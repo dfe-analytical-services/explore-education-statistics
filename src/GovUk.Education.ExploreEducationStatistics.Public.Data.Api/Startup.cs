@@ -338,7 +338,7 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
                 foreach (var description in (app as WebApplication)!.DescribeApiVersions())
                 {
                     options.SwaggerEndpoint(
-                        url: $"/swagger/v{description.GroupName}/openapi.json",
+                        url: $"{_appOptions.Url}/swagger/v{description.GroupName}/openapi.json",
                         name: $"v{description.GroupName}");
                 }
             });

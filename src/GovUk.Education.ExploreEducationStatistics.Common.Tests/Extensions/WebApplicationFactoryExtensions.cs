@@ -14,7 +14,7 @@ public static class WebApplicationFactoryExtensions
     {
         return app.WithWebHostBuilder(builder => builder.ConfigureServices(configureServices));
     }
-    
+
     public static WebApplicationFactory<TEntrypoint> ResetDbContext<TDbContext, TEntrypoint>(
         this WebApplicationFactory<TEntrypoint> app
     )
