@@ -14,7 +14,8 @@ variables:
   DotNetVersion: '8.0.x'
   NodeVersion: '20.16.0'
   RubyVersion: '3.2'
-  AcrServiceConnection: s101d-datahub-spn-ees-dfe-gov-uk-docker-managed-service-connection
+  OldAcrServiceConnection: s101d-datahub-spn-ees-dfe-gov-uk-docker-managed-service-connection
+  AcrServiceConnection: s101p-common-datahub-spn-ees-dfe-gov-uk-service-connection
   PublicApiDir: GovUk.Education.ExploreEducationStatistics.Public.Data.Api
   PublicApiDocsDir: explore-education-statistics-api-docs
 
@@ -163,6 +164,30 @@ jobs:
           projects: '**/GovUk.Education.ExploreEducationStatistics.Public.Data.Api.csproj'
           arguments: -r linux-musl-x64 --configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)/public-api
           zipAfterPublish: False
+      - task: Docker@2 # @MarkFix remove later
+        displayName: Build Public API Docker image
+        condition: and(succeeded(), eq(variables.IsBranchDeployable, true))
+        inputs:
+          containerRegistry: $(OldAcrServiceConnection)
+          repository: ees-public-api/api
+          command: build
+          Dockerfile: docker/public-api/Dockerfile
+          buildContext: $(Build.ArtifactStagingDirectory)/public-api/GovUk.Education.ExploreEducationStatistics.Public.Data.Api
+          tags: $(Build.BuildNumber)
+          arguments: --build-arg BUILD_BUILDNUMBER=$(Build.BuildNumber)
+        env:
+          DOCKER_BUILDKIT: 1
+
+      - task: Docker@2 # @MarkFix remove later
+        displayName: Push Public API Docker image
+        condition: and(succeeded(), eq(variables.IsBranchDeployable, true))
+        inputs:
+          containerRegistry: $(OldAcrServiceConnection)
+          repository: ees-public-api/api
+          command: push
+          tags: $(Build.BuildNumber)
+
+      # @MarkFix pushing to new ACR as well as old
       - task: Docker@2
         displayName: Build Public API Docker image
         condition: and(succeeded(), eq(variables.IsBranchDeployable, true))
@@ -176,7 +201,6 @@ jobs:
           arguments: --build-arg BUILD_BUILDNUMBER=$(Build.BuildNumber)
         env:
           DOCKER_BUILDKIT: 1
-
       - task: Docker@2
         displayName: Push Public API Docker image
         condition: and(succeeded(), eq(variables.IsBranchDeployable, true))
@@ -402,6 +426,30 @@ jobs:
           targetType: inline
           script: pnpm --filter=explore-education-statistics-frontend run build
 
+      - task: Docker@2 # @MarkFix remove later
+        displayName: Build Public frontend Docker image
+        condition: and(succeeded(), eq(variables.IsBranchDeployable, true))
+        inputs:
+          containerRegistry: $(OldAcrServiceConnection)
+          repository: ees-public-frontend
+          command: build
+          Dockerfile: docker/public-frontend/Dockerfile
+          buildContext: $(System.DefaultWorkingDirectory)
+          tags: $(Build.BuildNumber)
+          arguments: --build-arg BUILD_BUILDNUMBER=$(Build.BuildNumber)
+        env:
+          DOCKER_BUILDKIT: 1
+
+      - task: Docker@2 # @MarkFix remove later
+        displayName: Push Public frontend Docker image
+        condition: and(succeeded(), eq(variables.IsBranchDeployable, true))
+        inputs:
+          containerRegistry: $(OldAcrServiceConnection)
+          repository: ees-public-frontend
+          command: push
+          tags: $(Build.BuildNumber)
+
+      # @MarkFix publish image to new ACR and the old ACR at the same time
       - task: Docker@2
         displayName: Build Public frontend Docker image
         condition: and(succeeded(), eq(variables.IsBranchDeployable, true))
@@ -424,7 +472,6 @@ jobs:
           repository: ees-public-frontend
           command: push
           tags: $(Build.BuildNumber)
-
   - job: ApiDocs
     pool:
       vmImage: ubuntu-22.04
