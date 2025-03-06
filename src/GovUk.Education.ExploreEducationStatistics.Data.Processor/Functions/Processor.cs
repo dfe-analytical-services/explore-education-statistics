@@ -1,11 +1,11 @@
-using System;
-using System.Linq;
-using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Interfaces;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
+using System;
+using System.Linq;
+using System.Threading.Tasks;
 using static GovUk.Education.ExploreEducationStatistics.Data.Processor.Model.ProcessorQueues;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Functions
@@ -20,7 +20,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Functions
         private static readonly DataImportStatus[] RequeueMessageOnCompletionOfStages =
         [
             DataImportStatus.QUEUED,
-            DataImportStatus.PROCESSING_ARCHIVE_FILE,
             DataImportStatus.STAGE_1,
             DataImportStatus.STAGE_2
         ];
@@ -70,22 +69,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Functions
                             import.File.Filename);
                         break;
                     case DataImportStatus.QUEUED:
-                    case DataImportStatus.PROCESSING_ARCHIVE_FILE:
-                    {
-                        // This handles data sets from both dataZips and bulkDataZips
-                        if (import.ZipFile != null)
                         {
-                            _logger.LogInformation(
-                                "Unpacking data files for data file {DataFilename} for {ZipFilename}",
-                                import.File.Filename,
-                                import.ZipFile.Filename);
-                            
-                            await _processorService.ProcessUnpackingArchiveDataSet(import.Id);
+                            await _dataImportService.UpdateStatus(import.Id, DataImportStatus.STAGE_1, 0);
+                            break;
                         }
-
-                        await _dataImportService.UpdateStatus(import.Id, DataImportStatus.STAGE_1, 0);
-                        break;
-                    }
                     case DataImportStatus.STAGE_1:
                         await _processorService.ProcessStage1(import.Id);
                         await _dataImportService.UpdateStatus(import.Id, DataImportStatus.STAGE_2, 0);
