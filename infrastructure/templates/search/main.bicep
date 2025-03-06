@@ -61,6 +61,17 @@ var resourceNames = {
   }
 }
 
+// Create a shared Application Insights resource for Search resources to use.
+module applicationInsightsModule 'application/searchApplicationInsights.bicep' = {
+  name: 'searchApplicationInsightsModule'
+  params: {
+    location: location
+    resourcePrefix: resourcePrefix
+    resourceNames: resourceNames
+    tagValues: tagValues
+  }
+}
+
 module searchDocsFunctionModule 'application/searchDocsFunction.bicep' = {
   name: 'searchDocsFunctionModule'
   params: {
@@ -80,6 +91,7 @@ module searchDocsFunctionModule 'application/searchDocsFunction.bicep' = {
       maintenanceFirewallRules
     )
     storageFirewallRules: maintenanceIpRanges
+    applicationInsightsConnectionString: applicationInsightsModule.outputs.applicationInsightsConnectionString
     tagValues: tagValues
     deployAlerts: deployAlerts
   }
