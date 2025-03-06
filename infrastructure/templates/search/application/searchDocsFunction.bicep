@@ -61,6 +61,7 @@ module functionAppModule '../../common/components/functionApp.bicep' = {
       tier: 'ElasticPremium'
       family: 'EP'
     }
+    healthCheckPath: '/api/HealthCheck'
     operatingSystem: 'Linux'
     functionAppRuntime: 'dotnet-isolated'
     functionAppRuntimeVersion: '8.0'
