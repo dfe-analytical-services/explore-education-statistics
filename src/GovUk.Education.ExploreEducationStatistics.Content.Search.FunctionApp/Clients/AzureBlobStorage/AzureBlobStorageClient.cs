@@ -1,8 +1,10 @@
-﻿using Azure.Storage.Blobs;
+﻿using System.Diagnostics.CodeAnalysis;
+using Azure.Storage.Blobs;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Exceptions;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Clients.AzureBlobStorage;
 
+[ExcludeFromCodeCoverage]
 public class AzureBlobStorageClient(BlobServiceClient blobServiceClient) : IAzureBlobStorageClient
 {
     internal BlobServiceClient BlobServiceClient { get; } = blobServiceClient;
