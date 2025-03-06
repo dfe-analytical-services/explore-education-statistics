@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.DataImportStatus;
 
@@ -10,7 +10,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests
         {
             CANCELLING,
             QUEUED,
-            PROCESSING_ARCHIVE_FILE,
             FAILED,
             NOT_FOUND
         };
