@@ -128,11 +128,13 @@ public static class PublisherHostBuilderExtensions
                     .AddScoped<IReleaseVersionRepository, ReleaseVersionRepository>()
                     .AddScoped<IRedirectsCacheService, RedirectsCacheService>()
                     .AddScoped<IRedirectsService, RedirectsService>()
+                    .AddScoped<IEventRaiserService, EventRaiserService>()
                     .AddSingleton<INotifierClient, NotifierClient>(provider => new NotifierClient(
                         provider.GetRequiredService<IOptions<AppOptions>>().Value.NotifierStorageConnectionString))
                     .AddSingleton<IPublisherClient, PublisherClient>(provider => new PublisherClient(
                         provider.GetRequiredService<IOptions<AppOptions>>().Value.PublisherStorageConnectionString))
-                    .Configure<AppOptions>(configuration.GetSection(AppOptions.Section));
+                    .Configure<AppOptions>(configuration.GetSection(AppOptions.Section))
+                    .Configure<EventGridOptions>(configuration.GetSection(EventGridOptions.Section));
 
                 // TODO EES-5073 Remove this check when the Public Data db is available in all Azure environments.
                 if (publicDataDbExists)
