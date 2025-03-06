@@ -4,6 +4,7 @@ import React, { ReactNode } from 'react';
 
 interface Props {
   children?: ReactNode;
+  className?: string;
   fullWidthContent?: boolean;
   heading?: string;
   role?: 'region' | 'alert';
@@ -13,6 +14,7 @@ interface Props {
 
 const NotificationBanner = ({
   children,
+  className,
   fullWidthContent = false,
   heading,
   role = 'region',
@@ -24,6 +26,7 @@ const NotificationBanner = ({
       aria-labelledby="govuk-notification-banner-title"
       className={classNames(
         'govuk-notification-banner govuk-!-margin-bottom-6',
+        className,
         {
           [styles.fullWidthContent]: fullWidthContent,
           [styles.error]: variant === 'error',
