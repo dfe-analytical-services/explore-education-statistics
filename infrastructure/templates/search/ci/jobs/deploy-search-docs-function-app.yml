@@ -23,6 +23,10 @@ jobs:
               displayName: Download Search Docs Function App artifact
               artifact: search-function-app
 
+            - template: ../../../public-api/ci/tasks/bicep-output-variables.yml
+              parameters:
+                serviceConnection: ${{ parameters.serviceConnection }}
+
             - task: AzureCLI@2
               displayName: 'Deploy Search Docs Function App using az cli'
               retryCountOnTaskFailure: 1
@@ -37,3 +41,10 @@ jobs:
                     --resource-group $(resourceGroupName) \
                     --name $(searchDocsFunctionAppName) \
                     --src '$(Pipeline.Workspace)/MainBuild/search-function-app/GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.zip'
+
+            - template: ../../../public-api/ci/tasks/wait-for-endpoint-success.yml
+              parameters:
+                serviceConnection: ${{ parameters.serviceConnection }}
+                displayName: Check the Search Docs Function App is healthy after deployment
+                endpoint: $(searchDocsFunctionAppUrl)/api/HealthCheck
+
