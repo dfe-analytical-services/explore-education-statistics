@@ -1,3 +1,4 @@
+import { ExportButtonContext } from '@common/components/ExportButtonMenu';
 import FigureFootnotes from '@common/components/FigureFootnotes';
 import HorizontalBarBlock, {
   HorizontalBarProps,
@@ -14,7 +15,7 @@ import MapBlock, {
 import VerticalBarBlock, {
   VerticalBarProps,
 } from '@common/modules/charts/components/VerticalBarBlock';
-import React, { memo, useMemo } from 'react';
+import React, { memo, useContext, useMemo } from 'react';
 
 type HorizontalBarRendererProps = {
   type: 'horizontalbar';
@@ -51,6 +52,8 @@ export interface ChartRendererProps {
 
 function ChartRenderer({ source, id, chart }: ChartRendererProps) {
   const { data, meta, subtitle, title, type } = chart;
+
+  const searchInputRef = useContext(ExportButtonContext);
 
   const chartComponent = useMemo(() => {
     switch (chart.type) {
@@ -89,7 +92,7 @@ function ChartRenderer({ source, id, chart }: ChartRendererProps) {
     }
 
     return (
-      <figure className="govuk-!-margin-0" id={id} data-testid={id}>
+      <figure ref={searchInputRef} className="govuk-!-margin-0" id={id} data-testid={id}>
         {title && (
           <figcaption>
             <p

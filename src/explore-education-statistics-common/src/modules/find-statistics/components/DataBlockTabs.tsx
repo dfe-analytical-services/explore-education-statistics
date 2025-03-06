@@ -1,4 +1,5 @@
 import ErrorBoundary from '@common/components/ErrorBoundary';
+import RefComponent, { ExportButtonContext } from '@common/components/ExportButtonMenu';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
@@ -11,7 +12,7 @@ import TimePeriodDataTable from '@common/modules/table-tool/components/TimePerio
 import getDefaultTableHeaderConfig from '@common/modules/table-tool/utils/getDefaultTableHeadersConfig';
 import mapTableHeadersConfig from '@common/modules/table-tool/utils/mapTableHeadersConfig';
 import { DataBlock } from '@common/services/types/blocks';
-import React, { ReactNode } from 'react';
+import React, { ReactNode, useRef } from 'react';
 
 const testId = (dataBlock: DataBlock) => `Data block - ${dataBlock.name}`;
 
@@ -50,6 +51,7 @@ const DataBlockTabs = ({
     releaseId,
     getInfographic,
   });
+  const exportRef = useRef(null);
 
   const errorMessage = <WarningMessage>Could not load content</WarningMessage>;
   if (isTableDataError) return errorMessage;
@@ -59,6 +61,8 @@ const DataBlockTabs = ({
       ? additionalTabContent({ dataBlock })
       : additionalTabContent;
   return (
+    <ExportButtonContext.Provider value={exportRef}>
+      <RefComponent />
     <LoadingSpinner loading={isTableDataLoading || isGeoJsonInitialLoading}>
       <Tabs id={id} testId={testId(dataBlock)} onToggle={onToggle}>
         {firstTabs}
@@ -137,6 +141,7 @@ const DataBlockTabs = ({
         {lastTabs}
       </Tabs>
     </LoadingSpinner>
+    </ExportButtonContext.Provider>
   );
 };
 

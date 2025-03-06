@@ -92,7 +92,7 @@ const ChartBuilderTabSection = ({
         ...query,
         ...updatedQuery,
       };
-
+      
       // Don't fetch table data again if queries are the same
       if (isEqual(query, nextQuery)) {
         return;
@@ -113,16 +113,16 @@ const ChartBuilderTabSection = ({
   );
 
   return (
-    <ChartBuilder
-      releaseId={releaseId}
-      data={table.results}
-      meta={meta}
-      initialChart={dataBlock.charts[0]}
-      tableTitle={dataBlock.heading}
-      onChartSave={handleChartSave}
-      onChartDelete={handleChartDelete}
-      onTableQueryUpdate={handleTableQueryUpdate}
-    />
+      <ChartBuilder
+        releaseId={releaseId}
+        data={table.results}
+        meta={meta}
+        initialChart={dataBlock.charts[0]}
+        tableTitle={dataBlock.heading}
+        onChartSave={handleChartSave}
+        onChartDelete={handleChartDelete}
+        onTableQueryUpdate={handleTableQueryUpdate}
+      />
   );
 };
 

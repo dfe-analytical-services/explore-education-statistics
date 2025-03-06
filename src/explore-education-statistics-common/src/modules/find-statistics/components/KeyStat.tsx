@@ -1,15 +1,23 @@
 import Details from '@common/components/Details';
 import KeyStatTile from '@common/modules/find-statistics/components/KeyStatTile';
-import React, { ReactNode } from 'react';
+import React, { ReactNode, RefObject, useCallback, useContext } from 'react';
 import ReactMarkdown from 'react-markdown';
 import styles from '@common/modules/find-statistics/components/KeyStat.module.scss';
+import { ExportButtonContext } from '@common/components/ExportButtonMenu';
 
 interface KeyStatContainerProps {
   children: ReactNode;
 }
 
 export const KeyStatContainer = ({ children }: KeyStatContainerProps) => {
-  return <div className={styles.container}>{children}</div>;
+  const test = useContext(ExportButtonContext)
+
+  const measuredRef = useCallback(() : RefObject<HTMLDivElement> | null => {
+      console.log(test);
+      return test;
+  }, [test]);
+
+  return <div ref={measuredRef} className={styles.container}>{children}</div>;
 };
 
 interface KeyStatWrapperProps {
@@ -47,7 +55,7 @@ const KeyStat = ({
   trend,
 }: KeyStatProps) => {
   const body = (
-    <>
+    <div>
       <KeyStatTile title={title} value={statistic} testId={testId}>
         {trend && (
           <p className="govuk-body-s" data-testid={`${testId}-trend`}>
@@ -69,7 +77,7 @@ const KeyStat = ({
       )}
 
       {children}
-    </>
+    </div>
   );
 
   return includeWrapper ? (
