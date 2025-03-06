@@ -63,7 +63,7 @@ const PublicationReleasesPage = () => {
       />
 
       <PublicationPublishedReleases
-        publicationId={publicationId}
+        publication={publication}
         refetchRef={publishedReleasesRefetchRef}
         onEdit={onEditingPublishedRelease}
       />
