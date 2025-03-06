@@ -96,3 +96,4 @@ module failedRequestsAlert 'alerts/dynamicMetricAlert.bicep' = if (alerts != nul
 
 output applicationInsightsKey string = applicationInsights.properties.InstrumentationKey
 output applicationInsightsConnectionString string = applicationInsights.properties.ConnectionString
+output applicationInsightsName string = applicationInsights.name
