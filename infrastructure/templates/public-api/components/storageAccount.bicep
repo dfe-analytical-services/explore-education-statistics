@@ -20,7 +20,7 @@ param sku 'Standard_LRS' | 'Standard_GRS' | 'Standard_RAGRS' | 'Standard_ZRS' | 
 @description('Storage Account kind')
 param kind 'StorageV2' | 'FileStorage' = 'StorageV2'
 
-@description('Storage Account Name')
+@description('Key Vault Name')
 param keyVaultName string
 
 @description('Whether the storage account is accessible from the public internet')
@@ -56,13 +56,13 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2023-05-01' = {
       bypass: 'AzureServices'
       defaultAction: 'Deny'
       ipRules: [for firewallRule in firewallRules: {
-        value: firewallRule.cidr
-        action: 'Allow'
+          value: firewallRule.cidr
+          action: 'Allow'
       }]
       virtualNetworkRules: [for subnetId in allowedSubnetIds: {
-        #disable-next-line use-resource-id-functions
-        id: subnetId
-        action: 'Allow'
+          #disable-next-line use-resource-id-functions
+          id: subnetId
+          action: 'Allow'
       }]
     }
   }
