@@ -1,9 +1,11 @@
-﻿using System.Net.Http.Json;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Net.Http.Json;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Domain;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Exceptions;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Clients.ContentApi;
 
+[ExcludeFromCodeCoverage]
 internal class ContentApiClient(HttpClient httpClient) : IContentApiClient
 {
     internal HttpClient HttpClient { get; } = httpClient;

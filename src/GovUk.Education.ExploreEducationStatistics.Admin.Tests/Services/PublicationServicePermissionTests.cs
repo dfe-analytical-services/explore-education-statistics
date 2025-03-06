@@ -218,7 +218,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Title = "Old publication title",
                 Slug = "publication-slug",
                 Theme = new() { Title = "Old theme title" },
-                SupersededById = Guid.NewGuid(),
+                SupercededById = Guid.NewGuid(),
             };
 
             var contextId = Guid.NewGuid().ToString();

@@ -34,7 +34,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
             Publication publication)
         {
             // No user is allowed to create a new methodology of an archived or to-be-archived publication
-            if (publication.SupersededById.HasValue)
+            if (publication.SupercededById.HasValue)
             {
                 return;
             }

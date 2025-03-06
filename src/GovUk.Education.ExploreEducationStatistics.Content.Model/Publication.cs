@@ -36,7 +36,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
         public Contact Contact { get; set; } = null!;
 
-        public Guid? SupersededById { get; set; }
+        public Guid? SupercededById { get; set; }
 
         public Publication? SupersededBy { get; set; }
 

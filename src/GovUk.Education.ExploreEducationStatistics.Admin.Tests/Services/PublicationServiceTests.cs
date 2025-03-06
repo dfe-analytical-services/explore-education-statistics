@@ -652,7 +652,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 Assert.Equal(publication.Id, result.Id);
 
-                Assert.Equal(publication.SupersededById, result.SupersededById);
+                Assert.Equal(publication.SupercededById, result.SupersededById);
                 Assert.True(result.IsSuperseded);
             }
         }
@@ -688,7 +688,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 Assert.Equal(publication.Id, result.Id);
 
-                Assert.Equal(publication.SupersededById, result.SupersededById);
+                Assert.Equal(publication.SupercededById, result.SupersededById);
                 Assert.False(result.IsSuperseded);
             }
         }
@@ -968,7 +968,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     TeamName = "Old team",
                     TeamEmail = "old.smith@test.com",
                 },
-                SupersededById = Guid.NewGuid(),
+                SupercededById = Guid.NewGuid(),
             };
 
             var contextId = Guid.NewGuid().ToString();
@@ -1032,7 +1032,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 updatedPublication.Updated.AssertUtcNow();
                 Assert.Equal("new-title", updatedPublication.Slug);
                 Assert.Equal("New title", updatedPublication.Title);
-                Assert.Equal(newSupersededById, updatedPublication.SupersededById);
+                Assert.Equal(newSupersededById, updatedPublication.SupercededById);
 
                 Assert.Equal("Old name", updatedPublication.Contact.ContactName);
                 Assert.Equal("0987654321", updatedPublication.Contact.ContactTelNo);
@@ -1185,7 +1185,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(theme.Id, updatedPublication.ThemeId);
                 Assert.Equal("New theme", updatedPublication.Theme.Title);
 
-                Assert.Equal(newSupersededById, updatedPublication.SupersededById);
+                Assert.Equal(newSupersededById, updatedPublication.SupercededById);
 
                 var publicationRedirects = await context.PublicationRedirects
                     .ToListAsync();
@@ -1350,7 +1350,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     TeamName = "Old team",
                     TeamEmail = "old.smith@test.com",
                 },
-                SupersededById = Guid.NewGuid(),
+                SupercededById = Guid.NewGuid(),
             };
 
             var contextId = Guid.NewGuid().ToString();
@@ -1378,7 +1378,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         Title = "Old title",
                         Summary = "New summary",
                         ThemeId = theme.Id,
-                        SupersededById = publication.SupersededById,
+                        SupersededById = publication.SupercededById,
                     }
                 );
 
@@ -1388,7 +1388,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 Assert.Equal("Old title", viewModel.Title);
                 Assert.Equal("New summary", viewModel.Summary);
-                Assert.Equal(publication.SupersededById, viewModel.SupersededById);
+                Assert.Equal(publication.SupercededById, viewModel.SupersededById);
             }
         }
 

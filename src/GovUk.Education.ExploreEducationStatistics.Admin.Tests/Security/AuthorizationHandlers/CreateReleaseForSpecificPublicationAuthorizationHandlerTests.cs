@@ -30,7 +30,7 @@ public class CreateReleaseForSpecificPublicationAuthorizationHandlerTests
     private static readonly Publication PublicationArchived = new()
     {
         Id = Guid.NewGuid(),
-        SupersededById = Guid.NewGuid()
+        SupercededById = Guid.NewGuid()
     };
 
     private static readonly DataFixture DataFixture = new();

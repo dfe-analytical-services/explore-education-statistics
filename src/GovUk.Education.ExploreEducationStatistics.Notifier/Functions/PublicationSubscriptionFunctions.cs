@@ -195,7 +195,7 @@ public class PublicationSubscriptionFunctions(
                 rowKey: email);
 
         var supersededPublicationIds = await contentDbContext.Publications
-            .Where(p => p.SupersededById == Guid.Parse(publicationId))
+            .Where(p => p.SupercededById == Guid.Parse(publicationId))
             .Select(p => p.Id)
             .ToListAsync();
 

@@ -90,7 +90,7 @@ public class PublishingCompletionService(
         var publicationSlugsToUpdate = await contentDbContext
             .Publications
             .Where(p => directlyRelatedPublicationIds.Contains(p.Id) ||
-                        (p.SupersededById != null && directlyRelatedPublicationIds.Contains(p.SupersededById.Value)))
+                        (p.SupercededById != null && directlyRelatedPublicationIds.Contains(p.SupercededById.Value)))
             .Select(p => p.Slug)
             .ToListAsync();
 

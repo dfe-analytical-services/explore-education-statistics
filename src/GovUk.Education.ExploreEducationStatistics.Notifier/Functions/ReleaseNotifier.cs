@@ -58,7 +58,7 @@ public class ReleaseNotifier(
 
         // Then send emails to subscribers of any associated superseded publication
         var supersededPublicationList = await contentDbContext.Publications
-            .Where(p => p.SupersededById == msg.PublicationId)
+            .Where(p => p.SupercededById == msg.PublicationId)
             .ToListAsync();
 
         var numSupersededSubscriberEmailsSent = 0;

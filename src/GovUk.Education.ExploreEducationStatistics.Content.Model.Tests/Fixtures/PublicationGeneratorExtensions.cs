@@ -260,7 +260,7 @@ public static class PublicationGeneratorExtensions
     private static InstanceSetters<Publication> SetSupersededById(
         this InstanceSetters<Publication> setters,
         Guid? supersededById)
-        => setters.Set(p => p.SupersededById, supersededById);
+        => setters.Set(p => p.SupercededById, supersededById);
 
     private static InstanceSetters<Publication> SetThemeId(
         this InstanceSetters<Publication> setters,
