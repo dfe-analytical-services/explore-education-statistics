@@ -11,6 +11,10 @@
         <RootNamespace>GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests</RootNamespace>
     </PropertyGroup>
 
+  <ItemGroup>
+    <AssemblyAttribute Include="System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverageAttribute" />
+  </ItemGroup>
+
     <ItemGroup>
         <CompilerVisibleProperty Include="RootNamespace" />
         <CompilerVisibleProperty Include="ProjectDir" />
