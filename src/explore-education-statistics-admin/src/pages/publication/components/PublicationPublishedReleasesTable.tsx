@@ -13,6 +13,7 @@ import Tag from '@common/components/Tag';
 import VisuallyHidden from '@common/components/VisuallyHidden';
 import React, { useEffect, useRef } from 'react';
 import { generatePath } from 'react-router';
+import { Publication } from '@admin/services/publicationService';
 import { PublishedStatusGuidanceModal } from './PublicationGuidance';
 import ReleaseLabelEditModal, {
   ReleaseLabelFormValues,
@@ -20,7 +21,7 @@ import ReleaseLabelEditModal, {
 
 interface PublishedReleasesTableProps {
   focusReleaseId?: string;
-  publicationId: string;
+  publication: Publication;
   releases: ReleaseVersionSummaryWithPermissions[];
   onAmend: (releaseVersionId: string) => void;
   onEdit: (
@@ -31,7 +32,7 @@ interface PublishedReleasesTableProps {
 
 export default function PublicationPublishedReleasesTable({
   focusReleaseId,
-  publicationId,
+  publication,
   releases,
   onAmend,
   onEdit,
@@ -88,7 +89,7 @@ export default function PublicationPublishedReleasesTable({
                     to={generatePath<ReleaseRouteParams>(
                       releaseSummaryRoute.path,
                       {
-                        publicationId,
+                        publicationId: publication.id,
                         releaseVersionId: release.id,
                       },
                     )}
@@ -103,6 +104,9 @@ export default function PublicationPublishedReleasesTable({
                 )}
                 {release.permissions.canUpdateRelease && (
                   <ReleaseLabelEditModal
+                    currentReleaseSlug={release.slug}
+                    publicationSlug={publication.slug}
+                    initialValues={{ label: release.label }}
                     triggerButton={
                       <ButtonText
                         className={`govuk-!-display-inline-block ${
@@ -114,7 +118,6 @@ export default function PublicationPublishedReleasesTable({
                         Edit details
                       </ButtonText>
                     }
-                    initialValues={{ label: release.label }}
                     onSubmit={formValues =>
                       onEdit(release.releaseId, formValues)
                     }

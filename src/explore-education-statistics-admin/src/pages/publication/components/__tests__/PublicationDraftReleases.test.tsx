@@ -24,7 +24,8 @@ describe('PublicationDraftReleases', () => {
   const testRelease1: ReleaseVersionSummaryWithPermissions = {
     amendment: false,
     approvalStatus: 'Draft',
-    id: 'release-1',
+    id: 'release-1-version-1',
+    releaseId: 'release-1',
     live: false,
     permissions: {
       canAddPrereleaseUsers: false,

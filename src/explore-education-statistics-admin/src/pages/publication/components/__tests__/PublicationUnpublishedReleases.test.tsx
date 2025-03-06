@@ -36,7 +36,8 @@ describe('PublicationUnpublishedReleases', () => {
   const testRelease1: ReleaseVersionSummaryWithPermissions = {
     amendment: false,
     approvalStatus: 'Approved',
-    id: 'release-1',
+    id: 'release-1-version-1',
+    releaseId: 'release-1',
     live: false,
     permissions: testPermissions,
     publishScheduled: '2022-01-01T00:00:00',
@@ -55,7 +56,8 @@ describe('PublicationUnpublishedReleases', () => {
   const testRelease2: ReleaseVersionSummaryWithPermissions = {
     amendment: false,
     approvalStatus: 'Draft',
-    id: 'release-2',
+    id: 'release-2-version-1',
+    releaseId: 'release-2',
     live: false,
     permissions: testPermissions,
     slug: 'release-2-slug',
@@ -73,7 +75,8 @@ describe('PublicationUnpublishedReleases', () => {
   const testRelease3: ReleaseVersionSummaryWithPermissions = {
     amendment: true,
     approvalStatus: 'HigherLevelReview',
-    id: 'release-3',
+    id: 'release-version-1',
+    releaseId: 'release-3',
     live: false,
     permissions: testPermissions,
     slug: 'release-3-slug',
