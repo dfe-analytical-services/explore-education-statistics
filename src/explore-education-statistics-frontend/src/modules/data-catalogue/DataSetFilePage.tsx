@@ -207,7 +207,7 @@ export default function DataSetFilePage({
           </div>
 
           <div className={styles.subscribeContainer}>
-            <ContentHtml html={summary} />
+            <ContentHtml className="dfe-flex-grow--1" html={summary} />
             {apiDataSet && (
               <SubscribeLink
                 url={`/api-subscriptions/new-subscription/${dataSetFile.id}`}
