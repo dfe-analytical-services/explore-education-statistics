@@ -15,10 +15,11 @@ import { useInfiniteQuery } from '@tanstack/react-query';
 import last from 'lodash/last';
 import React, { MutableRefObject, useEffect, useMemo, useState } from 'react';
 import { generatePath, useHistory } from 'react-router';
+import { Publication } from '@admin/services/publicationService';
 import { ReleaseLabelFormValues } from './ReleaseLabelEditModal';
 
 interface Props {
-  publicationId: string;
+  publication: Publication;
   pageSize?: number;
   refetchRef?: MutableRefObject<() => void>;
   onEdit: (
@@ -28,7 +29,7 @@ interface Props {
 }
 
 export default function PublicationPublishedReleases({
-  publicationId,
+  publication,
   pageSize = 5,
   refetchRef,
   onEdit,
@@ -47,7 +48,7 @@ export default function PublicationPublishedReleases({
     refetch,
   } = useInfiniteQuery({
     ...publicationQueries.listPublishedReleaseVersionsWithPermissions(
-      publicationId,
+      publication.id,
       pageSize,
     ),
     ...{
@@ -103,14 +104,14 @@ export default function PublicationPublishedReleases({
           <>
             <PublicationPublishedReleasesTable
               focusReleaseId={focusReleaseId}
-              publicationId={publicationId}
+              publication={publication}
               releases={allReleases}
               onAmend={async id => {
                 const { id: amendmentId } =
                   await releaseVersionService.createReleaseVersionAmendment(id);
                 history.push(
                   generatePath<ReleaseRouteParams>(releaseSummaryRoute.path, {
-                    publicationId,
+                    publicationId: publication.id,
                     releaseVersionId: amendmentId,
                   }),
                 );

@@ -15,7 +15,8 @@ const releaseVersionService = _releaseVersionService as jest.Mocked<
 describe('ScheduledReleasesTable', () => {
   const testReleases: DashboardReleaseVersionSummary[] = [
     {
-      id: 'release-1',
+      id: 'release-1-version-1',
+      releaseId: 'release-1',
       latestRelease: true,
       publishScheduled: '2021-06-30T00:00:00',
       slug: 'release-1-slug',
@@ -52,7 +53,8 @@ describe('ScheduledReleasesTable', () => {
       approvalStatus: 'Approved',
     },
     {
-      id: 'release-2',
+      id: 'release-2-version-1',
+      releaseId: 'release-2',
       latestRelease: true,
       publishScheduled: '2021-05-30T00:00:00',
       slug: 'release-2-slug',
@@ -89,11 +91,12 @@ describe('ScheduledReleasesTable', () => {
       approvalStatus: 'Approved',
     },
     {
-      id: 'release-3',
+      id: 'release-1-version-2',
+      releaseId: 'release-1',
       latestRelease: false,
       publishScheduled: '2021-01-01T00:00:00',
-      slug: 'release-3-slug',
-      title: 'Release 3',
+      slug: 'release-1-slug',
+      title: 'Release 1',
       amendment: false,
       live: false,
       year: 2021,
@@ -126,11 +129,12 @@ describe('ScheduledReleasesTable', () => {
       approvalStatus: 'Approved',
     },
     {
-      id: 'release-4',
+      id: 'release-3-version-1',
+      releaseId: 'release-3',
       latestRelease: true,
       publishScheduled: '2021-05-30T00:00:00',
-      slug: 'release-4-slug',
-      title: 'Release 4',
+      slug: 'release-3-slug',
+      title: 'Release 3',
       amendment: false,
       live: false,
       year: 2021,

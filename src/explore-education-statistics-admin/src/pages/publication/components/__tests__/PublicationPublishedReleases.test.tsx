@@ -2,7 +2,9 @@ import PublicationPublishedReleases from '@admin/pages/publication/components/Pu
 import _releaseVersionService, {
   ReleaseVersionSummaryWithPermissions,
 } from '@admin/services/releaseVersionService';
-import _publicationService from '@admin/services/publicationService';
+import _publicationService, {
+  Publication,
+} from '@admin/services/publicationService';
 import baseRender from '@common-test/render';
 import { PaginatedList } from '@common/services/types/pagination';
 import { screen, waitFor, within } from '@testing-library/react';
@@ -11,6 +13,7 @@ import { createMemoryHistory } from 'history';
 import { produce } from 'immer';
 import React, { ReactElement } from 'react';
 import { MemoryRouter, Router } from 'react-router-dom';
+import { noop } from 'lodash';
 
 jest.mock('@admin/services/releaseVersionService');
 const releaseVersionService = _releaseVersionService as jest.Mocked<
@@ -23,12 +26,22 @@ const publicationService = _publicationService as jest.Mocked<
 >;
 
 describe('PublicationPublishedReleases', () => {
-  const testPublicationId = 'publication-1';
+  const testPublication: Publication = {
+    id: 'publication-1',
+    slug: 'publication-1-slug',
+    title: 'Publication 1',
+    summary: 'Publication 1 summary',
+    theme: {
+      id: 'theme-1',
+      title: 'Theme 1',
+    },
+  };
 
   const testRelease1: ReleaseVersionSummaryWithPermissions = {
     amendment: false,
     approvalStatus: 'Approved',
-    id: 'release-1',
+    id: 'release-1-version-1',
+    releaseId: 'release-1',
     live: true,
     permissions: {
       canAddPrereleaseUsers: false,
@@ -145,7 +158,12 @@ describe('PublicationPublishedReleases', () => {
   test('renders the published releases table once loaded', async () => {
     publicationService.listReleaseVersions.mockResolvedValue(testReleasesPage1);
 
-    render(<PublicationPublishedReleases publicationId={testPublicationId} />);
+    render(
+      <PublicationPublishedReleases
+        publication={testPublication}
+        onEdit={Promise.resolve}
+      />,
+    );
 
     await waitFor(() => {
       expect(
@@ -250,7 +268,12 @@ describe('PublicationPublishedReleases', () => {
       }),
     );
 
-    render(<PublicationPublishedReleases publicationId={testPublicationId} />);
+    render(
+      <PublicationPublishedReleases
+        publication={testPublication}
+        onEdit={Promise.resolve}
+      />,
+    );
 
     await waitFor(() => {
       expect(
@@ -268,7 +291,12 @@ describe('PublicationPublishedReleases', () => {
       .mockResolvedValueOnce(testReleasesPage1)
       .mockResolvedValueOnce(testReleasesPage2);
 
-    render(<PublicationPublishedReleases publicationId={testPublicationId} />);
+    render(
+      <PublicationPublishedReleases
+        publication={testPublication}
+        onEdit={Promise.resolve}
+      />,
+    );
 
     await waitFor(() => {
       expect(
@@ -341,7 +369,11 @@ describe('PublicationPublishedReleases', () => {
 
     baseRender(
       <Router history={history}>
-        <PublicationPublishedReleases publicationId={testPublicationId} />,
+        <PublicationPublishedReleases
+          publication={testPublication}
+          onEdit={Promise.resolve}
+        />
+        ,
       </Router>,
     );
 
@@ -392,7 +424,12 @@ describe('PublicationPublishedReleases', () => {
       }),
     );
 
-    render(<PublicationPublishedReleases publicationId={testPublicationId} />);
+    render(
+      <PublicationPublishedReleases
+        publication={testPublication}
+        onEdit={Promise.resolve}
+      />,
+    );
 
     await waitFor(() => {
       expect(

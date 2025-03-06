@@ -22,7 +22,8 @@ describe('PublicationScheduledReleases', () => {
   const testRelease1: ReleaseVersionSummaryWithPermissions = {
     amendment: false,
     approvalStatus: 'Approved',
-    id: 'release-1',
+    id: 'release-1-version-1',
+    releaseId: 'release-1',
     live: false,
     permissions: {
       canAddPrereleaseUsers: false,
