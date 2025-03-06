@@ -58,6 +58,9 @@ param publicNetworkAccessEnabled bool = false
 @description('IP address ranges that are allowed to access the Function App endpoints. Dependent on "publicNetworkAccessEnabled" being true.')
 param functionAppFirewallRules FirewallRule[] = []
 
+@description('Specifies an optional URL for Azure to use to monitor the health of this resource')
+param healthCheckPath string?
+
 @description('An existing Managed Identity\'s Resource Id with which to associate this Function App.')
 param userAssignedManagedIdentityParams {
   id: string
@@ -243,6 +246,7 @@ resource functionApp 'Microsoft.Web/sites@2024-04-01' = {
       ]
       ftpsState: 'FtpsOnly'
       functionAppScaleLimit: maximumInstanceCount
+      healthCheckPath: healthCheckPath
       minTlsVersion: '1.3'
       netFrameworkVersion: functionAppRuntimeVersion
       linuxFxVersion: operatingSystem == 'Linux' ? 'DOTNET-ISOLATED|8.0' : null
