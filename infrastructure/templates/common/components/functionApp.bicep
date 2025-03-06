@@ -58,6 +58,9 @@ param publicNetworkAccessEnabled bool = false
 @description('IP address ranges that are allowed to access the Function App endpoints. Dependent on "publicNetworkAccessEnabled" being true.')
 param functionAppFirewallRules FirewallRule[] = []
 
+@description('Specifies the list of origins that should be allowed to make cross-origin calls.')
+param allowedOrigins array = []
+
 @description('Specifies an optional URL for Azure to use to monitor the health of this resource')
 param healthCheckPath string?
 
@@ -244,6 +247,10 @@ resource functionApp 'Microsoft.Web/sites@2024-04-01' = {
           value: !functionAppExists ? '1' : null
         }
       ]
+      cors: {
+        allowedOrigins: union(['https://portal.azure.com'], allowedOrigins)
+        supportCredentials: false
+      }
       ftpsState: 'FtpsOnly'
       functionAppScaleLimit: maximumInstanceCount
       healthCheckPath: healthCheckPath
