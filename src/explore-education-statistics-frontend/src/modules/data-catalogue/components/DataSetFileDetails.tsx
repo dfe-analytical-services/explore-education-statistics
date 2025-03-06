@@ -36,7 +36,7 @@ export default function DataSetFileDetails({
       heading={pageSections.dataSetDetails}
       id="dataSetDetails"
     >
-      <SummaryList noBorder>
+      <SummaryList>
         <SummaryListItem term="Theme">
           {release.publication.themeTitle}
         </SummaryListItem>
