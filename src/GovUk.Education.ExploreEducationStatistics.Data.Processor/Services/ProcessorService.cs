@@ -1,6 +1,4 @@
 #nullable enable
-using System;
-using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
@@ -10,6 +8,8 @@ using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Interfa
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using System;
+using System.Threading.Tasks;
 using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainers;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
@@ -22,7 +22,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
         private readonly IImporterService _importerService;
         private readonly IDataImportService _dataImportService;
         private readonly IValidatorService _validatorService;
-        private readonly IDataArchiveService _dataArchiveService;
         private readonly IDbContextSupplier _dbContextSupplier;
 
         public ProcessorService(
@@ -32,7 +31,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             IImporterService importerService,
             IDataImportService dataImportService,
             IValidatorService validatorService,
-            IDataArchiveService dataArchiveService,
             IDbContextSupplier dbContextSupplier)
         {
             _logger = logger;
@@ -41,14 +39,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             _importerService = importerService;
             _dataImportService = dataImportService;
             _validatorService = validatorService;
-            _dataArchiveService = dataArchiveService;
             _dbContextSupplier = dbContextSupplier;
-        }
-
-        public async Task ProcessUnpackingArchiveDataSet(Guid importId)
-        {
-            var import = await _dataImportService.GetImport(importId);
-            await _dataArchiveService.ExtractDataFiles(import);
         }
 
         public async Task ProcessStage1(Guid importId)
@@ -86,11 +77,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             var subjectMeta = await _importerService.ImportMeta(metaFileCsvHeaders, metaFileCsvRows, subject, statisticsDbContext);
             await _fileImportService.ImportFiltersAndLocations(import.Id, subjectMeta, statisticsDbContext);
         }
-        
+
         public async Task ProcessStage3(Guid importId)
         {
             var import = await _dataImportService.GetImport(importId);
-            
+
             try
             {
                 await _fileImportService.ImportObservations(import, _dbContextSupplier.CreateDbContext<StatisticsDbContext>());
@@ -112,7 +103,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 var mainException = e.InnerException ?? e;
 
                 _logger.LogError(
-                    mainException, 
+                    mainException,
                     "ProcessStage3 FAILED for Import: {ImportId} : {Message}",
                     import.Id,
                     mainException.Message);
