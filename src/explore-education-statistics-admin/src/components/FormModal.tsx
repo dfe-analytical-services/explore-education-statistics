@@ -27,10 +27,6 @@ interface Props<TFormValues extends FieldValues> {
     | ((formValues?: TFormValues) => ReactNode);
 }
 
-function sleep(ms: number) {
-  return new Promise(resolve => setTimeout(resolve, ms));
-}
-
 export default function FormModal<TFormValues extends FieldValues>({
   children,
   formId,
@@ -74,8 +70,6 @@ export default function FormModal<TFormValues extends FieldValues>({
 
     await onSubmit(values);
 
-    await sleep(10000);
-
     if (isMounted.current) {
       toggleSubmitting.off();
       toggleOpen.off();
@@ -97,7 +91,7 @@ export default function FormModal<TFormValues extends FieldValues>({
         validationSchema={validationSchema}
       >
         <Form id={formId} onSubmit={handleSubmit} onChange={onChange}>
-          {children}
+          {!confirmationWarning && children}
           {confirmationWarning && <>{confirmationWarningTextWrapper()}</>}
           <ButtonGroup>
             {confirmationWarning ? (
@@ -113,7 +107,7 @@ export default function FormModal<TFormValues extends FieldValues>({
                   variant="secondary"
                   onClick={toggleConfirmationWarning.off}
                 >
-                  Abort
+                  Cancel
                 </Button>
               </>
             ) : (
@@ -121,11 +115,12 @@ export default function FormModal<TFormValues extends FieldValues>({
                 <Button
                   type={withConfirmationWarning ? 'button' : 'submit'}
                   className="govuk-button govuk-!-margin-right-1"
-                  onClick={
-                    withConfirmationWarning
-                      ? toggleConfirmationWarning.on
-                      : undefined
-                  }
+                  onClick={e => {
+                    if (withConfirmationWarning) {
+                      e.preventDefault();
+                      toggleConfirmationWarning.on();
+                    }
+                  }}
                 >
                   {submitText}
                 </Button>
