@@ -16,8 +16,8 @@ param resourceNames ResourceNames
 @description('Location for all resources.')
 param location string
 
-@description('The Application Insights key that is associated with this resource')
-param applicationInsightsKey string = ''
+@description('The Application Insights connection string that is associated with this resource.')
+param applicationInsightsConnectionString string = ''
 
 @description('Specifies whether or not the Search Docs Function App already exists.')
 param functionAppExists bool
@@ -44,7 +44,7 @@ module functionAppModule '../../common/components/functionApp.bicep' = {
   params: {
     functionAppName: resourceNames.search.searchDocsFunction
     location: location
-    applicationInsightsKey: applicationInsightsKey
+    applicationInsightsConnectionString: applicationInsightsConnectionString
     appServicePlanName: resourceNames.search.searchDocsFunction
     functionAppExists: functionAppExists
     keyVaultName: resourceNames.existingResources.keyVault

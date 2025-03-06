@@ -11,6 +11,7 @@ type ResourceNames = {
     }
   }
   search: {
+    applicationInsights: string
     searchDocsFunction: string
     searchDocsFunctionStorageAccount: string
     searchDocsStorageAccount: string

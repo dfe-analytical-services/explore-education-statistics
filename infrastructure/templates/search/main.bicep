@@ -73,10 +73,21 @@ var resourceNames = {
     }
   }
   search: {
+    applicationInsights: '${resourcePrefix}-${abbreviations.insightsComponents}-search'
     searchDocsFunction: '${resourcePrefix}-${abbreviations.webSitesFunctions}-searchdocs'
     searchDocsFunctionStorageAccount: '${replace(resourcePrefix, '-', '')}${abbreviations.storageStorageAccounts}searchdocsfn'
     searchDocsStorageAccount: '${replace(resourcePrefix, '-', '')}${abbreviations.storageStorageAccounts}searchdocs'
     searchService: '${resourcePrefix}-${abbreviations.searchSearchServices}'
+  }
+}
+
+// Create a shared Application Insights resource for Search resources to use.
+module applicationInsightsModule 'application/searchApplicationInsights.bicep' = {
+  name: 'searchApplicationInsightsModuleDeploy'
+  params: {
+    location: location
+    resourceNames: resourceNames
+    tagValues: tagValues
   }
 }
 
@@ -98,6 +109,7 @@ module searchDocsFunctionModule 'application/searchDocsFunction.bicep' = if (dep
       maintenanceFirewallRules
     )
     storageFirewallRules: maintenanceIpRanges
+    applicationInsightsConnectionString: applicationInsightsModule.outputs.connectionString
     tagValues: tagValues
     deployAlerts: deployAlerts
   }

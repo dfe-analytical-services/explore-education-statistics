@@ -34,8 +34,8 @@ param storageAccountPublicNetworkAccessEnabled bool = false
 @description('Specifies firewall rules for the storage account in use by the Function App.')
 param storageFirewallRules IpRange[] = []
 
-@description('The Application Insights key that is associated with this resource.')
-param applicationInsightsKey string
+@description('The Application Insights connection string that is associated with this resource.')
+param applicationInsightsConnectionString string
 
 @description('Set the amount of memory allocated to each instance of the function app in MB.')
 param instanceMemoryMB int = 2048
@@ -201,8 +201,8 @@ resource functionApp 'Microsoft.Web/sites@2024-04-01' = {
       alwaysOn: alwaysOn
       appSettings: [
         {
-          name: 'APPINSIGHTS_INSTRUMENTATIONKEY'
-          value: applicationInsightsKey
+          name: 'APPLICATIONINSIGHTS_CONNECTION_STRING'
+          value: applicationInsightsConnectionString
         }
         {
           name: 'AzureWebJobsStorage__accountName'

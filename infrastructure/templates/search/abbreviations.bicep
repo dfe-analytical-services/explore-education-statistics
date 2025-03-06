@@ -1,6 +1,8 @@
 // Originally sourced from https://github.com/Azure-Samples/todo-csharp-sql/blob/main/infra/abbreviations.json.
 @export()
 var abbreviations = {
+  // 'ai' is non-standard - it should be 'appi'
+  insightsComponents: 'ai'
   searchSearchServices: 'srch'
   // 'sa' is non-standard - it should be 'st'
   storageStorageAccounts: 'sa'
