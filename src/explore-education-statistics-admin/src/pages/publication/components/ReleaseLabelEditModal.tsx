@@ -3,6 +3,7 @@ import { useConfig } from '@admin/contexts/ConfigContext';
 import FormFieldTextInput from '@common/components/form/FormFieldTextInput';
 import UrlContainer from '@common/components/UrlContainer';
 import WarningMessage from '@common/components/WarningMessage';
+import { mapFieldErrors } from '@common/validation/serverValidations';
 import Yup from '@common/validation/yup';
 import React, { ReactNode } from 'react';
 import { ObjectSchema } from 'yup';
@@ -26,6 +27,20 @@ const validationSchema: ObjectSchema<ReleaseLabelFormValues> = Yup.object({
     'Release label must be no longer than ${max} characters',
   ),
 });
+
+const errorMappings = [
+  mapFieldErrors<ReleaseLabelFormValues>({
+    target: 'label',
+    messages: {
+      SlugNotUnique:
+        'A release with this label already exists in this publication for the same time period and year. Please choose a unique label.',
+      ReleaseUndergoingPublishing:
+        'Sorry, this release is currently undergoing publishing. Please wait until this has finished before changing the label.',
+      ReleaseSlugUsedByRedirect:
+        'This label previously been used by this release. Unfortunately, you cannot choose an historic label. Please choose another one.',
+    },
+  }),
+];
 
 const releaseSlugLabelSuffix = (label?: string) => {
   const lowercaseLabel = label?.toLowerCase();
@@ -61,19 +76,18 @@ export default function ReleaseLabelEditModal({
           Changing this release's label to <strong>{formValues?.label}</strong>{' '}
           will result in the release's public URL changing from
         </WarningMessage>
-        <p>
-          <UrlContainer
-            id="before-url"
-            label="Before URL"
-            url={`${publicAppUrl}/find-statistics/${publicationSlug}/${currentReleaseSlug}`}
-          />
-          to
-          <UrlContainer
-            id="after-url"
-            label="After URL"
-            url={`${publicAppUrl}/find-statistics/${publicationSlug}/${newReleaseSlug}`}
-          />
-        </p>
+        <UrlContainer
+          id="before-url"
+          label="Before URL"
+          url={`${publicAppUrl}/find-statistics/${publicationSlug}/${currentReleaseSlug}`}
+        />
+        to
+        <UrlContainer
+          id="after-url"
+          label="After URL"
+          url={`${publicAppUrl}/find-statistics/${publicationSlug}/${newReleaseSlug}`}
+        />
+        <br />
         <p>Any users visiting the old URL will be redirected to the new one.</p>
         <p>Are you sure you would like to proceed?</p>
       </>
@@ -82,11 +96,13 @@ export default function ReleaseLabelEditModal({
 
   return (
     <FormModal
+      className="govuk-!-width-two-thirds"
       formId="editReleaseLabelForm"
       title="Edit release label"
       triggerButton={triggerButton}
       initialValues={initialValues ?? { label: undefined }}
       validationSchema={validationSchema}
+      errorMappings={errorMappings}
       onSubmit={onSubmit}
       withConfirmationWarning
       confirmationWarningText={confirmationWarningText}

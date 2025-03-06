@@ -6,17 +6,22 @@ import LoadingSpinner from '@common/components/LoadingSpinner';
 import Modal from '@common/components/Modal';
 import useMountedRef from '@common/hooks/useMountedRef';
 import useToggle from '@common/hooks/useToggle';
+import { FieldMessageMapper } from '@common/validation/serverValidations';
 import React, { ReactNode, useState } from 'react';
 import { DeepPartial, FieldValues } from 'react-hook-form';
 import { ObjectSchema, Schema } from 'yup';
 
 interface Props<TFormValues extends FieldValues> {
   children: ReactNode;
+  className?: string;
   formId: string;
   title: string;
   triggerButton: ReactNode;
   initialValues?: TFormValues;
   validationSchema?: ObjectSchema<TFormValues> & Schema<TFormValues>;
+  errorMappings?:
+    | FieldMessageMapper<TFormValues>[]
+    | ((values: TFormValues) => FieldMessageMapper<TFormValues>[]);
   submitText?: string;
   cancelText?: string;
   hiddenSubmittingText?: string;
@@ -29,11 +34,13 @@ interface Props<TFormValues extends FieldValues> {
 
 export default function FormModal<TFormValues extends FieldValues>({
   children,
+  className,
   formId,
   title,
   triggerButton,
   initialValues,
   validationSchema,
+  errorMappings,
   submitText = 'Save',
   cancelText = 'Cancel',
   hiddenSubmittingText = 'Submitting',
@@ -78,6 +85,7 @@ export default function FormModal<TFormValues extends FieldValues>({
 
   return (
     <Modal
+      className={className}
       open={open}
       closeOnOutsideClick={!isSubmitting}
       closeOnEsc={!isSubmitting}
@@ -89,60 +97,78 @@ export default function FormModal<TFormValues extends FieldValues>({
       <FormProvider
         initialValues={formValues as DeepPartial<TFormValues>}
         validationSchema={validationSchema}
+        errorMappings={errorMappings}
+        mode="onBlur"
       >
-        <Form id={formId} onSubmit={handleSubmit} onChange={onChange}>
-          {!confirmationWarning && children}
-          {confirmationWarning && <>{confirmationWarningTextWrapper()}</>}
-          <ButtonGroup>
-            {confirmationWarning ? (
-              <>
-                <Button
-                  type="submit"
-                  className="govuk-button govuk-button--warning govuk-!-margin-right-1"
-                >
-                  Confirm
-                </Button>
-                <Button
-                  className="govuk-button govuk-button--secondary"
-                  variant="secondary"
-                  onClick={toggleConfirmationWarning.off}
-                >
-                  Cancel
-                </Button>
-              </>
-            ) : (
-              <>
-                <Button
-                  type={withConfirmationWarning ? 'button' : 'submit'}
-                  className="govuk-button govuk-!-margin-right-1"
-                  onClick={e => {
-                    if (withConfirmationWarning) {
-                      e.preventDefault();
-                      toggleConfirmationWarning.on();
-                    }
-                  }}
-                >
-                  {submitText}
-                </Button>
-                <Button
-                  className="govuk-button govuk-button--secondary"
-                  variant="secondary"
-                  onClick={toggleOpen.off}
-                >
-                  {cancelText}
-                </Button>
-              </>
-            )}
-            <LoadingSpinner
-              alert
-              inline
-              hideText
-              loading={isSubmitting}
-              size="sm"
-              text={hiddenSubmittingText}
-            />
-          </ButtonGroup>
-        </Form>
+        {({ formState }) => {
+          if (!formState.isValid) {
+            toggleSubmitting.off();
+            toggleConfirmationWarning.off();
+          }
+
+          return (
+            <Form id={formId} onSubmit={handleSubmit} onChange={onChange}>
+              {!confirmationWarning && children}
+              {confirmationWarning && <>{confirmationWarningTextWrapper()}</>}
+              <ButtonGroup>
+                {confirmationWarning ? (
+                  <>
+                    <Button
+                      type="submit"
+                      className="govuk-button govuk-button--warning govuk-!-margin-right-1"
+                    >
+                      Confirm
+                    </Button>
+                    <Button
+                      className="govuk-button govuk-button--secondary"
+                      variant="secondary"
+                      onClick={toggleConfirmationWarning.off}
+                    >
+                      Cancel
+                    </Button>
+                  </>
+                ) : (
+                  <>
+                    <Button
+                      type={withConfirmationWarning ? 'button' : 'submit'}
+                      className="govuk-button govuk-!-margin-right-1"
+                      onClick={e => {
+                        if (
+                          !formState.isValid ||
+                          Object.keys(formState.errors).length
+                        ) {
+                          return;
+                        }
+
+                        if (withConfirmationWarning) {
+                          e.preventDefault();
+                          toggleConfirmationWarning.on();
+                        }
+                      }}
+                    >
+                      {submitText}
+                    </Button>
+                    <Button
+                      className="govuk-button govuk-button--secondary"
+                      variant="secondary"
+                      onClick={toggleOpen.off}
+                    >
+                      {cancelText}
+                    </Button>
+                  </>
+                )}
+                <LoadingSpinner
+                  alert
+                  inline
+                  hideText
+                  loading={isSubmitting}
+                  size="sm"
+                  text={hiddenSubmittingText}
+                />
+              </ButtonGroup>
+            </Form>
+          );
+        }}
       </FormProvider>
     </Modal>
   );
