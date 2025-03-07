@@ -26,6 +26,9 @@ param dateProvisioned string = utcNow('u')
 @description('Do Azure Monitor alerts need creating or updating?')
 param deployAlerts bool = false
 
+@description('The URL of the Content API.')
+param contentApiUrl string
+
 @description('Specifies whether or not the Search Docs Function App already exists.')
 param searchDocsFunctionAppExists bool = true
 
@@ -78,6 +81,7 @@ module searchDocsFunctionModule 'application/searchDocsFunction.bicep' = {
     location: location
     resourceNames: resourceNames
     resourcePrefix: resourcePrefix
+    contentApiUrl: contentApiUrl
     functionAppExists: searchDocsFunctionAppExists
     functionAppFirewallRules: union(
       [
@@ -90,6 +94,9 @@ module searchDocsFunctionModule 'application/searchDocsFunction.bicep' = {
       ],
       maintenanceFirewallRules
     )
+    searchStorageAccountName: searchServiceModule.outputs.searchStorageAccountName
+    searchStorageAccountConnectionStringSecretName: searchServiceModule.outputs.searchStorageAccountConnectionStringSecretName
+    searchableDocumentsContainerName: searchServiceModule.outputs.searchableDocumentsContainerName
     storageFirewallRules: maintenanceIpRanges
     applicationInsightsConnectionString: applicationInsightsModule.outputs.applicationInsightsConnectionString
     tagValues: tagValues
