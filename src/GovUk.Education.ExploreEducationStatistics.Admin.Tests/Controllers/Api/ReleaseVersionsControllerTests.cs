@@ -39,11 +39,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
     public class ReleaseVersionsControllerUnitTests
     {
         private readonly Guid _releaseVersionId = Guid.NewGuid();
-        private readonly Guid _publicationId = Guid.NewGuid();
 
         [Fact]
         public async Task UploadDataSet_Success()
         {
+            // Arrange
             var dataFile = MockFile("datafile.csv");
             var metaFile = MockFile("metafile.csv");
 
@@ -60,18 +60,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                     dataFile,
                     metaFile,
                     "Data set title",
-                    null))
+                    null,
+                    default))
                 .ReturnsAsync(dataFileInfo);
 
-            // Call the method under test
+            // Act
             var controller = BuildController(releaseDataFileService: releaseDataFileService.Object);
 
-            var result = await controller.UploadDataSet(releaseVersionId: _releaseVersionId,
-                replacingFileId: null,
-                title: "Data set title",
-                file: dataFile,
-                metaFile: metaFile);
+            var result = await controller.UploadDataSet(
+                new()
+                {
+                    ReleaseVersionId = _releaseVersionId,
+                    DataSetTitle = "Data set title",
+                    DataFile = dataFile,
+                    MetaFile = metaFile,
+                    ReplacingFileId = null
+                },
+                cancellationToken: default);
 
+            // Assert
             VerifyAllMocks(releaseDataFileService);
 
             var dataFileInfoResult = result.AssertOkResult();
@@ -79,8 +86,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         }
 
         [Fact]
-        public async Task UploadDataSet_Fail_ValidationProblem()
+        public async Task UploadDataSet_InvalidRequest_ReturnsValidationProblems()
         {
+            // Arrange
             var dataFile = MockFile("datafile.csv");
             var metaFile = MockFile("metafile.csv");
 
@@ -90,353 +98,44 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                     dataFile,
                     metaFile,
                     "Data set title",
-                    null))
+                    null,
+                    default))
                 .ReturnsAsync(ValidationActionResult(CannotOverwriteFile));
 
             var controller = BuildController(releaseDataFileService: releaseDataFileService.Object);
 
-            // Call the method under test
-            var result = await controller.UploadDataSet(releaseVersionId: _releaseVersionId,
-                replacingFileId: null,
-                title: "Data set title",
-                file: dataFile,
-                metaFile: metaFile);
+            // Act
+            var result = await controller.UploadDataSet(
+                new()
+                {
+                    ReleaseVersionId = _releaseVersionId,
+                    DataSetTitle = "Data set title",
+                    DataFile = dataFile,
+                    MetaFile = metaFile,
+                    ReplacingFileId = null
+                },
+                cancellationToken: default);
 
+            // Assert
             VerifyAllMocks(releaseDataFileService);
 
             result.AssertValidationProblem(CannotOverwriteFile);
         }
 
         [Fact]
-        public async Task GetDataFileInfo_Returns_A_List_Of_Files()
+        public async Task UploadDataSetAsZip_Success()
         {
-            var testFiles = new List<DataFileInfo>
-            {
-                new()
-                {
-                    FileName = "file1.csv",
-                    Name = "Release a file 1",
-                    Size = "1 Kb",
-                },
-                new()
-                {
-                    FileName = "file2.csv",
-                    Name = "Release a file 2",
-                    Size = "1 Kb",
-                }
-            };
-
-            var releaseDataFileService = new Mock<IReleaseDataFileService>(Strict);
-
-            releaseDataFileService
-                .Setup(s => s.ListAll(_releaseVersionId))
-                .ReturnsAsync(testFiles);
-
-            var controller = BuildController(releaseDataFileService: releaseDataFileService.Object);
-
-            // Call the method under test
-            var result = await controller.GetDataFileInfo(_releaseVersionId);
-            VerifyAllMocks(releaseDataFileService);
-
-            var unboxed = result.AssertOkResult();
-            Assert.Contains(unboxed, f => f.Name == "Release a file 1");
-            Assert.Contains(unboxed, f => f.Name == "Release a file 2");
+            // Arrange
+            // Act
+            // Assert
         }
 
         [Fact]
-        public async Task DeleteDataFiles_Success()
+        public async Task UploadDataSetAsZip_InvalidRequest_ReturnsValidationProblems()
         {
-            var releaseVersionService = new Mock<IReleaseVersionService>(Strict);
-
-            var fileId = Guid.NewGuid();
-
-            releaseVersionService
-                .Setup(service => service.RemoveDataFiles(_releaseVersionId, fileId))
-                .ReturnsAsync(Unit.Instance);
-
-            var controller = BuildController(releaseVersionService: releaseVersionService.Object);
-
-            var result = await controller.DeleteDataFiles(releaseVersionId: _releaseVersionId,
-                fileId: fileId);
-            VerifyAllMocks(releaseVersionService);
-
-            Assert.IsAssignableFrom<NoContentResult>(result);
-        }
-
-        [Fact]
-        public async Task DeleteDataFiles_Fail_UnableToFindMetaFileToDelete()
-        {
-            var releaseVersionService = new Mock<IReleaseVersionService>(Strict);
-
-            var fileId = Guid.NewGuid();
-
-            releaseVersionService
-                .Setup(service => service.RemoveDataFiles(_releaseVersionId, fileId))
-                .ReturnsAsync(ValidationActionResult(UnableToFindMetadataFileToDelete));
-
-            var controller = BuildController(releaseVersionService: releaseVersionService.Object);
-
-            var result = await controller.DeleteDataFiles(releaseVersionId: _releaseVersionId,
-                fileId: fileId);
-            VerifyAllMocks(releaseVersionService);
-
-            result.AssertValidationProblem(UnableToFindMetadataFileToDelete);
-        }
-
-        [Fact]
-        public async Task UpdateReleaseVersion_Returns_Ok()
-        {
-            var releaseVersionService = new Mock<IReleaseVersionService>(Strict);
-
-            releaseVersionService
-                .Setup(s => s.UpdateReleaseVersion(
-                    It.Is<Guid>(id => id.Equals(_releaseVersionId)),
-                    It.IsAny<ReleaseVersionUpdateRequest>())
-                )
-                .ReturnsAsync(new ReleaseVersionViewModel { Id = _releaseVersionId });
-
-            var controller = BuildController(releaseVersionService: releaseVersionService.Object);
-
-            // Method under test
-            var result = await controller.UpdateReleaseVersion(new ReleaseVersionUpdateRequest(), _releaseVersionId);
-            VerifyAllMocks(releaseVersionService);
-
-            var unboxed = result.AssertOkResult();
-            Assert.Equal(_releaseVersionId, unboxed.Id);
-        }
-
-        [Fact]
-        public async Task GetTemplateRelease_Returns_Ok()
-        {
-            var releaseVersionService = new Mock<IReleaseVersionService>(Strict);
-
-            var templateReleaseResult =
-                new Either<ActionResult, IdTitleViewModel>(new IdTitleViewModel());
-
-            releaseVersionService
-                .Setup(s => s.GetLatestPublishedRelease(It.Is<Guid>(id => id == _releaseVersionId)))
-                .ReturnsAsync(templateReleaseResult);
-
-            var controller = BuildController(releaseVersionService.Object);
-
-            // Method under test
-            var result = await controller.GetTemplateRelease(_releaseVersionId);
-            VerifyAllMocks(releaseVersionService);
-
-            result.AssertOkResult();
-        }
-
-        [Fact]
-        public async Task CancelFileImport()
-        {
-            var importService = new Mock<IDataImportService>(Strict);
-
-            var fileId = Guid.NewGuid();
-
-            importService
-                .Setup(s => s.CancelImport(_releaseVersionId, fileId))
-                .ReturnsAsync(Unit.Instance);
-
-            var controller = BuildController(importService: importService.Object);
-
-            var result = await controller.CancelFileImport(releaseVersionId: _releaseVersionId,
-                fileId: fileId);
-            VerifyAllMocks(importService);
-
-            result.AssertAccepted();
-        }
-
-        [Fact]
-        public async Task CancelFileImport_Fail_Forbidden()
-        {
-            var importService = new Mock<IDataImportService>(Strict);
-
-            var fileId = Guid.NewGuid();
-
-            importService
-                .Setup(s => s.CancelImport(_releaseVersionId, fileId))
-                .ReturnsAsync(new ForbidResult());
-
-            var controller = BuildController(importService: importService.Object);
-
-            var result = await controller.CancelFileImport(releaseVersionId: _releaseVersionId,
-                fileId: fileId);
-            VerifyAllMocks(importService);
-
-            result.AssertForbidden();
-        }
-
-        [Fact]
-        public async Task GetDeleteDataFilePlan()
-        {
-            var releaseVersionService = new Mock<IReleaseVersionService>(Strict);
-
-            var fileId = Guid.NewGuid();
-
-            var deleteDataFilePlan = new DeleteDataFilePlanViewModel();
-
-            releaseVersionService
-                .Setup(s => s.GetDeleteDataFilePlan(_releaseVersionId, fileId, It.IsAny<CancellationToken>()))
-                .ReturnsAsync(deleteDataFilePlan);
-
-            var controller = BuildController(releaseVersionService: releaseVersionService.Object);
-
-            var result = await controller.GetDeleteDataFilePlan(releaseVersionId: _releaseVersionId,
-                fileId: fileId);
-            VerifyAllMocks(releaseVersionService);
-
-            result.AssertOkResult(deleteDataFilePlan);
-        }
-
-        [Fact]
-        public async Task GetDeleteReleaseVersionPlan()
-        {
-            var releaseVersionService = new Mock<IReleaseVersionService>(Strict);
-
-            var deleteReleasePlan = new DeleteReleasePlanViewModel();
-
-            releaseVersionService
-                .Setup(s => s.GetDeleteReleaseVersionPlan(_releaseVersionId, It.IsAny<CancellationToken>()))
-                .ReturnsAsync(deleteReleasePlan);
-
-            var controller = BuildController(releaseVersionService: releaseVersionService.Object);
-
-            var result = await controller.GetDeleteReleaseVersionPlan(_releaseVersionId, It.IsAny<CancellationToken>());
-            VerifyAllMocks(releaseVersionService);
-
-            result.AssertOkResult(deleteReleasePlan);
-        }
-
-        [Fact]
-        public async Task DeleteReleaseVersion_Returns_NoContent()
-        {
-            var releaseVersionService = new Mock<IReleaseVersionService>(Strict);
-
-            releaseVersionService
-                .Setup(service => service.DeleteReleaseVersion(_releaseVersionId, default))
-                .ReturnsAsync(Unit.Instance);
-
-            var controller = BuildController(releaseVersionService: releaseVersionService.Object);
-
-            var result = await controller.DeleteReleaseVersion(_releaseVersionId, default);
-            VerifyAllMocks(releaseVersionService);
-
-            Assert.IsAssignableFrom<NoContentResult>(result);
-        }
-
-        [Fact]
-        public async Task DeleteReleaseVersion_Returns_NotFound()
-        {
-            var releaseVersionService = new Mock<IReleaseVersionService>(Strict);
-
-            releaseVersionService
-                .Setup(service => service.DeleteReleaseVersion(_releaseVersionId, default))
-                .ReturnsAsync(new NotFoundResult());
-
-            var controller = BuildController(releaseVersionService: releaseVersionService.Object);
-
-            var result = await controller.DeleteReleaseVersion(_releaseVersionId, default);
-            VerifyAllMocks(releaseVersionService);
-
-            result.AssertNotFoundResult();
-        }
-
-        [Fact]
-        public async Task DeleteReleaseVersion_Returns_ValidationProblem()
-        {
-            var releaseVersionService = new Mock<IReleaseVersionService>(Strict);
-
-            releaseVersionService
-                .Setup(service => service.DeleteReleaseVersion(_releaseVersionId, default))
-                .ReturnsAsync(ValidationUtils.ValidationResult(new ErrorViewModel
-                {
-                    Code = "error code",
-                    Path = "error path"
-                }));
-
-            var controller = BuildController(releaseVersionService: releaseVersionService.Object);
-
-            var result = await controller.DeleteReleaseVersion(_releaseVersionId, default);
-            VerifyAllMocks(releaseVersionService);
-
-            var validationProblem = result.AssertBadRequestWithValidationProblem();
-
-            validationProblem.AssertHasError(
-                expectedPath: "error path",
-                expectedCode: "error code");
-        }
-
-        [Fact]
-        public async Task CreateReleaseStatus()
-        {
-            var releaseApprovalService = new Mock<IReleaseApprovalService>(Strict);
-            var releaseVersionService = new Mock<IReleaseVersionService>(Strict);
-
-            var request = new ReleaseStatusCreateRequest();
-            var returnedReleaseViewModel = new ReleaseVersionViewModel();
-
-            releaseApprovalService
-                .Setup(s => s.CreateReleaseStatus(_releaseVersionId, request))
-                .ReturnsAsync(Unit.Instance);
-
-            releaseVersionService
-                .Setup(s => s.GetRelease(_releaseVersionId))
-                .ReturnsAsync(returnedReleaseViewModel);
-
-            var controller = BuildController(
-                releaseApprovalService: releaseApprovalService.Object,
-                releaseVersionService: releaseVersionService.Object);
-
-            // Call the method under test
-            var result = await controller.CreateReleaseStatus(request, _releaseVersionId);
-            VerifyAllMocks(releaseApprovalService, releaseVersionService);
-
-            result.AssertOkResult(returnedReleaseViewModel);
-        }
-
-        [Fact]
-        public async Task ListReleasesForApproval()
-        {
-            var releases = ListOf(new ReleaseVersionSummaryViewModel
-            {
-                Id = Guid.NewGuid()
-            });
-
-            var releaseVersionService = new Mock<IReleaseVersionService>(Strict);
-
-            releaseVersionService
-                .Setup(s => s.ListUsersReleasesForApproval())
-                .ReturnsAsync(releases);
-
-            var controller = BuildController(
-                releaseVersionService: releaseVersionService.Object);
-
-            var result = await controller.ListUsersReleasesForApproval();
-            VerifyAllMocks(releaseVersionService);
-
-            result.AssertOkResult(releases);
-        }
-
-        [Fact]
-        public async Task CreateReleaseAmendment()
-        {
-            var originalReleaseVersionId = Guid.NewGuid();
-
-            var amendmentCreatedResponse = new IdViewModel(Guid.NewGuid());
-
-            var releaseAmendmentService = new Mock<IReleaseAmendmentService>(Strict);
-
-            releaseAmendmentService
-                .Setup(s => s.CreateReleaseAmendment(originalReleaseVersionId))
-                .ReturnsAsync(amendmentCreatedResponse);
-
-            var controller = BuildController(
-                releaseAmendmentService: releaseAmendmentService.Object);
-
-            var result = await controller.CreateReleaseAmendment(originalReleaseVersionId);
-            VerifyAllMocks(releaseAmendmentService);
-
-            result.AssertOkResult(amendmentCreatedResponse);
+            // Arrange
+            // Act
+            // Assert
         }
 
         [Fact]
@@ -458,14 +157,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
 
             // Act
             var result = await controller.UploadBulkZipDataSetsToTempStorage(
-                Guid.NewGuid(),
-                MockFile("bulk.zip"),
+                new()
+                {
+                    ReleaseVersionId = Guid.NewGuid(),
+                    ZipFile = MockFile("bulk.zip")
+                },
                 default);
 
             // Assert
             VerifyAllMocks(releaseDataFileService);
 
             result.AssertOkResult(dataSetFiles);
+        }
+
+        [Fact]
+        public async Task UploadBulkZipDataSetsToTempStorage_InvalidRequest_ReturnsValidationProblems()
+        {
+            // Arrange
+            // Act
+            // Assert
         }
 
         [Fact]
@@ -505,6 +215,396 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             result.AssertOkResult(dataFileInfo);
         }
 
+        [Fact]
+        public async Task GetDataFileInfo_Returns_A_List_Of_Files()
+        {
+            // Arrange
+            var testFiles = new List<DataFileInfo>
+            {
+                new()
+                {
+                    FileName = "file1.csv",
+                    Name = "Release a file 1",
+                    Size = "1 Kb",
+                },
+                new()
+                {
+                    FileName = "file2.csv",
+                    Name = "Release a file 2",
+                    Size = "1 Kb",
+                }
+            };
+
+            var releaseDataFileService = new Mock<IReleaseDataFileService>(Strict);
+
+            releaseDataFileService
+                .Setup(s => s.ListAll(_releaseVersionId))
+                .ReturnsAsync(testFiles);
+
+            var controller = BuildController(releaseDataFileService: releaseDataFileService.Object);
+
+            // Act
+            var result = await controller.GetDataFileInfo(_releaseVersionId);
+
+            // Assert
+            VerifyAllMocks(releaseDataFileService);
+
+            var unboxed = result.AssertOkResult();
+            Assert.Contains(unboxed, f => f.Name == "Release a file 1");
+            Assert.Contains(unboxed, f => f.Name == "Release a file 2");
+        }
+
+        [Fact]
+        public async Task DeleteDataFiles_Success()
+        {
+            // Arrange
+            var releaseVersionService = new Mock<IReleaseVersionService>(Strict);
+
+            var fileId = Guid.NewGuid();
+
+            releaseVersionService
+                .Setup(service => service.RemoveDataFiles(_releaseVersionId, fileId))
+                .ReturnsAsync(Unit.Instance);
+
+            var controller = BuildController(releaseVersionService: releaseVersionService.Object);
+
+            // Act
+            var result = await controller.DeleteDataFiles(releaseVersionId: _releaseVersionId,
+                fileId: fileId);
+
+            // Assert
+            VerifyAllMocks(releaseVersionService);
+
+            Assert.IsAssignableFrom<NoContentResult>(result);
+        }
+
+        [Fact]
+        public async Task DeleteDataFiles_Fail_UnableToFindMetaFileToDelete()
+        {
+            // Arrange
+            var releaseVersionService = new Mock<IReleaseVersionService>(Strict);
+
+            var fileId = Guid.NewGuid();
+
+            releaseVersionService
+                .Setup(service => service.RemoveDataFiles(_releaseVersionId, fileId))
+                .ReturnsAsync(ValidationActionResult(UnableToFindMetadataFileToDelete));
+
+            var controller = BuildController(releaseVersionService: releaseVersionService.Object);
+
+            // Act
+            var result = await controller.DeleteDataFiles(releaseVersionId: _releaseVersionId,
+                fileId: fileId);
+
+            // Assert
+            VerifyAllMocks(releaseVersionService);
+
+            result.AssertValidationProblem(UnableToFindMetadataFileToDelete);
+        }
+
+        [Fact]
+        public async Task UpdateReleaseVersion_Returns_Ok()
+        {
+            // Arrange
+            var releaseVersionService = new Mock<IReleaseVersionService>(Strict);
+
+            releaseVersionService
+                .Setup(s => s.UpdateReleaseVersion(
+                    It.Is<Guid>(id => id.Equals(_releaseVersionId)),
+                    It.IsAny<ReleaseVersionUpdateRequest>())
+                )
+                .ReturnsAsync(new ReleaseVersionViewModel { Id = _releaseVersionId });
+
+            var controller = BuildController(releaseVersionService: releaseVersionService.Object);
+
+            // Act
+            var result = await controller.UpdateReleaseVersion(new ReleaseVersionUpdateRequest(), _releaseVersionId);
+
+            // Assert
+            VerifyAllMocks(releaseVersionService);
+
+            var unboxed = result.AssertOkResult();
+            Assert.Equal(_releaseVersionId, unboxed.Id);
+        }
+
+        [Fact]
+        public async Task GetTemplateRelease_Returns_Ok()
+        {
+            // Arrange
+            var releaseVersionService = new Mock<IReleaseVersionService>(Strict);
+
+            var templateReleaseResult =
+                new Either<ActionResult, IdTitleViewModel>(new IdTitleViewModel());
+
+            releaseVersionService
+                .Setup(s => s.GetLatestPublishedRelease(It.Is<Guid>(id => id == _releaseVersionId)))
+                .ReturnsAsync(templateReleaseResult);
+
+            var controller = BuildController(releaseVersionService.Object);
+
+            // Act
+            var result = await controller.GetTemplateRelease(_releaseVersionId);
+
+            // Assert
+            VerifyAllMocks(releaseVersionService);
+
+            result.AssertOkResult();
+        }
+
+        [Fact]
+        public async Task CancelFileImport()
+        {
+            // Arrange
+            var importService = new Mock<IDataImportService>(Strict);
+
+            var fileId = Guid.NewGuid();
+
+            importService
+                .Setup(s => s.CancelImport(_releaseVersionId, fileId))
+                .ReturnsAsync(Unit.Instance);
+
+            var controller = BuildController(importService: importService.Object);
+
+            // Act
+            var result = await controller.CancelFileImport(releaseVersionId: _releaseVersionId,
+                fileId: fileId);
+
+            // Assert
+            VerifyAllMocks(importService);
+
+            result.AssertAccepted();
+        }
+
+        [Fact]
+        public async Task CancelFileImport_Fail_Forbidden()
+        {
+            // Arrange
+            var importService = new Mock<IDataImportService>(Strict);
+
+            var fileId = Guid.NewGuid();
+
+            importService
+                .Setup(s => s.CancelImport(_releaseVersionId, fileId))
+                .ReturnsAsync(new ForbidResult());
+
+            var controller = BuildController(importService: importService.Object);
+
+            // Act
+            var result = await controller.CancelFileImport(
+                releaseVersionId: _releaseVersionId,
+                fileId: fileId);
+
+            // Assert
+            VerifyAllMocks(importService);
+
+            result.AssertForbidden();
+        }
+
+        [Fact]
+        public async Task GetDeleteDataFilePlan()
+        {
+            // Arrange
+            var releaseVersionService = new Mock<IReleaseVersionService>(Strict);
+
+            var fileId = Guid.NewGuid();
+
+            var deleteDataFilePlan = new DeleteDataFilePlanViewModel();
+
+            releaseVersionService
+                .Setup(s => s.GetDeleteDataFilePlan(_releaseVersionId, fileId, It.IsAny<CancellationToken>()))
+                .ReturnsAsync(deleteDataFilePlan);
+
+            var controller = BuildController(releaseVersionService: releaseVersionService.Object);
+
+            // Act
+            var result = await controller.GetDeleteDataFilePlan(
+                releaseVersionId: _releaseVersionId,
+                fileId: fileId);
+
+            // Assert
+            VerifyAllMocks(releaseVersionService);
+
+            result.AssertOkResult(deleteDataFilePlan);
+        }
+
+        [Fact]
+        public async Task GetDeleteReleaseVersionPlan()
+        {
+            // Arrange
+            var releaseVersionService = new Mock<IReleaseVersionService>(Strict);
+
+            var deleteReleasePlan = new DeleteReleasePlanViewModel();
+
+            releaseVersionService
+                .Setup(s => s.GetDeleteReleaseVersionPlan(_releaseVersionId, It.IsAny<CancellationToken>()))
+                .ReturnsAsync(deleteReleasePlan);
+
+            var controller = BuildController(releaseVersionService: releaseVersionService.Object);
+
+            // Act
+            var result = await controller.GetDeleteReleaseVersionPlan(_releaseVersionId, It.IsAny<CancellationToken>());
+
+            // Assert
+            VerifyAllMocks(releaseVersionService);
+
+            result.AssertOkResult(deleteReleasePlan);
+        }
+
+        [Fact]
+        public async Task DeleteReleaseVersion_Returns_NoContent()
+        {
+            // Arrange
+            var releaseVersionService = new Mock<IReleaseVersionService>(Strict);
+
+            releaseVersionService
+                .Setup(service => service.DeleteReleaseVersion(_releaseVersionId, default))
+                .ReturnsAsync(Unit.Instance);
+
+            var controller = BuildController(releaseVersionService: releaseVersionService.Object);
+
+            // Act
+            var result = await controller.DeleteReleaseVersion(_releaseVersionId, default);
+
+            // Assert
+            VerifyAllMocks(releaseVersionService);
+
+            Assert.IsAssignableFrom<NoContentResult>(result);
+        }
+
+        [Fact]
+        public async Task DeleteReleaseVersion_Returns_NotFound()
+        {
+            // Arrange
+            var releaseVersionService = new Mock<IReleaseVersionService>(Strict);
+
+            releaseVersionService
+                .Setup(service => service.DeleteReleaseVersion(_releaseVersionId, default))
+                .ReturnsAsync(new NotFoundResult());
+
+            var controller = BuildController(releaseVersionService: releaseVersionService.Object);
+
+            // Act
+            var result = await controller.DeleteReleaseVersion(_releaseVersionId, default);
+
+            // Assert
+            VerifyAllMocks(releaseVersionService);
+
+            result.AssertNotFoundResult();
+        }
+
+        [Fact]
+        public async Task DeleteReleaseVersion_Returns_ValidationProblem()
+        {
+            // Arrange
+            var releaseVersionService = new Mock<IReleaseVersionService>(Strict);
+
+            releaseVersionService
+                .Setup(service => service.DeleteReleaseVersion(_releaseVersionId, default))
+                .ReturnsAsync(ValidationUtils.ValidationResult(new ErrorViewModel
+                {
+                    Code = "error code",
+                    Path = "error path"
+                }));
+
+            var controller = BuildController(releaseVersionService: releaseVersionService.Object);
+
+            // Act
+            var result = await controller.DeleteReleaseVersion(_releaseVersionId, default);
+
+            // Assert
+            VerifyAllMocks(releaseVersionService);
+
+            var validationProblem = result.AssertBadRequestWithValidationProblem();
+
+            validationProblem.AssertHasError(
+                expectedPath: "error path",
+                expectedCode: "error code");
+        }
+
+        [Fact]
+        public async Task CreateReleaseStatus()
+        {
+            // Arrange
+            var releaseApprovalService = new Mock<IReleaseApprovalService>(Strict);
+            var releaseVersionService = new Mock<IReleaseVersionService>(Strict);
+
+            var request = new ReleaseStatusCreateRequest();
+            var returnedReleaseViewModel = new ReleaseVersionViewModel();
+
+            releaseApprovalService
+                .Setup(s => s.CreateReleaseStatus(_releaseVersionId, request))
+                .ReturnsAsync(Unit.Instance);
+
+            releaseVersionService
+                .Setup(s => s.GetRelease(_releaseVersionId))
+                .ReturnsAsync(returnedReleaseViewModel);
+
+            var controller = BuildController(
+                releaseApprovalService: releaseApprovalService.Object,
+                releaseVersionService: releaseVersionService.Object);
+
+            // Act
+            var result = await controller.CreateReleaseStatus(request, _releaseVersionId);
+
+            // Assert
+            VerifyAllMocks(releaseApprovalService, releaseVersionService);
+
+            result.AssertOkResult(returnedReleaseViewModel);
+        }
+
+        [Fact]
+        public async Task ListReleasesForApproval()
+        {
+            // Arrange
+            var releases = ListOf(new ReleaseVersionSummaryViewModel
+            {
+                Id = Guid.NewGuid()
+            });
+
+            var releaseVersionService = new Mock<IReleaseVersionService>(Strict);
+
+            releaseVersionService
+                .Setup(s => s.ListUsersReleasesForApproval())
+                .ReturnsAsync(releases);
+
+            var controller = BuildController(
+                releaseVersionService: releaseVersionService.Object);
+
+            // Act
+            var result = await controller.ListUsersReleasesForApproval();
+
+            // Assert
+            VerifyAllMocks(releaseVersionService);
+
+            result.AssertOkResult(releases);
+        }
+
+        [Fact]
+        public async Task CreateReleaseAmendment()
+        {
+            // Arrange
+            var originalReleaseVersionId = Guid.NewGuid();
+
+            var amendmentCreatedResponse = new IdViewModel(Guid.NewGuid());
+
+            var releaseAmendmentService = new Mock<IReleaseAmendmentService>(Strict);
+
+            releaseAmendmentService
+                .Setup(s => s.CreateReleaseAmendment(originalReleaseVersionId))
+                .ReturnsAsync(amendmentCreatedResponse);
+
+            var controller = BuildController(
+                releaseAmendmentService: releaseAmendmentService.Object);
+
+            // Act
+            var result = await controller.CreateReleaseAmendment(originalReleaseVersionId);
+
+            // Assert
+            VerifyAllMocks(releaseAmendmentService);
+
+            result.AssertOkResult(amendmentCreatedResponse);
+        }
+
         private static IFormFile MockFile(string fileName)
         {
             var fileMock = new Mock<IFormFile>(Strict);
@@ -542,6 +642,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             [Fact]
             public async Task Success()
             {
+                // Arrange
                 Publication publication = DataFixture.DefaultPublication()
                     .WithReleases(
                         [
@@ -560,6 +661,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                 var newPreReleaseAccessList = "new-list";
                 var expectedNewSlug = "2021-22-q1-initial";
 
+                // Act
                 var response = await UpdateRelease(
                     releaseVersionId: publication.Releases[0].Versions[0].Id,
                     year: newYear,
@@ -567,6 +669,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                     label: newLabel,
                     preReleaseAccessList: newPreReleaseAccessList);
 
+                // Assert
                 var viewModel = response.AssertOk<ReleaseVersionViewModel>();
 
                 var contentDbContext = TestApp.GetDbContext<ContentDbContext>();
@@ -612,6 +715,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                 string? expectedNewLabel,
                 string expectedNewSlug)
             {
+                // Arrange
                 Publication publication = DataFixture.DefaultPublication()
                     .WithReleases(
                         [
@@ -624,12 +728,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                 await TestApp.AddTestData<ContentDbContext>(
                     context => context.Publications.Add(publication));
 
+                // Act
                 var response = await UpdateRelease(
                     releaseVersionId: publication.Releases[0].Versions[0].Id,
                     year: 2020,
                     timePeriodCoverage: TimeIdentifier.AcademicYear,
                     label: newLabel);
 
+                // Assert
                 var viewModel = response.AssertOk<ReleaseVersionViewModel>();
 
                 var contentDbContext = TestApp.GetDbContext<ContentDbContext>();
@@ -649,6 +755,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             [Fact]
             public async Task ReleaseVersionNotFirstVersion_YearChanged()
             {
+                // Arrange
                 Publication publication = DataFixture.DefaultPublication()
                     .WithReleases(
                         DataFixture
@@ -661,12 +768,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                 await TestApp.AddTestData<ContentDbContext>(
                     context => context.Publications.Add(publication));
 
+                // Act
                 var response = await UpdateRelease(
                     releaseVersionId: publication.Releases[0].Versions[1].Id,
                     year: 2021,
                     timePeriodCoverage: TimeIdentifier.AcademicYear,
                     label: null);
 
+                // Assert
                 var validationProblem = response.AssertValidationProblem();
 
                 var error = Assert.Single(validationProblem.Errors);
@@ -677,6 +786,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             [Fact]
             public async Task ReleaseVersionNotFirstVersion_TimePeriodCoverageChanged()
             {
+                // Arrange
                 Publication publication = DataFixture.DefaultPublication()
                     .WithReleases(
                         DataFixture
@@ -689,12 +799,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                 await TestApp.AddTestData<ContentDbContext>(
                     context => context.Publications.Add(publication));
 
+                // Act
                 var response = await UpdateRelease(
                     releaseVersionId: publication.Releases[0].Versions[1].Id,
                     year: 2020,
                     timePeriodCoverage: TimeIdentifier.AcademicYearQ1,
                     label: null);
 
+                // Assert
                 var validationProblem = response.AssertValidationProblem();
 
                 var error = Assert.Single(validationProblem.Errors);
@@ -705,6 +817,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             [Fact]
             public async Task ReleaseVersionNotFirstVersion_LabelChanged()
             {
+                // Arrange
                 Publication publication = DataFixture.DefaultPublication()
                     .WithReleases(
                         DataFixture
@@ -717,12 +830,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                 await TestApp.AddTestData<ContentDbContext>(
                     context => context.Publications.Add(publication));
 
+                // Act
                 var response = await UpdateRelease(
                     releaseVersionId: publication.Releases[0].Versions[1].Id,
                     year: 2020,
                     timePeriodCoverage: TimeIdentifier.AcademicYear,
                     label: "initial");
 
+                // Assert
                 var validationProblem = response.AssertValidationProblem();
 
                 var error = Assert.Single(validationProblem.Errors);
@@ -733,6 +848,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             [Fact]
             public async Task ReleaseVersionIsPublished()
             {
+                // Arrange
                 Publication publication = DataFixture.DefaultPublication()
                     .WithReleases([
                         DataFixture
@@ -742,30 +858,35 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                 await TestApp.AddTestData<ContentDbContext>(
                     context => context.Publications.Add(publication));
 
+                // Act
                 var response = await UpdateRelease(
                     releaseVersionId: publication.Releases[0].Versions[0].Id,
                     year: 2020,
                     timePeriodCoverage: TimeIdentifier.AcademicYear,
                     label: null);
 
+                // Assert
                 response.AssertForbidden();
             }
 
             [Fact]
             public async Task ReleaseVersionNotFound()
             {
+                // Act
                 var response = await UpdateRelease(
                     releaseVersionId: Guid.NewGuid(),
                     year: 2020,
                     timePeriodCoverage: TimeIdentifier.AcademicYear,
                     label: null);
 
+                // Assert
                 response.AssertNotFound();
             }
 
             [Fact]
             public async Task UserDoesNotHavePermission()
             {
+                // Arrange
                 Publication publication = DataFixture.DefaultPublication()
                     .WithReleases([
                         DataFixture
@@ -777,6 +898,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
 
                 var client = BuildApp(DataFixture.AuthenticatedUser()).CreateClient();
 
+                // Act
                 var response = await UpdateRelease(
                     releaseVersionId: publication.Releases[0].Versions[0].Id,
                     year: 2020,
@@ -784,12 +906,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                     label: null,
                     client: client);
 
+                // Assert
                 response.AssertForbidden();
             }
 
             [Fact]
             public async Task ReleaseTypeInvalid()
             {
+                // Arrange
                 Publication publication = DataFixture.DefaultPublication()
                     .WithReleases([
                         DataFixture
@@ -799,6 +923,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                 await TestApp.AddTestData<ContentDbContext>(
                     context => context.Publications.Add(publication));
 
+                // Act
                 var response = await UpdateRelease(
                     releaseVersionId: publication.Releases[0].Versions[0].Id,
                     year: 2020,
@@ -806,6 +931,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                     label: null,
                     type: ReleaseType.ExperimentalStatistics);
 
+                // Assert
                 var validationProblem = response.AssertValidationProblem();
 
                 var error = Assert.Single(validationProblem.Errors);
@@ -828,6 +954,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                 string? label,
                 string existingReleaseSlug)
             {
+                // Arrange
                 Publication publication = DataFixture.DefaultPublication()
                     .WithReleases(
                         DataFixture
@@ -839,12 +966,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                 await TestApp.AddTestData<ContentDbContext>(
                     context => context.Publications.Add(publication));
 
+                // Act
                 var response = await UpdateRelease(
                     releaseVersionId: publication.Releases[0].Versions[0].Id,
                     year: year,
                     timePeriodCoverage: timePeriodCoverage,
                     label: label);
 
+                // Assert
                 var validationProblem = response.AssertValidationProblem();
 
                 var error = Assert.Single(validationProblem.Errors);
@@ -855,6 +984,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             [Fact]
             public async Task LabelOver50Characters()
             {
+                // Arrange
                 Publication publication = DataFixture.DefaultPublication()
                     .WithReleases([
                             DataFixture
@@ -864,12 +994,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                 await TestApp.AddTestData<ContentDbContext>(
                     context => context.Publications.Add(publication));
 
+                // Act
                 var response = await UpdateRelease(
                     releaseVersionId: publication.Releases[0].Versions[0].Id,
                     year: 2020,
                     timePeriodCoverage: TimeIdentifier.AcademicYear,
                     label: new string('a', 51));
 
+                // Assert
                 var validationProblem = response.AssertValidationProblem();
 
                 var error = Assert.Single(validationProblem.Errors);
