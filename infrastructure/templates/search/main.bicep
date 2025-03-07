@@ -90,6 +90,9 @@ module searchDocsFunctionModule 'application/searchDocsFunction.bicep' = {
       ],
       maintenanceFirewallRules
     )
+    searchStorageAccountName: searchServiceModule.outputs.searchStorageAccountName
+    searchStorageAccountConnectionStringSecretName: searchServiceModule.outputs.searchStorageAccountConnectionStringSecretName
+    searchableDocumentsContainerName: searchServiceModule.outputs.searchableDocumentsContainerName
     storageFirewallRules: maintenanceIpRanges
     applicationInsightsConnectionString: applicationInsightsModule.outputs.applicationInsightsConnectionString
     tagValues: tagValues

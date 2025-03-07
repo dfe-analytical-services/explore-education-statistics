@@ -5,6 +5,16 @@ import { ResourceNames } from '../types.bicep'
 @description('The IP address ranges that can access the Search Docs Function App endpoints.')
 param functionAppFirewallRules FirewallRule[]
 
+@description('Name of the Search storage account.')
+param searchStorageAccountName string
+
+@description('The connection string to the Search storage account.')
+@secure()
+param searchStorageAccountConnectionStringSecretName string
+
+@description('Name of the searchable documents container in the storage account.')
+param searchableDocumentsContainerName string
+
 @description('The IP address ranges that can access the Search Docs Function App storage accounts.')
 param storageFirewallRules IpRange[]
 
@@ -25,6 +35,12 @@ param applicationInsightsConnectionString string = ''
 
 @description('Specifies whether or not the Search Docs Function App already exists.')
 param functionAppExists bool
+
+@description('The name of the queue that is used when a release version is published.')
+param releaseVersionPublishedQueueName string = 'release-version-published-queue'
+
+@description('The name of the queue that is used when a searchable document is created.')
+param searchableDocumentCreatedQueueName string = 'search-document-created-queue'
 
 @description('Specifies a set of tags with which to tag the resource in Azure.')
 param tagValues object
@@ -47,6 +63,20 @@ resource searchDocsFunctionPrivateEndpointSubnet 'Microsoft.Network/virtualNetwo
   parent: vNet
 }
 
+resource searchStorageAccount 'Microsoft.Storage/storageAccounts@2023-05-01' existing = {
+  name: searchStorageAccountName
+}
+
+resource searchBlobStorage 'Microsoft.Storage/storageAccounts/blobServices@2023-05-01' existing = {
+  name: 'default'
+  parent: searchStorageAccount
+}
+
+resource searchableDocumentsContainer 'Microsoft.Storage/storageAccounts/blobServices/containers@2023-05-01' existing = {
+  parent: searchBlobStorage
+  name: searchableDocumentsContainerName
+}
+
 module functionAppModule '../../common/components/functionApp.bicep' = {
   name: 'functionAppModuleDeploy'
   params: {
@@ -54,6 +84,28 @@ module functionAppModule '../../common/components/functionApp.bicep' = {
     location: location
     applicationInsightsConnectionString: applicationInsightsConnectionString
     appServicePlanName: '${resourcePrefix}-${abbreviations.webSitesFunctions}-searchdocs'
+    appSettings: [
+      {
+        name: 'App__SearchStorageConnectionString'
+        value: '@Microsoft.KeyVault(VaultName=${keyVault.name};SecretName=${searchStorageAccountConnectionStringSecretName})'
+      }
+      {
+        name: 'App__SearchableDocumentsContainerName'
+        value: searchableDocumentsContainer.name
+      }
+      {
+        name: 'ContentApi__Url'
+        value: 'http://localhost:5010' // TODO EES-5899 Update this value
+      }
+      {
+        name: 'ReleaseVersionPublishedQueueName'
+        value: releaseVersionPublishedQueueName
+      }
+      {
+        name: 'SearchableDocumentCreatedQueueName'
+        value: searchableDocumentCreatedQueueName
+      }
+    ]
     functionAppExists: functionAppExists
     keyVaultName: keyVault.name
     sku: {
