@@ -88,12 +88,12 @@ public class PublishingCompletionServiceTests
             private const string ReleaseVersionId11String = "00000011-0000-0000-0000-000000000000";
             private const string ReleaseVersionId2String = "00000002-0000-0000-0000-000000000000";
             
-            private const string ReleaseId1String = "00000001-0000-0000-0000-000000000000";
-            private const string ReleaseId2String = "00000002-0000-0000-0000-000000000000";
-            
             private static readonly Guid ReleaseVersionId1 = Guid.Parse(ReleaseVersionId1String);
             private static readonly Guid ReleaseVersionId11 = Guid.Parse(ReleaseVersionId11String);
             private static readonly Guid ReleaseVersionId2 = Guid.Parse(ReleaseVersionId2String);
+
+            private const string ReleaseId1String = "00000001-0000-0000-0000-000000000000";
+            private const string ReleaseId2String = "00000002-0000-0000-0000-000000000000";
 
             private static readonly Guid ReleaseId1 = Guid.Parse(ReleaseId1String);
             private static readonly Guid ReleaseId2 = Guid.Parse(ReleaseId2String);
@@ -117,13 +117,14 @@ public class PublishingCompletionServiceTests
             private Publication _publication1 = null!;
             private Publication _publication2 = null!;
             private Publication _publication22SupercededBy2 = null!;
-            private ReleaseVersion _releaseVersion1;
-            private ReleaseVersion _releaseVersion2;
-            private ReleaseVersion _releaseVersion11;
+            private ReleaseVersion _releaseVersion1 = null!;
+            private ReleaseVersion _releaseVersion2 = null!;
+            private ReleaseVersion _releaseVersion11 = null!;
             private readonly string _publicationSlug1 = "publication-slug-1";
             private readonly string _publicationSlug2 = "publication-slug-2";
             private readonly string _releaseSlug1 = "release-slug-1";
             private readonly string _releaseSlug2 = "release-slug-2";
+            
             private IReadOnlyList<ReleasePublishingKey> SetupHappyPath()
             {
                 var releasePublishingKeys = 
@@ -512,7 +513,7 @@ public class PublishingCompletionServiceTests
             public class EventRaiserTests : ReadyTests
             {
                 [Fact]
-                public async Task WhenReleaseVersionIsPublished_ThenEventIsRaiseed()
+                public async Task WhenReleaseVersionIsPublished_ThenEventIsRaised()
                 {
                     // ARRANGE
                     var releasePublishingKeys = SetupHappyPath();
@@ -535,7 +536,7 @@ public class PublishingCompletionServiceTests
                 }
                 
                 [Fact]
-                public async Task WhenPublishedReleaseVersionIsNotLatestVersion_ThenEventIsRaiseed()
+                public async Task WhenPublishedReleaseVersionIsNotLatestVersion_ThenEventIsRaised()
                 {
                     // ARRANGE
                     var releasePublishingKeys = SetupHappyPath();
