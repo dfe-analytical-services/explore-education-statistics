@@ -469,6 +469,23 @@ public class PublishingCompletionServiceTests
                     _redirectsCacheServiceBuilder.Assert.UpdateRedirectsCalled();
                 }
             }
+
+            public class DataSetPublishingServiceTests : ReadyTests
+            {
+                [Fact]
+                public async Task DataSetsWerePublished()
+                {
+                    // ARRANGE
+                    var releasePublishingKeys = SetupHappyPath();
+                    var sut = GetSut();
+
+                    // ACT
+                    await sut.CompletePublishingIfAllPriorStagesComplete(releasePublishingKeys);
+
+                    // ASSERT
+                    _dataSetPublishingServiceBuilder.Assert.DataSetsWerePublished(ReleaseVersionId1, ReleaseVersionId2);
+                }
+            }
         }
     }
 }
