@@ -11,8 +11,6 @@ parameters:
     type: string
   - name: parameterFile
     type: string
-  - name: deploySearchService
-    type: string
 
 steps:
   - task: AzureCLI@2
@@ -33,5 +31,4 @@ steps:
           --parameters \
               subscription='$(subscription)' \
               resourceTags='$(resourceTags)' \
-              maintenanceIpRanges='$(maintenanceFirewallRules)' \
-              deploySearchService=${{ parameters.deploySearchService }}
+              maintenanceIpRanges='$(maintenanceFirewallRules)'

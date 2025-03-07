@@ -26,9 +26,6 @@ param dateProvisioned string = utcNow('u')
 @description('Do Azure Monitor alerts need creating or updating?')
 param deployAlerts bool = false
 
-@description('Does the Search Service need creating or updating?')
-param deploySearchService bool = false
-
 @description('Provides access to resources for specific IP address ranges used for service maintenance.')
 param maintenanceIpRanges IpRange[] = []
 
@@ -50,7 +47,7 @@ var resourceNames = {
   }
 }
 
-module searchServiceModule 'application/searchService.bicep' = if (deploySearchService) {
+module searchServiceModule 'application/searchService.bicep' = {
   name: 'searchServiceModule'
   params: {
     location: location
@@ -62,4 +59,4 @@ module searchServiceModule 'application/searchService.bicep' = if (deploySearchS
   }
 }
 
-output searchServiceEndpoint string = deploySearchService ? searchServiceModule.outputs.searchServiceEndpoint : ''
+output searchServiceEndpoint string = searchServiceModule.outputs.searchServiceEndpoint
