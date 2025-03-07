@@ -13,9 +13,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model
         [EnumLabelValue("data")]
         Data,
         [EnumLabelValue("data-zip")]
-        DataZip,
+        DataZip, // @MarkFix remove
         [EnumLabelValue("bulk-data-zip")]
-        BulkDataZip,
+        BulkDataZip, // @MarkFix should also be removeable?
         [EnumLabelValue("image")]
         Image,
         [EnumLabelValue("metadata")]

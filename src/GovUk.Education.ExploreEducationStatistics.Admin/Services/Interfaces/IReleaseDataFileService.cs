@@ -51,7 +51,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
             IFormFile zipFile,
             CancellationToken cancellationToken);
 
-        Task<Either<ActionResult, List<DataFileInfo>>> SaveDataSetsFromTemporaryBlobStorage(
+        Task<Either<ActionResult, List<DataFileInfo>>> ImportDataSetsFromTemporaryBlobStorage(
             Guid releaseVersionId,
             List<ArchiveDataSetFileViewModel> archiveDataSetFiles,
             CancellationToken cancellationToken);

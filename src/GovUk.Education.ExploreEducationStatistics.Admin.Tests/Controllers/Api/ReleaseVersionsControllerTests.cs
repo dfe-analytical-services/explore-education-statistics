@@ -485,7 +485,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             var releaseDataFileService = new Mock<IReleaseDataFileService>(Strict);
 
             releaseDataFileService
-                .Setup(s => s.SaveDataSetsFromTemporaryBlobStorage(
+                .Setup(s => s.ImportDataSetsFromTemporaryBlobStorage(
                     It.IsAny<Guid>(),
                     It.IsAny<List<ArchiveDataSetFileViewModel>>(),
                     default))

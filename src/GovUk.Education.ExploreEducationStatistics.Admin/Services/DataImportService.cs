@@ -96,7 +96,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 MetaFileId = metaFile.Id,
                 SubjectId = subjectId,
                 Status = DataImportStatus.QUEUED,
-                ZipFileId = sourceZipFile?.Id,
+                ZipFileId = sourceZipFile?.Id, // @MarkFix ZipFileId could be removed from DataImport
             });
 
             await dataProcessorClient.Import(import.Id);

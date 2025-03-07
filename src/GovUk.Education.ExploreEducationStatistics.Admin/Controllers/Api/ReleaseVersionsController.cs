@@ -158,7 +158,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             CancellationToken cancellationToken)
         {
             return await _releaseDataFileService
-                .SaveDataSetsFromTemporaryBlobStorage(releaseVersionId, dataSetFiles, cancellationToken)
+                .ImportDataSetsFromTemporaryBlobStorage(releaseVersionId, dataSetFiles, cancellationToken)
                 .HandleFailuresOrOk();
         }
 

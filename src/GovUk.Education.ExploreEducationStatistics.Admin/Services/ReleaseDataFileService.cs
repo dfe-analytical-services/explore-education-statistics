@@ -316,7 +316,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                 type: FileType.Metadata,
                                 createdById: _userService.GetUserId());
 
-                            await UploadFileToStorage(dataFile, dataFormFile);
+                            await UploadFileToStorage(dataFile, dataFormFile); // @MarkFix import both of these to temp storage to match dataZip/bulkZip pattern?
                             await UploadFileToStorage(metaFile, metaFormFile);
 
                             var dataImport = await _dataImportService.Import(
@@ -348,7 +348,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(async _ =>
                 {
                     return await _persistenceHelper.CheckOptionalEntityExists<File>(replacingFileId)
-                        .OnSuccessCombineWith(async replacingFile =>
+                        .OnSuccess(async replacingFile =>
                         {
                             var newDataSetTitle = await GetReleaseVersionDataSetTitle(
                                 releaseVersionId, dataSetTitle, replacingFile);
@@ -360,74 +360,39 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                     zipFormFile,
                                     replacingFile);
                         })
-                        .OnSuccess(async tuple =>
+                        .OnSuccess(async archiveDataSet =>
                         {
-                            var (replacingFile, archiveDataSet) = tuple;
+                            await using var stream = zipFormFile.OpenReadStream();
+                            var archive = new ZipArchive(stream);
 
-                            var zipFile = new File
-                            {
-                                CreatedById = _userService.GetUserId(),
-                                RootPath = releaseVersionId,
-                                ContentLength = zipFormFile.Length,
-                                ContentType = zipFormFile.ContentType,
-                                Filename = zipFormFile.FileName.ToLower(),
-                                Type = FileType.DataZip,
-                            };
-                            _contentDbContext.Files.Add(zipFile);
-                            await _contentDbContext.SaveChangesAsync();
+                            var tempDataFileId = await UploadFileToTempStorage(
+                                releaseVersionId,
+                                archive.GetEntry(archiveDataSet.DataFilename)!,
+                                FileType.Data,
+                                cancellationToken: default);
+                            var tempMetaFileId = await UploadFileToTempStorage(
+                                releaseVersionId,
+                                archive.GetEntry(archiveDataSet.MetaFilename)!,
+                                FileType.Metadata,
+                                cancellationToken: default);
 
-                            var subjectId = await _releaseVersionRepository
-                                .CreateStatisticsDbReleaseAndSubjectHierarchy(releaseVersionId);
+                            var dataFileInfoList = await ImportDataSetsFromTemporaryBlobStorage(
+                                releaseVersionId,
+                                [
+                                    new ArchiveDataSetFileViewModel
+                                    {
+                                        Title = archiveDataSet.Title,
+                                        DataFileId = tempDataFileId,
+                                        DataFilename = archiveDataSet.DataFilename,
+                                        DataFileSize = archiveDataSet.DataFileSize,
+                                        MetaFileId = tempMetaFileId,
+                                        MetaFilename = archiveDataSet.MetaFilename,
+                                        MetaFileSize = archiveDataSet.MetaFileSize,
+                                        ReplacingFileId = archiveDataSet.ReplacingFile?.Id,
+                                    }
+                                ]);
 
-                            var releaseDataFileOrder =
-                                await GetNextDataFileOrder(releaseVersionId, replacingFile);
-
-                            var dataFile = await _releaseDataFileRepository.Create(
-                                releaseVersionId: releaseVersionId,
-                                subjectId: subjectId,
-                                filename: archiveDataSet.DataFilename,
-                                contentLength: archiveDataSet.DataFileSize,
-                                type: FileType.Data,
-                                createdById: _userService.GetUserId(),
-                                name: archiveDataSet.Title,
-                                replacingDataFile: replacingFile,
-                                source: zipFile,
-                                order: releaseDataFileOrder);
-
-                            var dataReleaseFile = await _contentDbContext.ReleaseFiles
-                                .Include(rf => rf.File)
-                                .SingleAsync(rf =>
-                                    rf.ReleaseVersionId == releaseVersionId
-                                    && rf.FileId == dataFile.Id);
-
-                            var metaFile = await _releaseDataFileRepository.Create(
-                                releaseVersionId: releaseVersionId,
-                                subjectId: subjectId,
-                                filename: archiveDataSet.MetaFilename,
-                                contentLength: archiveDataSet.MetaFileSize,
-                                type: FileType.Metadata,
-                                createdById: _userService.GetUserId(),
-                                source: zipFile);
-
-                            // data/meta files are extracted to blob storage by _dataImportService.Import
-                            await UploadFileToStorage(zipFile, zipFormFile);
-
-                            var dataImport = await _dataImportService.Import(
-                                subjectId: subjectId,
-                                dataFile: dataFile,
-                                metaFile: metaFile,
-                                sourceZipFile: zipFile);
-
-                            var permissions =
-                                await _userService.GetDataFilePermissions(dataFile);
-
-                            return BuildDataFileViewModel(
-                                dataReleaseFile: dataReleaseFile,
-                                metaFile: metaFile,
-                                archiveDataSet.Title,
-                                dataImport.TotalRows,
-                                dataImport.Status,
-                                permissions);
+                            return dataFileInfoList.Right.First(); // @MarkFix
                         });
                 });
         }
@@ -480,10 +445,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
-        public async Task<Either<ActionResult, List<DataFileInfo>>> SaveDataSetsFromTemporaryBlobStorage(
+        public async Task<Either<ActionResult, List<DataFileInfo>>> ImportDataSetsFromTemporaryBlobStorage(
             Guid releaseVersionId,
             List<ArchiveDataSetFileViewModel> archiveDataSetFiles,
-            CancellationToken cancellationToken)
+            CancellationToken cancellationToken = default)
         {
             return await _persistenceHelper
                 .CheckEntityExists<ReleaseVersion>(releaseVersionId)
@@ -501,7 +466,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
                         var replacingFile = archiveDataSetFile.ReplacingFileId is null
                             ? null
-                            : await _contentDbContext.Files.FirstAsync(f => f.Id == archiveDataSetFile.ReplacingFileId);
+                            : await _contentDbContext.Files.FirstAsync(f =>
+                                    f.Id == archiveDataSetFile.ReplacingFileId,
+                                cancellationToken: cancellationToken);
 
                         var releaseDataFileOrder = await GetNextDataFileOrder(releaseVersionId, replacingFile);
 
@@ -543,6 +510,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                             dataFile: dataFile,
                             metaFile: metaFile);
 
+                        // @MarkFix have the importer move the blob files?
+                        // @MarkFix this should happen before Import gets called?
                         await _privateBlobStorageService.MoveBlob(PrivateReleaseTempFiles, sourceDataFilePath, destinationDataFilePath, PrivateReleaseFiles);
                         await _privateBlobStorageService.MoveBlob(PrivateReleaseTempFiles, sourceMetaFilePath, destinationMetaFilePath, PrivateReleaseFiles);
                     }

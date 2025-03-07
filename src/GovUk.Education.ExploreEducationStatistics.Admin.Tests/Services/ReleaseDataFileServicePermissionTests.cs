@@ -216,7 +216,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     userService =>
                     {
                         var service = SetupReleaseDataFileService(userService: userService.Object);
-                        return service.SaveDataSetsFromTemporaryBlobStorage(
+                        return service.ImportDataSetsFromTemporaryBlobStorage(
                             releaseVersionId: _releaseVersion.Id,
                             archiveDataSetFiles: new Mock<List<ArchiveDataSetFileViewModel>>().Object,
                             cancellationToken: default);
