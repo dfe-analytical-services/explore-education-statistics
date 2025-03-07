@@ -81,9 +81,11 @@ public class PublishingCompletionServiceTests
         public class ReadyTests : CompletePublishingIfAllPriorStagesCompleteTests
         {
             private const string ReleaseVersionId1String = "00000001-0000-0000-0000-000000000000";
+            private const string ReleaseVersionId11String = "00000011-0000-0000-0000-000000000000";
             private const string ReleaseVersionId2String = "00000002-0000-0000-0000-000000000000";
             
             private static readonly Guid ReleaseVersionId1 = Guid.Parse(ReleaseVersionId1String);
+            private static readonly Guid ReleaseVersionId11 = Guid.Parse(ReleaseVersionId11String);
             private static readonly Guid ReleaseVersionId2 = Guid.Parse(ReleaseVersionId2String);
 
             private static readonly Guid PublicationId1 = Guid.Parse("00000000-0000-0001-0000-000000000000");
@@ -105,6 +107,9 @@ public class PublishingCompletionServiceTests
             private Publication _publication1 = null!;
             private Publication _publication2 = null!;
             private Publication _publication22SupercededBy2 = null!;
+            private ReleaseVersion _releaseVersion1;
+            private ReleaseVersion _releaseVersion2;
+            private ReleaseVersion _releaseVersion11;
 
             private IReadOnlyList<ReleasePublishingKey> SetupHappyPath()
             {
@@ -128,11 +133,15 @@ public class PublishingCompletionServiceTests
                             .Build());
                 }
 
-                var releaseVersion1 = new ReleaseVersionBuilder(ReleaseVersionId1)
+                _releaseVersion1 = new ReleaseVersionBuilder(ReleaseVersionId1)
                     .WithPublicationId(PublicationId1)
                     .Build();
 
-                var releaseVersion2 = new ReleaseVersionBuilder(ReleaseVersionId2)
+                _releaseVersion11 = new ReleaseVersionBuilder(ReleaseVersionId11)
+                    .WithPublicationId(PublicationId1)
+                    .Build();
+
+                _releaseVersion2 = new ReleaseVersionBuilder(ReleaseVersionId2)
                     .WithPublicationId(PublicationId2)
                     .Build();
 
@@ -140,17 +149,17 @@ public class PublishingCompletionServiceTests
                 _publication2 = new PublicationBuilder(PublicationId2, "publication-slug-2").Build();
                 _publication22SupercededBy2 = new PublicationBuilder(PublicationId22, "publication-slug-22").SupercededBy(_publication2.Id).Build();
                 
-                _releaseServiceBuilder.WhereGetReturns(ReleaseVersionId1, releaseVersion1);
-                _releaseServiceBuilder.WhereGetReturns(ReleaseVersionId2, releaseVersion2);
-                _methodologyServiceBuilder.WhereGetLatestVersionByReleaseReturnsNoMethodologies(releaseVersion1);
-                _methodologyServiceBuilder.WhereGetLatestVersionByReleaseReturnsNoMethodologies(releaseVersion2);
-                _contentDbContextBuilder.With(releaseVersion1);
-                _contentDbContextBuilder.With(releaseVersion2);
+                _releaseServiceBuilder.WhereGetReturns(ReleaseVersionId1, _releaseVersion1);
+                _releaseServiceBuilder.WhereGetReturns(ReleaseVersionId2, _releaseVersion2);
+                _methodologyServiceBuilder.WhereGetLatestVersionByReleaseReturnsNoMethodologies(_releaseVersion1);
+                _methodologyServiceBuilder.WhereGetLatestVersionByReleaseReturnsNoMethodologies(_releaseVersion2);
+                _contentDbContextBuilder.With(_releaseVersion1);
+                _contentDbContextBuilder.With(_releaseVersion2);
                 _contentDbContextBuilder.With(_publication1);
                 _contentDbContextBuilder.With(_publication2);
                 _contentDbContextBuilder.With(_publication22SupercededBy2);
-                _releaseServiceBuilder.WherePublicationLatestPublishedReleaseVersionIs(PublicationId1, releaseVersion1);
-                _releaseServiceBuilder.WherePublicationLatestPublishedReleaseVersionIs(PublicationId2, releaseVersion2);
+                _releaseServiceBuilder.WherePublicationLatestPublishedReleaseVersionIs(PublicationId1, _releaseVersion1);
+                _releaseServiceBuilder.WherePublicationLatestPublishedReleaseVersionIs(PublicationId2, _releaseVersion2);
                 
                 return releasePublishingKeys;
             }
@@ -330,7 +339,7 @@ public class PublishingCompletionServiceTests
             public class UpdatePublicationTests : ReadyTests
             {
                 [Fact]
-                public async Task AllPublicationsUpdated()
+                public async Task WhenPublishedReleaseVersionIsLatestVersion_ThenPublicationLatestReleaseVersionSetToIt()
                 {
                     // ARRANGE
                     var releasePublishingKeys = SetupHappyPath();
@@ -342,6 +351,24 @@ public class PublishingCompletionServiceTests
                     // ASSERT
                     _contentDbContextBuilder.Assert.PublicationsLatestPublishedReleaseVersionIdIs(PublicationId1, ReleaseVersionId1);
                     _contentDbContextBuilder.Assert.PublicationsLatestPublishedReleaseVersionIdIs(PublicationId2, ReleaseVersionId2);
+                }
+                
+                [Fact]
+                public async Task WhenPublishedReleaseVersionIsNotLatestVersion_ThenPublicationLatestReleaseVersionSetToLatestReleaseVersion()
+                {
+                    // ARRANGE
+                    var releasePublishingKeys = SetupHappyPath();
+                    
+                    // Set that release version 11 is the latest, not release version 1
+                    _releaseServiceBuilder.WherePublicationLatestPublishedReleaseVersionIs(PublicationId1, _releaseVersion11);
+                    
+                    var sut = GetSut();
+                    
+                    // ACT
+                    await sut.CompletePublishingIfAllPriorStagesComplete(releasePublishingKeys);
+
+                    // ASSERT
+                    _contentDbContextBuilder.Assert.PublicationsLatestPublishedReleaseVersionIdIs(PublicationId1, ReleaseVersionId11);
                 }
             }
             

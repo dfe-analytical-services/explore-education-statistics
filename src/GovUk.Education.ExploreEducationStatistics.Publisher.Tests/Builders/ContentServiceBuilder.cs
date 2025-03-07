@@ -33,12 +33,12 @@ public class ContentServiceBuilder
     {
         public void DeletePreviousVersionsDownloadFilesCalled(params Guid[] expectedReleaseVersionIds)
         {
-            mock.Verify(m => m.DeletePreviousVersionsDownloadFiles(It.Is<IReadOnlyList<Guid>>(actual => expectedReleaseVersionIds.All(actual.Contains) && actual.All(expectedReleaseVersionIds.Contains))), Times.Once);
+            mock.Verify(m => m.DeletePreviousVersionsDownloadFiles(It.Is<IReadOnlyList<Guid>>(actual => expectedReleaseVersionIds.OrderBy(g => g).SequenceEqual(actual.OrderBy(g => g)))), Times.Once);
         }
         
         public void DeletePreviousVersionsContentCalled(params Guid[] expectedReleaseVersionIds)
         {
-            mock.Verify(m => m.DeletePreviousVersionsContent(It.Is<IReadOnlyList<Guid>>(actual => expectedReleaseVersionIds.All(actual.Contains) && actual.All(expectedReleaseVersionIds.Contains))), Times.Once);
+            mock.Verify(m => m.DeletePreviousVersionsContent(It.Is<IReadOnlyList<Guid>>(actual => expectedReleaseVersionIds.OrderBy(g => g).SequenceEqual(actual.OrderBy(g => g)))), Times.Once);
         }
 
         public void UpdateCachedTaxonomyBlobsCalled()
