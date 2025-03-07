@@ -16,7 +16,7 @@ public class EventRaiserServiceBuilder
     public EventRaiserServiceBuilder()
     {
         _mock
-            .Setup(m => m.RaiseReleaseVersionPublishedEvents(It.IsAny<IEnumerable<PublishingCompletionService.PublishedReleaseVersionInfo>>()))
+            .Setup(m => m.RaiseReleaseVersionPublishedEvents(It.IsAny<IList<PublishingCompletionService.PublishedReleaseVersionInfo>>()))
             .Returns(Task.CompletedTask);
     }
 
@@ -25,7 +25,7 @@ public class EventRaiserServiceBuilder
         public void EventWasRaised(Func<PublishingCompletionService.PublishedReleaseVersionInfo, bool> expected)
         {
             mock.Verify(m => m.RaiseReleaseVersionPublishedEvents(
-                It.Is<IEnumerable<PublishingCompletionService.PublishedReleaseVersionInfo>>(
+                It.Is<IList<PublishingCompletionService.PublishedReleaseVersionInfo>>(
                     actual => actual.Any(expected))));
         }
     }
