@@ -37,6 +37,13 @@ param storageAccountPublicNetworkAccessEnabled bool = false
 @description('Specifies firewall rules for the storage account in use by the Function App.')
 param storageFirewallRules IpRange[] = []
 
+@description('Specifies additional setting to add to the Function App.')
+param appSettings {
+  name: string
+  @secure()
+  value: string
+}[]
+
 @description('The Application Insights connection string that is associated with this resource.')
 param applicationInsightsConnectionString string
 
@@ -144,6 +151,10 @@ var fileServiceAlerts = alerts != null
   }
 : null
 
+resource keyVault 'Microsoft.KeyVault/vaults@2023-07-01' existing = {
+  name: keyVaultName
+}
+
 module appServicePlanModule '../../public-api/components/appServicePlan.bicep' = {
   name: '${appServicePlanName}ModuleDeploy'
   params: {
@@ -170,7 +181,7 @@ module storageAccountModule '../../public-api/components/storageAccount.bicep' =
     firewallRules: storageFirewallRules
     sku: 'Standard_LRS'
     kind: 'StorageV2'
-    keyVaultName: keyVaultName
+    keyVaultName: keyVault.name
     privateEndpointSubnetIds: {
       blob: privateEndpoints.storageAccounts
       file: privateEndpoints.storageAccounts
@@ -205,7 +216,7 @@ resource functionApp 'Microsoft.Web/sites@2024-04-01' = {
     virtualNetworkSubnetId: subnetId
     siteConfig: {
       alwaysOn: alwaysOn
-      appSettings: [
+      appSettings: union([
         {
           name: 'APPLICATIONINSIGHTS_CONNECTION_STRING'
           value: applicationInsightsConnectionString
@@ -217,7 +228,7 @@ resource functionApp 'Microsoft.Web/sites@2024-04-01' = {
         }
         {
           name: 'WEBSITE_CONTENTAZUREFILECONNECTIONSTRING'
-          value: '@Microsoft.KeyVault(VaultName=${keyVaultName};SecretName=${storageAccountModule.outputs.connectionStringSecretName})'
+          value: '@Microsoft.KeyVault(VaultName=${keyVault.name};SecretName=${storageAccountModule.outputs.connectionStringSecretName})'
         }
         {
           name: 'WEBSITE_CONTENTSHARE'
@@ -247,7 +258,7 @@ resource functionApp 'Microsoft.Web/sites@2024-04-01' = {
           name: 'WEBSITE_SKIP_CONTENTSHARE_VALIDATION'
           value: !functionAppExists ? '1' : null
         }
-      ]
+      ], appSettings)
       cors: {
         allowedOrigins: union(['https://portal.azure.com'], allowedOrigins)
         supportCredentials: false
@@ -281,7 +292,7 @@ module keyVaultRoleAssignmentModule '../../public-api/components/keyVaultRoleAss
   name: '${functionAppName}KeyVaultRoleAssignmentModuleDeploy'
   params: {
     principalIds: userAssignedManagedIdentityParams != null ? [userAssignedManagedIdentityParams!.principalId] : [functionApp.identity.principalId]
-    keyVaultName: keyVaultName
+    keyVaultName: keyVault.name
     role: 'Secrets User'
   }
 }
