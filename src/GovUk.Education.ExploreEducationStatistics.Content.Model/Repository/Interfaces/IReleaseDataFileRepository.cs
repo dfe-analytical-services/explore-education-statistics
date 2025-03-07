@@ -15,6 +15,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.In
             long contentLength,
             FileType type,
             Guid createdById,
+            Guid? fileId = null,
             string? name = null,
             File? replacingDataFile = null,
             File? source = null,

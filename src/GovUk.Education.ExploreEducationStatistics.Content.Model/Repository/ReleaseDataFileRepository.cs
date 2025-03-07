@@ -33,6 +33,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository
             long contentLength,
             FileType type,
             Guid createdById,
+            Guid? fileId = null,
             string? name = null,
             File? replacingDataFile = null,
             File? source = null,
@@ -55,6 +56,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository
                 Order = order,
                 File = new File
                 {
+                    Id = fileId ?? Guid.NewGuid(),
                     CreatedById = createdById,
                     RootPath = releaseVersionId,
                     SubjectId = subjectId,

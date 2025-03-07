@@ -37,8 +37,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces
         public Task DeleteBlob(IBlobContainer containerName, string path);
 
         public Task<bool> MoveBlob(
-            IBlobContainer sourceContainer,
             string sourcePath,
+            IBlobContainer sourceContainer,
             string destinationPath,
             IBlobContainer? destinationContainer = null);
 

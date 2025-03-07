@@ -654,7 +654,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
             var service = SetupTestBlobStorageService(blobServiceClient.Object);
 
             // Act
-            var result = await service.MoveBlob(PrivateReleaseTempFiles, sourcePath, destinationPath);
+            var result = await service.MoveBlob(sourcePath, PrivateReleaseTempFiles, destinationPath);
 
             // Assert
             Assert.False(result);
@@ -685,7 +685,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
             var service = SetupTestBlobStorageService(blobServiceClient.Object);
 
             // Act
-            var result = await service.MoveBlob(PrivateReleaseTempFiles, sourcePath, destinationPath);
+            var result = await service.MoveBlob(sourcePath, PrivateReleaseTempFiles, destinationPath);
 
             // Assert
             Assert.False(result);

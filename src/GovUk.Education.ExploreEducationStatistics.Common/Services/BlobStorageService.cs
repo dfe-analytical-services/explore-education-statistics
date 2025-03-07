@@ -223,8 +223,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
         }
 
         public async Task<bool> MoveBlob(
-            IBlobContainer sourceContainer,
             string sourcePath,
+            IBlobContainer sourceContainer,
             string destinationPath,
             IBlobContainer? destinationContainer = null)
         {
