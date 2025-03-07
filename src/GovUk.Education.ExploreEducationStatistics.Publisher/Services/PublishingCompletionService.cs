@@ -133,9 +133,8 @@ public class PublishingCompletionService(
     public record PublishedReleaseVersionInfo
     {
         public Guid ReleaseVersionId { get; init; }
-
         public Guid ReleaseId {get;init;}
-        public string ReleaseSlug { get; init; }
+        public string ReleaseSlug { get; init; } = string.Empty;
         public Guid PublicationId { get; init; }
         public string PublicationSlug { get; init; } = string.Empty;
         public Guid PublicationLatestReleaseVersionId { get; init; }
