@@ -23,6 +23,10 @@ param storageFirewallRules IpRange[]
 @description('Specifies a set of tags with which to tag the resource in Azure.')
 param tagValues object
 
+resource keyVault 'Microsoft.KeyVault/vaults@2023-07-01' existing = {
+  name: resourceNames.existingResources.keyVault
+}
+
 resource vNet 'Microsoft.Network/virtualNetworks@2023-11-01' existing = {
   name: resourceNames.existingResources.vNet
 }
@@ -47,11 +51,11 @@ module searchStorageAccountModule '../../public-api/components/storageAccount.bi
   params: {
     location: location
     storageAccountName: '${replace(resourcePrefix, '-', '')}${abbreviations.storageStorageAccounts}search'
-    publicNetworkAccessEnabled: false
+    publicNetworkAccessEnabled: true
     firewallRules: storageFirewallRules
     sku: 'Standard_LRS'
     kind: 'StorageV2'
-    keyVaultName: resourceNames.existingResources.keyVault
+    keyVaultName: keyVault.name
     alerts: deployAlerts ? {
       availability: true
       latency: true
