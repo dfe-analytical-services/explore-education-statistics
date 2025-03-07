@@ -9,7 +9,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common
     public static class BlobContainers
     {
         public static readonly IBlobContainer PrivateReleaseFiles = new BlobContainer("releases");
-        public static readonly IBlobContainer PrivateReleaseTempFiles = new BlobContainer("releases-temp");
+        public static readonly IBlobContainer PrivateReleaseTempFiles = new BlobContainer("releases-temp"); // if you change this, also update it in the ARM template!
         public static readonly IBlobContainer PublicReleaseFiles = new BlobContainer("downloads");
         public static readonly IBlobContainer PrivateContent = new PrivateBlobContainer("cache");
         public static readonly IBlobContainer PublicContent = new PublicBlobContainer("cache");
