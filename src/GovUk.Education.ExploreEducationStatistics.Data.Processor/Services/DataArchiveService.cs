@@ -25,7 +25,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             var path = import.ZipFile!.Path();
 
             await using var zipBlobFileStream = await _privateBlobStorageService
-                .StreamBlob(PrivateReleaseFiles, path);
+                .StreamBlob(PrivateReleaseFiles, path); // @MarkFix change to PrivateReleaseTempFiles
             using var archive = new ZipArchive(zipBlobFileStream);
 
             var dataFile = archive.GetEntry(import.File.Filename) ??
@@ -33,7 +33,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             var metaFile = archive.GetEntry(import.MetaFile.Filename) ??
                            throw new FileNotFoundException($"Meta file {import.MetaFile.Filename} not found in archive");
 
-            await using (var stream = dataFile.Open()) // we should have validated file's existence previously
+            await using (var stream = dataFile.Open())
             {
                 await _privateBlobStorageService.UploadStream(
                     containerName: PrivateReleaseFiles,

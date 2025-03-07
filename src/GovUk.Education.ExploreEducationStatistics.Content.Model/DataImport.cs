@@ -105,7 +105,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
     public enum DataImportStatus
     {
         QUEUED,
-        PROCESSING_ARCHIVE_FILE,
         STAGE_1, // Basic row validation
         STAGE_2, // Create locations and filters
         STAGE_3, // Import observations
@@ -131,7 +130,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
         public static readonly List<DataImportStatus> IncompleteStatuses =
         [
             QUEUED,
-            PROCESSING_ARCHIVE_FILE,
             STAGE_1,
             STAGE_2,
             STAGE_3,

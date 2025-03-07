@@ -6,14 +6,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests
 {
     public class DataImportTests
     {
-        private static readonly List<DataImportStatus> StatusesWithZeroProgress = new List<DataImportStatus>
-        {
+        private static readonly List<DataImportStatus> StatusesWithZeroProgress =
+        [
             CANCELLING,
             QUEUED,
-            PROCESSING_ARCHIVE_FILE,
             FAILED,
             NOT_FOUND
-        };
+        ];
 
         private const int StagePercentageComplete = 50;
 

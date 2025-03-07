@@ -20,7 +20,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Functions
         private static readonly DataImportStatus[] RequeueMessageOnCompletionOfStages =
         [
             DataImportStatus.QUEUED,
-            DataImportStatus.PROCESSING_ARCHIVE_FILE,
             DataImportStatus.STAGE_1,
             DataImportStatus.STAGE_2
         ];
@@ -70,16 +69,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Functions
                             import.File.Filename);
                         break;
                     case DataImportStatus.QUEUED:
-                    case DataImportStatus.PROCESSING_ARCHIVE_FILE:
                     {
-                        // This handles data sets from both dataZips and bulkDataZips
+                        // This unpacks the data set from either a dataZip or a bulkDataZip
                         if (import.ZipFile != null)
                         {
                             _logger.LogInformation(
                                 "Unpacking data files for data file {DataFilename} for {ZipFilename}",
                                 import.File.Filename,
                                 import.ZipFile.Filename);
-                            
+
                             await _processorService.ProcessUnpackingArchiveDataSet(import.Id);
                         }
 
