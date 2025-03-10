@@ -1,11 +1,14 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Interfaces;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
+using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainers;
 using static GovUk.Education.ExploreEducationStatistics.Data.Processor.Model.ProcessorQueues;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Functions
@@ -14,6 +17,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Functions
     {
         private readonly IDataImportService _dataImportService;
         private readonly IProcessorService _processorService;
+        private readonly IPrivateBlobStorageService _privateBlobStorageService;
         private readonly ILogger<Processor> _logger;
         private readonly bool _rethrowExceptions;
 
@@ -27,11 +31,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Functions
         public Processor(
             IDataImportService dataImportService,
             IProcessorService processorService,
+            IPrivateBlobStorageService privateBlobStorageService,
             ILogger<Processor> logger,
             bool rethrowExceptions = false)
         {
             _dataImportService = dataImportService;
             _processorService = processorService;
+            _privateBlobStorageService = privateBlobStorageService;
             _logger = logger;
             _rethrowExceptions = rethrowExceptions;
         }
@@ -81,6 +87,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Functions
 
                             await _processorService.ProcessUnpackingArchiveDataSet(import.Id);
                         }
+
+                        var dataFilePath = import.File.Path();
+                        var metaFilePath = import.MetaFile.Path();
+
+                        await _privateBlobStorageService.MoveBlob(
+                            dataFilePath, PrivateReleaseTempFiles,
+                            dataFilePath, PrivateReleaseFiles);
+                        await _privateBlobStorageService.MoveBlob(
+                            metaFilePath, PrivateReleaseTempFiles,
+                            metaFilePath, PrivateReleaseFiles);
 
                         await _dataImportService.UpdateStatus(import.Id, DataImportStatus.STAGE_1, 0);
                         break;

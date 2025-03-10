@@ -316,8 +316,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                 type: FileType.Metadata,
                                 createdById: _userService.GetUserId());
 
-                            await UploadFileToStorage(dataFile, dataFormFile); // @MarkFix import both of these to temp storage to match dataZip/bulkZip pattern?
-                            await UploadFileToStorage(metaFile, metaFormFile);
+                            await UploadFileToTempStorage(dataFile, dataFormFile); // @MarkFix import both of these to temp storage to match dataZip/bulkZip pattern?
+                            await UploadFileToTempStorage(metaFile, metaFormFile);
 
                             var dataImport = await _dataImportService.Import(
                                 subjectId: subjectId,
@@ -513,17 +513,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                             subjectId: subjectId,
                             dataFile: dataFile,
                             metaFile: metaFile);
-
-                        // @MarkFix have the importer move the blob files?
-                        var dataFilePath = FileExtensions.Path(releaseVersionId, FileType.Data, dataFile.Id); // Same id used in temp storage and normal storage
-                        var metaFilePath = FileExtensions.Path(releaseVersionId, FileType.Metadata, metaFile.Id);
-
-                        await _privateBlobStorageService.MoveBlob(
-                            dataFilePath, PrivateReleaseTempFiles,
-                            dataFilePath, PrivateReleaseFiles);
-                        await _privateBlobStorageService.MoveBlob(
-                            metaFilePath, PrivateReleaseTempFiles,
-                            metaFilePath, PrivateReleaseFiles);
                     }
 
                     return await BuildDataFileViewModels(releaseFiles);
@@ -534,8 +523,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             Guid releaseVersionId,
             ArchiveDataSetFileViewModel fileImportRequest)
         {
-            var dataBlobExists = await _privateBlobStorageService.CheckBlobExists(PrivateReleaseTempFiles, $"{FileExtensions.Path(releaseVersionId, FileType.Data, fileImportRequest.DataFileId)}");
-            var metaBlobExists = await _privateBlobStorageService.CheckBlobExists(PrivateReleaseTempFiles, $"{FileExtensions.Path(releaseVersionId, FileType.Metadata, fileImportRequest.MetaFileId)}");
+            var dataBlobExists = await _privateBlobStorageService.CheckBlobExists(
+                PrivateReleaseTempFiles,
+                $"{FileExtensions.Path(releaseVersionId, FileType.Data, fileImportRequest.DataFileId)}");
+            var metaBlobExists = await _privateBlobStorageService.CheckBlobExists(
+                PrivateReleaseTempFiles,
+                $"{FileExtensions.Path(releaseVersionId, FileType.Metadata, fileImportRequest.MetaFileId)}");
 
             if (!dataBlobExists || !metaBlobExists)
             {
@@ -657,12 +650,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return dataSetTitle;
         }
 
-        private async Task UploadFileToStorage( // @MarkFix change to upload to temp storage
+        private async Task UploadFileToTempStorage(
             File file,
             IFormFile formFile)
         {
             await _privateBlobStorageService.UploadFile(
-                containerName: PrivateReleaseFiles,
+                containerName: PrivateReleaseTempFiles,
                 path: file.Path(),
                 file: formFile
             );
