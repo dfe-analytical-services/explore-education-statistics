@@ -59,7 +59,7 @@ export default function PublicationPublishedReleasesTable({
             Status <PublishedStatusGuidanceModal />
           </th>
           <th>Published date</th>
-          <th>Actions</th>
+          <th className="govuk-!-width-one-quarter">Actions</th>
         </tr>
       </thead>
       <tbody>
