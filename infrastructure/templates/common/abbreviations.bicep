@@ -46,6 +46,7 @@ var abbreviations = {
   eventGridEventSubscriptions: 'evgs'
   eventHubNamespaces: 'evhns'
   eventHubNamespacesEventHubs: 'evh'
+  fileShare: 'share'
   hdInsightClustersHadoop: 'hadoop'
   hdInsightClustersHbase: 'hbase'
   hdInsightClustersKafka: 'kafka'

@@ -36,6 +36,8 @@ stages:
     condition: ${{ parameters.condition }}
     variables:
       - group: Search Infrastructure - ${{ parameters.environment }}
+      - name: searchDocsFunctionAppName
+        value: $(subscription)-ees-fa-searchdocs
       - name: infraDeployName
         value: SearchInfrastructure$(Build.BuildNumber)
     jobs:
@@ -44,3 +46,9 @@ stages:
           serviceConnection: ${{ parameters.serviceConnection }}
           environment: ${{ parameters.environment }}
           bicepParamFile: ${{ parameters.bicepParamFile }}
+
+      - template: ../jobs/deploy-search-docs-function-app.yml
+        parameters:
+          serviceConnection: ${{ parameters.serviceConnection }}
+          environment: ${{ parameters.environment }}
+          dependsOn: DeploySearchInfrastructure
