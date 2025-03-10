@@ -22,11 +22,7 @@ resources:
   pipelines:
     - pipeline: MainBuild
       source: Explore Education Statistics
-      trigger:
-        branches:
-          - dev
-          - test
-          - master
+      trigger: none
 
 variables:
   - group: Search Infrastructure - Common
