@@ -1,6 +1,6 @@
 import ApprovalsTable from '@admin/pages/admin-dashboard/components/ApprovalsTable';
 import { MethodologyVersion } from '@admin/services/methodologyService';
-import { DashboardReleaseSummary } from '@admin/services/releaseService';
+import { DashboardReleaseVersionSummary } from '@admin/services/releaseVersionService';
 import { waitFor, within } from '@testing-library/dom';
 import { render, screen } from '@testing-library/react';
 import React from 'react';
@@ -33,7 +33,7 @@ describe('ApprovalsTable', () => {
     },
   ];
 
-  const testReleases: DashboardReleaseSummary[] = [
+  const testReleases: DashboardReleaseVersionSummary[] = [
     {
       id: 'test-id',
       title: 'Academic year 2016/17',

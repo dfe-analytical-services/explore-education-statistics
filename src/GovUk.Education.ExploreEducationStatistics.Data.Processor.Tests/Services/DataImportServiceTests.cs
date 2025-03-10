@@ -348,7 +348,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
                             ],
                         },
                     ],
-                    GroupCsvColumn = null,
+                    ParentFilter = null,
                 },
                 new()
                 {
@@ -365,7 +365,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
                             ],
                         },
                     ],
-                    GroupCsvColumn = "root_filter",
+                    ParentFilter = "root_filter",
                 },
                 new()
                 {
@@ -385,7 +385,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
                             ],
                         },
                     ],
-                    GroupCsvColumn = "child_filter1",
+                    ParentFilter = "child_filter1",
                 }
             };
 
@@ -468,7 +468,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
                         Label = f.Label,
                         Hint = f.Hint,
                         ColumnName = f.Name,
-                        GroupCsvColumn = f.GroupCsvColumn,
+                        ParentFilter = f.ParentFilter,
                     }).ToList());
 
                 var hierarchy = Assert.Single(results);
@@ -519,7 +519,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
                             ],
                         },
                     ],
-                    GroupCsvColumn = null,
+                    ParentFilter = null,
                 },
                 new()
                 {
@@ -534,7 +534,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
                             ],
                         },
                     ],
-                    GroupCsvColumn = "root_filter0",
+                    ParentFilter = "root_filter0",
                 },
                 new()
                 {
@@ -549,7 +549,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
                             ],
                         },
                     ],
-                    GroupCsvColumn = null,
+                    ParentFilter = null,
                 },
                 new()
                 {
@@ -564,7 +564,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
                             ],
                         },
                     ],
-                    GroupCsvColumn = "root_filter1",
+                    ParentFilter = "root_filter1",
                 },
             };
 
@@ -605,7 +605,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
                         Label = f.Label,
                         Hint = f.Hint,
                         ColumnName = f.Name,
-                        GroupCsvColumn = f.GroupCsvColumn,
+                        ParentFilter = f.ParentFilter,
                     }).ToList());
 
                 Assert.Equal(2, results.Count);

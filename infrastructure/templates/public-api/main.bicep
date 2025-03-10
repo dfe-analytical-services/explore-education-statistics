@@ -6,7 +6,7 @@ import {
   StaticWebAppSku
   ContainerAppWorkloadProfile
   PostgreSqlFlexibleServerConfig
-  PublicApiStorageAccountConfig
+  StorageAccountConfig
 } from 'types.bicep'
 
 @description('Environment : Subscription name e.g. s101d01. Used as a prefix for created resources.')
@@ -15,8 +15,18 @@ param subscription string = ''
 @description('Environment : Specifies the location in which the Azure resources should be deployed.')
 param location string = resourceGroup().location
 
+@description('Analytics Storage configuration.')
+param analyticsStorageConfig StorageAccountConfig = {
+  kind: 'FileStorage'
+  sku: 'Premium_ZRS'
+  fileShare: {
+    quotaGbs: 100
+    accessTier: 'Premium'
+  }
+}
+
 @description('Public API Storage configuration.')
-param publicApiStorageConfig PublicApiStorageAccountConfig = {
+param publicApiStorageConfig StorageAccountConfig = {
   kind: 'FileStorage'
   sku: 'Premium_ZRS'
   fileShare: {
@@ -119,6 +129,7 @@ param publicUrls {
   contentApi: string
   publicSite: string
   publicApi: string
+  publicApiAppGateway: string
 }
 
 @description('Specifies whether or not the Data Processor Function App already exists.')
@@ -200,6 +211,8 @@ var resourceNames = {
     }
   }
   sharedResources: {
+    analyticsFileShare: '${commonResourcePrefix}-${abbreviations.fileShare}-anlyt'
+    analyticsStorageAccount: '${replace(commonResourcePrefix, '-', '')}${abbreviations.storageStorageAccounts}anlyt'
     appGateway: '${commonResourcePrefix}-${abbreviations.networkApplicationGateways}-01'
     appGatewayIdentity: '${commonResourcePrefix}-${abbreviations.managedIdentityUserAssignedIdentities}-${abbreviations.networkApplicationGateways}-01'
     containerAppEnvironment: '${commonResourcePrefix}-${abbreviations.appManagedEnvironments}-01'
@@ -249,6 +262,18 @@ module privateDnsZonesModule 'application/shared/privateDnsZones.bicep' = if (de
   name: 'privateDnsZonesApplicationModuleDeploy'
   params: {
     resourceNames: resourceNames
+    tagValues: tagValues
+  }
+}
+
+module analyticsStorageModule 'application/shared/analyticsStorage.bicep' = {
+  name: 'analyticsStorageAccountApplicationModuleDeploy'
+  params: {
+    location: location
+    resourceNames: resourceNames
+    config: analyticsStorageConfig
+    storageFirewallRules: maintenanceIpRanges
+    deployAlerts: deployAlerts
     tagValues: tagValues
   }
 }
@@ -338,6 +363,7 @@ module containerAppEnvironmentModule 'application/shared/containerAppEnvironment
   }
   dependsOn: [
     publicApiStorageModule
+    analyticsStorageModule
   ]
 }
 
@@ -388,6 +414,20 @@ module docsModule 'application/public-api/publicApiDocs.bicep' = if (deployDocsS
 
 var docsRewriteSetName = '${publicApiResourcePrefix}-docs-rewrites'
 
+resource keyVault 'Microsoft.KeyVault/vaults@2023-07-01' existing = {
+  name: resourceNames.existingResources.keyVault
+}
+
+module publicApiWafPolicyModule 'application/public-api/publicApiWafPolicy.bicep' = {
+  name: 'publicApiWafPolicyModuleDeploy'
+  params: {
+    location: location
+    resourceNames: resourceNames
+    fuapiSecretValue: keyVault.getSecret('ees-publicapi-app-gateway-fuapi-header')
+    tagValues: tagValues
+  }
+}
+
 // Create an Application Gateway to serve public traffic for the Public API Container App.
 module appGatewayModule 'application/shared/appGateway.bicep' = if (deployContainerApp && deployDocsSite) {
   name: 'appGatewayModuleDeploy'
@@ -398,7 +438,8 @@ module appGatewayModule 'application/shared/appGateway.bicep' = if (deployContai
       {
         name: publicApiResourcePrefix
         certificateName: '${publicApiResourcePrefix}-certificate'
-        fqdn: replace(publicUrls.publicApi, 'https://', '')
+        fqdn: replace(publicUrls.publicApiAppGateway, 'https://', '')
+        wafPolicyName: publicApiWafPolicyModule.outputs.name
       }
     ]
     backends: [
@@ -426,6 +467,17 @@ module appGatewayModule 'application/shared/appGateway.bicep' = if (deployContai
             backendName: resourceNames.publicApi.docsApp
             rewriteSetName: docsRewriteSetName
           }
+          {
+            // Redirect non-rooted URL (has no trailing slash) to the
+            // rooted URL so that relative links in the docs site
+            // can resolve correctly.
+            name: 'docs-root-redirect'
+            paths: ['/docs']
+            type: 'redirect'
+            redirectUrl: '${publicUrls.publicApi}/docs/'
+            redirectType: 'Permanent'
+            includePath: false
+          }
         ]
       }
     ]
@@ -446,6 +498,24 @@ module appGatewayModule 'application/shared/appGateway.bicep' = if (deployContai
               urlConfiguration: {
                 modifiedPath: '/{var_uri_path_1}'
               }
+            }
+          }
+          {
+            name: 'replace-docs-backend-fqdn-with-public-docs-url'
+            conditions: [
+              {
+                variable: 'http_resp_Location'
+                pattern: 'https://${docsModule.outputs.appFqdn}/(.*)'
+                ignoreCase: true
+              }
+            ]
+            actionSet: {
+              responseHeaderConfigurations: [
+                {
+                  headerName: 'Location'
+                  headerValue: '${publicUrls.publicApi}/docs/{http_resp_Location_1}'
+                }
+              ]
             }
           }
         ]

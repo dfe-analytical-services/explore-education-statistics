@@ -7,6 +7,57 @@ describe('replaceReleaseIdPlaceholders', () => {
   test('adds release id to single uri', () => {
     expect(
       replaceReleaseIdPlaceholders(
+        '/api/releases/{releaseVersionId}/images/some-image-id',
+        'some-release-id',
+      ),
+    ).toBe('/api/releases/some-release-id/images/some-image-id');
+  });
+
+  test('adds release id for multiple uris', () => {
+    expect(
+      replaceReleaseIdPlaceholders(
+        '/api/releases/{releaseVersionId}/images/some-image-id-100 100w, ' +
+          '/api/releases/{releaseVersionId}/images/some-image-id-200 200w, ' +
+          '/api/releases/{releaseVersionId}/images/some-image-id-300 300w',
+        'some-release-id',
+      ),
+    ).toBe(
+      '/api/releases/some-release-id/images/some-image-id-100 100w, ' +
+        '/api/releases/some-release-id/images/some-image-id-200 200w, ' +
+        '/api/releases/some-release-id/images/some-image-id-300 300w',
+    );
+  });
+
+  test('does not add release id when no matching placeholder', () => {
+    expect(
+      replaceReleaseIdPlaceholders(
+        '/api/releases/[releaseVersionId]/images/some-image-id',
+        'some-release-id',
+      ),
+    ).toBe('/api/releases/[releaseVersionId]/images/some-image-id');
+
+    expect(
+      replaceReleaseIdPlaceholders(
+        '/api/releases/not-a-placeholder/images/some-image-id',
+        'some-release-id',
+      ),
+    ).toBe('/api/releases/not-a-placeholder/images/some-image-id');
+
+    expect(
+      replaceReleaseIdPlaceholders(
+        '/api/releases/images/some-image-id',
+        'some-release-id',
+      ),
+    ).toBe('/api/releases/images/some-image-id');
+  });
+});
+
+// TODO EES-5901 - migrate all content placeholders to be "releaseVersionId"
+//  and then remove the legacy "releaseId" checks below.
+describe('replaceReleaseIdPlaceholders - legacy "releaseId" placeholder', () => {
+  test('adds release id to single uri', () => {
+    expect(
+      replaceReleaseIdPlaceholders(
         '/api/releases/{releaseId}/images/some-image-id',
         'some-release-id',
       ),
@@ -78,9 +129,9 @@ describe('insertReleaseIdPlaceholders', () => {
   test('does not add release id placeholder when uri does not match pattern', () => {
     expect(
       insertReleaseIdPlaceholders(
-        '/api/releases/[releaseId]/images/some-image-id',
+        '/api/releases/[releaseVersionId]/images/some-image-id',
       ),
-    ).toBe('/api/releases/[releaseId]/images/some-image-id');
+    ).toBe('/api/releases/[releaseVersionId]/images/some-image-id');
 
     expect(
       insertReleaseIdPlaceholders('/api/releases/images/some-image-id'),

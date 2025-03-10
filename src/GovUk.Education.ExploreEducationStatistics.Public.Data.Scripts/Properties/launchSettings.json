@@ -1,10 +1,11 @@
 {
   "profiles": {
-    "Scripts": {
+    "Seed data": {
       "commandName": "Project",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
-      }
+      },
+      "commandLineArgs": "seed:data"
     }
   }
 }

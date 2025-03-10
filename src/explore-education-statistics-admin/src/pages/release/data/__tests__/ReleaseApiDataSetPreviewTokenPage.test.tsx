@@ -1,6 +1,6 @@
 import { TestConfigContextProvider } from '@admin/contexts/ConfigContext';
 import { testRelease } from '@admin/pages/release/__data__/testRelease';
-import { ReleaseContextProvider } from '@admin/pages/release/contexts/ReleaseContext';
+import { ReleaseVersionContextProvider } from '@admin/pages/release/contexts/ReleaseVersionContext';
 import ReleaseApiDataSetPreviewTokenPage from '@admin/pages/release/data/ReleaseApiDataSetPreviewTokenPage';
 import {
   releaseApiDataSetPreviewTokenRoute,
@@ -12,7 +12,7 @@ import _apiDataSetService, {
 import _previewTokenService, {
   PreviewToken,
 } from '@admin/services/previewTokenService';
-import { Release } from '@admin/services/releaseService';
+import { ReleaseVersion } from '@admin/services/releaseVersionService';
 import render from '@common-test/render';
 import { screen, waitFor, within } from '@testing-library/react';
 import addHours from 'date-fns/addHours';
@@ -116,17 +116,17 @@ describe('ReleaseApiDataSetPreviewTokenPage', () => {
     ).toBeInTheDocument();
     expect(
       screen.getByRole('heading', {
-        name: 'Get data set metadata',
+        name: 'Data set metadata',
       }),
     ).toBeInTheDocument();
     expect(
       screen.getByRole('heading', {
-        name: 'Query data set (GET)',
+        name: 'Query data set using GET',
       }),
     ).toBeInTheDocument();
     expect(
       screen.getByRole('heading', {
-        name: 'Query data set (POST)',
+        name: 'Query data set using POST',
       }),
     ).toBeInTheDocument();
   });
@@ -171,7 +171,7 @@ describe('ReleaseApiDataSetPreviewTokenPage', () => {
 
     await waitFor(() => {
       expect(history.location.pathname).toBe(
-        '/publication/publication-1/release/release-1/api-data-sets/data-set-id/preview',
+        '/publication/publication-1/release/release-1/api-data-sets/data-set-id/preview-tokens',
       );
     });
   });
@@ -202,13 +202,13 @@ describe('ReleaseApiDataSetPreviewTokenPage', () => {
   });
 
   function renderPage(options?: {
-    release?: Release;
+    releaseVersion?: ReleaseVersion;
     dataSetId?: string;
     previewTokenId?: string;
     history?: MemoryHistory;
   }) {
     const {
-      release = testRelease,
+      releaseVersion = testRelease,
       dataSetId = 'data-set-id',
       previewTokenId = 'token-id',
       history = createMemoryHistory(),
@@ -218,8 +218,8 @@ describe('ReleaseApiDataSetPreviewTokenPage', () => {
       generatePath<ReleaseDataSetPreviewTokenRouteParams>(
         releaseApiDataSetPreviewTokenRoute.path,
         {
-          publicationId: release.publicationId,
-          releaseId: release.id,
+          publicationId: releaseVersion.publicationId,
+          releaseVersionId: releaseVersion.id,
           dataSetId,
           previewTokenId,
         },
@@ -228,14 +228,14 @@ describe('ReleaseApiDataSetPreviewTokenPage', () => {
 
     return render(
       <TestConfigContextProvider>
-        <ReleaseContextProvider release={release}>
+        <ReleaseVersionContextProvider releaseVersion={releaseVersion}>
           <Router history={history}>
             <Route
               component={ReleaseApiDataSetPreviewTokenPage}
               path={releaseApiDataSetPreviewTokenRoute.path}
             />
           </Router>
-        </ReleaseContextProvider>
+        </ReleaseVersionContextProvider>
       </TestConfigContextProvider>,
     );
   }

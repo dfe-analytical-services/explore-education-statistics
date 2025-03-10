@@ -14,18 +14,18 @@ const ReleaseFootnoteCreatePage = ({
   match,
   history,
 }: RouteComponentProps<ReleaseRouteParams>) => {
-  const { publicationId, releaseId } = match.params;
+  const { publicationId, releaseVersionId } = match.params;
 
   const { value: footnoteMeta, isLoading } = useAsyncHandledRetry(
-    () => footnoteService.getFootnoteMeta(releaseId),
-    [releaseId],
+    () => footnoteService.getFootnoteMeta(releaseVersionId),
+    [releaseVersionId],
   );
 
   const footnotesPath = generatePath<ReleaseRouteParams>(
     releaseFootnotesRoute.path,
     {
       publicationId,
-      releaseId,
+      releaseVersionId,
     },
   );
 
@@ -42,7 +42,7 @@ const ReleaseFootnoteCreatePage = ({
           <FootnoteForm
             footnoteMeta={footnoteMeta}
             onSubmit={async values => {
-              await footnoteService.createFootnote(releaseId, values);
+              await footnoteService.createFootnote(releaseVersionId, values);
               history.push(footnotesPath);
             }}
             cancelButton={

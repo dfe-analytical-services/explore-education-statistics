@@ -30,7 +30,7 @@ export default function ReleaseApiDataSetPreviewTokenPage() {
 
   const { publicApiUrl, publicApiDocsUrl } = useConfig();
 
-  const { dataSetId, previewTokenId, releaseId, publicationId } =
+  const { dataSetId, previewTokenId, releaseVersionId, publicationId } =
     useParams<ReleaseDataSetPreviewTokenRouteParams>();
 
   const { data: dataSet, isLoading: isLoadingDataSet } = useQuery(
@@ -41,20 +41,11 @@ export default function ReleaseApiDataSetPreviewTokenPage() {
     ...previewTokenQueries.get(previewTokenId),
   });
 
-  const previewPagePath = generatePath<ReleaseDataSetRouteParams>(
-    releaseApiDataSetPreviewRoute.path,
-    {
-      publicationId,
-      releaseId,
-      dataSetId,
-    },
-  );
-
   const detailsPagePath = generatePath<ReleaseDataSetRouteParams>(
     releaseApiDataSetDetailsRoute.path,
     {
       publicationId,
-      releaseId,
+      releaseVersionId,
       dataSetId,
     },
   );
@@ -63,22 +54,17 @@ export default function ReleaseApiDataSetPreviewTokenPage() {
     releaseApiDataSetPreviewTokenLogRoute.path,
     {
       publicationId,
-      releaseId,
+      releaseVersionId,
       dataSetId,
     },
   );
 
   const handleRevoke = async (id: string) => {
     await previewTokenService.revokePreviewToken(id);
-
-    history.push(
-      lastLocation?.pathname === tokenLogPagePath
-        ? tokenLogPagePath
-        : previewPagePath,
-    );
+    history.push(tokenLogPagePath);
   };
 
-  const tokenExampleUrl = `${publicApiUrl}/api/v1.0/data-sets/${dataSet?.draftVersion?.id}`;
+  const tokenExampleUrl = `${publicApiUrl}/v1/data-sets/${dataSet?.draftVersion?.id}`;
 
   return (
     <>
@@ -191,7 +177,7 @@ response <- GET(url, add_headers("Preview-Token" = "${previewToken.id}"))
 
                 {dataSet?.draftVersion && (
                   <ApiDataSetQuickStart
-                    publicApiBaseUrl={`${publicApiUrl}/api/v1.0`}
+                    publicApiBaseUrl={publicApiUrl}
                     publicApiDocsUrl={publicApiDocsUrl}
                     dataSetId={dataSet.id}
                     dataSetName={dataSet.title}

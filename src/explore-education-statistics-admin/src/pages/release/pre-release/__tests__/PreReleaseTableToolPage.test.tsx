@@ -10,7 +10,9 @@ import _dataBlockService, {
 import _publicationService, {
   Publication,
 } from '@admin/services/publicationService';
-import _releaseService, { Release } from '@admin/services/releaseService';
+import _releaseVersionService, {
+  ReleaseVersion,
+} from '@admin/services/releaseVersionService';
 import _tableBuilderService, {
   SubjectMeta,
   TableDataResponse,
@@ -25,7 +27,7 @@ import { generatePath } from 'react-router-dom';
 
 jest.mock('@admin/services/dataBlockService');
 jest.mock('@admin/services/publicationService');
-jest.mock('@admin/services/releaseService');
+jest.mock('@admin/services/releaseVersionService');
 jest.mock('@common/services/tableBuilderService');
 
 const dataBlockService = _dataBlockService as jest.Mocked<
@@ -34,7 +36,9 @@ const dataBlockService = _dataBlockService as jest.Mocked<
 const publicationService = _publicationService as jest.Mocked<
   typeof _publicationService
 >;
-const releaseService = _releaseService as jest.Mocked<typeof _releaseService>;
+const releaseVersionService = _releaseVersionService as jest.Mocked<
+  typeof _releaseVersionService
+>;
 const tableBuilderService = _tableBuilderService as jest.Mocked<
   typeof _tableBuilderService
 >;
@@ -188,7 +192,7 @@ describe('PreReleaseTableToolPage', () => {
     ],
   };
 
-  const testRelease: Release = {
+  const testRelease: ReleaseVersion = {
     id: '123',
     releaseId: '456',
     slug: '123',
@@ -354,7 +358,7 @@ describe('PreReleaseTableToolPage', () => {
 
   test('renders correctly on step 5 with `dataBlockId` route param', async () => {
     publicationService.getPublication.mockResolvedValue(testPublication);
-    releaseService.getRelease.mockResolvedValue(testRelease);
+    releaseVersionService.getReleaseVersion.mockResolvedValue(testRelease);
     dataBlockService.getDataBlock.mockResolvedValue(testDataBlock);
 
     tableBuilderService.listReleaseSubjects.mockResolvedValue(testSubjects);
@@ -370,7 +374,7 @@ describe('PreReleaseTableToolPage', () => {
         preReleaseTableToolRoute.path,
         {
           publicationId: 'publication-1',
-          releaseId: 'release-1',
+          releaseVersionId: 'release-1',
           dataBlockId: 'block-1',
         },
       ),
@@ -413,7 +417,7 @@ describe('PreReleaseTableToolPage', () => {
         preReleaseTableToolRoute.path,
         {
           publicationId: 'publication-1',
-          releaseId: 'release-1',
+          releaseVersionId: 'release-1',
         },
       ),
     ],

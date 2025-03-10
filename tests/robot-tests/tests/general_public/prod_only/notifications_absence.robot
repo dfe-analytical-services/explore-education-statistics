@@ -10,7 +10,7 @@ Test Setup          fail test fast if required
 
 *** Test Cases ***
 Navigate to Absence publication
-    user navigates to public frontend    %{PUBLIC_URL}/find-statistics/pupil-absence-in-schools-in-england
+    user navigates to    %{PUBLIC_URL}/find-statistics/pupil-absence-in-schools-in-england
     user waits until h1 is visible    Pupil absence in schools in England    %{WAIT_MEDIUM}
 
 Go to Notify me page for Absence publication

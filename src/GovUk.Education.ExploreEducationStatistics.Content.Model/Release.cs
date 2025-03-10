@@ -45,10 +45,10 @@ public class Release : ICreatedUpdatedTimestamps<DateTime, DateTime?>
         public void Configure(EntityTypeBuilder<Release> builder)
         {
             builder.Property(m => m.Slug)
-                .HasMaxLength(81);
+                .HasMaxLength(51);
 
             builder.Property(m => m.Label)
-                .HasMaxLength(50);
+                .HasMaxLength(20);
 
             builder.Property(m => m.TimePeriodCoverage)
                 .HasConversion(new EnumToEnumValueConverter<TimeIdentifier>())

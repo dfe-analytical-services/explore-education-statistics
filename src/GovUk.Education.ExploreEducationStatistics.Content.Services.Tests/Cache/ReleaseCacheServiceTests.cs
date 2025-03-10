@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Chart;
+using GovUk.Education.ExploreEducationStatistics.Common.Services;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
@@ -373,10 +375,12 @@ public class ReleaseCacheServiceTests : CacheServiceTestFixture
     }
 
     private static ReleaseCacheService BuildService(
-        IReleaseService? releaseService = null
+        IReleaseService? releaseService = null,
+        IPublicBlobStorageService? publicBlobStorageService = null
     )
     {
         return new ReleaseCacheService(
-            releaseService: releaseService ?? Mock.Of<IReleaseService>(Strict));
+            releaseService: releaseService ?? Mock.Of<IReleaseService>(Strict),
+            publicBlobStorageService: publicBlobStorageService ?? Mock.Of<IPublicBlobStorageService>(Strict));
     }
 }

@@ -1,17 +1,19 @@
 import { testRelease } from '@admin/pages/release/__data__/testRelease';
 import { render, screen, waitFor } from '@testing-library/react';
 import React from 'react';
-import _releaseService from '@admin/services/releaseService';
+import _releaseVersionService from '@admin/services/releaseVersionService';
 import _permissionService from '@admin/services/permissionService';
 import _preReleaseUserService from '@admin/services/preReleaseUserService';
-import { ReleaseContextProvider } from '@admin/pages/release/contexts/ReleaseContext';
+import { ReleaseVersionContextProvider } from '@admin/pages/release/contexts/ReleaseVersionContext';
 import { MemoryRouter } from 'react-router';
 import { TestConfigContextProvider } from '@admin/contexts/ConfigContext';
 import ReleasePreReleaseAccessPage from '@admin/pages/release/pre-release/ReleasePreReleaseAccessPage';
 import userEvent from '@testing-library/user-event';
 
-jest.mock('@admin/services/releaseService');
-const releaseService = _releaseService as jest.Mocked<typeof _releaseService>;
+jest.mock('@admin/services/releaseVersionService');
+const releaseVersionService = _releaseVersionService as jest.Mocked<
+  typeof _releaseVersionService
+>;
 jest.mock('@admin/services/permissionService');
 const permissionService = _permissionService as jest.Mocked<
   typeof _permissionService
@@ -33,7 +35,7 @@ jest.mock('@common/hooks/useMedia', () => ({
 
 describe('ReleasePreReleaseAccessPage', () => {
   test('renders the pre-release users tab', async () => {
-    releaseService.getRelease.mockResolvedValue(testRelease);
+    releaseVersionService.getReleaseVersion.mockResolvedValue(testRelease);
     permissionService.canUpdateRelease.mockResolvedValue(true);
     preReleaseUserService.getUsers.mockResolvedValue([]);
 
@@ -63,7 +65,7 @@ describe('ReleasePreReleaseAccessPage', () => {
   });
 
   test('renders pre-release page link correctly', async () => {
-    releaseService.getRelease.mockResolvedValue(testRelease);
+    releaseVersionService.getReleaseVersion.mockResolvedValue(testRelease);
     permissionService.canUpdateRelease.mockResolvedValue(true);
 
     renderPage();
@@ -78,7 +80,7 @@ describe('ReleasePreReleaseAccessPage', () => {
   });
 
   test('renders the public access list tab', async () => {
-    releaseService.getRelease.mockResolvedValue(testRelease);
+    releaseVersionService.getReleaseVersion.mockResolvedValue(testRelease);
     permissionService.canUpdateRelease.mockResolvedValue(true);
     preReleaseUserService.getUsers.mockResolvedValue([]);
 
@@ -112,9 +114,9 @@ function renderPage() {
   render(
     <MemoryRouter>
       <TestConfigContextProvider>
-        <ReleaseContextProvider release={testRelease}>
+        <ReleaseVersionContextProvider releaseVersion={testRelease}>
           <ReleasePreReleaseAccessPage />
-        </ReleaseContextProvider>
+        </ReleaseVersionContextProvider>
       </TestConfigContextProvider>
     </MemoryRouter>,
   );

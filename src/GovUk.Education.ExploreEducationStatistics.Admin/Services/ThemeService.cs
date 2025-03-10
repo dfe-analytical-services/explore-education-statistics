@@ -35,7 +35,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly IUserService _userService;
         private readonly IMethodologyService _methodologyService;
         private readonly IPublishingService _publishingService;
-        private readonly IReleaseService _releaseService;
+        private readonly IReleaseVersionService _releaseVersionService;
         private readonly bool _themeDeletionAllowed;
 
         public ThemeService(
@@ -47,7 +47,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             IUserService userService,
             IMethodologyService methodologyService,
             IPublishingService publishingService,
-            IReleaseService releaseService)
+            IReleaseVersionService releaseVersionService)
         {
             _contentDbContext = contentDbContext;
             _dataSetVersionRepository = dataSetVersionRepository;
@@ -56,7 +56,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _userService = userService;
             _methodologyService = methodologyService;
             _publishingService = publishingService;
-            _releaseService = releaseService;
+            _releaseVersionService = releaseVersionService;
             _themeDeletionAllowed = appOptions.Value.EnableThemeDeletion;
         }
 
@@ -175,7 +175,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .ToAsyncEnumerable()
                 .SelectAwait(async publicationId =>
                     await DeleteMethodologiesForPublication(publicationId)
-                        .OnSuccess(() => DeleteReleasesForPublication(publicationId))
+                        .OnSuccess(() => DeleteReleaseVersionsForPublication(publicationId))
                         .OnSuccess(() => DeletePublication(publicationId)))
                 .ToListAsync(cancellationToken);
 
@@ -199,7 +199,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccessAllReturnVoid();
         }
 
-        private async Task<Either<ActionResult, Unit>> DeleteReleasesForPublication(Guid publicationId)
+        private async Task<Either<ActionResult, Unit>> DeleteReleaseVersionsForPublication(Guid publicationId)
         {
             var publications = await _contentDbContext
                 .Publications
@@ -243,7 +243,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .ToList();
 
             return await releaseVersionIdsInDeleteOrder
-                .Select(releaseVersionId => _releaseService.DeleteTestReleaseVersion(releaseVersionId))
+                .Select(releaseVersionId => _releaseVersionService.DeleteTestReleaseVersion(releaseVersionId))
                 .OnSuccessAllReturnVoid();
         }
 

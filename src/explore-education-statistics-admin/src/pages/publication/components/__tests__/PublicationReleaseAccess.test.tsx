@@ -1,6 +1,6 @@
 import baseRender from '@common-test/render';
 import PublicationReleaseAccess from '@admin/pages/publication/components/PublicationReleaseAccess';
-import { ReleaseSummary } from '@admin/services/releaseService';
+import { ReleaseVersionSummary } from '@admin/services/releaseVersionService';
 import _userService from '@admin/services/userService';
 import _releasePermissionService, {
   UserReleaseInvite,
@@ -22,7 +22,7 @@ const userService = _userService as jest.Mocked<typeof _userService>;
 describe('PublicationReleaseAccess', () => {
   const testPublicationId = 'publication-1';
 
-  const testRelease: ReleaseSummary = {
+  const testRelease: ReleaseVersionSummary = {
     id: 'release1-id',
     slug: 'release-1-slug',
     timePeriodCoverage: {

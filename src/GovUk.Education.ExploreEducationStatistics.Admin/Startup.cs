@@ -111,7 +111,7 @@ using IPublicationRepository =
     GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IPublicationRepository;
 using IPublicationService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IPublicationService;
 using IReleaseFileService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IReleaseFileService;
-using IReleaseService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IReleaseService;
+using IReleaseVersionService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IReleaseVersionService;
 using IReleaseVersionRepository =
     GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IReleaseVersionRepository;
 using IThemeService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IThemeService;
@@ -121,10 +121,12 @@ using MethodologyService = GovUk.Education.ExploreEducationStatistics.Admin.Serv
 using PublicationRepository = GovUk.Education.ExploreEducationStatistics.Admin.Services.PublicationRepository;
 using PublicationService = GovUk.Education.ExploreEducationStatistics.Admin.Services.PublicationService;
 using ReleaseFileService = GovUk.Education.ExploreEducationStatistics.Admin.Services.ReleaseFileService;
-using ReleaseService = GovUk.Education.ExploreEducationStatistics.Admin.Services.ReleaseService;
+using ReleaseVersionService = GovUk.Education.ExploreEducationStatistics.Admin.Services.ReleaseVersionService;
 using ReleaseVersionRepository = GovUk.Education.ExploreEducationStatistics.Admin.Services.ReleaseVersionRepository;
 using SameSiteMode = Microsoft.AspNetCore.Http.SameSiteMode;
 using ThemeService = GovUk.Education.ExploreEducationStatistics.Admin.Services.ThemeService;
+using IReleaseService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IReleaseService;
+using ReleaseService = GovUk.Education.ExploreEducationStatistics.Admin.Services.ReleaseService;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin
 {
@@ -428,6 +430,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<IPublicationService, PublicationService>();
             services.AddTransient<IPublicationRepository, PublicationRepository>();
             services.AddTransient<IMetaService, MetaService>();
+            services.AddTransient<IReleaseVersionService, ReleaseVersionService>();
             services.AddTransient<IReleaseService, ReleaseService>();
             services.AddTransient<IReleaseAmendmentService, ReleaseAmendmentService>();
             services.AddTransient<IReleaseApprovalService, ReleaseApprovalService>();
@@ -484,7 +487,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                 services.AddHttpClient<IPublicDataApiClient, PublicDataApiClient>((provider, httpClient) =>
                 {
                     var options = provider.GetRequiredService<IOptions<PublicDataApiOptions>>();
-                    httpClient.BaseAddress = new Uri(options.Value.Url);
+                    httpClient.BaseAddress = new Uri(options.Value.PrivateUrl);
                     httpClient.DefaultRequestHeaders.Add(HeaderNames.UserAgent, SecurityConstants.AdminUserAgent);
                 });
 
@@ -560,7 +563,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<ISubjectRepository, SubjectRepository>();
             services.AddTransient<ITimePeriodService, TimePeriodService>();
             services.AddTransient<IReleaseSubjectService, ReleaseSubjectService>();
-            services.AddTransient<ISubjectMetaService, SubjectMetaService>();
+            services.AddTransient<ISubjectMetaService, SubjectMetaService>(provider => 
+                new SubjectMetaService(
+                    statisticsDbContext: provider.GetRequiredService<StatisticsDbContext>(),
+                    contentDbContext: provider.GetRequiredService<ContentDbContext>(),
+                    cacheService: provider.GetRequiredService<IPrivateBlobCacheService>(),
+                    releaseSubjectService: provider.GetRequiredService<IReleaseSubjectService>(),
+                    filterRepository: provider.GetRequiredService<IFilterRepository>(),
+                    filterItemRepository: provider.GetRequiredService<IFilterItemRepository>(),
+                    indicatorGroupRepository: provider.GetRequiredService<IIndicatorGroupRepository>(),
+                    locationRepository: provider.GetRequiredService<ILocationRepository>(),
+                    logger: provider.GetRequiredService<ILogger<SubjectMetaService>>(),
+                    observationService: provider.GetRequiredService<IObservationService>(),
+                    timePeriodService: provider.GetRequiredService<ITimePeriodService>(),
+                    userService: provider.GetRequiredService<IUserService>(),
+                    locationOptions: provider.GetRequiredService<IOptions<LocationsOptions>>()
+                    ));
             services.AddTransient<ISubjectResultMetaService, SubjectResultMetaService>();
             services.AddTransient<ISubjectCsvMetaService, SubjectCsvMetaService>();
             services.AddSingleton<DataServiceMemoryCache<BoundaryLevel>, DataServiceMemoryCache<BoundaryLevel>>();
@@ -597,11 +615,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
 
             services.AddSingleton<IFileTypeService, FileTypeService>();
             services.AddTransient<IDataArchiveValidationService, DataArchiveValidationService>();
-            services.AddTransient<IBlobCacheService, BlobCacheService>(provider =>
-                new BlobCacheService(
-                    provider.GetRequiredService<IPrivateBlobStorageService>(),
-                    provider.GetRequiredService<ILogger<BlobCacheService>>()
-                ));
+            services.AddTransient<IPrivateBlobCacheService, PrivateBlobCacheService>();
             services.AddTransient<ICacheKeyService, CacheKeyService>();
             services.AddSingleton<IDataProcessorClient, DataProcessorClient>(_ =>
                 new DataProcessorClient(coreStorageConnectionString));

@@ -61,6 +61,9 @@ Create the initial API data set version
     user chooses select option    name:releaseFileId    ${SUBJECT_1_NAME}
     user clicks button    Confirm new API data set
 
+    user waits until page contains    Creating API data set
+    user clicks link    View API data set details
+
     user waits until page finishes loading
     user waits until modal is not visible    Create a new API data set
 
@@ -225,7 +228,7 @@ User checks relevant headings exist on API data set details page
     user waits until h2 is visible    Data set preview
     user waits until h2 is visible    Variables in this data set
     user waits until h2 is visible    Using this data
-    user waits until h2 is visible    API data set quick start
+    user waits until h2 is visible    Using the API
     user waits until h2 is visible    API data set version history
     user waits until h2 is visible    API data set changelog
 

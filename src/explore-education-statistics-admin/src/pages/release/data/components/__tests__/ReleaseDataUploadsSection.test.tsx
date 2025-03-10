@@ -129,7 +129,7 @@ describe('ReleaseDataUploadsSection', () => {
       <MemoryRouter>
         <ReleaseDataUploadsSection
           publicationId="publication-1"
-          releaseId="release-1"
+          releaseVersionId="release-1"
           canUpdateRelease
         />
       </MemoryRouter>,
@@ -172,7 +172,7 @@ describe('ReleaseDataUploadsSection', () => {
       <MemoryRouter>
         <ReleaseDataUploadsSection
           publicationId="publication-1"
-          releaseId="release-1"
+          releaseVersionId="release-1"
           canUpdateRelease
         />
       </MemoryRouter>,
@@ -219,7 +219,7 @@ describe('ReleaseDataUploadsSection', () => {
       <MemoryRouter>
         <ReleaseDataUploadsSection
           publicationId="publication-1"
-          releaseId="release-1"
+          releaseVersionId="release-1"
           canUpdateRelease
         />
       </MemoryRouter>,
@@ -259,7 +259,7 @@ describe('ReleaseDataUploadsSection', () => {
       <MemoryRouter>
         <ReleaseDataUploadsSection
           publicationId="publication-1"
-          releaseId="release-1"
+          releaseVersionId="release-1"
           canUpdateRelease
         />
       </MemoryRouter>,
@@ -283,7 +283,7 @@ describe('ReleaseDataUploadsSection', () => {
         <MemoryRouter>
           <ReleaseDataUploadsSection
             publicationId="publication-1"
-            releaseId="release-1"
+            releaseVersionId="release-1"
             canUpdateRelease
           />
         </MemoryRouter>,
@@ -350,7 +350,7 @@ describe('ReleaseDataUploadsSection', () => {
         <MemoryRouter>
           <ReleaseDataUploadsSection
             publicationId="publication-1"
-            releaseId="release-1"
+            releaseVersionId="release-1"
             canUpdateRelease
           />
         </MemoryRouter>,
@@ -419,7 +419,7 @@ describe('ReleaseDataUploadsSection', () => {
         <MemoryRouter>
           <ReleaseDataUploadsSection
             publicationId="publication-1"
-            releaseId="release-1"
+            releaseVersionId="release-1"
             canUpdateRelease
           />
         </MemoryRouter>,
@@ -481,7 +481,7 @@ describe('ReleaseDataUploadsSection', () => {
         <MemoryRouter>
           <ReleaseDataUploadsSection
             publicationId="publication-1"
-            releaseId="release-1"
+            releaseVersionId="release-1"
             canUpdateRelease
           />
         </MemoryRouter>,
@@ -561,7 +561,7 @@ describe('ReleaseDataUploadsSection', () => {
         <MemoryRouter>
           <ReleaseDataUploadsSection
             publicationId="publication-1"
-            releaseId="release-1"
+            releaseVersionId="release-1"
             canUpdateRelease
           />
         </MemoryRouter>,
@@ -618,7 +618,7 @@ describe('ReleaseDataUploadsSection', () => {
         <MemoryRouter>
           <ReleaseDataUploadsSection
             publicationId="publication-1"
-            releaseId="release-1"
+            releaseVersionId="release-1"
             canUpdateRelease
           />
         </MemoryRouter>,
@@ -671,7 +671,7 @@ describe('ReleaseDataUploadsSection', () => {
         <MemoryRouter>
           <ReleaseDataUploadsSection
             publicationId="publication-1"
-            releaseId="release-1"
+            releaseVersionId="release-1"
             canUpdateRelease
           />
         </MemoryRouter>,
@@ -713,7 +713,7 @@ describe('ReleaseDataUploadsSection', () => {
         <MemoryRouter>
           <ReleaseDataUploadsSection
             publicationId="publication-1"
-            releaseId="release-1"
+            releaseVersionId="release-1"
             canUpdateRelease
           />
         </MemoryRouter>,
@@ -748,7 +748,7 @@ describe('ReleaseDataUploadsSection', () => {
         <MemoryRouter>
           <ReleaseDataUploadsSection
             publicationId="publication-1"
-            releaseId="release-1"
+            releaseVersionId="release-1"
             canUpdateRelease
           />
         </MemoryRouter>,
@@ -797,7 +797,7 @@ describe('ReleaseDataUploadsSection', () => {
         <MemoryRouter>
           <ReleaseDataUploadsSection
             publicationId="publication-1"
-            releaseId="release-1"
+            releaseVersionId="release-1"
             canUpdateRelease
           />
         </MemoryRouter>,
@@ -819,7 +819,7 @@ describe('ReleaseDataUploadsSection', () => {
         <MemoryRouter>
           <ReleaseDataUploadsSection
             publicationId="publication-1"
-            releaseId="release-1"
+            releaseVersionId="release-1"
             canUpdateRelease
           />
         </MemoryRouter>,
@@ -845,7 +845,7 @@ describe('ReleaseDataUploadsSection', () => {
         <MemoryRouter>
           <ReleaseDataUploadsSection
             publicationId="publication-1"
-            releaseId="release-1"
+            releaseVersionId="release-1"
             canUpdateRelease
           />
         </MemoryRouter>,
@@ -887,7 +887,7 @@ describe('ReleaseDataUploadsSection', () => {
         <MemoryRouter>
           <ReleaseDataUploadsSection
             publicationId="publication-1"
-            releaseId="release-1"
+            releaseVersionId="release-1"
             canUpdateRelease
           />
         </MemoryRouter>,
@@ -931,7 +931,7 @@ describe('ReleaseDataUploadsSection', () => {
         <MemoryRouter>
           <ReleaseDataUploadsSection
             publicationId="publication-1"
-            releaseId="release-1"
+            releaseVersionId="release-1"
             canUpdateRelease
           />
         </MemoryRouter>,
@@ -964,7 +964,7 @@ describe('ReleaseDataUploadsSection', () => {
         <MemoryRouter>
           <ReleaseDataUploadsSection
             publicationId="publication-1"
-            releaseId="release-1"
+            releaseVersionId="release-1"
             canUpdateRelease
           />
         </MemoryRouter>,
@@ -1016,7 +1016,7 @@ describe('ReleaseDataUploadsSection', () => {
         <MemoryRouter>
           <ReleaseDataUploadsSection
             publicationId="publication-1"
-            releaseId="release-1"
+            releaseVersionId="release-1"
             canUpdateRelease
           />
         </MemoryRouter>,
@@ -1095,7 +1095,7 @@ describe('ReleaseDataUploadsSection', () => {
         <MemoryRouter>
           <ReleaseDataUploadsSection
             publicationId="publication-1"
-            releaseId="release-1"
+            releaseVersionId="release-1"
             canUpdateRelease
           />
         </MemoryRouter>,
@@ -1147,7 +1147,7 @@ describe('ReleaseDataUploadsSection', () => {
         <MemoryRouter>
           <ReleaseDataUploadsSection
             publicationId="publication-1"
-            releaseId="release-1"
+            releaseVersionId="release-1"
             canUpdateRelease
           />
         </MemoryRouter>,
@@ -1228,7 +1228,7 @@ describe('ReleaseDataUploadsSection', () => {
         <MemoryRouter>
           <ReleaseDataUploadsSection
             publicationId="publication-1"
-            releaseId="release-1"
+            releaseVersionId="release-1"
             canUpdateRelease
           />
         </MemoryRouter>,
@@ -1290,7 +1290,7 @@ describe('ReleaseDataUploadsSection', () => {
           <MemoryRouter>
             <ReleaseDataUploadsSection
               publicationId="publication-1"
-              releaseId="release-1"
+              releaseVersionId="release-1"
               canUpdateRelease
             />
           </MemoryRouter>,
@@ -1328,7 +1328,7 @@ describe('ReleaseDataUploadsSection', () => {
           <MemoryRouter>
             <ReleaseDataUploadsSection
               publicationId="publication-1"
-              releaseId="release-1"
+              releaseVersionId="release-1"
               canUpdateRelease
             />
           </MemoryRouter>,
@@ -1365,7 +1365,7 @@ describe('ReleaseDataUploadsSection', () => {
         <MemoryRouter>
           <ReleaseDataUploadsSection
             publicationId="publication-1"
-            releaseId="release-1"
+            releaseVersionId="release-1"
             canUpdateRelease
           />
         </MemoryRouter>,
@@ -1417,7 +1417,7 @@ describe('ReleaseDataUploadsSection', () => {
         <MemoryRouter>
           <ReleaseDataUploadsSection
             publicationId="publication-1"
-            releaseId="release-1"
+            releaseVersionId="release-1"
             canUpdateRelease
           />
         </MemoryRouter>,
@@ -1468,7 +1468,7 @@ describe('ReleaseDataUploadsSection', () => {
         <MemoryRouter>
           <ReleaseDataUploadsSection
             publicationId="publication-1"
-            releaseId="release-1"
+            releaseVersionId="release-1"
             canUpdateRelease
           />
         </MemoryRouter>,
@@ -1518,7 +1518,7 @@ describe('ReleaseDataUploadsSection', () => {
         <MemoryRouter>
           <ReleaseDataUploadsSection
             publicationId="publication-1"
-            releaseId="release-1"
+            releaseVersionId="release-1"
             canUpdateRelease
           />
         </MemoryRouter>,

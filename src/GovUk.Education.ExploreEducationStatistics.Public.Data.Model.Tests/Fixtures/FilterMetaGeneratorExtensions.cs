@@ -35,9 +35,15 @@ public static class FilterMetaGeneratorExtensions
     public static Generator<FilterMeta> WithHint(this Generator<FilterMeta> generator, string hint)
         => generator.ForInstance(s => s.SetHint(hint));
 
-    public static Generator<FilterMeta> WithAutoSelectLabel(this Generator<FilterMeta> generator,
-        string autoSelectLabel)
-        => generator.ForInstance(s => s.SetAutoSelectLabel(autoSelectLabel));
+    public static Generator<FilterMeta> WithDefaultOptionId(
+        this Generator<FilterMeta> generator,
+        int? defaultOptionId)
+        => generator.ForInstance(s => s.SetDefaultOptionId(defaultOptionId));
+
+    public static Generator<FilterMeta> WithDefaultOption(
+        this Generator<FilterMeta> generator,
+        FilterOptionMeta? defaultOption)
+        => generator.ForInstance(s => s.SetDefaultOption(defaultOption));
 
     public static Generator<FilterMeta> WithOptions(
         this Generator<FilterMeta> generator,
@@ -85,9 +91,17 @@ public static class FilterMetaGeneratorExtensions
     public static InstanceSetters<FilterMeta> SetHint(this InstanceSetters<FilterMeta> setters, string hint)
         => setters.Set(m => m.Hint, hint);
 
-    public static InstanceSetters<FilterMeta> SetAutoSelectLabel(this InstanceSetters<FilterMeta> setters,
-        string autoSelectLabel)
-        => setters.Set(m => m.AutoSelectLabel, autoSelectLabel);
+    public static InstanceSetters<FilterMeta> SetDefaultOptionId(
+        this InstanceSetters<FilterMeta> setters,
+        int? defaultOptionId)
+        => setters.Set(m => m.DefaultOptionId, defaultOptionId);
+
+    public static InstanceSetters<FilterMeta> SetDefaultOption(
+        this InstanceSetters<FilterMeta> setters,
+        FilterOptionMeta? defaultOption)
+        => setters
+            .Set(m => m.DefaultOption, defaultOption)
+            .Set(m => m.DefaultOptionId, defaultOption?.Id);
 
     public static InstanceSetters<FilterMeta> SetOptions(
         this InstanceSetters<FilterMeta> setters,

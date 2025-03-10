@@ -64,7 +64,7 @@ describe('ReleaseEditableBlock', () => {
     render(
       <ReleaseEditableBlock
         publicationId="publication-1"
-        releaseId="release-1"
+        releaseVersionId="release-1"
         sectionId="section-1"
         sectionKey="content"
         block={generateEditableContentBlock({})}
@@ -82,9 +82,9 @@ describe('ReleaseEditableBlock', () => {
 
   test('renders HTML block with correct image urls', () => {
     const image1SrcSet =
-      '/api/releases/{releaseId}/images/some-image-id-100 100w, ' +
-      '/api/releases/{releaseId}/images/some-image-id-200 200w, ' +
-      '/api/releases/{releaseId}/images/some-image-id-300 300w';
+      '/api/releases/release-1/images/some-image-id-100 100w, ' +
+      '/api/releases/release-1/images/some-image-id-200 200w, ' +
+      '/api/releases/release-1/images/some-image-id-300 300w';
 
     const image2SrcSet =
       'https://test/some-image-url-100.jpg 100w, ' +
@@ -94,14 +94,14 @@ describe('ReleaseEditableBlock', () => {
     render(
       <ReleaseEditableBlock
         publicationId="publication-1"
-        releaseId="release-1"
+        releaseVersionId="release-1"
         sectionId="section-1"
         sectionKey="content"
         block={generateEditableContentBlock({
           body: `
           <h3>Test heading</h3>
           <p>Some test content</p>
-          <img alt="Test image 1" src="/api/releases/{releaseId}/images/some-image-id" srcset="${image1SrcSet}" />
+          <img alt="Test image 1" src="/api/releases/release-1/images/some-image-id" srcset="${image1SrcSet}" />
           <img alt="Test image 2" src="https://test/some-image-url.jpg" srcset="${image2SrcSet}" />
           `,
         })}
@@ -135,7 +135,7 @@ describe('ReleaseEditableBlock', () => {
     render(
       <ReleaseEditableBlock
         publicationId="publication-1"
-        releaseId="release-1"
+        releaseVersionId="release-1"
         sectionId="section-1"
         sectionKey="content"
         block={generateEditableContentBlock({
@@ -175,7 +175,7 @@ describe('ReleaseEditableBlock', () => {
       if (methodName === 'LockContentBlock') {
         return Promise.resolve<ReleaseContentBlockLockEvent>({
           id: 'content-block-id',
-          releaseId: 'release-1',
+          releaseVersionId: 'release-1',
           sectionId: 'section-1',
           locked: '2022-02-16T12:05:00Z',
           lockedUntil: '2022-02-16T12:15:00Z',
@@ -189,7 +189,7 @@ describe('ReleaseEditableBlock', () => {
     render(
       <ReleaseEditableBlock
         publicationId="publication-1"
-        releaseId="release-1"
+        releaseVersionId="release-1"
         sectionId="section-1"
         sectionKey="content"
         block={generateEditableContentBlock({})}
@@ -238,7 +238,7 @@ describe('ReleaseEditableBlock', () => {
     render(
       <ReleaseEditableBlock
         publicationId="publication-1"
-        releaseId="release-1"
+        releaseVersionId="release-1"
         sectionId="section-1"
         sectionKey="content"
         block={generateEditableContentBlock({
@@ -281,7 +281,7 @@ describe('ReleaseEditableBlock', () => {
     render(
       <ReleaseEditableBlock
         publicationId="publication-1"
-        releaseId="release-1"
+        releaseVersionId="release-1"
         sectionId="section-1"
         sectionKey="content"
         block={generateEditableContentBlock({
@@ -335,7 +335,7 @@ describe('ReleaseEditableBlock', () => {
     render(
       <ReleaseEditableBlock
         publicationId="publication-1"
-        releaseId="release-1"
+        releaseVersionId="release-1"
         sectionId="section-1"
         sectionKey="content"
         block={generateEditableContentBlock({
@@ -372,7 +372,7 @@ describe('ReleaseEditableBlock', () => {
     render(
       <ReleaseEditableBlock
         publicationId="publication-1"
-        releaseId="release-1"
+        releaseVersionId="release-1"
         sectionId="section-1"
         sectionKey="content"
         block={generateEditableContentBlock({
@@ -407,7 +407,7 @@ describe('ReleaseEditableBlock', () => {
     render(
       <ReleaseEditableBlock
         publicationId="publication-1"
-        releaseId="release-1"
+        releaseVersionId="release-1"
         sectionId="section-1"
         sectionKey="content"
         block={generateEditableContentBlock({
@@ -471,7 +471,7 @@ describe('ReleaseEditableBlock', () => {
     render(
       <ReleaseEditableBlock
         publicationId="publication-1"
-        releaseId="release-1"
+        releaseVersionId="release-1"
         sectionId="section-1"
         sectionKey="content"
         block={generateEditableContentBlock({
@@ -552,7 +552,7 @@ describe('ReleaseEditableBlock', () => {
     render(
       <ReleaseEditableBlock
         publicationId="publication-1"
-        releaseId="release-1"
+        releaseVersionId="release-1"
         sectionId="section-1"
         sectionKey="content"
         block={generateEditableContentBlock({
@@ -587,7 +587,7 @@ describe('ReleaseEditableBlock', () => {
     // Simulates lock being renewed
     onContentBlockLocked({
       id: 'content-block-id',
-      releaseId: 'release-1',
+      releaseVersionId: 'release-1',
       sectionId: 'section-1',
       locked: '2022-02-16T12:08:00Z',
       lockedUntil: '2022-02-16T12:18:00Z',
@@ -633,7 +633,7 @@ describe('ReleaseEditableBlock', () => {
       if (methodName === 'LockContentBlock') {
         return Promise.resolve<ReleaseContentBlockLockEvent>({
           id: 'content-block-id',
-          releaseId: 'release-1',
+          releaseVersionId: 'release-1',
           sectionId: 'section-1',
           locked: '2022-02-16T12:00:00Z',
           lockedUntil: '2022-02-16T12:20:00Z',
@@ -647,7 +647,7 @@ describe('ReleaseEditableBlock', () => {
     render(
       <ReleaseEditableBlock
         publicationId="publication-1"
-        releaseId="release-1"
+        releaseVersionId="release-1"
         sectionId="section-1"
         sectionKey="content"
         block={generateEditableContentBlock({
@@ -722,7 +722,7 @@ describe('ReleaseEditableBlock', () => {
     render(
       <ReleaseEditableBlock
         publicationId="publication-1"
-        releaseId="release-1"
+        releaseVersionId="release-1"
         sectionId="section-1"
         sectionKey="content"
         block={generateEditableContentBlock({})}
@@ -740,7 +740,7 @@ describe('ReleaseEditableBlock', () => {
     // Simulates locking of block by other user
     onContentBlockLocked({
       id: 'content-block-id',
-      releaseId: 'release-1',
+      releaseVersionId: 'release-1',
       sectionId: 'section-1',
       locked: '2022-02-16T12:00:00Z',
       lockedUntil: '2022-02-16T12:10:00Z',
@@ -772,7 +772,7 @@ describe('ReleaseEditableBlock', () => {
     render(
       <ReleaseEditableBlock
         publicationId="publication-1"
-        releaseId="release-1"
+        releaseVersionId="release-1"
         sectionId="section-1"
         sectionKey="content"
         block={generateEditableContentBlock({})}
@@ -792,7 +792,7 @@ describe('ReleaseEditableBlock', () => {
     render(
       <ReleaseEditableBlock
         publicationId="publication-1"
-        releaseId="release-1"
+        releaseVersionId="release-1"
         sectionId="section-1"
         sectionKey="content"
         block={generateEditableContentBlock({})}
@@ -823,7 +823,7 @@ describe('ReleaseEditableBlock', () => {
     render(
       <ReleaseEditableBlock
         publicationId="publication-1"
-        releaseId="release-1"
+        releaseVersionId="release-1"
         sectionId="section-1"
         sectionKey="content"
         block={generateEditableEmbedBlock({})}
@@ -840,7 +840,7 @@ describe('ReleaseEditableBlock', () => {
     render(
       <ReleaseEditableBlock
         publicationId="publication-1"
-        releaseId="release-1"
+        releaseVersionId="release-1"
         sectionId="section-1"
         sectionKey="content"
         block={generateEditableDataBlock({})}
@@ -855,7 +855,7 @@ describe('ReleaseEditableBlock', () => {
       render(
         <ReleaseEditableBlock
           publicationId="publication-1"
-          releaseId="release-1"
+          releaseVersionId="release-1"
           sectionId="section-1"
           sectionKey="content"
           block={generateEditableDataBlock({ comments: testComments })}
@@ -888,7 +888,7 @@ describe('ReleaseEditableBlock', () => {
       render(
         <ReleaseEditableBlock
           publicationId="publication-1"
-          releaseId="release-1"
+          releaseVersionId="release-1"
           sectionId="section-1"
           sectionKey="content"
           block={generateEditableDataBlock({ comments: testComments })}
@@ -923,7 +923,7 @@ describe('ReleaseEditableBlock', () => {
       render(
         <ReleaseEditableBlock
           publicationId="publication-1"
-          releaseId="release-1"
+          releaseVersionId="release-1"
           sectionId="section-1"
           sectionKey="content"
           block={generateEditableDataBlock({ comments: testComments })}
@@ -966,7 +966,7 @@ describe('ReleaseEditableBlock', () => {
       render(
         <ReleaseEditableBlock
           publicationId="publication-1"
-          releaseId="release-1"
+          releaseVersionId="release-1"
           sectionId="section-1"
           sectionKey="content"
           block={generateEditableDataBlock({ comments: testComments })}
@@ -1002,7 +1002,7 @@ describe('ReleaseEditableBlock', () => {
       render(
         <ReleaseEditableBlock
           publicationId="publication-1"
-          releaseId="release-1"
+          releaseVersionId="release-1"
           sectionId="section-1"
           sectionKey="content"
           block={generateEditableDataBlock({ comments: testComments })}
@@ -1040,7 +1040,7 @@ describe('ReleaseEditableBlock', () => {
       render(
         <ReleaseEditableBlock
           publicationId="publication-1"
-          releaseId="release-1"
+          releaseVersionId="release-1"
           sectionId="section-1"
           sectionKey="content"
           block={generateEditableDataBlock({ comments: testComments })}
@@ -1086,7 +1086,7 @@ describe('ReleaseEditableBlock', () => {
       render(
         <ReleaseEditableBlock
           publicationId="publication-1"
-          releaseId="release-1"
+          releaseVersionId="release-1"
           sectionId="section-1"
           sectionKey="content"
           block={generateEditableEmbedBlock({ comments: testComments })}
@@ -1119,7 +1119,7 @@ describe('ReleaseEditableBlock', () => {
       render(
         <ReleaseEditableBlock
           publicationId="publication-1"
-          releaseId="release-1"
+          releaseVersionId="release-1"
           sectionId="section-1"
           sectionKey="content"
           block={generateEditableEmbedBlock({ comments: testComments })}
@@ -1154,7 +1154,7 @@ describe('ReleaseEditableBlock', () => {
       render(
         <ReleaseEditableBlock
           publicationId="publication-1"
-          releaseId="release-1"
+          releaseVersionId="release-1"
           sectionId="section-1"
           sectionKey="content"
           block={generateEditableEmbedBlock({ comments: testComments })}
@@ -1197,7 +1197,7 @@ describe('ReleaseEditableBlock', () => {
       render(
         <ReleaseEditableBlock
           publicationId="publication-1"
-          releaseId="release-1"
+          releaseVersionId="release-1"
           sectionId="section-1"
           sectionKey="content"
           block={generateEditableEmbedBlock({ comments: testComments })}
@@ -1233,7 +1233,7 @@ describe('ReleaseEditableBlock', () => {
       render(
         <ReleaseEditableBlock
           publicationId="publication-1"
-          releaseId="release-1"
+          releaseVersionId="release-1"
           sectionId="section-1"
           sectionKey="content"
           block={generateEditableEmbedBlock({ comments: testComments })}
@@ -1271,7 +1271,7 @@ describe('ReleaseEditableBlock', () => {
       render(
         <ReleaseEditableBlock
           publicationId="publication-1"
-          releaseId="release-1"
+          releaseVersionId="release-1"
           sectionId="section-1"
           sectionKey="content"
           block={generateEditableEmbedBlock({ comments: testComments })}
@@ -1327,7 +1327,7 @@ describe('ReleaseEditableBlock', () => {
         >
           unattachedDataBlocks: [],
           <ReleaseContentHubContextProvider
-            releaseId={releaseContent.release.id}
+            releaseVersionId={releaseContent.release.id}
           >
             <ReleaseContentProvider
               value={{

@@ -1,17 +1,19 @@
 import ScheduledReleasesTable from '@admin/pages/admin-dashboard/components/ScheduledReleasesTable';
-import _releaseService, {
-  DashboardReleaseSummary,
-} from '@admin/services/releaseService';
+import _releaseVersionService, {
+  DashboardReleaseVersionSummary,
+} from '@admin/services/releaseVersionService';
 import { waitFor, within } from '@testing-library/dom';
 import { render, screen } from '@testing-library/react';
 import React from 'react';
 import { MemoryRouter } from 'react-router';
 
-jest.mock('@admin/services/releaseService');
-const releaseService = _releaseService as jest.Mocked<typeof _releaseService>;
+jest.mock('@admin/services/releaseVersionService');
+const releaseVersionService = _releaseVersionService as jest.Mocked<
+  typeof _releaseVersionService
+>;
 
 describe('ScheduledReleasesTable', () => {
-  const testReleases: DashboardReleaseSummary[] = [
+  const testReleases: DashboardReleaseVersionSummary[] = [
     {
       id: 'release-1',
       latestRelease: true,
@@ -159,7 +161,7 @@ describe('ScheduledReleasesTable', () => {
   ];
 
   beforeEach(() => {
-    releaseService.getReleaseStatus.mockResolvedValue({
+    releaseVersionService.getReleaseVersionStatus.mockResolvedValue({
       overallStage: 'Scheduled',
     });
   });

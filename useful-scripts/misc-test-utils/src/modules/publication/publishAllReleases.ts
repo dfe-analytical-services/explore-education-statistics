@@ -1,6 +1,6 @@
 /* eslint-disable no-await-in-loop */
 import logger from '../../utils/logger';
-import releaseService from '../../services/releaseService';
+import releaseVersionService from '../../services/releaseVersionService';
 
 export type PublishMethod = 'Immediate' | 'Scheduled';
 
@@ -8,7 +8,7 @@ const publishAllReleases = async (
   publicationId: string,
   publishMethod: PublishMethod = 'Immediate',
 ) => {
-  const releases = await releaseService.getAllReleases(publicationId);
+  const releases = await releaseVersionService.getAllReleases(publicationId);
 
   switch (publishMethod) {
     case 'Immediate':
@@ -17,8 +17,10 @@ const publishAllReleases = async (
       const publishedReleases = new Set<string>();
 
       for (let i = 0; i < releases.length; i += 1) {
-        const release = await releaseService.getRelease(releases[i].id);
-        await releaseService.publishRelease(
+        const release = await releaseVersionService.getReleaseVersion(
+          releases[i].id,
+        );
+        await releaseVersionService.publishRelease(
           {
             ...release,
             approvalStatus: 'Approved',
@@ -38,13 +40,15 @@ const publishAllReleases = async (
       // eslint-disable-next-line no-case-declarations
       const scheduledReleases = new Set<string>();
       for (let i = 0; i < releases.length; i += 1) {
-        const release = await releaseService.getRelease(releases[i].id);
+        const release = await releaseVersionService.getReleaseVersion(
+          releases[i].id,
+        );
 
         const tomorrow = new Date(new Date().getTime() + 24 * 60 * 60 * 1000)
           .toISOString()
           .split('T')[0];
 
-        await releaseService.publishRelease(
+        await releaseVersionService.publishRelease(
           {
             ...release,
             approvalStatus: 'Approved',

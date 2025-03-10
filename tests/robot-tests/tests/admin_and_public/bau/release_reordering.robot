@@ -59,10 +59,8 @@ Validate first legacy release exists in the publication release order
 Create first release via api
     user creates test release via api    ${PUBLICATION_ID}    AY    2020
 
-    ${PUBLIC_URL_WITHOUT_AUTH}=    remove auth from url    %{PUBLIC_URL}
-    set suite variable    ${PUBLIC_URL_WITHOUT_AUTH}
     set suite variable    ${PUBLIC_RELEASE_1_URL}
-    ...    ${PUBLIC_URL_WITHOUT_AUTH}/find-statistics/${PUBLICATION_SLUG}/2020-21
+    ...    %{PUBLIC_URL}/find-statistics/${PUBLICATION_SLUG}/2020-21
 
 Validate first release exists in the publication release order with status unpublished
     user navigates to publication page from dashboard    ${PUBLICATION_NAME}
@@ -137,7 +135,7 @@ Validate first release has latest release status in publication release order
     user checks table cell contains    3    4    Delete
 
 Navigate to first published release on public frontend
-    user navigates to public frontend    ${PUBLIC_RELEASE_1_URL}
+    user navigates to    ${PUBLIC_RELEASE_1_URL}
 
 Validate first published release on public frontend is the latest data
     user checks page contains    This is the latest data
@@ -236,7 +234,7 @@ Validate reordered publication releases
     user checks table cell contains    3    3    Latest release
 
 Navigate to first published release on public frontend after reordering
-    user navigates to public frontend    ${PUBLIC_RELEASE_1_URL}
+    user navigates to    ${PUBLIC_RELEASE_1_URL}
 
 Validate first published release is the latest data after reordering
     user checks page contains    This is the latest data
@@ -261,7 +259,7 @@ Validate other releases section of first published release contains updated lega
 Create second release via api
     user creates test release via api    ${PUBLICATION_ID}    AYQ1    2022
     set suite variable    ${PUBLIC_RELEASE_2_URL}
-    ...    ${PUBLIC_URL_WITHOUT_AUTH}/find-statistics/${PUBLICATION_SLUG}/2022-23-q1
+    ...    %{PUBLIC_URL}/find-statistics/${PUBLICATION_SLUG}/2022-23-q1
 
 Validate second release exists in the publication release order with status unpublished
     user navigates to publication page from dashboard    ${PUBLICATION_NAME}
@@ -328,7 +326,7 @@ Validate second release has latest release status in publication release order
     user checks table cell does not contain    4    3    Latest release
 
 Navigate to second published release on public frontend
-    user navigates to public frontend    ${PUBLIC_RELEASE_2_URL}
+    user navigates to    ${PUBLIC_RELEASE_2_URL}
 
 Validate second published release is the latest data
     user checks page contains    This is the latest data
@@ -408,7 +406,7 @@ Validate first legacy release is deleted from publication release order
     user checks table cell does not contain    3    3    Latest release
 
 Navigate to second published release on public frontend after deleting legacy release
-    user navigates to public frontend    ${PUBLIC_RELEASE_2_URL}
+    user navigates to    ${PUBLIC_RELEASE_2_URL}
 
 Validate other releases section of second published release does not include first legacy release
     user checks number of other releases is correct    2
@@ -456,13 +454,13 @@ Validate first release has latest release status in publication release order af
     user checks table cell contains    3    4    Delete
 
 Navigate to first published release on public frontend after changing the latest release
-    user navigates to public frontend    ${PUBLIC_RELEASE_1_URL}
+    user navigates to    ${PUBLIC_RELEASE_1_URL}
 
 Validate first published release is the latest data after changing the latest release
     user checks page contains    This is the latest data
 
 Navigate to second published release on public frontend after changing the latest release
-    user navigates to public frontend    ${PUBLIC_RELEASE_2_URL}
+    user navigates to    ${PUBLIC_RELEASE_2_URL}
 
 Validate second published release is not the latest data after changing the latest release
     user checks page contains    This is not the latest data

@@ -1,7 +1,7 @@
 import { TestConfigContextProvider } from '@admin/contexts/ConfigContext';
 import { testRelease } from '@admin/pages/release/__data__/testRelease';
 import ReleaseApiDataSetVersionHistoryPage from '@admin/pages/release/data/ReleaseApiDataSetVersionHistoryPage';
-import { ReleaseContextProvider } from '@admin/pages/release/contexts/ReleaseContext';
+import { ReleaseVersionContextProvider } from '@admin/pages/release/contexts/ReleaseVersionContext';
 import {
   releaseApiDataSetVersionHistoryRoute,
   ReleaseDataSetRouteParams,
@@ -266,14 +266,14 @@ describe('ReleaseApiDataSetVersionHistoryPage', () => {
   function renderPage() {
     return render(
       <TestConfigContextProvider>
-        <ReleaseContextProvider release={testRelease}>
+        <ReleaseVersionContextProvider releaseVersion={testRelease}>
           <MemoryRouter
             initialEntries={[
               generatePath<ReleaseDataSetRouteParams>(
                 releaseApiDataSetVersionHistoryRoute.path,
                 {
                   publicationId: testRelease.publicationId,
-                  releaseId: testRelease.id,
+                  releaseVersionId: testRelease.id,
                   dataSetId: 'data-set-id',
                 },
               ),
@@ -284,7 +284,7 @@ describe('ReleaseApiDataSetVersionHistoryPage', () => {
               path={releaseApiDataSetVersionHistoryRoute.path}
             />
           </MemoryRouter>
-        </ReleaseContextProvider>
+        </ReleaseVersionContextProvider>
       </TestConfigContextProvider>,
     );
   }

@@ -15,9 +15,27 @@ describe('DataSetFileApiQuickStart', () => {
 
     expect(
       screen.getByRole('heading', {
-        name: 'API data set quick start',
+        name: 'Using the API',
       }),
     ).toBeInTheDocument();
+
+    expect(
+      screen.getByRole('link', {
+        name: 'API documentation',
+      }),
+    ).toHaveAttribute(
+      'href',
+      'https://dev.statistics.api.education.gov.uk/docs',
+    );
+
+    expect(
+      screen.getByRole('link', {
+        name: 'Building API integrations',
+      }),
+    ).toHaveAttribute(
+      'href',
+      'https://dev.statistics.api.education.gov.uk/docs/getting-started/building-api-integrations/',
+    );
 
     expect(
       screen.getByRole('heading', { name: 'API data set details' }),
@@ -43,20 +61,54 @@ describe('DataSetFileApiQuickStart', () => {
 
     expect(
       screen.getByLabelText('GET data set summary URL'),
-    ).toHaveDisplayValue(/data-sets\/api-data-set-id/);
+    ).toHaveDisplayValue('http://localhost:5050/v1/data-sets/api-data-set-id');
+    expect(
+      screen.getByRole('link', { name: 'Guidance: Get data set summary' }),
+    ).toHaveAttribute(
+      'href',
+      'https://dev.statistics.api.education.gov.uk/docs/reference-v1/endpoints/GetDataSet/',
+    );
+
     expect(
       screen.getByLabelText('GET data set metadata URL'),
     ).toHaveDisplayValue(
-      /data-sets\/api-data-set-id\/meta\?dataSetVersion=1.0/,
+      'http://localhost:5050/v1/data-sets/api-data-set-id/meta?dataSetVersion=1.0',
     );
+    expect(
+      screen.getByRole('link', { name: 'Guidance: Get data set metadata' }),
+    ).toHaveAttribute(
+      'href',
+      'https://dev.statistics.api.education.gov.uk/docs/reference-v1/endpoints/GetDataSetMeta/',
+    );
+
     expect(screen.getByLabelText('GET data set query URL')).toHaveDisplayValue(
-      /data-sets\/api-data-set-id\/query\?dataSetVersion=1.0/,
+      'http://localhost:5050/v1/data-sets/api-data-set-id/query?dataSetVersion=1.0',
     );
+    expect(
+      screen.getByRole('link', { name: 'Guidance: Query data set (GET)' }),
+    ).toHaveAttribute(
+      'href',
+      'https://dev.statistics.api.education.gov.uk/docs/reference-v1/endpoints/QueryDataSetGet/',
+    );
+
     expect(screen.getByLabelText('POST data set query URL')).toHaveDisplayValue(
-      /data-sets\/api-data-set-id\/query\?dataSetVersion=1.0/,
+      'http://localhost:5050/v1/data-sets/api-data-set-id/query?dataSetVersion=1.0',
     );
+    expect(
+      screen.getByRole('link', { name: 'Guidance: Query data set (POST)' }),
+    ).toHaveAttribute(
+      'href',
+      'https://dev.statistics.api.education.gov.uk/docs/reference-v1/endpoints/QueryDataSetPost/',
+    );
+
     expect(screen.getByLabelText('GET data set CSV URL')).toHaveDisplayValue(
-      /data-sets\/api-data-set-id\/csv\?dataSetVersion=1.0/,
+      'http://localhost:5050/v1/data-sets/api-data-set-id/csv?dataSetVersion=1.0',
+    );
+    expect(
+      screen.getByRole('link', { name: 'Guidance: Download data set as CSV' }),
+    ).toHaveAttribute(
+      'href',
+      'https://dev.statistics.api.education.gov.uk/docs/reference-v1/endpoints/DownloadDataSetCsv/',
     );
   });
 });

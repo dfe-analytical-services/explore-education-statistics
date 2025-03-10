@@ -159,7 +159,6 @@ describe('ChangeSection', () => {
               currentState: {
                 id: 'filter-opt-4',
                 label: 'Filter option 4 updated',
-                isAutoSelect: true,
               },
             },
             { currentState: { id: 'filter-opt-5', label: 'Filter option 5' } },
@@ -180,7 +179,6 @@ describe('ChangeSection', () => {
               currentState: {
                 id: 'filter-opt-8',
                 label: 'Filter option 8',
-                isAutoSelect: false,
               },
             },
             { currentState: { id: 'filter-opt-9', label: 'Filter option 9' } },
@@ -235,12 +233,9 @@ describe('ChangeSection', () => {
       updatedFilter1Options[1],
     ).getAllByRole('listitem');
 
-    expect(updatedFilter1Option2Changes).toHaveLength(2);
+    expect(updatedFilter1Option2Changes).toHaveLength(1);
     expect(updatedFilter1Option2Changes[0]).toHaveTextContent(
       'label changed to: Filter option 4 updated',
-    );
-    expect(updatedFilter1Option2Changes[1]).toHaveTextContent(
-      'changed to be the default option',
     );
 
     const addedFilter1Options = within(
@@ -275,12 +270,9 @@ describe('ChangeSection', () => {
 
     const updatedFilter2Option1Changes = within(
       updatedFilter2Options[0],
-    ).getAllByRole('listitem');
+    ).queryAllByRole('listitem');
 
-    expect(updatedFilter2Option1Changes).toHaveLength(1);
-    expect(updatedFilter2Options[0]).toHaveTextContent(
-      'no longer the default option',
-    );
+    expect(updatedFilter2Option1Changes).toHaveLength(0);
 
     const addedFilter2Options = within(
       screen.getByTestId('added-filterOptions-filter-2'),

@@ -155,6 +155,7 @@ Add release note to amendment
 Check amendment has no prerelease users
     user clicks link    Pre-release access
     user waits until h2 is visible    Manage pre-release user access
+    user waits until page contains button    Invite new users
     user checks page contains    No pre-release users have been invited.
 
 Check that there is no Pre-release warning text on the sign off page during amendment
@@ -200,7 +201,7 @@ Validate prerelease has not started for Analyst user during amendment as it is s
     ...    /prerelease-access#preReleaseAccess-publicList
     set suite variable    ${RELEASE_URL}
     user changes to analyst1
-    user navigates to admin frontend    ${RELEASE_URL}/prerelease/content
+    user navigates to    ${RELEASE_URL}/prerelease/content
     user waits until h1 is visible    Forbidden
 
 Approve amendment for a scheduled release and check warning text
@@ -209,7 +210,7 @@ Approve amendment for a scheduled release and check warning text
     ${month}=    get london month date    offset_days=2
     ${month_word}=    get london month word    offset_days=2
     ${year}=    get london year    offset_days=2
-    user navigates to admin frontend    ${RELEASE_URL}/status
+    user navigates to    ${RELEASE_URL}/status
     user clicks button    Edit release status
     user clicks radio    Approved for publication
     user enters text into element    id:releaseStatusForm-internalReleaseNote    Approved by prerelease UI tests
@@ -232,7 +233,7 @@ Approve amendment for a scheduled release and check warning text
 
 Validate prerelease window is not yet open for Analyst user
     user changes to analyst1
-    user navigates to admin frontend    ${RELEASE_URL}/prerelease/content
+    user navigates to    ${RELEASE_URL}/prerelease/content
 
     user waits until h1 is visible    Pre-release access is not yet available
     user checks breadcrumb count should be    2
@@ -251,7 +252,7 @@ Start prerelease
     ${month}=    get london month date    offset_days=1
     ${month_word}=    get london month word    offset_days=1
     ${year}=    get london year    offset_days=1
-    user navigates to admin frontend    ${RELEASE_URL}/status
+    user navigates to    ${RELEASE_URL}/status
     user clicks button    Edit release status
     user clicks radio    On a specific date
     user checks page contains    ${SCHEDULED_PRERELEASE_WARNING}
@@ -268,7 +269,7 @@ Start prerelease
 
 Validate prerelease has started for Analyst user after amendment
     user changes to analyst1
-    user navigates to admin frontend    ${RELEASE_URL}/prerelease/content
+    user navigates to    ${RELEASE_URL}/prerelease/content
 
     user checks breadcrumb count should be    2
     user checks nth breadcrumb contains    1    Home

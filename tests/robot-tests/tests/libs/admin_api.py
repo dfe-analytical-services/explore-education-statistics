@@ -172,7 +172,7 @@ def user_creates_test_release_via_api(
     publication_id: str, time_period: str, year: str, type: str = "AccreditedOfficialStatistics", label: str = None
 ):
     response = admin_client.post(
-        f"/api/publications/{publication_id}/releases",
+        f"/api/releases",
         {
             "publicationId": publication_id,
             "timePeriodCoverage": {

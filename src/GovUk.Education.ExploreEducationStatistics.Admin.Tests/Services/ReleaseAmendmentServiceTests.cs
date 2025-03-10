@@ -20,7 +20,6 @@ using Microsoft.EntityFrameworkCore;
 using Moq;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
-using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions.AssertExtensions;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using static GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Utils.StatisticsDbUtils;
 using ReleaseSubject = GovUk.Education.ExploreEducationStatistics.Data.Model.ReleaseSubject;
@@ -393,25 +392,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 // Check the values that we expect to have been copied over successfully from the original Release.
                 amendment.AssertDeepEqualTo(
                     originalReleaseVersion,
-                    notEqualProperties: Except<ReleaseVersion>(
+                    ignoreProperties:
+                    [
                         r => r.Id,
                         r => r.Amendment,
                         r => r.Publication,
                         r => r.Release,
-                        r => r.PreviousVersion!,
-                        r => r.PreviousVersionId!,
+                        r => r.PreviousVersion,
+                        r => r.PreviousVersionId,
                         r => r.Version,
-                        r => r.Published!,
-                        r => r.PublishScheduled!,
+                        r => r.Published,
+                        r => r.PublishScheduled,
                         r => r.Live,
                         r => r.ApprovalStatus,
                         r => r.Created,
                         r => r.CreatedBy,
                         r => r.CreatedById,
-                        r => r.NotifiedOn!,
+                        r => r.NotifiedOn,
                         r => r.NotifySubscribers,
                         r => r.UpdatePublishedDate,
-                        r => r.LatestInternalReleaseNote!,
+                        r => r.LatestInternalReleaseNote,
                         r => r.RelatedInformation,
                         r => r.Updates,
                         r => r.Content,
@@ -423,7 +423,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         r => r.KeyStatisticsSecondarySection,
                         r => r.RelatedDashboardsSection,
                         r => r.SummarySection,
-                        r => r.FeaturedTables));
+                        r => r.FeaturedTables
+                    ]);
 
                 // Check fields that should be set to new values for an amendment, rather than copied from the original
                 // Release.
@@ -436,12 +437,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Null(amendment.PublishScheduled);
                 Assert.False(amendment.Live);
                 Assert.Equal(ReleaseApprovalStatus.Draft, amendment.ApprovalStatus);
-                amendment.Created.AssertUtcNow(withinMillis: 1500);
                 Assert.Equal(amendmentCreator.Id, amendment.CreatedById);
                 Assert.Null(amendment.NotifiedOn);
                 Assert.False(amendment.NotifySubscribers);
                 Assert.False(amendment.UpdatePublishedDate);
                 Assert.Null(amendment.LatestInternalReleaseNote);
+
+                Assert.NotEqual(originalReleaseVersion.Created, amendment.Created);
+                amendment.Created.AssertUtcNow(withinMillis: 1500);
 
                 // Check Related Information links have been copied over.
                 Assert.Equal(2, amendment.RelatedInformation.Count);
@@ -613,7 +616,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     var originalTable = originalReleaseVersion.FeaturedTables[index];
                     amendedTable.AssertDeepEqualTo(
                         originalTable,
-                        notEqualProperties: Except<FeaturedTable>(
+                        ignoreProperties:
+                        [
                             ft => ft.Id,
                             ft => ft.DataBlock,
                             ft => ft.DataBlockId,
@@ -627,8 +631,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                             ft => ft.ReleaseVersion,
                             ft => ft.ReleaseVersionId,
                             ft => ft.Created,
-                            ft => ft.CreatedById!,
-                            ft => ft.Updated!));
+                            ft => ft.CreatedById,
+                            ft => ft.Updated
+                        ]);
 
                     Assert.NotEqual(Guid.Empty, amendedTable.Id);
                     Assert.NotEqual(Guid.Empty, amendedTable.DataBlockParentId);
@@ -642,8 +647,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                     Assert.Equal(amendment, amendedTable.ReleaseVersion);
                     Assert.Equal(amendment.Id, amendedTable.ReleaseVersionId);
+
+                    Assert.NotEqual(originalTable.Created, amendedTable.Created);
                     amendedTable.Created.AssertUtcNow();
                     Assert.Equal(_userId, amendedTable.CreatedById);
+
                     Assert.Null(amendedTable.Updated);
                     Assert.Null(amendedTable.UpdatedById);
                 });
@@ -669,16 +677,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 releaseSubjectAmendment.AssertDeepEqualTo(
                     releaseSubject,
-                    notEqualProperties: Except<ReleaseSubject>(
-                        rs => rs.Created!,
-                        rs => rs.Updated!,
+                    ignoreProperties:
+                    [
+                        rs => rs.Created,
+                        rs => rs.Updated,
                         // SubjectId will be the same despite a different instance of Subject itself.
                         rs => rs.Subject,
                         rs => rs.ReleaseVersion,
-                        rs => rs.ReleaseVersionId));
+                        rs => rs.ReleaseVersionId
+                    ]);
 
+                Assert.NotEqual(releaseSubject.Created, releaseSubjectAmendment.Created);
                 releaseSubjectAmendment.Created.AssertUtcNow(withinMillis: 1500);
+
                 Assert.Null(releaseSubjectAmendment.Updated);
+
                 Assert.Equal(amendmentId, releaseSubjectAmendment.ReleaseVersionId);
             }
         }
@@ -1092,23 +1105,28 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         {
             amendedLink.AssertDeepEqualTo(
                 originalLink,
-                notEqualProperties: Except<Link>(l => l.Id));
+                ignoreProperties: [l => l.Id]);
         }
 
         private void AssertAmendedUpdateCorrect(Update amendedUpdate, Update originalUpdate, ReleaseVersion amendment)
         {
             amendedUpdate.AssertDeepEqualTo(
                 originalUpdate,
-                notEqualProperties: Except<Update>(
+                ignoreProperties:
+                [
                     u => u.Id,
                     u => u.ReleaseVersion,
                     u => u.ReleaseVersionId,
-                    u => u.Created!,
-                    u => u.CreatedById!));
+                    u => u.Created,
+                    u => u.CreatedById
+                ]);
 
             Assert.Equal(amendment, amendedUpdate.ReleaseVersion);
             Assert.Equal(amendment.Id, amendedUpdate.ReleaseVersionId);
+
+            Assert.NotEqual(originalUpdate.Created, amendedUpdate.Created);
             amendedUpdate.Created.AssertUtcNow(withinMillis: 1500);
+
             Assert.Equal(_userId, amendedUpdate.CreatedById);
         }
 

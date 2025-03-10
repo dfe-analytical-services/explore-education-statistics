@@ -48,10 +48,10 @@
       "value": "data.test.explore-education-statistics.service.gov.uk"
     },
     "publicApiUrl": {
-      "value": "test.statistics.api.education.gov.uk"
+      "value": "pp-api.education.gov.uk/statistics-test"
     },
     "publicApiDocsUrl": {
-      "value": "test.statistics.api.education.gov.uk/docs"
+      "value": "pp-api.education.gov.uk/statistics-test/docs"
     },
     "detailedErrors": {
       "value": true
@@ -93,9 +93,6 @@
       "value": 268435456000
     },
     "immediatePublicationOfScheduledReleaseVersionsEnabled": {
-      "value": true
-    },
-    "publicDataDbExists": {
       "value": true
     }
   }

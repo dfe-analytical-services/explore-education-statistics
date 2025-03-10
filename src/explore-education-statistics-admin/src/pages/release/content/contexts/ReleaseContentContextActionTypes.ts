@@ -6,12 +6,12 @@ import {
 import {
   ContentSection,
   KeyStatistic,
-  Release,
+  ReleaseVersion,
 } from '@common/services/publicationService';
 import { DataBlock } from '@common/services/types/blocks';
 
 export type ContentSectionKeys = keyof Pick<
-  Release<EditableContentBlock>,
+  ReleaseVersion<EditableContentBlock>,
   | 'summarySection'
   | 'keyStatisticsSecondarySection'
   | 'headlinesSection'

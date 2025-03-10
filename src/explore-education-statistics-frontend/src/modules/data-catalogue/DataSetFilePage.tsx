@@ -23,6 +23,7 @@ import styles from '@frontend/modules/data-catalogue/DataSetPage.module.scss';
 import NotFoundPage from '@frontend/modules/NotFoundPage';
 import apiDataSetQueries from '@frontend/queries/apiDataSetQueries';
 import dataSetFileQueries from '@frontend/queries/dataSetFileQueries';
+import SubscribeLink from '@frontend/components/SubscribeLink';
 import {
   ApiDataSet,
   ApiDataSetVersion,
@@ -44,7 +45,7 @@ export const pageBaseSections = {
 } as const;
 
 export const pageApiSections = {
-  apiQuickStart: 'API data set quick start',
+  api: 'Using the API',
   apiVersionHistory: 'API data set version history',
   apiChangelog: 'API data set changelog',
 } as const;
@@ -175,7 +176,9 @@ export default function DataSetFilePage({
             )}
             {apiDataSetVersion && (
               <div className="govuk-!-font-size-16 govuk-!-margin-right-5">
-                <span className={styles.infoSectionHeading}>API version</span>{' '}
+                <span className={styles.infoSectionHeading}>
+                  API data set version
+                </span>{' '}
                 {apiDataSetVersion.version}
               </div>
             )}
@@ -203,7 +206,14 @@ export default function DataSetFilePage({
             </Button>
           </div>
 
-          <ContentHtml html={summary} />
+          <div className={styles.subscribeContainer}>
+            <ContentHtml className="dfe-flex-grow--1" html={summary} />
+            {apiDataSet && (
+              <SubscribeLink
+                url={`/api-subscriptions/new-subscription/${dataSetFile.id}`}
+              />
+            )}
+          </div>
 
           <SectionBreak size="l" />
 
@@ -218,8 +228,8 @@ export default function DataSetFilePage({
 
             <div className="govuk-grid-column-three-quarters">
               <DataSetFileDetails
+                apiDataSetId={apiDataSet?.id}
                 dataSetFile={dataSetFile}
-                hasApiDataSet={!!apiDataSet}
               />
 
               <DataSetFilePreview

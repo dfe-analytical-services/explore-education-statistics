@@ -129,7 +129,7 @@ export const methodologyRoute: ProtectedRouteProps = {
 };
 
 export const releaseRoute: ProtectedRouteProps = {
-  path: '/publication/:publicationId/release/:releaseId',
+  path: '/publication/:publicationId/release/:releaseVersionId',
   protectionAction: permissions => permissions.canAccessAnalystPages,
   component: ReleasePageContainer,
 };
@@ -142,20 +142,20 @@ export const releaseCreateRoute: ProtectedRouteProps = {
 };
 
 export const preReleaseRoute: ProtectedRouteProps = {
-  path: '/publication/:publicationId/release/:releaseId/prerelease',
+  path: '/publication/:publicationId/release/:releaseVersionId/prerelease',
   component: PreReleasePageContainer,
   protectionAction: permissions => permissions.canAccessPrereleasePages,
 };
 
 export const preReleaseAccessListRoute: ProtectedRouteProps = {
-  path: '/publication/:publicationId/release/:releaseId/prerelease-access-list',
+  path: '/publication/:publicationId/release/:releaseVersionId/prerelease-access-list',
   component: PreReleaseAccessListPage,
   protectionAction: permissions => permissions.canAccessPrereleasePages,
   exact: true,
 };
 
 export const releaseDataGuidanceRoute: ProtectedRouteProps = {
-  path: '/publication/:publicationId/release/:releaseId/data-guidance',
+  path: '/publication/:publicationId/release/:releaseVersionId/data-guidance',
   component: ReleaseDataGuidancePage,
   protectionAction: permissions => permissions.canAccessPrereleasePages,
   exact: true,

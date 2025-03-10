@@ -15,6 +15,10 @@ param workloadProfiles ContainerAppWorkloadProfile[] = []
 @description('Specifies a set of tags with which to tag the resource in Azure.')
 param tagValues object
 
+resource analyticsStorageAccount 'Microsoft.Storage/storageAccounts@2023-05-01' existing = {
+  name: resourceNames.sharedResources.analyticsStorageAccount
+}
+
 resource publicApiStorageAccount 'Microsoft.Storage/storageAccounts@2023-05-01' existing = {
   name: resourceNames.publicApi.publicApiStorageAccount
 }
@@ -37,6 +41,13 @@ module containerAppEnvironmentModule '../../components/containerAppEnvironment.b
     logAnalyticsWorkspaceName: resourceNames.sharedResources.logAnalyticsWorkspace
     applicationInsightsKey: applicationInsightsKey
     azureFileStorages: [
+      {
+        storageName: resourceNames.sharedResources.analyticsFileShare
+        storageAccountName: resourceNames.sharedResources.analyticsStorageAccount
+        storageAccountKey: analyticsStorageAccount.listKeys().keys[0].value
+        fileShareName: resourceNames.sharedResources.analyticsFileShare
+        accessMode: 'ReadWrite'
+      }
       {
         storageName: resourceNames.publicApi.publicApiFileShare
         storageAccountName: resourceNames.publicApi.publicApiStorageAccount

@@ -1,10 +1,10 @@
 import Link from '@admin/components/Link';
 import { getReleaseApprovalStatusLabel } from '@admin/pages/release/utils/releaseSummaryUtil';
 import CancelAmendmentModal from '@admin/pages/admin-dashboard/components/CancelAmendmentModal';
-import releaseService, {
+import releaseVersionService, {
   DeleteReleasePlan,
-  ReleaseSummaryWithPermissions,
-} from '@admin/services/releaseService';
+  ReleaseVersionSummaryWithPermissions,
+} from '@admin/services/releaseVersionService';
 import {
   ReleaseRouteParams,
   releaseSummaryRoute,
@@ -20,7 +20,7 @@ import DeleteDraftModal from '@admin/pages/admin-dashboard/components/DeleteDraf
 
 interface Props {
   publicationId: string;
-  release: ReleaseSummaryWithPermissions;
+  release: ReleaseVersionSummaryWithPermissions;
   onAmendmentDelete?: () => void;
 }
 
@@ -30,11 +30,13 @@ const DraftReleaseRow = ({
   onAmendmentDelete,
 }: Props) => {
   const { value: checklist, isLoading: isLoadingChecklist } =
-    useAsyncHandledRetry(() => releaseService.getReleaseChecklist(release.id));
+    useAsyncHandledRetry(() =>
+      releaseVersionService.getReleaseVersionChecklist(release.id),
+    );
 
   const [deleteReleasePlan, setDeleteReleasePlan] = useState<
     DeleteReleasePlan & {
-      releaseId: string;
+      releaseVersionId: string;
     }
   >();
 
@@ -63,7 +65,7 @@ const DraftReleaseRow = ({
           className="govuk-!-margin-right-4 govuk-!-display-inline-block"
           to={generatePath<ReleaseRouteParams>(releaseSummaryRoute.path, {
             publicationId,
-            releaseId: release.id,
+            releaseVersionId: release.id,
           })}
         >
           {release.permissions?.canUpdateRelease ? 'Edit' : 'View'}
@@ -81,7 +83,7 @@ const DraftReleaseRow = ({
                 </ButtonText>
               }
               onConfirm={async () => {
-                await releaseService.deleteRelease(release.id);
+                await releaseVersionService.deleteReleaseVersion(release.id);
                 onAmendmentDelete?.();
               }}
             />
@@ -92,7 +94,7 @@ const DraftReleaseRow = ({
             className="govuk-!-margin-right-4 govuk-!-display-inline-block"
             to={generatePath<ReleaseRouteParams>(releaseSummaryRoute.path, {
               publicationId,
-              releaseId: release.previousVersionId,
+              releaseVersionId: release.previousVersionId,
             })}
           >
             View existing version
@@ -108,8 +110,10 @@ const DraftReleaseRow = ({
                 variant="warning"
                 onClick={async () => {
                   setDeleteReleasePlan({
-                    ...(await releaseService.getDeleteReleasePlan(release.id)),
-                    releaseId: release.id,
+                    ...(await releaseVersionService.getDeleteReleaseVersionPlan(
+                      release.id,
+                    )),
+                    releaseVersionId: release.id,
                   });
                 }}
               >
@@ -119,7 +123,9 @@ const DraftReleaseRow = ({
             }
             onConfirm={async () => {
               if (deleteReleasePlan) {
-                await releaseService.deleteRelease(deleteReleasePlan.releaseId);
+                await releaseVersionService.deleteReleaseVersion(
+                  deleteReleasePlan.releaseVersionId,
+                );
                 setDeleteReleasePlan(undefined);
                 onAmendmentDelete?.();
               }

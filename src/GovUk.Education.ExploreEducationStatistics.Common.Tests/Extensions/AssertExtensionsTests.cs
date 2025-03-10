@@ -63,30 +63,14 @@ public class AssertExtensionsTests
         }
 
         [Fact]
-        public void ExceptField()
+        public void IgnoreProperty()
         {
             var person1 = new Person("Name", 30);
             var person2 = new Person("Different", 30);
 
             // Assert that all fields in Person are expected to be equal apart from the "Name" field, which is
             // expected to be unequal.
-            person1.AssertDeepEqualTo(person2, notEqualProperties: Except<Person>(person => person.Name));
-        }
-
-        [Fact]
-        public void ExceptField_ButFieldIsEqual()
-        {
-            var person1 = new Person("Name", 30);
-            var person2 = new Person("Name", 30);
-
-            // Assert that all fields in Person are expected to be equal apart from the "Name" field, which is
-            // expected to be unequal. It is, however, equal.
-            var exception = Assert.Throws<XunitException>(() =>
-                person1.AssertDeepEqualTo(person2, notEqualProperties: Except<Person>(person => person.Name)));
-
-            Assert.Equal(
-                "Expected values for expression person => person.Name to not be equal," +
-                " but they were both of value \"Name\".", exception.Message);
+            person1.AssertDeepEqualTo(person2, ignoreProperties: [person => person.Name]);
         }
     }
 

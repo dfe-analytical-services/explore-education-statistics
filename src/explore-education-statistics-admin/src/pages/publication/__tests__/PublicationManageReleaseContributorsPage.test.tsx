@@ -5,7 +5,9 @@ import {
   publicationManageReleaseContributorsPageRoute,
   PublicationManageTeamRouteParams,
 } from '@admin/routes/publicationRoutes';
-import _releaseService, { Release } from '@admin/services/releaseService';
+import _releaseVersionService, {
+  ReleaseVersion,
+} from '@admin/services/releaseVersionService';
 import _releasePermissionService, {
   UserReleaseRole,
 } from '@admin/services/releasePermissionService';
@@ -15,15 +17,17 @@ import React from 'react';
 import { MemoryRouter } from 'react-router-dom';
 import noop from 'lodash/noop';
 
-jest.mock('@admin/services/releaseService');
-const releaseService = _releaseService as jest.Mocked<typeof _releaseService>;
+jest.mock('@admin/services/releaseVersionService');
+const releaseVersionService = _releaseVersionService as jest.Mocked<
+  typeof _releaseVersionService
+>;
 
 jest.mock('@admin/services/releasePermissionService');
 const releasePermissionService = _releasePermissionService as jest.Mocked<
   typeof _releasePermissionService
 >;
 
-const testRelease: Release = {
+const testReleaseVersion: ReleaseVersion = {
   amendment: false,
   approvalStatus: 'Draft',
   id: 'release-1',
@@ -93,7 +97,9 @@ const testReleaseContributors: UserReleaseRole[] = [
 ];
 describe('PublicationManageReleaseContributorsPage', () => {
   test('renders the page correctly', async () => {
-    releaseService.getRelease.mockResolvedValue(testRelease);
+    releaseVersionService.getReleaseVersion.mockResolvedValue(
+      testReleaseVersion,
+    );
     releasePermissionService.listPublicationContributors.mockResolvedValue(
       testPublicationContributors,
     );
@@ -141,7 +147,7 @@ function renderPage() {
     publicationManageReleaseContributorsPageRoute.path,
     {
       publicationId: testPublication.id,
-      releaseId: testRelease.id,
+      releaseVersionId: testReleaseVersion.id,
     },
   );
 

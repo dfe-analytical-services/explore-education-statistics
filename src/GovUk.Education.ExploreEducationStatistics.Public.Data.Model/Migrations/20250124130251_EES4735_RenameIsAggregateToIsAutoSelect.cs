@@ -17,16 +17,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                 maxLength: 120,
                 nullable: true);
 
-            migrationBuilder.Sql("""
-                                 UPDATE "FilterMetas" FM
-                                 SET "AutoSelectLabel" = 'Total'
-                                 WHERE FM."AutoSelectLabel" IS NULL
-                                 AND EXISTS (
-                                     SELECT 1
-                                     FROM "FilterOptionMetas" FOM
-                                     JOIN "FilterOptionMetaLinks" FOML ON FM."Id" = FOML."MetaId"
-                                     WHERE FOML."OptionId" = FOM."Id" AND FOM."Label" = 'Total');
-                                 """);
+            migrationBuilder.Sql(
+                """
+                UPDATE "FilterMetas" FM
+                SET "AutoSelectLabel" = 'Total'
+                WHERE FM."AutoSelectLabel" IS NULL
+                AND EXISTS (
+                    SELECT 1
+                    FROM "FilterOptionMetas" FOM
+                    JOIN "FilterOptionMetaLinks" FOML ON FM."Id" = FOML."MetaId"
+                    WHERE FOML."OptionId" = FOM."Id" 
+                      AND FOM."Label" = 'Total');
+                """);
 
             migrationBuilder.DropColumn(
                 name: "IsAggregate",
@@ -37,15 +39,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropColumn(
-                name: "AutoSelectLabel",
-                table: "FilterMetas");
-
             migrationBuilder.AddColumn<bool>(
                 name: "IsAggregate",
                 table: "FilterOptionMetas",
                 type: "boolean",
                 nullable: true);
+
+            migrationBuilder.Sql(
+                """
+                UPDATE "FilterOptionMetas" FOM
+                SET "IsAggregate" = true
+                WHERE FOM."Label" = 'Total'
+                """);
+
+            migrationBuilder.DropColumn(
+                name: "AutoSelectLabel",
+                table: "FilterMetas");
         }
     }
 }

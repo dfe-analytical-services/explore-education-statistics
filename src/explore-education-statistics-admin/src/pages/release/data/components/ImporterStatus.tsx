@@ -84,16 +84,18 @@ export type ImporterStatusChangeHandler = (
 ) => void;
 
 interface ImporterStatusProps {
-  releaseId: string;
-  dataFile: DataFile;
-  onStatusChange?: ImporterStatusChangeHandler;
   className?: string;
+  dataFile: DataFile;
+  hideErrors?: boolean;
+  releaseVersionId: string;
+  onStatusChange?: ImporterStatusChangeHandler;
 }
 const ImporterStatus = ({
-  releaseId,
-  dataFile,
-  onStatusChange,
   className,
+  dataFile,
+  hideErrors,
+  releaseVersionId,
+  onStatusChange,
 }: ImporterStatusProps) => {
   const [currentStatus, setCurrentStatus] = useState<StatusState>({
     status: dataFile.status,
@@ -102,7 +104,7 @@ const ImporterStatus = ({
 
   const fetchStatus = useCallback(async () => {
     const nextStatus = await releaseDataFileService.getDataFileImportStatus(
-      releaseId,
+      releaseVersionId,
       dataFile,
     );
 
@@ -111,7 +113,7 @@ const ImporterStatus = ({
     if (onStatusChange && nextStatus.status !== dataFile.status) {
       onStatusChange(dataFile, nextStatus);
     }
-  }, [releaseId, dataFile, onStatusChange]);
+  }, [releaseVersionId, dataFile, onStatusChange]);
 
   const [cancelInterval] = useInterval(fetchStatus, 5000);
 
@@ -159,7 +161,7 @@ const ImporterStatus = ({
         />
       )}
 
-      {currentStatus.status === 'FAILED' && (
+      {currentStatus.status === 'FAILED' && !hideErrors && (
         <>
           {currentStatus.errors && currentStatus.errors.length > 0 && (
             <Details

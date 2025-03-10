@@ -1,7 +1,7 @@
 import { TestConfigContextProvider } from '@admin/contexts/ConfigContext';
 import { testRelease as testBaseRelease } from '@admin/pages/release/__data__/testRelease';
 import ReleaseApiDataSetDetailsPage from '@admin/pages/release/data/ReleaseApiDataSetDetailsPage';
-import { ReleaseContextProvider } from '@admin/pages/release/contexts/ReleaseContext';
+import { ReleaseVersionContextProvider } from '@admin/pages/release/contexts/ReleaseVersionContext';
 import {
   releaseApiDataSetDetailsRoute,
   ReleaseDataSetRouteParams,
@@ -12,7 +12,7 @@ import _apiDataSetService, {
   ApiDataSetLiveVersion,
 } from '@admin/services/apiDataSetService';
 import _apiDataSetVersionService from '@admin/services/apiDataSetVersionService';
-import { Release } from '@admin/services/releaseService';
+import { ReleaseVersion } from '@admin/services/releaseVersionService';
 import render from '@common-test/render';
 import { screen, waitFor, within } from '@testing-library/react';
 import React from 'react';
@@ -25,16 +25,16 @@ const apiDataSetService = jest.mocked(_apiDataSetService);
 const apiDataSetVersionService = jest.mocked(_apiDataSetVersionService);
 
 describe('ReleaseApiDataSetDetailsPage', () => {
-  const testLiveRelease: Release = {
+  const testLiveRelease: ReleaseVersion = {
     ...testBaseRelease,
     id: 'release-1-id',
-    title: 'Release 1',
+    title: 'ReleaseVersion 1',
   };
 
-  const testDraftRelease: Release = {
+  const testDraftRelease: ReleaseVersion = {
     ...testBaseRelease,
     id: 'release-2-id',
-    title: 'Release 2',
+    title: 'ReleaseVersion 2',
   };
 
   const testDataSet: ApiDataSet = {
@@ -459,7 +459,7 @@ describe('ReleaseApiDataSetDetailsPage', () => {
     });
 
     renderPage({
-      release: { ...testDraftRelease, approvalStatus: 'Approved' },
+      releaseVersion: { ...testDraftRelease, approvalStatus: 'Approved' },
     });
 
     expect(
@@ -512,7 +512,7 @@ describe('ReleaseApiDataSetDetailsPage', () => {
     });
 
     renderPage({
-      release: { ...testDraftRelease, approvalStatus: 'Approved' },
+      releaseVersion: { ...testDraftRelease, approvalStatus: 'Approved' },
     });
 
     expect(
@@ -569,7 +569,7 @@ describe('ReleaseApiDataSetDetailsPage', () => {
     });
 
     renderPage({
-      release: { ...testDraftRelease, approvalStatus: 'Approved' },
+      releaseVersion: { ...testDraftRelease, approvalStatus: 'Approved' },
     });
 
     expect(
@@ -610,7 +610,7 @@ describe('ReleaseApiDataSetDetailsPage', () => {
     });
 
     renderPage({
-      release: {
+      releaseVersion: {
         ...testDraftRelease,
         releaseId: testDataSet.previousReleaseIds[0],
       },
@@ -845,20 +845,23 @@ describe('ReleaseApiDataSetDetailsPage', () => {
     });
   });
 
-  function renderPage(options?: { release?: Release; dataSetId?: string }) {
-    const { release = testDraftRelease, dataSetId = 'data-set-id' } =
+  function renderPage(options?: {
+    releaseVersion?: ReleaseVersion;
+    dataSetId?: string;
+  }) {
+    const { releaseVersion = testDraftRelease, dataSetId = 'data-set-id' } =
       options ?? {};
 
     return render(
       <TestConfigContextProvider>
-        <ReleaseContextProvider release={release}>
+        <ReleaseVersionContextProvider releaseVersion={releaseVersion}>
           <MemoryRouter
             initialEntries={[
               generatePath<ReleaseDataSetRouteParams>(
                 releaseApiDataSetDetailsRoute.path,
                 {
-                  publicationId: release.publicationId,
-                  releaseId: release.id,
+                  publicationId: releaseVersion.publicationId,
+                  releaseVersionId: releaseVersion.id,
                   dataSetId,
                 },
               ),
@@ -869,7 +872,7 @@ describe('ReleaseApiDataSetDetailsPage', () => {
               path={releaseApiDataSetDetailsRoute.path}
             />
           </MemoryRouter>
-        </ReleaseContextProvider>
+        </ReleaseVersionContextProvider>
       </TestConfigContextProvider>,
     );
   }

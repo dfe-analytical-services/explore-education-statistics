@@ -24,7 +24,7 @@ public class ConfigController(
         {
             AppInsightsKey = appInsightsOptions.Value.InstrumentationKey,
             PublicAppUrl = publicAppOptions.Value.Url,
-            PublicApiUrl = publicDataApiOptions.Value.Url,
+            PublicApiUrl = publicDataApiOptions.Value.PublicUrl,
             PublicApiDocsUrl = publicDataApiOptions.Value.DocsUrl,
             PermittedEmbedUrlDomains = EmbedBlockService.PermittedDomains,
             Oidc = oidcOptions.Value

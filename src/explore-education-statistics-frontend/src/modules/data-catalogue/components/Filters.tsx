@@ -25,7 +25,7 @@ interface Props {
   latestOnly?: string;
   publicationId?: string;
   publications?: PublicationTreeSummary[];
-  releaseId?: string;
+  releaseVersionId?: string;
   releases?: ReleaseSummary[];
   geographicLevel?: GeographicLevelCode;
   showResetFiltersButton?: boolean;
@@ -47,7 +47,7 @@ export default function Filters({
   latestOnly = 'true',
   publications = [],
   publicationId,
-  releaseId,
+  releaseVersionId,
   releases = [],
   geographicLevel,
   showResetFiltersButton,
@@ -125,7 +125,7 @@ export default function Filters({
               <VisuallyHidden>Filter by </VisuallyHidden>Releases
             </>
           }
-          name="releaseId"
+          name="releaseVersionId"
           options={[
             ...(!publicationId
               ? [{ label: 'Latest releases', value: 'latest' }]
@@ -138,10 +138,13 @@ export default function Filters({
                 }))
               : []),
           ]}
-          value={releaseId ?? latestValue}
+          value={releaseVersionId ?? latestValue}
           order={[]}
           onChange={e => {
-            onChange({ filterType: 'releaseId', nextValue: e.target.value });
+            onChange({
+              filterType: 'releaseVersionId',
+              nextValue: e.target.value,
+            });
           }}
         />
       </FormGroup>

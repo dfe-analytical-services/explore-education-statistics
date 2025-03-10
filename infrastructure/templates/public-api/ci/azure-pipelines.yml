@@ -135,12 +135,12 @@ stages:
       environment: Pre-Prod
       serviceConnection: $(serviceConnectionPreProd)
       bicepParamFile: preprod
-#
-#  - template: stages/deploy.yml
-#    parameters:
-#      stageName: DeployProd
-#      condition:  and(succeeded(), eq(variables.isMaster, true))
-#      dependsOn: DeployPreProd
-#      environment: Prod
-#      serviceConnection: $(serviceConnectionProd)
-#      bicepParamFile: prod
+
+  - template: stages/deploy.yml
+    parameters:
+      stageName: DeployProd
+      condition:  and(succeeded(), eq(variables.isMaster, true))
+      dependsOn: DeployPreProd
+      environment: Prod
+      serviceConnection: $(serviceConnectionProd)
+      bicepParamFile: prod

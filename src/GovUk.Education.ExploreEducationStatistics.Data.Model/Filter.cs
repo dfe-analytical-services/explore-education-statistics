@@ -11,6 +11,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model
         public string Label { get; set; } = string.Empty;
         public string Name { get; set; } = string.Empty;
         public string? GroupCsvColumn { get; set; }
+        public string? ParentFilter { get; set; }
         public string? AutoSelectFilterItemLabel { get; set; }
         public Guid? AutoSelectFilterItemId { get; set; }
         public FilterItem? AutoSelectFilterItem { get; set; }
@@ -29,6 +30,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model
             string label,
             string name,
             string? groupCsvColumn,
+            string? parentFilter,
             string? autoSelectFilterItemLabel,
             Guid subjectId)
         {
@@ -37,6 +39,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model
             Label = label;
             Name = name;
             GroupCsvColumn = groupCsvColumn;
+            ParentFilter = parentFilter;
             AutoSelectFilterItemLabel = autoSelectFilterItemLabel;
             SubjectId = subjectId;
             FilterGroups = new List<FilterGroup>();

@@ -43,6 +43,7 @@ public class MetaDataFileReader
             ColumnType = Enum.Parse<ColumnType>(columnType!),
             Label = ReadMetaColumnValue(MetaColumns.label, rowValues),
             FilterGroupingColumn = ReadMetaColumnValue(MetaColumns.filter_grouping_column, rowValues),
+            ParentFilter = ReadMetaColumnValue(MetaColumns.parent_filter, rowValues),
             FilterHint = ReadMetaColumnValue(MetaColumns.filter_hint, rowValues),
             AutoSelectFilterItemLabel = ReadMetaColumnValue(MetaColumns.filter_default, rowValues),
             IndicatorGrouping = ReadMetaColumnValue(MetaColumns.indicator_grouping, rowValues),
@@ -63,6 +64,7 @@ public class MetaDataFileReader
                     label: filterMetaRow.Label,
                     name: filterMetaRow.ColumnName,
                     groupCsvColumn: filterMetaRow.FilterGroupingColumn,
+                    parentFilter: filterMetaRow.ParentFilter,
                     autoSelectFilterItemLabel: filterMetaRow.AutoSelectFilterItemLabel,
                     // NOTE: AutoSelectFilterItemId is set later, after filter items are created
                     subjectId: subject.Id),

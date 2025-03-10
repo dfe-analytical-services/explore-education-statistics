@@ -20,19 +20,12 @@ public record FilterOptionViewModel
     /// <example>State-funded primary</example>
     public required string Label { get; init; }
 
-    /// <summary>
-    /// Whether the filter option is auto selected in the table tool if no other options are selected.
-    /// </summary>
-    /// <example>false</example>
-    public bool? IsAutoSelect { get; init; }
-
     public static FilterOptionViewModel Create(FilterOptionMetaChange.State changeState)
     {
         return new FilterOptionViewModel
         {
             Id = changeState.PublicId,
             Label = changeState.Option.Label,
-            IsAutoSelect = changeState.Meta.AutoSelectLabel == changeState.Option.Label,
         };
     }
 }

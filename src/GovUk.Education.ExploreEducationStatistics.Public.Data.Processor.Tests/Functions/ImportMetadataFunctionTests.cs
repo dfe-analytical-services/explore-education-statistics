@@ -30,6 +30,7 @@ public abstract class ImportMetadataFunctionTests(ProcessorFunctionsIntegrationT
     public static readonly TheoryData<ProcessorTestData> TestDataFiles = new()
     {
         ProcessorTestData.AbsenceSchool,
+        ProcessorTestData.FilterDefaultOptions
     };
 
     public static readonly TheoryData<ProcessorTestData, int> TestDataFilesWithMetaInsertBatchSize =
@@ -37,6 +38,7 @@ public abstract class ImportMetadataFunctionTests(ProcessorFunctionsIntegrationT
         {
             { ProcessorTestData.AbsenceSchool, 1 },
             { ProcessorTestData.AbsenceSchool, 1000 },
+            { ProcessorTestData.FilterDefaultOptions, 1000 },
         };
 
     public class ImportMetadataDbTests(ProcessorFunctionsIntegrationTestFixture fixture)
@@ -140,12 +142,16 @@ public abstract class ImportMetadataFunctionTests(ProcessorFunctionsIntegrationT
                 {
                     var actualLocation = actualLocations[index];
                     actualLocation.AssertDeepEqualTo(expectedLocation,
-                        notEqualProperties: AssertExtensions.Except<LocationMeta>(
+                        ignoreProperties:
+                        [
                             l => l.DataSetVersionId,
                             l => l.Options,
                             l => l.OptionLinks,
                             l => l.Created
-                        ));
+                        ]);
+
+                    Assert.Equal(dataSetVersion.Id, actualLocation.DataSetVersionId);
+                    Assert.NotEqual(expectedLocation.Created, actualLocation.Created);
 
                     Assert.Equal(expectedLocation.Options.Count, actualLocation.Options.Count);
                     Assert.All(expectedLocation.Options,
@@ -153,10 +159,11 @@ public abstract class ImportMetadataFunctionTests(ProcessorFunctionsIntegrationT
                         {
                             var actualOption = actualLocation.Options[optionIndex];
                             actualOption.AssertDeepEqualTo(expectedOption,
-                                notEqualProperties: AssertExtensions.Except<LocationOptionMeta>(
+                                ignoreProperties:
+                                [
                                     o => o.Metas,
                                     o => o.MetaLinks
-                                ));
+                                ]);
                         });
                 });
 
@@ -165,7 +172,7 @@ public abstract class ImportMetadataFunctionTests(ProcessorFunctionsIntegrationT
                 .SelectMany(level => level.OptionLinks)
                 .ToList();
 
-            Assert.Equal(15, actualLinks.Count);
+            Assert.Equal(testData.ExpectedLocations.Sum(l => l.Options.Count), actualLinks.Count);
             Assert.All(actualLinks, link =>
                 Assert.Equal(SqidEncoder.Encode(link.OptionId), link.PublicId));
         }
@@ -246,12 +253,16 @@ public abstract class ImportMetadataFunctionTests(ProcessorFunctionsIntegrationT
                 {
                     var actualLocation = actualLocations[index];
                     actualLocation.AssertDeepEqualTo(expectedLocation,
-                        notEqualProperties: AssertExtensions.Except<LocationMeta>(
+                        ignoreProperties:
+                        [
                             l => l.DataSetVersionId,
                             l => l.Options,
                             l => l.OptionLinks,
                             l => l.Created
-                        ));
+                        ]);
+
+                    Assert.Equal(targetDataSetVersion.Id, actualLocation.DataSetVersionId);
+                    Assert.NotEqual(expectedLocation.Created, actualLocation.Created);
 
                     Assert.Equal(expectedLocation.Options.Count, actualLocation.Options.Count);
                     Assert.All(expectedLocation.Options,
@@ -259,10 +270,11 @@ public abstract class ImportMetadataFunctionTests(ProcessorFunctionsIntegrationT
                         {
                             var actualOption = actualLocation.Options[optionIndex];
                             actualOption.AssertDeepEqualTo(expectedOption,
-                                notEqualProperties: AssertExtensions.Except<LocationOptionMeta>(
+                                ignoreProperties:
+                                [
                                     o => o.Metas,
                                     o => o.MetaLinks
-                                ));
+                                ]);
                         });
                 });
 
@@ -283,7 +295,7 @@ public abstract class ImportMetadataFunctionTests(ProcessorFunctionsIntegrationT
                 .Where(link => link != actualMappedOption1Link && link != actualMappedOption2Link)
                 .ToList();
 
-            Assert.Equal(13, otherLinks.Count);
+            Assert.Equal(testData.ExpectedLocations.Sum(l => l.Options.Count), actualLinks.Count);
             Assert.All(otherLinks, link =>
                 Assert.Equal(SqidEncoder.Encode(link.OptionId), link.PublicId));
         }
@@ -309,11 +321,15 @@ public abstract class ImportMetadataFunctionTests(ProcessorFunctionsIntegrationT
                 {
                     var actualTimePeriod = actualTimePeriods[index];
                     actualTimePeriod.AssertDeepEqualTo(expectedTimePeriod,
-                        notEqualProperties: AssertExtensions.Except<TimePeriodMeta>(
+                        ignoreProperties:
+                        [
                             tpm => tpm.Id,
                             tpm => tpm.DataSetVersionId,
                             tpm => tpm.Created
-                        ));
+                        ]);
+
+                    Assert.Equal(dataSetVersion.Id, actualTimePeriod.DataSetVersionId);
+                    Assert.NotEqual(expectedTimePeriod.Created, actualTimePeriod.Created);
                 });
         }
 
@@ -849,10 +865,14 @@ public abstract class ImportMetadataFunctionTests(ProcessorFunctionsIntegrationT
 
                 actualIndicator.AssertDeepEqualTo(
                     expectedIndicator,
-                    notEqualProperties: AssertExtensions.Except<IndicatorMeta>(
+                    ignoreProperties:
+                    [
                         m => m.DataSetVersionId,
                         m => m.Created
-                    ));
+                    ]);
+
+                Assert.Equal(dataSetVersion.Id, actualIndicator.DataSetVersionId);
+                Assert.NotEqual(expectedIndicator.Created, actualIndicator.Created);
             });
         }
 
@@ -899,16 +919,19 @@ public abstract class ImportMetadataFunctionTests(ProcessorFunctionsIntegrationT
 
                 actualIndicator.AssertDeepEqualTo(
                     expectedIndicator,
-                    notEqualProperties: AssertExtensions.Except<IndicatorMeta>(
+                    ignoreProperties:
+                    [
                         m => m.Id,
                         m => m.PublicId,
                         m => m.DataSetVersionId,
                         m => m.Created
-                    ));
+                    ]);
 
 
                 // Indicators re-use old public IDs of existing indicators.
                 Assert.Equal($"{expectedIndicator.PublicId}-old", actualIndicator.PublicId);
+                Assert.Equal(targetDataSetVersion.Id, actualIndicator.DataSetVersionId);
+                Assert.NotEqual(expectedIndicator.Created, actualIndicator.Created);
             });
         }
 
@@ -948,18 +971,21 @@ public abstract class ImportMetadataFunctionTests(ProcessorFunctionsIntegrationT
 
                 actualIndicator.AssertDeepEqualTo(
                     expectedIndicator,
-                    notEqualProperties: AssertExtensions.Except<IndicatorMeta>(
+                    ignoreProperties:
+                    [
                         m => m.Id,
                         m => m.PublicId,
                         m => m.DataSetVersionId,
                         m => m.Created
-                    ));
+                    ]);
 
                 // Indicators get new public IDs offset by number of existing indicators.
                 Assert.Equal(
                     SqidEncoder.Encode(expectedIndicator.Id + existingIndicators.Count),
                     actualIndicator.PublicId
                 );
+                Assert.Equal(targetDataSetVersion.Id, actualIndicator.DataSetVersionId);
+                Assert.NotEqual(expectedIndicator.Created, actualIndicator.Created);
             });
         }
 
@@ -1008,18 +1034,21 @@ public abstract class ImportMetadataFunctionTests(ProcessorFunctionsIntegrationT
 
                 actualIndicator.AssertDeepEqualTo(
                     expectedIndicator,
-                    notEqualProperties: AssertExtensions.Except<IndicatorMeta>(
+                    ignoreProperties:
+                    [
                         m => m.Id,
                         m => m.PublicId,
                         m => m.DataSetVersionId,
                         m => m.Created
-                    ));
+                    ]);
 
                 // Indicators get new public IDs offset by number of existing indicators.
                 Assert.Equal(
                     SqidEncoder.Encode(expectedIndicator.Id + existingIndicators.Count),
                     actualIndicator.PublicId
                 );
+                Assert.Equal(targetDataSetVersion.Id, actualIndicator.DataSetVersionId);
+                Assert.NotEqual(expectedIndicator.Created, actualIndicator.Created);
             });
         }
 
@@ -1285,11 +1314,13 @@ public abstract class ImportMetadataFunctionTests(ProcessorFunctionsIntegrationT
     private static void AssertFiltersEqual(FilterMeta expectedFilter, FilterMeta actualFilter)
     {
         actualFilter.AssertDeepEqualTo(expectedFilter,
-            notEqualProperties: AssertExtensions.Except<FilterMeta>(
+            ignoreProperties:
+            [
+                m => m.DefaultOption,
                 m => m.DataSetVersionId,
                 m => m.Options,
                 m => m.OptionLinks,
                 m => m.Created
-            ));
+            ]);
     }
 }

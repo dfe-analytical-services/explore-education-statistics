@@ -1,7 +1,7 @@
 import { TestConfigContextProvider } from '@admin/contexts/ConfigContext';
 import { testRelease } from '@admin/pages/release/__data__/testRelease';
 import ReleaseApiDataSetChangelogPage from '@admin/pages/release/data/ReleaseApiDataSetChangelogPage';
-import { ReleaseContextProvider } from '@admin/pages/release/contexts/ReleaseContext';
+import { ReleaseVersionContextProvider } from '@admin/pages/release/contexts/ReleaseVersionContext';
 import {
   releaseApiDataSetChangelogRoute,
   ReleaseDataSetChangelogRouteParams,
@@ -225,14 +225,14 @@ describe('ReleaseApiDataSetChangelogPage', () => {
   function renderPage(dataSetVersionId: string) {
     return render(
       <TestConfigContextProvider>
-        <ReleaseContextProvider release={testRelease}>
+        <ReleaseVersionContextProvider releaseVersion={testRelease}>
           <MemoryRouter
             initialEntries={[
               generatePath<ReleaseDataSetChangelogRouteParams>(
                 releaseApiDataSetChangelogRoute.path,
                 {
                   publicationId: testRelease.publicationId,
-                  releaseId: testRelease.id,
+                  releaseVersionId: testRelease.id,
                   dataSetId: 'data-set-id',
                   dataSetVersionId,
                 },
@@ -244,7 +244,7 @@ describe('ReleaseApiDataSetChangelogPage', () => {
               path={releaseApiDataSetChangelogRoute.path}
             />
           </MemoryRouter>
-        </ReleaseContextProvider>
+        </ReleaseVersionContextProvider>
       </TestConfigContextProvider>,
     );
   }

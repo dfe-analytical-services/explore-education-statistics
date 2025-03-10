@@ -102,7 +102,9 @@ const ReleaseContentPageLoaded = () => {
                       {release.publication.title}
                     </h2>
 
-                    <ReleaseContentHubContextProvider releaseId={release.id}>
+                    <ReleaseContentHubContextProvider
+                      releaseVersionId={release.id}
+                    >
                       <ReleaseContent
                         transformFeaturedTableLinks={
                           canPreviewRelease
@@ -141,7 +143,7 @@ const ReleaseContentPageLoaded = () => {
                 )}
                 {editingMode === 'table-preview' && (
                   <ReleasePreviewTableTool
-                    releaseId={release.id}
+                    releaseVersionId={release.id}
                     releaseType={release.type}
                     publication={release.publication}
                     featuredTableId={previewFeaturedTableId}
@@ -159,19 +161,19 @@ const ReleaseContentPageLoaded = () => {
 const ReleaseContentPage = ({
   match,
 }: RouteComponentProps<ReleaseRouteParams>) => {
-  const { releaseId } = match.params;
+  const { releaseVersionId } = match.params;
 
   const { value, isLoading } =
     useAsyncRetry<ReleaseContentContextState>(async () => {
       const { release, unattachedDataBlocks } =
-        await releaseContentService.getContent(releaseId);
+        await releaseContentService.getContent(releaseVersionId);
 
       const canUpdateRelease = await permissionService.canUpdateRelease(
-        releaseId,
+        releaseVersionId,
       );
 
       const featuredTables = await featuredTableService.listFeaturedTables(
-        releaseId,
+        releaseVersionId,
       );
 
       return {
@@ -180,7 +182,7 @@ const ReleaseContentPage = ({
         canUpdateRelease,
         featuredTables,
       };
-    }, [releaseId]);
+    }, [releaseVersionId]);
 
   return (
     <LoadingSpinner loading={isLoading}>

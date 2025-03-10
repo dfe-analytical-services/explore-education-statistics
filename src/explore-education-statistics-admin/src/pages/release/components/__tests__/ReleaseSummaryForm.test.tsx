@@ -489,7 +489,7 @@ describe('ReleaseSummaryForm', () => {
     });
   });
 
-  test('validation error when release label over 50 characters', async () => {
+  test('validation error when release label over 20 characters', async () => {
     metaService.getTimePeriodCoverageGroups.mockResolvedValue(
       testTimeIdentifiers,
     );
@@ -530,7 +530,7 @@ describe('ReleaseSummaryForm', () => {
     const inputReleaseLabel = screen.getByLabelText('Release label');
     await userEvent.type(
       inputReleaseLabel,
-      'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', // 51 characters
+      'aaaaaaaaaaaaaaaaaaaaa', // 21 characters
     );
 
     await userEvent.click(screen.getByLabelText(releaseTypes.AdHocStatistics));
@@ -542,7 +542,7 @@ describe('ReleaseSummaryForm', () => {
 
     await waitFor(() => {
       expect(
-        screen.getByText('Release label must be no longer than 50 characters', {
+        screen.getByText('Release label must be no longer than 20 characters', {
           selector: 'a',
         }),
       ).toBeInTheDocument();

@@ -7,19 +7,30 @@ const releaseImageApiRegex = /\/api\/releases\/[A-Za-z0-9-]+\/images/g;
  * when we render the content. This is important for
  * amendments, as we want to avoid having to replace all
  * of the content's release ids when it's created.
+ *
+ * TODO EES-5901 - migrate all content placeholders to be "releaseVersionId"
+ * and then remove the legacy "releaseId" value below. In the meantime, we
+ * will continue to use the old "{releaseId}" placeholder to minimise the
+ * mixture of placeholders being created.
  */
 export const insertReleaseIdPlaceholders = (str: string) =>
   str.replaceAll(releaseImageApiRegex, `/api/releases/{releaseId}/images`);
 
 /**
  * Replace release id placeholders in a {@param str}
- * with an actual {@param releaseId}.
+ * with an actual {@param releaseVersionId}.
  *
  * This allows us to create amendments without having
  * to replace all of the release ids in the content.
+ *
+ * TODO EES-5901 - migrate all content placeholders to be "releaseVersionId"
+ * and then remove the legacy "releaseId" checks below.
  */
-export const replaceReleaseIdPlaceholders = (str: string, releaseId: string) =>
+export const replaceReleaseIdPlaceholders = (
+  str: string,
+  releaseVersionId: string,
+) =>
   str.replaceAll(
-    '/api/releases/{releaseId}/images',
-    `/api/releases/${releaseId}/images`,
+    /\/api\/releases\/\{(releaseId|releaseVersionId)}\/images/g,
+    `/api/releases/${releaseVersionId}/images`,
   );

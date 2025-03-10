@@ -124,7 +124,7 @@ describe('DraftApiDataSetsTable', () => {
         canUpdateRelease
         dataSets={testDataSets}
         publicationId="publication-1"
-        releaseId="release-1"
+        releaseVersionId="release-1"
       />,
     );
 
@@ -266,7 +266,7 @@ describe('DraftApiDataSetsTable', () => {
         canUpdateRelease={false}
         dataSets={testDataSets}
         publicationId="publication-1"
-        releaseId="release-1"
+        releaseVersionId="release-1"
       />,
     );
 
@@ -368,7 +368,7 @@ describe('DraftApiDataSetsTable', () => {
         canUpdateRelease
         dataSets={[]}
         publicationId="publication-1"
-        releaseId="release-1"
+        releaseVersionId="release-1"
       />,
     );
 

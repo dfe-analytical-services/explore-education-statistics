@@ -434,6 +434,78 @@ describe('ChartAxisConfiguration', () => {
     });
   });
 
+  describe('displayed decimal places', () => {
+    test('shows the displayed decimal places field for the minor axis', async () => {
+      render(
+        <ChartBuilderFormsContextProvider initialForms={testFormState}>
+          <ChartAxisConfiguration
+            id="chartBuilder-minor"
+            type="minor"
+            axesConfiguration={testAxesConfiguration}
+            definition={verticalBarBlockDefinition}
+            data={testTable.results}
+            meta={testTable.subjectMeta}
+            onChange={noop}
+            onSubmit={noop}
+          />
+        </ChartBuilderFormsContextProvider>,
+      );
+      expect(
+        screen.getByLabelText('Displayed decimal places'),
+      ).toBeInTheDocument();
+    });
+
+    test('does not show the displayed decimal places field for the major axis', async () => {
+      render(
+        <ChartBuilderFormsContextProvider initialForms={testFormState}>
+          <ChartAxisConfiguration
+            id="chartBuilder-major"
+            type="major"
+            axesConfiguration={testAxesConfiguration}
+            definition={verticalBarBlockDefinition}
+            data={testTable.results}
+            meta={testTable.subjectMeta}
+            onChange={noop}
+            onSubmit={noop}
+          />
+        </ChartBuilderFormsContextProvider>,
+      );
+      expect(
+        screen.queryByLabelText('Displayed decimal places'),
+      ).not.toBeInTheDocument();
+    });
+
+    test('shows validation error if invalid decimal places given', async () => {
+      const { user } = render(
+        <ChartBuilderFormsContextProvider initialForms={testFormState}>
+          <ChartAxisConfiguration
+            id="chartBuilder-minor"
+            type="minor"
+            axesConfiguration={testAxesConfiguration}
+            definition={verticalBarBlockDefinition}
+            data={testTable.results}
+            meta={testTable.subjectMeta}
+            onChange={noop}
+            onSubmit={noop}
+          />
+        </ChartBuilderFormsContextProvider>,
+      );
+      await user.clear(screen.getByLabelText('Displayed decimal places'));
+      await user.type(screen.getByLabelText('Displayed decimal places'), '-1');
+      await user.click(
+        screen.getByRole('button', { name: 'Save chart options' }),
+      );
+
+      expect(await screen.findByText('There is a problem')).toBeInTheDocument();
+
+      expect(
+        screen.getByRole('link', {
+          name: 'Displayed decimal places must be positive',
+        }),
+      ).toHaveAttribute('href', '#chartBuilder-minor-decimalPlaces');
+    });
+  });
+
   describe('group data by', () => {
     test('submitting succeeds with the group data by option changed', async () => {
       const handleSubmit = jest.fn();

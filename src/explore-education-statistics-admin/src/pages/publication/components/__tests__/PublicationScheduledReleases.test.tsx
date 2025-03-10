@@ -1,7 +1,7 @@
 import PublicationScheduledReleases from '@admin/pages/publication/components/PublicationScheduledReleases';
-import _releaseService, {
-  ReleaseSummaryWithPermissions,
-} from '@admin/services/releaseService';
+import _releaseVersionService, {
+  ReleaseVersionSummaryWithPermissions,
+} from '@admin/services/releaseVersionService';
 import {
   render as baseRender,
   screen,
@@ -11,13 +11,15 @@ import {
 import React, { ReactElement } from 'react';
 import { MemoryRouter } from 'react-router-dom';
 
-jest.mock('@admin/services/releaseService');
-const releaseService = _releaseService as jest.Mocked<typeof _releaseService>;
+jest.mock('@admin/services/releaseVersionService');
+const releaseVersionService = _releaseVersionService as jest.Mocked<
+  typeof _releaseVersionService
+>;
 
 describe('PublicationScheduledReleases', () => {
   const testPublicationId = 'publication-1';
 
-  const testRelease1: ReleaseSummaryWithPermissions = {
+  const testRelease1: ReleaseVersionSummaryWithPermissions = {
     amendment: false,
     approvalStatus: 'Approved',
     id: 'release-1',
@@ -43,7 +45,7 @@ describe('PublicationScheduledReleases', () => {
     latestRelease: false,
   };
 
-  const testRelease2: ReleaseSummaryWithPermissions = {
+  const testRelease2: ReleaseVersionSummaryWithPermissions = {
     ...testRelease1,
     approvalStatus: 'Approved',
     id: 'release-2',
@@ -55,7 +57,7 @@ describe('PublicationScheduledReleases', () => {
   const testReleases = [testRelease1, testRelease2];
 
   beforeEach(() => {
-    releaseService.getReleaseStatus.mockResolvedValue({
+    releaseVersionService.getReleaseVersionStatus.mockResolvedValue({
       overallStage: 'Scheduled',
     });
   });

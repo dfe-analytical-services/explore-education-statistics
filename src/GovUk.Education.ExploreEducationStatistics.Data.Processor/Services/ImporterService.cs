@@ -1,10 +1,4 @@
 #nullable enable
-using System;
-using System.Collections.Generic;
-using System.Data;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
@@ -18,6 +12,12 @@ using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using System;
+using System.Collections.Generic;
+using System.Data;
+using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
 using static System.StringComparison;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
@@ -112,7 +112,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 
             var filterAndIndicatorReader = new FilterAndIndicatorValuesReader(csvHeaders, subjectMeta);
             var fixedInformationReader = new FixedInformationDataFileReader(csvHeaders);
-            
+
             await CsvUtils.ForEachRow(dataFileStreamProvider, async (rowValues, index, _) =>
             {
                 if (index % Stage2RowCheck == 0)
@@ -129,7 +129,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 
                     await _dataImportService.UpdateStatus(dataImport.Id,
                         DataImportStatus.STAGE_2,
-                        (double) (index + 1) / dataImport.TotalRows!.Value * 100);
+                        (double)(index + 1) / dataImport.TotalRows!.Value * 100);
                 }
 
                 if (IsRowAllowed(soleGeographicLevel, rowValues, fixedInformationReader))
@@ -181,14 +181,29 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                             .Select(f => f.AutoSelectFilterItemLabel)
                             .SingleOrDefault() ?? "Total"; // If meta file didn't specify a default, look for "Total"
 
-                        return filterItems
+                        var filterItemsWithAutoSelectLabel = filterItems
                             .Where(item =>
-                                item.FilterGroup.FilterId == filterId
-                                && item.Label.Equals(autoSelectFilterItemLabel, OrdinalIgnoreCase))
-                            .Select(item => new { item.Id , item.Label})
-                            // There might be two filter items with the same label under different groups.
-                            // If so, we set no autoSelectFilterItem.
-                            .SingleOrDefault();
+                                item.FilterGroup.FilterId == filterId &&
+                                item.Label.Equals(autoSelectFilterItemLabel, OrdinalIgnoreCase))
+                            .ToList();
+
+                        // There might be two or more filter items with the same label under different groups
+                        if (filterItemsWithAutoSelectLabel.Count > 1)
+                        {
+                            // If so, does one belong to a filter group with the same label?
+                            // If it does, this is the auto select filter item
+                            return filterItemsWithAutoSelectLabel
+                                .Where(fi => fi.FilterGroup.Label == "Total")
+                                .Select(fi => new { fi.Id, fi.Label })
+                                .SingleOrDefault(); // is the default "null", or does it break?
+
+                            // NB. This implementation does not currently support filter hierarchies.
+                            // TODO (EES-5884): Fix auto-select filter items for filter hierarchies
+                        }
+
+                        return filterItemsWithAutoSelectLabel
+                            .Select(fi => new { fi.Id, fi.Label })
+                            .FirstOrDefault();
                     }
                 );
 

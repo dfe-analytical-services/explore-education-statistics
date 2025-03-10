@@ -469,7 +469,7 @@ describe('DataSetStep', () => {
       <DataSetStep
         {...wizardProps}
         stepTitle="Select a data set"
-        release={testRelease}
+        releaseVersion={testRelease}
         featuredTables={testFeaturedTables}
         renderFeaturedTableLink={table => <a href="/">{table.name}</a>}
         subjects={testSubjects}
@@ -554,7 +554,7 @@ describe('DataSetStep', () => {
         stepTitle="Select a data set"
         featuredTables={testFeaturedTables}
         renderFeaturedTableLink={table => <a href="/">{table.name}</a>}
-        release={testRelease}
+        releaseVersion={testRelease}
         subjects={testSubjects}
         onSubmit={noop}
       />,
@@ -590,7 +590,7 @@ describe('DataSetStep', () => {
         isActive={false}
         featuredTables={testFeaturedTables}
         renderFeaturedTableLink={table => <a href="/">{table.name}</a>}
-        release={testRelease}
+        releaseVersion={testRelease}
         subjectId="subject-1"
         subjects={testSubjects}
         onSubmit={noop}
@@ -609,7 +609,7 @@ describe('DataSetStep', () => {
         isActive={false}
         featuredTables={testFeaturedTables}
         renderFeaturedTableLink={table => <a href="/">{table.name}</a>}
-        release={testRelease}
+        releaseVersion={testRelease}
         subjectId=""
         subjects={testSubjects}
         onSubmit={noop}
@@ -629,7 +629,7 @@ describe('DataSetStep', () => {
         stepTitle="Select a data set"
         featuredTables={testFeaturedTables}
         renderFeaturedTableLink={table => <a href="/">{table.name}</a>}
-        release={testRelease}
+        releaseVersion={testRelease}
         subjects={testSubjects}
         onSubmit={handleSubmit}
       />,

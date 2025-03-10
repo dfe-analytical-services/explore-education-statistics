@@ -17,7 +17,7 @@ import methodologyContentQueries from '@admin/queries/methodologyContentQueries'
 const PreReleaseMethodologyPage = ({
   match,
 }: RouteComponentProps<PreReleaseMethodologyRouteParams>) => {
-  const { methodologyId, publicationId, releaseId } = match.params;
+  const { methodologyId, publicationId, releaseVersionId } = match.params;
 
   const { data: methodologyVersion, isLoading: isMethodologyVersionLoading } =
     useQuery(methodologyQueries.get(methodologyId));
@@ -37,7 +37,7 @@ const PreReleaseMethodologyPage = ({
             preReleaseMethodologiesRoute.path,
             {
               publicationId,
-              releaseId,
+              releaseVersionId,
             },
           )}
         >

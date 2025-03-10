@@ -1,4 +1,3 @@
-import InsetText from '@common/components/InsetText';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
 import UrlContainer from '@common/components/UrlContainer';
@@ -12,6 +11,7 @@ interface Props {
   headingsTag?: 'h3' | 'h4';
   publicApiBaseUrl: string;
   publicApiDocsUrl: string;
+  publicApiVersion?: 'v1';
   renderLink: ({
     children,
     toString,
@@ -28,27 +28,17 @@ export default function ApiDataSetQuickStart({
   headingsTag: Heading = 'h3',
   publicApiBaseUrl,
   publicApiDocsUrl,
+  publicApiVersion = 'v1',
   renderLink,
 }: Props) {
+  const publicApiVersionUrl = `${publicApiBaseUrl}/${publicApiVersion}`;
+  const publicApiDocsVersionUrl = `${publicApiDocsUrl}/reference-${publicApiVersion}`;
+
   return (
     <>
-      <InsetText>
-        <p>
-          If you are unfamiliar with APIs, we suggest you first read our{' '}
-          {renderLink({
-            to: publicApiDocsUrl,
-            children: 'API documentation',
-          })}
-        </p>
-        <p>
-          The documentation provides full guidance and examples on how to make
-          the best use of API data sets.
-        </p>
-      </InsetText>
-
       <Heading>API data set details</Heading>
 
-      <SummaryList>
+      <SummaryList compact noBorder className="govuk-!-margin-bottom-8">
         <SummaryListItem term="API data set name">
           {dataSetName}
         </SummaryListItem>
@@ -57,6 +47,102 @@ export default function ApiDataSetQuickStart({
           {dataSetVersion}
         </SummaryListItem>
       </SummaryList>
+
+      <Heading>Download data set as CSV</Heading>
+      <p>
+        Get familiar with the data. The CSV response will render its categories
+        and column headers in a human-readable format (instead of
+        machine-readable IDs).
+      </p>
+
+      <UrlContainer
+        className="govuk-!-margin-bottom-2"
+        id="data-set-download-csv-endpoint"
+        label={
+          <>
+            GET<VisuallyHidden> data set CSV URL</VisuallyHidden>
+          </>
+        }
+        labelHidden={false}
+        url={`${publicApiVersionUrl}/data-sets/${dataSetId}/csv?dataSetVersion=${dataSetVersion}`}
+      />
+      <p className="govuk-!-margin-bottom-8">
+        {renderLink({
+          to: `${publicApiDocsVersionUrl}/endpoints/DownloadDataSetCsv/`,
+          children: 'Guidance: Download data set as CSV',
+        })}
+      </p>
+
+      <Heading>Data set metadata</Heading>
+      <p>
+        Look up human-readable labels and their corresponding machine-readable
+        IDs to help you create data set queries.
+      </p>
+
+      <UrlContainer
+        className="govuk-!-margin-bottom-2"
+        id="data-set-meta-endpoint"
+        label={
+          <>
+            GET<VisuallyHidden> data set metadata URL</VisuallyHidden>
+          </>
+        }
+        labelHidden={false}
+        url={`${publicApiVersionUrl}/data-sets/${dataSetId}/meta?dataSetVersion=${dataSetVersion}`}
+      />
+      <p className="govuk-!-margin-bottom-8">
+        {renderLink({
+          to: `${publicApiDocsVersionUrl}/endpoints/GetDataSetMeta/`,
+          children: 'Guidance: Get data set metadata',
+        })}
+      </p>
+
+      <Heading>Query data set using GET</Heading>
+      <p>Quickly test the machine-readable IDs in a range of basic queries.</p>
+
+      <UrlContainer
+        className="govuk-!-margin-bottom-2"
+        id="data-set-get-query-endpoint"
+        label={
+          <>
+            GET<VisuallyHidden> data set query URL</VisuallyHidden>
+          </>
+        }
+        labelHidden={false}
+        url={`${publicApiVersionUrl}/data-sets/${dataSetId}/query?dataSetVersion=${dataSetVersion}`}
+      />
+      <p className="govuk-!-margin-bottom-8">
+        {renderLink({
+          to: `${publicApiDocsVersionUrl}/endpoints/QueryDataSetGet/`,
+          children: 'Guidance: Query data set (GET)',
+        })}
+      </p>
+
+      <Heading>Query data set using POST</Heading>
+      <p>
+        The POST endpoint is recommended for production level pipeline queries.
+        POST requires a query to be built and supplied in JSON format using
+        third party software such as Postman and Insomnia or programming
+        languages such as Python, R, etc.
+      </p>
+
+      <UrlContainer
+        className="govuk-!-margin-bottom-2"
+        id="data-set-post-query-endpoint"
+        label={
+          <>
+            POST<VisuallyHidden> data set query URL</VisuallyHidden>
+          </>
+        }
+        labelHidden={false}
+        url={`${publicApiVersionUrl}/data-sets/${dataSetId}/query?dataSetVersion=${dataSetVersion}`}
+      />
+      <p className="govuk-!-margin-bottom-8">
+        {renderLink({
+          to: `${publicApiDocsVersionUrl}/endpoints/QueryDataSetPost/`,
+          children: 'Guidance: Query data set (POST)',
+        })}
+      </p>
 
       <Heading>Get data set summary</Heading>
 
@@ -69,92 +155,12 @@ export default function ApiDataSetQuickStart({
           </>
         }
         labelHidden={false}
-        url={`${publicApiBaseUrl}/data-sets/${dataSetId}`}
+        url={`${publicApiVersionUrl}/data-sets/${dataSetId}`}
       />
       <p>
         {renderLink({
-          to: `${publicApiDocsUrl}/reference-v1/endpoints/GetDataSet/`,
+          to: `${publicApiDocsVersionUrl}/endpoints/GetDataSet/`,
           children: 'Guidance: Get data set summary',
-        })}
-      </p>
-
-      <Heading>Get data set metadata</Heading>
-
-      <UrlContainer
-        className="govuk-!-margin-bottom-2"
-        id="data-set-meta-endpoint"
-        label={
-          <>
-            GET<VisuallyHidden> data set metadata URL</VisuallyHidden>
-          </>
-        }
-        labelHidden={false}
-        url={`${publicApiBaseUrl}/data-sets/${dataSetId}/meta?dataSetVersion=${dataSetVersion}`}
-      />
-      <p>
-        {renderLink({
-          to: `${publicApiDocsUrl}/reference-v1/endpoints/GetDataSetMeta/`,
-          children: 'Guidance: Get data set metadata',
-        })}
-      </p>
-
-      <Heading>Query data set (GET)</Heading>
-
-      <UrlContainer
-        className="govuk-!-margin-bottom-2"
-        id="data-set-get-query-endpoint"
-        label={
-          <>
-            GET<VisuallyHidden> data set query URL</VisuallyHidden>
-          </>
-        }
-        labelHidden={false}
-        url={`${publicApiBaseUrl}/data-sets/${dataSetId}/query?dataSetVersion=${dataSetVersion}`}
-      />
-      <p>
-        {renderLink({
-          to: `${publicApiDocsUrl}/reference-v1/endpoints/QueryDataSetGet/`,
-          children: 'Guidance: Query data set (GET)',
-        })}
-      </p>
-
-      <Heading>Query data set (POST)</Heading>
-
-      <UrlContainer
-        className="govuk-!-margin-bottom-2"
-        id="data-set-post-query-endpoint"
-        label={
-          <>
-            POST<VisuallyHidden> data set query URL</VisuallyHidden>
-          </>
-        }
-        labelHidden={false}
-        url={`${publicApiBaseUrl}/data-sets/${dataSetId}/query?dataSetVersion=${dataSetVersion}`}
-      />
-      <p>
-        {renderLink({
-          to: `${publicApiDocsUrl}/reference-v1/endpoints/QueryDataSetPost/`,
-          children: 'Guidance: Query data set (POST)',
-        })}
-      </p>
-
-      <Heading>Download data set as CSV</Heading>
-
-      <UrlContainer
-        className="govuk-!-margin-bottom-2"
-        id="data-set-download-csv-endpoint"
-        label={
-          <>
-            GET<VisuallyHidden> data set CSV URL</VisuallyHidden>
-          </>
-        }
-        labelHidden={false}
-        url={`${publicApiBaseUrl}/data-sets/${dataSetId}/csv?dataSetVersion=${dataSetVersion}`}
-      />
-      <p>
-        {renderLink({
-          to: `${publicApiDocsUrl}/reference-v1/endpoints/DownloadDataSetCsv/`,
-          children: 'Guidance: Download data set as CSV',
         })}
       </p>
     </>

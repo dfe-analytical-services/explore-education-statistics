@@ -10,21 +10,18 @@ import adminApi from '../utils/adminApi';
 import logger from '../utils/logger';
 
 const { ADMIN_URL } = process.env;
-const releaseService = {
+const releaseVersionService = {
   createRelease: async (publicationId: string): Promise<string> => {
     spinner.start();
     console.time('createRelease');
 
-    const res = await adminApi.post(
-      `/api/publications/${publicationId}/releases`,
-      {
-        publicationId,
-        templateReleaseId: '',
-        timePeriodCoverage: { value: 'AY' },
-        type: 'AdHocStatistics',
-        year: Math.floor(Math.random() * (9999 - 1000 + 1) + 1000),
-      },
-    );
+    const res = await adminApi.post(`/api/releases`, {
+      publicationId,
+      templateReleaseId: '',
+      timePeriodCoverage: { value: 'AY' },
+      type: 'AdHocStatistics',
+      year: Math.floor(Math.random() * (9999 - 1000 + 1) + 1000),
+    });
     console.timeEnd('createRelease');
     const releaseId = res.data.id;
     spinner.succeed(
@@ -57,7 +54,7 @@ const releaseService = {
         `Overall stage of publication: ${chalk.blue(res.data.overallStage)}`,
       );
       await sleep(1500);
-      await releaseService.getReleaseProgress(releaseId);
+      await releaseVersionService.getReleaseProgress(releaseId);
     }
     if (url) {
       spinner.succeed(`Published release: ${url}`);
@@ -67,7 +64,7 @@ const releaseService = {
   publishRelease: async (release: Release, releaseId: string) => {
     await adminApi.post(`/api/releases/${releaseId}/status`, release);
   },
-  getRelease: async (releaseId: string) => {
+  getReleaseVersion: async (releaseId: string) => {
     spinner.start();
     const res = await adminApi.get(`/api/releases/${releaseId}`);
     const release: Release = res.data;
@@ -134,4 +131,4 @@ const releaseService = {
     );
   },
 };
-export default releaseService;
+export default releaseVersionService;
