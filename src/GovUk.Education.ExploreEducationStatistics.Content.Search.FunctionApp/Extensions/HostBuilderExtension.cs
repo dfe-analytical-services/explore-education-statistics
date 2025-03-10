@@ -36,6 +36,7 @@ public static class HostBuilderExtension
                     .AddTransient<IContentApiClient, ContentApiClient>()
                     .AddTransient<IAzureBlobStorageClient, AzureBlobStorageClient>()
                     .AddTransient<ISearchableDocumentCreator, SearchableDocumentCreator>()
+                    .AddHealthChecks()
                     .AddAzureClientsInline(
                         clientBuilder =>
                         {
