@@ -256,12 +256,14 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
 
         if (_analyticsOptions.Enabled)
         {
-            services.AddScoped<IAnalyticsService, AnalyticsService>();
+            services.AddSingleton<IQueryAnalyticsChannel, QueryAnalyticsChannel>();
+            services.AddHostedService<QueryAnalyticsConsumer>();
             services.AddSingleton<IAnalyticsPathResolver, AnalyticsPathResolver>();
+            services.AddSingleton<IQueryAnalyticsWriter, QueryAnalyticsWriter>();
         }
         else
         {
-            services.AddScoped<IAnalyticsService, NoOpAnalyticsService>();
+            services.AddSingleton<IQueryAnalyticsChannel, NoopQueryAnalyticsChannel>();
         }
     }
 
@@ -373,13 +375,16 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
         migrations.ForEach(migration => migration.Apply());
     }
 
-    private class NoOpAnalyticsService : IAnalyticsService
+    private class NoopQueryAnalyticsChannel : IQueryAnalyticsChannel
     {
-        public Task ReportDataSetVersionQuery(Guid dataSetId, Guid dataSetVersionId, string semVersion,
-            string dataSetTitle,
-            DataSetQueryRequest query, int resultsCount, int totalRowsCount, DateTime startTime, DateTime endTime)
+        public Task WriteQuery(CaptureDataSetVersionQueryRequest request, CancellationToken cancellationToken)
         {
-            return Task.CompletedTask;       
+            return Task.CompletedTask;
+        }
+
+        public ValueTask<CaptureDataSetVersionQueryRequest> ReadQuery(CancellationToken cancellationToken)
+        {
+            return default;
         }
     }
 }

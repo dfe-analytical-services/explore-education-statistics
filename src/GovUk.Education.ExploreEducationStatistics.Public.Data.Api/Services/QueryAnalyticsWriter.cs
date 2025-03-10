@@ -7,38 +7,21 @@ using IAnalyticsPathResolver = GovUk.Education.ExploreEducationStatistics.Public
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services;
 
-public class AnalyticsService(
+public class QueryAnalyticsWriter(
     IAnalyticsPathResolver analyticsPathResolver,
-    ILogger<AnalyticsService> logger) : IAnalyticsService
+    ILogger<QueryAnalyticsWriter> logger) : IQueryAnalyticsWriter
 {
-    public async Task ReportDataSetVersionQuery(
-        Guid dataSetId,
-        Guid dataSetVersionId,
-        string semVersion,
-        string dataSetTitle,
-        DataSetQueryRequest query,
-        int resultsCount,
-        int totalRowsCount,
-        DateTime startTime,
-        DateTime endTime)
+    public async Task ReportDataSetVersionQuery(CaptureDataSetVersionQueryRequest request)
     {
         logger.LogInformation(
             "Capturing query for analytics for data set {DataSetTitle}",
-            dataSetTitle);
-
-        var request = new CaptureDataSetVersionQueryRequest(
-            DataSetId: dataSetId,
-            DataSetVersionId: dataSetVersionId,
-            DataSetVersion: semVersion,
-            DataSetTitle: dataSetTitle,
-            ResultsCount: resultsCount,
-            TotalRowsCount: totalRowsCount,
-            StartTime: startTime,
-            EndTime: endTime,
-            Query: DataSetQueryNormalisationUtil.NormaliseQuery(query));
+            request.DataSetTitle);
 
         var serialisedRequest = JsonSerializationUtils.Serialize(
-            obj: request,
+            obj: request with
+            {
+                Query = DataSetQueryNormalisationUtil.NormaliseQuery(request.Query)
+            },
             formatting: Formatting.Indented,
             orderedProperties: true,
             camelCase: true);
@@ -47,7 +30,7 @@ public class AnalyticsService(
 
         Directory.CreateDirectory(directory);
 
-        var filename = $"{DateTime.UtcNow:yyyyMMdd-HHmmss-fff}_{dataSetVersionId}.json";
+        var filename = $"{DateTime.UtcNow:yyyyMMdd-HHmmss-fff}_{request.DataSetVersionId}.json";
         
         await File.WriteAllTextAsync(
             Path.Combine(directory, filename),
@@ -55,7 +38,7 @@ public class AnalyticsService(
     }
 }
 
-internal record CaptureDataSetVersionQueryRequest(
+public record CaptureDataSetVersionQueryRequest(
     Guid DataSetId,
     Guid DataSetVersionId,
     string DataSetVersion,
