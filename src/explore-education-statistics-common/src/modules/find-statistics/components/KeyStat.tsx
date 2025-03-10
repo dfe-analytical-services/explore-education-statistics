@@ -1,23 +1,15 @@
 import Details from '@common/components/Details';
 import KeyStatTile from '@common/modules/find-statistics/components/KeyStatTile';
-import React, { ReactNode, RefObject, useCallback, useContext } from 'react';
+import React, { ReactNode } from 'react';
 import ReactMarkdown from 'react-markdown';
 import styles from '@common/modules/find-statistics/components/KeyStat.module.scss';
-import { ExportButtonContext } from '@common/components/ExportButtonMenu';
 
 interface KeyStatContainerProps {
   children: ReactNode;
 }
 
 export const KeyStatContainer = ({ children }: KeyStatContainerProps) => {
-  const test = useContext(ExportButtonContext)
-
-  const measuredRef = useCallback(() : RefObject<HTMLDivElement> | null => {
-      console.log(test);
-      return test;
-  }, [test]);
-
-  return <div ref={measuredRef} className={styles.container}>{children}</div>;
+  return <div className={styles.container}>{children}</div>;
 };
 
 interface KeyStatWrapperProps {

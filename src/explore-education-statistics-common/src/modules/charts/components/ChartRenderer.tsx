@@ -1,5 +1,6 @@
-import { ExportButtonContext } from '@common/components/ExportButtonMenu';
+import ExportButtonMenu from '@common/components/ExportButtonMenu';
 import FigureFootnotes from '@common/components/FigureFootnotes';
+import { ExportButtonContext } from '@common/contexts/ExportButtonContext';
 import HorizontalBarBlock, {
   HorizontalBarProps,
 } from '@common/modules/charts/components/HorizontalBarBlock';
@@ -53,7 +54,7 @@ export interface ChartRendererProps {
 function ChartRenderer({ source, id, chart }: ChartRendererProps) {
   const { data, meta, subtitle, title, type } = chart;
 
-  const searchInputRef = useContext(ExportButtonContext);
+  const exportRef = useContext(ExportButtonContext);
 
   const chartComponent = useMemo(() => {
     switch (chart.type) {
@@ -92,29 +93,37 @@ function ChartRenderer({ source, id, chart }: ChartRendererProps) {
     }
 
     return (
-      <figure ref={searchInputRef} className="govuk-!-margin-0" id={id} data-testid={id}>
-        {title && (
-          <figcaption>
-            <p
-              className="govuk-heading-s govuk-!-margin-bottom-1"
-              data-testid="chart-title"
-            >
-              {title}
-            </p>
-            {subtitle && <p data-testid="chart-subtitle">{subtitle}</p>}
-          </figcaption>
-        )}
+      <>
+        <ExportButtonMenu />
+        <figure
+          ref={exportRef}
+          className="govuk-!-margin-0"
+          id={id}
+          data-testid={id}
+        >
+          {title && (
+            <figcaption>
+              <p
+                className="govuk-heading-s govuk-!-margin-bottom-1"
+                data-testid="chart-title"
+              >
+                {title}
+              </p>
+              {subtitle && <p data-testid="chart-subtitle">{subtitle}</p>}
+            </figcaption>
+          )}
 
-        {chartComponent}
+          {chartComponent}
 
-        <FigureFootnotes
-          footnotes={footnotes}
-          headingHiddenText={`for ${title}`}
-          id={`chartFootnotes-${id}`}
-        />
+          <FigureFootnotes
+            footnotes={footnotes}
+            headingHiddenText={`for ${title}`}
+            id={`chartFootnotes-${id}`}
+          />
 
-        {source && <p className="govuk-body-s">Source: {source}</p>}
-      </figure>
+          {source && <p className="govuk-body-s">Source: {source}</p>}
+        </figure>
+      </>
     );
   }
 

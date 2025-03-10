@@ -1,9 +1,9 @@
 import ErrorBoundary from '@common/components/ErrorBoundary';
-import RefComponent, { ExportButtonContext } from '@common/components/ExportButtonMenu';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
 import WarningMessage from '@common/components/WarningMessage';
+import { ExportButtonContext } from '@common/contexts/ExportButtonContext';
 import withLazyLoad from '@common/hocs/withLazyLoad';
 import ChartRenderer from '@common/modules/charts/components/ChartRenderer';
 import { GetInfographic } from '@common/modules/charts/components/InfographicBlock';
@@ -51,6 +51,7 @@ const DataBlockTabs = ({
     releaseId,
     getInfographic,
   });
+
   const exportRef = useRef(null);
 
   const errorMessage = <WarningMessage>Could not load content</WarningMessage>;
@@ -61,8 +62,6 @@ const DataBlockTabs = ({
       ? additionalTabContent({ dataBlock })
       : additionalTabContent;
   return (
-    <ExportButtonContext.Provider value={exportRef}>
-      <RefComponent />
     <LoadingSpinner loading={isTableDataLoading || isGeoJsonInitialLoading}>
       <Tabs id={id} testId={testId(dataBlock)} onToggle={onToggle}>
         {firstTabs}
@@ -85,11 +84,13 @@ const DataBlockTabs = ({
             {fullTable && (
               <ErrorBoundary fallback={errorMessage}>
                 {chart && (
-                  <ChartRenderer
-                    id="dataBlockTabs-chart"
-                    source={dataBlock.source}
-                    chart={chart}
-                  />
+                  <ExportButtonContext.Provider value={exportRef}>
+                    <ChartRenderer
+                      id="dataBlockTabs-chart"
+                      source={dataBlock.source}
+                      chart={chart}
+                    />
+                  </ExportButtonContext.Provider>
                 )}
                 {additionTabContentElement}
               </ErrorBoundary>
@@ -141,7 +142,6 @@ const DataBlockTabs = ({
         {lastTabs}
       </Tabs>
     </LoadingSpinner>
-    </ExportButtonContext.Provider>
   );
 };
 

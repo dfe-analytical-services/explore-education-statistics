@@ -4,6 +4,7 @@ import ChartBuilder, {
 import { SavedDataBlock } from '@admin/pages/release/datablocks/components/DataBlockPageTabs';
 import { ReleaseDataBlock } from '@admin/services/dataBlockService';
 import releaseChartFileService from '@admin/services/releaseChartFileService';
+import { ExportButtonContext } from '@common/contexts/ExportButtonContext';
 import { Chart } from '@common/modules/charts/types/chart';
 import { FullTable } from '@common/modules/table-tool/types/fullTable';
 import mapFullTable from '@common/modules/table-tool/utils/mapFullTable';
@@ -12,7 +13,7 @@ import tableBuilderService, {
   TableDataQuery,
 } from '@common/services/tableBuilderService';
 import isEqual from 'lodash/isEqual';
-import React, { useCallback, useMemo } from 'react';
+import React, { useCallback, useMemo, useRef } from 'react';
 
 export type ChartBuilderTableUpdateHandler = (params: {
   table: FullTable;
@@ -92,7 +93,7 @@ const ChartBuilderTabSection = ({
         ...query,
         ...updatedQuery,
       };
-      
+
       // Don't fetch table data again if queries are the same
       if (isEqual(query, nextQuery)) {
         return;
@@ -112,7 +113,10 @@ const ChartBuilderTabSection = ({
     [onTableUpdate, query, releaseId],
   );
 
+  const exportRef = useRef(null);
+
   return (
+    <ExportButtonContext.Provider value={exportRef}>
       <ChartBuilder
         releaseId={releaseId}
         data={table.results}
@@ -123,6 +127,7 @@ const ChartBuilderTabSection = ({
         onChartDelete={handleChartDelete}
         onTableQueryUpdate={handleTableQueryUpdate}
       />
+    </ExportButtonContext.Provider>
   );
 };
 

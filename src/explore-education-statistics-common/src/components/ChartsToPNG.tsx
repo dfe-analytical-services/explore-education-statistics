@@ -1,8 +1,8 @@
 /* eslint-disable import/no-extraneous-dependencies */
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { useExportButtonContext } from '@common/contexts/ExportButtonContext';
 import html2canvas, { Options as HTML2CanvasOptions } from 'html2canvas';
-import { Component, createRef, useCallback, useState } from 'react';
-import { useRefContext } from './ExportButtonMenu';
+import { useCallback, useState } from 'react';
 
 export type UseGenerateImage<T extends HTMLElement = HTMLDivElement> = [
   (callback?: BlobCallback) => Promise<string | undefined>,
@@ -17,22 +17,12 @@ export type UseGenerateImageArgs = {
   type?: string;
 };
 
-/**
- * @param {{options: HTML2CanvasOptions, type: string, quality: number}} [args] Optional arguments.
- * @param {HTML2CanvasOptions} [args.options] An html2canvas Options object.
- * @param {number} [args.quality] Applies if the type is an image format that supports variable quality (such as "image/jpeg"), and is a number in the range 0.0 to 1.0 inclusive indicating the desired quality level for the resulting image.
- * @param {string} [args.type] Controls the type of the image to be returned (e.g. PNG or JPEG). The default is "image/png"; that type is also used if the given type isn't supported.
- *
- * [Reference: html.spec.whatwg.org](https://html.spec.whatwg.org/multipage/canvas.html#dom-canvas-todataurl-dev)
- */
 export function useGenerateImage(
-  args?: UseGenerateImageArgs
+  args?: UseGenerateImageArgs,
 ): UseGenerateImage {
   const [isLoading, setIsLoading] = useState(false);
-  const ref = useRefContext();
+  const ref = useExportButtonContext();
 
-  console.log(ref);
-  
   const generateImage = useCallback(
     // eslint-disable-next-line consistent-return
     async (callback?: BlobCallback) => {
@@ -42,7 +32,7 @@ export function useGenerateImage(
         return html2canvas(ref.current, {
           logging: false,
           ...args?.options,
-        }).then((canvas) => {
+        }).then(canvas => {
           if (callback) {
             canvas.toBlob(callback, args?.type, args?.quality);
           }
@@ -51,13 +41,13 @@ export function useGenerateImage(
         });
       }
     },
-    [args, ref]
+    [args, ref],
   );
 
   return [
     generateImage,
     {
-      isLoading
+      isLoading,
     },
   ];
 }
@@ -70,13 +60,11 @@ export type UseCurrentPng = [
   },
 ];
 
-/**
- * @param options - optional html2canvas Options object
- */
-export function useCurrentPng(options?: Partial<HTML2CanvasOptions>): UseCurrentPng {
-  const ref = useRefContext();
+export function useCurrentPng(
+  options?: Partial<HTML2CanvasOptions>,
+): UseCurrentPng {
+  const ref = useExportButtonContext();
 
-  console.log(ref);
   const [isLoading, setIsLoading] = useState(false);
 
   const getPng = useCallback(
@@ -88,7 +76,7 @@ export function useCurrentPng(options?: Partial<HTML2CanvasOptions>): UseCurrent
         return html2canvas(ref.current as HTMLElement, {
           logging: false,
           ...options,
-        }).then((canvas) => {
+        }).then(canvas => {
           if (callback) {
             canvas.toBlob(callback, 'image/png', 1.0);
           }
@@ -97,7 +85,7 @@ export function useCurrentPng(options?: Partial<HTML2CanvasOptions>): UseCurrent
         });
       }
     },
-    [options, ref]
+    [options, ref],
   );
 
   return [
@@ -111,6 +99,8 @@ export function useCurrentPng(options?: Partial<HTML2CanvasOptions>): UseCurrent
 
 export interface CurrentPngProps {
   chartRef: React.RefObject<any>;
-  getPng: (options?: Partial<HTML2CanvasOptions>) => Promise<string | undefined>;
+  getPng: (
+    options?: Partial<HTML2CanvasOptions>,
+  ) => Promise<string | undefined>;
   isLoading: boolean;
 }
