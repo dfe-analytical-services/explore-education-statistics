@@ -17,7 +17,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="AspectInjector" Version="2.8.2" PrivateAssets="all" />
+    <PackageReference Include="AspectInjector" Version="2.8.1" PrivateAssets="all" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.7" PrivateAssets="all" />
     <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.22.0" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="8.0.7" />
