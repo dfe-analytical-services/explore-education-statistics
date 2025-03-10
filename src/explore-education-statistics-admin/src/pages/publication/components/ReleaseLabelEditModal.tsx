@@ -1,4 +1,5 @@
 import FormModal from '@admin/components/FormModal';
+import isNullOrWhitespace from '@common/utils/string/isNullOrWhitespace';
 import { useConfig } from '@admin/contexts/ConfigContext';
 import FormFieldTextInput from '@common/components/form/FormFieldTextInput';
 import UrlContainer from '@common/components/UrlContainer';
@@ -42,10 +43,22 @@ const errorMappings = [
   }),
 ];
 
-const releaseSlugLabelSuffix = (label?: string) => {
-  const lowercaseLabel = label?.toLowerCase();
+const replaceWhitespace = (str: string, replaceValue: string) => {
+  return str.replace(/\s+/g, replaceValue);
+};
 
-  return lowercaseLabel ? `-${lowercaseLabel}` : '';
+const releaseSlugLabelSuffix = (label?: string) => {
+  if (isNullOrWhitespace(label)) {
+    return '';
+  }
+
+  const trimmedLowercaseLabel = label!.trim().toLowerCase();
+  const whitespaceReplacedWithDashesLabel = replaceWhitespace(
+    trimmedLowercaseLabel,
+    '-',
+  );
+
+  return `-${whitespaceReplacedWithDashesLabel}`;
 };
 
 export default function ReleaseLabelEditModal({
@@ -70,10 +83,22 @@ export default function ReleaseLabelEditModal({
       newReleaseSlugLabelSuffix,
     );
 
+    const formattedLabel = isNullOrWhitespace(formValues?.label)
+      ? undefined
+      : replaceWhitespace(formValues!.label!, ' ');
+
     return (
       <>
         <WarningMessage className="govuk-!-font-weight-regular">
-          Changing this release's label to <strong>{formValues?.label}</strong>{' '}
+          {formattedLabel ? (
+            <span>
+              Changing this release's label to <strong>{formattedLabel}</strong>{' '}
+            </span>
+          ) : (
+            <span>
+              <strong>Removing</strong> this release's label{' '}
+            </span>
+          )}
           will result in the release's public URL changing from
         </WarningMessage>
         <UrlContainer
