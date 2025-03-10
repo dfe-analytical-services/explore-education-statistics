@@ -47,4 +47,4 @@ jobs:
                 serviceConnection: ${{ parameters.serviceConnection }}
                 displayName: Check the Search Docs Function App is healthy after deployment
                 endpoint: $(searchDocsFunctionAppUrl)/api/HealthCheck
-                maxAttempts: 10
+
