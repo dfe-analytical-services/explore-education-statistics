@@ -1,0 +1,15 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net8.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <PackageReference Include="DuckDB.NET.Data.Full" Version="1.2.0" />
+      <PackageReference Include="InterpolatedSql.Dapper" Version="2.3.0" />
+      <PackageReference Include="MiniProfiler.AspNetCore.Mvc" Version="4.5.4" />
+    </ItemGroup>
+
+</Project>

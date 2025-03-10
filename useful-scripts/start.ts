@@ -66,6 +66,7 @@ type ServiceSchemaDockerServices =
 // or we run into various circular reference issues in the types.
 const allowedServiceNames = [
   'admin',
+  'analytics',
   'content',
   'data',
   'frontend',
@@ -79,7 +80,6 @@ const allowedServiceNames = [
   'idp',
   'db',
   'dataStorage',
-  'searchFunctionApp',
 ] as const;
 
 type ServiceName = (typeof allowedServiceNames)[number];
@@ -96,6 +96,13 @@ const serviceSchemas: Record<ServiceName, ServiceSchema> = {
         ? ['db', 'data-storage', 'public-api-db']
         : ['db', 'data-storage', 'public-api-db', 'idp'];
     },
+  },
+  analytics: {
+    root: 'src/GovUk.Education.ExploreEducationStatistics.Analytics.Consumer',
+    colour: chalk.rgb(165, 158, 255),
+    port: 7075,
+    type: 'func',
+    dockerServices: ['data-storage'],
   },
   content: {
     root: 'src/GovUk.Education.ExploreEducationStatistics.Content.Api',
@@ -158,13 +165,6 @@ const serviceSchemas: Record<ServiceName, ServiceSchema> = {
     port: 7074,
     type: 'func',
     dockerServices: ['db', 'public-api-db', 'data-storage'],
-  },
-  searchFunctionApp: {
-    root: 'src/GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp',
-    colour: chalk.rgb(255, 102, 0),
-    port: 7075,
-    type: 'func',
-    dockerServices: ['data-storage'],
   },
   idp: {
     service: 'idp',
