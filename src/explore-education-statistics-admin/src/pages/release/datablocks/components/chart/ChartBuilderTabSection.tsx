@@ -23,7 +23,7 @@ export type ChartBuilderTableUpdateHandler = (params: {
 interface Props {
   dataBlock: ReleaseDataBlock;
   query: TableDataQuery;
-  releaseId: string;
+  releaseVersionId: string;
   table: FullTable;
   onDataBlockSave: (dataBlock: SavedDataBlock) => void;
   onTableUpdate: ChartBuilderTableUpdateHandler;
@@ -32,7 +32,7 @@ interface Props {
 const ChartBuilderTabSection = ({
   dataBlock,
   query,
-  releaseId,
+  releaseVersionId,
   table,
   onDataBlockSave,
   onTableUpdate,
@@ -53,7 +53,7 @@ const ChartBuilderTabSection = ({
 
       if (chart.type === 'infographic' && file) {
         const { id } = await releaseChartFileService.uploadChartFile(
-          releaseId,
+          releaseVersionId,
           { file },
         );
 
@@ -69,14 +69,17 @@ const ChartBuilderTabSection = ({
         charts: [chartToSave],
       });
     },
-    [dataBlock, onDataBlockSave, query, releaseId],
+    [dataBlock, onDataBlockSave, query, releaseVersionId],
   );
 
   const handleChartDelete = useCallback(
     async (chart: Chart) => {
       // Cleanup potential infographic chart file if required
       if (chart.type === 'infographic' && chart.fileId) {
-        await releaseChartFileService.deleteChartFile(releaseId, chart.fileId);
+        await releaseChartFileService.deleteChartFile(
+          releaseVersionId,
+          chart.fileId,
+        );
       }
 
       await onDataBlockSave({
@@ -84,7 +87,7 @@ const ChartBuilderTabSection = ({
         charts: [],
       });
     },
-    [dataBlock, onDataBlockSave, releaseId],
+    [dataBlock, onDataBlockSave, releaseVersionId],
   );
 
   const handleTableQueryUpdate: TableQueryUpdateHandler = useCallback(
@@ -101,7 +104,7 @@ const ChartBuilderTabSection = ({
 
       const tableData = await tableBuilderService.getTableData(
         nextQuery,
-        releaseId,
+        releaseVersionId,
         nextQuery.boundaryLevel,
       );
 
@@ -110,7 +113,7 @@ const ChartBuilderTabSection = ({
         query: nextQuery,
       });
     },
-    [onTableUpdate, query, releaseId],
+    [onTableUpdate, query, releaseVersionId],
   );
 
   const exportRef = useRef(null);
@@ -118,7 +121,7 @@ const ChartBuilderTabSection = ({
   return (
     <ExportButtonContext.Provider value={exportRef}>
       <ChartBuilder
-        releaseId={releaseId}
+        releaseVersionId={releaseVersionId}
         data={table.results}
         meta={meta}
         initialChart={dataBlock.charts[0]}
