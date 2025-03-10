@@ -3692,9 +3692,6 @@
               "addressPrefix": "10.0.14.0/24",
               "serviceEndpoints": [
                 {
-                  "service": "Microsoft.Sql"
-                },
-                {
                   "service": "Microsoft.Storage"
                 }
               ],

@@ -47,6 +47,9 @@ param appSettings {
 @description('The Application Insights connection string that is associated with this resource.')
 param applicationInsightsConnectionString string
 
+@description('Specifies whether to grant the Function App role-based access to storage account queue data.')
+param deployQueueRoleAssignment bool = false
+
 @description('Set the amount of memory allocated to each instance of the function app in MB.')
 param instanceMemoryMB int = 2048
 
@@ -218,6 +221,7 @@ resource functionApp 'Microsoft.Web/sites@2024-04-01' = {
           name: 'APPLICATIONINSIGHTS_CONNECTION_STRING'
           value: applicationInsightsConnectionString
         }
+        // Use managed identity to access the storage account rather than key based access with a connection string
         {
           name: 'AzureWebJobsStorage__accountName'
           value: storageAccountModule.outputs.storageAccountName
@@ -302,7 +306,7 @@ module storageAccountBlobRoleAssignmentModule 'storageAccountRoleAssignment.bice
   }
 }
 
-module storageAccountQueueRoleAssignmentModule 'storageAccountRoleAssignment.bicep' = {
+module storageAccountQueueRoleAssignmentModule 'storageAccountRoleAssignment.bicep' = if (deployQueueRoleAssignment) {
   name: '${storageAccountName}QueueRoleAssignmentModuleDeploy'
   params: {
     principalIds: [functionApp.identity.principalId]

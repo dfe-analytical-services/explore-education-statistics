@@ -86,7 +86,7 @@ module functionAppModule '../../common/components/functionApp.bicep' = {
     functionAppName: '${resourcePrefix}-${abbreviations.webSitesFunctions}-searchdocs'
     location: location
     applicationInsightsConnectionString: applicationInsightsConnectionString
-    appServicePlanName: '${resourcePrefix}-${abbreviations.webSitesFunctions}-searchdocs'
+    appServicePlanName: '${resourcePrefix}-${abbreviations.webServerFarms}-searchdocs'
     appSettings: [
       {
         name: 'App__SearchStorageConnectionString'
@@ -120,8 +120,9 @@ module functionAppModule '../../common/components/functionApp.bicep' = {
     operatingSystem: 'Linux'
     functionAppRuntime: 'dotnet-isolated'
     functionAppRuntimeVersion: '8.0'
+    deployQueueRoleAssignment: true
     storageAccountName: '${replace(resourcePrefix, '-', '')}${abbreviations.storageStorageAccounts}searchdocsfn'
-    storageAccountPublicNetworkAccessEnabled: true
+    storageAccountPublicNetworkAccessEnabled: false
     publicNetworkAccessEnabled: true
     functionAppFirewallRules: functionAppFirewallRules
     storageFirewallRules: storageFirewallRules
