@@ -1,27 +1,30 @@
 ﻿using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.HealthChecks.Dtos;
+using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.HealthChecks.Strategies;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.HealthChecks;
 
-public class HealthCheckFunction
+public class HealthCheckFunction(IEnumerable<IHeathCheckStrategy> strategies)
 {
     [Function(nameof(HealthCheck))]
     [Produces("application/json")]
-    public IActionResult HealthCheck(
-#pragma warning disable IDE0060
+    public async Task<IActionResult> HealthCheck(
         [HttpTrigger(AuthorizationLevel.Anonymous, "get")]
-        HttpRequest request)
-#pragma warning restore IDE0060
+        HttpRequest _,
+        CancellationToken cancellationToken)
     {
-        var healthCheckResponse = new HealthCheckResponseDto();
-
-        if (healthCheckResponse.Healthy)
+        var healthCheckResponse = new HealthCheckResponse
         {
-            return new OkObjectResult(healthCheckResponse);
-        }
+            Results = await Task.WhenAll(strategies.Select(s => s.Run(cancellationToken)))
+        };
 
-        return new ObjectResult(healthCheckResponse) { StatusCode = StatusCodes.Status500InternalServerError };
+        return healthCheckResponse.IsHealthy
+            ? new OkObjectResult(healthCheckResponse)
+            : new ObjectResult(healthCheckResponse)
+            {
+                StatusCode = StatusCodes.Status500InternalServerError
+            };
     }
 }
