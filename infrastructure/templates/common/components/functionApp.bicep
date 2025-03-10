@@ -1,4 +1,5 @@
 import { IpRange, FirewallRule } from '../types.bicep'
+import { abbreviations } from '../../common/abbreviations.bicep'
 import { staticAverageLessThanHundred, staticMinGreaterThanZero } from '../../public-api/components/alerts/staticAlertConfig.bicep'
 import { dynamicAverageGreaterThan } from '../../public-api/components/alerts/dynamicAlertConfig.bicep'
 
@@ -189,19 +190,11 @@ module storageAccountModule '../../public-api/components/storageAccount.bicep' =
   }
 }
 
-module blobServiceModule '../../common/components/blobService.bicep' = {
-  name: '${storageAccountName}BlobServiceModuleDeploy'
-  params: {
-    storageAccountName: storageAccountModule.outputs.storageAccountName
-    containerNames: []
-  }
-}
-
 module fileShareModule '../../public-api/components/fileShare.bicep' = {
   name: '${storageAccountName}FileShareModuleDeploy'
   params: {
     storageAccountName: storageAccountModule.outputs.storageAccountName
-    fileShareName: '${functionAppName}-share'
+    fileShareName: '${functionAppName}-${abbreviations.fileShare}'
     alerts: fileServiceAlerts
     tagValues: tagValues
   }
