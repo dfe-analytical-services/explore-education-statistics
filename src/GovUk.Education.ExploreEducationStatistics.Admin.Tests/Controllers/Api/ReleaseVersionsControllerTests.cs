@@ -1024,35 +1024,30 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         public class UploadDataSetTests(TestApplicationFactory testApp) : ReleaseVersionsControllerIntegrationTests(testApp)
         {
             [Fact]
-            public async Task UploadDataSetAsZip_Success()
+            public async Task UploadDataSetAsZip_ValidRequest_ReturnsDataFileInfo()
             {
                 // Arrange
                 var archive = CreateFormFileFromResource("data-zip-valid.zip");
 
-                var fileUploadsValidatorService = new Mock<IFileUploadsValidatorService>(Strict);
-
                 var contentDbContextId = Guid.NewGuid().ToString();
-                await using (var contentDbContext = DbUtils.InMemoryApplicationDbContext(contentDbContextId))
+                await using var contentDbContext = DbUtils.InMemoryApplicationDbContext(contentDbContextId);
+
+                // Act
+                var request = new UploadDataSetAsZipRequest
                 {
-                    // Act
-                    var request = new UploadDataSetAsZipRequest
-                    {
-                        ReleaseVersionId = Guid.NewGuid(),
-                        DataSetTitle = "Test title",
-                        ZipFile = archive
-                    };
+                    ReleaseVersionId = Guid.NewGuid(),
+                    DataSetTitle = "Test title",
+                    ZipFile = archive
+                };
 
-                    var response = await UploadDataSetAsZip(request); // Request isn't sending any values? All properties fail validation
+                var response = await UploadDataSetAsZip(request); // Request isn't sending any values? All properties fail validation
 
-                    // Assert
-                    var validationProblem = response.AssertValidationProblem();
-                    var archiveDataSet = response.AssertOk<DataFileInfo>();
+                // Assert
+                var validationProblem = response.AssertValidationProblem();
+                var archiveDataSet = response.AssertOk<DataFileInfo>();
 
-                    Assert.Equal("one.meta.csv", archiveDataSet.MetaFileName);
-                    // Add more assertions
-                }
-
-                VerifyAllMocks(fileUploadsValidatorService);
+                Assert.Equal("one.meta.csv", archiveDataSet.MetaFileName);
+                // Add more assertions
             }
 
             [Fact]
