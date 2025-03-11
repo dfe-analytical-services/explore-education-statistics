@@ -83,46 +83,47 @@ export default function ChartDataGroupingsConfiguration({
                       ].toLowerCase()}`}
                 </td>
                 <td className="govuk-!-text-align-right">
-                  <ButtonText
-                    onClick={() =>
-                      setEditDataSetConfig({ dataSetConfig, unit })
+                  <Modal
+                    open={!!editDataSetConfig}
+                    triggerButton={
+                      <ButtonText
+                        onClick={() =>
+                          setEditDataSetConfig({ dataSetConfig, unit })
+                        }
+                      >
+                        Edit
+                      </ButtonText>
                     }
+                    title="Edit groupings"
+                    onExit={() => setEditDataSetConfig(undefined)}
                   >
-                    Edit
-                  </ButtonText>
+                    {editDataSetConfig && (
+                      <ChartDataGroupingForm
+                        dataSetConfig={editDataSetConfig.dataSetConfig}
+                        dataSetConfigs={map.dataSetConfigs}
+                        meta={meta}
+                        unit={editDataSetConfig.unit}
+                        onCancel={() => setEditDataSetConfig(undefined)}
+                        onSubmit={values => {
+                          onChange({
+                            dataSetConfigs: map.dataSetConfigs.map(config => {
+                              return isEqual(config.dataSet, values.dataSet)
+                                ? values
+                                : config;
+                            }),
+                          });
+
+                          setEditDataSetConfig(undefined);
+                        }}
+                      />
+                    )}
+                  </Modal>
                 </td>
               </tr>
             );
           })}
         </tbody>
       </table>
-
-      {editDataSetConfig && (
-        <Modal
-          open
-          title="Edit groupings"
-          onExit={() => setEditDataSetConfig(undefined)}
-        >
-          <ChartDataGroupingForm
-            dataSetConfig={editDataSetConfig.dataSetConfig}
-            dataSetConfigs={map.dataSetConfigs}
-            meta={meta}
-            unit={editDataSetConfig.unit}
-            onCancel={() => setEditDataSetConfig(undefined)}
-            onSubmit={values => {
-              onChange({
-                dataSetConfigs: map.dataSetConfigs.map(config => {
-                  return isEqual(config.dataSet, values.dataSet)
-                    ? values
-                    : config;
-                }),
-              });
-
-              setEditDataSetConfig(undefined);
-            }}
-          />
-        </Modal>
-      )}
 
       <ChartBuilderSaveActions
         formId={formId}
