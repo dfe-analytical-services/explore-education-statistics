@@ -3,39 +3,39 @@ using Moq;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Tests.Builders;
 
-public class HeathCheckStrategyBuilder
+public class HealthCheckStrategyBuilder
 {
-    private readonly Mock<IHeathCheckStrategy> _mock = new(MockBehavior.Strict);
-    private bool _heathCheckIsSuccessful = true;
-    private string? _heathCheckMessage = string.Empty;
+    private readonly Mock<IHealthCheckStrategy> _mock = new(MockBehavior.Strict);
+    private bool _healthCheckIsSuccessful = true;
+    private string? _healthCheckMessage = string.Empty;
     
-    public IHeathCheckStrategy Build()
+    public IHealthCheckStrategy Build()
     {
         _mock
             .Setup(m => m.Run(It.IsAny<CancellationToken>()))
-            .ReturnsAsync(new HeathCheckResult(_heathCheckIsSuccessful, _heathCheckMessage));
+            .ReturnsAsync(new HealthCheckResult(_healthCheckIsSuccessful, _healthCheckMessage));
         
         return _mock.Object;
     }
 
-    public HeathCheckStrategyBuilder WhereResultIsHealthy(string? message = null)
+    public HealthCheckStrategyBuilder WhereResultIsHealthy(string? message = null)
     {
-        _heathCheckIsSuccessful = true;
-        _heathCheckMessage = message;
+        _healthCheckIsSuccessful = true;
+        _healthCheckMessage = message;
         return this;
     }
 
-    public HeathCheckStrategyBuilder WhereIsHeathyResultIs(bool isHeathy, string? message = null)
+    public HealthCheckStrategyBuilder WhereIsHealthyResultIs(bool isHealthy, string? message = null)
     {
-        _heathCheckIsSuccessful = isHeathy;
-        _heathCheckMessage = message;
+        _healthCheckIsSuccessful = isHealthy;
+        _healthCheckMessage = message;
         return this;
     }
 
-    public HeathCheckStrategyBuilder WhereResultIsUnhealthy(string? message = null)
+    public HealthCheckStrategyBuilder WhereResultIsUnhealthy(string? message = null)
     {
-        _heathCheckIsSuccessful = false;
-        _heathCheckMessage = message;
+        _healthCheckIsSuccessful = false;
+        _healthCheckMessage = message;
         return this;
     }
 }

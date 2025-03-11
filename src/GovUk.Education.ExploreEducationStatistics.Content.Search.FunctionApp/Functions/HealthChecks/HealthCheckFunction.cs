@@ -6,13 +6,14 @@ using Microsoft.Azure.Functions.Worker;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.HealthChecks;
 
-public class HealthCheckFunction(IEnumerable<IHeathCheckStrategy> strategies)
+public class HealthCheckFunction(IEnumerable<IHealthCheckStrategy> strategies)
 {
     [Function(nameof(HealthCheck))]
     [Produces("application/json")]
     public async Task<IActionResult> HealthCheck(
-        [HttpTrigger(AuthorizationLevel.Anonymous, "get")]
-        HttpRequest _,
+        [HttpTrigger(AuthorizationLevel.Anonymous, "get")] 
+        #pragma warning disable IDE0060 // Suppress removing unused parameter - must have a valid binding name for Azure function
+        HttpRequest httpRequest,
         CancellationToken cancellationToken)
     {
         var healthCheckResponse = new HealthCheckResponse

@@ -16,6 +16,6 @@ public static class ServiceCollectionExtensions
 
     public static IServiceCollection AddHealthChecks(this IServiceCollection serviceCollection) =>
         serviceCollection
-            .AddTransient<IHeathCheckStrategy, ContentApiHealthCheckStrategy>()
-            .AddTransient<IHeathCheckStrategy, AzureBlobStorageHealthCheckStrategy>();
+            .AddTransient<IHealthCheckStrategy, ContentApiHealthCheckStrategy>()
+            .AddTransient<IHealthCheckStrategy, AzureBlobStorageHealthCheckStrategy>();
 }

@@ -5,24 +5,24 @@ using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Func
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Tests.Builders;
 using Microsoft.AspNetCore.Mvc;
 
-namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Tests.Functions.HeathChecks;
+namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Tests.Functions.HealthChecks;
 
 public class HealthCheckFunctionTests
 {
-    private HealthCheckFunction GetSut(IEnumerable<IHeathCheckStrategy> strategies) => new(strategies);
+    private HealthCheckFunction GetSut(IEnumerable<IHealthCheckStrategy> strategies) => new(strategies);
 
     [Fact]
     public void Can_instantiate_sut() => Assert.NotNull(GetSut([]));
 
     [Fact]
-    public async Task WhenStrategiesAreAllHealthy_ThenHeathCheckIsHealthy()
+    public async Task WhenStrategiesAreAllHealthy_ThenHealthCheckIsHealthy()
     {
         // ARRANGE
-        IHeathCheckStrategy[] strategies =
+        IHealthCheckStrategy[] strategies =
         [
-            new HeathCheckStrategyBuilder().WhereResultIsHealthy().Build(),
-            new HeathCheckStrategyBuilder().WhereResultIsHealthy().Build(),
-            new HeathCheckStrategyBuilder().WhereResultIsHealthy().Build()
+            new HealthCheckStrategyBuilder().WhereResultIsHealthy().Build(),
+            new HealthCheckStrategyBuilder().WhereResultIsHealthy().Build(),
+            new HealthCheckStrategyBuilder().WhereResultIsHealthy().Build()
         ];
         var sut = GetSut(strategies);
         
@@ -32,8 +32,8 @@ public class HealthCheckFunctionTests
         // ASSERT
         Assert.NotNull(result);
         var okResult = Assert.IsType<OkObjectResult>(result);
-        var heathCheckResult = Assert.IsType<HealthCheckResponse>(okResult.Value);
-        Assert.True(heathCheckResult.IsHealthy);
+        var healthCheckResult = Assert.IsType<HealthCheckResponse>(okResult.Value);
+        Assert.True(healthCheckResult.IsHealthy);
     }
     
     [Theory]
@@ -41,18 +41,18 @@ public class HealthCheckFunctionTests
     [InlineData(false, true, true)]
     [InlineData(true, false, false)]
     [InlineData(false, false, false)]
-    public async Task WhenAnyOrAllStrategiesAreUnheatlhy_ThenHeathCheckIsUnhealthy(
+    public async Task WhenAnyOrAllStrategiesAreUnheatlhy_ThenHealthCheckIsUnhealthy(
         bool isHealthy1,
         bool isHealthy2,
         bool isHealthy3
         )
     {
         // ARRANGE
-        IHeathCheckStrategy[] strategies =
+        IHealthCheckStrategy[] strategies =
         [
-            new HeathCheckStrategyBuilder().WhereIsHeathyResultIs(isHealthy1).Build(),
-            new HeathCheckStrategyBuilder().WhereIsHeathyResultIs(isHealthy2).Build(),
-            new HeathCheckStrategyBuilder().WhereIsHeathyResultIs(isHealthy3).Build(),
+            new HealthCheckStrategyBuilder().WhereIsHealthyResultIs(isHealthy1).Build(),
+            new HealthCheckStrategyBuilder().WhereIsHealthyResultIs(isHealthy2).Build(),
+            new HealthCheckStrategyBuilder().WhereIsHealthyResultIs(isHealthy3).Build(),
         ];
         var sut = GetSut(strategies);
         
@@ -63,19 +63,19 @@ public class HealthCheckFunctionTests
         Assert.NotNull(result);
         var httpResult = Assert.IsType<ObjectResult>(result);
         Assert.Equal((int)HttpStatusCode.InternalServerError, httpResult.StatusCode);
-        var heathCheckResult = Assert.IsType<HealthCheckResponse>(httpResult.Value);
-        Assert.False(heathCheckResult.IsHealthy);
+        var healthCheckResult = Assert.IsType<HealthCheckResponse>(httpResult.Value);
+        Assert.False(healthCheckResult.IsHealthy);
     }
     
     [Fact]
-    public async Task WhenStrategiesReturnResults_ThenHeathCheckResponseContainsResults()
+    public async Task WhenStrategiesReturnResults_ThenHealthCheckResponseContainsResults()
     {
         // ARRANGE
-        IHeathCheckStrategy[] strategies =
+        IHealthCheckStrategy[] strategies =
         [
-            new HeathCheckStrategyBuilder().WhereResultIsHealthy("Result one").Build(),
-            new HeathCheckStrategyBuilder().WhereResultIsUnhealthy("Result two").Build(),
-            new HeathCheckStrategyBuilder().WhereResultIsHealthy(null).Build()
+            new HealthCheckStrategyBuilder().WhereResultIsHealthy("Result one").Build(),
+            new HealthCheckStrategyBuilder().WhereResultIsUnhealthy("Result two").Build(),
+            new HealthCheckStrategyBuilder().WhereResultIsHealthy(null).Build()
         ];
         var sut = GetSut(strategies);
         
@@ -85,14 +85,14 @@ public class HealthCheckFunctionTests
         // ASSERT
         Assert.NotNull(result);
         var okResult = Assert.IsType<ObjectResult>(result);
-        var heathCheckResult = Assert.IsType<HealthCheckResponse>(okResult.Value);
+        var healthCheckResult = Assert.IsType<HealthCheckResponse>(okResult.Value);
         var expectedResults = new[]
         {
-            new HeathCheckResult(true, "Result one"),
-            new HeathCheckResult(false, "Result two"),
-            new HeathCheckResult(true, null)
+            new HealthCheckResult(true, "Result one"),
+            new HealthCheckResult(false, "Result two"),
+            new HealthCheckResult(true, null)
         };
-        Assert.Equal(expectedResults, heathCheckResult.Results);
+        Assert.Equal(expectedResults, healthCheckResult.Results);
     }
 
 }

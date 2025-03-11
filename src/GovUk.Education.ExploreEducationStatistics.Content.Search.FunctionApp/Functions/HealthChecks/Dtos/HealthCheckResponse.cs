@@ -5,5 +5,5 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.
 public record HealthCheckResponse
 {
     public bool IsHealthy => Results.All(r => r.IsHealthy);
-    public required HeathCheckResult[] Results { get; init; }
+    public required HealthCheckResult[] Results { get; init; }
 }

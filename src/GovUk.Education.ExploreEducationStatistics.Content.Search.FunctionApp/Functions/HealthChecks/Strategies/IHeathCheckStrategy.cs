@@ -1,6 +1,6 @@
 namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.HealthChecks.Strategies;
 
-public interface IHeathCheckStrategy
+public interface IHealthCheckStrategy
 {
-    Task<HeathCheckResult> Run(CancellationToken cancellationToken);
+    Task<HealthCheckResult> Run(CancellationToken cancellationToken);
 }

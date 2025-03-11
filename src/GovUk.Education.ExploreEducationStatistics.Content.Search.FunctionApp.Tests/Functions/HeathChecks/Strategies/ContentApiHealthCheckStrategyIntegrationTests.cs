@@ -2,7 +2,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Clie
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.HealthChecks.Strategies;
 using Xunit.Abstractions;
 
-namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Tests.Functions.HeathChecks.Strategies;
+namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Tests.Functions.HealthChecks.Strategies;
 
 public class ContentApiHealthCheckStrategyIntegrationTests(ITestOutputHelper output)
 {
@@ -20,13 +20,13 @@ public class ContentApiHealthCheckStrategyIntegrationTests(ITestOutputHelper out
                 }));
         
         // ACT
-        var heathCheckResult = await sut.Run(CancellationToken.None);
+        var healthCheckResult = await sut.Run(CancellationToken.None);
         
         // ASSERT
-        Print(heathCheckResult);
-        Assert.NotNull(heathCheckResult);
-        Assert.True(heathCheckResult.IsHealthy);
-        Assert.Null(heathCheckResult.Message);
+        Print(healthCheckResult);
+        Assert.NotNull(healthCheckResult);
+        Assert.True(healthCheckResult.IsHealthy);
+        Assert.Null(healthCheckResult.Message);
     }
     
     private void Print(object obj) => output.WriteLine(obj.ToString());

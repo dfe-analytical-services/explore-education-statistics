@@ -2,11 +2,11 @@ using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Clie
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.HealthChecks.Strategies;
 
-internal class ContentApiHealthCheckStrategy(IContentApiClient contentApiClient) : IHeathCheckStrategy
+internal class ContentApiHealthCheckStrategy(IContentApiClient contentApiClient) : IHealthCheckStrategy
 {
-    public async Task<HeathCheckResult> Run(CancellationToken cancellationToken)
+    public async Task<HealthCheckResult> Run(CancellationToken cancellationToken)
     {
         var pingResult = await contentApiClient.Ping(cancellationToken);
-        return new HeathCheckResult(pingResult.WasSuccesssful, pingResult.ErrorMessage);
+        return new HealthCheckResult(pingResult.WasSuccesssful, pingResult.ErrorMessage);
     }
 }

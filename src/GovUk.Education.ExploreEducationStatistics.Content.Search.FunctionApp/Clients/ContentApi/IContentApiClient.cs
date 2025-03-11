@@ -1,5 +1,4 @@
-﻿using System.Diagnostics.CodeAnalysis;
-using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Domain;
+﻿using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Domain;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Exceptions;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Clients.ContentApi;

@@ -5,7 +5,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Opti
 using Microsoft.Extensions.Logging;
 using Moq;
 
-namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Tests.Functions.HeathChecks.Strategies;
+namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Tests.Functions.HealthChecks.Strategies;
 
 public class AzureBlobStorageHealthCheckStrategyIntegrationTests
 {
@@ -31,11 +31,11 @@ public class AzureBlobStorageHealthCheckStrategyIntegrationTests
             }));
 
         // ACT
-        var heathCheckResult = await sut.Run(CancellationToken.None);
+        var healthCheckResult = await sut.Run(CancellationToken.None);
         
         // ASSERT
-        Assert.NotNull(heathCheckResult);
-        Assert.True(heathCheckResult.IsHealthy);
+        Assert.NotNull(healthCheckResult);
+        Assert.True(healthCheckResult.IsHealthy);
     }
 
     [Fact(Skip = "Complete StorageAccountName and StorageAccountAccessKey to run this intergration test")]
@@ -53,11 +53,11 @@ public class AzureBlobStorageHealthCheckStrategyIntegrationTests
             }));
 
         // ACT
-        var heathCheckResult = await sut.Run(CancellationToken.None);
+        var healthCheckResult = await sut.Run(CancellationToken.None);
         
         // ASSERT
-        Assert.NotNull(heathCheckResult);
-        Assert.False(heathCheckResult.IsHealthy);
+        Assert.NotNull(healthCheckResult);
+        Assert.False(healthCheckResult.IsHealthy);
     }
     
     [Fact(Skip = "Complete StorageAccountName and StorageAccountAccessKey to run this intergration test")]
@@ -75,12 +75,12 @@ public class AzureBlobStorageHealthCheckStrategyIntegrationTests
             }));
 
         // ACT
-        var heathCheckResult = await sut.Run(CancellationToken.None);
+        var healthCheckResult = await sut.Run(CancellationToken.None);
         
         // ASSERT
-        Assert.NotNull(heathCheckResult);
-        Assert.False(heathCheckResult.IsHealthy);
-        Assert.Contains("container", heathCheckResult.Message);
-        Assert.Contains("not found", heathCheckResult.Message);
+        Assert.NotNull(healthCheckResult);
+        Assert.False(healthCheckResult.IsHealthy);
+        Assert.Contains("container", healthCheckResult.Message);
+        Assert.Contains("not found", healthCheckResult.Message);
     }
 }
