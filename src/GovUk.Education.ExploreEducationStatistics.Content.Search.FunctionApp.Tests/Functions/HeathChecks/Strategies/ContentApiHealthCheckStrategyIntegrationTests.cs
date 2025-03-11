@@ -1,5 +1,6 @@
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Clients.ContentApi;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.HealthChecks.Strategies;
+using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Options;
 using Xunit.Abstractions;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Tests.Functions.HealthChecks.Strategies;
@@ -13,11 +14,13 @@ public class ContentApiHealthCheckStrategyIntegrationTests(ITestOutputHelper out
     {
         // ARRANGE
         var sut = new ContentApiHealthCheckStrategy(
-            new ContentApiClient(
-                new HttpClient
-                {
-                    BaseAddress = new Uri(ContentApiUrl)
-                }));
+            Microsoft.Extensions.Options.Options.Create(
+                new ContentApiOptions()),
+                () => new ContentApiClient(
+                    new HttpClient
+                    {
+                        BaseAddress = new Uri(ContentApiUrl)
+                    }));
         
         // ACT
         var healthCheckResult = await sut.Run(CancellationToken.None);

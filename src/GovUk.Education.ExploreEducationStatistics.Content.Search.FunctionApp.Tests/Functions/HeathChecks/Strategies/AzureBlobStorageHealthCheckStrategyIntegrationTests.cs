@@ -21,7 +21,7 @@ public class AzureBlobStorageHealthCheckStrategyIntegrationTests
     {
         //  ARRANGE
         var sut = new AzureBlobStorageHealthCheckStrategy(
-            new AzureBlobStorageClient(
+            () => new AzureBlobStorageClient(
                 new BlobServiceClient(IntegrationTestStorageAccountConnectionString),
                 Mock.Of<ILogger<AzureBlobStorageClient>>()),
             Microsoft.Extensions.Options.Options.Create(new AppOptions
@@ -43,7 +43,7 @@ public class AzureBlobStorageHealthCheckStrategyIntegrationTests
     {
         //  ARRANGE
         var sut = new AzureBlobStorageHealthCheckStrategy(
-            new AzureBlobStorageClient(
+            () => new AzureBlobStorageClient(
                 new BlobServiceClient(IntegrationTestStorageAccountConnectionString),
                 Mock.Of<ILogger<AzureBlobStorageClient>>()),
             Microsoft.Extensions.Options.Options.Create(new AppOptions
@@ -65,7 +65,7 @@ public class AzureBlobStorageHealthCheckStrategyIntegrationTests
     {
         //  ARRANGE
         var sut = new AzureBlobStorageHealthCheckStrategy(
-            new AzureBlobStorageClient(
+            () => new AzureBlobStorageClient(
                 new BlobServiceClient(IntegrationTestStorageAccountConnectionString),
                 Mock.Of<ILogger<AzureBlobStorageClient>>()),
             Microsoft.Extensions.Options.Options.Create(new AppOptions
@@ -82,5 +82,53 @@ public class AzureBlobStorageHealthCheckStrategyIntegrationTests
         Assert.False(healthCheckResult.IsHealthy);
         Assert.Contains("container", healthCheckResult.Message);
         Assert.Contains("not found", healthCheckResult.Message);
+    }
+
+    [Fact]
+    public async Task WhenContainerNameIsMissingFromConfig_ThenShouldRespondAsUnhealthy()
+    {
+        //  ARRANGE
+        var sut = new AzureBlobStorageHealthCheckStrategy(
+            () => new AzureBlobStorageClient(
+                new BlobServiceClient(IntegrationTestStorageAccountConnectionString),
+                Mock.Of<ILogger<AzureBlobStorageClient>>()),
+            Microsoft.Extensions.Options.Options.Create(new AppOptions
+            {
+                SearchStorageConnectionString = IntegrationTestStorageAccountConnectionString,
+                SearchableDocumentsContainerName = string.Empty // Missing container name
+            }));
+
+        // ACT
+        var healthCheckResult = await sut.Run(CancellationToken.None);
+        
+        // ASSERT
+        Assert.NotNull(healthCheckResult);
+        Assert.False(healthCheckResult.IsHealthy);
+        Assert.Contains("Container", healthCheckResult.Message);
+        Assert.Contains("config", healthCheckResult.Message);
+    }
+    
+    [Fact]
+    public async Task WhenConnectionStringIsMissingFromConfig_ThenShouldRespondAsUnhealthy()
+    {
+        //  ARRANGE
+        var sut = new AzureBlobStorageHealthCheckStrategy(
+            () => new AzureBlobStorageClient(
+                new BlobServiceClient(IntegrationTestStorageAccountConnectionString),
+                Mock.Of<ILogger<AzureBlobStorageClient>>()),
+            Microsoft.Extensions.Options.Options.Create(new AppOptions
+            {
+                SearchStorageConnectionString = string.Empty,
+                SearchableDocumentsContainerName = "some-container-name"
+            }));
+
+        // ACT
+        var healthCheckResult = await sut.Run(CancellationToken.None);
+        
+        // ASSERT
+        Assert.NotNull(healthCheckResult);
+        Assert.False(healthCheckResult.IsHealthy);
+        Assert.Contains("Connection String", healthCheckResult.Message);
+        Assert.Contains("config", healthCheckResult.Message);
     }
 }

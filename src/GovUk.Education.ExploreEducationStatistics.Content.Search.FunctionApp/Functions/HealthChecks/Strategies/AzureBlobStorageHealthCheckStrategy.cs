@@ -5,11 +5,16 @@ using Microsoft.Extensions.Options;
 namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.HealthChecks.Strategies;
 
 internal class AzureBlobStorageHealthCheckStrategy(
-    IAzureBlobStorageClient azureBlobStorageClient,
+    Func<IAzureBlobStorageClient> azureBlobStorageClientFactory,
     IOptions<AppOptions> appOptions) : IHealthCheckStrategy
 {
     public async Task<HealthCheckResult> Run(CancellationToken cancellationToken)
     {
+        if (!appOptions.Value.IsValid(out var errorMessage))
+        {
+            return new HealthCheckResult(false,  errorMessage);
+        }
+        
         var containerName = appOptions.Value.SearchableDocumentsContainerName;
         if (string.IsNullOrWhiteSpace(containerName))
         {
@@ -19,6 +24,7 @@ internal class AzureBlobStorageHealthCheckStrategy(
 
         try
         {
+            var  azureBlobStorageClient = azureBlobStorageClientFactory();
             var containerExists = await azureBlobStorageClient.ContainerExists(containerName, cancellationToken);
             if (!containerExists)
             {
