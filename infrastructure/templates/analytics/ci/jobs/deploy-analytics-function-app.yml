@@ -1,0 +1,20 @@
+parameters:
+  - name: serviceConnection
+    type: string
+  - name: environment
+    type: string
+  - name: dependsOn
+    type: object
+    default: []
+
+jobs:
+- template: ../../../../common/ci/tasks/deploy-function-app.yml
+  parameters:
+    serviceConnection: ${{ parameters.serviceConnection }}
+    environment: ${{ parameters.environment }}
+    dependsOn: ${{ parameters.dependsOn }}
+    deploymentName: DeployAnalyticsFunction
+    functionAppName: $(analyticsFunctionAppName)
+    artifactName: analytics-function-app
+    artifactZipName: GovUk.Education.ExploreEducationStatistics.Analytics.Consumer.zip
+    healthCheckUrl: $(analyticsFunctionAppUrl)/api/HealthCheck
