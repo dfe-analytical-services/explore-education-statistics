@@ -183,7 +183,7 @@ public class ProgramTests
                     base.GetSutWithConfig(FullConfig, """
                                                       {
                                                          "App": {
-                                                              "SearchStorageConnectionString": "DefaultEndpointsProtocol=https;EndpointSuffix=core.windows.net;AccountName=mystorageaccount;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;BlobEndpoint=https://mystorageaccount.blob.core.windows.net/;FileEndpoint=https://mystorageaccount.file.core.windows.net/;QueueEndpoint=https://mystorageaccount.queue.core.windows.net/;TableEndpoint=https://mystorageaccount.table.core.windows.net/",
+                                                              "SearchStorageConnectionString": "UseDevelopmentStorage=true",
                                                               "SearchableDocumentsContainerName": null
                                                          }
                                                       }
