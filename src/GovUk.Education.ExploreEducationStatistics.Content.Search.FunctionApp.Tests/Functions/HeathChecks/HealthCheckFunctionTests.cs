@@ -41,7 +41,7 @@ public class HealthCheckFunctionTests
     [InlineData(false, true, true)]
     [InlineData(true, false, false)]
     [InlineData(false, false, false)]
-    public async Task WhenAnyOrAllStrategiesAreUnheatlhy_ThenHealthCheckIsUnhealthy(
+    public async Task WhenAnyOrAllStrategiesAreUnhealthy_ThenHealthCheckIsUnhealthy(
         bool isHealthy1,
         bool isHealthy2,
         bool isHealthy3
