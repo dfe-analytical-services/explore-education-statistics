@@ -1,0 +1,59 @@
+parameters:
+  - name: serviceConnection
+    type: string
+  - name: environment
+    type: string
+  - name: deploymentName
+    type: string
+  - name: functionAppName
+    type: string
+  - name: artifactName
+    type: string
+  - name: artifactZipName
+    type: string
+  - name: healthCheckUrl
+    type: string
+  - name: dependsOn
+    type: object
+    default: []
+
+jobs:
+  - deployment: ${{ parameters.deploymentName }}
+    displayName: Deploy ${{ parameters.functionAppName }} Function App
+    dependsOn: ${{ parameters.dependsOn }}
+    environment: ${{ parameters.environment }}
+    pool:
+      vmImage: $(vmImageName)
+
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+            - download: MainBuild
+              displayName: Download ${{ parameters.functionAppName }} Function App artifact
+              artifact: ${{ parameters.artifactName }}
+
+            - template: ../../../templates/public-api/ci/tasks/bicep-output-variables.yml
+              parameters:
+                serviceConnection: ${{ parameters.serviceConnection }}
+
+            - task: AzureCLI@2
+              displayName: 'Deploy ${{ parameters.functionAppName }} Function App using az cli'
+              retryCountOnTaskFailure: 1
+              inputs:
+                azureSubscription: ${{ parameters.serviceConnection }}
+                scriptType: 'bash'
+                scriptLocation: 'inlineScript'
+                inlineScript: |
+                  set -e
+                  echo "Deploying ${{ parameters.functionAppName }} Function App using zip deploy"
+                  az functionapp deployment source config-zip \
+                    --resource-group $(resourceGroupName) \
+                    --name ${{ parameters.functionAppName }} \
+                    --src '$(Pipeline.Workspace)/MainBuild/${{ parameters.artifactName }}/${{ parameters.artifactZipName }}'
+
+            - template: ../../../templates/public-api/ci/tasks/wait-for-endpoint-success.yml
+              parameters:
+                serviceConnection: ${{ parameters.serviceConnection }}
+                displayName: Check the ${{ parameters.functionAppName }} Function App is healthy after deployment
+                endpoint: ${{ parameters.healthCheckUrl }}
