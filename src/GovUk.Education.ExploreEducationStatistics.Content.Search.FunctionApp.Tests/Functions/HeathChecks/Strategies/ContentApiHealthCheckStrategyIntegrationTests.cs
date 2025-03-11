@@ -3,7 +3,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Func
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Options;
 using Xunit.Abstractions;
 
-namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Tests.Functions.HealthChecks.Strategies;
+namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Tests.Functions.HeathChecks.Strategies;
 
 public class ContentApiHealthCheckStrategyIntegrationTests(ITestOutputHelper output)
 {

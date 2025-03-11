@@ -5,7 +5,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Func
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Tests.Builders;
 using Microsoft.AspNetCore.Mvc;
 
-namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Tests.Functions.HealthChecks;
+namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Tests.Functions.HeathChecks;
 
 public class HealthCheckFunctionTests
 {

@@ -5,7 +5,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Opti
 using Microsoft.Extensions.Logging;
 using Moq;
 
-namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Tests.Functions.HealthChecks.Strategies;
+namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Tests.Functions.HeathChecks.Strategies;
 
 public class AzureBlobStorageHealthCheckStrategyIntegrationTests
 {
