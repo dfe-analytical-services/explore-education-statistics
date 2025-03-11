@@ -68,7 +68,7 @@ public abstract class IntegrationTestFixture(TestApplicationFactory testApp) :
     }
 
     public WebApplicationFactory<TestStartup> WithAzurite(
-        WebApplicationFactory<TestStartup>? testApp = null, 
+        WebApplicationFactory<TestStartup>? testApp = null,
         bool enabled = true)
     {
         testApp ??= TestApp;
@@ -103,10 +103,17 @@ public abstract class IntegrationTestFixture(TestApplicationFactory testApp) :
                             sp.GetRequiredService<ILogger<IBlobStorageService>>()
                         )
                     );
+                    services.ReplaceService<IPrivateBlobStorageService>(sp =>
+                        new PrivateBlobStorageService(
+                            _azuriteContainer.GetConnectionString(),
+                            sp.GetRequiredService<ILogger<IBlobStorageService>>()
+                        )
+                    );
                     services.ReplaceService<IPublisherTableStorageService>(sp =>
                         new PublisherTableStorageService(_azuriteContainer.GetConnectionString())
                     );
                     services.AddTransient<IPublicBlobCacheService, PublicBlobCacheService>();
+                    services.AddTransient<IPrivateBlobCacheService, PrivateBlobCacheService>();
                 });
         });
     }

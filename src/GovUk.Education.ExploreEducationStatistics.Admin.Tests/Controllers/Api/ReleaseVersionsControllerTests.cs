@@ -2,7 +2,6 @@
 using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
-using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Fixture;
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services;
@@ -10,7 +9,6 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
-using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
@@ -24,16 +22,19 @@ using Microsoft.EntityFrameworkCore;
 using Moq;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Net.Http.Json;
+using System.Net.Mime;
+using System.Reflection;
 using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
-using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockFormTestUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using static Moq.MockBehavior;
 using ErrorViewModel = GovUk.Education.ExploreEducationStatistics.Common.ViewModels.ErrorViewModel;
@@ -618,10 +619,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
 
     public abstract class ReleaseVersionsControllerIntegrationTests(TestApplicationFactory testApp) : IntegrationTestFixture(testApp)
     {
+        public override async Task InitializeAsync() => await InitializeWithAzurite();
+
         private WebApplicationFactory<TestStartup> BuildApp(
                 ClaimsPrincipal? user = null)
         {
-            return TestApp.SetUser(user ?? DataFixture.BauUser());
+            return WithAzurite(
+                testApp: TestApp.SetUser(user ?? DataFixture.BauUser()),
+                enabled: true);
         }
 
         public class UpdateReleaseTests(TestApplicationFactory testApp) : ReleaseVersionsControllerIntegrationTests(testApp)
@@ -1027,27 +1032,34 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             public async Task UploadDataSetAsZip_ValidRequest_ReturnsDataFileInfo()
             {
                 // Arrange
-                var archive = CreateFormFileFromResource("data-zip-valid.zip");
+                Publication publication = DataFixture.DefaultPublication()
+                    .WithReleases(
+                        [
+                            DataFixture
+                                .DefaultRelease(publishedVersions: 0, draftVersion: true, year: 2020)
+                                .WithTimePeriodCoverage(TimeIdentifier.AcademicYear)
+                                .WithLabel(null)
+                        ]);
+
+                await TestApp.AddTestData<ContentDbContext>(context => context.Publications.Add(publication));
 
                 var contentDbContextId = Guid.NewGuid().ToString();
                 await using var contentDbContext = DbUtils.InMemoryApplicationDbContext(contentDbContextId);
 
-                // Act
-                var request = new UploadDataSetAsZipRequest
-                {
-                    ReleaseVersionId = Guid.NewGuid(),
-                    DataSetTitle = "Test title",
-                    ZipFile = archive
-                };
+                await contentDbContext.Publications.AddAsync(publication);
+                await contentDbContext.SaveChangesAsync();
 
-                var response = await UploadDataSetAsZip(request); // Request isn't sending any values? All properties fail validation
+                // Act
+                var response = await UploadDataSetAsZip(
+                    releaseVersionId: publication.Releases[0].Versions[0].Id,
+                    dataSetTitle: "Test title",
+                    fileName: "data-zip-valid.zip");
 
                 // Assert
-                var validationProblem = response.AssertValidationProblem();
                 var archiveDataSet = response.AssertOk<DataFileInfo>();
 
                 Assert.Equal("one.meta.csv", archiveDataSet.MetaFileName);
-                // Add more assertions
+                // TODO: Add more assertions once test works properly
             }
 
             [Fact]
@@ -1066,25 +1078,28 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                 // Assert
             }
 
-            private static DataArchiveValidationService SetupDataArchiveValidationService(
-            ContentDbContext? contentDbContext = null,
-            IFileTypeService? fileTypeService = null,
-            IFileUploadsValidatorService? fileUploadsValidatorService = null)
-            {
-                return new DataArchiveValidationService(
-                    contentDbContext ?? Mock.Of<ContentDbContext>(Strict),
-                fileTypeService ?? Mock.Of<IFileTypeService>(Strict),
-                    fileUploadsValidatorService ?? Mock.Of<IFileUploadsValidatorService>(Strict)
-                );
-            }
-
             private async Task<HttpResponseMessage> UploadDataSetAsZip(
-                UploadDataSetAsZipRequest request,
+                Guid releaseVersionId,
+                string dataSetTitle,
+                string fileName,
                 HttpClient? client = null)
             {
                 client ??= BuildApp().CreateClient();
 
-                return await client.PostAsJsonAsync($"api/releaseVersions/zip-data", request);
+                var filePath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!,
+                "Resources" + Path.DirectorySeparatorChar + fileName);
+
+                var fileContent = new ByteArrayContent(await System.IO.File.ReadAllBytesAsync(filePath));
+                fileContent.Headers.ContentType = MediaTypeHeaderValue.Parse(MediaTypeNames.Application.Zip); // TODO: Add switch for csv/zip
+
+                var multipartContent = new MultipartFormDataContent
+                {
+                    { new StringContent(releaseVersionId.ToString()), "ReleaseVersionId" },
+                    { new StringContent(dataSetTitle), "DataSetTitle" },
+                    { fileContent, "ZipFile", fileName },
+                };
+
+                return await client.PostAsync($"api/releaseVersions/zip-data", multipartContent);
             }
 
             private async Task<HttpResponseMessage> UploadDataSetAsBulkZip(
