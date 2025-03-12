@@ -36,6 +36,7 @@ public static class HostBuilderExtension
                     .AddTransient<IContentApiClient, ContentApiClient>()
                     .AddTransient<IAzureBlobStorageClient, AzureBlobStorageClient>()
                     .AddTransient<ISearchableDocumentCreator, SearchableDocumentCreator>()
+                    .AddHealthChecks()
                     .AddAzureClientsInline(
                         clientBuilder =>
                         {
@@ -57,12 +58,5 @@ public static class HostBuilderExtension
                                 "EES Content Search Function App");
                         })
         )
-        .Build()
-        .Execute(
-            host =>
-            {
-                // Validate the configuration on startup to fail fast.
-                host.Services.GetRequiredService<IOptions<AppOptions>>().Value.Validate();
-                host.Services.GetRequiredService<IOptions<ContentApiOptions>>().Value.Validate();
-            });
+        .Build();
 }

@@ -15,4 +15,10 @@ public interface IContentApiClient
     Task<ReleaseSearchableDocument> GetPublicationLatestReleaseSearchableDocumentAsync(
         string publicationSlug,
         CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// A simple call to check whether the Content API is available
+    /// </summary>
+    /// <returns>true if Content API responded, and any error message if applicable</returns>
+    Task<(bool WasSuccesssful, string? ErrorMessage)> Ping(CancellationToken cancellationToken);
 }

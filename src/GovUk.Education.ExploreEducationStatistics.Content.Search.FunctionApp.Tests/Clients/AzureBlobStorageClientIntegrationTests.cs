@@ -2,16 +2,18 @@
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Clients;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Clients.AzureBlobStorage;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Exceptions;
+using Microsoft.Extensions.Logging;
+using Moq;
 using Blob = GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Clients.AzureBlobStorage.Blob;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Tests.Clients;
 
-public class AzureBlobStorageClientTests
+public class AzureBlobStorageClientIntegrationTests
 {
     private AzureBlobStorageClient GetSut(string connectionString)
     {
         var blobServiceClient = new BlobServiceClient(connectionString);
-        return new AzureBlobStorageClient(blobServiceClient);
+        return new AzureBlobStorageClient(blobServiceClient, Mock.Of<ILogger<AzureBlobStorageClient>>());
     }
 
     public class IntegrationTests
@@ -23,7 +25,7 @@ public class AzureBlobStorageClientTests
         /// - set StorageAccountAccessKey to one of its Access keys (found under Security + networking)
         /// - unskip the test 
         /// </summary>
-        public class HiveITAzureAccount : AzureBlobStorageClientTests
+        public class HiveITAzureAccount : AzureBlobStorageClientIntegrationTests
         {
             private const string StorageAccountName = "-- azure storage account name here --";
             private const string StorageAccountAccessKey = "-- azure storage account access key here --";
