@@ -47,7 +47,7 @@ export default function PublicationPublishedReleases({
     isSuccess,
     refetch,
   } = useInfiniteQuery({
-    ...publicationQueries.listPublishedReleaseVersionsWithPermissions(
+    ...publicationQueries.listPublishedReleaseVersions(
       publication.id,
       pageSize,
     ),

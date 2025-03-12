@@ -21,9 +21,10 @@ const publicationQueries = createQueryKeys('publication', {
     queryKey: null,
     queryFn: () => publicationService.getPublicationSummaries(),
   },
-  listPublishedReleaseVersionsWithPermissions(
+  listPublishedReleaseVersions(
     publicationId: string,
     pageSize: number = 5,
+    includePermissions: boolean = true,
   ) {
     return {
       queryKey: [publicationId],
@@ -34,14 +35,15 @@ const publicationQueries = createQueryKeys('publication', {
             versionsType: ReleaseVersionsType.LatestPublished,
             page: pageParam,
             pageSize,
-            includePermissions: true,
+            includePermissions,
           },
         ),
     };
   },
-  listUnpublishedReleaseVersionsWithPermissions(
+  listUnpublishedReleaseVersions(
     publicationId: string,
     pageSize: number = 100,
+    includePermissions: boolean = true,
   ) {
     return {
       queryKey: [publicationId],
@@ -51,7 +53,7 @@ const publicationQueries = createQueryKeys('publication', {
           {
             versionsType: ReleaseVersionsType.OnlyDraft,
             pageSize,
-            includePermissions: true,
+            includePermissions,
           },
         ),
     };

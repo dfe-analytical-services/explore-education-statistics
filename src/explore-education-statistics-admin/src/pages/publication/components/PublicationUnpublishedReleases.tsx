@@ -21,9 +21,7 @@ export default function PublicationUnpublishedReleases({
     isSuccess,
     refetch,
   } = useQuery(
-    publicationQueries.listUnpublishedReleaseVersionsWithPermissions(
-      publicationId,
-    ),
+    publicationQueries.listUnpublishedReleaseVersions(publicationId),
   );
 
   const draftReleases = useMemo(() => {
