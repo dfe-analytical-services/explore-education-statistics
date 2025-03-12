@@ -148,10 +148,44 @@ describe('PublicationUnpublishedReleases', () => {
     expect(
       within(draftRow1Cells[0]).getByText('Release 2'),
     ).toBeInTheDocument();
+    expect(within(draftRow1Cells[1]).getByText('Draft')).toBeInTheDocument();
+    expect(
+      within(draftRow1Cells[4]).getByRole('link', {
+        name: 'Edit draft Release 2',
+      }),
+    ).toBeInTheDocument();
+    expect(
+      within(draftRow1Cells[4]).getByRole('button', {
+        name: 'Delete Release 2',
+      }),
+    ).toBeInTheDocument();
+    expect(
+      within(draftRow1Cells[4]).queryByRole('button', {
+        name: 'Cancel amendment for Release 2',
+      }),
+    ).not.toBeInTheDocument();
 
     const draftRow2Cells = within(draftRows[2]).getAllByRole('cell');
     expect(
       within(draftRow2Cells[0]).getByText('Release 3'),
+    ).toBeInTheDocument();
+    expect(
+      within(draftRow2Cells[1]).getByText('In Review Amendment'),
+    ).toBeInTheDocument();
+    expect(
+      within(draftRow2Cells[4]).getByRole('link', {
+        name: 'Edit draft Release 3',
+      }),
+    ).toBeInTheDocument();
+    expect(
+      within(draftRow2Cells[4]).queryByRole('button', {
+        name: 'Delete Release 3',
+      }),
+    ).not.toBeInTheDocument();
+    expect(
+      within(draftRow2Cells[4]).getByRole('button', {
+        name: 'Cancel amendment for Release 3',
+      }),
     ).toBeInTheDocument();
   });
 
