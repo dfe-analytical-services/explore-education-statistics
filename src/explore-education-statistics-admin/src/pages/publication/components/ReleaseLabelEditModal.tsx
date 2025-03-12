@@ -1,5 +1,5 @@
 import FormModal from '@admin/components/FormModal';
-import isNullOrWhitespace from '@common/utils/string/isNullOrWhitespace';
+import isUndefinedOrWhitespace from '@common/utils/string/isUndefinedOrWhitespace';
 import { useConfig } from '@admin/contexts/ConfigContext';
 import FormFieldTextInput from '@common/components/form/FormFieldTextInput';
 import UrlContainer from '@common/components/UrlContainer';
@@ -48,7 +48,7 @@ const replaceWhitespace = (str: string, replaceValue: string) => {
 };
 
 const releaseSlugLabelSuffix = (label?: string) => {
-  if (isNullOrWhitespace(label)) {
+  if (isUndefinedOrWhitespace(label)) {
     return '';
   }
 
@@ -83,7 +83,7 @@ export default function ReleaseLabelEditModal({
       newReleaseSlugLabelSuffix,
     );
 
-    const formattedLabel = isNullOrWhitespace(formValues?.label)
+    const formattedLabel = isUndefinedOrWhitespace(formValues?.label)
       ? undefined
       : replaceWhitespace(formValues!.label!, ' ');
 
