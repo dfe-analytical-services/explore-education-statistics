@@ -2440,6 +2440,7 @@ public class PublicationServiceTests
             .DefaultPublication()
             .WithReleases(_dataFixture
                 .DefaultRelease(publishedVersions: 1)
+                .WithLabel("initial")
                 .Generate(1));
 
         var releaseVersion = publication.Releases.Single().Versions.Single();
@@ -2467,9 +2468,11 @@ public class PublicationServiceTests
             Assert.Equal(releaseVersion.Release.Title, summaryViewModel.Title);
             Assert.Equal(releaseVersion.Release.Slug, summaryViewModel.Slug);
             Assert.Equal(releaseVersion.Type, summaryViewModel.Type);
+            Assert.Equal(releaseVersion.Release.Id, summaryViewModel.ReleaseId);
             Assert.Equal(releaseVersion.Release.Year, summaryViewModel.Year);
             Assert.Equal(releaseVersion.Release.YearTitle, summaryViewModel.YearTitle);
             Assert.Equal(releaseVersion.Release.TimePeriodCoverage, summaryViewModel.TimePeriodCoverage);
+            Assert.Equal(releaseVersion.Release.Label, summaryViewModel.Label);
             Assert.Equal(releaseVersion.Published, summaryViewModel.Published);
             Assert.Equal(releaseVersion.Live, summaryViewModel.Live);
             Assert.Equal(releaseVersion.PublishScheduled?.ConvertUtcToUkTimeZone(), summaryViewModel.PublishScheduled);
@@ -2607,10 +2610,11 @@ public class PublicationServiceTests
             var releaseVersion = Assert.Single(releaseVersions);
 
             Assert.NotNull(releaseVersion.Permissions);
-            Assert.True(releaseVersion.Permissions!.CanDeleteRelease);
+            Assert.True(releaseVersion.Permissions!.CanDeleteReleaseVersion);
             Assert.True(releaseVersion.Permissions!.CanUpdateRelease);
+            Assert.True(releaseVersion.Permissions!.CanUpdateReleaseVersion);
             Assert.True(releaseVersion.Permissions!.CanAddPrereleaseUsers);
-            Assert.True(releaseVersion.Permissions!.CanMakeAmendmentOfRelease);
+            Assert.True(releaseVersion.Permissions!.CanMakeAmendmentOfReleaseVersion);
         }
     }
 
