@@ -38,15 +38,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
         {
             Publication publication = _dataFixture.DefaultPublication()
                 .WithTheme(_dataFixture.DefaultTheme())
-                .WithReleases(_dataFixture.DefaultRelease(publishedVersions: 1, draftVersion: true)
-                    .Generate(1))
+                .WithReleases([_dataFixture.DefaultRelease(publishedVersions: 1)])
                 .WithLegacyLinks(_dataFixture.DefaultLegacyReleaseSeriesItem()
                     .Generate(2));
 
-            var publishedReleaseVersion = publication.ReleaseVersions.Single(rv => rv.Published is not null);
-            var otherReleaseVersion = publication.ReleaseVersions.Single(rv => rv.Published is null);
+            var releaseVersion = publication.Releases.Single().Versions.Single();
 
-            publishedReleaseVersion.RelatedInformation.Add(
+            releaseVersion.RelatedInformation.Add(
                 new Link
                 {
                     Description = "Related 1",
@@ -57,7 +55,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
             {
                 LatestPublishedVersion = new DataBlockVersion
                 {
-                    ReleaseVersionId = publishedReleaseVersion.Id,
+                    ReleaseVersionId = releaseVersion.Id,
                     Id = Guid.NewGuid()
                 }
             };
@@ -66,7 +64,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
             {
                 LatestPublishedVersion = new DataBlockVersion
                 {
-                    ReleaseVersionId = publishedReleaseVersion.Id,
+                    ReleaseVersionId = releaseVersion.Id,
                     Id = Guid.NewGuid(),
                 }
             };
@@ -77,7 +75,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
             {
                 LatestPublishedVersion = new DataBlockVersion
                 {
-                    ReleaseVersionId = publishedReleaseVersion.Id,
+                    ReleaseVersionId = releaseVersion.Id,
                     Id = inContentDataBlockVersionId,
                     ContentBlock = new DataBlock
                     {
@@ -87,7 +85,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
                 }
             };
 
-            publishedReleaseVersion.KeyStatistics =
+            releaseVersion.KeyStatistics =
             [
                 new KeyStatisticText
                 {
@@ -110,7 +108,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
 
             var files = _dataFixture
                 .DefaultReleaseFile()
-                .WithReleaseVersion(publishedReleaseVersion)
+                .WithReleaseVersion(releaseVersion)
                 .WithFiles([
                     _dataFixture.DefaultFile(Ancillary),
                     _dataFixture.DefaultFile(FileType.Data)
@@ -143,7 +141,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
                     },
                     inContentDataBlockParent.LatestPublishedVersion!.ContentBlock
                 ],
-                ReleaseVersion = publishedReleaseVersion
+                ReleaseVersion = releaseVersion
             };
 
             var contentDbContextId = Guid.NewGuid().ToString();
@@ -156,22 +154,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
                 contentDbContext.ContentSections.AddRange(
                     new ContentSection
                     {
-                        ReleaseVersion = publishedReleaseVersion,
+                        ReleaseVersion = releaseVersion,
                         Type = ContentSectionType.Headlines
                     },
                     new ContentSection
                     {
-                        ReleaseVersion = publishedReleaseVersion,
+                        ReleaseVersion = releaseVersion,
                         Type = ContentSectionType.KeyStatisticsSecondary
                     },
                     new ContentSection
                     {
-                        ReleaseVersion = publishedReleaseVersion,
+                        ReleaseVersion = releaseVersion,
                         Type = ContentSectionType.ReleaseSummary
                     },
                     new ContentSection
                     {
-                        ReleaseVersion = publishedReleaseVersion,
+                        ReleaseVersion = releaseVersion,
                         Type = ContentSectionType.RelatedDashboards
                     },
                     genericContentSection);
@@ -184,7 +182,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
             var releaseFileService = new Mock<IReleaseFileService>(MockBehavior.Strict);
 
             dataBlockService.Setup(mock =>
-                    mock.GetUnattachedDataBlocks(publishedReleaseVersion.Id))
+                    mock.GetUnattachedDataBlocks(releaseVersion.Id))
                 .ReturnsAsync(unattachedDataBlocks);
 
             methodologyVersionRepository.Setup(mock =>
@@ -192,7 +190,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
                 .ReturnsAsync(methodology.Versions);
 
             releaseFileService.Setup(mock =>
-                    mock.ListAll(publishedReleaseVersion.Id, Ancillary, FileType.Data))
+                    mock.ListAll(releaseVersion.Id, Ancillary, FileType.Data))
                 .ReturnsAsync(files);
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -202,7 +200,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
                     methodologyVersionRepository: methodologyVersionRepository.Object,
                     releaseFileService: releaseFileService.Object);
 
-                var result = await service.GetManageContentPageViewModel(publishedReleaseVersion.Id);
+                var result = await service.GetManageContentPageViewModel(releaseVersion.Id);
 
                 MockUtils.VerifyAllMocks(dataBlockService, methodologyVersionRepository, releaseFileService);
 
@@ -213,16 +211,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
                 var contentRelease = viewModel.Release;
 
                 Assert.NotNull(contentRelease);
-                Assert.Equal(publishedReleaseVersion.Id, contentRelease.Id);
-                Assert.Equal(publishedReleaseVersion.Release.TimePeriodCoverage.GetEnumLabel(),
+                Assert.Equal(releaseVersion.Id, contentRelease.Id);
+                Assert.Equal(releaseVersion.Release.TimePeriodCoverage.GetEnumLabel(),
                     contentRelease.CoverageTitle);
                 Assert.True(contentRelease.HasDataGuidance);
                 Assert.True(contentRelease.HasPreReleaseAccessList);
 
                 Assert.Equal(2, contentRelease.KeyStatistics.Count);
-                Assert.Equal(publishedReleaseVersion.KeyStatistics[1].Id, contentRelease.KeyStatistics[0].Id);
+                Assert.Equal(releaseVersion.KeyStatistics[1].Id, contentRelease.KeyStatistics[0].Id);
                 Assert.Equal(0, contentRelease.KeyStatistics[0].Order);
-                var originalKeyStatDataBlock = (publishedReleaseVersion.KeyStatistics[1] as KeyStatisticDataBlock)!;
+                var originalKeyStatDataBlock = (releaseVersion.KeyStatistics[1] as KeyStatisticDataBlock)!;
                 var keyStatDataBlockViewModel =
                     Assert.IsType<KeyStatisticDataBlockViewModel>(contentRelease.KeyStatistics[0]);
                 Assert.Equal(originalKeyStatDataBlock.DataBlockId, keyStatDataBlockViewModel.DataBlockId);
@@ -230,25 +228,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
                     keyStatDataBlockParent.LatestPublishedVersion!.DataBlockParentId,
                     keyStatDataBlockViewModel.DataBlockParentId);
 
-                Assert.Equal(publishedReleaseVersion.KeyStatistics[0].Id, contentRelease.KeyStatistics[1].Id);
+                Assert.Equal(releaseVersion.KeyStatistics[0].Id, contentRelease.KeyStatistics[1].Id);
                 Assert.Equal(1, contentRelease.KeyStatistics[1].Order);
                 Assert.IsType<KeyStatisticTextViewModel>(contentRelease.KeyStatistics[1]);
 
-                Assert.Equal(publishedReleaseVersion.KeyStatisticsSecondarySection.Id,
+                Assert.Equal(releaseVersion.KeyStatisticsSecondarySection.Id,
                     contentRelease.KeyStatisticsSecondarySection.Id);
-                Assert.Equal(publishedReleaseVersion.HeadlinesSection.Id, contentRelease.HeadlinesSection.Id);
-                Assert.Equal(publishedReleaseVersion.RelatedDashboardsSection.Id, contentRelease.RelatedDashboardsSection.Id);
+                Assert.Equal(releaseVersion.HeadlinesSection.Id, contentRelease.HeadlinesSection.Id);
+                Assert.Equal(releaseVersion.RelatedDashboardsSection.Id, contentRelease.RelatedDashboardsSection.Id);
                 Assert.True(contentRelease.LatestRelease);
-                Assert.Equal(publishedReleaseVersion.NextReleaseDate, contentRelease.NextReleaseDate);
-                Assert.Equal(publishedReleaseVersion.Release.Year.ToString(), contentRelease.ReleaseName);
-                Assert.Equal(publishedReleaseVersion.PublishScheduled, contentRelease.PublishScheduled);
-                Assert.Equal(publishedReleaseVersion.Published, contentRelease.Published);
+                Assert.Equal(releaseVersion.NextReleaseDate, contentRelease.NextReleaseDate);
+                Assert.Equal(releaseVersion.Release.Year.ToString(), contentRelease.ReleaseName);
+                Assert.Equal(releaseVersion.PublishScheduled, contentRelease.PublishScheduled);
+                Assert.Equal(releaseVersion.Published, contentRelease.Published);
                 Assert.Equal(publication.Id, contentRelease.PublicationId);
-                Assert.Equal(publishedReleaseVersion.Release.Slug, contentRelease.Slug);
-                Assert.Equal(publishedReleaseVersion.Release.Title, contentRelease.Title);
-                Assert.Equal(publishedReleaseVersion.SummarySection.Id, contentRelease.SummarySection.Id);
-                Assert.Equal(publishedReleaseVersion.Type, contentRelease.Type);
-                Assert.Equal(publishedReleaseVersion.Release.YearTitle, contentRelease.YearTitle);
+                Assert.Equal(releaseVersion.Release.Slug, contentRelease.Slug);
+                Assert.Equal(releaseVersion.Release.Title, contentRelease.Title);
+                Assert.Equal(releaseVersion.SummarySection.Id, contentRelease.SummarySection.Id);
+                Assert.Equal(releaseVersion.Type, contentRelease.Type);
+                Assert.Equal(releaseVersion.Release.YearTitle, contentRelease.YearTitle);
                 Assert.Empty(contentRelease.Updates);
                 
                 var contentDownloadFiles = contentRelease.DownloadFiles.ToList();
@@ -303,9 +301,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
                 Assert.Equal(3, contentPublicationReleaseSeries.Count);
 
                 Assert.False(contentPublicationReleaseSeries[0].IsLegacyLink);
-                Assert.Equal(publishedReleaseVersion.Release.Id, contentPublicationReleaseSeries[0].ReleaseId);
-                Assert.Equal(publishedReleaseVersion.Release.Slug, contentPublicationReleaseSeries[0].ReleaseSlug);
-                Assert.Equal(publishedReleaseVersion.Release.Title, contentPublicationReleaseSeries[0].Description);
+                Assert.Equal(releaseVersion.Release.Id, contentPublicationReleaseSeries[0].ReleaseId);
+                Assert.Equal(releaseVersion.Release.Slug, contentPublicationReleaseSeries[0].ReleaseSlug);
+                Assert.Equal(releaseVersion.Release.Title, contentPublicationReleaseSeries[0].Description);
                 Assert.Null(contentPublicationReleaseSeries[0].LegacyLinkUrl);
 
                 Assert.True(contentPublicationReleaseSeries[1].IsLegacyLink);
