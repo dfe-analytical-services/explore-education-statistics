@@ -239,7 +239,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
                 Assert.True(contentRelease.LatestRelease);
                 Assert.Equal(releaseVersion.NextReleaseDate, contentRelease.NextReleaseDate);
                 Assert.Equal(releaseVersion.Release.Year.ToString(), contentRelease.ReleaseName);
-                Assert.Equal(releaseVersion.PublishScheduled, contentRelease.PublishScheduled);
+                Assert.Equal(releaseVersion.PublishScheduled?.ConvertUtcToUkTimeZone(),
+                    contentRelease.PublishScheduled);
                 Assert.Equal(releaseVersion.Published, contentRelease.Published);
                 Assert.Equal(publication.Id, contentRelease.PublicationId);
                 Assert.Equal(releaseVersion.Release.Slug, contentRelease.Slug);
