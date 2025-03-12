@@ -28,14 +28,10 @@ const PublicationReleasesPage = () => {
     });
 
     queryClient.invalidateQueries(
-      publicationQueries.listUnpublishedReleaseVersionsWithPermissions(
-        publicationId,
-      ).queryKey,
+      publicationQueries.listUnpublishedReleaseVersions(publicationId).queryKey,
     );
     queryClient.invalidateQueries(
-      publicationQueries.listPublishedReleaseVersionsWithPermissions(
-        publicationId,
-      ).queryKey,
+      publicationQueries.listPublishedReleaseVersions(publicationId).queryKey,
     );
   };
 
