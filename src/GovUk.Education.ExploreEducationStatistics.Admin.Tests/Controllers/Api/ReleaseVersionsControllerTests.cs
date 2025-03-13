@@ -1058,8 +1058,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                 // Assert
                 var archiveDataSet = response.AssertOk<DataFileInfo>();
 
-                Assert.Equal("one.meta.csv", archiveDataSet.MetaFileName);
-                // TODO: Add more assertions once test works properly
+                Assert.Equal("Test title", archiveDataSet.Name);
+                Assert.Equal("csvfile.csv", archiveDataSet.FileName);
+                Assert.Equal("csvfile.meta.csv", archiveDataSet.MetaFileName);
+                Assert.Equal(DataImportStatus.QUEUED, archiveDataSet.Status);
+                Assert.Equal(FileType.Data, archiveDataSet.Type);
             }
 
             [Fact]

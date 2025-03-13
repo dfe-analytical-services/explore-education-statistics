@@ -7,6 +7,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Data.Processor.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.Configuration;
@@ -92,7 +93,7 @@ public abstract class IntegrationTestFixture(TestApplicationFactory testApp) :
                     config.AddInMemoryCollection(
                     [
                         new KeyValuePair<string, string?>("PublicStorage", _azuriteContainer.GetConnectionString()),
-                        new KeyValuePair<string, string?>("PublisherStorage", _azuriteContainer.GetConnectionString())
+                        new KeyValuePair<string, string?>("PublisherStorage", _azuriteContainer.GetConnectionString()),
                     ]);
                 })
                 .ConfigureServices(services =>
@@ -111,6 +112,9 @@ public abstract class IntegrationTestFixture(TestApplicationFactory testApp) :
                     );
                     services.ReplaceService<IPublisherTableStorageService>(sp =>
                         new PublisherTableStorageService(_azuriteContainer.GetConnectionString())
+                    );
+                    services.ReplaceService<IDataProcessorClient>(sp =>
+                        new DataProcessorClient(_azuriteContainer.GetConnectionString())
                     );
                     services.AddTransient<IPublicBlobCacheService, PublicBlobCacheService>();
                     services.AddTransient<IPrivateBlobCacheService, PrivateBlobCacheService>();
