@@ -1,66 +1,66 @@
 {
-  "DataSetId": "01d29401-7274-a871-a8db-d4bc4e98c324",
-  "DataSetTitle": "Data Set 1",
-  "DataSetVersion": "1.2.0",
-  "DataSetVersionId": "01d29401-7974-1276-a06b-b28a6a5385c6",
-  "EndTime": "2025-02-24T03:07:44.850Z",
-  "Query": {
-    "Criteria": {
-      "Filters": {
-        "Eq": "qOnjG"
+  "dataSetId": "01d29401-7274-a871-a8db-d4bc4e98c324",
+  "dataSetTitle": "Data Set 1",
+  "dataSetVersion": "1.2.0",
+  "dataSetVersionId": "01d29401-7974-1276-a06b-b28a6a5385c6",
+  "endTime": "2025-02-24T03:07:44.850Z",
+  "query": {
+    "criteria": {
+      "filters": {
+        "eq": "qOnjG"
       },
-      "Locations": {
-        "In": [
+      "locations": {
+        "in": [
           {
-            "Id": "7zXob",
-            "Level": "LA"
+            "id": "7zXob",
+            "level": "LA"
           },
           {
-            "Id": "it6Xr",
-            "Level": "LA"
+            "id": "it6Xr",
+            "level": "LA"
           },
           {
-            "Id": "IzBzg",
-            "Level": "LA"
+            "id": "IzBzg",
+            "level": "LA"
           },
           {
-            "Id": "pTSoj",
-            "Level": "LA"
+            "id": "pTSoj",
+            "level": "LA"
           },
           {
-            "Id": "dP0Zw",
-            "Level": "NAT"
+            "id": "dP0Zw",
+            "level": "NAT"
           },
           {
-            "Id": "6jrfe",
-            "Level": "REG"
+            "id": "6jrfe",
+            "level": "REG"
           },
           {
-            "Id": "LxWjE",
-            "Level": "REG"
+            "id": "LxWjE",
+            "level": "REG"
           },
           {
-            "Id": "0kT5D",
-            "Level": "SCH"
+            "id": "0kT5D",
+            "level": "SCH"
           }
         ]
       },
-      "TimePeriods": {
-        "NotEq": {
-          "Code": "AY",
-          "Period": "2021/2022"
+      "timePeriods": {
+        "notEq": {
+          "code": "AY",
+          "period": "2021/2022"
         }
       }
     },
-    "Debug": false,
-    "Indicators": [
+    "debug": false,
+    "indicators": [
       "7YFXo",
       "dPe0Z"
     ],
-    "Page": 1,
-    "PageSize": 1000
+    "page": 1,
+    "pageSize": 1000
   },
-  "ResultsCount": 44,
-  "StartTime": "2025-02-24T03:07:44.710Z",
-  "TotalRowsCount": 800
+  "resultsCount": 44,
+  "startTime": "2025-02-24T03:07:44.710Z",
+  "totalRowsCount": 800
 }

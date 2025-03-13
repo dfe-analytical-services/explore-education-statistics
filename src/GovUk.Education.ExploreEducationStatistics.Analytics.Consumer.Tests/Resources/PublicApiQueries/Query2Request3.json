@@ -1,40 +1,40 @@
 {
-  "DataSetId": "8b9da0ae-80e4-43e8-9f39-4f670fd1a45a",
-  "DataSetTitle": "Data Set 2",
-  "DataSetVersion": "2.1.0",
-  "DataSetVersionId": "5ed5053d-92fc-49a1-b0b1-4c11f3b2c538",
-  "EndTime": "2025-02-22T03:07:44.955Z",
-  "Query": {
-    "Criteria": {
-      "Filters": {
-        "In": [
+  "dataSetId": "8b9da0ae-80e4-43e8-9f39-4f670fd1a45a",
+  "dataSetTitle": "Data Set 2",
+  "dataSetVersion": "2.1.0",
+  "dataSetVersionId": "5ed5053d-92fc-49a1-b0b1-4c11f3b2c538",
+  "endTime": "2025-02-22T03:07:44.955Z",
+  "query": {
+    "criteria": {
+      "filters": {
+        "in": [
           "qOnjG",
           "YvoHK"
         ]
       },
-      "Locations": {
-        "Eq": {
-          "Id": "6jrfe",
-          "Level": "REG"
+      "locations": {
+        "eq": {
+          "id": "6jrfe",
+          "level": "REG"
         }
       },
-      "TimePeriods": {
-        "In": [
+      "timePeriods": {
+        "in": [
           {
-            "Code": "AY",
-            "Period": "2020/2021"
+            "code": "AY",
+            "period": "2020/2021"
           }
         ]
       }
     },
-    "Debug": false,
-    "Indicators": [
+    "debug": false,
+    "indicators": [
       "7YFXo"
     ],
-    "Page": 1,
-    "PageSize": 1000
+    "page": 1,
+    "pageSize": 1000
   },
-  "ResultsCount": 20,
-  "StartTime": "2025-02-22T03:07:44.931Z",
-  "TotalRowsCount": 23
+  "resultsCount": 20,
+  "startTime": "2025-02-22T03:07:44.931Z",
+  "totalRowsCount": 23
 }

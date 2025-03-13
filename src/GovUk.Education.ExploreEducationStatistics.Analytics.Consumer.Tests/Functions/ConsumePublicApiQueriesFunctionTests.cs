@@ -22,7 +22,7 @@ public abstract class ConsumePublicApiQueriesFunctionTests
     public class FunctionTests : ConsumePublicApiQueriesFunctionTests
     {
         [Fact]
-        public async Task NoSourceFolder()
+        public async Task NoSourceFolder_NoReportsProduced()
         {
             var function = BuildFunction();
             await function.Run(new TimerInfo());
@@ -32,7 +32,7 @@ public abstract class ConsumePublicApiQueriesFunctionTests
         }
         
         [Fact]
-        public async Task NoSourceQueriesToConsume()
+        public async Task NoSourceQueriesToConsume_NoReportsProduced()
         {
             Directory.CreateDirectory(_pathResolver.PublicApiQueriesDirectoryPath());
 
@@ -46,7 +46,7 @@ public abstract class ConsumePublicApiQueriesFunctionTests
         }
 
         [Fact]
-        public async Task SingleSourceQuery()
+        public async Task SingleSourceQuery_ProducesOneReportRow()
         {
             SetupQueryRequest("Query1Request.json");
 
@@ -73,8 +73,8 @@ public abstract class ConsumePublicApiQueriesFunctionTests
             // match the expected values also.
             var queryReportRow = Assert.Single(queryReportRows);
 
-            Assert.Equal("502a11b95831e7f57e90cec95a82c1e2", queryReportRow.QueryVersionHash);
-            Assert.Equal("b5e94ee45b26d4f0c16059aee5b09fe8", queryReportRow.QueryHash);
+            Assert.Equal("f89944c2ee4284894962724bc68a1c8e", queryReportRow.QueryVersionHash);
+            Assert.Equal("a992584964c8051b6e1b167a0a8dd4e0", queryReportRow.QueryHash);
             Assert.Equal(Guid.Parse("01d29401-7274-a871-a8db-d4bc4e98c324"), queryReportRow.DataSetId);
             Assert.Equal(Guid.Parse("01d29401-7974-1276-a06b-b28a6a5385c6"), queryReportRow.DataSetVersionId);
             Assert.Equal("1.2.0", queryReportRow.DataSetVersion);
@@ -82,7 +82,7 @@ public abstract class ConsumePublicApiQueriesFunctionTests
             Assert.Equal(44, queryReportRow.ResultsCount);
             Assert.Equal(800, queryReportRow.TotalRowsCount);
             Assert.Equal(1, queryReportRow.QueryExecutions);
-            Assert.StartsWith("{\"Criteria\":{\"Filters\":{\"Eq\":\"qOnjG\"}", queryReportRow.Query);
+            Assert.StartsWith("{\"criteria\":{\"filters\":{\"eq\":\"qOnjG\"}", queryReportRow.Query);
             
             var queryAccessReportFile = reports.Single(file => file.EndsWith("public-api-query-access.parquet"));
 
@@ -96,7 +96,7 @@ public abstract class ConsumePublicApiQueriesFunctionTests
             
             var queryAccessReportRow = Assert.Single(queryAccessReportRows);
 
-            Assert.Equal("502a11b95831e7f57e90cec95a82c1e2", queryAccessReportRow.QueryVersionHash);
+            Assert.Equal("f89944c2ee4284894962724bc68a1c8e", queryAccessReportRow.QueryVersionHash);
             Assert.Equal(Guid.Parse("01d29401-7974-1276-a06b-b28a6a5385c6"), queryAccessReportRow.DataSetVersionId);
             Assert.Equal(DateTime.Parse("2025-02-24T03:07:44.710Z"), queryAccessReportRow.StartTime);
             Assert.Equal(DateTime.Parse("2025-02-24T03:07:44.850Z"), queryAccessReportRow.EndTime);
@@ -104,7 +104,7 @@ public abstract class ConsumePublicApiQueriesFunctionTests
         }
 
         [Fact]
-        public async Task TwoDifferentSourceQueries()
+        public async Task TwoDifferentSourceQueries_ProduceTwoDistinctReportRows()
         {
             SetupQueryRequest("Query1Request.json");
             SetupQueryRequest("Query2Request1.json");
@@ -131,8 +131,8 @@ public abstract class ConsumePublicApiQueriesFunctionTests
                 
             var queryReportRow1 = queryReportRows[0];
             
-            Assert.Equal("44fdabea15392762ef6e43489ad92e98", queryReportRow1.QueryVersionHash);
-            Assert.Equal("9e261de0f641d55fcca15a8b55c3d089", queryReportRow1.QueryHash);
+            Assert.Equal("b856e997ec5d2c7b445c71ff14859be7", queryReportRow1.QueryVersionHash);
+            Assert.Equal("7145877f51cbcab16411b8a1a7bac4c3", queryReportRow1.QueryHash);
             Assert.Equal(Guid.Parse("8b9da0ae-80e4-43e8-9f39-4f670fd1a45a"), queryReportRow1.DataSetId);
             Assert.Equal(Guid.Parse("5ed5053d-92fc-49a1-b0b1-4c11f3b2c538"), queryReportRow1.DataSetVersionId);
             Assert.Equal("2.1.0", queryReportRow1.DataSetVersion);
@@ -140,12 +140,12 @@ public abstract class ConsumePublicApiQueriesFunctionTests
             Assert.Equal(20, queryReportRow1.ResultsCount);
             Assert.Equal(23, queryReportRow1.TotalRowsCount);
             Assert.Equal(1, queryReportRow1.QueryExecutions);
-            Assert.StartsWith("{\"Criteria\":{\"Filters\":{\"In\":[\"qOnjG\"", queryReportRow1.Query);
+            Assert.StartsWith("{\"criteria\":{\"filters\":{\"in\":[\"qOnjG\"", queryReportRow1.Query);
             
             var queryReportRow2 = queryReportRows[1];
 
-            Assert.Equal("502a11b95831e7f57e90cec95a82c1e2", queryReportRow2.QueryVersionHash);
-            Assert.Equal("b5e94ee45b26d4f0c16059aee5b09fe8", queryReportRow2.QueryHash);
+            Assert.Equal("f89944c2ee4284894962724bc68a1c8e", queryReportRow2.QueryVersionHash);
+            Assert.Equal("a992584964c8051b6e1b167a0a8dd4e0", queryReportRow2.QueryHash);
             Assert.Equal(Guid.Parse("01d29401-7274-a871-a8db-d4bc4e98c324"), queryReportRow2.DataSetId);
             Assert.Equal(Guid.Parse("01d29401-7974-1276-a06b-b28a6a5385c6"), queryReportRow2.DataSetVersionId);
             Assert.Equal("1.2.0", queryReportRow2.DataSetVersion);
@@ -153,7 +153,7 @@ public abstract class ConsumePublicApiQueriesFunctionTests
             Assert.Equal(44, queryReportRow2.ResultsCount);
             Assert.Equal(800, queryReportRow2.TotalRowsCount);
             Assert.Equal(1, queryReportRow2.QueryExecutions);
-            Assert.StartsWith("{\"Criteria\":{\"Filters\":{\"Eq\":\"qOnjG\"}", queryReportRow2.Query);
+            Assert.StartsWith("{\"criteria\":{\"filters\":{\"eq\":\"qOnjG\"}", queryReportRow2.Query);
             
             var queryAccessReportFile = reports.Single(file => file.EndsWith("public-api-query-access.parquet"));
 
@@ -170,7 +170,7 @@ public abstract class ConsumePublicApiQueriesFunctionTests
             
             var queryAccessReportRow1 = queryAccessReportRows[0];
 
-            Assert.Equal("44fdabea15392762ef6e43489ad92e98", queryAccessReportRow1.QueryVersionHash);
+            Assert.Equal("b856e997ec5d2c7b445c71ff14859be7", queryAccessReportRow1.QueryVersionHash);
             Assert.Equal(Guid.Parse("5ed5053d-92fc-49a1-b0b1-4c11f3b2c538"), queryAccessReportRow1.DataSetVersionId);
             Assert.Equal(DateTime.Parse("2025-02-23T03:07:44.931Z"), queryAccessReportRow1.StartTime);
             Assert.Equal(DateTime.Parse("2025-02-23T03:07:44.955Z"), queryAccessReportRow1.EndTime);
@@ -178,14 +178,15 @@ public abstract class ConsumePublicApiQueriesFunctionTests
             
             var queryAccessReportRow2 = queryAccessReportRows[1];
 
-            Assert.Equal("502a11b95831e7f57e90cec95a82c1e2", queryAccessReportRow2.QueryVersionHash);
+            Assert.Equal("f89944c2ee4284894962724bc68a1c8e", queryAccessReportRow2.QueryVersionHash);
             Assert.Equal(Guid.Parse("01d29401-7974-1276-a06b-b28a6a5385c6"), queryAccessReportRow2.DataSetVersionId);
             Assert.Equal(DateTime.Parse("2025-02-24T03:07:44.710Z"), queryAccessReportRow2.StartTime);
             Assert.Equal(DateTime.Parse("2025-02-24T03:07:44.850Z"), queryAccessReportRow2.EndTime);
             Assert.Equal(140, queryAccessReportRow2.DurationMillis);
         }
 
-        [Fact] public async Task MultipleSourceFilesForSameQuery()
+        [Fact]
+        public async Task MultipleSourceFilesForSameQuery_ProduceSingleQueryRowAndMultipleQueryAccessRows()
         {
             SetupQueryRequest("Query2Request1.json");
             SetupQueryRequest("Query2Request2.json");
@@ -214,8 +215,8 @@ public abstract class ConsumePublicApiQueriesFunctionTests
             // calculated fields match the expected values also.
             var queryReportRow = Assert.Single(queryReportRows);
             
-            Assert.Equal("44fdabea15392762ef6e43489ad92e98", queryReportRow.QueryVersionHash);
-            Assert.Equal("9e261de0f641d55fcca15a8b55c3d089", queryReportRow.QueryHash);
+            Assert.Equal("b856e997ec5d2c7b445c71ff14859be7", queryReportRow.QueryVersionHash);
+            Assert.Equal("7145877f51cbcab16411b8a1a7bac4c3", queryReportRow.QueryHash);
             Assert.Equal(Guid.Parse("8b9da0ae-80e4-43e8-9f39-4f670fd1a45a"), queryReportRow.DataSetId);
             Assert.Equal(Guid.Parse("5ed5053d-92fc-49a1-b0b1-4c11f3b2c538"), queryReportRow.DataSetVersionId);
             Assert.Equal("2.1.0", queryReportRow.DataSetVersion);
@@ -226,7 +227,7 @@ public abstract class ConsumePublicApiQueriesFunctionTests
             // Check that the function successfully spotted that 3 instances of this query
             // were found in this batch of requests.
             Assert.Equal(3, queryReportRow.QueryExecutions);
-            Assert.StartsWith("{\"Criteria\":{\"Filters\":{\"In\":[\"qOnjG\"", queryReportRow.Query);
+            Assert.StartsWith("{\"criteria\":{\"filters\":{\"in\":[\"qOnjG\"", queryReportRow.Query);
             
             var queryAccessReportFile = reports.Single(file => file.EndsWith("public-api-query-access.parquet"));
 
@@ -246,7 +247,7 @@ public abstract class ConsumePublicApiQueriesFunctionTests
             var queryAccessReportRow1 = queryAccessReportRows[0];
 
             // Check that the first query access was recorded.
-            Assert.Equal("44fdabea15392762ef6e43489ad92e98", queryAccessReportRow1.QueryVersionHash);
+            Assert.Equal("b856e997ec5d2c7b445c71ff14859be7", queryAccessReportRow1.QueryVersionHash);
             Assert.Equal(Guid.Parse("5ed5053d-92fc-49a1-b0b1-4c11f3b2c538"), queryAccessReportRow1.DataSetVersionId);
             Assert.Equal(DateTime.Parse("2025-02-22T03:07:44.931Z"), queryAccessReportRow1.StartTime);
             Assert.Equal(DateTime.Parse("2025-02-22T03:07:44.955Z"), queryAccessReportRow1.EndTime);
@@ -255,7 +256,7 @@ public abstract class ConsumePublicApiQueriesFunctionTests
             var queryAccessReportRow2 = queryAccessReportRows[1];
             
             // Check that the second query access was recorded.
-            Assert.Equal("44fdabea15392762ef6e43489ad92e98", queryAccessReportRow2.QueryVersionHash);
+            Assert.Equal("b856e997ec5d2c7b445c71ff14859be7", queryAccessReportRow2.QueryVersionHash);
             Assert.Equal(Guid.Parse("5ed5053d-92fc-49a1-b0b1-4c11f3b2c538"), queryAccessReportRow2.DataSetVersionId);
             Assert.Equal(DateTime.Parse("2025-02-23T03:07:44.931Z"), queryAccessReportRow2.StartTime);
             Assert.Equal(DateTime.Parse("2025-02-23T03:07:44.955Z"), queryAccessReportRow2.EndTime);
@@ -264,7 +265,7 @@ public abstract class ConsumePublicApiQueriesFunctionTests
             var queryAccessReportRow3 = queryAccessReportRows[2];
             
             // Check that the third query access was recorded.
-            Assert.Equal("44fdabea15392762ef6e43489ad92e98", queryAccessReportRow3.QueryVersionHash);
+            Assert.Equal("b856e997ec5d2c7b445c71ff14859be7", queryAccessReportRow3.QueryVersionHash);
             Assert.Equal(Guid.Parse("5ed5053d-92fc-49a1-b0b1-4c11f3b2c538"), queryAccessReportRow3.DataSetVersionId);
             Assert.Equal(DateTime.Parse("2025-02-24T03:07:44.931Z"), queryAccessReportRow3.StartTime);
             Assert.Equal(DateTime.Parse("2025-02-24T03:07:44.955Z"), queryAccessReportRow3.EndTime);
@@ -272,7 +273,7 @@ public abstract class ConsumePublicApiQueriesFunctionTests
         }
 
         [Fact]
-        public async Task SameQueryStructureButDifferentDataSetVersion()
+        public async Task SameQueryStructureButDifferentDataSetVersion_ProducesTwoDistinctReportRows()
         {
             SetupQueryRequest("Query1Request.json");
             SetupQueryRequest("Query1RequestMinorVersionUpdate.json");
@@ -295,32 +296,32 @@ public abstract class ConsumePublicApiQueriesFunctionTests
             // report file, despite their queries being structurally the same and for the same
             // overarching data set.
             Assert.Equal(2, queryReportRows.Count);
-                
+            
             var queryReportRow1 = queryReportRows[0];
             
-            Assert.Equal("502a11b95831e7f57e90cec95a82c1e2", queryReportRow1.QueryVersionHash);
-            Assert.Equal("b5e94ee45b26d4f0c16059aee5b09fe8", queryReportRow1.QueryHash);
+            Assert.Equal("34822b182432c266b7198c243245fd60", queryReportRow1.QueryVersionHash);
+            Assert.Equal("a992584964c8051b6e1b167a0a8dd4e0", queryReportRow1.QueryHash);
             Assert.Equal(Guid.Parse("01d29401-7274-a871-a8db-d4bc4e98c324"), queryReportRow1.DataSetId);
-            Assert.Equal(Guid.Parse("01d29401-7974-1276-a06b-b28a6a5385c6"), queryReportRow1.DataSetVersionId);
-            Assert.Equal("1.2.0", queryReportRow1.DataSetVersion);
+            Assert.Equal(Guid.Parse("68c73c8e-808d-47fd-a2d5-268dc6b3a102"), queryReportRow1.DataSetVersionId);
+            Assert.Equal("1.2.1", queryReportRow1.DataSetVersion);
             Assert.Equal("Data Set 1", queryReportRow1.DataSetTitle);
-            Assert.Equal(44, queryReportRow1.ResultsCount);
-            Assert.Equal(800, queryReportRow1.TotalRowsCount);
+            Assert.Equal(52, queryReportRow1.ResultsCount);
+            Assert.Equal(850, queryReportRow1.TotalRowsCount);
             Assert.Equal(1, queryReportRow1.QueryExecutions);
-            Assert.StartsWith("{\"Criteria\":{\"Filters\":{\"Eq\":\"qOnjG\"}", queryReportRow1.Query);
-            
+            Assert.StartsWith("{\"criteria\":{\"filters\":{\"eq\":\"qOnjG\"}", queryReportRow1.Query);
+                
             var queryReportRow2 = queryReportRows[1];
             
-            Assert.Equal("b581a774d622a1f950a20cf6fd178f98", queryReportRow2.QueryVersionHash);
-            Assert.Equal("b5e94ee45b26d4f0c16059aee5b09fe8", queryReportRow2.QueryHash);
+            Assert.Equal("f89944c2ee4284894962724bc68a1c8e", queryReportRow2.QueryVersionHash);
+            Assert.Equal("a992584964c8051b6e1b167a0a8dd4e0", queryReportRow2.QueryHash);
             Assert.Equal(Guid.Parse("01d29401-7274-a871-a8db-d4bc4e98c324"), queryReportRow2.DataSetId);
-            Assert.Equal(Guid.Parse("68c73c8e-808d-47fd-a2d5-268dc6b3a102"), queryReportRow2.DataSetVersionId);
-            Assert.Equal("1.2.1", queryReportRow2.DataSetVersion);
+            Assert.Equal(Guid.Parse("01d29401-7974-1276-a06b-b28a6a5385c6"), queryReportRow2.DataSetVersionId);
+            Assert.Equal("1.2.0", queryReportRow2.DataSetVersion);
             Assert.Equal("Data Set 1", queryReportRow2.DataSetTitle);
-            Assert.Equal(52, queryReportRow2.ResultsCount);
-            Assert.Equal(850, queryReportRow2.TotalRowsCount);
+            Assert.Equal(44, queryReportRow2.ResultsCount);
+            Assert.Equal(800, queryReportRow2.TotalRowsCount);
             Assert.Equal(1, queryReportRow2.QueryExecutions);
-            Assert.StartsWith("{\"Criteria\":{\"Filters\":{\"Eq\":\"qOnjG\"}", queryReportRow2.Query);
+            Assert.StartsWith("{\"criteria\":{\"filters\":{\"eq\":\"qOnjG\"}", queryReportRow2.Query);
             
             var queryAccessReportFile = reports.Single(file => file.EndsWith("public-api-query-access.parquet"));
 
@@ -336,18 +337,18 @@ public abstract class ConsumePublicApiQueriesFunctionTests
             Assert.Equal(2, queryAccessReportRows.Count);
             
             var queryAccessReportRow1 = queryAccessReportRows[0];
-
+            
             // Check that the first query access was recorded.
-            Assert.Equal("502a11b95831e7f57e90cec95a82c1e2", queryAccessReportRow1.QueryVersionHash);
+            Assert.Equal("f89944c2ee4284894962724bc68a1c8e", queryAccessReportRow1.QueryVersionHash);
             Assert.Equal(Guid.Parse("01d29401-7974-1276-a06b-b28a6a5385c6"), queryAccessReportRow1.DataSetVersionId);
             Assert.Equal(DateTime.Parse("2025-02-24T03:07:44.710Z"), queryAccessReportRow1.StartTime);
             Assert.Equal(DateTime.Parse("2025-02-24T03:07:44.850Z"), queryAccessReportRow1.EndTime);
             Assert.Equal(140, queryAccessReportRow1.DurationMillis);
             
             var queryAccessReportRow2 = queryAccessReportRows[1];
-            
+
             // Check that the second query access was recorded.
-            Assert.Equal("b581a774d622a1f950a20cf6fd178f98", queryAccessReportRow2.QueryVersionHash);
+            Assert.Equal("34822b182432c266b7198c243245fd60", queryAccessReportRow2.QueryVersionHash);
             Assert.Equal(Guid.Parse("68c73c8e-808d-47fd-a2d5-268dc6b3a102"), queryAccessReportRow2.DataSetVersionId);
             Assert.Equal(DateTime.Parse("2025-02-25T03:07:44.710Z"), queryAccessReportRow2.StartTime);
             Assert.Equal(DateTime.Parse("2025-02-25T03:07:44.850Z"), queryAccessReportRow2.EndTime);
@@ -362,10 +363,6 @@ public abstract class ConsumePublicApiQueriesFunctionTests
                 .ToList();
             return queryReportRows;
         }
-
-        // TODO test for pagination and debug
-
-
     }
 
     private ConsumePublicApiQueriesFunction BuildFunction()

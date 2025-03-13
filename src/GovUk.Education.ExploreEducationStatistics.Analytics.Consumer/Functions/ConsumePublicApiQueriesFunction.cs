@@ -57,52 +57,52 @@ public class ConsumePublicApiQueriesFunction(
         duckDbConnection.ExecuteNonQuery("install json; load json");
 
         duckDbConnection.ExecuteNonQuery($@"
-            CREATE TABLE Queries AS 
+            CREATE TABLE queries AS 
             SELECT
-                MD5(CONCAT(Query, DataSetVersionId)) AS QueryVersionHash,
-                MD5(Query) AS QueryHash,
+                MD5(CONCAT(query, dataSetVersionId)) AS queryVersionHash,
+                MD5(query) AS queryHash,
                 *
             FROM read_json('{processingDirectory}/*.json', 
                 format='auto',
                 columns = {{
-                    DataSetId: UUID, 
-                    DataSetVersionId: UUID,
-                    DataSetVersion: VARCHAR,
-                    DataSetTitle: VARCHAR,
-                    ResultsCount: INT,
-                    TotalRowsCount: INT,
-                    StartTime: DATETIME,
-                    EndTime: DATETIME,
-                    Query: JSON
+                    dataSetId: UUID, 
+                    dataSetVersionId: UUID,
+                    dataSetVersion: VARCHAR,
+                    dataSetTitle: VARCHAR,
+                    resultsCount: INT,
+                    totalRowsCount: INT,
+                    startTime: DATETIME,
+                    endTime: DATETIME,
+                    query: JSON
                 }})");
 
         duckDbConnection.ExecuteNonQuery(@"
-            CREATE TABLE QueryReport AS 
+            CREATE TABLE queryReport AS 
             SELECT 
-                QueryVersionHash,
-                FIRST(QueryHash) AS QueryHash,
-                FIRST(DataSetId) AS DataSetId,
-                FIRST(DataSetVersionId) AS DataSetVersionId,
-                FIRST(DataSetVersion) AS DataSetVersion,
-                FIRST(DataSetTitle) AS DataSetTitle,
-                FIRST(ResultsCount) AS ResultsCount,
-                FIRST(TotalRowsCount) AS TotalRowsCount,
-                FIRST(Query) AS Query,
-                CAST(COUNT(QueryHash) AS INT) AS QueryExecutions
-            FROM Queries
-            GROUP BY QueryVersionHash
-            ORDER BY QueryVersionHash");
+                queryVersionHash ,
+                FIRST(queryHash) AS queryHash,
+                FIRST(dataSetId) AS dataSetId,
+                FIRST(dataSetVersionId) AS dataSetVersionId,
+                FIRST(dataSetVersion) AS dataSetVersion,
+                FIRST(dataSetTitle) AS dataSetTitle,
+                FIRST(resultsCount) AS resultsCount,
+                FIRST(totalRowsCount) AS totalRowsCount,
+                FIRST(query) AS query,
+                CAST(COUNT(queryHash) AS INT) AS queryExecutions
+            FROM queries
+            GROUP BY queryVersionHash
+            ORDER BY queryVersionHash");
         
         duckDbConnection.ExecuteNonQuery(@"
-            CREATE TABLE QueryAccessReport AS 
+            CREATE TABLE queryAccessReport AS 
             SELECT 
-                QueryVersionHash,
-                DataSetVersionId,
-                StartTime,
-                EndTime,
-                CAST(EXTRACT('milliseconds' FROM EndTime - StartTime) AS INT) AS DurationMillis
-            FROM Queries
-            ORDER BY QueryHash, StartTime");
+                queryVersionHash,
+                dataSetVersionId,
+                startTime,
+                endTime,
+                CAST(EXTRACT('milliseconds' FROM EndTime - StartTime) AS INT) AS durationMillis
+            FROM queries
+            ORDER BY queryHash, startTime");
 
         var reportFilenamePrefix = DateTime.UtcNow.ToString("yyyyMMdd-HHmmss");
         
@@ -115,11 +115,11 @@ public class ConsumePublicApiQueriesFunction(
             $"{reportFilenamePrefix}_public-api-query-access.parquet");
 
         duckDbConnection.ExecuteNonQuery($@"
-            COPY (SELECT * FROM QueryReport)
+            COPY (SELECT * FROM queryReport)
             TO '{queryReportFilename}' (FORMAT 'parquet', CODEC 'zstd')");
         
         duckDbConnection.ExecuteNonQuery($@"
-            COPY (SELECT * FROM QueryAccessReport)
+            COPY (SELECT * FROM queryAccessReport)
             TO '{queryAccessReportFilename}' (FORMAT 'parquet', CODEC 'zstd')");
         
         Directory.Delete(processingDirectory, recursive: true);
