@@ -1,8 +1,8 @@
 #nullable enable
 using System;
-using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Public.Data.PublicDataApiClient;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using Microsoft.AspNetCore.Mvc;
 
@@ -10,7 +10,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.P
 
 public interface IPublicDataApiClient
 {
-    Task<Either<ActionResult, HttpResponseMessage>> GetDataSetVersionChanges(
+    Task<Either<ActionResult, DataSetVersionChangesViewModelDto>> GetDataSetVersionChanges(
         Guid dataSetId,
         string dataSetVersion,
         CancellationToken cancellationToken = default);

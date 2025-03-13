@@ -1,7 +1,9 @@
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologies;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Public.Data.PublicDataApiClient;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ManageContent;
+using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Mappings;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
@@ -211,6 +213,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
                         methodologyVersion.Notes.OrderByDescending(note => note.DisplayDate)));
 
             CreateMap<ReleaseVersion, ReleasePublicationStatusViewModel>();
+
+            CreateMap<DataSetVersionChangesViewModelDto, DataSetVersionChangesViewModel2>();
         }
 
         private void CreateContentBlockMap()

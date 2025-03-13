@@ -8,7 +8,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using Azure.Core;
 using Azure.Identity;
-using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Admin.Options;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
@@ -28,7 +27,7 @@ public class PublicDataApiClient(
     IWebHostEnvironment environment)
     : IPublicDataApiClient
 {
-    public async Task<Either<ActionResult, HttpResponseMessage>> GetDataSetVersionChanges(
+    public async Task<Either<ActionResult, DataSetVersionChangesViewModelDto>> GetDataSetVersionChanges(
         Guid dataSetId,
         string dataSetVersion,
         CancellationToken cancellationToken = default)
@@ -39,7 +38,7 @@ public class PublicDataApiClient(
                 cancellationToken
             ),
             cancellationToken
-        );
+        ).OnSuccess(async response => (await response.Content.ReadFromJsonAsync<DataSetVersionChangesViewModelDto>())!);
     }
 
     private async Task<Either<ActionResult, HttpResponseMessage>> SendRequest(
