@@ -22,7 +22,7 @@ resources:
           - master
 
 variables:
-  - group: Analytics - Common
+  - group: Common
   - name: forceDeployToEnvironment
     value: ${{parameters.forceDeployToEnvironment}}
   - name: isDev

@@ -3,6 +3,8 @@ parameters:
     type: string
   - name: environment
     type: string
+  - name: displayName
+    type: string
   - name: deploymentName
     type: string
   - name: functionAppName
@@ -19,7 +21,7 @@ parameters:
 
 jobs:
   - deployment: ${{ parameters.deploymentName }}
-    displayName: Deploy ${{ parameters.functionAppName }} Function App
+    displayName: ${{ parameters.displayName }}
     dependsOn: ${{ parameters.dependsOn }}
     environment: ${{ parameters.environment }}
     pool:

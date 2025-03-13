@@ -37,7 +37,7 @@ jobs:
                 parameterFile: $(paramFile)
                 analyticsFunctionAppExists: false
 
-            - template: ../../../public-api/tasks/check-function-app-exists.yml
+            - template: ../../../public-api/ci/tasks/check-function-app-exists.yml
               parameters:
                 serviceConnection: ${{ parameters.serviceConnection }}
                 resourceGroupName: $(resourceGroupName)

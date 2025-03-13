@@ -108,6 +108,7 @@ var abbreviations = {
   notificationHubsNamespaces: 'ntfns'
   notificationHubsNamespacesNotificationHubs: 'ntf'
   operationalInsightsWorkspaces: 'log'
+  privateEndpoints: 'pep'
   portalDashboards: 'dash'
   powerBIDedicatedCapacities: 'pbi'
   purviewAccounts: 'pview'

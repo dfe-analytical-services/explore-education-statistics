@@ -1,4 +1,4 @@
-import { IpRange, FirewallRule } from '../types.bicep'
+import { IpRange, FirewallRule, AzureFileShareMount } from '../types.bicep'
 import { abbreviations } from '../../common/abbreviations.bicep'
 import { staticAverageLessThanHundred, staticMinGreaterThanZero } from '../../public-api/components/alerts/staticAlertConfig.bicep'
 import { dynamicAverageGreaterThan } from '../../public-api/components/alerts/dynamicAlertConfig.bicep'
@@ -57,7 +57,7 @@ param instanceMemoryMB int = 2048
 param maximumInstanceCount int = 100
 
 @description('Specifies the subnet id for the function app outbound traffic across the VNet.')
-param subnetId string
+param outboundSubnetId string?
 
 @description('Specifies the optional subnet id for function app inbound traffic from the VNet.')
 param privateEndpoints {
@@ -95,6 +95,9 @@ param functionAppExists bool
 
 @description('Specifies whether or not the Function App will always be on and not idle after periods of no traffic - must be compatible with the chosen hosting plan.')
 param alwaysOn bool = false
+
+@description('Specifies additional Azure Storage Accounts to make available to this Function App')
+param azureFileShares AzureFileShareMount[] = []
 
 @description('Whether to create or update Azure Monitor alerts during this deploy.')
 param alerts {
@@ -177,7 +180,7 @@ module storageAccountModule '../../public-api/components/storageAccount.bicep' =
   params: {
     location: location
     storageAccountName: storageAccountName
-    allowedSubnetIds: [subnetId]
+    allowedSubnetIds: outboundSubnetId != null ? [outboundSubnetId!] : []
     firewallRules: storageFirewallRules
     sku: 'Standard_LRS'
     kind: 'StorageV2'
@@ -213,7 +216,7 @@ resource functionApp 'Microsoft.Web/sites@2024-04-01' = {
     reserved: operatingSystem == 'Linux'
     serverFarmId: appServicePlanModule.outputs.planId
     vnetContentShareEnabled: true
-    virtualNetworkSubnetId: subnetId
+    virtualNetworkSubnetId: outboundSubnetId
     siteConfig: {
       alwaysOn: alwaysOn
       appSettings: union([
@@ -286,6 +289,25 @@ resource functionApp 'Microsoft.Web/sites@2024-04-01' = {
     httpsOnly: true
   }
   tags: tagValues
+}
+
+resource azureStorageAccountsConfig 'Microsoft.Web/sites/config@2023-12-01' = if (length(azureFileShares) > 0) {
+  name: 'azurestorageaccounts'
+  parent: functionApp
+  properties: reduce(
+    azureFileShares,
+    {},
+    (cur, next) =>
+      union(cur, {
+        '${next.storageName}': {
+          type: 'AzureFiles'
+          shareName: next.fileShareName
+          mountPath: next.mountPath
+          accountName: next.storageAccountName
+          accessKey: next.storageAccountKey
+        }
+      })
+  )
 }
 
 module keyVaultRoleAssignmentModule '../../public-api/components/keyVaultRoleAssignment.bicep' = {

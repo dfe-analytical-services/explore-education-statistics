@@ -16,7 +16,7 @@ param workloadProfiles ContainerAppWorkloadProfile[] = []
 param tagValues object
 
 resource analyticsStorageAccount 'Microsoft.Storage/storageAccounts@2023-05-01' existing = {
-  name: resourceNames.sharedResources.analyticsStorageAccount
+  name: resourceNames.existingResources.analyticsStorageAccount
 }
 
 resource publicApiStorageAccount 'Microsoft.Storage/storageAccounts@2023-05-01' existing = {
@@ -42,10 +42,10 @@ module containerAppEnvironmentModule '../../components/containerAppEnvironment.b
     applicationInsightsKey: applicationInsightsKey
     azureFileStorages: [
       {
-        storageName: resourceNames.sharedResources.analyticsFileShare
-        storageAccountName: resourceNames.sharedResources.analyticsStorageAccount
+        storageName: resourceNames.existingResources.analyticsFileShare
+        storageAccountName: resourceNames.existingResources.analyticsStorageAccount
         storageAccountKey: analyticsStorageAccount.listKeys().keys[0].value
-        fileShareName: resourceNames.sharedResources.analyticsFileShare
+        fileShareName: resourceNames.existingResources.analyticsFileShare
         accessMode: 'ReadWrite'
       }
       {
