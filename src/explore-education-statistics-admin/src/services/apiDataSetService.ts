@@ -81,12 +81,16 @@ export interface TimePeriodRange {
 
 export type DataSetStatus = 'Draft' | 'Published' | 'Deprecated' | 'Withdrawn';
 
+export const DataSetDraftVersionStatuses = [
+  'Processing',
+  'Failed',
+  'Mapping',
+  'Draft',
+  'Cancelled',
+] as const;
+
 export type DataSetDraftVersionStatus =
-  | 'Processing'
-  | 'Failed'
-  | 'Mapping'
-  | 'Draft'
-  | 'Cancelled';
+  (typeof DataSetDraftVersionStatuses)[number];
 
 export type DataSetLiveVersionStatus = 'Published' | 'Deprecated' | 'Withdrawn';
 
