@@ -3,6 +3,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Requests;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services;
@@ -23,7 +24,9 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.Services.Tests;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Primitives;
+using Moq;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
+using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Controllers;
 
@@ -2951,6 +2954,50 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
             Assert.False(Directory.Exists(_analyticsPathResolver.PublicApiQueriesDirectoryPath()));
         }
     }
+    
+    public class QueryAnalyticsExceptionTests(TestApplicationFactory testApp)
+        : DataSetsControllerGetQueryTests(testApp)
+    {
+        [Fact]
+        public async Task ExceptionThrownByQueryAnalyticsManager_SuccessfulResultsStillReturned()
+        {
+            // Set up the manager to throw an exception when the service attempts to add a query to it.
+            var analyticsManagerMock = new Mock<IQueryAnalyticsManager>(MockBehavior.Strict);
+            analyticsManagerMock
+                .Setup(m => m.AddQuery(
+                    It.IsAny<CaptureDataSetVersionQueryRequest>(), 
+                    It.IsAny<CancellationToken>()))
+                .Throws(new Exception("Error"));
+
+            var app = TestApp.ConfigureServices(services => services
+                .ReplaceService<IDataSetVersionPathResolver>(_dataSetVersionPathResolver)
+                .ReplaceService(analyticsManagerMock));
+            
+            var dataSetVersion = await SetupDefaultDataSetVersion();
+
+            var response = await QueryDataSet(
+                app: app,
+                dataSetId: dataSetVersion.DataSetId,
+                indicators: [AbsenceSchoolData.IndicatorEnrolments],
+                queryParameters: new Dictionary<string, StringValues>
+                {
+                    { "filters.eq", AbsenceSchoolData.FilterSchoolTypeTotal },
+                    { "geographicLevels.eq", "NAT" },
+                    { "timePeriods.eq", "2020/2021|AY" },
+                    { "locations.eq", $"NAT|id|{AbsenceSchoolData.LocationNatEngland}" }
+                },
+                sorts: ["timePeriod|Asc"]
+            );
+
+            // Verify that the manager threw the Exception as planned.
+            VerifyAllMocks(analyticsManagerMock);
+
+            // Verify that despite the Exception being thrown, the service still returned
+            // the expected successful query.
+            var viewModel = response.AssertOk<DataSetQueryPaginatedResultsViewModel>(useSystemJson: true);
+            Assert.Equal(4, viewModel.Results.Count);
+        }
+    }
 
     public class QueryAnalyticsDisabledTests(TestApplicationFactory testApp) : DataSetsControllerGetQueryTests(testApp)
     {
@@ -3002,7 +3049,8 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
         IEnumerable<string>? sorts = null,
         bool? debug = null,
         IDictionary<string, StringValues>? queryParameters = null,
-        Guid? previewTokenId = null)
+        Guid? previewTokenId = null,
+        WebApplicationFactory<Startup>? app = null)
     {
         var query = new Dictionary<string, StringValues>
         {
@@ -3039,7 +3087,7 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
             query.AddRange(queryParameters);
         }
 
-        var client = BuildApp().CreateClient();
+        var client = (app ?? BuildApp()).CreateClient();
         client.AddPreviewTokenHeader(previewTokenId);
 
         var uri = QueryHelpers.AddQueryString($"{BaseUrl}/{dataSetId}/query", query);

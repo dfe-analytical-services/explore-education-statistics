@@ -4,16 +4,26 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services.Interf
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services;
 
 public class QueryAnalyticsConsumer(
-    IQueryAnalyticsChannel channel,
-    IQueryAnalyticsWriter queryAnalyticsWriter
-    ) : BackgroundService
+    IQueryAnalyticsManager manager,
+    IQueryAnalyticsWriter queryAnalyticsWriter,
+    ILogger<QueryAnalyticsConsumer> logger) : BackgroundService
 {
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
         while (!stoppingToken.IsCancellationRequested)  
-        {            
-            var message = await channel.ReadQuery(stoppingToken);  
-            await queryAnalyticsWriter.ReportDataSetVersionQuery(message);  
+        {
+            try
+            {
+                var message = await manager.ReadQuery(stoppingToken);
+                await queryAnalyticsWriter.ReportDataSetVersionQuery(message);
+            }
+            catch (Exception e)
+            {
+                logger.LogError(
+                    exception: e,
+                    message: "Error whilst reading a query from {QueryManager}",
+                    nameof(IQueryAnalyticsManager));
+            }
         }       
     }
 }

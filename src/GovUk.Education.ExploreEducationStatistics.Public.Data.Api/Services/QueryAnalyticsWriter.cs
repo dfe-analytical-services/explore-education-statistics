@@ -28,13 +28,23 @@ public class QueryAnalyticsWriter(
 
         var directory = analyticsPathResolver.PublicApiQueriesDirectoryPath();
 
-        Directory.CreateDirectory(directory);
+        try
+        {
+            Directory.CreateDirectory(directory);
 
-        var filename = $"{DateTime.UtcNow:yyyyMMdd-HHmmss-fff}_{request.DataSetVersionId}.json";
-        
-        await File.WriteAllTextAsync(
-            Path.Combine(directory, filename),
-            contents: serialisedRequest);
+            var filename = $"{DateTime.UtcNow:yyyyMMdd-HHmmss-fff}_{request.DataSetVersionId}.json";
+
+            await File.WriteAllTextAsync(
+                Path.Combine(directory, filename),
+                contents: serialisedRequest);
+        }
+        catch (Exception e)
+        {
+            logger.LogError(
+                exception: e,
+                message: "Error whilst writing {QueryRequest} to disk",
+                nameof(CaptureDataSetVersionQueryRequest));
+        }
     }
 }
 

@@ -256,14 +256,14 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
 
         if (_analyticsOptions.Enabled)
         {
-            services.AddSingleton<IQueryAnalyticsChannel, QueryAnalyticsChannel>();
+            services.AddSingleton<IQueryAnalyticsManager, QueryAnalyticsManager>();
             services.AddHostedService<QueryAnalyticsConsumer>();
             services.AddSingleton<IAnalyticsPathResolver, AnalyticsPathResolver>();
             services.AddSingleton<IQueryAnalyticsWriter, QueryAnalyticsWriter>();
         }
         else
         {
-            services.AddSingleton<IQueryAnalyticsChannel, NoopQueryAnalyticsChannel>();
+            services.AddSingleton<IQueryAnalyticsManager, NoopQueryAnalyticsManager>();
         }
     }
 
@@ -375,16 +375,17 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
         migrations.ForEach(migration => migration.Apply());
     }
 
-    private class NoopQueryAnalyticsChannel : IQueryAnalyticsChannel
+    private class NoopQueryAnalyticsManager : IQueryAnalyticsManager
     {
-        public Task WriteQuery(CaptureDataSetVersionQueryRequest request, CancellationToken cancellationToken)
+        public Task AddQuery(CaptureDataSetVersionQueryRequest request, CancellationToken cancellationToken)
         {
             return Task.CompletedTask;
         }
 
-        public ValueTask<CaptureDataSetVersionQueryRequest> ReadQuery(CancellationToken cancellationToken)
+        public async ValueTask<CaptureDataSetVersionQueryRequest> ReadQuery(CancellationToken cancellationToken)
         {
-            return default;
+            await Task.Delay(Timeout.Infinite, cancellationToken);
+            return default!;
         }
     }
 }

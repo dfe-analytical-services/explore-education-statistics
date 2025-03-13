@@ -3,12 +3,12 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services.Interf
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services;
 
-public class QueryAnalyticsChannel : IQueryAnalyticsChannel
+public class QueryAnalyticsManager : IQueryAnalyticsManager
 {
     private readonly Channel<CaptureDataSetVersionQueryRequest> _channel = 
         Channel.CreateUnbounded<CaptureDataSetVersionQueryRequest>();
 
-    public async Task WriteQuery(CaptureDataSetVersionQueryRequest request, CancellationToken cancellationToken)
+    public async Task AddQuery(CaptureDataSetVersionQueryRequest request, CancellationToken cancellationToken)
     {
         await _channel.Writer.WriteAsync(request, cancellationToken);
     }
