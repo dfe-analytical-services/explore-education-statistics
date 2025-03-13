@@ -76,23 +76,15 @@ public class DataSetVersionsController(IDataSetVersionService dataSetVersionServ
 
     [HttpGet("{dataSetVersionId:guid}/changes")]
     [Produces("application/json")]
-    public async Task<ActionResult> GetVersionChanges(
+    public async Task<ActionResult<DataSetVersionChangesViewModel>> GetVersionChanges(
         Guid dataSetVersionId,
         CancellationToken cancellationToken)
     {
-        // We use a streaming approach as we don't have to share the public API view models
-        // with the admin. This means we can avoid inefficiently re-serializing a second JSON
-        // response and don't need to load the original response into memory.
         return await dataSetVersionService
             .GetVersionChanges(
                 dataSetVersionId: dataSetVersionId,
                 cancellationToken: cancellationToken)
-            .OnSuccessVoid(async response =>
-            {
-                Response.ContentType = response.Content.Headers.ContentType?.ToString();
-                await response.Content.CopyToAsync(Response.BodyWriter.AsStream(), cancellationToken);
-            })
-            .HandleFailuresOrNoOp();
+            .HandleFailuresOrOk();
     }
 
     [HttpPatch("{dataSetVersionId:guid}")]
