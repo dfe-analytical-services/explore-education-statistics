@@ -7,8 +7,24 @@ import {
   LocationOption,
   TimePeriodOption,
 } from '@common/services/types/apiDataSetMeta';
+import { IdTitlePair } from './common';
+import { DataSetVersionStatus, DataSetVersionType } from '../apiDataSetService';
 
 export interface ApiDataSetVersionChanges {
+  dataSet: IdTitlePair;
+  dataSetVersion: DataSetVersionViewModel2;
+  changes: ApiDataSetVersionChanges2;
+}
+
+export interface DataSetVersionViewModel2 {
+  id: string;
+  version: string;
+  status: DataSetVersionStatus;
+  type: DataSetVersionType;
+  notes: string;
+}
+
+export interface ApiDataSetVersionChanges2 {
   majorChanges: ChangeSet;
   minorChanges: ChangeSet;
 }
