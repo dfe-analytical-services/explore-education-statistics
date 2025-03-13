@@ -47,7 +47,6 @@ function FormBaseInput({
   addOn,
   addOnContainerClassName,
   announceError,
-  autoFocus = false,
   className,
   error,
   hint,
@@ -112,8 +111,6 @@ function FormBaseInput({
       onBlur={handleBlur}
       onChange={onChange}
       onKeyPress={handleKeyPress}
-      // eslint-disable-next-line jsx-a11y/no-autofocus
-      autoFocus={autoFocus}
     />
   );
 
