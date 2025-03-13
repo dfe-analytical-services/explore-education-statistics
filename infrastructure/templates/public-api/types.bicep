@@ -23,6 +23,8 @@ type MonthOfYear =
 type ResourceNames = {
   existingResources: {
     adminApp: string
+    analyticsStorageAccount: string
+    analyticsFileShare: string
     publisherFunction: string
     keyVault: string
     vNet: string
@@ -42,8 +44,6 @@ type ResourceNames = {
     }
   }
   sharedResources: {
-    analyticsStorageAccount: string
-    analyticsFileShare: string
     appGateway: string
     appGatewayIdentity: string
     containerAppEnvironment: string

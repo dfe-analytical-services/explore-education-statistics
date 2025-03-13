@@ -12,6 +12,7 @@ jobs:
   parameters:
     serviceConnection: ${{ parameters.serviceConnection }}
     environment: ${{ parameters.environment }}
+    displayName: Deploy Analytics Function App
     dependsOn: ${{ parameters.dependsOn }}
     deploymentName: DeployAnalyticsFunction
     functionAppName: $(analyticsFunctionAppName)
