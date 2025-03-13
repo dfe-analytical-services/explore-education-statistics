@@ -1,25 +1,29 @@
 import ButtonText from '@common/components/ButtonText';
-import VisuallyHidden from '@common/components/VisuallyHidden';
 import CollapsibleList from '@common/components/CollapsibleList';
 import { FormFieldset } from '@common/components/form';
-import FormProvider from '@common/components/form/FormProvider';
 import Form from '@common/components/form/Form';
 import FormCheckboxSelectedCount from '@common/components/form/FormCheckboxSelectedCount';
-import FormFieldCheckboxSearchSubGroups from '@common/components/form/FormFieldCheckboxSearchSubGroups';
 import FormFieldCheckboxGroupsMenu from '@common/components/form/FormFieldCheckboxGroupsMenu';
+import FormFieldCheckboxSearchSubGroups from '@common/components/form/FormFieldCheckboxSearchSubGroups';
+import FormProvider from '@common/components/form/FormProvider';
+import createErrorHelper from '@common/components/form/validation/createErrorHelper';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
+import VisuallyHidden from '@common/components/VisuallyHidden';
+import styles from '@common/modules/table-tool/components/FiltersForm.module.scss';
 import ResetFormOnPreviousStep from '@common/modules/table-tool/components/ResetFormOnPreviousStep';
 import TableQueryError from '@common/modules/table-tool/components/TableQueryError';
 import { InjectedWizardProps } from '@common/modules/table-tool/components/Wizard';
 import WizardStepFormActions from '@common/modules/table-tool/components/WizardStepFormActions';
 import WizardStepHeading from '@common/modules/table-tool/components/WizardStepHeading';
 import WizardStepSummary from '@common/modules/table-tool/components/WizardStepSummary';
-import styles from '@common/modules/table-tool/components/FiltersForm.module.scss';
 import { SelectedPublication } from '@common/modules/table-tool/types/selectedPublication';
-import { Subject, SubjectMeta } from '@common/services/tableBuilderService';
+import {
+  Subject,
+  SubjectMeta,
+  SubjectMetaFilter,
+} from '@common/services/tableBuilderService';
 import { Dictionary } from '@common/types';
-import createErrorHelper from '@common/components/form/validation/createErrorHelper';
 import {
   getErrorCode,
   hasErrorMessage,
@@ -27,11 +31,17 @@ import {
 } from '@common/validation/serverValidations';
 import Yup from '@common/validation/yup';
 
+import camelCase from 'lodash/camelCase';
 import mapValues from 'lodash/mapValues';
 import orderBy from 'lodash/orderBy';
-import React, { useMemo, useState } from 'react';
+import sortBy from 'lodash/sortBy';
+import React, { useCallback, useMemo, useState } from 'react';
 import { ObjectSchema } from 'yup';
-import FilterHierarchy from './FilterHierarchy';
+import FilterHierarchy, { FilterHierarchyType } from './FilterHierarchy';
+import {
+  FilterHierarchyOptionsTree,
+  filterHierarchySeparator,
+} from './FilterHierarchyOptions';
 
 export interface FiltersFormValues {
   indicators: string[];
@@ -83,24 +93,207 @@ export default function FiltersForm({
   const [previousValues, setPreviousValues] = useState<FiltersFormValues>();
   const [openFilterGroups, setOpenFilterGroups] = useState<string[]>([]);
 
-  const { hierarchiedFilterIds, nonHierarchiedFilters } = useMemo(() => {
-    const hierarchiedFilterIds =
+  const hierarchiedFilterIds = useMemo(() => {
+    return (
       subjectMeta.filterHierarchies?.flatMap(hierarchy => {
         return [hierarchy.rootFilterId, ...hierarchy.childFilterIds];
-      }) ?? [];
+      }) ?? []
+    );
+  }, [subjectMeta]);
 
-    const nonHierarchiedFilters = orderBy(
-      Object.entries(subjectMeta.filters) /* .filter(([_, filter]) => {
-        hierarchiedFilterIds.includes(filter.id);
-      }) */,
+  const filterGroups = useMemo(() => {
+    return orderBy(
+      Object.entries(subjectMeta.filters).filter(
+        ([_, filter]) =>
+          // filter out filters that are hierarchied
+          !hierarchiedFilterIds.includes(filter.id),
+      ),
       ([_, value]) => value.order,
     );
+  }, [subjectMeta, hierarchiedFilterIds]);
 
-    return {
-      hierarchiedFilterIds,
-      nonHierarchiedFilters,
-    };
+  /* const hierarchiedFilters = useMemo(() => {
+    return orderBy(
+      Object.entries(subjectMeta.filters).filter(([_, filter]) =>
+        hierarchiedFilterIds.includes(filter.id),
+      ),
+      ([_, value]) => value.order,
+    ).map(([_, filter]) => [filter.id, filter] as [string, SubjectMetaFilter]);
+  }, [subjectMeta, hierarchiedFilterIds]); */
+
+  const labels = useMemo(() => {
+    const labelsMap: Dictionary<{
+      label: string;
+      parentLegend?: string;
+      parentLabel?: string;
+    }> = {};
+    if (!subjectMeta.filterHierarchies?.length) {
+      return labelsMap;
+    }
+
+    Object.values(subjectMeta.filters).forEach(filter => {
+      labelsMap[filter.id] = { label: filter.legend };
+      Object.values(filter.options).forEach(filterOptions => {
+        labelsMap[filterOptions.id] = {
+          parentLegend: filter.legend,
+          label: filterOptions.label,
+        };
+        filterOptions.options.forEach(filterGroupOption => {
+          labelsMap[filterGroupOption.value] = {
+            parentLegend: filter.legend,
+            parentLabel: filterOptions.label,
+            label: filterGroupOption.label,
+          };
+        });
+      });
+    });
+
+    return labelsMap;
   }, [subjectMeta]);
+
+  const sortOptions = useCallback(
+    // alphabetise option labels, with "total" first
+    (options: string[]) => {
+      return options
+        .map(optionId => [optionId, labels[optionId].label])
+        .sort((a, b) => {
+          if (a[1].toLocaleLowerCase() === 'total') {
+            return -1;
+          }
+          if (b[1].toLocaleLowerCase() === 'total') {
+            return 1;
+          }
+          if (a[1] < b[1]) {
+            return -1;
+          }
+          if (a[1] > b[1]) {
+            return 1;
+          }
+          return 0;
+        })
+        .map(([optionId]) => optionId);
+    },
+    [labels],
+  );
+
+  const filterHierarchies: FilterHierarchyType[] = useMemo(() => {
+    return (
+      subjectMeta.filterHierarchies?.map(filterHierarchy => {
+        const levelsTotal = filterHierarchy.childFilterIds.length + 1;
+        const tiers = sortBy(filterHierarchy.tiers, 'level');
+        const totalsMap: { [key: string]: string } = {}; // {[optionId]: childOptionId} which is a 'total'
+
+        const bottomLevelOptionId = Object.values(
+          tiers[tiers.length - 1].hierarchy,
+        )?.find(([firstOption]) => !!firstOption)?.[0] as string;
+        // The bottom tier filter group legend is used as the hierarchy legend
+        const legend =
+          labels[bottomLevelOptionId].parentLegend ?? 'missing legend';
+
+        function getTierOptions({
+          currentLevel = 0,
+          parentOptionId,
+          parentValues,
+        }: {
+          parentOptionId: string;
+          parentValues: string[];
+          currentLevel?: number;
+        }): FilterHierarchyOptionsTree<string[]> | undefined {
+          const isBottomLevel = currentLevel === levelsTotal - 1;
+          if (isBottomLevel) {
+            return undefined;
+          }
+
+          const tierOptions =
+            tiers[currentLevel]?.hierarchy[parentOptionId] ?? [];
+
+          return sortOptions(tierOptions).map(optionId => {
+            const optionLabel = labels[optionId].label;
+
+            if (optionLabel.toLocaleLowerCase() === 'total') {
+              // while accessing the labels, save state to know which option is a total for each
+              totalsMap[parentOptionId] = optionId;
+            }
+
+            const value = [...parentValues, optionId];
+
+            return {
+              value,
+              label: optionLabel,
+              options: getTierOptions({
+                currentLevel: currentLevel + 1,
+                parentOptionId: optionId,
+                parentValues: value,
+              }),
+            };
+          });
+        }
+
+        const hierarchyMissingChildTotals: FilterHierarchyOptionsTree<
+          string[]
+        > = sortOptions(filterHierarchy.rootOptionIds).map(
+          firstLevelOptionId => {
+            const value = [firstLevelOptionId];
+            return {
+              value,
+              label: labels[firstLevelOptionId].label,
+              options: getTierOptions({
+                parentOptionId: firstLevelOptionId,
+                parentValues: value,
+              }),
+            };
+          },
+        );
+
+        function mapChildTotals(
+          optionsTreeOptions?: FilterHierarchyOptionsTree<string[]>,
+          currentLevel = 0,
+        ): FilterHierarchyOptionsTree<string> {
+          /**
+           * As all options need to know the total values beneath them, we map our options here to add those additional child totals for each option.
+           * We've previously created a totalsMap when first creating our tree to help keep this step more efficient, by not having to search for totals
+           */
+          const isBottomLevel = currentLevel === levelsTotal - 1;
+          if (
+            isBottomLevel ||
+            !optionsTreeOptions ||
+            optionsTreeOptions.length === 0
+          ) {
+            const optionsTree = optionsTreeOptions?.map(option => ({
+              ...option,
+              value: option.value.join(filterHierarchySeparator),
+              options: undefined,
+            }));
+            return optionsTree as FilterHierarchyOptionsTree<string>;
+          }
+
+          function getChildTotals(optionIds: string[]): string[] {
+            if (optionIds.length === levelsTotal) {
+              return optionIds;
+            }
+            const lastItem = optionIds[optionIds.length - 1];
+            return getChildTotals([...optionIds, totalsMap[lastItem]]);
+          }
+
+          return optionsTreeOptions.map(({ label, value, options }) => {
+            const valuesWithTotals = getChildTotals(value);
+            return {
+              label,
+              value: valuesWithTotals.join(filterHierarchySeparator),
+              options: mapChildTotals(options, currentLevel + 1),
+            };
+          });
+        }
+
+        return {
+          levelsTotal,
+          legend,
+          id: camelCase(labels[filterHierarchy.rootFilterId].label),
+          options: mapChildTotals(hierarchyMissingChildTotals),
+        };
+      }) ?? []
+    );
+  }, [subjectMeta, labels, sortOptions]);
 
   const initialFormValues = useMemo(() => {
     // Automatically select indicator when one indicator group with one option
@@ -110,29 +303,29 @@ export default function FiltersForm({
         ? [indicatorValues[0].options[0].value]
         : initialValues?.indicators ?? [];
 
-    const filters = mapValues(
-      Object.fromEntries(nonHierarchiedFilters),
-      filter => {
-        const filterGroups = Object.values(filter.options);
+    const filters = mapValues(Object.fromEntries(filterGroups), filter => {
+      const filterGroupOptions = Object.values(filter.options);
 
-        // Automatically select when only one group in filter, with only one option in it.
-        if (filterGroups.length === 1 && filterGroups[0].options.length === 1) {
-          return [filterGroups[0].options[0].value];
-        }
+      // Automatically select when only one group in filter, with only one option in it.
+      if (
+        filterGroupOptions.length === 1 &&
+        filterGroupOptions[0].options.length === 1
+      ) {
+        return [filterGroupOptions[0].options[0].value];
+      }
 
-        if (initialValues?.filters) {
-          const filterValues = filterGroups
-            .flatMap(group => group.options)
-            .map(option => option.value);
+      if (initialValues?.filters) {
+        const filterValues = filterGroupOptions
+          .flatMap(group => group.options)
+          .map(option => option.value);
 
-          return filterValues.filter(filterValue =>
-            initialValues.filters.includes(filterValue),
-          );
-        }
+        return filterValues.filter(filterValue =>
+          initialValues.filters.includes(filterValue),
+        );
+      }
 
-        return [];
-      },
-    );
+      return [];
+    });
 
     const filterHierarchies = Object.fromEntries(
       subjectMeta.filterHierarchies?.map(filterHierarchy => {
@@ -150,7 +343,7 @@ export default function FiltersForm({
       indicators,
       filterHierarchies,
     };
-  }, [initialValues, subjectMeta, nonHierarchiedFilters]);
+  }, [initialValues, subjectMeta.indicators, filterGroups, filterHierarchies]);
 
   const stepHeading = (
     <WizardStepHeading {...stepProps}>{stepTitle}</WizardStepHeading>
@@ -189,9 +382,15 @@ export default function FiltersForm({
     }
   };
 
-  const allFilterKeys = Object.keys(subjectMeta.filters);
+  const allFilterGroupKeys = useMemo(
+    () => [
+      ...filterGroups.map(([key]) => key),
+      ...filterHierarchies.map(({ id }) => id),
+    ],
+    [filterGroups, filterHierarchies],
+  );
 
-  const allFiltersOpen = openFilterGroups.length === allFilterKeys.length;
+  const allFiltersOpen = openFilterGroups.length === allFilterGroupKeys.length;
 
   const orderedIndicators = orderBy(
     Object.values(subjectMeta.indicators),
@@ -205,7 +404,7 @@ export default function FiltersForm({
         .of(Yup.string().defined())
         .min(1, 'Select at least one option from indicators'),
       filters: Yup.object(
-        mapValues(Object.fromEntries(nonHierarchiedFilters), filter => {
+        mapValues(Object.fromEntries(filterGroups), filter => {
           const label = filter.legend.toLowerCase();
 
           return Yup.array()
@@ -216,19 +415,23 @@ export default function FiltersForm({
         }),
       ),
       filterHierarchies: Yup.object(
-        // TODO
-        mapValues(Object.fromEntries(nonHierarchiedFilters), filter => {
-          const label = filter.legend.toLowerCase();
+        Object.fromEntries(
+          filterHierarchies.map(filter => {
+            const label = filter.legend.toLowerCase();
 
-          return Yup.array()
-            .required(`Select at least one option from ${label}`)
-            .typeError(`Select at least one option from ${label}`)
-            .of(Yup.string().defined())
-            .min(1, `Select at least one option from ${label}`);
-        }),
+            return [
+              filter.id,
+              Yup.array()
+                .required(`Select at least one option from ${label}`)
+                .typeError(`Select at least one option from ${label}`)
+                .of(Yup.string().defined())
+                .min(1, `Select at least one option from ${label}`),
+            ];
+          }),
+        ),
       ),
     });
-  }, [nonHierarchiedFilters]);
+  }, [filterGroups, filterHierarchies]);
 
   const filtersIncludeTotal = Object.values(subjectMeta.filters).some(
     filter => filter.autoSelectFilterItemId,
@@ -245,6 +448,7 @@ export default function FiltersForm({
           errors: formState.errors,
           touchedFields: formState.touchedFields,
         });
+
         if (isActive) {
           return (
             <Form id="filtersForm" onSubmit={handleSubmit}>
@@ -261,6 +465,7 @@ export default function FiltersForm({
               {stepHeading}
 
               <div className="govuk-grid-row">
+              initialValues:{initialValues?.filters}
                 <div className="govuk-grid-column govuk-!-margin-bottom-6">
                   <FormFieldCheckboxSearchSubGroups
                     disabled={formState.isSubmitting}
@@ -281,10 +486,11 @@ export default function FiltersForm({
                     order={[]}
                   />
 
-                  {nonHierarchiedFilters.length + hierarchiedFilterIds.length >
-                    0 && (
+                  {filterGroups.length + hierarchiedFilterIds.length > 0 && (
                     <FormFieldset
-                      error={getError('filters')}
+                      error={
+                        getError('filters') ?? getError('filterHierarchies')
+                      }
                       hint={
                         <div className="dfe-flex dfe-justify-content--space-between dfe-flex-wrap dfe-align-items-start">
                           <span
@@ -301,14 +507,14 @@ export default function FiltersForm({
                                 : ''
                             }`}
                           </span>
-                          {nonHierarchiedFilters.length > 1 && (
+                          {filterGroups.length > 1 && (
                             <ButtonText
                               ariaExpanded={allFiltersOpen}
                               ariaControls="filterGroups"
                               className="govuk-!-margin-bottom-2"
                               onClick={() => {
                                 setOpenFilterGroups(
-                                  allFiltersOpen ? [] : allFilterKeys,
+                                  allFiltersOpen ? [] : allFilterGroupKeys,
                                 );
                               }}
                             >
@@ -322,55 +528,51 @@ export default function FiltersForm({
                       legend="Categories"
                       legendSize="m"
                     >
-                      {subjectMeta.filterHierarchies.map(filterHierarchy => (
-                        <FilterHierarchy
-                          disabled={formState.isSubmitting}
-                          key={`filterHierarchies-${filterHierarchy.rootFilterId}`}
-                          filterHierarchy={filterHierarchy}
-                          filters={subjectMeta.filters}
-                          filterId={filterHierarchy.rootFilterId}
-                          // name={`filterHierarchies.${filterHierarchy.rootFilterId}`}
-                          totalTiers={filterHierarchy.childFilterIds.length + 1}
-                        />
-                      ))}
+                      {filterHierarchies.map(filterHierarchy => {
+                        const hierarchyName = `filterHierarchies.${filterHierarchy.id}`;
+                        return (
+                          <FilterHierarchy
+                            {...filterHierarchy}
+                            disabled={formState.isSubmitting}
+                            key={hierarchyName}
+                            name={hierarchyName}
+                          />
+                        );
+                      })}
                       <div id="filterGroups">
-                        {nonHierarchiedFilters.map(
-                          ([filterKey, filterGroup]) => {
-                            const filterName = `filters.${filterKey}`;
-                            const orderedFilterGroupOptions = orderBy(
-                              Object.values(filterGroup.options),
-                              'order',
-                            );
+                        {filterGroups.map(([filterKey, filterGroup]) => {
+                          const filterName = `filters.${filterKey}`;
+                          const orderedFilterGroupOptions = orderBy(
+                            Object.values(filterGroup.options),
+                            'order',
+                          );
 
-                            return (
-                              <FormFieldCheckboxGroupsMenu
-                                disabled={formState.isSubmitting}
-                                groupLabel={filterGroup.legend}
-                                hint={filterGroup.hint}
-                                key={filterKey}
-                                legend={filterGroup.legend}
-                                name={filterName}
-                                open={openFilterGroups.includes(filterKey)}
-                                options={orderedFilterGroupOptions.map(
-                                  group => ({
-                                    legend: group.label,
-                                    options: group.options,
-                                  }),
-                                )}
-                                order={[]}
-                                onToggle={isOpen => {
-                                  setOpenFilterGroups(groups =>
-                                    isOpen
-                                      ? [...groups, filterKey]
-                                      : groups.filter(
-                                          group => group !== filterKey,
-                                        ),
-                                  );
-                                }}
-                              />
-                            );
-                          },
-                        )}
+                          return (
+                            <FormFieldCheckboxGroupsMenu
+                              disabled={formState.isSubmitting}
+                              groupLabel={filterGroup.legend}
+                              hint={filterGroup.hint}
+                              key={filterKey}
+                              legend={filterGroup.legend}
+                              name={filterName}
+                              open={openFilterGroups.includes(filterKey)}
+                              options={orderedFilterGroupOptions.map(group => ({
+                                legend: group.label,
+                                options: group.options,
+                              }))}
+                              order={[]}
+                              onToggle={isOpen => {
+                                setOpenFilterGroups(groups =>
+                                  isOpen
+                                    ? [...groups, filterKey]
+                                    : groups.filter(
+                                        group => group !== filterKey,
+                                      ),
+                                );
+                              }}
+                            />
+                          );
+                        })}
                       </div>
                     </FormFieldset>
                   )}
@@ -402,7 +604,6 @@ export default function FiltersForm({
             </Form>
           );
         }
-
         const values = getValues();
 
         return (
@@ -426,7 +627,7 @@ export default function FiltersForm({
                     ))}
                 </CollapsibleList>
               </SummaryListItem>
-              {nonHierarchiedFilters
+              {filterGroups
                 .filter(([groupKey]) => !!values.filters[groupKey])
                 .map(([filterGroupKey, filterGroup]) => (
                   <SummaryListItem

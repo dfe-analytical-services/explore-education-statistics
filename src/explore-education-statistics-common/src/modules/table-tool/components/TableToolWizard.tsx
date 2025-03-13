@@ -44,6 +44,7 @@ import tableBuilderService, {
 import React, { ReactElement, ReactNode, useMemo, useState } from 'react';
 import { useImmer } from 'use-immer';
 import { Dictionary } from 'lodash';
+import { filterHierarchySeparator } from './FilterHierarchyOptions';
 
 const defaultLocationStepTitle = 'Choose locations';
 const defaultDataSetStepTitle = 'Select a data set';
@@ -372,7 +373,7 @@ export default function TableToolWizard({
         releaseVersionId,
       );
 
-      const dummyMeta: SubjectMeta = {
+      /* const dummyMeta: SubjectMeta = {
         filters: {
           LevelOfQualification: {
             id: '16c91df8-c533-41bb-5a07-08dd45241022',
@@ -644,7 +645,7 @@ export default function TableToolWizard({
             ],
           },
         ],
-      };
+      }; */
 
       const indicatorValues = new Set(
         Object.values(nextSubjectMeta.indicators).flatMap(indicator =>
@@ -667,13 +668,13 @@ export default function TableToolWizard({
       );
 
       updateState(draft => {
-        // draft.subjectMeta.indicators = nextSubjectMeta.indicators;
-        // draft.subjectMeta.filters = nextSubjectMeta.filters;
-        // draft.subjectMeta.filterHierarchies = nextSubjectMeta.filterHierarchies;
+        draft.subjectMeta.indicators = nextSubjectMeta.indicators;
+        draft.subjectMeta.filters = nextSubjectMeta.filters;
+        draft.subjectMeta.filterHierarchies = nextSubjectMeta.filterHierarchies;
 
-        draft.subjectMeta.indicators = dummyMeta.indicators;
-        draft.subjectMeta.filters = dummyMeta.filters;
-        draft.subjectMeta.filterHierarchies = dummyMeta.filterHierarchies;
+        // draft.subjectMeta.indicators = dummyMeta.indicators;
+        // draft.subjectMeta.filters = dummyMeta.filters;
+        // draft.subjectMeta.filterHierarchies = dummyMeta.filterHierarchies;
 
         draft.query.indicators = filteredIndicators;
         draft.query.filters = filteredFilters;
@@ -711,6 +712,7 @@ export default function TableToolWizard({
   };
 
   const handleFiltersFormSubmit: FilterFormSubmitHandler = async ({
+    filterHierarchies,
     filters,
     indicators,
   }) => {
@@ -718,9 +720,16 @@ export default function TableToolWizard({
       draft.response = undefined;
     });
 
+    const fhhhh = Object.values(filterHierarchies)
+      .map(fhValues =>
+        fhValues.map(idCombo => idCombo.split(filterHierarchySeparator)),
+      )
+      .flat()
+      .flat();
+
     const updatedReleaseTableDataQuery: ReleaseTableDataQuery = {
       ...state.query,
-      filters: Object.values(filters).flat(),
+      filters: [...Object.values(filters).flat(), ...fhhhh],
       indicators,
     };
 

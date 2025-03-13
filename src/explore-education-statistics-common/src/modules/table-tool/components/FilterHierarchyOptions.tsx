@@ -1,26 +1,26 @@
-import { FormCheckbox, FormFieldCheckbox } from '@common/components/form';
-import useRegister from '@common/components/form/hooks/useRegister';
-import classNames from 'classnames';
-import { useFormContext } from 'react-hook-form';
-import getFilterHierarchyColumns from '../utils/getFilterHierarchyColumns';
-import React, { memo } from 'react';
+import { FormCheckbox } from '@common/components/form';
 import FormField from '@common/components/form/FormField';
+import classNames from 'classnames';
+import React, { memo } from 'react';
 
-export type FilterHierarchyOptionsTree = {
-  value: string;
+export type FilterHierarchyOptionsTree<T=string> = {
+  value: T;
   label: string;
-  options?: FilterHierarchyOptionsTree;
+  options?: FilterHierarchyOptionsTree<T>;
 }[];
 
 interface FilterHierarchyOptionsProps {
   disabled?: boolean;
-  id: string;
+  id?: string;
   level?: number;
   name: string;
   optionsTree?: FilterHierarchyOptionsTree;
   totalColumns: number;
   value: string[];
+  hideLowerTotals?: boolean;
 }
+
+export const filterHierarchySeparator = ', ';
 
 function FilterHierarchyOptions({
   disabled,
@@ -29,6 +29,7 @@ function FilterHierarchyOptions({
   optionsTree,
   totalColumns,
   value = [],
+  hideLowerTotals = true,
   ...props
 }: FilterHierarchyOptionsProps) {
   if (!optionsTree) {
@@ -37,27 +38,34 @@ function FilterHierarchyOptions({
 
   return (
     <div
-      className={classNames(
-        'govuk-checkboxes',
-        {
-          'govuk-checkboxes--small': true,
-        },
-        getFilterHierarchyColumns(totalColumns - level, totalColumns),
-      )}
+      className={classNames('govuk-checkboxes', {
+        'govuk-checkboxes--small': true,
+      })}
     >
-      {level === 0 && JSON.stringify({ name: props.name, value })}
       {optionsTree.map(option => {
-        const key = `${id}.${option.value}`;
+        const key = `${id ? `${id}.` : ``}${option.value}`;
         return (
-          <div key={key} className="govuk-grid-row govuk-!-margin-bottom-2">
-            <div className={getFilterHierarchyColumns(1, totalColumns - level)}>
+          <div
+            id={id}
+            key={key}
+            className="govuk-!-margin-left-8 govuk-!-margin-bottom-2"
+          >
+            {hideLowerTotals &&
+            level !== 0 &&
+            option.label.toLocaleLowerCase() === 'total' &&
+            hideLowerTotals ? null : (
               <FormField
+                {...option}
+                label={`${option.label} (${
+                  option.value.split(filterHierarchySeparator).length
+                }) ${option.value}`}
                 name={props.name}
                 as={FormCheckbox}
-                {...option}
                 id={key}
+                checked={!!option.value && value.includes(option.value)}
+                disabled={disabled}
               />
-            </div>
+            )}
             <FilterHierarchyOptions
               {...props}
               id={key}
@@ -69,7 +77,6 @@ function FilterHierarchyOptions({
           </div>
         );
       })}
-      {level !== 0 && <hr />}
     </div>
   );
 }
