@@ -16,6 +16,11 @@ internal class ContentApiHealthCheckStrategy(
         }
         var contentApiClient = contentApiClientFactory();
         var pingResult = await contentApiClient.Ping(cancellationToken);
-        return new HealthCheckResult(pingResult.WasSuccesssful, pingResult.ErrorMessage ?? "Connection to Content API:OK");
+        
+        return new(
+            pingResult.WasSuccesssful, 
+            pingResult.WasSuccesssful
+                ? "Connection to Content API:OK"
+                : pingResult.ErrorMessage ?? "Connection to Content API:Failed");
     }
 }
