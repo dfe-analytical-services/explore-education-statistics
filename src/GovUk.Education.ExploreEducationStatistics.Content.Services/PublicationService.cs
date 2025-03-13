@@ -204,6 +204,7 @@ public class PublicationService : IPublicationService
         {
             Id = publication.Id,
             Title = publication.Title,
+            Summary = publication.Summary,
             Slug = publication.Slug,
             Theme = new ThemeViewModel(
                 theme.Id,
