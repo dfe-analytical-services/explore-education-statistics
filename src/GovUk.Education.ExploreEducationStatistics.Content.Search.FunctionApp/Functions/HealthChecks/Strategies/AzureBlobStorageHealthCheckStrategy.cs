@@ -38,6 +38,6 @@ internal class AzureBlobStorageHealthCheckStrategy(
             return new HealthCheckResult(false, $"Error occurred whilst trying to check for Azure blob storage container '{containerName}': {e.Message}");
         }
         
-        return new HealthCheckResult(true);
+        return new HealthCheckResult(true, "Connection to Azure blob storage container:OK");
     }
 }
