@@ -3,7 +3,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Clie
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Domain;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Exceptions;
 
-namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Tests.Clients;
+namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Tests.Clients.ContentApi;
 
 public class ContentApiClientTests
 {

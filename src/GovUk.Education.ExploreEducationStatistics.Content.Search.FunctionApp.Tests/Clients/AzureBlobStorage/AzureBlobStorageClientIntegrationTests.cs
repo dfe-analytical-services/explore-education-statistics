@@ -1,12 +1,11 @@
 ﻿using Azure.Storage.Blobs;
-using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Clients;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Clients.AzureBlobStorage;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Exceptions;
 using Microsoft.Extensions.Logging;
 using Moq;
 using Blob = GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Clients.AzureBlobStorage.Blob;
 
-namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Tests.Clients;
+namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Tests.Clients.AzureBlobStorage;
 
 public class AzureBlobStorageClientIntegrationTests
 {
