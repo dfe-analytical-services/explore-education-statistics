@@ -8,15 +8,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.
 /// </summary>
 public static class SearchableDocumentAzureBlobMetadataKeys
 {
-    public const string ReleaseVersionId = "RELEASE-VERSION-ID";
-    public const string PublicationSlug = "PUBLICATION-SLUG";
-    public const string ReleaseSlug = "RELEASE-SLUG";
-    public const string Published = "PUBLISHED";
-    public const string Summary = "SUMMARY";
-    public const string Title = "TITLE";
-    public const string Theme = "THEME";
-    public const string ReleaseType = "RELEASE-TYPE";
-    public const string TypeBoost = "TYPE-BOOST";
+    public const string ReleaseVersionId = "ReleaseVersionId";
+    public const string PublicationSlug = "PublicationSlug";
+    public const string ReleaseSlug = "ReleaseSlug";
+    public const string Published = "Published";
+    public const string Summary = "Summary";
+    public const string Title = "Title";
+    public const string Theme = "Theme";
+    public const string ReleaseType = "ReleaseType";
+    public const string TypeBoost = "TypeBoost";
 }
 
 public static class ReleaseSearchableDocumentExtensions
