@@ -26,12 +26,20 @@ trigger:
       - test
   paths:
     exclude:
-      - infrastructure/
+      - infrastructure/**
+      - src/GovUk.Education.ExploreEducationStatistics.Content.Search*/**
 
 pr:
-  - master
-  - dev
-  - test
+  branches:
+    include:
+      - master
+      - dev
+      - test
+  drafts: false
+  paths:
+    exclude:
+      - infrastructure/**
+      - src/GovUk.Education.ExploreEducationStatistics.Content.Search*/**
 
 jobs:
   - job: BackendVerify
@@ -250,22 +258,6 @@ jobs:
         inputs:
           artifactName: processor
           targetPath: $(Build.ArtifactStagingDirectory)/processor
-
-      - task: DotNetCoreCLI@2
-        displayName: Package Search Function App
-        inputs:
-          command: publish
-          publishWebProjects: false
-          projects: '**/GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.csproj'
-          arguments: --configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)/search-function-app
-          zipAfterPublish: True
-
-      - task: PublishPipelineArtifact@1
-        displayName: Publish Search Function App artifact
-        condition: and(succeeded(), eq(variables.IsBranchDeployable, true))
-        inputs:
-          artifactName: search-function-app
-          targetPath: $(Build.ArtifactStagingDirectory)/search-function-app
 
   - job: Admin
     pool: ees-ubuntu2204-xlarge

@@ -1,4 +1,15 @@
-trigger: none
+trigger:
+  branches:
+    include:
+      - master
+      - dev
+      - test
+  paths:
+    include:
+      - infrastructure/templates/common/**
+      - infrastructure/templates/search/**
+
+pr: none
 
 parameters:
   - name: deployAlerts
@@ -20,9 +31,13 @@ parameters:
 
 resources:
   pipelines:
-    - pipeline: MainBuild
-      source: Explore Education Statistics
-      trigger: none
+    - pipeline: SearchBuild
+      source: EES - Search - Build
+      trigger:
+        branches:
+          - master
+          - dev
+          - test
 
 variables:
   - group: Common
