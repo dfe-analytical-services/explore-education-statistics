@@ -88,7 +88,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
                 {
                     return _tableBuilderService.Query(releaseVersionId,
                             request.Query.AsFullTableQuery(),
-                            null,
                             cancellationToken)
                         .OnSuccess<ActionResult, TableBuilderResultViewModel, PermalinkViewModel>(async tableResult =>
                         {

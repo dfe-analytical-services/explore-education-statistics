@@ -67,7 +67,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             var result = await service.GetSubjectMeta(
                 releaseVersionId: Guid.NewGuid(),
                 query,
-                boundaryLevelId: null,
+                // boundaryLevelId: null, // @MarkFix
                 []);
 
             result.AssertNotFound();
@@ -139,9 +139,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             locationService
                 .Setup(s => s.GetLocationViewModels(
                     It.IsAny<List<Location>>(),
-                    It.IsAny<long?>(),
                     It.IsAny<Dictionary<GeographicLevel, List<string>>>()))
-                .ReturnsAsync([]);
+                .Returns([]);
 
             footnoteRepository.Setup(s => s.GetFilteredFootnotes(
                     releaseVersion.Id,
@@ -178,7 +177,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 var result = await service.GetSubjectMeta(
                     releaseVersion.Id,
                     query,
-                    boundaryLevelId: null,
+                    //boundaryLevelId: null, // @MarkFix
                     observations);
 
                 VerifyAllMocks(
@@ -310,9 +309,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             locationService
                 .Setup(s => s.GetLocationViewModels(
                     It.IsAny<List<Location>>(),
-                    It.IsAny<long?>(),
                     It.IsAny<Dictionary<GeographicLevel, List<string>>>()))
-                .ReturnsAsync([]);
+                .Returns([]);
 
             boundaryLevelRepository.Setup(s => s.FindByGeographicLevels(
                     new List<GeographicLevel>
@@ -365,7 +363,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 var result = await service.GetSubjectMeta(
                     releaseVersion.Id,
                     query,
-                    boundaryLevelId: null,
+                    //boundaryLevelId: null, // @MarkFix
                     observations);
 
                 VerifyAllMocks(

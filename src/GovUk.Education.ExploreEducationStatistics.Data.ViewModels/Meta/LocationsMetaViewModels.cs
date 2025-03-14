@@ -17,7 +17,7 @@ public record LocationAttributeViewModel : LabelValue
 {
     public Guid? Id { get; set; }
 
-    public Feature? GeoJson { get; init; }
+    public Feature? GeoJson { get; init; } // @MarkFix see if we can remove this?
 
     [JsonConverter(typeof(StringEnumConverter), typeof(CamelCaseNamingStrategy))]
     public GeographicLevel? Level { get; init; }

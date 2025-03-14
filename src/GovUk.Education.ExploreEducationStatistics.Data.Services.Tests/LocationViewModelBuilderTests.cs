@@ -194,8 +194,8 @@ public class LocationViewModelBuilderTests
 
         var result =
             (IDictionary<GeographicLevel, List<LocationAttributeViewModel>>)BuildLocationAttributeViewModels(locations,
-                hierarchies: null,
-                boundaryData);
+                hierarchies: null);
+                //boundaryData); // @MarkFix
 
         Assert.Equal(3, result.Count);
 
@@ -428,8 +428,8 @@ public class LocationViewModelBuilderTests
 
         var result =
             (IDictionary<GeographicLevel, List<LocationAttributeViewModel>>)BuildLocationAttributeViewModels(locations,
-                hierarchies,
-                geoJson);
+                hierarchies);
+                //geoJson); // @MarkFix
 
         Assert.Single(result);
 

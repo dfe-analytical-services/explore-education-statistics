@@ -109,8 +109,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                         );
                         return await service.Query(
                             releaseVersionId: releaseVersion.Id,
-                            new FullTableQuery { SubjectId = releaseSubject.SubjectId },
-                            boundaryLevelId: null
+                            new FullTableQuery { SubjectId = releaseSubject.SubjectId }
+                            //boundaryLevelId: null // @MarkFix
                         );
                     }
                 );

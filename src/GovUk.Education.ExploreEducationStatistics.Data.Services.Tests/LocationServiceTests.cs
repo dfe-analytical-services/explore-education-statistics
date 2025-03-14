@@ -25,7 +25,7 @@ public class LocationServiceTests
     {
         _context = InMemoryStatisticsDbContext();
         _boundaryDataRepository = new Mock<IBoundaryDataRepository>(Strict);
-        _sut = new LocationService(_context, _boundaryDataRepository.Object);
+        _sut = new LocationService();
     }
 
     private readonly Country _england = new("E92000001", "England");
@@ -145,9 +145,8 @@ public class LocationServiceTests
         await _context.SaveChangesAsync();
 
         // Act
-        var result = await _sut.GetLocationViewModels(
+        var result = _sut.GetLocationViewModels(
             locations,
-            null,
             hierarchies);
 
         // Assert
@@ -299,9 +298,9 @@ public class LocationServiceTests
                 });
 
         // Act
-        var result = await _sut.GetLocationViewModels(
+        var result = _sut.GetLocationViewModels(
             locations,
-            boundaryLevelId: 123,
+            //boundaryLevelId: 123, // @MarkFix
             hierarchies);
 
         // Assert

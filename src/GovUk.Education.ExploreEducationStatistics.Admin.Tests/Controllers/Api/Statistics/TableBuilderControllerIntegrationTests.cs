@@ -72,7 +72,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                 .Setup(s => s.Query(
                     ReleaseVersionId,
                     ItIs.DeepEqualTo(FullTableQuery),
-                    It.IsAny<long?>(),
                     It.IsAny<CancellationToken>()))
                 .ReturnsAsync(_tableBuilderResults);
 

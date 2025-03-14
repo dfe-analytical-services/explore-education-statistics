@@ -184,7 +184,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                         s => s.GetSubjectMeta(
                             releaseVersion.Id,
                             query,
-                            It.IsAny<long?>(),
                             It.IsAny<IList<Observation>>()
                         )
                     )
@@ -580,7 +579,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                         s => s.GetSubjectMeta(
                             releaseSubject.ReleaseVersionId,
                             query,
-                            It.IsAny<long?>(),
                             It.IsAny<IList<Observation>>()
                         )
                     )
@@ -592,7 +590,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     subjectResultMetaService: subjectResultMetaService.Object
                 );
 
-                var result = await service.Query(releaseSubject.ReleaseVersionId, query, null);
+                var result = await service.Query(releaseSubject.ReleaseVersionId, query);  //, null); // @MarkFix
 
                 VerifyAllMocks(observationService, subjectResultMetaService);
 
@@ -666,8 +664,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 // Query using a non-existent release version id
                 var result = await service.Query(
                     releaseVersionId: Guid.NewGuid(),
-                    query,
-                    boundaryLevelId: null);
+                    query);
+                    //boundaryLevelId: null); // @MarkFix
 
                 result.AssertNotFound();
             }
@@ -712,8 +710,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
                 var result = await service.Query(
                     releaseVersionId: releaseVersion.Id,
-                    query,
-                    boundaryLevelId: null);
+                    query);
+                    //boundaryLevelId: null); // @MarkFix
 
                 result.AssertNotFound();
             }
@@ -793,8 +791,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
                 var result = await service.Query(
                     releaseVersionId: releaseSubject.ReleaseVersionId,
-                    query,
-                    boundaryLevelId: null);
+                    query);
+                    //boundaryLevelId: null); // @MarkFix
 
                 VerifyAllMocks(filterItemRepository);
 
