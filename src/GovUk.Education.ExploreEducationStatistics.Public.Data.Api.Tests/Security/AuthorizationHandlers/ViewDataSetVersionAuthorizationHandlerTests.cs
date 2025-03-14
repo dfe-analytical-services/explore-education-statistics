@@ -285,7 +285,6 @@ public class ViewDataSetVersionAuthorizationHandlerTests
         Assert.False(context.HasSucceeded);
     }
 
-
     private static KeyValuePair<string, StringValues> PreviewTokenRequestHeader(PreviewToken previewToken)
     {
         return new KeyValuePair<string, StringValues>(RequestHeaderNames.PreviewToken, previewToken.Id.ToString());
@@ -298,6 +297,8 @@ public class ViewDataSetVersionAuthorizationHandlerTests
         string? userAgentValue = null,
         ClaimsPrincipal? claimsPrincipal = null)
     {
+        var dbContext = publicDataDbContext ?? Mock.Of<PublicDataDbContext>();
+        
         var httpContextAccessor = new HttpContextAccessor
         {
             HttpContext = new DefaultHttpContext
@@ -320,15 +321,13 @@ public class ViewDataSetVersionAuthorizationHandlerTests
             .SetupGet(s => s.EnvironmentName)
             .Returns(environmentName ?? Environments.Production);
 
+        var previewTokenService = new PreviewTokenService(dbContext);
+
         var authorizationHandlerService = new AuthorizationHandlerService(
             httpContextAccessor: httpContextAccessor,
-            environment: environment.Object);
-
-        var previewTokenService = new PreviewTokenService(publicDataDbContext);
-
-        return new ViewDataSetVersionAuthorizationHandler(
-            authorizationHandlerService,
-            httpContextAccessor,
+            environment: environment.Object,
             previewTokenService);
+
+        return new ViewDataSetVersionAuthorizationHandler(authorizationHandlerService);
     }
 }
