@@ -86,7 +86,6 @@ var resourceNames = {
       adminApp: '${legacyResourcePrefix}-snet-ees-admin'
       screenerFunction: '${resourcePrefix}-snet-${abbreviations.webSitesFunctions}-screener'
       screenerFunctionPrivateEndpoints: '${resourcePrefix}-snet-${abbreviations.webSitesFunctions}-screener-pep'
-      screenerFunctionStoragePrivateEndpoints: '${resourcePrefix}-snet-${abbreviations.storageStorageAccounts}-screener-pep'
     }
   }
   screener: {

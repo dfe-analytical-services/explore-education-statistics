@@ -19,7 +19,7 @@ parameters:
     default: none
 
 variables:
-  - group: Screener Infrastructure - Common
+  - group: Common
   - name: forceDeployToEnvironment
     value: ${{parameters.forceDeployToEnvironment}}
   - name: isDev

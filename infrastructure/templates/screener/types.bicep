@@ -8,7 +8,6 @@ type ResourceNames = {
     subnets: {
       screenerFunction: string
       screenerFunctionPrivateEndpoints: string
-      screenerFunctionStoragePrivateEndpoints: string
       adminApp: string
     }
   }
