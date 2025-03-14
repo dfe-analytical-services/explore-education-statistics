@@ -93,6 +93,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
             {
                 Id = publicationId,
                 Title = "Publication Title",
+                Summary = "This is the publication summary",
                 Theme = new ThemeViewModelBuilder().WithTitle("the theme"),
                 Slug = "publication-slug",
                 
@@ -166,7 +167,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
                     () => Assert.Equal(releaseId, actual.ReleaseVersionId), 
                     () => Assert.Equal(publishedTimestamp, actual.Published), 
                     () => Assert.Equal("Publication Title", actual.PublicationTitle), 
-                    () => Assert.Equal("This is the release summary", actual.Summary), 
+                    () => Assert.Equal("This is the publication summary", actual.Summary), 
                     () => Assert.Equal("the theme", actual.Theme), 
                     () => Assert.Equal("OfficialStatistics", actual.Type), 
                     () => Assert.Equal(releaseType.ToSearchDocumentTypeBoost(), actual.TypeBoost), 

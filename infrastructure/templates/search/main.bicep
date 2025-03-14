@@ -1,4 +1,5 @@
-import { abbreviations } from 'abbreviations.bicep'
+import { abbreviations } from '../common/abbreviations.bicep'
+import { IpRange } from '../common/types.bicep'
 
 @description('Environment : Subscription name e.g. s101d01. Used as a prefix for created resources.')
 param subscription string = ''
@@ -25,10 +26,95 @@ param dateProvisioned string = utcNow('u')
 @description('Do Azure Monitor alerts need creating or updating?')
 param deployAlerts bool = false
 
-@description('Does the Search Service need creating or updating?')
-param deploySearchService bool = false
+@description('The URL of the Content API.')
+param contentApiUrl string
+
+@description('Specifies whether or not the Search Docs Function App already exists.')
+param searchDocsFunctionAppExists bool = true
+
+@description('Provides access to resources for specific IP address ranges used for service maintenance.')
+param maintenanceIpRanges IpRange[] = []
 
 var tagValues = union(resourceTags ?? {}, {
   Environment: environmentName
   DateProvisioned: dateProvisioned
 })
+
+var maintenanceFirewallRules = [
+  for maintenanceIpRange in maintenanceIpRanges: {
+    name: maintenanceIpRange.name
+    cidr: maintenanceIpRange.cidr
+    tag: 'Default'
+    priority: 100
+  }
+]
+
+var resourcePrefix = '${subscription}-ees'
+
+var resourceNames = {
+  existingResources: {
+    keyVault: '${subscription}-kv-ees-01'
+    vNet: '${subscription}-vnet-ees'
+    alertsGroup: '${subscription}-ag-ees-alertedusers'
+    subnets: {
+      searchDocsFunction: '${resourcePrefix}-snet-${abbreviations.webSitesFunctions}-searchdocs'
+      searchDocsFunctionPrivateEndpoints: '${resourcePrefix}-snet-${abbreviations.webSitesFunctions}-searchdocs-pep'
+      searchStoragePrivateEndpoints: '${resourcePrefix}-snet-${abbreviations.storageStorageAccounts}-search-pep'
+    }
+  }
+}
+
+// Create a shared Application Insights resource for Search resources to use.
+module applicationInsightsModule 'application/searchApplicationInsights.bicep' = {
+  name: 'searchApplicationInsightsModule'
+  params: {
+    location: location
+    resourcePrefix: resourcePrefix
+    resourceNames: resourceNames
+    tagValues: tagValues
+  }
+}
+
+module searchDocsFunctionModule 'application/searchDocsFunction.bicep' = {
+  name: 'searchDocsFunctionModule'
+  params: {
+    location: location
+    resourceNames: resourceNames
+    resourcePrefix: resourcePrefix
+    contentApiUrl: contentApiUrl
+    functionAppExists: searchDocsFunctionAppExists
+    functionAppFirewallRules: union(
+      [
+        {
+          cidr: 'AzureCloud'
+          tag: 'ServiceTag'
+          priority: 101
+          name: 'AzureCloud'
+        }
+      ],
+      maintenanceFirewallRules
+    )
+    searchStorageAccountName: searchServiceModule.outputs.searchStorageAccountName
+    searchStorageAccountConnectionStringSecretName: searchServiceModule.outputs.searchStorageAccountConnectionStringSecretName
+    searchableDocumentsContainerName: searchServiceModule.outputs.searchableDocumentsContainerName
+    storageFirewallRules: maintenanceIpRanges
+    applicationInsightsConnectionString: applicationInsightsModule.outputs.applicationInsightsConnectionString
+    tagValues: tagValues
+    deployAlerts: deployAlerts
+  }
+}
+
+module searchServiceModule 'application/searchService.bicep' = {
+  name: 'searchServiceModule'
+  params: {
+    location: location
+    resourceNames: resourceNames
+    resourcePrefix: resourcePrefix
+    storageFirewallRules: maintenanceIpRanges
+    deployAlerts: deployAlerts
+    tagValues: tagValues
+  }
+}
+
+output searchDocsFunctionAppUrl string = searchDocsFunctionModule.outputs.functionAppUrl
+output searchServiceEndpoint string = searchServiceModule.outputs.searchServiceEndpoint

@@ -5,14 +5,14 @@ using Newtonsoft.Json.Converters;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
 
-public record ReleaseCacheViewModel
+public record ReleaseCacheViewModel(Guid Id)
 {
-    public ReleaseCacheViewModel(Guid id)
-    {
-        Id = id;
-    }
+    /// <summary>
+    /// Release Version Id
+    /// </summary>
+    public Guid Id { get; set; } = Id;
 
-    public Guid Id { get; set; }
+    public Guid ReleaseId { get; set; }
 
     public string Title { get; set; } = string.Empty;
 

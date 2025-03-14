@@ -350,12 +350,12 @@ public abstract class ReleasesControllerIntegrationTests(TestApplicationFactory 
 
             var latestPublishedReleaseVersion = oldRelease.Versions[1];
 
-            var oldReleaseCachedViewModel = new ReleaseCacheViewModel(id: latestPublishedReleaseVersion.Id);
+            var oldReleaseCachedViewModel = new ReleaseCacheViewModel(latestPublishedReleaseVersion.Id);
             var oldReleaseCacheKey = new ReleaseCacheKey(
                 publicationSlug: publication.Slug,
                 releaseSlug: oldRelease.Slug);
 
-            var oldLatestReleaseCachedViewModel = new ReleaseCacheViewModel(id: latestPublishedReleaseVersion.Id);
+            var oldLatestReleaseCachedViewModel = new ReleaseCacheViewModel(latestPublishedReleaseVersion.Id);
             var oldLatestReleaseCacheKey = new ReleaseCacheKey(
                 publicationSlug: publication.Slug);
 
@@ -484,12 +484,12 @@ public abstract class ReleasesControllerIntegrationTests(TestApplicationFactory 
 
             var latestPublishedReleaseVersion = oldRelease.Versions[1];
 
-            var oldReleaseCachedViewModel = new ReleaseCacheViewModel(id: latestPublishedReleaseVersion.Id);
+            var oldReleaseCachedViewModel = new ReleaseCacheViewModel(latestPublishedReleaseVersion.Id);
             var oldReleaseCacheKey = new ReleaseCacheKey(
                 publicationSlug: publication.Slug,
                 releaseSlug: oldRelease.Slug);
 
-            var oldLatestReleaseCachedViewModel = new ReleaseCacheViewModel(id: latestPublishedReleaseVersion.Id);
+            var oldLatestReleaseCachedViewModel = new ReleaseCacheViewModel(latestPublishedReleaseVersion.Id);
             var oldLatestReleaseCacheKey = new ReleaseCacheKey(
                 publicationSlug: publication.Slug);
 

@@ -1,0 +1,21 @@
+{
+  "version": "2.0",
+  "logging": {
+    "applicationInsights": {
+      "samplingSettings": {
+        "isEnabled": true,
+        "excludedTypes": "Request;Exception;Trace"
+      },
+      "enableLiveMetricsFilters": true
+    },
+    "logLevel": {
+      "default": "Error",
+      "Function": "Information"
+    }
+  },
+  "extensions": {
+    "queues": {
+      "maxPollingInterval": "00:00:02"
+    }
+  }
+}

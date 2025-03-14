@@ -8,7 +8,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Requests;
 
 public record PermalinkCreateRequest
 {
-    public Guid? ReleaseId { get; init; }
+    public Guid? ReleaseVersionId { get; init; }
 
     public TableBuilderConfiguration Configuration { get; init; } = new();
 

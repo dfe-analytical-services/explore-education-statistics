@@ -38,7 +38,9 @@ internal class DataSetQueryService(
     IParquetFilterRepository filterRepository,
     IParquetIndicatorRepository indicatorRepository,
     IParquetLocationRepository locationRepository,
-    IParquetTimePeriodRepository timePeriodRepository)
+    IParquetTimePeriodRepository timePeriodRepository,
+    IQueryAnalyticsManager queryAnalyticsManager,
+    ILogger<DataSetQueryService> logger)
     : IDataSetQueryService
 {
     private static readonly Dictionary<string, string> ReservedSorts = new()
@@ -78,19 +80,16 @@ internal class DataSetQueryService(
 
         return await FindDataSetVersion(dataSetId, dataSetVersion, cancellationToken)
             .OnSuccessDo(userService.CheckCanQueryDataSetVersion)
-            .OnSuccess(dsv => RunQuery(
+            .OnSuccess(dsv => RunQueryWithAnalytics(
                 dataSetVersion: dsv,
                 query: query,
                 cancellationToken: cancellationToken
             ))
-            .OnSuccess(results => results with
-            {
-                Warnings = results.Warnings.Select(MapGetQueryWarning).ToList()
-            })
+            .OnSuccess(results => results with { Warnings = results.Warnings.Select(MapGetQueryWarning).ToList() })
             .OnFailureFailWith(result =>
                 result is not BadRequestObjectResult { Value: ValidationProblemViewModel validationProblem }
-                ? result
-                : ValidationUtils.ValidationResult(validationProblem.Errors.Select(MapGetQueryError))
+                    ? result
+                    : ValidationUtils.ValidationResult(validationProblem.Errors.Select(MapGetQueryError))
             );
     }
 
@@ -102,7 +101,7 @@ internal class DataSetQueryService(
     {
         return await FindDataSetVersion(dataSetId, dataSetVersion, cancellationToken)
             .OnSuccessDo(userService.CheckCanQueryDataSetVersion)
-            .OnSuccess(dsv => RunQuery(
+            .OnSuccess(dsv => RunQueryWithAnalytics(
                 dataSetVersion: dsv,
                 query: request,
                 cancellationToken: cancellationToken,
@@ -120,16 +119,62 @@ internal class DataSetQueryService(
 
         if (dataSetVersion is null)
         {
-            return await publicDataDbContext.DataSets
+            return await publicDataDbContext
+                .DataSets
                 .AsNoTracking()
                 .Include(ds => ds.LatestLiveVersion)
+                .ThenInclude(dsv => dsv != null ? dsv.DataSet : null)
                 .Where(ds => ds.Id == dataSetId)
                 .Select(ds => ds.LatestLiveVersion!)
                 .SingleOrNotFoundAsync(cancellationToken);
         }
 
-        return await publicDataDbContext.DataSetVersions.AsNoTracking()
+        return await publicDataDbContext
+            .DataSetVersions
+            .AsNoTracking()
+            .Include(dsv => dsv.DataSet)
             .FindByVersion(dataSetId, dataSetVersion, cancellationToken);
+    }
+    
+    private async Task<Either<ActionResult, DataSetQueryPaginatedResultsViewModel>> RunQueryWithAnalytics(
+        DataSetVersion dataSetVersion,
+        DataSetQueryRequest query,
+        CancellationToken cancellationToken,
+        string baseCriteriaPath = "")
+    {
+        var startTime = DateTime.UtcNow;
+
+        return await 
+            RunQuery(
+                dataSetVersion: dataSetVersion,
+                query: query,
+                cancellationToken: cancellationToken,
+                baseCriteriaPath: baseCriteriaPath)
+            .OnSuccessDo(async results =>
+            {
+                try
+                {
+                    await queryAnalyticsManager.AddQuery(
+                        request: new CaptureDataSetVersionQueryRequest(
+                            DataSetId: dataSetVersion.DataSetId,
+                            DataSetVersionId: dataSetVersion.Id,
+                            DataSetVersion: dataSetVersion.SemVersion().ToString(),
+                            DataSetTitle: dataSetVersion.DataSet.Title,
+                            Query: query,
+                            ResultsCount: results.Results.Count,
+                            TotalRowsCount: results.Paging.TotalResults,
+                            StartTime: startTime,
+                            EndTime: DateTime.UtcNow),
+                        cancellationToken: cancellationToken);
+                }
+                catch (Exception e)
+                {
+                    logger.LogError(
+                        exception: e,
+                        message: "Error whilst adding a query to {QueryManager}",
+                        nameof(IQueryAnalyticsManager));
+                }
+            });
     }
 
     private async Task<Either<ActionResult, DataSetQueryPaginatedResultsViewModel>> RunQuery(
@@ -191,7 +236,8 @@ internal class DataSetQueryService(
 
         var rowsTask = dataRepository.ListRows(
             dataSetVersion: dataSetVersion,
-            columns: [
+            columns:
+            [
                 DataTable.Cols.TimePeriodId,
                 DataTable.Cols.GeographicLevel,
                 ..columnMappings.Columns
@@ -326,8 +372,7 @@ internal class DataSetQueryService(
     private static bool TryGetSortColumn(
         DataSetQuerySort sort,
         ColumnMappings columnMappings,
-        [NotNullWhen(true)]
-        out string? column)
+        [NotNullWhen(true)] out string? column)
     {
         column = null;
 
@@ -423,7 +468,7 @@ internal class DataSetQueryService(
             GetFilterOptionsById(dataSetVersion, filterOptionIds, debug, cancellationToken);
         var locationOptionsById =
             GetLocationOptionsById(dataSetVersion, locationOptionIds, debug, cancellationToken);
-        var timePeriodsById = 
+        var timePeriodsById =
             GetTimePeriodsById(dataSetVersion, timePeriodIds, cancellationToken);
 
         await Task.WhenAll(filterOptionsById, locationOptionsById, timePeriodsById);

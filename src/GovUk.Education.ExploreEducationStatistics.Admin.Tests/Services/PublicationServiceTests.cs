@@ -21,6 +21,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityPolicies;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.MapperUtils;
@@ -2445,7 +2446,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(releaseVersion.Release.TimePeriodCoverage, summaryViewModel.TimePeriodCoverage);
                 Assert.Equal(releaseVersion.Published, summaryViewModel.Published);
                 Assert.Equal(releaseVersion.Live, summaryViewModel.Live);
-                Assert.Equal(releaseVersion.PublishScheduled, summaryViewModel.PublishScheduled);
+                Assert.Equal(releaseVersion.PublishScheduled?.ConvertUtcToUkTimeZone(), summaryViewModel.PublishScheduled);
                 Assert.Equal(releaseVersion.NextReleaseDate, summaryViewModel.NextReleaseDate);
                 Assert.Equal(releaseVersion.ApprovalStatus, summaryViewModel.ApprovalStatus);
                 Assert.Equal(releaseVersion.Amendment, summaryViewModel.Amendment);
