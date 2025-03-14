@@ -1,0 +1,23 @@
+@import '~govuk-frontend/dist/govuk/base';
+
+.exportDropdown {
+  position: relative;
+  margin-bottom: govuk-spacing(2);
+}
+
+.exportMenu {
+  background-color: govuk-colour('white');
+  position: absolute;
+  z-index: 1;
+  border: 1px solid govuk-colour('black');
+  width: max-content;
+  padding: 5px;
+}
+
+.exportCloseButton {
+  margin-top: govuk-spacing(6);
+}
+
+.exportMenu button {
+  padding: 2px 15px;
+}
