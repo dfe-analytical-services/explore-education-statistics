@@ -19,9 +19,11 @@ jobs:
       runOnce:
         deploy:
           steps:
-            - download: MainBuild
-              displayName: Download Search Docs Function App artifact
-              artifact: search-function-app
+            - download: SearchBuild
+              displayName: Download artifacts
+              artifact: drop
+              patterns: |
+                GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.zip
 
             - template: ../../../public-api/ci/tasks/bicep-output-variables.yml
               parameters:
@@ -40,11 +42,11 @@ jobs:
                   az functionapp deployment source config-zip \
                     --resource-group $(resourceGroupName) \
                     --name $(searchDocsFunctionAppName) \
-                    --src '$(Pipeline.Workspace)/MainBuild/search-function-app/GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.zip'
+                    --src '$(Pipeline.Workspace)/SearchBuild/drop/GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.zip'
 
             - template: ../../../public-api/ci/tasks/wait-for-endpoint-success.yml
               parameters:
                 serviceConnection: ${{ parameters.serviceConnection }}
-                displayName: Check the Search Docs Function App is healthy after deployment
+                displayName: 'Health check'
                 endpoint: $(searchDocsFunctionAppUrl)/api/HealthCheck
 
