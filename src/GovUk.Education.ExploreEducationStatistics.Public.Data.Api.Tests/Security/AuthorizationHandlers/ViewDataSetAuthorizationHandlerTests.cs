@@ -24,7 +24,7 @@ public class ViewDataSetAuthorizationHandlerTests
     [Theory]
     [MemberData(nameof(DataSetStatusTheoryData.AvailableStatuses),
         MemberType = typeof(DataSetStatusTheoryData))]
-    public void DataSetHasAvailableStatus_Success(DataSetStatus status)
+    public async Task DataSetHasAvailableStatus_Success(DataSetStatus status)
     {
         DataSet dataSet = _dataFixture
             .DefaultDataSet()
@@ -33,7 +33,7 @@ public class ViewDataSetAuthorizationHandlerTests
         var handler = BuildHandler();
         var context = CreateAnonymousAuthContext<ViewDataSetRequirement, DataSet>(dataSet);
 
-        handler.HandleAsync(context);
+        await handler.HandleAsync(context);
 
         Assert.True(context.HasSucceeded);
     }
@@ -41,7 +41,7 @@ public class ViewDataSetAuthorizationHandlerTests
     [Theory]
     [MemberData(nameof(DataSetStatusTheoryData.UnavailableStatuses),
         MemberType = typeof(DataSetStatusTheoryData))]
-    public void DataSetHasUnavailableStatus_Failure(DataSetStatus status)
+    public async Task DataSetHasUnavailableStatus_Failure(DataSetStatus status)
     {
         DataSet dataSet = _dataFixture
             .DefaultDataSet()
@@ -50,7 +50,7 @@ public class ViewDataSetAuthorizationHandlerTests
         var handler = BuildHandler();
         var context = CreateAnonymousAuthContext<ViewDataSetRequirement, DataSet>(dataSet);
 
-        handler.HandleAsync(context);
+        await handler.HandleAsync(context);
 
         Assert.False(context.HasSucceeded);
     }
@@ -58,7 +58,7 @@ public class ViewDataSetAuthorizationHandlerTests
     [Theory]
     [MemberData(nameof(DataSetStatusTheoryData.AllStatuses),
         MemberType = typeof(DataSetStatusTheoryData))]
-    public void PreviewTokenForDraftDataSetVersionActive_Success(DataSetStatus status)
+    public async Task PreviewTokenForDraftDataSetVersionActive_Success(DataSetStatus status)
     {
         DataSet dataSet = _dataFixture
             .DefaultDataSet()
@@ -83,7 +83,7 @@ public class ViewDataSetAuthorizationHandlerTests
             ]);
         var context = CreateAnonymousAuthContext<ViewDataSetRequirement, DataSet>(dataSet);
 
-        handler.HandleAsync(context);
+        await handler.HandleAsync(context);
 
         Assert.True(context.HasSucceeded);
     }
@@ -95,7 +95,7 @@ public class ViewDataSetAuthorizationHandlerTests
     [Theory]
     [MemberData(nameof(DataSetStatusTheoryData.AvailableStatuses),
         MemberType = typeof(DataSetStatusTheoryData))]
-    public void PreviewTokenForDraftDataSetVersionExpired_DataSetStatusAvailable_Success(DataSetStatus status)
+    public async Task PreviewTokenForDraftDataSetVersionExpired_DataSetStatusAvailable_Success(DataSetStatus status)
     {
         DataSet dataSet = _dataFixture
             .DefaultDataSet()
@@ -120,7 +120,7 @@ public class ViewDataSetAuthorizationHandlerTests
             ]);
         var context = CreateAnonymousAuthContext<ViewDataSetRequirement, DataSet>(dataSet);
 
-        handler.HandleAsync(context);
+        await handler.HandleAsync(context);
 
         Assert.True(context.HasSucceeded);
     }
@@ -132,7 +132,7 @@ public class ViewDataSetAuthorizationHandlerTests
     [Theory]
     [MemberData(nameof(DataSetStatusTheoryData.UnavailableStatuses),
         MemberType = typeof(DataSetStatusTheoryData))]
-    public void PreviewTokenForDraftDataSetVersionExpired_DataSetStatusUnavailable_Failure(DataSetStatus status)
+    public async Task PreviewTokenForDraftDataSetVersionExpired_DataSetStatusUnavailable_Failure(DataSetStatus status)
     {
         DataSet dataSet = _dataFixture
             .DefaultDataSet()
@@ -157,7 +157,7 @@ public class ViewDataSetAuthorizationHandlerTests
             ]);
         var context = CreateAnonymousAuthContext<ViewDataSetRequirement, DataSet>(dataSet);
 
-        handler.HandleAsync(context);
+        await handler.HandleAsync(context);
 
         Assert.False(context.HasSucceeded);
     }
@@ -169,7 +169,7 @@ public class ViewDataSetAuthorizationHandlerTests
     [Theory]
     [MemberData(nameof(DataSetStatusTheoryData.AvailableStatuses),
         MemberType = typeof(DataSetStatusTheoryData))]
-    public void PreviewTokenActiveButForLiveDataSetVersion_DataSetStatusAvailable_Success(DataSetStatus status)
+    public async Task PreviewTokenActiveButForLiveDataSetVersion_DataSetStatusAvailable_Success(DataSetStatus status)
     {
         DataSet dataSet = _dataFixture
             .DefaultDataSet()
@@ -194,7 +194,7 @@ public class ViewDataSetAuthorizationHandlerTests
             ]);
         var context = CreateAnonymousAuthContext<ViewDataSetRequirement, DataSet>(dataSet);
 
-        handler.HandleAsync(context);
+        await handler.HandleAsync(context);
 
         Assert.True(context.HasSucceeded);
     }
@@ -206,7 +206,7 @@ public class ViewDataSetAuthorizationHandlerTests
     [Theory]
     [MemberData(nameof(DataSetStatusTheoryData.UnavailableStatuses),
         MemberType = typeof(DataSetStatusTheoryData))]
-    public void PreviewTokenActiveButForLiveDataSetVersion_DataSetStatusUnavailable_Failure(DataSetStatus status)
+    public async Task PreviewTokenActiveButForLiveDataSetVersion_DataSetStatusUnavailable_Failure(DataSetStatus status)
     {
         DataSet dataSet = _dataFixture
             .DefaultDataSet()
@@ -231,7 +231,7 @@ public class ViewDataSetAuthorizationHandlerTests
             ]);
         var context = CreateAnonymousAuthContext<ViewDataSetRequirement, DataSet>(dataSet);
 
-        handler.HandleAsync(context);
+        await handler.HandleAsync(context);
 
         Assert.False(context.HasSucceeded);
     }
