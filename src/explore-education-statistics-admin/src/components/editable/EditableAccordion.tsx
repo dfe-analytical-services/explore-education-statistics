@@ -116,6 +116,7 @@ const EditableAccordion = (props: EditableAccordionProps) => {
             onClick={onAddSection}
             className={styles.addSectionButton}
             disabled={isReordering}
+            preventDoubleClick={false}
           >
             Add new section
           </Button>
