@@ -73,6 +73,7 @@ const DownloadTable = ({
           <Form
             id="downloadTableForm"
             onSubmit={async ({ fileFormat }) => {
+              // @MarkFix record analytics here - could be table tool or permalink
               await onSubmit?.(fileFormat);
 
               if (fileFormat === 'csv') {

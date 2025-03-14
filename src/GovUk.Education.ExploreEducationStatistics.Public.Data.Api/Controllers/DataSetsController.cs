@@ -281,7 +281,7 @@ public class DataSetsController(
     )]
     [SwaggerResponse(403, type: typeof(ProblemDetailsViewModel), contentTypes: MediaTypeNames.Application.Json)]
     [SwaggerResponse(404, type: typeof(ProblemDetailsViewModel), contentTypes: MediaTypeNames.Application.Json)]
-    public async Task<ActionResult> DownloadDataSetCsv(
+    public async Task<ActionResult> DownloadDataSetCsv( // @MarkFix This is public api so don't record analytics for this, I think?
         [SwaggerParameter("The ID of the data set.")] Guid dataSetId,
         [SwaggerParameter("""
                           The data set version e.g. 1.0, 1.1, 2.0, etc.
