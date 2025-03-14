@@ -86,7 +86,7 @@ jobs:
           targetType: inline
           script: |
             docker run --rm -t \
-              -v $(System.DefaultWorkingDirectory)/src/$(PublicApiDir)/bin/$(BuildConfiguration)/net8.0:/api \
+              -v $(System.DefaultWorkingDirectory)/src/artifacts/bin/$(PublicApiDir)/${{ lower(variables.BuildConfiguration) }}:/api \
               -v $(System.DefaultWorkingDirectory)/src/$(PublicApiDocsDir):/api-docs \
               -v $(System.DefaultWorkingDirectory)/ci/scripts:/scripts \
               --entrypoint /bin/sh \
