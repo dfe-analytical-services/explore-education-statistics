@@ -137,7 +137,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 })
                 .OnSuccessDo(async publication =>
                 {
-                    if (publication.SupercededById != updatedPublication.SupersededById)
+                    if (publication.SupersededById != updatedPublication.SupersededById)
                     {
                         return await userService.CheckCanUpdatePublication();
                     }
@@ -209,7 +209,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     publication.Summary = updatedPublication.Summary;
                     publication.ThemeId = updatedPublication.ThemeId;
                     publication.Updated = DateTime.UtcNow;
-                    publication.SupercededById = updatedPublication.SupersededById;
+                    publication.SupersededById = updatedPublication.SupersededById;
 
                     context.Publications.Update(publication);
 
@@ -247,7 +247,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             // NOTE: When a publication is updated, any publication that is superseded by it can be affected, so
             // update any superseded publications that are cached
             var supersededPublications = await context.Publications
-                .Where(p => p.SupercededById == publication.Id)
+                .Where(p => p.SupersededById == publication.Id)
                 .ToListAsync();
 
             await supersededPublications

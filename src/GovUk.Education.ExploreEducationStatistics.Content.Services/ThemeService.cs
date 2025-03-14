@@ -24,7 +24,7 @@ public class ThemeService : IThemeService
             .Where(theme =>
                 theme.Publications.Any(publication =>
                     publication.LatestPublishedReleaseVersionId.HasValue &&
-                    (publication.SupercededById == null ||
+                    (publication.SupersededById == null ||
                     !publication.SupersededBy!.LatestPublishedReleaseVersionId.HasValue)))
             .OrderBy(theme => theme.Title)
             .Select(theme => new ThemeViewModel(

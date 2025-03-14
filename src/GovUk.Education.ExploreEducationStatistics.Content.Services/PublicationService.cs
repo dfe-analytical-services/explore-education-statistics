@@ -121,7 +121,7 @@ public class PublicationService : IPublicationService
         // Publications must have a published release and not be superseded
         var baseQueryable = _contentDbContext.Publications
             .Where(p => p.LatestPublishedReleaseVersionId.HasValue &&
-                        (p.SupercededById == null || !p.SupersededBy!.LatestPublishedReleaseVersionId.HasValue));
+                        (p.SupersededById == null || !p.SupersededBy!.LatestPublishedReleaseVersionId.HasValue));
 
         // Retrieve only requested publication IDs if specified
         if (publicationIds is not null)
@@ -335,7 +335,7 @@ public class PublicationService : IPublicationService
                 .Include(p => p.Releases)
                 .ThenInclude(r => r.Versions)
                 .Where(p => p.LatestPublishedReleaseVersionId.HasValue &&
-                            (p.SupercededById == null || !p.SupersededBy!.LatestPublishedReleaseVersionId.HasValue))
+                            (p.SupersededById == null || !p.SupersededBy!.LatestPublishedReleaseVersionId.HasValue))
                 .Select(p => new PublicationSitemapItemViewModel
                 {
                     Slug = p.Slug,

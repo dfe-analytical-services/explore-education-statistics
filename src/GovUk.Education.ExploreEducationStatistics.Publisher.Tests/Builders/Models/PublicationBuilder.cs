@@ -5,7 +5,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Builders.Mo
 
 public class PublicationBuilder(Guid publicationId, string publicationSlug)
 {
-    private Guid? _supercededByPublicationId;
+    private Guid? _supersededByPublicationId;
 
     public Publication Build()
     {
@@ -13,14 +13,14 @@ public class PublicationBuilder(Guid publicationId, string publicationSlug)
         {
             Id = publicationId,
             Slug = publicationSlug,
-            SupercededById = _supercededByPublicationId
+            SupersededById = _supersededByPublicationId
         };
         return publication;
     }
 
-    public PublicationBuilder SupercededBy(Guid supercededByPublicationId)
+    public PublicationBuilder SupersededBy(Guid supersededByPublicationId)
     {
-        _supercededByPublicationId = supercededByPublicationId;
+        _supersededByPublicationId = supersededByPublicationId;
         return this;
     }
 }

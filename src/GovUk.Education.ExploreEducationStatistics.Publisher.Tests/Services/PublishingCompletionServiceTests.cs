@@ -149,7 +149,7 @@ public class PublishingCompletionServiceTests
 
                 _publication1 = new PublicationBuilder(PublicationId1, "publication-slug-1").Build();
                 _publication2 = new PublicationBuilder(PublicationId2, "publication-slug-2").Build();
-                _publication22SupercededBy2 = new PublicationBuilder(PublicationId22, "publication-slug-22").SupercededBy(_publication2.Id).Build();
+                _publication22SupercededBy2 = new PublicationBuilder(PublicationId22, "publication-slug-22").SupersededBy(_publication2.Id).Build();
                 
                 _releaseServiceBuilder.WhereGetReturns(ReleaseVersionId1, _releaseVersion1);
                 _releaseServiceBuilder.WhereGetReturns(ReleaseVersionId2, _releaseVersion2);

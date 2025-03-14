@@ -510,7 +510,7 @@ public class PublicationSubscriptionFunctionsTests(NotifierFunctionsIntegrationT
             contentDbContext.Publications.Add(new Publication
             {
                 Id = supersededPublicationId,
-                SupercededById = publicationId,
+                SupersededById = publicationId,
             });
             await contentDbContext.SaveChangesAsync();
         }

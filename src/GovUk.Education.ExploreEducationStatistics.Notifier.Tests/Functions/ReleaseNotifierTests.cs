@@ -72,7 +72,7 @@ public class ReleaseNotifierTests
                 Id = supersededPubId,
                 Title = "Superseded publication",
                 Slug = "superseded-publication",
-                SupercededById = publication1Id,
+                SupersededById = publication1Id,
             });
             await context.SaveChangesAsync();
         }
@@ -244,7 +244,7 @@ public class ReleaseNotifierTests
                 Id = supersededPubId,
                 Title = "Superseded publication",
                 Slug = "superseded-publication",
-                SupercededById = publicationId,
+                SupersededById = publicationId,
             });
             await context.SaveChangesAsync();
         }
@@ -344,14 +344,14 @@ public class ReleaseNotifierTests
                     Id = supersededPub1Id,
                     Title = "Superseded 1 publication",
                     Slug = "superseded-1-publication",
-                    SupercededById = publicationId,
+                    SupersededById = publicationId,
                 },
                 new Publication
                 {
                     Id = supersededPub2Id,
                     Title = "Superseded 2 publication",
                     Slug = "superseded-2-publication",
-                    SupercededById = publicationId,
+                    SupersededById = publicationId,
                 });
             await context.SaveChangesAsync();
         }
@@ -438,7 +438,7 @@ public class ReleaseNotifierTests
                 Id = supersededPubId,
                 Title = "Superseded publication",
                 Slug = "superseded-publication",
-                SupercededById = publicationId,
+                SupersededById = publicationId,
             });
             await context.SaveChangesAsync();
         }

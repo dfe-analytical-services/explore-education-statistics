@@ -28,7 +28,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
             Publication publication)
         {
             // No user is allowed to create a new release of an archived publication
-            if (publication.SupercededById.HasValue)
+            if (publication.SupersededById.HasValue)
             {
                 return;
             }

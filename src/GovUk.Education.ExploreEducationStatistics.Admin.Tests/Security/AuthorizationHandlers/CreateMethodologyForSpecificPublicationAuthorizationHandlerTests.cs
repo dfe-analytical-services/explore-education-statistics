@@ -37,7 +37,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
         private static readonly Publication PublicationArchived = new()
         {
             Id = Guid.NewGuid(),
-            SupercededById = Guid.NewGuid()
+            SupersededById = Guid.NewGuid()
         };
 
         private static readonly Publication PublicationWithOwnedMethodology = new()

@@ -500,7 +500,7 @@ internal static class ReleaseFileQueryableExtensions
     private static IQueryable<ReleaseFile> HavingNoSupersededPublication(
         this IQueryable<ReleaseFile> query)
     {
-        return query.Where(rf => rf.ReleaseVersion.Release.Publication.SupercededById == null ||
+        return query.Where(rf => rf.ReleaseVersion.Release.Publication.SupersededById == null ||
                                  !rf.ReleaseVersion.Release.Publication.SupersededBy!.LatestPublishedReleaseVersionId.HasValue);
     }
 
