@@ -93,7 +93,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
             {
                 Id = publicationId,
                 Title = "Publication Title",
-                Summary = "<p>This is the publication summary</p>",
+                Summary = "This is the publication summary",
                 Theme = new ThemeViewModelBuilder().WithTitle("the theme"),
                 Slug = "publication-slug",
                 

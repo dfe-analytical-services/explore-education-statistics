@@ -28,7 +28,7 @@ public record ReleaseSearchViewModel
         ReleaseVersionId = releaseVersion.Id;
         Published = releaseVersion.Published ?? throw new ArgumentException("Release must have a published date");
         PublicationTitle = publication.Title;
-        Summary = publication.Summary.StripHtml();
+        Summary = publication.Summary;
         Theme = publication.Theme.Title;
         Type = releaseVersion.Type.ToString();
         TypeBoost = releaseVersion.Type.ToSearchDocumentTypeBoost();
