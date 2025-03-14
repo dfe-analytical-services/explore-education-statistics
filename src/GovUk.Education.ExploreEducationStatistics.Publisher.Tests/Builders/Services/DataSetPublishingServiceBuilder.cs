@@ -10,7 +10,7 @@ public class DataSetPublishingServiceBuilder
 {
     private readonly Mock<IDataSetPublishingService> _mock = new(MockBehavior.Strict);
     public IDataSetPublishingService Build() => _mock.Object;
-    public Asserter Assert => new Asserter(_mock);
+    public Asserter Assert => new(_mock);
     public DataSetPublishingServiceBuilder()
     {
         _mock

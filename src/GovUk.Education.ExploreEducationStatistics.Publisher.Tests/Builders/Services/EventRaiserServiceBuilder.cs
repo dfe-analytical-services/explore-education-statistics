@@ -6,7 +6,7 @@ using GovUk.Education.ExploreEducationStatistics.Publisher.Services;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 using Moq;
 
-namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Builders;
+namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Builders.Services;
 
 public class EventRaiserServiceBuilder
 {

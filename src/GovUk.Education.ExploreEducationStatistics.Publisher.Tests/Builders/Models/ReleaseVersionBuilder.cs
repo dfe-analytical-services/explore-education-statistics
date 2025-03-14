@@ -25,4 +25,10 @@ public class ReleaseVersionBuilder(Guid releaseVersionId)
         _publicationId = publicationId; // remove this line when EES-5818 removes ReleaseVersion.PublicationId
         return this;
     }
+    
+    public ReleaseVersionBuilder ForRelease(Func<ReleaseBuilder, ReleaseBuilder> modifyRelease)
+    {
+        modifyRelease(_releaseBuilder);
+        return this;
+    }
 }

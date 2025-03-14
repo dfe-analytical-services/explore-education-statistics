@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services;
-using GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Builders;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Builders.Models;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Builders.Services;
 using Xunit;
@@ -170,7 +169,7 @@ public class PublishingCompletionServiceTests
 
                 _publication1 = new PublicationBuilder(PublicationId1, _publicationSlug1).Build();
                 _publication2 = new PublicationBuilder(PublicationId2, _publicationSlug2).Build();
-                _publication22SupercededBy2 = new PublicationBuilder(PublicationId22, "publication-slug-22").SupercededBy(_publication2.Id).Build();
+                _publication22SupercededBy2 = new PublicationBuilder(PublicationId22, "publication-slug-22").SupersededBy(_publication2.Id).Build();
                 
                 _releaseServiceBuilder.WhereGetReturns(ReleaseVersionId1, _releaseVersion1);
                 _releaseServiceBuilder.WhereGetReturns(ReleaseVersionId2, _releaseVersion2);
