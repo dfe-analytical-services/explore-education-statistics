@@ -1,0 +1,10 @@
+namespace GovUk.Education.ExploreEducationStatistics.Analytics.Requests.Consumer.Services.Interfaces;
+
+public interface IAnalyticsPathResolver
+{
+    string PublicApiQueriesDirectoryPath();
+
+    string PublicApiQueriesProcessingDirectoryPath();
+
+    public string PublicApiQueriesReportsDirectoryPath();
+}

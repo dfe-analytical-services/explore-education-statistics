@@ -1,0 +1,66 @@
+{
+  "dataSetId": "01d29401-7274-a871-a8db-d4bc4e98c324",
+  "dataSetTitle": "Data Set 1",
+  "dataSetVersion": "1.2.0",
+  "dataSetVersionId": "01d29401-7974-1276-a06b-b28a6a5385c6",
+  "endTime": "2025-02-24T03:07:44.850Z",
+  "query": {
+    "criteria": {
+      "filters": {
+        "eq": "qOnjG"
+      },
+      "locations": {
+        "in": [
+          {
+            "id": "7zXob",
+            "level": "LA"
+          },
+          {
+            "id": "it6Xr",
+            "level": "LA"
+          },
+          {
+            "id": "IzBzg",
+            "level": "LA"
+          },
+          {
+            "id": "pTSoj",
+            "level": "LA"
+          },
+          {
+            "id": "dP0Zw",
+            "level": "NAT"
+          },
+          {
+            "id": "6jrfe",
+            "level": "REG"
+          },
+          {
+            "id": "LxWjE",
+            "level": "REG"
+          },
+          {
+            "id": "0kT5D",
+            "level": "SCH"
+          }
+        ]
+      },
+      "timePeriods": {
+        "notEq": {
+          "code": "AY",
+          "period": "2021/2022"
+        }
+      }
+    },
+    "debug": false,
+    "indicators": [
+      "7YFXo",
+      "dPe0Z"
+    ],
+    "page": 1,
+    "pageSize": 1000
+  },
+  "resultsCount": 44,
+  "startTime": "2025-02-24T03:07:44.710Z",
+  "totalRowsCount": 800
+}

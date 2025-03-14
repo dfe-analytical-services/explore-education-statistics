@@ -39,7 +39,8 @@ internal class DataSetQueryService(
     IParquetIndicatorRepository indicatorRepository,
     IParquetLocationRepository locationRepository,
     IParquetTimePeriodRepository timePeriodRepository,
-    IAnalyticsService analyticsService)
+    IQueryAnalyticsManager queryAnalyticsManager,
+    ILogger<DataSetQueryService> logger)
     : IDataSetQueryService
 {
     private static readonly Dictionary<string, string> ReservedSorts = new()
@@ -149,20 +150,30 @@ internal class DataSetQueryService(
                 query: query,
                 cancellationToken: cancellationToken,
                 baseCriteriaPath: baseCriteriaPath)
-            .OnSuccessDo(results =>
+            .OnSuccessDo(async results =>
             {
-                // Deliberately do not await this operation as we do not want to
-                // delay the return of the query to the end user.
-                _ = analyticsService.ReportDataSetVersionQuery(
-                    dataSetId: dataSetVersion.DataSetId,
-                    dataSetVersionId: dataSetVersion.Id,
-                    semVersion: dataSetVersion.SemVersion().ToString(),
-                    dataSetTitle: dataSetVersion.DataSet.Title,
-                    query: query,
-                    resultsCount: results.Results.Count,
-                    totalRowsCount: results.Paging.TotalResults,
-                    startTime: startTime,
-                    endTime: DateTime.UtcNow);
+                try
+                {
+                    await queryAnalyticsManager.AddQuery(
+                        request: new CaptureDataSetVersionQueryRequest(
+                            DataSetId: dataSetVersion.DataSetId,
+                            DataSetVersionId: dataSetVersion.Id,
+                            DataSetVersion: dataSetVersion.SemVersion().ToString(),
+                            DataSetTitle: dataSetVersion.DataSet.Title,
+                            Query: query,
+                            ResultsCount: results.Results.Count,
+                            TotalRowsCount: results.Paging.TotalResults,
+                            StartTime: startTime,
+                            EndTime: DateTime.UtcNow),
+                        cancellationToken: cancellationToken);
+                }
+                catch (Exception e)
+                {
+                    logger.LogError(
+                        exception: e,
+                        message: "Error whilst adding a query to {QueryManager}",
+                        nameof(IQueryAnalyticsManager));
+                }
             });
     }
 

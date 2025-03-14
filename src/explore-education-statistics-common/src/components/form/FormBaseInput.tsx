@@ -18,6 +18,7 @@ export interface FormBaseInputProps
   addOn?: ReactNode;
   addOnContainerClassName?: string;
   announceError?: boolean;
+  autoFocus?: boolean;
   className?: string;
   disabled?: boolean;
   error?: ReactNode | string;
