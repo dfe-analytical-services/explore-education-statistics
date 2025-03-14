@@ -1,8 +1,8 @@
-using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.ViewModels.Meta;
+using Microsoft.IdentityModel.Tokens;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.ViewModels;
 
@@ -13,12 +13,14 @@ public static class LocationViewModelBuilder
         Dictionary<GeographicLevel, List<string>>? hierarchies,
         Dictionary<GeographicLevel, Dictionary<string, BoundaryData>>? boundaryData = null)
     {
-        var locationAttributes = locations.GetLocationAttributesHierarchical(hierarchies);
+        var locationAttributes =
+            locations.GetLocationAttributesHierarchical(hierarchies);
         return locationAttributes.ToDictionary(
             levelAndLocationAttributes => levelAndLocationAttributes.Key,
             levelAndLocationAttributes =>
             {
-                var boundaryDataByCode = boundaryData?.GetValueOrDefault(levelAndLocationAttributes.Key);
+                var boundaryDataByCode =
+                    boundaryData?.GetValueOrDefault(levelAndLocationAttributes.Key);
                 return BuildLocationAttributeViewModels(levelAndLocationAttributes.Value, boundaryDataByCode);
             });
     }
@@ -40,40 +42,36 @@ public static class LocationViewModelBuilder
         IReadOnlyDictionary<string, BoundaryData>? boundaryDataByCode)
     {
         var locationAttribute = locationAttributeNode.Attribute;
-        return locationAttributeNode.IsLeaf
-            ? BuildLocationAttributeLeafViewModel(locationAttributeNode, boundaryDataByCode)
-            : new LocationAttributeViewModel
-            {
-                Label = locationAttribute.Name ?? string.Empty,
-                Level = locationAttribute.GeographicLevel,
-                Value = locationAttribute.GetCodeOrFallback(),
-                Options = BuildLocationAttributeViewModels(locationAttributeNode.Children, boundaryDataByCode)
-            };
-    }
 
-    private static LocationAttributeViewModel BuildLocationAttributeLeafViewModel(
-        LocationAttributeNode locationAttributeNode,
-        IReadOnlyDictionary<string, BoundaryData>? boundaryDataByCode)
-    {
-        var locationAttribute = locationAttributeNode.Attribute;
-        var code = locationAttribute.GetCodeOrFallback();
-
-        var feature = code.IsNullOrEmpty()
-            ? null
-            : boundaryDataByCode?.GetValueOrDefault(code)?.GeoJson;
-
-        if (feature != null)
+        if (locationAttributeNode.IsLeaf)
         {
-            feature.Properties.TryAdd("Code", BoundaryDataUtils.GetCode(feature.Properties));
-            feature.Properties.TryAdd("Name", BoundaryDataUtils.GetName(feature.Properties));
+            var code = locationAttribute.GetCodeOrFallback();
+
+            var feature = code.IsNullOrEmpty()
+                ? null
+                : boundaryDataByCode?.GetValueOrDefault(code)?.GeoJson;
+
+            if (feature != null)
+            {
+                feature.Properties.TryAdd("Code", BoundaryDataUtils.GetCode(feature.Properties));
+                feature.Properties.TryAdd("Name", BoundaryDataUtils.GetName(feature.Properties));
+            }
+
+            return new LocationAttributeViewModel
+            {
+                Id = locationAttributeNode.LocationId,
+                GeoJson = feature,
+                Label = locationAttribute.Name ?? string.Empty,
+                Value = code
+            };
         }
 
         return new LocationAttributeViewModel
         {
-            Id = locationAttributeNode.LocationId,
-            GeoJson = feature,
             Label = locationAttribute.Name ?? string.Empty,
-            Value = code
+            Level = locationAttribute.GeographicLevel,
+            Value = locationAttribute.GetCodeOrFallback(),
+            Options = BuildLocationAttributeViewModels(locationAttributeNode.Children, boundaryDataByCode)
         };
     }
 

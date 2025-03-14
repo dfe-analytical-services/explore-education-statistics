@@ -162,7 +162,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
                     s => s.Query(
                         releaseVersion.Id,
                         ItIs.DeepEqualTo(FullTableQuery),
-                        It.IsAny<long?>(),
                         It.IsAny<CancellationToken>()
                     )
                 )
@@ -265,7 +264,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
             var dataBlockService = new Mock<IDataBlockService>();
 
             dataBlockService
-                .Setup(s => s.GetDataBlockTableResult(releaseVersion.Id, dataBlockId, null))
+                .Setup(s => s.GetDataBlockTableResult(releaseVersion.Id, dataBlockId))
                 .ReturnsAsync(_tableBuilderResults);
 
             var client = SetupApp(dataBlockService: dataBlockService.Object)
@@ -393,7 +392,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
             var dataBlockService = new Mock<IDataBlockService>(Strict);
 
             dataBlockService
-                .Setup(s => s.GetDataBlockTableResult(releaseVersion.Id, dataBlockId, null))
+                .Setup(s => s.GetDataBlockTableResult(releaseVersion.Id, dataBlockId))
                 .ReturnsAsync(_tableBuilderResults);
 
             var client = SetupApp(dataBlockService: dataBlockService.Object)
@@ -466,7 +465,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
             var dataBlockService = new Mock<IDataBlockService>(Strict);
 
             dataBlockService
-                .Setup(s => s.GetDataBlockTableResult(releaseVersion.Id, dataBlockId, null))
+                .Setup(s => s.GetDataBlockTableResult(releaseVersion.Id, dataBlockId))
                 .ReturnsAsync(_tableBuilderResults);
 
             var client = SetupApp(dataBlockService: dataBlockService.Object)
@@ -543,7 +542,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
             var dataBlockService = new Mock<IDataBlockService>(Strict);
 
             dataBlockService
-                .Setup(s => s.GetDataBlockTableResult(releaseVersion.Id, dataBlockId, null))
+                .Setup(s => s.GetDataBlockTableResult(releaseVersion.Id, dataBlockId))
                 .ReturnsAsync(_tableBuilderResults);
 
             var client = SetupApp(
@@ -662,7 +661,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
             var dataBlockService = new Mock<IDataBlockService>(Strict);
 
             dataBlockService
-                .Setup(s => s.GetDataBlockTableResult(releaseVersion.Id, dataBlockId, null))
+                .Setup(s => s.GetDataBlockTableResult(releaseVersion.Id, dataBlockId))
                 .ReturnsAsync(_tableBuilderResults);
 
             var client = SetupApp(

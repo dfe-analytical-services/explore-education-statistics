@@ -147,7 +147,6 @@ public class LocationServiceTests
         // Act
         var result = await _sut.GetLocationViewModels(
             locations,
-            null,
             hierarchies);
 
         // Assert
@@ -166,7 +165,6 @@ public class LocationServiceTests
         Assert.Equal(_england.Code, countryOption1.Value);
         Assert.Null(countryOption1.Level);
         Assert.Null(countryOption1.Options);
-        Assert.Null(countryOption1.GeoJson);
 
         // Expect no hierarchy within the Region level
         var regions = result["region"];
@@ -178,7 +176,6 @@ public class LocationServiceTests
         Assert.Equal(_northEast.Code, regionOption1.Value);
         Assert.Null(regionOption1.Level);
         Assert.Null(regionOption1.Options);
-        Assert.Null(regionOption1.GeoJson);
 
         var regionOption2 = regions[1];
         Assert.Equal(location3.Id, regionOption2.Id);
@@ -186,7 +183,6 @@ public class LocationServiceTests
         Assert.Equal(_northWest.Code, regionOption2.Value);
         Assert.Null(regionOption2.Level);
         Assert.Null(regionOption2.Options);
-        Assert.Null(regionOption2.GeoJson);
 
         var regionOption3 = regions[2];
         Assert.Equal(location4.Id, regionOption3.Id);
@@ -194,7 +190,6 @@ public class LocationServiceTests
         Assert.Equal(_eastMidlands.Code, regionOption3.Value);
         Assert.Null(regionOption3.Level);
         Assert.Null(regionOption3.Options);
-        Assert.Null(regionOption3.GeoJson);
 
         // Expect a hierarchy of Country-Region-LA within the Local Authority level
         var localAuthorities = result["localAuthority"];
@@ -206,7 +201,6 @@ public class LocationServiceTests
         Assert.Equal(_england.Code, laOption1.Value);
         Assert.Equal(GeographicLevel.Country, laOption1.Level);
         Assert.NotNull(laOption1.Options);
-        Assert.Null(laOption1.GeoJson);
 
         var laOption1SubOption1 = Assert.Single(laOption1.Options!);
         Assert.NotNull(laOption1SubOption1);
@@ -216,7 +210,6 @@ public class LocationServiceTests
         Assert.Equal(GeographicLevel.Region, laOption1SubOption1.Level);
         Assert.NotNull(laOption1SubOption1.Options);
         Assert.Equal(2, laOption1SubOption1.Options!.Count);
-        Assert.Null(laOption1SubOption1.GeoJson);
 
         var laOption1SubOption1SubOption1 = laOption1SubOption1.Options[0];
         Assert.Equal(location5.Id, laOption1SubOption1SubOption1.Id);
@@ -224,7 +217,6 @@ public class LocationServiceTests
         Assert.Equal(_derby.Code, laOption1SubOption1SubOption1.Value);
         Assert.Null(laOption1SubOption1SubOption1.Level);
         Assert.Null(laOption1SubOption1SubOption1.Options);
-        Assert.Null(laOption1SubOption1SubOption1.GeoJson);
 
         var laOption1SubOption1SubOption2 = laOption1SubOption1.Options[1];
         Assert.Equal(location6.Id, laOption1SubOption1SubOption2.Id);
@@ -232,118 +224,5 @@ public class LocationServiceTests
         Assert.Equal(_nottingham.Code, laOption1SubOption1SubOption2.Value);
         Assert.Null(laOption1SubOption1SubOption2.Level);
         Assert.Null(laOption1SubOption1SubOption2.Options);
-        Assert.Null(laOption1SubOption1SubOption2.GeoJson);
-    }
-
-    [Fact]
-    public async Task GetLocationViewModels_WithBoundaryLevel_ReturnsViewModelsWithGeoJson()
-    {
-
-        var location1 = new Location
-        {
-            Id = Guid.NewGuid(),
-            GeographicLevel = GeographicLevel.Region,
-            Country = _england,
-            Region = _northEast
-        };
-
-        var location2 = new Location
-        {
-            Id = Guid.NewGuid(),
-            GeographicLevel = GeographicLevel.Region,
-            Country = _england,
-            Region = _northWest
-        };
-
-        var location3 = new Location
-        {
-            Id = Guid.NewGuid(),
-            GeographicLevel = GeographicLevel.Region,
-            Country = _england,
-            Region = _eastMidlands
-        };
-
-        var locations = new List<Location>
-        {
-            location1, location2, location3
-        };
-
-        var hierarchies = new Dictionary<GeographicLevel, List<string>>
-        {
-            {
-                GeographicLevel.Region, ["Country"]
-            }
-        };
-
-        _context.BoundaryLevel.Add(new() { Id = 123, Label = "Boundary Level 1", Level = GeographicLevel.Region });
-        await _context.SaveChangesAsync();
-
-        _boundaryDataRepository
-            .Setup(s => s.FindByBoundaryLevelAndCodes(
-                It.IsAny<long>(),
-                new List<string> { _northEast.Code!, _northWest.Code!, _eastMidlands.Code! }))
-            .Returns(new Dictionary<string, BoundaryData>
-                {
-                    {
-                        _northEast.Code!,
-                        _boundaryData
-                    },
-                    {
-                        _northWest.Code!,
-                        _boundaryData
-                    },
-                    {
-                        _eastMidlands.Code!,
-                        _boundaryData
-                    }
-                });
-
-        // Act
-        var result = await _sut.GetLocationViewModels(
-            locations,
-            boundaryLevelId: 123,
-            hierarchies);
-
-        // Assert
-        VerifyAllMocks(_boundaryDataRepository);
-
-        // Result only has a Region level
-        Assert.Single(result);
-        Assert.True(result.ContainsKey("region"));
-
-        // Expect a hierarchy of Country-Region within the Region level
-        var regions = result["region"];
-
-        // Country option that groups the Regions does not have GeoJson
-        var regionOption1 = Assert.Single(regions);
-        Assert.Null(regionOption1.Id);
-        Assert.Equal(_england.Name, regionOption1.Label);
-        Assert.Equal(_england.Code, regionOption1.Value);
-        Assert.Null(regionOption1.GeoJson);
-        Assert.Equal(GeographicLevel.Country, regionOption1.Level);
-        Assert.NotNull(regionOption1.Options);
-        Assert.Equal(3, regionOption1.Options!.Count);
-
-        // Each Region option should have GeoJson
-        var regionOption1SubOption1 = regionOption1.Options[0];
-        Assert.Equal(_northEast.Name, regionOption1SubOption1.Label);
-        Assert.Equal(_northEast.Code, regionOption1SubOption1.Value);
-        Assert.NotNull(regionOption1SubOption1.GeoJson);
-        Assert.Null(regionOption1SubOption1.Level);
-        Assert.Null(regionOption1SubOption1.Options);
-
-        var regionOption1SubOption2 = regionOption1.Options[1];
-        Assert.Equal(_northWest.Name, regionOption1SubOption2.Label);
-        Assert.Equal(_northWest.Code, regionOption1SubOption2.Value);
-        Assert.NotNull(regionOption1SubOption2.GeoJson);
-        Assert.Null(regionOption1SubOption2.Level);
-        Assert.Null(regionOption1SubOption2.Options);
-
-        var regionOption1SubOption3 = regionOption1.Options[2];
-        Assert.Equal(_eastMidlands.Name, regionOption1SubOption3.Label);
-        Assert.Equal(_eastMidlands.Code, regionOption1SubOption3.Value);
-        Assert.NotNull(regionOption1SubOption3.GeoJson);
-        Assert.Null(regionOption1SubOption3.Level);
-        Assert.Null(regionOption1SubOption3.Options);
     }
 }

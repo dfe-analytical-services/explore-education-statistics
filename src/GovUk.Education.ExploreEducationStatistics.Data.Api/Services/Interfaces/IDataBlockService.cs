@@ -13,8 +13,7 @@ public interface IDataBlockService
 {
     Task<Either<ActionResult, TableBuilderResultViewModel>> GetDataBlockTableResult(
         Guid releaseVersionId,
-        Guid dataBlockVersionId,
-        long? boundaryLevelId);
+        Guid dataBlockVersionId);
 
     Task<Either<ActionResult, Dictionary<string, List<LocationAttributeViewModel>>>> GetLocationsForDataBlock(
         Guid releaseVersionId,

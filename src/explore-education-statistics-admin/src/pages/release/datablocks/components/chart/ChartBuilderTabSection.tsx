@@ -104,7 +104,6 @@ const ChartBuilderTabSection = ({
       const tableData = await tableBuilderService.getTableData(
         nextQuery,
         releaseVersionId,
-        nextQuery.boundaryLevel,
       );
 
       onTableUpdate({

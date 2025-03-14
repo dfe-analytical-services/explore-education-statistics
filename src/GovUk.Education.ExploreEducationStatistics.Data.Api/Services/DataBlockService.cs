@@ -39,14 +39,13 @@ public class DataBlockService : IDataBlockService
 
     public async Task<Either<ActionResult, TableBuilderResultViewModel>> GetDataBlockTableResult(
         Guid releaseVersionId,
-        Guid dataBlockVersionId,
-        long? boundaryLevelId)
+        Guid dataBlockVersionId)
     {
         return await _persistenceHelper.CheckEntityExists<ReleaseVersion>(releaseVersionId)
             .OnSuccess(_userService.CheckCanViewReleaseVersion)
             .OnSuccess(() => CheckDataBlockVersionExists(releaseVersionId: releaseVersionId,
                 dataBlockVersionId: dataBlockVersionId))
-            .OnSuccess(dataBlock => _tableBuilderService.Query(releaseVersionId, dataBlock.Query, boundaryLevelId));
+            .OnSuccess(dataBlock => _tableBuilderService.Query(releaseVersionId, dataBlock.Query));
     }
 
     public async Task<Either<ActionResult, Dictionary<string, List<LocationAttributeViewModel>>>> GetLocationsForDataBlock(

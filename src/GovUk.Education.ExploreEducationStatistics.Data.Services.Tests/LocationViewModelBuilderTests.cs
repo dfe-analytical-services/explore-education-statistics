@@ -1,10 +1,8 @@
-using GeoJSON.Net.Geometry;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.ViewModels.Meta;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Data.ViewModels.LocationViewModelBuilder;
@@ -129,131 +127,6 @@ public class LocationViewModelBuilderTests
         Assert.Equal(_nottingham.Code, la2.Value);
         Assert.Null(la2.Level);
         Assert.Null(la2.Options);
-    }
-
-    [Fact]
-    public void BuildLocationAttributeViewModels_Flat_BoundaryDataProvided()
-    {
-        var locations = new List<Location>
-        {
-            new()
-            {
-                Id = Guid.NewGuid(),
-                GeographicLevel = GeographicLevel.Country,
-                Country = _england
-            },
-            new()
-            {
-                Id = Guid.NewGuid(),
-                GeographicLevel = GeographicLevel.Region,
-                Country = _england,
-                Region = _northEast
-            },
-            new()
-            {
-                Id = Guid.NewGuid(),
-                GeographicLevel = GeographicLevel.Region,
-                Country = _england,
-                Region = _northWest
-            },
-            new()
-            {
-                Id = Guid.NewGuid(),
-                GeographicLevel = GeographicLevel.Region,
-                Country = _england,
-                Region = _eastMidlands
-            },
-            new()
-            {
-                Id = Guid.NewGuid(),
-                GeographicLevel = GeographicLevel.LocalAuthority,
-                Country = _england,
-                Region = _northEast,
-                LocalAuthority = _sunderland
-            },
-            new()
-            {
-                Id = Guid.NewGuid(),
-                GeographicLevel = GeographicLevel.LocalAuthority,
-                Country = _england,
-                Region = _eastMidlands,
-                LocalAuthority = _derby
-            },
-            new()
-            {
-                Id = Guid.NewGuid(),
-                GeographicLevel = GeographicLevel.LocalAuthority,
-                Country = _england,
-                Region = _eastMidlands,
-                LocalAuthority = _nottingham
-            }
-        };
-
-        // Provide GeoJson for some but not all of the local authorities and not for any other level
-        var boundaryData = BuildBoundaryData(_derby, _sunderland);
-
-        var result =
-            (IDictionary<GeographicLevel, List<LocationAttributeViewModel>>)BuildLocationAttributeViewModels(locations,
-                hierarchies: null,
-                boundaryData);
-
-        Assert.Equal(3, result.Count);
-
-        var countries = Assert.Contains(GeographicLevel.Country, result);
-        var regions = Assert.Contains(GeographicLevel.Region, result);
-        var localAuthorities = Assert.Contains(GeographicLevel.LocalAuthority, result);
-
-        // Except no GeoJson at country level 
-        var country1 = Assert.Single(countries);
-        Assert.Equal(locations[0].Id, country1.Id);
-        Assert.Equal(_england.Name, country1.Label);
-        Assert.Equal(_england.Code, country1.Value);
-        Assert.Null(country1.GeoJson);
-
-        // Except no GeoJson at region level 
-        Assert.Equal(3, regions.Count);
-
-        var region1 = regions[0];
-        Assert.Equal(locations[1].Id, region1.Id);
-        Assert.Equal(_northEast.Name, region1.Label);
-        Assert.Equal(_northEast.Code, region1.Value);
-        Assert.Null(region1.GeoJson);
-
-        var region2 = regions[1];
-        Assert.Equal(locations[2].Id, region2.Id);
-        Assert.Equal(_northWest.Name, region2.Label);
-        Assert.Equal(_northWest.Code, region2.Value);
-        Assert.Null(region2.GeoJson);
-
-        var region3 = regions[2];
-        Assert.Equal(locations[3].Id, region3.Id);
-        Assert.Equal(_eastMidlands.Name, region3.Label);
-        Assert.Equal(_eastMidlands.Code, region3.Value);
-        Assert.Null(region3.GeoJson);
-
-        // Expect the local authorities to have the correct GeoJson if it was provided
-        Assert.Equal(3, localAuthorities.Count);
-
-        var la1 = localAuthorities[0];
-        Assert.Equal(locations[5].Id, la1.Id);
-        Assert.Equal(_derby.Name, la1.Label);
-        Assert.Equal(_derby.Code, la1.Value);
-        Assert.NotNull(la1.GeoJson);
-        Assert.Equal(_derby.Code, la1.GeoJson.Properties["Code"].ToString());
-
-        var la2 = localAuthorities[1];
-        Assert.Equal(locations[6].Id, la2.Id);
-        Assert.Equal(_nottingham.Name, la2.Label);
-        Assert.Equal(_nottingham.Code, la2.Value);
-        // GeoJson is missing as it was not provided for this code
-        Assert.Null(la2.GeoJson);
-
-        var la3 = localAuthorities[2];
-        Assert.Equal(locations[4].Id, la3.Id);
-        Assert.Equal(_sunderland.Name, la3.Label);
-        Assert.Equal(_sunderland.Code, la3.Value);
-        Assert.NotNull(la3.GeoJson);
-        Assert.Equal(_sunderland.Code, la3.GeoJson.Properties["Code"].ToString());
     }
 
     [Fact]
@@ -385,96 +258,6 @@ public class LocationViewModelBuilderTests
         Assert.Equal(_nottingham.Code, laOption1SubOption1SubOption2.Value);
         Assert.Null(laOption1SubOption1SubOption2.Level);
         Assert.Null(laOption1SubOption1SubOption2.Options);
-    }
-
-    [Fact]
-    public void BuildLocationAttributeViewModels_Hierarchical_BoundaryDataProvided()
-    {
-        var locations = new List<Location>
-        {
-            new()
-            {
-                Id = Guid.NewGuid(),
-                GeographicLevel = GeographicLevel.LocalAuthority,
-                Region = _northEast,
-                LocalAuthority = _sunderland
-            },
-            new()
-            {
-                Id = Guid.NewGuid(),
-                GeographicLevel = GeographicLevel.LocalAuthority,
-                Region = _eastMidlands,
-                LocalAuthority = _derby
-            },
-            new()
-            {
-                Id = Guid.NewGuid(),
-                GeographicLevel = GeographicLevel.LocalAuthority,
-                Region = _eastMidlands,
-                LocalAuthority = _nottingham
-            }
-        };
-
-        var hierarchies = new Dictionary<GeographicLevel, List<string>>
-        {
-            {
-                GeographicLevel.LocalAuthority,
-                ListOf("Region")
-            }
-        };
-
-        // Provide GeoJson for some but not all of the local authorities and not for any other level
-        var geoJson = BuildBoundaryData(_sunderland, _derby);
-
-        var result =
-            (IDictionary<GeographicLevel, List<LocationAttributeViewModel>>)BuildLocationAttributeViewModels(locations,
-                hierarchies,
-                geoJson);
-
-        Assert.Single(result);
-
-        var localAuthorities = Assert.Contains(GeographicLevel.LocalAuthority, result);
-
-        Assert.Equal(2, localAuthorities.Count);
-
-        // Expect a hierarchy of Region-LA within the Local Authority level
-        var laOption1 = localAuthorities[0];
-        Assert.Null(laOption1.Id);
-        Assert.Equal(_northEast.Name, laOption1.Label);
-        Assert.Equal(_northEast.Code, laOption1.Value);
-        Assert.Equal(GeographicLevel.Region, laOption1.Level);
-        Assert.Null(laOption1.GeoJson);
-        Assert.NotNull(laOption1.Options);
-
-        var laOption1SubOption1 = Assert.Single(laOption1.Options);
-        Assert.Equal(locations[0].Id, laOption1SubOption1.Id);
-        Assert.Equal(_sunderland.Name, laOption1SubOption1.Label);
-        Assert.Equal(_sunderland.Code, laOption1SubOption1.Value);
-        Assert.NotNull(laOption1SubOption1.GeoJson);
-        Assert.Equal(_sunderland.Code, laOption1SubOption1.GeoJson.Properties["Code"].ToString());
-
-        var laOption2 = localAuthorities[1];
-        Assert.Null(laOption2.Id);
-        Assert.Equal(_eastMidlands.Name, laOption2.Label);
-        Assert.Equal(_eastMidlands.Code, laOption2.Value);
-        Assert.Equal(GeographicLevel.Region, laOption2.Level);
-        Assert.Null(laOption2.GeoJson);
-        Assert.NotNull(laOption2.Options);
-        Assert.Equal(2, laOption2.Options.Count);
-
-        var laOption2SubOption1 = laOption2.Options[0];
-        Assert.Equal(locations[1].Id, laOption2SubOption1.Id);
-        Assert.Equal(_derby.Name, laOption2SubOption1.Label);
-        Assert.Equal(_derby.Code, laOption2SubOption1.Value);
-        Assert.NotNull(laOption2SubOption1.GeoJson);
-        Assert.Equal(_derby.Code, laOption2SubOption1.GeoJson.Properties["Code"].ToString());
-
-        var laOption2SubOption2 = laOption2.Options[1];
-        Assert.Equal(locations[2].Id, laOption2SubOption2.Id);
-        Assert.Equal(_nottingham.Name, laOption2SubOption2.Label);
-        Assert.Equal(_nottingham.Code, laOption2SubOption2.Value);
-        // GeoJson is missing as it was not provided for this code
-        Assert.Null(laOption2SubOption2.GeoJson);
     }
 
     [Fact]
@@ -834,33 +617,5 @@ public class LocationViewModelBuilderTests
             { "lat", 50 },
             { "GlobalID", "1277674d-5d60-457d-9322-833b31f77014" },
         };
-    }
-
-    private static Dictionary<GeographicLevel, Dictionary<string, BoundaryData>> BuildBoundaryData(
-        params LocationAttribute[] locationAttributes)
-    {
-        return locationAttributes
-            .GroupBy(locationAttribute => locationAttribute.GeographicLevel)
-            .ToDictionary(grouping => grouping.Key,
-                grouping => grouping.ToDictionary(locationAttribute => locationAttribute.Code,
-                    locationAttribute => new BoundaryData
-                    {
-                        Name = locationAttribute.Name,
-                        Code = locationAttribute.Code,
-                        BoundaryLevel = new()
-                        {
-                            Id = 1,
-                            Label = "Boundary Level 1",
-                            Level = GeographicLevel.Country,
-                            Published = DateTime.Now,
-                        },
-                        GeoJson = new(new MultiPolygon([[[
-                            [-71.17351189255714, 42.350224666504324],
-                            [-71.1677360907197, 42.34671571695422],
-                            [-71.16970919072628, 42.35326835618748],
-                            [-71.14341516047716, 42.36174674733808],
-                            [-71.17559093981981, 42.368232175909064],
-                            [-71.17351189255714, 42.350224666504324]]]]), BuildProperties(locationAttribute.Code, locationAttribute.Name), "1"),
-                    }));
     }
 }
