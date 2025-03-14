@@ -85,6 +85,22 @@ describe('ReleaseApiDataSetPreviewTokenPage', () => {
       screen.getByRole('heading', { name: 'Using the preview token' }),
     ).toBeInTheDocument();
 
+    expect(
+      screen.getByRole('heading', { name: 'Using the preview token' }),
+    ).toBeInTheDocument();
+
+    expect(screen.getByRole('tabpanel')).toBeInTheDocument();
+
+    expect(
+      within(screen.getByRole('tabpanel')).getByRole('heading', {
+        name: 'cURL',
+      }),
+    ).toBeInTheDocument();
+
+    expect(screen.getByRole('tabpanel')).toHaveTextContent(
+      /curl -X GET -H "Preview-Token: token-id" \\ http:\/\/public-api\/v1\/data-sets\/data-set-id/,
+    );
+
     expect(screen.getByLabelText('Preview token')).toHaveValue('token-id');
     expect(
       screen.getByRole('button', { name: 'Copy preview token' }),
@@ -109,26 +125,72 @@ describe('ReleaseApiDataSetPreviewTokenPage', () => {
         name: 'API data set details',
       }),
     ).toBeInTheDocument();
+
     expect(
       screen.getByRole('heading', {
-        name: 'Get data set summary',
+        name: 'Download data set as CSV',
       }),
     ).toBeInTheDocument();
+
+    expect(
+      screen.getByTestId('data-set-download-csv-endpoint'),
+    ).toBeInTheDocument();
+
+    expect(screen.getByTestId('data-set-download-csv-endpoint')).toHaveValue(
+      'http://public-api/v1/data-sets/data-set-id/csv?dataSetVersion=2.0',
+    );
+
     expect(
       screen.getByRole('heading', {
         name: 'Data set metadata',
       }),
     ).toBeInTheDocument();
+
+    expect(screen.getByTestId('data-set-meta-endpoint')).toBeInTheDocument();
+
+    expect(screen.getByTestId('data-set-meta-endpoint')).toHaveValue(
+      'http://public-api/v1/data-sets/data-set-id/meta?dataSetVersion=2.0',
+    );
+
     expect(
       screen.getByRole('heading', {
         name: 'Query data set using GET',
       }),
     ).toBeInTheDocument();
+
+    expect(
+      screen.getByTestId('data-set-get-query-endpoint'),
+    ).toBeInTheDocument();
+
+    expect(screen.getByTestId('data-set-get-query-endpoint')).toHaveValue(
+      'http://public-api/v1/data-sets/data-set-id/query?dataSetVersion=2.0',
+    );
+
     expect(
       screen.getByRole('heading', {
         name: 'Query data set using POST',
       }),
     ).toBeInTheDocument();
+
+    expect(
+      screen.getByTestId('data-set-post-query-endpoint'),
+    ).toBeInTheDocument();
+
+    expect(screen.getByTestId('data-set-post-query-endpoint')).toHaveValue(
+      'http://public-api/v1/data-sets/data-set-id/query?dataSetVersion=2.0',
+    );
+
+    expect(
+      screen.getByRole('heading', {
+        name: 'Get data set summary',
+      }),
+    ).toBeInTheDocument();
+
+    expect(screen.getByTestId('data-set-summary-endpoint')).toBeInTheDocument();
+
+    expect(screen.getByTestId('data-set-summary-endpoint')).toHaveValue(
+      'http://public-api/v1/data-sets/data-set-id',
+    );
   });
 
   test('shows a modal and calls the `onRevoke` handler on confirm when the revoke button is clicked', async () => {

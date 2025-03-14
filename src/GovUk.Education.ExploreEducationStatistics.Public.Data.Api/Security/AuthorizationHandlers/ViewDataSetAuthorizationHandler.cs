@@ -1,3 +1,4 @@
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using Microsoft.AspNetCore.Authorization;
 
@@ -5,9 +6,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Security.Au
 
 public class ViewDataSetRequirement : IAuthorizationRequirement;
 
-public class ViewDataSetAuthorizationHandler : AuthorizationHandler<ViewDataSetRequirement, DataSet>
+public class ViewDataSetAuthorizationHandler(IAuthorizationHandlerService authorizationHandlerService)
+    : AuthorizationHandler<ViewDataSetRequirement, DataSet>
 {
-    protected override Task HandleRequirementAsync(
+    protected override async Task HandleRequirementAsync(
         AuthorizationHandlerContext context,
         ViewDataSetRequirement requirement,
         DataSet dataSet)
@@ -15,8 +17,12 @@ public class ViewDataSetAuthorizationHandler : AuthorizationHandler<ViewDataSetR
         if (dataSet.Status is DataSetStatus.Published or DataSetStatus.Deprecated)
         {
             context.Succeed(requirement);
+            return;
         }
 
-        return Task.CompletedTask;
+        if (await authorizationHandlerService.RequestHasValidPreviewToken(dataSet))
+        {
+            context.Succeed(requirement);
+        }
     }
 }

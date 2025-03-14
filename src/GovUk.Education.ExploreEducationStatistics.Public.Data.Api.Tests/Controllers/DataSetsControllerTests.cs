@@ -1,3 +1,5 @@
+using System.Globalization;
+using System.Net.Mime;
 using CsvHelper;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
@@ -18,8 +20,6 @@ using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Primitives;
-using System.Globalization;
-using System.Net.Mime;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Controllers;
 
@@ -27,91 +27,298 @@ public abstract class DataSetsControllerTests(TestApplicationFactory testApp) : 
 {
     private const string BaseUrl = "v1/data-sets";
 
-    public class GetDataSetTests(TestApplicationFactory testApp) : DataSetsControllerTests(testApp)
+    public abstract class GetDataSetTests(TestApplicationFactory testApp) : DataSetsControllerTests(testApp)
     {
-        [Theory]
-        [MemberData(nameof(DataSetStatusTheoryData.AvailableStatuses),
-            MemberType = typeof(DataSetStatusTheoryData))]
-        public async Task DataSetIsAvailable_Returns200(DataSetStatus dataSetStatus)
+        public class PublishedDataSetTests(TestApplicationFactory testApp) : GetDataSetTests(testApp)
         {
-            DataSet dataSet = DataFixture
-                .DefaultDataSet()
-                .WithStatus(dataSetStatus);
-
-            await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
-
-            DataSetVersion dataSetVersion = DataFixture
-                .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 3)
-                .WithStatusPublished()
-                .WithDataSet(dataSet)
-                .FinishWith(dsv => dataSet.LatestLiveVersion = dsv);
-
-            await TestApp.AddTestData<PublicDataDbContext>(context =>
+            [Theory]
+            [MemberData(nameof(DataSetStatusTheoryData.AvailableStatuses),
+                MemberType = typeof(DataSetStatusTheoryData))]
+            public async Task DataSetIsAvailable_Returns200(DataSetStatus dataSetStatus)
             {
-                context.DataSetVersions.Add(dataSetVersion);
-                context.DataSets.Update(dataSet);
-            });
+                DataSet dataSet = DataFixture
+                    .DefaultDataSet()
+                    .WithStatus(dataSetStatus);
 
-            var response = await GetDataSet(dataSet.Id);
+                await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
 
-            var content = response.AssertOk<DataSetViewModel>(useSystemJson: true);
+                DataSetVersion dataSetVersion = DataFixture
+                    .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 3)
+                    .WithStatusPublished()
+                    .WithDataSet(dataSet)
+                    .FinishWith(dsv => dataSet.LatestLiveVersion = dsv);
 
-            Assert.NotNull(content);
-            Assert.Equal(dataSet.Id, content.Id);
-            Assert.Equal(dataSet.Title, content.Title);
-            Assert.Equal(dataSet.Summary, content.Summary);
-            Assert.Equal(dataSet.Status, content.Status);
-            Assert.Equal(dataSet.SupersedingDataSetId, content.SupersedingDataSetId);
-            Assert.Equal(dataSetVersion.PublicVersion, content.LatestVersion.Version);
-            Assert.Equal(
-                dataSetVersion.Published.TruncateNanoseconds(),
-                content.LatestVersion.Published
-            );
-            Assert.Equal(dataSetVersion.TotalResults, content.LatestVersion.TotalResults);
-            Assert.Equal(dataSetVersion.Release.DataSetFileId, content.LatestVersion.File.Id);
-            Assert.Equal(
-                TimePeriodFormatter.FormatLabel(
-                    dataSetVersion.MetaSummary!.TimePeriodRange.Start.Period,
-                    dataSetVersion.MetaSummary.TimePeriodRange.Start.Code),
-                content.LatestVersion.TimePeriods.Start);
-            Assert.Equal(
-                TimePeriodFormatter.FormatLabel(
-                    dataSetVersion.MetaSummary.TimePeriodRange.End.Period,
-                    dataSetVersion.MetaSummary.TimePeriodRange.End.Code),
-                content.LatestVersion.TimePeriods.End);
-            Assert.Equal(dataSetVersion.MetaSummary.GeographicLevels, content.LatestVersion.GeographicLevels);
-            Assert.Equal(dataSetVersion.MetaSummary.Filters, content.LatestVersion.Filters);
-            Assert.Equal(dataSetVersion.MetaSummary.Indicators, content.LatestVersion.Indicators);
+                await TestApp.AddTestData<PublicDataDbContext>(context =>
+                {
+                    context.DataSetVersions.Add(dataSetVersion);
+                    context.DataSets.Update(dataSet);
+                });
+
+                var response = await GetDataSet(dataSet.Id);
+
+                var content = response.AssertOk<DataSetViewModel>(useSystemJson: true);
+
+                Assert.NotNull(content);
+                Assert.Equal(dataSet.Id, content.Id);
+                Assert.Equal(dataSet.Title, content.Title);
+                Assert.Equal(dataSet.Summary, content.Summary);
+                Assert.Equal(dataSet.Status, content.Status);
+                Assert.Equal(dataSet.SupersedingDataSetId, content.SupersedingDataSetId);
+                Assert.NotNull(content.LatestVersion);
+                Assert.Equal(dataSetVersion.PublicVersion, content.LatestVersion.Version);
+                Assert.Equal(
+                    dataSetVersion.Published.TruncateNanoseconds(),
+                    content.LatestVersion.Published
+                );
+                Assert.Equal(dataSetVersion.TotalResults, content.LatestVersion.TotalResults);
+                Assert.Equal(dataSetVersion.Release.DataSetFileId, content.LatestVersion.File.Id);
+                Assert.Equal(
+                    TimePeriodFormatter.FormatLabel(
+                        dataSetVersion.MetaSummary!.TimePeriodRange.Start.Period,
+                        dataSetVersion.MetaSummary.TimePeriodRange.Start.Code),
+                    content.LatestVersion.TimePeriods.Start);
+                Assert.Equal(
+                    TimePeriodFormatter.FormatLabel(
+                        dataSetVersion.MetaSummary.TimePeriodRange.End.Period,
+                        dataSetVersion.MetaSummary.TimePeriodRange.End.Code),
+                    content.LatestVersion.TimePeriods.End);
+                Assert.Equal(dataSetVersion.MetaSummary.GeographicLevels, content.LatestVersion.GeographicLevels);
+                Assert.Equal(dataSetVersion.MetaSummary.Filters, content.LatestVersion.Filters);
+                Assert.Equal(dataSetVersion.MetaSummary.Indicators, content.LatestVersion.Indicators);
+            }
+
+            [Theory]
+            [MemberData(nameof(DataSetStatusTheoryData.UnavailableStatuses),
+                MemberType = typeof(DataSetStatusTheoryData))]
+            public async Task DataSetNotAvailable_Returns403(DataSetStatus dataSetStatus)
+            {
+                DataSet dataSet = DataFixture
+                    .DefaultDataSet()
+                    .WithStatus(dataSetStatus);
+
+                await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
+
+                var response = await GetDataSet(dataSet.Id);
+
+                response.AssertForbidden();
+            }
+
+            [Fact]
+            public async Task DataSetDoesNotExist_Returns404()
+            {
+                var response = await GetDataSet(Guid.NewGuid());
+
+                response.AssertNotFound();
+            }
         }
 
-        [Theory]
-        [MemberData(nameof(DataSetStatusTheoryData.UnavailableStatuses),
-            MemberType = typeof(DataSetStatusTheoryData))]
-        public async Task DataSetNotAvailable_Returns403(DataSetStatus dataSetStatus)
+        public class PreviewTokenTests(TestApplicationFactory testApp) : GetDataSetTests(testApp)
         {
-            DataSet dataSet = DataFixture
-                .DefaultDataSet()
-                .WithStatus(dataSetStatus);
+            [Theory]
+            [MemberData(nameof(DataSetStatusTheoryData.AllStatuses),
+                MemberType = typeof(DataSetStatusTheoryData))]
+            public async Task PreviewTokenIsActive_Returns200(DataSetStatus dataSetStatus)
+            {
+                DataSet dataSet = DataFixture
+                    .DefaultDataSet()
+                    .WithStatus(dataSetStatus);
 
-            await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
+                await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
 
-            var response = await GetDataSet(dataSet.Id);
+                DataSetVersion dataSetVersion = DataFixture
+                    .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 2)
+                    .WithStatus(DataSetVersionStatus.Draft)
+                    .WithDataSetId(dataSet.Id)
+                    .WithPreviewTokens(() => [DataFixture.DefaultPreviewToken()])
+                    .FinishWith(dsv => dataSet.LatestDraftVersion = dsv);
 
-            response.AssertForbidden();
+                await TestApp.AddTestData<PublicDataDbContext>(context =>
+                {
+                    context.DataSetVersions.Add(dataSetVersion);
+                    context.DataSets.Update(dataSet);
+                });
+
+                var response = await GetDataSet(
+                    dataSetId: dataSet.Id,
+                    previewTokenId: dataSetVersion.PreviewTokens[0].Id);
+
+                var content = response.AssertOk<DataSetViewModel>(useSystemJson: true);
+
+                Assert.NotNull(content);
+                Assert.Equal(dataSet.Id, content.Id);
+                Assert.Equal(dataSet.Title, content.Title);
+                Assert.Equal(dataSet.Summary, content.Summary);
+                Assert.Equal(dataSet.Status, content.Status);
+                Assert.Equal(dataSet.SupersedingDataSetId, content.SupersedingDataSetId);
+                Assert.Null(content.LatestVersion);
+            }
+            
+            /// <summary>
+            /// Despite the wrong Preview Token being used, the Data Set itself is available to the
+            /// public, and so the auth succeeds.
+            /// </summary>
+            [Fact]
+            public async Task PreviewTokenIsActiveButForLiveVersion_DataSetIsAvailable_ReturnsOk()
+            {
+                DataSet dataSet = DataFixture
+                    .DefaultDataSet()
+                    .WithStatus(DataSetStatus.Published);
+
+                await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
+
+                DataSetVersion liveDataSetVersion = DataFixture
+                    .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 2)
+                    .WithStatus(DataSetVersionStatus.Published)
+                    .WithPublished(DateTimeOffset.UtcNow)
+                    .WithVersionNumber(1, 0)
+                    .WithDataSetId(dataSet.Id)
+                    .WithPreviewTokens(() => [DataFixture.DefaultPreviewToken()])
+                    .FinishWith(dsv => dataSet.LatestLiveVersion = dsv);
+
+                DataSetVersion draftDataSetVersion = DataFixture
+                    .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 2)
+                    .WithStatus(DataSetVersionStatus.Draft)
+                    .WithVersionNumber(1, 1)
+                    .WithDataSetId(dataSet.Id)
+                    .WithPreviewTokens(() => [DataFixture.DefaultPreviewToken()])
+                    .FinishWith(dsv => dataSet.LatestDraftVersion = dsv);
+
+                await TestApp.AddTestData<PublicDataDbContext>(context =>
+                {
+                    context.DataSetVersions.AddRange(draftDataSetVersion, liveDataSetVersion);
+                    context.DataSets.Update(dataSet);
+                });
+
+                // We are requesting the DataSet but with the live DataSetVersion's preview token
+                // rather than the current draft's.
+                var response = await GetDataSet(
+                    dataSetId: dataSet.Id,
+                    previewTokenId: liveDataSetVersion.PreviewTokens[0].Id);
+
+                response.AssertOk();
+            }
+            
+            [Fact]
+            public async Task PreviewTokenIsExpired_Returns403()
+            {
+                DataSet dataSet = DataFixture
+                    .DefaultDataSet()
+                    .WithStatusDraft();
+
+                await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
+
+                DataSetVersion dataSetVersion = DataFixture
+                    .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 2)
+                    .WithStatus(DataSetVersionStatus.Draft)
+                    .WithDataSetId(dataSet.Id)
+                    .WithPreviewTokens(() => [DataFixture.DefaultPreviewToken(expired: true)])
+                    .FinishWith(dsv => dataSet.LatestDraftVersion = dsv);
+
+                await TestApp.AddTestData<PublicDataDbContext>(context =>
+                {
+                    context.DataSetVersions.Add(dataSetVersion);
+                    context.DataSets.Update(dataSet);
+                });
+
+                var response = await GetDataSet(
+                    dataSetId: dataSet.Id,
+                    previewTokenId: dataSetVersion.PreviewTokens[0].Id);
+
+                response.AssertForbidden();
+            }
+
+            [Fact]
+            public async Task PreviewTokenIsForWrongDataSet_Returns403()
+            {
+                var (dataSet1, dataSet2) = DataFixture
+                    .DefaultDataSet()
+                    .WithStatusDraft()
+                    .GenerateTuple2();
+
+                await TestApp.AddTestData<PublicDataDbContext>(context =>
+                {
+                    context.DataSets.AddRange(dataSet1, dataSet2);
+                });
+
+                var dataSet1Version = DataFixture
+                    .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 2)
+                    .WithStatus(DataSetVersionStatus.Draft)
+                    .WithDataSet(dataSet1)
+                    .WithPreviewTokens(() => [DataFixture.DefaultPreviewToken()])
+                    .FinishWith(dsv => dataSet1.LatestDraftVersion = dsv)
+                    .Generate();
+
+                var dataSet2Version = DataFixture
+                    .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 2)
+                    .WithStatus(DataSetVersionStatus.Draft)
+                    .WithDataSet(dataSet2)
+                    .WithPreviewTokens(() => [DataFixture.DefaultPreviewToken()])
+                    .FinishWith(dsv => dataSet2.LatestDraftVersion = dsv)
+                    .Generate();
+
+                await TestApp.AddTestData<PublicDataDbContext>(context =>
+                {
+                    context.DataSetVersions.AddRange(dataSet1Version, dataSet2Version);
+                    context.DataSets.UpdateRange(dataSet1, dataSet2);
+                });
+
+                // Firstly check that a correctly matched preview token will 
+                // produce a successful response.
+                var successResponse = await GetDataSet(
+                    dataSetId: dataSet1.Id,
+                    previewTokenId: dataSet1Version.PreviewTokens[0].Id);
+
+                successResponse.AssertOk();
+
+                // Then check that a mismatched preview token will 
+                // produce a forbidden response.
+                var forbiddenResponse = await GetDataSet(
+                    dataSetId: dataSet1.Id,
+                    previewTokenId: dataSet2Version.PreviewTokens[0].Id);
+
+                forbiddenResponse.AssertForbidden();
+            }
+
+            [Theory]
+            [MemberData(nameof(DataSetVersionStatusViewTheoryData.UnavailableStatusesExceptDraft),
+                MemberType = typeof(DataSetVersionStatusViewTheoryData))]
+            public async Task PreviewTokenIsForUnavailableDataSetVersion_Returns403(
+                DataSetVersionStatus dataSetVersionStatus)
+            {
+                DataSet dataSet = DataFixture
+                    .DefaultDataSet()
+                    .WithStatusDraft();
+
+                await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
+
+                DataSetVersion dataSetVersion = DataFixture
+                    .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 2)
+                    .WithStatus(dataSetVersionStatus)
+                    .WithDataSetId(dataSet.Id)
+                    .WithPreviewTokens(() => [DataFixture.DefaultPreviewToken()])
+                    .FinishWith(dsv => dataSet.LatestDraftVersion = dsv);
+
+                await TestApp.AddTestData<PublicDataDbContext>(context =>
+                {
+                    context.DataSetVersions.AddRange(dataSetVersion);
+                    context.DataSets.Update(dataSet);
+                });
+
+                var response = await GetDataSet(
+                    dataSetId: dataSet.Id,
+                    previewTokenId: dataSetVersion.PreviewTokens[0].Id);
+
+                response.AssertForbidden();
+            }
         }
 
-        [Fact]
-        public async Task DataSetDoesNotExist_Returns404()
-        {
-            var response = await GetDataSet(Guid.NewGuid());
-
-            response.AssertNotFound();
-        }
-
-        private async Task<HttpResponseMessage> GetDataSet(Guid dataSetId)
+        private async Task<HttpResponseMessage> GetDataSet(
+            Guid dataSetId,
+            Guid? previewTokenId = null)
         {
             var client = BuildApp().CreateClient();
-
+            client.AddPreviewTokenHeader(previewTokenId);
+            
             var uri = new Uri($"{BaseUrl}/{dataSetId}", UriKind.Relative);
 
             return await client.GetAsync(uri);
@@ -983,23 +1190,28 @@ public abstract class DataSetsControllerTests(TestApplicationFactory testApp) : 
         public class PreviewTokenTests(TestApplicationFactory testApp) : GetDataSetMetaTests(testApp)
         {
             [Theory]
-            [MemberData(nameof(DataSetVersionStatusViewTheoryData.AvailableStatusesIncludingDraft),
-                MemberType = typeof(DataSetVersionStatusViewTheoryData))]
-            public async Task PreviewTokenIsActive_Returns200(DataSetVersionStatus dataSetVersionStatus)
+            [MemberData(nameof(DataSetStatusTheoryData.AllStatuses),
+                MemberType = typeof(DataSetStatusTheoryData))]
+            public async Task PreviewTokenIsActive_Returns200(DataSetStatus dataSetStatus)
             {
                 DataSet dataSet = DataFixture
                     .DefaultDataSet()
-                    .WithStatusPublished();
+                    .WithStatus(dataSetStatus);
 
                 await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
 
                 DataSetVersion dataSetVersion = DataFixture
                     .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 2)
-                    .WithStatus(dataSetVersionStatus)
+                    .WithStatus(DataSetVersionStatus.Draft)
                     .WithDataSetId(dataSet.Id)
-                    .WithPreviewTokens(() => [DataFixture.DefaultPreviewToken()]);
+                    .WithPreviewTokens(() => [DataFixture.DefaultPreviewToken()])
+                    .FinishWith(dsv => dataSet.LatestDraftVersion = dsv);
 
-                await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSetVersions.Add(dataSetVersion));
+                await TestApp.AddTestData<PublicDataDbContext>(context =>
+                {
+                    context.DataSetVersions.Add(dataSetVersion);
+                    context.DataSets.Update(dataSet);
+                });
 
                 var response = await GetDataSetMeta(
                     dataSetId: dataSet.Id,
@@ -1010,11 +1222,52 @@ public abstract class DataSetsControllerTests(TestApplicationFactory testApp) : 
             }
 
             [Fact]
+            public async Task PreviewTokenIsActiveButForLiveVersion_DraftVersionTargeted_Returns403()
+            {
+                DataSet dataSet = DataFixture
+                    .DefaultDataSet()
+                    .WithStatus(DataSetStatus.Published);
+
+                await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
+
+                DataSetVersion liveDataSetVersion = DataFixture
+                    .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 2)
+                    .WithStatus(DataSetVersionStatus.Published)
+                    .WithPublished(DateTimeOffset.UtcNow)
+                    .WithVersionNumber(1, 0)
+                    .WithDataSetId(dataSet.Id)
+                    .WithPreviewTokens(() => [DataFixture.DefaultPreviewToken()])
+                    .FinishWith(dsv => dataSet.LatestLiveVersion = dsv);
+                
+                DataSetVersion draftDataSetVersion = DataFixture
+                    .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 2)
+                    .WithStatus(DataSetVersionStatus.Draft)
+                    .WithVersionNumber(1, 1)
+                    .WithDataSetId(dataSet.Id)
+                    .WithPreviewTokens(() => [DataFixture.DefaultPreviewToken()])
+                    .FinishWith(dsv => dataSet.LatestDraftVersion = dsv);
+
+                await TestApp.AddTestData<PublicDataDbContext>(context =>
+                {
+                    context.DataSetVersions.AddRange(liveDataSetVersion, draftDataSetVersion);
+                    context.DataSets.Update(dataSet);
+                });
+
+                // We are requesting the draft DataSetVersion but with the live DataSetVersion's preview token.
+                var response = await GetDataSetMeta(
+                    dataSetId: dataSet.Id,
+                    dataSetVersion: draftDataSetVersion.PublicVersion,
+                    previewTokenId: liveDataSetVersion.PreviewTokens[0].Id);
+
+                response.AssertForbidden();
+            }
+            
+            [Fact]
             public async Task PreviewTokenIsExpired_Returns403()
             {
                 DataSet dataSet = DataFixture
                     .DefaultDataSet()
-                    .WithStatusPublished();
+                    .WithStatusDraft();
 
                 await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
 
@@ -1039,7 +1292,7 @@ public abstract class DataSetsControllerTests(TestApplicationFactory testApp) : 
             {
                 DataSet dataSet = DataFixture
                     .DefaultDataSet()
-                    .WithStatusPublished();
+                    .WithStatusDraft();
 
                 await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
 
@@ -1069,7 +1322,7 @@ public abstract class DataSetsControllerTests(TestApplicationFactory testApp) : 
             {
                 DataSet dataSet = DataFixture
                     .DefaultDataSet()
-                    .WithStatusPublished();
+                    .WithStatusDraft();
 
                 await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
 
@@ -1116,231 +1369,436 @@ public abstract class DataSetsControllerTests(TestApplicationFactory testApp) : 
         }
     }
 
-    public class DownloadDataSetCsvTests(TestApplicationFactory testApp) : DataSetsControllerTests(testApp)
+    public abstract class DownloadDataSetCsvTests(TestApplicationFactory testApp) : DataSetsControllerTests(testApp)
     {
-        [Theory]
-        [MemberData(nameof(DataSetVersionStatusViewTheoryData.AvailableStatuses),
-            MemberType = typeof(DataSetVersionStatusViewTheoryData))]
-        public async Task LatestVersionAvailable_Returns200(DataSetVersionStatus dataSetVersionStatus)
+        private static readonly List<TestClass> CsvData =
+        [
+            new()
+            {
+                FirstColumn = "first-column-value-1",
+                SecondColumn = "second-column-value-1"
+            },
+
+            new()
+            {
+                FirstColumn = "first-column-value-2",
+                SecondColumn = "second-column-value-2"
+            }
+        ];
+
+        public class DownloadTests(TestApplicationFactory testApp) : DownloadDataSetCsvTests(testApp)
         {
-            DataSet dataSet = DataFixture
-                .DefaultDataSet()
-                .WithStatusPublished();
-
-            await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
-
-            DataSetVersion dataSetVersion = DataFixture
-                .DefaultDataSetVersion()
-                .WithStatus(dataSetVersionStatus)
-                .WithDataSet(dataSet)
-                .FinishWith(dsv => dataSet.LatestLiveVersion = dsv);
-
-            await TestApp.AddTestData<PublicDataDbContext>(context =>
+            [Theory]
+            [MemberData(nameof(DataSetVersionStatusViewTheoryData.AvailableStatuses),
+                MemberType = typeof(DataSetVersionStatusViewTheoryData))]
+            public async Task LatestVersionAvailable_Returns200(DataSetVersionStatus dataSetVersionStatus)
             {
-                context.DataSetVersions.Add(dataSetVersion);
-                context.DataSets.Update(dataSet);
-            });
+                DataSet dataSet = DataFixture
+                    .DefaultDataSet()
+                    .WithStatusPublished();
 
-            var csvData = new List<TestClass>
-            {
-                new()
+                await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
+
+                DataSetVersion dataSetVersion = DataFixture
+                    .DefaultDataSetVersion()
+                    .WithStatus(dataSetVersionStatus)
+                    .WithDataSet(dataSet)
+                    .FinishWith(dsv => dataSet.LatestLiveVersion = dsv);
+
+                await TestApp.AddTestData<PublicDataDbContext>(context =>
                 {
-                    FirstColumn = "first-column-value-1",
-                    SecondColumn = "second-column-value-1"
-                },
-                new()
+                    context.DataSetVersions.Add(dataSetVersion);
+                    context.DataSets.Update(dataSet);
+                });
+
+                await CreateGZippedTestCsv(dataSetVersion, CsvData);
+
+                var response = await DownloadDataSet(dataSet.Id);
+
+                response.AssertOk();
+
+                Assert.Equal(MediaTypeNames.Text.Csv, response.Content.Headers.ContentType!.MediaType);
+
+                var contentEncoding = Assert.Single(response.Content.Headers.ContentEncoding);
+                Assert.Equal(ContentEncodings.Gzip, contentEncoding);
+
+                var results = await DecompressGZippedCsv(response);
+
+                Assert.Equal(CsvData.Count, results.Count);
+                Assert.Equal(CsvData, results);
+            }
+
+            [Theory]
+            [MemberData(nameof(DataSetVersionStatusViewTheoryData.AvailableStatuses),
+                MemberType = typeof(DataSetVersionStatusViewTheoryData))]
+            public async Task RequestedVersionAvailable_Returns200(DataSetVersionStatus dataSetVersionStatus)
+            {
+                DataSet dataSet = DataFixture
+                    .DefaultDataSet()
+                    .WithStatusPublished();
+
+                await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
+
+                DataSetVersion latestDataSetVersion = DataFixture
+                    .DefaultDataSetVersion()
+                    .WithStatusPublished()
+                    .WithDataSet(dataSet);
+
+                DataSetVersion requestedDataSetVersion = DataFixture
+                    .DefaultDataSetVersion()
+                    .WithStatus(dataSetVersionStatus)
+                    .WithVersionNumber(major: 1, minor: 1, patch: 0)
+                    .WithDataSet(dataSet)
+                    .FinishWith(dsv => dataSet.LatestLiveVersion = dsv);
+
+                await TestApp.AddTestData<PublicDataDbContext>(context =>
                 {
-                    FirstColumn = "first-column-value-2",
-                    SecondColumn = "second-column-value-2"
-                }
-            };
+                    context.DataSetVersions.AddRange([latestDataSetVersion, requestedDataSetVersion]);
+                    context.DataSets.Update(dataSet);
+                });
 
-            await CreateGZippedTestCsv(dataSetVersion, csvData);
+                await CreateGZippedTestCsv(requestedDataSetVersion, CsvData);
 
-            var response = await DownloadDataSet(dataSet.Id);
+                var response = await DownloadDataSet(dataSet.Id, requestedDataSetVersion.PublicVersion);
 
-            response.AssertOk();
+                response.AssertOk();
 
-            Assert.Equal(MediaTypeNames.Text.Csv, response.Content.Headers.ContentType!.MediaType);
+                Assert.Equal(MediaTypeNames.Text.Csv, response.Content.Headers.ContentType!.MediaType);
 
-            var contentEncoding = Assert.Single(response.Content.Headers.ContentEncoding);
-            Assert.Equal(ContentEncodings.Gzip, contentEncoding);
+                var contentEncoding = Assert.Single(response.Content.Headers.ContentEncoding);
+                Assert.Equal(ContentEncodings.Gzip, contentEncoding);
 
-            var results = await DecompressGZippedCsv(response);
+                var results = await DecompressGZippedCsv(response);
 
-            Assert.Equal(csvData.Count, results.Count);
-            Assert.Equal(csvData, results);
-        }
+                Assert.Equal(CsvData.Count, results.Count);
+                Assert.Equal(CsvData, results);
+            }
 
-        [Theory]
-        [MemberData(nameof(DataSetVersionStatusViewTheoryData.AvailableStatuses),
-            MemberType = typeof(DataSetVersionStatusViewTheoryData))]
-        public async Task RequestedVersionAvailable_Returns200(DataSetVersionStatus dataSetVersionStatus)
-        {
-            DataSet dataSet = DataFixture
-                .DefaultDataSet()
-                .WithStatusPublished();
-
-            await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
-
-            DataSetVersion latestDataSetVersion = DataFixture
-                .DefaultDataSetVersion()
-                .WithStatusPublished()
-                .WithDataSet(dataSet);
-
-            DataSetVersion requestedDataSetVersion = DataFixture
-                .DefaultDataSetVersion()
-                .WithStatus(dataSetVersionStatus)
-                .WithVersionNumber(major: 1, minor: 1, patch: 0)
-                .WithDataSet(dataSet)
-                .FinishWith(dsv => dataSet.LatestLiveVersion = dsv);
-
-            await TestApp.AddTestData<PublicDataDbContext>(context =>
+            [Theory]
+            [MemberData(nameof(DataSetVersionStatusViewTheoryData.UnavailableStatuses),
+                MemberType = typeof(DataSetVersionStatusViewTheoryData))]
+            public async Task LatestVersionUnavailable_Returns403(DataSetVersionStatus dataSetVersionStatus)
             {
-                context.DataSetVersions.AddRange([latestDataSetVersion, requestedDataSetVersion]);
-                context.DataSets.Update(dataSet);
-            });
+                DataSet dataSet = DataFixture
+                    .DefaultDataSet()
+                    .WithStatusPublished();
 
-            var csvData = new List<TestClass>
-            {
-                new()
+                await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
+
+                DataSetVersion dataSetVersion = DataFixture
+                    .DefaultDataSetVersion()
+                    .WithStatus(dataSetVersionStatus)
+                    .WithDataSet(dataSet)
+                    .FinishWith(dsv => dataSet.LatestLiveVersion = dsv);
+
+                await TestApp.AddTestData<PublicDataDbContext>(context =>
                 {
-                    FirstColumn = "first-column-value-1",
-                    SecondColumn = "second-column-value-1"
-                },
-                new()
+                    context.DataSetVersions.Add(dataSetVersion);
+                    context.DataSets.Update(dataSet);
+                });
+
+                var response = await DownloadDataSet(dataSet.Id);
+
+                response.AssertForbidden();
+            }
+
+            [Theory]
+            [MemberData(nameof(DataSetVersionStatusViewTheoryData.UnavailableStatuses),
+                MemberType = typeof(DataSetVersionStatusViewTheoryData))]
+            public async Task RequestedVersionUnavailable_Returns403(DataSetVersionStatus dataSetVersionStatus)
+            {
+                DataSet dataSet = DataFixture
+                    .DefaultDataSet()
+                    .WithStatusPublished();
+
+                await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
+
+                DataSetVersion latestDataSetVersion = DataFixture
+                    .DefaultDataSetVersion()
+                    .WithStatusPublished()
+                    .WithDataSet(dataSet)
+                    .FinishWith(dsv => dataSet.LatestLiveVersion = dsv);
+
+                DataSetVersion requestedDataSetVersion = DataFixture
+                    .DefaultDataSetVersion()
+                    .WithStatus(dataSetVersionStatus)
+                    .WithVersionNumber(major: 1, minor: 1, patch: 0)
+                    .WithDataSet(dataSet)
+                    .FinishWith(dsv => dataSet.LatestDraftVersion = dsv);
+
+                await TestApp.AddTestData<PublicDataDbContext>(context =>
                 {
-                    FirstColumn = "first-column-value-2",
-                    SecondColumn = "second-column-value-2"
-                }
-            };
+                    context.DataSetVersions.AddRange([latestDataSetVersion, requestedDataSetVersion]);
+                    context.DataSets.Update(dataSet);
+                });
 
-            await CreateGZippedTestCsv(requestedDataSetVersion, csvData);
+                var response = await DownloadDataSet(dataSet.Id, requestedDataSetVersion.PublicVersion);
 
-            var response = await DownloadDataSet(dataSet.Id, requestedDataSetVersion.PublicVersion);
+                response.AssertForbidden();
+            }
 
-            response.AssertOk();
-
-            Assert.Equal(MediaTypeNames.Text.Csv, response.Content.Headers.ContentType!.MediaType);
-
-            var contentEncoding = Assert.Single(response.Content.Headers.ContentEncoding);
-            Assert.Equal(ContentEncodings.Gzip, contentEncoding);
-
-            var results = await DecompressGZippedCsv(response);
-
-            Assert.Equal(csvData.Count, results.Count);
-            Assert.Equal(csvData, results);
-        }
-
-        [Theory]
-        [MemberData(nameof(DataSetVersionStatusViewTheoryData.UnavailableStatuses),
-            MemberType = typeof(DataSetVersionStatusViewTheoryData))]
-        public async Task LatestVersionUnavailable_Returns403(DataSetVersionStatus dataSetVersionStatus)
-        {
-            DataSet dataSet = DataFixture
-                .DefaultDataSet()
-                .WithStatusPublished();
-
-            await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
-
-            DataSetVersion dataSetVersion = DataFixture
-                .DefaultDataSetVersion()
-                .WithStatus(dataSetVersionStatus)
-                .WithDataSet(dataSet)
-                .FinishWith(dsv => dataSet.LatestLiveVersion = dsv);
-
-            await TestApp.AddTestData<PublicDataDbContext>(context =>
+            [Fact]
+            public async Task DataSetDoesNotExist_Returns404()
             {
-                context.DataSetVersions.Add(dataSetVersion);
-                context.DataSets.Update(dataSet);
-            });
+                var response = await DownloadDataSet(Guid.NewGuid());
 
-            var response = await DownloadDataSet(dataSet.Id);
+                response.AssertNotFound();
+            }
 
-            response.AssertForbidden();
-        }
-
-        [Theory]
-        [MemberData(nameof(DataSetVersionStatusViewTheoryData.UnavailableStatuses),
-            MemberType = typeof(DataSetVersionStatusViewTheoryData))]
-        public async Task RequestedVersionUnavailable_Returns403(DataSetVersionStatus dataSetVersionStatus)
-        {
-            DataSet dataSet = DataFixture
-                .DefaultDataSet()
-                .WithStatusPublished();
-
-            await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
-
-            DataSetVersion latestDataSetVersion = DataFixture
-                .DefaultDataSetVersion()
-                .WithStatusPublished()
-                .WithDataSet(dataSet)
-                .FinishWith(dsv => dataSet.LatestLiveVersion = dsv);
-
-            DataSetVersion requestedDataSetVersion = DataFixture
-                .DefaultDataSetVersion()
-                .WithStatus(dataSetVersionStatus)
-                .WithVersionNumber(major: 1, minor: 1, patch: 0)
-                .WithDataSet(dataSet)
-                .FinishWith(dsv => dataSet.LatestDraftVersion = dsv);
-
-            await TestApp.AddTestData<PublicDataDbContext>(context =>
+            [Fact]
+            public async Task LatestVersionDoesNotExist_Returns404()
             {
-                context.DataSetVersions.AddRange([latestDataSetVersion, requestedDataSetVersion]);
-                context.DataSets.Update(dataSet);
-            });
+                DataSet dataSet = DataFixture
+                    .DefaultDataSet()
+                    .WithStatusPublished();
 
-            var response = await DownloadDataSet(dataSet.Id, requestedDataSetVersion.PublicVersion);
+                await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
 
-            response.AssertForbidden();
-        }
+                var response = await DownloadDataSet(dataSet.Id);
 
-        [Fact]
-        public async Task DataSetDoesNotExist_Returns404()
-        {
-            var response = await DownloadDataSet(Guid.NewGuid());
+                response.AssertNotFound();
+            }
 
-            response.AssertNotFound();
-        }
-
-        [Fact]
-        public async Task LatestVersionDoesNotExist_Returns404()
-        {
-            DataSet dataSet = DataFixture
-               .DefaultDataSet()
-               .WithStatusPublished();
-
-            await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
-
-            var response = await DownloadDataSet(dataSet.Id);
-
-            response.AssertNotFound();
-        }
-
-        [Fact]
-        public async Task RequestedVersionDoesNotExist_Returns404()
-        {
-            DataSet dataSet = DataFixture
-               .DefaultDataSet()
-               .WithStatusPublished();
-
-            await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
-
-            DataSetVersion dataSetVersion = DataFixture
-                .DefaultDataSetVersion()
-                .WithStatusPublished()
-                .WithDataSet(dataSet)
-                .FinishWith(dsv => dataSet.LatestLiveVersion = dsv);
-
-            await TestApp.AddTestData<PublicDataDbContext>(context =>
+            [Fact]
+            public async Task RequestedVersionDoesNotExist_Returns404()
             {
-                context.DataSetVersions.Add(dataSetVersion);
-                context.DataSets.Update(dataSet);
-            });
+                DataSet dataSet = DataFixture
+                    .DefaultDataSet()
+                    .WithStatusPublished();
 
-            var response = await DownloadDataSet(dataSet.Id, "2.0");
+                await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
 
-            response.AssertNotFound();
+                DataSetVersion dataSetVersion = DataFixture
+                    .DefaultDataSetVersion()
+                    .WithStatusPublished()
+                    .WithDataSet(dataSet)
+                    .FinishWith(dsv => dataSet.LatestLiveVersion = dsv);
+
+                await TestApp.AddTestData<PublicDataDbContext>(context =>
+                {
+                    context.DataSetVersions.Add(dataSetVersion);
+                    context.DataSets.Update(dataSet);
+                });
+
+                var response = await DownloadDataSet(dataSet.Id, "2.0");
+
+                response.AssertNotFound();
+            }
+        }
+
+        public class PreviewTokenTests(TestApplicationFactory testApp) : DownloadDataSetCsvTests(testApp)
+        {
+            [Theory]
+            [MemberData(nameof(DataSetStatusTheoryData.AllStatuses),
+                MemberType = typeof(DataSetStatusTheoryData))]
+            public async Task PreviewTokenIsActive_Returns200(DataSetStatus dataSetStatus)
+            {
+                DataSet dataSet = DataFixture
+                    .DefaultDataSet()
+                    .WithStatus(dataSetStatus);
+
+                await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
+
+                DataSetVersion dataSetVersion = DataFixture
+                    .DefaultDataSetVersion()
+                    .WithStatus(DataSetVersionStatus.Draft)
+                    .WithDataSet(dataSet)
+                    .WithPreviewTokens(() => [DataFixture.DefaultPreviewToken()])
+                    .FinishWith(dsv => dataSet.LatestDraftVersion = dsv);
+
+                await TestApp.AddTestData<PublicDataDbContext>(context =>
+                {
+                    context.DataSetVersions.Add(dataSetVersion);
+                    context.DataSets.Update(dataSet);
+                });
+
+                await CreateGZippedTestCsv(dataSetVersion, CsvData);
+
+                var response = await DownloadDataSet(
+                    dataSetId: dataSet.Id,
+                    dataSetVersion: dataSetVersion.PublicVersion,
+                    previewTokenId: dataSetVersion.PreviewTokens[0].Id);
+
+                response.AssertOk();
+
+                Assert.Equal(MediaTypeNames.Text.Csv, response.Content.Headers.ContentType!.MediaType);
+
+                var contentEncoding = Assert.Single(response.Content.Headers.ContentEncoding);
+                Assert.Equal(ContentEncodings.Gzip, contentEncoding);
+
+                var results = await DecompressGZippedCsv(response);
+
+                Assert.Equal(CsvData.Count, results.Count);
+                Assert.Equal(CsvData, results);
+            }
+            
+            [Fact]
+            public async Task PreviewTokenIsActiveButForLiveVersion_DraftVersionTargeted_Returns403()
+            {
+                DataSet dataSet = DataFixture
+                    .DefaultDataSet()
+                    .WithStatus(DataSetStatus.Published);
+
+                await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
+
+                DataSetVersion liveDataSetVersion = DataFixture
+                    .DefaultDataSetVersion()
+                    .WithStatus(DataSetVersionStatus.Published)
+                    .WithVersionNumber(1, 0)
+                    .WithDataSet(dataSet)
+                    .WithPreviewTokens(() => [DataFixture.DefaultPreviewToken()])
+                    .FinishWith(dsv => dataSet.LatestLiveVersion = dsv);
+                
+                DataSetVersion draftDataSetVersion = DataFixture
+                    .DefaultDataSetVersion()
+                    .WithStatus(DataSetVersionStatus.Draft)
+                    .WithVersionNumber(1, 1)
+                    .WithDataSet(dataSet)
+                    .WithPreviewTokens(() => [DataFixture.DefaultPreviewToken()])
+                    .FinishWith(dsv => dataSet.LatestDraftVersion = dsv);
+
+                await TestApp.AddTestData<PublicDataDbContext>(context =>
+                {
+                    context.DataSetVersions.AddRange(liveDataSetVersion, draftDataSetVersion);
+                    context.DataSets.Update(dataSet);
+                });
+
+                await CreateGZippedTestCsv(liveDataSetVersion, CsvData);
+
+                // We are requesting the draft DataSetVersion but with the live DataSetVersion's preview token.
+                var response = await DownloadDataSet(
+                    dataSetId: dataSet.Id,
+                    dataSetVersion: draftDataSetVersion.PublicVersion,
+                    previewTokenId: liveDataSetVersion.PreviewTokens[0].Id);
+
+                response.AssertForbidden();
+            }
+
+            [Theory]
+            [MemberData(nameof(DataSetStatusTheoryData.AllStatuses),
+                MemberType = typeof(DataSetStatusTheoryData))]
+            public async Task PreviewTokenIsExpired_Returns403(DataSetStatus dataSetStatus)
+            {
+                DataSet dataSet = DataFixture
+                    .DefaultDataSet()
+                    .WithStatus(dataSetStatus);
+
+                await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
+
+                DataSetVersion dataSetVersion = DataFixture
+                    .DefaultDataSetVersion()
+                    .WithStatus(DataSetVersionStatus.Draft)
+                    .WithDataSet(dataSet)
+                    .WithPreviewTokens(() => [DataFixture.DefaultPreviewToken(expired: true)])
+                    .FinishWith(dsv => dataSet.LatestDraftVersion = dsv);
+
+                await TestApp.AddTestData<PublicDataDbContext>(context =>
+                {
+                    context.DataSetVersions.Add(dataSetVersion);
+                    context.DataSets.Update(dataSet);
+                });
+
+                await CreateGZippedTestCsv(dataSetVersion, CsvData);
+
+                var response = await DownloadDataSet(
+                    dataSetId: dataSet.Id,
+                    dataSetVersion: dataSetVersion.PublicVersion,
+                    previewTokenId: dataSetVersion.PreviewTokens[0].Id);
+
+                response.AssertForbidden();
+            }
+            
+            [Fact]
+            public async Task PreviewTokenIsForWrongDataSet_Returns403()
+            {
+                var (dataSet1, dataSet2) = DataFixture
+                    .DefaultDataSet()
+                    .WithStatus(DataSetStatus.Draft)
+                    .GenerateTuple2();
+
+                await TestApp.AddTestData<PublicDataDbContext>(context =>
+                {
+                    context.DataSets.AddRange(dataSet1, dataSet2);
+                });
+            
+                var dataSet1Version = DataFixture
+                    .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 2)
+                    .WithStatus(DataSetVersionStatus.Draft)
+                    .WithDataSet(dataSet1)
+                    .WithPreviewTokens(() => [DataFixture.DefaultPreviewToken()])
+                    .FinishWith(dsv => dataSet1.LatestDraftVersion = dsv)
+                    .Generate();
+            
+                var dataSet2Version = DataFixture
+                    .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 2)
+                    .WithStatus(DataSetVersionStatus.Draft)
+                    .WithDataSet(dataSet2)
+                    .WithPreviewTokens(() => [DataFixture.DefaultPreviewToken()])
+                    .FinishWith(dsv => dataSet2.LatestDraftVersion = dsv)
+                    .Generate();
+            
+                await TestApp.AddTestData<PublicDataDbContext>(context =>
+                {
+                    context.DataSetVersions.AddRange(dataSet1Version, dataSet2Version);
+                    context.DataSets.UpdateRange(dataSet1, dataSet2);
+                });
+                
+                await CreateGZippedTestCsv(dataSet1Version, CsvData);
+            
+                // Firstly check that a correctly matched preview token will 
+                // produce a successful response
+
+                var successResponse = await DownloadDataSet(
+                    dataSetId: dataSet1.Id,
+                    dataSetVersion: dataSet1Version.PublicVersion,
+                    previewTokenId: dataSet1Version.PreviewTokens[0].Id);
+                
+                successResponse.AssertOk();
+                
+                // Then check that a mismatched preview token will 
+                // produce a forbidden response.
+                var forbiddenResponse = await DownloadDataSet(
+                    dataSetId: dataSet1.Id,
+                    dataSetVersion: dataSet1Version.PublicVersion,
+                    previewTokenId: dataSet2Version.PreviewTokens[0].Id);
+            
+                forbiddenResponse.AssertForbidden();
+            }
+            
+            [Theory]
+            [MemberData(nameof(DataSetVersionStatusViewTheoryData.UnavailableStatusesExceptDraft),
+                MemberType = typeof(DataSetVersionStatusViewTheoryData))]
+            public async Task PreviewTokenIsForUnavailableDataSetVersion_Returns403(
+                DataSetVersionStatus dataSetVersionStatus)
+            {
+                DataSet dataSet = DataFixture
+                    .DefaultDataSet()
+                    .WithStatus(DataSetStatus.Draft);
+
+                await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
+
+                DataSetVersion dataSetVersion = DataFixture
+                    .DefaultDataSetVersion()
+                    .WithStatus(dataSetVersionStatus)
+                    .WithDataSet(dataSet)
+                    .WithPreviewTokens(() => [DataFixture.DefaultPreviewToken(expired: true)])
+                    .FinishWith(dsv => dataSet.LatestDraftVersion = dsv);
+
+                await TestApp.AddTestData<PublicDataDbContext>(context =>
+                {
+                    context.DataSetVersions.Add(dataSetVersion);
+                    context.DataSets.Update(dataSet);
+                });
+
+                await CreateGZippedTestCsv(dataSetVersion, CsvData);
+
+                var response = await DownloadDataSet(
+                    dataSetId: dataSet.Id,
+                    dataSetVersion: dataSetVersion.PublicVersion,
+                    previewTokenId: dataSetVersion.PreviewTokens[0].Id);
+
+                response.AssertForbidden();
+            }
         }
 
         private async Task CreateGZippedTestCsv(DataSetVersion dataSetVersion, IReadOnlyList<TestClass> csvData)
@@ -1378,9 +1836,11 @@ public abstract class DataSetsControllerTests(TestApplicationFactory testApp) : 
 
         private async Task<HttpResponseMessage> DownloadDataSet(
             Guid dataSetId,
-            string? dataSetVersion = null)
+            string? dataSetVersion = null,
+            Guid? previewTokenId = null)
         {
             var client = BuildApp().CreateClient();
+            client.AddPreviewTokenHeader(previewTokenId);
 
             var query = new Dictionary<string, StringValues>();
 
