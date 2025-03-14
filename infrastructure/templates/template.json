@@ -732,6 +732,12 @@
         "description": "The Client ID of a manually-created App Registration that represents the Public API Data Processor Function App in Entra ID"
       }
     },
+    "screenerApiAppRegistrationClientId": {
+      "type": "string",
+      "metadata": {
+        "description": "The Client ID of a manually-created App Registration that represents the Screener API Function App in Entra ID"
+      }
+    },
     "apiAppRegistrationClientId": {
       "type": "string",
       "metadata": {
@@ -778,6 +784,7 @@
     "publisherStorageAccountId": "[concat(resourceGroup().id,'/providers/','Microsoft.Storage/storageAccounts/', variables('publisherStorageAccountName'))]",
     "loggingStorageAccountName": "[concat(parameters('subscription'), 'saeeslogging')]",
     "publicDataProcessorName": "[concat(parameters('subscription'), '-', parameters('environment'), '-papi-fa-processor')]",
+    "screenerApiName": "[concat(parameters('subscription'), '-', parameters('environment'), '-sapi')]",
     "logicAppSlackAlerts": "[concat(parameters('subscription'), '-la-', parameters('environment'), '-slackwebhook')]",
     "actionGroupAlerts": "[concat(parameters('subscription'), '-ag-', parameters('environment'), '-alertedusers')]",
     "metricAlerts": [
@@ -1825,7 +1832,9 @@
         "PublicDataApi:DocsUrl": "[concat('https://', parameters('publicApiDocsUrl'))]",
         "PublicDataApi:AppRegistrationClientId": "[parameters('apiAppRegistrationClientId')]",
         "PublicDataProcessor:Url": "[concat('https://', variables('publicDataProcessorName'), '.azurewebsites.net')]",
-        "PublicDataProcessor:AppRegistrationClientId": "[parameters('publicDataProcessorAppRegistrationClientId')]"
+        "PublicDataProcessor:AppRegistrationClientId": "[parameters('publicDataProcessorAppRegistrationClientId')]",
+        "ScreenerApi:Url": "[concat('https://', variables('screenerApiName'), '.azurewebsites.net')]",
+        "ScreenerApi:AppRegistrationClientId": "[parameters('screenerApiAppRegistrationClientId')]"
       }
     },
     {
