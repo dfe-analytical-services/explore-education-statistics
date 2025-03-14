@@ -1068,9 +1068,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             [Fact]
             public async Task UploadDataSetAsZip_InvalidRequest_ReturnsValidationProblems()
             {
-                // Arrange
                 // Act
+                var response = await UploadDataSetAsZip(
+                    releaseVersionId: Guid.Empty,
+                    dataSetTitle: "",
+                    fileName: "");
+
                 // Assert
+                var validationProblem = response.AssertValidationProblem();
+
+                Assert.Equal("Must not be empty.", validationProblem.Errors[0].Message);
+                Assert.Equal("Data set title cannot be empty", validationProblem.Errors[1].Message);
+                Assert.Equal("File 'Zip File' must not be of 0 size.", validationProblem.Errors[2].Message);
             }
 
             [Fact]
@@ -1092,15 +1101,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                 var filePath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!,
                 "Resources" + Path.DirectorySeparatorChar + fileName);
 
-                var fileContent = new ByteArrayContent(await System.IO.File.ReadAllBytesAsync(filePath));
-                fileContent.Headers.ContentType = MediaTypeHeaderValue.Parse(MediaTypeNames.Application.Zip); // TODO: Add switch for csv/zip
-
                 var multipartContent = new MultipartFormDataContent
                 {
                     { new StringContent(releaseVersionId.ToString()), "ReleaseVersionId" },
                     { new StringContent(dataSetTitle), "DataSetTitle" },
-                    { fileContent, "ZipFile", fileName },
                 };
+
+                try
+                {
+                    var fileContent = new ByteArrayContent(await System.IO.File.ReadAllBytesAsync(filePath));
+                    fileContent.Headers.ContentType = MediaTypeHeaderValue.Parse(MediaTypeNames.Application.Zip); // TODO: Add switch for csv/zip
+                    multipartContent.Add(fileContent, "ZipFile", fileName);
+                }
+                catch
+                {
+                    multipartContent.Add(new ByteArrayContent([]), "ZipFile", "empty.zip");
+                }
 
                 return await client.PostAsync($"api/releaseVersions/zip-data", multipartContent);
             }

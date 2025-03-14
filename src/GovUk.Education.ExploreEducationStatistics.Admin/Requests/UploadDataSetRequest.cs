@@ -31,7 +31,7 @@ public record UploadDataSetRequest
                 .NotEmpty()
                     .WithMessage(ValidationMessages.DataSetTitleCannotBeEmpty)
                 .MaximumLength(120)
-                    .WithMessage(ValidationMessages.DataSetTitleTooLong);
+                    .WithMessage(string.Format(ValidationMessages.DataSetTitleTooLong.Message, "{PropertyValue}", 120));
 
             RuleFor(request => request.DataFile)
                 .Cascade(CascadeMode.Stop)
@@ -41,7 +41,7 @@ public record UploadDataSetRequest
                 .Cascade(CascadeMode.Stop)
                 .MustBeValidCsvFile()
                 .Must(file => file.FileName.ToLower().EndsWith(".meta.csv"))
-                    .WithMessage(ValidationMessages.MetaFilenameMustEndDotMetaDotCsv);
+                    .WithMessage(string.Format(ValidationMessages.MetaFilenameMustEndDotMetaDotCsv.Message, "{PropertyValue}"));
         }
     }
 }
@@ -68,7 +68,7 @@ public record UploadDataSetAsZipRequest
                 .NotEmpty()
                     .WithMessage(ValidationMessages.DataSetTitleCannotBeEmpty)
                 .MaximumLength(120)
-                    .WithMessage(ValidationMessages.DataSetTitleTooLong);
+                    .WithMessage(string.Format(ValidationMessages.DataSetTitleTooLong.Message, "{PropertyValue}", 120));
 
             RuleFor(request => request.ZipFile)
                 .Cascade(CascadeMode.Stop)

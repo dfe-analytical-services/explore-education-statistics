@@ -99,7 +99,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 ZipFileId = sourceZipFile?.Id,
             });
 
-            // how should I create/use this is in a test so it's not a Mock?
             await dataProcessorClient.Import(import.Id);
             return import;
         }

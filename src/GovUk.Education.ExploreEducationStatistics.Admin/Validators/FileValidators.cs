@@ -15,11 +15,11 @@ public static class FileValidators
             .NotNull()
                 .WithMessage(ValidationMessages.FileIsNull)
             .Must(file => file.FileName.Length < MaxFilenameSize)
-                .WithMessage(ValidationMessages.FilenameTooLong)
+                .WithMessage(string.Format(ValidationMessages.FilenameTooLong.Message, "{PropertyName}", MaxFilenameSize))
             .Must(file => file.Length > 0)
-                .WithMessage(ValidationMessages.FileSizeMustNotBeZero)
+                .WithMessage(string.Format(ValidationMessages.FileSizeMustNotBeZero.Message, "{PropertyName}"))
             .Must(file => file.FileName.ToLower().EndsWith(".csv"))
-                .WithMessage(ValidationMessages.FilenameMustEndDotCsv);
+                .WithMessage(string.Format(ValidationMessages.FilenameMustEndDotCsv.Message, "{PropertyName}"));
     }
 
     public static IRuleBuilderOptions<T, IFormFile> MustBeValidZipFile<T>(
@@ -29,10 +29,10 @@ public static class FileValidators
             .NotNull()
                 .WithMessage(ValidationMessages.FileIsNull)
             .Must(file => file.FileName.Length < MaxFilenameSize)
-                .WithMessage(ValidationMessages.FilenameTooLong)
+                .WithMessage(string.Format(ValidationMessages.FilenameTooLong.Message, "{PropertyName}", MaxFilenameSize))
             .Must(file => file.Length > 0)
-                .WithMessage(ValidationMessages.FileSizeMustNotBeZero)
+                .WithMessage(string.Format(ValidationMessages.FileSizeMustNotBeZero.Message, "{PropertyName}"))
             .Must(file => file.FileName.ToLower().EndsWith(".zip"))
-                .WithMessage(ValidationMessages.ZipFilenameMustEndDotZip);
+                .WithMessage(string.Format(ValidationMessages.ZipFilenameMustEndDotZip.Message, "{PropertyName}"));
     }
 }
