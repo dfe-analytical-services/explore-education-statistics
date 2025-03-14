@@ -25,7 +25,7 @@ resources:
       trigger: none
 
 variables:
-  - group: Search Infrastructure - Common
+  - group: Common
   - name: forceDeployToEnvironment
     value: ${{parameters.forceDeployToEnvironment}}
   - name: isDev
