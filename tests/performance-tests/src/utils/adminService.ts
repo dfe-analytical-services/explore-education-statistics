@@ -244,25 +244,25 @@ export class AdminService {
   }
 
   getDataFile({
-    releaseId,
+    releaseVersionId,
     dataFileName,
   }: {
-    releaseId: string;
+    releaseVersionId: string;
     dataFileName: string;
   }) {
     const { json: releaseFiles } = this.client.get<
       { id: string; fileName: string }[]
-    >(`/api/release/${releaseId}/data`, applicationJsonHeaders);
+    >(`/api/release/${releaseVersionId}/data`, applicationJsonHeaders);
     return releaseFiles.find(file => file.fileName === dataFileName);
   }
 
   uploadDataZipFile({
     title,
-    releaseId,
+    releaseVersionId,
     zipFile,
   }: {
     title: string;
-    releaseId: string;
+    releaseVersionId: string;
     zipFile: {
       file: ArrayBuffer;
       filename: string;
@@ -270,19 +270,19 @@ export class AdminService {
   }) {
     return this.uploadDataFile({
       title,
-      releaseId,
+      releaseVersionId,
       dataFile: zipFile,
     });
   }
 
   uploadDataFile({
     title,
-    releaseId,
+    releaseVersionId,
     dataFile,
     metaFile,
   }: {
     title: string;
-    releaseId: string;
+    releaseVersionId: string;
     dataFile: {
       file: ArrayBuffer;
       filename: string;
@@ -312,7 +312,7 @@ export class AdminService {
     };
 
     const { response, json } = this.client.post<{ id: string }>(
-      `/api/release/${releaseId}/${
+      `/api/release/${releaseVersionId}/${
         zipUpload ? 'zip-data' : 'data'
       }?title=${encodeURI(title)}`,
       uploadBody,
@@ -327,7 +327,7 @@ export class AdminService {
   }
 
   waitForDataFileToImport({
-    releaseId,
+    releaseVersionId,
     fileId,
     pollingDelaySeconds = 5,
     onStatusCheckFailed,
@@ -336,7 +336,7 @@ export class AdminService {
     onImportCompleted,
     onImportExceededTimeout,
   }: {
-    releaseId: string;
+    releaseVersionId: string;
     fileId: string;
     pollingDelaySeconds?: number;
     onStatusCheckFailed?: (statusResponse: RefinedResponse<'text'>) => void;
@@ -350,7 +350,7 @@ export class AdminService {
 
     while (Date.now() < importExpireTime) {
       const { importStatus, response } = this.getImportStatus({
-        releaseId,
+        releaseVersionId,
         fileId,
       });
 
@@ -367,7 +367,7 @@ export class AdminService {
             return;
           }
           throw new Error(
-            `Import of file ${fileId} for Release ${releaseId} failed`,
+            `Import of file ${fileId} for Release ${releaseVersionId} failed`,
           );
         }
 
@@ -389,12 +389,12 @@ export class AdminService {
 
   getOrImportDataFile({
     title,
-    releaseId,
+    releaseVersionId,
     dataFile,
     metaFile,
   }: {
     title: string;
-    releaseId: string;
+    releaseVersionId: string;
     dataFile: {
       file: ArrayBuffer;
       filename: string;
@@ -406,18 +406,20 @@ export class AdminService {
   }) {
     return {
       id:
-        this.getDataFile({ releaseId, dataFileName: dataFile.filename })?.id ??
-        this.uploadDataFile({ title, releaseId, dataFile, metaFile })?.id,
+        this.getDataFile({ releaseVersionId, dataFileName: dataFile.filename })
+          ?.id ??
+        this.uploadDataFile({ title, releaseVersionId, dataFile, metaFile })
+          ?.id,
     };
   }
 
   getOrImportDataZipFile({
     title,
-    releaseId,
+    releaseVersionId,
     zipFile,
   }: {
     title: string;
-    releaseId: string;
+    releaseVersionId: string;
     zipFile: {
       file: ArrayBuffer;
       filename: string;
@@ -425,20 +427,21 @@ export class AdminService {
   }) {
     return {
       id:
-        this.getDataFile({ releaseId, dataFileName: zipFile.filename })?.id ??
-        this.uploadDataFile({ title, releaseId, dataFile: zipFile })?.id,
+        this.getDataFile({ releaseVersionId, dataFileName: zipFile.filename })
+          ?.id ??
+        this.uploadDataFile({ title, releaseVersionId, dataFile: zipFile })?.id,
     };
   }
 
   getImportStatus({
-    releaseId,
+    releaseVersionId,
     fileId,
   }: {
-    releaseId: string;
+    releaseVersionId: string;
     fileId: string;
   }) {
     const { response, json } = this.client.get<{ status: string }>(
-      `/api/release/${releaseId}/data/${fileId}/import/status`,
+      `/api/release/${releaseVersionId}/data/${fileId}/import/status`,
     );
     return {
       importStatus: json.status,
@@ -446,9 +449,9 @@ export class AdminService {
     };
   }
 
-  getSubjects({ releaseId }: { releaseId: string }) {
+  getSubjects({ releaseVersionId }: { releaseVersionId: string }) {
     const { response, json } = this.client.get<{ id: string; name: string }[]>(
-      `/api/data/releases/${releaseId}/subjects`,
+      `/api/data/releases/${releaseVersionId}/subjects`,
     );
     return {
       subjects: json.map(subject => ({
@@ -460,14 +463,14 @@ export class AdminService {
   }
 
   getSubjectMeta({
-    releaseId,
+    releaseVersionId,
     subjectId,
   }: {
-    releaseId: string;
+    releaseVersionId: string;
     subjectId: string;
   }) {
     const { response, json } = this.client.get<SubjectMeta>(
-      `/api/data/release/${releaseId}/meta/subject/${subjectId}`,
+      `/api/data/release/${releaseVersionId}/meta/subject/${subjectId}`,
     );
     return {
       subjectMeta: json,
@@ -476,14 +479,14 @@ export class AdminService {
   }
 
   tableQuery({
-    releaseId,
+    releaseVersionId,
     query,
   }: {
-    releaseId: string;
+    releaseVersionId: string;
     query: FullTableQuery;
   }) {
     const { response, json } = this.client.post<{ results: { id: string }[] }>(
-      `/api/data/tablebuilder/release/${releaseId}`,
+      `/api/data/tablebuilder/release/${releaseVersionId}`,
       JSON.stringify(query),
       applicationJsonHeaders,
     );
@@ -494,11 +497,11 @@ export class AdminService {
   }
 
   addDataGuidance({
-    releaseId,
+    releaseVersionId,
     content = '<p>Test Content</p>',
     subjects,
   }: {
-    releaseId: string;
+    releaseVersionId: string;
     content?: string;
     subjects: {
       id: string;
@@ -506,7 +509,7 @@ export class AdminService {
     }[];
   }) {
     const { response } = this.client.patch(
-      `/api/release/${releaseId}/data-guidance`,
+      `/api/release/${releaseVersionId}/data-guidance`,
       JSON.stringify({
         content,
         subjects,
@@ -519,16 +522,16 @@ export class AdminService {
   }
 
   approveRelease({
-    releaseId,
+    releaseVersionId,
     notifySubscribers = false,
     latestInternalReleaseNote = 'Approved',
   }: {
-    releaseId: string;
+    releaseVersionId: string;
     notifySubscribers?: boolean;
     latestInternalReleaseNote?: string;
   }) {
     const { response } = this.client.post(
-      `/api/releases/${releaseId}/status`,
+      `/api/releases/${releaseVersionId}/status`,
       JSON.stringify({
         notifySubscribers,
         latestInternalReleaseNote,
@@ -542,9 +545,9 @@ export class AdminService {
     };
   }
 
-  getReleaseApprovalStatus({ releaseId }: { releaseId: string }) {
+  getReleaseApprovalStatus({ releaseVersionId }: { releaseVersionId: string }) {
     const { response, json } = this.client.get<{ overallStage: OverallStage }>(
-      `/api/releases/${releaseId}/stage-status`,
+      `/api/releases/${releaseVersionId}/stage-status`,
       applicationJsonHeaders,
     );
     return {
@@ -554,7 +557,7 @@ export class AdminService {
   }
 
   waitForReleaseToBePublished({
-    releaseId,
+    releaseVersionId,
     pollingDelaySeconds = 5,
     onStatusCheckFailed,
     onStatusReceived,
@@ -562,7 +565,7 @@ export class AdminService {
     onPublishingCompleted,
     onPublishingExceededTimeout,
   }: {
-    releaseId: string;
+    releaseVersionId: string;
     pollingDelaySeconds?: number;
     onStatusCheckFailed?: (statusResponse: RefinedResponse<'text'>) => void;
     onStatusReceived?: (status: string) => void;
@@ -575,7 +578,9 @@ export class AdminService {
       publishingStartTime + TestData.maxPublishingWaitTimeMillis;
 
     while (Date.now() < publishingExpireTime) {
-      const { status, response } = this.getReleaseApprovalStatus({ releaseId });
+      const { status, response } = this.getReleaseApprovalStatus({
+        releaseVersionId,
+      });
 
       switch (response.status) {
         case 204: {
@@ -594,7 +599,9 @@ export class AdminService {
               onPublishingFailed(status);
               return;
             }
-            throw new Error(`Publishing failed for Release ${releaseId}`);
+            throw new Error(
+              `Publishing failed for Release ${releaseVersionId}`,
+            );
           }
 
           if (status === 'Complete') {
@@ -646,11 +653,11 @@ export function getDataFileUploadStrategy({ filename }: { filename: string }): {
     isZip,
     filename,
     subjectName: filename,
-    getOrImportSubject: (adminService, releaseId) =>
+    getOrImportSubject: (adminService, releaseVersionId) =>
       isZip
         ? adminService.uploadDataZipFile({
             title: subjectName,
-            releaseId,
+            releaseVersionId,
             zipFile: {
               file: zipFile as ArrayBuffer,
               filename: `${subjectName}.zip`,
@@ -658,7 +665,7 @@ export function getDataFileUploadStrategy({ filename }: { filename: string }): {
           })
         : adminService.uploadDataFile({
             title: subjectName,
-            releaseId,
+            releaseVersionId,
             dataFile: {
               file: subjectFile as ArrayBuffer,
               filename: `${subjectName}.csv`,

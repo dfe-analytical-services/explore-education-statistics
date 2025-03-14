@@ -162,6 +162,7 @@ describe('ChartBuilderTabSection', () => {
   });
 
   test('calls `getTableData` and `onTableUpdate` when boundary level changed', async () => {
+    // @MarkFix remove this test case?
     tableBuilderService.getTableData.mockResolvedValue(testTableData);
 
     const handleUpdate = jest.fn();
@@ -190,9 +191,8 @@ describe('ChartBuilderTabSection', () => {
     ]);
 
     expect(tableBuilderService.getTableData).toHaveBeenCalledWith(
-      { ...testQuery, boundaryLevel: 1 },
+      { ...testQuery, boundaryLevel: 1 }, // @MarkFix boundaryLevel
       'release-1',
-      1,
     );
 
     expect(handleUpdate).toHaveBeenCalledWith({

@@ -65,7 +65,6 @@ export interface LocationOption {
   value: string;
   level?: string;
   options?: LocationLeafOption[];
-  geoJson?: GeoJsonFeature;
 }
 
 export interface LocationGeoJsonOption extends LocationOption {
@@ -250,16 +249,8 @@ const tableBuilderService = {
   async getTableData(
     query: FullTableQuery,
     releaseVersionId?: string,
-    boundaryLevelId?: number,
   ): Promise<TableDataResponse> {
-    if (releaseVersionId && boundaryLevelId) {
-      return dataApi.post(
-        `/tablebuilder/release/${releaseVersionId}?boundaryLevelId=${boundaryLevelId}`,
-        query,
-      );
-    }
-
-    return releaseVersionId && !boundaryLevelId
+    return releaseVersionId
       ? dataApi.post(`/tablebuilder/release/${releaseVersionId}`, query)
       : dataApi.post('/tablebuilder', query);
   },

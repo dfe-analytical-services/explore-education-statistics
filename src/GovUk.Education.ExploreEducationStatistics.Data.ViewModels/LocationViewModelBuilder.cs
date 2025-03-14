@@ -13,12 +13,14 @@ public static class LocationViewModelBuilder
         Dictionary<GeographicLevel, List<string>>? hierarchies,
         Dictionary<GeographicLevel, Dictionary<string, BoundaryData>>? boundaryData = null)
     {
-        var locationAttributes = locations.GetLocationAttributesHierarchical(hierarchies);
+        var locationAttributes =
+            locations.GetLocationAttributesHierarchical(hierarchies);
         return locationAttributes.ToDictionary(
             levelAndLocationAttributes => levelAndLocationAttributes.Key,
             levelAndLocationAttributes =>
             {
-                var boundaryDataByCode = boundaryData?.GetValueOrDefault(levelAndLocationAttributes.Key);
+                var boundaryDataByCode =
+                    boundaryData?.GetValueOrDefault(levelAndLocationAttributes.Key);
                 return BuildLocationAttributeViewModels(levelAndLocationAttributes.Value, boundaryDataByCode);
             });
     }
@@ -40,22 +42,18 @@ public static class LocationViewModelBuilder
         IReadOnlyDictionary<string, BoundaryData>? boundaryDataByCode)
     {
         var locationAttribute = locationAttributeNode.Attribute;
-        return locationAttributeNode.IsLeaf
-            ? BuildLocationAttributeLeafViewModel(locationAttributeNode, boundaryDataByCode)
-            : new LocationAttributeViewModel
+
+        if (!locationAttributeNode.IsLeaf)
+        {
+            return new LocationAttributeViewModel
             {
                 Label = locationAttribute.Name ?? string.Empty,
                 Level = locationAttribute.GeographicLevel,
                 Value = locationAttribute.GetCodeOrFallback(),
                 Options = BuildLocationAttributeViewModels(locationAttributeNode.Children, boundaryDataByCode)
             };
-    }
+        }
 
-    private static LocationAttributeViewModel BuildLocationAttributeLeafViewModel(
-        LocationAttributeNode locationAttributeNode,
-        IReadOnlyDictionary<string, BoundaryData>? boundaryDataByCode)
-    {
-        var locationAttribute = locationAttributeNode.Attribute;
         var code = locationAttribute.GetCodeOrFallback();
 
         var feature = code.IsNullOrEmpty()

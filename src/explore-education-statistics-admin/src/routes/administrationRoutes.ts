@@ -12,10 +12,6 @@ import BoundaryDataUploadPage from '@admin/pages/bau/BoundaryDataUploadPage';
 import GlossaryPage from '@admin/pages/bau/GlossaryPage';
 import FeedbackPage from '@admin/pages/bau/FeedbackPage';
 
-export type BoundaryLevelEditPageRouteParams = {
-  boundaryLevelId: number;
-};
-
 export const administrationIndexRoute: ProtectedRouteProps = {
   path: '/administration',
   component: BauDashboardPage,

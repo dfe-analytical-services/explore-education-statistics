@@ -360,7 +360,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                 .Setup(s => s.Query(releaseVersion.Id,
                     It.Is<FullTableQuery>(ctx =>
                         ctx.Equals(request.Query.AsFullTableQuery())),
-                    null,
                     CancellationToken.None))
                 .ReturnsAsync(tableResult);
 
@@ -670,7 +669,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                 .Setup(s => s.Query(releaseVersion.Id,
                     It.Is<FullTableQuery>(ctx =>
                         ctx.Equals(request.Query.AsFullTableQuery())),
-                    It.IsAny<long?>(),
                     CancellationToken.None))
                 .ReturnsAsync(tableResult);
 
