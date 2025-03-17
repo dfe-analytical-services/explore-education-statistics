@@ -193,11 +193,23 @@ module keyVaultRoleAssignmentModule '../../public-api/components/keyVaultRoleAss
 
 var keyVaultReferenceIdentity = userAssignedManagedIdentityParams != null ? userAssignedManagedIdentityParams!.id : null
 
+var identity = userAssignedManagedIdentityParams != null
+  ? {
+      type: 'UserAssigned'
+      userAssignedIdentities: {
+        '${userAssignedManagedIdentityParams!.id}': {}
+      }
+    }
+  : {
+      type: 'SystemAssigned'
+    }
+
 resource functionApp 'Microsoft.Web/sites@2024-04-01' = {
   name: functionAppName
   location: location
   tags: tagValues
   kind: 'functionapp,linux,container'
+  identity: identity
   properties: {
     enabled: true
     serverFarmId: appServicePlanModule.outputs.planId
@@ -256,7 +268,7 @@ resource functionApp 'Microsoft.Web/sites@2024-04-01' = {
 }
 
 module deploymentStorageAccountModule '../../public-api/components/storageAccount.bicep' = {
-  name: '${functionAppName}-deploymentStorageAccountModuleDeploy'
+  name: '${functionAppName}DeploymentStorageAccountModuleDeploy'
   params: {
     location: location
     storageAccountName: deploymentStorageAccountName
