@@ -39,6 +39,10 @@ param deployAlerts bool = false
 @description('The Docker image tag for the data screener. This value should represent a pipeline build number')
 param screenerDockerImageTag string = '1.0.0'
 
+resource keyVault 'Microsoft.KeyVault/vaults@2023-07-01' existing = {
+  name: resourceNames.existingResources.keyVault
+}
+
 var maintenanceFirewallRules = [
   for maintenanceIpRange in maintenanceIpRanges: {
     name: maintenanceIpRange.name
@@ -53,7 +57,7 @@ module screenerFunctionAppModule 'application/screenerContainerisedFunctionApp.b
   params: {
     location: location
     functionAppImageName: 'ees-screener-api'
-    acrLoginServer: 'https://eesacr.azurecr.io/'
+    acrLoginServer: keyVault.getSecret('DOCKER-REGISTRY-SERVER-DOMAIN')
     screenerAppRegistrationClientId: screenerAppRegistrationClientId
     devopsServicePrincipalId: devopsServicePrincipalId
     screenerDockerImageTag: screenerDockerImageTag
