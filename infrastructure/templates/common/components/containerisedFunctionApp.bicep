@@ -26,8 +26,6 @@ param functionAppName string
 param azureFileShares AzureFileShareMount[] = []
 
 @description('Name of the deployment storage account.')
-@minLength(3)
-@maxLength(24)
 param deploymentStorageAccountName string
 
 @description('Specifies whether or not the Function App will always be on and not idle after periods of no traffic - must be compatible with the chosen hosting plan')
@@ -176,7 +174,7 @@ module fileShareModule '../../public-api/components/fileShare.bicep' = {
   name: '${deploymentStorageAccountName}FileShareModuleDeploy'
   params: {
     storageAccountName: deploymentStorageAccountModule.outputs.storageAccountName
-    fileShareName: '${functionAppName}-${abbreviations.fileShare}'
+    fileShareName: '${functionApp.name}-${abbreviations.fileShare}'
     alerts: fileServiceAlerts
     tagValues: tagValues
   }
@@ -322,7 +320,7 @@ module azureAuthentication '../../public-api/components/siteAzureAuthentication.
 module healthAlert '../../public-api/components/alerts/staticMetricAlert.bicep' = if (alerts != null && alerts!.functionAppHealth) {
   name: '${functionAppName}HealthAlertModule'
   params: {
-    resourceName: functionAppName
+    resourceName: functionApp.name
     resourceMetric: {
       resourceType: 'Microsoft.Web/sites'
       metric: 'HealthCheckStatus'
@@ -334,9 +332,6 @@ module healthAlert '../../public-api/components/alerts/staticMetricAlert.bicep' 
     alertsGroupName: alerts!.alertsGroupName
     tagValues: tagValues
   }
-  dependsOn: [
-    functionApp
-  ]
 }
 
 var unexpectedHttpStatusCodeMetrics = ['Http401', 'Http5xx']
@@ -345,7 +340,7 @@ module unexpectedHttpStatusCodeAlerts '../../public-api/components/alerts/static
   for httpStatusCode in unexpectedHttpStatusCodeMetrics: if (alerts != null && alerts!.httpErrors) {
     name: '${functionAppName}${httpStatusCode}Module'
     params: {
-      resourceName: functionAppName
+      resourceName: functionApp.name
       resourceMetric: {
         resourceType: 'Microsoft.Web/sites'
         metric: httpStatusCode
@@ -357,9 +352,6 @@ module unexpectedHttpStatusCodeAlerts '../../public-api/components/alerts/static
       alertsGroupName: alerts!.alertsGroupName
       tagValues: tagValues
     }
-    dependsOn: [
-      functionApp
-    ]
   }
 ]
 
@@ -369,7 +361,7 @@ module expectedHttpStatusCodeAlerts '../../public-api/components/alerts/dynamicM
   for httpStatusCode in expectedHttpStatusCodeMetrics: if (alerts != null && alerts!.httpErrors) {
     name: '${functionAppName}${httpStatusCode}Module'
     params: {
-      resourceName: functionAppName
+      resourceName: functionApp.name
       resourceMetric: {
         resourceType: 'Microsoft.Web/sites'
         metric: httpStatusCode
@@ -382,9 +374,6 @@ module expectedHttpStatusCodeAlerts '../../public-api/components/alerts/dynamicM
       alertsGroupName: alerts!.alertsGroupName
       tagValues: tagValues
     }
-    dependsOn: [
-      functionApp
-    ]
   }
 ]
 
