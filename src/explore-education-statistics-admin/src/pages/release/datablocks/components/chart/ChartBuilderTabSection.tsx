@@ -101,17 +101,31 @@ const ChartBuilderTabSection = ({
         return;
       }
 
-      const tableData = await tableBuilderService.getTableData(
-        nextQuery,
-        releaseVersionId,
-      );
+      const { boundaryLevel } = nextQuery;
+
+      const [tableData, geoJson] = await Promise.all([
+        tableBuilderService.getTableData(nextQuery, releaseVersionId),
+        boundaryLevel !== undefined
+          ? tableBuilderService.getDataBlockGeoJson(
+              releaseVersionId,
+              dataBlock.dataBlockParentId,
+              boundaryLevel,
+            )
+          : {},
+      ]);
 
       onTableUpdate({
-        table: mapFullTable(tableData),
+        table: mapFullTable({
+          ...tableData,
+          subjectMeta: {
+            ...tableData.subjectMeta,
+            locations: geoJson,
+          },
+        }),
         query: nextQuery,
       });
     },
-    [onTableUpdate, query, releaseVersionId],
+    [onTableUpdate, query, releaseVersionId, dataBlock],
   );
 
   return (
