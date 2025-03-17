@@ -35,6 +35,7 @@ stages:
     lockBehavior: sequential
     condition: ${{ parameters.condition }}
     variables:
+      - group: Common - ${{ parameters.environment }}
       - group: Screener Infrastructure - ${{ parameters.environment }}
       - name: infraDeployName
         value: ScreenerInfrastructure$(Build.BuildNumber)
