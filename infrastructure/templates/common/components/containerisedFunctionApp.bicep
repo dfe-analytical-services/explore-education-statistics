@@ -312,7 +312,7 @@ module azureAuthentication '../../public-api/components/siteAzureAuthentication.
   name: '${functionAppName}AzureAuthentication'
   params: {
     clientId: entraIdAuthentication!.appRegistrationClientId
-    siteName: functionAppName
+    siteName: functionApp.name
     allowedClientIds: entraIdAuthentication!.allowedClientIds
     allowedPrincipalIds: entraIdAuthentication!.allowedPrincipalIds
     requireAuthentication: entraIdAuthentication!.requireAuthentication

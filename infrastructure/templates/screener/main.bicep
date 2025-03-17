@@ -74,7 +74,7 @@ var tagValues = union(resourceTags ?? {}, {
 var legacyResourcePrefix = subscription
 
 // The resource prefix for anything specific to the Screener API.
-var resourcePrefix = '${subscription}-sapi'
+var resourcePrefix = '${subscription}-ees-sapi'
 
 var resourceNames = {
   existingResources: {
