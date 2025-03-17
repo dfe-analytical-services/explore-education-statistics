@@ -2,6 +2,7 @@ import ChartDataGroupingForm from '@admin/pages/release/datablocks/components/ch
 import { MapDataGroupingConfig } from '@admin/pages/release/datablocks/components/chart/types/mapConfig';
 import ButtonText from '@common/components/ButtonText';
 import Modal from '@common/components/Modal';
+import useToggle from '@common/hooks/useToggle';
 import {
   dataGroupingTypes,
   MapConfig,
@@ -9,7 +10,7 @@ import {
 } from '@common/modules/charts/types/chart';
 import { FullTableMeta } from '@common/modules/table-tool/types/fullTable';
 import isEqual from 'lodash/isEqual';
-import React, { useState } from 'react';
+import React from 'react';
 
 interface Props {
   dataSetConfig: MapDataSetConfig;
@@ -28,10 +29,7 @@ export default function ChartDataGroupingsConfigurationRow({
   unit,
   onChange,
 }: Props) {
-  const [editDataSetConfig, setEditDataSetConfig] = useState<{
-    dataSetConfig: MapDataSetConfig;
-    unit: string;
-  }>();
+  const [open, toggleOpen] = useToggle(false);
 
   return (
     <tr>
@@ -45,37 +43,29 @@ export default function ChartDataGroupingsConfigurationRow({
       </td>
       <td className="govuk-!-text-align-right">
         <Modal
-          open={!!editDataSetConfig}
-          triggerButton={
-            <ButtonText
-              onClick={() => setEditDataSetConfig({ dataSetConfig, unit })}
-            >
-              Edit
-            </ButtonText>
-          }
+          open={open}
+          triggerButton={<ButtonText onClick={toggleOpen.on}>Edit</ButtonText>}
           title="Edit groupings"
-          onExit={() => setEditDataSetConfig(undefined)}
+          onExit={toggleOpen.off}
         >
-          {editDataSetConfig && (
-            <ChartDataGroupingForm
-              dataSetConfig={editDataSetConfig.dataSetConfig}
-              dataSetConfigs={map.dataSetConfigs}
-              meta={meta}
-              unit={editDataSetConfig.unit}
-              onCancel={() => setEditDataSetConfig(undefined)}
-              onSubmit={values => {
-                onChange({
-                  dataSetConfigs: map.dataSetConfigs.map(config => {
-                    return isEqual(config.dataSet, values.dataSet)
-                      ? values
-                      : config;
-                  }),
-                });
+          <ChartDataGroupingForm
+            dataSetConfig={dataSetConfig}
+            dataSetConfigs={map.dataSetConfigs}
+            meta={meta}
+            unit={unit}
+            onCancel={toggleOpen.off}
+            onSubmit={values => {
+              onChange({
+                dataSetConfigs: map.dataSetConfigs.map(config => {
+                  return isEqual(config.dataSet, values.dataSet)
+                    ? values
+                    : config;
+                }),
+              });
 
-                setEditDataSetConfig(undefined);
-              }}
-            />
-          )}
+              toggleOpen.off();
+            }}
+          />
         </Modal>
       </td>
     </tr>
