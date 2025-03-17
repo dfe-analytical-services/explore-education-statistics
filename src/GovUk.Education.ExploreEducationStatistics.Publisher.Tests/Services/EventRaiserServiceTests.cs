@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Net;
 using System.Text.Json;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
@@ -126,6 +127,49 @@ public class EventRaiserServiceTests(ITestOutputHelper output)
             // ASSERT
             Assert.Equal(numberOfEvents, _eventGridPublisherClientBuilder.Client.Assert.EventsPublished.Count());
         }
+        
+        [Fact]
+        public async Task WhenPublishingEventReturnsErrorCode_ThenErrorLogged()
+        {
+            // ARRANGE
+            _eventGridOptionsBuilder.AddTopicConfig(
+                ReleaseVersionPublishedEventDto.EventTopicOptionsKey,
+                "http://test.topic.endpoint/",
+                topicAccessKey: null);
+
+            _eventGridPublisherClientBuilder.Client.WhereResponseIs(HttpStatusCode.Unauthorized);
+            
+            var sut = GetSut();
+            var info = new PublishingCompletionService.PublishedReleaseVersionInfo();
+            
+            // ACT
+            await sut.RaiseReleaseVersionPublishedEvents([info]);
+
+            // ASSERT
+            _loggerBuilder.Assert.LoggedErrorContains("401");
+        }
+        
+        [Fact]
+        public async Task WhenPublishingEventThrows_ThenErrorLogged()
+        {
+            // ARRANGE
+            _eventGridOptionsBuilder.AddTopicConfig(
+                ReleaseVersionPublishedEventDto.EventTopicOptionsKey,
+                "http://test.topic.endpoint/",
+                topicAccessKey: null);
+
+            _eventGridPublisherClientBuilder.Client.WhereSendEventAsyncThrows(new Exception("TEST EXCEPTION"));
+            
+            var sut = GetSut();
+            var info = new PublishingCompletionService.PublishedReleaseVersionInfo();
+            
+            // ACT
+            await sut.RaiseReleaseVersionPublishedEvents([info]);
+
+            // ASSERT
+            _loggerBuilder.Assert.LoggedErrorContains("TEST EXCEPTION");
+        }
+        
     }
 
     public class ServiceRegistrationTests()

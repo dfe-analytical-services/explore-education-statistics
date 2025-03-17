@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Net;
+using System.Runtime.CompilerServices;
 using Azure;
 using Azure.Core;
+using Azure.Core.Pipeline;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Builders.Services.EventGrid;
 
@@ -19,6 +21,8 @@ public class MockResponse : Response
     protected override bool ContainsHeader(string name) => throw new NotImplementedException();
 
     protected override IEnumerable<HttpHeader> EnumerateHeaders() => throw new NotImplementedException();
+
+    public override bool IsError => this.StatusCode != HttpStatusCode.OK;
 
     public override int Status => (int)StatusCode;
     public override string ReasonPhrase { get; } = string.Empty;

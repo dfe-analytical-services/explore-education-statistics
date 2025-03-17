@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Net;
 using System.Threading;
 using Azure.Messaging.EventGrid;
@@ -12,16 +13,26 @@ public class EventGridPublisherClientBuilder
     private readonly Mock<IEventGridPublisherClient> _mock = new(MockBehavior.Strict);
     private readonly List<EventGridEvent> _eventsPublished = new();
     private HttpStatusCode _httpStatusCode;
+    private Exception? _sendEventAsyncException;
 
     public IEventGridPublisherClient Build()
     {
-        _mock
-            .Setup(m => m.SendEventAsync(It.IsAny<EventGridEvent>(), It.IsAny<CancellationToken>()))
-            .Callback((EventGridEvent eventGridEvent, CancellationToken cancellationToken) => _eventsPublished.Add(eventGridEvent))
-            .ReturnsAsync(() => new MockResponse
-            {
-                StatusCode = _httpStatusCode
-            });
+        if (_sendEventAsyncException is null)
+        {
+            _mock
+                .Setup(m => m.SendEventAsync(It.IsAny<EventGridEvent>(), It.IsAny<CancellationToken>()))
+                .Callback((EventGridEvent eventGridEvent, CancellationToken cancellationToken) => _eventsPublished.Add(eventGridEvent))
+                .ReturnsAsync(() => new MockResponse
+                {
+                    StatusCode = _httpStatusCode
+                });
+        }
+        else
+        {
+            _mock
+                .Setup(m => m.SendEventAsync(It.IsAny<EventGridEvent>(), It.IsAny<CancellationToken>()))
+                .ThrowsAsync(_sendEventAsyncException);
+        }
         return _mock.Object;
     }
 
@@ -31,6 +42,12 @@ public class EventGridPublisherClientBuilder
         return this;
     }
 
+    public EventGridPublisherClientBuilder WhereSendEventAsyncThrows(Exception exception)
+    {
+        _sendEventAsyncException = exception;
+        return this;
+    }
+    
     public Asserter Assert => new(_mock, _eventsPublished);
     public class Asserter(Mock<IEventGridPublisherClient> mock, List<EventGridEvent> eventsPublished)
     {
