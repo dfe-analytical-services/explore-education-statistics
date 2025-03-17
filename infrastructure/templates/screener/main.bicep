@@ -53,7 +53,7 @@ module screenerFunctionAppModule 'application/screenerContainerisedFunctionApp.b
   params: {
     location: location
     functionAppImageName: 'eesyscreener-api'
-    acrLoginServer: 'eesacr'
+    acrLoginServer: 'https://eesacr.azurecr.io/'
     screenerAppRegistrationClientId: screenerAppRegistrationClientId
     devopsServicePrincipalId: devopsServicePrincipalId
     screenerDockerImageTag: screenerDockerImageTag
