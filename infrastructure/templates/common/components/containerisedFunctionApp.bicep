@@ -204,6 +204,8 @@ var identity = userAssignedManagedIdentityParams != null
       type: 'SystemAssigned'
     }
 
+var dockerImage = 'DOCKER|${acrLoginServer}/${functionAppImageName}:${functionAppDockerImageTag}'
+
 resource functionApp 'Microsoft.Web/sites@2024-04-01' = {
   name: functionAppName
   location: location
@@ -216,7 +218,7 @@ resource functionApp 'Microsoft.Web/sites@2024-04-01' = {
     reserved: operatingSystem == 'Linux'
     vnetImagePullEnabled: vnetImagePullEnabled
     siteConfig: {
-      linuxFxVersion: 'DOCKER|${acrLoginServer}/${functionAppImageName}:${functionAppDockerImageTag}'
+      linuxFxVersion: dockerImage
       acrUseManagedIdentityCreds: true
       alwaysOn: alwaysOn ?? null
       keyVaultReferenceIdentity: keyVaultReferenceIdentity
@@ -258,6 +260,10 @@ resource functionApp 'Microsoft.Web/sites@2024-04-01' = {
         {
           name: 'DOCKER_REGISTRY_SERVER_PASSWORD'
           value: dockerPullManagedIdentitySecretValue
+        }
+        {
+          name: 'DOCKER_CUSTOM_IMAGE_NAME'
+          value: dockerImage
         }
       ]
     }

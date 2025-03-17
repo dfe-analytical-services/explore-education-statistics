@@ -87,6 +87,16 @@ resource screenerFunctionAppManagedIdentity 'Microsoft.ManagedIdentity/userAssig
   location: location
 }
 
+module screenerFunctionAppManagedIdentityAcrPull '../../public-api/components/containerRegistryRoleAssignment.bicep' = {
+  name: 'screenerFunctionAppManagedIdentityAcrPullRoleAssignmentDeploy'
+  scope: resourceGroup()
+  params: {
+    role: 'AcrPull'
+    containerRegistryName: 'eesacr'
+    principalIds: [screenerFunctionAppManagedIdentity.properties.principalId]
+  }
+}
+
 module containerisedFunctionAppModule '../../common/components/containerisedFunctionApp.bicep' = {
   name: 'screenerContainerisedFunctionAppModuleDeploy'
   params: {
@@ -123,6 +133,7 @@ module containerisedFunctionAppModule '../../common/components/containerisedFunc
     deploymentStorageAccountName: resourceNames.screener.screenerFunctionStorageAccount
     functionAppFirewallRules: functionAppFirewallRules
     storageFirewallRules: storageFirewallRules
+    publicNetworkAccessEnabled: true
     privateEndpoints: {
       functionApp: privateEndpointSubnet.id
       storageAccounts: privateEndpointSubnet.id
