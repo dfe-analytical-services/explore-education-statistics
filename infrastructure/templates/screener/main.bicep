@@ -90,7 +90,7 @@ var resourceNames = {
   }
   screener: {
     screenerFunction: '${resourcePrefix}-${abbreviations.webSitesFunctions}-screener'
-    screenerFunctionStorageAccount: '${replace(resourcePrefix, '-', '')}${abbreviations.storageStorageAccounts}screenerfn'
+    screenerFunctionStorageAccount: '${replace(resourcePrefix, '-', '')}${abbreviations.storageStorageAccounts}fn'
     screenerFunctionIdentity: '${resourcePrefix}-${abbreviations.managedIdentityUserAssignedIdentities}-${abbreviations.webSitesFunctions}-screener'
   }
 }
