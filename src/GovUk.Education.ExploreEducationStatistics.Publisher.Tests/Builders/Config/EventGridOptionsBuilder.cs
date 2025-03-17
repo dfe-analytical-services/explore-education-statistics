@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Options;
 using Microsoft.Extensions.Options;
 
@@ -17,6 +18,12 @@ public class EventGridOptionsBuilder
     public EventGridOptionsBuilder AddTopicConfig(string topicKey, string topicEndpoint, string? topicAccessKey = null)
     {
         _eventTopicOptions.Add(new EventTopicOptions{ Key = topicKey, TopicEndpoint = topicEndpoint, TopicAccessKey = topicAccessKey});
+        return this;
+    }
+
+    public EventGridOptionsBuilder WhereNoTopicConfigFor(string topicKey)
+    {
+        _eventTopicOptions.RemoveAll(o => o.Key == topicKey);
         return this;
     }
 }

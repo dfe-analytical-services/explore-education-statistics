@@ -2,18 +2,20 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Azure;
-using Azure.Identity;
 using Azure.Messaging.EventGrid;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Events;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Options;
+using GovUk.Education.ExploreEducationStatistics.Publisher.Services.EventGrid;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services;
 
-public class EventRaiserService(IOptions<EventGridOptions> eventGridOptions, ILogger<EventRaiserService> logger)
+public class EventRaiserService(
+    IEventGridPublisherClientFactory eventGridPublisherClientFactory,
+    IOptions<EventGridOptions> eventGridOptions, 
+    ILogger<EventRaiserService> logger)
     : IEventRaiserService
 {
     private readonly EventGridOptions _eventGridOptions = eventGridOptions.Value;
@@ -39,9 +41,7 @@ public class EventRaiserService(IOptions<EventGridOptions> eventGridOptions, ILo
                                         PublicationLatestReleaseVersionId = info.PublicationLatestReleaseVersionId,
                                     }));
 
-        var client = options.TopicAccessKey is null
-                ? new EventGridPublisherClient(new Uri(options.TopicEndpoint), new DefaultAzureCredential())
-                : new EventGridPublisherClient(new Uri(options.TopicEndpoint), new AzureKeyCredential(options.TopicAccessKey));
+        var client = eventGridPublisherClientFactory.CreateClient(options.TopicEndpoint, options.TopicAccessKey);
 
         foreach (var evnt in releaseVersionPublishedEvents)
         {
@@ -50,7 +50,7 @@ public class EventRaiserService(IOptions<EventGridOptions> eventGridOptions, ILo
     }
 
     private async Task RaiseEvent(
-        EventGridPublisherClient client,
+        IEventGridPublisherClient client,
         EventGridEvent eventGridEvent)
     {
         try
