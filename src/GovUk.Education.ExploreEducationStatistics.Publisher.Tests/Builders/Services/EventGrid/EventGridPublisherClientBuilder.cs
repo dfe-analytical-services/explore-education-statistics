@@ -12,7 +12,7 @@ public class EventGridPublisherClientBuilder
 {
     private readonly Mock<IEventGridPublisherClient> _mock = new(MockBehavior.Strict);
     private readonly List<EventGridEvent> _eventsPublished = new();
-    private HttpStatusCode _httpStatusCode;
+    private HttpStatusCode _httpStatusCode = HttpStatusCode.OK;
     private Exception? _sendEventAsyncException;
 
     public IEventGridPublisherClient Build()

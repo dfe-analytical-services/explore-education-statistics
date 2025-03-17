@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using System.Net;
 using System.Text.Json;
@@ -7,6 +7,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Events;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Options;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services;
+using GovUk.Education.ExploreEducationStatistics.Publisher.Services.EventGrid;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Builders.Config;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Builders.Services;
@@ -26,8 +27,8 @@ public class EventRaiserServiceTests(ITestOutputHelper output)
     private readonly EventGridOptionsBuilder _eventGridOptionsBuilder = new();
     private readonly UnitTestOutputLoggerBuilder<EventRaiserService> _loggerBuilder = new();
 
-    private IEventRaiserService GetSut() => new EventRaiserService(
-        _eventGridPublisherClientBuilder.Build(),
+    private IEventRaiserService GetSut(IEventGridPublisherClientFactory? eventGridPublisherClientFactory = null) => new EventRaiserService(
+        eventGridPublisherClientFactory ?? _eventGridPublisherClientBuilder.Build(),
         _eventGridOptionsBuilder.Build(),
         _loggerBuilder.Build(output));
 
@@ -207,7 +208,8 @@ public class EventRaiserServiceTests(ITestOutputHelper output)
                     TestTopicEndpoint,
                     TopicAccessKey);
 
-            var sut = GetSut();
+            var realEventGridPublisherClientFactory = new EventGridPublisherClientFactory();
+            var sut = GetSut(realEventGridPublisherClientFactory);
 
             var publishedReleaseVersionInfo = new PublishingCompletionService.PublishedReleaseVersionInfo
             {
