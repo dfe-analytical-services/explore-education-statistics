@@ -42,6 +42,10 @@ resource keyVault 'Microsoft.KeyVault/vaults@2023-07-01' existing = {
 resource vNet 'Microsoft.Network/virtualNetworks@2023-11-01' existing = {
   name: resourceNames.existingResources.vNet
 }
+resource outboundVnetSubnet 'Microsoft.Network/virtualNetworks/subnets@2023-11-01' existing = {
+  name: resourceNames.existingResources.subnets.analyticsFunctionApp
+  parent: vNet
+}
 
 resource analyticsStorageAccount 'Microsoft.Storage/storageAccounts@2023-05-01' existing = {
   name: analyticsStorageAccountName
@@ -87,6 +91,7 @@ module functionAppModule '../../common/components/functionApp.bicep' = {
     publicNetworkAccessEnabled: false
     functionAppFirewallRules: functionAppFirewallRules
     storageFirewallRules: storageFirewallRules
+    outboundSubnetId: outboundVnetSubnet.id
     privateEndpoints: {
       storageAccounts: storagePrivateEndpointSubnet.id
     }

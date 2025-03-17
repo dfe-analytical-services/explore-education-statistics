@@ -54,6 +54,7 @@ var resourceNames = {
     vNet: '${subscription}-vnet-ees'
     alertsGroup: '${subscription}-ag-ees-alertedusers'
     subnets: {
+      analyticsFunctionApp: '${resourcePrefix}-snet-${abbreviations.webSitesFunctions}-analytics'
       storagePrivateEndpoints: '${resourcePrefix}-snet-${abbreviations.storageStorageAccounts}-anlyt-${abbreviations.privateEndpoints}'
     }
   }

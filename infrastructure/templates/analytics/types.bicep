@@ -5,6 +5,7 @@ type ResourceNames = {
     vNet: string
     alertsGroup: string
     subnets: {
+      analyticsFunctionApp: string
       storagePrivateEndpoints: string
     }
   }
