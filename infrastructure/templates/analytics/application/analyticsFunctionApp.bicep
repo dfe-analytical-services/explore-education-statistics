@@ -26,6 +26,9 @@ param analyticsFileShareName string
 @description('The Application Insights connection string that is associated with this resource.')
 param applicationInsightsConnectionString string = ''
 
+@description('The cron schedule for the Public API queries consumer Function. Defaults to every half hour.')
+param publicApiQueryConsumerCron string
+
 @description('Specifies whether or not the Analytics Function App already exists.')
 param functionAppExists bool
 
@@ -62,6 +65,10 @@ module functionAppModule '../../common/components/functionApp.bicep' = {
       {
         name: 'Analytics__BasePath'
         value: fileShareMountPath
+      }
+      {
+        name: 'App__ConsumePublicApiQueriesCronSchedule'
+        value: publicApiQueryConsumerCron
       }
     ]
     functionAppExists: functionAppExists
