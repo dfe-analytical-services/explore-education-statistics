@@ -22,7 +22,7 @@ public class QueryDataSetVersionAuthorizationHandlerTests
     [Theory]
     [MemberData(nameof(DataSetVersionStatusQueryTheoryData.AvailableStatuses),
         MemberType = typeof(DataSetVersionStatusQueryTheoryData))]
-    public void Success(DataSetVersionStatus status)
+    public async Task Success(DataSetVersionStatus status)
     {
         DataSetVersion dataSetVersion = _dataFixture
             .DefaultDataSetVersion()
@@ -31,7 +31,7 @@ public class QueryDataSetVersionAuthorizationHandlerTests
         var handler = BuildHandler();
         var context = CreateAnonymousAuthContext<QueryDataSetVersionRequirement, DataSetVersion>(dataSetVersion);
 
-        handler.HandleAsync(context);
+        await handler.HandleAsync(context);
 
         Assert.True(context.HasSucceeded);
     }
@@ -39,7 +39,7 @@ public class QueryDataSetVersionAuthorizationHandlerTests
     [Theory]
     [MemberData(nameof(DataSetVersionStatusQueryTheoryData.UnavailableStatuses),
         MemberType = typeof(DataSetVersionStatusQueryTheoryData))]
-    public void Failure(DataSetVersionStatus status)
+    public async Task Failure(DataSetVersionStatus status)
     {
         DataSetVersion dataSetVersion = _dataFixture
             .DefaultDataSetVersion()
@@ -48,7 +48,7 @@ public class QueryDataSetVersionAuthorizationHandlerTests
         var handler = BuildHandler();
         var context = CreateAnonymousAuthContext<QueryDataSetVersionRequirement, DataSetVersion>(dataSetVersion);
 
-        handler.HandleAsync(context);
+        await handler.HandleAsync(context);
 
         Assert.False(context.HasSucceeded);
     }
@@ -56,7 +56,7 @@ public class QueryDataSetVersionAuthorizationHandlerTests
     [Theory]
     [MemberData(nameof(DataSetVersionStatusQueryTheoryData.AvailableStatusesIncludingDraft),
         MemberType = typeof(DataSetVersionStatusQueryTheoryData))]
-    public void Success_PreviewTokenIsActive(DataSetVersionStatus status)
+    public async Task Success_PreviewTokenIsActive(DataSetVersionStatus status)
     {
         DataSetVersion dataSetVersion = _dataFixture
             .DefaultDataSetVersion()
@@ -79,13 +79,13 @@ public class QueryDataSetVersionAuthorizationHandlerTests
 
         var context = CreateAnonymousAuthContext<QueryDataSetVersionRequirement, DataSetVersion>(dataSetVersion);
 
-        handler.HandleAsync(context);
+        await handler.HandleAsync(context);
 
         Assert.True(context.HasSucceeded);
     }
 
     [Fact]
-    public void Failure_PreviewTokenIsExpired()
+    public async Task Failure_PreviewTokenIsExpired()
     {
         DataSetVersion dataSetVersion = _dataFixture
             .DefaultDataSetVersion()
@@ -108,13 +108,13 @@ public class QueryDataSetVersionAuthorizationHandlerTests
 
         var context = CreateAnonymousAuthContext<QueryDataSetVersionRequirement, DataSetVersion>(dataSetVersion);
 
-        handler.HandleAsync(context);
+        await handler.HandleAsync(context);
 
         Assert.False(context.HasSucceeded);
     }
 
     [Fact]
-    public void Failure_PreviewTokenIsForWrongDataSetVersion()
+    public async Task Failure_PreviewTokenIsForWrongDataSetVersion()
     {
         var (dataSetVersion1, dataSetVersion2) = _dataFixture
             .DefaultDataSetVersion()
@@ -139,7 +139,7 @@ public class QueryDataSetVersionAuthorizationHandlerTests
 
         var context = CreateAnonymousAuthContext<QueryDataSetVersionRequirement, DataSetVersion>(dataSetVersion1);
 
-        handler.HandleAsync(context);
+        await handler.HandleAsync(context);
 
         Assert.False(context.HasSucceeded);
     }
@@ -147,7 +147,7 @@ public class QueryDataSetVersionAuthorizationHandlerTests
     [Theory]
     [MemberData(nameof(DataSetVersionStatusQueryTheoryData.UnavailableStatusesExceptDraft),
         MemberType = typeof(DataSetVersionStatusQueryTheoryData))]
-    public void Failure_PreviewTokenIsForUnavailableDataSetVersion(DataSetVersionStatus status)
+    public async Task Failure_PreviewTokenIsForUnavailableDataSetVersion(DataSetVersionStatus status)
     {
         DataSetVersion dataSetVersion = _dataFixture
             .DefaultDataSetVersion()
@@ -170,7 +170,7 @@ public class QueryDataSetVersionAuthorizationHandlerTests
 
         var context = CreateAnonymousAuthContext<QueryDataSetVersionRequirement, DataSetVersion>(dataSetVersion);
 
-        handler.HandleAsync(context);
+        await handler.HandleAsync(context);
 
         Assert.False(context.HasSucceeded);
     }

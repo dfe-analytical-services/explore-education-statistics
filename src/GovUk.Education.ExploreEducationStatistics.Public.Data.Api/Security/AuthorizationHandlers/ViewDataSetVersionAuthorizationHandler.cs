@@ -10,10 +10,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Security.Au
 
 public class ViewDataSetVersionRequirement : IAuthorizationRequirement;
 
-public class ViewDataSetVersionAuthorizationHandler(
-    IAuthorizationHandlerService authorizationHandlerService,
-    IHttpContextAccessor httpContextAccessor,
-    IPreviewTokenService previewTokenService)
+public class ViewDataSetVersionAuthorizationHandler(IAuthorizationHandlerService authorizationHandlerService)
     : AuthorizationHandler<ViewDataSetVersionRequirement, DataSetVersion>
 {
     protected override async Task HandleRequirementAsync(
@@ -33,17 +30,9 @@ public class ViewDataSetVersionAuthorizationHandler(
             return;
         }
 
-        if (await RequestHasValidPreviewToken(dataSetVersion))
+        if (await authorizationHandlerService.RequestHasValidPreviewToken(dataSetVersion))
         {
             context.Succeed(requirement);
         }
-    }
-
-    private async Task<bool> RequestHasValidPreviewToken(DataSetVersion dataSetVersion)
-    {
-        return httpContextAccessor.HttpContext.TryGetRequestHeader(
-                   RequestHeaderNames.PreviewToken,
-                   out var previewToken)
-               && await previewTokenService.ValidatePreviewToken(previewToken.ToString(), dataSetVersion.Id);
     }
 }
