@@ -111,7 +111,7 @@ const ChartBuilderTabSection = ({
               dataBlock.dataBlockParentId,
               boundaryLevel,
             )
-          : {},
+          : undefined,
       ]);
 
       onTableUpdate({
@@ -119,7 +119,7 @@ const ChartBuilderTabSection = ({
           ...tableData,
           subjectMeta: {
             ...tableData.subjectMeta,
-            locations: geoJson,
+            locations: geoJson ?? tableData.subjectMeta.locations,
           },
         }),
         query: nextQuery,
