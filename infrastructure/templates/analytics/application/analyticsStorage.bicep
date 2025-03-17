@@ -47,7 +47,7 @@ module analyticsStorageAccountModule '../../public-api/components/storageAccount
   params: {
     location: location
     storageAccountName: storageAccountName
-    publicNetworkAccessEnabled: false
+    publicNetworkAccessEnabled: true
     firewallRules: storageFirewallRules
     sku: storageAccountConfig.sku
     kind: storageAccountConfig.kind
