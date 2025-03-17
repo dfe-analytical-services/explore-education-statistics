@@ -24,6 +24,11 @@ public class AnalyticsPathResolver : IAnalyticsPathResolver
         _basePath = GetBasePath(options.Value.BasePath, environment);
     }
 
+    public string BasePath()
+    {
+        return _basePath;
+    }
+
     public string PublicApiQueriesDirectoryPath()
     {
         return Path.Combine(_basePath, "public-api", "queries");

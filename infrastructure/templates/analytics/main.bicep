@@ -29,8 +29,8 @@ param analyticsFunctionAppExists bool = true
 @description('Provides access to resources for specific IP address ranges used for service maintenance.')
 param maintenanceIpRanges IpRange[] = []
 
-@description('The cron schedule for the Public API queries consumer Function. Defaults to every half hour.')
-param publicApiQueryConsumerCron string = '* */30 * * * *'
+@description('The cron schedule for the Public API queries consumer Function. Defaults to every hour.')
+param publicApiQueryConsumerCron string = '* 0 * * * *'
 
 var tagValues = union(resourceTags ?? {}, {
   Environment: environmentName

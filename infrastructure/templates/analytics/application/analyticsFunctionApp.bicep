@@ -88,7 +88,7 @@ module functionAppModule '../../common/components/functionApp.bicep' = {
     functionAppRuntimeVersion: '8.0'
     storageAccountName: '${replace(resourcePrefix, '-', '')}${abbreviations.storageStorageAccounts}anlytfa'
     storageAccountPublicNetworkAccessEnabled: false
-    publicNetworkAccessEnabled: false
+    publicNetworkAccessEnabled: true
     functionAppFirewallRules: functionAppFirewallRules
     storageFirewallRules: storageFirewallRules
     outboundSubnetId: outboundVnetSubnet.id

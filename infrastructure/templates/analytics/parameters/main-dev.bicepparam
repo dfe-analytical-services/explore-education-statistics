@@ -3,4 +3,4 @@ using '../main.bicep'
 // Environment Params
 param environmentName = 'Development'
 
-param publicApiQueryConsumerCron = '30 * * * * *'
+param publicApiQueryConsumerCron = '* */10 * * * *'
