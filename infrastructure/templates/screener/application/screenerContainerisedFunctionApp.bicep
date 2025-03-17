@@ -88,7 +88,7 @@ resource screenerFunctionAppManagedIdentity 'Microsoft.ManagedIdentity/userAssig
 }
 
 module containerisedFunctionAppModule '../../common/components/containerisedFunctionApp.bicep' = {
-  name: 'containerisedFunctionAppModuleDeploy'
+  name: 'screener-containerisedFunctionAppModuleDeploy'
   params: {
     operatingSystem: operatingSystem
     sku: {

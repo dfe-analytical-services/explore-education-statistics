@@ -256,7 +256,7 @@ resource functionApp 'Microsoft.Web/sites@2024-04-01' = {
 }
 
 module deploymentStorageAccountModule '../../public-api/components/storageAccount.bicep' = {
-  name: 'deploymentStorageAccountModuleDeploy'
+  name: '${functionAppName}-deploymentStorageAccountModuleDeploy'
   params: {
     location: location
     storageAccountName: deploymentStorageAccountName
@@ -267,7 +267,6 @@ module deploymentStorageAccountModule '../../public-api/components/storageAccoun
     keyVaultName: keyVaultName
     privateEndpointSubnetIds: {
       blob: privateEndpoints.storageAccounts
-      queue: privateEndpoints.storageAccounts
     }
     publicNetworkAccessEnabled: false
     alerts: storageAlerts
