@@ -44,8 +44,8 @@ param acrLoginServer string
 @description('Specifies the container image to deploy from the registry.')
 param functionAppImageName string
 
-@description('The Docker image tag. This value should represent a pipeline build number')
-param screenerDockerImageTag string = '1.0.0'
+@description('The Docker image tag for the data screener. This value should represent a pipeline build number')
+param screenerDockerImageTag string
 
 @description('Whether to create or update Azure Monitor alerts during this deploy')
 param deployAlerts bool
@@ -99,7 +99,7 @@ module containerisedFunctionAppModule '../../common/components/containerisedFunc
     functionAppName: resourceNames.screener.screenerFunction
     acrLoginServer: acrLoginServer
     functionAppImageName: functionAppImageName
-    functionAppImageTag: screenerDockerImageTag
+    functionAppDockerImageTag: screenerDockerImageTag
     location: location
     applicationInsightsKey: applicationInsightsKey
     appServicePlanName: resourceNames.screener.screenerFunction

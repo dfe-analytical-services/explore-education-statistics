@@ -52,8 +52,8 @@ param privateEndpoints {
 @description('Specifies the location for all resources.')
 param location string
 
-@description('The Docker image tag. This value represents a pipeline build number')
-param functionAppImageTag string = '1.0.0'
+@description('The Docker image tag. This value should represent a pipeline build number')
+param functionAppDockerImageTag string
 
 @description('Specifies the App Service plan name')
 param appServicePlanName string
@@ -216,7 +216,7 @@ resource functionApp 'Microsoft.Web/sites@2024-04-01' = {
     reserved: operatingSystem == 'Linux'
     vnetImagePullEnabled: vnetImagePullEnabled
     siteConfig: {
-      linuxFxVersion: 'DOCKER|${acrLoginServer}/${functionAppImageName}:${functionAppImageTag}'
+      linuxFxVersion: 'DOCKER|${acrLoginServer}/${functionAppImageName}:${functionAppDockerImageTag}'
       acrUseManagedIdentityCreds: true
       alwaysOn: alwaysOn ?? null
       keyVaultReferenceIdentity: keyVaultReferenceIdentity
