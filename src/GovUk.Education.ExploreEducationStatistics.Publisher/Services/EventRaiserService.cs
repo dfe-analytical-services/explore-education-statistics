@@ -28,8 +28,8 @@ public class EventRaiserService(
         
         if (options is null)
         {
-            logger.LogError(
-                "No Event Topic was configured for key {EventTopicOptionsKey}", 
+            logger.LogWarning(
+                "No Event Topic is configured for key {EventTopicOptionsKey}. No events will be published.", 
                 ReleaseVersionPublishedEventDto.EventTopicOptionsKey);
             
             return;
@@ -44,7 +44,7 @@ public class EventRaiserService(
                                         ReleaseSlug = info.ReleaseSlug,
                                         PublicationId = info.PublicationId,
                                         PublicationSlug = info.PublicationSlug,
-                                        PublicationLatestReleaseVersionId = info.PublicationLatestReleaseVersionId,
+                                        PublicationLatestPublishedReleaseVersionId = info.PublicationLatestPublishedReleaseVersionId,
                                     }));
 
         var client = eventGridPublisherClientFactory.CreateClient(options.TopicEndpoint, options.TopicAccessKey);

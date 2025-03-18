@@ -75,7 +75,7 @@ public class EventRaiserServiceTests(ITestOutputHelper output)
                 ReleaseId = Guid.Parse("11111111-2222-0000-0000-000000000000"),
                 ReleaseSlug = "test-release-slug",
                 ReleaseVersionId = Guid.Parse("11111111-2222-3333-0000-000000000000"),
-                PublicationLatestReleaseVersionId = Guid.Parse("11111111-2222-4444-0000-000000000000")
+                PublicationLatestPublishedReleaseVersionId = Guid.Parse("11111111-2222-4444-0000-000000000000")
             };
             
             // ACT
@@ -95,7 +95,7 @@ public class EventRaiserServiceTests(ITestOutputHelper output)
             Assert.Equal(info.ReleaseSlug, payload.ReleaseSlug);
             Assert.Equal(info.PublicationId, payload.PublicationId);
             Assert.Equal(info.PublicationSlug, payload.PublicationSlug);
-            Assert.Equal(info.PublicationLatestReleaseVersionId, payload.PublicationLatestReleaseVersionId);
+            Assert.Equal(info.PublicationLatestPublishedReleaseVersionId, payload.PublicationLatestPublishedReleaseVersionId);
         }
         
         [Theory]
@@ -118,7 +118,7 @@ public class EventRaiserServiceTests(ITestOutputHelper output)
                         ReleaseId = Guid.Parse($"11111111-2222-0000-0000-{i:000000000000}"),
                         ReleaseSlug = "test-release-slug",
                         ReleaseVersionId = Guid.Parse($"11111111-2222-3333-0000-{i:000000000000}"),
-                        PublicationLatestReleaseVersionId = Guid.Parse($"11111111-2222-4444-0000-{i:000000000000}")
+                        PublicationLatestPublishedReleaseVersionId = Guid.Parse($"11111111-2222-4444-0000-{i:000000000000}")
                     })
                 .ToArray();
             
@@ -218,7 +218,7 @@ public class EventRaiserServiceTests(ITestOutputHelper output)
                 ReleaseId = Guid.Parse("11111111-2222-0000-0000-000000000000"),
                 ReleaseSlug = "test-release-slug",
                 ReleaseVersionId = Guid.Parse("11111111-2222-3333-0000-000000000000"),
-                PublicationLatestReleaseVersionId = Guid.Parse("11111111-2222-4444-0000-000000000000")
+                PublicationLatestPublishedReleaseVersionId = Guid.Parse("11111111-2222-4444-0000-000000000000")
             };
 
             // ACT

@@ -559,7 +559,7 @@ public class PublishingCompletionServiceTests
                         ReleaseSlug = _releaseSlug1,
                         PublicationId = PublicationId1,
                         PublicationSlug = _publicationSlug1,
-                        PublicationLatestReleaseVersionId = ReleaseVersionId1
+                        PublicationLatestPublishedReleaseVersionId = ReleaseVersionId1
                     };
                     _eventRaiserServiceBuilder.Assert.EventWasRaised(evt => evt == expectedInfo); 
                 }
@@ -586,7 +586,7 @@ public class PublishingCompletionServiceTests
                         ReleaseSlug = _releaseSlug1,
                         PublicationId = PublicationId1,
                         PublicationSlug = _publicationSlug1,
-                        PublicationLatestReleaseVersionId = ReleaseVersionId11 // Assert latest release is different
+                        PublicationLatestPublishedReleaseVersionId = ReleaseVersionId11 // Assert latest release is different
                     };
                     _eventRaiserServiceBuilder.Assert.EventWasRaised(evt => evt == expectedInfo); 
                 }

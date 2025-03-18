@@ -137,7 +137,7 @@ public class PublishingCompletionService(
         public string ReleaseSlug { get; init; } = string.Empty;
         public Guid PublicationId { get; init; }
         public string PublicationSlug { get; init; } = string.Empty;
-        public Guid PublicationLatestReleaseVersionId { get; init; }
+        public Guid PublicationLatestPublishedReleaseVersionId { get; init; }
     }
 
     private async ValueTask<PublishedReleaseVersionInfo> UpdateLatestPublishedReleaseVersionForPublication(PublishedReleaseVersionInfo info)
@@ -153,7 +153,7 @@ public class PublishingCompletionService(
         
         return info with
         {
-            PublicationLatestReleaseVersionId = latestPublishedReleaseVersion.Id,
+            PublicationLatestPublishedReleaseVersionId = latestPublishedReleaseVersion.Id,
             PublicationSlug = publication.Slug
         };
     }
