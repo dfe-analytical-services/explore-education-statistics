@@ -18,7 +18,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
-namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Public.Data;
+namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Public.Data.PublicDataApiClient;
 
 public class PublicDataApiClient(
     ILogger<PublicDataApiClient> logger,
@@ -27,7 +27,7 @@ public class PublicDataApiClient(
     IWebHostEnvironment environment)
     : IPublicDataApiClient
 {
-    public async Task<Either<ActionResult, DataSetVersionChangesViewModelDto>> GetDataSetVersionChanges(
+    public async Task<Either<ActionResult, DataSetVersionChangesViewModelDto?>> GetDataSetVersionChanges(
         Guid dataSetId,
         string dataSetVersion,
         CancellationToken cancellationToken = default)
@@ -38,7 +38,7 @@ public class PublicDataApiClient(
                 cancellationToken
             ),
             cancellationToken
-        ).OnSuccess(async response => (await response.Content.ReadFromJsonAsync<DataSetVersionChangesViewModelDto>())!);
+        ).OnSuccess(async response => (await response.Content.ReadFromJsonAsync<DataSetVersionChangesViewModelDto>()));
     }
 
     private async Task<Either<ActionResult, HttpResponseMessage>> SendRequest(

@@ -95,7 +95,7 @@ public record DataSetVersionChangesViewModel
 
     public required DataSetVersionViewModel2 DataSetVersion { get; init; }
 
-    public required DataSetVersionChangesViewModel2 Changes { get; init; }
+    public DataSetVersionChangesViewModel2? Changes { get; init; }
 }
 
 public record DataSetVersionViewModel2
@@ -207,7 +207,7 @@ public record IndicatorViewModel
     public required string Label { get; init; }
 
     [JsonConverter(typeof(EnumToEnumLabelJsonConverter<IndicatorUnit>))]
-    public required IndicatorUnit? Unit { get; init; }
+    public IndicatorUnit? Unit { get; init; }
 
     public int? DecimalPlaces { get; init; }
 }
@@ -217,7 +217,7 @@ public record LocationGroupViewModel
     public required GeographicLevelViewModel Level { get; init; }
 }
 
-public abstract record LocationOptionViewModel
+public record LocationOptionViewModel
 {
     public required string Id { get; init; }
 

@@ -10,7 +10,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.P
 
 public interface IPublicDataApiClient
 {
-    Task<Either<ActionResult, DataSetVersionChangesViewModelDto>> GetDataSetVersionChanges(
+    Task<Either<ActionResult, DataSetVersionChangesViewModelDto?>> GetDataSetVersionChanges(
         Guid dataSetId,
         string dataSetVersion,
         CancellationToken cancellationToken = default);

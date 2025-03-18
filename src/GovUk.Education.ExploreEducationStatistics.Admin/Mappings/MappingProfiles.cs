@@ -214,7 +214,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
 
             CreateMap<ReleaseVersion, ReleasePublicationStatusViewModel>();
 
-            CreateMap<DataSetVersionChangesViewModelDto, DataSetVersionChangesViewModel2>();
+            CreateDataSetVersionChangesMap();
         }
 
         private void CreateContentBlockMap()
@@ -244,6 +244,57 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
             CreateMap<HtmlBlock, HtmlBlockViewModel>();
 
             CreateMap<MarkDownBlock, MarkDownBlockViewModel>();
+        }
+
+        private void CreateDataSetVersionChangesMap()
+        {
+            CreateMap<DataSetVersionChangesViewModelDto, DataSetVersionChangesViewModel2>();
+
+            CreateMap<ChangeSetViewModelDto, ChangeSetViewModel>()
+                .ForMember(dest => dest.Filters,
+                    m => m.AllowNull())
+                .ForMember(dest => dest.FilterOptions,
+                    m => m.AllowNull())
+                .ForMember(dest => dest.GeographicLevels,
+                    m => m.AllowNull())
+                .ForMember(dest => dest.Indicators,
+                    m => m.AllowNull())
+                .ForMember(dest => dest.LocationGroups,
+                    m => m.AllowNull())
+                .ForMember(dest => dest.LocationOptions,
+                    m => m.AllowNull())
+                .ForMember(dest => dest.TimePeriods,
+                    m => m.AllowNull());
+
+            CreateMap<FilterChangeViewModelDto, FilterChangeViewModel>();
+            CreateMap<FilterViewModelDto, FilterViewModel>();
+
+            CreateMap<FilterOptionChangeViewModelDto, FilterOptionChangeViewModel>();
+            CreateMap<FilterOptionChangesViewModelDto, FilterOptionChangesViewModel>()
+                .ForMember(dest => dest.Options,
+                    m => m.MapFrom(filterOptionChanges =>
+                        filterOptionChanges.Options));
+            CreateMap<FilterOptionViewModelDto, FilterOptionViewModel>();
+
+            CreateMap<GeographicLevelChangeViewModelDto, GeographicLevelChangeViewModel>();
+            CreateMap<GeographicLevelViewModelDto, GeographicLevelViewModel>();
+
+            CreateMap<IndicatorChangeViewModelDto, IndicatorChangeViewModel>();
+            CreateMap<IndicatorViewModelDto, IndicatorViewModel>();
+
+            CreateMap<LocationGroupChangeViewModelDto, LocationGroupChangeViewModel>();
+            CreateMap<LocationGroupViewModelDto, LocationGroupViewModel>();
+
+            CreateMap<LocationOptionChangeViewModelDto, LocationOptionChangeViewModel>();
+            CreateMap<LocationOptionChangesViewModelDto, LocationOptionChangesViewModel>()
+                .ForMember(dest => dest.Options,
+                    m => m.MapFrom(locationOptionChanges =>
+                        locationOptionChanges.Options));
+            CreateMap<LocationOptionViewModelDto, LocationOptionViewModel>();
+
+            CreateMap<TimePeriodOptionChangeViewModelDto, TimePeriodOptionChangeViewModel>();
+            CreateMap<TimePeriodOptionViewModelDto, TimePeriodOptionViewModel>();
+            CreateMap<TimePeriodViewModelDto, TimePeriodViewModel>();
         }
     }
 }

@@ -101,7 +101,7 @@ public record IndicatorViewModelDto
     public required string Label { get; init; }
 
     [JsonConverter(typeof(EnumToEnumLabelJsonConverter<IndicatorUnit>))]
-    public required IndicatorUnit? Unit { get; init; }
+    public IndicatorUnit? Unit { get; init; }
 
     public int? DecimalPlaces { get; init; }
 }
@@ -111,7 +111,7 @@ public record LocationGroupViewModelDto
     public required GeographicLevelViewModelDto Level { get; init; }
 }
 
-public abstract record LocationOptionViewModelDto
+public record LocationOptionViewModelDto
 {
     public required string Id { get; init; }
 

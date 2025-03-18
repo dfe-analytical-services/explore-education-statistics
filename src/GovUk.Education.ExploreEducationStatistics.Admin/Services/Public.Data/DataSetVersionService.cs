@@ -389,13 +389,15 @@ public class DataSetVersionService(
         };
     }
 
-    private DataSetVersionChangesViewModel MapVersionChanges(DataSetVersion dataSetVersion, DataSetVersionChangesViewModelDto dataSetVersionChanges)
+    private DataSetVersionChangesViewModel MapVersionChanges(DataSetVersion dataSetVersion, DataSetVersionChangesViewModelDto? dataSetVersionChanges)
     {
         return new DataSetVersionChangesViewModel
         {
             DataSet = new IdTitleViewModel(dataSetVersion.DataSetId, dataSetVersion.DataSet.Title),
             DataSetVersion = MapDataSetVersion(dataSetVersion),
-            Changes = mapper.Map<DataSetVersionChangesViewModel2>(dataSetVersionChanges),
+            Changes = dataSetVersionChanges == null 
+                ? null 
+                : mapper.Map<DataSetVersionChangesViewModel2>(dataSetVersionChanges),
         };
     }
 
