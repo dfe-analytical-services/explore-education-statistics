@@ -235,6 +235,10 @@ resource functionApp 'Microsoft.Web/sites@2024-04-01' = {
       preWarmedInstanceCount: preWarmedInstanceCount
       appSettings: [
         {
+          name: 'WEBSITE_CONTENTAZUREFILECONNECTIONSTRING'
+          value: '@Microsoft.KeyVault(VaultName=${keyVault.name};SecretName=${deploymentStorageAccountModule.outputs.connectionStringSecretName})'
+        }
+        {
           name: 'APPLICATIONINSIGHTS_CONNECTION_STRING'
           value: applicationInsightsConnectionString
         }
