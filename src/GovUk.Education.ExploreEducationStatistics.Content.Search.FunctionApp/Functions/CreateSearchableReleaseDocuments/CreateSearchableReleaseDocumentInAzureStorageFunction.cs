@@ -19,7 +19,7 @@ public class CreateSearchableReleaseDocumentInAzureStorageFunction(
     {
         logger.LogInformation("{FunctionName} triggered: {Request}", context.FunctionDefinition.Name, message);
 
-        var request = new CreatePublicationLatestReleaseSearchableDocumentRequest{ PublicationSlug = message.ReleaseSlug };
+        var request = new CreatePublicationLatestReleaseSearchableDocumentRequest{ PublicationSlug = message.PublicationSlug };
         var response = await searchableDocumentCreator.CreatePublicationLatestReleaseSearchableDocument(request, cancellationToken);
         var searchDocumentCreatedMessage = new SearchDocumentCreatedMessage
         {

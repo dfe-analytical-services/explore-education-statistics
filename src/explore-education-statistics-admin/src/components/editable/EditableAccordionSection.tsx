@@ -60,6 +60,7 @@ const EditableAccordionSection = (props: EditableAccordionSectionProps) => {
           id={`${id}-editHeading`}
           name="heading"
           label="Edit Heading"
+          autoFocus
           value={newHeading}
           onChange={e => {
             setNewHeading(e.target.value);
