@@ -1,27 +1,8 @@
-import Link from '@admin/components/Link';
-import DataFileSummaryList from '@admin/pages/release/data/components/DataFileSummaryList';
-import DataUploadCancelButton from '@admin/pages/release/data/components/DataUploadCancelButton';
-import ImporterStatus, {
-  terminalImportStatuses,
-} from '@admin/pages/release/data/components/ImporterStatus';
-import {
-  releaseApiDataSetDetailsRoute,
-  releaseDataFileReplaceRoute,
-  ReleaseDataFileReplaceRouteParams,
-  releaseDataFileRoute,
-  ReleaseDataFileRouteParams,
-  ReleaseDataSetRouteParams,
-} from '@admin/routes/releaseRoutes';
 import {
   DataFile,
   DataFileImportStatus,
-  DeleteDataFilePlan,
 } from '@admin/services/releaseDataFileService';
-import ButtonGroup from '@common/components/ButtonGroup';
-import ButtonText from '@common/components/ButtonText';
-import Modal from '@common/components/Modal';
 import React from 'react';
-import { generatePath } from 'react-router';
 import styles from './DataFilesTable.module.scss';
 import DataFilesTableRow from './DataFilesTableRow';
 
