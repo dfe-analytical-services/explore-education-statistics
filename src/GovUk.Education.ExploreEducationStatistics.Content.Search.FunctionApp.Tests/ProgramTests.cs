@@ -3,6 +3,8 @@ using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Clie
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Clients.AzureBlobStorage;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Clients.ContentApi;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.CreateSearchableReleaseDocuments;
+using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.ReindexSearchDocuments;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Options;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Services;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Tests.Extensions;
@@ -195,6 +197,38 @@ public class ProgramTests
                 // ASSERT
                 var options = host.Services.GetRequiredService<IOptions<AppOptions>>();
                 Assert.NotNull(options);
+            }
+        }
+        
+        public class ReindexSearchDocumentsFunctionTests : ProgramTests
+        {
+            [Fact]
+            public void Should_resolve_ReindexSearchDocumentsFunction()
+            {
+                // ARRANGE
+                var sut = GetSut();
+            
+                // ACT
+                var actual = ActivatorUtilities.CreateInstance<ReindexSearchDocumentsFunction>(sut.Services);
+            
+                // ASSERT
+                Assert.NotNull(actual);
+            }
+        }
+        
+        public class CreateSearchableReleaseDocumentInAzureStorageFunctionTests : ProgramTests
+        {
+            [Fact]
+            public void Should_resolve_CreateSearchableReleaseDocumentInAzureStorageFunction()
+            {
+                // ARRANGE
+                var sut = GetSut();
+            
+                // ACT
+                var actual = ActivatorUtilities.CreateInstance<CreateSearchableReleaseDocumentInAzureStorageFunction>(sut.Services);
+            
+                // ASSERT
+                Assert.NotNull(actual);
             }
         }
     }

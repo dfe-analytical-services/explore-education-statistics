@@ -7,7 +7,7 @@ public class HealthCheckStrategyBuilder
 {
     private readonly Mock<IHealthCheckStrategy> _mock = new(MockBehavior.Strict);
     private bool _healthCheckIsSuccessful = true;
-    private string? _healthCheckMessage = string.Empty;
+    private string _healthCheckMessage = string.Empty;
     
     public IHealthCheckStrategy Build()
     {
@@ -21,21 +21,21 @@ public class HealthCheckStrategyBuilder
     public HealthCheckStrategyBuilder WhereResultIsHealthy(string? message = null)
     {
         _healthCheckIsSuccessful = true;
-        _healthCheckMessage = message;
+        _healthCheckMessage = message ?? "Everything is OK";
         return this;
     }
 
     public HealthCheckStrategyBuilder WhereIsHealthyResultIs(bool isHealthy, string? message = null)
     {
         _healthCheckIsSuccessful = isHealthy;
-        _healthCheckMessage = message;
+        _healthCheckMessage = message ?? "Everything is OK";
         return this;
     }
 
     public HealthCheckStrategyBuilder WhereResultIsUnhealthy(string? message = null)
     {
         _healthCheckIsSuccessful = false;
-        _healthCheckMessage = message;
+        _healthCheckMessage = message ?? "Boo. It didn't work.";
         return this;
     }
 }
