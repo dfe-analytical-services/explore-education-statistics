@@ -16,18 +16,18 @@ public static class AssemblyExtensionTests
         {
             var directory = Assembly.GetExecutingAssembly().GetDirectory();
             var expectedPath = Path.Combine(
-                "src", "GovUk.Education.ExploreEducationStatistics.Common.Tests", "bin");
+                "src", "artifacts", "bin", "GovUk.Education.ExploreEducationStatistics.Common.Tests");
 
             Assert.Contains(expectedPath, directory.ToString());
             Assert.True(directory.Exists);
         }
 
         [Fact]
-        public void GetDirectoryName()
+        public void GetDirectoryPath()
         {
             var path = Assembly.GetExecutingAssembly().GetDirectoryPath();
             var expectedPath = Path.Combine(
-                "src", "GovUk.Education.ExploreEducationStatistics.Common.Tests", "bin");
+                "src", "artifacts", "bin", "GovUk.Education.ExploreEducationStatistics.Common.Tests");
 
             Assert.Contains(expectedPath, path);
             Assert.True(Directory.Exists(path));
