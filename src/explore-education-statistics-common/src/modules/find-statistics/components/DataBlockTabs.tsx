@@ -52,7 +52,7 @@ const DataBlockTabs = ({
     getInfographic,
   });
 
-  const exportRef = useRef(null);
+  const chartExportRef = useRef(null);
 
   const errorMessage = <WarningMessage>Could not load content</WarningMessage>;
   if (isTableDataError) return errorMessage;
@@ -84,7 +84,7 @@ const DataBlockTabs = ({
             {fullTable && (
               <ErrorBoundary fallback={errorMessage}>
                 {chart && (
-                  <ExportButtonContext.Provider value={exportRef}>
+                  <ExportButtonContext.Provider value={chartExportRef}>
                     <ChartRenderer
                       id="dataBlockTabs-chart"
                       source={dataBlock.source}

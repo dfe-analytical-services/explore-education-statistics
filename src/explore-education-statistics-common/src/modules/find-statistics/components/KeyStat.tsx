@@ -47,7 +47,7 @@ const KeyStat = ({
   trend,
 }: KeyStatProps) => {
   const body = (
-    <div>
+    <>
       <KeyStatTile title={title} value={statistic} testId={testId}>
         {trend && (
           <p className="govuk-body-s" data-testid={`${testId}-trend`}>
@@ -69,7 +69,7 @@ const KeyStat = ({
       )}
 
       {children}
-    </div>
+    </>
   );
 
   return includeWrapper ? (

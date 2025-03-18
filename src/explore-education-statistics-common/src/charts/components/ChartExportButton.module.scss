@@ -1,0 +1,52 @@
+@import '~govuk-frontend/dist/govuk/base';
+
+.exportCloseButton {
+  margin-top: govuk-spacing(6);
+}
+
+.exportMenuList {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+  width: max-content;
+}
+
+.exportMenu {
+  background: govuk-colour('white');
+  display: grid;
+  font-size: 16px !important;
+  justify-content: flex-end;
+  margin: 0;
+  padding: 0.2rem 0 0.5rem 0.5rem;
+  position: relative;
+  text-align: left;
+
+  &[open] {
+    box-shadow: 3px govuk-colour('black');
+  }
+
+  :global(.govuk-details__summary) {
+    margin-bottom: 0;
+    max-width: calc(100% - 1rem);
+    overflow: hidden;
+    padding-left: 16px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  :global(.govuk-details__text) {
+    background: govuk-colour('white');
+    border: 2px solid govuk-colour('black');
+    border-top: 0;
+    box-sizing: border-box;
+    max-height: 40vh;
+    overflow: auto;
+    position: absolute;
+    text-align: left;
+    z-index: 2;
+  }
+}
+
+.exportMenu button {
+  padding: 2px 15px;
+}

@@ -1,11 +1,9 @@
-/* eslint-disable import/no-extraneous-dependencies */
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useExportButtonContext } from '@common/contexts/ExportButtonContext';
 import html2canvas, { Options as HTML2CanvasOptions } from 'html2canvas';
 import { useCallback, useState } from 'react';
 
-export type UseGenerateImage<T extends HTMLElement = HTMLDivElement> = [
-  (callback?: BlobCallback) => Promise<string | undefined>,
+export type UseGenerateImageType = [
+  (callback?: BlobCallback) => Promise<string | null>,
   {
     isLoading: boolean;
   },
@@ -17,72 +15,40 @@ export type UseGenerateImageArgs = {
   type?: string;
 };
 
-export function useGenerateImage(
-  args?: UseGenerateImageArgs,
-): UseGenerateImage {
-  const [isLoading, setIsLoading] = useState(false);
-  const ref = useExportButtonContext();
-
-  const generateImage = useCallback(
-    // eslint-disable-next-line consistent-return
-    async (callback?: BlobCallback) => {
-      if (ref && ref.current) {
-        setIsLoading(true);
-
-        return html2canvas(ref.current, {
-          logging: false,
-          ...args?.options,
-        }).then(canvas => {
-          if (callback) {
-            canvas.toBlob(callback, args?.type, args?.quality);
-          }
-          setIsLoading(false);
-          return canvas.toDataURL(args?.type, args?.quality);
-        });
-      }
-    },
-    [args, ref],
-  );
-
-  return [
-    generateImage,
-    {
-      isLoading,
-    },
-  ];
-}
-
-export type UseCurrentPng = [
-  (callback?: BlobCallback) => Promise<string | undefined>,
+export type UseCurrentPngType = [
+  (callback?: BlobCallback) => Promise<string | null>,
   {
     isLoading: boolean;
-    ref: React.MutableRefObject<any>;
+    ref: React.MutableRefObject<HTMLDivElement | null>;
   },
 ];
 
 export function useCurrentPng(
   options?: Partial<HTML2CanvasOptions>,
-): UseCurrentPng {
+): UseCurrentPngType {
   const ref = useExportButtonContext();
 
   const [isLoading, setIsLoading] = useState(false);
 
   const getPng = useCallback(
-    // eslint-disable-next-line consistent-return
-    async (callback?: BlobCallback) => {
-      if (ref !== null && ref?.current) {
-        setIsLoading(true);
+    async (callback?: BlobCallback): Promise<string | null> => {
+      if (!ref?.current) return null;
 
-        return html2canvas(ref.current as HTMLElement, {
+      setIsLoading(true);
+
+      try {
+        const canvas = await html2canvas(ref.current as HTMLElement, {
           logging: false,
           ...options,
-        }).then(canvas => {
-          if (callback) {
-            canvas.toBlob(callback, 'image/png', 1.0);
-          }
-          setIsLoading(false);
-          return canvas.toDataURL('image/png', 1.0);
         });
+
+        if (callback) {
+          canvas.toBlob(callback, 'image/png', 1.0);
+        }
+
+        return canvas.toDataURL('image/png', 1.0);
+      } finally {
+        setIsLoading(false);
       }
     },
     [options, ref],
@@ -95,12 +61,4 @@ export function useCurrentPng(
       isLoading,
     },
   ];
-}
-
-export interface CurrentPngProps {
-  chartRef: React.RefObject<any>;
-  getPng: (
-    options?: Partial<HTML2CanvasOptions>,
-  ) => Promise<string | undefined>;
-  isLoading: boolean;
 }

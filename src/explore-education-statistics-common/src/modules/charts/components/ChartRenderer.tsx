@@ -1,4 +1,4 @@
-import ExportButtonMenu from '@common/components/ExportButtonMenu';
+import ChartExportButton from '@common/charts/components/ChartExportButton';
 import FigureFootnotes from '@common/components/FigureFootnotes';
 import { ExportButtonContext } from '@common/contexts/ExportButtonContext';
 import HorizontalBarBlock, {
@@ -58,7 +58,7 @@ function ChartRenderer({ source, id, chart }: ChartRendererProps) {
     type === 'map' ? getMapInitialBoundaryLevel(chart) : undefined,
   );
 
-  const exportRef = useContext(ExportButtonContext);
+  const chartExportRef = useContext(ExportButtonContext);
 
   const chartComponent = useMemo(() => {
     switch (type) {
@@ -84,7 +84,7 @@ function ChartRenderer({ source, id, chart }: ChartRendererProps) {
       default:
         return <p>Unable to render invalid chart type</p>;
     }
-  }, [id, chart]);
+  }, [type, chart, id]);
 
   const footnotes = useMemo(() => {
     if (!data?.length || !meta) {
@@ -112,14 +112,14 @@ function ChartRenderer({ source, id, chart }: ChartRendererProps) {
     }
 
     return metaFootnotes;
-  }, [chart, data, meta, selectedBoundaryLevelId]);
+  }, [data?.length, meta, selectedBoundaryLevelId, type]);
 
   if (data?.length && meta) {
     return (
       <>
-        <ExportButtonMenu />
+        <ChartExportButton chartTitle={title} />
         <figure
-          ref={exportRef}
+          ref={chartExportRef}
           className="govuk-!-margin-0"
           id={id}
           data-testid={id}

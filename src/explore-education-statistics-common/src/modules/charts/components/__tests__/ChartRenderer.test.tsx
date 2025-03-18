@@ -1,5 +1,5 @@
 import render from '@common-test/render';
-import React from 'react';
+import React, { useRef } from 'react';
 import { testChartTableData } from '@common/modules/charts/components/__tests__/__data__/testChartData';
 import ChartRenderer, {
   ChartRendererProps,
@@ -8,6 +8,7 @@ import { AxisConfiguration } from '@common/modules/charts/types/chart';
 import { DataSet } from '@common/modules/charts/types/dataSet';
 import mapFullTable from '@common/modules/table-tool/utils/mapFullTable';
 import { screen } from '@testing-library/react';
+import { ExportButtonContext } from '@common/contexts/ExportButtonContext';
 
 jest.mock('recharts/lib/util/LogUtils');
 
@@ -60,11 +61,39 @@ describe('ChartRenderer', () => {
   };
 
   test('renders auto-generated boundary level footnote successfully', async () => {
-    render(<ChartRenderer {...testMapChartRenderer} />);
+    const TestComponent = () => {
+      const contentRef = useRef<HTMLDivElement | null>(null);
+
+      return (
+        <ExportButtonContext.Provider value={contentRef}>
+          <ChartRenderer {...testMapChartRenderer} />
+        </ExportButtonContext.Provider>
+      );
+    };
+    const { rerender } = render(<TestComponent />);
+    rerender(<TestComponent />);
+
     const footnotes = screen.queryByTestId('footnotes');
+
     expect(footnotes).toBeInTheDocument();
     expect(footnotes).toHaveTextContent(
       'This map uses the boundary data Countries December 2017 Ultra Generalised Clipped Boundaries in UK',
     );
+  });
+
+  test('renders export button successfully', async () => {
+    const TestComponent = () => {
+      const contentRef = useRef<HTMLDivElement | null>(null);
+
+      return (
+        <ExportButtonContext.Provider value={contentRef}>
+          <ChartRenderer {...testMapChartRenderer} />
+        </ExportButtonContext.Provider>
+      );
+    };
+    const { rerender } = render(<TestComponent />);
+    rerender(<TestComponent />);
+
+    expect(screen.queryByText('Export options')).toBeInTheDocument();
   });
 });

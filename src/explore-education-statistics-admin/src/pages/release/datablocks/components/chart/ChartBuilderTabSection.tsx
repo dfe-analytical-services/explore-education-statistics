@@ -116,10 +116,10 @@ const ChartBuilderTabSection = ({
     [onTableUpdate, query, releaseVersionId],
   );
 
-  const exportRef = useRef(null);
+  const chartExportRef = useRef(null);
 
   return (
-    <ExportButtonContext.Provider value={exportRef}>
+    <ExportButtonContext.Provider value={chartExportRef}>
       <ChartBuilder
         releaseVersionId={releaseVersionId}
         data={table.results}
