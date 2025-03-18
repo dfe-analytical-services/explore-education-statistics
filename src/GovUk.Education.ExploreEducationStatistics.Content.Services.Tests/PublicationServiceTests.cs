@@ -173,6 +173,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
                     Assert.Equal(publication.Id, publicationViewModel.Id);
                     Assert.Equal(publication.Title, publicationViewModel.Title);
+                    Assert.Equal(publication.Summary, publicationViewModel.Summary);
                     Assert.Equal(publication.Slug, publicationViewModel.Slug);
                     Assert.False(publicationViewModel.IsSuperseded);
 

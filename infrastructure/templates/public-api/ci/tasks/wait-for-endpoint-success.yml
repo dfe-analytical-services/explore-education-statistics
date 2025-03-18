@@ -15,7 +15,7 @@ parameters:
     default: 5
   - name: maxAttempts
     type: number
-    default: 50
+    default: 20
   - name: endpoint
     type: string
   - name: allow404s

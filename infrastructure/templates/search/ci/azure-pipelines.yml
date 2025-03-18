@@ -8,13 +8,6 @@ parameters:
       - Yes
       - No
     default: No
-  - name: deploySearchService
-    displayName: Does the Search Service need creating or updating?
-    type: string
-    values:
-      - Yes
-      - No
-    default: No
   - name: forceDeployToEnvironment
     displayName: Set to either dev, test or preprod to force a deploy to that environment from the chosen branch.
     type: string
@@ -29,14 +22,10 @@ resources:
   pipelines:
     - pipeline: MainBuild
       source: Explore Education Statistics
-      trigger:
-        branches:
-          - dev
-          - test
-          - master
+      trigger: none
 
 variables:
-  - group: Search Infrastructure - Common
+  - group: Common
   - name: forceDeployToEnvironment
     value: ${{parameters.forceDeployToEnvironment}}
   - name: isDev
@@ -51,8 +40,6 @@ variables:
     value: ubuntu-latest
   - name: deployAlerts
     value: ${{ iif(eq(parameters.deployAlerts, 'Yes'), true, false) }}
-  - name: deploySearchService
-    value: ${{ iif(eq(parameters.deploySearchService, 'Yes'), true, false) }}
 
 pool:
   vmImage: $(vmImageName)
@@ -81,3 +68,12 @@ stages:
       environment: Pre-Prod
       serviceConnection: $(serviceConnectionPreProd)
       bicepParamFile: preprod
+
+  - template: stages/deploy.yml
+    parameters:
+      stageName: DeployProd
+      condition:  and(succeeded(), eq(variables.isMaster, true))
+      dependsOn: DeployPreProd
+      environment: Prod
+      serviceConnection: $(serviceConnectionProd)
+      bicepParamFile: prod

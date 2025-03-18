@@ -257,15 +257,15 @@ jobs:
           command: publish
           publishWebProjects: false
           projects: '**/GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.csproj'
-          arguments: --configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)/searchFunctionApp
+          arguments: --configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)/search-function-app
           zipAfterPublish: True
 
       - task: PublishPipelineArtifact@1
         displayName: Publish Search Function App artifact
         condition: and(succeeded(), eq(variables.IsBranchDeployable, true))
         inputs:
-          artifactName: searchFunctionApp
-          targetPath: $(Build.ArtifactStagingDirectory)/searchFunctionApp
+          artifactName: search-function-app
+          targetPath: $(Build.ArtifactStagingDirectory)/search-function-app
 
   - job: Admin
     pool: ees-ubuntu2204-xlarge
