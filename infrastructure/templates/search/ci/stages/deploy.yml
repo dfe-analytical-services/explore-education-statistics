@@ -35,7 +35,7 @@ stages:
     lockBehavior: sequential
     condition: ${{ parameters.condition }}
     variables:
-      - group: Search Infrastructure - ${{ parameters.environment }}
+      - group: Common - ${{ parameters.environment }}
       - name: searchDocsFunctionAppName
         value: $(subscription)-ees-fa-searchdocs
       - name: infraDeployName
