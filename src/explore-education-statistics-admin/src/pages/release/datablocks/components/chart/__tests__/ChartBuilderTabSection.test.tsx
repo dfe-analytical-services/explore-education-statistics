@@ -200,7 +200,7 @@ describe('ChartBuilderTabSection', () => {
     ]);
 
     expect(tableBuilderService.getTableData).toHaveBeenCalledWith(
-      { ...testQuery, boundaryLevel: 1 }, // @MarkFix boundaryLevel
+      { ...testQuery },
       'release-1',
     );
 
@@ -212,7 +212,7 @@ describe('ChartBuilderTabSection', () => {
 
     expect(handleUpdate).toHaveBeenCalledWith({
       table: testFullTable,
-      query: { ...testQuery, boundaryLevel: 1 },
+      query: { ...testQuery },
     });
   });
 });

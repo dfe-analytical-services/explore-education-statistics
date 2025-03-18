@@ -90,26 +90,24 @@ const ChartBuilderTabSection = ({
   );
 
   const handleTableQueryUpdate: TableQueryUpdateHandler = useCallback(
-    async updatedQuery => {
+    async (updatedQuery, updatedBoundaryLevel) => {
       const nextQuery: ReleaseTableDataQuery = {
         ...query,
         ...updatedQuery,
       };
 
-      // Don't fetch table data again if queries are the same
-      if (isEqual(query, nextQuery)) {
+      // Don't update if nothing has changed
+      if (isEqual(query, nextQuery) && updatedBoundaryLevel === undefined) {
         return;
       }
 
-      const { boundaryLevel } = nextQuery;
-
       const [tableData, geoJson] = await Promise.all([
         tableBuilderService.getTableData(nextQuery, releaseVersionId),
-        boundaryLevel !== undefined
+        updatedBoundaryLevel
           ? tableBuilderService.getDataBlockGeoJson(
               releaseVersionId,
               dataBlock.dataBlockParentId,
-              boundaryLevel,
+              updatedBoundaryLevel,
             )
           : undefined,
       ]);

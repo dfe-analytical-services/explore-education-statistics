@@ -43,6 +43,7 @@ public static class LocationViewModelBuilder
     {
         var locationAttribute = locationAttributeNode.Attribute;
 
+        // If we are including GeoJson data, it's only included in leaf nodes
         if (!locationAttributeNode.IsLeaf)
         {
             return new LocationAttributeViewModel
@@ -50,7 +51,7 @@ public static class LocationViewModelBuilder
                 Label = locationAttribute.Name ?? string.Empty,
                 Level = locationAttribute.GeographicLevel,
                 Value = locationAttribute.GetCodeOrFallback(),
-                Options = BuildLocationAttributeViewModels(locationAttributeNode.Children, boundaryDataByCode)
+                Options = BuildLocationAttributeViewModels(locationAttributeNode.Children, boundaryDataByCode),
             };
         }
 
@@ -71,7 +72,7 @@ public static class LocationViewModelBuilder
             Id = locationAttributeNode.LocationId,
             GeoJson = feature,
             Label = locationAttribute.Name ?? string.Empty,
-            Value = code
+            Value = code,
         };
     }
 

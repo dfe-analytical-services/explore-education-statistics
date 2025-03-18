@@ -137,13 +137,12 @@ export interface TimePeriodQuery {
   endCode: string;
 }
 
-export interface TableDataQuery extends FullTableQuery {
-  publicationId?: string;
-  boundaryLevel?: number;
-}
-
 export interface ReleaseTableDataQuery extends TableDataQuery {
   releaseVersionId?: string;
+}
+
+export interface TableDataQuery extends FullTableQuery {
+  publicationId?: string;
 }
 
 export interface FullTableQuery {
