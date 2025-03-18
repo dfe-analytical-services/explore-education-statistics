@@ -1,6 +1,5 @@
 import publicationService from '@admin/services/publicationService';
 import themeService from '@admin/services/themeService';
-import Button from '@common/components/Button';
 import ButtonGroup from '@common/components/ButtonGroup';
 import ButtonText from '@common/components/ButtonText';
 import { FormFieldset } from '@common/components/form';
@@ -11,7 +10,6 @@ import FormFieldTextArea from '@common/components/form/FormFieldTextArea';
 import FormFieldTextInput from '@common/components/form/FormFieldTextInput';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
-import useToggle from '@common/hooks/useToggle';
 import Yup from '@common/validation/yup';
 import React, { useMemo } from 'react';
 import { ObjectSchema } from 'yup';
@@ -45,8 +43,6 @@ export default function PublicationDetailsForm({
   onCancel,
   onSubmit,
 }: Props) {
-  const [showConfirmModal, toggleConfirmModal] = useToggle(false);
-
   const { value, isLoading } = useAsyncHandledRetry(async () => {
     const themes = await themeService.getThemes();
     if (!canUpdatePublication) {
@@ -99,83 +95,77 @@ export default function PublicationDetailsForm({
         validationSchema={validationSchema}
       >
         {form => {
+          const { title } = form.watch();
+
           return (
-            <>
-              <Form id={id} onSubmit={async () => toggleConfirmModal.on()}>
-                <FormFieldset id="details" legend="Publication details">
-                  {canUpdatePublication && (
-                    <FormFieldTextInput<FormValues>
-                      name="title"
-                      label="Publication title"
-                      className="govuk-!-width-one-half"
-                    />
-                  )}
-
-                  {canUpdatePublicationSummary && (
-                    <FormFieldTextArea<FormValues>
-                      name="summary"
-                      label="Publication summary"
-                      className="govuk-!-width-one-half"
-                      maxLength={160}
-                    />
-                  )}
-
-                  {canUpdatePublication && themes && (
-                    <FormFieldSelect<FormValues>
-                      className="govuk-!-width-one-half"
-                      id={id}
-                      inline={false}
-                      label="Select theme"
-                      name="themeId"
-                      options={themes.map(theme => {
-                        return {
-                          label: theme.title,
-                          value: theme.id,
-                        };
-                      })}
-                    />
-                  )}
-                </FormFieldset>
-
+            <Form id={id} onSubmit={handleSubmit}>
+              <FormFieldset id="details" legend="Publication details">
                 {canUpdatePublication && (
-                  <FormFieldset
-                    id="supersede"
-                    legend="Archive this publication"
-                    legendSize="s"
-                  >
-                    <FormFieldSelect<FormValues>
-                      className="govuk-!-width-one-half"
-                      hint="If superseded by a publication with a live release, this will archive the current publication immediately"
-                      label="Superseding publication"
-                      name="supersededById"
-                      options={publications?.map(publication => ({
-                        label: publication.title,
-                        value: publication.id,
-                      }))}
-                      placeholder="None selected"
-                    />
-                  </FormFieldset>
+                  <FormFieldTextInput<FormValues>
+                    name="title"
+                    label="Publication title"
+                    className="govuk-!-width-one-half"
+                  />
                 )}
 
-                <ButtonGroup>
-                  <Button type="submit">Update publication details</Button>
-                  <ButtonText onClick={onCancel}>Cancel</ButtonText>
-                </ButtonGroup>
-              </Form>
+                {canUpdatePublicationSummary && (
+                  <FormFieldTextArea<FormValues>
+                    name="summary"
+                    label="Publication summary"
+                    className="govuk-!-width-one-half"
+                    maxLength={160}
+                  />
+                )}
 
-              {showConfirmModal && (
+                {canUpdatePublication && themes && (
+                  <FormFieldSelect<FormValues>
+                    className="govuk-!-width-one-half"
+                    id={id}
+                    inline={false}
+                    label="Select theme"
+                    name="themeId"
+                    options={themes.map(theme => {
+                      return {
+                        label: theme.title,
+                        value: theme.id,
+                      };
+                    })}
+                  />
+                )}
+              </FormFieldset>
+
+              {canUpdatePublication && (
+                <FormFieldset
+                  id="supersede"
+                  legend="Archive this publication"
+                  legendSize="s"
+                >
+                  <FormFieldSelect<FormValues>
+                    className="govuk-!-width-one-half"
+                    hint="If superseded by a publication with a live release, this will archive the current publication immediately"
+                    label="Superseding publication"
+                    name="supersededById"
+                    options={publications?.map(publication => ({
+                      label: publication.title,
+                      value: publication.id,
+                    }))}
+                    placeholder="None selected"
+                  />
+                </FormFieldset>
+              )}
+
+              <ButtonGroup>
                 <PublicationUpdateConfirmModal
                   initialPublicationTitle={initialValues.title}
                   initialPublicationSlug={publicationSlug}
-                  newPublicationTitle={form.getValues().title}
+                  newPublicationTitle={title}
                   onConfirm={async () => {
                     await form.handleSubmit(handleSubmit)();
                   }}
-                  onExit={toggleConfirmModal.off}
-                  onCancel={toggleConfirmModal.off}
                 />
-              )}
-            </>
+                <ButtonText onClick={onCancel}>Cancel</ButtonText>
+              </ButtonGroup>
+            </Form>
           );
         }}
       </FormProvider>

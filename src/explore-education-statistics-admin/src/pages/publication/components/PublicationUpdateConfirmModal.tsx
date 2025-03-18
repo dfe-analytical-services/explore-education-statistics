@@ -3,14 +3,13 @@ import React from 'react';
 import { useConfig } from '@admin/contexts/ConfigContext';
 import UrlContainer from '@common/components/UrlContainer';
 import slugFromTitle from '@common/utils/slugFromTitle';
+import Button from '@common/components/Button';
 
 interface Props {
   initialPublicationTitle: string;
   initialPublicationSlug: string;
   newPublicationTitle: string;
   onConfirm: () => void;
-  onCancel: () => void;
-  onExit: () => void;
 }
 
 export default function PublicationUpdateConfirmModal({
@@ -18,8 +17,6 @@ export default function PublicationUpdateConfirmModal({
   initialPublicationSlug,
   newPublicationTitle,
   onConfirm,
-  onCancel,
-  onExit,
 }: Props) {
   const newPublicationSlug = slugFromTitle(newPublicationTitle);
 
@@ -31,10 +28,8 @@ export default function PublicationUpdateConfirmModal({
   return (
     <ModalConfirm
       title="Confirm publication changes"
-      open
       onConfirm={onConfirm}
-      onExit={onExit}
-      onCancel={onCancel}
+      triggerButton={<Button>Update publication details</Button>}
     >
       <p>Any changes will appear on the public site immediately.</p>
       {titleHasChanged && (
