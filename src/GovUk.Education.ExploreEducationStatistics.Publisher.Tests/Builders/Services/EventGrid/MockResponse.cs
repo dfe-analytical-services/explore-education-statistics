@@ -3,10 +3,8 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Net;
-using System.Runtime.CompilerServices;
 using Azure;
 using Azure.Core;
-using Azure.Core.Pipeline;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Builders.Services.EventGrid;
 

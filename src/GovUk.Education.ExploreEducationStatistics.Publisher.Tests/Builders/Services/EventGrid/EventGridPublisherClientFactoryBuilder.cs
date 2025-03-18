@@ -1,6 +1,4 @@
-﻿using System;
-using GovUk.Education.ExploreEducationStatistics.Publisher.Services;
-using GovUk.Education.ExploreEducationStatistics.Publisher.Services.EventGrid;
+﻿using GovUk.Education.ExploreEducationStatistics.Publisher.Services.EventGrid;
 using Moq;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Builders.Services.EventGrid;

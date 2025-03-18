@@ -4,7 +4,7 @@ public class EventGridOptions
 {
     public const string Section = "EventGrid";
 
-    public EventTopicOptions[] EventTopics { get; init; }
+    public EventTopicOptions[] EventTopics { get; init; } = [];
 }
 
 /// <summary>
@@ -12,7 +12,7 @@ public class EventGridOptions
 /// </summary>
 public class EventTopicOptions
 {
-    public string Key { get; init; }
-    public string TopicEndpoint { get; init; }
+    public required string Key { get; init; }
+    public required string TopicEndpoint { get; init; }
     public string? TopicAccessKey { get; init; }
 }

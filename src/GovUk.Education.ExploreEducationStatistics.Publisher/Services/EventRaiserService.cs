@@ -20,12 +20,18 @@ public class EventRaiserService(
 {
     private readonly EventGridOptions _eventGridOptions = eventGridOptions.Value;
 
-    public async Task RaiseReleaseVersionPublishedEvents(IList<PublishingCompletionService.PublishedReleaseVersionInfo> publishedReleaseVersionInfos)
+    public async Task RaiseReleaseVersionPublishedEvents(
+        IList<PublishingCompletionService.PublishedReleaseVersionInfo> publishedReleaseVersionInfos)
     {
-        var options = _eventGridOptions.EventTopics.SingleOrDefault(opt => opt.Key == ReleaseVersionPublishedEventDto.EventTopicOptionsKey);
+        var options = _eventGridOptions.EventTopics
+            .SingleOrDefault(opt => opt.Key == ReleaseVersionPublishedEventDto.EventTopicOptionsKey);
+        
         if (options is null)
         {
-            logger.LogError("No Event Topic was configured for key {EventTopicOptionsKey}", ReleaseVersionPublishedEventDto.EventTopicOptionsKey);
+            logger.LogError(
+                "No Event Topic was configured for key {EventTopicOptionsKey}", 
+                ReleaseVersionPublishedEventDto.EventTopicOptionsKey);
+            
             return;
         }
 
@@ -58,13 +64,21 @@ public class EventRaiserService(
             var response = await client.SendEventAsync(eventGridEvent);
             if (response.IsError)
             {
-                logger.LogError("Error occurred whilst trying to raise event {@Event}. Response:{@SendEventResponse}", eventGridEvent, response);
+                logger.LogError(
+                    "Error occurred whilst trying to raise event {@Event}. Response:{@SendEventResponse}", 
+                    eventGridEvent, 
+                    response);
+                
                 return;
             }
         }
-        catch (Exception e)
+        catch (Exception exception)
         {
-            logger.LogError("Error occurred whilst trying to raise event {@Event}. Exception:{@Exception}", eventGridEvent, e);
+            logger.LogError(
+                "Error occurred whilst trying to raise event {@Event}. Exception:{@Exception}", 
+                eventGridEvent, 
+                exception);
+            
             return;
         }
         logger.LogInformation("Event raised: {@Event}", eventGridEvent);

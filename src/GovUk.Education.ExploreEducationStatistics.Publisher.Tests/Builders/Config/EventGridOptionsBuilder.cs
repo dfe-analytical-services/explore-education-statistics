@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Options;
 using Microsoft.Extensions.Options;
 

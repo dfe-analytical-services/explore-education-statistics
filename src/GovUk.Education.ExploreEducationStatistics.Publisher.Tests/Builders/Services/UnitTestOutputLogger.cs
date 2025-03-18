@@ -6,10 +6,17 @@ using Xunit.Abstractions;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Builders.Services;
 
+/// <summary>
+/// Use this builder to construct an implementation of ILogger&lt;T&gt; that forwards all logging to the xunit test output.
+/// In addition, the log statements are recorded and can be asserted.
+/// </summary>
 public class UnitTestOutputLoggerBuilder<T>
 {
-    private UnitTestOutputLoggerBuilder<T>.XunitLogger? _logger;
+    private XunitLogger? _logger;
     
+    /// <summary>
+    /// Build the ILogger implementation. Pass in the instance of ITestOutputHelper injected into the xunit test class. 
+    /// </summary>
     public ILogger<T> Build(ITestOutputHelper output) => _logger = new XunitLogger(output);
 
     private class XunitLogger(ITestOutputHelper output) : ILogger<T>
