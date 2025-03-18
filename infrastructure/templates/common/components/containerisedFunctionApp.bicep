@@ -174,7 +174,7 @@ module fileShareModule '../../public-api/components/fileShare.bicep' = {
   name: '${deploymentStorageAccountName}FileShareModuleDeploy'
   params: {
     storageAccountName: deploymentStorageAccountModule.outputs.storageAccountName
-    fileShareName: '${functionApp.name}-${abbreviations.fileShare}'
+    fileShareName: '${functionAppName}-${abbreviations.fileShare}'
     alerts: fileServiceAlerts
     tagValues: tagValues
   }
@@ -237,6 +237,10 @@ resource functionApp 'Microsoft.Web/sites@2024-04-01' = {
         {
           name: 'WEBSITE_CONTENTAZUREFILECONNECTIONSTRING'
           value: '@Microsoft.KeyVault(VaultName=${keyVault.name};SecretName=${deploymentStorageAccountModule.outputs.connectionStringSecretName})'
+        }
+        {
+          name: 'WEBSITE_CONTENTSHARE'
+          value: fileShareModule.outputs.fileShareName
         }
         {
           name: 'APPLICATIONINSIGHTS_CONNECTION_STRING'
