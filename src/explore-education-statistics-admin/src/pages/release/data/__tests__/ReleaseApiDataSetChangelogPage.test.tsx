@@ -6,68 +6,23 @@ import {
   releaseApiDataSetChangelogRoute,
   ReleaseDataSetChangelogRouteParams,
 } from '@admin/routes/releaseRoutes';
-import _apiDataSetService, {
-  ApiDataSet,
-} from '@admin/services/apiDataSetService';
+import _apiDataSetService from '@admin/services/apiDataSetService';
 import _apiDataSetVersionService from '@admin/services/apiDataSetVersionService';
 import render from '@common-test/render';
 import { screen, waitFor, within } from '@testing-library/react';
 import React from 'react';
 import { generatePath, MemoryRouter, Route } from 'react-router-dom';
-import { ApiDataSetVersionChanges } from '@common/services/types/apiDataSetChanges';
+import {
+  ApiDataSetVersionChanges,
+  ApiDataSetVersionChanges2,
+} from '@admin/services/types/apiDataSetChanges';
 
-jest.mock('@admin/services/apiDataSetService');
 jest.mock('@admin/services/apiDataSetVersionService');
 
-const apiDataSetService = jest.mocked(_apiDataSetService);
 const apiDataSetVersionService = jest.mocked(_apiDataSetVersionService);
 
 describe('ReleaseApiDataSetChangelogPage', () => {
-  const testDataSet: ApiDataSet = {
-    id: 'data-set-id',
-    title: 'Data set title',
-    summary: 'Data set summary',
-    status: 'Draft',
-    draftVersion: {
-      id: 'draft-version-id',
-      version: '2.0',
-      status: 'Draft',
-      type: 'Major',
-      totalResults: 0,
-      releaseVersion: {
-        id: 'release-2-id',
-        title: 'Test release 2',
-      },
-      file: {
-        id: 'draft-file-id',
-        title: 'Test draft file',
-      },
-    },
-    latestLiveVersion: {
-      id: 'live-version-id',
-      version: '1.1',
-      status: 'Published',
-      type: 'Minor',
-      totalResults: 0,
-      releaseVersion: {
-        id: 'release-2-id',
-        title: 'Test release 2',
-      },
-      file: {
-        id: 'draft-file-id',
-        title: 'Test draft file',
-      },
-      timePeriods: { start: '', end: '' },
-      geographicLevels: [],
-      filters: [],
-      published: '',
-      indicators: [],
-      notes: 'Live version notes',
-    },
-    previousReleaseIds: [],
-  };
-
-  const testChanges: ApiDataSetVersionChanges = {
+  const testChanges: ApiDataSetVersionChanges2 = {
     majorChanges: {
       filters: [
         {
@@ -75,7 +30,7 @@ describe('ReleaseApiDataSetChangelogPage', () => {
             id: 'filter-1',
             column: 'filter_1',
             label: 'Filter 1',
-            hint: '',
+            hint: 'Filter 1 Hint',
           },
         },
       ],
@@ -87,18 +42,50 @@ describe('ReleaseApiDataSetChangelogPage', () => {
             id: 'filter-2',
             column: 'filter_2',
             label: 'Filter 2',
-            hint: '',
+            hint: 'Filter 2 Hint',
           },
         },
       ],
     },
   };
 
+  const draftDataSetVersionChanges: ApiDataSetVersionChanges = {
+    dataSet: {
+      id: 'data-set-id',
+      title: 'Data set title',
+    },
+    dataSetVersion: {
+      id: 'draft-version-id',
+      version: '2.0',
+      status: 'Draft',
+      type: 'Major',
+      notes: '',
+    },
+    changes: testChanges,
+  };
+
+  const liveDataSetVersionChanges: ApiDataSetVersionChanges = {
+    dataSet: {
+      id: 'data-set-id',
+      title: 'Data set title',
+    },
+    dataSetVersion: {
+      id: 'live-version-id',
+      version: '1.1',
+      status: 'Published',
+      type: 'Minor',
+      notes: 'Live version notes',
+    },
+    changes: testChanges,
+  };
+
   test('renders correctly for a live API data set', async () => {
-    apiDataSetService.getDataSet.mockResolvedValue(testDataSet);
     apiDataSetVersionService.getChanges.mockResolvedValue({
-      ...testChanges,
-      majorChanges: {},
+      ...liveDataSetVersionChanges,
+      changes: {
+        ...liveDataSetVersionChanges.changes!,
+        majorChanges: {},
+      },
     });
 
     renderPage('live-version-id');
@@ -130,8 +117,9 @@ describe('ReleaseApiDataSetChangelogPage', () => {
   });
 
   test('renders correctly for a draft API data set', async () => {
-    apiDataSetService.getDataSet.mockResolvedValue(testDataSet);
-    apiDataSetVersionService.getChanges.mockResolvedValue(testChanges);
+    apiDataSetVersionService.getChanges.mockResolvedValue(
+      draftDataSetVersionChanges,
+    );
 
     renderPage('draft-version-id');
 
@@ -167,8 +155,9 @@ describe('ReleaseApiDataSetChangelogPage', () => {
   });
 
   test('updating draft data set notes', async () => {
-    apiDataSetService.getDataSet.mockResolvedValue(testDataSet);
-    apiDataSetVersionService.getChanges.mockResolvedValue(testChanges);
+    apiDataSetVersionService.getChanges.mockResolvedValue(
+      draftDataSetVersionChanges,
+    );
 
     const { user } = renderPage('draft-version-id');
 
@@ -194,26 +183,25 @@ describe('ReleaseApiDataSetChangelogPage', () => {
     });
   });
 
-  test('renders warning if unable to fetch data set', async () => {
-    apiDataSetService.getDataSet.mockRejectedValue(
-      new Error('Unable to fetch changes'),
-    );
-    apiDataSetVersionService.getChanges.mockResolvedValue(testChanges);
-
-    renderPage('draft-version-id');
-
-    expect(screen.queryByText('Data set title')).not.toBeInTheDocument();
-
-    expect(
-      await screen.findByText('Could not load API data set'),
-    ).toBeInTheDocument();
-  });
-
-  test('renders warning if unable to fetch changes', async () => {
-    apiDataSetService.getDataSet.mockResolvedValue(testDataSet);
+  test('renders warning if unable to fetch API data set details', async () => {
     apiDataSetVersionService.getChanges.mockRejectedValue(
       new Error('Unable to fetch changes'),
     );
+
+    renderPage('draft-version-id');
+
+    await waitFor(() =>
+      expect(
+        screen.getByText('Could not load API data set'),
+      ).toBeInTheDocument(),
+    );
+  });
+
+  test('renders warning if unable to fetch changes', async () => {
+    apiDataSetVersionService.getChanges.mockResolvedValue({
+      ...draftDataSetVersionChanges,
+      changes: undefined,
+    });
 
     renderPage('draft-version-id');
 
