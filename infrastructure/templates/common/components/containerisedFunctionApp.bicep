@@ -58,8 +58,8 @@ param functionAppDockerImageTag string
 @description('Specifies the App Service plan name')
 param appServicePlanName string
 
-@description('The Application Insights key that is associated with this resource')
-param applicationInsightsKey string
+@description('The Application Insights connection string that is associated with this resource.')
+param applicationInsightsConnectionString string
 
 @description('Specifies the SKU for the Function App hosting plan')
 param sku object
@@ -235,8 +235,8 @@ resource functionApp 'Microsoft.Web/sites@2024-04-01' = {
       preWarmedInstanceCount: preWarmedInstanceCount
       appSettings: [
         {
-          name: 'APPINSIGHTS_INSTRUMENTATIONKEY'
-          value: applicationInsightsKey
+          name: 'APPLICATIONINSIGHTS_CONNECTION_STRING'
+          value: applicationInsightsConnectionString
         }
         // Use managed identity to access the storage account rather than key based access with a connection string
         {

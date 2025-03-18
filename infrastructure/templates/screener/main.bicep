@@ -52,6 +52,17 @@ var maintenanceFirewallRules = [
   }
 ]
 
+// Create a shared Application Insights resource for Search resources to use.
+module applicationInsightsModule 'application/screenerApplicationInsights.bicep' = {
+  name: 'screenerApplicationInsightsModule'
+  params: {
+    location: location
+    resourcePrefix: resourcePrefix
+    resourceNames: resourceNames
+    tagValues: tagValues
+  }
+}
+
 module screenerFunctionAppModule 'application/screenerContainerisedFunctionApp.bicep' = {
   name: 'screenerFunctionApp'
   params: {
@@ -64,6 +75,7 @@ module screenerFunctionAppModule 'application/screenerContainerisedFunctionApp.b
     resourceNames: resourceNames
     functionAppFirewallRules: union([], maintenanceFirewallRules)
     storageFirewallRules: maintenanceIpRanges
+    applicationInsightsConnectionString: applicationInsightsModule.outputs.applicationInsightsConnectionString
     tagValues: tagValues
     deployAlerts: deployAlerts
   }

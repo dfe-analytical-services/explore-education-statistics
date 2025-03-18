@@ -21,8 +21,8 @@ param location string
 @description('Function App Plan : operating system')
 param operatingSystem 'Windows' | 'Linux' = 'Linux'
 
-@description('The Application Insights key that is associated with this resource')
-param applicationInsightsKey string = ''
+@description('The Application Insights connection string that is associated with this resource.')
+param applicationInsightsConnectionString string = ''
 
 @description('The IP address ranges that can access the Screener storage accounts.')
 param storageFirewallRules IpRange[]
@@ -87,6 +87,16 @@ resource screenerFunctionAppManagedIdentity 'Microsoft.ManagedIdentity/userAssig
   location: location
 }
 
+module screenerFunctionAppManagedIdentityAcrPull '../../public-api/components/containerRegistryRoleAssignment.bicep' = {
+  name: 'screenerFunctionAppManagedIdentityAcrPullRoleAssignmentDeploy'
+  scope: resourceGroup()
+  params: {
+    role: 'AcrPull'
+    containerRegistryName: 'eesacr'
+    principalIds: [screenerFunctionAppManagedIdentity.properties.principalId]
+  }
+}
+
 module containerisedFunctionAppModule '../../common/components/containerisedFunctionApp.bicep' = {
   name: 'screenerContainerisedFunctionAppModuleDeploy'
   params: {
@@ -101,7 +111,7 @@ module containerisedFunctionAppModule '../../common/components/containerisedFunc
     functionAppImageName: functionAppImageName
     functionAppDockerImageTag: screenerDockerImageTag
     location: location
-    applicationInsightsKey: applicationInsightsKey
+    applicationInsightsConnectionString: applicationInsightsConnectionString
     appServicePlanName: resourceNames.screener.screenerFunction
     keyVaultName: keyVault.name
     entraIdAuthentication: {
@@ -123,6 +133,7 @@ module containerisedFunctionAppModule '../../common/components/containerisedFunc
     deploymentStorageAccountName: resourceNames.screener.screenerFunctionStorageAccount
     functionAppFirewallRules: functionAppFirewallRules
     storageFirewallRules: storageFirewallRules
+    publicNetworkAccessEnabled: true
     privateEndpoints: {
       functionApp: privateEndpointSubnet.id
       storageAccounts: privateEndpointSubnet.id
