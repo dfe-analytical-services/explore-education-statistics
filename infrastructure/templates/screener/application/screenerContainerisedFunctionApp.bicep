@@ -114,15 +114,15 @@ module containerisedFunctionAppModule '../../common/components/containerisedFunc
     applicationInsightsConnectionString: applicationInsightsConnectionString
     appServicePlanName: resourceNames.screener.screenerFunction
     keyVaultName: keyVault.name
-    entraIdAuthentication: {
-      appRegistrationClientId: screenerAppRegistrationClientId
-      allowedClientIds: [
-        adminAppClientId
-        devopsServicePrincipalId
-      ]
-      allowedPrincipalIds: []
-      requireAuthentication: true
-    }
+    // entraIdAuthentication: {
+    //   appRegistrationClientId: screenerAppRegistrationClientId
+    //   allowedClientIds: [
+    //     adminAppClientId
+    //     devopsServicePrincipalId
+    //   ]
+    //   allowedPrincipalIds: []
+    //   requireAuthentication: true
+    // }
     userAssignedManagedIdentityParams: {
       id: screenerFunctionAppManagedIdentity.id
       name: screenerFunctionAppManagedIdentity.name
