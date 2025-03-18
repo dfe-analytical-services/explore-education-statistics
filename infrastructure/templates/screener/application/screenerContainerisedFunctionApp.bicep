@@ -87,16 +87,6 @@ resource screenerFunctionAppManagedIdentity 'Microsoft.ManagedIdentity/userAssig
   location: location
 }
 
-module screenerFunctionAppManagedIdentityAcrPull '../../public-api/components/containerRegistryRoleAssignment.bicep' = {
-  name: 'screenerFunctionAppManagedIdentityAcrPullRoleAssignmentDeploy'
-  scope: resourceGroup()
-  params: {
-    role: 'AcrPull'
-    containerRegistryName: 'eesacr'
-    principalIds: [screenerFunctionAppManagedIdentity.properties.principalId]
-  }
-}
-
 module containerisedFunctionAppModule '../../common/components/containerisedFunctionApp.bicep' = {
   name: 'screenerContainerisedFunctionAppModuleDeploy'
   params: {
