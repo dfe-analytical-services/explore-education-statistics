@@ -243,19 +243,6 @@ export class AdminService {
     };
   }
 
-  getDataFile({
-    releaseVersionId,
-    dataFileName,
-  }: {
-    releaseVersionId: string;
-    dataFileName: string;
-  }) {
-    const { json: releaseFiles } = this.client.get<
-      { id: string; fileName: string }[]
-    >(`/api/release/${releaseVersionId}/data`, applicationJsonHeaders);
-    return releaseFiles.find(file => file.fileName === dataFileName);
-  }
-
   uploadDataZipFile({
     title,
     releaseVersionId,
@@ -386,52 +373,6 @@ export class AdminService {
       onImportExceededTimeout();
     }
   }
-
-  //getOrImportDataFile({ // @MarkFix remove?
-  //  title,
-  //  releaseVersionId,
-  //  dataFile,
-  //  metaFile,
-  //}: {
-  //  title: string;
-  //  releaseVersionId: string;
-  //  dataFile: {
-  //    file: ArrayBuffer;
-  //    filename: string;
-  //  };
-  //  metaFile?: {
-  //    file: ArrayBuffer;
-  //    filename: string;
-  //  };
-  //}) {
-  //  return {
-  //    id:
-  //      this.getDataFile({ releaseVersionId, dataFileName: dataFile.filename })
-  //        ?.id ??
-  //      this.uploadDataFile({ title, releaseVersionId, dataFile, metaFile })
-  //        ?.id,
-  //  };
-  //}
-
-  //getOrImportDataZipFile({ // @MarkFix remove?
-  //  title,
-  //  releaseVersionId,
-  //  zipFile,
-  //}: {
-  //  title: string;
-  //  releaseVersionId: string;
-  //  zipFile: {
-  //    file: ArrayBuffer;
-  //    filename: string;
-  //  };
-  //}) {
-  //  return {
-  //    id:
-  //      this.getDataFile({ releaseVersionId, dataFileName: zipFile.filename })
-  //        ?.id ??
-  //      this.uploadDataFile({ title, releaseVersionId, dataFile: zipFile })?.id,
-  //  };
-  //}
 
   getImportStatus({
     releaseVersionId,
