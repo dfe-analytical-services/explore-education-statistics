@@ -243,10 +243,6 @@ resource functionApp 'Microsoft.Web/sites@2024-04-01' = {
           value: fileShareModule.outputs.fileShareName
         }
         {
-          name: 'WEBSITE_CONTENTSHARE'
-          value: fileShareModule.outputs.fileShareName
-        }
-        {
           name: 'WEBSITE_CONTENTOVERVNET'
           value: '1'
         }
