@@ -38,7 +38,7 @@ public class PublicDataApiClient(
                 cancellationToken
             ),
             cancellationToken
-        ).OnSuccess(async response => (await response.Content.ReadFromJsonAsync<DataSetVersionChangesViewModelDto>()));
+        ).OnSuccess(async response => await response.Content.ReadFromJsonAsync<DataSetVersionChangesViewModelDto>());
     }
 
     private async Task<Either<ActionResult, HttpResponseMessage>> SendRequest(
