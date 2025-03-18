@@ -243,6 +243,18 @@ resource functionApp 'Microsoft.Web/sites@2024-04-01' = {
           value: fileShareModule.outputs.fileShareName
         }
         {
+          name: 'WEBSITE_CONTENTSHARE'
+          value: fileShareModule.outputs.fileShareName
+        }
+        {
+          name: 'WEBSITE_CONTENTOVERVNET'
+          value: '1'
+        }
+        {
+          name: 'vnetContentShareEnabled'
+          value: 'true'
+        }
+        {
           name: 'APPLICATIONINSIGHTS_CONNECTION_STRING'
           value: applicationInsightsConnectionString
         }
