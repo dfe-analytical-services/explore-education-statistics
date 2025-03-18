@@ -1,13 +1,14 @@
+import releaseDataFileQueries from '@admin/queries/releaseDataFileQueries';
 import releaseDataFileService, {
   DataFile,
-  DeleteDataFilePlan,
 } from '@admin/services/releaseDataFileService';
 import ButtonText from '@common/components/ButtonText';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import ModalConfirm from '@common/components/ModalConfirm';
 import useToggle from '@common/hooks/useToggle';
 import logger from '@common/services/logger';
-import React, { useCallback, useEffect, useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import React, { useCallback } from 'react';
 
 interface Props {
   dataFile: DataFile;
@@ -21,23 +22,6 @@ export default function DeleteDataFileModal({
   onConfirm,
 }: Props) {
   const [open, toggleOpen] = useToggle(false);
-  const [plan, setPlan] = useState<DeleteDataFilePlan>();
-
-  // TODO use react-query instead
-  useEffect(() => {
-    async function getPlan() {
-      setPlan(
-        await releaseDataFileService.getDeleteDataFilePlan(
-          releaseVersionId,
-          dataFile,
-        ),
-      );
-    }
-
-    if (open) {
-      getPlan();
-    }
-  }, [dataFile, open, releaseVersionId]);
 
   const handleDeleteConfirm = useCallback(async () => {
     try {
@@ -55,7 +39,6 @@ export default function DeleteDataFileModal({
     }
   }, [releaseVersionId, dataFile.id, onConfirm, toggleOpen]);
 
-  // TODO show a loader while it's fetching the plan
   return (
     <ModalConfirm
       open={open}
@@ -69,6 +52,25 @@ export default function DeleteDataFileModal({
         Are you sure you want to delete <strong>{dataFile.title}</strong>?
       </p>
       <p>This data will no longer be available for use in this release.</p>
+
+      {open && <Plan dataFile={dataFile} releaseVersionId={releaseVersionId} />}
+    </ModalConfirm>
+  );
+}
+
+interface PlanProps {
+  dataFile: DataFile;
+  releaseVersionId: string;
+}
+
+function Plan({ dataFile, releaseVersionId }: PlanProps) {
+  const { data: plan, isLoading } = useQuery(
+    releaseDataFileQueries.getDeleteFilePlan(releaseVersionId, dataFile),
+  );
+
+  return (
+    <>
+      <LoadingSpinner loading={isLoading} />
       {plan && (
         <>
           {plan.deleteDataBlockPlan.dependentDataBlocks.length > 0 && (
@@ -124,6 +126,6 @@ export default function DeleteDataFileModal({
           )}
         </>
       )}
-    </ModalConfirm>
+    </>
   );
 }

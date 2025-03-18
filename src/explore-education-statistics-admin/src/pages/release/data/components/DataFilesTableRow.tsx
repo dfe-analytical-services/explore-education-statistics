@@ -161,7 +161,6 @@ export default function DataFilesTableRow({
                     </p>
                   </Modal>
                 ) : (
-                  // <ButtonText>Delete file</ButtonText>
                   <DeleteDataFileModal
                     dataFile={dataFile}
                     releaseVersionId={releaseVersionId}
