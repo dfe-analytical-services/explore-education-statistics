@@ -250,7 +250,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             IFormFile dataFormFile,
             IFormFile metaFormFile,
             string? dataSetTitle,
-            Guid? replacingFileId)
+            Guid? replacingFileId,
+            CancellationToken cancellationToken)
         {
             return await _persistenceHelper
                 .CheckEntityExists<ReleaseVersion>(releaseVersionId)
@@ -340,7 +341,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         public async Task<Either<ActionResult, DataFileInfo>> UploadAsZip(Guid releaseVersionId,
             IFormFile zipFormFile,
             string? dataSetTitle,
-            Guid? replacingFileId)
+            Guid? replacingFileId,
+            CancellationToken cancellationToken)
         {
             return await _persistenceHelper
                 .CheckEntityExists<ReleaseVersion>(releaseVersionId)

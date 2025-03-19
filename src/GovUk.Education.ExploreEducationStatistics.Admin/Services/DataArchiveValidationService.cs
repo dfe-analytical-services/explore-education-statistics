@@ -272,24 +272,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             List<ErrorViewModel> errors = [];
 
-            if (zipFile is null)
-            {
-                errors.Add(ValidationMessages.GenerateErrorFileIsNull());
-                return errors;
-            }
-
-            if (zipFile.FileName.Length > MaxFilenameSize)
-            {
-                errors.Add(ValidationMessages.GenerateErrorFilenameTooLong(
-                    zipFile.FileName, MaxFilenameSize));
-            }
-
-            if (!zipFile.FileName.ToLower().EndsWith(".zip"))
-            {
-                errors.Add(ValidationMessages.GenerateErrorZipFilenameMustEndDotZip(zipFile.FileName));
-            }
-
-            if (!await fileTypeService.IsValidZipFile(zipFile))
+            if (!await fileTypeService.HasValidZipFileMeta(zipFile))
             {
                 errors.Add(ValidationMessages.GenerateErrorMustBeZipFile(zipFile.FileName));
             }

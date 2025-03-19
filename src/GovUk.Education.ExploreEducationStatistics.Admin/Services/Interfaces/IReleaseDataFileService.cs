@@ -38,13 +38,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
             IFormFile dataFormFile,
             IFormFile metaFormFile,
             string? dataSetTitle,
-            Guid? replacingFileId);
+            Guid? replacingFileId,
+            CancellationToken cancellationToken);
 
         Task<Either<ActionResult, DataFileInfo>> UploadAsZip(
             Guid releaseVersionId,
             IFormFile zipFormFile,
             string? dataSetTitle,
-            Guid? replacingFileId);
+            Guid? replacingFileId,
+            CancellationToken cancellationToken);
 
         Task<Either<ActionResult, List<ArchiveDataSetFileViewModel>>> ValidateAndUploadBulkZip(
             Guid releaseVersionId,
