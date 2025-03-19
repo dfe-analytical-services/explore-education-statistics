@@ -175,7 +175,9 @@ module keyVaultRoleAssignmentModule '../../public-api/components/keyVaultRoleAss
 module storageAccountBlobRoleAssignmentModule 'storageAccountRoleAssignment.bicep' = {
   name: '${deploymentStorageAccountName}BlobRoleAssignmentModuleDeploy'
   params: {
-    principalIds: [functionApp.identity.principalId]
+    principalIds: userAssignedManagedIdentityParams != null
+    ? [userAssignedManagedIdentityParams!.principalId]
+    : [functionApp.identity.principalId]
     storageAccountName: deploymentStorageAccountModule.outputs.storageAccountName
     role: 'Storage Blob Data Owner'
   }
