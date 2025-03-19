@@ -102,7 +102,7 @@ module containerisedFunctionAppModule '../../common/components/containerisedFunc
     functionAppDockerImageTag: screenerDockerImageTag
     location: location
     applicationInsightsConnectionString: applicationInsightsConnectionString
-    healthCheckPath: '/screen'
+    healthCheckPath: '/api/screen'
     appServicePlanName: resourceNames.screener.screenerFunction
     keyVaultName: keyVault.name
     // entraIdAuthentication: {
