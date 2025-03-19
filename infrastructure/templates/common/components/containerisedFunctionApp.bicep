@@ -142,15 +142,6 @@ var storageAlerts = alerts != null
     }
   : null
 
-var fileServiceAlerts = alerts != null
-  ? {
-      availability: alerts!.fileServiceAvailability
-      latency: alerts!.fileServiceLatency
-      capacity: alerts!.fileServiceCapacity
-      alertsGroupName: alerts!.alertsGroupName
-    }
-  : null
-
 module appServicePlanModule '../../public-api/components/appServicePlan.bicep' = {
   name: appServicePlanName
   params: {
@@ -170,16 +161,6 @@ module appServicePlanModule '../../public-api/components/appServicePlan.bicep' =
   }
 }
 
-module fileShareModule '../../public-api/components/fileShare.bicep' = {
-  name: '${deploymentStorageAccountName}FileShareModuleDeploy'
-  params: {
-    storageAccountName: deploymentStorageAccountModule.outputs.storageAccountName
-    fileShareName: '${functionAppName}-${abbreviations.fileShare}'
-    alerts: fileServiceAlerts
-    tagValues: tagValues
-  }
-}
-
 module keyVaultRoleAssignmentModule '../../public-api/components/keyVaultRoleAssignment.bicep' = {
   name: '${functionAppName}KeyVaultRoleAssignmentModuleDeploy'
   params: {
@@ -188,6 +169,15 @@ module keyVaultRoleAssignmentModule '../../public-api/components/keyVaultRoleAss
       : [functionApp.identity.principalId]
     keyVaultName: keyVault.name
     role: 'Secrets User'
+  }
+}
+
+module storageAccountBlobRoleAssignmentModule 'storageAccountRoleAssignment.bicep' = {
+  name: '${deploymentStorageAccountName}BlobRoleAssignmentModuleDeploy'
+  params: {
+    principalIds: [functionApp.identity.principalId]
+    storageAccountName: deploymentStorageAccountModule.outputs.storageAccountName
+    role: 'Storage Blob Data Owner'
   }
 }
 
@@ -217,7 +207,7 @@ resource functionApp 'Microsoft.Web/sites@2024-04-01' = {
     vnetImagePullEnabled: vnetImagePullEnabled
     siteConfig: {
       linuxFxVersion: 'DOCKER|${acrLoginServer}/${functionAppImageName}:${functionAppDockerImageTag}'
-      acrUseManagedIdentityCreds: true
+      // acrUseManagedIdentityCreds: true
       alwaysOn: alwaysOn ?? null
       keyVaultReferenceIdentity: keyVaultReferenceIdentity
       scmType: 'None'
