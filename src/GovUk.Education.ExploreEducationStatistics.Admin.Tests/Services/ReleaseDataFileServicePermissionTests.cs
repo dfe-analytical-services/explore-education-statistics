@@ -164,11 +164,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     userService =>
                     {
                         var service = SetupReleaseDataFileService(userService: userService.Object);
-                        return service.Upload(releaseVersionId: _releaseVersion.Id,
+                        return service.Upload(
+                            releaseVersionId: _releaseVersion.Id,
                             dataFormFile: new Mock<IFormFile>().Object,
                             metaFormFile: new Mock<IFormFile>().Object,
+                            dataSetTitle: "",
                             replacingFileId: null,
-                            dataSetTitle: "");
+                            cancellationToken: default);
                     }
                 );
         }
@@ -185,7 +187,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         return service.UploadAsZip(releaseVersionId: _releaseVersion.Id,
                             zipFormFile: new Mock<IFormFile>().Object,
                             dataSetTitle: "",
-                            replacingFileId: null);
+                            replacingFileId: null,
+                            cancellationToken: default);
                     }
                 );
         }

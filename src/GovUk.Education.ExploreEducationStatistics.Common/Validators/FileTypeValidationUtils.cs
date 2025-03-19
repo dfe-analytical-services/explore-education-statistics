@@ -1,12 +1,22 @@
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
-using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Validators
 {
     public static class FileTypeValidationUtils
     {
+        public static readonly Regex[] AllowedCsvMimeTypes = {
+            new ("^(application|text)/csv$"),
+            new ("^text/plain$")
+        };
+
+        public static readonly string[] AllowedCsvEncodingTypes = [
+            "us-ascii",
+            "utf-8"
+        ];
+
         public static readonly string[] AllowedArchiveEncodingTypes =
         [
             "binary"
@@ -48,6 +58,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Validators
             {
                 { Ancillary, AllowedAncillaryFileTypes },
                 { Chart, AllowedChartFileTypes },
+                { Data, AllowedCsvMimeTypes },
+                { Metadata, AllowedCsvMimeTypes },
                 { DataZip, AllowedArchiveMimeTypes },
                 { BulkDataZip, AllowedArchiveMimeTypes },
                 { Image, AllowedImageMimeTypes }

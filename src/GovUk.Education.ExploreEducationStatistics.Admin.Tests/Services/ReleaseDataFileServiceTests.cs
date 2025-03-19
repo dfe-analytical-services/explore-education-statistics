@@ -1856,7 +1856,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     dataFormFile: dataFormFile,
                     metaFormFile: metaFormFile,
                     dataSetTitle: subjectName,
-                    replacingFileId: null);
+                    replacingFileId: null,
+                    cancellationToken: default);
 
                 var dataFileInfo = result.AssertRight();
 
@@ -2018,7 +2019,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     dataFormFile: dataFormFile,
                     metaFormFile: metaFormFile,
                     dataSetTitle: null,
-                    replacingFileId: originalDataReleaseFile.File.Id);
+                    replacingFileId: originalDataReleaseFile.File.Id,
+                    cancellationToken: default);
 
                 var dataFileInfo = result.AssertRight();
 
@@ -2218,7 +2220,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     dataFormFile: dataFormFile,
                     metaFormFile: metaFormFile,
                     dataSetTitle: subjectName,
-                    replacingFileId: null);
+                    replacingFileId: null,
+                    cancellationToken: default);
 
                 var dataFileInfo = result.AssertRight();
 
@@ -2334,7 +2337,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     releaseVersionId: releaseVersion.Id,
                     zipFormFile: zipFormFile,
                     dataSetTitle: subjectName,
-                    replacingFileId: null)).AssertRight();
+                    replacingFileId: null,
+                    cancellationToken: default)).AssertRight();
 
                 MockUtils.VerifyAllMocks(privateBlobStorageService,
                     dataArchiveValidationService,
@@ -2488,7 +2492,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     releaseVersionId: releaseVersion.Id,
                     zipFormFile: zipFormFile,
                     dataSetTitle: subjectName,
-                    replacingFileId: null);
+                    replacingFileId: null,
+                    cancellationToken: default);
 
                 var dataFileInfo = result.AssertRight();
 
@@ -2631,7 +2636,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     releaseVersionId: releaseVersion.Id,
                     zipFormFile: zipFormFile,
                     dataSetTitle: null,
-                    replacingFileId: originalDataReleaseFile.File.Id)).AssertRight();
+                    replacingFileId: originalDataReleaseFile.File.Id,
+                    cancellationToken: default)).AssertRight();
 
                 MockUtils.VerifyAllMocks(privateBlobStorageService,
                     dataArchiveValidationService,
