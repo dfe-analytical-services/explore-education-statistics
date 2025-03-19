@@ -172,16 +172,16 @@ module keyVaultRoleAssignmentModule '../../public-api/components/keyVaultRoleAss
   }
 }
 
-module storageAccountBlobRoleAssignmentModule 'storageAccountRoleAssignment.bicep' = {
-  name: '${deploymentStorageAccountName}BlobRoleAssignmentModuleDeploy'
-  params: {
-    principalIds: userAssignedManagedIdentityParams != null
-    ? [userAssignedManagedIdentityParams!.principalId]
-    : [functionApp.identity.principalId]
-    storageAccountName: deploymentStorageAccountModule.outputs.storageAccountName
-    role: 'Storage Blob Data Owner'
-  }
-}
+// module storageAccountBlobRoleAssignmentModule 'storageAccountRoleAssignment.bicep' = {
+//   name: '${deploymentStorageAccountName}BlobRoleAssignmentModuleDeploy'
+//   params: {
+//     principalIds: userAssignedManagedIdentityParams != null
+//     ? [userAssignedManagedIdentityParams!.principalId]
+//     : [functionApp.identity.principalId]
+//     storageAccountName: deploymentStorageAccountModule.outputs.storageAccountName
+//     role: 'Storage Blob Data Owner'
+//   }
+// }
 
 var keyVaultReferenceIdentity = userAssignedManagedIdentityParams != null ? userAssignedManagedIdentityParams!.id : null
 
@@ -270,9 +270,10 @@ module deploymentStorageAccountModule '../../public-api/components/storageAccoun
     kind: 'StorageV2'
     keyVaultName: keyVaultName
     privateEndpointSubnetIds: {
+      // TODO DW - do we need more in order to support tables for the Function App etc?
       blob: privateEndpoints.storageAccounts
     }
-    publicNetworkAccessEnabled: false
+    publicNetworkAccessEnabled: true
     alerts: storageAlerts
     tagValues: tagValues
   }
