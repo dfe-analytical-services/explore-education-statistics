@@ -30,4 +30,6 @@ steps:
           --parameters ${{ parameters.parameterFile }} \
           --parameters \
               subscription='$(subscription)' \
-              resourceTags='$(resourceTags)'
+              resourceTags='$(resourceTags)' \
+              maintenanceIpRanges='$(maintenanceFirewallRules)' \
+              screenerDockerImageTag='$(screenerDockerImageTag)'
