@@ -206,16 +206,33 @@ resource functionApp 'Microsoft.Web/sites@2024-04-01' = {
     enabled: true
     serverFarmId: appServicePlanModule.outputs.planId
     reserved: operatingSystem == 'Linux'
-    vnetImagePullEnabled: vnetImagePullEnabled
+    // vnetImagePullEnabled: vnetImagePullEnabled
+    vnetRouteAllEnabled: false
+    vnetImagePullEnabled: false
+    vnetContentShareEnabled: false
+    storageAccountRequired: false
+    virtualNetworkSubnetId: subnetId
     siteConfig: {
+      numberOfWorkers: 1
+      netFrameworkVersion: 'v4.0'
+      managedPipelineMode: 'Integrated'
+      functionAppScaleLimit: 0
+      virtualApplications: [
+        {
+          virtualPath: '/'
+          physicalPath: 'site\\wwwroot'
+          preloadEnabled: false
+        }
+      ]
+      minimumElasticInstanceCount: 1
+      vnetRouteAllEnabled: false
       linuxFxVersion: 'DOCKER|${acrLoginServer}/${functionAppImageName}:${functionAppDockerImageTag}'
-      // acrUseManagedIdentityCreds: true
       alwaysOn: alwaysOn ?? null
       keyVaultReferenceIdentity: keyVaultReferenceIdentity
       scmType: 'None'
       autoHealEnabled: true
       healthCheckPath: healthCheckPath
-      vnetRouteAllEnabled: true
+      // vnetRouteAllEnabled: true
       publicNetworkAccess: publicNetworkAccessEnabled ? 'Enabled' : 'Disabled'
       ipSecurityRestrictions: publicNetworkAccessEnabled && length(firewallRules) > 0 ? firewallRules : null
       cors: {
@@ -238,6 +255,22 @@ resource functionApp 'Microsoft.Web/sites@2024-04-01' = {
         {
           name: 'FUNCTIONS_EXTENSION_VERSION'
           value: '~4'
+        }
+        {
+          name: 'WEBSITE_CONTENTAZUREFILECONNECTIONSTRING'
+          value: '@Microsoft.KeyVault(VaultName=${keyVaultName};SecretName=${deploymentStorageAccountModule.outputs.connectionStringSecretName})'
+        }
+        {
+          name: 'WEBSITE_CONTENTSHARE'
+          value: fileShareModule.outputs.fileShareName
+        }
+        {
+          name: 'WEBSITE_CONTENTOVERVNET'
+          value: '1'
+        }
+        {
+          name: 'WEBSITES_ENABLE_APP_SERVICE_STORAGE'
+          value: 'false'
         }
         {
           name: 'DOCKER_REGISTRY_SERVER_URL'
@@ -272,11 +305,25 @@ module deploymentStorageAccountModule '../../public-api/components/storageAccoun
     privateEndpointSubnetIds: {
       // TODO DW - do we need more in order to support tables for the Function App etc?
       blob: privateEndpoints.storageAccounts
+      file: privateEndpoints.storageAccounts
     }
     publicNetworkAccessEnabled: true
     alerts: storageAlerts
     tagValues: tagValues
   }
+}
+
+module fileShareModule '../../public-api/components/fileShare.bicep' = {
+  name: '${functionAppName}FileShareDeploy'
+  params: {
+    storageAccountName: deploymentStorageAccountName
+    fileShareName: '${functionAppName}-${abbreviations.fileShare}'
+    // alerts: fileServiceAlerts
+    tagValues: tagValues
+  }
+  dependsOn: [
+    deploymentStorageAccountModule
+  ]
 }
 
 resource azureStorageAccountsConfig 'Microsoft.Web/sites/config@2023-12-01' = {
