@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef } from 'react';
+import React, { useCallback, useEffect } from 'react';
 import downloadFile from '@common/utils/file/downloadFile';
 import logger from '@common/services/logger';
 import useToggle from '@common/hooks/useToggle';
