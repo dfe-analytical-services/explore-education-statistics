@@ -210,21 +210,21 @@ resource functionApp 'Microsoft.Web/sites@2024-04-01' = {
     vnetRouteAllEnabled: false
     vnetImagePullEnabled: false
     vnetContentShareEnabled: false
-    storageAccountRequired: false
+    // storageAccountRequired: false
     virtualNetworkSubnetId: subnetId
     siteConfig: {
-      numberOfWorkers: 1
-      netFrameworkVersion: 'v4.0'
-      managedPipelineMode: 'Integrated'
-      functionAppScaleLimit: 0
-      virtualApplications: [
-        {
-          virtualPath: '/'
-          physicalPath: 'site\\wwwroot'
-          preloadEnabled: false
-        }
-      ]
-      minimumElasticInstanceCount: 1
+      // numberOfWorkers: 1
+      // netFrameworkVersion: 'v4.0'
+      // managedPipelineMode: 'Integrated'
+      // functionAppScaleLimit: 0
+      // virtualApplications: [
+      //   {
+      //     virtualPath: '/'
+      //     physicalPath: 'site\\wwwroot'
+      //     preloadEnabled: false
+      //   }
+      // ]
+      // minimumElasticInstanceCount: 1
       vnetRouteAllEnabled: false
       linuxFxVersion: 'DOCKER|${acrLoginServer}/${functionAppImageName}:${functionAppDockerImageTag}'
       alwaysOn: alwaysOn ?? null
