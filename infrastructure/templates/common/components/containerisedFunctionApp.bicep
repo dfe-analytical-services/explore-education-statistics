@@ -232,8 +232,8 @@ resource functionApp 'Microsoft.Web/sites@2024-04-01' = {
         }
         // Use managed identity to access the storage account rather than key based access with a connection string
         {
-          name: 'AzureWebJobsStorage__accountName'
-          value: deploymentStorageAccountModule.outputs.storageAccountName
+          name: 'AzureWebJobsStorage'
+          value: '@Microsoft.KeyVault(VaultName=${keyVaultName};SecretName=${deploymentStorageAccountModule.outputs.connectionStringSecretName})'
         }
         {
           name: 'FUNCTIONS_EXTENSION_VERSION'
