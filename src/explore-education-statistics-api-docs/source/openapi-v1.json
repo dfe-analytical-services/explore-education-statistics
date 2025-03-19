@@ -11,7 +11,7 @@
   },
   "servers": [
     {
-      "url": "/",
+      "url": "http://localhost:5050",
       "description": "API server"
     }
   ],
@@ -2883,7 +2883,6 @@
       "DataSetViewModel": {
         "required": [
           "id",
-          "latestVersion",
           "status",
           "summary",
           "title"
@@ -2928,7 +2927,8 @@
                 "$ref": "#/components/schemas/DataSetLatestVersionViewModel"
               }
             ],
-            "description": "The latest published data set version."
+            "description": "The latest published data set version.",
+            "nullable": true
           }
         },
         "additionalProperties": false,

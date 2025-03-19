@@ -9,6 +9,10 @@ public class DataSetStatusTheoryData
         DataSetStatus.Deprecated,
         DataSetStatus.Published,
     ];
+    
+    public static readonly TheoryData<DataSetStatus> AllStatuses = new(
+        EnumUtil.GetEnums<DataSetStatus>()
+    );
 
     public static readonly TheoryData<DataSetStatus> AvailableStatuses = new(AvailableStatusesList);
 
