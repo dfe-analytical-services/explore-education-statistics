@@ -290,6 +290,9 @@ resource functionApp 'Microsoft.Web/sites@2024-04-01' = {
     redundancyMode: redundancyMode
     keyVaultReferenceIdentity: keyVaultReferenceIdentity
   }
+  dependsOn: [
+    keyVaultRoleAssignmentModule
+  ]
 }
 
 module deploymentStorageAccountModule '../../public-api/components/storageAccount.bicep' = {
