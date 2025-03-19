@@ -253,6 +253,10 @@ resource functionApp 'Microsoft.Web/sites@2024-04-01' = {
           value: '@Microsoft.KeyVault(VaultName=${keyVaultName};SecretName=${deploymentStorageAccountModule.outputs.connectionStringSecretName})'
         }
         {
+          name: 'WEBSITE_SKIP_CONTENTSHARE_VALIDATION'
+          value: '1'
+        }
+        {
           name: 'WEBSITE_CONTENTSHARE'
           value: fileShareModule.outputs.fileShareName
         }
