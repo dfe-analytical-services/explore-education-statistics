@@ -164,7 +164,7 @@ module appServicePlanModule '../../public-api/components/appServicePlan.bicep' =
 module keyVaultRoleAssignmentModule '../../public-api/components/keyVaultRoleAssignment.bicep' = {
   name: '${functionAppName}KeyVaultRoleAssignmentModuleDeploy'
   params: {
-    principalIds: userAssignedManagedIdentityParams.principalId
+    principalIds: [userAssignedManagedIdentityParams.principalId]
     keyVaultName: keyVault.name
     role: 'Secrets User'
   }
