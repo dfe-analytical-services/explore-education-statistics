@@ -17,7 +17,7 @@ param userAssignedManagedIdentityParams {
   id: string
   name: string
   principalId: string
-}?
+}
 
 @description('Specifies the Function App name')
 param functionAppName string
@@ -164,9 +164,7 @@ module appServicePlanModule '../../public-api/components/appServicePlan.bicep' =
 module keyVaultRoleAssignmentModule '../../public-api/components/keyVaultRoleAssignment.bicep' = {
   name: '${functionAppName}KeyVaultRoleAssignmentModuleDeploy'
   params: {
-    principalIds: userAssignedManagedIdentityParams != null
-      ? [userAssignedManagedIdentityParams!.principalId]
-      : [functionApp.identity.principalId]
+    principalIds: userAssignedManagedIdentityParams.principalId
     keyVaultName: keyVault.name
     role: 'Secrets User'
   }
@@ -175,26 +173,20 @@ module keyVaultRoleAssignmentModule '../../public-api/components/keyVaultRoleAss
 // module storageAccountBlobRoleAssignmentModule 'storageAccountRoleAssignment.bicep' = {
 //   name: '${deploymentStorageAccountName}BlobRoleAssignmentModuleDeploy'
 //   params: {
-//     principalIds: userAssignedManagedIdentityParams != null
-//     ? [userAssignedManagedIdentityParams!.principalId]
-//     : [functionApp.identity.principalId]
+//     principalIds: [userAssignedManagedIdentityParams.principalId]
 //     storageAccountName: deploymentStorageAccountModule.outputs.storageAccountName
 //     role: 'Storage Blob Data Owner'
 //   }
 // }
 
-var keyVaultReferenceIdentity = userAssignedManagedIdentityParams != null ? userAssignedManagedIdentityParams!.id : null
+var keyVaultReferenceIdentity = userAssignedManagedIdentityParams.id
 
-var identity = userAssignedManagedIdentityParams != null
-  ? {
-      type: 'UserAssigned'
-      userAssignedIdentities: {
-        '${userAssignedManagedIdentityParams!.id}': {}
-      }
-    }
-  : {
-      type: 'SystemAssigned'
-    }
+var identity = {
+  type: 'UserAssigned'
+  userAssignedIdentities: {
+    '${userAssignedManagedIdentityParams.id}': {}
+  }
+}
 
 resource functionApp 'Microsoft.Web/sites@2024-04-01' = {
   name: functionAppName
