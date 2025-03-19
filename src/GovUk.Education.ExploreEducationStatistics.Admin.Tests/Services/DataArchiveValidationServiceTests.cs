@@ -8,7 +8,6 @@ using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
-using Microsoft.AspNetCore.Http;
 using Moq;
 using System;
 using System.IO;
@@ -40,7 +39,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 .ReturnsAsync([]);
 
             fileTypeService
-                .Setup(s => s.IsValidZipFile(archive))
+                .Setup(s => s.HasValidZipFileMeta(archive))
                 .ReturnsAsync(true);
 
             var contentDbContextId = Guid.NewGuid().ToString();
@@ -70,7 +69,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var archive = CreateFormFileFromResource("data-zip-invalid.zip");
 
             fileTypeService
-                .Setup(s => s.IsValidZipFile(archive))
+                .Setup(s => s.HasValidZipFileMeta(archive))
                 .ReturnsAsync(() => true);
 
             var contentDbContextId = Guid.NewGuid().ToString();
@@ -384,37 +383,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async Task IsValidZipFile_NoFileProvided_ReturnsValidationError()
-        {
-            // Arrange
-            await using var contentDbContext = DbUtils.InMemoryApplicationDbContext();
-
-            var service = SetupDataArchiveValidationService(contentDbContext: contentDbContext);
-
-            IFormFile? archive = null;
-
-            // Act
-            var result = await service.IsValidZipFile(archive!);
-
-            // Assert
-            AssertHasErrors(result, [
-                ValidationMessages.GenerateErrorFileIsNull(),
-            ]);
-        }
-
-        [Fact]
-        public async Task IsValidZipFile_InvalidFileNameAndType_ReturnsValidationErrors()
+        public async Task IsValidZipFile_InvalidFileType_ReturnsValidationError()
         {
             // Arrange
             var contentDbContextId = Guid.NewGuid().ToString();
             await using var contentDbContext = DbUtils.InMemoryApplicationDbContext(contentDbContextId);
 
-            var longFilename = "loooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooongfilename.csv";
-            var archive = CreateFormFileFromResource("test-data.csv", longFilename);
+            var filename = "test-data.csv";
+            var archive = CreateFormFileFromResource("test-data.csv", filename);
 
             var fileTypeService = new Mock<IFileTypeService>(Strict);
             fileTypeService
-                .Setup(s => s.IsValidZipFile(archive))
+                .Setup(s => s.HasValidZipFileMeta(archive))
                 .ReturnsAsync(false);
 
             var service = SetupDataArchiveValidationService(
@@ -426,9 +406,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             // Assert
             AssertHasErrors(result, [
-                ValidationMessages.GenerateErrorFilenameTooLong(longFilename, DataArchiveValidationService.MaxFilenameSize),
-                ValidationMessages.GenerateErrorZipFilenameMustEndDotZip(longFilename),
-                ValidationMessages.GenerateErrorMustBeZipFile(longFilename),
+                ValidationMessages.GenerateErrorMustBeZipFile(filename),
             ]);
 
             VerifyAllMocks(fileTypeService);
