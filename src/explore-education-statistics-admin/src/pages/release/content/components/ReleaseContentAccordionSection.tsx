@@ -226,7 +226,11 @@ const ReleaseContentAccordionSection = ({
               )}
 
               <ButtonGroup className="govuk-!-margin-bottom-8 dfe-justify-content--center">
-                <Button variant="secondary" onClick={addBlock}>
+                <Button
+                  variant="secondary"
+                  onClick={addBlock}
+                  preventDoubleClick={false}
+                >
                   Add text block
                 </Button>
                 {!showDataBlockForm && (
