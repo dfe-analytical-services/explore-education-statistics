@@ -1,5 +1,5 @@
 import render from '@common-test/render';
-import React, { useRef } from 'react';
+import React from 'react';
 import { testChartTableData } from '@common/modules/charts/components/__tests__/__data__/testChartData';
 import ChartRenderer, {
   ChartRendererProps,
@@ -61,18 +61,13 @@ describe('ChartRenderer', () => {
   };
 
   test('renders auto-generated boundary level footnote successfully', async () => {
-    const TestComponent = () => {
-      const contentRef = useRef<HTMLDivElement | null>(null);
+    const mockRef: { current: HTMLInputElement | null } = { current: null };
 
-      return (
-        <ExportButtonContext.Provider value={contentRef}>
-          <ChartRenderer {...testMapChartRenderer} />
-        </ExportButtonContext.Provider>
-      );
-    };
-    const { rerender } = render(<TestComponent />);
-    rerender(<TestComponent />);
-
+    render(
+      <ExportButtonContext.Provider value={mockRef}>
+        <ChartRenderer {...testMapChartRenderer} />
+      </ExportButtonContext.Provider>,
+    );
     const footnotes = screen.queryByTestId('footnotes');
 
     expect(footnotes).toBeInTheDocument();
@@ -82,17 +77,13 @@ describe('ChartRenderer', () => {
   });
 
   test('renders export button successfully', async () => {
-    const TestComponent = () => {
-      const contentRef = useRef<HTMLDivElement | null>(null);
+    const mockRef: { current: HTMLInputElement | null } = { current: null };
 
-      return (
-        <ExportButtonContext.Provider value={contentRef}>
-          <ChartRenderer {...testMapChartRenderer} />
-        </ExportButtonContext.Provider>
-      );
-    };
-    const { rerender } = render(<TestComponent />);
-    rerender(<TestComponent />);
+    render(
+      <ExportButtonContext.Provider value={mockRef}>
+        <ChartRenderer {...testMapChartRenderer} />
+      </ExportButtonContext.Provider>,
+    );
 
     expect(screen.queryByText('Export options')).toBeInTheDocument();
   });
