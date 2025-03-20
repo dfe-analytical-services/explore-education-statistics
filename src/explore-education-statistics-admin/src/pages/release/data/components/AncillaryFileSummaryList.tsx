@@ -16,7 +16,6 @@ import { generatePath } from 'react-router-dom';
 
 interface Props {
   canUpdateRelease?: boolean;
-  deleteFile?: AncillaryFile;
   file: AncillaryFile;
   publicationId: string;
   releaseVersionId: string;
@@ -27,7 +26,6 @@ interface Props {
 
 export default function AncillaryFileSummaryList({
   canUpdateRelease,
-  deleteFile,
   file,
   publicationId,
   releaseVersionId,
@@ -88,7 +86,6 @@ export default function AncillaryFileSummaryList({
                 Edit file
               </Link>
               <ModalConfirm
-                open={deleteFile && deleteFile.id === file.id}
                 title="Confirm deletion of file"
                 triggerButton={
                   <ButtonText onClick={onDelete}>Delete file</ButtonText>
