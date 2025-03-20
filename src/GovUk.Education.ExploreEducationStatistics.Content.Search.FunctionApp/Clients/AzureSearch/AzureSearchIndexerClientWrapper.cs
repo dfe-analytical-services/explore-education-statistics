@@ -9,6 +9,7 @@ public class AzureSearchIndexerClientWrapper(Azure.Search.Documents.Indexes.Sear
     public async Task ResetIndexerAsync(string indexName, CancellationToken cancellationToken) => await azureSearchIndexerClient.ResetIndexerAsync(indexName, cancellationToken);
 
     public async Task RunIndexerAsync(string indexName, CancellationToken cancellationToken) => await azureSearchIndexerClient.RunIndexerAsync(indexName, cancellationToken);
+    
     public async Task<bool> IndexerExists(string indexName, CancellationToken cancellationToken)
     {
         try
