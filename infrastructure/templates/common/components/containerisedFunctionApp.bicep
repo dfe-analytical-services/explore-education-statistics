@@ -208,8 +208,8 @@ resource functionApp 'Microsoft.Web/sites@2024-04-01' = {
     serverFarmId: appServicePlanModule.outputs.planId
     reserved: operatingSystem == 'Linux'
     vnetImagePullEnabled: vnetImagePullEnabled
-    vnetRouteAllEnabled: false
-    vnetContentShareEnabled: false
+    vnetRouteAllEnabled: true
+    vnetContentShareEnabled: true
     virtualNetworkSubnetId: subnetId
     siteConfig: {
       linuxFxVersion: 'DOCKER|${acrLoginServer}/${functionAppImageName}:${functionAppDockerImageTag}'
