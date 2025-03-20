@@ -82,10 +82,11 @@ resource adminAppServiceIdentity 'Microsoft.ManagedIdentity/identities@2023-01-3
 
 var adminAppClientId = adminAppServiceIdentity.properties.clientId
 
-resource screenerFunctionAppManagedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' = {
-  name: resourceNames.screener.screenerFunctionIdentity
-  location: location
-}
+// TODO EES-5881 - don't think we neeed this identity
+// resource screenerFunctionAppManagedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' = {
+//   name: resourceNames.screener.screenerFunctionIdentity
+//   location: location
+// }
 
 module containerisedFunctionAppModule '../../common/components/containerisedFunctionApp.bicep' = {
   name: 'screenerContainerisedFunctionAppModuleDeploy'

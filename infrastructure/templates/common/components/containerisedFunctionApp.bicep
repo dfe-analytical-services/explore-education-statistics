@@ -192,6 +192,7 @@ module deploymentStorageAccountModule '../../public-api/components/storageAccoun
     keyVaultName: keyVaultName
     privateEndpointSubnetIds: {
       blob: privateEndpoints.storageAccounts
+      file: privateEndpoints.storageAccounts
     }
     publicNetworkAccessEnabled: false
     alerts: storageAlerts
