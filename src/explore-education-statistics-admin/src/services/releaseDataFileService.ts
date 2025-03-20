@@ -212,10 +212,10 @@ const releaseDataFileService = {
 
   getDeleteDataFilePlan(
     releaseId: string,
-    dataFile: DataFile,
+    dataFileId: string,
   ): Promise<DeleteDataFilePlan> {
     return client.get<DeleteDataFilePlan>(
-      `/release/${releaseId}/data/${dataFile.id}/delete-plan`,
+      `/release/${releaseId}/data/${dataFileId}/delete-plan`,
     );
   },
   deleteDataFiles(releaseId: string, fileId: string): Promise<void> {
