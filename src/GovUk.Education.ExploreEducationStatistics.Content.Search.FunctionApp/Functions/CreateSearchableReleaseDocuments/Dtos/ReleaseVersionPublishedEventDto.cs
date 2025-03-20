@@ -6,5 +6,5 @@ public record ReleaseVersionPublishedEventDto
     public required string ReleaseSlug { get; init; }
     public required Guid PublicationId { get; init; }
     public required string PublicationSlug { get; init; }
-    public required Guid PublicationLatestReleaseVersionId { get; init; }   
+    public required Guid PublicationLatestPublishedReleaseVersionId { get; init; }   
 }

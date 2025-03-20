@@ -11,5 +11,5 @@ public record SearchDocumentCreatedMessageDto
     public required Guid ReleaseVersionId { get; init; }
     public required string BlobName { get; init; }
     
-    public required Guid PublicationLatestReleaseVersionId { get; init; }  
+    public required Guid PublicationLatestPublishedReleaseVersionId { get; init; }  
 }

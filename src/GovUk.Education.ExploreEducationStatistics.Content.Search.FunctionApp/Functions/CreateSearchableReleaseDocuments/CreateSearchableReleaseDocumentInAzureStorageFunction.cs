@@ -30,7 +30,7 @@ public class CreateSearchableReleaseDocumentInAzureStorageFunction(
                     ReleaseSlug = payload.ReleaseSlug,
                     ReleaseVersionId = response.ReleaseVersionId,
                     BlobName = response.BlobName,
-                    PublicationLatestReleaseVersionId = payload.PublicationLatestReleaseVersionId
+                    PublicationLatestPublishedReleaseVersionId = payload.PublicationLatestPublishedReleaseVersionId
                 };
             });
 }
