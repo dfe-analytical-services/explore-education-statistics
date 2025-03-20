@@ -9,6 +9,7 @@
 *.iws
 
 ## Application
+artifacts
 bin
 obj
 /data/ees-mssql
