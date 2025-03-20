@@ -179,14 +179,14 @@ module keyVaultRoleAssignmentModule '../../public-api/components/keyVaultRoleAss
   }
 }
 
-// module storageAccountBlobRoleAssignmentModule 'storageAccountRoleAssignment.bicep' = {
-//   name: '${deploymentStorageAccountName}BlobRoleAssignmentModuleDeploy'
-//   params: {
-//     principalIds: [userAssignedManagedIdentityParams.principalId]
-//     storageAccountName: deploymentStorageAccountModule.outputs.storageAccountName
-//     role: 'Storage Blob Data Owner'
-//   }
-// }
+module storageAccountBlobRoleAssignmentModule 'storageAccountRoleAssignment.bicep' = {
+  name: '${deploymentStorageAccountName}BlobRoleAssignmentModuleDeploy'
+  params: {
+    principalIds: [userAssignedManagedIdentityParams.principalId]
+    storageAccountName: deploymentStorageAccountModule.outputs.storageAccountName
+    role: 'Storage Blob Data Owner'
+  }
+}
 
 var keyVaultReferenceIdentity = userAssignedManagedIdentityParams.id
 
@@ -208,8 +208,8 @@ resource functionApp 'Microsoft.Web/sites@2024-04-01' = {
     serverFarmId: appServicePlanModule.outputs.planId
     reserved: operatingSystem == 'Linux'
     vnetImagePullEnabled: vnetImagePullEnabled
-    vnetRouteAllEnabled: true
-    vnetContentShareEnabled: true
+    // vnetRouteAllEnabled: true
+    // vnetContentShareEnabled: true
     virtualNetworkSubnetId: subnetId
     siteConfig: {
       linuxFxVersion: 'DOCKER|${acrLoginServer}/${functionAppImageName}:${functionAppDockerImageTag}'
@@ -234,8 +234,8 @@ resource functionApp 'Microsoft.Web/sites@2024-04-01' = {
         }
         // Use managed identity to access the storage account rather than key based access with a connection string
         {
-          name: 'AzureWebJobsStorage'
-          value: '@Microsoft.KeyVault(VaultName=${keyVaultName};SecretName=${deploymentStorageAccountModule.outputs.connectionStringSecretName})'
+          name: 'AzureWebJobsStorage__accountName'
+          value: deploymentStorageAccountModule.outputs.storageAccountName
         }
         {
           name: 'FUNCTIONS_EXTENSION_VERSION'
