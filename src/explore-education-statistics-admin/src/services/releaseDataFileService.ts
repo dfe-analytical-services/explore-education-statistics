@@ -152,17 +152,16 @@ const releaseDataFileService = {
     releaseId: string,
     request: UploadZipDataFileRequest,
   ): Promise<DataFile> {
-    const { zipFile, ...params } = request;
+    const { zipFile, title } = request;
 
     const data = new FormData();
+    data.append('releaseVersionId', releaseId);
+    data.append('dataSetTitle', title);
     data.append('zipFile', zipFile);
 
     const file = await client.post<DataFileInfo>(
-      `/release/${releaseId}/zip-data`,
+      '/releaseVersions/zip-data',
       data,
-      {
-        params,
-      },
     );
 
     return mapFile(file);
@@ -172,10 +171,11 @@ const releaseDataFileService = {
     zipFile: File,
   ): Promise<ArchiveDataSetFile[]> {
     const data = new FormData();
+    data.append('releaseVersionId', releaseId);
     data.append('zipFile', zipFile);
 
     return client.post<ArchiveDataSetFile[]>(
-      `/release/${releaseId}/upload-bulk-zip-data`,
+      'releaseVersions/upload-bulk-zip-data',
       data,
     );
   },
