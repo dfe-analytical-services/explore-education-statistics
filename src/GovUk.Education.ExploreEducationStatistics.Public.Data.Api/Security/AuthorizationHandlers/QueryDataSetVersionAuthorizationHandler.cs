@@ -35,6 +35,6 @@ public class QueryDataSetVersionAuthorizationHandler(
         return httpContextAccessor.HttpContext.TryGetRequestHeader(
                    RequestHeaderNames.PreviewToken,
                    out var previewToken)
-               && await previewTokenService.ValidatePreviewToken(previewToken.ToString(), dataSetVersion.Id);
+               && await previewTokenService.ValidatePreviewTokenForDataSetVersion(previewToken.ToString(), dataSetVersion.Id);
     }
 }

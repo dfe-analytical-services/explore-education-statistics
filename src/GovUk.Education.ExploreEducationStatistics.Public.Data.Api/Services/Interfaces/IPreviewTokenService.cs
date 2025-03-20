@@ -2,7 +2,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services.In
 
 public interface IPreviewTokenService
 {
-    Task<bool> ValidatePreviewToken(
+    Task<bool> ValidatePreviewTokenForDataSet(
+        string previewToken,
+        Guid dataSetId,
+        CancellationToken cancellationToken = default);
+    
+    Task<bool> ValidatePreviewTokenForDataSetVersion(
         string previewToken,
         Guid dataSetVersionId,
         CancellationToken cancellationToken = default);
