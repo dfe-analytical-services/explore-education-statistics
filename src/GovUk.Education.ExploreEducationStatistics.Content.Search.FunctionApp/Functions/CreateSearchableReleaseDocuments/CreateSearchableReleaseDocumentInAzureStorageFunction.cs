@@ -11,18 +11,18 @@ public class CreateSearchableReleaseDocumentInAzureStorageFunction(
 {
     [Function("CreateSearchableReleaseDocument")]
     [QueueOutput("%SearchableDocumentCreatedQueueName%")]
-    public async Task<SearchDocumentCreatedMessageDto> CreateSearchableReleaseDocumentInAzureStorage(
+    public async Task<SearchableDocumentCreatedMessageDto> CreateSearchableReleaseDocumentInAzureStorage(
         [QueueTrigger("%ReleaseVersionPublishedQueueName%")]
         EventGridEvent eventDto,
         FunctionContext context) =>
-        await eventGridEventHandler.Handle<ReleaseVersionPublishedEventDto, SearchDocumentCreatedMessageDto>(
+        await eventGridEventHandler.Handle<ReleaseVersionPublishedEventDto, SearchableDocumentCreatedMessageDto>(
             context, 
             eventDto,
             async (payload, ct) =>
             {
                 var request = new CreatePublicationLatestReleaseSearchableDocumentRequest{ PublicationSlug = payload.PublicationSlug };
                 var response = await searchableDocumentCreator.CreatePublicationLatestReleaseSearchableDocument(request, ct);
-                return new SearchDocumentCreatedMessageDto
+                return new SearchableDocumentCreatedMessageDto
                 {
                     PublicationId = payload.PublicationId,
                     PublicationSlug = response.PublicationSlug,

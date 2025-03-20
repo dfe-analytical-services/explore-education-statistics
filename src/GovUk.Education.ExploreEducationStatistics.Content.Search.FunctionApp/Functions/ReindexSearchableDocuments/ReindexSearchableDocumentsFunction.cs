@@ -9,10 +9,10 @@ public class ReindexSearchableDocumentsFunction(
     ILogger<ReindexSearchableDocumentsFunction> logger,
     ISearchIndexClient searchIndexClient)
 {
-    [Function("ReindexNewlyCreatedSearchableDocument")]
-    public async Task ReindexNewlyCreatedSearchableDocument(
+    [Function("ReindexSearchableDocuments")]
+    public async Task ReindexSearchableDocuments(
         [QueueTrigger("%SearchableDocumentCreatedQueueName%")]
-        SearchDocumentCreatedMessageDto messageDto,
+        SearchableDocumentCreatedMessageDto messageDto,
         FunctionContext context)
     {
         logger.LogInformation("{FunctionName} triggered: {@Request}", context.FunctionDefinition.Name, messageDto);
