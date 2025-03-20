@@ -11,6 +11,7 @@ public class AzureSearchOptions
     /// https://{search_service}.search.windows.net
     /// </summary>
     public string SearchServiceEndpoint { get; init; } = string.Empty;
+    
     public string? SearchServiceAccessKey { get; init; }
     
     public string IndexName { get; init; } = string.Empty;

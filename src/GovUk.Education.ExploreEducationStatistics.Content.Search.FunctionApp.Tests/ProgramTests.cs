@@ -214,6 +214,35 @@ public class ProgramTests
                 // ASSERT
                 Assert.NotNull(actual);
             }
+            
+            [Fact]
+            public void GivenNotConfigured_WhenResolvingReindexSearchableDocumentsFunction_ThenShouldResolve()
+            {
+                // ARRANGE
+                var sut = GetSutWithConfig("{}");
+            
+                // ACT
+                var actual = sut.Services.GetRequiredService<IOptions<ReindexSearchableDocumentsFunction>>();
+                
+                // ASSERT
+                Assert.NotNull(actual);
+            }
+            
+            [Fact]
+            public void GivenNotConfigured_WhenResolvingAzureSearchOptions_ThenShouldResolve()
+            {
+                // ARRANGE
+                var sut = GetSutWithConfig("{}");
+            
+                // ACT
+                var options = sut.Services.GetRequiredService<IOptions<AzureSearchOptions>>();
+                
+                // ASSERT
+                Assert.NotNull(options.Value);
+                Assert.Equal(string.Empty, options.Value.SearchServiceEndpoint);
+                Assert.Null(options.Value.SearchServiceAccessKey);
+                Assert.Equal(string.Empty, options.Value.IndexName);
+            }
         }
         
         public class CreateSearchableReleaseDocumentInAzureStorageFunctionTests : ProgramTests
