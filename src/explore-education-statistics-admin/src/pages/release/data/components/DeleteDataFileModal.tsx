@@ -22,6 +22,10 @@ export default function DeleteDataFileModal({
   onConfirm,
 }: Props) {
   const [open, toggleOpen] = useToggle(false);
+  const { data: plan, isLoading } = useQuery({
+    ...releaseDataFileQueries.getDeleteFilePlan(releaseVersionId, dataFile.id),
+    enabled: open,
+  });
 
   const handleDeleteConfirm = useCallback(async () => {
     try {
@@ -53,79 +57,63 @@ export default function DeleteDataFileModal({
       </p>
       <p>This data will no longer be available for use in this release.</p>
 
-      {open && <Plan dataFile={dataFile} releaseVersionId={releaseVersionId} />}
+      <LoadingSpinner loading={isLoading}>
+        {plan && (
+          <>
+            {plan.deleteDataBlockPlan.dependentDataBlocks.length > 0 && (
+              <>
+                <p>The following data blocks will also be deleted:</p>
+
+                <ul>
+                  {plan.deleteDataBlockPlan.dependentDataBlocks.map(block => (
+                    <li key={block.name}>
+                      <p>{block.name}</p>
+
+                      {block.contentSectionHeading && (
+                        <p>
+                          It will also be removed from the "
+                          {block.contentSectionHeading}" content section.
+                        </p>
+                      )}
+                      {block.infographicFilesInfo.length > 0 && (
+                        <p>
+                          The following infographic files will also be removed:
+                          <ul>
+                            {block.infographicFilesInfo.map(fileInfo => (
+                              <li key={fileInfo.filename}>
+                                <p>{fileInfo.filename}</p>
+                              </li>
+                            ))}
+                          </ul>
+                        </p>
+                      )}
+                      {block.isKeyStatistic && (
+                        <p>
+                          A key statistic associated with this data block will
+                          be removed.
+                        </p>
+                      )}
+                      {block.featuredTable && (
+                        <p>
+                          The featured table "{block.featuredTable.name}" using
+                          this data block will be removed.
+                        </p>
+                      )}
+                    </li>
+                  ))}
+                </ul>
+              </>
+            )}
+            {plan.footnoteIds.length > 0 && (
+              <p>
+                {`${plan.footnoteIds.length} ${
+                  plan.footnoteIds.length > 1 ? 'footnotes' : 'footnote'
+                } will be removed or updated.`}
+              </p>
+            )}
+          </>
+        )}
+      </LoadingSpinner>
     </ModalConfirm>
-  );
-}
-
-interface PlanProps {
-  dataFile: DataFile;
-  releaseVersionId: string;
-}
-
-function Plan({ dataFile, releaseVersionId }: PlanProps) {
-  const { data: plan, isLoading } = useQuery(
-    releaseDataFileQueries.getDeleteFilePlan(releaseVersionId, dataFile),
-  );
-
-  return (
-    <>
-      <LoadingSpinner loading={isLoading} />
-      {plan && (
-        <>
-          {plan.deleteDataBlockPlan.dependentDataBlocks.length > 0 && (
-            <>
-              <p>The following data blocks will also be deleted:</p>
-
-              <ul>
-                {plan.deleteDataBlockPlan.dependentDataBlocks.map(block => (
-                  <li key={block.name}>
-                    <p>{block.name}</p>
-
-                    {block.contentSectionHeading && (
-                      <p>
-                        It will also be removed from the "
-                        {block.contentSectionHeading}" content section.
-                      </p>
-                    )}
-                    {block.infographicFilesInfo.length > 0 && (
-                      <p>
-                        The following infographic files will also be removed:
-                        <ul>
-                          {block.infographicFilesInfo.map(fileInfo => (
-                            <li key={fileInfo.filename}>
-                              <p>{fileInfo.filename}</p>
-                            </li>
-                          ))}
-                        </ul>
-                      </p>
-                    )}
-                    {block.isKeyStatistic && (
-                      <p>
-                        A key statistic associated with this data block will be
-                        removed.
-                      </p>
-                    )}
-                    {block.featuredTable && (
-                      <p>
-                        The featured table "{block.featuredTable.name}" using
-                        this data block will be removed.
-                      </p>
-                    )}
-                  </li>
-                ))}
-              </ul>
-            </>
-          )}
-          {plan.footnoteIds.length > 0 && (
-            <p>
-              {`${plan.footnoteIds.length} ${
-                plan.footnoteIds.length > 1 ? 'footnotes' : 'footnote'
-              } will be removed or updated.`}
-            </p>
-          )}
-        </>
-      )}
-    </>
   );
 }

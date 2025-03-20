@@ -10,13 +10,13 @@ const releaseDataFileQueries = createQueryKeys('releaseDataFile', {
       queryFn: () => releaseDataFileService.getDataFiles(releaseId),
     };
   },
-  getDeleteFilePlan(releaseVersionId: string, dataFile: DataFile) {
+  getDeleteFilePlan(releaseVersionId: string, dataFileId: string) {
     return {
-      queryKey: [releaseVersionId, dataFile],
+      queryKey: [releaseVersionId, dataFileId],
       queryFn: () =>
         releaseDataFileService.getDeleteDataFilePlan(
           releaseVersionId,
-          dataFile,
+          dataFileId,
         ),
     };
   },
