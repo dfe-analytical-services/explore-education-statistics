@@ -85,3 +85,18 @@ public record MappingStatusViewModel
     
     public required bool FiltersComplete { get; init; }
 }
+
+public record DataSetVersionInfoViewModel 
+{
+    public required Guid Id { get; init; }
+
+    public required string Version { get; init; }
+
+    [JsonConverter(typeof(StringEnumConverter))]
+    public required DataSetVersionStatus Status { get; init; }
+
+    [JsonConverter(typeof(StringEnumConverter))]
+    public required DataSetVersionType Type { get; init; }
+
+    public required string Notes { get; init; }
+}
