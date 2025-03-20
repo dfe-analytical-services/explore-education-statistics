@@ -1,34 +1,36 @@
+using Azure.Messaging.EventGrid;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.CreateSearchableReleaseDocuments.Dtos;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Services;
 using Microsoft.Azure.Functions.Worker;
-using Microsoft.Extensions.Logging;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.CreateSearchableReleaseDocuments;
 
 public class CreateSearchableReleaseDocumentInAzureStorageFunction(
-    ILogger<CreateSearchableReleaseDocumentInAzureStorageFunction> logger,
+    EventGridEventHandler eventGridEventHandler,
     ISearchableDocumentCreator searchableDocumentCreator)
 {
     [Function("CreateSearchableReleaseDocument")]
     [QueueOutput("%SearchableDocumentCreatedQueueName%")]
-    public async Task<SearchDocumentCreatedMessage> CreateSearchableReleaseDocumentInAzureStorage(
+    public async Task<SearchableDocumentCreatedMessageDto> CreateSearchableReleaseDocumentInAzureStorage(
         [QueueTrigger("%ReleaseVersionPublishedQueueName%")]
-        ReleasePublishedMessage message,
-        FunctionContext context,
-        CancellationToken cancellationToken)
-    {
-        logger.LogInformation("{FunctionName} triggered: {Request}", context.FunctionDefinition.Name, message);
-
-        var request = new CreatePublicationLatestReleaseSearchableDocumentRequest{ PublicationSlug = message.PublicationSlug };
-        var response = await searchableDocumentCreator.CreatePublicationLatestReleaseSearchableDocument(request, cancellationToken);
-        var searchDocumentCreatedMessage = new SearchDocumentCreatedMessage
-        {
-            PublicationSlug = response.PublicationSlug,
-            BlobName = response.BlobName,
-            ReleaseVersionId = response.ReleaseVersionId
-        };
-
-        logger.LogInformation("{FunctionName} completed. {Response}", context.FunctionDefinition.Name, searchDocumentCreatedMessage);
-        return searchDocumentCreatedMessage;
-    }
+        EventGridEvent eventDto,
+        FunctionContext context) =>
+        await eventGridEventHandler.Handle<ReleaseVersionPublishedEventDto, SearchableDocumentCreatedMessageDto>(
+            context, 
+            eventDto,
+            async (payload, ct) =>
+            {
+                var request = new CreatePublicationLatestReleaseSearchableDocumentRequest{ PublicationSlug = payload.PublicationSlug };
+                var response = await searchableDocumentCreator.CreatePublicationLatestReleaseSearchableDocument(request, ct);
+                return new SearchableDocumentCreatedMessageDto
+                {
+                    PublicationId = payload.PublicationId,
+                    PublicationSlug = response.PublicationSlug,
+                    ReleaseId = payload.ReleaseId,
+                    ReleaseSlug = payload.ReleaseSlug,
+                    ReleaseVersionId = response.ReleaseVersionId,
+                    BlobName = response.BlobName,
+                    PublicationLatestPublishedReleaseVersionId = payload.PublicationLatestPublishedReleaseVersionId
+                };
+            });
 }
