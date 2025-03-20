@@ -21,7 +21,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces
         Task<Either<ActionResult, TableBuilderResultViewModel>> Query(
             Guid releaseVersionId,
             FullTableQuery query,
-            long? boundaryLevelId,
             CancellationToken cancellationToken = default);
 
         Task<Either<ActionResult, Dictionary<string, List<LocationAttributeViewModel>>>> QueryForBoundaryLevel(

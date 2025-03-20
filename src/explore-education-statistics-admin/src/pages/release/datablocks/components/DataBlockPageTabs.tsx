@@ -15,7 +15,6 @@ import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
 import WarningMessage from '@common/components/WarningMessage';
 import useAsyncRetry from '@common/hooks/useAsyncRetry';
-import getMapInitialBoundaryLevel from '@common/modules/charts/components/utils/getMapInitialBoundaryLevel';
 import isOrphanedDataSet from '@common/modules/charts/util/isOrphanedDataSet';
 import { InitialTableToolState } from '@common/modules/table-tool/components/TableToolWizard';
 import getInitialStepSubjectMeta from '@common/modules/table-tool/components/utils/getInitialStepSubjectMeta';
@@ -82,9 +81,6 @@ const DataBlockPageTabs = ({
     const tableData = await tableBuilderService.getTableData(
       query,
       releaseVersionId,
-      dataBlock.charts[0]?.type === 'map'
-        ? getMapInitialBoundaryLevel(dataBlock.charts[0])
-        : undefined,
     );
 
     const { initialStep, subjectMeta } = await getInitialStepSubjectMeta(

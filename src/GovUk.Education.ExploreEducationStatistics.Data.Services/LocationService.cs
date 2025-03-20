@@ -13,12 +13,15 @@ using System.Linq;
 using System.Threading.Tasks;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Services;
-public class LocationService(StatisticsDbContext context, IBoundaryDataRepository boundaryDataRepository) : ILocationService
+public class LocationService(
+    StatisticsDbContext context,
+    IBoundaryDataRepository boundaryDataRepository
+    ) : ILocationService
 {
     public async Task<Dictionary<string, List<LocationAttributeViewModel>>> GetLocationViewModels(
             List<Location> locations,
-            long? boundaryLevelId,
-            Dictionary<GeographicLevel, List<string>>? hierarchies)
+            Dictionary<GeographicLevel, List<string>>? hierarchies,
+            long? boundaryLevelId = null)
     {
         var boundaryData = await GetBoundaryData(locations, boundaryLevelId);
 
@@ -29,8 +32,8 @@ public class LocationService(StatisticsDbContext context, IBoundaryDataRepositor
     }
 
     private async Task<Dictionary<GeographicLevel, Dictionary<string, BoundaryData>>> GetBoundaryData(
-            List<Location> locations,
-            long? boundaryLevelId)
+        List<Location> locations,
+        long? boundaryLevelId)
     {
         if (!boundaryLevelId.HasValue)
         {
@@ -38,7 +41,7 @@ public class LocationService(StatisticsDbContext context, IBoundaryDataRepositor
         }
 
         var boundaryLevel = await context.BoundaryLevel.FindAsync(boundaryLevelId)
-            ?? throw new ArgumentOutOfRangeException(nameof(boundaryLevelId));
+                            ?? throw new ArgumentOutOfRangeException(nameof(boundaryLevelId));
 
         var locationsMatchingLevel =
             locations.Where(location => location.GeographicLevel == boundaryLevel.Level);
@@ -50,11 +53,11 @@ public class LocationService(StatisticsDbContext context, IBoundaryDataRepositor
         var boundaryData = boundaryDataRepository.FindByBoundaryLevelAndCodes(boundaryLevelId.Value, codes);
 
         return new Dictionary<GeographicLevel, Dictionary<string, BoundaryData>>
+        {
             {
-                {
-                    boundaryLevel.Level,
-                    boundaryData
-                }
-            };
+                boundaryLevel.Level,
+                boundaryData
+            }
+        };
     }
 }

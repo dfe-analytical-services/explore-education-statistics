@@ -67,7 +67,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             var result = await service.GetSubjectMeta(
                 releaseVersionId: Guid.NewGuid(),
                 query,
-                boundaryLevelId: null,
                 []);
 
             result.AssertNotFound();
@@ -139,8 +138,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             locationService
                 .Setup(s => s.GetLocationViewModels(
                     It.IsAny<List<Location>>(),
-                    It.IsAny<long?>(),
-                    It.IsAny<Dictionary<GeographicLevel, List<string>>>()))
+                    It.IsAny<Dictionary<GeographicLevel, List<string>>>(),
+                    null))
                 .ReturnsAsync([]);
 
             footnoteRepository.Setup(s => s.GetFilteredFootnotes(
@@ -178,7 +177,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 var result = await service.GetSubjectMeta(
                     releaseVersion.Id,
                     query,
-                    boundaryLevelId: null,
                     observations);
 
                 VerifyAllMocks(
@@ -310,8 +308,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             locationService
                 .Setup(s => s.GetLocationViewModels(
                     It.IsAny<List<Location>>(),
-                    It.IsAny<long?>(),
-                    It.IsAny<Dictionary<GeographicLevel, List<string>>>()))
+                    It.IsAny<Dictionary<GeographicLevel, List<string>>>(),
+                    null))
                 .ReturnsAsync([]);
 
             boundaryLevelRepository.Setup(s => s.FindByGeographicLevels(
@@ -365,7 +363,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 var result = await service.GetSubjectMeta(
                     releaseVersion.Id,
                     query,
-                    boundaryLevelId: null,
                     observations);
 
                 VerifyAllMocks(
