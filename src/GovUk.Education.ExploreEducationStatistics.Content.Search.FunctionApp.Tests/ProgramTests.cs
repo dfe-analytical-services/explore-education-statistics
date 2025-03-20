@@ -4,7 +4,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Clie
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Clients.ContentApi;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.CreateSearchableReleaseDocuments;
-using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.ReindexSearchDocuments;
+using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.ReindexSearchableDocuments;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Options;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Services;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Tests.Extensions;
@@ -200,16 +200,16 @@ public class ProgramTests
             }
         }
         
-        public class ReindexSearchDocumentsFunctionTests : ProgramTests
+        public class ReindexSearchableDocumentsFunctionTests : ProgramTests
         {
             [Fact]
-            public void Should_resolve_ReindexSearchDocumentsFunction()
+            public void Should_resolve_ReindexSearchableDocumentsFunction()
             {
                 // ARRANGE
                 var sut = GetSut();
             
                 // ACT
-                var actual = ActivatorUtilities.CreateInstance<ReindexSearchDocumentsFunction>(sut.Services);
+                var actual = ActivatorUtilities.CreateInstance<ReindexSearchableDocumentsFunction>(sut.Services);
             
                 // ASSERT
                 Assert.NotNull(actual);

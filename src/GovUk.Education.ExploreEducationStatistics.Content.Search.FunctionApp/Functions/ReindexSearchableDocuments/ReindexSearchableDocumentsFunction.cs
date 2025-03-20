@@ -3,10 +3,10 @@ using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Func
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
 
-namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.ReindexSearchDocuments;
+namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.ReindexSearchableDocuments;
 
-public class ReindexSearchDocumentsFunction(
-    ILogger<ReindexSearchDocumentsFunction> logger,
+public class ReindexSearchableDocumentsFunction(
+    ILogger<ReindexSearchableDocumentsFunction> logger,
     ISearchIndexClient searchIndexClient)
 {
     [Function("ReindexNewlyCreatedSearchableDocument")]
