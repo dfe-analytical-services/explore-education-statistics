@@ -142,6 +142,15 @@ var storageAlerts = alerts != null
     }
   : null
 
+var fileServiceAlerts = alerts != null
+  ? {
+      availability: alerts!.fileServiceAvailability
+      latency: alerts!.fileServiceLatency
+      capacity: alerts!.fileServiceCapacity
+      alertsGroupName: alerts!.alertsGroupName
+    }
+  : null  
+
 module appServicePlanModule '../../public-api/components/appServicePlan.bicep' = {
   name: appServicePlanName
   params: {
@@ -172,16 +181,47 @@ module keyVaultRoleAssignmentModule '../../public-api/components/keyVaultRoleAss
   }
 }
 
-// module storageAccountBlobRoleAssignmentModule 'storageAccountRoleAssignment.bicep' = {
-//   name: '${deploymentStorageAccountName}BlobRoleAssignmentModuleDeploy'
-//   params: {
-//     principalIds: userAssignedManagedIdentityParams != null
-//     ? [userAssignedManagedIdentityParams!.principalId]
-//     : [functionApp.identity.principalId]
-//     storageAccountName: deploymentStorageAccountModule.outputs.storageAccountName
-//     role: 'Storage Blob Data Owner'
-//   }
-// }
+module deploymentStorageAccountModule '../../public-api/components/storageAccount.bicep' = {
+  name: '${functionAppName}DeploymentStorageAccountModuleDeploy'
+  params: {
+    location: location
+    storageAccountName: deploymentStorageAccountName
+    firewallRules: storageFirewallRules
+    sku: 'Standard_LRS'
+    kind: 'StorageV2'
+    keyVaultName: keyVaultName
+    privateEndpointSubnetIds: {
+      blob: privateEndpoints.storageAccounts
+    }
+    publicNetworkAccessEnabled: false
+    alerts: storageAlerts
+    tagValues: tagValues
+  }
+}
+
+module fileShareModule '../../public-api/components/fileShare.bicep' = {
+  name: '${functionAppName}FileShareDeploy'
+  params: {
+    storageAccountName: deploymentStorageAccountName
+    fileShareName: '${functionAppName}-${abbreviations.fileShare}'
+    alerts: fileServiceAlerts
+    tagValues: tagValues
+  }
+  dependsOn: [
+    deploymentStorageAccountModule
+  ]
+}
+
+module storageAccountBlobRoleAssignmentModule 'storageAccountRoleAssignment.bicep' = {
+  name: '${deploymentStorageAccountName}BlobRoleAssignmentModuleDeploy'
+  params: {
+    principalIds: userAssignedManagedIdentityParams != null
+    ? [userAssignedManagedIdentityParams!.principalId]
+    : [functionApp.identity.principalId]
+    storageAccountName: deploymentStorageAccountModule.outputs.storageAccountName
+    role: 'Storage Blob Data Owner'
+  }
+}
 
 var keyVaultReferenceIdentity = userAssignedManagedIdentityParams != null ? userAssignedManagedIdentityParams!.id : null
 
@@ -227,6 +267,10 @@ resource functionApp 'Microsoft.Web/sites@2024-04-01' = {
       preWarmedInstanceCount: preWarmedInstanceCount
       appSettings: [
         {
+          name: 'FUNCTIONS_EXTENSION_VERSION'
+          value: '~4'
+        }
+        {
           name: 'APPLICATIONINSIGHTS_CONNECTION_STRING'
           value: applicationInsightsConnectionString
         }
@@ -236,8 +280,24 @@ resource functionApp 'Microsoft.Web/sites@2024-04-01' = {
           value: deploymentStorageAccountModule.outputs.storageAccountName
         }
         {
-          name: 'FUNCTIONS_EXTENSION_VERSION'
-          value: '~4'
+          name: 'WEBSITE_CONTENTAZUREFILECONNECTIONSTRING'
+          value: '@Microsoft.KeyVault(VaultName=${keyVaultName};SecretName=${deploymentStorageAccountModule.outputs.connectionStringSecretName})'
+        }
+        {
+          name: 'WEBSITE_SKIP_CONTENTSHARE_VALIDATION'
+          value: '1'
+        }
+        {
+          name: 'WEBSITE_CONTENTSHARE'
+          value: fileShareModule.outputs.fileShareName
+        }
+        {
+          name: 'WEBSITE_CONTENTOVERVNET'
+          value: '1'
+        }
+        {
+          name: 'WEBSITES_ENABLE_APP_SERVICE_STORAGE'
+          value: 'false'
         }
         {
           name: 'DOCKER_REGISTRY_SERVER_URL'
@@ -251,35 +311,11 @@ resource functionApp 'Microsoft.Web/sites@2024-04-01' = {
           name: 'DOCKER_REGISTRY_SERVER_PASSWORD'
           value: dockerPullManagedIdentitySecretValue
         }
-        {
-          name: 'WEBSITES_ENABLE_APP_SERVICE_STORAGE'
-          value: 'false'
-        }
       ]
     }
     httpsOnly: true
     redundancyMode: redundancyMode
     keyVaultReferenceIdentity: keyVaultReferenceIdentity
-  }
-}
-
-module deploymentStorageAccountModule '../../public-api/components/storageAccount.bicep' = {
-  name: '${functionAppName}DeploymentStorageAccountModuleDeploy'
-  params: {
-    location: location
-    storageAccountName: deploymentStorageAccountName
-    allowedSubnetIds: [subnetId]
-    firewallRules: storageFirewallRules
-    sku: 'Standard_LRS'
-    kind: 'StorageV2'
-    keyVaultName: keyVaultName
-    privateEndpointSubnetIds: {
-      // TODO DW - do we need more in order to support tables for the Function App etc?
-      blob: privateEndpoints.storageAccounts
-    }
-    publicNetworkAccessEnabled: false
-    alerts: storageAlerts
-    tagValues: tagValues
   }
 }
 
