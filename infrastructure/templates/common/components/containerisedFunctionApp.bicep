@@ -207,9 +207,9 @@ resource functionApp 'Microsoft.Web/sites@2024-04-01' = {
     serverFarmId: appServicePlanModule.outputs.planId
     reserved: operatingSystem == 'Linux'
     vnetImagePullEnabled: vnetImagePullEnabled
+    virtualNetworkSubnetId: subnetId
     siteConfig: {
       linuxFxVersion: 'DOCKER|${acrLoginServer}/${functionAppImageName}:${functionAppDockerImageTag}'
-      // acrUseManagedIdentityCreds: true
       alwaysOn: alwaysOn ?? null
       keyVaultReferenceIdentity: keyVaultReferenceIdentity
       scmType: 'None'
@@ -232,8 +232,8 @@ resource functionApp 'Microsoft.Web/sites@2024-04-01' = {
         }
         // Use managed identity to access the storage account rather than key based access with a connection string
         {
-          name: 'AzureWebJobsStorage'
-          value: '@Microsoft.KeyVault(VaultName=${keyVaultName};SecretName=${deploymentStorageAccountModule.outputs.connectionStringSecretName})'
+          name: 'AzureWebJobsStorage__accountName'
+          value: deploymentStorageAccountModule.outputs.storageAccountName
         }
         {
           name: 'FUNCTIONS_EXTENSION_VERSION'
@@ -250,6 +250,10 @@ resource functionApp 'Microsoft.Web/sites@2024-04-01' = {
         {
           name: 'DOCKER_REGISTRY_SERVER_PASSWORD'
           value: dockerPullManagedIdentitySecretValue
+        }
+        {
+          name: 'WEBSITES_ENABLE_APP_SERVICE_STORAGE'
+          value: 'false'
         }
       ]
     }
