@@ -277,7 +277,7 @@ module deploymentStorageAccountModule '../../public-api/components/storageAccoun
       // TODO DW - do we need more in order to support tables for the Function App etc?
       blob: privateEndpoints.storageAccounts
     }
-    publicNetworkAccessEnabled: true
+    publicNetworkAccessEnabled: false
     alerts: storageAlerts
     tagValues: tagValues
   }
