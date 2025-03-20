@@ -114,11 +114,11 @@ module containerisedFunctionAppModule '../../common/components/containerisedFunc
     //   allowedPrincipalIds: []
     //   requireAuthentication: true
     // }
-    userAssignedManagedIdentityParams: {
-      id: screenerFunctionAppManagedIdentity.id
-      name: screenerFunctionAppManagedIdentity.name
-      principalId: screenerFunctionAppManagedIdentity.properties.principalId
-    }
+    // userAssignedManagedIdentityParams: {
+    //   id: screenerFunctionAppManagedIdentity.id
+    //   name: screenerFunctionAppManagedIdentity.name
+    //   principalId: screenerFunctionAppManagedIdentity.properties.principalId
+    // }
     dockerPullManagedIdentityClientId: keyVault.getSecret('DOCKER-REGISTRY-SERVER-USERNAME')
     dockerPullManagedIdentitySecretValue: keyVault.getSecret('DOCKER-REGISTRY-SERVER-PASSWORD')
     deploymentStorageAccountName: resourceNames.screener.screenerFunctionStorageAccount
