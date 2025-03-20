@@ -142,6 +142,15 @@ var storageAlerts = alerts != null
     }
   : null
 
+var fileServiceAlerts = alerts != null
+  ? {
+      availability: alerts!.fileServiceAvailability
+      latency: alerts!.fileServiceLatency
+      capacity: alerts!.fileServiceCapacity
+      alertsGroupName: alerts!.alertsGroupName
+    }
+  : null  
+
 module appServicePlanModule '../../public-api/components/appServicePlan.bicep' = {
   name: appServicePlanName
   params: {
@@ -198,33 +207,17 @@ resource functionApp 'Microsoft.Web/sites@2024-04-01' = {
     enabled: true
     serverFarmId: appServicePlanModule.outputs.planId
     reserved: operatingSystem == 'Linux'
-    // vnetImagePullEnabled: vnetImagePullEnabled
+    vnetImagePullEnabled: vnetImagePullEnabled
     vnetRouteAllEnabled: false
-    vnetImagePullEnabled: false
     vnetContentShareEnabled: false
-    // storageAccountRequired: false
     virtualNetworkSubnetId: subnetId
     siteConfig: {
-      // numberOfWorkers: 1
-      // netFrameworkVersion: 'v4.0'
-      // managedPipelineMode: 'Integrated'
-      // functionAppScaleLimit: 0
-      // virtualApplications: [
-      //   {
-      //     virtualPath: '/'
-      //     physicalPath: 'site\\wwwroot'
-      //     preloadEnabled: false
-      //   }
-      // ]
-      // minimumElasticInstanceCount: 1
-      vnetRouteAllEnabled: false
       linuxFxVersion: 'DOCKER|${acrLoginServer}/${functionAppImageName}:${functionAppDockerImageTag}'
       alwaysOn: alwaysOn ?? null
       keyVaultReferenceIdentity: keyVaultReferenceIdentity
       scmType: 'None'
       autoHealEnabled: true
       healthCheckPath: healthCheckPath
-      // vnetRouteAllEnabled: true
       publicNetworkAccess: publicNetworkAccessEnabled ? 'Enabled' : 'Disabled'
       ipSecurityRestrictions: publicNetworkAccessEnabled && length(firewallRules) > 0 ? firewallRules : null
       cors: {
@@ -317,7 +310,7 @@ module fileShareModule '../../public-api/components/fileShare.bicep' = {
   params: {
     storageAccountName: deploymentStorageAccountName
     fileShareName: '${functionAppName}-${abbreviations.fileShare}'
-    // alerts: fileServiceAlerts
+    alerts: fileServiceAlerts
     tagValues: tagValues
   }
   dependsOn: [
