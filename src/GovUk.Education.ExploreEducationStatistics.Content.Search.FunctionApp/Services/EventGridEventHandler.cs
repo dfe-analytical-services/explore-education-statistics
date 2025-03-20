@@ -14,12 +14,9 @@ public class EventGridEventHandler(ILogger<EventGridEventHandler> logger)
     {
         logger.LogInformation("{FunctionName} triggered: {Request}", context.FunctionDefinition.Name, eventGridEvent);
         
-        var payload = eventGridEvent.Data.ToObjectFromJson<TPayload>();
-        if (payload.IsDefault())
-        {
-            throw new Exception(
-                $"Unable to deserialise the payload of event into type {typeof(TPayload).Name}");
-        }
+        var payload = eventGridEvent.Data.ToObjectFromJson<TPayload>() 
+                      ?? throw new Exception(
+                          $"Unable to deserialise the payload of event into type {typeof(TPayload).Name}");
         
         var response = await handler(payload, context.CancellationToken);
 
