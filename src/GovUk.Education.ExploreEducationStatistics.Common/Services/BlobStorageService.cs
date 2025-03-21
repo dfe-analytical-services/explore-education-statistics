@@ -447,7 +447,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
                 var contentEncoding = response.Details.ContentEncoding;
                 if (contentEncoding.IsNullOrEmpty())
                 {
-                    return response.Content.ToString();
+                    return response.Content.ToStringSafe();
                 }
 
                 return await CompressionUtils.DecompressToString(
