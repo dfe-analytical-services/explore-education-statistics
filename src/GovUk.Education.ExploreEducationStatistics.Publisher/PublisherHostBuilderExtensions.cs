@@ -27,7 +27,6 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.Services.Options;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Options;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services;
-using GovUk.Education.ExploreEducationStatistics.Publisher.Services.EventGrid;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.EntityFrameworkCore;
@@ -129,7 +128,7 @@ public static class PublisherHostBuilderExtensions
                     .AddScoped<IReleaseVersionRepository, ReleaseVersionRepository>()
                     .AddScoped<IRedirectsCacheService, RedirectsCacheService>()
                     .AddScoped<IRedirectsService, RedirectsService>()
-                    .AddTransient<IEventGridPublisherClientFactory, EventGridPublisherClientFactory>()
+                    .AddEventGridPublisherClient()
                     .AddScoped<IEventRaiserService, EventRaiserService>()
                     .AddSingleton<INotifierClient, NotifierClient>(provider => new NotifierClient(
                         provider.GetRequiredService<IOptions<AppOptions>>().Value.NotifierStorageConnectionString))

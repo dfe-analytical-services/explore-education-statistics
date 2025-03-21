@@ -6,7 +6,7 @@ using System.Net;
 using Azure;
 using Azure.Core;
 
-namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Builders.Services.EventGrid;
+namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services.EventGrid;
 
 public class MockResponse : Response
 {

@@ -1,4 +1,4 @@
-﻿namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services.EventGrid;
+﻿namespace GovUk.Education.ExploreEducationStatistics.Common.Services.EventGrid;
 
 public interface IEventGridPublisherClientFactory
 {

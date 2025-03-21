@@ -2,6 +2,7 @@
 using System;
 using Azure.Core;
 using Azure.Identity;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.EventGrid;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -123,4 +124,7 @@ public static class ServiceCollectionExtensions
 
         return services;
     }
+
+    public static IServiceCollection AddEventGridPublisherClient(this IServiceCollection services) =>
+        services.AddTransient<IEventGridPublisherClientFactory, EventGridPublisherClientFactory>();
 }

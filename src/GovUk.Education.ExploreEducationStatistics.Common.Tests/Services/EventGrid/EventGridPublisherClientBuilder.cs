@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Net;
 using System.Threading;
 using Azure.Messaging.EventGrid;
-using GovUk.Education.ExploreEducationStatistics.Publisher.Services.EventGrid;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.EventGrid;
 using Moq;
 
-namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Builders.Services.EventGrid;
+namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services.EventGrid;
 
 public class EventGridPublisherClientBuilder
 {

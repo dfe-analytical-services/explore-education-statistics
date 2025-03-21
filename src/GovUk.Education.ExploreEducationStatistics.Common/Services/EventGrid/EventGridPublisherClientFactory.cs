@@ -3,7 +3,7 @@ using Azure;
 using Azure.Identity;
 using Azure.Messaging.EventGrid;
 
-namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services.EventGrid;
+namespace GovUk.Education.ExploreEducationStatistics.Common.Services.EventGrid;
 
 public class EventGridPublisherClientFactory : IEventGridPublisherClientFactory
 {
