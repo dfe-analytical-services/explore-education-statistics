@@ -289,7 +289,9 @@ describe('ReleaseApiDataSetChangelogPage', () => {
 
   test('updating draft data set notes', async () => {
     apiDataSetService.getDataSet.mockResolvedValue(testDataSet);
-    apiDataSetVersionService.getVersion.mockResolvedValue(draftDataSetVersion);
+    apiDataSetVersionService.getVersion
+      .mockResolvedValueOnce(draftDataSetVersion)
+      .mockResolvedValueOnce({ ...draftDataSetVersion, notes: 'Test notes' });
     apiDataSetVersionService.getChanges.mockResolvedValue({
       majorChanges: majorChangeSet,
       minorChanges: minorChangeSet,
@@ -317,6 +319,10 @@ describe('ReleaseApiDataSetChangelogPage', () => {
         { notes: 'Test notes' },
       );
     });
+
+    expect(screen.getByTestId('public-guidance-notes')).toHaveTextContent(
+      'Test notes',
+    );
   });
 
   test('renders warning if unable to fetch data set', async () => {
