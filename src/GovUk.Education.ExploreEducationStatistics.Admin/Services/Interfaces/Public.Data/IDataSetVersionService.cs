@@ -45,7 +45,7 @@ public interface IDataSetVersionService
         Guid dataSetVersionId,
         CancellationToken cancellationToken = default);
 
-    Task<Either<ActionResult, HttpResponseMessage>> GetVersionChanges(
+    Task<Either<ActionResult, DataSetVersionChangesViewModel>> GetVersionChanges(
         Guid dataSetVersionId,
         CancellationToken cancellationToken = default);
 

@@ -80,7 +80,6 @@ using Notify.Interfaces;
 using Semver;
 using System;
 using System.Collections.Generic;
-using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using Thinktecture;
@@ -127,6 +126,7 @@ using SameSiteMode = Microsoft.AspNetCore.Http.SameSiteMode;
 using ThemeService = GovUk.Education.ExploreEducationStatistics.Admin.Services.ThemeService;
 using IReleaseService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IReleaseService;
 using ReleaseService = GovUk.Education.ExploreEducationStatistics.Admin.Services.ReleaseService;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Public.Data.PublicDataApiClient;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin
 {
@@ -903,7 +903,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             return Task.FromResult(new Either<ActionResult, Unit>(Unit.Instance));
         }
 
-        public Task<Either<ActionResult, HttpResponseMessage>> GetVersionChanges(
+        public Task<Either<ActionResult, DataSetVersionChangesViewModel>> GetVersionChanges(
             Guid dataSetVersionId,
             CancellationToken cancellationToken = default)
             => throw new NotImplementedException();

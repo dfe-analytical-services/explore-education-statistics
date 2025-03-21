@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net;
 using System.Net.Http;
 using System.Net.Http.Json;
 using System.Security.Claims;
@@ -10,11 +9,13 @@ using System.Threading;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Public.Data;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Public.Data.PublicDataApiClient;
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Fixture;
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.TheoryData;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
@@ -32,7 +33,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.WebUtilities;
 using Moq;
+using Newtonsoft.Json;
 using ValidationMessages = GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationMessages;
+using JsonSerializer = System.Text.Json.JsonSerializer;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api.Public.Data;
 
@@ -802,8 +805,155 @@ public abstract class DataSetVersionsControllerTests(
 
     public class GetVersionChangesTests(TestApplicationFactory testApp) : DataSetVersionsControllerTests(testApp)
     {
-        [Fact]
-        public async Task Success_Returns200()
+        public static TheoryData<ChangeSetViewModelDto> PublicApiChangeSetData =>
+            [
+                // Changes with every change type
+                new() {
+                    Filters = [
+                            new FilterChangeViewModelDto {
+                                CurrentState = new FilterViewModelDto {
+                                    Id = Guid.NewGuid().ToString(),
+                                    Column = "filter1",
+                                    Label = "Filter 1 after",
+                                    Hint = "Filter 1 hint"
+                                },
+                                PreviousState = new FilterViewModelDto {
+                                    Id = Guid.NewGuid().ToString(),
+                                    Column = "filter1",
+                                    Label = "Filter 1 before",
+                                    Hint = "Filter 1 hint"
+                                }
+                            }
+                        ],
+                    FilterOptions = [
+                            new FilterOptionChangesViewModelDto {
+                                Filter = new FilterViewModelDto {
+                                    Id = Guid.NewGuid().ToString(),
+                                    Column = "filter1",
+                                    Label = "Filter 1 after",
+                                    Hint = "Filter 1 hint",
+                                },
+                                Options = [
+                                    new FilterOptionChangeViewModelDto {
+                                        CurrentState = new FilterOptionViewModelDto {
+                                            Id = Guid.NewGuid().ToString(),
+                                            Label = "Filter 1 Option 1 after",
+                                        },
+                                        PreviousState = new FilterOptionViewModelDto {
+                                            Id = Guid.NewGuid().ToString(),
+                                            Label = "Filter 1 Option 1 before",
+                                        }
+                                    }
+                                ]
+                            }
+                        ],
+                    GeographicLevels = [
+                            new GeographicLevelChangeViewModelDto {
+                                CurrentState = new GeographicLevelViewModelDto {
+                                    Code = GeographicLevel.Country,
+                                    Label = "Country after",
+                                },
+                                PreviousState = new GeographicLevelViewModelDto {
+                                    Code = GeographicLevel.Country,
+                                    Label = "Country before",
+                                }
+                            }
+                        ],
+                    Indicators = [
+                            new IndicatorChangeViewModelDto {
+                                CurrentState = new IndicatorViewModelDto {
+                                    Id = Guid.NewGuid().ToString(),
+                                    Column = "indicator1",
+                                    Label = "Indicator 1 after",
+                                    Unit =  IndicatorUnit.PercentagePoint,
+                                    DecimalPlaces = 2,
+                                },
+                                PreviousState = new IndicatorViewModelDto {
+                                    Id = Guid.NewGuid().ToString(),
+                                    Column = "indicator1",
+                                    Label = "Indicator 1 before",
+                                    Unit =  IndicatorUnit.PercentagePoint,
+                                    DecimalPlaces = 2,
+                                }
+                            }
+                        ],
+                    LocationGroups = [
+                            new LocationGroupChangeViewModelDto {
+                                CurrentState = new LocationGroupViewModelDto {
+                                    Level = new GeographicLevelViewModelDto {
+                                        Code = GeographicLevel.Country,
+                                        Label = "Country after",
+                                    }
+                                },
+                                PreviousState = new LocationGroupViewModelDto {
+                                    Level = new GeographicLevelViewModelDto {
+                                        Code = GeographicLevel.Country,
+                                        Label = "Country before",
+                                    }
+                                }
+                            }
+                        ],
+                    LocationOptions = [
+                            new LocationOptionChangesViewModelDto {
+                                Level = new GeographicLevelViewModelDto {
+                                    Code = GeographicLevel.Country,
+                                    Label = "Country after"
+                                },
+                                Options = [
+                                    new LocationOptionChangeViewModelDto {
+                                        CurrentState = new LocationOptionViewModelDto {
+                                            Id = Guid.NewGuid().ToString(),
+                                            Label = "Country 1 after",
+                                            Code = "country 1 code",
+                                            OldCode = "country 1 old code",
+                                            Ukprn = "country 1 ukprn",
+                                            Urn = "country 1 urn",
+                                            LaEstab = "country 1 laEstab",
+                                        },
+                                        PreviousState = new LocationOptionViewModelDto {
+                                            Id = Guid.NewGuid().ToString(),
+                                            Label = "Country 1 before",
+                                            Code = "country 1 code",
+                                            OldCode = "country 1 old code",
+                                            Ukprn = "country 1 ukprn",
+                                            Urn = "country 1 urn",
+                                            LaEstab = "country 1 laEstab",
+                                        }
+                                    }
+                                ]
+                            }
+                        ],
+                    TimePeriods = [
+                            new TimePeriodOptionChangeViewModelDto {
+                                CurrentState = new TimePeriodOptionViewModelDto {
+                                    Label = "Time Period Option 1 after",
+                                    Code = TimeIdentifier.AcademicYearQ1,
+                                    Period = "2024/25",
+                                },
+                                PreviousState = new TimePeriodOptionViewModelDto {
+                                    Label = "Time Period Option 1 before",
+                                    Code = TimeIdentifier.AcademicYearQ1,
+                                    Period = "2024/25",
+                                }
+                            }
+                        ],
+                },
+                // Empty changes
+                new(),
+                new() {
+                    Filters = [],
+                    FilterOptions = [],
+                    GeographicLevels = [],
+                    Indicators = [],
+                    LocationGroups = [],
+                    LocationOptions = [],
+                    TimePeriods = [],
+                }
+            ];
+
+        [Theory]
+        [MemberData(nameof(PublicApiChangeSetData))]
+        public async Task Success_Returns200(ChangeSetViewModelDto changeSetDto)
         {
             DataSet dataSet = DataFixture
                 .DefaultDataSet()
@@ -824,7 +974,11 @@ public abstract class DataSetVersionsControllerTests(
                 context.DataSets.Update(dataSet);
             });
 
-            var mockedChanges = new MockedChanges { Changes = ["test"] };
+            var mockedChanges = new DataSetVersionChangesViewModelDto
+            {
+                MajorChanges = changeSetDto,
+                MinorChanges = changeSetDto,
+            };
 
             var publicDataApiClient = new Mock<IPublicDataApiClient>(MockBehavior.Strict);
 
@@ -833,19 +987,26 @@ public abstract class DataSetVersionsControllerTests(
                     dataSetVersion.DataSetId,
                     dataSetVersion.PublicVersion,
                     It.IsAny<CancellationToken>()))
-                .ReturnsAsync(
-                    new HttpResponseMessage(HttpStatusCode.OK)
-                    {
-                        Content = JsonContent.Create(mockedChanges),
-                    }
-                );
+                .ReturnsAsync(mockedChanges);
 
             var client = BuildApp(publicDataApiClient: publicDataApiClient.Object)
                 .CreateClient();
 
             var response = await GetVersionChanges(dataSetVersion.Id, client);
 
-            response.AssertOk(mockedChanges, useSystemJson: true);
+            var result = response.AssertOk<DataSetVersionChangesViewModel>();
+
+            Assert.Equal(dataSet.Id, result.DataSet.Id);
+            Assert.Equal(dataSet.Title, result.DataSet.Title);
+            Assert.Equal(dataSetVersion.Id, result.DataSetVersion.Id);
+            Assert.Equal(dataSetVersion.PublicVersion, result.DataSetVersion.Version);
+            Assert.Equal(dataSetVersion.Status, result.DataSetVersion.Status);
+            Assert.Equal(dataSetVersion.VersionType, result.DataSetVersion.Type);
+            Assert.Equal(dataSetVersion.Notes, result.DataSetVersion.Notes);
+
+            // The changes returned from the Public API should have its properties mapped 1-to-1
+            // onto the Admin API's intended view model. Hence, the serialized objects should look the same.
+            Assert.Equal(JsonSerializer.Serialize(mockedChanges), JsonConvert.SerializeObject(result.Changes));
         }
 
         [Fact]

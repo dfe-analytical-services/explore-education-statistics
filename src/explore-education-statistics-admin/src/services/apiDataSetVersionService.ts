@@ -4,10 +4,10 @@ import {
   ApiDataSetLiveVersionSummary,
   ApiDataSetVersion,
 } from '@admin/services/apiDataSetService';
-import { ApiDataSetVersionChanges } from '@common/services/types/apiDataSetChanges';
 import { PaginatedList } from '@common/services/types/pagination';
 import { Dictionary } from '@common/types';
 import { LocationLevelKey } from '@common/utils/locationLevelsMap';
+import { ApiDataSetVersionChanges } from './types/apiDataSetChanges';
 
 export type MappingType =
   | 'ManualMapped'
