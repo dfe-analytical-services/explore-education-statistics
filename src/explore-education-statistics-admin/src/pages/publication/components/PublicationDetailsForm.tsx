@@ -13,7 +13,7 @@ import LoadingSpinner from '@common/components/LoadingSpinner';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
 import useToggle from '@common/hooks/useToggle';
 import Yup from '@common/validation/yup';
-import React, { useMemo } from 'react';
+import React, { useMemo, useRef } from 'react';
 import { ObjectSchema } from 'yup';
 import PublicationUpdateConfirmModal from '@admin/pages/publication/components/PublicationUpdateConfirmModal';
 
@@ -46,6 +46,7 @@ export default function PublicationDetailsForm({
   onSubmit,
 }: Props) {
   const [showConfirmModal, toggleConfirmModal] = useToggle(false);
+  const submitButtonRef = useRef<HTMLButtonElement>(null);
 
   const { value, isLoading } = useAsyncHandledRetry(async () => {
     const themes = await themeService.getThemes();
@@ -69,6 +70,15 @@ export default function PublicationDetailsForm({
       ...values,
     });
     onSubmit();
+  };
+
+  const cancelConfirmModal = () => {
+    toggleConfirmModal.off();
+    // This setTimeout is needed because the focus() fn needs to be called
+    // on the next tick. Without it, the button doesn't focus.
+    // I think the modal tries to handle the focus on close, which prevents
+    // our custom focus handling from working at that point.
+    setTimeout(() => submitButtonRef.current?.focus(), 0);
   };
 
   const validationSchema = useMemo<ObjectSchema<FormValues>>(() => {
@@ -158,7 +168,9 @@ export default function PublicationDetailsForm({
                 )}
 
                 <ButtonGroup>
-                  <Button type="submit">Update publication details</Button>
+                  <Button type="submit" ref={submitButtonRef}>
+                    Update publication details
+                  </Button>
                   <ButtonText onClick={onCancel}>Cancel</ButtonText>
                 </ButtonGroup>
               </Form>
@@ -171,8 +183,8 @@ export default function PublicationDetailsForm({
                   onConfirm={async () => {
                     await form.handleSubmit(handleSubmit)();
                   }}
-                  onExit={toggleConfirmModal.off}
-                  onCancel={toggleConfirmModal.off}
+                  onExit={cancelConfirmModal}
+                  onCancel={cancelConfirmModal}
                 />
               )}
             </>
