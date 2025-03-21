@@ -9,7 +9,9 @@ using GovUk.Education.ExploreEducationStatistics.Content.Api.Cache;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.Cache;
+using GovUk.Education.ExploreEducationStatistics.Content.Services.Options;
 using GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
+using Microsoft.Extensions.Options;
 using Moq;
 using NCrontab;
 using Xunit;
@@ -177,6 +179,15 @@ public class ReleaseControllerCachingTests : CacheServiceTestFixture
         return new ReleaseCacheViewModel(Guid.NewGuid());
     }
 
+    private static IOptions<AnalyticsOptions> DefaultAnalyticsOptions()
+    {
+        return new AnalyticsOptions
+        {
+            Enabled = false,
+            BasePath = "/data/analytics",
+        }.ToOptionsWrapper();
+    }
+
     private static ReleaseController BuildReleaseController(
         IMethodologyCacheService? methodologyCacheService = null,
         IPublicationCacheService? publicationCacheService = null,
@@ -188,7 +199,6 @@ public class ReleaseControllerCachingTests : CacheServiceTestFixture
             methodologyCacheService ?? Mock.Of<IMethodologyCacheService>(Strict),
             publicationCacheService ?? Mock.Of<IPublicationCacheService>(Strict),
             releaseCacheService ?? Mock.Of<IReleaseCacheService>(Strict),
-            releaseService ?? Mock.Of<IReleaseService>(Strict)
-        );
+            releaseService ?? Mock.Of<IReleaseService>(Strict));
     }
 }

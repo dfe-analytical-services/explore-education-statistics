@@ -21,6 +21,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Services;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Cache;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.Cache;
+using GovUk.Education.ExploreEducationStatistics.Content.Services.Options;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
@@ -51,10 +52,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api
         private IConfiguration Configuration { get; }
         private IHostEnvironment HostEnvironment { get; }
 
-        public Startup(IConfiguration configuration, IHostEnvironment hostEnvironment)
+        private AnalyticsOptions AnalyticsOptions { get; }
+
+        public Startup(
+            IConfiguration configuration,
+            IHostEnvironment hostEnvironment)
         {
             Configuration = configuration;
             HostEnvironment = hostEnvironment;
+
+            AnalyticsOptions = configuration
+                .GetSection(AnalyticsOptions.Section)
+                .Get<AnalyticsOptions>()!;
         }
 
         // This method gets called by the runtime. Use this method to add services to the container.
@@ -127,6 +136,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api
             });
 
             services.AddCors();
+
+            // Options - to allow them to be injected into services
+            services.AddOptions<AnalyticsOptions>() // @MarkFix needed? I assume so because we'll want BasePath
+                .Bind(Configuration.GetSection(AnalyticsOptions.Section));
+
+            // Services
             services.AddSingleton<IPublicBlobStorageService, PublicBlobStorageService>(provider =>
                 new PublicBlobStorageService(Configuration.GetValue<string>("PublicStorage"),
                     provider.GetRequiredService<ILogger<IBlobStorageService>>()));
@@ -175,6 +190,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api
             services.AddTransient<IThemeService, ThemeService>();
             services.AddTransient<IRedirectsCacheService, RedirectsCacheService>();
             services.AddTransient<IRedirectsService, RedirectsService>();
+
+            if (AnalyticsOptions.Enabled)
+            {
+                services.AddSingleton<IAnalyticsManager, AnalyticsManager>(); // @MarkFix Singleton correct?
+            }
+            else
+            {
+                services.AddSingleton<IAnalyticsManager, NoopAnalyticsManager>();
+            }
 
             StartupSecurityConfiguration.ConfigureAuthorizationPolicies(services);
             StartupSecurityConfiguration.ConfigureResourceBasedAuthorization(services);
@@ -245,6 +269,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api
             app.ServerFeatures.Get<IServerAddressesFeature>()
                 ?.Addresses
                 .ForEach(address => Console.WriteLine($"Server listening on address: {address}"));
+        }
+
+        private class NoopAnalyticsManager : IAnalyticsManager
+        {
+            public void AddZipDownload(string test) {}
         }
     }
 }
