@@ -34,7 +34,7 @@ resource searchServiceContributorRoleDefinition 'Microsoft.Authorization/roleDef
 resource deploymentScript 'Microsoft.Resources/deploymentScripts@2023-08-01' = {
   name: '${searchService.name}-deployment-script'
   location: location
-  kind: 'AzureCLI'
+  kind: 'AzurePowerShell'
   identity: {
     type: 'UserAssigned'
     userAssignedIdentities: {
@@ -42,13 +42,9 @@ resource deploymentScript 'Microsoft.Resources/deploymentScripts@2023-08-01' = {
     }
   }
   properties: {
-    azCliVersion: '2.69.0'
+    azPowerShellVersion: '13.3.0'
     arguments: searchServiceName
-    scriptContent: '''
-      #!/bin/bash
-      set -e
-      echo "The search service name is ${searchServiceName}"
-    '''
+    scriptContent: loadTextContent('../scripts/SetupSearchService.ps1')
     cleanupPreference: 'OnExpiration'
     retentionInterval: 'PT1H'
     timeout: 'PT1M'
