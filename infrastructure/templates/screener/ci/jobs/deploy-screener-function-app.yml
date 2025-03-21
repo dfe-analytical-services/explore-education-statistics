@@ -1,0 +1,31 @@
+parameters:
+  - name: serviceConnection
+    type: string
+  - name: environment
+    type: string
+  - name: dependsOn
+    type: object
+    default: []
+
+jobs:
+  - deployment: DeployScreenerFunction
+    displayName: Deploy Screener Function
+    dependsOn: ${{ parameters.dependsOn }}
+    environment: ${{ parameters.environment }}
+    pool:
+      vmImage: $(vmImageName)
+
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - template: ../../../public-api/ci/tasks/bicep-output-variables.yml
+            parameters:
+              serviceConnection: ${{ parameters.serviceConnection }}
+
+          - template: ../../../public-api/ci/tasks/wait-for-endpoint-success.yml
+            parameters:
+              serviceConnection: ${{ parameters.serviceConnection }}
+              displayName: Check the Screener API Function App is healthy after deployment
+              endpoint: '$(screenerFunctionAppUrl)/api/screen'
+              maxAttempts: 50
