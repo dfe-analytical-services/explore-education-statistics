@@ -1,11 +1,4 @@
-﻿namespace GovUk.Education.ExploreEducationStatistics.Publisher.Options;
-
-public class EventGridOptions
-{
-    public const string Section = "EventGrid";
-
-    public EventTopicOptions[] EventTopics { get; init; } = [];
-}
+﻿namespace GovUk.Education.ExploreEducationStatistics.Common.Services.EventGrid;
 
 /// <summary>
 /// Different event topic's configuration 

@@ -66,7 +66,7 @@ public class PublishingCompletionServiceTests
                     () => Assert.NotNull(host.Services.GetRequiredService<IReleaseService>()),
                     () => Assert.NotNull(host.Services.GetRequiredService<IRedirectsCacheService>()),
                     () => Assert.NotNull(host.Services.GetRequiredService<IDataSetPublishingService>()),
-                    () => Assert.NotNull(host.Services.GetRequiredService<IEventRaiserService>()),
+                    () => Assert.NotNull(host.Services.GetRequiredService<IPublisherEventRaiserService>()),
                 ],
                 assertion => assertion()
             );
