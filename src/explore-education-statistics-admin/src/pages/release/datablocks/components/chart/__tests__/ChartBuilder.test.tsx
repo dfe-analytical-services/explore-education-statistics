@@ -5,10 +5,12 @@ import {
   ChartBuilderFormsContextProvider,
 } from '@admin/pages/release/datablocks/components/chart/contexts/ChartBuilderFormsContext';
 import render from '@common-test/render';
+import { ExportButtonContext } from '@common/contexts/ExportButtonContext';
 import { Chart } from '@common/modules/charts/types/chart';
 import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import noop from 'lodash/noop';
+import React from 'react';
 
 describe('ChartBuilder', () => {
   const testFormState: ChartBuilderForms = {
@@ -111,18 +113,22 @@ describe('ChartBuilder', () => {
 
   describe('data sets', () => {
     test('adding data sets', async () => {
+      const myMockRef: { current: HTMLInputElement | null } = { current: null };
+
       const { user } = render(
-        <ChartBuilderFormsContextProvider initialForms={testFormState}>
-          <ChartBuilder
-            releaseVersionId="release-1"
-            data={testFullTable.results}
-            meta={testFullTable.subjectMeta}
-            tableTitle="Table title"
-            onChartSave={jest.fn()}
-            onChartDelete={noop}
-            onTableQueryUpdate={jest.fn()}
-          />
-        </ChartBuilderFormsContextProvider>,
+        <ExportButtonContext.Provider value={myMockRef}>
+          <ChartBuilderFormsContextProvider initialForms={testFormState}>
+            <ChartBuilder
+              releaseVersionId="release-1"
+              data={testFullTable.results}
+              meta={testFullTable.subjectMeta}
+              tableTitle="Table title"
+              onChartSave={jest.fn()}
+              onChartDelete={noop}
+              onTableQueryUpdate={jest.fn()}
+            />
+          </ChartBuilderFormsContextProvider>
+        </ExportButtonContext.Provider>,
       );
 
       await user.click(screen.getByRole('button', { name: 'Line' }));
@@ -189,18 +195,22 @@ describe('ChartBuilder', () => {
     });
 
     test('removing a data set', async () => {
+      const myMockRef: { current: HTMLInputElement | null } = { current: null };
+
       render(
-        <ChartBuilderFormsContextProvider initialForms={testFormState}>
-          <ChartBuilder
-            releaseVersionId="release-1"
-            data={testFullTable.results}
-            meta={testFullTable.subjectMeta}
-            tableTitle="Table title"
-            onChartSave={jest.fn()}
-            onChartDelete={noop}
-            onTableQueryUpdate={jest.fn()}
-          />
-        </ChartBuilderFormsContextProvider>,
+        <ExportButtonContext.Provider value={myMockRef}>
+          <ChartBuilderFormsContextProvider initialForms={testFormState}>
+            <ChartBuilder
+              releaseVersionId="release-1"
+              data={testFullTable.results}
+              meta={testFullTable.subjectMeta}
+              tableTitle="Table title"
+              onChartSave={jest.fn()}
+              onChartDelete={noop}
+              onTableQueryUpdate={jest.fn()}
+            />
+          </ChartBuilderFormsContextProvider>
+        </ExportButtonContext.Provider>,
       );
 
       await userEvent.click(screen.getByRole('button', { name: 'Line' }));
@@ -266,18 +276,22 @@ describe('ChartBuilder', () => {
     });
 
     test('removing all data sets', async () => {
+      const myMockRef: { current: HTMLInputElement | null } = { current: null };
+
       const { user } = render(
-        <ChartBuilderFormsContextProvider initialForms={testFormState}>
-          <ChartBuilder
-            releaseVersionId="release-1"
-            data={testFullTable.results}
-            meta={testFullTable.subjectMeta}
-            tableTitle="Table title"
-            onChartSave={jest.fn()}
-            onChartDelete={noop}
-            onTableQueryUpdate={jest.fn()}
-          />
-        </ChartBuilderFormsContextProvider>,
+        <ExportButtonContext.Provider value={myMockRef}>
+          <ChartBuilderFormsContextProvider initialForms={testFormState}>
+            <ChartBuilder
+              releaseVersionId="release-1"
+              data={testFullTable.results}
+              meta={testFullTable.subjectMeta}
+              tableTitle="Table title"
+              onChartSave={jest.fn()}
+              onChartDelete={noop}
+              onTableQueryUpdate={jest.fn()}
+            />
+          </ChartBuilderFormsContextProvider>
+        </ExportButtonContext.Provider>,
       );
 
       await user.click(screen.getByRole('button', { name: 'Line' }));
@@ -404,32 +418,35 @@ describe('ChartBuilder', () => {
     };
 
     const handleUpdate = jest.fn();
+    const myMockRef: { current: HTMLInputElement | null } = { current: null };
 
     const { user } = render(
-      <ChartBuilderFormsContextProvider initialForms={testFormState}>
-        <ChartBuilder
-          releaseVersionId="release-1"
-          data={testFullTable.results}
-          initialChart={testInitialChart}
-          meta={{
-            ...testFullTable.subjectMeta,
-            boundaryLevels: [
-              {
-                id: 1,
-                label: 'Boundary level 1',
-              },
-              {
-                id: 2,
-                label: 'Boundary level 2',
-              },
-            ],
-          }}
-          tableTitle="Table title"
-          onChartSave={jest.fn()}
-          onChartDelete={noop}
-          onTableQueryUpdate={handleUpdate}
-        />
-      </ChartBuilderFormsContextProvider>,
+      <ExportButtonContext.Provider value={myMockRef}>
+        <ChartBuilderFormsContextProvider initialForms={testFormState}>
+          <ChartBuilder
+            releaseVersionId="release-1"
+            data={testFullTable.results}
+            initialChart={testInitialChart}
+            meta={{
+              ...testFullTable.subjectMeta,
+              boundaryLevels: [
+                {
+                  id: 1,
+                  label: 'Boundary level 1',
+                },
+                {
+                  id: 2,
+                  label: 'Boundary level 2',
+                },
+              ],
+            }}
+            tableTitle="Table title"
+            onChartSave={jest.fn()}
+            onChartDelete={noop}
+            onTableQueryUpdate={handleUpdate}
+          />
+        </ChartBuilderFormsContextProvider>
+      </ExportButtonContext.Provider>,
     );
 
     expect(
@@ -557,32 +574,35 @@ describe('ChartBuilder', () => {
 
     test('save chart with updated data groupings', async () => {
       const handleSubmit = jest.fn();
+      const myMockRef: { current: HTMLInputElement | null } = { current: null };
 
       const { user } = render(
-        <ChartBuilderFormsContextProvider initialForms={testFormState}>
-          <ChartBuilder
-            releaseVersionId="release-1"
-            data={testFullTable.results}
-            initialChart={testInitialChart}
-            meta={{
-              ...testFullTable.subjectMeta,
-              boundaryLevels: [
-                {
-                  id: 1,
-                  label: 'Boundary level 1',
-                },
-                {
-                  id: 2,
-                  label: 'Boundary level 2',
-                },
-              ],
-            }}
-            tableTitle="Table title"
-            onChartSave={handleSubmit}
-            onChartDelete={noop}
-            onTableQueryUpdate={jest.fn()}
-          />
-        </ChartBuilderFormsContextProvider>,
+        <ExportButtonContext.Provider value={myMockRef}>
+          <ChartBuilderFormsContextProvider initialForms={testFormState}>
+            <ChartBuilder
+              releaseVersionId="release-1"
+              data={testFullTable.results}
+              initialChart={testInitialChart}
+              meta={{
+                ...testFullTable.subjectMeta,
+                boundaryLevels: [
+                  {
+                    id: 1,
+                    label: 'Boundary level 1',
+                  },
+                  {
+                    id: 2,
+                    label: 'Boundary level 2',
+                  },
+                ],
+              }}
+              tableTitle="Table title"
+              onChartSave={handleSubmit}
+              onChartDelete={noop}
+              onTableQueryUpdate={jest.fn()}
+            />
+          </ChartBuilderFormsContextProvider>
+        </ExportButtonContext.Provider>,
       );
 
       expect(
