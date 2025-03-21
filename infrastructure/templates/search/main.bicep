@@ -117,4 +117,5 @@ module searchServiceModule 'application/searchService.bicep' = {
 }
 
 output searchDocsFunctionAppUrl string = searchDocsFunctionModule.outputs.functionAppUrl
+output searchServiceConfigText string = searchServiceModule.outputs.searchServiceConfigText
 output searchServiceEndpoint string = searchServiceModule.outputs.searchServiceEndpoint
