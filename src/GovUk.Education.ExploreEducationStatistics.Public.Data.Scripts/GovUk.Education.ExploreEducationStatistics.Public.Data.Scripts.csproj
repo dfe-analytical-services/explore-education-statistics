@@ -19,9 +19,6 @@
       <PackageReference Include="CliFx" Version="2.3.5" />
       <PackageReference Include="CliWrap" Version="3.6.6" />
       <PackageReference Include="Dapper" Version="2.1.35" />
-      <PackageReference Include="DuckDB.NET.Data.Full" Version="1.0.2" />
-      <PackageReference Include="linq2db.EntityFrameworkCore" Version="8.1.0" />
-      <PackageReference Include="System.Linq.Async" Version="6.0.1" />
     </ItemGroup>
 
     <ItemGroup>

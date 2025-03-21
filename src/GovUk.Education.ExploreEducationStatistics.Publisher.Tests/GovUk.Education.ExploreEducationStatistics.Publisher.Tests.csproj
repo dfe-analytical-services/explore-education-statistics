@@ -17,18 +17,11 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.10.0" />
-        <PackageReference Include="Moq" Version="4.20.70" />
-        <PackageReference Include="Snapshooter.Xunit" Version="0.14.1" />
-        <PackageReference Include="Testcontainers" Version="3.9.0" />
         <PackageReference Include="Testcontainers.Azurite" Version="3.9.0" />
-        <PackageReference Include="Testcontainers.PostgreSql" Version="3.9.0" />
-        <PackageReference Include="xunit" Version="2.9.0" />
         <PackageReference Include="xunit.runner.visualstudio" Version="2.8.2">
           <PrivateAssets>all</PrivateAssets>
           <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="8.0.7" />
     </ItemGroup>
 
     <ItemGroup>

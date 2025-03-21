@@ -26,23 +26,18 @@
 
   <ItemGroup>
     <PackageReference Include="AspectInjector" Version="2.8.1" PrivateAssets="all" />
-    <PackageReference Include="GeoJSON.Net" Version="1.4.1" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.7" PrivateAssets="all" />
     <PackageReference Include="GovukNotify" Version="7.1.0" />
     <PackageReference Include="HtmlAgilityPack" Version="1.11.61" />
-    <PackageReference Include="JsonKnownTypes" Version="0.6.0" />
     <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.22.0" />
-    <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="8.0.7" />
     <PackageReference Include="Microsoft.AspNetCore.SignalR.Protocols.NewtonsoftJson" Version="8.0.7" />
     <PackageReference Include="Microsoft.AspNetCore.SpaServices.Extensions" Version="8.0.7" />
     <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="8.0.7" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.7" />
     <PackageReference Include="Microsoft.Azure.SignalR" Version="1.26.0" />
     <PackageReference Include="Microsoft.Azure.Storage.Queue" Version="11.2.3" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.7" />
     <PackageReference Include="Microsoft.Extensions.Logging.AzureAppServices" Version="8.0.7" />
     <PackageReference Include="NWebsec.AspNetCore.Middleware" Version="3.0.0" />
-    <PackageReference Include="System.Linq.Async" Version="6.0.1" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
     <PackageReference Include="Thinktecture.EntityFrameworkCore.SqlServer" Version="8.1.1" />
     <PackageReference Include="Cronos" Version="0.8.4" />

@@ -8,7 +8,6 @@
     <RootNamespace>GovUk.Education.ExploreEducationStatistics.Analytics.Requests.Consumer</RootNamespace>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="DuckDB.NET.Data.Full" Version="1.2.0"/>
     <PackageReference Include="Microsoft.Azure.Functions.Worker" Version="2.0.0"/>
     <PackageReference Include="Microsoft.Azure.Functions.Worker.Extensions.Http" Version="3.3.0" />
     <PackageReference Include="Microsoft.Azure.Functions.Worker.Extensions.Timer" Version="4.3.1"/>

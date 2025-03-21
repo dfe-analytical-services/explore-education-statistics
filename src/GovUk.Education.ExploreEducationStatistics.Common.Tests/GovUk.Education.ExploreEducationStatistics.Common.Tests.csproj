@@ -16,7 +16,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="AspectInjector" Version="2.8.1"/>
     <PackageReference Include="Bogus" Version="35.6.0"/>
     <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="8.0.7" PrivateAssets="all"/>
     <PackageReference Include="CompareNETObjects" Version="4.83.0"/>
@@ -24,14 +23,12 @@
     <PackageReference Include="Microsoft.Azure.Functions.Worker" Version="1.22.0"/>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.10.0"/>
     <PackageReference Include="Moq" Version="4.20.70"/>
-    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.4"/>
     <PackageReference Include="Snapshooter.Xunit" Version="0.14.1"/>
     <PackageReference Include="xunit" Version="2.9.0"/>
     <PackageReference Include="xunit.runner.visualstudio" Version="2.8.2">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="System.Net.NameResolution" Version="4.3.0"/>
     <PackageReference Include="Testcontainers" Version="3.9.0"/>
     <PackageReference Include="Testcontainers.PostgreSql" Version="3.9.0"/>
   </ItemGroup>
