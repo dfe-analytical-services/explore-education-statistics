@@ -13,7 +13,7 @@ import LoadingSpinner from '@common/components/LoadingSpinner';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
 import useToggle from '@common/hooks/useToggle';
 import Yup from '@common/validation/yup';
-import React, { useMemo, useRef } from 'react';
+import React, { useEffect, useMemo, useRef } from 'react';
 import { ObjectSchema } from 'yup';
 import PublicationUpdateConfirmModal from '@admin/pages/publication/components/PublicationUpdateConfirmModal';
 
@@ -48,6 +48,12 @@ export default function PublicationDetailsForm({
   const [showConfirmModal, toggleConfirmModal] = useToggle(false);
   const submitButtonRef = useRef<HTMLButtonElement>(null);
 
+  useEffect(() => {
+    if (showConfirmModal === false) {
+      submitButtonRef.current?.focus();
+    }
+  }, [showConfirmModal]);
+
   const { value, isLoading } = useAsyncHandledRetry(async () => {
     const themes = await themeService.getThemes();
     if (!canUpdatePublication) {
@@ -70,15 +76,6 @@ export default function PublicationDetailsForm({
       ...values,
     });
     onSubmit();
-  };
-
-  const cancelConfirmModal = () => {
-    toggleConfirmModal.off();
-    // This setTimeout is needed because the focus() fn needs to be called
-    // on the next tick. Without it, the button doesn't focus.
-    // I think the modal tries to handle the focus on close, which prevents
-    // our custom focus handling from working at that point.
-    setTimeout(() => submitButtonRef.current?.focus(), 0);
   };
 
   const validationSchema = useMemo<ObjectSchema<FormValues>>(() => {
@@ -183,8 +180,8 @@ export default function PublicationDetailsForm({
                   onConfirm={async () => {
                     await form.handleSubmit(handleSubmit)();
                   }}
-                  onExit={cancelConfirmModal}
-                  onCancel={cancelConfirmModal}
+                  onExit={toggleConfirmModal.off}
+                  onCancel={toggleConfirmModal.off}
                 />
               )}
             </>
