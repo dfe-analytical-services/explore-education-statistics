@@ -76,7 +76,16 @@ module blobServiceModule '../../common/components/blobService.bicep' = {
   }
 }
 
+module searchServiceConfigModule '../components/searchServiceConfig.bicep' = {
+  name: 'searchServiceConfigModuleDeploy'
+  params: {
+    searchServiceName: searchServiceModule.outputs.searchServiceName
+    location: location
+  }
+}
+
 output searchableDocumentsContainerName string = searchableDocumentsContainerName
+output searchServiceConfigText string = searchServiceConfigModule.outputs.text
 output searchServiceEndpoint string = searchServiceModule.outputs.searchServiceEndpoint
 output searchServiceName string = searchServiceModule.outputs.searchServiceName
 output searchStorageAccountConnectionStringSecretName string = searchStorageAccountModule.outputs.connectionStringSecretName
