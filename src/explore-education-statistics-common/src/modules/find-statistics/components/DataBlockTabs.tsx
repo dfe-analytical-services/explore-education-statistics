@@ -82,7 +82,7 @@ const DataBlockTabs = ({
               <ErrorBoundary fallback={errorMessage}>
                 {chart && (
                   <ChartRenderer
-                    id="dataBlockTabs-chart"
+                    id={`dataBlockTabs-chart-${dataBlock.id}`}
                     source={dataBlock.source}
                     chart={chart}
                   />
