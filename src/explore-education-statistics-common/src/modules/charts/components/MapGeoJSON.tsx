@@ -88,8 +88,7 @@ export default function MapGeoJSON({
 
   useEffect(() => {
     if (!selectedFeature) {
-      // reset zoom
-      map.setZoom(5);
+      resetZoom();
       return;
     }
 
@@ -106,6 +105,8 @@ export default function MapGeoJSON({
       map.fitBounds(layer.getBounds());
     }
   }, [map, selectedFeature]);
+
+  const resetZoom = () => map.setZoom(5);
 
   // We have to assign our `onEachFeature` callback to a ref
   // as `onEachFeature` forms an internal closure which
@@ -204,6 +205,20 @@ export default function MapGeoJSON({
               const { feature } = e.sourceTarget;
               if (feature.properties && feature.id) {
                 onSelectFeature(feature);
+              }
+            },
+            keydown: e => {
+              if (e.originalEvent.code === 'Tab') {
+                // https://dfedigital.atlassian.net/browse/EES-5910
+                // Reset the map zoom when user tabs through regions
+                // to ensure tooltips that appear are in bounds and visible
+                resetZoom();
+              } else if (e.originalEvent.code === 'Enter') {
+                // Also allow a feature to be 'selected' by pressing Enter
+                const { feature } = e.sourceTarget;
+                if (feature.properties && feature.id) {
+                  onSelectFeature(feature);
+                }
               }
             },
           }}
