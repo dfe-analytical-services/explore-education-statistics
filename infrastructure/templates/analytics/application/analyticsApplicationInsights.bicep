@@ -17,7 +17,7 @@ module applicationInsightsModule '../../public-api/components/appInsights.bicep'
   name: 'applicationInsightsModuleDeploy'
   params: {
     location: location
-    appInsightsName: '${resourcePrefix}-${abbreviations.insightsComponents}-search'
+    appInsightsName: '${resourcePrefix}-${abbreviations.insightsComponents}-analytics'
     alerts: {
       exceptionCount: true
       exceptionServerCount: true
