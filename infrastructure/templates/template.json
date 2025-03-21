@@ -743,6 +743,20 @@
       "metadata": {
         "description": "The Client ID of a manually-created App Registration that represents the Public API Container App in Entra ID"
       }
+    },
+    "analyticsEnabled": {
+      "type": "bool",
+      "defaultValue": true,
+      "metadata": {
+        "description": "Whether analytics will be enabled for the Content API"
+      }
+    },
+    "analyticsFileShareMountPath": {
+      "type": "string",
+      "defaultValue": "/data/analytics",
+      "metadata": {
+        "description": "Where analytics files will be stored before being processed"
+      }
     }
   },
   "variables": {
@@ -1565,7 +1579,9 @@
         "WEBSITE_NODE_DEFAULT_VERSION": "20.16.0",
         "WEBSITE_RUN_FROM_PACKAGE": "1",
         "PublicStorage": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-storage-public'), '2018-02-14').secretUriWithVersion, ')')]",
-        "enableSwagger": "[parameters('enableSwagger')]"
+        "enableSwagger": "[parameters('enableSwagger')]",
+        "Analytics__Enabled": "parameters('analyticsEnabled')]",
+        "Analytics__BasePath": "[parameters('analyticsFileShareMountPath')]"
       }
     },
     {

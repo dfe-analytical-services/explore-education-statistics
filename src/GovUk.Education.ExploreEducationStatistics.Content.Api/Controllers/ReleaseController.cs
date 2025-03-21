@@ -94,7 +94,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
                         new PublicationViewModel(publication, methodologySummaries)
                     );
                 });
-        
+
         private Task<Either<ActionResult, ReleaseSearchViewModel>> GetLatestReleaseSearchViewModel(string publicationSlug) =>
             _publicationCacheService.GetPublication(publicationSlug)
                 .OnSuccessCombineWith(_ => _releaseCacheService.GetRelease(publicationSlug))

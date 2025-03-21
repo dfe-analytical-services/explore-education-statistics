@@ -6,7 +6,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Cache;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
-using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Cache;
 using GovUk.Education.ExploreEducationStatistics.Content.Requests;
@@ -62,7 +61,7 @@ public class DataSetFilesController : ControllerBase
     }
 
     [HttpGet("data-set-files/{dataSetFileId:guid}/download")]
-    public async Task<ActionResult> DownloadDataSetFile(
+    public async Task<ActionResult> DownloadDataSetFile( // TODO Record analytics EES-5979
         Guid dataSetFileId)
     {
         return await _dataSetFileService
