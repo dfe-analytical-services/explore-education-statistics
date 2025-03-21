@@ -10,6 +10,11 @@ public class TestAnalyticsPathResolver : IAnalyticsPathResolver
         "Analytics",
         Guid.NewGuid().ToString());
 
+    public string BasePath()
+    {
+        return _basePath;
+    }
+
     public string PublicApiQueriesDirectoryPath()
     {
         return Path.Combine(_basePath, "public-api");

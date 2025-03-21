@@ -2,11 +2,13 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologies;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ManageContent;
+using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Mappings;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
 using System;
 using System.Collections.Generic;
@@ -211,6 +213,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
                         methodologyVersion.Notes.OrderByDescending(note => note.DisplayDate)));
 
             CreateMap<ReleaseVersion, ReleasePublicationStatusViewModel>();
+
+            CreateMap<DataSetVersion, DataSetVersionInfoViewModel>()
+                .ForMember(dest => dest.Version,
+                    m => m.MapFrom(dataSetVersion =>
+                        dataSetVersion.PublicVersion))
+                .ForMember(dest => dest.Type,
+                    m => m.MapFrom(dataSetVersion =>
+                        dataSetVersion.VersionType));
         }
 
         private void CreateContentBlockMap()
