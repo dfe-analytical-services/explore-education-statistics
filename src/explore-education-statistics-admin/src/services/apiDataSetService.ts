@@ -13,6 +13,14 @@ export interface ApiDataSetSummary {
   previousReleaseIds: string[];
 }
 
+export interface ApiDataSetVersionInfo {
+  id: string;
+  version: string;
+  status: DataSetVersionStatus;
+  type: DataSetVersionType;
+  notes: string;
+}
+
 export interface ApiDataSetVersionSummary {
   id: string;
   version: string;

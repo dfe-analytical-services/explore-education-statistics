@@ -33,6 +33,19 @@ public class DataSetVersionsController(IDataSetVersionService dataSetVersionServ
             .HandleFailuresOrOk();
     }
 
+    [HttpGet("{dataSetVersionId:guid}")]
+    [Produces("application/json")]
+    public async Task<ActionResult<DataSetVersionInfoViewModel>> GetDataSetVersion(
+        Guid dataSetVersionId,
+        CancellationToken cancellationToken)
+    {
+        return await dataSetVersionService
+            .GetDataSetVersion(
+                dataSetVersionId: dataSetVersionId,
+                cancellationToken: cancellationToken)
+            .HandleFailuresOrOk();
+    }
+
     [HttpPost]
     [Produces("application/json")]
     public async Task<ActionResult<DataSetVersionSummaryViewModel>> CreateNextVersion(
