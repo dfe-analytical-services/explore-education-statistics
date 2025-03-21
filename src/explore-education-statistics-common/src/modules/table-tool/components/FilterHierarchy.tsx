@@ -51,7 +51,7 @@ function FilterHierarchy({
       onToggle={onToggle}
     >
       <div id={id}>
-        <h4>Browse qualifications by related tiers</h4>
+        <h4>Browse {legend.toLocaleLowerCase()} by related tiers</h4>
 
         <FilterHierarchyOptions
           value={selectedValues}

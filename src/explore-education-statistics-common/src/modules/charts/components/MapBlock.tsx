@@ -291,7 +291,6 @@ export default function MapBlock({
             center={position}
             minZoom={5}
             zoom={5}
-            
           >
             <MapGeoJSON
               dataSetCategoryConfigs={dataSetCategoryConfigs}

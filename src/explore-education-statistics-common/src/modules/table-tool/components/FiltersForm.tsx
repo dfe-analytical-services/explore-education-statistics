@@ -30,7 +30,7 @@ import {
   isServerValidationError,
 } from '@common/validation/serverValidations';
 import Yup from '@common/validation/yup';
-
+import sortAlphabeticalTotalsFirst from '@common/utils/sortAlphabeticalTotalsFirst';
 import camelCase from 'lodash/camelCase';
 import mapValues from 'lodash/mapValues';
 import orderBy from 'lodash/orderBy';
@@ -70,6 +70,7 @@ interface Props extends InjectedWizardProps {
     publicationTitle: string,
     subjectName: string,
   ) => void;
+  hideFilterHierarchies: boolean;
 }
 
 export default function FiltersForm({
@@ -81,6 +82,7 @@ export default function FiltersForm({
   showTableQueryErrorDownload = true,
   onSubmit,
   onTableQueryError,
+  hideFilterHierarchies = true, // hierarchies feature flag
   ...stepProps
 }: Props) {
   const { goToNextStep, isActive } = stepProps;
@@ -98,6 +100,8 @@ export default function FiltersForm({
   }, [subjectMeta]);
 
   const filterGroups = useMemo(() => {
+    if (hideFilterHierarchies) return Object.entries(subjectMeta.filters);
+
     return orderBy(
       Object.entries(subjectMeta.filters).filter(
         ([_, filter]) =>
@@ -106,23 +110,26 @@ export default function FiltersForm({
       ),
       ([_, value]) => value.order,
     );
-  }, [subjectMeta, hierarchiedFilterIds]);
+  }, [subjectMeta, hierarchiedFilterIds, hideFilterHierarchies]);
 
-  const hierarchiedFilters = useMemo(() => {
+  const hierarchiedFilters: [string, SubjectMetaFilter][] = useMemo(() => {
+    if (hideFilterHierarchies) return [];
+
     return orderBy(
       Object.entries(subjectMeta.filters).filter(([_, filter]) =>
         hierarchiedFilterIds.includes(filter.id),
       ),
       ([_, value]) => value.order,
-    ).map(([_, filter]) => [filter.id, filter] as [string, SubjectMetaFilter]);
-  }, [subjectMeta, hierarchiedFilterIds]);
+    ).map(([_, filter]) => [filter.id, filter]);
+  }, [subjectMeta, hierarchiedFilterIds, hideFilterHierarchies]);
 
-  const labels = useMemo(() => {
+  const labelsDictionary = useMemo(() => {
     const labelsMap: Dictionary<{
       label: string;
       parentLegend?: string;
       parentLabel?: string;
     }> = {};
+
     if (!subjectMeta.filterHierarchies?.length) {
       return labelsMap;
     }
@@ -147,48 +154,34 @@ export default function FiltersForm({
     return labelsMap;
   }, [hierarchiedFilters, subjectMeta.filterHierarchies]);
 
-  function sortAlphabeticalTotalsFirst(a: string, b: string) {
-    if (a.toLocaleLowerCase() === 'total') {
-      return -1;
-    }
-    if (b.toLocaleLowerCase() === 'total') {
-      return 1;
-    }
-    if (a < b) {
-      return -1;
-    }
-    if (a > b) {
-      return 1;
-    }
-    return 0;
-  }
-
-  const sortOptions = useCallback(
-    // alphabetise option labels, with "total" first
+  const getLabelsAndSortOptions = useCallback(
     (options: string[]) => {
       return options
-        .map(optionId => [optionId, labels[optionId].label])
-        .sort((a, b) => sortAlphabeticalTotalsFirst(a[1], b[1]))
-        .map(([optionId]) => optionId);
+        .map(optionId => [optionId, labelsDictionary[optionId].label])
+        .sort((a, b) => sortAlphabeticalTotalsFirst(a[1], b[1]));
     },
-    [labels],
+    [labelsDictionary],
   );
 
   const [filterHierarchies, filterHierarchiesValuesMap] = useMemo(() => {
-    const valuesMap: { [key: string]: string[] } = {};
+    if (hideFilterHierarchies) {
+      return [[], {}];
+    }
+
+    const optionRelatedValuesDictionary: { [key: string]: string[] } = {};
 
     const hierarchies: FilterHierarchyType[] =
       subjectMeta.filterHierarchies?.map(filterHierarchy => {
         const tiersTotal = filterHierarchy.childFilterIds.length + 1;
         const tiers = sortBy(filterHierarchy.tiers, 'level');
-        const totalsMap: { [key: string]: string } = {};
+        const optionTotalDictionary: { [key: string]: string } = {};
 
         const bottomTierOptionId = Object.values(
           tiers[tiers.length - 1].hierarchy,
         )?.find(([firstOption]) => !!firstOption)?.[0] as string;
         // The bottom tier filter group legend is used as the hierarchy legend
         const legend =
-          labels[bottomTierOptionId].parentLegend ?? 'missing legend';
+          labelsDictionary[bottomTierOptionId].parentLegend ?? 'missing legend';
 
         interface TierOption {
           label: string;
@@ -214,73 +207,85 @@ export default function FiltersForm({
           const tierOptionsIds =
             tiers[currentTier]?.hierarchy[parentOptionId] ?? [];
 
-          return sortOptions(tierOptionsIds).map(optionId => {
-            const optionLabel = labels[optionId].label;
+          return getLabelsAndSortOptions(tierOptionsIds).map(
+            ([optionId, optionLabel]) => {
+              if (optionLabel.toLocaleLowerCase() === 'total') {
+                // Add "total"s to hashmap
+                optionTotalDictionary[parentOptionId] = optionId;
+              }
 
-            if (optionLabel.toLocaleLowerCase() === 'total') {
-              // Add "total"s to hashmap
-              totalsMap[parentOptionId] = optionId;
-            }
+              const appendedParentValues = [...parentValues, optionId];
 
-            const appendedParentValues = [...parentValues, optionId];
-
-            return {
-              value: optionId,
-              label: optionLabel,
-              parentValues: appendedParentValues,
-              options: generateOptionsTreeRecursively({
-                currentTier: currentTier + 1,
-                parentOptionId: optionId,
+              return {
+                value: optionId,
+                label: optionLabel,
                 parentValues: appendedParentValues,
-              }),
-            };
-          });
+                options: generateOptionsTreeRecursively({
+                  currentTier: currentTier + 1,
+                  parentOptionId: optionId,
+                  parentValues: appendedParentValues,
+                }),
+              };
+            },
+          );
         }
 
-        const tierOptions: TierOption[] = sortOptions(
+        const tierOptions: TierOption[] = getLabelsAndSortOptions(
           filterHierarchy.rootOptionIds,
-        ).map(rootOptionId => {
+        ).map(([value, label]) => {
           return {
             parentValues: [],
-            value: rootOptionId,
-            label: labels[rootOptionId].label,
+            value,
+            label,
             options: generateOptionsTreeRecursively({
-              parentOptionId: rootOptionId,
-              parentValues: [rootOptionId],
+              parentOptionId: value,
+              parentValues: [value],
             }),
           };
         });
 
-        function getOptionRelatedIdsRecursively(optionIds: string[]): string[] {
-          // Any options that aren't bottom tier options have select child total(s)
-          const nextItem = totalsMap[optionIds.at(-1) ?? ''];
+        function getOptionChildTotalIdsRecursively(
+          optionIds: string[],
+        ): string[] {
+          // Any options that aren't bottom tier options select child total(s) when selected
+          const nextItem = optionTotalDictionary[optionIds.at(-1) ?? ''];
           return nextItem
-            ? getOptionRelatedIdsRecursively([...optionIds, nextItem])
+            ? getOptionChildTotalIdsRecursively([...optionIds, nextItem])
             : optionIds;
         }
 
-        function populateValuesHashMap(options: TierOption[]) {
+        function generateOptionToRelatedValuesDictionaryRecursively(
+          options: TierOption[],
+        ) {
           options.forEach(option => {
             if (option.options) {
-              populateValuesHashMap(option.options);
+              generateOptionToRelatedValuesDictionaryRecursively(
+                option.options,
+              );
             }
-            valuesMap[option.value] = getOptionRelatedIdsRecursively([
-              ...option.parentValues,
-              option.value,
-            ]);
+            optionRelatedValuesDictionary[option.value] =
+              getOptionChildTotalIdsRecursively([
+                ...option.parentValues,
+                option.value,
+              ]);
           });
         }
-        populateValuesHashMap(tierOptions);
+        generateOptionToRelatedValuesDictionaryRecursively(tierOptions);
 
         return {
           tiersTotal,
           legend,
-          id: camelCase(labels[filterHierarchy.rootFilterId].label),
+          id: camelCase(labelsDictionary[filterHierarchy.rootFilterId].label),
           options: tierOptions,
         };
       }) ?? [];
-    return [hierarchies, valuesMap];
-  }, [subjectMeta, labels, sortOptions]);
+    return [hierarchies, optionRelatedValuesDictionary];
+  }, [
+    subjectMeta,
+    labelsDictionary,
+    getLabelsAndSortOptions,
+    hideFilterHierarchies,
+  ]);
 
   const initialFormValues = useMemo(() => {
     // Automatically select indicator when one indicator group with one option
@@ -314,21 +319,9 @@ export default function FiltersForm({
       return [];
     });
 
-    const hierarchies = Object.fromEntries(
-      subjectMeta.filterHierarchies?.map(filterHierarchy => {
-        const { rootFilterId } = filterHierarchy;
-
-        // TODO
-        // check initial value matches with option ids in this hierarchy then add them to the array (below)
-
-        return [rootFilterId, []];
-      }) ?? [],
-    );
-
     return {
       filters,
       indicators,
-      filterHierarchies: hierarchies,
     };
   }, [initialValues, subjectMeta, filterGroups]);
 
@@ -465,7 +458,6 @@ export default function FiltersForm({
               {stepHeading}
 
               <div className="govuk-grid-row">
-                initialValues:{initialValues?.filters}
                 <div className="govuk-grid-column govuk-!-margin-bottom-6">
                   <FormFieldCheckboxSearchSubGroups
                     disabled={formState.isSubmitting}
