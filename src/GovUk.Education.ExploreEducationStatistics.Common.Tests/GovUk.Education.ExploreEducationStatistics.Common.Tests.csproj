@@ -7,12 +7,16 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <AssemblyAttribute Include="System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverageAttribute" />
+  </ItemGroup>
+
+  <ItemGroup>
     <CompilerVisibleProperty Include="RootNamespace"/>
     <CompilerVisibleProperty Include="ProjectDir"/>
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="AspectInjector" Version="2.8.2"/>
+    <PackageReference Include="AspectInjector" Version="2.8.1"/>
     <PackageReference Include="Bogus" Version="35.6.0"/>
     <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="8.0.7" PrivateAssets="all"/>
     <PackageReference Include="CompareNETObjects" Version="4.83.0"/>

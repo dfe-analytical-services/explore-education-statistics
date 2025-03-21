@@ -1,4 +1,4 @@
-using System.Configuration;
+using System.Diagnostics.CodeAnalysis;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Options;
 
@@ -8,11 +8,15 @@ public class ContentApiOptions
 
     public string Url { get; init; } = string.Empty;
 
-    public void Validate()
+    public bool IsValid([NotNullWhen(false)] out string? errorMessage)
     {
         if (string.IsNullOrWhiteSpace(Url))
         {
-            throw new ConfigurationErrorsException($"ContentApi base address is not configured. Ensure the {Section}:{nameof(Url)} is set.");
+            errorMessage = $"ContentApi base address is not configured. Ensure the {Section}:{nameof(Url)} is set.";
+            return false;
         }
+        
+        errorMessage = null;
+        return true;
     }
 }

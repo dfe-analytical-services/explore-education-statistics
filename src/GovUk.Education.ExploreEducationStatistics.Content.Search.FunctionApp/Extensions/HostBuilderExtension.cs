@@ -1,13 +1,16 @@
 ﻿using Azure.Identity;
 using Azure.Storage.Blobs;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Clients.AzureBlobStorage;
+using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Clients.AzureSearch;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Clients.ContentApi;
+using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.CreateSearchableReleaseDocuments;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Options;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Services;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.Net.Http.Headers;
 
@@ -31,11 +34,31 @@ public static class HostBuilderExtension
                 services
                     .AddApplicationInsightsTelemetryWorkerService()
                     .ConfigureFunctionsApplicationInsights()
+                    .AddTransient<EventGridEventHandler>()
                     .Configure<AppOptions>(context.Configuration.GetSection(AppOptions.Section))
                     .Configure<ContentApiOptions>(context.Configuration.GetSection(ContentApiOptions.Section))
+                    .Configure<AzureSearchOptions>(context.Configuration.GetSection(AzureSearchOptions.Section))
+                    .Configure<LoggerFilterOptions>(options =>
+                    {
+                        // The Application Insights SDK adds a default logging filter that instructs ILogger to capture
+                        // only Warning and more severe logs. Application Insights requires an explicit override.
+                        // Log levels can also be configured using appsettings.json.
+                        // For more information, see https://learn.microsoft.com/en-us/azure/azure-monitor/app/worker-service#ilogger-logs
+                        var toRemove = options.Rules.FirstOrDefault(rule =>
+                            rule.ProviderName ==
+                            "Microsoft.Extensions.Logging.ApplicationInsights.ApplicationInsightsLoggerProvider");
+
+                        if (toRemove is not null)
+                        {
+                            options.Rules.Remove(toRemove);
+                        }
+                    })
                     .AddTransient<IContentApiClient, ContentApiClient>()
                     .AddTransient<IAzureBlobStorageClient, AzureBlobStorageClient>()
                     .AddTransient<ISearchableDocumentCreator, SearchableDocumentCreator>()
+                    .AddTransient<ISearchIndexClient, SearchIndexClient>()
+                    .AddTransient<IAzureSearchIndexerClientFactory, AzureSearchIndexerClientFactory>()
+                    .AddHealthChecks()
                     .AddAzureClientsInline(
                         clientBuilder =>
                         {
@@ -57,12 +80,5 @@ public static class HostBuilderExtension
                                 "EES Content Search Function App");
                         })
         )
-        .Build()
-        .Execute(
-            host =>
-            {
-                // Validate the configuration on startup to fail fast.
-                host.Services.GetRequiredService<IOptions<AppOptions>>().Value.Validate();
-                host.Services.GetRequiredService<IOptions<ContentApiOptions>>().Value.Validate();
-            });
+        .Build();
 }

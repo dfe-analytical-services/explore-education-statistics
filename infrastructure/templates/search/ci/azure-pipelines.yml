@@ -1,15 +1,19 @@
-trigger: none
+trigger:
+  branches:
+    include:
+      - master
+      - dev
+      - test
+  paths:
+    include:
+      - infrastructure/templates/common/**
+      - infrastructure/templates/search/**
+
+pr: none
 
 parameters:
   - name: deployAlerts
     displayName: Do the Azure Monitor alerts need creating or updating?
-    type: string
-    values:
-      - Yes
-      - No
-    default: No
-  - name: deploySearchService
-    displayName: Does the Search Service need creating or updating?
     type: string
     values:
       - Yes
@@ -27,16 +31,16 @@ parameters:
 
 resources:
   pipelines:
-    - pipeline: MainBuild
-      source: Explore Education Statistics
+    - pipeline: SearchBuild
+      source: EES - Search - Build
       trigger:
         branches:
+          - master
           - dev
           - test
-          - master
 
 variables:
-  - group: Search Infrastructure - Common
+  - group: Common
   - name: forceDeployToEnvironment
     value: ${{parameters.forceDeployToEnvironment}}
   - name: isDev
@@ -51,8 +55,6 @@ variables:
     value: ubuntu-latest
   - name: deployAlerts
     value: ${{ iif(eq(parameters.deployAlerts, 'Yes'), true, false) }}
-  - name: deploySearchService
-    value: ${{ iif(eq(parameters.deploySearchService, 'Yes'), true, false) }}
 
 pool:
   vmImage: $(vmImageName)
@@ -81,3 +83,12 @@ stages:
       environment: Pre-Prod
       serviceConnection: $(serviceConnectionPreProd)
       bicepParamFile: preprod
+
+  - template: stages/deploy.yml
+    parameters:
+      stageName: DeployProd
+      condition:  and(succeeded(), eq(variables.isMaster, true))
+      dependsOn: DeployPreProd
+      environment: Prod
+      serviceConnection: $(serviceConnectionProd)
+      bicepParamFile: prod

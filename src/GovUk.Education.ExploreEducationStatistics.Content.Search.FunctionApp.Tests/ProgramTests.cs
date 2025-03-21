@@ -3,10 +3,14 @@ using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Clie
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Clients.AzureBlobStorage;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Clients.ContentApi;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.CreateSearchableReleaseDocuments;
+using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.ReindexSearchableDocuments;
+using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Options;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Services;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Tests.Extensions;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Options;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Tests;
 
@@ -106,21 +110,21 @@ public class ProgramTests
             public void WhenBaseAddressIsNotConfiguredShouldThrowOnStartup()
             {
                 // ARRANGE
-                Action startupHost = () => base.GetSutWithConfig(FullConfig,
-                    """
-                    {
-                     "ContentApi": {
-                          "Url": null
-                     }
-                    }
-                    """);
-                
+                IHost StartupHost() =>
+                    base.GetSutWithConfig(FullConfig, """
+                                                      {
+                                                       "ContentApi": {
+                                                            "Url": null
+                                                       }
+                                                      }
+                                                      """);
+
                 // ACT
-                var actual = Record.Exception(startupHost);
+                var actual = StartupHost();
 
                 // ASSERT
-                Assert.NotNull(actual);
-                Assert.IsType<ConfigurationErrorsException>(actual);
+                var options = actual.Services.GetRequiredService<IOptions<ContentApiOptions>>();
+                Assert.NotNull(options);
             }
         }
         
@@ -152,47 +156,108 @@ public class ProgramTests
             }
             
             [Fact]
-            public void WhenConnectionStringNotConfiguredShouldThrowOnStartUp()
+            public void WhenConnectionStringNotConfiguredShouldNotThrowOnStartUp()
             {
                 // ARRANGE
-                Action startupHost = () => base.GetSutWithConfig(FullConfig,
-                    """
-                    {
-                       "App": {
-                            "SearchStorageConnectionString": null,
-                            "SearchableDocumentsContainerName": "searchable-documents-container-name"
-                       }
-                    }
-                    """);
+                IHost StartupHost() =>
+                    base.GetSutWithConfig(FullConfig, """
+                                                      {
+                                                         "App": {
+                                                              "SearchStorageConnectionString": null,
+                                                              "SearchableDocumentsContainerName": "searchable-documents-container-name"
+                                                         }
+                                                      }
+                                                      """);
 
                 // ACT
-                var actual = Record.Exception(startupHost);
+                var host = StartupHost();
 
                 // ASSERT
-                Assert.NotNull(actual);
-                Assert.IsType<ConfigurationErrorsException>(actual);
+                var options = host.Services.GetRequiredService<IOptions<ContentApiOptions>>();
+                Assert.NotNull(options);
             }
             
             [Fact]
-            public void WhenContainerNameNotConfiguredShouldThrowOnStartup()
+            public void WhenContainerNameNotConfiguredShouldNotThrowOnStartup()
             {
                 // ARRANGE
-                Action startupHost = () => base.GetSutWithConfig(FullConfig,
-                    """
-                    {
-                       "App": {
-                            "SearchStorageConnectionString": "DefaultEndpointsProtocol=https;EndpointSuffix=core.windows.net;AccountName=mystorageaccount;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;BlobEndpoint=https://mystorageaccount.blob.core.windows.net/;FileEndpoint=https://mystorageaccount.file.core.windows.net/;QueueEndpoint=https://mystorageaccount.queue.core.windows.net/;TableEndpoint=https://mystorageaccount.table.core.windows.net/",
-                            "SearchableDocumentsContainerName": null
-                       }
-                    }
-                    """);
+                IHost StartupHost() =>
+                    base.GetSutWithConfig(FullConfig, """
+                                                      {
+                                                         "App": {
+                                                              "SearchStorageConnectionString": "UseDevelopmentStorage=true",
+                                                              "SearchableDocumentsContainerName": null
+                                                         }
+                                                      }
+                                                      """);
 
                 // ACT
-                var actual = Record.Exception(startupHost);
+                var host = StartupHost();
 
                 // ASSERT
+                var options = host.Services.GetRequiredService<IOptions<AppOptions>>();
+                Assert.NotNull(options);
+            }
+        }
+        
+        public class ReindexSearchableDocumentsFunctionTests : ProgramTests
+        {
+            [Fact]
+            public void Should_resolve_ReindexSearchableDocumentsFunction()
+            {
+                // ARRANGE
+                var sut = GetSut();
+            
+                // ACT
+                var actual = ActivatorUtilities.CreateInstance<ReindexSearchableDocumentsFunction>(sut.Services);
+            
+                // ASSERT
                 Assert.NotNull(actual);
-                Assert.IsType<ConfigurationErrorsException>(actual);
+            }
+            
+            [Fact]
+            public void GivenNotConfigured_WhenResolvingReindexSearchableDocumentsFunction_ThenShouldResolve()
+            {
+                // ARRANGE
+                var sut = GetSutWithConfig("{}");
+            
+                // ACT
+                var actual = sut.Services.GetRequiredService<IOptions<ReindexSearchableDocumentsFunction>>();
+                
+                // ASSERT
+                Assert.NotNull(actual);
+            }
+            
+            [Fact]
+            public void GivenNotConfigured_WhenResolvingAzureSearchOptions_ThenShouldResolve()
+            {
+                // ARRANGE
+                var sut = GetSutWithConfig("{}");
+            
+                // ACT
+                var options = sut.Services.GetRequiredService<IOptions<AzureSearchOptions>>();
+                
+                // ASSERT
+                Assert.NotNull(options.Value);
+                Assert.Equal(string.Empty, options.Value.SearchServiceEndpoint);
+                Assert.Null(options.Value.SearchServiceAccessKey);
+                Assert.Equal(string.Empty, options.Value.IndexName);
+            }
+        }
+        
+        public class CreateSearchableReleaseDocumentInAzureStorageFunctionTests : ProgramTests
+        {
+            [Fact]
+            public void Should_resolve_CreateSearchableReleaseDocumentInAzureStorageFunction()
+            {
+                // ARRANGE
+                var sut = GetSut();
+            
+                // ACT
+                var actual = ActivatorUtilities.CreateInstance<CreateSearchableReleaseDocumentInAzureStorageFunction>(sut.Services);
+            
+                // ASSERT
+                Assert.NotNull(actual);
             }
         }
     }

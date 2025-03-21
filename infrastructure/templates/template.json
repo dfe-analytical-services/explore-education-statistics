@@ -1094,6 +1094,8 @@
     "vNetRef": "[resourceId('Microsoft.Network/virtualNetworks', variables('vNetName'))]",
     "adminSubnetName": "[concat(parameters('subscription'), '-snet-', parameters('environment'), '-admin')]",
     "adminSubnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vNetName'), variables('adminSubnetName'))]",
+    "analyticsFunctionAppSubnetName": "[concat(parameters('subscription'), '-', parameters('environment'), '-snet-fa-analytics')]",
+    "analyticsStoragePrivateEndpointsSubnetName": "[concat(parameters('subscription'), '-', parameters('environment'), '-snet-sa-anlyt-pep')]",
     "importerSubnetName": "[concat(parameters('subscription'), '-snet-', parameters('environment'), '-importer')]",
     "importerSubnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vNetName'), variables('importerSubnetName'))]",
     "publisherSubnetName": "[concat(parameters('subscription'), '-snet-', parameters('environment'), '-publisher')]",
@@ -1108,6 +1110,9 @@
     "publicApiDataProcessorSubnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vNetName'), variables('publicApiDataProcessorSubnetName'))]",
     "publicApiDataProcessorPrivateEndpointsSubnetName": "[concat(parameters('subscription'), '-', parameters('environment'), '-papi-snet-fa-processor-pep')]",
     "publicApiStoragePrivateEndpointsSubnetName": "[concat(parameters('subscription'), '-', parameters('environment'), '-papi-snet-sa-pep')]",
+    "searchDocsFunctionSubnetName": "[concat(parameters('subscription'), '-', parameters('environment'), '-snet-fa-searchdocs')]",
+    "searchDocsFunctionPrivateEndpointsSubnetName": "[concat(parameters('subscription'), '-', parameters('environment'), '-snet-fa-searchdocs-pep')]",
+    "searchStoragePrivateEndpointsSubnetName": "[concat(parameters('subscription'), '-', parameters('environment'), '-snet-sa-search-pep')]",
     "containerAppEnvironmentSubnetName": "[concat(parameters('subscription'), '-', parameters('environment'), '-snet-cae-01')]",
     "applicationGatewaySubnetName": "[concat(parameters('subscription'), '-', parameters('environment'), '-snet-agw-01')]",
     "psqlFlexibleServerSubnetName": "[concat(parameters('subscription'), '-', parameters('environment'), '-snet-psql-flexibleserver')]",
@@ -2245,6 +2250,38 @@
             "deleteRetentionPolicy": {
               "enabled": "[parameters('blobDeleteRetentionEnabled')]",
               "days": "[parameters('blobDeleteRetentionDays')]"
+            }
+          },
+          "dependsOn": [
+            "[variables('coreStorageAccountName')]"
+          ]
+        },
+        {
+          "name": "default",
+          "type": "managementPolicies",
+          "apiVersion": "2019-04-01",
+          "properties": {
+            "policy": {
+              "rules": [
+                {
+                  "enabled": true,
+                  "type": "Lifecycle",
+                  "name": "Delete temp data/meta files after a day",
+                  "definition": {
+                    "actions": {
+                      "baseBlob": {
+                        "delete": {
+                          "daysAfterModificationGreaterThan": 1
+                        }
+                      }
+                    },
+                    "filters": {
+                      "blobTypes": ["blockBlob"],
+                      "prefixMatch": ["releases-temp"]
+                    }
+                  }
+                }
+              ]
             }
           },
           "dependsOn": [
@@ -3675,6 +3712,62 @@
             "name": "[variables('psqlFlexibleServerSubnetName')]",
             "properties": {
               "addressPrefix": "10.0.12.0/24"
+            }
+          },
+          {
+            "name": "[variables('searchStoragePrivateEndpointsSubnetName')]",
+            "properties": {
+              "addressPrefix": "10.0.13.0/24"
+            }
+          },
+          {
+            "name": "[variables('searchDocsFunctionSubnetName')]",
+            "properties": {
+              "addressPrefix": "10.0.14.0/24",
+              "serviceEndpoints": [
+                {
+                  "service": "Microsoft.Storage"
+                }
+              ],
+              "delegations": [
+                {
+                  "name": "webapp",
+                  "properties": {
+                    "serviceName": "Microsoft.Web/serverFarms"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "name": "[variables('searchDocsFunctionPrivateEndpointsSubnetName')]",
+            "properties": {
+              "addressPrefix": "10.0.15.0/24"
+            }
+          },
+          {
+            "name": "[variables('analyticsStoragePrivateEndpointsSubnetName')]",
+            "properties": {
+              "addressPrefix": "10.0.16.0/24"
+            }
+          },
+          {
+            "name": "[variables('analyticsFunctionAppSubnetName')]",
+            "properties": {
+              "addressPrefix": "10.0.17.0/24",
+              "serviceEndpoints": [
+                {
+                  "service": "Microsoft.Storage"
+                }
+              ],
+              "delegations": [
+                {
+                  "name": "webapp",
+                  "properties": {
+                    "serviceName": "Microsoft.Web/serverFarms"
+                  }
+                }
+              ]
             }
           }
         ]

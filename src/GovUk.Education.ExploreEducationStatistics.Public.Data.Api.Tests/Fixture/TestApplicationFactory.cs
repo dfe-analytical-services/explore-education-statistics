@@ -47,9 +47,10 @@ public class TestApplicationFactory : TestApplicationFactory<Startup>
         await ClearTestData<PublicDataDbContext>();
     }
 
-    public void AddAppSettings(string filename)
+    public TestApplicationFactory AddAppSettings(string filename)
     {
         _additionalAppsettingsFiles.Add(filename);
+        return this;
     }
 
     protected override IHostBuilder CreateHostBuilder()

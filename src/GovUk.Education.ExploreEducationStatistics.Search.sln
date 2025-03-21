@@ -1,0 +1,65 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.8.34330.188
+MinimumVisualStudioVersion = 15.0.26124.0
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{259A0E76-88E3-422E-B43D-CA0E9DE6E48B}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp", "GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp\GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.csproj", "{8F5D27F9-339E-440F-8AD6-29189F706FCB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Tests", "GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Tests\GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Tests.csproj", "{EA8E2300-3F47-401F-99D1-72DB98B627F2}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Search", "Search", "{316C48ED-789B-428C-A4D0-FAA5F9856850}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Function App", "Function App", "{EB58283F-148A-4A51-B023-0757F5D730B1}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Debug|x64 = Debug|x64
+		Debug|x86 = Debug|x86
+		Release|Any CPU = Release|Any CPU
+		Release|x64 = Release|x64
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{8F5D27F9-339E-440F-8AD6-29189F706FCB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8F5D27F9-339E-440F-8AD6-29189F706FCB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8F5D27F9-339E-440F-8AD6-29189F706FCB}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{8F5D27F9-339E-440F-8AD6-29189F706FCB}.Debug|x64.Build.0 = Debug|Any CPU
+		{8F5D27F9-339E-440F-8AD6-29189F706FCB}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{8F5D27F9-339E-440F-8AD6-29189F706FCB}.Debug|x86.Build.0 = Debug|Any CPU
+		{8F5D27F9-339E-440F-8AD6-29189F706FCB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8F5D27F9-339E-440F-8AD6-29189F706FCB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8F5D27F9-339E-440F-8AD6-29189F706FCB}.Release|x64.ActiveCfg = Release|Any CPU
+		{8F5D27F9-339E-440F-8AD6-29189F706FCB}.Release|x64.Build.0 = Release|Any CPU
+		{8F5D27F9-339E-440F-8AD6-29189F706FCB}.Release|x86.ActiveCfg = Release|Any CPU
+		{8F5D27F9-339E-440F-8AD6-29189F706FCB}.Release|x86.Build.0 = Release|Any CPU
+		{EA8E2300-3F47-401F-99D1-72DB98B627F2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EA8E2300-3F47-401F-99D1-72DB98B627F2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EA8E2300-3F47-401F-99D1-72DB98B627F2}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{EA8E2300-3F47-401F-99D1-72DB98B627F2}.Debug|x64.Build.0 = Debug|Any CPU
+		{EA8E2300-3F47-401F-99D1-72DB98B627F2}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{EA8E2300-3F47-401F-99D1-72DB98B627F2}.Debug|x86.Build.0 = Debug|Any CPU
+		{EA8E2300-3F47-401F-99D1-72DB98B627F2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EA8E2300-3F47-401F-99D1-72DB98B627F2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EA8E2300-3F47-401F-99D1-72DB98B627F2}.Release|x64.ActiveCfg = Release|Any CPU
+		{EA8E2300-3F47-401F-99D1-72DB98B627F2}.Release|x64.Build.0 = Release|Any CPU
+		{EA8E2300-3F47-401F-99D1-72DB98B627F2}.Release|x86.ActiveCfg = Release|Any CPU
+		{EA8E2300-3F47-401F-99D1-72DB98B627F2}.Release|x86.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {0DABB090-F748-4529-95DA-80E640F824CE}
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{EB58283F-148A-4A51-B023-0757F5D730B1} = {316C48ED-789B-428C-A4D0-FAA5F9856850}
+		{8F5D27F9-339E-440F-8AD6-29189F706FCB} = {EB58283F-148A-4A51-B023-0757F5D730B1}
+		{EA8E2300-3F47-401F-99D1-72DB98B627F2} = {EB58283F-148A-4A51-B023-0757F5D730B1}
+	EndGlobalSection
+EndGlobal

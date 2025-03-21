@@ -26,12 +26,20 @@ trigger:
       - test
   paths:
     exclude:
-      - infrastructure/
+      - infrastructure/**
+      - src/GovUk.Education.ExploreEducationStatistics.Content.Search*/**
 
 pr:
-  - master
-  - dev
-  - test
+  branches:
+    include:
+      - master
+      - dev
+      - test
+  drafts: false
+  paths:
+    exclude:
+      - infrastructure/**
+      - src/GovUk.Education.ExploreEducationStatistics.Content.Search*/**
 
 jobs:
   - job: BackendVerify
@@ -86,7 +94,7 @@ jobs:
           targetType: inline
           script: |
             docker run --rm -t \
-              -v $(System.DefaultWorkingDirectory)/src/$(PublicApiDir)/bin/$(BuildConfiguration)/net8.0:/api \
+              -v $(System.DefaultWorkingDirectory)/src/artifacts/bin/$(PublicApiDir)/${{ lower(variables.BuildConfiguration) }}:/api \
               -v $(System.DefaultWorkingDirectory)/src/$(PublicApiDocsDir):/api-docs \
               -v $(System.DefaultWorkingDirectory)/ci/scripts:/scripts \
               --entrypoint /bin/sh \
@@ -122,6 +130,22 @@ jobs:
         inputs:
           version: $(DotNetVersion)
           performMultiLevelLookup: true
+
+      - task: DotNetCoreCLI@2
+        displayName: Package Analytics Function App
+        inputs:
+          command: publish
+          publishWebProjects: false
+          projects: '**/GovUk.Education.ExploreEducationStatistics.Analytics.Consumer.csproj'
+          arguments: --configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)/analytics-function-app
+          zipAfterPublish: True
+
+      - task: PublishPipelineArtifact@1
+        displayName: Publish Analytics Function App artifact
+        condition: and(succeeded(), eq(variables.IsBranchDeployable, true))
+        inputs:
+          artifactName: analytics-function-app
+          targetPath: $(Build.ArtifactStagingDirectory)/analytics-function-app    
 
       - task: DotNetCoreCLI@2
         displayName: Package Data API
@@ -250,22 +274,6 @@ jobs:
         inputs:
           artifactName: processor
           targetPath: $(Build.ArtifactStagingDirectory)/processor
-
-      - task: DotNetCoreCLI@2
-        displayName: Package Search Function App
-        inputs:
-          command: publish
-          publishWebProjects: false
-          projects: '**/GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.csproj'
-          arguments: --configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)/searchFunctionApp
-          zipAfterPublish: True
-
-      - task: PublishPipelineArtifact@1
-        displayName: Publish Search Function App artifact
-        condition: and(succeeded(), eq(variables.IsBranchDeployable, true))
-        inputs:
-          artifactName: searchFunctionApp
-          targetPath: $(Build.ArtifactStagingDirectory)/searchFunctionApp
 
   - job: Admin
     pool: ees-ubuntu2204-xlarge

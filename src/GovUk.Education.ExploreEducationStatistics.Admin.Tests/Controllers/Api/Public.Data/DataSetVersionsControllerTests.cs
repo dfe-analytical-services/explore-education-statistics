@@ -369,6 +369,79 @@ public abstract class DataSetVersionsControllerTests(
         }
     }
 
+    public class GetDataSetVersionTests(
+    TestApplicationFactory testApp) : DataSetVersionsControllerTests(testApp)
+    {
+        public static TheoryData<DataSetVersionStatus> AllDataSetVersionStatuses => new(EnumUtil.GetEnums<DataSetVersionStatus>());
+
+        [Theory]
+        [MemberData(nameof(AllDataSetVersionStatuses))]
+        public async Task Success(DataSetVersionStatus dataSetVersionStatus)
+        {
+            DataSet dataSet = DataFixture
+                .DefaultDataSet()
+                .WithStatusPublished();
+
+            await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
+
+            var dataSetVersions = DataFixture
+                .DefaultDataSetVersion()
+                .WithStatus(dataSetVersionStatus)
+                .WithDataSet(dataSet)
+                .GenerateList(3);
+
+            await TestApp.AddTestData<PublicDataDbContext>(context =>
+            {
+                context.DataSetVersions.AddRange(dataSetVersions);
+                context.DataSets.Update(dataSet);
+            });
+
+            var requestedDataSetVersion = dataSetVersions[1];
+
+            var response = await GetDataSetVersion(dataSetVersionId: requestedDataSetVersion.Id);
+
+            var viewModel = response.AssertOk<DataSetVersionInfoViewModel>();
+
+            Assert.NotNull(viewModel);
+            Assert.Equal(requestedDataSetVersion.Id, viewModel.Id);
+            Assert.Equal(requestedDataSetVersion.PublicVersion, viewModel.Version);
+            Assert.Equal(requestedDataSetVersion.Status, viewModel.Status);
+            Assert.Equal(requestedDataSetVersion.VersionType, viewModel.Type);
+            Assert.Equal(requestedDataSetVersion.Notes, viewModel.Notes);
+        }
+
+        [Fact]
+        public async Task NotBauUser_Returns403()
+        {
+            var client = BuildApp(user: DataFixture.AuthenticatedUser()).CreateClient();
+
+            var response = await GetDataSetVersion(
+                dataSetVersionId: Guid.NewGuid(),
+                client: client);
+
+            response.AssertForbidden();
+        }
+
+        [Fact]
+        public async Task DataSetVersionDoesNotExist_Returns404()
+        {
+            var response = await GetDataSetVersion(dataSetVersionId: Guid.NewGuid());
+
+            response.AssertNotFound();
+        }
+
+        private async Task<HttpResponseMessage> GetDataSetVersion(
+            Guid dataSetVersionId,
+            HttpClient? client = null)
+        {
+            client ??= BuildApp().CreateClient();
+
+            var uri = $"{BaseUrl}/{dataSetVersionId}";
+
+            return await client.GetAsync(uri);
+        }
+    }
+
     public class CreateNextVersionTests(
         TestApplicationFactory testApp) : DataSetVersionsControllerTests(testApp)
     {
