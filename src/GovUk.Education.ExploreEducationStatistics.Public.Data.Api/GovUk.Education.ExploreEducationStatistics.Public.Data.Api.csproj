@@ -29,20 +29,20 @@
     <PackageReference Include="InterpolatedSql.Dapper" Version="2.3.0"/>
     <PackageReference Include="MicroElements.Swashbuckle.FluentValidation" Version="6.1.0"/>
     <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.22.0"/>
-    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.7"/>
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.7"/>
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.7">
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.3"/>
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.3"/>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.3">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.Extensions.Logging.AzureAppServices" Version="8.0.7"/>
+    <PackageReference Include="Microsoft.Extensions.Logging.AzureAppServices" Version="9.0.3"/>
     <PackageReference Include="MiniProfiler.AspNetCore.Mvc" Version="4.3.8"/>
     <PackageReference Include="MiniProfiler.EntityFrameworkCore" Version="4.3.8"/>
-    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.4"/>
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.4"/>
     <PackageReference Include="NWebsec.AspNetCore.Middleware" Version="3.0.0"/>
-    <PackageReference Include="Swashbuckle.AspNetCore" Version="7.1.0" />
-    <PackageReference Include="Swashbuckle.AspNetCore.Annotations" Version="7.1.0" />
-    <PackageReference Include="Swashbuckle.AspNetCore.SwaggerGen" Version="7.1.0" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="8.0.0" />
+    <PackageReference Include="Swashbuckle.AspNetCore.Annotations" Version="8.0.0" />
+    <PackageReference Include="Swashbuckle.AspNetCore.SwaggerGen" Version="8.0.0" />
   </ItemGroup>
 
   <ItemGroup>
