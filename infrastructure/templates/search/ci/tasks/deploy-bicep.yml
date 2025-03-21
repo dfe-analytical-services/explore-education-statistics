@@ -11,6 +11,10 @@ parameters:
     type: string
   - name: parameterFile
     type: string
+  - name: deployAlerts
+    type: string
+  - name: deploySearchConfig
+    type: string
   - name: searchDocsFunctionAppExists
     type: string
     default: true
@@ -35,4 +39,6 @@ steps:
               subscription='$(subscription)' \
               resourceTags='$(resourceTags)' \
               maintenanceIpRanges='$(maintenanceFirewallRules)' \
+              deployAlerts=${{ parameters.deployAlerts }} \
+              deploySearchConfig=${{ parameters.deploySearchConfig }} \
               searchDocsFunctionAppExists=${{ parameters.searchDocsFunctionAppExists }}

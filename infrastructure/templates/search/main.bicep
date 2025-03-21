@@ -26,6 +26,9 @@ param dateProvisioned string = utcNow('u')
 @description('Do Azure Monitor alerts need creating or updating?')
 param deployAlerts bool = false
 
+@description('Does the Search Service configuration need creating or updating?')
+param deploySearchConfig bool = false
+
 @description('The URL of the Content API.')
 param contentApiUrl string
 
@@ -110,11 +113,14 @@ module searchServiceModule 'application/searchService.bicep' = {
     location: location
     resourceNames: resourceNames
     resourcePrefix: resourcePrefix
-    storageFirewallRules: maintenanceIpRanges
+    searchServiceIpRules: maintenanceIpRanges
+    storageIpRules: maintenanceIpRanges
     deployAlerts: deployAlerts
+    deploySearchConfig: deploySearchConfig
     tagValues: tagValues
   }
 }
 
 output searchDocsFunctionAppUrl string = searchDocsFunctionModule.outputs.functionAppUrl
+output searchServiceConfigText string = searchServiceModule.outputs.searchServiceConfigText
 output searchServiceEndpoint string = searchServiceModule.outputs.searchServiceEndpoint

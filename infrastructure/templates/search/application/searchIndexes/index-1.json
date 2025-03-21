@@ -1,0 +1,16 @@
+{
+  "name": "index-1",
+  "fields": [
+    {
+      "name": "rid",
+      "type": "Edm.String",
+      "searchable": true,
+      "filterable": true,
+      "retrievable": true,
+      "stored": true,
+      "sortable": true,
+      "facetable": true,
+      "key": true
+    }
+  ]
+}

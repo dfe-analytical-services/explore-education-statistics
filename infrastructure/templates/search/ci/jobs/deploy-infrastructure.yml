@@ -36,6 +36,8 @@ jobs:
                 action: validate
                 serviceConnection: ${{ parameters.serviceConnection }}
                 parameterFile: $(paramFile)
+                deployAlerts: false
+                deploySearchConfig: false
                 searchDocsFunctionAppExists: false
 
             - template: ../../../public-api/ci/tasks/check-function-app-exists.yml
@@ -51,4 +53,6 @@ jobs:
                 action: create
                 serviceConnection: ${{ parameters.serviceConnection }}
                 parameterFile: $(paramFile)
+                deployAlerts: $(deployAlerts)
+                deploySearchConfig: $(deploySearchConfig)
                 searchDocsFunctionAppExists: $(searchDocsFunctionAppExists)

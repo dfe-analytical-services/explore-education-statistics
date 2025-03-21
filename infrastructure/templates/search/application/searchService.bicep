@@ -5,6 +5,9 @@ import { ResourceNames } from '../types.bicep'
 @description('Whether to create or update Azure Monitor alerts during this deploy')
 param deployAlerts bool
 
+@description('Whether to deploy the Search configuration')
+param deploySearchConfig bool
+
 @description('Resource prefix for all resources.')
 param resourcePrefix string
 
@@ -17,8 +20,11 @@ param location string
 @description('Name of the searchable documents container in the Search storage account.')
 param searchableDocumentsContainerName string = 'searchable-documents'
 
-@description('Storage account firewall rules.')
-param storageFirewallRules IpRange[]
+@description('A list IP network rules to allow access to the Search Service from specific public internet IP address ranges.')
+param searchServiceIpRules IpRange[] = []
+
+@description('A list IP network rules to allow access to the Search storage account from specific public internet IP address ranges.')
+param storageIpRules IpRange[]
 
 @description('Specifies a set of tags with which to tag the resource in Azure.')
 param tagValues object
@@ -36,12 +42,17 @@ resource searchStoragePrivateEndpointSubnet 'Microsoft.Network/virtualNetworks/s
   parent: vNet
 }
 
+var searchServiceName = '${resourcePrefix}-${abbreviations.searchSearchServices}'
+
 module searchServiceModule '../components/searchService.bicep' = {
   name: 'searchServiceModuleDeploy'
   params: {
-    name: '${resourcePrefix}-${abbreviations.searchSearchServices}'
+    name: searchServiceName
     location: location
-    sku: 'free'
+    ipRules: [] // TODO EES-5940 - Should be searchServiceIpRules
+    publicNetworkAccess: 'Enabled'
+    sku: 'basic'
+    systemAssignedIdentity: true
     tagValues: tagValues
   }
 }
@@ -52,7 +63,7 @@ module searchStorageAccountModule '../../public-api/components/storageAccount.bi
     location: location
     storageAccountName: '${replace(resourcePrefix, '-', '')}${abbreviations.storageStorageAccounts}search'
     publicNetworkAccessEnabled: false
-    firewallRules: storageFirewallRules
+    firewallRules: storageIpRules
     sku: 'Standard_LRS'
     kind: 'StorageV2'
     keyVaultName: keyVault.name
@@ -76,7 +87,33 @@ module blobServiceModule '../../common/components/blobService.bicep' = {
   }
 }
 
+module searchServiceBlobRoleAssignmentModule '../../common/components/storageAccountRoleAssignment.bicep' = {
+  name: '${searchServiceName}BlobRoleAssignmentModuleDeploy'
+  params: {
+    principalIds: [searchServiceModule.outputs.searchServiceIdentityPrincipalId]
+    storageAccountName: searchStorageAccountModule.outputs.storageAccountName
+    role: 'Storage Blob Data Reader'
+  }
+}
+
+module searchServiceConfigModule '../components/searchServiceConfig.bicep' = if (deploySearchConfig) {
+  name: 'searchServiceConfigModuleDeploy'
+  params: {
+    dataSourceName: 'azureblob-${searchableDocumentsContainerName}-datasource'
+    dataSourceConnectionString: 'ResourceId=${searchStorageAccountModule.outputs.storageAccountId};'
+    dataSourceContainerName: searchableDocumentsContainerName
+    dataSourceType: 'azureblob'
+    indexName: 'index-1'
+    indexFilename: 'index-1.json'
+    indexerScheduleInterval: 'PT5M'
+    searchServiceName: searchServiceModule.outputs.searchServiceName
+    location: location
+  }
+  dependsOn: [blobServiceModule] // Ensures the searchable documents container exists
+}
+
 output searchableDocumentsContainerName string = searchableDocumentsContainerName
+output searchServiceConfigText string = deploySearchConfig ? searchServiceConfigModule.outputs.text : ''
 output searchServiceEndpoint string = searchServiceModule.outputs.searchServiceEndpoint
 output searchServiceName string = searchServiceModule.outputs.searchServiceName
 output searchStorageAccountConnectionStringSecretName string = searchStorageAccountModule.outputs.connectionStringSecretName
