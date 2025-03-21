@@ -8,17 +8,17 @@ import ButtonText from '../../components/ButtonText';
 import styles from './ChartExportButton.module.scss';
 
 interface Props {
-  chartTitle: string | undefined;
+  chartTitle?: string | undefined;
 }
 
 const ChartExportButton = ({ chartTitle }: Props) => {
   const [isOpen, toggleOpened] = useToggle(false);
   const [getClipboardPng] = useCurrentPng();
 
-  const handleDivDownload = useCallback(async () => {
-    const jpeg = await getClipboardPng();
-    if (jpeg) {
-      downloadFile(jpeg, chartTitle || 'Chart');
+  const handlePngDownload = useCallback(async () => {
+    const png = await getClipboardPng();
+    if (png) {
+      downloadFile(png, chartTitle || 'Chart');
     }
   }, [chartTitle, getClipboardPng]);
 
@@ -68,7 +68,7 @@ const ChartExportButton = ({ chartTitle }: Props) => {
       {isOpen && (
         <ul className={styles.exportMenuList} role="menu">
           <li role="menuitem">
-            <ButtonText onClick={handleDivDownload}>
+            <ButtonText onClick={handlePngDownload}>
               Download chart as PNG
             </ButtonText>
           </li>
