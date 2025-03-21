@@ -31,7 +31,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         public const int MaxFilenameSize = 150;
         private const int MaxFileSize = int.MaxValue; // 2GB
 
-        public FileUploadsValidatorService(IFileTypeService fileTypeService,
+        public FileUploadsValidatorService(
+            IFileTypeService fileTypeService,
             ContentDbContext context)
         {
             _fileTypeService = fileTypeService;
@@ -42,10 +43,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             Guid releaseVersionId,
             string dataSetTitle,
             string dataFileName,
-            long dataFileLength,
             Stream dataFileStream,
             string metaFileName,
-            long metaFileLength,
             Stream metaFileStream,
             File? replacingFile = null)
         {
@@ -99,10 +98,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 releaseVersionId: releaseVersionId,
                 dataSetTitle: dataSetTitle,
                 dataFileName: dataFile.FileName,
-                dataFileLength: dataFile.Length,
                 dataFileStream: dataFileStream,
                 metaFileName: metaFile.FileName,
-                metaFileLength: metaFile.Length,
                 metaFileStream: metaFileStream,
                 replacingFile: replacingFile);
         }
@@ -117,15 +114,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 releaseVersionId: releaseVersionId,
                 dataSetTitle: archiveDataSet.Title,
                 dataFileName: archiveDataSet.DataFilename,
-                dataFileLength: archiveDataSet.DataFileSize,
                 dataFileStream: dataFileStream,
                 metaFileName: archiveDataSet.MetaFilename,
-                metaFileLength: archiveDataSet.MetaFileSize,
                 metaFileStream: metaFileStream,
                 replacingFile: archiveDataSet.ReplacingFile);
         }
 
-        public async Task<Either<ActionResult, Unit>> ValidateFileForUpload(IFormFile file, FileType type)
+        public async Task<Either<ActionResult, Unit>> ValidateFileForUpload(
+            IFormFile file,
+            FileType type)
         {
             if (type is FileType.Data or Metadata)
             {
@@ -193,7 +190,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                    filename.IndexOfAny(Path.GetInvalidFileNameChars()) > -1;
         }
 
-        private bool IsFileExisting(Guid releaseVersionId,
+        private bool IsFileExisting(
+            Guid releaseVersionId,
             FileType type,
             string filename)
         {
