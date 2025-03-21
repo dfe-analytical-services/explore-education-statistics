@@ -1094,6 +1094,8 @@
     "vNetRef": "[resourceId('Microsoft.Network/virtualNetworks', variables('vNetName'))]",
     "adminSubnetName": "[concat(parameters('subscription'), '-snet-', parameters('environment'), '-admin')]",
     "adminSubnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vNetName'), variables('adminSubnetName'))]",
+    "analyticsFunctionAppSubnetName": "[concat(parameters('subscription'), '-', parameters('environment'), '-snet-fa-analytics')]",
+    "analyticsStoragePrivateEndpointsSubnetName": "[concat(parameters('subscription'), '-', parameters('environment'), '-snet-sa-anlyt-pep')]",
     "importerSubnetName": "[concat(parameters('subscription'), '-snet-', parameters('environment'), '-importer')]",
     "importerSubnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vNetName'), variables('importerSubnetName'))]",
     "publisherSubnetName": "[concat(parameters('subscription'), '-snet-', parameters('environment'), '-publisher')]",
@@ -3741,6 +3743,26 @@
             "name": "[variables('searchDocsFunctionPrivateEndpointsSubnetName')]",
             "properties": {
               "addressPrefix": "10.0.15.0/24"
+            }
+          },
+          {
+            "name": "[variables('analyticsStoragePrivateEndpointsSubnetName')]",
+            "properties": {
+              "addressPrefix": "10.0.16.0/24"
+            }
+          },
+          {
+            "name": "[variables('analyticsFunctionAppSubnetName')]",
+            "properties": {
+              "addressPrefix": "10.0.17.0/24",
+              "delegations": [
+                {
+                  "name": "webapp",
+                  "properties": {
+                    "serviceName": "Microsoft.Web/serverFarms"
+                  }
+                }
+              ]
             }
           }
         ]

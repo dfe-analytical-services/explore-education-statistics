@@ -1,0 +1,38 @@
+parameters:
+  - name: action
+    type: string
+    default: create
+    values:
+      - create
+      - validate
+  - name: displayName
+    type: string
+  - name: serviceConnection
+    type: string
+  - name: parameterFile
+    type: string
+  - name: analyticsFunctionAppExists
+    type: string
+    default: true
+
+steps:
+  - task: AzureCLI@2
+    displayName: ${{ parameters.displayName }}
+    inputs:
+      azureSubscription: ${{ parameters.serviceConnection }}
+      scriptType: bash
+      scriptLocation: inlineScript
+      addSpnToEnvironment: true
+      inlineScript: |
+        set -e
+
+        az deployment group ${{ parameters.action }} \
+          --name $(infraDeployName) \
+          --resource-group $(resourceGroupName) \
+          --template-file $(templateFile) \
+          --parameters ${{ parameters.parameterFile }} \
+          --parameters \
+              subscription='$(subscription)' \
+              resourceTags='$(resourceTags)' \
+              maintenanceIpRanges='$(maintenanceFirewallRules)' \
+              analyticsFunctionAppExists=${{ parameters.analyticsFunctionAppExists }}

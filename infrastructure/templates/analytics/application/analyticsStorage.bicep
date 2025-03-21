@@ -1,13 +1,15 @@
-import { ResourceNames, IpRange, StorageAccountConfig } from '../../types.bicep'
+import { abbreviations } from '../../common/abbreviations.bicep'
+import { ResourceNames } from '../types.bicep'
+import { IpRange, StorageAccountConfig } from '../../common/types.bicep'
 
 @description('Specifies common resource naming variables.')
 param resourceNames ResourceNames
 
+@description('Resource prefix for all resources.')
+param resourcePrefix string
+
 @description('Specifies the location for all resources.')
 param location string
-
-@description('Public API storage account and file share configuration.')
-param config StorageAccountConfig
 
 @description('Firewall rules.')
 param storageFirewallRules IpRange[]
@@ -27,15 +29,28 @@ resource storagePrivateEndpointSubnet 'Microsoft.Network/virtualNetworks/subnets
   parent: vNet
 }
 
-module analyticsStorageAccountModule '../../components/storageAccount.bicep' = {
+var storageAccountName = '${replace(resourcePrefix, '-', '')}${abbreviations.storageStorageAccounts}anlyt'
+
+var storageAccountConfig = {
+  kind: 'FileStorage'
+  sku: 'Premium_ZRS'
+  fileShare: {
+    quotaGbs: 100
+    accessTier: 'Premium'
+  }
+}
+
+var fileShareName = '${resourcePrefix}-${abbreviations.fileShare}-anlyt'
+
+module analyticsStorageAccountModule '../../public-api/components/storageAccount.bicep' = {
   name: 'analyticsStorageAccountDeploy'
   params: {
     location: location
-    storageAccountName: resourceNames.sharedResources.analyticsStorageAccount
-    publicNetworkAccessEnabled: false
+    storageAccountName: storageAccountName
+    publicNetworkAccessEnabled: true
     firewallRules: storageFirewallRules
-    sku: config.sku
-    kind: config.kind
+    sku: storageAccountConfig.sku
+    kind: storageAccountConfig.kind
     keyVaultName: resourceNames.existingResources.keyVault
     alerts: deployAlerts ? {
       availability: true
@@ -49,13 +64,13 @@ module analyticsStorageAccountModule '../../components/storageAccount.bicep' = {
   }
 }
 
-module analyticsFileShareModule '../../components/fileShare.bicep' = {
+module analyticsFileShareModule '../../public-api/components/fileShare.bicep' = {
   name: 'analyticsFileShareDeploy'
   params: {
-    fileShareName: resourceNames.sharedResources.analyticsFileShare
-    fileShareQuotaGbs: config.fileShare.quotaGbs
+    fileShareName: fileShareName
+    fileShareQuotaGbs: storageAccountConfig.fileShare.quotaGbs
     storageAccountName: analyticsStorageAccountModule.outputs.storageAccountName
-    fileShareAccessTier: config.fileShare.accessTier
+    fileShareAccessTier: storageAccountConfig.fileShare.accessTier
     alerts: deployAlerts ? {
       availability: true
       latency: true
@@ -67,5 +82,4 @@ module analyticsFileShareModule '../../components/fileShare.bicep' = {
 }
 
 output storageAccountName string = analyticsStorageAccountModule.outputs.storageAccountName
-output connectionStringSecretName string = analyticsStorageAccountModule.outputs.connectionStringSecretName
-output accessKeySecretName string = analyticsStorageAccountModule.outputs.accessKeySecretName
+output fileShareName string = fileShareName

@@ -1,7 +1,7 @@
+using GovUk.Education.ExploreEducationStatistics.Analytics.Requests.Consumer.Options;
 using GovUk.Education.ExploreEducationStatistics.Analytics.Requests.Consumer.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
-using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Options;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 
@@ -22,6 +22,11 @@ public class AnalyticsPathResolver : IAnalyticsPathResolver
         }
         
         _basePath = GetBasePath(options.Value.BasePath, environment);
+    }
+
+    public string BasePath()
+    {
+        return _basePath;
     }
 
     public string PublicApiQueriesDirectoryPath()

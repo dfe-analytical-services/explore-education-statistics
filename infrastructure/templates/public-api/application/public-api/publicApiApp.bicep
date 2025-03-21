@@ -101,7 +101,7 @@ module apiContainerAppModule '../../components/containerApp.bicep' = {
       {
         name: 'analytics-file-share-mount'
         storageType: 'AzureFile'
-        storageName: resourceNames.sharedResources.analyticsFileShare
+        storageName: resourceNames.existingResources.analyticsFileShare
       }
       {
         name: 'public-api-file-share-mount'
