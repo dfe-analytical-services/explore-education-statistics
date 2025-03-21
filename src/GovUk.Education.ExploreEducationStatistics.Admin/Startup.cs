@@ -872,11 +872,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             return Task.FromResult(PaginatedListViewModel<DataSetLiveVersionSummaryViewModel>.Paginate([], 1, 10));
         }
 
-        public Task<List<DataSetVersionStatusSummary>> GetStatusesForReleaseVersion(
-            Guid releaseVersionId,
+        public Task<Either<ActionResult, DataSetVersionInfoViewModel>> GetDataSetVersion(
+            Guid dataSetVersionIdId,
             CancellationToken cancellationToken = default)
         {
-            return Task.FromResult(new List<DataSetVersionStatusSummary>());
+            return Task.FromResult(new Either<ActionResult, DataSetVersionInfoViewModel>(new NotFoundResult()));
         }
 
         public Task<Either<ActionResult, DataSetVersion>> GetDataSetVersion(
@@ -885,6 +885,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             CancellationToken cancellationToken = default)
         {
             return Task.FromResult(new Either<ActionResult, DataSetVersion>(new NotFoundResult()));
+        }
+
+        public Task<List<DataSetVersionStatusSummary>> GetStatusesForReleaseVersion(
+            Guid releaseVersionId,
+            CancellationToken cancellationToken = default)
+        {
+            return Task.FromResult(new List<DataSetVersionStatusSummary>());
         }
 
         public Task<Either<ActionResult, DataSetVersionSummaryViewModel>> CreateNextVersion(

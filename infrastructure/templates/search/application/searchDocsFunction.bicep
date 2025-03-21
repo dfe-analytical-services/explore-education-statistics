@@ -81,7 +81,7 @@ resource searchableDocumentsContainer 'Microsoft.Storage/storageAccounts/blobSer
 }
 
 module functionAppModule '../../common/components/functionApp.bicep' = {
-  name: 'functionAppModuleDeploy'
+  name: 'searchDocsFunctionAppModuleDeploy'
   params: {
     functionAppName: '${resourcePrefix}-${abbreviations.webSitesFunctions}-searchdocs'
     location: location
@@ -130,7 +130,7 @@ module functionAppModule '../../common/components/functionApp.bicep' = {
       functionApp: searchDocsFunctionPrivateEndpointSubnet.id
       storageAccounts: searchDocsFunctionPrivateEndpointSubnet.id
     }
-    subnetId: outboundVnetSubnet.id
+    outboundSubnetId: outboundVnetSubnet.id
     alerts: deployAlerts ? {
       cpuPercentage: true
       functionAppHealth: true

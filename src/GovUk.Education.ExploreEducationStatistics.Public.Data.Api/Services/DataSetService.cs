@@ -176,7 +176,7 @@ internal class DataSetService(
             Title = dataSet.Title,
             Summary = dataSet.Summary,
             Status = dataSet.Status,
-            LatestVersion = MapLatestVersion(dataSet.LatestLiveVersion!),
+            LatestVersion = dataSet.LatestLiveVersion != null ? MapLatestVersion(dataSet.LatestLiveVersion) : null,
             SupersedingDataSetId = dataSet.SupersedingDataSetId,
         };
     }

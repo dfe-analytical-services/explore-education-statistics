@@ -132,6 +132,22 @@ jobs:
           performMultiLevelLookup: true
 
       - task: DotNetCoreCLI@2
+        displayName: Package Analytics Function App
+        inputs:
+          command: publish
+          publishWebProjects: false
+          projects: '**/GovUk.Education.ExploreEducationStatistics.Analytics.Consumer.csproj'
+          arguments: --configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)/analytics-function-app
+          zipAfterPublish: True
+
+      - task: PublishPipelineArtifact@1
+        displayName: Publish Analytics Function App artifact
+        condition: and(succeeded(), eq(variables.IsBranchDeployable, true))
+        inputs:
+          artifactName: analytics-function-app
+          targetPath: $(Build.ArtifactStagingDirectory)/analytics-function-app    
+
+      - task: DotNetCoreCLI@2
         displayName: Package Data API
         inputs:
           command: publish

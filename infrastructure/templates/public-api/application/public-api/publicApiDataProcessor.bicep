@@ -72,6 +72,7 @@ module dataProcessorFunctionAppModule '../../components/durableFunctionApp.bicep
   name: 'dataProcessorFunctionAppDeploy'
   params: {
     functionAppName: resourceNames.publicApi.dataProcessor
+    // Note that appServicePlan should be resourceNames.publicApi.dataProcessorPlan.
     appServicePlanName: resourceNames.publicApi.dataProcessor
     storageAccountsNamePrefix: resourceNames.publicApi.dataProcessorStorageAccountsPrefix
     location: location

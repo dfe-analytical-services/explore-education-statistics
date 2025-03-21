@@ -75,7 +75,7 @@ public class HealthCheckFunctionTests
         [
             new HealthCheckStrategyBuilder().WhereResultIsHealthy("Result one").Build(),
             new HealthCheckStrategyBuilder().WhereResultIsUnhealthy("Result two").Build(),
-            new HealthCheckStrategyBuilder().WhereResultIsHealthy(null).Build()
+            new HealthCheckStrategyBuilder().WhereResultIsHealthy("Result three").Build()
         ];
         var sut = GetSut(strategies);
         
@@ -90,7 +90,7 @@ public class HealthCheckFunctionTests
         {
             new HealthCheckResult(true, "Result one"),
             new HealthCheckResult(false, "Result two"),
-            new HealthCheckResult(true, null)
+            new HealthCheckResult(true, "Result three")
         };
         Assert.Equal(expectedResults, healthCheckResult.Results);
     }

@@ -1,0 +1,53 @@
+parameters:
+  - name: serviceConnection
+    type: string
+  - name: environment
+    type: string
+  - name: bicepParamFile
+    type: string
+
+jobs:
+  - deployment: DeployAnalyticsInfrastructure
+    displayName: Deploy Analytics infrastructure
+    environment: ${{ parameters.environment }}
+    variables:
+      templateDirectory: $(Build.SourcesDirectory)/infrastructure/templates/analytics
+      templateFile: $(templateDirectory)/main.bicep
+      paramDirectory: $(templateDirectory)/parameters
+      paramFile: $(paramDirectory)/main-${{ parameters.bicepParamFile }}.bicepparam
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+            - checkout: self
+
+            - task: AzureCLI@2
+              displayName: Install Bicep
+              inputs:
+                azureSubscription: ${{ parameters.serviceConnection }}
+                scriptType: bash
+                scriptLocation: inlineScript
+                inlineScript: az bicep install
+
+            - template: ../tasks/deploy-bicep.yml
+              parameters:
+                displayName: Validate Bicep template
+                action: validate
+                serviceConnection: ${{ parameters.serviceConnection }}
+                parameterFile: $(paramFile)
+                analyticsFunctionAppExists: false
+
+            - template: ../../../public-api/ci/tasks/check-function-app-exists.yml
+              parameters:
+                serviceConnection: ${{ parameters.serviceConnection }}
+                resourceGroupName: $(resourceGroupName)
+                functionAppName: $(analyticsFunctionAppName)
+                variableName: analyticsFunctionAppExists
+
+            - template: ../tasks/deploy-bicep.yml
+              parameters:
+                displayName: Deploy Bicep template
+                action: create
+                serviceConnection: ${{ parameters.serviceConnection }}
+                parameterFile: $(paramFile)
+                analyticsFunctionAppExists: $(analyticsFunctionAppExists)

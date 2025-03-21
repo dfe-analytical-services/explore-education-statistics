@@ -2,6 +2,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Analytics.Requests.Consumer
 
 public interface IAnalyticsPathResolver
 {
+    string BasePath();
+
     string PublicApiQueriesDirectoryPath();
 
     string PublicApiQueriesProcessingDirectoryPath();

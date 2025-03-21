@@ -8,13 +8,14 @@ import {
 } from '@admin/routes/releaseRoutes';
 import _apiDataSetService, {
   ApiDataSet,
+  ApiDataSetVersionInfo,
 } from '@admin/services/apiDataSetService';
 import _apiDataSetVersionService from '@admin/services/apiDataSetVersionService';
 import render from '@common-test/render';
 import { screen, waitFor, within } from '@testing-library/react';
 import React from 'react';
 import { generatePath, MemoryRouter, Route } from 'react-router-dom';
-import { ApiDataSetVersionChanges } from '@common/services/types/apiDataSetChanges';
+import { ChangeSet } from '@common/services/types/apiDataSetChanges';
 
 jest.mock('@admin/services/apiDataSetService');
 jest.mock('@admin/services/apiDataSetVersionService');
@@ -23,20 +24,52 @@ const apiDataSetService = jest.mocked(_apiDataSetService);
 const apiDataSetVersionService = jest.mocked(_apiDataSetVersionService);
 
 describe('ReleaseApiDataSetChangelogPage', () => {
+  const draftDataSetVersion: ApiDataSetVersionInfo = {
+    id: 'data-set-version-4-0',
+    version: '4.0',
+    status: 'Draft',
+    type: 'Major',
+    notes: '',
+  };
+
+  const latestLiveDataSetVersion: ApiDataSetVersionInfo = {
+    id: 'data-set-version-3-0',
+    version: '3.0',
+    status: 'Published',
+    type: 'Major',
+    notes: 'Version 3.0 notes',
+  };
+
+  const dataSetVersionWithOnlyMajorChanges: ApiDataSetVersionInfo = {
+    id: 'data-set-version-2-0',
+    version: '2.0',
+    status: 'Published',
+    type: 'Major',
+    notes: 'Version 2.0 notes',
+  };
+
+  const dataSetVersionWithOnlyMinorChanges: ApiDataSetVersionInfo = {
+    id: 'data-set-version-1-1',
+    version: '1.1',
+    status: 'Published',
+    type: 'Minor',
+    notes: 'Version 1.1 notes',
+  };
+
   const testDataSet: ApiDataSet = {
     id: 'data-set-id',
     title: 'Data set title',
     summary: 'Data set summary',
     status: 'Draft',
     draftVersion: {
-      id: 'draft-version-id',
-      version: '2.0',
+      id: draftDataSetVersion.id,
+      version: draftDataSetVersion.version,
       status: 'Draft',
-      type: 'Major',
+      type: draftDataSetVersion.type,
       totalResults: 0,
       releaseVersion: {
-        id: 'release-2-id',
-        title: 'Test release 2',
+        id: 'release-3-id',
+        title: 'Test release 3',
       },
       file: {
         id: 'draft-file-id',
@@ -44,10 +77,10 @@ describe('ReleaseApiDataSetChangelogPage', () => {
       },
     },
     latestLiveVersion: {
-      id: 'live-version-id',
-      version: '1.1',
+      id: latestLiveDataSetVersion.id,
+      version: latestLiveDataSetVersion.version,
       status: 'Published',
-      type: 'Minor',
+      type: latestLiveDataSetVersion.type,
       totalResults: 0,
       releaseVersion: {
         id: 'release-2-id',
@@ -62,46 +95,171 @@ describe('ReleaseApiDataSetChangelogPage', () => {
       filters: [],
       published: '',
       indicators: [],
-      notes: 'Live version notes',
+      notes: latestLiveDataSetVersion.notes,
     },
     previousReleaseIds: [],
   };
 
-  const testChanges: ApiDataSetVersionChanges = {
-    majorChanges: {
-      filters: [
-        {
-          previousState: {
-            id: 'filter-1',
-            column: 'filter_1',
-            label: 'Filter 1',
-            hint: '',
-          },
+  const majorChangeSet: ChangeSet = {
+    filters: [
+      {
+        previousState: {
+          id: 'filter-1',
+          column: 'filter_1',
+          label: 'Filter 1',
+          hint: '',
         },
-      ],
-    },
-    minorChanges: {
-      filters: [
-        {
-          currentState: {
-            id: 'filter-2',
-            column: 'filter_2',
-            label: 'Filter 2',
-            hint: '',
-          },
-        },
-      ],
-    },
+      },
+    ],
   };
 
-  test('renders correctly for a live API data set', async () => {
+  const minorChangeSet: ChangeSet = {
+    filters: [
+      {
+        currentState: {
+          id: 'filter-2',
+          column: 'filter_2',
+          label: 'Filter 2',
+          hint: '',
+        },
+      },
+    ],
+  };
+
+  test('renders correctly for a LIVE API data set with MAJOR AND MINOR changes', async () => {
     apiDataSetService.getDataSet.mockResolvedValue(testDataSet);
+    apiDataSetVersionService.getVersion.mockResolvedValue(
+      latestLiveDataSetVersion,
+    );
     apiDataSetVersionService.getChanges.mockResolvedValue({
-      ...testChanges,
-      majorChanges: {},
+      majorChanges: majorChangeSet,
+      minorChanges: minorChangeSet,
     });
 
-    renderPage('live-version-id');
+    renderPage('data-set-version-3-0');
+
+    expect(await screen.findByText('Data set title')).toBeInTheDocument();
+
+    expect(screen.getByText('Published v3.0')).toBeInTheDocument();
+    expect(screen.getByText('Major update')).toBeInTheDocument();
+
+    expect(
+      screen.getByRole('heading', { name: 'Public guidance notes' }),
+    ).toBeInTheDocument();
+
+    expect(screen.getByText('Version 3.0 notes')).toBeInTheDocument();
+
+    expect(
+      screen.queryByRole('heading', { name: 'Major changes for version 3.0' }),
+    ).toBeInTheDocument();
+
+    const majorChanges = within(screen.getByTestId('major-changes'));
+
+    expect(majorChanges.getByTestId('deleted-filters')).toHaveTextContent(
+      'Filter 1 (id: filter-1, column: filter_1)',
+    );
+
+    expect(
+      screen.getByRole('heading', { name: 'Minor changes for version 3.0' }),
+    ).toBeInTheDocument();
+
+    const minorChanges = within(screen.getByTestId('minor-changes'));
+
+    expect(minorChanges.getByTestId('added-filters')).toHaveTextContent(
+      'Filter 2 (id: filter-2, column: filter_2)',
+    );
+  });
+
+  test('renders correctly for a DRAFT API data set with MAJOR AND MINOR changes', async () => {
+    apiDataSetService.getDataSet.mockResolvedValue(testDataSet);
+    apiDataSetVersionService.getVersion.mockResolvedValue(draftDataSetVersion);
+    apiDataSetVersionService.getChanges.mockResolvedValue({
+      majorChanges: majorChangeSet,
+      minorChanges: minorChangeSet,
+    });
+
+    renderPage('data-set-version-4-0');
+
+    expect(await screen.findByText('Data set title')).toBeInTheDocument();
+
+    expect(screen.getByText('Draft v4.0')).toBeInTheDocument();
+    expect(screen.getByText('Major update')).toBeInTheDocument();
+
+    expect(screen.getByLabelText('Public guidance notes')).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: 'Save public guidance notes' }),
+    ).toBeInTheDocument();
+
+    expect(
+      screen.getByRole('heading', { name: 'Major changes for version 4.0' }),
+    ).toBeInTheDocument();
+
+    const majorChanges = within(screen.getByTestId('major-changes'));
+
+    expect(majorChanges.getByTestId('deleted-filters')).toHaveTextContent(
+      'Filter 1 (id: filter-1, column: filter_1)',
+    );
+
+    expect(
+      screen.getByRole('heading', { name: 'Minor changes for version 4.0' }),
+    ).toBeInTheDocument();
+
+    const minorChanges = within(screen.getByTestId('minor-changes'));
+
+    expect(minorChanges.getByTestId('added-filters')).toHaveTextContent(
+      'Filter 2 (id: filter-2, column: filter_2)',
+    );
+  });
+
+  test('renders correctly for a LIVE API data set with ONLY MAJOR changes', async () => {
+    apiDataSetService.getDataSet.mockResolvedValue(testDataSet);
+    apiDataSetVersionService.getVersion.mockResolvedValue(
+      dataSetVersionWithOnlyMajorChanges,
+    );
+    apiDataSetVersionService.getChanges.mockResolvedValue({
+      majorChanges: majorChangeSet,
+      minorChanges: {},
+    });
+
+    renderPage('data-set-version-2-0');
+
+    expect(await screen.findByText('Data set title')).toBeInTheDocument();
+
+    expect(screen.getByText('Published v2.0')).toBeInTheDocument();
+    expect(screen.getByText('Major update')).toBeInTheDocument();
+
+    expect(
+      screen.getByRole('heading', { name: 'Public guidance notes' }),
+    ).toBeInTheDocument();
+
+    expect(screen.getByText('Version 2.0 notes')).toBeInTheDocument();
+
+    expect(
+      screen.getByRole('heading', { name: 'Major changes for version 2.0' }),
+    ).toBeInTheDocument();
+
+    const majorChanges = within(screen.getByTestId('major-changes'));
+
+    expect(majorChanges.getByTestId('deleted-filters')).toHaveTextContent(
+      'Filter 1 (id: filter-1, column: filter_1)',
+    );
+
+    expect(
+      screen.queryByRole('heading', { name: 'Minor changes for version 2.0' }),
+    ).not.toBeInTheDocument();
+  });
+
+  test('renders correctly for a LIVE API data set with ONLY MINOR changes', async () => {
+    apiDataSetService.getDataSet.mockResolvedValue(testDataSet);
+    apiDataSetVersionService.getVersion.mockResolvedValue(
+      dataSetVersionWithOnlyMinorChanges,
+    );
+    apiDataSetVersionService.getChanges.mockResolvedValue({
+      majorChanges: {},
+      minorChanges: minorChangeSet,
+    });
+
+    renderPage('data-set-version-1-1');
 
     expect(await screen.findByText('Data set title')).toBeInTheDocument();
 
@@ -112,7 +270,7 @@ describe('ReleaseApiDataSetChangelogPage', () => {
       screen.getByRole('heading', { name: 'Public guidance notes' }),
     ).toBeInTheDocument();
 
-    expect(screen.getByText('Live version notes')).toBeInTheDocument();
+    expect(screen.getByText('Version 1.1 notes')).toBeInTheDocument();
 
     expect(
       screen.queryByRole('heading', { name: 'Major changes for version 1.1' }),
@@ -129,48 +287,15 @@ describe('ReleaseApiDataSetChangelogPage', () => {
     );
   });
 
-  test('renders correctly for a draft API data set', async () => {
-    apiDataSetService.getDataSet.mockResolvedValue(testDataSet);
-    apiDataSetVersionService.getChanges.mockResolvedValue(testChanges);
-
-    renderPage('draft-version-id');
-
-    expect(await screen.findByText('Data set title')).toBeInTheDocument();
-
-    expect(screen.getByText('Draft v2.0')).toBeInTheDocument();
-    expect(screen.getByText('Major update')).toBeInTheDocument();
-
-    expect(screen.getByLabelText('Public guidance notes')).toBeInTheDocument();
-    expect(
-      screen.getByRole('button', { name: 'Save public guidance notes' }),
-    ).toBeInTheDocument();
-
-    expect(
-      screen.getByRole('heading', { name: 'Major changes for version 2.0' }),
-    ).toBeInTheDocument();
-
-    const majorChanges = within(screen.getByTestId('major-changes'));
-
-    expect(majorChanges.getByTestId('deleted-filters')).toHaveTextContent(
-      'Filter 1 (id: filter-1, column: filter_1)',
-    );
-
-    expect(
-      screen.getByRole('heading', { name: 'Minor changes for version 2.0' }),
-    ).toBeInTheDocument();
-
-    const minorChanges = within(screen.getByTestId('minor-changes'));
-
-    expect(minorChanges.getByTestId('added-filters')).toHaveTextContent(
-      'Filter 2 (id: filter-2, column: filter_2)',
-    );
-  });
-
   test('updating draft data set notes', async () => {
     apiDataSetService.getDataSet.mockResolvedValue(testDataSet);
-    apiDataSetVersionService.getChanges.mockResolvedValue(testChanges);
+    apiDataSetVersionService.getVersion.mockResolvedValue(draftDataSetVersion);
+    apiDataSetVersionService.getChanges.mockResolvedValue({
+      majorChanges: majorChangeSet,
+      minorChanges: minorChangeSet,
+    });
 
-    const { user } = renderPage('draft-version-id');
+    const { user } = renderPage('data-set-version-4-0');
 
     expect(await screen.findByText('Data set title')).toBeInTheDocument();
 
@@ -188,7 +313,7 @@ describe('ReleaseApiDataSetChangelogPage', () => {
     await waitFor(() => {
       expect(apiDataSetVersionService.updateNotes).toHaveBeenCalledTimes(1);
       expect(apiDataSetVersionService.updateNotes).toHaveBeenCalledWith(
-        'draft-version-id',
+        'data-set-version-4-0',
         { notes: 'Test notes' },
       );
     });
@@ -196,11 +321,34 @@ describe('ReleaseApiDataSetChangelogPage', () => {
 
   test('renders warning if unable to fetch data set', async () => {
     apiDataSetService.getDataSet.mockRejectedValue(
-      new Error('Unable to fetch changes'),
+      new Error('Unable to fetch data set'),
     );
-    apiDataSetVersionService.getChanges.mockResolvedValue(testChanges);
+    apiDataSetVersionService.getVersion.mockResolvedValue(draftDataSetVersion);
+    apiDataSetVersionService.getChanges.mockResolvedValue({
+      majorChanges: majorChangeSet,
+      minorChanges: minorChangeSet,
+    });
 
-    renderPage('draft-version-id');
+    renderPage('data-set-version-4-0');
+
+    expect(screen.queryByText('Data set title')).not.toBeInTheDocument();
+
+    expect(
+      await screen.findByText('Could not load API data set'),
+    ).toBeInTheDocument();
+  });
+
+  test('renders warning if unable to fetch data set version', async () => {
+    apiDataSetService.getDataSet.mockResolvedValue(testDataSet);
+    apiDataSetVersionService.getVersion.mockRejectedValue(
+      new Error('Unable to fetch data set'),
+    );
+    apiDataSetVersionService.getChanges.mockResolvedValue({
+      majorChanges: majorChangeSet,
+      minorChanges: minorChangeSet,
+    });
+
+    renderPage('data-set-version-4-0');
 
     expect(screen.queryByText('Data set title')).not.toBeInTheDocument();
 
@@ -211,11 +359,12 @@ describe('ReleaseApiDataSetChangelogPage', () => {
 
   test('renders warning if unable to fetch changes', async () => {
     apiDataSetService.getDataSet.mockResolvedValue(testDataSet);
+    apiDataSetVersionService.getVersion.mockResolvedValue(draftDataSetVersion);
     apiDataSetVersionService.getChanges.mockRejectedValue(
       new Error('Unable to fetch changes'),
     );
 
-    renderPage('draft-version-id');
+    renderPage('data-set-version-4-0');
 
     expect(await screen.findByText('Data set title')).toBeInTheDocument();
 

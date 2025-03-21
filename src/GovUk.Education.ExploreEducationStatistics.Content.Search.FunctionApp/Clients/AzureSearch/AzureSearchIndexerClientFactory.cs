@@ -1,0 +1,24 @@
+﻿using Azure;
+using Azure.Identity;
+using Azure.Search.Documents.Indexes;
+using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Options;
+using Microsoft.Extensions.Options;
+
+namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Clients.AzureSearch;
+
+/// <summary>
+/// Factory creates the appropriate instance of SearchIndexerClient
+/// (depending on whether an access key has been configured)
+/// and wraps it in a AzureSearchIndexerClientWrapper
+/// </summary>
+public class AzureSearchIndexerClientFactory(IOptions<AzureSearchOptions> options) : IAzureSearchIndexerClientFactory
+{
+    private readonly string _searchServiceEndpoint = options.Value.SearchServiceEndpoint;
+    private readonly string? _accessKey = options.Value.SearchServiceAccessKey;
+
+    public IAzureSearchIndexerClient Create() =>
+        new AzureSearchIndexerClientWrapper(
+            string.IsNullOrEmpty(_accessKey)
+                ? new SearchIndexerClient(new Uri(_searchServiceEndpoint), new DefaultAzureCredential())
+                : new SearchIndexerClient(new Uri(_searchServiceEndpoint), new AzureKeyCredential(_accessKey)));
+}

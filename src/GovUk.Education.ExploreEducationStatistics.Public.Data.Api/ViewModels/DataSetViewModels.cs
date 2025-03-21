@@ -44,7 +44,7 @@ public record DataSetViewModel
     /// <summary>
     /// The latest published data set version.
     /// </summary>
-    public required DataSetLatestVersionViewModel LatestVersion { get; init; }
+    public DataSetLatestVersionViewModel? LatestVersion { get; init; }
 }
 
 /// <summary>

@@ -26,7 +26,7 @@ export default function DataSetFileApiChangelog({
       heading={pageSections.apiChangelog}
       id="apiChangelog"
     >
-      {guidanceNotes.length && (
+      {guidanceNotes.length > 0 && (
         <p data-testid="public-guidance-notes">{guidanceNotes}</p>
       )}
       <ApiDataSetChangelog

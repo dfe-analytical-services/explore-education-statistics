@@ -3,6 +3,8 @@ using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Clie
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Clients.AzureBlobStorage;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Clients.ContentApi;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.CreateSearchableReleaseDocuments;
+using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.ReindexSearchableDocuments;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Options;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Services;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Tests.Extensions;
@@ -195,6 +197,67 @@ public class ProgramTests
                 // ASSERT
                 var options = host.Services.GetRequiredService<IOptions<AppOptions>>();
                 Assert.NotNull(options);
+            }
+        }
+        
+        public class ReindexSearchableDocumentsFunctionTests : ProgramTests
+        {
+            [Fact]
+            public void Should_resolve_ReindexSearchableDocumentsFunction()
+            {
+                // ARRANGE
+                var sut = GetSut();
+            
+                // ACT
+                var actual = ActivatorUtilities.CreateInstance<ReindexSearchableDocumentsFunction>(sut.Services);
+            
+                // ASSERT
+                Assert.NotNull(actual);
+            }
+            
+            [Fact]
+            public void GivenNotConfigured_WhenResolvingReindexSearchableDocumentsFunction_ThenShouldResolve()
+            {
+                // ARRANGE
+                var sut = GetSutWithConfig("{}");
+            
+                // ACT
+                var actual = sut.Services.GetRequiredService<IOptions<ReindexSearchableDocumentsFunction>>();
+                
+                // ASSERT
+                Assert.NotNull(actual);
+            }
+            
+            [Fact]
+            public void GivenNotConfigured_WhenResolvingAzureSearchOptions_ThenShouldResolve()
+            {
+                // ARRANGE
+                var sut = GetSutWithConfig("{}");
+            
+                // ACT
+                var options = sut.Services.GetRequiredService<IOptions<AzureSearchOptions>>();
+                
+                // ASSERT
+                Assert.NotNull(options.Value);
+                Assert.Equal(string.Empty, options.Value.SearchServiceEndpoint);
+                Assert.Null(options.Value.SearchServiceAccessKey);
+                Assert.Equal(string.Empty, options.Value.IndexName);
+            }
+        }
+        
+        public class CreateSearchableReleaseDocumentInAzureStorageFunctionTests : ProgramTests
+        {
+            [Fact]
+            public void Should_resolve_CreateSearchableReleaseDocumentInAzureStorageFunction()
+            {
+                // ARRANGE
+                var sut = GetSut();
+            
+                // ACT
+                var actual = ActivatorUtilities.CreateInstance<CreateSearchableReleaseDocumentInAzureStorageFunction>(sut.Services);
+            
+                // ASSERT
+                Assert.NotNull(actual);
             }
         }
     }

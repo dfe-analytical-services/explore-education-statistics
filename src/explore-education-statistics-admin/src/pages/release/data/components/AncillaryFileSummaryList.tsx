@@ -8,6 +8,7 @@ import releaseAncillaryFileService, {
 } from '@admin/services/releaseAncillaryFileService';
 import ButtonText from '@common/components/ButtonText';
 import FormattedDate from '@common/components/FormattedDate';
+import ModalConfirm from '@common/components/ModalConfirm';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
 import React from 'react';
@@ -18,6 +19,8 @@ interface Props {
   file: AncillaryFile;
   publicationId: string;
   releaseVersionId: string;
+  onCancelDelete?: () => void;
+  onConfirmDelete: () => Promise<void>;
   onDelete?: () => void;
 }
 
@@ -26,6 +29,8 @@ export default function AncillaryFileSummaryList({
   file,
   publicationId,
   releaseVersionId,
+  onCancelDelete,
+  onConfirmDelete,
   onDelete,
 }: Props) {
   return (
@@ -80,7 +85,20 @@ export default function AncillaryFileSummaryList({
               >
                 Edit file
               </Link>
-              <ButtonText onClick={onDelete}>Delete file</ButtonText>
+              <ModalConfirm
+                title="Confirm deletion of file"
+                triggerButton={
+                  <ButtonText onClick={onDelete}>Delete file</ButtonText>
+                }
+                onExit={onCancelDelete}
+                onCancel={onCancelDelete}
+                onConfirm={onConfirmDelete}
+              >
+                <p>
+                  This file will no longer be available for use in this release
+                  ({file.filename})
+                </p>
+              </ModalConfirm>
             </>
           }
         />
