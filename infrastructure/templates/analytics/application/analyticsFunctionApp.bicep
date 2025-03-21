@@ -5,7 +5,7 @@ import { ResourceNames } from '../types.bicep'
 @description('The IP address ranges that can access the Analytics Function App endpoints.')
 param functionAppFirewallRules FirewallRule[]
 
-@description('The IP address ranges that can access the Search Docs Function App storage accounts.')
+@description('The IP address ranges that can access the Analytics Function App storage accounts.')
 param storageFirewallRules IpRange[]
 
 @description('Specifies common resource naming variables.')
