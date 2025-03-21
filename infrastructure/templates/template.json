@@ -3755,11 +3755,6 @@
             "name": "[variables('analyticsFunctionAppSubnetName')]",
             "properties": {
               "addressPrefix": "10.0.17.0/24",
-              "serviceEndpoints": [
-                {
-                  "service": "Microsoft.Storage"
-                }
-              ],
               "delegations": [
                 {
                   "name": "webapp",
