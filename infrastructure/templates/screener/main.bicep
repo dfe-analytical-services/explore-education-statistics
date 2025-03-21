@@ -77,7 +77,17 @@ module screenerFunctionAppModule 'application/screenerContainerisedFunctionApp.b
     screenerDockerImageTag: screenerDockerImageTag
     resourceNames: resourceNames
     functionAppExists: screenerFunctionAppExists
-    functionAppFirewallRules: union([], maintenanceFirewallRules)
+    functionAppFirewallRules: union(
+      [
+        {
+          cidr: 'AzureCloud'
+          tag: 'ServiceTag'
+          priority: 101
+          name: 'AzureCloud'
+        }
+      ],
+      maintenanceFirewallRules
+    )
     storageFirewallRules: maintenanceIpRanges
     applicationInsightsConnectionString: applicationInsightsModule.outputs.applicationInsightsConnectionString
     tagValues: tagValues
