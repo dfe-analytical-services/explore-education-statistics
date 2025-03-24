@@ -3,7 +3,7 @@ import downloadFile from '@common/utils/file/downloadFile';
 import logger from '@common/services/logger';
 import useToggle from '@common/hooks/useToggle';
 import Details from '@common/components/Details';
-import { useCurrentPng } from '../../components/ChartsToPNG';
+import useCurrentPng from '@common/components/ChartsToPNG';
 import ButtonText from '../../components/ButtonText';
 import styles from './ChartExportButton.module.scss';
 
@@ -37,10 +37,6 @@ const ChartExportButton = ({ chartTitle }: Props) => {
     });
   }, [getClipboardPng]);
 
-  const handleCloseMenu = () => {
-    toggleOpened.off();
-  };
-
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
@@ -66,7 +62,10 @@ const ChartExportButton = ({ chartTitle }: Props) => {
       className={styles.exportMenu}
     >
       {isOpen && (
-        <ul className={styles.exportMenuList} role="menu">
+        <ul
+          className={`${styles.exportMenuList} govuk-!-font-size-16`}
+          role="menu"
+        >
           <li role="menuitem">
             <ButtonText onClick={handlePngDownload}>
               Download chart as PNG
@@ -75,14 +74,6 @@ const ChartExportButton = ({ chartTitle }: Props) => {
           <li role="menuitem">
             <ButtonText onClick={handleCopyToClipboard}>
               Copy chart to clipboard
-            </ButtonText>
-          </li>
-          <li role="menuitem">
-            <ButtonText
-              className={styles.exportCloseButton}
-              onClick={handleCloseMenu}
-            >
-              Close
             </ButtonText>
           </li>
         </ul>

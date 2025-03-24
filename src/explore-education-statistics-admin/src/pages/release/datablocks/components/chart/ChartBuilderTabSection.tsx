@@ -4,7 +4,7 @@ import ChartBuilder, {
 import { SavedDataBlock } from '@admin/pages/release/datablocks/components/DataBlockPageTabs';
 import { ReleaseDataBlock } from '@admin/services/dataBlockService';
 import releaseChartFileService from '@admin/services/releaseChartFileService';
-import { ExportButtonContext } from '@common/contexts/ExportButtonContext';
+import { RefContext } from '@common/contexts/RefContext';
 import { Chart } from '@common/modules/charts/types/chart';
 import { FullTable } from '@common/modules/table-tool/types/fullTable';
 import mapFullTable from '@common/modules/table-tool/utils/mapFullTable';
@@ -119,7 +119,7 @@ const ChartBuilderTabSection = ({
   const chartExportRef = useRef(null);
 
   return (
-    <ExportButtonContext.Provider value={chartExportRef}>
+    <RefContext.Provider value={chartExportRef}>
       <ChartBuilder
         releaseVersionId={releaseVersionId}
         data={table.results}
@@ -130,7 +130,7 @@ const ChartBuilderTabSection = ({
         onChartDelete={handleChartDelete}
         onTableQueryUpdate={handleTableQueryUpdate}
       />
-    </ExportButtonContext.Provider>
+    </RefContext.Provider>
   );
 };
 

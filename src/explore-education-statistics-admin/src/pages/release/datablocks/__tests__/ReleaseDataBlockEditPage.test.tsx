@@ -14,7 +14,7 @@ import _dataBlockService, {
 } from '@admin/services/dataBlockService';
 import _permissionService from '@admin/services/permissionService';
 import render from '@common-test/render';
-import { ExportButtonContext } from '@common/contexts/ExportButtonContext';
+import { RefContext } from '@common/contexts/RefContext';
 import { Chart } from '@common/modules/charts/types/chart';
 import _tableBuilderService, {
   Subject,
@@ -541,10 +541,10 @@ describe('ReleaseDataBlockEditPage', () => {
   });
 
   const renderPage = () => {
-    const myMockRef: { current: HTMLInputElement | null } = { current: null };
+    const myMockRef = { current: null } as React.MutableRefObject<null>;
 
     return render(
-      <ExportButtonContext.Provider value={myMockRef}>
+      <RefContext.Provider value={myMockRef}>
         <TestConfigContextProvider>
           <MemoryRouter
             initialEntries={[
@@ -564,7 +564,7 @@ describe('ReleaseDataBlockEditPage', () => {
             />
           </MemoryRouter>
         </TestConfigContextProvider>
-      </ExportButtonContext.Provider>,
+      </RefContext.Provider>,
     );
   };
 });

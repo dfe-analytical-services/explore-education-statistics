@@ -1,18 +1,15 @@
-import { useExportButtonContext } from '@common/contexts/ExportButtonContext';
+import { useRefContext } from '@common/contexts/RefContext';
 import html2canvas, { Options as HTML2CanvasOptions } from 'html2canvas';
 import { useCallback } from 'react';
 
 export type UseCurrentPngType = [
   (callback?: BlobCallback) => Promise<string | null>,
-  {
-    ref: React.MutableRefObject<HTMLDivElement | null>;
-  },
 ];
 
-export function useCurrentPng(
+const useCurrentPng = (
   options?: Partial<HTML2CanvasOptions>,
-): UseCurrentPngType {
-  const ref = useExportButtonContext();
+): UseCurrentPngType => {
+  const ref = useRefContext();
 
   const getPng = useCallback(
     async (callback?: BlobCallback): Promise<string | null> => {
@@ -32,10 +29,7 @@ export function useCurrentPng(
     [options, ref],
   );
 
-  return [
-    getPng,
-    {
-      ref,
-    },
-  ];
-}
+  return [getPng];
+};
+
+export default useCurrentPng;

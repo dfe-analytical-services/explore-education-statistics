@@ -1,6 +1,6 @@
 import ChartExportButton from '@common/charts/components/ChartExportButton';
 import FigureFootnotes from '@common/components/FigureFootnotes';
-import { ExportButtonContext } from '@common/contexts/ExportButtonContext';
+import { RefContext } from '@common/contexts/RefContext';
 import HorizontalBarBlock, {
   HorizontalBarProps,
 } from '@common/modules/charts/components/HorizontalBarBlock';
@@ -58,7 +58,7 @@ function ChartRenderer({ source, id, chart }: ChartRendererProps) {
     type === 'map' ? getMapInitialBoundaryLevel(chart) : undefined,
   );
 
-  const chartExportRef = useContext(ExportButtonContext);
+  const chartExportRef = useContext(RefContext);
 
   const chartComponent = useMemo(() => {
     switch (type) {

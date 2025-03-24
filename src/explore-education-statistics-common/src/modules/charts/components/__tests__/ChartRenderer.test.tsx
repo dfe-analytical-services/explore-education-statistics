@@ -8,7 +8,7 @@ import { AxisConfiguration } from '@common/modules/charts/types/chart';
 import { DataSet } from '@common/modules/charts/types/dataSet';
 import mapFullTable from '@common/modules/table-tool/utils/mapFullTable';
 import { screen } from '@testing-library/react';
-import { ExportButtonContext } from '@common/contexts/ExportButtonContext';
+import { RefContext } from '@common/contexts/RefContext';
 
 jest.mock('recharts/lib/util/LogUtils');
 
@@ -61,12 +61,12 @@ describe('ChartRenderer', () => {
   };
 
   test('renders auto-generated boundary level footnote successfully', async () => {
-    const mockRef: { current: HTMLInputElement | null } = { current: null };
+    const mockRef = { current: null } as React.MutableRefObject<null>;
 
     render(
-      <ExportButtonContext.Provider value={mockRef}>
+      <RefContext.Provider value={mockRef}>
         <ChartRenderer {...testMapChartRenderer} />
-      </ExportButtonContext.Provider>,
+      </RefContext.Provider>,
     );
     const footnotes = screen.queryByTestId('footnotes');
 
@@ -77,12 +77,12 @@ describe('ChartRenderer', () => {
   });
 
   test('renders export button successfully', async () => {
-    const mockRef: { current: HTMLInputElement | null } = { current: null };
+    const mockRef = { current: null } as React.MutableRefObject<null>;
 
     render(
-      <ExportButtonContext.Provider value={mockRef}>
+      <RefContext.Provider value={mockRef}>
         <ChartRenderer {...testMapChartRenderer} />
-      </ExportButtonContext.Provider>,
+      </RefContext.Provider>,
     );
 
     expect(screen.queryByText('Export options')).toBeInTheDocument();

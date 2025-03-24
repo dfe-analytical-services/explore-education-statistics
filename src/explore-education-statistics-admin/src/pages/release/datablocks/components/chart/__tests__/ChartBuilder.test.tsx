@@ -5,7 +5,7 @@ import {
   ChartBuilderFormsContextProvider,
 } from '@admin/pages/release/datablocks/components/chart/contexts/ChartBuilderFormsContext';
 import render from '@common-test/render';
-import { ExportButtonContext } from '@common/contexts/ExportButtonContext';
+import { RefContext } from '@common/contexts/RefContext';
 import { Chart } from '@common/modules/charts/types/chart';
 import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -113,10 +113,10 @@ describe('ChartBuilder', () => {
 
   describe('data sets', () => {
     test('adding data sets', async () => {
-      const myMockRef: { current: HTMLInputElement | null } = { current: null };
+      const myMockRef = { current: null } as React.MutableRefObject<null>;
 
       const { user } = render(
-        <ExportButtonContext.Provider value={myMockRef}>
+        <RefContext.Provider value={myMockRef}>
           <ChartBuilderFormsContextProvider initialForms={testFormState}>
             <ChartBuilder
               releaseVersionId="release-1"
@@ -128,7 +128,7 @@ describe('ChartBuilder', () => {
               onTableQueryUpdate={jest.fn()}
             />
           </ChartBuilderFormsContextProvider>
-        </ExportButtonContext.Provider>,
+        </RefContext.Provider>,
       );
 
       await user.click(screen.getByRole('button', { name: 'Line' }));
@@ -195,10 +195,10 @@ describe('ChartBuilder', () => {
     });
 
     test('removing a data set', async () => {
-      const myMockRef: { current: HTMLInputElement | null } = { current: null };
+      const myMockRef = { current: null } as React.MutableRefObject<null>;
 
       render(
-        <ExportButtonContext.Provider value={myMockRef}>
+        <RefContext.Provider value={myMockRef}>
           <ChartBuilderFormsContextProvider initialForms={testFormState}>
             <ChartBuilder
               releaseVersionId="release-1"
@@ -210,7 +210,7 @@ describe('ChartBuilder', () => {
               onTableQueryUpdate={jest.fn()}
             />
           </ChartBuilderFormsContextProvider>
-        </ExportButtonContext.Provider>,
+        </RefContext.Provider>,
       );
 
       await userEvent.click(screen.getByRole('button', { name: 'Line' }));
@@ -276,10 +276,10 @@ describe('ChartBuilder', () => {
     });
 
     test('removing all data sets', async () => {
-      const myMockRef: { current: HTMLInputElement | null } = { current: null };
+      const myMockRef = { current: null } as React.MutableRefObject<null>;
 
       const { user } = render(
-        <ExportButtonContext.Provider value={myMockRef}>
+        <RefContext.Provider value={myMockRef}>
           <ChartBuilderFormsContextProvider initialForms={testFormState}>
             <ChartBuilder
               releaseVersionId="release-1"
@@ -291,7 +291,7 @@ describe('ChartBuilder', () => {
               onTableQueryUpdate={jest.fn()}
             />
           </ChartBuilderFormsContextProvider>
-        </ExportButtonContext.Provider>,
+        </RefContext.Provider>,
       );
 
       await user.click(screen.getByRole('button', { name: 'Line' }));
@@ -418,10 +418,10 @@ describe('ChartBuilder', () => {
     };
 
     const handleUpdate = jest.fn();
-    const myMockRef: { current: HTMLInputElement | null } = { current: null };
+    const myMockRef = { current: null } as React.MutableRefObject<null>;
 
     const { user } = render(
-      <ExportButtonContext.Provider value={myMockRef}>
+      <RefContext.Provider value={myMockRef}>
         <ChartBuilderFormsContextProvider initialForms={testFormState}>
           <ChartBuilder
             releaseVersionId="release-1"
@@ -446,7 +446,7 @@ describe('ChartBuilder', () => {
             onTableQueryUpdate={handleUpdate}
           />
         </ChartBuilderFormsContextProvider>
-      </ExportButtonContext.Provider>,
+      </RefContext.Provider>,
     );
 
     expect(
@@ -574,10 +574,10 @@ describe('ChartBuilder', () => {
 
     test('save chart with updated data groupings', async () => {
       const handleSubmit = jest.fn();
-      const myMockRef: { current: HTMLInputElement | null } = { current: null };
+      const myMockRef = { current: null } as React.MutableRefObject<null>;
 
       const { user } = render(
-        <ExportButtonContext.Provider value={myMockRef}>
+        <RefContext.Provider value={myMockRef}>
           <ChartBuilderFormsContextProvider initialForms={testFormState}>
             <ChartBuilder
               releaseVersionId="release-1"
@@ -602,7 +602,7 @@ describe('ChartBuilder', () => {
               onTableQueryUpdate={jest.fn()}
             />
           </ChartBuilderFormsContextProvider>
-        </ExportButtonContext.Provider>,
+        </RefContext.Provider>,
       );
 
       expect(

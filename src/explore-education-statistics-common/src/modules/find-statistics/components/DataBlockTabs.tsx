@@ -3,7 +3,7 @@ import LoadingSpinner from '@common/components/LoadingSpinner';
 import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
 import WarningMessage from '@common/components/WarningMessage';
-import { ExportButtonContext } from '@common/contexts/ExportButtonContext';
+import { RefContext } from '@common/contexts/RefContext';
 import withLazyLoad from '@common/hocs/withLazyLoad';
 import ChartRenderer from '@common/modules/charts/components/ChartRenderer';
 import { GetInfographic } from '@common/modules/charts/components/InfographicBlock';
@@ -84,13 +84,13 @@ const DataBlockTabs = ({
             {fullTable && (
               <ErrorBoundary fallback={errorMessage}>
                 {chart && (
-                  <ExportButtonContext.Provider value={chartExportRef}>
+                  <RefContext.Provider value={chartExportRef}>
                     <ChartRenderer
                       id="dataBlockTabs-chart"
                       source={dataBlock.source}
                       chart={chart}
                     />
-                  </ExportButtonContext.Provider>
+                  </RefContext.Provider>
                 )}
                 {additionTabContentElement}
               </ErrorBoundary>
