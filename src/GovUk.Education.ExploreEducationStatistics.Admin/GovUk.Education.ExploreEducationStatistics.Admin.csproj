@@ -39,6 +39,7 @@
     <PackageReference Include="Microsoft.Extensions.Logging.AzureAppServices" Version="8.0.14" />
     <PackageReference Include="NWebsec.AspNetCore.Middleware" Version="3.0.0" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="7.3.2" />
+    <PackageReference Include="System.Memory.Data" Version="7.0.0" />
     <PackageReference Include="Thinktecture.EntityFrameworkCore.SqlServer" Version="8.4.0" />
     <PackageReference Include="Cronos" Version="0.9.0" />
     <PackageReference Include="Microsoft.Identity.Web" Version="2.21.1" />
