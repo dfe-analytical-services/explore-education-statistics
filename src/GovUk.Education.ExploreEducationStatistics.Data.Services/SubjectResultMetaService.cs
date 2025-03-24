@@ -77,7 +77,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
         public async Task<Either<ActionResult, SubjectResultMetaViewModel>> GetSubjectMeta(
             Guid releaseVersionId,
             FullTableQuery query,
-            long? boundaryLevelId,
             IList<Observation> observations)
         {
             return await CheckReleaseSubjectExists(releaseVersionId: releaseVersionId,
@@ -128,7 +127,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                     var publicationTitle = (await _contentDbContext.Publications.FindAsync(publicationId))!.Title;
 
                     var locationViewModels =
-                        await _locationService.GetLocationViewModels(locations, boundaryLevelId, _locationOptions.Hierarchies);
+                        await _locationService.GetLocationViewModels(locations, _locationOptions.Hierarchies);
                     _logger.LogTrace("Got Location view models in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
                     stopwatch.Stop();
 

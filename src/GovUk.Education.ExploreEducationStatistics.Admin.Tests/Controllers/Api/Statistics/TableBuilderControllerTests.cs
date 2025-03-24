@@ -99,7 +99,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                             It.Is<FullTableQuery>(
                                 q => q.SubjectId == FullTableQueryRequest.SubjectId
                             ),
-                            It.IsAny<long?>(),
                             cancellationToken
                         )
                 )
@@ -113,7 +112,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
 
             var result = await controller.QueryForDataBlock(releaseVersionId: ReleaseVersionId,
                 dataBlockVersion.Id,
-                null,
                 cancellationToken);
             VerifyAllMocks(dataBlockService, tableBuilderService);
 
@@ -133,8 +131,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
 
             var result = await controller.QueryForDataBlock(
                 releaseVersionId: ReleaseVersionId,
-                dataBlockParentId: DataBlockId,
-                null);
+                dataBlockParentId: DataBlockId);
             VerifyAllMocks(dataBlockService);
 
             result.AssertNotFoundResult();
