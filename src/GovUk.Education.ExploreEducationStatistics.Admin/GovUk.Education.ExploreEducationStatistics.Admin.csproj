@@ -26,6 +26,8 @@
 
   <ItemGroup>
     <PackageReference Include="AspectInjector" Version="2.8.2" PrivateAssets="all" />
+    <PackageReference Include="Azure.Identity" Version="1.13.2" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.14" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.14" PrivateAssets="all" />
     <PackageReference Include="GovukNotify" Version="7.2.0" />
     <PackageReference Include="HtmlAgilityPack" Version="1.12.0" />
