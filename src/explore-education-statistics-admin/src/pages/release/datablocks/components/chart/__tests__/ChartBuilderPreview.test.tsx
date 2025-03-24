@@ -1,4 +1,5 @@
 import ChartBuilderPreview from '@admin/pages/release/datablocks/components/chart/ChartBuilderPreview';
+import { RefContext } from '@common/contexts/RefContext';
 import { testChartTableData } from '@common/modules/charts/components/__tests__/__data__/testChartData';
 import { RenderableChart } from '@common/modules/charts/components/ChartRenderer';
 import { AxisConfiguration } from '@common/modules/charts/types/chart';
@@ -110,7 +111,13 @@ describe('ChartBuilderPreview', () => {
   };
 
   test('renders the loading spinner when the loading flag is indicating that it is loading', () => {
-    render(<ChartBuilderPreview chart={testLineChart} loading />);
+    const myMockRef = { current: null } as React.MutableRefObject<null>;
+
+    render(
+      <RefContext.Provider value={myMockRef}>
+        <ChartBuilderPreview chart={testLineChart} loading />
+      </RefContext.Provider>,
+    );
     const detailsSection = screen.queryByTestId('chartBuilderPreviewContainer');
     expect(detailsSection).toBeInTheDocument();
     expect(detailsSection).toHaveTextContent('Loading chart data');
@@ -124,7 +131,13 @@ describe('ChartBuilderPreview', () => {
     testMapChart,
   ].forEach(chart => {
     test(`renders chart of type '${chart.type}' when all mandatory fields are provided`, () => {
-      render(<ChartBuilderPreview chart={chart} loading={false} />);
+      const myMockRef = { current: null } as React.MutableRefObject<null>;
+
+      render(
+        <RefContext.Provider value={myMockRef}>
+          <ChartBuilderPreview chart={chart} loading={false} />
+        </RefContext.Provider>,
+      );
       const detailsSection = screen.queryByTestId(
         'chartBuilderPreviewContainer',
       );
@@ -144,13 +157,17 @@ describe('ChartBuilderPreview', () => {
     testMapChart,
   ].forEach(chart => {
     test(`renders preview help text for chart of type '${chart.type}' when no data sets are yet added`, () => {
+      const myMockRef = { current: null } as React.MutableRefObject<null>;
+
       render(
-        <ChartBuilderPreview
-          chart={produce(chart, draft => {
-            draft.axes.major.dataSets = [];
-          })}
-          loading={false}
-        />,
+        <RefContext.Provider value={myMockRef}>
+          <ChartBuilderPreview
+            chart={produce(chart, draft => {
+              draft.axes.major.dataSets = [];
+            })}
+            loading={false}
+          />
+        </RefContext.Provider>,
       );
       const detailsSection = screen.queryByTestId(
         'chartBuilderPreviewContainer',
@@ -165,13 +182,17 @@ describe('ChartBuilderPreview', () => {
   });
 
   test(`renders preview help text for chart of type 'infographic' when no fileId is selected`, () => {
+    const myMockRef = { current: null } as React.MutableRefObject<null>;
+
     render(
-      <ChartBuilderPreview
-        chart={produce(testInfographicChart, draft => {
-          draft.fileId = '';
-        })}
-        loading={false}
-      />,
+      <RefContext.Provider value={myMockRef}>
+        <ChartBuilderPreview
+          chart={produce(testInfographicChart, draft => {
+            draft.fileId = '';
+          })}
+          loading={false}
+        />
+      </RefContext.Provider>,
     );
     const detailsSection = screen.queryByTestId('chartBuilderPreviewContainer');
     expect(detailsSection).toBeInTheDocument();
@@ -181,13 +202,17 @@ describe('ChartBuilderPreview', () => {
   });
 
   test(`renders preview help text for chart of type 'map' when no boundaryLevel is selected`, () => {
+    const myMockRef = { current: null } as React.MutableRefObject<null>;
+
     render(
-      <ChartBuilderPreview
-        chart={produce(testMapChart, draft => {
-          draft.boundaryLevel = 0;
-        })}
-        loading={false}
-      />,
+      <RefContext.Provider value={myMockRef}>
+        <ChartBuilderPreview
+          chart={produce(testMapChart, draft => {
+            draft.boundaryLevel = 0;
+          })}
+          loading={false}
+        />
+      </RefContext.Provider>,
     );
     const detailsSection = screen.queryByTestId('chartBuilderPreviewContainer');
     expect(detailsSection).toBeInTheDocument();
