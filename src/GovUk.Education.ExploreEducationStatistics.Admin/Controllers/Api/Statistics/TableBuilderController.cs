@@ -46,7 +46,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Stati
         public async Task<ActionResult> Query(
             Guid releaseVersionId,
             [FromBody] FullTableQueryRequest request,
-            [FromQuery] long? boundaryLevelId, // TODO: Remove in EES-5433
             CancellationToken cancellationToken = default)
         {
             if (Request.AcceptsCsv(exact: true))
@@ -65,7 +64,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Stati
             }
 
             return await _tableBuilderService
-                .Query(releaseVersionId, request.AsFullTableQuery(), boundaryLevelId, cancellationToken)
+                .Query(releaseVersionId, request.AsFullTableQuery(), cancellationToken)
                 .HandleFailuresOr(Ok);
         }
 
@@ -73,12 +72,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Stati
         public async Task<ActionResult<TableBuilderResultViewModel>> QueryForDataBlock(
             Guid releaseVersionId,
             Guid dataBlockParentId,
-            [FromQuery] long? boundaryLevelId, // TODO: Remove in EES-5433
             CancellationToken cancellationToken = default)
         {
             return await _dataBlockService
                 .GetDataBlockVersionForRelease(releaseVersionId: releaseVersionId, dataBlockParentId: dataBlockParentId)
-                .OnSuccess(dataBlockVersion => GetReleaseDataBlockResults(dataBlockVersion, boundaryLevelId, cancellationToken))
+                .OnSuccess(dataBlockVersion => GetReleaseDataBlockResults(dataBlockVersion, cancellationToken))
                 .HandleFailuresOrOk();
         }
 
@@ -98,14 +96,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Stati
         [BlobCache(typeof(DataBlockTableResultCacheKey))]
         private async Task<Either<ActionResult, TableBuilderResultViewModel>> GetReleaseDataBlockResults(
             DataBlockVersion dataBlockVersion,
-            long? boundaryLevelId,
             CancellationToken cancellationToken)
         {
             return await _userService
                 .CheckCanViewReleaseVersion(dataBlockVersion.ReleaseVersion)
                 .OnSuccess(_ => _tableBuilderService.Query(releaseVersionId: dataBlockVersion.ReleaseVersionId,
                     dataBlockVersion.Query,
-                    boundaryLevelId,
                     cancellationToken));
         }
 

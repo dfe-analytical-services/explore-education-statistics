@@ -86,7 +86,7 @@ const DataBlockTabs = ({
                 {chart && (
                   <RefContext.Provider value={chartExportRef}>
                     <ChartRenderer
-                      id="dataBlockTabs-chart"
+                      id={`dataBlockTabs-chart-${dataBlock.id}`}
                       source={dataBlock.source}
                       chart={chart}
                     />

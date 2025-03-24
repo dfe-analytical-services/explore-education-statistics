@@ -463,7 +463,7 @@ describe('ChartBuilder', () => {
       '1',
     ]);
 
-    expect(handleUpdate).toHaveBeenCalledWith({ boundaryLevel: 1 });
+    expect(handleUpdate).toHaveBeenCalledWith({}, 1);
   });
 
   describe('data groupings tab', () => {

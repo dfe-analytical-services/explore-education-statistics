@@ -199,9 +199,7 @@ describe('DataBlockTabs', () => {
         'block-1-parent',
       );
 
-      expect(
-        screen.queryByText('Could not load content'),
-      ).not.toBeInTheDocument();
+      expect(screen.queryByText('Could not load content')).toBeInTheDocument();
       expect(screen.queryByRole('table')).not.toBeInTheDocument();
     });
   });

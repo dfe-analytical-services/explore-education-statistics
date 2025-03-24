@@ -82,13 +82,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             CancellationToken cancellationToken = default)
         {
             return await FindLatestPublishedReleaseVersionId(query.SubjectId)
-                .OnSuccess(releaseVersionId => Query(releaseVersionId, query, boundaryLevelId: null, cancellationToken));
+                .OnSuccess(releaseVersionId => Query(releaseVersionId, query, cancellationToken));
         }
 
         public async Task<Either<ActionResult, TableBuilderResultViewModel>> Query(
             Guid releaseVersionId,
             FullTableQuery query,
-            long? boundaryLevelId,
             CancellationToken cancellationToken = default)
         {
             return await CheckReleaseSubjectExists(subjectId: query.SubjectId,
@@ -104,7 +103,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                     }
 
                     return await _subjectResultMetaService
-                        .GetSubjectMeta(releaseVersionId, query, boundaryLevelId, observations)
+                        .GetSubjectMeta(releaseVersionId, query, observations)
                         .OnSuccess(subjectMetaViewModel =>
                         {
                             return new TableBuilderResultViewModel
@@ -140,7 +139,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                         .Distinct()
                         .ToList();
 
-                    return await _locationService.GetLocationViewModels(locations, boundaryLevelId, _locationOptions.Hierarchies);
+                    return await _locationService.GetLocationViewModels(
+                        locations,
+                        _locationOptions.Hierarchies,
+                        boundaryLevelId);
                 });
         }
 

@@ -70,7 +70,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                             s.Query(
                                 dataBlockVersion.ReleaseVersionId,
                                 It.Is<FullTableQuery>(q => q.SubjectId == subjectId),
-                                It.IsAny<long?>(),
                                 default
                             )
                     )
@@ -78,8 +77,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
 
                 var result = (await service.GetDataBlockTableResult(
                     releaseVersionId: dataBlockVersion.ReleaseVersionId,
-                    dataBlockVersionId: dataBlockVersion.Id,
-                    null)).AssertRight();
+                    dataBlockVersionId: dataBlockVersion.Id)).AssertRight();
 
                 VerifyAllMocks(tableBuilderService);
 
@@ -108,8 +106,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
 
                 var result = await service.GetDataBlockTableResult(
                     releaseVersionId: htmlBlock.ReleaseVersionId,
-                    dataBlockVersionId: htmlBlock.Id,
-                    null);
+                    dataBlockVersionId: htmlBlock.Id);
 
                 result.AssertNotFound();
             }

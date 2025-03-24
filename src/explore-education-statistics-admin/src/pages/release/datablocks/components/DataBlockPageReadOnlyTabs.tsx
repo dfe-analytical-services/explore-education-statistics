@@ -82,7 +82,7 @@ const DataBlockPageReadOnlyTabs = ({ releaseVersionId, dataBlock }: Props) => {
                 >
                   {chart && (
                     <ChartRenderer
-                      id="dataBlockTabs-chart"
+                      id={`dataBlockTabs-chart-${dataBlock.id}`}
                       source={dataBlock.source}
                       chart={chart}
                     />
