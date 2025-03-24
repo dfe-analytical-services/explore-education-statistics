@@ -25,11 +25,8 @@
 
   <ItemGroup>
     <PackageReference Include="RichardSzalay.MockHttp" Version="7.0.0" />
-    <PackageReference Include="Testcontainers.Azurite" Version="3.10.0" />
-    <PackageReference Include="xunit.runner.visualstudio" Version="3.0.2">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
+    <PackageReference Include="Testcontainers.Azurite" Version="4.3.0" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.13.0" /> <!-- Required to execute unit tests in IDE -->
   </ItemGroup>
 
   <ItemGroup>
