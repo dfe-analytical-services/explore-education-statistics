@@ -1,6 +1,6 @@
 import ChartExportButton from '@common/charts/components/ChartExportButton';
 import FigureFootnotes from '@common/components/FigureFootnotes';
-import { RefContext } from '@common/contexts/RefContext';
+import { useRefContext } from '@common/contexts/RefContext';
 import HorizontalBarBlock, {
   HorizontalBarProps,
 } from '@common/modules/charts/components/HorizontalBarBlock';
@@ -16,7 +16,7 @@ import MapBlock, {
 import VerticalBarBlock, {
   VerticalBarProps,
 } from '@common/modules/charts/components/VerticalBarBlock';
-import React, { memo, useMemo, useContext, useState } from 'react';
+import React, { memo, useMemo, useState } from 'react';
 import getMapInitialBoundaryLevel from './utils/getMapInitialBoundaryLevel';
 
 type HorizontalBarRendererProps = {
@@ -58,7 +58,7 @@ function ChartRenderer({ source, id, chart }: ChartRendererProps) {
     type === 'map' ? getMapInitialBoundaryLevel(chart) : undefined,
   );
 
-  const chartExportRef = useContext(RefContext);
+  const chartExportRef = useRefContext();
 
   const chartComponent = useMemo(() => {
     switch (type) {

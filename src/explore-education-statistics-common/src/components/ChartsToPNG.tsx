@@ -2,9 +2,7 @@ import { useRefContext } from '@common/contexts/RefContext';
 import html2canvas, { Options as HTML2CanvasOptions } from 'html2canvas';
 import { useCallback } from 'react';
 
-export type UseCurrentPngType = [
-  (callback?: BlobCallback) => Promise<string | null>,
-];
+type UseCurrentPngType = [(callback?: BlobCallback) => Promise<string | null>];
 
 const useCurrentPng = (
   options?: Partial<HTML2CanvasOptions>,
