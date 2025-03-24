@@ -10,6 +10,7 @@ import tableBuilderService, {
   Subject,
 } from '@common/services/tableBuilderService';
 import Button from '@common/components/Button';
+import ButtonGroup from '@common/components/ButtonGroup';
 import InsetText from '@common/components/InsetText';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import WarningMessage from '@common/components/WarningMessage';
@@ -100,19 +101,21 @@ const ReleaseDataReorderSection = ({
                             <td className="govuk-!-width-two-thirds">
                               {subject.name}
                             </td>
-                            <td className="govuk-!-text-align-right">
-                              <Button
-                                className="govuk-!-margin-bottom-0 govuk-!-margin-right-2"
-                                onClick={() => setReorderingFilters(subject)}
-                              >
-                                Reorder filters
-                              </Button>
-                              <Button
-                                className="govuk-!-margin-bottom-0"
-                                onClick={() => setReorderingIndicators(subject)}
-                              >
-                                Reorder indicators
-                              </Button>
+                            <td>
+                              <ButtonGroup className={styles.tableCellButtons}>
+                                <Button
+                                  onClick={() => setReorderingFilters(subject)}
+                                >
+                                  Reorder filters
+                                </Button>
+                                <Button
+                                  onClick={() =>
+                                    setReorderingIndicators(subject)
+                                  }
+                                >
+                                  Reorder indicators
+                                </Button>
+                              </ButtonGroup>
                             </td>
                           </tr>
                         );

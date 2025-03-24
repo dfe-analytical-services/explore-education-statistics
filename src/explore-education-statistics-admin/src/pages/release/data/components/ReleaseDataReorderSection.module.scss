@@ -3,3 +3,9 @@
 .table td {
   vertical-align: middle;
 }
+
+.tableCellButtons {
+  --verticalSpacing: #{govuk-spacing(1)};
+  justify-content: flex-end;
+  margin-bottom: 0;
+}
