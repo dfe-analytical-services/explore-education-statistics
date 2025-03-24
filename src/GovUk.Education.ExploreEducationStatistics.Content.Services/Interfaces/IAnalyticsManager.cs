@@ -1,6 +1,10 @@
+#nullable enable
+using System;
+using System.Collections.Generic;
+
 namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
 
 public interface IAnalyticsManager
 {
-    void AddZipDownload(string test);
+    void RecordReleaseVersionZipDownload(Guid releaseVersionId, IList<Guid>? fileIds = null);
 }

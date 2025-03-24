@@ -21,7 +21,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
     [ApiController]
     public class ReleaseFileController(
         IPersistenceHelper<ContentDbContext> persistenceHelper,
-        IReleaseFileService releaseFileService)
+        IReleaseFileService releaseFileService,
+        IAnalyticsManager analyticsManager)
         : ControllerBase
     {
         [HttpPost("release-files")]
@@ -35,8 +36,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
         }
 
         [ResponseCache(Duration = 300)]
-        [HttpGet("releases/{releaseVersionId}/files/{fileId}")]
-        public async Task<ActionResult> Stream(string releaseVersionId, string fileId) // @MarkFix record analytics for this?
+        [HttpGet("releases/{releaseVersionId}/files/{fileId}")] // @MarkFix what is this being used for?
+        public async Task<ActionResult> Stream(string releaseVersionId, string fileId)
         {
             if (Guid.TryParse(releaseVersionId, out var releaseVersionIdGuid) &&
                 Guid.TryParse(fileId, out var fileIdGuid))
@@ -55,7 +56,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
         [ResponseCache(Duration = 300)]
         [HttpGet("releases/{releaseVersionId:guid}/files")]
         [Produces(MediaTypeNames.Application.Octet)]
-        public async Task<ActionResult> StreamFilesToZip( // @MarkFix record analytics for this
+        public async Task<ActionResult> StreamFilesToZip(
             Guid releaseVersionId,
             [FromQuery] IList<Guid>? fileIds = null)
         {
@@ -93,6 +94,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
                             : 500;
                     }
                 )
+                .OnSuccessDo(_ =>
+                {
+                    analyticsManager.RecordReleaseVersionZipDownload(releaseVersionId, fileIds);
+                })
                 .HandleFailuresOrNoOp();
         }
     }

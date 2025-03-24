@@ -1,5 +1,6 @@
 #nullable enable
 using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using FluentValidation;
 using GovUk.Education.ExploreEducationStatistics.Common.Cache;
@@ -273,7 +274,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api
 
         private class NoopAnalyticsManager : IAnalyticsManager
         {
-            public void AddZipDownload(string test) {}
+            public void RecordReleaseVersionZipDownload(Guid releaseVersionId, IList<Guid>? fileIds = null) {}
         }
     }
 }
