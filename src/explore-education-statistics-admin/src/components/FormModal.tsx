@@ -12,8 +12,9 @@ import { DeepPartial, FieldValues } from 'react-hook-form';
 import { ObjectSchema, Schema } from 'yup';
 
 interface Props<TFormValues extends FieldValues> {
-  children: ReactNode;
+  children?: ReactNode;
   className?: string;
+  underlayClass?: string;
   formId: string;
   title: string;
   triggerButton: ReactNode;
@@ -35,6 +36,7 @@ interface Props<TFormValues extends FieldValues> {
 export default function FormModal<TFormValues extends FieldValues>({
   children,
   className,
+  underlayClass,
   formId,
   title,
   triggerButton,
@@ -86,6 +88,7 @@ export default function FormModal<TFormValues extends FieldValues>({
   return (
     <Modal
       className={className}
+      underlayClass={underlayClass}
       open={open}
       closeOnOutsideClick={!isSubmitting}
       closeOnEsc={!isSubmitting}
@@ -116,6 +119,7 @@ export default function FormModal<TFormValues extends FieldValues>({
                     <Button
                       type="submit"
                       className="govuk-button govuk-button--warning govuk-!-margin-right-1"
+                      disabled={isSubmitting}
                     >
                       Confirm
                     </Button>
@@ -123,6 +127,7 @@ export default function FormModal<TFormValues extends FieldValues>({
                       className="govuk-button govuk-button--secondary"
                       variant="secondary"
                       onClick={toggleConfirmationWarning.off}
+                      disabled={isSubmitting}
                     >
                       Cancel
                     </Button>
@@ -145,6 +150,7 @@ export default function FormModal<TFormValues extends FieldValues>({
                           toggleConfirmationWarning.on();
                         }
                       }}
+                      disabled={isSubmitting}
                     >
                       {submitText}
                     </Button>
@@ -152,6 +158,7 @@ export default function FormModal<TFormValues extends FieldValues>({
                       className="govuk-button govuk-button--secondary"
                       variant="secondary"
                       onClick={toggleOpen.off}
+                      disabled={isSubmitting}
                     >
                       {cancelText}
                     </Button>
