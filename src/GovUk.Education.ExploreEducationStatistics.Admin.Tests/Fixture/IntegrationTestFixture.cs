@@ -116,6 +116,11 @@ public abstract class IntegrationTestFixture(TestApplicationFactory testApp) :
                     services.ReplaceService<IDataProcessorClient>(sp =>
                         new DataProcessorClient(_azuriteContainer.GetConnectionString())
                     );
+                    //services.ReplaceService<IFileUploadsValidatorService>(sp =>
+                    //    new FileUploadsValidatorService(
+                    //        sp.GetRequiredService<IFileTypeService>(),
+                    //        testApp.GetDbContext<ContentDbContext, TestStartup>())
+                    //);
                     services.AddTransient<IPublicBlobCacheService, PublicBlobCacheService>();
                     services.AddTransient<IPrivateBlobCacheService, PrivateBlobCacheService>();
                 });
