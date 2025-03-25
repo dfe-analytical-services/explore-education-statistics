@@ -30,7 +30,7 @@ const ReleaseDataBlocksPage = ({
 }: RouteComponentProps<ReleaseRouteParams>) => {
   const { publicationId, releaseVersionId } = match.params;
 
-  const [deleteDataBlock, setDeleteDataBlock] =
+  const [dataBlockToDelete, setDataBlockToDelete] =
     useState<ReleaseDataBlockSummary>();
 
   const queryClient = useQueryClient();
@@ -51,29 +51,31 @@ const ReleaseDataBlocksPage = ({
   const { data: canUpdateRelease = true, isLoading: isLoadingPermissions } =
     useQuery(permissionQueries.canUpdateRelease(releaseVersionId));
 
-  const handleDelete = useCallback(async () => {
-    if (!deleteDataBlock) {
+  const handleDeleteConfirm = useCallback(async () => {
+    if (!dataBlockToDelete) {
       return;
     }
 
     queryClient.setQueryData(
       listDataBlocksQuery.queryKey,
-      dataBlocks.filter(dataBlock => dataBlock.id !== deleteDataBlock.id),
+      dataBlocks.filter(dataBlock => dataBlock.id !== dataBlockToDelete.id),
     );
 
     queryClient.setQueryData(
       listFeaturedTablesQuery.queryKey,
-      featuredTables.filter(table => table.dataBlockId !== deleteDataBlock.id),
+      featuredTables.filter(
+        table => table.dataBlockId !== dataBlockToDelete.id,
+      ),
     );
     await queryClient.invalidateQueries([
       listDataBlocksQuery.queryKey,
       listFeaturedTablesQuery.queryKey,
     ]);
 
-    setDeleteDataBlock(undefined);
+    setDataBlockToDelete(undefined);
   }, [
     dataBlocks,
-    deleteDataBlock,
+    dataBlockToDelete,
     featuredTables,
     listDataBlocksQuery.queryKey,
     listFeaturedTablesQuery.queryKey,
@@ -81,7 +83,7 @@ const ReleaseDataBlocksPage = ({
   ]);
 
   const handleDeleteCancel = useCallback(() => {
-    setDeleteDataBlock(undefined);
+    setDataBlockToDelete(undefined);
   }, []);
 
   const handleSaveOrder = useCallback(
@@ -157,10 +159,13 @@ const ReleaseDataBlocksPage = ({
         <FeaturedTablesTable
           canUpdateRelease={canUpdateRelease}
           dataBlocks={dataBlocks}
+          deleteDataBlock={dataBlockToDelete}
           featuredTables={featuredTables}
           publicationId={publicationId}
           releaseVersionId={releaseVersionId}
-          onDelete={setDeleteDataBlock}
+          handleDeleteCancel={handleDeleteCancel}
+          handleDeleteConfirm={handleDeleteConfirm}
+          onDelete={setDataBlockToDelete}
           onSaveOrder={handleSaveOrder}
         />
       )}
@@ -215,12 +220,25 @@ const ReleaseDataBlocksPage = ({
                       {canUpdateRelease ? 'Edit block' : 'View block'}
                     </Link>
                     {canUpdateRelease && (
-                      <ButtonText
-                        className="govuk-!-margin-bottom-0"
-                        onClick={() => setDeleteDataBlock(dataBlock)}
-                      >
-                        Delete block
-                      </ButtonText>
+                      <DataBlockDeletePlanModal
+                        open={
+                          !!dataBlockToDelete &&
+                          dataBlockToDelete.id === dataBlock.id
+                        }
+                        releaseVersionId={releaseVersionId}
+                        dataBlockId={dataBlock.id}
+                        triggerButton={
+                          <ButtonText
+                            className="govuk-!-margin-bottom-0"
+                            onClick={() => setDataBlockToDelete(dataBlock)}
+                          >
+                            Delete block
+                          </ButtonText>
+                        }
+                        onConfirm={handleDeleteConfirm}
+                        onCancel={handleDeleteCancel}
+                        onExit={handleDeleteCancel}
+                      />
                     )}
                   </td>
                 </tr>
@@ -232,16 +250,6 @@ const ReleaseDataBlocksPage = ({
 
       {canUpdateRelease && (
         <ButtonLink to={createPath}>Create data block</ButtonLink>
-      )}
-
-      {deleteDataBlock && (
-        <DataBlockDeletePlanModal
-          releaseVersionId={releaseVersionId}
-          dataBlockId={deleteDataBlock.id}
-          onConfirm={handleDelete}
-          onCancel={handleDeleteCancel}
-          onExit={handleDeleteCancel}
-        />
       )}
     </>
   );

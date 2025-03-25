@@ -152,9 +152,19 @@ const ReleaseDataBlockEditPage = ({
               </SummaryList>
 
               {canUpdateRelease && (
-                <Button variant="warning" onClick={toggleDeleting.on}>
-                  Delete this data block
-                </Button>
+                <DataBlockDeletePlanModal
+                  open={isDeleting}
+                  releaseVersionId={releaseVersionId}
+                  dataBlockId={dataBlockId}
+                  triggerButton={
+                    <Button variant="warning" onClick={toggleDeleting.on}>
+                      Delete this data block
+                    </Button>
+                  }
+                  onConfirm={handleDataBlockDelete}
+                  onCancel={toggleDeleting.off}
+                  onExit={toggleDeleting.off}
+                />
               )}
 
               {canUpdateRelease ? (
@@ -171,16 +181,6 @@ const ReleaseDataBlockEditPage = ({
                 />
               )}
             </section>
-
-            {isDeleting && canUpdateRelease && (
-              <DataBlockDeletePlanModal
-                releaseVersionId={releaseVersionId}
-                dataBlockId={dataBlockId}
-                onConfirm={handleDataBlockDelete}
-                onCancel={toggleDeleting.off}
-                onExit={toggleDeleting.off}
-              />
-            )}
           </>
         )}
       </LoadingSpinner>

@@ -1,11 +1,13 @@
 import dataBlocksService from '@admin/services/dataBlockService';
 import ModalConfirm from '@common/components/ModalConfirm';
 import useAsyncRetry from '@common/hooks/useAsyncRetry';
-import React from 'react';
+import React, { ReactNode } from 'react';
 
 interface Props {
   releaseVersionId: string;
   dataBlockId: string;
+  open: boolean;
+  triggerButton: ReactNode;
   onConfirm: () => void;
   onCancel: () => void;
   onExit: () => void;
@@ -14,6 +16,8 @@ interface Props {
 const DataBlockDeletePlanModal = ({
   releaseVersionId,
   dataBlockId,
+  open,
+  triggerButton,
   onConfirm,
   onCancel,
   onExit,
@@ -30,7 +34,8 @@ const DataBlockDeletePlanModal = ({
   return (
     <ModalConfirm
       title="Delete data block"
-      open
+      open={open}
+      triggerButton={triggerButton}
       onConfirm={async () => {
         await dataBlocksService.deleteDataBlock(releaseVersionId, dataBlockId);
         onConfirm();
