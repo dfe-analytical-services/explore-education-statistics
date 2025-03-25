@@ -8,7 +8,7 @@ import { AxisConfiguration } from '@common/modules/charts/types/chart';
 import { DataSet } from '@common/modules/charts/types/dataSet';
 import mapFullTable from '@common/modules/table-tool/utils/mapFullTable';
 import { screen } from '@testing-library/react';
-import { RefContext } from '@common/contexts/RefContext';
+import { RefContextProvider } from '@common/contexts/RefContext';
 
 jest.mock('recharts/lib/util/LogUtils');
 
@@ -61,12 +61,10 @@ describe('ChartRenderer', () => {
   };
 
   test('renders auto-generated boundary level footnote successfully', async () => {
-    const mockRef = { current: null } as React.MutableRefObject<null>;
-
     render(
-      <RefContext.Provider value={mockRef}>
+      <RefContextProvider>
         <ChartRenderer {...testMapChartRenderer} />
-      </RefContext.Provider>,
+      </RefContextProvider>,
     );
     const footnotes = screen.queryByTestId('footnotes');
 
@@ -77,12 +75,10 @@ describe('ChartRenderer', () => {
   });
 
   test('renders export button successfully', async () => {
-    const mockRef = { current: null } as React.MutableRefObject<null>;
-
     render(
-      <RefContext.Provider value={mockRef}>
+      <RefContextProvider>
         <ChartRenderer {...testMapChartRenderer} />
-      </RefContext.Provider>,
+      </RefContextProvider>,
     );
 
     expect(screen.queryByText('Export options')).toBeInTheDocument();

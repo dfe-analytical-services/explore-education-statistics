@@ -5,7 +5,7 @@ import {
   ChartBuilderFormsContextProvider,
 } from '@admin/pages/release/datablocks/components/chart/contexts/ChartBuilderFormsContext';
 import render from '@common-test/render';
-import { RefContext } from '@common/contexts/RefContext';
+import { RefContextProvider } from '@common/contexts/RefContext';
 import { Chart } from '@common/modules/charts/types/chart';
 import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -113,10 +113,8 @@ describe('ChartBuilder', () => {
 
   describe('data sets', () => {
     test('adding data sets', async () => {
-      const myMockRef = { current: null } as React.MutableRefObject<null>;
-
       const { user } = render(
-        <RefContext.Provider value={myMockRef}>
+        <RefContextProvider>
           <ChartBuilderFormsContextProvider initialForms={testFormState}>
             <ChartBuilder
               releaseVersionId="release-1"
@@ -128,7 +126,7 @@ describe('ChartBuilder', () => {
               onTableQueryUpdate={jest.fn()}
             />
           </ChartBuilderFormsContextProvider>
-        </RefContext.Provider>,
+        </RefContextProvider>,
       );
 
       await user.click(screen.getByRole('button', { name: 'Line' }));
@@ -195,10 +193,8 @@ describe('ChartBuilder', () => {
     });
 
     test('removing a data set', async () => {
-      const myMockRef = { current: null } as React.MutableRefObject<null>;
-
       render(
-        <RefContext.Provider value={myMockRef}>
+        <RefContextProvider>
           <ChartBuilderFormsContextProvider initialForms={testFormState}>
             <ChartBuilder
               releaseVersionId="release-1"
@@ -210,7 +206,7 @@ describe('ChartBuilder', () => {
               onTableQueryUpdate={jest.fn()}
             />
           </ChartBuilderFormsContextProvider>
-        </RefContext.Provider>,
+        </RefContextProvider>,
       );
 
       await userEvent.click(screen.getByRole('button', { name: 'Line' }));
@@ -276,10 +272,8 @@ describe('ChartBuilder', () => {
     });
 
     test('removing all data sets', async () => {
-      const myMockRef = { current: null } as React.MutableRefObject<null>;
-
       const { user } = render(
-        <RefContext.Provider value={myMockRef}>
+        <RefContextProvider>
           <ChartBuilderFormsContextProvider initialForms={testFormState}>
             <ChartBuilder
               releaseVersionId="release-1"
@@ -291,7 +285,7 @@ describe('ChartBuilder', () => {
               onTableQueryUpdate={jest.fn()}
             />
           </ChartBuilderFormsContextProvider>
-        </RefContext.Provider>,
+        </RefContextProvider>,
       );
 
       await user.click(screen.getByRole('button', { name: 'Line' }));
@@ -418,10 +412,9 @@ describe('ChartBuilder', () => {
     };
 
     const handleUpdate = jest.fn();
-    const myMockRef = { current: null } as React.MutableRefObject<null>;
 
     const { user } = render(
-      <RefContext.Provider value={myMockRef}>
+      <RefContextProvider>
         <ChartBuilderFormsContextProvider initialForms={testFormState}>
           <ChartBuilder
             releaseVersionId="release-1"
@@ -446,7 +439,7 @@ describe('ChartBuilder', () => {
             onTableQueryUpdate={handleUpdate}
           />
         </ChartBuilderFormsContextProvider>
-      </RefContext.Provider>,
+      </RefContextProvider>,
     );
 
     expect(
@@ -574,10 +567,9 @@ describe('ChartBuilder', () => {
 
     test('save chart with updated data groupings', async () => {
       const handleSubmit = jest.fn();
-      const myMockRef = { current: null } as React.MutableRefObject<null>;
 
       const { user } = render(
-        <RefContext.Provider value={myMockRef}>
+        <RefContextProvider>
           <ChartBuilderFormsContextProvider initialForms={testFormState}>
             <ChartBuilder
               releaseVersionId="release-1"
@@ -602,7 +594,7 @@ describe('ChartBuilder', () => {
               onTableQueryUpdate={jest.fn()}
             />
           </ChartBuilderFormsContextProvider>
-        </RefContext.Provider>,
+        </RefContextProvider>,
       );
 
       expect(

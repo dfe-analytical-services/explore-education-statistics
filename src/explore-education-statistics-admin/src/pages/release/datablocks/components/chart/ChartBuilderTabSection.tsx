@@ -4,7 +4,7 @@ import ChartBuilder, {
 import { SavedDataBlock } from '@admin/pages/release/datablocks/components/DataBlockPageTabs';
 import { ReleaseDataBlock } from '@admin/services/dataBlockService';
 import releaseChartFileService from '@admin/services/releaseChartFileService';
-import { RefContext } from '@common/contexts/RefContext';
+import { RefContextProvider } from '@common/contexts/RefContext';
 import { Chart } from '@common/modules/charts/types/chart';
 import { FullTable } from '@common/modules/table-tool/types/fullTable';
 import mapFullTable from '@common/modules/table-tool/utils/mapFullTable';
@@ -13,7 +13,7 @@ import tableBuilderService, {
   TableDataQuery,
 } from '@common/services/tableBuilderService';
 import isEqual from 'lodash/isEqual';
-import React, { useCallback, useMemo, useRef } from 'react';
+import React, { useCallback, useMemo } from 'react';
 
 export type ChartBuilderTableUpdateHandler = (params: {
   table: FullTable;
@@ -127,10 +127,8 @@ const ChartBuilderTabSection = ({
     [onTableUpdate, query, releaseVersionId, dataBlock],
   );
 
-  const chartExportRef = useRef(null);
-
   return (
-    <RefContext.Provider value={chartExportRef}>
+    <RefContextProvider>
       <ChartBuilder
         releaseVersionId={releaseVersionId}
         data={table.results}
@@ -141,7 +139,7 @@ const ChartBuilderTabSection = ({
         onChartDelete={handleChartDelete}
         onTableQueryUpdate={handleTableQueryUpdate}
       />
-    </RefContext.Provider>
+    </RefContextProvider>
   );
 };
 
