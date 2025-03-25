@@ -6,7 +6,6 @@ import {
   ReleaseDataBlockRouteParams,
 } from '@admin/routes/releaseRoutes';
 import Button from '@common/components/Button';
-import ButtonText from '@common/components/ButtonText';
 import FormattedDate from '@common/components/FormattedDate';
 import ReorderableList from '@common/components/ReorderableList';
 import { ReorderableListItem } from '@common/components/ReorderableItem';
@@ -20,26 +19,20 @@ import DataBlockDeletePlanModal from './DataBlockDeletePlanModal';
 interface Props {
   canUpdateRelease: boolean;
   dataBlocks: ReleaseDataBlockSummary[];
-  deleteDataBlock?: ReleaseDataBlockSummary | undefined;
   featuredTables: FeaturedTable[];
   publicationId: string;
   releaseVersionId: string;
-  handleDeleteCancel: () => void;
-  handleDeleteConfirm: () => Promise<void>;
-  onDelete: (dataBlock: ReleaseDataBlockSummary) => void;
+  handleDeleteConfirm: (deletedDataBlockId?: string) => Promise<void>;
   onSaveOrder: (reorderedTables: FeaturedTable[]) => Promise<void>;
 }
 
 export default function FeaturedTablesTable({
   canUpdateRelease,
   dataBlocks,
-  deleteDataBlock,
   featuredTables,
   publicationId,
   releaseVersionId,
-  handleDeleteCancel,
   handleDeleteConfirm,
-  onDelete,
   onSaveOrder,
 }: Props) {
   const [isReordering, toggleIsReordering] = useToggle(false);
@@ -142,10 +135,7 @@ export default function FeaturedTablesTable({
                   },
                 )}
                 releaseVersionId={releaseVersionId}
-                deleteDataBlock={deleteDataBlock}
-                handleDeleteCancel={handleDeleteCancel}
                 handleDeleteConfirm={handleDeleteConfirm}
-                onDelete={onDelete}
               />
             ) : null;
           })}
@@ -157,26 +147,20 @@ export default function FeaturedTablesTable({
 
 interface FeaturedTablesRowProps {
   canUpdateRelease: boolean;
-  deleteDataBlock?: ReleaseDataBlockSummary | undefined;
   dataBlock: ReleaseDataBlockSummary;
   featuredTable: FeaturedTable;
   link: string;
   releaseVersionId: string;
-  handleDeleteCancel: () => void;
-  handleDeleteConfirm: () => Promise<void>;
-  onDelete: (dataBlock: ReleaseDataBlockSummary) => void;
+  handleDeleteConfirm: (deletedDataBlockId?: string) => Promise<void>;
 }
 
 function FeaturedTablesRow({
   canUpdateRelease,
-  deleteDataBlock,
   dataBlock,
   featuredTable,
   link,
   releaseVersionId,
-  handleDeleteCancel,
   handleDeleteConfirm,
-  onDelete,
 }: FeaturedTablesRowProps) {
   return (
     <tr>
@@ -204,20 +188,9 @@ function FeaturedTablesRow({
         </Link>
         {canUpdateRelease && (
           <DataBlockDeletePlanModal
-            open={!!deleteDataBlock && deleteDataBlock.id === dataBlock.id}
             releaseVersionId={releaseVersionId}
             dataBlockId={dataBlock.id}
-            triggerButton={
-              <ButtonText
-                className="govuk-!-margin-bottom-0"
-                onClick={() => onDelete(dataBlock)}
-              >
-                Delete block
-              </ButtonText>
-            }
-            onConfirm={handleDeleteConfirm}
-            onCancel={handleDeleteCancel}
-            onExit={handleDeleteCancel}
+            onConfirm={() => handleDeleteConfirm(dataBlock.id)}
           />
         )}
       </td>

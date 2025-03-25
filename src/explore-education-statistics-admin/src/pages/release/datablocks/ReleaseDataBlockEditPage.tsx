@@ -13,13 +13,11 @@ import dataBlocksService, {
   ReleaseDataBlock,
 } from '@admin/services/dataBlockService';
 import permissionService from '@admin/services/permissionService';
-import Button from '@common/components/Button';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
 import UrlContainer from '@common/components/UrlContainer';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
-import useToggle from '@common/hooks/useToggle';
 import React, { useCallback, useRef } from 'react';
 import { generatePath, RouteComponentProps } from 'react-router';
 
@@ -38,8 +36,6 @@ const ReleaseDataBlockEditPage = ({
 
   const config = useConfig();
   const pageRef = useRef<HTMLDivElement>(null);
-
-  const [isDeleting, toggleDeleting] = useToggle(false);
 
   const {
     value: model,
@@ -153,17 +149,10 @@ const ReleaseDataBlockEditPage = ({
 
               {canUpdateRelease && (
                 <DataBlockDeletePlanModal
-                  open={isDeleting}
                   releaseVersionId={releaseVersionId}
                   dataBlockId={dataBlockId}
-                  triggerButton={
-                    <Button variant="warning" onClick={toggleDeleting.on}>
-                      Delete this data block
-                    </Button>
-                  }
+                  triggerButtonVariant="BUTTON"
                   onConfirm={handleDataBlockDelete}
-                  onCancel={toggleDeleting.off}
-                  onExit={toggleDeleting.off}
                 />
               )}
 

@@ -1,27 +1,28 @@
 import dataBlocksService from '@admin/services/dataBlockService';
+import Button from '@common/components/Button';
+import ButtonText from '@common/components/ButtonText';
 import ModalConfirm from '@common/components/ModalConfirm';
 import useAsyncRetry from '@common/hooks/useAsyncRetry';
-import React, { ReactNode } from 'react';
+import useToggle from '@common/hooks/useToggle';
+import React from 'react';
 
 interface Props {
   releaseVersionId: string;
   dataBlockId: string;
-  open: boolean;
-  triggerButton: ReactNode;
+  // The edit dataBlock page has a button, but other instances are
+  // within a table and appear as button text
+  triggerButtonVariant?: 'TEXT' | 'BUTTON';
   onConfirm: () => void;
-  onCancel: () => void;
-  onExit: () => void;
 }
 
 const DataBlockDeletePlanModal = ({
   releaseVersionId,
   dataBlockId,
-  open,
-  triggerButton,
+  triggerButtonVariant = 'TEXT',
   onConfirm,
-  onCancel,
-  onExit,
 }: Props) => {
+  const [open, toggleOpen] = useToggle(false);
+
   const { value: deletePlan } = useAsyncRetry(
     () => dataBlocksService.getDeleteBlockPlan(releaseVersionId, dataBlockId),
     [releaseVersionId, dataBlockId],
@@ -35,13 +36,27 @@ const DataBlockDeletePlanModal = ({
     <ModalConfirm
       title="Delete data block"
       open={open}
-      triggerButton={triggerButton}
+      triggerButton={
+        triggerButtonVariant === 'TEXT' ? (
+          <ButtonText
+            className="govuk-!-margin-bottom-0"
+            onClick={toggleOpen.on}
+          >
+            Delete block
+          </ButtonText>
+        ) : (
+          <Button variant="warning" onClick={toggleOpen.on}>
+            Delete this data block
+          </Button>
+        )
+      }
       onConfirm={async () => {
         await dataBlocksService.deleteDataBlock(releaseVersionId, dataBlockId);
         onConfirm();
+        toggleOpen.off();
       }}
-      onExit={onExit}
-      onCancel={onCancel}
+      onExit={toggleOpen.off}
+      onCancel={toggleOpen.off}
     >
       <p>Are you sure you wish to delete this data block?</p>
 

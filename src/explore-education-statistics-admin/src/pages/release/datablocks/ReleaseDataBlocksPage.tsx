@@ -12,16 +12,14 @@ import {
   ReleaseRouteParams,
   releaseTableToolRoute,
 } from '@admin/routes/releaseRoutes';
-import { ReleaseDataBlockSummary } from '@admin/services/dataBlockService';
 import featuredTableService, {
   FeaturedTable,
 } from '@admin/services/featuredTableService';
-import ButtonText from '@common/components/ButtonText';
 import FormattedDate from '@common/components/FormattedDate';
 import InsetText from '@common/components/InsetText';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import WarningMessage from '@common/components/WarningMessage';
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import { generatePath, RouteComponentProps } from 'react-router';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 
@@ -29,9 +27,6 @@ const ReleaseDataBlocksPage = ({
   match,
 }: RouteComponentProps<ReleaseRouteParams>) => {
   const { publicationId, releaseVersionId } = match.params;
-
-  const [dataBlockToDelete, setDataBlockToDelete] =
-    useState<ReleaseDataBlockSummary>();
 
   const queryClient = useQueryClient();
 
@@ -51,40 +46,36 @@ const ReleaseDataBlocksPage = ({
   const { data: canUpdateRelease = true, isLoading: isLoadingPermissions } =
     useQuery(permissionQueries.canUpdateRelease(releaseVersionId));
 
-  const handleDeleteConfirm = useCallback(async () => {
-    if (!dataBlockToDelete) {
-      return;
-    }
+  const handleDeleteConfirm = useCallback(
+    async (deletedDataBlockId?: string) => {
+      if (!deletedDataBlockId) {
+        return;
+      }
 
-    queryClient.setQueryData(
+      queryClient.setQueryData(
+        listDataBlocksQuery.queryKey,
+        dataBlocks.filter(dataBlock => dataBlock.id !== deletedDataBlockId),
+      );
+
+      queryClient.setQueryData(
+        listFeaturedTablesQuery.queryKey,
+        featuredTables.filter(
+          table => table.dataBlockId !== deletedDataBlockId,
+        ),
+      );
+      await queryClient.invalidateQueries([
+        listDataBlocksQuery.queryKey,
+        listFeaturedTablesQuery.queryKey,
+      ]);
+    },
+    [
+      dataBlocks,
+      featuredTables,
       listDataBlocksQuery.queryKey,
-      dataBlocks.filter(dataBlock => dataBlock.id !== dataBlockToDelete.id),
-    );
-
-    queryClient.setQueryData(
       listFeaturedTablesQuery.queryKey,
-      featuredTables.filter(
-        table => table.dataBlockId !== dataBlockToDelete.id,
-      ),
-    );
-    await queryClient.invalidateQueries([
-      listDataBlocksQuery.queryKey,
-      listFeaturedTablesQuery.queryKey,
-    ]);
-
-    setDataBlockToDelete(undefined);
-  }, [
-    dataBlocks,
-    dataBlockToDelete,
-    featuredTables,
-    listDataBlocksQuery.queryKey,
-    listFeaturedTablesQuery.queryKey,
-    queryClient,
-  ]);
-
-  const handleDeleteCancel = useCallback(() => {
-    setDataBlockToDelete(undefined);
-  }, []);
+      queryClient,
+    ],
+  );
 
   const handleSaveOrder = useCallback(
     async (reorderedTables: FeaturedTable[]) => {
@@ -159,13 +150,10 @@ const ReleaseDataBlocksPage = ({
         <FeaturedTablesTable
           canUpdateRelease={canUpdateRelease}
           dataBlocks={dataBlocks}
-          deleteDataBlock={dataBlockToDelete}
           featuredTables={featuredTables}
           publicationId={publicationId}
           releaseVersionId={releaseVersionId}
-          handleDeleteCancel={handleDeleteCancel}
           handleDeleteConfirm={handleDeleteConfirm}
-          onDelete={setDataBlockToDelete}
           onSaveOrder={handleSaveOrder}
         />
       )}
@@ -221,23 +209,9 @@ const ReleaseDataBlocksPage = ({
                     </Link>
                     {canUpdateRelease && (
                       <DataBlockDeletePlanModal
-                        open={
-                          !!dataBlockToDelete &&
-                          dataBlockToDelete.id === dataBlock.id
-                        }
                         releaseVersionId={releaseVersionId}
                         dataBlockId={dataBlock.id}
-                        triggerButton={
-                          <ButtonText
-                            className="govuk-!-margin-bottom-0"
-                            onClick={() => setDataBlockToDelete(dataBlock)}
-                          >
-                            Delete block
-                          </ButtonText>
-                        }
-                        onConfirm={handleDeleteConfirm}
-                        onCancel={handleDeleteCancel}
-                        onExit={handleDeleteCancel}
+                        onConfirm={() => handleDeleteConfirm(dataBlock.id)}
                       />
                     )}
                   </td>
