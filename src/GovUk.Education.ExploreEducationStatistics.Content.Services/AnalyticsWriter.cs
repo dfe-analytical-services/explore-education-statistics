@@ -1,17 +1,62 @@
 #nullable enable
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
+using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Services;
 
-public class AnalyticsWriter : IAnalyticsWriter
+public class AnalyticsWriter(
+    IAnalyticsPathResolver analyticsPathResolver,
+    ILogger<IAnalyticsWriter> logger
+    ) : IAnalyticsWriter
 {
 
-    public Task ReportReleaseVersionZipDownload(CaptureReleaseVersionZipDownloadRequest request)
+    public async Task ReportReleaseVersionZipDownload(CaptureReleaseVersionZipDownloadRequest request)
     {
-        throw new NotImplementedException(); // @MarkFix
+        logger.LogInformation(
+            "Capturing ReleaseVersionZipDownload event analytics for releaseVersion {ReleaseVersionId}{AndFileIds}",
+            request.ReleaseVersionId,
+            request.FileIds == null ? "" : $" and file(s) {request.FileIds.JoinToString(',')}");
+
+        var serialisedRequest = JsonSerializationUtils.Serialize(
+            obj: request,
+            formatting: Formatting.Indented,
+            orderedProperties: true,
+            camelCase: true);
+
+        var directory = analyticsPathResolver.ZipDownloadsDirectoryPath();
+
+        var randomStr = RandomUtils.GenerateRandomAlphanumericString(length: 5);
+
+        var filename = $"{DateTime.UtcNow:yyyyMMdd-HHmmss-fff}_{randomStr}_{request.ReleaseVersionId}.json"; // @MarkFix keep randomStr to prevent clashes?
+
+        try
+        {
+            Directory.CreateDirectory(directory);
+
+            var filePath = Path.Combine(directory, filename);
+            if (File.Exists(filePath))
+            {
+                throw new Exception("Tried to create a file that already exists for ReleaseVersionZipDownloadRequest!");
+            }
+
+            await File.WriteAllTextAsync(
+                filePath,
+                contents: serialisedRequest);
+        }
+        catch (Exception e)
+        {
+            logger.LogError(
+                exception: e,
+                message: "Error whilst writing {ReleaseVersionZipDownloadRequest} to disk",
+                nameof(CaptureReleaseVersionZipDownloadRequest));
+        }
     }
 
     public record CaptureReleaseVersionZipDownloadRequest(

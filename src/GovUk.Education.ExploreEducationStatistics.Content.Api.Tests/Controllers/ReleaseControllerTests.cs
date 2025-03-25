@@ -14,11 +14,9 @@ using GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Builders;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.Cache;
-using GovUk.Education.ExploreEducationStatistics.Content.Services.Options;
 using GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Content.ViewModels.Extensions;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Options;
 using Moq;
 using Xunit;
 
@@ -498,15 +496,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
             return new ReleaseCacheViewModel(Guid.NewGuid());
         }
 
-        private static IOptions<AnalyticsOptions> DefaultAnalyticsOptions()
-        {
-            return new AnalyticsOptions
-            {
-                Enabled = false,
-                BasePath = "/data/analytics",
-            }.ToOptionsWrapper();
-        }
-
         private static ReleaseController BuildReleaseController(
             IMethodologyCacheService? methodologyCacheService = null,
             IPublicationCacheService? publicationCacheService = null,
@@ -520,7 +509,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
                 releaseCacheService ?? Mock.Of<IReleaseCacheService>(MockBehavior.Strict),
                 releaseService ?? Mock.Of<IReleaseService>(MockBehavior.Strict));
         }
-        
+
         private void AssertAll(params IEnumerable<Action>[] assertions) => Assert.All(assertions.SelectMany(a => a), assertion => assertion());
     }
 }

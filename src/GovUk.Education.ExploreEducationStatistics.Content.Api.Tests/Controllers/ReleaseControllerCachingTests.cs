@@ -9,9 +9,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Api.Cache;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.Cache;
-using GovUk.Education.ExploreEducationStatistics.Content.Services.Options;
 using GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
-using Microsoft.Extensions.Options;
 using Moq;
 using NCrontab;
 using Xunit;
@@ -177,15 +175,6 @@ public class ReleaseControllerCachingTests : CacheServiceTestFixture
     private static ReleaseCacheViewModel BuildReleaseCacheViewModel()
     {
         return new ReleaseCacheViewModel(Guid.NewGuid());
-    }
-
-    private static IOptions<AnalyticsOptions> DefaultAnalyticsOptions()
-    {
-        return new AnalyticsOptions
-        {
-            Enabled = false,
-            BasePath = "/data/analytics",
-        }.ToOptionsWrapper();
     }
 
     private static ReleaseController BuildReleaseController(
