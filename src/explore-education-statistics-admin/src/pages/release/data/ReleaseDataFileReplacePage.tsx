@@ -104,6 +104,7 @@ const ReleaseDataFileReplacePage = ({
       });
     } else {
       file = await releaseDataFileService.uploadZipDataFile(releaseVersionId, {
+        title: values.title!,
         replacingFileId: currentFile.id,
         zipFile: values.zipFile as File,
       });

@@ -20,7 +20,6 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Fixtures;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Moq;
 using System;
@@ -2284,28 +2283,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             }
 
             var zipFormFile = CreateFormFileMock(zipFileName, "application/zip").Object;
-            var archiveFile = new ArchiveDataSetFile(subjectName, dataFileName, metaFileName);
             var privateBlobStorageService = new Mock<IPrivateBlobStorageService>(Strict);
-            var dataArchiveValidationService = new Mock<IDataArchiveValidationService>(Strict);
             var fileUploadsValidatorService = new Mock<IFileUploadsValidatorService>(Strict);
             var dataImportService = new Mock<IDataImportService>(Strict);
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
-                dataArchiveValidationService
-                    .Setup(s => s.ValidateDataArchiveFile(
-                        releaseVersion.Id,
-                        subjectName,
-                        zipFormFile,
-                        null))
-                    .ReturnsAsync(archiveFile);
-
-                dataArchiveValidationService
-                    .Setup(s => s.ValidateDataArchiveFile(
-                        releaseVersion.Id, subjectName, zipFormFile, null))
-                    .ReturnsAsync(new Either<ActionResult, ArchiveDataSetFile>(archiveFile));
-
                 dataImportService
                     .Setup(s => s.Import(
                         It.IsAny<Guid>(),
@@ -2329,7 +2313,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     statisticsDbContext: statisticsDbContext,
                     privateBlobStorageService: privateBlobStorageService.Object,
                     dataImportService: dataImportService.Object,
-                    dataArchiveValidationService: dataArchiveValidationService.Object,
                     fileUploadsValidatorService: fileUploadsValidatorService.Object
                 );
 
@@ -2341,7 +2324,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     cancellationToken: default)).AssertRight();
 
                 MockUtils.VerifyAllMocks(privateBlobStorageService,
-                    dataArchiveValidationService,
                     fileUploadsValidatorService,
                     dataImportService);
 
@@ -2450,20 +2432,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             }
 
             var zipFormFile = CreateFormFileMock(zipFileName).Object;
-            var archiveFile = new ArchiveDataSetFile(subjectName, dataFileName, metaFileName);
             var privateBlobStorageService = new Mock<IPrivateBlobStorageService>(Strict);
-            var dataArchiveValidationService = new Mock<IDataArchiveValidationService>(Strict);
             var fileUploadsValidatorService = new Mock<IFileUploadsValidatorService>(Strict);
             var dataImportService = new Mock<IDataImportService>(Strict);
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
-                dataArchiveValidationService
-                    .Setup(s => s.ValidateDataArchiveFile(
-                        releaseVersion.Id, subjectName, zipFormFile, null))
-                    .ReturnsAsync(new Either<ActionResult, ArchiveDataSetFile>(archiveFile));
-
                 dataImportService
                     .Setup(s => s.Import(
                         It.IsAny<Guid>(),
@@ -2484,7 +2459,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     statisticsDbContext: statisticsDbContext,
                     privateBlobStorageService: privateBlobStorageService.Object,
                     dataImportService: dataImportService.Object,
-                    dataArchiveValidationService: dataArchiveValidationService.Object,
                     fileUploadsValidatorService: fileUploadsValidatorService.Object
                 );
 
@@ -2498,7 +2472,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var dataFileInfo = result.AssertRight();
 
                 MockUtils.VerifyAllMocks(privateBlobStorageService,
-                    dataArchiveValidationService,
                     fileUploadsValidatorService,
                     dataImportService);
 
@@ -2590,21 +2563,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             }
 
             var zipFormFile = CreateFormFileMock(zipFileName, "application/zip").Object;
-            var archiveFile = new ArchiveDataSetFile(originalDataReleaseFile.Name, dataFileName, metaFileName);
             var privateBlobStorageService = new Mock<IPrivateBlobStorageService>(Strict);
-            var dataArchiveValidationService = new Mock<IDataArchiveValidationService>(Strict);
             var fileUploadsValidatorService = new Mock<IFileUploadsValidatorService>(Strict);
             var dataImportService = new Mock<IDataImportService>(Strict);
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
-                dataArchiveValidationService
-                    .Setup(s => s.ValidateDataArchiveFile(
-                        releaseVersion.Id, originalDataReleaseFile.Name, zipFormFile,
-                        It.Is<File>(file => file.Filename == originalDataReleaseFile.File.Filename)))
-                    .ReturnsAsync(new Either<ActionResult, ArchiveDataSetFile>(archiveFile));
-
                 dataImportService
                     .Setup(s => s.Import(
                         It.IsAny<Guid>(),
@@ -2628,7 +2593,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     statisticsDbContext: statisticsDbContext,
                     privateBlobStorageService: privateBlobStorageService.Object,
                     dataImportService: dataImportService.Object,
-                    dataArchiveValidationService: dataArchiveValidationService.Object,
                     fileUploadsValidatorService: fileUploadsValidatorService.Object
                 );
 
@@ -2640,7 +2604,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     cancellationToken: default)).AssertRight();
 
                 MockUtils.VerifyAllMocks(privateBlobStorageService,
-                    dataArchiveValidationService,
                     fileUploadsValidatorService,
                     dataImportService);
 

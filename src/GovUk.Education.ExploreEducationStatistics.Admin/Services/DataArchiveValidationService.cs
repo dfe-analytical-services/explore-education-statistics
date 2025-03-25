@@ -80,7 +80,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
                 if (datasetName.Length > 120)
                 {
-                    errors.Add(ValidationMessages.GenerateErrorDataSetTitleTooLong(datasetName));
+                    errors.Add(ValidationMessages.GenerateErrorDataSetTitleTooLong(datasetName, 120));
                 }
 
                 dataSetNamesCsvEntries.Add((BaseFilename: filename, Title: datasetName));
