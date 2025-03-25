@@ -13,7 +13,7 @@ import LoadingSpinner from '@common/components/LoadingSpinner';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
 import useToggle from '@common/hooks/useToggle';
 import Yup from '@common/validation/yup';
-import React, { useMemo } from 'react';
+import React, { useEffect, useMemo, useRef } from 'react';
 import { ObjectSchema } from 'yup';
 import PublicationUpdateConfirmModal from '@admin/pages/publication/components/PublicationUpdateConfirmModal';
 
@@ -46,6 +46,13 @@ export default function PublicationDetailsForm({
   onSubmit,
 }: Props) {
   const [showConfirmModal, toggleConfirmModal] = useToggle(false);
+  const submitButtonRef = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    if (showConfirmModal === false) {
+      submitButtonRef.current?.focus();
+    }
+  }, [showConfirmModal]);
 
   const { value, isLoading } = useAsyncHandledRetry(async () => {
     const themes = await themeService.getThemes();
@@ -158,7 +165,9 @@ export default function PublicationDetailsForm({
                 )}
 
                 <ButtonGroup>
-                  <Button type="submit">Update publication details</Button>
+                  <Button type="submit" ref={submitButtonRef}>
+                    Update publication details
+                  </Button>
                   <ButtonText onClick={onCancel}>Cancel</ButtonText>
                 </ButtonGroup>
               </Form>

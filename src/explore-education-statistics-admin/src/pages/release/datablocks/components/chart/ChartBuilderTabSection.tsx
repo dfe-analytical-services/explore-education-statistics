@@ -4,6 +4,7 @@ import ChartBuilder, {
 import { SavedDataBlock } from '@admin/pages/release/datablocks/components/DataBlockPageTabs';
 import { ReleaseDataBlock } from '@admin/services/dataBlockService';
 import releaseChartFileService from '@admin/services/releaseChartFileService';
+import { RefContextProvider } from '@common/contexts/RefContext';
 import { Chart } from '@common/modules/charts/types/chart';
 import { FullTable } from '@common/modules/table-tool/types/fullTable';
 import mapFullTable from '@common/modules/table-tool/utils/mapFullTable';
@@ -127,16 +128,18 @@ const ChartBuilderTabSection = ({
   );
 
   return (
-    <ChartBuilder
-      releaseVersionId={releaseVersionId}
-      data={table.results}
-      meta={meta}
-      initialChart={dataBlock.charts[0]}
-      tableTitle={dataBlock.heading}
-      onChartSave={handleChartSave}
-      onChartDelete={handleChartDelete}
-      onTableQueryUpdate={handleTableQueryUpdate}
-    />
+    <RefContextProvider>
+      <ChartBuilder
+        releaseVersionId={releaseVersionId}
+        data={table.results}
+        meta={meta}
+        initialChart={dataBlock.charts[0]}
+        tableTitle={dataBlock.heading}
+        onChartSave={handleChartSave}
+        onChartDelete={handleChartDelete}
+        onTableQueryUpdate={handleTableQueryUpdate}
+      />
+    </RefContextProvider>
   );
 };
 
