@@ -1,10 +1,9 @@
 #nullable enable
-using System;
-using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Channels;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
+using static GovUk.Education.ExploreEducationStatistics.Content.Services.AnalyticsWriter;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Services;
 
@@ -25,8 +24,4 @@ public class AnalyticsManager : IAnalyticsManager
     {
         return _channel.Reader.ReadAsync(cancellationToken);
     }
-
-    public record CaptureReleaseVersionZipDownloadRequest( // @MarkFix move this somewhere else
-        Guid ReleaseVersionId,
-        IList<Guid>? FileIds = null);
 }

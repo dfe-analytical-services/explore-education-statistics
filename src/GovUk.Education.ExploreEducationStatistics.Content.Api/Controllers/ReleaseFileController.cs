@@ -10,12 +10,12 @@ using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Requests;
-using GovUk.Education.ExploreEducationStatistics.Content.Services;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using static GovUk.Education.ExploreEducationStatistics.Content.Services.AnalyticsWriter;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
 {
@@ -103,7 +103,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
                     try
                     {
                         analyticsManager.AddReleaseVersionZipDownload(
-                            new AnalyticsManager.CaptureReleaseVersionZipDownloadRequest(releaseVersionId, fileIds),
+                            new CaptureReleaseVersionZipDownloadRequest(releaseVersionId, fileIds),
                             cancellationToken);
                     }
                     catch (Exception e)

@@ -196,7 +196,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api
 
             if (AnalyticsOptions.Enabled)
             {
-                services.AddSingleton<IAnalyticsManager, AnalyticsManager>(); // @MarkFix Singleton correct?
+                services.AddSingleton<IAnalyticsManager, AnalyticsManager>();
+                services.AddHostedService<AnalyticsConsumer>();
+                services.AddSingleton<IAnalyticsWriter, AnalyticsWriter>();
             }
             else
             {
@@ -277,13 +279,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api
         private class NoopAnalyticsManager : IAnalyticsManager
         {
             public Task AddReleaseVersionZipDownload(
-                AnalyticsManager.CaptureReleaseVersionZipDownloadRequest request,
+                AnalyticsWriter.CaptureReleaseVersionZipDownloadRequest request,
                 CancellationToken cancellationToken)
             {
                 return Task.CompletedTask;
             }
 
-            public async ValueTask<AnalyticsManager.CaptureReleaseVersionZipDownloadRequest>
+            public async ValueTask<AnalyticsWriter.CaptureReleaseVersionZipDownloadRequest>
                 ReadReleaseVersionZipDownload(CancellationToken cancellationToken)
             {
                 await Task.Delay(Timeout.Infinite, cancellationToken);
