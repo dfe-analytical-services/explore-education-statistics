@@ -51,7 +51,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             List<ErrorViewModel> errors = [];
             var isReplacement = replacingFile != null;
 
-            errors.AddRange(ValidateDataSetTitle(
+            errors.AddRange(ValidateDataSetTitleDuplication(
                 releaseVersionId,
                 dataSetTitle,
                 isReplacement));
@@ -148,19 +148,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return Unit.Instance;
         }
 
-        private List<ErrorViewModel> ValidateDataSetTitle(
+        private List<ErrorViewModel> ValidateDataSetTitleDuplication(
             Guid releaseVersionId,
             string title,
             bool isReplacement)
         {
-            List<ErrorViewModel> errors = [];
-
-            if (ContainsSpecialChars(title))
-            {
-                errors.Add(ValidationMessages.GenerateErrorDataSetTitleShouldNotContainSpecialCharacters(title));
-            }
-
-            if (!isReplacement) // if a replacement, we get the title from the replacement which is already validated as unique
+            if (!isReplacement) // if it's a replacement, we get the title from the replacement which is already validated as unique
             {
                 var dataSetNameExists = _context.ReleaseFiles
                     .Include(rf => rf.File)
@@ -171,11 +164,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
                 if (dataSetNameExists)
                 {
-                    errors.Add(ValidationMessages.GenerateErrorDataSetTitleShouldBeUnique(title));
+                    return [ValidationMessages.GenerateErrorDataSetTitleShouldBeUnique(title)];
                 }
             }
 
-            return errors;
+            return [];
         }
 
         private static bool ContainsSpacesOrSpecialChars(string filename)
@@ -184,8 +177,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                    ContainsSpecialChars(filename);
         }
 
-        private static bool ContainsSpecialChars(string filename)
+        public static bool ContainsSpecialChars(string filename)
         {
+            if (string.IsNullOrWhiteSpace(filename))
+            {
+                return false;
+            }
+
             return filename.IndexOf("&", Ordinal) > -1 ||
                    filename.IndexOfAny(Path.GetInvalidFileNameChars()) > -1;
         }
@@ -255,7 +253,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             Stream metaFileStream)
         {
             List<ErrorViewModel> errors = [];
-
+            // pass cancellation tokens to these for async
             if (!await _fileTypeService.IsValidCsvFile(dataFileStream))
             {
                 errors.Add(ValidationMessages.GenerateErrorMustBeCsvFile(dataFileName));
