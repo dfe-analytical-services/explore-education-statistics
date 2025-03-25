@@ -107,7 +107,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                     request.ReleaseVersionId,
                     request.DataFile,
                     request.MetaFile,
-                    request.DataSetTitle,
+                    request.Title,
                     request.ReplacingFileId,
                     cancellationToken)
                 .HandleFailuresOrOk();
@@ -133,7 +133,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         [HttpPost("releaseVersions/upload-bulk-zip-data")]
         [DisableRequestSizeLimit]
         [RequestFormLimits(ValueLengthLimit = int.MaxValue, MultipartBodyLengthLimit = int.MaxValue)]
-        public async Task<ActionResult<List<ArchiveDataSetFileViewModel>>> UploadBulkZipDataSetsToTempStorage(
+        public async Task<ActionResult<List<ArchiveDataSetFileViewModel>>> UploadDataSetAsBulkZip(
             [FromForm] UploadDataSetAsBulkZipRequest request,
             CancellationToken cancellationToken)
         {

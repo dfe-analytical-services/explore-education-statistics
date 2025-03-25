@@ -61,6 +61,7 @@ export type UploadZipDataFileRequest =
       zipFile: File;
     }
   | {
+      title: string;
       replacingFileId: string;
       zipFile: File;
     };
