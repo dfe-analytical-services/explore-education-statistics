@@ -1,39 +1,32 @@
 #nullable enable
 using System;
 using System.Collections.Generic;
-using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+using System.Threading;
+using System.Threading.Channels;
+using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Content.Services.Options;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Services;
 
 public class AnalyticsManager : IAnalyticsManager
 {
-    private readonly ILogger<IAnalyticsManager> _logger;
+    private readonly Channel<CaptureReleaseVersionZipDownloadRequest> _channel =
+        Channel.CreateUnbounded<CaptureReleaseVersionZipDownloadRequest>();
 
-    private IOptions<AnalyticsOptions> _analyticsOptions;
-
-    public AnalyticsManager(
-        ILogger<IAnalyticsManager> logger,
-        IOptions<AnalyticsOptions> analyticsOptions)
+    public async Task AddReleaseVersionZipDownload(
+        CaptureReleaseVersionZipDownloadRequest request,
+        CancellationToken cancellationToken)
     {
-        _logger = logger;
-        _analyticsOptions = analyticsOptions;
+        await _channel.Writer.WriteAsync(request, cancellationToken);
     }
 
-    public void RecordReleaseVersionZipDownload(Guid releaseVersionId, IList<Guid>? fileIds = null)
+    public ValueTask<CaptureReleaseVersionZipDownloadRequest> ReadReleaseVersionZipDownload(
+        CancellationToken cancellationToken)
     {
-        var filesAsString = fileIds == null
-            ? "ALL FILES!"
-            : fileIds.JoinToString(' ');
-
-        _logger.LogWarning(
-            $"YES!!!! AnalyticsManager logging {this.GetType().FullName} for ReleaseVersion {releaseVersionId}\n" +
-            $"with files {filesAsString}\n" +
-            $"AND OPTIONS!!! Enabled: {_analyticsOptions.Value.Enabled}, BasePath: {_analyticsOptions.Value.BasePath}\n\n");
+        return _channel.Reader.ReadAsync(cancellationToken);
     }
 
-
+    public record CaptureReleaseVersionZipDownloadRequest( // @MarkFix move this somewhere else
+        Guid ReleaseVersionId,
+        IList<Guid>? FileIds = null);
 }

@@ -1,10 +1,15 @@
 #nullable enable
-using System;
-using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
 
 public interface IAnalyticsManager
 {
-    void RecordReleaseVersionZipDownload(Guid releaseVersionId, IList<Guid>? fileIds = null);
+    Task AddReleaseVersionZipDownload(
+        AnalyticsManager.CaptureReleaseVersionZipDownloadRequest request,
+        CancellationToken cancellationToken);
+
+    ValueTask<AnalyticsManager.CaptureReleaseVersionZipDownloadRequest>
+        ReadReleaseVersionZipDownload(CancellationToken cancellationToken);
 }

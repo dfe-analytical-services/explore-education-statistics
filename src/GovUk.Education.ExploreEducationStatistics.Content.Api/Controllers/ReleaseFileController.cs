@@ -10,10 +10,12 @@ using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Requests;
+using GovUk.Education.ExploreEducationStatistics.Content.Services;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
 {
@@ -22,7 +24,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
     public class ReleaseFileController(
         IPersistenceHelper<ContentDbContext> persistenceHelper,
         IReleaseFileService releaseFileService,
-        IAnalyticsManager analyticsManager)
+        IAnalyticsManager analyticsManager,
+        ILogger<ReleaseFileController> logger)
         : ControllerBase
     {
         [HttpPost("release-files")]
@@ -58,6 +61,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
         [Produces(MediaTypeNames.Application.Octet)]
         public async Task<ActionResult> StreamFilesToZip(
             Guid releaseVersionId,
+            CancellationToken cancellationToken,
             [FromQuery] IList<Guid>? fileIds = null)
         {
             return await persistenceHelper.CheckEntityExists<ReleaseVersion>(
@@ -96,7 +100,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
                 )
                 .OnSuccessDo(_ =>
                 {
-                    analyticsManager.RecordReleaseVersionZipDownload(releaseVersionId, fileIds);
+                    try
+                    {
+                        analyticsManager.AddReleaseVersionZipDownload(
+                            new AnalyticsManager.CaptureReleaseVersionZipDownloadRequest(releaseVersionId, fileIds),
+                            cancellationToken);
+                    }
+                    catch (Exception e)
+                    {
+                        logger.LogError(
+                            exception: e,
+                            message: "Error whilst adding a ReleaseVersionZipDownload event to {AnalyticsManager}",
+                            nameof(IAnalyticsManager));
+                    }
                 })
                 .HandleFailuresOrNoOp();
         }

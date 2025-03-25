@@ -2,6 +2,8 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Threading;
+using System.Threading.Tasks;
 using FluentValidation;
 using GovUk.Education.ExploreEducationStatistics.Common.Cache;
 using GovUk.Education.ExploreEducationStatistics.Common.Cancellation;
@@ -274,7 +276,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api
 
         private class NoopAnalyticsManager : IAnalyticsManager
         {
-            public void RecordReleaseVersionZipDownload(Guid releaseVersionId, IList<Guid>? fileIds = null) {}
+            public Task AddReleaseVersionZipDownload(
+                AnalyticsManager.CaptureReleaseVersionZipDownloadRequest request,
+                CancellationToken cancellationToken)
+            {
+                return Task.CompletedTask;
+            }
+
+            public async ValueTask<AnalyticsManager.CaptureReleaseVersionZipDownloadRequest>
+                ReadReleaseVersionZipDownload(CancellationToken cancellationToken)
+            {
+                await Task.Delay(Timeout.Infinite, cancellationToken);
+                return default!;
+            }
         }
     }
 }
