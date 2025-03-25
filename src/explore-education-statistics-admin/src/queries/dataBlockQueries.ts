@@ -8,6 +8,13 @@ const dataBlockQueries = createQueryKeys('dataBlocks', {
       queryFn: () => dataBlockService.listDataBlocks(releaseId),
     };
   },
+  getDeleteBlockPlan(releaseVersionId: string, dataBlockId: string) {
+    return {
+      queryKey: [releaseVersionId, dataBlockId],
+      queryFn: () =>
+        dataBlockService.getDeleteBlockPlan(releaseVersionId, dataBlockId),
+    };
+  },
 });
 
 export default dataBlockQueries;
