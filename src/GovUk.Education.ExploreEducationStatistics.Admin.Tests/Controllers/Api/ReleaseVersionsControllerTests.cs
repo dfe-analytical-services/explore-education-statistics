@@ -77,7 +77,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                 new()
                 {
                     ReleaseVersionId = _releaseVersionId,
-                    DataSetTitle = "Data set title",
+                    Title = "Data set title",
                     DataFile = dataFile,
                     MetaFile = metaFile,
                     ReplacingFileId = null
@@ -115,7 +115,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                 new()
                 {
                     ReleaseVersionId = _releaseVersionId,
-                    DataSetTitle = "Data set title",
+                    Title = "Data set title",
                     DataFile = dataFile,
                     MetaFile = metaFile,
                     ReplacingFileId = null
@@ -519,7 +519,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         }
 
         [Fact]
-        public async Task UploadBulkZipDataSetsToTempStorage()
+        public async Task UploadDataSetAsBulkZip()
         {
             // Arrange
             var dataSetFiles = new List<ArchiveDataSetFileViewModel>();
@@ -536,7 +536,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             var controller = BuildController(releaseDataFileService: releaseDataFileService.Object);
 
             // Act
-            var result = await controller.UploadBulkZipDataSetsToTempStorage(
+            var result = await controller.UploadDataSetAsBulkZip(
                 new()
                 {
                     ReleaseVersionId = Guid.NewGuid(),

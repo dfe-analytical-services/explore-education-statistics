@@ -1,7 +1,9 @@
 #nullable enable
 using FluentValidation;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 using System;
@@ -15,7 +17,7 @@ public record UploadDataSetRequest
 
     public Guid? ReplacingFileId { get; init; }
 
-    public string DataSetTitle { get; init; } = string.Empty;
+    public string Title { get; init; } = string.Empty;
 
     public IFormFile DataFile { get; init; } = null!;
 
@@ -28,11 +30,11 @@ public record UploadDataSetRequest
             RuleFor(request => request.ReleaseVersionId)
                 .NotEmpty();
 
-            RuleFor(request => request.DataSetTitle)
+            RuleFor(request => request.Title)
                 .NotEmpty()
                     .WithMessage(ValidationMessages.DataSetTitleCannotBeEmpty)
                 .MaximumLength(120)
-                    .WithMessage(string.Format(ValidationMessages.DataSetTitleTooLong.Message, "{PropertyValue}", 120));
+                    .WithMessage(ValidationMessages.DataSetTitleTooLong, "{PropertyValue}", "120");
 
             RuleFor(request => request.DataFile)
                 .Cascade(CascadeMode.Stop)
@@ -42,7 +44,7 @@ public record UploadDataSetRequest
                 .Cascade(CascadeMode.Stop)
                 .MustBeValidCsvFile()
                 .Must(file => file.FileName.ToLower().EndsWith(".meta.csv"))
-                    .WithMessage(string.Format(ValidationMessages.MetaFilenameMustEndDotMetaDotCsv.Message, "{PropertyValue}"));
+                    .WithMessage(ValidationMessages.MetaFilenameMustEndDotMetaDotCsv, "{PropertyValue}");
         }
     }
 }
@@ -60,8 +62,12 @@ public record UploadDataSetAsZipRequest
 
     public class Validator : AbstractValidator<UploadDataSetAsZipRequest>
     {
-        public Validator()
+        private readonly IFileTypeService _fileTypeService;
+
+        public Validator(IFileTypeService fileTypeService)
         {
+            _fileTypeService = fileTypeService;
+
             RuleFor(request => request.ReleaseVersionId)
                 .NotEmpty();
 
@@ -69,11 +75,15 @@ public record UploadDataSetAsZipRequest
                 .NotEmpty()
                     .WithMessage(ValidationMessages.DataSetTitleCannotBeEmpty)
                 .MaximumLength(120)
-                    .WithMessage(string.Format(ValidationMessages.DataSetTitleTooLong.Message, "{PropertyValue}", 120));
+                    .WithMessage(ValidationMessages.DataSetTitleTooLong, "{PropertyValue}", "120")
+                .Must(file => !FileUploadsValidatorService.ContainsSpecialChars(file))
+                    .WithMessage(ValidationMessages.DataSetTitleShouldNotContainSpecialCharacters, "{PropertyValue}");
 
             RuleFor(request => request.ZipFile)
                 .Cascade(CascadeMode.Stop)
-                .MustBeValidZipFile();
+                .MustBeValidZipFile()
+                .MustAsync(async (file, cancellationToken) => await _fileTypeService.HasValidZipFileMeta(file))
+                    .WithMessage(d => string.Format(ValidationMessages.MustBeZipFile.Message, d.ZipFile.FileName));
         }
     }
 }
@@ -87,14 +97,20 @@ public record UploadDataSetAsBulkZipRequest
 
     public class Validator : AbstractValidator<UploadDataSetAsBulkZipRequest>
     {
-        public Validator()
+        private readonly IFileTypeService _fileTypeService;
+
+        public Validator(IFileTypeService fileTypeService)
         {
+            _fileTypeService = fileTypeService;
+
             RuleFor(request => request.ReleaseVersionId)
                 .NotEmpty();
 
             RuleFor(request => request.ZipFile)
                 .Cascade(CascadeMode.Stop)
-                .MustBeValidZipFile();
+                .MustBeValidZipFile()
+                .MustAsync(async (file, cancellationToken) => await _fileTypeService.HasValidZipFileMeta(file))
+                    .WithMessage(d => string.Format(ValidationMessages.MustBeZipFile.Message, d.ZipFile.FileName));
         }
     }
 }

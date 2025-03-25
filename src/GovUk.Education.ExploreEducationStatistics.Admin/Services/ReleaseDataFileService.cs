@@ -425,12 +425,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         private async Task<DataSetDto> ExtractDataSetArchive(IFormFile zipFile)
         {
-            var errors = await _dataArchiveValidationService.IsValidZipFile(zipFile);
+            //var errors = await _dataArchiveValidationService.IsValidZipFile(zipFile); // why couldn't this be in the validator?
 
-            if (errors.Count > 0)
-            {
-                // return/do stuff
-            }
+            //if (errors.Count > 0)
+            //{
+            //    // return/do stuff
+            //}
 
             await using var stream = zipFile.OpenReadStream();
             using var archive = new ZipArchive(stream);

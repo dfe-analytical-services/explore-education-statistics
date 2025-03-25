@@ -48,10 +48,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Guid.NewGuid(),
                 "Data set title",
                 dataFile.FileName,
-                dataFile.Length,
                 dataFile.OpenReadStream(),
                 metaFile.FileName,
-                metaFile.Length,
                 metaFile.OpenReadStream());
             VerifyAllMocks(fileTypeService);
 
@@ -111,10 +109,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     releaseVersion.Id,
                     toBeReplacedReleaseFile.Name,
                     dataFile.FileName,
-                    dataFile.Length,
                     dataFile.OpenReadStream(),
                     metaFile.FileName,
-                    metaFile.Length,
                     metaFile.OpenReadStream(),
                     toBeReplacedReleaseFile.File);
 
@@ -125,38 +121,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Theory]
-        [InlineData("test/")]
-        [InlineData("test&")]
-        [InlineData("test\0")]
-        public async Task ValidateDataFilesForUpload_DataSetTitleCannotContainSpecialCharacters(string dataSetTitle)
+        [InlineData("test/", true)]
+        [InlineData("test&", true)]
+        [InlineData("test\0", true)]
+        [InlineData("test$", false)]
+        [InlineData("", false)]
+        public void ContainsSpecialChars_WithValue_ReturnsExpectedResult(
+            string dataSetTitle,
+            bool expectedResult)
         {
-            await using var context = InMemoryContentDbContext();
-            var (service, fileTypeService) = BuildService(context);
+            // Act
+            var result = FileUploadsValidatorService.ContainsSpecialChars(dataSetTitle);
 
-            var dataFile = CreateFormFileMock("test.csv").Object;
-            var metaFile = CreateFormFileMock("test.meta.csv").Object;
-
-            fileTypeService
-                .Setup(s => s.IsValidCsvFile(dataFile.OpenReadStream()))
-                .ReturnsAsync(true);
-            fileTypeService
-                .Setup(s => s.IsValidCsvFile(metaFile.OpenReadStream()))
-                .ReturnsAsync(true);
-
-            var errors = await service.ValidateDataSetFilesForUpload(
-                Guid.NewGuid(),
-                dataSetTitle,
-                dataFile.FileName,
-                dataFile.Length,
-                dataFile.OpenReadStream(),
-                metaFile.FileName,
-                metaFile.Length,
-                metaFile.OpenReadStream());
-            VerifyAllMocks(fileTypeService);
-
-            AssertHasErrors(errors, [
-                ValidationMessages.GenerateErrorDataSetTitleShouldNotContainSpecialCharacters(dataSetTitle),
-            ]);
+            // Assert
+            Assert.Equal(expectedResult, result);
         }
 
         [Fact]
@@ -194,10 +172,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     releaseFile.ReleaseVersionId,
                     "Used data set title",
                     dataFile.FileName,
-                    dataFile.Length,
                     dataFile.OpenReadStream(),
                     metaFile.FileName,
-                    metaFile.Length,
                     metaFile.OpenReadStream());
                 VerifyAllMocks(fileTypeService);
 
@@ -228,10 +204,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Guid.NewGuid(),
                 "Data file title",
                 dataFile.FileName,
-                dataFile.Length,
                 dataFile.OpenReadStream(),
                 metaFile.FileName,
-                metaFile.Length,
                 metaFile.OpenReadStream());
             VerifyAllMocks(fileTypeService);
 
@@ -268,10 +242,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Guid.NewGuid(),
                 "Data title",
                 dataFile.FileName,
-                dataFile.Length,
                 dataFile.OpenReadStream(),
                 metaFile.FileName,
-                metaFile.Length,
                 metaFile.OpenReadStream());
             VerifyAllMocks(fileTypeService);
 
@@ -326,10 +298,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     releaseVersion.Id,
                     "Data set title",
                     dataFile.FileName,
-                    dataFile.Length,
                     dataFile.OpenReadStream(),
                     metaFile.FileName,
-                    metaFile.Length,
                     metaFile.OpenReadStream());
                 VerifyAllMocks(fileTypeService);
 
@@ -363,10 +333,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Guid.NewGuid(),
                 "Data set title",
                 dataFile.FileName,
-                dataFile.Length,
                 dataFile.OpenReadStream(),
                 metaFile.FileName,
-                metaFile.Length,
                 metaFile.OpenReadStream());
             VerifyAllMocks(fileTypeService);
 
@@ -448,10 +416,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     releaseVersion.Id,
                     toBeReplacedReleaseFile.Name!,
                     "usedfilename.csv",
-                    dataFile.Length,
                     dataFile.OpenReadStream(),
                     "usedfilename.meta.csv",
-                    metaFile.Length,
                     metaFile.OpenReadStream(),
                     toBeReplacedReleaseFile.File);
 
@@ -515,10 +481,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     releaseVersion.Id,
                     toBeReplacedReleaseFile.Name,
                     dataFile.FileName,
-                    dataFile.Length,
                     dataFile.OpenReadStream(),
                     metaFile.FileName,
-                    metaFile.Length,
                     metaFile.OpenReadStream(),
                     toBeReplacedReleaseFile.File);
 
