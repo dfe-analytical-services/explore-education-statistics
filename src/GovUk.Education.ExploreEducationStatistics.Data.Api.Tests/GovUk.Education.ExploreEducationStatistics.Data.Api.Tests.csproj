@@ -1,43 +1,37 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-    <PropertyGroup>
-        <TargetFramework>net8.0</TargetFramework>
-        <IsPackable>false</IsPackable>
-        <RootNamespace>GovUk.Education.ExploreEducationStatistics.Data.Api.Tests</RootNamespace>
-        <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
-    </PropertyGroup>
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <IsPackable>false</IsPackable>
+    <RootNamespace>GovUk.Education.ExploreEducationStatistics.Data.Api.Tests</RootNamespace>
+    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+  </PropertyGroup>
 
   <ItemGroup>
-    <AssemblyAttribute Include="System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverageAttribute" />
+    <AssemblyAttribute Include="System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverageAttribute"/>
   </ItemGroup>
 
   <ItemGroup>
-        <CompilerVisibleProperty Include="RootNamespace" />
-        <CompilerVisibleProperty Include="ProjectDir" />
-    </ItemGroup>
+    <CompilerVisibleProperty Include="RootNamespace"/>
+    <CompilerVisibleProperty Include="ProjectDir"/>
+  </ItemGroup>
 
-    <ItemGroup>
-        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.10.0" />
-        <PackageReference Include="Moq" Version="4.20.70" />
-        <PackageReference Include="Testcontainers.Azurite" Version="3.9.0" />
-        <PackageReference Include="xunit" Version="2.9.0" />
-        <PackageReference Include="xunit.runner.visualstudio" Version="2.8.2">
-          <PrivateAssets>all</PrivateAssets>
-          <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-        </PackageReference>
-    </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.13.0"/> <!-- Required to execute unit tests in IDE -->
+    <PackageReference Include="Testcontainers.Azurite" Version="4.3.0" />
+  </ItemGroup>
 
-    <ItemGroup>
-      <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Common.Tests\GovUk.Education.ExploreEducationStatistics.Common.Tests.csproj" />
-      <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Content.Model.Tests\GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.csproj" />
-      <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Data.Api\GovUk.Education.ExploreEducationStatistics.Data.Api.csproj" />
-      <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Data.Model.Tests\GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.csproj" />
-    </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Common.Tests\GovUk.Education.ExploreEducationStatistics.Common.Tests.csproj"/>
+    <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Content.Model.Tests\GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.csproj"/>
+    <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Data.Api\GovUk.Education.ExploreEducationStatistics.Data.Api.csproj"/>
+    <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Data.Model.Tests\GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.csproj"/>
+  </ItemGroup>
 
-    <ItemGroup>
-        <None Remove="Resources\**" />
-        <Content Include="Resources\**">
-            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-        </Content>
-    </ItemGroup>
+  <ItemGroup>
+    <None Remove="Resources\**"/>
+    <Content Include="Resources\**">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
 </Project>

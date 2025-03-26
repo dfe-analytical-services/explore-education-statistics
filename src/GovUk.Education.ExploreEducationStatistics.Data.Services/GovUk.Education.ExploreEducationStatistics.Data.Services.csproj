@@ -11,12 +11,6 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="CsvHelper" Version="31.0.4" />
-        <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-        <PackageReference Include="Microsoft.AspNetCore.Authorization" Version="8.0.7" />
-    </ItemGroup>
-
-    <ItemGroup>
         <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Common\GovUk.Education.ExploreEducationStatistics.Common.csproj" />
         <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Content.Model\GovUk.Education.ExploreEducationStatistics.Content.Model.csproj" />
         <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Content.Security\GovUk.Education.ExploreEducationStatistics.Content.Security.csproj" />

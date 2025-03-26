@@ -1,49 +1,39 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-    <PropertyGroup>
-        <TargetFramework>net8.0</TargetFramework>
-        <IsPackable>false</IsPackable>
-        <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
-        <Nullable>enable</Nullable>
-    </PropertyGroup>
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <IsPackable>false</IsPackable>
+    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
 
   <ItemGroup>
-    <AssemblyAttribute Include="System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverageAttribute" />
+    <AssemblyAttribute Include="System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverageAttribute"/>
   </ItemGroup>
 
-    <ItemGroup>
-        <CompilerVisibleProperty Include="RootNamespace" />
-        <CompilerVisibleProperty Include="ProjectDir" />
-    </ItemGroup>
+  <ItemGroup>
+    <CompilerVisibleProperty Include="RootNamespace"/>
+    <CompilerVisibleProperty Include="ProjectDir"/>
+  </ItemGroup>
 
-    <ItemGroup>
-        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.10.0" />
-        <PackageReference Include="Moq" Version="4.20.70" />
-        <PackageReference Include="Snapshooter.Xunit" Version="0.14.1" />
-        <PackageReference Include="Testcontainers" Version="3.9.0" />
-        <PackageReference Include="Testcontainers.Azurite" Version="3.9.0" />
-        <PackageReference Include="Testcontainers.PostgreSql" Version="3.9.0" />
-        <PackageReference Include="xunit" Version="2.9.0" />
-        <PackageReference Include="xunit.runner.visualstudio" Version="2.8.2">
-          <PrivateAssets>all</PrivateAssets>
-          <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-        </PackageReference>
-        <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="8.0.7" />
-    </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.13.0"/> <!-- Required to execute unit tests in IDE -->
+    <PackageReference Include="Testcontainers.Azurite" Version="4.3.0" />
+  </ItemGroup>
 
-    <ItemGroup>
-        <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Common.Tests\GovUk.Education.ExploreEducationStatistics.Common.Tests.csproj" />
-        <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Content.Model.Tests\GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.csproj" />
-        <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Data.Model.Tests\GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.csproj" />
-        <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Data.Services\GovUk.Education.ExploreEducationStatistics.Data.Services.csproj" />
-        <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Publisher\GovUk.Education.ExploreEducationStatistics.Publisher.csproj" />
-        <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Tests\GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Tests.csproj" />
-    </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Common.Tests\GovUk.Education.ExploreEducationStatistics.Common.Tests.csproj"/>
+    <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Content.Model.Tests\GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.csproj"/>
+    <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Data.Model.Tests\GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.csproj"/>
+    <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Data.Services\GovUk.Education.ExploreEducationStatistics.Data.Services.csproj"/>
+    <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Publisher\GovUk.Education.ExploreEducationStatistics.Publisher.csproj"/>
+    <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Tests\GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Tests.csproj"/>
+  </ItemGroup>
 
-    <ItemGroup>
-      <Content Include="appsettings.IntegrationTest.json">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </Content>
-    </ItemGroup>
+  <ItemGroup>
+    <Content Include="appsettings.IntegrationTest.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
 
 </Project>
