@@ -6,13 +6,13 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <CompilerVisibleProperty Include="RootNamespace" />
-    <CompilerVisibleProperty Include="ProjectDir" />
+    <CompilerVisibleProperty Include="RootNamespace"/>
+    <CompilerVisibleProperty Include="ProjectDir"/>
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="GeoJSON.Net" Version="1.4.1" />
-    </ItemGroup>
+    <PackageReference Include="GeoJSON.Net" Version="1.4.1"/>
+  </ItemGroup>
 
   <ItemGroup>
     <Content Include="Migrations\*.sql">
@@ -21,7 +21,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Common\GovUk.Education.ExploreEducationStatistics.Common.csproj" />
+    <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Common\GovUk.Education.ExploreEducationStatistics.Common.csproj"/>
   </ItemGroup>
 
 </Project>
