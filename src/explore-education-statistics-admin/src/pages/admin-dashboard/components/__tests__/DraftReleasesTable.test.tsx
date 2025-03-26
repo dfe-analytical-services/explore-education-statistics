@@ -230,7 +230,7 @@ describe('DraftReleasesTable', () => {
       within(row3cells[2]).getByRole('link', { name: 'Edit Release 1' }),
     ).toHaveAttribute(
       'href',
-      '/publication/publication-1/release/release-1/summary',
+      '/publication/publication-1/release/release-1-version-1/summary',
     );
     expect(
       within(row3cells[2]).queryByRole('button', { name: /View issues/ }),
@@ -254,7 +254,7 @@ describe('DraftReleasesTable', () => {
       within(row4cells[2]).getByRole('link', { name: 'Edit Release 3' }),
     ).toHaveAttribute(
       'href',
-      '/publication/publication-1/release/release-3/summary',
+      '/publication/publication-1/release/release-3-version-1/summary',
     );
     expect(
       within(row4cells[2]).queryByRole('button', { name: /View issues/ }),
@@ -285,7 +285,7 @@ describe('DraftReleasesTable', () => {
       within(row6cells[2]).getByRole('link', { name: 'Edit Release 2' }),
     ).toHaveAttribute(
       'href',
-      '/publication/publication-2/release/release-2/summary',
+      '/publication/publication-2/release/release-2-version-1/summary',
     );
     expect(
       within(row6cells[2]).getByRole('button', {
@@ -315,7 +315,7 @@ describe('DraftReleasesTable', () => {
       within(row8cells[2]).getByRole('link', { name: 'Edit Release 4' }),
     ).toHaveAttribute(
       'href',
-      '/publication/publication-3/release/release-4/summary',
+      '/publication/publication-3/release/release-4-version-1/summary',
     );
     expect(
       within(row8cells[2]).queryByRole('button', { name: /View issues/ }),
@@ -369,7 +369,7 @@ describe('DraftReleasesTable', () => {
       within(row3cells[3]).getByRole('link', { name: 'Edit Release 1' }),
     ).toHaveAttribute(
       'href',
-      '/publication/publication-1/release/release-1/summary',
+      '/publication/publication-1/release/release-1-version-1/summary',
     );
     expect(
       within(row3cells[3]).queryByRole('button', {
@@ -393,7 +393,7 @@ describe('DraftReleasesTable', () => {
       within(row4cells[3]).getByRole('link', { name: 'Edit Release 3' }),
     ).toHaveAttribute(
       'href',
-      '/publication/publication-1/release/release-3/summary',
+      '/publication/publication-1/release/release-3-version-1/summary',
     );
     expect(
       within(row4cells[3]).queryByRole('button', {
@@ -424,7 +424,7 @@ describe('DraftReleasesTable', () => {
       within(row6cells[3]).getByRole('link', { name: 'Edit Release 2' }),
     ).toHaveAttribute(
       'href',
-      '/publication/publication-2/release/release-2/summary',
+      '/publication/publication-2/release/release-2-version-1/summary',
     );
     expect(
       within(row6cells[3]).getByRole('button', {
@@ -454,7 +454,7 @@ describe('DraftReleasesTable', () => {
       within(row8cells[3]).getByRole('link', { name: 'Edit Release 4' }),
     ).toHaveAttribute(
       'href',
-      '/publication/publication-3/release/release-4/summary',
+      '/publication/publication-3/release/release-4-version-1/summary',
     );
     expect(
       within(row8cells[3]).queryByRole('button', {
@@ -500,7 +500,7 @@ describe('DraftReleasesTable', () => {
       within(row3cells[2]).getByRole('link', { name: 'View Release 1' }),
     ).toHaveAttribute(
       'href',
-      '/publication/publication-1/release/release-1/summary',
+      '/publication/publication-1/release/release-1-version-1/summary',
     );
   });
 
@@ -586,7 +586,7 @@ describe('DraftReleasesTable', () => {
 
     expect(
       releaseVersionService.getDeleteReleaseVersionPlan,
-    ).toHaveBeenCalledWith('release-2');
+    ).toHaveBeenCalledWith('release-2-version-1');
 
     const modal = within(screen.getByRole('dialog'));
     expect(modal.getByText('Methodology 1')).toBeInTheDocument();
@@ -600,7 +600,7 @@ describe('DraftReleasesTable', () => {
 
     await waitFor(() => {
       expect(releaseVersionService.deleteReleaseVersion).toHaveBeenCalledWith(
-        'release-2',
+        'release-2-version-1',
       );
     });
 
