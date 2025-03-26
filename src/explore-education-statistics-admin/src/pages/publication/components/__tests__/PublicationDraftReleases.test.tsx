@@ -24,8 +24,8 @@ describe('PublicationDraftReleases', () => {
   const testRelease1: ReleaseVersionSummaryWithPermissions = {
     amendment: false,
     approvalStatus: 'Draft',
-    id: 'release-1-version-1',
-    releaseId: 'release-1',
+    id: 'release-1',
+    releaseId: 'release-id',
     live: false,
     permissions: {
       canAddPrereleaseUsers: false,
@@ -116,7 +116,7 @@ describe('PublicationDraftReleases', () => {
     });
 
     expect(
-      within(row1Cells[4]).getByRole('link', { name: 'Edit Release 1' }),
+      within(row1Cells[4]).getByRole('link', { name: 'Edit draft Release 1' }),
     ).toHaveAttribute(
       'href',
       '/publication/publication-1/release/release-1/summary',
@@ -125,12 +125,6 @@ describe('PublicationDraftReleases', () => {
     expect(
       within(row1Cells[4]).queryByRole('button', {
         name: 'Cancel amendment for Release 1',
-      }),
-    ).not.toBeInTheDocument();
-
-    expect(
-      within(row1Cells[4]).queryByRole('link', {
-        name: 'View existing version for Release 1',
       }),
     ).not.toBeInTheDocument();
 
@@ -147,7 +141,7 @@ describe('PublicationDraftReleases', () => {
     });
 
     expect(
-      within(row2Cells[4]).getByRole('link', { name: 'Edit Release 2' }),
+      within(row2Cells[4]).getByRole('link', { name: 'Edit draft Release 2' }),
     ).toHaveAttribute(
       'href',
       '/publication/publication-1/release/release-2/summary',
@@ -156,12 +150,6 @@ describe('PublicationDraftReleases', () => {
     expect(
       within(row2Cells[4]).queryByRole('button', {
         name: 'Cancel amendment for Release 2',
-      }),
-    ).not.toBeInTheDocument();
-
-    expect(
-      within(row2Cells[4]).queryByRole('link', {
-        name: 'View existing for Release 2',
       }),
     ).not.toBeInTheDocument();
 
@@ -180,7 +168,7 @@ describe('PublicationDraftReleases', () => {
     });
 
     expect(
-      within(row3Cells[4]).getByRole('link', { name: 'Edit Release 3' }),
+      within(row3Cells[4]).getByRole('link', { name: 'Edit draft Release 3' }),
     ).toHaveAttribute(
       'href',
       '/publication/publication-1/release/release-3/summary',
@@ -191,15 +179,6 @@ describe('PublicationDraftReleases', () => {
         name: 'Cancel amendment for Release 3',
       }),
     ).toBeInTheDocument();
-
-    expect(
-      within(row3Cells[4]).getByRole('link', {
-        name: 'View existing version for Release 3',
-      }),
-    ).toHaveAttribute(
-      'href',
-      '/publication/publication-1/release/release-previous-id/summary',
-    );
   });
 
   test('shows an empty message when there are no releases', () => {

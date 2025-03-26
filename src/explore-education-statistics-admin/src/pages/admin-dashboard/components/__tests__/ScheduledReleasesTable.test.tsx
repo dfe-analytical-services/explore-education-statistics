@@ -204,12 +204,12 @@ describe('ScheduledReleasesTable', () => {
     ).toBeInTheDocument();
 
     const row4cells = within(rows[3]).getAllByRole('cell');
-    expect(row4cells[0]).toHaveTextContent('Release 3');
+    expect(row4cells[0]).toHaveTextContent('Release 1');
     expect(row4cells[1]).toHaveTextContent('Scheduled');
     expect(row4cells[2]).toHaveTextContent('View stages');
     expect(row4cells[3]).toHaveTextContent('1 January 2021');
     expect(
-      within(row4cells[4]).getByRole('link', { name: 'Edit Release 3' }),
+      within(row4cells[4]).getByRole('link', { name: 'Edit Release 1' }),
     ).toBeInTheDocument();
 
     expect(within(rows[4]).getByRole('columnheader')).toHaveTextContent(
@@ -230,12 +230,12 @@ describe('ScheduledReleasesTable', () => {
     );
 
     const row8cells = within(rows[7]).getAllByRole('cell');
-    expect(row8cells[0]).toHaveTextContent('Release 4');
+    expect(row8cells[0]).toHaveTextContent('Release 3');
     expect(row8cells[1]).toHaveTextContent('Scheduled');
     expect(row8cells[2]).toHaveTextContent('View stages');
     expect(row8cells[3]).toHaveTextContent('30 May 2021');
     expect(
-      within(row8cells[4]).getByRole('link', { name: 'Edit Release 4' }),
+      within(row8cells[4]).getByRole('link', { name: 'Edit Release 3' }),
     ).toBeInTheDocument();
   });
 
@@ -269,7 +269,7 @@ describe('ScheduledReleasesTable', () => {
       within(row3cells[4]).getByRole('link', { name: 'View Release 1' }),
     ).toHaveAttribute(
       'href',
-      '/publication/publication-1/release/release-1/summary',
+      '/publication/publication-1/release/release-1-version-1/summary',
     );
   });
 

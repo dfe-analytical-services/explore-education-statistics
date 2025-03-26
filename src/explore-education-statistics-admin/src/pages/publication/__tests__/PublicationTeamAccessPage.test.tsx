@@ -375,15 +375,15 @@ describe('PublicationTeamAccessPage', () => {
     ).toBeInTheDocument();
 
     const releaseSelect = screen.getByLabelText('Select release');
-    expect(releaseSelect).toHaveValue('release-1');
+    expect(releaseSelect).toHaveValue('release-1-version-1');
     const releases = within(releaseSelect).queryAllByRole('option');
     expect(releases).toHaveLength(3);
     expect(releases[0]).toHaveTextContent('Academic year 2023/24');
-    expect(releases[0]).toHaveValue('release-1');
+    expect(releases[0]).toHaveValue('release-1-version-1');
     expect(releases[1]).toHaveTextContent('Academic year 2022/23');
-    expect(releases[1]).toHaveValue('release-2');
+    expect(releases[1]).toHaveValue('release-2-version-1');
     expect(releases[2]).toHaveTextContent('Academic year 2021/22');
-    expect(releases[2]).toHaveValue('release-3');
+    expect(releases[2]).toHaveValue('release-3-version-1');
 
     expect(screen.getByTestId('Release')).toHaveTextContent(
       'Academic year 2023/24 (Not live)',
@@ -448,15 +448,15 @@ describe('PublicationTeamAccessPage', () => {
     ).toBeInTheDocument();
 
     const releaseSelect = screen.getByLabelText('Select release');
-    expect(releaseSelect).toHaveValue('release-1');
+    expect(releaseSelect).toHaveValue('release-1-version-1');
     const releases = within(releaseSelect).queryAllByRole('option');
     expect(releases).toHaveLength(3);
     expect(releases[0]).toHaveTextContent('Academic year 2023/24');
-    expect(releases[0]).toHaveValue('release-1');
+    expect(releases[0]).toHaveValue('release-1-version-1');
     expect(releases[1]).toHaveTextContent('Academic year 2022/23');
-    expect(releases[1]).toHaveValue('release-2');
+    expect(releases[1]).toHaveValue('release-2-version-1');
     expect(releases[2]).toHaveTextContent('Academic year 2021/22');
-    expect(releases[2]).toHaveValue('release-3');
+    expect(releases[2]).toHaveValue('release-3-version-1');
 
     expect(screen.getByTestId('Release')).toHaveTextContent(
       'Academic year 2023/24 (Not live)',
@@ -540,7 +540,7 @@ describe('PublicationTeamAccessPage', () => {
     );
 
     await renderPage({
-      releaseVersionId: 'release-3',
+      releaseVersionId: 'release-3-version-1',
     });
 
     await waitFor(() => {
@@ -555,7 +555,9 @@ describe('PublicationTeamAccessPage', () => {
       screen.getByRole('heading', { name: 'Update release access' }),
     ).toBeInTheDocument();
 
-    expect(screen.getByLabelText('Select release')).toHaveValue('release-3');
+    expect(screen.getByLabelText('Select release')).toHaveValue(
+      'release-3-version-1',
+    );
     expect(screen.getByTestId('Release')).toHaveTextContent(
       'Academic year 2021/22',
     );
@@ -580,14 +582,16 @@ describe('PublicationTeamAccessPage', () => {
 
     expect(screen.getByText('Update release access')).toBeInTheDocument();
 
-    expect(screen.getByLabelText('Select release')).toHaveValue('release-1');
+    expect(screen.getByLabelText('Select release')).toHaveValue(
+      'release-1-version-1',
+    );
     expect(screen.getByTestId('Release')).toHaveTextContent(
       'Academic year 2023/24 (Not live)',
     );
     expect(screen.getByTestId('Status')).toHaveTextContent('Draft');
 
     expect(history.location.pathname).toBe(
-      `/publication/publication-1/team/release-1`,
+      `/publication/publication-1/team/release-1-version-1`,
     );
   });
 
@@ -611,22 +615,26 @@ describe('PublicationTeamAccessPage', () => {
       screen.getByRole('heading', { name: 'Update release access' }),
     ).toBeInTheDocument();
 
-    expect(screen.getByLabelText('Select release')).toHaveValue('release-1');
+    expect(screen.getByLabelText('Select release')).toHaveValue(
+      'release-1-version-1',
+    );
     expect(screen.getByTestId('Release')).toHaveTextContent(
       'Academic year 2023/24 (Not live)',
     );
     expect(screen.getByTestId('Status')).toHaveTextContent('Draft');
 
     expect(history.location.pathname).toBe(
-      `/publication/publication-1/team/release-1`,
+      `/publication/publication-1/team/release-1-version-1`,
     );
 
     await userEvent.selectOptions(
       screen.getByLabelText('Select release'),
-      'release-2',
+      'release-2-version-1',
     );
 
-    expect(screen.getByLabelText('Select release')).toHaveValue('release-2');
+    expect(screen.getByLabelText('Select release')).toHaveValue(
+      'release-2-version-1',
+    );
 
     await waitFor(() => {
       expect(screen.getByTestId('Release')).toHaveTextContent(
@@ -636,7 +644,7 @@ describe('PublicationTeamAccessPage', () => {
     expect(screen.getByTestId('Status')).toHaveTextContent('Draft');
 
     expect(history.location.pathname).toBe(
-      `/publication/publication-1/team/release-2`,
+      `/publication/publication-1/team/release-2-version-1`,
     );
   });
 });
