@@ -25,7 +25,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="AspectInjector" Version="2.8.2" PrivateAssets="all" />
+    <PackageReference Include="AspectInjector" Version="2.8.1" PrivateAssets="all" /> <!-- v2.8.1 is compatible with MacOS -->
     <PackageReference Include="Azure.Identity" Version="1.13.2" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.14" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.14" PrivateAssets="all" />
