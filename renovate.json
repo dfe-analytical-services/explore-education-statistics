@@ -48,6 +48,12 @@
       "schedule": ["every 3 months"]
     },
     {
+      "description": "Pin AspectInjector version to 2.8.1 for macOS compatibility",
+      "matchDatasources": ["nuget"],
+      "matchPackageNames": ["AspectInjector"],
+      "rangeStrategy": "pin"
+    },
+    {
       "matchDatasources": ["pypi"],
       "groupName": "Python dependencies",
       "enabled": false
