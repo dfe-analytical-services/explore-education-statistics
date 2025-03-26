@@ -92,7 +92,7 @@ describe('PublicationScheduledReleases', () => {
       within(row1Cells[4]).getByRole('link', { name: 'Edit Release 1' }),
     ).toHaveAttribute(
       'href',
-      '/publication/publication-1/release/release-1/summary',
+      '/publication/publication-1/release/release-1-version-1/summary',
     );
 
     const row2Cells = within(rows[2]).getAllByRole('cell');
@@ -151,7 +151,7 @@ describe('PublicationScheduledReleases', () => {
       within(row1Cells[4]).getByRole('link', { name: 'View Release 1' }),
     ).toHaveAttribute(
       'href',
-      '/publication/publication-1/release/release-1/summary',
+      '/publication/publication-1/release/release-1-version-1/summary',
     );
   });
 });
