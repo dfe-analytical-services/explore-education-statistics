@@ -60,6 +60,8 @@
         "Microsoft.AspNetCore",
         "Microsoft.EntityFrameworkCore",
         "Microsoft.Extensions",
+        "Moq.EntityFrameworkCore",
+        "Npgsql.EntityFrameworkCore.PostgreSQL",
         "Thinktecture.EntityFrameworkCore"
       ],
       "matchUpdateTypes": ["major"],
