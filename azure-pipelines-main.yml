@@ -28,6 +28,7 @@ trigger:
     exclude:
       - infrastructure/**
       - src/GovUk.Education.ExploreEducationStatistics.Content.Search*/**
+      - renovate.json
 
 pr:
   branches:
@@ -40,6 +41,7 @@ pr:
     exclude:
       - infrastructure/**
       - src/GovUk.Education.ExploreEducationStatistics.Content.Search*/**
+      - renovate.json
 
 jobs:
   - job: BackendVerify
