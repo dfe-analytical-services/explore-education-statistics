@@ -16,6 +16,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="AspectInjector" Version="2.8.1"/> <!-- Required for AspectInjector tests within this test project -->
     <PackageReference Include="Bogus" Version="35.6.2" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="8.0.14" PrivateAssets="all" />
     <PackageReference Include="CompareNETObjects" Version="4.83.0" />
