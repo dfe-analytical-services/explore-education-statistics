@@ -104,12 +104,14 @@ export interface FeaturedTable {
   order: number;
 }
 
-export interface SubjectMetaFilterHierarchy {
-  rootFilterId: string;
-  childFilterIds: string[];
-  rootOptionIds: string[];
-  tiers: { level: number; hierarchy: { [key: string]: string[] } }[];
+interface FilterHierarchyTier {
+  level: number;
+  filterId: string;
+  childOptionsFilterId: string;
+  hierarchy: Dictionary<string[]>;
 }
+
+export type SubjectMetaFilterHierarchy = FilterHierarchyTier[];
 
 export interface SubjectMetaFilter {
   legend: string;
@@ -122,7 +124,7 @@ export interface SubjectMetaFilter {
 }
 
 export interface SubjectMeta {
-  filterHierarchies: SubjectMetaFilterHierarchy[];
+  filterHierarchies?: SubjectMetaFilterHierarchy[];
   filters: Dictionary<SubjectMetaFilter>;
   indicators: Dictionary<{
     id: string;

@@ -433,7 +433,6 @@ export default function TableToolWizard({
   };
 
   const handleFiltersFormSubmit: FilterFormSubmitHandler = async ({
-    filterHierarchies,
     filters,
     indicators,
   }) => {
@@ -443,12 +442,7 @@ export default function TableToolWizard({
 
     const updatedReleaseTableDataQuery: ReleaseTableDataQuery = {
       ...state.query,
-      filters: Array.from(
-        new Set([
-          ...Object.values(filters).flat(),
-          ...Object.values(filterHierarchies).flat(),
-        ]),
-      ),
+      filters: Object.values(filters).flat(),
       indicators,
     };
 

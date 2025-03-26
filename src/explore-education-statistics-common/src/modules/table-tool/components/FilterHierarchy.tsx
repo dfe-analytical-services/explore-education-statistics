@@ -1,21 +1,17 @@
 import DetailsMenu from '@common/components/DetailsMenu';
 import { useFormIdContext } from '@common/components/form/contexts/FormIdContext';
 import FormCheckboxSelectedCount from '@common/components/form/FormCheckboxSelectedCount';
+import { SubjectMetaFilterHierarchy } from '@common/services/tableBuilderService';
+import { Dictionary } from '@common/types';
 import get from 'lodash/get';
 import React, { memo } from 'react';
 import { useFormContext, useWatch } from 'react-hook-form';
-import FilterHierarchyOptions, {
-  FilterHierarchyOption,
-} from './FilterHierarchyOptions';
+import FilterHierarchyOptions from './FilterHierarchyOptions';
 
-export interface FilterHierarchyType {
-  legend: string;
-  options?: FilterHierarchyOption[];
-  id: string;
-  tiersTotal: number;
-}
-
-interface Props extends FilterHierarchyType {
+export interface FilterHierarchyProps {
+  optionDetailsMap: Dictionary<string>;
+  filterHierarchy: SubjectMetaFilterHierarchy;
+  id?: string;
   disabled?: boolean;
   name: string;
   open?: boolean;
@@ -23,15 +19,18 @@ interface Props extends FilterHierarchyType {
 }
 
 function FilterHierarchy({
-  disabled,
-  legend,
-  options,
+  optionDetailsMap,
+  filterHierarchy,
   id: customId,
   name,
-  open = false,
-  tiersTotal,
+  disabled,
+  open,
   onToggle,
-}: Props) {
+}: FilterHierarchyProps) {
+  const tiersTotal = filterHierarchy.length + 1;
+  const bottomLevelFilterId = filterHierarchy.at(-1)?.childOptionsFilterId;
+  const legend = optionDetailsMap[bottomLevelFilterId ?? ''];
+
   const selectedValues = useWatch({ name });
   const {
     formState: { errors },
@@ -52,14 +51,21 @@ function FilterHierarchy({
     >
       <div id={id}>
         <h4>Browse {legend.toLocaleLowerCase()} by related tiers</h4>
-
-        <FilterHierarchyOptions
-          value={selectedValues}
-          disabled={disabled}
-          name={name}
-          options={options}
-          totalColumns={tiersTotal}
-        />
+        {Object.keys(filterHierarchy[0].hierarchy).map(optionId => {
+          return (
+            <FilterHierarchyOptions
+              key={optionId}
+              optionId={optionId}
+              optionDetailsMap={optionDetailsMap}
+              filterHierarchy={filterHierarchy}
+              name={name}
+              disabled={disabled}
+              tiersTotal={tiersTotal}
+              selectedValues={selectedValues}
+              level={0}
+            />
+          );
+        })}
       </div>
     </DetailsMenu>
   );

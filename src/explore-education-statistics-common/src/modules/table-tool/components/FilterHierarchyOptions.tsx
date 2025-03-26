@@ -1,38 +1,41 @@
 import { FormCheckbox } from '@common/components/form';
 import FormField from '@common/components/form/FormField';
+import { SubjectMetaFilterHierarchy } from '@common/services/tableBuilderService';
+import { Dictionary } from '@common/types';
 import classNames from 'classnames';
 import React, { memo } from 'react';
 
-export type FilterHierarchyOption = {
+export type FilterHierarchyOption2 = {
   value: string;
   label: string;
-  options?: FilterHierarchyOption[];
+  options?: FilterHierarchyOption2[];
 };
 
 interface FilterHierarchyOptionsProps {
+  optionDetailsMap: Dictionary<string>;
+  filterHierarchy: SubjectMetaFilterHierarchy;
+  tiersTotal: number;
+  optionId: string;
+  level: number;
   disabled?: boolean;
-  id?: string;
-  level?: number;
   name: string;
-  options?: FilterHierarchyOption[];
-  totalColumns: number;
-  value: string[];
+  selectedValues: string[];
   hideLowerTotals?: boolean;
 }
 
 function FilterHierarchyOptions({
+  optionId,
+  optionDetailsMap,
+  filterHierarchy,
+  tiersTotal,
+  name,
   disabled,
-  id,
-  level = 0,
-  options,
-  totalColumns,
-  value = [],
+  level,
+  selectedValues = [],
   hideLowerTotals = true,
-  ...props
 }: FilterHierarchyOptionsProps) {
-  if (!options) {
-    return undefined;
-  }
+  const optionLabel = optionDetailsMap[optionId];
+  const childOptionIds = filterHierarchy[level]?.hierarchy[optionId] ?? [];
 
   return (
     <div
@@ -40,38 +43,36 @@ function FilterHierarchyOptions({
         'govuk-checkboxes--small': true,
       })}
     >
-      {options.map(option => {
-        const key = `${id ? `${id}.` : ``}${option.value}`;
-        return (
-          <div
-            id={id}
-            key={key}
-            className="govuk-!-margin-left-8 govuk-!-margin-bottom-2"
-          >
-            {hideLowerTotals &&
-            level !== 0 &&
-            option.label.toLocaleLowerCase() === 'total' &&
-            hideLowerTotals ? null : (
-              <FormField
-                {...option}
-                name={props.name}
-                as={FormCheckbox}
-                id={key}
-                checked={!!option.value && value.includes(option.value)}
-                disabled={disabled}
-              />
-            )}
-            <FilterHierarchyOptions
-              {...props}
-              id={key}
-              options={option.options}
-              level={level + 1}
-              totalColumns={totalColumns}
-              value={value}
-            />
-          </div>
-        );
-      })}
+      <div className="govuk-!-margin-left-8 govuk-!-margin-bottom-2">
+        {hideLowerTotals &&
+        level !== 0 &&
+        optionLabel.toLocaleLowerCase() === 'total' &&
+        hideLowerTotals ? null : (
+          <FormField
+            label={optionLabel}
+            id={`${name}-${optionId}`}
+            // @ts-expect-error  `value` required to make checkboxes unique
+            value={optionId}
+            name={name}
+            as={FormCheckbox}
+            checked={selectedValues.includes(optionId)}
+            disabled={disabled}
+          />
+        )}
+        {childOptionIds.map(childOptionId => (
+          <FilterHierarchyOptions
+            optionId={childOptionId}
+            key={childOptionId}
+            optionDetailsMap={optionDetailsMap}
+            filterHierarchy={filterHierarchy}
+            name={name}
+            disabled={disabled}
+            tiersTotal={tiersTotal}
+            selectedValues={selectedValues}
+            level={level + 1}
+          />
+        ))}
+      </div>
     </div>
   );
 }
