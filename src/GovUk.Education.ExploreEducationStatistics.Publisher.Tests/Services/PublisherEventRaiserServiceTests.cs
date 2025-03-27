@@ -1,17 +1,15 @@
 using System;
 using System.Linq;
-using System.Net;
 using System.Text.Json;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.EventGrid;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Services.EventGrid;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Events;
-using GovUk.Education.ExploreEducationStatistics.Publisher.Options;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services;
-using GovUk.Education.ExploreEducationStatistics.Publisher.Services.EventGrid;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Builders.Config;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Builders.Services;
-using GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Builders.Services.EventGrid;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -21,30 +19,26 @@ using Xunit.Abstractions;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services;
 
-public class EventRaiserServiceTests(ITestOutputHelper output)
+public class PublisherEventRaiserServiceTests
 {
-    private readonly EventGridPublisherClientFactoryBuilder _eventGridPublisherClientBuilder = new();
-    private readonly EventGridOptionsBuilder _eventGridOptionsBuilder = new();
-    private readonly UnitTestOutputLoggerBuilder<EventRaiserService> _loggerBuilder = new();
+    private readonly ConfiguredEventGridClientFactoryBuilder _eventGridClientBuilder = new();
 
-    private IEventRaiserService GetSut(IEventGridPublisherClientFactory? eventGridPublisherClientFactory = null) => new EventRaiserService(
-        eventGridPublisherClientFactory ?? _eventGridPublisherClientBuilder.Build(),
-        _eventGridOptionsBuilder.Build(),
-        _loggerBuilder.Build(output));
+    private IPublisherEventRaiserService GetSut(IConfiguredEventGridClientFactory? eventGridClientFactory = null) => 
+        new PublisherEventRaiserService(eventGridClientFactory ?? _eventGridClientBuilder.Build());
 
-    public class BasicTests(ITestOutputHelper output) : EventRaiserServiceTests(output)
+    public class BasicTests : PublisherEventRaiserServiceTests
     {
         [Fact]
         public void Can_instantiate_sut() => Assert.NotNull(GetSut());
     }
 
-    public class RaiseReleaseVersionPublishedEvents(ITestOutputHelper output) : EventRaiserServiceTests(output)
+    public class RaiseReleaseVersionPublishedPublisherEvents : PublisherEventRaiserServiceTests
     {
         [Fact]
         public async Task GivenNotConfigured_WhenPublishedReleaseVersionInfoSpecified_ThenNoEventRaised()
         {
             // ARRANGE
-            _eventGridOptionsBuilder.WhereNoTopicConfigFor(ReleaseVersionPublishedEventDto.EventTopicOptionsKey);
+            _eventGridClientBuilder.WhereNoTopicConfigFound();
             
             var sut = GetSut();
             var publishedReleaseVersionInfo = new PublishingCompletionService.PublishedReleaseVersionInfo();
@@ -53,7 +47,7 @@ public class EventRaiserServiceTests(ITestOutputHelper output)
             await sut.RaiseReleaseVersionPublishedEvents([publishedReleaseVersionInfo]);
 
             // ASSERT
-            _eventGridPublisherClientBuilder
+            _eventGridClientBuilder
                 .Client
                 .Assert.NoEventsWerePublished();
         }
@@ -62,11 +56,6 @@ public class EventRaiserServiceTests(ITestOutputHelper output)
         public async Task GivenConfigured_WhenOnePublishedReleaseVersionInfoSpecified_ThenEventRaised()
         {
             // ARRANGE
-            _eventGridOptionsBuilder.AddTopicConfig(
-                ReleaseVersionPublishedEventDto.EventTopicOptionsKey,
-                "http://test.topic.endpoint/",
-                topicAccessKey: null);
-            
             var sut = GetSut();
             var info = new PublishingCompletionService.PublishedReleaseVersionInfo
             {
@@ -82,7 +71,7 @@ public class EventRaiserServiceTests(ITestOutputHelper output)
             await sut.RaiseReleaseVersionPublishedEvents([info]);
 
             // ASSERT
-            var eventGridEvent = Assert.Single(_eventGridPublisherClientBuilder.Client.Assert.EventsPublished);
+            var eventGridEvent = Assert.Single(_eventGridClientBuilder.Client.Assert.EventsPublished);
             Assert.NotNull(eventGridEvent);
             Assert.Equal(info.ReleaseVersionId.ToString(), eventGridEvent.Subject);
             Assert.Equal(ReleaseVersionPublishedEventDto.EventType, eventGridEvent.EventType);
@@ -104,11 +93,6 @@ public class EventRaiserServiceTests(ITestOutputHelper output)
         public async Task GivenConfigured_WhenNPublishedReleaseVersionInfoSpecified_ThenNEventRaised(int numberOfEvents)
         {
             // ARRANGE
-            _eventGridOptionsBuilder.AddTopicConfig(
-                ReleaseVersionPublishedEventDto.EventTopicOptionsKey,
-                "http://test.topic.endpoint/",
-                topicAccessKey: null);
-            
             var sut = GetSut();
             var infos = Enumerable.Range(1, numberOfEvents)
                 .Select(i => new PublishingCompletionService.PublishedReleaseVersionInfo
@@ -126,70 +110,27 @@ public class EventRaiserServiceTests(ITestOutputHelper output)
             await sut.RaiseReleaseVersionPublishedEvents(infos);
 
             // ASSERT
-            Assert.Equal(numberOfEvents, _eventGridPublisherClientBuilder.Client.Assert.EventsPublished.Count());
+            Assert.Equal(numberOfEvents, _eventGridClientBuilder.Client.Assert.EventsPublished.Count());
         }
-        
-        [Fact]
-        public async Task WhenPublishingEventReturnsErrorCode_ThenErrorLogged()
-        {
-            // ARRANGE
-            _eventGridOptionsBuilder.AddTopicConfig(
-                ReleaseVersionPublishedEventDto.EventTopicOptionsKey,
-                "http://test.topic.endpoint/",
-                topicAccessKey: null);
-
-            _eventGridPublisherClientBuilder.Client.WhereResponseIs(HttpStatusCode.Unauthorized);
-            
-            var sut = GetSut();
-            var info = new PublishingCompletionService.PublishedReleaseVersionInfo();
-            
-            // ACT
-            await sut.RaiseReleaseVersionPublishedEvents([info]);
-
-            // ASSERT
-            _loggerBuilder.Assert.LoggedErrorContains("401");
-        }
-        
-        [Fact]
-        public async Task WhenPublishingEventThrows_ThenErrorLogged()
-        {
-            // ARRANGE
-            _eventGridOptionsBuilder.AddTopicConfig(
-                ReleaseVersionPublishedEventDto.EventTopicOptionsKey,
-                "http://test.topic.endpoint/",
-                topicAccessKey: null);
-
-            _eventGridPublisherClientBuilder.Client.WhereSendEventAsyncThrows(new Exception("TEST EXCEPTION"));
-            
-            var sut = GetSut();
-            var info = new PublishingCompletionService.PublishedReleaseVersionInfo();
-            
-            // ACT
-            await sut.RaiseReleaseVersionPublishedEvents([info]);
-
-            // ASSERT
-            _loggerBuilder.Assert.LoggedErrorContains("TEST EXCEPTION");
-        }
-        
     }
 
-    public class ServiceRegistrationTests()
+    public class ServiceRegistrationTests
     {
         [Fact]
         public void WhenResolvedFromContainer_ThenEventRaiserServiceIsReturned()
         {
-            // ARRAGE
+            // ARRANGE
             var host = new HostBuilder().ConfigurePublisherHostBuilder().Build();
             
             // ACT
-            var eventRaiserService = host.Services.GetRequiredService<IEventRaiserService>();
+            var eventRaiserService = host.Services.GetRequiredService<IPublisherEventRaiserService>();
             
             // ASSERT
             Assert.NotNull(eventRaiserService);
         }
     }
     
-    public class IntegrationTests(ITestOutputHelper output) : EventRaiserServiceTests(output)
+    public class IntegrationTests(ITestOutputHelper output) : PublisherEventRaiserServiceTests
     {
         // Define a topic and access key to run this integration test
         private const string TopicName = "-- add test topic name here --";
@@ -202,14 +143,20 @@ public class EventRaiserServiceTests(ITestOutputHelper output)
         public async Task WhenTopicDefinedAndReleaseVersionPublished_ThenEventsRaised()
         {
             // ARRANGE
-            _eventGridOptionsBuilder
+            var eventGridOptions = new EventGridOptionsBuilder()
                 .AddTopicConfig(
                     ReleaseVersionPublishedEventDto.EventTopicOptionsKey,
                     TestTopicEndpoint,
-                    TopicAccessKey);
+                    TopicAccessKey)
+                .Build();
 
-            var realEventGridPublisherClientFactory = new EventGridPublisherClientFactory();
-            var sut = GetSut(realEventGridPublisherClientFactory);
+            var realEventGridClientFactory = new ConfiguredEventGridClientFactory(
+                new EventGridClientFactory(
+                    () => new UnitTestOutputLoggerBuilder<SafeEventGridClient>().Build(output)),
+                eventGridOptions,
+            new UnitTestOutputLoggerBuilder<ConfiguredEventGridClientFactory>().Build(output));
+            
+            var sut = GetSut(realEventGridClientFactory);
 
             var publishedReleaseVersionInfo = new PublishingCompletionService.PublishedReleaseVersionInfo
             {
@@ -230,7 +177,7 @@ public class EventRaiserServiceTests(ITestOutputHelper output)
         }
     }
 
-    public class ConfigTests(ITestOutputHelper output) : EventRaiserServiceTests(output)
+    public class ConfigTests : PublisherEventRaiserServiceTests
     {
         [Fact]
         public void Ensure_config_is_read_in()
@@ -265,12 +212,12 @@ public class EventRaiserServiceTests(ITestOutputHelper output)
 
             var actual = serviceProvider.GetRequiredService<IOptions<EventGridOptions>>();
             Assert.NotEmpty(actual.Value.EventTopics);
-            var eventTopic1 = Assert.Single(actual.Value.EventTopics.Where(t => t.Key == "Event topic options key 1"));
+            var eventTopic1 = Assert.Single(actual.Value.EventTopics, t => t.Key == "Event topic options key 1");
             Assert.Equal("Event topic options key 1", eventTopic1.Key);
             Assert.Equal("event topic endpoint 1", eventTopic1.TopicEndpoint);
             Assert.Equal("event topic access key", eventTopic1.TopicAccessKey);
 
-            var eventTopic2 = Assert.Single(actual.Value.EventTopics.Where(t => t.Key == "Event topic options key 2"));
+            var eventTopic2 = Assert.Single(actual.Value.EventTopics, t => t.Key == "Event topic options key 2");
             Assert.Equal("Event topic options key 2", eventTopic2.Key);
             Assert.Equal("event topic endpoint 2", eventTopic2.TopicEndpoint);
             Assert.Null(eventTopic2.TopicAccessKey);

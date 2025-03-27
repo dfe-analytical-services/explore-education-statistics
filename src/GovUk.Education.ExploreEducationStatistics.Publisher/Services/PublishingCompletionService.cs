@@ -20,7 +20,7 @@ public class PublishingCompletionService(
     IReleaseService releaseService,
     IRedirectsCacheService redirectsCacheService,
     IDataSetPublishingService dataSetPublishingService,
-    IEventRaiserService eventRaiserService)
+    IPublisherEventRaiserService publisherEventRaiserService)
     : IPublishingCompletionService
 {
     public async Task CompletePublishingIfAllPriorStagesComplete(
@@ -121,7 +121,7 @@ public class PublishingCompletionService(
 
         await dataSetPublishingService.PublishDataSets(releaseVersionIdsToUpdate);
 
-        await eventRaiserService.RaiseReleaseVersionPublishedEvents(publishedReleaseVersionInfos);
+        await publisherEventRaiserService.RaiseReleaseVersionPublishedEvents(publishedReleaseVersionInfos);
         
         await prePublishingStagesComplete
             .ToAsyncEnumerable()
