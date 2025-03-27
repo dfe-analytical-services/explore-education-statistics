@@ -1,15 +1,16 @@
 import DetailsMenu from '@common/components/DetailsMenu';
+import { FormFieldset } from '@common/components/form';
 import { useFormIdContext } from '@common/components/form/contexts/FormIdContext';
 import FormCheckboxSelectedCount from '@common/components/form/FormCheckboxSelectedCount';
 import { SubjectMetaFilterHierarchy } from '@common/services/tableBuilderService';
-import { Dictionary } from '@common/types';
 import get from 'lodash/get';
 import React, { memo } from 'react';
 import { useFormContext, useWatch } from 'react-hook-form';
 import FilterHierarchyOptions from './FilterHierarchyOptions';
+import { OptionLabelsMap } from './utils/getFilterHierarchyOptionLabelsMap';
 
 export interface FilterHierarchyProps {
-  optionDetailsMap: Dictionary<string>;
+  optionLabelsMap: OptionLabelsMap;
   filterHierarchy: SubjectMetaFilterHierarchy;
   id?: string;
   disabled?: boolean;
@@ -19,7 +20,7 @@ export interface FilterHierarchyProps {
 }
 
 function FilterHierarchy({
-  optionDetailsMap,
+  optionLabelsMap,
   filterHierarchy,
   id: customId,
   name,
@@ -28,8 +29,8 @@ function FilterHierarchy({
   onToggle,
 }: FilterHierarchyProps) {
   const tiersTotal = filterHierarchy.length + 1;
-  const bottomLevelFilterId = filterHierarchy.at(-1)?.childOptionsFilterId;
-  const legend = optionDetailsMap[bottomLevelFilterId ?? ''];
+  const bottomLevelFilterId = filterHierarchy.at(-1)?.childFilterId;
+  const legend = optionLabelsMap[bottomLevelFilterId ?? ''];
 
   const selectedValues = useWatch({ name });
   const {
@@ -38,34 +39,42 @@ function FilterHierarchy({
 
   const { fieldId } = useFormIdContext();
   const id = fieldId(name);
+  const errorMessage = get(errors, name)?.message;
 
   return (
     <DetailsMenu
       id={`details-${customId ?? id}`}
       open={open}
       jsRequired
-      preventToggle={!!get(errors, name)}
+      preventToggle={!!errorMessage}
       summary={`${legend}${tiersTotal > 1 ? ` (${tiersTotal} tiers)` : ''}`}
       summaryAfter={<FormCheckboxSelectedCount name={name} />}
       onToggle={onToggle}
     >
       <div id={id}>
-        <h4>Browse {legend.toLocaleLowerCase()} by related tiers</h4>
-        {Object.keys(filterHierarchy[0].hierarchy).map(optionId => {
-          return (
-            <FilterHierarchyOptions
-              key={optionId}
-              optionId={optionId}
-              optionDetailsMap={optionDetailsMap}
-              filterHierarchy={filterHierarchy}
-              name={name}
-              disabled={disabled}
-              tiersTotal={tiersTotal}
-              selectedValues={selectedValues}
-              level={0}
-            />
-          );
-        })}
+        <FormFieldset
+          id={name}
+          legend={`Browse ${legend.toLocaleLowerCase()} by related tiers`}
+          legendSize="s"
+          useFormId
+          error={errorMessage?.toString()}
+        >
+          {Object.keys(filterHierarchy[0].hierarchy).map(optionId => {
+            return (
+              <FilterHierarchyOptions
+                key={optionId}
+                optionId={optionId}
+                optionLabelsMap={optionLabelsMap}
+                filterHierarchy={filterHierarchy}
+                name={name}
+                disabled={disabled}
+                tiersTotal={tiersTotal}
+                selectedValues={selectedValues}
+                level={0}
+              />
+            );
+          })}
+        </FormFieldset>
       </div>
     </DetailsMenu>
   );

@@ -107,7 +107,7 @@ export interface FeaturedTable {
 interface FilterHierarchyTier {
   level: number;
   filterId: string;
-  childOptionsFilterId: string;
+  childFilterId: string;
   hierarchy: Dictionary<string[]>;
 }
 

@@ -372,6 +372,273 @@ export default function TableToolWizard({
         releaseVersionId,
       );
 
+      const dummyMeta: SubjectMeta = {
+        filters: {
+          LevelOfQualification: {
+            id: 'rootFilterId',
+            legend: 'Level of qualification',
+            options: {
+              Default: {
+                id: '7b7622ae-d9cb-4f45-ad3c-243fb2b4adf2',
+                label: 'Default',
+                options: [
+                  {
+                    label: 'Total',
+                    value: '99bac031-9da6-443b-8c4e-16daa14fa631',
+                  },
+                  {
+                    label: 'Entry level',
+                    value: 'a17097e9-924e-4bec-b0b4-d81933cf10d9',
+                  },
+                  {
+                    label: 'Higher',
+                    value: '98a8a2b6-46a1-4974-827e-c92dc07da57b',
+                  },
+                ],
+                order: 0,
+              },
+            },
+            name: 'qualification_level',
+            autoSelectFilterItemId: '99bac031-9da6-443b-8c4e-16daa14fa631',
+            order: 0,
+          },
+          NameOfCourseBeingStudied: {
+            id: 'childFilter2',
+            legend: 'Name of course being studied',
+            options: {
+              Total: {
+                id: 'b5d32484-dade-42be-a084-095c6ca67ce0',
+                label: 'Total',
+                options: [
+                  {
+                    label: 'Total',
+                    value: 'd0121b2f-38b8-4e85-8813-02084a9cb06a',
+                  },
+                ],
+                order: 0,
+              },
+              Construction: {
+                id: '6a4d123f-252d-42d3-801f-b0b174d35009',
+                label: 'Construction',
+                options: [
+                  {
+                    label: 'Total',
+                    value: 'd58ae212-0a62-41a1-95cf-7731a42aeae4',
+                  },
+                  {
+                    label: 'Bricklaying',
+                    value: '0e4abdca-4c21-4d9b-91f9-7e85d7fe9ff5',
+                  },
+                  {
+                    label: 'Plastering',
+                    value: '6859754b-708d-4d13-86dd-2583ed070962',
+                  },
+                ],
+                order: 1,
+              },
+              Engineering: {
+                id: '2e8db50a-7536-42f6-bf24-c6c433f5f6d0',
+                label: 'Engineering',
+                options: [
+                  {
+                    label: 'Total',
+                    value: 'f7f20343-ec55-42bb-a303-0f69879fa2a8',
+                  },
+                  {
+                    label: 'Civil engineering',
+                    value: 'bc97830e-a211-4070-b08b-ee11b52856e4',
+                  },
+                  {
+                    label: 'Electrical engineering',
+                    value: '999ad18e-b465-44fa-a49e-c3a887d51b86',
+                  },
+                ],
+                order: 2,
+              },
+              Horticulture: {
+                id: 'ae4bc5dc-4401-4394-8c8c-7ec220eb1a23',
+                label: 'Horticulture',
+                options: [
+                  {
+                    label: 'Total',
+                    value: '88235273-2521-497e-963b-63a0bd37e2d3',
+                  },
+                  {
+                    label: 'Forestry',
+                    value: 'e1d39d78-32f4-40b1-bd7e-0f84504701fe',
+                  },
+                  {
+                    label: 'Hedge rows',
+                    value: '432390e9-fd2e-44d7-a5e2-17f2089bd2b3',
+                  },
+                ],
+                order: 3,
+              },
+              Science: {
+                id: '5446bac1-012e-47dc-bcf4-22b55c7775fe',
+                label: 'Science',
+                options: [
+                  {
+                    label: 'Total',
+                    value: 'c2d9e80e-0625-4a99-80ad-fae07376ce3a',
+                  },
+                  {
+                    label: 'Biochemistry',
+                    value: '71bc558a-a8af-49d7-932e-6f68dc996069',
+                  },
+                  {
+                    label: 'Physics',
+                    value: '14947537-12a1-4509-b782-ba5bd0b9d274',
+                  },
+                ],
+                order: 4,
+              },
+            },
+            name: 'course_title',
+            groupCsvColumn: 'subject_area',
+            autoSelectFilterItemId: 'd0121b2f-38b8-4e85-8813-02084a9cb06a',
+            order: 1,
+          },
+          SectorSubjectArea: {
+            id: 'childFilter1',
+            legend: 'Sector subject area',
+            options: {
+              Total: {
+                id: '6a3000bc-b09c-4dc4-ba07-bd602468f1cb',
+                label: 'Total',
+                options: [
+                  {
+                    label: 'Total',
+                    value: 'd577db1b-0905-4485-ba93-cdccd91ac233',
+                  },
+                ],
+                order: 0,
+              },
+              EntryLevel: {
+                id: '6e197d80-4d4f-44ea-b5b4-4951a52d9b31',
+                label: 'Entry level',
+                options: [
+                  {
+                    label: 'Total',
+                    value: 'd3b85233-6563-4f7c-a501-dba7b88768f8',
+                  },
+                  {
+                    label: 'Engineering',
+                    value: 'a326596f-8e89-48d4-a138-e47ea9c16883',
+                  },
+                  {
+                    label: 'Science',
+                    value: 'aa766f80-f7ac-4313-9595-3445e2b5a67a',
+                  },
+                ],
+                order: 1,
+              },
+              Higher: {
+                id: '78cfc401-b57c-49c9-87ca-a491168e2ce6',
+                label: 'Higher',
+                options: [
+                  {
+                    label: 'Total',
+                    value: '83048c20-356e-43f5-9f13-b4caeeb6000f',
+                  },
+                  {
+                    label: 'Construction',
+                    value: '3a85728e-75b5-4598-987c-af639b1c193b',
+                  },
+                  {
+                    label: 'Horticulture',
+                    value: 'f9cd2409-cd8f-470d-93c2-1603f2f484b9',
+                  },
+                ],
+                order: 2,
+              },
+            },
+            name: 'subject_area',
+            groupCsvColumn: 'qualification_level',
+            autoSelectFilterItemId: 'd577db1b-0905-4485-ba93-cdccd91ac233',
+            order: 2,
+          },
+        },
+        indicators: {
+          Default: {
+            id: 'cee66198-20f8-46c3-8751-e6608e1be9ef',
+            label: 'Default',
+            options: [
+              {
+                label: 'Number of students enrolled',
+                unit: '',
+                value: '3b236a87-81ff-4bf1-5a0a-08dd45241022',
+                name: 'enrollment_count',
+              },
+            ],
+            order: 0,
+          },
+        },
+        locations: {},
+        timePeriod: {},
+        filterHierarchies: [
+          [
+            {
+              level: 0,
+              filterId: 'rootFilterId', // add this id
+              childFilterId: 'childFilter1', // add this id too
+              hierarchy: {
+                '99bac031-9da6-443b-8c4e-16daa14fa631': [
+                  // 'rootFilterId' option
+                  'd577db1b-0905-4485-ba93-cdccd91ac233', // 'childFilter1' options
+                ],
+                '98a8a2b6-46a1-4974-827e-c92dc07da57b': [
+                  'f9cd2409-cd8f-470d-93c2-1603f2f484b9',
+                  '83048c20-356e-43f5-9f13-b4caeeb6000f',
+                  '3a85728e-75b5-4598-987c-af639b1c193b',
+                ],
+                'a17097e9-924e-4bec-b0b4-d81933cf10d9': [
+                  'd3b85233-6563-4f7c-a501-dba7b88768f8',
+                  'aa766f80-f7ac-4313-9595-3445e2b5a67a',
+                  'a326596f-8e89-48d4-a138-e47ea9c16883',
+                ],
+              },
+            },
+            {
+              level: 1,
+              filterId: 'childFilter1',
+              childFilterId: 'childFilter2',
+              hierarchy: {
+                'f9cd2409-cd8f-470d-93c2-1603f2f484b9': [
+                  '432390e9-fd2e-44d7-a5e2-17f2089bd2b3',
+                  'e1d39d78-32f4-40b1-bd7e-0f84504701fe',
+                  '88235273-2521-497e-963b-63a0bd37e2d3',
+                ],
+                '83048c20-356e-43f5-9f13-b4caeeb6000f': [
+                  'd0121b2f-38b8-4e85-8813-02084a9cb06a',
+                ],
+                'd3b85233-6563-4f7c-a501-dba7b88768f8': [
+                  'd0121b2f-38b8-4e85-8813-02084a9cb06a',
+                ],
+                'd577db1b-0905-4485-ba93-cdccd91ac233': [
+                  'd0121b2f-38b8-4e85-8813-02084a9cb06a',
+                ],
+                '3a85728e-75b5-4598-987c-af639b1c193b': [
+                  '6859754b-708d-4d13-86dd-2583ed070962',
+                  '0e4abdca-4c21-4d9b-91f9-7e85d7fe9ff5',
+                  'd58ae212-0a62-41a1-95cf-7731a42aeae4',
+                ],
+                'aa766f80-f7ac-4313-9595-3445e2b5a67a': [
+                  '14947537-12a1-4509-b782-ba5bd0b9d274',
+                  '71bc558a-a8af-49d7-932e-6f68dc996069',
+                  'c2d9e80e-0625-4a99-80ad-fae07376ce3a',
+                ],
+                'a326596f-8e89-48d4-a138-e47ea9c16883': [
+                  'f7f20343-ec55-42bb-a303-0f69879fa2a8',
+                  'bc97830e-a211-4070-b08b-ee11b52856e4',
+                  '999ad18e-b465-44fa-a49e-c3a887d51b86',
+                ],
+              },
+            },
+          ],
+        ],
+      };
+
       const indicatorValues = new Set(
         Object.values(nextSubjectMeta.indicators).flatMap(indicator =>
           indicator.options.map(option => option.value),
@@ -396,6 +663,10 @@ export default function TableToolWizard({
         draft.subjectMeta.indicators = nextSubjectMeta.indicators;
         draft.subjectMeta.filters = nextSubjectMeta.filters;
         draft.subjectMeta.filterHierarchies = nextSubjectMeta.filterHierarchies;
+
+        // draft.subjectMeta.indicators = dummyMeta.indicators;
+        // draft.subjectMeta.filters = dummyMeta.filters;
+        // draft.subjectMeta.filterHierarchies = dummyMeta.filterHierarchies;
 
         draft.query.indicators = filteredIndicators;
         draft.query.filters = filteredFilters;
@@ -435,6 +706,7 @@ export default function TableToolWizard({
   const handleFiltersFormSubmit: FilterFormSubmitHandler = async ({
     filters,
     indicators,
+    filterHierarchies,
   }) => {
     updateState(draft => {
       draft.response = undefined;
@@ -442,7 +714,9 @@ export default function TableToolWizard({
 
     const updatedReleaseTableDataQuery: ReleaseTableDataQuery = {
       ...state.query,
-      filters: Object.values(filters).flat(),
+      filters: Object.values(filters)
+        .flat()
+        .concat(Object.values(filterHierarchies).flat()),
       indicators,
     };
 

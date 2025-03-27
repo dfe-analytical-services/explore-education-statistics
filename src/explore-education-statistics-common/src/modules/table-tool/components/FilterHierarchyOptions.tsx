@@ -12,7 +12,7 @@ export type FilterHierarchyOption2 = {
 };
 
 interface FilterHierarchyOptionsProps {
-  optionDetailsMap: Dictionary<string>;
+  optionLabelsMap: Dictionary<string>;
   filterHierarchy: SubjectMetaFilterHierarchy;
   tiersTotal: number;
   optionId: string;
@@ -25,7 +25,7 @@ interface FilterHierarchyOptionsProps {
 
 function FilterHierarchyOptions({
   optionId,
-  optionDetailsMap,
+  optionLabelsMap,
   filterHierarchy,
   tiersTotal,
   name,
@@ -34,7 +34,7 @@ function FilterHierarchyOptions({
   selectedValues = [],
   hideLowerTotals = true,
 }: FilterHierarchyOptionsProps) {
-  const optionLabel = optionDetailsMap[optionId];
+  const optionLabel = optionLabelsMap[optionId];
   const childOptionIds = filterHierarchy[level]?.hierarchy[optionId] ?? [];
 
   return (
@@ -63,7 +63,7 @@ function FilterHierarchyOptions({
           <FilterHierarchyOptions
             optionId={childOptionId}
             key={childOptionId}
-            optionDetailsMap={optionDetailsMap}
+            optionLabelsMap={optionLabelsMap}
             filterHierarchy={filterHierarchy}
             name={name}
             disabled={disabled}

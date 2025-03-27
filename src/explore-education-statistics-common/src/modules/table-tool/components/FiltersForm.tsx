@@ -29,9 +29,11 @@ import Yup from '@common/validation/yup';
 import camelCase from 'lodash/camelCase';
 import mapValues from 'lodash/mapValues';
 import orderBy from 'lodash/orderBy';
-import React, { useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { ObjectSchema } from 'yup';
-import FilterHierarchy, { FilterHierarchyProps } from './FilterHierarchy';
+import FilterHierarchy from './FilterHierarchy';
+import getFilterHierarchyOptionLabelsMap from './utils/getFilterHierarchyOptionLabelsMap';
+import getFilterHierarchyRelatedOptionIds from './utils/getFilterHierarchyRelatedOptionIds';
 
 export interface FiltersFormValues {
   indicators: string[];
@@ -76,7 +78,7 @@ export default function FiltersForm({
   showTableQueryErrorDownload = true,
   onSubmit,
   onTableQueryError,
-  hideFilterHierarchies = true, // hierarchies feature flag
+  hideFilterHierarchies = false, // hierarchies feature flag
   ...stepProps
 }: Props) {
   const { goToNextStep, isActive } = stepProps;
@@ -94,11 +96,12 @@ export default function FiltersForm({
 
   const hierarchiedFilterIds = useMemo(() => {
     if (hideFilterHierarchies) return [];
+
     return (
       filterHierarchies.flatMap(hierarchy => {
         return [
           ...hierarchy.map(({ filterId }) => filterId),
-          hierarchy.at(-1)?.childOptionsFilterId,
+          hierarchy.at(-1)?.childFilterId,
         ];
       }) ?? []
     );
@@ -119,21 +122,10 @@ export default function FiltersForm({
     );
   }, [subjectMeta, hierarchiedFilterIds]);
 
-  const optionDetailsMap = useMemo(() => {
-    const optionDetailsDict: FilterHierarchyProps['optionDetailsMap'] = {};
-
-    hierarchiedFilters.forEach(filter => {
-      optionDetailsDict[filter.id] = filter.legend;
-      Object.values(filter.options).forEach(filterOptions => {
-        optionDetailsDict[filterOptions.id] = filterOptions.label;
-        filterOptions.options.forEach(filterGroupOption => {
-          optionDetailsDict[filterGroupOption.value] = filterGroupOption.label;
-        });
-      });
-    });
-
-    return optionDetailsDict;
-  }, [hierarchiedFilters]);
+  const optionLabelsMap = useMemo(
+    () => getFilterHierarchyOptionLabelsMap(hierarchiedFilters),
+    [hierarchiedFilters],
+  );
 
   const initialFormValues = useMemo(() => {
     // Automatically select indicator when one indicator group with one option
@@ -177,46 +169,62 @@ export default function FiltersForm({
     <WizardStepHeading {...stepProps}>{stepTitle}</WizardStepHeading>
   );
 
-  const handleSubmit = async (values: FiltersFormValues) => {
-    setPreviousValues({ ...values });
+  const handleSubmit = useCallback(
+    async (values: FiltersFormValues) => {
+      setPreviousValues({ ...values });
 
-    try {
-      setTableQueryError(undefined);
+      try {
+        setTableQueryError(undefined);
 
-      await goToNextStep(async () => {
-        await onSubmit({
-          ...values,
+        await goToNextStep(async () => {
+          await onSubmit({
+            ...values,
+            filterHierarchies: getFilterHierarchyRelatedOptionIds(
+              values.filterHierarchies,
+              filterHierarchies,
+              optionLabelsMap,
+            ),
+          });
         });
-      });
-    } catch (error) {
-      if (
-        !isServerValidationError<TableQueryErrorCode>(error) ||
-        !hasErrorMessage(error, TableQueryErrorCodes)
-      ) {
-        throw error;
-      }
-
-      const errorCode = getErrorCode<TableQueryErrorCode>(error);
-
-      if (onTableQueryError) {
-        if (errorCode) {
-          onTableQueryError(
-            errorCode,
-            selectedPublication?.title || '',
-            subject?.name || '',
-          );
+      } catch (error) {
+        if (
+          !isServerValidationError<TableQueryErrorCode>(error) ||
+          !hasErrorMessage(error, TableQueryErrorCodes)
+        ) {
+          throw error;
         }
-      }
 
-      setTableQueryError(errorCode);
-    }
-  };
+        const errorCode = getErrorCode<TableQueryErrorCode>(error);
+
+        if (onTableQueryError) {
+          if (errorCode) {
+            onTableQueryError(
+              errorCode,
+              selectedPublication?.title || '',
+              subject?.name || '',
+            );
+          }
+        }
+
+        setTableQueryError(errorCode);
+      }
+    },
+    [
+      filterHierarchies,
+      goToNextStep,
+      onSubmit,
+      onTableQueryError,
+      optionLabelsMap,
+      selectedPublication?.title,
+      subject?.name,
+    ],
+  );
 
   const allFilterGroupKeys = useMemo(
     () => [
       ...standardFilters.map(([key]) => key),
       ...(subjectMeta.filterHierarchies ?? []).map(
-        tiers => tiers.at(-1)?.childOptionsFilterId ?? '',
+        tiers => tiers.at(-1)?.childFilterId ?? '',
       ),
     ],
     [standardFilters, subjectMeta],
@@ -249,13 +257,13 @@ export default function FiltersForm({
       filterHierarchies: Yup.object(
         Object.fromEntries(
           filterHierarchies.map(tiers => {
-            const hierarchyFilterId = tiers.at(-1)?.childOptionsFilterId ?? '';
+            const hierarchyFilterId = tiers.at(-1)?.childFilterId ?? '';
 
             const label =
-              optionDetailsMap[hierarchyFilterId].toLocaleLowerCase();
+              optionLabelsMap[hierarchyFilterId]?.toLocaleLowerCase();
 
             return [
-              hierarchyFilterId,
+              camelCase(optionLabelsMap[hierarchyFilterId]),
               Yup.array()
                 .required(`Select at least one option from ${label}`)
                 .typeError(`Select at least one option from ${label}`)
@@ -266,7 +274,7 @@ export default function FiltersForm({
         ),
       ),
     });
-  }, [standardFilters, filterHierarchies, optionDetailsMap]);
+  }, [standardFilters, filterHierarchies, optionLabelsMap]);
 
   const filtersIncludeTotal = Object.values(subjectMeta.filters).some(
     filter => filter.autoSelectFilterItemId,
@@ -367,15 +375,15 @@ export default function FiltersForm({
                         if (filterHierarchy.length === 0) return null;
 
                         const hierarchyName = `filterHierarchies.${camelCase(
-                          optionDetailsMap[
-                            filterHierarchy.at(-1)?.childOptionsFilterId ?? ''
+                          optionLabelsMap[
+                            filterHierarchy.at(-1)?.childFilterId ?? ''
                           ],
                         )}`;
 
                         return (
                           <FilterHierarchy
                             filterHierarchy={filterHierarchy}
-                            optionDetailsMap={optionDetailsMap}
+                            optionLabelsMap={optionLabelsMap}
                             disabled={formState.isSubmitting}
                             key={hierarchyName}
                             name={hierarchyName}
