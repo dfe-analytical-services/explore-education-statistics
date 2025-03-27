@@ -4,7 +4,7 @@ using Moq;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services.EventGrid;
 
-public class ConfiguredEventGridClientFactoryBuilder
+public class ConfiguredEventGridClientFactoryMockBuilder
 {
     private readonly Mock<IConfiguredEventGridClientFactory> _mock = new(MockBehavior.Strict);
     private bool _topicConfigFound = true;
@@ -27,9 +27,9 @@ public class ConfiguredEventGridClientFactoryBuilder
         return _mock.Object;
     }
 
-    public EventGridClientBuilder Client { get; } = new();
+    public EventGridClientMockBuilder Client { get; } = new();
 
-    public ConfiguredEventGridClientFactoryBuilder WhereNoTopicConfigFound()
+    public ConfiguredEventGridClientFactoryMockBuilder WhereNoTopicConfigFound()
     {
         _topicConfigFound = false;
         return this;

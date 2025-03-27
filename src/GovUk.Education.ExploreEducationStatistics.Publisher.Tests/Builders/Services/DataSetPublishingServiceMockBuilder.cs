@@ -6,12 +6,12 @@ using Moq;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Builders.Services;
 
-public class DataSetPublishingServiceBuilder
+public class DataSetPublishingServiceMockBuilder
 {
     private readonly Mock<IDataSetPublishingService> _mock = new(MockBehavior.Strict);
     public IDataSetPublishingService Build() => _mock.Object;
     public Asserter Assert => new(_mock);
-    public DataSetPublishingServiceBuilder()
+    public DataSetPublishingServiceMockBuilder()
     {
         _mock
             .Setup(m => m.PublishDataSets(It.IsAny<Guid[]>()))

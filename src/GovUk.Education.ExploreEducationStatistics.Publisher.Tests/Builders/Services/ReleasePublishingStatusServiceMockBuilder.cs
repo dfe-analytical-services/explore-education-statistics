@@ -5,14 +5,14 @@ using Moq;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Builders.Services;
 
-public class ReleasePublishingStatusServiceBuilder
+public class ReleasePublishingStatusServiceMockBuilder
 {
     private readonly Mock<IReleasePublishingStatusService> _mock = new(MockBehavior.Strict);
     public Asserter Assert => new(_mock);
 
     public IReleasePublishingStatusService Build() => _mock.Object;
 
-    public ReleasePublishingStatusServiceBuilder()
+    public ReleasePublishingStatusServiceMockBuilder()
     {
         _mock
             .Setup(
@@ -24,7 +24,7 @@ public class ReleasePublishingStatusServiceBuilder
 
     }
     
-    public ReleasePublishingStatusServiceBuilder WhereGetReturns(
+    public ReleasePublishingStatusServiceMockBuilder WhereGetReturns(
         ReleasePublishingKey releasePublishingKey,
         ReleasePublishingStatus releasePublishingStatus)
     {

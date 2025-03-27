@@ -8,7 +8,7 @@ using Moq;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services.EventGrid;
 
-public class EventGridClientBuilder
+public class EventGridClientMockBuilder
 {
     private readonly Mock<IEventGridClient> _mock = new(MockBehavior.Strict);
     private readonly List<EventGridEvent> _eventsPublished = new();
@@ -36,13 +36,13 @@ public class EventGridClientBuilder
         return _mock.Object;
     }
 
-    public EventGridClientBuilder WhereResponseIs(HttpStatusCode statusCode)
+    public EventGridClientMockBuilder WhereResponseIs(HttpStatusCode statusCode)
     {
         _httpStatusCode = statusCode;
         return this;
     }
 
-    public EventGridClientBuilder WhereSendEventAsyncThrows(Exception exception)
+    public EventGridClientMockBuilder WhereSendEventAsyncThrows(Exception exception)
     {
         _sendEventAsyncException = exception;
         return this;
