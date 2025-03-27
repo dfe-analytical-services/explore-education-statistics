@@ -73,7 +73,7 @@ public class PublishingCompletionServiceTests
                     .WhereFilesStatusIs(ReleasePublishingStatusFilesStage.NotStarted)
                     .Build();
                 
-                var readyKeys = new List<ReleasePublishingKey>()
+                var notReadyKeys = new List<ReleasePublishingKey>()
                 {
                     releasePublishingKey1, 
                     releasePublishingKey2
@@ -86,7 +86,7 @@ public class PublishingCompletionServiceTests
                 var sut = GetSut();
 
                 // ACT
-                await sut.CompletePublishingIfAllPriorStagesComplete(readyKeys);
+                await sut.CompletePublishingIfAllPriorStagesComplete(notReadyKeys);
 
                 // ASSERT
                 _releasePublishingStatusService.Assert.UpdatePublishingStageWasNotCalled();
@@ -120,14 +120,12 @@ public class PublishingCompletionServiceTests
                 _releaseVersion1 = new ReleaseVersionBuilder()
                     .WithPublicationId(PublicationId1)
                     .ForRelease(release => release
-                        .WithReleaseId(Guid.NewGuid())
                         .WithReleaseSlug("release-slug-1"))
                     .Build();
 
                 _releaseVersion2 = new ReleaseVersionBuilder()
                     .WithPublicationId(PublicationId2)
                     .ForRelease(release => release
-                        .WithReleaseId(Guid.NewGuid())
                         .WithReleaseSlug("release-slug-2"))
                     .Build();
                 
