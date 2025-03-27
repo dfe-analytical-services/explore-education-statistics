@@ -21,10 +21,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services;
 
 public class PublisherEventRaiserServiceTests
 {
-    private readonly ConfiguredEventGridClientFactoryBuilder _eventGridClientBuilder = new();
+    private readonly ConfiguredEventGridClientFactoryMockBuilder _eventGridClient = new();
 
     private IPublisherEventRaiserService GetSut(IConfiguredEventGridClientFactory? eventGridClientFactory = null) => 
-        new PublisherEventRaiserService(eventGridClientFactory ?? _eventGridClientBuilder.Build());
+        new PublisherEventRaiserService(eventGridClientFactory ?? _eventGridClient.Build());
 
     public class BasicTests : PublisherEventRaiserServiceTests
     {
@@ -38,7 +38,7 @@ public class PublisherEventRaiserServiceTests
         public async Task GivenNotConfigured_WhenPublishedReleaseVersionInfoSpecified_ThenNoEventRaised()
         {
             // ARRANGE
-            _eventGridClientBuilder.WhereNoTopicConfigFound();
+            _eventGridClient.WhereNoTopicConfigFound();
             
             var sut = GetSut();
             var publishedReleaseVersionInfo = new PublishingCompletionService.PublishedReleaseVersionInfo();
@@ -47,7 +47,7 @@ public class PublisherEventRaiserServiceTests
             await sut.RaiseReleaseVersionPublishedEvents([publishedReleaseVersionInfo]);
 
             // ASSERT
-            _eventGridClientBuilder
+            _eventGridClient
                 .Client
                 .Assert.NoEventsWerePublished();
         }
@@ -71,7 +71,7 @@ public class PublisherEventRaiserServiceTests
             await sut.RaiseReleaseVersionPublishedEvents([info]);
 
             // ASSERT
-            var eventGridEvent = Assert.Single(_eventGridClientBuilder.Client.Assert.EventsPublished);
+            var eventGridEvent = Assert.Single(_eventGridClient.Client.Assert.EventsPublished);
             Assert.NotNull(eventGridEvent);
             Assert.Equal(info.ReleaseVersionId.ToString(), eventGridEvent.Subject);
             Assert.Equal(ReleaseVersionPublishedEventDto.EventType, eventGridEvent.EventType);
@@ -110,7 +110,7 @@ public class PublisherEventRaiserServiceTests
             await sut.RaiseReleaseVersionPublishedEvents(infos);
 
             // ASSERT
-            Assert.Equal(numberOfEvents, _eventGridClientBuilder.Client.Assert.EventsPublished.Count());
+            Assert.Equal(numberOfEvents, _eventGridClient.Client.Assert.EventsPublished.Count());
         }
     }
 
