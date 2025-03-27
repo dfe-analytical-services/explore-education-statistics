@@ -226,15 +226,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                     logger.LogTrace("Got Indicators in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
 
                     var filterHierarchies = releaseFile.File.FilterHierarchies!
-                        .Select(fh => new DataSetFileFilterHierarchyViewModel(
-                            RootFilterId: fh.RootFilterId,
-                            ChildFilterIds: fh.ChildFilterIds,
-                            RootOptionIds: fh.RootOptionIds,
-                            Tiers: fh.Tiers
-                                .Select((tier, index) =>
-                                    new DataSetFileFilterHierarchyTierViewModel(index, tier))
-                                .ToList()
-                        )).ToList();
+                        .Select(fh => fh.Tiers
+                            .Select((tier, index) =>
+                                new DataSetFileFilterHierarchyTierViewModel(
+                                    Level: index,
+                                    FilterId: fh.FilterIds[index],
+                                    ChildFilterId: index + 1 >= fh.FilterIds.Count ? null : fh.FilterIds[index + 1],
+                                    tier))
+                            .ToList()
+                        ).ToList();
 
                     return new SubjectMetaViewModel
                     {
