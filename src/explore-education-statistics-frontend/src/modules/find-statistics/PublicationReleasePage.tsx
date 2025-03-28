@@ -591,7 +591,7 @@ export const getServerSideProps: GetServerSideProps<Dictionary<unknown>> =
       return {
         redirect: {
           destination: `/find-statistics/${publicationSlug}/${releaseVersion.slug}`,
-          permanent: false,
+          permanent: true,
         } as Redirect,
       };
     }
