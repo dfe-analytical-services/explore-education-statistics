@@ -21,7 +21,7 @@ param searchableDocumentsContainerName string
 @description('The IP address ranges that can access the Search Docs Function App storage accounts.')
 param storageFirewallRules IpRange[]
 
-@description('Whether to create or update Azure Monitor alerts during this deploy')
+@description('Whether to create/update Azure Monitor alerts during this deploy.')
 param deployAlerts bool
 
 @description('Specifies common resource naming variables.')
