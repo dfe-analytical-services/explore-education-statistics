@@ -103,16 +103,28 @@ export interface FeaturedTable {
   order: number;
 }
 
+interface FilterHierarchyTier {
+  level: number;
+  filterId: string;
+  childFilterId: string;
+  hierarchy: Dictionary<string[]>;
+}
+
+export type SubjectMetaFilterHierarchy = FilterHierarchyTier[];
+
+export interface SubjectMetaFilter {
+  legend: string;
+  hint?: string;
+  id: string;
+  options: GroupedFilterOptions;
+  order: number;
+  autoSelectFilterItemId?: string;
+  name: string;
+}
+
 export interface SubjectMeta {
-  filters: Dictionary<{
-    legend: string;
-    hint?: string;
-    id: string;
-    options: GroupedFilterOptions;
-    order: number;
-    autoSelectFilterItemId?: string;
-    name: string;
-  }>;
+  filterHierarchies?: SubjectMetaFilterHierarchy[];
+  filters: Dictionary<SubjectMetaFilter>;
   indicators: Dictionary<{
     id: string;
     label: string;
