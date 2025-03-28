@@ -29,7 +29,7 @@ public class AnalyticsPathResolver : IAnalyticsPathResolver
 
     private string BasePath() => _basePath;
 
-    public string ZipDownloadsDirectoryPath()
+    public string PublicZipDownloadsDirectoryPath()
     {
         return Path.Combine(BasePath(), "public", "zip-downloads");
     }

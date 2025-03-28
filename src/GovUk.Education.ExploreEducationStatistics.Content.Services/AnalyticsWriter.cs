@@ -30,11 +30,9 @@ public class AnalyticsWriter(
             orderedProperties: true,
             camelCase: true);
 
-        var directory = analyticsPathResolver.ZipDownloadsDirectoryPath();
+        var directory = analyticsPathResolver.PublicZipDownloadsDirectoryPath();
 
-        var randomStr = RandomUtils.GenerateRandomAlphanumericString(length: 5);
-
-        var filename = $"{DateTime.UtcNow:yyyyMMdd-HHmmss-fff}_{randomStr}_{request.ReleaseVersionId}.json"; // @MarkFix keep randomStr to prevent clashes?
+        var filename = $"{DateTime.UtcNow:yyyyMMdd-HHmmss-fffffff}_{request.ReleaseVersionId}.json";
 
         try
         {
@@ -43,7 +41,7 @@ public class AnalyticsWriter(
             var filePath = Path.Combine(directory, filename);
             if (File.Exists(filePath))
             {
-                throw new Exception("Tried to create a file that already exists for ReleaseVersionZipDownloadRequest!");
+                throw new Exception($"Tried to create a file that already exists for {nameof(CaptureReleaseVersionZipDownloadRequest)}!");
             }
 
             await File.WriteAllTextAsync(

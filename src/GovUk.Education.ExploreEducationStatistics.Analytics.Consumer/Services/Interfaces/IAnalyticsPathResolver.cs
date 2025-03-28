@@ -8,5 +8,11 @@ public interface IAnalyticsPathResolver
 
     string PublicApiQueriesProcessingDirectoryPath();
 
-    public string PublicApiQueriesReportsDirectoryPath();
+    string PublicApiQueriesReportsDirectoryPath();
+
+    string PublicZipDownloadsDirectoryPath();
+
+    string PublicZipDownloadsProcessingDirectoryPath();
+
+    string PublicZipDownloadsReportsDirectoryPath();
 }

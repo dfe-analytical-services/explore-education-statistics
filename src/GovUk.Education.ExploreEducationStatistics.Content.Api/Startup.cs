@@ -129,7 +129,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api
             services.AddCors();
 
             // Options - to allow them to be injected into services
-            services.AddOptions<AnalyticsOptions>() // @MarkFix needed? I assume so because we'll want BasePath
+            services.AddOptions<AnalyticsOptions>()
                 .Bind(configuration.GetSection(AnalyticsOptions.Section));
 
             // Services

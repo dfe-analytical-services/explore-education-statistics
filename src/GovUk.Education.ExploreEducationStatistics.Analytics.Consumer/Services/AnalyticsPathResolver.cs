@@ -43,7 +43,22 @@ public class AnalyticsPathResolver : IAnalyticsPathResolver
     {
         return Path.Combine(ReportsDirectoryPath(), "public-api", "queries");
     }
-    
+
+    public string PublicZipDownloadsDirectoryPath()
+    {
+        return Path.Combine(_basePath, "public", "zip-downloads");
+    }
+
+    public string PublicZipDownloadsProcessingDirectoryPath()
+    {
+        return Path.Combine(PublicZipDownloadsDirectoryPath(), "processing");
+    }
+
+    public string PublicZipDownloadsReportsDirectoryPath()
+    {
+        return Path.Combine(ReportsDirectoryPath(), "public", "zip-downloads");
+    }
+
     private string ReportsDirectoryPath()
     {
         return Path.Combine(_basePath, "reports");
