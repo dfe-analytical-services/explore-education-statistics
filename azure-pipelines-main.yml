@@ -28,6 +28,7 @@ trigger:
     exclude:
       - infrastructure/**
       - src/GovUk.Education.ExploreEducationStatistics.Content.Search*/**
+      - tests/robot-tests/tests/snapshots/**
       - renovate.json
 
 pr:
@@ -41,6 +42,7 @@ pr:
     exclude:
       - infrastructure/**
       - src/GovUk.Education.ExploreEducationStatistics.Content.Search*/**
+      - tests/robot-tests/tests/snapshots/**
       - renovate.json
 
 jobs:
