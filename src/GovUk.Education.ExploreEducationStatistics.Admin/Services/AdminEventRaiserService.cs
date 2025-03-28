@@ -1,17 +1,13 @@
 ﻿using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Events;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.EventGrid;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services;
 
-public interface IAdminEventRaiserService
-{
-    Task OnThemeUpdated(Theme theme);
-}
-
 /// <summary>
-/// Published events specific to the Publisher
+/// Published events specific to Admin
 /// </summary>
 /// <param name="eventGridClientFactory"></param>
 public class AdminEventRaiserService(IConfiguredEventGridClientFactory eventGridClientFactory) : IAdminEventRaiserService

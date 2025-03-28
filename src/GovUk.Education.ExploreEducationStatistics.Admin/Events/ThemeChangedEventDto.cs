@@ -24,14 +24,14 @@ public record ThemeChangedEventDto
     public const string EventTopicOptionsKey = "ThemeChangesEvent";
 
     /// <summary>
-    /// The ReleaseVersionId is the subject
+    /// The ThemeId is the subject
     /// </summary>
-    public string Subject { get; init; }
+    public string Subject { get; }
 
     /// <summary>
     /// The event payload
     /// </summary>
-    public EventPayload Payload { get; init; }
+    public EventPayload Payload { get; }
     
     public record EventPayload
     {
