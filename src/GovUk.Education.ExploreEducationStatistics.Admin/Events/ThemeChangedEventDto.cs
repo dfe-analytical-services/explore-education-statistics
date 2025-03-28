@@ -1,4 +1,4 @@
-﻿using Azure.Messaging.EventGrid;
+using Azure.Messaging.EventGrid;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Events;
@@ -17,8 +17,8 @@ public record ThemeChangedEventDto
     }
 
     // Changes to this event should also increment the version accordingly.
-    public const string DataVersion = "1.0";
-    public const string EventType = "theme-changed";
+    private const string DataVersion = "1.0";
+    private const string EventType = "theme-changed";
     
     // Which Topic endpoint to use from the appsettings
     public const string EventTopicOptionsKey = "ThemeChangesEvent";

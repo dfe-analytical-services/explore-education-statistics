@@ -21,4 +21,9 @@ public interface IContentApiClient
     /// </summary>
     /// <returns>true if Content API responded, and any error message if applicable</returns>
     Task<(bool WasSuccesssful, string? ErrorMessage)> Ping(CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Given a Theme, get the Publications
+    /// </summary>
+    Task<PublicationInfo[]> GetPublicationsForTheme(Guid themeId, CancellationToken cancellationToken = default);
 }

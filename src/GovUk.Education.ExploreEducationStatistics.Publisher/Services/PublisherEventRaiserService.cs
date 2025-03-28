@@ -8,7 +8,7 @@ using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services;
 
 /// <summary>
-/// Published events specific to the Publisher
+/// Publish events specific to the Publisher
 /// </summary>
 /// <param name="eventGridClientFactory"></param>
 public class PublisherEventRaiserService(

@@ -1,4 +1,5 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -24,7 +25,7 @@ public class ConfiguredEventGridClientFactory(
     public bool TryCreateClient(string configKey, [NotNullWhen(true)]out IEventGridClient? client)
     {
         var options = eventGridOptions.Value.EventTopics.SingleOrDefault(opt => opt.Key == configKey);
-        if (options is null)
+        if (options is null || string.IsNullOrEmpty(options.TopicEndpoint))
         {
             logger.LogWarning(
                 "No Event Topic is configured for key {EventTopicOptionsKey}. No events will be published.", 
@@ -33,8 +34,22 @@ public class ConfiguredEventGridClientFactory(
             client = null;
             return false;
         }
-        
-        client = eventGridClientFactory.CreateClient(options.TopicEndpoint, options.TopicAccessKey);
+
+        try
+        {
+            client = eventGridClientFactory.CreateClient(options.TopicEndpoint, options.TopicAccessKey);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(
+                ex,
+                "An error occurred whilst trying to create Event Grid Client with topic endpoint {TopicEndpoint}. Please check configuration for Topic Options Key {EventTopicOptionsKey}", 
+                options.TopicEndpoint,
+                configKey);
+            
+            client = null;
+            return false;
+        }
         return true;
     }
 }

@@ -1,9 +1,8 @@
 ﻿using System.Collections.Generic;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.EventGrid;
-using GovUk.Education.ExploreEducationStatistics.Publisher.Options;
 using Microsoft.Extensions.Options;
 
-namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Builders.Config;
+namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Builders.Config;
 
 public class EventGridOptionsBuilder
 {
@@ -24,6 +23,12 @@ public class EventGridOptionsBuilder
     public EventGridOptionsBuilder WhereNoTopicConfigFor(string topicKey)
     {
         _eventTopicOptions.RemoveAll(o => o.Key == topicKey);
+        return this;
+    }
+
+    public EventGridOptionsBuilder WhereNoTopicConfigDefined()
+    {
+        _eventTopicOptions.Clear();
         return this;
     }
 }

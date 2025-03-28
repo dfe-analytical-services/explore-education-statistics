@@ -33,10 +33,12 @@ internal class SearchableDocumentCreator(
             blobName,
             new Blob(releaseSearchableDocument.HtmlContent, releaseSearchableDocument.BuildMetadata()),
             cancellationToken);
-
+        
         return new CreatePublicationLatestReleaseSearchableDocumentResponse
         {
             PublicationSlug = request.PublicationSlug,
+            ReleaseId = releaseSearchableDocument.ReleaseId,
+            ReleaseSlug = releaseSearchableDocument.ReleaseSlug,
             ReleaseVersionId = releaseSearchableDocument.ReleaseVersionId,
             BlobName = blobName
         };
