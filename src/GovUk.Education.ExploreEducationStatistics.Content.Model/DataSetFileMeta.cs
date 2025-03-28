@@ -56,8 +56,3 @@ public class IndicatorMeta
 
     public required string ColumnName { get; set; }
 }
-
-public class TierMeta
-{
-
-}

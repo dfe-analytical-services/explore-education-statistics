@@ -3,7 +3,7 @@ import { Dictionary } from '@common/types';
 
 export type OptionLabelsMap = Dictionary<string>;
 
-export default function getFilterHierarchyOptionLabelsMap(
+export default function getFilterHierarchyLabelsMap(
   filters: SubjectMetaFilter[],
 ): OptionLabelsMap {
   const map: OptionLabelsMap = {};

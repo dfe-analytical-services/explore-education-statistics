@@ -7,7 +7,7 @@ import get from 'lodash/get';
 import React, { memo } from 'react';
 import { useFormContext, useWatch } from 'react-hook-form';
 import FilterHierarchyOptions from './FilterHierarchyOptions';
-import { OptionLabelsMap } from './utils/getFilterHierarchyOptionLabelsMap';
+import { OptionLabelsMap } from './utils/getFilterHierarchyLabelsMap';
 
 export interface FilterHierarchyProps {
   optionLabelsMap: OptionLabelsMap;

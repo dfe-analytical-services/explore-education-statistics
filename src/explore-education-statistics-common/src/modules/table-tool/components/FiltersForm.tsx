@@ -32,7 +32,7 @@ import orderBy from 'lodash/orderBy';
 import React, { useCallback, useMemo, useState } from 'react';
 import { ObjectSchema } from 'yup';
 import FilterHierarchy from './FilterHierarchy';
-import getFilterHierarchyOptionLabelsMap from './utils/getFilterHierarchyOptionLabelsMap';
+import getFilterHierarchyLabelsMap from './utils/getFilterHierarchyLabelsMap';
 import getFilterHierarchyRelatedOptionIds from './utils/getFilterHierarchyRelatedOptionIds';
 
 export interface FiltersFormValues {
@@ -78,7 +78,7 @@ export default function FiltersForm({
   showTableQueryErrorDownload = true,
   onSubmit,
   onTableQueryError,
-  hideFilterHierarchies = false, // hierarchies feature flag
+  hideFilterHierarchies = true, // hierarchies feature flag
   ...stepProps
 }: Props) {
   const { goToNextStep, isActive } = stepProps;
@@ -123,7 +123,7 @@ export default function FiltersForm({
   }, [subjectMeta, hierarchiedFilterIds]);
 
   const optionLabelsMap = useMemo(
-    () => getFilterHierarchyOptionLabelsMap(hierarchiedFilters),
+    () => getFilterHierarchyLabelsMap(hierarchiedFilters),
     [hierarchiedFilters],
   );
 

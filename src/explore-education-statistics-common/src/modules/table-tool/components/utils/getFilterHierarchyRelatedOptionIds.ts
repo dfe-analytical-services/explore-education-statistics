@@ -2,14 +2,14 @@ import { SubjectMeta } from '@common/services/tableBuilderService';
 import { Dictionary } from '@common/types';
 import mapValues from 'lodash/mapValues';
 import { FiltersFormValues } from '../FiltersForm';
-import { OptionLabelsMap } from './getFilterHierarchyOptionLabelsMap';
+import { OptionLabelsMap } from './getFilterHierarchyLabelsMap';
 
 /**
- * Ammends submitted option id lists to include parent option id(s) and child total option id(s)
+ * Amends submitted option id lists to include parent option id(s) and child total option id(s)
  * @param selectedValues submitted selected filter options
  * @param filterHierarchies the hierarchies to sift through to find appropriate parent and child related ids to add to return value
  * @param optionLabelsMap to help locate total options
- * @returns a ammended list of selected option ids to include option parent ids and child total ids to help API select appropriate tabel rows to return
+ * @returns a amended list of selected option ids to include option parent ids and child total ids to help API select appropriate tabel rows to return
  */
 export default function getFilterHierarchyRelatedOptionIds(
   selectedValues: FiltersFormValues['filterHierarchies'],
@@ -20,7 +20,7 @@ export default function getFilterHierarchyRelatedOptionIds(
     return selectedValues;
   }
 
-  // flatten and merge *all* FilterHierarchyTier["hierachies"] together,
+  // flatten and merge *all* FilterHierarchyTier["hierarchies"] together,
   // giving us a map of *all* parent option to child options relationships across all hierarchies and levels
   const optionChildrenRelationsMap: Dictionary<string[]> = filterHierarchies
     .flat()
@@ -54,13 +54,14 @@ function getOptionParentsRecursively(
   optionIds: string[],
   optionParentRelationsMap: Dictionary<string>,
 ): string[] {
-  const mostParentOptionId = optionIds[0];
-  const mostParentsParentId = optionParentRelationsMap[mostParentOptionId];
-  if (!mostParentsParentId) {
+  const optionId = optionIds[0] ?? '';
+  const parentOptionId = optionParentRelationsMap[optionId];
+
+  if (!parentOptionId) {
     return optionIds;
   }
   return getOptionParentsRecursively(
-    [mostParentsParentId, ...optionIds],
+    [parentOptionId, ...optionIds],
     optionParentRelationsMap,
   );
 }
@@ -70,11 +71,9 @@ function getOptionChildTotalsRecursively(
   optionChildrenRelationsMap: Dictionary<string[]>,
   optionLabelsMap: OptionLabelsMap,
 ) {
-  const mostChildOptionId = optionIds.at(-1);
-  if (!mostChildOptionId) {
-    return optionIds;
-  }
-  const childTotalId = optionChildrenRelationsMap[mostChildOptionId]?.find(
+  const parentOptionId = optionIds.at(-1) ?? '';
+
+  const childTotalId = optionChildrenRelationsMap[parentOptionId]?.find(
     childOptionId =>
       optionLabelsMap[childOptionId]?.toLocaleLowerCase() === 'total',
   );
