@@ -3,10 +3,6 @@ using System.Collections.Generic;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 
-public record DataSetFileFilterHierarchyViewModel(
-    List<DataSetFileFilterHierarchyTierViewModel> Tiers
-);
-
 public record DataSetFileFilterHierarchyTierViewModel(
     int Level,
     Guid FilterId,
