@@ -17,6 +17,12 @@ param resourceNames ResourceNames
 @description('Location for all resources.')
 param location string
 
+@description('Specifies the file containing the JSON definition of the index to create or update.')
+param indexDefinitionFilename string
+
+@description('Specifies the base path for the index definitions.')
+param indexDefinitionsBasePath string = 'infrastructure/templates/search/application/indexes'
+
 @description('Name of the searchable documents container in the Search storage account.')
 param searchableDocumentsContainerName string = 'searchable-documents'
 
@@ -25,6 +31,9 @@ param searchServiceIpRules IpRange[] = []
 
 @description('A list IP network rules to allow access to the Search storage account from specific public internet IP address ranges.')
 param storageIpRules IpRange[]
+
+@description('The branch, tag or commit of the source code from which the deployment is triggered.')
+param githubSourceRef string
 
 @description('Specifies a set of tags with which to tag the resource in Azure.')
 param tagValues object
@@ -96,6 +105,8 @@ module searchServiceBlobRoleAssignmentModule '../../common/components/storageAcc
   }
 }
 
+var gitHubRawContentBaseUrl = 'https://raw.githubusercontent.com/dfe-analytical-services/explore-education-statistics'
+
 module searchServiceConfigModule '../components/searchServiceConfig.bicep' = if (deploySearchConfig) {
   name: 'searchServiceConfigModuleDeploy'
   params: {
@@ -103,8 +114,8 @@ module searchServiceConfigModule '../components/searchServiceConfig.bicep' = if 
     dataSourceConnectionString: 'ResourceId=${searchStorageAccountModule.outputs.storageAccountId};'
     dataSourceContainerName: searchableDocumentsContainerName
     dataSourceType: 'azureblob'
-    indexName: 'index-1'
-    indexFilename: 'index-1.json'
+    indexerName: 'index-1-indexer'
+    indexDefinitionUri: '${gitHubRawContentBaseUrl}/${githubSourceRef}/${indexDefinitionsBasePath}/${indexDefinitionFilename}'
     indexerScheduleInterval: 'PT5M'
     searchServiceName: searchServiceModule.outputs.searchServiceName
     location: location

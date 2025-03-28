@@ -38,6 +38,7 @@ jobs:
                 parameterFile: $(paramFile)
                 deployAlerts: false
                 deploySearchConfig: false
+                githubSourceRef: $(Build.SourceBranch)
                 searchDocsFunctionAppExists: false
 
             - template: ../../../public-api/ci/tasks/check-function-app-exists.yml
@@ -55,4 +56,5 @@ jobs:
                 parameterFile: $(paramFile)
                 deployAlerts: $(deployAlerts)
                 deploySearchConfig: $(deploySearchConfig)
+                githubSourceRef: $(Build.SourceBranch)
                 searchDocsFunctionAppExists: $(searchDocsFunctionAppExists)

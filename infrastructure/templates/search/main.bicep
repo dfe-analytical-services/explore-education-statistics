@@ -38,6 +38,9 @@ param searchDocsFunctionAppExists bool = true
 @description('Provides access to resources for specific IP address ranges used for service maintenance.')
 param maintenanceIpRanges IpRange[] = []
 
+@description('The branch, tag or commit of the source code from which the deployment is triggered.')
+param githubSourceRef string = 'refs/heads/dev'
+
 var tagValues = union(resourceTags ?? {}, {
   Environment: environmentName
   DateProvisioned: dateProvisioned
@@ -111,6 +114,8 @@ module searchServiceModule 'application/searchService.bicep' = {
   name: 'searchServiceModule'
   params: {
     location: location
+    githubSourceRef: githubSourceRef
+    indexDefinitionFilename: 'index-1.json'
     resourceNames: resourceNames
     resourcePrefix: resourcePrefix
     searchServiceIpRules: maintenanceIpRanges

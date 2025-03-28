@@ -15,6 +15,8 @@ parameters:
     type: string
   - name: deploySearchConfig
     type: string
+  - name: githubSourceRef
+    type: string
   - name: searchDocsFunctionAppExists
     type: string
     default: true
@@ -41,4 +43,5 @@ steps:
               maintenanceIpRanges='$(maintenanceFirewallRules)' \
               deployAlerts=${{ parameters.deployAlerts }} \
               deploySearchConfig=${{ parameters.deploySearchConfig }} \
+              githubSourceRef=${{ parameters.githubSourceRef }} \
               searchDocsFunctionAppExists=${{ parameters.searchDocsFunctionAppExists }}

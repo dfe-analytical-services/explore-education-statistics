@@ -1,7 +1,6 @@
 param(
     [string] [Parameter(Mandatory=$true)] $searchServiceName,
-    [string] [Parameter(Mandatory=$true)] $indexName,
-    [string] [Parameter(Mandatory=$true)] $indexFilename,
+    [string] [Parameter(Mandatory=$true)] $indexDefinitionFilename,
     [string] [Parameter(Mandatory=$true)] $indexerName,
     [string] [Parameter(Mandatory=$true)] [AllowEmptyString()] $indexerScheduleInterval,
     [string] [Parameter(Mandatory=$true)] $dataSourceName,
@@ -16,25 +15,21 @@ param(
 $ErrorActionPreference = 'Stop'
 
 $apiVersion = '2024-07-01'
-$token = ConvertFrom-SecureString (Get-AzAccessToken -ResourceUrl https://search.azure.com -AsSecureString).Token -AsPlainText
+$token = (ConvertFrom-SecureString (Get-AzAccessToken -ResourceUrl https://search.azure.com -AsSecureString).Token -AsPlainText)
 $headers = @{ 'Authorization' = "Bearer $token"; 'Content-Type' = 'application/json'; }
 $uri = "https://$searchServiceName.search.windows.net"
 $dataSourceDefinition = $null
-$indexDefinition = $null
+$indexDefinitionPath = Join-Path -Path ${Env:AZ_SCRIPTS_PATH_INPUT_DIRECTORY} -ChildPath $indexDefinitionFilename
+$indexDefinition = Get-Content -Path $indexDefinitionPath -Raw | ConvertFrom-Json
 $indexerDefinition = $null
 $DeploymentScriptOutputs = @{}
+
+Write-Output "Creating search index from $indexDefinitionPath"
 
 # Create data source, indexer definitions
 switch ($dataSourceType)
 {
     "azureblob" {
-        $indexDefinition = @{
-            'name' = $indexName;
-            'fields' = @(
-                @{ 'name' = 'rid'; 'type' = 'Edm.String'; 'key' = $true },
-                @{ 'name' = 'description'; 'type' = 'Edm.String'; 'retrievable' = $true; 'searchable' = $true }
-            );
-        }
         $dataSourceDefinition = @{
             'name' = $dataSourceName;
             'type' = $dataSourceType;
@@ -52,11 +47,11 @@ switch ($dataSourceType)
         $indexerDefinition = @{
             'name' = $indexerName;
             'disabled' = $indexerDisabled -eq 'true';
-            'targetIndexName' = $indexName;
+            'targetIndexName' = $indexDefinition.name;
             'dataSourceName' = $dataSourceName;
             'schedule' = $indexerScheduleInterval.Length -gt 0 ? @{ 'interval' = $indexerScheduleInterval } : $null;
         }
-        $DeploymentScriptOutputs['text'] = $indexName
+        $DeploymentScriptOutputs['text'] = $indexDefinition.name
     }
     default {
         throw "Unsupported data source type $dataSourceType"
@@ -67,7 +62,7 @@ try {
     # https://learn.microsoft.com/rest/api/searchservice/create-index
     Invoke-WebRequest `
         -Method 'PUT' `
-        -Uri "$uri/indexes/$($indexDefinition['name'])?api-version=$apiVersion" `
+        -Uri "$uri/indexes/$($indexDefinition.name)?api-version=$apiVersion" `
         -Headers  $headers `
         -Body (ConvertTo-Json $indexDefinition)
 
