@@ -23,7 +23,7 @@ public class AdminEventRaiserServiceTests
         // ARRANGE
         _eventGridClientFactoryMockBuilder.WhereNoTopicConfigFound();
         var sut = GetSut();
-        var theme = new ThemeMockBuilder().Build();
+        var theme = new ThemeBuilder().Build();
         
         // ACT
         await sut.OnThemeUpdated(theme);
@@ -39,7 +39,7 @@ public class AdminEventRaiserServiceTests
     {
         // ARRANGE
         var sut = GetSut();
-        var theme = new ThemeMockBuilder().Build();
+        var theme = new ThemeBuilder().Build();
         
         // ACT
         await sut.OnThemeUpdated(theme);
