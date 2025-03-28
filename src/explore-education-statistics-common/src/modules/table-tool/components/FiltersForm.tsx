@@ -286,12 +286,11 @@ export default function FiltersForm({
       initialValues={initialFormValues}
       validationSchema={validationSchema}
     >
-      {({ formState, getValues, reset, setValue, watch }) => {
+      {({ formState, getValues, reset, setValue }) => {
         const { getError } = createErrorHelper({
           errors: formState.errors,
           touchedFields: formState.touchedFields,
         });
-        const values = watch();
 
         if (isActive) {
           return (
@@ -455,7 +454,7 @@ export default function FiltersForm({
             </Form>
           );
         }
-        // const values = getValues();
+        const values = getValues();
 
         return (
           <WizardStepSummary {...stepProps} goToButtonText="Edit filters">
