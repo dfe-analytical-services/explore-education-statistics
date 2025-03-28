@@ -28,7 +28,7 @@ import PublicationReleaseHeadlinesSection from '@frontend/modules/find-statistic
 import styles from '@frontend/modules/find-statistics/PublicationReleasePage.module.scss';
 import classNames from 'classnames';
 import orderBy from 'lodash/orderBy';
-import { GetServerSideProps, NextPage } from 'next';
+import { GetServerSideProps, NextPage, Redirect } from 'next';
 import React from 'react';
 
 interface Props {
@@ -577,8 +577,8 @@ const PublicationReleasePage: NextPage<Props> = ({ releaseVersion }) => {
   );
 };
 
-export const getServerSideProps: GetServerSideProps<Props> = withAxiosHandler(
-  async ({ query }) => {
+export const getServerSideProps: GetServerSideProps<Dictionary<unknown>> =
+  withAxiosHandler(async ({ query }) => {
     const { publication: publicationSlug, release: releaseSlug } =
       query as Dictionary<string>;
 
@@ -586,12 +586,21 @@ export const getServerSideProps: GetServerSideProps<Props> = withAxiosHandler(
       ? publicationService.getPublicationRelease(publicationSlug, releaseSlug)
       : publicationService.getLatestPublicationRelease(publicationSlug));
 
+    // EES-5951 Redirect to latest release URL if the requested URL is for the publication base
+    if (!releaseSlug) {
+      return {
+        redirect: {
+          destination: `/find-statistics/${publicationSlug}/${releaseVersion.slug}`,
+          permanent: false,
+        } as Redirect,
+      };
+    }
+
     return {
       props: {
         releaseVersion,
       },
     };
-  },
-);
+  });
 
 export default PublicationReleasePage;
