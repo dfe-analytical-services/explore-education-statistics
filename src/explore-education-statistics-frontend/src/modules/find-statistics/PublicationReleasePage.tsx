@@ -577,8 +577,8 @@ const PublicationReleasePage: NextPage<Props> = ({ releaseVersion }) => {
   );
 };
 
-export const getServerSideProps: GetServerSideProps<Dictionary<unknown>> =
-  withAxiosHandler(async ({ query }) => {
+export const getServerSideProps: GetServerSideProps = withAxiosHandler(
+  async ({ query }) => {
     const { publication: publicationSlug, release: releaseSlug } =
       query as Dictionary<string>;
 
@@ -586,13 +586,12 @@ export const getServerSideProps: GetServerSideProps<Dictionary<unknown>> =
       ? publicationService.getPublicationRelease(publicationSlug, releaseSlug)
       : publicationService.getLatestPublicationRelease(publicationSlug));
 
-    // EES-5951 Redirect to latest release URL if the requested URL is for the publication base
     if (!releaseSlug) {
       return {
         redirect: {
           destination: `/find-statistics/${publicationSlug}/${releaseVersion.slug}`,
           permanent: true,
-        } as Redirect,
+        },
       };
     }
 
@@ -601,6 +600,7 @@ export const getServerSideProps: GetServerSideProps<Dictionary<unknown>> =
         releaseVersion,
       },
     };
-  });
+  },
+);
 
 export default PublicationReleasePage;
