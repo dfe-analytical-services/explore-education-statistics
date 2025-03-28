@@ -181,6 +181,7 @@ module storeAccessKeyToKeyVault './keyVaultSecret.bicep' = {
   }
 }
 
+output storageAccountId string = storageAccount.id
 output storageAccountName string = storageAccount.name
 output connectionStringSecretName string = connectionStringSecretName
 output accessKeySecretName string = accessKeySecretName

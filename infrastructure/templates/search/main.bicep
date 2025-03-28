@@ -23,8 +23,11 @@ param resourceTags {
 @description('Tagging : Date Provisioned. Used for tagging resources created by this infrastructure pipeline.')
 param dateProvisioned string = utcNow('u')
 
-@description('Do Azure Monitor alerts need creating or updating?')
+@description('Whether to create/update Azure Monitor alerts during this deploy.')
 param deployAlerts bool = false
+
+@description('Whether to deploy the Search service configuration to create/update the data source, index and indexer.')
+param deploySearchConfig bool = false
 
 @description('The URL of the Content API.')
 param contentApiUrl string
@@ -34,6 +37,9 @@ param searchDocsFunctionAppExists bool = true
 
 @description('Provides access to resources for specific IP address ranges used for service maintenance.')
 param maintenanceIpRanges IpRange[] = []
+
+@description('The branch, tag or commit of the source code from which the deployment is triggered.')
+param githubSourceRef string = 'refs/heads/dev'
 
 var tagValues = union(resourceTags ?? {}, {
   Environment: environmentName
@@ -108,10 +114,14 @@ module searchServiceModule 'application/searchService.bicep' = {
   name: 'searchServiceModule'
   params: {
     location: location
+    githubSourceRef: githubSourceRef
+    indexName: 'index-1'
     resourceNames: resourceNames
     resourcePrefix: resourcePrefix
-    storageFirewallRules: maintenanceIpRanges
+    searchServiceIpRules: maintenanceIpRanges
+    storageIpRules: maintenanceIpRanges
     deployAlerts: deployAlerts
+    deploySearchConfig: deploySearchConfig
     tagValues: tagValues
   }
 }
