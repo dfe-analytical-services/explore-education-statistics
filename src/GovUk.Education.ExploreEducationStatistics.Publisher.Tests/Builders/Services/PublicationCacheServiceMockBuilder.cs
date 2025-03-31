@@ -6,14 +6,14 @@ using Moq;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Builders.Services;
 
-public class PublicationCacheServiceBuilder
+public class PublicationCacheServiceMockBuilder
 {
     private readonly Mock<IPublicationCacheService> _mock = new(MockBehavior.Strict);
     public Asserter Assert => new(_mock);
 
     public IPublicationCacheService Build() => _mock.Object;
 
-    public PublicationCacheServiceBuilder()
+    public PublicationCacheServiceMockBuilder()
     {
         _mock
             .Setup(m => m.UpdatePublication(It.IsAny<string>()))

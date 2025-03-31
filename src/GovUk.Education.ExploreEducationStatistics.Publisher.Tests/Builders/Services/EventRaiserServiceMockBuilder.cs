@@ -8,19 +8,19 @@ using Moq;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Builders.Services;
 
-public class EventRaiserServiceBuilder
+public class EventRaiserServiceMockBuilder
 {
-    private readonly Mock<IEventRaiserService> _mock = new(MockBehavior.Strict);
-    public IEventRaiserService Build() => _mock.Object;
+    private readonly Mock<IPublisherEventRaiserService> _mock = new(MockBehavior.Strict);
+    public IPublisherEventRaiserService Build() => _mock.Object;
     public Asserter Assert => new(_mock);
-    public EventRaiserServiceBuilder()
+    public EventRaiserServiceMockBuilder()
     {
         _mock
             .Setup(m => m.RaiseReleaseVersionPublishedEvents(It.IsAny<IList<PublishingCompletionService.PublishedReleaseVersionInfo>>()))
             .Returns(Task.CompletedTask);
     }
 
-    public class Asserter(Mock<IEventRaiserService> mock)
+    public class Asserter(Mock<IPublisherEventRaiserService> mock)
     {
         public void EventWasRaised(Func<PublishingCompletionService.PublishedReleaseVersionInfo, bool> expected)
         {

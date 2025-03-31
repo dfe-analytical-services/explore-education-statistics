@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.EventGrid;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Options;
 using Microsoft.Extensions.Options;
 

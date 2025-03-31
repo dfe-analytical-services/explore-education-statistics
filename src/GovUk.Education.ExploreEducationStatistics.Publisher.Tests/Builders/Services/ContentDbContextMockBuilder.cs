@@ -7,7 +7,7 @@ using ReleaseVersion = GovUk.Education.ExploreEducationStatistics.Content.Model.
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Builders.Services;
 
-public class ContentDbContextBuilder
+public class ContentDbContextMockBuilder
 {
     private readonly ContentDbContext _inMemoryContentDbContext = ContentDbUtils.InMemoryContentDbContext();
 
@@ -17,14 +17,14 @@ public class ContentDbContextBuilder
         return _inMemoryContentDbContext;
     }
 
-    public ContentDbContextBuilder With(ReleaseVersion releaseVersion)
+    public ContentDbContextMockBuilder With(ReleaseVersion releaseVersion)
     {
         _inMemoryContentDbContext.ReleaseVersions.Add(releaseVersion);
         _inMemoryContentDbContext.SaveChanges();
         return this;
     }
 
-    public ContentDbContextBuilder With(Publication publication)
+    public ContentDbContextMockBuilder With(Publication publication)
     {
         _inMemoryContentDbContext.Publications.Add(publication);
         _inMemoryContentDbContext.SaveChanges();

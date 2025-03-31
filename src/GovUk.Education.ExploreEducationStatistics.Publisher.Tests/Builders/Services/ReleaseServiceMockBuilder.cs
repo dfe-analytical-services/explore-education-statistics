@@ -7,30 +7,30 @@ using Moq;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Builders.Services;
 
-public class ReleaseServiceBuilder
+public class ReleaseServiceMockBuilder
 {
     private readonly Mock<IReleaseService> _mock = new(MockBehavior.Strict);
     public Asserter Assert => new(_mock);
 
     public IReleaseService Build() => _mock.Object;
 
-    public ReleaseServiceBuilder()
+    public ReleaseServiceMockBuilder()
     {
         _mock
             .Setup(m => m.CompletePublishing(It.IsAny<Guid>(), It.IsAny<DateTime>()))
             .Returns(Task.CompletedTask);
     }
 
-    public ReleaseServiceBuilder WhereGetReturns(Guid releaseVersionId, ReleaseVersion releaseVersion)
+    public ReleaseServiceMockBuilder WhereGetReturns(ReleaseVersion releaseVersion)
     {
         _mock
-            .Setup(m => m.Get(releaseVersionId))
+            .Setup(m => m.Get(releaseVersion.Id))
             .ReturnsAsync(releaseVersion);
         
         return this;
     }
 
-    public ReleaseServiceBuilder WherePublicationLatestPublishedReleaseVersionIs(
+    public ReleaseServiceMockBuilder WherePublicationLatestPublishedReleaseVersionIs(
         Guid publicationId,
         ReleaseVersion latestPublishedReleaseVersion)
     {

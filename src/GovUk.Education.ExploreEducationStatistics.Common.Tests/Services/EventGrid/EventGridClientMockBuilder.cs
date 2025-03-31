@@ -3,19 +3,19 @@ using System.Collections.Generic;
 using System.Net;
 using System.Threading;
 using Azure.Messaging.EventGrid;
-using GovUk.Education.ExploreEducationStatistics.Publisher.Services.EventGrid;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.EventGrid;
 using Moq;
 
-namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Builders.Services.EventGrid;
+namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services.EventGrid;
 
-public class EventGridPublisherClientBuilder
+public class EventGridClientMockBuilder
 {
-    private readonly Mock<IEventGridPublisherClient> _mock = new(MockBehavior.Strict);
+    private readonly Mock<IEventGridClient> _mock = new(MockBehavior.Strict);
     private readonly List<EventGridEvent> _eventsPublished = new();
     private HttpStatusCode _httpStatusCode = HttpStatusCode.OK;
     private Exception? _sendEventAsyncException;
 
-    public IEventGridPublisherClient Build()
+    public IEventGridClient Build()
     {
         if (_sendEventAsyncException is null)
         {
@@ -36,20 +36,20 @@ public class EventGridPublisherClientBuilder
         return _mock.Object;
     }
 
-    public EventGridPublisherClientBuilder WhereResponseIs(HttpStatusCode statusCode)
+    public EventGridClientMockBuilder WhereResponseIs(HttpStatusCode statusCode)
     {
         _httpStatusCode = statusCode;
         return this;
     }
 
-    public EventGridPublisherClientBuilder WhereSendEventAsyncThrows(Exception exception)
+    public EventGridClientMockBuilder WhereSendEventAsyncThrows(Exception exception)
     {
         _sendEventAsyncException = exception;
         return this;
     }
     
     public Asserter Assert => new(_mock, _eventsPublished);
-    public class Asserter(Mock<IEventGridPublisherClient> mock, List<EventGridEvent> eventsPublished)
+    public class Asserter(Mock<IEventGridClient> mock, List<EventGridEvent> eventsPublished)
     {
         public IEnumerable<EventGridEvent> EventsPublished => eventsPublished;
         

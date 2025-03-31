@@ -1,9 +1,14 @@
 // Originally sourced from https://github.com/Azure/azure-quickstart-templates/blob/master/quickstarts/microsoft.search/azure-search-create/main.bicep.
 
+import { IpRange } from '../../common/types.bicep'
+
 @description('Service name must only contain lowercase letters, digits or dashes, cannot use dash as the first two or last one characters, cannot contain consecutive dashes, and is limited between 2 and 60 characters in length.')
 @minLength(2)
 @maxLength(60)
 param name string
+
+@description('A list IP network rules to allow access to the Search Service from specific public internet IP address ranges. These rules are applied only when \'publicNetworkAccess\' is \'Enabled\'.')
+param ipRules IpRange[] = []
 
 @allowed([
   'free'
@@ -14,7 +19,7 @@ param name string
   'storage_optimized_l1'
   'storage_optimized_l2'
 ])
-@description('The pricing tier of the search service you want to create (for example, basic or standard).')
+@description('The pricing tier of the Search Service you want to create (for example, basic or standard).')
 param sku string = 'standard'
 
 @description('Replicas distribute search workloads across the service. You need at least two replicas to support high availability of query workloads (not applicable to the free tier).')
@@ -40,25 +45,61 @@ param partitionCount int = 1
 ])
 param hostingMode string = 'default'
 
+@description('Specifies whether traffic is allowed over the public interface.')
+@allowed([
+  'Disabled'
+  'Enabled'
+])
+param publicNetworkAccess string = 'Disabled'
+
+@description('Indicates whether the Search Service should have a system-assigned managed identity.')
+param systemAssignedIdentity bool = false
+
+@description('The name of a user-assigned managed identity to assign to the Search Service.')
+param userAssignedIdentityName string = ''
+
 @description('Location for all resources.')
 param location string
 
 @description('A set of tags with which to tag the resource in Azure')
 param tagValues object
 
-resource searchService 'Microsoft.Search/searchServices@2020-08-01' = {
+var identityType = systemAssignedIdentity ? (!empty(userAssignedIdentityName) ? 'SystemAssigned, UserAssigned' : 'SystemAssigned') : (!empty(userAssignedIdentityName) ? 'UserAssigned' : 'None')
+
+resource userAssignedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2024-11-30' existing = if (!empty(userAssignedIdentityName)) {
+  name: userAssignedIdentityName
+}
+
+resource searchService 'Microsoft.Search/searchServices@2024-06-01-preview' = {
   name: name
   location: location
   sku: {
     name: sku
   }
+  identity: {
+    type: identityType
+    userAssignedIdentities: !empty(userAssignedIdentityName) ? { '${userAssignedIdentity.id}': {} } : null
+  }
   properties: {
+    authOptions: {
+      aadOrApiKey: {
+        aadAuthFailureMode: 'http403'
+      }
+    }
     replicaCount: replicaCount
+    networkRuleSet: {
+      bypass: length(ipRules) > 0 ? 'AzureServices' : 'None'
+      ipRules: [for ipRule in ipRules: {
+        value: ipRule.cidr
+      }]
+    }
     partitionCount: partitionCount
+    publicNetworkAccess: publicNetworkAccess
     hostingMode: hostingMode
   }
   tags: tagValues
 }
 
 output searchServiceEndpoint string = 'https://${searchService.name}.search.windows.net'
+output searchServiceIdentityPrincipalId string = systemAssignedIdentity ? searchService.identity.principalId : ''
 output searchServiceName string = searchService.name
