@@ -127,10 +127,11 @@ public static class ServiceCollectionExtensions
         return services;
     }
 
-    public static IServiceCollection AddEventGridClient(this IServiceCollection services) =>
+    public static IServiceCollection AddEventGridClient(this IServiceCollection services, IConfiguration configuration) =>
         services
             .AddTransient<IEventGridClientFactory, EventGridClientFactory>()
             .AddTransient<IConfiguredEventGridClientFactory, ConfiguredEventGridClientFactory>()
             .AddTransient(typeof(Func<ILogger<SafeEventGridClient>>), sp => sp.GetRequiredService<ILogger<SafeEventGridClient>>)
+            .Configure<EventGridOptions>(configuration.GetSection(EventGridOptions.Section))
         ;
 }
