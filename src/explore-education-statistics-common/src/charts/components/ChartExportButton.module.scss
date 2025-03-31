@@ -24,7 +24,12 @@
     position: absolute;
     z-index: 2;
     padding-right: govuk-spacing(4);
+    right: 0;
   }
+}
+
+.exportMenu summary {
+  margin-left: auto;
 }
 
 .exportMenu button {
