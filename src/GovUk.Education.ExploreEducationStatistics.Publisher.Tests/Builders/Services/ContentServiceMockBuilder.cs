@@ -7,14 +7,14 @@ using Moq;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Builders.Services;
 
-public class ContentServiceBuilder
+public class ContentServiceMockBuilder
 {
     private readonly Mock<IContentService> _mock = new(MockBehavior.Strict);
     public Asserter Assert => new(_mock);
 
     public IContentService Build() => _mock.Object;
 
-    public ContentServiceBuilder()
+    public ContentServiceMockBuilder()
     {
         _mock
             .Setup(m => m.DeletePreviousVersionsDownloadFiles(It.IsAny<IReadOnlyList<Guid>>()))

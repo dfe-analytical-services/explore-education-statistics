@@ -7,13 +7,13 @@ using Moq;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Builders.Services;
 
-public class NotificationsServiceBuilder
+public class NotificationsServiceMockBuilder
 {
     private readonly Mock<INotificationsService> _mock = new(MockBehavior.Strict);
     public INotificationsService Build() => _mock.Object;
     public Asserter Assert => new(_mock);
 
-    public NotificationsServiceBuilder()
+    public NotificationsServiceMockBuilder()
     {
         _mock
             .Setup(m => m.NotifySubscribersIfApplicable(It.IsAny<IReadOnlyList<Guid>>()))

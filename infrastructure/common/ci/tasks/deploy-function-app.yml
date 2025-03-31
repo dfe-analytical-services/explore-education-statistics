@@ -5,6 +5,8 @@ parameters:
     type: string
   - name: displayName
     type: string
+  - name: downloadPipeline
+    type: string
   - name: deploymentName
     type: string
   - name: functionAppName
@@ -31,16 +33,18 @@ jobs:
       runOnce:
         deploy:
           steps:
-            - download: MainBuild
+            - download: ${{ parameters.downloadPipeline }}
               displayName: Download ${{ parameters.functionAppName }} Function App artifact
               artifact: ${{ parameters.artifactName }}
+              patterns: |
+                ${{ parameters.artifactZipName }}
 
             - template: ../../../templates/public-api/ci/tasks/bicep-output-variables.yml
               parameters:
                 serviceConnection: ${{ parameters.serviceConnection }}
 
             - task: AzureCLI@2
-              displayName: 'Deploy ${{ parameters.functionAppName }} Function App using az cli'
+              displayName: 'Deploy ${{ parameters.functionAppName }} Function App'
               retryCountOnTaskFailure: 1
               inputs:
                 azureSubscription: ${{ parameters.serviceConnection }}
@@ -52,10 +56,10 @@ jobs:
                   az functionapp deployment source config-zip \
                     --resource-group $(resourceGroupName) \
                     --name ${{ parameters.functionAppName }} \
-                    --src '$(Pipeline.Workspace)/MainBuild/${{ parameters.artifactName }}/${{ parameters.artifactZipName }}'
+                    --src '$(Pipeline.Workspace)/${{ parameters.downloadPipeline }}/${{ parameters.artifactName }}/${{ parameters.artifactZipName }}'
 
             - template: ../../../templates/public-api/ci/tasks/wait-for-endpoint-success.yml
               parameters:
                 serviceConnection: ${{ parameters.serviceConnection }}
-                displayName: Check the ${{ parameters.functionAppName }} Function App is healthy after deployment
+                displayName: Check ${{ parameters.functionAppName }} Function App health
                 endpoint: ${{ parameters.healthCheckUrl }}

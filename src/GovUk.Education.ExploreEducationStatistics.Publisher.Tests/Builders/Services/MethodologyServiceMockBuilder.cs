@@ -6,14 +6,22 @@ using Moq;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Builders.Services;
 
-public class MethodologyServiceBuilder
+public class MethodologyServiceMockBuilder
 {
     private readonly Mock<IMethodologyService> _mock = new(MockBehavior.Strict);
     public Asserter Assert => new(_mock);
 
+    public MethodologyServiceMockBuilder()
+    {
+        // By default, no methodologies for any release version
+        _mock
+            .Setup(m => m.GetLatestVersionByRelease(It.IsAny<ReleaseVersion>()))
+            .ReturnsAsync([]);
+    }
+    
     public IMethodologyService Build() => _mock.Object;
 
-    public MethodologyServiceBuilder WhereGetLatestVersionByReleaseReturns(
+    public MethodologyServiceMockBuilder WhereGetLatestVersionByReleaseReturns(
         ReleaseVersion releaseVersion,
         params MethodologyVersion[] methodologyVersions)
     {
@@ -28,7 +36,7 @@ public class MethodologyServiceBuilder
         return this;
     }
     
-    public MethodologyServiceBuilder WhereGetLatestVersionByReleaseReturnsNoMethodologies(ReleaseVersion releaseVersion)
+    public MethodologyServiceMockBuilder WhereGetLatestVersionByReleaseReturnsNoMethodologies(ReleaseVersion releaseVersion)
     {
         _mock
             .Setup(m => m.GetLatestVersionByRelease(releaseVersion))
@@ -37,7 +45,7 @@ public class MethodologyServiceBuilder
         return this;
     }
 
-    public MethodologyServiceBuilder WhereIsBeingPublishedAlongsideRelease(MethodologyVersion methodologyVersion, ReleaseVersion releaseVersion)
+    public MethodologyServiceMockBuilder WhereIsBeingPublishedAlongsideRelease(MethodologyVersion methodologyVersion, ReleaseVersion releaseVersion)
     {
         _mock
             .Setup(m => m.IsBeingPublishedAlongsideRelease(methodologyVersion, releaseVersion))
@@ -45,7 +53,7 @@ public class MethodologyServiceBuilder
         
         return this;
     }
-    public MethodologyServiceBuilder WhereIsNotBeingPublishedAlongsideRelease(MethodologyVersion methodologyVersion, ReleaseVersion releaseVersion)
+    public MethodologyServiceMockBuilder WhereIsNotBeingPublishedAlongsideRelease(MethodologyVersion methodologyVersion, ReleaseVersion releaseVersion)
     {
         _mock
             .Setup(m => m.IsBeingPublishedAlongsideRelease(methodologyVersion, releaseVersion))

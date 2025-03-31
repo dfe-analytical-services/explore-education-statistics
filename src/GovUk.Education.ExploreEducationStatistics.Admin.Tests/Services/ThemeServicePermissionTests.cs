@@ -7,6 +7,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Methodologies;
+using GovUk.Education.ExploreEducationStatistics.Admin.Tests.MockBuilders;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
@@ -176,7 +177,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             IUserService? userService = null,
             IMethodologyService? methodologyService = null,
             IPublishingService? publishingService = null,
-            IReleaseVersionService? releaseVersionService = null)
+            IReleaseVersionService? releaseVersionService = null,
+            IAdminEventRaiserService? adminEventRaiserService = null)
         {
             var publicContext = publicDataDbContext ?? Mock.Of<PublicDataDbContext>();
             var contentContext = contentDbContext ?? Mock.Of<ContentDbContext>();
@@ -192,7 +194,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 userService ?? AlwaysTrueUserService().Object,
                 methodologyService ?? Mock.Of<IMethodologyService>(Strict),
                 publishingService ?? Mock.Of<IPublishingService>(Strict),
-                releaseVersionService ?? Mock.Of<IReleaseVersionService>(Strict)
+                releaseVersionService ?? Mock.Of<IReleaseVersionService>(Strict),
+                adminEventRaiserService ?? new AdminEventRaiserServiceMockBuilder().Build()
             );
         }
     }
