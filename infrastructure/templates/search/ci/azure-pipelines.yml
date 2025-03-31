@@ -96,7 +96,7 @@ stages:
   - template: stages/deploy.yml
     parameters:
       stageName: DeployProd
-      condition:  and(succeeded(), eq(variables.isMaster, true))
+      condition: and(succeeded(), eq(variables.isMaster, true))
       dependsOn: DeployPreProd
       environment: Prod
       serviceConnection: $(serviceConnectionProd)

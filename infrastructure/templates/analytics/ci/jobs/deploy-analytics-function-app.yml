@@ -15,6 +15,7 @@ jobs:
     displayName: Deploy Analytics Function App
     dependsOn: ${{ parameters.dependsOn }}
     deploymentName: DeployAnalyticsFunction
+    downloadPipeline: MainBuild
     functionAppName: $(analyticsFunctionAppName)
     artifactName: analytics-function-app
     artifactZipName: GovUk.Education.ExploreEducationStatistics.Analytics.Consumer.zip
