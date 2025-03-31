@@ -73,10 +73,10 @@ const TimePeriodDataTable = forwardRef<HTMLElement, Props>(
               render when editing a draft release currently due to dataBlockId
           */}
           {dataBlockId && (
-            <ExportTableButton 
-              fileName={captionTitle} 
-              fullTable={fullTable} 
-              title={captionTitle} 
+            <ExportTableButton
+              fileName={captionTitle}
+              fullTable={fullTable}
+              title={captionTitle}
               tableRef={dataTableRef as RefObject<HTMLElement>}
             />
           )}

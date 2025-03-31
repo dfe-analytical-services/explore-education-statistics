@@ -8,75 +8,76 @@ import { FullTable } from '@common/modules/table-tool/types/fullTable';
 import styles from './ExportTableButton.module.scss';
 
 interface ExportTableButtonProps {
-    fileName?: string | undefined,
-    footnotes?: Footnote[];
-    fullTable?: FullTable,
-    tableRef: RefObject<HTMLElement>,
-    title?: string | undefined,
+  fileName?: string | undefined;
+  footnotes?: Footnote[];
+  fullTable?: FullTable;
+  tableRef: RefObject<HTMLElement>;
+  title?: string | undefined;
 }
 
 const ExportTableButton: React.FC<ExportTableButtonProps> = ({
-    fileName,
-    footnotes = [],
-    fullTable,
-    title,
-    tableRef,
- }) => {
-    const [isOpen, toggleOpened] = useToggle(false);
+  fileName,
+  footnotes = [],
+  fullTable,
+  title,
+  tableRef,
+}) => {
+  const [isOpen, toggleOpened] = useToggle(false);
 
-    const tableFootnotes = fullTable
+  const tableFootnotes = fullTable
     ? fullTable.subjectMeta.footnotes
     : footnotes;
 
-    const copyTableToClipboard = () => {
-        if (!tableRef.current) return;
-        
-        const clipboardItem = new ClipboardItem({
-          "text/plain": new Blob(
-            [tableRef.current.innerText],
-            { type: "text/plain" }
-          ),
-          "text/html": new Blob(
-            [tableRef.current.outerHTML],
-            { type: "text/html" }
-          ),
-        });
-    
-        navigator.clipboard.write([clipboardItem]);
-      }
+  const copyTableToClipboard = () => {
+    if (!tableRef.current) return;
 
-    const exportToOds = () => {
-        downloadTableOdsFile(fileName ?? "table", tableFootnotes, tableRef, title ?? "table")
-    };
+    const clipboardItem = new ClipboardItem({
+      'text/plain': new Blob([tableRef.current.innerText], {
+        type: 'text/plain',
+      }),
+      'text/html': new Blob([tableRef.current.outerHTML], {
+        type: 'text/html',
+      }),
+    });
 
-    return (
-        <Details
-            summary="Export options"
-            hiddenText="Export options for table"
-            open={isOpen}
-            onToggle={toggleOpened}
-            className={styles.exportMenu}
-        >
-        {isOpen && (
-            <ul
-                className={`${styles.exportMenuList} govuk-!-font-size-16`}
-                role="menu"
-            >
-                <li role="menuitem">
-                    <ButtonText onClick={exportToOds}>
-                        Download table as ODS
-                    </ButtonText>
-                </li>
-                <li role="menuitem">
-                    <ButtonText onClick={copyTableToClipboard}>
-                        Copy table to clipboard
-                    </ButtonText>
-                </li>
-                {/* need to add CSV functionality here but seems we need access to release table query */}
-            </ul>
-        )}
-    </Details>
+    navigator.clipboard.write([clipboardItem]);
+  };
+
+  const exportToOds = () => {
+    downloadTableOdsFile(
+      fileName ?? 'table',
+      tableFootnotes,
+      tableRef,
+      title ?? 'table',
     );
+  };
+
+  return (
+    <Details
+      summary="Export options"
+      hiddenText={`for ${title || 'table'}`}
+      open={isOpen}
+      onToggle={toggleOpened}
+      className={styles.exportMenu}
+    >
+      {isOpen && (
+        <ul
+          className={`${styles.exportMenuList} govuk-!-font-size-16`}
+          role="menu"
+        >
+          <li role="menuitem">
+            <ButtonText onClick={exportToOds}>Download table as ODS</ButtonText>
+          </li>
+          <li role="menuitem">
+            <ButtonText onClick={copyTableToClipboard}>
+              Copy table to clipboard
+            </ButtonText>
+          </li>
+          {/* need to add CSV functionality here but seems we need access to release table query */}
+        </ul>
+      )}
+    </Details>
+  );
 };
 
 export default ExportTableButton;
