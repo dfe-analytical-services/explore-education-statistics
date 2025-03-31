@@ -131,6 +131,8 @@ module searchServiceConfigModule '../components/searchServiceConfig.bicep' = if 
 
 output searchableDocumentsContainerName string = searchableDocumentsContainerName
 output searchServiceEndpoint string = searchServiceModule.outputs.searchServiceEndpoint
+output searchServiceIndexName string = indexName
+output searchServiceIndexerName string = indexerName
 output searchServiceName string = searchServiceModule.outputs.searchServiceName
 output searchStorageAccountConnectionStringSecretName string = searchStorageAccountModule.outputs.connectionStringSecretName
 output searchStorageAccountName string = searchStorageAccountModule.outputs.storageAccountName
