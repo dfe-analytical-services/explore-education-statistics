@@ -74,7 +74,7 @@ public class ConsumePublicZipDownloadsFunction(
                 zipDownloadHash,
                 FIRST(releaseVersionId) AS releaseVersionId,
                 FIRST(fileIds) AS fileIds,
-                CAST(COUNT(zipDownloadHash) AS INT) AS numZipDownloads
+                CAST(COUNT(zipDownloadHash) AS INT) AS downloads
             FROM zipDownloads
             GROUP BY zipDownloadHash
             ORDER BY zipDownloadHash");
@@ -86,7 +86,7 @@ public class ConsumePublicZipDownloadsFunction(
             $"{reportFilenamePrefix}_public-zip-downloads.parquet");
         
         duckDbConnection.ExecuteNonQuery($@"
-            COPY (SELECT * FROM queryReport)
+            COPY (SELECT * FROM zipDownloadsReport)
             TO '{zipDownloadReportFilename}' (FORMAT 'parquet', CODEC 'zstd')");
         
         Directory.Delete(processingDirectory, recursive: true);

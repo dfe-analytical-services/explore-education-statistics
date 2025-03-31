@@ -73,7 +73,7 @@ const DownloadTable = ({
           <Form
             id="downloadTableForm"
             onSubmit={async ({ fileFormat }) => {
-              // @MarkFix record analytics here - could be table tool or permalink
+              // TODO EES-5852 record analytics for table tool/permalink csv/ods downloads
               await onSubmit?.(fileFormat);
 
               if (fileFormat === 'csv') {

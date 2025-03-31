@@ -6,6 +6,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Json;
 using System.Net.Mime;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
@@ -18,7 +19,9 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Requests;
+using GovUk.Education.ExploreEducationStatistics.Content.Services;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Content.Services.Tests.Services;
 using GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Testing;
@@ -29,8 +32,19 @@ using static Moq.MockBehavior;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controllers;
 
-public abstract class ReleaseFileControllerTests(TestApplicationFactory testApp) : IntegrationTestFixture(testApp)
+public abstract class ReleaseFileControllerTests(TestApplicationFactory testApp)
+    : IntegrationTestFixture(testApp), IDisposable
 {
+    private readonly TestAnalyticsPathResolver _analyticsPathResolver = new();
+
+    public new void Dispose()
+    {
+        if (Directory.Exists(_analyticsPathResolver.BasePath()))
+        {
+            Directory.Delete(_analyticsPathResolver.BasePath(), recursive: true);
+        }
+    }
+
     public class ListReleaseFilesTests(TestApplicationFactory testApp)
         : ReleaseFileControllerTests(testApp)
     {
@@ -320,9 +334,83 @@ public abstract class ReleaseFileControllerTests(TestApplicationFactory testApp)
 
             response.AssertOk("Test zip");
         }
+
+        public class AnalyticsEnabledTests : ReleaseFileControllerTests
+        {
+            public AnalyticsEnabledTests(TestApplicationFactory testApp) : base(testApp)
+            {
+                testApp.AddAppSettings("appsettings.AnalyticsEnabled.json");
+            }
+
+            [Fact]
+            public async Task AnalyticsEnabled_Success()
+            {
+                Publication publication = DataFixture.DefaultPublication()
+                    .WithReleases(DataFixture.DefaultRelease(publishedVersions: 1)
+                        .GenerateList(1));
+
+                var releaseVersion = publication.Releases.Single().Versions.Single();
+
+                await TestApp.AddTestData<ContentDbContext>(context =>
+                {
+                    context.Publications.Add(publication);
+                });
+
+                var fileId1 = Guid.NewGuid();
+                var fileId2 = Guid.NewGuid();
+
+                var releaseFileService = new Mock<IReleaseFileService>(Strict);
+
+                releaseFileService
+                    .Setup(
+                        s => s.ZipFilesToStream(
+                            releaseVersion.Id,
+                            It.IsAny<Stream>(),
+                            It.Is<IEnumerable<Guid>>(
+                                ids => ids.SequenceEqual(ListOf(fileId1, fileId2))),
+                            It.IsAny<CancellationToken>()
+                        )
+                    )
+                    .ReturnsAsync(Unit.Instance)
+                    .Callback<Guid, Stream, IEnumerable<Guid>, CancellationToken?>(
+                        (_, stream, _, _) => stream.WriteText("Test zip"));
+
+                var client = BuildApp(
+                        releaseFileService: releaseFileService.Object,
+                        analyticsPathResolver: _analyticsPathResolver)
+                    .CreateClient();
+
+                var response = await client
+                    .GetAsync($"/api/releases/{releaseVersion.Id}/files?fileIds={fileId1},{fileId2}");
+
+                MockUtils.VerifyAllMocks(releaseFileService);
+
+                response.AssertOk("Test zip");
+
+                // Add a slight delay as the writing of the query details for analytics is non-blocking
+                // and could occur slightly after the result is returned to the user.
+                Thread.Sleep(2000);
+
+                var publicZipDownloadsPath = _analyticsPathResolver.PublicZipDownloadsDirectoryPath();
+
+                Assert.True(Directory.Exists(publicZipDownloadsPath));
+                var zipDownloadFiles = Directory.GetFiles(publicZipDownloadsPath);
+                var zipDownloadFile = Assert.Single(zipDownloadFiles);
+                var contents = await System.IO.File.ReadAllTextAsync(zipDownloadFile);
+                var zipDownloadDetails = JsonSerializer.Deserialize<AnalyticsWriter.CaptureReleaseVersionZipDownloadRequest>(
+                    contents,
+                    new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                Assert.NotNull(zipDownloadDetails);
+
+                Assert.Equal(publication.Releases[0].Versions[0].Id, zipDownloadDetails.ReleaseVersionId);
+                Assert.Equal([fileId1, fileId2], zipDownloadDetails.FileIds);
+            }
+        }
     }
 
-    private WebApplicationFactory<Startup> BuildApp(IReleaseFileService? releaseFileService = null)
+    private WebApplicationFactory<Startup> BuildApp(
+        IReleaseFileService? releaseFileService = null,
+        IAnalyticsPathResolver? analyticsPathResolver = null)
     {
         return TestApp
             .ConfigureServices(services =>
@@ -330,6 +418,11 @@ public abstract class ReleaseFileControllerTests(TestApplicationFactory testApp)
                 if (releaseFileService is not null)
                 {
                     services.ReplaceService(releaseFileService);
+                }
+
+                if (analyticsPathResolver is not null)
+                {
+                    services.ReplaceService(analyticsPathResolver, optional: true);
                 }
             });
     }

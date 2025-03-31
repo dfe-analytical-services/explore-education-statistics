@@ -3,7 +3,6 @@ using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
-using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Requests;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services;
@@ -30,7 +29,8 @@ using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockU
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Controllers;
 
-public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory testApp) : IntegrationTestFixture(testApp)
+public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory testApp)
+    : IntegrationTestFixture(testApp)
 {
     private const string BaseUrl = "v1/data-sets";
 
@@ -2827,7 +2827,7 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
 
         public void Dispose()
         {
-            var queriesDirectory = _analyticsPathResolver.PublicApiQueriesDirectoryPath();
+            var queriesDirectory = _analyticsPathResolver.BasePath();
             if (Directory.Exists(queriesDirectory))
             {
                 Directory.Delete(queriesDirectory, recursive: true);

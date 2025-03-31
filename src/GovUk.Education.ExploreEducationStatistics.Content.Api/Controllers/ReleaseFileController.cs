@@ -39,7 +39,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
         }
 
         [ResponseCache(Duration = 300)]
-        [HttpGet("releases/{releaseVersionId}/files/{fileId}")] // @MarkFix what is this being used for?
+        [HttpGet("releases/{releaseVersionId}/files/{fileId}")]
         public async Task<ActionResult> Stream(string releaseVersionId, string fileId)
         {
             if (Guid.TryParse(releaseVersionId, out var releaseVersionIdGuid) &&
@@ -103,7 +103,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
                     try
                     {
                         analyticsManager.AddReleaseVersionZipDownload(
-                            new CaptureReleaseVersionZipDownloadRequest(releaseVersionId, fileIds),
+                            new CaptureReleaseVersionZipDownloadRequest(releaseVersionId, fileIds ?? []),
                             cancellationToken);
                     }
                     catch (Exception e)

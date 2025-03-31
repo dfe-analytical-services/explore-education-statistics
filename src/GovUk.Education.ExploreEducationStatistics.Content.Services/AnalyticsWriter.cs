@@ -59,5 +59,5 @@ public class AnalyticsWriter(
 
     public record CaptureReleaseVersionZipDownloadRequest(
         Guid ReleaseVersionId,
-        IList<Guid>? FileIds = null);
+        IList<Guid> FileIds);
 }

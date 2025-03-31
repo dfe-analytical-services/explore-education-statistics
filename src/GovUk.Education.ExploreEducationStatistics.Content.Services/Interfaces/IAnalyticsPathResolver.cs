@@ -1,4 +1,4 @@
-namespace GovUk.Education.ExploreEducationStatistics.Content.Services;
+namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
 
 public interface IAnalyticsPathResolver
 {

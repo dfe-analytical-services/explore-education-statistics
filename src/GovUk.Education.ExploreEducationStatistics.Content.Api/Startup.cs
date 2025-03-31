@@ -191,7 +191,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api
             }
             else
             {
-                services.AddSingleton<IAnalyticsManager, NoopAnalyticsManager>();
+                services.AddSingleton<IAnalyticsManager, NoOpAnalyticsManager>();
             }
 
             StartupSecurityConfiguration.ConfigureAuthorizationPolicies(services);
@@ -265,7 +265,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api
                 .ForEach(address => Console.WriteLine($"Server listening on address: {address}"));
         }
 
-        private class NoopAnalyticsManager : IAnalyticsManager
+        private class NoOpAnalyticsManager : IAnalyticsManager
         {
             public Task AddReleaseVersionZipDownload(
                 AnalyticsWriter.CaptureReleaseVersionZipDownloadRequest request,

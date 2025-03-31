@@ -179,7 +179,7 @@ var legacyResourcePrefix = subscription
 var resourceNames = {
   existingResources: {
     adminApp: '${legacyResourcePrefix}-as-ees-admin'
-    analyticsFileShare: '${commonResourcePrefix}-${abbreviations.fileShare}-anlyt'
+    analyticsFileShare: '${commonResourcePrefix}-${abbreviations.fileShare}-anlyt' // @MarkFix need to do this for the content api...
     analyticsStorageAccount: '${replace(commonResourcePrefix, '-', '')}${abbreviations.storageStorageAccounts}anlyt'
     publisherFunction: '${legacyResourcePrefix}-fa-ees-publisher'
     keyVault: '${legacyResourcePrefix}-kv-ees-01'

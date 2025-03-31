@@ -6,8 +6,18 @@ using Snapshooter.Xunit;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Services;
 
-public abstract class QueryAnalyticsWriterTests
+public abstract class QueryAnalyticsWriterTests : IDisposable
 {
+    private readonly TestAnalyticsPathResolver _pathResolver = new();
+
+    public void Dispose()
+    {
+        if (Directory.Exists(_pathResolver.BasePath()))
+        {
+            Directory.Delete(_pathResolver.BasePath(), recursive: true);
+        }
+    }
+
     public class ReportDataSetVersionQueryTests : QueryAnalyticsWriterTests
     {
         private const string SnapshotPrefix = $"{nameof(QueryAnalyticsWriterTests)}.{nameof(ReportDataSetVersionQueryTests)}";
@@ -15,8 +25,7 @@ public abstract class QueryAnalyticsWriterTests
         [Fact]
         public async Task Success()
         {
-            var pathResolver = new TestAnalyticsPathResolver();
-            var service = BuildService(pathResolver);
+            var service = BuildService(_pathResolver);
 
             await service.ReportDataSetVersionQuery(new CaptureDataSetVersionQueryRequest(
                 DataSetId: new Guid("acb97c97-89c9-4b74-88e7-39c27f6bab63"),
@@ -41,7 +50,7 @@ public abstract class QueryAnalyticsWriterTests
                 EndTime: DateTime.Parse("2025-02-20T01:00:10.999Z")));
 
             var files = Directory
-                .GetFiles(pathResolver.PublicApiQueriesDirectoryPath())
+                .GetFiles(_pathResolver.PublicApiQueriesDirectoryPath())
                 .Order()
                 .ToList();
             
