@@ -12,8 +12,6 @@ import React, { useCallback } from 'react';
 interface Props {
   releaseVersionId: string;
   dataBlockId: string;
-  // The edit dataBlock page has a button, but other instances are
-  // within a table and appear as button text
   triggerButtonVariant?: 'TEXT' | 'BUTTON';
   onConfirm: () => void;
 }
