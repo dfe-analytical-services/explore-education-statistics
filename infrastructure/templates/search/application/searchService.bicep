@@ -2,8 +2,11 @@ import { abbreviations } from '../../common/abbreviations.bicep'
 import { IpRange } from '../../common/types.bicep'
 import { ResourceNames } from '../types.bicep'
 
-@description('Whether to create or update Azure Monitor alerts during this deploy')
+@description('Whether to create/update Azure Monitor alerts during this deploy.')
 param deployAlerts bool
+
+@description('Whether to deploy the Search service configuration to create/update the data source, index and indexer.')
+param deploySearchConfig bool
 
 @description('Resource prefix for all resources.')
 param resourcePrefix string
@@ -14,11 +17,29 @@ param resourceNames ResourceNames
 @description('Location for all resources.')
 param location string
 
+@description('Specifies the name of the index to create/update.')
+param indexName string
+
+@description('Specifies the file containing the JSON definition of the index to create/update.')
+param indexDefinitionFilename string = '${indexName}.json'
+
+@description('Specifies the base path for the index definitions.')
+param indexDefinitionsBasePath string = 'infrastructure/templates/search/application/indexes'
+
+@description('Specifies the name of the indexer to create/update.')
+param indexerName string = '${indexName}-indexer'
+
 @description('Name of the searchable documents container in the Search storage account.')
 param searchableDocumentsContainerName string = 'searchable-documents'
 
-@description('Storage account firewall rules.')
-param storageFirewallRules IpRange[]
+@description('A list IP network rules to allow access to the Search Service from specific public internet IP address ranges.')
+param searchServiceIpRules IpRange[] = []
+
+@description('A list IP network rules to allow access to the Search storage account from specific public internet IP address ranges.')
+param storageIpRules IpRange[]
+
+@description('The branch, tag or commit of the source code from which the deployment is triggered.')
+param githubSourceRef string
 
 @description('Specifies a set of tags with which to tag the resource in Azure.')
 param tagValues object
@@ -36,12 +57,17 @@ resource searchStoragePrivateEndpointSubnet 'Microsoft.Network/virtualNetworks/s
   parent: vNet
 }
 
+var searchServiceName = '${resourcePrefix}-${abbreviations.searchSearchServices}'
+
 module searchServiceModule '../components/searchService.bicep' = {
   name: 'searchServiceModuleDeploy'
   params: {
-    name: '${resourcePrefix}-${abbreviations.searchSearchServices}'
+    name: searchServiceName
     location: location
-    sku: 'free'
+    ipRules: [] // TODO EES-5940 - Should be searchServiceIpRules
+    publicNetworkAccess: 'Enabled'
+    sku: 'basic'
+    systemAssignedIdentity: true
     tagValues: tagValues
   }
 }
@@ -52,7 +78,7 @@ module searchStorageAccountModule '../../public-api/components/storageAccount.bi
     location: location
     storageAccountName: '${replace(resourcePrefix, '-', '')}${abbreviations.storageStorageAccounts}search'
     publicNetworkAccessEnabled: false
-    firewallRules: storageFirewallRules
+    firewallRules: storageIpRules
     sku: 'Standard_LRS'
     kind: 'StorageV2'
     keyVaultName: keyVault.name
@@ -74,6 +100,33 @@ module blobServiceModule '../../common/components/blobService.bicep' = {
     storageAccountName: searchStorageAccountModule.outputs.storageAccountName
     containerNames: [searchableDocumentsContainerName]
   }
+}
+
+module searchServiceBlobRoleAssignmentModule '../../common/components/storageAccountRoleAssignment.bicep' = {
+  name: '${searchServiceName}BlobRoleAssignmentModuleDeploy'
+  params: {
+    principalIds: [searchServiceModule.outputs.searchServiceIdentityPrincipalId]
+    storageAccountName: searchStorageAccountModule.outputs.storageAccountName
+    role: 'Storage Blob Data Reader'
+  }
+}
+
+var gitHubRawContentBaseUrl = 'https://raw.githubusercontent.com/dfe-analytical-services/explore-education-statistics'
+
+module searchServiceConfigModule '../components/searchServiceConfig.bicep' = if (deploySearchConfig) {
+  name: 'searchServiceConfigModuleDeploy'
+  params: {
+    dataSourceName: 'azureblob-${searchableDocumentsContainerName}-datasource'
+    dataSourceConnectionString: 'ResourceId=${searchStorageAccountModule.outputs.storageAccountId};'
+    dataSourceContainerName: searchableDocumentsContainerName
+    dataSourceType: 'azureblob'
+    indexerName: indexerName
+    indexDefinitionUri: '${gitHubRawContentBaseUrl}/${githubSourceRef}/${indexDefinitionsBasePath}/${indexDefinitionFilename}'
+    indexerScheduleInterval: 'PT5M'
+    searchServiceName: searchServiceModule.outputs.searchServiceName
+    location: location
+  }
+  dependsOn: [blobServiceModule] // Ensures the searchable documents container exists
 }
 
 output searchableDocumentsContainerName string = searchableDocumentsContainerName
