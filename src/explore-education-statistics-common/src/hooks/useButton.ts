@@ -36,11 +36,11 @@ export default function useButton({
   const [isClicking, toggleClicking] = useToggle(false);
   const isMountedRef = useMountedRef();
 
-  const isDisabled = ariaDisabled || disabled || isClicking;
+  const isClickDisabled = ariaDisabled || disabled || isClicking;
 
   const handleClick: MouseEventHandler<HTMLButtonElement> = useCallback(
     async event => {
-      if (isDisabled) {
+      if (isClickDisabled) {
         event.preventDefault();
         return;
       }
@@ -55,13 +55,19 @@ export default function useButton({
         toggleClicking.off();
       }
     },
-    [isDisabled, preventDoubleClick, onClick, isMountedRef, toggleClicking],
+    [
+      isClickDisabled,
+      preventDoubleClick,
+      onClick,
+      isMountedRef,
+      toggleClicking,
+    ],
   );
 
   return {
     'aria-controls': ariaControls,
     'aria-current': ariaCurrent,
-    'aria-disabled': isDisabled,
+    'aria-disabled': ariaDisabled || disabled,
     'aria-expanded': ariaExpanded,
     'aria-label': ariaLabel,
     children,
