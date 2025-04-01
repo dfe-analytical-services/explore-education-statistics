@@ -1,6 +1,6 @@
 namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Clients.ContentApi.Dtos;
 
-public class PagingDto
+public record PagingDto
 {
     public int Page { get; init; }
 

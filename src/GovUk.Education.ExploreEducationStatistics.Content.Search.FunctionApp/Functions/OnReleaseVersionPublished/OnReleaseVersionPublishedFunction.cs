@@ -8,7 +8,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.
 
 public class OnReleaseVersionPublishedFunction(EventGridEventHandler eventGridEventHandler)
 {
-    [Function("OnReleaseVersionPublished")]
+    [Function(nameof(OnReleaseVersionPublished))]
     [QueueOutput("%RefreshSearchableDocumentQueueName%")]
     public async Task<RefreshSearchableDocumentMessageDto[]> OnReleaseVersionPublished(
         [QueueTrigger("%ReleaseVersionPublishedQueueName%")]

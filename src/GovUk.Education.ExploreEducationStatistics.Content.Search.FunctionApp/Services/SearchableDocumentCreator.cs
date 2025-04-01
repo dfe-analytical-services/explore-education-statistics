@@ -23,7 +23,7 @@ internal class SearchableDocumentCreator(
             CancellationToken cancellationToken = default)
     {
         var releaseSearchableDocument =
-            await contentApiClient.GetPublicationLatestReleaseSearchableDocumentAsync(
+            await contentApiClient.GetPublicationLatestReleaseSearchableDocument(
                 request.PublicationSlug,
                 cancellationToken);
 

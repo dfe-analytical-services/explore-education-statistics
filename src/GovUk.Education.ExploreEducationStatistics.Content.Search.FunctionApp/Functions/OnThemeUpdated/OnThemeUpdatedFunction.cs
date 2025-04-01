@@ -13,7 +13,7 @@ public class OnThemeUpdatedFunction(
     IContentApiClient contentApiClient,
     ILogger<OnThemeUpdatedFunction> logger)
 {
-    [Function("OnThemeUpdated")]
+    [Function(nameof(OnThemeUpdated))]
     [QueueOutput("%RefreshSearchableDocumentQueueName%")]
     public async Task<RefreshSearchableDocumentMessageDto[]> OnThemeUpdated(
         [QueueTrigger("%ThemeUpdatedQueueName%")]

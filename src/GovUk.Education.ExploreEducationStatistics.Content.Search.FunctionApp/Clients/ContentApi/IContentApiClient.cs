@@ -12,7 +12,7 @@ public interface IContentApiClient
     /// <param name="cancellationToken">cancellation token</param>
     /// <returns>The latest release for the publication in searchable document format</returns>
     /// <exception cref="UnableToGetPublicationLatestReleaseSearchViewModelException">Thrown if the call to the API was unsuccessful</exception>
-    Task<ReleaseSearchableDocument> GetPublicationLatestReleaseSearchableDocumentAsync(
+    Task<ReleaseSearchableDocument> GetPublicationLatestReleaseSearchableDocument(
         string publicationSlug,
         CancellationToken cancellationToken = default);
 

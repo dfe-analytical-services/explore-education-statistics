@@ -56,7 +56,7 @@ public class ContentApiClientTests(ITestOutputHelper output)
                 var publicationSlug = "seed-publication-permanent-and-fixed-period-exclusions-in-england";
                 
                 // ACT
-                var actual = await sut.GetPublicationLatestReleaseSearchableDocumentAsync(publicationSlug);
+                var actual = await sut.GetPublicationLatestReleaseSearchableDocument(publicationSlug);
                 
                 // ASSERT
                 Assert.NotNull(actual);
@@ -90,7 +90,7 @@ public class ContentApiClientTests(ITestOutputHelper output)
                     var publicationSlug = "seed-publication-permanent-and-fixed-period-exclusions-in-england";
                     
                     // ACT
-                    var exception = await Record.ExceptionAsync(() => sut.GetPublicationLatestReleaseSearchableDocumentAsync(publicationSlug));
+                    var exception = await Record.ExceptionAsync(() => sut.GetPublicationLatestReleaseSearchableDocument(publicationSlug));
                     
                     // ASSERT
                     Assert.NotNull(exception);

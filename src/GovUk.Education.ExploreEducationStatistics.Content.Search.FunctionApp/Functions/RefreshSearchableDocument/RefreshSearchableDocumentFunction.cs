@@ -6,9 +6,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.
 
 public class RefreshSearchableDocumentFunction(ISearchableDocumentCreator searchableDocumentCreator)
 {
-    [Function("RefreshSearchableDocument")]
+    [Function(nameof(RefreshSearchableDocument))]
     [QueueOutput("%SearchableDocumentCreatedQueueName%")]
-    public async Task<SearchableDocumentCreatedMessageDto> OnReleaseVersionPublished(
+    public async Task<SearchableDocumentCreatedMessageDto> RefreshSearchableDocument(
         [QueueTrigger("%RefreshSearchableDocumentQueueName%")]
         RefreshSearchableDocumentMessageDto message,
         FunctionContext context)

@@ -11,13 +11,13 @@ internal class ContentApiClient(HttpClient httpClient) : IContentApiClient
 {
     internal HttpClient HttpClient { get; } = httpClient;
 
-    private const string GetPublicationLatestReleaseSearchViewModelApiEndPointFormat =
+    private const string GetPublicationLatestReleaseSearchViewModelApiEndpointFormat =
         "api/publications/{0}/releases/latest/searchable";
 
-    private const string GetPublicationsPageEndPointFormat =
+    private const string GetPublicationsPageEndpointFormat =
         "/api/publications?Page={0}&PageSize={1}";
 
-    private const string GetPublicationsByThemePageEndPointFormat =
+    private const string GetPublicationsByThemePageEndpointFormat =
         "/api/publications?ThemeId={1}&Page={0}";
 
 
@@ -55,11 +55,11 @@ internal class ContentApiClient(HttpClient httpClient) : IContentApiClient
                 : new GetResponse<TResponse>.Success(responseData);
     }
 
-    public async Task<ReleaseSearchableDocument> GetPublicationLatestReleaseSearchableDocumentAsync(
+    public async Task<ReleaseSearchableDocument> GetPublicationLatestReleaseSearchableDocument(
         string publicationSlug,
         CancellationToken cancellationToken)
     {
-        var apiEndpoint = string.Format(GetPublicationLatestReleaseSearchViewModelApiEndPointFormat, publicationSlug);
+        var apiEndpoint = string.Format(GetPublicationLatestReleaseSearchViewModelApiEndpointFormat, publicationSlug);
         var response = await Get<ReleaseSearchViewModelDto>(apiEndpoint, cancellationToken);
 
         return response switch
@@ -79,19 +79,19 @@ internal class ContentApiClient(HttpClient httpClient) : IContentApiClient
     public async Task<(bool WasSuccesssful, string? ErrorMessage)> Ping(CancellationToken cancellationToken)
     {
         // Determine whether the Content API is available by making a simple call
-        var apiEndpoint = BuildGetPublicationsPageEndPoint(page: 1, numberOfItems: 1);
-        var response = await Get<PaginatedResult<PublicationDto>>(apiEndpoint, cancellationToken);
+        var apiEndpoint = BuildGetPublicationsPageEndpoint(page: 1, numberOfItems: 1);
+        var response = await Get<PaginatedResultDto<PublicationDto>>(apiEndpoint, cancellationToken);
         return response switch
         {
-            GetResponse<PaginatedResult<PublicationDto>>.Success => (true, null),
-            GetResponse<PaginatedResult<PublicationDto>>.Error error => (false, error.ErrorMessage),
+            GetResponse<PaginatedResultDto<PublicationDto>>.Success => (true, null),
+            GetResponse<PaginatedResultDto<PublicationDto>>.Error error => (false, error.ErrorMessage),
             _ => throw new ArgumentOutOfRangeException()
         };
     }
 
     public async Task<PublicationInfo[]> GetPublicationsForTheme(Guid themeId, CancellationToken cancellationToken)
     {
-        var publicationDtos = await GetAllPaginatedItems<PublicationDto>(page => BuildGetPublicationsByThemePageEndPoint(themeId, page), cancellationToken);
+        var publicationDtos = await GetAllPaginatedItems<PublicationDto>(page => BuildGetPublicationsByThemePageEndpoint(themeId, page), cancellationToken);
         return publicationDtos
             .Select(dto => new PublicationInfo
             {
@@ -110,16 +110,16 @@ internal class ContentApiClient(HttpClient httpClient) : IContentApiClient
         {
             // Get a page of results from the API
             var apiEndpoint = getPageApiEndpoint(page);
-            var getResponse = await Get<PaginatedResult<TResponse>>(apiEndpoint, cancellationToken);
+            var getResponse = await Get<PaginatedResultDto<TResponse>>(apiEndpoint, cancellationToken);
             
             // If there was an error then throw
-            if (getResponse is GetResponse<PaginatedResult<TResponse>>.Error error)
+            if (getResponse is GetResponse<PaginatedResultDto<TResponse>>.Error error)
             {
                 throw new GetPaginatedItemsException(error.ErrorMessage);
             }
 
             // Store the latest page of results and if there are more to retrieve, loop around
-            if (getResponse is GetResponse<PaginatedResult<TResponse>>.Success success)
+            if (getResponse is GetResponse<PaginatedResultDto<TResponse>>.Success success)
             {
                 items.AddRange(success.Result.Results);
                 morePagesToGet = success.Result.Paging.Page < success.Result.Paging.TotalPages;
@@ -129,9 +129,9 @@ internal class ContentApiClient(HttpClient httpClient) : IContentApiClient
         return items.ToArray();
     }
     
-    private string BuildGetPublicationsPageEndPoint(int page = 1, int numberOfItems = 10) =>
-        string.Format(GetPublicationsPageEndPointFormat, page, numberOfItems);
+    private string BuildGetPublicationsPageEndpoint(int page = 1, int numberOfItems = 10) =>
+        string.Format(GetPublicationsPageEndpointFormat, page, numberOfItems);
 
-    private string BuildGetPublicationsByThemePageEndPoint(Guid themeId, int page = 1) =>
-        string.Format(GetPublicationsByThemePageEndPointFormat, page, themeId.ToString());
+    private string BuildGetPublicationsByThemePageEndpoint(Guid themeId, int page = 1) =>
+        string.Format(GetPublicationsByThemePageEndpointFormat, page, themeId.ToString());
 }

@@ -9,7 +9,7 @@ public class ReindexSearchableDocumentsFunction(
     ILogger<ReindexSearchableDocumentsFunction> logger,
     ISearchIndexClient searchIndexClient)
 {
-    [Function("ReindexSearchableDocuments")]
+    [Function(nameof(ReindexSearchableDocuments))]
     public async Task ReindexSearchableDocuments(
         [QueueTrigger("%SearchableDocumentCreatedQueueName%")]
         SearchableDocumentCreatedMessageDto messageDto,
