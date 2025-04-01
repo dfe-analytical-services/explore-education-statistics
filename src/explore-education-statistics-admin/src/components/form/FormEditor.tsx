@@ -156,6 +156,12 @@ const FormEditor = ({
     };
   }, [id]);
 
+  useEffect(() => {
+    if (!showFeaturedTablesModal && !showGlossaryModal) {
+      editorRef.current?.focus();
+    }
+  }, [showFeaturedTablesModal, showGlossaryModal]);
+
   const handleLabelClick = useCallback(() => {
     if (!editorRef.current) {
       return;
