@@ -98,6 +98,7 @@ const ReleaseDataFileReplacePage = ({
 
     if (values.uploadType === 'csv') {
       file = await releaseDataFileService.uploadDataFiles(releaseVersionId, {
+        title: values.title!,
         replacingFileId: currentFile.id,
         dataFile: values.dataFile as File,
         metadataFile: values.metadataFile as File,

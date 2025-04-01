@@ -39,87 +39,77 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _context = context;
         }
 
-        public async Task<List<ErrorViewModel>> ValidateDataSetFilesForUpload(
+        public async Task<List<ErrorViewModel>> ValidateDataSet(
             Guid releaseVersionId,
             string dataSetTitle,
-            string dataFileName,
-            Stream dataFileStream,
-            string metaFileName,
-            Stream metaFileStream,
+            List<DataSetFileDto> dataSetFiles,
             File? replacingFile = null)
         {
-            List<ErrorViewModel> errors = [];
+            var errorViewModels = new List<ErrorViewModel>();
+
+            var validator = new DataSetFileDto.Validator();
+
+            foreach (var file in dataSetFiles)
+            {
+                var result = validator.Validate(file);
+
+                if (!result.IsValid)
+                {
+                    result.Errors.ForEach(e => errorViewModels.Add(new()
+                    {
+                        Code = e.ErrorCode,
+                        Message = e.ErrorMessage,
+                    }));
+                }
+
+                //file.FileStream.SeekToBeginning(); // if not using mime detective in validator, this shouldn't be needed
+            }
+
             var isReplacement = replacingFile != null;
 
-            errors.AddRange(ValidateDataSetTitleDuplication(
+            errorViewModels.AddRange(ValidateDataSetTitleDuplication(
                 releaseVersionId,
                 dataSetTitle,
                 isReplacement));
 
-            errors.AddRange(ValidateDataFileNames(
-                releaseVersionId,
-                dataFileName: dataFileName,
-                metaFileName: metaFileName,
-                replacingFile));
+            if (dataSetFiles.Count != 2)
+            {
+                errorViewModels.Add(ValidationMessages.GenerateErrorDataZipShouldContainTwoFiles());
+            }
 
-            errors.AddRange(await ValidateDataFileTypes(
-                dataFileName,
-                dataFileStream,
-                metaFileName,
-                metaFileStream));
+            var dataFile = dataSetFiles.FirstOrDefault(file => !file.FileName.EndsWith(".meta.csv"));
+            var metaFile = dataSetFiles.FirstOrDefault(file => file.FileName.EndsWith(".meta.csv"));
+
+            if (dataFile is null || metaFile is null)
+            {
+                errorViewModels.Add(ValidationMessages.GenerateErrorDataSetFileNamesShouldMatchConvention());
+            }
+
+            errorViewModels.AddRange(ValidateDataFileNames(
+                releaseVersionId,
+                dataFile!.FileName,
+                metaFile!.FileName,
+                replacingFile));
 
             if (isReplacement)
             {
-                var releaseFileWithApiDataSet = _context.ReleaseFiles
-                    .SingleOrDefault(rf =>
+                var releaseFileWithApiDataSet = await _context.ReleaseFiles
+                    .SingleOrDefaultAsync(rf =>
                         rf.ReleaseVersionId == releaseVersionId
                         && rf.Name == dataSetTitle
                         && rf.PublicApiDataSetId != null);
                 if (releaseFileWithApiDataSet != null)
                 {
-                    errors.Add(ValidationMessages.GenerateErrorCannotReplaceDataSetWithApiDataSet(dataSetTitle));
+                    errorViewModels.Add(ValidationMessages.GenerateErrorCannotReplaceDataSetWithApiDataSet(dataSetTitle));
                 }
             }
 
-            return errors;
+            return errorViewModels;
         }
 
-        public async Task<List<ErrorViewModel>> ValidateDataSetFilesForUpload(
-            Guid releaseVersionId,
-            string dataSetTitle,
-            IFormFile dataFile,
-            IFormFile metaFile,
-            File? replacingFile = null)
-        {
-            await using var dataFileStream = dataFile.OpenReadStream();
-            await using var metaFileStream = metaFile.OpenReadStream();
-
-            return await ValidateDataSetFilesForUpload(
-                releaseVersionId: releaseVersionId,
-                dataSetTitle: dataSetTitle,
-                dataFileName: dataFile.FileName,
-                dataFileStream: dataFileStream,
-                metaFileName: metaFile.FileName,
-                metaFileStream: metaFileStream,
-                replacingFile: replacingFile);
-        }
-
-        public async Task<List<ErrorViewModel>> ValidateDataSetFilesForUpload(
-            Guid releaseVersionId,
-            ArchiveDataSetFile archiveDataSet,
-            Stream dataFileStream,
-            Stream metaFileStream)
-        {
-            return await ValidateDataSetFilesForUpload(
-                releaseVersionId: releaseVersionId,
-                dataSetTitle: archiveDataSet.Title,
-                dataFileName: archiveDataSet.DataFilename,
-                dataFileStream: dataFileStream,
-                metaFileName: archiveDataSet.MetaFilename,
-                metaFileStream: metaFileStream,
-                replacingFile: archiveDataSet.ReplacingFile);
-        }
-
+        // TODO: Move this validation to the request object and use FluentValidation?
+        // Implies acceptance (or removal) of MIME checking service dependency
+        // If so, rename this class to DataSetValidatorService
         public async Task<Either<ActionResult, Unit>> ValidateFileForUpload(
             IFormFile file,
             FileType type)
@@ -242,27 +232,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
             // NOTE: We allow duplicate meta file names - meta files aren't included in publicly downloadable
             // zips, so meta files won't be included in the same directory by filename and thereby cannot clash
-
-            return errors;
-        }
-
-        private async Task<List<ErrorViewModel>> ValidateDataFileTypes(
-            string dataFileName,
-            Stream dataFileStream,
-            string metaFileName,
-            Stream metaFileStream)
-        {
-            List<ErrorViewModel> errors = [];
-            // pass cancellation tokens to these for async
-            if (!await _fileTypeService.IsValidCsvFile(dataFileStream))
-            {
-                errors.Add(ValidationMessages.GenerateErrorMustBeCsvFile(dataFileName));
-            }
-
-            if (!await _fileTypeService.IsValidCsvFile(metaFileStream))
-            {
-                errors.Add(ValidationMessages.GenerateErrorMustBeCsvFile(metaFileName));
-            }
 
             return errors;
         }

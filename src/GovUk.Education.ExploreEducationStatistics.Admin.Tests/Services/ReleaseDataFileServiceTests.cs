@@ -1850,7 +1850,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     fileUploadsValidatorService: fileUploadsValidatorService.Object
                 );
 
-                var result = await service.Upload(
+                var result = await service.ValidateAndUpload(
                     releaseVersionId: releaseVersion.Id,
                     dataFormFile: dataFormFile,
                     metaFormFile: metaFormFile,
@@ -2013,7 +2013,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     fileUploadsValidatorService: fileUploadsValidatorService.Object
                 );
 
-                var result = await service.Upload(
+                var result = await service.ValidateAndUpload(
                     releaseVersionId: releaseVersion.Id,
                     dataFormFile: dataFormFile,
                     metaFormFile: metaFormFile,
@@ -2214,7 +2214,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     fileUploadsValidatorService: fileUploadsValidatorService.Object
                 );
 
-                var result = await service.Upload(
+                var result = await service.ValidateAndUpload(
                     releaseVersionId: releaseVersion.Id,
                     dataFormFile: dataFormFile,
                     metaFormFile: metaFormFile,
@@ -2316,7 +2316,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     fileUploadsValidatorService: fileUploadsValidatorService.Object
                 );
 
-                var result = (await service.UploadAsZip(
+                var result = (await service.ValidateAndUploadFromZip(
                     releaseVersionId: releaseVersion.Id,
                     zipFormFile: zipFormFile,
                     dataSetTitle: subjectName,
@@ -2462,7 +2462,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     fileUploadsValidatorService: fileUploadsValidatorService.Object
                 );
 
-                var result = await service.UploadAsZip(
+                var result = await service.ValidateAndUploadFromZip(
                     releaseVersionId: releaseVersion.Id,
                     zipFormFile: zipFormFile,
                     dataSetTitle: subjectName,
@@ -2596,7 +2596,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     fileUploadsValidatorService: fileUploadsValidatorService.Object
                 );
 
-                var result = (await service.UploadAsZip(
+                var result = (await service.ValidateAndUploadFromZip(
                     releaseVersionId: releaseVersion.Id,
                     zipFormFile: zipFormFile,
                     dataSetTitle: null,
@@ -2708,7 +2708,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var archive = CreateFormFileFromResource("bulk-data-zip-invalid-unused-files.zip");
 
-            var dataArchiveValidationService = new Mock<IDataArchiveValidationService>(Strict);
+            var dataArchiveValidationService = new Mock<IDataSetArchiveValidationService>(Strict);
 
             dataArchiveValidationService
                 .Setup(s => s.IsValidZipFile(archive))
@@ -2725,7 +2725,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 // Act & Assert
                 (await service
-                    .ValidateAndUploadBulkZip(releaseVersion.Id, archive, default))
+                    .ValidateAndUploadFromBulkZip(releaseVersion.Id, archive, default))
                     .AssertBadRequestWithValidationProblem();
 
                 MockUtils.VerifyAllMocks(dataArchiveValidationService);
@@ -2753,7 +2753,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var archiveFile1 = new ArchiveDataSetFile("One", "one.csv", "one.meta.csv");
             var archiveFile2 = new ArchiveDataSetFile("Two", "two.csv", "two.meta.csv");
 
-            var dataArchiveValidationService = new Mock<IDataArchiveValidationService>(Strict);
+            var dataArchiveValidationService = new Mock<IDataSetArchiveValidationService>(Strict);
             var fileUploadsValidatorService = new Mock<IFileUploadsValidatorService>(Strict);
             var privateBlobStorageService = new Mock<IPrivateBlobStorageService>(Strict);
 
@@ -2790,7 +2790,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 );
 
                 var result = (await service
-                    .ValidateAndUploadBulkZip(releaseVersion.Id, archive, default))
+                    .ValidateAndUploadFromBulkZip(releaseVersion.Id, archive, default))
                     .AssertRight();
 
                 MockUtils.VerifyAllMocks(
@@ -2817,7 +2817,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             StatisticsDbContext? statisticsDbContext = null,
             IPersistenceHelper<ContentDbContext>? contentPersistenceHelper = null,
             IPrivateBlobStorageService? privateBlobStorageService = null,
-            IDataArchiveValidationService? dataArchiveValidationService = null,
+            IDataSetArchiveValidationService? dataArchiveValidationService = null,
             IFileUploadsValidatorService? fileUploadsValidatorService = null,
             IFileRepository? fileRepository = null,
             IReleaseVersionRepository? releaseVersionRepository = null,
@@ -2834,7 +2834,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 contentDbContext,
                 contentPersistenceHelper ?? new PersistenceHelper<ContentDbContext>(contentDbContext),
                 privateBlobStorageService ?? Mock.Of<IPrivateBlobStorageService>(Strict),
-                dataArchiveValidationService ?? Mock.Of<IDataArchiveValidationService>(Strict),
+                dataArchiveValidationService ?? Mock.Of<IDataSetArchiveValidationService>(Strict),
                 fileUploadsValidatorService ?? Mock.Of<IFileUploadsValidatorService>(Strict),
                 fileRepository ?? new FileRepository(contentDbContext),
                 releaseVersionRepository ?? new ReleaseVersionRepository(

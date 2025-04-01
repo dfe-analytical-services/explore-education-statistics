@@ -38,13 +38,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var metaFile = CreateFormFileMock("test.meta.csv").Object;
 
             fileTypeService
-                .Setup(s => s.IsValidCsvFile(dataFile.OpenReadStream()))
+                .Setup(s => s.HasValidCsvFileMeta(dataFile.OpenReadStream()))
                 .ReturnsAsync(true);
             fileTypeService
-                .Setup(s => s.IsValidCsvFile(metaFile.OpenReadStream()))
+                .Setup(s => s.HasValidCsvFileMeta(metaFile.OpenReadStream()))
                 .ReturnsAsync(true);
 
-            var result = await service.ValidateDataSetFilesForUpload(
+            var result = await service.ValidateDataSet(
                 Guid.NewGuid(),
                 "Data set title",
                 dataFile.FileName,
@@ -99,13 +99,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var metaFile = CreateFormFileMock(toBeReplacedMetaReleaseFile.File.Filename).Object;
 
                 fileTypeService
-                    .Setup(s => s.IsValidCsvFile(dataFile.OpenReadStream()))
+                    .Setup(s => s.HasValidCsvFileMeta(dataFile.OpenReadStream()))
                     .ReturnsAsync(true);
                 fileTypeService
-                    .Setup(s => s.IsValidCsvFile(metaFile.OpenReadStream()))
+                    .Setup(s => s.HasValidCsvFileMeta(metaFile.OpenReadStream()))
                     .ReturnsAsync(true);
 
-                var result = await service.ValidateDataSetFilesForUpload(
+                var result = await service.ValidateDataSet(
                     releaseVersion.Id,
                     toBeReplacedReleaseFile.Name,
                     dataFile.FileName,
@@ -162,13 +162,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var metaFile = CreateFormFileMock("test.meta.csv").Object;
 
                 fileTypeService
-                    .Setup(s => s.IsValidCsvFile(dataFile.OpenReadStream()))
+                    .Setup(s => s.HasValidCsvFileMeta(dataFile.OpenReadStream()))
                     .ReturnsAsync(true);
                 fileTypeService
-                    .Setup(s => s.IsValidCsvFile(metaFile.OpenReadStream()))
+                    .Setup(s => s.HasValidCsvFileMeta(metaFile.OpenReadStream()))
                     .ReturnsAsync(true);
 
-                var errors = await service.ValidateDataSetFilesForUpload(
+                var errors = await service.ValidateDataSet(
                     releaseFile.ReleaseVersionId,
                     "Used data set title",
                     dataFile.FileName,
@@ -194,13 +194,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var metaFile = CreateFormFileMock("samefilename.meta.csv").Object;
 
             fileTypeService
-                .Setup(s => s.IsValidCsvFile(dataFile.OpenReadStream()))
+                .Setup(s => s.HasValidCsvFileMeta(dataFile.OpenReadStream()))
                 .ReturnsAsync(true);
             fileTypeService
-                .Setup(s => s.IsValidCsvFile(metaFile.OpenReadStream()))
+                .Setup(s => s.HasValidCsvFileMeta(metaFile.OpenReadStream()))
                 .ReturnsAsync(true);
 
-            var errors = await service.ValidateDataSetFilesForUpload(
+            var errors = await service.ValidateDataSet(
                 Guid.NewGuid(),
                 "Data file title",
                 dataFile.FileName,
@@ -232,13 +232,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var metaFile = CreateFormFileMock($"{dataFileName}.meta.csv").Object;
 
             fileTypeService
-                .Setup(s => s.IsValidCsvFile(dataFile.OpenReadStream()))
+                .Setup(s => s.HasValidCsvFileMeta(dataFile.OpenReadStream()))
                 .ReturnsAsync(true);
             fileTypeService
-                .Setup(s => s.IsValidCsvFile(metaFile.OpenReadStream()))
+                .Setup(s => s.HasValidCsvFileMeta(metaFile.OpenReadStream()))
                 .ReturnsAsync(true);
 
-            var errors = await service.ValidateDataSetFilesForUpload(
+            var errors = await service.ValidateDataSet(
                 Guid.NewGuid(),
                 "Data title",
                 dataFile.FileName,
@@ -288,13 +288,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var metaFile = CreateFormFileMock("test.meta.csv").Object;
 
                 fileTypeService
-                    .Setup(s => s.IsValidCsvFile(dataFile.OpenReadStream()))
+                    .Setup(s => s.HasValidCsvFileMeta(dataFile.OpenReadStream()))
                     .ReturnsAsync(true);
                 fileTypeService
-                    .Setup(s => s.IsValidCsvFile(metaFile.OpenReadStream()))
+                    .Setup(s => s.HasValidCsvFileMeta(metaFile.OpenReadStream()))
                     .ReturnsAsync(true);
 
-                var errors = await service.ValidateDataSetFilesForUpload(
+                var errors = await service.ValidateDataSet(
                     releaseVersion.Id,
                     "Data set title",
                     dataFile.FileName,
@@ -323,13 +323,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var metaFile = CreateFormFileMock("test.meta.csv").Object;
 
             fileTypeService
-                .Setup(s => s.IsValidCsvFile(dataFile.OpenReadStream()))
+                .Setup(s => s.HasValidCsvFileMeta(dataFile.OpenReadStream()))
                 .ReturnsAsync(false);
             fileTypeService
-                .Setup(s => s.IsValidCsvFile(metaFile.OpenReadStream()))
+                .Setup(s => s.HasValidCsvFileMeta(metaFile.OpenReadStream()))
                 .ReturnsAsync(false);
 
-            var errors = await service.ValidateDataSetFilesForUpload(
+            var errors = await service.ValidateDataSet(
                 Guid.NewGuid(),
                 "Data set title",
                 dataFile.FileName,
@@ -406,13 +406,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var metaFile = CreateFormFileMock("usedfilename.meta.csv").Object;
 
                 fileTypeService
-                    .Setup(s => s.IsValidCsvFile(dataFile.OpenReadStream()))
+                    .Setup(s => s.HasValidCsvFileMeta(dataFile.OpenReadStream()))
                     .ReturnsAsync(true);
                 fileTypeService
-                    .Setup(s => s.IsValidCsvFile(metaFile.OpenReadStream()))
+                    .Setup(s => s.HasValidCsvFileMeta(metaFile.OpenReadStream()))
                     .ReturnsAsync(true);
 
-                var errors = await service.ValidateDataSetFilesForUpload(
+                var errors = await service.ValidateDataSet(
                     releaseVersion.Id,
                     toBeReplacedReleaseFile.Name!,
                     "usedfilename.csv",
@@ -471,13 +471,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var metaFile = CreateFormFileMock(toBeReplacedMetaReleaseFile.File.Filename).Object;
 
                 fileTypeService
-                    .Setup(s => s.IsValidCsvFile(dataFile.OpenReadStream()))
+                    .Setup(s => s.HasValidCsvFileMeta(dataFile.OpenReadStream()))
                     .ReturnsAsync(true);
                 fileTypeService
-                    .Setup(s => s.IsValidCsvFile(metaFile.OpenReadStream()))
+                    .Setup(s => s.HasValidCsvFileMeta(metaFile.OpenReadStream()))
                     .ReturnsAsync(true);
 
-                var errors = await service.ValidateDataSetFilesForUpload(
+                var errors = await service.ValidateDataSet(
                     releaseVersion.Id,
                     toBeReplacedReleaseFile.Name,
                     dataFile.FileName,
