@@ -518,15 +518,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
                     foreach (var dataSet in validatedDataSets)
                     {
-                        var (dataFileId, metaFileId) = await UploadDataSetToTempStorage(releaseVersionId, dataSet, cancellationToken);
+                        var uploadResult = await UploadDataSetToTempStorage(releaseVersionId, dataSet, cancellationToken);
 
                         viewModels.Add(new ArchiveDataSetFileViewModel
                         {
                             Title = dataSet.Title,
-                            DataFileId = dataFileId,
+                            DataFileId = uploadResult.DataFileId,
                             DataFilename = dataSet.DataFile.FileName,
                             DataFileSize = dataSet.DataFile.FileSize,
-                            MetaFileId = metaFileId,
+                            MetaFileId = uploadResult.MetaFileId,
                             MetaFilename = dataSet.MetaFile.FileName,
                             MetaFileSize = dataSet.MetaFile.FileSize,
                             ReplacingFileId = dataSet.ReplacingFile?.Id,
@@ -746,8 +746,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             );
         }
 
-        // TODO: Return a named property object instead of generic tuple
-        private async Task<Tuple<Guid, Guid>> UploadDataSetToTempStorage(
+        /// <summary>
+        /// Upload the supplied data set files to temporary blob storage.
+        /// </summary>
+        /// <returns>An object consisting of newly generated IDs representing the uploaded files. The IDs are used to locate the files in virtual storage.</returns>
+        private async Task<DataSetUploadResult> UploadDataSetToTempStorage(
             Guid releaseVersionId,
             ArchivedDataSet archivedDataSet,
             CancellationToken cancellationToken)
@@ -774,7 +777,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             await archivedDataSet.DataFile.FileStream.DisposeAsync();
             await archivedDataSet.MetaFile.FileStream.DisposeAsync();
 
-            return Tuple.Create(dataFileId, metaFileId);
+            return new DataSetUploadResult
+            {
+                DataFileId = dataFileId,
+                MetaFileId = metaFileId
+            };
         }
 
         private async Task UploadFileToReleaseStorage(
