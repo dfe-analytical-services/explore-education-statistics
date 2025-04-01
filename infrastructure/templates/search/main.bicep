@@ -102,6 +102,7 @@ module searchDocsFunctionModule 'application/searchDocsFunction.bicep' = {
     )
     searchServiceEndpoint: searchServiceModule.outputs.searchServiceEndpoint
     searchServiceIndexerName: searchServiceModule.outputs.searchServiceIndexerName
+    searchServiceName: searchServiceModule.outputs.searchServiceName
     searchStorageAccountName: searchServiceModule.outputs.searchStorageAccountName
     searchStorageAccountConnectionStringSecretName: searchServiceModule.outputs.searchStorageAccountConnectionStringSecretName
     searchableDocumentsContainerName: searchServiceModule.outputs.searchableDocumentsContainerName

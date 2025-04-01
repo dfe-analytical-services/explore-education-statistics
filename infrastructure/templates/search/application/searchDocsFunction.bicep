@@ -14,6 +14,9 @@ param searchServiceEndpoint string
 @description('Specifies the Search Service indexer name.')
 param searchServiceIndexerName string
 
+@description('Specifies the Search Service name.')
+param searchServiceName string
+
 @description('Name of the Search storage account.')
 param searchStorageAccountName string
 
@@ -86,6 +89,10 @@ resource searchableDocumentsContainer 'Microsoft.Storage/storageAccounts/blobSer
   name: searchableDocumentsContainerName
 }
 
+resource searchService 'Microsoft.Search/searchServices@2024-06-01-preview' existing = {
+    name: searchServiceName
+}
+
 module functionAppModule '../../common/components/functionApp.bicep' = {
   name: 'searchDocsFunctionAppModuleDeploy'
   params: {
@@ -104,6 +111,7 @@ module functionAppModule '../../common/components/functionApp.bicep' = {
       }
       {
         name: 'AzureSearch__SearchServiceEndpoint'
+        // Should be able to replace this with searchService.properties.endpoint in future using API version 2025-02-01-preview or later
         value: searchServiceEndpoint
       }
       {
@@ -158,6 +166,15 @@ module functionAppModule '../../common/components/functionApp.bicep' = {
       alertsGroupName: resourceNames.existingResources.alertsGroup
     } : null
     tagValues: tagValues
+  }
+}
+
+module functionAppIdentityRoleAssignmentModule '../components/searchServiceRoleAssignment.bicep' = {
+  name: 'searchDocsFunctionAppRoleAssignmentModuleDeploy'
+  params: {
+    searchServiceName: searchService.name
+    principalIds: [functionAppModule.outputs.functionAppIdentityPrincipalId]
+    role: 'Search Service Contributor'
   }
 }
 

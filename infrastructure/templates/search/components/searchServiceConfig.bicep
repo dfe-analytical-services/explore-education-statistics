@@ -51,7 +51,7 @@ resource scriptIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2024-1
   location: location
 }
 
-// The built-in Search Service Contributor role. See https://learn.microsoft.com/azure/role-based-access-control/built-in-roles#search-service-contributor')
+// The built-in Search Service Contributor role. See https://learn.microsoft.com/en-gb/azure/role-based-access-control/built-in-roles/ai-machine-learning#search-service-contributor')
 resource searchServiceContributorRoleDefinition 'Microsoft.Authorization/roleDefinitions@2022-04-01' existing = {
   scope: subscription()
   name: '7ca78c08-252a-4471-8644-bb5ff32d4ba0'
