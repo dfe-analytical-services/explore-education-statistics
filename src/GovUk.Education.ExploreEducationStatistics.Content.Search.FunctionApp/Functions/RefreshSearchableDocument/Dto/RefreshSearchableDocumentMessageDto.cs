@@ -2,5 +2,5 @@
 
 public class RefreshSearchableDocumentMessageDto
 {
-    public required string PublicationSlug { get; set; }
+    public required string PublicationSlug { get; init; }
 }
