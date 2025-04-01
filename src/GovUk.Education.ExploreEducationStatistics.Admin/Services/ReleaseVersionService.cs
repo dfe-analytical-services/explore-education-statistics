@@ -58,7 +58,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         IReleaseSubjectRepository releaseSubjectRepository,
         IDataSetVersionService dataSetVersionService,
         IProcessorClient processorClient,
-        IPrivateBlobCacheService privateCacheService) : IReleaseVersionService
+        IPrivateBlobCacheService privateCacheService,
+        IReleaseSlugValidator releaseSlugValidator) : IReleaseVersionService
     {
         public async Task<Either<ActionResult, ReleaseVersionViewModel>> GetRelease(Guid releaseVersionId)
         {
@@ -398,10 +399,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(userService.CheckCanUpdateReleaseVersion)
                 .OnSuccessDo(releaseVersion => ValidateUpdateRequest(releaseVersion, request))
                 .OnSuccessDo(async releaseVersion =>
-                    await ValidateReleaseSlugUniqueToPublication(
-                        slug: request.Slug,
-                        publicationId: releaseVersion.PublicationId,
-                        releaseId: releaseVersion.ReleaseId))
+                    await releaseSlugValidator.ValidateNewSlug(
+                        newReleaseSlug: request.Slug,
+                        publicationId: releaseVersion.Release.PublicationId))
                 .OnSuccessDo(async releaseVersion =>
                     await context.RequireTransaction(() =>
                         UpdateReleaseAndVersion(request, releaseVersion)
@@ -673,20 +673,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(rf => rf.File.Type != FileType.Data
                     ? new Either<ActionResult, ReleaseFile>(ValidationActionResult(FileTypeMustBeData))
                     : rf);
-        }
-
-        private async Task<Either<ActionResult, Unit>> ValidateReleaseSlugUniqueToPublication(
-            string slug,
-            Guid publicationId,
-            Guid? releaseId = null)
-        {
-            var slugAlreadyExists = await context.Releases
-                .Where(r => r.PublicationId == publicationId)
-                .AnyAsync(r => r.Slug == slug && r.Id != releaseId);
-
-            return slugAlreadyExists 
-                ? ValidationActionResult(SlugNotUnique) 
-                : Unit.Instance;
         }
 
         private static Either<ActionResult, Unit> ValidateUpdateRequest(ReleaseVersion releaseVersion, ReleaseVersionUpdateRequest request)
