@@ -3,7 +3,6 @@ using FluentValidation;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
-using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 using System;
@@ -25,8 +24,12 @@ public record UploadDataSetRequest
 
     public class Validator : AbstractValidator<UploadDataSetRequest>
     {
-        public Validator()
+        //private readonly IFileTypeService _fileTypeService;
+
+        public Validator(/*IFileTypeService fileTypeService*/)
         {
+            //_fileTypeService = fileTypeService;
+
             RuleFor(request => request.ReleaseVersionId)
                 .NotEmpty();
 
@@ -39,12 +42,16 @@ public record UploadDataSetRequest
             RuleFor(request => request.DataFile)
                 .Cascade(CascadeMode.Stop)
                 .MustBeValidCsvFile();
+            //.MustAsync(async (file, cancellationToken) => await _fileTypeService.HasValidCsvFileMeta(file))
+            //    .WithMessage(d => string.Format(ValidationMessages.MustBeCsvFile.Message, d.DataFile.FileName));
 
             RuleFor(request => request.MetaFile)
                 .Cascade(CascadeMode.Stop)
                 .MustBeValidCsvFile()
                 .Must(file => file.FileName.ToLower().EndsWith(".meta.csv"))
                     .WithMessage(ValidationMessages.MetaFilenameMustEndDotMetaDotCsv, "{PropertyValue}");
+            //.MustAsync(async (file, cancellationToken) => await _fileTypeService.HasValidCsvFileMeta(file))
+            //    .WithMessage(d => string.Format(ValidationMessages.MustBeCsvFile.Message, d.MetaFile.FileName));
         }
     }
 }
@@ -56,22 +63,22 @@ public record UploadDataSetAsZipRequest
 
     public Guid? ReplacingFileId { get; init; }
 
-    public string DataSetTitle { get; init; } = string.Empty;
+    public string Title { get; init; } = string.Empty;
 
     public IFormFile ZipFile { get; init; } = null!;
 
     public class Validator : AbstractValidator<UploadDataSetAsZipRequest>
     {
-        private readonly IFileTypeService _fileTypeService;
+        //private readonly IFileTypeService _fileTypeService;
 
-        public Validator(IFileTypeService fileTypeService)
+        public Validator(/*IFileTypeService fileTypeService*/)
         {
-            _fileTypeService = fileTypeService;
+            //_fileTypeService = fileTypeService;
 
             RuleFor(request => request.ReleaseVersionId)
                 .NotEmpty();
 
-            RuleFor(request => request.DataSetTitle)
+            RuleFor(request => request.Title)
                 .NotEmpty()
                     .WithMessage(ValidationMessages.DataSetTitleCannotBeEmpty)
                 .MaximumLength(120)
@@ -81,9 +88,9 @@ public record UploadDataSetAsZipRequest
 
             RuleFor(request => request.ZipFile)
                 .Cascade(CascadeMode.Stop)
-                .MustBeValidZipFile()
-                .MustAsync(async (file, cancellationToken) => await _fileTypeService.HasValidZipFileMeta(file))
-                    .WithMessage(d => string.Format(ValidationMessages.MustBeZipFile.Message, d.ZipFile.FileName));
+                .MustBeValidZipFile();
+            //.MustAsync(async (file, cancellationToken) => await _fileTypeService.HasValidZipFileMeta(file))
+            //    .WithMessage(d => string.Format(ValidationMessages.MustBeZipFile.Message, d.ZipFile.FileName));
         }
     }
 }
@@ -97,20 +104,20 @@ public record UploadDataSetAsBulkZipRequest
 
     public class Validator : AbstractValidator<UploadDataSetAsBulkZipRequest>
     {
-        private readonly IFileTypeService _fileTypeService;
+        //private readonly IFileTypeService _fileTypeService;
 
-        public Validator(IFileTypeService fileTypeService)
+        public Validator(/*IFileTypeService fileTypeService*/)
         {
-            _fileTypeService = fileTypeService;
+            //_fileTypeService = fileTypeService;
 
             RuleFor(request => request.ReleaseVersionId)
                 .NotEmpty();
 
             RuleFor(request => request.ZipFile)
                 .Cascade(CascadeMode.Stop)
-                .MustBeValidZipFile()
-                .MustAsync(async (file, cancellationToken) => await _fileTypeService.HasValidZipFileMeta(file))
-                    .WithMessage(d => string.Format(ValidationMessages.MustBeZipFile.Message, d.ZipFile.FileName));
+                .MustBeValidZipFile();
+            //.MustAsync(async (file, cancellationToken) => await _fileTypeService.HasValidZipFileMeta(file))
+            //    .WithMessage(d => string.Format(ValidationMessages.MustBeZipFile.Message, d.ZipFile.FileName));
         }
     }
 }

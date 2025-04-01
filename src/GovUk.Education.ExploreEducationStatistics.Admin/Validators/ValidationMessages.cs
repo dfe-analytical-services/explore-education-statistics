@@ -92,6 +92,29 @@ public static class ValidationMessages
         Message: "The ZIP file provided should contain two files."
     );
 
+    public static ErrorViewModel GenerateErrorDataZipShouldContainTwoFiles()
+    {
+        return new ErrorViewModel
+        {
+            Code = DataZipShouldContainTwoFiles.Code,
+            Message = DataZipShouldContainTwoFiles.Message,
+        };
+    }
+
+    public static readonly LocalizableMessage DataSetFileNamesShouldMatchConvention = new(
+        Code: nameof(DataSetFileNamesShouldMatchConvention),
+        Message: "The data file should end .csv, and the meta file should end .meta.csv."
+    );
+
+    public static ErrorViewModel GenerateErrorDataSetFileNamesShouldMatchConvention()
+    {
+        return new ErrorViewModel
+        {
+            Code = DataSetFileNamesShouldMatchConvention.Code,
+            Message = DataSetFileNamesShouldMatchConvention.Message,
+        };
+    }
+
     public static readonly LocalizableMessage MustBeCsvFile = new(
         Code: nameof(MustBeCsvFile),
         Message: "The file provided '{0}' must be a CSV file."
@@ -172,11 +195,6 @@ public static class ValidationMessages
         };
     }
 
-    public static readonly LocalizableMessage DataSetNamesCsvFilenamesShouldNotEndDotCsv = new(
-        Code: nameof(DataSetNamesCsvFilenamesShouldNotEndDotCsv),
-        Message: "Inside dataset_names.csv, file_name cell entries should not end in '.csv' i.e. should be 'filename' not 'filename.csv'. Filename found with extension: '{0}'."
-    );
-
     public static readonly LocalizableMessage FileIsNull = new(
         Code: nameof(FileIsNull),
         Message: "No file provided."
@@ -218,15 +236,6 @@ public static class ValidationMessages
         {
             Code = DataSetTitleTooLong.Code,
             Message = string.Format(DataSetTitleTooLong.Message, title, maxLength),
-        };
-    }
-
-    public static ErrorViewModel GenerateErrorDataSetNamesCsvFilenamesShouldNotEndDotCsv(string filename)
-    {
-        return new ErrorViewModel
-        {
-            Code = DataSetNamesCsvFilenamesShouldNotEndDotCsv.Code,
-            Message = string.Format(DataSetNamesCsvFilenamesShouldNotEndDotCsv.Message, filename),
         };
     }
 

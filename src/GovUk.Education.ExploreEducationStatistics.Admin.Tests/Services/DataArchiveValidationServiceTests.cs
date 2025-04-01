@@ -336,12 +336,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             VerifyAllMocks(fileTypeService);
         }
 
-        private static DataArchiveValidationService SetupDataArchiveValidationService(
+        private static DataSetArchiveService SetupDataArchiveValidationService(
             ContentDbContext? contentDbContext = null,
             IFileTypeService? fileTypeService = null,
             IFileUploadsValidatorService? fileUploadsValidatorService = null)
         {
-            return new DataArchiveValidationService(
+            return new DataSetArchiveService(
                 contentDbContext ?? Mock.Of<ContentDbContext>(Strict),
             fileTypeService ?? Mock.Of<IFileTypeService>(Strict),
                 fileUploadsValidatorService ?? Mock.Of<IFileUploadsValidatorService>(Strict)
