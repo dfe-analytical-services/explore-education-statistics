@@ -12,16 +12,14 @@ import {
   ReleaseRouteParams,
   releaseTableToolRoute,
 } from '@admin/routes/releaseRoutes';
-import { ReleaseDataBlockSummary } from '@admin/services/dataBlockService';
 import featuredTableService, {
   FeaturedTable,
 } from '@admin/services/featuredTableService';
-import ButtonText from '@common/components/ButtonText';
 import FormattedDate from '@common/components/FormattedDate';
 import InsetText from '@common/components/InsetText';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import WarningMessage from '@common/components/WarningMessage';
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import { generatePath, RouteComponentProps } from 'react-router';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 
@@ -29,9 +27,6 @@ const ReleaseDataBlocksPage = ({
   match,
 }: RouteComponentProps<ReleaseRouteParams>) => {
   const { publicationId, releaseVersionId } = match.params;
-
-  const [deleteDataBlock, setDeleteDataBlock] =
-    useState<ReleaseDataBlockSummary>();
 
   const queryClient = useQueryClient();
 
@@ -51,38 +46,36 @@ const ReleaseDataBlocksPage = ({
   const { data: canUpdateRelease = true, isLoading: isLoadingPermissions } =
     useQuery(permissionQueries.canUpdateRelease(releaseVersionId));
 
-  const handleDelete = useCallback(async () => {
-    if (!deleteDataBlock) {
-      return;
-    }
+  const handleDeleteConfirm = useCallback(
+    async (deletedDataBlockId?: string) => {
+      if (!deletedDataBlockId) {
+        return;
+      }
 
-    queryClient.setQueryData(
+      queryClient.setQueryData(
+        listDataBlocksQuery.queryKey,
+        dataBlocks.filter(dataBlock => dataBlock.id !== deletedDataBlockId),
+      );
+
+      queryClient.setQueryData(
+        listFeaturedTablesQuery.queryKey,
+        featuredTables.filter(
+          table => table.dataBlockId !== deletedDataBlockId,
+        ),
+      );
+      await queryClient.invalidateQueries([
+        listDataBlocksQuery.queryKey,
+        listFeaturedTablesQuery.queryKey,
+      ]);
+    },
+    [
+      dataBlocks,
+      featuredTables,
       listDataBlocksQuery.queryKey,
-      dataBlocks.filter(dataBlock => dataBlock.id !== deleteDataBlock.id),
-    );
-
-    queryClient.setQueryData(
       listFeaturedTablesQuery.queryKey,
-      featuredTables.filter(table => table.dataBlockId !== deleteDataBlock.id),
-    );
-    await queryClient.invalidateQueries([
-      listDataBlocksQuery.queryKey,
-      listFeaturedTablesQuery.queryKey,
-    ]);
-
-    setDeleteDataBlock(undefined);
-  }, [
-    dataBlocks,
-    deleteDataBlock,
-    featuredTables,
-    listDataBlocksQuery.queryKey,
-    listFeaturedTablesQuery.queryKey,
-    queryClient,
-  ]);
-
-  const handleDeleteCancel = useCallback(() => {
-    setDeleteDataBlock(undefined);
-  }, []);
+      queryClient,
+    ],
+  );
 
   const handleSaveOrder = useCallback(
     async (reorderedTables: FeaturedTable[]) => {
@@ -160,7 +153,7 @@ const ReleaseDataBlocksPage = ({
           featuredTables={featuredTables}
           publicationId={publicationId}
           releaseVersionId={releaseVersionId}
-          onDelete={setDeleteDataBlock}
+          handleDeleteConfirm={handleDeleteConfirm}
           onSaveOrder={handleSaveOrder}
         />
       )}
@@ -215,12 +208,11 @@ const ReleaseDataBlocksPage = ({
                       {canUpdateRelease ? 'Edit block' : 'View block'}
                     </Link>
                     {canUpdateRelease && (
-                      <ButtonText
-                        className="govuk-!-margin-bottom-0"
-                        onClick={() => setDeleteDataBlock(dataBlock)}
-                      >
-                        Delete block
-                      </ButtonText>
+                      <DataBlockDeletePlanModal
+                        releaseVersionId={releaseVersionId}
+                        dataBlockId={dataBlock.id}
+                        onConfirm={() => handleDeleteConfirm(dataBlock.id)}
+                      />
                     )}
                   </td>
                 </tr>
@@ -232,16 +224,6 @@ const ReleaseDataBlocksPage = ({
 
       {canUpdateRelease && (
         <ButtonLink to={createPath}>Create data block</ButtonLink>
-      )}
-
-      {deleteDataBlock && (
-        <DataBlockDeletePlanModal
-          releaseVersionId={releaseVersionId}
-          dataBlockId={deleteDataBlock.id}
-          onConfirm={handleDelete}
-          onCancel={handleDeleteCancel}
-          onExit={handleDeleteCancel}
-        />
       )}
     </>
   );
