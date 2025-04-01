@@ -1,5 +1,5 @@
 ﻿using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Clients.AzureSearch;
-using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.CreateSearchableReleaseDocuments.Dtos;
+using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.RefreshSearchableDocument.Dto;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
 
@@ -9,7 +9,7 @@ public class ReindexSearchableDocumentsFunction(
     ILogger<ReindexSearchableDocumentsFunction> logger,
     ISearchIndexClient searchIndexClient)
 {
-    [Function("ReindexSearchableDocuments")]
+    [Function(nameof(ReindexSearchableDocuments))]
     public async Task ReindexSearchableDocuments(
         [QueueTrigger("%SearchableDocumentCreatedQueueName%")]
         SearchableDocumentCreatedMessageDto messageDto,
