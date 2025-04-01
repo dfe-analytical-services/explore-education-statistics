@@ -311,15 +311,26 @@ export default function ChartBuilder({
   const deleteButton = useMemo(
     () =>
       initialChart && (
-        <Button
-          variant="warning"
-          onClick={toggleDeleteModal.on}
-          disabled={isDeleting}
+        <ModalConfirm
+          title="Delete chart"
+          open={showDeleteModal}
+          onConfirm={handleChartDelete}
+          onExit={toggleDeleteModal.off}
+          onCancel={toggleDeleteModal.off}
+          triggerButton={
+            <Button
+              variant="warning"
+              onClick={toggleDeleteModal.on}
+              disabled={isDeleting}
+            >
+              Delete chart
+            </Button>
+          }
         >
-          Delete chart
-        </Button>
+          <p>Are you sure you want to delete this chart?</p>
+        </ModalConfirm>
       ),
-    [initialChart, isDeleting, toggleDeleteModal.on],
+    [initialChart, isDeleting, handleChartDelete, toggleDeleteModal],
   );
 
   return (
@@ -481,15 +492,6 @@ export default function ChartBuilder({
           )}
         </ChartBuilderFormsContextProvider>
       )}
-
-      <ModalConfirm
-        title="Delete chart"
-        open={showDeleteModal}
-        onConfirm={handleChartDelete}
-        onExit={toggleDeleteModal.off}
-      >
-        <p>Are you sure you want to delete this chart?</p>
-      </ModalConfirm>
     </div>
   );
 }
