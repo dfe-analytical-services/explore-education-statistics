@@ -1,6 +1,4 @@
-﻿using System.Configuration;
-using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Clients;
-using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Clients.AzureBlobStorage;
+﻿using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Clients.AzureBlobStorage;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Clients.ContentApi;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.CreateSearchableReleaseDocuments;
@@ -241,7 +239,7 @@ public class ProgramTests
                 Assert.NotNull(options.Value);
                 Assert.Equal(string.Empty, options.Value.SearchServiceEndpoint);
                 Assert.Null(options.Value.SearchServiceAccessKey);
-                Assert.Equal(string.Empty, options.Value.IndexName);
+                Assert.Equal(string.Empty, options.Value.IndexerName);
             }
         }
         
