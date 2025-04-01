@@ -302,7 +302,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
 
                 await using var stream = File.OpenRead(filePath);
 
-                var result = await service.IsValidCsvFile(stream);
+                var result = await service.HasValidCsvFileMeta(stream);
 
                 Assert.Equal(expectedToSucceed, result);
             }
