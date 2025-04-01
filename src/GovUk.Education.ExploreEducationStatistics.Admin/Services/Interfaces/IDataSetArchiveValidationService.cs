@@ -1,8 +1,6 @@
 #nullable enable
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
-using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -10,12 +8,10 @@ using System.Threading.Tasks;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 {
-    public interface IDataArchiveValidationService
+    public interface IDataSetArchiveValidationService
     {
-        Task<Either<ActionResult, List<ArchiveDataSetFile>>> ValidateBulkDataArchiveFiles(
+        Task<Either<ActionResult, List<ArchivedDataSet>>> ValidateBulkDataArchiveFiles(
             Guid releaseVersionId,
-            IFormFile zipFile);
-
-        Task<List<ErrorViewModel>> IsValidZipFile(IFormFile zipFile);
+            List<DataSetFileDto> dataSetFiles);
     }
 }

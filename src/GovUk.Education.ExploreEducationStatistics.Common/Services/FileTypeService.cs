@@ -50,7 +50,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             return encodingTypes.Contains(encodingType);
         }
 
-        public async Task<bool> IsValidCsvFile(Stream stream)
+        public async Task<bool> HasValidCsvFileMeta(Stream stream)
         {
             var sampleBuffer = new byte[1024];
             var sampleBufferSize = await stream.ReadAsync(sampleBuffer, 0, 1024);
