@@ -50,6 +50,7 @@ export type UploadDataFilesRequest =
       metadataFile: File;
     }
   | {
+      title: string;
       replacingFileId: string;
       dataFile: File;
       metadataFile: File;
@@ -133,19 +134,15 @@ const releaseDataFileService = {
     releaseId: string,
     request: UploadDataFilesRequest,
   ): Promise<DataFile> {
-    const { dataFile, metadataFile, ...params } = request;
+    const { dataFile, metadataFile, title } = request;
 
     const data = new FormData();
-    data.append('file', dataFile);
+    data.append('releaseVersionId', releaseId);
+    data.append('title', title);
+    data.append('dataFile', dataFile);
     data.append('metaFile', metadataFile);
 
-    const file = await client.post<DataFileInfo>(
-      `/release/${releaseId}/data`,
-      data,
-      {
-        params,
-      },
-    );
+    const file = await client.post<DataFileInfo>(`/releaseVersions/data`, data);
 
     return mapFile(file);
   },
@@ -157,7 +154,7 @@ const releaseDataFileService = {
 
     const data = new FormData();
     data.append('releaseVersionId', releaseId);
-    data.append('dataSetTitle', title);
+    data.append('title', title);
     data.append('zipFile', zipFile);
 
     const file = await client.post<DataFileInfo>(
