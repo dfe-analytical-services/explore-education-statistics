@@ -83,6 +83,7 @@ using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.EventGrid;
 using Thinktecture;
 using static GovUk.Education.ExploreEducationStatistics.Common.Utils.StartupUtils;
 using ContentGlossaryService = GovUk.Education.ExploreEducationStatistics.Content.Services.GlossaryService;
@@ -380,7 +381,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                 configuration.GetRequiredSection(TableBuilderOptions.Section));
             services.Configure<OpenIdConnectSpaClientOptions>(
                 configuration.GetSection(OpenIdConnectSpaClientOptions.Section));
-
+            
             services.Configure<RouteOptions>(options => options.LowercaseUrls = true);
 
             StartupSecurityConfiguration.ConfigureAuthorizationPolicies(services);
@@ -474,6 +475,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<IDataSetCandidateService, DataSetCandidateService>();
             services.AddTransient<IPostgreSqlRepository, PostgreSqlRepository>();
             services.AddTransient<ILocationService, LocationService>();
+            services.AddTransient<IAdminEventRaiserService, AdminEventRaiserService>();
+            services.AddEventGridClient(configuration);
 
             if (publicDataDbExists)
             {
