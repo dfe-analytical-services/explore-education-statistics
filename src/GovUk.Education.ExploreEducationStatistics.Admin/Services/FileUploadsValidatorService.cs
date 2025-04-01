@@ -55,7 +55,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
                 if (!result.IsValid)
                 {
-                    result.Errors.ForEach(e => errorViewModels.Add(new()
+                    errorViewModels.AddRange(result.Errors.Select(e => new ErrorViewModel
                     {
                         Code = e.ErrorCode,
                         Message = e.ErrorMessage,
@@ -82,13 +82,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
             if (dataFile is null || metaFile is null)
             {
-                errorViewModels.Add(ValidationMessages.GenerateErrorDataSetFileNamesShouldMatchConvention());
+                return [.. errorViewModels, ValidationMessages.GenerateErrorDataSetFileNamesShouldMatchConvention()];
             }
 
             errorViewModels.AddRange(ValidateDataFileNames(
                 releaseVersionId,
-                dataFile!.FileName,
-                metaFile!.FileName,
+                dataFile.FileName,
+                metaFile.FileName,
                 replacingFile));
 
             if (isReplacement)
