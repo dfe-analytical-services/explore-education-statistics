@@ -27,7 +27,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             var unprocessedFiles = dataSetFiles;
 
-            var dataSetNames = dataSetFiles.First(dsf => dsf.FileName == "dataset_names.csv");
+            var dataSetNames = dataSetFiles.FirstOrDefault(dsf => dsf.FileName == "dataset_names.csv");
             if (dataSetNames is null)
             {
                 return Common.Validators.ValidationUtils.ValidationResult(new ErrorViewModel
