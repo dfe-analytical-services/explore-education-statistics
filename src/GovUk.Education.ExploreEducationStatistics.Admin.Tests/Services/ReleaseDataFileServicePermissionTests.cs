@@ -221,7 +221,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         var service = SetupReleaseDataFileService(userService: userService.Object);
                         return service.SaveDataSetsFromTemporaryBlobStorage(
                             releaseVersionId: _releaseVersion.Id,
-                            archiveDataSetFiles: new Mock<List<ArchiveDataSetFileViewModel>>().Object,
+                            zipDataSetFiles: new Mock<List<ZipDataSetFileViewModel>>().Object,
                             cancellationToken: default);
                     }
                 );
@@ -232,7 +232,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             StatisticsDbContext? statisticsDbContext = null,
             IPersistenceHelper<ContentDbContext>? contentPersistenceHelper = null,
             IPrivateBlobStorageService? privateBlobStorageService = null,
-            IDataSetArchiveValidationService? dataArchiveValidationService = null,
+            IDataSetZipValidationService? dataSetZipValidationService = null,
             IDataSetValidatorService? dataSetValidatorService = null,
             IFileRepository? fileRepository = null,
             IReleaseVersionRepository? releaseVersionRepository = null,
@@ -248,7 +248,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 contentDbContext,
                 contentPersistenceHelper ?? DefaultPersistenceHelperMock().Object,
                 privateBlobStorageService ?? new Mock<IPrivateBlobStorageService>(MockBehavior.Strict).Object,
-                dataArchiveValidationService ?? new Mock<IDataSetArchiveValidationService>(MockBehavior.Strict).Object,
+                dataSetZipValidationService ?? new Mock<IDataSetZipValidationService>(MockBehavior.Strict).Object,
                 dataSetValidatorService ?? new Mock<IDataSetValidatorService>(MockBehavior.Strict).Object,
                 fileRepository ?? new FileRepository(contentDbContext),
                 releaseVersionRepository ?? new ReleaseVersionRepository(

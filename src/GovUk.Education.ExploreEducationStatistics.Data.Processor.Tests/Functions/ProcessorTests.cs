@@ -17,7 +17,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Functi
     public class ProcessorTests
     {
         [Fact]
-        public async Task ProcessUploadsUnpackArchiveWithNoArchive()
+        public async Task ProcessUploadsUnpackZipWithNoZipFile()
         {
             var mocks = Mocks();
             var (processorService, dataImportService, fileImportService) = mocks;
