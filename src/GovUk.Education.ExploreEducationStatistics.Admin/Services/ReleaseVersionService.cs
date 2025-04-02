@@ -401,7 +401,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccessDo(async releaseVersion =>
                     await releaseSlugValidator.ValidateNewSlug(
                         newReleaseSlug: request.Slug,
-                        publicationId: releaseVersion.Release.PublicationId))
+                        publicationId: releaseVersion.Release.PublicationId,
+                        releaseId: releaseVersion.ReleaseId))
                 .OnSuccessDo(async releaseVersion =>
                     await context.RequireTransaction(() =>
                         UpdateReleaseAndVersion(request, releaseVersion)

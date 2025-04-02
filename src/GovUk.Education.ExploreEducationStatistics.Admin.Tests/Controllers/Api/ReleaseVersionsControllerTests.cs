@@ -853,6 +853,74 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             }
 
             [Fact]
+            public async Task ReleaseRedirectExistsForNewSlugForDifferentReleaseInSamePublication()
+            {
+                Publication publication = DataFixture.DefaultPublication();
+
+                Release targetRelease = DataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true)
+                    .WithYear(2020)
+                    .WithTimePeriodCoverage(TimeIdentifier.AcademicYear)
+                    .WithLabel("initial")
+                    .WithSlug("2020-21-initial")
+                    .WithPublication(publication);
+
+                Release otherRelease = DataFixture.DefaultRelease(publishedVersions: 1)
+                    .WithYear(2020)
+                    .WithTimePeriodCoverage(TimeIdentifier.AcademicYear)
+                    .WithLabel("intermediate")
+                    .WithSlug("2020-21-intermediate")
+                    .WithRedirects([DataFixture.DefaultReleaseRedirect()
+                    .WithSlug("2020-21-final")])
+                    .WithPublication(publication);
+
+                await TestApp.AddTestData<ContentDbContext>(
+                    context => context.Releases.AddRange(targetRelease, otherRelease));
+
+                var response = await UpdateRelease(
+                    releaseVersionId: targetRelease.Versions[0].Id,
+                    year: 2020,
+                    timePeriodCoverage: TimeIdentifier.AcademicYear,
+                    label: "final");
+
+                var validationProblem = response.AssertValidationProblem();
+
+                var error = Assert.Single(validationProblem.Errors);
+
+                Assert.Equal(ReleaseSlugUsedByRedirect.ToString(), error.Code);
+            }
+
+            [Fact]
+            public async Task ReleaseRedirectExistsForNewSlugForReleaseInDifferentPublication()
+            {
+                Release targetRelease = DataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true)
+                    .WithYear(2020)
+                    .WithTimePeriodCoverage(TimeIdentifier.AcademicYear)
+                    .WithLabel("initial")
+                    .WithSlug("2020-21-initial")
+                    .WithPublication(DataFixture.DefaultPublication());
+
+                Release otherRelease = DataFixture.DefaultRelease(publishedVersions: 1)
+                    .WithYear(2020)
+                    .WithTimePeriodCoverage(TimeIdentifier.AcademicYear)
+                    .WithLabel("intermediate")
+                    .WithSlug("2020-21-intermediate")
+                    .WithRedirects([DataFixture.DefaultReleaseRedirect()
+                    .WithSlug("2020-21-final")])
+                    .WithPublication(DataFixture.DefaultPublication());
+
+                await TestApp.AddTestData<ContentDbContext>(
+                    context => context.Releases.AddRange(targetRelease, otherRelease));
+
+                var response = await UpdateRelease(
+                    releaseVersionId: targetRelease.Versions[0].Id,
+                    year: 2020,
+                    timePeriodCoverage: TimeIdentifier.AcademicYear,
+                    label: "final");
+
+                response.AssertOk();
+            }
+
+            [Fact]
             public async Task LabelOver50Characters()
             {
                 Publication publication = DataFixture.DefaultPublication()

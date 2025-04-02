@@ -16,12 +16,14 @@ public class ReleaseSlugValidator(ContentDbContext context) : IReleaseSlugValida
 {
     public async Task<Either<ActionResult, Unit>> ValidateNewSlug(
         string newReleaseSlug, 
-        Guid publicationId, 
+        Guid publicationId,
+        Guid? releaseId = null,
         CancellationToken cancellationToken = default)
     {
         return await ValidateReleaseSlugUniqueToPublication(
                 slug: newReleaseSlug,
                 publicationId: publicationId,
+                releaseId: releaseId,
                 cancellationToken: cancellationToken)
             .OnSuccess(async _ => await ValidateReleaseRedirectDoesNotExistForNewSlug(
                 slug: newReleaseSlug,
@@ -32,11 +34,12 @@ public class ReleaseSlugValidator(ContentDbContext context) : IReleaseSlugValida
     private async Task<Either<ActionResult, Unit>> ValidateReleaseSlugUniqueToPublication(
         string slug,
         Guid publicationId,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken,
+        Guid? releaseId = null)
     {
         var slugAlreadyExists = await context.Releases
             .Where(r => r.PublicationId == publicationId)
-            .AnyAsync(r => r.Slug == slug, cancellationToken: cancellationToken);
+            .AnyAsync(r => r.Slug == slug && r.Id != releaseId, cancellationToken: cancellationToken);
 
         return slugAlreadyExists
             ? ValidationActionResult(SlugNotUnique)

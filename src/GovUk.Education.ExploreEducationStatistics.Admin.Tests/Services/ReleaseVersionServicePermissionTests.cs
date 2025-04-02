@@ -6,6 +6,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Public.Data;
+using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
@@ -372,7 +373,8 @@ public class ReleaseVersionServicePermissionTests
             Mock.Of<IReleaseSubjectRepository>(),
             Mock.Of<IDataSetVersionService>(),
             Mock.Of<IProcessorClient>(),
-            Mock.Of<IPrivateBlobCacheService>()
+            Mock.Of<IPrivateBlobCacheService>(),
+            Mock.Of<IReleaseSlugValidator>()
         );
     }
 }
