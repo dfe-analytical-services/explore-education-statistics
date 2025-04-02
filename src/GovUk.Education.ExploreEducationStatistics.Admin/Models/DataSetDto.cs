@@ -3,6 +3,7 @@ using FluentValidation;
 using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using System.IO;
+using File = GovUk.Education.ExploreEducationStatistics.Content.Model.File;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Models;
 
@@ -20,13 +21,14 @@ public record DataSetFileDto
     /// Although streams contain a Length property, this value is unavailable once the stream has been disposed of.
     /// </remarks>
     public required long FileSize { get; init; }
+
     public required MemoryStream FileStream { get; init; }
 
     public class Validator : AbstractValidator<DataSetFileDto>
     {
         private const int MaxFilenameSize = 150;
 
-        public Validator() // TODO: Check if any duplications from the equivalent request model IFormFile validator can be be removed
+        public Validator()
         {
             RuleFor(dto => dto.FileName)
                 .MaximumLength(MaxFilenameSize)
@@ -55,7 +57,9 @@ public record DataSetFileDto
 public record DataSet
 {
     public required string Title { get; set; }
+
     public required DataSetFileDto DataFile { get; set; }
+
     public required DataSetFileDto MetaFile { get; set; }
 }
 
@@ -64,5 +68,5 @@ public record DataSet
 /// </summary>
 public record ZippedDataSet : DataSet
 {
-    public Content.Model.File? ReplacingFile { get; init; }
+    public File? ReplacingFile { get; init; }
 }
