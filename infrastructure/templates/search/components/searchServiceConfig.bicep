@@ -51,20 +51,12 @@ resource scriptIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2024-1
   location: location
 }
 
-// The built-in Search Service Contributor role. See https://learn.microsoft.com/en-gb/azure/role-based-access-control/built-in-roles/ai-machine-learning#search-service-contributor')
-resource searchServiceContributorRoleDefinition 'Microsoft.Authorization/roleDefinitions@2022-04-01' existing = {
-  scope: subscription()
-  name: '7ca78c08-252a-4471-8644-bb5ff32d4ba0'
-}
-
-// Assign the Search Service Contributor role to the deployment script identity
-resource scriptIdentityRoleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
-  scope: searchService
-  name: guid(searchService.id, scriptIdentity.id, searchServiceContributorRoleDefinition.id)
-  properties: {
-    roleDefinitionId: searchServiceContributorRoleDefinition.id
-    principalId: scriptIdentity.properties.principalId
-    principalType: 'ServicePrincipal'
+module scriptIdentityRoleAssignmentModule 'searchServiceRoleAssignment.bicep' = {
+  name: 'scriptIdentityRoleAssignmentModuleDeploy'
+  params: {
+    searchServiceName: searchService.name
+    principalIds: [scriptIdentity.properties.principalId]
+    role: 'Search Service Contributor'
   }
 }
 
@@ -91,7 +83,7 @@ resource deploymentScript 'Microsoft.Resources/deploymentScripts@2023-08-01' = {
     retentionInterval: 'PT1H'
     timeout: 'PT5M'
   }
-  dependsOn: [scriptIdentityRoleAssignment]
+  dependsOn: [scriptIdentityRoleAssignmentModule]
 }
 
 output indexName string = deploymentScript.properties.outputs.indexName
