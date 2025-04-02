@@ -8,7 +8,7 @@ public static class FileValidators
 {
     private const int MaxFilenameSize = 150;
 
-    public static IRuleBuilderOptions<T, IFormFile> MustBeValidCsvFile<T>(
+    public static IRuleBuilderOptions<T, IFormFile> MustBeValidFile<T>(
         this IRuleBuilder<T, IFormFile> ruleBuilder)
     {
         return ruleBuilder
@@ -17,7 +17,14 @@ public static class FileValidators
             .Must(file => file.FileName.Length < MaxFilenameSize)
                 .WithMessage(ValidationMessages.FilenameTooLong, "{PropertyName}", MaxFilenameSize.ToString())
             .Must(file => file.Length > 0)
-                .WithMessage(ValidationMessages.FileSizeMustNotBeZero, "{PropertyName}")
+                .WithMessage(ValidationMessages.FileSizeMustNotBeZero, "{PropertyName}");
+    }
+
+    public static IRuleBuilderOptions<T, IFormFile> MustBeValidCsvFile<T>(
+        this IRuleBuilder<T, IFormFile> ruleBuilder)
+    {
+        return ruleBuilder
+            .MustBeValidFile()
             .Must(file => file.FileName.ToLower().EndsWith(".csv"))
                 .WithMessage(ValidationMessages.FilenameMustEndDotCsv, "{PropertyName}");
     }
@@ -26,12 +33,7 @@ public static class FileValidators
         this IRuleBuilder<T, IFormFile> ruleBuilder)
     {
         return ruleBuilder
-            .NotNull()
-                .WithMessage(ValidationMessages.FileIsNull)
-            .Must(file => file.FileName.Length < MaxFilenameSize)
-                .WithMessage(ValidationMessages.FilenameTooLong, "{PropertyName}", MaxFilenameSize.ToString())
-            .Must(file => file.Length > 0)
-                .WithMessage(ValidationMessages.FileSizeMustNotBeZero, "{PropertyName}")
+            .MustBeValidFile()
             .Must(file => file.FileName.ToLower().EndsWith(".zip"))
                 .WithMessage(ValidationMessages.ZipFilenameMustEndDotZip, "{PropertyName}");
     }
