@@ -522,7 +522,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         public async Task UploadDataSetAsBulkZip()
         {
             // Arrange
-            var dataSetFiles = new List<ArchiveDataSetFileViewModel>();
+            var dataSetFiles = new List<ZipDataSetFileViewModel>();
 
             var releaseDataFileService = new Mock<IReleaseDataFileService>(Strict);
 
@@ -559,7 +559,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                 new() { FileName = "one.csv", Name = "Data set title", Size = "1024" },
             };
 
-            var importRequests = new List<ArchiveDataSetFileViewModel>
+            var importRequests = new List<ZipDataSetFileViewModel>
             {
                 new(){ DataFileId = Guid.NewGuid(), MetaFileId = Guid.NewGuid(), Title = "Data set title", DataFilename = "one.csv", MetaFilename = "one.meta.csv", DataFileSize = 1024, MetaFileSize = 128 }
             };
@@ -569,7 +569,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             releaseDataFileService
                 .Setup(s => s.SaveDataSetsFromTemporaryBlobStorage(
                     It.IsAny<Guid>(),
-                    It.IsAny<List<ArchiveDataSetFileViewModel>>(),
+                    It.IsAny<List<ZipDataSetFileViewModel>>(),
                     default))
                 .ReturnsAsync(dataFileInfo);
 
@@ -1126,13 +1126,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                     fileName: "data-zip-valid.zip");
 
                 // Assert
-                var archiveDataSet = response.AssertOk<DataFileInfo>();
+                var dataFileInfo = response.AssertOk<DataFileInfo>();
 
-                Assert.Equal("Test title", archiveDataSet.Name);
-                Assert.Equal("csvfile.csv", archiveDataSet.FileName);
-                Assert.Equal("csvfile.meta.csv", archiveDataSet.MetaFileName);
-                Assert.Equal(DataImportStatus.QUEUED, archiveDataSet.Status);
-                Assert.Equal(FileType.Data, archiveDataSet.Type);
+                Assert.Equal("Test title", dataFileInfo.Name);
+                Assert.Equal("csvfile.csv", dataFileInfo.FileName);
+                Assert.Equal("csvfile.meta.csv", dataFileInfo.MetaFileName);
+                Assert.Equal(DataImportStatus.QUEUED, dataFileInfo.Status);
+                Assert.Equal(FileType.Data, dataFileInfo.Type);
             }
 
             [Fact]
@@ -1179,7 +1179,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                     fileName: "bulk-data-zip-valid.zip");
 
                 // Assert
-                var viewModel = response.AssertOk<List<ArchiveDataSetFileViewModel>>();
+                var viewModel = response.AssertOk<List<ZipDataSetFileViewModel>>();
                 var dataSet1 = viewModel[0];
                 var dataSet2 = viewModel[1];
 

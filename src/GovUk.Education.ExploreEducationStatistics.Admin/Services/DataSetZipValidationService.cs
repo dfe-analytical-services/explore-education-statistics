@@ -16,12 +16,12 @@ using System.Threading.Tasks;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 {
-    public class DataSetArchiveService(ContentDbContext contentDbContext) : IDataSetArchiveValidationService
+    public class DataSetZipValidationService(ContentDbContext contentDbContext) : IDataSetZipValidationService
     {
         private readonly List<ErrorViewModel> _errors = [];
 
         // TODO: Move to FileUploadsValidatorService (optionally combine with existing ValidateDataSet function)
-        public async Task<Either<ActionResult, List<ArchivedDataSet>>> ValidateBulkDataArchiveFiles(
+        public async Task<Either<ActionResult, List<ZippedDataSet>>> ValidateBulkDataZipFiles(
             Guid releaseVersionId,
             List<DataSetFileDto> dataSetFiles)
         {
@@ -77,7 +77,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 return Common.Validators.ValidationUtils.ValidationResult(_errors);
             }
 
-            var archivedDataSetFiles = new List<ArchivedDataSet>();
+            var zippedDataSetFiles = new List<ZippedDataSet>();
             foreach (var (BaseFilename, Title) in dataSetNamesCsvEntries)
             {
                 var dataFile = unprocessedFiles.FirstOrDefault(f => f.FileName == $"{BaseFilename}.csv");
@@ -113,7 +113,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                 rf.File.Type == FileType.Data &&
                                 rf.Name == Title);
 
-                        archivedDataSetFiles.Add(new()
+                        zippedDataSetFiles.Add(new()
                         {
                             DataFile = dataFile,
                             MetaFile = metaFile,
@@ -141,7 +141,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 return Common.Validators.ValidationUtils.ValidationResult(_errors);
             }
 
-            return archivedDataSetFiles;
+            return zippedDataSetFiles;
         }
 
         private void CheckIndexFileForDuplicationErrors(List<(string BaseFilename, string Title)> dataSetNamesCsvEntries)
