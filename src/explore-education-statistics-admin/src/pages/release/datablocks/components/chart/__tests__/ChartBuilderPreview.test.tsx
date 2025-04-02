@@ -1,4 +1,5 @@
 import ChartBuilderPreview from '@admin/pages/release/datablocks/components/chart/ChartBuilderPreview';
+import { RefContextProvider } from '@common/contexts/RefContext';
 import { testChartTableData } from '@common/modules/charts/components/__tests__/__data__/testChartData';
 import { RenderableChart } from '@common/modules/charts/components/ChartRenderer';
 import { AxisConfiguration } from '@common/modules/charts/types/chart';
@@ -110,7 +111,11 @@ describe('ChartBuilderPreview', () => {
   };
 
   test('renders the loading spinner when the loading flag is indicating that it is loading', () => {
-    render(<ChartBuilderPreview chart={testLineChart} loading />);
+    render(
+      <RefContextProvider>
+        <ChartBuilderPreview chart={testLineChart} loading />
+      </RefContextProvider>,
+    );
     const detailsSection = screen.queryByTestId('chartBuilderPreviewContainer');
     expect(detailsSection).toBeInTheDocument();
     expect(detailsSection).toHaveTextContent('Loading chart data');
@@ -124,7 +129,11 @@ describe('ChartBuilderPreview', () => {
     testMapChart,
   ].forEach(chart => {
     test(`renders chart of type '${chart.type}' when all mandatory fields are provided`, () => {
-      render(<ChartBuilderPreview chart={chart} loading={false} />);
+      render(
+        <RefContextProvider>
+          <ChartBuilderPreview chart={chart} loading={false} />
+        </RefContextProvider>,
+      );
       const detailsSection = screen.queryByTestId(
         'chartBuilderPreviewContainer',
       );
@@ -145,12 +154,14 @@ describe('ChartBuilderPreview', () => {
   ].forEach(chart => {
     test(`renders preview help text for chart of type '${chart.type}' when no data sets are yet added`, () => {
       render(
-        <ChartBuilderPreview
-          chart={produce(chart, draft => {
-            draft.axes.major.dataSets = [];
-          })}
-          loading={false}
-        />,
+        <RefContextProvider>
+          <ChartBuilderPreview
+            chart={produce(chart, draft => {
+              draft.axes.major.dataSets = [];
+            })}
+            loading={false}
+          />
+        </RefContextProvider>,
       );
       const detailsSection = screen.queryByTestId(
         'chartBuilderPreviewContainer',
@@ -166,12 +177,14 @@ describe('ChartBuilderPreview', () => {
 
   test(`renders preview help text for chart of type 'infographic' when no fileId is selected`, () => {
     render(
-      <ChartBuilderPreview
-        chart={produce(testInfographicChart, draft => {
-          draft.fileId = '';
-        })}
-        loading={false}
-      />,
+      <RefContextProvider>
+        <ChartBuilderPreview
+          chart={produce(testInfographicChart, draft => {
+            draft.fileId = '';
+          })}
+          loading={false}
+        />
+      </RefContextProvider>,
     );
     const detailsSection = screen.queryByTestId('chartBuilderPreviewContainer');
     expect(detailsSection).toBeInTheDocument();
@@ -182,12 +195,14 @@ describe('ChartBuilderPreview', () => {
 
   test(`renders preview help text for chart of type 'map' when no boundaryLevel is selected`, () => {
     render(
-      <ChartBuilderPreview
-        chart={produce(testMapChart, draft => {
-          draft.boundaryLevel = 0;
-        })}
-        loading={false}
-      />,
+      <RefContextProvider>
+        <ChartBuilderPreview
+          chart={produce(testMapChart, draft => {
+            draft.boundaryLevel = 0;
+          })}
+          loading={false}
+        />
+      </RefContextProvider>,
     );
     const detailsSection = screen.queryByTestId('chartBuilderPreviewContainer');
     expect(detailsSection).toBeInTheDocument();

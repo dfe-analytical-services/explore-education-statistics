@@ -10,7 +10,7 @@ import Form from '@common/components/form/Form';
 import ModalConfirm from '@common/components/ModalConfirm';
 import useToggle from '@common/hooks/useToggle';
 import Yup from '@common/validation/yup';
-import React, { useMemo } from 'react';
+import React, { useEffect, useMemo, useRef } from 'react';
 import { ObjectSchema } from 'yup';
 
 interface FormValues {
@@ -34,6 +34,13 @@ export default function PublicationContactForm({
   onSubmit,
 }: Props) {
   const [showConfirmModal, toggleConfirmModal] = useToggle(false);
+  const submitButtonRef = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    if (showConfirmModal === false) {
+      submitButtonRef.current?.focus();
+    }
+  }, [showConfirmModal]);
 
   const handleSubmit = async (values: FormValues) => {
     const contact = values;
@@ -111,26 +118,30 @@ export default function PublicationContactForm({
               />
 
               <ButtonGroup>
-                <Button type="submit">Update contact details</Button>
+                <Button type="submit" ref={submitButtonRef}>
+                  Update contact details
+                </Button>
                 <ButtonText onClick={onCancel}>Cancel</ButtonText>
               </ButtonGroup>
             </Form>
 
-            <ModalConfirm
-              title="Confirm contact changes"
-              onConfirm={async () => {
-                await form.handleSubmit(handleSubmit)();
-              }}
-              onExit={toggleConfirmModal.off}
-              onCancel={toggleConfirmModal.off}
-              open={showConfirmModal}
-            >
-              <p>
-                Any changes made here will appear on the public site
-                immediately.
-              </p>
-              <p>Are you sure you want to save the changes?</p>
-            </ModalConfirm>
+            {showConfirmModal && (
+              <ModalConfirm
+                title="Confirm contact changes"
+                onConfirm={async () => {
+                  await form.handleSubmit(handleSubmit)();
+                }}
+                onExit={toggleConfirmModal.off}
+                onCancel={toggleConfirmModal.off}
+                open
+              >
+                <p>
+                  Any changes made here will appear on the public site
+                  immediately.
+                </p>
+                <p>Are you sure you want to save the changes?</p>
+              </ModalConfirm>
+            )}
           </>
         );
       }}

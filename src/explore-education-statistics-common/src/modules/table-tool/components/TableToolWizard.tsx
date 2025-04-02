@@ -395,6 +395,8 @@ export default function TableToolWizard({
       updateState(draft => {
         draft.subjectMeta.indicators = nextSubjectMeta.indicators;
         draft.subjectMeta.filters = nextSubjectMeta.filters;
+        draft.subjectMeta.filterHierarchies = nextSubjectMeta.filterHierarchies;
+
         draft.query.indicators = filteredIndicators;
         draft.query.filters = filteredFilters;
         draft.query.timePeriod = {
@@ -424,6 +426,7 @@ export default function TableToolWizard({
     updateState(draft => {
       draft.subjectMeta.indicators = nextSubjectMeta.indicators;
       draft.subjectMeta.filters = nextSubjectMeta.filters;
+      draft.subjectMeta.filterHierarchies = nextSubjectMeta.filterHierarchies;
     });
 
     onStepSubmit?.({ nextStepNumber: 5, nextStepTitle: stepTitles.filter });
@@ -432,6 +435,7 @@ export default function TableToolWizard({
   const handleFiltersFormSubmit: FilterFormSubmitHandler = async ({
     filters,
     indicators,
+    filterHierarchies,
   }) => {
     updateState(draft => {
       draft.response = undefined;
@@ -439,7 +443,9 @@ export default function TableToolWizard({
 
     const updatedReleaseTableDataQuery: ReleaseTableDataQuery = {
       ...state.query,
-      filters: Object.values(filters).flat(),
+      filters: Object.values(filters)
+        .flat()
+        .concat(Object.values(filterHierarchies).flat()),
       indicators,
     };
 

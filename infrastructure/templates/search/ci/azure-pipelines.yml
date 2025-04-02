@@ -13,7 +13,14 @@ pr: none
 
 parameters:
   - name: deployAlerts
-    displayName: Do the Azure Monitor alerts need creating or updating?
+    displayName: Do the Azure Monitor alerts need creating/updating?
+    type: string
+    values:
+      - Yes
+      - No
+    default: No
+  - name: deploySearchConfig
+    displayName: Does the Azure Search configuration need creating/updating?
     type: string
     values:
       - Yes
@@ -55,6 +62,8 @@ variables:
     value: ubuntu-latest
   - name: deployAlerts
     value: ${{ iif(eq(parameters.deployAlerts, 'Yes'), true, false) }}
+  - name: deploySearchConfig
+    value: ${{ iif(eq(parameters.deploySearchConfig, 'Yes'), true, false) }}
 
 pool:
   vmImage: $(vmImageName)
@@ -87,7 +96,7 @@ stages:
   - template: stages/deploy.yml
     parameters:
       stageName: DeployProd
-      condition:  and(succeeded(), eq(variables.isMaster, true))
+      condition: and(succeeded(), eq(variables.isMaster, true))
       dependsOn: DeployPreProd
       environment: Prod
       serviceConnection: $(serviceConnectionProd)

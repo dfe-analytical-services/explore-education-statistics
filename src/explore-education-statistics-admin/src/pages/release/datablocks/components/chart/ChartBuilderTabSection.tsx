@@ -4,6 +4,7 @@ import ChartBuilder, {
 import { SavedDataBlock } from '@admin/pages/release/datablocks/components/DataBlockPageTabs';
 import { ReleaseDataBlock } from '@admin/services/dataBlockService';
 import releaseChartFileService from '@admin/services/releaseChartFileService';
+import { RefContextProvider } from '@common/contexts/RefContext';
 import { Chart } from '@common/modules/charts/types/chart';
 import { FullTable } from '@common/modules/table-tool/types/fullTable';
 import mapFullTable from '@common/modules/table-tool/utils/mapFullTable';
@@ -90,42 +91,55 @@ const ChartBuilderTabSection = ({
   );
 
   const handleTableQueryUpdate: TableQueryUpdateHandler = useCallback(
-    async updatedQuery => {
+    async (updatedQuery, updatedBoundaryLevel) => {
       const nextQuery: ReleaseTableDataQuery = {
         ...query,
         ...updatedQuery,
       };
 
-      // Don't fetch table data again if queries are the same
-      if (isEqual(query, nextQuery)) {
+      // Don't update if nothing has changed
+      if (isEqual(query, nextQuery) && updatedBoundaryLevel === undefined) {
         return;
       }
 
-      const tableData = await tableBuilderService.getTableData(
-        nextQuery,
-        releaseVersionId,
-        nextQuery.boundaryLevel,
-      );
+      const [tableData, geoJson] = await Promise.all([
+        tableBuilderService.getTableData(nextQuery, releaseVersionId),
+        updatedBoundaryLevel
+          ? tableBuilderService.getDataBlockGeoJson(
+              releaseVersionId,
+              dataBlock.dataBlockParentId,
+              updatedBoundaryLevel,
+            )
+          : undefined,
+      ]);
 
       onTableUpdate({
-        table: mapFullTable(tableData),
+        table: mapFullTable({
+          ...tableData,
+          subjectMeta: {
+            ...tableData.subjectMeta,
+            locations: geoJson ?? tableData.subjectMeta.locations,
+          },
+        }),
         query: nextQuery,
       });
     },
-    [onTableUpdate, query, releaseVersionId],
+    [onTableUpdate, query, releaseVersionId, dataBlock],
   );
 
   return (
-    <ChartBuilder
-      releaseVersionId={releaseVersionId}
-      data={table.results}
-      meta={meta}
-      initialChart={dataBlock.charts[0]}
-      tableTitle={dataBlock.heading}
-      onChartSave={handleChartSave}
-      onChartDelete={handleChartDelete}
-      onTableQueryUpdate={handleTableQueryUpdate}
-    />
+    <RefContextProvider>
+      <ChartBuilder
+        releaseVersionId={releaseVersionId}
+        data={table.results}
+        meta={meta}
+        initialChart={dataBlock.charts[0]}
+        tableTitle={dataBlock.heading}
+        onChartSave={handleChartSave}
+        onChartDelete={handleChartDelete}
+        onTableQueryUpdate={handleTableQueryUpdate}
+      />
+    </RefContextProvider>
   );
 };
 

@@ -2,10 +2,11 @@
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Clients.ContentApi;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Domain;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Exceptions;
+using Xunit.Abstractions;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Tests.Clients.ContentApi;
 
-public class ContentApiClientTests
+public class ContentApiClientTests(ITestOutputHelper output)
 {
     private IContentApiClient GetSut(Action<HttpClient>? modifyHttpClient = null)
     {
@@ -14,6 +15,8 @@ public class ContentApiClientTests
         return new ContentApiClient(httpClient);
     }
 
+    protected void Print(string s) => output.WriteLine(s);
+    
     /// <summary>
     /// Separately assert that each of the public properties of two instances of an object are equal.
     /// This provides a finer grained explanation of where two objects differ in equality.  
@@ -29,18 +32,18 @@ public class ContentApiClientTests
     private void AssertAll(params IEnumerable<Action>[] assertions) =>
         Assert.All(assertions.SelectMany(a => a), assertion => assertion());
 
-    public class BasicTests : ContentApiClientTests
+    public class BasicTests(ITestOutputHelper output) : ContentApiClientTests(output)
     {
         [Fact]
         public void Can_instantiate_SUT() => Assert.NotNull(GetSut());
     }
 
-    public abstract class LocalDevelopmentIntegrationTests : ContentApiClientTests
+    public abstract class LocalDevelopmentIntegrationTests(ITestOutputHelper output) : ContentApiClientTests(output)
     {
         /// <summary>
         /// Ensure ContentAPI is running locally on port 5010
         /// </summary>
-        public class CallLocalService : LocalDevelopmentIntegrationTests
+        public class CallLocalService(ITestOutputHelper output) : LocalDevelopmentIntegrationTests(output)
         {
             private IContentApiClient GetSut() =>
                 base.GetSut(httpClient => httpClient.BaseAddress = new Uri("http://localhost:5010"));
@@ -53,7 +56,7 @@ public class ContentApiClientTests
                 var publicationSlug = "seed-publication-permanent-and-fixed-period-exclusions-in-england";
                 
                 // ACT
-                var actual = await sut.GetPublicationLatestReleaseSearchableDocumentAsync(publicationSlug);
+                var actual = await sut.GetPublicationLatestReleaseSearchableDocument(publicationSlug);
                 
                 // ASSERT
                 Assert.NotNull(actual);
@@ -74,8 +77,8 @@ public class ContentApiClientTests
             }
         }
 
-        public class CallUnknownService : LocalDevelopmentIntegrationTests
-            {
+        public class CallUnknownService(ITestOutputHelper output) : LocalDevelopmentIntegrationTests(output)
+        {
                 private IContentApiClient GetSut() =>
                     base.GetSut(httpClient => httpClient.BaseAddress = new Uri("http://localhost:8123")); // Cause a 404
 
@@ -87,7 +90,7 @@ public class ContentApiClientTests
                     var publicationSlug = "seed-publication-permanent-and-fixed-period-exclusions-in-england";
                     
                     // ACT
-                    var exception = await Record.ExceptionAsync(() => sut.GetPublicationLatestReleaseSearchableDocumentAsync(publicationSlug));
+                    var exception = await Record.ExceptionAsync(() => sut.GetPublicationLatestReleaseSearchableDocument(publicationSlug));
                     
                     // ASSERT
                     Assert.NotNull(exception);
@@ -96,5 +99,29 @@ public class ContentApiClientTests
                 }
             }
         
+    }
+
+    public class IntegrationTests(ITestOutputHelper output) : ContentApiClientTests(output)
+    {
+        private const string ContentApiBaseAddress = "-- insert Content API base address here --";
+
+        private IContentApiClient GetSut() =>
+            base.GetSut(httpClient =>
+            {
+                httpClient.BaseAddress = new Uri(ContentApiBaseAddress);
+            });
+
+        [Fact(Skip="Call Content API to get publications for a specified theme id")]
+        public async Task GetPublicationsForTheme()
+        {
+            var sut = GetSut();
+            var themeId = Guid.Parse("a4a32a06-c3ad-4103-faf4-08dab1d50de2");
+            var publicationsForTheme = await sut.GetPublicationsForTheme(themeId);
+            foreach (var publicationInfo in publicationsForTheme)
+            {
+                Print(publicationInfo.PublicationSlug);
+            }
+        }
+
     }
 }

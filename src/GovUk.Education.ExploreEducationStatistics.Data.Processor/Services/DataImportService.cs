@@ -266,7 +266,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 .Select(fi => fi.Id)
                 .ToHashSet();
 
-            var childFilterIds = new List<Guid>();
+            var filterIds = new List<Guid>();
             var tiers = new List<Dictionary<Guid, List<Guid>>>();
 
             var parentFilter = rootFilter;
@@ -274,13 +274,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             var childFilter = filters
                 .Single(f => f.ParentFilter == parentFilter.ColumnName);
 
+            filterIds.Add(rootFilter.Id);
+
             // Loop over each parent/child or tier, starting with the root filter, until no child is found
             while (true)
             {
                 var currentParentFilterId = parentFilter.Id; // avoid closure madness
                 var currentChildFilterId = childFilter.Id;
 
-                childFilterIds.Add(currentChildFilterId);
+                filterIds.Add(currentChildFilterId);
 
                 var filterItemRelationships = await statisticsDbContext.FilterItem
                     .AsNoTracking()
@@ -332,9 +334,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             }
 
             return new DataSetFileFilterHierarchy(
-                RootFilterId: rootFilter.Id,
-                ChildFilterIds: childFilterIds,
-                RootOptionIds: [.. rootFilterItemIds],
+                FilterIds: filterIds,
                 Tiers: tiers);
         }
     }

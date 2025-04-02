@@ -1,5 +1,4 @@
 ﻿using Azure.Messaging.EventGrid;
-using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Extensions;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
 

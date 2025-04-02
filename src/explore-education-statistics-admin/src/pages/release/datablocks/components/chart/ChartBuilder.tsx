@@ -102,6 +102,7 @@ const filterChartProps = (props: ChartBuilderChartProps): Chart => {
 
 export type TableQueryUpdateHandler = (
   query: Partial<ReleaseTableDataQuery>,
+  boundaryLevel: number | undefined,
 ) => Promise<void>;
 
 interface Props {
@@ -207,7 +208,7 @@ export default function ChartBuilder({
           boundaryLevel: options.boundaryLevel ?? 0,
           type: 'map',
           onBoundaryLevelChange: (boundaryLevel: number) =>
-            onTableQueryUpdate({ boundaryLevel }),
+            onTableQueryUpdate({}, boundaryLevel),
         };
       default:
         return undefined;
@@ -300,9 +301,7 @@ export default function ChartBuilder({
 
       setDataLoading(true);
 
-      await onTableQueryUpdate({
-        boundaryLevel: parseNumber(config.boundaryLevel),
-      });
+      await onTableQueryUpdate({}, parseNumber(config.boundaryLevel));
 
       setDataLoading(false);
     },

@@ -1,23 +1,23 @@
 trigger:
   branches:
     include:
-    - master
-    - dev
-    - test
+      - master
+      - dev
+      - test
   paths:
     include:
-    - src/GovUk.Education.ExploreEducationStatistics.Content.Search*/**
+      - src/GovUk.Education.ExploreEducationStatistics.Content.Search*/**
 
 pr:
   branches:
     include:
-    - master
-    - dev
-    - test
+      - master
+      - dev
+      - test
   drafts: false
   paths:
     include:
-    - src/GovUk.Education.ExploreEducationStatistics.Content.Search*/**
+      - src/GovUk.Education.ExploreEducationStatistics.Content.Search*/**
 
 pool:
   vmImage: 'ubuntu-22.04'
@@ -28,41 +28,41 @@ variables:
   solution: 'src/GovUk.Education.ExploreEducationStatistics.Search.sln'
 
 jobs:
-- job: BuildAndDeploy
-  displayName: 'Build, test, and publish'
-  steps:
-  - checkout: self
+  - job: BuildAndDeploy
+    displayName: 'Build, test, and publish'
+    steps:
+      - checkout: self
 
-  - task: UseDotNet@2
-    displayName: 'Install .NET SDK'
-    inputs:
-      version: $(dotNetVersion)
+      - task: UseDotNet@2
+        displayName: 'Install .NET SDK'
+        inputs:
+          version: $(dotNetVersion)
 
-  - task: DotNetCoreCLI@2
-    displayName: 'Build the solution'
-    inputs:
-      command: 'build'
-      projects: $(solution)
-      arguments: '--configuration $(buildConfiguration)'
+      - task: DotNetCoreCLI@2
+        displayName: 'Build the solution'
+        inputs:
+          command: 'build'
+          projects: $(solution)
+          arguments: '--configuration $(buildConfiguration)'
 
-  - task: DotNetCoreCLI@2
-    displayName: 'Test the solution'
-    inputs:
-      command: 'test'
-      projects: $(solution)
-      arguments: '--configuration $(buildConfiguration)'
+      - task: DotNetCoreCLI@2
+        displayName: 'Test the solution'
+        inputs:
+          command: 'test'
+          projects: $(solution)
+          arguments: '--configuration $(buildConfiguration)'
 
-  - task: DotNetCoreCLI@2
-    displayName: 'Publish the Search Function App'
-    inputs:
-      command: 'publish'
-      publishWebProjects: false
-      projects: |
-        src/GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp/GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.csproj
-      arguments: '--configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory)'
+      - task: DotNetCoreCLI@2
+        displayName: 'Publish the Search Function App'
+        inputs:
+          command: 'publish'
+          publishWebProjects: false
+          projects: |
+            src/GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp/GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.csproj
+          arguments: '--configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory)'
 
-  - task: PublishPipelineArtifact@1
-    displayName: 'Publish pipeline artifacts'
-    inputs:
-      targetPath: $(Build.ArtifactStagingDirectory)
-      artifactName: 'drop'
+      - task: PublishPipelineArtifact@1
+        displayName: 'Publish pipeline artifacts'
+        inputs:
+          targetPath: $(Build.ArtifactStagingDirectory)
+          artifactName: 'drop'

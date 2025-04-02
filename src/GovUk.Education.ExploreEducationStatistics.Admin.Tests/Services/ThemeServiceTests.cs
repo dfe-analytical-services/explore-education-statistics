@@ -9,6 +9,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Options;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Methodologies;
+using GovUk.Education.ExploreEducationStatistics.Admin.Tests.MockBuilders;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
@@ -137,9 +138,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .ReturnsAsync(Unit.Instance);
 
                 // Arrange
+                var eventRaiser = new AdminEventRaiserServiceMockBuilder();
+                
                 var service = SetupThemeService(
                     contentDbContext: context,
-                    publishingService: publishingService.Object);
+                    publishingService: publishingService.Object,
+                    adminEventRaiserService: eventRaiser.Build());
 
                 var result = await service.UpdateTheme(
                     theme.Id,
@@ -163,6 +167,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal("Updated theme", savedTheme.Title);
                 Assert.Equal("updated-theme", savedTheme.Slug);
                 Assert.Equal("Updated summary", savedTheme.Summary);
+                
+                eventRaiser.Assert.ThatOnThemeUpdatedCalled(actual => actual == savedTheme);
             }
         }
 
@@ -961,6 +967,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             IMethodologyService? methodologyService = null,
             IPublishingService? publishingService = null,
             IReleaseVersionService? releaseVersionService = null,
+            IAdminEventRaiserService? adminEventRaiserService = null,
             bool enableThemeDeletion = true)
         {
             contentDbContext ??= new Mock<ContentDbContext>().Object;
@@ -983,7 +990,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 userService ?? AlwaysTrueUserService().Object,
                 methodologyService ?? Mock.Of<IMethodologyService>(Strict),
                 publishingService ?? Mock.Of<IPublishingService>(Strict),
-                releaseVersionService ?? Mock.Of<IReleaseVersionService>(Strict)
+                releaseVersionService ?? Mock.Of<IReleaseVersionService>(Strict),
+                adminEventRaiserService ?? new AdminEventRaiserServiceMockBuilder().Build()
             );
         }
     }

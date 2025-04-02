@@ -9,7 +9,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 public interface ILocationService
 {
     Task<Dictionary<string, List<LocationAttributeViewModel>>> GetLocationViewModels(
-            List<Location> locations,
-            long? boundaryLevelId,
-            Dictionary<GeographicLevel, List<string>>? hierarchies);
+        List<Location> locations,
+        Dictionary<GeographicLevel, List<string>>? hierarchies,
+        long? boundaryLevelId = null);
 }

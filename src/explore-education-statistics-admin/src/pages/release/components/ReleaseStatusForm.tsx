@@ -362,28 +362,60 @@ const ReleaseStatusForm = ({
               />
 
               <ButtonGroup>
-                <Button
-                  type="submit"
-                  disabled={formState.isSubmitting}
-                  onClick={async e => {
-                    e.preventDefault();
-
-                    if (
-                      approvalStatus === 'Approved' &&
-                      getValues('publishMethod') === 'Scheduled' &&
-                      getValues('publishScheduled')
-                    ) {
-                      if (formState.isValid) {
-                        toggleConfirmScheduleModal.on();
-                        return;
-                      }
-                    }
-
+                <ModalConfirm
+                  title="Confirm publish date"
+                  open={showConfirmScheduleModal}
+                  onConfirm={async () => {
                     await handleSubmit(handleSubmitForm)();
+                    toggleConfirmScheduleModal.off();
                   }}
+                  onCancel={toggleConfirmScheduleModal.off}
+                  onExit={toggleConfirmScheduleModal.off}
+                  triggerButton={
+                    <Button
+                      type="submit"
+                      disabled={formState.isSubmitting}
+                      onClick={async e => {
+                        e.preventDefault();
+
+                        if (
+                          approvalStatus === 'Approved' &&
+                          getValues('publishMethod') === 'Scheduled' &&
+                          getValues('publishScheduled')
+                        ) {
+                          if (formState.isValid) {
+                            toggleConfirmScheduleModal.on();
+                            return;
+                          }
+                        }
+
+                        await handleSubmit(handleSubmitForm)();
+                      }}
+                    >
+                      Update status
+                    </Button>
+                  }
                 >
-                  Update status
-                </Button>
+                  <p>
+                    This release will be published at 09:30 on{' '}
+                    <FormattedDate format="EEEE d MMMM yyyy">
+                      {getValues('publishScheduled') || ''}
+                    </FormattedDate>
+                    .
+                  </p>
+                  <p>
+                    Once confirmed, if you need to change or cancel the
+                    publishing for any reason, you must come back to this page
+                    to change it yourself. If you need any support, please
+                    contact{' '}
+                    <a href="mailto:explore.statistics@education.gov.uk">
+                      explore.statistics@education.gov.uk
+                    </a>
+                    .
+                  </p>
+                  <p>Are you sure?</p>
+                </ModalConfirm>
+
                 <ButtonText
                   onClick={() => {
                     reset();
@@ -394,33 +426,6 @@ const ReleaseStatusForm = ({
                 </ButtonText>
               </ButtonGroup>
             </Form>
-            <ModalConfirm
-              title="Confirm publish date"
-              open={showConfirmScheduleModal}
-              onConfirm={async () => {
-                await handleSubmit(handleSubmitForm)();
-                toggleConfirmScheduleModal.off();
-              }}
-              onExit={toggleConfirmScheduleModal.off}
-            >
-              <p>
-                This release will be published at 09:30 on{' '}
-                <FormattedDate format="EEEE d MMMM yyyy">
-                  {getValues('publishScheduled') || ''}
-                </FormattedDate>
-                .
-              </p>
-              <p>
-                Once confirmed, if you need to change or cancel the publishing
-                for any reason, you must come back to this page to change it
-                yourself. If you need any support, please contact{' '}
-                <a href="mailto:explore.statistics@education.gov.uk">
-                  explore.statistics@education.gov.uk
-                </a>
-                .
-              </p>
-              <p>Are you sure?</p>
-            </ModalConfirm>
 
             <ModalConfirm
               title="Publish date cannot be scheduled"
