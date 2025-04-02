@@ -38,6 +38,8 @@ const errorMappings = [
     messages: {
       SlugNotUnique:
         'Choose a unique combination of type, start year and label',
+      ReleaseSlugUsedByRedirect:
+        'This label has previously been used by a release in this publication for the same year and time period. Please choose another one.',
     },
   }),
 ];
