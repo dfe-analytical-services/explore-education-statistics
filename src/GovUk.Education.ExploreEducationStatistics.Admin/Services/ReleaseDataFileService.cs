@@ -37,7 +37,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly IPersistenceHelper<ContentDbContext> _persistenceHelper;
         private readonly IPrivateBlobStorageService _privateBlobStorageService;
         private readonly IDataSetArchiveValidationService _dataArchiveValidationService;
-        private readonly IFileUploadsValidatorService _fileUploadsValidatorService;
+        private readonly IDataSetValidatorService _dataSetValidatorService;
         private readonly IFileRepository _fileRepository;
         private readonly IReleaseVersionRepository _releaseVersionRepository;
         private readonly IReleaseFileRepository _releaseFileRepository;
@@ -51,7 +51,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             IPersistenceHelper<ContentDbContext> persistenceHelper,
             IPrivateBlobStorageService privateBlobStorageService,
             IDataSetArchiveValidationService dataArchiveValidationService,
-            IFileUploadsValidatorService fileUploadsValidatorService,
+            IDataSetValidatorService dataSetValidatorService,
             IFileRepository fileRepository,
             IReleaseVersionRepository releaseVersionRepository,
             IReleaseFileRepository releaseFileRepository,
@@ -64,7 +64,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _persistenceHelper = persistenceHelper;
             _privateBlobStorageService = privateBlobStorageService;
             _dataArchiveValidationService = dataArchiveValidationService;
-            _fileUploadsValidatorService = fileUploadsValidatorService;
+            _dataSetValidatorService = dataSetValidatorService;
             _fileRepository = fileRepository;
             _releaseVersionRepository = releaseVersionRepository;
             _releaseFileRepository = releaseFileRepository;
@@ -266,11 +266,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                             var newDataSetTitle = await GetReleaseVersionDataSetTitle(releaseVersionId, dataSetTitle, replacingFile);
                             var dataSetFiles = await BuildDataSetFiles(dataFormFile, metaFormFile);
 
-                            var errors = await _fileUploadsValidatorService.ValidateDataSet(
-                                    releaseVersionId,
-                                    newDataSetTitle,
-                                    dataSetFiles,
-                                    replacingFile);
+                            var errors = await _dataSetValidatorService.ValidateDataSet(
+                                releaseVersionId,
+                                newDataSetTitle,
+                                dataSetFiles,
+                                replacingFile);
 
                             if (errors.Count > 0)
                             {
@@ -363,7 +363,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                             var newDataSetTitle = await GetReleaseVersionDataSetTitle(releaseVersionId, dataSetTitle, replacingFile);
                             var dataSetFiles = await ExtractDataSetArchive(zipFormFile);
 
-                            var errors = await _fileUploadsValidatorService.ValidateDataSet(
+                            var errors = await _dataSetValidatorService.ValidateDataSet(
                                 releaseVersionId,
                                 newDataSetTitle,
                                 dataSetFiles,
