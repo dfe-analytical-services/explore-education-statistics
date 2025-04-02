@@ -48,11 +48,20 @@ param applicationInsightsConnectionString string = ''
 @description('Specifies whether or not the Search Docs Function App already exists.')
 param functionAppExists bool
 
+@description('The name of the queue that is used when a searchable document requires a refresh.')
+param refreshSearchableDocumentQueueName string = 'refresh-searchable-document-queue'
+
+@description('The name of the queue that is used when a release slug is changed.')
+param releaseSlugChangedQueueName string = 'release-slug-changed-queue'
+
 @description('The name of the queue that is used when a release version is published.')
 param releaseVersionPublishedQueueName string = 'release-version-published-queue'
 
 @description('The name of the queue that is used when a searchable document is created.')
 param searchableDocumentCreatedQueueName string = 'search-document-created-queue'
+
+@description('The name of the queue that is used when a theme is updated.')
+param themeUpdatedQueueName string = 'theme-updated-queue'
 
 @description('Specifies a set of tags with which to tag the resource in Azure.')
 param tagValues object
@@ -123,12 +132,24 @@ module functionAppModule '../../common/components/functionApp.bicep' = {
         value: contentApiUrl
       }
       {
+        name: 'RefreshSearchableDocumentQueueName'
+        value: refreshSearchableDocumentQueueName
+      }
+      {
+        name: 'ReleaseSlugChangedQueueName'
+        value: releaseSlugChangedQueueName
+      }
+      {
         name: 'ReleaseVersionPublishedQueueName'
         value: releaseVersionPublishedQueueName
       }
       {
         name: 'SearchableDocumentCreatedQueueName'
         value: searchableDocumentCreatedQueueName
+      }
+      {
+        name: 'ThemeUpdatedQueueName'
+        value: themeUpdatedQueueName
       }
     ]
     functionAppExists: functionAppExists
