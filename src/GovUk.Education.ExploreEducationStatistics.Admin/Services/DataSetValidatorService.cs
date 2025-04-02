@@ -3,41 +3,22 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
-using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
-using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
-using static GovUk.Education.ExploreEducationStatistics.Common.Validators.FileTypeValidationUtils;
 using static System.StringComparison;
 using File = GovUk.Education.ExploreEducationStatistics.Content.Model.File;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 {
-    public class FileUploadsValidatorService : IFileUploadsValidatorService
+    public class DataSetValidatorService(ContentDbContext context) : IDataSetValidatorService
     {
-        private readonly IFileTypeService _fileTypeService;
-        private readonly ContentDbContext _context;
-
         public const int MaxFilenameSize = 150;
-        private const int MaxFileSize = int.MaxValue; // 2GB
-
-        public FileUploadsValidatorService(
-            IFileTypeService fileTypeService,
-            ContentDbContext context)
-        {
-            _fileTypeService = fileTypeService;
-            _context = context;
-        }
 
         public async Task<List<ErrorViewModel>> ValidateDataSet(
             Guid releaseVersionId,
@@ -93,7 +74,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
             if (isReplacement)
             {
-                var releaseFileWithApiDataSet = await _context.ReleaseFiles
+                var releaseFileWithApiDataSet = await context.ReleaseFiles
                     .SingleOrDefaultAsync(rf =>
                         rf.ReleaseVersionId == releaseVersionId
                         && rf.Name == dataSetTitle
@@ -107,37 +88,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return errorViewModels;
         }
 
-        // TODO: Move this validation to the request object and use FluentValidation?
-        // Implies acceptance (or removal) of MIME checking service dependency
-        // If so, rename this class to DataSetValidatorService
-        public async Task<Either<ActionResult, Unit>> ValidateFileForUpload(
-            IFormFile file,
-            FileType type)
-        {
-            if (type is FileType.Data or Metadata)
-            {
-                throw new ArgumentException("Cannot use generic function to validate data file", nameof(type));
-            }
-
-            // Check that it is not an empty file because this causes issues downstream
-            if (file.Length == 0)
-            {
-                return ValidationActionResult(FileCannotBeEmpty);
-            }
-
-            if (file.Length > MaxFileSize)
-            {
-                return ValidationActionResult(FileSizeLimitExceeded);
-            }
-
-            if (!await _fileTypeService.HasMatchingMimeType(file, AllowedMimeTypesByFileType[type]))
-            {
-                return ValidationActionResult(FileTypeInvalid);
-            }
-
-            return Unit.Instance;
-        }
-
         private List<ErrorViewModel> ValidateDataSetTitleDuplication(
             Guid releaseVersionId,
             string title,
@@ -145,7 +95,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             if (!isReplacement) // if it's a replacement, we get the title from the replacement which is already validated as unique
             {
-                var dataSetNameExists = _context.ReleaseFiles
+                var dataSetNameExists = context.ReleaseFiles
                     .Include(rf => rf.File)
                     .Any(rf =>
                         rf.ReleaseVersionId == releaseVersionId
@@ -183,12 +133,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             FileType type,
             string filename)
         {
-            return _context
+            return context
                 .ReleaseFiles
                 .Include(rf => rf.File)
-                .Where(rf => rf.ReleaseVersionId == releaseVersionId
-                             && rf.File.Type == type)
-                .ToList()
+                .Where(rf => rf.ReleaseVersionId == releaseVersionId && rf.File.Type == type)
+                .AsEnumerable()
                 .Any(rf => string.Equals(rf.File.Filename, filename, CurrentCultureIgnoreCase));
         }
 
