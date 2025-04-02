@@ -4,6 +4,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Admin.Tests.MockBuilders;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
@@ -100,6 +101,7 @@ public class ReleaseServicePermissionTests
             publicationCacheService: publicationCacheService ?? Mock.Of<IPublicationCacheService>(),
             releasePublishingStatusRepository: releasePublishingStatusRepository ?? Mock.Of<IReleasePublishingStatusRepository>(),
             redirectsCacheService: redirectsCacheService ?? Mock.Of<IRedirectsCacheService>(),
+            adminEventRaiserService: new AdminEventRaiserServiceMockBuilder().Build(),
             guidGenerator: new SequentialGuidGenerator()
         );
     }
