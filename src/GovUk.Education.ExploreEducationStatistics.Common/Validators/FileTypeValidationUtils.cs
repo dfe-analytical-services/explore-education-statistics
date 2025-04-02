@@ -31,13 +31,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Validators
             "utf-8"
         ];
 
-        public static readonly Regex[] AllowedArchiveMimeTypes =
+        public static readonly Regex[] AllowedZipFileMimeTypes =
         [
             ZipPattern(),
             CompressedPattern(),
         ];
 
-        public static readonly string[] AllowedArchiveEncodingTypes =
+        public static readonly string[] AllowedZipFileEncodingTypes =
         [
             "binary"
         ];
@@ -74,8 +74,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Validators
                     KeyValuePair.Create(Chart, AllowedChartFileTypes),
                     KeyValuePair.Create(Data, AllowedCsvMimeTypes),
                     KeyValuePair.Create(Metadata, AllowedCsvMimeTypes),
-                    KeyValuePair.Create(DataZip, AllowedArchiveMimeTypes),
-                    KeyValuePair.Create(BulkDataZip, AllowedArchiveMimeTypes),
+                    KeyValuePair.Create(DataZip, AllowedZipFileMimeTypes),
+                    KeyValuePair.Create(BulkDataZip, AllowedZipFileMimeTypes),
                     KeyValuePair.Create(Image, AllowedImageMimeTypes),
                 });
 
@@ -93,8 +93,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Validators
                 Chart => AllowedChartFileTypes.Any(pattern => pattern.Match(mimeType).Success),
                 Data => IsAllowedCsvMimeType(mimeType),
                 Metadata => IsAllowedCsvMimeType(mimeType),
-                DataZip => AllowedArchiveMimeTypes.Any(pattern => pattern.Match(mimeType).Success),
-                BulkDataZip => AllowedArchiveMimeTypes.Any(pattern => pattern.Match(mimeType).Success),
+                DataZip => AllowedZipFileMimeTypes.Any(pattern => pattern.Match(mimeType).Success),
+                BulkDataZip => AllowedZipFileMimeTypes.Any(pattern => pattern.Match(mimeType).Success),
                 Image => AllowedImageMimeTypes.Any(pattern => pattern.Match(mimeType).Success),
                 _ => false
             };

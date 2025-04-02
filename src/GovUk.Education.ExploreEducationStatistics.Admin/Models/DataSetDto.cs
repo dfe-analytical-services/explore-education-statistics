@@ -60,9 +60,9 @@ public record DataSet
 }
 
 /// <summary>
-/// Represents a validated data set extracted from an archive.
+/// Represents a validated data set extracted from a zip file.
 /// </summary>
-public record ArchivedDataSet : DataSet
+public record ZippedDataSet : DataSet
 {
     public Content.Model.File? ReplacingFile { get; init; }
 }

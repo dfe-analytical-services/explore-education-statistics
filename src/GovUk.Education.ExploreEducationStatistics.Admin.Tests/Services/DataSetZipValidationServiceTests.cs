@@ -20,61 +20,61 @@ using ValidationMessages = GovUk.Education.ExploreEducationStatistics.Admin.Vali
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 {
-    public class DataArchiveValidationServiceTests
+    public class DataSetZipValidationServiceTests
     {
         [Fact]
-        public async Task ValidateBulkDataArchiveFiles_Success_ReturnsArchiveSummary()
+        public async Task ValidateBulkDataZipFiles_Success_ReturnsDataSetSummary()
         {
             var releaseVersionId = Guid.NewGuid();
-            var archive = CreateFormFileFromResource("bulk-data-zip-valid.zip");
+            var zipFormFile = CreateFormFileFromResource("bulk-data-zip-valid.zip");
 
             var dataSetValidatorService = new Mock<IDataSetValidatorService>(Strict);
 
             var contentDbContextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = DbUtils.InMemoryApplicationDbContext(contentDbContextId))
             {
-                var service = SetupDataArchiveValidationService(
+                var service = SetupDataZipValidationService(
                     contentDbContext: contentDbContext,
                     dataSetValidatorService: dataSetValidatorService.Object);
 
                 dataSetValidatorService.Setup(mock => mock.ValidateDataSetFilesForUpload(
                         releaseVersionId,
-                        It.IsAny<ArchiveDataSetFile>(),
+                        It.IsAny<ZipDataSetFile>(),
                         It.IsAny<Stream>(),
                         It.IsAny<Stream>()))
                     .ReturnsAsync([]);
 
-                var result = await service.ValidateBulkDataArchiveFiles(
+                var result = await service.ValidateBulkDataZipFiles(
                     releaseVersionId,
-                    archive);
+                    zipFormFile);
 
-                var archiveDataSets = result.AssertRight();
+                var zippedDataSets = result.AssertRight();
 
-                Assert.Equal(2, archiveDataSets.Count);
+                Assert.Equal(2, zippedDataSets.Count);
 
-                Assert.Equal("First data set", archiveDataSets[0].Title);
-                Assert.Equal("one.csv", archiveDataSets[0].DataFilename);
-                Assert.Equal("one.meta.csv", archiveDataSets[0].MetaFilename);
-                Assert.Equal(696, archiveDataSets[0].DataFileSize);
-                Assert.Equal(210, archiveDataSets[0].MetaFileSize);
-                Assert.Null(archiveDataSets[0].ReplacingFile);
+                Assert.Equal("First data set", zippedDataSets[0].Title);
+                Assert.Equal("one.csv", zippedDataSets[0].DataFilename);
+                Assert.Equal("one.meta.csv", zippedDataSets[0].MetaFilename);
+                Assert.Equal(696, zippedDataSets[0].DataFileSize);
+                Assert.Equal(210, zippedDataSets[0].MetaFileSize);
+                Assert.Null(zippedDataSets[0].ReplacingFile);
 
-                Assert.Equal("Second data set", archiveDataSets[1].Title);
-                Assert.Equal("two.csv", archiveDataSets[1].DataFilename);
-                Assert.Equal("two.meta.csv", archiveDataSets[1].MetaFilename);
-                Assert.Equal(2085, archiveDataSets[1].DataFileSize);
-                Assert.Equal(318, archiveDataSets[1].MetaFileSize);
-                Assert.Null(archiveDataSets[1].ReplacingFile);
+                Assert.Equal("Second data set", zippedDataSets[1].Title);
+                Assert.Equal("two.csv", zippedDataSets[1].DataFilename);
+                Assert.Equal("two.meta.csv", zippedDataSets[1].MetaFilename);
+                Assert.Equal(2085, zippedDataSets[1].DataFileSize);
+                Assert.Equal(318, zippedDataSets[1].MetaFileSize);
+                Assert.Null(zippedDataSets[1].ReplacingFile);
             }
 
             VerifyAllMocks(dataSetValidatorService);
         }
 
         [Fact]
-        public async Task ValidateBulkDataArchiveFiles_WithFileReplacement_ReturnsArchiveSummary()
+        public async Task ValidateBulkDataZipFiles_WithFileReplacement_ReturnsDataSetSummary()
         {
             var releaseVersionId = Guid.NewGuid();
-            var archive = CreateFormFileFromResource("bulk-data-zip-valid.zip");
+            var zipFormFile = CreateFormFileFromResource("bulk-data-zip-valid.zip");
 
             var dataSetValidatorService = new Mock<IDataSetValidatorService>(Strict);
 
@@ -103,58 +103,58 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var contentDbContext = DbUtils.InMemoryApplicationDbContext(contentDbContextId))
             {
-                var service = SetupDataArchiveValidationService(
+                var service = SetupDataZipValidationService(
                     contentDbContext: contentDbContext,
                     dataSetValidatorService: dataSetValidatorService.Object);
 
                 dataSetValidatorService.Setup(mock => mock.ValidateDataSetFilesForUpload(
                         releaseVersionId,
-                        It.IsAny<ArchiveDataSetFile>(),
+                        It.IsAny<ZipDataSetFile>(),
                         It.IsAny<Stream>(),
                         It.IsAny<Stream>()))
                     .ReturnsAsync([]);
 
-                var result = await service.ValidateBulkDataArchiveFiles(
+                var result = await service.ValidateBulkDataZipFiles(
                     releaseVersionId,
-                    archive);
+                    zipFormFile);
 
-                var archiveDataSets = result.AssertRight();
+                var zippedDataSets = result.AssertRight();
 
-                Assert.Equal(2, archiveDataSets.Count);
+                Assert.Equal(2, zippedDataSets.Count);
 
-                Assert.Equal("First data set", archiveDataSets[0].Title);
-                Assert.Equal("one.csv", archiveDataSets[0].DataFilename);
-                Assert.Equal("one.meta.csv", archiveDataSets[0].MetaFilename);
-                Assert.Equal(696, archiveDataSets[0].DataFileSize);
-                Assert.Equal(210, archiveDataSets[0].MetaFileSize);
-                Assert.Equal(releaseFile.FileId, archiveDataSets[0].ReplacingFile!.Id);
+                Assert.Equal("First data set", zippedDataSets[0].Title);
+                Assert.Equal("one.csv", zippedDataSets[0].DataFilename);
+                Assert.Equal("one.meta.csv", zippedDataSets[0].MetaFilename);
+                Assert.Equal(696, zippedDataSets[0].DataFileSize);
+                Assert.Equal(210, zippedDataSets[0].MetaFileSize);
+                Assert.Equal(releaseFile.FileId, zippedDataSets[0].ReplacingFile!.Id);
 
-                Assert.Equal("Second data set", archiveDataSets[1].Title);
-                Assert.Equal("two.csv", archiveDataSets[1].DataFilename);
-                Assert.Equal("two.meta.csv", archiveDataSets[1].MetaFilename);
-                Assert.Equal(2085, archiveDataSets[1].DataFileSize);
-                Assert.Equal(318, archiveDataSets[1].MetaFileSize);
-                Assert.Null(archiveDataSets[1].ReplacingFile);
+                Assert.Equal("Second data set", zippedDataSets[1].Title);
+                Assert.Equal("two.csv", zippedDataSets[1].DataFilename);
+                Assert.Equal("two.meta.csv", zippedDataSets[1].MetaFilename);
+                Assert.Equal(2085, zippedDataSets[1].DataFileSize);
+                Assert.Equal(318, zippedDataSets[1].MetaFileSize);
+                Assert.Null(zippedDataSets[1].ReplacingFile);
             }
 
             VerifyAllMocks(dataSetValidatorService);
         }
 
         [Fact]
-        public async Task ValidateBulkDataArchiveFiles_IndexFileMissing_ReturnsValidationError()
+        public async Task ValidateBulkDataZipFiles_IndexFileMissing_ReturnsValidationError()
         {
             var releaseVersionId = Guid.NewGuid();
-            var archive = CreateFormFileFromResource("bulk-data-zip-invalid-no-datasetnames-csv.zip");
+            var zipFormFile = CreateFormFileFromResource("bulk-data-zip-invalid-no-datasetnames-csv.zip");
 
             var contentDbContextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = DbUtils.InMemoryApplicationDbContext(contentDbContextId))
             {
-                var service = SetupDataArchiveValidationService(
+                var service = SetupDataZipValidationService(
                     contentDbContext: contentDbContext);
 
-                var result = await service.ValidateBulkDataArchiveFiles(
+                var result = await service.ValidateBulkDataZipFiles(
                     releaseVersionId,
-                    archive);
+                    zipFormFile);
 
                 result
                     .AssertLeft()
@@ -169,21 +169,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async Task ValidateBulkDataArchiveFiles_IndexFileHasIncorrectHeaders_ReturnsValidationError()
+        public async Task ValidateBulkDataZipFiles_IndexFileHasIncorrectHeaders_ReturnsValidationError()
         {
             var releaseVersionId = Guid.NewGuid();
 
-            var archive = CreateFormFileFromResource("bulk-data-zip-invalid-datasetnames-headers.zip");
+            var zipFormFile = CreateFormFileFromResource("bulk-data-zip-invalid-datasetnames-headers.zip");
 
             var contentDbContextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = DbUtils.InMemoryApplicationDbContext(contentDbContextId))
             {
-                var service = SetupDataArchiveValidationService(
+                var service = SetupDataZipValidationService(
                     contentDbContext: contentDbContext);
 
-                var result = await service.ValidateBulkDataArchiveFiles(
+                var result = await service.ValidateBulkDataZipFiles(
                     releaseVersionId,
-                    archive);
+                    zipFormFile);
 
                 result
                     .AssertLeft()
@@ -198,20 +198,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async Task ValidateBulkDataArchiveFiles_ReferencedFilesNotFoundInArchive_ReturnsValidationError()
+        public async Task ValidateBulkDataZipFiles_ReferencedFilesNotFoundInZipFile_ReturnsValidationError()
         {
             var releaseVersionId = Guid.NewGuid();
-            var archive = CreateFormFileFromResource("bulk-data-zip-invalid-files-not-found.zip");
+            var zipFormFile = CreateFormFileFromResource("bulk-data-zip-invalid-files-not-found.zip");
 
             var contentDbContextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = DbUtils.InMemoryApplicationDbContext(contentDbContextId))
             {
-                var service = SetupDataArchiveValidationService(
+                var service = SetupDataZipValidationService(
                     contentDbContext: contentDbContext);
 
-                var result = await service.ValidateBulkDataArchiveFiles(
+                var result = await service.ValidateBulkDataZipFiles(
                     releaseVersionId,
-                    archive);
+                    zipFormFile);
 
                 result
                     .AssertLeft()
@@ -223,20 +223,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async Task ValidateBulkDataArchiveFiles_DuplicateDataSetTitlesAndFileNames_ReturnsValidationError()
+        public async Task ValidateBulkDataZipFiles_DuplicateDataSetTitlesAndFileNames_ReturnsValidationError()
         {
             var releaseVersionId = Guid.NewGuid();
-            var archive = CreateFormFileFromResource("bulk-data-zip-invalid-duplicate-names.zip");
+            var zipFormFile = CreateFormFileFromResource("bulk-data-zip-invalid-duplicate-names.zip");
 
             var contentDbContextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = DbUtils.InMemoryApplicationDbContext(contentDbContextId))
             {
-                var service = SetupDataArchiveValidationService(
+                var service = SetupDataZipValidationService(
                     contentDbContext: contentDbContext);
 
-                var result = await service.ValidateBulkDataArchiveFiles(
+                var result = await service.ValidateBulkDataZipFiles(
                     releaseVersionId,
-                    archive);
+                    zipFormFile);
 
                 result
                     .AssertLeft()
@@ -248,19 +248,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async Task ValidateBulkDataArchiveFiles_Fail_DataSetNamesCsvFilesnamesShouldNotEndDotCsv()
+        public async Task ValidateBulkDataZipFiles_Fail_DataSetNamesCsvFilesnamesShouldNotEndDotCsv()
         {
             var releaseVersionId = Guid.NewGuid();
-            var archive = CreateFormFileFromResource("bulk-data-zip-invalid-filename-contains-extension.zip");
+            var zipFormFile = CreateFormFileFromResource("bulk-data-zip-invalid-filename-contains-extension.zip");
 
             var contentDbContextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = DbUtils.InMemoryApplicationDbContext(contentDbContextId))
             {
-                var service = SetupDataArchiveValidationService(
+                var service = SetupDataZipValidationService(
                     contentDbContext: contentDbContext);
-                var result = await service.ValidateBulkDataArchiveFiles(
+                var result = await service.ValidateBulkDataZipFiles(
                     releaseVersionId,
-                    archive);
+                    zipFormFile);
 
                 result
                     .AssertLeft()
@@ -271,16 +271,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async Task ValidateBulkDataArchiveFiles_IndexFileMissingReferenceToArchiveFile_ReturnsValidationError()
+        public async Task ValidateBulkDataZipFiles_IndexFileMissingReferenceToZipFile_ReturnsValidationError()
         {
             var releaseVersionId = Guid.NewGuid();
-            var archive = CreateFormFileFromResource("bulk-data-zip-invalid-unused-files.zip");
+            var zipFormFile = CreateFormFileFromResource("bulk-data-zip-invalid-unused-files.zip");
 
             var dataSetValidatorService = new Mock<IDataSetValidatorService>(Strict);
 
             dataSetValidatorService.Setup(mock => mock.ValidateDataSetFilesForUpload(
                     releaseVersionId,
-                    It.IsAny<ArchiveDataSetFile>(),
+                    It.IsAny<ZipDataSetFile>(),
                     It.IsAny<Stream>(),
                     It.IsAny<Stream>()))
                 .ReturnsAsync([]);
@@ -288,13 +288,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var contentDbContextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = DbUtils.InMemoryApplicationDbContext(contentDbContextId))
             {
-                var service = SetupDataArchiveValidationService(
+                var service = SetupDataZipValidationService(
                     contentDbContext: contentDbContext,
                     dataSetValidatorService: dataSetValidatorService.Object);
 
-                var result = await service.ValidateBulkDataArchiveFiles(
+                var result = await service.ValidateBulkDataZipFiles(
                     releaseVersionId,
-                    archive);
+                    zipFormFile);
 
                 result
                     .AssertLeft()
@@ -314,19 +314,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using var contentDbContext = DbUtils.InMemoryApplicationDbContext(contentDbContextId);
 
             var filename = "test-data.csv";
-            var archive = CreateFormFileFromResource("test-data.csv", filename);
+            var zipFormFile = CreateFormFileFromResource("test-data.csv", filename);
 
             var fileTypeService = new Mock<IFileTypeService>(Strict);
             fileTypeService
-                .Setup(s => s.HasValidZipFileMeta(archive))
+                .Setup(s => s.HasValidZipFileMeta(zipFormFile))
                 .ReturnsAsync(false);
 
-            var service = SetupDataArchiveValidationService(
+            var service = SetupDataZipValidationService(
                 contentDbContext: contentDbContext,
                 fileTypeService: fileTypeService.Object);
 
             // Act
-            var result = await service.IsValidZipFile(archive);
+            var result = await service.IsValidZipFile(zipFormFile);
 
             // Assert
             AssertHasErrors(result, [
@@ -336,12 +336,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             VerifyAllMocks(fileTypeService);
         }
 
-        private static DataSetArchiveService SetupDataArchiveValidationService(
+        private static DataSetZipValidationService SetupDataZipValidationService(
             ContentDbContext? contentDbContext = null,
             IFileTypeService? fileTypeService = null,
             IDataSetValidatorService? dataSetValidatorService = null)
         {
-            return new DataSetArchiveService(
+            return new DataSetZipValidationService(
                 contentDbContext ?? Mock.Of<ContentDbContext>(Strict),
                 fileTypeService ?? Mock.Of<IFileTypeService>(Strict),
                 dataSetValidatorService ?? Mock.Of<IDataSetValidatorService>(Strict)
