@@ -621,7 +621,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             StartupSecurityConfiguration.ConfigureResourceBasedAuthorization(services);
 
             services.AddSingleton<IFileTypeService, FileTypeService>();
-            services.AddTransient<IDataSetArchiveValidationService, DataSetArchiveService>();
+            services.AddTransient<IDataSetZipValidationService, DataSetZipValidationService>();
             services.AddTransient<IPrivateBlobCacheService, PrivateBlobCacheService>();
             services.AddTransient<ICacheKeyService, CacheKeyService>();
             services.AddSingleton<IDataProcessorClient, DataProcessorClient>(_ =>

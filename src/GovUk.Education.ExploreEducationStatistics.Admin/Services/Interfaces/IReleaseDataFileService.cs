@@ -48,14 +48,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
             Guid? replacingFileId,
             CancellationToken cancellationToken);
 
-        Task<Either<ActionResult, List<ArchiveDataSetFileViewModel>>> ValidateAndUploadFromBulkZip(
+        Task<Either<ActionResult, List<ZipDataSetFileViewModel>>> ValidateAndUploadFromBulkZip(
             Guid releaseVersionId,
             IFormFile zipFormFile,
             CancellationToken cancellationToken);
 
         Task<Either<ActionResult, List<DataFileInfo>>> SaveDataSetsFromTemporaryBlobStorage(
             Guid releaseVersionId,
-            List<ArchiveDataSetFileViewModel> archiveDataSetFiles,
+            List<ZipDataSetFileViewModel> zipDataSetFiles,
             CancellationToken cancellationToken);
     }
 }

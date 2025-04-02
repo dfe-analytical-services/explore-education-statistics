@@ -2706,12 +2706,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await contentDbContext.SaveChangesAsync();
             }
 
-            var archive = CreateFormFileFromResource("bulk-data-zip-invalid-unused-files.zip");
+            var zipFormFile = CreateFormFileFromResource("bulk-data-zip-invalid-unused-files.zip");
 
-            var dataArchiveValidationService = new Mock<IDataSetArchiveValidationService>(Strict);
+            var dataSetZipValidationService = new Mock<IDataSetZipValidationService>(Strict);
 
-            dataArchiveValidationService
-                .Setup(s => s.IsValidZipFile(archive))
+            dataSetZipValidationService
+                .Setup(s => s.IsValidZipFile(zipFormFile))
                 .ReturnsAsync([new ErrorViewModel {
                     Code = ValidationMessages.ZipContainsUnusedFiles.Code,
                 }]);
@@ -2720,15 +2720,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 var service = SetupReleaseDataFileService(
                     contentDbContext: contentDbContext,
-                    dataArchiveValidationService: dataArchiveValidationService.Object
+                    dataSetZipValidationService: dataSetZipValidationService.Object
                 );
 
                 // Act & Assert
                 (await service
-                    .ValidateAndUploadFromBulkZip(releaseVersion.Id, archive, default))
+                    .ValidateAndUploadFromBulkZip(releaseVersion.Id, zipFormFile, default))
                     .AssertBadRequestWithValidationProblem();
 
-                MockUtils.VerifyAllMocks(dataArchiveValidationService);
+                MockUtils.VerifyAllMocks(dataSetZipValidationService);
             }
         }
 
@@ -2748,28 +2748,28 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await contentDbContext.SaveChangesAsync();
             }
 
-            var archive = CreateFormFileFromResource("bulk-data-zip-valid.zip");
+            var zipFormFile = CreateFormFileFromResource("bulk-data-zip-valid.zip");
 
-            var archiveFile1 = new ArchiveDataSetFile("One", "one.csv", "one.meta.csv");
-            var archiveFile2 = new ArchiveDataSetFile("Two", "two.csv", "two.meta.csv");
+            var zippedFile1 = new ZipDataSetFile("One", "one.csv", "one.meta.csv");
+            var zippedFile2 = new ZipDataSetFile("Two", "two.csv", "two.meta.csv");
 
-            var dataArchiveValidationService = new Mock<IDataSetArchiveValidationService>(Strict);
+            var dataSetZipValidationService = new Mock<IDataSetZipValidationService>(Strict);
             var dataSetValidatorService = new Mock<IDataSetValidatorService>(Strict);
             var privateBlobStorageService = new Mock<IPrivateBlobStorageService>(Strict);
 
-            dataArchiveValidationService
-                .Setup(s => s.IsValidZipFile(archive))
+            dataSetZipValidationService
+                .Setup(s => s.IsValidZipFile(zipFormFile))
                 .ReturnsAsync([]);
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                dataArchiveValidationService
-                    .Setup(s => s.ValidateBulkDataArchiveFiles(
+                dataSetZipValidationService
+                    .Setup(s => s.ValidateBulkDataZipFiles(
                         releaseVersion.Id,
-                        archive))
-                    .ReturnsAsync(new List<ArchiveDataSetFile>
+                        zipFormFile))
+                    .ReturnsAsync(new List<ZipDataSetFile>
                     {
-                        archiveFile1, archiveFile2,
+                        zippedFile1, zippedFile2,
                     });
 
                 privateBlobStorageService.Setup(mock =>
@@ -2784,17 +2784,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var service = SetupReleaseDataFileService(
                     contentDbContext: contentDbContext,
-                    dataArchiveValidationService: dataArchiveValidationService.Object,
+                    dataSetZipValidationService: dataSetZipValidationService.Object,
                     dataSetValidatorService: dataSetValidatorService.Object,
                     privateBlobStorageService: privateBlobStorageService.Object
                 );
 
                 var result = (await service
-                    .ValidateAndUploadFromBulkZip(releaseVersion.Id, archive, default))
+                    .ValidateAndUploadFromBulkZip(releaseVersion.Id, zipFormFile, default))
                     .AssertRight();
 
                 MockUtils.VerifyAllMocks(
-                    dataArchiveValidationService,
+                    dataSetZipValidationService,
                     dataSetValidatorService,
                     privateBlobStorageService);
 
@@ -2817,7 +2817,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             StatisticsDbContext? statisticsDbContext = null,
             IPersistenceHelper<ContentDbContext>? contentPersistenceHelper = null,
             IPrivateBlobStorageService? privateBlobStorageService = null,
-            IDataSetArchiveValidationService? dataArchiveValidationService = null,
+            IDataSetZipValidationService? dataSetZipValidationService = null,
             IDataSetValidatorService? dataSetValidatorService = null,
             IFileRepository? fileRepository = null,
             IReleaseVersionRepository? releaseVersionRepository = null,
@@ -2834,7 +2834,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 contentDbContext,
                 contentPersistenceHelper ?? new PersistenceHelper<ContentDbContext>(contentDbContext),
                 privateBlobStorageService ?? Mock.Of<IPrivateBlobStorageService>(Strict),
-                dataArchiveValidationService ?? Mock.Of<IDataSetArchiveValidationService>(Strict),
+                dataSetZipValidationService ?? Mock.Of<IDataSetZipValidationService>(Strict),
                 dataSetValidatorService ?? Mock.Of<IDataSetValidatorService>(Strict),
                 fileRepository ?? new FileRepository(contentDbContext),
                 releaseVersionRepository ?? new ReleaseVersionRepository(
