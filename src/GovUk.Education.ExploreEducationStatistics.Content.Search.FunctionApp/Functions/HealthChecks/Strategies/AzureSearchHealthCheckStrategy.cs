@@ -12,9 +12,9 @@ internal class AzureSearchHealthCheckStrategy(
     {
         if (!azureSearchOptions.Value.IsValid(out var errorMessage))
         {
-            return new HealthCheckResult(false,  errorMessage);
+            return new HealthCheckResult(false, errorMessage);
         }
-        
+
         try
         {
             var client = searchIndexClientFactory();
@@ -22,13 +22,12 @@ internal class AzureSearchHealthCheckStrategy(
             {
                 return new HealthCheckResult(false, $"Azure Search Indexer is not found");
             }
-
         }
         catch (Exception e)
         {
             return new HealthCheckResult(false, $"Error occurred whilst trying to run healthcheck for Azure Search Indexer: {e.Message}");
         }
-        
+
         return new HealthCheckResult(true, "Connection to Azure Search Indexer:OK");
     }
 }

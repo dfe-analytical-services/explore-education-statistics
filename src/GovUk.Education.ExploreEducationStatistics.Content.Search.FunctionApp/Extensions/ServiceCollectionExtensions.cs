@@ -21,10 +21,9 @@ public static class ServiceCollectionExtensions
         serviceCollection
             .AddTransient<IHealthCheckStrategy, ContentApiHealthCheckStrategy>()
             .AddTransient<IHealthCheckStrategy, AzureBlobStorageHealthCheckStrategy>()
-            // .AddTransient<IHealthCheckStrategy, AzureSearchHealthCheckStrategy>() // TODO: Comment this back in once the infrastructure and config for Azure Search are added. 
+            .AddTransient<IHealthCheckStrategy, AzureSearchHealthCheckStrategy>()
             // Factories to allow Healthcheck to evaluate config before attempting to instantiate clients
-            .AddTransient<Func<IContentApiClient>>(sp => sp.GetRequiredService<IContentApiClient>) 
+            .AddTransient<Func<IContentApiClient>>(sp => sp.GetRequiredService<IContentApiClient>)
             .AddTransient<Func<IAzureBlobStorageClient>>(sp => sp.GetRequiredService<IAzureBlobStorageClient>)
-            .AddTransient<Func<ISearchIndexClient>>(sp => sp.GetRequiredService<ISearchIndexClient>)
-        ;
+            .AddTransient<Func<ISearchIndexClient>>(sp => sp.GetRequiredService<ISearchIndexClient>);
 }

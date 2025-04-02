@@ -10,13 +10,13 @@ public class SearchIndexClientTests
     {
         SearchServiceEndpoint = _searchServiceEndpoint,
         SearchServiceAccessKey = _searchServiceAccessKey,
-        IndexName = _indexName
+        IndexerName = _indexerName
     };
 
 
     private string _searchServiceEndpoint = "https://example.search.windows.net/";
     private string? _searchServiceAccessKey = "my-access-key";
-    private string _indexName = "my-index-name";
+    private string _indexerName = "my-indexer-name";
 
     private ISearchIndexClient GetSut()
     {
@@ -38,7 +38,7 @@ public class SearchIndexClientTests
         {
             var searchServiceName = "-- insert search service name here --";
             _searchServiceAccessKey = "-- insert search service access key here --";
-            _indexName = "-- insert search index name here --";
+            _indexerName = "-- insert search indexer name here --";
 
             _searchServiceEndpoint = $"https://{searchServiceName}.search.windows.net/";
         }
@@ -67,7 +67,7 @@ public class SearchIndexClientTests
         public async Task Can_not_ping_unknown_indexer()
         {
             // ARRANGE
-            _indexName = "not-a-real-indexer";
+            _indexerName = "not-a-real-indexer";
             var sut = GetSut();
 
             // ACT

@@ -8,6 +8,15 @@ param contentApiUrl string
 @description('The IP address ranges that can access the Search Docs Function App endpoints.')
 param functionAppFirewallRules FirewallRule[]
 
+@description('Specifies the base URL of the Search Service endpoint for interacting with the data plane REST API. For example: https://[search-service-name].search.windows.net')
+param searchServiceEndpoint string
+
+@description('Specifies the Search Service indexer name.')
+param searchServiceIndexerName string
+
+@description('Specifies the Search Service name.')
+param searchServiceName string
+
 @description('Name of the Search storage account.')
 param searchStorageAccountName string
 
@@ -80,6 +89,10 @@ resource searchableDocumentsContainer 'Microsoft.Storage/storageAccounts/blobSer
   name: searchableDocumentsContainerName
 }
 
+resource searchService 'Microsoft.Search/searchServices@2024-06-01-preview' existing = {
+    name: searchServiceName
+}
+
 module functionAppModule '../../common/components/functionApp.bicep' = {
   name: 'searchDocsFunctionAppModuleDeploy'
   params: {
@@ -95,6 +108,15 @@ module functionAppModule '../../common/components/functionApp.bicep' = {
       {
         name: 'App__SearchableDocumentsContainerName'
         value: searchableDocumentsContainer.name
+      }
+      {
+        name: 'AzureSearch__SearchServiceEndpoint'
+        // Should be able to replace this with searchService.properties.endpoint in future using API version 2025-02-01-preview or later
+        value: searchServiceEndpoint
+      }
+      {
+        name: 'AzureSearch__IndexerName'
+        value: searchServiceIndexerName
       }
       {
         name: 'ContentApi__Url'
@@ -144,6 +166,15 @@ module functionAppModule '../../common/components/functionApp.bicep' = {
       alertsGroupName: resourceNames.existingResources.alertsGroup
     } : null
     tagValues: tagValues
+  }
+}
+
+module functionAppIdentityRoleAssignmentModule '../components/searchServiceRoleAssignment.bicep' = {
+  name: 'searchDocsFunctionAppRoleAssignmentModuleDeploy'
+  params: {
+    searchServiceName: searchService.name
+    principalIds: [functionAppModule.outputs.functionAppIdentityPrincipalId]
+    role: 'Search Service Contributor'
   }
 }
 
