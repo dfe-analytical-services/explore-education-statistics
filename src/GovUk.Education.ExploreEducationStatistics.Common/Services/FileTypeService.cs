@@ -60,7 +60,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             // Check mime type
             var magicTypeContext = new Magic(MagicOpenFlags.MAGIC_MIME_TYPE, magicFilePath);
             var mimeType = magicTypeContext.Read(sampleBuffer, sampleBufferSize);
-            if (!FileTypeValidationUtils.AllowedCsvMimeTypes.Any(pattern => pattern.Match(mimeType).Success))
+            if (!FileTypeValidationUtils.IsAllowedCsvMimeType(mimeType))
             {
                 return false;
             }
@@ -69,7 +69,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             var magicEncodingContext = new Magic(MagicOpenFlags.MAGIC_MIME_ENCODING, magicFilePath);
             var encodingType = magicEncodingContext.Read(sampleBuffer, sampleBufferSize);
 
-            return FileTypeValidationUtils.AllowedCsvEncodingTypes.Contains(encodingType);
+            return FileTypeValidationUtils.IsAllowedCsvEncodingType(encodingType);
         }
 
         public async Task<bool> HasValidZipFileMeta(IFormFile zipFile)
@@ -78,11 +78,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
                 && HasMatchingEncodingType(zipFile, FileTypeValidationUtils.AllowedArchiveEncodingTypes);
         }
 
-        private async Task<FileType?> GetMimeTypeUsingMimeDetective(Stream stream)
-        {
-            // Mime Detective is much better at zip files
-            return await stream.GetFileTypeAsync();
-        }
+        /// <remarks>Mime Detective is much better at zip files.</remarks>
+        private static async Task<FileType?> GetMimeTypeUsingMimeDetective(Stream stream)
+            => await stream.GetFileTypeAsync();
 
         private string GuessMagicInfo(IFormFile file, MagicOpenFlags flag)
         {
