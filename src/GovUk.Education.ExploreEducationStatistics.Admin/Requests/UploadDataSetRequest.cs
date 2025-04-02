@@ -83,7 +83,7 @@ public record UploadDataSetAsZipRequest
                     .WithMessage(ValidationMessages.DataSetTitleCannotBeEmpty)
                 .MaximumLength(120)
                     .WithMessage(ValidationMessages.DataSetTitleTooLong, "{PropertyValue}", "120")
-                .Must(file => !FileUploadsValidatorService.ContainsSpecialChars(file))
+                .Must(file => !DataSetValidatorService.ContainsSpecialChars(file))
                     .WithMessage(ValidationMessages.DataSetTitleShouldNotContainSpecialCharacters, "{PropertyValue}");
 
             RuleFor(request => request.ZipFile)

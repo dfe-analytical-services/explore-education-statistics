@@ -28,16 +28,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var releaseVersionId = Guid.NewGuid();
             var archive = CreateFormFileFromResource("bulk-data-zip-valid.zip");
 
-            var fileUploadsValidatorService = new Mock<IFileUploadsValidatorService>(Strict);
+            var dataSetValidatorService = new Mock<IDataSetValidatorService>(Strict);
 
             var contentDbContextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = DbUtils.InMemoryApplicationDbContext(contentDbContextId))
             {
                 var service = SetupDataArchiveValidationService(
                     contentDbContext: contentDbContext,
-                    fileUploadsValidatorService: fileUploadsValidatorService.Object);
+                    dataSetValidatorService: dataSetValidatorService.Object);
 
-                fileUploadsValidatorService.Setup(mock => mock.ValidateDataSetFilesForUpload(
+                dataSetValidatorService.Setup(mock => mock.ValidateDataSetFilesForUpload(
                         releaseVersionId,
                         It.IsAny<ArchiveDataSetFile>(),
                         It.IsAny<Stream>(),
@@ -67,7 +67,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Null(archiveDataSets[1].ReplacingFile);
             }
 
-            VerifyAllMocks(fileUploadsValidatorService);
+            VerifyAllMocks(dataSetValidatorService);
         }
 
         [Fact]
@@ -76,7 +76,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var releaseVersionId = Guid.NewGuid();
             var archive = CreateFormFileFromResource("bulk-data-zip-valid.zip");
 
-            var fileUploadsValidatorService = new Mock<IFileUploadsValidatorService>(Strict);
+            var dataSetValidatorService = new Mock<IDataSetValidatorService>(Strict);
 
             var releaseFile = new ReleaseFile
             {
@@ -105,9 +105,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 var service = SetupDataArchiveValidationService(
                     contentDbContext: contentDbContext,
-                    fileUploadsValidatorService: fileUploadsValidatorService.Object);
+                    dataSetValidatorService: dataSetValidatorService.Object);
 
-                fileUploadsValidatorService.Setup(mock => mock.ValidateDataSetFilesForUpload(
+                dataSetValidatorService.Setup(mock => mock.ValidateDataSetFilesForUpload(
                         releaseVersionId,
                         It.IsAny<ArchiveDataSetFile>(),
                         It.IsAny<Stream>(),
@@ -137,7 +137,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Null(archiveDataSets[1].ReplacingFile);
             }
 
-            VerifyAllMocks(fileUploadsValidatorService);
+            VerifyAllMocks(dataSetValidatorService);
         }
 
         [Fact]
@@ -276,9 +276,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var releaseVersionId = Guid.NewGuid();
             var archive = CreateFormFileFromResource("bulk-data-zip-invalid-unused-files.zip");
 
-            var fileUploadsValidatorService = new Mock<IFileUploadsValidatorService>(Strict);
+            var dataSetValidatorService = new Mock<IDataSetValidatorService>(Strict);
 
-            fileUploadsValidatorService.Setup(mock => mock.ValidateDataSetFilesForUpload(
+            dataSetValidatorService.Setup(mock => mock.ValidateDataSetFilesForUpload(
                     releaseVersionId,
                     It.IsAny<ArchiveDataSetFile>(),
                     It.IsAny<Stream>(),
@@ -290,7 +290,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 var service = SetupDataArchiveValidationService(
                     contentDbContext: contentDbContext,
-                    fileUploadsValidatorService: fileUploadsValidatorService.Object);
+                    dataSetValidatorService: dataSetValidatorService.Object);
 
                 var result = await service.ValidateBulkDataArchiveFiles(
                     releaseVersionId,
@@ -303,7 +303,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     ]);
             }
 
-            VerifyAllMocks(fileUploadsValidatorService);
+            VerifyAllMocks(dataSetValidatorService);
         }
 
         [Fact]
@@ -339,12 +339,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         private static DataSetArchiveService SetupDataArchiveValidationService(
             ContentDbContext? contentDbContext = null,
             IFileTypeService? fileTypeService = null,
-            IFileUploadsValidatorService? fileUploadsValidatorService = null)
+            IDataSetValidatorService? dataSetValidatorService = null)
         {
             return new DataSetArchiveService(
                 contentDbContext ?? Mock.Of<ContentDbContext>(Strict),
-            fileTypeService ?? Mock.Of<IFileTypeService>(Strict),
-                fileUploadsValidatorService ?? Mock.Of<IFileUploadsValidatorService>(Strict)
+                fileTypeService ?? Mock.Of<IFileTypeService>(Strict),
+                dataSetValidatorService ?? Mock.Of<IDataSetValidatorService>(Strict)
             );
         }
     }
