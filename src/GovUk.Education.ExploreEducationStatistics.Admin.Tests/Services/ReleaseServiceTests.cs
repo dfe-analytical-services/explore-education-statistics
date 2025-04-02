@@ -6,6 +6,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.MockBuilders;
+using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
@@ -484,7 +485,8 @@ public abstract class ReleaseServiceTests
         IPublicationCacheService? publicationCacheService = null,
         IReleasePublishingStatusRepository? releasePublishingStatusRepository = null,
         IRedirectsCacheService? redirectsCacheService = null,
-        IAdminEventRaiserService? adminEventRaiserService = null)
+        IAdminEventRaiserService? adminEventRaiserService = null,
+        IReleaseSlugValidator? releaseSlugValidator = null)
     {
         var userService = AlwaysTrueUserService();
 
@@ -501,7 +503,8 @@ public abstract class ReleaseServiceTests
             releasePublishingStatusRepository: releasePublishingStatusRepository ?? Mock.Of<IReleasePublishingStatusRepository>(Strict),
             redirectsCacheService: redirectsCacheService ?? Mock.Of<IRedirectsCacheService>(Strict),
             adminEventRaiserService: adminEventRaiserService ?? new AdminEventRaiserServiceMockBuilder().Build(),
-            guidGenerator: new SequentialGuidGenerator()
+            guidGenerator: new SequentialGuidGenerator(),
+            releaseSlugValidator: releaseSlugValidator ?? Mock.Of<IReleaseSlugValidator>(Strict)
         );
     }
 }

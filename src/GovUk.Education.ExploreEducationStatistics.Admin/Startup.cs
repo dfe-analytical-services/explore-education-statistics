@@ -128,6 +128,7 @@ using SameSiteMode = Microsoft.AspNetCore.Http.SameSiteMode;
 using ThemeService = GovUk.Education.ExploreEducationStatistics.Admin.Services.ThemeService;
 using IReleaseService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IReleaseService;
 using ReleaseService = GovUk.Education.ExploreEducationStatistics.Admin.Services.ReleaseService;
+using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin
 {
@@ -431,6 +432,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<IPublicationService, PublicationService>();
             services.AddTransient<IPublicationRepository, PublicationRepository>();
             services.AddTransient<IMetaService, MetaService>();
+            services.AddTransient<IReleaseSlugValidator, ReleaseSlugValidator>();
             services.AddTransient<IReleaseVersionService, ReleaseVersionService>();
             services.AddTransient<IReleaseService, ReleaseService>();
             services.AddTransient<IReleaseAmendmentService, ReleaseAmendmentService>();

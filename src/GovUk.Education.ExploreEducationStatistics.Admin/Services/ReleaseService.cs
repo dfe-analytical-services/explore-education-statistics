@@ -220,6 +220,7 @@ public partial class ReleaseService(
         return await releaseSlugValidator.ValidateNewSlug(
                 newReleaseSlug: newReleaseSlug, 
                 publicationId: release.PublicationId, 
+                releaseId: release.Id,
                 cancellationToken: cancellationToken)
             .OnSuccess(async _ => await ValidateReleaseIsNotUndergoingPublishing(release.Id, cancellationToken))
             .OnSuccess(_ => (release, oldReleaseSlug, newReleaseSlug));

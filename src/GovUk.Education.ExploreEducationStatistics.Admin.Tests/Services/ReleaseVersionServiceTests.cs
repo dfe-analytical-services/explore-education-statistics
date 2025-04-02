@@ -2336,7 +2336,8 @@ public abstract class ReleaseVersionServiceTests
         IReleaseSubjectRepository? releaseSubjectRepository = null,
         IDataSetVersionService? dataSetVersionService = null,
         IProcessorClient? processorClient = null,
-        IPrivateBlobCacheService? privateCacheService = null)
+        IPrivateBlobCacheService? privateCacheService = null,
+        IReleaseSlugValidator? releaseSlugValidator = null)
     {
         var userService = AlwaysTrueUserService();
 
@@ -2362,7 +2363,8 @@ public abstract class ReleaseVersionServiceTests
             releaseSubjectRepository ?? Mock.Of<IReleaseSubjectRepository>(Strict),
             dataSetVersionService ?? Mock.Of<IDataSetVersionService>(Strict),
             processorClient ?? Mock.Of<IProcessorClient>(Strict),
-            privateCacheService ?? Mock.Of<IPrivateBlobCacheService>(Strict)
+            privateCacheService ?? Mock.Of<IPrivateBlobCacheService>(Strict),
+            releaseSlugValidator ?? Mock.Of<IReleaseSlugValidator>(Strict)
         );
     }
 }
