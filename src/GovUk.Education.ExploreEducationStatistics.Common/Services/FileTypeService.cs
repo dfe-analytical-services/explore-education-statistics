@@ -74,8 +74,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
 
         public async Task<bool> HasValidZipFileMeta(IFormFile zipFile)
         {
-            return await HasMatchingMimeType(zipFile, FileTypeValidationUtils.AllowedArchiveMimeTypes)
-                && HasMatchingEncodingType(zipFile, FileTypeValidationUtils.AllowedArchiveEncodingTypes);
+            return await HasMatchingMimeType(zipFile, FileTypeValidationUtils.AllowedZipFileMimeTypes)
+                && HasMatchingEncodingType(zipFile, FileTypeValidationUtils.AllowedZipFileEncodingTypes);
         }
 
         /// <remarks>Mime Detective is much better at zip files.</remarks>

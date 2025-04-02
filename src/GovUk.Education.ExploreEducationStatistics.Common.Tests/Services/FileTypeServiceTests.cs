@@ -74,7 +74,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
             Txt,
         ];
 
-        private static readonly List<FileInfo> ArchiveTypes =
+        private static readonly List<FileInfo> ZipTypes =
         [
             Zip,
         ];
@@ -230,12 +230,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
         }
 
         [Fact]
-        public async Task HasMatchingMimeType_ValidArchiveFileUploads()
+        public async Task HasMatchingMimeType_ValidZipFileUploads()
         {
             foreach (var type in AllTypes)
             {
-                var expectedToSucceed = ArchiveTypes.Contains(type);
-                await AssertHasMatchingMimeType(type, AllowedArchiveMimeTypes.ToList(), expectedToSucceed);
+                var expectedToSucceed = ZipTypes.Contains(type);
+                await AssertHasMatchingMimeType(type, AllowedZipFileMimeTypes.ToList(), expectedToSucceed);
             }
         }
 
@@ -281,7 +281,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
                 .Setup(f => f.OpenReadStream())
                 .Returns(() => File.OpenRead(filePath));
 
-            var result = service.HasMatchingEncodingType(formFile.Object, AllowedArchiveEncodingTypes);
+            var result = service.HasMatchingEncodingType(formFile.Object, AllowedZipFileEncodingTypes);
 
             Assert.True(result);
         }
@@ -315,7 +315,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
 
             foreach (var type in AllTypes)
             {
-                var expectedToSucceed = ArchiveTypes.Contains(type);
+                var expectedToSucceed = ZipTypes.Contains(type);
 
                 var fileInfo = type;
 

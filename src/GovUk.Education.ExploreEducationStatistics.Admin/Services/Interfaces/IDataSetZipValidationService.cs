@@ -8,9 +8,9 @@ using System.Threading.Tasks;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 {
-    public interface IDataSetArchiveValidationService
+    public interface IDataSetZipValidationService
     {
-        Task<Either<ActionResult, List<ArchivedDataSet>>> ValidateBulkDataArchiveFiles(
+        Task<Either<ActionResult, List<ZippedDataSet>>> ValidateBulkDataZipFiles(
             Guid releaseVersionId,
             List<DataSetFileDto> dataSetFiles);
     }
