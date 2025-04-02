@@ -5,11 +5,11 @@ using Blob = GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionA
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Tests.Builders;
 
-internal class AzureBlobStorageClientBuilder
+internal class AzureBlobStorageClientMockBuilder
 {
     private readonly Mock<IAzureBlobStorageClient> _mock = new(MockBehavior.Strict);
 
-    public AzureBlobStorageClientBuilder()
+    public AzureBlobStorageClientMockBuilder()
     {
         Assert = new(_mock);
         

@@ -1,10 +1,11 @@
-﻿namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.OnReleaseVersionPublished.Dtos;
+﻿// ReSharper disable ClassNeverInstantiated.Global
+namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.OnReleaseVersionPublished.Dtos;
 
 public record ReleaseVersionPublishedEventDto
 {
-    public required Guid ReleaseId {get;init;}
-    public required string ReleaseSlug { get; init; }
-    public required Guid PublicationId { get; init; }
-    public required string PublicationSlug { get; init; }
-    public required Guid PublicationLatestPublishedReleaseVersionId { get; init; }   
+    public Guid? ReleaseId {get;init;}
+    public string? ReleaseSlug { get; init; }
+    public Guid? PublicationId { get; init; }
+    public string? PublicationSlug { get; init; }
+    public Guid? PublicationLatestPublishedReleaseVersionId { get; init; }   
 }

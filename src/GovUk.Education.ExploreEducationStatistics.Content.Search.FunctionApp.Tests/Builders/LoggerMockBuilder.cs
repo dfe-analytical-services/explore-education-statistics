@@ -7,7 +7,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.
 /// Use this builder to construct an implementation of <summary cref="ILogger{T}" /> where
 /// the log statements are recorded and can be asserted.
 /// </summary>
-public class LoggerBuilder<T>
+public class LoggerMockBuilder<T>
 {
     private MockLogger? _logger;
     

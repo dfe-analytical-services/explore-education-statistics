@@ -2,9 +2,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.
 
 public record SearchableDocumentCreatedMessageDto
 {
-    public required string PublicationSlug { get; init; }
-    public required Guid ReleaseId {get;init;}
-    public required string ReleaseSlug { get; init; }
-    public required Guid ReleaseVersionId { get; init; }
-    public required string BlobName { get; init; }
+    public string? PublicationSlug { get; init; }
+    public Guid? ReleaseId {get;init;}
+    public string? ReleaseSlug { get; init; }
+    public Guid? ReleaseVersionId { get; init; }
+    public string? BlobName { get; init; }
 }

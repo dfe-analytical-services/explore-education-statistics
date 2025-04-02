@@ -3,11 +3,11 @@ using Microsoft.Azure.Functions.Worker;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Tests.Builders;
 
-public class FunctionContextBuilder
+public class FunctionContextMockBuilder
 {
     private string _functionName = "Mock Function Name";
 
-    public class MockFunctionContext(FunctionDefinition functionDefinition) : FunctionContext
+    private class MockFunctionContext(FunctionDefinition functionDefinition) : FunctionContext
     {
         public override string InvocationId { get; } = string.Empty;
         public override string FunctionId { get; } = string.Empty;
@@ -20,7 +20,7 @@ public class FunctionContextBuilder
         public override IInvocationFeatures Features { get; } = null!;
     }
 
-    public class MockFunctionDefinition(string name) : FunctionDefinition
+    private class MockFunctionDefinition(string name) : FunctionDefinition
     {
         public override ImmutableArray<FunctionParameter> Parameters { get; } = ImmutableArray<FunctionParameter>.Empty;
         public override string PathToAssembly { get; } = string.Empty;
@@ -36,7 +36,7 @@ public class FunctionContextBuilder
             new MockFunctionDefinition(
                 name: _functionName));
 
-    public FunctionContextBuilder ForFunctionName(string functionName)
+    public FunctionContextMockBuilder ForFunctionName(string functionName)
     {
         _functionName = functionName;
         return this;

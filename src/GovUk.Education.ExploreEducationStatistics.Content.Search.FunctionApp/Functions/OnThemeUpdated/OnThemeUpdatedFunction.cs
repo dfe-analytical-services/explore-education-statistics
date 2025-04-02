@@ -9,7 +9,7 @@ using Microsoft.Extensions.Logging;
 namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.OnThemeUpdated;
 
 public class OnThemeUpdatedFunction(
-    EventGridEventHandler eventGridEventHandler,
+    IEventGridEventHandler eventGridEventHandler,
     IContentApiClient contentApiClient,
     ILogger<OnThemeUpdatedFunction> logger)
 {
