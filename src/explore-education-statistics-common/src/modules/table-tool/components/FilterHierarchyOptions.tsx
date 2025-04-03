@@ -2,25 +2,21 @@ import ButtonText from '@common/components/ButtonText';
 import DetailsMenu from '@common/components/DetailsMenu';
 import { FormCheckbox } from '@common/components/form';
 import FormField from '@common/components/form/FormField';
-import { SubjectMetaFilterHierarchy } from '@common/services/tableBuilderService';
-import { Dictionary } from '@common/types';
 import classNames from 'classnames';
 import React, { memo, useCallback, useMemo } from 'react';
 import { useFormContext } from 'react-hook-form';
 import styles from './FilterHierarchyOptions.module.scss';
 
-export type FilterHierarchyOption2 = {
+export type FilterHierarchyOption = {
   value: string;
   label: string;
-  options?: FilterHierarchyOption2[];
+  filterLabel: string;
+  childFilterLabel?: string;
+  options?: FilterHierarchyOption[];
 };
 
 interface FilterHierarchyOptionsProps {
-  optionLabelsMap: Dictionary<string>;
-  filterHierarchy: SubjectMetaFilterHierarchy;
-  filterLabels: string[];
-  tiersTotal: number;
-  optionId: string;
+  optionTree: FilterHierarchyOption;
   level: number;
   disabled?: boolean;
   name: string;
@@ -31,12 +27,8 @@ interface FilterHierarchyOptionsProps {
 }
 
 function FilterHierarchyOptions({
-  optionId,
-  optionLabelsMap,
-  filterHierarchy,
-  filterLabels,
-  tiersTotal,
   name,
+  optionTree,
   disabled,
   level,
   selectedValues = [],
@@ -44,19 +36,17 @@ function FilterHierarchyOptions({
   toggleOptions,
   hideLowerTotals = false,
 }: FilterHierarchyOptionsProps) {
-  const { optionLabel, childOptionIds, hasAllSelected } = useMemo(() => {
-    const optionIds = filterHierarchy[level]?.hierarchy[optionId] ?? [];
-
+  const { childOptionIds, hasAllSelected } = useMemo(() => {
+    const childIds = optionTree.options?.map(({ value }) => value) ?? [];
     return {
-      optionLabel: optionLabelsMap[optionId],
-      childOptionIds: optionIds,
-      hasAllSelected: optionIds.every(childOptionid =>
-        selectedValues.includes(childOptionid),
+      childOptionIds: childIds,
+      hasAllSelected: childIds.every(childOptionId =>
+        selectedValues.includes(childOptionId),
       ),
     };
-  }, [selectedValues, optionLabelsMap, filterHierarchy, level, optionId]);
+  }, [selectedValues, optionTree]);
 
-  const isExpanded = expandedOptionsList.includes(optionId);
+  const isExpanded = expandedOptionsList.includes(optionTree.value);
   const { setValue } = useFormContext();
 
   const toggleSelectAll = useCallback(() => {
@@ -72,10 +62,10 @@ function FilterHierarchyOptions({
       name,
       Array.from(new Set([...selectedValues, ...childOptionIds])),
     );
-  }, [childOptionIds, setValue, hasAllSelected, selectedValues]);
+  }, [childOptionIds, setValue, hasAllSelected, selectedValues, name]);
 
   return level !== 0 &&
-    optionLabel.toLocaleLowerCase() === 'total' &&
+    optionTree.label.toLocaleLowerCase() === 'total' &&
     hideLowerTotals ? null : (
     <div
       className={classNames('govuk-checkboxes', {
@@ -89,47 +79,43 @@ function FilterHierarchyOptions({
       >
         <div className={styles.checkbox}>
           <FormField
-            hint={filterLabels[level]}
-            label={optionLabel}
-            id={`${name}-${optionId}`}
+            hint={optionTree.filterLabel}
+            label={optionTree.label}
+            id={`${name}-${optionTree.value}`}
             // @ts-expect-error  `value` required to make checkboxes unique
-            value={optionId}
+            value={optionTree.value}
             name={name}
             as={FormCheckbox}
-            checked={selectedValues.includes(optionId)}
+            checked={selectedValues.includes(optionTree.value)}
             disabled={disabled}
           />
         </div>
-        {!!childOptionIds.length && (
+        {!!optionTree.options?.length && (
           <DetailsMenu
-            summary={`${isExpanded ? 'Close' : 'Show'} ${filterLabels[
-              level + 1
-            ]?.toLocaleLowerCase()}`}
+            summary={`${
+              isExpanded ? 'Close' : 'Show'
+            } ${optionTree.childFilterLabel?.toLocaleLowerCase()}`}
             open={isExpanded}
-            onToggle={() => toggleOptions(optionId)}
+            onToggle={() => toggleOptions(optionTree.value)}
             className={styles.detailsMenu}
           >
             <ul className={styles.content}>
-              {childOptionIds.length > 1 && (
+              {optionTree.options.length > 1 && (
                 <li className={styles.option}>
                   <ButtonText onClick={toggleSelectAll}>
                     {hasAllSelected ? 'Unselect' : 'Select'} all{' '}
-                    {childOptionIds.length} options
+                    {optionTree.options.length} options
                   </ButtonText>
                 </li>
               )}
-              {childOptionIds.map(childOptionId => (
+              {optionTree.options?.map(childOptionTree => (
                 <FilterHierarchyOptions
                   toggleOptions={toggleOptions}
                   expandedOptionsList={expandedOptionsList}
-                  optionId={childOptionId}
-                  key={childOptionId}
-                  optionLabelsMap={optionLabelsMap}
-                  filterHierarchy={filterHierarchy}
-                  filterLabels={filterLabels}
+                  optionTree={childOptionTree}
+                  key={childOptionTree.value}
                   name={name}
                   disabled={disabled}
-                  tiersTotal={tiersTotal}
                   selectedValues={selectedValues}
                   level={level + 1}
                 />
