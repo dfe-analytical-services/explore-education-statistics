@@ -7,7 +7,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.
 /// Use this builder to construct an implementation of <summary cref="ILogger{T}" /> where
 /// the log statements are recorded and can be asserted.
 /// </summary>
-public class LoggerBuilder<T>
+public class LoggerMockBuilder<T>
 {
     private MockLogger? _logger;
     
@@ -44,6 +44,13 @@ public class LoggerBuilder<T>
         public void LoggedInfoContains(string message)
         {
             var infos = logItems.Where(l => l.LogLevel == LogLevel.Information);
+            var infosWithMessage = infos.Where(l => l.Message.Contains(message));
+            Xunit.Assert.NotEmpty(infosWithMessage);
+        }
+        
+        public void LoggedDebugContains(string message)
+        {
+            var infos = logItems.Where(l => l.LogLevel == LogLevel.Debug);
             var infosWithMessage = infos.Where(l => l.Message.Contains(message));
             Xunit.Assert.NotEmpty(infosWithMessage);
         }

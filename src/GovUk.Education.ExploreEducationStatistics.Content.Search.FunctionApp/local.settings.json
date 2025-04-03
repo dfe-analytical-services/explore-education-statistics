@@ -4,6 +4,7 @@
     "AzureWebJobsStorage": "UseDevelopmentStorage=true;DevelopmentStorageProxyUri=http://data-storage",
     "FUNCTIONS_WORKER_RUNTIME": "dotnet-isolated",
     "ReleaseVersionPublishedQueueName": "release-version-published-queue",
+    "ReleaseSlugChangedQueueName": "release-slug-changed-queue",
     "SearchableDocumentCreatedQueueName": "search-document-created-queue",
     "RefreshSearchableDocumentQueueName": "refresh-searchable-document-queue",
     "ThemeUpdatedQueueName": "theme-updated-queue"

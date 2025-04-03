@@ -1,6 +1,7 @@
 ﻿using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Clients.AzureBlobStorage;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Clients.ContentApi;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.OnReleaseSlugChanged;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.OnReleaseVersionPublished;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.OnThemeUpdated;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.RefreshSearchableDocument;
@@ -247,6 +248,19 @@ public class ProgramTests
         
         public class ResolveFunctionTests : ProgramTests
         {
+            [Fact]
+            public void Can_resolve_OnReleaseSlugChangedFunction()
+            {
+                // ARRANGE
+                var sut = GetSut();
+            
+                // ACT
+                var actual = ActivatorUtilities.CreateInstance<OnReleaseSlugChangedFunction>(sut.Services);
+            
+                // ASSERT
+                Assert.NotNull(actual);
+            }
+            
             [Fact]
             public void Can_resolve_OnReleaseVersionPublishedFunction()
             {
