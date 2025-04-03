@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 using System;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
@@ -34,10 +34,10 @@ public class AdminEventRaiserServiceMockBuilder
 
     public class Asserter(Mock<IAdminEventRaiserService> mock)
     {
-        public void ThatOnThemeUpdatedCalled(Func<Theme, bool>? predicate = null) => 
+        public void ThatOnThemeUpdatedRaised(Func<Theme, bool>? predicate = null) => 
             mock.Verify(m => m.OnThemeUpdated(It.Is<Theme>(t => predicate == null || predicate(t))), Times.Once);
 
-        public void OnReleaseSlugChangedWasCalled(
+        public void OnReleaseSlugChangedWasRaised(
             Guid? expectedReleaseId = null,
             string? expectedNewReleaseSlug = null,
             Guid? expectedPublicationId = null,
@@ -49,7 +49,7 @@ public class AdminEventRaiserServiceMockBuilder
                 It.Is<string>(publicationSlug => expectedPublicationSlug == null || publicationSlug == expectedPublicationSlug)),
                 Times.Once);
 
-        public void OnReleaseSlugChangedWasNotCalled() => 
+        public void OnReleaseSlugChangedWasNotRaised() => 
             mock.Verify(OnReleaseSlugChanged, Times.Never);
     }
     public Asserter Assert => new(_mock);
