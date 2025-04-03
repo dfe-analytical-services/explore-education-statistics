@@ -4,10 +4,11 @@ import { useFormIdContext } from '@common/components/form/contexts/FormIdContext
 import FormCheckboxSelectedCount from '@common/components/form/FormCheckboxSelectedCount';
 import { SubjectMetaFilterHierarchy } from '@common/services/tableBuilderService';
 import get from 'lodash/get';
-import React, { memo } from 'react';
+import React, { memo, useCallback, useState } from 'react';
 import { useFormContext, useWatch } from 'react-hook-form';
 import FilterHierarchyOptions from './FilterHierarchyOptions';
 import { OptionLabelsMap } from './utils/getFilterHierarchyLabelsMap';
+import styles from './FilterHierarchy.module.scss';
 
 export interface FilterHierarchyProps {
   optionLabelsMap: OptionLabelsMap;
@@ -29,8 +30,13 @@ function FilterHierarchy({
   onToggle,
 }: FilterHierarchyProps) {
   const tiersTotal = filterHierarchy.length + 1;
-  const bottomLevelFilterId = filterHierarchy.at(-1)?.childFilterId;
-  const legend = optionLabelsMap[bottomLevelFilterId ?? ''];
+
+  const filterLabels: string[] = [
+    ...filterHierarchy.map(({ filterId }) => optionLabelsMap[filterId ?? '']),
+    optionLabelsMap[filterHierarchy.at(-1)?.childFilterId ?? ''],
+  ].filter(label => label !== undefined);
+
+  const legend = filterLabels.at(-1) ?? '';
 
   const selectedValues = useWatch({ name });
   const {
@@ -40,6 +46,19 @@ function FilterHierarchy({
   const { fieldId } = useFormIdContext();
   const id = fieldId(name);
   const errorMessage = get(errors, name)?.message;
+
+  const [expandedOptionsList, setExpandedOptionsList] = useState<string[]>([]);
+  const toggleOptions = useCallback(
+    (optionId: string) => {
+      if (expandedOptionsList.includes(optionId)) {
+        return setExpandedOptionsList(
+          expandedOptionsList.filter(expandedId => expandedId !== optionId),
+        );
+      }
+      return setExpandedOptionsList([...expandedOptionsList, optionId]);
+    },
+    [setExpandedOptionsList, expandedOptionsList],
+  );
 
   return (
     <DetailsMenu
@@ -51,10 +70,10 @@ function FilterHierarchy({
       summaryAfter={<FormCheckboxSelectedCount name={name} />}
       onToggle={onToggle}
     >
-      <div id={id}>
+      <ul id={id} className={styles.fhList}>
         <FormFieldset
           id={name}
-          legend={`Browse ${legend.toLocaleLowerCase()} by related tiers`}
+          legend={`Search tiered options of ${legend.toLowerCase()}`}
           legendSize="s"
           useFormId
           error={errorMessage?.toString()}
@@ -66,16 +85,19 @@ function FilterHierarchy({
                 optionId={optionId}
                 optionLabelsMap={optionLabelsMap}
                 filterHierarchy={filterHierarchy}
+                filterLabels={filterLabels}
                 name={name}
                 disabled={disabled}
                 tiersTotal={tiersTotal}
                 selectedValues={selectedValues}
                 level={0}
+                toggleOptions={toggleOptions}
+                expandedOptionsList={expandedOptionsList}
               />
             );
           })}
         </FormFieldset>
-      </div>
+      </ul>
     </DetailsMenu>
   );
 }
