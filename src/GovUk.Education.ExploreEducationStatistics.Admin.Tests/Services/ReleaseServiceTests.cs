@@ -17,6 +17,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Cache;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.Cache;
+using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using Microsoft.EntityFrameworkCore;
 using Moq;
 using Xunit.Abstractions;
@@ -259,6 +260,52 @@ public abstract class ReleaseServiceTests
                     .Where(dataBlock => dataBlock.ReleaseVersionId == newReleaseVersionId));
             }
         }
+
+        [Fact]
+        public async Task GivenReleaseExists_ReleaseSlugIsValidated()
+        {
+            Publication publication = _dataFixture.DefaultPublication();
+
+            using var context = InMemoryApplicationDbContext(Guid.NewGuid().ToString());
+            context.Publications.Add(publication);
+            await context.SaveChangesAsync();
+
+            var releaseVersionService = new ReleaseVersionServiceMockBuilder()
+                .WhereGetReleaseVersionReturns();
+
+            var releaseSlugValidator = new ReleaseSlugValidatorMockBuilder();
+
+            var sut = BuildService(
+                contentDbContext: context,
+                releaseVersionService: releaseVersionService.Build(),
+                releaseSlugValidator: releaseSlugValidator.Build());
+
+            var year = 2020;
+            var timePeriodCoverage = TimeIdentifier.AcademicYear;
+            var label = "initial";
+            var request = new ReleaseCreateRequest
+            {
+                PublicationId = publication.Id,
+                Year = year,
+                TimePeriodCoverage = timePeriodCoverage,
+                Label = label,
+                Type = ReleaseType.OfficialStatistics,
+            };
+
+            // ACT
+            await sut.CreateRelease(request);
+
+            // ASSERT
+            var expectedReleaseSlug = NamingUtils.CreateReleaseSlug(
+                year: year,
+                timePeriodCoverage: timePeriodCoverage,
+                label: label);
+
+            releaseSlugValidator.Assert.ValidateNewSlugWasCalled(
+                expectedNewReleaseSlug: expectedReleaseSlug,
+                expectedPublicationId: publication.Id,
+                expectedReleaseId: null);
+        }
     }
 
     public class UpdateReleaseTests(ITestOutputHelper output) : ReleaseServiceTests
@@ -475,6 +522,44 @@ public abstract class ReleaseServiceTests
             // ASSERT
             result.AssertRight();
             adminEventRaiserService.Assert.OnReleaseSlugChangedWasNotRaised();
+        }
+
+        [Fact]
+        public async Task GivenReleaseExists_NewReleaseSlugIsValidated()
+        {
+            Release release = _dataFixture.DefaultRelease()
+                .WithPublication(_dataFixture.DefaultPublication());
+
+            await using var context = InMemoryApplicationDbContext(Guid.NewGuid().ToString());
+            context.Releases.Add(release);
+            await context.SaveChangesAsync();
+
+            var releaseSlugValidator = new ReleaseSlugValidatorMockBuilder();
+
+            var sut = BuildService(
+                context,
+                releaseSlugValidator: releaseSlugValidator.Build());
+
+            var newLabel = "initial";
+
+            var request = new ReleaseUpdateRequest
+            {
+                Label = newLabel
+            };
+
+            // ACT
+            await sut.UpdateRelease(release.Id, request);
+
+            // ASSERT
+            var expectedNewReleaseSlug = NamingUtils.CreateReleaseSlug(
+                year: release.Year,
+                timePeriodCoverage: release.TimePeriodCoverage,
+                label: newLabel);
+
+            releaseSlugValidator.Assert.ValidateNewSlugWasCalled(
+                expectedNewReleaseSlug: expectedNewReleaseSlug,
+                expectedPublicationId: release.PublicationId,
+                expectedReleaseId: release.Id);
         }
     }
 
