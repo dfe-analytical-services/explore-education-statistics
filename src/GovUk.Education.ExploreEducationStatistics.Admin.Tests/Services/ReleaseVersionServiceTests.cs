@@ -10,6 +10,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Public.Data;
+using GovUk.Education.ExploreEducationStatistics.Admin.Tests.MockBuilders;
 using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using GovUk.Education.ExploreEducationStatistics.Admin.Validators.ErrorDetails;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
@@ -737,7 +738,21 @@ public abstract class ReleaseVersionServiceTests
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                var releaseVersionService = BuildService(context);
+                var expectedUpdatedReleaseSlug = NamingUtils.CreateReleaseSlug(
+                    year: otherRelease.Year, 
+                    timePeriodCoverage: otherRelease.TimePeriodCoverage, 
+                    label: null);
+
+                var releaseSlugValidator = new ReleaseSlugValidatorMockBuilder()
+                    .SetValidationToFail(
+                        validationErrorMessage: SlugNotUnique, 
+                        releaseSlug: expectedUpdatedReleaseSlug, 
+                        publicationId: publication.Id, 
+                        releaseId: releaseVersion.ReleaseId);
+
+                var releaseVersionService = BuildService(
+                    contentDbContext: context,
+                    releaseSlugValidator: releaseSlugValidator.Build());
 
                 var result = await releaseVersionService
                     .UpdateReleaseVersion(
@@ -2364,7 +2379,7 @@ public abstract class ReleaseVersionServiceTests
             dataSetVersionService ?? Mock.Of<IDataSetVersionService>(Strict),
             processorClient ?? Mock.Of<IProcessorClient>(Strict),
             privateCacheService ?? Mock.Of<IPrivateBlobCacheService>(Strict),
-            releaseSlugValidator ?? Mock.Of<IReleaseSlugValidator>(Strict)
+            releaseSlugValidator ?? new ReleaseSlugValidatorMockBuilder().Build()
         );
     }
 }
