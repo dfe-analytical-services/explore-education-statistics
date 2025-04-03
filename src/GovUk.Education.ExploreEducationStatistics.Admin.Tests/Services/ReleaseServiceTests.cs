@@ -454,7 +454,7 @@ public abstract class ReleaseServiceTests
                 .SetNoReleaseVersionStatus(releaseVersion.Id);
 
             var adminEventRaiserService = new AdminEventRaiserServiceMockBuilder();
-            
+
             var sut = BuildService(
                                     context,
                                     releaseVersionService: releaseVersionService.Build(),
@@ -504,7 +504,7 @@ public abstract class ReleaseServiceTests
             redirectsCacheService: redirectsCacheService ?? Mock.Of<IRedirectsCacheService>(Strict),
             adminEventRaiserService: adminEventRaiserService ?? new AdminEventRaiserServiceMockBuilder().Build(),
             guidGenerator: new SequentialGuidGenerator(),
-            releaseSlugValidator: releaseSlugValidator ?? Mock.Of<IReleaseSlugValidator>(Strict)
+            releaseSlugValidator: releaseSlugValidator ?? new ReleaseSlugValidatorMockBuilder().Build()
         );
     }
 }
