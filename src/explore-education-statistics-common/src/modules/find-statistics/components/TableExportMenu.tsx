@@ -5,6 +5,7 @@ import { FullTable } from '@common/modules/table-tool/types/fullTable';
 import ExportMenu from '@common/components/ExportMenu';
 import downloadFile from '@common/utils/file/downloadFile';
 import React, { RefObject } from 'react';
+import copyElementToClipboard from '@common/utils/copyElementToClipboard';
 
 interface Props {
   fileName?: string | undefined;
@@ -26,21 +27,6 @@ export default function TableExportMenu({
   const tableFootnotes = fullTable
     ? fullTable.subjectMeta.footnotes
     : footnotes;
-
-  const copyTableToClipboard = () => {
-    if (!tableRef.current) return;
-
-    const clipboardItem = new ClipboardItem({
-      'text/plain': new Blob([tableRef.current.innerText], {
-        type: 'text/plain',
-      }),
-      'text/html': new Blob([tableRef.current.outerHTML], {
-        type: 'text/html',
-      }),
-    });
-
-    navigator.clipboard.write([clipboardItem]);
-  };
 
   const handleOdsDownload = () => {
     downloadTableOdsFile(
@@ -69,7 +55,7 @@ export default function TableExportMenu({
         </ButtonText>
       </li>
       <li role="menuitem">
-        <ButtonText onClick={copyTableToClipboard}>
+        <ButtonText onClick={() => copyElementToClipboard(tableRef)}>
           Copy table to clipboard
         </ButtonText>
       </li>
