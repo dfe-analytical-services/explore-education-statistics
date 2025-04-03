@@ -1,4 +1,4 @@
-#nullable enable
+﻿#nullable enable
 using System;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
@@ -30,6 +30,10 @@ public class AdminEventRaiserServiceMockBuilder
         _mock
             .Setup(OnReleaseSlugChanged)
             .Returns(Task.CompletedTask);
+        
+        _mock
+            .Setup(m => m.OnPublicationChanged(It.IsAny<Publication>()))
+            .Returns(Task.CompletedTask);
     }
 
     public class Asserter(Mock<IAdminEventRaiserService> mock)
@@ -51,6 +55,12 @@ public class AdminEventRaiserServiceMockBuilder
 
         public void OnReleaseSlugChangedWasNotRaised() => 
             mock.Verify(OnReleaseSlugChanged, Times.Never);
+
+        public void OnPublicationChangedWasRaised(Publication? publication = null) =>
+            mock.Verify(m => m.OnPublicationChanged(It.Is<Publication>(p => publication == null || p == publication)), Times.Once);
+
+        public void OnPublicationChangedWasNotRaised()=>
+            mock.Verify(m => m.OnPublicationChanged(It.IsAny<Publication>()), Times.Never);
     }
     public Asserter Assert => new(_mock);
 }
