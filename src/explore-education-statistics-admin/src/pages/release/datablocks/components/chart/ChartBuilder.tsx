@@ -330,7 +330,13 @@ export default function ChartBuilder({
           <p>Are you sure you want to delete this chart?</p>
         </ModalConfirm>
       ),
-    [initialChart, isDeleting, handleChartDelete, toggleDeleteModal],
+    [
+      initialChart,
+      isDeleting,
+      handleChartDelete,
+      toggleDeleteModal,
+      showDeleteModal,
+    ],
   );
 
   return (
