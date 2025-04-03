@@ -10,6 +10,8 @@ using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Requests;
+using NextDataSetVersionCompleteImportRequest = GovUk.Education.ExploreEducationStatistics.Admin.Requests.Public.Data.NextDataSetVersionCompleteImportRequest;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Public.Data;
 
@@ -56,6 +58,9 @@ public class DataSetVersionsController(IDataSetVersionService dataSetVersionServ
             .CreateNextVersion(
                 releaseFileId: nextDataSetVersionCreateRequest.ReleaseFileId,
                 dataSetId: nextDataSetVersionCreateRequest.DataSetId,
+                patchVersionConfigs: nextDataSetVersionCreateRequest.SourceReleaseFileId == null ? 
+                    null : 
+                    new PatchVersionConfigs(true, nextDataSetVersionCreateRequest.SourceReleaseFileId),
                 cancellationToken: cancellationToken)
             .HandleFailuresOrOk();
     }

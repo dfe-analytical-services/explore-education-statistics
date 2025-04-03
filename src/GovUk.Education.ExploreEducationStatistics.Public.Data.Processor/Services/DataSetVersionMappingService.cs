@@ -99,6 +99,7 @@ internal class DataSetVersionMappingService(
 
     public async Task ApplyAutoMappings(
         Guid nextDataSetVersionId,
+        bool incrementPatchNumber = false,
         CancellationToken cancellationToken = default)
     {
         var mapping = await publicDataDbContext
@@ -129,8 +130,20 @@ internal class DataSetVersionMappingService(
 
         if (IsMajorVersionUpdate(mapping))
         {
-            mapping.TargetDataSetVersion.VersionMajor += 1;
-            mapping.TargetDataSetVersion.VersionMinor = 0;
+            if (incrementPatchNumber)
+            {
+                var doesntRequireManualMapping = mapping is { LocationMappingsComplete: true, FilterMappingsComplete: true } == false;//TODO: Need to account on whether the user has clicked finalize or not..
+
+                if (doesntRequireManualMapping)//TODO: test this unhappy path!!
+                {
+                    //throw new Exception("Major version number update is not allowed when replacement is in progress");
+                }//TODO: check that the patch number has increased?
+            }
+            else
+            {
+                mapping.TargetDataSetVersion.VersionMajor += 1;
+                mapping.TargetDataSetVersion.VersionMinor = 0;
+            }
         }
 
         publicDataDbContext.DataSetVersionMappings.Update(mapping);

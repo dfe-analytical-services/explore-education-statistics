@@ -22,6 +22,10 @@ using System.IO.Compression;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Public.Data;
+using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Public.Data;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Requests;
+using Semver;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainers;
@@ -45,6 +49,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly IReleaseDataFileRepository _releaseDataFileRepository;
         private readonly IDataImportService _dataImportService;
         private readonly IUserService _userService;
+        private readonly IDataSetVersionService _dataSetVersionService;
 
         public ReleaseDataFileService(
             ContentDbContext contentDbContext,
@@ -58,7 +63,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             IReleaseFileService releaseFileService,
             IReleaseDataFileRepository releaseDataFileRepository,
             IDataImportService dataImportService,
-            IUserService userService)
+            IUserService userService,
+            IDataSetVersionService dataSetVersionService)
         {
             _contentDbContext = contentDbContext;
             _persistenceHelper = persistenceHelper;
@@ -72,6 +78,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _releaseDataFileRepository = releaseDataFileRepository;
             _dataImportService = dataImportService;
             _userService = userService;
+            _dataSetVersionService = dataSetVersionService;
         }
 
         public async Task<Either<ActionResult, Unit>> Delete(Guid releaseVersionId,
@@ -282,8 +289,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         })
                         .OnSuccess(async tuple =>
                         {
-
                             var (replacingFile, newDataSetTitle) = tuple;
+                            DataImport? dataImport = null;
 
                             var subjectId =
                                 await _releaseVersionRepository
@@ -316,22 +323,56 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                 type: FileType.Metadata,
                                 createdById: _userService.GetUserId());
 
+                            var releaseFileWithApiDataSet = _contentDbContext.ReleaseFiles
+                                .SingleOrDefault(rf =>
+                                    rf.ReleaseVersionId == releaseVersionId
+                                    && rf.Name == newDataSetTitle
+                                    && rf.PublicApiDataSetId != null);
+
                             await UploadFileToStorage(dataFile, dataFormFile);
                             await UploadFileToStorage(metaFile, metaFormFile);
 
-                            var dataImport = await _dataImportService.Import(
-                                subjectId: subjectId,
-                                dataFile: dataFile,
-                                metaFile: metaFile);
+                            var createNextPatchVersion =
+                                releaseFileWithApiDataSet is not null && replacingFile is not null;
+                            
+                            if (createNextPatchVersion)
+                            {
+                                await _dataSetVersionService.CreateNextVersion(
+                                    dataReleaseFile.Id,
+                                    (Guid)releaseFileWithApiDataSet!.PublicApiDataSetId!,
+                                    new PatchVersionConfigs(createNextPatchVersion,
+                                        releaseFileWithApiDataSet.Id)
+                                ).OnFailureDo(_ => 
+                                        throw new ApplicationException("The Public data processor has failed to create the next patch version"))
+                                .OnSuccessDo(async res =>
+                                {
+                                    dataImport = await _dataImportService.Import(
+                                        subjectId: subjectId,
+                                        dataFile: dataFile,
+                                        metaFile: metaFile);
+                                });
+                            }
+                            else
+                            {
+                                dataImport = await _dataImportService.Import(
+                                    subjectId: subjectId,
+                                    dataFile: dataFile,
+                                    metaFile: metaFile);
+                            }
 
+                            if (dataImport is null)
+                            {
+                                throw new ApplicationException("The admin processor has failed to import the new file");
+                            }
+                            
                             var permissions = await _userService.GetDataFilePermissions(dataFile);
 
                             return BuildDataFileViewModel(
                                 dataReleaseFile: dataReleaseFile,
                                 metaFile: metaFile,
                                 newDataSetTitle,
-                                dataImport.TotalRows,
-                                dataImport.Status,
+                                dataImport!.TotalRows,
+                                dataImport!.Status,
                                 permissions);
                         });
                 });
@@ -445,12 +486,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     var errors = await _dataArchiveValidationService.IsValidZipFile(zipFile);
                     if (errors.Count > 0)
                     {
-                        return new Either<ActionResult, Unit>(Common.Validators.ValidationUtils.ValidationResult(errors));
+                        return new Either<ActionResult, Unit>(
+                            Common.Validators.ValidationUtils.ValidationResult(errors));
                     }
 
                     return Unit.Instance;
                 })
-                .OnSuccess(async _ => await _dataArchiveValidationService.ValidateBulkDataArchiveFiles(releaseVersionId, zipFile))
+                .OnSuccess(async _ =>
+                    await _dataArchiveValidationService.ValidateBulkDataArchiveFiles(releaseVersionId, zipFile))
                 .OnSuccess(async dataSetFiles =>
                 {
                     await using var stream = zipFile.OpenReadStream();

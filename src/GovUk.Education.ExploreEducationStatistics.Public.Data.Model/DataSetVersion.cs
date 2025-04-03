@@ -80,6 +80,8 @@ public class DataSetVersion : ICreatedUpdatedTimestamps<DateTimeOffset, DateTime
     public SemVersion SemVersion() => new(major: VersionMajor, minor: VersionMinor, patch: VersionPatch);
 
     public SemVersion DefaultNextVersion() => SemVersion().WithMinor(VersionMinor + 1);
+    
+    public SemVersion NextPatchVersion() => SemVersion().WithPatch(VersionPatch + 1);
 
     public bool IsFirstVersion => VersionMajor == 1 && VersionMinor == 0 && VersionPatch == 0;
 

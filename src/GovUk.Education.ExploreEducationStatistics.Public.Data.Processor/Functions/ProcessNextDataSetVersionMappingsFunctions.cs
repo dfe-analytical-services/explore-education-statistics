@@ -25,8 +25,8 @@ public class ProcessNextDataSetVersionMappingsFunctions(
         CancellationToken cancellationToken)
     {
         var dataSetVersionImport = await GetDataSetVersionImport(instanceId, cancellationToken);
-        await UpdateImportStage(dataSetVersionImport, DataSetVersionImportStage.AutoMapping, cancellationToken);
-        await mappingService.ApplyAutoMappings(dataSetVersionImport.DataSetVersionId, cancellationToken);
+        await UpdateImportStage(dataSetVersionImport, DataSetVersionImportStage.AutoMapping, cancellationToken); ;
+        await mappingService.ApplyAutoMappings(dataSetVersionImport.DataSetVersionId, dataSetVersionImport.IncrementPatchNumber, cancellationToken);
     }
 
     [Function(ActivityNames.CompleteNextDataSetVersionMappingProcessing)]

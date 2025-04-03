@@ -28,4 +28,7 @@ public interface IDataSetVersionMappingService
         Guid nextDataSetVersionId,
         BatchFilterOptionMappingUpdatesRequest request,
         CancellationToken cancellationToken = default);
+
+     Task<MappingStatusViewModel?> GetMappingCompletionStatus(Guid targetDataSetVersionId,
+        CancellationToken cancellationToken = default);
 }

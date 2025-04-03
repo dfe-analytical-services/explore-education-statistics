@@ -23,6 +23,8 @@ public class DataSetVersionImport : ICreatedUpdatedTimestamps<DateTimeOffset, Da
 
     public DateTimeOffset? Updated { get; set; }
 
+    public bool IncrementPatchNumber { get; set; } = false;
+    
     internal class Config : IEntityTypeConfiguration<DataSetVersionImport>
     {
         public void Configure(EntityTypeBuilder<DataSetVersionImport> builder)

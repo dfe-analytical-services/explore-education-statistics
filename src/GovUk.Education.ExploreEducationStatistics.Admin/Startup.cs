@@ -84,6 +84,7 @@ using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.EventGrid;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Requests;
 using Thinktecture;
 using static GovUk.Education.ExploreEducationStatistics.Common.Utils.StartupUtils;
 using ContentGlossaryService = GovUk.Education.ExploreEducationStatistics.Content.Services.GlossaryService;
@@ -844,6 +845,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
         public Task<Either<ActionResult, ProcessDataSetVersionResponseViewModel>> CreateNextDataSetVersionMappings(
             Guid dataSetId,
             Guid releaseFileId,
+            PatchVersionConfigs? patchVersionConfigs,
             CancellationToken cancellationToken = default) => throw new NotImplementedException();
 
         public Task<Either<ActionResult, ProcessDataSetVersionResponseViewModel>> CompleteNextDataSetVersionImport(
@@ -899,9 +901,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             return Task.FromResult(new List<DataSetVersionStatusSummary>());
         }
 
-        public Task<Either<ActionResult, DataSetVersionSummaryViewModel>> CreateNextVersion(
-            Guid releaseFileId,
+        public Task<Either<ActionResult, DataSetVersionSummaryViewModel>> CreateNextVersion(Guid releaseFileId,
             Guid dataSetId,
+            PatchVersionConfigs? patchVersionConfigs,
             CancellationToken cancellationToken = default) => throw new NotImplementedException();
 
         public Task<Either<ActionResult, DataSetVersionSummaryViewModel>> CompleteNextVersionImport(
@@ -962,6 +964,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                 BatchFilterOptionMappingUpdatesRequest request,
                 CancellationToken cancellationToken = default) =>
             throw new NotImplementedException();
+
+        public Task<MappingStatusViewModel?> GetMappingCompletionStatus(Guid targetDataSetVersionId, CancellationToken cancellationToken = default) => throw new NotImplementedException();
     }
 
     internal class NoOpPreviewTokenService : IPreviewTokenService
