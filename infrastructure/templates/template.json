@@ -3377,6 +3377,8 @@
         "App__PublicStorageConnectionString": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-storage-public')).secretUriWithVersion, ')')]",
         "App__PublisherStorageConnectionString": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-storage-publisher')).secretUriWithVersion, ')')]",
         "DataFiles__BasePath": "[variables('publicDataFileShareMountPathWindows')]",
+        "EventGrid__EventTopics__0__Key": "ReleaseVersionChangedEvent",
+        "EventGrid__EventTopics__0__TopicEndpoint": "",
         "PublicDataDbExists": "[parameters('publicDataDbExists')]"
       }
     },
