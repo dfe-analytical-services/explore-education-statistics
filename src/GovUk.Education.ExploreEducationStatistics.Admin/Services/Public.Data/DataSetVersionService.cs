@@ -21,6 +21,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Requests;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Semver;
@@ -125,12 +126,14 @@ public class DataSetVersionService(
     public async Task<Either<ActionResult, DataSetVersionSummaryViewModel>> CreateNextVersion(
         Guid releaseFileId,
         Guid dataSetId,
+        PatchVersionConfigs? patchVersionConfigs,
         CancellationToken cancellationToken = default)
     {
         return await userService.CheckIsBauUser()
             .OnSuccess(async _ => await processorClient.CreateNextDataSetVersionMappings(
                 dataSetId: dataSetId,
                 releaseFileId: releaseFileId,
+                patchVersionConfigs: patchVersionConfigs,
                 cancellationToken: cancellationToken))
             .OnSuccess(async processorResponse => await publicDataDbContext
                 .DataSetVersions
@@ -154,6 +157,21 @@ public class DataSetVersionService(
                     dataSetVersion => dataSetVersion.Id == processorResponse.DataSetVersionId,
                     cancellationToken))
             .OnSuccess(async dataSetVersion => await MapDraftVersionSummary(dataSetVersion, cancellationToken));
+    }
+
+    public async Task<Either<ActionResult, DataSetVersion>> GetDataSetVersion(
+        Guid dataSetId,
+        SemVersion version,
+        CancellationToken cancellationToken = default)
+    {
+        return await publicDataDbContext.DataSetVersions
+            .AsNoTracking()
+            .Include(dsv => dsv.DataSet)
+            .Where(dsv => dsv.DataSetId == dataSetId)
+            .Where(dsv => dsv.VersionMajor == version.Major)
+            .Where(dsv => dsv.VersionMinor == version.Minor)
+            .Where(dsv => dsv.VersionPatch == version.Patch)
+            .SingleOrNotFoundAsync(cancellationToken);
     }
 
     public async Task<Either<ActionResult, Unit>> DeleteVersion(

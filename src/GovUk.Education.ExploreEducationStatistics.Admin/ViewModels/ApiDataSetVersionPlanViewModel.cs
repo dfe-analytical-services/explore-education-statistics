@@ -1,10 +1,11 @@
 #nullable enable
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using System;
+using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Public.Data;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 
-public record DeleteApiDataSetVersionPlanViewModel
+public record ApiDataSetVersionPlanViewModel
 {
     public Guid DataSetId { get; init; }
 
@@ -16,5 +17,8 @@ public record DeleteApiDataSetVersionPlanViewModel
 
     public DataSetVersionStatus Status { get; init; }
 
-    public bool Valid { get; init; }
+    public MappingStatusViewModel? MappingStatus { get; init; }
+    
+    public bool Valid => MappingStatus == null 
+                         || (MappingStatus.FiltersComplete && MappingStatus.LocationsComplete);
 }

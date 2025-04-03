@@ -9,6 +9,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Cache
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
+using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Chart;
@@ -25,6 +26,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
 using IReleaseVersionService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IReleaseVersionService;
@@ -36,6 +38,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
     {
         private readonly ContentDbContext _contentDbContext;
         private readonly StatisticsDbContext _statisticsDbContext;
+        private readonly IDataSetVersionMappingService _dataSetVersionMappingService;
         private readonly IFilterRepository _filterRepository;
         private readonly IIndicatorRepository _indicatorRepository;
         private readonly IIndicatorGroupRepository _indicatorGroupRepository;
@@ -62,7 +65,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             ITimePeriodService timePeriodService,
             IUserService userService,
             ICacheKeyService cacheKeyService,
-            IPrivateBlobCacheService privateCacheService)
+            IPrivateBlobCacheService privateCacheService,
+            IDataSetVersionMappingService dataSetVersionMappingService)
         {
             _contentDbContext = contentDbContext;
             _statisticsDbContext = statisticsDbContext;
@@ -76,6 +80,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _timePeriodService = timePeriodService;
             _userService = userService;
             _cacheKeyService = cacheKeyService;
+            _dataSetVersionMappingService = dataSetVersionMappingService;
             _privateCacheService = privateCacheService;
         }
 
@@ -95,7 +100,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 {
                     var (originalReleaseFile, replacementReleaseFile) = tuple;
 
-                    return await GetLinkedDataSetVersion(originalReleaseFile, cancellationToken)
+                    return await GetLinkedDataSetVersion(replacementReleaseFile, cancellationToken)
                         .OnSuccess(apiDataSetVersion => (originalReleaseFile, replacementReleaseFile, apiDataSetVersion));
                 })
                 .OnSuccess(async tuple =>
@@ -115,23 +120,29 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         subjectId: originalSubjectId,
                         replacementSubjectMeta);
 
-                    var apiDataSetVersionDeletionPlan = tuple.apiDataSetVersion is null
-                    ? null
-                    : new DeleteApiDataSetVersionPlanViewModel
+                    ApiDataSetVersionPlanViewModel? apiDataSetVersionPlan = null;
+                    if (tuple.replacementReleaseFile.PublicApiDataSetId is not null
+                        && tuple.apiDataSetVersion is not null)
                     {
-                        DataSetId = tuple.apiDataSetVersion.DataSetId,
-                        DataSetTitle = tuple.apiDataSetVersion.DataSet.Title,
-                        Id = tuple.apiDataSetVersion.Id,
-                        Version = tuple.apiDataSetVersion.PublicVersion,
-                        Status = tuple.apiDataSetVersion.Status,
-                        Valid = false,
-                    };
+                        var completionStatus =
+                            await _dataSetVersionMappingService.GetMappingCompletionStatus(tuple.apiDataSetVersion.Id, cancellationToken);
+
+                        apiDataSetVersionPlan = new ApiDataSetVersionPlanViewModel
+                        {
+                            DataSetId = tuple.apiDataSetVersion.DataSetId,
+                            DataSetTitle = tuple.apiDataSetVersion.DataSet.Title,
+                            Id = tuple.apiDataSetVersion.Id,//Is this the original api dataset version id? is this used anywhere else and does this need further testing??
+                            Version = tuple.apiDataSetVersion.PublicVersion,//tuple.replacementReleaseFile.PublicApiDataSetVersionString!,
+                            Status = tuple.apiDataSetVersion.Status,
+                            MappingStatus = completionStatus
+                        };
+                    }
 
                     return new DataReplacementPlanViewModel
                     {
                         DataBlocks = dataBlocks,
                         Footnotes = footnotes,
-                        DeleteApiDataSetVersionPlan = apiDataSetVersionDeletionPlan,
+                        ApiDataSetVersionPlan = apiDataSetVersionPlan,
                         OriginalSubjectId = originalSubjectId,
                         ReplacementSubjectId = replacementSubjectId,
                     };

@@ -91,33 +91,6 @@ export default function DataFilesTableRow({
                     >
                       Edit title
                     </Link>
-                    {dataFile.publicApiDataSetId ? (
-                      <Modal
-                        showClose
-                        title="Cannot replace data"
-                        triggerButton={<ButtonText>Replace data</ButtonText>}
-                      >
-                        <p>
-                          This data file has an API data set linked to it.
-                          Please remove the API data set before replacing the
-                          data.
-                        </p>
-                        <p>
-                          <Link
-                            to={generatePath<ReleaseDataSetRouteParams>(
-                              releaseApiDataSetDetailsRoute.path,
-                              {
-                                publicationId,
-                                releaseVersionId,
-                                dataSetId: dataFile.publicApiDataSetId,
-                              },
-                            )}
-                          >
-                            Go to API data set
-                          </Link>
-                        </p>
-                      </Modal>
-                    ) : (
                       <Link
                         to={generatePath<ReleaseDataFileReplaceRouteParams>(
                           releaseDataFileReplaceRoute.path,
@@ -130,7 +103,6 @@ export default function DataFilesTableRow({
                       >
                         Replace data
                       </Link>
-                    )}
                   </>
                 )}
                 {dataFile.publicApiDataSetId ? (

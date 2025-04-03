@@ -43,12 +43,14 @@ internal class ProcessorClient(
     public async Task<Either<ActionResult, ProcessDataSetVersionResponseViewModel>> CreateNextDataSetVersionMappings(
         Guid dataSetId,
         Guid releaseFileId,
+        PatchVersionConfigs? patchVersionConfigs,
         CancellationToken cancellationToken = default)
     {
         var request = new NextDataSetVersionMappingsCreateRequest
         {
             ReleaseFileId = releaseFileId,
-            DataSetId = dataSetId
+            DataSetId = dataSetId,
+            PatchVersionConfig = patchVersionConfigs
         };
 
         return await SendPost<NextDataSetVersionMappingsCreateRequest, ProcessDataSetVersionResponseViewModel>(

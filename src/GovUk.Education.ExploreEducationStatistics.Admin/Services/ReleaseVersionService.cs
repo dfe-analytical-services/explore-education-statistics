@@ -631,14 +631,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
                     var linkedApiDataSetVersionDeletionPlan = tuple.apiDataSetVersion is null
                         ? null
-                        : new DeleteApiDataSetVersionPlanViewModel
+                        : new ApiDataSetVersionPlanViewModel
                         {
                             DataSetId = tuple.apiDataSetVersion.DataSetId,
                             DataSetTitle = tuple.apiDataSetVersion.DataSet.Title,
                             Id = tuple.apiDataSetVersion.Id,
                             Version = tuple.apiDataSetVersion.PublicVersion,
                             Status = tuple.apiDataSetVersion.Status,
-                            Valid = false
+                            //Valid = false TODO: test whatever uses this...
                         };
 
                     return new DeleteDataFilePlanViewModel

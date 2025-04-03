@@ -43,7 +43,7 @@ public class DataSetVersionMappingService(
         MappingType.ManualNone,
         MappingType.AutoNone
     ];
-
+    
     public Task<Either<ActionResult, LocationMappingPlan>> GetLocationMappings(
         Guid nextDataSetVersionId,
         CancellationToken cancellationToken = default)
@@ -172,6 +172,15 @@ public class DataSetVersionMappingService(
             .Where(mapping => mapping.TargetDataSetVersionId == nextDataSetVersionId)
             .Select(nextVersion => nextVersion.TargetDataSetVersion)
             .SingleAsync(cancellationToken);
+        DataSetVersionImport? ongoingNextVersionImport = null;
+
+        ongoingNextVersionImport = await publicDataDbContext.DataSetVersionImports.SingleOrDefaultAsync(a =>
+                a.DataSetVersionId == nextDataSetVersionId
+                && a.Stage != DataSetVersionImportStage.Completing
+                && a.IncrementPatchNumber,
+            cancellationToken: cancellationToken);
+
+        var doesntRequireManualMapping = await DoesntRequireManualMapping(nextDataSetVersionId, cancellationToken);
 
         var isMajorVersionUpdate = await IsMajorVersionUpdate(
             nextDataSetVersionId,
@@ -180,14 +189,20 @@ public class DataSetVersionMappingService(
             cancellationToken);
 
         if (isMajorVersionUpdate)
-        {
+        {//TODO: Add awareness of isIncrementingPatch the DataSetVersionMapping - 
+            if (ongoingNextVersionImport is not null && doesntRequireManualMapping)
+            {
+                throw new ApplicationException("Data set is Not allowed");
+            }
             targetDataSetVersion.VersionMajor = sourceDataSetVersion.VersionMajor + 1;
             targetDataSetVersion.VersionMinor = 0;
+            targetDataSetVersion.VersionPatch = 0;
         }
         else
         {
             targetDataSetVersion.VersionMajor = sourceDataSetVersion.VersionMajor;
             targetDataSetVersion.VersionMinor = sourceDataSetVersion.VersionMinor + 1;
+            targetDataSetVersion.VersionPatch = 0;
         }
 
         await publicDataDbContext.SaveChangesAsync(cancellationToken);
@@ -200,6 +215,41 @@ public class DataSetVersionMappingService(
         releaseFile.PublicApiDataSetVersion = targetDataSetVersion.SemVersion();
 
         await contentDbContext.SaveChangesAsync(cancellationToken);
+    }
+
+    private async Task<bool> DoesntRequireManualMapping(Guid nextDataSetVersionId, CancellationToken cancellationToken)
+    {
+        var mapping = await GetMappingCompletionStatus(nextDataSetVersionId, cancellationToken);
+
+        return mapping is { LocationsComplete: true, FiltersComplete: true };
+    }
+    public async Task<MappingStatusViewModel?> GetMappingCompletionStatus(Guid targetDataSetVersionId, CancellationToken cancellationToken = default)
+    {
+        var res = await publicDataDbContext
+            .DataSetVersionMappings
+            .Include(mapping => mapping.TargetDataSetVersion)
+            .FirstOrDefaultAsync(mapping => mapping.TargetDataSetVersionId == targetDataSetVersionId, cancellationToken);
+        MappingStatusViewModel? mappingStatus = null;
+        if (res is not null)
+        {
+            var locationsComplete = !res.LocationMappingPlan.Levels
+                // Ignore any levels where candidates or mappings are empty as this means the level
+                // has been added or deleted from the data set and is not a mappable change.
+                .Where(level => level.Value.Candidates.Count != 0 && level.Value.Mappings.Count != 0)
+                .Any(level => level.Value.Mappings
+                    .Any(optionMapping => IncompleteMappingTypes.Contains(optionMapping.Value.Type)));
+            var filtersComplete = !res.FilterMappingPlan
+                .Mappings
+                .Where(filterMapping => filterMapping.Value.Type != MappingType.AutoNone)
+                .SelectMany(filterMapping => filterMapping.Value.OptionMappings)
+                .Any(optionMapping => IncompleteMappingTypes.Contains(optionMapping.Value.Type));
+            mappingStatus = new MappingStatusViewModel
+            {
+                LocationsComplete = locationsComplete,
+                FiltersComplete = filtersComplete
+            };
+        }
+        return mappingStatus;
     }
 
     private async Task<bool> IsMajorVersionUpdate(

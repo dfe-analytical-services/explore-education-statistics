@@ -9,6 +9,8 @@ public record NextDataSetVersionCreateRequest
     public required Guid DataSetId { get; init; }
 
     public required Guid ReleaseFileId { get; init; }
+    
+    public Guid? SourceReleaseFileId { get; init; }
 
     public class Validator : AbstractValidator<NextDataSetVersionCreateRequest>
     {
