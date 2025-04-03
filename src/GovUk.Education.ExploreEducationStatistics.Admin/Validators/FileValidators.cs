@@ -6,16 +6,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 
 public static class FileValidators
 {
-    private const int MaxFilenameSize = 150;
-
     public static IRuleBuilderOptions<T, IFormFile> MustBeValidFile<T>(
         this IRuleBuilder<T, IFormFile> ruleBuilder)
     {
         return ruleBuilder
             .NotNull()
                 .WithMessage(ValidationMessages.FileIsNull)
-            .Must(file => file.FileName.Length < MaxFilenameSize)
-                .WithMessage(ValidationMessages.FilenameTooLong, "{PropertyName}", MaxFilenameSize.ToString())
+            .MustHaveAValidFileName()
             .Must(file => file.Length > 0)
                 .WithMessage(ValidationMessages.FileSizeMustNotBeZero, "{PropertyName}");
     }
@@ -26,7 +23,7 @@ public static class FileValidators
         return ruleBuilder
             .MustBeValidFile()
             .Must(file => file.FileName.ToLower().EndsWith(".csv"))
-                .WithMessage(ValidationMessages.FilenameMustEndDotCsv, "{PropertyName}");
+                .WithMessage(ValidationMessages.FileNameMustEndDotCsv, "{PropertyName}");
     }
 
     public static IRuleBuilderOptions<T, IFormFile> MustBeValidZipFile<T>(
@@ -35,6 +32,19 @@ public static class FileValidators
         return ruleBuilder
             .MustBeValidFile()
             .Must(file => file.FileName.ToLower().EndsWith(".zip"))
-                .WithMessage(ValidationMessages.ZipFilenameMustEndDotZip, "{PropertyName}");
+                .WithMessage(ValidationMessages.ZipFileNameMustEndDotZip, "{PropertyName}");
+    }
+
+    public static IRuleBuilderOptions<T, IFormFile> MustHaveAValidFileName<T>(
+        this IRuleBuilder<T, IFormFile> ruleBuilder)
+    {
+        return ruleBuilder
+            // TODO: Add "{FileName}" placeholder, {PropertyName}/{PropertyValue} output unsuitable
+            .Must(file => FileNameValidators.MeetsLengthRequirements(file.FileName))
+                .WithMessage(ValidationMessages.FilenameTooLong, "{PropertyValue}", FileNameValidators.MaxFileNameSize.ToString())
+            .Must(file => FileNameValidators.DoesNotContainSpaces(file.FileName))
+                .WithMessage(ValidationMessages.FileNameCannotContainSpaces, "{PropertyValue}")
+            .Must(file => FileNameValidators.DoesNotContainSpecialChars(file.FileName))
+                .WithMessage(ValidationMessages.FileNameCannotContainSpecialCharacters, "{PropertyValue}");
     }
 }
