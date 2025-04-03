@@ -384,18 +384,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public void GetPublication()
+        public async Task GetPublicationAsync()
         {
             var userService = AlwaysTrueUserService();
-            var publicationService = BuildPublicationService(
-                userService: userService.Object);
 
-            PermissionTestUtil.AssertSecurityPoliciesChecked(
-                async service => await service.GetPublication(_publication.Id),
-                _publication,
-                userService,
-                publicationService,
-                SecurityPolicies.CanViewSpecificPublication);
+            _publication.Theme = _theme;
+
+            await PermissionTestUtil.PolicyCheckBuilder()
+                .SetupResourceCheckToFail(_publication, SecurityPolicies.CanViewSpecificPublication)
+                .AssertForbidden(async userService =>
+                {
+                    await using var contentDbContext = InMemoryApplicationDbContext();
+                    contentDbContext.Publications.Add(_publication);
+                    await contentDbContext.SaveChangesAsync();
+
+                    var publicationService = BuildPublicationService(
+                        context: contentDbContext,
+                        userService: userService.Object);
+
+                    return await publicationService.GetPublication(_publication.Id);
+                });
         }
 
         [Fact]
@@ -541,18 +549,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public void ListLatestReleaseVersions()
+        public async Task ListReleaseVersions()
         {
             var userService = AlwaysTrueUserService();
-            var publicationService = BuildPublicationService(
-                userService: userService.Object);
 
-            PermissionTestUtil.AssertSecurityPoliciesChecked(
-                async service => await service.ListLatestReleaseVersions(_publication.Id),
-                _publication,
-                userService,
-                publicationService,
-                SecurityPolicies.CanViewSpecificPublication);
+            await PermissionTestUtil.PolicyCheckBuilder()
+                .SetupResourceCheckToFail(_publication, SecurityPolicies.CanViewSpecificPublication)
+                .AssertForbidden(async userService => 
+                {
+                    await using var contentDbContext = InMemoryApplicationDbContext();
+                    contentDbContext.Publications.Add(_publication);
+                    await contentDbContext.SaveChangesAsync();
+
+                    var publicationService = BuildPublicationService(
+                        context: contentDbContext,
+                        userService: userService.Object);
+
+                    return await publicationService.ListReleaseVersions(_publication.Id, ReleaseVersionsType.Latest);
+                });
         }
 
         [Fact]

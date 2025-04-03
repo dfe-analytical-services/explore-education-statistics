@@ -15,7 +15,8 @@ const releaseVersionService = _releaseVersionService as jest.Mocked<
 describe('ScheduledReleasesTable', () => {
   const testReleases: DashboardReleaseVersionSummary[] = [
     {
-      id: 'release-1',
+      id: 'release-1-version-1',
+      releaseId: 'release-1',
       latestRelease: true,
       publishScheduled: '2021-06-30T00:00:00',
       slug: 'release-1-slug',
@@ -42,16 +43,18 @@ describe('ScheduledReleasesTable', () => {
         },
       },
       permissions: {
-        canViewRelease: true,
+        canViewReleaseVersion: true,
         canUpdateRelease: true,
+        canUpdateReleaseVersion: true,
         canAddPrereleaseUsers: false,
-        canDeleteRelease: false,
-        canMakeAmendmentOfRelease: false,
+        canDeleteReleaseVersion: false,
+        canMakeAmendmentOfReleaseVersion: false,
       },
       approvalStatus: 'Approved',
     },
     {
-      id: 'release-2',
+      id: 'release-2-version-1',
+      releaseId: 'release-2',
       latestRelease: true,
       publishScheduled: '2021-05-30T00:00:00',
       slug: 'release-2-slug',
@@ -78,20 +81,22 @@ describe('ScheduledReleasesTable', () => {
         },
       },
       permissions: {
-        canViewRelease: true,
+        canViewReleaseVersion: true,
         canUpdateRelease: true,
+        canUpdateReleaseVersion: true,
         canAddPrereleaseUsers: false,
-        canDeleteRelease: false,
-        canMakeAmendmentOfRelease: false,
+        canDeleteReleaseVersion: false,
+        canMakeAmendmentOfReleaseVersion: false,
       },
       approvalStatus: 'Approved',
     },
     {
-      id: 'release-3',
+      id: 'release-1-version-2',
+      releaseId: 'release-1',
       latestRelease: false,
       publishScheduled: '2021-01-01T00:00:00',
-      slug: 'release-3-slug',
-      title: 'Release 3',
+      slug: 'release-1-slug',
+      title: 'Release 1',
       amendment: false,
       live: false,
       year: 2021,
@@ -114,20 +119,22 @@ describe('ScheduledReleasesTable', () => {
         },
       },
       permissions: {
-        canViewRelease: true,
+        canViewReleaseVersion: true,
         canUpdateRelease: true,
-        canDeleteRelease: true,
+        canUpdateReleaseVersion: true,
+        canDeleteReleaseVersion: true,
         canAddPrereleaseUsers: false,
-        canMakeAmendmentOfRelease: false,
+        canMakeAmendmentOfReleaseVersion: false,
       },
       approvalStatus: 'Approved',
     },
     {
-      id: 'release-4',
+      id: 'release-3-version-1',
+      releaseId: 'release-3',
       latestRelease: true,
       publishScheduled: '2021-05-30T00:00:00',
-      slug: 'release-4-slug',
-      title: 'Release 4',
+      slug: 'release-3-slug',
+      title: 'Release 3',
       amendment: false,
       live: false,
       year: 2021,
@@ -150,11 +157,12 @@ describe('ScheduledReleasesTable', () => {
         },
       },
       permissions: {
-        canViewRelease: true,
+        canViewReleaseVersion: true,
         canUpdateRelease: true,
+        canUpdateReleaseVersion: true,
         canAddPrereleaseUsers: false,
-        canDeleteRelease: false,
-        canMakeAmendmentOfRelease: false,
+        canDeleteReleaseVersion: false,
+        canMakeAmendmentOfReleaseVersion: false,
       },
       approvalStatus: 'Approved',
     },
@@ -196,12 +204,12 @@ describe('ScheduledReleasesTable', () => {
     ).toBeInTheDocument();
 
     const row4cells = within(rows[3]).getAllByRole('cell');
-    expect(row4cells[0]).toHaveTextContent('Release 3');
+    expect(row4cells[0]).toHaveTextContent('Release 1');
     expect(row4cells[1]).toHaveTextContent('Scheduled');
     expect(row4cells[2]).toHaveTextContent('View stages');
     expect(row4cells[3]).toHaveTextContent('1 January 2021');
     expect(
-      within(row4cells[4]).getByRole('link', { name: 'Edit Release 3' }),
+      within(row4cells[4]).getByRole('link', { name: 'Edit Release 1' }),
     ).toBeInTheDocument();
 
     expect(within(rows[4]).getByRole('columnheader')).toHaveTextContent(
@@ -222,12 +230,12 @@ describe('ScheduledReleasesTable', () => {
     );
 
     const row8cells = within(rows[7]).getAllByRole('cell');
-    expect(row8cells[0]).toHaveTextContent('Release 4');
+    expect(row8cells[0]).toHaveTextContent('Release 3');
     expect(row8cells[1]).toHaveTextContent('Scheduled');
     expect(row8cells[2]).toHaveTextContent('View stages');
     expect(row8cells[3]).toHaveTextContent('30 May 2021');
     expect(
-      within(row8cells[4]).getByRole('link', { name: 'Edit Release 4' }),
+      within(row8cells[4]).getByRole('link', { name: 'Edit Release 3' }),
     ).toBeInTheDocument();
   });
 
@@ -240,7 +248,7 @@ describe('ScheduledReleasesTable', () => {
               ...testReleases[0],
               permissions: {
                 ...testReleases[0].permissions,
-                canUpdateRelease: false,
+                canUpdateReleaseVersion: false,
               },
             },
           ]}
@@ -261,7 +269,7 @@ describe('ScheduledReleasesTable', () => {
       within(row3cells[4]).getByRole('link', { name: 'View Release 1' }),
     ).toHaveAttribute(
       'href',
-      '/publication/publication-1/release/release-1/summary',
+      '/publication/publication-1/release/release-1-version-1/summary',
     );
   });
 

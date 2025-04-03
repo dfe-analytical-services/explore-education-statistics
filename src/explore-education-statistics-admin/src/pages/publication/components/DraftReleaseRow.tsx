@@ -68,11 +68,11 @@ const DraftReleaseRow = ({
             releaseVersionId: release.id,
           })}
         >
-          {release.permissions?.canUpdateRelease ? 'Edit' : 'View'}
+          {release.permissions?.canUpdateReleaseVersion ? 'Edit draft' : 'View'}
           <VisuallyHidden> {release.title}</VisuallyHidden>
         </Link>
 
-        {release.permissions?.canDeleteRelease &&
+        {release.permissions?.canDeleteReleaseVersion &&
           release.approvalStatus === 'Draft' &&
           !release.amendment && (
             <DeleteDraftModal
@@ -89,20 +89,7 @@ const DraftReleaseRow = ({
             />
           )}
 
-        {release.amendment && release.previousVersionId && (
-          <Link
-            className="govuk-!-margin-right-4 govuk-!-display-inline-block"
-            to={generatePath<ReleaseRouteParams>(releaseSummaryRoute.path, {
-              publicationId,
-              releaseVersionId: release.previousVersionId,
-            })}
-          >
-            View existing version
-            <VisuallyHidden> for {release.title}</VisuallyHidden>
-          </Link>
-        )}
-
-        {release.permissions?.canDeleteRelease && release.amendment && (
+        {release.permissions?.canDeleteReleaseVersion && release.amendment && (
           <CancelAmendmentModal
             scheduledMethodologies={deleteReleasePlan?.scheduledMethodologies}
             triggerButton={

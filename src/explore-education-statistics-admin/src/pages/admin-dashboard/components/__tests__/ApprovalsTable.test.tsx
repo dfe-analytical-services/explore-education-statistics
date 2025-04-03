@@ -36,6 +36,7 @@ describe('ApprovalsTable', () => {
   const testReleases: DashboardReleaseVersionSummary[] = [
     {
       id: 'test-id',
+      releaseId: 'release-1',
       title: 'Academic year 2016/17',
       slug: '2024-25',
       publication: {
@@ -68,14 +69,16 @@ describe('ApprovalsTable', () => {
       amendment: false,
       permissions: {
         canAddPrereleaseUsers: true,
-        canViewRelease: true,
         canUpdateRelease: true,
-        canDeleteRelease: false,
-        canMakeAmendmentOfRelease: false,
+        canViewReleaseVersion: true,
+        canUpdateReleaseVersion: true,
+        canDeleteReleaseVersion: false,
+        canMakeAmendmentOfReleaseVersion: false,
       },
     },
     {
       id: '86d868cf-ff4b-4325-ef26-08d93c9b5089',
+      releaseId: 'release-1',
       title: 'Academic year 2024/25',
       slug: '2024-25',
       publication: {
@@ -110,10 +113,11 @@ describe('ApprovalsTable', () => {
       amendment: false,
       permissions: {
         canAddPrereleaseUsers: true,
-        canViewRelease: true,
         canUpdateRelease: true,
-        canDeleteRelease: false,
-        canMakeAmendmentOfRelease: false,
+        canViewReleaseVersion: true,
+        canUpdateReleaseVersion: true,
+        canDeleteReleaseVersion: false,
+        canMakeAmendmentOfReleaseVersion: false,
       },
     },
   ];

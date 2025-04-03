@@ -13,20 +13,29 @@ import Tag from '@common/components/Tag';
 import VisuallyHidden from '@common/components/VisuallyHidden';
 import React, { useEffect, useRef } from 'react';
 import { generatePath } from 'react-router';
+import { Publication } from '@admin/services/publicationService';
 import { PublishedStatusGuidanceModal } from './PublicationGuidance';
+import ReleaseLabelEditModal, {
+  ReleaseLabelFormValues,
+} from './ReleaseLabelEditModal';
 
 interface PublishedReleasesTableProps {
   focusReleaseId?: string;
-  publicationId: string;
+  publication: Publication;
   releases: ReleaseVersionSummaryWithPermissions[];
   onAmend: (releaseVersionId: string) => void;
+  onEdit: (
+    releaseId: string,
+    releaseDetailsFormValues: ReleaseLabelFormValues,
+  ) => Promise<void>;
 }
 
 export default function PublicationPublishedReleasesTable({
   focusReleaseId,
-  publicationId,
+  publication,
   releases,
   onAmend,
+  onEdit,
 }: PublishedReleasesTableProps) {
   const rowRef = useRef<HTMLTableRowElement>(null);
 
@@ -50,7 +59,7 @@ export default function PublicationPublishedReleasesTable({
             Status <PublishedStatusGuidanceModal />
           </th>
           <th>Published date</th>
-          <th className={styles.actionsColumn}>Actions</th>
+          <th className="govuk-!-width-one-quarter">Actions</th>
         </tr>
       </thead>
       <tbody>
@@ -74,12 +83,13 @@ export default function PublicationPublishedReleasesTable({
                 )}
               </td>
               <td>
-                {release.permissions.canViewRelease ? (
+                {release.permissions.canViewReleaseVersion ? (
                   <Link
+                    className="govuk-!-margin-right-4 govuk-!-display-inline-block"
                     to={generatePath<ReleaseRouteParams>(
                       releaseSummaryRoute.path,
                       {
-                        publicationId,
+                        publicationId: publication.id,
                         releaseVersionId: release.id,
                       },
                     )}
@@ -92,11 +102,32 @@ export default function PublicationPublishedReleasesTable({
                     <VisuallyHidden> {release.title}</VisuallyHidden>
                   </>
                 )}
-                {release.permissions.canMakeAmendmentOfRelease && (
+                {release.permissions.canUpdateRelease && (
+                  <ReleaseLabelEditModal
+                    currentReleaseSlug={release.slug}
+                    publicationSlug={publication.slug}
+                    initialValues={{ label: release.label }}
+                    triggerButton={
+                      <ButtonText
+                        className={`govuk-!-display-inline-block ${
+                          release.permissions.canMakeAmendmentOfReleaseVersion
+                            ? ' govuk-!-margin-right-4'
+                            : ''
+                        }`}
+                      >
+                        Edit details
+                      </ButtonText>
+                    }
+                    onSubmit={formValues =>
+                      onEdit(release.releaseId, formValues)
+                    }
+                  />
+                )}
+                {release.permissions.canMakeAmendmentOfReleaseVersion && (
                   <ModalConfirm
                     title="Confirm you want to amend this published release"
                     triggerButton={
-                      <ButtonText className="govuk-!-margin-left-4">
+                      <ButtonText>
                         Amend<VisuallyHidden> {release.title}</VisuallyHidden>
                       </ButtonText>
                     }
