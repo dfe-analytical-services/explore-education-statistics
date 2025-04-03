@@ -38,8 +38,11 @@ const errorMappings = [
     messages: {
       SlugNotUnique:
         'Choose a unique combination of type, start year and label',
-      ReleaseSlugUsedByRedirect:
-        'This label has previously been used by a release in this publication for the same year and time period. Please choose another one.',
+      ReleaseSlugUsedByRedirect: `The requested release label has previously been used either for this or another related release and can not be re-used without a manual check. Please e-mail ${(
+        <a href="mailto:explore.statistics@education.gov.uk">
+          explore.statistics@education.gov.uk
+        </a>
+      )} with the details of the requested label name change.`,
     },
   }),
 ];
