@@ -26,24 +26,34 @@ public record DataSetFileDto
 
     public class Validator : AbstractValidator<DataSetFileDto>
     {
-        private const int MaxFilenameSize = 150;
-
         public Validator()
         {
             RuleFor(dto => dto.FileName)
-                .MaximumLength(MaxFilenameSize)
-                    .WithMessage(ValidationMessages.FilenameTooLong, "{PropertyName}", MaxFilenameSize.ToString())
+                .Must(FileNameValidators.MeetsLengthRequirements)
+                    .WithMessage(ValidationMessages.FilenameTooLong, "{PropertyValue}", FileNameValidators.MaxFileNameSize.ToString())
+                .Must(FileNameValidators.DoesNotContainSpaces)
+                    .WithMessage(ValidationMessages.FileNameCannotContainSpaces, "{PropertyValue}")
+                .Must(FileNameValidators.DoesNotContainSpecialChars)
+                    .WithMessage(ValidationMessages.FileNameCannotContainSpecialCharacters, "{PropertyValue}")
                 .Must(fileName => fileName.ToLower().EndsWith(".csv"))
-                    .WithMessage(ValidationMessages.FilenameMustEndDotCsv, "{PropertyName}");
+                    .WithMessage(ValidationMessages.FileNameMustEndDotCsv, "{PropertyValue}");
 
             RuleFor(dto => dto.FileSize)
                 .Equal(dto => dto.FileStream.Length)
-                .GreaterThan(0)
-                    .WithMessage(ValidationMessages.FileSizeMustNotBeZero, "{PropertyName}");
+                .Must((dto, fileSize, context) =>
+                {
+                    context.MessageFormatter.AppendArgument("FileName", dto.FileName);
+                    return fileSize > 0;
+                })
+                    .WithMessage(ValidationMessages.FileSizeMustNotBeZero, "{FileName}");
 
             RuleFor(dto => dto.FileStream)
-                .Must(f => f.Length > 0)
-                    .WithMessage(ValidationMessages.FileSizeMustNotBeZero, "{PropertyName}");
+                .Must((dto, fileStream, context) =>
+                {
+                    context.MessageFormatter.AppendArgument("FileName", dto.FileName);
+                    return fileStream.Length > 0;
+                })
+                    .WithMessage(ValidationMessages.FileSizeMustNotBeZero, "{FileName}");
             // TODO: See why GetFileType keeps returning null. Replace raw MIME string with const/enum
             //.Must(f => f.GetFileType().Mime == "text/csv")
             //    .WithMessage(ValidationMessages.ZipFilenameMustEndDotZip, "{PropertyName}");
