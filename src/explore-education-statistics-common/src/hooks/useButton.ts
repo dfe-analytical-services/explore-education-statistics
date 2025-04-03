@@ -67,7 +67,7 @@ export default function useButton({
   return {
     'aria-controls': ariaControls,
     'aria-current': ariaCurrent,
-    'aria-disabled': ariaDisabled || disabled,
+    'aria-disabled': !!(ariaDisabled || disabled),
     'aria-expanded': ariaExpanded,
     'aria-label': ariaLabel,
     children,
