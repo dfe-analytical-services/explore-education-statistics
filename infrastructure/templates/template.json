@@ -753,7 +753,7 @@
     },
     "analyticsFileShareMountPath": {
       "type": "string",
-      "defaultValue": "/data/analytics",
+      "defaultValue": "\\mounts\\analytics",
       "metadata": {
         "description": "Where analytics files will be stored before being processed"
       }
@@ -1248,7 +1248,9 @@
     ],
     "publicDataFileShareMountPathWindows": "\\mounts\\public-api-data",
     "publicDataFileShareName": "[concat(parameters('subscription'), '-ees-papi-share-data')]",
-    "publicDataStorageAccountName": "[concat(parameters('subscription'), 'eespapisa')]"
+    "publicDataStorageAccountName": "[concat(parameters('subscription'), 'eespapisa')]",
+    "analyticsFileShareName": "[concat(parameters('subscription'), '-ees-share-anlyt')]",
+    "analyticsStorageAccountName": "[concat(parameters('subscription'), 'eessaanlyt')]"
   },
   "resources": [
     {
@@ -1580,8 +1582,28 @@
         "WEBSITE_RUN_FROM_PACKAGE": "1",
         "PublicStorage": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-storage-public'), '2018-02-14').secretUriWithVersion, ')')]",
         "enableSwagger": "[parameters('enableSwagger')]",
-        "Analytics__Enabled": "parameters('analyticsEnabled')]",
+        "Analytics__Enabled": "[parameters('analyticsEnabled')]",
         "Analytics__BasePath": "[parameters('analyticsFileShareMountPath')]"
+      }
+    },
+    {
+      "condition": "[parameters('analyticsEnabled')]",
+      "name": "[concat(variables('contentAppName'), '/azurestorageaccounts')]",
+      "type": "Microsoft.Web/sites/config",
+      "location": "[resourceGroup().location]",
+      "apiVersion": "2019-08-01",
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/sites', variables('contentAppName'))]"
+      ],
+      "properties": {
+        "[variables('analyticsFileShareName')]": {
+          "type": "AzureFiles",
+          "accountName": "[variables('analyticsStorageAccountName')]",
+          "accessKey": "[listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('analyticsStorageAccountName')), '2018-02-01').keys[0].value]",
+          "shareName": "[variables('analyticsFileShareName')]",
+          "mountPath": "[variables('analyticsFileShareMountPath')]",
+          "protocol": "Smb"
+        }
       }
     },
     {

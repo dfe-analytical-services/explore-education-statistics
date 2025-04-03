@@ -29,8 +29,11 @@ param analyticsFunctionAppExists bool = true
 @description('Provides access to resources for specific IP address ranges used for service maintenance.')
 param maintenanceIpRanges IpRange[] = []
 
-@description('The cron schedule for the Public API queries consumer Function. Defaults to every hour.')
+@description('The cron schedule for the Public API queries consumer Function. Defaults to every hour on the hour.')
 param publicApiQueryConsumerCron string = '0 0 * * * *'
+
+@description('The cron schedule for the Public zip downloads consumer Function. Defaults to every hour at 30 mins past.')
+param publicZipDownloadsConsumerCron string = '0 30 * * * *'
 
 var tagValues = union(resourceTags ?? {}, {
   Environment: environmentName
@@ -106,6 +109,7 @@ module analyticsFunctionAppModule 'application/analyticsFunctionApp.bicep' = {
     analyticsStorageAccountName: analyticsStorageModule.outputs.storageAccountName
     analyticsFileShareName: analyticsStorageModule.outputs.fileShareName
     publicApiQueryConsumerCron: publicApiQueryConsumerCron
+    publicZipDownloadsConsumerCron: publicZipDownloadsConsumerCron
     tagValues: tagValues
   }
 }
