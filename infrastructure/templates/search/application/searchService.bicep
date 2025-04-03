@@ -94,8 +94,8 @@ module searchStorageAccountModule '../../public-api/components/storageAccount.bi
   }
 }
 
-module blobServiceModule '../../common/components/blobService.bicep' = {
-  name: 'blobServiceModuleDeploy'
+module searchStorageAccountBlobServiceModule '../../common/components/blobService.bicep' = {
+  name: 'searchStorageAccountBlobServiceModuleDeploy'
   params: {
     storageAccountName: searchStorageAccountModule.outputs.storageAccountName
     containerNames: [searchableDocumentsContainerName]
@@ -126,7 +126,7 @@ module searchServiceConfigModule '../components/searchServiceConfig.bicep' = if 
     searchServiceName: searchServiceModule.outputs.searchServiceName
     location: location
   }
-  dependsOn: [blobServiceModule] // Ensures the searchable documents container exists
+  dependsOn: [searchStorageAccountBlobServiceModule] // Ensures the searchable documents container exists
 }
 
 output searchableDocumentsContainerName string = searchableDocumentsContainerName
