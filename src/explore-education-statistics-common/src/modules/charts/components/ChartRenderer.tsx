@@ -49,9 +49,15 @@ export interface ChartRendererProps {
   source?: string;
   id?: string;
   chart: RenderableChart;
+  showExportMenu?: boolean;
 }
 
-function ChartRenderer({ source, id, chart }: ChartRendererProps) {
+function ChartRenderer({
+  source,
+  id,
+  chart,
+  showExportMenu = true,
+}: ChartRendererProps) {
   const { data, meta, subtitle, title, type } = chart;
   const [selectedBoundaryLevelId, setSelectedBoundaryLevelId] = useState(
     type === 'map' ? getMapInitialBoundaryLevel(chart) : undefined,
@@ -116,7 +122,9 @@ function ChartRenderer({ source, id, chart }: ChartRendererProps) {
   if (data?.length && meta) {
     return (
       <>
-        <ChartExportMenu chartRef={chartRef} chartTitle={title} />
+        {showExportMenu && (
+          <ChartExportMenu chartRef={chartRef} chartTitle={title} />
+        )}
         <figure
           ref={chartRef}
           className="govuk-!-margin-0"

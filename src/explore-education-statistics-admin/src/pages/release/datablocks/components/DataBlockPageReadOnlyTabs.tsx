@@ -85,6 +85,7 @@ const DataBlockPageReadOnlyTabs = ({ releaseVersionId, dataBlock }: Props) => {
                       id={`dataBlockTabs-chart-${dataBlock.id}`}
                       source={dataBlock.source}
                       chart={chart}
+                      showExportMenu={false}
                     />
                   )}
                 </ErrorBoundary>
