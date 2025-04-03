@@ -21,7 +21,7 @@ public record ThemeChangedEventDto
     private const string EventType = "theme-changed";
     
     // Which Topic endpoint to use from the appsettings
-    public const string EventTopicOptionsKey = "ThemeChangesEvent";
+    public const string EventTopicOptionsKey = "ThemeChangedEvent";
 
     /// <summary>
     /// The ThemeId is the subject
