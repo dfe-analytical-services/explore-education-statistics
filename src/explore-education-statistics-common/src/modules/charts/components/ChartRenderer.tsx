@@ -1,4 +1,4 @@
-import ChartExportButton from '@common/charts/components/ChartExportButton';
+import ChartExportMenu from '@common/modules/charts/components/ChartExportMenu';
 import FigureFootnotes from '@common/components/FigureFootnotes';
 import { useRefContext } from '@common/contexts/RefContext';
 import HorizontalBarBlock, {
@@ -117,7 +117,7 @@ function ChartRenderer({ source, id, chart }: ChartRendererProps) {
   if (data?.length && meta) {
     return (
       <>
-        <ChartExportButton chartTitle={title} />
+        <ChartExportMenu chartTitle={title} />
         <figure
           ref={chartExportRef}
           className="govuk-!-margin-0"

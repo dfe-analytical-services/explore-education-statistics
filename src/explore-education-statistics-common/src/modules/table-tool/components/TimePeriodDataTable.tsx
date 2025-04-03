@@ -4,11 +4,11 @@ import isErrorLike from '@common/utils/error/isErrorLike';
 import { FullTable } from '@common/modules/table-tool/types/fullTable';
 import { TableHeadersConfig } from '@common/modules/table-tool/types/tableHeaders';
 import { ReleaseTableDataQuery } from '@common/services/tableBuilderService';
-import React, { forwardRef, memo, RefObject } from 'react';
 import DataTableCaption from '@common/modules/table-tool/components/DataTableCaption';
 import FixedMultiHeaderDataTable from '@common/modules/table-tool/components/FixedMultiHeaderDataTable';
 import mapTableToJson from '@common/modules/table-tool/utils/mapTableToJson';
-import ExportTableButton from '@common/table/components/TableExportButton';
+import TableExportMenu from '@common/modules/find-statistics/components/TableExportMenu';
+import React, { forwardRef, memo, RefObject } from 'react';
 
 interface Props {
   captionTitle?: string;
@@ -68,12 +68,8 @@ const TimePeriodDataTable = forwardRef<HTMLElement, Props>(
               not exist in the underlying file.
             </WarningMessage>
           )}
-          {/* query in props is defined at first render then undefined.
-              Can potentially use that for the CSV stuff. Also this doesn't
-              render when editing a draft release currently due to dataBlockId
-          */}
           {dataBlockId && (
-            <ExportTableButton
+            <TableExportMenu
               fileName={captionTitle}
               fullTable={fullTable}
               title={captionTitle}
