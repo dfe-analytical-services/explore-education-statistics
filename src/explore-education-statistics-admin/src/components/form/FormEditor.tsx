@@ -158,7 +158,9 @@ const FormEditor = ({
 
   useEffect(() => {
     if (!showFeaturedTablesModal && !showGlossaryModal) {
-      editorRef.current?.focus();
+      // setTimeout seems to be necessary otherwise it doesn't focus when
+      // successfully adding a link.
+      setTimeout(() => editorRef.current?.focus(), 0);
     }
   }, [showFeaturedTablesModal, showGlossaryModal]);
 
@@ -360,7 +362,6 @@ const FormEditor = ({
                   onSubmit={item => {
                     featuredTablesPlugin.current?.addFeaturedTableLink(item);
                     toggleFeaturedTablesModal.off();
-                    editorRef.current?.focus();
                   }}
                 />
               </Modal>
@@ -375,7 +376,6 @@ const FormEditor = ({
                   onSubmit={item => {
                     glossaryPlugin.current?.addGlossaryItem(item);
                     toggleGlossaryModal.off();
-                    editorRef.current?.focus();
                   }}
                 />
               </Modal>
