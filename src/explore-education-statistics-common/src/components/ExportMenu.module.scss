@@ -22,14 +22,18 @@
     border: 2px solid govuk-colour('black');
     border-top: 0;
     padding-right: govuk-spacing(4);
+    position: absolute;
     right: 0;
+    z-index: 3;
+  }
+
+  button {
+    padding: govuk-spacing(1);
   }
 }
 
-.exportMenu summary {
-  margin-left: auto;
-}
-
-.exportMenu button {
-  padding: govuk-spacing(1);
+.exportMenu[open] {
+  :global(.govuk-details__summary) {
+    margin-bottom: 0;
+  }
 }

@@ -1,4 +1,4 @@
-import React, { ReactNode, useEffect } from 'react';
+import React, { ReactNode, useEffect, useRef } from 'react';
 import useToggle from '@common/hooks/useToggle';
 import Details from '@common/components/Details';
 import styles from '@common/components/ExportMenu.module.scss';
