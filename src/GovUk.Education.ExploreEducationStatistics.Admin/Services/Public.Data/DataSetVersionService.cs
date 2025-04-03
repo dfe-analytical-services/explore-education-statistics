@@ -5,6 +5,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
+using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
@@ -32,7 +33,8 @@ public class DataSetVersionService(
     PublicDataDbContext publicDataDbContext,
     IProcessorClient processorClient,
     IPublicDataApiClient publicDataApiClient,
-    IUserService userService)
+    IUserService userService,
+    IMapper mapper)
     : IDataSetVersionService
 {
     public async Task<Either<ActionResult, PaginatedListViewModel<DataSetLiveVersionSummaryViewModel>>>
@@ -71,6 +73,31 @@ public class DataSetVersionService(
                     page: page,
                     pageSize: pageSize);
             });
+    }
+
+    public async Task<Either<ActionResult, DataSetVersionInfoViewModel>> GetDataSetVersion(
+        Guid dataSetVersionId,
+        CancellationToken cancellationToken = default)
+    {
+        return await userService.CheckIsBauUser()
+            .OnSuccess(async () => await GetVersion(
+            dataSetVersionId: dataSetVersionId,
+                cancellationToken: cancellationToken))
+            .OnSuccess(mapper.Map<DataSetVersionInfoViewModel>);
+    }
+
+    public async Task<Either<ActionResult, DataSetVersion>> GetDataSetVersion(
+        Guid dataSetId,
+        SemVersion version,
+        CancellationToken cancellationToken = default)
+    {
+        return await publicDataDbContext.DataSetVersions
+            .AsNoTracking()
+            .Include(dsv => dsv.DataSet)
+            .Where(dsv => dsv.DataSetId == dataSetId)
+            .Where(dsv => dsv.VersionMajor == version.Major)
+            .Where(dsv => dsv.VersionMinor == version.Minor)
+            .SingleOrNotFoundAsync(cancellationToken);
     }
 
     public async Task<List<DataSetVersionStatusSummary>> GetStatusesForReleaseVersion(
@@ -129,20 +156,6 @@ public class DataSetVersionService(
             .OnSuccess(async dataSetVersion => await MapDraftVersionSummary(dataSetVersion, cancellationToken));
     }
 
-    public async Task<Either<ActionResult, DataSetVersion>> GetDataSetVersion(
-        Guid dataSetId,
-        SemVersion version,
-        CancellationToken cancellationToken = default)
-    {
-        return await publicDataDbContext.DataSetVersions
-            .AsNoTracking()
-            .Include(dsv => dsv.DataSet)
-            .Where(dsv => dsv.DataSetId == dataSetId)
-            .Where(dsv => dsv.VersionMajor == version.Major)
-            .Where(dsv => dsv.VersionMinor == version.Minor)
-            .SingleOrNotFoundAsync(cancellationToken);
-    }
-
     public async Task<Either<ActionResult, Unit>> DeleteVersion(
         Guid dataSetVersionId,
         CancellationToken cancellationToken = default)
@@ -175,7 +188,7 @@ public class DataSetVersionService(
         CancellationToken cancellationToken = default)
     {
         return await userService.CheckIsBauUser()
-            .OnSuccess(async () => await GetDataSetVersion(
+            .OnSuccess(async () => await GetVersion(
                 dataSetVersionId: dataSetVersionId,
                 cancellationToken: cancellationToken))
             .OnSuccessDo(dataSetVersion => CheckCanUpdateVersion(dataSetVersion, updateRequest))
@@ -267,7 +280,7 @@ public class DataSetVersionService(
         };
     }
 
-    private async Task<Either<ActionResult, DataSetVersion>> GetDataSetVersion(
+    private async Task<Either<ActionResult, DataSetVersion>> GetVersion(
         Guid dataSetVersionId,
         CancellationToken cancellationToken)
     {

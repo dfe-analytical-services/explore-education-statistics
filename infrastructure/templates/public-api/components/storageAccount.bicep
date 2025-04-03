@@ -20,7 +20,7 @@ param sku 'Standard_LRS' | 'Standard_GRS' | 'Standard_RAGRS' | 'Standard_ZRS' | 
 @description('Storage Account kind')
 param kind 'StorageV2' | 'FileStorage' = 'StorageV2'
 
-@description('Storage Account Name')
+@description('Key Vault Name')
 param keyVaultName string
 
 @description('Whether the storage account is accessible from the public internet')
@@ -181,6 +181,7 @@ module storeAccessKeyToKeyVault './keyVaultSecret.bicep' = {
   }
 }
 
+output storageAccountId string = storageAccount.id
 output storageAccountName string = storageAccount.name
 output connectionStringSecretName string = connectionStringSecretName
 output accessKeySecretName string = accessKeySecretName

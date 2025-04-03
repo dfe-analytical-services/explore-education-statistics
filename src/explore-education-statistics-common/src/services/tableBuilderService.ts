@@ -65,7 +65,6 @@ export interface LocationOption {
   value: string;
   level?: string;
   options?: LocationLeafOption[];
-  geoJson?: GeoJsonFeature;
 }
 
 export interface LocationGeoJsonOption extends LocationOption {
@@ -104,16 +103,28 @@ export interface FeaturedTable {
   order: number;
 }
 
+interface FilterHierarchyTier {
+  level: number;
+  filterId: string;
+  childFilterId: string;
+  hierarchy: Dictionary<string[]>;
+}
+
+export type SubjectMetaFilterHierarchy = FilterHierarchyTier[];
+
+export interface SubjectMetaFilter {
+  legend: string;
+  hint?: string;
+  id: string;
+  options: GroupedFilterOptions;
+  order: number;
+  autoSelectFilterItemId?: string;
+  name: string;
+}
+
 export interface SubjectMeta {
-  filters: Dictionary<{
-    legend: string;
-    hint?: string;
-    id: string;
-    options: GroupedFilterOptions;
-    order: number;
-    autoSelectFilterItemId?: string;
-    name: string;
-  }>;
+  filterHierarchies?: SubjectMetaFilterHierarchy[];
+  filters: Dictionary<SubjectMetaFilter>;
   indicators: Dictionary<{
     id: string;
     label: string;
@@ -138,13 +149,12 @@ export interface TimePeriodQuery {
   endCode: string;
 }
 
-export interface TableDataQuery extends FullTableQuery {
-  publicationId?: string;
-  boundaryLevel?: number;
-}
-
 export interface ReleaseTableDataQuery extends TableDataQuery {
   releaseVersionId?: string;
+}
+
+export interface TableDataQuery extends FullTableQuery {
+  publicationId?: string;
 }
 
 export interface FullTableQuery {
@@ -250,16 +260,8 @@ const tableBuilderService = {
   async getTableData(
     query: FullTableQuery,
     releaseVersionId?: string,
-    boundaryLevelId?: number,
   ): Promise<TableDataResponse> {
-    if (releaseVersionId && boundaryLevelId) {
-      return dataApi.post(
-        `/tablebuilder/release/${releaseVersionId}?boundaryLevelId=${boundaryLevelId}`,
-        query,
-      );
-    }
-
-    return releaseVersionId && !boundaryLevelId
+    return releaseVersionId
       ? dataApi.post(`/tablebuilder/release/${releaseVersionId}`, query)
       : dataApi.post('/tablebuilder', query);
   },

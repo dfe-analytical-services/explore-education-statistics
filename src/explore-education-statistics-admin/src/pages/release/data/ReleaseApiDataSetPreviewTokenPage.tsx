@@ -2,7 +2,6 @@ import Link from '@admin/components/Link';
 import { useConfig } from '@admin/contexts/ConfigContext';
 import {
   releaseApiDataSetDetailsRoute,
-  releaseApiDataSetPreviewRoute,
   releaseApiDataSetPreviewTokenLogRoute,
   ReleaseDataSetPreviewTokenRouteParams,
   ReleaseDataSetRouteParams,
@@ -64,7 +63,7 @@ export default function ReleaseApiDataSetPreviewTokenPage() {
     history.push(tokenLogPagePath);
   };
 
-  const tokenExampleUrl = `${publicApiUrl}/v1/data-sets/${dataSet?.draftVersion?.id}`;
+  const tokenExampleUrl = `${publicApiUrl}/v1/data-sets/${dataSet?.id}`;
 
   return (
     <>

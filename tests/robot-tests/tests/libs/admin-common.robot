@@ -831,10 +831,13 @@ user waits until modal is visible
     [Arguments]
     ...    ${modal_title}
     ...    ${modal_text}=${EMPTY}
+    ...    ${wait}=${timeout}
 
     user waits until parent contains element    css:[role="dialog"]    xpath://h2[.="${modal_title}"]
+    ...    timeout=${wait}
     IF    "${modal_text}" != "${EMPTY}"
         user waits until parent contains element    css:[role="dialog"]    xpath://*[.="${modal_text}"]
+        ...    timeout=${wait}
     END
     ${modal_element}=    get webelement    css:[role="dialog"]
     [Return]    ${modal_element}

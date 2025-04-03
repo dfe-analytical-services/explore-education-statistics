@@ -282,6 +282,13 @@ export default function MapBlock({
             },
           )}
         >
+          <a
+            id={`map-start-${id}`}
+            href={`#map-end-${id}`}
+            className="govuk-skip-link"
+          >
+            Skip to end of map
+          </a>
           <MapContainer
             style={{
               width: (width && `${width}px`) || '100%',
@@ -310,6 +317,13 @@ export default function MapBlock({
             hideText
             alert
           />
+          <a
+            id={`map-end-${id}`}
+            href={`#map-start-${id}`}
+            className="govuk-skip-link"
+          >
+            Back to start of map
+          </a>
         </div>
 
         {selectedDataSetConfig && (

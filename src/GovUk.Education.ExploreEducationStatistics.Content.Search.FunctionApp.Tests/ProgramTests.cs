@@ -1,8 +1,10 @@
-﻿using System.Configuration;
-using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Clients;
-using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Clients.AzureBlobStorage;
+﻿using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Clients.AzureBlobStorage;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Clients.ContentApi;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.OnReleaseVersionPublished;
+using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.OnThemeUpdated;
+using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.RefreshSearchableDocument;
+using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.ReindexSearchableDocuments;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Options;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Services;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Tests.Extensions;
@@ -195,6 +197,106 @@ public class ProgramTests
                 // ASSERT
                 var options = host.Services.GetRequiredService<IOptions<AppOptions>>();
                 Assert.NotNull(options);
+            }
+        }
+        
+        public class ReindexSearchableDocumentsFunctionTests : ProgramTests
+        {
+            [Fact]
+            public void Should_resolve_ReindexSearchableDocumentsFunction()
+            {
+                // ARRANGE
+                var sut = GetSut();
+            
+                // ACT
+                var actual = ActivatorUtilities.CreateInstance<ReindexSearchableDocumentsFunction>(sut.Services);
+            
+                // ASSERT
+                Assert.NotNull(actual);
+            }
+            
+            [Fact]
+            public void GivenNotConfigured_WhenResolvingReindexSearchableDocumentsFunction_ThenShouldResolve()
+            {
+                // ARRANGE
+                var sut = GetSutWithConfig("{}");
+            
+                // ACT
+                var actual = sut.Services.GetRequiredService<IOptions<ReindexSearchableDocumentsFunction>>();
+                
+                // ASSERT
+                Assert.NotNull(actual);
+            }
+            
+            [Fact]
+            public void GivenNotConfigured_WhenResolvingAzureSearchOptions_ThenShouldResolve()
+            {
+                // ARRANGE
+                var sut = GetSutWithConfig("{}");
+            
+                // ACT
+                var options = sut.Services.GetRequiredService<IOptions<AzureSearchOptions>>();
+                
+                // ASSERT
+                Assert.NotNull(options.Value);
+                Assert.Equal(string.Empty, options.Value.SearchServiceEndpoint);
+                Assert.Null(options.Value.SearchServiceAccessKey);
+                Assert.Equal(string.Empty, options.Value.IndexerName);
+            }
+        }
+        
+        public class ResolveFunctionTests : ProgramTests
+        {
+            [Fact]
+            public void Can_resolve_OnReleaseVersionPublishedFunction()
+            {
+                // ARRANGE
+                var sut = GetSut();
+            
+                // ACT
+                var actual = ActivatorUtilities.CreateInstance<OnReleaseVersionPublishedFunction>(sut.Services);
+            
+                // ASSERT
+                Assert.NotNull(actual);
+            }
+            
+            [Fact]
+            public void Can_resolve_OnThemeUpdatedFunction()
+            {
+                // ARRANGE
+                var sut = GetSut();
+            
+                // ACT
+                var actual = ActivatorUtilities.CreateInstance<OnThemeUpdatedFunction>(sut.Services);
+            
+                // ASSERT
+                Assert.NotNull(actual);
+            }
+
+            [Fact]
+            public void Can_resolve_RefreshSearchableDocumentFunction()
+            {
+                // ARRANGE
+                var sut = GetSut();
+            
+                // ACT
+                var actual = ActivatorUtilities.CreateInstance<RefreshSearchableDocumentFunction>(sut.Services);
+            
+                // ASSERT
+                Assert.NotNull(actual);
+            }
+
+            [Fact]
+            public void Can_resolve_ReindexSearchableDocumentFunction()
+            {
+                // ARRANGE
+                var sut = GetSut();
+            
+                // ACT
+                var actual = ActivatorUtilities.CreateInstance<ReindexSearchableDocumentsFunction>(sut.Services);
+            
+                // ASSERT
+                Assert.NotNull(actual);
             }
         }
     }

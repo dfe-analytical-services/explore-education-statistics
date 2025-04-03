@@ -1,0 +1,55 @@
+parameters:
+  - name: stageName
+    type: string
+  - name: environment
+    type: string
+  - name: serviceConnection
+    type: string
+  - name: bicepParamFile
+    type: string
+    values:
+      - dev
+      - test
+      - preprod
+      - prod
+  - name: condition
+    type: string
+  - name: dependsOn
+    type: object
+    default: []
+  - name: trigger
+    type: string
+    default: automatic
+    values:
+      - automatic
+      - manual
+
+stages:
+  - stage: ${{ parameters.stageName }}
+    displayName: Deploy ${{ parameters.environment }}
+    dependsOn: ${{ parameters.dependsOn }}
+    trigger: ${{ parameters.trigger }}
+    # Prevent this stage from running in parallel with the same deploy stage in other
+    # ongoing runs of this pipeline. Instead, multiple executions of this stage will
+    # be queued and run sequentially in the order that their pipelines were triggered.
+    lockBehavior: sequential
+    condition: ${{ parameters.condition }}
+    variables:
+      - group: Common - ${{ parameters.environment }}
+      - group: Screener Infrastructure - ${{ parameters.environment }}
+      - name: screenerFunctionAppName
+        value: $(subscription)-ees-sapi-fa-screener
+      - name: infraDeployName
+        value: ScreenerInfrastructure$(Build.BuildNumber)
+    jobs:
+      - template: ../jobs/deploy-infrastructure.yml
+        parameters:
+          serviceConnection: ${{ parameters.serviceConnection }}
+          environment: ${{ parameters.environment }}
+          bicepParamFile: ${{ parameters.bicepParamFile }}
+
+      - template: ../jobs/deploy-screener-function-app.yml
+        parameters:
+          serviceConnection: ${{ parameters.serviceConnection }}
+          environment: ${{ parameters.environment }}
+          dependsOn: DeployScreenerInfrastructure

@@ -1,7 +1,7 @@
+using GovUk.Education.ExploreEducationStatistics.Analytics.Requests.Consumer.Options;
 using GovUk.Education.ExploreEducationStatistics.Analytics.Requests.Consumer.Services;
 using GovUk.Education.ExploreEducationStatistics.Analytics.Requests.Consumer.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.DuckDb.DuckDb;
-using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Options;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;

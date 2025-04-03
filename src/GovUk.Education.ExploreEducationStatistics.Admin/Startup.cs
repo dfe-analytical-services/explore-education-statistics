@@ -83,6 +83,7 @@ using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.EventGrid;
 using Thinktecture;
 using static GovUk.Education.ExploreEducationStatistics.Common.Utils.StartupUtils;
 using ContentGlossaryService = GovUk.Education.ExploreEducationStatistics.Content.Services.GlossaryService;
@@ -380,7 +381,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                 configuration.GetRequiredSection(TableBuilderOptions.Section));
             services.Configure<OpenIdConnectSpaClientOptions>(
                 configuration.GetSection(OpenIdConnectSpaClientOptions.Section));
-
+            
             services.Configure<RouteOptions>(options => options.LowercaseUrls = true);
 
             StartupSecurityConfiguration.ConfigureAuthorizationPolicies(services);
@@ -474,6 +475,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<IDataSetCandidateService, DataSetCandidateService>();
             services.AddTransient<IPostgreSqlRepository, PostgreSqlRepository>();
             services.AddTransient<ILocationService, LocationService>();
+            services.AddTransient<IAdminEventRaiserService, AdminEventRaiserService>();
+            services.AddEventGridClient(configuration);
 
             if (publicDataDbExists)
             {
@@ -872,11 +875,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             return Task.FromResult(PaginatedListViewModel<DataSetLiveVersionSummaryViewModel>.Paginate([], 1, 10));
         }
 
-        public Task<List<DataSetVersionStatusSummary>> GetStatusesForReleaseVersion(
-            Guid releaseVersionId,
+        public Task<Either<ActionResult, DataSetVersionInfoViewModel>> GetDataSetVersion(
+            Guid dataSetVersionIdId,
             CancellationToken cancellationToken = default)
         {
-            return Task.FromResult(new List<DataSetVersionStatusSummary>());
+            return Task.FromResult(new Either<ActionResult, DataSetVersionInfoViewModel>(new NotFoundResult()));
         }
 
         public Task<Either<ActionResult, DataSetVersion>> GetDataSetVersion(
@@ -885,6 +888,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             CancellationToken cancellationToken = default)
         {
             return Task.FromResult(new Either<ActionResult, DataSetVersion>(new NotFoundResult()));
+        }
+
+        public Task<List<DataSetVersionStatusSummary>> GetStatusesForReleaseVersion(
+            Guid releaseVersionId,
+            CancellationToken cancellationToken = default)
+        {
+            return Task.FromResult(new List<DataSetVersionStatusSummary>());
         }
 
         public Task<Either<ActionResult, DataSetVersionSummaryViewModel>> CreateNextVersion(

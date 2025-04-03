@@ -35,7 +35,7 @@ stages:
     lockBehavior: sequential
     condition: ${{ parameters.condition }}
     variables:
-      - group: Search Infrastructure - ${{ parameters.environment }}
+      - group: Common - ${{ parameters.environment }}
       - name: searchDocsFunctionAppName
         value: $(subscription)-ees-fa-searchdocs
       - name: infraDeployName
@@ -47,8 +47,15 @@ stages:
           environment: ${{ parameters.environment }}
           bicepParamFile: ${{ parameters.bicepParamFile }}
 
-      - template: ../jobs/deploy-search-docs-function-app.yml
+      - template: ../../../../common/ci/tasks/deploy-function-app.yml
         parameters:
           serviceConnection: ${{ parameters.serviceConnection }}
           environment: ${{ parameters.environment }}
+          displayName: Deploy Search Docs Function App
           dependsOn: DeploySearchInfrastructure
+          deploymentName: DeploySearchDocsFunction
+          downloadPipeline: SearchBuild
+          functionAppName: $(searchDocsFunctionAppName)
+          artifactName: drop
+          artifactZipName: GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.zip
+          healthCheckUrl: $(searchDocsFunctionAppUrl)/api/HealthCheck

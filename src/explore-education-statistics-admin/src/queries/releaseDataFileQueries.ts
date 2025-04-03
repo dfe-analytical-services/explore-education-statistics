@@ -8,6 +8,16 @@ const releaseDataFileQueries = createQueryKeys('releaseDataFile', {
       queryFn: () => releaseDataFileService.getDataFiles(releaseId),
     };
   },
+  getDeleteFilePlan(releaseVersionId: string, dataFileId: string) {
+    return {
+      queryKey: [releaseVersionId, dataFileId],
+      queryFn: () =>
+        releaseDataFileService.getDeleteDataFilePlan(
+          releaseVersionId,
+          dataFileId,
+        ),
+    };
+  },
 });
 
 export default releaseDataFileQueries;

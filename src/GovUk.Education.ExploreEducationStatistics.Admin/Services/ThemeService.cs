@@ -12,6 +12,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Secur
 using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.EventGrid;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
@@ -36,6 +37,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly IMethodologyService _methodologyService;
         private readonly IPublishingService _publishingService;
         private readonly IReleaseVersionService _releaseVersionService;
+        private readonly IAdminEventRaiserService _eventRaiserService;
         private readonly bool _themeDeletionAllowed;
 
         public ThemeService(
@@ -47,7 +49,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             IUserService userService,
             IMethodologyService methodologyService,
             IPublishingService publishingService,
-            IReleaseVersionService releaseVersionService)
+            IReleaseVersionService releaseVersionService,
+            IAdminEventRaiserService eventRaiserService)
         {
             _contentDbContext = contentDbContext;
             _dataSetVersionRepository = dataSetVersionRepository;
@@ -57,6 +60,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _methodologyService = methodologyService;
             _publishingService = publishingService;
             _releaseVersionService = releaseVersionService;
+            _eventRaiserService = eventRaiserService;
             _themeDeletionAllowed = appOptions.Value.EnableThemeDeletion;
         }
 
@@ -110,6 +114,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         await _contentDbContext.SaveChangesAsync();
 
                         await _publishingService.TaxonomyChanged();
+                        
+                        await _eventRaiserService.OnThemeUpdated(theme);
 
                         return await GetTheme(theme.Id);
                     }

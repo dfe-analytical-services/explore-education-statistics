@@ -4,6 +4,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Database;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Functions;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.EventGrid;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Security;
@@ -128,6 +129,8 @@ public static class PublisherHostBuilderExtensions
                     .AddScoped<IReleaseVersionRepository, ReleaseVersionRepository>()
                     .AddScoped<IRedirectsCacheService, RedirectsCacheService>()
                     .AddScoped<IRedirectsService, RedirectsService>()
+                    .AddEventGridClient(configuration)
+                    .AddScoped<IPublisherEventRaiserService, PublisherEventRaiserService>()
                     .AddSingleton<INotifierClient, NotifierClient>(provider => new NotifierClient(
                         provider.GetRequiredService<IOptions<AppOptions>>().Value.NotifierStorageConnectionString))
                     .AddSingleton<IPublisherClient, PublisherClient>(provider => new PublisherClient(

@@ -35,6 +35,7 @@ public partial class ReleaseService(
     IPublicationCacheService publicationCacheService,
     IReleasePublishingStatusRepository releasePublishingStatusRepository,
     IRedirectsCacheService redirectsCacheService,
+    IAdminEventRaiserService adminEventRaiserService,
     IGuidGenerator guidGenerator) : IReleaseService
 {
     public async Task<Either<ActionResult, ReleaseVersionViewModel>> CreateRelease(ReleaseCreateRequest request)
@@ -125,7 +126,7 @@ public partial class ReleaseService(
                 var releaseIsLive = latestPublishedReleaseVersion is not null;
                 var slugHasChanged = releaseAndSlugs.oldReleaseSlug != releaseAndSlugs.newReleaseSlug;
 
-                var releaseData = (releaseAndSlugs.oldReleaseSlug, slugHasChanged, releaseIsLive);
+                var releaseData = (releaseAndSlugs, slugHasChanged, releaseIsLive);
 
                 return releaseIsLive
                     ? await UpdateReleaseCache(
@@ -142,10 +143,22 @@ public partial class ReleaseService(
                 return releaseData.releaseIsLive && releaseData.slugHasChanged
                     ? await CreateReleaseRedirect(
                         releaseId: releaseId,
-                        oldReleaseSlug: releaseData.oldReleaseSlug,
+                        oldReleaseSlug: releaseData.releaseAndSlugs.oldReleaseSlug,
                         cancellationToken: cancellationToken)
                     : Unit.Instance;
             })
+            .OnSuccessDo(async releaseData =>
+                {
+                    if (releaseData.releaseIsLive && releaseData.slugHasChanged)
+                    {
+                        await adminEventRaiserService.OnReleaseSlugChanged(
+                            releaseId, 
+                            releaseData.releaseAndSlugs.newReleaseSlug,
+                            releaseData.releaseAndSlugs.release.PublicationId,
+                            releaseData.releaseAndSlugs.release.Publication.Slug
+                            );
+                    }
+                })
             .OnSuccess(async () => await GetRelease(releaseId))
             .OnSuccess(MapRelease);
     }

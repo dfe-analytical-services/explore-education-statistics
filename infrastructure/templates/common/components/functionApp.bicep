@@ -1,4 +1,4 @@
-import { IpRange, FirewallRule } from '../types.bicep'
+import { IpRange, FirewallRule, AzureFileShareMount } from '../types.bicep'
 import { abbreviations } from '../../common/abbreviations.bicep'
 import { staticAverageLessThanHundred, staticMinGreaterThanZero } from '../../public-api/components/alerts/staticAlertConfig.bicep'
 import { dynamicAverageGreaterThan } from '../../public-api/components/alerts/dynamicAlertConfig.bicep'
@@ -57,7 +57,7 @@ param instanceMemoryMB int = 2048
 param maximumInstanceCount int = 100
 
 @description('Specifies the subnet id for the function app outbound traffic across the VNet.')
-param subnetId string
+param outboundSubnetId string?
 
 @description('Specifies the optional subnet id for function app inbound traffic from the VNet.')
 param privateEndpoints {
@@ -77,12 +77,8 @@ param allowedOrigins array = []
 @description('Specifies an optional URL for Azure to use to monitor the health of this resource')
 param healthCheckPath string?
 
-@description('An existing Managed Identity\'s Resource Id with which to associate this Function App.')
-param userAssignedManagedIdentityParams {
-  id: string
-  name: string
-  principalId: string
-}?
+@description('The name of a user-assigned managed identity to assign to the Function App.')
+param userAssignedIdentityName string = ''
 
 @description('Specifies the SKU for the Function App hosting plan.')
 param sku object
@@ -95,6 +91,9 @@ param functionAppExists bool
 
 @description('Specifies whether or not the Function App will always be on and not idle after periods of no traffic - must be compatible with the chosen hosting plan.')
 param alwaysOn bool = false
+
+@description('Specifies additional Azure Storage Accounts to make available to this Function App')
+param azureFileShares AzureFileShareMount[] = []
 
 @description('Whether to create or update Azure Monitor alerts during this deploy.')
 param alerts {
@@ -123,17 +122,6 @@ var firewallRules = [
   }
 ]
 
-var identity = userAssignedManagedIdentityParams != null
-  ? {
-      type: 'UserAssigned'
-      userAssignedIdentities: {
-        '${userAssignedManagedIdentityParams!.id}': {}
-      }
-    }
-  : {
-      type: 'SystemAssigned'
-    }
-
 var storageAlerts = alerts != null
   ? {
       availability: alerts!.storageAccountAvailability
@@ -153,6 +141,12 @@ var fileServiceAlerts = alerts != null
 
 resource keyVault 'Microsoft.KeyVault/vaults@2023-07-01' existing = {
   name: keyVaultName
+}
+
+var identityType = !empty(userAssignedIdentityName) ? 'SystemAssigned, UserAssigned' : 'SystemAssigned'
+
+resource userAssignedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2024-11-30' existing = if (!empty(userAssignedIdentityName)) {
+  name: userAssignedIdentityName
 }
 
 module appServicePlanModule '../../public-api/components/appServicePlan.bicep' = {
@@ -177,7 +171,7 @@ module storageAccountModule '../../public-api/components/storageAccount.bicep' =
   params: {
     location: location
     storageAccountName: storageAccountName
-    allowedSubnetIds: [subnetId]
+    allowedSubnetIds: outboundSubnetId != null ? [outboundSubnetId!] : []
     firewallRules: storageFirewallRules
     sku: 'Standard_LRS'
     kind: 'StorageV2'
@@ -207,13 +201,16 @@ resource functionApp 'Microsoft.Web/sites@2024-04-01' = {
   name: functionAppName
   location: location
   kind: (operatingSystem == 'Linux' ? 'functionapp,linux' : 'functionapp')
-  identity: identity
+  identity: {
+    type: identityType
+    userAssignedIdentities: !empty(userAssignedIdentityName) ? { '${userAssignedIdentity.id}': {} } : null
+  }
   properties: {
     containerSize: instanceMemoryMB
     reserved: operatingSystem == 'Linux'
     serverFarmId: appServicePlanModule.outputs.planId
     vnetContentShareEnabled: true
-    virtualNetworkSubnetId: subnetId
+    virtualNetworkSubnetId: outboundSubnetId
     siteConfig: {
       alwaysOn: alwaysOn
       appSettings: union([
@@ -288,10 +285,29 @@ resource functionApp 'Microsoft.Web/sites@2024-04-01' = {
   tags: tagValues
 }
 
+resource azureStorageAccountsConfig 'Microsoft.Web/sites/config@2023-12-01' = if (length(azureFileShares) > 0) {
+  name: 'azurestorageaccounts'
+  parent: functionApp
+  properties: reduce(
+    azureFileShares,
+    {},
+    (cur, next) =>
+      union(cur, {
+        '${next.storageName}': {
+          type: 'AzureFiles'
+          shareName: next.fileShareName
+          mountPath: next.mountPath
+          accountName: next.storageAccountName
+          accessKey: next.storageAccountKey
+        }
+      })
+  )
+}
+
 module keyVaultRoleAssignmentModule '../../public-api/components/keyVaultRoleAssignment.bicep' = {
   name: '${functionAppName}KeyVaultRoleAssignmentModuleDeploy'
   params: {
-    principalIds: userAssignedManagedIdentityParams != null ? [userAssignedManagedIdentityParams!.principalId] : [functionApp.identity.principalId]
+    principalIds: [functionApp.identity.principalId]
     keyVaultName: keyVault.name
     role: 'Secrets User'
   }
@@ -389,3 +405,4 @@ module expectedHttpStatusCodeAlerts '../../public-api/components/alerts/dynamicM
 
 output name string = functionApp.name
 output url string = 'https://${functionApp.name}.azurewebsites.net'
+output functionAppIdentityPrincipalId string = functionApp.identity.principalId

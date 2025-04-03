@@ -1,39 +1,44 @@
 import ButtonText from '@common/components/ButtonText';
-import VisuallyHidden from '@common/components/VisuallyHidden';
 import CollapsibleList from '@common/components/CollapsibleList';
 import { FormFieldset } from '@common/components/form';
-import FormProvider from '@common/components/form/FormProvider';
 import Form from '@common/components/form/Form';
 import FormCheckboxSelectedCount from '@common/components/form/FormCheckboxSelectedCount';
-import FormFieldCheckboxSearchSubGroups from '@common/components/form/FormFieldCheckboxSearchSubGroups';
 import FormFieldCheckboxGroupsMenu from '@common/components/form/FormFieldCheckboxGroupsMenu';
+import FormFieldCheckboxSearchSubGroups from '@common/components/form/FormFieldCheckboxSearchSubGroups';
+import FormProvider from '@common/components/form/FormProvider';
+import createErrorHelper from '@common/components/form/validation/createErrorHelper';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
+import VisuallyHidden from '@common/components/VisuallyHidden';
+import styles from '@common/modules/table-tool/components/FiltersForm.module.scss';
 import ResetFormOnPreviousStep from '@common/modules/table-tool/components/ResetFormOnPreviousStep';
 import TableQueryError from '@common/modules/table-tool/components/TableQueryError';
 import { InjectedWizardProps } from '@common/modules/table-tool/components/Wizard';
 import WizardStepFormActions from '@common/modules/table-tool/components/WizardStepFormActions';
 import WizardStepHeading from '@common/modules/table-tool/components/WizardStepHeading';
 import WizardStepSummary from '@common/modules/table-tool/components/WizardStepSummary';
-import styles from '@common/modules/table-tool/components/FiltersForm.module.scss';
 import { SelectedPublication } from '@common/modules/table-tool/types/selectedPublication';
 import { Subject, SubjectMeta } from '@common/services/tableBuilderService';
 import { Dictionary } from '@common/types';
-import createErrorHelper from '@common/components/form/validation/createErrorHelper';
 import {
   getErrorCode,
   hasErrorMessage,
   isServerValidationError,
 } from '@common/validation/serverValidations';
 import Yup from '@common/validation/yup';
+import camelCase from 'lodash/camelCase';
 import mapValues from 'lodash/mapValues';
 import orderBy from 'lodash/orderBy';
-import React, { useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { ObjectSchema } from 'yup';
+import FilterHierarchy from './FilterHierarchy';
+import getFilterHierarchyLabelsMap from './utils/getFilterHierarchyLabelsMap';
+import getFilterHierarchyRelatedOptionIds from './utils/getFilterHierarchyRelatedOptionIds';
 
 export interface FiltersFormValues {
   indicators: string[];
   filters: Dictionary<string[]>;
+  filterHierarchies: Dictionary<string[]>;
 }
 
 export type FilterFormSubmitHandler = (values: FiltersFormValues) => void;
@@ -61,6 +66,7 @@ interface Props extends InjectedWizardProps {
     publicationTitle: string,
     subjectName: string,
   ) => void;
+  hideFilterHierarchies?: boolean;
 }
 
 export default function FiltersForm({
@@ -72,6 +78,7 @@ export default function FiltersForm({
   showTableQueryErrorDownload = true,
   onSubmit,
   onTableQueryError,
+  hideFilterHierarchies = true, // hierarchies feature flag
   ...stepProps
 }: Props) {
   const { goToNextStep, isActive } = stepProps;
@@ -79,6 +86,46 @@ export default function FiltersForm({
   const [tableQueryError, setTableQueryError] = useState<TableQueryErrorCode>();
   const [previousValues, setPreviousValues] = useState<FiltersFormValues>();
   const [openFilterGroups, setOpenFilterGroups] = useState<string[]>([]);
+
+  const filterHierarchies = useMemo(() => {
+    if (hideFilterHierarchies) {
+      return [];
+    }
+    return subjectMeta.filterHierarchies ?? [];
+  }, [subjectMeta, hideFilterHierarchies]);
+
+  const hierarchiedFilterIds = useMemo(() => {
+    if (hideFilterHierarchies) return [];
+
+    return (
+      filterHierarchies.flatMap(hierarchy => {
+        return [
+          ...hierarchy.map(({ filterId }) => filterId),
+          hierarchy.at(-1)?.childFilterId,
+        ];
+      }) ?? []
+    );
+  }, [filterHierarchies, hideFilterHierarchies]);
+
+  const standardFilters = useMemo(() => {
+    return orderBy(
+      Object.entries(subjectMeta.filters).filter(
+        ([_, filter]) => !hierarchiedFilterIds.includes(filter.id),
+      ),
+      ([_, value]) => value.order,
+    );
+  }, [subjectMeta, hierarchiedFilterIds]);
+
+  const hierarchiedFilters = useMemo(() => {
+    return Object.values(subjectMeta.filters).filter(filter =>
+      hierarchiedFilterIds.includes(filter.id),
+    );
+  }, [subjectMeta, hierarchiedFilterIds]);
+
+  const optionLabelsMap = useMemo(
+    () => getFilterHierarchyLabelsMap(hierarchiedFilters),
+    [hierarchiedFilters],
+  );
 
   const initialFormValues = useMemo(() => {
     // Automatically select indicator when one indicator group with one option
@@ -88,16 +135,19 @@ export default function FiltersForm({
         ? [indicatorValues[0].options[0].value]
         : initialValues?.indicators ?? [];
 
-    const filters = mapValues(subjectMeta.filters, filter => {
-      const filterGroups = Object.values(filter.options);
+    const filters = mapValues(Object.fromEntries(standardFilters), filter => {
+      const filterGroupOptions = Object.values(filter.options);
 
       // Automatically select when only one group in filter, with only one option in it.
-      if (filterGroups.length === 1 && filterGroups[0].options.length === 1) {
-        return [filterGroups[0].options[0].value];
+      if (
+        filterGroupOptions.length === 1 &&
+        filterGroupOptions[0].options.length === 1
+      ) {
+        return [filterGroupOptions[0].options[0].value];
       }
 
       if (initialValues?.filters) {
-        const filterValues = filterGroups
+        const filterValues = filterGroupOptions
           .flatMap(group => group.options)
           .map(option => option.value);
 
@@ -113,53 +163,74 @@ export default function FiltersForm({
       filters,
       indicators,
     };
-  }, [initialValues, subjectMeta]);
+  }, [initialValues, subjectMeta, standardFilters]);
 
   const stepHeading = (
     <WizardStepHeading {...stepProps}>{stepTitle}</WizardStepHeading>
   );
 
-  const handleSubmit = async (values: FiltersFormValues) => {
-    setPreviousValues({ ...values });
+  const handleSubmit = useCallback(
+    async (values: FiltersFormValues) => {
+      setPreviousValues({ ...values });
 
-    try {
-      setTableQueryError(undefined);
+      try {
+        setTableQueryError(undefined);
 
-      await goToNextStep(async () => {
-        await onSubmit(values);
-      });
-    } catch (error) {
-      if (
-        !isServerValidationError<TableQueryErrorCode>(error) ||
-        !hasErrorMessage(error, TableQueryErrorCodes)
-      ) {
-        throw error;
-      }
-
-      const errorCode = getErrorCode<TableQueryErrorCode>(error);
-
-      if (onTableQueryError) {
-        if (errorCode) {
-          onTableQueryError(
-            errorCode,
-            selectedPublication?.title || '',
-            subject?.name || '',
-          );
+        await goToNextStep(async () => {
+          await onSubmit({
+            ...values,
+            filterHierarchies: getFilterHierarchyRelatedOptionIds(
+              values.filterHierarchies,
+              filterHierarchies,
+              optionLabelsMap,
+            ),
+          });
+        });
+      } catch (error) {
+        if (
+          !isServerValidationError<TableQueryErrorCode>(error) ||
+          !hasErrorMessage(error, TableQueryErrorCodes)
+        ) {
+          throw error;
         }
+
+        const errorCode = getErrorCode<TableQueryErrorCode>(error);
+
+        if (onTableQueryError) {
+          if (errorCode) {
+            onTableQueryError(
+              errorCode,
+              selectedPublication?.title || '',
+              subject?.name || '',
+            );
+          }
+        }
+
+        setTableQueryError(errorCode);
       }
-
-      setTableQueryError(errorCode);
-    }
-  };
-
-  const orderedFilters = orderBy(
-    Object.entries(subjectMeta.filters),
-    ([_, value]) => value.order,
+    },
+    [
+      filterHierarchies,
+      goToNextStep,
+      onSubmit,
+      onTableQueryError,
+      optionLabelsMap,
+      selectedPublication?.title,
+      subject?.name,
+    ],
   );
 
-  const allFilterKeys = orderedFilters.map(([filterKey]) => filterKey);
+  const allFilterGroupKeys = useMemo(
+    () => [
+      ...standardFilters.map(([key]) => key),
+      ...(subjectMeta.filterHierarchies ?? []).map(
+        tiers => tiers.at(-1)?.childFilterId ?? '',
+      ),
+    ],
+    [standardFilters, subjectMeta],
+  );
 
-  const allFiltersOpen = openFilterGroups.length === allFilterKeys.length;
+  const allFiltersOpen = openFilterGroups.length === allFilterGroupKeys.length;
 
   const orderedIndicators = orderBy(
     Object.values(subjectMeta.indicators),
@@ -173,7 +244,7 @@ export default function FiltersForm({
         .of(Yup.string().defined())
         .min(1, 'Select at least one option from indicators'),
       filters: Yup.object(
-        mapValues(subjectMeta.filters, filter => {
+        mapValues(Object.fromEntries(standardFilters), filter => {
           const label = filter.legend.toLowerCase();
 
           return Yup.array()
@@ -183,8 +254,27 @@ export default function FiltersForm({
             .min(1, `Select at least one option from ${label}`);
         }),
       ),
+      filterHierarchies: Yup.object(
+        Object.fromEntries(
+          filterHierarchies.map(tiers => {
+            const hierarchyFilterId = tiers.at(-1)?.childFilterId ?? '';
+
+            const label =
+              optionLabelsMap[hierarchyFilterId]?.toLocaleLowerCase();
+
+            return [
+              camelCase(optionLabelsMap[hierarchyFilterId]),
+              Yup.array()
+                .required(`Select at least one option from ${label}`)
+                .typeError(`Select at least one option from ${label}`)
+                .of(Yup.string().defined())
+                .min(1, `Select at least one option from ${label}`),
+            ];
+          }),
+        ),
+      ),
     });
-  }, [subjectMeta.filters]);
+  }, [standardFilters, filterHierarchies, optionLabelsMap]);
 
   const filtersIncludeTotal = Object.values(subjectMeta.filters).some(
     filter => filter.autoSelectFilterItemId,
@@ -196,11 +286,13 @@ export default function FiltersForm({
       initialValues={initialFormValues}
       validationSchema={validationSchema}
     >
-      {({ formState, getValues, reset, setValue }) => {
+      {({ formState, getValues, reset, setValue, watch }) => {
         const { getError } = createErrorHelper({
           errors: formState.errors,
           touchedFields: formState.touchedFields,
         });
+        const values = watch();
+
         if (isActive) {
           return (
             <Form id="filtersForm" onSubmit={handleSubmit}>
@@ -217,7 +309,7 @@ export default function FiltersForm({
               {stepHeading}
 
               <div className="govuk-grid-row">
-                <div className="govuk-grid-column-one-half-from-desktop govuk-!-margin-bottom-6">
+                <div className="govuk-grid-column govuk-!-margin-bottom-6">
                   <FormFieldCheckboxSearchSubGroups
                     disabled={formState.isSubmitting}
                     groupLabel="Indicators"
@@ -236,9 +328,12 @@ export default function FiltersForm({
                     }))}
                     order={[]}
                   />
-                  {orderedFilters.length > 0 && (
+
+                  {standardFilters.length + hierarchiedFilterIds.length > 0 && (
                     <FormFieldset
-                      error={getError('filters')}
+                      error={
+                        getError('filters') ?? getError('filterHierarchies')
+                      }
                       hint={
                         <div className="dfe-flex dfe-justify-content--space-between dfe-flex-wrap dfe-align-items-start">
                           <span
@@ -255,14 +350,14 @@ export default function FiltersForm({
                                 : ''
                             }`}
                           </span>
-                          {orderedFilters.length > 1 && (
+                          {standardFilters.length > 1 && (
                             <ButtonText
                               ariaExpanded={allFiltersOpen}
                               ariaControls="filterGroups"
                               className="govuk-!-margin-bottom-2"
                               onClick={() => {
                                 setOpenFilterGroups(
-                                  allFiltersOpen ? [] : allFilterKeys,
+                                  allFiltersOpen ? [] : allFilterGroupKeys,
                                 );
                               }}
                             >
@@ -276,13 +371,33 @@ export default function FiltersForm({
                       legend="Categories"
                       legendSize="m"
                     >
+                      {filterHierarchies.map(filterHierarchy => {
+                        if (filterHierarchy.length === 0) return null;
+
+                        const hierarchyName = `filterHierarchies.${camelCase(
+                          optionLabelsMap[
+                            filterHierarchy.at(-1)?.childFilterId ?? ''
+                          ],
+                        )}`;
+
+                        return (
+                          <FilterHierarchy
+                            filterHierarchy={filterHierarchy}
+                            optionLabelsMap={optionLabelsMap}
+                            disabled={formState.isSubmitting}
+                            key={hierarchyName}
+                            name={hierarchyName}
+                          />
+                        );
+                      })}
                       <div id="filterGroups">
-                        {orderedFilters.map(([filterKey, filterGroup]) => {
+                        {standardFilters.map(([filterKey, filterGroup]) => {
                           const filterName = `filters.${filterKey}`;
                           const orderedFilterGroupOptions = orderBy(
                             Object.values(filterGroup.options),
                             'order',
                           );
+
                           return (
                             <FormFieldCheckboxGroupsMenu
                               disabled={formState.isSubmitting}
@@ -340,8 +455,7 @@ export default function FiltersForm({
             </Form>
           );
         }
-
-        const values = getValues();
+        // const values = getValues();
 
         return (
           <WizardStepSummary {...stepProps} goToButtonText="Edit filters">
@@ -364,8 +478,7 @@ export default function FiltersForm({
                     ))}
                 </CollapsibleList>
               </SummaryListItem>
-
-              {orderedFilters
+              {standardFilters
                 .filter(([groupKey]) => !!values.filters[groupKey])
                 .map(([filterGroupKey, filterGroup]) => (
                   <SummaryListItem

@@ -8,15 +8,12 @@ import releaseDataFileService, {
   ArchiveDataSetFile,
   DataFile,
   DataFileImportStatus,
-  DeleteDataFilePlan,
 } from '@admin/services/releaseDataFileService';
 import Button from '@common/components/Button';
 import InsetText from '@common/components/InsetText';
 import LoadingSpinner from '@common/components/LoadingSpinner';
-import ModalConfirm from '@common/components/ModalConfirm';
 import WarningMessage from '@common/components/WarningMessage';
 import useToggle from '@common/hooks/useToggle';
-import logger from '@common/services/logger';
 import { useQuery } from '@tanstack/react-query';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import BulkZipUploadModalConfirm from './BulkZipUploadModalConfirm';
@@ -29,18 +26,12 @@ interface Props {
   onDataFilesChange?: (dataFiles: DataFile[]) => void;
 }
 
-interface DeleteDataFile {
-  plan: DeleteDataFilePlan;
-  file: DataFile;
-}
-
 export default function ReleaseDataUploadsSection({
   publicationId,
   releaseVersionId,
   canUpdateRelease,
   onDataFilesChange,
 }: Props) {
-  const [deleteDataFile, setDeleteDataFile] = useState<DeleteDataFile>();
   const [allDataFiles, setAllDataFiles] = useState<DataFile[]>([]);
   const [bulkUploadPlan, setBulkUploadPlan] = useState<ArchiveDataSetFile[]>();
   const [isReordering, toggleReordering] = useToggle(false);
@@ -69,19 +60,6 @@ export default function ReleaseDataUploadsSection({
   const dataFiles = useMemo(
     () => allDataFiles.filter(dataFile => !dataFile.replacedBy),
     [allDataFiles],
-  );
-
-  const setFileDeleting = useCallback(
-    (dataFile: DeleteDataFile, deleting: boolean) => {
-      setAllDataFiles(files =>
-        files.map(file =>
-          file.fileName !== dataFile.file.fileName
-            ? file
-            : { ...file, isDeleting: deleting },
-        ),
-      );
-    },
-    [],
   );
 
   const confirmBulkUploadPlan = useCallback(
@@ -128,43 +106,10 @@ export default function ReleaseDataUploadsSection({
     [releaseVersionId],
   );
 
-  const handleDeleteFile = useCallback(
-    async (dataFile: DataFile) => {
-      setDeleteDataFile({
-        plan: await releaseDataFileService.getDeleteDataFilePlan(
-          releaseVersionId,
-          dataFile,
-        ),
-        file: dataFile,
-      });
-    },
-    [releaseVersionId],
-  );
-
-  const handleDeleteConfirm = useCallback(async () => {
-    if (!deleteDataFile) {
-      return;
-    }
-
-    const { file } = deleteDataFile;
-
-    setDeleteDataFile(undefined);
-    setFileDeleting(deleteDataFile, true);
-
-    try {
-      await releaseDataFileService.deleteDataFiles(releaseVersionId, file.id);
-
-      setAllDataFiles(files =>
-        files.filter(dataFile => dataFile.id !== file.id),
-      );
-    } catch (err) {
-      logger.error(err);
-      setFileDeleting(deleteDataFile, false);
-    }
-  }, [deleteDataFile, releaseVersionId, setFileDeleting]);
-
-  const handleDeleteExit = useCallback(() => {
-    setDeleteDataFile(undefined);
+  const handleDeleteConfirm = useCallback(async (deletedFileId: string) => {
+    setAllDataFiles(files =>
+      files.filter(dataFile => dataFile.id !== deletedFileId),
+    );
   }, []);
 
   const handleSubmit = useCallback(
@@ -307,7 +252,7 @@ export default function ReleaseDataUploadsSection({
                     publicationId={publicationId}
                     releaseVersionId={releaseVersionId}
                     testId="Data file replacements table"
-                    onDeleteFile={handleDeleteFile}
+                    onDeleteFile={handleDeleteConfirm}
                     onStatusChange={handleStatusChange}
                   />
                 )}
@@ -320,7 +265,7 @@ export default function ReleaseDataUploadsSection({
                     publicationId={publicationId}
                     releaseVersionId={releaseVersionId}
                     testId="Data files table"
-                    onDeleteFile={handleDeleteFile}
+                    onDeleteFile={handleDeleteConfirm}
                     onStatusChange={handleStatusChange}
                   />
                 )}
@@ -331,95 +276,6 @@ export default function ReleaseDataUploadsSection({
           <InsetText>No data files have been uploaded.</InsetText>
         )}
       </LoadingSpinner>
-
-      {deleteDataFile && (
-        <DeleteDataFileModal
-          file={deleteDataFile.file}
-          plan={deleteDataFile.plan}
-          onConfirm={handleDeleteConfirm}
-          onExit={handleDeleteExit}
-        />
-      )}
     </>
-  );
-}
-
-interface DeleteDataFileModalProps {
-  file: DataFile;
-  plan: DeleteDataFilePlan;
-  onConfirm: () => void;
-  onExit: () => void;
-}
-
-function DeleteDataFileModal({
-  file,
-  plan,
-  onConfirm,
-  onExit,
-}: DeleteDataFileModalProps) {
-  return (
-    <ModalConfirm
-      open
-      title="Confirm deletion of selected data files"
-      onExit={onExit}
-      onConfirm={onConfirm}
-    >
-      <p>
-        Are you sure you want to delete <strong>{file.title}</strong>?
-      </p>
-      <p>This data will no longer be available for use in this release.</p>
-
-      {plan.deleteDataBlockPlan.dependentDataBlocks.length > 0 && (
-        <>
-          <p>The following data blocks will also be deleted:</p>
-
-          <ul>
-            {plan.deleteDataBlockPlan.dependentDataBlocks.map(block => (
-              <li key={block.name}>
-                <p>{block.name}</p>
-
-                {block.contentSectionHeading && (
-                  <p>
-                    It will also be removed from the "
-                    {block.contentSectionHeading}" content section.
-                  </p>
-                )}
-                {block.infographicFilesInfo.length > 0 && (
-                  <p>
-                    The following infographic files will also be removed:
-                    <ul>
-                      {block.infographicFilesInfo.map(fileInfo => (
-                        <li key={fileInfo.filename}>
-                          <p>{fileInfo.filename}</p>
-                        </li>
-                      ))}
-                    </ul>
-                  </p>
-                )}
-                {block.isKeyStatistic && (
-                  <p>
-                    A key statistic associated with this data block will be
-                    removed.
-                  </p>
-                )}
-                {block.featuredTable && (
-                  <p>
-                    The featured table "{block.featuredTable.name}" using this
-                    data block will be removed.
-                  </p>
-                )}
-              </li>
-            ))}
-          </ul>
-        </>
-      )}
-      {plan.footnoteIds.length > 0 && (
-        <p>
-          {`${plan.footnoteIds.length} ${
-            plan.footnoteIds.length > 1 ? 'footnotes' : 'footnote'
-          } will be removed or updated.`}
-        </p>
-      )}
-    </ModalConfirm>
   );
 }

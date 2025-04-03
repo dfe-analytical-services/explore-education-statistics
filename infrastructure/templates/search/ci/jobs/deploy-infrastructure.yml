@@ -8,7 +8,7 @@ parameters:
 
 jobs:
   - deployment: DeploySearchInfrastructure
-    displayName: Deploy search infrastructure
+    displayName: Deploy Search Infrastructure
     environment: ${{ parameters.environment }}
     variables:
       templateDirectory: $(Build.SourcesDirectory)/infrastructure/templates/search
@@ -20,6 +20,7 @@ jobs:
         deploy:
           steps:
             - checkout: self
+            - download: none
 
             - task: AzureCLI@2
               displayName: Install Bicep
@@ -35,6 +36,9 @@ jobs:
                 action: validate
                 serviceConnection: ${{ parameters.serviceConnection }}
                 parameterFile: $(paramFile)
+                deployAlerts: false
+                deploySearchConfig: false
+                githubSourceRef: $(Build.SourceBranch)
                 searchDocsFunctionAppExists: false
 
             - template: ../../../public-api/ci/tasks/check-function-app-exists.yml
@@ -50,4 +54,7 @@ jobs:
                 action: create
                 serviceConnection: ${{ parameters.serviceConnection }}
                 parameterFile: $(paramFile)
+                deployAlerts: $(deployAlerts)
+                deploySearchConfig: $(deploySearchConfig)
+                githubSourceRef: $(Build.SourceBranch)
                 searchDocsFunctionAppExists: $(searchDocsFunctionAppExists)

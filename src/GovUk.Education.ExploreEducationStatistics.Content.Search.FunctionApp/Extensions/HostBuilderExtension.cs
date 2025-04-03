@@ -1,6 +1,7 @@
 ﻿using Azure.Identity;
 using Azure.Storage.Blobs;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Clients.AzureBlobStorage;
+using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Clients.AzureSearch;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Clients.ContentApi;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Options;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Services;
@@ -32,8 +33,10 @@ public static class HostBuilderExtension
                 services
                     .AddApplicationInsightsTelemetryWorkerService()
                     .ConfigureFunctionsApplicationInsights()
+                    .AddTransient<EventGridEventHandler>()
                     .Configure<AppOptions>(context.Configuration.GetSection(AppOptions.Section))
                     .Configure<ContentApiOptions>(context.Configuration.GetSection(ContentApiOptions.Section))
+                    .Configure<AzureSearchOptions>(context.Configuration.GetSection(AzureSearchOptions.Section))
                     .Configure<LoggerFilterOptions>(options =>
                     {
                         // The Application Insights SDK adds a default logging filter that instructs ILogger to capture
@@ -52,6 +55,8 @@ public static class HostBuilderExtension
                     .AddTransient<IContentApiClient, ContentApiClient>()
                     .AddTransient<IAzureBlobStorageClient, AzureBlobStorageClient>()
                     .AddTransient<ISearchableDocumentCreator, SearchableDocumentCreator>()
+                    .AddTransient<ISearchIndexClient, SearchIndexClient>()
+                    .AddTransient<IAzureSearchIndexerClientFactory, AzureSearchIndexerClientFactory>()
                     .AddHealthChecks()
                     .AddAzureClientsInline(
                         clientBuilder =>

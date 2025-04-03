@@ -1,0 +1,37 @@
+@import '~govuk-frontend/dist/govuk/base';
+
+.exportCloseButton {
+  margin-top: govuk-spacing(6);
+}
+
+.exportMenuList {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+}
+
+.exportMenu {
+  display: grid;
+  justify-content: flex-end;
+  margin: 0;
+  padding: govuk-spacing(2);
+  position: relative;
+
+  :global(.govuk-details__text) {
+    background: govuk-colour('white');
+    border: 2px solid govuk-colour('black');
+    border-top: 0;
+    position: absolute;
+    z-index: 2;
+    padding-right: govuk-spacing(4);
+    right: 0;
+  }
+}
+
+.exportMenu summary {
+  margin-left: auto;
+}
+
+.exportMenu button {
+  padding: govuk-spacing(1);
+}

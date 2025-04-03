@@ -38,7 +38,7 @@ public class DataBlockServicePermissionTests
                 {
                     var service = BuildService(
                         userService: userService.Object);
-                    return service.GetDataBlockTableResult(_releaseVersion.Id, _dataBlock.Id, null);
+                    return service.GetDataBlockTableResult(_releaseVersion.Id, _dataBlock.Id);
                 });
     }
 

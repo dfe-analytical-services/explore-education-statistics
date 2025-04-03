@@ -472,12 +472,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
                     }).ToList());
 
                 var hierarchy = Assert.Single(results);
-                Assert.Equal(filters[0].Id, hierarchy.RootFilterId);
-                Assert.Equal([filters[1].Id, filters[2].Id], hierarchy.ChildFilterIds);
-
-                Assert.Equal(
-                    [rootFilterItem0.Id, rootFilterItem1.Id],
-                    hierarchy.RootOptionIds);
+                Assert.Equal([filters[0].Id, filters[1].Id, filters[2].Id], hierarchy.FilterIds);
 
                 Assert.Equal(2, hierarchy.Tiers.Count);
 
@@ -613,10 +608,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
                 // hierarchy for root filter 0
                 var hierarchy0 = results[0];
 
-                Assert.Equal(filters[0].Id, hierarchy0.RootFilterId);
-                Assert.Equal([filters[1].Id], hierarchy0.ChildFilterIds);
-
-                Assert.Equal([rootFilter0Item0.Id], hierarchy0.RootOptionIds);
+                Assert.Equal([filters[0].Id, filters[1].Id], hierarchy0.FilterIds);
 
                 Assert.Single(hierarchy0.Tiers);
 
@@ -627,10 +619,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
                 // hierarchy for root filter 1
                 var hierarchy1 = results[1];
 
-                Assert.Equal(filters[2].Id, hierarchy1.RootFilterId);
-                Assert.Equal([filters[3].Id], hierarchy1.ChildFilterIds);
-
-                Assert.Equal([rootFilter1Item0.Id], hierarchy1.RootOptionIds);
+                Assert.Equal([filters[2].Id, filters[3].Id], hierarchy1.FilterIds);
 
                 Assert.Single(hierarchy1.Tiers);
 

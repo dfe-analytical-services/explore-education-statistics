@@ -1,8 +1,9 @@
 import redirectPages from '@frontend/middleware/pages/redirectPages';
 import chain from './middleware/pages/chain';
 import rewritePaths from './middleware/pages/rewritePaths';
+import noIndexPagesWithParams from './middleware/pages/noIndexPagesWithParams';
 
-export default chain([rewritePaths, redirectPages]);
+export default chain([rewritePaths, redirectPages, noIndexPagesWithParams]);
 
 // Only run the middleware on the specified paths below.
 // Ideally we'd just exclude build files and run it on all routes,
@@ -13,7 +14,7 @@ export const config = {
   matcher: [
     '/cookies/:path*',
     '/find-statistics/:path*/:path*',
-    '/data-tables',
+    '/data-tables/:path*/:path*',
     '/data-catalogue',
     '/data-catalogue/data-set/:dataSetFileId/csv',
     '/methodology/:path*',
