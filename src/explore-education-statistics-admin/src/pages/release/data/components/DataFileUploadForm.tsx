@@ -50,12 +50,13 @@ const fileErrorMappings = {
     'DataSetTitleShouldNotContainSpecialCharacters',
   DataSetTitleShouldBeUnique: 'DataTitleShouldBeUnique',
   DataAndMetaFilesCannotHaveSameName: 'DataAndMetaFilesCannotHaveSameName',
-  FilenameCannotContainSpacesOrSpecialCharacters:
-    'FilenameCannotContainSpacesOrSpecialCharacters',
-  FilenameMustEndDotCsv: 'FilenameMustEndDotCsv',
-  MetaFilenameMustEndDotMetaDotCsv: 'MetaFilenameMustEndDotMetaDotCsv',
+  FileNameCannotContainSpaces: 'FileNameCannotContainSpaces',
+  FileNameCannotContainSpecialCharacters:
+    'FileNameCannotContainSpecialCharacters',
+  FileNameMustEndDotCsv: 'FileNameMustEndDotCsv',
+  MetaFileNameMustEndDotMetaDotCsv: 'MetaFileNameMustEndDotMetaDotCsv',
   FileNameTooLong: 'FileNameTooLong',
-  FilenameNotUnique: 'FilenameNotUnique',
+  FileNameNotUnique: 'FileNameNotUnique',
   FileSizeMustNotBeZero: 'FileSizeMustNotBeZero',
   MustBeCsvFile: 'MustBeCsvFile',
   CannotReplaceDataSetWithApiDataSet: 'CannotReplaceDataSetWithApiDataSet',
@@ -70,7 +71,7 @@ function baseErrorMappings(
         target: 'bulkZipFile' as FieldName<DataFileUploadFormValues>,
         messages: {
           ...fileErrorMappings,
-          ZipFilenameMustEndDotZip: 'ZipFilenameMustEndDotZip',
+          ZipFileNameMustEndDotZip: 'ZipFileNameMustEndDotZip',
           MustBeZipFile: 'MustBeZipFile',
           BulkDataZipMustContainDataSetNamesCsv:
             'BulkDataZipMustContainDataSetNamesCsv',
