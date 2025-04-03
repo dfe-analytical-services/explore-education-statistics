@@ -14,7 +14,6 @@ import _dataBlockService, {
 } from '@admin/services/dataBlockService';
 import _permissionService from '@admin/services/permissionService';
 import render from '@common-test/render';
-import { RefContextProvider } from '@common/contexts/RefContext';
 import { Chart } from '@common/modules/charts/types/chart';
 import _tableBuilderService, {
   Subject,
@@ -542,27 +541,25 @@ describe('ReleaseDataBlockEditPage', () => {
 
   const renderPage = () => {
     return render(
-      <RefContextProvider>
-        <TestConfigContextProvider>
-          <MemoryRouter
-            initialEntries={[
-              generatePath<ReleaseDataBlockRouteParams>(
-                releaseDataBlockEditRoute.path,
-                {
-                  publicationId: 'publication-1',
-                  releaseVersionId: 'release-1',
-                  dataBlockId: 'block-1',
-                },
-              ),
-            ]}
-          >
-            <Route
-              path={releaseDataBlockEditRoute.path}
-              component={ReleaseDataBlockEditPage}
-            />
-          </MemoryRouter>
-        </TestConfigContextProvider>
-      </RefContextProvider>,
+      <TestConfigContextProvider>
+        <MemoryRouter
+          initialEntries={[
+            generatePath<ReleaseDataBlockRouteParams>(
+              releaseDataBlockEditRoute.path,
+              {
+                publicationId: 'publication-1',
+                releaseVersionId: 'release-1',
+                dataBlockId: 'block-1',
+              },
+            ),
+          ]}
+        >
+          <Route
+            path={releaseDataBlockEditRoute.path}
+            component={ReleaseDataBlockEditPage}
+          />
+        </MemoryRouter>
+      </TestConfigContextProvider>,
     );
   };
 });

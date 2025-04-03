@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React, { RefObject, useCallback } from 'react';
 import downloadFile from '@common/utils/file/downloadFile';
 import logger from '@common/services/logger';
 import useCurrentPng from '@common/components/ChartsToPNG';
@@ -6,11 +6,12 @@ import ButtonText from '@common/components/ButtonText';
 import ExportMenu from '@common/components/ExportMenu';
 
 interface Props {
+  chartRef: RefObject<HTMLElement>;
   chartTitle?: string | undefined;
 }
 
-export default function ChartExportMenu({ chartTitle }: Props) {
-  const [getClipboardPng] = useCurrentPng();
+export default function ChartExportMenu({ chartRef, chartTitle }: Props) {
+  const [getClipboardPng] = useCurrentPng({ ref: chartRef });
 
   const handlePngDownload = useCallback(async () => {
     const png = await getClipboardPng();

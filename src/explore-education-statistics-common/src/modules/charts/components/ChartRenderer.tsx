@@ -1,6 +1,5 @@
 import ChartExportMenu from '@common/modules/charts/components/ChartExportMenu';
 import FigureFootnotes from '@common/components/FigureFootnotes';
-import { useRefContext } from '@common/contexts/RefContext';
 import HorizontalBarBlock, {
   HorizontalBarProps,
 } from '@common/modules/charts/components/HorizontalBarBlock';
@@ -16,7 +15,7 @@ import MapBlock, {
 import VerticalBarBlock, {
   VerticalBarProps,
 } from '@common/modules/charts/components/VerticalBarBlock';
-import React, { memo, useMemo, useState } from 'react';
+import React, { memo, useMemo, useRef, useState } from 'react';
 import getMapInitialBoundaryLevel from './utils/getMapInitialBoundaryLevel';
 
 type HorizontalBarRendererProps = {
@@ -58,7 +57,7 @@ function ChartRenderer({ source, id, chart }: ChartRendererProps) {
     type === 'map' ? getMapInitialBoundaryLevel(chart) : undefined,
   );
 
-  const chartExportRef = useRefContext();
+  const chartRef = useRef<HTMLElement>(null);
 
   const chartComponent = useMemo(() => {
     switch (type) {
@@ -117,9 +116,9 @@ function ChartRenderer({ source, id, chart }: ChartRendererProps) {
   if (data?.length && meta) {
     return (
       <>
-        <ChartExportMenu chartTitle={title} />
+        <ChartExportMenu chartRef={chartRef} chartTitle={title} />
         <figure
-          ref={chartExportRef}
+          ref={chartRef}
           className="govuk-!-margin-0"
           id={id}
           data-testid={id}

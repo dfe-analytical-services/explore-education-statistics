@@ -6,7 +6,6 @@ import LoadingSpinner from '@common/components/LoadingSpinner';
 import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
 import WarningMessage from '@common/components/WarningMessage';
-import { RefContextProvider } from '@common/contexts/RefContext';
 import ChartRenderer from '@common/modules/charts/components/ChartRenderer';
 import useDataBlock from '@common/modules/find-statistics/hooks/useDataBlock';
 import mapTableHeadersConfig from '@common/modules/table-tool/utils/mapTableHeadersConfig';
@@ -82,13 +81,11 @@ const DataBlockPageReadOnlyTabs = ({ releaseVersionId, dataBlock }: Props) => {
                   }
                 >
                   {chart && (
-                    <RefContextProvider>
-                      <ChartRenderer
-                        id={`dataBlockTabs-chart-${dataBlock.id}`}
-                        source={dataBlock.source}
-                        chart={chart}
-                      />
-                    </RefContextProvider>
+                    <ChartRenderer
+                      id={`dataBlockTabs-chart-${dataBlock.id}`}
+                      source={dataBlock.source}
+                      chart={chart}
+                    />
                   )}
                 </ErrorBoundary>
               </div>
