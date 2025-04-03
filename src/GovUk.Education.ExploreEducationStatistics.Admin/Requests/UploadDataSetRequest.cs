@@ -1,6 +1,5 @@
 #nullable enable
 using FluentValidation;
-using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using Microsoft.AspNetCore.Http;
@@ -37,7 +36,7 @@ public record UploadDataSetRequest
                 .NotEmpty()
                     .WithMessage(ValidationMessages.DataSetTitleCannotBeEmpty)
                 .MaximumLength(120)
-                    .WithMessage(ValidationMessages.DataSetTitleTooLong, "{PropertyValue}", "120");
+                    .WithMessage(ValidationMessages.DataSetTitleTooLong, "{PropertyValue}", "{MaxLength}");
 
             RuleFor(request => request.DataFile)
                 .Cascade(CascadeMode.Stop)
@@ -82,8 +81,8 @@ public record UploadDataSetAsZipRequest
                 .NotEmpty()
                     .WithMessage(ValidationMessages.DataSetTitleCannotBeEmpty)
                 .MaximumLength(120)
-                    .WithMessage(ValidationMessages.DataSetTitleTooLong, "{PropertyValue}", "120")
-                .Must(file => !DataSetValidatorService.ContainsSpecialChars(file))
+                    .WithMessage(ValidationMessages.DataSetTitleTooLong, "{PropertyValue}", "{MaxLength}")
+                .Must(FileNameValidators.DoesNotContainSpecialChars)
                     .WithMessage(ValidationMessages.DataSetTitleShouldNotContainSpecialCharacters, "{PropertyValue}");
 
             RuleFor(request => request.ZipFile)

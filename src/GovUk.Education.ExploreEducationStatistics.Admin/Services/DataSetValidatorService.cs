@@ -8,7 +8,6 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using static System.StringComparison;
@@ -111,23 +110,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return [];
         }
 
-        private static bool ContainsSpacesOrSpecialChars(string filename)
-        {
-            return filename.IndexOf(" ", Ordinal) > -1 ||
-                   ContainsSpecialChars(filename);
-        }
-
-        public static bool ContainsSpecialChars(string filename)
-        {
-            if (string.IsNullOrWhiteSpace(filename))
-            {
-                return false;
-            }
-
-            return filename.IndexOf("&", Ordinal) > -1 ||
-                   filename.IndexOfAny(Path.GetInvalidFileNameChars()) > -1;
-        }
-
         private bool IsFileExisting(
             Guid releaseVersionId,
             FileType type,
@@ -156,18 +138,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     Code = ValidationMessages.DataAndMetaFilesCannotHaveSameName.Code,
                     Message = ValidationMessages.DataAndMetaFilesCannotHaveSameName.Message,
                 });
-            }
-
-            if (ContainsSpacesOrSpecialChars(dataFileName))
-            {
-                errors.Add(ValidationMessages.GenerateErrorFilenameCannotContainSpacesOrSpecialCharacters(
-                    dataFileName));
-            }
-
-            if (ContainsSpacesOrSpecialChars(metaFileName))
-            {
-                errors.Add(ValidationMessages.GenerateErrorFilenameCannotContainSpacesOrSpecialCharacters(
-                    metaFileName));
             }
 
             // - Original uploads' data filename is not unique if a ReleaseFile exists with the same filename.
