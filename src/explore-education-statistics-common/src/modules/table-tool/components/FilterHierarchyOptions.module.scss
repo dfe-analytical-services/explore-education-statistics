@@ -1,0 +1,44 @@
+@import '~govuk-frontend/dist/govuk/base';
+
+.option {
+  display: block;
+  padding: 0.5rem 4px;
+
+  @include govuk-media-query($from: tablet) {
+    padding: 0.5rem !important;
+  }
+
+  &__expanded {
+    background: #f3f2f1;
+    margin-bottom: 1rem;
+  }
+}
+
+.detailsMenu {
+  margin-bottom: 0;
+
+  > summary {
+    margin-left: 44px;
+  }
+}
+
+.detailsMenu > div {
+  background: #fff !important;
+  box-shadow: inset 0 -3px 1px -1px #ccc;
+  padding: 0.5rem 0 0.5rem 4px !important;
+
+  @include govuk-media-query($from: tablet) {
+    box-shadow: none;
+    padding: 0.5rem !important;
+  }
+
+  > ul {
+    margin: 0;
+    padding: 0;
+  }
+}
+
+.checkbox {
+  padding-left: 0.5rem;
+  padding-bottom: 0.5rem;
+}
