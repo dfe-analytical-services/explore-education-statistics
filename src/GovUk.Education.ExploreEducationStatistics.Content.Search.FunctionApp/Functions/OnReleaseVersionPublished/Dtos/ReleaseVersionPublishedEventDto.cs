@@ -1,5 +1,4 @@
-﻿// ReSharper disable ClassNeverInstantiated.Global
-namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.OnReleaseVersionPublished.Dtos;
+﻿namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.OnReleaseVersionPublished.Dtos;
 
 public record ReleaseVersionPublishedEventDto
 {

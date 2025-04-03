@@ -14,8 +14,10 @@ public class RefreshSearchableDocumentFunction(ISearchableDocumentCreator search
         FunctionContext context)
     {
         if (string.IsNullOrEmpty(message.PublicationSlug))
+        {
             return [];
-        
+        }
+
         // Create Searchable Document
         var request = new CreatePublicationLatestReleaseSearchableDocumentRequest
         {

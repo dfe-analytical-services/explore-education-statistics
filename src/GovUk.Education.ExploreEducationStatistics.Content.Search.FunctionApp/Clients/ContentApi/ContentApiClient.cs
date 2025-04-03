@@ -123,11 +123,15 @@ internal class ContentApiClient(HttpClient httpClient) : IContentApiClient
             if (getResponse is GetResponse<PaginatedResultDto<TResponse>>.Success success)
             {
                 if (success.Result.Paging is null)
+                {
                     throw new GetPaginatedItemsException("Paginated response did not contain the expected page information.");
-                
+                }
+
                 if (success.Result.Results is null)
+                {
                     throw new GetPaginatedItemsException("Paginated response did not contain any data.");
-                        
+                }
+
                 items.AddRange(success.Result.Results);
                 morePagesToGet = success.Result.Paging.Page < success.Result.Paging.TotalPages;
                 page++;

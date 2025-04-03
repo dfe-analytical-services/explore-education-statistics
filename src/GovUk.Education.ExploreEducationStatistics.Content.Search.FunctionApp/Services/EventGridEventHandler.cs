@@ -11,7 +11,7 @@ public class EventGridEventHandler(ILogger<EventGridEventHandler> logger) : IEve
         EventGridEvent eventGridEvent,
         Func<TPayload, CancellationToken, Task<TResponse>> handler)
     {
-        logger.LogInformation("{FunctionName} triggered: {Request}", context.FunctionDefinition.Name, eventGridEvent);
+        logger.LogDebug("{FunctionName} triggered: {@EventGridEvent}", context.FunctionDefinition.Name, eventGridEvent);
         
         var payload = eventGridEvent.Data.ToObjectFromJson<TPayload>() 
                       ?? throw new Exception(
@@ -20,12 +20,12 @@ public class EventGridEventHandler(ILogger<EventGridEventHandler> logger) : IEve
         try
         {
             var response = await handler(payload, context.CancellationToken);
-            logger.LogInformation("{FunctionName} completed. {Response}", context.FunctionDefinition.Name, response);
+            logger.LogDebug("{FunctionName} completed. {Response}", context.FunctionDefinition.Name, response);
             return response;
         }
         catch (Exception e)
         {
-            logger.LogError(e, "{FunctionName} errored processing {Request}.", context.FunctionDefinition.Name, eventGridEvent);
+            logger.LogError(e, "{FunctionName} errored processing {@EventGridEvent}.", context.FunctionDefinition.Name, eventGridEvent);
             throw;
         }
     }
