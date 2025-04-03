@@ -870,7 +870,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                     .WithLabel("intermediate")
                     .WithSlug("2020-21-intermediate")
                     .WithRedirects([DataFixture.DefaultReleaseRedirect()
-                    .WithSlug("2020-21-final")])
+                        .WithSlug("2020-21-final")])
                     .WithPublication(publication);
 
                 await TestApp.AddTestData<ContentDbContext>(
@@ -905,7 +905,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                     .WithLabel("intermediate")
                     .WithSlug("2020-21-intermediate")
                     .WithRedirects([DataFixture.DefaultReleaseRedirect()
-                    .WithSlug("2020-21-final")])
+                        .WithSlug("2020-21-final")])
                     .WithPublication(DataFixture.DefaultPublication());
 
                 await TestApp.AddTestData<ContentDbContext>(
