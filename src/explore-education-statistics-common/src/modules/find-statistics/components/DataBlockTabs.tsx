@@ -123,6 +123,8 @@ const DataBlockTabs = ({
                   ref={dataTableRef}
                   footnotesHeadingHiddenText={`for ${dataBlock?.heading}`}
                   fullTable={fullTable}
+                  query={dataBlock.query}
+                  releaseVersionId={releaseVersionId}
                   source={dataBlock?.source}
                   tableHeadersConfig={
                     dataBlock.table.tableHeaders

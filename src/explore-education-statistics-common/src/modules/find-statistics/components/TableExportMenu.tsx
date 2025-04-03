@@ -3,6 +3,7 @@ import { Footnote } from '@common/services/types/footnotes';
 import downloadTableOdsFile from '@common/modules/table-tool/components/utils/downloadTableOdsFile';
 import { FullTable } from '@common/modules/table-tool/types/fullTable';
 import ExportMenu from '@common/components/ExportMenu';
+import downloadFile from '@common/utils/file/downloadFile';
 import React, { RefObject } from 'react';
 
 interface Props {
@@ -11,14 +12,16 @@ interface Props {
   fullTable?: FullTable;
   tableRef: RefObject<HTMLElement>;
   title?: string | undefined;
+  onCsvDownload: () => Blob | Promise<Blob>;
 }
 
-export default function ExportTableButton({
+export default function TableExportMenu({
   fileName,
   footnotes = [],
   fullTable,
   title,
   tableRef,
+  onCsvDownload,
 }: Props) {
   const tableFootnotes = fullTable
     ? fullTable.subjectMeta.footnotes
@@ -39,7 +42,7 @@ export default function ExportTableButton({
     navigator.clipboard.write([clipboardItem]);
   };
 
-  const exportToOds = () => {
+  const handleOdsDownload = () => {
     downloadTableOdsFile(
       fileName ?? 'table',
       tableFootnotes,
@@ -48,10 +51,22 @@ export default function ExportTableButton({
     );
   };
 
+  const handleCsvDownload = async () => {
+    const csv = await onCsvDownload();
+    downloadFile(csv, fileName);
+  };
+
   return (
     <ExportMenu title={title || 'table'}>
       <li role="menuitem">
-        <ButtonText onClick={exportToOds}>Download table as ODS</ButtonText>
+        <ButtonText onClick={handleOdsDownload}>
+          Download table as ODS
+        </ButtonText>
+      </li>
+      <li role="menuitem">
+        <ButtonText onClick={handleCsvDownload}>
+          Download table as CSV
+        </ButtonText>
       </li>
       <li role="menuitem">
         <ButtonText onClick={copyTableToClipboard}>
