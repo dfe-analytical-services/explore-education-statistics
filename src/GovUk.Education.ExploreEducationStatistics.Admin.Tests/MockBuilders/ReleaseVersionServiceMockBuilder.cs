@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 using System;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
@@ -12,11 +12,11 @@ public class ReleaseVersionServiceMockBuilder
     public IReleaseVersionService Build() => _mock.Object;
 
     public ReleaseVersionServiceMockBuilder WhereGetReleaseVersionReturns(
-        Guid releaseVersionId,
+        Guid? releaseVersionId = null,
         ReleaseVersionViewModel? releaseVersionViewModel = null)
     {
         _mock
-            .Setup(rvs => rvs.GetRelease(releaseVersionId))
+            .Setup(rvs => rvs.GetRelease(It.Is<Guid>(id => releaseVersionId == null || id == releaseVersionId)))
             .ReturnsAsync(releaseVersionViewModel ?? new ReleaseVersionViewModel());
         return this;
     }

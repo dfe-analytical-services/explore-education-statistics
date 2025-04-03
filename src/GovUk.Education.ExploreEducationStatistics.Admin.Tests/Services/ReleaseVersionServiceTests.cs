@@ -784,6 +784,48 @@ public abstract class ReleaseVersionServiceTests
 
             result.AssertBadRequest(ReleaseTypeInvalid);
         }
+
+        [Fact]
+        public async Task GivenReleaseVersionExists_AndIsFirstVersion_NewReleaseSlugIsValidated()
+        {
+            Release release = _dataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true)
+                .WithPublication(_dataFixture.DefaultPublication());
+
+            await using var context = InMemoryApplicationDbContext(Guid.NewGuid().ToString());
+            context.Releases.Add(release);
+            await context.SaveChangesAsync();
+
+            var dataSetVersionService = new DataSetVersionServiceMockBuilder();
+            var releaseSlugValidator = new ReleaseSlugValidatorMockBuilder();
+            var sut = BuildService(
+                context,
+                dataSetVersionService: dataSetVersionService.Build(),
+                releaseSlugValidator: releaseSlugValidator.Build());
+
+            var newLabel = "initial";
+
+            var request = new ReleaseVersionUpdateRequest
+            {
+                Year = release.Year,
+                TimePeriodCoverage = release.TimePeriodCoverage,
+                Label = newLabel,
+                Type = ReleaseType.OfficialStatistics
+            };
+
+            // ACT
+            await sut.UpdateReleaseVersion(release.Versions[0].Id, request);
+
+            // ASSERT
+            var expectedNewReleaseSlug = NamingUtils.CreateReleaseSlug(
+                year: release.Year,
+                timePeriodCoverage: release.TimePeriodCoverage,
+                label: newLabel);
+
+            releaseSlugValidator.Assert.ValidateNewSlugWasCalled(
+                expectedNewReleaseSlug: expectedNewReleaseSlug,
+                expectedPublicationId: release.PublicationId,
+                expectedReleaseId: release.Id);
+        }
     }
 
     public class GetReleaseTests : ReleaseVersionServiceTests
