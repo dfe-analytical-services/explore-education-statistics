@@ -72,7 +72,6 @@ public static class HostBuilderExtension
                                 });
                             clientBuilder.UseCredential(new DefaultAzureCredential());
                         })
-                    .AddTransient<IContentApiClient, ContentApiClient>()
                     .AddHttpClient<IContentApiClient, ContentApiClient>(
                         (provider, httpClient) =>
                         {
