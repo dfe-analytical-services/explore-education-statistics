@@ -47,5 +47,12 @@ public class LoggerMockBuilder<T>
             var infosWithMessage = infos.Where(l => l.Message.Contains(message));
             Xunit.Assert.NotEmpty(infosWithMessage);
         }
+        
+        public void LoggedDebugContains(string message)
+        {
+            var infos = logItems.Where(l => l.LogLevel == LogLevel.Debug);
+            var infosWithMessage = infos.Where(l => l.Message.Contains(message));
+            Xunit.Assert.NotEmpty(infosWithMessage);
+        }
     }
 }

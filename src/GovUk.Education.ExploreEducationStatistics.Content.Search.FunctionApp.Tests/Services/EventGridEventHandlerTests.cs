@@ -77,7 +77,7 @@ public class EventGridEventHandlerTests
         await sut.Handle<MockPayloadRecord, MockResponse>(_functionContextMockBuilder.Build(), _eventGridEventBuilder.Build(), Handler);
         
         // ASSERT
-        _loggerMockBuilder.Assert.LoggedInfoContains("FUNCTION_NAME_123");
+        _loggerMockBuilder.Assert.LoggedDebugContains("FUNCTION_NAME_123");
     }
 
     [Fact]
