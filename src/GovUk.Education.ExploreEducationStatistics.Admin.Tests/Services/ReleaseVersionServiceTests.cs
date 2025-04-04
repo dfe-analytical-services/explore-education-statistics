@@ -10,6 +10,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Public.Data;
+using GovUk.Education.ExploreEducationStatistics.Admin.Tests.MockBuilders;
 using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using GovUk.Education.ExploreEducationStatistics.Admin.Validators.ErrorDetails;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
@@ -737,7 +738,21 @@ public abstract class ReleaseVersionServiceTests
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                var releaseVersionService = BuildService(context);
+                var expectedUpdatedReleaseSlug = NamingUtils.CreateReleaseSlug(
+                    year: otherRelease.Year, 
+                    timePeriodCoverage: otherRelease.TimePeriodCoverage, 
+                    label: null);
+
+                var releaseSlugValidator = new ReleaseSlugValidatorMockBuilder()
+                    .SetValidationToFail(
+                        validationErrorMessage: SlugNotUnique, 
+                        releaseSlug: expectedUpdatedReleaseSlug, 
+                        publicationId: publication.Id, 
+                        releaseId: releaseVersion.ReleaseId);
+
+                var releaseVersionService = BuildService(
+                    contentDbContext: context,
+                    releaseSlugValidator: releaseSlugValidator.Build());
 
                 var result = await releaseVersionService
                     .UpdateReleaseVersion(
@@ -768,6 +783,48 @@ public abstract class ReleaseVersionServiceTests
             var result = await releaseVersionService.UpdateReleaseVersion(It.IsAny<Guid>(), releaseUpdateRequest);
 
             result.AssertBadRequest(ReleaseTypeInvalid);
+        }
+
+        [Fact]
+        public async Task GivenReleaseVersionExists_AndIsFirstVersion_NewReleaseSlugIsValidated()
+        {
+            Release release = _dataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true)
+                .WithPublication(_dataFixture.DefaultPublication());
+
+            await using var context = InMemoryApplicationDbContext(Guid.NewGuid().ToString());
+            context.Releases.Add(release);
+            await context.SaveChangesAsync();
+
+            var dataSetVersionService = new DataSetVersionServiceMockBuilder();
+            var releaseSlugValidator = new ReleaseSlugValidatorMockBuilder();
+            var sut = BuildService(
+                context,
+                dataSetVersionService: dataSetVersionService.Build(),
+                releaseSlugValidator: releaseSlugValidator.Build());
+
+            var newLabel = "initial";
+
+            var request = new ReleaseVersionUpdateRequest
+            {
+                Year = release.Year,
+                TimePeriodCoverage = release.TimePeriodCoverage,
+                Label = newLabel,
+                Type = ReleaseType.OfficialStatistics
+            };
+
+            // ACT
+            await sut.UpdateReleaseVersion(release.Versions[0].Id, request);
+
+            // ASSERT
+            var expectedNewReleaseSlug = NamingUtils.CreateReleaseSlug(
+                year: release.Year,
+                timePeriodCoverage: release.TimePeriodCoverage,
+                label: newLabel);
+
+            releaseSlugValidator.Assert.ValidateNewSlugWasCalled(
+                expectedNewReleaseSlug: expectedNewReleaseSlug,
+                expectedPublicationId: release.PublicationId,
+                expectedReleaseId: release.Id);
         }
     }
 
@@ -2336,7 +2393,8 @@ public abstract class ReleaseVersionServiceTests
         IReleaseSubjectRepository? releaseSubjectRepository = null,
         IDataSetVersionService? dataSetVersionService = null,
         IProcessorClient? processorClient = null,
-        IPrivateBlobCacheService? privateCacheService = null)
+        IPrivateBlobCacheService? privateCacheService = null,
+        IReleaseSlugValidator? releaseSlugValidator = null)
     {
         var userService = AlwaysTrueUserService();
 
@@ -2362,7 +2420,8 @@ public abstract class ReleaseVersionServiceTests
             releaseSubjectRepository ?? Mock.Of<IReleaseSubjectRepository>(Strict),
             dataSetVersionService ?? Mock.Of<IDataSetVersionService>(Strict),
             processorClient ?? Mock.Of<IProcessorClient>(Strict),
-            privateCacheService ?? Mock.Of<IPrivateBlobCacheService>(Strict)
+            privateCacheService ?? Mock.Of<IPrivateBlobCacheService>(Strict),
+            releaseSlugValidator ?? new ReleaseSlugValidatorMockBuilder().Build()
         );
     }
 }
