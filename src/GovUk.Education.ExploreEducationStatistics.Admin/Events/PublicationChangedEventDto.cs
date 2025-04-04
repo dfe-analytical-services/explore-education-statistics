@@ -24,7 +24,7 @@ public record PublicationChangedEventDto
     public const string EventTopicOptionsKey = "PublicationChangedEvent";
 
     /// <summary>
-    /// The ThemeId is the subject
+    /// The PublicationId is the subject
     /// </summary>
     public string Subject { get; }
 
