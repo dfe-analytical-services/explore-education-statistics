@@ -1,30 +1,30 @@
-using Azure.Messaging.EventGrid;
+﻿using Azure.Messaging.EventGrid;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Events;
 
-public record ThemeChangedEventDto
+public record PublicationChangedEventDto
 {
-    public ThemeChangedEventDto(Theme theme)
+    public PublicationChangedEventDto(Publication publication)
     {
-        Subject = theme.Id.ToString();
+        Subject = publication.Id.ToString();
         Payload = new EventPayload
         {
-            Title = theme.Title,
-            Summary = theme.Summary,
-            Slug = theme.Slug
+            Title = publication.Title,
+            Summary = publication.Summary,
+            Slug = publication.Slug
         };
     }
 
     // Changes to this event should also increment the version accordingly.
     private const string DataVersion = "1.0";
-    private const string EventType = "theme-changed";
+    private const string EventType = "publication-changed";
     
     // Which Topic endpoint to use from the appsettings
-    public const string EventTopicOptionsKey = "ThemeChangedEvent";
+    public const string EventTopicOptionsKey = "PublicationChangedEvent";
 
     /// <summary>
-    /// The ThemeId is the subject
+    /// The PublicationId is the subject
     /// </summary>
     public string Subject { get; }
 

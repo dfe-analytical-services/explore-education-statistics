@@ -21,7 +21,7 @@ public record ReleaseSlugChangedEventDto
     private const string EventType = "release-slug-changed";
     
     // Which Topic endpoint to use from the appsettings
-    public const string EventTopicOptionsKey = "ReleaseChangesEvent";
+    public const string EventTopicOptionsKey = "ReleaseChangedEvent";
 
     /// <summary>
     /// The ThemeId is the subject

@@ -10,7 +10,7 @@ public record ReleaseVersionPublishedEventDto(Guid ReleaseVersionId, ReleaseVers
     public const string EventType = "release-version-published";
     
     // Which Topic endpoint to use from the appsettings
-    public const string EventTopicOptionsKey = "ReleaseVersionChangesEvent";
+    public const string EventTopicOptionsKey = "ReleaseVersionChangedEvent";
     
     /// <summary>
     /// The ReleaseVersionId is the subject
