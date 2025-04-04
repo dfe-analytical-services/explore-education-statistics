@@ -48,6 +48,9 @@ param applicationInsightsConnectionString string = ''
 @description('Specifies whether or not the Search Docs Function App already exists.')
 param functionAppExists bool
 
+@description('The name of the queue that is used when a publication is changed.')
+param publicationChangedQueueName string = 'publication-changed-queue'
+
 @description('The name of the queue that is used when a searchable document requires a refresh.')
 param refreshSearchableDocumentQueueName string = 'refresh-searchable-document-queue'
 
@@ -135,6 +138,10 @@ module functionAppModule '../../common/components/functionApp.bicep' = {
         value: contentApiUrl
       }
       {
+        name: 'PublicationChangedQueueName'
+        value: publicationChangedQueueName
+      }
+      {
         name: 'RefreshSearchableDocumentQueueName'
         value: refreshSearchableDocumentQueueName
       }
@@ -207,6 +214,7 @@ module functionAppStorageAccountQueueServiceModule '../../common/components/queu
   params: {
     storageAccountName: functionAppStorageAccountName
     queueNames: [
+      publicationChangedQueueName
       refreshSearchableDocumentQueueName
       releaseSlugChangedQueueName
       releaseVersionPublishedQueueName
