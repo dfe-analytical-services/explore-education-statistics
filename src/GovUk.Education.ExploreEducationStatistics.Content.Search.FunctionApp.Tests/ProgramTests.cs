@@ -248,66 +248,26 @@ public class ProgramTests
         
         public class ResolveFunctionTests : ProgramTests
         {
-            [Fact]
-            public void Can_resolve_OnReleaseSlugChangedFunction()
+            public static TheoryData<Type> GetAzureFunctionTypes()
             {
-                // ARRANGE
-                var sut = GetSut();
-            
-                // ACT
-                var actual = ActivatorUtilities.CreateInstance<OnReleaseSlugChangedFunction>(sut.Services);
-            
-                // ASSERT
-                Assert.NotNull(actual);
-            }
-            
-            [Fact]
-            public void Can_resolve_OnReleaseVersionPublishedFunction()
-            {
-                // ARRANGE
-                var sut = GetSut();
-            
-                // ACT
-                var actual = ActivatorUtilities.CreateInstance<OnReleaseVersionPublishedFunction>(sut.Services);
-            
-                // ASSERT
-                Assert.NotNull(actual);
-            }
-            
-            [Fact]
-            public void Can_resolve_OnThemeUpdatedFunction()
-            {
-                // ARRANGE
-                var sut = GetSut();
-            
-                // ACT
-                var actual = ActivatorUtilities.CreateInstance<OnThemeUpdatedFunction>(sut.Services);
-            
-                // ASSERT
-                Assert.NotNull(actual);
+                var types = typeof(Program)
+                    .Assembly
+                    .GetTypes()
+                    .Where(type => type.Namespace?.StartsWith("GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.") == true)
+                    .Where(type => type.Name.EndsWith("Function"));
+                
+                return new TheoryData<Type>(types);
             }
 
-            [Fact]
-            public void Can_resolve_RefreshSearchableDocumentFunction()
+            [Theory]
+            [MemberData(nameof(GetAzureFunctionTypes))]
+            public void Can_resolve_AzureFunction(Type functionType)
             {
                 // ARRANGE
                 var sut = GetSut();
             
                 // ACT
-                var actual = ActivatorUtilities.CreateInstance<RefreshSearchableDocumentFunction>(sut.Services);
-            
-                // ASSERT
-                Assert.NotNull(actual);
-            }
-
-            [Fact]
-            public void Can_resolve_ReindexSearchableDocumentFunction()
-            {
-                // ARRANGE
-                var sut = GetSut();
-            
-                // ACT
-                var actual = ActivatorUtilities.CreateInstance<ReindexSearchableDocumentsFunction>(sut.Services);
+                var actual = ActivatorUtilities.CreateInstance(sut.Services, functionType);
             
                 // ASSERT
                 Assert.NotNull(actual);
