@@ -28,14 +28,20 @@ public class QueryAnalyticsWriter(
 
         var directory = analyticsPathResolver.PublicApiQueriesDirectoryPath();
 
+        var filename = $"{DateTime.UtcNow:yyyyMMdd-HHmmss-fffffff}_{request.DataSetVersionId}.json";
+
         try
         {
             Directory.CreateDirectory(directory);
 
-            var filename = $"{DateTime.UtcNow:yyyyMMdd-HHmmss-fff}_{request.DataSetVersionId}.json";
+            var filePath = Path.Combine(directory, filename);
+            if (File.Exists(filePath))
+            {
+                throw new Exception($"Tried to create a file that already exists for {nameof(CaptureDataSetVersionQueryRequest)}!");
+            }
 
             await File.WriteAllTextAsync(
-                Path.Combine(directory, filename),
+                filePath,
                 contents: serialisedRequest);
         }
         catch (Exception e)

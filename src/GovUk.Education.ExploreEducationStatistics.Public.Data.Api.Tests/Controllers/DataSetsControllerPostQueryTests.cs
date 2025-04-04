@@ -30,7 +30,8 @@ using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockU
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Controllers;
 
-public abstract class DataSetsControllerPostQueryTests(TestApplicationFactory testApp) : IntegrationTestFixture(testApp)
+public abstract class DataSetsControllerPostQueryTests(TestApplicationFactory testApp)
+    : IntegrationTestFixture(testApp), IDisposable
 {
     private const string BaseUrl = "v1/data-sets";
 
@@ -40,6 +41,14 @@ public abstract class DataSetsControllerPostQueryTests(TestApplicationFactory te
     };
 
     private readonly TestAnalyticsPathResolver _analyticsPathResolver = new();
+
+    public void Dispose()
+    {
+        if (Directory.Exists(_analyticsPathResolver.BasePath()))
+        {
+            Directory.Delete(_analyticsPathResolver.BasePath(), recursive: true);
+        }
+    }
 
     public class AccessTests(TestApplicationFactory testApp) : DataSetsControllerPostQueryTests(testApp)
     {

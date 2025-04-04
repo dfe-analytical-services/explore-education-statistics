@@ -10,7 +10,7 @@ using Xunit;
 
 namespace GovUk.Education.ExploreEducationStatistics.Analytics.Consumer.Tests.Functions;
 
-public abstract class ConsumePublicApiQueriesFunctionTests
+public abstract class ConsumePublicApiQueriesFunctionTests : IDisposable
 {
     private readonly string _queryResourcesPath = Path.Combine(
         Assembly.GetExecutingAssembly().GetDirectoryPath(),
@@ -18,7 +18,15 @@ public abstract class ConsumePublicApiQueriesFunctionTests
         "PublicApiQueries");
 
     private readonly TestAnalyticsPathResolver _pathResolver = new();
-    
+
+    public void Dispose()
+    {
+        if (Directory.Exists(_pathResolver.BasePath()))
+        {
+            Directory.Delete(_pathResolver.BasePath(), recursive: true);
+        }
+    }
+
     public class FunctionTests : ConsumePublicApiQueriesFunctionTests
     {
         [Fact]

@@ -74,6 +74,7 @@ const DownloadTable = ({
           <Form
             id="downloadTableForm"
             onSubmit={async ({ fileFormat }) => {
+              // TODO EES-5852 record analytics for table tool/permalink csv/ods downloads
               await onSubmit?.(fileFormat);
 
               if (fileFormat === 'csv') {

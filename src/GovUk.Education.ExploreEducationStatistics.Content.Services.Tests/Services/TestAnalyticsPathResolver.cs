@@ -1,6 +1,8 @@
-using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services.Interfaces;
+using System;
+using System.IO;
+using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
 
-namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Services;
+namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests.Services;
 
 public class TestAnalyticsPathResolver : IAnalyticsPathResolver
 {
@@ -15,8 +17,8 @@ public class TestAnalyticsPathResolver : IAnalyticsPathResolver
         return _basePath;
     }
 
-    public string PublicApiQueriesDirectoryPath()
+    public string PublicZipDownloadsDirectoryPath()
     {
-        return Path.Combine(_basePath, "PublicApiQueries");
+        return Path.Combine(_basePath, "PublicZipDownloads");
     }
 }

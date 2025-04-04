@@ -188,7 +188,6 @@ public class ReleaseControllerCachingTests : CacheServiceTestFixture
             methodologyCacheService ?? Mock.Of<IMethodologyCacheService>(Strict),
             publicationCacheService ?? Mock.Of<IPublicationCacheService>(Strict),
             releaseCacheService ?? Mock.Of<IReleaseCacheService>(Strict),
-            releaseService ?? Mock.Of<IReleaseService>(Strict)
-        );
+            releaseService ?? Mock.Of<IReleaseService>(Strict));
     }
 }

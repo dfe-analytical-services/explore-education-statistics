@@ -3,6 +3,7 @@
   "Values": {
     "AzureWebJobsStorage": "UseDevelopmentStorage=true;DevelopmentStorageProxyUri=http://data-storage",
     "FUNCTIONS_WORKER_RUNTIME": "dotnet-isolated",
-    "App:ConsumePublicApiQueriesCronSchedule": "30 * * * * *"
+    "App:ConsumePublicApiQueriesCronSchedule": "30 * * * * *",
+    "App:ConsumePublicZipDownloadsCronSchedule": "45 * * * * *"
   }
 }

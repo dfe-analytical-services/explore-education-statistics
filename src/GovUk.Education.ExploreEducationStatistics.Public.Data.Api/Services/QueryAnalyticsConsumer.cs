@@ -1,4 +1,3 @@
-using System.Threading.Channels;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services.Interfaces;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services;

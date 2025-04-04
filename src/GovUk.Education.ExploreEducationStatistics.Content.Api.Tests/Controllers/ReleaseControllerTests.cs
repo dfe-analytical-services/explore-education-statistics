@@ -507,10 +507,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
                 methodologyCacheService ?? Mock.Of<IMethodologyCacheService>(MockBehavior.Strict),
                 publicationCacheService ?? Mock.Of<IPublicationCacheService>(MockBehavior.Strict),
                 releaseCacheService ?? Mock.Of<IReleaseCacheService>(MockBehavior.Strict),
-                releaseService ?? Mock.Of<IReleaseService>(MockBehavior.Strict)
-            );
+                releaseService ?? Mock.Of<IReleaseService>(MockBehavior.Strict));
         }
-        
+
         private void AssertAll(params IEnumerable<Action>[] assertions) => Assert.All(assertions.SelectMany(a => a), assertion => assertion());
     }
 }
