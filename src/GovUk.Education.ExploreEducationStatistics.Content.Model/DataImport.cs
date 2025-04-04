@@ -1,10 +1,10 @@
-﻿#nullable enable
-using System;
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
+#nullable enable
 using GovUk.Education.ExploreEducationStatistics.Common.Converters;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using Newtonsoft.Json;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.DataImportStatus;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Model
@@ -105,7 +105,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
     public enum DataImportStatus
     {
         QUEUED,
-        PROCESSING_ARCHIVE_FILE,
         STAGE_1, // Basic row validation
         STAGE_2, // Create locations and filters
         STAGE_3, // Import observations
@@ -131,7 +130,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
         public static readonly List<DataImportStatus> IncompleteStatuses =
         [
             QUEUED,
-            PROCESSING_ARCHIVE_FILE,
             STAGE_1,
             STAGE_2,
             STAGE_3,

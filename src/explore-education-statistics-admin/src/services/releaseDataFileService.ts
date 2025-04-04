@@ -50,6 +50,7 @@ export type UploadDataFilesRequest =
       metadataFile: File;
     }
   | {
+      title: string;
       replacingFileId: string;
       dataFile: File;
       metadataFile: File;
@@ -61,6 +62,7 @@ export type UploadZipDataFileRequest =
       zipFile: File;
     }
   | {
+      title: string;
       replacingFileId: string;
       zipFile: File;
     };
@@ -132,19 +134,15 @@ const releaseDataFileService = {
     releaseId: string,
     request: UploadDataFilesRequest,
   ): Promise<DataFile> {
-    const { dataFile, metadataFile, ...params } = request;
+    const { dataFile, metadataFile, title } = request;
 
     const data = new FormData();
-    data.append('file', dataFile);
+    data.append('releaseVersionId', releaseId);
+    data.append('title', title);
+    data.append('dataFile', dataFile);
     data.append('metaFile', metadataFile);
 
-    const file = await client.post<DataFileInfo>(
-      `/release/${releaseId}/data`,
-      data,
-      {
-        params,
-      },
-    );
+    const file = await client.post<DataFileInfo>(`/releaseVersions/data`, data);
 
     return mapFile(file);
   },
@@ -152,17 +150,16 @@ const releaseDataFileService = {
     releaseId: string,
     request: UploadZipDataFileRequest,
   ): Promise<DataFile> {
-    const { zipFile, ...params } = request;
+    const { zipFile, title } = request;
 
     const data = new FormData();
+    data.append('releaseVersionId', releaseId);
+    data.append('title', title);
     data.append('zipFile', zipFile);
 
     const file = await client.post<DataFileInfo>(
-      `/release/${releaseId}/zip-data`,
+      '/releaseVersions/zip-data',
       data,
-      {
-        params,
-      },
     );
 
     return mapFile(file);
@@ -172,10 +169,11 @@ const releaseDataFileService = {
     zipFile: File,
   ): Promise<ArchiveDataSetFile[]> {
     const data = new FormData();
+    data.append('releaseVersionId', releaseId);
     data.append('zipFile', zipFile);
 
     return client.post<ArchiveDataSetFile[]>(
-      `/release/${releaseId}/upload-bulk-zip-data`,
+      'releaseVersions/upload-bulk-zip-data',
       data,
     );
   },
