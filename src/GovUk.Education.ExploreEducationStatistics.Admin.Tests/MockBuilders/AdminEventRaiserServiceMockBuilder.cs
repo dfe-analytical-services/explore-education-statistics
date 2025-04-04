@@ -2,6 +2,7 @@
 using System;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Admin.Events;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using Moq;
@@ -57,7 +58,7 @@ public class AdminEventRaiserServiceMockBuilder
             mock.Verify(OnReleaseSlugChanged, Times.Never);
 
         public void OnPublicationChangedWasRaised(Publication? publication = null) =>
-            mock.Verify(m => m.OnPublicationChanged(It.Is<Publication>(p => publication == null || p == publication)), Times.Once);
+            mock.Verify(m => m.OnPublicationChanged(It.Is<Publication>(p => publication == null || new PublicationChangedEventDto(p) == new PublicationChangedEventDto(publication))), Times.Once);
 
         public void OnPublicationChangedWasNotRaised()=>
             mock.Verify(m => m.OnPublicationChanged(It.IsAny<Publication>()), Times.Never);
