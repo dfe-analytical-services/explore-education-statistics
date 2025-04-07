@@ -3090,10 +3090,11 @@ public class PublicationServiceTests
         var release2021 = publication.Releases.Single(r => r.Year == 2021);
         var release2022 = publication.Releases.Single(r => r.Year == 2022);
 
+        var originalLatestPublishedReleaseVersionId = release2022.Versions[1].Id;
         var expectedLatestPublishedReleaseVersionId = release2021.Versions[0].Id;
 
         // Check the publication's latest published release version in the generated test data setup
-        Assert.Equal(release2022.Versions[1].Id, publication.LatestPublishedReleaseVersionId);
+        Assert.Equal(originalLatestPublishedReleaseVersionId, publication.LatestPublishedReleaseVersionId);
 
         // Check the expected order of the release series items in the generated test data setup
         Assert.Equal(3, publication.ReleaseSeries.Count);
@@ -3171,7 +3172,9 @@ public class PublicationServiceTests
             Assert.Equal(expectedLatestPublishedReleaseVersionId,
                 actualPublication.LatestPublishedReleaseVersionId);
             
-            AssertOnPublicationChangedEventRaised(actualPublication);
+            AssertOnPublicationLatestPublishedReleaseVersionChangedWasRaised(
+                actualPublication,
+                originalLatestPublishedReleaseVersionId);
         }
     }
 
@@ -3194,10 +3197,11 @@ public class PublicationServiceTests
         var release2021 = publication.Releases.Single(r => r.Year == 2021);
         var release2022 = publication.Releases.Single(r => r.Year == 2022);
 
+        var originalLatestPublishedReleaseVersionId = release2022.Versions[1].Id;
         var expectedLatestPublishedReleaseVersionId = release2020.Versions[0].Id;
 
         // Check the publication's latest published release version in the generated test data setup
-        Assert.Equal(release2022.Versions[1].Id, publication.LatestPublishedReleaseVersionId);
+        Assert.Equal(originalLatestPublishedReleaseVersionId, publication.LatestPublishedReleaseVersionId);
 
         // Check the expected order of the release series items in the generated test data setup
         Assert.Equal(3, publication.ReleaseSeries.Count);
@@ -3275,7 +3279,9 @@ public class PublicationServiceTests
             Assert.Equal(expectedLatestPublishedReleaseVersionId,
                 actualPublication.LatestPublishedReleaseVersionId);
 
-            AssertOnPublicationChangedEventRaised(actualPublication);
+            AssertOnPublicationLatestPublishedReleaseVersionChangedWasRaised(
+                actualPublication,
+                originalLatestPublishedReleaseVersionId);
         }
     }
 
@@ -3494,6 +3500,13 @@ public class PublicationServiceTests
 
     private void AssertOnPublicationChangedEventRaised(Publication? publication = null) =>
         _adminEventRaiserServiceMockBuilder.Assert.OnPublicationChangedWasRaised(publication);
+    
+    private void AssertOnPublicationLatestPublishedReleaseVersionChangedWasRaised(
+        Publication? publication = null,
+        Guid? previousReleaseVersionId = null) =>
+        _adminEventRaiserServiceMockBuilder.Assert.OnPublicationLatestPublishedReleaseVersionChangedWasRaised(
+            publication,
+            previousReleaseVersionId);
     
     private void AssertOnPublicationChangedEventNotRaised() =>
         _adminEventRaiserServiceMockBuilder.Assert.OnPublicationChangedWasNotRaised();

@@ -62,5 +62,22 @@ public class AdminEventRaiserService(IConfiguredEventGridClientFactory eventGrid
         
         await client.SendEventAsync(eventDto.ToEventGridEvent());
     }
+    
+    /// <summary>
+    /// On Publication Latest Published Release Version changed
+    /// </summary>
+    public async Task OnPublicationLatestPublishedReleaseVersionChanged(Publication publication, Guid? previousReleaseVersionId)
+    {
+        if (!eventGridClientFactory.TryCreateClient(
+                PublicationLatestPublishedReleaseVersionChangedEventDto.EventTopicOptionsKey,
+                out var client))
+        {
+            return;
+        }
+
+        var eventDto = new PublicationLatestPublishedReleaseVersionChangedEventDto(publication, previousReleaseVersionId);
+        
+        await client.SendEventAsync(eventDto.ToEventGridEvent());
+    }
 }
 
