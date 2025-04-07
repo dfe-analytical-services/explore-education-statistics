@@ -4,7 +4,6 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
-using GovUk.Education.ExploreEducationStatistics.Common;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
@@ -267,25 +266,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                             var newDataSetTitle = await GetReleaseVersionDataSetTitle(releaseVersionId, dataSetTitle, replacingFile);
                             var dataSetFiles = await BuildDataSetFiles(dataFormFile, metaFormFile);
 
-                            var errors = await _dataSetValidatorService.ValidateDataSet(
+                            var result = await _dataSetValidatorService.ValidateDataSet(
                                 releaseVersionId,
                                 newDataSetTitle,
                                 dataSetFiles,
                                 replacingFile);
 
-                            if (errors.Count > 0)
-                            {
-                                return new Either<ActionResult, DataSet>(Common.Validators.ValidationUtils.ValidationResult(errors));
-                            }
-
-                            var dataSet = new DataSet
-                            {
-                                Title = newDataSetTitle,
-                                DataFile = dataSetFiles.FirstOrDefault(file => !file.FileName.EndsWith(Constants.DataSet.MetaFileExtension)),
-                                MetaFile = dataSetFiles.FirstOrDefault(file => file.FileName.EndsWith(Constants.DataSet.MetaFileExtension)),
-                            };
-
-                            return dataSet;
+                            return result.IsLeft
+                                ? new Either<ActionResult, DataSet>(Common.Validators.ValidationUtils.ValidationResult(result.Left))
+                                : (Either<ActionResult, DataSet>)result.Right;
                         })
                         .OnSuccess(async tuple =>
                         {
@@ -344,7 +333,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
-        // TODO: See if this function can be split into separate validate and upload functions, called independently by the controller
         public async Task<Either<ActionResult, DataFileInfo>> ValidateAndUploadFromZip(
             Guid releaseVersionId,
             IFormFile zipFormFile,
@@ -364,25 +352,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                             var newDataSetTitle = await GetReleaseVersionDataSetTitle(releaseVersionId, dataSetTitle, replacingFile);
                             var dataSetFiles = await ExtractDataSetZipFile(zipFormFile);
 
-                            var errors = await _dataSetValidatorService.ValidateDataSet(
+                            var result = await _dataSetValidatorService.ValidateDataSet(
                                 releaseVersionId,
                                 newDataSetTitle,
                                 dataSetFiles,
                                 replacingFile);
 
-                            if (errors.Count > 0)
-                            {
-                                return new Either<ActionResult, DataSet>(Common.Validators.ValidationUtils.ValidationResult(errors));
-                            }
-
-                            var dataSet = new DataSet
-                            {
-                                Title = newDataSetTitle,
-                                DataFile = dataSetFiles.FirstOrDefault(file => !file.FileName.EndsWith(Constants.DataSet.MetaFileExtension)),
-                                MetaFile = dataSetFiles.FirstOrDefault(file => file.FileName.EndsWith(Constants.DataSet.MetaFileExtension)),
-                            };
-
-                            return dataSet;
+                            return result.IsLeft
+                                ? new Either<ActionResult, DataSet>(Common.Validators.ValidationUtils.ValidationResult(result.Left))
+                                : (Either<ActionResult, DataSet>)result.Right;
                         })
                         .OnSuccess(async tuple =>
                         {
@@ -391,7 +369,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                             var subjectId = await _releaseVersionRepository.CreateStatisticsDbReleaseAndSubjectHierarchy(releaseVersionId);
                             var releaseDataFileOrder = await GetNextDataFileOrder(releaseVersionId, replacingFile);
 
-                            // TODO: Put the entity creations/imports inside an OnSuccess?
                             var dataFileEntity = await _releaseDataFileRepository.Create(
                                 releaseVersionId,
                                 subjectId,
@@ -439,7 +416,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
-        // TODO: Extract these two methods to a separate DataDetBuilder class
+        // TODO: Extract these two methods to a separate DataSetBuilder class
         // Optionally combine/refactor to reduce duplication of stream reading logic
         private static async Task<List<DataSetFileDto>> BuildDataSetFiles(
             IFormFile dataFormFile,

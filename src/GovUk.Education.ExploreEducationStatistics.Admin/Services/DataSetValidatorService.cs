@@ -20,7 +20,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
     {
         public const int MaxFilenameSize = 150;
 
-        public async Task<List<ErrorViewModel>> ValidateDataSet(
+        public async Task<Either<List<ErrorViewModel>, DataSet>> ValidateDataSet(
             Guid releaseVersionId,
             string dataSetTitle,
             List<DataSetFileDto> dataSetFiles,
@@ -63,7 +63,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
             if (dataFile is null || metaFile is null)
             {
-                return [.. errorViewModels, ValidationMessages.GenerateErrorDataSetFileNamesShouldMatchConvention()];
+                errorViewModels.Add(ValidationMessages.GenerateErrorDataSetFileNamesShouldMatchConvention());
+                return errorViewModels;
             }
 
             errorViewModels.AddRange(ValidateDataFileNames(
@@ -85,7 +86,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 }
             }
 
-            return errorViewModels;
+            return errorViewModels.Count > 0
+                ? (Either<List<ErrorViewModel>, DataSet>)errorViewModels
+                : (Either<List<ErrorViewModel>, DataSet>)new DataSet
+                {
+                    Title = dataSetTitle,
+                    DataFile = dataFile,
+                    MetaFile = metaFile,
+                };
         }
 
         private List<ErrorViewModel> ValidateDataSetTitleDuplication(
