@@ -81,6 +81,16 @@ module applicationInsightsModule 'application/searchApplicationInsights.bicep' =
   }
 }
 
+module eventGridMessagingModule 'application/eventGridMessaging.bicep' = {
+  name: 'eventGridMessagingModule'
+  params: {
+    location: location
+    resourcePrefix: resourcePrefix
+    ipRules: maintenanceIpRanges
+    tagValues: tagValues
+  }
+}
+
 module searchDocsFunctionModule 'application/searchDocsFunction.bicep' = {
   name: 'searchDocsFunctionModule'
   params: {

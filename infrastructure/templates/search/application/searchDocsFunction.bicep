@@ -102,9 +102,6 @@ resource searchService 'Microsoft.Search/searchServices@2024-06-01-preview' exis
     name: searchServiceName
 }
 
-// Name of the dedicated storage account for the Function App
-var functionAppStorageAccountName = '${replace(resourcePrefix, '-', '')}${abbreviations.storageStorageAccounts}searchdocsfn'
-
 module functionAppModule '../../common/components/functionApp.bicep' = {
   name: 'searchDocsFunctionAppModuleDeploy'
   params: {
@@ -167,7 +164,7 @@ module functionAppModule '../../common/components/functionApp.bicep' = {
     functionAppRuntime: 'dotnet-isolated'
     functionAppRuntimeVersion: '8.0'
     deployQueueRoleAssignment: true
-    storageAccountName: functionAppStorageAccountName
+    storageAccountName: '${replace(resourcePrefix, '-', '')}${abbreviations.storageStorageAccounts}searchdocsfn'
     storageAccountPublicNetworkAccessEnabled: false
     publicNetworkAccessEnabled: true
     functionAppFirewallRules: functionAppFirewallRules
@@ -203,9 +200,9 @@ module functionAppIdentityRoleAssignmentModule '../components/searchServiceRoleA
 }
 
 module functionAppStorageAccountQueueServiceModule '../../common/components/queueService.bicep' = {
-  name: 'functionAppStorageAccountQueueServiceModuleDeploy'
+  name: 'searchDocsFunctionAppStorageAccountQueueServiceModuleDeploy'
   params: {
-    storageAccountName: functionAppStorageAccountName
+    storageAccountName: functionAppModule.outputs.storageAccountName
     queueNames: [
       refreshSearchableDocumentQueueName
       releaseSlugChangedQueueName
