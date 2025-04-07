@@ -1,4 +1,5 @@
 using FluentValidation;
+using GovUk.Education.ExploreEducationStatistics.Common;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using Microsoft.AspNetCore.Http;
 
@@ -22,7 +23,7 @@ public static class FileValidators
     {
         return ruleBuilder
             .MustBeValidFile()
-            .Must(file => file.FileName.ToLower().EndsWith(".csv"))
+            .Must(file => file.FileName.ToLower().EndsWith(Constants.DataSet.DataFileExtension))
                 .WithMessage(ValidationMessages.FileNameMustEndDotCsv, "{PropertyName}");
     }
 
