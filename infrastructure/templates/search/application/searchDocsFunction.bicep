@@ -51,6 +51,9 @@ param functionAppExists bool
 @description('The name of the queue that is used when a publication is changed.')
 param publicationChangedQueueName string = 'publication-changed-queue'
 
+@description('The name of the queue that is used when the latest published release version has changed for a publication.')
+param publicationLatestPublishedReleaseVersionChangedQueueName string = 'publication-latest-published-release-version-changed-queue'
+
 @description('The name of the queue that is used when a searchable document requires a refresh.')
 param refreshSearchableDocumentQueueName string = 'refresh-searchable-document-queue'
 
@@ -142,6 +145,10 @@ module functionAppModule '../../common/components/functionApp.bicep' = {
         value: publicationChangedQueueName
       }
       {
+        name: 'PublicationLatestPublishedReleaseVersionChangedQueueName'
+        value: publicationLatestPublishedReleaseVersionChangedQueueName
+      }
+      {
         name: 'RefreshSearchableDocumentQueueName'
         value: refreshSearchableDocumentQueueName
       }
@@ -215,6 +222,7 @@ module functionAppStorageAccountQueueServiceModule '../../common/components/queu
     storageAccountName: functionAppStorageAccountName
     queueNames: [
       publicationChangedQueueName
+      publicationLatestPublishedReleaseVersionChangedQueueName
       refreshSearchableDocumentQueueName
       releaseSlugChangedQueueName
       releaseVersionPublishedQueueName
