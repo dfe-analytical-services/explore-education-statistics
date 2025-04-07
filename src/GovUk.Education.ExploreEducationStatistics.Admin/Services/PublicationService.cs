@@ -584,6 +584,11 @@ public class PublicationService(
                 {
                     await releaseCacheService.UpdateRelease(releaseVersionId: latestPublishedReleaseVersionId.Value,
                         publicationSlug: publication.Slug);
+
+                    // Arguably, we should always be raising a publication changed event and
+                    // detailing what has changed. The event subscriber should be deciding
+                    // whether to react or not.
+                    await adminEventRaiserService.OnPublicationChanged(publication);
                 }
 
                 return await GetReleaseSeries(publication.Id);

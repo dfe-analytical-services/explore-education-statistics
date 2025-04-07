@@ -2994,6 +2994,7 @@ public class PublicationServiceTests
                 contentDbContext,
                 publicationCacheService: publicationCacheService.Object);
 
+            // Let's swap the order of the oldest two releases to 2022, 2020, 2021 and insert a legacy link.
             var result = await publicationService.UpdateReleaseSeries(
                 publication.Id,
                 updatedReleaseSeriesItems:
@@ -3065,6 +3066,9 @@ public class PublicationServiceTests
             // as the first release after the legacy link
             Assert.Equal(release2022.Versions[1].Id, actualPublication.LatestPublishedReleaseVersionId);
         }
+        
+        // The latest release is unchanged so no event should have been raised
+        AssertOnPublicationChangedEventNotRaised();
     }
 
     [Fact]
@@ -3166,6 +3170,8 @@ public class PublicationServiceTests
             // version since it was positioned as the first release
             Assert.Equal(expectedLatestPublishedReleaseVersionId,
                 actualPublication.LatestPublishedReleaseVersionId);
+            
+            AssertOnPublicationChangedEventRaised(actualPublication);
         }
     }
 
@@ -3268,6 +3274,8 @@ public class PublicationServiceTests
             // version since it was positioned as the next release after 2021 which is unpublished
             Assert.Equal(expectedLatestPublishedReleaseVersionId,
                 actualPublication.LatestPublishedReleaseVersionId);
+
+            AssertOnPublicationChangedEventRaised(actualPublication);
         }
     }
 
@@ -3315,6 +3323,8 @@ public class PublicationServiceTests
 
             Assert.Empty(actualPublication.ReleaseSeries);
         }
+        
+        AssertOnPublicationChangedEventNotRaised();
     }
 
     [Fact]
