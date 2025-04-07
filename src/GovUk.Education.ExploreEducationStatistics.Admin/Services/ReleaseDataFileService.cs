@@ -311,9 +311,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                 type: FileType.Metadata,
                                 createdById: _userService.GetUserId());
 
-                            // TODO: Add overload function to handle data set pair upload
-                            await UploadFileToStorage(dataFileEntity, dataFormFile);
-                            await UploadFileToStorage(metaFileEntity, metaFormFile);
+                            await UploadDataSetFilesToStorage(dataFileEntity, dataFormFile, metaFileEntity, metaFormFile);
 
                             var dataImport = await _dataImportService.Import(
                                 subjectId,
@@ -394,9 +392,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                 type: FileType.Metadata,
                                 createdById: _userService.GetUserId());
 
-                            // TODO: Add overload function to handle data set pair upload (similar to UploadDataSetToTempStorage)
-                            await UploadFileToReleaseStorage(releaseVersionId, dataFileEntity.Id, dataSet.DataFile.FileStream, FileType.Data, cancellationToken);
-                            await UploadFileToReleaseStorage(releaseVersionId, metaFileEntity.Id, dataSet.MetaFile.FileStream, FileType.Metadata, cancellationToken);
+                            await UploadDataSetToReleaseStorage(releaseVersionId, dataFileEntity.Id, metaFileEntity.Id, dataSet, cancellationToken);
 
                             var dataImport = await _dataImportService.Import(
                                 subjectId,
@@ -713,14 +709,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return dataSetTitle;
         }
 
-        private async Task UploadFileToStorage(
-            File file,
-            IFormFile formFile)
+        private async Task UploadDataSetFilesToStorage(
+            File dataFile,
+            IFormFile dataFormFile,
+            File metaFile,
+            IFormFile metaFormFile)
         {
             await _privateBlobStorageService.UploadFile(
                 containerName: PrivateReleaseFiles,
-                path: file.Path(),
-                file: formFile
+                path: dataFile.Path(),
+                file: dataFormFile
+            );
+
+            await _privateBlobStorageService.UploadFile(
+                containerName: PrivateReleaseFiles,
+                path: metaFile.Path(),
+                file: metaFormFile
             );
         }
 
@@ -762,23 +766,32 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             };
         }
 
-        private async Task UploadFileToReleaseStorage(
+        private async Task UploadDataSetToReleaseStorage(
             Guid releaseVersionId,
-            Guid fileId,
-            System.IO.Stream fileStream,
-            FileType fileType,
+            Guid dataFileId,
+            Guid metaFileId,
+            DataSet dataSet,
             CancellationToken cancellationToken)
         {
-            var path = $"{FileStoragePathUtils.FilesPath(releaseVersionId, fileType)}{fileId}";
+            var dataFilePath = $"{FileStoragePathUtils.FilesPath(releaseVersionId, FileType.Data)}{dataFileId}";
+            var metaFilePath = $"{FileStoragePathUtils.FilesPath(releaseVersionId, FileType.Metadata)}{metaFileId}";
 
             await _privateBlobStorageService.UploadStream(
                 containerName: PrivateReleaseFiles,
-                path,
-                fileStream,
+                dataFilePath,
+                dataSet.DataFile.FileStream,
                 contentType: ContentTypes.Csv,
                 cancellationToken: cancellationToken);
 
-            await fileStream.DisposeAsync();
+            await _privateBlobStorageService.UploadStream(
+                containerName: PrivateReleaseFiles,
+                metaFilePath,
+                dataSet.MetaFile.FileStream,
+                contentType: ContentTypes.Csv,
+                cancellationToken: cancellationToken);
+
+            await dataSet.DataFile.FileStream.DisposeAsync();
+            await dataSet.MetaFile.FileStream.DisposeAsync();
         }
 
         private async Task<File> GetAssociatedMetaFile(Guid releaseVersionId,
