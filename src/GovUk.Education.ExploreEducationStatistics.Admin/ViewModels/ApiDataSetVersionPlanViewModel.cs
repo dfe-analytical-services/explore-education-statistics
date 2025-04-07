@@ -5,7 +5,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Public.Data;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 
-public record ApiDataSetVersionPlanViewModel
+public record DeleteApiDataSetVersionPlanViewModel
 {
     public Guid DataSetId { get; init; }
 
@@ -17,8 +17,12 @@ public record ApiDataSetVersionPlanViewModel
 
     public DataSetVersionStatus Status { get; init; }
 
+    public virtual bool Valid { get; init; }
+}
+public record ApiDataSetVersionPlanViewModel : DeleteApiDataSetVersionPlanViewModel
+{
     public MappingStatusViewModel? MappingStatus { get; init; }
     
-    public bool Valid => MappingStatus == null 
+    public override bool Valid => MappingStatus == null 
                          || (MappingStatus.FiltersComplete && MappingStatus.LocationsComplete);
 }
