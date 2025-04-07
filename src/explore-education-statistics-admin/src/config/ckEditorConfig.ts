@@ -8,6 +8,8 @@ import {
 } from '@admin/types/ckeditor';
 
 export const toolbarConfigFull: ReadonlyArray<ToolbarOption | ToolbarGroup> = [
+  'accessibilityHelp',
+  '|',
   'heading',
   '|',
   'bold',
@@ -52,6 +54,8 @@ export const methodologyToolbarConfigFull: ReadonlyArray<
 ];
 
 export const toolbarConfigSimple: ReadonlyArray<ToolbarOption> = [
+  'accessibilityHelp',
+  '|',
   'bold',
   'link',
   '|',
