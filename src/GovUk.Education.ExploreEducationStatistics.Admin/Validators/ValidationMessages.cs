@@ -1,4 +1,5 @@
 #nullable enable
+using GovUk.Education.ExploreEducationStatistics.Common;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
@@ -103,7 +104,7 @@ public static class ValidationMessages
 
     public static readonly LocalizableMessage DataSetFileNamesShouldMatchConvention = new(
         Code: nameof(DataSetFileNamesShouldMatchConvention),
-        Message: "The data file should end .csv, and the meta file should end .meta.csv."
+        Message: $"The data file should end .csv, and the meta file should end {Constants.DataSet.MetaFileExtension}."
     );
 
     public static ErrorViewModel GenerateErrorDataSetFileNamesShouldMatchConvention()
@@ -284,7 +285,7 @@ public static class ValidationMessages
 
     public static readonly LocalizableMessage FileNameMustEndDotCsv = new(
         Code: nameof(FileNameMustEndDotCsv),
-        Message: "File name '{0}' must end in '.csv'."
+        Message: $"File name '{0}' must end in '{Constants.DataSet.DataFileExtension}'."
     );
 
     public static ErrorViewModel GenerateErrorFilenameMustEndDotCsv(string fileName)
@@ -298,7 +299,7 @@ public static class ValidationMessages
 
     public static readonly LocalizableMessage MetaFilenameMustEndDotMetaDotCsv = new(
         Code: nameof(MetaFilenameMustEndDotMetaDotCsv),
-        Message: "Meta file '{0}' must end in '.meta.csv'."
+        Message: $"Meta file '{0}' must end in '{Constants.DataSet.MetaFileExtension}'."
     );
 
     public static ErrorViewModel GenerateErrorMetaFilenameMustEndDotMetaDotCsv(string fileName)

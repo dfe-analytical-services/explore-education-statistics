@@ -2,6 +2,7 @@
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
+using GovUk.Education.ExploreEducationStatistics.Common;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
@@ -57,8 +58,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 errorViewModels.Add(ValidationMessages.GenerateErrorDataZipShouldContainTwoFiles());
             }
 
-            var dataFile = dataSetFiles.FirstOrDefault(file => !file.FileName.EndsWith(".meta.csv"));
-            var metaFile = dataSetFiles.FirstOrDefault(file => file.FileName.EndsWith(".meta.csv"));
+            var dataFile = dataSetFiles.FirstOrDefault(file => !file.FileName.EndsWith(Constants.DataSet.MetaFileExtension));
+            var metaFile = dataSetFiles.FirstOrDefault(file => file.FileName.EndsWith(Constants.DataSet.MetaFileExtension));
 
             if (dataFile is null || metaFile is null)
             {
