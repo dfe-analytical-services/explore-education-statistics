@@ -1,6 +1,6 @@
 import { abbreviations } from '../../common/abbreviations.bicep'
 import { IpRange, FirewallRule } from '../../common/types.bicep'
-import { ResourceNames } from '../types.bicep'
+import { ResourceNames, StorageQueueNamesType } from '../types.bicep'
 
 @description('The URL of the Content API.')
 param contentApiUrl string
@@ -231,3 +231,13 @@ module functionAppStorageAccountQueueServiceModule '../../common/components/queu
 
 output functionAppName string = functionAppModule.outputs.name
 output functionAppUrl string = functionAppModule.outputs.url
+output functionAppStorageAccountName string = functionAppModule.outputs.storageAccountName
+output storageQueueNames StorageQueueNamesType = {
+  publicationChangedQueueName: publicationChangedQueueName
+  publicationLatestPublishedReleaseVersionChangedQueueName: publicationLatestPublishedReleaseVersionChangedQueueName
+  refreshSearchableDocumentQueueName: refreshSearchableDocumentQueueName
+  releaseSlugChangedQueueName: releaseSlugChangedQueueName
+  releaseVersionPublishedQueueName: releaseVersionPublishedQueueName
+  searchableDocumentCreatedQueueName: searchableDocumentCreatedQueueName
+  themeUpdatedQueueName: themeUpdatedQueueName
+}

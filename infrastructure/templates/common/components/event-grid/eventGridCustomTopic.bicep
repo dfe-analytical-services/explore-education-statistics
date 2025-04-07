@@ -1,6 +1,8 @@
 import { IpRange } from '../../types.bicep'
 
 @description('The resource name.')
+@minLength(3)
+@maxLength(50)
 param name string
 
 @description('Location for all resources.')

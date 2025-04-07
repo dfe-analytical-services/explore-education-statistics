@@ -132,6 +132,15 @@ module searchDocsFunctionModule 'application/searchDocsFunction.bicep' = {
   }
 }
 
+module searchDocsFunctionEventSubscriptionsModule 'application/searchDocsFunctionEventSubscriptions.bicep' = {
+  name: 'searchDocsFunctionEventSubscriptionsModule'
+  params: {
+    resourcePrefix: resourcePrefix
+    searchDocsFunctionAppStorageAccountName: searchDocsFunctionModule.outputs.functionAppStorageAccountName
+    storageQueueNames: searchDocsFunctionModule.outputs.storageQueueNames
+  }
+}
+
 module searchServiceModule 'application/searchService.bicep' = {
   name: 'searchServiceModule'
   params: {

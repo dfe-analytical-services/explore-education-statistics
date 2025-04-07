@@ -16,8 +16,8 @@ param tagValues object
 @description('A list of custom topic names to create.')
 param customTopicNames string[] = []
 
-module eventGridCustomTopicsModule 'eventGridCustomTopic.bicep' = [for topicName in customTopicNames: {
-  name: '${topicName}EventGridCustomTopicModuleDeploy'
+module eventGridCustomTopicModule 'eventGridCustomTopic.bicep' = [for (topicName, index) in customTopicNames: {
+  name: '${index}eventGridCustomTopicModuleDeploy'
   params: {
     name: '${resourcePrefix}-${abbreviations.eventGridTopics}-${topicName}'
     location: location
