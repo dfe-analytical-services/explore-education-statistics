@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -32,15 +31,20 @@ public class AnalyticsWriterTests : IDisposable
         var service = BuildService(_analyticsPathResolver);
 
         await service.ReportReleaseVersionZipDownload(new AnalyticsWriter.CaptureReleaseVersionZipDownloadRequest(
+            PublicationName: "Publication name",
             ReleaseVersionId: new Guid("4ed767c7-79e6-4bd4-a0d1-8c9b7f4bbfaa"),
-            FileIds: new List<Guid> {
-                new ("9e3bdced-d289-4017-b93f-23ecfb3c90b9"),
-                new ("0574559f-49dd-47f5-a331-f7bf55ea1039")
-            }));
+            ReleaseName: "Release name",
+            ReleaseLabel: "Release label",
+            SubjectId: new Guid("9e3bdced-d289-4017-b93f-23ecfb3c90b9"),
+            DataSetName: "Data set name"));
 
         await service.ReportReleaseVersionZipDownload(new AnalyticsWriter.CaptureReleaseVersionZipDownloadRequest(
+            PublicationName: "Publication name",
             ReleaseVersionId: new Guid("4ed767c7-79e6-4bd4-a0d1-8c9b7f4bbfaa"),
-            FileIds: null));
+            ReleaseName: "Release name",
+            ReleaseLabel: "Release label",
+            SubjectId: null,
+            DataSetName: null));
 
         var files = Directory
             .GetFiles(_analyticsPathResolver.PublicZipDownloadsDirectoryPath())

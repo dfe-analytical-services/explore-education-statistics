@@ -8,6 +8,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using Moq;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils
@@ -188,6 +189,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils
             }
 
             return configuration;
+        }
+
+        public static void LoggerSetup<T>(Mock<ILogger<T>> logger, LogLevel logLevel, string logMessage)
+        {
+            logger.Setup(mock =>
+                mock.Log(
+                    It.Is<LogLevel>(ll => ll == logLevel),
+                    It.IsAny<EventId>(),
+                    It.Is<It.IsAnyType>((v, t) => v.ToString()!.Equals(logMessage)),
+                    It.IsAny<Exception>(),
+                    It.IsAny<Func<It.IsAnyType, Exception?, string>>()));
         }
     }
 }

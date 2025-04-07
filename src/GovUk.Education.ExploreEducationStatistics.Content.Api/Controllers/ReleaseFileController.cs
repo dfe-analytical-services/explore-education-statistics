@@ -14,8 +14,6 @@ using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
-using static GovUk.Education.ExploreEducationStatistics.Content.Services.AnalyticsWriter;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
 {
@@ -23,9 +21,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
     [ApiController]
     public class ReleaseFileController(
         IPersistenceHelper<ContentDbContext> persistenceHelper,
-        IReleaseFileService releaseFileService,
-        IAnalyticsManager analyticsManager,
-        ILogger<ReleaseFileController> logger)
+        IReleaseFileService releaseFileService)
         : ControllerBase
     {
         [HttpPost("release-files")]
@@ -61,7 +57,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
         [Produces(MediaTypeNames.Application.Octet)]
         public async Task<ActionResult> StreamFilesToZip(
             Guid releaseVersionId,
-            CancellationToken cancellationToken,
+            // The previous data catalogue page allowed users to selected multiple specific files to include in the zip file,
+            // hence why this endpoint takes an array of fileIds, but this is no longer the case. Users can only download all
+            // the releaseVersion's data (by not providing fileIds) or provide a single fileId for a specific data set.
+            // In theory, users could still download a zip with multiple files if they manually crafted
             [FromQuery] IList<Guid>? fileIds = null)
         {
             return await persistenceHelper.CheckEntityExists<ReleaseVersion>(
@@ -98,22 +97,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
                             : 500;
                     }
                 )
-                .OnSuccessDo(_ =>
-                {
-                    try
-                    {
-                        analyticsManager.AddReleaseVersionZipDownload(
-                            new CaptureReleaseVersionZipDownloadRequest(releaseVersionId, fileIds ?? []),
-                            cancellationToken);
-                    }
-                    catch (Exception e)
-                    {
-                        logger.LogError(
-                            exception: e,
-                            message: "Error whilst adding a ReleaseVersionZipDownload event to {AnalyticsManager}",
-                            nameof(IAnalyticsManager));
-                    }
-                })
                 .HandleFailuresOrNoOp();
         }
     }

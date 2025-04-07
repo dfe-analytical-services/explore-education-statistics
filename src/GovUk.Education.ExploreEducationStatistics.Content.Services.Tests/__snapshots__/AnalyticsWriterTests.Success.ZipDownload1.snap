@@ -1,7 +1,8 @@
 ﻿{
-  "fileIds": [
-    "9e3bdced-d289-4017-b93f-23ecfb3c90b9",
-    "0574559f-49dd-47f5-a331-f7bf55ea1039"
-  ],
-  "releaseVersionId": "4ed767c7-79e6-4bd4-a0d1-8c9b7f4bbfaa"
+  "dataSetName": "Data set name",
+  "publicationName": "Publication name",
+  "releaseLabel": "Release label",
+  "releaseName": "Release name",
+  "releaseVersionId": "4ed767c7-79e6-4bd4-a0d1-8c9b7f4bbfaa",
+  "subjectId": "9e3bdced-d289-4017-b93f-23ecfb3c90b9"
 }

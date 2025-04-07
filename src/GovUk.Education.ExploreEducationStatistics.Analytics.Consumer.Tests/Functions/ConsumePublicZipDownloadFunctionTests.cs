@@ -6,7 +6,6 @@ using InterpolatedSql.Dapper;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
 using Moq;
-using Newtonsoft.Json;
 using Xunit;
 
 namespace GovUk.Education.ExploreEducationStatistics.Analytics.Consumer.Tests.Functions;
@@ -76,8 +75,12 @@ public abstract class ConsumePublicZipDownloadsFunctionTests : IDisposable
             var zipDownloadReportRows = await ReadZipDownloadReport(duckDbConnection, reportFilename);
             var zipDownloadReportRow = Assert.Single(zipDownloadReportRows);
 
+            Assert.Equal("publication name", zipDownloadReportRow.PublicationName);
             Assert.Equal(new Guid("4ed767c7-79e6-4bd4-a0d1-8c9b7f4bbfaa"), zipDownloadReportRow.ReleaseVersionId);
-            Assert.Null(zipDownloadReportRow.FileIds);
+            Assert.Equal("release name", zipDownloadReportRow.ReleaseName);
+            Assert.Equal("release-label", zipDownloadReportRow.ReleaseLabel);
+            Assert.Null(zipDownloadReportRow.SubjectId);
+            Assert.Null(zipDownloadReportRow.DataSetName);
         }
 
         [Fact]
@@ -101,19 +104,22 @@ public abstract class ConsumePublicZipDownloadsFunctionTests : IDisposable
             Assert.Equal(2, zipDownloadReportRows.Count);
 
             // ZipDownloadRequest_SpecificFiles.json
+            Assert.Equal("publication name 2", zipDownloadReportRows[0].PublicationName);
             Assert.Equal(new Guid("5ed767c7-79e6-4bd4-a0d1-8c9b7f4bbfaa"), zipDownloadReportRows[0].ReleaseVersionId);
-
-            Assert.NotNull(zipDownloadReportRows[0].FileIds);
-            var fileIds = JsonConvert.DeserializeObject<List<Guid>>(zipDownloadReportRows[0].FileIds!);
-            Assert.Equal(2, fileIds.Count);
-            Assert.Equal(new Guid("9e3bdced-d289-4017-b93f-23ecfb3c90b9"), fileIds[0]);
-            Assert.Equal(new Guid("0574559f-49dd-47f5-a331-f7bf55ea1039"), fileIds[1]);
-
+            Assert.Equal("release name 2", zipDownloadReportRows[0].ReleaseName);
+            Assert.Equal("release-label-2", zipDownloadReportRows[0].ReleaseLabel);
+            Assert.NotNull(zipDownloadReportRows[0].SubjectId);
+            Assert.Equal(new Guid("9e3bdced-d289-4017-b93f-23ecfb3c90b9"), zipDownloadReportRows[0].SubjectId);
+            Assert.Equal("data set name", zipDownloadReportRows[0].DataSetName);
             Assert.Equal(1, zipDownloadReportRows[0].Downloads);
 
             // ZipDownloadRequest_AllFiles.json
+            Assert.Equal("publication name", zipDownloadReportRows[1].PublicationName);
             Assert.Equal(new Guid("4ed767c7-79e6-4bd4-a0d1-8c9b7f4bbfaa"), zipDownloadReportRows[1].ReleaseVersionId);
-            Assert.Null(zipDownloadReportRows[1].FileIds);
+            Assert.Equal("release name", zipDownloadReportRows[1].ReleaseName);
+            Assert.Equal("release-label", zipDownloadReportRows[1].ReleaseLabel);
+            Assert.Null(zipDownloadReportRows[1].SubjectId);
+            Assert.Null(zipDownloadReportRows[1].DataSetName);
             Assert.Equal(1, zipDownloadReportRows[1].Downloads);
 
         }
@@ -138,8 +144,12 @@ public abstract class ConsumePublicZipDownloadsFunctionTests : IDisposable
             var zipDownloadReportRows = await ReadZipDownloadReport(duckDbConnection, reportFilename);
             var zipDownloadReportRow = Assert.Single(zipDownloadReportRows);
 
+            Assert.Equal("publication name", zipDownloadReportRow.PublicationName);
             Assert.Equal(new Guid("4ed767c7-79e6-4bd4-a0d1-8c9b7f4bbfaa"), zipDownloadReportRow.ReleaseVersionId);
-            Assert.Null(zipDownloadReportRow.FileIds);
+            Assert.Equal("release name", zipDownloadReportRow.ReleaseName);
+            Assert.Equal("release-label", zipDownloadReportRow.ReleaseLabel);
+            Assert.Null(zipDownloadReportRow.SubjectId);
+            Assert.Null(zipDownloadReportRow.DataSetName);
             Assert.Equal(2, zipDownloadReportRow.Downloads);
         }
 
@@ -174,7 +184,11 @@ public abstract class ConsumePublicZipDownloadsFunctionTests : IDisposable
     // ReSharper disable once ClassNeverInstantiated.Local
     private record ZipDownloadReportRow(
         string ZipDownloadHash,
+        string PublicationName,
         Guid ReleaseVersionId,
-        string? FileIds,
+        string ReleaseName,
+        string ReleaseLabel,
+        Guid? SubjectId,
+        string? DataSetName,
         int Downloads);
 }

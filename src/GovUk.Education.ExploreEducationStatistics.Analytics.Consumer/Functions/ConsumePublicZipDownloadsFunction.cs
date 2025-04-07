@@ -59,21 +59,29 @@ public class ConsumePublicZipDownloadsFunction(
         duckDbConnection.ExecuteNonQuery($@"
             CREATE TABLE zipDownloads AS 
             SELECT
-                MD5(CONCAT(fileIds, releaseVersionId)) AS zipDownloadHash,
+                MD5(CONCAT(subjectId, releaseVersionId)) AS zipDownloadHash,
                 *
             FROM read_json('{processingDirectory}/*.json', 
                 format='auto',
                 columns = {{
+                    publicationName: VARCHAR,
                     releaseVersionId: UUID,
-                    fileIds: JSON
+                    releaseName: VARCHAR,
+                    releaseLabel: VARCHAR,
+                    subjectId: UUID,
+                    dataSetName: VARCHAR
                 }})");
 
         duckDbConnection.ExecuteNonQuery(@"
             CREATE TABLE zipDownloadsReport AS 
             SELECT 
                 zipDownloadHash,
+                FIRST(publicationName) AS publicationName,
                 FIRST(releaseVersionId) AS releaseVersionId,
-                FIRST(fileIds) AS fileIds,
+                FIRST(releaseName) AS releaseName,
+                FIRST(releaseLabel) AS releaseLabel,
+                FIRST(subjectId) AS subjectId,
+                FIRST(dataSetName) AS dataSetName,
                 CAST(COUNT(zipDownloadHash) AS INT) AS downloads
             FROM zipDownloads
             GROUP BY zipDownloadHash

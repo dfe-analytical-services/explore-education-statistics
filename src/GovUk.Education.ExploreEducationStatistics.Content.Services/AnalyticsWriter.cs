@@ -1,9 +1,7 @@
 #nullable enable
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
 using Microsoft.Extensions.Logging;
@@ -20,9 +18,11 @@ public class AnalyticsWriter(
     public async Task ReportReleaseVersionZipDownload(CaptureReleaseVersionZipDownloadRequest request)
     {
         logger.LogInformation(
-            "Capturing ReleaseVersionZipDownload event analytics for releaseVersion {ReleaseVersionId}{AndFileIds}",
+            "Capturing ReleaseVersionZipDownload event analytics for releaseVersion {ReleaseVersionId}{WithSubject}",
             request.ReleaseVersionId,
-            request.FileIds == null ? "" : $" and file(s) {request.FileIds.JoinToString(',')}");
+            request.SubjectId == null
+                ? ""
+                : " for subject " + request.SubjectId);
 
         var serialisedRequest = JsonSerializationUtils.Serialize(
             obj: request,
@@ -58,6 +58,10 @@ public class AnalyticsWriter(
     }
 
     public record CaptureReleaseVersionZipDownloadRequest(
+        string PublicationName,
         Guid ReleaseVersionId,
-        IList<Guid> FileIds);
+        string ReleaseName,
+        string? ReleaseLabel,
+        Guid? SubjectId = null,
+        string? DataSetName = null);
 }
