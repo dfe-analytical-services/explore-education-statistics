@@ -4,6 +4,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
+using GovUk.Education.ExploreEducationStatistics.Common;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
@@ -280,8 +281,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                             var dataSet = new DataSet
                             {
                                 Title = newDataSetTitle,
-                                DataFile = dataSetFiles.FirstOrDefault(file => !file.FileName.EndsWith(".meta.csv")),
-                                MetaFile = dataSetFiles.FirstOrDefault(file => file.FileName.EndsWith(".meta.csv")),
+                                DataFile = dataSetFiles.FirstOrDefault(file => !file.FileName.EndsWith(Constants.DataSet.MetaFileExtension)),
+                                MetaFile = dataSetFiles.FirstOrDefault(file => file.FileName.EndsWith(Constants.DataSet.MetaFileExtension)),
                             };
 
                             return dataSet;
@@ -377,8 +378,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                             var dataSet = new DataSet
                             {
                                 Title = newDataSetTitle,
-                                DataFile = dataSetFiles.FirstOrDefault(file => !file.FileName.EndsWith(".meta.csv")),
-                                MetaFile = dataSetFiles.FirstOrDefault(file => file.FileName.EndsWith(".meta.csv")),
+                                DataFile = dataSetFiles.FirstOrDefault(file => !file.FileName.EndsWith(Constants.DataSet.MetaFileExtension)),
+                                MetaFile = dataSetFiles.FirstOrDefault(file => file.FileName.EndsWith(Constants.DataSet.MetaFileExtension)),
                             };
 
                             return dataSet;

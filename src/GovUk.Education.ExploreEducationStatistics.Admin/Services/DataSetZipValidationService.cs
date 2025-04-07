@@ -2,6 +2,7 @@
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
+using GovUk.Education.ExploreEducationStatistics.Common;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
@@ -80,12 +81,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             var zippedDataSetFiles = new List<ZippedDataSet>();
             foreach (var (BaseFilename, Title) in dataSetNamesCsvEntries)
             {
-                var dataFile = unprocessedFiles.FirstOrDefault(f => f.FileName == $"{BaseFilename}.csv");
-                var metaFile = unprocessedFiles.FirstOrDefault(f => f.FileName == $"{BaseFilename}.meta.csv");
+                var dataFile = unprocessedFiles.FirstOrDefault(f => f.FileName == $"{BaseFilename}{Constants.DataSet.DataFileExtension}");
+                var metaFile = unprocessedFiles.FirstOrDefault(f => f.FileName == $"{BaseFilename}{Constants.DataSet.MetaFileExtension}");
 
                 if (dataFile is null)
                 {
-                    _errors.Add(ValidationMessages.GenerateErrorFileNotFoundInZip($"{BaseFilename}.csv", FileType.Data));
+                    _errors.Add(ValidationMessages.GenerateErrorFileNotFoundInZip($"{BaseFilename}{Constants.DataSet.DataFileExtension}", FileType.Data));
                 }
                 else
                 {
@@ -94,7 +95,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
                 if (metaFile is null)
                 {
-                    _errors.Add(ValidationMessages.GenerateErrorFileNotFoundInZip($"{BaseFilename}.meta.csv", FileType.Metadata));
+                    _errors.Add(ValidationMessages.GenerateErrorFileNotFoundInZip($"{BaseFilename}{Constants.DataSet.MetaFileExtension}", FileType.Metadata));
                 }
                 else
                 {

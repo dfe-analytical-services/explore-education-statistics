@@ -1,6 +1,7 @@
 #nullable enable
 using FluentValidation;
 using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
+using GovUk.Education.ExploreEducationStatistics.Common;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
@@ -47,7 +48,7 @@ public record UploadDataSetRequest
             RuleFor(request => request.MetaFile)
                 .Cascade(CascadeMode.Stop)
                 .MustBeValidCsvFile()
-                .Must(file => file.FileName.ToLower().EndsWith(".meta.csv"))
+                .Must(file => file.FileName.ToLower().EndsWith(Constants.DataSet.MetaFileExtension))
                     .WithMessage(ValidationMessages.MetaFilenameMustEndDotMetaDotCsv, "{PropertyValue}");
             //.MustAsync(async (file, cancellationToken) => await _fileTypeService.HasValidCsvFileMeta(file))
             //    .WithMessage(d => string.Format(ValidationMessages.MustBeCsvFile.Message, d.MetaFile.FileName));
