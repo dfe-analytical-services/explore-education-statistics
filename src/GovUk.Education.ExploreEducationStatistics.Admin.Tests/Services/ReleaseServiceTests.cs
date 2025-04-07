@@ -331,7 +331,7 @@ public abstract class ReleaseServiceTests
             output.WriteLine($"Expected Publication Id: {expectedPublicationId}");
             output.WriteLine($"Expected Publication Slug: {expectedPublicationSlug}");
             
-            adminEventRaiserService.Assert.OnReleaseSlugChangedWasCalled(
+            adminEventRaiserService.Assert.OnReleaseSlugChangedWasRaised(
                 expectedReleaseId,
                 expectedNewReleaseSlug,
                 expectedPublicationId,
@@ -406,7 +406,7 @@ public abstract class ReleaseServiceTests
             var newReleaseSlug = NamingUtils.CreateReleaseSlug(year, timePeriod, label);
             Assert.NotEqual(currentReleaseSlug, newReleaseSlug);
             
-            adminEventRaiserService.Assert.OnReleaseSlugChangedWasNotCalled();
+            adminEventRaiserService.Assert.OnReleaseSlugChangedWasNotRaised();
         }
         
         [Fact]
@@ -473,7 +473,7 @@ public abstract class ReleaseServiceTests
             
             // ASSERT
             result.AssertRight();
-            adminEventRaiserService.Assert.OnReleaseSlugChangedWasNotCalled();
+            adminEventRaiserService.Assert.OnReleaseSlugChangedWasNotRaised();
         }
     }
 

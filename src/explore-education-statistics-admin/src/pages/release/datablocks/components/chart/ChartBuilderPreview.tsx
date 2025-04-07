@@ -30,6 +30,7 @@ const ChartBuilderPreview = ({ chart, loading }: Props) => {
                 chart={chart}
                 key={renderCount.current}
                 id="chartBuilderPreview"
+                showExportMenu={false}
               />
             </div>
           </LoadingSpinner>

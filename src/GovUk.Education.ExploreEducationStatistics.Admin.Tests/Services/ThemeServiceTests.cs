@@ -168,7 +168,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal("updated-theme", savedTheme.Slug);
                 Assert.Equal("Updated summary", savedTheme.Summary);
                 
-                eventRaiser.Assert.ThatOnThemeUpdatedCalled(actual => actual == savedTheme);
+                eventRaiser.Assert.ThatOnThemeUpdatedRaised(actual => actual == savedTheme);
             }
         }
 
