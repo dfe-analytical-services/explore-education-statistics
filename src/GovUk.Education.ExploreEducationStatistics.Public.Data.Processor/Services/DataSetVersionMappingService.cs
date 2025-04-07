@@ -130,20 +130,22 @@ internal class DataSetVersionMappingService(
 
         if (IsMajorVersionUpdate(mapping))
         {
-            if (incrementPatchNumber)
-            {
-                var doesntRequireManualMapping = mapping is { LocationMappingsComplete: true, FilterMappingsComplete: true } == false;//TODO: Need to account on whether the user has clicked finalize or not..
-
-                if (doesntRequireManualMapping)//TODO: test this unhappy path!!
-                {
-                    //throw new Exception("Major version number update is not allowed when replacement is in progress");
-                }//TODO: check that the patch number has increased?
-            }
-            else
-            {
-                mapping.TargetDataSetVersion.VersionMajor += 1;
-                mapping.TargetDataSetVersion.VersionMinor = 0;
-            }
+            // if (incrementPatchNumber)
+            // {
+            //     var doesntRequireManualMapping = mapping is { LocationMappingsComplete: true, FilterMappingsComplete: true } == false;//
+            //
+            //     if (doesntRequireManualMapping)//TODO: implement appropriate failure handler in EES-5996, also Need to account on whether the user has clicked finalize or not..
+            //     {
+            //         //throw new Exception("Major version number update is not allowed when replacement is in progress");
+            //     }
+            // }
+            // else
+            // {
+            //     mapping.TargetDataSetVersion.VersionMajor += 1;
+            //     mapping.TargetDataSetVersion.VersionMinor = 0;
+            // }
+            mapping.TargetDataSetVersion.VersionMajor += 1;
+            mapping.TargetDataSetVersion.VersionMinor = 0;
         }
 
         publicDataDbContext.DataSetVersionMappings.Update(mapping);

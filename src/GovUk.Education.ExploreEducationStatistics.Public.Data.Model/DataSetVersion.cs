@@ -77,6 +77,8 @@ public class DataSetVersion : ICreatedUpdatedTimestamps<DateTimeOffset, DateTime
         ? $"{VersionMajor}.{VersionMinor}.{VersionPatch}" 
         : $"{VersionMajor}.{VersionMinor}";
 
+    public string VersionString => $"{VersionMajor}.{VersionMinor}.{VersionPatch}";
+
     public SemVersion SemVersion() => new(major: VersionMajor, minor: VersionMinor, patch: VersionPatch);
 
     public SemVersion DefaultNextVersion() => SemVersion().WithMinor(VersionMinor + 1);

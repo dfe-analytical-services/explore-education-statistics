@@ -100,7 +100,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 {
                     var (originalReleaseFile, replacementReleaseFile) = tuple;
 
-                    return await GetLinkedDataSetVersion(replacementReleaseFile, cancellationToken)
+                    return await GetLinkedDataSetVersion(originalReleaseFile, cancellationToken)
                         .OnSuccess(apiDataSetVersion => (originalReleaseFile, replacementReleaseFile, apiDataSetVersion));
                 })
                 .OnSuccess(async tuple =>
@@ -121,7 +121,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         replacementSubjectMeta);
 
                     ApiDataSetVersionPlanViewModel? apiDataSetVersionPlan = null;
-                    if (tuple.replacementReleaseFile.PublicApiDataSetId is not null
+                    if (tuple.originalReleaseFile.PublicApiDataSetId is not null
                         && tuple.apiDataSetVersion is not null)
                     {
                         var completionStatus =
@@ -131,8 +131,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         {
                             DataSetId = tuple.apiDataSetVersion.DataSetId,
                             DataSetTitle = tuple.apiDataSetVersion.DataSet.Title,
-                            Id = tuple.apiDataSetVersion.Id,//Is this the original api dataset version id? is this used anywhere else and does this need further testing??
-                            Version = tuple.apiDataSetVersion.PublicVersion,//tuple.replacementReleaseFile.PublicApiDataSetVersionString!,
+                            Id = tuple.apiDataSetVersion.Id,
+                            Version = tuple.apiDataSetVersion.PublicVersion,
                             Status = tuple.apiDataSetVersion.Status,
                             MappingStatus = completionStatus
                         };

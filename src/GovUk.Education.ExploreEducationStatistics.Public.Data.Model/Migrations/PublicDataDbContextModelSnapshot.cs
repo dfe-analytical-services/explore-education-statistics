@@ -18,7 +18,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.7")
+                .HasAnnotation("ProductVersion", "8.0.14")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
@@ -145,8 +145,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                     b.Property<Guid>("DataSetVersionId")
                         .HasColumnType("uuid");
 
-                    b.Property<bool>("IncrementPatchNumber")
-                        .HasColumnType("boolean");
+                    b.Property<string>("DataSetVersionToPatch")
+                        .HasColumnType("text");
 
                     b.Property<Guid>("InstanceId")
                         .HasColumnType("uuid");

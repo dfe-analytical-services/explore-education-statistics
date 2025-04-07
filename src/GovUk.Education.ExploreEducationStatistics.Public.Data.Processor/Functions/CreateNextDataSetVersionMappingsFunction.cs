@@ -37,7 +37,7 @@ public class CreateNextDataSetVersionMappingsFunction(
                 dataSetId: request.DataSetId,
                 releaseFileId: request.ReleaseFileId,
                 instanceId,
-                request.PatchVersionConfig,
+                request.DataSetVersionToPatch,
                 cancellationToken: cancellationToken
             ))
             .OnSuccess(async dataSetVersionId =>
