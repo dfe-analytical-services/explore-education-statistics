@@ -7,8 +7,8 @@ public record NextDataSetVersionMappingsCreateRequest
     public required Guid DataSetId { get; init; }
 
     public required Guid ReleaseFileId { get; init; }
-    
-    public PatchVersionConfigs? PatchVersionConfig { get; init; }
+
+    public string? DataSetVersionToPatch { get; init; } = null;
     
     public class Validator : AbstractValidator<NextDataSetVersionMappingsCreateRequest>
     {
@@ -21,11 +21,4 @@ public record NextDataSetVersionMappingsCreateRequest
                 .NotEmpty();
         }
     }
-}
-
-public record PatchVersionConfigs(bool IsIncrementingPatchVersion, Guid? OldReleaseFileId)
-{
-    public Guid? SourceReleaseFileId { get; init; } = OldReleaseFileId;
-    
-    public bool IsIncrementingPatchVersion { get; set; } = IsIncrementingPatchVersion;
 }
