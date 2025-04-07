@@ -892,13 +892,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             [Fact]
             public async Task ReleaseRedirectExistsForNewSlugForReleaseInDifferentPublication()
             {
+                Publication targetPublication = DataFixture.DefaultPublication();
                 Release targetRelease = DataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true)
                     .WithYear(2020)
                     .WithTimePeriodCoverage(TimeIdentifier.AcademicYear)
                     .WithLabel("initial")
                     .WithSlug("2020-21-initial")
-                    .WithPublication(DataFixture.DefaultPublication());
+                    .WithPublication(targetPublication);
 
+                Publication otherPublication = DataFixture.DefaultPublication();
                 Release otherRelease = DataFixture.DefaultRelease(publishedVersions: 1)
                     .WithYear(2020)
                     .WithTimePeriodCoverage(TimeIdentifier.AcademicYear)
@@ -906,7 +908,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                     .WithSlug("2020-21-intermediate")
                     .WithRedirects([DataFixture.DefaultReleaseRedirect()
                         .WithSlug("2020-21-final")])
-                    .WithPublication(DataFixture.DefaultPublication());
+                    .WithPublication(otherPublication);
 
                 await TestApp.AddTestData<ContentDbContext>(
                     context => context.Releases.AddRange(targetRelease, otherRelease));
