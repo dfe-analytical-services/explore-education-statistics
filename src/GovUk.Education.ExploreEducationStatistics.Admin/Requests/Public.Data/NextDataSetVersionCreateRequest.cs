@@ -10,7 +10,7 @@ public record NextDataSetVersionCreateRequest
 
     public required Guid ReleaseFileId { get; init; }
     
-    public Guid? SourceReleaseFileId { get; init; }
+    public string? DataSetVersionToPatch { get; init; } = null;
 
     public class Validator : AbstractValidator<NextDataSetVersionCreateRequest>
     {

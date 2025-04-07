@@ -83,8 +83,6 @@ using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Common.Services.EventGrid;
-using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Requests;
 using Thinktecture;
 using static GovUk.Education.ExploreEducationStatistics.Common.Utils.StartupUtils;
 using ContentGlossaryService = GovUk.Education.ExploreEducationStatistics.Content.Services.GlossaryService;
@@ -845,7 +843,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
         public Task<Either<ActionResult, ProcessDataSetVersionResponseViewModel>> CreateNextDataSetVersionMappings(
             Guid dataSetId,
             Guid releaseFileId,
-            PatchVersionConfigs? patchVersionConfigs,
+            string? dataSetVersionToPatch = null,
             CancellationToken cancellationToken = default) => throw new NotImplementedException();
 
         public Task<Either<ActionResult, ProcessDataSetVersionResponseViewModel>> CompleteNextDataSetVersionImport(
@@ -903,7 +901,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
 
         public Task<Either<ActionResult, DataSetVersionSummaryViewModel>> CreateNextVersion(Guid releaseFileId,
             Guid dataSetId,
-            PatchVersionConfigs? patchVersionConfigs,
+            string? dataSetVersionToPatch = null,
             CancellationToken cancellationToken = default) => throw new NotImplementedException();
 
         public Task<Either<ActionResult, DataSetVersionSummaryViewModel>> CompleteNextVersionImport(

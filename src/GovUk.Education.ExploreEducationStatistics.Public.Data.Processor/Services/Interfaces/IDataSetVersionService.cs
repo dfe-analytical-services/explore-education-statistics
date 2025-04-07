@@ -16,7 +16,7 @@ public interface IDataSetVersionService
         Guid dataSetId,
         Guid releaseFileId,
         Guid instanceId,
-        PatchVersionConfigs? patchVersionConfig,
+        string? dataSetVersionToPatch = null,
         CancellationToken cancellationToken = default);
 
     Task<Either<ActionResult, Unit>> BulkDeleteVersions(
