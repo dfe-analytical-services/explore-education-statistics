@@ -66,7 +66,7 @@ interface Props extends InjectedWizardProps {
     publicationTitle: string,
     subjectName: string,
   ) => void;
-  hideFilterHierarchies?: boolean;
+  showFilterHierarchies?: boolean;
 }
 
 export default function FiltersForm({
@@ -78,7 +78,7 @@ export default function FiltersForm({
   showTableQueryErrorDownload = true,
   onSubmit,
   onTableQueryError,
-  hideFilterHierarchies = false, // hierarchies feature flag
+  showFilterHierarchies = false, // hierarchies feature flag
   ...stepProps
 }: Props) {
   const { goToNextStep, isActive } = stepProps;
@@ -88,14 +88,14 @@ export default function FiltersForm({
   const [openFilterGroups, setOpenFilterGroups] = useState<string[]>([]);
 
   const filterHierarchies = useMemo(() => {
-    if (hideFilterHierarchies) {
+    if (!showFilterHierarchies) {
       return [];
     }
     return subjectMeta.filterHierarchies ?? [];
-  }, [subjectMeta, hideFilterHierarchies]);
+  }, [subjectMeta, showFilterHierarchies]);
 
   const hierarchiedFilterIds = useMemo(() => {
-    if (hideFilterHierarchies) return [];
+    if (!showFilterHierarchies) return [];
 
     return (
       filterHierarchies.flatMap(hierarchy => {
@@ -105,7 +105,7 @@ export default function FiltersForm({
         ];
       }) ?? []
     );
-  }, [filterHierarchies, hideFilterHierarchies]);
+  }, [filterHierarchies, showFilterHierarchies]);
 
   const standardFilters = useMemo(() => {
     return orderBy(
