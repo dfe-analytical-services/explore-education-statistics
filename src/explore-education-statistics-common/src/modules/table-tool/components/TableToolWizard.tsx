@@ -612,7 +612,7 @@ export default function TableToolWizard({
                   showTableQueryErrorDownload={showTableQueryErrorDownload}
                   onTableQueryError={onTableQueryError}
                   onSubmit={handleFiltersFormSubmit}
-                  hideFilterHierarchies={!showFilterHierachies}
+                  showFilterHierarchies={showFilterHierachies}
                 />
               )}
             </WizardStep>
