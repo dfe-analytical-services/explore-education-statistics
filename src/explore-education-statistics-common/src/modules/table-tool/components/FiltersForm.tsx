@@ -307,34 +307,38 @@ export default function FiltersForm({
 
               {stepHeading}
 
-              <FormFieldCheckboxSearchSubGroups
-                disabled={formState.isSubmitting}
-                groupLabel="Indicators"
-                hint="Select at least one indicator below"
-                legend={
-                  <>
-                    Indicators
-                    <FormCheckboxSelectedCount name="indicators" />
-                  </>
-                }
-                legendSize="m"
-                name="indicators"
-                options={orderedIndicators.map(group => ({
-                  legend: group.label,
-                  options: group.options,
-                }))}
-                order={[]}
-              />
+              <div className="govuk-grid-row">
+                <div className="govuk-grid-column govuk-!-margin-bottom-6">
+                  <FormFieldCheckboxSearchSubGroups
+                    disabled={formState.isSubmitting}
+                    groupLabel="Indicators"
+                    hint="Select at least one indicator below"
+                    legend={
+                      <>
+                        Indicators
+                        <FormCheckboxSelectedCount name="indicators" />
+                      </>
+                    }
+                    legendSize="m"
+                    name="indicators"
+                    options={orderedIndicators.map(group => ({
+                      legend: group.label,
+                      options: group.options,
+                    }))}
+                    order={[]}
+                  />
 
-              {standardFilters.length + hierarchiedFilterIds.length > 0 && (
-                <FormFieldset
-                  error={getError('filters') ?? getError('filterHierarchies')}
-                  hint={
-                    <div className="dfe-flex dfe-justify-content--space-between dfe-flex-wrap dfe-align-items-start">
-                      <span
-                        className={`govuk-!-margin-bottom-2 ${styles.hintText}`}
-                      >
-                        {`Select at least one option from all categories.
+                  {standardFilters.length + hierarchiedFilterIds.length > 0 && (
+                    <FormFieldset
+                      error={
+                        getError('filters') ?? getError('filterHierarchies')
+                      }
+                      hint={
+                        <div className="dfe-flex dfe-justify-content--space-between dfe-flex-wrap dfe-align-items-start">
+                          <span
+                            className={`govuk-!-margin-bottom-2 ${styles.hintText}`}
+                          >
+                            {`Select at least one option from all categories.
                             ${
                               filtersIncludeTotal
                                 ? ` If no options are selected from a category then
@@ -344,82 +348,86 @@ export default function FiltersForm({
                                 other options within a category.`
                                 : ''
                             }`}
-                      </span>
-                      {standardFilters.length > 1 && (
-                        <ButtonText
-                          ariaExpanded={allFiltersOpen}
-                          ariaControls="filterGroups"
-                          className="govuk-!-margin-bottom-2"
-                          onClick={() => {
-                            setOpenFilterGroups(
-                              allFiltersOpen ? [] : allFilterGroupKeys,
-                            );
-                          }}
-                        >
-                          {allFiltersOpen ? 'Collapse all' : 'Expand all'}
-                          <VisuallyHidden> categories</VisuallyHidden>
-                        </ButtonText>
-                      )}
-                    </div>
-                  }
-                  id="filters"
-                  legend="Categories"
-                  legendSize="m"
-                >
-                  {filterHierarchies.map(filterHierarchy => {
-                    if (filterHierarchy.length === 0) return null;
+                          </span>
+                          {standardFilters.length > 1 && (
+                            <ButtonText
+                              ariaExpanded={allFiltersOpen}
+                              ariaControls="filterGroups"
+                              className="govuk-!-margin-bottom-2"
+                              onClick={() => {
+                                setOpenFilterGroups(
+                                  allFiltersOpen ? [] : allFilterGroupKeys,
+                                );
+                              }}
+                            >
+                              {allFiltersOpen ? 'Collapse all' : 'Expand all'}
+                              <VisuallyHidden> categories</VisuallyHidden>
+                            </ButtonText>
+                          )}
+                        </div>
+                      }
+                      id="filters"
+                      legend="Categories"
+                      legendSize="m"
+                    >
+                      {filterHierarchies.map(filterHierarchy => {
+                        if (filterHierarchy.length === 0) return null;
 
-                    const hierarchyName = `filterHierarchies.${camelCase(
-                      optionLabelsMap[
-                        filterHierarchy.at(-1)?.childFilterId ?? ''
-                      ],
-                    )}`;
+                        const hierarchyName = `filterHierarchies.${camelCase(
+                          optionLabelsMap[
+                            filterHierarchy.at(-1)?.childFilterId ?? ''
+                          ],
+                        )}`;
 
-                    return (
-                      <FilterHierarchy
-                        filterHierarchy={filterHierarchy}
-                        optionLabelsMap={optionLabelsMap}
-                        disabled={formState.isSubmitting}
-                        key={hierarchyName}
-                        name={hierarchyName}
-                      />
-                    );
-                  })}
-                  <div id="filterGroups">
-                    {standardFilters.map(([filterKey, filterGroup]) => {
-                      const filterName = `filters.${filterKey}`;
-                      const orderedFilterGroupOptions = orderBy(
-                        Object.values(filterGroup.options),
-                        'order',
-                      );
+                        return (
+                          <FilterHierarchy
+                            filterHierarchy={filterHierarchy}
+                            optionLabelsMap={optionLabelsMap}
+                            disabled={formState.isSubmitting}
+                            key={hierarchyName}
+                            name={hierarchyName}
+                          />
+                        );
+                      })}
+                      <div id="filterGroups">
+                        {standardFilters.map(([filterKey, filterGroup]) => {
+                          const filterName = `filters.${filterKey}`;
+                          const orderedFilterGroupOptions = orderBy(
+                            Object.values(filterGroup.options),
+                            'order',
+                          );
 
-                      return (
-                        <FormFieldCheckboxGroupsMenu
-                          disabled={formState.isSubmitting}
-                          groupLabel={filterGroup.legend}
-                          hint={filterGroup.hint}
-                          key={filterKey}
-                          legend={filterGroup.legend}
-                          name={filterName}
-                          open={openFilterGroups.includes(filterKey)}
-                          options={orderedFilterGroupOptions.map(group => ({
-                            legend: group.label,
-                            options: group.options,
-                          }))}
-                          order={[]}
-                          onToggle={isOpen => {
-                            setOpenFilterGroups(groups =>
-                              isOpen
-                                ? [...groups, filterKey]
-                                : groups.filter(group => group !== filterKey),
-                            );
-                          }}
-                        />
-                      );
-                    })}
-                  </div>
-                </FormFieldset>
-              )}
+                          return (
+                            <FormFieldCheckboxGroupsMenu
+                              disabled={formState.isSubmitting}
+                              groupLabel={filterGroup.legend}
+                              hint={filterGroup.hint}
+                              key={filterKey}
+                              legend={filterGroup.legend}
+                              name={filterName}
+                              open={openFilterGroups.includes(filterKey)}
+                              options={orderedFilterGroupOptions.map(group => ({
+                                legend: group.label,
+                                options: group.options,
+                              }))}
+                              order={[]}
+                              onToggle={isOpen => {
+                                setOpenFilterGroups(groups =>
+                                  isOpen
+                                    ? [...groups, filterKey]
+                                    : groups.filter(
+                                        group => group !== filterKey,
+                                      ),
+                                );
+                              }}
+                            />
+                          );
+                        })}
+                      </div>
+                    </FormFieldset>
+                  )}
+                </div>
+              </div>
 
               <WizardStepFormActions
                 {...stepProps}
