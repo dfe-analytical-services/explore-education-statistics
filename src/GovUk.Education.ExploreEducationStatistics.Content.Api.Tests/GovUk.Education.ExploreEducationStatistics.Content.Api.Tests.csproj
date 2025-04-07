@@ -28,10 +28,4 @@
         <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Content.Services.Tests\GovUk.Education.ExploreEducationStatistics.Content.Services.Tests.csproj" />
         <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Data.Model.Tests\GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.csproj" />
     </ItemGroup>
-
-    <ItemGroup>
-      <Content Include="appsettings.AnalyticsEnabled.json">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </Content>
-    </ItemGroup>
 </Project>

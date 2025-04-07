@@ -19,14 +19,14 @@ public class AnalyticsConsumer(
             try
             {
                 var request =
-                    await analyticsManager.ReadReleaseVersionZipDownload(stoppingToken);
-                await analyticsWriter.ReportReleaseVersionZipDownload(request);
+                    await analyticsManager.ReadZipDownload(stoppingToken);
+                await analyticsWriter.ReportZipDownload(request);
             }
             catch (Exception e)
             {
                 logger.LogError(
                     exception: e,
-                    message: "Error whilst reading a ReleaseVersionZipDownload event from {AnalyticsManager}",
+                    message: "Error whilst reading a ZipDownload event from {AnalyticsManager}",
                     nameof(IAnalyticsManager));
             }
         }

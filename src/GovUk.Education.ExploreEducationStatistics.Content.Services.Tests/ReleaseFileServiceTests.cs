@@ -247,10 +247,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     (stream, _, _) => { stream.WriteText("Test data guidance blob"); }
                 );
 
-            // This should never happen during normal usage, as we don't expect users to request multiple files.
-            // At the time of writing, the service only officially allows users to download all data sets for a release
-            // (if fileIds is null) or a specific data set. But this endpoint takes an array of files as this is what
-            // the old Data catalogue page allowed.
+            // This should not happen during normal usage, as the public frontend doesn't allow users to request
+            // multiple files. At the time of writing, the service only officially allows users to download all data
+            // sets for a release (if fileIds is null) or a specific data set. But this endpoint takes an array of
+            // files as this is what the old Data catalogue page allowed.
             var logger = new Mock<ILogger<ReleaseFileService>>(MockBehavior.Strict);
             var expectedWarning =
                 "We only record analytics for zip downloads for an entire release or one specific data set. So this means someone manually attempted to download a zip with more than one specific file?";
@@ -344,7 +344,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     (stream, _, _) => { stream.WriteText("Test data guidance blob"); }
                 );
 
-            var request = new AnalyticsWriter.CaptureReleaseVersionZipDownloadRequest
+            var request = new AnalyticsWriter.CaptureZipDownloadRequest
             (
                 PublicationName: releaseVersion.Release.Publication.Title,
                 ReleaseVersionId: releaseVersion.Id,
@@ -354,8 +354,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 DataSetName: releaseFile.Name
             );
             var analyticsManager = new Mock<IAnalyticsManager>(MockBehavior.Strict);
-            analyticsManager.Setup(m => m.AddReleaseVersionZipDownload(
-                It.Is<AnalyticsWriter.CaptureReleaseVersionZipDownloadRequest>(r =>
+            analyticsManager.Setup(m => m.AddZipDownload(
+                It.Is<AnalyticsWriter.CaptureZipDownloadRequest>(r =>
                     r.IsDeepEqualTo(request, null)),
                 It.IsAny<CancellationToken>()))
                 .Returns(Task.CompletedTask);
@@ -460,7 +460,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
             var publicBlobStorageService = new Mock<IPublicBlobStorageService>(MockBehavior.Strict);
 
-            var request = new AnalyticsWriter.CaptureReleaseVersionZipDownloadRequest
+            var request = new AnalyticsWriter.CaptureZipDownloadRequest
             (
                 PublicationName: releaseVersion.Release.Publication.Title,
                 ReleaseVersionId: releaseVersion.Id,
@@ -468,8 +468,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 ReleaseLabel: releaseVersion.Release.Label
             );
             var analyticsManager = new Mock<IAnalyticsManager>(MockBehavior.Strict);
-            analyticsManager.Setup(m => m.AddReleaseVersionZipDownload(
-                It.Is<AnalyticsWriter.CaptureReleaseVersionZipDownloadRequest>(r =>
+            analyticsManager.Setup(m => m.AddZipDownload(
+                It.Is<AnalyticsWriter.CaptureZipDownloadRequest>(r =>
                     r.IsDeepEqualTo(request, null)),
                 It.IsAny<CancellationToken>()))
                 .Returns(Task.CompletedTask);
@@ -536,7 +536,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             // File does not exist in blob storage
             publicBlobStorageService.SetupCheckBlobExists(PublicReleaseFiles, releaseFile.PublicPath(), false);
 
-            var request = new AnalyticsWriter.CaptureReleaseVersionZipDownloadRequest
+            var request = new AnalyticsWriter.CaptureZipDownloadRequest
             (
                 PublicationName: releaseVersion.Release.Publication.Title,
                 ReleaseVersionId: releaseVersion.Id,
@@ -544,8 +544,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 ReleaseLabel: releaseVersion.Release.Label
             );
             var analyticsManager = new Mock<IAnalyticsManager>(MockBehavior.Strict);
-            analyticsManager.Setup(m => m.AddReleaseVersionZipDownload(
-                It.Is<AnalyticsWriter.CaptureReleaseVersionZipDownloadRequest>(r =>
+            analyticsManager.Setup(m => m.AddZipDownload(
+                It.Is<AnalyticsWriter.CaptureZipDownloadRequest>(r =>
                     r.IsDeepEqualTo(request, null)),
                 It.IsAny<CancellationToken>()))
                 .Returns(Task.CompletedTask);
@@ -620,7 +620,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
             var publicBlobStorageService = new Mock<IPublicBlobStorageService>(MockBehavior.Strict);
 
-            var request = new AnalyticsWriter.CaptureReleaseVersionZipDownloadRequest
+            var request = new AnalyticsWriter.CaptureZipDownloadRequest
             (
                 PublicationName: releaseVersion.Release.Publication.Title,
                 ReleaseVersionId: releaseVersion.Id,
@@ -628,8 +628,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 ReleaseLabel: releaseVersion.Release.Label
             );
             var analyticsManager = new Mock<IAnalyticsManager>(MockBehavior.Strict);
-            analyticsManager.Setup(m => m.AddReleaseVersionZipDownload(
-                It.Is<AnalyticsWriter.CaptureReleaseVersionZipDownloadRequest>(r =>
+            analyticsManager.Setup(m => m.AddZipDownload(
+                It.Is<AnalyticsWriter.CaptureZipDownloadRequest>(r =>
                     r.IsDeepEqualTo(request, null)),
                 It.IsAny<CancellationToken>()))
                 .Returns(Task.CompletedTask);
@@ -679,7 +679,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
             var publicBlobStorageService = new Mock<IPublicBlobStorageService>(MockBehavior.Strict);
 
-            var request = new AnalyticsWriter.CaptureReleaseVersionZipDownloadRequest
+            var request = new AnalyticsWriter.CaptureZipDownloadRequest
             (
                 PublicationName: releaseVersion.Release.Publication.Title,
                 ReleaseVersionId: releaseVersion.Id,
@@ -687,8 +687,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 ReleaseLabel: releaseVersion.Release.Label
             );
             var analyticsManager = new Mock<IAnalyticsManager>(MockBehavior.Strict);
-            analyticsManager.Setup(m => m.AddReleaseVersionZipDownload(
-                It.Is<AnalyticsWriter.CaptureReleaseVersionZipDownloadRequest>(r =>
+            analyticsManager.Setup(m => m.AddZipDownload(
+                It.Is<AnalyticsWriter.CaptureZipDownloadRequest>(r =>
                     r.IsDeepEqualTo(request, null)),
                 It.IsAny<CancellationToken>()))
                 .Returns(Task.CompletedTask);
@@ -773,10 +773,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     cancellationToken: tokenSource.Token)
                 .Callback(() => tokenSource.Cancel());
 
-            // This should never happen during normal usage, as we don't expect users to request multiple files.
-            // At the time of writing, the service only officially allows users to download all data sets for a release
-            // (if fileIds is null) or a specific data set. But this endpoint takes an array of files as this is what
-            // the old Data catalogue page allowed.
+            // This should not happen during normal usage, as the public frontend doesn't allow users to request
+            // multiple files. At the time of writing, the service only officially allows users to download all data
+            // sets for a release (if fileIds is null) or a specific data set. But this endpoint takes an array of
+            // files as this is what the old Data catalogue page allowed.
             var logger = new Mock<ILogger<ReleaseFileService>>(MockBehavior.Strict);
             var expectedWarning =
                 "We only record analytics for zip downloads for an entire release or one specific data set. So this means someone manually attempted to download a zip with more than one specific file?";
@@ -896,7 +896,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     (stream, _, _) => { stream.WriteText("Test data guidance blob"); }
                 );
 
-            var request = new AnalyticsWriter.CaptureReleaseVersionZipDownloadRequest
+            var request = new AnalyticsWriter.CaptureZipDownloadRequest
             (
                 PublicationName: releaseVersion.Release.Publication.Title,
                 ReleaseVersionId: releaseVersion.Id,
@@ -904,8 +904,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 ReleaseLabel: releaseVersion.Release.Label
             );
             var analyticsManager = new Mock<IAnalyticsManager>(MockBehavior.Strict);
-            analyticsManager.Setup(m => m.AddReleaseVersionZipDownload(
-                It.Is<AnalyticsWriter.CaptureReleaseVersionZipDownloadRequest>(r =>
+            analyticsManager.Setup(m => m.AddZipDownload(
+                It.Is<AnalyticsWriter.CaptureZipDownloadRequest>(r =>
                     r.IsDeepEqualTo(request, null)),
                 It.IsAny<CancellationToken>()))
                 .Returns(Task.CompletedTask);
@@ -982,7 +982,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             publicBlobStorageService
                 .SetupDownloadToStream(PublicReleaseFiles, allFilesZipPath, "Test cached all files zip");
 
-            var request = new AnalyticsWriter.CaptureReleaseVersionZipDownloadRequest
+            var request = new AnalyticsWriter.CaptureZipDownloadRequest
             (
                 PublicationName: releaseVersion.Release.Publication.Title,
                 ReleaseVersionId: releaseVersion.Id,
@@ -990,8 +990,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 ReleaseLabel: releaseVersion.Release.Label
             );
             var analyticsManager = new Mock<IAnalyticsManager>(MockBehavior.Strict);
-            analyticsManager.Setup(m => m.AddReleaseVersionZipDownload(
-                It.Is<AnalyticsWriter.CaptureReleaseVersionZipDownloadRequest>(r =>
+            analyticsManager.Setup(m => m.AddZipDownload(
+                It.Is<AnalyticsWriter.CaptureZipDownloadRequest>(r =>
                     r.IsDeepEqualTo(request, null)),
                 It.IsAny<CancellationToken>()))
                 .Returns(Task.CompletedTask);
@@ -1087,7 +1087,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 )
                 .Returns(Task.CompletedTask);
 
-            var request = new AnalyticsWriter.CaptureReleaseVersionZipDownloadRequest
+            var request = new AnalyticsWriter.CaptureZipDownloadRequest
             (
                 PublicationName: releaseVersion.Release.Publication.Title,
                 ReleaseVersionId: releaseVersion.Id,
@@ -1095,8 +1095,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 ReleaseLabel: releaseVersion.Release.Label
             );
             var analyticsManager = new Mock<IAnalyticsManager>(MockBehavior.Strict);
-            analyticsManager.Setup(m => m.AddReleaseVersionZipDownload(
-                It.Is<AnalyticsWriter.CaptureReleaseVersionZipDownloadRequest>(r =>
+            analyticsManager.Setup(m => m.AddZipDownload(
+                It.Is<AnalyticsWriter.CaptureZipDownloadRequest>(r =>
                     r.IsDeepEqualTo(request, null)),
                 It.IsAny<CancellationToken>()))
                 .Returns(Task.CompletedTask);

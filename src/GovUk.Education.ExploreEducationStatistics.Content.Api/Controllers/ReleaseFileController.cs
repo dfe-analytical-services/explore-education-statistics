@@ -57,10 +57,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
         [Produces(MediaTypeNames.Application.Octet)]
         public async Task<ActionResult> StreamFilesToZip(
             Guid releaseVersionId,
-            // The previous data catalogue page allowed users to selected multiple specific files to include in the zip file,
-            // hence why this endpoint takes an array of fileIds, but this is no longer the case. Users can only download all
-            // the releaseVersion's data (by not providing fileIds) or provide a single fileId for a specific data set.
-            // In theory, users could still download a zip with multiple files if they manually crafted
+            // The previous data catalogue page allowed users to selected multiple specific files to include in the
+            // zip file, hence why this endpoint takes an array of fileIds, but this is no longer the case. Via the
+            // public frontend, users only download all the releaseVersion's data (by not providing fileIds) or provide
+            // a single fileId for a specific data set.
             [FromQuery] IList<Guid>? fileIds = null)
         {
             return await persistenceHelper.CheckEntityExists<ReleaseVersion>(

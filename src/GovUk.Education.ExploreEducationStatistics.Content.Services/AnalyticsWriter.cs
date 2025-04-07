@@ -15,10 +15,10 @@ public class AnalyticsWriter(
     ) : IAnalyticsWriter
 {
 
-    public async Task ReportReleaseVersionZipDownload(CaptureReleaseVersionZipDownloadRequest request)
+    public async Task ReportZipDownload(CaptureZipDownloadRequest request)
     {
         logger.LogInformation(
-            "Capturing ReleaseVersionZipDownload event analytics for releaseVersion {ReleaseVersionId}{WithSubject}",
+            "Capturing ZipDownload event analytics for releaseVersion {ReleaseVersionId}{WithSubject}",
             request.ReleaseVersionId,
             request.SubjectId == null
                 ? ""
@@ -41,7 +41,7 @@ public class AnalyticsWriter(
             var filePath = Path.Combine(directory, filename);
             if (File.Exists(filePath))
             {
-                throw new Exception($"Tried to create a file that already exists for {nameof(CaptureReleaseVersionZipDownloadRequest)}!");
+                throw new Exception($"Tried to create a file that already exists for {nameof(CaptureZipDownloadRequest)}!");
             }
 
             await File.WriteAllTextAsync(
@@ -52,12 +52,12 @@ public class AnalyticsWriter(
         {
             logger.LogError(
                 exception: e,
-                message: "Error whilst writing {ReleaseVersionZipDownloadRequest} to disk",
-                nameof(CaptureReleaseVersionZipDownloadRequest));
+                message: "Error whilst writing {ZipDownloadRequest} to disk",
+                nameof(CaptureZipDownloadRequest));
         }
     }
 
-    public record CaptureReleaseVersionZipDownloadRequest(
+    public record CaptureZipDownloadRequest(
         string PublicationName,
         Guid ReleaseVersionId,
         string ReleaseName,

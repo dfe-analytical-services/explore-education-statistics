@@ -9,19 +9,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services;
 
 public class AnalyticsManager : IAnalyticsManager
 {
-    private readonly Channel<CaptureReleaseVersionZipDownloadRequest> _releaseVersionZipChannel =
-        Channel.CreateUnbounded<CaptureReleaseVersionZipDownloadRequest>();
+    private readonly Channel<CaptureZipDownloadRequest> _downloadZipChannel =
+        Channel.CreateUnbounded<CaptureZipDownloadRequest>();
 
-    public async Task AddReleaseVersionZipDownload(
-        CaptureReleaseVersionZipDownloadRequest request,
+    public async Task AddZipDownload(
+        CaptureZipDownloadRequest request,
         CancellationToken cancellationToken)
     {
-        await _releaseVersionZipChannel.Writer.WriteAsync(request, cancellationToken);
+        await _downloadZipChannel.Writer.WriteAsync(request, cancellationToken);
     }
 
-    public ValueTask<CaptureReleaseVersionZipDownloadRequest> ReadReleaseVersionZipDownload(
+    public ValueTask<CaptureZipDownloadRequest> ReadZipDownload(
         CancellationToken cancellationToken)
     {
-        return _releaseVersionZipChannel.Reader.ReadAsync(cancellationToken);
+        return _downloadZipChannel.Reader.ReadAsync(cancellationToken);
     }
 }

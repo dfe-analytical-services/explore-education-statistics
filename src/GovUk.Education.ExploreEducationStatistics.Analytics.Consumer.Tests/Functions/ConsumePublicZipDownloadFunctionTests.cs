@@ -81,6 +81,7 @@ public abstract class ConsumePublicZipDownloadsFunctionTests : IDisposable
             Assert.Equal("release-label", zipDownloadReportRow.ReleaseLabel);
             Assert.Null(zipDownloadReportRow.SubjectId);
             Assert.Null(zipDownloadReportRow.DataSetName);
+            Assert.Equal(1, zipDownloadReportRow.Downloads);
         }
 
         [Fact]
@@ -121,7 +122,6 @@ public abstract class ConsumePublicZipDownloadsFunctionTests : IDisposable
             Assert.Null(zipDownloadReportRows[1].SubjectId);
             Assert.Null(zipDownloadReportRows[1].DataSetName);
             Assert.Equal(1, zipDownloadReportRows[1].Downloads);
-
         }
 
         [Fact]

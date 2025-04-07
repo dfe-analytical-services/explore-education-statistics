@@ -7,10 +7,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces
 
 public interface IAnalyticsManager
 {
-    Task AddReleaseVersionZipDownload(
-        CaptureReleaseVersionZipDownloadRequest request,
+    Task AddZipDownload(
+        CaptureZipDownloadRequest request,
         CancellationToken cancellationToken);
 
-    ValueTask<CaptureReleaseVersionZipDownloadRequest>
-        ReadReleaseVersionZipDownload(CancellationToken cancellationToken);
+    ValueTask<CaptureZipDownloadRequest>
+        ReadZipDownload(CancellationToken cancellationToken);
 }

@@ -26,11 +26,11 @@ public class AnalyticsWriterTests : IDisposable
     }
 
     [Fact]
-    public async Task Success()
+    public async Task TwoZipDownloads_Success()
     {
         var service = BuildService(_analyticsPathResolver);
 
-        await service.ReportReleaseVersionZipDownload(new AnalyticsWriter.CaptureReleaseVersionZipDownloadRequest(
+        await service.ReportZipDownload(new AnalyticsWriter.CaptureZipDownloadRequest(
             PublicationName: "Publication name",
             ReleaseVersionId: new Guid("4ed767c7-79e6-4bd4-a0d1-8c9b7f4bbfaa"),
             ReleaseName: "Release name",
@@ -38,7 +38,7 @@ public class AnalyticsWriterTests : IDisposable
             SubjectId: new Guid("9e3bdced-d289-4017-b93f-23ecfb3c90b9"),
             DataSetName: "Data set name"));
 
-        await service.ReportReleaseVersionZipDownload(new AnalyticsWriter.CaptureReleaseVersionZipDownloadRequest(
+        await service.ReportZipDownload(new AnalyticsWriter.CaptureZipDownloadRequest(
             PublicationName: "Publication name",
             ReleaseVersionId: new Guid("4ed767c7-79e6-4bd4-a0d1-8c9b7f4bbfaa"),
             ReleaseName: "Release name",
@@ -56,12 +56,12 @@ public class AnalyticsWriterTests : IDisposable
         var file1Contents = await File.ReadAllTextAsync(files[0]);
         Snapshot.Match(
             currentResult: file1Contents,
-            snapshotName: $"{SnapshotPrefix}.{nameof(Success)}.ZipDownload1");
+            snapshotName: $"{SnapshotPrefix}.{nameof(TwoZipDownloads_Success)}.ZipDownload1");
 
         var file2Contents = await File.ReadAllTextAsync(files[1]);
         Snapshot.Match(
             currentResult: file2Contents,
-            snapshotName: $"{SnapshotPrefix}.{nameof(Success)}.ZipDownload2");
+            snapshotName: $"{SnapshotPrefix}.{nameof(TwoZipDownloads_Success)}.ZipDownload2");
     }
 
     private static AnalyticsWriter BuildService(IAnalyticsPathResolver pathResolver)

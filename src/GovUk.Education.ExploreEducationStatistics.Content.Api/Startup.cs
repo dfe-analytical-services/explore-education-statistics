@@ -268,15 +268,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api
 
         private class NoOpAnalyticsManager : IAnalyticsManager
         {
-            public Task AddReleaseVersionZipDownload(
-                AnalyticsWriter.CaptureReleaseVersionZipDownloadRequest request,
+            public Task AddZipDownload(
+                AnalyticsWriter.CaptureZipDownloadRequest request,
                 CancellationToken cancellationToken)
             {
                 return Task.CompletedTask;
             }
 
-            public async ValueTask<AnalyticsWriter.CaptureReleaseVersionZipDownloadRequest>
-                ReadReleaseVersionZipDownload(CancellationToken cancellationToken)
+            public async ValueTask<AnalyticsWriter.CaptureZipDownloadRequest>
+                ReadZipDownload(CancellationToken cancellationToken)
             {
                 await Task.Delay(Timeout.Infinite, cancellationToken);
                 return default!;

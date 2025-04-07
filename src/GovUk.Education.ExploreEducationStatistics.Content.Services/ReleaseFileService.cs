@@ -314,8 +314,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
                 dataSetName = releaseFiles[0].Name;
             }
 
-            await analyticManager.AddReleaseVersionZipDownload(
-                new AnalyticsWriter.CaptureReleaseVersionZipDownloadRequest(
+            await analyticManager.AddZipDownload(
+                new AnalyticsWriter.CaptureZipDownloadRequest(
                     releaseVersion.Release.Publication.Title,
                     releaseVersion.Id,
                     releaseVersion.Release.Title,
