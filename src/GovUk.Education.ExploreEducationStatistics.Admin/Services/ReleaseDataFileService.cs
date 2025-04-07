@@ -412,68 +412,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
-        // TODO: Extract these two methods to a separate DataSetBuilder class
-        // Optionally combine/refactor to reduce duplication of stream reading logic
-        private static async Task<List<DataSetFileDto>> BuildDataSetFiles(
-            IFormFile dataFormFile,
-            IFormFile metaFormFile)
-        {
-            var files = new List<DataSetFileDto>();
-
-            using var dataFileStream = dataFormFile.OpenReadStream();
-            var dataMemoryStream = new System.IO.MemoryStream();
-            await dataFileStream.CopyToAsync(dataMemoryStream);
-
-            files.Add(new DataSetFileDto
-            {
-                FileName = dataFormFile.FileName,
-                FileSize = dataMemoryStream.Length,
-                FileStream = dataMemoryStream,
-            });
-
-            using var metaFileStream = metaFormFile.OpenReadStream();
-            var metaMemoryStream = new System.IO.MemoryStream();
-            await metaFileStream.CopyToAsync(metaMemoryStream);
-
-            files.Add(new DataSetFileDto
-            {
-                FileName = metaFormFile.FileName,
-                FileSize = metaMemoryStream.Length,
-                FileStream = metaMemoryStream,
-            });
-
-            dataMemoryStream.SeekToBeginning();
-            metaMemoryStream.SeekToBeginning();
-
-            return files;
-        }
-
-        private static async Task<List<DataSetFileDto>> ExtractDataSetZipFile(IFormFile zipFile)
-        {
-            await using var stream = zipFile.OpenReadStream();
-            using var archive = new ZipArchive(stream);
-
-            var files = new List<DataSetFileDto>();
-
-            foreach (var entry in archive.Entries)
-            {
-                using var fileStream = entry.Open();
-                var memoryStream = new System.IO.MemoryStream();
-                await fileStream.CopyToAsync(memoryStream);
-
-                files.Add(new DataSetFileDto
-                {
-                    FileName = entry.Name,
-                    FileSize = memoryStream.Length,
-                    FileStream = memoryStream,
-                });
-
-                memoryStream.SeekToBeginning();
-            }
-
-            return files;
-        }
-
         public async Task<Either<ActionResult, List<ZipDataSetFileViewModel>>> ValidateAndUploadFromBulkZip(
             Guid releaseVersionId,
             IFormFile zipFormFile,
@@ -509,6 +447,54 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
                     return viewModels;
                 });
+        }
+
+        private static async Task<List<DataSetFileDto>> BuildDataSetFiles(
+            IFormFile dataFormFile,
+            IFormFile metaFormFile)
+        {
+            var files = new List<DataSetFileDto>();
+
+            using var dataFileStream = dataFormFile.OpenReadStream();
+            files.Add(await BuildDataSetFile(dataFileStream, dataFormFile.FileName));
+
+            using var metaFileStream = metaFormFile.OpenReadStream();
+            files.Add(await BuildDataSetFile(metaFileStream, metaFormFile.FileName));
+
+            return files;
+        }
+
+        private static async Task<List<DataSetFileDto>> ExtractDataSetZipFile(IFormFile zipFile)
+        {
+            await using var stream = zipFile.OpenReadStream();
+            using var archive = new ZipArchive(stream);
+
+            var files = new List<DataSetFileDto>();
+
+            foreach (var entry in archive.Entries)
+            {
+                using var fileStream = entry.Open();
+                files.Add(await BuildDataSetFile(fileStream, entry.Name));
+            }
+
+            return files;
+        }
+
+        private static async Task<DataSetFileDto> BuildDataSetFile(
+            System.IO.Stream fileStream,
+            string fileName)
+        {
+            var memoryStream = new System.IO.MemoryStream();
+            await fileStream.CopyToAsync(memoryStream);
+
+            memoryStream.SeekToBeginning();
+
+            return new DataSetFileDto
+            {
+                FileName = fileName,
+                FileSize = memoryStream.Length,
+                FileStream = memoryStream,
+            };
         }
 
         public async Task<Either<ActionResult, List<DataFileInfo>>> SaveDataSetsFromTemporaryBlobStorage(
