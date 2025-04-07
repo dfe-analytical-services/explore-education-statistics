@@ -27,7 +27,12 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Public.Data;
+using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Public.Data;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Tests.Fixtures;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainers;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
@@ -2117,6 +2122,152 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
+        public async Task Upload_ReplacingWithDataSet()
+        {
+            const string dataFileName = "test-data.csv";
+            const string metaFileName = "test-data.meta.csv";
+            DataSet dataSet = _fixture
+                .DefaultDataSet();
+
+            DataSetVersion dataSetVersion = _fixture
+                .DefaultDataSetVersion()
+                .WithDataSet(dataSet)
+                .WithVersionNumber(1, 0);
+
+            var originalSubject = new Subject
+            {
+                Id = Guid.NewGuid(),
+            };
+
+           
+            File file = _fixture
+                .DefaultFile()
+                .WithSubjectId(originalSubject.Id)
+                .WithType(FileType.Data);
+
+            ReleaseVersion releaseVersion = _fixture.DefaultReleaseVersion()
+                .WithRelease(_fixture.DefaultRelease()
+                    .WithPublication(_fixture.DefaultPublication()));
+
+            ReleaseFile originalDataReleaseFile = _fixture
+                .DefaultReleaseFile()
+                .WithReleaseVersion(releaseVersion)
+                .WithFile(file)
+                .WithPublicApiDataSetId(dataSet.Id)
+                .WithPublicApiDataSetVersion(dataSetVersion.SemVersion()); 
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await contentDbContext.AddAsync(originalDataReleaseFile);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            var originalReleaseSubject = new ReleaseSubject
+            {
+                ReleaseVersionId = releaseVersion.Id,
+                SubjectId = originalSubject.Id
+            };
+
+            var statisticsDbContextId = Guid.NewGuid().ToString();
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            {
+                await statisticsDbContext.AddAsync(originalSubject);
+                await statisticsDbContext.AddAsync(originalReleaseSubject);
+                await statisticsDbContext.SaveChangesAsync();
+            }
+            
+
+            var dataFormFile = CreateFormFileMock(dataFileName).Object;
+            var metaFormFile = CreateFormFileMock(metaFileName).Object;
+            var privateBlobStorageService = new Mock<IPrivateBlobStorageService>(Strict);
+            var fileUploadsValidatorService = new Mock<IFileUploadsValidatorService>(Strict);
+            var dataImportService = new Mock<IDataImportService>(Strict);
+            var dataSetVersionService = new Mock<IDataSetVersionService>(Strict);
+            
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            {
+                fileUploadsValidatorService
+                    .Setup(s => s.ValidateDataSetFilesForUpload(
+                        releaseVersion.Id,
+                        originalDataReleaseFile.Name,
+                        dataFormFile,
+                        metaFormFile,
+                        It.Is<File>(f => f.Id == originalDataReleaseFile.File.Id)))
+                    .ReturnsAsync([]);
+
+                dataImportService
+                    .Setup(s => s.Import(
+                        It.IsAny<Guid>(),
+                        It.Is<File>(file => file.Type == FileType.Data && file.Filename == dataFileName),
+                        It.Is<File>(file => file.Type == Metadata && file.Filename == metaFileName),
+                        null))
+                    .ReturnsAsync(new DataImport
+                    {
+                        Status = QUEUED
+                    });
+
+                privateBlobStorageService.Setup(mock =>
+                    mock.UploadFile(PrivateReleaseFiles,
+                        It.Is<string>(path =>
+                            path.Contains(FilesPath(releaseVersion.Id, FileType.Data))),
+                        dataFormFile
+                    )).Returns(Task.CompletedTask);
+
+                privateBlobStorageService.Setup(mock =>
+                    mock.UploadFile(PrivateReleaseFiles,
+                        It.Is<string>(path =>
+                            path.Contains(FilesPath(releaseVersion.Id, FileType.Data))),
+                        metaFormFile
+                    )).Returns(Task.CompletedTask);
+
+                dataSetVersionService.Setup(mock => mock.CreateNextVersion(
+                        It.IsAny<Guid>(),
+                        dataSet.Id,
+                        dataSetVersion.VersionString,
+                        CancellationToken.None)
+                    )
+                    .ReturnsAsync(new Either<ActionResult, DataSetVersionSummaryViewModel>(
+                        new DataSetVersionSummaryViewModel
+                        {
+                            Id = dataSetVersion.Id,
+                            Version = dataSetVersion.SemVersion().WithPatch(1).ToString(),
+                            Status = DataSetVersionStatus.Processing,
+                            Type = DataSetVersionType.Minor,
+                            ReleaseVersion =
+                                new IdTitleViewModel() { Id = releaseVersion.Id, Title = dataFileName, },
+                            File = new IdTitleViewModel() { Id = file.Id, Title = dataFileName, }
+                        }))
+                    .Callback(() =>
+                    {
+                        originalDataReleaseFile.PublicApiDataSetId = dataSet.Id;
+                        originalDataReleaseFile.PublicApiDataSetVersion = dataSetVersion.SemVersion().WithPatch(1).ToString();
+                    });
+                
+                var service = SetupReleaseDataFileService(
+                    contentDbContext: contentDbContext,
+                    statisticsDbContext: statisticsDbContext,
+                    privateBlobStorageService: privateBlobStorageService.Object,
+                    dataImportService: dataImportService.Object,
+                    fileUploadsValidatorService: fileUploadsValidatorService.Object,
+                    dataSetVersionService: dataSetVersionService.Object
+                );
+
+                var result = await service.Upload(
+                    releaseVersionId: releaseVersion.Id,
+                    dataFormFile: dataFormFile,
+                    metaFormFile: metaFormFile,
+                    dataSetTitle: null, 
+                    replacingFileId: originalDataReleaseFile.File.Id);
+
+                var dataFileInfo = result.AssertRight();
+                
+                MockUtils.VerifyAllMocks(privateBlobStorageService, fileUploadsValidatorService, dataImportService, dataSetVersionService);
+            }
+        }
+
+        [Fact]
         public async Task Upload_Order()
         {
             const string subjectName = "Test Subject";
@@ -2856,7 +3007,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             IReleaseFileService? releaseFileService = null,
             IReleaseDataFileRepository? releaseDataFileRepository = null,
             IDataImportService? dataImportService = null,
-            IUserService? userService = null)
+            IUserService? userService = null,
+            IDataSetVersionService? dataSetVersionService = null)
         {
             contentDbContext.Users.Add(_user);
             contentDbContext.SaveChanges();
@@ -2875,7 +3027,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 releaseFileService ?? Mock.Of<IReleaseFileService>(Strict),
                 releaseDataFileRepository ?? new ReleaseDataFileRepository(contentDbContext),
                 dataImportService ?? Mock.Of<IDataImportService>(Strict),
-                userService ?? MockUtils.AlwaysTrueUserService(_user.Id).Object
+                userService ?? MockUtils.AlwaysTrueUserService(_user.Id).Object,
+                dataSetVersionService ?? Mock.Of<IDataSetVersionService>(Strict)
             );
         }
     }
