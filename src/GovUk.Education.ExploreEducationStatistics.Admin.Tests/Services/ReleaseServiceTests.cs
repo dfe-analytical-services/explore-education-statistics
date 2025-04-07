@@ -6,6 +6,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.MockBuilders;
+using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
@@ -16,6 +17,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Cache;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.Cache;
+using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using Microsoft.EntityFrameworkCore;
 using Moq;
 using Xunit.Abstractions;
@@ -258,6 +260,52 @@ public abstract class ReleaseServiceTests
                     .Where(dataBlock => dataBlock.ReleaseVersionId == newReleaseVersionId));
             }
         }
+
+        [Fact]
+        public async Task GivenReleaseExists_ReleaseSlugIsValidated()
+        {
+            Publication publication = _dataFixture.DefaultPublication();
+
+            using var context = InMemoryApplicationDbContext(Guid.NewGuid().ToString());
+            context.Publications.Add(publication);
+            await context.SaveChangesAsync();
+
+            var releaseVersionService = new ReleaseVersionServiceMockBuilder()
+                .WhereGetReleaseVersionReturns();
+
+            var releaseSlugValidator = new ReleaseSlugValidatorMockBuilder();
+
+            var sut = BuildService(
+                contentDbContext: context,
+                releaseVersionService: releaseVersionService.Build(),
+                releaseSlugValidator: releaseSlugValidator.Build());
+
+            var year = 2020;
+            var timePeriodCoverage = TimeIdentifier.AcademicYear;
+            var label = "initial";
+            var request = new ReleaseCreateRequest
+            {
+                PublicationId = publication.Id,
+                Year = year,
+                TimePeriodCoverage = timePeriodCoverage,
+                Label = label,
+                Type = ReleaseType.OfficialStatistics,
+            };
+
+            // ACT
+            await sut.CreateRelease(request);
+
+            // ASSERT
+            var expectedReleaseSlug = NamingUtils.CreateReleaseSlug(
+                year: year,
+                timePeriodCoverage: timePeriodCoverage,
+                label: label);
+
+            releaseSlugValidator.Assert.ValidateNewSlugWasCalled(
+                expectedNewReleaseSlug: expectedReleaseSlug,
+                expectedPublicationId: publication.Id,
+                expectedReleaseId: null);
+        }
     }
 
     public class UpdateReleaseTests(ITestOutputHelper output) : ReleaseServiceTests
@@ -453,7 +501,7 @@ public abstract class ReleaseServiceTests
                 .SetNoReleaseVersionStatus(releaseVersion.Id);
 
             var adminEventRaiserService = new AdminEventRaiserServiceMockBuilder();
-            
+
             var sut = BuildService(
                                     context,
                                     releaseVersionService: releaseVersionService.Build(),
@@ -475,6 +523,44 @@ public abstract class ReleaseServiceTests
             result.AssertRight();
             adminEventRaiserService.Assert.OnReleaseSlugChangedWasNotRaised();
         }
+
+        [Fact]
+        public async Task GivenReleaseExists_NewReleaseSlugIsValidated()
+        {
+            Release release = _dataFixture.DefaultRelease()
+                .WithPublication(_dataFixture.DefaultPublication());
+
+            await using var context = InMemoryApplicationDbContext(Guid.NewGuid().ToString());
+            context.Releases.Add(release);
+            await context.SaveChangesAsync();
+
+            var releaseSlugValidator = new ReleaseSlugValidatorMockBuilder();
+
+            var sut = BuildService(
+                context,
+                releaseSlugValidator: releaseSlugValidator.Build());
+
+            var newLabel = "initial";
+
+            var request = new ReleaseUpdateRequest
+            {
+                Label = newLabel
+            };
+
+            // ACT
+            await sut.UpdateRelease(release.Id, request);
+
+            // ASSERT
+            var expectedNewReleaseSlug = NamingUtils.CreateReleaseSlug(
+                year: release.Year,
+                timePeriodCoverage: release.TimePeriodCoverage,
+                label: newLabel);
+
+            releaseSlugValidator.Assert.ValidateNewSlugWasCalled(
+                expectedNewReleaseSlug: expectedNewReleaseSlug,
+                expectedPublicationId: release.PublicationId,
+                expectedReleaseId: release.Id);
+        }
     }
 
     private static ReleaseService BuildService(
@@ -484,7 +570,8 @@ public abstract class ReleaseServiceTests
         IPublicationCacheService? publicationCacheService = null,
         IReleasePublishingStatusRepository? releasePublishingStatusRepository = null,
         IRedirectsCacheService? redirectsCacheService = null,
-        IAdminEventRaiserService? adminEventRaiserService = null)
+        IAdminEventRaiserService? adminEventRaiserService = null,
+        IReleaseSlugValidator? releaseSlugValidator = null)
     {
         var userService = AlwaysTrueUserService();
 
@@ -501,7 +588,8 @@ public abstract class ReleaseServiceTests
             releasePublishingStatusRepository: releasePublishingStatusRepository ?? Mock.Of<IReleasePublishingStatusRepository>(Strict),
             redirectsCacheService: redirectsCacheService ?? Mock.Of<IRedirectsCacheService>(Strict),
             adminEventRaiserService: adminEventRaiserService ?? new AdminEventRaiserServiceMockBuilder().Build(),
-            guidGenerator: new SequentialGuidGenerator()
+            guidGenerator: new SequentialGuidGenerator(),
+            releaseSlugValidator: releaseSlugValidator ?? new ReleaseSlugValidatorMockBuilder().Build()
         );
     }
 }

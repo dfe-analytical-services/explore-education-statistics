@@ -4,6 +4,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.MockBuilders;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
@@ -91,7 +92,8 @@ public class ReleaseServicePermissionTests
         IReleaseCacheService? releaseCacheService = null,
         IPublicationCacheService? publicationCacheService = null,
         IReleasePublishingStatusRepository? releasePublishingStatusRepository = null,
-        IRedirectsCacheService? redirectsCacheService = null)
+        IRedirectsCacheService? redirectsCacheService = null,
+        IReleaseSlugValidator? releaseSlugValidator = null)
     {
         return new ReleaseService(
             context: context ?? Mock.Of<ContentDbContext>(),
@@ -102,7 +104,8 @@ public class ReleaseServicePermissionTests
             releasePublishingStatusRepository: releasePublishingStatusRepository ?? Mock.Of<IReleasePublishingStatusRepository>(),
             redirectsCacheService: redirectsCacheService ?? Mock.Of<IRedirectsCacheService>(),
             adminEventRaiserService: new AdminEventRaiserServiceMockBuilder().Build(),
-            guidGenerator: new SequentialGuidGenerator()
+            guidGenerator: new SequentialGuidGenerator(),
+            releaseSlugValidator: releaseSlugValidator ?? Mock.Of<IReleaseSlugValidator>()
         );
     }
 }
