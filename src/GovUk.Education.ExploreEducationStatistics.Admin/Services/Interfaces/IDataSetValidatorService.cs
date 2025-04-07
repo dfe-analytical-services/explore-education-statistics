@@ -1,5 +1,6 @@
 #nullable enable
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using System;
 using System.Collections.Generic;
@@ -10,7 +11,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 
 public interface IDataSetValidatorService
 {
-    Task<List<ErrorViewModel>> ValidateDataSet(
+    Task<Either<List<ErrorViewModel>, DataSet>> ValidateDataSet(
         Guid releaseVersionId,
         string dataSetTitle,
         List<DataSetFileDto> dataSetFiles,
