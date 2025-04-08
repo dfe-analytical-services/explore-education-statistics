@@ -8,7 +8,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.
 
 public class OnPublicationLatestPublishedReleaseVersionChangedFunction(IEventGridEventHandler eventGridEventHandler)
 {
-    [Function(nameof(OnPublicationChanged))]
+    [Function(nameof(OnPublicationLatestPublishedReleaseVersionChanged))]
     [QueueOutput("%RefreshSearchableDocumentQueueName%")]
     public async Task<RefreshSearchableDocumentMessageDto[]> OnPublicationLatestPublishedReleaseVersionChanged(
         [QueueTrigger("%PublicationLatestPublishedReleaseVersionChangedQueueName%")]
