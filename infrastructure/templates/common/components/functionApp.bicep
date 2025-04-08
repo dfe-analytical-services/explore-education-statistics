@@ -77,7 +77,7 @@ param allowedOrigins array = []
 @description('Specifies an optional URL for Azure to use to monitor the health of this resource')
 param healthCheckPath string?
 
-@description('The name of a user-assigned managed identity to assign to the Function App.')
+@description('The name of a user-assigned managed identity to assign to the resource.')
 param userAssignedIdentityName string = ''
 
 @description('Specifies the SKU for the Function App hosting plan.')
@@ -406,3 +406,4 @@ module expectedHttpStatusCodeAlerts '../../public-api/components/alerts/dynamicM
 output name string = functionApp.name
 output url string = 'https://${functionApp.name}.azurewebsites.net'
 output functionAppIdentityPrincipalId string = functionApp.identity.principalId
+output storageAccountName string = storageAccountModule.outputs.storageAccountName

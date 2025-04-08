@@ -32,10 +32,10 @@ param indexerName string = '${indexName}-indexer'
 @description('Name of the searchable documents container in the Search storage account.')
 param searchableDocumentsContainerName string = 'searchable-documents'
 
-@description('A list IP network rules to allow access to the Search Service from specific public internet IP address ranges.')
-param searchServiceIpRules IpRange[] = []
+@description('A list of IP network rules to allow access to the Search Service from specific public internet IP address ranges.')
+param searchServiceIpRules IpRange[]
 
-@description('A list IP network rules to allow access to the Search storage account from specific public internet IP address ranges.')
+@description('A list of IP network rules to allow access to the Search storage account from specific public internet IP address ranges.')
 param storageIpRules IpRange[]
 
 @description('The branch, tag or commit of the source code from which the deployment is triggered.')

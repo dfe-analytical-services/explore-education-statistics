@@ -46,6 +46,14 @@ var tagValues = union(resourceTags ?? {}, {
   DateProvisioned: dateProvisioned
 })
 
+// Custom Event Grid topics used by Admin and Publisher to publish events
+var eventGridCustomTopicNames = [
+  'publication-changed'
+  'release-changed'
+  'release-version-changed'
+  'theme-changed'
+]
+
 var maintenanceFirewallRules = [
   for maintenanceIpRange in maintenanceIpRanges: {
     name: maintenanceIpRange.name
@@ -77,6 +85,17 @@ module applicationInsightsModule 'application/searchApplicationInsights.bicep' =
     location: location
     resourcePrefix: resourcePrefix
     resourceNames: resourceNames
+    tagValues: tagValues
+  }
+}
+
+module eventGridMessagingModule '../common/components/event-grid/eventGridMessaging.bicep' = {
+  name: 'eventGridMessagingModule'
+  params: {
+    location: location
+    resourcePrefix: resourcePrefix
+    customTopicNames: eventGridCustomTopicNames
+    ipRules: maintenanceIpRanges
     tagValues: tagValues
   }
 }
