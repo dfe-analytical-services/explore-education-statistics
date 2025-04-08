@@ -11,7 +11,7 @@ import { Dictionary } from '@common/types';
 import formatPretty from '@common/utils/number/formatPretty';
 import { FeatureCollection } from 'geojson';
 import Leaflet, { Layer, PathOptions } from 'leaflet';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { GeoJSON, useMap } from 'react-leaflet';
 
 interface Props {
@@ -86,6 +86,8 @@ export default function MapGeoJSON({
     }
   }, [features]);
 
+  const resetZoom = useCallback(() => map.setZoom(5), [map]);
+
   useEffect(() => {
     if (!selectedFeature) {
       resetZoom();
@@ -104,9 +106,7 @@ export default function MapGeoJSON({
       // Centers the feature on the map
       map.fitBounds(layer.getBounds());
     }
-  }, [map, selectedFeature]);
-
-  const resetZoom = () => map.setZoom(5);
+  }, [map, selectedFeature, resetZoom]);
 
   // We have to assign our `onEachFeature` callback to a ref
   // as `onEachFeature` forms an internal closure which

@@ -2,6 +2,7 @@
 using System;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Admin.Events;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using Moq;
@@ -30,14 +31,18 @@ public class AdminEventRaiserServiceMockBuilder
         _mock
             .Setup(OnReleaseSlugChanged)
             .Returns(Task.CompletedTask);
+        
+        _mock
+            .Setup(m => m.OnPublicationChanged(It.IsAny<Publication>()))
+            .Returns(Task.CompletedTask);
     }
 
     public class Asserter(Mock<IAdminEventRaiserService> mock)
     {
-        public void ThatOnThemeUpdatedCalled(Func<Theme, bool>? predicate = null) => 
+        public void ThatOnThemeUpdatedRaised(Func<Theme, bool>? predicate = null) => 
             mock.Verify(m => m.OnThemeUpdated(It.Is<Theme>(t => predicate == null || predicate(t))), Times.Once);
 
-        public void OnReleaseSlugChangedWasCalled(
+        public void OnReleaseSlugChangedWasRaised(
             Guid? expectedReleaseId = null,
             string? expectedNewReleaseSlug = null,
             Guid? expectedPublicationId = null,
@@ -49,8 +54,14 @@ public class AdminEventRaiserServiceMockBuilder
                 It.Is<string>(publicationSlug => expectedPublicationSlug == null || publicationSlug == expectedPublicationSlug)),
                 Times.Once);
 
-        public void OnReleaseSlugChangedWasNotCalled() => 
+        public void OnReleaseSlugChangedWasNotRaised() => 
             mock.Verify(OnReleaseSlugChanged, Times.Never);
+
+        public void OnPublicationChangedWasRaised(Publication? publication = null) =>
+            mock.Verify(m => m.OnPublicationChanged(It.Is<Publication>(p => publication == null || new PublicationChangedEventDto(p) == new PublicationChangedEventDto(publication))), Times.Once);
+
+        public void OnPublicationChangedWasNotRaised()=>
+            mock.Verify(m => m.OnPublicationChanged(It.IsAny<Publication>()), Times.Never);
     }
     public Asserter Assert => new(_mock);
 }

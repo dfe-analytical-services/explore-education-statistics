@@ -168,7 +168,7 @@ const LocationFiltersForm = ({
             onSubmit={handleSubmit}
           >
             <FormFieldset
-              id="levels"
+              id="locations"
               legend={stepHeading}
               hint="Select at least one"
               error={

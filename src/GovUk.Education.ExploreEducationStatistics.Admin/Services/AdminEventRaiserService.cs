@@ -45,5 +45,22 @@ public class AdminEventRaiserService(IConfiguredEventGridClientFactory eventGrid
         var eventDto = new ReleaseSlugChangedEventDto(releaseId, newReleaseSlug, publicationId, publicationSlug);
         await client.SendEventAsync(eventDto.ToEventGridEvent());
     }
+
+    /// <summary>
+    /// On Publication Changed
+    /// </summary>
+    public async Task OnPublicationChanged(Publication publication)
+    {
+        if (!eventGridClientFactory.TryCreateClient(
+                PublicationChangedEventDto.EventTopicOptionsKey,
+                out var client))
+        {
+            return;
+        }
+
+        var eventDto = new PublicationChangedEventDto(publication);
+        
+        await client.SendEventAsync(eventDto.ToEventGridEvent());
+    }
 }
 

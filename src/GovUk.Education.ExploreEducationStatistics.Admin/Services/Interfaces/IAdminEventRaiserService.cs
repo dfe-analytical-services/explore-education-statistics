@@ -8,4 +8,5 @@ public interface IAdminEventRaiserService
 {
     Task OnThemeUpdated(Theme theme);
     Task OnReleaseSlugChanged(Guid releaseId, string newReleaseSlug, Guid publicationId, string publicationSlug);
+    Task OnPublicationChanged(Publication publication);
 }
