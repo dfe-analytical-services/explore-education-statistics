@@ -3502,8 +3502,8 @@ public class PublicationServiceTests
         _adminEventRaiserServiceMockBuilder.Assert.OnPublicationChangedWasRaised(publication);
     
     private void AssertOnPublicationLatestPublishedReleaseVersionChangedWasRaised(
-        Publication? publication = null,
-        Guid? previousReleaseVersionId = null) =>
+        Publication publication,
+        Guid previousReleaseVersionId) =>
         _adminEventRaiserServiceMockBuilder.Assert.OnPublicationLatestPublishedReleaseVersionChangedWasRaised(
             publication,
             previousReleaseVersionId);

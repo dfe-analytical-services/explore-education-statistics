@@ -8,14 +8,14 @@ public record PublicationLatestPublishedReleaseVersionChangedEventDto
 {
     public PublicationLatestPublishedReleaseVersionChangedEventDto(
         Publication publication,
-        Guid? previousReleaseVersionId)
+        Guid previousReleaseVersionId)
     {
         Subject = publication.Id.ToString();
         Payload = new EventPayload
         {
             Title = publication.Title,
             Slug = publication.Slug,
-            LatestPublishedReleaseVersionId = publication.LatestPublishedReleaseVersionId,
+            LatestPublishedReleaseVersionId = publication.LatestPublishedReleaseVersionId ?? throw new ArgumentNullException(nameof(publication.LatestPublishedReleaseVersionId)),
             PreviousReleaseVersionId = previousReleaseVersionId
         };
     }
@@ -41,8 +41,8 @@ public record PublicationLatestPublishedReleaseVersionChangedEventDto
     {
         public string Title { get; init; }
         public string Slug { get; init; }
-        public Guid? LatestPublishedReleaseVersionId { get; init; }
-        public Guid? PreviousReleaseVersionId { get; init; }
+        public Guid LatestPublishedReleaseVersionId { get; init; }
+        public Guid PreviousReleaseVersionId { get; init; }
     }
 
     public EventGridEvent ToEventGridEvent() => new(Subject, EventType, DataVersion, Payload);

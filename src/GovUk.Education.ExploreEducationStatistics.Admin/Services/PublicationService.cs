@@ -585,9 +585,14 @@ public class PublicationService(
                     await releaseCacheService.UpdateRelease(releaseVersionId: latestPublishedReleaseVersionId.Value,
                         publicationSlug: publication.Slug);
 
-                    await adminEventRaiserService.OnPublicationLatestPublishedReleaseVersionChanged(
-                        publication, 
-                        oldLatestPublishedReleaseVersionId);
+                    // The reordering of the series implies that there was already a published release version,
+                    // therefore, this should always have a value
+                    if (oldLatestPublishedReleaseVersionId.HasValue)
+                    {
+                        await adminEventRaiserService.OnPublicationLatestPublishedReleaseVersionChanged(
+                            publication,
+                            oldLatestPublishedReleaseVersionId.Value);
+                    }
                 }
 
                 return await GetReleaseSeries(publication.Id);

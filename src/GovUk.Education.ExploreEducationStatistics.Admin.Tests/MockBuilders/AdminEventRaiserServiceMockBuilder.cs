@@ -40,14 +40,14 @@ public class AdminEventRaiserServiceMockBuilder
         _mock
             .Setup(m => m.OnPublicationLatestPublishedReleaseVersionChanged(
                 It.IsAny<Publication>(),
-                It.IsAny<Guid?>()))
-            .Callback((Publication publication, Guid? oldLatestPublishedReleaseVersionId) => 
+                It.IsAny<Guid>()))
+            .Callback((Publication publication, Guid oldLatestPublishedReleaseVersionId) => 
                 _onPublicationLatestPublishedReleaseVersionChangedInvocations
                     .Add(new OnPublicationLatestPublishedReleaseVersionChangedArgs(publication, oldLatestPublishedReleaseVersionId)))
             .Returns(Task.CompletedTask);
     }
 
-    private record OnPublicationLatestPublishedReleaseVersionChangedArgs(Publication Publication, Guid? OldLatestPublishedReleaseVersionId);
+    private record OnPublicationLatestPublishedReleaseVersionChangedArgs(Publication Publication, Guid OldLatestPublishedReleaseVersionId);
     
     public class Asserter(AdminEventRaiserServiceMockBuilder mockBuilder)
     {
@@ -75,8 +75,8 @@ public class AdminEventRaiserServiceMockBuilder
                 || new PublicationChangedEventDto(p) == new PublicationChangedEventDto(publication))), Times.Once);
 
         public void OnPublicationLatestPublishedReleaseVersionChangedWasRaised(
-            Publication? publication = null,
-            Guid? previousReleaseVersionId = null)
+            Publication publication,
+            Guid previousReleaseVersionId)
         {
             var expectedEvent = new PublicationLatestPublishedReleaseVersionChangedEventDto(
                 publication, 
@@ -97,7 +97,7 @@ public class AdminEventRaiserServiceMockBuilder
             mockBuilder._mock.Verify(m => m.OnPublicationChanged(It.IsAny<Publication>()), Times.Never);
             mockBuilder._mock.Verify(m => m.OnPublicationLatestPublishedReleaseVersionChanged(
                 It.IsAny<Publication>(),
-                It.IsAny<Guid?>()), 
+                It.IsAny<Guid>()), 
                 Times.Never);
         }
     }
