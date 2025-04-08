@@ -1,4 +1,4 @@
-import { IpRange } from '../../common/types.bicep'
+import { IpRange } from '../../types.bicep'
 
 @description('The resource name.')
 param name string

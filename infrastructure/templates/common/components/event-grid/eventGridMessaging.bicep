@@ -1,5 +1,5 @@
-import { abbreviations } from '../../common/abbreviations.bicep'
-import { IpRange } from '../../common/types.bicep'
+import { abbreviations } from '../../abbreviations.bicep'
+import { IpRange } from '../../types.bicep'
 
 @description('Resource prefix for all resources.')
 param resourcePrefix string
@@ -13,14 +13,10 @@ param ipRules IpRange[]
 @description('Specifies a set of tags with which to tag the resource in Azure.')
 param tagValues object
 
-var customTopicNames = [
-  'publication-changed'
-  'release-changed'
-  'release-version-changed'
-  'theme-changed'
-]
+@description('A list of custom topic names to create.')
+param customTopicNames string[] = []
 
-module eventGridCustomTopicsModule '../../common/components/eventGridCustomTopic.bicep' = [for topicName in customTopicNames: {
+module eventGridCustomTopicsModule 'eventGridCustomTopic.bicep' = [for topicName in customTopicNames: {
   name: '${topicName}EventGridCustomTopicModuleDeploy'
   params: {
     name: '${resourcePrefix}-${abbreviations.eventGridTopics}-${topicName}'
