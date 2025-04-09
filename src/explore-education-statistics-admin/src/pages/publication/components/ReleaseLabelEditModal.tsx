@@ -8,6 +8,7 @@ import { mapFieldErrors } from '@common/validation/serverValidations';
 import Yup from '@common/validation/yup';
 import React, { ReactNode } from 'react';
 import { ObjectSchema } from 'yup';
+import _ from 'lodash';
 
 export type ReleaseLabelFormValues = {
   label?: string;
@@ -43,8 +44,8 @@ const errorMappings = [
   }),
 ];
 
-const replaceWhitespace = (str: string, replaceValue: string) => {
-  return str.replace(/\s+/g, replaceValue);
+const replaceAllWhitespaceWithSingleSpace = (str: string) => {
+  return str.replace(/\s+/g, ' ');
 };
 
 const releaseSlugLabelSuffix = (label?: string) => {
@@ -52,13 +53,7 @@ const releaseSlugLabelSuffix = (label?: string) => {
     return '';
   }
 
-  const trimmedLowercaseLabel = label!.trim().toLowerCase();
-  const whitespaceReplacedWithDashesLabel = replaceWhitespace(
-    trimmedLowercaseLabel,
-    '-',
-  );
-
-  return `-${whitespaceReplacedWithDashesLabel}`;
+  return `-${_.kebabCase(label)}`;
 };
 
 export default function ReleaseLabelEditModal({
@@ -71,7 +66,7 @@ export default function ReleaseLabelEditModal({
   const { publicAppUrl } = useConfig();
 
   const confirmationWarningText = (
-    formValues?: ReleaseLabelFormValues,
+    formValues: ReleaseLabelFormValues,
   ): ReactNode => {
     const currentReleaseSlugLabelSuffix = releaseSlugLabelSuffix(
       initialValues?.label,
@@ -85,7 +80,7 @@ export default function ReleaseLabelEditModal({
 
     const formattedLabel = isUndefinedOrWhitespace(formValues?.label)
       ? undefined
-      : replaceWhitespace(formValues!.label!, ' ');
+      : replaceAllWhitespaceWithSingleSpace(formValues!.label!.trim());
 
     return (
       <>
@@ -129,7 +124,6 @@ export default function ReleaseLabelEditModal({
       validationSchema={validationSchema}
       errorMappings={errorMappings}
       onSubmit={onSubmit}
-      withConfirmationWarning
       confirmationWarningText={confirmationWarningText}
     >
       <FormFieldTextInput<ReleaseLabelFormValues> label="Label" name="label" />
