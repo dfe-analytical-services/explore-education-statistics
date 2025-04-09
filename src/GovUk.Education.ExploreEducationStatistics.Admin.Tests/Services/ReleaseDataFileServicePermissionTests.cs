@@ -233,7 +233,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             IPersistenceHelper<ContentDbContext>? contentPersistenceHelper = null,
             IPrivateBlobStorageService? privateBlobStorageService = null,
             IDataSetZipValidationService? dataSetZipValidationService = null,
-            IDataSetValidatorService? dataSetValidatorService = null,
+            IDataSetValidator? dataSetValidator = null,
             IFileRepository? fileRepository = null,
             IReleaseVersionRepository? releaseVersionRepository = null,
             IReleaseFileRepository? releaseFileRepository = null,
@@ -249,7 +249,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 contentPersistenceHelper ?? DefaultPersistenceHelperMock().Object,
                 privateBlobStorageService ?? new Mock<IPrivateBlobStorageService>(MockBehavior.Strict).Object,
                 dataSetZipValidationService ?? new Mock<IDataSetZipValidationService>(MockBehavior.Strict).Object,
-                dataSetValidatorService ?? new Mock<IDataSetValidatorService>(MockBehavior.Strict).Object,
+                dataSetValidator ?? new Mock<IDataSetValidator>(MockBehavior.Strict).Object,
                 fileRepository ?? new FileRepository(contentDbContext),
                 releaseVersionRepository ?? new ReleaseVersionRepository(
                     contentDbContext,
