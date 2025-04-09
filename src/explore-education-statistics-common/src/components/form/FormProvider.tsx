@@ -22,7 +22,7 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import isEqual from 'lodash/isEqual';
 import { ObjectSchema, Schema } from 'yup';
 
-interface FormProviderProps<TFormValues extends FieldValues> {
+export interface FormProviderProps<TFormValues extends FieldValues> {
   children: ReactNode | ((form: UseFormReturn<TFormValues>) => ReactNode);
   enableReinitialize?: boolean;
   errorMappings?:
