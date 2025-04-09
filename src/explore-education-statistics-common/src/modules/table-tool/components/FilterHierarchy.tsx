@@ -10,6 +10,7 @@ import classNames from 'classnames';
 import get from 'lodash/get';
 import React, { memo, useCallback, useMemo, useState } from 'react';
 import { useFormContext, useWatch } from 'react-hook-form';
+import FormSearchBar from '@common/components/form/FormSearchBar';
 import styles from './FilterHierarchy.module.scss';
 import FilterHierarchyOptions, {
   FilterHierarchyOption,
@@ -44,12 +45,22 @@ function FilterHierarchy({
 
   const legend = filterLabels.at(-1) ?? '';
 
+  const [hierarchySearchTerm, setHierarchySearchTerm] = useState('');
+  const searchFormSubmit = useCallback(
+    (value: string) => {
+      setHierarchySearchTerm(value.toLowerCase().trim());
+    },
+    [setHierarchySearchTerm],
+  );
+
   const rootOptionTrees = useMemo(
-    () => getRootOptionTrees(filterHierarchy, optionLabelsMap),
-    [filterHierarchy, optionLabelsMap],
+    () =>
+      getRootOptionTrees(filterHierarchy, optionLabelsMap, hierarchySearchTerm),
+    [filterHierarchy, optionLabelsMap, hierarchySearchTerm],
   );
 
   const selectedValues = useWatch({ name });
+
   const {
     formState: { errors },
   } = useFormContext();
@@ -81,9 +92,23 @@ function FilterHierarchy({
       summaryAfter={<FormCheckboxSelectedCount name={name} />}
       onToggle={onToggle}
     >
+      <FormSearchBar
+        id={`${name}-search`}
+        name={`${name}-search`}
+        labelSize="s"
+        label={`Search all tiers and ${legend.toLowerCase()}`}
+        className={styles.search}
+        onSubmit={searchFormSubmit}
+        min={0}
+        onReset={() => setHierarchySearchTerm('')}
+      />
       <FormFieldset
         id={name}
-        legend={`Search all tiers and ${legend.toLowerCase()}`}
+        legend={
+          hierarchySearchTerm
+            ? `Search '${hierarchySearchTerm}' in all tiers and ${legend.toLowerCase()}`
+            : `Browse all ${legend.toLowerCase()}`
+        }
         legendSize="s"
         useFormId
         error={errorMessage?.toString()}
@@ -156,6 +181,7 @@ function FilterHierarchy({
               level={0}
               toggleOptions={toggleOptions}
               expandedOptionsList={expandedOptionsList}
+              hierarchySearchTerm={hierarchySearchTerm}
             />
           );
         })}
@@ -167,6 +193,7 @@ function FilterHierarchy({
 function getRootOptionTrees(
   filterHierarchy: SubjectMetaFilterHierarchy,
   optionLabelsMap: OptionLabelsMap,
+  hierarchySearchTerm: string,
 ): FilterHierarchyOption[] {
   const rootOptionIds = Object.keys(filterHierarchy[0].hierarchy);
   return mapOptionTreesRecursively(
@@ -174,6 +201,7 @@ function getRootOptionTrees(
     rootOptionIds,
     filterHierarchy,
     optionLabelsMap,
+    hierarchySearchTerm,
   )!;
 }
 
@@ -182,31 +210,46 @@ function mapOptionTreesRecursively(
   optionIds: string[],
   filterHierarchy: SubjectMetaFilterHierarchy,
   optionLabelsMap: OptionLabelsMap,
+  hierarchySearchTerm: string,
 ): FilterHierarchyOption[] | undefined {
   if (optionIds.length === 0) {
     return undefined;
   }
-  return optionIds
-    .map(optionId => {
-      const childOptionIds = filterHierarchy[tier]?.hierarchy[optionId] ?? [];
+  const unfilteredOptionsTree = optionIds.map(optionId => {
+    const childOptionIds = filterHierarchy[tier]?.hierarchy[optionId] ?? [];
 
-      return {
-        value: optionId,
-        label: optionLabelsMap[optionId] ?? '',
-        filterLabel: optionLabelsMap[filterHierarchy[tier]?.filterId] ?? '',
-        childFilterLabel: optionLabelsMap[filterHierarchy[tier]?.childFilterId],
-        options: mapOptionTreesRecursively(
-          tier + 1,
-          childOptionIds,
-          filterHierarchy,
-          optionLabelsMap,
-        ),
-      };
-    })
+    return {
+      value: optionId,
+      label: optionLabelsMap[optionId]?.trim() ?? '',
+      filterLabel: optionLabelsMap[filterHierarchy[tier]?.filterId] ?? '',
+      childFilterLabel: optionLabelsMap[filterHierarchy[tier]?.childFilterId],
+      options: mapOptionTreesRecursively(
+        tier + 1,
+        childOptionIds,
+        filterHierarchy,
+        optionLabelsMap,
+        hierarchySearchTerm,
+      ),
+    };
+  });
+
+  const optionsTree = unfilteredOptionsTree
     .filter(
       option => tier === 0 || option.label.toLocaleLowerCase() !== 'total',
     )
     .sort((a, b) => sortAlphabeticalTotalsFirst(a.label, b.label));
+
+  if (!hierarchySearchTerm) {
+    return optionsTree;
+  }
+
+  return optionsTree.filter(option => {
+    const hasOptions = (option.options?.length ?? 0) > 0;
+    const hasSearchTerm = option.label
+      .toLowerCase()
+      .includes(hierarchySearchTerm.trim().toLowerCase());
+    return hasOptions || hasSearchTerm;
+  });
 }
 
 export default memo(FilterHierarchy);
