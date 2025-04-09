@@ -11,14 +11,15 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using static System.StringComparison;
 using File = GovUk.Education.ExploreEducationStatistics.Content.Model.File;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 {
-    public class DataSetValidatorService(ContentDbContext context) : IDataSetValidatorService
+    public class DataSetValidator(ContentDbContext context) : IDataSetValidator
     {
         public const int MaxFilenameSize = 150;
+
+        private readonly List<ErrorViewModel> _errors = [];
 
         public async Task<Either<List<ErrorViewModel>, DataSet>> ValidateDataSet(
             Guid releaseVersionId,
@@ -26,8 +27,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             List<DataSetFileDto> dataSetFiles,
             File? replacingFile = null)
         {
-            var errorViewModels = new List<ErrorViewModel>();
-
             var validator = new DataSetFileDto.Validator();
 
             foreach (var file in dataSetFiles)
@@ -36,7 +35,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
                 if (!result.IsValid)
                 {
-                    errorViewModels.AddRange(result.Errors.Select(e => new ErrorViewModel
+                    _errors.AddRange(result.Errors.Select(e => new ErrorViewModel
                     {
                         Code = e.ErrorCode,
                         Message = e.ErrorMessage,
@@ -48,14 +47,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
             var isReplacement = replacingFile != null;
 
-            errorViewModels.AddRange(ValidateDataSetTitleDuplication(
-                releaseVersionId,
-                dataSetTitle,
-                isReplacement));
+            ValidateDataSetTitleDuplication(releaseVersionId, dataSetTitle, isReplacement);
 
             if (dataSetFiles.Count != 2)
             {
-                errorViewModels.Add(ValidationMessages.GenerateErrorDataZipShouldContainTwoFiles());
+                _errors.Add(ValidationMessages.GenerateErrorDataSetShouldContainTwoFiles());
             }
 
             var dataFile = dataSetFiles.FirstOrDefault(file => !file.FileName.EndsWith(Constants.DataSet.MetaFileExtension));
@@ -63,15 +59,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
             if (dataFile is null || metaFile is null)
             {
-                errorViewModels.Add(ValidationMessages.GenerateErrorDataSetFileNamesShouldMatchConvention());
-                return errorViewModels;
+                _errors.Add(ValidationMessages.GenerateErrorDataSetFileNamesShouldMatchConvention());
+                return _errors;
             }
 
-            errorViewModels.AddRange(ValidateDataFileNames(
-                releaseVersionId,
-                dataFile.FileName,
-                metaFile.FileName,
-                replacingFile));
+            ValidateDataFileNames(releaseVersionId, dataFile.FileName, replacingFile);
 
             if (isReplacement)
             {
@@ -82,12 +74,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         && rf.PublicApiDataSetId != null);
                 if (releaseFileWithApiDataSet != null)
                 {
-                    errorViewModels.Add(ValidationMessages.GenerateErrorCannotReplaceDataSetWithApiDataSet(dataSetTitle));
+                    _errors.Add(ValidationMessages.GenerateErrorCannotReplaceDataSetWithApiDataSet(dataSetTitle));
                 }
             }
 
-            return errorViewModels.Count > 0
-                ? (Either<List<ErrorViewModel>, DataSet>)errorViewModels
+            return _errors.Count > 0
+                ? (Either<List<ErrorViewModel>, DataSet>)_errors
                 : (Either<List<ErrorViewModel>, DataSet>)new DataSet
                 {
                     Title = dataSetTitle,
@@ -96,7 +88,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 };
         }
 
-        private List<ErrorViewModel> ValidateDataSetTitleDuplication(
+        private void ValidateDataSetTitleDuplication(
             Guid releaseVersionId,
             string title,
             bool isReplacement)
@@ -112,11 +104,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
                 if (dataSetNameExists)
                 {
-                    return [ValidationMessages.GenerateErrorDataSetTitleShouldBeUnique(title)];
+                    _errors.Add(ValidationMessages.GenerateErrorDataSetTitleShouldBeUnique(title));
                 }
             }
-
-            return [];
         }
 
         private bool IsFileExisting(
@@ -129,39 +119,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .Include(rf => rf.File)
                 .Where(rf => rf.ReleaseVersionId == releaseVersionId && rf.File.Type == type)
                 .AsEnumerable()
-                .Any(rf => string.Equals(rf.File.Filename, filename, CurrentCultureIgnoreCase));
+                .Any(rf => string.Equals(rf.File.Filename, filename, StringComparison.CurrentCultureIgnoreCase));
         }
 
-        private List<ErrorViewModel> ValidateDataFileNames(
+        private void ValidateDataFileNames(
             Guid releaseVersionId,
             string dataFileName,
-            string metaFileName,
             File? replacingFile = null)
         {
-            List<ErrorViewModel> errors = [];
-
-            if (string.Equals(dataFileName.ToLower(), metaFileName.ToLower(), OrdinalIgnoreCase))
-            {
-                errors.Add(new ErrorViewModel
-                {
-                    Code = ValidationMessages.DataAndMetaFilesCannotHaveSameName.Code,
-                    Message = ValidationMessages.DataAndMetaFilesCannotHaveSameName.Message,
-                });
-            }
-
             // - Original uploads' data filename is not unique if a ReleaseFile exists with the same filename.
             // - With replacement uploads, we can ignore a preexisting ReleaseFile if it is the file being replaced -
             // we only care if the preexisting duplicate ReleaseFile name isn't the file being replaced.
             if (IsFileExisting(releaseVersionId, FileType.Data, dataFileName) &&
                 (replacingFile == null || replacingFile.Filename != dataFileName))
             {
-                errors.Add(ValidationMessages.GenerateErrorFilenameNotUnique(dataFileName, FileType.Data));
+                _errors.Add(ValidationMessages.GenerateErrorFilenameNotUnique(dataFileName, FileType.Data));
             }
 
             // NOTE: We allow duplicate meta file names - meta files aren't included in publicly downloadable
             // zips, so meta files won't be included in the same directory by filename and thereby cannot clash
-
-            return errors;
         }
     }
 }

@@ -37,7 +37,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly IPersistenceHelper<ContentDbContext> _persistenceHelper;
         private readonly IPrivateBlobStorageService _privateBlobStorageService;
         private readonly IDataSetZipValidationService _dataSetZipValidationService;
-        private readonly IDataSetValidatorService _dataSetValidatorService;
+        private readonly IDataSetValidator _dataSetValidator;
         private readonly IFileRepository _fileRepository;
         private readonly IReleaseVersionRepository _releaseVersionRepository;
         private readonly IReleaseFileRepository _releaseFileRepository;
@@ -51,7 +51,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             IPersistenceHelper<ContentDbContext> persistenceHelper,
             IPrivateBlobStorageService privateBlobStorageService,
             IDataSetZipValidationService dataSetZipValidationService,
-            IDataSetValidatorService dataSetValidatorService,
+            IDataSetValidator dataSetValidator,
             IFileRepository fileRepository,
             IReleaseVersionRepository releaseVersionRepository,
             IReleaseFileRepository releaseFileRepository,
@@ -64,7 +64,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _persistenceHelper = persistenceHelper;
             _privateBlobStorageService = privateBlobStorageService;
             _dataSetZipValidationService = dataSetZipValidationService;
-            _dataSetValidatorService = dataSetValidatorService;
+            _dataSetValidator = dataSetValidator;
             _fileRepository = fileRepository;
             _releaseVersionRepository = releaseVersionRepository;
             _releaseFileRepository = releaseFileRepository;
@@ -318,7 +318,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             var newDataSetTitle = await GetReleaseVersionDataSetTitle(releaseVersionId, dataSetTitle, replacingFile);
 
-            var result = await _dataSetValidatorService.ValidateDataSet(
+            var result = await _dataSetValidator.ValidateDataSet(
                 releaseVersionId,
                 newDataSetTitle,
                 dataSetFiles,
