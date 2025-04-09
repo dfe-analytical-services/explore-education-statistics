@@ -9,7 +9,7 @@ using File = GovUk.Education.ExploreEducationStatistics.Content.Model.File;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 
-public interface IDataSetValidatorService
+public interface IDataSetValidator
 {
     Task<Either<List<ErrorViewModel>, DataSet>> ValidateDataSet(
         Guid releaseVersionId,

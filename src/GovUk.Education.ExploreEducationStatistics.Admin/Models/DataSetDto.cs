@@ -38,15 +38,6 @@ public record DataSetFileDto
                 .Must(fileName => fileName.ToLower().EndsWith(".csv"))
                     .WithMessage(ValidationMessages.FileNameMustEndDotCsv, "{PropertyValue}");
 
-            RuleFor(dto => dto.FileSize)
-                .Equal(dto => dto.FileStream.Length)
-                .Must((dto, fileSize, context) =>
-                {
-                    context.MessageFormatter.AppendArgument("FileName", dto.FileName);
-                    return fileSize > 0;
-                })
-                    .WithMessage(ValidationMessages.FileSizeMustNotBeZero, "{FileName}");
-
             RuleFor(dto => dto.FileStream)
                 .Must((dto, fileStream, context) =>
                 {

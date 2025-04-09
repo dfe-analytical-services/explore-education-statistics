@@ -88,17 +88,17 @@ public static class ValidationMessages
         };
     }
 
-    public static readonly LocalizableMessage DataZipShouldContainTwoFiles = new(
-        Code: nameof(DataZipShouldContainTwoFiles),
-        Message: "The ZIP file provided should contain two files."
+    public static readonly LocalizableMessage DataSetShouldContainTwoFiles = new(
+        Code: nameof(DataSetShouldContainTwoFiles),
+        Message: "The data set provided should contain two files."
     );
 
-    public static ErrorViewModel GenerateErrorDataZipShouldContainTwoFiles()
+    public static ErrorViewModel GenerateErrorDataSetShouldContainTwoFiles()
     {
         return new ErrorViewModel
         {
-            Code = DataZipShouldContainTwoFiles.Code,
-            Message = DataZipShouldContainTwoFiles.Message,
+            Code = DataSetShouldContainTwoFiles.Code,
+            Message = DataSetShouldContainTwoFiles.Message,
         };
     }
 
@@ -311,17 +311,17 @@ public static class ValidationMessages
         };
     }
 
-    public static readonly LocalizableMessage FilenameNotUnique = new(
-        Code: nameof(FilenameNotUnique),
-        Message: "Filename '{0}' of type {1} isn't unique to this release."
+    public static readonly LocalizableMessage FileNameNotUnique = new(
+        Code: nameof(FileNameNotUnique),
+        Message: "File name '{0}' of type {1} isn't unique to this release."
     );
 
     public static ErrorViewModel GenerateErrorFilenameNotUnique(string fileName, FileType type)
     {
         return new ErrorViewModel
         {
-            Code = FilenameNotUnique.Code,
-            Message = string.Format(FilenameNotUnique.Message, fileName, type.ToString()),
+            Code = FileNameNotUnique.Code,
+            Message = string.Format(FileNameNotUnique.Message, fileName, type.ToString()),
         };
     }
 
