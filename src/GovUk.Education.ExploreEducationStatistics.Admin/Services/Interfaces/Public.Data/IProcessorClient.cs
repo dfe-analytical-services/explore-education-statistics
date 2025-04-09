@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Requests;
+using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Public.Data;
 
@@ -18,7 +18,7 @@ public interface IProcessorClient
     Task<Either<ActionResult, ProcessDataSetVersionResponseViewModel>> CreateNextDataSetVersionMappings(
         Guid dataSetId,
         Guid releaseFileId,
-        string? dataSetVersionToPatch = null,
+        DataSetVersionNumber? dataSetVersionToPatch = null,
         CancellationToken cancellationToken = default);
 
     Task<Either<ActionResult, ProcessDataSetVersionResponseViewModel>> CompleteNextDataSetVersionImport(

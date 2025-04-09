@@ -1,5 +1,6 @@
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.Validators;
 using GovUk.Education.ExploreEducationStatistics.Common.Validators.ErrorDetails;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
@@ -33,48 +34,56 @@ internal class DataSetVersionMappingService(
         MappingType.AutoNone
     ];
 
-    public async Task<Either<ActionResult, Unit>> CreateMappings(
-        Guid nextDataSetVersionId,
+    public async Task<Either<ActionResult, Unit>> CreateMappings(Guid nextDataSetVersionId,
+        string? dataSetVersionToPatchFromDb,
         CancellationToken cancellationToken = default)
     {
+        DataSetVersionNumber? dataSetVersionToPatch = null;
+        dataSetVersionToPatch = ValidateDataSetVersion(dataSetVersionToPatchFromDb);
+
         var nextVersion = await publicDataDbContext
             .DataSetVersions
             .Include(dsv => dsv.DataSet)
             .ThenInclude(ds => ds.LatestLiveVersion)
+            .Include(dataSetVersion => dataSetVersion.DataSet)
+            .ThenInclude(dataSet => dataSet.Versions)
             .SingleAsync(dsv => dsv.Id == nextDataSetVersionId, cancellationToken);
 
-        var liveVersion = nextVersion.DataSet.LatestLiveVersion!;
+        var sourceVersion = (dataSetVersionToPatch is not null
+            ? nextVersion.DataSet.Versions.FirstOrDefault(v => v.PublicVersion == dataSetVersionToPatch)
+            : nextVersion.DataSet.LatestLiveVersion!) ?? throw new Exception($"Unable to find appropriate source version via latest live version or specified version to patch: ${dataSetVersionToPatch}.");
+        //TODO: this is WIP, EES-5994 will take care of failures and recovering from them within this user journey.
 
         var nextVersionMeta = await dataSetMetaService.ReadDataSetVersionMappingMeta(
             dataSetVersionId: nextDataSetVersionId,
             cancellationToken);
 
         var sourceLocationMeta =
-            await GetLocationMeta(liveVersion.Id, cancellationToken);
+            await GetLocationMeta(sourceVersion.Id, cancellationToken);
 
         var locationMappings = CreateLocationMappings(
             sourceLocationMeta,
             nextVersionMeta.Locations);
 
         var sourceFilterMeta =
-            await GetFilterMeta(liveVersion.Id, cancellationToken);
+            await GetFilterMeta(sourceVersion.Id, cancellationToken);
 
         var filterMappings = CreateFilterMappings(
             sourceFilterMeta,
             nextVersionMeta.Filters);
 
         var hasDeletedIndicators = await HasDeletedIndicators(
-            liveVersion.Id,
+            sourceVersion.Id,
             nextVersionMeta.Indicators,
             cancellationToken);
 
         var hasDeletedGeographicLevels = await HasDeletedGeographicLevels(
-            liveVersion.Id,
+            sourceVersion.Id,
             nextVersionMeta.GeographicLevel,
             cancellationToken);
 
         var hasDeletedTimePeriods = await HasDeletedTimePeriods(
-            liveVersion.Id,
+            sourceVersion.Id,
             nextVersionMeta.TimePeriods,
             cancellationToken);
 
@@ -84,7 +93,7 @@ internal class DataSetVersionMappingService(
             .DataSetVersionMappings
             .Add(new DataSetVersionMapping
             {
-                SourceDataSetVersionId = liveVersion.Id,
+                SourceDataSetVersionId = sourceVersion.Id,
                 TargetDataSetVersionId = nextDataSetVersionId,
                 LocationMappingPlan = locationMappings,
                 FilterMappingPlan = filterMappings,
@@ -95,6 +104,15 @@ internal class DataSetVersionMappingService(
 
         await publicDataDbContext.SaveChangesAsync(cancellationToken);
         return Unit.Instance;
+        
+        DataSetVersionNumber? ValidateDataSetVersion(string? dataSetVersionRaw)
+        {
+            return dataSetVersionRaw == null
+                ? null
+                : DataSetVersionNumber.TryParse(dataSetVersionRaw, out var parsedVersion)
+                    ? parsedVersion
+                    : throw new ArgumentException($"Invalid data set version to patch number: {dataSetVersionToPatch}");
+        }
     }
 
     public async Task ApplyAutoMappings(
@@ -112,21 +130,8 @@ internal class DataSetVersionMappingService(
         AutoMapLocations(mapping.LocationMappingPlan);
         AutoMapFilters(mapping.FilterMappingPlan);
 
-        mapping.LocationMappingsComplete = !mapping.LocationMappingPlan
-            .Levels
-            // Ignore any levels where candidates or mappings are empty as this means the level
-            // has been added or deleted from the data set and is not a mappable change.
-            .Where(level => level.Value.Candidates.Count != 0 && level.Value.Mappings.Count != 0)
-            .Any(level => level.Value.Mappings
-                .Any(optionMapping => IncompleteMappingTypes.Contains(optionMapping.Value.Type)));
-
-        // Note that currently within the UI there is no way to resolve unmapped filters, and therefore we
-        // omit checking the status of filters that have a mapping of AutoNone.
-        mapping.FilterMappingsComplete = !mapping.FilterMappingPlan
-            .Mappings
-            .Where(filterMapping => filterMapping.Value.Type != MappingType.AutoNone)
-            .SelectMany(filterMapping => filterMapping.Value.OptionMappings)
-            .Any(optionMapping => IncompleteMappingTypes.Contains(optionMapping.Value.Type));
+        mapping.LocationMappingsComplete = !mapping.IsLocationMappingComplete;
+        mapping.FilterMappingsComplete = !mapping.IsFilterMappingComplete;
 
         if (IsMajorVersionUpdate(mapping))
         {
@@ -190,8 +195,10 @@ internal class DataSetVersionMappingService(
 
         return mapping.FilterMappingPlan
             .Mappings
-            .SelectMany(filterMapping => filterMapping.Value.OptionMappings)
-            .Any(optionMapping => NoMappingTypes.Contains(optionMapping.Value.Type));
+            .SelectMany(filterMapping => 
+                filterMapping.Value.OptionMappings)
+            .Any(optionMapping => 
+                NoMappingTypes.Contains(optionMapping.Value.Type));
     }
 
     public Task<Either<ActionResult, Tuple<DataSetVersion, DataSetVersionImport>>> GetManualMappingVersionAndImport(

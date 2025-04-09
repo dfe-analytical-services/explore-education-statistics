@@ -1,5 +1,6 @@
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.Validators;
 using GovUk.Education.ExploreEducationStatistics.Common.Validators.ErrorDetails;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
@@ -29,7 +30,6 @@ internal class DataSetVersionService(
     IDataSetVersionPathResolver dataSetVersionPathResolver,
     IOptions<AppOptions> options) : IDataSetVersionService
 {
-    private string? _previousVersion;
 
     public async Task<Either<ActionResult, Guid>> CreateInitialVersion(
         Guid dataSetId,
@@ -51,18 +51,18 @@ internal class DataSetVersionService(
         Guid dataSetId,
         Guid releaseFileId,
         Guid instanceId,
-        string? dataSetVersionToPatch = null,
+        DataSetVersionNumber? dataSetVersionToPatch = null,
         CancellationToken cancellationToken = default)
     {
-        _previousVersion = dataSetVersionToPatch;
         return await GetDataSet(dataSetId, cancellationToken)
-            .OnSuccess(ds => ValidateNextDataSet(ds, dataSetVersionToPatch))
-            .OnSuccessCombineWith(dataSet => ValidatePreviousDataSetVersion(dataSet, dataSetVersionToPatch))
-            .OnSuccess(dataSetAndDataSetVersion => CreateDataSetVersion(
+            .OnSuccess(ds => ValidateCanCreateNextDataSetVersion(ds, dataSetVersionToPatch))
+            .OnSuccess(dataSet => ValidatePreviousDataSetVersion(dataSet, dataSetVersionToPatch)
+                .OnSuccess(previousDataSetVersionToPatch => (dataSet, previousDataSetVersionToPatch)))
+                .OnSuccess(dataSetAndDataSetVersion => CreateDataSetVersion(
                 releaseFileId: releaseFileId,
                 instanceId: instanceId,
-                dataSet: dataSetAndDataSetVersion.Item1,
-                previousVersionToPatch: dataSetAndDataSetVersion.Item2,
+                dataSet: dataSetAndDataSetVersion.dataSet,
+                previousVersionToPatch: dataSetAndDataSetVersion.previousDataSetVersionToPatch,
                 cancellationToken: cancellationToken))
             .OnSuccess(dataSetVersion => dataSetVersion.Id);
     }
@@ -343,33 +343,41 @@ internal class DataSetVersionService(
         return dataSet;
     }
 
-    private Either<ActionResult, DataSet> ValidateNextDataSet(DataSet dataSet, string? dataSetVersionToPatch)
+    private static Either<ActionResult, DataSet> ValidateCanCreateNextDataSetVersion(DataSet dataSet, DataSetVersionNumber? dataSetVersionToPatch)
     {
-        if (dataSetVersionToPatch is null && dataSet.LatestLiveVersionId is null)
+        if (dataSetVersionToPatch is not null && dataSet.LatestLiveVersionId is null && dataSet.Versions.Count == 1)
         {
-            return ValidationUtils.ValidationResult(CreateDataSetIdError(
-                message: ValidationMessages.DataSetNoLiveVersion,
-                dataSetId: dataSet.Id));
+            ProcessPatchingInitialVersion();
+            return dataSet;
         }
 
-        return dataSet;
+        return dataSet.LatestLiveVersionId is null
+            ? ValidationUtils.ValidationResult(CreateDataSetIdError(
+                message: ValidationMessages.DataSetNoLiveVersion,
+                dataSetId: dataSet.Id))
+            : dataSet;
     }
-    private Either<ActionResult, DataSetVersion?> ValidatePreviousDataSetVersion(DataSet dataSet, string? previousVersionId)
+
+    private static void ProcessPatchingInitialVersion()
     {
-        if (previousVersionId is null)
+        //throw new NotImplementedException(); //WIP in EES-5996
+    }
+
+    private static Either<ActionResult, DataSetVersion?> ValidatePreviousDataSetVersion(DataSet dataSet, DataSetVersionNumber? dataSetVersionToPatch)
+    {
+        if (dataSetVersionToPatch is null)
         {
-            return (DataSetVersion?)null;
+            return null as DataSetVersion;
         }
-        var previousVersion = dataSet.Versions
-            .SingleOrDefault(dv => dv.VersionString == previousVersionId);
         
-        if (previousVersion is null)
-        {
-            return ValidationUtils.ValidationResult(CreateDataSetIdError(
+        var previousVersion = dataSet.Versions
+            .SingleOrDefault(dv => dataSetVersionToPatch == dv.PublicVersion);
+
+        return previousVersion is null
+            ? ValidationUtils.ValidationResult(CreateDataSetIdError(
                 message: ValidationMessages.DataSetVersionNotFound,
-                dataSetId: dataSet.Id));
-        }
-        return previousVersion;
+                dataSetId: dataSet.Id))
+            : previousVersion;
     }
 
     private async Task<Either<ActionResult, DataSetVersion>> CreateDataSetVersion(
@@ -385,6 +393,7 @@ internal class DataSetVersionService(
                     await ValidateReleaseFileAndDataSet(
                             releaseFile,
                             dataSet,
+                            previousVersionToPatch?.PublicVersion,
                             cancellationToken)
                         .OnSuccess(async () =>
                             await CreateDataSetVersion(
@@ -396,6 +405,7 @@ internal class DataSetVersionService(
                             await CreateDataSetVersionImport(
                                 dataSetVersion,
                                 instanceId,
+                                previousVersionToPatch?.PublicVersion,
                                 cancellationToken))
                         .OnSuccessDo(async dataSetVersion =>
                             await UpdateReleaseFilePublicDataSetVersionId(
@@ -424,7 +434,8 @@ internal class DataSetVersionService(
     private async Task<Either<ActionResult, Unit>> ValidateReleaseFileAndDataSet(
         ReleaseFile releaseFile,
         DataSet dataSet,
-        CancellationToken cancellationToken)
+        string? dataSetVersionToPatch = null,
+        CancellationToken cancellationToken = default)
     {
         // ReleaseFile must not already have a DataSetVersion
         if (await publicDataDbContext.DataSetVersions.AnyAsync(
@@ -495,14 +506,16 @@ internal class DataSetVersionService(
                 cancellationToken))
             .Single();
 
-        if (_previousVersion is null)
+        if (dataSetVersionToPatch is not null)
         {
-            if (previousReleaseIds.Contains(selectedReleaseFileReleaseId))
-            {
-                errors.Add(CreateReleaseFileIdError(
-                    message: ValidationMessages.FileMustBeInDifferentRelease,
-                    releaseFileId: releaseFile.Id));
-            }
+            return errors.Count == 0 ? Unit.Instance : ValidationUtils.ValidationResult(errors);
+        }
+
+        if (previousReleaseIds.Contains(selectedReleaseFileReleaseId))
+        {
+            errors.Add(CreateReleaseFileIdError(
+                message: ValidationMessages.FileMustBeInDifferentRelease,
+                releaseFileId: releaseFile.Id));
         }
 
         return errors.Count == 0 ? Unit.Instance : ValidationUtils.ValidationResult(errors);
@@ -514,16 +527,10 @@ internal class DataSetVersionService(
         DataSetVersion? previousVersionToPatch,
         CancellationToken cancellationToken)
     {
-        SemVersion nextVersion;
-        if (previousVersionToPatch is null)
-        {
-            nextVersion = dataSet.LatestLiveVersion?.DefaultNextVersion()
-                          ?? new SemVersion(major: 1, minor: 0, patch: 0);
-        }
-        else
-        {
-            nextVersion = previousVersionToPatch.NextPatchVersion();
-        }
+        var nextVersion = previousVersionToPatch is null
+            ? dataSet.LatestLiveVersion?.DefaultNextVersion()
+                          ?? new SemVersion(major: 1, minor: 0, patch: 0)
+            : previousVersionToPatch.NextPatchVersion();
 
         var dataSetVersion = new DataSetVersion
         {
@@ -555,14 +562,15 @@ internal class DataSetVersionService(
     private async Task CreateDataSetVersionImport(
         DataSetVersion dataSetVersion,
         Guid instanceId,
-        CancellationToken cancellationToken)
+        string? dataSetVersionToPatch = null,
+        CancellationToken cancellationToken = default)
     {
         var dataSetVersionImport = new DataSetVersionImport
         {
             DataSetVersionId = dataSetVersion.Id,
             InstanceId = instanceId,
             Stage = DataSetVersionImportStage.Pending,
-            DataSetVersionToPatch = _previousVersion
+            DataSetVersionToPatch = dataSetVersionToPatch
         };
 
         publicDataDbContext.DataSetVersionImports.Add(dataSetVersionImport);

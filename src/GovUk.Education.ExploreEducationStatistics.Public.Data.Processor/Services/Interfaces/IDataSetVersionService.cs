@@ -1,5 +1,5 @@
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
-using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Requests;
+using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Services.Interfaces;
@@ -16,7 +16,7 @@ public interface IDataSetVersionService
         Guid dataSetId,
         Guid releaseFileId,
         Guid instanceId,
-        string? dataSetVersionToPatch = null,
+        DataSetVersionNumber? dataSetVersionToPatch = null,
         CancellationToken cancellationToken = default);
 
     Task<Either<ActionResult, Unit>> BulkDeleteVersions(

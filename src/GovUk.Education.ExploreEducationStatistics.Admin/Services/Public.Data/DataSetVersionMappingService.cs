@@ -43,7 +43,7 @@ public class DataSetVersionMappingService(
         MappingType.ManualNone,
         MappingType.AutoNone
     ];
-    
+
     public Task<Either<ActionResult, LocationMappingPlan>> GetLocationMappings(
         Guid nextDataSetVersionId,
         CancellationToken cancellationToken = default)
@@ -172,15 +172,16 @@ public class DataSetVersionMappingService(
             .Where(mapping => mapping.TargetDataSetVersionId == nextDataSetVersionId)
             .Select(nextVersion => nextVersion.TargetDataSetVersion)
             .SingleAsync(cancellationToken);
+
         DataSetVersionImport? ongoingNextVersionImport = null;
 
-        ongoingNextVersionImport = await publicDataDbContext.DataSetVersionImports.SingleOrDefaultAsync(a =>
-                a.DataSetVersionId == nextDataSetVersionId
-                && a.Stage != DataSetVersionImportStage.Completing
-                && a.DataSetVersionToPatch == null,//TODO: Handle in EES-5996
-            cancellationToken: cancellationToken);
+        ongoingNextVersionImport = await publicDataDbContext.DataSetVersionImports.SingleOrDefaultAsync(import =>
+                import.DataSetVersionId == nextDataSetVersionId
+                && import.Stage != DataSetVersionImportStage.Completing
+                && import.DataSetVersionToPatch == null,//TODO: Handle in EES-5996
+            cancellationToken);
 
-        var doesntRequireManualMapping = await DoesntRequireManualMapping(nextDataSetVersionId, cancellationToken);
+        var doesNotRequireManualMapping = await IsMappingComplete(nextDataSetVersionId, cancellationToken);
 
         var isMajorVersionUpdate = await IsMajorVersionUpdate(
             nextDataSetVersionId,
@@ -190,7 +191,7 @@ public class DataSetVersionMappingService(
 
         if (isMajorVersionUpdate)
         {//TODO: Add awareness of isIncrementingPatch the DataSetVersionMapping -  implement appropriate failure handler in EES-5996 
-            if (ongoingNextVersionImport is not null && doesntRequireManualMapping)
+            if (ongoingNextVersionImport is not null && doesNotRequireManualMapping)
             {//TODO: WIP
                 //throw new ApplicationException("Data set is Not allowed");
             }
@@ -217,7 +218,7 @@ public class DataSetVersionMappingService(
         await contentDbContext.SaveChangesAsync(cancellationToken);
     }
 
-    private async Task<bool> DoesntRequireManualMapping(Guid nextDataSetVersionId, CancellationToken cancellationToken)
+    private async Task<bool> IsMappingComplete(Guid nextDataSetVersionId, CancellationToken cancellationToken)
     {
         var mapping = await GetMappingCompletionStatus(nextDataSetVersionId, cancellationToken);
 
@@ -225,30 +226,21 @@ public class DataSetVersionMappingService(
     }
     public async Task<MappingStatusViewModel?> GetMappingCompletionStatus(Guid targetDataSetVersionId, CancellationToken cancellationToken = default)
     {
-        var res = await publicDataDbContext
+        var mapping = await publicDataDbContext
             .DataSetVersionMappings
             .Include(mapping => mapping.TargetDataSetVersion)
             .FirstOrDefaultAsync(mapping => mapping.TargetDataSetVersionId == targetDataSetVersionId, cancellationToken);
-        MappingStatusViewModel? mappingStatus = null;
-        if (res is not null)
+
+        if (mapping is null)
         {
-            var locationsComplete = !res.LocationMappingPlan.Levels
-                // Ignore any levels where candidates or mappings are empty as this means the level
-                // has been added or deleted from the data set and is not a mappable change.
-                .Where(level => level.Value.Candidates.Count != 0 && level.Value.Mappings.Count != 0)
-                .Any(level => level.Value.Mappings
-                    .Any(optionMapping => IncompleteMappingTypes.Contains(optionMapping.Value.Type)));
-            var filtersComplete = !res.FilterMappingPlan
-                .Mappings
-                .Where(filterMapping => filterMapping.Value.Type != MappingType.AutoNone)
-                .SelectMany(filterMapping => filterMapping.Value.OptionMappings)
-                .Any(optionMapping => IncompleteMappingTypes.Contains(optionMapping.Value.Type));
-            mappingStatus = new MappingStatusViewModel
-            {
-                LocationsComplete = locationsComplete,
-                FiltersComplete = filtersComplete
-            };
+            return null;
         }
+
+        var mappingStatus = new MappingStatusViewModel
+        {
+            LocationsComplete = mapping.IsLocationMappingComplete,
+            FiltersComplete = mapping.IsFilterMappingComplete
+        };
         return mappingStatus;
     }
 

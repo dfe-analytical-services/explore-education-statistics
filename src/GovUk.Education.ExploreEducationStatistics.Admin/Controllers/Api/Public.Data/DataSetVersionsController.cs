@@ -10,8 +10,6 @@ using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Requests;
-using NextDataSetVersionCompleteImportRequest = GovUk.Education.ExploreEducationStatistics.Admin.Requests.Public.Data.NextDataSetVersionCompleteImportRequest;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Public.Data;
 

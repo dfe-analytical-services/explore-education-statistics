@@ -11,6 +11,7 @@ using Azure.Identity;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Admin.Options;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Requests;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.ViewModels;
@@ -43,7 +44,7 @@ internal class ProcessorClient(
     public async Task<Either<ActionResult, ProcessDataSetVersionResponseViewModel>> CreateNextDataSetVersionMappings(
         Guid dataSetId,
         Guid releaseFileId,
-        string? dataSetVersionToPatch = null,
+        DataSetVersionNumber? dataSetVersionToPatch = null,
         CancellationToken cancellationToken = default)
     {
         var request = new NextDataSetVersionMappingsCreateRequest

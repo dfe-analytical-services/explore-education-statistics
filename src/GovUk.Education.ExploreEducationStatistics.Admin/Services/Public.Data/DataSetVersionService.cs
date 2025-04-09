@@ -13,6 +13,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
+using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.Validators;
 using GovUk.Education.ExploreEducationStatistics.Common.Validators.ErrorDetails;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
@@ -130,11 +131,13 @@ public class DataSetVersionService(
         string? dataSetVersionToPatch = null,
         CancellationToken cancellationToken = default)
     {
+        var parsedVersion = ValidateDataSetVersion(dataSetVersionToPatch);
+
         return await userService.CheckIsBauUser()
             .OnSuccess(async _ => await processorClient.CreateNextDataSetVersionMappings(
                 dataSetId: dataSetId,
                 releaseFileId: releaseFileId,
-                dataSetVersionToPatch: dataSetVersionToPatch,
+                dataSetVersionToPatch: parsedVersion,
                 cancellationToken: cancellationToken))
             .OnSuccess(async processorResponse => await publicDataDbContext
                 .DataSetVersions
@@ -142,6 +145,15 @@ public class DataSetVersionService(
                     dataSetVersion => dataSetVersion.Id == processorResponse.DataSetVersionId,
                     cancellationToken))
             .OnSuccess(async dataSetVersion => await MapDraftVersionSummary(dataSetVersion, cancellationToken));
+
+        DataSetVersionNumber? ValidateDataSetVersion(string? dataSetVersionRaw)
+        {
+            return dataSetVersionRaw == null
+                ? null
+                : DataSetVersionNumber.TryParse(dataSetVersionRaw, out parsedVersion)
+                    ? parsedVersion
+                    : throw new ArgumentException($"Invalid data set version to patch number: {dataSetVersionToPatch}");
+        }
     }
 
     public async Task<Either<ActionResult, DataSetVersionSummaryViewModel>> CompleteNextVersionImport(
