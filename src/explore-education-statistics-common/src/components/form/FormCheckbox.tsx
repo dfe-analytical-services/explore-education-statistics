@@ -24,7 +24,7 @@ export interface FormCheckboxProps {
   id: string;
   hint?: string | ReactNode;
   hintSmall?: boolean;
-  label: string;
+  label: string | Element;
   boldLabel?: boolean;
   name: string;
   onBlur?: FocusEventHandler<HTMLInputElement>;
