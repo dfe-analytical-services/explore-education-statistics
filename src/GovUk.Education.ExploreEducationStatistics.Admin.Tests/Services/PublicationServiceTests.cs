@@ -2994,6 +2994,7 @@ public class PublicationServiceTests
                 contentDbContext,
                 publicationCacheService: publicationCacheService.Object);
 
+            // Let's swap the order of the oldest two releases to 2022, 2020, 2021 and insert a legacy link.
             var result = await publicationService.UpdateReleaseSeries(
                 publication.Id,
                 updatedReleaseSeriesItems:
@@ -3065,6 +3066,9 @@ public class PublicationServiceTests
             // as the first release after the legacy link
             Assert.Equal(release2022.Versions[1].Id, actualPublication.LatestPublishedReleaseVersionId);
         }
+        
+        // The latest release is unchanged so no event should have been raised
+        AssertOnPublicationChangedEventNotRaised();
     }
 
     [Fact]
@@ -3086,10 +3090,11 @@ public class PublicationServiceTests
         var release2021 = publication.Releases.Single(r => r.Year == 2021);
         var release2022 = publication.Releases.Single(r => r.Year == 2022);
 
+        var originalLatestPublishedReleaseVersionId = release2022.Versions[1].Id;
         var expectedLatestPublishedReleaseVersionId = release2021.Versions[0].Id;
 
         // Check the publication's latest published release version in the generated test data setup
-        Assert.Equal(release2022.Versions[1].Id, publication.LatestPublishedReleaseVersionId);
+        Assert.Equal(originalLatestPublishedReleaseVersionId, publication.LatestPublishedReleaseVersionId);
 
         // Check the expected order of the release series items in the generated test data setup
         Assert.Equal(3, publication.ReleaseSeries.Count);
@@ -3166,6 +3171,10 @@ public class PublicationServiceTests
             // version since it was positioned as the first release
             Assert.Equal(expectedLatestPublishedReleaseVersionId,
                 actualPublication.LatestPublishedReleaseVersionId);
+            
+            AssertOnPublicationLatestPublishedReleaseVersionChangedWasRaised(
+                actualPublication,
+                originalLatestPublishedReleaseVersionId);
         }
     }
 
@@ -3188,10 +3197,11 @@ public class PublicationServiceTests
         var release2021 = publication.Releases.Single(r => r.Year == 2021);
         var release2022 = publication.Releases.Single(r => r.Year == 2022);
 
+        var originalLatestPublishedReleaseVersionId = release2022.Versions[1].Id;
         var expectedLatestPublishedReleaseVersionId = release2020.Versions[0].Id;
 
         // Check the publication's latest published release version in the generated test data setup
-        Assert.Equal(release2022.Versions[1].Id, publication.LatestPublishedReleaseVersionId);
+        Assert.Equal(originalLatestPublishedReleaseVersionId, publication.LatestPublishedReleaseVersionId);
 
         // Check the expected order of the release series items in the generated test data setup
         Assert.Equal(3, publication.ReleaseSeries.Count);
@@ -3268,6 +3278,10 @@ public class PublicationServiceTests
             // version since it was positioned as the next release after 2021 which is unpublished
             Assert.Equal(expectedLatestPublishedReleaseVersionId,
                 actualPublication.LatestPublishedReleaseVersionId);
+
+            AssertOnPublicationLatestPublishedReleaseVersionChangedWasRaised(
+                actualPublication,
+                originalLatestPublishedReleaseVersionId);
         }
     }
 
@@ -3315,6 +3329,8 @@ public class PublicationServiceTests
 
             Assert.Empty(actualPublication.ReleaseSeries);
         }
+        
+        AssertOnPublicationChangedEventNotRaised();
     }
 
     [Fact]
@@ -3484,6 +3500,13 @@ public class PublicationServiceTests
 
     private void AssertOnPublicationChangedEventRaised(Publication? publication = null) =>
         _adminEventRaiserServiceMockBuilder.Assert.OnPublicationChangedWasRaised(publication);
+    
+    private void AssertOnPublicationLatestPublishedReleaseVersionChangedWasRaised(
+        Publication publication,
+        Guid previousReleaseVersionId) =>
+        _adminEventRaiserServiceMockBuilder.Assert.OnPublicationLatestPublishedReleaseVersionChangedWasRaised(
+            publication,
+            previousReleaseVersionId);
     
     private void AssertOnPublicationChangedEventNotRaised() =>
         _adminEventRaiserServiceMockBuilder.Assert.OnPublicationChangedWasNotRaised();
