@@ -307,7 +307,7 @@ export default function FiltersForm({
 
               {stepHeading}
 
-              <div className="govuk-grid-row">
+              <div>
                 <div className="govuk-grid-column govuk-!-margin-bottom-6">
                   <FormFieldCheckboxSearchSubGroups
                     disabled={formState.isSubmitting}
