@@ -16,12 +16,13 @@ export type FilterHierarchyOption = {
 };
 
 interface FilterHierarchyOptionsProps {
-  optionTree: FilterHierarchyOption;
-  level: number;
   disabled?: boolean;
-  name: string;
-  selectedValues: string[];
   expandedOptionsList: string[];
+  hierarchySearchTerm: string;
+  level: number;
+  name: string;
+  optionTree: FilterHierarchyOption;
+  selectedValues: string[];
   toggleOptions: (optionId: string) => void;
 }
 
@@ -32,17 +33,44 @@ function FilterHierarchyOptions({
   level,
   selectedValues = [],
   expandedOptionsList,
+  hierarchySearchTerm,
   toggleOptions,
 }: FilterHierarchyOptionsProps) {
   const [searchTerm, setSearchTerm] = useState<string>('');
 
+  const optionLabel = useMemo(() => {
+    const termIndex = optionTree.label
+      .toLowerCase()
+      .indexOf(hierarchySearchTerm);
+    if (!hierarchySearchTerm || termIndex === -1) {
+      return optionTree.label;
+    }
+
+    return (
+      <span
+        // eslint-disable-next-line react/no-danger
+        dangerouslySetInnerHTML={{
+          __html: `${optionTree.label.slice(
+            0,
+            termIndex,
+          )}<strong>${optionTree.label.slice(
+            termIndex,
+            hierarchySearchTerm.length,
+          )}</strong>${optionTree.label.slice(
+            termIndex + hierarchySearchTerm.length,
+          )}`,
+        }}
+      />
+    ) as unknown as Element;
+  }, [hierarchySearchTerm, optionTree]);
+
   const filteredOptions = useMemo(() => {
     if (!optionTree.options) return [];
-    if (!searchTerm) return optionTree.options;
+    if (!hierarchySearchTerm && !searchTerm) return optionTree.options;
     return optionTree.options.filter(option =>
       option.label.toLowerCase().includes(searchTerm.trim().toLowerCase()),
     );
-  }, [optionTree, searchTerm]);
+  }, [optionTree, searchTerm, hierarchySearchTerm]);
 
   const { childOptionIds, hasAllSelected } = useMemo(() => {
     const childIds = filteredOptions?.map(({ value }) => value) ?? [];
@@ -90,7 +118,7 @@ function FilterHierarchyOptions({
           inputRef={inputRef}
           key={optionTree.label}
           id={`${name}-${optionTree.value}`}
-          label={optionTree.label}
+          label={optionLabel}
           value={optionTree.value}
           hint={optionTree.filterLabel}
           disabled={disabled}
@@ -150,6 +178,7 @@ function FilterHierarchyOptions({
                 disabled={disabled}
                 selectedValues={selectedValues}
                 level={level + 1}
+                hierarchySearchTerm={hierarchySearchTerm}
               />
             ))}
           </div>
