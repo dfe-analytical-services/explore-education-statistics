@@ -1,6 +1,6 @@
-using System.Diagnostics;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
@@ -187,12 +187,13 @@ public abstract class CreateNextDataSetVersionMappingsFunctionTests(
                         startOrchestrationOptions = options;
                     });
 
-
+            DataSetVersionNumber.TryParse(versionUnderTest.PublicVersion, out var version);
+            
             var result = await CreateNextDataSetVersion(
                 dataSetId: dataSet.Id,
                 releaseFileId: releaseFile.Id,
                 durableTaskClientMock.Object,
-                dataSetVersionToPatch: versionUnderTest.VersionString);
+                dataSetVersionToPatch: version);
 
             VerifyAllMocks(durableTaskClientMock);
             
@@ -226,7 +227,7 @@ public abstract class CreateNextDataSetVersionMappingsFunctionTests(
             Assert.Equal(1, nextDataSetVersion.VersionMinor);
             Assert.Equal(1, nextDataSetVersion.VersionPatch);
 
-            Assert.Equal("1.1.1", nextDataSetVersion.VersionString);
+            Assert.Equal("1.1.1", nextDataSetVersion.PublicVersion);
             
             // Assert a single import was created.
             var dataSetVersionImport = Assert.Single(nextDataSetVersion.Imports);
@@ -269,11 +270,11 @@ public abstract class CreateNextDataSetVersionMappingsFunctionTests(
             {
                 context.ReleaseFiles.Add(releaseFile);
             });
-
+            
             var result = await CreateNextDataSetVersion(
                 dataSetId: dataSet.Id,
                 releaseFileId: releaseFile.Id,
-                dataSetVersionToPatch: "1.0.99");
+                dataSetVersionToPatch: new DataSetVersionNumber(1, 0, 99));
          
             var validationProblem = result.AssertBadRequestWithValidationProblem();
 
@@ -663,9 +664,10 @@ public abstract class CreateNextDataSetVersionMappingsFunctionTests(
             Guid dataSetId,
             Guid releaseFileId,
             DurableTaskClient? durableTaskClient = null,
-            string? dataSetVersionToPatch = null)
+            DataSetVersionNumber? dataSetVersionToPatch = null)
         {
             var function = GetRequiredService<CreateNextDataSetVersionMappingsFunction>();
+            
             return await function.CreateNextDataSetVersionMappings(
                 new NextDataSetVersionMappingsCreateRequest
                 {

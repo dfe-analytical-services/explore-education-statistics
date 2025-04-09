@@ -7,8 +7,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Servi
 
 public interface IDataSetVersionMappingService
 {
-    Task<Either<ActionResult, Unit>> CreateMappings(
-        Guid nextDataSetVersionId,
+    Task<Either<ActionResult, Unit>> CreateMappings(Guid nextDataSetVersionId,
+        string? dataSetVersionToPatch,
         CancellationToken cancellationToken = default);
     
     Task<Either<ActionResult, Tuple<DataSetVersion, DataSetVersionImport>>> GetManualMappingVersionAndImport(

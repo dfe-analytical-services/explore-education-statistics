@@ -100,7 +100,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 {
                     var (originalReleaseFile, replacementReleaseFile) = tuple;
 
-                    return await GetLinkedDataSetVersion(originalReleaseFile, cancellationToken)
+                    return await GetLinkedDataSetVersion(replacementReleaseFile, cancellationToken)
                         .OnSuccess(apiDataSetVersion => (originalReleaseFile, replacementReleaseFile, apiDataSetVersion));
                 })
                 .OnSuccess(async tuple =>
@@ -121,11 +121,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         replacementSubjectMeta);
 
                     ApiDataSetVersionPlanViewModel? apiDataSetVersionPlan = null;
-                    if (tuple.originalReleaseFile.PublicApiDataSetId is not null
-                        && tuple.apiDataSetVersion is not null)
+                    if (tuple.replacementReleaseFile.PublicApiDataSetId is not null)
                     {
-                        var completionStatus =
-                            await _dataSetVersionMappingService.GetMappingCompletionStatus(tuple.apiDataSetVersion.Id, cancellationToken);
+                        var completionStatus = await _dataSetVersionMappingService.GetMappingCompletionStatus(tuple.apiDataSetVersion!.Id, cancellationToken);
 
                         apiDataSetVersionPlan = new ApiDataSetVersionPlanViewModel
                         {

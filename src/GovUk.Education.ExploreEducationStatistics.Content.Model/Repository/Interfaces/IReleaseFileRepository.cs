@@ -44,6 +44,4 @@ public interface IReleaseFileRepository
         string? name = null,
         string? fileName = null,
         string? summary = null);
-
-    Task<ReleaseFile?> GetByIdOrDefaultAsync(Guid releaseFileId);
 }

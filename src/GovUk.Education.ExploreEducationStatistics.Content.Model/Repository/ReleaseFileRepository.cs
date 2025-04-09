@@ -144,10 +144,5 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository
 
             return releaseFile;
         }
-        public async Task<ReleaseFile?> GetByIdOrDefaultAsync(Guid releaseFileId)
-        {
-            return await _contentDbContext.ReleaseFiles
-            .SingleOrDefaultAsync(releaseFile => releaseFile.Id == releaseFileId);
-        }
     }
 }

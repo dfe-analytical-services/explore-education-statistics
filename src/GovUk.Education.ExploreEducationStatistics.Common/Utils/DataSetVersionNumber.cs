@@ -62,4 +62,65 @@ public record DataSetVersionNumber(int? Major, int? Minor, int? Patch)
             parts.Length > 2 ? parts[2] : null);
         return true;
     }
+    
+    public static bool operator ==(SemVersion? versionString, DataSetVersionNumber? dataSetVersion)
+    {
+        return dataSetVersion == versionString;
+    }
+
+    public static bool operator !=(SemVersion? versionString, DataSetVersionNumber? dataSetVersion)
+    {
+        return dataSetVersion != versionString;
+    }
+    public static bool operator ==(DataSetVersionNumber? dataSetVersion, SemVersion? semVersion)
+    {
+        if (dataSetVersion is null && semVersion is null)
+        {
+            return true;
+        }
+
+        if (dataSetVersion is null || semVersion is null)
+        {
+            return false;
+        }
+
+        return dataSetVersion.Major == semVersion.Major
+            && dataSetVersion.Minor == semVersion.Minor
+            && dataSetVersion.Patch == semVersion.Patch;
+    }
+
+    public static bool operator !=(DataSetVersionNumber? dataSetVersion, SemVersion? semVersion)
+    {
+        return !(dataSetVersion == semVersion);
+    }
+
+    public static bool operator ==(string? versionString, DataSetVersionNumber? dataSetVersion)
+    {
+        return dataSetVersion == versionString;
+    }
+
+    public static bool operator !=(string? versionString, DataSetVersionNumber? dataSetVersion)
+    {
+        return dataSetVersion != versionString;
+    }
+    
+    public static bool operator ==(DataSetVersionNumber? dataSetVersion, string? versionString)
+    {
+        if (dataSetVersion is null && versionString is null)
+        {
+            return true;
+        }
+
+        if (dataSetVersion is null || versionString is null)
+        {
+            return false;
+        }
+
+        return TryParse(versionString, out var parsedVersion) && dataSetVersion == parsedVersion;
+    }
+
+    public static bool operator !=(DataSetVersionNumber? dataSetVersion, string? versionString)
+    {
+        return !(dataSetVersion == versionString);
+    }
 }

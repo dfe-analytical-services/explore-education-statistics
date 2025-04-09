@@ -1697,6 +1697,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [InlineData(true, true, true)]
         [InlineData(false, true, false)]
         [InlineData(true, false, false)]
+        [InlineData(false, false, false)]
         public async Task GetReplacementPlan_FileIsLinkedToPublicApiDataSet_ReplacementValidated(bool locationsComplete, bool filtersComplete, bool expectedValidValue)
         {
             DataSet dataSet = _fixture
@@ -1730,11 +1731,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var (originalReleaseFile, replacementReleaseFile) = _fixture.DefaultReleaseFile()
                 .WithReleaseVersion(releaseVersion)
-                .ForIndex(0, rv => 
+                .ForIndex(0, rv =>
                     rv.SetFile(originalFile)
-                    .SetPublicApiDataSetId(dataSet.Id)
-                    .SetPublicApiDataSetVersion(dataSetVersion.SemVersion()))
-                .ForIndex(1, rv => rv.SetFile(replacementFile))
+                        .SetPublicApiDataSetId(dataSet.Id)
+                        .SetPublicApiDataSetVersion(dataSetVersion.SemVersion()))
+                .ForIndex(1, rv =>
+                    rv.SetFile(replacementFile)
+                        .SetPublicApiDataSetId(dataSet.Id)
+                        .SetPublicApiDataSetVersion(dataSetVersion.SemVersion()))
                 .GenerateTuple2();
 
             var mappingService = new Mock<IDataSetVersionMappingService>(Strict);
