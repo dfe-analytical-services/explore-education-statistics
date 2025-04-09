@@ -296,8 +296,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             string? dataSetTitle,
             File? replacingFile)
         {
-            var dataSetFiles = await BuildDataSetFiles(dataFormFile, metaFormFile);
-            return await ValidateDataSetFiles(releaseVersionId, dataSetFiles, dataSetTitle, replacingFile);
+            var dataFile = await BuildDataSetFile(dataFormFile);
+            var metaFile = await BuildDataSetFile(metaFormFile);
+            return await ValidateDataSetFiles(releaseVersionId, [dataFile, metaFile], dataSetTitle, replacingFile);
         }
 
         private async Task<Either<ActionResult, DataSet>> ValidateDataSet(
@@ -419,21 +420,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
-        private static async Task<List<DataSetFileDto>> BuildDataSetFiles(
-            IFormFile dataFormFile,
-            IFormFile metaFormFile)
-        {
-            var files = new List<DataSetFileDto>();
-
-            using var dataFileStream = dataFormFile.OpenReadStream();
-            files.Add(await BuildDataSetFile(dataFileStream, dataFormFile.FileName));
-
-            using var metaFileStream = metaFormFile.OpenReadStream();
-            files.Add(await BuildDataSetFile(metaFileStream, metaFormFile.FileName));
-
-            return files;
-        }
-
         private static async Task<List<DataSetFileDto>> ExtractDataSetZipFile(IFormFile zipFile)
         {
             await using var stream = zipFile.OpenReadStream();
@@ -448,6 +434,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             }
 
             return files;
+        }
+
+        private static async Task<DataSetFileDto> BuildDataSetFile(IFormFile formFile)
+        {
+            using var fileStream = formFile.OpenReadStream();
+            return await BuildDataSetFile(fileStream, formFile.FileName);
         }
 
         private static async Task<DataSetFileDto> BuildDataSetFile(
