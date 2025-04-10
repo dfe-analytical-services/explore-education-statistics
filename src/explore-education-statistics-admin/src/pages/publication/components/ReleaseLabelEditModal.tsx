@@ -8,7 +8,7 @@ import { mapFieldErrors } from '@common/validation/serverValidations';
 import Yup from '@common/validation/yup';
 import React, { ReactNode } from 'react';
 import { ObjectSchema } from 'yup';
-import _ from 'lodash';
+import slugFromTitle from '@common/utils/slugFromTitle';
 
 export type ReleaseLabelFormValues = {
   label?: string;
@@ -53,7 +53,7 @@ const releaseSlugLabelSuffix = (label?: string) => {
     return '';
   }
 
-  return `-${_.kebabCase(label)}`;
+  return `-${slugFromTitle(label!)}`;
 };
 
 export default function ReleaseLabelEditModal({
