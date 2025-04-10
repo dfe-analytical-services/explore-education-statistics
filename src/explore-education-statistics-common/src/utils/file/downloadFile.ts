@@ -1,3 +1,5 @@
+import sanitiseFileName from './sanitiseFileName';
+
 /**
  * Start downloading a {@param file} onto the client's disk.
  *
@@ -16,7 +18,7 @@ export default function downloadFile(file: Blob | string, fileName?: string) {
   link.href = url;
 
   if (fileName) {
-    link.setAttribute('download', fileName);
+    link.setAttribute('download', sanitiseFileName(fileName));
   }
 
   document.body.appendChild(link);
