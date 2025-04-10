@@ -72,6 +72,12 @@ describe('ReleaseLabelEditModal', () => {
     [{ label: 'initial 2' }, 'release-slug-initial-2', 'initial 2'],
     [{ label: 'initial  2' }, 'release-slug-initial-2', 'initial 2'],
     [{ label: 'INITIAL' }, 'release-slug-initial', 'INITIAL'],
+    [{ label: 'initial2' }, 'release-slug-initial2', 'initial2'],
+    [
+      { label: 'initial2initial' },
+      'release-slug-initial2initial',
+      'initial2initial',
+    ],
     [
       { label: 'INITIAL initial' },
       'release-slug-initial-initial',
@@ -125,6 +131,8 @@ describe('ReleaseLabelEditModal', () => {
     ['next  2', 'next 2', 'release-slug-next-2'],
     ['NEXT', 'NEXT', 'release-slug-next'],
     ['NEXT next', 'NEXT next', 'release-slug-next-next'],
+    ['initial2', 'initial2', 'release-slug-initial2'],
+    ['initial2initial', 'initial2initial', 'release-slug-initial2initial'],
   ])(
     'submit button displays confirmation warning with NEW VALUES when CHANGED',
     async (
