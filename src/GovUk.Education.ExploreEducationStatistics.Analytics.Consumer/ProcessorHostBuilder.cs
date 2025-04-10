@@ -1,6 +1,8 @@
+using GovUk.Education.ExploreEducationStatistics.Analytics.Consumer.Functions;
 using GovUk.Education.ExploreEducationStatistics.Analytics.Consumer.Options;
 using GovUk.Education.ExploreEducationStatistics.Analytics.Consumer.Services;
 using GovUk.Education.ExploreEducationStatistics.Analytics.Consumer.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Analytics.Requests.Consumer.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.DuckDb.DuckDb;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Configuration;
@@ -39,6 +41,10 @@ public static class ProcessorHostBuilder
                     .ConfigureFunctionsApplicationInsights()
                     .AddTransient<IAnalyticsPathResolver, AnalyticsPathResolver>()
                     .AddTransient<DuckDbConnection>(_ => new DuckDbConnection());
+
+                // Services to be called by ConsumeAnalyticsRequestFilesFunction
+                services
+                    .AddTransient<IRequestFileProcessorService, PublicApiQueriesProcessorService>();
             });
     }
 }
