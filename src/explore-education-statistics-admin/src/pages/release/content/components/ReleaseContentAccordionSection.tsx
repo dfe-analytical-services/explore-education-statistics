@@ -235,33 +235,31 @@ const ReleaseContentAccordionSection = ({
                   </Button>
                 )}
                 {user?.permissions.isBauUser && (
-                  <>
-                    {!showEmbedDashboardForm && (
+                  <Modal
+                    title="Embed a URL"
+                    open={showEmbedDashboardForm}
+                    onExit={toggleEmbedDashboardForm.off}
+                    triggerButton={
                       <Button
                         variant="secondary"
                         onClick={toggleEmbedDashboardForm.on}
                       >
                         Embed a URL
                       </Button>
-                    )}
-                  </>
+                    }
+                  >
+                    <EditableEmbedForm
+                      onCancel={toggleEmbedDashboardForm.off}
+                      onSubmit={async embedBlock => {
+                        await addEmbedBlock(embedBlock);
+                        toggleEmbedDashboardForm.off();
+                      }}
+                    />
+                  </Modal>
                 )}
               </ButtonGroup>
             </>
           )}
-          <Modal
-            title="Embed a URL"
-            open={showEmbedDashboardForm}
-            onExit={toggleEmbedDashboardForm.off}
-          >
-            <EditableEmbedForm
-              onCancel={toggleEmbedDashboardForm.off}
-              onSubmit={async embedBlock => {
-                await addEmbedBlock(embedBlock);
-                toggleEmbedDashboardForm.off();
-              }}
-            />
-          </Modal>
         </>
       )}
     </EditableAccordionSection>
