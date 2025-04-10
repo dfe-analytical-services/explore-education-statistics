@@ -8,7 +8,7 @@ import { SubjectMetaFilterHierarchy } from '@common/services/tableBuilderService
 import sortAlphabeticalTotalsFirst from '@common/utils/sortAlphabeticalTotalsFirst';
 import classNames from 'classnames';
 import get from 'lodash/get';
-import React, { memo, useCallback, useMemo, useState } from 'react';
+import React, { memo, useCallback, useEffect, useMemo, useState } from 'react';
 import { useFormContext, useWatch } from 'react-hook-form';
 import FormSearchBar from '@common/components/form/FormSearchBar';
 import styles from './FilterHierarchy.module.scss';
@@ -37,6 +37,7 @@ function FilterHierarchy({
   onToggle,
 }: FilterHierarchyProps) {
   const tiersTotal = filterHierarchy.length + 1;
+  const [expandedOptionsList, setExpandedOptionsList] = useState<string[]>([]);
 
   const filterLabels: string[] = [
     ...filterHierarchy.map(({ filterId }) => optionLabelsMap[filterId ?? '']),
@@ -53,11 +54,39 @@ function FilterHierarchy({
     [setHierarchySearchTerm],
   );
 
-  const rootOptionTrees = useMemo(
-    () =>
-      getRootOptionTrees(filterHierarchy, optionLabelsMap, hierarchySearchTerm),
-    [filterHierarchy, optionLabelsMap, hierarchySearchTerm],
+  const searchFormReset = useCallback(() => {
+    setExpandedOptionsList([]);
+    setHierarchySearchTerm('');
+  }, [setHierarchySearchTerm, setExpandedOptionsList]);
+
+  const expandAllOptions = useCallback(
+    (optionTrees: FilterHierarchyOption[]) => {
+      function getOptionIdsRecursively(
+        optionTree: FilterHierarchyOption,
+      ): string[] {
+        const optionsIds =
+          optionTree.options?.flatMap(getOptionIdsRecursively) ?? [];
+        return [optionTree.value, ...optionsIds];
+      }
+      setExpandedOptionsList(optionTrees.flatMap(getOptionIdsRecursively));
+    },
+    [setExpandedOptionsList],
   );
+
+  const rootOptionTrees = useMemo(() => {
+    const optionTrees = getRootOptionTrees(
+      filterHierarchy,
+      optionLabelsMap,
+      hierarchySearchTerm,
+    );
+    if (hierarchySearchTerm) {
+      expandAllOptions(optionTrees);
+    } else {
+      setExpandedOptionsList([]);
+    }
+
+    return optionTrees;
+  }, [filterHierarchy, optionLabelsMap, hierarchySearchTerm, expandAllOptions]);
 
   const selectedValues = useWatch({ name });
 
@@ -69,7 +98,6 @@ function FilterHierarchy({
   const id = fieldId(name);
   const errorMessage = get(errors, name)?.message;
 
-  const [expandedOptionsList, setExpandedOptionsList] = useState<string[]>([]);
   const toggleOptions = useCallback(
     (optionId: string) => {
       if (expandedOptionsList.includes(optionId)) {
@@ -100,7 +128,7 @@ function FilterHierarchy({
         className={styles.search}
         onSubmit={searchFormSubmit}
         min={0}
-        onReset={() => setHierarchySearchTerm('')}
+        onReset={searchFormReset}
       />
       <FormFieldset
         id={name}

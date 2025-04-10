@@ -43,6 +43,14 @@ const FormSearchBar = ({
   }, [initialValue]);
 
   const handleSubmit = () => {
+    if (searchTerm === initialValue) {
+      // reset if user submits the original value
+      setSearchTerm('');
+      toggleHasSubmitted.off();
+      toggleError.off();
+      onReset?.();
+      return;
+    }
     if (searchTerm.length >= min) {
       toggleHasSubmitted.on();
       toggleError.off();
