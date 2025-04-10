@@ -95,6 +95,7 @@ export default function useMethodologyContentActions() {
         block: newBlock,
       },
     });
+    return newBlock;
   }
 
   async function updateSectionBlockOrder({

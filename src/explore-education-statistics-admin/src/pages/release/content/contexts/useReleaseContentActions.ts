@@ -209,6 +209,8 @@ export default function useReleaseContentActions() {
       });
 
       await updateUnattachedDataBlocks({ releaseVersionId });
+
+      return newBlock;
     },
     [dispatch, updateUnattachedDataBlocks],
   );

@@ -66,7 +66,7 @@ const ReleaseContentAccordionSection = ({
   }, [blocks, section, unsavedBlocks, unsavedCommentDeletions]);
 
   const addBlock = useCallback(async () => {
-    await actions.addContentSectionBlock({
+    const newBlock = await actions.addContentSectionBlock({
       releaseVersionId: release.id,
       sectionId,
       sectionKey: 'content',
@@ -76,6 +76,18 @@ const ReleaseContentAccordionSection = ({
         body: '',
       },
     });
+
+    setTimeout(() => {
+      const newBlockEl = document.querySelector(
+        `#editableSectionBlocks-${newBlock.id}`,
+      );
+      const newBlockButton = newBlockEl?.querySelector(
+        'button.govuk-button--secondary',
+      ) as HTMLButtonElement;
+      if (newBlockButton) {
+        newBlockButton.focus();
+      }
+    }, 100);
   }, [actions, release.id, sectionId, sectionContent.length]);
 
   const addEmbedBlock = useCallback(
