@@ -12,6 +12,8 @@ public class TestAnalyticsPathResolver : IAnalyticsPathResolver
         "Analytics",
         Guid.NewGuid().ToString());
 
+    public string BasePath() => _basePath;
+
     public string PublicZipDownloadsDirectoryPath()
     {
         return Path.Combine(_basePath, "PublicZipDownloads");

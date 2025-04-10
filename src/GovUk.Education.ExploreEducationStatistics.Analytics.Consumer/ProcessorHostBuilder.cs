@@ -39,6 +39,12 @@ public static class ProcessorHostBuilder
                     .ConfigureFunctionsApplicationInsights()
                     .AddTransient<IAnalyticsPathResolver, AnalyticsPathResolver>()
                     .AddTransient<DuckDbConnection>(_ => new DuckDbConnection());
+
+                services
+                    .AddTransient<IRequestFileProcessorService, PublicApiQueriesProcessorService>()
+                    .AddTransient<IRequestFileProcessorService, PublicCsvDownloadsProcessorService>()
+                    .AddTransient<IRequestFileProcessorService, PublicZipDownloadsProcessorService>();
+
             });
     }
 }

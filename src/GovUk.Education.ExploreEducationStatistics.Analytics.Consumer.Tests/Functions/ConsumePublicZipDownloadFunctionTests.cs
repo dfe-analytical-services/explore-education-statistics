@@ -1,5 +1,6 @@
 using System.Reflection;
 using GovUk.Education.ExploreEducationStatistics.Analytics.Requests.Consumer.Functions;
+using GovUk.Education.ExploreEducationStatistics.Analytics.Requests.Consumer.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.DuckDb.DuckDb;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using InterpolatedSql.Dapper;
@@ -165,14 +166,15 @@ public abstract class ConsumePublicZipDownloadsFunctionTests : IDisposable
         }
     }
 
-    private ConsumePublicZipDownloadsFunction BuildFunction()
+    private ConsumeAnalyticsRequestFilesFunction BuildFunction()
     {
         return new(
-            duckDbConnection: new DuckDbConnection(),
-            pathResolver: _pathResolver,
-            Mock.Of<ILogger<ConsumePublicZipDownloadsFunction>>());
+            new List<IRequestFileProcessorService>
+            {
+                new Mock<IRequestFileProcessorService>(MockBehavior.Strict).Object // @MarkFix
+            },
+            Mock.Of<ILogger<ConsumeAnalyticsRequestFilesFunction>>());
     }
-    
     private void SetupZipDownloadRequest(string filename)
     {
         Directory.CreateDirectory(_pathResolver.PublicZipDownloadsDirectoryPath());

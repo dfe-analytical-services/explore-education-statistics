@@ -1,5 +1,6 @@
 using System.Reflection;
 using GovUk.Education.ExploreEducationStatistics.Analytics.Requests.Consumer.Functions;
+using GovUk.Education.ExploreEducationStatistics.Analytics.Requests.Consumer.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.DuckDb.DuckDb;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using InterpolatedSql.Dapper;
@@ -10,7 +11,7 @@ using Xunit;
 
 namespace GovUk.Education.ExploreEducationStatistics.Analytics.Consumer.Tests.Functions;
 
-public abstract class ConsumePublicApiQueriesFunctionTests : IDisposable
+public abstract class ConsumePublicApiQueriesFunctionTests : IDisposable // @MarkFix all these tests will become service tests
 {
     private readonly string _queryResourcesPath = Path.Combine(
         Assembly.GetExecutingAssembly().GetDirectoryPath(),
@@ -373,12 +374,14 @@ public abstract class ConsumePublicApiQueriesFunctionTests : IDisposable
         }
     }
 
-    private ConsumePublicApiQueriesFunction BuildFunction()
+    private ConsumeAnalyticsRequestFilesFunction BuildFunction()
     {
         return new(
-            duckDbConnection: new DuckDbConnection(),
-            pathResolver: _pathResolver,
-            Mock.Of<ILogger<ConsumePublicApiQueriesFunction>>());
+            new List<IRequestFileProcessorService>
+            {
+                new Mock<IRequestFileProcessorService>(MockBehavior.Strict).Object // @MarkFix
+            },
+            Mock.Of<ILogger<ConsumeAnalyticsRequestFilesFunction>>());
     }
     
     private void SetupQueryRequest(string filename)

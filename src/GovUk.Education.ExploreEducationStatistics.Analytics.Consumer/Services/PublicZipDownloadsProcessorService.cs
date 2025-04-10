@@ -1,27 +1,23 @@
 using GovUk.Education.ExploreEducationStatistics.Analytics.Requests.Consumer.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.DuckDb.DuckDb;
-using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
 
-namespace GovUk.Education.ExploreEducationStatistics.Analytics.Requests.Consumer.Functions;
+namespace GovUk.Education.ExploreEducationStatistics.Analytics.Requests.Consumer.Services;
 
-public class ConsumePublicCsvDownloadsFunction(
+public class PublicZipDownloadsProcessorService(
     DuckDbConnection duckDbConnection,
     IAnalyticsPathResolver pathResolver,
-    ILogger<ConsumePublicCsvDownloadsFunction> logger)
+    ILogger<PublicZipDownloadsProcessorService> logger) : IRequestFileProcessorService
 {
-    [Function(nameof(ConsumePublicCsvDownloadsFunction))]
-    public Task Run(
-        [TimerTrigger("%App:ConsumePublicCsvDownloadsCronSchedule%")] // @MarkFix add this whereever it needs to be added
-        TimerInfo timer)
+    public Task Consume()
     {
-        logger.LogInformation($"{nameof(ConsumePublicCsvDownloadsFunction)} triggered");
+        logger.LogInformation($"{nameof(PublicZipDownloadsProcessorService)} triggered");
 
-        var sourceDirectory = pathResolver.PublicCsvDownloadsDirectoryPath();
+        var sourceDirectory = pathResolver.PublicZipDownloadsDirectoryPath();
 
         if (!Directory.Exists(sourceDirectory))
         {
-            logger.LogInformation("No public csv downloads to process");
+            logger.LogInformation("No public zip downloads to process");
             return Task.CompletedTask; 
         }
         
@@ -33,14 +29,14 @@ public class ConsumePublicCsvDownloadsFunction(
 
         if (filesToProcess.Count == 0)
         {
-            logger.LogInformation("No public csv downloads to process");
+            logger.LogInformation("No public zip downloads to process");
             return Task.CompletedTask;
         }
         
-        logger.LogInformation("Found {Count} csv downloads to process", filesToProcess.Count);
+        logger.LogInformation("Found {Count} zip downloads to process", filesToProcess.Count);
 
-        var processingDirectory = pathResolver.PublicCsvDownloadsProcessingDirectoryPath();
-        var reportsDirectory = pathResolver.PublicCsvDownloadsReportsDirectoryPath();
+        var processingDirectory = pathResolver.PublicZipDownloadsProcessingDirectoryPath();
+        var reportsDirectory = pathResolver.PublicZipDownloadsReportsDirectoryPath();
         
         Directory.CreateDirectory(processingDirectory);
         Directory.CreateDirectory(reportsDirectory);
@@ -57,9 +53,9 @@ public class ConsumePublicCsvDownloadsFunction(
         duckDbConnection.ExecuteNonQuery("install json; load json");
 
         duckDbConnection.ExecuteNonQuery($@"
-            CREATE TABLE csvDownloads AS 
+            CREATE TABLE zipDownloads AS 
             SELECT
-                MD5(CONCAT(subjectId, releaseVersionId)) AS csvDownloadHash,
+                MD5(CONCAT(subjectId, releaseVersionId)) AS zipDownloadHash,
                 *
             FROM read_json('{processingDirectory}/*.json', 
                 format='auto',
@@ -73,29 +69,29 @@ public class ConsumePublicCsvDownloadsFunction(
                 }})");
 
         duckDbConnection.ExecuteNonQuery(@"
-            CREATE TABLE csvDownloadsReport AS 
+            CREATE TABLE zipDownloadsReport AS 
             SELECT 
-                csvDownloadHash,
+                zipDownloadHash,
                 FIRST(publicationName) AS publicationName,
                 FIRST(releaseVersionId) AS releaseVersionId,
                 FIRST(releaseName) AS releaseName,
                 FIRST(releaseLabel) AS releaseLabel,
                 FIRST(subjectId) AS subjectId,
                 FIRST(dataSetName) AS dataSetName,
-                CAST(COUNT(csvDownloadHash) AS INT) AS downloads
-            FROM csvDownloads
-            GROUP BY csvDownloadHash
-            ORDER BY csvDownloadHash");
+                CAST(COUNT(zipDownloadHash) AS INT) AS downloads
+            FROM zipDownloads
+            GROUP BY zipDownloadHash
+            ORDER BY zipDownloadHash");
         
         var reportFilenamePrefix = DateTime.UtcNow.ToString("yyyyMMdd-HHmmss");
         
-        var csvDownloadReportFilename = Path.Combine(
+        var zipDownloadReportFilename = Path.Combine(
             reportsDirectory, 
-            $"{reportFilenamePrefix}_public-csv-downloads.parquet");
+            $"{reportFilenamePrefix}_public-zip-downloads.parquet");
         
         duckDbConnection.ExecuteNonQuery($@"
-            COPY (SELECT * FROM csvDownloadsReport)
-            TO '{csvDownloadReportFilename}' (FORMAT 'parquet', CODEC 'zstd')");
+            COPY (SELECT * FROM zipDownloadsReport)
+            TO '{zipDownloadReportFilename}' (FORMAT 'parquet', CODEC 'zstd')");
         
         Directory.Delete(processingDirectory, recursive: true);
         
