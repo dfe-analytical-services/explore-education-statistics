@@ -67,6 +67,8 @@ var resourcePrefix = '${subscription}-ees'
 
 var resourceNames = {
   existingResources: {
+    adminApp: '${subscription}-as-ees-admin'
+    publisherFunction: '${subscription}-fa-ees-publisher'
     keyVault: '${subscription}-kv-ees-01'
     vNet: '${subscription}-vnet-ees'
     alertsGroup: '${subscription}-ag-ees-alertedusers'
@@ -98,6 +100,28 @@ module eventGridMessagingModule '../common/components/event-grid/eventGridMessag
     ipRules: [] // TODO EES-5952 Should be maintenanceIpRanges
     tagValues: tagValues
   }
+}
+
+module adminRoleAssignmentsModule 'application/adminRoleAssignments.bicep' = {
+  name: 'adminRoleAssignmentsModule'
+  params: {
+    resourcePrefix: resourcePrefix
+    resourceNames: resourceNames
+  }
+  dependsOn: [
+    eventGridMessagingModule
+  ]
+}
+
+module publisherRoleAssignmentsModule 'application/publisherRoleAssignments.bicep' = {
+  name: 'publisherRoleAssignmentsModule'
+  params: {
+    resourcePrefix: resourcePrefix
+    resourceNames: resourceNames
+  }
+  dependsOn: [
+    eventGridMessagingModule
+  ]
 }
 
 module searchDocsFunctionModule 'application/searchDocsFunction.bicep' = {

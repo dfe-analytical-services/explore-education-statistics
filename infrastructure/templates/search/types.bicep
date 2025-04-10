@@ -1,6 +1,8 @@
 @export()
 type ResourceNames = {
   existingResources: {
+    adminApp: string
+    publisherFunction: string
     keyVault: string
     vNet: string
     alertsGroup: string
