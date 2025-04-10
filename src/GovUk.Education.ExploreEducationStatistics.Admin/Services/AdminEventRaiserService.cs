@@ -62,5 +62,30 @@ public class AdminEventRaiserService(IConfiguredEventGridClientFactory eventGrid
         
         await client.SendEventAsync(eventDto.ToEventGridEvent());
     }
+    
+    /// <summary>
+    /// On Publication Latest Published Release Version changed.
+    /// It is assumed that the publication LatestPublishedReleaseVersionId has a value assigned to it.
+    /// If it is null, then no event will be raised.
+    /// </summary>
+    public async Task OnPublicationLatestPublishedReleaseVersionChanged(Publication publication, Guid previousLatestPublishedReleaseVersionId)
+    {
+        if (!eventGridClientFactory.TryCreateClient(
+                PublicationLatestPublishedReleaseVersionChangedEventDto.EventTopicOptionsKey,
+                out var client))
+        {
+            return;
+        }
+
+        // Should the publication not have a latest published release version for some reason, do nothing.
+        if (publication.LatestPublishedReleaseVersionId is null)
+        {
+            return;
+        }
+
+        var eventDto = new PublicationLatestPublishedReleaseVersionChangedEventDto(publication, previousLatestPublishedReleaseVersionId);
+        
+        await client.SendEventAsync(eventDto.ToEventGridEvent());
+    }
 }
 

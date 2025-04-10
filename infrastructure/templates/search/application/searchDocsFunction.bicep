@@ -1,6 +1,6 @@
 import { abbreviations } from '../../common/abbreviations.bicep'
 import { IpRange, FirewallRule } from '../../common/types.bicep'
-import { ResourceNames } from '../types.bicep'
+import { ResourceNames, SearchStorageQueueNames } from '../types.bicep'
 
 @description('The URL of the Content API.')
 param contentApiUrl string
@@ -47,6 +47,12 @@ param applicationInsightsConnectionString string = ''
 
 @description('Specifies whether or not the Search Docs Function App already exists.')
 param functionAppExists bool
+
+@description('The name of the queue that is used when a publication is changed.')
+param publicationChangedQueueName string = 'publication-changed-queue'
+
+@description('The name of the queue that is used when the latest published release version has changed for a publication.')
+param publicationLatestPublishedReleaseVersionChangedQueueName string = 'publication-latest-published-release-version-changed-queue'
 
 @description('The name of the queue that is used when a searchable document requires a refresh.')
 param refreshSearchableDocumentQueueName string = 'refresh-searchable-document-queue'
@@ -99,11 +105,8 @@ resource searchableDocumentsContainer 'Microsoft.Storage/storageAccounts/blobSer
 }
 
 resource searchService 'Microsoft.Search/searchServices@2024-06-01-preview' existing = {
-    name: searchServiceName
+  name: searchServiceName
 }
-
-// Name of the dedicated storage account for the Function App
-var functionAppStorageAccountName = '${replace(resourcePrefix, '-', '')}${abbreviations.storageStorageAccounts}searchdocsfn'
 
 module functionAppModule '../../common/components/functionApp.bicep' = {
   name: 'searchDocsFunctionAppModuleDeploy'
@@ -133,6 +136,14 @@ module functionAppModule '../../common/components/functionApp.bicep' = {
       {
         name: 'ContentApi__Url'
         value: contentApiUrl
+      }
+      {
+        name: 'PublicationChangedQueueName'
+        value: publicationChangedQueueName
+      }
+      {
+        name: 'PublicationLatestPublishedReleaseVersionChangedQueueName'
+        value: publicationLatestPublishedReleaseVersionChangedQueueName
       }
       {
         name: 'RefreshSearchableDocumentQueueName'
@@ -167,7 +178,7 @@ module functionAppModule '../../common/components/functionApp.bicep' = {
     functionAppRuntime: 'dotnet-isolated'
     functionAppRuntimeVersion: '8.0'
     deployQueueRoleAssignment: true
-    storageAccountName: functionAppStorageAccountName
+    storageAccountName: '${replace(resourcePrefix, '-', '')}${abbreviations.storageStorageAccounts}searchdocsfn'
     storageAccountPublicNetworkAccessEnabled: false
     publicNetworkAccessEnabled: true
     functionAppFirewallRules: functionAppFirewallRules
@@ -177,18 +188,20 @@ module functionAppModule '../../common/components/functionApp.bicep' = {
       storageAccounts: searchDocsFunctionPrivateEndpointSubnet.id
     }
     outboundSubnetId: outboundVnetSubnet.id
-    alerts: deployAlerts ? {
-      cpuPercentage: true
-      functionAppHealth: true
-      httpErrors: true
-      memoryPercentage: true
-      storageAccountAvailability: true
-      storageLatency: false
-      fileServiceAvailability: true
-      fileServiceLatency: false
-      fileServiceCapacity: true
-      alertsGroupName: resourceNames.existingResources.alertsGroup
-    } : null
+    alerts: deployAlerts
+      ? {
+          cpuPercentage: true
+          functionAppHealth: true
+          httpErrors: true
+          memoryPercentage: true
+          storageAccountAvailability: true
+          storageLatency: false
+          fileServiceAvailability: true
+          fileServiceLatency: false
+          fileServiceCapacity: true
+          alertsGroupName: resourceNames.existingResources.alertsGroup
+        }
+      : null
     tagValues: tagValues
   }
 }
@@ -203,10 +216,12 @@ module functionAppIdentityRoleAssignmentModule '../components/searchServiceRoleA
 }
 
 module functionAppStorageAccountQueueServiceModule '../../common/components/queueService.bicep' = {
-  name: 'functionAppStorageAccountQueueServiceModuleDeploy'
+  name: 'searchDocsFunctionAppStorageAccountQueueServiceModuleDeploy'
   params: {
-    storageAccountName: functionAppStorageAccountName
+    storageAccountName: functionAppModule.outputs.storageAccountName
     queueNames: [
+      publicationChangedQueueName
+      publicationLatestPublishedReleaseVersionChangedQueueName
       refreshSearchableDocumentQueueName
       releaseSlugChangedQueueName
       releaseVersionPublishedQueueName
@@ -218,3 +233,13 @@ module functionAppStorageAccountQueueServiceModule '../../common/components/queu
 
 output functionAppName string = functionAppModule.outputs.name
 output functionAppUrl string = functionAppModule.outputs.url
+output functionAppStorageAccountName string = functionAppModule.outputs.storageAccountName
+output storageQueueNames SearchStorageQueueNames = {
+  publicationChangedQueueName: publicationChangedQueueName
+  publicationLatestPublishedReleaseVersionChangedQueueName: publicationLatestPublishedReleaseVersionChangedQueueName
+  refreshSearchableDocumentQueueName: refreshSearchableDocumentQueueName
+  releaseSlugChangedQueueName: releaseSlugChangedQueueName
+  releaseVersionPublishedQueueName: releaseVersionPublishedQueueName
+  searchableDocumentCreatedQueueName: searchableDocumentCreatedQueueName
+  themeUpdatedQueueName: themeUpdatedQueueName
+}

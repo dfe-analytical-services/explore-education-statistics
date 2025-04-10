@@ -52,10 +52,10 @@ param hostingMode string = 'default'
 ])
 param publicNetworkAccess string = 'Disabled'
 
-@description('Indicates whether the Search Service should have a system-assigned managed identity.')
+@description('Indicates whether the resource should have a system-assigned managed identity.')
 param systemAssignedIdentity bool = false
 
-@description('The name of a user-assigned managed identity to assign to the Search Service.')
+@description('The name of a user-assigned managed identity to assign to the resource.')
 param userAssignedIdentityName string = ''
 
 @description('Location for all resources.')
