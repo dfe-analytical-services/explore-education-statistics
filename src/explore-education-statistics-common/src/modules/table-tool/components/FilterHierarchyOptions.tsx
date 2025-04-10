@@ -46,21 +46,12 @@ function FilterHierarchyOptions({
       return optionTree.label;
     }
 
+    // text matching search term emboldened
+    const regex = new RegExp(hierarchySearchTerm, 'gi');
+    const newText = optionTree.label.replace(regex, `<strong>$&</strong>`);
     return (
-      <span
-        // eslint-disable-next-line react/no-danger
-        dangerouslySetInnerHTML={{
-          __html: `${optionTree.label.slice(
-            0,
-            termIndex,
-          )}<strong>${optionTree.label.slice(
-            termIndex,
-            hierarchySearchTerm.length,
-          )}</strong>${optionTree.label.slice(
-            termIndex + hierarchySearchTerm.length,
-          )}`,
-        }}
-      />
+      // eslint-disable-next-line react/no-danger
+      <span dangerouslySetInnerHTML={{ __html: newText }} />
     ) as unknown as Element;
   }, [hierarchySearchTerm, optionTree]);
 
@@ -135,7 +126,7 @@ function FilterHierarchyOptions({
           onToggle={() => toggleOptions(optionTree.value)}
           className={styles.detailsMenu}
         >
-          {optionTree.options.length > 6 && (
+          {level !== 0 && optionTree.options.length > 6 && (
             <div className={styles.search}>
               <FormTextSearchInput
                 id={`${name}-search`}
