@@ -1,28 +1,24 @@
 using GovUk.Education.ExploreEducationStatistics.Analytics.Consumer.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.DuckDb.DuckDb;
-using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
 
-namespace GovUk.Education.ExploreEducationStatistics.Analytics.Consumer.Functions;
+namespace GovUk.Education.ExploreEducationStatistics.Analytics.Consumer.Services;
 
-public class ConsumePublicApiQueriesFunction(
+public class PublicApiQueriesProcessorService(
     DuckDbConnection duckDbConnection,
     IAnalyticsPathResolver pathResolver,
-    ILogger<ConsumePublicApiQueriesFunction> logger)
+    ILogger<PublicApiQueriesProcessorService> logger) : IRequestFileProcessorService
 {
-    [Function(nameof(ConsumePublicApiQueriesFunction))]
-    public Task Run(
-        [TimerTrigger("%App:ConsumePublicApiQueriesCronSchedule%")]
-        TimerInfo timer)
+    public Task Consume()
     {
-        logger.LogInformation($"{nameof(ConsumePublicApiQueriesFunction)} triggered");
+        logger.LogInformation($"{nameof(PublicApiQueriesProcessorService)} triggered");
 
         var sourceDirectory = pathResolver.PublicApiQueriesDirectoryPath();
 
         if (!Directory.Exists(sourceDirectory))
         {
             logger.LogInformation("No data set queries to process");
-            return Task.CompletedTask; 
+            return Task.CompletedTask;
         }
         
         var filesToProcess = Directory

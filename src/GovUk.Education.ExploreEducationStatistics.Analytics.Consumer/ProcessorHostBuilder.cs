@@ -39,6 +39,10 @@ public static class ProcessorHostBuilder
                     .ConfigureFunctionsApplicationInsights()
                     .AddTransient<IAnalyticsPathResolver, AnalyticsPathResolver>()
                     .AddTransient<DuckDbConnection>(_ => new DuckDbConnection());
+
+                // Services to be called by ConsumeAnalyticsRequestFilesFunction
+                services
+                    .AddTransient<IRequestFileProcessorService, PublicApiQueriesProcessorService>();
             });
     }
 }
