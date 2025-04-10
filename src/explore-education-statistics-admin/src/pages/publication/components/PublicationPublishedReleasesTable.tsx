@@ -83,62 +83,53 @@ export default function PublicationPublishedReleasesTable({
                 )}
               </td>
               <td>
-                {release.permissions.canViewReleaseVersion ? (
-                  <Link
-                    className="govuk-!-margin-right-4 govuk-!-display-inline-block"
-                    to={generatePath<ReleaseRouteParams>(
-                      releaseSummaryRoute.path,
-                      {
-                        publicationId: publication.id,
-                        releaseVersionId: release.id,
-                      },
-                    )}
-                  >
-                    View<VisuallyHidden> {release.title}</VisuallyHidden>
-                  </Link>
-                ) : (
-                  <>
-                    No permission
-                    <VisuallyHidden> {release.title}</VisuallyHidden>
-                  </>
-                )}
-                {release.permissions.canUpdateRelease && (
-                  <ReleaseLabelEditModal
-                    currentReleaseSlug={release.slug}
-                    publicationSlug={publication.slug}
-                    initialValues={{ label: release.label }}
-                    triggerButton={
-                      <ButtonText
-                        className={`govuk-!-display-inline-block ${
-                          release.permissions.canMakeAmendmentOfReleaseVersion
-                            ? ' govuk-!-margin-right-4'
-                            : ''
-                        }`}
-                      >
-                        Edit details
-                      </ButtonText>
-                    }
-                    onSubmit={formValues =>
-                      onEdit(release.releaseId, formValues)
-                    }
-                  />
-                )}
-                {release.permissions.canMakeAmendmentOfReleaseVersion && (
-                  <ModalConfirm
-                    title="Confirm you want to amend this published release"
-                    triggerButton={
-                      <ButtonText>
-                        Amend<VisuallyHidden> {release.title}</VisuallyHidden>
-                      </ButtonText>
-                    }
-                    onConfirm={async () => onAmend(release.id)}
-                  >
-                    <p>
-                      Please note, any changes made to this published release
-                      must be approved before updates can be published.
-                    </p>
-                  </ModalConfirm>
-                )}
+                <div className={styles.actionsColumn}>
+                  {release.permissions.canViewReleaseVersion ? (
+                    <Link
+                      to={generatePath<ReleaseRouteParams>(
+                        releaseSummaryRoute.path,
+                        {
+                          publicationId: publication.id,
+                          releaseVersionId: release.id,
+                        },
+                      )}
+                    >
+                      View<VisuallyHidden> {release.title}</VisuallyHidden>
+                    </Link>
+                  ) : (
+                    <>
+                      No permission
+                      <VisuallyHidden> {release.title}</VisuallyHidden>
+                    </>
+                  )}
+                  {release.permissions.canUpdateRelease && (
+                    <ReleaseLabelEditModal
+                      currentReleaseSlug={release.slug}
+                      publicationSlug={publication.slug}
+                      initialValues={{ label: release.label }}
+                      triggerButton={<ButtonText>Edit details</ButtonText>}
+                      onSubmit={formValues =>
+                        onEdit(release.releaseId, formValues)
+                      }
+                    />
+                  )}
+                  {release.permissions.canMakeAmendmentOfReleaseVersion && (
+                    <ModalConfirm
+                      title="Confirm you want to amend this published release"
+                      triggerButton={
+                        <ButtonText>
+                          Amend<VisuallyHidden> {release.title}</VisuallyHidden>
+                        </ButtonText>
+                      }
+                      onConfirm={async () => onAmend(release.id)}
+                    >
+                      <p>
+                        Please note, any changes made to this published release
+                        must be approved before updates can be published.
+                      </p>
+                    </ModalConfirm>
+                  )}
+                </div>
               </td>
             </tr>
           );
