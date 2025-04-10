@@ -145,6 +145,7 @@ export default function useMethodologyContentActions() {
         section: newSection,
       },
     });
+    return newSection;
   }
 
   async function updateContentSectionsOrder({

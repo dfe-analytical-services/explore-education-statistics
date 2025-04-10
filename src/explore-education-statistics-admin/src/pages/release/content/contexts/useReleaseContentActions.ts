@@ -369,6 +369,7 @@ export default function useReleaseContentActions() {
           section: newSection,
         },
       });
+      return newSection;
     },
     [dispatch],
   );

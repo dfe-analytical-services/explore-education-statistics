@@ -25,10 +25,19 @@ const ReleaseContentAccordion = ({
     useReleaseContentActions();
 
   const addAccordionSection = useCallback(async () => {
-    await addContentSection({
+    const newSection = await addContentSection({
       releaseVersionId: release.id,
       order: release.content.length,
     });
+
+    setTimeout(() => {
+      const newSectionButton = document.querySelector(
+        `#${id}-${newSection.id}-heading`,
+      ) as HTMLButtonElement;
+      if (newSectionButton) {
+        newSectionButton.focus();
+      }
+    }, 100);
   }, [release.id, release.content.length, addContentSection]);
 
   const reorderAccordionSections = useCallback(

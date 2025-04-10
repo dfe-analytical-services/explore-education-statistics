@@ -26,15 +26,22 @@ const MethodologyAccordion = ({
   const { addContentSection, updateContentSectionsOrder } =
     useMethodologyContentActions();
 
-  const onAddSection = useCallback(
-    () =>
-      addContentSection({
-        methodologyId: methodology.id,
-        order: methodology[sectionKey].length,
-        sectionKey,
-      }),
-    [addContentSection, methodology, sectionKey],
-  );
+  const onAddSection = useCallback(async () => {
+    const newSection = await addContentSection({
+      methodologyId: methodology.id,
+      order: methodology[sectionKey].length,
+      sectionKey,
+    });
+
+    setTimeout(() => {
+      const newSectionButton = document.querySelector(
+        `#${id}-${newSection.id}-heading`,
+      ) as HTMLButtonElement;
+      if (newSectionButton) {
+        newSectionButton.focus();
+      }
+    }, 100);
+  }, [addContentSection, methodology, sectionKey]);
 
   const reorderAccordionSections = useCallback(
     async (ids: string[]) => {
