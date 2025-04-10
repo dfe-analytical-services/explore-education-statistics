@@ -95,7 +95,7 @@ module eventGridMessagingModule '../common/components/event-grid/eventGridMessag
     location: location
     resourcePrefix: resourcePrefix
     customTopicNames: eventGridCustomTopicNames
-    ipRules: maintenanceIpRanges
+    ipRules: [] // TODO EES-5952 Should be maintenanceIpRanges
     tagValues: tagValues
   }
 }
