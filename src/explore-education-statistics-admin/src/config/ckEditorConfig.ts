@@ -65,7 +65,12 @@ export const toolbarConfigSimple: ReadonlyArray<ToolbarOption> = [
   'redo',
   'undo',
 ];
-export const toolbarConfigLinkOnly: ReadonlyArray<ToolbarOption> = ['link'];
+
+export const toolbarConfigLinkOnly: ReadonlyArray<ToolbarOption> = [
+  'accessibilityHelp',
+  '|',
+  'link',
+];
 
 export const corePlugins: ReadonlySet<PluginName> = new Set<PluginName>([
   'Essentials',
