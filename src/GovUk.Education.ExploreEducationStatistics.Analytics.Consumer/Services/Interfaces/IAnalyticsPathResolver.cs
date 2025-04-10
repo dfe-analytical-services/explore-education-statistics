@@ -15,4 +15,10 @@ public interface IAnalyticsPathResolver
     string PublicZipDownloadsProcessingDirectoryPath();
 
     string PublicZipDownloadsReportsDirectoryPath();
+
+    string PublicCsvDownloadsDirectoryPath();
+
+    string PublicCsvDownloadsProcessingDirectoryPath();
+
+    string PublicCsvDownloadsReportsDirectoryPath();
 }

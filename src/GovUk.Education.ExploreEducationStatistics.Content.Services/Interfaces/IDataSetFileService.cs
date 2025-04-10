@@ -30,7 +30,7 @@ public interface IDataSetFileService
 
     Task<Either<ActionResult, DataSetFileViewModel>> GetDataSetFile(Guid dataSetFileId);
 
-    Task<ActionResult> DownloadDataSetFile(Guid dataSetFileId);
+    Task<ActionResult> DownloadDataSetFileWithAnalytics(Guid dataSetFileId, CancellationToken cancellationToken);
 
     Task<Either<ActionResult, List<DataSetSitemapItemViewModel>>> ListSitemapItems(
         CancellationToken cancellationToken = default);

@@ -15,6 +15,7 @@ public class TestAnalyticsPathResolver : IAnalyticsPathResolver
         return _basePath;
     }
 
+    // Public API queries
     public string PublicApiQueriesDirectoryPath()
     {
         return Path.Combine(_basePath, "public-api", "queries");
@@ -28,6 +29,7 @@ public class TestAnalyticsPathResolver : IAnalyticsPathResolver
         return Path.Combine(_basePath, "reports", "public-api", "queries");
     }
 
+    // Public zip downloads
     public string PublicZipDownloadsDirectoryPath()
     {
         return Path.Combine(_basePath, "public", "zip-downloads");
@@ -42,5 +44,22 @@ public class TestAnalyticsPathResolver : IAnalyticsPathResolver
     public string PublicZipDownloadsReportsDirectoryPath()
     {
         return Path.Combine(_basePath, "reports", "public", "zip-downloads");
+    }
+
+    // Public CSV downloads
+    public string PublicCsvDownloadsDirectoryPath()
+    {
+        return Path.Combine(_basePath, "public", "csv-downloads");
+    }
+
+    public string PublicCsvDownloadsProcessingDirectoryPath()
+    {
+        return Path.Combine(_basePath, "public", "csv-downloads", "processing");
+
+    }
+
+    public string PublicCsvDownloadsReportsDirectoryPath()
+    {
+        return Path.Combine(_basePath, "reports", "public", "csv-downloads");
     }
 }

@@ -37,7 +37,8 @@ public class DataSetFileService(
     ContentDbContext contentDbContext,
     IReleaseVersionRepository releaseVersionRepository,
     IPublicBlobStorageService publicBlobStorageService,
-    IFootnoteRepository footnoteRepository)
+    IFootnoteRepository footnoteRepository,
+    IAnalyticsManager analyticsManager)
     : IDataSetFileService
 {
     public async Task<Either<ActionResult, PaginatedListViewModel<DataSetFileSummaryViewModel>>> ListDataSetFiles(
@@ -264,10 +265,12 @@ public class DataSetFileService(
         };
     }
 
-    public async Task<ActionResult> DownloadDataSetFile(
-        Guid dataSetFileId)
+    public async Task<ActionResult> DownloadDataSetFileWithAnalytics(
+        Guid dataSetFileId,
+        CancellationToken cancellationToken)
     {
         var releaseFile = await contentDbContext.ReleaseFiles
+            .Include(rf => rf.ReleaseVersion.Release.Publication)
             .Include(rf => rf.File)
             .Where(rf =>
                 rf.File.DataSetFileId == dataSetFileId
@@ -286,6 +289,16 @@ public class DataSetFileService(
         var stream = await publicBlobStorageService.StreamBlob(
             containerName: BlobContainers.PublicReleaseFiles,
             path: releaseFile.PublicPath());
+
+        await analyticsManager.AddCsvDownload(
+            new AnalyticsWriter.CaptureCsvDownloadRequest(
+                releaseFile.ReleaseVersion.Release.Publication.Title,
+                releaseFile.ReleaseVersionId,
+                releaseFile.ReleaseVersion.Release.Title,
+                releaseFile.ReleaseVersion.Release.Label,
+                releaseFile.File.SubjectId ?? default,
+                releaseFile.Name ?? "No data set name"),
+            cancellationToken: cancellationToken);
 
         return new FileStreamResult(stream, "text/csv")
         {

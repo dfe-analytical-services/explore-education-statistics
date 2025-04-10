@@ -29,6 +29,21 @@ public class AnalyticsPathResolver : IAnalyticsPathResolver
         return _basePath;
     }
 
+    private string GetBasePath(string originalPath, IHostEnvironment environment)
+    {
+        if (!environment.IsDevelopment())
+        {
+            return originalPath;
+        }
+
+        return Path.Combine(PathUtils.ProjectRootPath, PathUtils.OsPath(originalPath));
+    }
+
+    private string ReportsDirectoryPath()
+    {
+        return Path.Combine(_basePath, "reports");
+    }
+
     public string PublicApiQueriesDirectoryPath()
     {
         return Path.Combine(_basePath, "public-api", "queries");
@@ -59,18 +74,18 @@ public class AnalyticsPathResolver : IAnalyticsPathResolver
         return Path.Combine(ReportsDirectoryPath(), "public", "zip-downloads");
     }
 
-    private string ReportsDirectoryPath()
+    public string PublicCsvDownloadsDirectoryPath()
     {
-        return Path.Combine(_basePath, "reports");
+        return Path.Combine(_basePath, "public", "csv-downloads");
     }
 
-    private string GetBasePath(string originalPath, IHostEnvironment environment)
+    public string PublicCsvDownloadsProcessingDirectoryPath()
     {
-        if (!environment.IsDevelopment())
-        {
-            return originalPath;
-        }
-        
-        return Path.Combine(PathUtils.ProjectRootPath, PathUtils.OsPath(originalPath));
+        return Path.Combine(PublicCsvDownloadsDirectoryPath(), "processing");
+    }
+
+    public string PublicCsvDownloadsReportsDirectoryPath()
+    {
+        return Path.Combine(ReportsDirectoryPath(), "public", "csv-downloads");
     }
 }

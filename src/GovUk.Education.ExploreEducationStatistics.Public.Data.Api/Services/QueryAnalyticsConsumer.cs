@@ -16,6 +16,10 @@ public class QueryAnalyticsConsumer(
                 var message = await manager.ReadQuery(stoppingToken);
                 await queryAnalyticsWriter.ReportDataSetVersionQuery(message);
             }
+            catch (TaskCanceledException e)
+            {
+                return;
+            }
             catch (Exception e)
             {
                 logger.LogError(

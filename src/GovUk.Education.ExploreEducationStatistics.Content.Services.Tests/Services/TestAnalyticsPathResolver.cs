@@ -21,4 +21,9 @@ public class TestAnalyticsPathResolver : IAnalyticsPathResolver
     {
         return Path.Combine(_basePath, "PublicZipDownloads");
     }
+
+    public string PublicCsvDownloadsDirectoryPath()
+    {
+        return Path.Combine(_basePath, "PublicCsvDownloads");
+    }
 }

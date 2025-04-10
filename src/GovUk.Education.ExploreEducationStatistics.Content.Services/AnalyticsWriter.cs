@@ -63,5 +63,55 @@ public class AnalyticsWriter(
         string ReleaseName,
         string? ReleaseLabel,
         Guid? SubjectId = null,
-        string? DataSetName = null);
+        string? DataSetName = null) : BaseCaptureRequest;
+
+    public record CaptureCsvDownloadRequest(
+        string PublicationName,
+        Guid ReleaseVersionId,
+        string ReleaseName,
+        string? ReleaseLabel,
+        Guid SubjectId,
+        string DataSetName) : BaseCaptureRequest;
+
+    public abstract record BaseCaptureRequest;
+
+    public async Task ReportCsvDownload(CaptureCsvDownloadRequest request)
+    {
+        logger.LogInformation(
+            "Capturing CsvDownload event analytics for releaseVersion {ReleaseVersionId} for subject {SubjectId}",
+            request.ReleaseVersionId,
+            request.SubjectId);
+
+        var serialisedRequest = JsonSerializationUtils.Serialize(
+            obj: request,
+            formatting: Formatting.Indented,
+            orderedProperties: true,
+            camelCase: true);
+
+        var directory = analyticsPathResolver.PublicCsvDownloadsDirectoryPath();
+
+        var filename = $"{DateTime.UtcNow:yyyyMMdd-HHmmss-fffffff}_{request.ReleaseVersionId}_{request.SubjectId}.json";
+
+        try
+        {
+            Directory.CreateDirectory(directory);
+
+            var filePath = Path.Combine(directory, filename);
+            if (File.Exists(filePath))
+            {
+                throw new Exception($"Tried to create a file that already exists for {nameof(CaptureCsvDownloadRequest)}!");
+            }
+
+            await File.WriteAllTextAsync(
+                filePath,
+                contents: serialisedRequest);
+        }
+        catch (Exception e)
+        {
+            logger.LogError(
+                exception: e,
+                message: "Error whilst writing {CsvDownloadRequest} to disk",
+                nameof(CaptureCsvDownloadRequest));
+        }
+    }
 }

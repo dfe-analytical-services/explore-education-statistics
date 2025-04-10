@@ -268,6 +268,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api
 
         private class NoOpAnalyticsManager : IAnalyticsManager
         {
+            public Task Add(AnalyticsWriter.BaseCaptureRequest request, CancellationToken cancellationToken)
+            {
+                return Task.CompletedTask;
+            }
+
+            public async ValueTask<AnalyticsWriter.BaseCaptureRequest> Read(CancellationToken cancellationToken)
+            {
+                await Task.Delay(Timeout.Infinite, cancellationToken);
+                return default!;
+            }
+
             public Task AddZipDownload(
                 AnalyticsWriter.CaptureZipDownloadRequest request,
                 CancellationToken cancellationToken)
@@ -277,6 +288,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api
 
             public async ValueTask<AnalyticsWriter.CaptureZipDownloadRequest>
                 ReadZipDownload(CancellationToken cancellationToken)
+            {
+                await Task.Delay(Timeout.Infinite, cancellationToken);
+                return default!;
+            }
+
+            public Task AddCsvDownload(
+                AnalyticsWriter.CaptureCsvDownloadRequest request,
+                CancellationToken cancellationToken)
+            {
+                return Task.CompletedTask;
+            }
+
+            public async ValueTask<AnalyticsWriter.CaptureCsvDownloadRequest>
+                ReadCsvDownload(CancellationToken cancellationToken)
             {
                 await Task.Delay(Timeout.Infinite, cancellationToken);
                 return default!;

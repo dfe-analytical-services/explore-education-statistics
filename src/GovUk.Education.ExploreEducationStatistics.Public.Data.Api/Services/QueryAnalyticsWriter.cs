@@ -1,6 +1,5 @@
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Requests;
-using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services.Utils;
 using Newtonsoft.Json;
 using IAnalyticsPathResolver = GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services.Interfaces.IAnalyticsPathResolver;
@@ -9,7 +8,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services;
 
 public class QueryAnalyticsWriter(
     IAnalyticsPathResolver analyticsPathResolver,
-    ILogger<QueryAnalyticsWriter> logger) : IQueryAnalyticsWriter
+    ILogger<QueryAnalyticsWriter> logger)
 {
     public async Task ReportDataSetVersionQuery(CaptureDataSetVersionQueryRequest request)
     {
