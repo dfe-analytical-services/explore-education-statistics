@@ -59,6 +59,8 @@ var resourcePrefix = '${subscription}-ees'
 
 var resourceNames = {
   existingResources: {
+    adminApp: '${subscription}-as-ees-admin'
+    publisherFunction: '${subscription}-fa-ees-publisher'
     keyVault: '${subscription}-kv-ees-01'
     vNet: '${subscription}-vnet-ees'
     alertsGroup: '${subscription}-ag-ees-alertedusers'
@@ -92,6 +94,7 @@ module eventMessagingModule 'application/eventMessaging.bicep' = {
     location: location
     ipRules: maintenanceIpRanges
     resourcePrefix: resourcePrefix
+    resourceNames: resourceNames
     tagValues: tagValues
   }
 }
