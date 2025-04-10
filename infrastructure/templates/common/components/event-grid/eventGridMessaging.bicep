@@ -14,16 +14,19 @@ param ipRules IpRange[]
 param tagValues object
 
 @description('A list of custom topic names to create.')
-param customTopicNames string[] = []
+@minLength(1)
+param customTopicNames string[]
 
-module eventGridCustomTopicsModule 'eventGridCustomTopic.bicep' = [for topicName in customTopicNames: {
-  name: '${topicName}EventGridCustomTopicModuleDeploy'
-  params: {
-    name: '${resourcePrefix}-${abbreviations.eventGridTopics}-${topicName}'
-    location: location
-    ipRules: ipRules
-    publicNetworkAccess: 'Enabled'
-    systemAssignedIdentity: true
-    tagValues: tagValues
+module eventGridCustomTopicModule 'eventGridCustomTopic.bicep' = [
+  for (topicName, index) in customTopicNames: {
+    name: '${index}eventGridCustomTopicModuleDeploy'
+    params: {
+      name: '${resourcePrefix}-${abbreviations.eventGridTopics}-${topicName}'
+      location: location
+      ipRules: ipRules
+      publicNetworkAccess: 'Enabled'
+      systemAssignedIdentity: true
+      tagValues: tagValues
+    }
   }
-}]
+]
