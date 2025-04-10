@@ -32,6 +32,7 @@ using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockU
 using static Moq.MockBehavior;
 using IReleaseVersionRepository = GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces.IReleaseVersionRepository;
 using ReleaseVersionRepository = GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.ReleaseVersionRepository;
+using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services;
 
@@ -2567,7 +2568,7 @@ public class PublicationServiceTests
 
             var result = await publicationService.ListReleaseVersions(
                 publication.Id,
-                ReleaseVersionsType.OnlyDraft);
+                ReleaseVersionsType.NotPublished);
 
             var releaseVersions = result.AssertRight();
 

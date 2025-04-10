@@ -28,6 +28,7 @@ using ExternalMethodologyViewModel = GovUk.Education.ExploreEducationStatistics.
 using IReleaseVersionRepository = GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces.IReleaseVersionRepository;
 using PublicationViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.PublicationViewModel;
 using ReleaseVersionSummaryViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ReleaseVersionSummaryViewModel;
+using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services;
 
@@ -673,7 +674,7 @@ public class PublicationService(
         {
             ReleaseVersionsType.Latest => await releaseVersionRepository.ListLatestReleaseVersions(publicationId),
             ReleaseVersionsType.LatestPublished => await releaseVersionRepository.ListLatestReleaseVersions(publicationId, publishedOnly: true),
-            ReleaseVersionsType.OnlyDraft => (await releaseVersionRepository.ListLatestReleaseVersions(publicationId))
+            ReleaseVersionsType.NotPublished => (await releaseVersionRepository.ListLatestReleaseVersions(publicationId))
                 .Where(rv => rv.Live == false)
                 .ToList(),
             _ => throw new Exception(),
