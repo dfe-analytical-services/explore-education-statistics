@@ -1,4 +1,5 @@
-﻿namespace GovUk.Education.ExploreEducationStatistics.Common.Services.EventGrid;
+﻿#nullable enable
+namespace GovUk.Education.ExploreEducationStatistics.Common.Services.EventGrid;
 
 /// <summary>
 /// Different event topic's configuration 
