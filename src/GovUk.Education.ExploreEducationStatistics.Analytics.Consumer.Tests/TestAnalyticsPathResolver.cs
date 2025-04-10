@@ -1,4 +1,4 @@
-using GovUk.Education.ExploreEducationStatistics.Analytics.Requests.Consumer.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Analytics.Consumer.Services.Interfaces;
 
 namespace GovUk.Education.ExploreEducationStatistics.Analytics.Consumer.Tests;
 
