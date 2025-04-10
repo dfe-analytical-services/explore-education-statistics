@@ -27,6 +27,7 @@ using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
+using GovUk.Education.ExploreEducationStatistics.Content.Services.Requests;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.SortDirection;
 using static GovUk.Education.ExploreEducationStatistics.Content.Requests.DataSetsListRequestSortBy;
 using ReleaseVersion = GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseVersion;
@@ -290,8 +291,8 @@ public class DataSetFileService(
             containerName: BlobContainers.PublicReleaseFiles,
             path: releaseFile.PublicPath());
 
-        await analyticsManager.AddCsvDownload(
-            new AnalyticsWriter.CaptureCsvDownloadRequest(
+        await analyticsManager.Add(
+            new CaptureCsvDownloadRequest(
                 releaseFile.ReleaseVersion.Release.Publication.Title,
                 releaseFile.ReleaseVersionId,
                 releaseFile.ReleaseVersion.Release.Title,

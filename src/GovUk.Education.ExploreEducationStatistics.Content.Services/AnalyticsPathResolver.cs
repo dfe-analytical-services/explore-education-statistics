@@ -25,7 +25,15 @@ public class AnalyticsPathResolver : IAnalyticsPathResolver
             );
         }
 
-        _basePath = GetBasePath(options.Value.BasePath, environment);
+        var originalPath = options.Value.BasePath;
+        if (environment.IsDevelopment())
+        {
+            _basePath = Path.Combine(PathUtils.ProjectRootPath, PathUtils.OsPath(originalPath));
+        }
+        else
+        {
+            _basePath = originalPath;
+        }
     }
 
     private string BasePath() => _basePath;
@@ -38,15 +46,5 @@ public class AnalyticsPathResolver : IAnalyticsPathResolver
     public string PublicCsvDownloadsDirectoryPath()
     {
         return Path.Combine(BasePath(), "public", "csv-downloads");
-    }
-
-    private string GetBasePath(string originalPath, IHostEnvironment environment)
-    {
-        if (!environment.IsDevelopment())
-        {
-            return originalPath;
-        }
-
-        return Path.Combine(PathUtils.ProjectRootPath, PathUtils.OsPath(originalPath));
     }
 }

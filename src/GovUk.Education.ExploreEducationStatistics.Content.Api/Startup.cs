@@ -2,7 +2,6 @@
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading;
-using System.Threading.Channels;
 using System.Threading.Tasks;
 using FluentValidation;
 using GovUk.Education.ExploreEducationStatistics.Common.Cache;
@@ -25,6 +24,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Services.Cache;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.Cache;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Options;
+using GovUk.Education.ExploreEducationStatistics.Content.Services.Requests;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
@@ -189,6 +189,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api
                 services.AddSingleton<IAnalyticsWriter, AnalyticsWriter>();
                 services.AddHostedService<AnalyticsConsumer>();
                 services.AddSingleton<IAnalyticsPathResolver, AnalyticsPathResolver>();
+
+                services.AddSingleton<IAnalyticsWriteStrategy, AnalyticsWriteZipDownloadStrategy>();
+                services.AddSingleton<IAnalyticsWriteStrategy, AnalyticsWriteCsvDownloadStrategy>();
             }
             else
             {
@@ -268,40 +271,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api
 
         private class NoOpAnalyticsManager : IAnalyticsManager
         {
-            public Task Add(AnalyticsWriter.BaseCaptureRequest request, CancellationToken cancellationToken)
+            public Task Add(BaseCaptureRequest request, CancellationToken cancellationToken)
             {
                 return Task.CompletedTask;
             }
 
-            public async ValueTask<AnalyticsWriter.BaseCaptureRequest> Read(CancellationToken cancellationToken)
-            {
-                await Task.Delay(Timeout.Infinite, cancellationToken);
-                return default!;
-            }
-
-            public Task AddZipDownload(
-                AnalyticsWriter.CaptureZipDownloadRequest request,
-                CancellationToken cancellationToken)
-            {
-                return Task.CompletedTask;
-            }
-
-            public async ValueTask<AnalyticsWriter.CaptureZipDownloadRequest>
-                ReadZipDownload(CancellationToken cancellationToken)
-            {
-                await Task.Delay(Timeout.Infinite, cancellationToken);
-                return default!;
-            }
-
-            public Task AddCsvDownload(
-                AnalyticsWriter.CaptureCsvDownloadRequest request,
-                CancellationToken cancellationToken)
-            {
-                return Task.CompletedTask;
-            }
-
-            public async ValueTask<AnalyticsWriter.CaptureCsvDownloadRequest>
-                ReadCsvDownload(CancellationToken cancellationToken)
+            public async ValueTask<BaseCaptureRequest> Read(CancellationToken cancellationToken)
             {
                 await Task.Delay(Timeout.Infinite, cancellationToken);
                 return default!;

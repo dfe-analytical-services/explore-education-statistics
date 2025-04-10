@@ -18,6 +18,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Requests;
 using GovUk.Education.ExploreEducationStatistics.Content.Security.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Content.Services.Requests;
 using GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -157,7 +158,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
                             await DoZipFilesToStream(releaseFiles, releaseVersion, outputStream, cancellationToken);
                         }
 
-                        await RecordAnalytics(releaseVersion, releaseFiles, cancellationToken);
+                        await RecordZipDownloadAnalytics(releaseVersion, releaseFiles, cancellationToken);
                     }
                 );
         }
@@ -294,7 +295,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
                                       && AllowedFileTypes.Contains(releaseFile.File.Type));
         }
 
-        private async Task RecordAnalytics(
+        private async Task RecordZipDownloadAnalytics(
             ReleaseVersion releaseVersion,
             List<ReleaseFile>? releaseFiles,
             CancellationToken cancellationToken)
@@ -314,8 +315,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
                 dataSetName = releaseFiles[0].Name;
             }
 
-            await analyticManager.AddZipDownload(
-                new AnalyticsWriter.CaptureZipDownloadRequest(
+            await analyticManager.Add(
+                new CaptureZipDownloadRequest(
                     releaseVersion.Release.Publication.Title,
                     releaseVersion.Id,
                     releaseVersion.Release.Title,

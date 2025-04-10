@@ -13,21 +13,9 @@ public class AnalyticsConsumer(
     {
         while (!stoppingToken.IsCancellationRequested)
         {
-            var request = await Task.WhenAny(analyticsManager.ReadZipAsync(), analyticsManager.ReadCsvAsync());
+            var request = await analyticsManager.Read(stoppingToken);
 
-            // switch
-
-            var zipDownloadRequest = analyticsManager.TryReadZipDownload();
-            if (zipDownloadRequest is not null)
-            {
-                await analyticsWriter.ReportZipDownload(zipDownloadRequest);
-            }
-
-            var csvDownloadRequest = analyticsManager.TryReadCsvDownload();
-            if (csvDownloadRequest is not null)
-            {
-                await analyticsWriter.ReportCsvDownload(csvDownloadRequest);
-            }
+            await analyticsWriter.Report(request);
         }
     }
 }
