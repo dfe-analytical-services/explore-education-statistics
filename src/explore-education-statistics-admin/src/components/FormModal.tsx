@@ -59,7 +59,7 @@ export default function FormModal<TFormValues extends FieldValues>({
     }
 
     return confirmationWarningText;
-  }, [confirmationWarningText]);
+  }, [formValues, confirmationWarningText]);
 
   const onChange = useCallback(
     (values: Partial<TFormValues>) => {

@@ -260,7 +260,6 @@ describe('FormModal', () => {
         formId="testForm"
         triggerButton={<button type="button">Open</button>}
         onSubmit={onSubmit}
-        withConfirmationWarning={withConfirmationWarning}
         confirmationWarningText={confirmationWarningText}
       >
         <div>Child node.</div>
