@@ -1,6 +1,6 @@
 import { abbreviations } from '../../common/abbreviations.bicep'
 import { IpRange, FirewallRule } from '../../common/types.bicep'
-import { ResourceNames, StorageQueueNamesType } from '../types.bicep'
+import { ResourceNames, SearchStorageQueueNames } from '../types.bicep'
 
 @description('The URL of the Content API.')
 param contentApiUrl string
@@ -105,7 +105,7 @@ resource searchableDocumentsContainer 'Microsoft.Storage/storageAccounts/blobSer
 }
 
 resource searchService 'Microsoft.Search/searchServices@2024-06-01-preview' existing = {
-    name: searchServiceName
+  name: searchServiceName
 }
 
 module functionAppModule '../../common/components/functionApp.bicep' = {
@@ -188,18 +188,20 @@ module functionAppModule '../../common/components/functionApp.bicep' = {
       storageAccounts: searchDocsFunctionPrivateEndpointSubnet.id
     }
     outboundSubnetId: outboundVnetSubnet.id
-    alerts: deployAlerts ? {
-      cpuPercentage: true
-      functionAppHealth: true
-      httpErrors: true
-      memoryPercentage: true
-      storageAccountAvailability: true
-      storageLatency: false
-      fileServiceAvailability: true
-      fileServiceLatency: false
-      fileServiceCapacity: true
-      alertsGroupName: resourceNames.existingResources.alertsGroup
-    } : null
+    alerts: deployAlerts
+      ? {
+          cpuPercentage: true
+          functionAppHealth: true
+          httpErrors: true
+          memoryPercentage: true
+          storageAccountAvailability: true
+          storageLatency: false
+          fileServiceAvailability: true
+          fileServiceLatency: false
+          fileServiceCapacity: true
+          alertsGroupName: resourceNames.existingResources.alertsGroup
+        }
+      : null
     tagValues: tagValues
   }
 }
@@ -232,7 +234,7 @@ module functionAppStorageAccountQueueServiceModule '../../common/components/queu
 output functionAppName string = functionAppModule.outputs.name
 output functionAppUrl string = functionAppModule.outputs.url
 output functionAppStorageAccountName string = functionAppModule.outputs.storageAccountName
-output storageQueueNames StorageQueueNamesType = {
+output storageQueueNames SearchStorageQueueNames = {
   publicationChangedQueueName: publicationChangedQueueName
   publicationLatestPublishedReleaseVersionChangedQueueName: publicationLatestPublishedReleaseVersionChangedQueueName
   refreshSearchableDocumentQueueName: refreshSearchableDocumentQueueName

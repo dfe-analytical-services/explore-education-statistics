@@ -30,7 +30,9 @@ param userAssignedIdentityName string = ''
 @description('A set of tags with which to tag the resource in Azure')
 param tagValues object
 
-var identityType = systemAssignedIdentity ? (!empty(userAssignedIdentityName) ? 'SystemAssigned, UserAssigned' : 'SystemAssigned') : (!empty(userAssignedIdentityName) ? 'UserAssigned' : 'None')
+var identityType = systemAssignedIdentity
+  ? (!empty(userAssignedIdentityName) ? 'SystemAssigned, UserAssigned' : 'SystemAssigned')
+  : (!empty(userAssignedIdentityName) ? 'UserAssigned' : 'None')
 
 resource userAssignedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2024-11-30' existing = if (!empty(userAssignedIdentityName)) {
   name: userAssignedIdentityName
@@ -47,10 +49,12 @@ resource topic 'Microsoft.EventGrid/topics@2025-02-15' = {
     minimumTlsVersionAllowed: '1.2'
     inputSchema: 'EventGridSchema'
     publicNetworkAccess: publicNetworkAccess
-    inboundIpRules: [for ipRule in ipRules: {
+    inboundIpRules: [
+      for ipRule in ipRules: {
         action: 'Allow'
         ipMask: ipRule.cidr
-      }]
+      }
+    ]
     disableLocalAuth: !localAuthenticationEnabled
     dataResidencyBoundary: 'WithinRegion'
   }

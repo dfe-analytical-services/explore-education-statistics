@@ -3,7 +3,7 @@
 @maxLength(64)
 param name string
 
-@description('The name of the parent topic.')
+@description('The Event Grid topic name associated with the subscription.')
 param topicName string
 
 @description('The name of the storage account that contains the queue that is the destination of the subscription.')

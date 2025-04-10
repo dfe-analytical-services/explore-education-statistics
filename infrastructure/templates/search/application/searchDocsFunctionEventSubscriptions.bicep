@@ -1,11 +1,11 @@
 import { abbreviations } from '../../common/abbreviations.bicep'
-import { ResourceNames, StorageQueueNamesType } from '../types.bicep'
+import { ResourceNames, SearchStorageQueueNames } from '../types.bicep'
 
 @description('Resource prefix for all resources.')
 param resourcePrefix string
 
 @description('Queue names for the Search Docs Function App used as Event Grid subscription destinations.')
-param storageQueueNames StorageQueueNamesType
+param storageQueueNames SearchStorageQueueNames
 
 @description('The name of the Search Docs Function App storage account.')
 param searchDocsFunctionAppStorageAccountName string
@@ -59,19 +59,22 @@ var eventGridCustomTopicSubscriptions = [
   }
 ]
 
-var subscriptions = flatten(
-  map(eventGridCustomTopicSubscriptions, item =>
-    map(item.subscriptions, subscription => { topic: item.topic, ...subscription } )))
+var subscriptions = flatten(map(
+  eventGridCustomTopicSubscriptions,
+  item => map(item.subscriptions, subscription => { topic: item.topic, ...subscription })
+))
 
 // The functions have Queue trigger bindings rather than Event Grid trigger bindings,
 // so Event Grid subscriptions are created using storage queues as destinations.
-module eventGridQueueSubscriptionModuleDeploy '../../common/components/event-grid/eventGridCustomTopicQueueSubscription.bicep' = [for (subscription, index) in subscriptions: {
-  name: '${index}eventGridQueueSubscriptionModuleDeploy'
-  params: {
-    name: '${resourcePrefix}-${abbreviations.eventGridSubscriptions}-${subscription.name}'
-    topicName: '${resourcePrefix}-${abbreviations.eventGridTopics}-${subscription.topic}'
-    includedEventTypes: subscription.includedEventTypes
-    storageAccountName: searchDocsFunctionAppStorageAccountName
-    queueName: subscription.queueName
+module eventGridQueueSubscriptionModuleDeploy '../../common/components/event-grid/eventGridCustomTopicQueueSubscription.bicep' = [
+  for (subscription, index) in subscriptions: {
+    name: '${index}eventGridQueueSubscriptionModuleDeploy'
+    params: {
+      name: '${resourcePrefix}-${abbreviations.eventGridSubscriptions}-${subscription.name}'
+      topicName: '${resourcePrefix}-${abbreviations.eventGridTopics}-${subscription.topic}'
+      includedEventTypes: subscription.includedEventTypes
+      storageAccountName: searchDocsFunctionAppStorageAccountName
+      queueName: subscription.queueName
+    }
   }
-}]
+]

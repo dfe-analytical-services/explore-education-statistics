@@ -17,7 +17,8 @@ type ResourceNames = {
 type SearchServiceRole = 'Search Index Data Contributor' | 'Search Index Data Reader' | 'Search Service Contributor'
 
 @export()
-type StorageQueueNamesType = {
+@sealed()
+type SearchStorageQueueNames = {
   publicationChangedQueueName: string
   publicationLatestPublishedReleaseVersionChangedQueueName: string
   refreshSearchableDocumentQueueName: string
