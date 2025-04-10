@@ -22,6 +22,7 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Map
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using static Moq.MockBehavior;
 using IReleaseVersionRepository = GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces.IReleaseVersionRepository;
+using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 {
@@ -385,7 +386,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async Task GetPublicationAsync()
+        public async Task GetPublication()
         {
             var userService = AlwaysTrueUserService();
 

@@ -51,7 +51,7 @@ const publicationQueries = createQueryKeys('publication', {
         publicationService.listReleaseVersions<ReleaseVersionSummaryWithPermissions>(
           publicationId,
           {
-            versionsType: ReleaseVersionsType.OnlyDraft,
+            versionsType: ReleaseVersionsType.NotPublished,
             pageSize,
             includePermissions,
           },

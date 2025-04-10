@@ -91,7 +91,7 @@ export interface ReleaseSeriesItemUpdateRequest {
 export enum ReleaseVersionsType {
   Latest,
   LatestPublished,
-  OnlyDraft,
+  NotPublished,
 }
 
 export interface ListReleaseVersionsParams {
