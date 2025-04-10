@@ -41,7 +41,7 @@ const MethodologyAccordion = ({
         newSectionButton.focus();
       }
     }, 100);
-  }, [addContentSection, methodology, sectionKey]);
+  }, [addContentSection, methodology, sectionKey, id]);
 
   const reorderAccordionSections = useCallback(
     async (ids: string[]) => {

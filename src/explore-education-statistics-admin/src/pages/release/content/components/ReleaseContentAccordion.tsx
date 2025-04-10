@@ -38,7 +38,7 @@ const ReleaseContentAccordion = ({
         newSectionButton.focus();
       }
     }, 100);
-  }, [release.id, release.content.length, addContentSection]);
+  }, [release.id, release.content.length, addContentSection, id]);
 
   const reorderAccordionSections = useCallback(
     async (ids: string[]) => {
