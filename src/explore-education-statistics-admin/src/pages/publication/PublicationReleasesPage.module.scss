@@ -9,3 +9,10 @@
 .statusColumn {
   width: 200px;
 }
+
+.actionsColumn {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 20px;
+}
