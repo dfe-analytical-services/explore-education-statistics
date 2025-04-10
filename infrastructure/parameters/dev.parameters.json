@@ -114,7 +114,7 @@
       "value": true
     },
     "eventGridTopicsExist": {
-      "value": false
+      "value": true
     }
   }
 }
