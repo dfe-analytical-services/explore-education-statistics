@@ -68,7 +68,7 @@ var subscriptions = flatten(map(
 // so Event Grid subscriptions are created using storage queues as destinations.
 module eventGridQueueSubscriptionModuleDeploy '../../common/components/event-grid/eventGridCustomTopicQueueSubscription.bicep' = [
   for (subscription, index) in subscriptions: {
-    name: '${index}eventGridQueueSubscriptionModuleDeploy'
+    name: 'eventGridQueueSubscriptionModuleDeploy-${index}'
     params: {
       name: '${resourcePrefix}-${abbreviations.eventGridSubscriptions}-${subscription.name}'
       topicName: '${resourcePrefix}-${abbreviations.eventGridTopics}-${subscription.topic}'

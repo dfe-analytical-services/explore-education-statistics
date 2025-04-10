@@ -19,7 +19,7 @@ param customTopicNames string[]
 
 module eventGridCustomTopicModule 'eventGridCustomTopic.bicep' = [
   for (topicName, index) in customTopicNames: {
-    name: '${index}eventGridCustomTopicModuleDeploy'
+    name: 'eventGridCustomTopicModuleDeploy-${index}'
     params: {
       name: '${resourcePrefix}-${abbreviations.eventGridTopics}-${topicName}'
       location: location
