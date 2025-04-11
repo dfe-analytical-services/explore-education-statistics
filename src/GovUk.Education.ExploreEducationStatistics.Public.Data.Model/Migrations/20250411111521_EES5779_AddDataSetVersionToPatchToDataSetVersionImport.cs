@@ -13,7 +13,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
             migrationBuilder.AddColumn<string>(
                 name: "DataSetVersionToPatch",
                 table: "DataSetVersionImports",
-                type: "nvarchar(50)",
+                type: "varchar(50)",
                 nullable: true);
         }
 

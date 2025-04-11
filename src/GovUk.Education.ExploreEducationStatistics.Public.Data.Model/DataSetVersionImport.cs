@@ -24,7 +24,7 @@ public class DataSetVersionImport : ICreatedUpdatedTimestamps<DateTimeOffset, Da
 
     public DateTimeOffset? Updated { get; set; }
 
-    [Column(TypeName = "nvarchar(50)")]
+    [Column(TypeName = "varchar(50)")]
     public string? DataSetVersionToPatch { get; set; }
     
     internal class Config : IEntityTypeConfiguration<DataSetVersionImport>

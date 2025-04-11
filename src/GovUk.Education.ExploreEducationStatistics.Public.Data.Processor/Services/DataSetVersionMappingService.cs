@@ -23,10 +23,6 @@ internal class DataSetVersionMappingService(
     ContentDbContext contentDbContext)
     : IDataSetVersionMappingService
 {
-    private static readonly MappingType[] IncompleteMappingTypes =
-    [
-        MappingType.AutoNone
-    ];
 
     private static readonly MappingType[] NoMappingTypes =
     [
