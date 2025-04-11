@@ -1,11 +1,12 @@
 using System;
 using Azure.Messaging.EventGrid;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.EventGrid;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Events;
 
-public record ReleaseSlugChangedEventDto
+public record ReleaseSlugChangedEvent : IEvent
 {
-    public ReleaseSlugChangedEventDto(Guid releaseId, string newReleaseSlug, Guid publicationId, string publicationSlug)
+    public ReleaseSlugChangedEvent(Guid releaseId, string newReleaseSlug, Guid publicationId, string publicationSlug)
     {
         Subject = releaseId.ToString();
         Payload = new EventPayload
@@ -21,7 +22,7 @@ public record ReleaseSlugChangedEventDto
     private const string EventType = "release-slug-changed";
     
     // Which Topic endpoint to use from the appsettings
-    public const string EventTopicOptionsKey = "ReleaseChangedEvent";
+    public static string EventTopicOptionsKey => "ReleaseChangedEvent";
 
     /// <summary>
     /// The ThemeId is the subject

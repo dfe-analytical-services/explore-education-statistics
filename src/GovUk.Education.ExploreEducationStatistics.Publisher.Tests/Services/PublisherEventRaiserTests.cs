@@ -19,41 +19,23 @@ using Xunit.Abstractions;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services;
 
-public class PublisherEventRaiserServiceTests
+public class PublisherEventRaiserTests
 {
-    private readonly ConfiguredEventGridClientFactoryMockBuilder _eventGridClient = new();
+    private readonly EventRaiserMockBuilder _eventRaiserMockBuilder = new();
 
-    private IPublisherEventRaiserService GetSut(IConfiguredEventGridClientFactory? eventGridClientFactory = null) => 
-        new PublisherEventRaiserService(eventGridClientFactory ?? _eventGridClient.Build());
+    private IPublisherEventRaiser GetSut(IEventRaiser? eventRaiser = null) => 
+        new PublisherEventRaiser(eventRaiser ?? _eventRaiserMockBuilder.Build());
 
-    public class BasicTests : PublisherEventRaiserServiceTests
+    public class BasicTests : PublisherEventRaiserTests
     {
         [Fact]
         public void Can_instantiate_sut() => Assert.NotNull(GetSut());
     }
 
-    public class RaiseReleaseVersionPublishedPublisherEvents : PublisherEventRaiserServiceTests
+    public class RaiseReleaseVersionPublishedPublisherEvents : PublisherEventRaiserTests
     {
         [Fact]
-        public async Task GivenNotConfigured_WhenPublishedReleaseVersionInfoSpecified_ThenNoEventRaised()
-        {
-            // ARRANGE
-            _eventGridClient.WhereNoTopicConfigFound();
-            
-            var sut = GetSut();
-            var publishedReleaseVersionInfo = new PublishingCompletionService.PublishedReleaseVersionInfo();
-            
-            // ACT
-            await sut.RaiseReleaseVersionPublishedEvents([publishedReleaseVersionInfo]);
-
-            // ASSERT
-            _eventGridClient
-                .Client
-                .Assert.NoEventsWerePublished();
-        }
-        
-        [Fact]
-        public async Task GivenConfigured_WhenOnePublishedReleaseVersionInfoSpecified_ThenEventRaised()
+        public async Task WhenOnePublishedReleaseVersionInfoSpecified_ThenEventRaised()
         {
             // ARRANGE
             var sut = GetSut();
@@ -71,20 +53,8 @@ public class PublisherEventRaiserServiceTests
             await sut.RaiseReleaseVersionPublishedEvents([info]);
 
             // ASSERT
-            var eventGridEvent = Assert.Single(_eventGridClient.Client.Assert.EventsPublished);
-            Assert.NotNull(eventGridEvent);
-            Assert.Equal(info.ReleaseVersionId.ToString(), eventGridEvent.Subject);
-            Assert.Equal(ReleaseVersionPublishedEventDto.EventType, eventGridEvent.EventType);
-            Assert.Equal(ReleaseVersionPublishedEventDto.DataVersion, eventGridEvent.DataVersion);
-            
-            var jsonPayload = eventGridEvent.Data.ToString();
-            var payload = JsonSerializer.Deserialize<ReleaseVersionPublishedEventDto.EventPayload>(jsonPayload);
-            Assert.NotNull(payload);
-            Assert.Equal(info.ReleaseId, payload.ReleaseId);
-            Assert.Equal(info.ReleaseSlug, payload.ReleaseSlug);
-            Assert.Equal(info.PublicationId, payload.PublicationId);
-            Assert.Equal(info.PublicationSlug, payload.PublicationSlug);
-            Assert.Equal(info.PublicationLatestPublishedReleaseVersionId, payload.PublicationLatestPublishedReleaseVersionId);
+            var expectedEvent = new ReleaseVersionPublishedEvent(info);
+            _eventRaiserMockBuilder.Assert.EventsRaised([expectedEvent]);
         }
         
         [Theory]
@@ -110,27 +80,28 @@ public class PublisherEventRaiserServiceTests
             await sut.RaiseReleaseVersionPublishedEvents(infos);
 
             // ASSERT
-            Assert.Equal(numberOfEvents, _eventGridClient.Client.Assert.EventsPublished.Count());
+            var expectedEvents = infos.Select(info => new ReleaseVersionPublishedEvent(info));
+            _eventRaiserMockBuilder.Assert.EventsRaised(expectedEvents);
         }
     }
 
     public class ServiceRegistrationTests
     {
         [Fact]
-        public void WhenResolvedFromContainer_ThenEventRaiserServiceIsReturned()
+        public void WhenResolvedFromContainer_ThenEventRaiserIsReturned()
         {
             // ARRANGE
             var host = new HostBuilder().ConfigurePublisherHostBuilder().Build();
             
             // ACT
-            var eventRaiserService = host.Services.GetRequiredService<IPublisherEventRaiserService>();
+            var eventRaiser = host.Services.GetRequiredService<IPublisherEventRaiser>();
             
             // ASSERT
-            Assert.NotNull(eventRaiserService);
+            Assert.NotNull(eventRaiser);
         }
     }
     
-    public class IntegrationTests(ITestOutputHelper output) : PublisherEventRaiserServiceTests
+    public class IntegrationTests(ITestOutputHelper output) : PublisherEventRaiserTests
     {
         // Define a topic and access key to run this integration test
         private const string TopicName = "-- add test topic name here --";
@@ -139,13 +110,13 @@ public class PublisherEventRaiserServiceTests
 
         private string TestTopicEndpoint => $"https://{TopicName}.{TopicRegion}.eventgrid.azure.net/api/events";
 
-        [Fact(Skip = "Integration test to test the event raiser service")]
+        [Fact(Skip = "Integration test to test the event raiser")]
         public async Task WhenTopicDefinedAndReleaseVersionPublished_ThenEventsRaised()
         {
             // ARRANGE
             var eventGridOptions = new EventGridOptionsBuilder()
                 .AddTopicConfig(
-                    ReleaseVersionPublishedEventDto.EventTopicOptionsKey,
+                    ReleaseVersionPublishedEvent.EventTopicOptionsKey,
                     TestTopicEndpoint,
                     TopicAccessKey)
                 .Build();
@@ -156,7 +127,7 @@ public class PublisherEventRaiserServiceTests
                 eventGridOptions,
             new UnitTestOutputLoggerBuilder<ConfiguredEventGridClientFactory>().Build(output));
             
-            var sut = GetSut(realEventGridClientFactory);
+            var sut = GetSut(new EventRaiser(realEventGridClientFactory));
 
             var publishedReleaseVersionInfo = new PublishingCompletionService.PublishedReleaseVersionInfo
             {
@@ -177,7 +148,7 @@ public class PublisherEventRaiserServiceTests
         }
     }
 
-    public class ConfigTests : PublisherEventRaiserServiceTests
+    public class ConfigTests : PublisherEventRaiserTests
     {
         [Fact]
         public void Ensure_config_is_read_in()

@@ -1,11 +1,12 @@
 using Azure.Messaging.EventGrid;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.EventGrid;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Events;
 
-public record ThemeChangedEventDto
+public record ThemeChangedEvent : IEvent
 {
-    public ThemeChangedEventDto(Theme theme)
+    public ThemeChangedEvent(Theme theme)
     {
         Subject = theme.Id.ToString();
         Payload = new EventPayload
@@ -21,7 +22,7 @@ public record ThemeChangedEventDto
     private const string EventType = "theme-changed";
     
     // Which Topic endpoint to use from the appsettings
-    public const string EventTopicOptionsKey = "ThemeChangedEvent";
+    public static string EventTopicOptionsKey => "ThemeChangedEvent";
 
     /// <summary>
     /// The ThemeId is the subject

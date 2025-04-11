@@ -138,12 +138,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .ReturnsAsync(Unit.Instance);
 
                 // Arrange
-                var eventRaiser = new AdminEventRaiserServiceMockBuilder();
+                var eventRaiser = new AdminEventRaiserMockBuilder();
                 
                 var service = SetupThemeService(
                     contentDbContext: context,
                     publishingService: publishingService.Object,
-                    adminEventRaiserService: eventRaiser.Build());
+                    adminEventRaiser: eventRaiser.Build());
 
                 var result = await service.UpdateTheme(
                     theme.Id,
@@ -967,7 +967,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             IMethodologyService? methodologyService = null,
             IPublishingService? publishingService = null,
             IReleaseVersionService? releaseVersionService = null,
-            IAdminEventRaiserService? adminEventRaiserService = null,
+            IAdminEventRaiser? adminEventRaiser = null,
             bool enableThemeDeletion = true)
         {
             contentDbContext ??= new Mock<ContentDbContext>().Object;
@@ -991,7 +991,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 methodologyService ?? Mock.Of<IMethodologyService>(Strict),
                 publishingService ?? Mock.Of<IPublishingService>(Strict),
                 releaseVersionService ?? Mock.Of<IReleaseVersionService>(Strict),
-                adminEventRaiserService ?? new AdminEventRaiserServiceMockBuilder().Build()
+                adminEventRaiser ?? new AdminEventRaiserMockBuilder().Build()
             );
         }
     }

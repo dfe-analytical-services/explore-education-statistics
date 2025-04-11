@@ -1,11 +1,12 @@
-﻿using Azure.Messaging.EventGrid;
+using Azure.Messaging.EventGrid;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.EventGrid;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Events;
 
-public record PublicationChangedEventDto
+public record PublicationChangedEvent : IEvent
 {
-    public PublicationChangedEventDto(Publication publication)
+    public PublicationChangedEvent(Publication publication)
     {
         Subject = publication.Id.ToString();
         Payload = new EventPayload
@@ -21,7 +22,7 @@ public record PublicationChangedEventDto
     private const string EventType = "publication-changed";
     
     // Which Topic endpoint to use from the appsettings
-    public const string EventTopicOptionsKey = "PublicationChangedEvent";
+    public static string EventTopicOptionsKey => "PublicationChangedEvent";
 
     /// <summary>
     /// The PublicationId is the subject

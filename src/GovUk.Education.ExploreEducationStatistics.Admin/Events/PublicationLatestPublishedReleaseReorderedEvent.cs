@@ -1,12 +1,13 @@
-﻿using System;
+using System;
 using Azure.Messaging.EventGrid;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.EventGrid;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Events;
 
-public record PublicationLatestPublishedReleaseVersionChangedEventDto
+public record PublicationLatestPublishedReleaseReorderedEvent : IEvent
 {
-    public PublicationLatestPublishedReleaseVersionChangedEventDto(
+    public PublicationLatestPublishedReleaseReorderedEvent(
         Publication publication,
         Guid previousReleaseVersionId)
     {
@@ -22,10 +23,10 @@ public record PublicationLatestPublishedReleaseVersionChangedEventDto
 
     // Changes to this event should also increment the version accordingly.
     private const string DataVersion = "1.0";
-    private const string EventType = "publication-latest-publised-release-version-changed";
+    private const string EventType = "publication-latest-published-release-reordered";
     
     // Which Topic endpoint to use from the appsettings
-    public const string EventTopicOptionsKey = "PublicationChangedEvent";
+    public static string EventTopicOptionsKey => "PublicationChangedEvent";
 
     /// <summary>
     /// The PublicationId is the subject
