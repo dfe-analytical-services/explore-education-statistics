@@ -11,12 +11,12 @@ using Xunit.Abstractions;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services;
 
-public class AdminEventRaiserServiceTests(ITestOutputHelper output)
+public class AdminEventRaiserTests(ITestOutputHelper output)
 {
     private readonly ConfiguredEventGridClientFactoryMockBuilder _eventGridClientFactoryMockBuilder = new();
     
-    private IAdminEventRaiserService GetSut() => 
-        new AdminEventRaiserService(_eventGridClientFactoryMockBuilder.Build());
+    private IAdminEventRaiser GetSut() => 
+        new AdminEventRaiser(_eventGridClientFactoryMockBuilder.Build());
 
     [Fact]
     public void Can_instantiate_SUT() => Assert.NotNull(GetSut());

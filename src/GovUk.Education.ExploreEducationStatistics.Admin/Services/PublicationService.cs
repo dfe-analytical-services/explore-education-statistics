@@ -43,7 +43,7 @@ public class PublicationService(
     IReleaseCacheService releaseCacheService,
     IMethodologyCacheService methodologyCacheService,
     IRedirectsCacheService redirectsCacheService,
-    IAdminEventRaiserService adminEventRaiserService)
+    IAdminEventRaiser adminEventRaiser)
     : IPublicationService
 {
     public async Task<Either<ActionResult, List<PublicationViewModel>>> ListPublications(
@@ -243,7 +243,7 @@ public class PublicationService(
 
                 if (publication.Live && (titleChanged || slugChanged || summaryChanged))
                 {
-                    await adminEventRaiserService.OnPublicationChanged(publication);
+                    await adminEventRaiser.OnPublicationChanged(publication);
                 }
                 
                 return await GetPublication(publication.Id);
@@ -589,7 +589,7 @@ public class PublicationService(
                     // therefore, this should always have a value
                     if (oldLatestPublishedReleaseVersionId.HasValue)
                     {
-                        await adminEventRaiserService.OnPublicationLatestPublishedReleaseVersionChanged(
+                        await adminEventRaiser.OnPublicationLatestPublishedReleaseVersionChanged(
                             publication,
                             oldLatestPublishedReleaseVersionId.Value);
                     }

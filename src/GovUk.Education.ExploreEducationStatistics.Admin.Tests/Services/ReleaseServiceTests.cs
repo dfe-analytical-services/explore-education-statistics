@@ -352,7 +352,7 @@ public abstract class ReleaseServiceTests
             var releasePublishingStatusRepository = new ReleasePublishingStatusRepositoryMockBuilder()
                 .SetNoReleaseVersionStatus(releaseVersion.Id);
 
-            var adminEventRaiserService = new AdminEventRaiserServiceMockBuilder();
+            var adminEventRaiser = new AdminEventRaiserMockBuilder();
             
             var sut = BuildService(
                                     context,
@@ -361,7 +361,7 @@ public abstract class ReleaseServiceTests
                                     publicationCacheService: new PublicationCacheServiceMockBuilder().Build(),
                                     redirectsCacheService: new RedirectsCacheServiceMockBuilder().Build(),
                                     releasePublishingStatusRepository: releasePublishingStatusRepository.Build(),
-                                    adminEventRaiserService: adminEventRaiserService.Build());
+                                    adminEventRaiser: adminEventRaiser.Build());
             
             var request = new ReleaseUpdateRequest
             {
@@ -379,7 +379,7 @@ public abstract class ReleaseServiceTests
             output.WriteLine($"Expected Publication Id: {expectedPublicationId}");
             output.WriteLine($"Expected Publication Slug: {expectedPublicationSlug}");
             
-            adminEventRaiserService.Assert.OnReleaseSlugChangedWasRaised(
+            adminEventRaiser.Assert.OnReleaseSlugChangedWasRaised(
                 expectedReleaseId,
                 expectedNewReleaseSlug,
                 expectedPublicationId,
@@ -429,7 +429,7 @@ public abstract class ReleaseServiceTests
             var releasePublishingStatusRepository = new ReleasePublishingStatusRepositoryMockBuilder()
                 .SetNoReleaseVersionStatus(releaseVersion.Id);
 
-            var adminEventRaiserService = new AdminEventRaiserServiceMockBuilder();
+            var adminEventRaiser = new AdminEventRaiserMockBuilder();
             
             var sut = BuildService(
                                     context,
@@ -438,7 +438,7 @@ public abstract class ReleaseServiceTests
                                     publicationCacheService: new PublicationCacheServiceMockBuilder().Build(),
                                     redirectsCacheService: new RedirectsCacheServiceMockBuilder().Build(),
                                     releasePublishingStatusRepository: releasePublishingStatusRepository.Build(),
-                                    adminEventRaiserService: adminEventRaiserService.Build());
+                                    adminEventRaiser: adminEventRaiser.Build());
             
             var request = new ReleaseUpdateRequest
             {
@@ -454,7 +454,7 @@ public abstract class ReleaseServiceTests
             var newReleaseSlug = NamingUtils.CreateReleaseSlug(year, timePeriod, label);
             Assert.NotEqual(currentReleaseSlug, newReleaseSlug);
             
-            adminEventRaiserService.Assert.OnReleaseSlugChangedWasNotRaised();
+            adminEventRaiser.Assert.OnReleaseSlugChangedWasNotRaised();
         }
         
         [Fact]
@@ -500,7 +500,7 @@ public abstract class ReleaseServiceTests
             var releasePublishingStatusRepository = new ReleasePublishingStatusRepositoryMockBuilder()
                 .SetNoReleaseVersionStatus(releaseVersion.Id);
 
-            var adminEventRaiserService = new AdminEventRaiserServiceMockBuilder();
+            var adminEventRaiser = new AdminEventRaiserMockBuilder();
 
             var sut = BuildService(
                                     context,
@@ -509,7 +509,7 @@ public abstract class ReleaseServiceTests
                                     publicationCacheService: new PublicationCacheServiceMockBuilder().Build(),
                                     redirectsCacheService: new RedirectsCacheServiceMockBuilder().Build(),
                                     releasePublishingStatusRepository: releasePublishingStatusRepository.Build(),
-                                    adminEventRaiserService: adminEventRaiserService.Build());
+                                    adminEventRaiser: adminEventRaiser.Build());
             
             var request = new ReleaseUpdateRequest
             {
@@ -521,7 +521,7 @@ public abstract class ReleaseServiceTests
             
             // ASSERT
             result.AssertRight();
-            adminEventRaiserService.Assert.OnReleaseSlugChangedWasNotRaised();
+            adminEventRaiser.Assert.OnReleaseSlugChangedWasNotRaised();
         }
 
         [Fact]
@@ -570,7 +570,7 @@ public abstract class ReleaseServiceTests
         IPublicationCacheService? publicationCacheService = null,
         IReleasePublishingStatusRepository? releasePublishingStatusRepository = null,
         IRedirectsCacheService? redirectsCacheService = null,
-        IAdminEventRaiserService? adminEventRaiserService = null,
+        IAdminEventRaiser? adminEventRaiser = null,
         IReleaseSlugValidator? releaseSlugValidator = null)
     {
         var userService = AlwaysTrueUserService();
@@ -587,7 +587,7 @@ public abstract class ReleaseServiceTests
             publicationCacheService: publicationCacheService ?? Mock.Of<IPublicationCacheService>(Strict),
             releasePublishingStatusRepository: releasePublishingStatusRepository ?? Mock.Of<IReleasePublishingStatusRepository>(Strict),
             redirectsCacheService: redirectsCacheService ?? Mock.Of<IRedirectsCacheService>(Strict),
-            adminEventRaiserService: adminEventRaiserService ?? new AdminEventRaiserServiceMockBuilder().Build(),
+            adminEventRaiser: adminEventRaiser ?? new AdminEventRaiserMockBuilder().Build(),
             guidGenerator: new SequentialGuidGenerator(),
             releaseSlugValidator: releaseSlugValidator ?? new ReleaseSlugValidatorMockBuilder().Build()
         );

@@ -11,7 +11,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services;
 /// Publish events specific to Admin
 /// </summary>
 /// <param name="eventGridClientFactory"></param>
-public class AdminEventRaiserService(IConfiguredEventGridClientFactory eventGridClientFactory) : IAdminEventRaiserService
+public class AdminEventRaiser(IConfiguredEventGridClientFactory eventGridClientFactory) : IAdminEventRaiser
 {
     /// <summary>
     /// On Theme Updated
