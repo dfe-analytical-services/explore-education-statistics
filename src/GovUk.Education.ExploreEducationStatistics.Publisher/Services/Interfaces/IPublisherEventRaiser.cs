@@ -6,5 +6,5 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfac
 public interface IPublisherEventRaiser
 {
     Task RaiseReleaseVersionPublishedEvents(
-        IList<PublishingCompletionService.PublishedReleaseVersionInfo> publishedReleaseVersionInfos);
+        IEnumerable<PublishingCompletionService.PublishedReleaseVersionInfo> publishedReleaseVersionInfos);
 }

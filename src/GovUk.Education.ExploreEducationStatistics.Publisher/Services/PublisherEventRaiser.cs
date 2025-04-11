@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.EventGrid;
@@ -10,42 +10,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services;
 /// <summary>
 /// Publish events specific to the Publisher
 /// </summary>
-/// <param name="eventGridClientFactory"></param>
-public class PublisherEventRaiser(
-    IConfiguredEventGridClientFactory eventGridClientFactory)
-    : IPublisherEventRaiser
+public class PublisherEventRaiser(IEventRaiser eventRaiser) : IPublisherEventRaiser
 {
     /// <summary>
     /// On Release Version Published
     /// </summary>
     /// <param name="publishedReleaseVersionInfos">information about the one or more release versions that have been published</param>
     public async Task RaiseReleaseVersionPublishedEvents(
-        IList<PublishingCompletionService.PublishedReleaseVersionInfo> publishedReleaseVersionInfos)
-    {
-        if (!eventGridClientFactory.TryCreateClient(
-                ReleaseVersionPublishedEvent.EventTopicOptionsKey,
-                out var client))
-        {
-            return;
-        }
-
-        var releaseVersionPublishedEvents = 
-            publishedReleaseVersionInfos.Select(info => 
-                new ReleaseVersionPublishedEvent(
-                        info.ReleaseVersionId,
-                        new ReleaseVersionPublishedEvent.EventPayload
-                        {
-                            ReleaseId = info.ReleaseId,
-                            ReleaseSlug = info.ReleaseSlug,
-                            PublicationId = info.PublicationId,
-                            PublicationSlug = info.PublicationSlug,
-                            PublicationLatestPublishedReleaseVersionId = info.PublicationLatestPublishedReleaseVersionId,
-                        })
-                .ToEventGridEvent());
-
-        foreach (var evnt in releaseVersionPublishedEvents)
-        {
-            await client.SendEventAsync(evnt);
-        }
-    }
+        IEnumerable<PublishingCompletionService.PublishedReleaseVersionInfo> publishedReleaseVersionInfos) =>
+        await eventRaiser.RaiseEvents(
+            publishedReleaseVersionInfos.Select(info => new ReleaseVersionPublishedEvent(info)));
 }
