@@ -88,7 +88,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         releaseVersionId: ReleaseVersion.Id,
                         footnoteId: Footnote.Id),
                 ReleaseVersion,
-                ContentSecurityPolicies.CanViewSpecificRelease
+                ContentSecurityPolicies.CanViewSpecificReleaseVersion
             );
         }
 
@@ -99,7 +99,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 service => service
                     .GetFootnotes(ReleaseVersion.Id),
                 ReleaseVersion,
-                ContentSecurityPolicies.CanViewSpecificRelease
+                ContentSecurityPolicies.CanViewSpecificReleaseVersion
             );
         }
 

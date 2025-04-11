@@ -188,7 +188,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
             services.AddAuthorization(options =>
             {
                 // does this use have permission to view a specific Release?
-                options.AddPolicy(ContentSecurityPolicies.CanViewSpecificRelease.ToString(), policy =>
+                options.AddPolicy(ContentSecurityPolicies.CanViewSpecificReleaseVersion.ToString(), policy =>
                     policy.Requirements.Add(new ViewReleaseRequirement()));
 
                 // does this user have permission to view the subject data of a specific Release?

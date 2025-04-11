@@ -60,7 +60,7 @@ describe('PublicationTeamAccessPage', () => {
   });
 
   test('renders the page correctly without any publication roles assigned', async () => {
-    publicationService.listReleases.mockResolvedValue(
+    publicationService.listReleaseVersions.mockResolvedValue(
       testPaginatedReleaseSummariesNoResults,
     );
 
@@ -96,7 +96,7 @@ describe('PublicationTeamAccessPage', () => {
   });
 
   test('renders the page correctly with a mix of publication roles assigned', async () => {
-    publicationService.listReleases.mockResolvedValue(
+    publicationService.listReleaseVersions.mockResolvedValue(
       testPaginatedReleaseSummariesNoResults,
     );
     publicationService.listRoles.mockClear();
@@ -182,7 +182,7 @@ describe('PublicationTeamAccessPage', () => {
   });
 
   test('renders the page correctly with only publication owners assigned', async () => {
-    publicationService.listReleases.mockResolvedValue(
+    publicationService.listReleaseVersions.mockResolvedValue(
       testPaginatedReleaseSummariesNoResults,
     );
     publicationService.listRoles.mockClear();
@@ -253,7 +253,7 @@ describe('PublicationTeamAccessPage', () => {
   });
 
   test('renders the page correctly with only publication approvers assigned', async () => {
-    publicationService.listReleases.mockResolvedValue(
+    publicationService.listReleaseVersions.mockResolvedValue(
       testPaginatedReleaseSummariesNoResults,
     );
     publicationService.listRoles.mockClear();
@@ -332,7 +332,7 @@ describe('PublicationTeamAccessPage', () => {
   });
 
   test('renders the page correctly with no releases', async () => {
-    publicationService.listReleases.mockResolvedValue(
+    publicationService.listReleaseVersions.mockResolvedValue(
       testPaginatedReleaseSummariesNoResults,
     );
 
@@ -356,7 +356,7 @@ describe('PublicationTeamAccessPage', () => {
   });
 
   test('renders the page correctly with releases', async () => {
-    publicationService.listReleases.mockResolvedValue(
+    publicationService.listReleaseVersions.mockResolvedValue(
       testPaginatedReleaseSummaries,
     );
 
@@ -375,15 +375,15 @@ describe('PublicationTeamAccessPage', () => {
     ).toBeInTheDocument();
 
     const releaseSelect = screen.getByLabelText('Select release');
-    expect(releaseSelect).toHaveValue('release-1');
+    expect(releaseSelect).toHaveValue('release-1-version-1');
     const releases = within(releaseSelect).queryAllByRole('option');
     expect(releases).toHaveLength(3);
     expect(releases[0]).toHaveTextContent('Academic year 2023/24');
-    expect(releases[0]).toHaveValue('release-1');
+    expect(releases[0]).toHaveValue('release-1-version-1');
     expect(releases[1]).toHaveTextContent('Academic year 2022/23');
-    expect(releases[1]).toHaveValue('release-2');
+    expect(releases[1]).toHaveValue('release-2-version-1');
     expect(releases[2]).toHaveTextContent('Academic year 2021/22');
-    expect(releases[2]).toHaveValue('release-3');
+    expect(releases[2]).toHaveValue('release-3-version-1');
 
     expect(screen.getByTestId('Release')).toHaveTextContent(
       'Academic year 2023/24 (Not live)',
@@ -425,7 +425,7 @@ describe('PublicationTeamAccessPage', () => {
   });
 
   test('renders the page correctly with no contributor management permissions', async () => {
-    publicationService.listReleases.mockResolvedValue(
+    publicationService.listReleaseVersions.mockResolvedValue(
       testPaginatedReleaseSummaries,
     );
 
@@ -448,15 +448,15 @@ describe('PublicationTeamAccessPage', () => {
     ).toBeInTheDocument();
 
     const releaseSelect = screen.getByLabelText('Select release');
-    expect(releaseSelect).toHaveValue('release-1');
+    expect(releaseSelect).toHaveValue('release-1-version-1');
     const releases = within(releaseSelect).queryAllByRole('option');
     expect(releases).toHaveLength(3);
     expect(releases[0]).toHaveTextContent('Academic year 2023/24');
-    expect(releases[0]).toHaveValue('release-1');
+    expect(releases[0]).toHaveValue('release-1-version-1');
     expect(releases[1]).toHaveTextContent('Academic year 2022/23');
-    expect(releases[1]).toHaveValue('release-2');
+    expect(releases[1]).toHaveValue('release-2-version-1');
     expect(releases[2]).toHaveTextContent('Academic year 2021/22');
-    expect(releases[2]).toHaveValue('release-3');
+    expect(releases[2]).toHaveValue('release-3-version-1');
 
     expect(screen.getByTestId('Release')).toHaveTextContent(
       'Academic year 2023/24 (Not live)',
@@ -497,7 +497,7 @@ describe('PublicationTeamAccessPage', () => {
   });
 
   test('renders the page correctly with no permission to view release access section', async () => {
-    publicationService.listReleases.mockResolvedValue(
+    publicationService.listReleaseVersions.mockResolvedValue(
       testPaginatedReleaseSummaries,
     );
     await renderPage({
@@ -512,7 +512,7 @@ describe('PublicationTeamAccessPage', () => {
       ).toBeInTheDocument();
     });
 
-    expect(publicationService.listReleases).toHaveBeenCalled();
+    expect(publicationService.listReleaseVersions).toHaveBeenCalled();
 
     expect(
       screen.queryByRole('heading', { name: 'Release access' }),
@@ -535,12 +535,12 @@ describe('PublicationTeamAccessPage', () => {
   });
 
   test('selects the release from the id in the url', async () => {
-    publicationService.listReleases.mockResolvedValue(
+    publicationService.listReleaseVersions.mockResolvedValue(
       testPaginatedReleaseSummaries,
     );
 
     await renderPage({
-      releaseVersionId: 'release-3',
+      releaseVersionId: 'release-3-version-1',
     });
 
     await waitFor(() => {
@@ -555,7 +555,9 @@ describe('PublicationTeamAccessPage', () => {
       screen.getByRole('heading', { name: 'Update release access' }),
     ).toBeInTheDocument();
 
-    expect(screen.getByLabelText('Select release')).toHaveValue('release-3');
+    expect(screen.getByLabelText('Select release')).toHaveValue(
+      'release-3-version-1',
+    );
     expect(screen.getByTestId('Release')).toHaveTextContent(
       'Academic year 2021/22',
     );
@@ -563,7 +565,7 @@ describe('PublicationTeamAccessPage', () => {
   });
 
   test('selects the first release if no release is set in the url', async () => {
-    publicationService.listReleases.mockResolvedValue(
+    publicationService.listReleaseVersions.mockResolvedValue(
       testPaginatedReleaseSummaries,
     );
 
@@ -580,19 +582,21 @@ describe('PublicationTeamAccessPage', () => {
 
     expect(screen.getByText('Update release access')).toBeInTheDocument();
 
-    expect(screen.getByLabelText('Select release')).toHaveValue('release-1');
+    expect(screen.getByLabelText('Select release')).toHaveValue(
+      'release-1-version-1',
+    );
     expect(screen.getByTestId('Release')).toHaveTextContent(
       'Academic year 2023/24 (Not live)',
     );
     expect(screen.getByTestId('Status')).toHaveTextContent('Draft');
 
     expect(history.location.pathname).toBe(
-      `/publication/publication-1/team/release-1`,
+      `/publication/publication-1/team/release-1-version-1`,
     );
   });
 
   test('updates the page and url when select a different release', async () => {
-    publicationService.listReleases.mockResolvedValue(
+    publicationService.listReleaseVersions.mockResolvedValue(
       testPaginatedReleaseSummaries,
     );
 
@@ -611,22 +615,26 @@ describe('PublicationTeamAccessPage', () => {
       screen.getByRole('heading', { name: 'Update release access' }),
     ).toBeInTheDocument();
 
-    expect(screen.getByLabelText('Select release')).toHaveValue('release-1');
+    expect(screen.getByLabelText('Select release')).toHaveValue(
+      'release-1-version-1',
+    );
     expect(screen.getByTestId('Release')).toHaveTextContent(
       'Academic year 2023/24 (Not live)',
     );
     expect(screen.getByTestId('Status')).toHaveTextContent('Draft');
 
     expect(history.location.pathname).toBe(
-      `/publication/publication-1/team/release-1`,
+      `/publication/publication-1/team/release-1-version-1`,
     );
 
     await userEvent.selectOptions(
       screen.getByLabelText('Select release'),
-      'release-2',
+      'release-2-version-1',
     );
 
-    expect(screen.getByLabelText('Select release')).toHaveValue('release-2');
+    expect(screen.getByLabelText('Select release')).toHaveValue(
+      'release-2-version-1',
+    );
 
     await waitFor(() => {
       expect(screen.getByTestId('Release')).toHaveTextContent(
@@ -636,7 +644,7 @@ describe('PublicationTeamAccessPage', () => {
     expect(screen.getByTestId('Status')).toHaveTextContent('Draft');
 
     expect(history.location.pathname).toBe(
-      `/publication/publication-1/team/release-2`,
+      `/publication/publication-1/team/release-2-version-1`,
     );
   });
 });

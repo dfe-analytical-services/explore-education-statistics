@@ -2,7 +2,9 @@ import PublicationPublishedReleases from '@admin/pages/publication/components/Pu
 import _releaseVersionService, {
   ReleaseVersionSummaryWithPermissions,
 } from '@admin/services/releaseVersionService';
-import _publicationService from '@admin/services/publicationService';
+import _publicationService, {
+  Publication,
+} from '@admin/services/publicationService';
 import baseRender from '@common-test/render';
 import { PaginatedList } from '@common/services/types/pagination';
 import { screen, waitFor, within } from '@testing-library/react';
@@ -11,6 +13,7 @@ import { createMemoryHistory } from 'history';
 import { produce } from 'immer';
 import React, { ReactElement } from 'react';
 import { MemoryRouter, Router } from 'react-router-dom';
+import { TestConfigContextProvider } from '@admin/contexts/ConfigContext';
 
 jest.mock('@admin/services/releaseVersionService');
 const releaseVersionService = _releaseVersionService as jest.Mocked<
@@ -23,19 +26,30 @@ const publicationService = _publicationService as jest.Mocked<
 >;
 
 describe('PublicationPublishedReleases', () => {
-  const testPublicationId = 'publication-1';
+  const testPublication: Publication = {
+    id: 'publication-1',
+    slug: 'publication-1-slug',
+    title: 'Publication 1',
+    summary: 'Publication 1 summary',
+    theme: {
+      id: 'theme-1',
+      title: 'Theme 1',
+    },
+  };
 
   const testRelease1: ReleaseVersionSummaryWithPermissions = {
     amendment: false,
     approvalStatus: 'Approved',
-    id: 'release-1',
+    id: 'release-1-version-1',
+    releaseId: 'release-1',
     live: true,
     permissions: {
       canAddPrereleaseUsers: false,
-      canUpdateRelease: false,
-      canDeleteRelease: false,
-      canMakeAmendmentOfRelease: true,
-      canViewRelease: true,
+      canUpdateRelease: true,
+      canUpdateReleaseVersion: false,
+      canDeleteReleaseVersion: false,
+      canMakeAmendmentOfReleaseVersion: true,
+      canViewReleaseVersion: true,
     },
     published: '2022-01-01T00:00:00',
     slug: 'release-1-slug',
@@ -52,7 +66,8 @@ describe('PublicationPublishedReleases', () => {
 
   const testRelease2: ReleaseVersionSummaryWithPermissions = {
     ...testRelease1,
-    id: 'release-2',
+    id: 'release-2-version-1',
+    releaseId: 'release-2',
     published: '2022-01-02T00:00:00',
     slug: 'release-2-slug',
     title: 'Release 2',
@@ -62,7 +77,8 @@ describe('PublicationPublishedReleases', () => {
 
   const testRelease3: ReleaseVersionSummaryWithPermissions = {
     ...testRelease1,
-    id: 'release-3',
+    id: 'release-3-version-1',
+    releaseId: 'release-3',
     published: '2022-01-03T00:00:00',
     slug: 'release-3-slug',
     title: 'Release 3',
@@ -72,7 +88,8 @@ describe('PublicationPublishedReleases', () => {
 
   const testRelease4: ReleaseVersionSummaryWithPermissions = {
     ...testRelease1,
-    id: 'release-4',
+    id: 'release-4-version-1',
+    releaseId: 'release-4',
     published: '2022-01-04T00:00:00',
     slug: 'release-4-slug',
     title: 'Release 4',
@@ -82,7 +99,8 @@ describe('PublicationPublishedReleases', () => {
 
   const testRelease5: ReleaseVersionSummaryWithPermissions = {
     ...testRelease1,
-    id: 'release-5',
+    id: 'release-5-version-1',
+    releaseId: 'release-5',
     published: '2022-01-05T00:00:00',
     slug: 'release-5-slug',
     title: 'Release 5',
@@ -92,7 +110,8 @@ describe('PublicationPublishedReleases', () => {
 
   const testRelease6: ReleaseVersionSummaryWithPermissions = {
     ...testRelease1,
-    id: 'release-6',
+    id: 'release-6-version-1',
+    releaseId: 'release-6',
     published: '2022-01-06T00:00:00',
     slug: 'release-6-slug',
     title: 'Release 6',
@@ -102,7 +121,8 @@ describe('PublicationPublishedReleases', () => {
 
   const testRelease7: ReleaseVersionSummaryWithPermissions = {
     ...testRelease1,
-    id: 'release-7',
+    id: 'release-7-version-1',
+    releaseId: 'release-7',
     published: '2022-01-07T00:00:00',
     slug: 'release-7-slug',
     title: 'Release 7',
@@ -142,9 +162,16 @@ describe('PublicationPublishedReleases', () => {
     };
 
   test('renders the published releases table once loaded', async () => {
-    publicationService.listReleases.mockResolvedValue(testReleasesPage1);
+    publicationService.listReleaseVersions.mockResolvedValue(testReleasesPage1);
 
-    render(<PublicationPublishedReleases publicationId={testPublicationId} />);
+    render(
+      <TestConfigContextProvider>
+        <PublicationPublishedReleases
+          publication={testPublication}
+          onEdit={Promise.resolve}
+        />
+      </TestConfigContextProvider>,
+    );
 
     await waitFor(() => {
       expect(
@@ -173,8 +200,11 @@ describe('PublicationPublishedReleases', () => {
       within(row1Cells[3]).getByRole('link', { name: 'View Release 1' }),
     ).toHaveAttribute(
       'href',
-      '/publication/publication-1/release/release-1/summary',
+      '/publication/publication-1/release/release-1-version-1/summary',
     );
+    expect(
+      within(row1Cells[3]).getByRole('button', { name: 'Edit details' }),
+    ).toBeInTheDocument();
 
     const row2Cells = within(rows[2]).getAllByRole('cell');
     expect(within(row2Cells[0]).getByText('Release 2')).toBeInTheDocument();
@@ -189,8 +219,11 @@ describe('PublicationPublishedReleases', () => {
       within(row2Cells[3]).getByRole('link', { name: 'View Release 2' }),
     ).toHaveAttribute(
       'href',
-      '/publication/publication-1/release/release-2/summary',
+      '/publication/publication-1/release/release-2-version-1/summary',
     );
+    expect(
+      within(row2Cells[3]).getByRole('button', { name: 'Edit details' }),
+    ).toBeInTheDocument();
 
     const row3Cells = within(rows[3]).getAllByRole('cell');
     expect(within(row3Cells[0]).getByText('Release 3')).toBeInTheDocument();
@@ -205,8 +238,11 @@ describe('PublicationPublishedReleases', () => {
       within(row3Cells[3]).getByRole('link', { name: 'View Release 3' }),
     ).toHaveAttribute(
       'href',
-      '/publication/publication-1/release/release-3/summary',
+      '/publication/publication-1/release/release-3-version-1/summary',
     );
+    expect(
+      within(row3Cells[3]).getByRole('button', { name: 'Edit details' }),
+    ).toBeInTheDocument();
 
     const row4Cells = within(rows[4]).getAllByRole('cell');
     expect(within(row4Cells[0]).getByText('Release 4')).toBeInTheDocument();
@@ -221,8 +257,11 @@ describe('PublicationPublishedReleases', () => {
       within(row4Cells[3]).getByRole('link', { name: 'View Release 4' }),
     ).toHaveAttribute(
       'href',
-      '/publication/publication-1/release/release-4/summary',
+      '/publication/publication-1/release/release-4-version-1/summary',
     );
+    expect(
+      within(row4Cells[3]).getByRole('button', { name: 'Edit details' }),
+    ).toBeInTheDocument();
 
     const row5Cells = within(rows[5]).getAllByRole('cell');
     expect(within(row5Cells[0]).getByText('Release 5')).toBeInTheDocument();
@@ -237,19 +276,81 @@ describe('PublicationPublishedReleases', () => {
       within(row5Cells[3]).getByRole('link', { name: 'View Release 5' }),
     ).toHaveAttribute(
       'href',
-      '/publication/publication-1/release/release-5/summary',
+      '/publication/publication-1/release/release-5-version-1/summary',
     );
+    expect(
+      within(row5Cells[3]).getByRole('button', { name: 'Edit details' }),
+    ).toBeInTheDocument();
   });
 
+  test.each([true, false])(
+    '"Edit details" button only appears if the user has permission to update the release',
+    async (canUpdateRelease: boolean) => {
+      publicationService.listReleaseVersions.mockResolvedValue(
+        produce(
+          {
+            paging: {
+              page: 1,
+              pageSize: 1,
+              totalPages: 1,
+              totalResults: 1,
+            },
+            results: [testRelease1],
+          },
+          draft => {
+            draft.results[0].permissions.canUpdateRelease = canUpdateRelease;
+          },
+        ),
+      );
+
+      render(
+        <TestConfigContextProvider>
+          <PublicationPublishedReleases
+            publication={testPublication}
+            onEdit={Promise.resolve}
+          />
+        </TestConfigContextProvider>,
+      );
+
+      await waitFor(() => {
+        expect(
+          screen.queryByText('Loading published releases'),
+        ).not.toBeInTheDocument();
+      });
+
+      const rows = screen.getAllByRole('row');
+      expect(rows).toHaveLength(2);
+
+      const rowCells = within(rows[1]).getAllByRole('cell');
+
+      if (canUpdateRelease) {
+        expect(
+          within(rowCells[3]).getByRole('button', { name: 'Edit details' }),
+        ).toBeInTheDocument();
+      } else {
+        expect(
+          within(rowCells[3]).queryByRole('button', { name: 'Edit details' }),
+        ).not.toBeInTheDocument();
+      }
+    },
+  );
+
   test('renders show more button with a maximum of the default `pageSize`', async () => {
-    publicationService.listReleases.mockResolvedValue(
+    publicationService.listReleaseVersions.mockResolvedValue(
       produce(testReleasesPage1, draft => {
         draft.paging.totalPages = 3;
         draft.paging.totalResults = 12;
       }),
     );
 
-    render(<PublicationPublishedReleases publicationId={testPublicationId} />);
+    render(
+      <TestConfigContextProvider>
+        <PublicationPublishedReleases
+          publication={testPublication}
+          onEdit={Promise.resolve}
+        />
+      </TestConfigContextProvider>,
+    );
 
     await waitFor(() => {
       expect(
@@ -263,11 +364,18 @@ describe('PublicationPublishedReleases', () => {
   });
 
   test('displays more releases when the show more button is clicked', async () => {
-    publicationService.listReleases
+    publicationService.listReleaseVersions
       .mockResolvedValueOnce(testReleasesPage1)
       .mockResolvedValueOnce(testReleasesPage2);
 
-    render(<PublicationPublishedReleases publicationId={testPublicationId} />);
+    render(
+      <TestConfigContextProvider>
+        <PublicationPublishedReleases
+          publication={testPublication}
+          onEdit={Promise.resolve}
+        />
+      </TestConfigContextProvider>,
+    );
 
     await waitFor(() => {
       expect(
@@ -305,7 +413,7 @@ describe('PublicationPublishedReleases', () => {
       within(row6Cells[3]).getByRole('link', { name: 'View Release 6' }),
     ).toHaveAttribute(
       'href',
-      '/publication/publication-1/release/release-6/summary',
+      '/publication/publication-1/release/release-6-version-1/summary',
     );
 
     const row7Cells = within(rows[7]).getAllByRole('cell');
@@ -321,7 +429,7 @@ describe('PublicationPublishedReleases', () => {
       within(row7Cells[3]).getByRole('link', { name: 'View Release 7' }),
     ).toHaveAttribute(
       'href',
-      '/publication/publication-1/release/release-7/summary',
+      '/publication/publication-1/release/release-7-version-1/summary',
     );
 
     expect(
@@ -330,7 +438,7 @@ describe('PublicationPublishedReleases', () => {
   });
 
   test('creating an amendment works correctly', async () => {
-    publicationService.listReleases.mockResolvedValue(testReleasesPage1);
+    publicationService.listReleaseVersions.mockResolvedValue(testReleasesPage1);
 
     const history = createMemoryHistory();
 
@@ -340,7 +448,13 @@ describe('PublicationPublishedReleases', () => {
 
     baseRender(
       <Router history={history}>
-        <PublicationPublishedReleases publicationId={testPublicationId} />,
+        <TestConfigContextProvider>
+          <PublicationPublishedReleases
+            publication={testPublication}
+            onEdit={Promise.resolve}
+          />
+        </TestConfigContextProvider>
+        ,
       </Router>,
     );
 
@@ -385,13 +499,20 @@ describe('PublicationPublishedReleases', () => {
   });
 
   test('does not show the amendment button if you do not have the correct permissions', async () => {
-    publicationService.listReleases.mockResolvedValue(
+    publicationService.listReleaseVersions.mockResolvedValue(
       produce(testReleasesPage1, draft => {
-        draft.results[0].permissions.canMakeAmendmentOfRelease = false;
+        draft.results[0].permissions.canMakeAmendmentOfReleaseVersion = false;
       }),
     );
 
-    render(<PublicationPublishedReleases publicationId={testPublicationId} />);
+    render(
+      <TestConfigContextProvider>
+        <PublicationPublishedReleases
+          publication={testPublication}
+          onEdit={Promise.resolve}
+        />
+      </TestConfigContextProvider>,
+    );
 
     await waitFor(() => {
       expect(

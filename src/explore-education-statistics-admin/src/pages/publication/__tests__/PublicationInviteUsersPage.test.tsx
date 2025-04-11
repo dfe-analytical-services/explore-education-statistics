@@ -20,7 +20,7 @@ const publicationService = _publicationService as jest.Mocked<
 
 describe('PublicationInviteUsersPage', () => {
   test('renders the page correctly', async () => {
-    publicationService.listReleases.mockResolvedValue(
+    publicationService.listReleaseVersions.mockResolvedValue(
       testPaginatedReleaseSummaries,
     );
 

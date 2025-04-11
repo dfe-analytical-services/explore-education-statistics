@@ -22,14 +22,16 @@ describe('PublicationScheduledReleases', () => {
   const testRelease1: ReleaseVersionSummaryWithPermissions = {
     amendment: false,
     approvalStatus: 'Approved',
-    id: 'release-1',
+    id: 'release-1-version-1',
+    releaseId: 'release-1',
     live: false,
     permissions: {
       canAddPrereleaseUsers: false,
       canUpdateRelease: true,
-      canDeleteRelease: false,
-      canMakeAmendmentOfRelease: true,
-      canViewRelease: false,
+      canUpdateReleaseVersion: true,
+      canDeleteReleaseVersion: false,
+      canMakeAmendmentOfReleaseVersion: true,
+      canViewReleaseVersion: false,
     },
     previousVersionId: 'release-previous-id',
     publishScheduled: '2022-01-01T00:00:00',
@@ -90,7 +92,7 @@ describe('PublicationScheduledReleases', () => {
       within(row1Cells[4]).getByRole('link', { name: 'Edit Release 1' }),
     ).toHaveAttribute(
       'href',
-      '/publication/publication-1/release/release-1/summary',
+      '/publication/publication-1/release/release-1-version-1/summary',
     );
 
     const row2Cells = within(rows[2]).getAllByRole('cell');
@@ -132,7 +134,7 @@ describe('PublicationScheduledReleases', () => {
             ...testRelease1,
             permissions: {
               ...testRelease1.permissions,
-              canUpdateRelease: false,
+              canUpdateReleaseVersion: false,
             },
           },
           testRelease2,
@@ -149,7 +151,7 @@ describe('PublicationScheduledReleases', () => {
       within(row1Cells[4]).getByRole('link', { name: 'View Release 1' }),
     ).toHaveAttribute(
       'href',
-      '/publication/publication-1/release/release-1/summary',
+      '/publication/publication-1/release/release-1-version-1/summary',
     );
   });
 });

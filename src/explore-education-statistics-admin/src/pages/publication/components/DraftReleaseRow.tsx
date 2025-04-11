@@ -1,4 +1,5 @@
 import Link from '@admin/components/Link';
+import styles from '@admin/pages/publication/PublicationReleasesPage.module.scss';
 import { getReleaseApprovalStatusLabel } from '@admin/pages/release/utils/releaseSummaryUtil';
 import CancelAmendmentModal from '@admin/pages/admin-dashboard/components/CancelAmendmentModal';
 import releaseVersionService, {
@@ -61,78 +62,71 @@ const DraftReleaseRow = ({
         </LoadingSpinner>
       </td>
       <td>
-        <Link
-          className="govuk-!-margin-right-4 govuk-!-display-inline-block"
-          to={generatePath<ReleaseRouteParams>(releaseSummaryRoute.path, {
-            publicationId,
-            releaseVersionId: release.id,
-          })}
-        >
-          {release.permissions?.canUpdateRelease ? 'Edit' : 'View'}
-          <VisuallyHidden> {release.title}</VisuallyHidden>
-        </Link>
-
-        {release.permissions?.canDeleteRelease &&
-          release.approvalStatus === 'Draft' &&
-          !release.amendment && (
-            <DeleteDraftModal
-              triggerButton={
-                <ButtonText variant="warning">
-                  Delete
-                  <VisuallyHidden> {release.title}</VisuallyHidden>
-                </ButtonText>
-              }
-              onConfirm={async () => {
-                await releaseVersionService.deleteReleaseVersion(release.id);
-                onAmendmentDelete?.();
-              }}
-            />
-          )}
-
-        {release.amendment && release.previousVersionId && (
+        <div className={styles.actionsColumn}>
           <Link
-            className="govuk-!-margin-right-4 govuk-!-display-inline-block"
             to={generatePath<ReleaseRouteParams>(releaseSummaryRoute.path, {
               publicationId,
-              releaseVersionId: release.previousVersionId,
+              releaseVersionId: release.id,
             })}
           >
-            View existing version
-            <VisuallyHidden> for {release.title}</VisuallyHidden>
+            {release.permissions?.canUpdateReleaseVersion
+              ? 'Edit draft'
+              : 'View'}
+            <VisuallyHidden> {release.title}</VisuallyHidden>
           </Link>
-        )}
 
-        {release.permissions?.canDeleteRelease && release.amendment && (
-          <CancelAmendmentModal
-            scheduledMethodologies={deleteReleasePlan?.scheduledMethodologies}
-            triggerButton={
-              <ButtonText
-                variant="warning"
-                onClick={async () => {
-                  setDeleteReleasePlan({
-                    ...(await releaseVersionService.getDeleteReleaseVersionPlan(
-                      release.id,
-                    )),
-                    releaseVersionId: release.id,
-                  });
+          {release.permissions?.canDeleteReleaseVersion &&
+            release.approvalStatus === 'Draft' &&
+            !release.amendment && (
+              <DeleteDraftModal
+                triggerButton={
+                  <ButtonText variant="warning">
+                    Delete
+                    <VisuallyHidden> {release.title}</VisuallyHidden>
+                  </ButtonText>
+                }
+                onConfirm={async () => {
+                  await releaseVersionService.deleteReleaseVersion(release.id);
+                  onAmendmentDelete?.();
                 }}
-              >
-                Cancel amendment
-                <VisuallyHidden> for {release.title}</VisuallyHidden>
-              </ButtonText>
-            }
-            onConfirm={async () => {
-              if (deleteReleasePlan) {
-                await releaseVersionService.deleteReleaseVersion(
-                  deleteReleasePlan.releaseVersionId,
-                );
-                setDeleteReleasePlan(undefined);
-                onAmendmentDelete?.();
-              }
-            }}
-            onCancel={() => setDeleteReleasePlan(undefined)}
-          />
-        )}
+              />
+            )}
+
+          {release.permissions?.canDeleteReleaseVersion &&
+            release.amendment && (
+              <CancelAmendmentModal
+                scheduledMethodologies={
+                  deleteReleasePlan?.scheduledMethodologies
+                }
+                triggerButton={
+                  <ButtonText
+                    variant="warning"
+                    onClick={async () => {
+                      setDeleteReleasePlan({
+                        ...(await releaseVersionService.getDeleteReleaseVersionPlan(
+                          release.id,
+                        )),
+                        releaseVersionId: release.id,
+                      });
+                    }}
+                  >
+                    Cancel amendment
+                    <VisuallyHidden> for {release.title}</VisuallyHidden>
+                  </ButtonText>
+                }
+                onConfirm={async () => {
+                  if (deleteReleasePlan) {
+                    await releaseVersionService.deleteReleaseVersion(
+                      deleteReleasePlan.releaseVersionId,
+                    );
+                    setDeleteReleasePlan(undefined);
+                    onAmendmentDelete?.();
+                  }
+                }}
+                onCancel={() => setDeleteReleasePlan(undefined)}
+              />
+            )}
+        </div>
       </td>
     </tr>
   );

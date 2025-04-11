@@ -235,7 +235,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.S
             this IUserService userService,
             ReleaseVersion releaseVersion)
         {
-            return userService.CheckPolicy(releaseVersion, ContentSecurityPolicies.CanViewSpecificRelease);
+            return userService.CheckPolicy(releaseVersion, ContentSecurityPolicies.CanViewSpecificReleaseVersion);
         }
 
         public static Task<Either<ActionResult, ReleaseVersion>> CheckCanUpdateReleaseVersion(
@@ -259,7 +259,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.S
             this IUserService userService,
             ReleaseVersion releaseVersion)
         {
-            return userService.CheckPolicy(releaseVersion, SecurityPolicies.CanDeleteSpecificRelease);
+            return userService.CheckPolicy(releaseVersion, SecurityPolicies.CanDeleteSpecificReleaseVersion);
         }
 
         public static Task<Either<ActionResult, ReleaseVersion>> CheckCanDeleteTestReleaseVersion(
@@ -323,11 +323,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.S
             return userService.CheckPolicy(releaseVersion, SecurityPolicies.CanApproveSpecificRelease);
         }
 
-        public static Task<Either<ActionResult, ReleaseVersion>> CheckCanMakeAmendmentOfRelease(
+        public static Task<Either<ActionResult, ReleaseVersion>> CheckCanMakeAmendmentOfReleaseVersion(
             this IUserService userService,
             ReleaseVersion releaseVersion)
         {
-            return userService.CheckPolicy(releaseVersion, SecurityPolicies.CanMakeAmendmentOfSpecificRelease);
+            return userService.CheckPolicy(releaseVersion, SecurityPolicies.CanMakeAmendmentOfSpecificReleaseVersion);
         }
 
         public static Task<Either<ActionResult, ReleaseVersion>> CheckCanAssignPrereleaseContactsToReleaseVersion(
