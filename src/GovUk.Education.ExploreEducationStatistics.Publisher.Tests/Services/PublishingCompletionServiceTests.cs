@@ -24,7 +24,7 @@ public class PublishingCompletionServiceTests
     private readonly ReleaseServiceMockBuilder _releaseService = new();
     private readonly RedirectsCacheServiceMockBuilder _redirectsCacheService = new();
     private readonly DataSetPublishingServiceMockBuilder _dataSetPublishingService = new();
-    private readonly EventRaiserMockBuilder _eventRaiser = new();
+    private readonly PublisherEventRaiserMockBuilder _publisherEventRaiser = new();
 
     private PublishingCompletionService GetSut() =>
         new(
@@ -37,7 +37,7 @@ public class PublishingCompletionServiceTests
             _releaseService.Build(),
             _redirectsCacheService.Build(),
             _dataSetPublishingService.Build(),
-            _eventRaiser.Build());
+            _publisherEventRaiser.Build());
 
     public class BasicTests : PublishingCompletionServiceTests
     {
@@ -568,7 +568,7 @@ public class PublishingCompletionServiceTests
                         PublicationSlug = _releaseVersion1.Release.Publication.Slug,
                         PublicationLatestPublishedReleaseVersionId = _releaseVersion1.Id
                     };
-                    _eventRaiser.Assert.EventWasRaised(evt => evt == expectedInfo); 
+                    _publisherEventRaiser.Assert.EventWasRaised(evt => evt == expectedInfo); 
                 }
                 
                 [Fact]
@@ -600,7 +600,7 @@ public class PublishingCompletionServiceTests
                         PublicationSlug = _releaseVersion1.Release.Publication.Slug,
                         PublicationLatestPublishedReleaseVersionId = releaseVersionId1V2 // Assert latest release is different
                     };
-                    _eventRaiser.Assert.EventWasRaised(evt => evt == expectedInfo); 
+                    _publisherEventRaiser.Assert.EventWasRaised(evt => evt == expectedInfo); 
                 }
             }
         }
