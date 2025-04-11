@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 
-public interface IPublisherEventRaiserService
+public interface IPublisherEventRaiser
 {
     Task RaiseReleaseVersionPublishedEvents(
         IList<PublishingCompletionService.PublishedReleaseVersionInfo> publishedReleaseVersionInfos);

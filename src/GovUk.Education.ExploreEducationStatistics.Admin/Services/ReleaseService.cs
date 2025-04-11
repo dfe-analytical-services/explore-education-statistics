@@ -35,7 +35,7 @@ public partial class ReleaseService(
     IPublicationCacheService publicationCacheService,
     IReleasePublishingStatusRepository releasePublishingStatusRepository,
     IRedirectsCacheService redirectsCacheService,
-    IAdminEventRaiserService adminEventRaiserService,
+    IAdminEventRaiser adminEventRaiser,
     IGuidGenerator guidGenerator,
     IReleaseSlugValidator releaseSlugValidator) : IReleaseService
 {
@@ -154,7 +154,7 @@ public partial class ReleaseService(
                 {
                     if (releaseData.releaseIsLive && releaseData.slugHasChanged)
                     {
-                        await adminEventRaiserService.OnReleaseSlugChanged(
+                        await adminEventRaiser.OnReleaseSlugChanged(
                             releaseId, 
                             releaseData.releaseAndSlugs.newReleaseSlug,
                             releaseData.releaseAndSlugs.release.PublicationId,

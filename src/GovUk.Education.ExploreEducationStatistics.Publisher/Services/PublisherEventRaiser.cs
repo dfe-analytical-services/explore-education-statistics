@@ -11,9 +11,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services;
 /// Publish events specific to the Publisher
 /// </summary>
 /// <param name="eventGridClientFactory"></param>
-public class PublisherEventRaiserService(
+public class PublisherEventRaiser(
     IConfiguredEventGridClientFactory eventGridClientFactory)
-    : IPublisherEventRaiserService
+    : IPublisherEventRaiser
 {
     /// <summary>
     /// On Release Version Published
