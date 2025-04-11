@@ -10,6 +10,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Security;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
+using Microsoft.Extensions.Logging;
 using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
@@ -90,14 +91,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             IPersistenceHelper<ContentDbContext>? persistenceHelper = null,
             IPublicBlobStorageService? publicBlobStorageService = null,
             IDataGuidanceFileWriter? dataGuidanceFileWriter = null,
-            IUserService? userService = null)
+            IUserService? userService = null,
+            IAnalyticsManager? analyticsManager = null,
+            ILogger<ReleaseFileService>? logger = null)
         {
             return new(
                 contentDbContext ?? Mock.Of<ContentDbContext>(),
                 persistenceHelper ?? DefaultPersistenceHelperMock().Object,
                 publicBlobStorageService ?? Mock.Of<IPublicBlobStorageService>(),
                 dataGuidanceFileWriter ?? Mock.Of<IDataGuidanceFileWriter>(),
-                userService ?? Mock.Of<IUserService>()
+                userService ?? Mock.Of<IUserService>(),
+                analyticsManager ?? Mock.Of<IAnalyticsManager>(),
+                logger ?? Mock.Of<ILogger<ReleaseFileService>>()
             );
         }
 

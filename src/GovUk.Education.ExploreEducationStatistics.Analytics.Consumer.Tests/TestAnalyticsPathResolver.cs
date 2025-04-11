@@ -23,16 +23,31 @@ public class TestAnalyticsPathResolver : IAnalyticsPathResolver, IDisposable
         return _basePath;
     }
 
+    // PublicApiQueries
     public string PublicApiQueriesDirectoryPath()
     {
-        return Path.Combine(_basePath, "public-api");
+        return Path.Combine(_basePath, "public-api", "queries");
     }
 
     public string PublicApiQueriesProcessingDirectoryPath() {
-        return Path.Combine(_basePath, "public-api", "processing");
+        return Path.Combine(_basePath, "public-api", "queries", "processing");
     }
 
     public string PublicApiQueriesReportsDirectoryPath() {
-        return Path.Combine(_basePath, "reports", "public-api", "reports");
+        return Path.Combine(_basePath, "reports", "public-api", "queries");
+    }
+
+    // PublicZipDownloads
+    public string PublicZipDownloadsDirectoryPath()
+    {
+        return Path.Combine(_basePath, "public", "zip-downloads");
+    }
+
+    public string PublicZipDownloadsProcessingDirectoryPath() {
+        return Path.Combine(_basePath, "public", "zip-downloads", "processing");
+    }
+
+    public string PublicZipDownloadsReportsDirectoryPath() {
+        return Path.Combine(_basePath, "reports", "public", "zip-downloads");
     }
 }

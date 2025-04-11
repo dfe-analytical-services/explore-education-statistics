@@ -36,7 +36,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
                     contentType: ContentTypes.Csv,
                     filename: $"permalink-{permalinkId}.csv");
 
-                return await _permalinkService.DownloadCsvToStream(
+                return await _permalinkService.DownloadCsvToStream( // TODO EES-5976 analytics
                         permalinkId: permalinkId,
                         stream: Response.BodyWriter.AsStream(),
                         cancellationToken: cancellationToken
