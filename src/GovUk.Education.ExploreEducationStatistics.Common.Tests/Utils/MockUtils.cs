@@ -8,6 +8,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using Moq;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils
@@ -144,7 +145,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils
                     }
                 });
         }
-        
+
         public static void VerifyAllMocks(ITuple mocks)
         {
             Mock[] values = mocks
@@ -153,7 +154,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils
                 .Select(f => f.GetValue(mocks))
                 .Cast<Mock>()
                 .ToArray();
-            
+
             VerifyAllMocks(values);
         }
 
@@ -163,13 +164,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils
             return PopulateMockConfiguration(keysAndValues, configuration);
         }
 
-        public static Mock<IConfigurationSection> CreateMockConfigurationSection(params Tuple<string, string>[] keysAndValues)
+        public static Mock<IConfigurationSection> CreateMockConfigurationSection(
+            params Tuple<string, string>[] keysAndValues)
         {
             var configuration = new Mock<IConfigurationSection>(MockBehavior.Strict);
             return PopulateMockConfiguration(keysAndValues, configuration);
         }
 
-        private static Mock<TConfiguration> PopulateMockConfiguration<TConfiguration>(Tuple<string, string>[] keysAndValues, Mock<TConfiguration> configuration)
+        private static Mock<TConfiguration> PopulateMockConfiguration<TConfiguration>(
+            Tuple<string, string>[] keysAndValues, Mock<TConfiguration> configuration)
             where TConfiguration : class, IConfiguration
         {
             foreach (var keyValue in keysAndValues)
@@ -188,6 +191,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils
             }
 
             return configuration;
+        }
+
+        public static void LoggerSetup<T>(Mock<ILogger<T>> logger, LogLevel logLevel, string logMessage)
+        {
+            logger.Setup(mock =>
+                mock.Log(
+                    It.Is<LogLevel>(ll => ll == logLevel),
+                    It.IsAny<EventId>(),
+                    It.Is<It.IsAnyType>((v, t) => v.ToString()!.Equals(logMessage)),
+                    It.IsAny<Exception>(),
+                    It.IsAny<Func<It.IsAnyType, Exception?, string>>()));
         }
     }
 }

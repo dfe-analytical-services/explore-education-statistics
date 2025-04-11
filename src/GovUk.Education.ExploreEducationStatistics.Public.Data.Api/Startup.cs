@@ -263,7 +263,7 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
         }
         else
         {
-            services.AddSingleton<IQueryAnalyticsManager, NoopQueryAnalyticsManager>();
+            services.AddSingleton<IQueryAnalyticsManager, NoOpQueryAnalyticsManager>();
         }
     }
 
@@ -375,7 +375,7 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
         migrations.ForEach(migration => migration.Apply());
     }
 
-    private class NoopQueryAnalyticsManager : IQueryAnalyticsManager
+    private class NoOpQueryAnalyticsManager : IQueryAnalyticsManager
     {
         public Task AddQuery(CaptureDataSetVersionQueryRequest request, CancellationToken cancellationToken)
         {

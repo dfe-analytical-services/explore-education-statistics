@@ -750,6 +750,20 @@
       "metadata": {
         "description": "The Client ID of a manually-created App Registration that represents the Public API Container App in Entra ID"
       }
+    },
+    "analyticsEnabled": {
+      "type": "bool",
+      "defaultValue": true,
+      "metadata": {
+        "description": "Whether analytics is enabled"
+      }
+    },
+    "analyticsFileShareMountPath": {
+      "type": "string",
+      "defaultValue": "\\mounts\\analytics",
+      "metadata": {
+        "description": "Where analytics request files are saved before being processed"
+      }
     }
   },
   "variables": {
@@ -1242,6 +1256,8 @@
     "publicDataFileShareMountPathWindows": "\\mounts\\public-api-data",
     "publicDataFileShareName": "[concat(parameters('subscription'), '-ees-papi-share-data')]",
     "publicDataStorageAccountName": "[concat(parameters('subscription'), 'eespapisa')]",
+    "analyticsFileShareName": "[concat(parameters('subscription'), '-ees-share-anlyt')]",
+    "analyticsStorageAccountName": "[concat(parameters('subscription'), 'eessaanlyt')]",
     "eventGridTopicNamePublicationChanged": "[concat(parameters('subscription'), '-', parameters('environment'), '-evgt-publication-changed')]",
     "eventGridTopicNameReleaseChanged": "[concat(parameters('subscription'), '-', parameters('environment'), '-evgt-release-changed')]",
     "eventGridTopicNameReleaseVersionChanged": "[concat(parameters('subscription'), '-', parameters('environment'), '-evgt-release-version-changed')]",
@@ -1576,7 +1592,29 @@
         "WEBSITE_NODE_DEFAULT_VERSION": "20.16.0",
         "WEBSITE_RUN_FROM_PACKAGE": "1",
         "PublicStorage": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-storage-public'), '2018-02-14').secretUriWithVersion, ')')]",
-        "enableSwagger": "[parameters('enableSwagger')]"
+        "enableSwagger": "[parameters('enableSwagger')]",
+        "Analytics__Enabled": "[parameters('analyticsEnabled')]",
+        "Analytics__BasePath": "[parameters('analyticsFileShareMountPath')]"
+      }
+    },
+    {
+      "condition": "[parameters('analyticsEnabled')]",
+      "name": "[concat(variables('contentAppName'), '/azurestorageaccounts')]",
+      "type": "Microsoft.Web/sites/config",
+      "location": "[resourceGroup().location]",
+      "apiVersion": "2019-08-01",
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/sites', variables('contentAppName'))]"
+      ],
+      "properties": {
+        "[variables('analyticsFileShareName')]": {
+          "type": "AzureFiles",
+          "accountName": "[variables('analyticsStorageAccountName')]",
+          "accessKey": "[listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('analyticsStorageAccountName')), '2018-02-01').keys[0].value]",
+          "shareName": "[variables('analyticsFileShareName')]",
+          "mountPath": "[variables('analyticsFileShareMountPath')]",
+          "protocol": "Smb"
+        }
       }
     },
     {
