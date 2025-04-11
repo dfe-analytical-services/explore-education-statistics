@@ -4,9 +4,17 @@ public interface IAnalyticsPathResolver
 {
     string BasePath();
 
+    // PublicApiQueries
     string PublicApiQueriesDirectoryPath();
 
     string PublicApiQueriesProcessingDirectoryPath();
 
-    public string PublicApiQueriesReportsDirectoryPath();
+    string PublicApiQueriesReportsDirectoryPath();
+
+    // PublicZipDownloads
+    string PublicZipDownloadsDirectoryPath();
+
+    string PublicZipDownloadsProcessingDirectoryPath();
+
+    string PublicZipDownloadsReportsDirectoryPath();
 }
