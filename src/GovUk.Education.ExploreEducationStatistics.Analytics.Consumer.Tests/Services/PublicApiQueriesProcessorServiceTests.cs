@@ -25,7 +25,7 @@ public abstract class ConsumePublicApiQueriesFunctionTests
 
             var service = BuildService(
                 pathResolver: pathResolver);
-            await service.Consume();
+            await service.Process();
 
             Assert.False(Directory.Exists(pathResolver.PublicApiQueriesProcessingDirectoryPath()));
             Assert.False(Directory.Exists(pathResolver.PublicApiQueriesReportsDirectoryPath()));
@@ -40,7 +40,7 @@ public abstract class ConsumePublicApiQueriesFunctionTests
 
             var service = BuildService(
                 pathResolver: pathResolver);
-            await service.Consume();
+            await service.Process();
 
             // Check that as there were no files to process, no working directories were
             // created as a result.
@@ -56,7 +56,7 @@ public abstract class ConsumePublicApiQueriesFunctionTests
 
             var service = BuildService(
                 pathResolver: pathResolver);
-            await service.Consume();
+            await service.Process();
 
             Assert.False(Directory.Exists(pathResolver.PublicApiQueriesProcessingDirectoryPath()));
             Assert.True(Directory.Exists(pathResolver.PublicApiQueriesReportsDirectoryPath()));
@@ -118,7 +118,7 @@ public abstract class ConsumePublicApiQueriesFunctionTests
 
             var service = BuildService(
                 pathResolver: pathResolver);
-            await service.Consume();
+            await service.Process();
 
             var reports = Directory.GetFiles(pathResolver.PublicApiQueriesReportsDirectoryPath());
 
@@ -204,7 +204,7 @@ public abstract class ConsumePublicApiQueriesFunctionTests
 
             var service = BuildService(
                 pathResolver: pathResolver);
-            await service.Consume();
+            await service.Process();
 
             var reports = Directory.GetFiles(pathResolver.PublicApiQueriesReportsDirectoryPath());
 
@@ -293,7 +293,7 @@ public abstract class ConsumePublicApiQueriesFunctionTests
 
             var service = BuildService(
                 pathResolver: pathResolver);
-            await service.Consume();
+            await service.Process();
 
             var reports = Directory.GetFiles(pathResolver.PublicApiQueriesReportsDirectoryPath());
 
@@ -379,13 +379,13 @@ public abstract class ConsumePublicApiQueriesFunctionTests
         }
     }
 
-    private PublicApiQueriesProcessorService BuildService(
+    private PublicApiQueriesProcessor BuildService(
         TestAnalyticsPathResolver? pathResolver = null)
     {
-        return new PublicApiQueriesProcessorService(
+        return new PublicApiQueriesProcessor(
             duckDbConnection: new DuckDbConnection(),
             pathResolver: pathResolver ?? new TestAnalyticsPathResolver(),
-            Mock.Of<ILogger<PublicApiQueriesProcessorService>>());
+            Mock.Of<ILogger<PublicApiQueriesProcessor>>());
     }
 
     private void SetupQueryRequest(TestAnalyticsPathResolver pathResolver, string filename)

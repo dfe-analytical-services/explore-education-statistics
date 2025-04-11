@@ -12,23 +12,23 @@ public class ConsumeAnalyticsRequestFilesFunctionTests
     [Fact]
     public async Task ConsumeAnalyticsRequestFilesFunction_MultipleStrategies()
     {
-        var strategy1 = new Mock<IRequestFileProcessorService>(MockBehavior.Strict);
-        strategy1.Setup(s => s.Consume())
+        var strategy1 = new Mock<IRequestFileProcessor>(MockBehavior.Strict);
+        strategy1.Setup(s => s.Process())
             .Returns(Task.CompletedTask);
 
-        var strategy2 = new Mock<IRequestFileProcessorService>(MockBehavior.Strict);
-        strategy2.Setup(s => s.Consume())
+        var strategy2 = new Mock<IRequestFileProcessor>(MockBehavior.Strict);
+        strategy2.Setup(s => s.Process())
             .Returns(Task.CompletedTask);
 
         var function = BuildFunction([strategy1, strategy2]);
 
         await function.Run(new TimerInfo());
 
-        strategy1.Verify(s => s.Consume(), Times.Once);
-        strategy2.Verify(s => s.Consume(), Times.Once);
+        strategy1.Verify(s => s.Process(), Times.Once);
+        strategy2.Verify(s => s.Process(), Times.Once);
     }
 
-    private ConsumeAnalyticsRequestFilesFunction BuildFunction(List<Mock<IRequestFileProcessorService>> processorServices)
+    private ConsumeAnalyticsRequestFilesFunction BuildFunction(List<Mock<IRequestFileProcessor>> processorServices)
     {
         return new(
             processorServices.Select(s => s.Object),

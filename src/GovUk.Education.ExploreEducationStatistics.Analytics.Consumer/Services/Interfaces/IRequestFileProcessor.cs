@@ -1,6 +1,6 @@
 namespace GovUk.Education.ExploreEducationStatistics.Analytics.Consumer.Services.Interfaces;
 
-public interface IRequestFileProcessorService
+public interface IRequestFileProcessor
 {
-    public Task Consume();
+    public Task Process();
 }

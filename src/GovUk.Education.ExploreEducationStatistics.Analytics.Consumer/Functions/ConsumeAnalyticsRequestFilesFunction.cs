@@ -5,7 +5,7 @@ using Microsoft.Extensions.Logging;
 namespace GovUk.Education.ExploreEducationStatistics.Analytics.Consumer.Functions;
 
 public class ConsumeAnalyticsRequestFilesFunction(
-    IEnumerable<IRequestFileProcessorService> processorServices,
+    IEnumerable<IRequestFileProcessor> processors,
     ILogger<ConsumeAnalyticsRequestFilesFunction> logger)
 {
     [Function(nameof(ConsumeAnalyticsRequestFilesFunction))]
@@ -14,9 +14,9 @@ public class ConsumeAnalyticsRequestFilesFunction(
     {
         logger.LogInformation($"{nameof(ConsumeAnalyticsRequestFilesFunction)} triggered");
 
-        foreach (var requestFileProcessor in processorServices)
+        foreach (var requestFileProcessor in processors)
         {
-            await requestFileProcessor.Consume();
+            await requestFileProcessor.Process();
         }
     }
 }

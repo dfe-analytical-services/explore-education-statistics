@@ -4,14 +4,14 @@ using Microsoft.Extensions.Logging;
 
 namespace GovUk.Education.ExploreEducationStatistics.Analytics.Consumer.Services;
 
-public class PublicApiQueriesProcessorService(
+public class PublicApiQueriesProcessor(
     DuckDbConnection duckDbConnection,
     IAnalyticsPathResolver pathResolver,
-    ILogger<PublicApiQueriesProcessorService> logger) : IRequestFileProcessorService
+    ILogger<PublicApiQueriesProcessor> logger) : IRequestFileProcessor
 {
-    public Task Consume()
+    public Task Process()
     {
-        logger.LogInformation($"{nameof(PublicApiQueriesProcessorService)} triggered");
+        logger.LogInformation($"{nameof(PublicApiQueriesProcessor)} triggered");
 
         var sourceDirectory = pathResolver.PublicApiQueriesDirectoryPath();
 
