@@ -5,7 +5,7 @@
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migrations
 {
     /// <inheritdoc />
-    public partial class EES5779_AddDataSetVersionToPatchColumnToDataSetVersionImport : Migration
+    public partial class EES5779_AddDataSetVersionToPatchToDataSetVersionImport : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -13,7 +13,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
             migrationBuilder.AddColumn<string>(
                 name: "DataSetVersionToPatch",
                 table: "DataSetVersionImports",
-                type: "text",
+                type: "nvarchar(50)",
                 nullable: true);
         }
 

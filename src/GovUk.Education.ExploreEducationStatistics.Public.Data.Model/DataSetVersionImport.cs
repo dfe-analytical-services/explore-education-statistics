@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations.Schema;
 using GovUk.Education.ExploreEducationStatistics.Common.Database;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using Microsoft.EntityFrameworkCore;
@@ -23,6 +24,7 @@ public class DataSetVersionImport : ICreatedUpdatedTimestamps<DateTimeOffset, Da
 
     public DateTimeOffset? Updated { get; set; }
 
+    [Column(TypeName = "nvarchar(50)")]
     public string? DataSetVersionToPatch { get; set; }
     
     internal class Config : IEntityTypeConfiguration<DataSetVersionImport>

@@ -146,8 +146,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                         .HasColumnType("uuid");
 
                     b.Property<string>("DataSetVersionToPatch")
-                        .HasColumnType("text")
-                        .HasMaxLength(50);
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<Guid>("InstanceId")
                         .HasColumnType("uuid");
