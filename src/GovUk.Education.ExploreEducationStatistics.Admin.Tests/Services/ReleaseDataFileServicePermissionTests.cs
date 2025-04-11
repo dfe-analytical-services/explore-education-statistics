@@ -164,11 +164,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     userService =>
                     {
                         var service = SetupReleaseDataFileService(userService: userService.Object);
-                        return service.Upload(releaseVersionId: _releaseVersion.Id,
+                        return service.ValidateAndUpload(
+                            releaseVersionId: _releaseVersion.Id,
                             dataFormFile: new Mock<IFormFile>().Object,
                             metaFormFile: new Mock<IFormFile>().Object,
+                            dataSetTitle: "",
                             replacingFileId: null,
-                            dataSetTitle: "");
+                            cancellationToken: default);
                     }
                 );
         }
@@ -182,10 +184,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     userService =>
                     {
                         var service = SetupReleaseDataFileService(userService: userService.Object);
-                        return service.UploadAsZip(releaseVersionId: _releaseVersion.Id,
+                        return service.ValidateAndUploadFromZip(releaseVersionId: _releaseVersion.Id,
                             zipFormFile: new Mock<IFormFile>().Object,
                             dataSetTitle: "",
-                            replacingFileId: null);
+                            replacingFileId: null,
+                            cancellationToken: default);
                     }
                 );
         }
@@ -199,9 +202,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     userService =>
                     {
                         var service = SetupReleaseDataFileService(userService: userService.Object);
-                        return service.ValidateAndUploadBulkZip(
+                        return service.ValidateAndUploadFromBulkZip(
                             releaseVersionId: _releaseVersion.Id,
-                            zipFile: new Mock<IFormFile>().Object,
+                            zipFormFile: new Mock<IFormFile>().Object,
                             cancellationToken: default);
                     }
                 );
@@ -218,7 +221,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         var service = SetupReleaseDataFileService(userService: userService.Object);
                         return service.SaveDataSetsFromTemporaryBlobStorage(
                             releaseVersionId: _releaseVersion.Id,
-                            archiveDataSetFiles: new Mock<List<ArchiveDataSetFileViewModel>>().Object,
+                            zipDataSetFiles: new Mock<List<ZipDataSetFileViewModel>>().Object,
                             cancellationToken: default);
                     }
                 );
@@ -229,8 +232,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             StatisticsDbContext? statisticsDbContext = null,
             IPersistenceHelper<ContentDbContext>? contentPersistenceHelper = null,
             IPrivateBlobStorageService? privateBlobStorageService = null,
-            IDataArchiveValidationService? dataArchiveValidationService = null,
-            IFileUploadsValidatorService? fileUploadsValidatorService = null,
+            IDataSetZipValidationService? dataSetZipValidationService = null,
+            IDataSetValidator? dataSetValidator = null,
             IFileRepository? fileRepository = null,
             IReleaseVersionRepository? releaseVersionRepository = null,
             IReleaseFileRepository? releaseFileRepository = null,
@@ -245,8 +248,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 contentDbContext,
                 contentPersistenceHelper ?? DefaultPersistenceHelperMock().Object,
                 privateBlobStorageService ?? new Mock<IPrivateBlobStorageService>(MockBehavior.Strict).Object,
-                dataArchiveValidationService ?? new Mock<IDataArchiveValidationService>(MockBehavior.Strict).Object,
-                fileUploadsValidatorService ?? new Mock<IFileUploadsValidatorService>(MockBehavior.Strict).Object,
+                dataSetZipValidationService ?? new Mock<IDataSetZipValidationService>(MockBehavior.Strict).Object,
+                dataSetValidator ?? new Mock<IDataSetValidator>(MockBehavior.Strict).Object,
                 fileRepository ?? new FileRepository(contentDbContext),
                 releaseVersionRepository ?? new ReleaseVersionRepository(
                     contentDbContext,
