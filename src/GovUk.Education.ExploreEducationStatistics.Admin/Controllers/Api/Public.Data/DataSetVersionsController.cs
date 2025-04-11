@@ -56,6 +56,7 @@ public class DataSetVersionsController(IDataSetVersionService dataSetVersionServ
             .CreateNextVersion(
                 releaseFileId: nextDataSetVersionCreateRequest.ReleaseFileId,
                 dataSetId: nextDataSetVersionCreateRequest.DataSetId,
+                dataSetVersionToPatch: nextDataSetVersionCreateRequest.DataSetVersionToPatch,
                 cancellationToken: cancellationToken)
             .HandleFailuresOrOk();
     }

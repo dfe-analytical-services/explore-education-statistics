@@ -75,19 +75,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 metaFileName,
                 metaFileStream));
 
-            if (isReplacement)
-            {
-                var releaseFileWithApiDataSet = _context.ReleaseFiles
-                    .SingleOrDefault(rf =>
-                        rf.ReleaseVersionId == releaseVersionId
-                        && rf.Name == dataSetTitle
-                        && rf.PublicApiDataSetId != null);
-                if (releaseFileWithApiDataSet != null)
-                {
-                    errors.Add(ValidationMessages.GenerateErrorCannotReplaceDataSetWithApiDataSet(dataSetTitle));
-                }
-            }
-
             return errors;
         }
 
