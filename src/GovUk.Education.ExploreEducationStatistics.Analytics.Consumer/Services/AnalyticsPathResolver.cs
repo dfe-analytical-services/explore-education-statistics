@@ -1,11 +1,11 @@
-using GovUk.Education.ExploreEducationStatistics.Analytics.Requests.Consumer.Options;
-using GovUk.Education.ExploreEducationStatistics.Analytics.Requests.Consumer.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Analytics.Consumer.Options;
+using GovUk.Education.ExploreEducationStatistics.Analytics.Consumer.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 
-namespace GovUk.Education.ExploreEducationStatistics.Analytics.Requests.Consumer.Services;
+namespace GovUk.Education.ExploreEducationStatistics.Analytics.Consumer.Services;
 
 public class AnalyticsPathResolver : IAnalyticsPathResolver
 {

@@ -5,20 +5,20 @@
 /// </summary>
 /// <param name="azureSearchIndexerClient">A real SearchIndexerClient instance</param>
 public class AzureSearchIndexerClientWrapper(
-    Azure.Search.Documents.Indexes.SearchIndexerClient azureSearchIndexerClient) 
+    Azure.Search.Documents.Indexes.SearchIndexerClient azureSearchIndexerClient)
     : IAzureSearchIndexerClient
 {
-    public async Task ResetIndexerAsync(string indexName, CancellationToken cancellationToken) =>
-        await azureSearchIndexerClient.ResetIndexerAsync(indexName, cancellationToken);
+    public async Task ResetIndexerAsync(string indexerName, CancellationToken cancellationToken) =>
+        await azureSearchIndexerClient.ResetIndexerAsync(indexerName, cancellationToken);
 
-    public async Task RunIndexerAsync(string indexName, CancellationToken cancellationToken) => 
-        await azureSearchIndexerClient.RunIndexerAsync(indexName, cancellationToken);
-    
-    public async Task<bool> IndexerExists(string indexName, CancellationToken cancellationToken)
+    public async Task RunIndexerAsync(string indexerName, CancellationToken cancellationToken) =>
+        await azureSearchIndexerClient.RunIndexerAsync(indexerName, cancellationToken);
+
+    public async Task<bool> IndexerExists(string indexerName, CancellationToken cancellationToken)
     {
         try
         {
-            var response = await azureSearchIndexerClient.GetIndexerAsync(indexName, cancellationToken);
+            var response = await azureSearchIndexerClient.GetIndexerAsync(indexerName, cancellationToken);
             return response.HasValue;
         }
         catch (Azure.RequestFailedException)

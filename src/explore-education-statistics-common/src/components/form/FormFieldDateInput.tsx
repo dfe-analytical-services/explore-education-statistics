@@ -41,7 +41,7 @@ export default function FormFieldDateInput<TFormValues extends FieldValues>({
   const id = fieldId(name as string, customId);
 
   const {
-    formState: { errors },
+    formState: { errors, isSubmitted },
     setValue,
     trigger,
   } = useFormContext<TFormValues>();
@@ -107,9 +107,11 @@ export default function FormFieldDateInput<TFormValues extends FieldValues>({
         [key]: inputValue,
       });
 
-      trigger(name);
+      if (isSubmitted) {
+        trigger(name);
+      }
     },
-    [name, setValue, trigger, type, values],
+    [name, isSubmitted, setValue, trigger, type, values],
   );
 
   return (

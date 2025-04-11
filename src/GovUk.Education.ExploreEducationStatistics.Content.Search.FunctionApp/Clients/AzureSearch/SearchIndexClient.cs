@@ -11,23 +11,23 @@ public class SearchIndexClient(
     IOptions<AzureSearchOptions> searchOptions)
     : ISearchIndexClient
 {
-    private readonly string _indexName = searchOptions.Value.IndexName;
+    private readonly string _indexerName = searchOptions.Value.IndexerName;
 
     public async Task RunIndexer(CancellationToken cancellationToken = default)
     {
         var client = azureSearchIndexerClientFactory.Create();
-        await client.RunIndexerAsync(_indexName, cancellationToken);
+        await client.RunIndexerAsync(_indexerName, cancellationToken);
     }
 
     public async Task ResetIndexer(CancellationToken cancellationToken = default)
     {
         var client = azureSearchIndexerClientFactory.Create();
-        await client.ResetIndexerAsync(_indexName, cancellationToken);
+        await client.ResetIndexerAsync(_indexerName, cancellationToken);
     }
     
     public async Task<bool> IndexerExists(CancellationToken cancellationToken = default)
     {
         var client = azureSearchIndexerClientFactory.Create();
-        return await client.IndexerExists(_indexName, cancellationToken);
+        return await client.IndexerExists(_indexerName, cancellationToken);
     }
 }

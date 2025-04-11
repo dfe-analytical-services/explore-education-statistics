@@ -1,14 +1,15 @@
-import { useRefContext } from '@common/contexts/RefContext';
 import html2canvas, { Options as HTML2CanvasOptions } from 'html2canvas';
-import { useCallback } from 'react';
+import { RefObject, useCallback } from 'react';
 
 type UseCurrentPngType = [(callback?: BlobCallback) => Promise<string | null>];
 
-const useCurrentPng = (
-  options?: Partial<HTML2CanvasOptions>,
-): UseCurrentPngType => {
-  const ref = useRefContext();
-
+const useCurrentPng = ({
+  options,
+  ref,
+}: {
+  options?: Partial<HTML2CanvasOptions>;
+  ref: RefObject<HTMLElement>;
+}): UseCurrentPngType => {
   const getPng = useCallback(
     async (callback?: BlobCallback): Promise<string | null> => {
       if (!ref?.current) return null;

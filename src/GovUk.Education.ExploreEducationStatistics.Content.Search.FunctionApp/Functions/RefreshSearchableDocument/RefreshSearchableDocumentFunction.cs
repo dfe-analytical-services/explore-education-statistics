@@ -8,26 +8,37 @@ public class RefreshSearchableDocumentFunction(ISearchableDocumentCreator search
 {
     [Function(nameof(RefreshSearchableDocument))]
     [QueueOutput("%SearchableDocumentCreatedQueueName%")]
-    public async Task<SearchableDocumentCreatedMessageDto> RefreshSearchableDocument(
+    public async Task<SearchableDocumentCreatedMessageDto[]> RefreshSearchableDocument(
         [QueueTrigger("%RefreshSearchableDocumentQueueName%")]
         RefreshSearchableDocumentMessageDto message,
         FunctionContext context)
     {
+        if (string.IsNullOrEmpty(message.PublicationSlug))
+        {
+            return [];
+        }
+
         // Create Searchable Document
         var request = new CreatePublicationLatestReleaseSearchableDocumentRequest
-            {
-                PublicationSlug = message.PublicationSlug
-            };
-        
-        var response = await searchableDocumentCreator.CreatePublicationLatestReleaseSearchableDocument(request, context.CancellationToken);
-        
-        return new SearchableDocumentCreatedMessageDto
         {
-            PublicationSlug = response.PublicationSlug,
-            ReleaseId = response.ReleaseId,
-            ReleaseSlug = response.ReleaseSlug,
-            ReleaseVersionId = response.ReleaseVersionId,
-            BlobName = response.BlobName,
+            PublicationSlug = message.PublicationSlug
         };
+
+        var response =
+            await searchableDocumentCreator.CreatePublicationLatestReleaseSearchableDocument(
+                request,
+                context.CancellationToken);
+
+        return
+        [
+            new SearchableDocumentCreatedMessageDto
+            {
+                PublicationSlug = response.PublicationSlug,
+                ReleaseId = response.ReleaseId,
+                ReleaseSlug = response.ReleaseSlug,
+                ReleaseVersionId = response.ReleaseVersionId,
+                BlobName = response.BlobName,
+            }
+        ];
     }
 }

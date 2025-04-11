@@ -38,6 +38,7 @@ const errorMappings = [
     messages: {
       SlugNotUnique:
         'Choose a unique combination of type, start year and label',
+      ReleaseSlugUsedByRedirect: `The requested release label has previously been used either for this or another related release and can not be re-used without a manual check. Please contact the Explore Education Statistics team with the details of the requested label name change.`,
     },
   }),
 ];

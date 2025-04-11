@@ -9,13 +9,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.
 
 public class SearchableDocumentCreatorTests
 {
-    private readonly ContentApiClientBuilder _contentApiClientBuilder = new();
-    private readonly AzureBlobStorageClientBuilder _azureBlobStorageClientBuilder = new();
+    private readonly ContentApiClientMockBuilder _contentApiClientMockBuilder = new();
+    private readonly AzureBlobStorageClientMockBuilder _azureBlobStorageClientMockBuilder = new();
     private AppOptions _appOptions = new();
     
     private SearchableDocumentCreator GetSut() => new(
-        _contentApiClientBuilder.Build(), 
-        _azureBlobStorageClientBuilder.Build(), 
+        _contentApiClientMockBuilder.Build(), 
+        _azureBlobStorageClientMockBuilder.Build(), 
         Microsoft.Extensions.Options.Options.Create(_appOptions));
 
     public class BasicTests : SearchableDocumentCreatorTests
@@ -36,7 +36,7 @@ public class SearchableDocumentCreatorTests
             await sut.CreatePublicationLatestReleaseSearchableDocument(new CreatePublicationLatestReleaseSearchableDocumentRequest { PublicationSlug = "publication-slug" });
             
             // ASSERT
-            _contentApiClientBuilder.Assert.ContentWasLoadedFor("publication-slug");
+            _contentApiClientMockBuilder.Assert.ContentWasLoadedFor("publication-slug");
         }
 
         [Fact]
@@ -55,7 +55,7 @@ public class SearchableDocumentCreatorTests
             await sut.CreatePublicationLatestReleaseSearchableDocument(new CreatePublicationLatestReleaseSearchableDocumentRequest { PublicationSlug = "publication-slug" });
             
             // ASSERT
-            _azureBlobStorageClientBuilder.Assert.BlobWasUploaded(containerName: _appOptions.SearchableDocumentsContainerName);
+            _azureBlobStorageClientMockBuilder.Assert.BlobWasUploaded(containerName: _appOptions.SearchableDocumentsContainerName);
         }
         
         [Fact]
@@ -63,7 +63,7 @@ public class SearchableDocumentCreatorTests
         {
             // ARRANGE
             var releaseId = new Guid("11223344-5566-7788-9900-123456789abc");
-            _contentApiClientBuilder.WhereReleaseSearchViewModelIs(builder => builder.WithReleaseId(releaseId));
+            _contentApiClientMockBuilder.WhereReleaseSearchViewModelIs(builder => builder.WithReleaseId(releaseId));
             
             var sut = GetSut();
             
@@ -71,7 +71,7 @@ public class SearchableDocumentCreatorTests
             await sut.CreatePublicationLatestReleaseSearchableDocument(new CreatePublicationLatestReleaseSearchableDocumentRequest { PublicationSlug = "publication-slug" });
             
             // ASSERT
-            _azureBlobStorageClientBuilder.Assert.BlobWasUploaded(blobName: releaseId.ToString());
+            _azureBlobStorageClientMockBuilder.Assert.BlobWasUploaded(blobName: releaseId.ToString());
         }
         
         [Fact]
@@ -79,7 +79,7 @@ public class SearchableDocumentCreatorTests
         {
             // ARRANGE
             var releaseSearchableDocument = new ReleaseSearchableDocumentBuilder().Build();
-            _contentApiClientBuilder.WhereReleaseSearchViewModelIs(releaseSearchableDocument);
+            _contentApiClientMockBuilder.WhereReleaseSearchViewModelIs(releaseSearchableDocument);
             var sut = GetSut();
             
             // ACT
@@ -87,7 +87,7 @@ public class SearchableDocumentCreatorTests
             
             // ASSERT
             var expected = new Blob(releaseSearchableDocument.HtmlContent, releaseSearchableDocument.BuildMetadata());
-            _azureBlobStorageClientBuilder.Assert.BlobWasUploaded(whereBlob: blob => blob == expected);
+            _azureBlobStorageClientMockBuilder.Assert.BlobWasUploaded(whereBlob: blob => blob == expected);
         }
         
         [Fact]
@@ -95,7 +95,7 @@ public class SearchableDocumentCreatorTests
         {
             // ARRANGE
             var releaseSearchableDocument = new ReleaseSearchableDocumentBuilder().Build();
-            _contentApiClientBuilder.WhereReleaseSearchViewModelIs(releaseSearchableDocument);
+            _contentApiClientMockBuilder.WhereReleaseSearchViewModelIs(releaseSearchableDocument);
             var sut = GetSut();
             
             // ACT

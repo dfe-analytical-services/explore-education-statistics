@@ -275,6 +275,7 @@ export type PluginName =
 
 export type ToolbarOption =
   | '|'
+  | 'accessibilityHelp'
   | 'alignment'
   | 'blockQuote'
   | 'bold'

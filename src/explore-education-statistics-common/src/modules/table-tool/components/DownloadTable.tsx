@@ -10,6 +10,7 @@ import { Footnote } from '@common/services/types/footnotes';
 import downloadFile from '@common/utils/file/downloadFile';
 import Yup from '@common/validation/yup';
 import LoadingSpinner from '@common/components/LoadingSpinner';
+import copyElementToClipboard from '@common/utils/copyElementToClipboard';
 import React, { createElement, RefObject } from 'react';
 
 export type FileFormat = 'ods' | 'csv';
@@ -113,6 +114,12 @@ const DownloadTable = ({
               <ButtonGroup>
                 <Button type="submit" disabled={formState.isSubmitting}>
                   Download table
+                </Button>
+                <Button
+                  variant="secondary"
+                  onClick={() => copyElementToClipboard(tableRef)}
+                >
+                  Copy table to clipboard
                 </Button>
                 <LoadingSpinner
                   alert

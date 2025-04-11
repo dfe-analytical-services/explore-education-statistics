@@ -5,7 +5,7 @@
 /// </summary>
 public interface IAzureSearchIndexerClient
 {
-    Task ResetIndexerAsync(string indexName, CancellationToken cancellationToken);
-    Task RunIndexerAsync(string indexName, CancellationToken cancellationToken);
-    Task<bool> IndexerExists(string indexName, CancellationToken cancellationToken);
+    Task ResetIndexerAsync(string indexerName, CancellationToken cancellationToken);
+    Task RunIndexerAsync(string indexerName, CancellationToken cancellationToken);
+    Task<bool> IndexerExists(string indexerName, CancellationToken cancellationToken);
 }

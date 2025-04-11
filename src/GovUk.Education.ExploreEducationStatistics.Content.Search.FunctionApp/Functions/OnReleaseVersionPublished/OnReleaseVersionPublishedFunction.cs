@@ -6,7 +6,7 @@ using Microsoft.Azure.Functions.Worker;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.OnReleaseVersionPublished;
 
-public class OnReleaseVersionPublishedFunction(EventGridEventHandler eventGridEventHandler)
+public class OnReleaseVersionPublishedFunction(IEventGridEventHandler eventGridEventHandler)
 {
     [Function(nameof(OnReleaseVersionPublished))]
     [QueueOutput("%RefreshSearchableDocumentQueueName%")]
@@ -15,17 +15,16 @@ public class OnReleaseVersionPublishedFunction(EventGridEventHandler eventGridEv
         EventGridEvent eventDto,
         FunctionContext context) =>
         await eventGridEventHandler.Handle<ReleaseVersionPublishedEventDto, RefreshSearchableDocumentMessageDto[]>(
-            context, 
+            context,
             eventDto,
-            (payload, _) => 
+            (payload, _) =>
                 Task.FromResult(
                     // TODO: Detect whether this is the latest published release version.
-                    // If not, we don't need to refresh the Searchable Document (which is only for the latest release version) so return empty. 
-                    new []
-                    {
-                        new RefreshSearchableDocumentMessageDto
+                    // If not, we don't need to refresh the Searchable Document (which is only for the latest release version) so return empty.
+                    string.IsNullOrEmpty(payload.PublicationSlug)
+                        ? []
+                        : new[]
                         {
-                            PublicationSlug = payload.PublicationSlug
-                        }
-                    }));
+                            new RefreshSearchableDocumentMessageDto { PublicationSlug = payload.PublicationSlug }
+                        }));
 }

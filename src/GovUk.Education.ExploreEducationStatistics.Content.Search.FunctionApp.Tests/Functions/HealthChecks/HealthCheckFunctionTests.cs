@@ -20,9 +20,9 @@ public class HealthCheckFunctionTests
         // ARRANGE
         IHealthCheckStrategy[] strategies =
         [
-            new HealthCheckStrategyBuilder().WhereResultIsHealthy().Build(),
-            new HealthCheckStrategyBuilder().WhereResultIsHealthy().Build(),
-            new HealthCheckStrategyBuilder().WhereResultIsHealthy().Build()
+            new HealthCheckStrategyMockBuilder().WhereResultIsHealthy().Build(),
+            new HealthCheckStrategyMockBuilder().WhereResultIsHealthy().Build(),
+            new HealthCheckStrategyMockBuilder().WhereResultIsHealthy().Build()
         ];
         var sut = GetSut(strategies);
         
@@ -50,9 +50,9 @@ public class HealthCheckFunctionTests
         // ARRANGE
         IHealthCheckStrategy[] strategies =
         [
-            new HealthCheckStrategyBuilder().WhereIsHealthyResultIs(isHealthy1).Build(),
-            new HealthCheckStrategyBuilder().WhereIsHealthyResultIs(isHealthy2).Build(),
-            new HealthCheckStrategyBuilder().WhereIsHealthyResultIs(isHealthy3).Build(),
+            new HealthCheckStrategyMockBuilder().WhereIsHealthyResultIs(isHealthy1).Build(),
+            new HealthCheckStrategyMockBuilder().WhereIsHealthyResultIs(isHealthy2).Build(),
+            new HealthCheckStrategyMockBuilder().WhereIsHealthyResultIs(isHealthy3).Build(),
         ];
         var sut = GetSut(strategies);
         
@@ -73,9 +73,9 @@ public class HealthCheckFunctionTests
         // ARRANGE
         IHealthCheckStrategy[] strategies =
         [
-            new HealthCheckStrategyBuilder().WhereResultIsHealthy("Result one").Build(),
-            new HealthCheckStrategyBuilder().WhereResultIsUnhealthy("Result two").Build(),
-            new HealthCheckStrategyBuilder().WhereResultIsHealthy("Result three").Build()
+            new HealthCheckStrategyMockBuilder().WhereResultIsHealthy("Result one").Build(),
+            new HealthCheckStrategyMockBuilder().WhereResultIsUnhealthy("Result two").Build(),
+            new HealthCheckStrategyMockBuilder().WhereResultIsHealthy("Result three").Build()
         ];
         var sut = GetSut(strategies);
         
