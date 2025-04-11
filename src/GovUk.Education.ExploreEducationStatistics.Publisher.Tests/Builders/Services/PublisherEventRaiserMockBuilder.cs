@@ -8,12 +8,12 @@ using Moq;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Builders.Services;
 
-public class EventRaiserMockBuilder
+public class PublisherEventRaiserMockBuilder
 {
     private readonly Mock<IPublisherEventRaiser> _mock = new(MockBehavior.Strict);
     public IPublisherEventRaiser Build() => _mock.Object;
     public Asserter Assert => new(_mock);
-    public EventRaiserMockBuilder()
+    public PublisherEventRaiserMockBuilder()
     {
         _mock
             .Setup(m => m.RaiseReleaseVersionPublishedEvents(It.IsAny<IList<PublishingCompletionService.PublishedReleaseVersionInfo>>()))
