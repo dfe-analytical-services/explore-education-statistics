@@ -3172,7 +3172,7 @@ public class PublicationServiceTests
             Assert.Equal(expectedLatestPublishedReleaseVersionId,
                 actualPublication.LatestPublishedReleaseVersionId);
             
-            AssertOnPublicationLatestPublishedReleaseVersionChangedWasRaised(
+            AssertOnPublicationLatestPublishedReleaseReorderedWasRaised(
                 actualPublication,
                 originalLatestPublishedReleaseVersionId);
         }
@@ -3279,7 +3279,7 @@ public class PublicationServiceTests
             Assert.Equal(expectedLatestPublishedReleaseVersionId,
                 actualPublication.LatestPublishedReleaseVersionId);
 
-            AssertOnPublicationLatestPublishedReleaseVersionChangedWasRaised(
+            AssertOnPublicationLatestPublishedReleaseReorderedWasRaised(
                 actualPublication,
                 originalLatestPublishedReleaseVersionId);
         }
@@ -3501,10 +3501,10 @@ public class PublicationServiceTests
     private void AssertOnPublicationChangedEventRaised(Publication? publication = null) =>
         _adminEventRaiserMockBuilder.Assert.OnPublicationChangedWasRaised(publication);
     
-    private void AssertOnPublicationLatestPublishedReleaseVersionChangedWasRaised(
+    private void AssertOnPublicationLatestPublishedReleaseReorderedWasRaised(
         Publication publication,
         Guid previousReleaseVersionId) =>
-        _adminEventRaiserMockBuilder.Assert.OnPublicationLatestPublishedReleaseVersionChangedWasRaised(
+        _adminEventRaiserMockBuilder.Assert.OnPublicationLatestPublishedReleaseReorderedWasRaised(
             publication,
             previousReleaseVersionId);
     

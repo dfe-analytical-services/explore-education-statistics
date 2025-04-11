@@ -3,9 +3,9 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Events;
 
-public record ThemeChangedEventDto
+public record ThemeChangedEvent
 {
-    public ThemeChangedEventDto(Theme theme)
+    public ThemeChangedEvent(Theme theme)
     {
         Subject = theme.Id.ToString();
         Payload = new EventPayload

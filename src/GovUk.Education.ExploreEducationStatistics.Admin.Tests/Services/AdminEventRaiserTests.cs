@@ -54,8 +54,8 @@ public class AdminEventRaiserTests(ITestOutputHelper output)
                 .Client
                 .Assert.EventsPublished);
 
-        var expectedEvent = new ThemeChangedEventDto(theme);
-        var expectedPayload = new ThemeChangedEventDto.EventPayload
+        var expectedEvent = new ThemeChangedEvent(theme);
+        var expectedPayload = new ThemeChangedEvent.EventPayload
         {
             Title = theme.Title,
             Summary = theme.Summary,
@@ -65,7 +65,7 @@ public class AdminEventRaiserTests(ITestOutputHelper output)
         Assert.Equal(expectedEvent.Subject, theme.Id.ToString());
 
         // Ensure the payload is correct
-        var actualPayload = actualEvent.Data.ToObjectFromJson<ThemeChangedEventDto.EventPayload>();
+        var actualPayload = actualEvent.Data.ToObjectFromJson<ThemeChangedEvent.EventPayload>();
         Assert.Equal(expectedPayload, actualPayload);
 
         // Output the EventGridEvent - useful for adding to a function app processing queue in Microsoft Azure Storage Explorer 
