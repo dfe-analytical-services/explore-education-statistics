@@ -1,6 +1,8 @@
 #nullable enable
 using System;
 using System.Diagnostics.CodeAnalysis;
+using System.Threading;
+using System.Threading.Tasks;
 using FluentValidation;
 using GovUk.Education.ExploreEducationStatistics.Common.Cache;
 using GovUk.Education.ExploreEducationStatistics.Common.Cancellation;
@@ -21,6 +23,9 @@ using GovUk.Education.ExploreEducationStatistics.Content.Services;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Cache;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.Cache;
+using GovUk.Education.ExploreEducationStatistics.Content.Services.Requests;
+using GovUk.Education.ExploreEducationStatistics.Content.Services.Strategies;
+using GovUk.Education.ExploreEducationStatistics.Content.Services.Strategies.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
@@ -181,12 +186,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api
 
             if (_analyticsOptions is { Enabled: true })
             {
-                ; // @MarkFix
+                services.AddSingleton<IAnalyticsManager, AnalyticsManager>();
+                services.AddSingleton<IAnalyticsWriter, AnalyticsWriter>();
+                services.AddHostedService<AnalyticsConsumer>();
+                services.AddSingleton<IAnalyticsPathResolver, AnalyticsPathResolver>();
 
+                services.AddSingleton<IAnalyticsWriteStrategy, AnalyticsWriteZipDownloadStrategy>();
             }
             else
             {
-                ; // @MarkFix
+                services.AddSingleton<IAnalyticsManager, NoOpAnalyticsManager>();
             }
 
             StartupSecurityConfiguration.ConfigureAuthorizationPolicies(services);
@@ -258,6 +267,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api
             app.ServerFeatures.Get<IServerAddressesFeature>()
                 ?.Addresses
                 .ForEach(address => Console.WriteLine($"Server listening on address: {address}"));
+        }
+
+        private class NoOpAnalyticsManager : IAnalyticsManager
+        {
+            public Task Add(BaseCaptureRequest request, CancellationToken cancellationToken)
+            {
+                return Task.CompletedTask;
+            }
+
+            public async ValueTask<BaseCaptureRequest> Read(CancellationToken cancellationToken)
+            {
+                await Task.Delay(Timeout.Infinite, cancellationToken);
+                return default!;
+            }
         }
     }
 }
