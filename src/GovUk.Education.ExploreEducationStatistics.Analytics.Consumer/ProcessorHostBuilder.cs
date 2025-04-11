@@ -1,6 +1,6 @@
-using GovUk.Education.ExploreEducationStatistics.Analytics.Requests.Consumer.Options;
-using GovUk.Education.ExploreEducationStatistics.Analytics.Requests.Consumer.Services;
-using GovUk.Education.ExploreEducationStatistics.Analytics.Requests.Consumer.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Analytics.Consumer.Options;
+using GovUk.Education.ExploreEducationStatistics.Analytics.Consumer.Services;
+using GovUk.Education.ExploreEducationStatistics.Analytics.Consumer.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.DuckDb.DuckDb;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Configuration;
@@ -8,7 +8,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
-namespace GovUk.Education.ExploreEducationStatistics.Analytics.Requests.Consumer;
+namespace GovUk.Education.ExploreEducationStatistics.Analytics.Consumer;
 
 public static class ProcessorHostBuilder
 {

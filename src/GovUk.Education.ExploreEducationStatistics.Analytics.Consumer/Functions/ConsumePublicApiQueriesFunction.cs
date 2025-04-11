@@ -1,9 +1,9 @@
-using GovUk.Education.ExploreEducationStatistics.Analytics.Requests.Consumer.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Analytics.Consumer.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.DuckDb.DuckDb;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
 
-namespace GovUk.Education.ExploreEducationStatistics.Analytics.Requests.Consumer.Functions;
+namespace GovUk.Education.ExploreEducationStatistics.Analytics.Consumer.Functions;
 
 public class ConsumePublicApiQueriesFunction(
     DuckDbConnection duckDbConnection,

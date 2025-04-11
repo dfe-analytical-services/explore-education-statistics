@@ -5,7 +5,7 @@
     <OutputType>Exe</OutputType>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <RootNamespace>GovUk.Education.ExploreEducationStatistics.Analytics.Requests.Consumer</RootNamespace>
+    <RootNamespace>GovUk.Education.ExploreEducationStatistics.Analytics.Consumer</RootNamespace>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Azure.Identity" Version="1.13.2" />

@@ -1,5 +1,5 @@
 using System.Reflection;
-using GovUk.Education.ExploreEducationStatistics.Analytics.Requests.Consumer.Functions;
+using GovUk.Education.ExploreEducationStatistics.Analytics.Consumer.Functions;
 using GovUk.Education.ExploreEducationStatistics.Common.DuckDb.DuckDb;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using InterpolatedSql.Dapper;
