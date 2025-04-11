@@ -209,6 +209,8 @@ export default function useReleaseContentActions() {
       });
 
       await updateUnattachedDataBlocks({ releaseVersionId });
+
+      return newBlock;
     },
     [dispatch, updateUnattachedDataBlocks],
   );
@@ -369,6 +371,7 @@ export default function useReleaseContentActions() {
           section: newSection,
         },
       });
+      return newSection;
     },
     [dispatch],
   );

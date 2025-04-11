@@ -47,7 +47,7 @@ const MethodologyAccordionSection = ({
   }, [sectionContent]);
 
   const addBlockToAccordionSection = useCallback(async () => {
-    await addContentSectionBlock({
+    const newBlock = await addContentSectionBlock({
       methodologyId,
       sectionId,
       block: {
@@ -57,6 +57,18 @@ const MethodologyAccordionSection = ({
       },
       sectionKey,
     });
+
+    setTimeout(() => {
+      const newBlockEl = document.querySelector(
+        `#editableSectionBlocks-${newBlock.id}`,
+      );
+      const newBlockButton = newBlockEl?.querySelector(
+        'button.govuk-button--secondary',
+      ) as HTMLButtonElement;
+      if (newBlockButton) {
+        newBlockButton.focus();
+      }
+    }, 100);
   }, [
     addContentSectionBlock,
     methodologyId,
