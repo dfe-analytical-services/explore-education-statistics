@@ -3,9 +3,9 @@ using Azure.Messaging.EventGrid;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Events;
 
-public record ReleaseSlugChangedEventDto
+public record ReleaseSlugChangedEvent
 {
-    public ReleaseSlugChangedEventDto(Guid releaseId, string newReleaseSlug, Guid publicationId, string publicationSlug)
+    public ReleaseSlugChangedEvent(Guid releaseId, string newReleaseSlug, Guid publicationId, string publicationSlug)
     {
         Subject = releaseId.ToString();
         Payload = new EventPayload

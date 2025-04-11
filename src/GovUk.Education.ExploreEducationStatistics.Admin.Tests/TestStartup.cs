@@ -64,7 +64,7 @@ public class TestStartup : Startup
             .MockService<IPublisherTableStorageService>()
             .MockService<IPrivateBlobStorageService>()
             .MockService<IPublicBlobStorageService>()
-            .MockService<IAdminEventRaiserService>(MockBehavior.Loose) // Ignore calls to publish events
+            .MockService<IAdminEventRaiser>(MockBehavior.Loose) // Ignore calls to publish events
             .RegisterControllers<Startup>();
 
         services

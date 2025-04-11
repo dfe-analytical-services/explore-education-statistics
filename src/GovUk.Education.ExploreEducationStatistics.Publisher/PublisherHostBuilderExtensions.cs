@@ -130,7 +130,7 @@ public static class PublisherHostBuilderExtensions
                     .AddScoped<IRedirectsCacheService, RedirectsCacheService>()
                     .AddScoped<IRedirectsService, RedirectsService>()
                     .AddEventGridClient(configuration)
-                    .AddScoped<IPublisherEventRaiserService, PublisherEventRaiserService>()
+                    .AddScoped<IPublisherEventRaiser, PublisherEventRaiser>()
                     .AddSingleton<INotifierClient, NotifierClient>(provider => new NotifierClient(
                         provider.GetRequiredService<IOptions<AppOptions>>().Value.NotifierStorageConnectionString))
                     .AddSingleton<IPublisherClient, PublisherClient>(provider => new PublisherClient(

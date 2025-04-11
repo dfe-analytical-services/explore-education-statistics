@@ -11,9 +11,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services;
 /// Publish events specific to the Publisher
 /// </summary>
 /// <param name="eventGridClientFactory"></param>
-public class PublisherEventRaiserService(
+public class PublisherEventRaiser(
     IConfiguredEventGridClientFactory eventGridClientFactory)
-    : IPublisherEventRaiserService
+    : IPublisherEventRaiser
 {
     /// <summary>
     /// On Release Version Published
@@ -23,7 +23,7 @@ public class PublisherEventRaiserService(
         IList<PublishingCompletionService.PublishedReleaseVersionInfo> publishedReleaseVersionInfos)
     {
         if (!eventGridClientFactory.TryCreateClient(
-                ReleaseVersionPublishedEventDto.EventTopicOptionsKey,
+                ReleaseVersionPublishedEvent.EventTopicOptionsKey,
                 out var client))
         {
             return;
@@ -31,9 +31,9 @@ public class PublisherEventRaiserService(
 
         var releaseVersionPublishedEvents = 
             publishedReleaseVersionInfos.Select(info => 
-                new ReleaseVersionPublishedEventDto(
+                new ReleaseVersionPublishedEvent(
                         info.ReleaseVersionId,
-                        new ReleaseVersionPublishedEventDto.EventPayload
+                        new ReleaseVersionPublishedEvent.EventPayload
                         {
                             ReleaseId = info.ReleaseId,
                             ReleaseSlug = info.ReleaseSlug,

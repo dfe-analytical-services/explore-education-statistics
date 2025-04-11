@@ -37,7 +37,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly IMethodologyService _methodologyService;
         private readonly IPublishingService _publishingService;
         private readonly IReleaseVersionService _releaseVersionService;
-        private readonly IAdminEventRaiserService _eventRaiserService;
+        private readonly IAdminEventRaiser _eventRaiser;
         private readonly bool _themeDeletionAllowed;
 
         public ThemeService(
@@ -50,7 +50,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             IMethodologyService methodologyService,
             IPublishingService publishingService,
             IReleaseVersionService releaseVersionService,
-            IAdminEventRaiserService eventRaiserService)
+            IAdminEventRaiser eventRaiser)
         {
             _contentDbContext = contentDbContext;
             _dataSetVersionRepository = dataSetVersionRepository;
@@ -60,7 +60,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _methodologyService = methodologyService;
             _publishingService = publishingService;
             _releaseVersionService = releaseVersionService;
-            _eventRaiserService = eventRaiserService;
+            _eventRaiser = eventRaiser;
             _themeDeletionAllowed = appOptions.Value.EnableThemeDeletion;
         }
 
@@ -115,7 +115,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
                         await _publishingService.TaxonomyChanged();
                         
-                        await _eventRaiserService.OnThemeUpdated(theme);
+                        await _eventRaiser.OnThemeUpdated(theme);
 
                         return await GetTheme(theme.Id);
                     }

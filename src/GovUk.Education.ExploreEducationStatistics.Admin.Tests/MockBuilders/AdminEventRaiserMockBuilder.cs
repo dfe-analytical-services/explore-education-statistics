@@ -10,20 +10,20 @@ using Moq;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.MockBuilders;
 
-public class AdminEventRaiserServiceMockBuilder
+public class AdminEventRaiserMockBuilder
 {
-    private readonly Mock<IAdminEventRaiserService> _mock = new(MockBehavior.Strict);
-    private readonly List<OnPublicationLatestPublishedReleaseVersionChangedArgs> _onPublicationLatestPublishedReleaseVersionChangedInvocations = new();
-    private static readonly Expression<Func<IAdminEventRaiserService, Task>> OnReleaseSlugChanged =  
+    private readonly Mock<IAdminEventRaiser> _mock = new(MockBehavior.Strict);
+    private readonly List<InvokeArguments> _invocations = new();
+    private static readonly Expression<Func<IAdminEventRaiser, Task>> OnReleaseSlugChanged =  
         m => m.OnReleaseSlugChanged(
             It.IsAny<Guid>(), 
             It.IsAny<string>(), 
             It.IsAny<Guid>(), 
             It.IsAny<string>());
 
-    public IAdminEventRaiserService Build() => _mock.Object;
+    public IAdminEventRaiser Build() => _mock.Object;
 
-    public AdminEventRaiserServiceMockBuilder()
+    public AdminEventRaiserMockBuilder()
     {
         _mock
             .Setup(m => m.OnThemeUpdated(It.IsAny<Theme>()))
@@ -38,18 +38,18 @@ public class AdminEventRaiserServiceMockBuilder
             .Returns(Task.CompletedTask);
         
         _mock
-            .Setup(m => m.OnPublicationLatestPublishedReleaseVersionChanged(
+            .Setup(m => m.OnPublicationLatestPublishedReleaseReordered(
                 It.IsAny<Publication>(),
                 It.IsAny<Guid>()))
             .Callback((Publication publication, Guid oldLatestPublishedReleaseVersionId) => 
-                _onPublicationLatestPublishedReleaseVersionChangedInvocations
-                    .Add(new OnPublicationLatestPublishedReleaseVersionChangedArgs(publication, oldLatestPublishedReleaseVersionId)))
+                _invocations
+                    .Add(new InvokeArguments(publication, oldLatestPublishedReleaseVersionId)))
             .Returns(Task.CompletedTask);
     }
 
-    private record OnPublicationLatestPublishedReleaseVersionChangedArgs(Publication Publication, Guid OldLatestPublishedReleaseVersionId);
+    private record InvokeArguments(Publication Publication, Guid OldLatestPublishedReleaseVersionId);
     
-    public class Asserter(AdminEventRaiserServiceMockBuilder mockBuilder)
+    public class Asserter(AdminEventRaiserMockBuilder mockBuilder)
     {
         public void ThatOnThemeUpdatedRaised(Func<Theme, bool>? predicate = null) => 
             mockBuilder._mock.Verify(m => m.OnThemeUpdated(It.Is<Theme>(t => predicate == null || predicate(t))), Times.Once);
@@ -72,20 +72,20 @@ public class AdminEventRaiserServiceMockBuilder
         public void OnPublicationChangedWasRaised(Publication? publication = null) =>
             mockBuilder._mock.Verify(m => m.OnPublicationChanged(It.Is<Publication>(p => 
                 publication == null 
-                || new PublicationChangedEventDto(p) == new PublicationChangedEventDto(publication))), Times.Once);
+                || new PublicationChangedEvent(p) == new PublicationChangedEvent(publication))), Times.Once);
 
-        public void OnPublicationLatestPublishedReleaseVersionChangedWasRaised(
+        public void OnPublicationLatestPublishedReleaseReorderedWasRaised(
             Publication publication,
             Guid previousReleaseVersionId)
         {
-            var expectedEvent = new PublicationLatestPublishedReleaseVersionChangedEventDto(
+            var expectedEvent = new PublicationLatestPublishedReleaseReorderedEvent(
                 publication, 
                 previousReleaseVersionId);
 
             Xunit.Assert.Single(
-                mockBuilder._onPublicationLatestPublishedReleaseVersionChangedInvocations, 
+                mockBuilder._invocations, 
                 inv =>
-                    new PublicationLatestPublishedReleaseVersionChangedEventDto(
+                    new PublicationLatestPublishedReleaseReorderedEvent(
                         inv.Publication,
                         inv.OldLatestPublishedReleaseVersionId)
                     == expectedEvent);
@@ -95,7 +95,7 @@ public class AdminEventRaiserServiceMockBuilder
         public void OnPublicationChangedWasNotRaised()
         {
             mockBuilder._mock.Verify(m => m.OnPublicationChanged(It.IsAny<Publication>()), Times.Never);
-            mockBuilder._mock.Verify(m => m.OnPublicationLatestPublishedReleaseVersionChanged(
+            mockBuilder._mock.Verify(m => m.OnPublicationLatestPublishedReleaseReordered(
                 It.IsAny<Publication>(),
                 It.IsAny<Guid>()), 
                 Times.Never);
