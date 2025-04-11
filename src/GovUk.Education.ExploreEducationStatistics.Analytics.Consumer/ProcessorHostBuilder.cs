@@ -40,9 +40,10 @@ public static class ProcessorHostBuilder
                     .AddTransient<IAnalyticsPathResolver, AnalyticsPathResolver>()
                     .AddTransient<DuckDbConnection>(_ => new DuckDbConnection());
 
-                // Services to be called by ConsumeAnalyticsRequestFilesFunction
+                // To be used by ConsumeAnalyticsRequestFilesFunction
                 services
-                    .AddTransient<IRequestFileProcessor, PublicApiQueriesProcessor>();
+                    .AddTransient<IRequestFileProcessor, PublicApiQueriesProcessor>()
+                    .AddTransient<IRequestFileProcessor, PublicZipDownloadsProcessor>();
             });
     }
 }

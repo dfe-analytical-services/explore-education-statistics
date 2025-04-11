@@ -61,7 +61,7 @@ public class DataSetFilesController : ControllerBase
             .HandleFailuresOrOk();
     }
 
-    [HttpGet("data-set-files/{dataSetFileId:guid}/download")]
+    [HttpGet("data-set-files/{dataSetFileId:guid}/download")] // TODO EES-5979 analytics
     public async Task<ActionResult> DownloadDataSetFile(
         Guid dataSetFileId)
     {

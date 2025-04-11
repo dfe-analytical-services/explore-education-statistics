@@ -18,9 +18,11 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Requests;
 using GovUk.Education.ExploreEducationStatistics.Content.Security.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Content.Services.Requests;
 using GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainers;
 using File = System.IO.File;
 
@@ -31,7 +33,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
         IPersistenceHelper<ContentDbContext> persistenceHelper,
         IPublicBlobStorageService publicBlobStorageService,
         IDataGuidanceFileWriter dataGuidanceFileWriter,
-        IUserService userService)
+        IUserService userService,
+        IAnalyticsManager analyticsManager,
+        ILogger<ReleaseFileService> logger)
         : IReleaseFileService
     {
         /// How long the all files zip should be
@@ -131,19 +135,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
                 .OnSuccessVoid(
                     async releaseVersion =>
                     {
-                        if (fileIds is null
-                            && await TryStreamCachedAllFilesZip(releaseVersion, outputStream, cancellationToken))
-                        {
-                            return;
-                        }
+                        List<ReleaseFile>? releaseFiles = null;
 
                         if (fileIds is null)
                         {
-                            await ZipAllFilesToStream(releaseVersion, outputStream, cancellationToken);
+                            var successfullyStreamCachedAllFilesZip =
+                                await TryStreamCachedAllFilesZip(releaseVersion, outputStream, cancellationToken);
+
+                            if (!successfullyStreamCachedAllFilesZip)
+                            {
+                                await ZipAllFilesToStream(releaseVersion, outputStream, cancellationToken);
+                            }
                         }
                         else
                         {
-                            var releaseFiles = (await QueryReleaseFiles(releaseVersionId)
+                            releaseFiles = (await QueryReleaseFiles(releaseVersionId)
                                     .Where(rf => fileIds.Contains(rf.FileId))
                                     .ToListAsync(cancellationToken: cancellationToken))
                                 .OrderBy(rf => rf.File.ZipFileEntryName())
@@ -151,6 +157,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
 
                             await DoZipFilesToStream(releaseFiles, releaseVersion, outputStream, cancellationToken);
                         }
+
+                        await RecordZipDownloadAnalytics(releaseVersion, releaseFiles, cancellationToken);
                     }
                 );
         }
@@ -285,6 +293,37 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
                 .Include(f => f.File)
                 .Where(releaseFile => releaseFile.ReleaseVersionId == releaseVersionId
                                       && AllowedFileTypes.Contains(releaseFile.File.Type));
+        }
+
+        private async Task RecordZipDownloadAnalytics(
+            ReleaseVersion releaseVersion,
+            List<ReleaseFile>? releaseFiles,
+            CancellationToken cancellationToken)
+        {
+            if (releaseFiles is not null && releaseFiles.Count > 1)
+            {
+                logger.LogWarning("We only record analytics for zip downloads for an entire release or one specific data set. So this means someone manually attempted to download a zip with more than one specific file?");
+                return;
+            }
+
+            Guid? subjectId = null;
+            string? dataSetName = null;
+
+            if (releaseFiles is not null && releaseFiles.Count == 1)
+            {
+                subjectId = releaseFiles[0].File.SubjectId;
+                dataSetName = releaseFiles[0].Name;
+            }
+
+            await analyticsManager.Add(
+                new CaptureZipDownloadRequest(
+                    releaseVersion.Release.Publication.Title,
+                    releaseVersion.Id,
+                    releaseVersion.Release.Title,
+                    releaseVersion.Release.Label,
+                    subjectId,
+                    dataSetName),
+                cancellationToken);
         }
     }
 }
