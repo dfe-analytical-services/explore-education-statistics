@@ -44,7 +44,7 @@ public static class ProcessorHostBuilder
 
                 // Services to be called by ConsumeAnalyticsRequestFilesFunction
                 services
-                    .AddTransient<IRequestFileProcessorService, PublicApiQueriesProcessorService>();
+                    .AddTransient<IRequestFileProcessor, PublicApiQueriesProcessor>();
             });
     }
 }
