@@ -74,11 +74,11 @@ public class PublisherEventRaiserTests
             var eventGridEvent = Assert.Single(_eventGridClient.Client.Assert.EventsPublished);
             Assert.NotNull(eventGridEvent);
             Assert.Equal(info.ReleaseVersionId.ToString(), eventGridEvent.Subject);
-            Assert.Equal(ReleaseVersionPublishedEventDto.EventType, eventGridEvent.EventType);
-            Assert.Equal(ReleaseVersionPublishedEventDto.DataVersion, eventGridEvent.DataVersion);
+            Assert.Equal(ReleaseVersionPublishedEvent.EventType, eventGridEvent.EventType);
+            Assert.Equal(ReleaseVersionPublishedEvent.DataVersion, eventGridEvent.DataVersion);
             
             var jsonPayload = eventGridEvent.Data.ToString();
-            var payload = JsonSerializer.Deserialize<ReleaseVersionPublishedEventDto.EventPayload>(jsonPayload);
+            var payload = JsonSerializer.Deserialize<ReleaseVersionPublishedEvent.EventPayload>(jsonPayload);
             Assert.NotNull(payload);
             Assert.Equal(info.ReleaseId, payload.ReleaseId);
             Assert.Equal(info.ReleaseSlug, payload.ReleaseSlug);
@@ -145,7 +145,7 @@ public class PublisherEventRaiserTests
             // ARRANGE
             var eventGridOptions = new EventGridOptionsBuilder()
                 .AddTopicConfig(
-                    ReleaseVersionPublishedEventDto.EventTopicOptionsKey,
+                    ReleaseVersionPublishedEvent.EventTopicOptionsKey,
                     TestTopicEndpoint,
                     TopicAccessKey)
                 .Build();

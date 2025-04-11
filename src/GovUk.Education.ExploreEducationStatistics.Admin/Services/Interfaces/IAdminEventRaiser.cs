@@ -9,5 +9,5 @@ public interface IAdminEventRaiser
     Task OnThemeUpdated(Theme theme);
     Task OnReleaseSlugChanged(Guid releaseId, string newReleaseSlug, Guid publicationId, string publicationSlug);
     Task OnPublicationChanged(Publication publication);
-    Task OnPublicationLatestPublishedReleaseVersionChanged(Publication publication, Guid previousLatestPublishedReleaseVersionId);
+    Task OnPublicationLatestPublishedReleaseReordered(Publication publication, Guid previousLatestPublishedReleaseVersionId);
 }

@@ -1,28 +1,24 @@
-﻿using System;
-using Azure.Messaging.EventGrid;
+﻿using Azure.Messaging.EventGrid;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Events;
 
-public record PublicationLatestPublishedReleaseVersionChangedEventDto
+public record PublicationChangedEvent
 {
-    public PublicationLatestPublishedReleaseVersionChangedEventDto(
-        Publication publication,
-        Guid previousReleaseVersionId)
+    public PublicationChangedEvent(Publication publication)
     {
         Subject = publication.Id.ToString();
         Payload = new EventPayload
         {
             Title = publication.Title,
-            Slug = publication.Slug,
-            LatestPublishedReleaseVersionId = publication.LatestPublishedReleaseVersionId ?? throw new ArgumentNullException(nameof(publication.LatestPublishedReleaseVersionId)),
-            PreviousReleaseVersionId = previousReleaseVersionId
+            Summary = publication.Summary,
+            Slug = publication.Slug
         };
     }
 
     // Changes to this event should also increment the version accordingly.
     private const string DataVersion = "1.0";
-    private const string EventType = "publication-latest-publised-release-version-changed";
+    private const string EventType = "publication-changed";
     
     // Which Topic endpoint to use from the appsettings
     public const string EventTopicOptionsKey = "PublicationChangedEvent";
@@ -40,9 +36,8 @@ public record PublicationLatestPublishedReleaseVersionChangedEventDto
     public record EventPayload
     {
         public string Title { get; init; }
+        public string Summary { get; init; }
         public string Slug { get; init; }
-        public Guid LatestPublishedReleaseVersionId { get; init; }
-        public Guid PreviousReleaseVersionId { get; init; }
     }
 
     public EventGridEvent ToEventGridEvent() => new(Subject, EventType, DataVersion, Payload);

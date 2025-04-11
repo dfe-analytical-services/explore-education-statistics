@@ -589,7 +589,7 @@ public class PublicationService(
                     // therefore, this should always have a value
                     if (oldLatestPublishedReleaseVersionId.HasValue)
                     {
-                        await adminEventRaiser.OnPublicationLatestPublishedReleaseVersionChanged(
+                        await adminEventRaiser.OnPublicationLatestPublishedReleaseReordered(
                             publication,
                             oldLatestPublishedReleaseVersionId.Value);
                     }

@@ -3,7 +3,7 @@ using Azure.Messaging.EventGrid;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Events;
 
-public record ReleaseVersionPublishedEventDto(Guid ReleaseVersionId, ReleaseVersionPublishedEventDto.EventPayload Payload)
+public record ReleaseVersionPublishedEvent(Guid ReleaseVersionId, ReleaseVersionPublishedEvent.EventPayload Payload)
 {
     // Changes to this event should also increment the version accordingly.
     public const string DataVersion = "1.0";
