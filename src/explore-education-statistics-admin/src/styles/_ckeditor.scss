@@ -1,0 +1,10 @@
+.ck.ck-accessibility-help-dialog {
+  --ck-accessibility-help-dialog-max-height: min(
+    400px,
+    calc(var(--ck-dialog-max-height) - var(--ck-form-header-height))
+  );
+}
+
+.ck.ck-accessibility-help-dialog .ck-accessibility-help-dialog__content {
+  overscroll-behavior-y: none;
+}
