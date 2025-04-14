@@ -32,7 +32,7 @@ public class DataBlockServicePermissionTests
     public async Task GetDataBlockTableResult()
     {
         await PolicyCheckBuilder<ContentSecurityPolicies>()
-            .SetupResourceCheckToFail(_releaseVersion, ContentSecurityPolicies.CanViewSpecificRelease)
+            .SetupResourceCheckToFail(_releaseVersion, ContentSecurityPolicies.CanViewSpecificReleaseVersion)
             .AssertForbidden(
                 userService =>
                 {

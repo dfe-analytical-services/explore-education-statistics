@@ -73,6 +73,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
             CreateMap<ReleaseVersion, ReleaseVersionSummaryViewModel>()
                 .ForMember(dest => dest.Slug,
                     m => m.MapFrom(rv => rv.Release.Slug))
+                .ForMember(dest => dest.Label,
+                    m => m.MapFrom(rv => rv.Release.Label))
                 .ForMember(dest => dest.TimePeriodCoverage,
                     m => m.MapFrom(rv => rv.Release.TimePeriodCoverage))
                 .ForMember(dest => dest.Title,

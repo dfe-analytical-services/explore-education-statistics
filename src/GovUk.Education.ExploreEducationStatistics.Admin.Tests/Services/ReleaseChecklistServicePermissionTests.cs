@@ -33,7 +33,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await PolicyCheckBuilder<ContentSecurityPolicies>()
                 .SetupResourceCheckToFailWithMatcher<ReleaseVersion>(
                     rv => rv.Id == releaseVersion.Id,
-                    ContentSecurityPolicies.CanViewSpecificRelease)
+                    ContentSecurityPolicies.CanViewSpecificReleaseVersion)
                 .AssertForbidden(async userService =>
                 {
                     var contentDbContextId = Guid.NewGuid().ToString();

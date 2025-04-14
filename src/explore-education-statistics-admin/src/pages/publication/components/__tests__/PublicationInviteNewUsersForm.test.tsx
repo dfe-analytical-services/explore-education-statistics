@@ -52,13 +52,13 @@ describe('PublicationInviteNewUsersForm', () => {
     expect(checkboxes).toHaveLength(3);
 
     expect(checkboxes[0].checked).toBe(true);
-    expect(checkboxes[0]).toHaveAttribute('value', 'release-1');
+    expect(checkboxes[0]).toHaveAttribute('value', 'release-1-version-1');
 
     expect(checkboxes[1].checked).toBe(true);
-    expect(checkboxes[1]).toHaveAttribute('value', 'release-2');
+    expect(checkboxes[1]).toHaveAttribute('value', 'release-2-version-1');
 
     expect(checkboxes[2].checked).toBe(true);
-    expect(checkboxes[2]).toHaveAttribute('value', 'release-3');
+    expect(checkboxes[2]).toHaveAttribute('value', 'release-3-version-1');
 
     await userEvent.click(checkboxes[1]);
 
@@ -75,7 +75,7 @@ describe('PublicationInviteNewUsersForm', () => {
       expect(userService.inviteContributor).toHaveBeenCalledWith(
         'test@test.com',
         'publication-id',
-        ['release-1', 'release-3'],
+        ['release-1-version-1', 'release-3-version-1'],
       );
     });
   });

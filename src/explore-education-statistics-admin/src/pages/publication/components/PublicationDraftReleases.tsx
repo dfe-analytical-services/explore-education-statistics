@@ -1,4 +1,5 @@
 import DraftReleaseRow from '@admin/pages/publication/components/DraftReleaseRow';
+import styles from '@admin/pages/publication/PublicationReleasesPage.module.scss';
 import {
   DraftStatusGuidanceModal,
   IssuesGuidanceModal,
@@ -30,7 +31,7 @@ const PublicationDraftReleases = ({
       <thead>
         <tr>
           <th className="govuk-!-width-one-third">Release period</th>
-          <th className="dfe-white-space--nowrap">
+          <th className={`${styles.statusColumn} dfe-white-space--nowrap`}>
             Status <DraftStatusGuidanceModal />
           </th>
           <th className="dfe-white-space--nowrap">
@@ -39,7 +40,7 @@ const PublicationDraftReleases = ({
           <th className="dfe-white-space--nowrap">
             Warnings <IssuesGuidanceModal />
           </th>
-          <th>Actions</th>
+          <th className="govuk-!-width-one-quarter">Actions</th>
         </tr>
       </thead>
       <tbody>

@@ -33,7 +33,7 @@ describe('PublicationPageContainer', () => {
 
   test('renders the page with the releases tab', async () => {
     publicationService.getPublication.mockResolvedValue(testPublication);
-    publicationService.listReleases.mockResolvedValue(testEmptyReleases);
+    publicationService.listReleaseVersions.mockResolvedValue(testEmptyReleases);
 
     renderPage();
 
@@ -73,7 +73,7 @@ describe('PublicationPageContainer', () => {
       isSuperseded: true,
       supersededById: 'publication-2',
     });
-    publicationService.listReleases.mockResolvedValue(testEmptyReleases);
+    publicationService.listReleaseVersions.mockResolvedValue(testEmptyReleases);
 
     renderPage();
 
@@ -92,7 +92,7 @@ describe('PublicationPageContainer', () => {
       isSuperseded: false,
       supersededById: 'publication-2',
     });
-    publicationService.listReleases.mockResolvedValue(testEmptyReleases);
+    publicationService.listReleaseVersions.mockResolvedValue(testEmptyReleases);
 
     renderPage();
 

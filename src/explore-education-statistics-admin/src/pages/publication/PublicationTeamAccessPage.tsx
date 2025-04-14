@@ -6,6 +6,7 @@ import {
 } from '@admin/routes/publicationRoutes';
 import publicationService, {
   PublicationPermissions,
+  ReleaseVersionsType,
 } from '@admin/services/publicationService';
 import { ReleaseVersionSummary } from '@admin/services/releaseVersionService';
 import { FormSelect } from '@common/components/form';
@@ -39,8 +40,11 @@ const PublicationTeamAccessPage = ({
   );
 
   const { value: model, isLoading } = useAsyncHandledRetry<Model>(async () => {
-    const { results: releases } = await publicationService.listReleases(
+    const { results: releases } = await publicationService.listReleaseVersions(
       publicationId,
+      {
+        versionsType: ReleaseVersionsType.Latest,
+      },
     );
     const publicationRoles = await publicationService.listRoles(publicationId);
 
