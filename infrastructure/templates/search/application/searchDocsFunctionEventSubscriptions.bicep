@@ -1,4 +1,5 @@
 import { abbreviations } from '../../common/abbreviations.bicep'
+import { eventTopics } from '../../common/eventTopics.bicep'
 import { buildFullyQualifiedTopicName } from '../../common/functions.bicep'
 import { SearchStorageQueueNames } from '../types.bicep'
 
@@ -14,7 +15,7 @@ param searchDocsFunctionAppStorageAccountName string
 // Define each of the topics and their associated subscriptions
 var eventGridCustomTopicSubscriptions = [
   {
-    topic: 'publication-changed'
+    topicName: eventTopics.publicationChanged
     subscriptions: [
       {
         name: 'publication-changed'
@@ -29,7 +30,7 @@ var eventGridCustomTopicSubscriptions = [
     ]
   }
   {
-    topic: 'release-changed'
+    topicName: eventTopics.releaseChanged
     subscriptions: [
       {
         name: 'release-slug-changed'
@@ -39,7 +40,7 @@ var eventGridCustomTopicSubscriptions = [
     ]
   }
   {
-    topic: 'release-version-changed'
+    topicName: eventTopics.releaseVersionChanged
     subscriptions: [
       {
         name: 'release-version-published'
@@ -49,7 +50,7 @@ var eventGridCustomTopicSubscriptions = [
     ]
   }
   {
-    topic: 'theme-changed'
+    topicName: eventTopics.themeChanged
     subscriptions: [
       {
         name: 'theme-changed'
@@ -62,7 +63,7 @@ var eventGridCustomTopicSubscriptions = [
 
 var subscriptions = flatten(map(
   eventGridCustomTopicSubscriptions,
-  item => map(item.subscriptions, subscription => { topic: item.topic, ...subscription })
+  item => map(item.subscriptions, subscription => { topicName: item.topicName, ...subscription })
 ))
 
 // The functions have Queue trigger bindings rather than Event Grid trigger bindings,
@@ -72,7 +73,7 @@ module eventGridQueueSubscriptionModuleDeploy '../../common/components/event-gri
     name: 'eventGridQueueSubscriptionModuleDeploy-${index}'
     params: {
       name: '${resourcePrefix}-${abbreviations.eventGridSubscriptions}-${subscription.name}'
-      topicName: buildFullyQualifiedTopicName(resourcePrefix, subscription.topic)
+      topicName: buildFullyQualifiedTopicName(resourcePrefix, subscription.topicName)
       includedEventTypes: subscription.includedEventTypes
       storageAccountName: searchDocsFunctionAppStorageAccountName
       queueName: subscription.queueName
