@@ -25,23 +25,8 @@ public class DataSetVersionMapping : ICreatedUpdatedTimestamps<DateTimeOffset, D
     public FilterMappingPlan FilterMappingPlan { get; set; } = null!;
 
     public bool LocationMappingsComplete { get; set; }
-    public bool IsLocationMappingComplete => !LocationMappingPlan
-        .Levels
-        // Ignore any levels where candidates or mappings are empty as this means the level
-        // has been added or deleted from the data set and is not a mappable change.
-        .Where(level => level.Value.Candidates.Count != 0 
-                        && level.Value.Mappings.Count != 0)
-        .Any(level => level.Value.Mappings
-            .Any(optionMapping => optionMapping.Value.Type == MappingType.AutoNone));
     
     public bool FilterMappingsComplete { get; set; }
-    public bool IsFilterMappingComplete =>
-        // Note that currently within the UI there is no way to resolve unmapped filters, and therefore we
-        // omit checking the status of filters that have a mapping of AutoNone.
-        FilterMappingPlan.Mappings
-            .Where(filterMapping => filterMapping.Value.Type != MappingType.AutoNone)
-            .SelectMany(filterMapping => filterMapping.Value.OptionMappings)
-            .All(optionMapping => optionMapping.Value.Type != MappingType.AutoNone);
     
     // Use boolean flags to describe meta types that have been deleted and cannot be
     // changed via mapping currently. We can use this when calculating the version number.

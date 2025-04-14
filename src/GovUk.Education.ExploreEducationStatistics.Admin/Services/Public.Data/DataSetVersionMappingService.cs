@@ -236,10 +236,22 @@ public class DataSetVersionMappingService(
             return null;
         }
 
+        var locationsComplete = !mapping.LocationMappingPlan.Levels
+            // Ignore any levels where candidates or mappings are empty as this means the level
+            // has been added or deleted from the data set and is not a mappable change.
+            .Where(level => level.Value.Candidates.Count != 0 && level.Value.Mappings.Count != 0)
+            .Any(level => level.Value.Mappings
+                .Any(optionMapping => IncompleteMappingTypes.Contains(optionMapping.Value.Type)));
+        var filtersComplete = !mapping.FilterMappingPlan
+            .Mappings
+            .Where(filterMapping => filterMapping.Value.Type != MappingType.AutoNone)
+            .SelectMany(filterMapping => filterMapping.Value.OptionMappings)
+            .Any(optionMapping => IncompleteMappingTypes.Contains(optionMapping.Value.Type));
+        
         var mappingStatus = new MappingStatusViewModel
         {
-            LocationsComplete = mapping.IsLocationMappingComplete,
-            FiltersComplete = mapping.IsFilterMappingComplete
+            LocationsComplete = locationsComplete,
+            FiltersComplete = filtersComplete
         };
         return mappingStatus;
     }

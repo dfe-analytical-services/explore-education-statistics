@@ -12,6 +12,7 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Requests;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Semver;
 using ValidationMessages =
     GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Requests.Validators.ValidationMessages;
 
@@ -23,6 +24,10 @@ internal class DataSetVersionMappingService(
     ContentDbContext contentDbContext)
     : IDataSetVersionMappingService
 {
+    private static readonly MappingType[] IncompleteMappingTypes =
+    [
+        MappingType.AutoNone
+    ];
 
     private static readonly MappingType[] NoMappingTypes =
     [
@@ -30,13 +35,11 @@ internal class DataSetVersionMappingService(
         MappingType.AutoNone
     ];
 
-    public async Task<Either<ActionResult, Unit>> CreateMappings(Guid nextDataSetVersionId,
-        string? dataSetVersionToPatchFromDb,
+    public async Task<Either<ActionResult, Unit>> CreateMappings(
+        Guid nextDataSetVersionId,
+        SemVersion? dataSetVersionToPatch,
         CancellationToken cancellationToken = default)
     {
-        DataSetVersionNumber? dataSetVersionToPatch = null;
-        dataSetVersionToPatch = ValidateDataSetVersion(dataSetVersionToPatchFromDb);
-
         var nextVersion = await publicDataDbContext
             .DataSetVersions
             .Include(dsv => dsv.DataSet)
@@ -46,7 +49,7 @@ internal class DataSetVersionMappingService(
             .SingleAsync(dsv => dsv.Id == nextDataSetVersionId, cancellationToken);
 
         var sourceVersion = (dataSetVersionToPatch is not null
-            ? nextVersion.DataSet.Versions.FirstOrDefault(v => v.PublicVersion == dataSetVersionToPatch)
+            ? nextVersion.DataSet.Versions.FirstOrDefault(v => v.SemVersion() == dataSetVersionToPatch)
             : nextVersion.DataSet.LatestLiveVersion!) ?? throw new Exception($"Unable to find appropriate source version via latest live version or specified version to patch: ${dataSetVersionToPatch}.");
         //TODO: this is WIP, EES-5994 will take care of failures and recovering from them within this user journey.
 
@@ -100,15 +103,6 @@ internal class DataSetVersionMappingService(
 
         await publicDataDbContext.SaveChangesAsync(cancellationToken);
         return Unit.Instance;
-        
-        DataSetVersionNumber? ValidateDataSetVersion(string? dataSetVersionRaw)
-        {
-            return dataSetVersionRaw == null
-                ? null
-                : DataSetVersionNumber.TryParse(dataSetVersionRaw, out var parsedVersion)
-                    ? parsedVersion
-                    : throw new ArgumentException($"Invalid data set version to patch number: {dataSetVersionToPatch}");
-        }
     }
 
     public async Task ApplyAutoMappings(
@@ -126,8 +120,21 @@ internal class DataSetVersionMappingService(
         AutoMapLocations(mapping.LocationMappingPlan);
         AutoMapFilters(mapping.FilterMappingPlan);
 
-        mapping.LocationMappingsComplete = !mapping.IsLocationMappingComplete;
-        mapping.FilterMappingsComplete = !mapping.IsFilterMappingComplete;
+        mapping.LocationMappingsComplete = !mapping.LocationMappingPlan
+            .Levels
+            // Ignore any levels where candidates or mappings are empty as this means the level
+            // has been added or deleted from the data set and is not a mappable change.
+            .Where(level => level.Value.Candidates.Count != 0 && level.Value.Mappings.Count != 0)
+            .Any(level => level.Value.Mappings
+                .Any(optionMapping => IncompleteMappingTypes.Contains(optionMapping.Value.Type)));
+
+        // Note that currently within the UI there is no way to resolve unmapped filters, and therefore we
+        // omit checking the status of filters that have a mapping of AutoNone.
+        mapping.FilterMappingsComplete = !mapping.FilterMappingPlan
+            .Mappings
+            .Where(filterMapping => filterMapping.Value.Type != MappingType.AutoNone)
+            .SelectMany(filterMapping => filterMapping.Value.OptionMappings)
+            .Any(optionMapping => IncompleteMappingTypes.Contains(optionMapping.Value.Type));
 
         if (IsMajorVersionUpdate(mapping))
         {
