@@ -21,6 +21,9 @@ public class EventRaiserMockBuilder
         public void EventsRaised<TEventBuilder>(IEnumerable<TEventBuilder> expectedEvents) 
             where TEventBuilder : IEvent
             => Xunit.Assert.All(expectedEvents, e => Xunit.Assert.True( parent._mock.EventWasRaised(e)));
+
+        public void NoEventRaised() 
+            => Xunit.Assert.False(parent._mock.EventWasRaised());
     }
 
     private class MockEventRaiser : IEventRaiser
@@ -40,6 +43,8 @@ public class EventRaiserMockBuilder
 
         public bool EventWasRaised<TEventBuilder>(TEventBuilder expectedEvent) => 
             _events.OfType<TEventBuilder>().Any(actual => actual.Equals(expectedEvent));
+
+        public bool EventWasRaised() => _events.Any();
 
         public Task RaiseEvent<TEventBuilder>(TEventBuilder eventBuilder, CancellationToken cancellationToken = default) 
             where TEventBuilder : IEvent => 

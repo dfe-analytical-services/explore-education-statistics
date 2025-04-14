@@ -30,7 +30,7 @@ public record ReleaseVersionPublishedEvent : IEvent
     /// <summary>
     /// The ReleaseVersionId is the subject
     /// </summary>
-    public string Subject { get; init; }
+    public string Subject { get; }
 
     /// <summary>
     /// The event payload
@@ -43,7 +43,7 @@ public record ReleaseVersionPublishedEvent : IEvent
         public required string PublicationSlug { get; init; }
         public required Guid PublicationLatestPublishedReleaseVersionId { get; init; }    
     }
-    public EventPayload Payload { get; init; }
+    public EventPayload Payload { get; }
     
     public EventGridEvent ToEventGridEvent() => new(Subject, EventType, DataVersion, Payload);
 }

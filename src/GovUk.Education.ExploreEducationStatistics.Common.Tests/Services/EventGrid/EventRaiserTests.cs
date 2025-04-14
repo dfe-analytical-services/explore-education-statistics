@@ -42,7 +42,7 @@ public class EventRaiserTests
     }
     
     [Fact]
-    public async Task GivenTopicConfigured_WhenOnThemeUpdated_ThenEventPublished()
+    public async Task GivenTopicConfigured_WhenTestEventRaised_ThenEventPublished()
     {
         // ARRANGE
         var sut = GetSut();
