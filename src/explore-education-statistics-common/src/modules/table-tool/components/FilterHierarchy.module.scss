@@ -2,22 +2,22 @@
 
 .tier {
   background: govuk-colour('light-grey');
-  padding: 0.5rem;
-  margin-bottom: 1.5rem;
+  padding: govuk-spacing(2);
+  margin-bottom: govuk-spacing(5);
 }
 
 .subTier {
   position: relative;
-  margin-top: 3rem;
+  margin-top: govuk-spacing(8);
 
   &::before {
     content: '';
-    border-top: 1.2rem solid govuk-colour('blue');
-    border-left: 3rem solid transparent;
-    border-right: 3rem solid transparent;
+    border-top: govuk-spacing(4) solid govuk-colour('blue');
+    border-left: govuk-spacing(8) solid transparent;
+    border-right: govuk-spacing(8) solid transparent;
     left: 50%;
     position: absolute;
-    top: -1.5rem;
+    top: govuk-spacing(-5);
     transform: translate(-50%, -50%);
   }
 }

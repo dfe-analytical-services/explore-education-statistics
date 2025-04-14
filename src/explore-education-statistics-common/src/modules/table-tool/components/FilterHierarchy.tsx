@@ -5,6 +5,7 @@ import { useFormIdContext } from '@common/components/form/contexts/FormIdContext
 import FormCheckboxSelectedCount from '@common/components/form/FormCheckboxSelectedCount';
 import Modal from '@common/components/Modal';
 import { SubjectMetaFilterHierarchy } from '@common/services/tableBuilderService';
+import sortAlphabeticalTotalsFirst from '@common/utils/sortAlphabeticalTotalsFirst';
 import classNames from 'classnames';
 import get from 'lodash/get';
 import React, { memo, useCallback, useMemo, useState } from 'react';
@@ -161,22 +162,6 @@ function FilterHierarchy({
       </FormFieldset>
     </DetailsMenu>
   );
-}
-
-function sortAlphabeticalTotalsFirst(a: string, b: string) {
-  if (a.toLocaleLowerCase() === 'total') {
-    return -1;
-  }
-  if (b.toLocaleLowerCase() === 'total') {
-    return 1;
-  }
-  if (a < b) {
-    return -1;
-  }
-  if (a > b) {
-    return 1;
-  }
-  return 0;
 }
 
 function getRootOptionTrees(
