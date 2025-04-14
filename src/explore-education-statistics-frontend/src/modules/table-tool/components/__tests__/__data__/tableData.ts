@@ -216,6 +216,7 @@ export const testSelectedPublicationWithLatestRelease: SelectedPublication = {
   },
   latestRelease: {
     title: 'Latest Release Title',
+    slug: 'latest-release-slug',
   },
 };
 
@@ -234,6 +235,7 @@ export const testSelectedPublicationWithNonLatestRelease: SelectedPublication =
     },
     latestRelease: {
       title: 'Latest Release Title',
+      slug: 'latest-release-slug',
     },
   };
 
