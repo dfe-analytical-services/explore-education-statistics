@@ -23,7 +23,7 @@ public class PublisherEventRaiser(
         IList<PublishingCompletionService.PublishedReleaseVersionInfo> publishedReleaseVersionInfos)
     {
         if (!eventGridClientFactory.TryCreateClient(
-                ReleaseVersionPublishedEventDto.EventTopicOptionsKey,
+                ReleaseVersionPublishedEvent.EventTopicOptionsKey,
                 out var client))
         {
             return;
@@ -31,9 +31,9 @@ public class PublisherEventRaiser(
 
         var releaseVersionPublishedEvents = 
             publishedReleaseVersionInfos.Select(info => 
-                new ReleaseVersionPublishedEventDto(
+                new ReleaseVersionPublishedEvent(
                         info.ReleaseVersionId,
-                        new ReleaseVersionPublishedEventDto.EventPayload
+                        new ReleaseVersionPublishedEvent.EventPayload
                         {
                             ReleaseId = info.ReleaseId,
                             ReleaseSlug = info.ReleaseSlug,

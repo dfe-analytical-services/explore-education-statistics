@@ -19,15 +19,15 @@ public class AdminEventRaiser(IConfiguredEventGridClientFactory eventGridClientF
     public async Task OnThemeUpdated(Theme theme)
     {
         if (!eventGridClientFactory.TryCreateClient(
-                ThemeChangedEventDto.EventTopicOptionsKey,
+                ThemeChangedEvent.EventTopicOptionsKey,
                 out var client))
         {
             return;
         }
 
-        var eventDto = new ThemeChangedEventDto(theme);
+        var evnt = new ThemeChangedEvent(theme);
         
-        await client.SendEventAsync(eventDto.ToEventGridEvent());
+        await client.SendEventAsync(evnt.ToEventGridEvent());
     }
 
     /// <summary>
@@ -36,14 +36,14 @@ public class AdminEventRaiser(IConfiguredEventGridClientFactory eventGridClientF
     public async Task OnReleaseSlugChanged(Guid releaseId, string newReleaseSlug, Guid publicationId, string publicationSlug)
     {
         if (!eventGridClientFactory.TryCreateClient(
-                ReleaseSlugChangedEventDto.EventTopicOptionsKey,
+                ReleaseSlugChangedEvent.EventTopicOptionsKey,
                 out var client))
         {
             return;
         }
 
-        var eventDto = new ReleaseSlugChangedEventDto(releaseId, newReleaseSlug, publicationId, publicationSlug);
-        await client.SendEventAsync(eventDto.ToEventGridEvent());
+        var evnt = new ReleaseSlugChangedEvent(releaseId, newReleaseSlug, publicationId, publicationSlug);
+        await client.SendEventAsync(evnt.ToEventGridEvent());
     }
 
     /// <summary>
@@ -52,26 +52,26 @@ public class AdminEventRaiser(IConfiguredEventGridClientFactory eventGridClientF
     public async Task OnPublicationChanged(Publication publication)
     {
         if (!eventGridClientFactory.TryCreateClient(
-                PublicationChangedEventDto.EventTopicOptionsKey,
+                PublicationChangedEvent.EventTopicOptionsKey,
                 out var client))
         {
             return;
         }
 
-        var eventDto = new PublicationChangedEventDto(publication);
+        var evnt = new PublicationChangedEvent(publication);
         
-        await client.SendEventAsync(eventDto.ToEventGridEvent());
+        await client.SendEventAsync(evnt.ToEventGridEvent());
     }
     
     /// <summary>
-    /// On Publication Latest Published Release Version changed.
+    /// On Publication Latest Published Release Reordered.
     /// It is assumed that the publication LatestPublishedReleaseVersionId has a value assigned to it.
     /// If it is null, then no event will be raised.
     /// </summary>
-    public async Task OnPublicationLatestPublishedReleaseVersionChanged(Publication publication, Guid previousLatestPublishedReleaseVersionId)
+    public async Task OnPublicationLatestPublishedReleaseReordered(Publication publication, Guid previousLatestPublishedReleaseVersionId)
     {
         if (!eventGridClientFactory.TryCreateClient(
-                PublicationLatestPublishedReleaseVersionChangedEventDto.EventTopicOptionsKey,
+                PublicationLatestPublishedReleaseReorderedEvent.EventTopicOptionsKey,
                 out var client))
         {
             return;
@@ -83,9 +83,9 @@ public class AdminEventRaiser(IConfiguredEventGridClientFactory eventGridClientF
             return;
         }
 
-        var eventDto = new PublicationLatestPublishedReleaseVersionChangedEventDto(publication, previousLatestPublishedReleaseVersionId);
+        var evnt = new PublicationLatestPublishedReleaseReorderedEvent(publication, previousLatestPublishedReleaseVersionId);
         
-        await client.SendEventAsync(eventDto.ToEventGridEvent());
+        await client.SendEventAsync(evnt.ToEventGridEvent());
     }
 }
 

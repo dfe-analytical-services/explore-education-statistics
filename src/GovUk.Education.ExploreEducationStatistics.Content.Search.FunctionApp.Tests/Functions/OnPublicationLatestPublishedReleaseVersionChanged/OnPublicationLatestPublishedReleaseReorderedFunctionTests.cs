@@ -1,15 +1,16 @@
 ﻿using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.OnPublicationChanged.Dtos;
-using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.OnPublicationLatestPublishedReleaseVersionChanged;
-using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.OnPublicationLatestPublishedReleaseVersionChanged.Dtos;
+using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.OnPublicationLatestPublishedReleaseReordered;
+using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.OnPublicationLatestPublishedReleaseReordered;
+using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.OnPublicationLatestPublishedReleaseReordered.Dtos;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Services;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Tests.Builders;
 using Microsoft.Extensions.Logging.Abstractions;
 
-namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Tests.Functions.OnPublicationLatestPublishedReleaseVersionChanged;
+namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Tests.Functions.OnPublicationLatestPublishedReleaseReordered;
 
-public class OnPublicationLatestPublishedReleaseVersionChangedFunctionTests
+public class OnPublicationLatestPublishedReleaseReorderedFunctionTests
 {
-    private OnPublicationLatestPublishedReleaseVersionChangedFunction GetSut() => new(new EventGridEventHandler(new NullLogger<EventGridEventHandler>()));
+    private OnPublicationLatestPublishedReleaseReorderedFunction GetSut() => new(new EventGridEventHandler(new NullLogger<EventGridEventHandler>()));
 
     [Fact]
     public void Can_instantiate_Sut() => Assert.NotNull(GetSut());
@@ -18,7 +19,7 @@ public class OnPublicationLatestPublishedReleaseVersionChangedFunctionTests
     public async Task GivenEvent_WhenPayloadContainsSlug_ThenRefreshSearchableDocumentMessageDtoReturned()
     {
         // ARRANGE
-        var payload = new PublicationLatestPublishedReleaseVersionChangedEventDto
+        var payload = new PublicationLatestPublishedReleaseReorderedEventDto
         {
             Slug = "this-is-a-publication-slug",
         };
@@ -30,7 +31,7 @@ public class OnPublicationLatestPublishedReleaseVersionChangedFunctionTests
         var sut = GetSut();
         
         // ACT
-        var response = await sut.OnPublicationLatestPublishedReleaseVersionChanged(
+        var response = await sut.OnPublicationLatestPublishedReleaseReordered(
             eventGridEvent, 
             new FunctionContextMockBuilder().Build());
         
@@ -46,7 +47,7 @@ public class OnPublicationLatestPublishedReleaseVersionChangedFunctionTests
     public async Task GivenEvent_WhenPayloadDoesNotContainSlug_ThenNothingIsReturned(string? blankSlug)
     {
         // ARRANGE
-        var payload = new PublicationLatestPublishedReleaseVersionChangedEventDto
+        var payload = new PublicationLatestPublishedReleaseReorderedEventDto
         {
             Slug = blankSlug,
         };
@@ -58,7 +59,7 @@ public class OnPublicationLatestPublishedReleaseVersionChangedFunctionTests
         var sut = GetSut();
         
         // ACT
-        var response = await sut.OnPublicationLatestPublishedReleaseVersionChanged(
+        var response = await sut.OnPublicationLatestPublishedReleaseReordered(
             eventGridEvent, 
             new FunctionContextMockBuilder().Build());
         
