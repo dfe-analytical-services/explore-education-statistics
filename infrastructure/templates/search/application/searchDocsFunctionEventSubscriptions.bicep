@@ -21,8 +21,8 @@ var eventGridCustomTopicSubscriptions = [
         queueName: storageQueueNames.publicationChangedQueueName
       }
       {
-        name: 'publication-latest-published-release-changed'
-        includedEventTypes: ['publication-latest-published-release-version-changed']
+        name: 'publication-latest-published-release-reordered'
+        includedEventTypes: ['publication-latest-published-release-reordered']
         queueName: storageQueueNames.publicationLatestPublishedReleaseVersionChangedQueueName
       }
     ]
