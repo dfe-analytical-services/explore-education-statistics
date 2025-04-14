@@ -307,7 +307,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                 await dataSetVersionService.CreateNextVersion(
                                     dataReleaseFile.Id,
                                     (Guid)releaseFileWithApiDataSet.PublicApiDataSetId!,
-                                    replacedReleaseDataFile?.PublicApiDataSetVersionString
+                                    replacedReleaseDataFile?.PublicApiDataSetVersion
                                 );
                             }
                             

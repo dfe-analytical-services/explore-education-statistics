@@ -2,6 +2,7 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Services.Interfaces;
 using Microsoft.Azure.Functions.Worker;
+using Semver;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Functions;
 
@@ -14,9 +15,10 @@ public class ProcessNextDataSetVersionMappingsFunctions(
         [ActivityTrigger] Guid instanceId,
         CancellationToken cancellationToken)
     {
+        SemVersion? dataSetVersionToPatch = null;
         var dataSetVersionImport = await GetDataSetVersionImport(instanceId, cancellationToken);
         await UpdateImportStage(dataSetVersionImport, DataSetVersionImportStage.CreatingMappings, cancellationToken);
-        await mappingService.CreateMappings(dataSetVersionImport.DataSetVersionId, dataSetVersionImport.DataSetVersionToPatch, cancellationToken);
+        await mappingService.CreateMappings(dataSetVersionImport.DataSetVersionId, dataSetVersionToPatch, cancellationToken);
     }
 
     [Function(ActivityNames.ApplyAutoMappings)]

@@ -1,5 +1,5 @@
 using FluentValidation;
-using GovUk.Education.ExploreEducationStatistics.Common.Utils;
+using Semver;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Requests;
 
@@ -9,7 +9,7 @@ public record NextDataSetVersionMappingsCreateRequest
 
     public required Guid ReleaseFileId { get; init; }
 
-    public DataSetVersionNumber? DataSetVersionToPatch { get; init; } = null;
+    public SemVersion? DataSetVersionToPatch { get; init; } = null;
     
     public class Validator : AbstractValidator<NextDataSetVersionMappingsCreateRequest>
     {

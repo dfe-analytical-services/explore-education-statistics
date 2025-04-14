@@ -3,6 +3,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Database;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Semver;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 
@@ -24,8 +25,7 @@ public class DataSetVersionImport : ICreatedUpdatedTimestamps<DateTimeOffset, Da
 
     public DateTimeOffset? Updated { get; set; }
 
-    [Column(TypeName = "varchar(50)")]
-    public string? DataSetVersionToPatch { get; set; }
+    public SemVersion? DataSetVersionToPatch { get; set; }
     
     internal class Config : IEntityTypeConfiguration<DataSetVersionImport>
     {
@@ -39,6 +39,30 @@ public class DataSetVersionImport : ICreatedUpdatedTimestamps<DateTimeOffset, Da
 
             builder.HasIndex(i => i.InstanceId)
                 .IsUnique();
+
+            builder.Property(i => i.DataSetVersionToPatch)
+                .HasColumnType("varchar(50)")
+                .HasConversion(
+                    value => ConvertSemVersionToString(value),
+                    value => ConvertStringToSemVersion(value)
+                );
         }
+        private static string? ConvertSemVersionToString(SemVersion? semVersion)
+        {
+            return semVersion == null ? null : $"{semVersion?.Major}.{semVersion?.Minor}.{semVersion?.Patch}";
+        }
+
+        private static SemVersion? ConvertStringToSemVersion(string? value)
+        {
+            // Parses the string back into a SemVersion instance
+            var successful = SemVersion.TryParse(
+                value,
+                SemVersionStyles.OptionalMinorPatch
+                | SemVersionStyles.AllowWhitespace
+                | SemVersionStyles.AllowLowerV,
+                out var version);
+            return successful ? version : null;
+        }
+
     }
 }

@@ -844,7 +844,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
         public Task<Either<ActionResult, ProcessDataSetVersionResponseViewModel>> CreateNextDataSetVersionMappings(
             Guid dataSetId,
             Guid releaseFileId,
-            DataSetVersionNumber? dataSetVersionToPatch = null,
+            SemVersion? dataSetVersionToPatch = null,
             CancellationToken cancellationToken = default) => throw new NotImplementedException();
 
         public Task<Either<ActionResult, ProcessDataSetVersionResponseViewModel>> CompleteNextDataSetVersionImport(
@@ -903,7 +903,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
         public Task<Either<ActionResult, DataSetVersionSummaryViewModel>> CreateNextVersion(
             Guid releaseFileId,
             Guid dataSetId,
-            string? dataSetVersionToPatch = null,
+            SemVersion? dataSetVersionToPatch = null,
             CancellationToken cancellationToken = default) => throw new NotImplementedException();
 
         public Task<Either<ActionResult, DataSetVersionSummaryViewModel>> CompleteNextVersionImport(

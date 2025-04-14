@@ -51,7 +51,7 @@ internal class DataSetVersionService(
         Guid dataSetId,
         Guid releaseFileId,
         Guid instanceId,
-        DataSetVersionNumber? dataSetVersionToPatch = null,
+        SemVersion? dataSetVersionToPatch = null,
         CancellationToken cancellationToken = default)
     {
         return await GetDataSet(dataSetId, cancellationToken)
@@ -62,7 +62,7 @@ internal class DataSetVersionService(
                 releaseFileId: releaseFileId,
                 instanceId: instanceId,
                 dataSet: dataSetAndDataSetVersion.dataSet,
-                previousVersionToPatch: dataSetAndDataSetVersion.previousDataSetVersionToPatch,
+                previousDataSetVersionToPatch: dataSetAndDataSetVersion.previousDataSetVersionToPatch,
                 cancellationToken: cancellationToken))
             .OnSuccess(dataSetVersion => dataSetVersion.Id);
     }
@@ -343,7 +343,7 @@ internal class DataSetVersionService(
         return dataSet;
     }
 
-    private static Either<ActionResult, DataSet> ValidateCanCreateNextDataSetVersion(DataSet dataSet, DataSetVersionNumber? dataSetVersionToPatch)
+    private static Either<ActionResult, DataSet> ValidateCanCreateNextDataSetVersion(DataSet dataSet, SemVersion? dataSetVersionToPatch)
     {
         if (dataSetVersionToPatch is not null && dataSet.LatestLiveVersionId is null && dataSet.Versions.Count == 1)
         {
@@ -363,15 +363,15 @@ internal class DataSetVersionService(
         //throw new NotImplementedException(); //WIP in EES-5996
     }
 
-    private static Either<ActionResult, DataSetVersion?> ValidatePreviousDataSetVersion(DataSet dataSet, DataSetVersionNumber? dataSetVersionToPatch)
+    private static Either<ActionResult, DataSetVersion?> ValidatePreviousDataSetVersion(DataSet dataSet, SemVersion? dataSetVersionToPatch)
     {
         if (dataSetVersionToPatch is null)
         {
-            return null as DataSetVersion;
+            return (DataSetVersion?)null;
         }
         
         var previousVersion = dataSet.Versions
-            .SingleOrDefault(dv => dataSetVersionToPatch == dv.PublicVersion);
+            .SingleOrDefault(dv => dataSetVersionToPatch == dv.SemVersion());
 
         return previousVersion is null
             ? ValidationUtils.ValidationResult(CreateDataSetIdError(
@@ -384,7 +384,7 @@ internal class DataSetVersionService(
         Guid releaseFileId,
         Guid instanceId,
         DataSet dataSet,
-        DataSetVersion? previousVersionToPatch = null,
+        DataSetVersion? previousDataSetVersionToPatch = null,
         CancellationToken cancellationToken = default)
     {
         return await publicDataDbContext.RequireTransaction(async () =>
@@ -393,19 +393,19 @@ internal class DataSetVersionService(
                     await ValidateReleaseFileAndDataSet(
                             releaseFile,
                             dataSet,
-                            previousVersionToPatch?.PublicVersion,
+                            previousDataSetVersionToPatch?.PublicVersion,
                             cancellationToken)
                         .OnSuccess(async () =>
                             await CreateDataSetVersion(
                                 dataSet,
                                 releaseFile,
-                                previousVersionToPatch,
+                                previousDataSetVersionToPatch,
                                 cancellationToken))
                         .OnSuccessDo(async dataSetVersion =>
                             await CreateDataSetVersionImport(
                                 dataSetVersion,
                                 instanceId,
-                                previousVersionToPatch?.PublicVersion,
+                                previousDataSetVersionToPatch?.PublicVersion,
                                 cancellationToken))
                         .OnSuccessDo(async dataSetVersion =>
                             await UpdateReleaseFilePublicDataSetVersionId(
@@ -495,6 +495,11 @@ internal class DataSetVersionService(
             .Select(version => version.Release.ReleaseFileId)
             .ToList();
 
+        if (dataSetVersionToPatch is not null)
+        {
+            return errors.Count == 0 ? Unit.Instance : ValidationUtils.ValidationResult(errors);
+        }
+        
         var previousReleaseIds = await GetReleaseIdsForReleaseFiles(
             contentDbContext,
             previousReleaseFileIds,
@@ -505,11 +510,6 @@ internal class DataSetVersionService(
                 [releaseFile.Id],
                 cancellationToken))
             .Single();
-
-        if (dataSetVersionToPatch is not null)
-        {
-            return errors.Count == 0 ? Unit.Instance : ValidationUtils.ValidationResult(errors);
-        }
 
         if (previousReleaseIds.Contains(selectedReleaseFileReleaseId))
         {

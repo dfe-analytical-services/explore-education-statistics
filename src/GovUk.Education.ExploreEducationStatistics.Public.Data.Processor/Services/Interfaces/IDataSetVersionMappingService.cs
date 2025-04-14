@@ -2,13 +2,15 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Requests;
 using Microsoft.AspNetCore.Mvc;
+using Semver;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Services.Interfaces;
 
 public interface IDataSetVersionMappingService
 {
-    Task<Either<ActionResult, Unit>> CreateMappings(Guid nextDataSetVersionId,
-        string? dataSetVersionToPatch,
+    Task<Either<ActionResult, Unit>> CreateMappings(
+        Guid nextDataSetVersionId,
+        SemVersion? dataSetVersionToPatch,
         CancellationToken cancellationToken = default);
     
     Task<Either<ActionResult, Tuple<DataSetVersion, DataSetVersionImport>>> GetManualMappingVersionAndImport(

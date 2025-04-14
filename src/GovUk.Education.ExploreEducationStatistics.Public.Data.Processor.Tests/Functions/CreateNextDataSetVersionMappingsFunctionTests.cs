@@ -187,13 +187,11 @@ public abstract class CreateNextDataSetVersionMappingsFunctionTests(
                         startOrchestrationOptions = options;
                     });
 
-            DataSetVersionNumber.TryParse(versionUnderTest.PublicVersion, out var version);
-            
             var result = await CreateNextDataSetVersion(
                 dataSetId: dataSet.Id,
                 releaseFileId: releaseFile.Id,
                 durableTaskClientMock.Object,
-                dataSetVersionToPatch: version);
+                dataSetVersionToPatch: versionUnderTest.SemVersion());
 
             VerifyAllMocks(durableTaskClientMock);
             
@@ -274,7 +272,7 @@ public abstract class CreateNextDataSetVersionMappingsFunctionTests(
             var result = await CreateNextDataSetVersion(
                 dataSetId: dataSet.Id,
                 releaseFileId: releaseFile.Id,
-                dataSetVersionToPatch: new DataSetVersionNumber(1, 0, 99));
+                dataSetVersionToPatch: new SemVersion(1, 0, 99));
          
             var validationProblem = result.AssertBadRequestWithValidationProblem();
 
@@ -664,7 +662,7 @@ public abstract class CreateNextDataSetVersionMappingsFunctionTests(
             Guid dataSetId,
             Guid releaseFileId,
             DurableTaskClient? durableTaskClient = null,
-            DataSetVersionNumber? dataSetVersionToPatch = null)
+            SemVersion? dataSetVersionToPatch = null)
         {
             var function = GetRequiredService<CreateNextDataSetVersionMappingsFunction>();
             
