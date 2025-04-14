@@ -20,7 +20,7 @@ type SearchServiceRole = 'Search Index Data Contributor' | 'Search Index Data Re
 @sealed()
 type SearchStorageQueueNames = {
   publicationChangedQueueName: string
-  publicationLatestPublishedReleaseVersionChangedQueueName: string
+  publicationLatestPublishedReleaseReorderedQueueName: string
   refreshSearchableDocumentQueueName: string
   releaseSlugChangedQueueName: string
   releaseVersionPublishedQueueName: string
