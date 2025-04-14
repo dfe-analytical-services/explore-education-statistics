@@ -1,5 +1,6 @@
 import { abbreviations } from '../../common/abbreviations.bicep'
-import { ResourceNames, SearchStorageQueueNames } from '../types.bicep'
+import { buildFullyQualifiedTopicName } from '../../common/functions.bicep'
+import { SearchStorageQueueNames } from '../types.bicep'
 
 @description('Resource prefix for all resources.')
 param resourcePrefix string
@@ -71,7 +72,7 @@ module eventGridQueueSubscriptionModuleDeploy '../../common/components/event-gri
     name: 'eventGridQueueSubscriptionModuleDeploy-${index}'
     params: {
       name: '${resourcePrefix}-${abbreviations.eventGridSubscriptions}-${subscription.name}'
-      topicName: '${resourcePrefix}-${abbreviations.eventGridTopics}-${subscription.topic}'
+      topicName: buildFullyQualifiedTopicName(resourcePrefix, subscription.topic)
       includedEventTypes: subscription.includedEventTypes
       storageAccountName: searchDocsFunctionAppStorageAccountName
       queueName: subscription.queueName
