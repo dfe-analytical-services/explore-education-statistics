@@ -51,8 +51,8 @@ param functionAppExists bool
 @description('The name of the queue that is used when a publication is changed.')
 param publicationChangedQueueName string = 'publication-changed-queue'
 
-@description('The name of the queue that is used when the latest published release version has changed for a publication.')
-param publicationLatestPublishedReleaseVersionChangedQueueName string = 'publication-latest-published-release-version-changed-queue'
+@description('The name of the queue that is used when the latest published release of a publication changes due to reordering.')
+param publicationLatestPublishedReleaseReorderedQueueName string = 'publication-latest-published-release-reordered-queue'
 
 @description('The name of the queue that is used when a searchable document requires a refresh.')
 param refreshSearchableDocumentQueueName string = 'refresh-searchable-document-queue'
@@ -142,8 +142,8 @@ module functionAppModule '../../common/components/functionApp.bicep' = {
         value: publicationChangedQueueName
       }
       {
-        name: 'PublicationLatestPublishedReleaseVersionChangedQueueName'
-        value: publicationLatestPublishedReleaseVersionChangedQueueName
+        name: 'PublicationLatestPublishedReleaseReorderedQueueName'
+        value: publicationLatestPublishedReleaseReorderedQueueName
       }
       {
         name: 'RefreshSearchableDocumentQueueName'
@@ -221,7 +221,7 @@ module functionAppStorageAccountQueueServiceModule '../../common/components/queu
     storageAccountName: functionAppModule.outputs.storageAccountName
     queueNames: [
       publicationChangedQueueName
-      publicationLatestPublishedReleaseVersionChangedQueueName
+      publicationLatestPublishedReleaseReorderedQueueName
       refreshSearchableDocumentQueueName
       releaseSlugChangedQueueName
       releaseVersionPublishedQueueName
@@ -236,7 +236,7 @@ output functionAppUrl string = functionAppModule.outputs.url
 output functionAppStorageAccountName string = functionAppModule.outputs.storageAccountName
 output storageQueueNames SearchStorageQueueNames = {
   publicationChangedQueueName: publicationChangedQueueName
-  publicationLatestPublishedReleaseVersionChangedQueueName: publicationLatestPublishedReleaseVersionChangedQueueName
+  publicationLatestPublishedReleaseReorderedQueueName: publicationLatestPublishedReleaseReorderedQueueName
   refreshSearchableDocumentQueueName: refreshSearchableDocumentQueueName
   releaseSlugChangedQueueName: releaseSlugChangedQueueName
   releaseVersionPublishedQueueName: releaseVersionPublishedQueueName
