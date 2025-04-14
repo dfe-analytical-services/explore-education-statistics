@@ -44,8 +44,8 @@ const errorMappings = [
   }),
 ];
 
-const replaceAllWhitespaceWithSingleSpace = (str: string) => {
-  return str.replace(/\s+/g, ' ');
+const formatWhitespace = (str: string) => {
+  return str.replace(/\s+/g, ' ').trim();
 };
 
 const releaseSlugLabelSuffix = (label?: string) => {
@@ -78,9 +78,9 @@ export default function ReleaseLabelEditModal({
       newReleaseSlugLabelSuffix,
     );
 
-    const formattedLabel = isUndefinedOrWhitespace(formValues?.label)
-      ? undefined
-      : replaceAllWhitespaceWithSingleSpace(formValues!.label!.trim());
+    const formattedLabel = formValues.label
+      ? formatWhitespace(formValues.label)
+      : '';
 
     return (
       <>
