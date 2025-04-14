@@ -41,8 +41,8 @@ var eventGridCustomTopicSubscriptions = [
     topic: 'release-version-changed'
     subscriptions: [
       {
-        name: 'release-version-changed'
-        includedEventTypes: ['release-version-changed']
+        name: 'release-version-published'
+        includedEventTypes: ['release-version-published']
         queueName: storageQueueNames.releaseVersionPublishedQueueName
       }
     ]
