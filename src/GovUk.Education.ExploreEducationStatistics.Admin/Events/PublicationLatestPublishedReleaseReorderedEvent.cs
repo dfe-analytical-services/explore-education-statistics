@@ -1,10 +1,11 @@
-﻿using System;
+using System;
 using Azure.Messaging.EventGrid;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.EventGrid;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Events;
 
-public record PublicationLatestPublishedReleaseReorderedEvent
+public record PublicationLatestPublishedReleaseReorderedEvent : IEvent
 {
     public PublicationLatestPublishedReleaseReorderedEvent(
         Publication publication,
@@ -25,7 +26,7 @@ public record PublicationLatestPublishedReleaseReorderedEvent
     private const string EventType = "publication-latest-published-release-reordered";
     
     // Which Topic endpoint to use from the appsettings
-    public const string EventTopicOptionsKey = "PublicationChangedEvent";
+    public static string EventTopicOptionsKey => "PublicationChangedEvent";
 
     /// <summary>
     /// The PublicationId is the subject

@@ -21,10 +21,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services;
 
 public class PublisherEventRaiserTests
 {
-    private readonly ConfiguredEventGridClientFactoryMockBuilder _eventGridClient = new();
+    private readonly EventRaiserMockBuilder _eventRaiserMockBuilder = new();
 
-    private IPublisherEventRaiser GetSut(IConfiguredEventGridClientFactory? eventGridClientFactory = null) => 
-        new PublisherEventRaiser(eventGridClientFactory ?? _eventGridClient.Build());
+    private IPublisherEventRaiser GetSut(IEventRaiser? eventRaiser = null) => 
+        new PublisherEventRaiser(eventRaiser ?? _eventRaiserMockBuilder.Build());
 
     public class BasicTests : PublisherEventRaiserTests
     {
@@ -35,25 +35,7 @@ public class PublisherEventRaiserTests
     public class RaiseReleaseVersionPublishedPublisherEvents : PublisherEventRaiserTests
     {
         [Fact]
-        public async Task GivenNotConfigured_WhenPublishedReleaseVersionInfoSpecified_ThenNoEventRaised()
-        {
-            // ARRANGE
-            _eventGridClient.WhereNoTopicConfigFound();
-            
-            var sut = GetSut();
-            var publishedReleaseVersionInfo = new PublishingCompletionService.PublishedReleaseVersionInfo();
-            
-            // ACT
-            await sut.RaiseReleaseVersionPublishedEvents([publishedReleaseVersionInfo]);
-
-            // ASSERT
-            _eventGridClient
-                .Client
-                .Assert.NoEventsWerePublished();
-        }
-        
-        [Fact]
-        public async Task GivenConfigured_WhenOnePublishedReleaseVersionInfoSpecified_ThenEventRaised()
+        public async Task WhenOnePublishedReleaseVersionInfoSpecified_ThenEventRaised()
         {
             // ARRANGE
             var sut = GetSut();
@@ -71,20 +53,8 @@ public class PublisherEventRaiserTests
             await sut.RaiseReleaseVersionPublishedEvents([info]);
 
             // ASSERT
-            var eventGridEvent = Assert.Single(_eventGridClient.Client.Assert.EventsPublished);
-            Assert.NotNull(eventGridEvent);
-            Assert.Equal(info.ReleaseVersionId.ToString(), eventGridEvent.Subject);
-            Assert.Equal(ReleaseVersionPublishedEvent.EventType, eventGridEvent.EventType);
-            Assert.Equal(ReleaseVersionPublishedEvent.DataVersion, eventGridEvent.DataVersion);
-            
-            var jsonPayload = eventGridEvent.Data.ToString();
-            var payload = JsonSerializer.Deserialize<ReleaseVersionPublishedEvent.EventPayload>(jsonPayload);
-            Assert.NotNull(payload);
-            Assert.Equal(info.ReleaseId, payload.ReleaseId);
-            Assert.Equal(info.ReleaseSlug, payload.ReleaseSlug);
-            Assert.Equal(info.PublicationId, payload.PublicationId);
-            Assert.Equal(info.PublicationSlug, payload.PublicationSlug);
-            Assert.Equal(info.PublicationLatestPublishedReleaseVersionId, payload.PublicationLatestPublishedReleaseVersionId);
+            var expectedEvent = new ReleaseVersionPublishedEvent(info);
+            _eventRaiserMockBuilder.Assert.EventsRaised([expectedEvent]);
         }
         
         [Theory]
@@ -110,7 +80,8 @@ public class PublisherEventRaiserTests
             await sut.RaiseReleaseVersionPublishedEvents(infos);
 
             // ASSERT
-            Assert.Equal(numberOfEvents, _eventGridClient.Client.Assert.EventsPublished.Count());
+            var expectedEvents = infos.Select(info => new ReleaseVersionPublishedEvent(info));
+            _eventRaiserMockBuilder.Assert.EventsRaised(expectedEvents);
         }
     }
 
@@ -156,7 +127,7 @@ public class PublisherEventRaiserTests
                 eventGridOptions,
             new UnitTestOutputLoggerBuilder<ConfiguredEventGridClientFactory>().Build(output));
             
-            var sut = GetSut(realEventGridClientFactory);
+            var sut = GetSut(new EventRaiser(realEventGridClientFactory));
 
             var publishedReleaseVersionInfo = new PublishingCompletionService.PublishedReleaseVersionInfo
             {
