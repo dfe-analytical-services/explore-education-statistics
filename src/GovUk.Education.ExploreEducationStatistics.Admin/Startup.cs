@@ -477,7 +477,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<IDataSetCandidateService, DataSetCandidateService>();
             services.AddTransient<IPostgreSqlRepository, PostgreSqlRepository>();
             services.AddTransient<ILocationService, LocationService>();
-            services.AddTransient<IAdminEventRaiserService, AdminEventRaiserService>();
+            services.AddTransient<IAdminEventRaiser, AdminEventRaiser>();
             services.AddEventGridClient(configuration);
 
             if (publicDataDbExists)

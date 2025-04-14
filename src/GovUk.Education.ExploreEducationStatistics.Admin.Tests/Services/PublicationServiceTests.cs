@@ -3493,21 +3493,21 @@ public class PublicationServiceTests
             releaseCacheService ?? Mock.Of<IReleaseCacheService>(Strict),
             methodologyCacheService ?? Mock.Of<IMethodologyCacheService>(Strict),
             redirectsCacheService ?? Mock.Of<IRedirectsCacheService>(Strict),
-            _adminEventRaiserServiceMockBuilder.Build());
+            _adminEventRaiserMockBuilder.Build());
     }
 
-    private readonly AdminEventRaiserServiceMockBuilder _adminEventRaiserServiceMockBuilder = new();
+    private readonly AdminEventRaiserMockBuilder _adminEventRaiserMockBuilder = new();
 
     private void AssertOnPublicationChangedEventRaised(Publication? publication = null) =>
-        _adminEventRaiserServiceMockBuilder.Assert.OnPublicationChangedWasRaised(publication);
+        _adminEventRaiserMockBuilder.Assert.OnPublicationChangedWasRaised(publication);
     
     private void AssertOnPublicationLatestPublishedReleaseVersionChangedWasRaised(
         Publication publication,
         Guid previousReleaseVersionId) =>
-        _adminEventRaiserServiceMockBuilder.Assert.OnPublicationLatestPublishedReleaseVersionChangedWasRaised(
+        _adminEventRaiserMockBuilder.Assert.OnPublicationLatestPublishedReleaseVersionChangedWasRaised(
             publication,
             previousReleaseVersionId);
     
     private void AssertOnPublicationChangedEventNotRaised() =>
-        _adminEventRaiserServiceMockBuilder.Assert.OnPublicationChangedWasNotRaised();
+        _adminEventRaiserMockBuilder.Assert.OnPublicationChangedWasNotRaised();
 }

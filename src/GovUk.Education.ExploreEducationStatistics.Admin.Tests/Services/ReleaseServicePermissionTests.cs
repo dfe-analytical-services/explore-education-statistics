@@ -103,7 +103,7 @@ public class ReleaseServicePermissionTests
             publicationCacheService: publicationCacheService ?? Mock.Of<IPublicationCacheService>(),
             releasePublishingStatusRepository: releasePublishingStatusRepository ?? Mock.Of<IReleasePublishingStatusRepository>(),
             redirectsCacheService: redirectsCacheService ?? Mock.Of<IRedirectsCacheService>(),
-            adminEventRaiserService: new AdminEventRaiserServiceMockBuilder().Build(),
+            adminEventRaiser: new AdminEventRaiserMockBuilder().Build(),
             guidGenerator: new SequentialGuidGenerator(),
             releaseSlugValidator: releaseSlugValidator ?? Mock.Of<IReleaseSlugValidator>()
         );

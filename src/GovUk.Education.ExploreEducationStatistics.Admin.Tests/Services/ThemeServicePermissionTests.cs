@@ -178,7 +178,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             IMethodologyService? methodologyService = null,
             IPublishingService? publishingService = null,
             IReleaseVersionService? releaseVersionService = null,
-            IAdminEventRaiserService? adminEventRaiserService = null)
+            IAdminEventRaiser? adminEventRaiser = null)
         {
             var publicContext = publicDataDbContext ?? Mock.Of<PublicDataDbContext>();
             var contentContext = contentDbContext ?? Mock.Of<ContentDbContext>();
@@ -195,7 +195,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 methodologyService ?? Mock.Of<IMethodologyService>(Strict),
                 publishingService ?? Mock.Of<IPublishingService>(Strict),
                 releaseVersionService ?? Mock.Of<IReleaseVersionService>(Strict),
-                adminEventRaiserService ?? new AdminEventRaiserServiceMockBuilder().Build()
+                adminEventRaiser ?? new AdminEventRaiserMockBuilder().Build()
             );
         }
     }

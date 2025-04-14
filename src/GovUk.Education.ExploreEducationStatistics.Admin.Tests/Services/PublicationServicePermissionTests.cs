@@ -631,7 +631,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             IReleaseCacheService? releaseCacheService = null,
             IMethodologyCacheService? methodologyCacheService = null,
             IRedirectsCacheService? redirectsCacheService = null,
-            IAdminEventRaiserService? adminEventRaiserService = null)
+            IAdminEventRaiser? adminEventRaiser = null)
         {
             context ??= Mock.Of<ContentDbContext>();
 
@@ -647,7 +647,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 releaseCacheService ?? Mock.Of<IReleaseCacheService>(Strict),
                 methodologyCacheService ?? Mock.Of<IMethodologyCacheService>(Strict),
                 redirectsCacheService ?? Mock.Of<IRedirectsCacheService>(Strict),
-                adminEventRaiserService ?? new AdminEventRaiserServiceMockBuilder().Build());
+                adminEventRaiser ?? new AdminEventRaiserMockBuilder().Build());
         }
     }
 }
