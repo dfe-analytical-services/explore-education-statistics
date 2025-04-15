@@ -21,6 +21,9 @@ jobs:
           steps:
             - checkout: self
 
+            - script: az upgrade --yes
+              displayName: Upgrade Azure CLI and extensions
+
             - task: AzureCLI@2
               displayName: Install Bicep
               inputs:

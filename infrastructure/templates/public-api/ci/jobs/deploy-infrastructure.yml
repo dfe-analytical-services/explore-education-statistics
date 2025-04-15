@@ -21,6 +21,9 @@ jobs:
           steps:
             - checkout: self
 
+            - script: az upgrade --yes
+              displayName: Upgrade Azure CLI and extensions
+
             - task: AzureCLI@2
               displayName: Install Bicep
               inputs:
@@ -66,9 +69,9 @@ jobs:
                 deployAlerts: $(deployAlerts)
                 dataProcessorExists: $(dataProcessorExists)
 
-           # - template: ../tasks/assign-app-role-to-service-principal.yml
-           #   parameters:
-           #     serviceConnection: ${ {parameters.serviceConnection }}
-           #     appRoleName: Admin.Access
-           #     protectedResourceAppRegName: $(subscription)-ees-papi-ca-api-appreg
-           #     servicePrincipalName: $(subscription)-as-ees-admin
+            # - template: ../tasks/assign-app-role-to-service-principal.yml
+            #   parameters:
+            #     serviceConnection: ${ {parameters.serviceConnection }}
+            #     appRoleName: Admin.Access
+            #     protectedResourceAppRegName: $(subscription)-ees-papi-ca-api-appreg
+            #     servicePrincipalName: $(subscription)-as-ees-admin
