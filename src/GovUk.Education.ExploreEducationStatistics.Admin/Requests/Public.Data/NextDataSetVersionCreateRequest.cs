@@ -1,6 +1,7 @@
 #nullable enable
 using System;
 using FluentValidation;
+using Semver;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Requests.Public.Data;
 
@@ -10,7 +11,7 @@ public record NextDataSetVersionCreateRequest
 
     public required Guid ReleaseFileId { get; init; }
     
-    public string? DataSetVersionToPatch { get; init; } = null;
+    public SemVersion? DataSetVersionToPatch { get; init; } = null;
 
     public class Validator : AbstractValidator<NextDataSetVersionCreateRequest>
     {

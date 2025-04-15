@@ -405,7 +405,7 @@ internal class DataSetVersionService(
                             await CreateDataSetVersionImport(
                                 dataSetVersion,
                                 instanceId,
-                                previousDataSetVersionToPatch?.PublicVersion,
+                                previousDataSetVersionToPatch?.SemVersion(),
                                 cancellationToken))
                         .OnSuccessDo(async dataSetVersion =>
                             await UpdateReleaseFilePublicDataSetVersionId(
@@ -562,7 +562,7 @@ internal class DataSetVersionService(
     private async Task CreateDataSetVersionImport(
         DataSetVersion dataSetVersion,
         Guid instanceId,
-        string? dataSetVersionToPatch = null,
+        SemVersion? dataSetVersionToPatch = null,
         CancellationToken cancellationToken = default)
     {
         var dataSetVersionImport = new DataSetVersionImport

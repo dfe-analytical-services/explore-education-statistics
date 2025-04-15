@@ -1,3 +1,5 @@
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using FluentValidation;
 using Semver;
 
@@ -9,8 +11,9 @@ public record NextDataSetVersionMappingsCreateRequest
 
     public required Guid ReleaseFileId { get; init; }
 
+    [JsonConverter(typeof(SemVersionJsonConverter))]
     public SemVersion? DataSetVersionToPatch { get; init; } = null;
-    
+
     public class Validator : AbstractValidator<NextDataSetVersionMappingsCreateRequest>
     {
         public Validator()
