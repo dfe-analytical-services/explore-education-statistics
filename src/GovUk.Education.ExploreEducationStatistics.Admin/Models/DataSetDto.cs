@@ -2,10 +2,81 @@
 using FluentValidation;
 using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+using System;
+using System.Collections.Generic;
 using System.IO;
 using File = GovUk.Education.ExploreEducationStatistics.Content.Model.File;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Models;
+
+/// <summary>
+/// Represents an unvalidated data set.
+/// </summary>
+public record DataSetDto()
+{
+    public Guid ReleaseVersionId { get; init; }
+
+    public string Title { get; init; } = string.Empty;
+
+    public required DataSetFileDto DataFile { get; init; }
+
+    public required DataSetFileDto MetaFile { get; init; }
+
+    public File? ReplacingFile { get; init; }
+
+    public class Validator : AbstractValidator<DataSetDto>
+    {
+        public Validator()
+        {
+            RuleLevelCascadeMode = CascadeMode.Stop;
+
+            RuleFor(dto => dto.ReleaseVersionId)
+                .NotEmpty();
+
+            RuleFor(dto => dto.Title)
+                .NotEmpty()
+                    .WithMessage(ValidationMessages.DataSetTitleCannotBeEmpty)
+                .MaximumLength(120)
+                    .WithMessage(ValidationMessages.DataSetTitleTooLong, "{PropertyValue}", "{MaxLength}");
+
+            RuleFor(dto => dto.DataFile)
+                .Must(file => FileNameValidators.MeetsLengthRequirements(file.FileName))
+                    .WithMessage(ValidationMessages.FilenameTooLong, "{PropertyValue}", FileNameValidators.MaxFileNameSize.ToString())
+                .Must(file => FileNameValidators.DoesNotContainSpaces(file.FileName))
+                    .When(dto => dto.DataFile is not null)
+                    .WithMessage(ValidationMessages.FileNameCannotContainSpaces, "{PropertyValue}")
+                .Must(file => FileNameValidators.DoesNotContainSpecialChars(file.FileName))
+                    .WithMessage(ValidationMessages.FileNameCannotContainSpecialCharacters, "{PropertyValue}")
+                .Must(file => file.FileName.ToLower().EndsWith(".csv"))
+                    .WithMessage(ValidationMessages.FileNameMustEndDotCsv, "{PropertyValue}")
+                .Must((dto, file, context) =>
+                {
+                    context.MessageFormatter.AppendArgument("FileName", dto.DataFile.FileName);
+                    return file.FileStream.Length > 0;
+                })
+                    .WithMessage(ValidationMessages.FileSizeMustNotBeZero, "{FileName}");
+
+            RuleFor(dto => dto.MetaFile)
+                .Must(file => FileNameValidators.MeetsLengthRequirements(file.FileName))
+                    .WithMessage(ValidationMessages.FilenameTooLong, "{PropertyValue}", FileNameValidators.MaxFileNameSize.ToString())
+                .Must(file => FileNameValidators.DoesNotContainSpaces(file.FileName))
+                    .WithMessage(ValidationMessages.FileNameCannotContainSpaces, "{PropertyValue}")
+                .Must(file => FileNameValidators.DoesNotContainSpecialChars(file.FileName))
+                    .WithMessage(ValidationMessages.FileNameCannotContainSpecialCharacters, "{PropertyValue}")
+                .Must(file => file.FileName.ToLower().EndsWith(".csv"))
+                    .WithMessage(ValidationMessages.FileNameMustEndDotCsv, "{PropertyValue}")
+                .Must((dto, file, context) =>
+                {
+                    context.MessageFormatter.AppendArgument("FileName", dto.MetaFile.FileName);
+                    return file.FileStream.Length > 0;
+                })
+                    .WithMessage(ValidationMessages.FileSizeMustNotBeZero, "{FileName}");
+
+            // TODO: Extract duplicated DataSetFileDto validation (FileName/FileStream)
+            // DataSetFileDto.Validate() is now only used for the dataset_names.csv file
+        }
+    }
+}
 
 /// <summary>
 /// Represents an data set file.
@@ -57,17 +128,29 @@ public record DataSetFileDto
 /// </summary>
 public record DataSet
 {
-    public required string Title { get; set; }
+    public required string Title { get; init; }
 
-    public required DataSetFileDto DataFile { get; set; }
+    public required DataSetFileDto DataFile { get; init; }
 
-    public required DataSetFileDto MetaFile { get; set; }
+    public required DataSetFileDto MetaFile { get; init; }
+
+    public File? ReplacingFile { get; init; }
 }
 
-/// <summary>
-/// Represents a validated data set extracted from a zip file.
-/// </summary>
-public record ZippedDataSet : DataSet
+public record DataSetIndex()
 {
+    public required Guid ReleaseVersionId { get; init; }
+
+    public List<DataSetIndexItem> DataSetIndexItems { get; init; } = [];
+}
+
+public record DataSetIndexItem
+{
+    public required string DataSetTitle { get; init; }
+
+    public required string DataFileName { get; init; }
+
+    public required string MetaFileName { get; init; }
+
     public File? ReplacingFile { get; init; }
 }

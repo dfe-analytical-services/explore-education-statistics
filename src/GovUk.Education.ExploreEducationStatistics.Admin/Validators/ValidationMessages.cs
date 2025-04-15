@@ -88,23 +88,9 @@ public static class ValidationMessages
         };
     }
 
-    public static readonly LocalizableMessage DataSetShouldContainTwoFiles = new(
-        Code: nameof(DataSetShouldContainTwoFiles),
-        Message: "The data set provided should contain two files."
-    );
-
-    public static ErrorViewModel GenerateErrorDataSetShouldContainTwoFiles()
-    {
-        return new ErrorViewModel
-        {
-            Code = DataSetShouldContainTwoFiles.Code,
-            Message = DataSetShouldContainTwoFiles.Message,
-        };
-    }
-
     public static readonly LocalizableMessage DataSetFileNamesShouldMatchConvention = new(
         Code: nameof(DataSetFileNamesShouldMatchConvention),
-        Message: $"The data file should end .csv, and the meta file should end {Constants.DataSet.MetaFileExtension}."
+        Message: $"The data file should end {Constants.DataSet.DataFileExtension}, and the meta file should end {Constants.DataSet.MetaFileExtension}."
     );
 
     public static ErrorViewModel GenerateErrorDataSetFileNamesShouldMatchConvention()
@@ -135,6 +121,15 @@ public static class ValidationMessages
         Message: "For bulk imports, the ZIP must include dataset_names.csv"
     );
 
+    public static ErrorViewModel GenerateErrorBulkDataZipMustContainDataSetNamesCsv()
+    {
+        return new ErrorViewModel
+        {
+            Code = BulkDataZipMustContainDataSetNamesCsv.Code,
+            Message = BulkDataZipMustContainDataSetNamesCsv.Message,
+        };
+    }
+
     public static readonly LocalizableMessage DataSetNamesCsvReaderException = new(
         Code: nameof(DataSetNamesCsvReaderException),
         Message: "Failed to read dataset_names.csv. Exception: {0}"
@@ -153,6 +148,15 @@ public static class ValidationMessages
         Code: nameof(DataSetNamesCsvIncorrectHeaders),
         Message: "dataset_names.csv has incorrect headers. It should have 'file_name' and 'dataset_name' only."
     );
+
+    public static ErrorViewModel GenerateErrorDataSetNamesCsvIncorrectHeaders()
+    {
+        return new ErrorViewModel
+        {
+            Code = DataSetNamesCsvIncorrectHeaders.Code,
+            Message = DataSetNamesCsvIncorrectHeaders.Message,
+        };
+    }
 
     public static readonly LocalizableMessage FileNotFoundInZip = new(
         Code: nameof(FileNotFoundInZip),
@@ -327,7 +331,7 @@ public static class ValidationMessages
 
     public static readonly LocalizableMessage FileSizeMustNotBeZero = new(
         Code: nameof(FileSizeMustNotBeZero),
-        Message: "File '{0}' must not be of 0 size."
+        Message: "File '{0}' either empty or not found."
     );
 
     public static ErrorViewModel GenerateErrorFileSizeMustNotBeZero(string fileName)

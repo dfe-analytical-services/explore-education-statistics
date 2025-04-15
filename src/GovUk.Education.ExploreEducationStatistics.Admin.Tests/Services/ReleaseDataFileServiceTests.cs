@@ -2312,7 +2312,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     dataSetValidatorService: dataSetValidatorService.Object
                 );
 
-                var result = (await service.ValidateAndUploadFromZip(
+                var result = (await service.UploadFromZip(
                     releaseVersionId: releaseVersion.Id,
                     zipFormFile: zipFormFile,
                     dataSetTitle: subjectName,
@@ -2458,7 +2458,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     dataSetValidatorService: dataSetValidatorService.Object
                 );
 
-                var result = await service.ValidateAndUploadFromZip(
+                var result = await service.UploadFromZip(
                     releaseVersionId: releaseVersion.Id,
                     zipFormFile: zipFormFile,
                     dataSetTitle: subjectName,
@@ -2592,7 +2592,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     dataSetValidatorService: dataSetValidatorService.Object
                 );
 
-                var result = (await service.ValidateAndUploadFromZip(
+                var result = (await service.UploadFromZip(
                     releaseVersionId: releaseVersion.Id,
                     zipFormFile: zipFormFile,
                     dataSetTitle: null,
@@ -2811,7 +2811,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             StatisticsDbContext? statisticsDbContext = null,
             IPersistenceHelper<ContentDbContext>? contentPersistenceHelper = null,
             IPrivateBlobStorageService? privateBlobStorageService = null,
-            IDataSetZipValidationService? dataSetZipValidationService = null,
             IDataSetValidator? dataSetValidatorService = null,
             IFileRepository? fileRepository = null,
             IReleaseVersionRepository? releaseVersionRepository = null,
@@ -2828,7 +2827,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 contentDbContext,
                 contentPersistenceHelper ?? new PersistenceHelper<ContentDbContext>(contentDbContext),
                 privateBlobStorageService ?? Mock.Of<IPrivateBlobStorageService>(Strict),
-                dataSetZipValidationService ?? Mock.Of<IDataSetZipValidationService>(Strict),
                 dataSetValidatorService ?? Mock.Of<IDataSetValidator>(Strict),
                 fileRepository ?? new FileRepository(contentDbContext),
                 releaseVersionRepository ?? new ReleaseVersionRepository(

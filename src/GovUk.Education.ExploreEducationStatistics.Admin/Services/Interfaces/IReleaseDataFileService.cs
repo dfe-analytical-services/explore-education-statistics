@@ -33,7 +33,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
             Guid releaseVersionId,
             List<Guid> fileIds);
 
-        Task<Either<ActionResult, DataFileInfo>> ValidateAndUpload(
+        Task<Either<ActionResult, DataFileInfo>> Upload(
             Guid releaseVersionId,
             IFormFile dataFormFile,
             IFormFile metaFormFile,
@@ -41,14 +41,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
             Guid? replacingFileId,
             CancellationToken cancellationToken);
 
-        Task<Either<ActionResult, DataFileInfo>> ValidateAndUploadFromZip(
+        Task<Either<ActionResult, DataFileInfo>> UploadFromZip(
             Guid releaseVersionId,
             IFormFile zipFormFile,
             string? dataSetTitle,
             Guid? replacingFileId,
             CancellationToken cancellationToken);
 
-        Task<Either<ActionResult, List<ZipDataSetFileViewModel>>> ValidateAndUploadFromBulkZip(
+        Task<Either<ActionResult, List<ZipDataSetFileViewModel>>> UploadFromBulkZip(
             Guid releaseVersionId,
             IFormFile zipFormFile,
             CancellationToken cancellationToken);
