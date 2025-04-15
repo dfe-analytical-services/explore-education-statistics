@@ -1,5 +1,5 @@
+using GovUk.Education.ExploreEducationStatistics.Common.DuckDb.DuckDb;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
-using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.DuckDb;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Repository.Interfaces;
 
