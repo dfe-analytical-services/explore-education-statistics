@@ -175,11 +175,11 @@ public class DataSetVersionMappingService(
 
         DataSetVersionImport? ongoingNextVersionImport = null;
 
-        ongoingNextVersionImport = await publicDataDbContext.DataSetVersionImports.SingleOrDefaultAsync(import =>
-                import.DataSetVersionId == nextDataSetVersionId
-                && import.Stage != DataSetVersionImportStage.Completing
-                && import.DataSetVersionToPatch == null,//TODO: Handle in EES-5996
-            cancellationToken);
+        // ongoingNextVersionImport = await publicDataDbContext.DataSetVersionImports.SingleOrDefaultAsync(import =>
+        //         import.DataSetVersionId == nextDataSetVersionId
+        //         && import.Stage != DataSetVersionImportStage.Completing
+        //         && import.DataSetVersionToPatch != null,//TODO: Handle in EES-5996
+        //     cancellationToken);
 
         var doesNotRequireManualMapping = await IsMappingComplete(nextDataSetVersionId, cancellationToken);
 
@@ -192,7 +192,7 @@ public class DataSetVersionMappingService(
         if (isMajorVersionUpdate)
         {//TODO: Add awareness of isIncrementingPatch the DataSetVersionMapping -  implement appropriate failure handler in EES-5996 
             if (ongoingNextVersionImport is not null && doesNotRequireManualMapping)
-            {//TODO: WIP
+            {//TODO: WIP EES-5996
                 //throw new ApplicationException("Data set is Not allowed");
             }
             targetDataSetVersion.VersionMajor = sourceDataSetVersion.VersionMajor + 1;

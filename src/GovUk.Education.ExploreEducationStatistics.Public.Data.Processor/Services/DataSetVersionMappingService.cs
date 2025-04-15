@@ -1,6 +1,5 @@
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
-using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.Validators;
 using GovUk.Education.ExploreEducationStatistics.Common.Validators.ErrorDetails;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
