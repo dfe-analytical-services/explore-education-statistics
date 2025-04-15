@@ -1,3 +1,4 @@
+using DuckDB.NET.Data;
 using GovUk.Education.ExploreEducationStatistics.Analytics.Consumer.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.DuckDb.DuckDb;
 using Microsoft.Extensions.Logging;
@@ -37,7 +38,7 @@ public class PublicApiQueriesProcessor(
 
         var processingDirectory = pathResolver.PublicApiQueriesProcessingDirectoryPath();
         var reportsDirectory = pathResolver.PublicApiQueriesReportsDirectoryPath();
-        
+
         Directory.CreateDirectory(processingDirectory);
         Directory.CreateDirectory(reportsDirectory);
 
@@ -47,30 +48,69 @@ public class PublicApiQueriesProcessor(
             var newPath = Path.Combine(processingDirectory, file);
             File.Move(originalPath, newPath);
         });
-        
+
         duckDbConnection.Open();
         
         duckDbConnection.ExecuteNonQuery("install json; load json");
+        duckDbConnection.ExecuteNonQuery(@"
+            CREATE TABLE queries (
+                queryVersionHash VARCHAR,
+                queryHash VARCHAR,
+                dataSetId UUID,
+                dataSetVersionId UUID,
+                dataSetVersion VARCHAR,
+                dataSetTitle VARCHAR,
+                resultsCount INT,
+                totalRowsCount INT,
+                startTime DATETIME,
+                endTime DATETIME,
+                query JSON
+            );
+        ");
 
-        duckDbConnection.ExecuteNonQuery($@"
-            CREATE TABLE queries AS 
-            SELECT
-                MD5(CONCAT(query, dataSetVersionId)) AS queryVersionHash,
-                MD5(query) AS queryHash,
-                *
-            FROM read_json('{processingDirectory}/*.json', 
-                format='auto',
-                columns = {{
-                    dataSetId: UUID, 
-                    dataSetVersionId: UUID,
-                    dataSetVersion: VARCHAR,
-                    dataSetTitle: VARCHAR,
-                    resultsCount: INT,
-                    totalRowsCount: INT,
-                    startTime: DATETIME,
-                    endTime: DATETIME,
-                    query: JSON
-                }})");
+        // We fetch the files again in case there are files leftover in the processing dir from a previous function run
+        var filesReadyForProcessing = Directory
+            .GetFiles(processingDirectory)
+            .Select(Path.GetFileName)
+            .Cast<string>()
+            .ToList();
+
+        foreach (var filename in filesReadyForProcessing)
+        {
+            try
+            {
+                duckDbConnection.ExecuteNonQuery($@"
+                    INSERT INTO queries BY NAME (
+                        SELECT
+                            MD5(CONCAT(query, dataSetVersionId)) AS queryVersionHash,
+                            MD5(query) AS queryHash,
+                            *
+                        FROM read_json('{processingDirectory}/{filename}',
+                            format='auto',
+                            columns = {{
+                                dataSetId: UUID,
+                                dataSetVersionId: UUID,
+                                dataSetVersion: VARCHAR,
+                                dataSetTitle: VARCHAR,
+                                resultsCount: INT,
+                                totalRowsCount: INT,
+                                startTime: DATETIME,
+                                endTime: DATETIME,
+                                query: JSON
+                            }})
+                    )
+                ");
+            }
+            catch (DuckDBException e)
+            {
+                logger.LogCritical($"Failed to process analytics request file {filename}\n Exception: {e}");
+                var badFilePath = Path.Combine(processingDirectory, filename);
+                var newPath = Path.Combine(sourceDirectory, "failures", filename);
+
+                Directory.CreateDirectory(Path.Combine(sourceDirectory, "failures"));
+                File.Move(badFilePath, newPath);
+            }
+        }
 
         duckDbConnection.ExecuteNonQuery(@"
             CREATE TABLE queryReport AS 
