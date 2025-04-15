@@ -1,3 +1,15 @@
+/*
+This file contains all of the role definition Id's for the built-in Azure roles.
+Do not modify this list manually. It is auto-generated using the Azure CLI.
+To regenerate it, paste the following command as a one-liner directly into a PowerShell session:
+
+  (az role definition list --query "[?roleType == 'BuiltInRole'].{RoleDefinitionId:name, RoleName:roleName}" | ConvertFrom-Json) | ForEach-Object {
+  $cleanRoleName = $_.RoleName -replace "[\s\-\(\)\./]", ""
+  "  {0}: '{1}'" -f $cleanRoleName, $_.RoleDefinitionId
+  } |
+  Sort-Object | Set-Content builtInRoles.output
+
+*/
 @description('The role definition Id\'s for the built-in Azure roles.')
 @export()
 var builtInRoleDefinitionIds = {
