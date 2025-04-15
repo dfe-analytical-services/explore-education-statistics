@@ -10,17 +10,19 @@ using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.Cache;
 using Moq;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Admin.Tests.MockBuilders;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.MapperUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using static Moq.MockBehavior;
-using IPublicationRepository = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IPublicationRepository;
+using IReleaseVersionRepository = GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces.IReleaseVersionRepository;
+using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 {
@@ -384,18 +386,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public void GetPublication()
+        public async Task GetPublication()
         {
             var userService = AlwaysTrueUserService();
-            var publicationService = BuildPublicationService(
-                userService: userService.Object);
 
-            PermissionTestUtil.AssertSecurityPoliciesChecked(
-                async service => await service.GetPublication(_publication.Id),
-                _publication,
-                userService,
-                publicationService,
-                SecurityPolicies.CanViewSpecificPublication);
+            _publication.Theme = _theme;
+
+            await PermissionTestUtil.PolicyCheckBuilder()
+                .SetupResourceCheckToFail(_publication, SecurityPolicies.CanViewSpecificPublication)
+                .AssertForbidden(async userService =>
+                {
+                    await using var contentDbContext = InMemoryApplicationDbContext();
+                    contentDbContext.Publications.Add(_publication);
+                    await contentDbContext.SaveChangesAsync();
+
+                    var publicationService = BuildPublicationService(
+                        context: contentDbContext,
+                        userService: userService.Object);
+
+                    return await publicationService.GetPublication(_publication.Id);
+                });
         }
 
         [Fact]
@@ -541,18 +551,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public void ListLatestReleaseVersions()
+        public async Task ListReleaseVersions()
         {
             var userService = AlwaysTrueUserService();
-            var publicationService = BuildPublicationService(
-                userService: userService.Object);
 
-            PermissionTestUtil.AssertSecurityPoliciesChecked(
-                async service => await service.ListLatestReleaseVersions(_publication.Id),
-                _publication,
-                userService,
-                publicationService,
-                SecurityPolicies.CanViewSpecificPublication);
+            await PermissionTestUtil.PolicyCheckBuilder()
+                .SetupResourceCheckToFail(_publication, SecurityPolicies.CanViewSpecificPublication)
+                .AssertForbidden(async userService => 
+                {
+                    await using var contentDbContext = InMemoryApplicationDbContext();
+                    contentDbContext.Publications.Add(_publication);
+                    await contentDbContext.SaveChangesAsync();
+
+                    var publicationService = BuildPublicationService(
+                        context: contentDbContext,
+                        userService: userService.Object);
+
+                    return await publicationService.ListReleaseVersions(_publication.Id, ReleaseVersionsType.Latest);
+                });
         }
 
         [Fact]
@@ -629,7 +645,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             IPublicationCacheService? publicationCacheService = null,
             IReleaseCacheService? releaseCacheService = null,
             IMethodologyCacheService? methodologyCacheService = null,
-            IRedirectsCacheService? redirectsCacheService = null)
+            IRedirectsCacheService? redirectsCacheService = null,
+            IAdminEventRaiser? adminEventRaiser = null)
         {
             context ??= Mock.Of<ContentDbContext>();
 
@@ -644,7 +661,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 publicationCacheService ?? Mock.Of<IPublicationCacheService>(Strict),
                 releaseCacheService ?? Mock.Of<IReleaseCacheService>(Strict),
                 methodologyCacheService ?? Mock.Of<IMethodologyCacheService>(Strict),
-                redirectsCacheService ?? Mock.Of<IRedirectsCacheService>(Strict));
+                redirectsCacheService ?? Mock.Of<IRedirectsCacheService>(Strict),
+                adminEventRaiser ?? new AdminEventRaiserMockBuilder().Build());
         }
     }
 }

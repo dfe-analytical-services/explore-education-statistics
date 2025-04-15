@@ -21,13 +21,8 @@ jobs:
           steps:
             - checkout: self
 
-            - task: AzureCLI@2
-              displayName: Install Bicep
-              inputs:
-                azureSubscription: ${{ parameters.serviceConnection }}
-                scriptType: bash
-                scriptLocation: inlineScript
-                inlineScript: az bicep install
+            - script: az upgrade --yes
+              displayName: Upgrade Azure CLI and extensions
 
             - template: ../tasks/deploy-bicep.yml
               parameters:

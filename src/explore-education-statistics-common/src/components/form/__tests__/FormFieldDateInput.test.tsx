@@ -7,6 +7,7 @@ import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import noop from 'lodash/noop';
 import React from 'react';
+import Button from '@common/components/Button';
 
 describe('FormFieldDateInput', () => {
   test('renders correctly', () => {
@@ -31,27 +32,30 @@ describe('FormFieldDateInput', () => {
           startDate: Yup.date().required('Select a date'),
         })}
       >
-        <FormFieldDateInput
-          legend="Start date"
-          id="startDate"
-          name="startDate"
-        />
+        <Form id="testForm" onSubmit={noop} visuallyHiddenErrorSummary>
+          <FormFieldDateInput
+            legend="Start date"
+            id="startDate"
+            name="startDate"
+          />
+          <Button type="submit">Submit</Button>
+        </Form>
       </FormProvider>,
     );
 
-    await userEvent.tab();
-    await userEvent.tab();
+    await userEvent.click(screen.getByRole('button', { name: 'Submit' }));
 
+    const group = within(screen.getByRole('group'));
     await waitFor(() => {
-      expect(screen.getByText('Select a date')).toHaveAttribute(
+      expect(group.getByText('Select a date')).toHaveAttribute(
         'id',
-        'startDate-error',
+        'testForm-startDate-error',
       );
     });
 
     expect(screen.getByRole('group')).toHaveAttribute(
       'aria-describedby',
-      'startDate-error',
+      'testForm-startDate-error',
     );
   });
 
@@ -91,6 +95,7 @@ describe('FormFieldDateInput', () => {
             hint="Test hint"
             name="startDate"
           />
+          <Button type="submit">Submit</Button>
         </Form>
       </FormProvider>,
     );
@@ -115,57 +120,12 @@ describe('FormFieldDateInput', () => {
       'testForm-startDate-year',
     );
 
-    await userEvent.tab();
-    await userEvent.tab();
+    await userEvent.click(screen.getByRole('button', { name: 'Submit' }));
 
     await waitFor(() => {
       expect(group.getByText('Select a date')).toHaveAttribute(
         'id',
         'testForm-startDate-error',
-      );
-    });
-  });
-
-  test('renders with correct defaults ids without form', async () => {
-    render(
-      <FormProvider
-        initialValues={{}}
-        validationSchema={Yup.object({
-          startDate: Yup.date().required('Select a date'),
-        })}
-      >
-        <FormFieldDateInput
-          legend="Start date"
-          hint="Test hint"
-          name="startDate"
-        />
-      </FormProvider>,
-    );
-
-    const group = within(screen.getByRole('group'));
-
-    expect(group.getByText('Test hint')).toHaveAttribute(
-      'id',
-      'startDate-hint',
-    );
-
-    expect(group.getByLabelText('Day')).toHaveAttribute('id', 'startDate-day');
-    expect(group.getByLabelText('Month')).toHaveAttribute(
-      'id',
-      'startDate-month',
-    );
-    expect(group.getByLabelText('Year')).toHaveAttribute(
-      'id',
-      'startDate-year',
-    );
-
-    await userEvent.tab();
-    await userEvent.tab();
-
-    await waitFor(() => {
-      expect(group.getByText('Select a date')).toHaveAttribute(
-        'id',
-        'startDate-error',
       );
     });
   });
@@ -185,6 +145,7 @@ describe('FormFieldDateInput', () => {
             name="startDate"
             id="customId"
           />
+          <Button type="submit">Submit</Button>
         </Form>
       </FormProvider>,
     );
@@ -209,50 +170,12 @@ describe('FormFieldDateInput', () => {
       'testForm-customId-year',
     );
 
-    await userEvent.tab();
-    await userEvent.tab();
+    await userEvent.click(screen.getByRole('button', { name: 'Submit' }));
 
     await waitFor(() => {
       expect(group.getByText('Select a date')).toHaveAttribute(
         'id',
         'testForm-customId-error',
-      );
-    });
-  });
-
-  test('renders with correct custom ids without form', async () => {
-    render(
-      <FormProvider
-        initialValues={{}}
-        validationSchema={Yup.object({
-          startDate: Yup.date().required('Select a date'),
-        })}
-      >
-        <FormFieldDateInput
-          legend="Start date"
-          hint="Test hint"
-          name="startDate"
-          id="customId"
-        />
-      </FormProvider>,
-    );
-
-    const group = within(screen.getByRole('group'));
-
-    expect(group.getByLabelText('Day')).toHaveAttribute('id', 'customId-day');
-    expect(group.getByLabelText('Month')).toHaveAttribute(
-      'id',
-      'customId-month',
-    );
-    expect(group.getByLabelText('Year')).toHaveAttribute('id', 'customId-year');
-
-    await userEvent.tab();
-    await userEvent.tab();
-
-    await waitFor(() => {
-      expect(group.getByText('Select a date')).toHaveAttribute(
-        'id',
-        'customId-error',
       );
     });
   });

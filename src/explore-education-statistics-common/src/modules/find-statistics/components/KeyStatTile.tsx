@@ -1,5 +1,4 @@
 import styles from '@common/modules/find-statistics/components/KeyStatTile.module.scss';
-import formatPretty from '@common/utils/number/formatPretty';
 import React, { ReactNode } from 'react';
 
 interface Props {

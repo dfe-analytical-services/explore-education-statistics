@@ -33,7 +33,7 @@ public static class HostBuilderExtension
                 services
                     .AddApplicationInsightsTelemetryWorkerService()
                     .ConfigureFunctionsApplicationInsights()
-                    .AddTransient<EventGridEventHandler>()
+                    // Config
                     .Configure<AppOptions>(context.Configuration.GetSection(AppOptions.Section))
                     .Configure<ContentApiOptions>(context.Configuration.GetSection(ContentApiOptions.Section))
                     .Configure<AzureSearchOptions>(context.Configuration.GetSection(AzureSearchOptions.Section))
@@ -52,12 +52,15 @@ public static class HostBuilderExtension
                             options.Rules.Remove(toRemove);
                         }
                     })
-                    .AddTransient<IContentApiClient, ContentApiClient>()
-                    .AddTransient<IAzureBlobStorageClient, AzureBlobStorageClient>()
+                    // Services
                     .AddTransient<ISearchableDocumentCreator, SearchableDocumentCreator>()
+                    // Functions
+                    .AddTransient<IEventGridEventHandler, EventGridEventHandler>()
+                    .AddHealthChecks()
+                    // Clients
                     .AddTransient<ISearchIndexClient, SearchIndexClient>()
                     .AddTransient<IAzureSearchIndexerClientFactory, AzureSearchIndexerClientFactory>()
-                    .AddHealthChecks()
+                    .AddTransient<IAzureBlobStorageClient, AzureBlobStorageClient>()
                     .AddAzureClientsInline(
                         clientBuilder =>
                         {

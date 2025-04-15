@@ -5,11 +5,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.
 
 public class EventGridEventHandlerTests
 {
-    private readonly FunctionContextBuilder _functionContextBuilder = new();
+    private readonly FunctionContextMockBuilder _functionContextMockBuilder = new();
     private readonly EventGridEventBuilder _eventGridEventBuilder = new();
-    private readonly LoggerBuilder<EventGridEventHandler> _loggerBuilder = new();
+    private readonly LoggerMockBuilder<EventGridEventHandler> _loggerMockBuilder = new();
 
-    private EventGridEventHandler GetSut() => new(_loggerBuilder.Build());
+    private EventGridEventHandler GetSut() => new(_loggerMockBuilder.Build());
     
     [Fact]
     public void Can_instantiate_SUT() => Assert.NotNull(GetSut());
@@ -31,7 +31,7 @@ public class EventGridEventHandlerTests
         }
         
         // ACT
-        await sut.Handle<MockPayloadClass, MockResponse>(_functionContextBuilder.Build(), _eventGridEventBuilder.Build(), Handler);
+        await sut.Handle<MockPayloadClass, MockResponse>(_functionContextMockBuilder.Build(), _eventGridEventBuilder.Build(), Handler);
         
         // ASSERT
         Assert.NotNull(actualPayload);
@@ -55,7 +55,7 @@ public class EventGridEventHandlerTests
         }
         
         // ACT
-        await sut.Handle<MockPayloadRecord, MockResponse>(_functionContextBuilder.Build(), _eventGridEventBuilder.Build(), Handler);
+        await sut.Handle<MockPayloadRecord, MockResponse>(_functionContextMockBuilder.Build(), _eventGridEventBuilder.Build(), Handler);
         
         // ASSERT
         Assert.Equal(expectedPayload, actualPayload);
@@ -65,7 +65,7 @@ public class EventGridEventHandlerTests
     public async Task GivenEvent_WhenEventHandled_ThenHandlerLogs()
     {
         // ARRANGE
-        _functionContextBuilder.ForFunctionName("FUNCTION_NAME_123");
+        _functionContextMockBuilder.ForFunctionName("FUNCTION_NAME_123");
         var sut = GetSut();
 
         Task<MockResponse> Handler(MockPayloadRecord payload, CancellationToken cancellationToken = default)
@@ -74,10 +74,10 @@ public class EventGridEventHandlerTests
         }
         
         // ACT
-        await sut.Handle<MockPayloadRecord, MockResponse>(_functionContextBuilder.Build(), _eventGridEventBuilder.Build(), Handler);
+        await sut.Handle<MockPayloadRecord, MockResponse>(_functionContextMockBuilder.Build(), _eventGridEventBuilder.Build(), Handler);
         
         // ASSERT
-        _loggerBuilder.Assert.LoggedInfoContains("FUNCTION_NAME_123");
+        _loggerMockBuilder.Assert.LoggedDebugContains("FUNCTION_NAME_123");
     }
 
     [Fact]
@@ -96,7 +96,7 @@ public class EventGridEventHandlerTests
         }
         
         // ACT
-        await sut.Handle<MockPayloadClass, MockResponse>(_functionContextBuilder.Build(), _eventGridEventBuilder.Build(), Handler);
+        await sut.Handle<MockPayloadClass, MockResponse>(_functionContextMockBuilder.Build(), _eventGridEventBuilder.Build(), Handler);
         
         // ASSERT
         Assert.NotNull(actualPayload);
@@ -119,7 +119,7 @@ public class EventGridEventHandlerTests
         }
         
         // ACT
-        await sut.Handle<MockPayloadRecord, MockResponse>(_functionContextBuilder.Build(), _eventGridEventBuilder.Build(), Handler);
+        await sut.Handle<MockPayloadRecord, MockResponse>(_functionContextMockBuilder.Build(), _eventGridEventBuilder.Build(), Handler);
         
         // ASSERT
         var expectedPayload = new MockPayloadRecord();
@@ -141,7 +141,7 @@ public class EventGridEventHandlerTests
         }
         
         // ACT
-        var actualReponse = await sut.Handle<MockPayloadClass, MockResponse>(_functionContextBuilder.Build(), _eventGridEventBuilder.Build(), Handler);
+        var actualReponse = await sut.Handle<MockPayloadClass, MockResponse>(_functionContextMockBuilder.Build(), _eventGridEventBuilder.Build(), Handler);
 
         // ASSERT
         Assert.NotNull(actualReponse);

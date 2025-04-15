@@ -3,11 +3,14 @@ import logger from '@common/services/logger';
 import isErrorLike from '@common/utils/error/isErrorLike';
 import { FullTable } from '@common/modules/table-tool/types/fullTable';
 import { TableHeadersConfig } from '@common/modules/table-tool/types/tableHeaders';
-import { ReleaseTableDataQuery } from '@common/services/tableBuilderService';
-import React, { forwardRef, memo } from 'react';
+import tableBuilderService, {
+  ReleaseTableDataQuery,
+} from '@common/services/tableBuilderService';
 import DataTableCaption from '@common/modules/table-tool/components/DataTableCaption';
 import FixedMultiHeaderDataTable from '@common/modules/table-tool/components/FixedMultiHeaderDataTable';
 import mapTableToJson from '@common/modules/table-tool/utils/mapTableToJson';
+import TableExportMenu from '@common/modules/find-statistics/components/TableExportMenu';
+import React, { forwardRef, memo, RefObject } from 'react';
 
 interface Props {
   captionTitle?: string;
@@ -16,6 +19,7 @@ interface Props {
   footnotesHeadingHiddenText?: string;
   fullTable: FullTable;
   query?: ReleaseTableDataQuery;
+  releaseVersionId?: string;
   source?: string;
   tableHeadersConfig: TableHeadersConfig;
   onError?: (message: string) => void;
@@ -30,6 +34,7 @@ const TimePeriodDataTable = forwardRef<HTMLElement, Props>(
       footnotesHeadingHiddenText,
       fullTable,
       query,
+      releaseVersionId,
       source,
       tableHeadersConfig,
       onError,
@@ -66,6 +71,17 @@ const TimePeriodDataTable = forwardRef<HTMLElement, Props>(
               Some rows and columns are not shown in this table as the data does
               not exist in the underlying file.
             </WarningMessage>
+          )}
+          {dataBlockId && query && (
+            <TableExportMenu
+              fileName={captionTitle}
+              fullTable={fullTable}
+              title={captionTitle}
+              tableRef={dataTableRef as RefObject<HTMLElement>}
+              onCsvDownload={() =>
+                tableBuilderService.getTableCsv({ releaseVersionId, ...query })
+              }
+            />
           )}
           <FixedMultiHeaderDataTable
             caption={

@@ -32,10 +32,10 @@ param indexerName string = '${indexName}-indexer'
 @description('Name of the searchable documents container in the Search storage account.')
 param searchableDocumentsContainerName string = 'searchable-documents'
 
-@description('A list IP network rules to allow access to the Search Service from specific public internet IP address ranges.')
-param searchServiceIpRules IpRange[] = []
+@description('A list of IP network rules to allow access to the Search Service from specific public internet IP address ranges.')
+param searchServiceIpRules IpRange[]
 
-@description('A list IP network rules to allow access to the Search storage account from specific public internet IP address ranges.')
+@description('A list of IP network rules to allow access to the Search storage account from specific public internet IP address ranges.')
 param storageIpRules IpRange[]
 
 @description('The branch, tag or commit of the source code from which the deployment is triggered.')
@@ -94,8 +94,8 @@ module searchStorageAccountModule '../../public-api/components/storageAccount.bi
   }
 }
 
-module blobServiceModule '../../common/components/blobService.bicep' = {
-  name: 'blobServiceModuleDeploy'
+module searchStorageAccountBlobServiceModule '../../common/components/blobService.bicep' = {
+  name: 'searchStorageAccountBlobServiceModuleDeploy'
   params: {
     storageAccountName: searchStorageAccountModule.outputs.storageAccountName
     containerNames: [searchableDocumentsContainerName]
@@ -126,7 +126,7 @@ module searchServiceConfigModule '../components/searchServiceConfig.bicep' = if 
     searchServiceName: searchServiceModule.outputs.searchServiceName
     location: location
   }
-  dependsOn: [blobServiceModule] // Ensures the searchable documents container exists
+  dependsOn: [searchStorageAccountBlobServiceModule] // Ensures the searchable documents container exists
 }
 
 output searchableDocumentsContainerName string = searchableDocumentsContainerName

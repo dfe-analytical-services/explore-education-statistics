@@ -22,6 +22,7 @@ export interface SelectOption<Value = string | number> {
 
 export interface FormSelectProps
   extends Pick<FormLabelProps, 'hideLabel' | 'label'> {
+  autoFocus?: boolean;
   className?: string;
   disabled?: boolean;
   error?: string;
@@ -53,6 +54,7 @@ export interface FormSelectProps
 }
 
 const FormSelect = ({
+  autoFocus,
   className,
   disabled,
   error,
@@ -109,6 +111,8 @@ const FormSelect = ({
           className={classNames('govuk-select', className, {
             'govuk-select--error': !!error,
           })}
+          // eslint-disable-next-line jsx-a11y/no-autofocus
+          autoFocus={autoFocus}
           id={id}
           name={name}
           disabled={disabled}

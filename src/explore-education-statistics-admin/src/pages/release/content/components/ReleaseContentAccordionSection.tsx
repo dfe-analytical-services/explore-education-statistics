@@ -66,7 +66,7 @@ const ReleaseContentAccordionSection = ({
   }, [blocks, section, unsavedBlocks, unsavedCommentDeletions]);
 
   const addBlock = useCallback(async () => {
-    await actions.addContentSectionBlock({
+    const newBlock = await actions.addContentSectionBlock({
       releaseVersionId: release.id,
       sectionId,
       sectionKey: 'content',
@@ -76,6 +76,18 @@ const ReleaseContentAccordionSection = ({
         body: '',
       },
     });
+
+    setTimeout(() => {
+      const newBlockEl = document.querySelector(
+        `#editableSectionBlocks-${newBlock.id}`,
+      );
+      const newBlockButton = newBlockEl?.querySelector(
+        'button.govuk-button--secondary',
+      ) as HTMLButtonElement;
+      if (newBlockButton) {
+        newBlockButton.focus();
+      }
+    }, 100);
   }, [actions, release.id, sectionId, sectionContent.length]);
 
   const addEmbedBlock = useCallback(
@@ -235,33 +247,31 @@ const ReleaseContentAccordionSection = ({
                   </Button>
                 )}
                 {user?.permissions.isBauUser && (
-                  <>
-                    {!showEmbedDashboardForm && (
+                  <Modal
+                    title="Embed a URL"
+                    open={showEmbedDashboardForm}
+                    onExit={toggleEmbedDashboardForm.off}
+                    triggerButton={
                       <Button
                         variant="secondary"
                         onClick={toggleEmbedDashboardForm.on}
                       >
                         Embed a URL
                       </Button>
-                    )}
-                  </>
+                    }
+                  >
+                    <EditableEmbedForm
+                      onCancel={toggleEmbedDashboardForm.off}
+                      onSubmit={async embedBlock => {
+                        await addEmbedBlock(embedBlock);
+                        toggleEmbedDashboardForm.off();
+                      }}
+                    />
+                  </Modal>
                 )}
               </ButtonGroup>
             </>
           )}
-          <Modal
-            title="Embed a URL"
-            open={showEmbedDashboardForm}
-            onExit={toggleEmbedDashboardForm.off}
-          >
-            <EditableEmbedForm
-              onCancel={toggleEmbedDashboardForm.off}
-              onSubmit={async embedBlock => {
-                await addEmbedBlock(embedBlock);
-                toggleEmbedDashboardForm.off();
-              }}
-            />
-          </Modal>
         </>
       )}
     </EditableAccordionSection>

@@ -59,6 +59,8 @@ var resourcePrefix = '${subscription}-ees'
 
 var resourceNames = {
   existingResources: {
+    adminApp: '${subscription}-as-ees-admin'
+    publisherFunction: '${subscription}-fa-ees-publisher'
     keyVault: '${subscription}-kv-ees-01'
     vNet: '${subscription}-vnet-ees'
     alertsGroup: '${subscription}-ag-ees-alertedusers'
@@ -75,6 +77,22 @@ module applicationInsightsModule 'application/searchApplicationInsights.bicep' =
   name: 'searchApplicationInsightsModule'
   params: {
     location: location
+    resourcePrefix: resourcePrefix
+    resourceNames: resourceNames
+    tagValues: tagValues
+  }
+}
+
+// Provision the event messaging infrastructure utilised by EES for communication between services.
+// While not exclusively part of the Search service infrastructure, it is included here to support
+// other services that publish events but are not yet defined in Bicep such as the Admin App Service
+// and the Publisher Function App.
+// The Search Service relies on this infrastructure to subscribe to events.
+module eventMessagingModule 'application/eventMessaging.bicep' = {
+  name: 'eventMessagingModule'
+  params: {
+    location: location
+    ipRules: [] // TODO EES-6036 Should be maintenanceIpRanges
     resourcePrefix: resourcePrefix
     resourceNames: resourceNames
     tagValues: tagValues
@@ -111,6 +129,18 @@ module searchDocsFunctionModule 'application/searchDocsFunction.bicep' = {
     tagValues: tagValues
     deployAlerts: deployAlerts
   }
+}
+
+module searchDocsFunctionEventSubscriptionsModule 'application/searchDocsFunctionEventSubscriptions.bicep' = {
+  name: 'searchDocsFunctionEventSubscriptionsModule'
+  params: {
+    resourcePrefix: resourcePrefix
+    searchDocsFunctionAppStorageAccountName: searchDocsFunctionModule.outputs.functionAppStorageAccountName
+    storageQueueNames: searchDocsFunctionModule.outputs.storageQueueNames
+  }
+  dependsOn: [
+    eventMessagingModule
+  ]
 }
 
 module searchServiceModule 'application/searchService.bicep' = {

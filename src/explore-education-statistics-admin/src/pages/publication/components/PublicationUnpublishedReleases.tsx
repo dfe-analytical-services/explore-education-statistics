@@ -1,7 +1,6 @@
 import PublicationDraftReleases from '@admin/pages/publication/components/PublicationDraftReleases';
 import PublicationScheduledReleases from '@admin/pages/publication/components/PublicationScheduledReleases';
-import publicationService from '@admin/services/publicationService';
-import { ReleaseVersionSummaryWithPermissions } from '@admin/services/releaseVersionService';
+import publicationQueries from '@admin/queries/publicationQueries';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import WarningMessage from '@common/components/WarningMessage';
 import { useQuery } from '@tanstack/react-query';
@@ -21,15 +20,8 @@ export default function PublicationUnpublishedReleases({
     isLoading,
     isSuccess,
     refetch,
-  } = useQuery(['publicationUnpublishedReleases', publicationId], () =>
-    publicationService.listReleases<ReleaseVersionSummaryWithPermissions>(
-      publicationId,
-      {
-        live: false,
-        pageSize: 100,
-        includePermissions: true,
-      },
-    ),
+  } = useQuery(
+    publicationQueries.listUnpublishedReleaseVersions(publicationId),
   );
 
   const draftReleases = useMemo(() => {
@@ -38,7 +30,7 @@ export default function PublicationUnpublishedReleases({
         release =>
           (release.approvalStatus === 'Draft' ||
             release.approvalStatus === 'HigherLevelReview') &&
-          release.permissions?.canViewRelease, // We don't display draft releases they have no permission to view
+          release.permissions?.canViewReleaseVersion, // We don't display draft releases they have no permission to view
       ) ?? []
     );
   }, [releases?.results]);
@@ -48,7 +40,7 @@ export default function PublicationUnpublishedReleases({
       releases?.results.filter(
         release =>
           release.approvalStatus === 'Approved' &&
-          release.permissions?.canViewRelease, // We don't display scheduled releases they have no permission to view
+          release.permissions?.canViewReleaseVersion, // We don't display scheduled releases they have no permission to view
       ) ?? []
     );
   }, [releases?.results]);
