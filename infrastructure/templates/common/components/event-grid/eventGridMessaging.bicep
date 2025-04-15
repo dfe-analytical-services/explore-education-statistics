@@ -1,4 +1,5 @@
 import { abbreviations } from '../../abbreviations.bicep'
+import { buildFullyQualifiedTopicName } from '../../functions.bicep'
 import { IpRange } from '../../types.bicep'
 
 @description('Resource prefix for all resources.')
@@ -19,9 +20,9 @@ param customTopicNames string[]
 
 module eventGridCustomTopicModule 'eventGridCustomTopic.bicep' = [
   for (topicName, index) in customTopicNames: {
-    name: '${index}eventGridCustomTopicModuleDeploy'
+    name: 'eventGridCustomTopicModuleDeploy-${index}'
     params: {
-      name: '${resourcePrefix}-${abbreviations.eventGridTopics}-${topicName}'
+      name: buildFullyQualifiedTopicName(resourcePrefix, topicName)
       location: location
       ipRules: ipRules
       publicNetworkAccess: 'Enabled'

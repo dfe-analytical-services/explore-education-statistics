@@ -46,14 +46,6 @@ var tagValues = union(resourceTags ?? {}, {
   DateProvisioned: dateProvisioned
 })
 
-// Custom Event Grid topics used by Admin and Publisher to publish events
-var eventGridCustomTopicNames = [
-  'publication-changed'
-  'release-changed'
-  'release-version-changed'
-  'theme-changed'
-]
-
 var maintenanceFirewallRules = [
   for maintenanceIpRange in maintenanceIpRanges: {
     name: maintenanceIpRange.name
@@ -67,6 +59,8 @@ var resourcePrefix = '${subscription}-ees'
 
 var resourceNames = {
   existingResources: {
+    adminApp: '${subscription}-as-ees-admin'
+    publisherFunction: '${subscription}-fa-ees-publisher'
     keyVault: '${subscription}-kv-ees-01'
     vNet: '${subscription}-vnet-ees'
     alertsGroup: '${subscription}-ag-ees-alertedusers'
@@ -89,13 +83,18 @@ module applicationInsightsModule 'application/searchApplicationInsights.bicep' =
   }
 }
 
-module eventGridMessagingModule '../common/components/event-grid/eventGridMessaging.bicep' = {
-  name: 'eventGridMessagingModule'
+// Provision the event messaging infrastructure utilised by EES for communication between services.
+// While not exclusively part of the Search service infrastructure, it is included here to support
+// other services that publish events but are not yet defined in Bicep such as the Admin App Service
+// and the Publisher Function App.
+// The Search Service relies on this infrastructure to subscribe to events.
+module eventMessagingModule 'application/eventMessaging.bicep' = {
+  name: 'eventMessagingModule'
   params: {
     location: location
+    ipRules: [] // TODO EES-6036 Should be maintenanceIpRanges
     resourcePrefix: resourcePrefix
-    customTopicNames: eventGridCustomTopicNames
-    ipRules: maintenanceIpRanges
+    resourceNames: resourceNames
     tagValues: tagValues
   }
 }
@@ -139,6 +138,9 @@ module searchDocsFunctionEventSubscriptionsModule 'application/searchDocsFunctio
     searchDocsFunctionAppStorageAccountName: searchDocsFunctionModule.outputs.functionAppStorageAccountName
     storageQueueNames: searchDocsFunctionModule.outputs.storageQueueNames
   }
+  dependsOn: [
+    eventMessagingModule
+  ]
 }
 
 module searchServiceModule 'application/searchService.bicep' = {

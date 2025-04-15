@@ -1,5 +1,7 @@
 import { abbreviations } from '../../common/abbreviations.bicep'
-import { ResourceNames, SearchStorageQueueNames } from '../types.bicep'
+import { eventTopics } from '../../common/eventTopics.bicep'
+import { buildFullyQualifiedTopicName } from '../../common/functions.bicep'
+import { SearchStorageQueueNames } from '../types.bicep'
 
 @description('Resource prefix for all resources.')
 param resourcePrefix string
@@ -13,7 +15,7 @@ param searchDocsFunctionAppStorageAccountName string
 // Define each of the topics and their associated subscriptions
 var eventGridCustomTopicSubscriptions = [
   {
-    topic: 'publication-changed'
+    topicName: eventTopics.publicationChanged
     subscriptions: [
       {
         name: 'publication-changed'
@@ -28,7 +30,7 @@ var eventGridCustomTopicSubscriptions = [
     ]
   }
   {
-    topic: 'release-changed'
+    topicName: eventTopics.releaseChanged
     subscriptions: [
       {
         name: 'release-slug-changed'
@@ -38,7 +40,7 @@ var eventGridCustomTopicSubscriptions = [
     ]
   }
   {
-    topic: 'release-version-changed'
+    topicName: eventTopics.releaseVersionChanged
     subscriptions: [
       {
         name: 'release-version-published'
@@ -48,7 +50,7 @@ var eventGridCustomTopicSubscriptions = [
     ]
   }
   {
-    topic: 'theme-changed'
+    topicName: eventTopics.themeChanged
     subscriptions: [
       {
         name: 'theme-changed'
@@ -61,17 +63,17 @@ var eventGridCustomTopicSubscriptions = [
 
 var subscriptions = flatten(map(
   eventGridCustomTopicSubscriptions,
-  item => map(item.subscriptions, subscription => { topic: item.topic, ...subscription })
+  item => map(item.subscriptions, subscription => { topicName: item.topicName, ...subscription })
 ))
 
 // The functions have Queue trigger bindings rather than Event Grid trigger bindings,
 // so Event Grid subscriptions are created using storage queues as destinations.
 module eventGridQueueSubscriptionModuleDeploy '../../common/components/event-grid/eventGridCustomTopicQueueSubscription.bicep' = [
   for (subscription, index) in subscriptions: {
-    name: '${index}eventGridQueueSubscriptionModuleDeploy'
+    name: 'eventGridQueueSubscriptionModuleDeploy-${index}'
     params: {
       name: '${resourcePrefix}-${abbreviations.eventGridSubscriptions}-${subscription.name}'
-      topicName: '${resourcePrefix}-${abbreviations.eventGridTopics}-${subscription.topic}'
+      topicName: buildFullyQualifiedTopicName(resourcePrefix, subscription.topicName)
       includedEventTypes: subscription.includedEventTypes
       storageAccountName: searchDocsFunctionAppStorageAccountName
       queueName: subscription.queueName
