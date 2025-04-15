@@ -1741,8 +1741,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         .SetPublicApiDataSetVersion(dataSetVersion.SemVersion()))
                 .GenerateTuple2();
 
-            var mappingService = new Mock<IDataSetVersionMappingService>(Strict);
-            mappingService.Setup(service => service.GetMappingCompletionStatus(
+            var mappingService = new Mock<IDataSetService>(Strict);
+            mappingService.Setup(service => service.GetMappingStatus(
                     It.IsAny<Guid>(),
                     It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new MappingStatusViewModel
@@ -1785,7 +1785,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     dataSetVersionService: dataSetVersionService.Object,
                     timePeriodService: timePeriodService.Object,
                     locationRepository: locationRepository.Object,
-                    dataSetVersionMappingService: mappingService.Object
+                    dataSetService: mappingService.Object
                     );
 
                 var result = await replacementService.GetReplacementPlan(
@@ -4493,7 +4493,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             ITimePeriodService? timePeriodService = null,
             ICacheKeyService? cacheKeyService = null,
             IPrivateBlobCacheService? privateBlobCacheService = null,
-            IDataSetVersionMappingService dataSetVersionMappingService = null
+            IDataSetService dataSetService = null
             )
         {
             return new ReplacementService(
@@ -4510,7 +4510,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 AlwaysTrueUserService().Object,
                 cacheKeyService ?? Mock.Of<ICacheKeyService>(Strict),
                 privateBlobCacheService ?? Mock.Of<IPrivateBlobCacheService>(Strict),
-                dataSetVersionMappingService ?? Mock.Of<IDataSetVersionMappingService>(Strict)
+                dataSetService ?? Mock.Of<IDataSetService>(Strict)
             );
         }
     }

@@ -9,7 +9,6 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Cache
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
-using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Chart;
@@ -26,7 +25,6 @@ using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
 using IReleaseVersionService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IReleaseVersionService;
@@ -38,7 +36,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
     {
         private readonly ContentDbContext _contentDbContext;
         private readonly StatisticsDbContext _statisticsDbContext;
-        private readonly IDataSetVersionMappingService _dataSetVersionMappingService;
+        private readonly IDataSetService _dataSetService;
         private readonly IFilterRepository _filterRepository;
         private readonly IIndicatorRepository _indicatorRepository;
         private readonly IIndicatorGroupRepository _indicatorGroupRepository;
@@ -66,7 +64,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             IUserService userService,
             ICacheKeyService cacheKeyService,
             IPrivateBlobCacheService privateCacheService,
-            IDataSetVersionMappingService dataSetVersionMappingService)
+            IDataSetService dataSetService)
         {
             _contentDbContext = contentDbContext;
             _statisticsDbContext = statisticsDbContext;
@@ -80,7 +78,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _timePeriodService = timePeriodService;
             _userService = userService;
             _cacheKeyService = cacheKeyService;
-            _dataSetVersionMappingService = dataSetVersionMappingService;
+            _dataSetService = dataSetService;
             _privateCacheService = privateCacheService;
         }
 
@@ -91,7 +89,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             CancellationToken cancellationToken = default)
         {
             return await _contentDbContext.ReleaseVersions
-                .FirstOrNotFoundAsync(rv => rv.Id == releaseVersionId)
+                .FirstOrNotFoundAsync(rv => rv.Id == releaseVersionId, cancellationToken: cancellationToken)
                 .OnSuccess(_userService.CheckCanUpdateReleaseVersion)
                 .OnSuccess(() => CheckReleaseFilesExist(releaseVersionId: releaseVersionId,
                     originalFileId: originalFileId,
@@ -123,7 +121,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     ApiDataSetVersionPlanViewModel? apiDataSetVersionPlan = null;
                     if (tuple.replacementReleaseFile.PublicApiDataSetId is not null)
                     {
-                        var completionStatus = await _dataSetVersionMappingService.GetMappingCompletionStatus(tuple.apiDataSetVersion!.Id, cancellationToken);
+                        var completionStatus = await _dataSetService.GetMappingStatus(tuple.apiDataSetVersion!.Id, cancellationToken);
 
                         apiDataSetVersionPlan = new ApiDataSetVersionPlanViewModel
                         {

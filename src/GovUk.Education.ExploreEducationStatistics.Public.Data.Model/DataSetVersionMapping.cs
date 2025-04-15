@@ -25,9 +25,9 @@ public class DataSetVersionMapping : ICreatedUpdatedTimestamps<DateTimeOffset, D
     public FilterMappingPlan FilterMappingPlan { get; set; } = null!;
 
     public bool LocationMappingsComplete { get; set; }
-    
+
     public bool FilterMappingsComplete { get; set; }
-    
+
     // Use boolean flags to describe meta types that have been deleted and cannot be
     // changed via mapping currently. We can use this when calculating the version number.
     // We've gone with this approach for simplicity and expedience, but we may need to

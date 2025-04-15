@@ -30,7 +30,8 @@ public class DataSetVersionMappingService(
     IPostgreSqlRepository postgreSqlRepository,
     IUserService userService,
     PublicDataDbContext publicDataDbContext,
-    ContentDbContext contentDbContext)
+    ContentDbContext contentDbContext,
+    IDataSetService dataSetService)
     : IDataSetVersionMappingService
 {
     private static readonly MappingType[] IncompleteMappingTypes =
@@ -181,8 +182,10 @@ public class DataSetVersionMappingService(
         //         && import.DataSetVersionToPatch != null,//TODO: Handle in EES-5996
         //     cancellationToken);
 
-        var doesNotRequireManualMapping = await IsMappingComplete(nextDataSetVersionId, cancellationToken);
 
+        var mapping = await dataSetService.GetMappingStatus(nextDataSetVersionId, cancellationToken);
+        var doesNotRequireManualMapping = mapping is { LocationsComplete: true, FiltersComplete: true };
+        
         var isMajorVersionUpdate = await IsMajorVersionUpdate(
             nextDataSetVersionId,
             locationMappingTypes,
@@ -216,44 +219,6 @@ public class DataSetVersionMappingService(
         releaseFile.PublicApiDataSetVersion = targetDataSetVersion.SemVersion();
 
         await contentDbContext.SaveChangesAsync(cancellationToken);
-    }
-
-    private async Task<bool> IsMappingComplete(Guid nextDataSetVersionId, CancellationToken cancellationToken)
-    {
-        var mapping = await GetMappingCompletionStatus(nextDataSetVersionId, cancellationToken);
-
-        return mapping is { LocationsComplete: true, FiltersComplete: true };
-    }
-    public async Task<MappingStatusViewModel?> GetMappingCompletionStatus(Guid targetDataSetVersionId, CancellationToken cancellationToken = default)
-    {
-        var mapping = await publicDataDbContext
-            .DataSetVersionMappings
-            .Include(mapping => mapping.TargetDataSetVersion)
-            .FirstOrDefaultAsync(mapping => mapping.TargetDataSetVersionId == targetDataSetVersionId, cancellationToken);
-
-        if (mapping is null)
-        {
-            return null;
-        }
-
-        var locationsComplete = !mapping.LocationMappingPlan.Levels
-            // Ignore any levels where candidates or mappings are empty as this means the level
-            // has been added or deleted from the data set and is not a mappable change.
-            .Where(level => level.Value.Candidates.Count != 0 && level.Value.Mappings.Count != 0)
-            .Any(level => level.Value.Mappings
-                .Any(optionMapping => IncompleteMappingTypes.Contains(optionMapping.Value.Type)));
-        var filtersComplete = !mapping.FilterMappingPlan
-            .Mappings
-            .Where(filterMapping => filterMapping.Value.Type != MappingType.AutoNone)
-            .SelectMany(filterMapping => filterMapping.Value.OptionMappings)
-            .Any(optionMapping => IncompleteMappingTypes.Contains(optionMapping.Value.Type));
-        
-        var mappingStatus = new MappingStatusViewModel
-        {
-            LocationsComplete = locationsComplete,
-            FiltersComplete = filtersComplete
-        };
-        return mappingStatus;
     }
 
     private async Task<bool> IsMajorVersionUpdate(

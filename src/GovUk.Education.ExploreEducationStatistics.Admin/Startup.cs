@@ -964,8 +964,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                 BatchFilterOptionMappingUpdatesRequest request,
                 CancellationToken cancellationToken = default) =>
             throw new NotImplementedException();
-
-        public Task<MappingStatusViewModel?> GetMappingCompletionStatus(Guid targetDataSetVersionId, CancellationToken cancellationToken = default) => throw new NotImplementedException();
     }
 
     internal class NoOpPreviewTokenService : IPreviewTokenService
