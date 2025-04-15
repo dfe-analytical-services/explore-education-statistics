@@ -138,7 +138,7 @@ public abstract class CreateNextDataSetVersionMappingsFunctionTests(
             {
                 context.DataSets.Add(dataSet);
             });
-            DataSetVersion verseion1 = DataFixture
+            DataSetVersion version1 = DataFixture
                 .DefaultDataSetVersion()
                 .WithDefaults()
                 .WithVersionNumber(1, 0, 0)
@@ -154,11 +154,11 @@ public abstract class CreateNextDataSetVersionMappingsFunctionTests(
                 .WithVersionNumber(2, 0, 0)
                 .WithStatusPublished();
             
-            dataSet.Versions.AddRange([verseion1, versionUnderTest, version3]);
+            dataSet.Versions.AddRange([version1, versionUnderTest, version3]);
             
             await AddTestData<PublicDataDbContext>(context =>
             {
-                context.DataSetVersions.AddRange([verseion1, versionUnderTest, version3]);
+                context.DataSetVersions.AddRange([version1, versionUnderTest, version3]);
                 dataSet.LatestLiveVersion = version3;
                 context.DataSets.Update(dataSet);
             });
