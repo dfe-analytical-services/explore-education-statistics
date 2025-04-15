@@ -54,6 +54,7 @@ const DataBlockSelectForm = ({
   return (
     <form className="govuk-!-text-align-left" id={id}>
       <FormSelect
+        autoFocus
         className="govuk-!-margin-right-1"
         id={`${id}-selectedDataBlock`}
         name="selectedDataBlock"
