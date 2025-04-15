@@ -209,6 +209,7 @@ export default function TableToolWizard({
         },
         latestRelease: {
           title: latestRelease.title,
+          slug: latestRelease.slug,
         },
       };
     });

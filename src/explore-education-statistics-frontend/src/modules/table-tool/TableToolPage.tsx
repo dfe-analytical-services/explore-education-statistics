@@ -351,6 +351,7 @@ export const getServerSideProps: GetServerSideProps<
           },
           latestRelease: {
             title: latestRelease.title,
+            slug: latestRelease.slug,
           },
         },
         selectedSubjectId: subjectId,
@@ -375,6 +376,7 @@ export const getServerSideProps: GetServerSideProps<
         },
         latestRelease: {
           title: latestRelease.title,
+          slug: latestRelease.slug,
         },
       },
       subjects,

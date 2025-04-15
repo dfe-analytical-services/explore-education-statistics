@@ -5,6 +5,7 @@ export interface SelectedPublication extends PublicationTreeSummary {
   selectedRelease: SelectedRelease;
   latestRelease: {
     title: string;
+    slug: string;
   };
 }
 

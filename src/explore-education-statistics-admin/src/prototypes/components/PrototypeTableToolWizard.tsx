@@ -162,6 +162,7 @@ const PrototypeTableToolWizard = ({
         },
         latestRelease: {
           title: latestRelease.title,
+          slug: latestRelease.slug,
         },
         isSuperseded: false,
       };
