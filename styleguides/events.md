@@ -27,13 +27,13 @@ There are many parts to raising and consuming an event in the EES system.
 
 | Part              | Description                                                   |
 | --                | --                                                            |
-| event domain model      | Our representation of the event. It also contains the code to create the EventGridEvent | 
-| method on Event Raiser | Consumers wishing to raise the event do so by calling the Event Raiser e.g. IAdminEventRaiser.OnThemeChanged |
-| topic             | a grouping of event types in Azure's Event Grid |
-| the topic configuration | The topic details are read from configuation. This is setup in bicep. |
-| subscription      | when an event is raised, it is handled by zero or more subscriptions. Typically, the event is copied into a handler queue to await processing |
-| queue             | Holds a queue of event messages ready to be processed |
-| event handler     | Some code that performs a task in response to an event being raised. For example, there are Azure functions that consume the events that are queued by the subscription. |
+| Event Domain Model      | Our representation of the event. It also contains the code to create the EventGridEvent | 
+| Method on Event Raiser | Consumers wishing to raise the event do so by calling the Event Raiser e.g. IAdminEventRaiser.OnThemeChanged |
+| Topic             | a grouping of event types in Azure's Event Grid. In Azure terminology, we use _Custom Topics_. See [Azure Documentation on Custom Topics](https://learn.microsoft.com/en-us/azure/event-grid/custom-topics) |
+| Topic Configuration | The topic details are read from configuation. This is setup in bicep. |
+| Subscription      | when an event is raised, it is handled by zero or more subscriptions. Typically, the event is copied into a handler queue to await processing |
+| Queue             | Holds a queue of event messages ready to be processed by the Event Handler |
+| Event Handler     | Some code that performs a task in response to an event being raised. For example, there are Azure functions that consume the events that are queued by the subscription. |
 
 ## Creating the Domain Event Model
 
@@ -130,7 +130,7 @@ The heavy lifting is already done by the somain model and the IEventRaiser.
 Each event is published to a specific Topic. If a new Topic is being introduced, then there some configuration and infrastructure steps that need to be added.
 
 ### Configuration
-Each Topic endpoint must be configured so that the Event Topic client knows where to send the event request. Within our Azure environments, we are utilsing role based security, so the topic access keys remain blank. However, the access keys are required should one wish to invoke them from a local development machine.
+Each Topic endpoint must be configured so that the Event Topic client knows where to send the event request. The EES Azure environments utilse role based security, so the topic access keys remain blank. Further more, EES Topics can not be accessed from outside of the Azure subscription, and the use of access keys is disabled. The feature remains to enable testing against a separate Azure subscription.
 
 The shape of the Topic configuration is as follows.
 ```json
@@ -163,7 +163,7 @@ The shape of the Topic configuration is as follows.
 
 #### Declaring the new Topic
 
-#### Declaring an event handler queue
+#### Declaring Topic Subscriptions
 
 
 # Further Details
