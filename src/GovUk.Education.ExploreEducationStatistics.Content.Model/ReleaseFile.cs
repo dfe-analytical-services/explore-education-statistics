@@ -28,7 +28,7 @@ public class ReleaseFile
     public SemVersion? PublicApiDataSetVersion { get; set; }
 
     public string? PublicApiDataSetVersionString => PublicApiDataSetVersion is not null
-        ? $"{PublicApiDataSetVersion.Major}.{PublicApiDataSetVersion.Minor}.{PublicApiDataSetVersion.Patch}"
+        ? $"{PublicApiDataSetVersion.Major}.{PublicApiDataSetVersion.Minor}"
         : null;
 
     public List<FilterSequenceEntry>? FilterSequence { get; set; }
