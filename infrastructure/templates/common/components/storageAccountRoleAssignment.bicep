@@ -27,7 +27,7 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2023-01-01' existing 
 // Create the role assignment. Note that this is dependent on the deploying service principal having
 // "Microsoft.Authorization/roleAssignments/write" permissions on the Storage Account via an appropriate
 // role.
-resource keyVaultRoleAssignments 'Microsoft.Authorization/roleAssignments@2022-04-01' = [for principalId in principalIds: {
+resource storageAccountRoleAssignments 'Microsoft.Authorization/roleAssignments@2022-04-01' = [for principalId in principalIds: {
   scope: storageAccount
   name: guid(storageAccount.id, principalId, rolesToRoleIds[role])
   properties: {

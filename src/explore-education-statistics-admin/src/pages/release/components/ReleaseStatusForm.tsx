@@ -33,7 +33,7 @@ import Yup from '@common/validation/yup';
 import { endOfDay, format, isValid, parseISO } from 'date-fns';
 import keyBy from 'lodash/keyBy';
 import mapValues from 'lodash/mapValues';
-import React, { useMemo } from 'react';
+import React, { useMemo, useRef } from 'react';
 import { ObjectSchema } from 'yup';
 
 export interface ReleaseStatusFormValues {
@@ -98,6 +98,38 @@ const ReleaseStatusForm = ({
   const [showConfirmScheduleModal, toggleConfirmScheduleModal] =
     useToggle(false);
   const [showScheduleErrorModal, toggleScheduleErrorModal] = useToggle(false);
+
+  const submitButtonRef = useRef<HTMLButtonElement>(null);
+
+  const closeConfirmScheduleModal = () => {
+    toggleConfirmScheduleModal.off();
+    setTimeout(() => {
+      submitButtonRef.current?.focus();
+    }, 1);
+  };
+
+  const handlePreSubmit = async ({
+    approvalStatus,
+    publishMethod,
+    publishScheduled,
+    ...values
+  }: ReleaseStatusFormValues) => {
+    if (
+      approvalStatus === 'Approved' &&
+      publishMethod === 'Scheduled' &&
+      publishScheduled
+    ) {
+      toggleConfirmScheduleModal.on();
+      return;
+    }
+
+    await handleSubmitForm({
+      approvalStatus,
+      publishMethod,
+      publishScheduled,
+      ...values,
+    });
+  };
 
   const handleSubmitForm = async ({
     approvalStatus,
@@ -239,7 +271,7 @@ const ReleaseStatusForm = ({
         const approvalStatus = watch('approvalStatus');
         return (
           <>
-            <Form id={formId} onSubmit={handleSubmitForm}>
+            <Form id={formId} onSubmit={handlePreSubmit}>
               <FormFieldRadioGroup<ReleaseStatusFormValues>
                 legend="Status"
                 name="approvalStatus"
@@ -362,39 +394,22 @@ const ReleaseStatusForm = ({
               />
 
               <ButtonGroup>
+                <Button
+                  type="submit"
+                  disabled={formState.isSubmitting}
+                  ref={submitButtonRef}
+                >
+                  Update status
+                </Button>
                 <ModalConfirm
                   title="Confirm publish date"
                   open={showConfirmScheduleModal}
                   onConfirm={async () => {
                     await handleSubmit(handleSubmitForm)();
-                    toggleConfirmScheduleModal.off();
+                    closeConfirmScheduleModal();
                   }}
-                  onCancel={toggleConfirmScheduleModal.off}
-                  onExit={toggleConfirmScheduleModal.off}
-                  triggerButton={
-                    <Button
-                      type="submit"
-                      disabled={formState.isSubmitting}
-                      onClick={async e => {
-                        e.preventDefault();
-
-                        if (
-                          approvalStatus === 'Approved' &&
-                          getValues('publishMethod') === 'Scheduled' &&
-                          getValues('publishScheduled')
-                        ) {
-                          if (formState.isValid) {
-                            toggleConfirmScheduleModal.on();
-                            return;
-                          }
-                        }
-
-                        await handleSubmit(handleSubmitForm)();
-                      }}
-                    >
-                      Update status
-                    </Button>
-                  }
+                  onCancel={closeConfirmScheduleModal}
+                  onExit={closeConfirmScheduleModal}
                 >
                   <p>
                     This release will be published at 09:30 on{' '}

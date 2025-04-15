@@ -30,7 +30,7 @@ param analyticsFunctionAppExists bool = true
 param maintenanceIpRanges IpRange[] = []
 
 @description('The cron schedule for the Public API queries consumer Function. Defaults to every hour.')
-param publicApiQueryConsumerCron string = '0 0 * * * *'
+param analyticsRequestFilesConsumerCron string = '0 0 * * * *'
 
 var tagValues = union(resourceTags ?? {}, {
   Environment: environmentName
@@ -105,7 +105,7 @@ module analyticsFunctionAppModule 'application/analyticsFunctionApp.bicep' = {
     applicationInsightsConnectionString: applicationInsightsModule.outputs.applicationInsightsConnectionString
     analyticsStorageAccountName: analyticsStorageModule.outputs.storageAccountName
     analyticsFileShareName: analyticsStorageModule.outputs.fileShareName
-    publicApiQueryConsumerCron: publicApiQueryConsumerCron
+    analyticsRequestFilesConsumerCron: analyticsRequestFilesConsumerCron
     tagValues: tagValues
   }
 }

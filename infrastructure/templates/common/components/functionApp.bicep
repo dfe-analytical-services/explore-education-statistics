@@ -77,12 +77,8 @@ param allowedOrigins array = []
 @description('Specifies an optional URL for Azure to use to monitor the health of this resource')
 param healthCheckPath string?
 
-@description('An existing Managed Identity\'s Resource Id with which to associate this Function App.')
-param userAssignedManagedIdentityParams {
-  id: string
-  name: string
-  principalId: string
-}?
+@description('The name of a user-assigned managed identity to assign to the resource.')
+param userAssignedIdentityName string = ''
 
 @description('Specifies the SKU for the Function App hosting plan.')
 param sku object
@@ -126,17 +122,6 @@ var firewallRules = [
   }
 ]
 
-var identity = userAssignedManagedIdentityParams != null
-  ? {
-      type: 'UserAssigned'
-      userAssignedIdentities: {
-        '${userAssignedManagedIdentityParams!.id}': {}
-      }
-    }
-  : {
-      type: 'SystemAssigned'
-    }
-
 var storageAlerts = alerts != null
   ? {
       availability: alerts!.storageAccountAvailability
@@ -156,6 +141,12 @@ var fileServiceAlerts = alerts != null
 
 resource keyVault 'Microsoft.KeyVault/vaults@2023-07-01' existing = {
   name: keyVaultName
+}
+
+var identityType = !empty(userAssignedIdentityName) ? 'SystemAssigned, UserAssigned' : 'SystemAssigned'
+
+resource userAssignedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2024-11-30' existing = if (!empty(userAssignedIdentityName)) {
+  name: userAssignedIdentityName
 }
 
 module appServicePlanModule '../../public-api/components/appServicePlan.bicep' = {
@@ -210,7 +201,10 @@ resource functionApp 'Microsoft.Web/sites@2024-04-01' = {
   name: functionAppName
   location: location
   kind: (operatingSystem == 'Linux' ? 'functionapp,linux' : 'functionapp')
-  identity: identity
+  identity: {
+    type: identityType
+    userAssignedIdentities: !empty(userAssignedIdentityName) ? { '${userAssignedIdentity.id}': {} } : null
+  }
   properties: {
     containerSize: instanceMemoryMB
     reserved: operatingSystem == 'Linux'
@@ -313,7 +307,7 @@ resource azureStorageAccountsConfig 'Microsoft.Web/sites/config@2023-12-01' = if
 module keyVaultRoleAssignmentModule '../../public-api/components/keyVaultRoleAssignment.bicep' = {
   name: '${functionAppName}KeyVaultRoleAssignmentModuleDeploy'
   params: {
-    principalIds: userAssignedManagedIdentityParams != null ? [userAssignedManagedIdentityParams!.principalId] : [functionApp.identity.principalId]
+    principalIds: [functionApp.identity.principalId]
     keyVaultName: keyVault.name
     role: 'Secrets User'
   }
@@ -411,3 +405,5 @@ module expectedHttpStatusCodeAlerts '../../public-api/components/alerts/dynamicM
 
 output name string = functionApp.name
 output url string = 'https://${functionApp.name}.azurewebsites.net'
+output functionAppIdentityPrincipalId string = functionApp.identity.principalId
+output storageAccountName string = storageAccountModule.outputs.storageAccountName

@@ -35,7 +35,9 @@ public partial class ReleaseService(
     IPublicationCacheService publicationCacheService,
     IReleasePublishingStatusRepository releasePublishingStatusRepository,
     IRedirectsCacheService redirectsCacheService,
-    IGuidGenerator guidGenerator) : IReleaseService
+    IAdminEventRaiser adminEventRaiser,
+    IGuidGenerator guidGenerator,
+    IReleaseSlugValidator releaseSlugValidator) : IReleaseService
 {
     public async Task<Either<ActionResult, ReleaseVersionViewModel>> CreateRelease(ReleaseCreateRequest request)
     {
@@ -44,7 +46,9 @@ public partial class ReleaseService(
                 .SingleOrNotFoundAsync(p => p.Id == request.PublicationId))
             .OnSuccess(userService.CheckCanCreateReleaseForPublication)
             .OnSuccessDo(async _ =>
-                await ValidateReleaseSlugUniqueToPublication(request.Slug, request.PublicationId))
+                await releaseSlugValidator.ValidateNewSlug(
+                    newReleaseSlug: request.Slug, 
+                    publicationId: request.PublicationId))
             .OnSuccess(async publication =>
             {
                 var release = new Release
@@ -125,7 +129,7 @@ public partial class ReleaseService(
                 var releaseIsLive = latestPublishedReleaseVersion is not null;
                 var slugHasChanged = releaseAndSlugs.oldReleaseSlug != releaseAndSlugs.newReleaseSlug;
 
-                var releaseData = (releaseAndSlugs.oldReleaseSlug, slugHasChanged, releaseIsLive);
+                var releaseData = (releaseAndSlugs, slugHasChanged, releaseIsLive);
 
                 return releaseIsLive
                     ? await UpdateReleaseCache(
@@ -142,10 +146,22 @@ public partial class ReleaseService(
                 return releaseData.releaseIsLive && releaseData.slugHasChanged
                     ? await CreateReleaseRedirect(
                         releaseId: releaseId,
-                        oldReleaseSlug: releaseData.oldReleaseSlug,
+                        oldReleaseSlug: releaseData.releaseAndSlugs.oldReleaseSlug,
                         cancellationToken: cancellationToken)
                     : Unit.Instance;
             })
+            .OnSuccessDo(async releaseData =>
+                {
+                    if (releaseData.releaseIsLive && releaseData.slugHasChanged)
+                    {
+                        await adminEventRaiser.OnReleaseSlugChanged(
+                            releaseId, 
+                            releaseData.releaseAndSlugs.newReleaseSlug,
+                            releaseData.releaseAndSlugs.release.PublicationId,
+                            releaseData.releaseAndSlugs.release.Publication.Slug
+                            );
+                    }
+                })
             .OnSuccess(async () => await GetRelease(releaseId))
             .OnSuccess(MapRelease);
     }
@@ -201,32 +217,13 @@ public partial class ReleaseService(
 
         var oldReleaseSlug = release.Slug;
 
-        return await ValidateReleaseSlugUniqueToPublication(
-                slug: newReleaseSlug,
-                publicationId: release.PublicationId,
+        return await releaseSlugValidator.ValidateNewSlug(
+                newReleaseSlug: newReleaseSlug, 
+                publicationId: release.PublicationId, 
                 releaseId: release.Id,
                 cancellationToken: cancellationToken)
             .OnSuccess(async _ => await ValidateReleaseIsNotUndergoingPublishing(release.Id, cancellationToken))
-            .OnSuccess(async _ => await ValidateReleaseRedirectDoesNotExistForNewSlug(
-                releaseId: release.Id,
-                newReleaseSlug: newReleaseSlug,
-                cancellationToken: cancellationToken))
             .OnSuccess(_ => (release, oldReleaseSlug, newReleaseSlug));
-    }
-
-    private async Task<Either<ActionResult, Unit>> ValidateReleaseSlugUniqueToPublication(
-        string slug,
-        Guid publicationId,
-        Guid? releaseId = null,
-        CancellationToken cancellationToken = default)
-    {
-        var slugAlreadyExists = await context.Releases
-            .Where(r => r.PublicationId == publicationId)
-            .AnyAsync(r => r.Slug == slug && r.Id != releaseId, cancellationToken: cancellationToken);
-
-        return slugAlreadyExists
-            ? ValidationActionResult(SlugNotUnique)
-            : Unit.Instance;
     }
 
     private async Task<Either<ActionResult, Unit>> ValidateReleaseIsNotUndergoingPublishing(
@@ -253,18 +250,6 @@ public partial class ReleaseService(
 
         return releaseVersionPublishingStartedStatuses.Any()
             ? ValidationActionResult(ReleaseUndergoingPublishing)
-            : Unit.Instance;
-    }
-
-    private async Task<Either<ActionResult, Unit>> ValidateReleaseRedirectDoesNotExistForNewSlug(
-        Guid releaseId,
-        string newReleaseSlug, 
-        CancellationToken cancellationToken)
-    {
-        return await context.ReleaseRedirects
-            .Where(rr => rr.ReleaseId == releaseId)
-            .AnyAsync(rr => rr.Slug == newReleaseSlug, cancellationToken: cancellationToken)
-            ? ValidationActionResult(ReleaseSlugUsedByRedirect)
             : Unit.Instance;
     }
 

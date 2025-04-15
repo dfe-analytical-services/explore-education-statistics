@@ -1,12 +1,21 @@
 import { abbreviations } from '../../common/abbreviations.bicep'
 import { IpRange, FirewallRule } from '../../common/types.bicep'
-import { ResourceNames } from '../types.bicep'
+import { ResourceNames, SearchStorageQueueNames } from '../types.bicep'
 
 @description('The URL of the Content API.')
 param contentApiUrl string
 
 @description('The IP address ranges that can access the Search Docs Function App endpoints.')
 param functionAppFirewallRules FirewallRule[]
+
+@description('Specifies the base URL of the Search Service endpoint for interacting with the data plane REST API. For example: https://[search-service-name].search.windows.net')
+param searchServiceEndpoint string
+
+@description('Specifies the Search Service indexer name.')
+param searchServiceIndexerName string
+
+@description('Specifies the Search Service name.')
+param searchServiceName string
 
 @description('Name of the Search storage account.')
 param searchStorageAccountName string
@@ -39,11 +48,26 @@ param applicationInsightsConnectionString string = ''
 @description('Specifies whether or not the Search Docs Function App already exists.')
 param functionAppExists bool
 
+@description('The name of the queue that is used when a publication is changed.')
+param publicationChangedQueueName string = 'publication-changed-queue'
+
+@description('The name of the queue that is used when the latest published release of a publication changes due to reordering.')
+param publicationLatestPublishedReleaseReorderedQueueName string = 'publication-latest-published-release-reordered-queue'
+
+@description('The name of the queue that is used when a searchable document requires a refresh.')
+param refreshSearchableDocumentQueueName string = 'refresh-searchable-document-queue'
+
+@description('The name of the queue that is used when a release slug is changed.')
+param releaseSlugChangedQueueName string = 'release-slug-changed-queue'
+
 @description('The name of the queue that is used when a release version is published.')
 param releaseVersionPublishedQueueName string = 'release-version-published-queue'
 
 @description('The name of the queue that is used when a searchable document is created.')
 param searchableDocumentCreatedQueueName string = 'search-document-created-queue'
+
+@description('The name of the queue that is used when a theme is updated.')
+param themeUpdatedQueueName string = 'theme-updated-queue'
 
 @description('Specifies a set of tags with which to tag the resource in Azure.')
 param tagValues object
@@ -80,6 +104,10 @@ resource searchableDocumentsContainer 'Microsoft.Storage/storageAccounts/blobSer
   name: searchableDocumentsContainerName
 }
 
+resource searchService 'Microsoft.Search/searchServices@2024-06-01-preview' existing = {
+  name: searchServiceName
+}
+
 module functionAppModule '../../common/components/functionApp.bicep' = {
   name: 'searchDocsFunctionAppModuleDeploy'
   params: {
@@ -97,8 +125,33 @@ module functionAppModule '../../common/components/functionApp.bicep' = {
         value: searchableDocumentsContainer.name
       }
       {
+        name: 'AzureSearch__SearchServiceEndpoint'
+        // Should be able to replace this with searchService.properties.endpoint in future using API version 2025-02-01-preview or later
+        value: searchServiceEndpoint
+      }
+      {
+        name: 'AzureSearch__IndexerName'
+        value: searchServiceIndexerName
+      }
+      {
         name: 'ContentApi__Url'
         value: contentApiUrl
+      }
+      {
+        name: 'PublicationChangedQueueName'
+        value: publicationChangedQueueName
+      }
+      {
+        name: 'PublicationLatestPublishedReleaseReorderedQueueName'
+        value: publicationLatestPublishedReleaseReorderedQueueName
+      }
+      {
+        name: 'RefreshSearchableDocumentQueueName'
+        value: refreshSearchableDocumentQueueName
+      }
+      {
+        name: 'ReleaseSlugChangedQueueName'
+        value: releaseSlugChangedQueueName
       }
       {
         name: 'ReleaseVersionPublishedQueueName'
@@ -107,6 +160,10 @@ module functionAppModule '../../common/components/functionApp.bicep' = {
       {
         name: 'SearchableDocumentCreatedQueueName'
         value: searchableDocumentCreatedQueueName
+      }
+      {
+        name: 'ThemeUpdatedQueueName'
+        value: themeUpdatedQueueName
       }
     ]
     functionAppExists: functionAppExists
@@ -131,21 +188,58 @@ module functionAppModule '../../common/components/functionApp.bicep' = {
       storageAccounts: searchDocsFunctionPrivateEndpointSubnet.id
     }
     outboundSubnetId: outboundVnetSubnet.id
-    alerts: deployAlerts ? {
-      cpuPercentage: true
-      functionAppHealth: true
-      httpErrors: true
-      memoryPercentage: true
-      storageAccountAvailability: true
-      storageLatency: false
-      fileServiceAvailability: true
-      fileServiceLatency: false
-      fileServiceCapacity: true
-      alertsGroupName: resourceNames.existingResources.alertsGroup
-    } : null
+    alerts: deployAlerts
+      ? {
+          cpuPercentage: true
+          functionAppHealth: true
+          httpErrors: true
+          memoryPercentage: true
+          storageAccountAvailability: true
+          storageLatency: false
+          fileServiceAvailability: true
+          fileServiceLatency: false
+          fileServiceCapacity: true
+          alertsGroupName: resourceNames.existingResources.alertsGroup
+        }
+      : null
     tagValues: tagValues
+  }
+}
+
+module functionAppIdentityRoleAssignmentModule '../components/searchServiceRoleAssignment.bicep' = {
+  name: 'searchDocsFunctionAppRoleAssignmentModuleDeploy'
+  params: {
+    searchServiceName: searchService.name
+    principalIds: [functionAppModule.outputs.functionAppIdentityPrincipalId]
+    role: 'Search Service Contributor'
+  }
+}
+
+module functionAppStorageAccountQueueServiceModule '../../common/components/queueService.bicep' = {
+  name: 'searchDocsFunctionAppStorageAccountQueueServiceModuleDeploy'
+  params: {
+    storageAccountName: functionAppModule.outputs.storageAccountName
+    queueNames: [
+      publicationChangedQueueName
+      publicationLatestPublishedReleaseReorderedQueueName
+      refreshSearchableDocumentQueueName
+      releaseSlugChangedQueueName
+      releaseVersionPublishedQueueName
+      searchableDocumentCreatedQueueName
+      themeUpdatedQueueName
+    ]
   }
 }
 
 output functionAppName string = functionAppModule.outputs.name
 output functionAppUrl string = functionAppModule.outputs.url
+output functionAppStorageAccountName string = functionAppModule.outputs.storageAccountName
+output storageQueueNames SearchStorageQueueNames = {
+  publicationChangedQueueName: publicationChangedQueueName
+  publicationLatestPublishedReleaseReorderedQueueName: publicationLatestPublishedReleaseReorderedQueueName
+  refreshSearchableDocumentQueueName: refreshSearchableDocumentQueueName
+  releaseSlugChangedQueueName: releaseSlugChangedQueueName
+  releaseVersionPublishedQueueName: releaseVersionPublishedQueueName
+  searchableDocumentCreatedQueueName: searchableDocumentCreatedQueueName
+  themeUpdatedQueueName: themeUpdatedQueueName
+}

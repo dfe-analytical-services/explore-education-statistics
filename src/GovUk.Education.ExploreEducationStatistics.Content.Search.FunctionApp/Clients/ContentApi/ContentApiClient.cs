@@ -93,9 +93,10 @@ internal class ContentApiClient(HttpClient httpClient) : IContentApiClient
     {
         var publicationDtos = await GetAllPaginatedItems<PublicationDto>(page => BuildGetPublicationsByThemePageEndpoint(themeId, page), cancellationToken);
         return publicationDtos
+            .Where(dto => !string.IsNullOrEmpty(dto.Slug))
             .Select(dto => new PublicationInfo
             {
-                PublicationSlug = dto.Slug
+                PublicationSlug = dto.Slug!
             })
             .ToArray();
     }
@@ -121,6 +122,16 @@ internal class ContentApiClient(HttpClient httpClient) : IContentApiClient
             // Store the latest page of results and if there are more to retrieve, loop around
             if (getResponse is GetResponse<PaginatedResultDto<TResponse>>.Success success)
             {
+                if (success.Result.Paging is null)
+                {
+                    throw new GetPaginatedItemsException("Paginated response did not contain the expected page information.");
+                }
+
+                if (success.Result.Results is null)
+                {
+                    throw new GetPaginatedItemsException("Paginated response did not contain any data.");
+                }
+
                 items.AddRange(success.Result.Results);
                 morePagesToGet = success.Result.Paging.Page < success.Result.Paging.TotalPages;
                 page++;

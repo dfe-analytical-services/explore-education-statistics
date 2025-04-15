@@ -27,15 +27,17 @@ describe('PublicationUnpublishedReleases', () => {
   const testPermissions: ReleaseVersionPermissions = {
     canAddPrereleaseUsers: false,
     canUpdateRelease: true,
-    canDeleteRelease: true,
-    canMakeAmendmentOfRelease: true,
-    canViewRelease: true,
+    canUpdateReleaseVersion: true,
+    canDeleteReleaseVersion: true,
+    canMakeAmendmentOfReleaseVersion: true,
+    canViewReleaseVersion: true,
   };
 
   const testRelease1: ReleaseVersionSummaryWithPermissions = {
     amendment: false,
     approvalStatus: 'Approved',
-    id: 'release-1',
+    id: 'release-1-version-1',
+    releaseId: 'release-1',
     live: false,
     permissions: testPermissions,
     publishScheduled: '2022-01-01T00:00:00',
@@ -54,7 +56,8 @@ describe('PublicationUnpublishedReleases', () => {
   const testRelease2: ReleaseVersionSummaryWithPermissions = {
     amendment: false,
     approvalStatus: 'Draft',
-    id: 'release-2',
+    id: 'release-2-version-1',
+    releaseId: 'release-2',
     live: false,
     permissions: testPermissions,
     slug: 'release-2-slug',
@@ -72,7 +75,8 @@ describe('PublicationUnpublishedReleases', () => {
   const testRelease3: ReleaseVersionSummaryWithPermissions = {
     amendment: true,
     approvalStatus: 'HigherLevelReview',
-    id: 'release-3',
+    id: 'release-version-1',
+    releaseId: 'release-3',
     live: false,
     permissions: testPermissions,
     slug: 'release-3-slug',
@@ -110,7 +114,7 @@ describe('PublicationUnpublishedReleases', () => {
   });
 
   test('renders tables of unpublished releases once loaded', async () => {
-    publicationService.listReleases.mockResolvedValue(testReleasesPage1);
+    publicationService.listReleaseVersions.mockResolvedValue(testReleasesPage1);
 
     render(
       <PublicationUnpublishedReleases publicationId={testPublicationId} />,
@@ -144,15 +148,49 @@ describe('PublicationUnpublishedReleases', () => {
     expect(
       within(draftRow1Cells[0]).getByText('Release 2'),
     ).toBeInTheDocument();
+    expect(within(draftRow1Cells[1]).getByText('Draft')).toBeInTheDocument();
+    expect(
+      within(draftRow1Cells[4]).getByRole('link', {
+        name: 'Edit draft Release 2',
+      }),
+    ).toBeInTheDocument();
+    expect(
+      within(draftRow1Cells[4]).getByRole('button', {
+        name: 'Delete Release 2',
+      }),
+    ).toBeInTheDocument();
+    expect(
+      within(draftRow1Cells[4]).queryByRole('button', {
+        name: 'Cancel amendment for Release 2',
+      }),
+    ).not.toBeInTheDocument();
 
     const draftRow2Cells = within(draftRows[2]).getAllByRole('cell');
     expect(
       within(draftRow2Cells[0]).getByText('Release 3'),
     ).toBeInTheDocument();
+    expect(
+      within(draftRow2Cells[1]).getByText('In Review Amendment'),
+    ).toBeInTheDocument();
+    expect(
+      within(draftRow2Cells[4]).getByRole('link', {
+        name: 'Edit draft Release 3',
+      }),
+    ).toBeInTheDocument();
+    expect(
+      within(draftRow2Cells[4]).queryByRole('button', {
+        name: 'Delete Release 3',
+      }),
+    ).not.toBeInTheDocument();
+    expect(
+      within(draftRow2Cells[4]).getByRole('button', {
+        name: 'Cancel amendment for Release 3',
+      }),
+    ).toBeInTheDocument();
   });
 
   test('shows error messages if unpublished releases could not be loaded', async () => {
-    publicationService.listReleases.mockRejectedValue(
+    publicationService.listReleaseVersions.mockRejectedValue(
       new Error('Something went wrong'),
     );
 
@@ -171,7 +209,7 @@ describe('PublicationUnpublishedReleases', () => {
   });
 
   test('shows empty messages if there are no unpublished releases', async () => {
-    publicationService.listReleases.mockResolvedValue({
+    publicationService.listReleaseVersions.mockResolvedValue({
       paging: {
         page: 1,
         pageSize: 20,
@@ -203,7 +241,7 @@ describe('PublicationUnpublishedReleases', () => {
   });
 
   test("shows empty messages if don't have permission to view draft or scheduled releases", async () => {
-    publicationService.listReleases.mockResolvedValue({
+    publicationService.listReleaseVersions.mockResolvedValue({
       paging: {
         page: 1,
         pageSize: 20,
@@ -214,17 +252,17 @@ describe('PublicationUnpublishedReleases', () => {
         {
           ...testRelease1,
           approvalStatus: 'Approved',
-          permissions: { ...testPermissions, canViewRelease: false },
+          permissions: { ...testPermissions, canViewReleaseVersion: false },
         },
         {
           ...testRelease2,
           approvalStatus: 'Draft',
-          permissions: { ...testPermissions, canViewRelease: false },
+          permissions: { ...testPermissions, canViewReleaseVersion: false },
         },
         {
           ...testRelease3,
           approvalStatus: 'HigherLevelReview',
-          permissions: { ...testPermissions, canViewRelease: false },
+          permissions: { ...testPermissions, canViewReleaseVersion: false },
         },
       ],
     });
@@ -251,7 +289,7 @@ describe('PublicationUnpublishedReleases', () => {
   });
 
   test('calls `onAmendmentDelete` handler when amendment is deleted', async () => {
-    publicationService.listReleases.mockResolvedValue(testReleasesPage1);
+    publicationService.listReleaseVersions.mockResolvedValue(testReleasesPage1);
     releaseVersionService.getDeleteReleaseVersionPlan.mockResolvedValue({
       scheduledMethodologies: [],
     });

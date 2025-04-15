@@ -88,8 +88,14 @@ export interface ReleaseSeriesItemUpdateRequest {
   legacyLinkUrl?: string;
 }
 
-export interface ListReleasesParams {
-  live?: boolean;
+export enum ReleaseVersionsType {
+  Latest,
+  LatestPublished,
+  NotPublished,
+}
+
+export interface ListReleaseVersionsParams {
+  versionsType: ReleaseVersionsType;
   page?: number;
   pageSize?: number;
   includePermissions?: boolean;
@@ -173,12 +179,12 @@ const publicationService = {
     return client.put(`publication/${publicationId}/contact`, updatedContact);
   },
 
-  listReleases<
+  listReleaseVersions<
     TReleaseVersionSummary extends
       ReleaseVersionSummary = ReleaseVersionSummary,
   >(
     publicationId: string,
-    params?: ListReleasesParams,
+    params: ListReleaseVersionsParams,
   ): Promise<PaginatedList<TReleaseVersionSummary>> {
     return client.get<PaginatedList<TReleaseVersionSummary>>(
       `/publication/${publicationId}/releases`,

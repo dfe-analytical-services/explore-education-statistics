@@ -1,10 +1,10 @@
-using GovUk.Education.ExploreEducationStatistics.Analytics.Requests.Consumer.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Analytics.Consumer.Services.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
 
-namespace GovUk.Education.ExploreEducationStatistics.Analytics.Requests.Consumer.Functions;
+namespace GovUk.Education.ExploreEducationStatistics.Analytics.Consumer.Functions;
 
 // ReSharper disable once ClassNeverInstantiated.Global
 public class HealthCheckFunctions(

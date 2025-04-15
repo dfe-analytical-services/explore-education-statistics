@@ -1,0 +1,32 @@
+﻿#nullable enable
+using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
+
+namespace GovUk.Education.ExploreEducationStatistics.Common.Services.EventGrid;
+
+public class EventRaiser(IConfiguredEventGridClientFactory eventGridClientFactory) : IEventRaiser
+{
+    public async Task RaiseEvent<TEventBuilder>(TEventBuilder eventBuilder, CancellationToken cancellationToken = default)
+        where TEventBuilder : IEvent
+    {
+        // Try to obtain an event grid client, configured using the configuration keyed on EventTopicOptionsKey 
+        if (!eventGridClientFactory.TryCreateClient(
+                TEventBuilder.EventTopicOptionsKey,
+                out var client))
+        {
+            return;
+        }
+        
+        await client.SendEventAsync(eventBuilder.ToEventGridEvent(), cancellationToken);
+    }
+
+    public async Task RaiseEvents<TEventBuilder>(IEnumerable<TEventBuilder> eventBuilders, CancellationToken cancellationToken = default)
+        where TEventBuilder : IEvent
+    {
+        foreach (var eventBuilder in eventBuilders)
+        {
+            await RaiseEvent(eventBuilder, cancellationToken);
+        }
+    }
+}

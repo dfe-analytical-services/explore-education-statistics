@@ -23,7 +23,8 @@ describe('PublicationReleaseAccess', () => {
   const testPublicationId = 'publication-1';
 
   const testRelease: ReleaseVersionSummary = {
-    id: 'release1-id',
+    id: 'release-1-version-1',
+    releaseId: 'release-1',
     slug: 'release-1-slug',
     timePeriodCoverage: {
       value: 'AY',

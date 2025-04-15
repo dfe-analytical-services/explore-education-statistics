@@ -30,9 +30,6 @@ describe('ModalConfirm', () => {
 
       await userEvent.click(screen.getByRole('button', { name: 'Confirm' }));
 
-      expect(
-        screen.getByRole('button', { name: 'Confirm' }),
-      ).toBeAriaDisabled();
       expect(screen.getByRole('button', { name: 'Cancel' })).toBeDisabled();
 
       expect(screen.getByTestId('loadingSpinner')).toBeInTheDocument();
@@ -110,9 +107,6 @@ describe('ModalConfirm', () => {
 
       await userEvent.click(screen.getByRole('button', { name: 'Confirm' }));
 
-      expect(
-        screen.getByRole('button', { name: 'Confirm' }),
-      ).toBeAriaDisabled();
       expect(screen.getByRole('button', { name: 'Cancel' })).toBeDisabled();
 
       await waitFor(() => {
@@ -195,7 +189,6 @@ describe('ModalConfirm', () => {
       await userEvent.click(screen.getByRole('button', { name: 'Cancel' }));
 
       expect(screen.getByRole('button', { name: 'Confirm' })).toBeDisabled();
-      expect(screen.getByRole('button', { name: 'Cancel' })).toBeAriaDisabled();
 
       expect(screen.getByTestId('loadingSpinner')).toBeInTheDocument();
     });
@@ -272,7 +265,6 @@ describe('ModalConfirm', () => {
       await userEvent.click(screen.getByRole('button', { name: 'Cancel' }));
 
       expect(screen.getByRole('button', { name: 'Confirm' })).toBeDisabled();
-      expect(screen.getByRole('button', { name: 'Cancel' })).toBeAriaDisabled();
 
       await waitFor(() => {
         expect(screen.queryByText('Confirm')).not.toBeInTheDocument();

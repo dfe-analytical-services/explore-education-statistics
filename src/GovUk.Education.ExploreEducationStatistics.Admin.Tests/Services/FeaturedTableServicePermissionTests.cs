@@ -27,7 +27,7 @@ public class FeaturedTableServicePermissionTests
     public async Task Get()
     {
         await PolicyCheckBuilder<ContentSecurityPolicies>()
-            .SetupResourceCheckToFail(_releaseVersion, CanViewSpecificRelease)
+            .SetupResourceCheckToFail(_releaseVersion, CanViewSpecificReleaseVersion)
             .AssertForbidden(
                 userService =>
                 {
@@ -43,7 +43,7 @@ public class FeaturedTableServicePermissionTests
     public async Task List()
     {
         await PolicyCheckBuilder<ContentSecurityPolicies>()
-            .SetupResourceCheckToFail(_releaseVersion, CanViewSpecificRelease)
+            .SetupResourceCheckToFail(_releaseVersion, CanViewSpecificReleaseVersion)
             .AssertForbidden(
                 userService =>
                 {

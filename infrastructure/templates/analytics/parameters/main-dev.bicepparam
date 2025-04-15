@@ -4,4 +4,4 @@ using '../main.bicep'
 param environmentName = 'Development'
 
 // On Dev, we will run the Function App every 10 minutes.
-param publicApiQueryConsumerCron = '0 */10 * * * *'
+param analyticsRequestFilesConsumerCron = '0 */10 * * * *'

@@ -3,7 +3,7 @@ using Moq;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Tests.Builders;
 
-public class HealthCheckStrategyBuilder
+public class HealthCheckStrategyMockBuilder
 {
     private readonly Mock<IHealthCheckStrategy> _mock = new(MockBehavior.Strict);
     private bool _healthCheckIsSuccessful = true;
@@ -18,21 +18,21 @@ public class HealthCheckStrategyBuilder
         return _mock.Object;
     }
 
-    public HealthCheckStrategyBuilder WhereResultIsHealthy(string? message = null)
+    public HealthCheckStrategyMockBuilder WhereResultIsHealthy(string? message = null)
     {
         _healthCheckIsSuccessful = true;
         _healthCheckMessage = message ?? "Everything is OK";
         return this;
     }
 
-    public HealthCheckStrategyBuilder WhereIsHealthyResultIs(bool isHealthy, string? message = null)
+    public HealthCheckStrategyMockBuilder WhereIsHealthyResultIs(bool isHealthy, string? message = null)
     {
         _healthCheckIsSuccessful = isHealthy;
         _healthCheckMessage = message ?? "Everything is OK";
         return this;
     }
 
-    public HealthCheckStrategyBuilder WhereResultIsUnhealthy(string? message = null)
+    public HealthCheckStrategyMockBuilder WhereResultIsUnhealthy(string? message = null)
     {
         _healthCheckIsSuccessful = false;
         _healthCheckMessage = message ?? "Boo. It didn't work.";

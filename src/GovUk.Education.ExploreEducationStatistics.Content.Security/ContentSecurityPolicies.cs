@@ -4,6 +4,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Security
     {
         CanViewSpecificMethodologyVersion,
         CanViewSpecificPublication,
-        CanViewSpecificRelease
+        CanViewSpecificReleaseVersion
     }
 }

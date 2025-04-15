@@ -3,7 +3,6 @@ import LoadingSpinner from '@common/components/LoadingSpinner';
 import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
 import WarningMessage from '@common/components/WarningMessage';
-import { RefContextProvider } from '@common/contexts/RefContext';
 import withLazyLoad from '@common/hocs/withLazyLoad';
 import ChartRenderer from '@common/modules/charts/components/ChartRenderer';
 import { GetInfographic } from '@common/modules/charts/components/InfographicBlock';
@@ -12,7 +11,7 @@ import TimePeriodDataTable from '@common/modules/table-tool/components/TimePerio
 import getDefaultTableHeaderConfig from '@common/modules/table-tool/utils/getDefaultTableHeadersConfig';
 import mapTableHeadersConfig from '@common/modules/table-tool/utils/mapTableHeadersConfig';
 import { DataBlock } from '@common/services/types/blocks';
-import React, { ReactNode } from 'react';
+import React, { ReactNode, useRef } from 'react';
 
 const testId = (dataBlock: DataBlock) => `Data block - ${dataBlock.name}`;
 
@@ -52,6 +51,8 @@ const DataBlockTabs = ({
     getInfographic,
   });
 
+  const dataTableRef = useRef<HTMLElement>(null);
+
   const errorMessage = <WarningMessage>Could not load content</WarningMessage>;
   if (isTableDataError) return errorMessage;
 
@@ -82,13 +83,11 @@ const DataBlockTabs = ({
             {fullTable && (
               <ErrorBoundary fallback={errorMessage}>
                 {chart && (
-                  <RefContextProvider>
-                    <ChartRenderer
-                      id="dataBlockTabs-chart"
-                      source={dataBlock.source}
-                      chart={chart}
-                    />
-                  </RefContextProvider>
+                  <ChartRenderer
+                    id="dataBlockTabs-chart"
+                    source={dataBlock.source}
+                    chart={chart}
+                  />
                 )}
                 {additionTabContentElement}
               </ErrorBoundary>
@@ -118,8 +117,11 @@ const DataBlockTabs = ({
                   key={dataBlock.id}
                   captionTitle={dataBlock?.heading}
                   dataBlockId={dataBlock.id}
+                  ref={dataTableRef}
                   footnotesHeadingHiddenText={`for ${dataBlock?.heading}`}
                   fullTable={fullTable}
+                  query={dataBlock.query}
+                  releaseVersionId={releaseVersionId}
                   source={dataBlock?.source}
                   tableHeadersConfig={
                     dataBlock.table.tableHeaders

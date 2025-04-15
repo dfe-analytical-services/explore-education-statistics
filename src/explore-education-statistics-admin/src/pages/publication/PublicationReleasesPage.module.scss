@@ -6,7 +6,13 @@
   }
 }
 
-.actionsColumn,
 .statusColumn {
-  width: 150px;
+  width: 200px;
+}
+
+.actionsColumn {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: #{govuk-spacing(2)};
 }

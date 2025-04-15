@@ -17,7 +17,8 @@ const releaseVersionService = _releaseVersionService as jest.Mocked<
 describe('DraftReleasesTable', () => {
   const testReleases: DashboardReleaseVersionSummary[] = [
     {
-      id: 'release-1',
+      id: 'release-1-version-1',
+      releaseId: 'release-1',
       latestRelease: true,
       slug: 'release-1-slug',
       title: 'Release 1',
@@ -49,15 +50,17 @@ describe('DraftReleasesTable', () => {
       approvalStatus: 'Draft',
       amendment: false,
       permissions: {
-        canViewRelease: true,
+        canViewReleaseVersion: true,
         canUpdateRelease: true,
-        canDeleteRelease: false,
-        canMakeAmendmentOfRelease: false,
+        canUpdateReleaseVersion: true,
+        canDeleteReleaseVersion: false,
+        canMakeAmendmentOfReleaseVersion: false,
         canAddPrereleaseUsers: false,
       },
     },
     {
-      id: 'release-2',
+      id: 'release-2-version-1',
+      releaseId: 'release-2',
       latestRelease: true,
       slug: 'release-2-slug',
       title: 'Release 2',
@@ -90,15 +93,17 @@ describe('DraftReleasesTable', () => {
       amendment: true,
       previousVersionId: 'previous-version-id',
       permissions: {
-        canViewRelease: true,
-        canDeleteRelease: true,
+        canViewReleaseVersion: true,
         canUpdateRelease: true,
-        canMakeAmendmentOfRelease: false,
+        canDeleteReleaseVersion: true,
+        canUpdateReleaseVersion: true,
+        canMakeAmendmentOfReleaseVersion: false,
         canAddPrereleaseUsers: false,
       },
     },
     {
-      id: 'release-3',
+      id: 'release-3-version-1',
+      releaseId: 'release-3',
       latestRelease: false,
       slug: 'release-3-slug',
       title: 'Release 3',
@@ -130,15 +135,17 @@ describe('DraftReleasesTable', () => {
       approvalStatus: 'HigherLevelReview',
       amendment: false,
       permissions: {
-        canViewRelease: true,
+        canViewReleaseVersion: true,
         canUpdateRelease: true,
-        canDeleteRelease: true,
-        canMakeAmendmentOfRelease: false,
+        canUpdateReleaseVersion: true,
+        canDeleteReleaseVersion: true,
+        canMakeAmendmentOfReleaseVersion: false,
         canAddPrereleaseUsers: false,
       },
     },
     {
-      id: 'release-4',
+      id: 'release-4-version-1',
+      releaseId: 'release-4',
       latestRelease: true,
       slug: 'release-4-slug',
       title: 'Release 4',
@@ -166,10 +173,11 @@ describe('DraftReleasesTable', () => {
       amendment: true,
       previousVersionId: 'previous-version-id',
       permissions: {
-        canViewRelease: true,
-        canDeleteRelease: true,
+        canViewReleaseVersion: true,
         canUpdateRelease: true,
-        canMakeAmendmentOfRelease: false,
+        canDeleteReleaseVersion: true,
+        canUpdateReleaseVersion: true,
+        canMakeAmendmentOfReleaseVersion: false,
         canAddPrereleaseUsers: false,
       },
     },
@@ -222,7 +230,7 @@ describe('DraftReleasesTable', () => {
       within(row3cells[2]).getByRole('link', { name: 'Edit Release 1' }),
     ).toHaveAttribute(
       'href',
-      '/publication/publication-1/release/release-1/summary',
+      '/publication/publication-1/release/release-1-version-1/summary',
     );
     expect(
       within(row3cells[2]).queryByRole('button', { name: /View issues/ }),
@@ -246,7 +254,7 @@ describe('DraftReleasesTable', () => {
       within(row4cells[2]).getByRole('link', { name: 'Edit Release 3' }),
     ).toHaveAttribute(
       'href',
-      '/publication/publication-1/release/release-3/summary',
+      '/publication/publication-1/release/release-3-version-1/summary',
     );
     expect(
       within(row4cells[2]).queryByRole('button', { name: /View issues/ }),
@@ -277,7 +285,7 @@ describe('DraftReleasesTable', () => {
       within(row6cells[2]).getByRole('link', { name: 'Edit Release 2' }),
     ).toHaveAttribute(
       'href',
-      '/publication/publication-2/release/release-2/summary',
+      '/publication/publication-2/release/release-2-version-1/summary',
     );
     expect(
       within(row6cells[2]).getByRole('button', {
@@ -307,7 +315,7 @@ describe('DraftReleasesTable', () => {
       within(row8cells[2]).getByRole('link', { name: 'Edit Release 4' }),
     ).toHaveAttribute(
       'href',
-      '/publication/publication-3/release/release-4/summary',
+      '/publication/publication-3/release/release-4-version-1/summary',
     );
     expect(
       within(row8cells[2]).queryByRole('button', { name: /View issues/ }),
@@ -361,7 +369,7 @@ describe('DraftReleasesTable', () => {
       within(row3cells[3]).getByRole('link', { name: 'Edit Release 1' }),
     ).toHaveAttribute(
       'href',
-      '/publication/publication-1/release/release-1/summary',
+      '/publication/publication-1/release/release-1-version-1/summary',
     );
     expect(
       within(row3cells[3]).queryByRole('button', {
@@ -385,7 +393,7 @@ describe('DraftReleasesTable', () => {
       within(row4cells[3]).getByRole('link', { name: 'Edit Release 3' }),
     ).toHaveAttribute(
       'href',
-      '/publication/publication-1/release/release-3/summary',
+      '/publication/publication-1/release/release-3-version-1/summary',
     );
     expect(
       within(row4cells[3]).queryByRole('button', {
@@ -416,7 +424,7 @@ describe('DraftReleasesTable', () => {
       within(row6cells[3]).getByRole('link', { name: 'Edit Release 2' }),
     ).toHaveAttribute(
       'href',
-      '/publication/publication-2/release/release-2/summary',
+      '/publication/publication-2/release/release-2-version-1/summary',
     );
     expect(
       within(row6cells[3]).getByRole('button', {
@@ -446,7 +454,7 @@ describe('DraftReleasesTable', () => {
       within(row8cells[3]).getByRole('link', { name: 'Edit Release 4' }),
     ).toHaveAttribute(
       'href',
-      '/publication/publication-3/release/release-4/summary',
+      '/publication/publication-3/release/release-4-version-1/summary',
     );
     expect(
       within(row8cells[3]).queryByRole('button', {
@@ -470,7 +478,7 @@ describe('DraftReleasesTable', () => {
               ...testReleases[0],
               permissions: {
                 ...testReleases[0].permissions,
-                canUpdateRelease: false,
+                canUpdateReleaseVersion: false,
               },
             },
           ]}
@@ -492,7 +500,7 @@ describe('DraftReleasesTable', () => {
       within(row3cells[2]).getByRole('link', { name: 'View Release 1' }),
     ).toHaveAttribute(
       'href',
-      '/publication/publication-1/release/release-1/summary',
+      '/publication/publication-1/release/release-1-version-1/summary',
     );
   });
 
@@ -506,7 +514,7 @@ describe('DraftReleasesTable', () => {
               ...testReleases[2],
               permissions: {
                 ...testReleases[2].permissions,
-                canDeleteRelease: false,
+                canDeleteReleaseVersion: false,
               },
             },
           ]}
@@ -578,7 +586,7 @@ describe('DraftReleasesTable', () => {
 
     expect(
       releaseVersionService.getDeleteReleaseVersionPlan,
-    ).toHaveBeenCalledWith('release-2');
+    ).toHaveBeenCalledWith('release-2-version-1');
 
     const modal = within(screen.getByRole('dialog'));
     expect(modal.getByText('Methodology 1')).toBeInTheDocument();
@@ -592,7 +600,7 @@ describe('DraftReleasesTable', () => {
 
     await waitFor(() => {
       expect(releaseVersionService.deleteReleaseVersion).toHaveBeenCalledWith(
-        'release-2',
+        'release-2-version-1',
       );
     });
 
