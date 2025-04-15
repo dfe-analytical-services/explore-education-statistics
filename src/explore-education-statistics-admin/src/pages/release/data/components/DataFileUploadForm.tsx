@@ -99,7 +99,6 @@ function baseErrorMappings(
           ...fileErrorMappings,
           ZipFilenameMustEndDotZip: 'ZipFilenameMustEndDotZip',
           MustBeZipFile: 'MustBeZipFile',
-          DataZipFileShouldContainTwoFiles: 'DataZipFileShouldContainTwoFiles',
         },
       }),
     ];

@@ -5,15 +5,16 @@ using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using File = GovUk.Education.ExploreEducationStatistics.Content.Model.File;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 
 public interface IDataSetValidator
 {
     Task<Either<List<ErrorViewModel>, DataSet>> ValidateDataSet(
+        DataSetDto dataSet,
+        bool isFromBulkZipUpload = false);
+
+    Task<Either<List<ErrorViewModel>, DataSetIndex>> ValidateBulkDataZipIndexFile(
         Guid releaseVersionId,
-        string dataSetTitle,
-        List<DataSetFileDto> dataSetFiles,
-        File? replacingFile = null);
+        DataSetFileDto indexFile);
 }

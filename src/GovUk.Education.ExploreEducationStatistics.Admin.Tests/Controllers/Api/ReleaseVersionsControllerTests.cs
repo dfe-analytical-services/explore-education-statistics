@@ -62,7 +62,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
 
             var releaseDataFileService = new Mock<IReleaseDataFileService>(Strict);
             releaseDataFileService
-                .Setup(service => service.ValidateAndUpload(_releaseVersionId,
+                .Setup(service => service.Upload(_releaseVersionId,
                     dataFile,
                     metaFile,
                     "Data set title",
@@ -100,7 +100,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
 
             var releaseDataFileService = new Mock<IReleaseDataFileService>(Strict);
             releaseDataFileService
-                .Setup(service => service.ValidateAndUpload(_releaseVersionId,
+                .Setup(service => service.Upload(_releaseVersionId,
                     dataFile,
                     metaFile,
                     "Data set title",
@@ -527,7 +527,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             var releaseDataFileService = new Mock<IReleaseDataFileService>(Strict);
 
             releaseDataFileService
-                .Setup(s => s.ValidateAndUploadFromBulkZip(
+                .Setup(s => s.UploadFromBulkZip(
                     It.IsAny<Guid>(),
                     It.IsAny<IFormFile>(),
                     default))

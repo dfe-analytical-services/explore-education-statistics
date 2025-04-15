@@ -3,6 +3,7 @@ using FluentValidation;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
+using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
@@ -36,7 +37,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly ContentDbContext _contentDbContext;
         private readonly IPersistenceHelper<ContentDbContext> _persistenceHelper;
         private readonly IPrivateBlobStorageService _privateBlobStorageService;
-        private readonly IDataSetZipValidationService _dataSetZipValidationService;
         private readonly IDataSetValidator _dataSetValidator;
         private readonly IFileRepository _fileRepository;
         private readonly IReleaseVersionRepository _releaseVersionRepository;
@@ -50,7 +50,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             ContentDbContext contentDbContext,
             IPersistenceHelper<ContentDbContext> persistenceHelper,
             IPrivateBlobStorageService privateBlobStorageService,
-            IDataSetZipValidationService dataSetZipValidationService,
             IDataSetValidator dataSetValidator,
             IFileRepository fileRepository,
             IReleaseVersionRepository releaseVersionRepository,
@@ -63,7 +62,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _contentDbContext = contentDbContext;
             _persistenceHelper = persistenceHelper;
             _privateBlobStorageService = privateBlobStorageService;
-            _dataSetZipValidationService = dataSetZipValidationService;
             _dataSetValidator = dataSetValidator;
             _fileRepository = fileRepository;
             _releaseVersionRepository = releaseVersionRepository;
@@ -246,7 +244,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
-        public async Task<Either<ActionResult, DataFileInfo>> ValidateAndUpload(
+        public async Task<Either<ActionResult, DataFileInfo>> Upload(
             Guid releaseVersionId,
             IFormFile dataFormFile,
             IFormFile metaFormFile,
@@ -262,13 +260,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     return await _persistenceHelper
                         .CheckOptionalEntityExists<File>(replacingFileId)
                         .OnSuccessCombineWith(async replacingFile
-                            => await ValidateDataSet(releaseVersionId, dataFormFile, metaFormFile, dataSetTitle, replacingFile))
+                            => await ValidateDataSetCsvPair(releaseVersionId, dataFormFile, metaFormFile, dataSetTitle, replacingFile))
                         .OnSuccess(async tuple
                             => await PersistAndUploadDataSet(releaseVersionId, replacingFile: tuple.Item1, dataSet: tuple.Item2, cancellationToken));
                 });
         }
 
-        public async Task<Either<ActionResult, DataFileInfo>> ValidateAndUploadFromZip(
+        public async Task<Either<ActionResult, DataFileInfo>> UploadFromZip(
             Guid releaseVersionId,
             IFormFile zipFormFile,
             string? dataSetTitle,
@@ -283,13 +281,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     return await _persistenceHelper
                         .CheckOptionalEntityExists<File>(replacingFileId)
                         .OnSuccessCombineWith(async replacingFile
-                            => await ValidateDataSet(releaseVersionId, zipFormFile, dataSetTitle, replacingFile))
+                            => await ValidateDataSetZip(releaseVersionId, zipFormFile, dataSetTitle, replacingFile))
                         .OnSuccess(async tuple
                             => await PersistAndUploadDataSet(releaseVersionId, replacingFile: tuple.Item1, dataSet: tuple.Item2, cancellationToken));
                 });
         }
 
-        private async Task<Either<ActionResult, DataSet>> ValidateDataSet(
+        public async Task<Either<ActionResult, List<ZipDataSetFileViewModel>>> UploadFromBulkZip(
+            Guid releaseVersionId,
+            IFormFile zipFormFile,
+            CancellationToken cancellationToken)
+        {
+            return await _persistenceHelper
+                .CheckEntityExists<ReleaseVersion>(releaseVersionId)
+                .OnSuccess(_userService.CheckCanUpdateReleaseVersion)
+                .OnSuccess(async _
+                    => await ValidateBulkDataSetZip(releaseVersionId, zipFormFile))
+                .OnSuccess(async dataSets
+                    => await UploadDataSet(releaseVersionId, dataSets, cancellationToken));
+        }
+
+        private async Task<Either<ActionResult, DataSet>> ValidateDataSetCsvPair(
             Guid releaseVersionId,
             IFormFile dataFormFile,
             IFormFile metaFormFile,
@@ -298,36 +310,107 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             var dataFile = await BuildDataSetFile(dataFormFile);
             var metaFile = await BuildDataSetFile(metaFormFile);
-            return await ValidateDataSetFiles(releaseVersionId, [dataFile, metaFile], dataSetTitle, replacingFile);
+            return await BuildDataSet(releaseVersionId, dataFile, metaFile, dataSetTitle, replacingFile);
         }
 
-        private async Task<Either<ActionResult, DataSet>> ValidateDataSet(
+        private async Task<Either<ActionResult, DataSet>> ValidateDataSetZip(
             Guid releaseVersionId,
             IFormFile zipFormFile,
             string? dataSetTitle,
             File? replacingFile)
         {
             var dataSetFiles = await ExtractDataSetZipFile(zipFormFile);
-            return await ValidateDataSetFiles(releaseVersionId, dataSetFiles, dataSetTitle, replacingFile);
+            return await BuildDataSet(releaseVersionId, dataSetFiles[0], dataSetFiles[1], dataSetTitle, replacingFile);
         }
 
-        private async Task<Either<ActionResult, DataSet>> ValidateDataSetFiles(
+        private async Task<Either<ActionResult, DataSet>> BuildDataSet(
             Guid releaseVersionId,
-            List<DataSetFileDto> dataSetFiles,
+            DataSetFileDto dataFile,
+            DataSetFileDto metaFile,
             string? dataSetTitle,
             File? replacingFile)
         {
             var newDataSetTitle = await GetReleaseVersionDataSetTitle(releaseVersionId, dataSetTitle, replacingFile);
 
-            var result = await _dataSetValidator.ValidateDataSet(
-                releaseVersionId,
-                newDataSetTitle,
-                dataSetFiles,
-                replacingFile);
+            var dataSet = new DataSetDto
+            {
+                ReleaseVersionId = releaseVersionId,
+                Title = newDataSetTitle,
+                DataFile = dataFile,
+                MetaFile = metaFile,
+                ReplacingFile = replacingFile,
+            };
 
-            return result.IsLeft
-                ? new Either<ActionResult, DataSet>(Common.Validators.ValidationUtils.ValidationResult(result.Left))
-                : (Either<ActionResult, DataSet>)result.Right;
+            var validationResult = await _dataSetValidator.ValidateDataSet(dataSet);
+
+            return validationResult.IsLeft
+                ? new Either<ActionResult, DataSet>(Common.Validators.ValidationUtils.ValidationResult(validationResult.Left))
+                : (Either<ActionResult, DataSet>)validationResult.Right;
+        }
+
+        private async Task<Either<ActionResult, List<DataSet>>> ValidateBulkDataSetZip(
+            Guid releaseVersionId,
+            IFormFile zipFormFile)
+        {
+            var dataSetFiles = await ExtractDataSetZipFile(zipFormFile);
+
+            var dataSetNames = dataSetFiles.FirstOrDefault(dsf => dsf.FileName == "dataset_names.csv");
+            if (dataSetNames is null)
+            {
+                return new Either<ActionResult, List<DataSet>>(
+                    Common.Validators.ValidationUtils.ValidationResult(ValidationMessages.GenerateErrorBulkDataZipMustContainDataSetNamesCsv()));
+            }
+
+            var indexFileValidationResult = await _dataSetValidator.ValidateBulkDataZipIndexFile(releaseVersionId, dataSetNames);
+
+            dataSetFiles.Remove(dataSetNames);
+
+            var dataSets = new List<DataSetDto>();
+            if (indexFileValidationResult.IsLeft)
+            {
+                return new Either<ActionResult, List<DataSet>>(Common.Validators.ValidationUtils.ValidationResult(indexFileValidationResult.Left));
+            }
+            else
+            {
+                dataSets.AddRange(BuildDataSetsFromBulkZip(indexFileValidationResult.Right, dataSetFiles));
+            }
+
+            var results = new List<DataSet>();
+            foreach (var dataSet in dataSets)
+            {
+                var validationResult = await _dataSetValidator.ValidateDataSet(dataSet, isFromBulkZipUpload: true);
+
+                if (validationResult.IsLeft)
+                {
+                    return new Either<ActionResult, List<DataSet>>(Common.Validators.ValidationUtils.ValidationResult(indexFileValidationResult.Left));
+                }
+                else
+                {
+                    results.Add(validationResult.Right);
+                }
+            }
+
+            return results;
+        }
+
+        private static List<DataSetDto> BuildDataSetsFromBulkZip(
+            DataSetIndex dataSetIndex,
+            List<DataSetFileDto> dataSetFiles)
+        {
+            var dataSets = new List<DataSetDto>();
+            foreach (var dataSet in dataSetIndex.DataSetIndexItems)
+            {
+                dataSets.Add(new()
+                {
+                    ReleaseVersionId = dataSetIndex.ReleaseVersionId,
+                    Title = dataSet.DataSetTitle,
+                    DataFile = dataSetFiles.FirstOrDefault(file => file.FileName == dataSet.DataFileName),
+                    MetaFile = dataSetFiles.FirstOrDefault(file => file.FileName == dataSet.MetaFileName),
+                    ReplacingFile = dataSet.ReplacingFile,
+                });
+            }
+
+            return dataSets;
         }
 
         private async Task<DataFileInfo> PersistAndUploadDataSet(
@@ -382,42 +465,31 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 permissions);
         }
 
-        public async Task<Either<ActionResult, List<ZipDataSetFileViewModel>>> ValidateAndUploadFromBulkZip(
+        private async Task<List<ZipDataSetFileViewModel>> UploadDataSet(
             Guid releaseVersionId,
-            IFormFile zipFormFile,
+            List<DataSet> dataSets,
             CancellationToken cancellationToken)
         {
-            return await _persistenceHelper
-                .CheckEntityExists<ReleaseVersion>(releaseVersionId)
-                .OnSuccess(_userService.CheckCanUpdateReleaseVersion)
-                .OnSuccess(async _ =>
+            var viewModels = new List<ZipDataSetFileViewModel>();
+
+            foreach (var dataSet in dataSets)
+            {
+                var uploadResult = await UploadDataSetToTempStorage(releaseVersionId, dataSet, cancellationToken);
+
+                viewModels.Add(new ZipDataSetFileViewModel
                 {
-                    var dataSetFiles = await ExtractDataSetZipFile(zipFormFile);
-                    return await _dataSetZipValidationService.ValidateBulkDataZipFiles(releaseVersionId, dataSetFiles);
-                })
-                .OnSuccess(async validatedDataSets =>
-                {
-                    var viewModels = new List<ZipDataSetFileViewModel>();
-
-                    foreach (var dataSet in validatedDataSets)
-                    {
-                        var uploadResult = await UploadDataSetToTempStorage(releaseVersionId, dataSet, cancellationToken);
-
-                        viewModels.Add(new ZipDataSetFileViewModel
-                        {
-                            Title = dataSet.Title,
-                            DataFileId = uploadResult.DataFileId,
-                            DataFilename = dataSet.DataFile.FileName,
-                            DataFileSize = dataSet.DataFile.FileSize,
-                            MetaFileId = uploadResult.MetaFileId,
-                            MetaFilename = dataSet.MetaFile.FileName,
-                            MetaFileSize = dataSet.MetaFile.FileSize,
-                            ReplacingFileId = dataSet.ReplacingFile?.Id,
-                        });
-                    }
-
-                    return viewModels;
+                    Title = dataSet.Title,
+                    DataFileId = uploadResult.DataFileId,
+                    DataFilename = dataSet.DataFile.FileName,
+                    DataFileSize = dataSet.DataFile.FileSize,
+                    MetaFileId = uploadResult.MetaFileId,
+                    MetaFilename = dataSet.MetaFile.FileName,
+                    MetaFileSize = dataSet.MetaFile.FileSize,
+                    ReplacingFileId = dataSet.ReplacingFile?.Id,
                 });
+            }
+
+            return viewModels;
         }
 
         private static async Task<List<DataSetFileDto>> ExtractDataSetZipFile(IFormFile zipFile)
@@ -657,32 +729,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return dataSetTitle;
         }
 
-        private async Task UploadDataSetFilesToStorage(
-            File dataFile,
-            IFormFile dataFormFile,
-            File metaFile,
-            IFormFile metaFormFile)
-        {
-            await _privateBlobStorageService.UploadFile(
-                containerName: PrivateReleaseFiles,
-                path: dataFile.Path(),
-                file: dataFormFile
-            );
-
-            await _privateBlobStorageService.UploadFile(
-                containerName: PrivateReleaseFiles,
-                path: metaFile.Path(),
-                file: metaFormFile
-            );
-        }
-
         /// <summary>
         /// Upload the supplied data set files to temporary blob storage.
         /// </summary>
         /// <returns>An object consisting of newly generated IDs representing the uploaded files. The IDs are used to locate the files in virtual storage.</returns>
         private async Task<DataSetUploadResult> UploadDataSetToTempStorage(
             Guid releaseVersionId,
-            ZippedDataSet zippedDataSet,
+            DataSet dataSet,
             CancellationToken cancellationToken)
         {
             var dataFileId = Guid.NewGuid();
@@ -693,19 +746,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             await _privateBlobStorageService.UploadStream(
                 containerName: PrivateReleaseTempFiles,
                 path: dataFilePath,
-                stream: zippedDataSet.DataFile.FileStream,
+                stream: dataSet.DataFile.FileStream,
                 contentType: ContentTypes.Csv,
                 cancellationToken: cancellationToken);
 
             await _privateBlobStorageService.UploadStream(
                 containerName: PrivateReleaseTempFiles,
                 path: metaFilePath,
-                stream: zippedDataSet.MetaFile.FileStream,
+                stream: dataSet.MetaFile.FileStream,
                 contentType: ContentTypes.Csv,
                 cancellationToken: cancellationToken);
 
-            await zippedDataSet.DataFile.FileStream.DisposeAsync();
-            await zippedDataSet.MetaFile.FileStream.DisposeAsync();
+            await dataSet.DataFile.FileStream.DisposeAsync();
+            await dataSet.MetaFile.FileStream.DisposeAsync();
 
             return new DataSetUploadResult
             {
