@@ -1,0 +1,12 @@
+.ck.ck-accessibility-help-dialog {
+  // Dialog content was appearing too large on small viewports.
+  --ck-accessibility-help-dialog-max-height: min(
+    400px,
+    calc(var(--ck-dialog-max-height) - var(--ck-form-header-height))
+  );
+}
+
+.ck.ck-accessibility-help-dialog .ck-accessibility-help-dialog__content {
+  // Prevent scrolling background page content after fully scrolling dialog content
+  overscroll-behavior-y: none;
+}
