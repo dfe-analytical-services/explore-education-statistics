@@ -64,6 +64,13 @@ public abstract class CreateNextDataSetVersionMappingsFunctionTests(
                 durableTaskClientMock.Object);
 
             VerifyAllMocks(durableTaskClientMock);
+            durableTaskClientMock.Verify(client =>
+                client.ScheduleNewOrchestrationInstanceAsync(
+                    It.IsAny<string>(),
+                    It.IsAny<object>(),
+                    It.IsAny<StartOrchestrationOptions>(),
+                    It.IsAny<CancellationToken>()),
+                Times.Once);
 
             var responseViewModel = result.AssertOkObjectResult<ProcessDataSetVersionResponseViewModel>();
 
@@ -212,8 +219,7 @@ public abstract class CreateNextDataSetVersionMappingsFunctionTests(
                 .Versions
                 .FirstOrDefault((a) => a.SemVersion() == expectedVersion);
             
-            Assert.True(nextDataSetVersion != null, nameof(nextDataSetVersion) + " != null");
-                
+            Assert.NotNull(nextDataSetVersion);
             // Assert that the new DataSetVersion is not set as the latest live version,
             Assert.Equal(nextDataSetVersion, updatedDataSet.LatestDraftVersion);
             Assert.NotEqual(nextDataSetVersion, updatedDataSet.LatestLiveVersion);
@@ -245,6 +251,14 @@ public abstract class CreateNextDataSetVersionMappingsFunctionTests(
                 processNextDataSetVersionContext);
             Assert.Equal(new StartOrchestrationOptions { InstanceId = dataSetVersionImport.InstanceId.ToString() },
                 startOrchestrationOptions);
+            
+            //startOrchestrationOptions.ScheduleNewOrchestrationInstanceAsync
+            durableTaskClientMock.Verify(t => t.ScheduleNewOrchestrationInstanceAsync(
+                nameof(ProcessNextDataSetVersionMappingsFunctionOrchestration
+                    .ProcessNextDataSetVersionMappings),
+                It.IsAny<object>(),
+                It.IsAny<StartOrchestrationOptions>(),
+                It.IsAny<CancellationToken>()), Times.Once);
         }
         
         [Fact]
