@@ -103,7 +103,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             CancellationToken cancellationToken)
         {
             return await _releaseDataFileService
-                .ValidateAndUpload(
+                .Upload(
                     request.ReleaseVersionId,
                     request.DataFile,
                     request.MetaFile,
@@ -121,7 +121,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             CancellationToken cancellationToken)
         {
             return await _releaseDataFileService
-                .ValidateAndUploadFromZip(
+                .UploadFromZip(
                     request.ReleaseVersionId,
                     request.ZipFile,
                     request.Title,
@@ -138,7 +138,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             CancellationToken cancellationToken)
         {
             return await _releaseDataFileService
-                .ValidateAndUploadFromBulkZip(request.ReleaseVersionId, request.ZipFile, cancellationToken)
+                .UploadFromBulkZip(request.ReleaseVersionId, request.ZipFile, cancellationToken)
                 .HandleFailuresOrOk();
         }
 

@@ -1,4 +1,5 @@
 #nullable enable
+using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.MockBuilders;
 using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
@@ -25,15 +26,19 @@ public class DataSetValidatorTests
         var dataFile = await new DataSetFileBuilder().Build(FileType.Data);
         var metaFile = await new DataSetFileBuilder().Build(FileType.Metadata);
 
+        var dataSetDto = new DataSetDto
+        {
+            ReleaseVersionId = Guid.NewGuid(),
+            Title = "Data set title",
+            DataFile = dataFile,
+            MetaFile = metaFile,
+        };
+
         await using var context = InMemoryContentDbContext();
         var sut = BuildService(context);
 
         // Act
-        var result = await sut.ValidateDataSet(
-            Guid.NewGuid(),
-            "Data set title",
-            [dataFile, metaFile],
-            replacingFile: null);
+        var result = await sut.ValidateDataSet(dataSetDto);
 
         // Assert
         var dataSet = result.AssertRight();
@@ -53,10 +58,12 @@ public class DataSetValidatorTests
             Id = Guid.NewGuid(),
         };
 
+        var dataSetTitle = "Data set title";
+
         var toBeReplacedDataReleaseFile = _fixture
             .DefaultReleaseFile()
             .WithReleaseVersion(releaseVersion)
-            .WithName("Data set title")
+            .WithName(dataSetTitle)
             .WithFile(_fixture.DefaultFile()
                 .WithType(FileType.Data)
                 .WithFilename("test-data.csv"))
@@ -69,6 +76,18 @@ public class DataSetValidatorTests
                 .WithFilename("test-data.meta.csv"))
             .Generate();
 
+        var dataFile = await new DataSetFileBuilder().Build(FileType.Data);
+        var metaFile = await new DataSetFileBuilder().Build(FileType.Metadata);
+
+        var dataSetDto = new DataSetDto
+        {
+            ReleaseVersionId = releaseVersion.Id,
+            Title = dataSetTitle,
+            DataFile = dataFile,
+            MetaFile = metaFile,
+            ReplacingFile = toBeReplacedDataReleaseFile.File,
+        };
+
         var contentDbContextId = Guid.NewGuid().ToString();
         await using (var context = InMemoryContentDbContext(contentDbContextId))
         {
@@ -76,19 +95,12 @@ public class DataSetValidatorTests
             await context.SaveChangesAsync();
         }
 
-        var dataFile = await new DataSetFileBuilder().Build(FileType.Data);
-        var metaFile = await new DataSetFileBuilder().Build(FileType.Metadata);
-
         await using (var context = InMemoryContentDbContext(contentDbContextId))
         {
             var sut = BuildService(context);
 
             // Act
-            var result = await sut.ValidateDataSet(
-                Guid.NewGuid(),
-                "Data set title",
-                [dataFile, metaFile],
-                toBeReplacedDataReleaseFile.File);
+            var result = await sut.ValidateDataSet(dataSetDto, isFromBulkZipUpload: true);
 
             // Assert
             var dataSet = result.AssertRight();
@@ -107,15 +119,19 @@ public class DataSetValidatorTests
         var dataFile = await new DataSetFileBuilder().WhereFileSizeIsZero().Build(FileType.Data);
         var metaFile = await new DataSetFileBuilder().WhereFileSizeIsZero().Build(FileType.Metadata);
 
+        var dataSetDto = new DataSetDto
+        {
+            ReleaseVersionId = Guid.NewGuid(),
+            Title = "Data set title",
+            DataFile = dataFile,
+            MetaFile = metaFile,
+        };
+
         await using var context = InMemoryContentDbContext();
         var sut = BuildService(context);
 
         // Act
-        var result = await sut.ValidateDataSet(
-            Guid.NewGuid(),
-            "Data set title",
-            [dataFile, metaFile],
-            replacingFile: null);
+        var result = await sut.ValidateDataSet(dataSetDto);
 
         // Assert
         var errors = result.AssertLeft();
@@ -164,14 +180,18 @@ public class DataSetValidatorTests
             var dataFile = await new DataSetFileBuilder().Build(FileType.Data);
             var metaFile = await new DataSetFileBuilder().Build(FileType.Metadata);
 
+            var dataSetDto = new DataSetDto
+            {
+                ReleaseVersionId = releaseVersion.Id,
+                Title = "Data set title",
+                DataFile = dataFile,
+                MetaFile = metaFile,
+            };
+
             var sut = BuildService(context);
 
             // Act
-            var result = await sut.ValidateDataSet(
-                releaseVersion.Id,
-                dataSetTitle,
-                [dataFile, metaFile],
-                replacingFile: null);
+            var result = await sut.ValidateDataSet(dataSetDto);
 
             // Assert
             var errors = result.AssertLeft();
@@ -187,48 +207,27 @@ public class DataSetValidatorTests
     public async Task ValidateDataSet_IncompleteDataSetFilePair_ReturnsErrorDetails(FileType includeFileType)
     {
         // Arrange
-        var dataSetFile = await new DataSetFileBuilder().Build(includeFileType);
+        var dataFile = await new DataSetFileBuilder().Build(includeFileType);
+        var metaFile = await new DataSetFileBuilder().Build(includeFileType);
+
+        var dataSetDto = new DataSetDto
+        {
+            ReleaseVersionId = Guid.NewGuid(),
+            Title = "Data set title",
+            DataFile = includeFileType == FileType.Data ? dataFile : null,
+            MetaFile = includeFileType == FileType.Metadata ? metaFile : null,
+        };
 
         await using var context = InMemoryContentDbContext();
         var sut = BuildService(context);
 
         // Act
-        var result = await sut.ValidateDataSet(
-            Guid.NewGuid(),
-            "Data set title",
-            [dataSetFile],
-            replacingFile: null);
-
-        // Assert
-        var errors = result.AssertLeft();
-        Assert.Equal(2, errors.Count);
-        Assert.Equal(ValidationMessages.DataSetShouldContainTwoFiles.Code, errors[0].Code);
-        Assert.Equal(ValidationMessages.DataSetFileNamesShouldMatchConvention.Code, errors[1].Code);
-    }
-
-    [Fact]
-    public async Task ValidateDataSet_TooManyFilesProvided_ReturnsErrorDetails()
-    {
-        // Arrange
-        var dataFile1 = await new DataSetFileBuilder().Build(FileType.Data);
-        var metaFile1 = await new DataSetFileBuilder().Build(FileType.Metadata);
-        var dataFile2 = await new DataSetFileBuilder().Build(FileType.Data);
-        var metaFile2 = await new DataSetFileBuilder().Build(FileType.Metadata);
-
-        await using var context = InMemoryContentDbContext();
-        var sut = BuildService(context);
-
-        // Act
-        var result = await sut.ValidateDataSet(
-            Guid.NewGuid(),
-            "Data set title",
-            [dataFile1, metaFile1, dataFile2, metaFile2],
-            replacingFile: null);
+        var result = await sut.ValidateDataSet(dataSetDto);
 
         // Assert
         var errors = result.AssertLeft();
         Assert.Single(errors);
-        Assert.Equal(ValidationMessages.DataSetShouldContainTwoFiles.Code, errors[0].Code);
+        Assert.Equal(ValidationMessages.DataSetFileNamesShouldMatchConvention.Code, errors[0].Code);
     }
 
     [Fact]
@@ -240,9 +239,11 @@ public class DataSetValidatorTests
         var dataFile = await new DataSetFileBuilder().Build(FileType.Data);
         var metaFile = await new DataSetFileBuilder().Build(FileType.Metadata);
 
+        var dataSetTitle = "Data set title";
+
         var existingDataReleaseFile = _fixture.DefaultReleaseFile()
             .WithReleaseVersion(releaseVersion)
-            .WithName("Data set title")
+            .WithName(dataSetTitle)
             .WithFile(_fixture.DefaultFile()
                 .WithType(FileType.Data)
                 .WithFilename(dataFile.FileName))
@@ -256,6 +257,15 @@ public class DataSetValidatorTests
                 .WithFilename(metaFile.FileName))
             .Generate();
 
+        var dataSetDto = new DataSetDto
+        {
+            ReleaseVersionId = releaseVersion.Id,
+            Title = dataSetTitle,
+            DataFile = dataFile,
+            MetaFile = metaFile,
+            ReplacingFile = existingDataReleaseFile.File,
+        };
+
         var contentDbContextId = Guid.NewGuid().ToString();
         await using var context = InMemoryContentDbContext(contentDbContextId);
 
@@ -265,11 +275,7 @@ public class DataSetValidatorTests
         var sut = BuildService(context);
 
         // Act
-        var result = await sut.ValidateDataSet(
-            releaseVersion.Id,
-            "Data set title",
-            [dataFile, metaFile],
-            existingDataReleaseFile.File);
+        var result = await sut.ValidateDataSet(dataSetDto, isFromBulkZipUpload: true);
 
         // Assert
         var errors = result.AssertLeft();

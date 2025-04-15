@@ -1,10 +1,14 @@
 #nullable enable
+using FluentValidation;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using GovUk.Education.ExploreEducationStatistics.Common;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
+using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -22,40 +26,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly List<ErrorViewModel> _errors = [];
 
         public async Task<Either<List<ErrorViewModel>, DataSet>> ValidateDataSet(
-            Guid releaseVersionId,
-            string dataSetTitle,
-            List<DataSetFileDto> dataSetFiles,
-            File? replacingFile = null)
+            DataSetDto dataSet,
+            bool isFromBulkZipUpload = false) // TODO (EES-5708): This flag will be removed once upload methods are aligned
         {
-            var validator = new DataSetFileDto.Validator();
-
-            foreach (var file in dataSetFiles)
-            {
-                var result = validator.Validate(file);
-
-                if (!result.IsValid)
-                {
-                    _errors.AddRange(result.Errors.Select(e => new ErrorViewModel
-                    {
-                        Code = e.ErrorCode,
-                        Message = e.ErrorMessage,
-                    }));
-                }
-
-                //file.FileStream.SeekToBeginning(); // if not using mime detective in validator, this shouldn't be needed
-            }
-
-            var isReplacement = replacingFile != null;
-
-            ValidateDataSetTitleDuplication(releaseVersionId, dataSetTitle, isReplacement);
-
-            if (dataSetFiles.Count != 2)
-            {
-                _errors.Add(ValidationMessages.GenerateErrorDataSetShouldContainTwoFiles());
-            }
-
-            var dataFile = dataSetFiles.FirstOrDefault(file => !file.FileName.EndsWith(Constants.DataSet.MetaFileExtension));
-            var metaFile = dataSetFiles.FirstOrDefault(file => file.FileName.EndsWith(Constants.DataSet.MetaFileExtension));
+            var dataFile = dataSet.DataFile;
+            var metaFile = dataSet.MetaFile;
 
             if (dataFile is null || metaFile is null)
             {
@@ -63,18 +38,40 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 return _errors;
             }
 
-            ValidateDataFileNames(releaseVersionId, dataFile.FileName, replacingFile);
+            var validator = new DataSetDto.Validator();
+
+            var result = validator.Validate(dataSet);
+
+            if (!result.IsValid)
+            {
+                _errors.AddRange(result.Errors.Select(e => new ErrorViewModel
+                {
+                    Code = e.ErrorCode,
+                    Message = e.ErrorMessage,
+                }));
+            }
+
+            var isReplacement = dataSet.ReplacingFile != null && isFromBulkZipUpload; // Replacement is currently only available for bulk zip uploads (EES-5708)
+
+            ValidateDataSetTitleDuplication(dataSet.ReleaseVersionId, dataSet.Title, isReplacement);
+
+            ValidateDataFileNames(dataSet.ReleaseVersionId, dataFile.FileName, dataSet.ReplacingFile);
+
+            var fileToBeReplaced = (File?)null;
 
             if (isReplacement)
             {
-                var releaseFileWithApiDataSet = await context.ReleaseFiles
-                    .SingleOrDefaultAsync(rf =>
-                        rf.ReleaseVersionId == releaseVersionId
-                        && rf.Name == dataSetTitle
-                        && rf.PublicApiDataSetId != null);
+                var releaseFileWithApiDataSet = await GetReplacingFileWithApiDataSetIfExists(dataSet.ReleaseVersionId, dataSet.Title);
+
                 if (releaseFileWithApiDataSet != null)
                 {
-                    _errors.Add(ValidationMessages.GenerateErrorCannotReplaceDataSetWithApiDataSet(dataSetTitle));
+                    _errors.Add(ValidationMessages.GenerateErrorCannotReplaceDataSetWithApiDataSet(dataSet.Title));
+                }
+
+                // TODO (EES-5708): This condition can be removed once upload methods are aligned
+                if (isFromBulkZipUpload)
+                {
+                    fileToBeReplaced = await GetReplacingFileIfExists(dataSet.ReleaseVersionId, dataSet.Title);
                 }
             }
 
@@ -82,10 +79,141 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 ? (Either<List<ErrorViewModel>, DataSet>)_errors
                 : (Either<List<ErrorViewModel>, DataSet>)new DataSet
                 {
-                    Title = dataSetTitle,
+                    Title = dataSet.Title,
                     DataFile = dataFile,
                     MetaFile = metaFile,
+                    ReplacingFile = fileToBeReplaced,
                 };
+        }
+
+        public async Task<Either<List<ErrorViewModel>, DataSetIndex>> ValidateBulkDataZipIndexFile(
+            Guid releaseVersionId,
+            DataSetFileDto indexFile)
+        {
+            var validator = new DataSetFileDto.Validator();
+
+            var result = validator.Validate(indexFile);
+
+            if (!result.IsValid)
+            {
+                _errors.AddRange(result.Errors.Select(e => new ErrorViewModel
+                {
+                    Code = e.ErrorCode,
+                    Message = e.ErrorMessage,
+                }));
+            }
+
+            var headers = await CsvUtils.GetCsvHeaders(indexFile.FileStream, leaveOpen: true);
+
+            if (headers is not ["file_name", "dataset_name"])
+            {
+                _errors.Add(ValidationMessages.GenerateErrorDataSetNamesCsvIncorrectHeaders());
+                return _errors;
+            }
+
+            var fileNameIndex = headers[0] == "file_name" ? 0 : 1;
+            var datasetNameIndex = headers[0] == "dataset_name" ? 0 : 1;
+
+            indexFile.FileStream.SeekToBeginning();
+
+            var rows = await CsvUtils.GetCsvRows(indexFile.FileStream);
+            var dataSetIndex = new DataSetIndex { ReleaseVersionId = releaseVersionId };
+
+            var indexFileEntries = new List<(string BaseFilename, string Title)>();
+
+            foreach (var row in rows)
+            {
+                var dataSetName = row[datasetNameIndex].Trim();
+                var dataFilename = row[fileNameIndex].Replace(".csv", "");
+
+                var releaseFileToBeReplaced = await GetReplacingFileIfExists(releaseVersionId, dataSetName);
+
+                dataSetIndex.DataSetIndexItems.Add(new()
+                {
+                    DataSetTitle = dataSetName,
+                    DataFileName = $"{dataFilename}{Constants.DataSet.DataFileExtension}",
+                    MetaFileName = $"{dataFilename}{Constants.DataSet.MetaFileExtension}",
+                    ReplacingFile = releaseFileToBeReplaced,
+                });
+
+                indexFileEntries.Add((BaseFilename: dataFilename, Title: dataSetName));
+            }
+
+            CheckIndexFileForDuplicationErrors(indexFileEntries);
+
+            // TODO: Re-implement unprocessedFiles validation check
+            //if (unprocessedFiles.Count > 0)
+            //{
+            //    _errors.Add(ValidationMessages.GenerateErrorZipContainsUnusedFiles(
+            //        unprocessedFiles
+            //            .Select(file => file.FileName)
+            //            .ToList()));
+            //}
+
+            if (_errors.Count > 0)
+            {
+                return _errors;
+            }
+
+            return dataSetIndex;
+        }
+
+        private async Task<File?> GetReplacingFileIfExists(
+            Guid releaseVersionId,
+            string dataSetName)
+        {
+            // We replace files with the same title. If there is no ReleaseFile with the same title, it's a new data set.
+            var releaseFileToBeReplaced = await context.ReleaseFiles
+                .Include(rf => rf.File)
+                .Where(rf =>
+                    rf.ReleaseVersionId == releaseVersionId &&
+                    rf.File.Type == FileType.Data &&
+                    rf.Name == dataSetName)
+                .ToListAsync();
+
+            if (releaseFileToBeReplaced.Count > 1)
+            {
+                _errors.Add(ValidationMessages.GenerateErrorDataReplacementAlreadyInProgress());
+                return null;
+            }
+            else
+            {
+                return releaseFileToBeReplaced.SingleOrDefault()?.File;
+            }
+        }
+
+        private async Task<ReleaseFile?> GetReplacingFileWithApiDataSetIfExists(
+            Guid releaseVersionId,
+            string dataSetName)
+        {
+            return await context.ReleaseFiles
+                .SingleOrDefaultAsync(rf =>
+                    rf.ReleaseVersionId == releaseVersionId &&
+                    rf.Name == dataSetName &&
+                    rf.PublicApiDataSetId != null);
+        }
+
+        private void CheckIndexFileForDuplicationErrors(List<(string BaseFilename, string Title)> dataSetNamesCsvEntries)
+        {
+            dataSetNamesCsvEntries
+                .GroupBy(entry => entry.Title)
+                .Where(group => group.Count() > 1)
+                .Select(group => group.Key)
+                .ToList()
+                .ForEach(duplicateTitle =>
+                {
+                    _errors.Add(ValidationMessages.GenerateErrorDataSetTitleShouldBeUnique(duplicateTitle));
+                });
+
+            dataSetNamesCsvEntries
+                .GroupBy(entry => entry.BaseFilename)
+                .Where(group => group.Count() > 1)
+                .Select(group => group.Key)
+                .ToList()
+                .ForEach(duplicateFilename =>
+                {
+                    _errors.Add(ValidationMessages.GenerateErrorDataSetNamesCsvFilenamesShouldBeUnique(duplicateFilename));
+                });
         }
 
         private void ValidateDataSetTitleDuplication(
