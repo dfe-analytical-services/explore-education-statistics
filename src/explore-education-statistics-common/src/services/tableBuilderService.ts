@@ -222,6 +222,7 @@ export interface FastTrackTableAndReleaseMeta extends FastTrackTable {
   releaseType: ReleaseType;
   latestData: boolean;
   latestReleaseTitle: string;
+  latestReleaseSlug: string;
 }
 
 const tableBuilderService = {
