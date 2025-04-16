@@ -24,7 +24,7 @@ public static class FileValidators
         return ruleBuilder
             .MustBeValidFile()
             .Must(file => file.FileName.ToLower().EndsWith(Constants.DataSet.DataFileExtension))
-                .WithMessage(ValidationMessages.FileNameMustEndDotCsv, "{PropertyName}");
+                .WithMessage(ValidationMessages.FileNameMustEndDotCsv, "{PropertyName}", Constants.DataSet.DataFileExtension);
     }
 
     public static IRuleBuilderOptions<T, IFormFile> MustBeValidZipFile<T>(

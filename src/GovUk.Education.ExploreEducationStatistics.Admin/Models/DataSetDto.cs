@@ -1,6 +1,7 @@
 #nullable enable
 using FluentValidation;
 using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
+using GovUk.Education.ExploreEducationStatistics.Common;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using System;
@@ -48,8 +49,8 @@ public record DataSetDto()
                     .WithMessage(ValidationMessages.FileNameCannotContainSpaces, "{PropertyValue}")
                 .Must(file => FileNameValidators.DoesNotContainSpecialChars(file.FileName))
                     .WithMessage(ValidationMessages.FileNameCannotContainSpecialCharacters, "{PropertyValue}")
-                .Must(file => file.FileName.ToLower().EndsWith(".csv"))
-                    .WithMessage(ValidationMessages.FileNameMustEndDotCsv, "{PropertyValue}")
+                .Must(file => file.FileName.ToLower().EndsWith(Constants.DataSet.DataFileExtension))
+                    .WithMessage(ValidationMessages.FileNameMustEndDotCsv, "{PropertyValue}", Constants.DataSet.DataFileExtension)
                 .Must((dto, file, context) =>
                 {
                     context.MessageFormatter.AppendArgument("FileName", dto.DataFile.FileName);
@@ -64,8 +65,8 @@ public record DataSetDto()
                     .WithMessage(ValidationMessages.FileNameCannotContainSpaces, "{PropertyValue}")
                 .Must(file => FileNameValidators.DoesNotContainSpecialChars(file.FileName))
                     .WithMessage(ValidationMessages.FileNameCannotContainSpecialCharacters, "{PropertyValue}")
-                .Must(file => file.FileName.ToLower().EndsWith(".csv"))
-                    .WithMessage(ValidationMessages.FileNameMustEndDotCsv, "{PropertyValue}")
+                .Must(file => file.FileName.ToLower().EndsWith(Constants.DataSet.MetaFileExtension))
+                    .WithMessage(ValidationMessages.MetaFileNameMustEndDotMetaDotCsv, "{PropertyValue}", Constants.DataSet.MetaFileExtension)
                 .Must((dto, file, context) =>
                 {
                     context.MessageFormatter.AppendArgument("FileName", dto.MetaFile.FileName);
@@ -112,7 +113,7 @@ public record DataSetFileDto
                 .Must(FileNameValidators.DoesNotContainSpecialChars)
                     .WithMessage(ValidationMessages.FileNameCannotContainSpecialCharacters, "{PropertyValue}")
                 .Must(fileName => fileName.ToLower().EndsWith(".csv"))
-                    .WithMessage(ValidationMessages.FileNameMustEndDotCsv, "{PropertyValue}");
+                    .WithMessage(ValidationMessages.FileNameMustEndDotCsv, "{PropertyValue}", Constants.DataSet.DataFileExtension);
 
             RuleFor(dto => dto.FileStream)
                 .Must((dto, fileStream, context) =>
