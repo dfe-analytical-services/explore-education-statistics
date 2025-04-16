@@ -289,7 +289,7 @@ public static class ValidationMessages
 
     public static readonly LocalizableMessage FileNameMustEndDotCsv = new(
         Code: nameof(FileNameMustEndDotCsv),
-        Message: $"File name '{0}' must end in '{Constants.DataSet.DataFileExtension}'."
+        Message: "File name '{0}' must end in '{1}'."
     );
 
     public static ErrorViewModel GenerateErrorFilenameMustEndDotCsv(string fileName)
@@ -303,7 +303,7 @@ public static class ValidationMessages
 
     public static readonly LocalizableMessage MetaFileNameMustEndDotMetaDotCsv = new(
         Code: nameof(MetaFileNameMustEndDotMetaDotCsv),
-        Message: $"Meta file '{0}' must end in '{Constants.DataSet.MetaFileExtension}'."
+        Message: "Meta file '{0}' must end in '{1}'."
     );
 
     public static ErrorViewModel GenerateErrorMetaFilenameMustEndDotMetaDotCsv(string fileName)
