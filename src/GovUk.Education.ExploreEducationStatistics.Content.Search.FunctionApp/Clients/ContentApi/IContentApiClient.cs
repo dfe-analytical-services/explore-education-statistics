@@ -26,4 +26,14 @@ public interface IContentApiClient
     /// Given a Theme, get the Publications
     /// </summary>
     Task<PublicationInfo[]> GetPublicationsForTheme(Guid themeId, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Retrieves the releases for the specified publication.
+    /// </summary>
+    /// <param name="publicationSlug">the publication slug</param>
+    /// <param name="cancellationToken">cancellation token</param>
+    /// <returns> An array of releases for the specified publication.</returns>
+    Task<ReleaseInfo[]> GetReleasesForPublication(
+        string publicationSlug,
+        CancellationToken cancellationToken = default);
 }
