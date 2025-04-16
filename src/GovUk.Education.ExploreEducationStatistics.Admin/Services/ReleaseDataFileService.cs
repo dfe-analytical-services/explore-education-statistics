@@ -248,7 +248,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             Guid releaseVersionId,
             IFormFile dataFormFile,
             IFormFile metaFormFile,
-            string? dataSetTitle,
+            string dataSetTitle,
             Guid? replacingFileId,
             CancellationToken cancellationToken)
         {
@@ -269,7 +269,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         public async Task<Either<ActionResult, DataFileInfo>> UploadFromZip(
             Guid releaseVersionId,
             IFormFile zipFormFile,
-            string? dataSetTitle,
+            string dataSetTitle,
             Guid? replacingFileId,
             CancellationToken cancellationToken)
         {
@@ -305,7 +305,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             Guid releaseVersionId,
             IFormFile dataFormFile,
             IFormFile metaFormFile,
-            string? dataSetTitle,
+            string dataSetTitle,
             File? replacingFile)
         {
             var dataFile = await BuildDataSetFile(dataFormFile);
@@ -316,7 +316,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private async Task<Either<ActionResult, DataSet>> ValidateDataSetZip(
             Guid releaseVersionId,
             IFormFile zipFormFile,
-            string? dataSetTitle,
+            string dataSetTitle,
             File? replacingFile)
         {
             var dataSetFiles = await ExtractDataSetZipFile(zipFormFile);
@@ -327,7 +327,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             Guid releaseVersionId,
             DataSetFileDto dataFile,
             DataSetFileDto metaFile,
-            string? dataSetTitle,
+            string dataSetTitle,
             File? replacingFile)
         {
             var newDataSetTitle = await GetReleaseVersionDataSetTitle(releaseVersionId, dataSetTitle, replacingFile);
@@ -378,7 +378,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             var results = new List<DataSet>();
             foreach (var dataSet in dataSets)
             {
-                var validationResult = await _dataSetValidator.ValidateDataSet(dataSet, isFromBulkZipUpload: true);
+                var validationResult = await _dataSetValidator.ValidateDataSet(dataSet, performAutoReplacement: true);
 
                 if (validationResult.IsLeft)
                 {
@@ -631,7 +631,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return BuildDataFileViewModel(
                 dataReleaseFile: releaseFile,
                 metaFile: dataImport.MetaFile,
-                releaseFile.Name,
+                releaseFile.Name ?? "Unknown",
                 dataImport.TotalRows,
                 dataImport.Status,
                 permissions);
@@ -675,7 +675,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private static DataFileInfo BuildDataFileViewModel(
             ReleaseFile dataReleaseFile,
             File metaFile,
-            string? subjectName,
+            string dataSetTitle,
             int? totalRows,
             DataImportStatus importStatus,
             DataFilePermissions permissions)
@@ -684,7 +684,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             {
                 Id = dataReleaseFile.FileId,
                 FileName = dataReleaseFile.File.Filename,
-                Name = subjectName ?? "Unknown",
+                Name = dataSetTitle,
                 Size = dataReleaseFile.File.DisplaySize(),
                 MetaFileId = metaFile.Id,
                 MetaFileName = metaFile.Filename,
@@ -699,31 +699,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             };
         }
 
-        // This method fetches the data set file title based on whether it's an original import or a replacement.
-        // Replacement's use the title from the data set being replaced.
-        private async Task<string> GetReleaseVersionDataSetTitle(Guid releaseVersionId, string? dataSetTitle = null,
-            File? replacingFile = null)
+        /// <summary>
+        /// Determine the title which should be used for a data set.
+        /// </summary>
+        /// <remarks>
+        /// Data replacements use the title of the original data set upload, regardless of whether a new one has been provided during a subsequent upload.
+        /// </remarks>
+        private async Task<string> GetReleaseVersionDataSetTitle(
+            Guid releaseVersionId,
+            string dataSetTitle,
+            File? replacingFile)
         {
-            if (replacingFile != null)
+            if (replacingFile is not null)
             {
-                if (dataSetTitle != null)
-                {
-                    throw new ArgumentException("subjectName and replacingFile shouldn't both be provided");
-                }
-
-                if (replacingFile.Type != FileType.Data)
-                {
-                    throw new ArgumentException("replacingFile.Type should equal FileType.Data");
-                }
-
-                // No need to validate the data set title if a replacement is occurring and we're using the replacement title
-                return (await _releaseFileRepository.Find(releaseVersionId: releaseVersionId,
-                    fileId: replacingFile.Id))?.Name ?? "Unknown";
-            }
-
-            if (dataSetTitle == null)
-            {
-                throw new ArgumentException("New data set files cannot have a null data set title");
+                var originalDataSetTitle = await _releaseFileRepository.Find(releaseVersionId, replacingFile.Id);
+                dataSetTitle = originalDataSetTitle?.Name ?? dataSetTitle;
             }
 
             return dataSetTitle;

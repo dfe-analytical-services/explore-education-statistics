@@ -2,6 +2,7 @@
 using FluentValidation;
 using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -71,6 +72,10 @@ public record DataSetDto()
                     return file.FileStream.Length > 0;
                 })
                     .WithMessage(ValidationMessages.FileSizeMustNotBeZero, "{FileName}");
+
+            RuleFor(dto => dto.ReplacingFile)
+                .Must(file => file is null || file.Type == FileType.Data)
+                    .WithMessage("replacingFile.Type should equal FileType.Data"); // TODO: Test this with a random type, then add to ValidationMessages (inc. a frontend mapping for the Code)
 
             // TODO: Extract duplicated DataSetFileDto validation (FileName/FileStream)
             // DataSetFileDto.Validate() is now only used for the dataset_names.csv file

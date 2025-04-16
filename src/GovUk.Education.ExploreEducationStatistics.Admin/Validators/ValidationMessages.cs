@@ -301,8 +301,8 @@ public static class ValidationMessages
         };
     }
 
-    public static readonly LocalizableMessage MetaFilenameMustEndDotMetaDotCsv = new(
-        Code: nameof(MetaFilenameMustEndDotMetaDotCsv),
+    public static readonly LocalizableMessage MetaFileNameMustEndDotMetaDotCsv = new(
+        Code: nameof(MetaFileNameMustEndDotMetaDotCsv),
         Message: $"Meta file '{0}' must end in '{Constants.DataSet.MetaFileExtension}'."
     );
 
@@ -310,8 +310,8 @@ public static class ValidationMessages
     {
         return new ErrorViewModel
         {
-            Code = MetaFilenameMustEndDotMetaDotCsv.Code,
-            Message = string.Format(MetaFilenameMustEndDotMetaDotCsv.Message, fileName),
+            Code = MetaFileNameMustEndDotMetaDotCsv.Code,
+            Message = string.Format(MetaFileNameMustEndDotMetaDotCsv.Message, fileName),
         };
     }
 
