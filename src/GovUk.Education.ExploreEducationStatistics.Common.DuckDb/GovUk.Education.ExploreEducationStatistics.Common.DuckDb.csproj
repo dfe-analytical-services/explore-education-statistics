@@ -8,7 +8,7 @@
 
     <ItemGroup>
       <PackageReference Include="Dapper" Version="2.1.66" />
-      <PackageReference Include="DuckDB.NET.Data.Full" Version="1.2.1" />
+      <PackageReference Include="DuckDB.NET.Data.Full" Version="1.0.2" />
       <PackageReference Include="InterpolatedSql.Dapper" Version="2.3.0" />
       <PackageReference Include="MiniProfiler.AspNetCore.Mvc" Version="4.5.4" />
     </ItemGroup>
