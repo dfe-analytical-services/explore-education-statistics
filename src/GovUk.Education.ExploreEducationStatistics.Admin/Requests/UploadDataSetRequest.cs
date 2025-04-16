@@ -41,15 +41,30 @@ public record UploadDataSetRequest
 
             RuleFor(request => request.DataFile)
                 .Cascade(CascadeMode.Stop)
-                .MustBeValidCsvFile();
+                .MustBeValidCsvFile()
+                .Must((request, file, context) =>
+                {
+                    context.MessageFormatter.AppendArgument("FileName", request.DataFile.FileName);
+
+                    var fileName = file.FileName.ToLower();
+
+                    return
+                        fileName.EndsWith(Constants.DataSet.DataFileExtension) &&
+                        !fileName.EndsWith(Constants.DataSet.MetaFileExtension);
+                })
+                    .WithMessage(ValidationMessages.FileNameMustEndDotCsv, "{FileName}", Constants.DataSet.DataFileExtension);
             //.MustAsync(async (file, cancellationToken) => await _fileTypeService.HasValidCsvFileMeta(file))
             //    .WithMessage(d => string.Format(ValidationMessages.MustBeCsvFile.Message, d.DataFile.FileName));
 
             RuleFor(request => request.MetaFile)
                 .Cascade(CascadeMode.Stop)
                 .MustBeValidCsvFile()
-                .Must(file => file.FileName.ToLower().EndsWith(Constants.DataSet.MetaFileExtension))
-                    .WithMessage(ValidationMessages.MetaFileNameMustEndDotMetaDotCsv, "{PropertyValue}");
+                .Must((request, file, context) =>
+                {
+                    context.MessageFormatter.AppendArgument("FileName", request.MetaFile.FileName);
+                    return file.FileName.ToLower().EndsWith(Constants.DataSet.MetaFileExtension);
+                })
+                    .WithMessage(ValidationMessages.MetaFileNameMustEndDotMetaDotCsv, "{FileName}", Constants.DataSet.MetaFileExtension);
             //.MustAsync(async (file, cancellationToken) => await _fileTypeService.HasValidCsvFileMeta(file))
             //    .WithMessage(d => string.Format(ValidationMessages.MustBeCsvFile.Message, d.MetaFile.FileName));
         }
