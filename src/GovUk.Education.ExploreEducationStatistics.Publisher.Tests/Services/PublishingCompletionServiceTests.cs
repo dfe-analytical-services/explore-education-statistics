@@ -50,7 +50,11 @@ public class PublishingCompletionServiceTests
         [Fact]
         public void EnsureSUTCanBeResolved()
         {
-            var host = new HostBuilder().ConfigurePublisherHostBuilder().Build();
+            var host = new HostBuilder()
+                .ConfigureTestAppConfiguration()
+                .ConfigureServices()
+                .Build();
+            
             ActivatorUtilities.CreateInstance<PublishingCompletionService>(host.Services);
         }
     }
