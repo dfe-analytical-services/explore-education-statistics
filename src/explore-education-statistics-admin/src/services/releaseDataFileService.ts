@@ -43,29 +43,18 @@ export interface DataFile {
   publicApiDataSetVersion?: string;
 }
 
-export type UploadDataFilesRequest =
-  | {
-      title: string;
-      dataFile: File;
-      metadataFile: File;
-    }
-  | {
-      title: string;
-      replacingFileId: string;
-      dataFile: File;
-      metadataFile: File;
-    };
+export type UploadDataFilesRequest = {
+  title: string;
+  dataFile: File;
+  metadataFile: File;
+  replacingFileId?: string;
+};
 
-export type UploadZipDataFileRequest =
-  | {
-      title: string;
-      zipFile: File;
-    }
-  | {
-      title: string;
-      replacingFileId: string;
-      zipFile: File;
-    };
+export type UploadZipDataFileRequest = {
+  title: string;
+  zipFile: File;
+  replacingFileId?: string;
+};
 
 export type ArchiveDataSetFile = {
   title: string;
@@ -134,13 +123,14 @@ const releaseDataFileService = {
     releaseId: string,
     request: UploadDataFilesRequest,
   ): Promise<DataFile> {
-    const { dataFile, metadataFile, title } = request;
+    const { dataFile, metadataFile, title, replacingFileId } = request;
 
     const data = new FormData();
     data.append('releaseVersionId', releaseId);
     data.append('title', title);
     data.append('dataFile', dataFile);
     data.append('metaFile', metadataFile);
+    data.append('replacingFileId', replacingFileId ?? '');
 
     const file = await client.post<DataFileInfo>(`/releaseVersions/data`, data);
 
@@ -150,12 +140,13 @@ const releaseDataFileService = {
     releaseId: string,
     request: UploadZipDataFileRequest,
   ): Promise<DataFile> {
-    const { zipFile, title } = request;
+    const { zipFile, title, replacingFileId } = request;
 
     const data = new FormData();
     data.append('releaseVersionId', releaseId);
     data.append('title', title);
     data.append('zipFile', zipFile);
+    data.append('replacingFileId', replacingFileId ?? '');
 
     const file = await client.post<DataFileInfo>(
       '/releaseVersions/zip-data',
