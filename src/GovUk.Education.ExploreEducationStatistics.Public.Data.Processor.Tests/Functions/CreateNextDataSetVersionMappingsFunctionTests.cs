@@ -1,6 +1,6 @@
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
-using GovUk.Education.ExploreEducationStatistics.Common.Utils;
+using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
@@ -11,6 +11,7 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Functions
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Requests;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Requests.Validators;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.DurableTask;
@@ -252,13 +253,240 @@ public abstract class CreateNextDataSetVersionMappingsFunctionTests(
             Assert.Equal(new StartOrchestrationOptions { InstanceId = dataSetVersionImport.InstanceId.ToString() },
                 startOrchestrationOptions);
             
-            //startOrchestrationOptions.ScheduleNewOrchestrationInstanceAsync
             durableTaskClientMock.Verify(t => t.ScheduleNewOrchestrationInstanceAsync(
                 nameof(ProcessNextDataSetVersionMappingsFunctionOrchestration
                     .ProcessNextDataSetVersionMappings),
                 It.IsAny<object>(),
                 It.IsAny<StartOrchestrationOptions>(),
                 It.IsAny<CancellationToken>()), Times.Once);
+        }
+        
+        [Fact]
+        public async Task DataSetVersionToPatchProvided_InvalidReleaseID_Returns404NotFoundProblem()
+        {
+            var durableTaskClientMock = new Mock<DurableTaskClient>(MockBehavior.Strict, "TestClient");
+            // Arrange
+            durableTaskClientMock.Setup(client =>
+                    client.ScheduleNewOrchestrationInstanceAsync(
+                        nameof(ProcessNextDataSetVersionMappingsFunctionOrchestration
+                            .ProcessNextDataSetVersionMappings),
+                        It.IsAny<ProcessDataSetVersionContext>(),
+                        It.IsAny<StartOrchestrationOptions>(),
+                        It.IsAny<CancellationToken>()))
+                .ReturnsAsync((TaskName _, object _, StartOrchestrationOptions? options, CancellationToken _) =>
+                    options?.InstanceId ?? Guid.NewGuid().ToString());
+
+            DataSet dataSet = DataFixture
+                .DefaultDataSet()
+                .WithStatusPublished();
+
+            await AddTestData<PublicDataDbContext>(context =>
+            {
+                context.DataSets.Add(dataSet);
+            });
+
+            DataSetVersion version1 = DataFixture
+                .DefaultDataSetVersion()
+                .WithDefaults()
+                .WithVersionNumber(1, 0, 0)
+                .WithStatusPublished();
+            DataSetVersion version2 = DataFixture
+                .DefaultDataSetVersion()
+                .WithDefaults()
+                .WithVersionNumber(1, 1, 0)
+                .WithStatusPublished();
+
+            dataSet.LatestLiveVersion = version2;
+            await AddTestData<PublicDataDbContext>(context =>
+            {
+                dataSet.Versions.AddRange([version1, version2]);
+                context.DataSetVersions.AddRange([version1, version2]);
+                context.DataSets.Update(dataSet);
+            });
+            
+            // Act
+
+            var result = await CreateNextDataSetVersion(
+                dataSetId: dataSet.Id,
+                releaseFileId: Guid.NewGuid(),
+                durableTaskClientMock.Object,
+                dataSetVersionToPatch: new SemVersion(1, 1, 0));
+
+            // Assert
+             Assert.IsType<NotFoundObjectResult>(result);
+        }
+        
+         [Fact]
+        public async Task DataSetVersionToPatchProvided_InvalidDataSetID_Returns404NotFoundProblem()
+        {
+             var durableTaskClientMock = new Mock<DurableTaskClient>(MockBehavior.Strict, "TestClient");
+            // Arrange
+            durableTaskClientMock.Setup(client =>
+                    client.ScheduleNewOrchestrationInstanceAsync(
+                        nameof(ProcessNextDataSetVersionMappingsFunctionOrchestration
+                            .ProcessNextDataSetVersionMappings),
+                        It.IsAny<ProcessDataSetVersionContext>(),
+                        It.IsAny<StartOrchestrationOptions>(),
+                        It.IsAny<CancellationToken>()))
+                .ReturnsAsync((TaskName _, object _, StartOrchestrationOptions? options, CancellationToken _) =>
+                    options?.InstanceId ?? Guid.NewGuid().ToString());
+
+            DataSet dataSet = DataFixture
+                .DefaultDataSet()
+                .WithStatusPublished();
+
+            await AddTestData<PublicDataDbContext>(context =>
+            {
+                context.DataSets.Add(dataSet);
+            });
+
+            DataSetVersion version1 = DataFixture
+                .DefaultDataSetVersion()
+                .WithDefaults()
+                .WithVersionNumber(1, 0, 0)
+                .WithStatusPublished();
+           
+            dataSet.LatestLiveVersion = version1;
+
+            await AddTestData<PublicDataDbContext>(context =>
+            {
+                dataSet.Versions.AddRange([version1]);
+                context.DataSetVersions.AddRange([version1]);
+                context.DataSets.Update(dataSet);
+            });
+           
+            var (releaseFile, meta) = await AddDataAndMetadataFiles(dataSet.PublicationId);
+          
+            var releaseFileId = releaseFile.Id;
+            var dataSetVersionToPatch = new SemVersion(1, 0, 0);
+           
+            // Act
+
+            var result = await CreateNextDataSetVersion(
+                dataSetId: Guid.NewGuid(), 
+                releaseFileId: releaseFileId,
+                durableTaskClientMock.Object,
+                dataSetVersionToPatch: dataSetVersionToPatch);
+
+            // Assert
+             Assert.IsType<NotFoundObjectResult>(result);
+        }
+        
+        [Fact]
+        public async Task WrongDataSetVersionToPatchProvided_ReturnsDataSetVersionNotFoundProblem()
+        {
+            var durableTaskClientMock = new Mock<DurableTaskClient>(MockBehavior.Strict, "TestClient");
+            // Arrange
+            durableTaskClientMock.Setup(client =>
+                    client.ScheduleNewOrchestrationInstanceAsync(
+                        nameof(ProcessNextDataSetVersionMappingsFunctionOrchestration
+                            .ProcessNextDataSetVersionMappings),
+                        It.IsAny<ProcessDataSetVersionContext>(),
+                        It.IsAny<StartOrchestrationOptions>(),
+                        It.IsAny<CancellationToken>()))
+                .ReturnsAsync((TaskName _, object _, StartOrchestrationOptions? options, CancellationToken _) =>
+                    options?.InstanceId ?? Guid.NewGuid().ToString());
+            
+            DataSet dataSet = DataFixture
+                .DefaultDataSet()
+                .WithStatusPublished();
+
+            await AddTestData<PublicDataDbContext>(context =>
+            {
+                context.DataSets.Add(dataSet);
+            });
+
+            DataSetVersion version1 = DataFixture
+                .DefaultDataSetVersion()
+                .WithDefaults()
+                .WithVersionNumber(1, 0, 0)
+                .WithStatusPublished();
+            
+            await AddTestData<PublicDataDbContext>(context =>
+            {
+                dataSet.Versions.Add(version1);
+                context.DataSetVersions.AddRange(version1);
+                context.DataSets.Update(dataSet);
+            });
+            
+            var invalidDataSetVersionToPatch = new SemVersion(2, 1, 0);
+
+            // Act
+
+            var result = await CreateNextDataSetVersion(
+                dataSetId: dataSet.Id,
+                releaseFileId: Guid.NewGuid(),
+                durableTaskClientMock.Object,
+                dataSetVersionToPatch: invalidDataSetVersionToPatch);
+
+            // Assert
+             result.AssertBadRequestWithValidationErrors([
+                new ErrorViewModel
+                {
+                    Code = ValidationMessages.DataSetVersionNotFound.Code,
+                    Message = ValidationMessages.DataSetVersionNotFound.Message,
+                    Path = "dataSetId"
+                }
+            ]);
+        }
+
+        [Fact]
+        public async Task DataSetVersionToPatchProvided_MultipleDataSetVersionsPlusNoLiveVersion_ReturnsDataSetNoLiveVersionProblem()
+        {
+            var durableTaskClientMock = new Mock<DurableTaskClient>(MockBehavior.Strict, "TestClient");
+            // Arrange
+            durableTaskClientMock.Setup(client =>
+                    client.ScheduleNewOrchestrationInstanceAsync(
+                        nameof(ProcessNextDataSetVersionMappingsFunctionOrchestration
+                            .ProcessNextDataSetVersionMappings),
+                        It.IsAny<ProcessDataSetVersionContext>(),
+                        It.IsAny<StartOrchestrationOptions>(),
+                        It.IsAny<CancellationToken>()))
+                .ReturnsAsync((TaskName _, object _, StartOrchestrationOptions? options, CancellationToken _) =>
+                    options?.InstanceId ?? Guid.NewGuid().ToString());
+
+            DataSet dataSet = DataFixture
+                .DefaultDataSet()
+                .WithStatusPublished();
+            await AddTestData<PublicDataDbContext>(context =>
+            {
+                context.DataSets.Add(dataSet);
+            });
+
+            DataSetVersion version1 = DataFixture
+                .DefaultDataSetVersion()
+                .WithDefaults()
+                .WithVersionNumber(1, 0, 0)
+                .WithStatusPublished();
+            DataSetVersion version2 = DataFixture
+                .DefaultDataSetVersion()
+                .WithDefaults()
+                .WithVersionNumber(1, 1, 0)
+                .WithStatusPublished();
+            await AddTestData<PublicDataDbContext>(context =>
+            {
+                dataSet.Versions.AddRange([version1, version2]);
+                context.DataSetVersions.AddRange([version1, version2]);
+                context.DataSets.Update(dataSet);
+            });
+            
+            // Act
+
+            var result = await CreateNextDataSetVersion(
+                dataSetId: dataSet.Id,
+                releaseFileId: Guid.NewGuid(),
+                durableTaskClientMock.Object,
+                dataSetVersionToPatch: new SemVersion(1, 1, 1));
+
+            // Assert
+             result.AssertBadRequestWithValidationErrors([
+                new ErrorViewModel
+                {
+                    Code = ValidationMessages.DataSetNoLiveVersion.Code,
+                    Message = ValidationMessages.DataSetNoLiveVersion.Message,
+                    Path = "dataSetId"
+                }
+            ]);
         }
         
         [Fact]

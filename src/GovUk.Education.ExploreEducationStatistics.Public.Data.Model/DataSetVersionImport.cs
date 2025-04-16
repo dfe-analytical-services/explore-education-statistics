@@ -43,26 +43,18 @@ public class DataSetVersionImport : ICreatedUpdatedTimestamps<DateTimeOffset, Da
             builder.Property(i => i.DataSetVersionToPatch)
                 .HasColumnType("varchar(50)")
                 .HasConversion(
-                    value => ConvertSemVersionToString(value),
+                    value => value == null ? null : value.ToString(),
                     value => ConvertStringToSemVersion(value)
                 );
-        }
-        private static string? ConvertSemVersionToString(SemVersion? semVersion)
-        {
-            return semVersion == null ? null : $"{semVersion?.Major}.{semVersion?.Minor}.{semVersion?.Patch}";
         }
 
         private static SemVersion? ConvertStringToSemVersion(string? value)
         {
-            // Parses the string back into a SemVersion instance
-            var successful = SemVersion.TryParse(
+            return value == null ? null : SemVersion.Parse(
                 value,
                 SemVersionStyles.OptionalMinorPatch
                 | SemVersionStyles.AllowWhitespace
-                | SemVersionStyles.AllowLowerV,
-                out var version);
-            return successful ? version : null;
+                | SemVersionStyles.AllowLowerV);
         }
-
     }
 }
