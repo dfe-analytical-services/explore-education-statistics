@@ -242,7 +242,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             {
                 var publicDataDbConnectionString = configuration.GetConnectionString("PublicDataDb")!;
                 // TODO EES-5073 Remove this check when the Public Data db is available in all Azure environments.
-                if (publicDataDbExists)
+                if (publicDataDbExists && !string.IsNullOrWhiteSpace(publicDataDbConnectionString))
                 {
                     services.AddPsqlDbContext<PublicDataDbContext>(publicDataDbConnectionString, hostEnvironment);
                 }
