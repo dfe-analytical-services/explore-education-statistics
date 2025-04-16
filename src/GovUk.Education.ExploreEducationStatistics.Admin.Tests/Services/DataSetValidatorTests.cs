@@ -100,7 +100,7 @@ public class DataSetValidatorTests
             var sut = BuildService(context);
 
             // Act
-            var result = await sut.ValidateDataSet(dataSetDto, isFromBulkZipUpload: true);
+            var result = await sut.ValidateDataSet(dataSetDto, performAutoReplacement: true);
 
             // Assert
             var dataSet = result.AssertRight();
@@ -275,7 +275,7 @@ public class DataSetValidatorTests
         var sut = BuildService(context);
 
         // Act
-        var result = await sut.ValidateDataSet(dataSetDto, isFromBulkZipUpload: true);
+        var result = await sut.ValidateDataSet(dataSetDto, performAutoReplacement: true);
 
         // Assert
         var errors = result.AssertLeft();

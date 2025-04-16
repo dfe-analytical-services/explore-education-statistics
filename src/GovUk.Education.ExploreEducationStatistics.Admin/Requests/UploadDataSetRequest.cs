@@ -49,7 +49,7 @@ public record UploadDataSetRequest
                 .Cascade(CascadeMode.Stop)
                 .MustBeValidCsvFile()
                 .Must(file => file.FileName.ToLower().EndsWith(Constants.DataSet.MetaFileExtension))
-                    .WithMessage(ValidationMessages.MetaFilenameMustEndDotMetaDotCsv, "{PropertyValue}");
+                    .WithMessage(ValidationMessages.MetaFileNameMustEndDotMetaDotCsv, "{PropertyValue}");
             //.MustAsync(async (file, cancellationToken) => await _fileTypeService.HasValidCsvFileMeta(file))
             //    .WithMessage(d => string.Format(ValidationMessages.MustBeCsvFile.Message, d.MetaFile.FileName));
         }
@@ -79,6 +79,7 @@ public record UploadDataSetAsZipRequest
                 .NotEmpty();
 
             RuleFor(request => request.Title)
+                .Cascade(CascadeMode.Stop)
                 .NotEmpty()
                     .WithMessage(ValidationMessages.DataSetTitleCannotBeEmpty)
                 .MaximumLength(120)

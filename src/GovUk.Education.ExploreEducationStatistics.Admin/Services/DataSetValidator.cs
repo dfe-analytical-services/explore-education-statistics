@@ -27,7 +27,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         public async Task<Either<List<ErrorViewModel>, DataSet>> ValidateDataSet(
             DataSetDto dataSet,
-            bool isFromBulkZipUpload = false) // TODO (EES-5708): This flag will be removed once upload methods are aligned
+            bool performAutoReplacement = false) // TODO (EES-5708): This flag will be removed once upload methods are aligned. Currently auto-replacement is only available via bulk uploads
         {
             var dataFile = dataSet.DataFile;
             var metaFile = dataSet.MetaFile;
@@ -51,7 +51,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 }));
             }
 
-            var isReplacement = dataSet.ReplacingFile != null && isFromBulkZipUpload; // Replacement is currently only available for bulk zip uploads (EES-5708)
+            var isReplacement = dataSet.ReplacingFile != null;
 
             ValidateDataSetTitleDuplication(dataSet.ReleaseVersionId, dataSet.Title, isReplacement);
 
@@ -69,7 +69,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 }
 
                 // TODO (EES-5708): This condition can be removed once upload methods are aligned
-                if (isFromBulkZipUpload)
+                // Auto-replacement is currently only available for bulk zip uploads (EES-5708)
+                if (performAutoReplacement)
                 {
                     fileToBeReplaced = await GetReplacingFileIfExists(dataSet.ReleaseVersionId, dataSet.Title);
                 }

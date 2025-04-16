@@ -12,7 +12,7 @@ public interface IDataSetValidator
 {
     Task<Either<List<ErrorViewModel>, DataSet>> ValidateDataSet(
         DataSetDto dataSet,
-        bool isFromBulkZipUpload = false);
+        bool performAutoReplacement = false);
 
     Task<Either<List<ErrorViewModel>, DataSetIndex>> ValidateBulkDataZipIndexFile(
         Guid releaseVersionId,
