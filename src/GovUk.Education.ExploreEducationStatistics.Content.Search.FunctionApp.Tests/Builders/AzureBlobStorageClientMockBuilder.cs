@@ -7,17 +7,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.
 internal class AzureBlobStorageClientMockBuilder
 {
     private readonly Mock<IAzureBlobStorageClient> _mock = new(MockBehavior.Strict);
-    private bool _deleteBlobIfExistsIsSuccessful = true;
+    private string? _deleteBlobFailsForBlobName;
+    private bool _deleteBlobIsSuccessful = true;
 
-    public AzureBlobStorageClientMockBuilder()
+    public IAzureBlobStorageClient Build()
     {
-        Assert = new Asserter(_mock);
-
         _mock.Setup(mock => mock.DeleteBlobIfExists(
                 It.IsAny<string>(),
                 It.IsAny<string>(),
                 It.IsAny<CancellationToken>()))
-            .ReturnsAsync(() => _deleteBlobIfExistsIsSuccessful);
+            .ReturnsAsync(_deleteBlobIsSuccessful);
+
+        if (!string.IsNullOrWhiteSpace(_deleteBlobFailsForBlobName))
+        {
+            _mock.Setup(mock => mock.DeleteBlobIfExists(
+                    It.IsAny<string>(),
+                    _deleteBlobFailsForBlobName,
+                    It.IsAny<CancellationToken>()))
+                .ReturnsAsync(false);
+        }
 
         _mock.Setup(mock => mock.UploadBlob(
                 It.IsAny<string>(),
@@ -25,21 +33,27 @@ internal class AzureBlobStorageClientMockBuilder
                 It.IsAny<Blob>(),
                 It.IsAny<CancellationToken>()))
             .Returns(Task.CompletedTask);
+
+        return _mock.Object;
     }
 
-    public IAzureBlobStorageClient Build() => _mock.Object;
-
-    public AzureBlobStorageClientMockBuilder WhereDeleteBlobIfExistsIsSuccessful(bool isSuccessful)
+    public AzureBlobStorageClientMockBuilder WhereDeleteBlobFails()
     {
-        _deleteBlobIfExistsIsSuccessful = isSuccessful;
+        _deleteBlobIsSuccessful = false;
         return this;
     }
 
-    public Asserter Assert { get; }
+    public AzureBlobStorageClientMockBuilder WhereDeleteBlobFailsFor(string blobName)
+    {
+        _deleteBlobFailsForBlobName = blobName;
+        return this;
+    }
+
+    public Asserter Assert => new(_mock);
 
     public class Asserter(Mock<IAzureBlobStorageClient> mock)
     {
-        public void BlobWasDeletedIfExists(
+        public void BlobWasDeleted(
             string? containerName = null,
             string? blobName = null)
         {
@@ -54,9 +68,9 @@ internal class AzureBlobStorageClientMockBuilder
         {
             mock
                 .Verify(m => m.DeleteBlobIfExists(
-                            It.IsAny<string>(),
-                            It.IsAny<string>(),
-                            It.IsAny<CancellationToken>()),
+                        It.IsAny<string>(),
+                        It.IsAny<string>(),
+                        It.IsAny<CancellationToken>()),
                     Times.Never);
         }
 

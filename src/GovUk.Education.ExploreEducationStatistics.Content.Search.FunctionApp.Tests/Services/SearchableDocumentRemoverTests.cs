@@ -64,7 +64,7 @@ public class SearchableDocumentRemoverTests
 
             await GetSut().RemovePublicationSearchableDocuments(request);
 
-            _azureBlobStorageClientMockBuilder.Assert.BlobWasDeletedIfExists(
+            _azureBlobStorageClientMockBuilder.Assert.BlobWasDeleted(
                 containerName: _appOptions.SearchableDocumentsContainerName);
         }
 
@@ -81,9 +81,9 @@ public class SearchableDocumentRemoverTests
 
             await GetSut().RemovePublicationSearchableDocuments(request);
 
-            _azureBlobStorageClientMockBuilder.Assert.BlobWasDeletedIfExists(
+            _azureBlobStorageClientMockBuilder.Assert.BlobWasDeleted(
                 blobName: releases[0].ReleaseId.ToString());
-            _azureBlobStorageClientMockBuilder.Assert.BlobWasDeletedIfExists(
+            _azureBlobStorageClientMockBuilder.Assert.BlobWasDeleted(
                 blobName: releases[1].ReleaseId.ToString());
         }
 
@@ -97,13 +97,13 @@ public class SearchableDocumentRemoverTests
             ];
             var request = new RemovePublicationSearchableDocumentsRequest { PublicationSlug = "publication-slug" };
             _contentApiClientMockBuilder.WherePublicationHasReleases(releases);
-            _azureBlobStorageClientMockBuilder.WhereDeleteBlobIfExistsIsSuccessful(false);
+            _azureBlobStorageClientMockBuilder.WhereDeleteBlobFailsFor(releases[0].ReleaseId.ToString());
 
             var response = await GetSut().RemovePublicationSearchableDocuments(request);
 
             Assert.Equal(2, response.ReleaseIdToDeletionResult.Count);
             Assert.False(response.ReleaseIdToDeletionResult[releases[0].ReleaseId]);
-            Assert.False(response.ReleaseIdToDeletionResult[releases[1].ReleaseId]);
+            Assert.True(response.ReleaseIdToDeletionResult[releases[1].ReleaseId]);
         }
     }
 }
