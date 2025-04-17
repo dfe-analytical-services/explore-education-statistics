@@ -66,7 +66,7 @@ interface Props extends InjectedWizardProps {
     publicationTitle: string,
     subjectName: string,
   ) => void;
-  hideFilterHierarchies?: boolean;
+  showFilterHierarchies?: boolean;
 }
 
 export default function FiltersForm({
@@ -78,7 +78,7 @@ export default function FiltersForm({
   showTableQueryErrorDownload = true,
   onSubmit,
   onTableQueryError,
-  hideFilterHierarchies = true, // hierarchies feature flag
+  showFilterHierarchies = false, // hierarchies feature flag
   ...stepProps
 }: Props) {
   const { goToNextStep, isActive } = stepProps;
@@ -88,14 +88,14 @@ export default function FiltersForm({
   const [openFilterGroups, setOpenFilterGroups] = useState<string[]>([]);
 
   const filterHierarchies = useMemo(() => {
-    if (hideFilterHierarchies) {
+    if (!showFilterHierarchies) {
       return [];
     }
     return subjectMeta.filterHierarchies ?? [];
-  }, [subjectMeta, hideFilterHierarchies]);
+  }, [subjectMeta, showFilterHierarchies]);
 
   const hierarchiedFilterIds = useMemo(() => {
-    if (hideFilterHierarchies) return [];
+    if (!showFilterHierarchies) return [];
 
     return (
       filterHierarchies.flatMap(hierarchy => {
@@ -105,7 +105,7 @@ export default function FiltersForm({
         ];
       }) ?? []
     );
-  }, [filterHierarchies, hideFilterHierarchies]);
+  }, [filterHierarchies, showFilterHierarchies]);
 
   const standardFilters = useMemo(() => {
     return orderBy(
@@ -286,12 +286,11 @@ export default function FiltersForm({
       initialValues={initialFormValues}
       validationSchema={validationSchema}
     >
-      {({ formState, getValues, reset, setValue, watch }) => {
+      {({ formState, getValues, reset, setValue }) => {
         const { getError } = createErrorHelper({
           errors: formState.errors,
           touchedFields: formState.touchedFields,
         });
-        const values = watch();
 
         if (isActive) {
           return (
@@ -308,7 +307,7 @@ export default function FiltersForm({
 
               {stepHeading}
 
-              <div className="govuk-grid-row">
+              <div>
                 <div className="govuk-grid-column govuk-!-margin-bottom-6">
                   <FormFieldCheckboxSearchSubGroups
                     disabled={formState.isSubmitting}
@@ -455,7 +454,7 @@ export default function FiltersForm({
             </Form>
           );
         }
-        // const values = getValues();
+        const values = getValues();
 
         return (
           <WizardStepSummary {...stepProps} goToButtonText="Edit filters">
