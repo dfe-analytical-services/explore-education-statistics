@@ -319,6 +319,18 @@ describe('DataReplacementPlan', () => {
         indicatorGroups: {},
       },
     ],
+    apiDataSetVersionPlan: {
+      id: 'version-1',
+      dataSetId: 'data-set-1',
+      name: 'Version 1',
+      version: '1.0',
+      status: 'Draft',
+      mappingStatus: {
+        locationsComplete: false,
+        filtersComplete: false,
+      },
+      valid: false,
+    },
     originalSubjectId: 'subject-1',
     replacementSubjectId: 'subject-2',
     valid: false,
@@ -367,6 +379,18 @@ describe('DataReplacementPlan', () => {
     ],
     originalSubjectId: 'subject-1',
     replacementSubjectId: 'subject-2',
+    apiDataSetVersionPlan: {
+      id: 'version-1',
+      dataSetId: 'data-set-1',
+      name: 'Version 1',
+      version: '1.0',
+      status: 'Draft',
+      mappingStatus: {
+        locationsComplete: true,
+        filtersComplete: true,
+      },
+      valid: true,
+    },
     valid: true,
   };
 
@@ -390,6 +414,12 @@ describe('DataReplacementPlan', () => {
     await waitFor(() => {
       expect(screen.getByText('Data blocks: ERROR')).toBeInTheDocument();
       expect(screen.getByText('Footnotes: ERROR')).toBeInTheDocument();
+      expect(
+        screen.getByText('Api Data Set Filters: ERROR'),
+      ).toBeInTheDocument();
+      expect(
+        screen.getByText('Api Data Set Locations: ERROR'),
+      ).toBeInTheDocument();
     });
 
     expect(
@@ -604,6 +634,10 @@ describe('DataReplacementPlan', () => {
     await waitFor(() => {
       expect(screen.getByText('Data blocks: OK')).toBeInTheDocument();
       expect(screen.getByText('Footnotes: OK')).toBeInTheDocument();
+      expect(screen.getByText('Api Data Set Filters: OK')).toBeInTheDocument();
+      expect(
+        screen.getByText('Api Data Set Locations: OK'),
+      ).toBeInTheDocument();
     });
 
     expect(

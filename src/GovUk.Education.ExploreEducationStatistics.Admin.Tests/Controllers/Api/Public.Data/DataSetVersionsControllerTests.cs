@@ -485,6 +485,7 @@ public abstract class DataSetVersionsControllerTests(
             processorClient
                 .Setup(c => c.CreateNextDataSetVersionMappings(dataSet.Id,
                     releaseFile.Id,
+                    null,
                     It.IsAny<CancellationToken>()))
                 .Returns(async () =>
                 {

@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Semver;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Public.Data;
 
@@ -52,10 +53,16 @@ public class DataSetVersionsController(IDataSetVersionService dataSetVersionServ
         [FromBody] NextDataSetVersionCreateRequest nextDataSetVersionCreateRequest,
         CancellationToken cancellationToken)
     {
+        var dataSetVersionToPatch = nextDataSetVersionCreateRequest.DataSetVersionToPatch is not null 
+            ? SemVersion.Parse(nextDataSetVersionCreateRequest.DataSetVersionToPatch, SemVersionStyles.OptionalMinorPatch
+                                                              | SemVersionStyles.AllowWhitespace
+                                                              | SemVersionStyles.AllowLowerV) : null;
+
         return await dataSetVersionService
             .CreateNextVersion(
                 releaseFileId: nextDataSetVersionCreateRequest.ReleaseFileId,
                 dataSetId: nextDataSetVersionCreateRequest.DataSetId,
+                dataSetVersionToPatch: dataSetVersionToPatch,
                 cancellationToken: cancellationToken)
             .HandleFailuresOrOk();
     }
