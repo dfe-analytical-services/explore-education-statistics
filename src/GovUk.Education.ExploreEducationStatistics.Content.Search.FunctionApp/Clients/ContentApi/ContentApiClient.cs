@@ -20,7 +20,6 @@ internal class ContentApiClient(HttpClient httpClient) : IContentApiClient
     private const string GetPublicationsByThemePageEndpointFormat =
         "/api/publications?ThemeId={1}&Page={0}";
 
-
     private record GetResponse<T>
     {
         public record Success(T Result) : GetResponse<T>;
@@ -91,17 +90,40 @@ internal class ContentApiClient(HttpClient httpClient) : IContentApiClient
 
     public async Task<PublicationInfo[]> GetPublicationsForTheme(Guid themeId, CancellationToken cancellationToken)
     {
-        var publicationDtos = await GetAllPaginatedItems<PublicationDto>(page => BuildGetPublicationsByThemePageEndpoint(themeId, page), cancellationToken);
+        var publicationDtos =
+            await GetAllPaginatedItems<PublicationDto>(page => BuildGetPublicationsByThemePageEndpoint(themeId, page),
+                cancellationToken);
         return publicationDtos
             .Where(dto => !string.IsNullOrEmpty(dto.Slug))
-            .Select(dto => new PublicationInfo
-            {
-                PublicationSlug = dto.Slug!
-            })
+            .Select(dto => new PublicationInfo { PublicationSlug = dto.Slug! })
             .ToArray();
     }
 
-    private async Task<TResponse[]> GetAllPaginatedItems<TResponse>(Func<int, string> getPageApiEndpoint, CancellationToken cancellationToken)
+    public async Task<ReleaseInfo[]> GetReleasesForPublication(
+        string publicationSlug,
+        CancellationToken cancellationToken = default)
+    {
+        var apiEndpoint = $"api/publications/{publicationSlug}/releases";
+        var response = await Get<ReleaseSummaryViewModelDto[]>(apiEndpoint, cancellationToken);
+
+        return response switch
+        {
+            GetResponse<ReleaseSummaryViewModelDto[]>.Success success =>
+                success.Result
+                    .Select(dto => new ReleaseInfo { ReleaseId = dto.ReleaseId })
+                    .ToArray(),
+
+            GetResponse<ReleaseSummaryViewModelDto[]>.Error error =>
+                throw new UnableToGetReleasesForPublicationException(
+                    publicationSlug,
+                    error.ErrorMessage),
+        
+            _ => throw new ArgumentOutOfRangeException()
+        };
+    }
+
+    private async Task<TResponse[]> GetAllPaginatedItems<TResponse>(
+        Func<int, string> getPageApiEndpoint, CancellationToken cancellationToken)
     {
         var page = 1;
         var morePagesToGet = true;
@@ -112,7 +134,7 @@ internal class ContentApiClient(HttpClient httpClient) : IContentApiClient
             // Get a page of results from the API
             var apiEndpoint = getPageApiEndpoint(page);
             var getResponse = await Get<PaginatedResultDto<TResponse>>(apiEndpoint, cancellationToken);
-            
+
             // If there was an error then throw
             if (getResponse is GetResponse<PaginatedResultDto<TResponse>>.Error error)
             {
@@ -124,7 +146,8 @@ internal class ContentApiClient(HttpClient httpClient) : IContentApiClient
             {
                 if (success.Result.Paging is null)
                 {
-                    throw new GetPaginatedItemsException("Paginated response did not contain the expected page information.");
+                    throw new GetPaginatedItemsException(
+                        "Paginated response did not contain the expected page information.");
                 }
 
                 if (success.Result.Results is null)
@@ -137,9 +160,10 @@ internal class ContentApiClient(HttpClient httpClient) : IContentApiClient
                 page++;
             }
         }
+
         return items.ToArray();
     }
-    
+
     private string BuildGetPublicationsPageEndpoint(int page = 1, int numberOfItems = 10) =>
         string.Format(GetPublicationsPageEndpointFormat, page, numberOfItems);
 

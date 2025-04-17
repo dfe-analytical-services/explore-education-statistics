@@ -21,11 +21,22 @@ type SearchServiceRole = 'Search Index Data Contributor' | 'Search Index Data Re
 @export()
 @sealed()
 type SearchStorageQueueNames = {
-  publicationChangedQueueName: string
-  publicationLatestPublishedReleaseReorderedQueueName: string
-  refreshSearchableDocumentQueueName: string
-  releaseSlugChangedQueueName: string
-  releaseVersionPublishedQueueName: string
-  searchableDocumentCreatedQueueName: string
-  themeUpdatedQueueName: string
+  @description('The name of the queue used when a publication is archived.')
+  publicationArchived: string
+  @description('The name of the queue used when a publication is changed.')
+  publicationChanged: string
+  @description('The name of the queue used when the latest published release of a publication changes due to reordering.')
+  publicationLatestPublishedReleaseReordered: string
+  @description('The name of the queue used when a searchable document requires a refresh.')
+  refreshSearchableDocument: string
+  @description('The name of the queue used when a release slug is changed.')
+  releaseSlugChanged: string
+  @description('The name of the queue used when a release version is published.')
+  releaseVersionPublished: string
+  @description('The name of the queue used for removing searchable documents associated with a publication.')
+  removePublicationSearchableDocuments: string
+  @description('The name of the queue used when a searchable document is created.')
+  searchableDocumentCreated: string
+  @description('The name of the queue used when a theme is updated.')
+  themeUpdated: string
 }
