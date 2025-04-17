@@ -101,6 +101,7 @@ internal class DataSetService(
             .FindByVersion(
                 dataSetId: dataSetId,
                 version: dataSetVersion,
+                publicOnly: true,
                 cancellationToken: cancellationToken)
             .OnSuccessDo(userService.CheckCanViewDataSetVersion)
             .OnSuccess(MapDataSetVersion);
@@ -258,6 +259,7 @@ internal class DataSetService(
             .AsNoTracking()
             .FindByVersion(
                 dataSetId: dataSetId,
+                publicOnly: true,
                 version: dataSetVersion,
                 cancellationToken: cancellationToken);
     }

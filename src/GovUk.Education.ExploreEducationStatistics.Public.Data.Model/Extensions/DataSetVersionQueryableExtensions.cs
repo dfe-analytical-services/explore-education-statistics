@@ -8,13 +8,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Extension
 public static class DataSetVersionQueryableExtensions
 {
     /// <summary>
-    /// Returns specified data set version or the latest version of a data set based on a major/minor/patch level that's being wildcarded (i.e., substituted with '*').
+    /// Returns specified data set version or the latest version of a data set based on a major/minor/patch level that can be wildcarded (i.e., substituted with '*').
     /// </summary>
     /// <param name="version">Data set version which can contain a wildcard</param>
+    /// <param name="publicOnly">Specifies whether this method should return versions that are not
+    /// "Published", "Depreciated" or "Withdrawn".
+    /// </param>
     public static async Task<Either<ActionResult, DataSetVersion>> FindByVersion(
         this IQueryable<DataSetVersion> queryable,
         Guid dataSetId,
         string version,
+        bool publicOnly = false,
         CancellationToken cancellationToken = default)
     {
         if (!DataSetVersionNumber.TryParse(version, out var parsedVersion))
@@ -22,9 +26,18 @@ public static class DataSetVersionQueryableExtensions
             return new NotFoundResult();
         }
 
-        return await queryable
-            .Where(dsv => dsv.DataSetId == dataSetId)
-            .Where(v =>
+        var query = queryable
+            .Where(dsv => dsv.DataSetId == dataSetId);
+
+        if (publicOnly)
+        {
+            query = query.Where(dsv => new[]
+            {
+                DataSetVersionStatus.Published, DataSetVersionStatus.Withdrawn, DataSetVersionStatus.Deprecated
+            }.Contains(dsv.Status));
+        }
+
+        return await query.Where(v =>
                 (!parsedVersion.Major.HasValue || v.VersionMajor == parsedVersion.Major) &&
                 (!parsedVersion.Minor.HasValue || v.VersionMinor == parsedVersion.Minor) &&
                 (!parsedVersion.Patch.HasValue || v.VersionPatch == parsedVersion.Patch))
@@ -34,4 +47,3 @@ public static class DataSetVersionQueryableExtensions
             .FirstOrNotFoundAsync(cancellationToken);
     }
 }
-

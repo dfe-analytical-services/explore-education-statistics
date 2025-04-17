@@ -27,6 +27,7 @@ public class DataSetVersionChangeService(
             .FindByVersion(
                 dataSetId: dataSetId,
                 version: dataSetVersion,
+                publicOnly: true,
                 cancellationToken: cancellationToken)
             .OnSuccessDo(userService.CheckCanViewDataSetVersion)
             .OnSuccess(dsv => LoadChanges(dsv, cancellationToken))
