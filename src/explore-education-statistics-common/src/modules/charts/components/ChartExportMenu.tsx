@@ -1,9 +1,10 @@
-import React, { RefObject, useCallback } from 'react';
+import React, { RefObject, useCallback, useEffect } from 'react';
 import downloadFile from '@common/utils/file/downloadFile';
 import logger from '@common/services/logger';
 import useCurrentPng from '@common/components/ChartsToPNG';
 import ButtonText from '@common/components/ButtonText';
 import ExportMenu from '@common/components/ExportMenu';
+import useToggle from '@common/hooks/useToggle';
 
 interface Props {
   chartRef: RefObject<HTMLElement>;
@@ -12,6 +13,17 @@ interface Props {
 
 export default function ChartExportMenu({ chartRef, chartTitle }: Props) {
   const [getClipboardPng] = useCurrentPng({ ref: chartRef });
+  const [copySuccess, setCopySuccess] = useToggle(false);
+
+  useEffect(() => {
+    const resetTimeout = setTimeout(setCopySuccess.off, 5000);
+
+    return () => {
+      if (copySuccess) {
+        clearTimeout(resetTimeout);
+      }
+    };
+  }, [copySuccess, setCopySuccess]);
 
   const handlePngDownload = useCallback(async () => {
     const png = await getClipboardPng();
@@ -41,6 +53,8 @@ export default function ChartExportMenu({ chartRef, chartTitle }: Props) {
           }),
         }),
       ]);
+
+      setCopySuccess.on();
     } catch (error) {
       logger.error(error);
     }
@@ -55,7 +69,7 @@ export default function ChartExportMenu({ chartRef, chartTitle }: Props) {
       </li>
       <li role="menuitem">
         <ButtonText onClick={handleCopyToClipboard}>
-          Copy chart to clipboard
+          {copySuccess ? 'Copied' : 'Copy chart to clipboard'}
         </ButtonText>
       </li>
     </ExportMenu>
