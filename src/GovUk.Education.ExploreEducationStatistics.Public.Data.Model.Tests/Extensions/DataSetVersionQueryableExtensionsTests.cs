@@ -1,3 +1,4 @@
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Extensions;
@@ -26,7 +27,7 @@ public class DataSetVersionQueryableExtensionsTests
             var queryable = SetupDataSetVersions(out dataSetId);
 
             // Act 
-            var actualResult = await queryable.FindByVersion(dataSetId, versionString, CancellationToken.None);
+            var actualResult = await queryable.FindByVersion(dataSetId, versionString, false, CancellationToken.None);
 
             // Assert
             Assert.True(actualResult.IsRight);
@@ -61,17 +62,113 @@ public class DataSetVersionQueryableExtensionsTests
             var queryable = SetupDataSetVersions(out dataSetId);
 
             // Act 
-            var actualResult = await queryable.FindByVersion(dataSetId, versionString, CancellationToken.None);
+            var actualResult = await queryable.FindByVersion(dataSetId, versionString, false, CancellationToken.None);
 
             // Assert
-            Assert.True(actualResult.IsLeft);
+            actualResult.AssertNotFound();
+        }
+
+        [Theory]
+        [InlineData("2.*")]
+        [InlineData("2.1.*")]
+        [InlineData("2.1")]
+        [InlineData("2.0")]
+
+        public async Task TestPublicOnlyDataSetVersions_SpecifyDraftVersion_ReturnsNotFound(
+            string versionString)
+        {
+            // Arrange
+            DataSet dataSet = _dataFixture
+                .DefaultDataSet()
+                .WithStatusPublished();
+
+            var dataSetVersions = _dataFixture
+                .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 3)
+                .WithStatusPublished()
+                .WithDataSetId(dataSet.Id)
+                .WithPreviewTokens(() => [_dataFixture.DefaultPreviewToken()])
+                .ForIndex(1, dsv => dsv.SetVersionNumber(1, 1))
+                .ForIndex(2, dsv => dsv.SetVersionNumber(1, 2))
+                .ForIndex(3, dsv =>
+                {
+                    dsv.SetStatusDraft();
+                    dsv.SetVersionNumber(2, 0);
+                })
+                .ForIndex(4, dsv =>
+                {
+                    dsv.SetStatusDraft();
+                    dsv.SetVersionNumber(2, 1);
+                })
+                .GenerateList();
+
+            var publicDataDbContextMock = new Mock<PublicDataDbContext>();
+            publicDataDbContextMock.Setup(dbContext => dbContext.DataSetVersions).ReturnsDbSet(dataSetVersions);
+
+            var queryable = publicDataDbContextMock.Object.DataSetVersions.AsNoTracking();
+
+            // Act 
+            var actualResult = await queryable.FindByVersion(dataSet.Id, versionString, true, CancellationToken.None);
+
+            // Assert
+            actualResult.AssertNotFound();
+        }
+        
+        [Theory]
+        [InlineData("1.*")]
+        [InlineData("*")]
+        [InlineData("v1.*")]
+        [InlineData("v*")]
+        public async Task TestPublicOnlyDataSetVersions_SpecifyWildCard_DoesNotReturnDraftVersion(
+            string versionString)
+        {
+            // Arrange
+            DataSet dataSet = _dataFixture
+                .DefaultDataSet()
+                .WithStatusPublished();
+
+            var dataSetVersions = _dataFixture
+                .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 3)
+                .WithStatusPublished()
+                .WithDataSetId(dataSet.Id)
+                .WithPreviewTokens(() => [_dataFixture.DefaultPreviewToken()])
+                .ForIndex(1, dsv => dsv.SetVersionNumber(1, 1))
+                .ForIndex(2, dsv => dsv.SetVersionNumber(1, 2))
+                .ForIndex(3, dsv =>
+                {
+                    dsv.SetStatusDraft();
+                    dsv.SetVersionNumber(1, 3);
+                })
+                .ForIndex(4, dsv =>
+                {
+                    dsv.SetStatusDraft();
+                    dsv.SetVersionNumber(2, 0);
+                })
+                .ForIndex(5, dsv =>
+                {
+                    dsv.SetStatusDraft();
+                    dsv.SetVersionNumber(2, 1);
+                })                
+                .GenerateList();
+
+            var publicDataDbContextMock = new Mock<PublicDataDbContext>();
+            publicDataDbContextMock.Setup(dbContext => dbContext.DataSetVersions).ReturnsDbSet(dataSetVersions);
+
+            var queryable = publicDataDbContextMock.Object.DataSetVersions.AsNoTracking();
+
+            // Act 
+            var actualResult = await queryable.FindByVersion(dataSet.Id, versionString, true, CancellationToken.None);
+
+            // Assert
+            Assert.Equal(1, actualResult.Right.VersionMajor);
+            Assert.Equal(2, actualResult.Right.VersionMinor);
+            Assert.Equal(0, actualResult.Right.VersionPatch);
         }
 
         private IQueryable<DataSetVersion> SetupDataSetVersions(out Guid dataSetGuid)
         {
             DataSet dataSet = _dataFixture
-                        .DefaultDataSet()
-                        .WithStatusPublished();
+                .DefaultDataSet()
+                .WithStatusPublished();
             dataSetGuid = dataSet.Id;
 
             var dataSetVersions = _dataFixture
@@ -108,6 +205,7 @@ public class DataSetVersionQueryableExtensionsTests
 
             return publicDataDbContextMock.Object.DataSetVersions.AsNoTracking();
         }
+
         public static TheoryData<string, int, int, int> ValidVersions => new()
         {
             {"0.1.*", 0, 1, 3},

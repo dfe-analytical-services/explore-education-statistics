@@ -133,7 +133,7 @@ internal class DataSetQueryService(
             .DataSetVersions
             .AsNoTracking()
             .Include(dsv => dsv.DataSet)
-            .FindByVersion(dataSetId, dataSetVersion, cancellationToken);
+            .FindByVersion(dataSetId, dataSetVersion, true, cancellationToken);
     }
     
     private async Task<Either<ActionResult, DataSetQueryPaginatedResultsViewModel>> RunQueryWithAnalytics(
