@@ -434,8 +434,13 @@ user checks element does not contain link
     user waits until parent does not contain element    ${element}    xpath://a[text()="${link_text}"]
 
 user waits until element is visible
-    [Arguments]    ${selector}    ${wait}=${timeout}
-    user scrolls to element    ${selector}
+    [Arguments]
+    ...    ${selector}
+    ...    ${wait}=${timeout}
+    ...    ${scroll_to_element}=${True}
+    IF    ${scroll_to_element}
+        user scrolls to element    ${selector}
+    END
     wait until element is visible    ${selector}    timeout=${wait}
 
 user checks element is visible
