@@ -3,6 +3,7 @@
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.
     RemovePublicationSearchableDocuments.Dto;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Tests.Builders;
+using Microsoft.Extensions.Logging.Abstractions;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Tests.Functions.
     RemovePublicationSearchableDocuments;
@@ -12,6 +13,7 @@ public class RemovePublicationSearchableDocumentsTests
     private readonly SearchableDocumentRemoverMockBuilder _searchableDocumentRemoverMockBuilder = new();
 
     private RemovePublicationSearchableDocumentsFunction GetSut() => new(
+        new NullLogger<RemovePublicationSearchableDocumentsFunction>(),
         _searchableDocumentRemoverMockBuilder.Build());
 
     [Fact]
