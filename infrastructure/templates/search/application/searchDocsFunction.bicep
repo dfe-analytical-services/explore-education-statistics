@@ -50,15 +50,15 @@ param functionAppExists bool
 
 @description('Specifies the names of the storage queues that trigger functions within the Search Docs Function App.')
 param storageQueueNames SearchStorageQueueNames = {
-  publicationArchivedQueueName: 'publication-archived-queue'
-  publicationChangedQueueName: 'publication-changed-queue'
-  publicationLatestPublishedReleaseReorderedQueueName: 'publication-latest-published-release-reordered-queue'
-  refreshSearchableDocumentQueueName: 'refresh-searchable-document-queue'
-  releaseSlugChangedQueueName: 'release-slug-changed-queue'
-  releaseVersionPublishedQueueName: 'release-version-published-queue'
-  removePublicationSearchableDocumentsQueueName: 'remove-publication-searchable-documents-queue'
-  searchableDocumentCreatedQueueName: 'search-document-created-queue'
-  themeUpdatedQueueName: 'theme-updated-queue'
+  publicationArchived: 'publication-archived-queue'
+  publicationChanged: 'publication-changed-queue'
+  publicationLatestPublishedReleaseReordered: 'publication-latest-published-release-reordered-queue'
+  refreshSearchableDocument: 'refresh-searchable-document-queue'
+  releaseSlugChanged: 'release-slug-changed-queue'
+  releaseVersionPublished: 'release-version-published-queue'
+  removePublicationSearchableDocuments: 'remove-publication-searchable-documents-queue'
+  searchableDocumentCreated: 'search-document-created-queue'
+  themeUpdated: 'theme-updated-queue'
 }
 
 @description('Specifies a set of tags with which to tag the resource in Azure.')
@@ -131,39 +131,39 @@ module functionAppModule '../../common/components/functionApp.bicep' = {
       }
       {
         name: 'PublicationArchivedQueueName'
-        value: storageQueueNames.publicationArchivedQueueName
+        value: storageQueueNames.publicationArchived
       }
       {
         name: 'PublicationChangedQueueName'
-        value: storageQueueNames.publicationChangedQueueName
+        value: storageQueueNames.publicationChanged
       }
       {
         name: 'PublicationLatestPublishedReleaseReorderedQueueName'
-        value: storageQueueNames.publicationLatestPublishedReleaseReorderedQueueName
+        value: storageQueueNames.publicationLatestPublishedReleaseReordered
       }
       {
         name: 'RefreshSearchableDocumentQueueName'
-        value: storageQueueNames.refreshSearchableDocumentQueueName
+        value: storageQueueNames.refreshSearchableDocument
       }
       {
         name: 'ReleaseSlugChangedQueueName'
-        value: storageQueueNames.releaseSlugChangedQueueName
+        value: storageQueueNames.releaseSlugChanged
       }
       {
         name: 'ReleaseVersionPublishedQueueName'
-        value: storageQueueNames.releaseVersionPublishedQueueName
+        value: storageQueueNames.releaseVersionPublished
       }
       {
         name: 'RemovePublicationSearchableDocumentsQueueName'
-        value: storageQueueNames.removePublicationSearchableDocumentsQueueName
+        value: storageQueueNames.removePublicationSearchableDocuments
       }
       {
         name: 'SearchableDocumentCreatedQueueName'
-        value: storageQueueNames.searchableDocumentCreatedQueueName
+        value: storageQueueNames.searchableDocumentCreated
       }
       {
         name: 'ThemeUpdatedQueueName'
-        value: storageQueueNames.themeUpdatedQueueName
+        value: storageQueueNames.themeUpdated
       }
     ]
     functionAppExists: functionAppExists
