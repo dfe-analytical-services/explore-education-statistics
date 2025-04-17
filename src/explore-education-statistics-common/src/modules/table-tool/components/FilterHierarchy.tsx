@@ -161,6 +161,7 @@ function FilterHierarchy({
                 className={classNames(styles.tier, {
                   [styles.subTier]: !isFirst,
                 })}
+                data-testid="modal-tier-description-section"
               >
                 <h3 className="govuk-heading-s">
                   {filterLabel} (tier {index + 1})
@@ -198,21 +199,23 @@ function FilterHierarchy({
             );
           })}
         </Modal>
-        {rootOptionTrees.map(optionTree => {
-          return (
-            <FilterHierarchyOptions
-              key={optionTree.value}
-              optionTree={optionTree}
-              name={name}
-              disabled={disabled}
-              selectedValues={selectedValues}
-              level={0}
-              toggleOptions={toggleOptions}
-              expandedOptionsList={expandedOptionsList}
-              hierarchySearchTerm={hierarchySearchTerm}
-            />
-          );
-        })}
+        <div data-testid="filter-hierarchy-options">
+          {rootOptionTrees.map(optionTree => {
+            return (
+              <FilterHierarchyOptions
+                key={optionTree.value}
+                optionTree={optionTree}
+                name={name}
+                disabled={disabled}
+                selectedValues={selectedValues}
+                level={0}
+                toggleOptions={toggleOptions}
+                expandedOptionsList={expandedOptionsList}
+                hierarchySearchTerm={hierarchySearchTerm}
+              />
+            );
+          })}
+        </div>
       </FormFieldset>
     </DetailsMenu>
   );
