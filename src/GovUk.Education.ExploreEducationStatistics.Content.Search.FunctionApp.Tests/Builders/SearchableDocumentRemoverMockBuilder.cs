@@ -16,7 +16,7 @@ public class SearchableDocumentRemoverMockBuilder
             .Setup(m => m.RemovePublicationSearchableDocuments(
                 It.IsAny<RemovePublicationSearchableDocumentsRequest>(),
                 It.IsAny<CancellationToken>()))
-            .ReturnsAsync(_response ?? new RemovePublicationSearchableDocumentsResponse());
+            .ReturnsAsync(_response ?? new RemovePublicationSearchableDocumentsResponse(new Dictionary<Guid, bool>()));
     }
 
     public ISearchableDocumentRemover Build()

@@ -21,18 +21,18 @@ internal class SearchableDocumentRemover(
             request.PublicationSlug,
             cancellationToken);
 
-        var response = new RemovePublicationSearchableDocumentsResponse();
+        var results = new Dictionary<Guid, bool>();
 
         foreach (var releaseInfo in releaseInfos)
         {
             var blobName = releaseInfo.ReleaseId.ToString();
-            response.ReleaseIdToDeletionResult[releaseInfo.ReleaseId] =
+            results[releaseInfo.ReleaseId] =
                 await azureBlobStorageClient.DeleteBlobIfExists(
                     appOptions.Value.SearchableDocumentsContainerName,
                     blobName,
                     cancellationToken);
         }
 
-        return response;
+        return new RemovePublicationSearchableDocumentsResponse(results);
     }
 }
