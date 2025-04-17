@@ -21,18 +21,29 @@ export default function ChartExportMenu({ chartRef, chartTitle }: Props) {
   }, [chartTitle, getClipboardPng]);
 
   const handleCopyToClipboard = useCallback(async () => {
-    await getClipboardPng(async blob => {
-      try {
-        if (blob) {
-          const clipboardItems: ClipboardItem[] = [];
-          const clipboardItem = new ClipboardItem({ [blob.type]: blob });
-          clipboardItems.push(clipboardItem);
-          await navigator.clipboard.write(clipboardItems);
-        }
-      } catch (error) {
-        logger.error(error);
-      }
-    });
+    try {
+      await navigator.clipboard.write([
+        // EES-6032 Safari requires the clipboard item value be returned from a promise
+        // https://web.dev/articles/async-clipboard#write
+        new ClipboardItem({
+          // eslint-disable-next-line no-async-promise-executor
+          'image/png': new Promise(async (resolve, reject) => {
+            try {
+              await getClipboardPng(blob => {
+                if (!blob) {
+                  throw new Error("Couldn't create blob");
+                }
+                resolve(blob);
+              });
+            } catch (err) {
+              reject(err);
+            }
+          }),
+        }),
+      ]);
+    } catch (error) {
+      logger.error(error);
+    }
   }, [getClipboardPng]);
 
   return (
