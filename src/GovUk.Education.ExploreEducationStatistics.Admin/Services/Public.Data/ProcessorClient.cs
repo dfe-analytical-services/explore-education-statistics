@@ -51,7 +51,7 @@ internal class ProcessorClient(
         {
             ReleaseFileId = releaseFileId,
             DataSetId = dataSetId,
-            DataSetVersionToPatch = dataSetVersionToPatch
+            DataSetVersionToPatch = dataSetVersionToPatch?.ToString()
         };
 
         return await SendPost<NextDataSetVersionMappingsCreateRequest, ProcessDataSetVersionResponseViewModel>(

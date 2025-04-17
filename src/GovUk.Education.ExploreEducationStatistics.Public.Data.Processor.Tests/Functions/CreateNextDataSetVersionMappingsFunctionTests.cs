@@ -913,7 +913,7 @@ public abstract class CreateNextDataSetVersionMappingsFunctionTests(
                 {
                     DataSetId = dataSetId,
                     ReleaseFileId = releaseFileId,
-                    DataSetVersionToPatch = dataSetVersionToPatch
+                    DataSetVersionToPatch = dataSetVersionToPatch?.ToString()
                 },
                 durableTaskClient ?? new Mock<DurableTaskClient>(MockBehavior.Strict, "TestClient").Object,
                 CancellationToken.None);

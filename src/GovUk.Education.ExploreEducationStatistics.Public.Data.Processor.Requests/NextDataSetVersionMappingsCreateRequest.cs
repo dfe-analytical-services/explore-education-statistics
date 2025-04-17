@@ -1,5 +1,3 @@
-using System.Text.Json;
-using System.Text.Json.Serialization;
 using FluentValidation;
 using Semver;
 
@@ -11,8 +9,7 @@ public record NextDataSetVersionMappingsCreateRequest
 
     public required Guid ReleaseFileId { get; init; }
 
-    [JsonConverter(typeof(SemVersionJsonConverter))]
-    public SemVersion? DataSetVersionToPatch { get; init; } = null;
+    public string? DataSetVersionToPatch { get; init; } = null;
 
     public class Validator : AbstractValidator<NextDataSetVersionMappingsCreateRequest>
     {
@@ -23,6 +20,14 @@ public record NextDataSetVersionMappingsCreateRequest
             
             RuleFor(request => request.ReleaseFileId)
                 .NotEmpty();
+            
+            RuleFor(request => request.DataSetVersionToPatch)
+                .Must(version => version == null || SemVersion.TryParse(version,
+                    SemVersionStyles.OptionalMinorPatch
+                    | SemVersionStyles.AllowWhitespace
+                    | SemVersionStyles.AllowLowerV
+                    ,out _))
+                .WithMessage("DataSetVersionToPatch must be a valid semantic version if provided.");
         }
     }
 }

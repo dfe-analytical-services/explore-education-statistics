@@ -10,6 +10,7 @@ using Microsoft.Azure.Functions.Worker;
 using Microsoft.DurableTask;
 using Microsoft.DurableTask.Client;
 using Microsoft.Extensions.Logging;
+using Semver;
 using FromBodyAttribute = Microsoft.Azure.Functions.Worker.Http.FromBodyAttribute;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Functions;
@@ -33,13 +34,21 @@ public class CreateNextDataSetVersionMappingsFunction(
         var instanceId = Guid.NewGuid();
 
         return await requestValidator.Validate(request, cancellationToken)
-            .OnSuccess(() => dataSetVersionService.CreateNextVersion(
-                dataSetId: request.DataSetId,
-                releaseFileId: request.ReleaseFileId,
-                instanceId,
-                request.DataSetVersionToPatch,
-                cancellationToken: cancellationToken
-            ))
+            .OnSuccess(() =>
+            {
+                var dataSetVersionToPatch = request.DataSetVersionToPatch is not null 
+                    ? SemVersion.Parse(request.DataSetVersionToPatch, SemVersionStyles.OptionalMinorPatch
+                        | SemVersionStyles.AllowWhitespace
+                        | SemVersionStyles.AllowLowerV) : null;
+
+                return dataSetVersionService.CreateNextVersion(
+                    dataSetId: request.DataSetId,
+                    releaseFileId: request.ReleaseFileId,
+                    instanceId,
+                    dataSetVersionToPatch,
+                    cancellationToken: cancellationToken
+                );
+            })
             .OnSuccess(async dataSetVersionId =>
             {
                 await ProcessNextDataSetVersion(
