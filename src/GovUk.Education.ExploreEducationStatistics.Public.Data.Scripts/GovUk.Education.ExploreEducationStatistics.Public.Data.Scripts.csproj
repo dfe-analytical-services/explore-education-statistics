@@ -22,6 +22,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Common.DuckDb\GovUk.Education.ExploreEducationStatistics.Common.DuckDb.csproj" />
       <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Public.Data.Model\GovUk.Education.ExploreEducationStatistics.Public.Data.Model.csproj" />
       <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Public.Data.Utils\GovUk.Education.ExploreEducationStatistics.Public.Data.Utils.csproj" />
     </ItemGroup>
