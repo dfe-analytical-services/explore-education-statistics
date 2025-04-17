@@ -16,7 +16,17 @@ public class ConsumeAnalyticsRequestFilesFunction(
 
         foreach (var requestFileProcessor in processors)
         {
-            await requestFileProcessor.Process();
+            try
+            {
+                await requestFileProcessor.Process();
+            }
+            catch (Exception e)
+            {
+                logger.LogError(
+                    e,
+                    "Failed to process request files with processor {RequestFileProcessorType}",
+                    requestFileProcessor.GetType());
+            }
         }
     }
 }

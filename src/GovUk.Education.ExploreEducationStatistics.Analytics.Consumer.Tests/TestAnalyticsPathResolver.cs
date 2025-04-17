@@ -32,6 +32,10 @@ public class TestAnalyticsPathResolver : IAnalyticsPathResolver, IDisposable
         return Path.Combine(_basePath, "public-api", "processing");
     }
 
+    public string PublicApiQueriesFailuresDirectoryPath() {
+        return Path.Combine(_basePath, "public-api", "failures");
+    }
+
     public string PublicApiQueriesReportsDirectoryPath() {
         return Path.Combine(_basePath, "reports", "public-api", "reports");
     }

@@ -9,14 +9,14 @@ using Xunit;
 
 namespace GovUk.Education.ExploreEducationStatistics.Analytics.Consumer.Tests.Services;
 
-public abstract class ConsumePublicApiQueriesFunctionTests
+public abstract class ConsumePublicApiQueriesProcessorTests
 {
     private readonly string _queryResourcesPath = Path.Combine(
         Assembly.GetExecutingAssembly().GetDirectoryPath(),
         "Resources",
         "PublicApiQueries");
 
-    public class FunctionTests : ConsumePublicApiQueriesFunctionTests
+    public class ProcessTests : ConsumePublicApiQueriesProcessorTests
     {
         [Fact]
         public async Task NoSourceFolder_NoReportsProduced()
