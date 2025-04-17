@@ -32,7 +32,7 @@ public class QueryAnalyticsWriter(
         {
             Directory.CreateDirectory(directory);
 
-            var filename = $"{DateTime.UtcNow:yyyyMMdd-HHmmss-fff}_{request.DataSetVersionId}_{Guid.NewGuid()}.json";
+            var filename = $"{DateTime.UtcNow:yyyyMMdd-HHmmss}_{request.DataSetVersionId}_{RandomUtils.RandomString()}.json";
 
             await File.WriteAllTextAsync(
                 Path.Combine(directory, filename),

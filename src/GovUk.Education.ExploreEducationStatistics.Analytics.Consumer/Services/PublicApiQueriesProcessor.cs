@@ -12,7 +12,7 @@ public class PublicApiQueriesProcessor(
 {
     public Task Process()
     {
-        logger.LogInformation($"{nameof(PublicApiQueriesProcessor)} triggered");
+        logger.LogInformation("{PublicApiQueriesProcessor} triggered", nameof(PublicApiQueriesProcessor));
 
         var sourceDirectory = pathResolver.PublicApiQueriesDirectoryPath();
 
@@ -25,7 +25,7 @@ public class PublicApiQueriesProcessor(
         var filesToProcess = Directory
             .GetFiles(sourceDirectory)
             .Select(Path.GetFileName)
-            .Cast<string>()
+            .OfType<string>()
             .ToList();
 
         if (filesToProcess.Count == 0)
@@ -52,8 +52,9 @@ public class PublicApiQueriesProcessor(
         duckDbConnection.Open();
         
         duckDbConnection.ExecuteNonQuery("install json; load json");
+
         duckDbConnection.ExecuteNonQuery(@"
-            CREATE TABLE queries (
+            CREATE TABLE IF NOT EXISTS queries (
                 queryVersionHash VARCHAR,
                 queryHash VARCHAR,
                 dataSetId UUID,
@@ -72,7 +73,7 @@ public class PublicApiQueriesProcessor(
         var filesReadyForProcessing = Directory
             .GetFiles(processingDirectory)
             .Select(Path.GetFileName)
-            .Cast<string>()
+            .OfType<string>()
             .ToList();
 
         foreach (var filename in filesReadyForProcessing)
@@ -103,12 +104,9 @@ public class PublicApiQueriesProcessor(
             }
             catch (DuckDBException e)
             {
-                logger.LogCritical($"Failed to process analytics request file {filename}\n Exception: {e}");
+                logger.LogError(e, "Failed to process analytics request file {Filename}", filename);
                 var badFilePath = Path.Combine(processingDirectory, filename);
-                var newPath = Path.Combine(sourceDirectory, "failures", filename);
-
-                Directory.CreateDirectory(Path.Combine(sourceDirectory, "failures"));
-                File.Move(badFilePath, newPath);
+                MoveBadFileToFailuresDirectory(badFilePath);
             }
         }
 
@@ -141,7 +139,7 @@ public class PublicApiQueriesProcessor(
             ORDER BY queryHash, startTime");
 
         var reportFilenamePrefix = DateTime.UtcNow.ToString("yyyyMMdd-HHmmss");
-        
+
         var queryReportFilename = Path.Combine(
             reportsDirectory, 
             $"{reportFilenamePrefix}_public-api-queries.parquet");
@@ -161,5 +159,24 @@ public class PublicApiQueriesProcessor(
         Directory.Delete(processingDirectory, recursive: true);
         
         return Task.CompletedTask;
+    }
+
+    private void MoveBadFileToFailuresDirectory(string filePath)
+    {
+        var failuresDirectoryPath = pathResolver.PublicApiQueriesFailuresDirectoryPath();
+
+        try
+        {
+            Directory.CreateDirectory(failuresDirectoryPath);
+            File.Move(filePath, failuresDirectoryPath);
+        }
+        catch (Exception e)
+        {
+            logger.LogError(
+                e,
+                "Failed to move bad file to failures directory. SourcePath: {FilePath}. DestPath: {FailuresDirectoryPath}",
+                filePath,
+                failuresDirectoryPath);
+        }
     }
 }
