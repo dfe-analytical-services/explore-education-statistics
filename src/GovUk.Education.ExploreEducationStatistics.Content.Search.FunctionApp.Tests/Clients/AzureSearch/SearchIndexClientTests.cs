@@ -1,10 +1,14 @@
 ﻿using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Clients.AzureSearch;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Options;
+using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Tests.Builders;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
+using Xunit.Abstractions;
 using SearchIndexClient = GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Clients.AzureSearch.SearchIndexClient;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Tests.Clients.AzureSearch;
 
-public class SearchIndexClientTests
+public abstract class SearchIndexClientTests
 {
     private AzureSearchOptions AzureSearchOptions => new()
     {
@@ -18,12 +22,13 @@ public class SearchIndexClientTests
     private string? _searchServiceAccessKey = "my-access-key";
     private string _indexerName = "my-indexer-name";
 
-    private ISearchIndexClient GetSut()
+    protected virtual ISearchIndexClient GetSut(ILogger<SearchIndexClient>? logger = null)
     {
         return new SearchIndexClient(
             new AzureSearchIndexerClientFactory(
                 Microsoft.Extensions.Options.Options.Create(AzureSearchOptions)),
-            Microsoft.Extensions.Options.Options.Create(AzureSearchOptions));
+            Microsoft.Extensions.Options.Options.Create(AzureSearchOptions),
+            logger ?? new NullLogger<SearchIndexClient>());
     }
 
     public class BasicTests : SearchIndexClientTests
@@ -34,25 +39,24 @@ public class SearchIndexClientTests
 
     public class IntegrationTests : SearchIndexClientTests
     {
-        public IntegrationTests()
+        private readonly ITestOutputHelper _output;
+
+        public IntegrationTests(ITestOutputHelper output)
         {
+            _output = output;
+
             var searchServiceName = "-- insert search service name here --";
             _searchServiceAccessKey = "-- insert search service access key here --";
             _indexerName = "-- insert search indexer name here --";
 
             _searchServiceEndpoint = $"https://{searchServiceName}.search.windows.net/";
         }
-        
-        [Fact(Skip = "Integration test is disabled")]
-        public async Task Trigger_reindex()
-        {
-            // ARRANGE
-            var sut = GetSut();
 
-            // ACT
-            await sut.RunIndexer();
-        }
-        
+        protected override ISearchIndexClient GetSut(ILogger<SearchIndexClient>? logger = null) =>
+            base.GetSut(new LoggerMockBuilder<SearchIndexClient>()
+                .WithLogAction(s => _output.WriteLine(s))
+                .Build());
+
         [Fact(Skip = "Integration test is disabled")]
         public async Task Can_ping_indexer()
         {
@@ -73,5 +77,42 @@ public class SearchIndexClientTests
             // ACT
             Assert.False(await sut.IndexerExists());
         }
+
+        [Fact(Skip = "Integration test is disabled")]
+        public async Task Run_indexer()
+        {
+            var sut = GetSut();
+            await sut.RunIndexer();
+        }
+        
+        [Fact(Skip = "Integration test is disabled")]
+        public async Task Reset_indexer()
+        {
+            var sut = GetSut();
+            await sut.ResetIndexer();
+        }
+
+        [Fact(Skip = "Integration test is disabled")]
+        public async Task Run_indexer_multiple_times()
+        {
+            var sut = GetSut();
+            var tasks = new List<Task>();
+            for (var i = 0; i < 10; i++)
+            {
+                tasks.Add(sut.RunIndexer());
+                await Task.Delay(TimeSpan.FromMilliseconds(50));
+            }
+            await Task.WhenAll(tasks);
+        }
+
+        [Fact(Skip = "Integration test is disabled")]
+        public async Task Is_indexer_running()
+        {
+            var sut = GetSut();
+            var isIndexerRunning = await sut.IsIndexerRunning(_indexerName);
+            Print($"Is indexer {_indexerName} running: {isIndexerRunning}");
+        }
+        
+        private void Print(string message) => _output.WriteLine(message);
     }
 }
