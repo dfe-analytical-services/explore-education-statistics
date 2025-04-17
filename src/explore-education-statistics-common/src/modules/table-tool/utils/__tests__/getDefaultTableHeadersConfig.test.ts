@@ -338,7 +338,7 @@ describe('getDefaultTableHeadersConfig', () => {
     expect(rows[1].label).toBe('Number of authorised absence sessions');
   });
 
-  test('returns correct config with siblingless filters removed when one option for every filter type', () => {
+  test('does not remove siblingless non-default filters', () => {
     const testTableDataSiblingless: TableDataResponse = {
       ...testTableData,
       subjectMeta: {
@@ -409,10 +409,93 @@ describe('getDefaultTableHeadersConfig', () => {
     const { rows, rowGroups, columns, columnGroups } =
       getDefaultTableHeaderConfig(testSubjectMeta);
 
-    // Should only have indicators and time periods
-    // when all other filter types are siblingless
     expect(columnGroups).toHaveLength(0);
-    expect(rowGroups).toHaveLength(0);
+    expect(rowGroups).toHaveLength(2);
+    expect(rowGroups[0][0].label).toBe('State-funded secondary');
+    expect(rowGroups[1][0].label).toBe('Ethnicity Major Black Total');
+
+    expect(rows).toHaveLength(1);
+    expect(rows[0].label).toBe('Number of overall absence sessions');
+
+    expect(columns).toHaveLength(1);
+    expect(columns[0].label).toBe('2014/15');
+  });
+
+  test('removes siblingless default filters', () => {
+    const testTableDataSiblingless: TableDataResponse = {
+      ...testTableData,
+      subjectMeta: {
+        ...testTableData.subjectMeta,
+        filters: {
+          ...testTableData.subjectMeta.filters,
+          Characteristic: {
+            ...testTableData.subjectMeta.filters.Characteristic,
+            autoSelectFilterItemId: 'ethnicity-major-black-total',
+            options: {
+              EthnicGroupMajor: {
+                id: 'ethnic-group-major',
+                label: 'Ethnic group major',
+                options: [
+                  {
+                    label: 'Ethnicity Major Black Total',
+                    value: 'ethnicity-major-black-total',
+                  },
+                ],
+                order: 0,
+              },
+            },
+          },
+          SchoolType: {
+            ...testTableData.subjectMeta.filters.SchoolType,
+            options: {
+              Default: {
+                id: 'default',
+                label: 'Default',
+                options: [
+                  {
+                    label: 'State-funded secondary',
+                    value: 'state-funded-secondary',
+                  },
+                ],
+                order: 0,
+              },
+            },
+          },
+        },
+        indicators: [
+          {
+            value: 'overall-absence-sessions',
+            label: 'Number of overall absence sessions',
+            unit: '',
+            name: 'sess_overall',
+            decimalPlaces: 2,
+          },
+        ],
+        locations: {
+          localAuthority: [
+            { id: 'barnsley', value: 'barnsley', label: 'Barnsley' },
+          ],
+        },
+      },
+      results: [
+        {
+          filters: [],
+          geographicLevel: '',
+          locationId: '',
+          measures: {},
+          timePeriod: '2014_AY',
+        },
+      ],
+    };
+
+    const testSubjectMeta = mapFullTable(testTableDataSiblingless);
+
+    const { rows, rowGroups, columns, columnGroups } =
+      getDefaultTableHeaderConfig(testSubjectMeta);
+
+    expect(columnGroups).toHaveLength(0);
+    expect(rowGroups).toHaveLength(1);
+    expect(rowGroups[0][0].label).toBe('State-funded secondary');
 
     expect(rows).toHaveLength(1);
     expect(rows[0].label).toBe('Number of overall absence sessions');
