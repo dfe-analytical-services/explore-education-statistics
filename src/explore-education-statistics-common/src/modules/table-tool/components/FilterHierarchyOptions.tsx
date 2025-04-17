@@ -94,6 +94,7 @@ function FilterHierarchyOptions({
 
   return (
     <div
+      data-testid={`filter-hierarchy-options-${optionTree.value}`}
       className={classNames(
         'govuk-checkboxes',
         'govuk-checkboxes--small',
