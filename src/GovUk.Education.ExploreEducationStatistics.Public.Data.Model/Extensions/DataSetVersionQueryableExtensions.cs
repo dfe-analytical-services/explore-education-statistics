@@ -31,10 +31,7 @@ public static class DataSetVersionQueryableExtensions
 
         if (publicOnly)
         {
-            query = query.Where(dsv => new[]
-            {
-                DataSetVersionStatus.Published, DataSetVersionStatus.Withdrawn, DataSetVersionStatus.Deprecated
-            }.Contains(dsv.Status));
+            query = query.Where(dsv => dsv.Status == DataSetVersionStatus.Published);
         }
 
         return await query.Where(v =>
