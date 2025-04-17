@@ -62,6 +62,12 @@ public static class PublisherHostBuilderExtensions
                 // TODO EES-5013 Why can't this be controlled through application settings?
                 logging.AddFilter("Microsoft.EntityFrameworkCore.Database.Command", LogLevel.Warning);
             })
+            .ConfigureServices();
+    }
+    
+    public static IHostBuilder ConfigureServices(this IHostBuilder hostBuilder)
+    {
+        return hostBuilder
             .ConfigureServices((hostContext, services) =>
             {
                 var configuration = hostContext.Configuration;
@@ -171,9 +177,9 @@ public static class PublisherHostBuilderExtensions
                 // cause the data source builder to throw a host exception.
                 if (!hostEnvironment.IsIntegrationTest())
                 {
-                    var connectionString = ConnectionUtils.GetPostgreSqlConnectionString("PublicDataDb")!;
-                    if (publicDataDbExists && !string.IsNullOrWhiteSpace(connectionString))
+                    if (publicDataDbExists)
                     {
+                        var connectionString = ConnectionUtils.GetPostgreSqlConnectionString("PublicDataDb")!;
                         services.AddFunctionAppPsqlDbContext<PublicDataDbContext>(connectionString, hostContext);
                     }
                 }
