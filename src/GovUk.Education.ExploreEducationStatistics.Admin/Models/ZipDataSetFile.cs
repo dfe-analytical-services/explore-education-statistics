@@ -3,7 +3,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Models;
 
-public record ArchiveDataSetFile(
+public record ZipDataSetFile(
     string Title,
     string DataFilename,
     string MetaFilename,

@@ -1,6 +1,3 @@
-using System;
-using System.Linq;
-using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Functions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
@@ -9,6 +6,9 @@ using GovUk.Education.ExploreEducationStatistics.Data.Processor.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Interfaces;
 using Microsoft.Extensions.Logging;
 using Moq;
+using System;
+using System.Linq;
+using System.Threading.Tasks;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.DataImportStatus;
 
@@ -17,61 +17,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Functi
     public class ProcessorTests
     {
         [Fact]
-        public async Task ProcessUploadsUnpackArchive()
-        {
-            var mocks = Mocks();
-            var (processorService, dataImportService, fileImportService) = mocks;
-
-            var import = new DataImport
-            {
-                Id = Guid.NewGuid(),
-                File = new File
-                {
-                    Filename = "my_data_file.csv"
-                },
-                ZipFile = new File
-                {
-                    Filename = "my_data_file.zip"
-                },
-                Status = QUEUED
-            };
-
-            var processor = new Processor.Functions.Processor(
-                dataImportService.Object,
-                processorService.Object,
-                new Mock<ILogger<Processor.Functions.Processor>>().Object);
-
-            processorService
-                .Setup(s => s.ProcessUnpackingArchiveDataSet(import.Id))
-                .Returns(Task.CompletedTask);
-
-            dataImportService
-                .Setup(s => s.GetImport(import.Id))
-                .ReturnsAsync(import);
-
-            dataImportService
-                .Setup(s => s.UpdateStatus(import.Id, STAGE_1, 0))
-                .Returns(Task.CompletedTask);
-
-            var importMessage = new ImportMessage(import.Id);
-
-            var outputMessages = await processor.ProcessUploads(
-                importMessage,
-                new TestFunctionContext());
-
-            MockUtils.VerifyAllMocks(processorService,
-                dataImportService,
-                fileImportService);
-
-            // Verify that the message will be queued to trigger the next stage.
-            Assert.Equal(new[]
-            {
-                importMessage
-            }, outputMessages);
-        }
-
-        [Fact]
-        public async Task ProcessUploadsUnpackArchiveWithNoArchive()
+        public async Task ProcessUploadsUnpackZipWithNoZipFile()
         {
             var mocks = Mocks();
             var (processorService, dataImportService, fileImportService) = mocks;
