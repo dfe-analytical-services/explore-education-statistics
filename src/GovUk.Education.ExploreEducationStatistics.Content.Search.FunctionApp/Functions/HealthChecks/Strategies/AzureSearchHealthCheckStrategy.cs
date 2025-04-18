@@ -5,7 +5,7 @@ using Microsoft.Extensions.Options;
 namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.HealthChecks.Strategies;
 
 internal class AzureSearchHealthCheckStrategy(
-    Func<ISearchIndexClient> searchIndexClientFactory,
+    Func<ISearchIndexerClient> searchIndexClientFactory,
     IOptions<AzureSearchOptions> azureSearchOptions) : IHealthCheckStrategy
 {
     public async Task<HealthCheckResult> Run(CancellationToken cancellationToken)

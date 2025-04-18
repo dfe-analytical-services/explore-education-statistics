@@ -7,11 +7,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.
 /// <summary>
 /// Client for calling the configured Azure Search Indexer
 /// </summary>
-public class SearchIndexClient(
+public class SearchIndexerClient(
     IAzureSearchIndexerClientFactory azureSearchIndexerClientFactory,
     IOptions<AzureSearchOptions> searchOptions,
-    ILogger<SearchIndexClient> logger)
-    : ISearchIndexClient
+    ILogger<SearchIndexerClient> logger)
+    : ISearchIndexerClient
 {
     private const int IndexerAlreadyRunning = 409;
     private readonly string _indexerName = searchOptions.Value.IndexerName;

@@ -4,11 +4,10 @@ using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Test
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Xunit.Abstractions;
-using SearchIndexClient = GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Clients.AzureSearch.SearchIndexClient;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Tests.Clients.AzureSearch;
 
-public abstract class SearchIndexClientTests
+public abstract class SearchIndexerClientTests
 {
     private AzureSearchOptions AzureSearchOptions => new()
     {
@@ -22,22 +21,22 @@ public abstract class SearchIndexClientTests
     private string? _searchServiceAccessKey = "my-access-key";
     private string _indexerName = "my-indexer-name";
 
-    protected virtual ISearchIndexClient GetSut(ILogger<SearchIndexClient>? logger = null)
+    protected virtual ISearchIndexerClient GetSut(ILogger<SearchIndexerClient>? logger = null)
     {
-        return new SearchIndexClient(
+        return new SearchIndexerClient(
             new AzureSearchIndexerClientFactory(
                 Microsoft.Extensions.Options.Options.Create(AzureSearchOptions)),
             Microsoft.Extensions.Options.Options.Create(AzureSearchOptions),
-            logger ?? new NullLogger<SearchIndexClient>());
+            logger ?? new NullLogger<SearchIndexerClient>());
     }
 
-    public class BasicTests : SearchIndexClientTests
+    public class BasicTests : SearchIndexerClientTests
     {
         [Fact]
         public void Can_Instantiate_SUT() => Assert.NotNull(GetSut());
     }
 
-    public class IntegrationTests : SearchIndexClientTests
+    public class IntegrationTests : SearchIndexerClientTests
     {
         private readonly ITestOutputHelper _output;
 
@@ -52,8 +51,8 @@ public abstract class SearchIndexClientTests
             _searchServiceEndpoint = $"https://{searchServiceName}.search.windows.net/";
         }
 
-        protected override ISearchIndexClient GetSut(ILogger<SearchIndexClient>? logger = null) =>
-            base.GetSut(new LoggerMockBuilder<SearchIndexClient>()
+        protected override ISearchIndexerClient GetSut(ILogger<SearchIndexerClient>? logger = null) =>
+            base.GetSut(new LoggerMockBuilder<SearchIndexerClient>()
                 .WithLogAction(s => _output.WriteLine(s))
                 .Build());
 
