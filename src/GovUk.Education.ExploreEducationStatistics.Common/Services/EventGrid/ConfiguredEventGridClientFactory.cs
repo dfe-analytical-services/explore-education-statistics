@@ -7,7 +7,9 @@ using Microsoft.Extensions.Options;
 namespace GovUk.Education.ExploreEducationStatistics.Common.Services.EventGrid;
 
 /// <summary>
-/// Creates Event Grid Publisher clients using settings from configuration
+/// The ConfiguredEventGridClientFactory obtains the configuration for an IEventGridClient using a specified
+/// configuration key. The actual configuration, such as the Topic endpoint URL, is obtained from
+/// <see cref="EventGridOptions"/>. This information is used to create a configured client via the IEventGridClientFactory.
 /// </summary>
 public class ConfiguredEventGridClientFactory(
     IEventGridClientFactory eventGridClientFactory,
