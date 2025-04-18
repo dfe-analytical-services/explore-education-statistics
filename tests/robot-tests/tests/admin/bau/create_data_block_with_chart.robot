@@ -316,6 +316,10 @@ Navigate to release content page
 
 Check updated footnote is displayed in release content page
     [Documentation]    EES-3136
+
+    # EES-6052 - remove page reload below once the bug in EES-6052 is fixed.
+    user reloads page
+
     user clicks button    Test data block section
     ${section}=    user gets accordion section content element    Test data block section
     ...    //*[@data-testid="editableAccordionSection"]
@@ -826,6 +830,9 @@ Validate basic geographic chart preview
 
     user mouses over selected map feature    id:chartBuilderPreview
     user checks map tooltip label contains    id:chartBuilderPreview    Barnsley
+
+    # EES-6055 - remove the manual selection of the "selectedDataSet" below when the EES-6055 bug is fixed.
+    user chooses select option    id:chartBuilderPreview-map-selectedDataSet    Admissions in 2014
 
     user checks map chart indicator tile contains    id:chartBuilderPreview    Admissions in 2014    9,854
 
