@@ -157,15 +157,6 @@ The shape of the Topic configuration is as follows.
   }
 ```
 
-
-
-### Infrastructure
-
-#### Declaring the new Topic
-
-#### Declaring Topic Subscriptions
-
-
 # Further Details
 
 Events can be raised without any further knowledge but for completeness, here are details of the other classes that complete the mechansim.
