@@ -25,5 +25,5 @@ public static class ServiceCollectionExtensions
             // Factories to allow Healthcheck to evaluate config before attempting to instantiate clients
             .AddTransient<Func<IContentApiClient>>(sp => sp.GetRequiredService<IContentApiClient>)
             .AddTransient<Func<IAzureBlobStorageClient>>(sp => sp.GetRequiredService<IAzureBlobStorageClient>)
-            .AddTransient<Func<ISearchIndexClient>>(sp => sp.GetRequiredService<ISearchIndexClient>);
+            .AddTransient<Func<ISearchIndexerClient>>(sp => sp.GetRequiredService<ISearchIndexerClient>);
 }
