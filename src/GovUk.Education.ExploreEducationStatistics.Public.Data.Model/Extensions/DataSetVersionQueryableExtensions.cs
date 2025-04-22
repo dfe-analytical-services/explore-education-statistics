@@ -12,7 +12,7 @@ public static class DataSetVersionQueryableExtensions
     /// </summary>
     /// <param name="version">Data set version which can contain a wildcard</param>
     /// <param name="publicOnly">Specifies whether this method should return versions that are not
-    /// "Published", "Depreciated" or "Withdrawn".
+    /// "Published".
     /// </param>
     public static async Task<Either<ActionResult, DataSetVersion>> FindByVersion(
         this IQueryable<DataSetVersion> queryable,
