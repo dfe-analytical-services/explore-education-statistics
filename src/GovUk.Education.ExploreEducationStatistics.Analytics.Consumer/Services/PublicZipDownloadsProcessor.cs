@@ -92,13 +92,13 @@ public class PublicZipDownloadsProcessor( // @MarkFix write tests for this
                                 dataSetName: VARCHAR
                             }}
                         )
+                     )
                 ");
             }
             catch (DuckDBException e)
             {
                 logger.LogError(e, "Failed to process analytics request file {Filename}", filename);
-                var badFilePath = Path.Combine(processingDirectory, filename);
-                MoveBadFileToFailuresDirectory(badFilePath);
+                MoveBadFileToFailuresDirectory(filename);
             }
         }
 
@@ -132,17 +132,20 @@ public class PublicZipDownloadsProcessor( // @MarkFix write tests for this
         return Task.CompletedTask;
     }
 
-    public void MoveBadFileToFailuresDirectory(string filePath) // @MarkFix make a common util method for all processors?
+    private void MoveBadFileToFailuresDirectory(string filename) // @MarkFix make a common util method for all processors?
     {
         try
         {
             var failuresDirectoryPath = pathResolver.PublicZipDownloadsFailuresDirectoryPath();
             Directory.CreateDirectory(failuresDirectoryPath);
-            File.Move(filePath, failuresDirectoryPath);
+
+            var fileSourcePath = Path.Combine(pathResolver.PublicZipDownloadsProcessingDirectoryPath(), filename);
+            var fileDestPath = Path.Combine(failuresDirectoryPath, filename);
+            File.Move(fileSourcePath, fileDestPath);
         }
         catch (Exception e)
         {
-            logger.LogError(e, "Failed to move bad file to failures directory {FilePath}", filePath);
+            logger.LogError(e, "Failed to move bad file to failures directory {Filename}", filename);
         }
     }
 }
