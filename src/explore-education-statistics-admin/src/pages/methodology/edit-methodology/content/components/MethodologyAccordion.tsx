@@ -101,7 +101,7 @@ const MethodologyAccordion = ({
         buttonToFocus?.focus();
       }, 100);
     },
-    [removeContentSection, id, methodology.id, methodology.content],
+    [removeContentSection, id, methodology.id, methodology.content, sectionKey],
   );
 
   if (

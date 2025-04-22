@@ -11,6 +11,7 @@ import ReleaseEditableBlock from '@admin/pages/release/content/components/Releas
 import { useReleaseContentState } from '@admin/pages/release/content/contexts/ReleaseContentContext';
 import useReleaseContentActions from '@admin/pages/release/content/contexts/useReleaseContentActions';
 import { EditableBlock } from '@admin/services/types/content';
+import focusAddedSectionBlockButton from '@admin/utils/focus/focusAddedSectionBlockButton';
 import Button from '@common/components/Button';
 import ButtonGroup from '@common/components/ButtonGroup';
 import Modal from '@common/components/Modal';
@@ -19,7 +20,14 @@ import useToggle from '@common/hooks/useToggle';
 import { ContentSection } from '@common/services/publicationService';
 import { Dictionary } from '@common/types';
 import { isFuture } from 'date-fns';
-import React, { memo, useCallback, useEffect, useMemo, useState } from 'react';
+import React, {
+  memo,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 
 export interface ReleaseContentAccordionSectionProps {
   id: string;
@@ -50,6 +58,8 @@ const ReleaseContentAccordionSection = ({
 
   const [blocks, setBlocks] = useState<EditableBlock[]>(sectionContent);
 
+  const addTextBlockButton = useRef<HTMLButtonElement>(null);
+
   useEffect(() => {
     setBlocks(sectionContent);
   }, [sectionContent]);
@@ -79,17 +89,7 @@ const ReleaseContentAccordionSection = ({
       },
     });
 
-    setTimeout(() => {
-      const newBlockEl = document.querySelector(
-        `#editableSectionBlocks-${newBlock.id}`,
-      );
-      const newBlockButton = newBlockEl?.querySelector(
-        'button.govuk-button--secondary',
-      ) as HTMLButtonElement;
-      if (newBlockButton) {
-        newBlockButton.focus();
-      }
-    }, 100);
+    focusAddedSectionBlockButton(newBlock.id);
   }, [actions, release.id, sectionId, sectionContent.length]);
 
   const addEmbedBlock = useCallback(
@@ -147,6 +147,12 @@ const ReleaseContentAccordionSection = ({
     },
     [actions, sectionId, release.id],
   );
+
+  const onAfterDeleteBlock = () => {
+    setTimeout(() => {
+      addTextBlockButton.current?.focus();
+    }, 100);
+  };
 
   const hasLockedBlocks = blocks.some(
     block => block.lockedUntil && isFuture(new Date(block.lockedUntil)),
@@ -214,6 +220,7 @@ const ReleaseContentAccordionSection = ({
                 publicationId={release.publication.id}
                 releaseVersionId={release.id}
                 visible={open}
+                onAfterDeleteBlock={onAfterDeleteBlock}
               />
             )}
           />
@@ -233,7 +240,11 @@ const ReleaseContentAccordionSection = ({
               )}
 
               <ButtonGroup className="govuk-!-margin-bottom-8 dfe-justify-content--center">
-                <Button variant="secondary" onClick={addBlock}>
+                <Button
+                  variant="secondary"
+                  onClick={addBlock}
+                  ref={addTextBlockButton}
+                >
                   Add text block
                 </Button>
                 {!showDataBlockForm && (

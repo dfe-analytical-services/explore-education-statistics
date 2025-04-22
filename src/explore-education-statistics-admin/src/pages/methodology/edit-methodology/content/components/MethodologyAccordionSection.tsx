@@ -10,7 +10,8 @@ import { Dictionary } from '@common/types';
 import MethodologyBlock from '@admin/pages/methodology/components/MethodologyBlock';
 import { ContentSectionKeys } from '@admin/pages/methodology/edit-methodology/content/context/MethodologyContentContextActionTypes';
 import useMethodologyContentActions from '@admin/pages/methodology/edit-methodology/content/context/useMethodologyContentActions';
-import React, { memo, useCallback, useEffect, useState } from 'react';
+import focusAddedSectionBlockButton from '@admin/utils/focus/focusAddedSectionBlockButton';
+import React, { memo, useCallback, useEffect, useRef, useState } from 'react';
 
 interface MethodologyAccordionSectionProps {
   id: string;
@@ -43,6 +44,8 @@ const MethodologyAccordionSection = ({
   const [isReordering, setIsReordering] = useState(false);
   const [blocks, setBlocks] = useState<EditableContentBlock[]>(sectionContent);
 
+  const addTextBlockButton = useRef<HTMLButtonElement>(null);
+
   useEffect(() => {
     setBlocks(sectionContent);
   }, [sectionContent]);
@@ -59,17 +62,7 @@ const MethodologyAccordionSection = ({
       sectionKey,
     });
 
-    setTimeout(() => {
-      const newBlockEl = document.querySelector(
-        `#editableSectionBlocks-${newBlock.id}`,
-      );
-      const newBlockButton = newBlockEl?.querySelector(
-        'button.govuk-button--secondary',
-      ) as HTMLButtonElement;
-      if (newBlockButton) {
-        newBlockButton.focus();
-      }
-    }, 100);
+    focusAddedSectionBlockButton(newBlock.id);
   }, [
     addContentSectionBlock,
     methodologyId,
@@ -91,15 +84,29 @@ const MethodologyAccordionSection = ({
     [methodologyId, sectionId, sectionKey, updateContentSectionBlock],
   );
 
+  const onAfterDeleteBlock = () => {
+    setTimeout(() => {
+      addTextBlockButton.current?.focus();
+    }, 100);
+  };
+
   const removeBlockFromAccordionSection = useCallback(
-    (blockId: string) =>
+    (blockId: string) => {
       deleteContentSectionBlock({
         methodologyId,
         sectionId,
         blockId,
         sectionKey,
-      }),
-    [deleteContentSectionBlock, methodologyId, sectionId, sectionKey],
+      });
+      onAfterDeleteBlock();
+    },
+    [
+      deleteContentSectionBlock,
+      onAfterDeleteBlock,
+      methodologyId,
+      sectionId,
+      sectionKey,
+    ],
   );
 
   const reorderBlocksInAccordionSection = useCallback(async () => {
@@ -176,7 +183,11 @@ const MethodologyAccordionSection = ({
       />
       {editingMode === 'edit' && !isReordering && (
         <div className="govuk-!-margin-bottom-8 govuk-!-text-align-centre">
-          <Button variant="secondary" onClick={addBlockToAccordionSection}>
+          <Button
+            variant="secondary"
+            onClick={addBlockToAccordionSection}
+            ref={addTextBlockButton}
+          >
             Add text block
           </Button>
         </div>
