@@ -12,6 +12,24 @@ public class AzureBlobStorageClient(
 {
     internal BlobServiceClient BlobServiceClient { get; } = blobServiceClient;
 
+    public async Task<bool> DeleteBlobIfExists(
+        string containerName,
+        string blobName,
+        CancellationToken cancellationToken = default)
+    {
+        var blobContainerClient = BlobServiceClient.GetBlobContainerClient(containerName);
+        var blobClient = blobContainerClient.GetBlobClient(blobName);
+        try
+        {
+            return await blobClient.DeleteIfExistsAsync(cancellationToken: cancellationToken);
+        }
+        catch (Exception e)
+        {
+            logger.LogError(e, "Failed to delete blob {ContainerName}/{BlobName}", containerName, blobName);
+            throw;
+        }
+    }
+
     public async Task UploadBlob(
         string containerName,
         string blobName,

@@ -54,6 +54,7 @@ public static class HostBuilderExtension
                     })
                     // Services
                     .AddTransient<ISearchableDocumentCreator, SearchableDocumentCreator>()
+                    .AddTransient<ISearchableDocumentRemover, SearchableDocumentRemover>()
                     // Functions
                     .AddTransient<IEventGridEventHandler, EventGridEventHandler>()
                     .AddHealthChecks()
