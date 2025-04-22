@@ -21,8 +21,11 @@ const ReleaseContentAccordion = ({
   transformFeaturedTableLinks,
   onSectionOpen,
 }: ReleaseContentAccordionProps) => {
-  const { addContentSection, updateContentSectionsOrder } =
-    useReleaseContentActions();
+  const {
+    addContentSection,
+    removeContentSection,
+    updateContentSectionsOrder,
+  } = useReleaseContentActions();
 
   const addAccordionSection = useCallback(async () => {
     const newSection = await addContentSection({
@@ -39,6 +42,44 @@ const ReleaseContentAccordion = ({
       }
     }, 100);
   }, [release.id, release.content.length, addContentSection, id]);
+
+  const handleRemoveSection = useCallback(
+    async (sectionId: string) => {
+      // Get position of section to remove, for focus handling after deletion
+      const removedSectionIndex = release.content.findIndex(
+        section => section.id === sectionId,
+      );
+
+      const updatedContent = await removeContentSection({
+        sectionId,
+        releaseVersionId: release.id,
+      });
+
+      // Section has been removed, now move focus to:
+      // the previous section if exists
+      // otherwise to the first section if exists,
+      // otherwise to the 'add section' button
+      setTimeout(() => {
+        let buttonToFocus = document.querySelector(
+          '#editable-accordion-add-section-button',
+        ) as HTMLButtonElement;
+
+        if (updatedContent.length > 0) {
+          const sectionToFocus = updatedContent.at(
+            Math.max(removedSectionIndex - 1, 0),
+          );
+
+          if (sectionToFocus) {
+            buttonToFocus = document.querySelector(
+              `#${id}-${sectionToFocus.id}-heading`,
+            ) as HTMLButtonElement;
+          }
+        }
+        buttonToFocus?.focus();
+      }, 100);
+    },
+    [removeContentSection, release.id, release.content, id],
+  );
 
   const reorderAccordionSections = useCallback(
     async (ids: string[]) => {
@@ -69,6 +110,7 @@ const ReleaseContentAccordion = ({
           id={`${id}-${section.id}`}
           section={section}
           transformFeaturedTableLinks={transformFeaturedTableLinks}
+          onRemoveSection={handleRemoveSection}
         />
       ))}
     </EditableAccordion>

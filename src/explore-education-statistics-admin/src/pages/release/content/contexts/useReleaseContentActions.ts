@@ -418,6 +418,8 @@ export default function useReleaseContentActions() {
           content,
         },
       });
+
+      return content;
     },
     [dispatch],
   );

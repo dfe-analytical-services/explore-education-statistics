@@ -24,11 +24,13 @@ import React, { memo, useCallback, useEffect, useMemo, useState } from 'react';
 export interface ReleaseContentAccordionSectionProps {
   id: string;
   section: ContentSection<EditableBlock>;
+  onRemoveSection: (sectionId: string) => void;
   transformFeaturedTableLinks?: (url: string, text: string) => void;
 }
 
 const ReleaseContentAccordionSection = ({
   section,
+  onRemoveSection,
   transformFeaturedTableLinks,
   ...props
 }: ReleaseContentAccordionSectionProps) => {
@@ -146,13 +148,6 @@ const ReleaseContentAccordionSection = ({
     [actions, sectionId, release.id],
   );
 
-  const handleRemoveSection = useCallback(async () => {
-    await actions.removeContentSection({
-      sectionId,
-      releaseVersionId: release.id,
-    });
-  }, [actions, sectionId, release.id]);
-
   const hasLockedBlocks = blocks.some(
     block => block.lockedUntil && isFuture(new Date(block.lockedUntil)),
   );
@@ -168,7 +163,7 @@ const ReleaseContentAccordionSection = ({
       }
       caption={caption}
       onHeadingChange={handleHeadingChange}
-      onRemoveSection={handleRemoveSection}
+      onRemoveSection={() => onRemoveSection(sectionId)}
       headerButtons={
         <Tooltip
           text="This section is being edited and cannot be reordered"
