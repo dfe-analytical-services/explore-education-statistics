@@ -61,7 +61,7 @@ const ReleaseContentAccordion = ({
       // otherwise to the 'add section' button
       setTimeout(() => {
         let buttonToFocus = document.querySelector(
-          '#editable-accordion-add-section-button',
+          `#add-section-button-${id}`,
         ) as HTMLButtonElement;
 
         if (updatedContent.length > 0) {
