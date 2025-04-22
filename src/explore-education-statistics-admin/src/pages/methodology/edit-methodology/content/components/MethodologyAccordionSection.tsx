@@ -84,12 +84,6 @@ const MethodologyAccordionSection = ({
     [methodologyId, sectionId, sectionKey, updateContentSectionBlock],
   );
 
-  const onAfterDeleteBlock = () => {
-    setTimeout(() => {
-      addTextBlockButton.current?.focus();
-    }, 100);
-  };
-
   const removeBlockFromAccordionSection = useCallback(
     (blockId: string) => {
       deleteContentSectionBlock({
@@ -98,11 +92,14 @@ const MethodologyAccordionSection = ({
         blockId,
         sectionKey,
       });
-      onAfterDeleteBlock();
+
+      setTimeout(() => {
+        addTextBlockButton.current?.focus();
+      }, 100);
     },
     [
       deleteContentSectionBlock,
-      onAfterDeleteBlock,
+      addTextBlockButton,
       methodologyId,
       sectionId,
       sectionKey,
