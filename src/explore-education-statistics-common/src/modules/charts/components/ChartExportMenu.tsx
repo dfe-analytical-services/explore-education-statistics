@@ -58,7 +58,7 @@ export default function ChartExportMenu({ chartRef, chartTitle }: Props) {
     } catch (error) {
       logger.error(error);
     }
-  }, [getClipboardPng]);
+  }, [getClipboardPng, setCopySuccess]);
 
   return (
     <ExportMenu title={chartTitle || 'chart'}>
