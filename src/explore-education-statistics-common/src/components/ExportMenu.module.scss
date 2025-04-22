@@ -30,6 +30,10 @@
   button {
     padding: govuk-spacing(1);
   }
+
+  > summary {
+    margin-left: auto;
+  }
 }
 
 .exportMenu[open] {
