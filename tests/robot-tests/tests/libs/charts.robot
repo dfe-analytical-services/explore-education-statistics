@@ -140,7 +140,7 @@ user checks chart tooltip label contains
     [Arguments]    ${locator}    ${text}
     user waits until parent contains element    ${locator}    testid:chartTooltip-label
     ${element}=    get child element    ${locator}    testid:chartTooltip-label
-    user waits until element is visible    ${element}
+    user waits until element is visible    ${element}    scroll_to_element=${False}
     user waits until element contains    ${element}    ${text}
 
 user checks chart tooltip item contains
@@ -148,14 +148,14 @@ user checks chart tooltip item contains
     user waits until parent contains element    ${locator}
     ...    css:[data-testid="chartTooltip-items"] li:nth-of-type(${item})
     ${element}=    get child element    ${locator}    css:[data-testid="chartTooltip-items"] li:nth-of-type(${item})
-    user waits until element is visible    ${element}
+    user waits until element is visible    ${element}    scroll_to_element=${False}
     user waits until element contains    ${element}    ${text}
 
 user checks map tooltip label contains
     [Arguments]    ${locator}    ${text}
     user waits until parent contains element    ${locator}    testid:chartTooltip-label
     ${element}=    get child element    ${locator}    testid:chartTooltip-label
-    user waits until element is visible    ${element}
+    user waits until element is visible    ${element}    scroll_to_element=${False}
     user waits until element contains    ${element}    ${text}
 
 user checks map tooltip item contains
@@ -163,7 +163,7 @@ user checks map tooltip item contains
     user waits until parent contains element    ${locator}
     ...    testid:chartTooltip-content
     ${element}=    get child element    ${locator}    testid:chartTooltip-content
-    user waits until element is visible    ${element}
+    user waits until element is visible    ${element}    scroll_to_element=${False}
     user waits until element contains    ${element}    ${text}
 
 user checks map chart indicator tile contains
@@ -173,11 +173,11 @@ user checks map chart indicator tile contains
     ${indicator}=    get child element    ${locator}    testid:mapBlock-indicator
 
     ${indicator_title}=    get child element    ${indicator}    testid:mapBlock-indicatorTile-title
-    user waits until element is visible    ${indicator_title}
+    user waits until element is visible    ${indicator_title}    scroll_to_element=${False}
     user waits until element contains    ${indicator_title}    ${title}
 
     ${indicator_stat}=    get child element    ${indicator}    testid:mapBlock-indicatorTile-statistic
-    user waits until element is visible    ${indicator_stat}
+    user waits until element is visible    ${indicator_stat}    scroll_to_element=${False}
     user waits until element contains    ${indicator_stat}    ${statistic}
 
 user gets map boundary polygon dimensions

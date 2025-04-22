@@ -158,7 +158,7 @@ Delete UI test subject
     user clicks button    Delete files
 
     user waits until modal is visible    Confirm deletion of selected data files    wait=%{WAIT_LONG}
-    user checks page contains    4 footnotes will be removed or updated.
+    user waits until page contains    4 footnotes will be removed or updated.
     user checks page contains    The following data blocks will also be deleted:
     user checks page contains    UI test table name
     user checks page contains    The following infographic files will also be removed:
