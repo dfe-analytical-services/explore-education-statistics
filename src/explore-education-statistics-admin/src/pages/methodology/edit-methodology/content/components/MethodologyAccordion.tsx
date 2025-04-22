@@ -23,8 +23,11 @@ const MethodologyAccordion = ({
   onSectionOpen,
 }: MethodologyAccordionProps) => {
   const { editingMode } = useEditingContext();
-  const { addContentSection, updateContentSectionsOrder } =
-    useMethodologyContentActions();
+  const {
+    addContentSection,
+    removeContentSection,
+    updateContentSectionsOrder,
+  } = useMethodologyContentActions();
 
   const onAddSection = useCallback(async () => {
     const newSection = await addContentSection({
@@ -62,6 +65,45 @@ const MethodologyAccordion = ({
     [id, methodology.id, sectionKey, updateContentSectionsOrder],
   );
 
+  const handleRemoveSection = useCallback(
+    async (sectionId: string) => {
+      // Get position of section to remove, for focus handling after deletion
+      const removedSectionIndex = methodology.content.findIndex(
+        section => section.id === sectionId,
+      );
+
+      const updatedContent = await removeContentSection({
+        methodologyId: methodology.id,
+        sectionId,
+        sectionKey,
+      });
+
+      // Section has been removed, now move focus to:
+      // the previous section if exists
+      // otherwise to the first section if exists,
+      // otherwise to the 'add section' button
+      setTimeout(() => {
+        let buttonToFocus = document.querySelector(
+          `#add-section-button-${id}`,
+        ) as HTMLButtonElement;
+
+        if (updatedContent.length > 0) {
+          const sectionToFocus = updatedContent.at(
+            Math.max(removedSectionIndex - 1, 0),
+          );
+
+          if (sectionToFocus) {
+            buttonToFocus = document.querySelector(
+              `#${id}-${sectionToFocus.id}-heading`,
+            ) as HTMLButtonElement;
+          }
+        }
+        buttonToFocus?.focus();
+      }, 100);
+    },
+    [removeContentSection, id, methodology.id, methodology.content],
+  );
+
   if (
     sectionKey === 'annexes' &&
     editingMode !== 'edit' &&
@@ -84,6 +126,7 @@ const MethodologyAccordion = ({
           methodologySlug={methodology.slug}
           section={section}
           sectionKey={sectionKey}
+          onRemoveSection={handleRemoveSection}
         />
       ))}
     </EditableAccordion>

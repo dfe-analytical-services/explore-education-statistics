@@ -18,6 +18,7 @@ interface MethodologyAccordionSectionProps {
   sectionKey: ContentSectionKeys;
   methodologyId: string;
   methodologySlug: string;
+  onRemoveSection: (sectionId: string) => void;
 }
 
 const MethodologyAccordionSection = ({
@@ -25,6 +26,7 @@ const MethodologyAccordionSection = ({
   section: { id: sectionId, caption, heading, content: sectionContent = [] },
   methodologyId,
   methodologySlug,
+  onRemoveSection,
   ...props
 }: MethodologyAccordionSectionProps) => {
   const { editingMode } = useEditingContext();
@@ -36,7 +38,6 @@ const MethodologyAccordionSection = ({
     updateContentSectionBlock,
     updateSectionBlockOrder,
     updateContentSectionHeading,
-    removeContentSection,
   } = useMethodologyContentActions();
 
   const [isReordering, setIsReordering] = useState(false);
@@ -126,16 +127,6 @@ const MethodologyAccordionSection = ({
     [methodologyId, sectionId, sectionKey, updateContentSectionHeading],
   );
 
-  const handleRemoveSection = useCallback(
-    () =>
-      removeContentSection({
-        methodologyId,
-        sectionId,
-        sectionKey,
-      }),
-    [methodologyId, removeContentSection, sectionId, sectionKey],
-  );
-
   return (
     <EditableAccordionSection
       {...props}
@@ -163,7 +154,7 @@ const MethodologyAccordionSection = ({
         </Button>
       }
       onHeadingChange={handleHeadingChange}
-      onRemoveSection={handleRemoveSection}
+      onRemoveSection={() => onRemoveSection(sectionId)}
     >
       <EditableSectionBlocks<EditableContentBlock>
         blocks={blocks}
