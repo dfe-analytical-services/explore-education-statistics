@@ -4183,7 +4183,9 @@ public abstract class DataSetsControllerPostQueryTests(TestApplicationFactory te
                 })
                 .GenerateList();
 
-        dataSet.LatestLiveVersion = dataSetVersion.FirstOrDefault(dsv => dsv.PublicVersion == "1.2");
+        var version = versionStatus == DataSetVersionStatus.Published ? "2.1" : "1.2";
+
+        dataSet.LatestLiveVersion = dataSetVersion.FirstOrDefault(dsv => dsv.PublicVersion == version);
         dataSet.Versions = dataSetVersion;
 
         await TestApp.AddTestData<PublicDataDbContext>(
