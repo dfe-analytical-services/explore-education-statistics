@@ -273,7 +273,6 @@
   ],
   "suggesters": [],
   "analyzers": [],
-  "normalizers": [],
   "tokenizers": [],
   "tokenFilters": [],
   "charFilters": [],
@@ -284,7 +283,6 @@
     "configurations": [
       {
         "name": "semantic-configuration-1",
-        "flightingOptIn": false,
         "prioritizedFields": {
           "titleField": {
             "fieldName": "title"
