@@ -8,17 +8,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Extension
 public static class DataSetVersionQueryableExtensions
 {
     /// <summary>
-    /// Returns specified data set version or the latest version of a data set based on a major/minor/patch level that can be wildcarded (i.e., substituted with '*').
+    /// Returns specified data set version, if a wildcard is specified, the latest version of a data set based on a major/minor/patch level that's being wildcarded (i.e., substituted with '*') is returned.
     /// </summary>
+    /// <param name="queryable">The queryable collection of <see cref="DataSetVersion"/> objects.</param>
     /// <param name="version">Data set version which can contain a wildcard</param>
-    /// <param name="publicOnly">Specifies whether this method should return versions that are not
-    /// "Published".
-    /// </param>
+    /// <param name="dataSetId">The unique identifier of the data set.</param>
+    /// <param name="cancellationToken">A <see cref="CancellationToken"/> to observe while waiting for the task to complete.</param>
     public static async Task<Either<ActionResult, DataSetVersion>> FindByVersion(
         this IQueryable<DataSetVersion> queryable,
         Guid dataSetId,
         string version,
-        bool publicOnly = false,
         CancellationToken cancellationToken = default)
     {
         if (!DataSetVersionNumber.TryParse(version, out var parsedVersion))
@@ -26,15 +25,9 @@ public static class DataSetVersionQueryableExtensions
             return new NotFoundResult();
         }
 
-        var query = queryable
-            .Where(dsv => dsv.DataSetId == dataSetId);
-
-        if (publicOnly)
-        {
-            query = query.Where(dsv => dsv.Status == DataSetVersionStatus.Published);
-        }
-
-        return await query.Where(v =>
+        return await queryable
+            .Where(dsv => dsv.DataSetId == dataSetId)
+            .Where(v =>
                 (!parsedVersion.Major.HasValue || v.VersionMajor == parsedVersion.Major) &&
                 (!parsedVersion.Minor.HasValue || v.VersionMinor == parsedVersion.Minor) &&
                 (!parsedVersion.Patch.HasValue || v.VersionPatch == parsedVersion.Patch))

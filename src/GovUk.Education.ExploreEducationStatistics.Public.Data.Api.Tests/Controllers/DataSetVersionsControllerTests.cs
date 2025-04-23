@@ -1721,6 +1721,35 @@ public abstract class DataSetVersionsControllerTests(TestApplicationFactory test
             response.AssertOk();
         }
 
+        [Fact]
+        public async Task WildCardSpecified_RequestedPublished_Returns200()
+        {
+            var (dataSet, dataSetVersion) = await SetupDataSetWithSpecifiedVersionStatuses(DataSetVersionStatus.Published);
+            
+            var response = await GetDataSetVersionChanges(
+                dataSetId: dataSet.Id,
+                dataSetVersion: "2.*",
+                previewTokenId: dataSetVersion.Last().PreviewTokens[0].Id);
+
+            response.AssertOk<DataSetVersionChangesViewModel>(useSystemJson: true);
+        }
+
+
+        [Theory]
+        [MemberData(nameof(DataSetVersionStatusViewTheoryData.NonPublishedStatus),
+            MemberType = typeof(DataSetVersionStatusViewTheoryData))]
+        public async Task WildCardSpecified_RequestedNonPublished_Returns404(DataSetVersionStatus dataSetVersionStatus)
+        {
+            var (dataSet, dataSetVersion) = await SetupDataSetWithSpecifiedVersionStatuses(dataSetVersionStatus);
+            
+            var response = await GetDataSetVersionChanges(
+                dataSetId: dataSet.Id,
+                dataSetVersion: "2.*",
+                previewTokenId: dataSetVersion.Last().PreviewTokens[0].Id);
+
+            response.AssertNotFound();
+        }
+        
         private async Task<HttpResponseMessage> GetDataSetVersionChanges(
             Guid dataSetId,
             string dataSetVersion,
@@ -1740,6 +1769,59 @@ public abstract class DataSetVersionsControllerTests(TestApplicationFactory test
         }
     }
 
+    private async Task<(DataSet, List<DataSetVersion>)> SetupDataSetWithSpecifiedVersionStatuses(
+        DataSetVersionStatus versionStatus)
+    {
+        DataSet dataSet = DataFixture
+            .DefaultDataSet()
+            .WithStatusPublished();
+
+        await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
+
+        var dataSetVersion = DataFixture
+                .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 3)
+                .WithStatusPublished()
+                .WithDataSetId(dataSet.Id)
+                .WithMetaSummary(
+                    DataFixture.DefaultDataSetVersionMetaSummary()
+                        .WithGeographicLevels(
+                            [
+                                GeographicLevel.Country,
+                                GeographicLevel.LocalAuthority,
+                                GeographicLevel.Region,
+                                GeographicLevel.School
+                            ]
+                        )
+                )
+                .WithPreviewTokens(() => [DataFixture.DefaultPreviewToken()])
+                .ForIndex(1, dsv => dsv.SetVersionNumber(1, 1))
+                .ForIndex(2, dsv => dsv.SetVersionNumber(1, 2))
+                .ForIndex(3, dsv =>
+                {
+                    dsv.SetStatus(versionStatus);
+                    dsv.SetVersionNumber(2, 0);
+                    
+                })
+                .ForIndex(4, dsv =>
+                {
+                    dsv.SetStatus(versionStatus);
+                    dsv.SetVersionNumber(2, 1);
+                })
+                .GenerateList();
+
+        dataSet.LatestLiveVersion = dataSetVersion.FirstOrDefault(dsv => dsv.PublicVersion == "1.2");
+        dataSet.Versions = dataSetVersion;
+
+        await TestApp.AddTestData<PublicDataDbContext>(
+            context =>
+            {
+                context.DataSetVersions.AddRange(dataSetVersion);
+                context.DataSets.Update(dataSet);
+            }
+        );
+
+        return (dataSet, dataSetVersion);
+    }
     private WebApplicationFactory<Startup> BuildApp(
         IContentApiClient? contentApiClient = null,
         ClaimsPrincipal? user = null)

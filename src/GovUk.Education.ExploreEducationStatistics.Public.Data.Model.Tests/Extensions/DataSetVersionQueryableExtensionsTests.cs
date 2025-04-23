@@ -27,7 +27,7 @@ public class DataSetVersionQueryableExtensionsTests
             var queryable = SetupDataSetVersions(out dataSetId);
 
             // Act 
-            var actualResult = await queryable.FindByVersion(dataSetId, versionString, false, CancellationToken.None);
+            var actualResult = await queryable.WherePublishedStatus().FindByVersion(dataSetId, versionString, CancellationToken.None);
 
             // Assert
             Assert.True(actualResult.IsRight);
@@ -62,7 +62,7 @@ public class DataSetVersionQueryableExtensionsTests
             var queryable = SetupDataSetVersions(out dataSetId);
 
             // Act 
-            var actualResult = await queryable.FindByVersion(dataSetId, versionString, false, CancellationToken.None);
+            var actualResult = await queryable.WherePublishedStatus().FindByVersion(dataSetId, versionString, CancellationToken.None);
 
             // Assert
             actualResult.AssertNotFound();
@@ -107,7 +107,7 @@ public class DataSetVersionQueryableExtensionsTests
             var queryable = publicDataDbContextMock.Object.DataSetVersions.AsNoTracking();
 
             // Act 
-            var actualResult = await queryable.FindByVersion(dataSet.Id, versionString, true, CancellationToken.None);
+            var actualResult = await queryable.WherePublishedStatus().FindByVersion(dataSet.Id, versionString, CancellationToken.None);
 
             // Assert
             actualResult.AssertNotFound();
@@ -156,7 +156,7 @@ public class DataSetVersionQueryableExtensionsTests
             var queryable = publicDataDbContextMock.Object.DataSetVersions.AsNoTracking();
 
             // Act 
-            var actualResult = await queryable.FindByVersion(dataSet.Id, versionString, true, CancellationToken.None);
+            var actualResult = await queryable.WherePublishedStatus().FindByVersion(dataSet.Id, versionString, CancellationToken.None);
 
             // Assert
             Assert.Equal(1, actualResult.Right.VersionMajor);

@@ -117,6 +117,50 @@ public abstract class DataSetsControllerPostQueryTests(TestApplicationFactory te
 
             response.AssertNotFound();
         }
+        [Theory]
+        [MemberData(nameof(DataSetVersionStatusQueryTheoryData.NonPublishedStatus),
+            MemberType = typeof(DataSetVersionStatusQueryTheoryData))]
+        public async Task WildCardSpecified_RequestsNonPublishedVersion_Returns404(DataSetVersionStatus versionStatus)
+        {
+            var (dataSet, versions) = await SetupDataSetWithSpecifiedVersionStatuses(versionStatus);
+            
+            var response = await QueryDataSet(
+                dataSetId: dataSet.Id,
+                dataSetVersion: "2.*",
+                previewTokenId: versions.Last().PreviewTokens[0].Id,
+                request: new DataSetQueryRequest
+                {
+                    Indicators = [AbsenceSchoolData.IndicatorSessAuthorised]
+                });
+
+            response.AssertNotFound();
+        }
+        
+        [Fact]
+        public async Task WildCardSpecified_RequestPublishedVersion_Returns200()
+        {
+            var (dataSet, versions) = await SetupDataSetWithSpecifiedVersionStatuses(DataSetVersionStatus.Published);
+            
+            var response = await QueryDataSet(
+                dataSetId: dataSet.Id,
+                dataSetVersion: "2.*",
+                previewTokenId: versions.Last().PreviewTokens[0].Id,
+                request: new DataSetQueryRequest
+                {
+                    Indicators = [AbsenceSchoolData.IndicatorSessAuthorised]
+                });
+
+            response.AssertOk();
+            
+            var viewModel = response.AssertOk<DataSetQueryPaginatedResultsViewModel>(useSystemJson: true);
+            Assert.Equal(1, viewModel.Paging.Page);
+            Assert.Equal(1, viewModel.Paging.TotalPages);
+            Assert.Equal(216, viewModel.Paging.TotalResults);
+
+            Assert.Empty(viewModel.Warnings);
+
+            Assert.Equal(216, viewModel.Results.Count);
+        }
     }
 
     public class PreviewTokenTests(TestApplicationFactory testApp) : DataSetsControllerPostQueryTests(testApp)
@@ -4099,6 +4143,60 @@ public abstract class DataSetsControllerPostQueryTests(TestApplicationFactory te
         return dataSetVersion;
     }
 
+    private async Task<(DataSet, List<DataSetVersion>)> SetupDataSetWithSpecifiedVersionStatuses(
+        DataSetVersionStatus versionStatus)
+    {
+        DataSet dataSet = DataFixture
+            .DefaultDataSet()
+            .WithStatusPublished();
+
+        await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
+
+        var dataSetVersion = DataFixture
+                .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 3)
+                .WithStatusPublished()
+                .WithDataSetId(dataSet.Id)
+                .WithMetaSummary(
+                    DataFixture.DefaultDataSetVersionMetaSummary()
+                        .WithGeographicLevels(
+                            [
+                                GeographicLevel.Country,
+                                GeographicLevel.LocalAuthority,
+                                GeographicLevel.Region,
+                                GeographicLevel.School
+                            ]
+                        )
+                )
+                .WithPreviewTokens(() => [DataFixture.DefaultPreviewToken()])
+                .ForIndex(1, dsv => dsv.SetVersionNumber(1, 1))
+                .ForIndex(2, dsv => dsv.SetVersionNumber(1, 2))
+                .ForIndex(3, dsv =>
+                {
+                    dsv.SetStatus(versionStatus);
+                    dsv.SetVersionNumber(2, 0);
+                    
+                })
+                .ForIndex(4, dsv =>
+                {
+                    dsv.SetStatus(versionStatus);
+                    dsv.SetVersionNumber(2, 1);
+                })
+                .GenerateList();
+
+        dataSet.LatestLiveVersion = dataSetVersion.FirstOrDefault(dsv => dsv.PublicVersion == "1.2");
+        dataSet.Versions = dataSetVersion;
+
+        await TestApp.AddTestData<PublicDataDbContext>(
+            context =>
+            {
+                context.DataSetVersions.AddRange(dataSetVersion);
+                context.DataSets.Update(dataSet);
+            }
+        );
+
+        return (dataSet, dataSetVersion);
+    }
+    
     private WebApplicationFactory<Startup> BuildApp()
     {
         return TestApp
