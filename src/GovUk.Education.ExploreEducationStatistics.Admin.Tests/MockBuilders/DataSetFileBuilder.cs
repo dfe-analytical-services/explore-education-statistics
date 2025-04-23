@@ -1,5 +1,6 @@
 #nullable enable
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using System;
 using System.IO;
@@ -15,14 +16,24 @@ public class DataSetFileBuilder
 
     public async Task<DataSetFileDto> Build(FileType fileType)
     {
-        if (fileType is not FileType.Data and not FileType.Metadata)
+        if (fileType is not FileType.Data and not FileType.Metadata and not FileType.BulkDataZipIndex)
         {
-            throw new NotSupportedException("Builder only accepts Data and Metadata file types");
+            throw new NotSupportedException("Builder only accepts Data, Metadata and BulkDataZipIndex file types");
         }
 
-        _fileName ??= fileType == FileType.Data
-            ? "test-data.csv"
-            : "test-data.meta.csv";
+        if (_fileName is null)
+        {
+            if (fileType is FileType.BulkDataZipIndex)
+            {
+                _fileName = "dataset_names.csv";
+            }
+            else
+            {
+                _fileName = fileType == FileType.Metadata
+                    ? "test-data.meta.csv"
+                    : "test-data.csv";
+            }
+        }
 
         var memoryStream = new MemoryStream();
 
@@ -30,6 +41,7 @@ public class DataSetFileBuilder
         {
             using var fileStream = File.OpenRead(GetPathForFile(_fileName));
             await fileStream.CopyToAsync(memoryStream);
+            memoryStream.SeekToBeginning();
         }
 
         return
