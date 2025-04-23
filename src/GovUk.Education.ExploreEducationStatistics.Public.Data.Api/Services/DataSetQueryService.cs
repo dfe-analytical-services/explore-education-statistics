@@ -117,25 +117,25 @@ internal class DataSetQueryService(
         using var _ = MiniProfiler.Current
             .Step($"{nameof(DataSetQueryService)}.{nameof(FindDataSetVersion)}");
 
-        if (dataSetVersion is null)
-        {
-            return await publicDataDbContext
+        return dataSetVersion is null or "*"
+            ? await publicDataDbContext
                 .DataSets
                 .AsNoTracking()
                 .Include(ds => ds.LatestLiveVersion)
                 .ThenInclude(dsv => dsv != null ? dsv.DataSet : null)
                 .Where(ds => ds.Id == dataSetId)
                 .Select(ds => ds.LatestLiveVersion!)
-                .SingleOrNotFoundAsync(cancellationToken);
-        }
-
-        return await publicDataDbContext
-            .DataSetVersions
-            .AsNoTracking()
-            .Include(dsv => dsv.DataSet)
-            .FindByVersion(dataSetId, dataSetVersion, cancellationToken);
+                .SingleOrNotFoundAsync(cancellationToken)
+            : await publicDataDbContext
+                .DataSetVersions
+                .AsNoTracking()
+                .Include(dsv => dsv.DataSet)
+                .FindByVersion(
+                    dataSetId: dataSetId,
+                    version: dataSetVersion,
+                    cancellationToken);
     }
-    
+
     private async Task<Either<ActionResult, DataSetQueryPaginatedResultsViewModel>> RunQueryWithAnalytics(
         DataSetVersion dataSetVersion,
         DataSetQueryRequest query,
