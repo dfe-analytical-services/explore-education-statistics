@@ -249,24 +249,10 @@ public class DataSetVersionQueryableExtensionsTests
             {"v*", 5, 0, 0}
         };
         
-        public static TheoryData<DataSetVersionStatus, string> NonPublishedStatusWithVersionStringTheoryData
-        {
-            get
-            {
-                var data = new TheoryData<DataSetVersionStatus, string>();
-                var statuses = EnumUtil.GetEnums<DataSetVersionStatus>()
-                    .Except([DataSetVersionStatus.Published]);
-                string[] versions = ["1.*", "*", "v1.*", "v*"];
-                foreach (var status in statuses)
-                {
-                    foreach (var version in versions)
-                    {
-                        data.Add(status, version);
-                    }
-                }
-
-                return data;
-            }
-        }
+        public static TheoryData<DataSetVersionStatus, string> NonPublishedStatusWithVersionStringTheoryData =>
+            new TheoryData<DataSetVersionStatus, string>()
+                .Cross(
+                    Enum.GetValues<DataSetVersionStatus>().Except([DataSetVersionStatus.Published]),
+                    ["1.*", "*", "v1.*", "v*"]);
     }
 }
