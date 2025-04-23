@@ -15,7 +15,6 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Fixtures;
 using Microsoft.EntityFrameworkCore;
 using Moq;
@@ -34,13 +33,17 @@ using static Moq.MockBehavior;
 using File = GovUk.Education.ExploreEducationStatistics.Content.Model.File;
 using IReleaseVersionRepository = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IReleaseVersionRepository;
 using ReleaseVersion = GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseVersion;
-using ReleaseVersionRepository = GovUk.Education.ExploreEducationStatistics.Admin.Services.ReleaseVersionRepository;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 {
     public class ReleaseDataFileServiceTest
     {
         private readonly DataFixture _fixture = new();
+
+        private readonly ReleaseVersion _releaseVersion = new()
+        {
+            Id = Guid.NewGuid()
+        };
 
         private readonly User _user = new()
         {
@@ -2306,10 +2309,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var service = SetupReleaseDataFileService(
                     contentDbContext: contentDbContext,
-                    statisticsDbContext: statisticsDbContext,
                     privateBlobStorageService: privateBlobStorageService.Object,
-                    dataImportService: dataImportService.Object,
-                    dataSetValidatorService: dataSetValidatorService.Object
+                    dataImportService: dataImportService.Object
                 );
 
                 var result = (await service.UploadFromZip(
@@ -2452,10 +2453,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var service = SetupReleaseDataFileService(
                     contentDbContext: contentDbContext,
-                    statisticsDbContext: statisticsDbContext,
                     privateBlobStorageService: privateBlobStorageService.Object,
-                    dataImportService: dataImportService.Object,
-                    dataSetValidatorService: dataSetValidatorService.Object
+                    dataImportService: dataImportService.Object
                 );
 
                 var result = await service.UploadFromZip(
@@ -2586,10 +2585,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var service = SetupReleaseDataFileService(
                     contentDbContext: contentDbContext,
-                    statisticsDbContext: statisticsDbContext,
                     privateBlobStorageService: privateBlobStorageService.Object,
-                    dataImportService: dataImportService.Object,
-                    dataSetValidatorService: dataSetValidatorService.Object
+                    dataImportService: dataImportService.Object
                 );
 
                 var result = (await service.UploadFromZip(
@@ -2807,37 +2804,48 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         //}
 
         private ReleaseDataFileService SetupReleaseDataFileService(
-            ContentDbContext contentDbContext,
-            StatisticsDbContext? statisticsDbContext = null,
+            ContentDbContext? contentDbContext = null,
             IPersistenceHelper<ContentDbContext>? contentPersistenceHelper = null,
             IPrivateBlobStorageService? privateBlobStorageService = null,
-            IDataSetValidator? dataSetValidatorService = null,
+            IDataSetValidator? dataSetValidator = null,
             IFileRepository? fileRepository = null,
             IReleaseVersionRepository? releaseVersionRepository = null,
             IReleaseFileRepository? releaseFileRepository = null,
             IReleaseFileService? releaseFileService = null,
             IReleaseDataFileRepository? releaseDataFileRepository = null,
             IDataImportService? dataImportService = null,
+            IDataSetFileStorage? dataSetFileStorage = null,
             IUserService? userService = null)
         {
+            contentDbContext ??= new Mock<ContentDbContext>().Object;
+            privateBlobStorageService ??= new Mock<IPrivateBlobStorageService>(Strict).Object;
+            releaseVersionRepository ??= new Mock<IReleaseVersionRepository>(Strict).Object;
+            releaseDataFileRepository ??= new Mock<IReleaseDataFileRepository>(Strict).Object;
+            dataImportService ??= new Mock<IDataImportService>(Strict).Object;
+            userService ??= MockUtils.AlwaysTrueUserService(_user.Id).Object;
+
             contentDbContext.Users.Add(_user);
             contentDbContext.SaveChanges();
 
             return new ReleaseDataFileService(
                 contentDbContext,
-                contentPersistenceHelper ?? new PersistenceHelper<ContentDbContext>(contentDbContext),
-                privateBlobStorageService ?? Mock.Of<IPrivateBlobStorageService>(Strict),
-                dataSetValidatorService ?? Mock.Of<IDataSetValidator>(Strict),
+                contentPersistenceHelper ?? DefaultPersistenceHelperMock().Object,
+                privateBlobStorageService,
+                dataSetValidator ?? new Mock<IDataSetValidator>(Strict).Object,
                 fileRepository ?? new FileRepository(contentDbContext),
-                releaseVersionRepository ?? new ReleaseVersionRepository(
-                    contentDbContext,
-                    statisticsDbContext ?? Mock.Of<StatisticsDbContext>(Strict)),
                 releaseFileRepository ?? new ReleaseFileRepository(contentDbContext),
-                releaseFileService ?? Mock.Of<IReleaseFileService>(Strict),
-                releaseDataFileRepository ?? new ReleaseDataFileRepository(contentDbContext),
-                dataImportService ?? Mock.Of<IDataImportService>(Strict),
-                userService ?? MockUtils.AlwaysTrueUserService(_user.Id).Object
+                releaseFileService ?? new Mock<IReleaseFileService>(Strict).Object,
+                dataImportService,
+                userService,
+                dataSetFileStorage ?? new DataSetFileStorage(contentDbContext, privateBlobStorageService, releaseVersionRepository, releaseDataFileRepository, dataImportService, userService)
             );
+        }
+
+        private Mock<IPersistenceHelper<ContentDbContext>> DefaultPersistenceHelperMock()
+        {
+            var mock = MockUtils.MockPersistenceHelper<ContentDbContext, ReleaseVersion>();
+            MockUtils.SetupCall(mock, _releaseVersion.Id, _releaseVersion);
+            return mock;
         }
     }
 }
