@@ -22,18 +22,7 @@ public class DataSetVersionChangeService(
         string dataSetVersion,
         CancellationToken cancellationToken = default)
     {
-        return dataSetVersion.Contains('*')
-            ? publicDataDbContext.DataSetVersions
-                .AsNoTracking()
-                .WherePublishedStatus()
-                .FindByVersion(
-                    dataSetId: dataSetId,
-                    version: dataSetVersion,
-                    cancellationToken: cancellationToken)
-                .OnSuccessDo(userService.CheckCanViewDataSetVersion)
-                .OnSuccess(dsv => LoadChanges(dsv, cancellationToken))
-                .OnSuccess(MapChanges)
-            : publicDataDbContext.DataSetVersions
+        return publicDataDbContext.DataSetVersions
             .AsNoTracking()
             .FindByVersion(
                 dataSetId: dataSetId,

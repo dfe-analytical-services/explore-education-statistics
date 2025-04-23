@@ -8,7 +8,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Extension
 public static class DataSetVersionQueryableExtensions
 {
     /// <summary>
-    /// Returns specified data set version, if a wildcard is specified, the latest version of a data set based on a major/minor/patch level that's being wildcarded (i.e., substituted with '*') is returned.
+    /// Returns specified data set version. If a wildcard is specified, the latest version of a data set based on a major/minor/patch level that's being wildcarded (i.e., substituted with '*') is returned.
     /// </summary>
     /// <param name="queryable">The queryable collection of <see cref="DataSetVersion"/> objects.</param>
     /// <param name="version">Data set version which can contain a wildcard</param>
@@ -19,13 +19,21 @@ public static class DataSetVersionQueryableExtensions
         Guid dataSetId,
         string version,
         CancellationToken cancellationToken = default)
-    {
+    { 
         if (!DataSetVersionNumber.TryParse(version, out var parsedVersion))
         {
             return new NotFoundResult();
         }
 
-        return await queryable
+        var query = queryable
+            .Where(dsv => dsv.DataSetId == dataSetId);
+
+        if (parsedVersion.IsWildcard)
+        {
+            query = query.WherePublishedStatus();
+        }
+
+        return await query
             .Where(dsv => dsv.DataSetId == dataSetId)
             .Where(v =>
                 (!parsedVersion.Major.HasValue || v.VersionMajor == parsedVersion.Major) &&

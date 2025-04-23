@@ -126,24 +126,14 @@ internal class DataSetQueryService(
                 .Where(ds => ds.Id == dataSetId)
                 .Select(ds => ds.LatestLiveVersion!)
                 .SingleOrNotFoundAsync(cancellationToken)
-            : dataSetVersion.Contains('*')
-                ? await publicDataDbContext
-                    .DataSetVersions
-                    .AsNoTracking()
-                    .Include(dsv => dsv.DataSet)
-                    .WherePublishedStatus()
-                    .FindByVersion(
-                        dataSetId: dataSetId,
-                        version: dataSetVersion,
-                        cancellationToken)
-                : await publicDataDbContext
-                    .DataSetVersions
-                    .AsNoTracking()
-                    .Include(dsv => dsv.DataSet)
-                    .FindByVersion(
-                        dataSetId: dataSetId,
-                        version: dataSetVersion,
-                        cancellationToken);
+            : await publicDataDbContext
+                .DataSetVersions
+                .AsNoTracking()
+                .Include(dsv => dsv.DataSet)
+                .FindByVersion(
+                    dataSetId: dataSetId,
+                    version: dataSetVersion,
+                    cancellationToken);
     }
 
     private async Task<Either<ActionResult, DataSetQueryPaginatedResultsViewModel>> RunQueryWithAnalytics(

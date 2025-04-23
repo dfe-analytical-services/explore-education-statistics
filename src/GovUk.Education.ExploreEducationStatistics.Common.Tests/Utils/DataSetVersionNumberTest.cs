@@ -118,5 +118,25 @@ public static class DataSetVersionNumberTest
         {
             Assert.False(DataSetVersionNumber.TryParse(versionString, out _));
         }
+
+        [Theory]
+        [InlineData("1.*")]
+        [InlineData("1.1.*")]
+        [InlineData("*")]
+        public void PassedWildcard_ExpectsIsWildcardToReturnTrue(string versionString)
+        {
+            DataSetVersionNumber.TryParse(versionString, out var version);
+            Assert.True(version.IsWildcard);
+        }
+        
+        [Theory]
+        [InlineData("1.1")]
+        [InlineData("1.1.1")]
+        [InlineData("1")]
+        public void PassedNonWildcard_ExpectsIsWildcardToReturnFalse(string versionString)
+        {
+            DataSetVersionNumber.TryParse(versionString, out var version);
+            Assert.False(version.IsWildcard);
+        }
     }
 }

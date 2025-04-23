@@ -1,5 +1,6 @@
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
+using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Tests.Fixtures;
@@ -71,11 +72,7 @@ public class DataSetVersionQueryableExtensionsTests
         [Theory]
         [InlineData("2.*")]
         [InlineData("2.1.*")]
-        [InlineData("2.1")]
-        [InlineData("2.0")]
-
-        public async Task TestPublicOnlyDataSetVersions_SpecifyDraftVersion_ReturnsNotFound(
-            string versionString)
+        public async Task SpecifyWildCardThatIsNonPublished_Returns404NotFound(string versionString)
         {
             // Arrange
             DataSet dataSet = _dataFixture
@@ -114,12 +111,10 @@ public class DataSetVersionQueryableExtensionsTests
         }
         
         [Theory]
-        [InlineData("1.*")]
-        [InlineData("*")]
-        [InlineData("v1.*")]
-        [InlineData("v*")]
-        public async Task TestPublicOnlyDataSetVersions_SpecifyWildCard_DoesNotReturnDraftVersion(
-            string versionString)
+        [MemberData(nameof(DataSetVersionStatusQueryTheoryData.NonPublishedStatusWithVersionString),
+            MemberType = typeof(DataSetVersionStatusQueryTheoryData))]
+        public async Task SpecifyWildCard_SkipsNonPublishedVersionAndReturnsPublishedVersion(
+            DataSetVersionStatus status, string versionString)
         {
             // Arrange
             DataSet dataSet = _dataFixture
@@ -135,17 +130,17 @@ public class DataSetVersionQueryableExtensionsTests
                 .ForIndex(2, dsv => dsv.SetVersionNumber(1, 2))
                 .ForIndex(3, dsv =>
                 {
-                    dsv.SetStatusDraft();
+                    dsv.SetStatus(status); //The status is not published status and so these will not be returned
                     dsv.SetVersionNumber(1, 3);
                 })
                 .ForIndex(4, dsv =>
                 {
-                    dsv.SetStatusDraft();
+                    dsv.SetStatus(status);
                     dsv.SetVersionNumber(2, 0);
                 })
                 .ForIndex(5, dsv =>
                 {
-                    dsv.SetStatusDraft();
+                    dsv.SetStatus(status);
                     dsv.SetVersionNumber(2, 1);
                 })                
                 .GenerateList();
@@ -156,9 +151,11 @@ public class DataSetVersionQueryableExtensionsTests
             var queryable = publicDataDbContextMock.Object.DataSetVersions.AsNoTracking();
 
             // Act 
-            var actualResult = await queryable.WherePublishedStatus().FindByVersion(dataSet.Id, versionString, CancellationToken.None);
+            var actualResult = await queryable.FindByVersion(dataSet.Id, versionString, CancellationToken.None);
 
             // Assert
+            actualResult.AssertRight();
+            
             Assert.Equal(1, actualResult.Right.VersionMajor);
             Assert.Equal(2, actualResult.Right.VersionMinor);
             Assert.Equal(0, actualResult.Right.VersionPatch);
@@ -251,5 +248,13 @@ public class DataSetVersionQueryableExtensionsTests
             {"v2.*.*", 2, 1, 4},
             {"v*", 5, 0, 0}
         };
+    }
+
+    private static class DataSetVersionStatusQueryTheoryData
+    {
+        public static IEnumerable<object[]> NonPublishedStatusWithVersionString =>
+            from status in EnumUtil.GetEnums<DataSetVersionStatus>().Except(new[] { DataSetVersionStatus.Published })
+            from versionString in new[] { "1.*", "*", "v1.*", "v*" }
+            select new object[] { status, versionString };
     }
 }

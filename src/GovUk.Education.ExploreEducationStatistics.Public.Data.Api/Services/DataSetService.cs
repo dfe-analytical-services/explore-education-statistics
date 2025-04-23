@@ -96,17 +96,7 @@ internal class DataSetService(
         string dataSetVersion,
         CancellationToken cancellationToken = default)
     {
-        return dataSetVersion.Contains('*')
-            ? await publicDataDbContext.DataSetVersions
-                .AsNoTracking()
-                .WherePublishedStatus()
-                .FindByVersion(
-                    dataSetId: dataSetId,
-                    version: dataSetVersion,
-                    cancellationToken: cancellationToken)
-                .OnSuccessDo(userService.CheckCanViewDataSetVersion)
-                .OnSuccess(MapDataSetVersion)
-            : await publicDataDbContext.DataSetVersions
+        return await publicDataDbContext.DataSetVersions
             .AsNoTracking()
             .FindByVersion(
                 dataSetId: dataSetId,
