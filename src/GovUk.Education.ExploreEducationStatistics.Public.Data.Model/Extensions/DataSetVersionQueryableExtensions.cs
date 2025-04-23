@@ -34,7 +34,6 @@ public static class DataSetVersionQueryableExtensions
         }
 
         return await query
-            .Where(dsv => dsv.DataSetId == dataSetId)
             .Where(v =>
                 (!parsedVersion.Major.HasValue || v.VersionMajor == parsedVersion.Major) &&
                 (!parsedVersion.Minor.HasValue || v.VersionMinor == parsedVersion.Minor) &&
