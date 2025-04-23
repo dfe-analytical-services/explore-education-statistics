@@ -283,6 +283,187 @@ public class DataSetValidatorTests
         Assert.Equal(ValidationMessages.CannotReplaceDataSetWithApiDataSet.Code, errors[0].Code);
     }
 
+    [Fact]
+    public async Task ValidateBulkDataZipIndexFile_Valid_ReturnsIndexFileObject()
+    {
+        // Arrange
+        var releaseVersion = new ReleaseVersion
+        {
+            Id = Guid.NewGuid(),
+        };
+
+        var indexFile = await new DataSetFileBuilder().Build(FileType.BulkDataZipIndex);
+
+        await using var context = InMemoryContentDbContext();
+        var sut = BuildService(context);
+
+        // Act
+        var result = await sut.ValidateBulkDataZipIndexFile(releaseVersion.Id, indexFile);
+
+        // Assert
+        var dataSetIndex = result.AssertRight();
+        Assert.Equal(releaseVersion.Id, dataSetIndex.ReleaseVersionId);
+
+        var dataSetItem = Assert.Single(dataSetIndex.DataSetIndexItems);
+        Assert.Equal("Data set title", dataSetItem.DataSetTitle);
+        Assert.Equal("test-data.csv", dataSetItem.DataFileName);
+        Assert.Equal("test-data.meta.csv", dataSetItem.MetaFileName);
+        Assert.Null(dataSetItem.ReplacingFile);
+    }
+
+    [Fact]
+    public async Task ValidateBulkDataZipIndexFile_ValidWithReplacement_ReturnsIndexFileObject()
+    {
+        // Arrange
+        var releaseVersion = new ReleaseVersion
+        {
+            Id = Guid.NewGuid(),
+        };
+
+        var dataSetTitle = "Data set title";
+
+        var toBeReplacedDataReleaseFile = _fixture
+            .DefaultReleaseFile()
+            .WithReleaseVersion(releaseVersion)
+            .WithName(dataSetTitle)
+            .WithFile(_fixture.DefaultFile()
+                .WithType(FileType.Data)
+                .WithFilename("test-data.csv"))
+            .Generate();
+
+        var toBeReplacedMetaReleaseFile = _fixture.DefaultReleaseFile()
+            .WithReleaseVersion(releaseVersion)
+            .WithFile(_fixture.DefaultFile()
+                .WithType(FileType.Metadata)
+                .WithFilename("test-data.meta.csv"))
+            .Generate();
+
+        var contentDbContextId = Guid.NewGuid().ToString();
+        await using (var context = InMemoryContentDbContext(contentDbContextId))
+        {
+            context.ReleaseFiles.AddRange(toBeReplacedDataReleaseFile, toBeReplacedMetaReleaseFile);
+            await context.SaveChangesAsync();
+        }
+
+        var indexFile = await new DataSetFileBuilder().Build(FileType.BulkDataZipIndex);
+
+        await using (var context = InMemoryContentDbContext(contentDbContextId))
+        {
+            var sut = BuildService(context);
+
+            // Act
+            var result = await sut.ValidateBulkDataZipIndexFile(releaseVersion.Id, indexFile);
+
+            // Assert
+            var dataSetIndex = result.AssertRight();
+            Assert.Equal(releaseVersion.Id, dataSetIndex.ReleaseVersionId);
+
+            var dataSetItem = Assert.Single(dataSetIndex.DataSetIndexItems);
+            Assert.Equal("Data set title", dataSetItem.DataSetTitle);
+            Assert.Equal("test-data.csv", dataSetItem.DataFileName);
+            Assert.Equal("test-data.meta.csv", dataSetItem.MetaFileName);
+            Assert.NotNull(dataSetItem.ReplacingFile);
+            Assert.Equal(toBeReplacedDataReleaseFile.File.Id, dataSetItem.ReplacingFile.Id);
+        }
+    }
+
+    [Fact]
+    public async Task ValidateBulkDataZipIndexFile_ReplacementInProgress_ReturnsErrorDetails()
+    {
+        // Arrange
+        var releaseVersion = new ReleaseVersion
+        {
+            Id = Guid.NewGuid(),
+        };
+
+        var dataSetTitle = "Data set title";
+
+        var toBeReplacedDataReleaseFiles = _fixture
+            .DefaultReleaseFile()
+            .WithReleaseVersion(releaseVersion)
+            .WithName(dataSetTitle)
+            .WithFile(_fixture.DefaultFile()
+                .WithType(FileType.Data)
+                .WithFilename("test-data.csv"))
+            .Generate(2);
+
+        var contentDbContextId = Guid.NewGuid().ToString();
+        await using (var context = InMemoryContentDbContext(contentDbContextId))
+        {
+            context.ReleaseFiles.AddRange(toBeReplacedDataReleaseFiles);
+            await context.SaveChangesAsync();
+        }
+
+        var indexFile = await new DataSetFileBuilder().Build(FileType.BulkDataZipIndex);
+
+        await using (var context = InMemoryContentDbContext(contentDbContextId))
+        {
+            var sut = BuildService(context);
+
+            // Act
+            var result = await sut.ValidateBulkDataZipIndexFile(releaseVersion.Id, indexFile);
+
+            // Assert
+            var errors = result.AssertLeft();
+
+            var error = Assert.Single(errors);
+            Assert.Equal(ValidationMessages.DataReplacementAlreadyInProgress.Code, error.Code);
+        }
+    }
+
+    [Fact]
+    public async Task ValidateBulkDataZipIndexFile_InvalidHeaders_ReturnsErrorDetails()
+    {
+        // Arrange
+        var releaseVersion = new ReleaseVersion
+        {
+            Id = Guid.NewGuid(),
+        };
+
+        var indexFile = await new DataSetFileBuilder()
+            .WhereFileNameIs("dataset_names_invalid_headers.csv")
+            .Build(FileType.BulkDataZipIndex);
+
+        await using var context = InMemoryContentDbContext();
+        var sut = BuildService(context);
+
+        // Act
+        var result = await sut.ValidateBulkDataZipIndexFile(releaseVersion.Id, indexFile);
+
+        // Assert
+        var errors = result.AssertLeft();
+
+        var error = Assert.Single(errors);
+        Assert.Equal(ValidationMessages.DataSetNamesCsvIncorrectHeaders.Code, error.Code);
+    }
+
+    [Fact]
+    public async Task ValidateBulkDataZipIndexFile_DuplicateRecords_ReturnsErrorDetails()
+    {
+        // Arrange
+        var releaseVersion = new ReleaseVersion
+        {
+            Id = Guid.NewGuid(),
+        };
+
+        var indexFile = await new DataSetFileBuilder()
+            .WhereFileNameIs("dataset_names_duplicate_records.csv")
+            .Build(FileType.BulkDataZipIndex);
+
+        await using var context = InMemoryContentDbContext();
+        var sut = BuildService(context);
+
+        // Act
+        var result = await sut.ValidateBulkDataZipIndexFile(releaseVersion.Id, indexFile);
+
+        // Assert
+        var errors = result.AssertLeft();
+
+        Assert.Equal(2, errors.Count);
+        Assert.Equal(ValidationMessages.DataSetTitleShouldBeUnique.Code, errors[0].Code);
+        Assert.Equal(ValidationMessages.DataSetNamesCsvFilenamesShouldBeUnique.Code, errors[1].Code);
+    }
+
     private static DataSetValidator BuildService(ContentDbContext? contentDbContext = null)
     {
         return new DataSetValidator(contentDbContext!);
