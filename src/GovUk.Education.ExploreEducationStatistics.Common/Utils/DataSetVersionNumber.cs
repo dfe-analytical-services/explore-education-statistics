@@ -8,7 +8,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Utils;
 
 public record DataSetVersionNumber(int? Major, int? Minor, int? Patch)
 {
-    public bool IsWildcard { get; set; }
+    public bool IsWildcard { get; init; }
 
     public static bool TryParse(string versionString, [NotNullWhen(true)] out DataSetVersionNumber? version)
     {

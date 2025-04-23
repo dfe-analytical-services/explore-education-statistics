@@ -111,10 +111,9 @@ public class DataSetVersionQueryableExtensionsTests
         }
         
         [Theory]
-        [MemberData(nameof(DataSetVersionStatusQueryTheoryData.NonPublishedStatusWithVersionString),
-            MemberType = typeof(DataSetVersionStatusQueryTheoryData))]
+        [MemberData(nameof(NonPublishedStatusWithVersionStringTheoryData))]
         public async Task SpecifyWildCard_SkipsNonPublishedVersionAndReturnsPublishedVersion(
-            DataSetVersionStatus status, string versionString)
+            DataSetVersionStatus nonPublishedStatus, string versionString)
         {
             // Arrange
             DataSet dataSet = _dataFixture
@@ -130,17 +129,17 @@ public class DataSetVersionQueryableExtensionsTests
                 .ForIndex(2, dsv => dsv.SetVersionNumber(1, 2))
                 .ForIndex(3, dsv =>
                 {
-                    dsv.SetStatus(status); //The status is not published status and so these will not be returned
+                    dsv.SetStatus(nonPublishedStatus); //The status is not published status and so these will not be returned
                     dsv.SetVersionNumber(1, 3);
                 })
                 .ForIndex(4, dsv =>
                 {
-                    dsv.SetStatus(status);
+                    dsv.SetStatus(nonPublishedStatus);
                     dsv.SetVersionNumber(2, 0);
                 })
                 .ForIndex(5, dsv =>
                 {
-                    dsv.SetStatus(status);
+                    dsv.SetStatus(nonPublishedStatus);
                     dsv.SetVersionNumber(2, 1);
                 })                
                 .GenerateList();
@@ -161,6 +160,7 @@ public class DataSetVersionQueryableExtensionsTests
             Assert.Equal(0, actualResult.Right.VersionPatch);
         }
 
+        
         private IQueryable<DataSetVersion> SetupDataSetVersions(out Guid dataSetGuid)
         {
             DataSet dataSet = _dataFixture
@@ -248,13 +248,25 @@ public class DataSetVersionQueryableExtensionsTests
             {"v2.*.*", 2, 1, 4},
             {"v*", 5, 0, 0}
         };
-    }
+        
+        public static TheoryData<DataSetVersionStatus, string> NonPublishedStatusWithVersionStringTheoryData
+        {
+            get
+            {
+                var data = new TheoryData<DataSetVersionStatus, string>();
+                var statuses = EnumUtil.GetEnums<DataSetVersionStatus>()
+                    .Except([DataSetVersionStatus.Published]);
+                string[] versions = ["1.*", "*", "v1.*", "v*"];
+                foreach (var status in statuses)
+                {
+                    foreach (var version in versions)
+                    {
+                        data.Add(status, version);
+                    }
+                }
 
-    private static class DataSetVersionStatusQueryTheoryData
-    {
-        public static IEnumerable<object[]> NonPublishedStatusWithVersionString =>
-            from status in EnumUtil.GetEnums<DataSetVersionStatus>().Except(new[] { DataSetVersionStatus.Published })
-            from versionString in new[] { "1.*", "*", "v1.*", "v*" }
-            select new object[] { status, versionString };
+                return data;
+            }
+        }
     }
 }

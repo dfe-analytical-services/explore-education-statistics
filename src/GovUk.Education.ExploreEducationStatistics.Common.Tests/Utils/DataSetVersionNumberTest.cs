@@ -125,7 +125,7 @@ public static class DataSetVersionNumberTest
         [InlineData("*")]
         public void PassedWildcard_ExpectsIsWildcardToReturnTrue(string versionString)
         {
-            DataSetVersionNumber.TryParse(versionString, out var version);
+            Assert.True(DataSetVersionNumber.TryParse(versionString, out var version));
             Assert.True(version.IsWildcard);
         }
         
@@ -135,7 +135,7 @@ public static class DataSetVersionNumberTest
         [InlineData("1")]
         public void PassedNonWildcard_ExpectsIsWildcardToReturnFalse(string versionString)
         {
-            DataSetVersionNumber.TryParse(versionString, out var version);
+            Assert.True(DataSetVersionNumber.TryParse(versionString, out var version));
             Assert.False(version.IsWildcard);
         }
     }
