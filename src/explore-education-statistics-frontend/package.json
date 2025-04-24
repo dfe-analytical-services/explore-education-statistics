@@ -54,7 +54,6 @@
     "@types/qs": "^6.9.7",
     "@types/react": "^18.2.0",
     "@types/react-dom": "^18.2.0",
-    "@types/whatwg-fetch": "0.0.33",
     "case-sensitive-paths-webpack-plugin": "^2.4.0",
     "eslint": "^8.57.0",
     "eslint-webpack-plugin": "^4.0.1",
@@ -96,10 +95,7 @@
     "tsc": "tsc --noEmit"
   },
   "browserslist": [
-    ">0.2%",
-    "not dead",
-    "not ie < 11",
-    "not op_mini all"
+    "defaults"
   ],
   "jest-junit": {
     "ancestorSeparator": " › ",

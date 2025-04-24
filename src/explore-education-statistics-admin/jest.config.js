@@ -1,7 +1,6 @@
 /** @type {import('jest').Config} */
 const config = {
   collectCoverageFrom: ['src/**/*.{js,jsx,ts,tsx}', '!src/**/*.d.ts'],
-  setupFiles: ['react-app-polyfill/jsdom'],
   verbose: true,
   setupFilesAfterEnv: ['<rootDir>/test/setupTests.js'],
   testMatch: [

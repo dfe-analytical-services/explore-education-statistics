@@ -10,9 +10,8 @@
     "strict": true,
     "strictNullChecks": true,
     "jsx": "preserve",
-    "target": "es5",
+    "target": "ES6",
     "lib": [
-      "dom",
       "dom.iterable",
       "esnext",
       "webworker"
