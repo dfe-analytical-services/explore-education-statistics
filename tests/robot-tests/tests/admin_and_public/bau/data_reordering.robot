@@ -547,31 +547,31 @@ Validate results table column headings
     user checks table row heading contains    10    1    Indicator 6
 
 Validate row headings
-    user checks table column heading contains    1    1    2021
-    user checks table column heading contains    1    2    2022
+    user checks table column heading contains    1    1    2022
+    user checks table column heading contains    1    2    2021
 
 Validate table cells
-    user checks table cell contains    1    1    91,732,417
-    user checks table cell contains    2    1    89,626,171
-    user checks table cell contains    3    1    51,029,335
-    user checks table cell contains    4    1    83,771,711
-    user checks table cell contains    5    1    91,439,757
-    user checks table cell contains    6    1    84,288,196
-    user checks table cell contains    7    1    68,482,122
-    user checks table cell contains    8    1    65,182,202
-    user checks table cell contains    9    1    61,121,060
-    user checks table cell contains    10    1    37,961,046
+    user checks table cell contains    1    1    56,920,389
+    user checks table cell contains    2    1    75,873,610
+    user checks table cell contains    3    1    49,220,007
+    user checks table cell contains    4    1    31,859,890
+    user checks table cell contains    5    1    63,230,370
+    user checks table cell contains    6    1    54,759,203
+    user checks table cell contains    7    1    10,214,603
+    user checks table cell contains    8    1    28,403,292
+    user checks table cell contains    9    1    24,284,255
+    user checks table cell contains    10    1    39,761,905
 
-    user checks table cell contains    1    2    56,920,389
-    user checks table cell contains    2    2    75,873,610
-    user checks table cell contains    3    2    49,220,007
-    user checks table cell contains    4    2    31,859,890
-    user checks table cell contains    5    2    63,230,370
-    user checks table cell contains    6    2    54,759,203
-    user checks table cell contains    7    2    10,214,603
-    user checks table cell contains    8    2    28,403,292
-    user checks table cell contains    9    2    24,284,255
-    user checks table cell contains    10    2    39,761,905
+    user checks table cell contains    1    2    91,732,417
+    user checks table cell contains    2    2    89,626,171
+    user checks table cell contains    3    2    51,029,335
+    user checks table cell contains    4    2    83,771,711
+    user checks table cell contains    5    2    91,439,757
+    user checks table cell contains    6    2    84,288,196
+    user checks table cell contains    7    2    68,482,122
+    user checks table cell contains    8    2    65,182,202
+    user checks table cell contains    9    2    61,121,060
+    user checks table cell contains    10    2    37,961,046
 
 Go back to locations step
     user clicks button    Edit locations
