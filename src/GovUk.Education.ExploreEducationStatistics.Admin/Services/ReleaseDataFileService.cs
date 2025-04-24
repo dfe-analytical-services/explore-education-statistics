@@ -468,13 +468,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
             var permissions = await userService.GetDataFilePermissions(dataImport.File);
 
-            return dataSetFileStorage.BuildDataFileViewModel(
-                releaseFile,
-                dataImport.MetaFile,
-                releaseFile.Name ?? "Unknown",
-                dataImport.TotalRows,
-                dataImport.Status,
-                permissions);
+            return new DataFileInfo
+            {
+                Id = releaseFile.FileId,
+                FileName = releaseFile.File.Filename,
+                Name = releaseFile.Name ?? "Unknown",
+                Size = releaseFile.File.DisplaySize(),
+                MetaFileId = dataImport.MetaFile.Id,
+                MetaFileName = dataImport.MetaFile.Filename,
+                ReplacedBy = releaseFile.File.ReplacedById,
+                Rows = dataImport.TotalRows,
+                UserName = releaseFile.File.CreatedBy?.Email ?? "",
+                Status = dataImport.Status,
+                Created = releaseFile.File.Created,
+                Permissions = permissions,
+                PublicApiDataSetId = releaseFile.PublicApiDataSetId,
+                PublicApiDataSetVersion = releaseFile.PublicApiDataSetVersionString,
+            };
         }
 
         private async Task<List<DataFileInfo>> BuildDataFileViewModels(List<ReleaseFile> releaseFiles)
@@ -504,13 +514,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             {
                 var dataImport = dataImports[releaseFile.FileId];
 
-                return dataSetFileStorage.BuildDataFileViewModel(
-                    releaseFile,
-                    dataImport.MetaFile,
-                    subjectNames[releaseFile.FileId],
-                    dataImport.TotalRows,
-                    dataImport.Status,
-                    permissions[releaseFile.FileId]);
+                return new DataFileInfo
+                {
+                    Id = releaseFile.FileId,
+                    FileName = releaseFile.File.Filename,
+                    Name = subjectNames[releaseFile.FileId] ?? "",
+                    Size = releaseFile.File.DisplaySize(),
+                    MetaFileId = dataImport.MetaFile.Id,
+                    MetaFileName = dataImport.MetaFile.Filename,
+                    ReplacedBy = releaseFile.File.ReplacedById,
+                    Rows = dataImport.TotalRows,
+                    UserName = releaseFile.File.CreatedBy?.Email ?? "",
+                    Status = dataImport.Status,
+                    Created = releaseFile.File.Created,
+                    Permissions = permissions[releaseFile.FileId],
+                    PublicApiDataSetId = releaseFile.PublicApiDataSetId,
+                    PublicApiDataSetVersion = releaseFile.PublicApiDataSetVersionString,
+                };
             }).ToList();
         }
 

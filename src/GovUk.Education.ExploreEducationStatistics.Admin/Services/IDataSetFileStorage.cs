@@ -1,7 +1,6 @@
 #nullable enable
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
-using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using System;
 using System.Collections.Generic;
@@ -58,12 +57,4 @@ public interface IDataSetFileStorage
         Guid releaseVersionId,
         List<ZipDataSetFileViewModel> dataSets,
         CancellationToken cancellationToken);
-
-    DataFileInfo BuildDataFileViewModel(
-        ReleaseFile dataReleaseFile,
-        File metaFile,
-        string dataSetTitle,
-        int? totalRows,
-        DataImportStatus importStatus,
-        DataFilePermissions permissions);
 }
