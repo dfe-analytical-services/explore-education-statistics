@@ -654,7 +654,7 @@ Select featured table from subjects step
     ...    xpath://*[@data-testid="dataTableCaption" and text()="Admission Numbers for '${SUBJECT_2_NAME}' for Not specified in Bolton 001, Bolton 004, Nailsea Youngwood and Syon between 2005 and 2017"]
 
 Validate table column headings for featured table
-    user checks table column heading contains    1    1    Admission Numbers
+    user checks table column heading contains    1    1    Not specified
 
 Validate table rows for featured table
     ${row}=    user gets row number with heading    Bolton 001
