@@ -306,8 +306,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             // Publishing a scheduled release relies on two Azure Functions which are triggered by cron expressions.
             // These notes will refer to them as functions (1) and (2):
-            // PublishReleases (1) - Runs tasks for the releases that are scheduled to be published.
-            // PublishStagedReleaseContent (2) - Runs after (1) and completes publishing of releases.
+            // StageScheduledReleases (1) - Runs tasks for the releases that are scheduled to be published.
+            // PublishScheduledReleases (2) - Runs after (1) and completes publishing of releases.
 
             // The cron expressions are configurable per environment to allow different schedules for testing.
 

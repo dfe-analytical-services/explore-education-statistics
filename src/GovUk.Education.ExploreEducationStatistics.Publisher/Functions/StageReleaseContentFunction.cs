@@ -1,14 +1,13 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Options;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using NCrontab;
-using static GovUk.Education.ExploreEducationStatistics.Common.Utils.CronExpressionUtil;
 using static GovUk.Education.ExploreEducationStatistics.Publisher.Model.PublisherQueues;
 using static GovUk.Education.ExploreEducationStatistics.Publisher.Model.ReleasePublishingStatusContentStage;
 
@@ -17,6 +16,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
     public class StageReleaseContentFunction(
         ILogger<StageReleaseContentFunction> logger,
         IOptions<AppOptions> appOptions,
+        TimeProvider timeProvider,
         IContentService contentService,
         IReleasePublishingStatusService releasePublishingStatusService)
     {
@@ -39,13 +39,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
             await UpdateContentStage(message, Started);
             try
             {
-                var publishStagedReleasesCronExpression = _appOptions.PublishReleaseContentCronSchedule;
-                var nextScheduledPublishingTime = CrontabSchedule.Parse(publishStagedReleasesCronExpression,
-                    new CrontabSchedule.ParseOptions
-                    {
-                        IncludingSeconds = CronExpressionHasSecondPrecision(publishStagedReleasesCronExpression)
-                    }).GetNextOccurrence(DateTime.UtcNow);
-                await contentService.UpdateContentStaged(nextScheduledPublishingTime,
+                var nextScheduledPublishingTime = CronExpressionUtil.GetNextOccurrence(
+                    cronExpression: _appOptions.PublishReleaseContentCronSchedule,
+                    baseTime: timeProvider.GetUtcNow());
+                await contentService.UpdateContentStaged(nextScheduledPublishingTime.UtcDateTime,
                     message.ReleasePublishingKeys.Select(key => key.ReleaseVersionId).ToArray());
                 await UpdateContentStage(message, Scheduled);
             }

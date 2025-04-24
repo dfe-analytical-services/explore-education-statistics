@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
@@ -94,13 +93,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
         {
             // There may be an existing scheduled ReleaseStatus entry if this release version has been validated before
             // If so, mark it as superseded
-            var scheduled = await releasePublishingStatusService.GetAllByOverallStage(
+            var scheduled = await releasePublishingStatusService.GetReleasesWithOverallStages(
                 message.ReleaseVersionId,
-                ReleasePublishingStatusOverallStage.Scheduled);
+                [ReleasePublishingStatusOverallStage.Scheduled]);
 
             foreach (var status in scheduled)
             {
-                await releasePublishingStatusService.UpdateState(status.AsTableRowKey(),
+                await releasePublishingStatusService.UpdateState(status,
                     ReleasePublishingStatusStates.SupersededState);
             }
         }

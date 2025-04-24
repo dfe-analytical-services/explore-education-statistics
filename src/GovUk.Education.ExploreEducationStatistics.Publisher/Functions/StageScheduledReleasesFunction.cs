@@ -3,20 +3,28 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
+using GovUk.Education.ExploreEducationStatistics.Publisher.Options;
+using GovUk.Education.ExploreEducationStatistics.Publisher.Services;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
 {
     public class StageScheduledReleasesFunction(
         ILogger<StageScheduledReleasesFunction> logger,
+        IOptions<AppOptions> appOptions,
+        TimeProvider timeProvider,
         IQueueService queueService,
         IReleasePublishingStatusService releasePublishingStatusService)
     {
+        private readonly AppOptions _appOptions = appOptions.Value;
+
         /// <summary>
         /// Azure function which triggers publishing files and staging content for all release versions that are scheduled to
         /// be published later during the day. This operates on a schedule which by default occurs at midnight every
@@ -24,19 +32,31 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
         /// </summary>
         /// <param name="timer"></param>
         /// <param name="context"></param>
-        [Function("StageScheduledReleases")]
+        [Function(nameof(StageScheduledReleases))]
         public async Task StageScheduledReleases(
             [TimerTrigger("%App:PublishReleasesCronSchedule%")] TimerInfo timer,
             FunctionContext context)
         {
             logger.LogInformation("{FunctionName} triggered", context.FunctionDefinition.Name);
 
-            var releasesToBeStaged = await releasePublishingStatusService
-                .GetWherePublishingDueToday(
-                    overall: ReleasePublishingStatusOverallStage.Scheduled);
-            await PublishReleaseFilesAndStageContent(releasesToBeStaged);
+            // Get the next scheduled publishing time using the cron expression of the PublishScheduledReleases function
+            var nextScheduledPublishingTime = CronExpressionUtil.GetNextOccurrence(
+                cronExpression: _appOptions.PublishReleaseContentCronSchedule,
+                baseTime: timeProvider.GetUtcNow());
 
-            logger.LogInformation("{FunctionName} completed", context.FunctionDefinition.Name);
+            // Fetch releases scheduled for publishing before or on the next run time
+            var releasesToBeStaged = await releasePublishingStatusService
+                .GetScheduledReleasesForPublishingRelativeToDate(
+                    DateComparison.BeforeOrOn,
+                    nextScheduledPublishingTime);
+
+            await QueueReleaseFilesAndContentTasks(releasesToBeStaged);
+
+            var stagedReleaseVersionIds = releasesToBeStaged.Select(key => key.ReleaseVersionId).ToArray();
+
+            logger.LogInformation("{FunctionName} completed. Queued tasks for release versions: [{ReleaseVersionIds}]",
+                context.FunctionDefinition.Name,
+                stagedReleaseVersionIds.JoinToString(','));
         }
 
         /// <summary>
@@ -59,25 +79,34 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
 
             var releaseVersionIds = (await request.GetJsonBody<ManualTriggerRequest>())?.ReleaseVersionIds;
 
-            var scheduled = releaseVersionIds?.Length > 0
-                ? await releasePublishingStatusService.GetWherePublishingDueTodayOrInFuture(
-                    releaseVersionIds,
-                    overall: ReleasePublishingStatusOverallStage.Scheduled)
-                : await releasePublishingStatusService.GetWherePublishingDueToday(
-                    overall: ReleasePublishingStatusOverallStage.Scheduled);
+            var utcNow = timeProvider.GetUtcNow();
+            var startOfToday = new DateTimeOffset(utcNow.Year, utcNow.Month, utcNow.Day, 0, 0, 0, TimeSpan.Zero);
+            var endOfToday = startOfToday.AddDays(1).AddTicks(-1);
 
-            await PublishReleaseFilesAndStageContent(scheduled);
+            var releasesToBeStaged = releaseVersionIds?.Length > 0
+                ? await releasePublishingStatusService.GetScheduledReleasesForPublishingRelativeToDate(
+                    DateComparison.After, startOfToday)
+                : await releasePublishingStatusService.GetScheduledReleasesForPublishingRelativeToDate(
+                    DateComparison.BeforeOrOn, endOfToday);
 
-            var stagedReleaseVersionIds = scheduled.Select(key => key.ReleaseVersionId).ToArray();
+            var selectedReleasesToBeStaged = releaseVersionIds?.Length > 0
+                ? releasesToBeStaged
+                    .Where(key => releaseVersionIds.Contains(key.ReleaseVersionId))
+                    .ToList()
+                : releasesToBeStaged;
 
-            logger.LogInformation("{FunctionName} completed. Staged release versions [{ReleaseVersionIds}]",
+            await QueueReleaseFilesAndContentTasks(selectedReleasesToBeStaged);
+
+            var stagedReleaseVersionIds = selectedReleasesToBeStaged.Select(key => key.ReleaseVersionId).ToArray();
+
+            logger.LogInformation("{FunctionName} completed. Queued tasks for release versions: [{ReleaseVersionIds}]",
                 context.FunctionDefinition.Name,
                 stagedReleaseVersionIds.JoinToString(','));
 
             return new ManualTriggerResponse(stagedReleaseVersionIds);
         }
 
-        private async Task PublishReleaseFilesAndStageContent(IReadOnlyList<ReleasePublishingKey> scheduled)
+        private async Task QueueReleaseFilesAndContentTasks(IReadOnlyList<ReleasePublishingKey> scheduled)
         {
             if (!scheduled.Any())
             {

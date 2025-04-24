@@ -89,6 +89,7 @@ public static class PublisherHostBuilderExtensions
                         options.UseSqlServer(
                             ConnectionUtils.GetAzureSqlConnectionString("StatisticsDb"),
                             providerOptions => providerOptions.EnableCustomRetryOnFailure()))
+                    .AddSingleton(TimeProvider.System)
                     .AddSingleton<IFileStorageService, FileStorageService>(provider =>
                         new FileStorageService(
                             provider.GetRequiredService<IOptions<AppOptions>>().Value.PublisherStorageConnectionString))

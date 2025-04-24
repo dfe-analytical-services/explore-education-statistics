@@ -28,25 +28,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
         /// <param name="timer"></param>
         /// <param name="context"></param>
         /// <returns></returns>
-        [Function("PublishStagedReleaseContent")]
+        [Function(nameof(PublishScheduledReleases))]
         public async Task PublishScheduledReleases(
             [TimerTrigger("%App:PublishReleaseContentCronSchedule%")] TimerInfo timer,
             FunctionContext context)
         {
             logger.LogInformation("{FunctionName} triggered", context.FunctionDefinition.Name);
 
-            var scheduledStagedReleases = await releasePublishingStatusService
-                .GetWherePublishingDueToday(
-                    content: ReleasePublishingStatusContentStage.Scheduled,
-                    files: ReleasePublishingStatusFilesStage.Complete,
-                    publishing: ReleasePublishingStatusPublishingStage.Scheduled);
+            var releasesReadyForPublishing =
+                await releasePublishingStatusService.GetScheduledReleasesReadyForPublishing();
 
-            await PublishScheduledReleases(scheduledStagedReleases);
+            await PublishScheduledReleases(releasesReadyForPublishing);
+
+            var publishedReleaseVersionIds = releasesReadyForPublishing.Select(key => key.ReleaseVersionId).ToArray();
 
             logger.LogInformation(
                 "{FunctionName} completed. Published release versions [{ReleaseVersionIds}].",
                 context.FunctionDefinition.Name,
-                scheduledStagedReleases.Select(key => key.ReleaseVersionId).JoinToString(','));
+                publishedReleaseVersionIds.JoinToString(','));
         }
 
         /// <summary>
@@ -72,20 +71,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
 
             var releaseVersionIds = (await request.GetJsonBody<ManualTriggerRequest>())?.ReleaseVersionIds;
 
-            var scheduled = releaseVersionIds?.Length > 0
-                ? await releasePublishingStatusService.GetWherePublishingDueTodayOrInFuture(
-                    releaseVersionIds,
-                    content: ReleasePublishingStatusContentStage.Scheduled,
-                    files: ReleasePublishingStatusFilesStage.Complete,
-                    publishing: ReleasePublishingStatusPublishingStage.Scheduled)
-                : await releasePublishingStatusService.GetWherePublishingDueToday(
-                    content: ReleasePublishingStatusContentStage.Scheduled,
-                    files: ReleasePublishingStatusFilesStage.Complete,
-                    publishing: ReleasePublishingStatusPublishingStage.Scheduled);
+            var releasesReadyForPublishing =
+                await releasePublishingStatusService.GetScheduledReleasesReadyForPublishing();
 
-            await PublishScheduledReleases(scheduled);
+            var selectedReleasesToPublish = releaseVersionIds?.Length > 0
+                ? releasesReadyForPublishing
+                    .Where(key => releaseVersionIds.Contains(key.ReleaseVersionId))
+                    .ToList()
+                : releasesReadyForPublishing;
 
-            var publishedReleaseVersionIds = scheduled.Select(key => key.ReleaseVersionId).ToArray();
+            await PublishScheduledReleases(selectedReleasesToPublish);
+
+            var publishedReleaseVersionIds = selectedReleasesToPublish.Select(key => key.ReleaseVersionId).ToArray();
 
             logger.LogInformation("{FunctionName} completed. Published release versions [{ReleaseVersionIds}]",
                 context.FunctionDefinition.Name,
