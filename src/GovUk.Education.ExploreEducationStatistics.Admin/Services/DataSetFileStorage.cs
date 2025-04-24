@@ -70,13 +70,23 @@ public class DataSetFileStorage(
 
         var permissions = await userService.GetDataFilePermissions(dataFile);
 
-        return BuildDataFileViewModel(
-            dataReleaseFile,
-            metaFile,
-            dataSet.Title,
-            dataImport.TotalRows,
-            dataImport.Status,
-            permissions);
+        return new DataFileInfo
+        {
+            Id = dataReleaseFile.FileId,
+            FileName = dataReleaseFile.File.Filename,
+            Name = dataSet.Title,
+            Size = dataReleaseFile.File.DisplaySize(),
+            MetaFileId = dataImport.MetaFile.Id,
+            MetaFileName = dataImport.MetaFile.Filename,
+            ReplacedBy = dataReleaseFile.File.ReplacedById,
+            Rows = dataImport.TotalRows,
+            UserName = dataReleaseFile.File.CreatedBy?.Email ?? "",
+            Status = dataImport.Status,
+            Created = dataReleaseFile.File.Created,
+            Permissions = permissions,
+            PublicApiDataSetId = dataReleaseFile.PublicApiDataSetId,
+            PublicApiDataSetVersion = dataReleaseFile.PublicApiDataSetVersionString,
+        };
     }
 
     private async Task UploadDataSetToReleaseStorage(
@@ -248,38 +258,12 @@ public class DataSetFileStorage(
 
         var currentMaxOrder = await contentDbContext.ReleaseFiles
             .Include(releaseFile => releaseFile.File)
-            .Where(releaseFile => releaseFile.ReleaseVersionId == releaseVersionId
-                                  && releaseFile.File.Type == FileType.Data
-                                  && releaseFile.File.ReplacingId == null)
+            .Where(releaseFile =>
+                releaseFile.ReleaseVersionId == releaseVersionId &&
+                releaseFile.File.Type == FileType.Data &&
+                releaseFile.File.ReplacingId == null)
             .MaxAsync(releaseFile => (int?)releaseFile.Order);
 
         return currentMaxOrder.HasValue ? currentMaxOrder.Value + 1 : 0;
-    }
-
-    public DataFileInfo BuildDataFileViewModel(
-        ReleaseFile dataReleaseFile,
-        File metaFile,
-        string dataSetTitle,
-        int? totalRows,
-        DataImportStatus importStatus,
-        DataFilePermissions permissions)
-    {
-        return new()
-        {
-            Id = dataReleaseFile.FileId,
-            FileName = dataReleaseFile.File.Filename,
-            Name = dataSetTitle,
-            Size = dataReleaseFile.File.DisplaySize(),
-            MetaFileId = metaFile.Id,
-            MetaFileName = metaFile.Filename,
-            ReplacedBy = dataReleaseFile.File.ReplacedById,
-            Rows = totalRows,
-            UserName = dataReleaseFile.File.CreatedBy?.Email ?? "",
-            Status = importStatus,
-            Created = dataReleaseFile.File.Created,
-            Permissions = permissions,
-            PublicApiDataSetId = dataReleaseFile.PublicApiDataSetId,
-            PublicApiDataSetVersion = dataReleaseFile.PublicApiDataSetVersionString,
-        };
     }
 }
