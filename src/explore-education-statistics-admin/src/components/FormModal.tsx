@@ -100,7 +100,6 @@ export default function FormModal<TFormValues extends FieldValues>({
     [
       onSubmit,
       isMounted,
-      toggleConfirmationWarning,
       formHasConfirmationWarning,
       showConfirmationWarning,
       isSubmitting,
