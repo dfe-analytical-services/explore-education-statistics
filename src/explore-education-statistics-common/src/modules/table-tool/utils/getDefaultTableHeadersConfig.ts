@@ -70,7 +70,6 @@ function getFixedTimePeriodAndIndicatorTableHeadersConfig(
   filteredTimePeriodRange: TimePeriodFilter[],
 ): TableHeadersConfig {
   const { indicators, filters, locations } = fullTableMeta;
-
   const { columnGroups, rowGroups } = getSortedRowColGroups(
     removeSingleOptionFilterGroups([
       ...Object.values(filters).map(group => group.options),
@@ -130,6 +129,12 @@ export default function getDefaultTableHeaderConfig(
     filteredTimePeriodRange,
     indicators,
   ]);
+
+  // Make sure there's always something in the columns
+  if (!columnGroups.length) {
+    columnGroups.push(rowGroups[0]);
+    rowGroups.shift();
+  }
 
   return {
     columnGroups: columnGroups.length > 1 ? columnGroups.slice(0, -1) : [],
