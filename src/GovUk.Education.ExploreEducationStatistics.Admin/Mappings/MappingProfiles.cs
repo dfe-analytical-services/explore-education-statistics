@@ -131,8 +131,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
             CreateMap<FeaturedTable, FeaturedTableViewModel>();
             CreateMap<FeaturedTableCreateRequest, FeaturedTable>();
 
-            CreateMap<Theme, ThemeViewModel>()
-                .ForMember(theme => theme.Publications, m => m.MapFrom(t => t.Publications.OrderBy(publication => publication.Title)));
+            CreateMap<Theme, ThemeViewModel>();
 
             CreateMap<ContentSection, ContentSectionViewModel>().ForMember(dest => dest.Content,
                 m => m.MapFrom(section => section.Content.OrderBy(contentBlock => contentBlock.Order)));
