@@ -222,28 +222,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 Title = "Test theme",
                 Slug = "test-theme",
-                Summary = "Test summary",
-                Publications =
-                [
-                    new()
-                    {
-                        Title = "Test publication 1",
-                        Slug = "test-publication-1"
-                    },
-                    new()
-                    {
-                        Title = "Test publication 2",
-                        Slug = "test-publication-2",
-                    }
-                ]
-            };
-
-            // This publication should not be included with
-            // the theme as it is unrelated.
-            var unrelatedTheme = new Publication
-            {
-                Title = "Unrelated publication",
-                Slug = "unrelated-publication"
+                Summary = "Test summary"
             };
 
             var contextId = Guid.NewGuid().ToString();
@@ -251,8 +230,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
                 context.Add(theme);
-                context.Add(unrelatedTheme);
-
                 await context.SaveChangesAsync();
             }
 
@@ -266,13 +243,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal("Test theme", viewModel.Title);
                 Assert.Equal("test-theme", viewModel.Slug);
                 Assert.Equal("Test summary", viewModel.Summary);
-
-                Assert.Equal(2, theme.Publications.Count);
-                Assert.Equal("Test publication 1", theme.Publications[0].Title);
-                Assert.Equal("test-publication-1", theme.Publications[0].Slug);
-
-                Assert.Equal("Test publication 2", theme.Publications[1].Title);
-                Assert.Equal("test-publication-2", theme.Publications[1].Slug);
             }
         }
 
