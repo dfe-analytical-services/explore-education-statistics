@@ -1,21 +1,20 @@
 ﻿#nullable enable
 using System;
-using NCrontab;
+using Cronos;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Utils;
 
 public static class CronExpressionUtil
 {
-    public static DateTimeOffset GetNextOccurrence(
+    public static DateTimeOffset? GetNextOccurrence(
         string cronExpression,
-        DateTimeOffset baseTime)
+        DateTimeOffset from,
+        TimeZoneInfo timeZoneInfo)
     {
-        return CrontabSchedule.Parse(cronExpression,
-                new CrontabSchedule.ParseOptions
-                {
-                    IncludingSeconds = CronExpressionHasSecondPrecision(cronExpression)
-                })
-            .GetNextOccurrence(baseTime: baseTime.UtcDateTime);
+        var expression = CronExpression.Parse(cronExpression,
+            CronExpressionHasSecondPrecision(cronExpression) ? CronFormat.IncludeSeconds : CronFormat.Standard);
+
+        return expression.GetNextOccurrence(from, timeZoneInfo);
     }
 
     public static bool CronExpressionHasSecondPrecision(string cronExpression)

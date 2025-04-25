@@ -40,15 +40,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
             logger.LogInformation("{FunctionName} triggered", context.FunctionDefinition.Name);
 
             // Get the next scheduled publishing time using the cron expression of the PublishScheduledReleases function
-            var nextScheduledPublishingTime = CronExpressionUtil.GetNextOccurrence(
-                cronExpression: _appOptions.PublishReleaseContentCronSchedule,
-                baseTime: timeProvider.GetUtcNow());
+                var nextScheduledPublishingTime = CronExpressionUtil.GetNextOccurrence(
+                    cronExpression: _appOptions.PublishReleaseContentCronSchedule,
+                    from: timeProvider.GetUtcNow(),
+                    timeZoneInfo: timeProvider.LocalTimeZone);
 
             // Fetch releases scheduled for publishing before or on the next run time
             var releasesToBeStaged = await releasePublishingStatusService
                 .GetScheduledReleasesForPublishingRelativeToDate(
                     DateComparison.BeforeOrOn,
-                    nextScheduledPublishingTime);
+                    nextScheduledPublishingTime!.Value);
 
             await QueueReleaseFilesAndContentTasks(releasesToBeStaged);
 

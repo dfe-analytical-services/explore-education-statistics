@@ -41,8 +41,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
             {
                 var nextScheduledPublishingTime = CronExpressionUtil.GetNextOccurrence(
                     cronExpression: _appOptions.PublishReleaseContentCronSchedule,
-                    baseTime: timeProvider.GetUtcNow());
-                await contentService.UpdateContentStaged(nextScheduledPublishingTime.UtcDateTime,
+                    from: timeProvider.GetUtcNow(),
+                    timeZoneInfo: timeProvider.LocalTimeZone);
+
+                await contentService.UpdateContentStaged(nextScheduledPublishingTime!.Value.UtcDateTime,
                     message.ReleasePublishingKeys.Select(key => key.ReleaseVersionId).ToArray());
                 await UpdateContentStage(message, Scheduled);
             }
