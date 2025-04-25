@@ -7,7 +7,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.
 
 public class ReindexSearchableDocumentsFunction(
     ILogger<ReindexSearchableDocumentsFunction> logger,
-    ISearchIndexClient searchIndexClient)
+    ISearchIndexerClient searchIndexerClient)
 {
     [Function(nameof(ReindexSearchableDocuments))]
     public async Task ReindexSearchableDocuments(
@@ -17,7 +17,7 @@ public class ReindexSearchableDocumentsFunction(
     {
         logger.LogInformation("{FunctionName} triggered: {@Request}", context.FunctionDefinition.Name, messageDto);
 
-        await searchIndexClient.RunIndexer(context.CancellationToken);
+        await searchIndexerClient.RunIndexer(context.CancellationToken);
         
         logger.LogInformation("{FunctionName} completed.", context.FunctionDefinition.Name);
     }

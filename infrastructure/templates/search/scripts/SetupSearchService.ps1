@@ -66,7 +66,7 @@ try {
         -Method 'PUT' `
         -Uri "$uri/indexes/$($indexDefinition.name)?api-version=$apiVersion" `
         -Headers  $headers `
-        -Body (ConvertTo-Json $indexDefinition)
+        -Body (ConvertTo-Json -Compress -Depth 100 $indexDefinition)
 
     if ($dataSourceContainerName.Length -gt 0 -and $dataSourceConnectionString.Length -gt 0)
     {
@@ -75,14 +75,14 @@ try {
             -Method 'PUT' `
             -Uri "$uri/datasources/$($dataSourceDefinition['name'])?api-version=$apiVersion" `
             -Headers $headers `
-            -Body (ConvertTo-Json $dataSourceDefinition)
+            -Body (ConvertTo-Json -Compress -Depth 100 $dataSourceDefinition)
 
         # https://learn.microsoft.com/rest/api/searchservice/create-indexer
         Invoke-WebRequest `
             -Method 'PUT' `
             -Uri "$uri/indexers/$($indexerDefinition['name'])?api-version=$apiVersion" `
             -Headers $headers `
-            -Body (ConvertTo-Json $indexerDefinition)
+            -Body (ConvertTo-Json -Compress -Depth 100 $indexerDefinition)
     }
     $DeploymentScriptOutputs['result'] = 'Success'
 } catch {

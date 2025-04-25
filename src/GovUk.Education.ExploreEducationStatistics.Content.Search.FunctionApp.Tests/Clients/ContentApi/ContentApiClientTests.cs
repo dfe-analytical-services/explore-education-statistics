@@ -16,7 +16,7 @@ public class ContentApiClientTests(ITestOutputHelper output)
     }
 
     protected void Print(string s) => output.WriteLine(s);
-    
+
     /// <summary>
     /// Separately assert that each of the public properties of two instances of an object are equal.
     /// This provides a finer grained explanation of where two objects differ in equality.  
@@ -54,16 +54,16 @@ public class ContentApiClientTests(ITestOutputHelper output)
                 // ARRANGE
                 var sut = GetSut();
                 var publicationSlug = "seed-publication-permanent-and-fixed-period-exclusions-in-england";
-                
+
                 // ACT
                 var actual = await sut.GetPublicationLatestReleaseSearchableDocument(publicationSlug);
-                
+
                 // ASSERT
                 Assert.NotNull(actual);
                 var expected = new ReleaseSearchableDocument
                 {
                     ReleaseVersionId = new Guid("46c5d916-ee40-49bd-cfdc-08dc1c5c621e"),
-                    Published = DateTimeOffset.Parse("2018-07-18T23:00:00Z"), 
+                    Published = DateTimeOffset.Parse("2018-07-18T23:00:00Z"),
                     PublicationTitle = "Seed publication - Permanent and fixed-period exclusions in England",
                     Summary = "Read national statistical summaries, view charts and tables and download data files.",
                     Theme = "Seed theme - Pupils and schools",
@@ -98,7 +98,6 @@ public class ContentApiClientTests(ITestOutputHelper output)
                     Assert.Contains(publicationSlug, unableToGetPublicationLatestReleaseSearchViewModelException.Message);
                 }
             }
-        
     }
 
     public class IntegrationTests(ITestOutputHelper output) : ContentApiClientTests(output)
@@ -111,7 +110,7 @@ public class ContentApiClientTests(ITestOutputHelper output)
                 httpClient.BaseAddress = new Uri(ContentApiBaseAddress);
             });
 
-        [Fact(Skip="Call Content API to get publications for a specified theme id")]
+        [Fact(Skip = "Call Content API to get publications for a specified theme id")]
         public async Task GetPublicationsForTheme()
         {
             var sut = GetSut();
@@ -123,5 +122,16 @@ public class ContentApiClientTests(ITestOutputHelper output)
             }
         }
 
+        [Fact(Skip = "Call Content API to get releases for a specified publication slug")]
+        public async Task GetReleasesForPublication()
+        {
+            var sut = GetSut();
+            const string publicationSlug = "seed-publication-pupil-absence-in-schools-in-england";
+            var releases = await sut.GetReleasesForPublication(publicationSlug);
+            foreach (var release in releases)
+            {
+                Print(release.ReleaseId.ToString());
+            }
+        }
     }
 }

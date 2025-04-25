@@ -330,6 +330,7 @@ describe('TableToolPage', () => {
     },
     latestRelease: {
       title: 'Latest Release Title',
+      slug: 'latest-release-slug',
     },
   };
 
@@ -347,6 +348,7 @@ describe('TableToolPage', () => {
     },
     latestRelease: {
       title: 'Latest Release Title',
+      slug: 'latest-release-slug',
     },
   };
 
@@ -508,7 +510,7 @@ describe('TableToolPage', () => {
 
     expect(latestDataLink).toBeInTheDocument();
     expect(latestDataLink.href).toEqual(
-      'http://localhost/find-statistics/test-publication/selected-release-slug',
+      'http://localhost/find-statistics/test-publication/latest-release-slug',
     );
     expect(latestDataLink.text).toContain('View latest data');
     expect(latestDataLink.text).toContain('Latest Release Title');

@@ -257,7 +257,10 @@ describe('TableToolWizard', () => {
               title: 'Selected release',
               type: 'AdHocStatistics',
             },
-            latestRelease: { title: 'Latest release title' },
+            latestRelease: {
+              title: 'Latest release title',
+              slug: 'latest-release-slug',
+            },
           },
         }}
       />,

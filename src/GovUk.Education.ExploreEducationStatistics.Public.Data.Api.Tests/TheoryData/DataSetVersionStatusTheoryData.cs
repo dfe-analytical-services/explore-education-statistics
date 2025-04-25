@@ -21,6 +21,9 @@ public static class DataSetVersionStatusQueryTheoryData
 
     public static readonly TheoryData<DataSetVersionStatus> UnavailableStatusesExceptDraft = new(
         EnumUtil.GetEnums<DataSetVersionStatus>().Except([.. AvailableStatusesList, DataSetVersionStatus.Draft]));
+    
+    public static readonly TheoryData<DataSetVersionStatus> NonPublishedStatus = new(
+        EnumUtil.GetEnums<DataSetVersionStatus>().Except([DataSetVersionStatus.Published]));
 }
 
 public static class DataSetVersionStatusViewTheoryData
@@ -46,4 +49,7 @@ public static class DataSetVersionStatusViewTheoryData
 
     public static readonly TheoryData<DataSetVersionStatus> UnavailableStatusesExceptDraft = new(
         EnumUtil.GetEnums<DataSetVersionStatus>().Except([.. AvailableStatusesList, DataSetVersionStatus.Draft]));
+    
+    public static readonly TheoryData<DataSetVersionStatus> NonPublishedStatus = new(
+        EnumUtil.GetEnums<DataSetVersionStatus>().Except([DataSetVersionStatus.Published]));
 }

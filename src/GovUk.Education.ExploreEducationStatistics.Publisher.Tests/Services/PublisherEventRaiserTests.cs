@@ -1,6 +1,5 @@
 using System;
 using System.Linq;
-using System.Text.Json;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.EventGrid;
@@ -91,7 +90,10 @@ public class PublisherEventRaiserTests
         public void WhenResolvedFromContainer_ThenEventRaiserIsReturned()
         {
             // ARRANGE
-            var host = new HostBuilder().ConfigurePublisherHostBuilder().Build();
+            var host = new HostBuilder()
+                .ConfigureTestAppConfiguration()
+                .ConfigureServices()
+                .Build();
             
             // ACT
             var eventRaiser = host.Services.GetRequiredService<IPublisherEventRaiser>();

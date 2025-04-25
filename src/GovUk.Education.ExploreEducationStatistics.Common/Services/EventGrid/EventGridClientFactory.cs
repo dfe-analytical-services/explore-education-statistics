@@ -8,7 +8,8 @@ using Microsoft.Extensions.Logging;
 namespace GovUk.Education.ExploreEducationStatistics.Common.Services.EventGrid;
 
 /// <summary>
-/// Create an instance of IEventGridClient for a specified topic and access key
+/// Create an instance of IEventGridClient for a specified topic and optional access key.
+/// If no access key is supplied, the default Azure credentials are used e.g. role based security
 /// </summary>
 /// <param name="clientLoggerFactory">Factory to create loggers for clients</param>
 public class EventGridClientFactory(Func<ILogger<SafeEventGridClient>> clientLoggerFactory)

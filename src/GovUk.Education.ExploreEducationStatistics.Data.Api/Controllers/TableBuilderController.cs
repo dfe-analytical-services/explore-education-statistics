@@ -182,7 +182,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
                 ReleaseSlug = releaseVersion.Release.Slug,
                 ReleaseType = releaseVersion.Type,
                 LatestData = latestReleaseVersion.Id == releaseVersion.Id,
-                LatestReleaseTitle = latestReleaseVersion.Release.Title
+                LatestReleaseTitle = latestReleaseVersion.Release.Title,
+                LatestReleaseSlug = latestReleaseVersion.Release.Slug
             };
         }
 

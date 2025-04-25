@@ -54,11 +54,12 @@ public static class HostBuilderExtension
                     })
                     // Services
                     .AddTransient<ISearchableDocumentCreator, SearchableDocumentCreator>()
+                    .AddTransient<ISearchableDocumentRemover, SearchableDocumentRemover>()
                     // Functions
                     .AddTransient<IEventGridEventHandler, EventGridEventHandler>()
                     .AddHealthChecks()
                     // Clients
-                    .AddTransient<ISearchIndexClient, SearchIndexClient>()
+                    .AddTransient<ISearchIndexerClient, SearchIndexerClient>()
                     .AddTransient<IAzureSearchIndexerClientFactory, AzureSearchIndexerClientFactory>()
                     .AddTransient<IAzureBlobStorageClient, AzureBlobStorageClient>()
                     .AddAzureClientsInline(

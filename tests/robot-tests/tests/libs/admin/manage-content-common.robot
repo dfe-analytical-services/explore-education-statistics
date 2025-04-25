@@ -171,7 +171,7 @@ user creates key stats data block for dates csv
     user waits until results table appears    %{WAIT_LONG}
 
     user checks table column heading contains    1    1    2020 Week 13
-    user checks headed table body row cell contains    ${indicator_name}    1    ${expected_indicator_value}
+    user checks headed table body row cell contains    23/03/2020    1    ${expected_indicator_value}
 
     user enters text into element    id:dataBlockDetailsForm-name    ${datablock_name}
     user enters text into element    id:dataBlockDetailsForm-heading    ${datablock_title}

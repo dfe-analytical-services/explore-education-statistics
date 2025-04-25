@@ -10,7 +10,8 @@ import { Dictionary } from '@common/types';
 import MethodologyBlock from '@admin/pages/methodology/components/MethodologyBlock';
 import { ContentSectionKeys } from '@admin/pages/methodology/edit-methodology/content/context/MethodologyContentContextActionTypes';
 import useMethodologyContentActions from '@admin/pages/methodology/edit-methodology/content/context/useMethodologyContentActions';
-import React, { memo, useCallback, useEffect, useState } from 'react';
+import focusAddedSectionBlockButton from '@admin/utils/focus/focusAddedSectionBlockButton';
+import React, { memo, useCallback, useEffect, useRef, useState } from 'react';
 
 interface MethodologyAccordionSectionProps {
   id: string;
@@ -18,6 +19,7 @@ interface MethodologyAccordionSectionProps {
   sectionKey: ContentSectionKeys;
   methodologyId: string;
   methodologySlug: string;
+  onRemoveSection: (sectionId: string) => void;
 }
 
 const MethodologyAccordionSection = ({
@@ -25,6 +27,7 @@ const MethodologyAccordionSection = ({
   section: { id: sectionId, caption, heading, content: sectionContent = [] },
   methodologyId,
   methodologySlug,
+  onRemoveSection,
   ...props
 }: MethodologyAccordionSectionProps) => {
   const { editingMode } = useEditingContext();
@@ -36,11 +39,12 @@ const MethodologyAccordionSection = ({
     updateContentSectionBlock,
     updateSectionBlockOrder,
     updateContentSectionHeading,
-    removeContentSection,
   } = useMethodologyContentActions();
 
   const [isReordering, setIsReordering] = useState(false);
   const [blocks, setBlocks] = useState<EditableContentBlock[]>(sectionContent);
+
+  const addTextBlockButton = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     setBlocks(sectionContent);
@@ -58,17 +62,7 @@ const MethodologyAccordionSection = ({
       sectionKey,
     });
 
-    setTimeout(() => {
-      const newBlockEl = document.querySelector(
-        `#editableSectionBlocks-${newBlock.id}`,
-      );
-      const newBlockButton = newBlockEl?.querySelector(
-        'button.govuk-button--secondary',
-      ) as HTMLButtonElement;
-      if (newBlockButton) {
-        newBlockButton.focus();
-      }
-    }, 100);
+    focusAddedSectionBlockButton(newBlock.id);
   }, [
     addContentSectionBlock,
     methodologyId,
@@ -91,14 +85,25 @@ const MethodologyAccordionSection = ({
   );
 
   const removeBlockFromAccordionSection = useCallback(
-    (blockId: string) =>
+    (blockId: string) => {
       deleteContentSectionBlock({
         methodologyId,
         sectionId,
         blockId,
         sectionKey,
-      }),
-    [deleteContentSectionBlock, methodologyId, sectionId, sectionKey],
+      });
+
+      setTimeout(() => {
+        addTextBlockButton.current?.focus();
+      }, 100);
+    },
+    [
+      deleteContentSectionBlock,
+      addTextBlockButton,
+      methodologyId,
+      sectionId,
+      sectionKey,
+    ],
   );
 
   const reorderBlocksInAccordionSection = useCallback(async () => {
@@ -124,16 +129,6 @@ const MethodologyAccordionSection = ({
         sectionKey,
       }),
     [methodologyId, sectionId, sectionKey, updateContentSectionHeading],
-  );
-
-  const handleRemoveSection = useCallback(
-    () =>
-      removeContentSection({
-        methodologyId,
-        sectionId,
-        sectionKey,
-      }),
-    [methodologyId, removeContentSection, sectionId, sectionKey],
   );
 
   return (
@@ -163,7 +158,7 @@ const MethodologyAccordionSection = ({
         </Button>
       }
       onHeadingChange={handleHeadingChange}
-      onRemoveSection={handleRemoveSection}
+      onRemoveSection={() => onRemoveSection(sectionId)}
     >
       <EditableSectionBlocks<EditableContentBlock>
         blocks={blocks}
@@ -185,7 +180,11 @@ const MethodologyAccordionSection = ({
       />
       {editingMode === 'edit' && !isReordering && (
         <div className="govuk-!-margin-bottom-8 govuk-!-text-align-centre">
-          <Button variant="secondary" onClick={addBlockToAccordionSection}>
+          <Button
+            variant="secondary"
+            onClick={addBlockToAccordionSection}
+            ref={addTextBlockButton}
+          >
             Add text block
           </Button>
         </div>

@@ -240,10 +240,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             // cause the data source builder to throw a host exception.
             if (!hostEnvironment.IsIntegrationTest())
             {
-                var publicDataDbConnectionString = configuration.GetConnectionString("PublicDataDb")!;
                 // TODO EES-5073 Remove this check when the Public Data db is available in all Azure environments.
                 if (publicDataDbExists)
                 {
+                    var publicDataDbConnectionString = configuration.GetConnectionString("PublicDataDb")!;
                     services.AddPsqlDbContext<PublicDataDbContext>(publicDataDbConnectionString, hostEnvironment);
                 }
             }

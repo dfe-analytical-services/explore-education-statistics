@@ -38,6 +38,7 @@ interface Props {
   sectionId: string;
   sectionKey: ContentSectionKeys;
   visible?: boolean;
+  onAfterDeleteBlock?: () => void;
 }
 
 const ReleaseEditableBlock = ({
@@ -50,6 +51,7 @@ const ReleaseEditableBlock = ({
   sectionId,
   sectionKey,
   visible,
+  onAfterDeleteBlock,
 }: Props) => {
   const {
     addUnsavedBlock,
@@ -202,9 +204,12 @@ const ReleaseEditableBlock = ({
       sectionKey,
       blockId: block.id,
     });
+
+    onAfterDeleteBlock?.();
   }, [
     block.id,
     deleteContentSectionBlock,
+    onAfterDeleteBlock,
     releaseVersionId,
     sectionId,
     sectionKey,

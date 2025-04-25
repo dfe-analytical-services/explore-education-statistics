@@ -8,7 +8,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Utils;
 
 public record DataSetVersionNumber(int? Major, int? Minor, int? Patch)
 {
-    public static bool TryParse(string versionString, out DataSetVersionNumber? version)
+    public bool IsWildcard { get; init; }
+
+    public static bool TryParse(string versionString, [NotNullWhen(true)] out DataSetVersionNumber? version)
     {
         version = null;
         if (versionString.Contains('*'))
@@ -27,8 +29,12 @@ public record DataSetVersionNumber(int? Major, int? Minor, int? Patch)
         {
             return false;
         }
-
-        version = new DataSetVersionNumber(sv.Major, sv.Minor, sv.Patch);
+        
+        version = new DataSetVersionNumber(sv.Major, sv.Minor, sv.Patch)
+        {
+            IsWildcard = false
+        };
+        
         return successful;
     }
 
@@ -59,7 +65,11 @@ public record DataSetVersionNumber(int? Major, int? Minor, int? Patch)
 
         version = new DataSetVersionNumber(parts[0],
             parts.Length > 1 ? parts[1] : null,
-            parts.Length > 2 ? parts[2] : null);
+            parts.Length > 2 ? parts[2] : null)
+        {
+            IsWildcard = true
+        };
+
         return true;
     }
 }

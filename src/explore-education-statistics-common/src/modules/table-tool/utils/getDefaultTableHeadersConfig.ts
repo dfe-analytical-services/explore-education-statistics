@@ -1,4 +1,5 @@
 import {
+  CategoryFilter,
   Filter,
   TimePeriodFilter,
 } from '@common/modules/table-tool/types/filters';
@@ -11,7 +12,13 @@ import last from 'lodash/last';
 import orderBy from 'lodash/orderBy';
 
 const removeSingleOptionFilterGroups = (filters: Filter[][]): Filter[][] => {
-  return filters.filter(filterGroup => filterGroup.length > 1);
+  return filters.filter(
+    filterGroup =>
+      filterGroup.length > 1 ||
+      (filterGroup[0] instanceof CategoryFilter &&
+        filterGroup.length === 1 &&
+        !filterGroup[0].isAutoSelect),
+  );
 };
 
 /**
@@ -29,7 +36,12 @@ function getSortedRowColGroups(
     options => options.reduce((acc, option) => acc + option.label.length, 0),
   ]);
 
-  const halfwayIndex = Math.floor(sortedFilters.length / 2);
+  // Adjust the halfwayIndex if we have a single filter option in the table
+  // to keep it in the rows.
+  const halfwayIndex =
+    sortedFilters.length > 1 && sortedFilters[0].length === 1
+      ? Math.floor(sortedFilters.length / 2) - 1
+      : Math.floor(sortedFilters.length / 2);
 
   // Re-sort by number of options. We want to avoid cases where groups
   // with small number of options repeat many times, causing the
@@ -58,7 +70,6 @@ function getFixedTimePeriodAndIndicatorTableHeadersConfig(
   filteredTimePeriodRange: TimePeriodFilter[],
 ): TableHeadersConfig {
   const { indicators, filters, locations } = fullTableMeta;
-
   const { columnGroups, rowGroups } = getSortedRowColGroups(
     removeSingleOptionFilterGroups([
       ...Object.values(filters).map(group => group.options),
@@ -118,6 +129,12 @@ export default function getDefaultTableHeaderConfig(
     filteredTimePeriodRange,
     indicators,
   ]);
+
+  // Make sure there's always something in the columns
+  if (!columnGroups.length) {
+    columnGroups.push(rowGroups[0]);
+    rowGroups.shift();
+  }
 
   return {
     columnGroups: columnGroups.length > 1 ? columnGroups.slice(0, -1) : [],

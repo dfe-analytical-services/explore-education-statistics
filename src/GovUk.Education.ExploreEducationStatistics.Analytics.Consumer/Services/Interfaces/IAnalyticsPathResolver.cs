@@ -8,5 +8,7 @@ public interface IAnalyticsPathResolver
 
     string PublicApiQueriesProcessingDirectoryPath();
 
-    public string PublicApiQueriesReportsDirectoryPath();
+    string PublicApiQueriesFailuresDirectoryPath();
+
+    string PublicApiQueriesReportsDirectoryPath();
 }

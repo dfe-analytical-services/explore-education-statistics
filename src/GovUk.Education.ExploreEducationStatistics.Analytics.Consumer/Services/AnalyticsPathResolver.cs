@@ -39,6 +39,11 @@ public class AnalyticsPathResolver : IAnalyticsPathResolver
         return Path.Combine(PublicApiQueriesDirectoryPath(), "processing");
     }
 
+    public string PublicApiQueriesFailuresDirectoryPath()
+    {
+        return Path.Combine(PublicApiQueriesDirectoryPath(), "failures");
+    }
+
     public string PublicApiQueriesReportsDirectoryPath()
     {
         return Path.Combine(ReportsDirectoryPath(), "public-api", "queries");
