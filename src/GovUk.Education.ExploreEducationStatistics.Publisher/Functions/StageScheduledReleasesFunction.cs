@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
+using GovUk.Education.ExploreEducationStatistics.Publisher.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Options;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services;
@@ -53,11 +54,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
 
             await QueueReleaseFilesAndContentTasks(releasesToBeStaged);
 
-            var stagedReleaseVersionIds = releasesToBeStaged.Select(key => key.ReleaseVersionId).ToArray();
-
             logger.LogInformation("{FunctionName} completed. Queued tasks for release versions: [{ReleaseVersionIds}]",
                 context.FunctionDefinition.Name,
-                stagedReleaseVersionIds.JoinToString(','));
+                releasesToBeStaged.ToReleaseVersionIdsString());
         }
 
         /// <summary>
@@ -71,7 +70,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
         /// the scope of the Function to only the provided release version id's.
         /// </param>
         /// <param name="context"></param>
-        [Function("StageScheduledReleaseVersionsImmediately")]
+        [Function(nameof(StageScheduledReleaseVersionsImmediately))]
         public async Task<ActionResult<ManualTriggerResponse>> StageScheduledReleaseVersionsImmediately(
             [HttpTrigger(AuthorizationLevel.Anonymous, "post")] HttpRequest request,
             FunctionContext context)
@@ -98,13 +97,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
 
             await QueueReleaseFilesAndContentTasks(selectedReleasesToBeStaged);
 
-            var stagedReleaseVersionIds = selectedReleasesToBeStaged.Select(key => key.ReleaseVersionId).ToArray();
-
             logger.LogInformation("{FunctionName} completed. Queued tasks for release versions: [{ReleaseVersionIds}]",
                 context.FunctionDefinition.Name,
-                stagedReleaseVersionIds.JoinToString(','));
+                selectedReleasesToBeStaged.ToReleaseVersionIdsString());
 
-            return new ManualTriggerResponse(stagedReleaseVersionIds);
+            return new ManualTriggerResponse(selectedReleasesToBeStaged.ToReleaseVersionIds());
         }
 
         private async Task QueueReleaseFilesAndContentTasks(IReadOnlyList<ReleasePublishingKey> scheduled)

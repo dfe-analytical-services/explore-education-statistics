@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
+using GovUk.Education.ExploreEducationStatistics.Publisher.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Options;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
@@ -45,7 +46,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
                     timeZoneInfo: timeProvider.LocalTimeZone);
 
                 await contentService.UpdateContentStaged(nextScheduledPublishingTime!.Value.UtcDateTime,
-                    message.ReleasePublishingKeys.Select(key => key.ReleaseVersionId).ToArray());
+                    message.ReleasePublishingKeys.ToReleaseVersionIds());
                 await UpdateContentStage(message, Scheduled);
             }
             catch (Exception e)

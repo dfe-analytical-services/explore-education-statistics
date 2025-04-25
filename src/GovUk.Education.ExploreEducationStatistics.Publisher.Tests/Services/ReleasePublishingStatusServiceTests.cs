@@ -56,13 +56,12 @@ public abstract class ReleasePublishingStatusServiceTests
             var service = BuildService(publisherTableStorageService: publisherTableStorageService.Object);
 
             // Act
-            var result = await service.GetScheduledReleasesForPublishingRelativeToDate(
+            await service.GetScheduledReleasesForPublishingRelativeToDate(
                 dateComparison,
                 referenceDate);
 
             // Assert
             MockUtils.VerifyAllMocks(publisherTableStorageService);
-            Assert.Empty(result);
         }
 
         [Fact]
@@ -125,11 +124,10 @@ public abstract class ReleasePublishingStatusServiceTests
             var service = BuildService(publisherTableStorageService: publisherTableStorageService.Object);
 
             // Act
-            var result = await service.GetScheduledReleasesReadyForPublishing();
+            await service.GetScheduledReleasesReadyForPublishing();
 
             // Assert
             MockUtils.VerifyAllMocks(publisherTableStorageService);
-            Assert.Empty(result);
         }
 
         [Fact]
@@ -190,13 +188,12 @@ public abstract class ReleasePublishingStatusServiceTests
             var service = BuildService(publisherTableStorageService: publisherTableStorageService.Object);
 
             // Act
-            var result = await service.GetReleasesWithOverallStages(
+            await service.GetReleasesWithOverallStages(
                 releaseVersionId,
                 overallStages: [overallStage]);
 
             // Assert
             MockUtils.VerifyAllMocks(publisherTableStorageService);
-            Assert.Empty(result);
         }
 
         [Fact]
@@ -226,13 +223,12 @@ public abstract class ReleasePublishingStatusServiceTests
             var service = BuildService(publisherTableStorageService: publisherTableStorageService.Object);
 
             // Act
-            var result = await service.GetReleasesWithOverallStages(
+            await service.GetReleasesWithOverallStages(
                 releaseVersionId,
                 overallStages: overallStages);
 
             // Assert
             MockUtils.VerifyAllMocks(publisherTableStorageService);
-            Assert.Empty(result);
         }
 
         [Fact]

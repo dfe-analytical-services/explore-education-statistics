@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Publisher.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 using Microsoft.AspNetCore.Http;
@@ -40,12 +41,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
 
             await PublishScheduledReleases(releasesReadyForPublishing);
 
-            var publishedReleaseVersionIds = releasesReadyForPublishing.Select(key => key.ReleaseVersionId).ToArray();
-
             logger.LogInformation(
                 "{FunctionName} completed. Published release versions [{ReleaseVersionIds}].",
                 context.FunctionDefinition.Name,
-                publishedReleaseVersionIds.JoinToString(','));
+                releasesReadyForPublishing.ToReleaseVersionIdsString());
         }
 
         /// <summary>
@@ -62,7 +61,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
         /// </param>
         /// <param name="context"></param>
         /// <returns></returns>
-        [Function("PublishStagedReleaseVersionContentImmediately")]
+        [Function(nameof(PublishStagedReleaseVersionContentImmediately))]
         public async Task<ActionResult<ManualTriggerResponse>> PublishStagedReleaseVersionContentImmediately(
             [HttpTrigger(AuthorizationLevel.Anonymous, "post")] HttpRequest request,
             FunctionContext context)
@@ -82,13 +81,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
 
             await PublishScheduledReleases(selectedReleasesToPublish);
 
-            var publishedReleaseVersionIds = selectedReleasesToPublish.Select(key => key.ReleaseVersionId).ToArray();
-
             logger.LogInformation("{FunctionName} completed. Published release versions [{ReleaseVersionIds}]",
                 context.FunctionDefinition.Name,
-                publishedReleaseVersionIds.JoinToString(','));
+                selectedReleasesToPublish.ToReleaseVersionIdsString());
 
-            return new ManualTriggerResponse(publishedReleaseVersionIds);
+            return new ManualTriggerResponse(selectedReleasesToPublish.ToReleaseVersionIds());
         }
 
         private async Task PublishScheduledReleases(IReadOnlyList<ReleasePublishingKey> scheduled)

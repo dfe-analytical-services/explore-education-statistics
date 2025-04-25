@@ -101,7 +101,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             var overallStageFilter = CreateQueryFilter(
                 status => status.OverallStage == nameof(ReleasePublishingStatusOverallStage.Started));
 
-            // Match the internal stages with expected values
+            // Match the internal stages with the values we expect for a release after tasks have been performed by
+            // the StageScheduledReleases function.
             var contentStageFilter = CreateQueryFilter(
                 status => status.ContentStage == nameof(ReleasePublishingStatusContentStage.Scheduled));
             var filesStageFilter = CreateQueryFilter(
