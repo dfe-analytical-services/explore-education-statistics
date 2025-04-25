@@ -58,10 +58,10 @@ export type UploadZipDataFileRequest = {
 
 export type ArchiveDataSetFile = {
   title: string;
-  dataFilename: string;
+  dataFileName: string;
   dataFileId: string;
   dataFileSize: number;
-  metaFilename: string;
+  metaFileName: string;
   metaFileId: string;
   metaFileSize: number;
   replacingFileId?: string;

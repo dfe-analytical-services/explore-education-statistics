@@ -292,7 +292,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             File? replacingFile)
         {
             var dataSetFiles = await ExtractDataSetZipFile(zipFormFile);
-            return await BuildDataSet(releaseVersionId, dataSetFiles[0], dataSetFiles[1], dataSetTitle, replacingFile);
+
+            var dataFile = dataSetFiles.FirstOrDefault(file => !file.FileName.EndsWith(".meta.csv"));
+            var metaFile = dataSetFiles.FirstOrDefault(file => file.FileName.EndsWith(".meta.csv"));
+
+            return await BuildDataSet(releaseVersionId, dataFile, metaFile, dataSetTitle, replacingFile);
         }
 
         private async Task<Either<ActionResult, DataSet>> BuildDataSet(
