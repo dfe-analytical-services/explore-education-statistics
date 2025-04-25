@@ -430,28 +430,28 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         public async Task<Either<ActionResult, List<DataFileInfo>>> SaveDataSetsFromTemporaryBlobStorage(
             Guid releaseVersionId,
-            List<ZipDataSetFileViewModel> zipDataSetFiles,
+            List<ZipDataSetFileViewModel> dataSetFiles,
             CancellationToken cancellationToken)
         {
             return await persistenceHelper
                 .CheckEntityExists<ReleaseVersion>(releaseVersionId)
                 .OnSuccess(userService.CheckCanUpdateReleaseVersion)
-                .OnSuccess(() => zipDataSetFiles
-                    .Select(importRequest => ValidateTempDataSetFileExistence(releaseVersionId, importRequest))
+                .OnSuccess(() => dataSetFiles
+                    .Select(dataSet => ValidateTempDataSetFileExistence(releaseVersionId, dataSet))
                     .OnSuccessAll())
                 .OnSuccess(async _ =>
                 {
-                    var releaseFiles = await dataSetFileStorage.MoveDataSetsToPermanentStorage(releaseVersionId, zipDataSetFiles, cancellationToken);
+                    var releaseFiles = await dataSetFileStorage.MoveDataSetsToPermanentStorage(releaseVersionId, dataSetFiles, cancellationToken);
                     return await BuildDataFileViewModels(releaseFiles);
                 });
         }
 
         private async Task<Either<ActionResult, Unit>> ValidateTempDataSetFileExistence(
             Guid releaseVersionId,
-            ZipDataSetFileViewModel fileImportRequest)
+            ZipDataSetFileViewModel dataSet)
         {
-            var dataBlobExists = await privateBlobStorageService.CheckBlobExists(PrivateReleaseTempFiles, $"{FileExtensions.Path(releaseVersionId, FileType.Data, fileImportRequest.DataFileId)}");
-            var metaBlobExists = await privateBlobStorageService.CheckBlobExists(PrivateReleaseTempFiles, $"{FileExtensions.Path(releaseVersionId, FileType.Metadata, fileImportRequest.MetaFileId)}");
+            var dataBlobExists = await privateBlobStorageService.CheckBlobExists(PrivateReleaseTempFiles, $"{FileExtensions.Path(releaseVersionId, FileType.Data, dataSet.DataFileId)}");
+            var metaBlobExists = await privateBlobStorageService.CheckBlobExists(PrivateReleaseTempFiles, $"{FileExtensions.Path(releaseVersionId, FileType.Metadata, dataSet.MetaFileId)}");
 
             if (!dataBlobExists || !metaBlobExists)
             {
@@ -495,7 +495,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             var fileIds = releaseFiles.Select(rf => rf.FileId).ToList();
 
-            var dataImports = await contentDbContext.DataImports
+            var dataImports = await contentDbContext.DataImports // not found here, possibly because FileId matches the wrong file (MetaFileId)
                 .AsSplitQuery()
                 .Include(di => di.File)
                 .ThenInclude(f => f.CreatedBy)

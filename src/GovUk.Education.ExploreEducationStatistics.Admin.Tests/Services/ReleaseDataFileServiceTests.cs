@@ -1,6 +1,7 @@
 #nullable enable
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
@@ -22,6 +23,7 @@ using Semver;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainers;
@@ -2107,6 +2109,96 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         //        Assert.Equal(0, dbMetaReleaseFile.Order); // Files that aren't FileType.Data have Order set to 0
         //    }
         //}
+
+        [Fact]
+        public async Task SaveDataSetsFromTemporaryBlobStorage_Success_ReturnsUploadSummary()
+        {
+            // Arrange
+            var dataSetName = "Test Data Set";
+
+            var dataFile = _fixture
+                .DefaultFile()
+                .WithType(FileType.Data)
+                .Generate();
+
+            var metaFile = _fixture.DefaultFile().WithType(FileType.Metadata).Generate();
+
+            var import = new DataImport
+            {
+                File = dataFile,
+                FileId = dataFile.Id,
+                MetaFile = metaFile,
+                MetaFileId = metaFile.Id,
+            };
+
+            var releaseFiles = new List<ReleaseFile>
+            {
+                _fixture.DefaultReleaseFile().WithFile(dataFile).Generate(),
+            };
+
+            ReleaseVersion releaseVersion = _fixture.DefaultReleaseVersion()
+                .WithRelease(_fixture.DefaultRelease()
+                    .WithPublication(_fixture.DefaultPublication()));
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using var contentDbContext = InMemoryApplicationDbContext(contentDbContextId);
+
+            contentDbContext.ReleaseVersions.Add(releaseVersion);
+            contentDbContext.DataImports.Add(import);
+            await contentDbContext.SaveChangesAsync();
+
+            var privateBlobStorageService = new Mock<IPrivateBlobStorageService>(Strict);
+            var dataSetFileStorage = new Mock<IDataSetFileStorage>(Strict);
+
+            var dataSetFile = new ZipDataSetFileViewModel
+            {
+                Title = dataSetName,
+                DataFileId = dataFile.Id,
+                DataFileName = dataFile.Filename,
+                DataFileSize = 434,
+                MetaFileId = metaFile.Id,
+                MetaFileName = metaFile.Filename,
+                MetaFileSize = 157,
+                ReplacingFileId = null,
+            };
+
+            var dataPath = $"{releaseVersion.Id}/data/{dataSetFile.DataFileId}";
+            var metaPath = $"{releaseVersion.Id}/data/{dataSetFile.MetaFileId}";
+
+            privateBlobStorageService.SetupCheckBlobExists(PrivateReleaseTempFiles, dataPath, exists: true);
+            privateBlobStorageService.SetupCheckBlobExists(PrivateReleaseTempFiles, metaPath, exists: true);
+
+            dataSetFileStorage
+                .Setup(mock => mock.MoveDataSetsToPermanentStorage(
+                    It.IsAny<Guid>(),
+                    It.IsAny<List<ZipDataSetFileViewModel>>(),
+                    It.IsAny<CancellationToken>()))
+                .Returns(Task.FromResult(releaseFiles));
+
+            var service = SetupReleaseDataFileService(
+                contentDbContext: contentDbContext,
+                privateBlobStorageService: privateBlobStorageService.Object,
+                dataSetFileStorage: dataSetFileStorage.Object);
+
+            // Act
+            var result = await service.SaveDataSetsFromTemporaryBlobStorage(
+                releaseVersion.Id,
+                [dataSetFile],
+                cancellationToken: default);
+
+            // Assert
+            MockUtils.VerifyAllMocks(privateBlobStorageService, dataSetFileStorage);
+
+            var files = result.AssertRight();
+            var dataFileInfo = files.Single();
+            Assert.Equal(releaseFiles[0].Name, dataFileInfo.Name);
+            Assert.Equal(dataFile.Id, dataFileInfo.Id);
+            Assert.Equal(dataFile.Filename, dataFileInfo.FileName);
+            Assert.Equal(metaFile.Id, dataFileInfo.MetaFileId);
+            Assert.Equal(metaFile.Filename, dataFileInfo.MetaFileName);
+            Assert.Equal(QUEUED, dataFileInfo.Status);
+            Assert.Equal(FileType.Data, dataFileInfo.Type);
+        }
 
         [Fact]
         public async Task UploadFromZip_Success_ReturnsUploadSummary()
