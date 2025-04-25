@@ -132,10 +132,10 @@ public class DataSetFileStorage(
             {
                 Title = dataSet.Title,
                 DataFileId = uploadResult.DataFileId,
-                DataFilename = dataSet.DataFile.FileName,
+                DataFileName = dataSet.DataFile.FileName,
                 DataFileSize = dataSet.DataFile.FileSize,
                 MetaFileId = uploadResult.MetaFileId,
-                MetaFilename = dataSet.MetaFile.FileName,
+                MetaFileName = dataSet.MetaFile.FileName,
                 MetaFileSize = dataSet.MetaFile.FileSize,
                 ReplacingFileId = dataSet.ReplacingFile?.Id,
             });
@@ -202,7 +202,7 @@ public class DataSetFileStorage(
             var dataFile = await releaseDataFileRepository.Create(
                 releaseVersionId,
                 subjectId,
-                dataSetFile.DataFilename,
+                dataSetFile.DataFileName,
                 contentLength: dataSetFile.DataFileSize,
                 type: FileType.Data,
                 createdById: userService.GetUserId(),
@@ -224,7 +224,7 @@ public class DataSetFileStorage(
             var metaFile = await releaseDataFileRepository.Create(
                 releaseVersionId,
                 subjectId,
-                dataSetFile.MetaFilename,
+                dataSetFile.MetaFileName,
                 dataSetFile.MetaFileSize,
                 type: FileType.Metadata,
                 createdById: userService.GetUserId());

@@ -561,7 +561,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
 
             var importRequests = new List<ZipDataSetFileViewModel>
             {
-                new(){ DataFileId = Guid.NewGuid(), MetaFileId = Guid.NewGuid(), Title = "Data set title", DataFilename = "one.csv", MetaFilename = "one.meta.csv", DataFileSize = 1024, MetaFileSize = 128 }
+                new(){ DataFileId = Guid.NewGuid(), MetaFileId = Guid.NewGuid(), Title = "Data set title", DataFileName = "one.csv", MetaFileName = "one.meta.csv", DataFileSize = 1024, MetaFileSize = 128 }
             };
 
             var releaseDataFileService = new Mock<IReleaseDataFileService>(Strict);
@@ -1149,7 +1149,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
 
                 Assert.Equal("Must not be empty.", validationProblem.Errors[0].Message);
                 Assert.Equal("Data set title cannot be empty", validationProblem.Errors[1].Message);
-                Assert.Equal("File 'Zip File' must not be of 0 size.", validationProblem.Errors[2].Message);
+                Assert.Equal("File 'Zip File' either empty or not found.", validationProblem.Errors[2].Message);
             }
 
             [Fact]
@@ -1184,8 +1184,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                 var dataSet2 = viewModel[1];
 
                 Assert.Equal("First data set", dataSet1.Title);
-                Assert.Equal("one.csv", dataSet1.DataFilename);
-                Assert.Equal("one.meta.csv", dataSet1.MetaFilename);
+                Assert.Equal("one.csv", dataSet1.DataFileName);
+                Assert.Equal("one.meta.csv", dataSet1.MetaFileName);
                 Assert.Equal(696, dataSet1.DataFileSize);
                 Assert.Equal(210, dataSet1.MetaFileSize);
                 Assert.Null(dataSet1.ReplacingFileId);
@@ -1193,8 +1193,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                 Assert.NotEqual(Guid.Empty, dataSet1.MetaFileId);
 
                 Assert.Equal("Second data set", dataSet2.Title);
-                Assert.Equal("two.csv", dataSet2.DataFilename);
-                Assert.Equal("two.meta.csv", dataSet2.MetaFilename);
+                Assert.Equal("two.csv", dataSet2.DataFileName);
+                Assert.Equal("two.meta.csv", dataSet2.MetaFileName);
                 Assert.Equal(2085, dataSet2.DataFileSize);
                 Assert.Equal(318, dataSet2.MetaFileSize);
                 Assert.Null(dataSet2.ReplacingFileId);
@@ -1214,7 +1214,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                 var validationProblem = response.AssertValidationProblem();
 
                 Assert.Equal("Must not be empty.", validationProblem.Errors[0].Message);
-                Assert.Equal("File 'Zip File' must not be of 0 size.", validationProblem.Errors[1].Message);
+                Assert.Equal("File 'Zip File' either empty or not found.", validationProblem.Errors[1].Message);
             }
 
             private async Task<HttpResponseMessage> UploadDataSetAsZip(
@@ -1232,7 +1232,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                 var multipartContent = new MultipartFormDataContent
                 {
                     { new StringContent(releaseVersionId.ToString()), "ReleaseVersionId" },
-                    { new StringContent(dataSetTitle), "DataSetTitle" },
+                    { new StringContent(dataSetTitle), "Title" },
                 };
 
                 try
