@@ -219,7 +219,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         var service = SetupReleaseDataFileService(userService: userService.Object);
                         return service.SaveDataSetsFromTemporaryBlobStorage(
                             releaseVersionId: _releaseVersion.Id,
-                            zipDataSetFiles: new Mock<List<ZipDataSetFileViewModel>>().Object,
+                            dataSetFiles: new Mock<List<ZipDataSetFileViewModel>>().Object,
                             cancellationToken: default);
                     }
                 );

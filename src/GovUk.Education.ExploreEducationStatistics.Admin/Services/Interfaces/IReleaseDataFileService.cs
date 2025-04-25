@@ -55,7 +55,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 
         Task<Either<ActionResult, List<DataFileInfo>>> SaveDataSetsFromTemporaryBlobStorage(
             Guid releaseVersionId,
-            List<ZipDataSetFileViewModel> zipDataSetFiles,
+            List<ZipDataSetFileViewModel> dataSetFiles,
             CancellationToken cancellationToken);
     }
 }
