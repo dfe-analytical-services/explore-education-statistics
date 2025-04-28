@@ -80,6 +80,14 @@ describe('ReleaseDataFileReplacePage', () => {
     footnotes: [],
     originalSubjectId: 'subject-1',
     replacementSubjectId: 'subject-1',
+    apiDataSetVersionPlan: {
+      id: '',
+      dataSetId: '',
+      name: '',
+      version: '',
+      status: '',
+      valid: false,
+    },
   };
 
   test('renders original data file details', async () => {
