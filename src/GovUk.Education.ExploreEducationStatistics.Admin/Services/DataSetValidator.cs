@@ -89,7 +89,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         public async Task<Either<List<ErrorViewModel>, DataSetIndex>> ValidateBulkDataZipIndexFile(
             Guid releaseVersionId,
-            DataSetFileDto indexFile)
+            DataSetFileDto indexFile,
+            List<DataSetFileDto> dataSetFiles)
         {
             var validator = new DataSetFileDto.Validator();
 
@@ -125,38 +126,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             foreach (var row in rows)
             {
                 var dataSetName = row[datasetNameIndex].Trim();
-                var dataFilename = row[fileNameIndex].Replace(".csv", "");
+                var dataFileName = row[fileNameIndex].Replace(".csv", "");
 
                 var releaseFileToBeReplaced = await GetReplacingFileIfExists(releaseVersionId, dataSetName);
 
                 dataSetIndex.DataSetIndexItems.Add(new()
                 {
                     DataSetTitle = dataSetName,
-                    DataFileName = $"{dataFilename}{Constants.DataSet.DataFileExtension}",
-                    MetaFileName = $"{dataFilename}{Constants.DataSet.MetaFileExtension}",
+                    DataFileName = $"{dataFileName}{Constants.DataSet.DataFileExtension}",
+                    MetaFileName = $"{dataFileName}{Constants.DataSet.MetaFileExtension}",
                     ReplacingFile = releaseFileToBeReplaced,
                 });
 
-                indexFileEntries.Add((BaseFilename: dataFilename, Title: dataSetName));
+                indexFileEntries.Add((BaseFilename: dataFileName, Title: dataSetName));
             }
 
             CheckIndexFileForDuplicationErrors(indexFileEntries);
+            CheckBulkDataZipForUnusedFiles(dataSetIndex.DataSetIndexItems, dataSetFiles);
 
-            // TODO: Re-implement unprocessedFiles validation check
-            //if (unprocessedFiles.Count > 0)
-            //{
-            //    _errors.Add(ValidationMessages.GenerateErrorZipContainsUnusedFiles(
-            //        unprocessedFiles
-            //            .Select(file => file.FileName)
-            //            .ToList()));
-            //}
-
-            if (_errors.Count > 0)
-            {
-                return _errors;
-            }
-
-            return dataSetIndex;
+            return _errors.Count > 0
+                ? (Either<List<ErrorViewModel>, DataSetIndex>)_errors
+                : (Either<List<ErrorViewModel>, DataSetIndex>)dataSetIndex;
         }
 
         private async Task<File?> GetReplacingFileIfExists(
@@ -215,6 +205,29 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 {
                     _errors.Add(ValidationMessages.GenerateErrorDataSetNamesCsvFilenamesShouldBeUnique(duplicateFilename));
                 });
+        }
+
+        private void CheckBulkDataZipForUnusedFiles(
+            List<DataSetIndexItem> indexItems,
+            List<DataSetFileDto> dataSetFiles)
+        {
+            var indexItemDataFileNames = indexItems.Select(item => item.DataFileName);
+            var indexItemMetaFileNames = indexItems.Select(item => item.MetaFileName);
+
+            var remainingFiles = dataSetFiles
+                .Where(file =>
+                    !indexItemDataFileNames.Contains(file.FileName) &&
+                    !indexItemMetaFileNames.Contains(file.FileName))
+                .ToList();
+
+            if (remainingFiles.Count > 0)
+            {
+                var remainingFileNames = remainingFiles
+                    .Select(file => file.FileName)
+                    .ToList();
+
+                _errors.Add(ValidationMessages.GenerateErrorZipContainsUnusedFiles(remainingFileNames));
+            }
         }
 
         private void ValidateDataSetTitleDuplication(
