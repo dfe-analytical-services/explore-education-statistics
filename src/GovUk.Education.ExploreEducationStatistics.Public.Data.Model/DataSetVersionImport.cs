@@ -25,7 +25,7 @@ public class DataSetVersionImport : ICreatedUpdatedTimestamps<DateTimeOffset, Da
 
     public DateTimeOffset? Updated { get; set; }
 
-    public SemVersion? DataSetVersionToPatch { get; set; }
+    public SemVersion? DataSetVersionToReplace { get; set; }
     
     internal class Config : IEntityTypeConfiguration<DataSetVersionImport>
     {
@@ -40,7 +40,7 @@ public class DataSetVersionImport : ICreatedUpdatedTimestamps<DateTimeOffset, Da
             builder.HasIndex(i => i.InstanceId)
                 .IsUnique();
 
-            builder.Property(i => i.DataSetVersionToPatch)
+            builder.Property(i => i.DataSetVersionToReplace)
                 .HasColumnType("varchar(50)")
                 .HasConversion(
                     value => value == null ? null : value.ToString(),

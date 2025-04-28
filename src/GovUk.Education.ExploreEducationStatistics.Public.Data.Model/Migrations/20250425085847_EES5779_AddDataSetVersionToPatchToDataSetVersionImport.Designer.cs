@@ -13,7 +13,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migrations
 {
     [DbContext(typeof(PublicDataDbContext))]
-    [Migration("20250414204811_EES5779_AddDataSetVersionToPatchToDataSetVersionImport")]
+    [Migration("20250425085847_EES5779_AddDataSetVersionToPatchToDataSetVersionImport")]
     partial class EES5779_AddDataSetVersionToPatchToDataSetVersionImport
     {
         /// <inheritdoc />
@@ -148,7 +148,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                     b.Property<Guid>("DataSetVersionId")
                         .HasColumnType("uuid");
 
-                    b.Property<string>("DataSetVersionToPatch")
+                    b.Property<string>("DataSetVersionToReplace")
                         .HasColumnType("varchar(50)");
 
                     b.Property<Guid>("InstanceId")

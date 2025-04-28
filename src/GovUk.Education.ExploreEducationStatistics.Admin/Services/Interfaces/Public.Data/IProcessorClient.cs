@@ -18,7 +18,7 @@ public interface IProcessorClient
     Task<Either<ActionResult, ProcessDataSetVersionResponseViewModel>> CreateNextDataSetVersionMappings(
         Guid dataSetId,
         Guid releaseFileId,
-        SemVersion? dataSetVersionToPatch = null,
+        SemVersion? dataSetVersionToReplace = null,
         CancellationToken cancellationToken = default);
 
     Task<Either<ActionResult, ProcessDataSetVersionResponseViewModel>> CompleteNextDataSetVersionImport(

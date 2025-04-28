@@ -179,7 +179,7 @@ public class DataSetVersionMappingService(
         // ongoingNextVersionImport = await publicDataDbContext.DataSetVersionImports.SingleOrDefaultAsync(import =>
         //         import.DataSetVersionId == nextDataSetVersionId
         //         && import.Stage != DataSetVersionImportStage.Completing
-        //         && import.DataSetVersionToPatch != null,//TODO: Handle in EES-5996
+        //         && import.DataSetVersionToReplace != null,//TODO: Handle in EES-5996
         //     cancellationToken);
 
 

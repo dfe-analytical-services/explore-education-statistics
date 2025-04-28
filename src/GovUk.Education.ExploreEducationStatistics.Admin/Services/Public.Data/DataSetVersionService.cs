@@ -126,14 +126,14 @@ public class DataSetVersionService(
     public async Task<Either<ActionResult, DataSetVersionSummaryViewModel>> CreateNextVersion(
         Guid releaseFileId,
         Guid dataSetId,
-        SemVersion? dataSetVersionToPatch = null,
+        SemVersion? dataSetVersionToReplace = null,
         CancellationToken cancellationToken = default)
     {
         return await userService.CheckIsBauUser()
             .OnSuccess(async () => await processorClient.CreateNextDataSetVersionMappings(
                 dataSetId: dataSetId,
                 releaseFileId: releaseFileId,
-                dataSetVersionToPatch: dataSetVersionToPatch,
+                dataSetVersionToReplace: dataSetVersionToReplace,
                 cancellationToken: cancellationToken))
             .OnSuccess(async processorResponse => await publicDataDbContext
                 .DataSetVersions

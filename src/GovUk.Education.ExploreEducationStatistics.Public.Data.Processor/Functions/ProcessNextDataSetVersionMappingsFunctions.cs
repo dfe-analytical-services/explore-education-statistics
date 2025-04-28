@@ -29,7 +29,7 @@ public class ProcessNextDataSetVersionMappingsFunctions(
         var dataSetVersionImport = await GetDataSetVersionImport(instanceId, cancellationToken);
         await UpdateImportStage(dataSetVersionImport, DataSetVersionImportStage.AutoMapping, cancellationToken);
         await mappingService.ApplyAutoMappings(dataSetVersionImport.DataSetVersionId,
-            dataSetVersionImport.DataSetVersionToPatch is not null, cancellationToken);
+            dataSetVersionImport.DataSetVersionToReplace is not null, cancellationToken);
     }
 
     [Function(ActivityNames.CompleteNextDataSetVersionMappingProcessing)]

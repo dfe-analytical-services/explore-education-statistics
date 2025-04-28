@@ -11,7 +11,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.AddColumn<string>(
-                name: "DataSetVersionToPatch",
+                name: "DataSetVersionToReplace",
                 table: "DataSetVersionImports",
                 type: "varchar(50)",
                 nullable: true);
@@ -21,7 +21,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropColumn(
-                name: "DataSetVersionToPatch",
+                name: "DataSetVersionToReplace",
                 table: "DataSetVersionImports");
         }
     }

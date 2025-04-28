@@ -44,7 +44,7 @@ public interface IDataSetVersionService
     Task<Either<ActionResult, DataSetVersionSummaryViewModel>> CreateNextVersion(
         Guid releaseFileId,
         Guid dataSetId,
-        SemVersion? dataSetVersionToPatch = null,
+        SemVersion? dataSetVersionToReplace = null,
         CancellationToken cancellationToken = default);
 
     Task<Either<ActionResult, DataSetVersionSummaryViewModel>> CompleteNextVersionImport(
