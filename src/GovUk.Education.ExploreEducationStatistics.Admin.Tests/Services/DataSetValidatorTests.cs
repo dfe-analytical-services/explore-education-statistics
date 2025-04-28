@@ -293,12 +293,14 @@ public class DataSetValidatorTests
         };
 
         var indexFile = await new DataSetFileBuilder().Build(FileType.BulkDataZipIndex);
+        var dataFile = await new DataSetFileBuilder().Build(FileType.Data);
+        var metaFile = await new DataSetFileBuilder().Build(FileType.Metadata);
 
         await using var context = InMemoryContentDbContext();
         var sut = BuildService(context);
 
         // Act
-        var result = await sut.ValidateBulkDataZipIndexFile(releaseVersion.Id, indexFile);
+        var result = await sut.ValidateBulkDataZipIndexFile(releaseVersion.Id, indexFile, [dataFile, metaFile]);
 
         // Assert
         var dataSetIndex = result.AssertRight();
@@ -346,13 +348,15 @@ public class DataSetValidatorTests
         }
 
         var indexFile = await new DataSetFileBuilder().Build(FileType.BulkDataZipIndex);
+        var dataFile = await new DataSetFileBuilder().Build(FileType.Data);
+        var metaFile = await new DataSetFileBuilder().Build(FileType.Metadata);
 
         await using (var context = InMemoryContentDbContext(contentDbContextId))
         {
             var sut = BuildService(context);
 
             // Act
-            var result = await sut.ValidateBulkDataZipIndexFile(releaseVersion.Id, indexFile);
+            var result = await sut.ValidateBulkDataZipIndexFile(releaseVersion.Id, indexFile, [dataFile, metaFile]);
 
             // Assert
             var dataSetIndex = result.AssertRight();
@@ -395,13 +399,15 @@ public class DataSetValidatorTests
         }
 
         var indexFile = await new DataSetFileBuilder().Build(FileType.BulkDataZipIndex);
+        var dataFile = await new DataSetFileBuilder().Build(FileType.Data);
+        var metaFile = await new DataSetFileBuilder().Build(FileType.Metadata);
 
         await using (var context = InMemoryContentDbContext(contentDbContextId))
         {
             var sut = BuildService(context);
 
             // Act
-            var result = await sut.ValidateBulkDataZipIndexFile(releaseVersion.Id, indexFile);
+            var result = await sut.ValidateBulkDataZipIndexFile(releaseVersion.Id, indexFile, [dataFile, metaFile]);
 
             // Assert
             var errors = result.AssertLeft();
@@ -421,14 +427,17 @@ public class DataSetValidatorTests
         };
 
         var indexFile = await new DataSetFileBuilder()
-            .WhereFileNameIs("dataset_names_invalid_headers.csv")
+            .WhereFileNameIs("dataset_names_invalid-headers.csv")
             .Build(FileType.BulkDataZipIndex);
+
+        var dataFile = await new DataSetFileBuilder().Build(FileType.Data);
+        var metaFile = await new DataSetFileBuilder().Build(FileType.Metadata);
 
         await using var context = InMemoryContentDbContext();
         var sut = BuildService(context);
 
         // Act
-        var result = await sut.ValidateBulkDataZipIndexFile(releaseVersion.Id, indexFile);
+        var result = await sut.ValidateBulkDataZipIndexFile(releaseVersion.Id, indexFile, [dataFile, metaFile]);
 
         // Assert
         var errors = result.AssertLeft();
@@ -447,14 +456,17 @@ public class DataSetValidatorTests
         };
 
         var indexFile = await new DataSetFileBuilder()
-            .WhereFileNameIs("dataset_names_duplicate_records.csv")
+            .WhereFileNameIs("dataset_names_duplicate-records.csv")
             .Build(FileType.BulkDataZipIndex);
+
+        var dataFile = await new DataSetFileBuilder().Build(FileType.Data);
+        var metaFile = await new DataSetFileBuilder().Build(FileType.Metadata);
 
         await using var context = InMemoryContentDbContext();
         var sut = BuildService(context);
 
         // Act
-        var result = await sut.ValidateBulkDataZipIndexFile(releaseVersion.Id, indexFile);
+        var result = await sut.ValidateBulkDataZipIndexFile(releaseVersion.Id, indexFile, [dataFile, metaFile]);
 
         // Assert
         var errors = result.AssertLeft();
@@ -462,6 +474,38 @@ public class DataSetValidatorTests
         Assert.Equal(2, errors.Count);
         Assert.Equal(ValidationMessages.DataSetTitleShouldBeUnique.Code, errors[0].Code);
         Assert.Equal(ValidationMessages.DataSetNamesCsvFilenamesShouldBeUnique.Code, errors[1].Code);
+    }
+
+    [Fact]
+    public async Task ValidateBulkDataZipIndexFile_UnusedFiles_ReturnsErrorDetails()
+    {
+        // Arrange
+        var releaseVersion = new ReleaseVersion
+        {
+            Id = Guid.NewGuid(),
+        };
+
+        var indexFile = await new DataSetFileBuilder().Build(FileType.BulkDataZipIndex);
+        var dataFile1 = await new DataSetFileBuilder().Build(FileType.Data);
+        var metaFile1 = await new DataSetFileBuilder().Build(FileType.Metadata);
+
+        var dataFile2 = await new DataSetFileBuilder()
+            .WhereFileNameIs("test-data-unused.csv")
+            .Build(FileType.Data);
+        var metaFile2 = await new DataSetFileBuilder()
+            .WhereFileNameIs("test-data-unused.meta.csv")
+            .Build(FileType.Metadata);
+
+        await using var context = InMemoryContentDbContext();
+        var sut = BuildService(context);
+
+        // Act
+        var result = await sut.ValidateBulkDataZipIndexFile(releaseVersion.Id, indexFile, [dataFile1, metaFile1, dataFile2, metaFile2]);
+
+        // Assert
+        var errors = result.AssertLeft();
+        var error = Assert.Single(errors);
+        Assert.Equal(ValidationMessages.ZipContainsUnusedFiles.Code, error.Code);
     }
 
     private static DataSetValidator BuildService(ContentDbContext? contentDbContext = null)

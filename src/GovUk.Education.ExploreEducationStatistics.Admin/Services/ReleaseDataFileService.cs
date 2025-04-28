@@ -337,9 +337,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     Common.Validators.ValidationUtils.ValidationResult(ValidationMessages.GenerateErrorBulkDataZipMustContainDataSetNamesCsv()));
             }
 
-            var indexFileValidationResult = await dataSetValidator.ValidateBulkDataZipIndexFile(releaseVersionId, dataSetNames);
-
             dataSetFiles.Remove(dataSetNames);
+
+            var indexFileValidationResult = await dataSetValidator.ValidateBulkDataZipIndexFile(releaseVersionId, dataSetNames, dataSetFiles);
 
             var dataSets = new List<DataSetDto>();
             if (indexFileValidationResult.IsLeft)
