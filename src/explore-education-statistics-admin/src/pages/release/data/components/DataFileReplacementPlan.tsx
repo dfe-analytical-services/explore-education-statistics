@@ -1,6 +1,8 @@
 import ButtonLink from '@admin/components/ButtonLink';
 import mergeReplacementFootnoteFilters from '@admin/pages/release/data/components/utils/mergeReplacementFootnoteFilters';
 import {
+  releaseDataRoute,
+  ReleaseRouteParams,
   releaseDataBlockEditRoute,
   ReleaseDataBlockRouteParams,
   ReleaseFootnoteRouteParams,
@@ -27,10 +29,6 @@ import useMountedRef from '@common/hooks/useMountedRef';
 import React, { ReactNode, useMemo } from 'react';
 import { generatePath } from 'react-router';
 import sanitizeHtml from '@common/utils/sanitizeHtml';
-import {
-  releaseDataRoute,
-  ReleaseRouteParams,
-} from '@admin/routes/releaseRoutes';
 import { useAuthContext } from '@admin/contexts/AuthContext';
 import releaseDataPageTabIds from '@admin/pages/release/data/utils/releaseDataPageTabIds';
 import Link from '@admin/components/Link';
@@ -80,42 +78,49 @@ const DataFileReplacementPlan = ({
     () => plan?.footnotes.some(footnote => !footnote.valid) ?? false,
     [plan],
   );
-  
+
   const hasDataSetVersionPlan = useMemo<boolean>(
     () => plan?.apiDataSetVersionPlan !== undefined,
     [plan],
   );
 
   const hasInvalidLocationMapping = useMemo<boolean>(
-    () => hasDataSetVersionPlan ?
-            !(plan?.apiDataSetVersionPlan?.mappingStatus?.locationsComplete ?? false) 
-          : false,
-    [plan],
+    () =>
+      hasDataSetVersionPlan
+        ? !(
+            plan?.apiDataSetVersionPlan?.mappingStatus?.locationsComplete ??
+            false
+          )
+        : false,
+    [plan, hasDataSetVersionPlan],
   );
 
   const hasInvalidFilterMapping = useMemo<boolean>(
-    () => hasDataSetVersionPlan ?
-            !(plan?.apiDataSetVersionPlan?.mappingStatus?.filtersComplete ?? false) 
-          : false,
-    [plan],
+    () =>
+      hasDataSetVersionPlan
+        ? !(
+            plan?.apiDataSetVersionPlan?.mappingStatus?.filtersComplete ?? false
+          )
+        : false,
+    [plan, hasDataSetVersionPlan],
   );
 
   const { user } = useAuthContext();
 
   const releaseRouteParams = useMemo<ReleaseRouteParams>(
-      () => ({
-        releaseVersionId: releaseVersionId,
-        publicationId: publicationId,
-      }),
-      [releaseVersionId, publicationId],
-    );
+    () => ({
+      releaseVersionId,
+      publicationId,
+    }),
+    [releaseVersionId, publicationId],
+  );
 
   const apiDataSetsTabRoute = user?.permissions.isBauUser
-  ? `${generatePath<ReleaseRouteParams>(
-      releaseDataRoute.path,
-      releaseRouteParams,
-    )}#${releaseDataPageTabIds.apiDataSets}`
-  : undefined;
+    ? `${generatePath<ReleaseRouteParams>(
+        releaseDataRoute.path,
+        releaseRouteParams,
+      )}#${releaseDataPageTabIds.apiDataSets}`
+    : undefined;
 
   if (error) {
     return (
@@ -447,7 +452,9 @@ const DataFileReplacementPlan = ({
             <>
               <h3 className="govuk-heading-m">
                 <Tag colour={hasInvalidFilterMapping ? 'red' : 'green'}>
-                  {`Api Data Set Filters: ${hasInvalidFilterMapping ? 'ERROR' : 'OK'}`}
+                  {`Api Data Set Filters: ${
+                    hasInvalidFilterMapping ? 'ERROR' : 'OK'
+                  }`}
                 </Tag>
               </h3>
 
@@ -458,35 +465,35 @@ const DataFileReplacementPlan = ({
                     <Link to={apiDataSetsTabRoute} unvisited>
                       head over to the API data sets tab
                     </Link>
-                  )} and complete manual mapping process for filters.
+                  )}{' '}
+                  and complete manual mapping process for filters.
                 </p>
-                ) : (
-                <p>
-                  No manual mapping required for Api Data set filters.
-                </p>
+              ) : (
+                <p>No manual mapping required for Api Data set filters.</p>
               )}
 
               <h3 className="govuk-heading-m">
                 <Tag colour={hasInvalidLocationMapping ? 'red' : 'green'}>
-                  {`Api Data Set Locations: ${hasInvalidLocationMapping ? 'ERROR' : 'OK'}`}
+                  {`Api Data Set Locations: ${
+                    hasInvalidLocationMapping ? 'ERROR' : 'OK'
+                  }`}
                 </Tag>
               </h3>
 
               {hasInvalidLocationMapping ? (
                 <p>
                   Please{' '}
-                  {apiDataSetsTabRoute && ( 
-                  <Link to={apiDataSetsTabRoute} unvisited>
-                     head over to the API data sets tab
-                  </Link>
-                  )} and complete manual mapping process for locations.
+                  {apiDataSetsTabRoute && (
+                    <Link to={apiDataSetsTabRoute} unvisited>
+                      head over to the API data sets tab
+                    </Link>
+                  )}{' '}
+                  and complete manual mapping process for locations.
                 </p>
-                ) : (
-                <p>
-                  No manual mapping required for Api Data set locations.
-                </p>
+              ) : (
+                <p>No manual mapping required for Api Data set locations.</p>
               )}
-          </>
+            </>
           )}
 
           <ButtonGroup className="govuk-!-margin-top-8">
