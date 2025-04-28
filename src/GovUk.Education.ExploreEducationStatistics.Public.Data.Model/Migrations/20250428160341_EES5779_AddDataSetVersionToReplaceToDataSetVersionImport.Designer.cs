@@ -13,8 +13,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migrations
 {
     [DbContext(typeof(PublicDataDbContext))]
-    [Migration("20250425085847_EES5779_AddDataSetVersionToPatchToDataSetVersionImport")]
-    partial class EES5779_AddDataSetVersionToPatchToDataSetVersionImport
+    [Migration("20250428160341_EES5779_AddDataSetVersionToReplaceToDataSetVersionImport")]
+    partial class EES5779_AddDataSetVersionToReplaceToDataSetVersionImport
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

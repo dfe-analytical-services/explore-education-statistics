@@ -5,7 +5,7 @@
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migrations
 {
     /// <inheritdoc />
-    public partial class EES5779_AddDataSetVersionToPatchToDataSetVersionImport : Migration
+    public partial class EES5779_AddDataSetVersionToReplaceToDataSetVersionImport : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
