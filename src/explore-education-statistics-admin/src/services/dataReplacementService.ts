@@ -1,6 +1,5 @@
 import client from '@admin/services/utils/service';
 import { Dictionary } from '@common/types';
-import { Mapping } from 'classnames';
 
 export interface TargetReplacement {
   id: string;
@@ -95,7 +94,7 @@ export interface DataBlockReplacementPlan {
 export interface MappingStatus {
   locationsComplete: boolean;
   filtersComplete: boolean;
-};
+}
 
 export interface ApiDataSetVersionPlan {
   id: string;
