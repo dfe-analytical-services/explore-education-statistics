@@ -1,5 +1,7 @@
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using Microsoft.AspNetCore.Mvc;
+using Semver;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Services.Interfaces;
 
@@ -15,6 +17,7 @@ public interface IDataSetVersionService
         Guid dataSetId,
         Guid releaseFileId,
         Guid instanceId,
+        SemVersion? dataSetVersionToReplace = null,
         CancellationToken cancellationToken = default);
 
     Task<Either<ActionResult, Unit>> BulkDeleteVersions(

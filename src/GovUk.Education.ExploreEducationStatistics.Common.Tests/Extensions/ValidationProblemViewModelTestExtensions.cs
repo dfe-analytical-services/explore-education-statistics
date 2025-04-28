@@ -414,6 +414,31 @@ public static class ValidationProblemViewModelTestExtensions
 
         return validationProblem.Errors.First(new Func<ErrorViewModel, bool>(predicate));
     }
+    
+    public static void AssertDoesNotHaveError(
+        this ValidationProblemViewModel validationProblem,
+        string? expectedPath,
+        string expectedCode,
+        string? expectedMessage = null,
+        object? expectedDetail = null)
+    {
+        Predicate<ErrorViewModel> predicate = error =>
+        {
+            if (expectedMessage is not null && error.Message != expectedMessage)
+            {
+                return false;
+            }
+
+            if (expectedDetail is not null && (error.Detail is null || !error.Detail.Equals(expectedDetail)))
+            {
+                return false;
+            }
+
+            return error.Path == expectedPath && error.Code == expectedCode;
+        };
+
+        Assert.DoesNotContain(validationProblem.Errors, predicate);
+    }
 
     public static void AssertHasErrors(
         this ValidationProblemViewModel validationProblem,

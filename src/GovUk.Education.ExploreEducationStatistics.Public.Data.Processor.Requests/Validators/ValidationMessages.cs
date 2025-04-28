@@ -75,4 +75,14 @@ public static class ValidationMessages
         Code: nameof(DataSetVersionMappingsNotComplete),
         Message: "The data set version mappings are not complete."
     );
+    
+    public static readonly LocalizableMessage DataSetVersionNotFound = new(
+        Code: nameof(DataSetVersionNotFound),
+        Message: "The data set version required for creating the next version was not found."
+    );
+
+    public static readonly LocalizableMessage DataSetVersionToReplaceNotValid = new(
+        Code: "DataSetVersionToReplaceNotValid",
+        Message: "DataSetVersionToReplace must be a valid semantic version if provided."
+    );
 }

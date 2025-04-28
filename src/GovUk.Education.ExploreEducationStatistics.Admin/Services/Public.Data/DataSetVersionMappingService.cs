@@ -30,7 +30,8 @@ public class DataSetVersionMappingService(
     IPostgreSqlRepository postgreSqlRepository,
     IUserService userService,
     PublicDataDbContext publicDataDbContext,
-    ContentDbContext contentDbContext)
+    ContentDbContext contentDbContext,
+    IDataSetService dataSetService)
     : IDataSetVersionMappingService
 {
     private static readonly MappingType[] IncompleteMappingTypes =
@@ -173,6 +174,18 @@ public class DataSetVersionMappingService(
             .Select(nextVersion => nextVersion.TargetDataSetVersion)
             .SingleAsync(cancellationToken);
 
+        DataSetVersionImport? ongoingNextVersionImport = null;
+
+        // ongoingNextVersionImport = await publicDataDbContext.DataSetVersionImports.SingleOrDefaultAsync(import =>
+        //         import.DataSetVersionId == nextDataSetVersionId
+        //         && import.Stage != DataSetVersionImportStage.Completing
+        //         && import.DataSetVersionToReplace != null,//TODO: Handle in EES-5996
+        //     cancellationToken);
+
+
+        var mapping = await dataSetService.GetMappingStatus(nextDataSetVersionId, cancellationToken);
+        var doesNotRequireManualMapping = mapping is { LocationsComplete: true, FiltersComplete: true };
+        
         var isMajorVersionUpdate = await IsMajorVersionUpdate(
             nextDataSetVersionId,
             locationMappingTypes,
@@ -180,14 +193,20 @@ public class DataSetVersionMappingService(
             cancellationToken);
 
         if (isMajorVersionUpdate)
-        {
+        {//TODO: Add awareness of isIncrementingPatch the DataSetVersionMapping -  implement appropriate failure handler in EES-5996 
+            if (ongoingNextVersionImport is not null && doesNotRequireManualMapping)
+            {//TODO: WIP EES-5996
+                //throw new ApplicationException("Data set is Not allowed");
+            }
             targetDataSetVersion.VersionMajor = sourceDataSetVersion.VersionMajor + 1;
             targetDataSetVersion.VersionMinor = 0;
+            targetDataSetVersion.VersionPatch = 0;
         }
         else
         {
             targetDataSetVersion.VersionMajor = sourceDataSetVersion.VersionMajor;
             targetDataSetVersion.VersionMinor = sourceDataSetVersion.VersionMinor + 1;
+            targetDataSetVersion.VersionPatch = 0;
         }
 
         await publicDataDbContext.SaveChangesAsync(cancellationToken);

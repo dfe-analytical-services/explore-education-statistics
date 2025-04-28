@@ -11,6 +11,7 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Requests;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Semver;
 using ValidationMessages =
     GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Requests.Validators.ValidationMessages;
 
@@ -35,46 +36,52 @@ internal class DataSetVersionMappingService(
 
     public async Task<Either<ActionResult, Unit>> CreateMappings(
         Guid nextDataSetVersionId,
+        SemVersion? dataSetVersionToReplace,
         CancellationToken cancellationToken = default)
     {
         var nextVersion = await publicDataDbContext
             .DataSetVersions
             .Include(dsv => dsv.DataSet)
             .ThenInclude(ds => ds.LatestLiveVersion)
+            .Include(dataSetVersion => dataSetVersion.DataSet)
+            .ThenInclude(dataSet => dataSet.Versions)
             .SingleAsync(dsv => dsv.Id == nextDataSetVersionId, cancellationToken);
 
-        var liveVersion = nextVersion.DataSet.LatestLiveVersion!;
+        var sourceVersion = (dataSetVersionToReplace is not null
+            ? nextVersion.DataSet.Versions.FirstOrDefault(v => v.SemVersion() == dataSetVersionToReplace)
+            : nextVersion.DataSet.LatestLiveVersion!) ?? throw new Exception($"Unable to find appropriate source version via latest live version or specified version to patch: ${dataSetVersionToReplace}.");
+        //TODO: this is WIP, EES-5994 will take care of failures and recovering from them within this user journey.
 
         var nextVersionMeta = await dataSetMetaService.ReadDataSetVersionMappingMeta(
             dataSetVersionId: nextDataSetVersionId,
             cancellationToken);
 
         var sourceLocationMeta =
-            await GetLocationMeta(liveVersion.Id, cancellationToken);
+            await GetLocationMeta(sourceVersion.Id, cancellationToken);
 
         var locationMappings = CreateLocationMappings(
             sourceLocationMeta,
             nextVersionMeta.Locations);
 
         var sourceFilterMeta =
-            await GetFilterMeta(liveVersion.Id, cancellationToken);
+            await GetFilterMeta(sourceVersion.Id, cancellationToken);
 
         var filterMappings = CreateFilterMappings(
             sourceFilterMeta,
             nextVersionMeta.Filters);
 
         var hasDeletedIndicators = await HasDeletedIndicators(
-            liveVersion.Id,
+            sourceVersion.Id,
             nextVersionMeta.Indicators,
             cancellationToken);
 
         var hasDeletedGeographicLevels = await HasDeletedGeographicLevels(
-            liveVersion.Id,
+            sourceVersion.Id,
             nextVersionMeta.GeographicLevel,
             cancellationToken);
 
         var hasDeletedTimePeriods = await HasDeletedTimePeriods(
-            liveVersion.Id,
+            sourceVersion.Id,
             nextVersionMeta.TimePeriods,
             cancellationToken);
 
@@ -84,7 +91,7 @@ internal class DataSetVersionMappingService(
             .DataSetVersionMappings
             .Add(new DataSetVersionMapping
             {
-                SourceDataSetVersionId = liveVersion.Id,
+                SourceDataSetVersionId = sourceVersion.Id,
                 TargetDataSetVersionId = nextDataSetVersionId,
                 LocationMappingPlan = locationMappings,
                 FilterMappingPlan = filterMappings,
@@ -99,6 +106,7 @@ internal class DataSetVersionMappingService(
 
     public async Task ApplyAutoMappings(
         Guid nextDataSetVersionId,
+        bool incrementPatchNumber = false,
         CancellationToken cancellationToken = default)
     {
         var mapping = await publicDataDbContext
@@ -129,6 +137,20 @@ internal class DataSetVersionMappingService(
 
         if (IsMajorVersionUpdate(mapping))
         {
+            // if (incrementPatchNumber)
+            // {
+            //     var doesntRequireManualMapping = mapping is { LocationMappingsComplete: true, FilterMappingsComplete: true } == false;//
+            //
+            //     if (doesntRequireManualMapping)//TODO: implement appropriate failure handler in EES-5996, also Need to account on whether the user has clicked finalize or not..
+            //     {
+            //         //throw new Exception("Major version number update is not allowed when replacement is in progress");
+            //     }
+            // }
+            // else
+            // {
+            //     mapping.TargetDataSetVersion.VersionMajor += 1;
+            //     mapping.TargetDataSetVersion.VersionMinor = 0;
+            // }
             mapping.TargetDataSetVersion.VersionMajor += 1;
             mapping.TargetDataSetVersion.VersionMinor = 0;
         }
@@ -175,8 +197,10 @@ internal class DataSetVersionMappingService(
 
         return mapping.FilterMappingPlan
             .Mappings
-            .SelectMany(filterMapping => filterMapping.Value.OptionMappings)
-            .Any(optionMapping => NoMappingTypes.Contains(optionMapping.Value.Type));
+            .SelectMany(filterMapping => 
+                filterMapping.Value.OptionMappings)
+            .Any(optionMapping => 
+                NoMappingTypes.Contains(optionMapping.Value.Type));
     }
 
     public Task<Either<ActionResult, Tuple<DataSetVersion, DataSetVersionImport>>> GetManualMappingVersionAndImport(

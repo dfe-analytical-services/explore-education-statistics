@@ -2,6 +2,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Requests;
 using Microsoft.AspNetCore.Mvc;
+using Semver;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Services.Interfaces;
 
@@ -9,6 +10,7 @@ public interface IDataSetVersionMappingService
 {
     Task<Either<ActionResult, Unit>> CreateMappings(
         Guid nextDataSetVersionId,
+        SemVersion? dataSetVersionToReplace,
         CancellationToken cancellationToken = default);
     
     Task<Either<ActionResult, Tuple<DataSetVersion, DataSetVersionImport>>> GetManualMappingVersionAndImport(
@@ -17,5 +19,6 @@ public interface IDataSetVersionMappingService
 
     Task ApplyAutoMappings(
         Guid nextDataSetVersionId,
+        bool incrementPatchNumber = false,
         CancellationToken cancellationToken = default);
 }
