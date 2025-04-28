@@ -29,6 +29,12 @@
     "slackAlertsChannel": {
       "value": "C0681S50SP5"
     },
+    "publishReleasesCronSchedule": {
+      "value": "0 5 0 * * *"
+    },
+    "publishReleaseContentCronSchedule": {
+      "value": "0 30 9 * * *"
+    },
     "useSubnets": {
       "value": true
     },
