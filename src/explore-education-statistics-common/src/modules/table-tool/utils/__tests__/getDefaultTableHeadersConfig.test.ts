@@ -135,8 +135,8 @@ describe('getDefaultTableHeadersConfig', () => {
     expect(columnGroups[0][1].label).toBe('Barnsley');
 
     expect(columns).toHaveLength(2);
-    expect(columns[0].label).toBe('2014/15');
-    expect(columns[1].label).toBe('2015/16');
+    expect(columns[0].label).toBe('2015/16');
+    expect(columns[1].label).toBe('2014/15');
 
     expect(rowGroups).toHaveLength(2);
     expect(rowGroups[0]).toHaveLength(2);
@@ -241,11 +241,11 @@ describe('getDefaultTableHeadersConfig', () => {
     expect(columnGroups[0][1].label).toBe('Barnsley');
 
     expect(columns).toHaveLength(5);
-    expect(columns[0].label).toBe('2014/15');
-    expect(columns[1].label).toBe('2015/16');
+    expect(columns[0].label).toBe('2018/19');
+    expect(columns[1].label).toBe('2017/18');
     expect(columns[2].label).toBe('2016/17');
-    expect(columns[3].label).toBe('2017/18');
-    expect(columns[4].label).toBe('2018/19');
+    expect(columns[3].label).toBe('2015/16');
+    expect(columns[4].label).toBe('2014/15');
 
     expect(rowGroups).toHaveLength(2);
     expect(rowGroups[0]).toHaveLength(2);
@@ -321,8 +321,8 @@ describe('getDefaultTableHeadersConfig', () => {
     expect(columnGroups[0][1].label).toBe('Barnsley');
 
     expect(columns).toHaveLength(2);
-    expect(columns[0].label).toBe('2014/15');
-    expect(columns[1].label).toBe('2015/16');
+    expect(columns[0].label).toBe('2015/16');
+    expect(columns[1].label).toBe('2014/15');
 
     expect(rowGroups).toHaveLength(2);
     expect(rowGroups[0]).toHaveLength(2);
@@ -540,7 +540,7 @@ describe('getDefaultTableHeadersConfig', () => {
     const { columns } = getDefaultTableHeaderConfig(testSubjectMeta);
 
     expect(columns).toHaveLength(2);
-    expect(columns[0].label).toBe('2017/18 Autumn Term');
-    expect(columns[1].label).toBe('2018/19 Autumn Term');
+    expect(columns[0].label).toBe('2018/19 Autumn Term');
+    expect(columns[1].label).toBe('2017/18 Autumn Term');
   });
 });
