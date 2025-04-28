@@ -36,7 +36,7 @@ internal class DataSetVersionMappingService(
 
     public async Task<Either<ActionResult, Unit>> CreateMappings(
         Guid nextDataSetVersionId,
-        SemVersion? dataSetVersionToPatch,
+        SemVersion? dataSetVersionToReplace,
         CancellationToken cancellationToken = default)
     {
         var nextVersion = await publicDataDbContext
@@ -47,9 +47,9 @@ internal class DataSetVersionMappingService(
             .ThenInclude(dataSet => dataSet.Versions)
             .SingleAsync(dsv => dsv.Id == nextDataSetVersionId, cancellationToken);
 
-        var sourceVersion = (dataSetVersionToPatch is not null
-            ? nextVersion.DataSet.Versions.FirstOrDefault(v => v.SemVersion() == dataSetVersionToPatch)
-            : nextVersion.DataSet.LatestLiveVersion!) ?? throw new Exception($"Unable to find appropriate source version via latest live version or specified version to patch: ${dataSetVersionToPatch}.");
+        var sourceVersion = (dataSetVersionToReplace is not null
+            ? nextVersion.DataSet.Versions.FirstOrDefault(v => v.SemVersion() == dataSetVersionToReplace)
+            : nextVersion.DataSet.LatestLiveVersion!) ?? throw new Exception($"Unable to find appropriate source version via latest live version or specified version to patch: ${dataSetVersionToReplace}.");
         //TODO: this is WIP, EES-5994 will take care of failures and recovering from them within this user journey.
 
         var nextVersionMeta = await dataSetMetaService.ReadDataSetVersionMappingMeta(
