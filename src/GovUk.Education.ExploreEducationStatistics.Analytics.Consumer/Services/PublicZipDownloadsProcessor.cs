@@ -61,7 +61,7 @@ public class PublicZipDownloadsProcessor(
                 releaseName VARCHAR,
                 releaseLabel VARCHAR,
                 subjectId UUID,
-                dataSetName VARCHAR
+                dataSetTitle VARCHAR
             );
         ");
 
@@ -89,7 +89,7 @@ public class PublicZipDownloadsProcessor(
                                 releaseName: VARCHAR,
                                 releaseLabel: VARCHAR,
                                 subjectId: UUID,
-                                dataSetName: VARCHAR
+                                dataSetTitle: VARCHAR
                             }}
                         )
                      )
@@ -111,7 +111,7 @@ public class PublicZipDownloadsProcessor(
                 FIRST(releaseName) AS releaseName,
                 FIRST(releaseLabel) AS releaseLabel,
                 FIRST(subjectId) AS subjectId,
-                FIRST(dataSetName) AS dataSetName,
+                FIRST(dataSetTitle) AS dataSetTitle,
                 CAST(COUNT(zipDownloadHash) AS INT) AS downloads
             FROM zipDownloads
             GROUP BY zipDownloadHash

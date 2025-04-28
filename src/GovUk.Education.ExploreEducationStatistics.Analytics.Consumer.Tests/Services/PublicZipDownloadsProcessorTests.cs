@@ -1,10 +1,14 @@
 using System.Reflection;
+using System.Security.Cryptography;
+using System.Text;
+using AngleSharp.Io;
 using GovUk.Education.ExploreEducationStatistics.Analytics.Consumer.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.DuckDb.DuckDb;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using InterpolatedSql.Dapper;
 using Microsoft.Extensions.Logging;
 using Moq;
+using Newtonsoft.Json;
 using Xunit;
 
 namespace GovUk.Education.ExploreEducationStatistics.Analytics.Consumer.Tests.Services;
@@ -21,7 +25,7 @@ public abstract class PublicZipDownloadsProcessorTests
         [Fact]
         public async Task NoSourceFolder_NoReportProduced()
         {
-            var pathResolver = new TestAnalyticsPathResolver();
+            using var pathResolver = new TestAnalyticsPathResolver();
 
             var service = BuildService(
                 pathResolver: pathResolver);
@@ -34,7 +38,7 @@ public abstract class PublicZipDownloadsProcessorTests
         [Fact]
         public async Task NoRequestFilesToConsume_NoReportProduced()
         {
-            var pathResolver = new TestAnalyticsPathResolver();
+            using var pathResolver = new TestAnalyticsPathResolver();
 
             Directory.CreateDirectory(pathResolver.PublicZipDownloadsDirectoryPath());
 
@@ -51,7 +55,7 @@ public abstract class PublicZipDownloadsProcessorTests
         [Fact]
         public async Task SingleRequestFileNoSubjectId_ProducesOneReportRow()
         {
-            var pathResolver = new TestAnalyticsPathResolver();
+            using var pathResolver = new TestAnalyticsPathResolver();
             SetupZipDownloadRequest(pathResolver, "ZipDownloadRequestFile_NoSubjectId.json");
 
             var service = BuildService(
@@ -77,20 +81,16 @@ public abstract class PublicZipDownloadsProcessorTests
             // match the expected values also.
             var zipDownloadReportRow = Assert.Single(zipDownloadReportRows);
 
-            Assert.Equal("2e1ff1faca8870e00a9ec1fab7e58409", zipDownloadReportRow.ZipDownloadHash);
-            Assert.Equal("publication name", zipDownloadReportRow.PublicationName);
-            Assert.Equal(Guid.Parse("319750f6-4c33-476c-9e6d-3da7a403201d"), zipDownloadReportRow.ReleaseVersionId);
-            Assert.Equal("release name", zipDownloadReportRow.ReleaseName);
-            Assert.Equal("release label", zipDownloadReportRow.ReleaseLabel);
-            Assert.Null(zipDownloadReportRow.SubjectId);
-            Assert.Null(zipDownloadReportRow.DataSetName);
-            Assert.Equal(1, zipDownloadReportRow.Downloads);
+            await AssertZipDownloadReportRow(
+                zipDownloadReportRow,
+                "ZipDownloadRequestFile_NoSubjectId.json",
+                1);
         }
 
         [Fact]
         public async Task TwoDifferentSourceQueries_ProduceTwoDistinctReportRows()
         {
-            var pathResolver = new TestAnalyticsPathResolver();
+            using var pathResolver = new TestAnalyticsPathResolver();
 
             SetupZipDownloadRequest(pathResolver, "ZipDownloadRequestFile_NoSubjectId.json");
             SetupZipDownloadRequest(pathResolver, "ZipDownloadRequestFile_WithSubjectId.json");
@@ -111,29 +111,21 @@ public abstract class PublicZipDownloadsProcessorTests
 
             Assert.Equal(2, zipDownloadReportRows.Count);
 
-            Assert.Equal("2e1ff1faca8870e00a9ec1fab7e58409", zipDownloadReportRows[0].ZipDownloadHash);
-            Assert.Equal("publication name", zipDownloadReportRows[0].PublicationName);
-            Assert.Equal(Guid.Parse("319750f6-4c33-476c-9e6d-3da7a403201d"), zipDownloadReportRows[0].ReleaseVersionId);
-            Assert.Equal("release name", zipDownloadReportRows[0].ReleaseName);
-            Assert.Equal("release label", zipDownloadReportRows[0].ReleaseLabel);
-            Assert.Null(zipDownloadReportRows[0].SubjectId);
-            Assert.Null(zipDownloadReportRows[0].DataSetName);
-            Assert.Equal(1, zipDownloadReportRows[0].Downloads);
+            await AssertZipDownloadReportRow(
+                zipDownloadReportRows[0],
+                "ZipDownloadRequestFile_NoSubjectId.json",
+                1);
 
-            Assert.Equal("670871b1327feb682dd3516374f35928", zipDownloadReportRows[1].ZipDownloadHash);
-            Assert.Equal("publication name 2", zipDownloadReportRows[1].PublicationName);
-            Assert.Equal(Guid.Parse("72a6856c-8d7b-4ad9-b533-2066d171d146"), zipDownloadReportRows[1].ReleaseVersionId);
-            Assert.Equal("release name 2", zipDownloadReportRows[1].ReleaseName);
-            Assert.Equal("release label 2", zipDownloadReportRows[1].ReleaseLabel);
-            Assert.Equal(Guid.Parse("66c5eb5f-a85b-4586-bae8-dc3504d3042f"), zipDownloadReportRows[1].SubjectId);
-            Assert.Equal("data set name 2", zipDownloadReportRows[1].DataSetName);
-            Assert.Equal(1, zipDownloadReportRows[1].Downloads);
+            await AssertZipDownloadReportRow(
+                zipDownloadReportRows[1],
+                "ZipDownloadRequestFile_WithSubjectId.json",
+                1);
         }
 
         [Fact]
         public async Task MultipleRequestFilesForSameZipFile_ProduceSingleReportRow()
         {
-            var pathResolver = new TestAnalyticsPathResolver();
+            using var pathResolver = new TestAnalyticsPathResolver();
 
             SetupZipDownloadRequest(pathResolver, "ZipDownloadRequestFile_WithSubjectId.json");
             SetupZipDownloadRequest(pathResolver, "ZipDownloadRequestFile_WithSubjectId_Copy.json");
@@ -154,14 +146,10 @@ public abstract class PublicZipDownloadsProcessorTests
 
             var zipDownloadReportRow = Assert.Single(zipDownloadReportRows);
 
-            Assert.Equal("670871b1327feb682dd3516374f35928", zipDownloadReportRow.ZipDownloadHash);
-            Assert.Equal("publication name 2", zipDownloadReportRow.PublicationName);
-            Assert.Equal(Guid.Parse("72a6856c-8d7b-4ad9-b533-2066d171d146"), zipDownloadReportRow.ReleaseVersionId);
-            Assert.Equal("release name 2", zipDownloadReportRow.ReleaseName);
-            Assert.Equal("release label 2", zipDownloadReportRow.ReleaseLabel);
-            Assert.Equal(Guid.Parse("66c5eb5f-a85b-4586-bae8-dc3504d3042f"), zipDownloadReportRow.SubjectId);
-            Assert.Equal("data set name 2", zipDownloadReportRow.DataSetName);
-            Assert.Equal(2, zipDownloadReportRow.Downloads);
+            await AssertZipDownloadReportRow(
+                zipDownloadReportRow,
+                "ZipDownloadRequestFile_WithSubjectId.json",
+                2);
         }
 
         private static async Task<List<ZipDownloadReportLine>> ReadZipDownloadReport(DuckDbConnection duckDbConnection, string reportFile)
@@ -169,16 +157,17 @@ public abstract class PublicZipDownloadsProcessorTests
             return (await duckDbConnection
                     .SqlBuilder($"SELECT * FROM read_parquet('{reportFile:raw}')")
                     .QueryAsync<ZipDownloadReportLine>())
+                .OrderBy(row => row.DataSetTitle)
                 .ToList();
         }
     }
 
     private PublicZipDownloadsProcessor BuildService(
-        TestAnalyticsPathResolver? pathResolver = null)
+        TestAnalyticsPathResolver pathResolver)
     {
         return new PublicZipDownloadsProcessor(
             duckDbConnection: new DuckDbConnection(),
-            pathResolver: pathResolver ?? new TestAnalyticsPathResolver(),
+            pathResolver: pathResolver,
             Mock.Of<ILogger<PublicZipDownloadsProcessor>>());
     }
 
@@ -190,6 +179,43 @@ public abstract class PublicZipDownloadsProcessorTests
         File.Copy(sourceFilePath, Path.Combine(pathResolver.PublicZipDownloadsDirectoryPath(), filename));
     }
 
+    private async Task AssertZipDownloadReportRow(
+        ZipDownloadReportLine row,
+        string jsonFileName,
+        int numRequests)
+    {
+        var jsonText = await File.ReadAllTextAsync(Path.Combine(_resourcesPath, jsonFileName));
+
+        var request = JsonConvert.DeserializeObject<CaptureZipDownloadRequest>(jsonText);
+        Assert.NotNull(request);
+
+        Assert.Equal(request.PublicationName, row.PublicationName);
+        Assert.Equal(request.ReleaseVersionId, row.ReleaseVersionId);
+        Assert.Equal(request.ReleaseName, row.ReleaseName);
+        Assert.Equal(request.ReleaseLabel, row.ReleaseLabel);
+        Assert.Equal(request.SubjectId, row.SubjectId);
+        Assert.Equal(request.DataSetTitle, row.DataSetTitle);
+
+        // Generate expected ZipDownloadHash
+        var subjectIdStr = request.SubjectId == null ? "" : request.SubjectId.ToString()!.ToLower();
+        var strToHash = $"{subjectIdStr}{request.ReleaseVersionId.ToString().ToLower()}";
+        var bytesToHash = Encoding.UTF8.GetBytes(strToHash);
+        var hash = MD5.Create().ComputeHash(bytesToHash);
+        var hashSb = new StringBuilder();
+        hash.ForEach(b => hashSb.Append(b.ToString("x2")));
+
+        Assert.Equal(hashSb.ToString(), row.ZipDownloadHash);
+        Assert.Equal(numRequests, row.Downloads);
+    }
+
+    public record CaptureZipDownloadRequest(
+        string PublicationName,
+        Guid ReleaseVersionId,
+        string ReleaseName,
+        string? ReleaseLabel,
+        Guid? SubjectId = null,
+        string? DataSetTitle = null);
+
     // ReSharper disable once ClassNeverInstantiated.Local
     private record ZipDownloadReportLine(
         string ZipDownloadHash,
@@ -198,6 +224,6 @@ public abstract class PublicZipDownloadsProcessorTests
         string ReleaseName,
         string ReleaseLabel,
         Guid? SubjectId,
-        string? DataSetName,
+        string? DataSetTitle,
         int Downloads);
 }

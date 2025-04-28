@@ -15,31 +15,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests.Stra
 
 public class AnalyticsWritePublicZipDownloadStrategyTests
 {
-    public class CanHandleTests : AnalyticsWritePublicZipDownloadStrategyTests
-    {
-        [Fact]
-        public void CanHandle_CaptureZipDownloadRequest_True()
-        {
-            var strategy = BuildStrategy();
-            var result = strategy.CanHandle(new CaptureZipDownloadRequest(
-                "publication name",
-                Guid.NewGuid(),
-                "release name",
-                "release label"));
-            Assert.True(result);
-        }
-
-        private record CaptureSomethingElseRequest : BaseCaptureRequest;
-
-        [Fact]
-        public void CanHandle_OtherCaptureRequest_False()
-        {
-            var strategy = BuildStrategy();
-            var result = strategy.CanHandle(new CaptureSomethingElseRequest());
-            Assert.False(result);
-        }
-    }
-
     public class ReportTests : AnalyticsWritePublicZipDownloadStrategyTests
     {
         private const string SnapshotPrefix =
@@ -48,7 +23,7 @@ public class AnalyticsWritePublicZipDownloadStrategyTests
         [Fact]
         public async Task ProduceTwoRequestFiles_Success()
         {
-            var pathResolver = new TestAnalyticsPathResolver();
+            using var pathResolver = new TestAnalyticsPathResolver();
             var strategy = BuildStrategy(
                 pathResolver: pathResolver);
 
@@ -67,7 +42,7 @@ public class AnalyticsWritePublicZipDownloadStrategyTests
                     "release name 2",
                     "release label 2",
                     SubjectId: Guid.Parse("39132b60-d4a0-4b62-befe-ba10cea4b30e"),
-                    DataSetName: "data set name 2"),
+                    DataSetTitle: "data set title 2"),
                 default);
 
             var files = Directory.GetFiles(pathResolver.PublicZipDownloadsDirectoryPath())
@@ -96,11 +71,11 @@ public class AnalyticsWritePublicZipDownloadStrategyTests
     }
 
     private AnalyticsWritePublicZipDownloadStrategy BuildStrategy(
-        IAnalyticsPathResolver? pathResolver = null,
+        IAnalyticsPathResolver pathResolver,
         ILogger<AnalyticsWritePublicZipDownloadStrategy>? logger = null)
     {
         return new AnalyticsWritePublicZipDownloadStrategy(
-            pathResolver ?? new TestAnalyticsPathResolver(),
+            pathResolver,
             logger ?? Mock.Of<ILogger<AnalyticsWritePublicZipDownloadStrategy>>());
     }
 }

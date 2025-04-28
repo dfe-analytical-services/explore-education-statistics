@@ -1,5 +1,6 @@
 #nullable enable
 using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using System.Threading.Tasks;
@@ -189,9 +190,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api
                 services.AddSingleton<IAnalyticsManager, AnalyticsManager>();
                 services.AddSingleton<IAnalyticsWriter, AnalyticsWriter>();
                 services.AddHostedService<AnalyticsConsumer>();
-                services.AddSingleton<IAnalyticsPathResolver, AnalyticsPathResolver>();
+
+                if (hostEnvironment.IsDevelopment())
+                {
+                    services.AddSingleton<IAnalyticsPathResolver, LocalAnalyticsPathResolver>();
+                }
+                else
+                {
+                    services.AddSingleton<IAnalyticsPathResolver, AnalyticsPathResolver>();
+                }
 
                 services.AddSingleton<IAnalyticsWriteStrategy, AnalyticsWritePublicZipDownloadStrategy>();
+
+                services.AddSingleton<IDictionary<Type, IAnalyticsWriteStrategy>>(provider =>
+                    new Dictionary<Type, IAnalyticsWriteStrategy>
+                    {
+                        {
+                            typeof(CaptureZipDownloadRequest),
+                            provider.GetRequiredService<AnalyticsWritePublicZipDownloadStrategy>()
+                        },
+                    }
+                );
             }
             else
             {
@@ -267,20 +286,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api
             app.ServerFeatures.Get<IServerAddressesFeature>()
                 ?.Addresses
                 .ForEach(address => Console.WriteLine($"Server listening on address: {address}"));
-        }
-
-        private class NoOpAnalyticsManager : IAnalyticsManager
-        {
-            public Task Add(BaseCaptureRequest request, CancellationToken cancellationToken)
-            {
-                return Task.CompletedTask;
-            }
-
-            public async ValueTask<BaseCaptureRequest> Read(CancellationToken cancellationToken)
-            {
-                await Task.Delay(Timeout.Infinite, cancellationToken);
-                return default!;
-            }
         }
     }
 }

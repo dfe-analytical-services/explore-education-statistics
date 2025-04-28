@@ -1,17 +1,18 @@
 using System;
 using System.IO;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Options;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Services;
 
-public class AnalyticsPathResolver : IAnalyticsPathResolver
+public class LocalAnalyticsPathResolver : IAnalyticsPathResolver
 {
     private readonly string _basePath;
 
-    public AnalyticsPathResolver(IOptions<AnalyticsOptions> options, IWebHostEnvironment environment)
+    public LocalAnalyticsPathResolver(IOptions<AnalyticsOptions> options, IWebHostEnvironment environment)
     {
 
         if (options.Value.BasePath.IsNullOrWhitespace())
@@ -22,7 +23,8 @@ public class AnalyticsPathResolver : IAnalyticsPathResolver
             );
         }
 
-        _basePath = options.Value.BasePath;
+        var originalPath = options.Value.BasePath;
+        _basePath = Path.Combine(PathUtils.ProjectRootPath, PathUtils.OsPath(originalPath));
     }
 
     public string PublicZipDownloadsDirectoryPath()

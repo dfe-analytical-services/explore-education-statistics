@@ -6,7 +6,6 @@ using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Requests;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Strategies.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Content.Services.Utils;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 
@@ -15,14 +14,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Strategies
 public class AnalyticsWritePublicZipDownloadStrategy(
     IAnalyticsPathResolver analyticsPathResolver,
     ILogger<AnalyticsWritePublicZipDownloadStrategy> logger
-    ) : IAnalyticsWriteStrategy
+    ) : AnalyticsWriteStrategyBase(logger), IAnalyticsWriteStrategy
 {
-    public bool CanHandle(BaseCaptureRequest request)
-    {
-        return request is CaptureZipDownloadRequest;
-    }
-
-    public async Task Report(BaseCaptureRequest request, CancellationToken cancellationToken)
+    public async Task Report(AnalyticsCaptureRequestBase request, CancellationToken cancellationToken)
     {
         var zipDownloadRequest = request as CaptureZipDownloadRequest
                                  ?? throw new ArgumentException($"request isn't a {nameof(CaptureZipDownloadRequest)}");
@@ -41,16 +35,10 @@ public class AnalyticsWritePublicZipDownloadStrategy(
             orderedProperties: true,
             camelCase: true);
 
-        var directory = analyticsPathResolver.PublicZipDownloadsDirectoryPath();
-
-        var filename =
-            $"{DateTime.UtcNow:yyyyMMdd-HHmmss}_{zipDownloadRequest.ReleaseVersionId}_{RandomUtils.RandomString()}.json";
-
-        await AnalyticsUtils.WriteToFileShare(
-            request.GetType().ToString(),
-            directory,
-            filename,
-            serialisedRequest,
-            logger);
+        await this.WriteToFileShare(
+            requestTypeName: request.GetType().ToString(),
+            directory: analyticsPathResolver.PublicZipDownloadsDirectoryPath(),
+            filename: $"{DateTime.UtcNow:yyyyMMdd-HHmmss}_{zipDownloadRequest.ReleaseVersionId}_{RandomUtils.RandomString()}.json",
+            serialisedRequest: serialisedRequest);
     }
 }

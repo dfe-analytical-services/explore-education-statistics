@@ -1,18 +1,20 @@
+#nullable enable
 using System;
 using System.IO;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 
-namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Utils;
+namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Strategies;
 
-public static class AnalyticsUtils
+public abstract class AnalyticsWriteStrategyBase(
+    ILogger<AnalyticsWriteStrategyBase> logger
+    )
 {
-    public static async Task WriteToFileShare(
+    protected async Task WriteToFileShare(
         string requestTypeName,
         string directory,
         string filename,
-        string serialisedRequest,
-        ILogger logger)
+        string serialisedRequest)
     {
         try
         {

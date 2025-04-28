@@ -255,7 +255,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             var logger = new Mock<ILogger<ReleaseFileService>>(MockBehavior.Strict);
             var expectedWarning =
                 "We only record analytics for zip downloads for an entire release or one specific data set. So this means someone manually attempted to download a zip with more than one specific file?";
-            MockUtils.LoggerSetup(logger, LogLevel.Warning, expectedWarning);
+            MockUtils.ExpectLogMessage(logger, LogLevel.Warning, expectedWarning);
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
@@ -351,12 +351,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 ReleaseName: releaseVersion.Release.Title,
                 ReleaseLabel: releaseVersion.Release.Label,
                 SubjectId: releaseFile.File.SubjectId,
-                DataSetName: releaseFile.Name
+                DataSetTitle: releaseFile.Name
             );
             var analyticsManager = new Mock<IAnalyticsManager>(MockBehavior.Strict);
             analyticsManager.Setup(m => m.Add(
-                    It.Is<CaptureZipDownloadRequest>(r =>
-                        r.IsDeepEqualTo(captureRequest, null)),
+                    ItIs.DeepEqualTo(captureRequest),
                     It.IsAny<CancellationToken>()))
                 .Returns(Task.CompletedTask);
 
@@ -468,8 +467,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             );
             var analyticsManager = new Mock<IAnalyticsManager>(MockBehavior.Strict);
             analyticsManager.Setup(m => m.Add(
-                    It.Is<CaptureZipDownloadRequest>(r =>
-                        r.IsDeepEqualTo(captureRequest, null)),
+                    ItIs.DeepEqualTo(captureRequest),
                     It.IsAny<CancellationToken>()))
                 .Returns(Task.CompletedTask);
 
@@ -542,8 +540,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             );
             var analyticsManager = new Mock<IAnalyticsManager>(MockBehavior.Strict);
             analyticsManager.Setup(m => m.Add(
-                    It.Is<CaptureZipDownloadRequest>(r =>
-                        r.IsDeepEqualTo(request, null)),
+                    ItIs.DeepEqualTo(request),
                     It.IsAny<CancellationToken>()))
                 .Returns(Task.CompletedTask);
 
@@ -624,8 +621,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             );
             var analyticsManager = new Mock<IAnalyticsManager>(MockBehavior.Strict);
             analyticsManager.Setup(m => m.Add(
-                    It.Is<CaptureZipDownloadRequest>(r =>
-                        r.IsDeepEqualTo(request, null)),
+                    ItIs.DeepEqualTo(request),
                     It.IsAny<CancellationToken>()))
                 .Returns(Task.CompletedTask);
 
@@ -683,8 +679,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             );
             var analyticsManager = new Mock<IAnalyticsManager>(MockBehavior.Strict);
             analyticsManager.Setup(m => m.Add(
-                    It.Is<CaptureZipDownloadRequest>(r =>
-                        r.IsDeepEqualTo(request, null)),
+                    ItIs.DeepEqualTo(request),
                     It.IsAny<CancellationToken>()))
                 .Returns(Task.CompletedTask);
 
@@ -775,7 +770,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             var logger = new Mock<ILogger<ReleaseFileService>>(MockBehavior.Strict);
             var expectedWarning =
                 "We only record analytics for zip downloads for an entire release or one specific data set. So this means someone manually attempted to download a zip with more than one specific file?";
-            MockUtils.LoggerSetup(logger, LogLevel.Warning, expectedWarning);
+            MockUtils.ExpectLogMessage(logger, LogLevel.Warning, expectedWarning);
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
@@ -900,8 +895,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             );
             var analyticsManager = new Mock<IAnalyticsManager>(MockBehavior.Strict);
             analyticsManager.Setup(m => m.Add(
-                    It.Is<CaptureZipDownloadRequest>(r =>
-                        r.IsDeepEqualTo(request, null)),
+                    ItIs.DeepEqualTo(request),
                     It.IsAny<CancellationToken>()))
                 .Returns(Task.CompletedTask);
 
@@ -986,8 +980,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             );
             var analyticsManager = new Mock<IAnalyticsManager>(MockBehavior.Strict);
             analyticsManager.Setup(m => m.Add(
-                    It.Is<CaptureZipDownloadRequest>(r =>
-                        r.IsDeepEqualTo(request, null)),
+                    ItIs.DeepEqualTo(request),
                     It.IsAny<CancellationToken>()))
                 .Returns(Task.CompletedTask);
 
@@ -1092,8 +1085,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
             var analyticsManager = new Mock<IAnalyticsManager>(MockBehavior.Strict);
             analyticsManager.Setup(m => m.Add(
-                    It.Is<CaptureZipDownloadRequest>(r =>
-                        r.IsDeepEqualTo(request, null)),
+                    ItIs.DeepEqualTo(request),
                     It.IsAny<CancellationToken>()))
                 .Returns(Task.CompletedTask);
 

@@ -6,7 +6,5 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Strategies
 
 public interface IAnalyticsWriteStrategy
 {
-    bool CanHandle(BaseCaptureRequest request);
-
-    Task Report(BaseCaptureRequest request, CancellationToken cancellationToken);
+    Task Report(AnalyticsCaptureRequestBase request, CancellationToken cancellationToken);
 }

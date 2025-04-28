@@ -1,5 +1,5 @@
+using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
@@ -9,12 +9,15 @@ using GovUk.Education.ExploreEducationStatistics.Content.Services.Strategies.Int
 namespace GovUk.Education.ExploreEducationStatistics.Content.Services;
 
 public class AnalyticsWriter(
-    IEnumerable<IAnalyticsWriteStrategy> writeStrategies) : IAnalyticsWriter
+    IDictionary<Type, IAnalyticsWriteStrategy> strategyByRequestType) : IAnalyticsWriter
 {
-    public async Task Report(BaseCaptureRequest request, CancellationToken cancellationToken)
+    public async Task Report(AnalyticsCaptureRequestBase request, CancellationToken cancellationToken)
     {
-        var strategy = writeStrategies
-            .Single(s => s.CanHandle(request));
+        var success = strategyByRequestType.TryGetValue(request.GetType(), out var strategy);
+        if (!success)
+        {
+            throw new Exception($"No write strategy for request type {request.GetType()}");
+        }
 
         await strategy.Report(request, cancellationToken);
     }

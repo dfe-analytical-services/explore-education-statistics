@@ -66,7 +66,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
         {
             if (fileIds is not null && fileIds.Count > 1)
             {
-                throw new ArgumentException("We don't expect multiple specific files to be requested.");
+                ModelState.AddModelError(
+                    "fileIds",
+                    "Providing multiple fileIds is deprecated.");
+                return BadRequest(ModelState);
             }
 
             return await persistenceHelper.CheckEntityExists<ReleaseVersion>(

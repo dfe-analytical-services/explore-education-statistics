@@ -193,7 +193,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils
             return configuration;
         }
 
-        public static void LoggerSetup<T>(Mock<ILogger<T>> logger, LogLevel logLevel, string logMessage)
+        public static void ExpectLogMessage<T>(Mock<ILogger<T>> logger, LogLevel logLevel, string logMessage)
         {
             logger.Setup(mock =>
                 mock.Log(
