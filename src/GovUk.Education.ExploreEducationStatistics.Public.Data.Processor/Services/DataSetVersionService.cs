@@ -60,7 +60,7 @@ internal class DataSetVersionService(
                 releaseFileId: releaseFileId,
                 instanceId: instanceId,
                 dataSet: dataSetAndDataSetVersion.dataSet,
-                previousDataSetVersionToPatch: dataSetAndDataSetVersion.previousDataSetVersionToReplace,
+                previousDataSetVersionToReplace: dataSetAndDataSetVersion.previousDataSetVersionToReplace,
                 cancellationToken: cancellationToken))
             .OnSuccess(dataSetVersion => dataSetVersion.Id);
     }
@@ -374,7 +374,7 @@ internal class DataSetVersionService(
         Guid releaseFileId,
         Guid instanceId,
         DataSet dataSet,
-        DataSetVersion? previousDataSetVersionToPatch = null,
+        DataSetVersion? previousDataSetVersionToReplace = null,
         CancellationToken cancellationToken = default)
     {
         return await publicDataDbContext.RequireTransaction(async () =>
@@ -383,19 +383,19 @@ internal class DataSetVersionService(
                     await ValidateReleaseFileAndDataSet(
                             releaseFile,
                             dataSet,
-                            previousDataSetVersionToPatch?.PublicVersion,
+                            previousDataSetVersionToReplace?.PublicVersion,
                             cancellationToken)
                         .OnSuccess(async () =>
                             await CreateDataSetVersion(
                                 dataSet,
                                 releaseFile,
-                                previousDataSetVersionToPatch,
+                                previousDataSetVersionToReplace,
                                 cancellationToken))
                         .OnSuccessDo(async dataSetVersion =>
                             await CreateDataSetVersionImport(
                                 dataSetVersion,
                                 instanceId,
-                                previousDataSetVersionToPatch?.SemVersion(),
+                                previousDataSetVersionToReplace?.SemVersion(),
                                 cancellationToken))
                         .OnSuccessDo(async dataSetVersion =>
                             await UpdateReleaseFilePublicDataSetVersionId(
@@ -559,7 +559,7 @@ internal class DataSetVersionService(
     private async Task CreateDataSetVersionImport(
         DataSetVersion dataSetVersion,
         Guid instanceId,
-        SemVersion? dataSetVersionToPatch = null,
+        SemVersion? dataSetVersionToReplace = null,
         CancellationToken cancellationToken = default)
     {
         var dataSetVersionImport = new DataSetVersionImport
@@ -567,7 +567,7 @@ internal class DataSetVersionService(
             DataSetVersionId = dataSetVersion.Id,
             InstanceId = instanceId,
             Stage = DataSetVersionImportStage.Pending,
-            DataSetVersionToReplace = dataSetVersionToPatch
+            DataSetVersionToReplace = dataSetVersionToReplace
         };
 
         publicDataDbContext.DataSetVersionImports.Add(dataSetVersionImport);
