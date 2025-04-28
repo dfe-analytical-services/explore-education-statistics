@@ -91,7 +91,7 @@ export default function DataFilesTableRow({
                     >
                       Edit title
                     </Link>
-                    {dataFile.publicApiDataSetId ? (
+                    {dataFile.publicApiDataSetId ? ( // TODO: Remove call to modal when EES-5779 is fully done
                       <Modal
                         showClose
                         title="Cannot replace data"

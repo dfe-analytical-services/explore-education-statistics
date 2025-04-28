@@ -27,7 +27,12 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Public.Data;
+using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Public.Data;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Tests.Fixtures;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainers;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
@@ -2115,7 +2120,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     rf.ReleaseVersionId == releaseVersion.Id && rf.FileId == metaFile.Id));
             }
         }
-
+        
         [Fact]
         public async Task Upload_Order()
         {
@@ -2856,7 +2861,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             IReleaseFileService? releaseFileService = null,
             IReleaseDataFileRepository? releaseDataFileRepository = null,
             IDataImportService? dataImportService = null,
-            IUserService? userService = null)
+            IUserService? userService = null,
+            IDataSetVersionService? dataSetVersionService = null)
         {
             contentDbContext.Users.Add(_user);
             contentDbContext.SaveChanges();
@@ -2875,7 +2881,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 releaseFileService ?? Mock.Of<IReleaseFileService>(Strict),
                 releaseDataFileRepository ?? new ReleaseDataFileRepository(contentDbContext),
                 dataImportService ?? Mock.Of<IDataImportService>(Strict),
-                userService ?? MockUtils.AlwaysTrueUserService(_user.Id).Object
+                userService ?? MockUtils.AlwaysTrueUserService(_user.Id).Object,
+                dataSetVersionService ?? Mock.Of<IDataSetVersionService>(Strict)
             );
         }
     }

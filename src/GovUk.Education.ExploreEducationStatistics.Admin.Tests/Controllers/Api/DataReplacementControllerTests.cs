@@ -60,14 +60,13 @@ public abstract class DataReplacementControllerTests
                         })
                 ],
                 Footnotes = [],
-                DeleteApiDataSetVersionPlan = new DeleteApiDataSetVersionPlanViewModel
+                ApiDataSetVersionPlan = new ApiDataSetVersionPlanViewModel
                 {
                     DataSetId = Guid.NewGuid(),
                     DataSetTitle = "my data set",
                     Id = Guid.NewGuid(),
                     Version = "v1.0",
                     Status = DataSetVersionStatus.Draft,
-                    Valid = false
                 },
                 OriginalSubjectId = Guid.NewGuid(),
                 ReplacementSubjectId = Guid.NewGuid()

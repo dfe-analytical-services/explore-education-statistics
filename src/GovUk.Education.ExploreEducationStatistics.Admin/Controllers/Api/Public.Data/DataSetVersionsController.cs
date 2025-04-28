@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Semver;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Public.Data;
 

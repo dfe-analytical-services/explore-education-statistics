@@ -97,6 +97,7 @@ public class DataSetVersionService(
             .Where(dsv => dsv.DataSetId == dataSetId)
             .Where(dsv => dsv.VersionMajor == version.Major)
             .Where(dsv => dsv.VersionMinor == version.Minor)
+            .Where(dsv => dsv.VersionPatch == version.Patch)
             .SingleOrNotFoundAsync(cancellationToken);
     }
 
@@ -125,12 +126,14 @@ public class DataSetVersionService(
     public async Task<Either<ActionResult, DataSetVersionSummaryViewModel>> CreateNextVersion(
         Guid releaseFileId,
         Guid dataSetId,
+        SemVersion? dataSetVersionToReplace = null,
         CancellationToken cancellationToken = default)
     {
         return await userService.CheckIsBauUser()
-            .OnSuccess(async _ => await processorClient.CreateNextDataSetVersionMappings(
+            .OnSuccess(async () => await processorClient.CreateNextDataSetVersionMappings(
                 dataSetId: dataSetId,
                 releaseFileId: releaseFileId,
+                dataSetVersionToReplace: dataSetVersionToReplace,
                 cancellationToken: cancellationToken))
             .OnSuccess(async processorResponse => await publicDataDbContext
                 .DataSetVersions
@@ -138,6 +141,7 @@ public class DataSetVersionService(
                     dataSetVersion => dataSetVersion.Id == processorResponse.DataSetVersionId,
                     cancellationToken))
             .OnSuccess(async dataSetVersion => await MapDraftVersionSummary(dataSetVersion, cancellationToken));
+
     }
 
     public async Task<Either<ActionResult, DataSetVersionSummaryViewModel>> CompleteNextVersionImport(

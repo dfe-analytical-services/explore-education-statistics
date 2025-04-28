@@ -409,7 +409,7 @@ public class DataSetFileService(
 
     private static DataSetFileApiViewModel? BuildDataSetFileApiViewModel(ReleaseFile releaseFile)
     {
-        if (releaseFile.PublicApiDataSetId is null || releaseFile.PublicApiDataSetVersionString is null)
+        if (releaseFile.PublicApiDataSetId is null || releaseFile.PublicApiDataSetVersion is null)
         {
             return null;
         }
@@ -417,7 +417,7 @@ public class DataSetFileService(
         return new DataSetFileApiViewModel
         {
             Id = releaseFile.PublicApiDataSetId.Value,
-            Version = releaseFile.PublicApiDataSetVersionString,
+            Version = releaseFile.PublicApiDataSetVersionString!,
         };
     }
 }
