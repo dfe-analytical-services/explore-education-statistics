@@ -111,13 +111,23 @@ public abstract class CronExpressionUtilTests(ITestOutputHelper output)
         }
 
         [Fact]
+        public void GetNextOccurrence_ReturnsNull_ForCronExpressionWithNoNextOccurrence()
+        {
+            const string cronExpression = "0 0 30 2 *"; // 30th of February is unreachable
+            var from = DateTimeOffset.Parse("2025-01-01T12:00:00Z");
+
+            var result = CronExpressionUtil.GetNextOccurrence(cronExpression, from, TimeZoneInfo.Utc);
+            Assert.Null(result);
+        }
+
+        [Fact]
         public void GetNextOccurrence_ThrowsException_ForInvalidCronExpression()
         {
             const string cronExpression = "* * * *"; // Not enough fields
-            var fromDateTime = DateTimeOffset.Parse("2025-01-01T12:00:00Z");
+            var from = DateTimeOffset.Parse("2025-01-01T12:00:00Z");
 
             Assert.Throws<Cronos.CronFormatException>(() =>
-                CronExpressionUtil.GetNextOccurrence(cronExpression, fromDateTime, TimeZoneInfo.Utc));
+                CronExpressionUtil.GetNextOccurrence(cronExpression, from, TimeZoneInfo.Utc));
         }
 
         private void AssertNextOccurrence(

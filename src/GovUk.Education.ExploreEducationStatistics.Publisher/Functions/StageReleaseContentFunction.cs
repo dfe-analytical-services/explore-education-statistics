@@ -44,10 +44,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
                     cronExpression: _appOptions.PublishReleaseContentCronSchedule,
                     from: timeProvider.GetUtcNow(),
                     timeZoneInfo: timeProvider.LocalTimeZone // UTC or the value in WEBSITE_TIME_ZONE if specified
-                );
+                ) ?? throw new InvalidOperationException("No next occurrence for Cron schedule");
 
-                await contentService.UpdateContentStaged(nextScheduledPublishingTime!.Value.UtcDateTime,
-                    message.ReleasePublishingKeys.ToReleaseVersionIds());
+                await contentService.UpdateContentStaged(
+                    expectedPublishDate: nextScheduledPublishingTime.UtcDateTime,
+                    releaseVersionIds: message.ReleasePublishingKeys.ToReleaseVersionIds());
                 await UpdateContentStage(message, Scheduled);
             }
             catch (Exception e)

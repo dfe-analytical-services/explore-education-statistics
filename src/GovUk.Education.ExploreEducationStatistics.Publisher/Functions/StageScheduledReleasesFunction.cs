@@ -45,13 +45,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
                 cronExpression: _appOptions.PublishReleaseContentCronSchedule,
                 from: timeProvider.GetUtcNow(),
                 timeZoneInfo: timeProvider.LocalTimeZone // UTC or the time zone in WEBSITE_TIME_ZONE if specified
-            );
+            ) ?? throw new InvalidOperationException("No next occurrence for Cron schedule");
 
             // Fetch releases scheduled for publishing before or on the next run time
             var releasesToBeStaged = await releasePublishingStatusService
                 .GetScheduledReleasesForPublishingRelativeToDate(
                     DateComparison.BeforeOrOn,
-                    nextScheduledPublishingTime!.Value);
+                    nextScheduledPublishingTime);
 
             await QueueReleaseFilesAndContentTasks(releasesToBeStaged);
 
