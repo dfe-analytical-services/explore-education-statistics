@@ -511,8 +511,7 @@ Add text block with link to a featured table to accordion section
     user clicks element    id:featuredTablesSearch-option-0
     user clicks button    Insert    ${modal}
     user waits until modal is not visible    Insert featured table link
-    user clicks button    Save & close    ${block}
-    sleep    0.5
+    user saves autosaving text block    ${block}
     user waits until element contains link    ${block}    Test highlight name 2
 
 Add public prerelease access list again
@@ -658,7 +657,7 @@ Validate table column headings for featured table
 
 Validate table rows for featured table
     ${row}=    user gets row number with heading    Bolton 001
-    user checks table heading in offset row contains    ${row}    0    2    2009
+    user checks table heading in offset row contains    ${row}    0    3    2009
     user checks table heading in offset row contains    ${row}    1    1    2010
     user checks table heading in offset row contains    ${row}    2    1    2017
 
@@ -669,6 +668,7 @@ Validate table rows for featured table
     ${row}=    user gets row number with heading    Bolton 004
     user checks table heading in offset row contains    ${row}    0    2    2005
     user checks table heading in offset row contains    ${row}    1    1    2017
+
     user checks table cell in offset row contains    ${row}    0    1    8,557
     user checks table cell in offset row contains    ${row}    1    1    3,481
 
