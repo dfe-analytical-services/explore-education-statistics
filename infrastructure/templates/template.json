@@ -483,16 +483,16 @@
     },
     "publishReleasesCronSchedule": {
       "type": "string",
-      "defaultValue": "0 0 0 * * *",
+      "defaultValue": "0 5 0 * * *",
       "metadata": {
-        "description": "Cron string that is used to control the schedule of the Publish Releases Function in the Publisher App"
+        "description": "Cron string that is used to control the schedule of the StageScheduledReleases Function in the Publisher App"
       }
     },
     "publishReleaseContentCronSchedule": {
       "type": "string",
       "defaultValue": "0 30 9 * * *",
       "metadata": {
-        "description": "Cron string that is used to control the schedule of the Publish Release Content Function in the Publisher App"
+        "description": "Cron string that is used to control the schedule of the PublishScheduledReleases Function in the Publisher App"
       }
     },
     "preReleaseMinutesBeforeStart": {
