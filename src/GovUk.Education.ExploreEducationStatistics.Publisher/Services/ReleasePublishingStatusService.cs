@@ -77,8 +77,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 
             var publishDateFilter = comparison switch
             {
+                DateComparison.Before => CreateQueryFilter(status => status.Publish < referenceDate),
                 DateComparison.BeforeOrOn => CreateQueryFilter(status => status.Publish <= referenceDate),
                 DateComparison.After => CreateQueryFilter(status => status.Publish > referenceDate),
+                DateComparison.AfterOrOn => CreateQueryFilter(status => status.Publish >= referenceDate),
+                DateComparison.Equal => CreateQueryFilter(status => status.Publish == referenceDate),
+                DateComparison.NotEqual => CreateQueryFilter(status => status.Publish != referenceDate),
                 _ => throw new ArgumentOutOfRangeException(nameof(comparison), comparison, null)
             };
 
@@ -272,7 +276,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 
     public enum DateComparison
     {
+        Before,
         BeforeOrOn,
-        After
+        After,
+        AfterOrOn,
+        Equal,
+        NotEqual
     }
 }

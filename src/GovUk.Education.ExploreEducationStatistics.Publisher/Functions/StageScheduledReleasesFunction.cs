@@ -80,17 +80,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
 
             var releaseVersionIds = (await request.GetJsonBody<ManualTriggerRequest>())?.ReleaseVersionIds;
 
-            var utcNow = timeProvider.GetUtcNow();
-            var startOfToday = new DateTimeOffset(utcNow.Year, utcNow.Month, utcNow.Day, 0, 0, 0, TimeSpan.Zero);
-            var endOfToday = startOfToday.AddDays(1).AddTicks(-1);
+            var now = timeProvider.GetLocalNow();
+            var startOfToday = new DateTimeOffset(now.Year, now.Month, now.Day, 0, 0, 0, now.Offset);
 
             var releasesToBeStaged = releaseVersionIds?.Length > 0
                 ? await releasePublishingStatusService.GetScheduledReleasesForPublishingRelativeToDate(
-                    DateComparison.After,
+                    DateComparison.AfterOrOn,
                     startOfToday)
                 : await releasePublishingStatusService.GetScheduledReleasesForPublishingRelativeToDate(
-                    DateComparison.BeforeOrOn,
-                    endOfToday);
+                    DateComparison.Before,
+                    startOfToday.AddDays(1));
 
             var selectedReleasesToBeStaged = releaseVersionIds?.Length > 0
                 ? releasesToBeStaged

@@ -35,8 +35,12 @@ public abstract class ReleasePublishingStatusServiceTests
             var referenceDate = DateTimeOffset.Parse("2025-01-01T12:00:00Z");
             var expectedDateOperator = dateComparison switch
             {
+                DateComparison.Before => "lt",
                 DateComparison.BeforeOrOn => "le",
                 DateComparison.After => "gt",
+                DateComparison.AfterOrOn => "ge",
+                DateComparison.Equal => "eq",
+                DateComparison.NotEqual => "ne",
                 _ => throw new ArgumentOutOfRangeException(nameof(dateComparison), dateComparison, null)
             };
             var expectedFilter =
