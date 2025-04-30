@@ -1,5 +1,7 @@
 {
   "name": "index-1",
+  "analyzers": [],
+  "charFilters": [],
   "defaultScoringProfile": "scoring-profile-1",
   "fields": [
     {
@@ -271,14 +273,6 @@
       "functions": []
     }
   ],
-  "suggesters": [],
-  "analyzers": [],
-  "tokenizers": [],
-  "tokenFilters": [],
-  "charFilters": [],
-  "similarity": {
-    "@odata.type": "#Microsoft.Azure.Search.BM25Similarity"
-  },
   "semantic": {
     "configurations": [
       {
@@ -303,5 +297,10 @@
         }
       }
     ]
-  }
+  },
+  "similarity": {
+    "@odata.type": "#Microsoft.Azure.Search.BM25Similarity"
+  },
+  "tokenFilters": [],
+  "tokenizers": []
 }
