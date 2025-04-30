@@ -4,8 +4,8 @@
     "AzureWebJobsStorage": "UseDevelopmentStorage=true;DevelopmentStorageProxyUri=http://data-storage",
     "FUNCTIONS_WORKER_RUNTIME": "dotnet-isolated",
     "WEBSITE_TIME_ZONE": "Europe/London",
-    "App:PublishReleasesCronSchedule": "0 0-58/2 * * * *",
-    "App:PublishReleaseContentCronSchedule": "0 1-59/2 * * * *"
+    "App:StageScheduledReleasesFunctionCronSchedule": "0 0-58/2 * * * *",
+    "App:PublishScheduledReleasesFunctionCronSchedule": "0 1-59/2 * * * *"
   },
   "ConnectionStrings": {
     "ContentDb": "Server=db;Database=content;User=publisher;Password=Your_Password123;TrustServerCertificate=True;",

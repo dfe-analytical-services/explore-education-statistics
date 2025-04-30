@@ -338,7 +338,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
             // Publishing won't occur unless there's an occurrence of (1) between the publishing range
             var nextOccurrenceUtc = GetNextOccurrenceForCronExpression(
-                cronExpression: _options.PublishReleasesCronSchedule,
+                cronExpression: _options.StageScheduledReleasesFunctionCronSchedule,
                 fromUtc: fromUtc,
                 toUtc: toUtc,
                 timeZone: ukTimeZone);
@@ -347,7 +347,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             {
                 // Publishing won't occur unless there's an occurrence of (2) after (1) but before the end of the range
                 return GetNextOccurrenceForCronExpression(
-                    cronExpression: _options.PublishReleaseContentCronSchedule,
+                    cronExpression: _options.PublishScheduledReleasesFunctionCronSchedule,
                     fromUtc: nextOccurrenceUtc.Value,
                     toUtc: toUtc,
                     timeZone: ukTimeZone).HasValue;
