@@ -3,7 +3,7 @@
   "Values": {
     "AzureWebJobsStorage": "UseDevelopmentStorage=true;DevelopmentStorageProxyUri=http://data-storage",
     "FUNCTIONS_WORKER_RUNTIME": "dotnet-isolated",
-    "WEBSITE_TIME_ZONE": "GMT Standard Time",
+    "WEBSITE_TIME_ZONE": "Europe/London",
     "App:PublishReleasesCronSchedule": "0 0-58/2 * * * *",
     "App:PublishReleaseContentCronSchedule": "0 1-59/2 * * * *"
   },
