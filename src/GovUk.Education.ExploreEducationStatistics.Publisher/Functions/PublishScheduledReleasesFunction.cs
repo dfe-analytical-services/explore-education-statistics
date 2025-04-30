@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Publisher.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 using Microsoft.AspNetCore.Http;
@@ -28,25 +29,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
         /// <param name="timer"></param>
         /// <param name="context"></param>
         /// <returns></returns>
-        [Function("PublishStagedReleaseContent")]
+        [Function(nameof(PublishScheduledReleases))]
         public async Task PublishScheduledReleases(
             [TimerTrigger("%App:PublishReleaseContentCronSchedule%")] TimerInfo timer,
             FunctionContext context)
         {
             logger.LogInformation("{FunctionName} triggered", context.FunctionDefinition.Name);
 
-            var scheduledStagedReleases = await releasePublishingStatusService
-                .GetWherePublishingDueToday(
-                    content: ReleasePublishingStatusContentStage.Scheduled,
-                    files: ReleasePublishingStatusFilesStage.Complete,
-                    publishing: ReleasePublishingStatusPublishingStage.Scheduled);
+            var releasesReadyForPublishing =
+                await releasePublishingStatusService.GetScheduledReleasesReadyForPublishing();
 
-            await PublishScheduledReleases(scheduledStagedReleases);
+            await PublishScheduledReleases(releasesReadyForPublishing);
 
             logger.LogInformation(
                 "{FunctionName} completed. Published release versions [{ReleaseVersionIds}].",
                 context.FunctionDefinition.Name,
-                scheduledStagedReleases.Select(key => key.ReleaseVersionId).JoinToString(','));
+                releasesReadyForPublishing.ToReleaseVersionIdsString());
         }
 
         /// <summary>
@@ -63,7 +61,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
         /// </param>
         /// <param name="context"></param>
         /// <returns></returns>
-        [Function("PublishStagedReleaseVersionContentImmediately")]
+        [Function(nameof(PublishStagedReleaseVersionContentImmediately))]
         public async Task<ActionResult<ManualTriggerResponse>> PublishStagedReleaseVersionContentImmediately(
             [HttpTrigger(AuthorizationLevel.Anonymous, "post")] HttpRequest request,
             FunctionContext context)
@@ -72,26 +70,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
 
             var releaseVersionIds = (await request.GetJsonBody<ManualTriggerRequest>())?.ReleaseVersionIds;
 
-            var scheduled = releaseVersionIds?.Length > 0
-                ? await releasePublishingStatusService.GetWherePublishingDueTodayOrInFuture(
-                    releaseVersionIds,
-                    content: ReleasePublishingStatusContentStage.Scheduled,
-                    files: ReleasePublishingStatusFilesStage.Complete,
-                    publishing: ReleasePublishingStatusPublishingStage.Scheduled)
-                : await releasePublishingStatusService.GetWherePublishingDueToday(
-                    content: ReleasePublishingStatusContentStage.Scheduled,
-                    files: ReleasePublishingStatusFilesStage.Complete,
-                    publishing: ReleasePublishingStatusPublishingStage.Scheduled);
+            var releasesReadyForPublishing =
+                await releasePublishingStatusService.GetScheduledReleasesReadyForPublishing();
 
-            await PublishScheduledReleases(scheduled);
+            var selectedReleasesToPublish = releaseVersionIds?.Length > 0
+                ? releasesReadyForPublishing
+                    .Where(key => releaseVersionIds.Contains(key.ReleaseVersionId))
+                    .ToList()
+                : releasesReadyForPublishing;
 
-            var publishedReleaseVersionIds = scheduled.Select(key => key.ReleaseVersionId).ToArray();
+            await PublishScheduledReleases(selectedReleasesToPublish);
 
             logger.LogInformation("{FunctionName} completed. Published release versions [{ReleaseVersionIds}]",
                 context.FunctionDefinition.Name,
-                publishedReleaseVersionIds.JoinToString(','));
+                selectedReleasesToPublish.ToReleaseVersionIdsString());
 
-            return new ManualTriggerResponse(publishedReleaseVersionIds);
+            return new ManualTriggerResponse(selectedReleasesToPublish.ToReleaseVersionIds());
         }
 
         private async Task PublishScheduledReleases(IReadOnlyList<ReleasePublishingKey> scheduled)
