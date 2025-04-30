@@ -8,7 +8,8 @@ public static class CronExpressionUtil
 {
     /// <summary>
     /// Gets the next occurrence of a Cron expression from a starting point in time, in the specified time zone.
-    /// Wraps <see cref="CronExpression.GetNextOccurrence"/> to handle Cron expressions with potential second precision.
+    /// Wraps <see cref="CronExpression.GetNextOccurrence(DateTime, TimeZoneInfo, bool)"/> to handle Cron expressions
+    /// with potential second precision.
     /// </summary>
     /// <param name="cronExpression">The Cron expression to evaluate.</param>
     /// <param name="from">The starting point in time to calculate the next occurrence, which can be in any offset,
