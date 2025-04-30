@@ -47,11 +47,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
             try
             {
                 var nextScheduledPublishingTime = CronExpressionUtil.GetNextOccurrence(
-                    cronExpression: _appOptions.PublishReleaseContentCronSchedule,
+                    cronExpression: _appOptions.PublishScheduledReleasesFunctionCronSchedule,
                     from: now,
                     timeZone
                 ) ?? throw new CronNoFutureOccurrenceException(
-                    cronExpression: _appOptions.PublishReleaseContentCronSchedule,
+                    cronExpression: _appOptions.PublishScheduledReleasesFunctionCronSchedule,
                     from: now,
                     timeZone);
 

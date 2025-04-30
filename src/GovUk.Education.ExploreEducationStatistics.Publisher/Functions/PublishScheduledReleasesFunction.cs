@@ -31,7 +31,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
         /// <returns></returns>
         [Function(nameof(PublishScheduledReleases))]
         public async Task PublishScheduledReleases(
-            [TimerTrigger("%App:PublishReleaseContentCronSchedule%")] TimerInfo timer,
+            [TimerTrigger("%App:PublishScheduledReleasesFunctionCronSchedule%")] TimerInfo timer,
             FunctionContext context)
         {
             logger.LogInformation("{FunctionName} triggered", context.FunctionDefinition.Name);

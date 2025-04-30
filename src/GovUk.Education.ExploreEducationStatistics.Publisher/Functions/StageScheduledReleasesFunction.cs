@@ -36,7 +36,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
         /// <param name="context"></param>
         [Function(nameof(StageScheduledReleases))]
         public async Task StageScheduledReleases(
-            [TimerTrigger("%App:PublishReleasesCronSchedule%")] TimerInfo timer,
+            [TimerTrigger("%App:StageScheduledReleasesFunctionCronSchedule%")] TimerInfo timer,
             FunctionContext context)
         {
             logger.LogInformation("{FunctionName} triggered", context.FunctionDefinition.Name);
@@ -46,11 +46,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
 
             // Get the next scheduled publishing time using the cron expression of the PublishScheduledReleases function
             var nextScheduledPublishingTime = CronExpressionUtil.GetNextOccurrence(
-                cronExpression: _appOptions.PublishReleaseContentCronSchedule,
+                cronExpression: _appOptions.PublishScheduledReleasesFunctionCronSchedule,
                 from: now,
                 timeZone
             ) ?? throw new CronNoFutureOccurrenceException(
-                cronExpression: _appOptions.PublishReleaseContentCronSchedule,
+                cronExpression: _appOptions.PublishScheduledReleasesFunctionCronSchedule,
                 from: now,
                 timeZone);
 
