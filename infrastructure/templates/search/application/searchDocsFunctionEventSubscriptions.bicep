@@ -18,6 +18,11 @@ var eventGridCustomTopicSubscriptions = [
     topicName: eventTopics.publicationChanged
     subscriptions: [
       {
+        name: 'publication-archived'
+        includedEventTypes: ['publication-archived']
+        queueName: storageQueueNames.publicationArchived
+      }
+      {
         name: 'publication-changed'
         includedEventTypes: ['publication-changed']
         queueName: storageQueueNames.publicationChanged
