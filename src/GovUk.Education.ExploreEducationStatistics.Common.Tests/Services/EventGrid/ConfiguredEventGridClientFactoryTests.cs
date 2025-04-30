@@ -10,7 +10,7 @@ public class ConfiguredEventGridClientFactoryTests
 {
     private readonly EventGridClientFactoryMockBuilder _eventGridClientFactory = new();
     private readonly EventGridOptionsBuilder _eventGridOptions = new();
-    private readonly ILogger<ConfiguredEventGridClientFactory> _logger = new NullLogger<ConfiguredEventGridClientFactory>();
+    private readonly ILogger<ConfiguredEventGridClientFactory> _logger = NullLogger<ConfiguredEventGridClientFactory>.Instance;
 
     private ConfiguredEventGridClientFactory GetSut() => new(
             _eventGridClientFactory.Build(),

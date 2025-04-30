@@ -14,6 +14,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Cache;
 
@@ -77,6 +78,32 @@ public class PublicationCacheService : IPublicationCacheService
         return _publicationService.GetPublicationTree();
     }
 
+    /// <summary>
+    /// Invalidate all Publications in the cache for the specified Theme
+    /// </summary>
+    public Task<Either<ActionResult, Unit>> InvalidatePublicationsByTheme(Guid themeId)
+    {
+        return _publicationService
+            .ListPublications(themeId: themeId, pageSize: int.MaxValue)
+            .OnSuccessVoid(publications =>
+                publications
+                    .Results
+                    .Select(publication => InvalidatePublicationSafe(publication.Slug))
+                    .OnSuccessAllReturnVoid());
+    }
+
+    /// <summary>
+    /// Invalidates the Publication in the cache. Errors are logged and not returned.
+    /// </summary>
+    private Task<Either<Unit, Unit>> InvalidatePublicationSafe(string publicationSlug) =>
+        UpdatePublication(publicationSlug)
+            .OnFailureVoid(
+                result => _logger.LogWarning(
+                    "Failed to invalidate cache for Publication {PublicationSlug}. Reason: {Result}",
+                    publicationSlug,
+                    result))
+            .OnSuccessVoid();
+    
     [BlobCache(typeof(PublicationTreeCacheKey), ServiceName = "public")]
     private Task<IList<PublicationTreeThemeViewModel>> GetFullPublicationTree()
     {

@@ -313,7 +313,7 @@ public abstract class ReleasePublishingStatusServiceTests
     {
         return new ReleasePublishingStatusService(
             contentDbContext ?? Mock.Of<ContentDbContext>(),
-            new NullLogger<ReleasePublishingStatusService>(),
+            NullLogger<ReleasePublishingStatusService>.Instance,
             publisherTableStorageService ?? Mock.Of<IPublisherTableStorageService>(MockBehavior.Strict)
         );
     }

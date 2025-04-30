@@ -11,7 +11,11 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Common.Cache.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Content.Services.Tests.Builders;
+using Org.BouncyCastle.Bcpg;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
@@ -396,6 +400,95 @@ public class PublicationCacheServiceTests : CacheServiceTestFixture
 
         var converted = DeserializeObject<PublicationTreeThemeViewModel>(SerializeObject(publicationTree));
         converted.AssertDeepEqualTo(publicationTree);
+    }
+
+    [Fact]
+    public async Task GivenThemeWithPublications_WhenInvalidatePublicationsByTheme_ThenShouldUpdateAllPublicationsForTheme()
+    {
+        // ARRANGE
+        var themeId = Guid.NewGuid();
+        var publicationService = new PublicationServiceMockBuilder();
+        
+        string[] themePublicationSlugs =
+            [
+                "publication-for-theme-1",
+                "publication-for-theme-2",
+                "publication-for-theme-3"
+            ];
+
+        // Setup the search results to return the publications for the theme
+        publicationService
+            .WhereListPublicationsReturns(
+                themePublicationSlugs
+                    .Select(slug => new PublicationSearchResultViewModelBuilder().WithSlug(slug).Build()));
+
+        // Setup each publication viewmodel returned on Get. These are the values that should get cached.
+        var publicationVMs = themePublicationSlugs
+            .Select(slug => new PublicationCacheViewModel { Slug = slug })
+            .ToArray();
+        foreach (var publicationVM in publicationVMs)
+        {
+            publicationService.WhereGetPublicationReturns(publicationVM);
+        }
+
+        // Setup call for adding items to the Cache service
+        PublicBlobCacheService
+            .Setup(s => s.SetItemAsync(It.IsAny<IBlobCacheKey>(), It.IsAny<object>()))
+            .Returns(Task.CompletedTask);
+        
+        // Our SUT
+        var service = BuildService(
+            publicationService: publicationService.Build()
+            );
+
+        // ACT
+        var result = await service.InvalidatePublicationsByTheme(themeId);
+
+        // ASSERT
+        result.AssertRight();
+        Assert.All(publicationVMs,
+            expected =>
+            {
+                // Verify all viewmodels were refreshed in cache
+                PublicBlobCacheService
+                    .Verify(
+                        s => s.SetItemAsync(
+                            It.Is<IBlobCacheKey>(actual => new PublicationCacheKey(expected.Slug).Equals(actual)),
+                            It.Is<object>(actual => ((PublicationCacheViewModel)actual) == expected)),
+                        Times.Once
+                        );
+            });
+        publicationService.Assert.SearchWasFor(themeId);
+    }
+    
+    [Fact]
+    public async Task GivenThemeWithNoPublications_WhenInvalidatePublicationsByTheme_ThenDoesNothing()
+    {
+        // ARRANGE
+        var themeId = Guid.NewGuid();
+        var publicationService = new PublicationServiceMockBuilder();
+        
+        // Setup the search results to return the publications for the theme
+        publicationService
+            .WhereListPublicationsReturnsNoResults();
+
+        // Our SUT
+        var service = BuildService(
+            publicationService: publicationService.Build()
+            );
+
+        // ACT
+        var result = await service.InvalidatePublicationsByTheme(themeId);
+
+        // ASSERT
+        result.AssertRight();
+        
+        // Verify nothing refreshed in cache
+        PublicBlobCacheService
+            .Verify(
+                s => s.SetItemAsync(It.IsAny<IBlobCacheKey>(), It.IsAny<object>()),
+                Times.Never());
+        
     }
 
     private async Task AssertPublicationTreeUnfiltered(
