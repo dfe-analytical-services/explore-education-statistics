@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
+using GovUk.Education.ExploreEducationStatistics.Publisher.Exceptions;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Options;
@@ -37,14 +38,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
             logger.LogInformation("{FunctionName} triggered: {Message}",
                 context.FunctionDefinition.Name,
                 message);
+
             await UpdateContentStage(message, Started);
+
+            var now = timeProvider.GetUtcNow();
+            var timeZone = timeProvider.LocalTimeZone; // UTC or the time zone in WEBSITE_TIME_ZONE if specified
+
             try
             {
                 var nextScheduledPublishingTime = CronExpressionUtil.GetNextOccurrence(
                     cronExpression: _appOptions.PublishReleaseContentCronSchedule,
-                    from: timeProvider.GetUtcNow(),
-                    timeZoneInfo: timeProvider.LocalTimeZone // UTC or the value in WEBSITE_TIME_ZONE if specified
-                ) ?? throw new InvalidOperationException("No next occurrence for Cron schedule");
+                    from: now,
+                    timeZone
+                ) ?? throw new CronNoFutureOccurrenceException(
+                    cronExpression: _appOptions.PublishReleaseContentCronSchedule,
+                    from: now,
+                    timeZone);
 
                 await contentService.UpdateContentStaged(
                     expectedPublishDate: nextScheduledPublishingTime.UtcDateTime,

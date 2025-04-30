@@ -13,19 +13,19 @@ public static class CronExpressionUtil
     /// <param name="cronExpression">The Cron expression to evaluate.</param>
     /// <param name="from">The starting point in time to calculate the next occurrence, which can be in any offset,
     /// not necessarily the offset of the given time zone.</param>
-    /// <param name="timeZoneInfo">The time zone which the next occurrence should be evaluated in.</param>
+    /// <param name="timeZone">The time zone which the next occurrence should be evaluated in.</param>
     /// <returns>
     /// The next occurrence of the Cron expression as a <see cref="DateTimeOffset"/>, or <c>null</c> if no future occurrence exists.
     /// </returns>
     public static DateTimeOffset? GetNextOccurrence(
         string cronExpression,
         DateTimeOffset from,
-        TimeZoneInfo timeZoneInfo)
+        TimeZoneInfo timeZone)
     {
         var expression = CronExpression.Parse(cronExpression,
             CronExpressionHasSecondPrecision(cronExpression) ? CronFormat.IncludeSeconds : CronFormat.Standard);
 
-        return expression.GetNextOccurrence(from, timeZoneInfo);
+        return expression.GetNextOccurrence(from, timeZone);
     }
 
     /// <summary>
