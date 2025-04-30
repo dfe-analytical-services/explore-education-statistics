@@ -585,9 +585,12 @@
         "description": "Maximum number of table cells that a table builder query could potentially render for a request to be valid"
       }
     },
-    "timeZone": {
+    "publisherFunctionAppTimeZone": {
       "type": "string",
-      "defaultValue": "GMT Standard Time"
+      "defaultValue": "Europe/London",
+      "metadata": {
+        "description": "The time zone of the Publisher Function App. This time zone is used for evaluating Cron expressions of the functions running with Cron triggers and altering it will change the time of execution of these functions."
+      }
     },
     "branch": {
       "type": "string",
@@ -3366,7 +3369,7 @@
         "AzureWebJobs.StageScheduledReleaseVersionsImmediately.Disabled": "[not(parameters('immediatePublicationOfScheduledReleaseVersionsEnabled'))]",
         "AzureWebJobs.PublishStagedReleaseVersionContentImmediately.Disabled": "[not(parameters('immediatePublicationOfScheduledReleaseVersionsEnabled'))]",
         "WEBSITE_CONTENTOVERVNET": "1",
-        "WEBSITE_TIME_ZONE": "[parameters('timeZone')]",
+        "WEBSITE_TIME_ZONE": "[parameters('publisherFunctionAppTimeZone')]",
         "WEBSITE_RUN_FROM_PACKAGE": "1",
         "FUNCTIONS_EXTENSION_VERSION": "~4",
         "FUNCTIONS_WORKER_RUNTIME": "dotnet-isolated",
