@@ -32,7 +32,7 @@ public class OnPublicationArchivedFunctionTests
     [InlineData("")]
     public async Task GivenEvent_WhenPayloadDoesNotContainSlug_ThenNothingIsReturned(string? blankSlug)
     {
-        var payload = new PublicationArchivedEventDto { Slug = blankSlug };
+        var payload = new PublicationArchivedEventDto { PublicationSlug = blankSlug };
         var eventGridEvent = new EventGridEventBuilder().WithPayload(payload).Build();
 
         var response = await GetSut().OnPublicationArchived(eventGridEvent, new FunctionContextMockBuilder().Build());
