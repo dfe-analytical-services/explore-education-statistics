@@ -341,7 +341,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 cronExpression: _options.PublishReleasesCronSchedule,
                 fromUtc: fromUtc,
                 toUtc: toUtc,
-                timeZoneInfo: ukTimeZone);
+                timeZone: ukTimeZone);
 
             if (nextOccurrenceUtc.HasValue)
             {
@@ -350,7 +350,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     cronExpression: _options.PublishReleaseContentCronSchedule,
                     fromUtc: nextOccurrenceUtc.Value,
                     toUtc: toUtc,
-                    timeZoneInfo: ukTimeZone).HasValue;
+                    timeZone: ukTimeZone).HasValue;
             }
 
             return false;
@@ -360,7 +360,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             string cronExpression,
             DateTime fromUtc,
             DateTime toUtc,
-            TimeZoneInfo timeZoneInfo,
+            TimeZoneInfo timeZone,
             bool fromInclusive = true,
             bool toInclusive = true)
         {
@@ -369,7 +369,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             var expression = CronExpression.Parse(cronExpression,
                 CronExpressionHasSecondPrecision(cronExpression) ? CronFormat.IncludeSeconds : CronFormat.Standard);
 
-            var occurrences = expression.GetOccurrences(fromUtc, toUtc, timeZoneInfo, fromInclusive, toInclusive)
+            var occurrences = expression.GetOccurrences(fromUtc, toUtc, timeZone, fromInclusive, toInclusive)
                 .ToList();
             return occurrences.Any() ? occurrences[0] : null;
         }

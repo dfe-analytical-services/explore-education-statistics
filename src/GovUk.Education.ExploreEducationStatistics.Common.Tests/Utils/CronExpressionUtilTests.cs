@@ -27,96 +27,50 @@ public abstract class CronExpressionUtilTests(ITestOutputHelper output)
 
     public class GetNextOccurrenceTests(ITestOutputHelper output) : CronExpressionUtilTests(output)
     {
-        private readonly TimeZoneInfo _ukTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Europe/London");
-
         [Theory]
         [MemberData(nameof(CronExpressionUtilTestsTheoryData.UtcTimeZoneTestData),
             MemberType = typeof(CronExpressionUtilTestsTheoryData))]
-        public void GetNextOccurrence_ReturnsExpectedResult_ForUtcTimezone_FromIsUtc(
-            string from,
-            string expectedNextOccurrence,
-            string cronExpression,
-            string significance)
-        {
-            var (parsedFrom, parsedExpectedNextOccurrence) =
-                CronExpressionUtilTestsTheoryData.ParseTheoryData(from, expectedNextOccurrence);
-
-            // Convert from into UTC if it is not already
-            var fromDateTimeOffsetUtc = parsedFrom.ToUniversalTime();
-
-            AssertNextOccurrence(
-                cronExpression,
-                from: fromDateTimeOffsetUtc,
-                expectedNextOccurrence: parsedExpectedNextOccurrence,
-                timeZoneInfo: TimeZoneInfo.Utc,
-                significance);
-        }
-
-        [Theory]
         [MemberData(nameof(CronExpressionUtilTestsTheoryData.UkTimeZoneTestData),
             MemberType = typeof(CronExpressionUtilTestsTheoryData))]
-        public void GetNextOccurrence_ReturnsExpectedResult_ForUkTimezone_FromIsUtc(
-            string from,
-            string expectedNextOccurrence,
+        public void GetNextOccurrence_ReturnsExpectedResult(
+            DateTimeOffset from,
+            DateTimeOffset expectedNextOccurrence,
             string cronExpression,
+            TimeZoneInfo timezone,
             string significance)
         {
-            var (parsedFrom, parsedExpectedNextOccurrence) =
-                CronExpressionUtilTestsTheoryData.ParseTheoryData(from, expectedNextOccurrence);
+            Print($"Cron expression: '{cronExpression}'\n" +
+                  $"From: {from}\n" +
+                  $"Significance: '{significance}'\n" +
+                  $"Time zone the next occurrence should be evaluated in: {timezone.Id}\n" +
+                  $"Expected next occurrence: {expectedNextOccurrence}");
 
-            // Convert from into UTC if it is not already
-            var fromUtc = parsedFrom.ToUniversalTime();
+            var result = CronExpressionUtil.GetNextOccurrence(cronExpression, from, timezone);
 
-            AssertNextOccurrence(
-                cronExpression,
-                from: fromUtc,
-                expectedNextOccurrence: parsedExpectedNextOccurrence,
-                timeZoneInfo: _ukTimeZone,
-                significance);
-        }
-
-        [Theory]
-        [MemberData(nameof(CronExpressionUtilTestsTheoryData.UkTimeZoneTestData),
-            MemberType = typeof(CronExpressionUtilTestsTheoryData))]
-        public void GetNextOccurrence_ReturnsExpectedResult_ForUkTimezone_FromIsUkTime(
-            string from,
-            string expectedNextOccurrence,
-            string cronExpression,
-            string significance)
-        {
-            var (parsedFrom, parsedExpectedNextOccurrence) =
-                CronExpressionUtilTestsTheoryData.ParseTheoryData(from, expectedNextOccurrence);
-
-            // Convert from into UK time if it is not already
-            var fromUkTime = TimeZoneInfo.ConvertTime(parsedFrom, _ukTimeZone);
-
-            AssertNextOccurrence(
-                cronExpression,
-                from: fromUkTime,
-                expectedNextOccurrence: parsedExpectedNextOccurrence,
-                timeZoneInfo: _ukTimeZone,
-                significance);
+            Assert.NotNull(result);
+            Assert.Equal(expectedNextOccurrence, result.Value);
         }
 
         [Fact]
         public void GetNextOccurrence_HandlesCronExpressionWithSecondPrecision()
         {
             const string cronExpression = "0 30 9 * * *"; // At 09:30:00 every day
+            var from = DateTimeOffset.Parse("2025-01-01T09:30:00 +00:00");
+            var expectedNextOccurrence = DateTimeOffset.Parse("2025-01-02T09:30:00 +00:00");
 
-            AssertNextOccurrence(
-                cronExpression,
-                from: DateTimeOffset.Parse("2025-01-01T17:00:00Z"),
-                expectedNextOccurrence: DateTimeOffset.Parse("2025-01-02T09:30:00Z"),
-                timeZoneInfo: TimeZoneInfo.Utc);
+            var nextOccurrence = CronExpressionUtil.GetNextOccurrence(cronExpression, from, TimeZoneInfo.Utc);
+
+            Assert.Equal(expectedNextOccurrence, nextOccurrence);
         }
 
         [Fact]
         public void GetNextOccurrence_ReturnsNull_ForCronExpressionWithNoNextOccurrence()
         {
             const string cronExpression = "0 0 30 2 *"; // 30th of February is unreachable
-            var from = DateTimeOffset.Parse("2025-01-01T12:00:00Z");
+            var from = DateTimeOffset.Parse("2025-01-01T12:00:00 +00:00");
 
             var result = CronExpressionUtil.GetNextOccurrence(cronExpression, from, TimeZoneInfo.Utc);
+
             Assert.Null(result);
         }
 
@@ -128,27 +82,6 @@ public abstract class CronExpressionUtilTests(ITestOutputHelper output)
 
             Assert.Throws<Cronos.CronFormatException>(() =>
                 CronExpressionUtil.GetNextOccurrence(cronExpression, from, TimeZoneInfo.Utc));
-        }
-
-        private void AssertNextOccurrence(
-            string cronExpression,
-            DateTimeOffset from,
-            DateTimeOffset expectedNextOccurrence,
-            TimeZoneInfo timeZoneInfo,
-            string? significance = null)
-        {
-            Print($"Cron expression: '{cronExpression}'\n" +
-                  $"From: {from}\n" +
-                  (significance != null ? $"Significance: '{significance}'\n" : "") +
-                  $"Time zone: {timeZoneInfo.Id}\n" +
-                  $"Expected next occurrence: {expectedNextOccurrence}");
-
-            var result = CronExpressionUtil.GetNextOccurrence(cronExpression, from, timeZoneInfo);
-
-            Assert.NotNull(result);
-            // There's no need to convert the expected and actual values to use the same offset.
-            // Assert.Equal compares expected and actual values accounting for their respective offsets.
-            Assert.Equal(expectedNextOccurrence, result.Value);
         }
     }
 }
