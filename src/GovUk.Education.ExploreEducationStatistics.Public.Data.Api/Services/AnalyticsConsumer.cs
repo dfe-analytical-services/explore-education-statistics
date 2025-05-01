@@ -2,10 +2,10 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services.Interf
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services;
 
-public class QueryAnalyticsConsumer(
+public class AnalyticsConsumer(
     IAnalyticsManager manager,
     IAnalyticsWriter analyticsWriter,
-    ILogger<QueryAnalyticsConsumer> logger) : BackgroundService
+    ILogger<AnalyticsConsumer> logger) : BackgroundService
 {
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {

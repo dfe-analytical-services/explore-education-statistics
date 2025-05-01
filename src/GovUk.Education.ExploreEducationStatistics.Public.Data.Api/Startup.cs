@@ -257,7 +257,7 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
         {
             services.AddSingleton<IAnalyticsManager, AnalyticsManager>();
             services.AddSingleton<IAnalyticsWriter, AnalyticsWriter>();
-            services.AddHostedService<QueryAnalyticsConsumer>();
+            services.AddHostedService<AnalyticsConsumer>();
 
             if (hostEnvironment.IsDevelopment())
             {
