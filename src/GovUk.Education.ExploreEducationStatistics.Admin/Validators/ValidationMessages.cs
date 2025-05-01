@@ -107,12 +107,12 @@ public static class ValidationMessages
         Message: "The file provided '{0}' must be a CSV file."
     );
 
-    public static ErrorViewModel GenerateErrorMustBeCsvFile(string fullFilename)
+    public static ErrorViewModel GenerateErrorMustBeCsvFile(string fullFileName)
     {
         return new ErrorViewModel
         {
             Code = MustBeCsvFile.Code,
-            Message = string.Format(MustBeCsvFile.Message, fullFilename),
+            Message = string.Format(MustBeCsvFile.Message, fullFileName),
         };
     }
 
@@ -163,12 +163,12 @@ public static class ValidationMessages
         Message: "Failed to find file '{0}' of type {1} in ZIP file."
     );
 
-    public static ErrorViewModel GenerateErrorFileNotFoundInZip(string fullFilename, FileType type)
+    public static ErrorViewModel GenerateErrorFileNotFoundInZip(string fullFileName, FileType type)
     {
         return new ErrorViewModel
         {
             Code = FileNotFoundInZip.Code,
-            Message = string.Format(FileNotFoundInZip.Message, fullFilename, type.ToString()),
+            Message = string.Format(FileNotFoundInZip.Message, fullFileName, type.ToString()),
         };
     }
 
@@ -186,8 +186,8 @@ public static class ValidationMessages
         };
     }
 
-    public static readonly LocalizableMessage DataSetNamesCsvFilenamesShouldBeUnique = new(
-        Code: nameof(DataSetNamesCsvFilenamesShouldBeUnique),
+    public static readonly LocalizableMessage DataSetNamesCsvFileNamesShouldBeUnique = new(
+        Code: nameof(DataSetNamesCsvFileNamesShouldBeUnique),
         Message: "In dataset_names.csv, all file names should be unique. Duplicate file name: '{0}'."
     );
 
@@ -195,8 +195,8 @@ public static class ValidationMessages
     {
         return new ErrorViewModel
         {
-            Code = DataSetNamesCsvFilenamesShouldBeUnique.Code,
-            Message = string.Format(DataSetNamesCsvFilenamesShouldBeUnique.Message, duplicate),
+            Code = DataSetNamesCsvFileNamesShouldBeUnique.Code,
+            Message = string.Format(DataSetNamesCsvFileNamesShouldBeUnique.Message, duplicate),
         };
     }
 
@@ -244,17 +244,17 @@ public static class ValidationMessages
         };
     }
 
-    public static readonly LocalizableMessage FilenameTooLong = new(
-        Code: nameof(FilenameTooLong),
-        Message: "Filename '{0}' is too long. Should be at most {1} characters."
+    public static readonly LocalizableMessage FileNameLengthInvalid = new(
+        Code: nameof(FileNameLengthInvalid),
+        Message: "File name '{0}' should be greater than 0 characters in length, and less than {1}."
     );
 
     public static ErrorViewModel GenerateErrorFilenameTooLong(string fullFileName, int maxLength)
     {
         return new ErrorViewModel
         {
-            Code = FilenameTooLong.Code,
-            Message = string.Format(FilenameTooLong.Message, fullFileName, maxLength),
+            Code = FileNameLengthInvalid.Code,
+            Message = string.Format(FileNameLengthInvalid.Message, fullFileName, maxLength),
         };
     }
 
@@ -263,12 +263,12 @@ public static class ValidationMessages
         Message: "ZIP file contains unused files: {0}"
     );
 
-    public static ErrorViewModel GenerateErrorZipContainsUnusedFiles(List<string> unusedFilenames)
+    public static ErrorViewModel GenerateErrorZipContainsUnusedFiles(List<string> unusedFileNames)
     {
         return new ErrorViewModel
         {
             Code = ZipContainsUnusedFiles.Code,
-            Message = string.Format(ZipContainsUnusedFiles.Message, unusedFilenames.JoinToString(",")),
+            Message = string.Format(ZipContainsUnusedFiles.Message, unusedFileNames.JoinToString(",")),
         };
     }
 

@@ -42,7 +42,7 @@ public static class FileValidators
         return ruleBuilder
             // TODO: Add "{FileName}" placeholder, {PropertyName}/{PropertyValue} output unsuitable
             .Must(file => FileNameValidators.MeetsLengthRequirements(file.FileName))
-                .WithMessage(ValidationMessages.FilenameTooLong, "{PropertyValue}", FileNameValidators.MaxFileNameSize.ToString())
+                .WithMessage(ValidationMessages.FileNameLengthInvalid, "{PropertyValue}", FileNameValidators.MaxFileNameSize.ToString())
             .Must(file => FileNameValidators.DoesNotContainSpaces(file.FileName))
                 .WithMessage(ValidationMessages.FileNameCannotContainSpaces, "{PropertyValue}")
             .Must(file => FileNameValidators.DoesNotContainSpecialChars(file.FileName))

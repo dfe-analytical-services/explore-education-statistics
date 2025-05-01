@@ -55,7 +55,7 @@ const fileErrorMappings = {
     'FileNameCannotContainSpecialCharacters',
   FileNameMustEndDotCsv: 'FileNameMustEndDotCsv',
   MetaFileNameMustEndDotMetaDotCsv: 'MetaFileNameMustEndDotMetaDotCsv',
-  FileNameTooLong: 'FileNameTooLong',
+  FileNameLengthInvalid: 'FileNameLengthInvalid',
   FileNameNotUnique: 'FileNameNotUnique',
   FileSizeMustNotBeZero: 'FileSizeMustNotBeZero',
   MustBeCsvFile: 'MustBeCsvFile',
@@ -79,8 +79,8 @@ function baseErrorMappings(
           DataSetNamesCsvIncorrectHeaders: 'DataSetNamesCsvIncorrectHeaders',
           DataSetNamesCsvFilenamesShouldNotEndDotCsv:
             'DataSetNamesCsvFilenamesShouldNotEndDotCsv',
-          DataSetNamesCsvFilenamesShouldBeUnique:
-            'DataSetNamesCsvFilenamesShouldBeUnique',
+          DataSetNamesCsvFileNamesShouldBeUnique:
+            'DataSetNamesCsvFileNamesShouldBeUnique',
           FileNotFoundInZip: 'FileNotFoundInZip',
           ZipContainsUnusedFiles: 'ZipContainsUnusedFiles',
           DataReplacementAlreadyInProgress:
