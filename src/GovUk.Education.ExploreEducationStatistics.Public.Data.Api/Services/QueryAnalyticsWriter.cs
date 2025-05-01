@@ -48,14 +48,3 @@ public class QueryAnalyticsWriter(
         }
     }
 }
-
-public record CaptureDataSetVersionQueryRequest(
-    Guid DataSetId,
-    Guid DataSetVersionId,
-    string DataSetVersion,
-    string DataSetTitle,
-    int ResultsCount,
-    int TotalRowsCount,
-    DateTime StartTime,
-    DateTime EndTime,
-    DataSetQueryRequest Query);
