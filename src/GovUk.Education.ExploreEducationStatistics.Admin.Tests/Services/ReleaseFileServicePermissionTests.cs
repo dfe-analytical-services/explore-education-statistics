@@ -226,7 +226,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             IPersistenceHelper<ContentDbContext>? contentPersistenceHelper = null,
             IPrivateBlobStorageService? privateBlobStorageService = null,
             IFileRepository? fileRepository = null,
-            IAncillaryFileValidatorService? ancillaryFileValidatorService = null,
+            IFileValidatorService? ancillaryFileValidatorService = null,
             IReleaseFileRepository? releaseFileRepository = null,
             IDataGuidanceFileWriter? dataGuidanceFileWriter = null,
             IUserService? userService = null)
@@ -236,7 +236,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 contentPersistenceHelper ?? DefaultPersistenceHelperMock().Object,
                 privateBlobStorageService ?? Mock.Of<IPrivateBlobStorageService>(),
                 fileRepository ?? new FileRepository(contentDbContext),
-                ancillaryFileValidatorService ?? Mock.Of<IAncillaryFileValidatorService>(),
+                ancillaryFileValidatorService ?? Mock.Of<IFileValidatorService>(),
                 releaseFileRepository ?? new ReleaseFileRepository(contentDbContext),
                 dataGuidanceFileWriter ?? Mock.Of<IDataGuidanceFileWriter>(),
                 userService ?? Mock.Of<IUserService>()

@@ -29,7 +29,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
         private readonly ContentDbContext _contentDbContext;
         private readonly IPersistenceHelper<ContentDbContext> _persistenceHelper;
         private readonly IPrivateBlobStorageService _privateBlobStorageService;
-        private readonly IAncillaryFileValidatorService _ancillaryFileValidatorService;
+        private readonly IFileValidatorService _ancillaryFileValidatorService;
         private readonly IFileRepository _fileRepository;
         private readonly IMethodologyFileRepository _methodologyFileRepository;
         private readonly IUserService _userService;
@@ -37,7 +37,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
         public MethodologyImageService(ContentDbContext contentDbContext,
             IPersistenceHelper<ContentDbContext> persistenceHelper,
             IPrivateBlobStorageService privateBlobStorageService,
-            IAncillaryFileValidatorService ancillaryFileValidatorService,
+            IFileValidatorService ancillaryFileValidatorService,
             IFileRepository fileRepository,
             IMethodologyFileRepository methodologyFileRepository,
             IUserService userService)

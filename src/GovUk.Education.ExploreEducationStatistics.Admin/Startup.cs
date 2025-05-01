@@ -597,7 +597,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<IUserRepository, UserRepository>();
             services.AddTransient<IUserInviteRepository, UserInviteRepository>();
             services.AddTransient<IDataSetValidator, DataSetValidator>();
-            services.AddTransient<IAncillaryFileValidatorService, AncillaryFileValidatorService>();
+            services.AddTransient<IFileValidatorService, FileValidatorService>();
             services.AddTransient<IReleaseFileBlobService, PrivateReleaseFileBlobService>();
             services.AddTransient<IPrivateBlobStorageService, PrivateBlobStorageService>(provider =>
                 new PrivateBlobStorageService(configuration.GetValue<string>("CoreStorage"),
