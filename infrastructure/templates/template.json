@@ -1615,7 +1615,7 @@
           "accountName": "[variables('analyticsStorageAccountName')]",
           "accessKey": "[listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('analyticsStorageAccountName')), '2018-02-01').keys[0].value]",
           "shareName": "[variables('analyticsFileShareName')]",
-          "mountPath": "[variables('analyticsFileShareMountPath')]",
+          "mountPath": "[parameters('analyticsFileShareMountPath')]",
           "protocol": "Smb"
         }
       }
