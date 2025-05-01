@@ -587,9 +587,9 @@
     },
     "publisherFunctionAppTimeZone": {
       "type": "string",
-      "defaultValue": "Europe/London",
+      "defaultValue": "GMT Standard Time",
       "metadata": {
-        "description": "The time zone of the Publisher Function App. This time zone is used for evaluating Cron expressions of the functions running with Cron triggers and altering it will change the time of execution of these functions."
+        "description": "The time zone of the Publisher Function App. This time zone is used for evaluating Cron expressions of the functions running with Cron triggers and altering it will change the time of execution of these functions. The name of this time zone depends on the operating system and plan on which the function app runs."
       }
     },
     "branch": {
