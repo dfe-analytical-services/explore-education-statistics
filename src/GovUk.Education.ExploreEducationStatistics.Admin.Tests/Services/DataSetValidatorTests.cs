@@ -477,6 +477,32 @@ public class DataSetValidatorTests
     }
 
     [Fact]
+    public async Task ValidateBulkDataZipIndexFile_ReferencedFilesNotFoundInZipFile_ReturnsErrorDetails()
+    {
+        // Arrange
+        var releaseVersion = new ReleaseVersion
+        {
+            Id = Guid.NewGuid(),
+        };
+
+        var indexFile = await new DataSetFileBuilder()
+            .WhereFileNameIs("dataset_names-invalid-unused-files.csv")
+            .Build(FileType.BulkDataZipIndex);
+
+        await using var context = InMemoryContentDbContext();
+        var sut = BuildService(context);
+
+        // Act
+        var result = await sut.ValidateBulkDataZipIndexFile(releaseVersion.Id, indexFile, []);
+
+        // Assert
+        var errors = result.AssertLeft();
+        Assert.Equal(2, errors.Count);
+        Assert.Equal(ValidationMessages.FileNotFoundInZip.Code, errors[0].Code);
+        Assert.Equal(ValidationMessages.FileNotFoundInZip.Code, errors[1].Code);
+    }
+
+    [Fact]
     public async Task ValidateBulkDataZipIndexFile_UnusedFiles_ReturnsErrorDetails()
     {
         // Arrange

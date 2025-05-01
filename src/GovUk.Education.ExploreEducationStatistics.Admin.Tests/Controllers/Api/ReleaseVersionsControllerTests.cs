@@ -1303,6 +1303,32 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             }
 
             [Fact]
+            public async Task UploadDataSetAsBulkZip_IndexFileMissing_ReturnsValidationProblems()
+            {
+                // Arrange
+                Publication publication = DataFixture.DefaultPublication()
+                    .WithReleases(
+                        [
+                            DataFixture
+                                .DefaultRelease(publishedVersions: 0, draftVersion: true, year: 2020)
+                                .WithTimePeriodCoverage(TimeIdentifier.AcademicYear)
+                                .WithLabel(null)
+                        ]);
+
+                await TestApp.AddTestData<ContentDbContext>(context => context.Publications.Add(publication));
+
+                // Act
+                var response = await UploadDataSetAsBulkZip(
+                    releaseVersionId: publication.Releases[0].Versions[0].Id,
+                    fileName: "bulk-data-zip-invalid-no-datasetnames-csv.zip");
+
+                // Assert
+                var validationProblem = response.AssertValidationProblem();
+
+                Assert.Equal("For bulk imports, the ZIP must include dataset_names.csv", validationProblem.Errors[0].Message);
+            }
+
+            [Fact]
             public async Task ImportBulkZipDataSetsFromTempStorage_InvalidRequest_ReturnsValidationProblems()
             {
                 // Act
