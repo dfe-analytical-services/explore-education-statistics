@@ -238,7 +238,7 @@ public abstract class ReleaseFileControllerTests(TestApplicationFactory testApp)
         : ReleaseFileControllerTests(testApp)
     {
         [Fact]
-        public async Task Success()
+        public async Task ZipWithSpecificFile_Success()
         {
             Publication publication = DataFixture.DefaultPublication()
                 .WithReleases(DataFixture.DefaultRelease(publishedVersions: 1)
@@ -251,8 +251,7 @@ public abstract class ReleaseFileControllerTests(TestApplicationFactory testApp)
                 context.Publications.Add(publication);
             });
 
-            var fileId1 = Guid.NewGuid();
-            var fileId2 = Guid.NewGuid();
+            var fileId = Guid.NewGuid();
 
             var releaseFileService = new Mock<IReleaseFileService>(Strict);
 
@@ -262,7 +261,7 @@ public abstract class ReleaseFileControllerTests(TestApplicationFactory testApp)
                         releaseVersion.Id,
                         It.IsAny<Stream>(),
                         It.Is<IEnumerable<Guid>>(
-                            ids => ids.SequenceEqual(ListOf(fileId1, fileId2))),
+                            ids => ids.SequenceEqual(ListOf(fileId))),
                         It.IsAny<CancellationToken>()
                     )
                 )
@@ -274,7 +273,7 @@ public abstract class ReleaseFileControllerTests(TestApplicationFactory testApp)
                 .CreateClient();
 
             var response = await client
-                .GetAsync($"/api/releases/{releaseVersion.Id}/files?fileIds={fileId1},{fileId2}");
+                .GetAsync($"/api/releases/{releaseVersion.Id}/files?fileIds={fileId}");
 
             MockUtils.VerifyAllMocks(releaseFileService);
 

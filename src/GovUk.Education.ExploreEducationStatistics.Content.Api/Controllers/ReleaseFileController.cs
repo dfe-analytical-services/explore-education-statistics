@@ -57,8 +57,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
         [Produces(MediaTypeNames.Application.Octet)]
         public async Task<ActionResult> StreamFilesToZip(
             Guid releaseVersionId,
+            // TODO EES-6034
+            // The previous data catalogue page allowed users to selected multiple specific files to include in the
+            // zip file, hence why this endpoint takes an array of fileIds, but this is no longer the case. Via the
+            // public frontend, users only download all the releaseVersion's data (by not providing fileIds) or provide
+            // a single fileId for a specific data set.
             [FromQuery] IList<Guid>? fileIds = null)
         {
+            if (fileIds is not null && fileIds.Count > 1)
+            {
+                ModelState.AddModelError(
+                    "fileIds",
+                    "Providing multiple fileIds is deprecated.");
+                return BadRequest(ModelState);
+            }
+
             return await persistenceHelper.CheckEntityExists<ReleaseVersion>(
                     releaseVersionId,
                     q => q.Include(rv => rv.Release)

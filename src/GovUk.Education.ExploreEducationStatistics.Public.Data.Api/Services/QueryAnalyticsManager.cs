@@ -18,3 +18,17 @@ public class QueryAnalyticsManager : IQueryAnalyticsManager
         return _channel.Reader.ReadAsync(cancellationToken);
     }
 }
+
+public class NoOpQueryAnalyticsManager : IQueryAnalyticsManager
+{
+    public Task AddQuery(CaptureDataSetVersionQueryRequest request, CancellationToken cancellationToken)
+    {
+        return Task.CompletedTask;
+    }
+
+    public async ValueTask<CaptureDataSetVersionQueryRequest> ReadQuery(CancellationToken cancellationToken)
+    {
+        await Task.Delay(Timeout.Infinite, cancellationToken);
+        return default!;
+    }
+}

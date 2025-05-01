@@ -21,7 +21,16 @@ public class AnalyticsPathResolver : IAnalyticsPathResolver
             );
         }
         
-        _basePath = GetBasePath(options.Value.BasePath, environment);
+        var originalPath = options.Value.BasePath;
+        if (environment.IsDevelopment())
+        {
+            _basePath = Path.Combine(PathUtils.ProjectRootPath, PathUtils.OsPath(originalPath));
+        }
+        else
+        {
+            _basePath = originalPath;
+        }
+
     }
 
     public string BasePath()
@@ -29,6 +38,12 @@ public class AnalyticsPathResolver : IAnalyticsPathResolver
         return _basePath;
     }
 
+    private string ReportsDirectoryPath()
+    {
+        return Path.Combine(_basePath, "reports");
+    }
+
+    // PublicApiQueries
     public string PublicApiQueriesDirectoryPath()
     {
         return Path.Combine(_basePath, "public-api", "queries");
@@ -48,19 +63,25 @@ public class AnalyticsPathResolver : IAnalyticsPathResolver
     {
         return Path.Combine(ReportsDirectoryPath(), "public-api", "queries");
     }
-    
-    private string ReportsDirectoryPath()
+
+    // PublicZipDownloads
+    public string PublicZipDownloadsDirectoryPath()
     {
-        return Path.Combine(_basePath, "reports");
+        return Path.Combine(_basePath, "public", "zip-downloads");
     }
 
-    private string GetBasePath(string originalPath, IHostEnvironment environment)
+    public string PublicZipDownloadsProcessingDirectoryPath()
     {
-        if (!environment.IsDevelopment())
-        {
-            return originalPath;
-        }
-        
-        return Path.Combine(PathUtils.ProjectRootPath, PathUtils.OsPath(originalPath));
+        return Path.Combine(PublicZipDownloadsDirectoryPath(), "processing");
+    }
+
+    public string PublicZipDownloadsFailuresDirectoryPath()
+    {
+        return Path.Combine(PublicZipDownloadsDirectoryPath(), "failures");
+    }
+
+    public string PublicZipDownloadsReportsDirectoryPath()
+    {
+        return Path.Combine(ReportsDirectoryPath(), "public", "zip-downloads");
     }
 }

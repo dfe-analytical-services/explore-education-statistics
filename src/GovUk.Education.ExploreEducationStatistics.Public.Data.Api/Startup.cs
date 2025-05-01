@@ -33,9 +33,6 @@ using Microsoft.AspNetCore.Rewrite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Swashbuckle.AspNetCore.SwaggerGen;
-using AnalyticsOptions = GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Options.AnalyticsOptions;
-using AnalyticsPathResolver = GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services.AnalyticsPathResolver;
-using IAnalyticsPathResolver = GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services.Interfaces.IAnalyticsPathResolver;
 using RequestTimeoutOptions = GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Options.RequestTimeoutOptions;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api;
@@ -258,12 +255,20 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
         {
             services.AddSingleton<IQueryAnalyticsManager, QueryAnalyticsManager>();
             services.AddHostedService<QueryAnalyticsConsumer>();
-            services.AddSingleton<IAnalyticsPathResolver, AnalyticsPathResolver>();
             services.AddSingleton<IQueryAnalyticsWriter, QueryAnalyticsWriter>();
+
+            if (hostEnvironment.IsDevelopment())
+            {
+                services.AddSingleton<IAnalyticsPathResolver, LocalAnalyticsPathResolver>();
+            }
+            else
+            {
+                services.AddSingleton<IAnalyticsPathResolver, AnalyticsPathResolver>();
+            }
         }
         else
         {
-            services.AddSingleton<IQueryAnalyticsManager, NoopQueryAnalyticsManager>();
+            services.AddSingleton<IQueryAnalyticsManager, NoOpQueryAnalyticsManager>();
         }
     }
 
@@ -373,19 +378,5 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
         var migrations = serviceScope.ServiceProvider.GetServices<ICustomMigration>();
 
         migrations.ForEach(migration => migration.Apply());
-    }
-
-    private class NoopQueryAnalyticsManager : IQueryAnalyticsManager
-    {
-        public Task AddQuery(CaptureDataSetVersionQueryRequest request, CancellationToken cancellationToken)
-        {
-            return Task.CompletedTask;
-        }
-
-        public async ValueTask<CaptureDataSetVersionQueryRequest> ReadQuery(CancellationToken cancellationToken)
-        {
-            await Task.Delay(Timeout.Infinite, cancellationToken);
-            return default!;
-        }
     }
 }
