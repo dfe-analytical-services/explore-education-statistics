@@ -32,9 +32,25 @@ Visit featured table and generate a permalink
     user waits until page contains button    Generate shareable link
     user clicks button    Generate shareable link
     user waits until page contains testid    permalink-generated-url
-    #user clicks button    Copy link
+    user clicks button    Copy link
 
-Open share link and check outdated warning
+Open shareable link and check outdated warning
     user clicks link    View share link
     user waits until page contains
     ...    WARNING - The data used in this table may now be out-of-date as a new release has been published since its creation.
+
+Validate that View latest data link takes user to the latest release page
+    user goes back
+    user waits until page contains    This data is not from the latest release
+    user clicks link containing text    View latest data: Academic year 2024/25
+    user waits until h1 is visible    Further education and skills
+    user checks page contains   Academic year 2024/25
+    user checks page contains    This is the latest data
+
+ Validate that Publication link in Related information takes user to the latest release page
+    user goes back
+    user waits until page contains link    Further education and skills, Academic year 2024/25
+    user clicks link containing text    Further education and skills, Academic year 2024/25
+    user waits until h1 is visible    Further education and skills
+    user checks page contains   Academic year 2024/25
+    user checks page contains    This is the latest data
