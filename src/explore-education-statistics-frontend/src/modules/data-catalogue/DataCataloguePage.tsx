@@ -49,7 +49,6 @@ import { logEvent } from '@frontend/services/googleAnalyticsService';
 import compact from 'lodash/compact';
 import isEqual from 'lodash/isEqual';
 import omit from 'lodash/omit';
-import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { ParsedUrlQuery } from 'querystring';
 import {
@@ -290,13 +289,6 @@ const DataCataloguePage: NextPage<Props> = ({ showTypeFilter }) => {
       includeDefaultMetaTitle={pageTitle === defaultPageTitle}
       metaTitle={pageTitle}
     >
-      <Head>
-        <link
-          rel="canonical"
-          href={`${process.env.PUBLIC_URL}data-catalogue`}
-          key="canonical"
-        />
-      </Head>
       <div className="govuk-grid-row">
         <div className="govuk-grid-column-two-thirds">
           <p className="govuk-body-l">
