@@ -1,26 +1,29 @@
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Requests;
-using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services.Utils;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Strategies.Interfaces;
 using Newtonsoft.Json;
 using IAnalyticsPathResolver = GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services.Interfaces.IAnalyticsPathResolver;
 
-namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services;
+namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Strategies;
 
-public class QueryAnalyticsWriter(
+public class AnalyticsWritePublicApiQueryStrategy(
     IAnalyticsPathResolver analyticsPathResolver,
-    ILogger<QueryAnalyticsWriter> logger) : IQueryAnalyticsWriter
+    ILogger<AnalyticsWritePublicApiQueryStrategy> logger) : IAnalyticsWriteStrategy
 {
-    public async Task ReportDataSetVersionQuery(CaptureDataSetVersionQueryRequest request)
+    public async Task Report(AnalyticsCaptureRequestBase request, CancellationToken cancellationToken)
     {
+        var queryRequest = request as CaptureDataSetVersionQueryRequest
+                           ?? throw new ArgumentException(
+                               $"request isn't a {nameof(CaptureDataSetVersionQueryRequest)}");
         logger.LogInformation(
             "Capturing query for analytics for data set {DataSetTitle}",
-            request.DataSetTitle);
+            queryRequest.DataSetTitle);
 
         var serialisedRequest = JsonSerializationUtils.Serialize(
-            obj: request with
+            obj: queryRequest with
             {
-                Query = DataSetQueryNormalisationUtil.NormaliseQuery(request.Query)
+                Query = DataSetQueryNormalisationUtil.NormaliseQuery(queryRequest.Query)
             },
             formatting: Formatting.Indented,
             orderedProperties: true,
@@ -33,7 +36,7 @@ public class QueryAnalyticsWriter(
             Directory.CreateDirectory(directory);
 
             var filename =
-                $"{DateTime.UtcNow:yyyyMMdd-HHmmss}_{request.DataSetVersionId}_{RandomUtils.RandomString()}.json";
+                $"{DateTime.UtcNow:yyyyMMdd-HHmmss}_{queryRequest.DataSetVersionId}_{RandomUtils.RandomString()}.json";
 
             await File.WriteAllTextAsync(
                 Path.Combine(directory, filename),
