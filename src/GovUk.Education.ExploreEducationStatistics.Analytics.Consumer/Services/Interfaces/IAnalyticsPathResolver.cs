@@ -12,6 +12,15 @@ public interface IAnalyticsPathResolver
     string PublicApiQueriesFailuresDirectoryPath();
 
     string PublicApiQueriesReportsDirectoryPath();
+    
+    // PublicApiGetMeta
+    string PublicApiGetMetaDirectoryPath();
+
+    string PublicApiGetMetaProcessingDirectoryPath();
+
+    string PublicApiGetMetaFailuresDirectoryPath();
+
+    string PublicApiGetMetaReportsDirectoryPath();
 
     // PublicZipDownloads
     string PublicZipDownloadsDirectoryPath();
