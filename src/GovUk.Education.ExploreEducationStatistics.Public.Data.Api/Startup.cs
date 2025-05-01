@@ -19,6 +19,8 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services.Security;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Strategies;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Strategies.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Swagger;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.DuckDb;
@@ -254,8 +256,8 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
         if (_analyticsOptions.Enabled)
         {
             services.AddSingleton<IAnalyticsManager, AnalyticsManager>();
+            services.AddSingleton<IAnalyticsWriter, AnalyticsWriter>();
             services.AddHostedService<QueryAnalyticsConsumer>();
-            services.AddSingleton<IQueryAnalyticsWriter, QueryAnalyticsWriter>();
 
             if (hostEnvironment.IsDevelopment())
             {
@@ -265,6 +267,18 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
             {
                 services.AddSingleton<IAnalyticsPathResolver, AnalyticsPathResolver>();
             }
+
+            services.AddSingleton<AnalyticsWritePublicApiQueryStrategy>();
+
+            services.AddSingleton<IDictionary<Type, IAnalyticsWriteStrategy>>(provider =>
+                    new Dictionary<Type, IAnalyticsWriteStrategy>
+                    {
+                        {
+                            typeof(CaptureDataSetVersionQueryRequest),
+                            provider.GetRequiredService<AnalyticsWritePublicApiQueryStrategy>()
+                        },
+                    }
+                );
         }
         else
         {
