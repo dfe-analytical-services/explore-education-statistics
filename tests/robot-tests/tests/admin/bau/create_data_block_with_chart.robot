@@ -317,9 +317,6 @@ Navigate to release content page
 Check updated footnote is displayed in release content page
     [Documentation]    EES-3136
 
-    # EES-6052 - remove page reload below once the bug in EES-6052 is fixed.
-    user reloads page
-
     user clicks button    Test data block section
     ${section}=    user gets accordion section content element    Test data block section
     ...    //*[@data-testid="editableAccordionSection"]
