@@ -1,5 +1,14 @@
 {
   "name": "index-1",
+  "analyzers": [],
+  "charFilters": [],
+  "corsOptions": {
+    "allowedOrigins": [
+      "http://localhost:3000",
+      "https://localhost:3000"
+    ],
+    "maxAgeInSeconds": 300
+  },
   "defaultScoringProfile": "scoring-profile-1",
   "fields": [
     {
@@ -271,14 +280,6 @@
       "functions": []
     }
   ],
-  "suggesters": [],
-  "analyzers": [],
-  "tokenizers": [],
-  "tokenFilters": [],
-  "charFilters": [],
-  "similarity": {
-    "@odata.type": "#Microsoft.Azure.Search.BM25Similarity"
-  },
   "semantic": {
     "configurations": [
       {
@@ -303,5 +304,20 @@
         }
       }
     ]
-  }
+  },
+  "similarity": {
+    "@odata.type": "#Microsoft.Azure.Search.BM25Similarity"
+  },
+  "suggesters": [
+    {
+      "name": "suggester-1",
+      "searchMode": "analyzingInfixMatching",
+      "sourceFields": [
+        "title",
+        "summary"
+      ]
+    }
+  ],
+  "tokenFilters": [],
+  "tokenizers": []
 }
