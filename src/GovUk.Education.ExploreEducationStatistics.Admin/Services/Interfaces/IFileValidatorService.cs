@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 
-public interface IAncillaryFileValidatorService
+public interface IFileValidatorService
 {
     Task<Either<ActionResult, Unit>> ValidateFileForUpload(
         IFormFile file,

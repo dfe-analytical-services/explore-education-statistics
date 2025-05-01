@@ -709,7 +709,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
 
             var formFile = CreateFormFileMock(filename, "image/png").Object;
             var privateBlobStorageService = new Mock<IPrivateBlobStorageService>(MockBehavior.Strict);
-            var ancillaryFileValidatorService = new Mock<IAncillaryFileValidatorService>(MockBehavior.Strict);
+            var ancillaryFileValidatorService = new Mock<IFileValidatorService>(MockBehavior.Strict);
 
             privateBlobStorageService.Setup(mock =>
                 mock.UploadFile(PrivateMethodologyFiles,
@@ -785,7 +785,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             ContentDbContext contentDbContext,
             IPersistenceHelper<ContentDbContext>? contentPersistenceHelper = null,
             IPrivateBlobStorageService? privateBlobStorageService = null,
-            IAncillaryFileValidatorService? ancillaryFileValidatorService = null,
+            IFileValidatorService? ancillaryFileValidatorService = null,
             IFileRepository? fileRepository = null,
             IMethodologyFileRepository? methodologyFileRepository = null,
             IUserService? userService = null)
@@ -797,7 +797,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 contentDbContext,
                 contentPersistenceHelper ?? new PersistenceHelper<ContentDbContext>(contentDbContext),
                 privateBlobStorageService ?? Mock.Of<IPrivateBlobStorageService>(MockBehavior.Strict),
-                ancillaryFileValidatorService ?? Mock.Of<IAncillaryFileValidatorService>(MockBehavior.Strict),
+                ancillaryFileValidatorService ?? Mock.Of<IFileValidatorService>(MockBehavior.Strict),
                 fileRepository ?? new FileRepository(contentDbContext),
                 methodologyFileRepository ?? new MethodologyFileRepository(contentDbContext),
                 userService ?? MockUtils.AlwaysTrueUserService(_user.Id).Object

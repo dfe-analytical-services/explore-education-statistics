@@ -52,7 +52,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly IPersistenceHelper<ContentDbContext> _persistenceHelper;
         private readonly IPrivateBlobStorageService _privateBlobStorageService;
         private readonly IFileRepository _fileRepository;
-        private readonly IAncillaryFileValidatorService _ancillaryFileValidatorService;
+        private readonly IFileValidatorService _ancillaryFileValidatorService;
         private readonly IReleaseFileRepository _releaseFileRepository;
         private readonly IDataGuidanceFileWriter _dataGuidanceFileWriter;
         private readonly IUserService _userService;
@@ -61,7 +61,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             IPersistenceHelper<ContentDbContext> persistenceHelper,
             IPrivateBlobStorageService privateBlobStorageService,
             IFileRepository fileRepository,
-            IAncillaryFileValidatorService ancillaryFileValidatorService,
+            IFileValidatorService ancillaryFileValidatorService,
             IReleaseFileRepository releaseFileRepository,
             IDataGuidanceFileWriter dataGuidanceFileWriter,
             IUserService userService)

@@ -27,14 +27,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly ContentDbContext _contentDbContext;
         private readonly IPersistenceHelper<ContentDbContext> _persistenceHelper;
         private readonly IPrivateBlobStorageService _privateBlobStorageService;
-        private readonly IAncillaryFileValidatorService _ancillaryFileValidatorService;
+        private readonly IFileValidatorService _ancillaryFileValidatorService;
         private readonly IReleaseFileRepository _releaseFileRepository;
         private readonly IUserService _userService;
 
         public ReleaseImageService(ContentDbContext contentDbContext,
             IPersistenceHelper<ContentDbContext> persistenceHelper,
             IPrivateBlobStorageService privateBlobStorageService,
-            IAncillaryFileValidatorService ancillaryFileValidatorService,
+            IFileValidatorService ancillaryFileValidatorService,
             IReleaseFileRepository releaseFileRepository,
             IUserService userService)
         {

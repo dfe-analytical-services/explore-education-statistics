@@ -2450,7 +2450,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var formFile = CreateFormFileMock(filename, "application/pdf").Object;
             var privateBlobStorageService = new Mock<IPrivateBlobStorageService>(Strict);
-            var ancillaryFileValidatorService = new Mock<IAncillaryFileValidatorService>(Strict);
+            var ancillaryFileValidatorService = new Mock<IFileValidatorService>(Strict);
 
             privateBlobStorageService.Setup(mock =>
                 mock.UploadFile(PrivateReleaseFiles,
@@ -2921,7 +2921,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             IPersistenceHelper<ContentDbContext>? contentPersistenceHelper = null,
             IPrivateBlobStorageService? privateBlobStorageService = null,
             IFileRepository? fileRepository = null,
-            IAncillaryFileValidatorService? ancillaryFileValidatorService = null,
+            IFileValidatorService? ancillaryFileValidatorService = null,
             IReleaseFileRepository? releaseFileRepository = null,
             IDataGuidanceFileWriter? dataGuidanceFileWriter = null,
             IUserService? userService = null)
@@ -2934,7 +2934,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 contentPersistenceHelper ?? new PersistenceHelper<ContentDbContext>(contentDbContext),
                 privateBlobStorageService ?? Mock.Of<IPrivateBlobStorageService>(Strict),
                 fileRepository ?? new FileRepository(contentDbContext),
-                ancillaryFileValidatorService ?? Mock.Of<IAncillaryFileValidatorService>(Strict),
+                ancillaryFileValidatorService ?? Mock.Of<IFileValidatorService>(Strict),
                 releaseFileRepository ?? new ReleaseFileRepository(contentDbContext),
                 dataGuidanceFileWriter ?? Mock.Of<IDataGuidanceFileWriter>(Strict),
                 userService ?? MockUtils.AlwaysTrueUserService(_user.Id).Object

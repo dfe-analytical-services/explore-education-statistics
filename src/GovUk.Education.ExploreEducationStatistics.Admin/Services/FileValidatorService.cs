@@ -13,7 +13,7 @@ using static GovUk.Education.ExploreEducationStatistics.Common.Validators.FileTy
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services;
 
-public class AncillaryFileValidatorService(IFileTypeService fileTypeService) : IAncillaryFileValidatorService
+public class FileValidatorService(IFileTypeService fileTypeService) : IFileValidatorService
 {
     private const int MaxFileSize = int.MaxValue; // 2GB
 

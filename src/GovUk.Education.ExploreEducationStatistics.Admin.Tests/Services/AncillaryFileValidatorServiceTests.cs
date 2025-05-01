@@ -71,12 +71,12 @@ public class AncillaryFileValidatorServiceTests
     }
 
     private static (
-        AncillaryFileValidatorService,
+        FileValidatorService,
         Mock<IFileTypeService> fileTypeService)
         BuildService(Mock<IFileTypeService>? fileTypeService = null)
     {
         fileTypeService ??= new Mock<IFileTypeService>(Strict);
-        var service = new AncillaryFileValidatorService(fileTypeService.Object);
+        var service = new FileValidatorService(fileTypeService.Object);
 
         return (service, fileTypeService);
     }
