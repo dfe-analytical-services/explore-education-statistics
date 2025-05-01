@@ -6,7 +6,6 @@ using GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Requests;
 using Microsoft.EntityFrameworkCore;
-using System.Linq;
 using System.Net.Http.Json;
 using System.Threading.Tasks;
 using Xunit;
