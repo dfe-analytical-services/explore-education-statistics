@@ -8,7 +8,7 @@ public static class FileNameValidators
     public const int MaxFileNameSize = 150;
 
     public static bool MeetsLengthRequirements(string fileName)
-        => fileName.Length is > 0 and < MaxFileNameSize;
+        => fileName.Split('.')[0].Length is > 0 and < MaxFileNameSize;
 
     public static bool DoesNotContainSpaces(string fileName)
         => !fileName.Contains(' ', StringComparison.Ordinal);
