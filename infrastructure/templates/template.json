@@ -1593,6 +1593,7 @@
       "properties": {
         "APPINSIGHTS_INSTRUMENTATIONKEY": "[reference(resourceId('microsoft.insights/components/', variables('contentAppInsights')), '2020-02-02').InstrumentationKey]",
         "WEBSITE_NODE_DEFAULT_VERSION": "20.16.0",
+        "WEBSITE_CONTENTOVERVNET": "1",
         "WEBSITE_RUN_FROM_PACKAGE": "1",
         "PublicStorage": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-storage-public'), '2018-02-14').secretUriWithVersion, ')')]",
         "enableSwagger": "[parameters('enableSwagger')]",

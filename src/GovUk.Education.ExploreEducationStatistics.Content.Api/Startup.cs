@@ -200,7 +200,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api
                     services.AddSingleton<IAnalyticsPathResolver, AnalyticsPathResolver>();
                 }
 
-                services.AddSingleton<IAnalyticsWriteStrategy, AnalyticsWritePublicZipDownloadStrategy>();
+                services.AddSingleton<AnalyticsWritePublicZipDownloadStrategy>();
 
                 services.AddSingleton<IDictionary<Type, IAnalyticsWriteStrategy>>(provider =>
                     new Dictionary<Type, IAnalyticsWriteStrategy>
