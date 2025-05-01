@@ -9,7 +9,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Strategies;
 
 public class AnalyticsWritePublicApiQueryStrategy(
     IAnalyticsPathResolver analyticsPathResolver,
-    ILogger<AnalyticsWritePublicApiQueryStrategy> logger) : IAnalyticsWriteStrategy
+    ILogger<AnalyticsWritePublicApiQueryStrategy> logger
+    ) : AnalyticsWriteStrategyBase(logger), IAnalyticsWriteStrategy
 {
     public async Task Report(AnalyticsCaptureRequestBase request, CancellationToken cancellationToken)
     {
@@ -29,25 +30,11 @@ public class AnalyticsWritePublicApiQueryStrategy(
             orderedProperties: true,
             camelCase: true);
 
-        var directory = analyticsPathResolver.PublicApiQueriesDirectoryPath();
-
-        try
-        {
-            Directory.CreateDirectory(directory);
-
-            var filename =
-                $"{DateTime.UtcNow:yyyyMMdd-HHmmss}_{queryRequest.DataSetVersionId}_{RandomUtils.RandomString()}.json";
-
-            await File.WriteAllTextAsync(
-                Path.Combine(directory, filename),
-                contents: serialisedRequest);
-        }
-        catch (Exception e)
-        {
-            logger.LogError(
-                exception: e,
-                message: "Error whilst writing {QueryRequest} to disk",
-                nameof(CaptureDataSetVersionQueryRequest));
-        }
+        await this.WriteFileToShare(
+            requestTypeName: request.GetType().ToString(),
+            directory: analyticsPathResolver.PublicApiQueriesDirectoryPath(),
+            filename:
+            $"{DateTime.UtcNow:yyyyMMdd-HHmmss}_{queryRequest.DataSetVersionId}_{RandomUtils.RandomString()}.json",
+            serialisedRequest: serialisedRequest);
     }
 }
