@@ -253,7 +253,7 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
 
         if (_analyticsOptions.Enabled)
         {
-            services.AddSingleton<IQueryAnalyticsManager, QueryAnalyticsManager>();
+            services.AddSingleton<IAnalyticsManager, AnalyticsManager>();
             services.AddHostedService<QueryAnalyticsConsumer>();
             services.AddSingleton<IQueryAnalyticsWriter, QueryAnalyticsWriter>();
 
@@ -268,7 +268,7 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
         }
         else
         {
-            services.AddSingleton<IQueryAnalyticsManager, NoOpQueryAnalyticsManager>();
+            services.AddSingleton<IAnalyticsManager, NoOpAnalyticsManager>();
         }
     }
 
