@@ -142,11 +142,30 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             }
 
             CheckIndexFileForDuplicationErrors(indexFileEntries);
+            CheckBulkDataZipForMissingFiles(dataSetIndex.DataSetIndexItems, dataSetFiles);
             CheckBulkDataZipForUnusedFiles(dataSetIndex.DataSetIndexItems, dataSetFiles);
 
             return _errors.Count > 0
                 ? (Either<List<ErrorViewModel>, DataSetIndex>)_errors
                 : (Either<List<ErrorViewModel>, DataSetIndex>)dataSetIndex;
+        }
+
+        private void CheckBulkDataZipForMissingFiles(
+            List<DataSetIndexItem> indexItems,
+            List<DataSetFileDto> dataSetFiles)
+        {
+            var indexItemDataFileNames = indexItems.Select(item => item.DataFileName);
+            var indexItemMetaFileNames = indexItems.Select(item => item.MetaFileName);
+
+            var dataSetFileNames = dataSetFiles.Select(item => item.FileName);
+
+            _errors.AddRange(indexItemDataFileNames
+                .Where(fileName => !dataSetFileNames.Contains(fileName))
+                .Select(fileName => ValidationMessages.GenerateErrorFileNotFoundInZip(fileName, FileType.Data)));
+
+            _errors.AddRange(indexItemMetaFileNames
+                .Where(fileName => !dataSetFileNames.Contains(fileName))
+                .Select(fileName => ValidationMessages.GenerateErrorFileNotFoundInZip(fileName, FileType.Metadata)));
         }
 
         private async Task<File?> GetReplacingFileIfExists(
