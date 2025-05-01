@@ -1,3 +1,4 @@
+#nullable enable
 namespace GovUk.Education.ExploreEducationStatistics.Content.Services;
 
 public class AnalyticsOptions

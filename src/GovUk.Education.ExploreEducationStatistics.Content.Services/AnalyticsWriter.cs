@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.Threading;
@@ -19,6 +20,6 @@ public class AnalyticsWriter(
             throw new Exception($"No write strategy for request type {request.GetType()}");
         }
 
-        await strategy.Report(request, cancellationToken);
+        await strategy!.Report(request, cancellationToken);
     }
 }

@@ -20,8 +20,7 @@ public class AnalyticsConsumer(
             {
                 logger.LogError(
                     exception: e,
-                    message: "Error whilst reading a query from {QueryManager}",
-                    nameof(IAnalyticsManager));
+                    message: "Failed to read/report request recorded for analytics");
             }
         }       
     }
