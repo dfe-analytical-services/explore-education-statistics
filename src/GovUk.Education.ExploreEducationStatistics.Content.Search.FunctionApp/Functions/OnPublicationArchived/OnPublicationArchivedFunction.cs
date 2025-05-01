@@ -18,7 +18,7 @@ public class OnPublicationArchivedFunction(IEventGridEventHandler eventGridEvent
             eventDto,
             (payload, _) =>
                 Task.FromResult<RemovePublicationSearchableDocumentsDto[]>(
-                    string.IsNullOrEmpty(payload.Slug)
+                    string.IsNullOrEmpty(payload.PublicationSlug)
                         ? []
-                        : [new RemovePublicationSearchableDocumentsDto { PublicationSlug = payload.Slug }]));
+                        : [new RemovePublicationSearchableDocumentsDto { PublicationSlug = payload.PublicationSlug }]));
 }

@@ -2,5 +2,7 @@
 
 public class PublicationArchivedEventDto
 {
-    public string? Slug { get; init; }
+    public Guid? SupersededByPublicationId { get; init; }
+
+    public string? PublicationSlug { get; init; }
 }

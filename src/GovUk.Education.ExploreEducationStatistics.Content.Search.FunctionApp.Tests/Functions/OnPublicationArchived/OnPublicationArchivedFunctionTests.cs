@@ -1,6 +1,5 @@
 ﻿using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.OnPublicationArchived;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.OnPublicationArchived.Dtos;
-using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.OnPublicationChanged.Dtos;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Services;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Tests.Builders;
 using Microsoft.Extensions.Logging.Abstractions;
@@ -16,15 +15,15 @@ public class OnPublicationArchivedFunctionTests
     public void CanInstantiateSut() => Assert.NotNull(GetSut());
 
     [Fact]
-    public async Task GivenEvent_WhenPayloadContainsSlug_ReturnsExpectedDto()
+    public async Task GivenEvent_WhenPayloadContainsPublicationSlug_ReturnsExpectedDto()
     {
-        var payload = new PublicationChangedEventDto { Slug = "publication-slug" };
+        var payload = new PublicationArchivedEventDto { PublicationSlug = "publication-slug" };
         var eventGridEvent = new EventGridEventBuilder().WithPayload(payload).Build();
 
         var response = await GetSut().OnPublicationArchived(eventGridEvent, new FunctionContextMockBuilder().Build());
 
         var actual = Assert.Single(response);
-        Assert.Equal(payload.Slug, actual.PublicationSlug);
+        Assert.Equal(payload.PublicationSlug, actual.PublicationSlug);
     }
 
     [Theory]
@@ -32,7 +31,7 @@ public class OnPublicationArchivedFunctionTests
     [InlineData("")]
     public async Task GivenEvent_WhenPayloadDoesNotContainSlug_ThenNothingIsReturned(string? blankSlug)
     {
-        var payload = new PublicationArchivedEventDto { Slug = blankSlug };
+        var payload = new PublicationArchivedEventDto { PublicationSlug = blankSlug };
         var eventGridEvent = new EventGridEventBuilder().WithPayload(payload).Build();
 
         var response = await GetSut().OnPublicationArchived(eventGridEvent, new FunctionContextMockBuilder().Build());
