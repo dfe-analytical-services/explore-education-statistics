@@ -473,7 +473,7 @@ public class DataSetValidatorTests
 
         Assert.Equal(2, errors.Count);
         Assert.Equal(ValidationMessages.DataSetTitleShouldBeUnique.Code, errors[0].Code);
-        Assert.Equal(ValidationMessages.DataSetNamesCsvFilenamesShouldBeUnique.Code, errors[1].Code);
+        Assert.Equal(ValidationMessages.DataSetNamesCsvFileNamesShouldBeUnique.Code, errors[1].Code);
     }
 
     [Fact]
