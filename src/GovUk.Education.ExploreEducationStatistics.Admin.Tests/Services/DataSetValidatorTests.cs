@@ -314,6 +314,39 @@ public class DataSetValidatorTests
     }
 
     [Fact]
+    public async Task ValidateBulkDataZipIndexFile_ValidWithDotCsvExtension_ReturnsIndexFileObject()
+    {
+        // Arrange
+        var releaseVersion = new ReleaseVersion
+        {
+            Id = Guid.NewGuid(),
+        };
+
+        var indexFile = await new DataSetFileBuilder()
+            .WhereFileNameIs("dataset_names-invalid-filename-contains-extension.csv")
+            .Build(FileType.BulkDataZipIndex);
+
+        var dataFile = await new DataSetFileBuilder().Build(FileType.Data);
+        var metaFile = await new DataSetFileBuilder().Build(FileType.Metadata);
+
+        await using var context = InMemoryContentDbContext();
+        var sut = BuildService(context);
+
+        // Act
+        var result = await sut.ValidateBulkDataZipIndexFile(releaseVersion.Id, indexFile, [dataFile, metaFile]);
+
+        // Assert
+        var dataSetIndex = result.AssertRight();
+        Assert.Equal(releaseVersion.Id, dataSetIndex.ReleaseVersionId);
+
+        var dataSetItem = Assert.Single(dataSetIndex.DataSetIndexItems);
+        Assert.Equal("First data set title", dataSetItem.DataSetTitle);
+        Assert.Equal("one.csv", dataSetItem.DataFileName);
+        Assert.Equal("one.meta.csv", dataSetItem.MetaFileName);
+        Assert.Null(dataSetItem.ReplacingFile);
+    }
+
+    [Fact]
     public async Task ValidateBulkDataZipIndexFile_ValidWithReplacement_ReturnsIndexFileObject()
     {
         // Arrange

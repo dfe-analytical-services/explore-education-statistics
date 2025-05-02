@@ -375,8 +375,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 {
                     ReleaseVersionId = dataSetIndex.ReleaseVersionId,
                     Title = dataSet.DataSetTitle,
-                    DataFile = dataSetFiles.FirstOrDefault(file => file.FileName == dataSet.DataFileName), // TODO: Handle nullability
-                    MetaFile = dataSetFiles.FirstOrDefault(file => file.FileName == dataSet.MetaFileName), // TODO: Handle nullability
+                    DataFile = dataSetFiles.FirstOrDefault(file => file.FileName == dataSet.DataFileName),
+                    MetaFile = dataSetFiles.FirstOrDefault(file => file.FileName == dataSet.MetaFileName),
                     ReplacingFile = dataSet.ReplacingFile,
                 });
             }
