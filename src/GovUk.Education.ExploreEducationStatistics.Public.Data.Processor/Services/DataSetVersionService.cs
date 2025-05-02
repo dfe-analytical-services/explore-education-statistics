@@ -57,7 +57,7 @@ internal class DataSetVersionService(
 
         if (featureFLags.Value.EnableReplacementOfPublicApiDataSets == false)
         {
-            return Task.FromResult<Either<ActionResult, SemVersion>?>(null)!;
+            return Task.FromResult(new Either<ActionResult, SemVersion?>((SemVersion?)null));
         }
 
         return Task.FromResult(!string.IsNullOrEmpty(version)
@@ -565,12 +565,17 @@ internal class DataSetVersionService(
         DataSetVersion? previousVersionToPatch,
         CancellationToken cancellationToken)
     {
-        var nextVersion = featureFLags.Value.EnableReplacementOfPublicApiDataSets
-            ? previousVersionToPatch is null
-                ? dataSet.LatestLiveVersion?.DefaultNextVersion()
-                  ?? new SemVersion(major: 1, minor: 0, patch: 0)
-                : previousVersionToPatch.NextPatchVersion()
-            : dataSet.LatestLiveVersion?.DefaultNextVersion();
+        SemVersion nextVersion;
+        if (featureFLags.Value.EnableReplacementOfPublicApiDataSets)
+        {
+            nextVersion = previousVersionToPatch is null ? throw new NullReferenceException("previousVersionToPatch cannot be null when EnableReplacementOfPublicApiDataSets is true")
+                : previousVersionToPatch.NextPatchVersion();
+        }
+        else
+        {
+            nextVersion = dataSet.LatestLiveVersion?.DefaultNextVersion()
+                          ?? new SemVersion(major: 1, minor: 0, patch: 0);
+        }
 
         var dataSetVersion = new DataSetVersion
         {
