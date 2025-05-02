@@ -84,7 +84,13 @@ const FindStatisticsPage: NextPage = () => {
   const { paging, results: publications = [] } = publicationsData ?? {};
   const { page, totalPages, totalResults = 0 } = paging ?? {};
 
-  const totalResultsAzure = publicationsDataAzure?.count || 0;
+  const { paging: pagingAzure, results: publicationsAzure = [] } =
+    publicationsDataAzure ?? {};
+  const {
+    page: pageAzure,
+    totalPages: totalPagesAzure,
+    totalResults: totalResultsAzure = 0,
+  } = pagingAzure ?? {};
 
   const { releaseType, search, sortBy, themeId } = getParamsFromQuery(
     router.query,
@@ -137,10 +143,7 @@ const FindStatisticsPage: NextPage = () => {
 
     // TODO
     if (publicationsDataAzure?.results) {
-      for await (const result of publicationsDataAzure.results) {
-        const name = result.document.title;
-        console.log(name);
-      }
+      console.log(publicationsDataAzure);
     }
   };
 
@@ -216,9 +219,6 @@ const FindStatisticsPage: NextPage = () => {
     totalResultsAzure !== 1 ? 'results' : 'result'
   }`;
 
-  // TODO check if this calculation is correct!
-  const totalPagesAzure = Math.floor(totalResultsAzure / 10) + 1;
-
   return useAzureSearch ? (
     <Page
       title={defaultPageTitle}
@@ -247,7 +247,7 @@ const FindStatisticsPage: NextPage = () => {
             <p className="govuk-!-margin-bottom-0">
               {`${totalResultsMessageAzure}, ${
                 totalResultsAzure
-                  ? `page ${router.query.page || 1} of ${totalPagesAzure}`
+                  ? `page ${pageAzure} of ${totalPagesAzure}`
                   : '0 pages'
               }, ${isFiltered ? 'filtered by: ' : 'showing all publications'}`}
             </p>
