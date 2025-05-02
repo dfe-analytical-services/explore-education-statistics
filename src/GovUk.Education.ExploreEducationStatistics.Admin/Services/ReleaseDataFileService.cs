@@ -10,6 +10,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
+using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
@@ -282,7 +283,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             var dataFile = await BuildDataSetFile(dataFormFile);
             var metaFile = await BuildDataSetFile(metaFormFile);
-            return await BuildDataSet(releaseVersionId, dataFile, metaFile, dataSetTitle, replacingFile);
+            return await ValidateAndBuildDataSet(releaseVersionId, dataFile, metaFile, dataSetTitle, replacingFile);
         }
 
         private async Task<Either<ActionResult, DataSet>> ValidateDataSetZip(
@@ -296,10 +297,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             var dataFile = dataSetFiles.FirstOrDefault(file => !file.FileName.EndsWith(".meta.csv"));
             var metaFile = dataSetFiles.FirstOrDefault(file => file.FileName.EndsWith(".meta.csv"));
 
-            return await BuildDataSet(releaseVersionId, dataFile, metaFile, dataSetTitle, replacingFile);
+            return await ValidateAndBuildDataSet(releaseVersionId, dataFile, metaFile, dataSetTitle, replacingFile);
         }
 
-        private async Task<Either<ActionResult, DataSet>> BuildDataSet(
+        private async Task<Either<ActionResult, DataSet>> ValidateAndBuildDataSet(
             Guid releaseVersionId,
             DataSetFileDto dataFile,
             DataSetFileDto metaFile,
@@ -320,8 +321,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             var validationResult = await dataSetValidator.ValidateDataSet(dataSet);
 
             return validationResult.IsLeft
-                ? new Either<ActionResult, DataSet>(Common.Validators.ValidationUtils.ValidationResult(validationResult.Left))
-                : (Either<ActionResult, DataSet>)validationResult.Right;
+                ? Common.Validators.ValidationUtils.ValidationResult(validationResult.Left)
+                : validationResult.Right;
         }
 
         private async Task<Either<ActionResult, List<DataSet>>> ValidateBulkDataSetZip(
@@ -330,43 +331,37 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             var dataSetFiles = await ExtractDataSetZipFile(zipFormFile);
 
-            var dataSetNames = dataSetFiles.FirstOrDefault(dsf => dsf.FileName == "dataset_names.csv");
-            if (dataSetNames is null)
+            var indexFile = dataSetFiles.FirstOrDefault(dsf => dsf.FileName == "dataset_names.csv");
+            if (indexFile is null)
             {
-                return new Either<ActionResult, List<DataSet>>(
-                    Common.Validators.ValidationUtils.ValidationResult(ValidationMessages.GenerateErrorBulkDataZipMustContainDataSetNamesCsv()));
+                return Common.Validators.ValidationUtils.ValidationResult(ValidationMessages.GenerateErrorBulkDataZipMustContainDataSetNamesCsv());
             }
 
-            dataSetFiles.Remove(dataSetNames);
+            dataSetFiles.Remove(indexFile);
 
-            var indexFileValidationResult = await dataSetValidator.ValidateBulkDataZipIndexFile(releaseVersionId, dataSetNames, dataSetFiles);
+            var dataSetDtos = new List<DataSetDto>();
+            var errors = new List<ErrorViewModel>();
 
-            var dataSets = new List<DataSetDto>();
-            if (indexFileValidationResult.IsLeft)
+            await dataSetValidator.ValidateBulkDataZipIndexFile(releaseVersionId, indexFile, dataSetFiles)
+                .OnSuccessDo(dataSetIndex => dataSetDtos.AddRange(BuildDataSetsFromBulkZip(dataSetIndex, dataSetFiles)))
+                .OnFailureDo(errors.AddRange);
+
+            if (errors.Count > 0)
             {
-                return new Either<ActionResult, List<DataSet>>(Common.Validators.ValidationUtils.ValidationResult(indexFileValidationResult.Left));
-            }
-            else
-            {
-                dataSets.AddRange(BuildDataSetsFromBulkZip(indexFileValidationResult.Right, dataSetFiles));
-            }
-
-            var results = new List<DataSet>();
-            foreach (var dataSet in dataSets)
-            {
-                var validationResult = await dataSetValidator.ValidateDataSet(dataSet, performAutoReplacement: true);
-
-                if (validationResult.IsLeft)
-                {
-                    return new Either<ActionResult, List<DataSet>>(Common.Validators.ValidationUtils.ValidationResult(indexFileValidationResult.Left));
-                }
-                else
-                {
-                    results.Add(validationResult.Right);
-                }
+                return Common.Validators.ValidationUtils.ValidationResult(errors);
             }
 
-            return results;
+            var dataSets = new List<DataSet>();
+            foreach (var dataSetDto in dataSetDtos)
+            {
+                await dataSetValidator.ValidateDataSet(dataSetDto, performAutoReplacement: true)
+                    .OnSuccessDo(dataSets.Add)
+                    .OnFailureDo(errors.AddRange);
+            }
+
+            return errors.Count > 0
+                ? Common.Validators.ValidationUtils.ValidationResult(errors)
+                : dataSets;
         }
 
         private static List<DataSetDto> BuildDataSetsFromBulkZip(
@@ -453,12 +448,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             var dataBlobExists = await privateBlobStorageService.CheckBlobExists(PrivateReleaseTempFiles, $"{FileExtensions.Path(releaseVersionId, FileType.Data, dataSet.DataFileId)}");
             var metaBlobExists = await privateBlobStorageService.CheckBlobExists(PrivateReleaseTempFiles, $"{FileExtensions.Path(releaseVersionId, FileType.Metadata, dataSet.MetaFileId)}");
 
-            if (!dataBlobExists || !metaBlobExists)
-            {
-                throw new Exception("Unable to locate temporary files at the locations specified");
-            }
-
-            return Unit.Instance;
+            return !dataBlobExists || !metaBlobExists
+                ? throw new Exception("Unable to locate temporary files at the locations specified")
+                : Unit.Instance;
         }
 
         private async Task<DataFileInfo> BuildDataFileViewModel(ReleaseFile releaseFile)

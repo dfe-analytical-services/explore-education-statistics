@@ -12,8 +12,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces
 
         bool HasMatchingEncodingType(IFormFile file, IEnumerable<string> encodingTypes);
 
-        Task<bool> HasValidCsvFileMeta(Stream stream);
+        Task<bool> HasCsvFileType(Stream stream);
 
-        Task<bool> HasValidZipFileMeta(IFormFile zipFile);
+        Task<bool> HasZipFileType(IFormFile zipFile);
     }
 }
