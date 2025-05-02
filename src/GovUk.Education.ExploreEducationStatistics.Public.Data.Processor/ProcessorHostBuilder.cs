@@ -100,31 +100,24 @@ public static class ProcessorHostBuilder
                         hostBuilderContext.Configuration.GetSection(AppOptions.Section))
                     .Configure<DataFilesOptions>(
                         hostBuilderContext.Configuration.GetSection(DataFilesOptions.Section));
-                
-                var section = configuration.GetSection("FeatureFlags");
-                if (!section.Exists())
+
+                if (!isIntegrationTest)
                 {
-                    Console.WriteLine("Warning: FeatureFlags section is missing from configuration. Using defaults.");
-                    if (isIntegrationTest)
+                    var section = configuration.GetSection("FeatureFlags");
+                    if (!section.Exists())
                     {
-                        //Set this feature flag to on so that the tests related to new functionlity EES-5779 always run
-                        services.Configure<FeatureFlags>(options =>
-                        {
-                            options.EnableReplacementOfPublicApiDataSets = true;
-                        });
-                    }
-                    else
-                    {
+                        Console.WriteLine("Warning: FeatureFlags section is missing from configuration. Using defaults.");
+              
                         services.Configure<FeatureFlags>(options =>
                         {
                             options.EnableReplacementOfPublicApiDataSets = false;
                         });
                     }
-                }
-                else
-                {
-                    services.Configure<FeatureFlags>(section);
-                }
+                    else
+                    {
+                        services.Configure<FeatureFlags>(section);
+                    }
+                }  
                 
                 services.AddValidatorsFromAssembly(typeof(DataSetCreateRequest.Validator).Assembly); // Adds *all* validators from Public.Data.Processor
             });
