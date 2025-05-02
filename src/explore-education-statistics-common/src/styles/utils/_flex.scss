@@ -1,3 +1,5 @@
+@import '~govuk-frontend/dist/govuk/base';
+
 .dfe-flex {
   display: flex;
 }
@@ -64,4 +66,8 @@
 
 .dfe-align-self-end {
   align-self: end;
+}
+
+.dfe-gap-2 {
+  gap: govuk-spacing(2);
 }

@@ -8,6 +8,17 @@ import createPublicationListRequest from '@frontend/modules/find-statistics/util
 import { ParsedUrlQuery } from 'querystring';
 import { UseQueryOptions } from '@tanstack/react-query';
 import { PaginatedList } from '@common/services/types/pagination';
+import { AzureKeyCredential, SearchClient } from '@azure/search-documents';
+
+const ENDPOINT = 'https://s101d01-ees-srch.search.windows.net';
+const INDEX = 'index-1';
+const AZURE_SEARCH_QUERY_KEY = '';
+
+const client = new SearchClient(
+  ENDPOINT,
+  INDEX,
+  new AzureKeyCredential(AZURE_SEARCH_QUERY_KEY),
+);
 
 const publicationQueries = {
   getPublicationTree(query: PublicationTreeOptions): UseQueryOptions<Theme[]> {
@@ -25,6 +36,18 @@ const publicationQueries = {
         publicationService.listPublications(
           createPublicationListRequest(query),
         ),
+    };
+  },
+  listFromAzure(
+    query: ParsedUrlQuery,
+  ): UseQueryOptions<PaginatedList<PublicationListSummary>> {
+    return {
+      queryKey: ['listPublicationsFromAzure', query],
+      queryFn: () =>
+        publicationService.listPublications(
+          createPublicationListRequest(query),
+        ),
+      // client.search(createAzSearchFromQuery(queryF))
     };
   },
   listReleases(publicationSlug: string): UseQueryOptions<ReleaseSummary[]> {
