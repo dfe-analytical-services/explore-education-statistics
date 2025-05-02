@@ -1,5 +1,6 @@
 #nullable enable
 using System;
+using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
@@ -14,12 +15,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Strategies
 public class AnalyticsWritePublicZipDownloadStrategy(
     IAnalyticsPathResolver analyticsPathResolver,
     ILogger<AnalyticsWritePublicZipDownloadStrategy> logger
-    ) : AnalyticsWriteStrategyBase(logger), IAnalyticsWriteStrategy
+    ) : IAnalyticsWriteStrategy
 {
+    public Type RequestType => typeof(CaptureZipDownloadRequest);
+
     public async Task Report(AnalyticsCaptureRequestBase request, CancellationToken cancellationToken)
     {
-        var zipDownloadRequest = request as CaptureZipDownloadRequest
-                                 ?? throw new ArgumentException($"request isn't a {nameof(CaptureZipDownloadRequest)}");
+        if (request is not CaptureZipDownloadRequest zipDownloadRequest)
+        {
+            throw new ArgumentException($"request isn't a {nameof(CaptureZipDownloadRequest)}");
+        }
 
         logger.LogInformation(
             "Capturing {RequestTypeName} for releaseVersion {ReleaseVersionId}{WithSubject}",
@@ -29,16 +34,31 @@ public class AnalyticsWritePublicZipDownloadStrategy(
                 ? ""
                 : " for subject " + zipDownloadRequest.SubjectId);
 
-        var serialisedRequest = JsonSerializationUtils.Serialize(
-            obj: zipDownloadRequest,
-            formatting: Formatting.Indented,
-            orderedProperties: true,
-            camelCase: true);
+        var directory = analyticsPathResolver.PublicZipDownloadsDirectoryPath();
+        var filename =
+            $"{DateTime.UtcNow:yyyyMMdd-HHmmss}_{zipDownloadRequest.ReleaseVersionId}_{RandomUtils.RandomString()}.json";
 
-        await this.WriteToFileShare(
-            requestTypeName: request.GetType().ToString(),
-            directory: analyticsPathResolver.PublicZipDownloadsDirectoryPath(),
-            filename: $"{DateTime.UtcNow:yyyyMMdd-HHmmss}_{zipDownloadRequest.ReleaseVersionId}_{RandomUtils.RandomString()}.json",
-            serialisedRequest: serialisedRequest);
+        try
+        {
+            Directory.CreateDirectory(directory);
+
+            var filePath = Path.Combine(directory, filename);
+
+            var serialisedRequest = JsonSerializationUtils.Serialize(
+                obj: zipDownloadRequest,
+                formatting: Formatting.Indented,
+                orderedProperties: true,
+                camelCase: true);
+
+            await File.WriteAllTextAsync(
+                filePath, contents: serialisedRequest, cancellationToken: cancellationToken);
+        }
+        catch (Exception e)
+        {
+            logger.LogError(
+                e,
+                "Error whilst writing {RequestTypeName} to disk",
+                request!.GetType().ToString());
+        }
     }
 }

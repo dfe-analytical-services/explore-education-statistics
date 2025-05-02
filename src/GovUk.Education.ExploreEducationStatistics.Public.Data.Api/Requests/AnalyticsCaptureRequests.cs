@@ -1,6 +1,6 @@
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Requests;
 
-public record AnalyticsCaptureRequestBase();
+public abstract record AnalyticsCaptureRequestBase;
 
 public record CaptureDataSetVersionQueryRequest(
     Guid DataSetId,

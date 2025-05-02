@@ -4,5 +4,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Strategies.
 
 public interface IAnalyticsWriteStrategy
 {
+    Type RequestType { get; }
+
     Task Report(AnalyticsCaptureRequestBase request, CancellationToken cancellationToken);
 }

@@ -253,37 +253,7 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
         services.AddScoped<IParquetLocationRepository, ParquetLocationRepository>();
         services.AddScoped<IParquetTimePeriodRepository, ParquetTimePeriodRepository>();
 
-        if (_analyticsOptions.Enabled)
-        {
-            services.AddSingleton<IAnalyticsManager, AnalyticsManager>();
-            services.AddSingleton<IAnalyticsWriter, AnalyticsWriter>();
-            services.AddHostedService<AnalyticsConsumer>();
-
-            if (hostEnvironment.IsDevelopment())
-            {
-                services.AddSingleton<IAnalyticsPathResolver, LocalAnalyticsPathResolver>();
-            }
-            else
-            {
-                services.AddSingleton<IAnalyticsPathResolver, AnalyticsPathResolver>();
-            }
-
-            services.AddSingleton<AnalyticsWritePublicApiQueryStrategy>();
-
-            services.AddSingleton<IDictionary<Type, IAnalyticsWriteStrategy>>(provider =>
-                    new Dictionary<Type, IAnalyticsWriteStrategy>
-                    {
-                        {
-                            typeof(CaptureDataSetVersionQueryRequest),
-                            provider.GetRequiredService<AnalyticsWritePublicApiQueryStrategy>()
-                        },
-                    }
-                );
-        }
-        else
-        {
-            services.AddSingleton<IAnalyticsManager, NoOpAnalyticsManager>();
-        }
+        services.AddAnalytics(hostEnvironment, configuration);
     }
 
     // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
