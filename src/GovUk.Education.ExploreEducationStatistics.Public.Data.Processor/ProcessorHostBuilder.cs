@@ -101,23 +101,21 @@ public static class ProcessorHostBuilder
                     .Configure<DataFilesOptions>(
                         hostBuilderContext.Configuration.GetSection(DataFilesOptions.Section));
 
-                if (!isIntegrationTest)
+                var section = configuration.GetSection("FeatureFlags");
+                if (!section.Exists())
                 {
-                    var section = configuration.GetSection("FeatureFlags");
-                    if (!section.Exists())
+                    Console.WriteLine("Warning: FeatureFlags section is missing from configuration. Using defaults.");
+          
+                    services.Configure<FeatureFlags>(options =>
                     {
-                        Console.WriteLine("Warning: FeatureFlags section is missing from configuration. Using defaults.");
-              
-                        services.Configure<FeatureFlags>(options =>
-                        {
-                            options.EnableReplacementOfPublicApiDataSets = false;
-                        });
-                    }
-                    else
-                    {
-                        services.Configure<FeatureFlags>(section);
-                    }
-                }  
+                        options.EnableReplacementOfPublicApiDataSets = false;
+                    });
+                }
+                else
+                {
+                    services.Configure<FeatureFlags>(section);
+                }
+            
                 
                 services.AddValidatorsFromAssembly(typeof(DataSetCreateRequest.Validator).Assembly); // Adds *all* validators from Public.Data.Processor
             });
