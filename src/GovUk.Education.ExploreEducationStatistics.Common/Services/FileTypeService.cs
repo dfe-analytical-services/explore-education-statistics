@@ -50,7 +50,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             return encodingTypes.Contains(encodingType);
         }
 
-        public async Task<bool> HasValidCsvFileMeta(Stream stream)
+        public async Task<bool> HasCsvFileType(Stream stream)
         {
             var sampleBuffer = new byte[1024];
             var sampleBufferSize = await stream.ReadAsync(sampleBuffer, 0, 1024);
@@ -72,7 +72,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             return FileTypeValidationUtils.IsAllowedCsvEncodingType(encodingType);
         }
 
-        public async Task<bool> HasValidZipFileMeta(IFormFile zipFile)
+        public async Task<bool> HasZipFileType(IFormFile zipFile)
         {
             return await HasMatchingMimeType(zipFile, FileTypeValidationUtils.AllowedZipFileMimeTypes)
                 && HasMatchingEncodingType(zipFile, FileTypeValidationUtils.AllowedZipFileEncodingTypes);

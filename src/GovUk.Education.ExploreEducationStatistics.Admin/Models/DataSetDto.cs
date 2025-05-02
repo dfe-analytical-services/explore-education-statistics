@@ -14,7 +14,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Models;
 /// <summary>
 /// Represents an unvalidated data set.
 /// </summary>
-public record DataSetDto()
+public record DataSetDto
 {
     public Guid ReleaseVersionId { get; init; }
 
@@ -41,6 +41,7 @@ public record DataSetDto()
                 .MaximumLength(120)
                     .WithMessage(ValidationMessages.DataSetTitleTooLong, "{PropertyValue}", "{MaxLength}");
 
+            // TODO: Extract to MustBeValidDataFile
             RuleFor(dto => dto.DataFile)
                 .Must(file => FileNameValidators.MeetsLengthRequirements(file.FileName))
                     .WithMessage(ValidationMessages.FileNameLengthInvalid, "{PropertyValue}", FileNameValidators.MaxFileNameSize.ToString())
@@ -58,6 +59,7 @@ public record DataSetDto()
                 })
                     .WithMessage(ValidationMessages.FileSizeMustNotBeZero, "{FileName}");
 
+            // TODO: Extract to MustBeValidMetaFile
             RuleFor(dto => dto.MetaFile)
                 .Must(file => FileNameValidators.MeetsLengthRequirements(file.FileName))
                     .WithMessage(ValidationMessages.FileNameLengthInvalid, "{PropertyValue}", FileNameValidators.MaxFileNameSize.ToString())
@@ -77,15 +79,12 @@ public record DataSetDto()
             RuleFor(dto => dto.ReplacingFile)
                 .Must(file => file is null || file.Type == FileType.Data)
                     .WithMessage("replacingFile.Type should equal FileType.Data"); // TODO: Test this with a random type, then add to ValidationMessages (inc. a frontend mapping for the Code)
-
-            // TODO: Extract duplicated DataSetFileDto validation (FileName/FileStream)
-            // DataSetFileDto.Validate() is now only used for the dataset_names.csv file
         }
     }
 }
 
 /// <summary>
-/// Represents an data set file.
+/// Represents a data set file, which forms part of a <see cref="DataSet"/>.
 /// </summary>
 public record DataSetFileDto
 {

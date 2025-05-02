@@ -122,7 +122,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
         {
             await using var stream = await fileStreamProvider.Invoke();
 
-            if (!await _fileTypeService.HasValidCsvFileMeta(stream))
+            if (!await _fileTypeService.HasCsvFileType(stream))
             {
                 return ListOf(isMetaFile
                     ? new DataImportError(MetaFileMustBeCsvFile.GetEnumLabel())

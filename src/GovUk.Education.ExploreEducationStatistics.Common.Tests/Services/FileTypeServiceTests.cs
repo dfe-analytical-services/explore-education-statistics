@@ -302,7 +302,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
 
                 await using var stream = File.OpenRead(filePath);
 
-                var result = await service.HasValidCsvFileMeta(stream);
+                var result = await service.HasCsvFileType(stream);
 
                 Assert.Equal(expectedToSucceed, result);
             }
@@ -327,7 +327,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
                     .Setup(f => f.OpenReadStream())
                     .Returns(() => File.OpenRead(filePath));
 
-                var result = await service.HasValidZipFileMeta(formFile.Object);
+                var result = await service.HasZipFileType(formFile.Object);
 
                 Assert.Equal(expectedToSucceed, result);
             }

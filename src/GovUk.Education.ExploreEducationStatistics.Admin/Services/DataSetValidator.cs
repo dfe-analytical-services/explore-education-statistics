@@ -65,6 +65,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 if (releaseFileWithApiDataSet != null)
                 {
                     errors.Add(ValidationMessages.GenerateErrorCannotReplaceDataSetWithApiDataSet(dataSet.Title));
+                    return errors;
                 }
 
                 // TODO (EES-5708): This condition can be removed once upload methods are aligned
@@ -128,7 +129,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             foreach (var row in rows)
             {
                 var dataSetName = row[datasetNameIndex].Trim();
-                var dataFileName = row[fileNameIndex].Replace(".csv", "");
+                var dataFileName = row[fileNameIndex].Replace(".csv", ""); // File names should exclude extensions, but better to replace than return an error
 
                 await GetReplacingFileIfExists(releaseVersionId, dataSetName)
                     .OnFailureDo(errors.Add)
