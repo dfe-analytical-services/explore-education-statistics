@@ -1,3 +1,4 @@
+using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Requests;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Strategies;
@@ -63,7 +64,9 @@ public abstract class AnalyticsWritePublicApiQueryStrategyTests
         private static AnalyticsWritePublicApiQueryStrategy BuildStrategy(IAnalyticsPathResolver pathResolver)
         {
             return new AnalyticsWritePublicApiQueryStrategy(
-                pathResolver, Mock.Of<ILogger<AnalyticsWritePublicApiQueryStrategy>>());
+                pathResolver,
+                Mock.Of<DateTimeProvider>(),
+                Mock.Of<ILogger<AnalyticsWritePublicApiQueryStrategy>>());
         }
     }
 }

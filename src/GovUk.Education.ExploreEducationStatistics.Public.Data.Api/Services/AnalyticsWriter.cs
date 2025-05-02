@@ -4,12 +4,14 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Strategies.Inte
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services;
 
-public class AnalyticsWriter(
-    IDictionary<Type, IAnalyticsWriteStrategy> strategyByRequestType) : IAnalyticsWriter
+public class AnalyticsWriter(IEnumerable<IAnalyticsWriteStrategy> strategies) : IAnalyticsWriter
 {
+    private readonly Dictionary<Type, IAnalyticsWriteStrategy> _strategyByRequestType =
+        strategies.ToDictionary(strategy => strategy.RequestType);
+
     public async Task Report(AnalyticsCaptureRequestBase request, CancellationToken cancellationToken)
     {
-        var success = strategyByRequestType.TryGetValue(request.GetType(), out var strategy);
+        var success = _strategyByRequestType.TryGetValue(request.GetType(), out var strategy);
         if (!success)
         {
             throw new Exception($"No write strategy for request type {request.GetType()}");

@@ -16,6 +16,10 @@ public class AnalyticsConsumer(
                 var message = await manager.Read(stoppingToken);
                 await analyticsWriter.Report(message, stoppingToken);
             }
+            catch (TaskCanceledException e)
+            {
+                logger.LogInformation(e, "AnalyticsConsumer background task cancelled");
+            }
             catch (Exception e)
             {
                 logger.LogError(

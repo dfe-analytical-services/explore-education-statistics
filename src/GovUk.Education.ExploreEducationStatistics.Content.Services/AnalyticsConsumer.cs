@@ -22,6 +22,10 @@ public class AnalyticsConsumer(
                 var request = await analyticsManager.Read(stoppingToken);
                 await analyticsWriter.Report(request, stoppingToken);
             }
+            catch (TaskCanceledException e)
+            {
+                logger.LogInformation(e, "AnalyticsConsumer background task cancelled");
+            }
             catch (Exception e)
             {
                 logger.LogWarning(e, "Failed to read/report request recorded for analytics");
