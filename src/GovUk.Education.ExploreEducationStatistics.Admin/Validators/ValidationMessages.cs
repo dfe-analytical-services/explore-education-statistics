@@ -97,11 +97,6 @@ public static class ValidationMessages
         Message: "The file provided '{0}' must be a CSV file."
     );
 
-    public static readonly LocalizableMessage DataSetVersionIsInvalid = new(
-        Code: nameof(DataSetVersionIsInvalid),
-        Message: "The data set version '{0}' must be valid Semantic Version."
-    );
-
     public static ErrorViewModel GenerateErrorMustBeCsvFile(string fullFilename)
     {
         return new ErrorViewModel

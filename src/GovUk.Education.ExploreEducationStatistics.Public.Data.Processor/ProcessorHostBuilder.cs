@@ -3,6 +3,7 @@ using FluentValidation;
 using GovUk.Education.ExploreEducationStatistics.Common.Database;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Functions;
+using GovUk.Education.ExploreEducationStatistics.Common.Options;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
@@ -53,7 +54,8 @@ public static class ProcessorHostBuilder
                 // Only set up the `PublicDataDbContext` in non-integration test
                 // environments. Otherwise, the connection string will be null and
                 // cause the data source builder to throw a host exception.
-                if (!hostEnvironment.IsIntegrationTest())
+                var isIntegrationTest = hostEnvironment.IsIntegrationTest();
+                if (!isIntegrationTest)
                 {
                     var connectionString = ConnectionUtils.GetPostgreSqlConnectionString("PublicDataDb")!;
                     services.AddFunctionAppPsqlDbContext<PublicDataDbContext>(connectionString, hostBuilderContext);
@@ -98,6 +100,31 @@ public static class ProcessorHostBuilder
                         hostBuilderContext.Configuration.GetSection(AppOptions.Section))
                     .Configure<DataFilesOptions>(
                         hostBuilderContext.Configuration.GetSection(DataFilesOptions.Section));
+                
+                var section = configuration.GetSection("FeatureFlags");
+                if (!section.Exists())
+                {
+                    Console.WriteLine("Warning: FeatureFlags section is missing from configuration. Using defaults.");
+                    if (isIntegrationTest)
+                    {
+                        //Set this feature flag to on so that the tests related to new functionlity EES-5779 always run
+                        services.Configure<FeatureFlags>(options =>
+                        {
+                            options.EnableReplacementOfPublicApiDataSets = true;
+                        });
+                    }
+                    else
+                    {
+                        services.Configure<FeatureFlags>(options =>
+                        {
+                            options.EnableReplacementOfPublicApiDataSets = false;
+                        });
+                    }
+                }
+                else
+                {
+                    services.Configure<FeatureFlags>(section);
+                }
                 
                 services.AddValidatorsFromAssembly(typeof(DataSetCreateRequest.Validator).Assembly); // Adds *all* validators from Public.Data.Processor
             });

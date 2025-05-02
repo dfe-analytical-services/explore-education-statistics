@@ -1,5 +1,4 @@
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
-using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using Microsoft.AspNetCore.Mvc;
 using Semver;
 
@@ -7,6 +6,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Servi
 
 public interface IDataSetVersionService
 {
+    Task<Either<ActionResult, SemVersion?>> ParseVersionToReplace(string? version);
+
     Task<Either<ActionResult, Guid>> CreateInitialVersion(
         Guid dataSetId,
         Guid releaseFileId,

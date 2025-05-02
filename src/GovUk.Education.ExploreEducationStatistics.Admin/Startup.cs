@@ -83,7 +83,6 @@ using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using Thinktecture;
 using static GovUk.Education.ExploreEducationStatistics.Common.Utils.StartupUtils;
 using ContentGlossaryService = GovUk.Education.ExploreEducationStatistics.Content.Services.GlossaryService;
@@ -129,6 +128,7 @@ using ThemeService = GovUk.Education.ExploreEducationStatistics.Admin.Services.T
 using IReleaseService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IReleaseService;
 using ReleaseService = GovUk.Education.ExploreEducationStatistics.Admin.Services.ReleaseService;
 using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
+using GovUk.Education.ExploreEducationStatistics.Common.Options;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin
 {
@@ -382,7 +382,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                 configuration.GetRequiredSection(TableBuilderOptions.Section));
             services.Configure<OpenIdConnectSpaClientOptions>(
                 configuration.GetSection(OpenIdConnectSpaClientOptions.Section));
-            
+
+            AddFeatureFlags(services, configuration);
+
             services.Configure<RouteOptions>(options => options.LowercaseUrls = true);
 
             StartupSecurityConfiguration.ConfigureAuthorizationPolicies(services);
@@ -831,6 +833,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             foreach (var migration in migrations)
             {
                 migration.Apply();
+            }
+        }
+
+        private static void AddFeatureFlags(IServiceCollection services, IConfiguration configuration)
+        {
+            var section = configuration.GetSection("FeatureFlags");
+            if (!section.Exists())
+            {
+                Console.WriteLine("Warning: FeatureFlags section is missing from configuration. Using defaults.");
+            
+                services.Configure<FeatureFlags>(options =>
+                {
+                    options.EnableReplacementOfPublicApiDataSets = false;
+                });
+            }
+            else
+            {
+                services.Configure<FeatureFlags>(section);
             }
         }
     }

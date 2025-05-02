@@ -19,7 +19,9 @@ using File = GovUk.Education.ExploreEducationStatistics.Content.Model.File;
 using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using System.Collections.Generic;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
+using GovUk.Education.ExploreEducationStatistics.Common.Options;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
+using Microsoft.Extensions.Options;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 {
@@ -27,15 +29,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
     {
         private readonly IFileTypeService _fileTypeService;
         private readonly ContentDbContext _context;
+        private readonly IOptions<FeatureFlags> _featureFlags;
 
         public const int MaxFilenameSize = 150;
         private const int MaxFileSize = int.MaxValue; // 2GB
 
         public FileUploadsValidatorService(IFileTypeService fileTypeService,
-            ContentDbContext context)
+            ContentDbContext context,
+            IOptions<FeatureFlags> featureFlags)
         {
             _fileTypeService = fileTypeService;
             _context = context;
+            _featureFlags = featureFlags;
         }
 
         public async Task<List<ErrorViewModel>> ValidateDataSetFilesForUpload(
@@ -74,6 +79,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 dataFileStream,
                 metaFileName,
                 metaFileStream));
+
+            if (isReplacement)
+            {
+                if (_featureFlags.Value.EnableReplacementOfPublicApiDataSets)
+                {//TODO: delete this if (isReplacement) block once EES-5779 is over the line 
+                    return errors;
+                }
+
+                var releaseFileWithApiDataSet = _context.ReleaseFiles
+                    .SingleOrDefault(rf =>
+                        rf.ReleaseVersionId == releaseVersionId
+                        && rf.Name == dataSetTitle
+                        && rf.PublicApiDataSetId != null);
+                if (releaseFileWithApiDataSet != null)
+                {
+                    errors.Add(ValidationMessages.GenerateErrorCannotReplaceDataSetWithApiDataSet(dataSetTitle));
+                }
+            }
 
             return errors;
         }
