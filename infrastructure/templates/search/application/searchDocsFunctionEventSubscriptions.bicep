@@ -32,6 +32,11 @@ var eventGridCustomTopicSubscriptions = [
         includedEventTypes: ['publication-latest-published-release-reordered']
         queueName: storageQueueNames.publicationLatestPublishedReleaseReordered
       }
+      {
+        name: 'publication-restored'
+        includedEventTypes: ['publication-restored']
+        queueName: storageQueueNames.publicationRestored
+      }
     ]
   }
   {

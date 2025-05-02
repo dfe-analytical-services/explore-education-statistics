@@ -53,6 +53,7 @@ param storageQueueNames SearchStorageQueueNames = {
   publicationArchived: 'publication-archived-queue'
   publicationChanged: 'publication-changed-queue'
   publicationLatestPublishedReleaseReordered: 'publication-latest-published-release-reordered-queue'
+  publicationRestored: 'publication-restored-queue'
   refreshSearchableDocument: 'refresh-searchable-document-queue'
   releaseSlugChanged: 'release-slug-changed-queue'
   releaseVersionPublished: 'release-version-published-queue'
@@ -140,6 +141,10 @@ module functionAppModule '../../common/components/functionApp.bicep' = {
       {
         name: 'PublicationLatestPublishedReleaseReorderedQueueName'
         value: storageQueueNames.publicationLatestPublishedReleaseReordered
+      }
+      {
+        name: 'PublicationRestoredQueueName'
+        value: storageQueueNames.publicationRestored
       }
       {
         name: 'RefreshSearchableDocumentQueueName'

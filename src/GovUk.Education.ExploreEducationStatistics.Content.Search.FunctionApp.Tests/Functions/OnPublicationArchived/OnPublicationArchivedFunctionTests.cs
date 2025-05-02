@@ -1,5 +1,6 @@
 ﻿using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.OnPublicationArchived;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.OnPublicationArchived.Dtos;
+using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.RemovePublicationSearchableDocuments.Dto;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Services;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Tests.Builders;
 using Microsoft.Extensions.Logging.Abstractions;
@@ -19,11 +20,12 @@ public class OnPublicationArchivedFunctionTests
     {
         var payload = new PublicationArchivedEventDto { PublicationSlug = "publication-slug" };
         var eventGridEvent = new EventGridEventBuilder().WithPayload(payload).Build();
+        var expected = new RemovePublicationSearchableDocumentsDto { PublicationSlug = payload.PublicationSlug };
 
         var response = await GetSut().OnPublicationArchived(eventGridEvent, new FunctionContextMockBuilder().Build());
 
         var actual = Assert.Single(response);
-        Assert.Equal(payload.PublicationSlug, actual.PublicationSlug);
+        Assert.Equal(expected, actual);
     }
 
     [Theory]

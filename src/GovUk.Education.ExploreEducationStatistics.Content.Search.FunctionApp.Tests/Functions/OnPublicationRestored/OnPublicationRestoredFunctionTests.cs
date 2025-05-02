@@ -1,0 +1,43 @@
+﻿using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.OnPublicationRestored;
+using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.OnPublicationRestored.Dtos;
+using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.RefreshSearchableDocument.Dto;
+using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Services;
+using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Tests.Builders;
+using Microsoft.Extensions.Logging.Abstractions;
+
+namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Tests.Functions.OnPublicationRestored;
+
+public class OnPublicationRestoredFunctionTests
+{
+    private OnPublicationRestoredFunction GetSut() => new(
+        new EventGridEventHandler(new NullLogger<EventGridEventHandler>()));
+
+    [Fact]
+    public void CanInstantiateSut() => Assert.NotNull(GetSut());
+
+    [Fact]
+    public async Task GivenEvent_WhenPayloadContainsPublicationSlug_ReturnsExpectedDto()
+    {
+        var payload = new PublicationRestoredEventDto { PublicationSlug = "publication-slug" };
+        var eventGridEvent = new EventGridEventBuilder().WithPayload(payload).Build();
+        var expected = new RefreshSearchableDocumentMessageDto { PublicationSlug = payload.PublicationSlug };
+
+        var response = await GetSut().OnPublicationRestored(eventGridEvent, new FunctionContextMockBuilder().Build());
+
+        var actual = Assert.Single(response);
+        Assert.Equal(expected, actual);
+    }
+
+    [Theory]
+    [InlineData(null)]
+    [InlineData("")]
+    public async Task GivenEvent_WhenPayloadDoesNotContainSlug_ThenNothingIsReturned(string? blankSlug)
+    {
+        var payload = new PublicationRestoredEventDto { PublicationSlug = blankSlug };
+        var eventGridEvent = new EventGridEventBuilder().WithPayload(payload).Build();
+
+        var response = await GetSut().OnPublicationRestored(eventGridEvent, new FunctionContextMockBuilder().Build());
+
+        Assert.Empty(response);
+    }
+}
