@@ -11,7 +11,6 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.Services.Options;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
 using Moq;
-using Semver;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Services.Tests;
 

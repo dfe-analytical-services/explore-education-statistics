@@ -1,7 +1,6 @@
 using System.Reflection;
 using System.Security.Cryptography;
 using System.Text;
-using AngleSharp.Io;
 using GovUk.Education.ExploreEducationStatistics.Analytics.Consumer.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.DuckDb.DuckDb;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;

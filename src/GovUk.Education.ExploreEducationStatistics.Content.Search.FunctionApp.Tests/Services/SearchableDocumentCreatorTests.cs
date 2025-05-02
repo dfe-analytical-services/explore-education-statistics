@@ -1,4 +1,3 @@
-using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Clients;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Options;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Services;

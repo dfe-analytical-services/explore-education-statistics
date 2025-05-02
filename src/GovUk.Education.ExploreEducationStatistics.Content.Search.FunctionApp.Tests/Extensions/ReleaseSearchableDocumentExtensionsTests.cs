@@ -1,6 +1,4 @@
-﻿using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Clients;
-using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Clients.ContentApi;
-using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Domain;
+﻿using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Domain;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Tests.Builders;
 
