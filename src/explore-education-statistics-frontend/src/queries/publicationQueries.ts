@@ -1,3 +1,5 @@
+/* eslint-disable no-restricted-syntax */
+
 import publicationService, {
   PublicationListSummary,
   PublicationTreeOptions,
@@ -14,6 +16,7 @@ import {
   AzureKeyCredential,
   SearchClient,
   SearchDocumentsResult,
+  SearchResult,
 } from '@azure/search-documents';
 
 // TODO change to env config values
@@ -100,22 +103,41 @@ const publicationQueries = {
   // },
   listAzure(
     query: ParsedUrlQuery,
-  ): UseQueryOptions<SearchDocumentsResult<PublicationAzureSearchResult>> {
+  ): UseQueryOptions<
+    PaginatedList<SearchResult<PublicationAzureSearchResult>>
+  > {
     return {
       queryKey: ['listPublicationsAzure', query],
-      queryFn: () => {
+      queryFn: async () => {
         // We need to map <FindStatisticsPageQuery> to azclient SearchOptions
         // TODO add in faceting and sorting
         const params = getParamsFromQuery(query);
-        const searchResults = azureSearchClient.search(params.search || '', {
-          includeTotalCount: true,
-          top: 10,
-          // TODO Check if params.page needs number check or safe to assume type
-          skip: params.page ? params.page - 1 * 10 : 0,
-        });
-        return searchResults;
+        const searchResults = await azureSearchClient.search(
+          params.search || '',
+          {
+            includeTotalCount: true,
+            top: 10,
+            // TODO Check if params.page needs number check or safe to assume type
+            skip: params.page ? params.page - 1 * 10 : 0,
+          },
+        );
+        // return searchResults;
 
-        // Map results back to <PaginatedList<PublicationListSummary>>, or just return az result?
+        const publicationsResult = {
+          paging: {
+            totalPages: Math.floor(searchResults.count || 0 / 10) + 1,
+            totalResults: searchResults.count || 0,
+            page: params.page || 1,
+            pageSize: 10,
+          },
+          results: [] as SearchResult<PublicationAzureSearchResult>[],
+        };
+
+        for await (const result of searchResults.results) {
+          publicationsResult.results.push(result);
+        }
+
+        return publicationsResult;
       },
     };
   },
