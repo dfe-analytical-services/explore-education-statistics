@@ -4,17 +4,36 @@ import publicationService, {
   ReleaseSummary,
   Theme,
 } from '@common/services/publicationService';
-import createPublicationListRequest from '@frontend/modules/find-statistics/utils/createPublicationListRequest';
+import createPublicationListRequest, {
+  getParamsFromQuery,
+} from '@frontend/modules/find-statistics/utils/createPublicationListRequest';
 import { ParsedUrlQuery } from 'querystring';
 import { UseQueryOptions } from '@tanstack/react-query';
 import { PaginatedList } from '@common/services/types/pagination';
-import { AzureKeyCredential, SearchClient } from '@azure/search-documents';
+import {
+  AzureKeyCredential,
+  SearchClient,
+  SearchDocumentsResult,
+} from '@azure/search-documents';
 
+// TODO change to env config values
 const ENDPOINT = 'https://s101d01-ees-srch.search.windows.net';
 const INDEX = 'index-1';
 const AZURE_SEARCH_QUERY_KEY = '';
 
-const client = new SearchClient(
+export interface PublicationAzureSearchResult {
+  content: string;
+  releaseSlug: string;
+  releaseType: string;
+  releaseVersionId: string;
+  publicationSlug: string;
+  published: string;
+  summary: string;
+  theme: string;
+  title: string;
+}
+
+const azureSearchClient = new SearchClient<PublicationAzureSearchResult>(
   ENDPOINT,
   INDEX,
   new AzureKeyCredential(AZURE_SEARCH_QUERY_KEY),
@@ -38,16 +57,66 @@ const publicationQueries = {
         ),
     };
   },
-  listFromAzure(
+  // list(
+  //   query: ParsedUrlQuery,
+  // ): UseQueryOptions<
+  //   PaginatedList<PublicationListSummary | PublicationAzureSearchResult>
+  // > {
+  //   return {
+  //     queryKey: ['listPublications', query],
+  //     queryFn: () => {
+  //       if (query.azsearch && query.azsearch === 'true') {
+  //           // We need to map <FindStatisticsPageQuery> to azclient SearchOptions
+  //           const params = getParamsFromQuery(query);
+  //           const searchResults = azureSearchClient.search(
+  //             params.search || '',
+  //             {
+  //               includeTotalCount: true,
+  //               top: 10,
+  //               skip: params.page ? params.page - 1 * 10 : 0,
+  //             },
+  //           );
+  //           console.log({ searchResults });
+  //           // And then map results back to <PaginatedList<PublicationListSummary>>
+  //           return {
+  //             paging: {
+  //               totalPages: 1,
+  //               totalResults: 0,
+  //               page: 1,
+  //               pageSize: 10,
+  //             },
+  //             results: searchResults,
+  //           };
+  //       } else {
+  //         const oldServiceResults = publicationService.listPublications(
+  //           createPublicationListRequest(query),
+  //         );
+  //         console.log({ oldServiceResults });
+
+  //         return oldServiceResults;
+  //       }
+  //     },
+  //   };
+  // },
+  listAzure(
     query: ParsedUrlQuery,
-  ): UseQueryOptions<PaginatedList<PublicationListSummary>> {
+  ): UseQueryOptions<SearchDocumentsResult<PublicationAzureSearchResult>> {
     return {
-      queryKey: ['listPublicationsFromAzure', query],
-      queryFn: () =>
-        publicationService.listPublications(
-          createPublicationListRequest(query),
-        ),
-      // client.search(createAzSearchFromQuery(queryF))
+      queryKey: ['listPublicationsAzure', query],
+      queryFn: () => {
+        // We need to map <FindStatisticsPageQuery> to azclient SearchOptions
+        // TODO add in faceting and sorting
+        const params = getParamsFromQuery(query);
+        const searchResults = azureSearchClient.search(params.search || '', {
+          includeTotalCount: true,
+          top: 10,
+          // TODO Check if params.page needs number check or safe to assume type
+          skip: params.page ? params.page - 1 * 10 : 0,
+        });
+        return searchResults;
+
+        // Map results back to <PaginatedList<PublicationListSummary>>, or just return az result?
+      },
     };
   },
   listReleases(publicationSlug: string): UseQueryOptions<ReleaseSummary[]> {

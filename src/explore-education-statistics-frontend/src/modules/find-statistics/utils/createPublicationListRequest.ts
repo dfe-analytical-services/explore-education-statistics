@@ -73,6 +73,7 @@ function getSortParams(sortBy: PublicationSortOption): {
 
 export function getParamsFromQuery(query: FindStatisticsPageQuery) {
   return {
+    page: getFirst(query.page),
     releaseType:
       query.releaseType &&
       isOneOf(query.releaseType, Object.keys(releaseTypes) as ReleaseType[])

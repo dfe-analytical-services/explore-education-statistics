@@ -1,3 +1,4 @@
+/* eslint-disable no-restricted-syntax */
 import React, { useState } from 'react';
 import { GetServerSideProps, NextPage } from 'next';
 import { useRouter } from 'next/router';
@@ -7,9 +8,6 @@ import omit from 'lodash/omit';
 import { ParsedUrlQuery } from 'querystring';
 import GoToTopLink from '@common/components/GoToTopLink';
 import ScreenReaderMessage from '@common/components/ScreenReaderMessage';
-import FilterResetButtonAzureSearch from '@frontend/components/FilterResetButtonAzureSearch';
-import FiltersAzureSearch from '@frontend/modules/find-statistics/components/FiltersAzureSearch';
-
 import ButtonText from '@common/components/ButtonText';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import RelatedInformation from '@common/components/RelatedInformation';
@@ -17,6 +15,7 @@ import VisuallyHidden from '@common/components/VisuallyHidden';
 import WarningMessage from '@common/components/WarningMessage';
 import { useMobileMedia } from '@common/hooks/useMedia';
 import { ReleaseType, releaseTypes } from '@common/services/types/releaseType';
+import FilterResetButtonAzureSearch from '@frontend/components/FilterResetButtonAzureSearch';
 import FilterResetButton from '@frontend/components/FilterResetButton';
 import FiltersDesktop from '@frontend/components/FiltersDesktop';
 import FiltersMobile from '@frontend/components/FiltersMobile';
@@ -26,6 +25,7 @@ import Pagination from '@frontend/components/Pagination';
 import SearchForm from '@frontend/components/SearchForm';
 import SortControls, { SortOption } from '@frontend/components/SortControls';
 import Filters from '@frontend/modules/find-statistics/components/Filters';
+import FiltersAzureSearch from '@frontend/modules/find-statistics/components/FiltersAzureSearch';
 import PublicationSummary from '@frontend/modules/find-statistics/components/PublicationSummary';
 import { getParamsFromQuery } from '@frontend/modules/find-statistics/utils/createPublicationListRequest';
 import {
@@ -65,6 +65,17 @@ const FindStatisticsPage: NextPage = () => {
     staleTime: 60000,
   });
 
+  const {
+    data: publicationsDataAzure,
+    isError: isErrorAzure,
+    isFetching: isFetchingAzure,
+    isLoading: isLoadingAzure,
+  } = useQuery({
+    ...publicationQueries.listAzure(router.query),
+    keepPreviousData: true,
+    staleTime: 60000,
+  });
+
   const { data: themes = [] } = useQuery({
     ...themeQueries.list(),
     staleTime: Infinity,
@@ -72,6 +83,8 @@ const FindStatisticsPage: NextPage = () => {
 
   const { paging, results: publications = [] } = publicationsData ?? {};
   const { page, totalPages, totalResults = 0 } = paging ?? {};
+
+  const totalResultsAzure = publicationsDataAzure?.count || 0;
 
   const { releaseType, search, sortBy, themeId } = getParamsFromQuery(
     router.query,
@@ -87,6 +100,8 @@ const FindStatisticsPage: NextPage = () => {
     selectedTheme?.title,
     selectedReleaseType,
   ]).join(', ');
+
+  console.log({ publicationsDataAzure });
 
   const sortOptions: SortOption[] = [
     { label: 'Newest', value: 'newest' },
@@ -119,6 +134,14 @@ const FindStatisticsPage: NextPage = () => {
         shallow: true,
       },
     );
+
+    // TODO
+    if (publicationsDataAzure?.results) {
+      for await (const result of publicationsDataAzure.results) {
+        const name = result.document.title;
+        console.log(name);
+      }
+    }
   };
 
   const handleSortBy = async (nextSortBy: PublicationSortOption) => {
@@ -189,6 +212,13 @@ const FindStatisticsPage: NextPage = () => {
     totalResults !== 1 ? 'results' : 'result'
   }`;
 
+  const totalResultsMessageAzure = `${totalResultsAzure} ${
+    totalResultsAzure !== 1 ? 'results' : 'result'
+  }`;
+
+  // TODO check if this calculation is correct!
+  const totalPagesAzure = Math.floor(totalResultsAzure / 10) + 1;
+
   return useAzureSearch ? (
     <Page
       title={defaultPageTitle}
@@ -215,8 +245,10 @@ const FindStatisticsPage: NextPage = () => {
 
           <div className="govuk-!-margin-top-3 dfe-flex dfe-flex-wrap dfe-gap-2 dfe-align-items--center">
             <p className="govuk-!-margin-bottom-0">
-              {`${totalResultsMessage}, ${
-                totalResults ? `page ${page} of ${totalPages}` : '0 pages'
+              {`${totalResultsMessageAzure}, ${
+                totalResultsAzure
+                  ? `page ${router.query.page || 1} of ${totalPagesAzure}`
+                  : '0 pages'
               }, ${isFiltered ? 'filtered by: ' : 'showing all publications'}`}
             </p>
 
@@ -303,16 +335,16 @@ const FindStatisticsPage: NextPage = () => {
           )}
 
           <LoadingSpinner
-            loading={isLoading || isFetching}
+            loading={isLoadingAzure || isFetchingAzure}
             className="govuk-!-margin-top-4"
           >
-            {isError ? (
+            {isErrorAzure ? (
               <WarningMessage>
                 Cannot load publications, please try again later.
               </WarningMessage>
             ) : (
               <>
-                {publications.length === 0 ? (
+                {totalResultsAzure === 0 ? (
                   <div className="govuk-!-margin-top-5" id="searchResults">
                     {isFiltered ? (
                       <>
@@ -337,12 +369,7 @@ const FindStatisticsPage: NextPage = () => {
                     id="searchResults"
                     data-testid="publicationsList"
                   >
-                    {publications.map(publication => (
-                      <PublicationSummary
-                        key={publication.id}
-                        publication={publication}
-                      />
-                    ))}
+                    <li>render results here</li>
                   </ul>
                 )}
               </>
@@ -595,6 +622,7 @@ export const getServerSideProps: GetServerSideProps = async ({ query }) => {
 
   await Promise.all([
     queryClient.prefetchQuery(publicationQueries.list(query)),
+    // queryClient.prefetchQuery(publicationQueries.listAzure(query)),
     queryClient.prefetchQuery(themeQueries.list()),
   ]);
 
