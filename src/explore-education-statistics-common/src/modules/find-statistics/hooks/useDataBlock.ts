@@ -11,14 +11,16 @@ import { useCallback, useMemo, useState } from 'react';
 
 interface Options {
   dataBlock: Pick<DataBlock, 'id' | 'charts' | 'query' | 'dataBlockParentId'>;
-  releaseVersionId: string;
+  dataBlockStaleTime?: number;
   getInfographic?: GetInfographic;
+  releaseVersionId: string;
 }
 
 export default function useDataBlock({
   dataBlock,
-  releaseVersionId,
+  dataBlockStaleTime,
   getInfographic,
+  releaseVersionId,
 }: Options) {
   const getChartFile = useGetReleaseFile(releaseVersionId);
   const queryClient = useQueryClient();
@@ -39,7 +41,7 @@ export default function useDataBlock({
       releaseVersionId,
       dataBlock.dataBlockParentId,
     ),
-    staleTime: Infinity,
+    staleTime: dataBlockStaleTime,
   });
 
   const {
