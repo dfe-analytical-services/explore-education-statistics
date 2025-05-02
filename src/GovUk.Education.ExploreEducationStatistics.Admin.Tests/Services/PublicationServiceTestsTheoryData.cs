@@ -45,32 +45,38 @@ internal class PublicationServiceTestsTheoryData
     /// <term>expectPublicationArchivedEventRaised</term>
     /// <description>A boolean indicating whether a publication archived event is expected to be raised.</description>
     /// </item>
+    /// <item>
+    /// <term>expectedPublicationRestoredEventRaised</term>
+    /// <description>A boolean indicating whether a publication restored event is expected to be raised.</description>
+    /// </item>
     /// </list>
     /// </remarks>
-    public static readonly TheoryData<Publication, Publication?, Publication?, bool>
+    public static readonly TheoryData<Publication, Publication?, Publication?, bool, bool>
         PublicationArchivedEventTestData =
             new()
             {
+                // @formatter:off
                 // When the publication is live expect events to be raised dependent on states
                 // of the initial and updated `SupersededBy` publications
-                { LivePublication(), null, null, false },
-                { LivePublication(), null, NotLivePublication(), false },
-                { LivePublication(), null, LivePublication(), true }, // Transition to archived
-                { LivePublication(), NotLivePublication(), null, false },
-                { LivePublication(), NotLivePublication(), NotLivePublication(), false },
-                { LivePublication(), NotLivePublication(), LivePublication(), true }, // Transition to archived
-                { LivePublication(), LivePublication(), null, false },
-                { LivePublication(), LivePublication(), NotLivePublication(), false },
-                { LivePublication(), LivePublication(), LivePublication(), false },
+                { LivePublication(), null, null, false, false },
+                { LivePublication(), null, NotLivePublication(), false, false },
+                { LivePublication(), null, LivePublication(), true, false }, // Transition to archived
+                { LivePublication(), NotLivePublication(), null, false, false },
+                { LivePublication(), NotLivePublication(), NotLivePublication(), false, false },
+                { LivePublication(), NotLivePublication(), LivePublication(), true, false }, // Transition to archived
+                { LivePublication(), LivePublication(), null, false, true }, // Transition to not archived
+                { LivePublication(), LivePublication(), NotLivePublication(), false, true }, // Transition to not archived
+                { LivePublication(), LivePublication(), LivePublication(), false, false },
                 // When the publication is not live expect no events to be raised
-                { NotLivePublication(), null, null, false },
-                { NotLivePublication(), null, NotLivePublication(), false },
-                { NotLivePublication(), null, LivePublication(), false },
-                { NotLivePublication(), NotLivePublication(), null, false },
-                { NotLivePublication(), NotLivePublication(), NotLivePublication(), false },
-                { NotLivePublication(), NotLivePublication(), LivePublication(), false },
-                { NotLivePublication(), LivePublication(), null, false },
-                { NotLivePublication(), LivePublication(), NotLivePublication(), false },
-                { NotLivePublication(), LivePublication(), LivePublication(), false }
+                { NotLivePublication(), null, null, false, false },
+                { NotLivePublication(), null, NotLivePublication(), false, false },
+                { NotLivePublication(), null, LivePublication(), false, false },
+                { NotLivePublication(), NotLivePublication(), null, false, false },
+                { NotLivePublication(), NotLivePublication(), NotLivePublication(), false, false },
+                { NotLivePublication(), NotLivePublication(), LivePublication(), false, false },
+                { NotLivePublication(), LivePublication(), null, false, false },
+                { NotLivePublication(), LivePublication(), NotLivePublication(), false, false },
+                { NotLivePublication(), LivePublication(), LivePublication(), false, false }
+                // @formatter:on
             };
 }

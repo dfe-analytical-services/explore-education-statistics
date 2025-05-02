@@ -36,6 +36,12 @@ public class AdminEventRaiserMockBuilder
             It.IsAny<Publication>(),
             It.IsAny<Guid>());
 
+    private static readonly Expression<Func<IAdminEventRaiser, Task>> OnPublicationRestored =
+        m => m.OnPublicationRestored(
+            It.IsAny<Guid>(),
+            It.IsAny<string>(),
+            It.IsAny<Guid>());
+
     public IAdminEventRaiser Build() => _mock.Object;
 
     public AdminEventRaiserMockBuilder()
@@ -63,6 +69,10 @@ public class AdminEventRaiserMockBuilder
             .Callback((Publication publication, Guid oldLatestPublishedReleaseVersionId) =>
                 _invocations
                     .Add(new InvokeArguments(publication, oldLatestPublishedReleaseVersionId)))
+            .Returns(Task.CompletedTask);
+
+        _mock
+            .Setup(OnPublicationRestored)
             .Returns(Task.CompletedTask);
     }
 
@@ -130,11 +140,26 @@ public class AdminEventRaiserMockBuilder
         private void OnPublicationLatestPublishedReleaseReorderedWasNotRaised() =>
             mockBuilder._mock.Verify(OnPublicationLatestPublishedReleaseReordered, Times.Never);
 
+        public void OnPublicationRestoredWasRaised(
+            Guid? publicationId = null,
+            string? publicationSlug = null,
+            Guid? previousSupersededByPublicationId = null) =>
+            mockBuilder._mock.Verify(m => m.OnPublicationRestored(
+                    It.Is<Guid>(actual => publicationId == null || actual == publicationId),
+                    It.Is<string>(actual => publicationSlug == null || actual == publicationSlug),
+                    It.Is<Guid>(actual =>
+                        previousSupersededByPublicationId == null || actual == previousSupersededByPublicationId)),
+                Times.Once);
+
+        private void OnPublicationRestoredWasNotRaised() =>
+            mockBuilder._mock.Verify(OnPublicationRestored, Times.Never);
+
         public void AssertOnPublicationChangedEventsNotRaised()
         {
             OnPublicationArchivedWasNotRaised();
             OnPublicationChangedWasNotRaised();
             OnPublicationLatestPublishedReleaseReorderedWasNotRaised();
+            OnPublicationRestoredWasNotRaised();
         }
     }
 

@@ -1151,7 +1151,8 @@ public class PublicationServiceTests
         Publication publication,
         Publication? initialPublicationSupersededBy,
         Publication? updatedPublicationSupersededBy,
-        bool expectPublicationArchivedEventRaised)
+        bool expectPublicationArchivedEventRaised,
+        bool expectedPublicationRestoredEventRaised)
     {
         // Set the initial publication's `SupersededBy` publication (null, live, or not live)
         publication.SupersededBy = initialPublicationSupersededBy;
@@ -1189,16 +1190,25 @@ public class PublicationServiceTests
             );
         }
 
-        if (expectPublicationArchivedEventRaised)
+        await using (var context = InMemoryApplicationDbContext(contextId))
         {
-            await using var context = InMemoryApplicationDbContext(contextId);
             var updatedPublication = await context.Publications
                 .SingleAsync(p => p.Id == publication.Id);
-            AssertOnPublicationArchivedEventRaised(updatedPublication);
-        }
-        else
-        {
-            AssertOnPublicationChangedEventsNotRaised();
+
+            if (expectPublicationArchivedEventRaised)
+            {
+                AssertOnPublicationArchivedEventRaised(updatedPublication);
+            }
+            else if (expectedPublicationRestoredEventRaised)
+            {
+                AssertOnPublicationRestoredEventRaised(
+                    updatedPublication,
+                    previousSupersededByPublicationId: publication.SupersededById!.Value);
+            }
+            else
+            {
+                AssertOnPublicationChangedEventsNotRaised();
+            }
         }
     }
 
@@ -3631,6 +3641,14 @@ public class PublicationServiceTests
         _adminEventRaiserMockBuilder.Assert.OnPublicationLatestPublishedReleaseReorderedWasRaised(
             publication,
             previousReleaseVersionId);
+
+    private void AssertOnPublicationRestoredEventRaised(
+        Publication publication,
+        Guid previousSupersededByPublicationId) =>
+        _adminEventRaiserMockBuilder.Assert.OnPublicationRestoredWasRaised(
+            publication.Id,
+            publication.Slug,
+            previousSupersededByPublicationId);
 
     private void AssertOnPublicationChangedEventsNotRaised()
     {

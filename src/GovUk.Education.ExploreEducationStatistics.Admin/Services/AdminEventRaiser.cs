@@ -83,4 +83,19 @@ public class AdminEventRaiser(IEventRaiser eventRaiser) : IAdminEventRaiser
                 publication,
                 previousLatestPublishedReleaseVersionId));
     }
+
+    /// <summary>
+    /// Publishes an event when an archived publication is restored.
+    /// </summary>
+    /// <param name="publicationId">The unique identifier of the archived publication that has been restored.</param>
+    /// <param name="publicationSlug">The slug of the archived publication that has been restored.</param>
+    /// <param name="previousSupersededByPublicationId">The unique identifier of the publication that superseded the archived publication before it was restored.</param>
+    public async Task OnPublicationRestored(
+        Guid publicationId,
+        string publicationSlug,
+        Guid previousSupersededByPublicationId) =>
+        await eventRaiser.RaiseEvent(new PublicationRestoredEvent(
+            publicationId,
+            publicationSlug,
+            previousSupersededByPublicationId));
 }
