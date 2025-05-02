@@ -42,13 +42,6 @@ public class PublicApiQueriesProcessor(
         Directory.CreateDirectory(processingDirectory);
         Directory.CreateDirectory(reportsDirectory);
 
-        Parallel.ForEach(filesToProcess, file =>
-        {
-            var originalPath = Path.Combine(sourceDirectory, file);
-            var newPath = Path.Combine(processingDirectory, file);
-            File.Move(originalPath, newPath);
-        });
-
         duckDbConnection.Open();
         
         duckDbConnection.ExecuteNonQuery("install json; load json");
@@ -69,44 +62,57 @@ public class PublicApiQueriesProcessor(
             );
         ");
 
-        // We fetch the files again in case there are files leftover in the processing dir from a previous function run
-        var filesReadyForProcessing = Directory
-            .GetFiles(processingDirectory)
-            .Select(Path.GetFileName)
-            .OfType<string>()
-            .ToList();
-
-        foreach (var filename in filesReadyForProcessing)
         {
-            try
+            var batchNum = 0;
+            const int batchSize = 100;
+
+            while (filesToProcess.Count > batchNum * batchSize)
             {
-                duckDbConnection.ExecuteNonQuery($@"
-                    INSERT INTO queries BY NAME (
-                        SELECT
-                            MD5(CONCAT(query, dataSetVersionId)) AS queryVersionHash,
-                            MD5(query) AS queryHash,
-                            *
-                        FROM read_json('{processingDirectory}/{filename}', 
-                            format='unstructured',
-                            columns = {{
-                                dataSetId: UUID, 
-                                dataSetVersionId: UUID,
-                                dataSetVersion: VARCHAR,
-                                dataSetTitle: VARCHAR,
-                                resultsCount: INT,
-                                totalRowsCount: INT,
-                                startTime: DATETIME,
-                                endTime: DATETIME,
-                                query: JSON
-                            }})
-                       )
-                ");
-            }
-            catch (DuckDBException e)
-            {
-                logger.LogError(e, "Failed to process analytics request file {Filename}", filename);
-                var badFilePath = Path.Combine(processingDirectory, filename);
-                MoveBadFileToFailuresDirectory(badFilePath);
+                Directory.CreateDirectory(processingDirectory);
+
+                var filesForThisBatch = filesToProcess
+                    .Skip(batchNum++ * batchSize)
+                    .Take(batchSize)
+                    .ToList();
+
+                Parallel.ForEach(filesForThisBatch, file =>
+                {
+                    var originalPath = Path.Combine(sourceDirectory, file);
+                    var newPath = Path.Combine(processingDirectory, file);
+                    File.Move(originalPath, newPath);
+                });
+
+                try
+                {
+                    duckDbConnection.ExecuteNonQuery($@"
+                        INSERT INTO queries BY NAME (
+                            SELECT
+                                MD5(CONCAT(query, dataSetVersionId)) AS queryVersionHash,
+                                MD5(query) AS queryHash,
+                                *
+                            FROM read_json('{processingDirectory}/*', 
+                                format='unstructured',
+                                columns = {{
+                                    dataSetId: UUID, 
+                                    dataSetVersionId: UUID,
+                                    dataSetVersion: VARCHAR,
+                                    dataSetTitle: VARCHAR,
+                                    resultsCount: INT,
+                                    totalRowsCount: INT,
+                                    startTime: DATETIME,
+                                    endTime: DATETIME,
+                                    query: JSON
+                                }})
+                           )
+                    ");
+
+                    Directory.Delete(processingDirectory, recursive: true);
+                }
+                catch (DuckDBException e)
+                {
+                    logger.LogError(e, "Failed to process a batch of analytics request files. Moving files to failures directory.");
+                    MoveBadFilesToFailuresDirectory(filesForThisBatch);
+                }
             }
         }
 
@@ -156,27 +162,27 @@ public class PublicApiQueriesProcessor(
             COPY (SELECT * FROM queryAccessReport)
             TO '{queryAccessReportFilename}' (FORMAT 'parquet', CODEC 'zstd')");
 
-        Directory.Delete(processingDirectory, recursive: true);
-        
         return Task.CompletedTask;
     }
 
-    private void MoveBadFileToFailuresDirectory(string filePath)
+    private void MoveBadFilesToFailuresDirectory(List<string> filenames)
     {
         var failuresDirectoryPath = pathResolver.PublicApiQueriesFailuresDirectoryPath();
 
         try
         {
             Directory.CreateDirectory(failuresDirectoryPath);
-            File.Move(filePath, failuresDirectoryPath);
+
+            Parallel.ForEach(filenames, file =>
+            {
+                var originalPath = Path.Combine(pathResolver.PublicZipDownloadsProcessingDirectoryPath(), file);
+                var newPath = Path.Combine(failuresDirectoryPath, file);
+                File.Move(originalPath, newPath);
+            });
         }
         catch (Exception e)
         {
-            logger.LogError(
-                e,
-                "Failed to move bad file to failures directory. SourcePath: {FilePath}. DestPath: {FailuresDirectoryPath}",
-                filePath,
-                failuresDirectoryPath);
+            logger.LogError(e, "Failed to move bad files to failures directory.");
         }
     }
 }

@@ -42,13 +42,6 @@ public class PublicZipDownloadsProcessor(
         Directory.CreateDirectory(processingDirectory);
         Directory.CreateDirectory(reportsDirectory);
 
-        Parallel.ForEach(filesToProcess, file =>
-        {
-            var originalPath = Path.Combine(sourceDirectory, file);
-            var newPath = Path.Combine(processingDirectory, file);
-            File.Move(originalPath, newPath);
-        });
-
         duckDbConnection.Open();
 
         duckDbConnection.ExecuteNonQuery("install json; load json");
@@ -65,23 +58,34 @@ public class PublicZipDownloadsProcessor(
             );
         ");
 
-        // We fetch the files again in case there are files leftover in the processing dir from a previous function run
-        var filesReadyForProcessing = Directory
-            .GetFiles(processingDirectory)
-            .Select(Path.GetFileName)
-            .OfType<string>()
-            .ToList();
-
-        foreach (var filename in filesReadyForProcessing)
         {
-            try
+            var batchNum = 0;
+            const int batchSize = 100;
+
+            while (filesToProcess.Count > batchNum * batchSize)
             {
-                duckDbConnection.ExecuteNonQuery($@"
+                Directory.CreateDirectory(processingDirectory);
+
+                var filesForThisBatch = filesToProcess
+                    .Skip(batchNum++ * batchSize)
+                    .Take(batchSize)
+                    .ToList();
+
+                Parallel.ForEach(filesForThisBatch, file =>
+                {
+                    var originalPath = Path.Combine(sourceDirectory, file);
+                    var newPath = Path.Combine(processingDirectory, file);
+                    File.Move(originalPath, newPath);
+                });
+
+                try
+                {
+                    duckDbConnection.ExecuteNonQuery($@"
                     INSERT INTO zipDownloads BY NAME (
                         SELECT
                             MD5(CONCAT(subjectId, releaseVersionId)) AS zipDownloadHash,
                             *
-                        FROM read_json('{processingDirectory}/{filename}', 
+                        FROM read_json('{processingDirectory}/*', 
                             format='unstructured',
                             columns = {{
                                 publicationName: VARCHAR,
@@ -92,19 +96,22 @@ public class PublicZipDownloadsProcessor(
                                 dataSetTitle: VARCHAR
                             }}
                         )
-                     )
-                ");
-            }
-            catch (DuckDBException e)
-            {
-                logger.LogError(e, "Failed to process analytics request file {Filename}", filename);
-                MoveBadFileToFailuresDirectory(filename);
+                    )");
+
+                    Directory.Delete(processingDirectory, recursive: true);
+                }
+                catch (DuckDBException e)
+                {
+                    logger.LogError(e,
+                        "Failed to process a batch of analytics request files. Moving files to failures directory.");
+                    MoveBadFilesToFailuresDirectory(filesForThisBatch);
+                }
             }
         }
 
         duckDbConnection.ExecuteNonQuery(@"
             CREATE TABLE zipDownloadsReport AS 
-            SELECT 
+            SELECT
                 zipDownloadHash,
                 FIRST(publicationName) AS publicationName,
                 FIRST(releaseVersionId) AS releaseVersionId,
@@ -127,25 +134,26 @@ public class PublicZipDownloadsProcessor(
             COPY (SELECT * FROM zipDownloadsReport)
             TO '{zipDownloadReportFilename}' (FORMAT 'parquet', CODEC 'zstd')");
 
-        Directory.Delete(processingDirectory, recursive: true);
-
         return Task.CompletedTask;
     }
 
-    private void MoveBadFileToFailuresDirectory(string filename)
+    private void MoveBadFilesToFailuresDirectory(List<string> filenames)
     {
         try
         {
             var failuresDirectoryPath = pathResolver.PublicZipDownloadsFailuresDirectoryPath();
             Directory.CreateDirectory(failuresDirectoryPath);
 
-            var fileSourcePath = Path.Combine(pathResolver.PublicZipDownloadsProcessingDirectoryPath(), filename);
-            var fileDestPath = Path.Combine(failuresDirectoryPath, filename);
-            File.Move(fileSourcePath, fileDestPath);
+            Parallel.ForEach(filenames, file =>
+            {
+                var originalPath = Path.Combine(pathResolver.PublicZipDownloadsProcessingDirectoryPath(), file);
+                var newPath = Path.Combine(failuresDirectoryPath, file);
+                File.Move(originalPath, newPath);
+            });
         }
         catch (Exception e)
         {
-            logger.LogError(e, "Failed to move bad file to failures directory {Filename}", filename);
+            logger.LogError(e, "Failed to move bad files to failures directory.");
         }
     }
 }
