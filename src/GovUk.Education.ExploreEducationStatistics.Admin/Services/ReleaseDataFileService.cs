@@ -487,7 +487,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             var fileIds = releaseFiles.Select(rf => rf.FileId).ToList();
 
-            var dataImports = await contentDbContext.DataImports // not found here, possibly because FileId matches the wrong file (MetaFileId)
+            var dataImports = await contentDbContext.DataImports
                 .AsSplitQuery()
                 .Include(di => di.File)
                 .ThenInclude(f => f.CreatedBy)

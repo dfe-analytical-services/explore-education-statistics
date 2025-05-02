@@ -29,7 +29,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
         private readonly ContentDbContext _contentDbContext;
         private readonly IPersistenceHelper<ContentDbContext> _persistenceHelper;
         private readonly IPrivateBlobStorageService _privateBlobStorageService;
-        private readonly IFileValidatorService _ancillaryFileValidatorService;
+        private readonly IFileValidatorService _fileValidatorService;
         private readonly IFileRepository _fileRepository;
         private readonly IMethodologyFileRepository _methodologyFileRepository;
         private readonly IUserService _userService;
@@ -37,7 +37,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
         public MethodologyImageService(ContentDbContext contentDbContext,
             IPersistenceHelper<ContentDbContext> persistenceHelper,
             IPrivateBlobStorageService privateBlobStorageService,
-            IFileValidatorService ancillaryFileValidatorService,
+            IFileValidatorService fileValidatorService,
             IFileRepository fileRepository,
             IMethodologyFileRepository methodologyFileRepository,
             IUserService userService)
@@ -45,7 +45,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
             _contentDbContext = contentDbContext;
             _persistenceHelper = persistenceHelper;
             _privateBlobStorageService = privateBlobStorageService;
-            _ancillaryFileValidatorService = ancillaryFileValidatorService;
+            _fileValidatorService = fileValidatorService;
             _fileRepository = fileRepository;
             _methodologyFileRepository = methodologyFileRepository;
             _userService = userService;
@@ -117,7 +117,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
             return _persistenceHelper
                 .CheckEntityExists<MethodologyVersion>(methodologyVersionId)
                 .OnSuccess(_userService.CheckCanUpdateMethodologyVersion)
-                .OnSuccess(async () => await _ancillaryFileValidatorService.ValidateFileForUpload(formFile, Image))
+                .OnSuccess(async () => await _fileValidatorService.ValidateFileForUpload(formFile, Image))
                 .OnSuccess(async () => await Upload(
                     methodologyVersionId,
                     Image,

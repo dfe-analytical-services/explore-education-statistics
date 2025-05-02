@@ -203,7 +203,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var formFile = CreateFormFileMock(filename, "image/png").Object;
             var privateBlobStorageService = new Mock<IPrivateBlobStorageService>(Strict);
-            var ancillaryFileValidatorService = new Mock<IFileValidatorService>(Strict);
+            var fileValidatorService = new Mock<IFileValidatorService>(Strict);
 
             privateBlobStorageService.Setup(mock =>
                 mock.UploadFile(PrivateReleaseFiles,
@@ -212,7 +212,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     formFile
                 )).Returns(Task.CompletedTask);
 
-            ancillaryFileValidatorService.Setup(mock =>
+            fileValidatorService.Setup(mock =>
                     mock.ValidateFileForUpload(formFile, Image))
                 .ReturnsAsync(Unit.Instance);
 
@@ -220,15 +220,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 var service = SetupReleaseImageService(contentDbContext: contentDbContext,
                     privateBlobStorageService: privateBlobStorageService.Object,
-                    ancillaryFileValidatorService: ancillaryFileValidatorService.Object);
+                    fileValidatorService: fileValidatorService.Object);
 
                 var result = await service.Upload(releaseVersion.Id, formFile);
 
-                MockUtils.VerifyAllMocks(privateBlobStorageService, ancillaryFileValidatorService);
+                MockUtils.VerifyAllMocks(privateBlobStorageService, fileValidatorService);
 
                 Assert.True(result.IsRight);
 
-                ancillaryFileValidatorService.Verify(mock =>
+                fileValidatorService.Verify(mock =>
                     mock.ValidateFileForUpload(formFile, Image), Times.Once);
 
                 privateBlobStorageService.Verify(mock =>
@@ -267,27 +267,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         {
             var formFile = CreateFormFileMock("image.png", "image/png").Object;
             var privateBlobStorageService = new Mock<IPrivateBlobStorageService>(Strict);
-            var ancillaryFileValidatorService = new Mock<IFileValidatorService>(Strict);
+            var fileValidatorService = new Mock<IFileValidatorService>(Strict);
 
             await using (var contentDbContext = InMemoryApplicationDbContext())
             {
                 var service = SetupReleaseImageService(contentDbContext: contentDbContext,
                     privateBlobStorageService: privateBlobStorageService.Object,
-                    ancillaryFileValidatorService: ancillaryFileValidatorService.Object);
+                    fileValidatorService: fileValidatorService.Object);
 
                 var result = await service.Upload(Guid.NewGuid(), formFile);
 
                 result.AssertNotFound();
             }
 
-            MockUtils.VerifyAllMocks(privateBlobStorageService, ancillaryFileValidatorService);
+            MockUtils.VerifyAllMocks(privateBlobStorageService, fileValidatorService);
         }
 
         private ReleaseImageService SetupReleaseImageService(
             ContentDbContext contentDbContext,
             IPersistenceHelper<ContentDbContext>? contentPersistenceHelper = null,
             IPrivateBlobStorageService? privateBlobStorageService = null,
-            IFileValidatorService? ancillaryFileValidatorService = null,
+            IFileValidatorService? fileValidatorService = null,
             IReleaseFileRepository? releaseFileRepository = null,
             IUserService? userService = null)
         {
@@ -298,7 +298,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 contentDbContext,
                 contentPersistenceHelper ?? new PersistenceHelper<ContentDbContext>(contentDbContext),
                 privateBlobStorageService ?? new Mock<IPrivateBlobStorageService>(Strict).Object,
-                ancillaryFileValidatorService ?? new Mock<IFileValidatorService>(Strict).Object,
+                fileValidatorService ?? new Mock<IFileValidatorService>(Strict).Object,
                 releaseFileRepository ?? new ReleaseFileRepository(contentDbContext),
                 userService ?? MockUtils.AlwaysTrueUserService(_user.Id).Object
             );
