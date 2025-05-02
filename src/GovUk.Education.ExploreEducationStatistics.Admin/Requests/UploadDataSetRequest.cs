@@ -24,12 +24,8 @@ public record UploadDataSetRequest
 
     public class Validator : AbstractValidator<UploadDataSetRequest>
     {
-        //private readonly IFileTypeService _fileTypeService;
-
-        public Validator(/*IFileTypeService fileTypeService*/)
+        public Validator()
         {
-            //_fileTypeService = fileTypeService;
-
             RuleFor(request => request.ReleaseVersionId)
                 .NotEmpty();
 
@@ -53,8 +49,6 @@ public record UploadDataSetRequest
                         !fileName.EndsWith(Constants.DataSet.MetaFileExtension);
                 })
                     .WithMessage(ValidationMessages.FileNameMustEndDotCsv, "{FileName}", Constants.DataSet.DataFileExtension);
-            //.MustAsync(async (file, cancellationToken) => await _fileTypeService.HasValidCsvFileMeta(file))
-            //    .WithMessage(d => string.Format(ValidationMessages.MustBeCsvFile.Message, d.DataFile.FileName));
 
             RuleFor(request => request.MetaFile)
                 .Cascade(CascadeMode.Stop)
@@ -65,8 +59,6 @@ public record UploadDataSetRequest
                     return file.FileName.ToLower().EndsWith(Constants.DataSet.MetaFileExtension);
                 })
                     .WithMessage(ValidationMessages.MetaFileNameMustEndDotMetaDotCsv, "{FileName}", Constants.DataSet.MetaFileExtension);
-            //.MustAsync(async (file, cancellationToken) => await _fileTypeService.HasValidCsvFileMeta(file))
-            //    .WithMessage(d => string.Format(ValidationMessages.MustBeCsvFile.Message, d.MetaFile.FileName));
         }
     }
 }
@@ -84,12 +76,8 @@ public record UploadDataSetAsZipRequest
 
     public class Validator : AbstractValidator<UploadDataSetAsZipRequest>
     {
-        //private readonly IFileTypeService _fileTypeService;
-
-        public Validator(/*IFileTypeService fileTypeService*/)
+        public Validator()
         {
-            //_fileTypeService = fileTypeService;
-
             RuleFor(request => request.ReleaseVersionId)
                 .NotEmpty();
 
@@ -105,8 +93,6 @@ public record UploadDataSetAsZipRequest
             RuleFor(request => request.ZipFile)
                 .Cascade(CascadeMode.Stop)
                 .MustBeValidZipFile();
-            //.MustAsync(async (file, cancellationToken) => await _fileTypeService.HasValidZipFileMeta(file))
-            //    .WithMessage(d => string.Format(ValidationMessages.MustBeZipFile.Message, d.ZipFile.FileName));
         }
     }
 }
@@ -120,20 +106,14 @@ public record UploadDataSetAsBulkZipRequest
 
     public class Validator : AbstractValidator<UploadDataSetAsBulkZipRequest>
     {
-        //private readonly IFileTypeService _fileTypeService;
-
-        public Validator(/*IFileTypeService fileTypeService*/)
+        public Validator()
         {
-            //_fileTypeService = fileTypeService;
-
             RuleFor(request => request.ReleaseVersionId)
                 .NotEmpty();
 
             RuleFor(request => request.ZipFile)
                 .Cascade(CascadeMode.Stop)
                 .MustBeValidZipFile();
-            //.MustAsync(async (file, cancellationToken) => await _fileTypeService.HasValidZipFileMeta(file))
-            //    .WithMessage(d => string.Format(ValidationMessages.MustBeZipFile.Message, d.ZipFile.FileName));
         }
     }
 }

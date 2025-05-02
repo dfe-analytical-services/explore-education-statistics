@@ -15,7 +15,7 @@ using static Moq.MockBehavior;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services;
 
-public class AncillaryFileValidatorServiceTests
+public class FileValidatorServiceTests
 {
     [Fact]
     public async Task ValidateFileForUpload_FileCannotBeEmpty()

@@ -44,7 +44,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             ContentDbContext? contentDbContext = null,
             IPersistenceHelper<ContentDbContext>? contentPersistenceHelper = null,
             IPrivateBlobStorageService? privateBlobStorageService = null,
-            IFileValidatorService? ancillaryFileValidatorService = null,
+            IFileValidatorService? fileValidatorService = null,
             IReleaseFileRepository? releaseFileRepository = null,
             IUserService? userService = null)
         {
@@ -52,7 +52,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 contentDbContext ?? Mock.Of<ContentDbContext>(),
                 contentPersistenceHelper ?? DefaultPersistenceHelperMock().Object,
                 privateBlobStorageService ?? Mock.Of<IPrivateBlobStorageService>(),
-                ancillaryFileValidatorService ?? Mock.Of<IFileValidatorService>(),
+                fileValidatorService ?? Mock.Of<IFileValidatorService>(),
                 releaseFileRepository ?? Mock.Of<IReleaseFileRepository>(),
                 userService ?? Mock.Of<IUserService>()
             );
