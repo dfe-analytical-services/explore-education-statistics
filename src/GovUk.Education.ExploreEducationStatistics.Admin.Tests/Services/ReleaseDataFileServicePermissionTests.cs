@@ -19,6 +19,8 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Public.Data;
+using GovUk.Education.ExploreEducationStatistics.Common.Options;
+using Microsoft.Extensions.Options;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityPolicies;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.PermissionTestUtils;
@@ -239,7 +241,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             IReleaseDataFileRepository? releaseDataFileRepository = null,
             IDataImportService? dataImportService = null,
             IUserService? userService = null,
-            IDataSetVersionService dataSetVersionService = null
+            IDataSetVersionService? dataSetVersionService = null
             )
         {
             contentDbContext ??= new Mock<ContentDbContext>().Object;
@@ -259,7 +261,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 releaseDataFileRepository ?? new ReleaseDataFileRepository(contentDbContext),
                 dataImportService ?? new Mock<IDataImportService>(MockBehavior.Strict).Object,
                 userService ?? new Mock<IUserService>().Object,
-                dataSetVersionService ?? new Mock<IDataSetVersionService>(MockBehavior.Strict).Object
+                dataSetVersionService ?? new Mock<IDataSetVersionService>(MockBehavior.Strict).Object,
+                new Mock<IOptions<FeatureFlags>>(MockBehavior.Strict).Object
             );
         }
 

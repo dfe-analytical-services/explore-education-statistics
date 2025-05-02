@@ -13,6 +13,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Chart;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
+using GovUk.Education.ExploreEducationStatistics.Common.Options;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
@@ -25,6 +26,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
 using IReleaseVersionService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IReleaseVersionService;
@@ -37,6 +39,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly ContentDbContext _contentDbContext;
         private readonly StatisticsDbContext _statisticsDbContext;
         private readonly IDataSetService _dataSetService;
+        private readonly IOptions<FeatureFlags> _featureFlags;
         private readonly IFilterRepository _filterRepository;
         private readonly IIndicatorRepository _indicatorRepository;
         private readonly IIndicatorGroupRepository _indicatorGroupRepository;
@@ -64,7 +67,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             IUserService userService,
             ICacheKeyService cacheKeyService,
             IPrivateBlobCacheService privateCacheService,
-            IDataSetService dataSetService)
+            IDataSetService dataSetService,
+            IOptions<FeatureFlags> featureFlags)
         {
             _contentDbContext = contentDbContext;
             _statisticsDbContext = statisticsDbContext;
@@ -79,6 +83,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _userService = userService;
             _cacheKeyService = cacheKeyService;
             _dataSetService = dataSetService;
+            _featureFlags = featureFlags;
             _privateCacheService = privateCacheService;
         }
 
@@ -98,7 +103,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 {
                     var (originalReleaseFile, replacementReleaseFile) = tuple;
 
-                    return await GetLinkedDataSetVersion(replacementReleaseFile, cancellationToken)
+                    return await GetLinkedDataSetVersion(_featureFlags.Value.EnableReplacementOfPublicApiDataSets ? replacementReleaseFile : originalReleaseFile, cancellationToken)
                         .OnSuccess(apiDataSetVersion => (originalReleaseFile, replacementReleaseFile, apiDataSetVersion));
                 })
                 .OnSuccess(async tuple =>
@@ -119,21 +124,44 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         replacementSubjectMeta);
 
                     ApiDataSetVersionPlanViewModel? apiDataSetVersionPlan = null;
-                    if (tuple.replacementReleaseFile.PublicApiDataSetId is not null)
+                    if (_featureFlags.Value.EnableReplacementOfPublicApiDataSets)
                     {
-                        var completionStatus = await _dataSetService.GetMappingStatus(tuple.apiDataSetVersion!.Id, cancellationToken);
+                        if (tuple.replacementReleaseFile.PublicApiDataSetId is not null)
+                        {
+                            var completionStatus = await _dataSetService.GetMappingStatus(tuple.apiDataSetVersion!.Id, cancellationToken);
 
-                        apiDataSetVersionPlan = new ApiDataSetVersionPlanViewModel
+                            apiDataSetVersionPlan = new ApiDataSetVersionPlanViewModel
+                            {
+                                DataSetId = tuple.apiDataSetVersion.DataSetId,
+                                DataSetTitle = tuple.apiDataSetVersion.DataSet.Title,
+                                Id = tuple.apiDataSetVersion.Id,
+                                Version = tuple.apiDataSetVersion.PublicVersion,
+                                Status = tuple.apiDataSetVersion.Status,
+                                MappingStatus = completionStatus,
+                                Valid = completionStatus is null or { FiltersComplete: true, LocationsComplete: true }//Temporarily using this until feature flag is taken off. Then Will use logic inside ApiDataSetVersionPlanViewModel.MappingValid.
+                            };
+                        }
+                        return new DataReplacementPlanViewModel
+                        {
+                            DataBlocks = dataBlocks,
+                            Footnotes = footnotes,
+                            ApiDataSetVersionPlan = apiDataSetVersionPlan,
+                            OriginalSubjectId = originalSubjectId,
+                            ReplacementSubjectId = replacementSubjectId,
+                        };
+                    }
+
+                    apiDataSetVersionPlan = tuple.apiDataSetVersion is null
+                        ? null
+                        : new ApiDataSetVersionPlanViewModel
                         {
                             DataSetId = tuple.apiDataSetVersion.DataSetId,
                             DataSetTitle = tuple.apiDataSetVersion.DataSet.Title,
                             Id = tuple.apiDataSetVersion.Id,
                             Version = tuple.apiDataSetVersion.PublicVersion,
                             Status = tuple.apiDataSetVersion.Status,
-                            MappingStatus = completionStatus
+                            Valid = false,
                         };
-                    }
-
                     return new DataReplacementPlanViewModel
                     {
                         DataBlocks = dataBlocks,

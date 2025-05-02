@@ -17,12 +17,12 @@ public record DeleteApiDataSetVersionPlanViewModel
 
     public DataSetVersionStatus Status { get; init; }
 
-    public virtual bool Valid { get; init; }
+    public bool Valid { get; init; }
 }
 public record ApiDataSetVersionPlanViewModel : DeleteApiDataSetVersionPlanViewModel
 {
     public MappingStatusViewModel? MappingStatus { get; init; }
     
-    public override bool Valid => MappingStatus == null 
+    public bool MappingValid => MappingStatus == null
                          || (MappingStatus.FiltersComplete && MappingStatus.LocationsComplete);
 }

@@ -23,6 +23,8 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Public.Data;
+using GovUk.Education.ExploreEducationStatistics.Common.Options;
+using Microsoft.Extensions.Options;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainers;
@@ -45,7 +47,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         IReleaseDataFileRepository releaseDataFileRepository,
         IDataImportService dataImportService,
         IUserService userService,
-        IDataSetVersionService dataSetVersionService)
+        IDataSetVersionService dataSetVersionService,
+        IOptions<FeatureFlags> featureFlags)
         : IReleaseDataFileService
     {
         public async Task<Either<ActionResult, Unit>> Delete(Guid releaseVersionId,
@@ -257,7 +260,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         .OnSuccess(async tuple =>
                         {
                             var (replacingFile, newDataSetTitle) = tuple;
-                            var subjectId = await releaseVersionRepository.CreateStatisticsDbReleaseAndSubjectHierarchy(releaseVersionId);
+                            var subjectId = 
+                                await releaseVersionRepository
+                                    .CreateStatisticsDbReleaseAndSubjectHierarchy(releaseVersionId);
                             ReleaseFile? replacedReleaseDataFile = null;
 
                             if (replacingFile is not null)
@@ -292,30 +297,34 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                 type: FileType.Metadata,
                                 createdById: userService.GetUserId());
 
-                            var releaseFileWithApiDataSet = contentDbContext.ReleaseFiles
-                                .FirstOrDefault(rf =>
-                                    rf.ReleaseVersionId == releaseVersionId
-                                    && rf.Name == newDataSetTitle
-                                    && rf.PublicApiDataSetId != null);
-
                             await UploadFileToStorage(dataFile, dataFormFile);
                             await UploadFileToStorage(metaFile, metaFormFile);
 
-                            if (releaseFileWithApiDataSet is not null && replacingFile is not null)
+                            if (featureFlags.Value.EnableReplacementOfPublicApiDataSets)
                             {
-                                // Creates a new patch version. Failure cases will be handled in EES-5996.  
-                                await dataSetVersionService.CreateNextVersion(
-                                    dataReleaseFile.Id,
-                                    (Guid)releaseFileWithApiDataSet.PublicApiDataSetId!,
-                                    replacedReleaseDataFile?.PublicApiDataSetVersion
-                                );
+                                var releaseFileWithApiDataSet = contentDbContext.ReleaseFiles
+                                    .FirstOrDefault(rf =>
+                                        rf.ReleaseVersionId == releaseVersionId
+                                        && rf.Name == newDataSetTitle
+                                        && rf.PublicApiDataSetId != null);
+
+                                if (releaseFileWithApiDataSet is not null && replacingFile is not null)
+                                {
+                                    // Creates a new data set version to enable replacement. 
+                                    await dataSetVersionService.CreateNextVersion(
+                                        dataReleaseFile.Id,
+                                        (Guid)releaseFileWithApiDataSet.PublicApiDataSetId!,
+                                        replacedReleaseDataFile?.PublicApiDataSetVersion,
+                                        CancellationToken.None
+                                    );
+                                }
                             }
-                            
+
                             var dataImport = await dataImportService.Import(
                                 subjectId: subjectId,
                                 dataFile: dataFile,
                                 metaFile: metaFile);
-                            
+
                             var permissions = await userService.GetDataFilePermissions(dataFile);
 
                             return BuildDataFileViewModel(
@@ -376,7 +385,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                             {
                                 replacedReleaseDataFile = await GetReplacedReleaseDataFile(releaseVersionId, replacingFile);
                             }
-                            var releaseDataFileOrder = await GetNextDataFileOrder(releaseVersionId, replacedReleaseDataFile);
+                            var releaseDataFileOrder = await 
+                                GetNextDataFileOrder(releaseVersionId, replacedReleaseDataFile);
 
                             var dataFile = await releaseDataFileRepository.Create(
                                 releaseVersionId: releaseVersionId,
@@ -441,14 +451,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     var errors = await dataArchiveValidationService.IsValidZipFile(zipFile);
                     if (errors.Count > 0)
                     {
-                        return new Either<ActionResult, Unit>(
-                            Common.Validators.ValidationUtils.ValidationResult(errors));
+                        return new Either<ActionResult, Unit>(Common.Validators.ValidationUtils.ValidationResult(errors));
                     }
 
                     return Unit.Instance;
                 })
-                .OnSuccess(async _ =>
-                    await dataArchiveValidationService.ValidateBulkDataArchiveFiles(releaseVersionId, zipFile))
+                .OnSuccess(async _ => await dataArchiveValidationService.ValidateBulkDataArchiveFiles(releaseVersionId, zipFile))
                 .OnSuccess(async dataSetFiles =>
                 {
                     await using var stream = zipFile.OpenReadStream();
@@ -745,7 +753,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         }
         private async Task<ReleaseFile?> GetReplacedReleaseDataFile(Guid releaseVersionId, File replacingFile)
         {
-            
             return await contentDbContext.ReleaseFiles
                 .Include(rf => rf.File)
                 .SingleAsync(rf =>

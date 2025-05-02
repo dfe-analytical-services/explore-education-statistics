@@ -129,6 +129,7 @@ using IReleaseService = GovUk.Education.ExploreEducationStatistics.Admin.Service
 using ReleaseService = GovUk.Education.ExploreEducationStatistics.Admin.Services.ReleaseService;
 using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using GovUk.Education.ExploreEducationStatistics.Events.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Options;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin
 {

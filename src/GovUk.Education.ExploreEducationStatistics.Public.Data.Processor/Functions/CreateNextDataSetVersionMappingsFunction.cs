@@ -3,7 +3,6 @@ using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Requests;
-using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Requests.Validators;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.ViewModels;
 using Microsoft.AspNetCore.Mvc;
@@ -11,7 +10,6 @@ using Microsoft.Azure.Functions.Worker;
 using Microsoft.DurableTask;
 using Microsoft.DurableTask.Client;
 using Microsoft.Extensions.Logging;
-using Semver;
 using FromBodyAttribute = Microsoft.Azure.Functions.Worker.Http.FromBodyAttribute;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Functions;
@@ -35,7 +33,7 @@ public class CreateNextDataSetVersionMappingsFunction(
         var instanceId = Guid.NewGuid();
 
         return await requestValidator.Validate(request, cancellationToken)
-            .OnSuccess(() => ValidateVersionToReplaceIfSupplied(request.DataSetVersionToReplace))
+            .OnSuccess(() => dataSetVersionService.ParseVersionToReplace(request.DataSetVersionToReplace))
             .OnSuccess((dataSetVersionToReplace) =>
                  dataSetVersionService.CreateNextVersion(
                     dataSetId: request.DataSetId,
@@ -62,17 +60,6 @@ public class CreateNextDataSetVersionMappingsFunction(
             .HandleFailuresOr(result => new OkObjectResult(result));
     }
 
-    private static Task<Either<ActionResult, SemVersion?>> ValidateVersionToReplaceIfSupplied(string? version)
-    {
-        return Task.FromResult(!string.IsNullOrEmpty(version)
-            ? SemVersion.TryParse(version,
-                SemVersionStyles.OptionalMinorPatch | SemVersionStyles.AllowWhitespace | SemVersionStyles.AllowLowerV,
-                out var versionToReplace)
-                ? new Either<ActionResult, SemVersion?>(versionToReplace)
-                : new Either<ActionResult, SemVersion?>(
-                    new BadRequestObjectResult(ValidationMessages.DataSetVersionToReplaceNotValid))
-            : new Either<ActionResult, SemVersion?>((SemVersion?)null));
-    }
     private async Task ProcessNextDataSetVersion(
         DurableTaskClient client,
         Guid dataSetVersionId,

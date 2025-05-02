@@ -1,5 +1,6 @@
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Options;
 using GovUk.Education.ExploreEducationStatistics.Common.Validators;
 using GovUk.Education.ExploreEducationStatistics.Common.Validators.ErrorDetails;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
@@ -11,6 +12,7 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Requests;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Semver;
 using ValidationMessages =
     GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Requests.Validators.ValidationMessages;
@@ -20,7 +22,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Servi
 internal class DataSetVersionMappingService(
     IDataSetMetaService dataSetMetaService,
     PublicDataDbContext publicDataDbContext,
-    ContentDbContext contentDbContext)
+    ContentDbContext contentDbContext,
+    IOptions<FeatureFlags> featureFlags)
     : IDataSetVersionMappingService
 {
     private static readonly MappingType[] IncompleteMappingTypes =
@@ -47,10 +50,13 @@ internal class DataSetVersionMappingService(
             .ThenInclude(dataSet => dataSet.Versions)
             .SingleAsync(dsv => dsv.Id == nextDataSetVersionId, cancellationToken);
 
-        var sourceVersion = (dataSetVersionToReplace is not null
-            ? nextVersion.DataSet.Versions.FirstOrDefault(v => v.SemVersion() == dataSetVersionToReplace)
-            : nextVersion.DataSet.LatestLiveVersion!) ?? throw new Exception($"Unable to find appropriate source version via latest live version or specified version to patch: ${dataSetVersionToReplace}.");
-        //TODO: this is WIP, EES-5994 will take care of failures and recovering from them within this user journey.
+        var sourceVersion = featureFlags.Value.EnableReplacementOfPublicApiDataSets
+            ? (dataSetVersionToReplace is not null
+                ? nextVersion.DataSet.Versions.FirstOrDefault(v => v.SemVersion() == dataSetVersionToReplace)
+                : nextVersion.DataSet.LatestLiveVersion!) ?? throw new Exception(
+                $"Unable to find appropriate source version via latest live version or specified version to patch: ${dataSetVersionToReplace}.")
+            : nextVersion.DataSet.LatestLiveVersion!;
+        //TODO: this is WIP, EES-5996 will take care of failures and recovering from them within this user journey.
 
         var nextVersionMeta = await dataSetMetaService.ReadDataSetVersionMappingMeta(
             dataSetVersionId: nextDataSetVersionId,
@@ -137,20 +143,18 @@ internal class DataSetVersionMappingService(
 
         if (IsMajorVersionUpdate(mapping))
         {
-            // if (incrementPatchNumber)
-            // {
-            //     var doesntRequireManualMapping = mapping is { LocationMappingsComplete: true, FilterMappingsComplete: true } == false;//
-            //
-            //     if (doesntRequireManualMapping)//TODO: implement appropriate failure handler in EES-5996, also Need to account on whether the user has clicked finalize or not..
-            //     {
-            //         //throw new Exception("Major version number update is not allowed when replacement is in progress");
-            //     }
-            // }
-            // else
-            // {
-            //     mapping.TargetDataSetVersion.VersionMajor += 1;
-            //     mapping.TargetDataSetVersion.VersionMinor = 0;
-            // }
+            if (featureFlags.Value.EnableReplacementOfPublicApiDataSets)
+            {
+                if (incrementPatchNumber)
+                {
+                    var doesntRequireManualMapping = mapping is { LocationMappingsComplete: true, FilterMappingsComplete: true } == false;//
+            
+                    if (doesntRequireManualMapping)//TODO: implement appropriate failure handler in EES-5996, also Need to account on whether the user has clicked finalize or not..
+                    {
+                        //throw new Exception("Major version number update is not allowed when replacement is in progress");
+                    }
+                }
+            }
             mapping.TargetDataSetVersion.VersionMajor += 1;
             mapping.TargetDataSetVersion.VersionMinor = 0;
         }
@@ -197,9 +201,9 @@ internal class DataSetVersionMappingService(
 
         return mapping.FilterMappingPlan
             .Mappings
-            .SelectMany(filterMapping => 
+            .SelectMany(filterMapping =>
                 filterMapping.Value.OptionMappings)
-            .Any(optionMapping => 
+            .Any(optionMapping =>
                 NoMappingTypes.Contains(optionMapping.Value.Type));
     }
 

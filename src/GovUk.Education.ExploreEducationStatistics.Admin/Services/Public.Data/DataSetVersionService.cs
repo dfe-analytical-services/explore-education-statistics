@@ -141,7 +141,6 @@ public class DataSetVersionService(
                     dataSetVersion => dataSetVersion.Id == processorResponse.DataSetVersionId,
                     cancellationToken))
             .OnSuccess(async dataSetVersion => await MapDraftVersionSummary(dataSetVersion, cancellationToken));
-
     }
 
     public async Task<Either<ActionResult, DataSetVersionSummaryViewModel>> CompleteNextVersionImport(

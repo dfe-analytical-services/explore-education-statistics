@@ -11,6 +11,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Options;
 using GovUk.Education.ExploreEducationStatistics.Common.Requests;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
@@ -20,6 +21,7 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Npgsql;
 using ErrorViewModel = GovUk.Education.ExploreEducationStatistics.Common.ViewModels.ErrorViewModel;
 using ValidationUtils = GovUk.Education.ExploreEducationStatistics.Common.Validators.ValidationUtils;
@@ -31,7 +33,8 @@ public class DataSetVersionMappingService(
     IUserService userService,
     PublicDataDbContext publicDataDbContext,
     ContentDbContext contentDbContext,
-    IDataSetService dataSetService)
+    IDataSetService dataSetService,
+    IOptions<FeatureFlags> featureFlags)
     : IDataSetVersionMappingService
 {
     private static readonly MappingType[] IncompleteMappingTypes =
@@ -173,18 +176,6 @@ public class DataSetVersionMappingService(
             .Where(mapping => mapping.TargetDataSetVersionId == nextDataSetVersionId)
             .Select(nextVersion => nextVersion.TargetDataSetVersion)
             .SingleAsync(cancellationToken);
-
-        DataSetVersionImport? ongoingNextVersionImport = null;
-
-        // ongoingNextVersionImport = await publicDataDbContext.DataSetVersionImports.SingleOrDefaultAsync(import =>
-        //         import.DataSetVersionId == nextDataSetVersionId
-        //         && import.Stage != DataSetVersionImportStage.Completing
-        //         && import.DataSetVersionToReplace != null,//TODO: Handle in EES-5996
-        //     cancellationToken);
-
-
-        var mapping = await dataSetService.GetMappingStatus(nextDataSetVersionId, cancellationToken);
-        var doesNotRequireManualMapping = mapping is { LocationsComplete: true, FiltersComplete: true };
         
         var isMajorVersionUpdate = await IsMajorVersionUpdate(
             nextDataSetVersionId,
@@ -193,11 +184,27 @@ public class DataSetVersionMappingService(
             cancellationToken);
 
         if (isMajorVersionUpdate)
-        {//TODO: Add awareness of isIncrementingPatch the DataSetVersionMapping -  implement appropriate failure handler in EES-5996 
-            if (ongoingNextVersionImport is not null && doesNotRequireManualMapping)
-            {//TODO: WIP EES-5996
-                //throw new ApplicationException("Data set is Not allowed");
+        {
+            if (featureFlags.Value.EnableReplacementOfPublicApiDataSets)
+            {
+                //TODO: Handle in EES-5996
+                DataSetVersionImport? ongoingNextVersionImport = null;
+                // ongoingNextVersionImport = await publicDataDbContext.DataSetVersionImports.SingleOrDefaultAsync(import =>
+                //         import.DataSetVersionId == nextDataSetVersionId
+                //         && import.Stage != DataSetVersionImportStage.Completing
+                //         && import.DataSetVersionToReplace != null,
+                //     cancellationToken);
+
+                var mapping = await dataSetService.GetMappingStatus(nextDataSetVersionId, cancellationToken);
+                var doesNotRequireManualMapping = mapping is { LocationsComplete: true, FiltersComplete: true };
+
+                //TODO: Add awareness of isIncrementingPatch the DataSetVersionMapping -  implement appropriate failure handler in EES-5996 
+                if (ongoingNextVersionImport is not null && doesNotRequireManualMapping)
+                {//TODO: WIP EES-5996
+                    //throw new ApplicationException("Data set is Not allowed");
+                }
             }
+            
             targetDataSetVersion.VersionMajor = sourceDataSetVersion.VersionMajor + 1;
             targetDataSetVersion.VersionMinor = 0;
             targetDataSetVersion.VersionPatch = 0;

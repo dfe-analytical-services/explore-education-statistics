@@ -448,6 +448,36 @@ public static class ValidationProblemViewModelTestExtensions
         AssertHasErrors(errors, expectedErrors);
     }
 
+    public static void AssertDoesNotHaveErrors(
+        List<ErrorViewModel> errors,
+        List<ErrorViewModel> expectedMissingErrors)
+    {
+        var matchedErrors = errors
+            .Where(error => expectedMissingErrors.Any(expected => ErrorsMatch(error, expected)))
+            .ToArray();
+    
+        if (matchedErrors.Length == 0)
+        {
+            return;
+        }
+    
+        var matchedErrorMessages = matchedErrors
+            .Select(e => e.Message)
+            .ToList()
+            .JoinToString('\n');
+    
+        Assert.Fail($"""
+            Error message(s) found in expectedMissingErrors that should not be present:
+            {matchedErrorMessages}
+            """);
+
+        return;
+        static bool ErrorsMatch(ErrorViewModel current, ErrorViewModel expected) =>
+            current.Code == expected.Code &&
+            current.Message == expected.Message &&
+            current.Path == expected.Path;
+    }
+    
     public static void AssertHasErrors(
         List<ErrorViewModel> errors,
         List<ErrorViewModel> expectedErrors)
