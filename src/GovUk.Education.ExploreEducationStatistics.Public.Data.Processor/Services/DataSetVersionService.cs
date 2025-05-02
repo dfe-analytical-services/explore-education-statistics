@@ -33,11 +33,26 @@ internal class DataSetVersionService(
 {
     public Task<Either<ActionResult, SemVersion?>> ParseVersionToReplace(string? version)
     {
+        var dataSetVersionToReplaceNotEnabledError = ValidationUtils.ValidationResult(new ErrorViewModel
+        {
+            Code = ValidationMessages.DataSetVersionToReplaceNotEnabled.Code,
+            Message = ValidationMessages.DataSetVersionToReplaceNotEnabled.Message,
+            Path = nameof(NextDataSetVersionMappingsCreateRequest.DataSetVersionToReplace),
+            Detail = null
+        });
+        
+        var dataSetVersionToReplaceNotValidError = ValidationUtils.ValidationResult(new ErrorViewModel
+        {
+            Code = ValidationMessages.DataSetVersionToReplaceNotValid.Code,
+            Message = ValidationMessages.DataSetVersionToReplaceNotValid.Message,
+            Path = nameof(NextDataSetVersionMappingsCreateRequest.DataSetVersionToReplace),
+            Detail = null
+        });
+        
         if (featureFLags.Value.EnableReplacementOfPublicApiDataSets == false && version is not null)
         {
             // Terminate this function app if it is creating a patch version whilst the feature flag is turned off. 
-            return Task.FromResult(new Either<ActionResult, SemVersion?>(
-                new BadRequestObjectResult(ValidationMessages.DataSetVersionToReplaceNotEnabled)));
+            return Task.FromResult(new Either<ActionResult, SemVersion?>(dataSetVersionToReplaceNotEnabledError));
         }
 
         if (featureFLags.Value.EnableReplacementOfPublicApiDataSets == false)
@@ -46,12 +61,11 @@ internal class DataSetVersionService(
         }
 
         return Task.FromResult(!string.IsNullOrEmpty(version)
-            ? SemVersion.TryParse(version,
+            ? SemVersion.TryParse(version, 
                 SemVersionStyles.OptionalMinorPatch | SemVersionStyles.AllowWhitespace | SemVersionStyles.AllowLowerV,
-                out var versionToReplace)
-                ? versionToReplace
-                : new Either<ActionResult, SemVersion?>(
-                    new BadRequestObjectResult(ValidationMessages.DataSetVersionToReplaceNotValid))
+                out var versionToReplaceParsed)
+                ? versionToReplaceParsed
+                : new Either<ActionResult, SemVersion?>(dataSetVersionToReplaceNotValidError)
             : (SemVersion?)null);
     }
 
