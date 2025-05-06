@@ -5,16 +5,16 @@ using Microsoft.Extensions.Logging;
 
 namespace GovUk.Education.ExploreEducationStatistics.Analytics.Consumer.Services;
 
-public class PublicApiGetMetaProcessor(
+public class PublicApiDataSetVersionCallsProcessor(
     DuckDbConnection duckDbConnection,
     IAnalyticsPathResolver pathResolver,
-    ILogger<PublicApiGetMetaProcessor> logger) : IRequestFileProcessor
+    ILogger<PublicApiDataSetVersionCallsProcessor> logger) : IRequestFileProcessor
 {
     public Task Process()
     {
-        logger.LogInformation("{PublicApiGetMetaProcessor} triggered", nameof(PublicApiGetMetaProcessor));
+        logger.LogInformation("{PublicApiGetMetaProcessor} triggered", nameof(PublicApiDataSetVersionCallsProcessor));
 
-        var sourceDirectory = pathResolver.PublicApiGetMetaDirectoryPath();
+        var sourceDirectory = pathResolver.PublicApiDataSetVersionCallsDirectoryPath();
 
         if (!Directory.Exists(sourceDirectory))
         {
@@ -36,8 +36,8 @@ public class PublicApiGetMetaProcessor(
 
         logger.LogInformation("Found {Count} public api \"get meta\" requests to process", filesToProcess.Count);
 
-        var processingDirectory = pathResolver.PublicApiGetMetaProcessingDirectoryPath();
-        var reportsDirectory = pathResolver.PublicApiGetMetaReportsDirectoryPath();
+        var processingDirectory = pathResolver.PublicApiDataSetVersionCallsProcessingDirectoryPath();
+        var reportsDirectory = pathResolver.PublicApiDataSetVersionCallsReportsDirectoryPath();
 
         Directory.CreateDirectory(processingDirectory);
         Directory.CreateDirectory(reportsDirectory);
@@ -59,10 +59,11 @@ public class PublicApiGetMetaProcessor(
                 dataSetTitle VARCHAR,
                 dataSetVersion VARCHAR,
                 dataSetVersionId UUID,
+                parameters JSON,
                 previewToken JSON,
                 requestedDataSetVersion VARCHAR,
                 startTime DATETIME,
-                types JSON
+                type VARCHAR
             );
         ");
 
@@ -97,7 +98,7 @@ public class PublicApiGetMetaProcessor(
 
         var reportFilename = Path.Combine(
             reportsDirectory,
-            $"{reportFilenamePrefix}_public-api-get-meta.parquet");
+            $"{reportFilenamePrefix}_public-api-data-set-version-calls.parquet");
 
         duckDbConnection.ExecuteNonQuery($@"
             COPY (SELECT * FROM GetMeta ORDER BY startTime ASC)
@@ -112,10 +113,10 @@ public class PublicApiGetMetaProcessor(
     {
         try
         {
-            var failuresDirectoryPath = pathResolver.PublicApiGetMetaFailuresDirectoryPath();
+            var failuresDirectoryPath = pathResolver.PublicApiDataSetVersionCallsFailuresDirectoryPath();
             Directory.CreateDirectory(failuresDirectoryPath);
 
-            var fileSourcePath = Path.Combine(pathResolver.PublicApiGetMetaProcessingDirectoryPath(), filename);
+            var fileSourcePath = Path.Combine(pathResolver.PublicApiDataSetVersionCallsProcessingDirectoryPath(), filename);
             var fileDestPath = Path.Combine(failuresDirectoryPath, filename);
             File.Move(fileSourcePath, fileDestPath);
         }

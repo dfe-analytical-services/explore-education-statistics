@@ -42,20 +42,20 @@ public class TestAnalyticsPathResolver : IAnalyticsPathResolver, IDisposable
     }
     
     // PublicApiQueries
-    public string PublicApiGetMetaDirectoryPath()
+    public string PublicApiDataSetVersionCallsDirectoryPath()
     {
         return Path.Combine(_basePath, "public-api", "get-meta");
     }
 
-    public string PublicApiGetMetaProcessingDirectoryPath() {
-        return Path.Combine(PublicApiGetMetaDirectoryPath(), "processing");
+    public string PublicApiDataSetVersionCallsProcessingDirectoryPath() {
+        return Path.Combine(PublicApiDataSetVersionCallsDirectoryPath(), "processing");
     }
 
-    public string PublicApiGetMetaFailuresDirectoryPath() {
-        return Path.Combine(PublicApiGetMetaDirectoryPath(), "failures");
+    public string PublicApiDataSetVersionCallsFailuresDirectoryPath() {
+        return Path.Combine(PublicApiDataSetVersionCallsDirectoryPath(), "failures");
     }
 
-    public string PublicApiGetMetaReportsDirectoryPath() {
+    public string PublicApiDataSetVersionCallsReportsDirectoryPath() {
         return Path.Combine(_basePath, "reports", "public-api", "get-meta");
     }
 

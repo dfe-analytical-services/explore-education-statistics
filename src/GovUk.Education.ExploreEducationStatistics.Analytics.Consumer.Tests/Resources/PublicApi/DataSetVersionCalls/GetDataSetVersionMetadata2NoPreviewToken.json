@@ -3,11 +3,14 @@
   "dataSetTitle": "Data Set 1",
   "dataSetVersion": "1.2.0",
   "dataSetVersionId": "01d29401-7974-1276-a06b-b28a6a5385c6",
+  "parameters": {
+    "types": [
+      "Filters",
+      "Locations",
+      "TimePeriods"
+    ]
+  },
   "requestedDataSetVersion": "1.*",
   "startTime": "2025-02-24T02:07:44.850Z",
-  "types": [
-    "Filters",
-    "Locations",
-    "TimePeriods"
-  ]
+  "type": "GetDataSetVersionMetadata"
 }

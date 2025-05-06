@@ -44,10 +44,10 @@ public class DataSetVersionsController(
     }
 
     /// <summary>
-    /// Get a data set version
+    /// Get a data set version’s summary
     /// </summary>
     /// <remarks>
-    /// Get a data set version's summary details.
+    /// Gets a specific data set version’s summary details.
     /// </remarks>
     [HttpGet("{dataSetVersion}")]
     [Produces(MediaTypeNames.Application.Json)]

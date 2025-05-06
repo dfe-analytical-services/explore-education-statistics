@@ -65,24 +65,24 @@ public class AnalyticsPathResolver : IAnalyticsPathResolver
     }
     
     // PublicApiQueries
-    public string PublicApiGetMetaDirectoryPath()
+    public string PublicApiDataSetVersionCallsDirectoryPath()
     {
         return Path.Combine(_basePath, "public-api", "get-meta");
     }
 
-    public string PublicApiGetMetaProcessingDirectoryPath()
+    public string PublicApiDataSetVersionCallsProcessingDirectoryPath()
     {
-        return Path.Combine(PublicApiGetMetaDirectoryPath(), "processing");
+        return Path.Combine(PublicApiDataSetVersionCallsDirectoryPath(), "processing");
     }
 
-    public string PublicApiGetMetaFailuresDirectoryPath()
+    public string PublicApiDataSetVersionCallsFailuresDirectoryPath()
     {
-        return Path.Combine(PublicApiGetMetaDirectoryPath(), "failures");
+        return Path.Combine(PublicApiDataSetVersionCallsDirectoryPath(), "failures");
     }
 
-    public string PublicApiGetMetaReportsDirectoryPath()
+    public string PublicApiDataSetVersionCallsReportsDirectoryPath()
     {
-        return Path.Combine(PublicApiGetMetaDirectoryPath(), "public-api", "get-meta");
+        return Path.Combine(PublicApiDataSetVersionCallsDirectoryPath(), "public-api", "get-meta");
     }
 
     // PublicZipDownloads
