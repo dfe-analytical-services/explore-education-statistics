@@ -107,8 +107,6 @@ const FindStatisticsPage: NextPage = () => {
     selectedReleaseType,
   ]).join(', ');
 
-  console.log({ publicationsDataAzure });
-
   const sortOptions: SortOption[] = [
     { label: 'Newest', value: 'newest' },
     { label: 'Oldest', value: 'oldest' },
@@ -140,11 +138,6 @@ const FindStatisticsPage: NextPage = () => {
         shallow: true,
       },
     );
-
-    // TODO
-    if (publicationsDataAzure?.results) {
-      console.log(publicationsDataAzure);
-    }
   };
 
   const handleSortBy = async (nextSortBy: PublicationSortOption) => {
@@ -369,16 +362,34 @@ const FindStatisticsPage: NextPage = () => {
                     id="searchResults"
                     data-testid="publicationsList"
                   >
-                    <li>render results here</li>
+                    {publicationsAzure.map(publicationSearchResult => {
+                      const { document } = publicationSearchResult;
+                      const pub = {
+                        ...document,
+                        published: new Date(document.published),
+                        id: document.releaseVersionId,
+                        rank: publicationSearchResult.score,
+                        slug: document.releaseSlug,
+                        latestReleaseSlug: document.releaseSlug, // TODO needs adding somehow
+                        type: document.releaseType as ReleaseType,
+                        // summary: document.content,
+                      };
+                      return (
+                        <PublicationSummary
+                          key={pub.releaseVersionId}
+                          publication={pub}
+                        />
+                      );
+                    })}
                   </ul>
                 )}
               </>
             )}
-            {page && totalPages && (
+            {page && totalPagesAzure && (
               <Pagination
                 currentPage={page}
                 shallow
-                totalPages={totalPages}
+                totalPages={totalPagesAzure}
                 onClick={pageNumber => {
                   // Make sure the page title is updated before the route change,
                   // otherwise the wrong page number is announced.
