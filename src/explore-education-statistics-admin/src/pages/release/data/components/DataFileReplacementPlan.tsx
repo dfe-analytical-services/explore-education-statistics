@@ -32,6 +32,7 @@ import sanitizeHtml from '@common/utils/sanitizeHtml';
 import { useAuthContext } from '@admin/contexts/AuthContext';
 import releaseDataPageTabIds from '@admin/pages/release/data/utils/releaseDataPageTabIds';
 import Link from '@admin/components/Link';
+import { useFeatureFlag } from '@admin/contexts/FeatureFlagContext';
 
 interface Props {
   cancelButton: ReactNode;
@@ -78,10 +79,13 @@ const DataFileReplacementPlan = ({
     () => plan?.footnotes.some(footnote => !footnote.valid) ?? false,
     [plan],
   );
+  const isNewReplaceDsvFeatureEnabled = useFeatureFlag(
+    'enableReplacementOfPublicApiDataSets',
+  );
 
   const hasDataSetVersionPlan = useMemo<boolean>(
-    () => plan?.apiDataSetVersionPlan !== undefined,
-    [plan],
+    () => isNewReplaceDsvFeatureEnabled && plan?.apiDataSetVersionPlan !== null,
+    [plan, isNewReplaceDsvFeatureEnabled],
   );
 
   const hasInvalidLocationMapping = useMemo<boolean>(
