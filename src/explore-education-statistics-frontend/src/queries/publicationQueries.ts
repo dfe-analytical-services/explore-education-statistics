@@ -118,14 +118,14 @@ const publicationQueries = {
             includeTotalCount: true,
             top: 10,
             // TODO Check if params.page needs number check or safe to assume type
-            skip: params.page ? params.page - 1 * 10 : 0,
+            skip: params.page && params.page > 1 ? (params.page - 1) * 10 : 0,
           },
         );
         // return searchResults;
 
         const publicationsResult = {
           paging: {
-            totalPages: Math.floor(searchResults.count || 0 / 10) + 1,
+            totalPages: Math.floor((searchResults.count || 0) / 10) + 1,
             totalResults: searchResults.count || 0,
             page: params.page || 1,
             pageSize: 10,
