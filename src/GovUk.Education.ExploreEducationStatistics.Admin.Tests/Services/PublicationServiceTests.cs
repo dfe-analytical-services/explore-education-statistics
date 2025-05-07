@@ -1189,19 +1189,16 @@ public class PublicationServiceTests
             );
         }
 
-        await using (var context = InMemoryApplicationDbContext(contextId))
+        if (expectPublicationArchivedEventRaised)
         {
+            await using var context = InMemoryApplicationDbContext(contextId);
             var updatedPublication = await context.Publications
                 .SingleAsync(p => p.Id == publication.Id);
-
-            if (expectPublicationArchivedEventRaised)
-            {
-                AssertOnPublicationArchivedEventRaised(updatedPublication);
-            }
-            else
-            {
-                AssertOnPublicationChangedEventsNotRaised();
-            }
+            AssertOnPublicationArchivedEventRaised(updatedPublication);
+        }
+        else
+        {
+            AssertOnPublicationChangedEventsNotRaised();
         }
     }
 

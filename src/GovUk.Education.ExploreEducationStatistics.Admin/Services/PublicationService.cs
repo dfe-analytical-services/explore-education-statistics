@@ -256,23 +256,25 @@ public class PublicationService(
 
     private async Task RaiseEventIfSupersededByChanged(Publication publication, Guid? previousSupersededById)
     {
-        if (previousSupersededById != publication.SupersededById)
+        if (publication.SupersededById == previousSupersededById)
         {
-            var previousSupersedingPublication = await GetSupersedingPublication(previousSupersededById);
-            var newSupersedingPublication = await GetSupersedingPublication(publication.SupersededById);
+            return;
+        }
 
-            var transition = PublicationArchiveStatusTransitionResolver.GetTransition(
-                previousSupersedingPublication,
-                newSupersedingPublication);
+        var previousSupersedingPublication = await GetSupersedingPublication(previousSupersededById);
+        var newSupersedingPublication = await GetSupersedingPublication(publication.SupersededById);
 
-            if (transition == PublicationArchiveStatusTransitionResolver.PublicationArchiveStatusTransition
-                    .NotArchivedToArchived)
-            {
-                await adminEventRaiser.OnPublicationArchived(
-                    publication.Id,
-                    publication.Slug,
-                    supersededByPublicationId: publication.SupersededById!.Value);
-            }
+        var transition = PublicationArchiveStatusTransitionResolver.GetTransition(
+            previousSupersedingPublication,
+            newSupersedingPublication);
+
+        if (transition == PublicationArchiveStatusTransitionResolver.PublicationArchiveStatusTransition
+                .NotArchivedToArchived)
+        {
+            await adminEventRaiser.OnPublicationArchived(
+                publication.Id,
+                publication.Slug,
+                supersededByPublicationId: publication.SupersededById!.Value);
         }
     }
 
@@ -280,7 +282,6 @@ public class PublicationService(
     {
         return supersededByPublicationId != null
             ? await context.Publications
-                .Where(p => p.Id == supersededByPublicationId)
                 .SingleAsync(p => p.Id == supersededByPublicationId)
             : null;
     }

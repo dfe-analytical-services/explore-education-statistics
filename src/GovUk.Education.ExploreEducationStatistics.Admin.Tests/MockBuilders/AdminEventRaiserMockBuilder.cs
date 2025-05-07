@@ -78,15 +78,12 @@ public class AdminEventRaiserMockBuilder
             Guid? expectedReleaseId = null,
             string? expectedNewReleaseSlug = null,
             Guid? expectedPublicationId = null,
-            string? expectedPublicationSlug = null) =>
+            string? expectedPublicationSlug = null) => 
             mockBuilder._mock.Verify(m => m.OnReleaseSlugChanged(
-                    It.Is<Guid>(releaseId => expectedReleaseId == null || releaseId == expectedReleaseId),
-                    It.Is<string>(newReleaseSlug =>
-                        expectedNewReleaseSlug == null || newReleaseSlug == expectedNewReleaseSlug),
-                    It.Is<Guid>(
-                        publicationId => expectedPublicationId == null || publicationId == expectedPublicationId),
-                    It.Is<string>(publicationSlug =>
-                        expectedPublicationSlug == null || publicationSlug == expectedPublicationSlug)),
+                    It.Is<Guid>(releaseId => expectedReleaseId == null || releaseId == expectedReleaseId), 
+                    It.Is<string>(newReleaseSlug => expectedNewReleaseSlug == null || newReleaseSlug == expectedNewReleaseSlug), 
+                    It.Is<Guid>(publicationId => expectedPublicationId == null || publicationId == expectedPublicationId), 
+                    It.Is<string>(publicationSlug => expectedPublicationSlug == null || publicationSlug == expectedPublicationSlug)),
                 Times.Once);
 
         public void OnReleaseSlugChangedWasNotRaised() =>
