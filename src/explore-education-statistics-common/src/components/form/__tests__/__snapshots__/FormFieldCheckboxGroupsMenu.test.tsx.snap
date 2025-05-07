@@ -75,7 +75,7 @@ exports[`FormFieldCheckboxGroupsMenu renders multiple checkbox groups in correct
               value="1"
             />
             <label
-              class="govuk-label govuk-checkboxes__label"
+              class="govuk-label govuk-checkboxes__label label"
               for="test-options-1-1"
             >
               Option 1
@@ -93,7 +93,7 @@ exports[`FormFieldCheckboxGroupsMenu renders multiple checkbox groups in correct
               value="2"
             />
             <label
-              class="govuk-label govuk-checkboxes__label"
+              class="govuk-label govuk-checkboxes__label label"
               for="test-options-1-2"
             >
               Option 2
@@ -142,7 +142,7 @@ exports[`FormFieldCheckboxGroupsMenu renders multiple checkbox groups in correct
               value="3"
             />
             <label
-              class="govuk-label govuk-checkboxes__label"
+              class="govuk-label govuk-checkboxes__label label"
               for="test-options-2-3"
             >
               Option 3
@@ -160,7 +160,7 @@ exports[`FormFieldCheckboxGroupsMenu renders multiple checkbox groups in correct
               value="4"
             />
             <label
-              class="govuk-label govuk-checkboxes__label"
+              class="govuk-label govuk-checkboxes__label label"
               for="test-options-2-4"
             >
               Option 4
@@ -223,7 +223,7 @@ exports[`FormFieldCheckboxGroupsMenu renders single checkbox group with search i
           value="1"
         />
         <label
-          class="govuk-label govuk-checkboxes__label"
+          class="govuk-label govuk-checkboxes__label label"
           for="test-1-1"
         >
           Option 1
@@ -241,7 +241,7 @@ exports[`FormFieldCheckboxGroupsMenu renders single checkbox group with search i
           value="2"
         />
         <label
-          class="govuk-label govuk-checkboxes__label"
+          class="govuk-label govuk-checkboxes__label label"
           for="test-1-2"
         >
           Option 2
@@ -281,7 +281,7 @@ exports[`FormFieldCheckboxGroupsMenu renders single checkbox group with single c
           value="1"
         />
         <label
-          class="govuk-label govuk-checkboxes__label"
+          class="govuk-label govuk-checkboxes__label label"
           for="test-1-1"
         >
           Option 1
