@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Events;
@@ -33,7 +34,7 @@ public class AdminEventRaiserTests
         var expectedEvent = new ThemeChangedEvent(theme);
         _eventRaiserMockBuilder.Assert.EventRaised(expectedEvent);
     }
-    
+
     [Fact]
     public async Task WhenOnReleaseSlugChanged_ThenEventPublished()
     {
@@ -42,7 +43,7 @@ public class AdminEventRaiserTests
         var newReleaseSlug = "new-release-slug";
         var publicationId = Guid.NewGuid();
         var publicationSlug = "publication-slug";
-        
+
         var sut = GetSut();
 
         // ACT
@@ -60,7 +61,31 @@ public class AdminEventRaiserTests
             publicationSlug);
         _eventRaiserMockBuilder.Assert.EventRaised(expectedEvent);
     }
-    
+
+    [Fact]
+    public async Task WhenOnPublicationArchived_ThenEventPublished()
+    {
+        // ARRANGE
+        var publicationId = Guid.NewGuid();
+        const string publicationSlug = "publication-slug";
+        var supersededByPublicationId = Guid.NewGuid();
+
+        var sut = GetSut();
+
+        // ACT
+        await sut.OnPublicationArchived(
+            publicationId,
+            publicationSlug,
+            supersededByPublicationId);
+
+        // ASSERT
+        var expectedEvent = new PublicationArchivedEvent(
+            publicationId,
+            publicationSlug,
+            supersededByPublicationId);
+        _eventRaiserMockBuilder.Assert.EventRaised(expectedEvent);
+    }
+
     [Fact]
     public async Task WhenOnPublicationChanged_ThenEventPublished()
     {
@@ -72,7 +97,7 @@ public class AdminEventRaiserTests
             Summary = "This is the publication summary",
             Slug = "publication-slug"
         };
-        
+
         var sut = GetSut();
 
         // ACT
@@ -82,7 +107,7 @@ public class AdminEventRaiserTests
         var expectedEvent = new PublicationChangedEvent(publication);
         _eventRaiserMockBuilder.Assert.EventRaised(expectedEvent);
     }
-    
+
     [Fact]
     public async Task WhenOnPublicationLatestPublishedReleaseReordered_ThenEventPublished()
     {
@@ -96,23 +121,24 @@ public class AdminEventRaiserTests
             LatestPublishedReleaseVersionId = Guid.NewGuid()
         };
         var previousLatestPublishedReleaseVersionId = Guid.NewGuid();
-        
+
         var sut = GetSut();
 
         // ACT
         await sut.OnPublicationLatestPublishedReleaseReordered(
-            publication, 
+            publication,
             previousLatestPublishedReleaseVersionId);
 
         // ASSERT
         var expectedEvent = new PublicationLatestPublishedReleaseReorderedEvent(
-            publication, 
+            publication,
             previousLatestPublishedReleaseVersionId);
         _eventRaiserMockBuilder.Assert.EventRaised(expectedEvent);
     }
-    
+
     [Fact]
-    public async Task GivenPublicationLatestPublishedReleaseVersionIdIsNull_WhenOnPublicationLatestPublishedReleaseReordered_ThenNoEventPublished()
+    public async Task
+        GivenPublicationLatestPublishedReleaseVersionIdIsNull_WhenOnPublicationLatestPublishedReleaseReordered_ThenNoEventPublished()
     {
         // ARRANGE
         var publication = new Publication
@@ -124,12 +150,12 @@ public class AdminEventRaiserTests
             LatestPublishedReleaseVersionId = null
         };
         var previousLatestPublishedReleaseVersionId = Guid.NewGuid();
-        
+
         var sut = GetSut();
 
         // ACT
         await sut.OnPublicationLatestPublishedReleaseReordered(
-            publication, 
+            publication,
             previousLatestPublishedReleaseVersionId);
 
         // ASSERT

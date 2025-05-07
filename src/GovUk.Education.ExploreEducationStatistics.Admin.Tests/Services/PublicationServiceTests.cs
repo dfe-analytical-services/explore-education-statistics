@@ -949,52 +949,31 @@ public class PublicationServiceTests
     [Fact]
     public async Task UpdatePublication_NotPublished()
     {
-        var theme = new Theme
-        {
-            Title = "New theme",
-        };
+        Publication publication = _dataFixture
+            .DefaultPublication()
+            .WithTheme(_dataFixture.DefaultTheme());
 
-        var publication = new Publication
-        {
-            Title = "Old title",
-            Summary = "Old summary",
-            Slug = "old-slug",
-            Theme = new Theme
-            {
-                Title = "Old theme"
-            },
-            Contact = new Contact
-            {
-                ContactName = "Old name",
-                ContactTelNo = "0987654321",
-                TeamName = "Old team",
-                TeamEmail = "old.smith@test.com",
-            },
-            SupersededById = Guid.NewGuid(),
-        };
+        Theme otherTheme = _dataFixture.DefaultTheme();
 
         var contextId = Guid.NewGuid().ToString();
-
         await using (var context = InMemoryApplicationDbContext(contextId))
         {
-            context.Add(theme);
-            context.Add(publication);
-
+            context.Publications.Add(publication);
+            context.Themes.Add(otherTheme);
             await context.SaveChangesAsync();
         }
 
-        var newSupersededById = Guid.NewGuid();
+        var methodologyService = new Mock<IMethodologyService>(Strict);
+        methodologyService
+            .Setup(s => s.PublicationTitleOrSlugChanged(
+                publication.Id,
+                publication.Slug,
+                "New title",
+                "new-title"))
+            .Returns(Task.CompletedTask);
+
         await using (var context = InMemoryApplicationDbContext(contextId))
         {
-            var methodologyService = new Mock<IMethodologyService>(Strict);
-            methodologyService
-                .Setup(s => s.PublicationTitleOrSlugChanged(
-                    publication.Id,
-                    publication.Slug,
-                    "New title",
-                    "new-title"))
-                .Returns(Task.CompletedTask);
-
             var publicationService = BuildPublicationService(context,
                 methodologyService: methodologyService.Object);
 
@@ -1004,9 +983,10 @@ public class PublicationServiceTests
                 new PublicationSaveRequest
                 {
                     Title = "New title",
+                    Slug = "new-title",
                     Summary = "New summary",
-                    ThemeId = theme.Id,
-                    SupersededById = newSupersededById,
+                    ThemeId = otherTheme.Id,
+                    SupersededById = null
                 }
             );
 
@@ -1017,10 +997,10 @@ public class PublicationServiceTests
             Assert.Equal("New title", viewModel.Title);
             Assert.Equal("New summary", viewModel.Summary);
 
-            Assert.Equal(theme.Id, viewModel.Theme.Id);
-            Assert.Equal(theme.Title, viewModel.Theme.Title);
+            Assert.Equal(otherTheme.Id, viewModel.Theme.Id);
+            Assert.Equal(otherTheme.Title, viewModel.Theme.Title);
 
-            Assert.Equal(newSupersededById, viewModel.SupersededById);
+            Assert.Null(viewModel.SupersededById);
         }
 
         await using (var context = InMemoryApplicationDbContext(contextId))
@@ -1028,117 +1008,74 @@ public class PublicationServiceTests
             var updatedPublication = await context.Publications
                 .Include(p => p.Contact)
                 .Include(p => p.Theme)
-                .SingleAsync(p => p.Title == "New title");
+                .SingleAsync(p => p.Id == publication.Id);
 
             Assert.False(updatedPublication.Live);
             updatedPublication.Updated.AssertUtcNow();
             Assert.Equal("new-title", updatedPublication.Slug);
             Assert.Equal("New title", updatedPublication.Title);
-            Assert.Equal(newSupersededById, updatedPublication.SupersededById);
+            Assert.Null(updatedPublication.SupersededById);
 
-            Assert.Equal("Old name", updatedPublication.Contact.ContactName);
-            Assert.Equal("0987654321", updatedPublication.Contact.ContactTelNo);
-            Assert.Equal("Old team", updatedPublication.Contact.TeamName);
-            Assert.Equal("old.smith@test.com", updatedPublication.Contact.TeamEmail);
+            Assert.Equal(publication.Contact.ContactName, updatedPublication.Contact.ContactName);
+            Assert.Equal(publication.Contact.ContactTelNo, updatedPublication.Contact.ContactTelNo);
+            Assert.Equal(publication.Contact.TeamName, updatedPublication.Contact.TeamName);
+            Assert.Equal(publication.Contact.TeamEmail, updatedPublication.Contact.TeamEmail);
 
-            Assert.Equal(theme.Id, updatedPublication.ThemeId);
-            Assert.Equal("New theme", updatedPublication.Theme.Title);
+            Assert.Equal(otherTheme.Id, updatedPublication.ThemeId);
+            Assert.Equal(otherTheme.Title, updatedPublication.Theme.Title);
 
             var publicationRedirects = await context.PublicationRedirects.ToListAsync();
             Assert.Empty(publicationRedirects);
         }
-        
-        AssertOnPublicationChangedEventNotRaised();
+
+        _publicationCacheServiceMockBuilder.Assert.CacheNotInvalidatedForPublicationTree();
+        _publicationCacheServiceMockBuilder.Assert.CacheNotInvalidatedForPublicationEntry("new-title");
+        _publicationCacheServiceMockBuilder.Assert.CacheNotInvalidatedForPublicationAndReleases(publication.Slug);
+        AssertOnPublicationChangedEventsNotRaised();
     }
 
     [Fact]
     public async Task UpdatePublication_AlreadyPublished()
     {
-        var theme = new Theme
-        {
-            Title = "New theme",
-        };
+        Publication publication = _dataFixture
+            .DefaultPublication()
+            .WithReleases([_dataFixture.DefaultRelease(publishedVersions: 1, draftVersion: false)])
+            .WithTheme(_dataFixture.DefaultTheme());
 
-        var supersedingPublicationToRemove = new Publication
-        {
-            Slug = "superseding-to-remove-slug",
-        };
-
-        var publication = new Publication
-        {
-            Slug = "old-title",
-            Title = "Old title",
-            Summary = "Old summary",
-            Theme = new Theme
-            {
-                Title = "Old theme"
-            },
-            Contact = new Contact
-            {
-                ContactName = "Old name",
-                ContactTelNo = "0987654321",
-                TeamName = "Old team",
-                TeamEmail = "old.smith@test.com",
-            },
-            LatestPublishedReleaseVersion = new ReleaseVersion(),
-            SupersededBy = supersedingPublicationToRemove,
-        };
-
-        var supersededPublication = new Publication
-        {
-            Slug = "superseded-slug",
-            SupersededBy = publication,
-        };
+        Theme otherTheme = _dataFixture.DefaultTheme();
 
         var contextId = Guid.NewGuid().ToString();
         await using (var context = InMemoryApplicationDbContext(contextId))
         {
-            context.AddRange(theme, publication, supersedingPublicationToRemove, supersededPublication);
+            context.Publications.Add(publication);
+            context.Themes.Add(otherTheme);
             await context.SaveChangesAsync();
         }
 
-        var newSupersededById = Guid.NewGuid();
+        var methodologyService = new Mock<IMethodologyService>(Strict);
+        methodologyService
+            .Setup(s => s.PublicationTitleOrSlugChanged(
+                publication.Id,
+                publication.Slug,
+                "New title",
+                "new-title"))
+            .Returns(Task.CompletedTask);
+
+        var methodologyCacheService = new Mock<IMethodologyCacheService>(Strict);
+        methodologyCacheService.Setup(mock => mock.UpdateSummariesTree())
+            .ReturnsAsync(new Either<ActionResult, List<AllMethodologiesThemeViewModel>>([]));
+
+        var redirectsCacheService = new Mock<IRedirectsCacheService>(Strict);
+        redirectsCacheService.Setup(mock => mock.UpdateRedirects())
+            .ReturnsAsync(new RedirectsViewModel(
+                PublicationRedirects: [],
+                MethodologyRedirects: [],
+                ReleaseRedirectsByPublicationSlug: []));
 
         await using (var context = InMemoryApplicationDbContext(contextId))
         {
-            var methodologyService = new Mock<IMethodologyService>(Strict);
-            var methodologyCacheService = new Mock<IMethodologyCacheService>(Strict);
-            var publicationCacheService = new Mock<IPublicationCacheService>(Strict);
-            var redirectsCacheService = new Mock<IRedirectsCacheService>(Strict);
-
-            methodologyService
-                .Setup(s => s.PublicationTitleOrSlugChanged(
-                    publication.Id,
-                    publication.Slug,
-                    "New title",
-                    "new-title"))
-                .Returns(Task.CompletedTask);
-
-            methodologyCacheService.Setup(mock => mock.UpdateSummariesTree())
-                .ReturnsAsync(new Either<ActionResult, List<AllMethodologiesThemeViewModel>>(
-                    new List<AllMethodologiesThemeViewModel>()));
-
-            publicationCacheService.Setup(mock => mock.UpdatePublication("new-title"))
-                .ReturnsAsync(new PublicationCacheViewModel());
-
-            publicationCacheService.Setup(mock => mock.UpdatePublication(supersededPublication.Slug))
-                .ReturnsAsync(new PublicationCacheViewModel());
-
-            publicationCacheService.Setup(mock => mock.UpdatePublicationTree())
-                .ReturnsAsync(new List<PublicationTreeThemeViewModel>());
-
-            publicationCacheService.Setup(mock => mock.RemovePublication("old-title"))
-                .ReturnsAsync(Unit.Instance);
-
-            redirectsCacheService.Setup(mock => mock.UpdateRedirects())
-                .ReturnsAsync(new RedirectsViewModel(
-                    PublicationRedirects: [],
-                    MethodologyRedirects: [],
-                    ReleaseRedirectsByPublicationSlug: []));
-
             var publicationService = BuildPublicationService(context,
                 methodologyService: methodologyService.Object,
-                publicationCacheService: publicationCacheService.Object,
                 methodologyCacheService: methodologyCacheService.Object,
                 redirectsCacheService: redirectsCacheService.Object);
 
@@ -1147,25 +1084,27 @@ public class PublicationServiceTests
                 new PublicationSaveRequest
                 {
                     Title = "New title",
+                    Slug = "new-title",
                     Summary = "New summary",
-                    ThemeId = theme.Id,
-                    SupersededById = newSupersededById,
+                    ThemeId = otherTheme.Id,
+                    SupersededById = null
                 }
             );
 
-            VerifyAllMocks(methodologyService,
+            VerifyAllMocks(
+                methodologyService,
                 methodologyCacheService,
-                publicationCacheService);
+                redirectsCacheService);
 
             var viewModel = result.AssertRight();
 
             Assert.Equal("New title", viewModel.Title);
             Assert.Equal("New summary", viewModel.Summary);
 
-            Assert.Equal(theme.Id, viewModel.Theme.Id);
-            Assert.Equal(theme.Title, viewModel.Theme.Title);
+            Assert.Equal(otherTheme.Id, viewModel.Theme.Id);
+            Assert.Equal(otherTheme.Title, viewModel.Theme.Title);
 
-            Assert.Equal(newSupersededById, viewModel.SupersededById);
+            Assert.Null(viewModel.SupersededById);
         }
 
         await using (var context = InMemoryApplicationDbContext(contextId))
@@ -1173,33 +1112,162 @@ public class PublicationServiceTests
             var updatedPublication = await context.Publications
                 .Include(p => p.Contact)
                 .Include(p => p.Theme)
-                .SingleAsync(p => p.Title == "New title");
+                .SingleAsync(p => p.Id == publication.Id);
 
             Assert.True(updatedPublication.Live);
             updatedPublication.Updated.AssertUtcNow();
-            Assert.Equal("New title", updatedPublication.Title);
             Assert.Equal("new-title", updatedPublication.Slug);
-            Assert.Equal("New summary", updatedPublication.Summary);
+            Assert.Equal("New title", updatedPublication.Title);
+            Assert.Null(updatedPublication.SupersededById);
 
-            Assert.Equal("Old name", updatedPublication.Contact.ContactName);
-            Assert.Equal("0987654321", updatedPublication.Contact.ContactTelNo);
-            Assert.Equal("Old team", updatedPublication.Contact.TeamName);
-            Assert.Equal("old.smith@test.com", updatedPublication.Contact.TeamEmail);
+            Assert.Equal(publication.Contact.ContactName, updatedPublication.Contact.ContactName);
+            Assert.Equal(publication.Contact.ContactTelNo, updatedPublication.Contact.ContactTelNo);
+            Assert.Equal(publication.Contact.TeamName, updatedPublication.Contact.TeamName);
+            Assert.Equal(publication.Contact.TeamEmail, updatedPublication.Contact.TeamEmail);
 
-            Assert.Equal(theme.Id, updatedPublication.ThemeId);
-            Assert.Equal("New theme", updatedPublication.Theme.Title);
-
-            Assert.Equal(newSupersededById, updatedPublication.SupersededById);
+            Assert.Equal(otherTheme.Id, updatedPublication.ThemeId);
+            Assert.Equal(otherTheme.Title, updatedPublication.Theme.Title);
 
             var publicationRedirects = await context.PublicationRedirects
                 .ToListAsync();
 
             var publicationRedirect = Assert.Single(publicationRedirects);
 
-            Assert.Equal("old-title", publicationRedirect.Slug);
+            Assert.Equal(publication.Slug, publicationRedirect.Slug);
             Assert.Equal(publication.Id, publicationRedirect.PublicationId);
 
             AssertOnPublicationChangedEventRaised(updatedPublication);
+        }
+
+        _publicationCacheServiceMockBuilder.Assert.CacheInvalidatedForPublicationTree();
+        _publicationCacheServiceMockBuilder.Assert.CacheInvalidatedForPublicationEntry("new-title");
+        _publicationCacheServiceMockBuilder.Assert.CacheInvalidatedForPublicationAndReleases(publication.Slug);
+    }
+
+    [Theory]
+    [MemberData(nameof(PublicationServiceTestsTheoryData.PublicationArchivedEventTestData),
+        MemberType = typeof(PublicationServiceTestsTheoryData))]
+    public async Task UpdatePublication_RaisesEventsDependentOnLiveAndArchivedStatus(
+        Publication publication,
+        Publication? initialPublicationSupersededBy,
+        Publication? updatedPublicationSupersededBy,
+        bool expectPublicationArchivedEventRaised)
+    {
+        // Set the initial publication's `SupersededBy` publication (null, live, or not live)
+        publication.SupersededBy = initialPublicationSupersededBy;
+
+        var contextId = Guid.NewGuid().ToString();
+        await using (var context = InMemoryApplicationDbContext(contextId))
+        {
+            context.Publications.Add(publication);
+            if (updatedPublicationSupersededBy != null)
+            {
+                context.Publications.Add(updatedPublicationSupersededBy);
+            }
+
+            await context.SaveChangesAsync();
+        }
+
+        await using (var context = InMemoryApplicationDbContext(contextId))
+        {
+            var publicationService = BuildPublicationService(context,
+                methodologyCacheService: new Mock<IMethodologyCacheService>(Default).Object,
+                redirectsCacheService: new Mock<IRedirectsCacheService>(Default).Object);
+
+            // Service method under test
+            // The update request includes the new `SupersededBy` publication (null, live, or not live)
+            await publicationService.UpdatePublication(
+                publication.Id,
+                new PublicationSaveRequest
+                {
+                    Title = publication.Title,
+                    Slug = publication.Slug,
+                    Summary = publication.Summary,
+                    ThemeId = publication.ThemeId,
+                    SupersededById = updatedPublicationSupersededBy?.Id
+                }
+            );
+        }
+
+        if (expectPublicationArchivedEventRaised)
+        {
+            await using var context = InMemoryApplicationDbContext(contextId);
+            var updatedPublication = await context.Publications
+                .SingleAsync(p => p.Id == publication.Id);
+            AssertOnPublicationArchivedEventRaised(updatedPublication);
+        }
+        else
+        {
+            AssertOnPublicationChangedEventsNotRaised();
+        }
+    }
+
+    [Fact]
+    public async Task UpdatePublication_CacheInvalidatedForSupersededPublications()
+    {
+        Theme theme = _dataFixture.DefaultTheme();
+
+        Publication publication = _dataFixture
+            .DefaultPublication()
+            .WithReleases([_dataFixture.DefaultRelease(publishedVersions: 1, draftVersion: false)])
+            .WithTheme(theme);
+
+        // These publications are superseded by the publication being updated
+        var (supersededPublication1, supersededPublication2) = _dataFixture
+            .DefaultPublication()
+            .WithSupersededBy(publication)
+            .WithTheme(theme)
+            .GenerateTuple2();
+
+        // This is another publication not superseded by the publication being updated
+        Publication notSupersededPublication = _dataFixture
+            .DefaultPublication();
+
+        var contextId = Guid.NewGuid().ToString();
+        await using (var context = InMemoryApplicationDbContext(contextId))
+        {
+            context.Themes.Add(theme);
+            context.Publications.AddRange(publication,
+                supersededPublication1,
+                supersededPublication2,
+                notSupersededPublication);
+            await context.SaveChangesAsync();
+        }
+
+        await using (var context = InMemoryApplicationDbContext(contextId))
+        {
+            var publicationService = BuildPublicationService(context,
+                methodologyCacheService: new Mock<IMethodologyCacheService>(Default).Object,
+                redirectsCacheService: new Mock<IRedirectsCacheService>(Default).Object);
+
+            await publicationService.UpdatePublication(
+                publication.Id,
+                new PublicationSaveRequest
+                {
+                    Title = publication.Title,
+                    Slug = publication.Slug,
+                    Summary = publication.Summary,
+                    ThemeId = publication.ThemeId,
+                    SupersededById = null
+                }
+            );
+        }
+
+        await using (var context = InMemoryApplicationDbContext(contextId))
+        {
+            var updatedPublication = await context.Publications
+                .SingleAsync(p => p.Id == publication.Id);
+
+            // Ensure the cache was only invalidated for the updated and superseded publications
+            Publication[] expectedInvalidatedPublications =
+                [updatedPublication, supersededPublication1, supersededPublication2];
+            foreach (var expected in expectedInvalidatedPublications)
+            {
+                _publicationCacheServiceMockBuilder.Assert.CacheInvalidatedForPublicationEntry(expected.Slug);
+            }
+
+            _publicationCacheServiceMockBuilder.Assert.CacheNotInvalidatedForPublicationEntry(
+                notSupersededPublication.Slug);
         }
     }
 
@@ -1397,8 +1465,8 @@ public class PublicationServiceTests
             Assert.Equal("New summary", viewModel.Summary);
             Assert.Equal(publication.SupersededById, viewModel.SupersededById);
         }
-        
-        AssertOnPublicationChangedEventNotRaised();
+
+        AssertOnPublicationChangedEventsNotRaised();
     }
 
     [Fact]
@@ -1530,8 +1598,8 @@ public class PublicationServiceTests
 
             result.AssertBadRequest(ThemeDoesNotExist);
         }
-        
-        AssertOnPublicationChangedEventNotRaised();
+
+        AssertOnPublicationChangedEventsNotRaised();
     }
 
     [Fact]
@@ -3116,8 +3184,8 @@ public class PublicationServiceTests
             Assert.Equal(release2022.Versions[1].Id, actualPublication.LatestPublishedReleaseVersionId);
         }
         
-        // The latest release is unchanged so no event should have been raised
-        AssertOnPublicationChangedEventNotRaised();
+        // The latest release is unchanged so no events should have been raised
+        AssertOnPublicationChangedEventsNotRaised();
     }
 
     [Fact]
@@ -3378,8 +3446,8 @@ public class PublicationServiceTests
 
             Assert.Empty(actualPublication.ReleaseSeries);
         }
-        
-        AssertOnPublicationChangedEventNotRaised();
+
+        AssertOnPublicationChangedEventsNotRaised();
     }
 
     [Fact]
@@ -3538,7 +3606,7 @@ public class PublicationServiceTests
             publicationRepository ?? new PublicationRepository(context),
             releaseVersionRepository ?? new ReleaseVersionRepository(context),
             methodologyService ?? Mock.Of<IMethodologyService>(Strict),
-            publicationCacheService ?? Mock.Of<IPublicationCacheService>(Strict),
+            publicationCacheService ?? _publicationCacheServiceMockBuilder.Build(),
             releaseCacheService ?? Mock.Of<IReleaseCacheService>(Strict),
             methodologyCacheService ?? Mock.Of<IMethodologyCacheService>(Strict),
             redirectsCacheService ?? Mock.Of<IRedirectsCacheService>(Strict),
@@ -3546,8 +3614,15 @@ public class PublicationServiceTests
     }
 
     private readonly AdminEventRaiserMockBuilder _adminEventRaiserMockBuilder = new();
+    private readonly PublicationCacheServiceMockBuilder _publicationCacheServiceMockBuilder = new();
 
-    private void AssertOnPublicationChangedEventRaised(Publication? publication = null) =>
+    private void AssertOnPublicationArchivedEventRaised(Publication publication) =>
+        _adminEventRaiserMockBuilder.Assert.OnPublicationArchivedWasRaised(
+            publication.Id,
+            publication.Slug,
+            publication.SupersededById);
+
+    private void AssertOnPublicationChangedEventRaised(Publication publication) =>
         _adminEventRaiserMockBuilder.Assert.OnPublicationChangedWasRaised(publication);
     
     private void AssertOnPublicationLatestPublishedReleaseReorderedWasRaised(
@@ -3556,7 +3631,9 @@ public class PublicationServiceTests
         _adminEventRaiserMockBuilder.Assert.OnPublicationLatestPublishedReleaseReorderedWasRaised(
             publication,
             previousReleaseVersionId);
-    
-    private void AssertOnPublicationChangedEventNotRaised() =>
-        _adminEventRaiserMockBuilder.Assert.OnPublicationChangedWasNotRaised();
+
+    private void AssertOnPublicationChangedEventsNotRaised()
+    {
+        _adminEventRaiserMockBuilder.Assert.AssertOnPublicationChangedEventsNotRaised();
+    }
 }

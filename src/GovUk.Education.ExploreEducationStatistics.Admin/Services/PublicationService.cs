@@ -3,7 +3,6 @@ using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Methodologies;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
-using GovUk.Education.ExploreEducationStatistics.Admin.Services.Util;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
@@ -29,6 +28,8 @@ using IReleaseVersionRepository = GovUk.Education.ExploreEducationStatistics.Con
 using PublicationViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.PublicationViewModel;
 using ReleaseVersionSummaryViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ReleaseVersionSummaryViewModel;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Util;
+using GovUk.Education.ExploreEducationStatistics.Admin.Utils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services;
 
@@ -166,13 +167,14 @@ public class PublicationService(
             })
             .OnSuccess(async publication =>
             {
-                var originalTitle = publication.Title;
-                var originalSlug = publication.Slug;
-                var originalSummary = publication.Summary;
+                var previousTitle = publication.Title;
+                var previousSlug = publication.Slug;
+                var previousSummary = publication.Summary;
+                var previousSupersededById = publication.SupersededById;
 
-                var titleChanged = originalTitle != updatedPublication.Title;
-                var slugChanged = originalSlug != updatedPublication.Slug;
-                var summaryChanged = originalSummary != updatedPublication.Summary;
+                var titleChanged = previousTitle != updatedPublication.Title;
+                var slugChanged = previousSlug != updatedPublication.Slug;
+                var summaryChanged = previousSummary != updatedPublication.Summary;
 
                 if (slugChanged)
                 {
@@ -188,11 +190,11 @@ public class PublicationService(
 
                     if (publication.Live
                         && context.PublicationRedirects.All(pr =>
-                            !(pr.PublicationId == publicationId && pr.Slug == originalSlug))) // don't create duplicate redirect
+                            !(pr.PublicationId == publicationId && pr.Slug == previousSlug))) // don't create duplicate redirect
                     {
                         var publicationRedirect = new PublicationRedirect
                         {
-                            Slug = originalSlug,
+                            Slug = previousSlug,
                             Publication = publication,
                             PublicationId = publication.Id,
                         };
@@ -222,7 +224,7 @@ public class PublicationService(
                 if (titleChanged || slugChanged)
                 {
                     await methodologyService.PublicationTitleOrSlugChanged(publicationId,
-                        originalSlug,
+                        previousSlug,
                         publication.Title,
                         publication.Slug);
                 }
@@ -235,10 +237,11 @@ public class PublicationService(
 
                     if (slugChanged)
                     {
-                        await publicationCacheService.RemovePublication(originalSlug);
+                        await publicationCacheService.RemovePublication(previousSlug);
                         await redirectsCacheService.UpdateRedirects();
                     }
 
+                    await RaiseEventIfSupersededByChanged(publication, previousSupersededById);
                     await UpdateCachedSupersededPublications(publication);
                 }
 
@@ -246,9 +249,41 @@ public class PublicationService(
                 {
                     await adminEventRaiser.OnPublicationChanged(publication);
                 }
-                
+
                 return await GetPublication(publication.Id);
             });
+    }
+
+    private async Task RaiseEventIfSupersededByChanged(Publication publication, Guid? previousSupersededById)
+    {
+        if (publication.SupersededById == previousSupersededById)
+        {
+            return;
+        }
+
+        var previousSupersedingPublication = await GetSupersedingPublication(previousSupersededById);
+        var newSupersedingPublication = await GetSupersedingPublication(publication.SupersededById);
+
+        var transition = PublicationArchiveStatusTransitionResolver.GetTransition(
+            previousSupersedingPublication,
+            newSupersedingPublication);
+
+        if (transition == PublicationArchiveStatusTransitionResolver.PublicationArchiveStatusTransition
+                .NotArchivedToArchived)
+        {
+            await adminEventRaiser.OnPublicationArchived(
+                publication.Id,
+                publication.Slug,
+                supersededByPublicationId: publication.SupersededById!.Value);
+        }
+    }
+
+    private async Task<Publication?> GetSupersedingPublication(Guid? supersededByPublicationId)
+    {
+        return supersededByPublicationId != null
+            ? await context.Publications
+                .SingleAsync(p => p.Id == supersededByPublicationId)
+            : null;
     }
 
     private async Task UpdateCachedSupersededPublications(Publication publication)
@@ -624,7 +659,7 @@ public class PublicationService(
             // Strictly, we should also check whether the owned methodology inherits the publication slug - we don't
             // need to validate the new slug against methodologies if it isn't changing the methodology slug - but
             // this check is expensive and an unlikely edge case, so doesn't seem worth it.
-            )
+           )
         {
             var methodologySlugValidation = await methodologyService
                 .ValidateMethodologySlug(newSlug);
