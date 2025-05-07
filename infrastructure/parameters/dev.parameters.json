@@ -26,10 +26,10 @@
     "slackAlertsChannel": {
       "value": "C067Z1K68UD"
     },
-    "publishReleasesCronSchedule": {
+    "stageScheduledReleasesFunctionCronSchedule": {
       "value": "0 0 * * * *"
     },
-    "publishReleaseContentCronSchedule": {
+    "publishScheduledReleasesFunctionCronSchedule": {
       "value": "0 30 * * * *"
     },
     "preReleaseMinutesBeforeStart": {

@@ -4,7 +4,6 @@ using GovUk.Education.ExploreEducationStatistics.Common.Database;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Functions;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
-using GovUk.Education.ExploreEducationStatistics.Common.Services.EventGrid;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Security;
@@ -89,6 +88,7 @@ public static class PublisherHostBuilderExtensions
                         options.UseSqlServer(
                             ConnectionUtils.GetAzureSqlConnectionString("StatisticsDb"),
                             providerOptions => providerOptions.EnableCustomRetryOnFailure()))
+                    .AddSingleton(TimeProvider.System)
                     .AddSingleton<IFileStorageService, FileStorageService>(provider =>
                         new FileStorageService(
                             provider.GetRequiredService<IOptions<AppOptions>>().Value.PublisherStorageConnectionString))

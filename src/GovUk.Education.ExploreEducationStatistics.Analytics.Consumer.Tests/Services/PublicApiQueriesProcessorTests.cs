@@ -9,19 +9,19 @@ using Xunit;
 
 namespace GovUk.Education.ExploreEducationStatistics.Analytics.Consumer.Tests.Services;
 
-public abstract class ConsumePublicApiQueriesProcessorTests
+public abstract class PublicApiQueriesProcessorTests
 {
     private readonly string _queryResourcesPath = Path.Combine(
         Assembly.GetExecutingAssembly().GetDirectoryPath(),
         "Resources",
         "PublicApiQueries");
 
-    public class ProcessTests : ConsumePublicApiQueriesProcessorTests
+    public class ProcessTests : PublicApiQueriesProcessorTests
     {
         [Fact]
         public async Task NoSourceFolder_NoReportsProduced()
         {
-            var pathResolver = new TestAnalyticsPathResolver();
+            using var pathResolver = new TestAnalyticsPathResolver();
 
             var service = BuildService(
                 pathResolver: pathResolver);
@@ -34,7 +34,7 @@ public abstract class ConsumePublicApiQueriesProcessorTests
         [Fact]
         public async Task NoSourceQueriesToConsume_NoReportsProduced()
         {
-            var pathResolver = new TestAnalyticsPathResolver();
+            using var pathResolver = new TestAnalyticsPathResolver();
 
             Directory.CreateDirectory(pathResolver.PublicApiQueriesDirectoryPath());
 
@@ -51,7 +51,7 @@ public abstract class ConsumePublicApiQueriesProcessorTests
         [Fact]
         public async Task SingleSourceQuery_ProducesOneReportRow()
         {
-            var pathResolver = new TestAnalyticsPathResolver();
+            using var pathResolver = new TestAnalyticsPathResolver();
             SetupQueryRequest(pathResolver, "Query1Request.json");
 
             var service = BuildService(
@@ -111,7 +111,7 @@ public abstract class ConsumePublicApiQueriesProcessorTests
         [Fact]
         public async Task TwoDifferentSourceQueries_ProduceTwoDistinctReportRows()
         {
-            var pathResolver = new TestAnalyticsPathResolver();
+            using var pathResolver = new TestAnalyticsPathResolver();
 
             SetupQueryRequest(pathResolver, "Query1Request.json");
             SetupQueryRequest(pathResolver, "Query2Request1.json");
@@ -139,29 +139,29 @@ public abstract class ConsumePublicApiQueriesProcessorTests
 
             var queryReportRow1 = queryReportRows[0];
 
-            Assert.Equal("b856e997ec5d2c7b445c71ff14859be7", queryReportRow1.QueryVersionHash);
-            Assert.Equal("7145877f51cbcab16411b8a1a7bac4c3", queryReportRow1.QueryHash);
-            Assert.Equal(Guid.Parse("8b9da0ae-80e4-43e8-9f39-4f670fd1a45a"), queryReportRow1.DataSetId);
-            Assert.Equal(Guid.Parse("5ed5053d-92fc-49a1-b0b1-4c11f3b2c538"), queryReportRow1.DataSetVersionId);
-            Assert.Equal("2.1.0", queryReportRow1.DataSetVersion);
-            Assert.Equal("Data Set 2", queryReportRow1.DataSetTitle);
-            Assert.Equal(20, queryReportRow1.ResultsCount);
-            Assert.Equal(23, queryReportRow1.TotalRowsCount);
+            Assert.Equal("f89944c2ee4284894962724bc68a1c8e", queryReportRow1.QueryVersionHash);
+            Assert.Equal("a992584964c8051b6e1b167a0a8dd4e0", queryReportRow1.QueryHash);
+            Assert.Equal(Guid.Parse("01d29401-7274-a871-a8db-d4bc4e98c324"), queryReportRow1.DataSetId);
+            Assert.Equal(Guid.Parse("01d29401-7974-1276-a06b-b28a6a5385c6"), queryReportRow1.DataSetVersionId);
+            Assert.Equal("1.2.0", queryReportRow1.DataSetVersion);
+            Assert.Equal("Data Set 1", queryReportRow1.DataSetTitle);
+            Assert.Equal(44, queryReportRow1.ResultsCount);
+            Assert.Equal(800, queryReportRow1.TotalRowsCount);
             Assert.Equal(1, queryReportRow1.QueryExecutions);
-            Assert.StartsWith("{\"criteria\":{\"filters\":{\"in\":[\"qOnjG\"", queryReportRow1.Query);
+            Assert.StartsWith("{\"criteria\":{\"filters\":{\"eq\":\"qOnjG\"}", queryReportRow1.Query);
 
             var queryReportRow2 = queryReportRows[1];
 
-            Assert.Equal("f89944c2ee4284894962724bc68a1c8e", queryReportRow2.QueryVersionHash);
-            Assert.Equal("a992584964c8051b6e1b167a0a8dd4e0", queryReportRow2.QueryHash);
-            Assert.Equal(Guid.Parse("01d29401-7274-a871-a8db-d4bc4e98c324"), queryReportRow2.DataSetId);
-            Assert.Equal(Guid.Parse("01d29401-7974-1276-a06b-b28a6a5385c6"), queryReportRow2.DataSetVersionId);
-            Assert.Equal("1.2.0", queryReportRow2.DataSetVersion);
-            Assert.Equal("Data Set 1", queryReportRow2.DataSetTitle);
-            Assert.Equal(44, queryReportRow2.ResultsCount);
-            Assert.Equal(800, queryReportRow2.TotalRowsCount);
+            Assert.Equal("b856e997ec5d2c7b445c71ff14859be7", queryReportRow2.QueryVersionHash);
+            Assert.Equal("7145877f51cbcab16411b8a1a7bac4c3", queryReportRow2.QueryHash);
+            Assert.Equal(Guid.Parse("8b9da0ae-80e4-43e8-9f39-4f670fd1a45a"), queryReportRow2.DataSetId);
+            Assert.Equal(Guid.Parse("5ed5053d-92fc-49a1-b0b1-4c11f3b2c538"), queryReportRow2.DataSetVersionId);
+            Assert.Equal("2.1.0", queryReportRow2.DataSetVersion);
+            Assert.Equal("Data Set 2", queryReportRow2.DataSetTitle);
+            Assert.Equal(20, queryReportRow2.ResultsCount);
+            Assert.Equal(23, queryReportRow2.TotalRowsCount);
             Assert.Equal(1, queryReportRow2.QueryExecutions);
-            Assert.StartsWith("{\"criteria\":{\"filters\":{\"eq\":\"qOnjG\"}", queryReportRow2.Query);
+            Assert.StartsWith("{\"criteria\":{\"filters\":{\"in\":[\"qOnjG\"", queryReportRow2.Query);
 
             var queryAccessReportFile = reports.Single(file => file.EndsWith("public-api-query-access.parquet"));
 
@@ -196,7 +196,7 @@ public abstract class ConsumePublicApiQueriesProcessorTests
         [Fact]
         public async Task MultipleSourceFilesForSameQuery_ProduceSingleQueryRowAndMultipleQueryAccessRows()
         {
-            var pathResolver = new TestAnalyticsPathResolver();
+            using var pathResolver = new TestAnalyticsPathResolver();
 
             SetupQueryRequest(pathResolver, "Query2Request1.json");
             SetupQueryRequest(pathResolver, "Query2Request2.json");
@@ -286,7 +286,7 @@ public abstract class ConsumePublicApiQueriesProcessorTests
         [Fact]
         public async Task SameQueryStructureButDifferentDataSetVersion_ProducesTwoDistinctReportRows()
         {
-            var pathResolver = new TestAnalyticsPathResolver();
+            using var pathResolver = new TestAnalyticsPathResolver();
 
             SetupQueryRequest(pathResolver, "Query1Request.json");
             SetupQueryRequest(pathResolver, "Query1RequestMinorVersionUpdate.json");
@@ -374,17 +374,18 @@ public abstract class ConsumePublicApiQueriesProcessorTests
             var queryReportRows = (await duckDbConnection
                     .SqlBuilder($"SELECT * FROM read_parquet('{queryReportFile:raw}')")
                     .QueryAsync<QueryReportLine>())
+                .OrderBy(row => row.DataSetTitle)
                 .ToList();
             return queryReportRows;
         }
     }
 
     private PublicApiQueriesProcessor BuildService(
-        TestAnalyticsPathResolver? pathResolver = null)
+        TestAnalyticsPathResolver pathResolver)
     {
         return new PublicApiQueriesProcessor(
             duckDbConnection: new DuckDbConnection(),
-            pathResolver: pathResolver ?? new TestAnalyticsPathResolver(),
+            pathResolver: pathResolver,
             Mock.Of<ILogger<PublicApiQueriesProcessor>>());
     }
 

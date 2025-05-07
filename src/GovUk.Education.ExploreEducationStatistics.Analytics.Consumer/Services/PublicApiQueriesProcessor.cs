@@ -54,7 +54,7 @@ public class PublicApiQueriesProcessor(
         duckDbConnection.ExecuteNonQuery("install json; load json");
 
         duckDbConnection.ExecuteNonQuery(@"
-            CREATE TABLE IF NOT EXISTS queries (
+            CREATE TABLE queries (
                 queryVersionHash VARCHAR,
                 queryHash VARCHAR,
                 dataSetId UUID,
@@ -86,10 +86,10 @@ public class PublicApiQueriesProcessor(
                             MD5(CONCAT(query, dataSetVersionId)) AS queryVersionHash,
                             MD5(query) AS queryHash,
                             *
-                        FROM read_json('{processingDirectory}/{filename}',
-                            format='auto',
+                        FROM read_json('{processingDirectory}/{filename}', 
+                            format='unstructured',
                             columns = {{
-                                dataSetId: UUID,
+                                dataSetId: UUID, 
                                 dataSetVersionId: UUID,
                                 dataSetVersion: VARCHAR,
                                 dataSetTitle: VARCHAR,
@@ -99,7 +99,7 @@ public class PublicApiQueriesProcessor(
                                 endTime: DATETIME,
                                 query: JSON
                             }})
-                    )
+                       )
                 ");
             }
             catch (DuckDBException e)
@@ -112,7 +112,7 @@ public class PublicApiQueriesProcessor(
 
         duckDbConnection.ExecuteNonQuery(@"
             CREATE TABLE queryReport AS 
-            SELECT 
+            SELECT
                 queryVersionHash ,
                 FIRST(queryHash) AS queryHash,
                 FIRST(dataSetId) AS dataSetId,
@@ -151,11 +151,11 @@ public class PublicApiQueriesProcessor(
         duckDbConnection.ExecuteNonQuery($@"
             COPY (SELECT * FROM queryReport)
             TO '{queryReportFilename}' (FORMAT 'parquet', CODEC 'zstd')");
-        
+
         duckDbConnection.ExecuteNonQuery($@"
             COPY (SELECT * FROM queryAccessReport)
             TO '{queryAccessReportFilename}' (FORMAT 'parquet', CODEC 'zstd')");
-        
+
         Directory.Delete(processingDirectory, recursive: true);
         
         return Task.CompletedTask;

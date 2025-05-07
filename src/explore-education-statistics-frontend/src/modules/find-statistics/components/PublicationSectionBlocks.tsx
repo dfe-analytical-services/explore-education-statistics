@@ -47,6 +47,7 @@ const PublicationSectionBlocks = ({
             <Gate condition={!!visible} key={block.id}>
               <DataBlockTabs
                 dataBlock={block}
+                dataBlockStaleTime={Infinity}
                 releaseVersionId={releaseVersion.id}
                 getInfographic={getReleaseFile}
                 onToggle={section => {

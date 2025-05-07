@@ -1,7 +1,6 @@
 using System;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using Xunit;
-using Xunit.Sdk;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 

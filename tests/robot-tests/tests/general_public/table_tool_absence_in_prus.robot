@@ -56,19 +56,19 @@ Create table
     ...    xpath://*[@data-testid="dataTableCaption" and text()="Number of schools for 'Absence in PRUs' in England between 2013/14 and 2016/17"]
 
 Validate results table column headings
-    user checks table column heading contains    1    1    2013/14
-    user checks table column heading contains    1    2    2014/15
-    user checks table column heading contains    1    3    2015/16
-    user checks table column heading contains    1    4    2016/17
+    user checks table column heading contains    1    1    2016/17
+    user checks table column heading contains    1    2    2015/16
+    user checks table column heading contains    1    3    2014/15
+    user checks table column heading contains    1    4    2013/14
 
 Validate results table row headings
     user checks table row heading contains    1    1    Number of schools
 
 Validate Number of schools row results
-    user checks table cell contains    1    1    361
-    user checks table cell contains    1    2    363
-    user checks table cell contains    1    3    350
-    user checks table cell contains    1    4    349
+    user checks table cell contains    1    1    349
+    user checks table cell contains    1    2    350
+    user checks table cell contains    1    3    363
+    user checks table cell contains    1    4    361
 
 Go back to Locations step
     user clicks button    Edit locations
@@ -125,41 +125,41 @@ Create table again
     ...    xpath://*[@data-testid="dataTableCaption" and text()="'Absence in PRUs' in Barnet, Barnsley and Bedford between 2014/15 and 2015/16"]
 
 Validate new table column headings
-    user checks table column heading contains    1    1    2014/15
-    user checks table column heading contains    1    2    2015/16
+    user checks table column heading contains    1    1    2015/16
+    user checks table column heading contains    1    2    2014/15
 
 Validate Barnet Number of pupil enrolments row
     ${row}=    user gets row with group and indicator    Barnet    Number of pupil enrolments
     user checks row contains heading    ${row}    Number of pupil enrolments
-    user checks row cell contains text    ${row}    1    224
-    user checks row cell contains text    ${row}    2    210
+    user checks row cell contains text    ${row}    1    210
+    user checks row cell contains text    ${row}    2    224
 
 Validate Barnet Number of sessions possible row
     ${row}=    user gets row with group and indicator    Barnet    Number of sessions possible
     user checks row contains heading    ${row}    Number of sessions possible
-    user checks row cell contains text    ${row}    1    38,345
-    user checks row cell contains text    ${row}    2    36,820
+    user checks row cell contains text    ${row}    1    36,820
+    user checks row cell contains text    ${row}    2    38,345
 
 Validate Barnsley Number of pupil enrolments row
     ${row}=    user gets row with group and indicator    Barnsley    Number of pupil enrolments
     user checks row contains heading    ${row}    Number of pupil enrolments
-    user checks row cell contains text    ${row}    1    149
-    user checks row cell contains text    ${row}    2    146
+    user checks row cell contains text    ${row}    1    146
+    user checks row cell contains text    ${row}    2    149
 
 Validate Barnsley Number of sessions possible row
     ${row}=    user gets row with group and indicator    Barnsley    Number of sessions possible
     user checks row contains heading    ${row}    Number of sessions possible
-    user checks row cell contains text    ${row}    1    31,938
-    user checks row cell contains text    ${row}    2    36,250
+    user checks row cell contains text    ${row}    1    36,250
+    user checks row cell contains text    ${row}    2    31,938
 
 Validate Bedford Number of pupil enrolments row
     ${row}=    user gets row with group and indicator    Bedford    Number of pupil enrolments
     user checks row contains heading    ${row}    Number of pupil enrolments
-    user checks row cell contains text    ${row}    1    176
-    user checks row cell contains text    ${row}    2    178
+    user checks row cell contains text    ${row}    1    178
+    user checks row cell contains text    ${row}    2    176
 
 Validate Bedford Number of sessions possible row
     ${row}=    user gets row with group and indicator    Bedford    Number of sessions possible
     user checks row contains heading    ${row}    Number of sessions possible
-    user checks row cell contains text    ${row}    1    17,687
-    user checks row cell contains text    ${row}    2    21,847
+    user checks row cell contains text    ${row}    1    21,847
+    user checks row cell contains text    ${row}    2    17,687

@@ -1,4 +1,3 @@
-using System.Text.Json.Serialization;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.ViewModels;

@@ -20,6 +20,7 @@ export interface DataBlockTabsProps {
     | ((props: { dataBlock: DataBlock }) => ReactNode)
     | ReactNode;
   dataBlock: DataBlock;
+  dataBlockStaleTime?: number;
   firstTabs?: ReactNode;
   lastTabs?: ReactNode;
   getInfographic?: GetInfographic;
@@ -31,6 +32,7 @@ export interface DataBlockTabsProps {
 const DataBlockTabs = ({
   additionalTabContent,
   dataBlock,
+  dataBlockStaleTime,
   firstTabs,
   lastTabs,
   getInfographic,
@@ -47,6 +49,7 @@ const DataBlockTabs = ({
     isGeoJsonInitialLoading,
   } = useDataBlock({
     dataBlock,
+    dataBlockStaleTime,
     releaseVersionId,
     getInfographic,
   });

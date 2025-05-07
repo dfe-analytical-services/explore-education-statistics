@@ -15,7 +15,7 @@ public abstract class QueryAnalyticsWriterTests
         [Fact]
         public async Task Success()
         {
-            var pathResolver = new TestAnalyticsPathResolver();
+            using var pathResolver = new TestAnalyticsPathResolver();
             var service = BuildService(pathResolver);
 
             await service.ReportDataSetVersionQuery(new CaptureDataSetVersionQueryRequest(

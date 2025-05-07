@@ -6,6 +6,7 @@
     "PublicationArchivedQueueName": "publication-archived-queue",
     "PublicationChangedQueueName": "publication-changed-queue",
     "PublicationLatestPublishedReleaseReorderedQueueName" : "publication-latest-published-release-reordered-queue",
+    "PublicationRestoredQueueName": "publication-restored-queue",
     "RefreshSearchableDocumentQueueName": "refresh-searchable-document-queue",
     "ReleaseSlugChangedQueueName": "release-slug-changed-queue",
     "ReleaseVersionPublishedQueueName": "release-version-published-queue",

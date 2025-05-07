@@ -499,7 +499,7 @@
   {
     "publication_summary": "Annual target for the number of trainees to start postgraduate initial teacher training in the relevant academic year, in England, by subject.",
     "publication_title": "Postgraduate initial teacher training targets",
-    "published": "14 Mar 2024",
+    "published": "29 Apr 2025",
     "release_type": "Official statistics",
     "theme": "Teachers and school workforce"
   },
@@ -527,7 +527,7 @@
   {
     "publication_summary": "Pupil attendance and absence data including termly national statistics and fortnightly statistics in development derived from DfE\u2019s regular attendance data",
     "publication_title": "Pupil attendance in schools",
-    "published": "17 Apr 2025",
+    "published": "1 May 2025",
     "release_type": "Official statistics in development",
     "theme": "Pupils and schools"
   },
@@ -579,6 +579,13 @@
     "published": "6 Jun 2024",
     "release_type": "Accredited official statistics",
     "theme": "Teachers and school workforce"
+  },
+  {
+    "publication_summary": "Data on numbers and types of schools that the Department for Education (DfE) considers to be underperforming on the basis of their Ofsted inspections.",
+    "publication_title": "Schools eligible for RISE intervention",
+    "published": "29 Apr 2025",
+    "release_type": "Ad hoc statistics",
+    "theme": "Pupils and schools"
   },
   {
     "publication_summary": "School and pupil statistics for England including age, gender, free school meals (FSM), ethnicity, English as additional language (EAL), class size.",

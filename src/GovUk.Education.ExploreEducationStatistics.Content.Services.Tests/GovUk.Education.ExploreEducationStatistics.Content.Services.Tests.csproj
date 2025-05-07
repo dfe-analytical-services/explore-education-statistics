@@ -28,4 +28,8 @@
     <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Content.ViewModels\GovUk.Education.ExploreEducationStatistics.Content.ViewModels.csproj"/>
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="StrategiesTests\__snapshots__\" />
+  </ItemGroup>
+
 </Project>

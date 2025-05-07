@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Publisher.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 using Microsoft.Extensions.Logging;
@@ -18,7 +18,7 @@ public class QueueService(
     {
         logger.LogInformation(
             "Queuing generate content message for release versions: [{ReleaseVersionIds}]",
-            releasePublishingKeys.Select(key => key.ReleaseVersionId).JoinToString(','));
+            releasePublishingKeys.ToReleaseVersionIdsString());
 
         await publisherClient.StageReleaseContent(releasePublishingKeys);
 
@@ -42,7 +42,7 @@ public class QueueService(
     {
         logger.LogInformation(
             "Queuing files message for release versions: [{ReleaseVersionIds}]",
-            releasePublishingKeys.Select(key => key.ReleaseVersionId).JoinToString(','));
+            releasePublishingKeys.ToReleaseVersionIdsString());
 
         await publisherClient.PublishReleaseFiles(releasePublishingKeys);
 
