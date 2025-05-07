@@ -1148,27 +1148,21 @@ public class PublicationServiceTests
     [MemberData(nameof(PublicationServiceTestsTheoryData.PublicationArchivedEventTestData),
         MemberType = typeof(PublicationServiceTestsTheoryData))]
     public async Task UpdatePublication_RaisesEventsDependentOnLiveAndArchivedStatus(
-        Func<Publication> initialPublicationGenerator,
-        Func<Publication?> initialPublicationSupersededByGenerator,
-        Func<Publication?> updatedPublicationSupersededByGenerator,
+        Publication publication,
+        Publication? initialPublicationSupersededBy,
+        Publication? updatedPublicationSupersededBy,
         bool expectPublicationArchivedEventRaised)
     {
-        // Generate the initial publication being updated (live or not live)
-        var publication = initialPublicationGenerator();
-
-        // Generate the initial publication's `SupersededBy` publication (null, live, or not live)
-        publication.SupersededBy = initialPublicationSupersededByGenerator();
-
-        // Generate the new `SupersededBy` publication being set in the update (null, live, or not live)
-        var newSupersededBy = updatedPublicationSupersededByGenerator();
+        // Set the initial publication's `SupersededBy` publication (null, live, or not live)
+        publication.SupersededBy = initialPublicationSupersededBy;
 
         var contextId = Guid.NewGuid().ToString();
         await using (var context = InMemoryApplicationDbContext(contextId))
         {
             context.Publications.Add(publication);
-            if (newSupersededBy != null)
+            if (updatedPublicationSupersededBy != null)
             {
-                context.Publications.Add(newSupersededBy);
+                context.Publications.Add(updatedPublicationSupersededBy);
             }
 
             await context.SaveChangesAsync();
@@ -1180,6 +1174,8 @@ public class PublicationServiceTests
                 methodologyCacheService: new Mock<IMethodologyCacheService>(Default).Object,
                 redirectsCacheService: new Mock<IRedirectsCacheService>(Default).Object);
 
+            // Service method under test
+            // The update request includes the new `SupersededBy` publication (null, live, or not live)
             await publicationService.UpdatePublication(
                 publication.Id,
                 new PublicationSaveRequest
@@ -1188,7 +1184,7 @@ public class PublicationServiceTests
                     Slug = publication.Slug,
                     Summary = publication.Summary,
                     ThemeId = publication.ThemeId,
-                    SupersededById = newSupersededBy?.Id
+                    SupersededById = updatedPublicationSupersededBy?.Id
                 }
             );
         }

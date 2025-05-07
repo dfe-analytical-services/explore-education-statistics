@@ -10,13 +10,11 @@ internal class PublicationServiceTestsTheoryData
 {
     private static readonly DataFixture DataFixture = new();
 
-    private static readonly Func<Publication?> NullPublication = () => null;
-
-    private static readonly Func<Publication> NotLivePublication = () => DataFixture
+    private static Publication NotLivePublication() => DataFixture
         .DefaultPublication()
-        .WithTheme(DataFixture.DefaultTheme());
+        .WithTheme(DataFixture.DefaultTheme().Generate());
 
-    private static readonly Func<Publication> LivePublication = () => DataFixture
+    private static Publication LivePublication() => DataFixture
         .DefaultPublication()
         .WithReleases([DataFixture.DefaultRelease(publishedVersions: 1, draftVersion: false)])
         .WithTheme(DataFixture.DefaultTheme());
@@ -32,16 +30,16 @@ internal class PublicationServiceTestsTheoryData
     /// <description>description</description>
     /// </listheader>
     /// <item>
-    /// <term>initialPublicationGenerator</term>
-    /// <description>A generator for the initial publication (live or not live).</description>
+    /// <term>publication</term>
+    /// <description>The initial publication (live or not live).</description>
     /// </item>
     /// <item>
-    /// <term>initialPublicationSupersededByGenerator</term>
-    /// <description>A generator for the initial `SupersededBy` publication (null, live, or not live).</description>
+    /// <term>initialPublicationSupersededBy</term>
+    /// <description>The initial `SupersededBy` publication (null, live, or not live).</description>
     /// </item>
     /// <item>
-    /// <term>updatedPublicationSupersededByGenerator</term>
-    /// <description>A generator for the new `SupersededBy` publication (null, live, or not live).</description>
+    /// <term>updatedPublicationSupersededBy</term>
+    /// <description>The updated `SupersededBy` publication (null, live, or not live).</description>
     /// </item>
     /// <item>
     /// <term>expectPublicationArchivedEventRaised</term>
@@ -49,30 +47,30 @@ internal class PublicationServiceTestsTheoryData
     /// </item>
     /// </list>
     /// </remarks>
-    public static readonly TheoryData<Func<Publication>, Func<Publication?>, Func<Publication?>, bool>
+    public static readonly TheoryData<Publication, Publication?, Publication?, bool>
         PublicationArchivedEventTestData =
             new()
             {
                 // When the publication is live expect events to be raised dependent on states
                 // of the initial and updated `SupersededBy` publications
-                { LivePublication, NullPublication, NullPublication, false },
-                { LivePublication, NullPublication, NotLivePublication, false },
-                { LivePublication, NullPublication, LivePublication, true }, // Transition to archived
-                { LivePublication, NotLivePublication, NullPublication, false },
-                { LivePublication, NotLivePublication, NotLivePublication, false },
-                { LivePublication, NotLivePublication, LivePublication, true }, // Transition to archived
-                { LivePublication, LivePublication, NullPublication, false },
-                { LivePublication, LivePublication, NotLivePublication, false },
-                { LivePublication, LivePublication, LivePublication, false },
+                { LivePublication(), null, null, false },
+                { LivePublication(), null, NotLivePublication(), false },
+                { LivePublication(), null, LivePublication(), true }, // Transition to archived
+                { LivePublication(), NotLivePublication(), null, false },
+                { LivePublication(), NotLivePublication(), NotLivePublication(), false },
+                { LivePublication(), NotLivePublication(), LivePublication(), true }, // Transition to archived
+                { LivePublication(), LivePublication(), null, false },
+                { LivePublication(), LivePublication(), NotLivePublication(), false },
+                { LivePublication(), LivePublication(), LivePublication(), false },
                 // When the publication is not live expect no events to be raised
-                { NotLivePublication, NullPublication, NullPublication, false },
-                { NotLivePublication, NullPublication, NotLivePublication, false },
-                { NotLivePublication, NullPublication, LivePublication, false },
-                { NotLivePublication, NotLivePublication, NullPublication, false },
-                { NotLivePublication, NotLivePublication, NotLivePublication, false },
-                { NotLivePublication, NotLivePublication, LivePublication, false },
-                { NotLivePublication, LivePublication, NullPublication, false },
-                { NotLivePublication, LivePublication, NotLivePublication, false },
-                { NotLivePublication, LivePublication, LivePublication, false }
+                { NotLivePublication(), null, null, false },
+                { NotLivePublication(), null, NotLivePublication(), false },
+                { NotLivePublication(), null, LivePublication(), false },
+                { NotLivePublication(), NotLivePublication(), null, false },
+                { NotLivePublication(), NotLivePublication(), NotLivePublication(), false },
+                { NotLivePublication(), NotLivePublication(), LivePublication(), false },
+                { NotLivePublication(), LivePublication(), null, false },
+                { NotLivePublication(), LivePublication(), NotLivePublication(), false },
+                { NotLivePublication(), LivePublication(), LivePublication(), false }
             };
 }
