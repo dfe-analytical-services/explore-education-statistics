@@ -1199,13 +1199,23 @@ public class PublicationServiceTests
             {
                 AssertOnPublicationArchivedEventRaised(updatedPublication);
             }
-            else if (expectedPublicationRestoredEventRaised)
+            else
+            {
+                AssertOnPublicationArchivedEventNotRaised();
+            }
+
+            if (expectedPublicationRestoredEventRaised)
             {
                 AssertOnPublicationRestoredEventRaised(
                     updatedPublication,
                     previousSupersededByPublicationId: publication.SupersededById!.Value);
             }
             else
+            {
+                AssertOnPublicationRestoredEventNotRaised();
+            }
+
+            if (!expectPublicationArchivedEventRaised && !expectedPublicationRestoredEventRaised)
             {
                 AssertOnPublicationChangedEventsNotRaised();
             }
@@ -3632,9 +3642,12 @@ public class PublicationServiceTests
             publication.Slug,
             publication.SupersededById);
 
+    private void AssertOnPublicationArchivedEventNotRaised() =>
+        _adminEventRaiserMockBuilder.Assert.OnPublicationArchivedWasNotRaised();
+
     private void AssertOnPublicationChangedEventRaised(Publication publication) =>
         _adminEventRaiserMockBuilder.Assert.OnPublicationChangedWasRaised(publication);
-    
+
     private void AssertOnPublicationLatestPublishedReleaseReorderedWasRaised(
         Publication publication,
         Guid previousReleaseVersionId) =>
@@ -3650,8 +3663,11 @@ public class PublicationServiceTests
             publication.Slug,
             previousSupersededByPublicationId);
 
+    private void AssertOnPublicationRestoredEventNotRaised() =>
+        _adminEventRaiserMockBuilder.Assert.OnPublicationRestoredWasNotRaised();
+
     private void AssertOnPublicationChangedEventsNotRaised()
     {
-        _adminEventRaiserMockBuilder.Assert.AssertOnPublicationChangedEventsNotRaised();
+        _adminEventRaiserMockBuilder.Assert.OnPublicationChangedEventsNotRaised();
     }
 }

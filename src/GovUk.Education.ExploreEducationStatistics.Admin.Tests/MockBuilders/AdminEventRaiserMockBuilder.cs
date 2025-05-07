@@ -109,7 +109,7 @@ public class AdminEventRaiserMockBuilder
                     It.Is<Guid>(actual => supersededByPublicationId == null || actual == supersededByPublicationId)),
                 Times.Once);
 
-        private void OnPublicationArchivedWasNotRaised() =>
+        public void OnPublicationArchivedWasNotRaised() =>
             mockBuilder._mock.Verify(OnPublicationArchived, Times.Never);
 
         public void OnPublicationChangedWasRaised(Publication? publication = null) =>
@@ -151,10 +151,10 @@ public class AdminEventRaiserMockBuilder
                         previousSupersededByPublicationId == null || actual == previousSupersededByPublicationId)),
                 Times.Once);
 
-        private void OnPublicationRestoredWasNotRaised() =>
+        public void OnPublicationRestoredWasNotRaised() =>
             mockBuilder._mock.Verify(OnPublicationRestored, Times.Never);
 
-        public void AssertOnPublicationChangedEventsNotRaised()
+        public void OnPublicationChangedEventsNotRaised()
         {
             OnPublicationArchivedWasNotRaised();
             OnPublicationChangedWasNotRaised();
