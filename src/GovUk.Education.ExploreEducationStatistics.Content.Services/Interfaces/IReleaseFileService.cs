@@ -5,6 +5,7 @@ using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Requests;
 using GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
 using Microsoft.AspNetCore.Mvc;
@@ -32,6 +33,7 @@ public interface IReleaseFileService
     Task<Either<ActionResult, Unit>> ZipFilesToStream(
         Guid releaseVersionId,
         Stream outputStream,
+        FromPage fromPage,
         IEnumerable<Guid>? fileIds = null,
         CancellationToken cancellationToken = default);
 }

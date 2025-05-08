@@ -15,7 +15,6 @@ import publicationService, {
   ReleaseVersion,
 } from '@common/services/publicationService';
 import { Dictionary } from '@common/types';
-import ButtonLink from '@frontend/components/ButtonLink';
 import Link from '@frontend/components/Link';
 import Page from '@frontend/components/Page';
 import PageSearchFormWithAnalytics from '@frontend/components/PageSearchFormWithAnalytics';
@@ -30,6 +29,8 @@ import classNames from 'classnames';
 import orderBy from 'lodash/orderBy';
 import { GetServerSideProps, NextPage } from 'next';
 import React from 'react';
+import Button from '@common/components/Button';
+import downloadService from '@frontend/services/downloadService';
 
 interface Props {
   releaseVersion: ReleaseVersion;
@@ -223,10 +224,14 @@ const PublicationReleasePage: NextPage<Props> = ({ releaseVersion }) => {
               <ul className="govuk-list">
                 {showAllFilesButton && (
                   <li>
-                    <ButtonLink
+                    <Button
                       className="govuk-button  govuk-!-margin-bottom-3"
-                      to={`${process.env.CONTENT_API_BASE_URL}/releases/${releaseVersion.id}/files`}
-                      onClick={() => {
+                      onClick={async () => {
+                        await downloadService.downloadZip(
+                          releaseVersion.id,
+                          'ReleaseUsefulInfo',
+                        );
+
                         logEvent({
                           category: `${releaseVersion.publication.title} release page - Useful information`,
                           action: 'Download all data button clicked',
@@ -235,7 +240,7 @@ const PublicationReleasePage: NextPage<Props> = ({ releaseVersion }) => {
                       }}
                     >
                       Download all data (zip)
-                    </ButtonLink>
+                    </Button>
                   </li>
                 )}
                 {!!releaseVersion.relatedDashboardsSection?.content.length && (
@@ -432,9 +437,13 @@ const PublicationReleasePage: NextPage<Props> = ({ releaseVersion }) => {
           downloadFiles={releaseVersion.downloadFiles}
           hasDataGuidance={releaseVersion.hasDataGuidance}
           renderAllFilesLink={
-            <Link
-              to={`${process.env.CONTENT_API_BASE_URL}/releases/${releaseVersion.id}/files`}
-              onClick={() => {
+            <Button
+              onClick={async () => {
+                await downloadService.downloadZip(
+                  releaseVersion.id,
+                  'ReleaseDownloads',
+                );
+
                 logEvent({
                   category: 'Downloads',
                   action: `Release page all files, Release: ${releaseVersion.title}, File: All files`,
@@ -442,7 +451,7 @@ const PublicationReleasePage: NextPage<Props> = ({ releaseVersion }) => {
               }}
             >
               Download all data (ZIP)
-            </Link>
+            </Button>
           }
           renderCreateTablesLink={
             <Link

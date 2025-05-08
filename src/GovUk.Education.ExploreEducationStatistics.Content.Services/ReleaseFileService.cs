@@ -124,6 +124,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
         public async Task<Either<ActionResult, Unit>> ZipFilesToStream(
             Guid releaseVersionId,
             Stream outputStream,
+            FromPage fromPage,
             IEnumerable<Guid>? fileIds = null,
             CancellationToken cancellationToken = default)
         {
@@ -158,7 +159,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
                             await DoZipFilesToStream(releaseFiles, releaseVersion, outputStream, cancellationToken);
                         }
 
-                        await RecordZipDownloadAnalytics(releaseVersion, releaseFiles, cancellationToken);
+                        await RecordZipDownloadAnalytics(releaseVersion, releaseFiles, fromPage, cancellationToken);
                     }
                 );
         }
@@ -298,6 +299,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
         private async Task RecordZipDownloadAnalytics(
             ReleaseVersion releaseVersion,
             List<ReleaseFile>? releaseFiles,
+            FromPage fromPage,
             CancellationToken cancellationToken)
         {
             if (releaseFiles is not null && releaseFiles.Count > 1)
@@ -322,7 +324,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
                     releaseVersion.Release.Title,
                     releaseVersion.Release.Label,
                     subjectId,
-                    dataSetName),
+                    dataSetName,
+                    fromPage.ToString()), // @MarkFix need update Azure Function to process this
                 cancellationToken);
         }
     }

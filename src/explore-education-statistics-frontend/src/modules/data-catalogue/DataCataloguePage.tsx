@@ -545,7 +545,7 @@ const DataCataloguePage: NextPage<Props> = ({ showTypeFilter }) => {
                                 <p>
                                   <ButtonLink
                                     className="govuk-!-margin-bottom-2"
-                                    to={`${process.env.CONTENT_API_BASE_URL}/releases/${selectedRelease.id}/files`}
+                                    to={`${process.env.CONTENT_API_BASE_URL}/releases/${selectedRelease.id}/files?fromPage=DataCatalogue`}
                                     onClick={() => {
                                       logEvent({
                                         category: 'Data catalogue',
