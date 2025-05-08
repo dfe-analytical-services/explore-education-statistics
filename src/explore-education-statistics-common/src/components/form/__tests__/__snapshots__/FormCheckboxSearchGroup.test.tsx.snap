@@ -36,7 +36,7 @@ exports[`FormCheckboxSearchGroup without searchOnly renders list of checkboxes i
                  type="checkbox"
                  value="1"
           >
-          <label class="govuk-label govuk-checkboxes__label"
+          <label class="govuk-label govuk-checkboxes__label label"
                  for="test-checkboxes-options-1"
           >
             Test checkbox 1
@@ -51,7 +51,7 @@ exports[`FormCheckboxSearchGroup without searchOnly renders list of checkboxes i
                  type="checkbox"
                  value="2"
           >
-          <label class="govuk-label govuk-checkboxes__label"
+          <label class="govuk-label govuk-checkboxes__label label"
                  for="test-checkboxes-options-2"
           >
             Test checkbox 2
@@ -66,7 +66,7 @@ exports[`FormCheckboxSearchGroup without searchOnly renders list of checkboxes i
                  type="checkbox"
                  value="3"
           >
-          <label class="govuk-label govuk-checkboxes__label"
+          <label class="govuk-label govuk-checkboxes__label label"
                  for="test-checkboxes-options-3"
           >
             Test checkbox 3

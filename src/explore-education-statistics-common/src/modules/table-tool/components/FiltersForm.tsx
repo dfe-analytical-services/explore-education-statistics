@@ -66,7 +66,6 @@ interface Props extends InjectedWizardProps {
     publicationTitle: string,
     subjectName: string,
   ) => void;
-  hideFilterHierarchies?: boolean;
 }
 
 export default function FiltersForm({
@@ -78,7 +77,6 @@ export default function FiltersForm({
   showTableQueryErrorDownload = true,
   onSubmit,
   onTableQueryError,
-  hideFilterHierarchies = true, // hierarchies feature flag
   ...stepProps
 }: Props) {
   const { goToNextStep, isActive } = stepProps;
@@ -88,15 +86,10 @@ export default function FiltersForm({
   const [openFilterGroups, setOpenFilterGroups] = useState<string[]>([]);
 
   const filterHierarchies = useMemo(() => {
-    if (hideFilterHierarchies) {
-      return [];
-    }
     return subjectMeta.filterHierarchies ?? [];
-  }, [subjectMeta, hideFilterHierarchies]);
+  }, [subjectMeta]);
 
   const hierarchiedFilterIds = useMemo(() => {
-    if (hideFilterHierarchies) return [];
-
     return (
       filterHierarchies.flatMap(hierarchy => {
         return [
@@ -105,7 +98,7 @@ export default function FiltersForm({
         ];
       }) ?? []
     );
-  }, [filterHierarchies, hideFilterHierarchies]);
+  }, [filterHierarchies]);
 
   const standardFilters = useMemo(() => {
     return orderBy(
@@ -117,17 +110,20 @@ export default function FiltersForm({
   }, [subjectMeta, hierarchiedFilterIds]);
 
   const hierarchiedFilters = useMemo(() => {
-    return Object.values(subjectMeta.filters).filter(filter =>
+    return Object.entries(subjectMeta.filters).filter(([_, filter]) =>
       hierarchiedFilterIds.includes(filter.id),
     );
   }, [subjectMeta, hierarchiedFilterIds]);
 
   const optionLabelsMap = useMemo(
-    () => getFilterHierarchyLabelsMap(hierarchiedFilters),
+    () =>
+      getFilterHierarchyLabelsMap(
+        hierarchiedFilters.map(([_, filter]) => filter),
+      ),
     [hierarchiedFilters],
   );
 
-  const initialFormValues = useMemo(() => {
+  const initialFormValues: FiltersFormValues = useMemo(() => {
     // Automatically select indicator when one indicator group with one option
     const indicatorValues = Object.values(subjectMeta.indicators);
     const indicators =
@@ -162,6 +158,7 @@ export default function FiltersForm({
     return {
       filters,
       indicators,
+      filterHierarchies: {},
     };
   }, [initialValues, subjectMeta, standardFilters]);
 
@@ -263,7 +260,7 @@ export default function FiltersForm({
               optionLabelsMap[hierarchyFilterId]?.toLocaleLowerCase();
 
             return [
-              camelCase(optionLabelsMap[hierarchyFilterId]),
+              hierarchyFilterId,
               Yup.array()
                 .required(`Select at least one option from ${label}`)
                 .typeError(`Select at least one option from ${label}`)
@@ -286,12 +283,11 @@ export default function FiltersForm({
       initialValues={initialFormValues}
       validationSchema={validationSchema}
     >
-      {({ formState, getValues, reset, setValue, watch }) => {
+      {({ formState, getValues, reset, setValue }) => {
         const { getError } = createErrorHelper({
           errors: formState.errors,
           touchedFields: formState.touchedFields,
         });
-        const values = watch();
 
         if (isActive) {
           return (
@@ -308,7 +304,7 @@ export default function FiltersForm({
 
               {stepHeading}
 
-              <div className="govuk-grid-row">
+              <div>
                 <div className="govuk-grid-column govuk-!-margin-bottom-6">
                   <FormFieldCheckboxSearchSubGroups
                     disabled={formState.isSubmitting}
@@ -374,11 +370,9 @@ export default function FiltersForm({
                       {filterHierarchies.map(filterHierarchy => {
                         if (filterHierarchy.length === 0) return null;
 
-                        const hierarchyName = `filterHierarchies.${camelCase(
-                          optionLabelsMap[
-                            filterHierarchy.at(-1)?.childFilterId ?? ''
-                          ],
-                        )}`;
+                        const hierarchyName = `filterHierarchies.${
+                          filterHierarchy.at(-1)?.childFilterId ?? ''
+                        }`;
 
                         return (
                           <FilterHierarchy
@@ -455,7 +449,7 @@ export default function FiltersForm({
             </Form>
           );
         }
-        // const values = getValues();
+        const values = getValues();
 
         return (
           <WizardStepSummary {...stepProps} goToButtonText="Edit filters">
@@ -501,6 +495,24 @@ export default function FiltersForm({
                     </CollapsibleList>
                   </SummaryListItem>
                 ))}
+              {Object.entries(values.filterHierarchies).map(
+                ([filterGroupKey, selectedOptions]) => (
+                  <SummaryListItem
+                    key={filterGroupKey}
+                    term={optionLabelsMap[filterGroupKey]}
+                  >
+                    <CollapsibleList
+                      id={`filtersList-${filterGroupKey}`}
+                      itemName="filter"
+                      itemNamePlural="filters"
+                    >
+                      {selectedOptions.map(optionId => (
+                        <li key={optionId}>{optionLabelsMap[optionId]}</li>
+                      ))}
+                    </CollapsibleList>
+                  </SummaryListItem>
+                ),
+              )}
             </SummaryList>
 
             <ResetFormOnPreviousStep {...stepProps} onReset={reset} />

@@ -7,6 +7,7 @@ import React, {
   ReactNode,
   Ref,
 } from 'react';
+import styles from './FormCheckbox.module.scss';
 
 export type OtherCheckboxChangeProps = Pick<FormCheckboxProps, 'label'>;
 
@@ -23,7 +24,7 @@ export interface FormCheckboxProps {
   id: string;
   hint?: string | ReactNode;
   hintSmall?: boolean;
-  label: string;
+  label: string | Element;
   boldLabel?: boolean;
   name: string;
   onBlur?: FocusEventHandler<HTMLInputElement>;
@@ -81,10 +82,14 @@ const FormCheckbox = ({
           value={value}
         />
         <label
-          className={classNames('govuk-label govuk-checkboxes__label', {
-            'govuk-!-font-weight-bold': boldLabel,
-            'govuk-!-padding-bottom-1': hintSmall,
-          })}
+          className={classNames(
+            'govuk-label govuk-checkboxes__label',
+            styles.label,
+            {
+              'govuk-!-font-weight-bold': boldLabel,
+              'govuk-!-padding-bottom-1': hintSmall,
+            },
+          )}
           htmlFor={id}
         >
           {label}

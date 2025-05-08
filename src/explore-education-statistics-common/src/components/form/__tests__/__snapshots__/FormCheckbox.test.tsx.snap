@@ -11,7 +11,7 @@ exports[`FormCheckbox does not render conditional content when not checked 1`] =
          value="true"
          aria-controls="test-checkbox-conditional"
   >
-  <label class="govuk-label govuk-checkboxes__label"
+  <label class="govuk-label govuk-checkboxes__label label"
          for="test-checkbox"
   >
     Test checkbox
@@ -39,7 +39,7 @@ exports[`FormCheckbox renders conditional content when checked 1`] = `
          aria-controls="test-checkbox-conditional"
          aria-expanded="true"
   >
-  <label class="govuk-label govuk-checkboxes__label"
+  <label class="govuk-label govuk-checkboxes__label label"
          for="test-checkbox"
   >
     Test checkbox
@@ -65,7 +65,7 @@ exports[`FormCheckbox renders correctly when \`hint\` is provided 1`] = `
          type="checkbox"
          value="true"
   >
-  <label class="govuk-label govuk-checkboxes__label"
+  <label class="govuk-label govuk-checkboxes__label label"
          for="test-checkbox"
   >
     Test checkbox
@@ -88,7 +88,7 @@ exports[`FormCheckbox renders correctly with required props 1`] = `
          type="checkbox"
          value="true"
   >
-  <label class="govuk-label govuk-checkboxes__label"
+  <label class="govuk-label govuk-checkboxes__label label"
          for="test-checkbox"
   >
     Test checkbox

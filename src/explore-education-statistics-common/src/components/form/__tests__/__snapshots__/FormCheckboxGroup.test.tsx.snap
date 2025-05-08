@@ -18,7 +18,7 @@ exports[`FormCheckboxGroup renders checkboxes with some pre-checked 1`] = `
                type="checkbox"
                value="1"
         >
-        <label class="govuk-label govuk-checkboxes__label"
+        <label class="govuk-label govuk-checkboxes__label label"
                for="test-checkboxes-checkbox-1"
         >
           Test checkbox 1
@@ -34,7 +34,7 @@ exports[`FormCheckboxGroup renders checkboxes with some pre-checked 1`] = `
                value="2"
                checked
         >
-        <label class="govuk-label govuk-checkboxes__label"
+        <label class="govuk-label govuk-checkboxes__label label"
                for="test-checkboxes-checkbox-2"
         >
           Test checkbox 2
@@ -49,7 +49,7 @@ exports[`FormCheckboxGroup renders checkboxes with some pre-checked 1`] = `
                type="checkbox"
                value="3"
         >
-        <label class="govuk-label govuk-checkboxes__label"
+        <label class="govuk-label govuk-checkboxes__label label"
                for="test-checkboxes-checkbox-3"
         >
           Test checkbox 3
@@ -78,7 +78,7 @@ exports[`FormCheckboxGroup renders correctly with legend 1`] = `
                type="checkbox"
                value="1"
         >
-        <label class="govuk-label govuk-checkboxes__label"
+        <label class="govuk-label govuk-checkboxes__label label"
                for="test-checkboxes-checkbox-1"
         >
           Test checkbox 1
@@ -118,7 +118,7 @@ exports[`FormCheckboxGroup renders correctly with small size variants 1`] = `
             value="1"
           />
           <label
-            class="govuk-label govuk-checkboxes__label"
+            class="govuk-label govuk-checkboxes__label label"
             for="test-checkboxes-checkbox-1"
           >
             Test checkbox 1
@@ -148,7 +148,7 @@ exports[`FormCheckboxGroup renders list of checkboxes in correct order 1`] = `
                type="checkbox"
                value="1"
         >
-        <label class="govuk-label govuk-checkboxes__label"
+        <label class="govuk-label govuk-checkboxes__label label"
                for="test-checkboxes-checkbox-1"
         >
           Test checkbox 1
@@ -163,7 +163,7 @@ exports[`FormCheckboxGroup renders list of checkboxes in correct order 1`] = `
                type="checkbox"
                value="2"
         >
-        <label class="govuk-label govuk-checkboxes__label"
+        <label class="govuk-label govuk-checkboxes__label label"
                for="test-checkboxes-checkbox-2"
         >
           Test checkbox 2
@@ -178,7 +178,7 @@ exports[`FormCheckboxGroup renders list of checkboxes in correct order 1`] = `
                type="checkbox"
                value="3"
         >
-        <label class="govuk-label govuk-checkboxes__label"
+        <label class="govuk-label govuk-checkboxes__label label"
                for="test-checkboxes-checkbox-3"
         >
           Test checkbox 3
@@ -209,7 +209,7 @@ exports[`FormCheckboxGroup renders option with conditional contents 1`] = `
                aria-controls="test-checkboxes-checkbox-1-conditional"
                aria-expanded="false"
         >
-        <label class="govuk-label govuk-checkboxes__label"
+        <label class="govuk-label govuk-checkboxes__label label"
                for="test-checkboxes-checkbox-1"
         >
           Test checkbox 1
@@ -234,7 +234,7 @@ exports[`FormCheckboxGroup renders option with conditional contents 1`] = `
                aria-controls="test-checkboxes-checkbox-2-conditional"
                aria-expanded="true"
         >
-        <label class="govuk-label govuk-checkboxes__label"
+        <label class="govuk-label govuk-checkboxes__label label"
                for="test-checkboxes-checkbox-2"
         >
           Test checkbox 2
@@ -258,7 +258,7 @@ exports[`FormCheckboxGroup renders option with conditional contents 1`] = `
                aria-controls="test-checkboxes-checkbox-3-conditional"
                aria-expanded="false"
         >
-        <label class="govuk-label govuk-checkboxes__label"
+        <label class="govuk-label govuk-checkboxes__label label"
                for="test-checkboxes-checkbox-3"
         >
           Test checkbox 3

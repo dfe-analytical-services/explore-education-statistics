@@ -1,0 +1,27 @@
+@import '~govuk-frontend/dist/govuk/base';
+
+.search {
+  max-width: map-get($govuk-breakpoints, 'desktop');
+}
+
+.tier {
+  background: govuk-colour('light-grey');
+  padding: govuk-spacing(2);
+  margin-bottom: govuk-spacing(5);
+}
+
+.subTier {
+  position: relative;
+  margin-top: govuk-spacing(8);
+
+  &::before {
+    content: '';
+    border-top: govuk-spacing(4) solid govuk-colour('blue');
+    border-left: govuk-spacing(8) solid transparent;
+    border-right: govuk-spacing(8) solid transparent;
+    left: 50%;
+    position: absolute;
+    top: govuk-spacing(-5);
+    transform: translate(-50%, -50%);
+  }
+}
