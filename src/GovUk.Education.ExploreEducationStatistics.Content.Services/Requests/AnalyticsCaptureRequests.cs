@@ -14,4 +14,5 @@ public record CaptureZipDownloadRequest(
     string ReleaseName,
     string? ReleaseLabel,
     Guid? SubjectId = null,
-    string? DataSetTitle = null) : IAnalyticsCaptureRequestBase;
+    string? DataSetTitle = null,
+    string? FromPage = null) : IAnalyticsCaptureRequestBase;
