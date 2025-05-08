@@ -52,7 +52,7 @@ export interface PublicationSummary {
 
 export interface PublicationListSummary {
   id: string;
-  published: Date;
+  published: Date | string;
   rank: number;
   slug: string;
   latestReleaseSlug: string;
