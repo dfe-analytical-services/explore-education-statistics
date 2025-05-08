@@ -25,14 +25,24 @@ internal class SearchableDocumentRemover(
 
         foreach (var releaseInfo in releaseInfos)
         {
-            var blobName = releaseInfo.ReleaseId.ToString();
-            results[releaseInfo.ReleaseId] =
-                await azureBlobStorageClient.DeleteBlobIfExists(
-                    appOptions.Value.SearchableDocumentsContainerName,
-                    blobName,
-                    cancellationToken);
+            var result = await RemoveSearchableDocument(new RemoveSearchableDocumentRequest{ ReleaseId = releaseInfo.ReleaseId }, cancellationToken);
+            results[releaseInfo.ReleaseId] = result.Success;
         }
 
         return new RemovePublicationSearchableDocumentsResponse(results);
+    }
+
+    public async Task<RemoveSearchableDocumentResponse> RemoveSearchableDocument(
+        RemoveSearchableDocumentRequest request,
+        CancellationToken cancellationToken = default)
+    {
+        var blobName = request.ReleaseId.ToString();
+
+        var success = await azureBlobStorageClient.DeleteBlobIfExists(
+            appOptions.Value.SearchableDocumentsContainerName,
+            blobName,
+            cancellationToken);
+
+        return new RemoveSearchableDocumentResponse(success);
     }
 }

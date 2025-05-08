@@ -37,6 +37,8 @@ type SearchStorageQueueNames = {
   releaseVersionPublished: string
   @description('Queue name for removing searchable documents associated with a publication.')
   removePublicationSearchableDocuments: string
+  @description('Queue name for removing a single searchable document.')
+  removeSearchableDocument: string
   @description('Queue name for when a searchable document is created.')
   searchableDocumentCreated: string
   @description('Queue name for when a theme is updated.')
