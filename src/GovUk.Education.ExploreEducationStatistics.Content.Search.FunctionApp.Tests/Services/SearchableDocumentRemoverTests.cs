@@ -106,4 +106,59 @@ public class SearchableDocumentRemoverTests
             Assert.True(response.ReleaseIdToDeletionResult[releases[1].ReleaseId]);
         }
     }
+    
+    public class RemoveSearchableDocumentTests : SearchableDocumentRemoverTests
+    {
+        [Fact]
+        public async Task ShouldDeleteBlobFromExpectedStorageContainer()
+        {
+            // Arrange
+            _appOptions = new AppOptions
+            {
+                SearchStorageConnectionString = "azure storage connection string",
+                SearchableDocumentsContainerName = "searchable-documents-container-name"
+            };
+
+            var releaseId = Guid.NewGuid();
+
+            var request = new RemoveSearchableDocumentRequest { ReleaseId = releaseId };
+
+            // Act
+            await GetSut().RemoveSearchableDocument(request);
+
+            // Assert
+            _azureBlobStorageClientMockBuilder.Assert.BlobWasDeleted(containerName: _appOptions.SearchableDocumentsContainerName);
+        }
+
+        [Fact]
+        public async Task ShouldDeleteBlobForRelease()
+        {
+            // Arrange
+            var releaseId = Guid.NewGuid();
+            
+            var request = new RemoveSearchableDocumentRequest { ReleaseId = releaseId };
+
+            // Act
+            await GetSut().RemoveSearchableDocument(request);
+
+            // Assert
+            _azureBlobStorageClientMockBuilder.Assert.BlobWasDeleted(blobName: releaseId.ToString());
+        }
+        
+        [Fact]
+        public async Task ShouldReturnDeletionResultInResponse()
+        {
+            // Arrange
+            var releaseId = Guid.NewGuid();
+
+            var request = new RemoveSearchableDocumentRequest { ReleaseId = releaseId };
+            _azureBlobStorageClientMockBuilder.WhereDeleteBlobFailsFor(releaseId.ToString());
+
+            // Act
+            var response = await GetSut().RemoveSearchableDocument(request);
+
+            // Assert
+            Assert.False(response.Success);
+        }
+    }
 }

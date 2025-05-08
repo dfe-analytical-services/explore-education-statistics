@@ -6,7 +6,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.
 public class SearchableDocumentRemoverMockBuilder
 {
     private readonly Mock<ISearchableDocumentRemover> _mock = new(MockBehavior.Strict);
-    private RemovePublicationSearchableDocumentsResponse? _response;
+    private RemovePublicationSearchableDocumentsResponse? _removePublicationSearchableDocumentsResponse;
+    private RemoveSearchableDocumentResponse? _removeSearchableDocumentResponse;
 
     public SearchableDocumentRemoverMockBuilder()
     {
@@ -16,7 +17,13 @@ public class SearchableDocumentRemoverMockBuilder
             .Setup(m => m.RemovePublicationSearchableDocuments(
                 It.IsAny<RemovePublicationSearchableDocumentsRequest>(),
                 It.IsAny<CancellationToken>()))
-            .ReturnsAsync(_response ?? new RemovePublicationSearchableDocumentsResponse(new Dictionary<Guid, bool>()));
+            .ReturnsAsync(_removePublicationSearchableDocumentsResponse ?? new RemovePublicationSearchableDocumentsResponse(new Dictionary<Guid, bool>()));
+        
+        _mock
+            .Setup(m => m.RemoveSearchableDocument(
+                It.IsAny<RemoveSearchableDocumentRequest>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync(_removeSearchableDocumentResponse ?? new RemoveSearchableDocumentResponse(Success: true));
     }
 
     public ISearchableDocumentRemover Build()
@@ -26,7 +33,13 @@ public class SearchableDocumentRemoverMockBuilder
 
     public SearchableDocumentRemoverMockBuilder WhereResponseIs(RemovePublicationSearchableDocumentsResponse response)
     {
-        _response = response;
+        _removePublicationSearchableDocumentsResponse = response;
+        return this;
+    }
+
+    public SearchableDocumentRemoverMockBuilder WhereResponseIs(RemoveSearchableDocumentResponse response)
+    {
+        _removeSearchableDocumentResponse = response;
         return this;
     }
 
@@ -51,6 +64,26 @@ public class SearchableDocumentRemoverMockBuilder
                     It.IsAny<RemovePublicationSearchableDocumentsRequest>(),
                     It.IsAny<CancellationToken>()),
                 Times.Never);
+        }
+
+        public void RemoveSearchableDocumentCalledFor(Guid releaseId)
+        {
+            mock
+                .Verify(m => m.RemoveSearchableDocument(
+                        It.Is<RemoveSearchableDocumentRequest>(
+                            req =>
+                                req.ReleaseId == releaseId),
+                        It.IsAny<CancellationToken>()),
+                    Times.Once);
+        }
+
+        public void RemoveSearchableDocumentNotCalled()
+        {
+            mock
+                .Verify(m => m.RemoveSearchableDocument(
+                        It.IsAny<RemoveSearchableDocumentRequest>(),
+                        It.IsAny<CancellationToken>()),
+                    Times.Never);
         }
     }
 }

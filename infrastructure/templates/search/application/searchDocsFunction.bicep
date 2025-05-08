@@ -58,6 +58,7 @@ param storageQueueNames SearchStorageQueueNames = {
   releaseSlugChanged: 'release-slug-changed-queue'
   releaseVersionPublished: 'release-version-published-queue'
   removePublicationSearchableDocuments: 'remove-publication-searchable-documents-queue'
+  removeSearchableDocument: 'remove-searchable-document-queue'
   searchableDocumentCreated: 'search-document-created-queue'
   themeUpdated: 'theme-updated-queue'
 }
@@ -161,6 +162,10 @@ module functionAppModule '../../common/components/functionApp.bicep' = {
       {
         name: 'RemovePublicationSearchableDocumentsQueueName'
         value: storageQueueNames.removePublicationSearchableDocuments
+      }
+      {
+        name: 'RemoveSearchableDocumentQueueName'
+        value: storageQueueNames.removeSearchableDocument
       }
       {
         name: 'SearchableDocumentCreatedQueueName'
