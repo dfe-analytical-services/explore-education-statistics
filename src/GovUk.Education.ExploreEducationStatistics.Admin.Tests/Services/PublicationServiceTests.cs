@@ -1151,7 +1151,8 @@ public class PublicationServiceTests
         Publication publication,
         Publication? initialPublicationSupersededBy,
         Publication? updatedPublicationSupersededBy,
-        bool expectPublicationArchivedEventRaised)
+        bool expectPublicationArchivedEventRaised,
+        bool expectedPublicationRestoredEventRaised)
     {
         // Set the initial publication's `SupersededBy` publication (null, live, or not live)
         publication.SupersededBy = initialPublicationSupersededBy;
@@ -1189,16 +1190,35 @@ public class PublicationServiceTests
             );
         }
 
-        if (expectPublicationArchivedEventRaised)
+        await using (var context = InMemoryApplicationDbContext(contextId))
         {
-            await using var context = InMemoryApplicationDbContext(contextId);
             var updatedPublication = await context.Publications
                 .SingleAsync(p => p.Id == publication.Id);
-            AssertOnPublicationArchivedEventRaised(updatedPublication);
-        }
-        else
-        {
-            AssertOnPublicationChangedEventsNotRaised();
+
+            if (expectPublicationArchivedEventRaised)
+            {
+                AssertOnPublicationArchivedEventRaised(updatedPublication);
+            }
+            else
+            {
+                AssertOnPublicationArchivedEventNotRaised();
+            }
+
+            if (expectedPublicationRestoredEventRaised)
+            {
+                AssertOnPublicationRestoredEventRaised(
+                    updatedPublication,
+                    previousSupersededByPublicationId: publication.SupersededById!.Value);
+            }
+            else
+            {
+                AssertOnPublicationRestoredEventNotRaised();
+            }
+
+            if (!expectPublicationArchivedEventRaised && !expectedPublicationRestoredEventRaised)
+            {
+                AssertOnPublicationChangedEventsNotRaised();
+            }
         }
     }
 
@@ -3622,9 +3642,12 @@ public class PublicationServiceTests
             publication.Slug,
             publication.SupersededById);
 
+    private void AssertOnPublicationArchivedEventNotRaised() =>
+        _adminEventRaiserMockBuilder.Assert.OnPublicationArchivedWasNotRaised();
+
     private void AssertOnPublicationChangedEventRaised(Publication publication) =>
         _adminEventRaiserMockBuilder.Assert.OnPublicationChangedWasRaised(publication);
-    
+
     private void AssertOnPublicationLatestPublishedReleaseReorderedWasRaised(
         Publication publication,
         Guid previousReleaseVersionId) =>
@@ -3632,8 +3655,19 @@ public class PublicationServiceTests
             publication,
             previousReleaseVersionId);
 
+    private void AssertOnPublicationRestoredEventRaised(
+        Publication publication,
+        Guid previousSupersededByPublicationId) =>
+        _adminEventRaiserMockBuilder.Assert.OnPublicationRestoredWasRaised(
+            publication.Id,
+            publication.Slug,
+            previousSupersededByPublicationId);
+
+    private void AssertOnPublicationRestoredEventNotRaised() =>
+        _adminEventRaiserMockBuilder.Assert.OnPublicationRestoredWasNotRaised();
+
     private void AssertOnPublicationChangedEventsNotRaised()
     {
-        _adminEventRaiserMockBuilder.Assert.AssertOnPublicationChangedEventsNotRaised();
+        _adminEventRaiserMockBuilder.Assert.OnPublicationChangedEventsNotRaised();
     }
 }

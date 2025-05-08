@@ -276,6 +276,14 @@ public class PublicationService(
                 publication.Slug,
                 supersededByPublicationId: publication.SupersededById!.Value);
         }
+        else if (transition == PublicationArchiveStatusTransitionResolver.PublicationArchiveStatusTransition
+                     .ArchivedToNotArchived)
+        {
+            await adminEventRaiser.OnPublicationRestored(
+                publication.Id,
+                publication.Slug,
+                previousSupersededByPublicationId: previousSupersededById!.Value);
+        }
     }
 
     private async Task<Publication?> GetSupersedingPublication(Guid? supersededByPublicationId)

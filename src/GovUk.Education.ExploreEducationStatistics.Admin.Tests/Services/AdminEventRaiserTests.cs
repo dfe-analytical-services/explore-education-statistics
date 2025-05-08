@@ -137,6 +137,30 @@ public class AdminEventRaiserTests
     }
 
     [Fact]
+    public async Task WhenOnPublicationRestored_ThenEventPublished()
+    {
+        // ARRANGE
+        var publicationId = Guid.NewGuid();
+        const string publicationSlug = "publication-slug";
+        var previousSupersededByPublicationId = Guid.NewGuid();
+
+        var sut = GetSut();
+
+        // ACT
+        await sut.OnPublicationRestored(
+            publicationId: publicationId,
+            publicationSlug,
+            previousSupersededByPublicationId: previousSupersededByPublicationId);
+
+        // ASSERT
+        var expectedEvent = new PublicationRestoredEvent(
+            publicationId,
+            publicationSlug,
+            previousSupersededByPublicationId);
+        _eventRaiserMockBuilder.Assert.EventRaised(expectedEvent);
+    }
+
+    [Fact]
     public async Task
         GivenPublicationLatestPublishedReleaseVersionIdIsNull_WhenOnPublicationLatestPublishedReleaseReordered_ThenNoEventPublished()
     {
