@@ -1,34 +1,24 @@
-import {
-  DataFile,
-  DataFileImportStatus,
-} from '@admin/services/releaseDataFileService';
+import { DataFile } from '@admin/services/releaseDataFileService';
 import styles from '@admin/pages/release/data/components/DataFilesTable.module.scss';
-import DataFilesTableRow from '@admin/pages/release/data/components/DataFilesTableRow';
+import DataFileReplacementTableRow from '@admin/pages/release/data/components/DataFilesReplacementTableRow';
 import React from 'react';
 
 interface Props {
-  canUpdateRelease?: boolean;
   caption: string;
   dataFiles: DataFile[];
   publicationId: string;
   releaseVersionId: string;
   testId?: string;
-  onDeleteFile: (deletedFileId: string) => void;
-  onStatusChange: (
-    dataFile: DataFile,
-    importStatus: DataFileImportStatus,
-  ) => Promise<void>;
+  onConfirmReplacement?: () => void;
 }
 
-export default function DataFilesTable({
-  canUpdateRelease,
+export default function DataFilesReplacementTable({
   caption,
   dataFiles,
   publicationId,
   releaseVersionId,
   testId,
-  onDeleteFile,
-  onStatusChange,
+  onConfirmReplacement,
 }: Props) {
   return (
     <table className={styles.table} data-testid={testId}>
@@ -38,21 +28,19 @@ export default function DataFilesTable({
         <tr>
           <th scope="col">Title</th>
           <th scope="col">Size</th>
-          <th scope="col">Status</th>
+          <th scope="col">Replacement status</th>
           <th scope="col">Actions</th>
         </tr>
       </thead>
 
       <tbody>
         {dataFiles.map(dataFile => (
-          <DataFilesTableRow
-            canUpdateRelease={canUpdateRelease}
+          <DataFileReplacementTableRow
             dataFile={dataFile}
             key={dataFile.title}
             publicationId={publicationId}
             releaseVersionId={releaseVersionId}
-            onConfirmDelete={onDeleteFile}
-            onStatusChange={onStatusChange}
+            onConfirmReplacement={onConfirmReplacement}
           />
         ))}
       </tbody>
