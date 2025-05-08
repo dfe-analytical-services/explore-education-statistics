@@ -1,3 +1,4 @@
+using GovUk.Education.ExploreEducationStatistics.Common.DuckDb.DuckDb;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Requests;
@@ -5,7 +6,6 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services.Interf
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services.Query;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Utils;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
-using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.DuckDb;
 using InterpolatedSql;
 using StackExchange.Profiling;
 
