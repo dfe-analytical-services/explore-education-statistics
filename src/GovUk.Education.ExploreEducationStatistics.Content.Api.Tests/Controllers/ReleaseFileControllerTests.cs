@@ -12,6 +12,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
+using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
@@ -260,20 +261,21 @@ public abstract class ReleaseFileControllerTests(TestApplicationFactory testApp)
                     s => s.ZipFilesToStream(
                         releaseVersion.Id,
                         It.IsAny<Stream>(),
+                        FromPage.ReleaseUsefulInfo,
                         It.Is<IEnumerable<Guid>>(
                             ids => ids.SequenceEqual(ListOf(fileId))),
                         It.IsAny<CancellationToken>()
                     )
                 )
                 .ReturnsAsync(Unit.Instance)
-                .Callback<Guid, Stream, IEnumerable<Guid>, CancellationToken?>(
-                    (_, stream, _, _) => stream.WriteText("Test zip"));
+                .Callback<Guid, Stream, FromPage, IEnumerable<Guid>, CancellationToken?>(
+                    (_, stream, _, _, _) => stream.WriteText("Test zip"));
 
             var client = BuildApp(releaseFileService: releaseFileService.Object)
                 .CreateClient();
 
             var response = await client
-                .GetAsync($"/api/releases/{releaseVersion.Id}/files?fileIds={fileId}");
+                .GetAsync($"/api/releases/{releaseVersion.Id}/files?fromPage=ReleaseUsefulInfo&fileIds={fileId}");
 
             MockUtils.VerifyAllMocks(releaseFileService);
 
@@ -301,19 +303,20 @@ public abstract class ReleaseFileControllerTests(TestApplicationFactory testApp)
                     s => s.ZipFilesToStream(
                         releaseVersion.Id,
                         It.IsAny<Stream>(),
+                        FromPage.ReleaseDownloads,
                         null,
                         It.IsAny<CancellationToken>()
                     )
                 )
                 .ReturnsAsync(Unit.Instance)
-                .Callback<Guid, Stream, IEnumerable<Guid>?, CancellationToken?>(
-                    (_, stream, _, _) => stream.WriteText("Test zip"));
+                .Callback<Guid, Stream, FromPage, IEnumerable<Guid>?, CancellationToken?>(
+                    (_, stream, _, _, _) => stream.WriteText("Test zip"));
 
             var client = BuildApp(releaseFileService: releaseFileService.Object)
                 .CreateClient();
 
             var response = await client
-                .GetAsync($"/api/releases/{releaseVersion.Id}/files");
+                .GetAsync($"/api/releases/{releaseVersion.Id}/files?fromPage=ReleaseDownloads");
 
             MockUtils.VerifyAllMocks(releaseFileService);
 

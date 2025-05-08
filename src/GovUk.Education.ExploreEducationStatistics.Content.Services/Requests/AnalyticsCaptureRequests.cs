@@ -13,4 +13,6 @@ public record CaptureZipDownloadRequest(
     string ReleaseName,
     string? ReleaseLabel,
     Guid? SubjectId = null,
-    string? DataSetTitle = null) : IAnalyticsCaptureRequestBase;
+    string? DataSetTitle = null,
+    // TODO: FromPage can be made non-optional later
+    string? FromPage = null) : IAnalyticsCaptureRequestBase;

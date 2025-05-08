@@ -6,7 +6,6 @@ import SectionBreak from '@common/components/SectionBreak';
 import Tag from '@common/components/Tag';
 import useDebouncedCallback from '@common/hooks/useDebouncedCallback';
 import useToggle from '@common/hooks/useToggle';
-import downloadService from '@common/services/downloadService';
 import { ApiDataSetVersionChanges } from '@common/services/types/apiDataSetChanges';
 import { Dictionary } from '@common/types';
 import Page from '@frontend/components/Page';
@@ -35,6 +34,7 @@ import classNames from 'classnames';
 import { GetServerSideProps } from 'next';
 import React, { useEffect, useMemo, useState } from 'react';
 import omit from 'lodash/omit';
+import downloadService from '@frontend/services/downloadService';
 
 export const pageBaseSections = {
   dataSetDetails: 'Data set details',
@@ -74,16 +74,6 @@ export default function DataSetFilePage({
   const [activeSection, setActiveSection] =
     useState<PageSectionId>('dataSetDetails');
   const [fullScreenPreview, toggleFullScreenPreview] = useToggle(false);
-
-  const handleDownload = async () => {
-    await downloadService.downloadFiles(release.id, [file.id]);
-
-    logEvent({
-      category: 'Data catalogue - data set page',
-      action: 'Data set file download',
-      label: `Publication: ${release.publication.title}, Release: ${release.title}, Data set: ${title}`,
-    });
-  };
 
   const [handleScroll] = useDebouncedCallback(() => {
     const sections = document.querySelectorAll('[data-page-section]');
@@ -200,7 +190,19 @@ export default function DataSetFilePage({
                 'govuk-!-margin-bottom-0',
                 styles.infoDownloadButton,
               )}
-              onClick={handleDownload}
+              onClick={async () => {
+                await downloadService.downloadZip(
+                  release.id,
+                  'DataCatalogue',
+                  file.id,
+                );
+
+                logEvent({
+                  category: 'Data catalogue - data set page',
+                  action: 'Data set file download',
+                  label: `Publication: ${release.publication.title}, Release: ${release.title}, Data set: ${title}`,
+                });
+              }}
             >
               Download data set (ZIP)
             </Button>
@@ -251,7 +253,19 @@ export default function DataSetFilePage({
                 dataSetFileId={dataSetFile.id}
                 hasApiDataSet={!!apiDataSet}
                 tableToolLink={`/data-tables/${release.publication.slug}/${release.slug}?subjectId=${file.subjectId}`}
-                onDownload={handleDownload}
+                onDownload={async () => {
+                  await downloadService.downloadZip(
+                    release.id,
+                    'DataCatalogue',
+                    file.id,
+                  );
+
+                  logEvent({
+                    category: 'Data catalogue - data set page',
+                    action: 'Data set file download',
+                    label: `Publication: ${release.publication.title}, Release: ${release.title}, Data set: ${title}`,
+                  });
+                }}
               />
 
               {apiDataSet && apiDataSetVersion && (

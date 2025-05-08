@@ -190,6 +190,7 @@ public abstract class PublicZipDownloadsProcessorTests
         Assert.Equal(request.ReleaseLabel, row.ReleaseLabel);
         Assert.Equal(request.SubjectId, row.SubjectId);
         Assert.Equal(request.DataSetTitle, row.DataSetTitle);
+        Assert.Equal(request.FromPage, row.FromPage);
 
         // Generate expected ZipDownloadHash
         var subjectIdStr = request.SubjectId == null ? "" : request.SubjectId.ToString()!.ToLower();
@@ -214,7 +215,8 @@ public abstract class PublicZipDownloadsProcessorTests
         string ReleaseName,
         string? ReleaseLabel,
         Guid? SubjectId = null,
-        string? DataSetTitle = null);
+        string? DataSetTitle = null,
+        string? FromPage = null);
 
     // ReSharper disable once ClassNeverInstantiated.Local
     private record ZipDownloadReportLine(
@@ -225,5 +227,6 @@ public abstract class PublicZipDownloadsProcessorTests
         string ReleaseLabel,
         Guid? SubjectId,
         string? DataSetTitle,
+        string? FromPage,
         int Downloads);
 }
