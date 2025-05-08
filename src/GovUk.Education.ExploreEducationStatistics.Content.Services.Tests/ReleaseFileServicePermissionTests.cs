@@ -80,6 +80,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                         return await service.ZipFilesToStream(
                             releaseVersionId: releaseVersion.Id,
                             outputStream: Stream.Null,
+                            fromPage: FromPage.DataCatalogue,
                             fileIds: [Guid.NewGuid()]
                         );
                     }
