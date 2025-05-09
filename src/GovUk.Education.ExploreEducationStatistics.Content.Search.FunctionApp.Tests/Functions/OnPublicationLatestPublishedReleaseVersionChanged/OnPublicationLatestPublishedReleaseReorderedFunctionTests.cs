@@ -1,8 +1,9 @@
 ﻿using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.OnPublicationLatestPublishedReleaseReordered;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.OnPublicationLatestPublishedReleaseReordered.Dtos;
+using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.RemoveSearchableDocument.Dto;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Services;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Tests.Builders;
-using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Tests.TheoryDatas;
+using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Tests.TheoryDataHelpers;
 using Microsoft.Extensions.Logging.Abstractions;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Tests.Functions.OnPublicationLatestPublishedReleaseVersionChanged;
@@ -39,21 +40,24 @@ public class OnPublicationLatestPublishedReleaseReorderedFunctionTests
         var actual = Assert.Single(response.RefreshSearchableDocuments);
         Assert.NotNull(actual);
         Assert.Equal(payload.Slug, actual.PublicationSlug);
-        Assert.Empty(response.RemoveSearchableDocuments);
     }
     
-    [Fact]
-    public async Task GivenEvent_WhenPayloadContainsPreviousReleaseVersionId_ThenRemoveSearchableDocumentReturned()
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public async Task GivenEvent_OnlyWhenPayloadContainsPreviousReleaseVersionId_ThenRemoveSearchableDocumentReturned(bool hasPreviousReleaseVersionId)
     {
         // ARRANGE
-        var payload = new PublicationLatestPublishedReleaseReorderedEventDto
-        {
-            Slug = "this-is-a-publication-slug",
-            PreviousReleaseVersionId = Guid.NewGuid()
-        };
+        Guid? previousReleaseVersionId = hasPreviousReleaseVersionId 
+                                            ? Guid.NewGuid() 
+                                            : null;
 
         var eventGridEvent = new EventGridEventBuilder()
-            .WithPayload(payload)
+            .WithPayload(new PublicationLatestPublishedReleaseReorderedEventDto
+            {
+                Slug = "this-is-a-publication-slug",
+                PreviousReleaseVersionId = previousReleaseVersionId
+            })
             .Build();
 
         var sut = GetSut();
@@ -65,13 +69,15 @@ public class OnPublicationLatestPublishedReleaseReorderedFunctionTests
         
         // ASSERT
         Assert.NotNull(response);
-        var actual = Assert.Single(response.RemoveSearchableDocuments);
-        Assert.NotNull(actual);
-        Assert.Equal(payload.PreviousReleaseVersionId, actual.ReleaseId);
+
+        RemoveSearchableDocumentDto[] expected = hasPreviousReleaseVersionId
+            ? [new RemoveSearchableDocumentDto{ ReleaseId = previousReleaseVersionId! }]
+            : [];
+        Assert.Equal(expected, response.RemoveSearchableDocuments);
     }
     
     [Theory]
-    [MemberData(nameof(Empty.StringValues), MemberType = typeof(Empty))]
+    [MemberData(nameof(TheoryDatas.Blank.Strings), MemberType = typeof(TheoryDatas.Blank))]
     public async Task GivenEvent_WhenPayloadDoesNotContainSlug_ThenNothingIsReturned(string? blankSlug)
     {
         // ARRANGE
@@ -92,8 +98,6 @@ public class OnPublicationLatestPublishedReleaseReorderedFunctionTests
             new FunctionContextMockBuilder().Build());
         
         // ASSERT
-        Assert.NotNull(response);
-        Assert.Empty(response.RefreshSearchableDocuments);
-        Assert.Empty(response.RemoveSearchableDocuments);
+        Assert.Equal(OnPublicationLatestPublishedReleaseReorderedOutput.Empty, response);
     }
 }

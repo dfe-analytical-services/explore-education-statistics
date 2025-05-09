@@ -4,7 +4,7 @@ using Microsoft.Azure.Functions.Worker;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.OnPublicationLatestPublishedReleaseReordered;
 
-public class OnPublicationLatestPublishedReleaseReorderedOutput
+public record OnPublicationLatestPublishedReleaseReorderedOutput
 {
     [QueueOutput("%RefreshSearchableDocumentQueueName%")]
     public RefreshSearchableDocumentMessageDto[] RefreshSearchableDocuments { get; init; } = [];
