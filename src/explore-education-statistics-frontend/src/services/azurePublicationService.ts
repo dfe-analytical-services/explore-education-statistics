@@ -49,20 +49,37 @@ const azurePublicationService = {
   async listPublications(
     params: AzurePublicationListRequest,
   ): Promise<PaginatedList<PublicationListSummary>> {
-    const searchResults = await azureSearchClient.search(params.search || '', {
+    const { releaseType, themeId, page, search } = params;
+
+    let filter: string | undefined;
+    if (releaseType && themeId) {
+      filter = odata`releaseType eq ${releaseType} and theme eq ${themeId}`;
+    } else if (releaseType) {
+      filter = odata`releaseType eq ${releaseType}`;
+    } else if (themeId) {
+      // TODO amend theme to themeId once EES-6123 merged
+      filter = odata`theme eq ${themeId}`;
+    }
+    const searchResults = await azureSearchClient.search(search || '', {
+      // Pagination
       includeTotalCount: true,
       top: 10,
-      // TODO Check if params.page needs number check or safe to assume type
-      skip: params.page && params.page > 1 ? (params.page - 1) * 10 : 0,
+      skip: page && page > 1 ? (page - 1) * 10 : 0,
       queryType: 'semantic',
+
+      // Semantic search
       semanticSearchOptions: {
         configurationName: 'semantic-configuration-1',
       },
-      // orderBy: ["title asc"],
-      filter: params.themeId ? odata`theme eq ${params.themeId}` : undefined,
-      facets: ['theme,sort:count', 'releaseType'],
-      highlightFields: 'summary',
       searchMode: 'any',
+      scoringProfile: 'scoring-profile-1',
+      highlightFields: 'content',
+
+      // TODO Sorting
+      // orderBy: ["title asc"],
+      filter,
+      // TODO amend theme to themeId once EES-6123 merged
+      facets: ['theme,sort:count', 'releaseType'],
       select: [
         'content',
         'releaseSlug',
@@ -74,39 +91,44 @@ const azurePublicationService = {
         'theme',
         'title',
       ],
-      scoringProfile: 'scoring-profile-1',
     });
-    // return searchResults;
-    // console.log(searchResults);
 
+    // Transform response into <PaginatedList<PublicationListSummary>>
+    const { count, results } = searchResults;
     const publicationsResult = {
       paging: {
-        totalPages: Math.floor((searchResults.count || 0) / 10) + 1,
-        totalResults: searchResults.count || 0,
+        totalPages: Math.floor((count || 0) / 10) + 1,
+        totalResults: count || 0,
         page: params.page || 1,
         pageSize: 10,
       },
       results: [] as PublicationListSummary[],
     };
-    console.log(searchResults);
 
-    for await (const result of searchResults.results) {
-      console.log(result);
+    for await (const result of results) {
+      // console.log(result);
       const { document } = result;
+      const {
+        theme,
+        title,
+        summary,
+        published,
+        releaseVersionId: id,
+        releaseSlug: slug,
+        releaseType: type,
+      } = document;
+
       publicationsResult.results.push({
-        theme: document.theme,
-        title: document.title,
-        summary:
-          result.highlights?.summary?.reduce(
-            (highlight, fullstring) => `${fullstring} ${highlight}`,
-            '',
-          ) || document.summary,
-        published: document.published.toString(),
-        id: document.releaseVersionId,
+        theme,
+        title,
+        summary,
+        highlightContent: result.highlights?.content?.join(' ... ') || null,
+        published: published.toString(),
+        id,
         rank: result.score,
-        slug: document.releaseSlug,
-        latestReleaseSlug: document.releaseSlug,
-        type: document.releaseType as ReleaseType,
+        slug,
+        latestReleaseSlug: slug,
+        type: type as ReleaseType,
       });
     }
 
