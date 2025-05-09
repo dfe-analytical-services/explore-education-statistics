@@ -8,13 +8,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.
 /// </summary>
 public static class SearchableDocumentAzureBlobMetadataKeys
 {
-    public const string ReleaseVersionId = "ReleaseVersionId";
-    public const string PublicationSlug = "PublicationSlug";
+    public const string ReleaseId = "ReleaseId";
     public const string ReleaseSlug = "ReleaseSlug";
+    public const string ReleaseVersionId = "ReleaseVersionId";
+    public const string PublicationId = "PublicationId";
+    public const string PublicationSlug = "PublicationSlug";
+    public const string ThemeId = "ThemeId";
+    public const string ThemeTitle = "ThemeTitle";
     public const string Published = "Published";
     public const string Summary = "Summary";
     public const string Title = "Title";
-    public const string Theme = "Theme";
     public const string ReleaseType = "ReleaseType";
     public const string TypeBoost = "TypeBoost";
 }
@@ -23,15 +26,18 @@ public static class ReleaseSearchableDocumentExtensions
 {
     public static IDictionary<string, string> BuildMetadata(this ReleaseSearchableDocument releaseSearchableDocument)
     {
-        var metadata = new Dictionary<string, string>()
+        var metadata = new Dictionary<string, string>
         {
-            { SearchableDocumentAzureBlobMetadataKeys.ReleaseVersionId, releaseSearchableDocument.ReleaseVersionId.ToString() },
-            { SearchableDocumentAzureBlobMetadataKeys.PublicationSlug, releaseSearchableDocument.PublicationSlug },
+            { SearchableDocumentAzureBlobMetadataKeys.ReleaseId, releaseSearchableDocument.ReleaseId.ToString() },
             { SearchableDocumentAzureBlobMetadataKeys.ReleaseSlug, releaseSearchableDocument.ReleaseSlug },
+            { SearchableDocumentAzureBlobMetadataKeys.ReleaseVersionId, releaseSearchableDocument.ReleaseVersionId.ToString() },
+            { SearchableDocumentAzureBlobMetadataKeys.PublicationId, releaseSearchableDocument.PublicationId.ToString() },
+            { SearchableDocumentAzureBlobMetadataKeys.PublicationSlug, releaseSearchableDocument.PublicationSlug },
+            { SearchableDocumentAzureBlobMetadataKeys.ThemeId, releaseSearchableDocument.ThemeId.ToString() },
+            { SearchableDocumentAzureBlobMetadataKeys.ThemeTitle, ToMetadataSafeString(releaseSearchableDocument.ThemeTitle) },
             { SearchableDocumentAzureBlobMetadataKeys.Published, releaseSearchableDocument.Published.ToUniversalTime().ToString("yyyy-MM-ddThh:mm:ssZ") ?? string.Empty },
             { SearchableDocumentAzureBlobMetadataKeys.Summary, ToMetadataSafeString(releaseSearchableDocument.Summary) },
             { SearchableDocumentAzureBlobMetadataKeys.Title, ToMetadataSafeString(releaseSearchableDocument.PublicationTitle) },
-            { SearchableDocumentAzureBlobMetadataKeys.Theme, releaseSearchableDocument.Theme },
             { SearchableDocumentAzureBlobMetadataKeys.ReleaseType, releaseSearchableDocument.ReleaseType },
             { SearchableDocumentAzureBlobMetadataKeys.TypeBoost, releaseSearchableDocument.TypeBoost.ToString() },
         };
