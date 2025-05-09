@@ -363,7 +363,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.Configure<AppOptions>(
                 configuration.GetRequiredSection(AppOptions.Section));
             services.Configure<FeatureFlags>(
-                configuration.GetRequiredSection(FeatureFlags.Section));
+                configuration.GetSection(FeatureFlags.Section));
             services.Configure<AppInsightsOptions>(
                 configuration.GetSection(AppInsightsOptions.Section));
             services.Configure<NotifyOptions>(
