@@ -14,7 +14,6 @@ using Moq;
 using NCrontab;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.Cache.CronSchedules;
-using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using static Moq.MockBehavior;
 using static Newtonsoft.Json.JsonConvert;
@@ -23,9 +22,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
 
 public class ThemeControllerCachingTests : CacheServiceTestFixture
 {
-    private readonly IList<ThemeViewModel> _themes = ListOf(
-        new ThemeViewModel(Guid.NewGuid(), "slug1", "title1", "summary1"),
-        new ThemeViewModel(Guid.NewGuid(), "slug2", "title2", "summary2"));
+    private readonly IList<ThemeViewModel> _themes =
+    [
+        new()
+        {
+            Id = Guid.NewGuid(),
+            Slug = "slug1",
+            Title = "title1",
+            Summary = "summary1"
+        },
+        new()
+        {
+            Id = Guid.NewGuid(),
+            Slug = "slug2",
+            Title = "title2",
+            Summary = "summary2"
+        }
+    ];
 
     [Fact]
     public async Task ListThemes_NoCachedEntryExists()

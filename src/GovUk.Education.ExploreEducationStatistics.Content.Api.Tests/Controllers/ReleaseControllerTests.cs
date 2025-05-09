@@ -84,22 +84,28 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
         public async Task GetLatestReleaseAsSearchable()
         {
             // ARRANGE
+            var themeId = Guid.NewGuid();
+            const string themeTitle = "the theme";
             var publicationId = Guid.NewGuid();
             var releaseId = Guid.NewGuid();
+            var releaseVersionId = Guid.NewGuid();
             var publishedTimestamp = new DateTime(2025, 02, 19, 11, 41, 00, DateTimeKind.Utc);
-            var releaseType = ReleaseType.OfficialStatistics;
+            const ReleaseType releaseType = ReleaseType.OfficialStatistics;
 
             var publicationCacheViewModel = new PublicationCacheViewModel
             {
                 Id = publicationId,
                 Title = "Publication Title",
                 Summary = "This is the publication summary",
-                Theme = new ThemeViewModelBuilder().WithTitle("the theme"),
+                Theme = new ThemeViewModelBuilder()
+                    .WithId(themeId)
+                    .WithTitle(themeTitle),
                 Slug = "publication-slug",
                 
             };
-            var releaseCacheViewModel = new ReleaseCacheViewModel(releaseId)
+            var releaseCacheViewModel = new ReleaseCacheViewModel(releaseVersionId)
             {
+                ReleaseId = releaseId,
                 Published = publishedTimestamp,
                 Title = "Release Title",
                 SummarySection = new ContentSectionViewModelBuilder().AddHtmlContent("<p>This is the release summary</p>"),
@@ -164,11 +170,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
             
             AssertAll(
                 [
-                    () => Assert.Equal(releaseId, actual.ReleaseVersionId), 
+                    () => Assert.Equal(releaseId, actual.ReleaseId),
+                    () => Assert.Equal(releaseVersionId, actual.ReleaseVersionId), 
                     () => Assert.Equal(publishedTimestamp, actual.Published), 
+                    () => Assert.Equal(publicationId, actual.PublicationId),
                     () => Assert.Equal("Publication Title", actual.PublicationTitle), 
                     () => Assert.Equal("This is the publication summary", actual.Summary), 
-                    () => Assert.Equal("the theme", actual.Theme), 
+                    () => Assert.Equal(themeId, actual.ThemeId),
+                    () => Assert.Equal(themeTitle, actual.ThemeTitle),
                     () => Assert.Equal("OfficialStatistics", actual.Type), 
                     () => Assert.Equal(releaseType.ToSearchDocumentTypeBoost(), actual.TypeBoost), 
                     () => Assert.Equal("publication-slug", actual.PublicationSlug), 

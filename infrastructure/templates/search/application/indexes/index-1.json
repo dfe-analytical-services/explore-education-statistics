@@ -52,7 +52,19 @@
       "name": "releaseVersionId",
       "type": "Edm.String",
       "searchable": false,
-      "filterable": false,
+      "filterable": true,
+      "retrievable": true,
+      "stored": true,
+      "sortable": false,
+      "facetable": false,
+      "key": false,
+      "synonymMaps": []
+    },
+    {
+      "name": "publicationId",
+      "type": "Edm.String",
+      "searchable": false,
+      "filterable": true,
       "retrievable": true,
       "stored": true,
       "sortable": false,
@@ -85,6 +97,18 @@
       "synonymMaps": []
     },
     {
+      "name": "releaseId",
+      "type": "Edm.String",
+      "searchable": false,
+      "filterable": true,
+      "retrievable": true,
+      "stored": true,
+      "sortable": false,
+      "facetable": false,
+      "key": false,
+      "synonymMaps": []
+    },
+    {
       "name": "summary",
       "type": "Edm.String",
       "searchable": true,
@@ -98,7 +122,7 @@
       "synonymMaps": []
     },
     {
-      "name": "theme",
+      "name": "themeId",
       "type": "Edm.String",
       "searchable": false,
       "filterable": true,
@@ -106,6 +130,18 @@
       "stored": true,
       "sortable": false,
       "facetable": true,
+      "key": false,
+      "synonymMaps": []
+    },
+    {
+      "name": "themeTitle",
+      "type": "Edm.String",
+      "searchable": false,
+      "filterable": false,
+      "retrievable": true,
+      "stored": true,
+      "sortable": false,
+      "facetable": false,
       "key": false,
       "synonymMaps": []
     },
