@@ -57,6 +57,7 @@ export interface PublicationListSummary {
   slug: string;
   latestReleaseSlug: string;
   summary?: string;
+  highlightContent?: string | null;
   theme: string;
   title: string;
   type: ReleaseType;
