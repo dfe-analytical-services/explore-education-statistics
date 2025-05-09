@@ -1,4 +1,5 @@
-﻿using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.RemoveSearchableDocument.Dto;
+﻿using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.RemoveSearchableDocument.Dto;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Services;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
@@ -15,7 +16,7 @@ public class RemoveSearchableDocumentFunction(
         FunctionContext context)
     {
         var releaseId = message.ReleaseId;
-        if (releaseId is null || releaseId == Guid.Empty)
+        if (!releaseId.HasNonEmptyValue())
         {
             return;
         }

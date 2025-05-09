@@ -3,6 +3,7 @@
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.
     RemovePublicationSearchableDocuments.Dto;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Tests.Builders;
+using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Tests.TheoryDataHelpers;
 using Microsoft.Extensions.Logging.Abstractions;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Tests.Functions.
@@ -31,8 +32,7 @@ public class RemovePublicationSearchableDocumentsTests
     }
 
     [Theory]
-    [InlineData(null)]
-    [InlineData("")]
+    [MemberData(nameof(TheoryDatas.Blank.Strings), MemberType = typeof(TheoryDatas.Blank))]
     public async Task WhenMessageDoesNotContainSlug_ThenDocumentRemoverNotCalled(string? publicationSlug)
     {
         var command = new RemovePublicationSearchableDocumentsDto { PublicationSlug = publicationSlug };
