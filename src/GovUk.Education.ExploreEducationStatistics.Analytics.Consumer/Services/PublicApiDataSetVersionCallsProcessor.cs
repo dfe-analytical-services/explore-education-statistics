@@ -54,7 +54,7 @@ public class PublicApiDataSetVersionCallsProcessor(
         duckDbConnection.ExecuteNonQuery("install json; load json");
 
         duckDbConnection.ExecuteNonQuery(@"
-            CREATE TABLE GetMeta (
+            CREATE TABLE DataSetVersionCalls (
                 dataSetId UUID,
                 dataSetTitle VARCHAR,
                 dataSetVersion VARCHAR,
@@ -79,7 +79,7 @@ public class PublicApiDataSetVersionCallsProcessor(
             try
             {
                 duckDbConnection.ExecuteNonQuery($@"
-                    INSERT INTO GetMeta BY NAME (
+                    INSERT INTO DataSetVersionCalls BY NAME (
                         SELECT *
                         FROM read_json('{processingDirectory}/{filename}', 
                             format='unstructured'
@@ -101,7 +101,15 @@ public class PublicApiDataSetVersionCallsProcessor(
             $"{reportFilenamePrefix}_public-api-data-set-version-calls.parquet");
 
         duckDbConnection.ExecuteNonQuery($@"
-            COPY (SELECT * FROM GetMeta ORDER BY startTime ASC)
+            COPY (
+                SELECT * EXCLUDE previewToken,
+                previewToken->>'label' AS previewTokenLabel,
+                CAST(previewToken->>'dataSetVersionId' AS UUID) AS previewTokenDataSetVersionId,
+                CAST(previewToken->>'created' AS DATETIME) AS previewTokenCreated,
+                CAST(previewToken->>'expiry' AS DATETIME) AS previewTokenExpiry 
+                FROM DataSetVersionCalls 
+                ORDER BY startTime ASC
+            )
             TO '{reportFilename}' (FORMAT 'parquet', CODEC 'zstd')");
 
         Directory.Delete(processingDirectory, recursive: true);
