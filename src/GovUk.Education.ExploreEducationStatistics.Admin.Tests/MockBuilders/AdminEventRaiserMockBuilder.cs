@@ -120,15 +120,13 @@ public class AdminEventRaiserMockBuilder
                 publication.Title,
                 publication.Summary);
 
-            Xunit.Assert.Single(
-                mockBuilder._invocations,
-                inv =>
+            mockBuilder._mock.Verify(m => m.OnPublicationChanged(It.Is<Publication>(p =>
                     new PublicationChangedEvent(
-                        inv.Publication.Id,
-                        inv.Publication.Slug,
-                        inv.Publication.Title,
-                        inv.Publication.Summary)
-                    == expectedEvent);
+                        p.Id,
+                        p.Slug,
+                        p.Title,
+                        p.Summary) == expectedEvent)),
+                Times.Once);
         }
 
         private void OnPublicationChangedWasNotRaised() =>

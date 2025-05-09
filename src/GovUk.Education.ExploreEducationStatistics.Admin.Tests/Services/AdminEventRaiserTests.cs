@@ -110,9 +110,9 @@ public class AdminEventRaiserTests
         // ASSERT
         var expectedEvent = new PublicationChangedEvent(
             publication.Id,
+            publication.Slug,
             publication.Title,
-            publication.Summary,
-            publication.Slug);
+            publication.Summary);
         _eventRaiserMockBuilder.Assert.EventRaised(expectedEvent);
     }
 
