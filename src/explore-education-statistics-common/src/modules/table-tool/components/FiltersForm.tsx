@@ -26,7 +26,6 @@ import {
   isServerValidationError,
 } from '@common/validation/serverValidations';
 import Yup from '@common/validation/yup';
-import camelCase from 'lodash/camelCase';
 import mapValues from 'lodash/mapValues';
 import orderBy from 'lodash/orderBy';
 import React, { useCallback, useMemo, useState } from 'react';
@@ -162,12 +161,32 @@ export default function FiltersForm({
       return [];
     });
 
+    const initialFilterHierarchyValues = Object.fromEntries(
+      // Set up intitial value for each hierachy,
+      // include initialValue filters if they're in the hierarchy
+      filterHierarchies.map(tiers => {
+        const hierachyKey = tiers.at(-1)!.childFilterId;
+
+        const hierarchyOptionValues = tiers
+          .flatMap(tier => Object.values(tier.hierarchy))
+          .flat()
+          .concat(Object.keys(tiers[0].hierarchy));
+
+        return [
+          hierachyKey,
+          initialValues?.filters.filter(
+            optionId => !hierarchyOptionValues.includes(optionId),
+          ) ?? [],
+        ];
+      }),
+    );
+
     return {
       filters,
       indicators,
-      filterHierarchies: {},
+      filterHierarchies: initialFilterHierarchyValues,
     };
-  }, [initialValues, subjectMeta, standardFilters]);
+  }, [initialValues, subjectMeta, standardFilters, filterHierarchies]);
 
   const stepHeading = (
     <WizardStepHeading {...stepProps}>{stepTitle}</WizardStepHeading>
@@ -308,9 +327,7 @@ export default function FiltersForm({
                   previousValues={previousValues}
                 />
               )}
-
               {stepHeading}
-
               <div>
                 <div className="govuk-grid-column govuk-!-margin-bottom-6">
                   <FormFieldCheckboxSearchSubGroups
@@ -430,7 +447,6 @@ export default function FiltersForm({
                   )}
                 </div>
               </div>
-
               <WizardStepFormActions
                 {...stepProps}
                 isSubmitting={formState.isSubmitting}
