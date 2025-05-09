@@ -1,7 +1,7 @@
 ﻿using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.RemoveSearchableDocument;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.RemoveSearchableDocument.Dto;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Tests.Builders;
-using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Tests.TheoryDatas;
+using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Tests.TheoryDataHelpers;
 using Microsoft.Extensions.Logging.Abstractions;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Tests.Functions.RemoveSearchableDocument;
@@ -29,7 +29,7 @@ public class RemoveSearchableDocumentTests
 
 
     [Theory]
-    [MemberData(nameof(Empty.GuidValues), MemberType = typeof(Empty))]
+    [MemberData(nameof(TheoryDatas.Blank.Guids), MemberType = typeof(TheoryDatas.Blank))]
     public async Task WhenMessageDoesNotContainReleaseId_ThenDocumentRemoverNotCalled(Guid? missingReleaseId)
     {
         var command = new RemoveSearchableDocumentDto { ReleaseId = missingReleaseId };

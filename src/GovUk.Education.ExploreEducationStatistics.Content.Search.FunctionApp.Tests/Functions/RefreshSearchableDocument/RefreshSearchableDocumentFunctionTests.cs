@@ -2,6 +2,7 @@
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.RefreshSearchableDocument.Dto;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Services;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Tests.Builders;
+using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Tests.TheoryDataHelpers;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Tests.Functions.RefreshSearchableDocument;
 
@@ -33,8 +34,7 @@ public class RefreshSearchableDocumentFunctionTests
     }
     
     [Theory]
-    [InlineData("")]
-    [InlineData(null)]
+    [MemberData(nameof(TheoryDatas.Blank.Strings), MemberType = typeof(TheoryDatas.Blank))]
     public async Task WhenMessageHasNoPublicationSlug_ThenDocumentCreatorNotCalled(string? blankPublicationSlug)
     {
         // ARRANGE
