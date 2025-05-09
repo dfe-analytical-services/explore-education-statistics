@@ -362,6 +362,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
 
             services.Configure<AppOptions>(
                 configuration.GetRequiredSection(AppOptions.Section));
+            services.Configure<FeatureFlags>(
+                configuration.GetRequiredSection(FeatureFlags.Section));
             services.Configure<AppInsightsOptions>(
                 configuration.GetSection(AppInsightsOptions.Section));
             services.Configure<NotifyOptions>(
@@ -382,9 +384,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                 configuration.GetRequiredSection(TableBuilderOptions.Section));
             services.Configure<OpenIdConnectSpaClientOptions>(
                 configuration.GetSection(OpenIdConnectSpaClientOptions.Section));
-
-            AddFeatureFlags(services, configuration);
-
+            services.Configure<FeatureFlags>(
+                configuration.GetSection(FeatureFlags.Section));
             services.Configure<RouteOptions>(options => options.LowercaseUrls = true);
 
             StartupSecurityConfiguration.ConfigureAuthorizationPolicies(services);
@@ -833,24 +834,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             foreach (var migration in migrations)
             {
                 migration.Apply();
-            }
-        }
-
-        private static void AddFeatureFlags(IServiceCollection services, IConfiguration configuration)
-        {
-            var section = configuration.GetSection("FeatureFlags");
-            if (!section.Exists())
-            {
-                Console.WriteLine("Warning: FeatureFlags section is missing from configuration. Using defaults.");
-            
-                services.Configure<FeatureFlags>(options =>
-                {
-                    options.EnableReplacementOfPublicApiDataSets = false;
-                });
-            }
-            else
-            {
-                services.Configure<FeatureFlags>(section);
             }
         }
     }

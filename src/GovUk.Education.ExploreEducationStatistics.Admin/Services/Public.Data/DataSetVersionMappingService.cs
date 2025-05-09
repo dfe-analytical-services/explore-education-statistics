@@ -185,26 +185,6 @@ public class DataSetVersionMappingService(
 
         if (isMajorVersionUpdate)
         {
-            if (featureFlags.Value.EnableReplacementOfPublicApiDataSets)
-            {
-                //TODO: Handle in EES-5996
-                DataSetVersionImport? ongoingNextVersionImport = null;
-                // ongoingNextVersionImport = await publicDataDbContext.DataSetVersionImports.SingleOrDefaultAsync(import =>
-                //         import.DataSetVersionId == nextDataSetVersionId
-                //         && import.Stage != DataSetVersionImportStage.Completing
-                //         && import.DataSetVersionToReplace != null,
-                //     cancellationToken);
-
-                var mapping = await dataSetService.GetMappingStatus(nextDataSetVersionId, cancellationToken);
-                var doesNotRequireManualMapping = mapping is { LocationsComplete: true, FiltersComplete: true };
-
-                //TODO: Add awareness of isIncrementingPatch the DataSetVersionMapping -  implement appropriate failure handler in EES-5996 
-                if (ongoingNextVersionImport is not null && doesNotRequireManualMapping)
-                {//TODO: WIP EES-5996
-                    //throw new ApplicationException("Data set is Not allowed");
-                }
-            }
-            
             targetDataSetVersion.VersionMajor = sourceDataSetVersion.VersionMajor + 1;
             targetDataSetVersion.VersionMinor = 0;
             targetDataSetVersion.VersionPatch = 0;

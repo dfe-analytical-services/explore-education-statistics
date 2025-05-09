@@ -262,7 +262,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 dataImportService ?? new Mock<IDataImportService>(MockBehavior.Strict).Object,
                 userService ?? new Mock<IUserService>().Object,
                 dataSetVersionService ?? new Mock<IDataSetVersionService>(MockBehavior.Strict).Object,
-                new Mock<IOptions<FeatureFlags>>(MockBehavior.Strict).Object
+                Microsoft.Extensions.Options.Options.Create(new FeatureFlags())
             );
         }
 

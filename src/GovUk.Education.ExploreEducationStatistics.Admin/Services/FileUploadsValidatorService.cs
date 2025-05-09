@@ -80,22 +80,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 metaFileName,
                 metaFileStream));
 
-            if (isReplacement)
+            if (!isReplacement || _featureFlags.Value.EnableReplacementOfPublicApiDataSets)
             {
-                if (_featureFlags.Value.EnableReplacementOfPublicApiDataSets)
-                {//TODO: delete this if (isReplacement) block once EES-5779 is over the line 
-                    return errors;
-                }
+                return errors;
+            }
 
-                var releaseFileWithApiDataSet = _context.ReleaseFiles
-                    .SingleOrDefault(rf =>
-                        rf.ReleaseVersionId == releaseVersionId
-                        && rf.Name == dataSetTitle
-                        && rf.PublicApiDataSetId != null);
-                if (releaseFileWithApiDataSet != null)
-                {
-                    errors.Add(ValidationMessages.GenerateErrorCannotReplaceDataSetWithApiDataSet(dataSetTitle));
-                }
+            if (_context.ReleaseFiles
+                .Any(rf =>
+                    rf.ReleaseVersionId == releaseVersionId
+                    && rf.Name == dataSetTitle
+                    && rf.PublicApiDataSetId != null))
+            {
+                errors.Add(ValidationMessages.GenerateErrorCannotReplaceDataSetWithApiDataSet(dataSetTitle));
             }
 
             return errors;

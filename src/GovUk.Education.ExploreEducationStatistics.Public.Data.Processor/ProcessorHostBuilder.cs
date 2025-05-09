@@ -54,8 +54,7 @@ public static class ProcessorHostBuilder
                 // Only set up the `PublicDataDbContext` in non-integration test
                 // environments. Otherwise, the connection string will be null and
                 // cause the data source builder to throw a host exception.
-                var isIntegrationTest = hostEnvironment.IsIntegrationTest();
-                if (!isIntegrationTest)
+                if (!hostEnvironment.IsIntegrationTest())
                 {
                     var connectionString = ConnectionUtils.GetPostgreSqlConnectionString("PublicDataDb")!;
                     services.AddFunctionAppPsqlDbContext<PublicDataDbContext>(connectionString, hostBuilderContext);
@@ -98,24 +97,10 @@ public static class ProcessorHostBuilder
                             provider.GetRequiredService<ILogger<IBlobStorageService>>()))
                     .Configure<AppOptions>(
                         hostBuilderContext.Configuration.GetSection(AppOptions.Section))
+                    .Configure<FeatureFlags>(
+                        hostBuilderContext.Configuration.GetSection(FeatureFlags.Section))
                     .Configure<DataFilesOptions>(
                         hostBuilderContext.Configuration.GetSection(DataFilesOptions.Section));
-
-                var section = configuration.GetSection("FeatureFlags");
-                if (!section.Exists())
-                {
-                    Console.WriteLine("Warning: FeatureFlags section is missing from configuration. Using defaults.");
-          
-                    services.Configure<FeatureFlags>(options =>
-                    {
-                        options.EnableReplacementOfPublicApiDataSets = false;
-                    });
-                }
-                else
-                {
-                    services.Configure<FeatureFlags>(section);
-                }
-            
                 
                 services.AddValidatorsFromAssembly(typeof(DataSetCreateRequest.Validator).Assembly); // Adds *all* validators from Public.Data.Processor
             });
