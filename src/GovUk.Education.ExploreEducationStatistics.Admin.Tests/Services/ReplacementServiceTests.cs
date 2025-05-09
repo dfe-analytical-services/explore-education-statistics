@@ -2740,6 +2740,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             DataSetVersion dataSetVersion = _fixture
                 .DefaultDataSetVersion()
+                .WithVersionNumber(major: 1, minor: 1, patch: 1)
                 .WithDataSet(dataSet);
 
             Content.Model.ReleaseVersion releaseVersion = _fixture
@@ -2777,7 +2778,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 {
                     rv.SetFile(replacementFile)
                         .SetPublicApiDataSetId(dataSet.Id)
-                        .SetPublicApiDataSetVersion(dataSetVersion.SemVersion().WithPatch(1));
+                        .SetPublicApiDataSetVersion(dataSetVersion.SemVersion());
                 })
                 .GenerateTuple2();
 

@@ -54,11 +54,11 @@ internal class DataSetVersionService(
         SemVersion? dataSetVersionToReplace = null,
         CancellationToken cancellationToken = default)
     {
-        var replacementOfPublicApiDataSet = featureFlags.Value.EnableReplacementOfPublicApiDataSets && dataSetVersionToReplace is not null; 
         return await GetDataSet(dataSetId, cancellationToken)
             .OnSuccess(ds => ValidateCanCreateNextDataSetVersion(ds, dataSetVersionToReplace))
-            .OnSuccess(dataSet => (replacementOfPublicApiDataSet 
-                    ? ValidateDataSetVersionToReplace(dataSet, dataSetVersionToReplace!) 
+            .OnSuccess(dataSet => Task.FromResult(featureFlags.Value.EnableReplacementOfPublicApiDataSets 
+                                                  && dataSetVersionToReplace is not null
+                    ? ValidateDataSetVersionToReplace(dataSet, dataSetVersionToReplace!)
                     : (DataSetVersion?)null)
                 .OnSuccess(previousDataSetVersionToReplace => (dataSet, previousDataSetVersionToReplace)))
             .OnSuccess(dataSetAndDataSetVersion => CreateDataSetVersion(

@@ -13,6 +13,7 @@ using Microsoft.DurableTask;
 using Microsoft.DurableTask.Client;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Semver;
 using FromBodyAttribute = Microsoft.Azure.Functions.Worker.Http.FromBodyAttribute;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Functions;
@@ -37,9 +38,14 @@ public class CreateNextDataSetVersionMappingsFunction(
         var instanceId = Guid.NewGuid();
         
         return await requestValidator.Validate(request, cancellationToken)
-            .OnSuccess(() => featureFlags.Value.EnableReplacementOfPublicApiDataSets && request.DataSetVersionToReplace is not null 
-                ? Task.FromResult(SemVersionParser.ParseVersionWithValidation(request.DataSetVersionToReplace)) 
-                : null)
+            .OnSuccess(() =>
+            {
+                var replaceApiDataSets = featureFlags.Value.EnableReplacementOfPublicApiDataSets
+                                                                && request.DataSetVersionToReplace is not null;
+                return Task.FromResult(replaceApiDataSets
+                    ? SemVersionParser.ParseVersionWithValidation(request.DataSetVersionToReplace!)
+                    : (SemVersion?)null!);
+            })
             .OnSuccess(dataSetVersionToReplace =>
                  dataSetVersionService.CreateNextVersion(
                     dataSetId: request.DataSetId,

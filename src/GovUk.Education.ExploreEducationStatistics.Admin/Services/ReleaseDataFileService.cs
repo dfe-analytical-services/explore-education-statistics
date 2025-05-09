@@ -311,10 +311,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                     // Creates a new data set version to enable replacement. 
                                     await dataSetVersionService.CreateNextVersion(
                                         dataReleaseFile.Id,
-                                        //(Guid)releaseFileWithApiDataSet.PublicApiDataSetId!,
                                         (Guid)replacedReleaseDataFile?.PublicApiDataSetId!,
-                                        replacedReleaseDataFile?.PublicApiDataSetVersion,
-                                        CancellationToken.None
+                                        replacedReleaseDataFile?.PublicApiDataSetVersion
                                     );
                                 }
                             }
