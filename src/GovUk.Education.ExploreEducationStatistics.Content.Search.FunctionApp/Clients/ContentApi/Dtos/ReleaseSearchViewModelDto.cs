@@ -7,9 +7,11 @@ internal record ReleaseSearchViewModelDto
     public Guid ReleaseId { get; init; }
     public Guid ReleaseVersionId { get; init; }
     public DateTimeOffset Published { get; init; } = DateTimeOffset.MinValue;
+    public Guid PublicationId { get; init; }
     public string PublicationTitle { get; init; } = string.Empty;
+    public Guid ThemeId { get; init; }
+    public string ThemeTitle { get; init; } = string.Empty;
     public string Summary { get; init; } = string.Empty;
-    public string Theme { get; init; } = string.Empty;
     public string Type { get; init; } = string.Empty;
 
     public int TypeBoost { get; init; }
@@ -26,8 +28,10 @@ internal record ReleaseSearchViewModelDto
             ReleaseVersionId = ReleaseVersionId,
             Published = Published,
             PublicationTitle = PublicationTitle,
+            PublicationId = PublicationId,
+            ThemeId = ThemeId,
+            ThemeTitle = ThemeTitle,
             Summary = Summary,
-            Theme = Theme,
             ReleaseType = Type,
             TypeBoost = TypeBoost,
             PublicationSlug = PublicationSlug,

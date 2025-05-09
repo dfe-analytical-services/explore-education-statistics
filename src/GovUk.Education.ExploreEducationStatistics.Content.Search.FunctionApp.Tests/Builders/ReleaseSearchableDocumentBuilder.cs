@@ -8,15 +8,20 @@ public class ReleaseSearchableDocumentBuilder
     private string? _title;
     private Guid? _releaseVersionId;
     private Guid? _releaseId;
+    private Guid? _publicationId;
+    private Guid? _themeId;
+    private string? _themeTitle;
 
     public ReleaseSearchableDocument Build() => new()
     {
-        ReleaseId = _releaseId ?? new Guid("11223344-5566-7788-9900-123456789abc"),
-        ReleaseVersionId = _releaseVersionId ?? new Guid("12345678-1234-1234-1234-123456789abc"),
+        ReleaseId = _releaseId ?? new Guid("08228000-71de-4a1a-9adf-35f3d2bd061a"),
+        ReleaseVersionId = _releaseVersionId ?? new Guid("a20f1068-4298-495d-8d80-c662ca72731d"),
+        PublicationId = _publicationId ?? new Guid("8db69a42-ef47-441b-bed5-5e91d012194f"),
+        ThemeId = _themeId ?? new Guid("498e449b-d093-43dc-959c-bc3a2c23fdfb"),
+        ThemeTitle = _themeTitle ?? "Theme Title",
         Published = new DateTimeOffset(2025, 02, 21, 09, 24, 01, TimeSpan.Zero),
         PublicationTitle = _title ?? "Publication Title",
         Summary = _summary ?? "This is a summary.",
-        Theme = "Theme",
         ReleaseType = "Official Statistics",
         TypeBoost = 10,
         PublicationSlug = "publication-slug",
@@ -29,7 +34,7 @@ public class ReleaseSearchableDocumentBuilder
         _summary = summary;
         return this;
     }
-    
+
     public ReleaseSearchableDocumentBuilder WithTitle(string title)
     {
         _title = title;
@@ -45,6 +50,24 @@ public class ReleaseSearchableDocumentBuilder
     public ReleaseSearchableDocumentBuilder WithReleaseId(Guid releaseId)
     {
         _releaseId = releaseId;
+        return this;
+    }
+
+    public ReleaseSearchableDocumentBuilder WithPublicationId(Guid publicationId)
+    {
+        _publicationId = publicationId;
+        return this;
+    }
+
+    public ReleaseSearchableDocumentBuilder WithThemeId(Guid themeId)
+    {
+        _themeId = themeId;
+        return this;
+    }
+
+    public ReleaseSearchableDocumentBuilder WithThemeTitle(string themeTitle)
+    {
+        _themeTitle = themeTitle;
         return this;
     }
 }
