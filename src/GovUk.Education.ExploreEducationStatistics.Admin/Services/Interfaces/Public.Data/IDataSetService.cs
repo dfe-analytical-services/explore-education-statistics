@@ -24,4 +24,8 @@ public interface IDataSetService
     Task<Either<ActionResult, DataSetViewModel>> CreateDataSet(
         Guid releaseFileId,
         CancellationToken cancellationToken = default);
+
+    Task<MappingStatusViewModel?> GetMappingStatus(
+        Guid nextDataSetVersionId,
+        CancellationToken cancellationToken);
 }

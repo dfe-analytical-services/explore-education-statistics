@@ -13,6 +13,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Chart;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
+using GovUk.Education.ExploreEducationStatistics.Common.Options;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
@@ -25,6 +26,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
 using IReleaseVersionService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IReleaseVersionService;
@@ -36,6 +38,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
     {
         private readonly ContentDbContext _contentDbContext;
         private readonly StatisticsDbContext _statisticsDbContext;
+        private readonly IDataSetService _dataSetService;
+        private readonly IOptions<FeatureFlags> _featureFlags;
         private readonly IFilterRepository _filterRepository;
         private readonly IIndicatorRepository _indicatorRepository;
         private readonly IIndicatorGroupRepository _indicatorGroupRepository;
@@ -62,7 +66,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             ITimePeriodService timePeriodService,
             IUserService userService,
             ICacheKeyService cacheKeyService,
-            IPrivateBlobCacheService privateCacheService)
+            IPrivateBlobCacheService privateCacheService,
+            IDataSetService dataSetService,
+            IOptions<FeatureFlags> featureFlags)
         {
             _contentDbContext = contentDbContext;
             _statisticsDbContext = statisticsDbContext;
@@ -76,6 +82,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _timePeriodService = timePeriodService;
             _userService = userService;
             _cacheKeyService = cacheKeyService;
+            _dataSetService = dataSetService;
+            _featureFlags = featureFlags;
             _privateCacheService = privateCacheService;
         }
 
@@ -86,7 +94,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             CancellationToken cancellationToken = default)
         {
             return await _contentDbContext.ReleaseVersions
-                .FirstOrNotFoundAsync(rv => rv.Id == releaseVersionId)
+                .FirstOrNotFoundAsync(rv => rv.Id == releaseVersionId, cancellationToken: cancellationToken)
                 .OnSuccess(_userService.CheckCanUpdateReleaseVersion)
                 .OnSuccess(() => CheckReleaseFilesExist(releaseVersionId: releaseVersionId,
                     originalFileId: originalFileId,
@@ -95,7 +103,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 {
                     var (originalReleaseFile, replacementReleaseFile) = tuple;
 
-                    return await GetLinkedDataSetVersion(originalReleaseFile, cancellationToken)
+                    return await GetLinkedDataSetVersion(_featureFlags.Value.EnableReplacementOfPublicApiDataSets ? replacementReleaseFile : originalReleaseFile, cancellationToken)
                         .OnSuccess(apiDataSetVersion => (originalReleaseFile, replacementReleaseFile, apiDataSetVersion));
                 })
                 .OnSuccess(async tuple =>
@@ -115,29 +123,41 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         subjectId: originalSubjectId,
                         replacementSubjectMeta);
 
-                    var apiDataSetVersionDeletionPlan = tuple.apiDataSetVersion is null
-                    ? null
-                    : new DeleteApiDataSetVersionPlanViewModel
-                    {
-                        DataSetId = tuple.apiDataSetVersion.DataSetId,
-                        DataSetTitle = tuple.apiDataSetVersion.DataSet.Title,
-                        Id = tuple.apiDataSetVersion.Id,
-                        Version = tuple.apiDataSetVersion.PublicVersion,
-                        Status = tuple.apiDataSetVersion.Status,
-                        Valid = false,
-                    };
+                    var apiDataSetVersionPlan = tuple.apiDataSetVersion is null ? null 
+                        : await GetApiVersionPlanViewModel(tuple.apiDataSetVersion, cancellationToken);
 
                     return new DataReplacementPlanViewModel
                     {
                         DataBlocks = dataBlocks,
                         Footnotes = footnotes,
-                        DeleteApiDataSetVersionPlan = apiDataSetVersionDeletionPlan,
+                        ApiDataSetVersionPlan = apiDataSetVersionPlan,
                         OriginalSubjectId = originalSubjectId,
                         ReplacementSubjectId = replacementSubjectId,
                     };
                 });
-        }
 
+            
+        }
+        private async Task<ApiDataSetVersionPlanViewModel?> GetApiVersionPlanViewModel(DataSetVersion apiDataSetVersion, CancellationToken cancellationToken)
+        {
+            var apiDataSetVersionPlan = new ApiDataSetVersionPlanViewModel
+                {
+                    DataSetId = apiDataSetVersion.DataSetId,
+                    DataSetTitle = apiDataSetVersion.DataSet.Title,
+                    Id = apiDataSetVersion.Id,
+                    Version = apiDataSetVersion.PublicVersion,
+                    Status = apiDataSetVersion.Status,
+                    Valid = false,
+                };
+            if (_featureFlags.Value.EnableReplacementOfPublicApiDataSets && apiDataSetVersion.VersionPatch > 0)
+            { 
+                apiDataSetVersionPlan.MappingStatus = await _dataSetService.GetMappingStatus(apiDataSetVersion.Id, cancellationToken);
+                apiDataSetVersionPlan.Valid = apiDataSetVersionPlan.MappingStatus is
+                    { FiltersComplete: true, LocationsComplete: true };
+            }
+
+            return apiDataSetVersionPlan;
+        }
         public async Task<Either<ActionResult, Unit>> Replace(
             Guid releaseVersionId,
             Guid originalFileId,

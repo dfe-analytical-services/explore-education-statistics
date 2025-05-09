@@ -1,6 +1,7 @@
 #nullable enable
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using System;
+using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Public.Data;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 
@@ -16,5 +17,11 @@ public record DeleteApiDataSetVersionPlanViewModel
 
     public DataSetVersionStatus Status { get; init; }
 
-    public bool Valid { get; init; }
+    public bool Valid { get; set; }
+}
+
+public record ApiDataSetVersionPlanViewModel : DeleteApiDataSetVersionPlanViewModel
+{
+    public MappingStatusViewModel? MappingStatus { get; set; }
+    
 }
