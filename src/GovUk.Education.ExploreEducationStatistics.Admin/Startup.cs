@@ -128,6 +128,7 @@ using ThemeService = GovUk.Education.ExploreEducationStatistics.Admin.Services.T
 using IReleaseService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IReleaseService;
 using ReleaseService = GovUk.Education.ExploreEducationStatistics.Admin.Services.ReleaseService;
 using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
+using GovUk.Education.ExploreEducationStatistics.Events.Extensions;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin
 {

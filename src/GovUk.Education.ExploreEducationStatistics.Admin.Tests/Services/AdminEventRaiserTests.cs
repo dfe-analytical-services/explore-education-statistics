@@ -1,12 +1,12 @@
 #nullable enable
 using System;
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Admin.Events;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.MockBuilders;
-using GovUk.Education.ExploreEducationStatistics.Common.Tests.Services.EventGrid;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
+using GovUk.Education.ExploreEducationStatistics.Events;
+using GovUk.Education.ExploreEducationStatistics.Events.Tests.EventGrid.Builders;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services;
 
@@ -31,7 +31,11 @@ public class AdminEventRaiserTests
         await sut.OnThemeUpdated(theme);
 
         // ASSERT
-        var expectedEvent = new ThemeChangedEvent(theme);
+        var expectedEvent = new ThemeChangedEvent(
+            theme.Id,
+            theme.Title,
+            theme.Summary,
+            theme.Slug);
         _eventRaiserMockBuilder.Assert.EventRaised(expectedEvent);
     }
 
@@ -104,7 +108,11 @@ public class AdminEventRaiserTests
         await sut.OnPublicationChanged(publication);
 
         // ASSERT
-        var expectedEvent = new PublicationChangedEvent(publication);
+        var expectedEvent = new PublicationChangedEvent(
+            publication.Id,
+            publication.Slug,
+            publication.Title,
+            publication.Summary);
         _eventRaiserMockBuilder.Assert.EventRaised(expectedEvent);
     }
 
@@ -116,7 +124,6 @@ public class AdminEventRaiserTests
         {
             Id = Guid.NewGuid(),
             Title = "Publication title",
-            Summary = "This is the publication summary",
             Slug = "publication-slug",
             LatestPublishedReleaseVersionId = Guid.NewGuid()
         };
@@ -131,7 +138,10 @@ public class AdminEventRaiserTests
 
         // ASSERT
         var expectedEvent = new PublicationLatestPublishedReleaseReorderedEvent(
-            publication,
+            publication.Id,
+            publication.Title,
+            publication.Slug,
+            publication.LatestPublishedReleaseVersionId.Value,
             previousLatestPublishedReleaseVersionId);
         _eventRaiserMockBuilder.Assert.EventRaised(expectedEvent);
     }
