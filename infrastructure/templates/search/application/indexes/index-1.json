@@ -79,7 +79,7 @@
       "filterable": false,
       "retrievable": true,
       "stored": true,
-      "sortable": false,
+      "sortable": true,
       "facetable": false,
       "key": false,
       "synonymMaps": []
@@ -116,7 +116,7 @@
       "filterable": false,
       "retrievable": true,
       "stored": true,
-      "sortable": false,
+      "sortable": true,
       "facetable": false,
       "key": false,
       "analyzer": "standard.lucene",
