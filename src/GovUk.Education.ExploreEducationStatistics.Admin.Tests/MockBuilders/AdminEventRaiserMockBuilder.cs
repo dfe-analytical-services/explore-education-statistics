@@ -3,9 +3,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Admin.Events;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
+using GovUk.Education.ExploreEducationStatistics.Events;
 using Moq;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.MockBuilders;
@@ -13,7 +13,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.MockBuilders;
 public class AdminEventRaiserMockBuilder
 {
     private readonly Mock<IAdminEventRaiser> _mock = new(MockBehavior.Strict);
-    private readonly List<InvokeArguments> _invocations = new();
+    private readonly List<InvokeArguments> _invocations = [];
 
     private static readonly Expression<Func<IAdminEventRaiser, Task>> OnReleaseSlugChanged =
         m => m.OnReleaseSlugChanged(
@@ -112,10 +112,24 @@ public class AdminEventRaiserMockBuilder
         public void OnPublicationArchivedWasNotRaised() =>
             mockBuilder._mock.Verify(OnPublicationArchived, Times.Never);
 
-        public void OnPublicationChangedWasRaised(Publication? publication = null) =>
-            mockBuilder._mock.Verify(m => m.OnPublicationChanged(It.Is<Publication>(p =>
-                    publication == null || new PublicationChangedEvent(p) == new PublicationChangedEvent(publication))),
-                Times.Once);
+        public void OnPublicationChangedWasRaised(Publication publication)
+        {
+            var expectedEvent = new PublicationChangedEvent(
+                publication.Id,
+                publication.Slug,
+                publication.Title,
+                publication.Summary);
+
+            Xunit.Assert.Single(
+                mockBuilder._invocations,
+                inv =>
+                    new PublicationChangedEvent(
+                        inv.Publication.Id,
+                        inv.Publication.Slug,
+                        inv.Publication.Title,
+                        inv.Publication.Summary)
+                    == expectedEvent);
+        }
 
         private void OnPublicationChangedWasNotRaised() =>
             mockBuilder._mock.Verify(OnPublicationChanged, Times.Never);
@@ -125,14 +139,20 @@ public class AdminEventRaiserMockBuilder
             Guid previousReleaseVersionId)
         {
             var expectedEvent = new PublicationLatestPublishedReleaseReorderedEvent(
-                publication,
+                publication.Id,
+                publication.Title,
+                publication.Slug,
+                publication.LatestPublishedReleaseVersionId!.Value,
                 previousReleaseVersionId);
 
             Xunit.Assert.Single(
                 mockBuilder._invocations,
                 inv =>
                     new PublicationLatestPublishedReleaseReorderedEvent(
-                        inv.Publication,
+                        inv.Publication.Id,
+                        inv.Publication.Title,
+                        inv.Publication.Slug,
+                        inv.Publication.LatestPublishedReleaseVersionId!.Value,
                         inv.OldLatestPublishedReleaseVersionId)
                     == expectedEvent);
         }

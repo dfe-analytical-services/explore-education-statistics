@@ -1,10 +1,10 @@
 #nullable enable
 using System;
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Admin.Events;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Common.Services.EventGrid;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
+using GovUk.Education.ExploreEducationStatistics.Events;
+using GovUk.Education.ExploreEducationStatistics.Events.EventGrid;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services;
 
@@ -18,7 +18,10 @@ public class AdminEventRaiser(IEventRaiser eventRaiser) : IAdminEventRaiser
     /// </summary>
     /// <param name="theme">The theme that has been updated.</param>
     public async Task OnThemeUpdated(Theme theme) =>
-        await eventRaiser.RaiseEvent(new ThemeChangedEvent(theme));
+        await eventRaiser.RaiseEvent(new ThemeChangedEvent(theme.Id,
+            theme.Title,
+            theme.Summary,
+            theme.Slug));
 
     /// <summary>
     /// On Release Slug changed
@@ -57,7 +60,12 @@ public class AdminEventRaiser(IEventRaiser eventRaiser) : IAdminEventRaiser
     /// </summary>
     /// <param name="publication">The publication that has been changed.</param>
     public async Task OnPublicationChanged(Publication publication) =>
-        await eventRaiser.RaiseEvent(new PublicationChangedEvent(publication));
+        await eventRaiser.RaiseEvent(new PublicationChangedEvent(
+            publication.Id,
+            publication.Slug,
+            publication.Title,
+            publication.Summary
+        ));
 
     /// <summary>
     /// On Publication Latest Published Release Reordered.
@@ -80,7 +88,10 @@ public class AdminEventRaiser(IEventRaiser eventRaiser) : IAdminEventRaiser
 
         await eventRaiser.RaiseEvent(
             new PublicationLatestPublishedReleaseReorderedEvent(
-                publication,
+                publication.Id,
+                publication.Title,
+                publication.Slug,
+                publication.LatestPublishedReleaseVersionId.Value,
                 previousLatestPublishedReleaseVersionId));
     }
 

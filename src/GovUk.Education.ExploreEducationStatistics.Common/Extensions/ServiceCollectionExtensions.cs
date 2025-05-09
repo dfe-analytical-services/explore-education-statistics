@@ -2,12 +2,10 @@
 using System;
 using Azure.Core;
 using Azure.Identity;
-using GovUk.Education.ExploreEducationStatistics.Common.Services.EventGrid;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using Npgsql;
 #pragma warning disable CS8974 // Converting method group to non-delegate type
 
@@ -126,13 +124,4 @@ public static class ServiceCollectionExtensions
 
         return services;
     }
-
-    public static IServiceCollection AddEventGridClient(this IServiceCollection services, IConfiguration configuration) =>
-        services
-            .AddTransient<IEventGridClientFactory, EventGridClientFactory>()
-            .AddTransient<IEventRaiser, EventRaiser>()
-            .AddTransient<IConfiguredEventGridClientFactory, ConfiguredEventGridClientFactory>()
-            .AddTransient(typeof(Func<ILogger<SafeEventGridClient>>), sp => sp.GetRequiredService<ILogger<SafeEventGridClient>>)
-            .Configure<EventGridOptions>(configuration.GetSection(EventGridOptions.Section))
-        ;
 }
