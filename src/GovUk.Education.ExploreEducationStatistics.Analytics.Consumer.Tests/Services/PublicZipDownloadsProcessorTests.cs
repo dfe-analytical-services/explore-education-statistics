@@ -165,7 +165,6 @@ public abstract class PublicZipDownloadsProcessorTests
         TestAnalyticsPathResolver pathResolver)
     {
         return new PublicZipDownloadsProcessor(
-            duckDbConnection: new DuckDbConnection(),
             pathResolver: pathResolver,
             Mock.Of<ILogger<PublicZipDownloadsProcessor>>());
     }

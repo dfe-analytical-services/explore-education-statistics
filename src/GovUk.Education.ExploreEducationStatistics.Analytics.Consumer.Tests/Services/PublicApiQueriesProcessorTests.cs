@@ -385,7 +385,6 @@ public abstract class PublicApiQueriesProcessorTests
         TestAnalyticsPathResolver pathResolver)
     {
         return new PublicApiQueriesProcessor(
-            duckDbConnection: new DuckDbConnection(),
             pathResolver: pathResolver,
             Mock.Of<ILogger<PublicApiQueriesProcessor>>());
     }

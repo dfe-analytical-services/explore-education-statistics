@@ -3,58 +3,62 @@ using GovUk.Education.ExploreEducationStatistics.Analytics.Consumer.Services.Int
 using GovUk.Education.ExploreEducationStatistics.Common.DuckDb.DuckDb;
 using Microsoft.Extensions.Logging;
 
-namespace GovUk.Education.ExploreEducationStatistics.Analytics.Consumer.Services;
+namespace GovUk.Education.ExploreEducationStatistics.Analytics.Consumer.Services.Workflow;
 
-public class ProcessorWorkflowManager(
-    DuckDbConnection duckDbConnection,
-    ICommonWorkflowRequestFileProcessor processor,
+public class ProcessRequestFilesWorkflow(
+    string processorName,
+    string sourceDirectory,
+    string reportsDirectory,
+    Action<InitialiseDuckDbContext> initialiseAction,
+    Action<ProcessSourceFileContext> processSourceFileAction,
+    Action<CreateParquetReportsContext> createParquetReportsAction,
     ILogger<IRequestFileProcessor> logger)
 {
-    private readonly string _sourceDirectory = processor.SourceDirectory();
-    private readonly string _processingDirectory = Path.Combine(processor.SourceDirectory(), "processing");
-    private readonly string _failuresDirectory = Path.Combine(processor.SourceDirectory(), "failures");
-    private readonly string _reportsDirectory = processor.ReportsDirectory();
+    private readonly string _processingDirectory = Path.Combine(sourceDirectory, "processing");
+    private readonly string _failuresDirectory = Path.Combine(sourceDirectory, "failures");
 
-    public Task ProcessWorkflow()
+    public Task Process()
     {
-        logger.LogInformation("{Processor} triggered", GetType().Name);
+        logger.LogInformation("{Processor} triggered", processorName);
         
-        if (!Directory.Exists(_sourceDirectory))
+        if (!Directory.Exists(sourceDirectory))
         {
-            logger.LogInformation("No requests for {Processor} to process", GetType().Name);
+            logger.LogInformation("No requests for {Processor} to process", processorName);
             return Task.CompletedTask;
         }
 
         var filesToProcess = Directory
-            .GetFiles(_sourceDirectory)
+            .GetFiles(sourceDirectory)
             .Select(Path.GetFileName)
             .OfType<string>()
             .ToList();
 
         if (filesToProcess.Count == 0)
         {
-            logger.LogInformation("No requests for {Processor} to process", GetType().Name);
+            logger.LogInformation("No requests for {Processor} to process", processorName);
             return Task.CompletedTask;
         }
 
         logger.LogInformation("Found {Count} requests for {Processor} to process", filesToProcess.Count,
-            GetType().Name);
+            processorName);
 
         Directory.CreateDirectory(_processingDirectory);
-        Directory.CreateDirectory(_reportsDirectory);
+        Directory.CreateDirectory(reportsDirectory);
 
         Parallel.ForEach(filesToProcess, file =>
         {
-            var originalPath = Path.Combine(_sourceDirectory, file);
+            var originalPath = Path.Combine(sourceDirectory, file);
             var newPath = Path.Combine(_processingDirectory, file);
             File.Move(originalPath, newPath);
         });
+
+        using var duckDbConnection = new DuckDbConnection();
 
         duckDbConnection.Open();
 
         duckDbConnection.ExecuteNonQuery("install json; load json");
 
-        processor.InitialiseDuckDb(duckDbConnection);
+        initialiseAction(new InitialiseDuckDbContext(duckDbConnection));
 
         // We fetch the files again in case there are files leftover in the processing dir from a previous function run
         var filesReadyForProcessing = Directory
@@ -67,7 +71,9 @@ public class ProcessorWorkflowManager(
         {
             try
             {
-                processor.ProcessSourceFile($"{_processingDirectory}/{filename}", duckDbConnection);
+                processSourceFileAction(new ProcessSourceFileContext(
+                    SourceFilePath: $"{_processingDirectory}/{filename}",
+                    Connection: duckDbConnection));
             }
             catch (DuckDBException e)
             {
@@ -76,13 +82,13 @@ public class ProcessorWorkflowManager(
             }
         }
 
-        var reportFilenamePrefix = DateTime.UtcNow.ToString("yyyyMMdd-HHmmss");
+        var reportFilePathAndFilenamePrefix = Path.Combine(
+            reportsDirectory,
+            DateTime.UtcNow.ToString("yyyyMMdd-HHmmss"));
 
-        var reportFilePath = Path.Combine(
-            _reportsDirectory,
-            $"{reportFilenamePrefix}_${processor.ReportsFilenameSuffix()}.parquet");
-
-        processor.CreateParquetReport(reportFilePath, duckDbConnection);
+        createParquetReportsAction(new CreateParquetReportsContext(
+            ReportsFilePathAndFilenamePrefix: reportFilePathAndFilenamePrefix,
+            Connection: duckDbConnection));
 
         Directory.Delete(_processingDirectory, recursive: true);
 
@@ -105,3 +111,9 @@ public class ProcessorWorkflowManager(
         }
     }
 }
+
+public record InitialiseDuckDbContext(DuckDbConnection Connection);
+
+public record ProcessSourceFileContext(string SourceFilePath, DuckDbConnection Connection);
+
+public record CreateParquetReportsContext(string ReportsFilePathAndFilenamePrefix, DuckDbConnection Connection);

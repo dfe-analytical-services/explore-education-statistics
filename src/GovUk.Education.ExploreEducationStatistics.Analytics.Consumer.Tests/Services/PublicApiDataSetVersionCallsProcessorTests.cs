@@ -254,7 +254,6 @@ public abstract class PublicApiDataSetVersionCallsProcessorTests
         TestAnalyticsPathResolver pathResolver)
     {
         return new PublicApiDataSetVersionCallsProcessor(
-            duckDbConnection: new DuckDbConnection(),
             pathResolver: pathResolver,
             Mock.Of<ILogger<PublicApiDataSetVersionCallsProcessor>>());
     }
