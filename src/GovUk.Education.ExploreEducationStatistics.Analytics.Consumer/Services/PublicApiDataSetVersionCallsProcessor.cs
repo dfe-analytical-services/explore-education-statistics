@@ -12,13 +12,13 @@ public class PublicApiDataSetVersionCallsProcessor(
 {
     public Task Process()
     {
-        logger.LogInformation("{PublicApiGetMetaProcessor} triggered", nameof(PublicApiDataSetVersionCallsProcessor));
+        logger.LogInformation("{Processor} triggered", nameof(PublicApiDataSetVersionCallsProcessor));
 
         var sourceDirectory = pathResolver.PublicApiDataSetVersionCallsDirectoryPath();
 
         if (!Directory.Exists(sourceDirectory))
         {
-            logger.LogInformation("""No public api "get meta" requests to process""");
+            logger.LogInformation("No Public API DataSetVersion requests to process");
             return Task.CompletedTask;
         }
 
@@ -30,11 +30,11 @@ public class PublicApiDataSetVersionCallsProcessor(
 
         if (filesToProcess.Count == 0)
         {
-            logger.LogInformation("""No public api "get meta" requests to process""");
+            logger.LogInformation("No Public API DataSetVersion requests to process");
             return Task.CompletedTask;
         }
 
-        logger.LogInformation("Found {Count} public api \"get meta\" requests to process", filesToProcess.Count);
+        logger.LogInformation("Found {Count} requests to process", filesToProcess.Count);
 
         var processingDirectory = pathResolver.PublicApiDataSetVersionCallsProcessingDirectoryPath();
         var reportsDirectory = pathResolver.PublicApiDataSetVersionCallsReportsDirectoryPath();

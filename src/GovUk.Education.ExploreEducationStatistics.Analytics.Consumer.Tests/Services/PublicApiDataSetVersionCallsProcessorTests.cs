@@ -150,6 +150,55 @@ public abstract class PublicApiDataSetVersionCallsProcessorTests
                 expectedStartTime: DateTime.Parse("2025-02-24T03:07:44.850Z"),
                 expectedParameters: """{"types":["Filters","Indicators","Locations","TimePeriods"]}""");
         }
+        
+        [Fact]
+        public async Task MultipleCalls_CapturedInReport()
+        {
+            using var pathResolver = new TestAnalyticsPathResolver();
+            SetupQueryRequest(pathResolver, "WithCoreDataSetVersionDetails.json");
+            SetupQueryRequest(pathResolver, "WithParameters.json");
+            SetupQueryRequest(pathResolver, "WithPreviewTokens.json");
+
+            var service = BuildService(pathResolver: pathResolver);
+            await service.Process();
+
+            Assert.False(Directory.Exists(pathResolver.PublicApiDataSetVersionCallsProcessingDirectoryPath()));
+            Assert.True(Directory.Exists(pathResolver.PublicApiDataSetVersionCallsReportsDirectoryPath()));
+
+            var reports = Directory.GetFiles(pathResolver.PublicApiDataSetVersionCallsReportsDirectoryPath());
+
+            var queryReportFile = Assert.Single(reports);
+
+            var duckDbConnection = new DuckDbConnection();
+            duckDbConnection.Open();
+
+            var reportRows = await ReadGetMetaReport(duckDbConnection, queryReportFile);
+
+            // Check that the 3 recorded queries have resulted in 3 lines in the query report
+            // and the order is in ascending date order.
+            Assert.Equal(3, reportRows.Count);
+            
+            AssertDataSetVersionCallReportRowOk(
+                reportRows[0],
+                expectedType: "GetDataSetVersionMetadata",
+                expectPreviewToken: false,
+                expectedStartTime: DateTime.Parse("2025-02-24T02:07:44.850Z"),
+                expectedParameters: null);
+            
+            AssertDataSetVersionCallReportRowOk(
+                reportRows[1],
+                expectedType: "GetDataSetVersionMetadata",
+                expectPreviewToken: false,
+                expectedStartTime: DateTime.Parse("2025-02-24T03:07:44.850Z"),
+                expectedParameters: """{"types":["Filters","Indicators","Locations","TimePeriods"]}""");
+            
+            AssertDataSetVersionCallReportRowOk(
+                reportRows[2],
+                expectedType: "GetDataSetVersionSummary",
+                expectPreviewToken: true,
+                expectedStartTime: DateTime.Parse("2025-02-28T03:07:44.850Z"),
+                expectedParameters: null);
+        }
 
         private static async Task<List<QueryReportLine>> ReadGetMetaReport(DuckDbConnection duckDbConnection, string queryReportFile)
         {
@@ -166,7 +215,7 @@ public abstract class PublicApiDataSetVersionCallsProcessorTests
         string expectedType,
         DateTime expectedStartTime,
         bool expectPreviewToken,
-        string? expectedParameters = null)
+        string? expectedParameters)
     {
         Assert.Equal(expectedType, queryReportRow.Type);
         Assert.Equal(Guid.Parse("01d29401-7274-a871-a8db-d4bc4e98c324"), queryReportRow.DataSetId);
