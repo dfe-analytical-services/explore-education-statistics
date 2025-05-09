@@ -84,7 +84,9 @@ const DataFileReplacementPlan = ({
   );
 
   const hasDataSetVersionPlan = useMemo<boolean>(
-    () => isNewReplaceDsvFeatureEnabled && plan?.apiDataSetVersionPlan !== null,
+    () =>
+      isNewReplaceDsvFeatureEnabled &&
+      plan?.apiDataSetVersionPlan !== undefined,
     [plan, isNewReplaceDsvFeatureEnabled],
   );
 

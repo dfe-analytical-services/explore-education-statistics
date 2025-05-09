@@ -19,6 +19,5 @@ public interface IDataSetVersionMappingService
 
     Task ApplyAutoMappings(
         Guid nextDataSetVersionId,
-        bool incrementPatchNumber = false,
         CancellationToken cancellationToken = default);
 }

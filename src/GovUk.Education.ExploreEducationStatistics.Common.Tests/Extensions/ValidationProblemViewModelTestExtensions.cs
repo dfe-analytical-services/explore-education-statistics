@@ -448,12 +448,12 @@ public static class ValidationProblemViewModelTestExtensions
         AssertHasErrors(errors, expectedErrors);
     }
 
-    public static void AssertDoesNotHaveErrors(
+    public static void AssertDoesNotContainErrors(
         List<ErrorViewModel> errors,
-        List<ErrorViewModel> expectedMissingErrors)
+        List<ErrorViewModel> expectedNotToContain)
     {
         var matchedErrors = errors
-            .Where(error => expectedMissingErrors.Any(expected => ErrorsMatch(error, expected)))
+            .Where(error => expectedNotToContain.Any(expected => ErrorsMatch(error, expected)))
             .ToArray();
     
         if (matchedErrors.Length == 0)
@@ -463,7 +463,6 @@ public static class ValidationProblemViewModelTestExtensions
     
         var matchedErrorMessages = matchedErrors
             .Select(e => e.Message)
-            .ToList()
             .JoinToString('\n');
     
         Assert.Fail($"""
@@ -474,7 +473,6 @@ public static class ValidationProblemViewModelTestExtensions
         return;
         static bool ErrorsMatch(ErrorViewModel current, ErrorViewModel expected) =>
             current.Code == expected.Code &&
-            current.Message == expected.Message &&
             current.Path == expected.Path;
     }
     

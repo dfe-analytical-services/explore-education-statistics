@@ -50,14 +50,17 @@ internal class DataSetVersionMappingService(
             .ThenInclude(dataSet => dataSet.Versions)
             .SingleAsync(dsv => dsv.Id == nextDataSetVersionId, cancellationToken);
 
-        var sourceVersion = featureFlags.Value.EnableReplacementOfPublicApiDataSets
-            ? (dataSetVersionToReplace is not null
-                ? nextVersion.DataSet.Versions.FirstOrDefault(v => v.SemVersion() == dataSetVersionToReplace)
-                : nextVersion.DataSet.LatestLiveVersion!) ?? throw new Exception(
-                $"Unable to find appropriate source version via latest live version or specified version to patch: ${dataSetVersionToReplace}.")
-            : nextVersion.DataSet.LatestLiveVersion!;
-        //TODO: this is WIP, EES-5996 will take care of failures and recovering from them within this user journey.
-
+        var sourceVersion = featureFlags.Value.EnableReplacementOfPublicApiDataSets && dataSetVersionToReplace is not null
+            ? nextVersion.DataSet.Versions.FirstOrDefault(v => v.SemVersion() == dataSetVersionToReplace)
+            : nextVersion.DataSet.LatestLiveVersion;
+        
+        if (featureFlags.Value.EnableReplacementOfPublicApiDataSets 
+            && dataSetVersionToReplace is not null 
+            && sourceVersion is null)
+        {
+            return VersionToReplaceNotFoundError();
+        }
+        
         var nextVersionMeta = await dataSetMetaService.ReadDataSetVersionMappingMeta(
             dataSetVersionId: nextDataSetVersionId,
             cancellationToken);
@@ -108,11 +111,26 @@ internal class DataSetVersionMappingService(
 
         await publicDataDbContext.SaveChangesAsync(cancellationToken);
         return Unit.Instance;
+
+        Either<ActionResult, Unit> VersionToReplaceNotFoundError()
+        {
+            return new BadRequestObjectResult(new ValidationProblemViewModel()
+            {
+                Errors =
+                [
+                    new ErrorViewModel
+                    {
+                        Code = ValidationMessages.DataSetVersionNotFound.Code,
+                        Message = ValidationMessages.DataSetVersionNotFound.Message,
+                        Path = nameof(NextDataSetVersionMappingsCreateRequest.DataSetVersionToReplace).ToLowerFirst(),
+                    }
+                ]
+            });
+        }
     }
 
     public async Task ApplyAutoMappings(
         Guid nextDataSetVersionId,
-        bool incrementPatchNumber = false,
         CancellationToken cancellationToken = default)
     {
         var mapping = await publicDataDbContext
@@ -143,18 +161,6 @@ internal class DataSetVersionMappingService(
 
         if (IsMajorVersionUpdate(mapping))
         {
-            if (featureFlags.Value.EnableReplacementOfPublicApiDataSets)
-            {
-                if (incrementPatchNumber)
-                {
-                    var doesntRequireManualMapping = mapping is { LocationMappingsComplete: true, FilterMappingsComplete: true } == false;//
-            
-                    if (doesntRequireManualMapping)//TODO: implement appropriate failure handler in EES-5996, also Need to account on whether the user has clicked finalize or not..
-                    {
-                        //throw new Exception("Major version number update is not allowed when replacement is in progress");
-                    }
-                }
-            }
             mapping.TargetDataSetVersion.VersionMajor += 1;
             mapping.TargetDataSetVersion.VersionMinor = 0;
         }

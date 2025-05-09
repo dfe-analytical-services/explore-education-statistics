@@ -1,6 +1,8 @@
 using FluentValidation;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Options;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Helpers;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Requests;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Services.Interfaces;
@@ -10,6 +12,8 @@ using Microsoft.Azure.Functions.Worker;
 using Microsoft.DurableTask;
 using Microsoft.DurableTask.Client;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using Semver;
 using FromBodyAttribute = Microsoft.Azure.Functions.Worker.Http.FromBodyAttribute;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Functions;
@@ -17,7 +21,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Funct
 public class CreateNextDataSetVersionMappingsFunction(
     ILogger<CreateNextDataSetVersionMappingsFunction> logger,
     IDataSetVersionService dataSetVersionService,
-    IValidator<NextDataSetVersionMappingsCreateRequest> requestValidator)
+    IValidator<NextDataSetVersionMappingsCreateRequest> requestValidator,
+    IOptions<FeatureFlags> featureFlags)
 {
     [Function(nameof(CreateNextDataSetVersionMappings))]
     public async Task<IActionResult> CreateNextDataSetVersionMappings(
@@ -31,10 +36,19 @@ public class CreateNextDataSetVersionMappingsFunction(
     {
         // Identifier of the scheduled processing orchestration instance
         var instanceId = Guid.NewGuid();
-
+        
         return await requestValidator.Validate(request, cancellationToken)
-            .OnSuccess(() => dataSetVersionService.ParseVersionToReplace(request.DataSetVersionToReplace))
-            .OnSuccess((dataSetVersionToReplace) =>
+            .OnSuccess(() =>
+            {
+                var replaceApiDataSets = featureFlags.Value.EnableReplacementOfPublicApiDataSets
+                                                                && request.DataSetVersionToReplace is not null;
+                return Task.FromResult(replaceApiDataSets
+                    ? SemVersionParser.ParseVersionWithValidation(request.DataSetVersionToReplace!, 
+                        Requests.Validators.ValidationMessages.DataSetVersionToReplaceNotValid, 
+                        nameof(NextDataSetVersionMappingsCreateRequest.DataSetVersionToReplace))
+                    : (SemVersion?)null!);
+            })
+            .OnSuccess(dataSetVersionToReplace =>
                  dataSetVersionService.CreateNextVersion(
                     dataSetId: request.DataSetId,
                     releaseFileId: request.ReleaseFileId,

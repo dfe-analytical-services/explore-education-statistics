@@ -267,7 +267,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
                             if (replacingFile is not null)
                             {
-                                replacedReleaseDataFile = await GetReplacedReleaseDataFile(releaseVersionId, replacingFile);
+                                replacedReleaseDataFile = await GetReplacedReleaseFile(releaseVersionId, replacingFile);
                             }
                             
                             var releaseDataFileOrder = await GetNextDataFileOrder(releaseVersionId, replacedReleaseDataFile);
@@ -302,20 +302,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
                             if (featureFlags.Value.EnableReplacementOfPublicApiDataSets)
                             {
-                                var releaseFileWithApiDataSet = contentDbContext.ReleaseFiles
-                                    .FirstOrDefault(rf =>
-                                        rf.ReleaseVersionId == releaseVersionId
-                                        && rf.Name == newDataSetTitle
-                                        && rf.PublicApiDataSetId != null);
-
-                                if (releaseFileWithApiDataSet is not null && replacingFile is not null)
+                                if (replacingFile is not null && contentDbContext.ReleaseFiles
+                                        .Any(rf =>
+                                            rf.ReleaseVersionId == releaseVersionId
+                                            && rf.Name == newDataSetTitle
+                                            && rf.PublicApiDataSetId != null))
                                 {
                                     // Creates a new data set version to enable replacement. 
                                     await dataSetVersionService.CreateNextVersion(
                                         dataReleaseFile.Id,
-                                        (Guid)releaseFileWithApiDataSet.PublicApiDataSetId!,
-                                        replacedReleaseDataFile?.PublicApiDataSetVersion,
-                                        CancellationToken.None
+                                        (Guid)replacedReleaseDataFile?.PublicApiDataSetId!,
+                                        replacedReleaseDataFile?.PublicApiDataSetVersion
                                     );
                                 }
                             }
@@ -383,7 +380,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
                             if (replacingFile is not null)
                             {
-                                replacedReleaseDataFile = await GetReplacedReleaseDataFile(releaseVersionId, replacingFile);
+                                replacedReleaseDataFile = await GetReplacedReleaseFile(releaseVersionId, replacingFile);
                             }
                             var releaseDataFileOrder = await 
                                 GetNextDataFileOrder(releaseVersionId, replacedReleaseDataFile);
@@ -512,7 +509,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
                         if (replacingFile is not null)
                         {
-                            replacedReleaseDataFile = await GetReplacedReleaseDataFile(releaseVersionId, replacingFile);
+                            replacedReleaseDataFile = await GetReplacedReleaseFile(releaseVersionId, replacingFile);
                         }
 
                         var releaseDataFileOrder = await GetNextDataFileOrder(releaseVersionId, replacedReleaseDataFile);
@@ -751,7 +748,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
             return currentMaxOrder.HasValue ? currentMaxOrder.Value + 1 : 0;
         }
-        private async Task<ReleaseFile?> GetReplacedReleaseDataFile(Guid releaseVersionId, File replacingFile)
+        private async Task<ReleaseFile?> GetReplacedReleaseFile(Guid releaseVersionId, File replacingFile)
         {
             return await contentDbContext.ReleaseFiles
                 .Include(rf => rf.File)

@@ -28,47 +28,9 @@ internal class DataSetVersionService(
     PublicDataDbContext publicDataDbContext,
     IReleaseFileRepository releaseFileRepository,
     IDataSetVersionPathResolver dataSetVersionPathResolver,
-    IOptions<AppOptions> options,
-    IOptions<FeatureFlags> featureFLags) : IDataSetVersionService
+    IOptions<FeatureFlags> featureFlags,
+    IOptions<AppOptions> options) : IDataSetVersionService
 {
-    public Task<Either<ActionResult, SemVersion?>> ParseVersionToReplace(string? version)
-    {
-        var dataSetVersionToReplaceNotEnabledError = ValidationUtils.ValidationResult(new ErrorViewModel
-        {
-            Code = ValidationMessages.DataSetVersionToReplaceNotEnabled.Code,
-            Message = ValidationMessages.DataSetVersionToReplaceNotEnabled.Message,
-            Path = nameof(NextDataSetVersionMappingsCreateRequest.DataSetVersionToReplace),
-            Detail = null
-        });
-        
-        var dataSetVersionToReplaceNotValidError = ValidationUtils.ValidationResult(new ErrorViewModel
-        {
-            Code = ValidationMessages.DataSetVersionToReplaceNotValid.Code,
-            Message = ValidationMessages.DataSetVersionToReplaceNotValid.Message,
-            Path = nameof(NextDataSetVersionMappingsCreateRequest.DataSetVersionToReplace),
-            Detail = null
-        });
-        
-        if (featureFLags.Value.EnableReplacementOfPublicApiDataSets == false && version is not null)
-        {
-            // Terminate this function app if it is creating a patch version whilst the feature flag is turned off. 
-            return Task.FromResult(new Either<ActionResult, SemVersion?>(dataSetVersionToReplaceNotEnabledError));
-        }
-
-        if (featureFLags.Value.EnableReplacementOfPublicApiDataSets == false)
-        {
-            return Task.FromResult(new Either<ActionResult, SemVersion?>((SemVersion?)null));
-        }
-
-        return Task.FromResult(!string.IsNullOrEmpty(version)
-            ? SemVersion.TryParse(version, 
-                SemVersionStyles.OptionalMinorPatch | SemVersionStyles.AllowWhitespace | SemVersionStyles.AllowLowerV,
-                out var versionToReplaceParsed)
-                ? versionToReplaceParsed
-                : new Either<ActionResult, SemVersion?>(dataSetVersionToReplaceNotValidError)
-            : (SemVersion?)null);
-    }
-
     public async Task<Either<ActionResult, Guid>> CreateInitialVersion(
         Guid dataSetId,
         Guid releaseFileId,
@@ -94,7 +56,10 @@ internal class DataSetVersionService(
     {
         return await GetDataSet(dataSetId, cancellationToken)
             .OnSuccess(ds => ValidateCanCreateNextDataSetVersion(ds, dataSetVersionToReplace))
-            .OnSuccess(dataSet => ValidateDataSetVersionToReplace(dataSet, dataSetVersionToReplace)
+            .OnSuccess(dataSet => (featureFlags.Value.EnableReplacementOfPublicApiDataSets 
+                                   && dataSetVersionToReplace is not null
+                    ? ValidateDataSetVersionToReplace(dataSet, dataSetVersionToReplace)
+                    : (DataSetVersion?)null)
                 .OnSuccess(previousDataSetVersionToReplace => (dataSet, previousDataSetVersionToReplace)))
             .OnSuccess(dataSetAndDataSetVersion => CreateDataSetVersion(
                 releaseFileId: releaseFileId,
@@ -383,7 +348,6 @@ internal class DataSetVersionService(
 
     private static Either<ActionResult, DataSet> ValidateCanCreateNextDataSetVersion(DataSet dataSet, SemVersion? dataSetVersionToReplace)
     {
-        // TODO: remove this comment before releasing EES-5779: JFI no need to feature flag as the refactor has the same effect when dataSetVersionToReplace is null
         var isNotReplacingAndIsMissingLiveVersion =
             dataSetVersionToReplace is null && dataSet.LatestLiveVersionId is null;
 
@@ -394,13 +358,8 @@ internal class DataSetVersionService(
             : dataSet;
     }
 
-    private Either<ActionResult, DataSetVersion?> ValidateDataSetVersionToReplace(DataSet dataSet, SemVersion? dataSetVersionToReplace)
+    private Either<ActionResult, DataSetVersion?> ValidateDataSetVersionToReplace(DataSet dataSet, SemVersion dataSetVersionToReplace)
     {
-        if (featureFLags.Value.EnableReplacementOfPublicApiDataSets == false || dataSetVersionToReplace is null)
-        {
-            return (DataSetVersion?)null;
-        }
-
         var previousVersion = dataSet.Versions
             .SingleOrDefault(dv => dataSetVersionToReplace == dv.SemVersion());
 
@@ -526,7 +485,7 @@ internal class DataSetVersionService(
             .Select(version => version.Release.ReleaseFileId)
             .ToList();
 
-        if (dataSetVersionToReplace is not null && featureFLags.Value.EnableReplacementOfPublicApiDataSets)
+        if (featureFlags.Value.EnableReplacementOfPublicApiDataSets && dataSetVersionToReplace is not null)
         {
             //`dataSetVersionToReplace` gets initiated when in an amendment.
             //When in an amendment, we are modifying one of the previous release ID and so the
@@ -565,17 +524,10 @@ internal class DataSetVersionService(
         DataSetVersion? previousVersionToPatch,
         CancellationToken cancellationToken)
     {
-        SemVersion nextVersion;
-        if (featureFLags.Value.EnableReplacementOfPublicApiDataSets)
-        {
-            nextVersion = previousVersionToPatch is null ? throw new NullReferenceException("previousVersionToPatch cannot be null when EnableReplacementOfPublicApiDataSets is true")
-                : previousVersionToPatch.NextPatchVersion();
-        }
-        else
-        {
-            nextVersion = dataSet.LatestLiveVersion?.DefaultNextVersion()
-                          ?? new SemVersion(major: 1, minor: 0, patch: 0);
-        }
+        var nextVersion = featureFlags.Value.EnableReplacementOfPublicApiDataSets && previousVersionToPatch is not null
+            ? previousVersionToPatch.NextPatchVersion()
+            : dataSet.LatestLiveVersion?.DefaultNextVersion()
+              ?? new SemVersion(major: 1, minor: 0, patch: 0);
 
         var dataSetVersion = new DataSetVersion
         {

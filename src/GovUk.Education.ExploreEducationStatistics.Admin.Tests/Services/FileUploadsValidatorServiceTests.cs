@@ -12,7 +12,6 @@ using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
-using Microsoft.Extensions.Options;
 using Moq;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
@@ -80,7 +79,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .WithType(FileType.Data)
                     .WithFilename("test.csv")
                     .WithSubjectId(toBeReplacedSubjectId))
-                //.WithPublicApiDataSetId(publicApiDataSetId)
+                //.WithPublicApiDataSetId(publicApiDataSetId) -> see comment below
                 .Generate();
 
             //Once EES-5779 is finished, this test's set up WILL contain value for the
@@ -625,7 +624,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public async Task ValidateDataFilesForUpload_Replacement_HasApiDataSet(bool enableReplacementOfPublicApiDataSets)
         {
             //TODO: This test will be deleted when EES-5779 is complete.
-            // It's coverage will be replaced by the tweak made to
+            // Its coverage will be replaced by the tweak made to
             // ValidateDataFilesForUpload_Valid_Replacement which will ensure that if a replacement has an 
             // API data set, then it is still valid (because EES-5779 allows this now).
             var releaseVersion = new ReleaseVersion { Id = Guid.NewGuid() };
@@ -659,8 +658,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var context = DbUtils.InMemoryApplicationDbContext(contentDbContextId))
             {
-                var (service, fileTypeService) = BuildService(contentDbContext: context, 
-                    enableReplacementOfPublicApiDataSets: enableReplacementOfPublicApiDataSets);
+                var (service, fileTypeService) = BuildService(contentDbContext: context, enableReplacementOfPublicApiDataSets: enableReplacementOfPublicApiDataSets);
 
                 var dataFile = CreateFormFileMock(toBeReplacedReleaseFile.File.Filename).Object;
                 var metaFile = CreateFormFileMock(toBeReplacedMetaReleaseFile.File.Filename).Object;
@@ -687,7 +685,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 if (enableReplacementOfPublicApiDataSets)
                 {
-                    AssertDoesNotHaveErrors(errors, [
+                    AssertDoesNotContainErrors(errors, [
                         ValidationMessages.GenerateErrorCannotReplaceDataSetWithApiDataSet("Data set title"),
                     ]);                    
                 }
@@ -765,8 +763,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         {
             var fileTypeServiceMock = new Mock<IFileTypeService>(Strict);
 
-            var optionsMock = new Mock<IOptions<FeatureFlags>>(Strict);
-            optionsMock.Setup(o => o.Value).Returns(new FeatureFlags()
+            var options = Microsoft.Extensions.Options.Options.Create(new FeatureFlags()
             {
                 EnableReplacementOfPublicApiDataSets = enableReplacementOfPublicApiDataSets
             });
@@ -774,7 +771,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var service = new FileUploadsValidatorService(
                 fileTypeService ?? fileTypeServiceMock.Object,
                 contentDbContext!,
-                optionsMock.Object);
+                options);
 
             return (service, fileTypeServiceMock);
         }

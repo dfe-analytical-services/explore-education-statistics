@@ -85,9 +85,4 @@ public static class ValidationMessages
         Code: "DataSetVersionToReplaceNotValid",
         Message: "DataSetVersionToReplace must be a valid semantic version if provided."
     );
-
-    public static readonly LocalizableMessage DataSetVersionToReplaceNotEnabled = new(
-        Code: "DataSetVersionToReplaceNotEnabled",
-        Message: "This feature is not available yet."
-    );
 }

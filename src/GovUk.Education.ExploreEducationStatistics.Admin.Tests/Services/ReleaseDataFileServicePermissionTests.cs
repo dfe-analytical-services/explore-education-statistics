@@ -20,7 +20,6 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Options;
-using Microsoft.Extensions.Options;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityPolicies;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.PermissionTestUtils;
@@ -262,7 +261,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 dataImportService ?? new Mock<IDataImportService>(MockBehavior.Strict).Object,
                 userService ?? new Mock<IUserService>().Object,
                 dataSetVersionService ?? new Mock<IDataSetVersionService>(MockBehavior.Strict).Object,
-                new Mock<IOptions<FeatureFlags>>(MockBehavior.Strict).Object
+                Microsoft.Extensions.Options.Options.Create(new FeatureFlags())
             );
         }
 

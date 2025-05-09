@@ -123,45 +123,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         subjectId: originalSubjectId,
                         replacementSubjectMeta);
 
-                    ApiDataSetVersionPlanViewModel? apiDataSetVersionPlan = null;
-                    if (_featureFlags.Value.EnableReplacementOfPublicApiDataSets)
-                    {
-                        if (tuple.replacementReleaseFile.PublicApiDataSetId is not null)
-                        {
-                            var completionStatus = await _dataSetService.GetMappingStatus(tuple.apiDataSetVersion!.Id, cancellationToken);
+                    var apiDataSetVersionPlan = tuple.apiDataSetVersion is null ? null 
+                        : await GetApiVersionPlanViewModel(tuple.apiDataSetVersion, cancellationToken);
 
-                            apiDataSetVersionPlan = new ApiDataSetVersionPlanViewModel
-                            {
-                                DataSetId = tuple.apiDataSetVersion.DataSetId,
-                                DataSetTitle = tuple.apiDataSetVersion.DataSet.Title,
-                                Id = tuple.apiDataSetVersion.Id,
-                                Version = tuple.apiDataSetVersion.PublicVersion,
-                                Status = tuple.apiDataSetVersion.Status,
-                                MappingStatus = completionStatus,
-                                Valid = completionStatus is null or { FiltersComplete: true, LocationsComplete: true }//Temporarily using this until feature flag is taken off. Then Will use logic inside ApiDataSetVersionPlanViewModel.MappingValid.
-                            };
-                        }
-                        return new DataReplacementPlanViewModel
-                        {
-                            DataBlocks = dataBlocks,
-                            Footnotes = footnotes,
-                            ApiDataSetVersionPlan = apiDataSetVersionPlan,
-                            OriginalSubjectId = originalSubjectId,
-                            ReplacementSubjectId = replacementSubjectId,
-                        };
-                    }
-
-                    apiDataSetVersionPlan = tuple.apiDataSetVersion is null
-                        ? null
-                        : new ApiDataSetVersionPlanViewModel
-                        {
-                            DataSetId = tuple.apiDataSetVersion.DataSetId,
-                            DataSetTitle = tuple.apiDataSetVersion.DataSet.Title,
-                            Id = tuple.apiDataSetVersion.Id,
-                            Version = tuple.apiDataSetVersion.PublicVersion,
-                            Status = tuple.apiDataSetVersion.Status,
-                            Valid = false,
-                        };
                     return new DataReplacementPlanViewModel
                     {
                         DataBlocks = dataBlocks,
@@ -171,8 +135,29 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         ReplacementSubjectId = replacementSubjectId,
                     };
                 });
-        }
 
+            
+        }
+        private async Task<ApiDataSetVersionPlanViewModel?> GetApiVersionPlanViewModel(DataSetVersion apiDataSetVersion, CancellationToken cancellationToken)
+        {
+            var apiDataSetVersionPlan = new ApiDataSetVersionPlanViewModel
+                {
+                    DataSetId = apiDataSetVersion.DataSetId,
+                    DataSetTitle = apiDataSetVersion.DataSet.Title,
+                    Id = apiDataSetVersion.Id,
+                    Version = apiDataSetVersion.PublicVersion,
+                    Status = apiDataSetVersion.Status,
+                    Valid = false,
+                };
+            if (_featureFlags.Value.EnableReplacementOfPublicApiDataSets && apiDataSetVersion.VersionPatch > 0)
+            { 
+                apiDataSetVersionPlan.MappingStatus = await _dataSetService.GetMappingStatus(apiDataSetVersion.Id, cancellationToken);
+                apiDataSetVersionPlan.Valid = apiDataSetVersionPlan.MappingStatus is
+                    { FiltersComplete: true, LocationsComplete: true };
+            }
+
+            return apiDataSetVersionPlan;
+        }
         public async Task<Either<ActionResult, Unit>> Replace(
             Guid releaseVersionId,
             Guid originalFileId,

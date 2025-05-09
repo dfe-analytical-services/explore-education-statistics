@@ -388,22 +388,6 @@ public abstract class CreateNextDataSetVersionMappingsFunctionTests(
         ProcessorFunctionsIntegrationTestFixture fixture)
         : CreateNextDataSetVersionMappingsFunctionTests(fixture)
     {
-        [Fact]
-        public async Task FeatureFlagFalse_VersionToReplaceProvided_ReturnsValidationProblem()
-        {
-            SetDataSetVersionReplacementFeatureFlag(false);
-            var result = await CreateNextDataSetVersion(
-                dataSetId: Guid.NewGuid(),
-                releaseFileId: Guid.NewGuid(),
-                dataSetVersionToReplace: "1.1.1");
-
-            var validationProblem = result.AssertBadRequestWithValidationProblem();
-
-            validationProblem.AssertHasError(
-                expectedPath: nameof(NextDataSetVersionMappingsCreateRequest.DataSetVersionToReplace),
-                expectedCode: ValidationMessages.DataSetVersionToReplaceNotEnabled.Code);
-        }
-        
         [Theory]
         [InlineData(true)]
         [InlineData(false)]
@@ -475,27 +459,27 @@ public abstract class CreateNextDataSetVersionMappingsFunctionTests(
                 durableTaskClientMock.Object,
                 dataSetVersionToReplace: versionUnderTest.PublicVersion);
             
+            VerifyAllMocks(durableTaskClientMock);
+
+            var responseViewModel = result.AssertOkObjectResult<ProcessDataSetVersionResponseViewModel>();
+
+            await using var publicDataDbContext = GetDbContext<PublicDataDbContext>();
+
+            // Assert only the original data set exists.
+            var updatedDataSet = Assert.Single(await publicDataDbContext.DataSets
+                .Include(ds => ds.Versions)
+                .ThenInclude(dsv => dsv.Imports)
+                .ToListAsync());
+
+            //Assert that we have one new version added to the data set
+            Assert.Equal(4, updatedDataSet.Versions.Count);
+
+            var nextDataSetVersion = updatedDataSet
+                .Versions
+                .FirstOrDefault((a) => a.SemVersion() == expectedVersion);
+
             if (enableDataSetVersionReplacement)
             {
-                VerifyAllMocks(durableTaskClientMock);
-
-                var responseViewModel = result.AssertOkObjectResult<ProcessDataSetVersionResponseViewModel>();
-
-                await using var publicDataDbContext = GetDbContext<PublicDataDbContext>();
-
-                // Assert only the original data set exists.
-                var updatedDataSet = Assert.Single(await publicDataDbContext.DataSets
-                    .Include(ds => ds.Versions)
-                    .ThenInclude(dsv => dsv.Imports)
-                    .ToListAsync());
-
-                //Assert that we have one new version added to the data set
-                Assert.Equal(4, updatedDataSet.Versions.Count);
-
-                var nextDataSetVersion = updatedDataSet
-                    .Versions
-                    .FirstOrDefault((a) => a.SemVersion() == expectedVersion);
-
                 Assert.NotNull(nextDataSetVersion);
                 // Assert that the new DataSetVersion is not set as the latest live version,
                 Assert.Equal(nextDataSetVersion, updatedDataSet.LatestDraftVersion);
@@ -538,7 +522,7 @@ public abstract class CreateNextDataSetVersionMappingsFunctionTests(
             }
             else
             {
-                AssertFeatureNotEnabledValidationThrown(result);
+                Assert.Null(nextDataSetVersion);
             }
         }
 
@@ -548,17 +532,27 @@ public abstract class CreateNextDataSetVersionMappingsFunctionTests(
         public async Task NonExistingDataSetVersionToReplaceProvided_ReturnsDataSetVersionNotFoundProblem(bool enableDataSetVersionReplacement)
         {
             // Arrange
-            SetDataSetVersionReplacementFeatureFlag(enableDataSetVersionReplacement);
+            var durableTaskClientMock = new Mock<DurableTaskClient>(MockBehavior.Strict, "TestClient");
+            ProcessDataSetVersionContext? processNextDataSetVersionContext = null;
+            StartOrchestrationOptions? startOrchestrationOptions = null;
+            SetUpMockDurableTaskClient(durableTaskClientMock, (_, input, options, _) =>
+            {
+                processNextDataSetVersionContext =
+                    Assert.IsAssignableFrom<ProcessDataSetVersionContext>(input);
+                startOrchestrationOptions = options;
+            });
 
-            var mockedReleaseFileId = Guid.NewGuid();
+            SetDataSetVersionReplacementFeatureFlag(enableDataSetVersionReplacement);
             var (dataSet, _) = await AddDataSetAndLatestLiveVersion();
-            var nonExistingDataSetVersionToReplace = "2.1.0";
+            var (releaseFile, _) = await AddDataAndMetadataFiles(publicationId: dataSet.PublicationId);
+            var nonExistingDataSetVersionToReplace = "9.1.0";
 
             // Act
             var result = await CreateNextDataSetVersion(
                 dataSetId: dataSet.Id,
-                releaseFileId: mockedReleaseFileId,
-                dataSetVersionToReplace: nonExistingDataSetVersionToReplace);
+                releaseFileId: releaseFile.Id,
+                dataSetVersionToReplace: nonExistingDataSetVersionToReplace,
+                durableTaskClient: durableTaskClientMock.Object);
 
             // Assert
             if (enableDataSetVersionReplacement)
@@ -574,7 +568,7 @@ public abstract class CreateNextDataSetVersionMappingsFunctionTests(
             }
             else
             {
-                AssertFeatureNotEnabledValidationThrown(result);
+                result.AssertOkObjectResult<ProcessDataSetVersionResponseViewModel>();
             }
         }
         
@@ -624,17 +618,13 @@ public abstract class CreateNextDataSetVersionMappingsFunctionTests(
             }
             else
             {
-                AssertFeatureNotEnabledValidationThrown(result);
-            }
-        }
-        
-        private static void AssertFeatureNotEnabledValidationThrown(IActionResult result)
-        {
-            var validationProblem = result.AssertBadRequestWithValidationProblem();
+                 var validationProblem = result.AssertBadRequestWithValidationProblem();
 
-            validationProblem.AssertHasError(
-                expectedPath: nameof(NextDataSetVersionMappingsCreateRequest.DataSetVersionToReplace),
-                expectedCode: ValidationMessages.DataSetVersionToReplaceNotEnabled.Code);
+                validationProblem.AssertHasError(
+                    expectedPath: nameof(NextDataSetVersionMappingsCreateRequest.ReleaseFileId).ToLowerFirst(),
+                    expectedCode: ValidationMessages.FileMustBeInDifferentRelease.Code
+                );
+            }
         }
     }
 
