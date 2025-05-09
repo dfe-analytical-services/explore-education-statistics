@@ -1,7 +1,4 @@
 #nullable enable
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
@@ -18,6 +15,9 @@ using GovUk.Education.ExploreEducationStatistics.Content.Security;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Moq;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityPolicies;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.PermissionTestUtils;
@@ -226,7 +226,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             IPersistenceHelper<ContentDbContext>? contentPersistenceHelper = null,
             IPrivateBlobStorageService? privateBlobStorageService = null,
             IFileRepository? fileRepository = null,
-            IFileUploadsValidatorService? fileUploadsValidatorService = null,
+            IFileValidatorService? fileValidatorService = null,
             IReleaseFileRepository? releaseFileRepository = null,
             IDataGuidanceFileWriter? dataGuidanceFileWriter = null,
             IUserService? userService = null)
@@ -236,7 +236,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 contentPersistenceHelper ?? DefaultPersistenceHelperMock().Object,
                 privateBlobStorageService ?? Mock.Of<IPrivateBlobStorageService>(),
                 fileRepository ?? new FileRepository(contentDbContext),
-                fileUploadsValidatorService ?? Mock.Of<IFileUploadsValidatorService>(),
+                fileValidatorService ?? Mock.Of<IFileValidatorService>(),
                 releaseFileRepository ?? new ReleaseFileRepository(contentDbContext),
                 dataGuidanceFileWriter ?? Mock.Of<IDataGuidanceFileWriter>(),
                 userService ?? Mock.Of<IUserService>()

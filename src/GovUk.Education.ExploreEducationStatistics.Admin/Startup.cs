@@ -5,6 +5,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Hubs;
 using GovUk.Education.ExploreEducationStatistics.Admin.Hubs.Filters;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Options;
+using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers;
@@ -18,6 +19,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Publi
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageContent;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologies;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Public.Data;
+using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Cache;
 using GovUk.Education.ExploreEducationStatistics.Common.Cancellation;
@@ -111,9 +113,10 @@ using IPublicationRepository =
     GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IPublicationRepository;
 using IPublicationService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IPublicationService;
 using IReleaseFileService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IReleaseFileService;
-using IReleaseVersionService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IReleaseVersionService;
+using IReleaseService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IReleaseService;
 using IReleaseVersionRepository =
     GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IReleaseVersionRepository;
+using IReleaseVersionService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IReleaseVersionService;
 using IThemeService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IThemeService;
 using MethodologyImageService =
     GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologies.MethodologyImageService;
@@ -121,13 +124,11 @@ using MethodologyService = GovUk.Education.ExploreEducationStatistics.Admin.Serv
 using PublicationRepository = GovUk.Education.ExploreEducationStatistics.Admin.Services.PublicationRepository;
 using PublicationService = GovUk.Education.ExploreEducationStatistics.Admin.Services.PublicationService;
 using ReleaseFileService = GovUk.Education.ExploreEducationStatistics.Admin.Services.ReleaseFileService;
-using ReleaseVersionService = GovUk.Education.ExploreEducationStatistics.Admin.Services.ReleaseVersionService;
+using ReleaseService = GovUk.Education.ExploreEducationStatistics.Admin.Services.ReleaseService;
 using ReleaseVersionRepository = GovUk.Education.ExploreEducationStatistics.Admin.Services.ReleaseVersionRepository;
+using ReleaseVersionService = GovUk.Education.ExploreEducationStatistics.Admin.Services.ReleaseVersionService;
 using SameSiteMode = Microsoft.AspNetCore.Http.SameSiteMode;
 using ThemeService = GovUk.Education.ExploreEducationStatistics.Admin.Services.ThemeService;
-using IReleaseService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IReleaseService;
-using ReleaseService = GovUk.Education.ExploreEducationStatistics.Admin.Services.ReleaseService;
-using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin
 {
@@ -172,8 +173,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddHttpContextAccessor();
 
             services.AddFluentValidation();
-            services.AddValidatorsFromAssembly(typeof(FullTableQueryRequest.Validator)
-                .Assembly); // Adds *all* validators from Common
+
+            services.AddValidatorsFromAssemblies([
+                typeof(UploadDataSetRequest.Validator).Assembly, // Adds *all* validators from Admin
+                typeof(FullTableQueryRequest.Validator).Assembly // Adds *all* validators from Common
+            ]);
 
             services.AddMvc(options =>
                 {
@@ -381,7 +385,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                 configuration.GetRequiredSection(TableBuilderOptions.Section));
             services.Configure<OpenIdConnectSpaClientOptions>(
                 configuration.GetSection(OpenIdConnectSpaClientOptions.Section));
-            
+
             services.Configure<RouteOptions>(options => options.LowercaseUrls = true);
 
             StartupSecurityConfiguration.ConfigureAuthorizationPolicies(services);
@@ -418,6 +422,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<IReleaseDataFileRepository, ReleaseDataFileRepository>();
 
             services.AddTransient<IReleaseDataFileService, ReleaseDataFileService>();
+            services.AddTransient<IDataSetFileStorage, DataSetFileStorage>();
             services.AddTransient<IDataGuidanceFileWriter, DataGuidanceFileWriter>();
             services.AddTransient<IReleaseFileService, ReleaseFileService>();
             services.AddTransient<IReleaseImageService, ReleaseImageService>();
@@ -567,7 +572,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<ISubjectRepository, SubjectRepository>();
             services.AddTransient<ITimePeriodService, TimePeriodService>();
             services.AddTransient<IReleaseSubjectService, ReleaseSubjectService>();
-            services.AddTransient<ISubjectMetaService, SubjectMetaService>(provider => 
+            services.AddTransient<ISubjectMetaService, SubjectMetaService>(provider =>
                 new SubjectMetaService(
                     statisticsDbContext: provider.GetRequiredService<StatisticsDbContext>(),
                     contentDbContext: provider.GetRequiredService<ContentDbContext>(),
@@ -591,7 +596,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<IReleaseInviteService, ReleaseInviteService>();
             services.AddTransient<IUserRepository, UserRepository>();
             services.AddTransient<IUserInviteRepository, UserInviteRepository>();
-            services.AddTransient<IFileUploadsValidatorService, FileUploadsValidatorService>();
+            services.AddTransient<IDataSetValidator, DataSetValidator>();
+            services.AddTransient<IFileValidatorService, FileValidatorService>();
             services.AddTransient<IReleaseFileBlobService, PrivateReleaseFileBlobService>();
             services.AddTransient<IPrivateBlobStorageService, PrivateBlobStorageService>(provider =>
                 new PrivateBlobStorageService(configuration.GetValue<string>("CoreStorage"),
@@ -618,7 +624,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             StartupSecurityConfiguration.ConfigureResourceBasedAuthorization(services);
 
             services.AddSingleton<IFileTypeService, FileTypeService>();
-            services.AddTransient<IDataArchiveValidationService, DataArchiveValidationService>();
             services.AddTransient<IPrivateBlobCacheService, PrivateBlobCacheService>();
             services.AddTransient<ICacheKeyService, CacheKeyService>();
             services.AddSingleton<IDataProcessorClient, DataProcessorClient>(_ =>

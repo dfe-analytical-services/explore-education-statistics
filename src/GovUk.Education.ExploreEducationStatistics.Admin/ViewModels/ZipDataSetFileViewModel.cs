@@ -3,17 +3,17 @@ using System;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 
-public record ArchiveDataSetFileViewModel
+public record ZipDataSetFileViewModel
 {
     public string Title { get; set; } = string.Empty;
 
-    public string DataFilename { get; set; } = string.Empty;
+    public string DataFileName { get; set; } = string.Empty;
 
     public Guid DataFileId { get; set; }
 
     public long DataFileSize { get; set; }
 
-    public string MetaFilename { get; set; } = string.Empty;
+    public string MetaFileName { get; set; } = string.Empty;
 
     public Guid MetaFileId { get; set; }
 

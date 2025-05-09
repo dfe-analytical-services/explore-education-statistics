@@ -1,9 +1,4 @@
 #nullable enable
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Methodologies;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
@@ -19,6 +14,11 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interf
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
 using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainers;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
 
@@ -29,7 +29,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
         private readonly ContentDbContext _contentDbContext;
         private readonly IPersistenceHelper<ContentDbContext> _persistenceHelper;
         private readonly IPrivateBlobStorageService _privateBlobStorageService;
-        private readonly IFileUploadsValidatorService _fileUploadsValidatorService;
+        private readonly IFileValidatorService _fileValidatorService;
         private readonly IFileRepository _fileRepository;
         private readonly IMethodologyFileRepository _methodologyFileRepository;
         private readonly IUserService _userService;
@@ -37,7 +37,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
         public MethodologyImageService(ContentDbContext contentDbContext,
             IPersistenceHelper<ContentDbContext> persistenceHelper,
             IPrivateBlobStorageService privateBlobStorageService,
-            IFileUploadsValidatorService fileUploadsValidatorService,
+            IFileValidatorService fileValidatorService,
             IFileRepository fileRepository,
             IMethodologyFileRepository methodologyFileRepository,
             IUserService userService)
@@ -45,7 +45,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
             _contentDbContext = contentDbContext;
             _persistenceHelper = persistenceHelper;
             _privateBlobStorageService = privateBlobStorageService;
-            _fileUploadsValidatorService = fileUploadsValidatorService;
+            _fileValidatorService = fileValidatorService;
             _fileRepository = fileRepository;
             _methodologyFileRepository = methodologyFileRepository;
             _userService = userService;
@@ -117,7 +117,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
             return _persistenceHelper
                 .CheckEntityExists<MethodologyVersion>(methodologyVersionId)
                 .OnSuccess(_userService.CheckCanUpdateMethodologyVersion)
-                .OnSuccess(async () => await _fileUploadsValidatorService.ValidateFileForUpload(formFile, Image))
+                .OnSuccess(async () => await _fileValidatorService.ValidateFileForUpload(formFile, Image))
                 .OnSuccess(async () => await Upload(
                     methodologyVersionId,
                     Image,

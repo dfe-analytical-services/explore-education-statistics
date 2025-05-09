@@ -1,8 +1,8 @@
+using Microsoft.AspNetCore.Http;
 using System.Collections.Generic;
 using System.IO;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces
 {
@@ -12,8 +12,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces
 
         bool HasMatchingEncodingType(IFormFile file, IEnumerable<string> encodingTypes);
 
-        Task<bool> IsValidCsvFile(Stream stream);
+        Task<bool> HasCsvFileType(Stream stream);
 
-        Task<bool> IsValidZipFile(IFormFile zipFile);
+        Task<bool> HasZipFileType(IFormFile zipFile);
     }
 }

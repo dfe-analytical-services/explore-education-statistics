@@ -98,12 +98,14 @@ const ReleaseDataFileReplacePage = ({
 
     if (values.uploadType === 'csv') {
       file = await releaseDataFileService.uploadDataFiles(releaseVersionId, {
+        title: values.title ?? dataFile!.title,
         replacingFileId: currentFile.id,
         dataFile: values.dataFile as File,
         metadataFile: values.metadataFile as File,
       });
     } else {
       file = await releaseDataFileService.uploadZipDataFile(releaseVersionId, {
+        title: values.title ?? dataFile!.title,
         replacingFileId: currentFile.id,
         zipFile: values.zipFile as File,
       });
