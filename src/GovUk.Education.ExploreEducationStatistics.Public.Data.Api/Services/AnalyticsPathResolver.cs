@@ -9,7 +9,7 @@ public class AnalyticsPathResolver : IAnalyticsPathResolver
 {
     private readonly string _basePath;
 
-    public AnalyticsPathResolver(IOptions<AnalyticsOptions> options, IWebHostEnvironment environment)
+    public AnalyticsPathResolver(IOptions<AnalyticsOptions> options)
     {
         if (options.Value.BasePath.IsNullOrWhitespace())
         {

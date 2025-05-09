@@ -1,11 +1,8 @@
-#nullable enable
-using System.Threading;
 using System.Threading.Channels;
-using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Content.Services.Requests;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Requests;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services.Interfaces;
 
-namespace GovUk.Education.ExploreEducationStatistics.Content.Services;
+namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services;
 
 public class AnalyticsManager : IAnalyticsManager
 {

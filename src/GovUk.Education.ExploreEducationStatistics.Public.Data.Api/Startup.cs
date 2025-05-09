@@ -19,6 +19,8 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services.Security;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Strategies;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Strategies.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Swagger;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.DuckDb;
@@ -251,25 +253,7 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
         services.AddScoped<IParquetLocationRepository, ParquetLocationRepository>();
         services.AddScoped<IParquetTimePeriodRepository, ParquetTimePeriodRepository>();
 
-        if (_analyticsOptions.Enabled)
-        {
-            services.AddSingleton<IQueryAnalyticsManager, QueryAnalyticsManager>();
-            services.AddHostedService<QueryAnalyticsConsumer>();
-            services.AddSingleton<IQueryAnalyticsWriter, QueryAnalyticsWriter>();
-
-            if (hostEnvironment.IsDevelopment())
-            {
-                services.AddSingleton<IAnalyticsPathResolver, LocalAnalyticsPathResolver>();
-            }
-            else
-            {
-                services.AddSingleton<IAnalyticsPathResolver, AnalyticsPathResolver>();
-            }
-        }
-        else
-        {
-            services.AddSingleton<IQueryAnalyticsManager, NoOpQueryAnalyticsManager>();
-        }
+        services.AddAnalytics(hostEnvironment, configuration);
     }
 
     // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
