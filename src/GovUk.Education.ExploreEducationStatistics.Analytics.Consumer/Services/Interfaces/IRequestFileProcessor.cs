@@ -2,5 +2,5 @@ namespace GovUk.Education.ExploreEducationStatistics.Analytics.Consumer.Services
 
 public interface IRequestFileProcessor
 {
-    public Task Process();
+    Task Process();
 }
