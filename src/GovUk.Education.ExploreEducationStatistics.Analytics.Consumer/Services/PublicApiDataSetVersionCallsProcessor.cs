@@ -1,38 +1,29 @@
 using GovUk.Education.ExploreEducationStatistics.Analytics.Consumer.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Analytics.Consumer.Services.Workflow;
 using GovUk.Education.ExploreEducationStatistics.Common.DuckDb.DuckDb;
 using Microsoft.Extensions.Logging;
 
 namespace GovUk.Education.ExploreEducationStatistics.Analytics.Consumer.Services;
 
 public class PublicApiDataSetVersionCallsProcessor(
-    DuckDbConnection duckDbConnection,
     IAnalyticsPathResolver pathResolver,
     ILogger<PublicApiDataSetVersionCallsProcessor> logger)
     : IRequestFileProcessor
 {
     public Task Process()
     {
-        var workflowManager = new ProcessorWorkflowManager(
-            duckDbConnection: duckDbConnection,
-            processor: new PublicApiDataSetVersionCallsWorkflowProcessor(
-                sourceDirectory: pathResolver.PublicApiDataSetVersionCallsDirectoryPath(),
-                reportsDirectory: pathResolver.PublicApiDataSetVersionCallsReportsDirectoryPath()),
+        var workflow = new ProcessRequestFilesWorkflow(
+            processorName: GetType().Name,
+            sourceDirectory: pathResolver.PublicApiDataSetVersionCallsDirectoryPath(),
+            reportsDirectory: pathResolver.PublicApiDataSetVersionCallsReportsDirectoryPath(),
+            actor: new WorkflowActor(),
             logger: logger);
 
-        return workflowManager.ProcessWorkflow();
+        return workflow.Process();
     }
 
-    private class PublicApiDataSetVersionCallsWorkflowProcessor(
-        string sourceDirectory,
-        string reportsDirectory)
-        : ICommonWorkflowRequestFileProcessor
+    private class WorkflowActor : IWorkflowActor
     {
-        public string SourceDirectory() => sourceDirectory;
-
-        public string ReportsDirectory() => reportsDirectory;
-
-        public string ReportsFilenameSuffix() => "public-api-data-set-version-calls";
-
         public void InitialiseDuckDb(DuckDbConnection connection)
         {
             connection.ExecuteNonQuery(@"
@@ -50,20 +41,23 @@ public class PublicApiDataSetVersionCallsProcessor(
             ");
         }
 
-        public void ProcessSourceFile(string filepath, DuckDbConnection connection)
+        public void ProcessSourceFile(string sourceFilePath, DuckDbConnection connection)
         {
             connection.ExecuteNonQuery($@"
                 INSERT INTO DataSetVersionCalls BY NAME (
                     SELECT *
-                    FROM read_json('{filepath}', 
+                    FROM read_json('{sourceFilePath}', 
                         format='unstructured'
                     )
                  )
             ");
         }
 
-        public void CreateParquetReport(string reportFilepath, DuckDbConnection connection)
+        public void CreateParquetReports(string reportsFilePathAndFilenamePrefix, DuckDbConnection connection)
         {
+            var reportFilePath = 
+                $"{reportsFilePathAndFilenamePrefix}_public-api-data-set-version-calls.parquet";
+        
             connection.ExecuteNonQuery($@"
                 COPY (
                     SELECT * EXCLUDE previewToken,
@@ -74,7 +68,7 @@ public class PublicApiDataSetVersionCallsProcessor(
                     FROM DataSetVersionCalls 
                     ORDER BY startTime ASC
                 )
-                TO '{reportFilepath}' (FORMAT 'parquet', CODEC 'zstd')
+                TO '{reportFilePath}' (FORMAT 'parquet', CODEC 'zstd')
             ");
         }
     }

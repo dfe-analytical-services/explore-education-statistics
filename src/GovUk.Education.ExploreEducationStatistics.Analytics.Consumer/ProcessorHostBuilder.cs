@@ -37,13 +37,13 @@ public static class ProcessorHostBuilder
                 services
                     .AddApplicationInsightsTelemetryWorkerService()
                     .ConfigureFunctionsApplicationInsights()
-                    .AddTransient<IAnalyticsPathResolver, AnalyticsPathResolver>()
-                    .AddTransient<DuckDbConnection>(_ => new DuckDbConnection());
+                    .AddTransient<IAnalyticsPathResolver, AnalyticsPathResolver>();
 
                 // To be used by ConsumeAnalyticsRequestFilesFunction
                 services
                     .AddTransient<IRequestFileProcessor, PublicApiDataSetVersionCallsProcessor>()
                     .AddTransient<IRequestFileProcessor, PublicApiQueriesProcessor>()
+                    .AddTransient<IRequestFileProcessor, PublicApiDataSetVersionCallsProcessor>()
                     .AddTransient<IRequestFileProcessor, PublicZipDownloadsProcessor>();
             });
     }
