@@ -1,11 +1,11 @@
-﻿using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.RefreshSearchableDocument.Dto;
+﻿using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.CommandHandlers.RefreshSearchableDocument.Dto;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Azure.Functions.Worker;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.CommandHandlers.FullReset;
 
-public class FullResetFunction(IFullSearchableDocumentReseter fullSearchableDocumentReseter)
+public class FullResetFunction(IFullSearchableDocumentResetter fullSearchableDocumentResetter)
 {
     [Function(nameof(FullSearchableDocumentsReset))]
     public async Task<FullSearchableDocumentsResetOutput> FullSearchableDocumentsReset(
@@ -13,14 +13,14 @@ public class FullResetFunction(IFullSearchableDocumentReseter fullSearchableDocu
         HttpRequest _,
         FunctionContext context)
     {
-        var response = await fullSearchableDocumentReseter.Run(context.CancellationToken);
+        var response = await fullSearchableDocumentResetter.PerformReset(context.CancellationToken);
         
         return new FullSearchableDocumentsResetOutput
         {
-            RefreshSearchableDocuments = response.AllPublicationSlugs
-                .Select(publicationSlug => new RefreshSearchableDocumentMessageDto
+            RefreshSearchableDocuments = response.AllPublications
+                .Select(publication => new RefreshSearchableDocumentMessageDto
                                                     {
-                                                        PublicationSlug = publicationSlug
+                                                        PublicationSlug = publication.PublicationSlug
                                                     })
                 .ToArray()
         };
