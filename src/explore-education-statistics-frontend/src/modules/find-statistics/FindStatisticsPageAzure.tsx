@@ -41,10 +41,10 @@ const FindStatisticsPage: NextPage = () => {
   const [pageTitle, setPageTitle] = useState<string>(defaultPageTitle);
 
   const {
-    data: publicationsDataAzure,
-    isError: isErrorAzure,
-    isFetching: isFetchingAzure,
-    isLoading: isLoadingAzure,
+    data: publicationsData,
+    isError,
+    isFetching,
+    isLoading,
   } = useQuery({
     ...publicationQueries.listAzure(router.query),
     keepPreviousData: true,
@@ -56,13 +56,14 @@ const FindStatisticsPage: NextPage = () => {
     staleTime: Infinity,
   });
 
-  const { paging: pagingAzure, results: publicationsAzure = [] } =
-    publicationsDataAzure ?? {};
   const {
-    page: pageAzure,
-    totalPages: totalPagesAzure,
-    totalResults: totalResultsAzure = 0,
-  } = pagingAzure ?? {};
+    paging,
+    results: publications = [],
+    facets = { theme: [], releaseType: [] },
+  } = publicationsData ?? {};
+  const { page, totalPages, totalResults = 0 } = paging ?? {};
+
+  const { theme: themeFacetResults } = facets;
 
   const { releaseType, search, sortBy, themeId } = getParamsFromQuery(
     router.query,
@@ -176,8 +177,8 @@ const FindStatisticsPage: NextPage = () => {
     });
   };
 
-  const totalResultsMessageAzure = `${totalResultsAzure} ${
-    totalResultsAzure !== 1 ? 'results' : 'result'
+  const totalResultsMessage = `${totalResults} ${
+    totalResults !== 1 ? 'results' : 'result'
   }`;
 
   return (
@@ -206,10 +207,8 @@ const FindStatisticsPage: NextPage = () => {
 
           <div className="govuk-!-margin-top-3 dfe-flex dfe-flex-wrap dfe-gap-2 dfe-align-items--center">
             <p className="govuk-!-margin-bottom-0">
-              {`${totalResultsMessageAzure}, ${
-                totalResultsAzure
-                  ? `page ${pageAzure} of ${totalPagesAzure}`
-                  : '0 pages'
+              {`${totalResultsMessage}, ${
+                totalResults ? `page ${page} of ${totalPages}` : '0 pages'
               }, ${isFiltered ? 'filtered by: ' : 'showing all publications'}`}
             </p>
 
@@ -257,7 +256,7 @@ const FindStatisticsPage: NextPage = () => {
           )}
           {/* Using ScreenReaderMessage here as the message is announced twice if have
           aria-live etc on the h2. */}
-          <ScreenReaderMessage message={totalResultsMessageAzure} />
+          <ScreenReaderMessage message={totalResultsMessage} />
         </div>
       </div>
       <hr />
@@ -269,6 +268,7 @@ const FindStatisticsPage: NextPage = () => {
               showResetFiltersButton={!isMobileMedia && isFiltered}
               sortBy={sortBy}
               sortOptions={sortOptions}
+              themeFacetResults={themeFacetResults}
               themeId={themeId}
               themes={themes}
               onChange={handleChangeFilter}
@@ -281,12 +281,13 @@ const FindStatisticsPage: NextPage = () => {
           {isMobileMedia && (
             <FiltersMobile
               title="Sort and filter publications"
-              totalResults={totalResultsAzure}
+              totalResults={totalResults}
             >
               <FiltersAzureSearch
                 releaseType={releaseType}
                 sortBy={sortBy}
                 sortOptions={sortOptions}
+                themeFacetResults={themeFacetResults}
                 themeId={themeId}
                 themes={themes}
                 onChange={handleChangeFilter}
@@ -296,16 +297,16 @@ const FindStatisticsPage: NextPage = () => {
           )}
 
           <LoadingSpinner
-            loading={isLoadingAzure || isFetchingAzure}
+            loading={isLoading || isFetching}
             className="govuk-!-margin-top-4"
           >
-            {isErrorAzure ? (
+            {isError ? (
               <WarningMessage>
                 Cannot load publications, please try again later.
               </WarningMessage>
             ) : (
               <>
-                {totalResultsAzure === 0 ? (
+                {totalResults === 0 ? (
                   <div className="govuk-!-margin-top-5" id="searchResults">
                     {isFiltered ? (
                       <>
@@ -330,18 +331,18 @@ const FindStatisticsPage: NextPage = () => {
                     id="searchResults"
                     data-testid="publicationsList"
                   >
-                    {publicationsAzure.map(pub => (
+                    {publications.map(pub => (
                       <PublicationSummary key={pub.id} publication={pub} />
                     ))}
                   </ul>
                 )}
               </>
             )}
-            {pageAzure && totalPagesAzure && (
+            {page && totalPages && (
               <Pagination
-                currentPage={pageAzure}
+                currentPage={page}
                 shallow
-                totalPages={totalPagesAzure}
+                totalPages={totalPages}
                 onClick={pageNumber => {
                   // Make sure the page title is updated before the route change,
                   // otherwise the wrong page number is announced.
@@ -356,7 +357,7 @@ const FindStatisticsPage: NextPage = () => {
             )}
           </LoadingSpinner>
 
-          {publicationsAzure.length > 0 && (
+          {publications.length > 0 && (
             <GoToTopLink className="govuk-!-margin-top-7" />
           )}
         </div>
