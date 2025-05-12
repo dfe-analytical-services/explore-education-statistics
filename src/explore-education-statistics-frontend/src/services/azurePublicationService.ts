@@ -1,4 +1,5 @@
 /* eslint-disable no-restricted-syntax */
+import { env } from 'process';
 import {
   PublicationListSummary,
   PublicationSortParam,
@@ -11,11 +12,6 @@ import {
 } from '@azure/search-documents';
 import { ReleaseType } from '@common/services/types/releaseType';
 import { SortDirection } from '@common/services/types/sort';
-
-// TODO change to env config values
-const ENDPOINT = 'https://s101d01-ees-srch.search.windows.net';
-const INDEX = 'index-1';
-const AZURE_SEARCH_QUERY_KEY = '';
 
 export interface PublicationAzureSearchResult {
   content: string;
@@ -39,10 +35,13 @@ export interface AzurePublicationListRequest {
   themeId?: string;
 }
 
+const { AZURE_SEARCH_ENDPOINT, AZURE_SEARCH_INDEX, AZURE_SEARCH_QUERY_KEY } =
+  env;
+
 const azureSearchClient = new SearchClient<PublicationAzureSearchResult>(
-  ENDPOINT,
-  INDEX,
-  new AzureKeyCredential(AZURE_SEARCH_QUERY_KEY),
+  AZURE_SEARCH_ENDPOINT || '',
+  AZURE_SEARCH_INDEX || '',
+  new AzureKeyCredential(AZURE_SEARCH_QUERY_KEY || ''),
 );
 
 const azurePublicationService = {
