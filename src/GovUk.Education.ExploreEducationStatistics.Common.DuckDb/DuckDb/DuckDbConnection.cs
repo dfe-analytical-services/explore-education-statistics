@@ -42,4 +42,11 @@ public class DuckDbConnection(string connectionString = DuckDBConnectionStringBu
         command.CommandText = commandText;
         return command.ExecuteNonQuery();
     }
+    
+    public Task<int> ExecuteNonQueryAsync(string commandText)
+    {
+        var command = CreateCommand();
+        command.CommandText = commandText;
+        return command.ExecuteNonQueryAsync();
+    }
 }

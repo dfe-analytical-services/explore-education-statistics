@@ -24,9 +24,9 @@ public class PublicApiDataSetVersionCallsProcessor(
 
     private class WorkflowActor : IWorkflowActor
     {
-        public void InitialiseDuckDb(DuckDbConnection connection)
+        public async Task InitialiseDuckDb(DuckDbConnection connection)
         {
-            connection.ExecuteNonQuery(@"
+            await connection.ExecuteNonQueryAsync(@"
                 CREATE TABLE DataSetVersionCalls (
                     dataSetId UUID,
                     dataSetTitle VARCHAR,
@@ -41,9 +41,9 @@ public class PublicApiDataSetVersionCallsProcessor(
             ");
         }
 
-        public void ProcessSourceFile(string sourceFilePath, DuckDbConnection connection)
+        public async Task ProcessSourceFile(string sourceFilePath, DuckDbConnection connection)
         {
-            connection.ExecuteNonQuery($@"
+            await connection.ExecuteNonQueryAsync($@"
                 INSERT INTO DataSetVersionCalls BY NAME (
                     SELECT *
                     FROM read_json('{sourceFilePath}', 
@@ -53,12 +53,12 @@ public class PublicApiDataSetVersionCallsProcessor(
             ");
         }
 
-        public void CreateParquetReports(string reportsFilePathAndFilenamePrefix, DuckDbConnection connection)
+        public async Task CreateParquetReports(string reportsFilePathAndFilenamePrefix, DuckDbConnection connection)
         {
             var reportFilePath = 
                 $"{reportsFilePathAndFilenamePrefix}_public-api-data-set-version-calls.parquet";
         
-            connection.ExecuteNonQuery($@"
+            await connection.ExecuteNonQueryAsync($@"
                 COPY (
                     SELECT * EXCLUDE previewToken,
                     previewToken->>'label' AS previewTokenLabel,

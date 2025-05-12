@@ -23,9 +23,9 @@ public class PublicZipDownloadsProcessor(
 
     private class WorkflowActor : IWorkflowActor
     {
-        public void InitialiseDuckDb(DuckDbConnection connection)
+        public async Task InitialiseDuckDb(DuckDbConnection connection)
         {
-            connection.ExecuteNonQuery(@"
+            await connection.ExecuteNonQueryAsync(@"
                 CREATE TABLE zipDownloads (
                     zipDownloadHash VARCHAR,
                     publicationName VARCHAR,
@@ -38,9 +38,9 @@ public class PublicZipDownloadsProcessor(
             ");
         }
 
-        public void ProcessSourceFile(string sourceFilePath, DuckDbConnection connection)
+        public async Task ProcessSourceFile(string sourceFilePath, DuckDbConnection connection)
         {
-            connection.ExecuteNonQuery($@"
+            await connection.ExecuteNonQueryAsync($@"
                 INSERT INTO zipDownloads BY NAME (
                     SELECT
                         MD5(CONCAT(subjectId, releaseVersionId)) AS zipDownloadHash,
@@ -60,9 +60,9 @@ public class PublicZipDownloadsProcessor(
             ");
         }
 
-        public void CreateParquetReports(string reportsFilePathAndFilenamePrefix, DuckDbConnection connection)
+        public async Task CreateParquetReports(string reportsFilePathAndFilenamePrefix, DuckDbConnection connection)
         {
-            connection.ExecuteNonQuery(@"
+            await connection.ExecuteNonQueryAsync(@"
                 CREATE TABLE zipDownloadsReport AS 
                 SELECT 
                     zipDownloadHash,

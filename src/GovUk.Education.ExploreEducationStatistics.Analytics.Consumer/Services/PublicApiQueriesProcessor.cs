@@ -23,9 +23,9 @@ public class PublicApiQueriesProcessor(
 
     private class WorkflowActor : IWorkflowActor
     {
-        public void InitialiseDuckDb(DuckDbConnection connection)
+        public async Task InitialiseDuckDb(DuckDbConnection connection)
         {
-            connection.ExecuteNonQuery(@"
+            await connection.ExecuteNonQueryAsync(@"
                 CREATE TABLE queries (
                     queryVersionHash VARCHAR,
                     queryHash VARCHAR,
@@ -42,9 +42,9 @@ public class PublicApiQueriesProcessor(
             ");
         }
 
-        public void ProcessSourceFile(string sourceFilePath, DuckDbConnection connection)
+        public async Task ProcessSourceFile(string sourceFilePath, DuckDbConnection connection)
         {
-            connection.ExecuteNonQuery($@"
+            await connection.ExecuteNonQueryAsync($@"
                 INSERT INTO queries BY NAME (
                     SELECT
                         MD5(CONCAT(query, dataSetVersionId)) AS queryVersionHash,
@@ -67,9 +67,9 @@ public class PublicApiQueriesProcessor(
             ");
         }
 
-        public void CreateParquetReports(string reportsFilePathAndFilenamePrefix, DuckDbConnection connection)
+        public async Task CreateParquetReports(string reportsFilePathAndFilenamePrefix, DuckDbConnection connection)
         {
-            connection.ExecuteNonQuery(@"
+            await connection.ExecuteNonQueryAsync(@"
                 CREATE TABLE queryReport AS 
                 SELECT
                     queryVersionHash ,
@@ -85,8 +85,8 @@ public class PublicApiQueriesProcessor(
                 FROM queries
                 GROUP BY queryVersionHash
                 ORDER BY queryVersionHash");
-        
-                connection.ExecuteNonQuery(@"
+    
+            await connection.ExecuteNonQueryAsync(@"
                 CREATE TABLE queryAccessReport AS 
                 SELECT 
                     queryVersionHash,
@@ -101,14 +101,14 @@ public class PublicApiQueriesProcessor(
             var queryReportFilePath = 
                 $"{reportsFilePathAndFilenamePrefix}_public-api-queries.parquet";
     
-            connection.ExecuteNonQuery($@"
+            await connection.ExecuteNonQueryAsync($@"
                 COPY (SELECT * FROM queryReport)
                 TO '{queryReportFilePath}' (FORMAT 'parquet', CODEC 'zstd')");
 
             var queryAccessReportFilePath = 
                 $"{reportsFilePathAndFilenamePrefix}_public-api-query-access.parquet";
 
-            connection.ExecuteNonQuery($@"
+            await connection.ExecuteNonQueryAsync($@"
                 COPY (SELECT * FROM queryAccessReport)
                 TO '{queryAccessReportFilePath}' (FORMAT 'parquet', CODEC 'zstd')");
         }
