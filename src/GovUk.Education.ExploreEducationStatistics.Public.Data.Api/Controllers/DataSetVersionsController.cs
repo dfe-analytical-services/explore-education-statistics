@@ -19,10 +19,10 @@ public class DataSetVersionsController(
     : ControllerBase
 {
     /// <summary>
-    /// List a data set’s versions
+    /// List a data set's versions
     /// </summary>
     /// <remarks>
-    /// List a data set’s versions. Only provides summary information of each version.
+    /// List a data set's versions. Only provides summary information of each version.
     /// </remarks>
     [HttpGet]
     [Produces(MediaTypeNames.Application.Json)]
@@ -44,10 +44,10 @@ public class DataSetVersionsController(
     }
 
     /// <summary>
-    /// Get a data set version’s summary
+    /// Get a data set version's summary
     /// </summary>
     /// <remarks>
-    /// Gets a specific data set version’s summary details.
+    /// Gets a data set version's summary details.
     /// </remarks>
     [HttpGet("{dataSetVersion}")]
     [Produces(MediaTypeNames.Application.Json)]
