@@ -80,10 +80,7 @@ public class ProcessRequestFilesWorkflow(
         });
 
         await using var duckDbConnection = new DuckDbConnection();
-
         duckDbConnection.Open();
-
-        await duckDbConnection.ExecuteNonQueryAsync("install json; load json");
 
         await actor.InitialiseDuckDb(duckDbConnection);
 
