@@ -45,4 +45,11 @@ internal class SearchableDocumentRemover(
 
         return new RemoveSearchableDocumentResponse(success);
     }
+
+    public async Task RemoveAllSearchableDocuments(CancellationToken cancellationToken = default)
+    {
+        await azureBlobStorageClient.DeleteAllBlobsFromContainer(
+            appOptions.Value.SearchableDocumentsContainerName,
+            cancellationToken);
+    }
 }
