@@ -21,7 +21,7 @@ import SearchForm from '@frontend/components/SearchForm';
 import { SortOption } from '@frontend/components/SortControls';
 import FiltersAzureSearch from '@frontend/modules/find-statistics/components/FiltersAzureSearch';
 import PublicationSummary from '@frontend/modules/find-statistics/components/PublicationSummary';
-import { getParamsFromQuery } from '@frontend/modules/find-statistics/utils/createPublicationListRequest';
+import { getParamsFromQuery } from '@frontend/modules/find-statistics/utils/createAzurePublicationListRequest';
 import {
   PublicationFilter,
   publicationFilters,

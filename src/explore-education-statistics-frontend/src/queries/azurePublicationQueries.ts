@@ -1,4 +1,4 @@
-import createPublicationListRequest from '@frontend/modules/find-statistics/utils/createPublicationListRequest';
+import createAzurePublicationListRequest from '@frontend/modules/find-statistics/utils/createAzurePublicationListRequest';
 import { ParsedUrlQuery } from 'querystring';
 import { UseQueryOptions } from '@tanstack/react-query';
 import { PaginatedList } from '@common/services/types/pagination';
@@ -13,7 +13,7 @@ const azurePublicationQueries = {
       queryKey: ['listPublicationsAzure', query],
       queryFn: async () =>
         azurePublicationService.listPublications(
-          createPublicationListRequest(query),
+          createAzurePublicationListRequest(query),
         ),
     };
   },

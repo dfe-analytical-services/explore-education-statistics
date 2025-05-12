@@ -1,15 +1,8 @@
 /* eslint-disable no-restricted-syntax */
 import { env } from 'process';
-import {
-  PublicationListSummary,
-  PublicationSortParam,
-} from '@common/services/publicationService';
+import { PublicationListSummary } from '@common/services/publicationService';
 import { PaginatedList } from '@common/services/types/pagination';
-import {
-  AzureKeyCredential,
-  odata,
-  SearchClient,
-} from '@azure/search-documents';
+import { AzureKeyCredential, SearchClient } from '@azure/search-documents';
 import { ReleaseType } from '@common/services/types/releaseType';
 import { SortDirection } from '@common/services/types/sort';
 
@@ -25,14 +18,19 @@ export interface PublicationAzureSearchResult {
   title: string;
 }
 
+export type AzurePublicationOrderByParam =
+  | 'published asc'
+  | 'published desc'
+  | 'title asc'
+  | undefined;
+
 export interface AzurePublicationListRequest {
+  filter?: string;
   page?: number;
   pageSize?: number;
-  releaseType?: ReleaseType;
   search?: string;
-  sort?: PublicationSortParam;
+  orderBy?: AzurePublicationOrderByParam;
   sortDirection?: SortDirection;
-  themeId?: string;
 }
 
 const { AZURE_SEARCH_ENDPOINT, AZURE_SEARCH_INDEX, AZURE_SEARCH_QUERY_KEY } =
@@ -48,25 +46,16 @@ const azurePublicationService = {
   async listPublications(
     params: AzurePublicationListRequest,
   ): Promise<PaginatedList<PublicationListSummary>> {
-    const { releaseType, themeId, page, search } = params;
+    const { filter, orderBy, page = 1, search } = params;
 
-    let filter: string | undefined;
-    if (releaseType && themeId) {
-      filter = odata`releaseType eq ${releaseType} and theme eq ${themeId}`;
-    } else if (releaseType) {
-      filter = odata`releaseType eq ${releaseType}`;
-    } else if (themeId) {
-      // TODO amend theme to themeId once EES-6123 merged
-      filter = odata`theme eq ${themeId}`;
-    }
     const searchResults = await azureSearchClient.search(search || '', {
       // Pagination
       includeTotalCount: true,
       top: 10,
-      skip: page && page > 1 ? (page - 1) * 10 : 0,
-      queryType: 'semantic',
+      skip: page > 1 ? (page - 1) * 10 : 0,
 
       // Semantic search
+      // queryType: 'semantic',
       semanticSearchOptions: {
         configurationName: 'semantic-configuration-1',
       },
@@ -74,11 +63,10 @@ const azurePublicationService = {
       scoringProfile: 'scoring-profile-1',
       highlightFields: 'content',
 
-      // TODO Sorting
-      // orderBy: ["title asc"],
-      filter,
       // TODO amend theme to themeId once EES-6123 merged
       facets: ['theme,sort:count', 'releaseType'],
+      filter,
+      orderBy: orderBy ? [orderBy] : undefined,
       select: [
         'content',
         'releaseSlug',
@@ -98,14 +86,13 @@ const azurePublicationService = {
       paging: {
         totalPages: Math.floor((count || 0) / 10) + 1,
         totalResults: count || 0,
-        page: params.page || 1,
+        page,
         pageSize: 10,
       },
       results: [] as PublicationListSummary[],
     };
 
     for await (const result of results) {
-      // console.log(result);
       const { document } = result;
       const {
         theme,
@@ -134,4 +121,5 @@ const azurePublicationService = {
     return publicationsResult;
   },
 };
+
 export default azurePublicationService;
