@@ -60,12 +60,13 @@ public class PublicationCacheServiceTests : CacheServiceTestFixture
                 LegacyLinkUrl = "http://test.com/",
             }
         ],
-        Theme = new ThemeViewModel(
-            Guid.NewGuid(),
-            Slug: "",
-            Title: "",
-            Summary: ""
-        )
+        Theme = new ThemeViewModel
+        {
+            Id = Guid.NewGuid(),
+            Slug = "",
+            Title = "",
+            Summary = ""
+        }
     };
 
     [Fact]

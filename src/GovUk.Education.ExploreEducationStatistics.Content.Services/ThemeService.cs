@@ -9,29 +9,21 @@ using System.Threading.Tasks;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Services;
 
-public class ThemeService : IThemeService
+public class ThemeService(ContentDbContext contentDbContext) : IThemeService
 {
-    private readonly ContentDbContext _contentDbContext;
-
-    public ThemeService(ContentDbContext contentDbContext)
-    {
-        _contentDbContext = contentDbContext;
-    }
-
-    public async Task<IList<ThemeViewModel>> ListThemes()
-    {
-        return await _contentDbContext.Themes
+    public async Task<IList<ThemeViewModel>> ListThemes() =>
+        await contentDbContext.Themes
             .Where(theme =>
                 theme.Publications.Any(publication =>
                     publication.LatestPublishedReleaseVersionId.HasValue &&
                     (publication.SupersededById == null ||
-                    !publication.SupersededBy!.LatestPublishedReleaseVersionId.HasValue)))
+                     !publication.SupersededBy!.LatestPublishedReleaseVersionId.HasValue)))
             .OrderBy(theme => theme.Title)
-            .Select(theme => new ThemeViewModel(
-                theme.Id,
-                theme.Slug,
-                theme.Title,
-                theme.Summary
-            )).ToListAsync();
-    }
+            .Select(theme => new ThemeViewModel
+            {
+                Id = theme.Id,
+                Slug = theme.Slug,
+                Title = theme.Title,
+                Summary = theme.Summary
+            }).ToListAsync();
 }

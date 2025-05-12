@@ -206,12 +206,13 @@ public class PublicationService : IPublicationService
             Title = publication.Title,
             Summary = publication.Summary,
             Slug = publication.Slug,
-            Theme = new ThemeViewModel(
-                theme.Id,
-                theme.Slug,
-                theme.Title,
-                theme.Summary
-            ),
+            Theme = new ThemeViewModel
+            {
+                Id = theme.Id,
+                Slug = theme.Slug,
+                Title = theme.Title,
+                Summary = theme.Summary
+            },
             Contact = new ContactViewModel(publication.Contact),
             ExternalMethodology = publication.ExternalMethodology != null
                 ? new ExternalMethodologyViewModel(publication.ExternalMethodology)

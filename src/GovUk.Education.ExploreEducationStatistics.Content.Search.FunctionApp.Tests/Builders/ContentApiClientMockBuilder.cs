@@ -20,7 +20,7 @@ internal class ContentApiClientMockBuilder
             .Setup(m => m.GetPublicationLatestReleaseSearchableDocument(
                 It.IsAny<string>(),
                 It.IsAny<CancellationToken>()))
-            .ReturnsAsync(_releaseSearchableDocument ?? _releaseSearchableDocumentBuilder.Build());
+            .ReturnsAsync(() => _releaseSearchableDocument ?? _releaseSearchableDocumentBuilder.Build());
 
         _mock
             .Setup(m => m.GetPublicationsForTheme(
