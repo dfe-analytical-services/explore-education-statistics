@@ -29,4 +29,9 @@ public interface IAzureBlobStorageClient
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
     Task<bool> ContainerExists(string containerName, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Delete all blobs from the specified container
+    /// </summary>
+    Task DeleteAllBlobsFromContainer(string containerName, CancellationToken cancellationToken);
 }
