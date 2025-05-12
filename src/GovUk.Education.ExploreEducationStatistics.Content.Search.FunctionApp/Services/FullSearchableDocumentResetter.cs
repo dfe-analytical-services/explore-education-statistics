@@ -16,7 +16,7 @@ public class FullSearchableDocumentResetter(
         await searchableDocumentRemover.RemoveAllSearchableDocuments(cancellationToken);
         
         // Get list of all live publications
-        var allPublications = await contentApiClient.GetAllLivePublicationSlugs(cancellationToken);
+        var allPublications = await contentApiClient.GetAllLivePublicationInfos(cancellationToken);
         
         // Return list of slugs to send to the Searchable Document creator
         return new PerformResetResponse { AllPublications = allPublications };

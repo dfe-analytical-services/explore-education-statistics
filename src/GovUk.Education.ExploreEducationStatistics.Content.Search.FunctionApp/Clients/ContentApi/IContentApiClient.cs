@@ -36,4 +36,9 @@ public interface IContentApiClient
     Task<ReleaseInfo[]> GetReleasesForPublication(
         string publicationSlug,
         CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Retrieves the slugs for all live publications
+    /// </summary>
+    Task<PublicationInfo[]> GetAllLivePublicationInfos(CancellationToken cancellationToken);
 }
