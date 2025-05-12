@@ -97,7 +97,7 @@ public class PublicZipDownloadsProcessor(
             }
             catch (DuckDBException e)
             {
-                logger.LogError(e, "Failed to process analytics request file {Filename}", filename);
+                logger.LogError(e, "Failed to process zip download request file {Filename}", filename);
                 MoveBadFileToFailuresDirectory(filename);
             }
         }

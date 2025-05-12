@@ -63,6 +63,27 @@ public class AnalyticsPathResolver : IAnalyticsPathResolver
     {
         return Path.Combine(ReportsDirectoryPath(), "public-api", "queries");
     }
+    
+    // PublicApiQueries
+    public string PublicApiDataSetVersionCallsDirectoryPath()
+    {
+        return Path.Combine(_basePath, "public-api", "get-meta");
+    }
+
+    public string PublicApiDataSetVersionCallsProcessingDirectoryPath()
+    {
+        return Path.Combine(PublicApiDataSetVersionCallsDirectoryPath(), "processing");
+    }
+
+    public string PublicApiDataSetVersionCallsFailuresDirectoryPath()
+    {
+        return Path.Combine(PublicApiDataSetVersionCallsDirectoryPath(), "failures");
+    }
+
+    public string PublicApiDataSetVersionCallsReportsDirectoryPath()
+    {
+        return Path.Combine(PublicApiDataSetVersionCallsDirectoryPath(), "public-api", "get-meta");
+    }
 
     // PublicZipDownloads
     public string PublicZipDownloadsDirectoryPath()

@@ -14,7 +14,8 @@ public abstract class PublicApiQueriesProcessorTests
     private readonly string _queryResourcesPath = Path.Combine(
         Assembly.GetExecutingAssembly().GetDirectoryPath(),
         "Resources",
-        "PublicApiQueries");
+        "PublicApi",
+        "Queries");
 
     public class ProcessTests : PublicApiQueriesProcessorTests
     {
