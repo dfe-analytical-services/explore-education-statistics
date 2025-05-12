@@ -1,16 +1,7 @@
 ﻿using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Clients.ContentApi;
-using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Domain;
 using Microsoft.Extensions.Logging;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Services;
-
-public interface IFullSearchableDocumentResetter
-{
-    /// <summary>
-    /// Delete all Searchable Documents from Azure storage, and return a list of all live publications.
-    /// </summary>
-    Task<PerformResetResponse> PerformReset(CancellationToken cancellationToken = default);
-}
 
 public class FullSearchableDocumentResetter(
     IContentApiClient contentApiClient,
@@ -30,9 +21,4 @@ public class FullSearchableDocumentResetter(
         // Return list of slugs to send to the Searchable Document creator
         return new PerformResetResponse { AllPublications = allPublications };
     }
-}
-
-public class PerformResetResponse
-{
-    public PublicationInfo[] AllPublications { get; init; }
 }
