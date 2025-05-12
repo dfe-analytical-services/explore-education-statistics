@@ -36,17 +36,10 @@ public class DuckDbConnection(string connectionString = DuckDBConnectionStringBu
         return command;
     }
     
-    public int ExecuteNonQuery(string commandText)
+    public async Task<int> ExecuteNonQueryAsync(string commandText)
     {
-        var command = CreateCommand();
+        await using var command = CreateCommand();
         command.CommandText = commandText;
-        return command.ExecuteNonQuery();
-    }
-    
-    public Task<int> ExecuteNonQueryAsync(string commandText)
-    {
-        var command = CreateCommand();
-        command.CommandText = commandText;
-        return command.ExecuteNonQueryAsync();
+        return await command.ExecuteNonQueryAsync();
     }
 }

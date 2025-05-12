@@ -81,7 +81,7 @@ public class PublicZipDownloadsProcessor(
             var reportFilePath = 
                 $"{reportsFilePathAndFilenamePrefix}_public-zip-downloads.parquet";
 
-            connection.ExecuteNonQuery($@"
+            await connection.ExecuteNonQueryAsync($@"
                 COPY (SELECT * FROM zipDownloadsReport)
                 TO '{reportFilePath}' (FORMAT 'parquet', CODEC 'zstd')");
         }
