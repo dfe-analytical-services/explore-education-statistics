@@ -115,7 +115,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 UserId = Guid.NewGuid(),
                 ReleaseVersionId = Guid.NewGuid(),
-                Role = Lead,
+                Role = Approver,
                 CreatedById = Guid.NewGuid(),
                 Created = new DateTime(2021, 12, 25),
             };
@@ -351,7 +351,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 UserId = Guid.NewGuid(),
                 ReleaseVersionId = Guid.NewGuid(),
-                Role = Lead,
+                Role = Approver,
                 Deleted = null,
                 DeletedById = null,
             };
@@ -384,7 +384,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 UserId = Guid.NewGuid(),
                 ReleaseVersionId = Guid.NewGuid(),
-                Role = Lead,
+                Role = Approver,
                 Deleted = null,
                 DeletedById = null,
             };
@@ -418,15 +418,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public async Task RemoveMany()
         {
             var deletedById = Guid.NewGuid();
+
             var userReleaseRole1 = new UserReleaseRole
-            {
-                UserId = Guid.NewGuid(),
-                ReleaseVersionId = Guid.NewGuid(),
-                Role = Lead,
-                Deleted = null,
-                DeletedById = null,
-            };
-            var userReleaseRole2 = new UserReleaseRole
             {
                 UserId = Guid.NewGuid(),
                 ReleaseVersionId = Guid.NewGuid(),
@@ -434,7 +427,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Deleted = null,
                 DeletedById = null,
             };
-            var userReleaseRole3 = new UserReleaseRole
+            var userReleaseRole2 = new UserReleaseRole
             {
                 UserId = Guid.NewGuid(),
                 ReleaseVersionId = Guid.NewGuid(),
@@ -454,7 +447,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var contentDbContextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                await contentDbContext.AddRangeAsync(userReleaseRole1, userReleaseRole2, userReleaseRole3,
+                await contentDbContext.AddRangeAsync(userReleaseRole1, userReleaseRole2,
                     notDeletedUserReleaseRole);
                 await contentDbContext.SaveChangesAsync();
             }
@@ -463,7 +456,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 var service = SetupUserReleaseRoleRepository(contentDbContext);
                 await service.RemoveMany(
-                    ListOf(userReleaseRole1, userReleaseRole2, userReleaseRole3),
+                    ListOf(userReleaseRole1, userReleaseRole2),
                     deletedById);
 
                 var userReleaseRole = await contentDbContext.UserReleaseRoles
@@ -477,15 +470,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public async Task RemoveMany_IgnoreQueryFilters()
         {
             var deletedById = Guid.NewGuid();
+
             var userReleaseRole1 = new UserReleaseRole
-            {
-                UserId = Guid.NewGuid(),
-                ReleaseVersionId = Guid.NewGuid(),
-                Role = Lead,
-                Deleted = null,
-                DeletedById = null,
-            };
-            var userReleaseRole2 = new UserReleaseRole
             {
                 UserId = Guid.NewGuid(),
                 ReleaseVersionId = Guid.NewGuid(),
@@ -493,7 +479,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Deleted = null,
                 DeletedById = null,
             };
-            var userReleaseRole3 = new UserReleaseRole
+            var userReleaseRole2 = new UserReleaseRole
             {
                 UserId = Guid.NewGuid(),
                 ReleaseVersionId = Guid.NewGuid(),
@@ -513,7 +499,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var contentDbContextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                await contentDbContext.AddRangeAsync(userReleaseRole1, userReleaseRole2, userReleaseRole3,
+                await contentDbContext.AddRangeAsync(userReleaseRole1, userReleaseRole2,
                     notDeletedUserReleaseRole);
                 await contentDbContext.SaveChangesAsync();
             }
@@ -522,7 +508,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 var service = SetupUserReleaseRoleRepository(contentDbContext);
                 await service.RemoveMany(
-                    ListOf(userReleaseRole1, userReleaseRole2, userReleaseRole3),
+                    ListOf(userReleaseRole1, userReleaseRole2),
                     deletedById);
 
                 var userReleaseRoles = await contentDbContext.UserReleaseRoles
@@ -542,17 +528,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 userReleaseRoles[1].Deleted.AssertUtcNow();
                 Assert.Equal(deletedById, userReleaseRoles[1].DeletedById);
 
-                Assert.Equal(userReleaseRole3.Id, userReleaseRoles[2].Id);
-                Assert.Equal(userReleaseRole3.ReleaseVersionId, userReleaseRoles[2].ReleaseVersionId);
-                Assert.Equal(userReleaseRole3.Role, userReleaseRoles[2].Role);
-                userReleaseRoles[2].Deleted.AssertUtcNow();
-                Assert.Equal(deletedById, userReleaseRoles[2].DeletedById);
-
-                Assert.Equal(notDeletedUserReleaseRole.Id, userReleaseRoles[3].Id);
-                Assert.Equal(notDeletedUserReleaseRole.ReleaseVersionId, userReleaseRoles[3].ReleaseVersionId);
-                Assert.Equal(notDeletedUserReleaseRole.Role, userReleaseRoles[3].Role);
-                Assert.Null(userReleaseRoles[3].Deleted);
-                Assert.Null(userReleaseRoles[3].DeletedById);
+                Assert.Equal(notDeletedUserReleaseRole.Id, userReleaseRoles[2].Id);
+                Assert.Equal(notDeletedUserReleaseRole.ReleaseVersionId, userReleaseRoles[2].ReleaseVersionId);
+                Assert.Equal(notDeletedUserReleaseRole.Role, userReleaseRoles[2].Role);
+                Assert.Null(userReleaseRoles[2].Deleted);
+                Assert.Null(userReleaseRoles[2].DeletedById);
             }
         }
 
@@ -654,7 +634,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 {
                     User = user,
                     ReleaseVersion = releaseVersion,
-                    Role = Lead
+                    Role = PrereleaseViewer
                 }
             };
 
@@ -696,7 +676,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 Assert.Equal(2, result.Count);
                 Assert.Equal(Contributor, result[0]);
-                Assert.Equal(Lead, result[1]);
+                Assert.Equal(PrereleaseViewer, result[1]);
             }
         }
 
@@ -724,7 +704,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     {
                         Publication = publication
                     },
-                    Role = Lead
+                    Role = Approver
                 },
                 // Add a duplicate ReleaseRole to ensure duplicates are removed by the method under test
                 new()
@@ -734,7 +714,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     {
                         Publication = publication
                     },
-                    Role = Lead
+                    Role = Approver
                 }
             };
 
@@ -749,7 +729,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     {
                         Publication = otherPublication
                     },
-                    Role = Approver
+                    Role = PrereleaseViewer
                 },
                 // Role for same Publication but different user
                 new()
@@ -759,7 +739,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     {
                         Publication = publication
                     },
-                    Role = Approver
+                    Role = PrereleaseViewer
                 }
             };
 
@@ -781,7 +761,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 Assert.Equal(2, result.Count);
                 Assert.Equal(Contributor, result[0]);
-                Assert.Equal(Lead, result[1]);
+                Assert.Equal(Approver, result[1]);
             }
         }
 
@@ -804,7 +784,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 {
                     User = user,
                     ReleaseVersion = release1,
-                    Role = Lead
+                    Role = PrereleaseViewer
                 },
                 new()
                 {
@@ -816,7 +796,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 {
                     User = user,
                     ReleaseVersion = release2,
-                    Role = Lead
+                    Role = PrereleaseViewer
                 }
             };
 
@@ -855,10 +835,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var result = await service.GetDistinctRolesByUser(user.Id);
 
-                // Expect 3 distinct results.  The 4th duplicate "Lead" role is filtered out.
+                // Expect 3 distinct results.  The 4th duplicate "PrereleaseViewer" role is filtered out.
                 Assert.Equal(3, result.Count);
                 Assert.Equal(Contributor, result[0]);
-                Assert.Equal(Lead, result[1]);
+                Assert.Equal(PrereleaseViewer, result[1]);
                 Assert.Equal(Approver, result[2]);
             }
         }

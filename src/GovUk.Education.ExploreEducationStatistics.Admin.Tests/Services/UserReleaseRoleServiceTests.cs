@@ -48,7 +48,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 User = new User { Id = Guid.NewGuid() },
                 ReleaseVersion = publication.ReleaseVersions[0],
-                Role = Lead,
+                Role = Approver,
             };
             var userReleaseRoleIgnored2 = new UserReleaseRole // Ignored because Deleted set
             {

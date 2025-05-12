@@ -254,7 +254,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 Id = Guid.NewGuid(),
                 UserId = Guid.NewGuid(),
-                Role = ReleaseRole.Lead,
+                Role = ReleaseRole.Contributor,
                 ReleaseVersion = originalReleaseVersion,
                 ReleaseVersionId = originalReleaseVersion.Id,
                 Deleted = DateTime.UtcNow,
