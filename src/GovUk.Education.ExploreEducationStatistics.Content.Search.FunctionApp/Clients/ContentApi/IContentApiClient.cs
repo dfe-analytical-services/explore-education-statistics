@@ -40,5 +40,5 @@ public interface IContentApiClient
     /// <summary>
     /// Retrieves the slugs for all live publications
     /// </summary>
-    Task<PublicationInfo[]> GetAllLivePublicationInfos(CancellationToken cancellationToken);
+    Task<PublicationInfo[]> GetAllLivePublicationInfos(CancellationToken cancellationToken = default);
 }

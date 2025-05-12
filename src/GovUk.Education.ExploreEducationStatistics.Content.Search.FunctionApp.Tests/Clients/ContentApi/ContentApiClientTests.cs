@@ -131,9 +131,22 @@ public class ContentApiClientTests(ITestOutputHelper output)
             var sut = GetSut();
             const string publicationSlug = "seed-publication-pupil-absence-in-schools-in-england";
             var releases = await sut.GetReleasesForPublication(publicationSlug);
+            Print($"{releases.Length} releases found");
             foreach (var release in releases)
             {
                 Print(release.ReleaseId.ToString());
+            }
+        }        
+        
+        [Fact(Skip = "Call Content API to get all publication infos")]
+        public async Task GetAllPublicationInfos()
+        {
+            var sut = GetSut();
+            var publicationInfos = await sut.GetAllLivePublicationInfos();
+            Print($"{publicationInfos.Length} publications found");
+            foreach (var publicationInfo in publicationInfos)
+            {
+                Print(publicationInfo.ToString());
             }
         }
     }
