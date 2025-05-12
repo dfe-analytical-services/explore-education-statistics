@@ -1,5 +1,4 @@
-﻿namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.
-    RemovePublicationSearchableDocuments.Dto;
+﻿namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.CommandHandlers.RemovePublicationSearchableDocuments.Dto;
 
 public record RemovePublicationSearchableDocumentsDto
 {
