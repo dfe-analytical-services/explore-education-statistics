@@ -334,7 +334,7 @@
           ],
           "prioritizedKeywordsFields": [
             {
-              "fieldName": "theme"
+              "fieldName": "themeTitle"
             }
           ]
         }
