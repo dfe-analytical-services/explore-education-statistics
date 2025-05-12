@@ -1,3 +1,4 @@
+import { FacetResult } from '@azure/search-documents';
 import VisuallyHidden from '@common/components/VisuallyHidden';
 import { FormGroup, FormSelect } from '@common/components/form';
 import { ThemeSummary } from '@common/services/themeService';
@@ -29,6 +30,7 @@ interface Props {
   showResetFiltersButton?: boolean;
   sortBy: SortOptionType;
   sortOptions: SortOption[];
+  themeFacetResults?: FacetResult[];
   themeId?: string;
   themes: ThemeSummary[];
   onChange: FilterChangeHandler;
@@ -41,6 +43,7 @@ export default function Filters({
   showResetFiltersButton,
   sortBy,
   sortOptions,
+  themeFacetResults,
   themeId,
   themes,
   onChange,
@@ -73,12 +76,18 @@ export default function Filters({
             </>
           }
           name="themeId"
+          // TODO change to lookup label from `themes` when EES-6123 merged
           options={[
             { label: 'All themes', value: 'all' },
-            ...themes.map(theme => ({
-              label: theme.title,
-              value: theme.id,
-            })),
+            ...(themeFacetResults
+              ? themeFacetResults.map(result => ({
+                  label: `${result.value} (${result.count})`,
+                  value: result.value,
+                }))
+              : themes.map(theme => ({
+                  label: theme.title,
+                  value: theme.id,
+                }))),
           ]}
           value={themeId ?? 'all'}
           order={[]}

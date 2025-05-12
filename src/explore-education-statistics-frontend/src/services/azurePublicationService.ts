@@ -2,7 +2,11 @@
 import { env } from 'process';
 import { PublicationListSummary } from '@common/services/publicationService';
 import { PaginatedList } from '@common/services/types/pagination';
-import { AzureKeyCredential, SearchClient } from '@azure/search-documents';
+import {
+  AzureKeyCredential,
+  FacetResult,
+  SearchClient,
+} from '@azure/search-documents';
 import { ReleaseType } from '@common/services/types/releaseType';
 import { SortDirection } from '@common/services/types/sort';
 
@@ -16,6 +20,12 @@ export interface PublicationAzureSearchResult {
   summary: string;
   theme: string;
   title: string;
+}
+
+type AzureFacetKey = 'theme' | 'releaseType';
+
+export interface PaginatedListWithAzureFacets<T> extends PaginatedList<T> {
+  facets: Record<AzureFacetKey, FacetResult[]>;
 }
 
 export type AzurePublicationOrderByParam =
@@ -45,7 +55,7 @@ const azureSearchClient = new SearchClient<PublicationAzureSearchResult>(
 const azurePublicationService = {
   async listPublications(
     params: AzurePublicationListRequest,
-  ): Promise<PaginatedList<PublicationListSummary>> {
+  ): Promise<PaginatedListWithAzureFacets<PublicationListSummary>> {
     const { filter, orderBy, page = 1, search } = params;
 
     const searchResults = await azureSearchClient.search(search || '', {
@@ -81,7 +91,7 @@ const azurePublicationService = {
     });
 
     // Transform response into <PaginatedList<PublicationListSummary>>
-    const { count, results } = searchResults;
+    const { count, results, facets = {} } = searchResults;
     const publicationsResult = {
       paging: {
         totalPages: Math.floor((count || 0) / 10) + 1,
@@ -90,6 +100,7 @@ const azurePublicationService = {
         pageSize: 10,
       },
       results: [] as PublicationListSummary[],
+      facets,
     };
 
     for await (const result of results) {
