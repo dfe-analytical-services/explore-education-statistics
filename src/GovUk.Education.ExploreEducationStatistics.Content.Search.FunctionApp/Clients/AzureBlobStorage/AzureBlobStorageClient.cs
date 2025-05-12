@@ -1,5 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
 using Azure.Storage.Blobs;
+using Azure.Storage.Blobs.Models;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Exceptions;
 using Microsoft.Extensions.Logging;
 
@@ -18,10 +19,9 @@ public class AzureBlobStorageClient(
         CancellationToken cancellationToken = default)
     {
         var blobContainerClient = BlobServiceClient.GetBlobContainerClient(containerName);
-        var blobClient = blobContainerClient.GetBlobClient(blobName);
         try
         {
-            return await blobClient.DeleteIfExistsAsync(cancellationToken: cancellationToken);
+            return await blobContainerClient.DeleteIfExistsAsync(cancellationToken: cancellationToken);
         }
         catch (Exception e)
         {
@@ -58,5 +58,20 @@ public class AzureBlobStorageClient(
     {
         var blobContainerClient = BlobServiceClient.GetBlobContainerClient(containerName);
         return await blobContainerClient.ExistsAsync(cancellationToken);
+    }
+
+    public async Task DeleteAllBlobsFromContainer(string containerName, CancellationToken cancellationToken)
+    {
+        var blobContainerClient = BlobServiceClient.GetBlobContainerClient(containerName);
+        var asyncPageable = blobContainerClient.GetBlobsAsync(cancellationToken: cancellationToken);
+        var blobNames = new List<string>();
+        await foreach (var blob in asyncPageable)
+        {
+            blobNames.Add(blob.Name);
+        }
+
+        await Task.WhenAll(
+            blobNames.Select(blobName => 
+                    blobContainerClient.DeleteBlobIfExistsAsync(blobName, cancellationToken: cancellationToken)));
     }
 }
