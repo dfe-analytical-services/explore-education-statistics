@@ -28,7 +28,7 @@ public abstract class PublicApiQueriesProcessorTests
                 pathResolver: pathResolver);
             await service.Process();
 
-            Assert.False(Directory.Exists(pathResolver.PublicApiQueriesProcessingDirectoryPath()));
+            Assert.False(Directory.Exists(ProcessingDirectoryPath(pathResolver)));
             Assert.False(Directory.Exists(pathResolver.PublicApiQueriesReportsDirectoryPath()));
         }
 
@@ -45,7 +45,7 @@ public abstract class PublicApiQueriesProcessorTests
 
             // Check that as there were no files to process, no working directories were
             // created as a result.
-            Assert.False(Directory.Exists(pathResolver.PublicApiQueriesProcessingDirectoryPath()));
+            Assert.False(Directory.Exists(ProcessingDirectoryPath(pathResolver)));
             Assert.False(Directory.Exists(pathResolver.PublicApiQueriesReportsDirectoryPath()));
         }
 
@@ -59,7 +59,7 @@ public abstract class PublicApiQueriesProcessorTests
                 pathResolver: pathResolver);
             await service.Process();
 
-            Assert.False(Directory.Exists(pathResolver.PublicApiQueriesProcessingDirectoryPath()));
+            Assert.False(Directory.Exists(ProcessingDirectoryPath(pathResolver)));
             Assert.True(Directory.Exists(pathResolver.PublicApiQueriesReportsDirectoryPath()));
 
             var reports = Directory.GetFiles(pathResolver.PublicApiQueriesReportsDirectoryPath());
@@ -385,7 +385,6 @@ public abstract class PublicApiQueriesProcessorTests
         TestAnalyticsPathResolver pathResolver)
     {
         return new PublicApiQueriesProcessor(
-            duckDbConnection: new DuckDbConnection(),
             pathResolver: pathResolver,
             Mock.Of<ILogger<PublicApiQueriesProcessor>>());
     }
@@ -396,6 +395,11 @@ public abstract class PublicApiQueriesProcessorTests
 
         var sourceFilePath = Path.Combine(_queryResourcesPath, filename);
         File.Copy(sourceFilePath, Path.Combine(pathResolver.PublicApiQueriesDirectoryPath(), filename));
+    }
+    
+    private static string ProcessingDirectoryPath(TestAnalyticsPathResolver pathResolver)
+    {
+        return Path.Combine(pathResolver.PublicApiQueriesDirectoryPath(), "processing");
     }
 
     // ReSharper disable once ClassNeverInstantiated.Local

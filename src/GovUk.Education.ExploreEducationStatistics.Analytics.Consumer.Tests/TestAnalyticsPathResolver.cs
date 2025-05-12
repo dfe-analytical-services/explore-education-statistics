@@ -29,14 +29,6 @@ public class TestAnalyticsPathResolver : IAnalyticsPathResolver, IDisposable
         return Path.Combine(_basePath, "public-api", "queries");
     }
 
-    public string PublicApiQueriesProcessingDirectoryPath() {
-        return Path.Combine(_basePath, "public-api", "queries", "processing");
-    }
-
-    public string PublicApiQueriesFailuresDirectoryPath() {
-        return Path.Combine(_basePath, "public-api", "queries", "failures");
-    }
-
     public string PublicApiQueriesReportsDirectoryPath() {
         return Path.Combine(_basePath, "reports", "public-api", "queries");
     }
@@ -47,14 +39,6 @@ public class TestAnalyticsPathResolver : IAnalyticsPathResolver, IDisposable
         return Path.Combine(_basePath, "public-api", "get-meta");
     }
 
-    public string PublicApiDataSetVersionCallsProcessingDirectoryPath() {
-        return Path.Combine(PublicApiDataSetVersionCallsDirectoryPath(), "processing");
-    }
-
-    public string PublicApiDataSetVersionCallsFailuresDirectoryPath() {
-        return Path.Combine(PublicApiDataSetVersionCallsDirectoryPath(), "failures");
-    }
-
     public string PublicApiDataSetVersionCallsReportsDirectoryPath() {
         return Path.Combine(_basePath, "reports", "public-api", "get-meta");
     }
@@ -63,14 +47,6 @@ public class TestAnalyticsPathResolver : IAnalyticsPathResolver, IDisposable
     public string PublicZipDownloadsDirectoryPath()
     {
         return Path.Combine(_basePath, "public", "zip-downloads");
-    }
-
-    public string PublicZipDownloadsProcessingDirectoryPath() {
-        return Path.Combine(PublicZipDownloadsDirectoryPath(), "processing");
-    }
-
-    public string PublicZipDownloadsFailuresDirectoryPath() {
-        return Path.Combine(PublicZipDownloadsDirectoryPath(), "failures");
     }
 
     public string PublicZipDownloadsReportsDirectoryPath() {

@@ -28,7 +28,7 @@ public abstract class PublicApiDataSetVersionCallsProcessorTests
                 pathResolver: pathResolver);
             await service.Process();
 
-            Assert.False(Directory.Exists(pathResolver.PublicApiDataSetVersionCallsProcessingDirectoryPath()));
+            Assert.False(Directory.Exists(ProcessingDirectoryPath(pathResolver)));
             Assert.False(Directory.Exists(pathResolver.PublicApiDataSetVersionCallsReportsDirectoryPath()));
         }
 
@@ -45,7 +45,7 @@ public abstract class PublicApiDataSetVersionCallsProcessorTests
 
             // Check that as there were no files to process, no working directories were
             // created as a result.
-            Assert.False(Directory.Exists(pathResolver.PublicApiDataSetVersionCallsProcessingDirectoryPath()));
+            Assert.False(Directory.Exists(ProcessingDirectoryPath(pathResolver)));
             Assert.False(Directory.Exists(pathResolver.PublicApiDataSetVersionCallsReportsDirectoryPath()));
         }
 
@@ -58,7 +58,7 @@ public abstract class PublicApiDataSetVersionCallsProcessorTests
             var service = BuildService(pathResolver: pathResolver);
             await service.Process();
 
-            Assert.False(Directory.Exists(pathResolver.PublicApiDataSetVersionCallsProcessingDirectoryPath()));
+            Assert.False(Directory.Exists(ProcessingDirectoryPath(pathResolver)));
             Assert.True(Directory.Exists(pathResolver.PublicApiDataSetVersionCallsReportsDirectoryPath()));
 
             var reports = Directory.GetFiles(pathResolver.PublicApiDataSetVersionCallsReportsDirectoryPath());
@@ -92,7 +92,7 @@ public abstract class PublicApiDataSetVersionCallsProcessorTests
             var service = BuildService(pathResolver: pathResolver);
             await service.Process();
 
-            Assert.False(Directory.Exists(pathResolver.PublicApiDataSetVersionCallsProcessingDirectoryPath()));
+            Assert.False(Directory.Exists(ProcessingDirectoryPath(pathResolver)));
             Assert.True(Directory.Exists(pathResolver.PublicApiDataSetVersionCallsReportsDirectoryPath()));
 
             var reports = Directory.GetFiles(pathResolver.PublicApiDataSetVersionCallsReportsDirectoryPath());
@@ -126,7 +126,7 @@ public abstract class PublicApiDataSetVersionCallsProcessorTests
             var service = BuildService(pathResolver: pathResolver);
             await service.Process();
 
-            Assert.False(Directory.Exists(pathResolver.PublicApiDataSetVersionCallsProcessingDirectoryPath()));
+            Assert.False(Directory.Exists(ProcessingDirectoryPath(pathResolver)));
             Assert.True(Directory.Exists(pathResolver.PublicApiDataSetVersionCallsReportsDirectoryPath()));
 
             var reports = Directory.GetFiles(pathResolver.PublicApiDataSetVersionCallsReportsDirectoryPath());
@@ -162,7 +162,7 @@ public abstract class PublicApiDataSetVersionCallsProcessorTests
             var service = BuildService(pathResolver: pathResolver);
             await service.Process();
 
-            Assert.False(Directory.Exists(pathResolver.PublicApiDataSetVersionCallsProcessingDirectoryPath()));
+            Assert.False(Directory.Exists(ProcessingDirectoryPath(pathResolver)));
             Assert.True(Directory.Exists(pathResolver.PublicApiDataSetVersionCallsReportsDirectoryPath()));
 
             var reports = Directory.GetFiles(pathResolver.PublicApiDataSetVersionCallsReportsDirectoryPath());
@@ -254,7 +254,6 @@ public abstract class PublicApiDataSetVersionCallsProcessorTests
         TestAnalyticsPathResolver pathResolver)
     {
         return new PublicApiDataSetVersionCallsProcessor(
-            duckDbConnection: new DuckDbConnection(),
             pathResolver: pathResolver,
             Mock.Of<ILogger<PublicApiDataSetVersionCallsProcessor>>());
     }
@@ -266,7 +265,12 @@ public abstract class PublicApiDataSetVersionCallsProcessorTests
         var sourceFilePath = Path.Combine(_queryResourcesPath, filename);
         File.Copy(sourceFilePath, Path.Combine(pathResolver.PublicApiDataSetVersionCallsDirectoryPath(), filename));
     }
-
+    
+    private static string ProcessingDirectoryPath(TestAnalyticsPathResolver pathResolver)
+    {
+        return Path.Combine(pathResolver.PublicApiDataSetVersionCallsDirectoryPath(), "processing");
+    }
+    
     // ReSharper disable once ClassNeverInstantiated.Local
     private record QueryReportLine
     {

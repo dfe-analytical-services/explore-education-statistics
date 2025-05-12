@@ -30,7 +30,7 @@ public abstract class PublicZipDownloadsProcessorTests
                 pathResolver: pathResolver);
             await service.Process();
 
-            Assert.False(Directory.Exists(pathResolver.PublicZipDownloadsProcessingDirectoryPath()));
+            Assert.False(Directory.Exists(ProcessingDirectoryPath(pathResolver)));
             Assert.False(Directory.Exists(pathResolver.PublicZipDownloadsReportsDirectoryPath()));
         }
 
@@ -47,7 +47,7 @@ public abstract class PublicZipDownloadsProcessorTests
 
             // Check that as there were no files to process, no working directories were
             // created as a result.
-            Assert.False(Directory.Exists(pathResolver.PublicZipDownloadsProcessingDirectoryPath()));
+            Assert.False(Directory.Exists(ProcessingDirectoryPath(pathResolver)));
             Assert.False(Directory.Exists(pathResolver.PublicZipDownloadsReportsDirectoryPath()));
         }
 
@@ -61,7 +61,7 @@ public abstract class PublicZipDownloadsProcessorTests
                 pathResolver: pathResolver);
             await service.Process();
 
-            Assert.False(Directory.Exists(pathResolver.PublicZipDownloadsProcessingDirectoryPath()));
+            Assert.False(Directory.Exists(ProcessingDirectoryPath(pathResolver)));
             Assert.True(Directory.Exists(pathResolver.PublicZipDownloadsReportsDirectoryPath()));
 
             var reports = Directory.GetFiles(pathResolver.PublicZipDownloadsReportsDirectoryPath());
@@ -165,7 +165,6 @@ public abstract class PublicZipDownloadsProcessorTests
         TestAnalyticsPathResolver pathResolver)
     {
         return new PublicZipDownloadsProcessor(
-            duckDbConnection: new DuckDbConnection(),
             pathResolver: pathResolver,
             Mock.Of<ILogger<PublicZipDownloadsProcessor>>());
     }
@@ -205,6 +204,11 @@ public abstract class PublicZipDownloadsProcessorTests
 
         Assert.Equal(hashSb.ToString(), row.ZipDownloadHash);
         Assert.Equal(numRequests, row.Downloads);
+    }
+    
+    private static string ProcessingDirectoryPath(TestAnalyticsPathResolver pathResolver)
+    {
+        return Path.Combine(pathResolver.PublicZipDownloadsDirectoryPath(), "processing");
     }
 
     public record CaptureZipDownloadRequest(
