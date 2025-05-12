@@ -122,6 +122,18 @@ internal class ContentApiClient(HttpClient httpClient) : IContentApiClient
         };
     }
 
+    public async Task<PublicationInfo[]> GetAllLivePublicationInfos(CancellationToken cancellationToken)
+    {
+        var publicationDtos =
+            await GetAllPaginatedItems<PublicationDto>(page => BuildGetPublicationsPageEndpoint(page, numberOfItems:30),
+                cancellationToken);
+        
+        return publicationDtos
+            .Where(dto => !string.IsNullOrEmpty(dto.Slug))
+            .Select(dto => new PublicationInfo { PublicationSlug = dto.Slug! })
+            .ToArray();
+    }
+
     private async Task<TResponse[]> GetAllPaginatedItems<TResponse>(
         Func<int, string> getPageApiEndpoint, CancellationToken cancellationToken)
     {
