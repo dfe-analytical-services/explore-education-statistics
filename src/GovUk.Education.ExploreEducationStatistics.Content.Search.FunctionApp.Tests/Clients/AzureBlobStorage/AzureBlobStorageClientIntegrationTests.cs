@@ -1,4 +1,4 @@
-﻿using Azure.Storage.Blobs;
+using Azure.Storage.Blobs;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Clients.AzureBlobStorage;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Exceptions;
 using Microsoft.Extensions.Logging;
@@ -82,6 +82,16 @@ public class AzureBlobStorageClientIntegrationTests
                 
                 // ACT
                 await AzureBlobStorageIntegrationHelper.DeleteAsync(sut.BlobServiceClient, IntegrationTestContainerName, uniqueBlobName);
+            }
+
+            [Fact]
+            public async Task DeleteAllBlobsFromContainer()
+            {
+                // ARRANGE
+                var sut = GetSut();
+                
+                // ACT
+                await sut.DeleteAllBlobsFromContainer(IntegrationTestContainerName);
             }
         }    
     }

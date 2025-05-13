@@ -11,7 +11,7 @@ internal class ContentApiClientMockBuilder
     private ReleaseSearchableDocument? _releaseSearchableDocument;
     private PublicationInfo[]? _publicationsForTheme;
     private ReleaseInfo[]? _releasesForPublication;
-    private PublicationInfo[]? _eesPublications;
+    private PublicationInfo[]? _publications;
 
     public ContentApiClientMockBuilder()
     {
@@ -38,7 +38,7 @@ internal class ContentApiClientMockBuilder
         _mock
             .Setup(m => m.GetAllLivePublicationInfos(
                 It.IsAny<CancellationToken>()))
-            .ReturnsAsync(() => _eesPublications ?? []);
+            .ReturnsAsync(() => _publications ?? []);
     }
 
     public IContentApiClient Build()
@@ -72,9 +72,9 @@ internal class ContentApiClientMockBuilder
         return this;
     }
 
-    public ContentApiClientMockBuilder WhereEESHasPublications(params PublicationInfo[] publications)
+    public ContentApiClientMockBuilder WhereHasPublications(params PublicationInfo[] publications)
     {
-        _eesPublications = publications;
+        _publications = publications;
         return this;
     }
 

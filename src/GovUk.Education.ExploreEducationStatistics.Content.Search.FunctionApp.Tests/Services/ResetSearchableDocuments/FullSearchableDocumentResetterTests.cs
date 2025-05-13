@@ -20,7 +20,7 @@ public class FullSearchableDocumentResetterTests
     public void Can_instantiate_SUT() => Assert.NotNull(GetSut());
 
     [Fact]
-    public async Task WhenPerformFullReset_ThenAllSearchableDocumentsAreRemoved()
+    public async Task WhenPerformReset_ThenAllSearchableDocumentsAreRemoved()
     {
         // Arrange
         var sut = GetSut();
@@ -47,7 +47,7 @@ public class FullSearchableDocumentResetterTests
             })
             .ToArray(); 
 
-        _contentApi.WhereEESHasPublications(publications);
+        _contentApi.WhereHasPublications(publications);
             
         var sut = GetSut();
         
