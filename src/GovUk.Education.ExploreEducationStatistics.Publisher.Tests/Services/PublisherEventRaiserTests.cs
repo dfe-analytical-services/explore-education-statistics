@@ -22,13 +22,40 @@ public class PublisherEventRaiserTests
 {
     private readonly EventRaiserMockBuilder _eventRaiserMockBuilder = new();
 
-    private IPublisherEventRaiser GetSut(IEventRaiser? eventRaiser = null) => 
+    private IPublisherEventRaiser GetSut(IEventRaiser? eventRaiser = null) =>
         new PublisherEventRaiser(eventRaiser ?? _eventRaiserMockBuilder.Build());
 
     public class BasicTests : PublisherEventRaiserTests
     {
         [Fact]
         public void Can_instantiate_sut() => Assert.NotNull(GetSut());
+    }
+
+    public class OnPublicationArchivedTests : PublisherEventRaiserTests
+    {
+        [Fact]
+        public async Task WhenOnPublicationArchived_ThenEventRaised()
+        {
+            // ARRANGE
+            var publicationId = Guid.NewGuid();
+            const string publicationSlug = "publication-slug";
+            var supersededByPublicationId = Guid.NewGuid();
+
+            var sut = GetSut();
+
+            // ACT
+            await sut.OnPublicationArchived(
+                publicationId,
+                publicationSlug,
+                supersededByPublicationId);
+
+            // ASSERT
+            var expectedEvent = new PublicationArchivedEvent(
+                publicationId,
+                publicationSlug,
+                supersededByPublicationId);
+            _eventRaiserMockBuilder.Assert.EventRaised(expectedEvent);
+        }
     }
 
     public class RaiseReleaseVersionPublishedPublisherEvents : PublisherEventRaiserTests
@@ -171,15 +198,15 @@ public class PublisherEventRaiserTests
                 .ConfigureTestAppConfiguration()
                 .ConfigureServices()
                 .Build();
-            
+
             // ACT
             var eventRaiser = host.Services.GetRequiredService<IPublisherEventRaiser>();
-            
+
             // ASSERT
             Assert.NotNull(eventRaiser);
         }
     }
-    
+
     public class IntegrationTests(ITestOutputHelper output) : PublisherEventRaiserTests
     {
         // Define a topic and access key to run this integration test

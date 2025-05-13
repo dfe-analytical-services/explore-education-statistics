@@ -17,6 +17,13 @@ public class PublisherEventRaiserMockBuilder
     public PublisherEventRaiserMockBuilder()
     {
         _mock
+            .Setup(m => m.OnPublicationArchived(
+                It.IsAny<Guid>(),
+                It.IsAny<string>(),
+                It.IsAny<Guid>()))
+            .Returns(Task.CompletedTask);
+
+        _mock
             .Setup(m => m.RaiseReleaseVersionPublishedEvents(
                 It.IsAny<IReadOnlyList<PublishedPublicationInfo>>()))
             .Returns(Task.CompletedTask);
