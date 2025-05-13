@@ -40,7 +40,7 @@ public class DataSetVersionImport : ICreatedUpdatedTimestamps<DateTimeOffset, Da
                 .IsUnique();
 
             builder.Property(i => i.DataSetVersionToReplace)
-                .HasColumnType("varchar(50)")
+                .HasColumnType("varchar(10)")
                 .HasConversion(
                     value => value == null ? null : value.ToString(),
                     value => ConvertStringToSemVersion(value)

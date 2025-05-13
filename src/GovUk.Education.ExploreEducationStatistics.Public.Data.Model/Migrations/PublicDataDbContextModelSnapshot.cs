@@ -146,7 +146,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                         .HasColumnType("uuid");
 
                     b.Property<string>("DataSetVersionToReplace")
-                        .HasColumnType("varchar(50)");
+                        .HasColumnType("varchar(10)");
 
                     b.Property<Guid>("InstanceId")
                         .HasColumnType("uuid");
