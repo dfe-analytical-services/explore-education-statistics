@@ -5,7 +5,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Opti
 using Microsoft.Extensions.Options;
 using Blob = GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Clients.AzureBlobStorage.Blob;
 
-namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Services;
+namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Services.CreateSearchableDocuments;
 
 /// <summary>
 /// We provide a searchable version of a Release for the Azure AI Search Indexers to ingest.
