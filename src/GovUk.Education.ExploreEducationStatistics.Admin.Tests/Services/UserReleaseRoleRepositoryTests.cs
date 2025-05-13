@@ -514,7 +514,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var userReleaseRoles = await contentDbContext.UserReleaseRoles
                     .IgnoreQueryFilters()
                     .ToListAsync();
-                Assert.Equal(4, userReleaseRoles.Count);
+                Assert.Equal(3, userReleaseRoles.Count);
 
                 Assert.Equal(userReleaseRole1.Id, userReleaseRoles[0].Id);
                 Assert.Equal(userReleaseRole1.ReleaseVersionId, userReleaseRoles[0].ReleaseVersionId);
