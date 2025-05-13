@@ -34,6 +34,11 @@ internal class AzureBlobStorageClientMockBuilder
                 It.IsAny<CancellationToken>()))
             .Returns(Task.CompletedTask);
 
+        _mock.Setup(mock => mock.DeleteAllBlobsFromContainer(
+                It.IsAny<string>(),
+                It.IsAny<CancellationToken>()))
+            .Returns(Task.CompletedTask);
+
         return _mock.Object;
     }
 
@@ -83,6 +88,14 @@ internal class AzureBlobStorageClientMockBuilder
                     It.Is<string>(actualContainerName => containerName == null || actualContainerName == containerName),
                     It.Is<string>(actualBlobName => blobName == null || actualBlobName == blobName),
                     It.Is<Blob>(blob => whereBlob == null || whereBlob(blob)),
+                    It.IsAny<CancellationToken>()),
+                Times.Once);
+        }
+
+        public void AllBlobsWereDeleted(string? containerName)
+        {
+            mock.Verify(m => m.DeleteAllBlobsFromContainer(
+                    It.Is<string>(actualContainerName => containerName == null || actualContainerName == containerName),
                     It.IsAny<CancellationToken>()),
                 Times.Once);
         }
