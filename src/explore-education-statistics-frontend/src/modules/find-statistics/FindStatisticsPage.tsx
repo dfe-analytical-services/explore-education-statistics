@@ -34,11 +34,9 @@ export const getServerSideProps: GetServerSideProps = async ({ query }) => {
   const queryClient = new QueryClient();
 
   await Promise.all([
-    queryClient.prefetchQuery(
-      azsearch
-        ? azurePublicationQueries.listAzure(query)
-        : publicationQueries.list(query),
-    ),
+    azsearch
+      ? queryClient.prefetchQuery(azurePublicationQueries.listAzure(query))
+      : queryClient.prefetchQuery(publicationQueries.list(query)),
     queryClient.prefetchQuery(themeQueries.list()),
   ]);
 
