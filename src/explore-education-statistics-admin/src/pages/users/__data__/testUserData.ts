@@ -93,7 +93,7 @@ export const testRoles: Role[] = [
 
 export const testResourceRoles: ResourceRoles = {
   Publication: ['Approver', 'Owner'],
-  Release: ['Approver', 'Contributor', 'Lead', 'PrereleaseViewer', 'Viewer'],
+  Release: ['Approver', 'Contributor', 'PrereleaseViewer', 'Viewer'],
 };
 
 export const testReleases: IdTitlePair[] = [
