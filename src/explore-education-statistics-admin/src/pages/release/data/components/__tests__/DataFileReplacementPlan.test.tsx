@@ -449,47 +449,46 @@ describe('DataReplacementPlan', () => {
         );
       });
     });
-  });
 
-  test('doesnt render the section when the feature flag is turned and no mapping status is defined', async () => {
-    dataReplacementService.getReplacementPlan.mockResolvedValue({
-      ...testReplacementPlan,
-      apiDataSetVersionPlan: {
-        id: 'version-1',
-        dataSetId: 'data-set-1',
-        name: 'Version 1',
-        version: '1.0',
-        status: 'Draft',
-        valid: false,
-      },
-    });
-    render(
-      <FeatureFlagProvider
-        initialFlags={{
-          enableReplacementOfPublicApiDataSets: true,
-        }}
-      >
-        <MemoryRouter>
-          <DataFileReplacementPlan
-            cancelButton={<button type="button">Cancel</button>}
-            publicationId="publication-1"
-            releaseVersionId="release-1"
-            fileId="file-1"
-            replacementFileId="file-2"
-          />
-        </MemoryRouter>
-      </FeatureFlagProvider>,
-    );
-    await waitFor(() => {
-      expect(() => screen.getByText('Api Data Set Filters: ERROR')).toThrow(
-        'Unable to find an element',
+    test('doesnt render the section when the feature flag is turned and no mapping status is defined', async () => {
+      dataReplacementService.getReplacementPlan.mockResolvedValue({
+        ...testReplacementPlan,
+        apiDataSetVersionPlan: {
+          id: 'version-1',
+          dataSetId: 'data-set-1',
+          name: 'Version 1',
+          version: '1.0',
+          status: 'Draft',
+          valid: false,
+        },
+      });
+      render(
+        <FeatureFlagProvider
+          initialFlags={{
+            enableReplacementOfPublicApiDataSets: true,
+          }}
+        >
+          <MemoryRouter>
+            <DataFileReplacementPlan
+              cancelButton={<button type="button">Cancel</button>}
+              publicationId="publication-1"
+              releaseVersionId="release-1"
+              fileId="file-1"
+              replacementFileId="file-2"
+            />
+          </MemoryRouter>
+        </FeatureFlagProvider>,
       );
-      expect(() => screen.getByText('Api Data Set Locations: ERROR')).toThrow(
-        'Unable to find an element',
-      );
+      await waitFor(() => {
+        expect(() => screen.getByText('Api Data Set Filters: ERROR')).toThrow(
+          'Unable to find an element',
+        );
+        expect(() => screen.getByText('Api Data Set Locations: ERROR')).toThrow(
+          'Unable to find an element',
+        );
+      });
     });
   });
-
   test('renders correctly with invalid plan', async () => {
     dataReplacementService.getReplacementPlan.mockResolvedValue(
       testReplacementPlan,
