@@ -7,6 +7,7 @@ using Dapper;
 using FluentValidation;
 using GovUk.Education.ExploreEducationStatistics.Common.Config;
 using GovUk.Education.ExploreEducationStatistics.Common.Database;
+using GovUk.Education.ExploreEducationStatistics.Common.DuckDb.DuckDb;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.ModelBinding;
 using GovUk.Education.ExploreEducationStatistics.Common.Rules;
@@ -21,7 +22,6 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services.Interf
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services.Security;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Swagger;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.DuckDb;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Services;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Services.Options;
