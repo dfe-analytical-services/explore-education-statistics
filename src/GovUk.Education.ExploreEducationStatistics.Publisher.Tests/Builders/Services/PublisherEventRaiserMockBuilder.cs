@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 using Moq;
@@ -17,6 +18,13 @@ public class PublisherEventRaiserMockBuilder
     public PublisherEventRaiserMockBuilder()
     {
         _mock
+            .Setup(m => m.OnPublicationArchived(
+                It.IsAny<Guid>(),
+                It.IsAny<string>(),
+                It.IsAny<Guid>()))
+            .Returns(Task.CompletedTask);
+
+        _mock
             .Setup(m => m.OnReleaseVersionsPublished(
                 It.IsAny<IReadOnlyList<PublishedPublicationInfo>>()))
             .Returns(Task.CompletedTask);
@@ -24,6 +32,24 @@ public class PublisherEventRaiserMockBuilder
 
     public class Asserter(Mock<IPublisherEventRaiser> mock)
     {
+        public void PublicationArchivedEventWasRaised(Publication publication)
+        {
+            mock.Verify(m => m.OnPublicationArchived(
+                    publication.Id,
+                    publication.Slug,
+                    publication.SupersededById!.Value),
+                Times.Once());
+        }
+
+        public void PublicationArchivedEventWasNotRaised()
+        {
+            mock.Verify(m => m.OnPublicationArchived(
+                    It.IsAny<Guid>(),
+                    It.IsAny<string>(),
+                    It.IsAny<Guid>()),
+                Times.Never());
+        }
+
         public void ReleaseVersionPublishedEventWasRaised(Func<PublishedPublicationInfo, bool> expected)
         {
             mock.Verify(m => m.OnReleaseVersionsPublished(

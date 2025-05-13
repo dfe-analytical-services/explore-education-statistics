@@ -716,6 +716,58 @@ public class PublishingCompletionServiceTests
 
                     _publisherEventRaiser.Assert.ReleaseVersionPublishedEventWasRaised(evt => evt == expectedInfo);
                 }
+
+                [Fact]
+                public async Task GivenASupersededPublication_WhenPublicationIsNotAlreadyPublished_ThenPublicationArchivedEventRaised()
+                {
+                    // ARRANGE
+                    var readyKeys = SetupHappyPath();
+
+                    // Create a publication that is superseded by publication 1.
+                    // Publication 1 has no published releases prior to the current publishing run
+                    var supersededPublication = new PublicationBuilder(Guid.NewGuid(), "publication-slug-superseded")
+                        .SupersededBy(_releaseVersion1.Release.Publication.Id)
+                        .Build();
+                    _contentDbContext.With(supersededPublication);
+
+                    var sut = GetSut();
+
+                    // ACT
+                    await sut.CompletePublishingIfAllPriorStagesComplete(readyKeys);
+
+                    // ASSERT
+                    _publisherEventRaiser.Assert.PublicationArchivedEventWasRaised(supersededPublication);
+                }
+
+                [Fact]
+                public async Task GivenASupersededPublication_WhenPublicationIsAlreadyPublished_ThenPublicationArchivedEventNotRaised()
+                {
+                    // ARRANGE
+                    var readyKeys = SetupHappyPath();
+
+                    // Set publication 1 to have a published release prior to the current publishing run
+                    WherePreviousPublicationLatestPublishedReleaseVersionIs(
+                        publicationId: PublicationId1,
+                        releaseVersion: new ReleaseVersionBuilder()
+                            .WithPublicationId(PublicationId1)
+                            .ForRelease(release => release
+                                .WithReleaseSlug("release-slug-previous"))
+                            .Build());
+
+                    // Create a publication that is superseded by publication 1
+                    var supersededPublication = new PublicationBuilder(Guid.NewGuid(), "publication-slug-superseded")
+                        .SupersededBy(_releaseVersion1.Release.Publication.Id)
+                        .Build();
+                    _contentDbContext.With(supersededPublication);
+
+                    var sut = GetSut();
+
+                    // ACT
+                    await sut.CompletePublishingIfAllPriorStagesComplete(readyKeys);
+
+                    // ASSERT
+                    _publisherEventRaiser.Assert.PublicationArchivedEventWasNotRaised();
+                }
             }
 
             private void WherePreviousPublicationLatestPublishedReleaseVersionIs(Guid publicationId, ReleaseVersion releaseVersion)
