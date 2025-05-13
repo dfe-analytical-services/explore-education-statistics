@@ -178,6 +178,12 @@ public class PublishingCompletionService(
         {
             // Clear the cache of the publication to reflect its new state
             await publicationCacheService.UpdatePublication(archivedPublication.Slug);
+
+            // Raise an event to indicate the publication has been archived
+            await publisherEventRaiser.OnPublicationArchived(
+                archivedPublication.Id,
+                archivedPublication.Slug,
+                archivedPublication.SupersededById!.Value);
         }
     }
 }

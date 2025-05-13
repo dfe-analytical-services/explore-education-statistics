@@ -22,13 +22,40 @@ public class PublisherEventRaiserTests
 {
     private readonly EventRaiserMockBuilder _eventRaiserMockBuilder = new();
 
-    private IPublisherEventRaiser GetSut(IEventRaiser? eventRaiser = null) => 
+    private IPublisherEventRaiser GetSut(IEventRaiser? eventRaiser = null) =>
         new PublisherEventRaiser(eventRaiser ?? _eventRaiserMockBuilder.Build());
 
     public class BasicTests : PublisherEventRaiserTests
     {
         [Fact]
         public void Can_instantiate_sut() => Assert.NotNull(GetSut());
+    }
+
+    public class OnPublicationArchivedTests : PublisherEventRaiserTests
+    {
+        [Fact]
+        public async Task WhenOnPublicationArchived_ThenEventRaised()
+        {
+            // ARRANGE
+            var publicationId = Guid.NewGuid();
+            const string publicationSlug = "publication-slug";
+            var supersededByPublicationId = Guid.NewGuid();
+
+            var sut = GetSut();
+
+            // ACT
+            await sut.OnPublicationArchived(
+                publicationId,
+                publicationSlug,
+                supersededByPublicationId);
+
+            // ASSERT
+            var expectedEvent = new PublicationArchivedEvent(
+                publicationId,
+                publicationSlug,
+                supersededByPublicationId);
+            _eventRaiserMockBuilder.Assert.EventRaised(expectedEvent);
+        }
     }
 
     public class RaiseReleaseVersionPublishedPublisherEvents : PublisherEventRaiserTests
@@ -47,7 +74,7 @@ public class PublisherEventRaiserTests
                 ReleaseVersionId = Guid.Parse("11111111-2222-3333-0000-000000000000"),
                 PublicationLatestPublishedReleaseVersionId = Guid.Parse("11111111-2222-4444-0000-000000000000")
             };
-            
+
             // ACT
             await sut.RaiseReleaseVersionPublishedEvents([info]);
 
@@ -64,7 +91,7 @@ public class PublisherEventRaiserTests
                 });
             _eventRaiserMockBuilder.Assert.EventsRaised([expectedEvent]);
         }
-        
+
         [Theory]
         [InlineData(2)]
         [InlineData(10)]
@@ -83,7 +110,7 @@ public class PublisherEventRaiserTests
                         PublicationLatestPublishedReleaseVersionId = Guid.Parse($"11111111-2222-4444-0000-{i:000000000000}")
                     })
                 .ToArray();
-            
+
             // ACT
             await sut.RaiseReleaseVersionPublishedEvents(infos);
 
@@ -113,15 +140,15 @@ public class PublisherEventRaiserTests
                 .ConfigureTestAppConfiguration()
                 .ConfigureServices()
                 .Build();
-            
+
             // ACT
             var eventRaiser = host.Services.GetRequiredService<IPublisherEventRaiser>();
-            
+
             // ASSERT
             Assert.NotNull(eventRaiser);
         }
     }
-    
+
     public class IntegrationTests(ITestOutputHelper output) : PublisherEventRaiserTests
     {
         // Define a topic and access key to run this integration test
