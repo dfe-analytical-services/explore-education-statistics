@@ -115,9 +115,10 @@ const azurePublicationService = {
         themeTitle,
         title,
         summary,
+        publicationSlug: slug,
         published,
         releaseVersionId: id,
-        releaseSlug: slug,
+        releaseSlug: latestReleaseSlug,
         releaseType: type,
       } = document;
 
@@ -130,7 +131,7 @@ const azurePublicationService = {
         id,
         rank: result.score,
         slug,
-        latestReleaseSlug: slug,
+        latestReleaseSlug,
         type: type as ReleaseType,
       });
     }
