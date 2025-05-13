@@ -16,12 +16,13 @@ export type FilterHierarchyOption = {
 };
 
 interface FilterHierarchyOptionsProps {
-  optionTree: FilterHierarchyOption;
-  level: number;
   disabled?: boolean;
-  name: string;
-  selectedValues: string[];
   expandedOptionsList: string[];
+  hierarchySearchTerm: string;
+  level: number;
+  name: string;
+  optionTree: FilterHierarchyOption;
+  selectedValues: string[];
   toggleOptions: (optionId: string) => void;
 }
 
@@ -32,17 +33,35 @@ function FilterHierarchyOptions({
   level,
   selectedValues = [],
   expandedOptionsList,
+  hierarchySearchTerm,
   toggleOptions,
 }: FilterHierarchyOptionsProps) {
   const [searchTerm, setSearchTerm] = useState<string>('');
 
+  const optionLabel = useMemo(() => {
+    const termIndex = optionTree.label
+      .toLowerCase()
+      .indexOf(hierarchySearchTerm);
+    if (!hierarchySearchTerm || termIndex === -1) {
+      return optionTree.label;
+    }
+
+    // text matching search term emboldened
+    const regex = new RegExp(hierarchySearchTerm, 'gi');
+    const newText = optionTree.label.replace(regex, `<strong>$&</strong>`);
+    return (
+      // eslint-disable-next-line react/no-danger
+      <span dangerouslySetInnerHTML={{ __html: newText }} />
+    ) as unknown as Element;
+  }, [hierarchySearchTerm, optionTree]);
+
   const filteredOptions = useMemo(() => {
     if (!optionTree.options) return [];
-    if (!searchTerm) return optionTree.options;
+    if (!hierarchySearchTerm && !searchTerm) return optionTree.options;
     return optionTree.options.filter(option =>
       option.label.toLowerCase().includes(searchTerm.trim().toLowerCase()),
     );
-  }, [optionTree, searchTerm]);
+  }, [optionTree, searchTerm, hierarchySearchTerm]);
 
   const { childOptionIds, hasAllSelected } = useMemo(() => {
     const childIds = filteredOptions?.map(({ value }) => value) ?? [];
@@ -75,6 +94,7 @@ function FilterHierarchyOptions({
 
   return (
     <div
+      data-testid={`filter-hierarchy-options-${optionTree.value}`}
       className={classNames(
         'govuk-checkboxes',
         'govuk-checkboxes--small',
@@ -90,7 +110,7 @@ function FilterHierarchyOptions({
           inputRef={inputRef}
           key={optionTree.label}
           id={`${name}-${optionTree.value}`}
-          label={optionTree.label}
+          label={optionLabel}
           value={optionTree.value}
           hint={optionTree.filterLabel}
           disabled={disabled}
@@ -107,7 +127,7 @@ function FilterHierarchyOptions({
           onToggle={() => toggleOptions(optionTree.value)}
           className={styles.detailsMenu}
         >
-          {optionTree.options.length > 6 && (
+          {level !== 0 && optionTree.options.length > 6 && (
             <div className={styles.search}>
               <FormTextSearchInput
                 id={`${name}-search`}
@@ -150,6 +170,7 @@ function FilterHierarchyOptions({
                 disabled={disabled}
                 selectedValues={selectedValues}
                 level={level + 1}
+                hierarchySearchTerm={hierarchySearchTerm}
               />
             ))}
           </div>
