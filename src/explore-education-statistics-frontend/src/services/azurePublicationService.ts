@@ -10,22 +10,29 @@ import {
 import { ReleaseType } from '@common/services/types/releaseType';
 import { SortDirection } from '@common/services/types/sort';
 
-export interface PublicationAzureSearchResult {
+export interface AzurePublicationSearchResult {
+  '@search.score': string;
   content: string;
   releaseSlug: string;
   releaseType: string;
   releaseVersionId: string;
+  publicationId: string;
   publicationSlug: string;
   published: Date;
+  releaseId: string;
   summary: string;
-  theme: string;
+  themeId: string;
+  themeTitle: string;
   title: string;
+  typeBoost: string;
+  metadata_storage_last_modified: Date;
+  metadata_storage_name: string;
 }
 
-type AzureFacetKey = 'theme' | 'releaseType';
-
 export interface PaginatedListWithAzureFacets<T> extends PaginatedList<T> {
-  facets: Record<AzureFacetKey, FacetResult[]>;
+  facets: {
+    [propertyName: string]: FacetResult[];
+  };
 }
 
 export type AzurePublicationOrderByParam =
@@ -46,7 +53,7 @@ export interface AzurePublicationListRequest {
 const { AZURE_SEARCH_ENDPOINT, AZURE_SEARCH_INDEX, AZURE_SEARCH_QUERY_KEY } =
   env;
 
-const azureSearchClient = new SearchClient<PublicationAzureSearchResult>(
+const azureSearchClient = new SearchClient<AzurePublicationSearchResult>(
   AZURE_SEARCH_ENDPOINT || '',
   AZURE_SEARCH_INDEX || '',
   new AzureKeyCredential(AZURE_SEARCH_QUERY_KEY || ''),
@@ -73,8 +80,7 @@ const azurePublicationService = {
       scoringProfile: 'scoring-profile-1',
       highlightFields: 'content',
 
-      // TODO amend theme to themeId once EES-6123 merged
-      facets: ['theme,sort:count', 'releaseType'],
+      facets: ['themeId,sort:count', 'releaseType'],
       filter,
       orderBy: orderBy ? [orderBy] : undefined,
       select: [
@@ -85,7 +91,7 @@ const azurePublicationService = {
         'publicationSlug',
         'published',
         'summary',
-        'theme',
+        'themeTitle',
         'title',
       ],
     });
@@ -106,7 +112,7 @@ const azurePublicationService = {
     for await (const result of results) {
       const { document } = result;
       const {
-        theme,
+        themeTitle,
         title,
         summary,
         published,
@@ -116,7 +122,7 @@ const azurePublicationService = {
       } = document;
 
       publicationsResult.results.push({
-        theme,
+        theme: themeTitle,
         title,
         summary,
         highlightContent: result.highlights?.content?.join(' ... ') || null,
