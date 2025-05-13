@@ -84,7 +84,7 @@ public class AzureBlobStorageClientIntegrationTests
                 await AzureBlobStorageIntegrationHelper.DeleteAsync(sut.BlobServiceClient, IntegrationTestContainerName, uniqueBlobName);
             }
 
-            [Fact]
+            [Fact(Skip = "This integration test deletes all blobs from the specified container in the Azure Storage Account.")]
             public async Task DeleteAllBlobsFromContainer()
             {
                 // ARRANGE
