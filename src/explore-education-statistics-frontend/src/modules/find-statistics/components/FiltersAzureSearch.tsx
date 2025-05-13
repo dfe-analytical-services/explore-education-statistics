@@ -2,7 +2,7 @@ import { SelectOption } from '@common/components/form/FormSelect';
 import VisuallyHidden from '@common/components/VisuallyHidden';
 import { FormGroup, FormSelect } from '@common/components/form';
 import { ThemeSummary } from '@common/services/themeService';
-import { ReleaseType, releaseTypes } from '@common/services/types/releaseType';
+import { ReleaseType } from '@common/services/types/releaseType';
 import Button from '@common/components/Button';
 import ButtonText from '@common/components/ButtonText';
 import ReleaseTypesModal from '@common/modules/release/components/ReleaseTypesModal';
@@ -26,26 +26,28 @@ export type FilterChangeHandler = ({
 type SortOptionType = PublicationSortOption;
 
 interface Props {
-  mappedThemeFacetResults: SelectOption[];
   releaseType?: ReleaseType;
+  releaseTypesWithResultCounts: SelectOption[];
   showResetFiltersButton?: boolean;
   sortBy: SortOptionType;
   sortOptions: SortOption[];
   themeId?: string;
   themes: ThemeSummary[];
+  themesWithResultCounts: SelectOption[];
   onChange: FilterChangeHandler;
   onResetFilters?: () => void;
   onSortChange: (nextSortBy: SortOptionType) => void;
 }
 
 export default function Filters({
-  mappedThemeFacetResults,
   releaseType,
+  releaseTypesWithResultCounts,
   showResetFiltersButton,
   sortBy,
   sortOptions,
   themeId,
   themes,
+  themesWithResultCounts,
   onChange,
   onResetFilters,
   onSortChange,
@@ -76,10 +78,9 @@ export default function Filters({
             </>
           }
           name="themeId"
-          // TODO change to lookup label from `themes` when EES-6123 merged
           options={[
             { label: 'All themes', value: 'all' },
-            ...mappedThemeFacetResults,
+            ...themesWithResultCounts,
           ]}
           value={themeId ?? 'all'}
           order={[]}
@@ -102,10 +103,7 @@ export default function Filters({
           name="releaseType"
           options={[
             { label: 'All release types', value: 'all' },
-            ...Object.keys(releaseTypes).map(type => ({
-              label: releaseTypes[type as ReleaseType],
-              value: type,
-            })),
+            ...releaseTypesWithResultCounts,
           ]}
           value={releaseType ?? 'all'}
           order={[]}

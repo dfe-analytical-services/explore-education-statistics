@@ -8,7 +8,6 @@ import { ParsedUrlQuery } from 'querystring';
 import GoToTopLink from '@common/components/GoToTopLink';
 import ScreenReaderMessage from '@common/components/ScreenReaderMessage';
 import ButtonText from '@common/components/ButtonText';
-import { SelectOption } from '@common/components/form/FormSelect';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import VisuallyHidden from '@common/components/VisuallyHidden';
 import WarningMessage from '@common/components/WarningMessage';
@@ -62,18 +61,34 @@ const FindStatisticsPage: NextPage = () => {
     results: publications = [],
     facets = { themeId: [], releaseType: [] },
   } = publicationsData ?? {};
+
   const { page, totalPages, totalResults = 0 } = paging ?? {};
 
-  const { themeId: themeFacetResults } = facets;
+  const { themeId: themeFacetResults, releaseType: releaseTypeFacetResults } =
+    facets;
 
-  const mappedThemeFacetResults = themeFacetResults.map(result => {
-    const themeFromApi = themes.find(theme => theme.id === result.value);
+  const themesWithResultCounts = themes.map(theme => {
+    const facetedResult = themeFacetResults.find(
+      result => theme.id === result.value,
+    );
     return {
-      label: themeFromApi
-        ? `${themeFromApi.title} (${result.count})`
-        : result.title,
-      value: result.value,
-    } as SelectOption;
+      label: facetedResult
+        ? `${theme.title} (${facetedResult.count})`
+        : theme.title,
+      value: theme.id,
+    };
+  });
+
+  const releaseTypesWithResultCounts = Object.keys(releaseTypes).map(type => {
+    const facetedResult = releaseTypeFacetResults.find(
+      result => type === result.value,
+    );
+    const title = releaseTypes[type as ReleaseType];
+
+    return {
+      label: facetedResult ? `${title} (${facetedResult.count})` : title,
+      value: type,
+    };
   });
 
   const { releaseType, search, sortBy, themeId } = getParamsFromQuery(
@@ -276,12 +291,13 @@ const FindStatisticsPage: NextPage = () => {
           {!isMobileMedia && (
             <FiltersAzureSearch
               releaseType={releaseType}
+              releaseTypesWithResultCounts={releaseTypesWithResultCounts}
               showResetFiltersButton={!isMobileMedia && isFiltered}
               sortBy={sortBy}
               sortOptions={sortOptions}
-              mappedThemeFacetResults={mappedThemeFacetResults}
               themeId={themeId}
               themes={themes}
+              themesWithResultCounts={themesWithResultCounts}
               onChange={handleChangeFilter}
               onSortChange={handleSortBy}
               onResetFilters={() => handleResetFilter({ filterType: 'all' })}
@@ -295,12 +311,13 @@ const FindStatisticsPage: NextPage = () => {
               totalResults={totalResults}
             >
               <FiltersAzureSearch
+                releaseTypesWithResultCounts={releaseTypesWithResultCounts}
                 releaseType={releaseType}
                 sortBy={sortBy}
                 sortOptions={sortOptions}
-                mappedThemeFacetResults={mappedThemeFacetResults}
                 themeId={themeId}
                 themes={themes}
+                themesWithResultCounts={themesWithResultCounts}
                 onChange={handleChangeFilter}
                 onSortChange={handleSortBy}
               />
