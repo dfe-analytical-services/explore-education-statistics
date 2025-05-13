@@ -2,7 +2,7 @@
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
 
-namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Services;
+namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Services.Core;
 
 public class EventGridEventHandler(ILogger<EventGridEventHandler> logger) : IEventGridEventHandler
 {

@@ -1,7 +1,7 @@
 ﻿using Azure.Messaging.EventGrid;
 using Microsoft.Azure.Functions.Worker;
 
-namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Services;
+namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Services.Core;
 
 public interface IEventGridEventHandler
 {

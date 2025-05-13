@@ -1,7 +1,7 @@
-﻿using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Services;
+﻿using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Services.Core;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Tests.Builders;
 
-namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Tests.Services;
+namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Tests.Services.Core;
 
 public class EventGridEventHandlerTests
 {

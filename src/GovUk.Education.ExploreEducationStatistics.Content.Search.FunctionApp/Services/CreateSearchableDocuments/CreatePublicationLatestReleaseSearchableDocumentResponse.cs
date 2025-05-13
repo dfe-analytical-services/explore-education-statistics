@@ -1,4 +1,4 @@
-﻿namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Services;
+﻿namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Services.CreateSearchableDocuments;
 
 public record CreatePublicationLatestReleaseSearchableDocumentResponse
 {
