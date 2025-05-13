@@ -161,4 +161,27 @@ public class SearchableDocumentRemoverTests
             Assert.False(response.Success);
         }
     }
+
+    public class RemoveAllSearchableDocumentsTests : SearchableDocumentRemoverTests
+    {
+        [Fact]
+        public async Task ShouldDeleteBlobsFromExpectedStorageContainer()
+        {
+            // Arrange
+            var searchableDocumentsContainerName = "searchable-documents-container-name";
+            _appOptions = new AppOptions
+            {
+                SearchStorageConnectionString = "azure storage connection string",
+                SearchableDocumentsContainerName = searchableDocumentsContainerName
+            };
+            var sut = GetSut();
+
+            // Act
+            await sut.RemoveAllSearchableDocuments();
+
+            // Assert
+            _azureBlobStorageClientMockBuilder.Assert.AllBlobsWereDeleted(searchableDocumentsContainerName);
+        }
+        
+    }
 }
