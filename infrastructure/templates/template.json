@@ -3420,8 +3420,10 @@
         "App__PublicStorageConnectionString": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-storage-public')).secretUriWithVersion, ')')]",
         "App__PublisherStorageConnectionString": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-storage-publisher')).secretUriWithVersion, ')')]",
         "DataFiles__BasePath": "[variables('publicDataFileShareMountPathWindows')]",
-        "EventGrid__EventTopics__0__Key": "ReleaseVersionChangedEvent",
-        "EventGrid__EventTopics__0__TopicEndpoint": "[if(parameters('eventGridTopicsExist'), reference(resourceId('Microsoft.EventGrid/topics', variables('eventGridTopicNameReleaseVersionChanged')), '2025-02-15').endpoint, '')]",
+        "EventGrid__EventTopics__0__Key": "PublicationChangedEvent",
+        "EventGrid__EventTopics__0__TopicEndpoint": "[if(parameters('eventGridTopicsExist'), reference(resourceId('Microsoft.EventGrid/topics', variables('eventGridTopicNamePublicationChanged')), '2025-02-15').endpoint, '')]",
+        "EventGrid__EventTopics__1__Key": "ReleaseVersionChangedEvent",
+        "EventGrid__EventTopics__1__TopicEndpoint": "[if(parameters('eventGridTopicsExist'), reference(resourceId('Microsoft.EventGrid/topics', variables('eventGridTopicNameReleaseVersionChanged')), '2025-02-15').endpoint, '')]",
         "PublicDataDbExists": "[parameters('publicDataDbExists')]"
       }
     },
