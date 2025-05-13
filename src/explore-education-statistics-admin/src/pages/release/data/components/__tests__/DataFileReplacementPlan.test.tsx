@@ -9,7 +9,6 @@ import React from 'react';
 import { MemoryRouter } from 'react-router';
 import userEvent from '@testing-library/user-event';
 import { FeatureFlagProvider } from '@admin/contexts/FeatureFlagContext';
-import { FeatureFlags } from '@admin/config/featureFlags';
 
 jest.mock('@admin/services/dataBlockService');
 jest.mock('@admin/services/dataReplacementService');
@@ -396,19 +395,15 @@ describe('DataReplacementPlan', () => {
     valid: true,
   };
 
-  test.each([[true], [false]])(
-    'renders correctly with invalid plan',
-    async featureFlagDisplaysApiErrors => {
+  describe('feature flagged section with invalid plan ', () => {
+    test('renders the section when the feature flag is turned on', async () => {
       dataReplacementService.getReplacementPlan.mockResolvedValue(
         testReplacementPlan,
       );
-
-      const testFeatureFlag: FeatureFlags = {
-        enableReplacementOfPublicApiDataSets: featureFlagDisplaysApiErrors,
-      };
-
       render(
-        <FeatureFlagProvider initialFlags={testFeatureFlag}>
+        <FeatureFlagProvider
+          initialFlags={{ enableReplacementOfPublicApiDataSets: true }}
+        >
           <MemoryRouter>
             <DataFileReplacementPlan
               cancelButton={<button type="button">Cancel</button>}
@@ -420,330 +415,380 @@ describe('DataReplacementPlan', () => {
           </MemoryRouter>
         </FeatureFlagProvider>,
       );
-
       await waitFor(() => {
-        expect(screen.getByText('Data blocks: ERROR')).toBeInTheDocument();
-        expect(screen.getByText('Footnotes: ERROR')).toBeInTheDocument();
-
-        if (testFeatureFlag.enableReplacementOfPublicApiDataSets) {
-          expect(
-            screen.getByText('Api Data Set Filters: ERROR'),
-          ).toBeInTheDocument();
-          expect(
-            screen.getByText('Api Data Set Locations: ERROR'),
-          ).toBeInTheDocument();
-        } else {
-          expect(() => screen.getByText('Api Data Set Filters: ERROR')).toThrow(
-            'Unable to find an element',
-          );
-          expect(() =>
-            screen.getByText('Api Data Set Locations: ERROR'),
-          ).toThrow('Unable to find an element');
-        }
+        expect(
+          screen.getByText('Api Data Set Filters: ERROR'),
+        ).toBeInTheDocument();
+        expect(
+          screen.getByText('Api Data Set Locations: ERROR'),
+        ).toBeInTheDocument();
       });
+    });
 
-      expect(
-        screen.getByText(
-          /One or more data blocks will be invalidated by this data replacement/,
-        ),
-      ).toBeInTheDocument();
-      expect(
-        screen.getByText(
-          /One or more footnotes will be invalidated by this data replacement/,
-        ),
-      ).toBeInTheDocument();
-
-      const details = screen.getAllByRole('group');
-
-      expect(details).toHaveLength(4);
-
-      const dataBlock1 = within(details[0]);
-
-      expect(
-        dataBlock1.getByRole('button', { name: /Data block 1/ }),
-      ).toHaveTextContent('ERROR');
-
-      expect(dataBlock1.getByTestId('Country')).toHaveTextContent('England');
-      expect(dataBlock1.getByTestId('Country')).not.toHaveTextContent(
-        'England not present',
-      );
-
-      expect(dataBlock1.getByTestId('Local Authority')).toHaveTextContent(
-        'Barnsley',
-      );
-      expect(dataBlock1.getByTestId('Local Authority')).not.toHaveTextContent(
-        'Barnsley not present',
-      );
-
-      expect(dataBlock1.getByTestId('Local Authority')).toHaveTextContent(
-        'Birmingham not present',
-      );
-      expect(dataBlock1.getByTestId('Start date')).toHaveTextContent(
-        '2016 not present',
-      );
-
-      expect(dataBlock1.getByTestId('End date')).toHaveTextContent('2018');
-      expect(dataBlock1.getByTestId('End date')).not.toHaveTextContent(
-        '2018 not present',
-      );
-
-      expect(dataBlock1.getByTestId('Filter 1')).toHaveTextContent('Group 1');
-      expect(dataBlock1.getByTestId('Filter 1')).toHaveTextContent('Group 2');
-
-      expect(dataBlock1.getByTestId('Group 1')).toHaveTextContent(
-        'Item 1 not present',
-      );
-      expect(dataBlock1.getByTestId('Group 1')).toHaveTextContent('Item 2');
-      expect(dataBlock1.getByTestId('Group 1')).not.toHaveTextContent(
-        'Item 2 not present',
-      );
-
-      expect(dataBlock1.getByTestId('Group 2')).toHaveTextContent('Item 3');
-      expect(dataBlock1.getByTestId('Group 2')).not.toHaveTextContent(
-        'Item 3 not present',
-      );
-
-      expect(dataBlock1.getByTestId('Filter 2')).toHaveTextContent('Group 3');
-      expect(dataBlock1.getByTestId('Filter 2')).toHaveTextContent('Group 4');
-
-      expect(dataBlock1.getByTestId('Group 3')).toHaveTextContent('Item 4');
-      expect(dataBlock1.getByTestId('Group 3')).not.toHaveTextContent(
-        'Item 4 not present',
-      );
-
-      expect(dataBlock1.getByTestId('Group 4')).toHaveTextContent(
-        'Item 5 not present',
-      );
-      expect(dataBlock1.getByTestId('Group 4')).toHaveTextContent(
-        'Item 6 not present',
-      );
-
-      expect(dataBlock1.getByTestId('Indicator group 1')).toHaveTextContent(
-        'Indicator 1',
-      );
-      expect(dataBlock1.getByTestId('Indicator group 1')).not.toHaveTextContent(
-        'Indicator 1 not present',
-      );
-
-      expect(dataBlock1.getByTestId('Indicator group 2')).toHaveTextContent(
-        'Indicator 2',
-      );
-      expect(dataBlock1.getByTestId('Indicator group 2')).not.toHaveTextContent(
-        'Indicator 2 not present',
-      );
-      expect(dataBlock1.getByTestId('Indicator group 2')).toHaveTextContent(
-        'Indicator 3 not present',
-      );
-
-      expect(dataBlock1.getByTestId('Indicator group 3')).toHaveTextContent(
-        'Indicator 4 not present',
-      );
-
-      expect(
-        dataBlock1.getByRole('link', { name: 'Edit data block', hidden: true }),
-      ).toHaveAttribute(
-        'href',
-        '/publication/publication-1/release/release-1/data-blocks/block-1',
-      );
-      expect(
-        dataBlock1.getByRole('button', {
-          name: 'Delete data block',
-          hidden: true,
-        }),
-      ).toBeInTheDocument();
-
-      const dataBlock2 = within(details[1]);
-
-      expect(
-        dataBlock2.getByRole('button', { name: /Data block 2/ }),
-      ).toHaveTextContent('OK');
-
-      expect(
-        dataBlock2.getByText(
-          'This data block has no conflicts and can be replaced.',
-        ),
-      ).toBeInTheDocument();
-
-      const footnote1 = within(details[2]);
-
-      expect(
-        footnote1.getByRole('button', { name: /Footnote 1/ }),
-      ).toHaveTextContent('ERROR');
-
-      expect(footnote1.getByTestId('Filter 1')).toHaveTextContent('Group 2');
-      expect(footnote1.getByTestId('Filter 1')).toHaveTextContent('Group 3');
-      expect(footnote1.getByTestId('Filter 1')).toHaveTextContent('Group 1');
-
-      expect(footnote1.getByTestId('Group 2')).toHaveTextContent(
-        'Item 1 not present',
-      );
-      expect(footnote1.getByTestId('Group 2')).toHaveTextContent(
-        'Item 3 not present',
-      );
-
-      expect(footnote1.getByTestId('Group 3')).toHaveTextContent('Item 2');
-      expect(footnote1.getByTestId('Group 3')).not.toHaveTextContent(
-        'Item 2 not present',
-      );
-
-      expect(footnote1.getByTestId('Group 1')).toHaveTextContent(
-        '(All selected)',
-      );
-
-      expect(footnote1.getByTestId('Filter 2')).toHaveTextContent('Group 5');
-      expect(footnote1.getByTestId('Filter 2')).toHaveTextContent('Group 4');
-
-      expect(footnote1.getByTestId('Group 5')).toHaveTextContent(
-        'Item 4 not present',
-      );
-      expect(footnote1.getByTestId('Group 4')).toHaveTextContent(
-        '(All selected)',
-      );
-
-      expect(footnote1.getByTestId('Filter 3')).toHaveTextContent(
-        '(All selected)',
-      );
-      expect(footnote1.getByTestId('Filter 4')).toHaveTextContent(
-        '(All selected)',
-      );
-
-      expect(footnote1.getByTestId('Indicator group 1')).toHaveTextContent(
-        'Indicator 1',
-      );
-      expect(footnote1.getByTestId('Indicator group 1')).not.toHaveTextContent(
-        'Indicator 1 not present',
-      );
-      expect(footnote1.getByTestId('Indicator group 2')).toHaveTextContent(
-        'Indicator 3 not present',
-      );
-
-      const footnote2 = within(details[3]);
-
-      expect(
-        footnote2.getByRole('button', { name: /Footnote 2/ }),
-      ).toHaveTextContent('OK');
-
-      expect(
-        footnote2.getByText(
-          'This footnote has no conflicts and can be replaced.',
-        ),
-      ).toBeInTheDocument();
-
-      expect(
-        screen.queryByRole('button', { name: 'Confirm data replacement' }),
-      ).not.toBeInTheDocument();
-    },
-  );
-
-  test.each([[true], [false]])(
-    'renders correctly with valid plan',
-    async featureFlagDisplaysApiErrors => {
+    test('doesnt render the section when the feature flag is turned off', async () => {
       dataReplacementService.getReplacementPlan.mockResolvedValue(
-        testValidReplacementPlan,
+        testReplacementPlan,
       );
-
-      const testFeatureFlag: FeatureFlags = {
-        enableReplacementOfPublicApiDataSets: featureFlagDisplaysApiErrors,
-      };
-
       render(
-        <FeatureFlagProvider initialFlags={testFeatureFlag}>
-          <MemoryRouter>
-            <DataFileReplacementPlan
-              cancelButton={<button type="button">Cancel</button>}
-              publicationId="publication-1"
-              releaseVersionId="release-1"
-              fileId="file-1"
-              replacementFileId="file-2"
-            />
-          </MemoryRouter>
-        </FeatureFlagProvider>,
+        <MemoryRouter>
+          <DataFileReplacementPlan
+            cancelButton={<button type="button">Cancel</button>}
+            publicationId="publication-1"
+            releaseVersionId="release-1"
+            fileId="file-1"
+            replacementFileId="file-2"
+          />
+        </MemoryRouter>,
       );
-
       await waitFor(() => {
-        expect(screen.getByText('Data blocks: OK')).toBeInTheDocument();
-        expect(screen.getByText('Footnotes: OK')).toBeInTheDocument();
-        if (testFeatureFlag.enableReplacementOfPublicApiDataSets) {
-          expect(
-            screen.getByText('Api Data Set Filters: OK'),
-          ).toBeInTheDocument();
-          expect(
-            screen.getByText('Api Data Set Locations: OK'),
-          ).toBeInTheDocument();
-        } else {
-          expect(() => screen.getByText('Api Data Set Filters: OK')).toThrow(
-            'Unable to find an element',
-          );
-          expect(() => screen.getByText('Api Data Set Locations: OK')).toThrow(
-            'Unable to find an element',
-          );
-        }
+        expect(() => screen.getByText('Api Data Set Filters: ERROR')).toThrow(
+          'Unable to find an element',
+        );
+        expect(() => screen.getByText('Api Data Set Locations: ERROR')).toThrow(
+          'Unable to find an element',
+        );
       });
+    });
+  });
 
-      expect(
-        screen.getByText(
-          'All existing data blocks can be replaced by this data replacement.',
-        ),
-      ).toBeInTheDocument();
-      expect(
-        screen.getByText(
-          'All existing footnotes can be replaced by this data replacement.',
-        ),
-      ).toBeInTheDocument();
+  test('doesnt render the section when the feature flag is turned and no mapping status is defined', async () => {
+    dataReplacementService.getReplacementPlan.mockResolvedValue({
+      ...testReplacementPlan,
+      apiDataSetVersionPlan: {
+        id: 'version-1',
+        dataSetId: 'data-set-1',
+        name: 'Version 1',
+        version: '1.0',
+        status: 'Draft',
+        valid: false,
+      },
+    });
+    render(
+      <FeatureFlagProvider
+        initialFlags={{
+          enableReplacementOfPublicApiDataSets: true,
+        }}
+      >
+        <MemoryRouter>
+          <DataFileReplacementPlan
+            cancelButton={<button type="button">Cancel</button>}
+            publicationId="publication-1"
+            releaseVersionId="release-1"
+            fileId="file-1"
+            replacementFileId="file-2"
+          />
+        </MemoryRouter>
+      </FeatureFlagProvider>,
+    );
+    await waitFor(() => {
+      expect(() => screen.getByText('Api Data Set Filters: ERROR')).toThrow(
+        'Unable to find an element',
+      );
+      expect(() => screen.getByText('Api Data Set Locations: ERROR')).toThrow(
+        'Unable to find an element',
+      );
+    });
+  });
 
-      const details = screen.getAllByRole('group');
+  test('renders correctly with invalid plan', async () => {
+    dataReplacementService.getReplacementPlan.mockResolvedValue(
+      testReplacementPlan,
+    );
 
-      expect(details).toHaveLength(4);
+    render(
+      <MemoryRouter>
+        <DataFileReplacementPlan
+          cancelButton={<button type="button">Cancel</button>}
+          publicationId="publication-1"
+          releaseVersionId="release-1"
+          fileId="file-1"
+          replacementFileId="file-2"
+        />
+      </MemoryRouter>,
+    );
 
-      const dataBlock1 = within(details[0]);
+    await waitFor(() => {
+      expect(screen.getByText('Data blocks: ERROR')).toBeInTheDocument();
+      expect(screen.getByText('Footnotes: ERROR')).toBeInTheDocument();
+    });
 
-      expect(
-        dataBlock1.getByRole('button', { name: /Data block 1/ }),
-      ).toHaveTextContent('OK');
-      expect(
-        dataBlock1.getByText(
-          'This data block has no conflicts and can be replaced.',
-        ),
-      ).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        /One or more data blocks will be invalidated by this data replacement/,
+      ),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        /One or more footnotes will be invalidated by this data replacement/,
+      ),
+    ).toBeInTheDocument();
 
-      const dataBlock2 = within(details[1]);
+    const details = screen.getAllByRole('group');
 
-      expect(
-        dataBlock2.getByRole('button', { name: /Data block 2/ }),
-      ).toHaveTextContent('OK');
-      expect(
-        dataBlock2.getByText(
-          'This data block has no conflicts and can be replaced.',
-        ),
-      ).toBeInTheDocument();
+    expect(details).toHaveLength(4);
 
-      const footnote1 = within(details[2]);
+    const dataBlock1 = within(details[0]);
 
-      expect(
-        footnote1.getByRole('button', { name: /Footnote 1/ }),
-      ).toHaveTextContent('OK');
-      expect(
-        footnote1.getByText(
-          'This footnote has no conflicts and can be replaced.',
-        ),
-      ).toBeInTheDocument();
+    expect(
+      dataBlock1.getByRole('button', { name: /Data block 1/ }),
+    ).toHaveTextContent('ERROR');
 
-      const footnote2 = within(details[3]);
+    expect(dataBlock1.getByTestId('Country')).toHaveTextContent('England');
+    expect(dataBlock1.getByTestId('Country')).not.toHaveTextContent(
+      'England not present',
+    );
 
-      expect(
-        footnote2.getByRole('button', { name: /Footnote 2/ }),
-      ).toHaveTextContent('OK');
-      expect(
-        footnote2.getByText(
-          'This footnote has no conflicts and can be replaced.',
-        ),
-      ).toBeInTheDocument();
+    expect(dataBlock1.getByTestId('Local Authority')).toHaveTextContent(
+      'Barnsley',
+    );
+    expect(dataBlock1.getByTestId('Local Authority')).not.toHaveTextContent(
+      'Barnsley not present',
+    );
 
-      expect(
-        screen.getByRole('button', { name: 'Confirm data replacement' }),
-      ).toBeInTheDocument();
-    },
-  );
+    expect(dataBlock1.getByTestId('Local Authority')).toHaveTextContent(
+      'Birmingham not present',
+    );
+    expect(dataBlock1.getByTestId('Start date')).toHaveTextContent(
+      '2016 not present',
+    );
+
+    expect(dataBlock1.getByTestId('End date')).toHaveTextContent('2018');
+    expect(dataBlock1.getByTestId('End date')).not.toHaveTextContent(
+      '2018 not present',
+    );
+
+    expect(dataBlock1.getByTestId('Filter 1')).toHaveTextContent('Group 1');
+    expect(dataBlock1.getByTestId('Filter 1')).toHaveTextContent('Group 2');
+
+    expect(dataBlock1.getByTestId('Group 1')).toHaveTextContent(
+      'Item 1 not present',
+    );
+    expect(dataBlock1.getByTestId('Group 1')).toHaveTextContent('Item 2');
+    expect(dataBlock1.getByTestId('Group 1')).not.toHaveTextContent(
+      'Item 2 not present',
+    );
+
+    expect(dataBlock1.getByTestId('Group 2')).toHaveTextContent('Item 3');
+    expect(dataBlock1.getByTestId('Group 2')).not.toHaveTextContent(
+      'Item 3 not present',
+    );
+
+    expect(dataBlock1.getByTestId('Filter 2')).toHaveTextContent('Group 3');
+    expect(dataBlock1.getByTestId('Filter 2')).toHaveTextContent('Group 4');
+
+    expect(dataBlock1.getByTestId('Group 3')).toHaveTextContent('Item 4');
+    expect(dataBlock1.getByTestId('Group 3')).not.toHaveTextContent(
+      'Item 4 not present',
+    );
+
+    expect(dataBlock1.getByTestId('Group 4')).toHaveTextContent(
+      'Item 5 not present',
+    );
+    expect(dataBlock1.getByTestId('Group 4')).toHaveTextContent(
+      'Item 6 not present',
+    );
+
+    expect(dataBlock1.getByTestId('Indicator group 1')).toHaveTextContent(
+      'Indicator 1',
+    );
+    expect(dataBlock1.getByTestId('Indicator group 1')).not.toHaveTextContent(
+      'Indicator 1 not present',
+    );
+
+    expect(dataBlock1.getByTestId('Indicator group 2')).toHaveTextContent(
+      'Indicator 2',
+    );
+    expect(dataBlock1.getByTestId('Indicator group 2')).not.toHaveTextContent(
+      'Indicator 2 not present',
+    );
+    expect(dataBlock1.getByTestId('Indicator group 2')).toHaveTextContent(
+      'Indicator 3 not present',
+    );
+
+    expect(dataBlock1.getByTestId('Indicator group 3')).toHaveTextContent(
+      'Indicator 4 not present',
+    );
+
+    expect(
+      dataBlock1.getByRole('link', { name: 'Edit data block', hidden: true }),
+    ).toHaveAttribute(
+      'href',
+      '/publication/publication-1/release/release-1/data-blocks/block-1',
+    );
+    expect(
+      dataBlock1.getByRole('button', {
+        name: 'Delete data block',
+        hidden: true,
+      }),
+    ).toBeInTheDocument();
+
+    const dataBlock2 = within(details[1]);
+
+    expect(
+      dataBlock2.getByRole('button', { name: /Data block 2/ }),
+    ).toHaveTextContent('OK');
+
+    expect(
+      dataBlock2.getByText(
+        'This data block has no conflicts and can be replaced.',
+      ),
+    ).toBeInTheDocument();
+
+    const footnote1 = within(details[2]);
+
+    expect(
+      footnote1.getByRole('button', { name: /Footnote 1/ }),
+    ).toHaveTextContent('ERROR');
+
+    expect(footnote1.getByTestId('Filter 1')).toHaveTextContent('Group 2');
+    expect(footnote1.getByTestId('Filter 1')).toHaveTextContent('Group 3');
+    expect(footnote1.getByTestId('Filter 1')).toHaveTextContent('Group 1');
+
+    expect(footnote1.getByTestId('Group 2')).toHaveTextContent(
+      'Item 1 not present',
+    );
+    expect(footnote1.getByTestId('Group 2')).toHaveTextContent(
+      'Item 3 not present',
+    );
+
+    expect(footnote1.getByTestId('Group 3')).toHaveTextContent('Item 2');
+    expect(footnote1.getByTestId('Group 3')).not.toHaveTextContent(
+      'Item 2 not present',
+    );
+
+    expect(footnote1.getByTestId('Group 1')).toHaveTextContent(
+      '(All selected)',
+    );
+
+    expect(footnote1.getByTestId('Filter 2')).toHaveTextContent('Group 5');
+    expect(footnote1.getByTestId('Filter 2')).toHaveTextContent('Group 4');
+
+    expect(footnote1.getByTestId('Group 5')).toHaveTextContent(
+      'Item 4 not present',
+    );
+    expect(footnote1.getByTestId('Group 4')).toHaveTextContent(
+      '(All selected)',
+    );
+
+    expect(footnote1.getByTestId('Filter 3')).toHaveTextContent(
+      '(All selected)',
+    );
+    expect(footnote1.getByTestId('Filter 4')).toHaveTextContent(
+      '(All selected)',
+    );
+
+    expect(footnote1.getByTestId('Indicator group 1')).toHaveTextContent(
+      'Indicator 1',
+    );
+    expect(footnote1.getByTestId('Indicator group 1')).not.toHaveTextContent(
+      'Indicator 1 not present',
+    );
+    expect(footnote1.getByTestId('Indicator group 2')).toHaveTextContent(
+      'Indicator 3 not present',
+    );
+
+    const footnote2 = within(details[3]);
+
+    expect(
+      footnote2.getByRole('button', { name: /Footnote 2/ }),
+    ).toHaveTextContent('OK');
+
+    expect(
+      footnote2.getByText(
+        'This footnote has no conflicts and can be replaced.',
+      ),
+    ).toBeInTheDocument();
+
+    expect(
+      screen.queryByRole('button', { name: 'Confirm data replacement' }),
+    ).not.toBeInTheDocument();
+  });
+
+  test('renders correctly with valid plan', async () => {
+    dataReplacementService.getReplacementPlan.mockResolvedValue(
+      testValidReplacementPlan,
+    );
+
+    render(
+      <MemoryRouter>
+        <DataFileReplacementPlan
+          cancelButton={<button type="button">Cancel</button>}
+          publicationId="publication-1"
+          releaseVersionId="release-1"
+          fileId="file-1"
+          replacementFileId="file-2"
+        />
+      </MemoryRouter>,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText('Data blocks: OK')).toBeInTheDocument();
+      expect(screen.getByText('Footnotes: OK')).toBeInTheDocument();
+    });
+
+    expect(
+      screen.getByText(
+        'All existing data blocks can be replaced by this data replacement.',
+      ),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        'All existing footnotes can be replaced by this data replacement.',
+      ),
+    ).toBeInTheDocument();
+
+    const details = screen.getAllByRole('group');
+
+    expect(details).toHaveLength(4);
+
+    const dataBlock1 = within(details[0]);
+
+    expect(
+      dataBlock1.getByRole('button', { name: /Data block 1/ }),
+    ).toHaveTextContent('OK');
+    expect(
+      dataBlock1.getByText(
+        'This data block has no conflicts and can be replaced.',
+      ),
+    ).toBeInTheDocument();
+
+    const dataBlock2 = within(details[1]);
+
+    expect(
+      dataBlock2.getByRole('button', { name: /Data block 2/ }),
+    ).toHaveTextContent('OK');
+    expect(
+      dataBlock2.getByText(
+        'This data block has no conflicts and can be replaced.',
+      ),
+    ).toBeInTheDocument();
+
+    const footnote1 = within(details[2]);
+
+    expect(
+      footnote1.getByRole('button', { name: /Footnote 1/ }),
+    ).toHaveTextContent('OK');
+    expect(
+      footnote1.getByText(
+        'This footnote has no conflicts and can be replaced.',
+      ),
+    ).toBeInTheDocument();
+
+    const footnote2 = within(details[3]);
+
+    expect(
+      footnote2.getByRole('button', { name: /Footnote 2/ }),
+    ).toHaveTextContent('OK');
+    expect(
+      footnote2.getByText(
+        'This footnote has no conflicts and can be replaced.',
+      ),
+    ).toBeInTheDocument();
+
+    expect(
+      screen.getByRole('button', { name: 'Confirm data replacement' }),
+    ).toBeInTheDocument();
+  });
 
   test('renders correctly with valid empty plan', async () => {
     dataReplacementService.getReplacementPlan.mockResolvedValue({

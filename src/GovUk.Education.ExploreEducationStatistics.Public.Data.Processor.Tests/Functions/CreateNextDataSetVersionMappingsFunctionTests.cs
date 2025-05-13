@@ -618,7 +618,7 @@ public abstract class CreateNextDataSetVersionMappingsFunctionTests(
             }
             else
             {
-                 var validationProblem = result.AssertBadRequestWithValidationProblem();
+                var validationProblem = result.AssertBadRequestWithValidationProblem();
 
                 validationProblem.AssertHasError(
                     expectedPath: nameof(NextDataSetVersionMappingsCreateRequest.ReleaseFileId).ToLowerFirst(),

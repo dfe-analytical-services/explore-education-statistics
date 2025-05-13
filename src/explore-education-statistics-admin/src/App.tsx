@@ -24,8 +24,6 @@ import { Route, Switch, useHistory } from 'react-router';
 import { BrowserRouter } from 'react-router-dom';
 import PageNotFoundPage from './pages/errors/PageNotFoundPage';
 import { LastLocationContextProvider } from './contexts/LastLocationContext';
-import { FeatureFlagProvider } from './contexts/FeatureFlagContext';
-import { DEFAULT_FLAGS } from './config/featureFlags';
 
 const queryClient = new QueryClient();
 
@@ -112,7 +110,6 @@ const Providers = composeProviders(
   ConfiguredMsalProvider,
   AuthContextProvider,
   LastLocationContextProvider,
-  ConfiguredFeatureFlagProvider,
 );
 
 function ApplicationInsightsContextProvider({
@@ -136,17 +133,5 @@ function QueryClientProvider({ children }: { children?: ReactNode }) {
     <BaseQueryClientProvider client={queryClient}>
       {children}
     </BaseQueryClientProvider>
-  );
-}
-
-function ConfiguredFeatureFlagProvider({
-  children,
-}: {
-  children?: React.ReactNode;
-}) {
-  return (
-    <FeatureFlagProvider initialFlags={DEFAULT_FLAGS}>
-      {children}
-    </FeatureFlagProvider>
   );
 }

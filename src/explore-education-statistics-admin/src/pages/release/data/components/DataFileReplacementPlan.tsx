@@ -83,33 +83,27 @@ const DataFileReplacementPlan = ({
     'enableReplacementOfPublicApiDataSets',
   );
 
-  const hasDataSetVersionPlan = useMemo<boolean>(
-    () =>
-      isNewReplaceDsvFeatureEnabled &&
-      plan?.apiDataSetVersionPlan !== undefined,
-    [plan, isNewReplaceDsvFeatureEnabled],
-  );
+  const {
+    hasDataSetVersionPlan,
+    hasIncompleteLocationMapping,
+    hasIncompleteFilterMapping,
+  } = useMemo(() => {
+    if (!isNewReplaceDsvFeatureEnabled) {
+      return {
+        hasDataSetVersionPlan: false,
+        hasIncompleteLocationMapping: false,
+        hasIncompleteFilterMapping: false,
+      };
+    }
 
-  const hasInvalidLocationMapping = useMemo<boolean>(
-    () =>
-      hasDataSetVersionPlan
-        ? !(
-            plan?.apiDataSetVersionPlan?.mappingStatus?.locationsComplete ??
-            false
-          )
-        : false,
-    [plan, hasDataSetVersionPlan],
-  );
-
-  const hasInvalidFilterMapping = useMemo<boolean>(
-    () =>
-      hasDataSetVersionPlan
-        ? !(
-            plan?.apiDataSetVersionPlan?.mappingStatus?.filtersComplete ?? false
-          )
-        : false,
-    [plan, hasDataSetVersionPlan],
-  );
+    return {
+      hasDataSetVersionPlan: !!plan?.apiDataSetVersionPlan,
+      hasIncompleteLocationMapping:
+        !plan?.apiDataSetVersionPlan?.mappingStatus?.locationsComplete,
+      hasIncompleteFilterMapping:
+        !plan?.apiDataSetVersionPlan?.mappingStatus?.filtersComplete,
+    };
+  }, [plan, isNewReplaceDsvFeatureEnabled]);
 
   const { user } = useAuthContext();
 
@@ -457,14 +451,14 @@ const DataFileReplacementPlan = ({
           {hasDataSetVersionPlan && (
             <>
               <h3 className="govuk-heading-m">
-                <Tag colour={hasInvalidFilterMapping ? 'red' : 'green'}>
+                <Tag colour={hasIncompleteFilterMapping ? 'red' : 'green'}>
                   {`Api Data Set Filters: ${
-                    hasInvalidFilterMapping ? 'ERROR' : 'OK'
+                    hasIncompleteFilterMapping ? 'ERROR' : 'OK'
                   }`}
                 </Tag>
               </h3>
 
-              {hasInvalidFilterMapping ? (
+              {hasIncompleteFilterMapping ? (
                 <p>
                   Please{' '}
                   {apiDataSetsTabRoute && (
@@ -479,14 +473,14 @@ const DataFileReplacementPlan = ({
               )}
 
               <h3 className="govuk-heading-m">
-                <Tag colour={hasInvalidLocationMapping ? 'red' : 'green'}>
+                <Tag colour={hasIncompleteLocationMapping ? 'red' : 'green'}>
                   {`Api Data Set Locations: ${
-                    hasInvalidLocationMapping ? 'ERROR' : 'OK'
+                    hasIncompleteLocationMapping ? 'ERROR' : 'OK'
                   }`}
                 </Tag>
               </h3>
 
-              {hasInvalidLocationMapping ? (
+              {hasIncompleteLocationMapping ? (
                 <p>
                   Please{' '}
                   {apiDataSetsTabRoute && (

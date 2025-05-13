@@ -2,18 +2,16 @@
   createContext,
   useContext,
   ReactNode,
-  useMemo,
   useCallback,
+  useMemo,
 } from 'react';
 import { DEFAULT_FLAGS, FeatureFlags } from '../config/featureFlags';
 
 interface FeatureFlagContextType {
-  flags: FeatureFlags;
-  isFeatureEnabled: (flagName: string) => boolean;
+  isFeatureEnabled: (flagName: keyof typeof DEFAULT_FLAGS) => boolean;
 }
 
 const FeatureFlagContext = createContext<FeatureFlagContextType>({
-  flags: DEFAULT_FLAGS,
   isFeatureEnabled: () => false,
 });
 
@@ -27,28 +25,28 @@ export const FeatureFlagProvider: React.FC<FeatureFlagProviderProps> = ({
   initialFlags = DEFAULT_FLAGS,
 }) => {
   const isFeatureEnabled = useCallback(
-    (flagName: string): boolean => {
+    (flagName: keyof typeof DEFAULT_FLAGS): boolean => {
       return initialFlags[flagName] || false;
     },
     [initialFlags],
   );
-
-  const contextValue = useMemo(
+  const value = useMemo(
     () => ({
-      flags: initialFlags,
       isFeatureEnabled,
     }),
-    [initialFlags, isFeatureEnabled],
+    [isFeatureEnabled],
   );
 
   return (
-    <FeatureFlagContext.Provider value={contextValue}>
+    <FeatureFlagContext.Provider value={value}>
       {children}
     </FeatureFlagContext.Provider>
   );
 };
 
-export const useFeatureFlag = (flagName: string): boolean => {
+export const useFeatureFlag = (
+  flagName: keyof typeof DEFAULT_FLAGS,
+): boolean => {
   const { isFeatureEnabled } = useContext(FeatureFlagContext);
   return isFeatureEnabled(flagName);
 };

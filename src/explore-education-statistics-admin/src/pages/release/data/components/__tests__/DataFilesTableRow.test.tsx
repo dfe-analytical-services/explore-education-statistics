@@ -31,55 +31,76 @@ describe('DataFilesTableRow', () => {
   });
 
   describe('when feature flag is toggled', () => {
-    test.each([[true], [false]])(
-      'The Replace Data button shows 1) if on: MODAL to stop the user from proceeding further or 2) if off: no MODAL',
-      async featureFlagDisplaysApiErrors => {
-        const dataFile = { ...mockDataFile, publicApiDataSetId: 'dataset-1' };
-        const testFeatureFlag: FeatureFlags = {
-          enableReplacementOfPublicApiDataSets: featureFlagDisplaysApiErrors,
-        };
-        render(
-          <FeatureFlagProvider initialFlags={testFeatureFlag}>
-            <MemoryRouter>
-              <table>
-                <thead>
-                  <tr>
-                    <th scope="col">Title</th>
-                    <th scope="col">Size</th>
-                    <th scope="col">Status</th>
-                    <th scope="col">Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <DataFilesTableRow {...baseProps} dataFile={dataFile} />
-                </tbody>
-              </table>
-            </MemoryRouter>
-          </FeatureFlagProvider>,
-        );
-        const replaceLink = screen.getByText('Replace data');
-        expect(replaceLink).toBeInTheDocument();
+    test('shows no modal when feature flag is enabled', async () => {
+      const dataFile = { ...mockDataFile, publicApiDataSetId: 'dataset-1' };
+      const testFeatureFlag: FeatureFlags = {
+        enableReplacementOfPublicApiDataSets: true,
+      };
+      render(
+        <FeatureFlagProvider initialFlags={testFeatureFlag}>
+          <MemoryRouter>
+            <table>
+              <thead>
+                <tr>
+                  <th scope="col">Title</th>
+                  <th scope="col">Size</th>
+                  <th scope="col">Status</th>
+                  <th scope="col">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <DataFilesTableRow {...baseProps} dataFile={dataFile} />
+              </tbody>
+            </table>
+          </MemoryRouter>
+        </FeatureFlagProvider>,
+      );
+      const replaceLink = screen.getByText('Replace data');
+      expect(replaceLink).toBeInTheDocument();
 
-        fireEvent.click(replaceLink);
+      fireEvent.click(replaceLink);
 
-        if (featureFlagDisplaysApiErrors) {
-          await waitFor(() => {
-            expect(
-              screen.queryByText(
-                /This data file has an API data set linked to it/,
-              ),
-            ).not.toBeInTheDocument();
-          });
-        } else {
-          await waitFor(() => {
-            expect(
-              screen.queryByText(
-                /This data file has an API data set linked to it/,
-              ),
-            ).toBeInTheDocument();
-          });
-        }
-      },
-    );
+      await waitFor(() => {
+        expect(
+          screen.queryByText(/This data file has an API data set linked to it/),
+        ).not.toBeInTheDocument();
+      });
+    });
+
+    test('shows modal when feature flag is disabled', async () => {
+      const dataFile = { ...mockDataFile, publicApiDataSetId: 'dataset-1' };
+      const testFeatureFlag: FeatureFlags = {
+        enableReplacementOfPublicApiDataSets: false,
+      };
+      render(
+        <FeatureFlagProvider initialFlags={testFeatureFlag}>
+          <MemoryRouter>
+            <table>
+              <thead>
+                <tr>
+                  <th scope="col">Title</th>
+                  <th scope="col">Size</th>
+                  <th scope="col">Status</th>
+                  <th scope="col">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <DataFilesTableRow {...baseProps} dataFile={dataFile} />
+              </tbody>
+            </table>
+          </MemoryRouter>
+        </FeatureFlagProvider>,
+      );
+      const replaceLink = screen.getByText('Replace data');
+      expect(replaceLink).toBeInTheDocument();
+
+      fireEvent.click(replaceLink);
+
+      await waitFor(() => {
+        expect(
+          screen.queryByText(/This data file has an API data set linked to it/),
+        ).toBeInTheDocument();
+      });
+    });
   });
 });

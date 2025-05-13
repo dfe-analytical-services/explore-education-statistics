@@ -1,5 +1,6 @@
 ﻿export interface FeatureFlags {
-  [key: string]: boolean;
+  enableReplacementOfPublicApiDataSets: boolean;
+  // Add more flags as needed
 }
 
 export const DEFAULT_FLAGS: FeatureFlags = {
