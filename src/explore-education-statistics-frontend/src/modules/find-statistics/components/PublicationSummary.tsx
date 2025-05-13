@@ -1,3 +1,4 @@
+import ContentHtml from '@common/components/ContentHtml';
 import FormattedDate from '@common/components/FormattedDate';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
@@ -12,8 +13,16 @@ interface Props {
 }
 
 const PublicationSummary = ({ publication }: Props) => {
-  const { published, slug, summary, theme, title, type, latestReleaseSlug } =
-    publication;
+  const {
+    published,
+    slug,
+    summary,
+    highlightContent,
+    theme,
+    title,
+    type,
+    latestReleaseSlug,
+  } = publication;
   return (
     <li className={`${styles.container} govuk-!-margin-top-4`}>
       <h3 className="govuk-!-margin-bottom-2">
@@ -22,6 +31,14 @@ const PublicationSummary = ({ publication }: Props) => {
         </Link>
       </h3>
       <p>{summary}</p>
+
+      {highlightContent && (
+        <ContentHtml
+          html={`<p>${highlightContent}</p>`}
+          sanitizeOptions={{ allowedTags: ['em'] }}
+          className={styles.highlightContent}
+        />
+      )}
 
       <SummaryList
         className="govuk-!-margin-bottom-4 govuk-!-margin-top-4"
