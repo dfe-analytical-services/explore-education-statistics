@@ -28,12 +28,11 @@ export default function createAzurePublicationListRequest(
 
   let filter: string | undefined;
   if (releaseType && themeId) {
-    filter = odata`releaseType eq ${releaseType} and theme eq ${themeId}`;
+    filter = odata`releaseType eq ${releaseType} and themeId eq ${themeId}`;
   } else if (releaseType) {
     filter = odata`releaseType eq ${releaseType}`;
   } else if (themeId) {
-    // TODO amend theme to themeId once EES-6123 merged
-    filter = odata`theme eq ${themeId}`;
+    filter = odata`themeId eq ${themeId}`;
   }
 
   const minSearchCharacters = 3;
