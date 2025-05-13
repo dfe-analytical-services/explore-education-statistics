@@ -1,6 +1,7 @@
 using DuckDB.NET.Data;
 using GovUk.Education.ExploreEducationStatistics.Analytics.Consumer.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.DuckDb.DuckDb;
+using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using Microsoft.Extensions.Logging;
 
 namespace GovUk.Education.ExploreEducationStatistics.Analytics.Consumer.Services.Workflow;
@@ -38,27 +39,27 @@ public class ProcessRequestFilesWorkflow(
     string processorName,
     string sourceDirectory,
     string reportsDirectory,
-    IWorkflowActor actor,
-    ILogger<IRequestFileProcessor> logger)
+    IWorkflowActor actor, 
+    ILogger<IRequestFileProcessor> logger,
+    IFileAccessor? fileAccessor = null,
+    DateTimeProvider? dateTimeProvider = null)
 {
     private readonly string _processingDirectory = Path.Combine(sourceDirectory, "processing");
     private readonly string _failuresDirectory = Path.Combine(sourceDirectory, "failures");
+    private readonly IFileAccessor _fileAccessor = fileAccessor ?? new DefaultFileAccessor();
+    private readonly DateTimeProvider _dateTimeProvider = dateTimeProvider ?? new DateTimeProvider();
 
     public async Task Process()
     {
         logger.LogInformation("{Processor} triggered", processorName);
         
-        if (!Directory.Exists(sourceDirectory))
+        if (!_fileAccessor.DirectoryExists(sourceDirectory))
         {
             logger.LogInformation("No requests for {Processor} to process", processorName);
             return;
         }
 
-        var filesToProcess = Directory
-            .GetFiles(sourceDirectory)
-            .Select(Path.GetFileName)
-            .OfType<string>()
-            .ToList();
+        var filesToProcess = _fileAccessor.ListFiles(sourceDirectory);
 
         if (filesToProcess.Count == 0)
         {
@@ -69,14 +70,14 @@ public class ProcessRequestFilesWorkflow(
         logger.LogInformation("Found {Count} requests for {Processor} to process", filesToProcess.Count,
             processorName);
 
-        Directory.CreateDirectory(_processingDirectory);
-        Directory.CreateDirectory(reportsDirectory);
+        _fileAccessor.CreateDirectory(_processingDirectory);
+        _fileAccessor.CreateDirectory(reportsDirectory);
 
         Parallel.ForEach(filesToProcess, file =>
         {
             var originalPath = Path.Combine(sourceDirectory, file);
             var newPath = Path.Combine(_processingDirectory, file);
-            File.Move(originalPath, newPath);
+            _fileAccessor.Move(originalPath, newPath);
         });
 
         await using var duckDbConnection = new DuckDbConnection();
@@ -86,21 +87,17 @@ public class ProcessRequestFilesWorkflow(
 
         // We fetch the files again in case there are files leftover in the processing dir
         // from a previous function run.
-        var filesReadyForProcessing = Directory
-            .GetFiles(_processingDirectory)
-            .Select(Path.GetFileName)
-            .OfType<string>()
-            .ToList();
+        var filesReadyForProcessing = _fileAccessor.ListFiles(_processingDirectory);
 
         foreach (var filename in filesReadyForProcessing)
         {
             try
             {
                 await actor.ProcessSourceFile(
-                    sourceFilePath: $"{_processingDirectory}/{filename}",
+                    sourceFilePath: Path.Combine(_processingDirectory, filename),
                     connection: duckDbConnection);
             }
-            catch (DuckDBException e)
+            catch (Exception e)
             {
                 logger.LogError(e, "Failed to process request file {Filename}", filename);
                 MoveBadFileToFailuresDirectory(filename);
@@ -109,29 +106,74 @@ public class ProcessRequestFilesWorkflow(
 
         var reportFilePathAndFilenamePrefix = Path.Combine(
             reportsDirectory,
-            DateTime.UtcNow.ToString("yyyyMMdd-HHmmss"));
+            _dateTimeProvider.UtcNow.ToString("yyyyMMdd-HHmmss"));
 
         await actor.CreateParquetReports(
             reportsFilePathAndFilenamePrefix: reportFilePathAndFilenamePrefix,
             connection: duckDbConnection);
 
-        Directory.Delete(_processingDirectory, recursive: true);
+        _fileAccessor.DeleteDirectory(_processingDirectory);
     }
 
     private void MoveBadFileToFailuresDirectory(string filename)
     {
         try
         {
-            Directory.CreateDirectory(_failuresDirectory);
+            _fileAccessor.CreateDirectory(_failuresDirectory);
 
             var fileSourcePath = Path.Combine(_processingDirectory, filename);
             var fileDestPath = Path.Combine(_failuresDirectory, filename);
-            File.Move(fileSourcePath, fileDestPath);
+            _fileAccessor.Move(fileSourcePath, fileDestPath);
         }
         catch (Exception e)
         {
             logger.LogError(e, "Failed to move bad file to failures directory {Filename}", filename);
         }
+    }
+}
+
+public interface IFileAccessor
+{
+    bool DirectoryExists(string directory);
+    
+    void CreateDirectory(string directory);
+    
+    void DeleteDirectory(string directory);
+    
+    IList<string> ListFiles(string directory);
+    
+    void Move(string sourcePath, string destinationPath);
+}
+
+internal class DefaultFileAccessor : IFileAccessor
+{
+    public bool DirectoryExists(string directory)
+    {
+        return Directory.Exists(directory);
+    }
+
+    public void CreateDirectory(string directory)
+    {
+        Directory.CreateDirectory(directory);
+    }
+
+    public void DeleteDirectory(string directory)
+    {
+        Directory.Delete(directory, recursive: true);
+    }
+
+    public IList<string> ListFiles(string directory)
+    {
+        return Directory
+            .GetFiles(directory)
+            .Select(Path.GetFileName)
+            .OfType<string>()
+            .ToList(); 
+    }
+
+    public void Move(string sourcePath, string destinationPath)
+    {
+        Directory.Move(sourcePath, destinationPath);
     }
 }
 
