@@ -8,6 +8,7 @@ import { ParsedUrlQuery } from 'querystring';
 import GoToTopLink from '@common/components/GoToTopLink';
 import ScreenReaderMessage from '@common/components/ScreenReaderMessage';
 import ButtonText from '@common/components/ButtonText';
+import { SelectOption } from '@common/components/form/FormSelect';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import VisuallyHidden from '@common/components/VisuallyHidden';
 import WarningMessage from '@common/components/WarningMessage';
@@ -59,11 +60,21 @@ const FindStatisticsPage: NextPage = () => {
   const {
     paging,
     results: publications = [],
-    facets = { theme: [], releaseType: [] },
+    facets = { themeId: [], releaseType: [] },
   } = publicationsData ?? {};
   const { page, totalPages, totalResults = 0 } = paging ?? {};
 
-  const { theme: themeFacetResults } = facets;
+  const { themeId: themeFacetResults } = facets;
+
+  const mappedThemeFacetResults = themeFacetResults.map(result => {
+    const themeFromApi = themes.find(theme => theme.id === result.value);
+    return {
+      label: themeFromApi
+        ? `${themeFromApi.title} (${result.count})`
+        : result.title,
+      value: result.value,
+    } as SelectOption;
+  });
 
   const { releaseType, search, sortBy, themeId } = getParamsFromQuery(
     router.query,
@@ -268,7 +279,7 @@ const FindStatisticsPage: NextPage = () => {
               showResetFiltersButton={!isMobileMedia && isFiltered}
               sortBy={sortBy}
               sortOptions={sortOptions}
-              themeFacetResults={themeFacetResults}
+              mappedThemeFacetResults={mappedThemeFacetResults}
               themeId={themeId}
               themes={themes}
               onChange={handleChangeFilter}
@@ -287,7 +298,7 @@ const FindStatisticsPage: NextPage = () => {
                 releaseType={releaseType}
                 sortBy={sortBy}
                 sortOptions={sortOptions}
-                themeFacetResults={themeFacetResults}
+                mappedThemeFacetResults={mappedThemeFacetResults}
                 themeId={themeId}
                 themes={themes}
                 onChange={handleChangeFilter}
