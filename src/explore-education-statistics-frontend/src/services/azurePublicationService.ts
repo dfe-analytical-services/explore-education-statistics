@@ -66,20 +66,16 @@ const azurePublicationService = {
     const { filter, orderBy, page = 1, search } = params;
 
     const searchResults = await azureSearchClient.search(search || '', {
-      // Pagination
       includeTotalCount: true,
       top: 10,
       skip: page > 1 ? (page - 1) * 10 : 0,
-
-      // Semantic search
-      // queryType: 'semantic',
+      queryType: !orderBy ? 'semantic' : undefined,
       semanticSearchOptions: {
         configurationName: 'semantic-configuration-1',
       },
       searchMode: 'any',
       scoringProfile: 'scoring-profile-1',
       highlightFields: 'content',
-
       facets: ['themeId,sort:count', 'releaseType'],
       filter,
       orderBy: orderBy ? [orderBy] : undefined,
@@ -96,7 +92,7 @@ const azurePublicationService = {
       ],
     });
 
-    // Transform response into <PaginatedList<PublicationListSummary>>
+    // Transform response into <PaginatedListWithAzureFacets<PublicationListSummary>>
     const { count, results, facets = {} } = searchResults;
     const publicationsResult = {
       paging: {
