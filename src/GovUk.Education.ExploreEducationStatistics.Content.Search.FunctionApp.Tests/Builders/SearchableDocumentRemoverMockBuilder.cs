@@ -25,6 +25,10 @@ public class SearchableDocumentRemoverMockBuilder
                 It.IsAny<RemoveSearchableDocumentRequest>(),
                 It.IsAny<CancellationToken>()))
             .ReturnsAsync(_removeSearchableDocumentResponse ?? new RemoveSearchableDocumentResponse(Success: true));
+        
+        _mock
+            .Setup(m => m.RemoveAllSearchableDocuments(It.IsAny<CancellationToken>()))
+            .Returns(Task.CompletedTask);
     }
 
     public ISearchableDocumentRemover Build()
@@ -85,6 +89,11 @@ public class SearchableDocumentRemoverMockBuilder
                         It.IsAny<RemoveSearchableDocumentRequest>(),
                         It.IsAny<CancellationToken>()),
                     Times.Never);
+        }
+
+        public void AllSearchableDocumentsRemoved()
+        {
+            mock.Verify(m => m.RemoveAllSearchableDocuments(It.IsAny<CancellationToken>()), Times.Once);
         }
     }
 }

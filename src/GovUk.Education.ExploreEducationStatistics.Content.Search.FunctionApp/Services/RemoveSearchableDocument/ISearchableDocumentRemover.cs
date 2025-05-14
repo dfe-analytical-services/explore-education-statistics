@@ -9,4 +9,6 @@ public interface ISearchableDocumentRemover
     Task<RemoveSearchableDocumentResponse> RemoveSearchableDocument(
         RemoveSearchableDocumentRequest request,
         CancellationToken cancellationToken = default);
+
+    Task RemoveAllSearchableDocuments(CancellationToken cancellationToken);
 }
