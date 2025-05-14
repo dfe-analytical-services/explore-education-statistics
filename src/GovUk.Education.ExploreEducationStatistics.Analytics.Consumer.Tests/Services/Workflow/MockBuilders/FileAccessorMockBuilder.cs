@@ -113,11 +113,11 @@ public class FileAccessorMockBuilder
         }
         
         public Asserter MoveBetweenFoldersCalledFor(
-            IEnumerable<string> sourceFiles,
+            IEnumerable<string> files,
             string sourceDirectory,
             string destinationDirectory)
         {
-            sourceFiles.ForEach(sourceFile =>
+            files.ForEach(sourceFile =>
             {
                 mock.Verify(m => m.Move(
                     Path.Combine(sourceDirectory, sourceFile),

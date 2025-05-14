@@ -69,8 +69,9 @@ public abstract class ProcessRequestFilesWorkflowTests
             
             // Ensure no reports were generated or reports folder created
             // because no source files existed.
-            _fileAccessorAsserter.DirectoryExistsCalledFor(SourceFolder);
-            _fileAccessorAsserter.FileListForDirectoryCalledFor(SourceFolder);
+            _fileAccessorAsserter
+                .DirectoryExistsCalledFor(SourceFolder)
+                .FileListForDirectoryCalledFor(SourceFolder);
         }
         
         [Fact]
@@ -93,7 +94,9 @@ public abstract class ProcessRequestFilesWorkflowTests
                     sourceFiles: sourceFiles,
                     sourceDirectory: SourceFolder,
                     destinationDirectory: ProcessingFolder)
-                .WhereFileListForDirectoryIs(ProcessingFolder, sourceFiles);
+                .WhereFileListForDirectoryIs(
+                    directory: ProcessingFolder,
+                    files: sourceFiles);
 
             _workflowActorMockBuilder
                 .WhereSourceFilesAreProcessedSuccessfully(
@@ -115,24 +118,34 @@ public abstract class ProcessRequestFilesWorkflowTests
                 dateTimeProvider: new DateTimeProvider(DateTime.Parse("2022-03-16T12:01:02Z")));
 
             await workflow.Process();
-            
-            _fileAccessorAsserter.DirectoryExistsCalledFor(SourceFolder);
-            _fileAccessorAsserter.FileListForDirectoryCalledFor(SourceFolder);
-            _fileAccessorAsserter.CreateDirectoryCalledFor(ProcessingFolder);
-            
-            _fileAccessorAsserter.MoveBetweenFoldersCalledFor(
-                sourceFiles, SourceFolder, ProcessingFolder);
-            
-            _workflowActorAsserter.DuckDbInitialised();
-            _workflowActorAsserter.SourceFilesProcessed(
-                processingFolder: ProcessingFolder,
-                sourceFiles: sourceFiles);
-            _fileAccessorAsserter.DeleteDirectoryCalledFor(ProcessingFolder);
-            
-            _fileAccessorAsserter.CreateDirectoryCalledFor(ReportsFolder);
-            _workflowActorAsserter.ReportsGeneratedSuccessfully(
-                reportsFolder: ReportsFolder,
-                reportsFilenamePrefix: "20220316-120102");
+
+            _fileAccessorAsserter
+                .DirectoryExistsCalledFor(SourceFolder)
+                .FileListForDirectoryCalledFor(SourceFolder)
+                .CreateDirectoryCalledFor(ProcessingFolder);
+
+            _fileAccessorAsserter
+                .MoveBetweenFoldersCalledFor(
+                    files: sourceFiles,
+                    sourceDirectory: SourceFolder,
+                    destinationDirectory: ProcessingFolder);
+
+            _workflowActorAsserter
+                .DuckDbInitialised()
+                .SourceFilesProcessed(
+                    processingFolder: ProcessingFolder,
+                    sourceFiles: sourceFiles);
+
+            _fileAccessorAsserter
+                .DeleteDirectoryCalledFor(ProcessingFolder);
+
+            _fileAccessorAsserter
+                .CreateDirectoryCalledFor(ReportsFolder);
+
+            _workflowActorAsserter
+                .ReportsGeneratedSuccessfully(
+                    reportsFolder: ReportsFolder,
+                    reportsFilenamePrefix: "20220316-120102");
         }
         
         [Fact]
@@ -192,29 +205,40 @@ public abstract class ProcessRequestFilesWorkflowTests
                 dateTimeProvider: new DateTimeProvider(DateTime.Parse("2022-03-16T12:01:02Z")));
 
             await workflow.Process();
+
+            _fileAccessorAsserter
+                .DirectoryExistsCalledFor(SourceFolder)
+                .FileListForDirectoryCalledFor(SourceFolder)
+                .CreateDirectoryCalledFor(ProcessingFolder);
+
+            _fileAccessorAsserter
+                .MoveBetweenFoldersCalledFor(
+                    files: sourceFiles,
+                    sourceDirectory: SourceFolder,
+                    destinationDirectory: ProcessingFolder);
             
-            _fileAccessorAsserter.DirectoryExistsCalledFor(SourceFolder);
-            _fileAccessorAsserter.FileListForDirectoryCalledFor(SourceFolder);
-            _fileAccessorAsserter.CreateDirectoryCalledFor(ProcessingFolder);
+            _workflowActorAsserter
+                .DuckDbInitialised();
             
-            _fileAccessorAsserter.MoveBetweenFoldersCalledFor(
-                sourceFiles, SourceFolder, ProcessingFolder);
-            
-            _workflowActorAsserter.DuckDbInitialised();
             _workflowActorAsserter.SourceFilesProcessed(
                 processingFolder: ProcessingFolder,
                 sourceFiles: sourceFiles);
             
-            _fileAccessorAsserter.CreateDirectoryCalledFor(FailuresFolder);
-            _fileAccessorAsserter.MoveBetweenFoldersCalledFor(
-                ["failingFile2", "failingFile4"], ProcessingFolder, FailuresFolder);
+            _fileAccessorAsserter
+                .CreateDirectoryCalledFor(FailuresFolder)
+                .MoveBetweenFoldersCalledFor(
+                    files: ["failingFile2", "failingFile4"],
+                    sourceDirectory: ProcessingFolder,
+                    destinationDirectory: FailuresFolder);
             
-            _fileAccessorAsserter.DeleteDirectoryCalledFor(ProcessingFolder);
+            _fileAccessorAsserter
+                .DeleteDirectoryCalledFor(ProcessingFolder)
+                .CreateDirectoryCalledFor(ReportsFolder);
             
-            _fileAccessorAsserter.CreateDirectoryCalledFor(ReportsFolder);
-            _workflowActorAsserter.ReportsGeneratedSuccessfully(
-                reportsFolder: ReportsFolder,
-                reportsFilenamePrefix: "20220316-120102");
+            _workflowActorAsserter
+                .ReportsGeneratedSuccessfully(
+                    reportsFolder: ReportsFolder,
+                    reportsFilenamePrefix: "20220316-120102");
         }
     }
 

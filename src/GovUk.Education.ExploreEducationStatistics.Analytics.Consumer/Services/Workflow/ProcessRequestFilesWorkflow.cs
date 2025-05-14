@@ -46,7 +46,7 @@ public class ProcessRequestFilesWorkflow(
 {
     private readonly string _processingDirectory = Path.Combine(sourceDirectory, "processing");
     private readonly string _failuresDirectory = Path.Combine(sourceDirectory, "failures");
-    private readonly IFileAccessor _fileAccessor = fileAccessor ?? new DefaultFileAccessor();
+    private readonly IFileAccessor _fileAccessor = fileAccessor ?? new FilesystemFileAccessor();
     private readonly DateTimeProvider _dateTimeProvider = dateTimeProvider ?? new DateTimeProvider();
 
     public async Task Process()
@@ -132,6 +132,13 @@ public class ProcessRequestFilesWorkflow(
     }
 }
 
+/// <summary>
+/// This interface represents a component that interacts with a file store
+/// comprising directories and files.
+///
+/// It declares common filesystem interactions, mostly modelled from equivalent
+/// calls from <see cref="Directory"/> and <see cref="File"/>.
+/// </summary>
 public interface IFileAccessor
 {
     bool DirectoryExists(string directory);
@@ -145,7 +152,12 @@ public interface IFileAccessor
     void Move(string sourcePath, string destinationPath);
 }
 
-internal class DefaultFileAccessor : IFileAccessor
+/// <summary>
+/// This default implementation of <see cref="IFileAccessor"/> interacts
+/// directly with a standard filesystem, using <see cref="Directory"/>
+/// and <see cref="File"/> to perform the work.
+/// </summary>
+internal class FilesystemFileAccessor : IFileAccessor
 {
     public bool DirectoryExists(string directory)
     {
