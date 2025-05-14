@@ -18,10 +18,9 @@ public class AzureBlobStorageClient(
         CancellationToken cancellationToken = default)
     {
         var blobContainerClient = BlobServiceClient.GetBlobContainerClient(containerName);
-        var blobClient = blobContainerClient.GetBlobClient(blobName);
         try
         {
-            return await blobClient.DeleteIfExistsAsync(cancellationToken: cancellationToken);
+            return await blobContainerClient.DeleteBlobIfExistsAsync(blobName, cancellationToken: cancellationToken);
         }
         catch (Exception e)
         {
