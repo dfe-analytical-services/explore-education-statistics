@@ -16,7 +16,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="CliFx" Version="2.3.5" />
+      <PackageReference Include="CliFx" Version="2.3.6" />
       <PackageReference Include="CliWrap" Version="3.8.2" />
       <PackageReference Include="Dapper" Version="2.1.66" />
     </ItemGroup>
