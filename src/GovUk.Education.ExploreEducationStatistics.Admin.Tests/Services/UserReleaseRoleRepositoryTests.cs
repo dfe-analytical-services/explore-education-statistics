@@ -456,7 +456,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 var service = SetupUserReleaseRoleRepository(contentDbContext);
                 await service.RemoveMany(
-                    ListOf(userReleaseRole1, userReleaseRole2),
+                    [userReleaseRole1, userReleaseRole2],
                     deletedById);
 
                 var userReleaseRole = await contentDbContext.UserReleaseRoles
@@ -508,7 +508,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 var service = SetupUserReleaseRoleRepository(contentDbContext);
                 await service.RemoveMany(
-                    ListOf(userReleaseRole1, userReleaseRole2),
+                    [userReleaseRole1, userReleaseRole2],
                     deletedById);
 
                 var userReleaseRoles = await contentDbContext.UserReleaseRoles
