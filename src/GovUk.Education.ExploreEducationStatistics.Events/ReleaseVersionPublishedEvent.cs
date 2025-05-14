@@ -5,16 +5,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Events;
 
 public record ReleaseVersionPublishedEvent : IEvent
 {
-    public ReleaseVersionPublishedEvent(PublishedReleaseVersionInfo publishedReleaseVersion)
+    public ReleaseVersionPublishedEvent(ReleaseVersionPublishedEventInfo releaseVersionPublishedEvent)
     {
-        Subject = publishedReleaseVersion.ReleaseVersionId.ToString();
-        Payload = new()
+        Subject = releaseVersionPublishedEvent.ReleaseVersionId.ToString();
+        Payload = new EventPayload
         {
-            ReleaseId = publishedReleaseVersion.ReleaseId,
-            ReleaseSlug = publishedReleaseVersion.ReleaseSlug,
-            PublicationId = publishedReleaseVersion.PublicationId,
-            PublicationSlug = publishedReleaseVersion.PublicationSlug,
-            PublicationLatestPublishedReleaseVersionId = publishedReleaseVersion.PublicationLatestPublishedReleaseVersionId,
+            ReleaseId = releaseVersionPublishedEvent.ReleaseId,
+            ReleaseSlug = releaseVersionPublishedEvent.ReleaseSlug,
+            PublicationId = releaseVersionPublishedEvent.PublicationId,
+            PublicationSlug = releaseVersionPublishedEvent.PublicationSlug,
+            PublicationLatestPublishedReleaseVersionId = releaseVersionPublishedEvent.PublicationLatestPublishedReleaseVersionId,
         };
     }
 
@@ -45,7 +45,7 @@ public record ReleaseVersionPublishedEvent : IEvent
     
     public EventGridEvent ToEventGridEvent() => new(Subject, EventType, DataVersion, Payload);
 
-    public record PublishedReleaseVersionInfo
+    public record ReleaseVersionPublishedEventInfo
     {
         public Guid ReleaseVersionId { get; init; }
         public Guid ReleaseId {get;init;}

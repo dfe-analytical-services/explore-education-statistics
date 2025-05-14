@@ -17,7 +17,16 @@ public class PublisherEventRaiser(IEventRaiser eventRaiser) : IPublisherEventRai
     /// </summary>
     /// <param name="publishedReleaseVersionInfos">information about the one or more release versions that have been published</param>
     public async Task RaiseReleaseVersionPublishedEvents(
-        IEnumerable<ReleaseVersionPublishedEvent.PublishedReleaseVersionInfo> publishedReleaseVersionInfos) =>
+        IEnumerable<PublishedReleaseVersionInfo> publishedReleaseVersionInfos) =>
         await eventRaiser.RaiseEvents(
-            publishedReleaseVersionInfos.Select(info => new ReleaseVersionPublishedEvent(info)));
+            publishedReleaseVersionInfos.Select(info => new ReleaseVersionPublishedEvent(
+                new ReleaseVersionPublishedEvent.ReleaseVersionPublishedEventInfo
+                {
+                    PublicationId = info.PublicationId,
+                    PublicationSlug = info.PublicationSlug,
+                    ReleaseId = info.ReleaseId,
+                    ReleaseSlug = info.ReleaseSlug,
+                    ReleaseVersionId = info.ReleaseVersionId,
+                    PublicationLatestPublishedReleaseVersionId = info.PublicationLatestPublishedReleaseVersionId
+                })));
 }

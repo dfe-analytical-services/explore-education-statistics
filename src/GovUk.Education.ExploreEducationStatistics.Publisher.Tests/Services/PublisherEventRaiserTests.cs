@@ -38,7 +38,7 @@ public class PublisherEventRaiserTests
         {
             // ARRANGE
             var sut = GetSut();
-            var info = new ReleaseVersionPublishedEvent.PublishedReleaseVersionInfo
+            var info = new PublishedReleaseVersionInfo
             {
                 PublicationId = Guid.Parse("11111111-0000-0000-0000-000000000000"),
                 PublicationSlug = "test-publication-slug",
@@ -52,7 +52,16 @@ public class PublisherEventRaiserTests
             await sut.RaiseReleaseVersionPublishedEvents([info]);
 
             // ASSERT
-            var expectedEvent = new ReleaseVersionPublishedEvent(info);
+            var expectedEvent = new ReleaseVersionPublishedEvent(
+                new ReleaseVersionPublishedEvent.ReleaseVersionPublishedEventInfo
+                {
+                    PublicationId = info.PublicationId,
+                    PublicationSlug = info.PublicationSlug,
+                    ReleaseId = info.ReleaseId,
+                    ReleaseSlug = info.ReleaseSlug,
+                    ReleaseVersionId = info.ReleaseVersionId,
+                    PublicationLatestPublishedReleaseVersionId = info.PublicationLatestPublishedReleaseVersionId
+                });
             _eventRaiserMockBuilder.Assert.EventsRaised([expectedEvent]);
         }
         
@@ -64,7 +73,7 @@ public class PublisherEventRaiserTests
             // ARRANGE
             var sut = GetSut();
             var infos = Enumerable.Range(1, numberOfEvents)
-                .Select(i => new ReleaseVersionPublishedEvent.PublishedReleaseVersionInfo
+                .Select(i => new PublishedReleaseVersionInfo
                     {
                         PublicationId = Guid.Parse($"11111111-0000-0000-0000-{i:000000000000}"),
                         PublicationSlug = "test-publication-slug",
@@ -79,7 +88,17 @@ public class PublisherEventRaiserTests
             await sut.RaiseReleaseVersionPublishedEvents(infos);
 
             // ASSERT
-            var expectedEvents = infos.Select(info => new ReleaseVersionPublishedEvent(info));
+            var expectedEvents = infos.Select(info =>
+                new ReleaseVersionPublishedEvent(
+                    new ReleaseVersionPublishedEvent.ReleaseVersionPublishedEventInfo
+                    {
+                        PublicationId = info.PublicationId,
+                        PublicationSlug = info.PublicationSlug,
+                        ReleaseId = info.ReleaseId,
+                        ReleaseSlug = info.ReleaseSlug,
+                        ReleaseVersionId = info.ReleaseVersionId,
+                        PublicationLatestPublishedReleaseVersionId = info.PublicationLatestPublishedReleaseVersionId
+                    }));
             _eventRaiserMockBuilder.Assert.EventsRaised(expectedEvents);
         }
     }
@@ -131,7 +150,7 @@ public class PublisherEventRaiserTests
             
             var sut = GetSut(new EventRaiser(realEventGridClientFactory));
 
-            var publishedReleaseVersionInfo = new ReleaseVersionPublishedEvent.PublishedReleaseVersionInfo
+            var publishedReleaseVersionInfo = new PublishedReleaseVersionInfo
             {
                 PublicationId = Guid.Parse("11111111-0000-0000-0000-000000000000"),
                 PublicationSlug = "test-publication-slug",
