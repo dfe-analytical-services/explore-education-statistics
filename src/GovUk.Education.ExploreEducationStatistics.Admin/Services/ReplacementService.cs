@@ -138,20 +138,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
             
         }
-        private async Task<ApiDataSetVersionPlanViewModel?> GetApiVersionPlanViewModel(DataSetVersion apiDataSetVersion, CancellationToken cancellationToken)
+        private async Task<ApiDataSetVersionPlanViewModel?> GetApiVersionPlanViewModel(DataSetVersion apiDataSetVersionToReplace, CancellationToken cancellationToken)
         {
             var apiDataSetVersionPlan = new ApiDataSetVersionPlanViewModel
                 {
-                    DataSetId = apiDataSetVersion.DataSetId,
-                    DataSetTitle = apiDataSetVersion.DataSet.Title,
-                    Id = apiDataSetVersion.Id,
-                    Version = apiDataSetVersion.PublicVersion,
-                    Status = apiDataSetVersion.Status,
+                    DataSetId = apiDataSetVersionToReplace.DataSetId,
+                    DataSetTitle = apiDataSetVersionToReplace.DataSet.Title,
+                    Id = apiDataSetVersionToReplace.Id,
+                    Version = apiDataSetVersionToReplace.PublicVersion,
+                    Status = apiDataSetVersionToReplace.Status,
                     Valid = false,
                 };
-            if (_featureFlags.Value.EnableReplacementOfPublicApiDataSets && apiDataSetVersion.VersionPatch > 0)
+            if (_featureFlags.Value.EnableReplacementOfPublicApiDataSets && apiDataSetVersionToReplace.VersionPatch > 0)
             { 
-                apiDataSetVersionPlan.MappingStatus = await _dataSetService.GetMappingStatus(apiDataSetVersion.Id, cancellationToken);
+                apiDataSetVersionPlan.MappingStatus = await _dataSetService.GetMappingStatus(apiDataSetVersionToReplace.Id, cancellationToken);
                 apiDataSetVersionPlan.Valid = apiDataSetVersionPlan.MappingStatus is
                     { FiltersComplete: true, LocationsComplete: true };
             }
