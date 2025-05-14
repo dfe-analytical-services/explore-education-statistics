@@ -30,8 +30,8 @@ describe('DataFilesTableRow', () => {
     jest.clearAllMocks();
   });
 
-  describe('when feature flag is toggled', () => {
-    test('shows no modal when feature flag is enabled', async () => {
+  describe('when feature flag enableReplacementOfPublicApiDataSets is toggled', () => {
+    test('shows no API modal that stops the user when feature flag enableReplacementOfPublicApiDataSets is enabled', async () => {
       const dataFile = { ...mockDataFile, publicApiDataSetId: 'dataset-1' };
       const testFeatureFlag: FeatureFlags = {
         enableReplacementOfPublicApiDataSets: true,
@@ -67,7 +67,7 @@ describe('DataFilesTableRow', () => {
       });
     });
 
-    test('shows modal when feature flag is disabled', async () => {
+    test('shows - modal that stops the user, when feature flag enableReplacementOfPublicApiDataSets is disabled', async () => {
       const dataFile = { ...mockDataFile, publicApiDataSetId: 'dataset-1' };
       const testFeatureFlag: FeatureFlags = {
         enableReplacementOfPublicApiDataSets: false,

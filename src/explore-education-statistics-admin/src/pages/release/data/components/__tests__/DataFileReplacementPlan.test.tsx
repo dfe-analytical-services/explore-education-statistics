@@ -395,8 +395,8 @@ describe('DataReplacementPlan', () => {
     valid: true,
   };
 
-  describe('feature flagged section with invalid plan ', () => {
-    test('renders the section when the feature flag is turned on', async () => {
+  describe('feature flagged enableReplacementOfPublicApiDataSets section renders with invalid plan ', () => {
+    test('renders the section when the feature flag enableReplacementOfPublicApiDataSets is turned on', async () => {
       dataReplacementService.getReplacementPlan.mockResolvedValue(
         testReplacementPlan,
       );
@@ -425,7 +425,7 @@ describe('DataReplacementPlan', () => {
       });
     });
 
-    test('doesnt render the section when the feature flag is turned off', async () => {
+    test('doesnt render the section when the feature flag enableReplacementOfPublicApiDataSets is turned off', async () => {
       dataReplacementService.getReplacementPlan.mockResolvedValue(
         testReplacementPlan,
       );
@@ -450,7 +450,7 @@ describe('DataReplacementPlan', () => {
       });
     });
 
-    test('doesnt render the section when the feature flag is turned and no mapping status is defined', async () => {
+    test('doesnt render the section when the feature flag enableReplacementOfPublicApiDataSets is turned and no mapping status is defined', async () => {
       dataReplacementService.getReplacementPlan.mockResolvedValue({
         ...testReplacementPlan,
         apiDataSetVersionPlan: {
@@ -489,6 +489,7 @@ describe('DataReplacementPlan', () => {
       });
     });
   });
+
   test('renders correctly with invalid plan', async () => {
     dataReplacementService.getReplacementPlan.mockResolvedValue(
       testReplacementPlan,
