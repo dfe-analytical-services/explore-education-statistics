@@ -1,27 +1,31 @@
 using GovUk.Education.ExploreEducationStatistics.Analytics.Consumer.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Analytics.Consumer.Services.Workflow;
 using GovUk.Education.ExploreEducationStatistics.Common.DuckDb.DuckDb;
+using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using Microsoft.Extensions.Logging;
 
 namespace GovUk.Education.ExploreEducationStatistics.Analytics.Consumer.Services;
 
 public class PublicZipDownloadsProcessor(
     IAnalyticsPathResolver pathResolver,
-    ILogger<PublicZipDownloadsProcessor> logger) : IRequestFileProcessor
+    ILogger<PublicZipDownloadsProcessor> logger,
+    IWorkflowActor<PublicZipDownloadsProcessor>? workflowActor = null) : IRequestFileProcessor
 {
+    private readonly IWorkflowActor<PublicZipDownloadsProcessor> _workflowActor 
+        = workflowActor ?? new WorkflowActor();
+    
     public Task Process() {
     
-        var workflow = new ProcessRequestFilesWorkflow(
-            processorName: GetType().Name,
+        var workflow = new ProcessRequestFilesWorkflow<PublicZipDownloadsProcessor>(
             sourceDirectory: pathResolver.PublicZipDownloadsDirectoryPath(),
             reportsDirectory: pathResolver.PublicZipDownloadsReportsDirectoryPath(),
-            actor: new WorkflowActor(),
+            actor: _workflowActor,
             logger: logger);
 
         return workflow.Process();
     }
 
-    private class WorkflowActor : IWorkflowActor
+    private class WorkflowActor : IWorkflowActor<PublicZipDownloadsProcessor>
     {
         public async Task InitialiseDuckDb(DuckDbConnection connection)
         {

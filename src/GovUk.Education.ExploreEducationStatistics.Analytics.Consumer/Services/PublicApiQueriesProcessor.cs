@@ -1,27 +1,31 @@
 using GovUk.Education.ExploreEducationStatistics.Analytics.Consumer.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Analytics.Consumer.Services.Workflow;
 using GovUk.Education.ExploreEducationStatistics.Common.DuckDb.DuckDb;
+using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using Microsoft.Extensions.Logging;
 
 namespace GovUk.Education.ExploreEducationStatistics.Analytics.Consumer.Services;
 
 public class PublicApiQueriesProcessor(
     IAnalyticsPathResolver pathResolver,
-    ILogger<PublicApiQueriesProcessor> logger) : IRequestFileProcessor
+    ILogger<PublicApiQueriesProcessor> logger,
+    IWorkflowActor<PublicApiQueriesProcessor>? workflowActor = null) : IRequestFileProcessor
 {
+    private readonly IWorkflowActor<PublicApiQueriesProcessor> _workflowActor 
+        = workflowActor ?? new WorkflowActor();
+    
     public Task Process()
     {
-        var workflow = new ProcessRequestFilesWorkflow(
-            processorName: GetType().Name,
+        var workflow = new ProcessRequestFilesWorkflow<PublicApiQueriesProcessor>(
             sourceDirectory: pathResolver.PublicApiQueriesDirectoryPath(),
             reportsDirectory: pathResolver.PublicApiQueriesReportsDirectoryPath(),
-            actor: new WorkflowActor(),
+            actor: _workflowActor,
             logger: logger);
 
         return workflow.Process();
     }
 
-    private class WorkflowActor : IWorkflowActor
+    private class WorkflowActor : IWorkflowActor<PublicApiQueriesProcessor>
     {
         public async Task InitialiseDuckDb(DuckDbConnection connection)
         {

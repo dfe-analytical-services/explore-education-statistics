@@ -1,4 +1,3 @@
-using DuckDB.NET.Data;
 using GovUk.Education.ExploreEducationStatistics.Analytics.Consumer.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.DuckDb.DuckDb;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
@@ -23,9 +22,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Analytics.Consumer.Services
 /// implementation-specific steps along the way. 
 /// 
 /// </summary>
-/// <param name="processorName">
-///     Class name of the <see cref="IRequestFileProcessor" /> using this workflow.
-/// </param>
 /// <param name="sourceDirectory">
 ///     Folder in which to find the source files to read in this workflow.
 /// </param>
@@ -33,16 +29,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Analytics.Consumer.Services
 ///     Folder in which to generate the Parquet report files in this workflow.
 /// </param>
 /// <param name="actor">
-///     The <see cref="IWorkflowActor" /> implementation being guided through the workflow.
+///     The <see cref="IWorkflowActor{TRequestFileProcessor}" /> implementation being guided through the workflow.
 /// </param>
-public class ProcessRequestFilesWorkflow(
-    string processorName,
+public class ProcessRequestFilesWorkflow<TRequestFileProcessor>(
     string sourceDirectory,
     string reportsDirectory,
-    IWorkflowActor actor, 
+    IWorkflowActor<TRequestFileProcessor> actor, 
     ILogger<IRequestFileProcessor> logger,
     IFileAccessor? fileAccessor = null,
     DateTimeProvider? dateTimeProvider = null)
+    where TRequestFileProcessor : IRequestFileProcessor
 {
     private readonly string _processingDirectory = Path.Combine(sourceDirectory, "processing");
     private readonly string _failuresDirectory = Path.Combine(sourceDirectory, "failures");
@@ -51,6 +47,8 @@ public class ProcessRequestFilesWorkflow(
 
     public async Task Process()
     {
+        var processorName = typeof(TRequestFileProcessor).Name;
+        
         logger.LogInformation("{Processor} triggered", processorName);
         
         if (!_fileAccessor.DirectoryExists(sourceDirectory))
@@ -70,8 +68,12 @@ public class ProcessRequestFilesWorkflow(
         logger.LogInformation("Found {Count} requests for {Processor} to process", filesToProcess.Count,
             processorName);
 
+        await using var duckDbConnection = new DuckDbConnection();
+        duckDbConnection.Open();
+
+        await actor.InitialiseDuckDb(duckDbConnection);
+
         _fileAccessor.CreateDirectory(_processingDirectory);
-        _fileAccessor.CreateDirectory(reportsDirectory);
 
         Parallel.ForEach(filesToProcess, file =>
         {
@@ -80,22 +82,17 @@ public class ProcessRequestFilesWorkflow(
             _fileAccessor.Move(originalPath, newPath);
         });
 
-        await using var duckDbConnection = new DuckDbConnection();
-        duckDbConnection.Open();
-
-        await actor.InitialiseDuckDb(duckDbConnection);
-
-        // We fetch the files again in case there are files leftover in the processing dir
-        // from a previous function run.
-        var filesReadyForProcessing = _fileAccessor.ListFiles(_processingDirectory);
-
-        foreach (var filename in filesReadyForProcessing)
+        var someFilesProcessedSuccessfully = false;
+        
+        foreach (var filename in filesToProcess)
         {
             try
             {
                 await actor.ProcessSourceFile(
                     sourceFilePath: Path.Combine(_processingDirectory, filename),
                     connection: duckDbConnection);
+
+                someFilesProcessedSuccessfully = true;
             }
             catch (Exception e)
             {
@@ -104,6 +101,17 @@ public class ProcessRequestFilesWorkflow(
             }
         }
 
+        _fileAccessor.DeleteDirectory(_processingDirectory);
+
+        // If no files were successfully processed, there is no need to generate
+        // reports, so exit early.
+        if (!someFilesProcessedSuccessfully)
+        {
+            return;
+        }
+        
+        _fileAccessor.CreateDirectory(reportsDirectory);
+        
         var reportFilePathAndFilenamePrefix = Path.Combine(
             reportsDirectory,
             _dateTimeProvider.UtcNow.ToString("yyyyMMdd-HHmmss"));
@@ -111,8 +119,6 @@ public class ProcessRequestFilesWorkflow(
         await actor.CreateParquetReports(
             reportsFolderPathAndFilenamePrefix: reportFilePathAndFilenamePrefix,
             connection: duckDbConnection);
-
-        _fileAccessor.DeleteDirectory(_processingDirectory);
     }
 
     private void MoveBadFileToFailuresDirectory(string filename)
@@ -191,14 +197,15 @@ internal class FilesystemFileAccessor : IFileAccessor
 
 /// <summary>
 /// This class represents an actor who is guided through the workflow
-/// as implemented in <see cref="ProcessRequestFilesWorkflow"/>.
+/// as implemented in <see cref="ProcessRequestFilesWorkflow{TRequestFileProcessor}"/>.
 ///
 /// This class is responsible for implementing steps that
-/// are carried out during the workflow that are specific to indicidual
+/// are carried out during the workflow that are specific to individual
 /// use cases e.g. collecting data about and generating Parquet report
 /// files for Public API queries.
 /// </summary>
-public interface IWorkflowActor
+public interface IWorkflowActor<TRequestFileProcessor>
+    where TRequestFileProcessor : IRequestFileProcessor
 {
     /// <summary>
     /// Create any initial tables and state needed for collecting information
@@ -210,8 +217,13 @@ public interface IWorkflowActor
     /// Given a source file, process it, generally by reading it into DuckDb
     /// into tables set up at the beginning of the workflow.
     /// </summary>
-    /// <param name="sourceFilePath">The fully-qualified filepath for the source
-    /// file to process.</param>
+    /// <param name="sourceFilePath">
+    /// The fully-qualified filepath for the source
+    /// file to process.
+    /// </param>
+    /// <param name="connection">
+    /// An open DuckDB connection that supports JSON reading and Parquet writing.
+    /// </param>
     Task ProcessSourceFile(string sourceFilePath, DuckDbConnection connection);
 
     /// <summary>
@@ -222,6 +234,9 @@ public interface IWorkflowActor
     /// The fully-qualified folder path and filename prefix for any reports being
     /// generated. In addition to a name suffix to identify each report being generated
     /// here, '.parquet' will also need to be appended to any report filenames.
+    /// </param>
+    /// <param name="connection">
+    /// An open DuckDB connection that supports JSON reading and Parquet writing.
     /// </param>
     Task CreateParquetReports(string reportsFolderPathAndFilenamePrefix, DuckDbConnection connection);
 }
