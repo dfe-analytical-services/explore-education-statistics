@@ -53,10 +53,10 @@ public class PublicApiDataSetVersionCallsProcessor(
             ");
         }
 
-        public async Task CreateParquetReports(string reportsFilePathAndFilenamePrefix, DuckDbConnection connection)
+        public async Task CreateParquetReports(string reportsFolderPathAndFilenamePrefix, DuckDbConnection connection)
         {
             var reportFilePath = 
-                $"{reportsFilePathAndFilenamePrefix}_public-api-data-set-version-calls.parquet";
+                $"{reportsFolderPathAndFilenamePrefix}_public-api-data-set-version-calls.parquet";
         
             await connection.ExecuteNonQueryAsync($@"
                 COPY (

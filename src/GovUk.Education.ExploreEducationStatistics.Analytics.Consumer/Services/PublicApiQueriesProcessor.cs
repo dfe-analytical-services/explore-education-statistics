@@ -67,7 +67,7 @@ public class PublicApiQueriesProcessor(
             ");
         }
 
-        public async Task CreateParquetReports(string reportsFilePathAndFilenamePrefix, DuckDbConnection connection)
+        public async Task CreateParquetReports(string reportsFolderPathAndFilenamePrefix, DuckDbConnection connection)
         {
             await connection.ExecuteNonQueryAsync(@"
                 CREATE TABLE queryReport AS 
@@ -99,14 +99,14 @@ public class PublicApiQueriesProcessor(
             ");
 
             var queryReportFilePath = 
-                $"{reportsFilePathAndFilenamePrefix}_public-api-queries.parquet";
+                $"{reportsFolderPathAndFilenamePrefix}_public-api-queries.parquet";
     
             await connection.ExecuteNonQueryAsync($@"
                 COPY (SELECT * FROM queryReport)
                 TO '{queryReportFilePath}' (FORMAT 'parquet', CODEC 'zstd')");
 
             var queryAccessReportFilePath = 
-                $"{reportsFilePathAndFilenamePrefix}_public-api-query-access.parquet";
+                $"{reportsFolderPathAndFilenamePrefix}_public-api-query-access.parquet";
 
             await connection.ExecuteNonQueryAsync($@"
                 COPY (SELECT * FROM queryAccessReport)

@@ -109,7 +109,7 @@ public class ProcessRequestFilesWorkflow(
             _dateTimeProvider.UtcNow.ToString("yyyyMMdd-HHmmss"));
 
         await actor.CreateParquetReports(
-            reportsFilePathAndFilenamePrefix: reportFilePathAndFilenamePrefix,
+            reportsFolderPathAndFilenamePrefix: reportFilePathAndFilenamePrefix,
             connection: duckDbConnection);
 
         _fileAccessor.DeleteDirectory(_processingDirectory);
@@ -206,11 +206,11 @@ public interface IWorkflowActor
     /// Create one or more Parquet report files based on the source files that
     /// have been read.
     /// </summary>
-    /// <param name="reportsFilePathAndFilenamePrefix">
+    /// <param name="reportsFolderPathAndFilenamePrefix">
     /// The fully-qualified folder path and filename prefix for any reports being
     /// generated. In addition to a name suffix to identify each report being generated
     /// here, '.parquet' will also need to be appended to any report filenames.
     /// </param>
-    Task CreateParquetReports(string reportsFilePathAndFilenamePrefix, DuckDbConnection connection);
+    Task CreateParquetReports(string reportsFolderPathAndFilenamePrefix, DuckDbConnection connection);
 }
 

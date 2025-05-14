@@ -60,7 +60,7 @@ public class PublicZipDownloadsProcessor(
             ");
         }
 
-        public async Task CreateParquetReports(string reportsFilePathAndFilenamePrefix, DuckDbConnection connection)
+        public async Task CreateParquetReports(string reportsFolderPathAndFilenamePrefix, DuckDbConnection connection)
         {
             await connection.ExecuteNonQueryAsync(@"
                 CREATE TABLE zipDownloadsReport AS 
@@ -79,7 +79,7 @@ public class PublicZipDownloadsProcessor(
             ");
         
             var reportFilePath = 
-                $"{reportsFilePathAndFilenamePrefix}_public-zip-downloads.parquet";
+                $"{reportsFolderPathAndFilenamePrefix}_public-zip-downloads.parquet";
 
             await connection.ExecuteNonQueryAsync($@"
                 COPY (SELECT * FROM zipDownloadsReport)
