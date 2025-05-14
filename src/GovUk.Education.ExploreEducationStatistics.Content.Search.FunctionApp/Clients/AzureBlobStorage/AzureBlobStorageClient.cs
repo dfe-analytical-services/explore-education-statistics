@@ -1,6 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
 using Azure.Storage.Blobs;
-using Azure.Storage.Blobs.Models;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Exceptions;
 using Microsoft.Extensions.Logging;
 
@@ -19,9 +18,10 @@ public class AzureBlobStorageClient(
         CancellationToken cancellationToken = default)
     {
         var blobContainerClient = BlobServiceClient.GetBlobContainerClient(containerName);
+        var blobClient = blobContainerClient.GetBlobClient(blobName);
         try
         {
-            return await blobContainerClient.DeleteIfExistsAsync(cancellationToken: cancellationToken);
+            return await blobClient.DeleteIfExistsAsync(cancellationToken: cancellationToken);
         }
         catch (Exception e)
         {
