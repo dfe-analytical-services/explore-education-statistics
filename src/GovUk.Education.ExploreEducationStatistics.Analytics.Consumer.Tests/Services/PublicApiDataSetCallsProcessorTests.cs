@@ -11,23 +11,23 @@ using Xunit;
 
 namespace GovUk.Education.ExploreEducationStatistics.Analytics.Consumer.Tests.Services;
 
-public abstract class PublicApiDataSetVersionCallsProcessorTests
+public abstract class PublicApiDataSetCallsProcessorTests
 {
     private readonly string _queryResourcesPath = Path.Combine(
         Assembly.GetExecutingAssembly().GetDirectoryPath(),
         "Resources",
         "PublicApi",
-        "DataSetVersionCalls");
+        "DataSetCalls");
 
-    public class ProcessTests : PublicApiDataSetVersionCallsProcessorTests
+    public class ProcessTests : PublicApiDataSetCallsProcessorTests
     {
         [Fact]
         public async Task ProcessorUsesWorkflow()
         {
             using var pathResolver = new TestAnalyticsPathResolver();
-            SetupRequestFile(pathResolver, "WithCoreDataSetVersionDetails.json");
+            SetupRequestFile(pathResolver, "WithCoreDataSetDetails.json");
 
-            var workflowActorBuilder = new WorkflowActorMockBuilder<PublicApiDataSetVersionCallsProcessor>();
+            var workflowActorBuilder = new WorkflowActorMockBuilder<PublicApiDataSetCallsProcessor>();
             
             var workflowActor = workflowActorBuilder 
                 .WhereDuckDbInitialisedWithErrors()
@@ -45,18 +45,18 @@ public abstract class PublicApiDataSetVersionCallsProcessorTests
         }
 
         [Fact]
-        public async Task CoreDataSetVersionDetails_CapturedInReport()
+        public async Task CoreDataSetDetails_CapturedInReport()
         {
             using var pathResolver = new TestAnalyticsPathResolver();
-            SetupRequestFile(pathResolver, "WithCoreDataSetVersionDetails.json");
+            SetupRequestFile(pathResolver, "WithCoreDataSetDetails.json");
 
             var service = BuildService(pathResolver: pathResolver);
             await service.Process();
 
             Assert.False(Directory.Exists(ProcessingDirectoryPath(pathResolver)));
-            Assert.True(Directory.Exists(pathResolver.PublicApiDataSetVersionCallsReportsDirectoryPath()));
+            Assert.True(Directory.Exists(pathResolver.PublicApiDataSetCallsReportsDirectoryPath()));
 
-            var reports = Directory.GetFiles(pathResolver.PublicApiDataSetVersionCallsReportsDirectoryPath());
+            var reports = Directory.GetFiles(pathResolver.PublicApiDataSetCallsReportsDirectoryPath());
 
             var queryReportFile = Assert.Single(reports);
 
@@ -72,7 +72,7 @@ public abstract class PublicApiDataSetVersionCallsProcessorTests
 
             AssertReportRowOk(
                 queryReportRow,
-                expectedType: "GetDataSetVersionMetadata",
+                expectedType: "GetDataSetSummary",
                 expectPreviewToken: false,
                 expectedStartTime: DateTime.Parse("2025-02-24T02:07:44.850Z"),
                 expectedParameters: null);
@@ -88,9 +88,9 @@ public abstract class PublicApiDataSetVersionCallsProcessorTests
             await service.Process();
 
             Assert.False(Directory.Exists(ProcessingDirectoryPath(pathResolver)));
-            Assert.True(Directory.Exists(pathResolver.PublicApiDataSetVersionCallsReportsDirectoryPath()));
+            Assert.True(Directory.Exists(pathResolver.PublicApiDataSetCallsReportsDirectoryPath()));
 
-            var reports = Directory.GetFiles(pathResolver.PublicApiDataSetVersionCallsReportsDirectoryPath());
+            var reports = Directory.GetFiles(pathResolver.PublicApiDataSetCallsReportsDirectoryPath());
 
             var queryReportFile = Assert.Single(reports);
 
@@ -106,7 +106,7 @@ public abstract class PublicApiDataSetVersionCallsProcessorTests
 
             AssertReportRowOk(
                 queryReportRow,
-                expectedType: "GetDataSetVersionSummary",
+                expectedType: "GetDataSetSummary",
                 expectPreviewToken: true,
                 expectedStartTime: DateTime.Parse("2025-02-28T03:07:44.850Z"),
                 expectedParameters: null);
@@ -122,9 +122,9 @@ public abstract class PublicApiDataSetVersionCallsProcessorTests
             await service.Process();
 
             Assert.False(Directory.Exists(ProcessingDirectoryPath(pathResolver)));
-            Assert.True(Directory.Exists(pathResolver.PublicApiDataSetVersionCallsReportsDirectoryPath()));
+            Assert.True(Directory.Exists(pathResolver.PublicApiDataSetCallsReportsDirectoryPath()));
 
-            var reports = Directory.GetFiles(pathResolver.PublicApiDataSetVersionCallsReportsDirectoryPath());
+            var reports = Directory.GetFiles(pathResolver.PublicApiDataSetCallsReportsDirectoryPath());
 
             var queryReportFile = Assert.Single(reports);
 
@@ -140,17 +140,17 @@ public abstract class PublicApiDataSetVersionCallsProcessorTests
 
             AssertReportRowOk(
                 queryReportRow,
-                expectedType: "GetDataSetVersionMetadata",
+                expectedType: "ListVersions",
                 expectPreviewToken: false,
                 expectedStartTime: DateTime.Parse("2025-02-24T03:07:44.850Z"),
-                expectedParameters: """{"types":["Filters","Indicators","Locations","TimePeriods"]}""");
+                expectedParameters: """{"page":"1","pageSize":"10"}""");
         }
         
         [Fact]
         public async Task MultipleCalls_CapturedInReport()
         {
             using var pathResolver = new TestAnalyticsPathResolver();
-            SetupRequestFile(pathResolver, "WithCoreDataSetVersionDetails.json");
+            SetupRequestFile(pathResolver, "WithCoreDataSetDetails.json");
             SetupRequestFile(pathResolver, "WithParameters.json");
             SetupRequestFile(pathResolver, "WithPreviewTokens.json");
 
@@ -158,9 +158,9 @@ public abstract class PublicApiDataSetVersionCallsProcessorTests
             await service.Process();
 
             Assert.False(Directory.Exists(ProcessingDirectoryPath(pathResolver)));
-            Assert.True(Directory.Exists(pathResolver.PublicApiDataSetVersionCallsReportsDirectoryPath()));
+            Assert.True(Directory.Exists(pathResolver.PublicApiDataSetCallsReportsDirectoryPath()));
 
-            var reports = Directory.GetFiles(pathResolver.PublicApiDataSetVersionCallsReportsDirectoryPath());
+            var reports = Directory.GetFiles(pathResolver.PublicApiDataSetCallsReportsDirectoryPath());
 
             var queryReportFile = Assert.Single(reports);
 
@@ -175,21 +175,21 @@ public abstract class PublicApiDataSetVersionCallsProcessorTests
             
             AssertReportRowOk(
                 reportRows[0],
-                expectedType: "GetDataSetVersionMetadata",
+                expectedType: "GetDataSetSummary",
                 expectPreviewToken: false,
                 expectedStartTime: DateTime.Parse("2025-02-24T02:07:44.850Z"),
                 expectedParameters: null);
             
             AssertReportRowOk(
                 reportRows[1],
-                expectedType: "GetDataSetVersionMetadata",
+                expectedType: "ListVersions",
                 expectPreviewToken: false,
                 expectedStartTime: DateTime.Parse("2025-02-24T03:07:44.850Z"),
-                expectedParameters: """{"types":["Filters","Indicators","Locations","TimePeriods"]}""");
+                expectedParameters: """{"page":"1","pageSize":"10"}""");
             
             AssertReportRowOk(
                 reportRows[2],
-                expectedType: "GetDataSetVersionSummary",
+                expectedType: "GetDataSetSummary",
                 expectPreviewToken: true,
                 expectedStartTime: DateTime.Parse("2025-02-28T03:07:44.850Z"),
                 expectedParameters: null);
@@ -214,9 +214,6 @@ public abstract class PublicApiDataSetVersionCallsProcessorTests
     {
         Assert.Equal(expectedType, queryReportRow.Type);
         Assert.Equal(Guid.Parse("01d29401-7274-a871-a8db-d4bc4e98c324"), queryReportRow.DataSetId);
-        Assert.Equal(Guid.Parse("01d29401-7974-1276-a06b-b28a6a5385c6"), queryReportRow.DataSetVersionId);
-        Assert.Equal("1.2.0", queryReportRow.DataSetVersion);
-        Assert.Equal("1.*", queryReportRow.RequestedDataSetVersion);
         Assert.Equal("Data Set 1", queryReportRow.DataSetTitle);
         Assert.Equal(expectedStartTime, queryReportRow.StartTime);
 
@@ -245,27 +242,27 @@ public abstract class PublicApiDataSetVersionCallsProcessorTests
         }
     }
 
-    private PublicApiDataSetVersionCallsProcessor BuildService(
+    private PublicApiDataSetCallsProcessor BuildService(
         TestAnalyticsPathResolver pathResolver,
-        IWorkflowActor<PublicApiDataSetVersionCallsProcessor>? workflowActor = null)
+        IWorkflowActor<PublicApiDataSetCallsProcessor>? workflowActor = null)
     {
-        return new PublicApiDataSetVersionCallsProcessor(
+        return new PublicApiDataSetCallsProcessor(
             pathResolver: pathResolver,
-            logger: Mock.Of<ILogger<PublicApiDataSetVersionCallsProcessor>>(),
+            logger: Mock.Of<ILogger<PublicApiDataSetCallsProcessor>>(),
             workflowActor: workflowActor);
     }
 
     private void SetupRequestFile(TestAnalyticsPathResolver pathResolver, string filename)
     {
-        Directory.CreateDirectory(pathResolver.PublicApiDataSetVersionCallsDirectoryPath());
+        Directory.CreateDirectory(pathResolver.PublicApiDataSetCallsDirectoryPath());
 
         var sourceFilePath = Path.Combine(_queryResourcesPath, filename);
-        File.Copy(sourceFilePath, Path.Combine(pathResolver.PublicApiDataSetVersionCallsDirectoryPath(), filename));
+        File.Copy(sourceFilePath, Path.Combine(pathResolver.PublicApiDataSetCallsDirectoryPath(), filename));
     }
     
     private static string ProcessingDirectoryPath(TestAnalyticsPathResolver pathResolver)
     {
-        return Path.Combine(pathResolver.PublicApiDataSetVersionCallsDirectoryPath(), "processing");
+        return Path.Combine(pathResolver.PublicApiDataSetCallsDirectoryPath(), "processing");
     }
     
     // ReSharper disable once ClassNeverInstantiated.Local
@@ -273,10 +270,7 @@ public abstract class PublicApiDataSetVersionCallsProcessorTests
     {
         public Guid DataSetId { get; init; }
         public string DataSetTitle { get; init; } = string.Empty;
-        public string DataSetVersion { get; init; } = string.Empty;
-        public Guid DataSetVersionId { get; init; }
         public string? Parameters { get; init; }
-        public string RequestedDataSetVersion { get; init; } = string.Empty;
         public string? PreviewTokenLabel { get; init; }
         public Guid? PreviewTokenDataSetVersionId { get; init; }
         public DateTime? PreviewTokenCreated { get; init; }

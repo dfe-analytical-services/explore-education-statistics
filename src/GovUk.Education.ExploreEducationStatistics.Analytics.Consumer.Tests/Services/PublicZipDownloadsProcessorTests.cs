@@ -67,7 +67,7 @@ public abstract class PublicZipDownloadsProcessorTests
             var duckDbConnection = new DuckDbConnection();
             duckDbConnection.Open();
 
-            var zipDownloadReportRows = await ReadZipDownloadReport(duckDbConnection, zipDownloadsReport);
+            var zipDownloadReportRows = await ReadReport(duckDbConnection, zipDownloadsReport);
 
             // Check that the single recorded zip download has resulted in a
             // single line in the report and the values match the
@@ -75,7 +75,7 @@ public abstract class PublicZipDownloadsProcessorTests
             // match the expected values also.
             var zipDownloadReportRow = Assert.Single(zipDownloadReportRows);
 
-            await AssertZipDownloadReportRow(
+            await AssertReportRow(
                 zipDownloadReportRow,
                 "ZipDownloadRequestFile_NoSubjectId.json",
                 1);
@@ -101,16 +101,16 @@ public abstract class PublicZipDownloadsProcessorTests
             var duckDbConnection = new DuckDbConnection();
             duckDbConnection.Open();
 
-            var zipDownloadReportRows = await ReadZipDownloadReport(duckDbConnection, zipDownloadsReport);
+            var zipDownloadReportRows = await ReadReport(duckDbConnection, zipDownloadsReport);
 
             Assert.Equal(2, zipDownloadReportRows.Count);
 
-            await AssertZipDownloadReportRow(
+            await AssertReportRow(
                 zipDownloadReportRows[0],
                 "ZipDownloadRequestFile_NoSubjectId.json",
                 1);
 
-            await AssertZipDownloadReportRow(
+            await AssertReportRow(
                 zipDownloadReportRows[1],
                 "ZipDownloadRequestFile_WithSubjectId.json",
                 1);
@@ -136,17 +136,17 @@ public abstract class PublicZipDownloadsProcessorTests
             var duckDbConnection = new DuckDbConnection();
             duckDbConnection.Open();
 
-            var zipDownloadReportRows = await ReadZipDownloadReport(duckDbConnection, zipDownloadsReport);
+            var zipDownloadReportRows = await ReadReport(duckDbConnection, zipDownloadsReport);
 
             var zipDownloadReportRow = Assert.Single(zipDownloadReportRows);
 
-            await AssertZipDownloadReportRow(
+            await AssertReportRow(
                 zipDownloadReportRow,
                 "ZipDownloadRequestFile_WithSubjectId.json",
                 2);
         }
 
-        private static async Task<List<ZipDownloadReportLine>> ReadZipDownloadReport(DuckDbConnection duckDbConnection, string reportFile)
+        private static async Task<List<ZipDownloadReportLine>> ReadReport(DuckDbConnection duckDbConnection, string reportFile)
         {
             return (await duckDbConnection
                     .SqlBuilder($"SELECT * FROM read_parquet('{reportFile:raw}')")
@@ -174,7 +174,7 @@ public abstract class PublicZipDownloadsProcessorTests
         File.Copy(sourceFilePath, Path.Combine(pathResolver.PublicZipDownloadsDirectoryPath(), filename));
     }
 
-    private async Task AssertZipDownloadReportRow(
+    private async Task AssertReportRow(
         ZipDownloadReportLine row,
         string jsonFileName,
         int numRequests)
