@@ -15,6 +15,7 @@ public record ReleaseVersionPublishedEvent : IEvent
             PublicationId = publishedReleaseVersion.PublicationId,
             PublicationSlug = publishedReleaseVersion.PublicationSlug,
             PublicationLatestPublishedReleaseVersionId = publishedReleaseVersion.PublicationLatestPublishedReleaseVersionId,
+            PreviousLatestReleaseId = publishedReleaseVersion.PreviousLatestReleaseId,
         };
     }
 
@@ -40,6 +41,7 @@ public record ReleaseVersionPublishedEvent : IEvent
         public required Guid PublicationId { get; init; }
         public required string PublicationSlug { get; init; }
         public required Guid PublicationLatestPublishedReleaseVersionId { get; init; }    
+        public Guid? PreviousLatestReleaseId { get; init; }
     }
     public EventPayload Payload { get; }
     
@@ -52,6 +54,12 @@ public record ReleaseVersionPublishedEvent : IEvent
         public string ReleaseSlug { get; init; } = string.Empty;
         public Guid PublicationId { get; init; }
         public string PublicationSlug { get; init; } = string.Empty;
+        
+        /// <summary>
+        /// The release version that has been published may not be the latest.
+        /// This property contains the latest published release version id.
+        /// </summary>
         public Guid PublicationLatestPublishedReleaseVersionId { get; init; }
+        public Guid? PreviousLatestReleaseId { get; init; }
     }
 }
