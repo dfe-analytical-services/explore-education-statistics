@@ -49,10 +49,29 @@ public record ReleaseVersionPublishedEvent : IEvent
 
     public record PublishedReleaseVersionInfo
     {
+        /// <summary>
+        /// Newly published release version id
+        /// </summary>
         public Guid ReleaseVersionId { get; init; }
+    
+        /// <summary>
+        /// The Release Id for the newly published release version
+        /// </summary>
         public Guid ReleaseId {get;init;}
+        
+        /// <summary>
+        /// The release slug for the newly published release version
+        /// </summary>
         public string ReleaseSlug { get; init; } = string.Empty;
+        
+        /// <summary>
+        /// The publication id for the newly published release version
+        /// </summary>
         public Guid PublicationId { get; init; }
+        
+        /// <summary>
+        /// The publication slug for the newly published release version
+        /// </summary>
         public string PublicationSlug { get; init; } = string.Empty;
         
         /// <summary>
@@ -60,6 +79,10 @@ public record ReleaseVersionPublishedEvent : IEvent
         /// This property contains the latest published release version id.
         /// </summary>
         public Guid PublicationLatestPublishedReleaseVersionId { get; init; }
+        
+        /// <summary>
+        /// The Release Id of the previous "latest release version"
+        /// </summary>
         public Guid? PreviousLatestReleaseId { get; init; }
     }
 }
