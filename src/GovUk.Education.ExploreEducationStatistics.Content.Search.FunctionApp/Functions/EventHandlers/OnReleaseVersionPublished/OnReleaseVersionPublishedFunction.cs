@@ -1,5 +1,6 @@
 using Azure.Messaging.EventGrid;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.CommandHandlers.RefreshSearchableDocument.Dto;
+using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.CommandHandlers.RemoveSearchableDocument.Dto;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.EventHandlers.OnReleaseVersionPublished.Dtos;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Services;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Services.Core;
@@ -10,22 +11,34 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.
 public class OnReleaseVersionPublishedFunction(IEventGridEventHandler eventGridEventHandler)
 {
     [Function(nameof(OnReleaseVersionPublished))]
-    [QueueOutput("%RefreshSearchableDocumentQueueName%")]
-    public async Task<RefreshSearchableDocumentMessageDto[]> OnReleaseVersionPublished(
+    public async Task<OnReleaseVersionPublishedOutput> OnReleaseVersionPublished(
         [QueueTrigger("%ReleaseVersionPublishedQueueName%")]
         EventGridEvent eventDto,
         FunctionContext context) =>
-        await eventGridEventHandler.Handle<ReleaseVersionPublishedEventDto, RefreshSearchableDocumentMessageDto[]>(
+        await eventGridEventHandler.Handle<ReleaseVersionPublishedEventDto, OnReleaseVersionPublishedOutput>(
             context,
             eventDto,
             (payload, _) =>
                 Task.FromResult(
-                    // TODO: Detect whether this is the latest published release version.
-                    // If not, we don't need to refresh the Searchable Document (which is only for the latest release version) so return empty.
-                    string.IsNullOrEmpty(payload.PublicationSlug)
-                        ? []
-                        : new[]
+                    string.IsNullOrEmpty(payload.PublicationSlug) || !payload.NewlyPublishedReleaseVersionIsLatest
+                        ? OnReleaseVersionPublishedOutput.Empty
+                        : new OnReleaseVersionPublishedOutput
                         {
-                            new RefreshSearchableDocumentMessageDto { PublicationSlug = payload.PublicationSlug }
+                            RefreshSearchableDocumentMessages = 
+                                [ new RefreshSearchableDocumentMessageDto { PublicationSlug = payload.PublicationSlug } ],
+                            RemoveSearchableDocuments = payload.NewlyPublishedReleaseVersionIsForDifferentRelease
+                                ? [ new RemoveSearchableDocumentDto { ReleaseId = payload.PreviousLatestReleaseId } ]
+                                : []
                         }));
+}
+
+public record OnReleaseVersionPublishedOutput
+{
+    [QueueOutput("%RefreshSearchableDocumentQueueName%")]
+    public RefreshSearchableDocumentMessageDto[] RefreshSearchableDocumentMessages { get; init; } = [];
+    
+    [QueueOutput("%RemoveSearchableDocumentQueueName%")]
+    public RemoveSearchableDocumentDto[] RemoveSearchableDocuments { get; init; } = [];
+    
+    public static OnReleaseVersionPublishedOutput Empty => new();
 }
