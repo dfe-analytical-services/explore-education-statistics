@@ -52,7 +52,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly IPersistenceHelper<ContentDbContext> _persistenceHelper;
         private readonly IPrivateBlobStorageService _privateBlobStorageService;
         private readonly IFileRepository _fileRepository;
-        private readonly IFileUploadsValidatorService _fileUploadsValidatorService;
+        private readonly IFileValidatorService _fileValidatorService;
         private readonly IReleaseFileRepository _releaseFileRepository;
         private readonly IDataGuidanceFileWriter _dataGuidanceFileWriter;
         private readonly IUserService _userService;
@@ -61,7 +61,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             IPersistenceHelper<ContentDbContext> persistenceHelper,
             IPrivateBlobStorageService privateBlobStorageService,
             IFileRepository fileRepository,
-            IFileUploadsValidatorService fileUploadsValidatorService,
+            IFileValidatorService fileValidatorService,
             IReleaseFileRepository releaseFileRepository,
             IDataGuidanceFileWriter dataGuidanceFileWriter,
             IUserService userService)
@@ -70,7 +70,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _persistenceHelper = persistenceHelper;
             _privateBlobStorageService = privateBlobStorageService;
             _fileRepository = fileRepository;
-            _fileUploadsValidatorService = fileUploadsValidatorService;
+            _fileValidatorService = fileValidatorService;
             _releaseFileRepository = releaseFileRepository;
             _dataGuidanceFileWriter = dataGuidanceFileWriter;
             _userService = userService;
@@ -338,7 +338,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return _persistenceHelper
                 .CheckEntityExists<ReleaseVersion>(releaseVersionId)
                 .OnSuccess(_userService.CheckCanUpdateReleaseVersion)
-                .OnSuccess(async () => await _fileUploadsValidatorService.ValidateFileForUpload(upload.File, Ancillary))
+                .OnSuccess(async () => await _fileValidatorService.ValidateFileForUpload(upload.File, Ancillary))
                 .OnSuccess(async () =>
                 {
                     var newFileId = Guid.NewGuid();
@@ -388,7 +388,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 {
                     if (request.File != null)
                     {
-                        return await _fileUploadsValidatorService.ValidateFileForUpload(request.File, Ancillary);
+                        return await _fileValidatorService.ValidateFileForUpload(request.File, Ancillary);
                     }
 
                     return Unit.Instance;
@@ -453,7 +453,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return _persistenceHelper
                 .CheckEntityExists<ReleaseVersion>(releaseVersionId)
                 .OnSuccess(_userService.CheckCanUpdateReleaseVersion)
-                .OnSuccess(async () => await _fileUploadsValidatorService.ValidateFileForUpload(formFile, Chart))
+                .OnSuccess(async () => await _fileValidatorService.ValidateFileForUpload(formFile, Chart))
                 .OnSuccess(async () =>
                 {
                     var releaseFile = replacingId.HasValue
