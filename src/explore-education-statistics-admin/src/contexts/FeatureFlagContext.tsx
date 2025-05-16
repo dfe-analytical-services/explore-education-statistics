@@ -50,3 +50,15 @@ export const useFeatureFlag = (
   const { isFeatureEnabled } = useContext(FeatureFlagContext);
   return isFeatureEnabled(flagName);
 };
+
+export const ConfiguredFeatureFlagProvider = ({
+  children,
+}: {
+  children?: ReactNode;
+}): React.FC => {
+  return (
+    <FeatureFlagProvider initialFlags={DEFAULT_FLAGS}>
+      {children}
+    </FeatureFlagProvider>
+  );
+};
