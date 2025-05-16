@@ -27,7 +27,15 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Public.Data;
+using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Public.Data;
+using GovUk.Education.ExploreEducationStatistics.Common.Options;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Tests.Fixtures;
+using Microsoft.Extensions.Options;
+using Semver;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainers;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
@@ -1805,6 +1813,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var privateBlobStorageService = new Mock<IPrivateBlobStorageService>(Strict);
             var fileUploadsValidatorService = new Mock<IFileUploadsValidatorService>(Strict);
             var dataImportService = new Mock<IDataImportService>(Strict);
+            var options = Microsoft.Extensions.Options.Options.Create(new FeatureFlags());
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
@@ -1842,13 +1851,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                             path.Contains(FilesPath(releaseVersion.Id, FileType.Data))),
                         metaFormFile
                     )).Returns(Task.CompletedTask);
-
                 var service = SetupReleaseDataFileService(
                     contentDbContext: contentDbContext,
                     statisticsDbContext: statisticsDbContext,
                     privateBlobStorageService: privateBlobStorageService.Object,
                     dataImportService: dataImportService.Object,
-                    fileUploadsValidatorService: fileUploadsValidatorService.Object
+                    fileUploadsValidatorService: fileUploadsValidatorService.Object,
+                    featureFlags: options
                 );
 
                 var result = await service.Upload(
@@ -1911,8 +1920,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             }
         }
 
-        [Fact]
-        public async Task Upload_Replacing()
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public async Task Upload_Replacing(bool enableReplacementOfPublicApiDataSets)
         {
             const string dataFileName = "test-data.csv";
             const string metaFileName = "test-data.meta.csv";
@@ -1925,7 +1936,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 Id = Guid.NewGuid(),
             };
+            DataSet dataSet = _fixture
+                .DefaultDataSet()
+                .WithStatusPublished();
 
+            DataSetVersion dataSetVersion = _fixture
+                .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 2)
+                .WithVersionNumber(major: 1, minor: 1, patch: 1)
+                .WithStatusPublished()
+                .WithDataSet(dataSet)
+                .FinishWith(dsv => dsv.DataSet.LatestLiveVersion = dsv);
+            
             var originalDataReleaseFile = new ReleaseFile
             {
                 ReleaseVersion = releaseVersion,
@@ -1939,6 +1960,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     DataSetFileId = Guid.NewGuid(),
                     DataSetFileVersion = 0,
                 },
+                PublicApiDataSetId = enableReplacementOfPublicApiDataSets ?  dataSet.Id : null,
+                PublicApiDataSetVersion = enableReplacementOfPublicApiDataSets ? dataSetVersion.SemVersion() : null
             };
 
             var contentDbContextId = Guid.NewGuid().ToString();
@@ -1967,6 +1990,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var privateBlobStorageService = new Mock<IPrivateBlobStorageService>(Strict);
             var fileUploadsValidatorService = new Mock<IFileUploadsValidatorService>(Strict);
             var dataImportService = new Mock<IDataImportService>(Strict);
+            var dataSetVersionService = new Mock<IDataSetVersionService>(Strict);
+            var options = Microsoft.Extensions.Options.Options.Create(new FeatureFlags()
+            {
+                EnableReplacementOfPublicApiDataSets = enableReplacementOfPublicApiDataSets
+            });
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
@@ -2005,12 +2033,41 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         metaFormFile
                     )).Returns(Task.CompletedTask);
 
+                if (enableReplacementOfPublicApiDataSets)
+                {
+                    dataSetVersionService.Setup(mock => 
+                        mock.GetDataSetVersion(
+                            It.IsAny<Guid>(),
+                            It.IsAny<SemVersion>(), 
+                            It.IsAny<CancellationToken>()
+                            )).ReturnsAsync(dataSetVersion);
+
+                    dataSetVersionService.Setup(mock =>
+                        mock.CreateNextVersion(
+                            It.IsAny<Guid>(),
+                            It.IsAny<Guid>(),
+                            It.IsAny<Guid?>(),
+                            It.IsAny<CancellationToken>()
+                        ))
+                    .ReturnsAsync(new DataSetVersionSummaryViewModel
+                    {
+                        Id = Guid.Empty,
+                        Version = string.Empty,
+                        Status = DataSetVersionStatus.Processing,
+                        Type = DataSetVersionType.Major,
+                        ReleaseVersion = new IdTitleViewModel(),
+                        File = new IdTitleViewModel()
+                    });
+                }
+                    
                 var service = SetupReleaseDataFileService(
                     contentDbContext: contentDbContext,
                     statisticsDbContext: statisticsDbContext,
                     privateBlobStorageService: privateBlobStorageService.Object,
                     dataImportService: dataImportService.Object,
-                    fileUploadsValidatorService: fileUploadsValidatorService.Object
+                    fileUploadsValidatorService: fileUploadsValidatorService.Object,
+                    dataSetVersionService: dataSetVersionService.Object,
+                    featureFlags: options
                 );
 
                 var result = await service.Upload(
@@ -2022,7 +2079,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var dataFileInfo = result.AssertRight();
 
-                MockUtils.VerifyAllMocks(privateBlobStorageService, fileUploadsValidatorService, dataImportService);
+                if (enableReplacementOfPublicApiDataSets)
+                {
+                    MockUtils.VerifyAllMocks(privateBlobStorageService, fileUploadsValidatorService, dataImportService, dataSetVersionService);
+                }
+                else
+                {
+                    MockUtils.VerifyAllMocks(privateBlobStorageService, fileUploadsValidatorService, dataImportService);
+                }
 
                 Assert.True(dataFileInfo.Id.HasValue);
                 Assert.Equal(originalDataReleaseFile.Name, dataFileInfo.Name);
@@ -2170,6 +2234,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var privateBlobStorageService = new Mock<IPrivateBlobStorageService>(MockBehavior.Strict);
             var fileUploadsValidatorService = new Mock<IFileUploadsValidatorService>(MockBehavior.Strict);
             var dataImportService = new Mock<IDataImportService>(MockBehavior.Strict);
+            var options = Microsoft.Extensions.Options.Options.Create(new FeatureFlags());
+
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
@@ -2204,13 +2270,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                             path.Contains(FilesPath(releaseVersion.Id, FileType.Data))),
                         metaFormFile
                     )).Returns(Task.CompletedTask);
-
+                
                 var service = SetupReleaseDataFileService(
                     contentDbContext: contentDbContext,
                     statisticsDbContext: statisticsDbContext,
                     privateBlobStorageService: privateBlobStorageService.Object,
                     dataImportService: dataImportService.Object,
-                    fileUploadsValidatorService: fileUploadsValidatorService.Object
+                    fileUploadsValidatorService: fileUploadsValidatorService.Object,
+                    featureFlags: options
                 );
 
                 var result = await service.Upload(
@@ -2856,7 +2923,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             IReleaseFileService? releaseFileService = null,
             IReleaseDataFileRepository? releaseDataFileRepository = null,
             IDataImportService? dataImportService = null,
-            IUserService? userService = null)
+            IUserService? userService = null,
+            IDataSetVersionService? dataSetVersionService = null,
+            IOptions<FeatureFlags>? featureFlags = null)
         {
             contentDbContext.Users.Add(_user);
             contentDbContext.SaveChanges();
@@ -2875,7 +2944,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 releaseFileService ?? Mock.Of<IReleaseFileService>(Strict),
                 releaseDataFileRepository ?? new ReleaseDataFileRepository(contentDbContext),
                 dataImportService ?? Mock.Of<IDataImportService>(Strict),
-                userService ?? MockUtils.AlwaysTrueUserService(_user.Id).Object
+                userService ?? MockUtils.AlwaysTrueUserService(_user.Id).Object,
+                dataSetVersionService ?? Mock.Of<IDataSetVersionService>(Strict),
+                featureFlags ?? Mock.Of<IOptions<FeatureFlags>>(Strict)
             );
         }
     }

@@ -129,6 +129,7 @@ using IReleaseService = GovUk.Education.ExploreEducationStatistics.Admin.Service
 using ReleaseService = GovUk.Education.ExploreEducationStatistics.Admin.Services.ReleaseService;
 using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using GovUk.Education.ExploreEducationStatistics.Events.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Options;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin
 {
@@ -382,7 +383,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                 configuration.GetRequiredSection(TableBuilderOptions.Section));
             services.Configure<OpenIdConnectSpaClientOptions>(
                 configuration.GetSection(OpenIdConnectSpaClientOptions.Section));
-            
+            services.Configure<FeatureFlags>(
+                configuration.GetSection(FeatureFlags.Section));
             services.Configure<RouteOptions>(options => options.LowercaseUrls = true);
 
             StartupSecurityConfiguration.ConfigureAuthorizationPolicies(services);
@@ -844,6 +846,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
         public Task<Either<ActionResult, ProcessDataSetVersionResponseViewModel>> CreateNextDataSetVersionMappings(
             Guid dataSetId,
             Guid releaseFileId,
+            Guid? dataSetVersionToReplaceId = null,
             CancellationToken cancellationToken = default) => throw new NotImplementedException();
 
         public Task<Either<ActionResult, ProcessDataSetVersionResponseViewModel>> CompleteNextDataSetVersionImport(
@@ -902,6 +905,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
         public Task<Either<ActionResult, DataSetVersionSummaryViewModel>> CreateNextVersion(
             Guid releaseFileId,
             Guid dataSetId,
+            Guid? dataSetVersionToReplaceId = null,
             CancellationToken cancellationToken = default) => throw new NotImplementedException();
 
         public Task<Either<ActionResult, DataSetVersionSummaryViewModel>> CompleteNextVersionImport(

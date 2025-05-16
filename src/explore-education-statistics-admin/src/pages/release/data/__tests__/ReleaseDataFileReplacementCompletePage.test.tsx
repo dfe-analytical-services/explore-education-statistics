@@ -23,6 +23,14 @@ describe('ReleaseDataFilePage', () => {
     footnotes: [],
     originalSubjectId: 'subject-1',
     replacementSubjectId: 'subject-2',
+    apiDataSetVersionPlan: {
+      id: '',
+      dataSetId: '',
+      name: '',
+      version: '',
+      status: '',
+      valid: false,
+    },
     valid: true,
   };
 

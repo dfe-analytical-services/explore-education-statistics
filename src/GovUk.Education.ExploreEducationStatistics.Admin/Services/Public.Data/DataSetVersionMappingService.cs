@@ -11,6 +11,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Options;
 using GovUk.Education.ExploreEducationStatistics.Common.Requests;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
@@ -20,6 +21,7 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Npgsql;
 using ErrorViewModel = GovUk.Education.ExploreEducationStatistics.Common.ViewModels.ErrorViewModel;
 using ValidationUtils = GovUk.Education.ExploreEducationStatistics.Common.Validators.ValidationUtils;
@@ -30,7 +32,9 @@ public class DataSetVersionMappingService(
     IPostgreSqlRepository postgreSqlRepository,
     IUserService userService,
     PublicDataDbContext publicDataDbContext,
-    ContentDbContext contentDbContext)
+    ContentDbContext contentDbContext,
+    IDataSetService dataSetService,
+    IOptions<FeatureFlags> featureFlags)
     : IDataSetVersionMappingService
 {
     private static readonly MappingType[] IncompleteMappingTypes =
@@ -172,7 +176,7 @@ public class DataSetVersionMappingService(
             .Where(mapping => mapping.TargetDataSetVersionId == nextDataSetVersionId)
             .Select(nextVersion => nextVersion.TargetDataSetVersion)
             .SingleAsync(cancellationToken);
-
+        
         var isMajorVersionUpdate = await IsMajorVersionUpdate(
             nextDataSetVersionId,
             locationMappingTypes,
@@ -183,11 +187,13 @@ public class DataSetVersionMappingService(
         {
             targetDataSetVersion.VersionMajor = sourceDataSetVersion.VersionMajor + 1;
             targetDataSetVersion.VersionMinor = 0;
+            targetDataSetVersion.VersionPatch = 0;
         }
         else
         {
             targetDataSetVersion.VersionMajor = sourceDataSetVersion.VersionMajor;
             targetDataSetVersion.VersionMinor = sourceDataSetVersion.VersionMinor + 1;
+            targetDataSetVersion.VersionPatch = 0;
         }
 
         await publicDataDbContext.SaveChangesAsync(cancellationToken);

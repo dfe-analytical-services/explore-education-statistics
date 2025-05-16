@@ -1,6 +1,8 @@
 import ButtonLink from '@admin/components/ButtonLink';
 import mergeReplacementFootnoteFilters from '@admin/pages/release/data/components/utils/mergeReplacementFootnoteFilters';
 import {
+  releaseDataRoute,
+  ReleaseRouteParams,
   releaseDataBlockEditRoute,
   ReleaseDataBlockRouteParams,
   ReleaseFootnoteRouteParams,
@@ -27,6 +29,10 @@ import useMountedRef from '@common/hooks/useMountedRef';
 import React, { ReactNode, useMemo } from 'react';
 import { generatePath } from 'react-router';
 import sanitizeHtml from '@common/utils/sanitizeHtml';
+import { useAuthContext } from '@admin/contexts/AuthContext';
+import releaseDataPageTabIds from '@admin/pages/release/data/utils/releaseDataPageTabIds';
+import Link from '@admin/components/Link';
+import { useFeatureFlag } from '@admin/contexts/FeatureFlagContext';
 
 interface Props {
   cancelButton: ReactNode;
@@ -73,6 +79,48 @@ const DataFileReplacementPlan = ({
     () => plan?.footnotes.some(footnote => !footnote.valid) ?? false,
     [plan],
   );
+  const isNewReplaceDsvFeatureEnabled = useFeatureFlag(
+    'enableReplacementOfPublicApiDataSets',
+  );
+
+  const {
+    hasDataSetVersionPlan,
+    hasIncompleteLocationMapping,
+    hasIncompleteFilterMapping,
+  } = useMemo(() => {
+    if (!isNewReplaceDsvFeatureEnabled) {
+      return {
+        hasDataSetVersionPlan: false,
+        hasIncompleteLocationMapping: false,
+        hasIncompleteFilterMapping: false,
+      };
+    }
+
+    return {
+      hasDataSetVersionPlan: !!plan?.apiDataSetVersionPlan,
+      hasIncompleteLocationMapping:
+        !plan?.apiDataSetVersionPlan?.mappingStatus?.locationsComplete,
+      hasIncompleteFilterMapping:
+        !plan?.apiDataSetVersionPlan?.mappingStatus?.filtersComplete,
+    };
+  }, [plan, isNewReplaceDsvFeatureEnabled]);
+
+  const { user } = useAuthContext();
+
+  const releaseRouteParams = useMemo<ReleaseRouteParams>(
+    () => ({
+      releaseVersionId,
+      publicationId,
+    }),
+    [releaseVersionId, publicationId],
+  );
+
+  const apiDataSetsTabRoute = user?.permissions.isBauUser
+    ? `${generatePath<ReleaseRouteParams>(
+        releaseDataRoute.path,
+        releaseRouteParams,
+      )}#${releaseDataPageTabIds.apiDataSets}`
+    : undefined;
 
   if (error) {
     return (
@@ -399,6 +447,54 @@ const DataFileReplacementPlan = ({
               </Details>
             );
           })}
+
+          {hasDataSetVersionPlan && (
+            <>
+              <h3 className="govuk-heading-m">
+                <Tag colour={hasIncompleteFilterMapping ? 'red' : 'green'}>
+                  {`Api Data Set Filters: ${
+                    hasIncompleteFilterMapping ? 'ERROR' : 'OK'
+                  }`}
+                </Tag>
+              </h3>
+
+              {hasIncompleteFilterMapping ? (
+                <p>
+                  Please{' '}
+                  {apiDataSetsTabRoute && (
+                    <Link to={apiDataSetsTabRoute} unvisited>
+                      head over to the API data sets tab
+                    </Link>
+                  )}{' '}
+                  and complete manual mapping process for filters.
+                </p>
+              ) : (
+                <p>No manual mapping required for Api Data set filters.</p>
+              )}
+
+              <h3 className="govuk-heading-m">
+                <Tag colour={hasIncompleteLocationMapping ? 'red' : 'green'}>
+                  {`Api Data Set Locations: ${
+                    hasIncompleteLocationMapping ? 'ERROR' : 'OK'
+                  }`}
+                </Tag>
+              </h3>
+
+              {hasIncompleteLocationMapping ? (
+                <p>
+                  Please{' '}
+                  {apiDataSetsTabRoute && (
+                    <Link to={apiDataSetsTabRoute} unvisited>
+                      head over to the API data sets tab
+                    </Link>
+                  )}{' '}
+                  and complete manual mapping process for locations.
+                </p>
+              ) : (
+                <p>No manual mapping required for Api Data set locations.</p>
+              )}
+            </>
+          )}
 
           <ButtonGroup className="govuk-!-margin-top-8">
             {plan.valid && (
