@@ -34,52 +34,129 @@ public class PublisherEventRaiserTests
     public class RaiseReleaseVersionPublishedPublisherEvents : PublisherEventRaiserTests
     {
         [Fact]
-        public async Task WhenOnePublishedReleaseVersionInfoSpecified_ThenEventRaised()
+        public async Task WhenOnePublishedReleaseVersion_ThenEventRaised()
         {
             // ARRANGE
+            var publicationId = Guid.NewGuid();
             var sut = GetSut();
-            var info = new ReleaseVersionPublishedEvent.PublishedReleaseVersionInfo
+            var info = new PublishedPublicationInfo
             {
-                PublicationId = Guid.Parse("11111111-0000-0000-0000-000000000000"),
+                PublicationId = publicationId,
                 PublicationSlug = "test-publication-slug",
-                ReleaseId = Guid.Parse("11111111-2222-0000-0000-000000000000"),
-                ReleaseSlug = "test-release-slug",
-                ReleaseVersionId = Guid.Parse("11111111-2222-3333-0000-000000000000"),
-                PublicationLatestPublishedReleaseVersionId = Guid.Parse("11111111-2222-4444-0000-000000000000")
+                PreviousLatestPublishedReleaseId = Guid.NewGuid(),
+                PreviousLatestPublishedReleaseVersionId = Guid.NewGuid(),
+                LatestPublishedReleaseId = Guid.NewGuid(),
+                LatestPublishedReleaseVersionId = Guid.NewGuid(),
+                PublishedReleaseVersions = [
+                    new PublishedReleaseVersionInfo
+                    {
+                        ReleaseId = Guid.NewGuid(),
+                        ReleaseSlug = "test-release-slug",
+                        ReleaseVersionId = Guid.NewGuid(),
+                        PublicationId = publicationId
+                    }
+                ]
             };
-            
+
             // ACT
             await sut.RaiseReleaseVersionPublishedEvents([info]);
 
             // ASSERT
-            var expectedEvent = new ReleaseVersionPublishedEvent(info);
+            var expectedEvent = new ReleaseVersionPublishedEvent(
+                new ReleaseVersionPublishedEvent.ReleaseVersionPublishedEventInfo
+                {
+                    PublicationId = info.PublicationId,
+                    PublicationSlug = info.PublicationSlug,
+                    ReleaseId = info.PublishedReleaseVersions[0].ReleaseId,
+                    ReleaseSlug = info.PublishedReleaseVersions[0].ReleaseSlug,
+                    ReleaseVersionId = info.PublishedReleaseVersions[0].ReleaseVersionId,
+                    PreviousLatestReleaseId = info.PreviousLatestPublishedReleaseId,
+                    PublicationLatestPublishedReleaseVersionId = info.LatestPublishedReleaseVersionId
+                });
             _eventRaiserMockBuilder.Assert.EventsRaised([expectedEvent]);
         }
-        
-        [Theory]
-        [InlineData(2)]
-        [InlineData(10)]
-        public async Task GivenConfigured_WhenNPublishedReleaseVersionInfoSpecified_ThenNEventRaised(int numberOfEvents)
+
+        [Fact]
+        public async Task WhenMultiplePublishedReleaseVersions_ThenEventsRaised()
         {
             // ARRANGE
             var sut = GetSut();
-            var infos = Enumerable.Range(1, numberOfEvents)
-                .Select(i => new ReleaseVersionPublishedEvent.PublishedReleaseVersionInfo
-                    {
-                        PublicationId = Guid.Parse($"11111111-0000-0000-0000-{i:000000000000}"),
-                        PublicationSlug = "test-publication-slug",
-                        ReleaseId = Guid.Parse($"11111111-2222-0000-0000-{i:000000000000}"),
-                        ReleaseSlug = "test-release-slug",
-                        ReleaseVersionId = Guid.Parse($"11111111-2222-3333-0000-{i:000000000000}"),
-                        PublicationLatestPublishedReleaseVersionId = Guid.Parse($"11111111-2222-4444-0000-{i:000000000000}")
-                    })
-                .ToArray();
-            
+            var publication1Id = Guid.NewGuid();
+            var publication2Id = Guid.NewGuid();
+            var infos = new[]
+            {
+                new PublishedPublicationInfo
+                {
+                    PublicationId = publication1Id,
+                    PublicationSlug = "test-publication-slug-1",
+                    PreviousLatestPublishedReleaseId = Guid.NewGuid(),
+                    PreviousLatestPublishedReleaseVersionId = Guid.NewGuid(),
+                    LatestPublishedReleaseId = Guid.NewGuid(),
+                    LatestPublishedReleaseVersionId = Guid.NewGuid(),
+                    PublishedReleaseVersions =
+                    [
+                        new PublishedReleaseVersionInfo
+                        {
+                            ReleaseId = Guid.NewGuid(),
+                            ReleaseSlug = "test-release-slug-1",
+                            ReleaseVersionId = Guid.NewGuid(),
+                            PublicationId = publication1Id
+                        },
+                        new PublishedReleaseVersionInfo
+                        {
+                            ReleaseId = Guid.NewGuid(),
+                            ReleaseSlug = "test-release-slug-2",
+                            ReleaseVersionId = Guid.NewGuid(),
+                            PublicationId = publication1Id
+                        }
+                    ]
+                },
+                new PublishedPublicationInfo
+                {
+                    PublicationId = publication2Id,
+                    PublicationSlug = "test-publication-slug-2",
+                    PreviousLatestPublishedReleaseId = Guid.NewGuid(),
+                    PreviousLatestPublishedReleaseVersionId = Guid.NewGuid(),
+                    LatestPublishedReleaseId = Guid.NewGuid(),
+                    LatestPublishedReleaseVersionId = Guid.NewGuid(),
+                    PublishedReleaseVersions =
+                    [
+                        new PublishedReleaseVersionInfo
+                        {
+                            ReleaseId = Guid.NewGuid(),
+                            ReleaseSlug = "test-release-slug-3",
+                            ReleaseVersionId = Guid.NewGuid(),
+                            PublicationId = publication2Id
+                        },
+                        new PublishedReleaseVersionInfo
+                        {
+                            ReleaseId = Guid.NewGuid(),
+                            ReleaseSlug = "test-release-slug-4",
+                            ReleaseVersionId = Guid.NewGuid(),
+                            PublicationId = publication2Id
+                        }
+                    ]
+                }
+            };
+
             // ACT
             await sut.RaiseReleaseVersionPublishedEvents(infos);
 
             // ASSERT
-            var expectedEvents = infos.Select(info => new ReleaseVersionPublishedEvent(info));
+            var expectedEvents = infos.SelectMany(info =>
+                info.PublishedReleaseVersions.Select(version =>
+                    new ReleaseVersionPublishedEvent(
+                        new ReleaseVersionPublishedEvent.ReleaseVersionPublishedEventInfo
+                        {
+                            PublicationId = info.PublicationId,
+                            PublicationSlug = info.PublicationSlug,
+                            ReleaseId = version.ReleaseId,
+                            ReleaseSlug = version.ReleaseSlug,
+                            ReleaseVersionId = version.ReleaseVersionId,
+                            PreviousLatestReleaseId = info.PreviousLatestPublishedReleaseId,
+                            PublicationLatestPublishedReleaseVersionId = info.LatestPublishedReleaseVersionId
+                        }))).ToList();
+
             _eventRaiserMockBuilder.Assert.EventsRaised(expectedEvents);
         }
     }
@@ -127,22 +204,32 @@ public class PublisherEventRaiserTests
                 new EventGridClientFactory(
                     () => new UnitTestOutputLoggerBuilder<SafeEventGridClient>().Build(output)),
                 eventGridOptions,
-            new UnitTestOutputLoggerBuilder<ConfiguredEventGridClientFactory>().Build(output));
-            
+                new UnitTestOutputLoggerBuilder<ConfiguredEventGridClientFactory>().Build(output));
+
             var sut = GetSut(new EventRaiser(realEventGridClientFactory));
 
-            var publishedReleaseVersionInfo = new ReleaseVersionPublishedEvent.PublishedReleaseVersionInfo
+            var publicationId = Guid.NewGuid();
+            var info = new PublishedPublicationInfo
             {
-                PublicationId = Guid.Parse("11111111-0000-0000-0000-000000000000"),
+                PublicationId = publicationId,
                 PublicationSlug = "test-publication-slug",
-                ReleaseId = Guid.Parse("11111111-2222-0000-0000-000000000000"),
-                ReleaseSlug = "test-release-slug",
-                ReleaseVersionId = Guid.Parse("11111111-2222-3333-0000-000000000000"),
-                PublicationLatestPublishedReleaseVersionId = Guid.Parse("11111111-2222-4444-0000-000000000000")
+                PreviousLatestPublishedReleaseId = Guid.NewGuid(),
+                PreviousLatestPublishedReleaseVersionId = Guid.NewGuid(),
+                LatestPublishedReleaseId = Guid.NewGuid(),
+                LatestPublishedReleaseVersionId = Guid.NewGuid(),
+                PublishedReleaseVersions = [
+                    new PublishedReleaseVersionInfo
+                    {
+                        ReleaseId = Guid.NewGuid(),
+                        ReleaseSlug = "test-release-slug",
+                        ReleaseVersionId = Guid.NewGuid(),
+                        PublicationId = publicationId
+                    }
+                ]
             };
 
             // ACT
-            await sut.RaiseReleaseVersionPublishedEvents([publishedReleaseVersionInfo]);
+            await sut.RaiseReleaseVersionPublishedEvents([info]);
 
             // ASSERT
             // Check unit test output for logs

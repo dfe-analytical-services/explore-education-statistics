@@ -15,9 +15,25 @@ public class PublisherEventRaiser(IEventRaiser eventRaiser) : IPublisherEventRai
     /// <summary>
     /// On Release Version Published
     /// </summary>
-    /// <param name="publishedReleaseVersionInfos">information about the one or more release versions that have been published</param>
+    /// <param name="publishedPublications">information about the one or more publications that have been published</param>
     public async Task RaiseReleaseVersionPublishedEvents(
-        IEnumerable<ReleaseVersionPublishedEvent.PublishedReleaseVersionInfo> publishedReleaseVersionInfos) =>
-        await eventRaiser.RaiseEvents(
-            publishedReleaseVersionInfos.Select(info => new ReleaseVersionPublishedEvent(info)));
+        IReadOnlyList<PublishedPublicationInfo> publishedPublications)
+    {
+        var events = publishedPublications.SelectMany(publication =>
+            publication.PublishedReleaseVersions.Select(releaseVersion =>
+                new ReleaseVersionPublishedEvent(
+                    new ReleaseVersionPublishedEvent.ReleaseVersionPublishedEventInfo
+                    {
+                        ReleaseId = releaseVersion.ReleaseId,
+                        ReleaseSlug = releaseVersion.ReleaseSlug,
+                        ReleaseVersionId = releaseVersion.ReleaseVersionId,
+                        PublicationId = publication.PublicationId,
+                        PublicationSlug = publication.PublicationSlug,
+                        PreviousLatestReleaseId = publication.PreviousLatestPublishedReleaseId,
+                        PublicationLatestPublishedReleaseVersionId = publication.LatestPublishedReleaseVersionId
+                    })))
+            .ToList();
+
+        await eventRaiser.RaiseEvents(events);
+    }
 }
