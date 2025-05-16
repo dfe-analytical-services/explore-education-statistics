@@ -1,8 +1,10 @@
-﻿using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.OnPublicationRestored;
-using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.OnPublicationRestored.Dtos;
-using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.RefreshSearchableDocument.Dto;
+﻿using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.CommandHandlers.RefreshSearchableDocument.Dto;
+using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.EventHandlers.OnPublicationRestored;
+using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.EventHandlers.OnPublicationRestored.Dtos;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Services;
+using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Services.Core;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Tests.Builders;
+using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Tests.TheoryDataHelpers;
 using Microsoft.Extensions.Logging.Abstractions;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Tests.Functions.OnPublicationRestored;
@@ -29,8 +31,7 @@ public class OnPublicationRestoredFunctionTests
     }
 
     [Theory]
-    [InlineData(null)]
-    [InlineData("")]
+    [MemberData(nameof(TheoryDatas.Blank.Strings), MemberType = typeof(TheoryDatas.Blank))]
     public async Task GivenEvent_WhenPayloadDoesNotContainSlug_ThenNothingIsReturned(string? blankSlug)
     {
         var payload = new PublicationRestoredEventDto { PublicationSlug = blankSlug };

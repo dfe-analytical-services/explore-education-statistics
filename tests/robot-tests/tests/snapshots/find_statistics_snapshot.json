@@ -79,7 +79,7 @@
   {
     "publication_summary": "Children accommodated in secure children's homes in England and Wales including approved places, availability, occupancy, sex, age, ethnicity, length of stay",
     "publication_title": "Children accommodated in secure children's homes",
-    "published": "16 May 2024",
+    "published": "15 May 2025",
     "release_type": "Accredited official statistics",
     "theme": "Children's social care"
   },
@@ -217,9 +217,16 @@
     "theme": "UK education and training statistics"
   },
   {
+    "publication_summary": "Initial outputs from DfE's Childcare Experiences Survey (aka \u201cYour Childcare\u201d), understanding working parents' experiences of the expanded childcare entitlement",
+    "publication_title": "Expansion to early childcare entitlements: Childcare Experiences Survey",
+    "published": "12 May 2025",
+    "release_type": "Management information",
+    "theme": "Early years"
+  },
+  {
     "publication_summary": "Management information on eligibility codes for the extended childcare entitlement for working parents.",
     "publication_title": "Expansion to early childcare entitlements: eligibility codes issued and validated",
-    "published": "20 Mar 2025",
+    "published": "12 May 2025",
     "release_type": "Management information",
     "theme": "Early years"
   },
@@ -373,7 +380,7 @@
   {
     "publication_summary": "Sustained education, apprenticeship or employment destinations 1, 3 and 5 years after GCSEs. Includes disadvantage and gender breakdowns.",
     "publication_title": "Longer term destinations",
-    "published": "9 May 2024",
+    "published": "15 May 2025",
     "release_type": "Official statistics",
     "theme": "Destination of pupils and students"
   },
@@ -527,7 +534,7 @@
   {
     "publication_summary": "Pupil attendance and absence data including termly national statistics and fortnightly statistics in development derived from DfE\u2019s regular attendance data",
     "publication_title": "Pupil attendance in schools",
-    "published": "1 May 2025",
+    "published": "15 May 2025",
     "release_type": "Official statistics in development",
     "theme": "Pupils and schools"
   },

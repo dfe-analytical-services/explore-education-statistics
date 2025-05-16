@@ -62,11 +62,14 @@ public class ContentApiClientTests(ITestOutputHelper output)
                 Assert.NotNull(actual);
                 var expected = new ReleaseSearchableDocument
                 {
+                    ReleaseId = new Guid("4fcb18ba-2adb-49ff-9414-f91f9f5d2e57"),
                     ReleaseVersionId = new Guid("46c5d916-ee40-49bd-cfdc-08dc1c5c621e"),
+                    PublicationId = new Guid("346fd6f2-3938-4006-9867-08dc1c5c66c3"),
+                    ThemeId = new Guid("0396c130-4d59-4099-9050-08dc1c5c669e"),
+                    ThemeTitle = "Seed theme - Pupils and schools",
                     Published = DateTimeOffset.Parse("2018-07-18T23:00:00Z"),
                     PublicationTitle = "Seed publication - Permanent and fixed-period exclusions in England",
-                    Summary = "Read national statistical summaries, view charts and tables and download data files.",
-                    Theme = "Seed theme - Pupils and schools",
+                    Summary = "Seed publication - Permanent and fixed-period exclusions in England summary",
                     ReleaseType = "OfficialStatistics",
                     TypeBoost = 5,
                     PublicationSlug = "seed-publication-permanent-and-fixed-period-exclusions-in-england",
@@ -128,9 +131,22 @@ public class ContentApiClientTests(ITestOutputHelper output)
             var sut = GetSut();
             const string publicationSlug = "seed-publication-pupil-absence-in-schools-in-england";
             var releases = await sut.GetReleasesForPublication(publicationSlug);
+            Print($"{releases.Length} releases found");
             foreach (var release in releases)
             {
                 Print(release.ReleaseId.ToString());
+            }
+        }        
+        
+        [Fact(Skip = "Call Content API to get all publication infos")]
+        public async Task GetAllPublicationInfos()
+        {
+            var sut = GetSut();
+            var publicationInfos = await sut.GetAllLivePublicationInfos();
+            Print($"{publicationInfos.Length} publications found");
+            foreach (var publicationInfo in publicationInfos)
+            {
+                Print(publicationInfo.ToString());
             }
         }
     }

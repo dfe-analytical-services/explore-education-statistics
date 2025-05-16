@@ -18,10 +18,9 @@ public class AzureBlobStorageClient(
         CancellationToken cancellationToken = default)
     {
         var blobContainerClient = BlobServiceClient.GetBlobContainerClient(containerName);
-        var blobClient = blobContainerClient.GetBlobClient(blobName);
         try
         {
-            return await blobClient.DeleteIfExistsAsync(cancellationToken: cancellationToken);
+            return await blobContainerClient.DeleteBlobIfExistsAsync(blobName, cancellationToken: cancellationToken);
         }
         catch (Exception e)
         {
@@ -58,5 +57,29 @@ public class AzureBlobStorageClient(
     {
         var blobContainerClient = BlobServiceClient.GetBlobContainerClient(containerName);
         return await blobContainerClient.ExistsAsync(cancellationToken);
+    }
+
+    public async Task DeleteAllBlobsFromContainer(string containerName, CancellationToken cancellationToken = default)
+    {
+        var blobContainerClient = BlobServiceClient.GetBlobContainerClient(containerName);
+        var blobNames = await GetAllBlobNames(blobContainerClient, cancellationToken);
+
+        await Task.WhenAll(
+            blobNames
+                .Select(blobName => 
+                    blobContainerClient.DeleteBlobIfExistsAsync(blobName, cancellationToken: cancellationToken)));
+    }
+
+    private static async Task<IList<string>> GetAllBlobNames(
+        BlobContainerClient blobContainerClient,
+        CancellationToken cancellationToken)
+    {
+        var asyncPageable = blobContainerClient.GetBlobsAsync(cancellationToken: cancellationToken);
+        var blobNames = new List<string>();
+        await foreach (var blobItem in asyncPageable)
+        {
+            blobNames.Add(blobItem.Name);
+        }
+        return blobNames;
     }
 }

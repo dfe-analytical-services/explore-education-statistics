@@ -1,7 +1,9 @@
-﻿using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.OnPublicationChanged;
-using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.OnPublicationChanged.Dtos;
+﻿using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.EventHandlers.OnPublicationChanged;
+using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.EventHandlers.OnPublicationChanged.Dtos;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Services;
+using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Services.Core;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Tests.Builders;
+using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Tests.TheoryDataHelpers;
 using Microsoft.Extensions.Logging.Abstractions;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Tests.Functions.OnPublicationChanged;
@@ -38,8 +40,7 @@ public class OnPublicationChangedFunctionTests
     }
     
     [Theory]
-    [InlineData((string?)null)]
-    [InlineData("")]
+    [MemberData(nameof(TheoryDatas.Blank.Strings), MemberType = typeof(TheoryDatas.Blank))]
     public async Task GivenEvent_WhenPayloadDoesNotContainSlug_ThenNothingIsReturned(string? blankSlug)
     {
         // ARRANGE

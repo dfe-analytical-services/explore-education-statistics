@@ -182,7 +182,7 @@ public class ThemeServiceTests
 
             Assert.All(
                 expectedPublicationSlugs,
-                publicationCacheService.Assert.CacheInvalidatedForPublicationSlug);
+                publicationCacheService.Assert.CacheInvalidatedForPublicationEntry);
         }
     }
 
@@ -983,12 +983,12 @@ public class ThemeServiceTests
             var expectedInvalidatedPublications = publications.Where(p => p.ThemeId == themeId).ToArray();
             foreach (var expected in expectedInvalidatedPublications)
             {
-                publicationCacheService.Assert.CacheInvalidatedForPublicationSlug(expected.Slug);
+                publicationCacheService.Assert.CacheInvalidatedForPublicationEntry(expected.Slug);
             }
             var expectedNotInvalidatedPublications = publications.Except(expectedInvalidatedPublications);
             foreach (var notExpected in expectedNotInvalidatedPublications)
             {
-                publicationCacheService.Assert.CacheNotInvalidatedForPublicationSlug(notExpected.Slug);
+                publicationCacheService.Assert.CacheNotInvalidatedForPublicationEntry(notExpected.Slug);
             }
         }
         
@@ -1027,9 +1027,9 @@ public class ThemeServiceTests
             }
 
             // ASSERT
-            publicationCacheService.Assert.CacheInvalidatedForPublicationSlug("publication-slug-1");
-            publicationCacheService.Assert.CacheInvalidatedForPublicationSlug("publication-slug-2");
-            publicationCacheService.Assert.CacheInvalidatedForPublicationSlug("publication-slug-3");
+            publicationCacheService.Assert.CacheInvalidatedForPublicationEntry("publication-slug-1");
+            publicationCacheService.Assert.CacheInvalidatedForPublicationEntry("publication-slug-2");
+            publicationCacheService.Assert.CacheInvalidatedForPublicationEntry("publication-slug-3");
         }
         
         [Fact]
@@ -1067,9 +1067,9 @@ public class ThemeServiceTests
             }
 
             // ASSERT
-            publicationCacheService.Assert.CacheInvalidatedForPublicationSlug("publication-slug-1");
-            publicationCacheService.Assert.CacheInvalidatedForPublicationSlug("publication-slug-2");
-            publicationCacheService.Assert.CacheInvalidatedForPublicationSlug("publication-slug-3");
+            publicationCacheService.Assert.CacheInvalidatedForPublicationEntry("publication-slug-1");
+            publicationCacheService.Assert.CacheInvalidatedForPublicationEntry("publication-slug-2");
+            publicationCacheService.Assert.CacheInvalidatedForPublicationEntry("publication-slug-3");
         }
     }
 

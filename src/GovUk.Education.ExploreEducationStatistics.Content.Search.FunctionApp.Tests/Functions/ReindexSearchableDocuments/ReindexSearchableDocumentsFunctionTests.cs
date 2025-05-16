@@ -1,5 +1,5 @@
-﻿using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.RefreshSearchableDocument.Dto;
-using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.ReindexSearchableDocuments;
+﻿using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.CommandHandlers.RefreshSearchableDocument.Dto;
+using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.CommandHandlers.ReindexSearchableDocuments;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Tests.Builders;
 using Microsoft.Extensions.Logging.Abstractions;
 

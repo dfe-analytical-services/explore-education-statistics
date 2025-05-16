@@ -25,8 +25,15 @@ public interface IAzureBlobStorageClient
     /// <summary>
     /// Check for the existence of a container in our configured Azure Blob Storage account
     /// </summary>
-    /// <param name="containerName"></param>
-    /// <param name="cancellationToken"></param>
+    /// <param name="containerName">The name of the storage account container</param>
+    /// <param name="cancellationToken">Cancellation token</param>
     /// <returns></returns>
     Task<bool> ContainerExists(string containerName, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Delete all blobs from the specified container
+    /// </summary>
+    /// /// <param name="containerName">The name of the storage account container</param>
+    /// /// <param name="cancellationToken">Cancellation token</param>
+    Task DeleteAllBlobsFromContainer(string containerName, CancellationToken cancellationToken = default);
 }
