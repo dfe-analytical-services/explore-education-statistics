@@ -151,7 +151,7 @@ module searchServiceModule 'application/searchService.bicep' = {
     indexName: 'index-1'
     resourceNames: resourceNames
     resourcePrefix: resourcePrefix
-    searchServiceIpRules: maintenanceIpRanges
+    searchServiceIpRules: []
     storageIpRules: maintenanceIpRanges
     deployAlerts: deployAlerts
     deploySearchConfig: deploySearchConfig
