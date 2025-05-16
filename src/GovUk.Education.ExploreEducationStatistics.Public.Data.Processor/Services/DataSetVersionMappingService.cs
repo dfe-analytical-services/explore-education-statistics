@@ -124,6 +124,7 @@ internal class DataSetVersionMappingService(
 
     public async Task ApplyAutoMappings(
         Guid nextDataSetVersionId,
+        bool isReplacement = false,
         CancellationToken cancellationToken = default)
     {
         var mapping = await publicDataDbContext
@@ -151,8 +152,8 @@ internal class DataSetVersionMappingService(
             .Where(filterMapping => filterMapping.Value.Type != MappingType.AutoNone)
             .SelectMany(filterMapping => filterMapping.Value.OptionMappings)
             .Any(optionMapping => IncompleteMappingTypes.Contains(optionMapping.Value.Type));
-
-        if (IsMajorVersionUpdate(mapping))
+ 
+        if (!isReplacement && IsMajorVersionUpdate(mapping))
         {
             mapping.TargetDataSetVersion.VersionMajor += 1;
             mapping.TargetDataSetVersion.VersionMinor = 0;

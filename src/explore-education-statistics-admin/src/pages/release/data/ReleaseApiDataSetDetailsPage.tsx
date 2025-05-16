@@ -17,8 +17,10 @@ import {
   ReleaseDataSetChangelogRouteParams,
   ReleaseDataSetRouteParams,
   ReleaseRouteParams,
+  releaseDataFileReplaceRoute,
+  ReleaseDataFileReplaceRouteParams,
 } from '@admin/routes/releaseRoutes';
-import { DataSetStatus } from '@admin/services/apiDataSetService';
+import { ApiDataSet, DataSetStatus } from '@admin/services/apiDataSetService';
 import apiDataSetVersionService from '@admin/services/apiDataSetVersionService';
 import ContentHtml from '@common/components/ContentHtml';
 import LoadingSpinner from '@common/components/LoadingSpinner';
@@ -37,8 +39,10 @@ export type DataSetFinalisingStatus = 'finalising' | 'finalised' | undefined;
 export default function ReleaseApiDataSetDetailsPage() {
   const { dataSetId } = useParams<ReleaseDataSetRouteParams>();
   const history = useHistory();
-
-  const { publicAppUrl } = useConfig();
+  const {
+    enableReplacementOfPublicApiDataSets: isNewReplaceDsvFeatureEnabled,
+    publicAppUrl,
+  } = useConfig();
   const { releaseVersion } = useReleaseVersionContext();
 
   const [finalisingStatus, setFinalisingStatus] =
@@ -66,6 +70,23 @@ export default function ReleaseApiDataSetDetailsPage() {
       setFinalisingStatus('finalised');
     }
   }, [finalisingStatus, dataSet?.draftVersion?.status, setFinalisingStatus]);
+
+  const shouldShowRejectedError = (
+    apiDataSet: ApiDataSet | undefined,
+    hasNewReplaceDsvFeatureEnabled: boolean | undefined,
+  ): boolean => {
+    const versionParts = apiDataSet?.draftVersion?.version?.split('.') || [];
+    const isPatch = hasNewReplaceDsvFeatureEnabled
+      ? versionParts?.length === 3 && parseInt(versionParts[2], 10) > 0
+      : false;
+
+    return isPatch
+      ? !!(
+          apiDataSet?.draftVersion?.mappingStatus &&
+          apiDataSet.draftVersion.mappingStatus.hasMajorVersionUpdate
+        )
+      : false;
+  };
 
   const handleFinalise = async () => {
     if (dataSet?.draftVersion) {
@@ -228,6 +249,11 @@ export default function ReleaseApiDataSetDetailsPage() {
     />
   ) : null;
 
+  const showRejectedError = shouldShowRejectedError(
+    dataSet,
+    isNewReplaceDsvFeatureEnabled,
+  );
+
   const mappingComplete =
     dataSet?.draftVersion?.mappingStatus &&
     dataSet.draftVersion.mappingStatus.filtersComplete &&
@@ -240,6 +266,44 @@ export default function ReleaseApiDataSetDetailsPage() {
     (dataSet?.draftVersion?.status === 'Draft' ||
       dataSet?.draftVersion?.status === 'Mapping');
 
+  const replaceRouteParams = dataSet?.draftVersion?.originalFileId
+    ? {
+        publicationId: releaseVersion.publicationId,
+        releaseVersionId: releaseVersion.id,
+        fileId: dataSet?.draftVersion?.originalFileId as string,
+      }
+    : undefined;
+  const replaceTabRoute = replaceRouteParams
+    ? `${generatePath<ReleaseDataFileReplaceRouteParams>(
+        releaseDataFileReplaceRoute.path,
+        replaceRouteParams,
+      )}`
+    : '';
+  const majorVersionErrorSummary = (
+    <div className="govuk-inset-text InsetText_error__ZDwli" role="alert">
+      <h2 className="govuk-error-summary__title" id="error-summary-title">
+        This API data set can not be published because it has a major version
+        update.
+      </h2>
+      <div className="govuk-error-summary__body">
+        <ul className="govuk-list govuk-error-summary__list">
+          <li>
+            The data file uploaded has resulted in a major version update which
+            is not allowed in release amendments. Major version type changes
+            (e.g. removing data rows, ...) can only be made as part of new
+            releases. For further guidance, contact the EES team. Please select
+            a mapping configuration that does not result in a major version or
+            cancel the ongoing replacement
+            <Link to={replaceTabRoute} test-id="cancel-replacement-link">
+              by clicking here
+            </Link>
+            . and upload a new data file which does not result in a major
+            version update.
+          </li>
+        </ul>
+      </div>
+    </div>
+  );
   return (
     <>
       <Link
@@ -259,17 +323,20 @@ export default function ReleaseApiDataSetDetailsPage() {
             <span className="govuk-caption-l">API data set details</span>
             <h2>{dataSet.title}</h2>
 
-            {mappingComplete && dataSet.draftVersion && (
-              <ApiDataSetFinaliseBanner
-                dataSetId={dataSetId}
-                dataSetVersionId={dataSet.draftVersion.id}
-                draftVersionStatus={dataSet.draftVersion.status}
-                finalisingStatus={finalisingStatus}
-                publicationId={releaseVersion.publicationId}
-                releaseVersionId={releaseVersion.id}
-                onFinalise={handleFinalise}
-              />
-            )}
+            {showRejectedError
+              ? majorVersionErrorSummary
+              : mappingComplete &&
+                dataSet.draftVersion && (
+                  <ApiDataSetFinaliseBanner
+                    dataSetId={dataSetId}
+                    dataSetVersionId={dataSet.draftVersion.id}
+                    draftVersionStatus={dataSet.draftVersion.status}
+                    finalisingStatus={finalisingStatus}
+                    publicationId={releaseVersion.publicationId}
+                    releaseVersionId={releaseVersion.id}
+                    onFinalise={handleFinalise}
+                  />
+                )}
 
             <SummaryList
               className="govuk-!-margin-bottom-8"
@@ -302,13 +369,18 @@ export default function ReleaseApiDataSetDetailsPage() {
                         <Tag
                           colour={
                             dataSet.draftVersion.mappingStatus
-                              ?.locationsComplete
+                              ?.locationsComplete &&
+                            !dataSet.draftVersion.mappingStatus
+                              ?.locationsHaveMajorChange
                               ? 'blue'
                               : 'red'
                           }
                         >
                           {dataSet.draftVersion.mappingStatus?.locationsComplete
-                            ? 'Complete'
+                            ? getCompleteText(
+                                dataSet.draftVersion.mappingStatus
+                                  ?.locationsHaveMajorChange,
+                              )
                             : 'Incomplete'}
                         </Tag>
                       }
@@ -335,13 +407,19 @@ export default function ReleaseApiDataSetDetailsPage() {
                       status={
                         <Tag
                           colour={
-                            dataSet.draftVersion.mappingStatus?.filtersComplete
+                            dataSet.draftVersion.mappingStatus
+                              ?.filtersComplete &&
+                            !dataSet.draftVersion.mappingStatus
+                              ?.filtersHaveMajorChange
                               ? 'blue'
                               : 'red'
                           }
                         >
                           {dataSet.draftVersion.mappingStatus?.filtersComplete
-                            ? 'Complete'
+                            ? getCompleteText(
+                                dataSet.draftVersion.mappingStatus
+                                  ?.filtersHaveMajorChange,
+                              )
                             : 'Incomplete'}
                         </Tag>
                       }
@@ -429,6 +507,10 @@ export default function ReleaseApiDataSetDetailsPage() {
       </LoadingSpinner>
     </>
   );
+
+  function getCompleteText(majorVersionFound: boolean): React.ReactNode {
+    return showRejectedError && majorVersionFound ? 'Major Change' : 'Complete';
+  }
 }
 
 function getDataSetStatusColour(status: DataSetStatus): TagProps['colour'] {

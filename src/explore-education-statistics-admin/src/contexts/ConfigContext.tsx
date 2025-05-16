@@ -51,6 +51,7 @@ const defaultTestConfig: Config = {
       endSessionEndpoint: '',
     },
   },
+  enableReplacementOfPublicApiDataSets: false,
 };
 
 interface TestConfigContextProps {
