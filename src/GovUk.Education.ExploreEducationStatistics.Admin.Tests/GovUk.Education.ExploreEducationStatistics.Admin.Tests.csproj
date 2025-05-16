@@ -34,6 +34,7 @@
     <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Common.Tests\GovUk.Education.ExploreEducationStatistics.Common.Tests.csproj" />
     <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Content.Model.Tests\GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.csproj" />
     <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Data.Model.Tests\GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.csproj" />
+    <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Events.Tests\GovUk.Education.ExploreEducationStatistics.Events.Tests.csproj" />
     <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Tests\GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Tests.csproj" />
   </ItemGroup>
 

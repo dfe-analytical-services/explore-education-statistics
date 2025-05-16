@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.Cache;
+using GovUk.Education.ExploreEducationStatistics.Events;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
@@ -78,7 +79,7 @@ public class PublishingCompletionService(
         var publishedReleaseVersionInfos = await contentDbContext
             .ReleaseVersions
             .Where(rv => releaseVersionIdsToUpdate.Contains(rv.Id))
-            .Select(rv => new PublishedReleaseVersionInfo
+            .Select(rv => new ReleaseVersionPublishedEvent.PublishedReleaseVersionInfo
             {
                 ReleaseVersionId = rv.Id, 
                 ReleaseId = rv.ReleaseId,
@@ -130,17 +131,8 @@ public class PublishingCompletionService(
                     .UpdatePublishingStage(status.AsTableRowKey(), ReleasePublishingStatusPublishingStage.Complete));
     }
 
-    public record PublishedReleaseVersionInfo
-    {
-        public Guid ReleaseVersionId { get; init; }
-        public Guid ReleaseId {get;init;}
-        public string ReleaseSlug { get; init; } = string.Empty;
-        public Guid PublicationId { get; init; }
-        public string PublicationSlug { get; init; } = string.Empty;
-        public Guid PublicationLatestPublishedReleaseVersionId { get; init; }
-    }
-
-    private async ValueTask<PublishedReleaseVersionInfo> UpdateLatestPublishedReleaseVersionForPublication(PublishedReleaseVersionInfo info)
+    private async ValueTask<ReleaseVersionPublishedEvent.PublishedReleaseVersionInfo> UpdateLatestPublishedReleaseVersionForPublication(
+        ReleaseVersionPublishedEvent.PublishedReleaseVersionInfo info)
     {
         var publication = await contentDbContext.Publications
             .SingleAsync(p => p.Id == info.PublicationId);

@@ -2,10 +2,10 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
-using GovUk.Education.ExploreEducationStatistics.Common.Services.EventGrid;
-using GovUk.Education.ExploreEducationStatistics.Common.Tests.Builders.Config;
-using GovUk.Education.ExploreEducationStatistics.Common.Tests.Services.EventGrid;
-using GovUk.Education.ExploreEducationStatistics.Publisher.Events;
+using GovUk.Education.ExploreEducationStatistics.Events;
+using GovUk.Education.ExploreEducationStatistics.Events.EventGrid;
+using GovUk.Education.ExploreEducationStatistics.Events.Tests.EventGrid.Builders;
+using GovUk.Education.ExploreEducationStatistics.Events.Tests.EventGrid.Builders.Config;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Builders.Services;
@@ -38,7 +38,7 @@ public class PublisherEventRaiserTests
         {
             // ARRANGE
             var sut = GetSut();
-            var info = new PublishingCompletionService.PublishedReleaseVersionInfo
+            var info = new ReleaseVersionPublishedEvent.PublishedReleaseVersionInfo
             {
                 PublicationId = Guid.Parse("11111111-0000-0000-0000-000000000000"),
                 PublicationSlug = "test-publication-slug",
@@ -64,7 +64,7 @@ public class PublisherEventRaiserTests
             // ARRANGE
             var sut = GetSut();
             var infos = Enumerable.Range(1, numberOfEvents)
-                .Select(i => new PublishingCompletionService.PublishedReleaseVersionInfo
+                .Select(i => new ReleaseVersionPublishedEvent.PublishedReleaseVersionInfo
                     {
                         PublicationId = Guid.Parse($"11111111-0000-0000-0000-{i:000000000000}"),
                         PublicationSlug = "test-publication-slug",
@@ -131,7 +131,7 @@ public class PublisherEventRaiserTests
             
             var sut = GetSut(new EventRaiser(realEventGridClientFactory));
 
-            var publishedReleaseVersionInfo = new PublishingCompletionService.PublishedReleaseVersionInfo
+            var publishedReleaseVersionInfo = new ReleaseVersionPublishedEvent.PublishedReleaseVersionInfo
             {
                 PublicationId = Guid.Parse("11111111-0000-0000-0000-000000000000"),
                 PublicationSlug = "test-publication-slug",

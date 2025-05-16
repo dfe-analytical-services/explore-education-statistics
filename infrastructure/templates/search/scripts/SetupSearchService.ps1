@@ -33,25 +33,28 @@ switch ($dataSourceType)
 {
     "azureblob" {
         $dataSourceDefinition = @{
-            'name' = $dataSourceName;
-            'type' = $dataSourceType;
+            'name' = $dataSourceName
+            'type' = $dataSourceType
             'container' = @{
-                'name' = $dataSourceContainerName;
-                'query' = $dataSourceContainerQuery;
-            };
+                'name' = $dataSourceContainerName
+                'query' = $dataSourceContainerQuery
+            }
             'credentials' = @{
-                'connectionString' = $dataSourceConnectionString;
-            };
+                'connectionString' = $dataSourceConnectionString
+            }
             'dataDeletionDetectionPolicy' = @{
-                '@odata.type' = '#Microsoft.Azure.Search.NativeBlobSoftDeleteDeletionDetectionPolicy';
-            };
+                '@odata.type' = '#Microsoft.Azure.Search.NativeBlobSoftDeleteDeletionDetectionPolicy'
+            }
         }
         $indexerDefinition = @{
-            'name' = $indexerName;
-            'disabled' = $indexerDisabled -eq 'true';
-            'targetIndexName' = $indexDefinition.name;
-            'dataSourceName' = $dataSourceName;
-            'schedule' = $indexerScheduleInterval.Length -gt 0 ? @{ 'interval' = $indexerScheduleInterval } : $null;
+            'name' = $indexerName
+            'disabled' = $indexerDisabled -eq 'true'
+            'targetIndexName' = $indexDefinition.name
+            'dataSourceName' = $dataSourceName
+            'schedule' = $indexerScheduleInterval.Length -gt 0 ? @{ 
+                'interval' = $indexerScheduleInterval
+                'startTime' = '2025-01-01T00:00:00Z'
+            } : $null
         }
     }
     default {

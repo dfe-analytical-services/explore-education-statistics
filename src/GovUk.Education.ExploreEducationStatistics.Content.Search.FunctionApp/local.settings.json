@@ -11,6 +11,7 @@
     "ReleaseSlugChangedQueueName": "release-slug-changed-queue",
     "ReleaseVersionPublishedQueueName": "release-version-published-queue",
     "RemovePublicationSearchableDocumentsQueueName": "remove-publication-searchable-documents-queue",
+    "RemoveSearchableDocumentQueueName": "remove-searchable-document-queue",
     "SearchableDocumentCreatedQueueName": "search-document-created-queue",
     "ThemeUpdatedQueueName": "theme-updated-queue"
   },

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
+using GovUk.Education.ExploreEducationStatistics.Events;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Builders.Models;
@@ -563,7 +564,7 @@ public class PublishingCompletionServiceTests
                     await sut.CompletePublishingIfAllPriorStagesComplete(readyKeys);
 
                     // ASSERT
-                    var expectedInfo = new PublishingCompletionService.PublishedReleaseVersionInfo
+                    var expectedInfo = new ReleaseVersionPublishedEvent.PublishedReleaseVersionInfo
                     {
                         ReleaseVersionId = _releaseVersion1.Id,
                         ReleaseId = _releaseVersion1.ReleaseId,
@@ -595,7 +596,7 @@ public class PublishingCompletionServiceTests
                     await sut.CompletePublishingIfAllPriorStagesComplete(readyKeys);
 
                     // ASSERT
-                    var expectedInfo = new PublishingCompletionService.PublishedReleaseVersionInfo
+                    var expectedInfo = new ReleaseVersionPublishedEvent.PublishedReleaseVersionInfo
                     {
                         ReleaseVersionId = _releaseVersion1.Id,
                         ReleaseId = _releaseVersion1.ReleaseId,
