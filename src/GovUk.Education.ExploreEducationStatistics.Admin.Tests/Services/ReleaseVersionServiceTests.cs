@@ -17,6 +17,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Cache;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Options;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
@@ -2393,7 +2394,8 @@ public abstract class ReleaseVersionServiceTests
         IDataSetVersionService? dataSetVersionService = null,
         IProcessorClient? processorClient = null,
         IPrivateBlobCacheService? privateCacheService = null,
-        IReleaseSlugValidator? releaseSlugValidator = null)
+        IReleaseSlugValidator? releaseSlugValidator = null,
+        bool enableReplacementOfPublicApiDataSets = false)
     {
         var userService = AlwaysTrueUserService();
 
@@ -2420,7 +2422,11 @@ public abstract class ReleaseVersionServiceTests
             dataSetVersionService ?? Mock.Of<IDataSetVersionService>(Strict),
             processorClient ?? Mock.Of<IProcessorClient>(Strict),
             privateCacheService ?? Mock.Of<IPrivateBlobCacheService>(Strict),
-            releaseSlugValidator ?? new ReleaseSlugValidatorMockBuilder().Build()
+            releaseSlugValidator ?? new ReleaseSlugValidatorMockBuilder().Build(),
+            featureFlags: Microsoft.Extensions.Options.Options.Create(new FeatureFlags()
+            {
+                EnableReplacementOfPublicApiDataSets = enableReplacementOfPublicApiDataSets
+            })
         );
     }
 }
