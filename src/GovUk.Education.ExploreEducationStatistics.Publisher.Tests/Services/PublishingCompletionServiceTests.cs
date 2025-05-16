@@ -137,8 +137,8 @@ public class PublishingCompletionServiceTests
                 // Assign the release versions a status id
                 ReleasePublishingKey[] readyKeys = 
                 [
-                    new(_releaseVersion1.Id, Guid.NewGuid()), 
-                    new(_releaseVersion2.Id, Guid.NewGuid()), 
+                    new(_releaseVersion1.Id, ReleaseStatusId:Guid.NewGuid()), 
+                    new(_releaseVersion2.Id, ReleaseStatusId:Guid.NewGuid()), 
                 ];
 
                 // Set the Status Service to report on whether a release version is ready to be published or not ie Complete 
@@ -577,6 +577,38 @@ public class PublishingCompletionServiceTests
                 }
                 
                 [Fact]
+                public async Task GivenReleaseAlreadyPublished_WhenReleaseVersionIsPublished_ThenEventIsRaisedWithPreviousReleaseId()
+                {
+                    // ARRANGE
+                    var readyKeys = SetupHappyPath();
+                    var sut = GetSut();
+                    var previousReleaseVersion = new ReleaseVersionBuilder()
+                        .WithPublicationId(PublicationId1)
+                        .ForRelease(release => release
+                            .WithReleaseSlug("release-slug-previous"))
+                        .Build();
+
+                    WherePreviousPublicationLatestPublishedReleaseVersionIs(publicationId: PublicationId1, releaseVersion: previousReleaseVersion);
+                    _releaseService.WherePublicationLatestPublishedReleaseVersionIs(PublicationId1, _releaseVersion1);
+
+                    // ACT
+                    await sut.CompletePublishingIfAllPriorStagesComplete(readyKeys);
+
+                    // ASSERT
+                    var expectedInfo = new ReleaseVersionPublishedEvent.PublishedReleaseVersionInfo
+                    {
+                        ReleaseVersionId = _releaseVersion1.Id,
+                        ReleaseId = _releaseVersion1.ReleaseId,
+                        ReleaseSlug = _releaseVersion1.Release.Slug,
+                        PublicationId = _releaseVersion1.Release.PublicationId,
+                        PublicationSlug = _releaseVersion1.Release.Publication.Slug,
+                        PublicationLatestPublishedReleaseVersionId = _releaseVersion1.Id,
+                        PreviousLatestReleaseId = previousReleaseVersion.ReleaseId // Event contains the previous release id
+                    };
+                    _publisherEventRaiser.Assert.EventWasRaised(evt => evt == expectedInfo); 
+                }
+                
+                [Fact]
                 public async Task WhenPublishedReleaseVersionIsNotLatestVersion_ThenEventIsRaised()
                 {
                     // ARRANGE
@@ -589,6 +621,7 @@ public class PublishingCompletionServiceTests
 
                     // Set that release version 1V2 is the latest, not release version 1
                     _releaseService.WherePublicationLatestPublishedReleaseVersionIs(PublicationId1, releaseVersion1V2);
+                    WherePreviousPublicationLatestPublishedReleaseVersionIs(PublicationId1, releaseVersion1V2);
                     
                     var sut = GetSut();
                     
@@ -603,9 +636,16 @@ public class PublishingCompletionServiceTests
                         ReleaseSlug = _releaseVersion1.Release.Slug,
                         PublicationId = _releaseVersion1.Release.PublicationId,
                         PublicationSlug = _releaseVersion1.Release.Publication.Slug,
-                        PublicationLatestPublishedReleaseVersionId = releaseVersionId1V2 // Assert latest release is different
+                        PublicationLatestPublishedReleaseVersionId = releaseVersionId1V2, // Assert latest release is 1v2
+                        PreviousLatestReleaseId = releaseVersion1V2.ReleaseId // Previous Release Id should still be 1v2's 
                     };
                     _publisherEventRaiser.Assert.EventWasRaised(evt => evt == expectedInfo); 
+                }
+
+                private void WherePreviousPublicationLatestPublishedReleaseVersionIs(Guid publicationId, ReleaseVersion releaseVersion)
+                {
+                    _contentDbContext.With(releaseVersion);
+                    _contentDbContext.WherePublication(publicationId, publication => publication.LatestPublishedReleaseVersionId = releaseVersion.Id);
                 }
             }
         }

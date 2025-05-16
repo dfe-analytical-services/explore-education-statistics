@@ -135,10 +135,12 @@ public class PublishingCompletionService(
         ReleaseVersionPublishedEvent.PublishedReleaseVersionInfo info)
     {
         var publication = await contentDbContext.Publications
+            .Include(p => p.LatestPublishedReleaseVersion)
             .SingleAsync(p => p.Id == info.PublicationId);
 
         var latestPublishedReleaseVersion = await releaseService.GetLatestPublishedReleaseVersion(info.PublicationId);
 
+        var previousLatestReleaseId = publication.LatestPublishedReleaseVersion?.ReleaseId;
         publication.LatestPublishedReleaseVersionId = latestPublishedReleaseVersion.Id;
 
         await contentDbContext.SaveChangesAsync();
@@ -146,7 +148,8 @@ public class PublishingCompletionService(
         return info with
         {
             PublicationLatestPublishedReleaseVersionId = latestPublishedReleaseVersion.Id,
-            PublicationSlug = publication.Slug
+            PublicationSlug = publication.Slug,
+            PreviousLatestReleaseId = previousLatestReleaseId,
         };
     }
 }
