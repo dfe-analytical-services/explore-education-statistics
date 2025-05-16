@@ -22,7 +22,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 {
     public class DataSetValidator(
         ContentDbContext context,
-        IOptions<FeatureFlags> featureFlags) : IDataSetValidator
+        IOptions<FeatureFlagsOptions> featureFlags) : IDataSetValidator
     {
         public const int MaxFilenameSize = 150;
 

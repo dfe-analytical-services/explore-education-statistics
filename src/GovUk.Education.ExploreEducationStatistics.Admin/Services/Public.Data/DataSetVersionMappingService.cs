@@ -32,8 +32,7 @@ public class DataSetVersionMappingService(
     IUserService userService,
     PublicDataDbContext publicDataDbContext,
     ContentDbContext contentDbContext,
-    IMappingTypesRepository mappingTypesRepository,
-    IOptions<FeatureFlags> featureFlags)
+    IMappingTypesRepository mappingTypesRepository)
     : IDataSetVersionMappingService
 {
     private static readonly MappingType[] IncompleteMappingTypes =
@@ -81,37 +80,27 @@ public class DataSetVersionMappingService(
             .OnSuccess(() => CheckMappingExists(nextDataSetVersionId, cancellationToken))
             .OnSuccess(mapping => mapping.FilterMappingPlan);
     }
-
-    /// <summary>
-    /// Determines whether a dataset version mapping requires a major version update by analyzing
-    /// the mapping types of locations and filters. Returns true if there are any locations or filters
-    /// that cannot be mapped (NoMappingTypes) or if there are any deletion-based major version changes.
-    /// </summary>
-    /// <param name="dataSetVersionId">The ID of the target dataset version to check</param>
-    /// <param name="cancellationToken">Optional cancellation token</param>
-    /// <returns>True if a major version update is required, false otherwise</returns>
-    public async Task<bool> IsMajorVersionUpdate(
-        Guid dataSetVersionId,
-        CancellationToken cancellationToken = default)
+    
+    public async Task<MappingStatusViewModel?> GetMappingStatus(Guid dataSetVersionId, CancellationToken cancellationToken = default)
     {
         var locationOptionMappingTypes = await mappingTypesRepository.GetLocationOptionMappingTypes(
             dataSetVersionId, 
             cancellationToken);
 
         var filterAndOptionMappingTypes = await mappingTypesRepository.GetFilterOptionMappingTypes(
-                dataSetVersionId, 
-                cancellationToken);
-
-        return await IsMajorVersionUpdate(
-            dataSetVersionId,
-            locationOptionMappingTypes,
-            filterAndOptionMappingTypes,
+            dataSetVersionId, 
             cancellationToken);
-    }
 
-    public async Task<MappingStatusViewModel?> GetMappingStatus(Guid dataSetVersionId, CancellationToken cancellationToken = default)
-    {
-        var isMajorVersionUpdate = await IsMajorVersionUpdate(dataSetVersionId, cancellationToken);
+        var locationIsMajor = locationOptionMappingTypes
+            .Any(types => NoMappingTypes.Contains(types.LocationLevel) || NoMappingTypes.Contains(types.LocationOption));
+
+        var filtersIsMajor = filterAndOptionMappingTypes.Any(types => NoMappingTypes.Contains(types.Filter) ||  NoMappingTypes.Contains(types.FilterOption));
+
+        var isMajorVersionUpdate = await IsMajorVersionUpdate(
+                dataSetVersionId,
+                    locationOptionMappingTypes,
+                    filterAndOptionMappingTypes,
+                    cancellationToken);
 
         return await publicDataDbContext
             .DataSetVersionMappings
@@ -120,6 +109,8 @@ public class DataSetVersionMappingService(
             {
                 LocationsComplete = mapping.LocationMappingsComplete,
                 FiltersComplete = mapping.FilterMappingsComplete,
+                LocationsHaveMajorChange = locationIsMajor,
+                FiltersHaveMajorChange = filtersIsMajor,
                 HasMajorVersionUpdate = isMajorVersionUpdate
             })
             .SingleOrDefaultAsync(cancellationToken);
@@ -226,17 +217,25 @@ public class DataSetVersionMappingService(
             filterMappingTypes,
             cancellationToken);
 
-        if (isMajorVersionUpdate)
-        {
-            targetDataSetVersion.VersionMajor = sourceDataSetVersion.VersionMajor + 1;
-            targetDataSetVersion.VersionMinor = 0;
-            targetDataSetVersion.VersionPatch = 0;
-        }
-        else
-        {
-            targetDataSetVersion.VersionMajor = sourceDataSetVersion.VersionMajor;
-            targetDataSetVersion.VersionMinor = sourceDataSetVersion.VersionMinor + 1;
-            targetDataSetVersion.VersionPatch = 0;
+        var isReplacingAPIDataFile = await publicDataDbContext.DataSetVersionImports
+            .AnyAsync(i => i.DataSetVersionToReplaceId != null 
+                           && i.DataSetVersionToReplaceId == sourceDataSetVersion.Id,
+                cancellationToken) && targetDataSetVersion.VersionPatch > 0;
+
+        if (!isReplacingAPIDataFile)
+        {   
+            if (isMajorVersionUpdate)
+            {
+                targetDataSetVersion.VersionMajor = sourceDataSetVersion.VersionMajor + 1;
+                targetDataSetVersion.VersionMinor = 0;
+                targetDataSetVersion.VersionPatch = 0;
+            }
+            else
+            {
+                targetDataSetVersion.VersionMajor = sourceDataSetVersion.VersionMajor;
+                targetDataSetVersion.VersionMinor = sourceDataSetVersion.VersionMinor + 1;
+                targetDataSetVersion.VersionPatch = 0;
+            }
         }
 
         await publicDataDbContext.SaveChangesAsync(cancellationToken);
@@ -251,28 +250,15 @@ public class DataSetVersionMappingService(
         await contentDbContext.SaveChangesAsync(cancellationToken);
     }
 
-    private async Task<bool> IsMajorVersionUpdate(
+    public async Task<bool> IsMajorVersionUpdate(
         Guid targetDataSetVersionId,
         List<LocationMappingTypes> locationMappingTypes,
         List<FilterMappingTypes> filterMappingTypes,
-        CancellationToken cancellationToken)
-    {
-        if (locationMappingTypes.Any(types => NoMappingTypes.Contains(types.LocationLevel)
-                                               || NoMappingTypes.Contains(types.LocationOption)))
-        {
-            return true;
-        }
-
-        if (filterMappingTypes.Any(types => NoMappingTypes.Contains(types.Filter)
-                                            ||  NoMappingTypes.Contains(types.FilterOption)))
-        {
-            return true;
-        }
-
-        return await HasDeletionChanges(
-            targetDataSetVersionId,
-            cancellationToken);
-    }
+        CancellationToken cancellationToken) => locationMappingTypes
+                   .Any(types => NoMappingTypes.Contains(types.LocationLevel) || NoMappingTypes.Contains(types.LocationOption))
+                || filterMappingTypes
+                    .Any(types => NoMappingTypes.Contains(types.Filter) ||  NoMappingTypes.Contains(types.FilterOption))
+                || await HasDeletionChanges(targetDataSetVersionId, cancellationToken);
     
     /// <summary>
     /// Checks if there are any major version changes due to deletions in indicators, geographic levels, or time periods

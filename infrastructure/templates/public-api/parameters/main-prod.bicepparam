@@ -53,3 +53,5 @@ param docsAppSku = 'Standard'
 param recoveryVaultImmutable = true
 
 param enableThemeDeletion = false
+
+param enableReplacementOfPublicApiDataSets = false

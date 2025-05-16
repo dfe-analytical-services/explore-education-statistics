@@ -143,7 +143,7 @@ public class DataSetFileStorageTests
                });
         }
 
-        var featureFlagOptions = Microsoft.Extensions.Options.Options.Create(new FeatureFlags()
+        var featureFlagsOptions = Microsoft.Extensions.Options.Options.Create(new FeatureFlagsOptions()
         {
             EnableReplacementOfPublicApiDataSets = false
         });
@@ -156,7 +156,7 @@ public class DataSetFileStorageTests
                 dataImportService: dataImportService.Object,
                 releaseVersionRepository: releaseVersionRepository.Object,
                 releaseDataFileRepository: releaseDataFileRepository.Object,
-                featureFlags: featureFlagOptions,
+                featureFlags: featureFlagsOptions,
                 addDefaultUser: false
             );
 
@@ -404,7 +404,7 @@ public class DataSetFileStorageTests
         IDataImportService? dataImportService = null,
         IUserService? userService = null,
         IDataSetVersionService? dataSetVersionService = null,
-        IOptions<FeatureFlags>? featureFlags = null,
+        IOptions<FeatureFlagsOptions>? featureFlags = null,
         bool addDefaultUser = true)
     {
         if (addDefaultUser)
@@ -421,7 +421,7 @@ public class DataSetFileStorageTests
             dataImportService ?? Mock.Of<IDataImportService>(Strict),
             userService ?? MockUtils.AlwaysTrueUserService(_user.Id).Object,
             dataSetVersionService ?? Mock.Of<IDataSetVersionService>(Strict),
-            featureFlags ?? Mock.Of<IOptions<FeatureFlags>>(Strict),
+            featureFlags ?? Mock.Of<IOptions<FeatureFlagsOptions>>(Strict),
             Mock.Of<ILogger<DataSetFileStorage>>(Strict));
     }
 }

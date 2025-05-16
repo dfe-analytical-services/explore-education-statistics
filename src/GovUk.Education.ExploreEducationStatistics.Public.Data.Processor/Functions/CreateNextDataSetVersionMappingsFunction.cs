@@ -19,8 +19,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Funct
 public class CreateNextDataSetVersionMappingsFunction(
     ILogger<CreateNextDataSetVersionMappingsFunction> logger,
     IDataSetVersionService dataSetVersionService,
-    IValidator<NextDataSetVersionMappingsCreateRequest> requestValidator,
-    IOptions<FeatureFlags> featureFlags)
+    IValidator<NextDataSetVersionMappingsCreateRequest> requestValidator)
 {
     [Function(nameof(CreateNextDataSetVersionMappings))]
     public async Task<IActionResult> CreateNextDataSetVersionMappings(
