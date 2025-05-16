@@ -4,7 +4,6 @@ using GovUk.Education.ExploreEducationStatistics.Analytics.Consumer.Services.Wor
 using GovUk.Education.ExploreEducationStatistics.Analytics.Consumer.Tests.Services.Workflow.MockBuilders;
 using GovUk.Education.ExploreEducationStatistics.Common.DuckDb.DuckDb;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
-using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using InterpolatedSql.Dapper;
 using Microsoft.Extensions.Logging;
 using Moq;

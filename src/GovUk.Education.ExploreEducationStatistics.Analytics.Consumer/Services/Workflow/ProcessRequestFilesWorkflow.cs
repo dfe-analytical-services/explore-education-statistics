@@ -31,6 +31,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Analytics.Consumer.Services
 /// <param name="actor">
 ///     The <see cref="IWorkflowActor{TRequestFileProcessor}" /> implementation being guided through the workflow.
 /// </param>
+/// <param name="logger">
+///     Logger from the associated Processor.
+/// </param>
+/// <param name="fileAccessor">
+///     Optional <see cref="IFileAccessor"/> implementation. If not provided, defaults to an instance of
+///     <see cref="FilesystemFileAccessor"/>.
+/// </param>
+/// <param name="dateTimeProvider">
+///     Optional <see cref="DateTimeProvider"/>. If not provided, defaults to providing the current time.  
+/// </param>
 public class ProcessRequestFilesWorkflow<TRequestFileProcessor>(
     string sourceDirectory,
     string reportsDirectory,
