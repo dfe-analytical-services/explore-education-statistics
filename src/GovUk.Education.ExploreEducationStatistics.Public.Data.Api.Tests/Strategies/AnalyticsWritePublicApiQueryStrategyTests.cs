@@ -61,11 +61,13 @@ public abstract class AnalyticsWritePublicApiQueryStrategyTests
                 snapshotName: $"{SnapshotPrefix}.{nameof(Success)}.Query2");
         }
 
-        private static AnalyticsWritePublicApiQueryStrategy BuildStrategy(IAnalyticsPathResolver pathResolver)
+        private static AnalyticsWritePublicApiQueryStrategy BuildStrategy(
+            IAnalyticsPathResolver pathResolver,
+            DateTimeProvider? dateTimeProvider = null)
         {
             return new AnalyticsWritePublicApiQueryStrategy(
                 pathResolver,
-                Mock.Of<DateTimeProvider>(),
+                dateTimeProvider ?? new DateTimeProvider(),
                 Mock.Of<ILogger<AnalyticsWritePublicApiQueryStrategy>>());
         }
     }

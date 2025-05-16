@@ -10,6 +10,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Database;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.ModelBinding;
 using GovUk.Education.ExploreEducationStatistics.Common.Rules;
+using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Options;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Repository;
@@ -254,6 +255,8 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
         services.AddScoped<IParquetTimePeriodRepository, ParquetTimePeriodRepository>();
 
         services.AddAnalytics(hostEnvironment, configuration);
+
+        services.AddSingleton<DateTimeProvider>();
     }
 
     // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
