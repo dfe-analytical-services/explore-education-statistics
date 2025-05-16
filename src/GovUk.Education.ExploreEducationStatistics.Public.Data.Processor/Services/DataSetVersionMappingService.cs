@@ -116,8 +116,8 @@ internal class DataSetVersionMappingService(
         {
            return ValidationUtils.ValidationResult(new ErrorViewModel
             {
-                Code = ValidationMessages.DataSetVersionNotFound.Code,
-                Message = ValidationMessages.DataSetVersionNotFound.Message,
+                Code = ValidationMessages.NextDataSetVersionNotFound.Code,
+                Message = ValidationMessages.NextDataSetVersionNotFound.Message,
                 Path = nameof(NextDataSetVersionMappingsCreateRequest.DataSetVersionToReplaceId).ToLowerFirst(),
             });
         }

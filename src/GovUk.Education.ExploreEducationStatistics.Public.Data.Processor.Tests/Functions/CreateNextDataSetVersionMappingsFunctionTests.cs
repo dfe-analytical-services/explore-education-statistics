@@ -560,8 +560,8 @@ public abstract class CreateNextDataSetVersionMappingsFunctionTests(
                 result.AssertBadRequestWithValidationErrors([
                     new ErrorViewModel
                     {
-                        Code = ValidationMessages.DataSetVersionNotFound.Code,
-                        Message = ValidationMessages.DataSetVersionNotFound.Message,
+                        Code = ValidationMessages.NextDataSetVersionNotFound.Code,
+                        Message = ValidationMessages.NextDataSetVersionNotFound.Message,
                         Path = nameof(NextDataSetVersionMappingsCreateRequest.DataSetId).ToLowerFirst()
                     }
                 ]);

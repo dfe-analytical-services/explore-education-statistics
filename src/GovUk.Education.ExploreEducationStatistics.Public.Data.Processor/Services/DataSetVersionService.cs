@@ -366,7 +366,7 @@ internal class DataSetVersionService(
 
         return previousVersion is null
             ? ValidationUtils.ValidationResult(CreateDataSetIdError(
-                message: ValidationMessages.DataSetVersionNotFound,
+                message: ValidationMessages.NextDataSetVersionNotFound,
                 dataSetId: dataSet.Id))
             : previousVersion;
     }

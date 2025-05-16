@@ -310,13 +310,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                     //Please note this will is WIP, EES-5996 and will address failure,
                                     //and any refactor that may be required
                                     await dataSetVersionService.GetDataSetVersion(
-                                            (Guid)replacedReleaseDataFile?.PublicApiDataSetId!,
+                                            replacedReleaseDataFile!.PublicApiDataSetId!.Value,
                                             replacedReleaseDataFile.PublicApiDataSetVersion!)
                                         .OnSuccessDo(async dataSetVersion =>
                                         {
                                             await dataSetVersionService.CreateNextVersion(
                                                 dataReleaseFile.Id,
-                                                (Guid)replacedReleaseDataFile?.PublicApiDataSetId!,
+                                                replacedReleaseDataFile.PublicApiDataSetId.Value,
                                                 dataSetVersion.Id
                                             ); 
                                         });

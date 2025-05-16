@@ -104,7 +104,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     var (originalReleaseFile, replacementReleaseFile) = tuple;
 
                     return await GetLinkedDataSetVersion(_featureFlags.Value.EnableReplacementOfPublicApiDataSets ? replacementReleaseFile : originalReleaseFile, cancellationToken)
-                        .OnSuccess(apiDataSetVersion => (originalReleaseFile, replacementReleaseFile, apiDataSetVersion));
+                        .OnSuccess(replacementApiDataSetVersion => (originalReleaseFile, replacementReleaseFile, replacementApiDataSetVersion));
                 })
                 .OnSuccess(async tuple =>
                 {
@@ -123,8 +123,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         subjectId: originalSubjectId,
                         replacementSubjectMeta);
 
-                    var apiDataSetVersionPlan = tuple.apiDataSetVersion is null ? null 
-                        : await GetApiVersionPlanViewModel(tuple.apiDataSetVersion, cancellationToken);
+                    var apiDataSetVersionPlan = tuple.replacementApiDataSetVersion is null ? null 
+                        : await GetApiVersionPlanViewModel(tuple.replacementApiDataSetVersion, cancellationToken);
 
                     return new DataReplacementPlanViewModel
                     {
@@ -138,24 +138,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
             
         }
-        private async Task<ApiDataSetVersionPlanViewModel?> GetApiVersionPlanViewModel(DataSetVersion apiDataSetVersionToReplace, CancellationToken cancellationToken)
+        private async Task<ApiDataSetVersionPlanViewModel?> GetApiVersionPlanViewModel(DataSetVersion replacementApiDataSetVersion, CancellationToken cancellationToken)
         {
             var apiDataSetVersionPlan = new ApiDataSetVersionPlanViewModel
                 {
-                    DataSetId = apiDataSetVersionToReplace.DataSetId,
-                    DataSetTitle = apiDataSetVersionToReplace.DataSet.Title,
-                    Id = apiDataSetVersionToReplace.Id,
-                    Version = apiDataSetVersionToReplace.PublicVersion,
-                    Status = apiDataSetVersionToReplace.Status,
+                    DataSetId = replacementApiDataSetVersion.DataSetId,
+                    DataSetTitle = replacementApiDataSetVersion.DataSet.Title,
+                    Id = replacementApiDataSetVersion.Id,
+                    Version = replacementApiDataSetVersion.PublicVersion,
+                    Status = replacementApiDataSetVersion.Status,
                     Valid = false,
                 };
-            if (_featureFlags.Value.EnableReplacementOfPublicApiDataSets && apiDataSetVersionToReplace.VersionPatch > 0)
+            if (_featureFlags.Value.EnableReplacementOfPublicApiDataSets && replacementApiDataSetVersion.VersionPatch > 0)
             { 
                 //TODO: Please note EES-5779 PR Note this will be updated in an upcomming PR - Valid's value will take into account
                 //more things than just the values { FiltersComplete: true, LocationsComplete: true }. It will
                 //also include whether the user has 'finalized' the data set version mapping & whether the version has
                 //a breaking change and results in a major version increment. 
-                apiDataSetVersionPlan.MappingStatus = await _dataSetService.GetMappingStatus(apiDataSetVersionToReplace.Id, cancellationToken);
+                apiDataSetVersionPlan.MappingStatus = await _dataSetService.GetMappingStatus(replacementApiDataSetVersion.Id, cancellationToken);
                 apiDataSetVersionPlan.Valid = apiDataSetVersionPlan.MappingStatus is
                     { FiltersComplete: true, LocationsComplete: true };
             }
