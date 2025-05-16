@@ -1,10 +1,4 @@
 #nullable enable
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Reflection;
-using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
@@ -26,6 +20,12 @@ using GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Moq;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Reflection;
+using System.Threading.Tasks;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainers;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
@@ -193,7 +193,6 @@ public class ProcessorStage3Tests
             importerService,
             dataImportService,
             Mock.Of<IValidatorService>(Strict),
-            Mock.Of<IDataArchiveService>(Strict),
             dbContextSupplier);
 
         var function = BuildFunction(
@@ -421,7 +420,6 @@ public class ProcessorStage3Tests
             importerService,
             dataImportService,
             Mock.Of<IValidatorService>(Strict),
-            Mock.Of<IDataArchiveService>(Strict),
             dbContextSupplier);
 
         var function = BuildFunction(
@@ -553,7 +551,6 @@ public class ProcessorStage3Tests
             importerService,
             dataImportService,
             Mock.Of<IValidatorService>(Strict),
-            Mock.Of<IDataArchiveService>(Strict),
             dbContextSupplier);
 
         var function = BuildFunction(
@@ -703,7 +700,6 @@ public class ProcessorStage3Tests
             importerService,
             dataImportService,
             Mock.Of<IValidatorService>(Strict),
-            Mock.Of<IDataArchiveService>(Strict),
             dbContextSupplier);
 
         var function = BuildFunction(
@@ -839,7 +835,6 @@ public class ProcessorStage3Tests
             importerService,
             dataImportService,
             Mock.Of<IValidatorService>(Strict),
-            Mock.Of<IDataArchiveService>(Strict),
             dbContextSupplier);
 
         var function = BuildFunction(
@@ -1001,7 +996,6 @@ public class ProcessorStage3Tests
             importerService,
             dataImportService,
             Mock.Of<IValidatorService>(Strict),
-            Mock.Of<IDataArchiveService>(Strict),
             dbContextSupplier);
 
         var function = BuildFunction(
@@ -1143,7 +1137,6 @@ public class ProcessorStage3Tests
             importerService,
             dataImportService,
             Mock.Of<IValidatorService>(Strict),
-            Mock.Of<IDataArchiveService>(Strict),
             dbContextSupplier);
 
         var function = BuildFunction(
@@ -1265,7 +1258,6 @@ public class ProcessorStage3Tests
             importerService,
             dataImportService,
             Mock.Of<IValidatorService>(Strict),
-            Mock.Of<IDataArchiveService>(Strict),
             dbContextSupplier);
 
         var function = BuildFunction(
@@ -1415,7 +1407,6 @@ public class ProcessorStage3Tests
             importerService,
             dataImportService,
             Mock.Of<IValidatorService>(Strict),
-            Mock.Of<IDataArchiveService>(Strict),
             dbContextSupplier);
 
         var function = BuildFunction(
@@ -1583,7 +1574,6 @@ public class ProcessorStage3Tests
             importerService,
             dataImportService,
             Mock.Of<IValidatorService>(Strict),
-            Mock.Of<IDataArchiveService>(Strict),
             dbContextSupplier);
 
         var function = BuildFunction(

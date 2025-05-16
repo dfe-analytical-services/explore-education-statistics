@@ -1,8 +1,4 @@
 #nullable enable
-using System;
-using System.IO;
-using System.Reflection;
-using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
@@ -20,6 +16,10 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Moq;
+using System;
+using System.IO;
+using System.Reflection;
+using System.Threading.Tasks;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainers;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
@@ -188,7 +188,6 @@ public class ProcessorStage1Tests
             importerService ?? Mock.Of<IImporterService>(Strict),
             dataImportService ?? Mock.Of<IDataImportService>(Strict),
             validatorService ?? Mock.Of<IValidatorService>(Strict),
-            Mock.Of<IDataArchiveService>(Strict),
             dbContextSupplier);
     }
 

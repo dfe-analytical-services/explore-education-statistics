@@ -34,7 +34,7 @@ export default function BulkZipUploadModalConfirm({
           {bulkUploadPlan.map(archiveDataSet => (
             <tr key={archiveDataSet.title}>
               <td>{archiveDataSet.title}</td>
-              <td>{archiveDataSet.dataFilename}</td>
+              <td>{archiveDataSet.dataFileName}</td>
               <td>
                 {archiveDataSet.replacingFileId && (
                   <WarningMessage className="govuk-!-margin-0 govuk-!-padding-0">

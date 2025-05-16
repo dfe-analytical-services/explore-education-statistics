@@ -1,6 +1,3 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Methodologies;
@@ -14,6 +11,9 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Moq;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.PermissionTestUtils;
 using static Moq.MockBehavior;
@@ -89,7 +89,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             ContentDbContext contentDbContext = null,
             IPersistenceHelper<ContentDbContext> contentPersistenceHelper = null,
             IPrivateBlobStorageService privateBlobStorageService = null,
-            IFileUploadsValidatorService fileUploadsValidatorService = null,
+            IFileValidatorService fileValidatorService = null,
             IFileRepository fileRepository = null,
             IMethodologyFileRepository methodologyFileRepository = null,
             IUserService userService = null)
@@ -98,7 +98,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 contentDbContext ?? Mock.Of<ContentDbContext>(),
                 contentPersistenceHelper ?? DefaultPersistenceHelperMock().Object,
                 privateBlobStorageService ?? Mock.Of<IPrivateBlobStorageService>(),
-                fileUploadsValidatorService ?? Mock.Of<IFileUploadsValidatorService>(),
+                fileValidatorService ?? Mock.Of<IFileValidatorService>(),
                 fileRepository ?? Mock.Of<IFileRepository>(),
                 methodologyFileRepository ?? Mock.Of<IMethodologyFileRepository>(),
                 userService ?? Mock.Of<IUserService>()
