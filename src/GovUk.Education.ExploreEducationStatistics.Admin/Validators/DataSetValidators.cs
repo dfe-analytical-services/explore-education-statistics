@@ -7,8 +7,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 
 public static class DataSetValidators
 {
-    public static IRuleBuilderOptions<T, DataSetFileDto> MustHaveAValidFileName<T>(
-        this IRuleBuilder<T, DataSetFileDto> ruleBuilder)
+    public static IRuleBuilderOptions<T, FileDto> MustHaveAValidFileName<T>(
+        this IRuleBuilder<T, FileDto> ruleBuilder)
     {
         return ruleBuilder
             .Must((root, dto, context) =>
@@ -31,8 +31,8 @@ public static class DataSetValidators
                 .WithMessage(ValidationMessages.FileNameCannotContainSpecialCharacters, "{FileName}");
     }
 
-    public static IRuleBuilderOptions<T, DataSetFileDto> MustNotBeAnEmptyFile<T>(
-        this IRuleBuilder<T, DataSetFileDto> ruleBuilder)
+    public static IRuleBuilderOptions<T, FileDto> MustNotBeAnEmptyFile<T>(
+        this IRuleBuilder<T, FileDto> ruleBuilder)
     {
         return ruleBuilder
             .Must((root, dto, context) =>
@@ -43,8 +43,8 @@ public static class DataSetValidators
                 .WithMessage(ValidationMessages.FileSizeMustNotBeZero, "{FileName}");
     }
 
-    public static IRuleBuilderOptions<T, DataSetFileDto> MustBeValidFile<T>(
-        this IRuleBuilder<T, DataSetFileDto> ruleBuilder)
+    public static IRuleBuilderOptions<T, FileDto> MustBeValidFile<T>(
+        this IRuleBuilder<T, FileDto> ruleBuilder)
     {
         return ruleBuilder
             .MustNotBeAnEmptyFile()
@@ -52,8 +52,8 @@ public static class DataSetValidators
             .When(dto => dto is not null);
     }
 
-    public static IRuleBuilderOptions<T, DataSetFileDto> MustBeValidDataFile<T>(
-        this IRuleBuilder<T, DataSetFileDto> ruleBuilder)
+    public static IRuleBuilderOptions<T, FileDto> MustBeValidDataFile<T>(
+        this IRuleBuilder<T, FileDto> ruleBuilder)
     {
         return ruleBuilder
             .MustBeValidFile()
@@ -62,8 +62,8 @@ public static class DataSetValidators
             .When(dto => dto is not null);
     }
 
-    public static IRuleBuilderOptions<T, DataSetFileDto> MustBeValidMetaFile<T>(
-        this IRuleBuilder<T, DataSetFileDto> ruleBuilder)
+    public static IRuleBuilderOptions<T, FileDto> MustBeValidMetaFile<T>(
+        this IRuleBuilder<T, FileDto> ruleBuilder)
     {
         return ruleBuilder
             .MustBeValidFile()

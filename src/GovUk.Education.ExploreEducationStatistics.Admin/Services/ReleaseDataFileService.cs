@@ -302,8 +302,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         private async Task<Either<ActionResult, DataSet>> ValidateAndBuildDataSet(
             Guid releaseVersionId,
-            DataSetFileDto dataFile,
-            DataSetFileDto metaFile,
+            FileDto dataFile,
+            FileDto metaFile,
             string dataSetTitle,
             File? replacingFile)
         {
@@ -366,7 +366,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         private static List<DataSetDto> BuildDataSetsFromBulkZip(
             DataSetIndex dataSetIndex,
-            List<DataSetFileDto> dataSetFiles)
+            List<FileDto> dataSetFiles)
         {
             var dataSets = new List<DataSetDto>();
             foreach (var dataSet in dataSetIndex.DataSetIndexItems)
@@ -384,12 +384,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return dataSets;
         }
 
-        private static async Task<List<DataSetFileDto>> ExtractDataSetZipFile(IFormFile zipFile)
+        private static async Task<List<FileDto>> ExtractDataSetZipFile(IFormFile zipFile)
         {
             await using var stream = zipFile.OpenReadStream();
             using var archive = new ZipArchive(stream);
 
-            var files = new List<DataSetFileDto>();
+            var files = new List<FileDto>();
 
             foreach (var entry in archive.Entries)
             {
@@ -400,13 +400,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return files;
         }
 
-        private static async Task<DataSetFileDto> BuildDataSetFile(IFormFile formFile)
+        private static async Task<FileDto> BuildDataSetFile(IFormFile formFile)
         {
             using var fileStream = formFile.OpenReadStream();
             return await BuildDataSetFile(fileStream, formFile.FileName);
         }
 
-        private static async Task<DataSetFileDto> BuildDataSetFile(
+        private static async Task<FileDto> BuildDataSetFile(
             System.IO.Stream fileStream,
             string fileName)
         {
@@ -415,7 +415,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
             memoryStream.SeekToBeginning();
 
-            return new DataSetFileDto
+            return new FileDto
             {
                 FileName = fileName,
                 FileSize = memoryStream.Length,

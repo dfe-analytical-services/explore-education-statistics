@@ -5,7 +5,6 @@ using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using File = GovUk.Education.ExploreEducationStatistics.Content.Model.File;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Models;
@@ -19,9 +18,9 @@ public record DataSetDto
 
     public string Title { get; init; } = string.Empty;
 
-    public DataSetFileDto? DataFile { get; init; }
+    public FileDto? DataFile { get; init; }
 
-    public DataSetFileDto? MetaFile { get; init; }
+    public FileDto? MetaFile { get; init; }
 
     public File? ReplacingFile { get; init; }
 
@@ -55,42 +54,15 @@ public record DataSetDto
 }
 
 /// <summary>
-/// Represents a data set file, which forms part of a <see cref="DataSet"/>.
-/// </summary>
-public record DataSetFileDto
-{
-    public required string FileName { get; init; }
-
-    /// <summary>
-    /// Get the size of a data set file in bytes.
-    /// </summary>
-    /// <remarks>
-    /// Although streams contain a Length property, this value is unavailable once the stream has been disposed of.
-    /// </remarks>
-    public required long FileSize { get; init; }
-
-    public required MemoryStream FileStream { get; init; }
-
-    public class Validator : AbstractValidator<DataSetFileDto>
-    {
-        public Validator()
-        {
-            RuleFor(dto => dto)
-                .MustBeValidFile();
-        }
-    }
-}
-
-/// <summary>
 /// Represents a validated data set.
 /// </summary>
 public record DataSet
 {
     public required string Title { get; init; }
 
-    public required DataSetFileDto DataFile { get; init; }
+    public required FileDto DataFile { get; init; }
 
-    public required DataSetFileDto MetaFile { get; init; }
+    public required FileDto MetaFile { get; init; }
 
     public File? ReplacingFile { get; init; }
 }

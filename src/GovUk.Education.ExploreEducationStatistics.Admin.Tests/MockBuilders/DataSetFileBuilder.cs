@@ -18,7 +18,7 @@ public class DataSetFileBuilder
     private string? _fileName;
     private bool _fileSizeIsZero;
 
-    public async Task<DataSetFileDto> Build(FileType fileType)
+    public async Task<FileDto> Build(FileType fileType)
     {
         if (fileType is not FileType.Data and not FileType.Metadata and not FileType.BulkDataZipIndex)
         {

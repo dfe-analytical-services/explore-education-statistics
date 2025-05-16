@@ -91,11 +91,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         public async Task<Either<List<ErrorViewModel>, DataSetIndex>> ValidateBulkDataZipIndexFile(
             Guid releaseVersionId,
-            DataSetFileDto indexFile,
-            List<DataSetFileDto> dataSetFiles)
+            FileDto indexFile,
+            List<FileDto> dataSetFiles)
         {
             var errors = new List<ErrorViewModel>();
-            var validator = new DataSetFileDto.Validator();
+            var validator = new FileDto.Validator();
 
             var result = validator.Validate(indexFile);
 
@@ -163,7 +163,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         private static List<ErrorViewModel> CheckBulkDataZipForMissingFiles(
             List<DataSetIndexItem> indexItems,
-            List<DataSetFileDto> dataSetFiles)
+            List<FileDto> dataSetFiles)
         {
             var errors = new List<ErrorViewModel>();
 
@@ -235,7 +235,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         private static List<ErrorViewModel> CheckBulkDataZipForUnusedFiles(
             List<DataSetIndexItem> indexItems,
-            List<DataSetFileDto> dataSetFiles)
+            List<FileDto> dataSetFiles)
         {
             var indexItemDataFileNames = indexItems.Select(item => item.DataFileName);
             var indexItemMetaFileNames = indexItems.Select(item => item.MetaFileName);
