@@ -43,6 +43,25 @@ public class DataSetVersionMappingServiceTests
     {
         // Arrange
         var targetDataSetVersionId = Guid.NewGuid();
+
+        var locationMappingTypes = new List<LocationMappingTypes>
+        {
+            new()
+            {
+                LocationLevelRaw = locationMappingTypesLevel,
+                LocationOptionRaw = locationMappingTypesOption
+            }
+        }; 
+        
+        var filterMappingTypes = new List<FilterMappingTypes>
+        {
+            new()
+            {
+                FilterRaw = filterMappingTypesLevel,
+                FilterOptionRaw = filterMappingTypesOption
+            }
+        };
+        
         SetupDbContext(
             targetDataSetVersionId, 
             majorCausedByDeletion, 
@@ -67,6 +86,8 @@ public class DataSetVersionMappingServiceTests
         // Act
         var result = await service.IsMajorVersionUpdate(
             targetDataSetVersionId,
+            locationMappingTypes,
+            filterMappingTypes,
             CancellationToken.None);
 
         // Assert
@@ -166,18 +187,14 @@ public class DataSetVersionMappingServiceTests
         ContentDbContext contentDbContext,
         IPostgreSqlRepository? mockPostgreSqlRepository = null,
         IUserService? mockUserService = null,
-        IMappingTypesRepository? mockMappingTypesRepository = null,
-        IOptions<FeatureFlagsOptions>? mockFeatureFlags = null)
+        IMappingTypesRepository? mockMappingTypesRepository = null)
     {
         return new DataSetVersionMappingService(
             mockPostgreSqlRepository ?? Mock.Of<IPostgreSqlRepository>(behavior: MockBehavior.Strict),
             mockUserService ?? Mock.Of<IUserService>(behavior: MockBehavior.Strict),
             publicDataDbContext,
             contentDbContext,
-            mockMappingTypesRepository ?? Mock.Of<IMappingTypesRepository>(behavior: MockBehavior.Strict),
-            mockFeatureFlags ?? Microsoft.Extensions.Options.Options.Create(new FeatureFlagsOptions
-            {
-                EnableReplacementOfPublicApiDataSets = false
-            }));
+            mockMappingTypesRepository ?? Mock.Of<IMappingTypesRepository>(behavior: MockBehavior.Strict)
+            );
     }
 }

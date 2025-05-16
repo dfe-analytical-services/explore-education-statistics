@@ -22,6 +22,8 @@ public abstract record DataSetVersionViewModel
 
     public required IdTitleViewModel File { get; init; }
 
+    public Guid? OriginalFileId { get; set; }
+    
     public required IdTitleViewModel ReleaseVersion { get; init; }
 
     public long TotalResults { get; init; }
@@ -86,6 +88,10 @@ public record MappingStatusViewModel
     public required bool FiltersComplete { get; init; }
     
     public required bool HasMajorVersionUpdate { get; init; } 
+
+    public bool? LocationsHaveMajorChange { get; init; }
+
+    public bool? FiltersHaveMajorChange { get; init; }
 }
 
 public record DataSetVersionInfoViewModel 
