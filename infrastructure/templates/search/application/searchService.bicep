@@ -77,7 +77,7 @@ module searchStorageAccountModule '../../public-api/components/storageAccount.bi
   params: {
     location: location
     storageAccountName: '${replace(resourcePrefix, '-', '')}${abbreviations.storageStorageAccounts}search'
-    publicNetworkAccessEnabled: false
+    publicNetworkAccessEnabled: true
     firewallRules: storageIpRules
     sku: 'Standard_LRS'
     kind: 'StorageV2'
