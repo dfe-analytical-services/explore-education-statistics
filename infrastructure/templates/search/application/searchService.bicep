@@ -64,7 +64,7 @@ module searchServiceModule '../components/searchService.bicep' = {
   params: {
     name: searchServiceName
     location: location
-    ipRules: [] // TODO EES-5940 - Should be searchServiceIpRules
+    ipRules: searchServiceIpRules
     publicNetworkAccess: 'Enabled'
     sku: 'basic'
     systemAssignedIdentity: true
