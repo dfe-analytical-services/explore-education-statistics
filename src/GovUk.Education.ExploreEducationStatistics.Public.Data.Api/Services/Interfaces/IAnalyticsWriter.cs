@@ -4,5 +4,5 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services.In
 
 public interface IAnalyticsWriter
 {
-    Task Report(AnalyticsCaptureRequestBase request, CancellationToken cancellationToken);
+    Task Report(IAnalyticsCaptureRequestBase request, CancellationToken cancellationToken);
 }

@@ -3,7 +3,7 @@ using System;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Requests;
 
-public abstract record AnalyticsCaptureRequestBase;
+public interface IAnalyticsCaptureRequestBase;
 
 /// <summary>
 /// To capture data relating to a zip download request for analytics.
@@ -14,4 +14,4 @@ public record CaptureZipDownloadRequest(
     string ReleaseName,
     string? ReleaseLabel,
     Guid? SubjectId = null,
-    string? DataSetTitle = null) : AnalyticsCaptureRequestBase;
+    string? DataSetTitle = null) : IAnalyticsCaptureRequestBase;

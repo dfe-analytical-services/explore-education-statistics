@@ -16,7 +16,7 @@ public class AnalyticsWritePublicApiQueryStrategy(
 {
     public Type RequestType => typeof(CaptureDataSetVersionQueryRequest);
 
-    public async Task Report(AnalyticsCaptureRequestBase request, CancellationToken cancellationToken)
+    public async Task Report(IAnalyticsCaptureRequestBase request, CancellationToken cancellationToken)
     {
         if (request is not CaptureDataSetVersionQueryRequest queryRequest)
         {

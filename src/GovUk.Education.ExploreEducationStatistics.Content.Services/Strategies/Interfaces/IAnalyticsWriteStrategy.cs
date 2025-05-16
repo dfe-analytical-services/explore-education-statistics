@@ -10,5 +10,5 @@ public interface IAnalyticsWriteStrategy
 {
     Type RequestType { get; }
 
-    Task Report(AnalyticsCaptureRequestBase request, CancellationToken cancellationToken);
+    Task Report(IAnalyticsCaptureRequestBase request, CancellationToken cancellationToken);
 }

@@ -1,6 +1,6 @@
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Requests;
 
-public abstract record AnalyticsCaptureRequestBase;
+public interface IAnalyticsCaptureRequestBase;
 
 public record CaptureDataSetVersionQueryRequest(
     Guid DataSetId,
@@ -11,4 +11,4 @@ public record CaptureDataSetVersionQueryRequest(
     int TotalRowsCount,
     DateTime StartTime,
     DateTime EndTime,
-    DataSetQueryRequest Query) : AnalyticsCaptureRequestBase;
+    DataSetQueryRequest Query) : IAnalyticsCaptureRequestBase;

@@ -9,15 +9,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services;
 
 public class AnalyticsManager : IAnalyticsManager
 {
-    private readonly Channel<AnalyticsCaptureRequestBase> _channel =
-        Channel.CreateUnbounded<AnalyticsCaptureRequestBase>();
+    private readonly Channel<IAnalyticsCaptureRequestBase> _channel =
+        Channel.CreateUnbounded<IAnalyticsCaptureRequestBase>();
 
-    public async Task Add(AnalyticsCaptureRequestBase request, CancellationToken cancellationToken)
+    public async Task Add(IAnalyticsCaptureRequestBase request, CancellationToken cancellationToken)
     {
         await _channel.Writer.WriteAsync(request, cancellationToken);
     }
 
-    public ValueTask<AnalyticsCaptureRequestBase> Read(CancellationToken cancellationToken)
+    public ValueTask<IAnalyticsCaptureRequestBase> Read(CancellationToken cancellationToken)
     {
         return _channel.Reader.ReadAsync(cancellationToken);
     }
@@ -25,12 +25,12 @@ public class AnalyticsManager : IAnalyticsManager
 
 public class NoOpAnalyticsManager : IAnalyticsManager
 {
-    public Task Add(AnalyticsCaptureRequestBase request, CancellationToken cancellationToken)
+    public Task Add(IAnalyticsCaptureRequestBase request, CancellationToken cancellationToken)
     {
         return Task.CompletedTask;
     }
 
-    public async ValueTask<AnalyticsCaptureRequestBase> Read(CancellationToken cancellationToken)
+    public async ValueTask<IAnalyticsCaptureRequestBase> Read(CancellationToken cancellationToken)
     {
         await Task.Delay(Timeout.Infinite, cancellationToken);
         return default!;

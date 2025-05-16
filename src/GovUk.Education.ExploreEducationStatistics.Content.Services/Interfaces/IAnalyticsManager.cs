@@ -7,7 +7,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces
 
 public interface IAnalyticsManager
 {
-    Task Add(AnalyticsCaptureRequestBase request, CancellationToken cancellationToken);
+    Task Add(IAnalyticsCaptureRequestBase request, CancellationToken cancellationToken);
 
-    ValueTask<AnalyticsCaptureRequestBase> Read(CancellationToken cancellationToken);
+    ValueTask<IAnalyticsCaptureRequestBase> Read(CancellationToken cancellationToken);
 }

@@ -15,7 +15,7 @@ public class AnalyticsWriter(IEnumerable<IAnalyticsWriteStrategy> strategies) : 
     private readonly Dictionary<Type, IAnalyticsWriteStrategy> _strategyByRequestType =
         strategies.ToDictionary(strategy => strategy.RequestType);
 
-    public async Task Report(AnalyticsCaptureRequestBase request, CancellationToken cancellationToken)
+    public async Task Report(IAnalyticsCaptureRequestBase request, CancellationToken cancellationToken)
     {
         if (!_strategyByRequestType.TryGetValue(request.GetType(), out var strategy))
         {
