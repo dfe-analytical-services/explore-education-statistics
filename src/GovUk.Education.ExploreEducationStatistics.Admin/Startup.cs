@@ -83,6 +83,7 @@ using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Admin.Repositories;
 using Thinktecture;
 using static GovUk.Education.ExploreEducationStatistics.Common.Utils.StartupUtils;
 using ContentGlossaryService = GovUk.Education.ExploreEducationStatistics.Content.Services.GlossaryService;
@@ -998,5 +999,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
         {
             return Task.FromResult(new List<DataSetVersion>());
         }
+
+        public Task<DataSetVersion> GetDataSetVersion(Guid dataSetVersionId) => throw new NotImplementedException();
+
+        public Task<DataSetVersion> GetDataSetVersion(Guid dataSetId, SemVersion version, CancellationToken cancellationToken = default) => throw new NotImplementedException();
     }
 }
