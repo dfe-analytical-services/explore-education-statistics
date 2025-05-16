@@ -2,7 +2,6 @@ using FluentValidation;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Options;
-using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Helpers;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Requests;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Services.Interfaces;
@@ -13,7 +12,6 @@ using Microsoft.DurableTask;
 using Microsoft.DurableTask.Client;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Semver;
 using FromBodyAttribute = Microsoft.Azure.Functions.Worker.Http.FromBodyAttribute;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Functions;
@@ -39,21 +37,11 @@ public class CreateNextDataSetVersionMappingsFunction(
         
         return await requestValidator.Validate(request, cancellationToken)
             .OnSuccess(() =>
-            {
-                var replaceApiDataSets = featureFlags.Value.EnableReplacementOfPublicApiDataSets
-                                                                && request.DataSetVersionToReplace is not null;
-                return Task.FromResult(replaceApiDataSets
-                    ? SemVersionParser.ParseVersionWithValidation(request.DataSetVersionToReplace!, 
-                        Requests.Validators.ValidationMessages.DataSetVersionToReplaceNotValid, 
-                        nameof(NextDataSetVersionMappingsCreateRequest.DataSetVersionToReplace))
-                    : (SemVersion?)null!);
-            })
-            .OnSuccess(dataSetVersionToReplace =>
                  dataSetVersionService.CreateNextVersion(
                     dataSetId: request.DataSetId,
                     releaseFileId: request.ReleaseFileId,
                     instanceId,
-                    dataSetVersionToReplace,
+                    request.DataSetVersionToReplaceId,
                     cancellationToken: cancellationToken
                 ))
             .OnSuccess(async dataSetVersionId =>

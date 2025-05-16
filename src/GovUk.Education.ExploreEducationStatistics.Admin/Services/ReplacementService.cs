@@ -151,6 +151,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 };
             if (_featureFlags.Value.EnableReplacementOfPublicApiDataSets && apiDataSetVersionToReplace.VersionPatch > 0)
             { 
+                //TODO: Please note EES-5779 PR Note this will be updated in an upcomming PR - Valid's value will take into account
+                //more things than just the values { FiltersComplete: true, LocationsComplete: true }. It will
+                //also include whether the user has 'finalized' the data set version mapping & whether the version has
+                //a breaking change and results in a major version increment. 
                 apiDataSetVersionPlan.MappingStatus = await _dataSetService.GetMappingStatus(apiDataSetVersionToReplace.Id, cancellationToken);
                 apiDataSetVersionPlan.Valid = apiDataSetVersionPlan.MappingStatus is
                     { FiltersComplete: true, LocationsComplete: true };

@@ -39,7 +39,7 @@ internal class DataSetVersionMappingService(
 
     public async Task<Either<ActionResult, Unit>> CreateMappings(
         Guid nextDataSetVersionId,
-        SemVersion? dataSetVersionToReplace,
+        Guid? dataSetVersionToReplaceId,
         CancellationToken cancellationToken = default)
     {
         var nextVersion = await publicDataDbContext
@@ -50,12 +50,12 @@ internal class DataSetVersionMappingService(
             .ThenInclude(dataSet => dataSet.Versions)
             .SingleAsync(dsv => dsv.Id == nextDataSetVersionId, cancellationToken);
 
-        var sourceVersion = featureFlags.Value.EnableReplacementOfPublicApiDataSets && dataSetVersionToReplace is not null
-            ? nextVersion.DataSet.Versions.FirstOrDefault(v => v.SemVersion() == dataSetVersionToReplace)
+        var sourceVersion = featureFlags.Value.EnableReplacementOfPublicApiDataSets && dataSetVersionToReplaceId is not null
+            ? nextVersion.DataSet.Versions.FirstOrDefault(v => v.Id == dataSetVersionToReplaceId )
             : nextVersion.DataSet.LatestLiveVersion;
         
         if (featureFlags.Value.EnableReplacementOfPublicApiDataSets 
-            && dataSetVersionToReplace is not null 
+            && dataSetVersionToReplaceId is not null 
             && sourceVersion is null)
         {
             return VersionToReplaceNotFoundError();
@@ -114,17 +114,11 @@ internal class DataSetVersionMappingService(
 
         Either<ActionResult, Unit> VersionToReplaceNotFoundError()
         {
-            return new BadRequestObjectResult(new ValidationProblemViewModel()
+           return ValidationUtils.ValidationResult(new ErrorViewModel
             {
-                Errors =
-                [
-                    new ErrorViewModel
-                    {
-                        Code = ValidationMessages.DataSetVersionNotFound.Code,
-                        Message = ValidationMessages.DataSetVersionNotFound.Message,
-                        Path = nameof(NextDataSetVersionMappingsCreateRequest.DataSetVersionToReplace).ToLowerFirst(),
-                    }
-                ]
+                Code = ValidationMessages.DataSetVersionNotFound.Code,
+                Message = ValidationMessages.DataSetVersionNotFound.Message,
+                Path = nameof(NextDataSetVersionMappingsCreateRequest.DataSetVersionToReplaceId).ToLowerFirst(),
             });
         }
     }

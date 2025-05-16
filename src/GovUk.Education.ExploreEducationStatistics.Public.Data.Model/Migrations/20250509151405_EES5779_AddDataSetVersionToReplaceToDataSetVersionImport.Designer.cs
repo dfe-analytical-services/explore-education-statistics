@@ -13,7 +13,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migrations
 {
     [DbContext(typeof(PublicDataDbContext))]
-    [Migration("20250513160631_EES5779_AddDataSetVersionToReplaceToDataSetVersionImport")]
+    [Migration("20250509151405_EES5779_AddDataSetVersionToReplaceToDataSetVersionImport")]
     partial class EES5779_AddDataSetVersionToReplaceToDataSetVersionImport
     {
         /// <inheritdoc />
@@ -148,8 +148,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                     b.Property<Guid>("DataSetVersionId")
                         .HasColumnType("uuid");
 
-                    b.Property<string>("DataSetVersionToReplace")
-                        .HasColumnType("varchar(10)");
+                    b.Property<Guid?>("DataSetVersionToReplaceId")
+                        .HasColumnType("uuid");
 
                     b.Property<Guid>("InstanceId")
                         .HasColumnType("uuid");
@@ -164,6 +164,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                     b.HasKey("Id");
 
                     b.HasIndex("DataSetVersionId");
+
+                    b.HasIndex("DataSetVersionToReplaceId");
 
                     b.HasIndex("InstanceId")
                         .IsUnique();
@@ -962,7 +964,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.DataSetVersion", "DataSetVersionToReplace")
+                        .WithMany()
+                        .HasForeignKey("DataSetVersionToReplaceId");
+
                     b.Navigation("DataSetVersion");
+
+                    b.Navigation("DataSetVersionToReplace");
                 });
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.DataSetVersionMapping", b =>

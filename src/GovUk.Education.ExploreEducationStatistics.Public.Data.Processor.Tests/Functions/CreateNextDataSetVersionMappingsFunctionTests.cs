@@ -457,7 +457,7 @@ public abstract class CreateNextDataSetVersionMappingsFunctionTests(
                 dataSetId: dataSet.Id,
                 releaseFileId: releaseFile.Id,
                 durableTaskClientMock.Object,
-                dataSetVersionToReplace: versionUnderTest.PublicVersion);
+                dataSetVersionToReplace: versionUnderTest.Id);
             
             VerifyAllMocks(durableTaskClientMock);
 
@@ -545,7 +545,7 @@ public abstract class CreateNextDataSetVersionMappingsFunctionTests(
             SetDataSetVersionReplacementFeatureFlag(enableDataSetVersionReplacement);
             var (dataSet, _) = await AddDataSetAndLatestLiveVersion();
             var (releaseFile, _) = await AddDataAndMetadataFiles(publicationId: dataSet.PublicationId);
-            var nonExistingDataSetVersionToReplace = "9.1.0";
+            var nonExistingDataSetVersionToReplace = Guid.NewGuid();
 
             // Act
             var result = await CreateNextDataSetVersion(
@@ -572,24 +572,6 @@ public abstract class CreateNextDataSetVersionMappingsFunctionTests(
             }
         }
         
-        [Fact]
-        public async Task DatasetVersionFormatIsInvalid_ReturnsValidationProblem()
-        {
-            var (dataSet, _) = await AddDataSetAndLatestLiveVersion();
-            var (releaseFile, _) = await AddDataAndMetadataFiles(publicationId: dataSet.PublicationId);
-
-            var result = await CreateNextDataSetVersion(
-                dataSetId: dataSet.Id,
-                releaseFileId: releaseFile.Id,
-                dataSetVersionToReplace: "Not A Semantic Version");
-
-            var validationProblem = result.AssertBadRequestWithValidationProblem();
-
-            validationProblem.AssertHasError(
-                expectedPath: nameof(NextDataSetVersionMappingsCreateRequest.DataSetVersionToReplace).ToLowerFirst(),
-                expectedCode: ValidationMessages.DataSetVersionToReplaceNotValid.Code);
-        }
-
         [Theory]
         [InlineData(true)]
         [InlineData(false)]
@@ -604,7 +586,7 @@ public abstract class CreateNextDataSetVersionMappingsFunctionTests(
             var result = await CreateNextDataSetVersion(
                 dataSetId: dataSet.Id,
                 releaseFileId: nextDataFile.Id,
-                dataSetVersionToReplace: "1.1.1"
+                dataSetVersionToReplace: liveDataSetVersion.Id
             );
 
             if (enableDataSetVersionReplacement)
@@ -772,7 +754,7 @@ public abstract class CreateNextDataSetVersionMappingsFunctionTests(
         Guid dataSetId,
         Guid releaseFileId,
         DurableTaskClient? durableTaskClient = null,
-        string? dataSetVersionToReplace = null)
+        Guid? dataSetVersionToReplace = null)
     {
         var function = GetRequiredService<CreateNextDataSetVersionMappingsFunction>();
 
@@ -781,7 +763,7 @@ public abstract class CreateNextDataSetVersionMappingsFunctionTests(
             {
                 DataSetId = dataSetId,
                 ReleaseFileId = releaseFileId,
-                DataSetVersionToReplace = dataSetVersionToReplace
+                DataSetVersionToReplaceId = dataSetVersionToReplace
             },
             durableTaskClient ?? new Mock<DurableTaskClient>(MockBehavior.Strict, "TestClient").Object,
             CancellationToken.None);

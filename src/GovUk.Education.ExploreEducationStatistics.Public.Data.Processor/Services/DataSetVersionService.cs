@@ -51,14 +51,14 @@ internal class DataSetVersionService(
         Guid dataSetId,
         Guid releaseFileId,
         Guid instanceId,
-        SemVersion? dataSetVersionToReplace = null,
+        Guid? dataSetVersionToReplaceId = null,
         CancellationToken cancellationToken = default)
     {
         return await GetDataSet(dataSetId, cancellationToken)
-            .OnSuccess(ds => ValidateCanCreateNextDataSetVersion(ds, dataSetVersionToReplace))
+            .OnSuccess(ds => ValidateCanCreateNextDataSetVersion(ds, dataSetVersionToReplaceId))
             .OnSuccess(dataSet => (featureFlags.Value.EnableReplacementOfPublicApiDataSets 
-                                   && dataSetVersionToReplace is not null
-                    ? ValidateDataSetVersionToReplace(dataSet, dataSetVersionToReplace)
+                                   && dataSetVersionToReplaceId is not null
+                    ? ValidateDataSetVersionToReplace(dataSet, dataSetVersionToReplaceId.Value)
                     : (DataSetVersion?)null)
                 .OnSuccess(previousDataSetVersionToReplace => (dataSet, previousDataSetVersionToReplace)))
             .OnSuccess(dataSetAndDataSetVersion => CreateDataSetVersion(
@@ -346,22 +346,23 @@ internal class DataSetVersionService(
         return dataSet;
     }
 
-    private static Either<ActionResult, DataSet> ValidateCanCreateNextDataSetVersion(DataSet dataSet, SemVersion? dataSetVersionToReplace)
+    private static Either<ActionResult, DataSet> ValidateCanCreateNextDataSetVersion(DataSet dataSet, Guid? dataSetVersionToReplaceId)
     {
         var isNotReplacingAndIsMissingLiveVersion =
-            dataSetVersionToReplace is null && dataSet.LatestLiveVersionId is null;
+            dataSetVersionToReplaceId is null && dataSet.LatestLiveVersionId is null;
 
-        return isNotReplacingAndIsMissingLiveVersion
+        //TODO: Action for EES-5996: Reword the validation error message to be more appropriate when EES-5779 is LIVE.
+        return isNotReplacingAndIsMissingLiveVersion 
             ? ValidationUtils.ValidationResult(CreateDataSetIdError(
                 message: ValidationMessages.DataSetNoLiveVersion,
                 dataSetId: dataSet.Id))
             : dataSet;
     }
 
-    private Either<ActionResult, DataSetVersion?> ValidateDataSetVersionToReplace(DataSet dataSet, SemVersion dataSetVersionToReplace)
+    private Either<ActionResult, DataSetVersion?> ValidateDataSetVersionToReplace(DataSet dataSet, Guid dataSetVersionToReplaceId)
     {
         var previousVersion = dataSet.Versions
-            .SingleOrDefault(dv => dataSetVersionToReplace == dv.SemVersion());
+            .FirstOrDefault(dv => dataSetVersionToReplaceId == dv.Id);
 
         return previousVersion is null
             ? ValidationUtils.ValidationResult(CreateDataSetIdError(
@@ -395,7 +396,7 @@ internal class DataSetVersionService(
                             await CreateDataSetVersionImport(
                                 dataSetVersion,
                                 instanceId,
-                                previousDataSetVersionToReplace?.SemVersion(),
+                                previousDataSetVersionToReplace,
                                 cancellationToken))
                         .OnSuccessDo(async dataSetVersion =>
                             await UpdateReleaseFilePublicDataSetVersionId(
@@ -559,7 +560,7 @@ internal class DataSetVersionService(
     private async Task CreateDataSetVersionImport(
         DataSetVersion dataSetVersion,
         Guid instanceId,
-        SemVersion? dataSetVersionToReplace = null,
+        DataSetVersion? dataSetVersionToReplace = null,
         CancellationToken cancellationToken = default)
     {
         var dataSetVersionImport = new DataSetVersionImport
@@ -567,7 +568,7 @@ internal class DataSetVersionService(
             DataSetVersionId = dataSetVersion.Id,
             InstanceId = instanceId,
             Stage = DataSetVersionImportStage.Pending,
-            DataSetVersionToReplace = dataSetVersionToReplace
+            DataSetVersionToReplaceId = dataSetVersionToReplace?.Id
         };
 
         publicDataDbContext.DataSetVersionImports.Add(dataSetVersionImport);

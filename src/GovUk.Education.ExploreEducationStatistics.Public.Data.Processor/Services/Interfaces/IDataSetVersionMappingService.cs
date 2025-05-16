@@ -10,7 +10,7 @@ public interface IDataSetVersionMappingService
 {
     Task<Either<ActionResult, Unit>> CreateMappings(
         Guid nextDataSetVersionId,
-        SemVersion? dataSetVersionToReplace,
+        Guid? dataSetVersionToReplace,
         CancellationToken cancellationToken = default);
     
     Task<Either<ActionResult, Tuple<DataSetVersion, DataSetVersionImport>>> GetManualMappingVersionAndImport(

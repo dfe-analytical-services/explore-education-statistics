@@ -15,10 +15,9 @@ public class ProcessNextDataSetVersionMappingsFunctions(
         [ActivityTrigger] Guid instanceId,
         CancellationToken cancellationToken)
     {
-        SemVersion? dataSetVersionToReplace = null;
         var dataSetVersionImport = await GetDataSetVersionImport(instanceId, cancellationToken);
         await UpdateImportStage(dataSetVersionImport, DataSetVersionImportStage.CreatingMappings, cancellationToken);
-        await mappingService.CreateMappings(dataSetVersionImport.DataSetVersionId, dataSetVersionToReplace, cancellationToken);
+        await mappingService.CreateMappings(dataSetVersionImport.DataSetVersionId, dataSetVersionImport.DataSetVersionToReplaceId, cancellationToken);
     }
 
     [Function(ActivityNames.ApplyAutoMappings)]

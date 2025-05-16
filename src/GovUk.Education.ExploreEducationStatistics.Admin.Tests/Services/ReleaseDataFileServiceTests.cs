@@ -33,6 +33,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Publi
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Options;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Tests.Fixtures;
 using Microsoft.Extensions.Options;
 using Semver;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
@@ -1935,8 +1936,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 Id = Guid.NewGuid(),
             };
+            DataSet dataSet = _fixture
+                .DefaultDataSet()
+                .WithStatusPublished();
 
-            var publicApiDataSetId = Guid.NewGuid();
+            DataSetVersion dataSetVersion = _fixture
+                .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 2)
+                .WithVersionNumber(major: 1, minor: 1, patch: 1)
+                .WithStatusPublished()
+                .WithDataSet(dataSet)
+                .FinishWith(dsv => dsv.DataSet.LatestLiveVersion = dsv);
+            
             var originalDataReleaseFile = new ReleaseFile
             {
                 ReleaseVersion = releaseVersion,
@@ -1950,8 +1960,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     DataSetFileId = Guid.NewGuid(),
                     DataSetFileVersion = 0,
                 },
-                PublicApiDataSetId = enableReplacementOfPublicApiDataSets ? publicApiDataSetId : null,
-                PublicApiDataSetVersion = enableReplacementOfPublicApiDataSets ? new SemVersion(1, 0) : null
+                PublicApiDataSetId = enableReplacementOfPublicApiDataSets ?  dataSet.Id : null,
+                PublicApiDataSetVersion = enableReplacementOfPublicApiDataSets ? dataSetVersion.SemVersion() : null
             };
 
             var contentDbContextId = Guid.NewGuid().ToString();
@@ -2025,11 +2035,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 if (enableReplacementOfPublicApiDataSets)
                 {
+                    dataSetVersionService.Setup(mock => 
+                        mock.GetDataSetVersion(
+                            It.IsAny<Guid>(),
+                            It.IsAny<SemVersion>(), 
+                            It.IsAny<CancellationToken>()
+                            )).ReturnsAsync(dataSetVersion);
+
                     dataSetVersionService.Setup(mock =>
                         mock.CreateNextVersion(
                             It.IsAny<Guid>(),
                             It.IsAny<Guid>(),
-                            It.IsAny<SemVersion?>(),
+                            It.IsAny<Guid?>(),
                             It.IsAny<CancellationToken>()
                         ))
                     .ReturnsAsync(new DataSetVersionSummaryViewModel

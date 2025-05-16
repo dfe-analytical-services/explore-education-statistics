@@ -145,8 +145,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                     b.Property<Guid>("DataSetVersionId")
                         .HasColumnType("uuid");
 
-                    b.Property<string>("DataSetVersionToReplace")
-                        .HasColumnType("varchar(10)");
+                    b.Property<Guid?>("DataSetVersionToReplaceId")
+                        .HasColumnType("uuid");
 
                     b.Property<Guid>("InstanceId")
                         .HasColumnType("uuid");
@@ -161,6 +161,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                     b.HasKey("Id");
 
                     b.HasIndex("DataSetVersionId");
+
+                    b.HasIndex("DataSetVersionToReplaceId");
 
                     b.HasIndex("InstanceId")
                         .IsUnique();
@@ -959,7 +961,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.DataSetVersion", "DataSetVersionToReplace")
+                        .WithMany()
+                        .HasForeignKey("DataSetVersionToReplaceId");
+
                     b.Navigation("DataSetVersion");
+
+                    b.Navigation("DataSetVersionToReplace");
                 });
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.DataSetVersionMapping", b =>

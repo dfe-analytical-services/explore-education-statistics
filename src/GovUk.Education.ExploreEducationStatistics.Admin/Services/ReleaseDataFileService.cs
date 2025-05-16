@@ -260,8 +260,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         .OnSuccess(async tuple =>
                         {
                             var (replacingFile, newDataSetTitle) = tuple;
-                            var subjectId = 
-                                await releaseVersionRepository
+                            var subjectId = await releaseVersionRepository
                                     .CreateStatisticsDbReleaseAndSubjectHierarchy(releaseVersionId);
                             ReleaseFile? replacedReleaseDataFile = null;
 
@@ -269,7 +268,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                             {
                                 replacedReleaseDataFile = await GetReplacedReleaseFile(releaseVersionId, replacingFile);
                             }
-                            
+
                             var releaseDataFileOrder = await GetNextDataFileOrder(releaseVersionId, replacedReleaseDataFile);
 
                             var dataFile = await releaseDataFileRepository.Create(
@@ -299,7 +298,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
                             await UploadFileToStorage(dataFile, dataFormFile);
                             await UploadFileToStorage(metaFile, metaFormFile);
-
                             if (featureFlags.Value.EnableReplacementOfPublicApiDataSets)
                             {
                                 if (replacingFile is not null && contentDbContext.ReleaseFiles
@@ -309,14 +307,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                             && rf.PublicApiDataSetId != null))
                                 {
                                     // Creates a new data set version to enable replacement. 
-                                    await dataSetVersionService.CreateNextVersion(
-                                        dataReleaseFile.Id,
-                                        (Guid)replacedReleaseDataFile?.PublicApiDataSetId!,
-                                        replacedReleaseDataFile?.PublicApiDataSetVersion
-                                    );
+                                    //Please note this will is WIP, EES-5996 and will address failure,
+                                    //and any refactor that may be required
+                                    await dataSetVersionService.GetDataSetVersion(
+                                            (Guid)replacedReleaseDataFile?.PublicApiDataSetId!,
+                                            replacedReleaseDataFile.PublicApiDataSetVersion!)
+                                        .OnSuccessDo(async dataSetVersion =>
+                                        {
+                                            await dataSetVersionService.CreateNextVersion(
+                                                dataReleaseFile.Id,
+                                                (Guid)replacedReleaseDataFile?.PublicApiDataSetId!,
+                                                dataSetVersion.Id
+                                            ); 
+                                        });
                                 }
                             }
-
                             var dataImport = await dataImportService.Import(
                                 subjectId: subjectId,
                                 dataFile: dataFile,

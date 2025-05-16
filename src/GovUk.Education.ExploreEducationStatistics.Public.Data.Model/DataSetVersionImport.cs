@@ -24,7 +24,9 @@ public class DataSetVersionImport : ICreatedUpdatedTimestamps<DateTimeOffset, Da
 
     public DateTimeOffset? Updated { get; set; }
 
-    public SemVersion? DataSetVersionToReplace { get; set; }
+    public Guid? DataSetVersionToReplaceId { get; init; }
+    
+    public DataSetVersion? DataSetVersionToReplace { get; init; }
     
     internal class Config : IEntityTypeConfiguration<DataSetVersionImport>
     {
@@ -39,21 +41,9 @@ public class DataSetVersionImport : ICreatedUpdatedTimestamps<DateTimeOffset, Da
             builder.HasIndex(i => i.InstanceId)
                 .IsUnique();
 
-            builder.Property(i => i.DataSetVersionToReplace)
-                .HasColumnType("varchar(10)")
-                .HasConversion(
-                    value => value == null ? null : value.ToString(),
-                    value => ConvertStringToSemVersion(value)
-                );
-        }
-
-        private static SemVersion? ConvertStringToSemVersion(string? value)
-        {
-            return value == null ? null : SemVersion.Parse(
-                value,
-                SemVersionStyles.OptionalMinorPatch
-                | SemVersionStyles.AllowWhitespace
-                | SemVersionStyles.AllowLowerV);
+            builder.HasOne(i => i.DataSetVersionToReplace)
+                .WithMany()
+                .HasForeignKey(i => i.DataSetVersionToReplaceId);
         }
     }
 }
