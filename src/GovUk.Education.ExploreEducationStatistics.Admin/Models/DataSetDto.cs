@@ -1,7 +1,6 @@
 #nullable enable
 using FluentValidation;
 using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
-using GovUk.Education.ExploreEducationStatistics.Common;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using System;
@@ -20,9 +19,9 @@ public record DataSetDto
 
     public string Title { get; init; } = string.Empty;
 
-    public required DataSetFileDto DataFile { get; init; }
+    public DataSetFileDto? DataFile { get; init; }
 
-    public required DataSetFileDto MetaFile { get; init; }
+    public DataSetFileDto? MetaFile { get; init; }
 
     public File? ReplacingFile { get; init; }
 
@@ -41,44 +40,16 @@ public record DataSetDto
                 .MaximumLength(120)
                     .WithMessage(ValidationMessages.DataSetTitleTooLong, "{PropertyValue}", "{MaxLength}");
 
-            // TODO: Extract to MustBeValidDataFile
             RuleFor(dto => dto.DataFile)
-                .Must(file => FileNameValidators.MeetsLengthRequirements(file.FileName))
-                    .WithMessage(ValidationMessages.FileNameLengthInvalid, "{PropertyValue}", FileNameValidators.MaxFileNameSize.ToString())
-                .Must(file => FileNameValidators.DoesNotContainSpaces(file.FileName))
-                    .When(dto => dto.DataFile is not null)
-                    .WithMessage(ValidationMessages.FileNameCannotContainSpaces, "{PropertyValue}")
-                .Must(file => FileNameValidators.DoesNotContainSpecialChars(file.FileName))
-                    .WithMessage(ValidationMessages.FileNameCannotContainSpecialCharacters, "{PropertyValue}")
-                .Must(file => file.FileName.ToLower().EndsWith(Constants.DataSet.DataFileExtension))
-                    .WithMessage(ValidationMessages.FileNameMustEndDotCsv, "{PropertyValue}", Constants.DataSet.DataFileExtension)
-                .Must((dto, file, context) =>
-                {
-                    context.MessageFormatter.AppendArgument("FileName", dto.DataFile.FileName);
-                    return file.FileStream.Length > 0;
-                })
-                    .WithMessage(ValidationMessages.FileSizeMustNotBeZero, "{FileName}");
+                .MustBeValidDataFile();
 
-            // TODO: Extract to MustBeValidMetaFile
             RuleFor(dto => dto.MetaFile)
-                .Must(file => FileNameValidators.MeetsLengthRequirements(file.FileName))
-                    .WithMessage(ValidationMessages.FileNameLengthInvalid, "{PropertyValue}", FileNameValidators.MaxFileNameSize.ToString())
-                .Must(file => FileNameValidators.DoesNotContainSpaces(file.FileName))
-                    .WithMessage(ValidationMessages.FileNameCannotContainSpaces, "{PropertyValue}")
-                .Must(file => FileNameValidators.DoesNotContainSpecialChars(file.FileName))
-                    .WithMessage(ValidationMessages.FileNameCannotContainSpecialCharacters, "{PropertyValue}")
-                .Must(file => file.FileName.ToLower().EndsWith(Constants.DataSet.MetaFileExtension))
-                    .WithMessage(ValidationMessages.MetaFileNameMustEndDotMetaDotCsv, "{PropertyValue}", Constants.DataSet.MetaFileExtension)
-                .Must((dto, file, context) =>
-                {
-                    context.MessageFormatter.AppendArgument("FileName", dto.MetaFile.FileName);
-                    return file.FileStream.Length > 0;
-                })
-                    .WithMessage(ValidationMessages.FileSizeMustNotBeZero, "{FileName}");
+                .MustBeValidMetaFile();
 
+            // TODO: Test this with a random type, then add to ValidationMessages (inc. a frontend mapping for the Code)
             RuleFor(dto => dto.ReplacingFile)
                 .Must(file => file is null || file.Type == FileType.Data)
-                    .WithMessage("replacingFile.Type should equal FileType.Data"); // TODO: Test this with a random type, then add to ValidationMessages (inc. a frontend mapping for the Code)
+                    .WithMessage("replacingFile.Type should equal FileType.Data");
         }
     }
 }
@@ -104,26 +75,8 @@ public record DataSetFileDto
     {
         public Validator()
         {
-            RuleFor(dto => dto.FileName)
-                .Must(FileNameValidators.MeetsLengthRequirements)
-                    .WithMessage(ValidationMessages.FileNameLengthInvalid, "{PropertyValue}", FileNameValidators.MaxFileNameSize.ToString())
-                .Must(FileNameValidators.DoesNotContainSpaces)
-                    .WithMessage(ValidationMessages.FileNameCannotContainSpaces, "{PropertyValue}")
-                .Must(FileNameValidators.DoesNotContainSpecialChars)
-                    .WithMessage(ValidationMessages.FileNameCannotContainSpecialCharacters, "{PropertyValue}")
-                .Must(fileName => fileName.ToLower().EndsWith(".csv"))
-                    .WithMessage(ValidationMessages.FileNameMustEndDotCsv, "{PropertyValue}", Constants.DataSet.DataFileExtension);
-
-            RuleFor(dto => dto.FileStream)
-                .Must((dto, fileStream, context) =>
-                {
-                    context.MessageFormatter.AppendArgument("FileName", dto.FileName);
-                    return fileStream.Length > 0;
-                })
-                    .WithMessage(ValidationMessages.FileSizeMustNotBeZero, "{FileName}");
-            // TODO: See why GetFileType keeps returning null. Replace raw MIME string with const/enum
-            //.Must(f => f.GetFileType().Mime == "text/csv")
-            //    .WithMessage(ValidationMessages.ZipFilenameMustEndDotZip, "{PropertyName}");
+            RuleFor(dto => dto)
+                .MustBeValidFile();
         }
     }
 }
