@@ -158,6 +158,9 @@ param publicApiContainerAppConfig ContainerAppResourceConfig = {
 @description('Enable the Swagger UI for public API.')
 param enableSwagger bool = false
 
+@description('Enable replacement of public API data sets.')
+param enableReplacementOfPublicApiDataSets bool = false
+
 var tagValues = union(resourceTags ?? {}, {
   Environment: environmentName
   DateProvisioned: dateProvisioned
@@ -563,3 +566,5 @@ output coreStorageConnectionStringSecretKey string = coreStorage.outputs.coreSto
 output keyVaultName string = resourceNames.existingResources.keyVault
 
 output enableThemeDeletion bool = enableThemeDeletion
+
+output enableReplacementOfPublicApiDataSets bool = enableReplacementOfPublicApiDataSets

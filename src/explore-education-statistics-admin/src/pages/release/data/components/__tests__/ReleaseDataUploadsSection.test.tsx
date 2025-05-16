@@ -15,6 +15,7 @@ import _permissionService, {
   DataFilePermissions,
 } from '@admin/services/permissionService';
 import render from '@common-test/render';
+import { TestConfigContextProvider } from '@admin/contexts/ConfigContext';
 
 jest.mock('@admin/services/releaseDataFileService');
 jest.mock('@admin/services/permissionService');
@@ -127,7 +128,7 @@ describe('ReleaseDataUploadsSection', () => {
       testCompleteImportStatus,
     );
 
-    render(
+    renderWithTestConfig(
       <MemoryRouter>
         <ReleaseDataUploadsSection
           publicationId="publication-1"
@@ -169,7 +170,7 @@ describe('ReleaseDataUploadsSection', () => {
     releaseDataFileService.getDataFileImportStatus.mockResolvedValue(
       testCompleteImportStatus,
     );
-
+    
     releaseDataFileService.getDataFile.mockResolvedValueOnce({
       ...testDataFiles[0],
       id: 'data-replacement-1',
@@ -184,7 +185,7 @@ describe('ReleaseDataUploadsSection', () => {
       testValidReplacementPlan,
     );
 
-    render(
+    renderWithTestConfig(
       <MemoryRouter>
         <ReleaseDataUploadsSection
           publicationId="publication-1"
@@ -238,7 +239,7 @@ describe('ReleaseDataUploadsSection', () => {
       testValidReplacementPlan,
     );
 
-    render(
+    renderWithTestConfig(
       <MemoryRouter>
         <ReleaseDataUploadsSection
           publicationId="publication-1"
@@ -277,7 +278,7 @@ describe('ReleaseDataUploadsSection', () => {
   test('renders empty message when there are no data files', async () => {
     releaseDataFileService.getDataFiles.mockResolvedValue([]);
 
-    render(
+    renderWithTestConfig(
       <MemoryRouter>
         <ReleaseDataUploadsSection
           publicationId="publication-1"
@@ -301,7 +302,7 @@ describe('ReleaseDataUploadsSection', () => {
         testCompleteImportStatus,
       );
 
-      const { user } = render(
+      const { user } = renderWithTestConfig(
         <MemoryRouter>
           <ReleaseDataUploadsSection
             publicationId="publication-1"
@@ -368,7 +369,7 @@ describe('ReleaseDataUploadsSection', () => {
         testQueuedImportStatus,
       );
 
-      render(
+      renderWithTestConfig(
         <MemoryRouter>
           <ReleaseDataUploadsSection
             publicationId="publication-1"
@@ -430,7 +431,7 @@ describe('ReleaseDataUploadsSection', () => {
         footnoteIds: ['footnote-1'],
       });
 
-      const { user } = render(
+      const { user } = renderWithTestConfig(
         <MemoryRouter>
           <ReleaseDataUploadsSection
             publicationId="publication-1"
@@ -510,7 +511,7 @@ describe('ReleaseDataUploadsSection', () => {
       });
       releaseDataFileService.deleteDataFiles.mockResolvedValue();
 
-      const { user } = render(
+      const { user } = renderWithTestConfig(
         <MemoryRouter>
           <ReleaseDataUploadsSection
             publicationId="publication-1"
@@ -567,7 +568,7 @@ describe('ReleaseDataUploadsSection', () => {
         testCompleteImportStatus,
       );
 
-      const { user } = render(
+      const { user } = renderWithTestConfig(
         <MemoryRouter>
           <ReleaseDataUploadsSection
             publicationId="publication-1"
@@ -620,7 +621,7 @@ describe('ReleaseDataUploadsSection', () => {
         testQueuedImportStatus,
       );
 
-      render(
+      renderWithTestConfig(
         <MemoryRouter>
           <ReleaseDataUploadsSection
             publicationId="publication-1"
@@ -662,7 +663,7 @@ describe('ReleaseDataUploadsSection', () => {
         testQueuedImportStatus,
       );
 
-      render(
+      renderWithTestConfig(
         <MemoryRouter>
           <ReleaseDataUploadsSection
             publicationId="publication-1"
@@ -697,7 +698,7 @@ describe('ReleaseDataUploadsSection', () => {
         testCompleteImportStatus,
       );
 
-      const { user } = render(
+      const { user } = renderWithTestConfig(
         <MemoryRouter>
           <ReleaseDataUploadsSection
             publicationId="publication-1"
@@ -746,7 +747,7 @@ describe('ReleaseDataUploadsSection', () => {
     });
 
     test('show validation message when no subject title', async () => {
-      const { user } = render(
+      const { user } = renderWithTestConfig(
         <MemoryRouter>
           <ReleaseDataUploadsSection
             publicationId="publication-1"
@@ -768,7 +769,7 @@ describe('ReleaseDataUploadsSection', () => {
     });
 
     test('shows validation message when non-unique subject title', async () => {
-      const { user } = render(
+      const { user } = renderWithTestConfig(
         <MemoryRouter>
           <ReleaseDataUploadsSection
             publicationId="publication-1"
@@ -794,7 +795,7 @@ describe('ReleaseDataUploadsSection', () => {
     });
 
     test('cannot submit with invalid values when trying to upload CSV files', async () => {
-      const { user } = render(
+      const { user } = renderWithTestConfig(
         <MemoryRouter>
           <ReleaseDataUploadsSection
             publicationId="publication-1"
@@ -838,7 +839,7 @@ describe('ReleaseDataUploadsSection', () => {
     });
 
     test('cannot submit with invalid values when trying to upload ZIP file', async () => {
-      const { user } = render(
+      const { user } = renderWithTestConfig(
         <MemoryRouter>
           <ReleaseDataUploadsSection
             publicationId="publication-1"
@@ -884,7 +885,7 @@ describe('ReleaseDataUploadsSection', () => {
     });
 
     test('cannot submit with invalid values when trying to upload bulk ZIP file', async () => {
-      const { user } = render(
+      const { user } = renderWithTestConfig(
         <MemoryRouter>
           <ReleaseDataUploadsSection
             publicationId="publication-1"
@@ -916,7 +917,7 @@ describe('ReleaseDataUploadsSection', () => {
       releaseDataFileService.getDataFileImportStatus.mockResolvedValue(
         testQueuedImportStatus,
       );
-      const { user } = render(
+      const { user } = renderWithTestConfig(
         <MemoryRouter>
           <ReleaseDataUploadsSection
             publicationId="publication-1"
@@ -964,7 +965,7 @@ describe('ReleaseDataUploadsSection', () => {
         testQueuedImportStatus,
       );
 
-      const { user } = render(
+      const { user } = renderWithTestConfig(
         <MemoryRouter>
           <ReleaseDataUploadsSection
             publicationId="publication-1"
@@ -1006,7 +1007,7 @@ describe('ReleaseDataUploadsSection', () => {
         testQueuedImportStatus,
       );
 
-      const { user } = render(
+      const { user } = renderWithTestConfig(
         <MemoryRouter>
           <ReleaseDataUploadsSection
             publicationId="publication-1"
@@ -1054,7 +1055,7 @@ describe('ReleaseDataUploadsSection', () => {
         {} as DataFilePermissions,
       );
 
-      const { user } = render(
+      const { user } = renderWithTestConfig(
         <MemoryRouter>
           <ReleaseDataUploadsSection
             publicationId="publication-1"
@@ -1130,7 +1131,7 @@ describe('ReleaseDataUploadsSection', () => {
         {} as DataFilePermissions,
       );
 
-      const { user } = render(
+      const { user } = renderWithTestConfig(
         <MemoryRouter>
           <ReleaseDataUploadsSection
             publicationId="publication-1"
@@ -1191,7 +1192,7 @@ describe('ReleaseDataUploadsSection', () => {
           testQueuedImportStatus,
         );
 
-        render(
+        renderWithTestConfig(
           <MemoryRouter>
             <ReleaseDataUploadsSection
               publicationId="publication-1"
@@ -1229,7 +1230,7 @@ describe('ReleaseDataUploadsSection', () => {
           testQueuedImportStatus,
         );
 
-        render(
+        renderWithTestConfig(
           <MemoryRouter>
             <ReleaseDataUploadsSection
               publicationId="publication-1"
@@ -1266,7 +1267,7 @@ describe('ReleaseDataUploadsSection', () => {
         testImportedDataFile,
       ]);
 
-      const { user } = render(
+      const { user } = renderWithTestConfig(
         <MemoryRouter>
           <ReleaseDataUploadsSection
             publicationId="publication-1"
@@ -1318,7 +1319,7 @@ describe('ReleaseDataUploadsSection', () => {
         testImportedDataFile,
       ]);
 
-      const { user } = render(
+      const { user } = renderWithTestConfig(
         <MemoryRouter>
           <ReleaseDataUploadsSection
             publicationId="publication-1"
@@ -1369,7 +1370,7 @@ describe('ReleaseDataUploadsSection', () => {
         testImportedDataFile,
       ]);
 
-      const { user } = render(
+      const { user } = renderWithTestConfig(
         <MemoryRouter>
           <ReleaseDataUploadsSection
             publicationId="publication-1"
@@ -1419,7 +1420,7 @@ describe('ReleaseDataUploadsSection', () => {
       releaseDataFileService.getDataFiles.mockResolvedValue([
         testImportedDataFile,
       ]);
-      const { user } = render(
+      const { user } = renderWithTestConfig(
         <MemoryRouter>
           <ReleaseDataUploadsSection
             publicationId="publication-1"
@@ -1474,5 +1475,43 @@ describe('ReleaseDataUploadsSection', () => {
     const table = screen.getByRole('table', { name: caption });
 
     return within(table).getAllByRole('row');
+  }
+
+  function renderWithTestConfig(
+    children: React.ReactNode,
+    enableReplacementFeatureFlag: boolean = false,
+  ) {
+    const defaultTestConfig = {
+      appInsightsKey: '',
+      publicAppUrl: 'http://localhost',
+      publicApiUrl: 'http://public-api',
+      publicApiDocsUrl: 'http://public-api-docs',
+      permittedEmbedUrlDomains: [
+        'https://department-for-education.shinyapps.io',
+      ],
+      oidc: {
+        clientId: '',
+        authority: '',
+        knownAuthorities: [''],
+        adminApiScope: '',
+        authorityMetadata: {
+          authorizationEndpoint: '',
+          tokenEndpoint: '',
+          issuer: '',
+          userInfoEndpoint: '',
+          endSessionEndpoint: '',
+        },
+      },
+    };
+    return render(
+      <TestConfigContextProvider
+        config={{
+          ...defaultTestConfig,
+          enableReplacementOfPublicApiDataSets: enableReplacementFeatureFlag,
+        }}
+      >
+        {children}
+      </TestConfigContextProvider>,
+    );
   }
 });

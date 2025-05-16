@@ -774,6 +774,13 @@
       "metadata": {
         "description": "Replaces Notify exceptions with logged messages only when team-only API keys are used and a recipient email address is not valid for that key."
       }
+    },
+    "enableReplacementOfPublicApiDataSets": {
+      "type": "bool",
+      "defaultValue": false,
+      "metadata": {
+        "description": "Feature flag to control the replacement of public API data sets"
+      }
     }
   },
   "variables": {
@@ -1910,7 +1917,8 @@
         "PublicDataApi__AppRegistrationClientId": "[parameters('apiAppRegistrationClientId')]",
         "PublicDataProcessor__Url": "[concat('https://', variables('publicDataProcessorName'), '.azurewebsites.net')]",
         "PublicDataProcessor__AppRegistrationClientId": "[parameters('publicDataProcessorAppRegistrationClientId')]",
-        "DataScreener__Url": "[concat('https://', variables('dataScreenerName'), '.azurewebsites.net')]"
+        "DataScreener__Url": "[concat('https://', variables('dataScreenerName'), '.azurewebsites.net')]",
+        "FeatureFlags__EnableReplacementOfPublicApiDataSets": "[parameters('enableReplacementOfPublicApiDataSets')]"
         // "DataScreener__AppRegistrationClientId": "[parameters('dataScreenerAppRegistrationClientId')]"
       }
     },
@@ -3401,7 +3409,8 @@
         "EventGrid__EventTopics__0__TopicEndpoint": "[reference(resourceId('Microsoft.EventGrid/topics', variables('eventGridTopicNamePublicationChanged')), '2025-02-15').endpoint]",
         "EventGrid__EventTopics__1__Key": "ReleaseVersionChangedEvent",
         "EventGrid__EventTopics__1__TopicEndpoint": "[reference(resourceId('Microsoft.EventGrid/topics', variables('eventGridTopicNameReleaseVersionChanged')), '2025-02-15').endpoint]",
-        "PublicDataDbExists": "[parameters('publicDataDbExists')]"
+        "PublicDataDbExists": "[parameters('publicDataDbExists')]",
+        "FeatureFlags__EnableReplacementOfPublicApiDataSets": "[parameters('enableReplacementOfPublicApiDataSets')]"
       }
     },
     {

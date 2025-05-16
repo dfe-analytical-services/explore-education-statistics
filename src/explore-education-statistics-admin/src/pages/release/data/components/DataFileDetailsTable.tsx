@@ -6,7 +6,12 @@ import releaseDataFileService, {
 } from '@admin/services/releaseDataFileService';
 import ButtonText from '@common/components/ButtonText';
 import FormattedDate from '@common/components/FormattedDate';
+import Tag from '@common/components/Tag';
+import { useQuery } from '@tanstack/react-query';
 import React, { ReactNode } from 'react';
+import { useConfig } from '@admin/contexts/ConfigContext';
+import apiDataSetQueries from '@admin/queries/apiDataSetQueries';
+import getDataSetVersionStatusText from './utils/getDataSetVersionStatusText';
 
 interface Props {
   children?: ReactNode;
@@ -25,6 +30,26 @@ const DataFileDetailsTable = ({
   onStatusChange,
   onReplacementStatusChange,
 }: Props) => {
+  const {
+    enableReplacementOfPublicApiDataSets: isNewReplaceDsvFeatureEnabled,
+  } = useConfig();
+  const replacementFileHasApi = isNewReplaceDsvFeatureEnabled
+    ? dataFile.publicApiDataSetId !== undefined &&
+      dataFile.replacedBy !== undefined
+    : false;
+
+  const { data: dataSet, isLoading } = useQuery({
+    ...(dataFile.publicApiDataSetId
+      ? apiDataSetQueries.get(dataFile.publicApiDataSetId)
+      : {}),
+    enabled: !!dataFile.publicApiDataSetId,
+    refetchInterval: data => {
+      return data?.draftVersion?.status === 'Processing' ? 3000 : false;
+    },
+  });
+
+  const tagColor = dataSet?.draftVersion?.status === 'Draft' ? 'green' : 'red';
+
   return (
     <table>
       {replacementDataFile && (
@@ -135,7 +160,7 @@ const DataFileDetailsTable = ({
           )}
         </tr>
         <tr>
-          <th scope="row">Status</th>
+          <th scope="row">Data file import status</th>
           <td data-testid="Status">
             <ImporterStatus
               releaseVersionId={releaseVersionId}
@@ -153,6 +178,29 @@ const DataFileDetailsTable = ({
             </td>
           )}
         </tr>
+        {replacementFileHasApi && (
+          <tr>
+            <th scope="row">API data set attachment status</th>
+            <td data-testid="Status">
+              <div className="dfe-flex dfe-align-items--center">
+                <Tag colour="blue">Replacement in progress</Tag>
+              </div>
+            </td>
+            {replacementDataFile && (
+              <td data-testid="Replacement Status">
+                <div className="dfe-flex dfe-align-items--center">
+                  <Tag colour={isLoading ? 'red' : tagColor}>
+                    {isLoading
+                      ? 'Processing'
+                      : getDataSetVersionStatusText(
+                          dataSet?.draftVersion?.status ?? 'Processing',
+                        )}
+                  </Tag>
+                </div>
+              </td>
+            )}
+          </tr>
+        )}
         <tr>
           <th scope="row">Uploaded by</th>
           <td data-testid="Uploaded by">
