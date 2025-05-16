@@ -138,28 +138,34 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
             
         }
-        private async Task<ApiDataSetVersionPlanViewModel?> GetApiVersionPlanViewModel(DataSetVersion replacementApiDataSetVersion, CancellationToken cancellationToken)
+        private async Task<ReplacementApiDataSetVersionPlanViewModel?> GetApiVersionPlanViewModel(DataSetVersion replacementApiDataSetVersion, CancellationToken cancellationToken)
         {
-            var apiDataSetVersionPlan = new ApiDataSetVersionPlanViewModel
-                {
-                    DataSetId = replacementApiDataSetVersion.DataSetId,
-                    DataSetTitle = replacementApiDataSetVersion.DataSet.Title,
-                    Id = replacementApiDataSetVersion.Id,
-                    Version = replacementApiDataSetVersion.PublicVersion,
-                    Status = replacementApiDataSetVersion.Status,
-                    Valid = false,
-                };
-            if (_featureFlags.Value.EnableReplacementOfPublicApiDataSets && replacementApiDataSetVersion.VersionPatch > 0)
+            var apiDataSetVersionPlan = new ReplacementApiDataSetVersionPlanViewModel
+            {
+                DataSetId = replacementApiDataSetVersion.DataSetId,
+                DataSetTitle = replacementApiDataSetVersion.DataSet.Title,
+                Id = replacementApiDataSetVersion.Id,
+                Version = replacementApiDataSetVersion.PublicVersion,
+                Status = replacementApiDataSetVersion.Status,
+                Valid = false,
+            };
+            if (!_featureFlags.Value.EnableReplacementOfPublicApiDataSets || replacementApiDataSetVersion.VersionPatch <= 0)
             { 
-                //TODO: Please note EES-5779 PR Note this will be updated in an upcomming PR - Valid's value will take into account
-                //more things than just the values { FiltersComplete: true, LocationsComplete: true }. It will
-                //also include whether the user has 'finalized' the data set version mapping & whether the version has
-                //a breaking change and results in a major version increment. 
-                apiDataSetVersionPlan.MappingStatus = await _dataSetService.GetMappingStatus(replacementApiDataSetVersion.Id, cancellationToken);
-                apiDataSetVersionPlan.Valid = apiDataSetVersionPlan.MappingStatus is
-                    { FiltersComplete: true, LocationsComplete: true };
+                return apiDataSetVersionPlan;
             }
+            //TODO: Please note EES-5779 PR Note this will be updated in an upcomming PR - Valid's value will take into account
+            //more things than just the values { FiltersComplete: true, LocationsComplete: true }. It will
+            //also include whether the user has 'finalized' the data set version mapping & whether the version has
+            //a breaking change and results in a major version increment. 
+            var mapping = await _dataSetService.GetMappingStatus(replacementApiDataSetVersion.Id, cancellationToken);
 
+            apiDataSetVersionPlan.MappingStatus = new ReplacementApiDataSetVersionPlanViewModel.MappingCompletionStatusViewModel
+            {
+                Complete = replacementApiDataSetVersion.Status == DataSetVersionStatus.Draft,
+                FiltersComplete = mapping?.FiltersComplete ?? false,
+                LocationsComplete = mapping?.LocationsComplete ?? false,
+                HasMajorVersionUpdate = replacementApiDataSetVersion is { VersionMinor: 0 }
+            };
             return apiDataSetVersionPlan;
         }
         public async Task<Either<ActionResult, Unit>> Replace(

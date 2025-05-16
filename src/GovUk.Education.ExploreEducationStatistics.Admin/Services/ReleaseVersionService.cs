@@ -16,6 +16,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Cache;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Options;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
@@ -30,6 +31,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Services.Cache;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyApprovalStatus;
@@ -59,7 +61,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         IDataSetVersionService dataSetVersionService,
         IProcessorClient processorClient,
         IPrivateBlobCacheService privateCacheService,
-        IReleaseSlugValidator releaseSlugValidator) : IReleaseVersionService
+        IReleaseSlugValidator releaseSlugValidator,
+        IOptions<FeatureFlags> featureFlags) : IReleaseVersionService
     {
         public async Task<Either<ActionResult, ReleaseVersionViewModel>> GetRelease(Guid releaseVersionId)
         {
@@ -589,7 +592,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
                     var linkedApiDataSetVersionDeletionPlan = tuple.apiDataSetVersion is null
                         ? null
-                        : new DeleteApiDataSetVersionPlanViewModel
+                        : new ReplacementApiDataSetVersionPlanViewModel
                         {
                             DataSetId = tuple.apiDataSetVersion.DataSetId,
                             DataSetTitle = tuple.apiDataSetVersion.DataSet.Title,
@@ -758,7 +761,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 return ValidationActionResult(CannotRemoveDataFilesOnceReleaseApproved);
             }
 
-            if (releaseFile.PublicApiDataSetId is not null)
+            if (!featureFlags.Value.EnableReplacementOfPublicApiDataSets && releaseFile.PublicApiDataSetId is not null)
             {
                 return ValidationUtils.ValidationResult(new ErrorViewModel
                 {

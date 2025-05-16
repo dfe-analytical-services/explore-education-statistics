@@ -24,6 +24,7 @@ import { Route, Switch, useHistory } from 'react-router';
 import { BrowserRouter } from 'react-router-dom';
 import PageNotFoundPage from './pages/errors/PageNotFoundPage';
 import { LastLocationContextProvider } from './contexts/LastLocationContext';
+import { ConfiguredFeatureFlagProvider } from './contexts/FeatureFlagContext';
 
 const queryClient = new QueryClient();
 
@@ -110,6 +111,7 @@ const Providers = composeProviders(
   ConfiguredMsalProvider,
   AuthContextProvider,
   LastLocationContextProvider,
+  ConfiguredFeatureFlagProvider,
 );
 
 function ApplicationInsightsContextProvider({
