@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
@@ -126,13 +127,13 @@ public class PublishingCompletionService(
             .ToAsyncEnumerable()
             .SelectAwait(group => PublishPublication(
                 publicationId: group.Key,
-                publishedReleaseVersions: group.ToList()))
+                publishedReleaseVersions: group.ToImmutableList()))
             .ToListAsync();
     }
 
     private async ValueTask<PublishedPublicationInfo> PublishPublication(
         Guid publicationId,
-        List<PublishedReleaseVersionInfo> publishedReleaseVersions)
+        IImmutableList<PublishedReleaseVersionInfo> publishedReleaseVersions)
     {
         var publication = await contentDbContext.Publications
             .Include(p => p.LatestPublishedReleaseVersion)

@@ -443,14 +443,22 @@ public class PublishingCompletionServiceTests
                 }
 
                 [Fact]
-                public async Task GivenASupersededPublication_WhenPublicationIsAlreadyPublished_ThenSupersededPublicationNotUpdatedInCache()
+                public async Task
+                    GivenASupersededPublication_WhenPublicationIsAlreadyPublished_ThenSupersededPublicationNotUpdatedInCache()
                 {
                     // ARRANGE
                     var readyKeys = SetupHappyPath();
 
-                    // Create a publication that is superseded by publication 1 related to release version 1.
-                    // Publication 1 has published releases prior to the current publishing run so the cache does not
-                    // need updating for this one
+                    // Set publication 1 to have published releases prior to the current publishing run
+                    WherePreviousPublicationLatestPublishedReleaseVersionIs(
+                        publicationId: PublicationId1,
+                        releaseVersion: new ReleaseVersionBuilder()
+                            .WithPublicationId(PublicationId1)
+                            .ForRelease(release => release
+                                .WithReleaseSlug("release-slug-previous"))
+                            .Build());
+
+                    // Create a publication that is superseded by publication 1
                     var supersededPublication = new PublicationBuilder(Guid.NewGuid(), "publication-slug-superseded")
                         .SupersededBy(_releaseVersion1.Release.Publication.Id)
                         .Build();
@@ -462,6 +470,7 @@ public class PublishingCompletionServiceTests
                     await sut.CompletePublishingIfAllPriorStagesComplete(readyKeys);
 
                     // ASSERT
+                    // The publication cache should not be updated for the superseded publication
                     _publicationCacheService.Assert.PublicationNotUpdated(supersededPublication.Slug);
                 }
 
@@ -471,11 +480,10 @@ public class PublishingCompletionServiceTests
                     // ARRANGE
                     var readyKeys = SetupHappyPath();
 
-                    // Create a publication that is superseded by publication 1 related to release version 1.
-                    // Publication 1 has no published releases prior to the current publishing run so the cache should
-                    // be updated for this one
+                    // Create a publication that is superseded by publication 1.
+                    // Publication 1 has no published releases prior to the current publishing run
                     var supersededPublication = new PublicationBuilder(Guid.NewGuid(), "publication-slug-superseded")
-                        .SupersededBy(_releaseVersion2.Release.Publication.Id)
+                        .SupersededBy(_releaseVersion1.Release.Publication.Id)
                         .Build();
                     _contentDbContext.With(supersededPublication);
 
@@ -485,6 +493,7 @@ public class PublishingCompletionServiceTests
                     await sut.CompletePublishingIfAllPriorStagesComplete(readyKeys);
 
                     // ASSERT
+                    // The publication cache should be updated for the superseded publication
                     _publicationCacheService.Assert.PublicationUpdated(supersededPublication.Slug);
                 }
             }
@@ -645,8 +654,8 @@ public class PublishingCompletionServiceTests
                         PublicationSlug = _releaseVersion1.Release.Publication.Slug,
                         LatestPublishedReleaseId = _releaseVersion1.ReleaseId,
                         LatestPublishedReleaseVersionId = _releaseVersion1.Id,
-                        PreviousLatestPublishedReleaseId = previousReleaseVersion.ReleaseId,
-                        PreviousLatestPublishedReleaseVersionId = previousReleaseVersion.Id,
+                        PreviousLatestPublishedReleaseId = previousReleaseVersion.ReleaseId, // Assert info contains previous release id
+                        PreviousLatestPublishedReleaseVersionId = previousReleaseVersion.Id, // Assert info contains previous release version id
                         PublishedReleaseVersions = [
                             new PublishedReleaseVersionInfo
                             {
@@ -659,7 +668,7 @@ public class PublishingCompletionServiceTests
                     };
                     _publisherEventRaiser.Assert.EventWasRaised(evt => evt == expectedInfo); 
                 }
-                
+
                 [Fact]
                 public async Task WhenPublishedReleaseVersionIsNotLatestVersion_ThenEventIsRaised()
                 {
@@ -685,8 +694,8 @@ public class PublishingCompletionServiceTests
                     {
                         PublicationId = _releaseVersion1.Release.PublicationId,
                         PublicationSlug = _releaseVersion1.Release.Publication.Slug,
-                        LatestPublishedReleaseId = releaseVersion1V2.ReleaseId, // // Assert latest release is different
-                        LatestPublishedReleaseVersionId = releaseVersionId1V2, // Assert latest release version is different
+                        LatestPublishedReleaseId = releaseVersion1V2.ReleaseId,
+                        LatestPublishedReleaseVersionId = releaseVersionId1V2, // Assert latest release version is still 1v2
                         PreviousLatestPublishedReleaseId = releaseVersion1V2.ReleaseId,
                         PreviousLatestPublishedReleaseVersionId = releaseVersion1V2.Id,
                         PublishedReleaseVersions = [
@@ -702,12 +711,12 @@ public class PublishingCompletionServiceTests
 
                     _publisherEventRaiser.Assert.EventWasRaised(evt => evt == expectedInfo);
                 }
+            }
 
-                private void WherePreviousPublicationLatestPublishedReleaseVersionIs(Guid publicationId, ReleaseVersion releaseVersion)
-                {
-                    _contentDbContext.With(releaseVersion);
-                    _contentDbContext.WherePublication(publicationId, publication => publication.LatestPublishedReleaseVersionId = releaseVersion.Id);
-                }
+            private void WherePreviousPublicationLatestPublishedReleaseVersionIs(Guid publicationId, ReleaseVersion releaseVersion)
+            {
+                _contentDbContext.With(releaseVersion);
+                _contentDbContext.WherePublication(publicationId, publication => publication.LatestPublishedReleaseVersionId = releaseVersion.Id);
             }
         }
     }

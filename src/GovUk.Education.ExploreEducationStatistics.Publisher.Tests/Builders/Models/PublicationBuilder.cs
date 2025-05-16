@@ -5,7 +5,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Builders.Mo
 
 public class PublicationBuilder(Guid publicationId, string publicationSlug)
 {
-    private Guid? _latestPublishedReleaseVersionId;
     private Guid? _supersededByPublicationId;
 
     public Publication Build()
@@ -14,16 +13,9 @@ public class PublicationBuilder(Guid publicationId, string publicationSlug)
         {
             Id = publicationId,
             Slug = publicationSlug,
-            LatestPublishedReleaseVersionId = _latestPublishedReleaseVersionId,
-            SupersededById = _supersededByPublicationId,
+            SupersededById = _supersededByPublicationId
         };
         return publication;
-    }
-
-    public PublicationBuilder WithLatestPublishedReleaseVersionId(Guid? latestPublishedReleaseVersionId)
-    {
-        _latestPublishedReleaseVersionId = latestPublishedReleaseVersionId;
-        return this;
     }
 
     public PublicationBuilder SupersededBy(Guid supersededByPublicationId)

@@ -8,7 +8,7 @@ public record PublishedReleaseVersionInfo
 
     public required Guid ReleaseId { get; init; }
 
-    public required string ReleaseSlug { get; init; } = string.Empty;
+    public required string ReleaseSlug { get; init; }
 
     public required Guid PublicationId { get; init; }
 }
