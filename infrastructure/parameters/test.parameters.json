@@ -97,6 +97,9 @@
     },
     "notifierSuppressExceptionsForTeamOnlyApiKeyErrors": {
       "value": true
+    },
+    "enableReplacementOfPublicApiDataSets" : {
+      "value": true
     }
   }
 }

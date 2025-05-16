@@ -8,7 +8,7 @@ import { render, screen, waitFor, within } from '@testing-library/react';
 import React from 'react';
 import { MemoryRouter } from 'react-router';
 import userEvent from '@testing-library/user-event';
-import { FeatureFlagProvider } from '@admin/contexts/FeatureFlagContext';
+import { TestConfigContextProvider } from '@admin/contexts/ConfigContext';
 
 jest.mock('@admin/services/dataBlockService');
 jest.mock('@admin/services/dataReplacementService');
@@ -404,20 +404,17 @@ describe('DataReplacementPlan', () => {
       dataReplacementService.getReplacementPlan.mockResolvedValue(
         testReplacementPlan,
       );
-      render(
-        <FeatureFlagProvider
-          initialFlags={{ enableReplacementOfPublicApiDataSets: true }}
-        >
-          <MemoryRouter>
-            <DataFileReplacementPlan
-              cancelButton={<button type="button">Cancel</button>}
-              publicationId="publication-1"
-              releaseVersionId="release-1"
-              fileId="file-1"
-              replacementFileId="file-2"
-            />
-          </MemoryRouter>
-        </FeatureFlagProvider>,
+      renderWithTestConfig(
+        <MemoryRouter>
+          <DataFileReplacementPlan
+            cancelButton={<button type="button">Cancel</button>}
+            publicationId="publication-1"
+            releaseVersionId="release-1"
+            fileId="file-1"
+            replacementFileId="file-2"
+          />
+        </MemoryRouter>,
+        true,
       );
       await waitFor(() => {
         expect(
@@ -433,7 +430,7 @@ describe('DataReplacementPlan', () => {
       dataReplacementService.getReplacementPlan.mockResolvedValue(
         testReplacementPlan,
       );
-      render(
+      renderWithTestConfig(
         <MemoryRouter>
           <DataFileReplacementPlan
             cancelButton={<button type="button">Cancel</button>}
@@ -454,7 +451,7 @@ describe('DataReplacementPlan', () => {
       });
     });
 
-    test('doesnt render the section when the feature flag enableReplacementOfPublicApiDataSets is turned and no mapping status is defined', async () => {
+    test('doesnt render the section when the feature flag enableReplacementOfPublicApiDataSets is turned on and no mapping status is defined', async () => {
       dataReplacementService.getReplacementPlan.mockResolvedValue({
         ...testReplacementPlan,
         apiDataSetVersionPlan: {
@@ -467,22 +464,17 @@ describe('DataReplacementPlan', () => {
           valid: false,
         },
       });
-      render(
-        <FeatureFlagProvider
-          initialFlags={{
-            enableReplacementOfPublicApiDataSets: true,
-          }}
-        >
-          <MemoryRouter>
-            <DataFileReplacementPlan
-              cancelButton={<button type="button">Cancel</button>}
-              publicationId="publication-1"
-              releaseVersionId="release-1"
-              fileId="file-1"
-              replacementFileId="file-2"
-            />
-          </MemoryRouter>
-        </FeatureFlagProvider>,
+      renderWithTestConfig(
+        <MemoryRouter>
+          <DataFileReplacementPlan
+            cancelButton={<button type="button">Cancel</button>}
+            publicationId="publication-1"
+            releaseVersionId="release-1"
+            fileId="file-1"
+            replacementFileId="file-2"
+          />
+        </MemoryRouter>,
+        true,
       );
       await waitFor(() => {
         expect(() => screen.getByText('API data set Filters: ERROR')).toThrow(
@@ -500,7 +492,7 @@ describe('DataReplacementPlan', () => {
       testReplacementPlan,
     );
 
-    render(
+    renderWithTestConfig(
       <MemoryRouter>
         <DataFileReplacementPlan
           cancelButton={<button type="button">Cancel</button>}
@@ -714,7 +706,7 @@ describe('DataReplacementPlan', () => {
       testValidReplacementPlan,
     );
 
-    render(
+    renderWithTestConfig(
       <MemoryRouter>
         <DataFileReplacementPlan
           cancelButton={<button type="button">Cancel</button>}
@@ -802,7 +794,7 @@ describe('DataReplacementPlan', () => {
       footnotes: [],
     });
 
-    render(
+    renderWithTestConfig(
       <MemoryRouter>
         <DataFileReplacementPlan
           cancelButton={<button type="button">Cancel</button>}
@@ -834,7 +826,7 @@ describe('DataReplacementPlan', () => {
       new Error('Something went wrong'),
     );
 
-    render(
+    renderWithTestConfig(
       <DataFileReplacementPlan
         cancelButton={<button type="button">Cancel</button>}
         publicationId="publication-1"
@@ -859,7 +851,7 @@ describe('DataReplacementPlan', () => {
       footnotes: [],
     });
 
-    render(
+    renderWithTestConfig(
       <MemoryRouter>
         <DataFileReplacementPlan
           cancelButton={<button type="button">Cancel</button>}
@@ -904,7 +896,7 @@ describe('DataReplacementPlan', () => {
       footnotes: [],
     });
 
-    render(
+    renderWithTestConfig(
       <MemoryRouter>
         <DataFileReplacementPlan
           cancelButton={<button type="button">Cancel</button>}
@@ -936,7 +928,7 @@ describe('DataReplacementPlan', () => {
       footnotes: [],
     });
 
-    render(
+    renderWithTestConfig(
       <MemoryRouter>
         <DataFileReplacementPlan
           cancelButton={<button type="button">Cancel</button>}
@@ -982,7 +974,7 @@ describe('DataReplacementPlan', () => {
       footnotes: [],
     });
 
-    render(
+    renderWithTestConfig(
       <MemoryRouter>
         <DataFileReplacementPlan
           cancelButton={<button type="button">Cancel</button>}
@@ -1057,7 +1049,7 @@ describe('DataReplacementPlan', () => {
       dataBlocks: [],
     });
 
-    render(
+    renderWithTestConfig(
       <MemoryRouter>
         <DataFileReplacementPlan
           cancelButton={<button type="button">Cancel</button>}
@@ -1090,7 +1082,7 @@ describe('DataReplacementPlan', () => {
       dataBlocks: [],
     });
 
-    render(
+    renderWithTestConfig(
       <MemoryRouter>
         <DataFileReplacementPlan
           cancelButton={<button type="button">Cancel</button>}
@@ -1143,7 +1135,7 @@ describe('DataReplacementPlan', () => {
       dataBlocks: [],
     });
 
-    render(
+    renderWithTestConfig(
       <MemoryRouter>
         <DataFileReplacementPlan
           cancelButton={<button type="button">Cancel</button>}
@@ -1221,7 +1213,7 @@ describe('DataReplacementPlan', () => {
       testValidReplacementPlan,
     );
 
-    render(
+    renderWithTestConfig(
       <MemoryRouter>
         <DataFileReplacementPlan
           cancelButton={<button type="button">Cancel</button>}
@@ -1253,4 +1245,41 @@ describe('DataReplacementPlan', () => {
       'file-2',
     );
   });
+  function renderWithTestConfig(
+    children: React.ReactNode,
+    enableReplacementFeatureFlag: boolean = false,
+  ) {
+    const defaultTestConfig = {
+      appInsightsKey: '',
+      publicAppUrl: 'http://localhost',
+      publicApiUrl: 'http://public-api',
+      publicApiDocsUrl: 'http://public-api-docs',
+      permittedEmbedUrlDomains: [
+        'https://department-for-education.shinyapps.io',
+      ],
+      oidc: {
+        clientId: '',
+        authority: '',
+        knownAuthorities: [''],
+        adminApiScope: '',
+        authorityMetadata: {
+          authorizationEndpoint: '',
+          tokenEndpoint: '',
+          issuer: '',
+          userInfoEndpoint: '',
+          endSessionEndpoint: '',
+        },
+      },
+    };
+    return render(
+      <TestConfigContextProvider
+        config={{
+          ...defaultTestConfig,
+          enableReplacementOfPublicApiDataSets: enableReplacementFeatureFlag,
+        }}
+      >
+        {children}
+      </TestConfigContextProvider>,
+    );
+  }
 });
