@@ -39,7 +39,7 @@ internal class DataSetQueryService(
     IParquetIndicatorRepository indicatorRepository,
     IParquetLocationRepository locationRepository,
     IParquetTimePeriodRepository timePeriodRepository,
-    IQueryAnalyticsManager queryAnalyticsManager,
+    IAnalyticsManager analyticsManager,
     ILogger<DataSetQueryService> logger)
     : IDataSetQueryService
 {
@@ -154,7 +154,7 @@ internal class DataSetQueryService(
             {
                 try
                 {
-                    await queryAnalyticsManager.AddQuery(
+                    await analyticsManager.Add(
                         request: new CaptureDataSetVersionQueryRequest(
                             DataSetId: dataSetVersion.DataSetId,
                             DataSetVersionId: dataSetVersion.Id,
@@ -172,7 +172,7 @@ internal class DataSetQueryService(
                     logger.LogError(
                         exception: e,
                         message: "Error whilst adding a query to {QueryManager}",
-                        nameof(IQueryAnalyticsManager));
+                        nameof(IAnalyticsManager));
                 }
             });
     }

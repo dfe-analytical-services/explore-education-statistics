@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using System.Threading;
 using System.Threading.Tasks;
@@ -20,6 +21,10 @@ public class AnalyticsConsumer(
             {
                 var request = await analyticsManager.Read(stoppingToken);
                 await analyticsWriter.Report(request, stoppingToken);
+            }
+            catch (TaskCanceledException e)
+            {
+                logger.LogInformation(e, "AnalyticsConsumer background task cancelled");
             }
             catch (Exception e)
             {
