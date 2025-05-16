@@ -1,27 +1,31 @@
 using GovUk.Education.ExploreEducationStatistics.Analytics.Consumer.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Analytics.Consumer.Services.Workflow;
 using GovUk.Education.ExploreEducationStatistics.Common.DuckDb.DuckDb;
+using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using Microsoft.Extensions.Logging;
 
 namespace GovUk.Education.ExploreEducationStatistics.Analytics.Consumer.Services;
 
 public class PublicApiQueriesProcessor(
     IAnalyticsPathResolver pathResolver,
-    ILogger<PublicApiQueriesProcessor> logger) : IRequestFileProcessor
+    ILogger<PublicApiQueriesProcessor> logger,
+    IWorkflowActor<PublicApiQueriesProcessor>? workflowActor = null) : IRequestFileProcessor
 {
+    private readonly IWorkflowActor<PublicApiQueriesProcessor> _workflowActor 
+        = workflowActor ?? new WorkflowActor();
+    
     public Task Process()
     {
-        var workflow = new ProcessRequestFilesWorkflow(
-            processorName: GetType().Name,
+        var workflow = new ProcessRequestFilesWorkflow<PublicApiQueriesProcessor>(
             sourceDirectory: pathResolver.PublicApiQueriesDirectoryPath(),
             reportsDirectory: pathResolver.PublicApiQueriesReportsDirectoryPath(),
-            actor: new WorkflowActor(),
+            actor: _workflowActor,
             logger: logger);
 
         return workflow.Process();
     }
 
-    private class WorkflowActor : IWorkflowActor
+    private class WorkflowActor : IWorkflowActor<PublicApiQueriesProcessor>
     {
         public async Task InitialiseDuckDb(DuckDbConnection connection)
         {
@@ -67,7 +71,7 @@ public class PublicApiQueriesProcessor(
             ");
         }
 
-        public async Task CreateParquetReports(string reportsFilePathAndFilenamePrefix, DuckDbConnection connection)
+        public async Task CreateParquetReports(string reportsFolderPathAndFilenamePrefix, DuckDbConnection connection)
         {
             await connection.ExecuteNonQueryAsync(@"
                 CREATE TABLE queryReport AS 
@@ -99,14 +103,14 @@ public class PublicApiQueriesProcessor(
             ");
 
             var queryReportFilePath = 
-                $"{reportsFilePathAndFilenamePrefix}_public-api-queries.parquet";
+                $"{reportsFolderPathAndFilenamePrefix}_public-api-queries.parquet";
     
             await connection.ExecuteNonQueryAsync($@"
                 COPY (SELECT * FROM queryReport)
                 TO '{queryReportFilePath}' (FORMAT 'parquet', CODEC 'zstd')");
 
             var queryAccessReportFilePath = 
-                $"{reportsFilePathAndFilenamePrefix}_public-api-query-access.parquet";
+                $"{reportsFolderPathAndFilenamePrefix}_public-api-query-access.parquet";
 
             await connection.ExecuteNonQueryAsync($@"
                 COPY (SELECT * FROM queryAccessReport)

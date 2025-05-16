@@ -1,27 +1,31 @@
 using GovUk.Education.ExploreEducationStatistics.Analytics.Consumer.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Analytics.Consumer.Services.Workflow;
 using GovUk.Education.ExploreEducationStatistics.Common.DuckDb.DuckDb;
+using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using Microsoft.Extensions.Logging;
 
 namespace GovUk.Education.ExploreEducationStatistics.Analytics.Consumer.Services;
 
 public class PublicZipDownloadsProcessor(
     IAnalyticsPathResolver pathResolver,
-    ILogger<PublicZipDownloadsProcessor> logger) : IRequestFileProcessor
+    ILogger<PublicZipDownloadsProcessor> logger,
+    IWorkflowActor<PublicZipDownloadsProcessor>? workflowActor = null) : IRequestFileProcessor
 {
+    private readonly IWorkflowActor<PublicZipDownloadsProcessor> _workflowActor 
+        = workflowActor ?? new WorkflowActor();
+    
     public Task Process() {
     
-        var workflow = new ProcessRequestFilesWorkflow(
-            processorName: GetType().Name,
+        var workflow = new ProcessRequestFilesWorkflow<PublicZipDownloadsProcessor>(
             sourceDirectory: pathResolver.PublicZipDownloadsDirectoryPath(),
             reportsDirectory: pathResolver.PublicZipDownloadsReportsDirectoryPath(),
-            actor: new WorkflowActor(),
+            actor: _workflowActor,
             logger: logger);
 
         return workflow.Process();
     }
 
-    private class WorkflowActor : IWorkflowActor
+    private class WorkflowActor : IWorkflowActor<PublicZipDownloadsProcessor>
     {
         public async Task InitialiseDuckDb(DuckDbConnection connection)
         {
@@ -60,7 +64,7 @@ public class PublicZipDownloadsProcessor(
             ");
         }
 
-        public async Task CreateParquetReports(string reportsFilePathAndFilenamePrefix, DuckDbConnection connection)
+        public async Task CreateParquetReports(string reportsFolderPathAndFilenamePrefix, DuckDbConnection connection)
         {
             await connection.ExecuteNonQueryAsync(@"
                 CREATE TABLE zipDownloadsReport AS 
@@ -79,7 +83,7 @@ public class PublicZipDownloadsProcessor(
             ");
         
             var reportFilePath = 
-                $"{reportsFilePathAndFilenamePrefix}_public-zip-downloads.parquet";
+                $"{reportsFolderPathAndFilenamePrefix}_public-zip-downloads.parquet";
 
             await connection.ExecuteNonQueryAsync($@"
                 COPY (SELECT * FROM zipDownloadsReport)

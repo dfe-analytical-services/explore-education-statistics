@@ -36,11 +36,11 @@ public class TestAnalyticsPathResolver : IAnalyticsPathResolver, IDisposable
     // PublicApiQueries
     public string PublicApiDataSetVersionCallsDirectoryPath()
     {
-        return Path.Combine(_basePath, "public-api", "get-meta");
+        return Path.Combine(_basePath, "public-api", "data-set-version-calls");
     }
 
     public string PublicApiDataSetVersionCallsReportsDirectoryPath() {
-        return Path.Combine(_basePath, "reports", "public-api", "get-meta");
+        return Path.Combine(_basePath, "reports", "public-api", "data-set-version-calls");
     }
 
     // PublicZipDownloads

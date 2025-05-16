@@ -1,5 +1,7 @@
 using System.Reflection;
 using GovUk.Education.ExploreEducationStatistics.Analytics.Consumer.Services;
+using GovUk.Education.ExploreEducationStatistics.Analytics.Consumer.Services.Workflow;
+using GovUk.Education.ExploreEducationStatistics.Analytics.Consumer.Tests.Services.Workflow.MockBuilders;
 using GovUk.Education.ExploreEducationStatistics.Common.DuckDb.DuckDb;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using InterpolatedSql.Dapper;
@@ -20,40 +22,33 @@ public abstract class PublicApiDataSetVersionCallsProcessorTests
     public class ProcessTests : PublicApiDataSetVersionCallsProcessorTests
     {
         [Fact]
-        public async Task NoSourceFolder_NoReportsProduced()
+        public async Task ProcessorUsesWorkflow()
         {
             using var pathResolver = new TestAnalyticsPathResolver();
+            SetupRequestFile(pathResolver, "WithCoreDataSetVersionDetails.json");
+
+            var workflowActorBuilder = new WorkflowActorMockBuilder<PublicApiDataSetVersionCallsProcessor>();
+            
+            var workflowActor = workflowActorBuilder 
+                .WhereDuckDbInitialisedWithErrors()
+                .Build();
 
             var service = BuildService(
-                pathResolver: pathResolver);
-            await service.Process();
+                pathResolver: pathResolver,
+                workflowActor: workflowActor);
+            
+            await Assert.ThrowsAsync<ArgumentException>(service.Process);
 
-            Assert.False(Directory.Exists(ProcessingDirectoryPath(pathResolver)));
-            Assert.False(Directory.Exists(pathResolver.PublicApiDataSetVersionCallsReportsDirectoryPath()));
-        }
-
-        [Fact]
-        public async Task NoSourceQueriesToConsume_NoReportsProduced()
-        {
-            using var pathResolver = new TestAnalyticsPathResolver();
-
-            Directory.CreateDirectory(pathResolver.PublicApiDataSetVersionCallsDirectoryPath());
-
-            var service = BuildService(
-                pathResolver: pathResolver);
-            await service.Process();
-
-            // Check that as there were no files to process, no working directories were
-            // created as a result.
-            Assert.False(Directory.Exists(ProcessingDirectoryPath(pathResolver)));
-            Assert.False(Directory.Exists(pathResolver.PublicApiDataSetVersionCallsReportsDirectoryPath()));
+            workflowActorBuilder
+                .Assert
+                .InitialiseDuckDbCalled();
         }
 
         [Fact]
         public async Task CoreDataSetVersionDetails_CapturedInReport()
         {
             using var pathResolver = new TestAnalyticsPathResolver();
-            SetupQueryRequest(pathResolver, "WithCoreDataSetVersionDetails.json");
+            SetupRequestFile(pathResolver, "WithCoreDataSetVersionDetails.json");
 
             var service = BuildService(pathResolver: pathResolver);
             await service.Process();
@@ -87,7 +82,7 @@ public abstract class PublicApiDataSetVersionCallsProcessorTests
         public async Task WithPreviewTokens_CapturedInReport()
         {
             using var pathResolver = new TestAnalyticsPathResolver();
-            SetupQueryRequest(pathResolver, "WithPreviewTokens.json");
+            SetupRequestFile(pathResolver, "WithPreviewTokens.json");
 
             var service = BuildService(pathResolver: pathResolver);
             await service.Process();
@@ -121,7 +116,7 @@ public abstract class PublicApiDataSetVersionCallsProcessorTests
         public async Task WithParameters_CapturedInReport()
         {
             using var pathResolver = new TestAnalyticsPathResolver();
-            SetupQueryRequest(pathResolver, "WithParameters.json");
+            SetupRequestFile(pathResolver, "WithParameters.json");
 
             var service = BuildService(pathResolver: pathResolver);
             await service.Process();
@@ -155,9 +150,9 @@ public abstract class PublicApiDataSetVersionCallsProcessorTests
         public async Task MultipleCalls_CapturedInReport()
         {
             using var pathResolver = new TestAnalyticsPathResolver();
-            SetupQueryRequest(pathResolver, "WithCoreDataSetVersionDetails.json");
-            SetupQueryRequest(pathResolver, "WithParameters.json");
-            SetupQueryRequest(pathResolver, "WithPreviewTokens.json");
+            SetupRequestFile(pathResolver, "WithCoreDataSetVersionDetails.json");
+            SetupRequestFile(pathResolver, "WithParameters.json");
+            SetupRequestFile(pathResolver, "WithPreviewTokens.json");
 
             var service = BuildService(pathResolver: pathResolver);
             await service.Process();
@@ -251,14 +246,16 @@ public abstract class PublicApiDataSetVersionCallsProcessorTests
     }
 
     private PublicApiDataSetVersionCallsProcessor BuildService(
-        TestAnalyticsPathResolver pathResolver)
+        TestAnalyticsPathResolver pathResolver,
+        IWorkflowActor<PublicApiDataSetVersionCallsProcessor>? workflowActor = null)
     {
         return new PublicApiDataSetVersionCallsProcessor(
             pathResolver: pathResolver,
-            Mock.Of<ILogger<PublicApiDataSetVersionCallsProcessor>>());
+            logger: Mock.Of<ILogger<PublicApiDataSetVersionCallsProcessor>>(),
+            workflowActor: workflowActor);
     }
 
-    private void SetupQueryRequest(TestAnalyticsPathResolver pathResolver, string filename)
+    private void SetupRequestFile(TestAnalyticsPathResolver pathResolver, string filename)
     {
         Directory.CreateDirectory(pathResolver.PublicApiDataSetVersionCallsDirectoryPath());
 
