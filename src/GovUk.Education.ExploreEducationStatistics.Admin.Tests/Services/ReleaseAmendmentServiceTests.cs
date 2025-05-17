@@ -254,7 +254,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 Id = Guid.NewGuid(),
                 UserId = Guid.NewGuid(),
-                Role = ReleaseRole.Lead,
+                Role = ReleaseRole.Contributor,
                 ReleaseVersion = originalReleaseVersion,
                 ReleaseVersionId = originalReleaseVersion.Id,
                 Deleted = DateTime.UtcNow,
@@ -579,14 +579,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 // Expect one less UserReleaseRole on the Amendment, as the Pre-release role shouldn't be copied over
                 Assert.Equal(userReleaseRoles.Count - 1, amendmentReleaseRoles.Count);
-                var approverAmendmentRole = amendmentReleaseRoles.First(r => r.Role == ReleaseRole.Approver);
+                var approverAmendmentRole = amendmentReleaseRoles.Single(r => r.Role == ReleaseRole.Approver);
                 AssertAmendedReleaseRoleCorrect(approverReleaseRole, approverAmendmentRole, amendment);
 
-                var contributorAmendmentRole = amendmentReleaseRoles.First(r => r.Role == ReleaseRole.Contributor);
+                var contributorAmendmentRole = amendmentReleaseRoles.Single(r => r.Role == ReleaseRole.Contributor && r.Deleted == null);
                 Assert.NotEqual(contributorReleaseRole.Id, contributorAmendmentRole.Id);
                 AssertAmendedReleaseRoleCorrect(contributorReleaseRole, contributorAmendmentRole, amendment);
 
-                var deletedAmendmentRole = amendmentReleaseRoles.First(r => r.Deleted != null);
+                var deletedAmendmentRole = amendmentReleaseRoles.Single(r => r.Deleted != null);
                 Assert.NotEqual(deletedReleaseRole.Id, deletedAmendmentRole.Id);
                 AssertAmendedReleaseRoleCorrect(deletedReleaseRole, deletedAmendmentRole, amendment);
 

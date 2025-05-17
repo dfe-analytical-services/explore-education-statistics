@@ -40,8 +40,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                     new ReleaseVersion(),
                     ReleaseRole.Viewer,
                     ReleaseRole.Contributor,
-                    ReleaseRole.Approver,
-                    ReleaseRole.Lead
+                    ReleaseRole.Approver
                 );
             }
         }

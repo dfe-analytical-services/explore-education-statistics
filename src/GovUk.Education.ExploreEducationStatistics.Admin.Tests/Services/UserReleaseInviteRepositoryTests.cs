@@ -251,7 +251,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 Email = "test@test.com",
                 ReleaseVersion = releaseVersion1,
-                Role = Lead,
+                Role = Approver,
             };
 
             // different email address

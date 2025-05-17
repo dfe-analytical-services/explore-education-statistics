@@ -150,7 +150,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                                 ApprovalStatus = status
                             };
 
-                            // Assert that a Release Editor (Contributor, Lead, Approver) can update the Release
+                            // Assert that a Release Editor (Contributor, Approver) can update the Release
                             // Version in any approval state other than Approved.
                             await AssertReleaseVersionHandlerSucceedsWithCorrectReleaseRoles<
                                 UpdateSpecificReleaseVersionRequirement>(
@@ -159,7 +159,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                                 rolesExpectedToSucceed: new[]
                                 {
                                     ReleaseRole.Contributor,
-                                    ReleaseRole.Lead,
                                     ReleaseRole.Approver
                                 });
                         }

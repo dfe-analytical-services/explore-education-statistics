@@ -4,7 +4,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
     {
         Viewer,
         Contributor,
-        Lead,
         Approver,
         PrereleaseViewer
     }
