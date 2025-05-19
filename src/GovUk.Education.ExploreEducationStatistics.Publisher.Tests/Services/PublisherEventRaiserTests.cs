@@ -31,6 +31,33 @@ public class PublisherEventRaiserTests
         public void Can_instantiate_sut() => Assert.NotNull(GetSut());
     }
 
+    public class OnPublicationArchivedTests : PublisherEventRaiserTests
+    {
+        [Fact]
+        public async Task WhenOnPublicationArchived_ThenEventRaised()
+        {
+            // ARRANGE
+            var publicationId = Guid.NewGuid();
+            const string publicationSlug = "publication-slug";
+            var supersededByPublicationId = Guid.NewGuid();
+
+            var sut = GetSut();
+
+            // ACT
+            await sut.OnPublicationArchived(
+                publicationId,
+                publicationSlug,
+                supersededByPublicationId);
+
+            // ASSERT
+            var expectedEvent = new PublicationArchivedEvent(
+                publicationId,
+                publicationSlug,
+                supersededByPublicationId);
+            _eventRaiserMockBuilder.Assert.EventRaised(expectedEvent);
+        }
+    }
+
     public class RaiseReleaseVersionPublishedPublisherEvents : PublisherEventRaiserTests
     {
         [Fact]
@@ -59,7 +86,7 @@ public class PublisherEventRaiserTests
             };
 
             // ACT
-            await sut.RaiseReleaseVersionPublishedEvents([info]);
+            await sut.OnReleaseVersionsPublished([info]);
 
             // ASSERT
             var expectedEvent = new ReleaseVersionPublishedEvent(
@@ -140,7 +167,7 @@ public class PublisherEventRaiserTests
             };
 
             // ACT
-            await sut.RaiseReleaseVersionPublishedEvents(infos);
+            await sut.OnReleaseVersionsPublished(infos);
 
             // ASSERT
             var expectedEvents = infos.SelectMany(info =>
@@ -171,15 +198,15 @@ public class PublisherEventRaiserTests
                 .ConfigureTestAppConfiguration()
                 .ConfigureServices()
                 .Build();
-            
+
             // ACT
             var eventRaiser = host.Services.GetRequiredService<IPublisherEventRaiser>();
-            
+
             // ASSERT
             Assert.NotNull(eventRaiser);
         }
     }
-    
+
     public class IntegrationTests(ITestOutputHelper output) : PublisherEventRaiserTests
     {
         // Define a topic and access key to run this integration test
@@ -229,7 +256,7 @@ public class PublisherEventRaiserTests
             };
 
             // ACT
-            await sut.RaiseReleaseVersionPublishedEvents([info]);
+            await sut.OnReleaseVersionsPublished([info]);
 
             // ASSERT
             // Check unit test output for logs

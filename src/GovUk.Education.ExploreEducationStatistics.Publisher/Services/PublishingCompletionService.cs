@@ -93,7 +93,7 @@ public class PublishingCompletionService(
 
         await dataSetPublishingService.PublishDataSets(releaseVersionIdsToUpdate);
 
-        await publisherEventRaiser.RaiseReleaseVersionPublishedEvents(publishedPublicationInfos);
+        await publisherEventRaiser.OnReleaseVersionsPublished(publishedPublicationInfos);
 
         await prePublishingStagesComplete
             .ToAsyncEnumerable()
@@ -178,6 +178,12 @@ public class PublishingCompletionService(
         {
             // Invalidate the cache of the publication to reflect its new archived status
             await publicationCacheService.UpdatePublication(archivedPublication.Slug);
+
+            // Raise an event to indicate the publication has been archived
+            await publisherEventRaiser.OnPublicationArchived(
+                archivedPublication.Id,
+                archivedPublication.Slug,
+                archivedPublication.SupersededById!.Value);
         }
     }
 }

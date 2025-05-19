@@ -44,7 +44,7 @@ public class PublishingCompletionServiceTests
         [Fact]
         public void Can_instantiate_Sut() => Assert.NotNull(GetSut());
     }
-    
+
     public class ContainerRegistrationTests : PublishingCompletionServiceTests
     {
         [Fact]
@@ -54,7 +54,7 @@ public class PublishingCompletionServiceTests
                 .ConfigureTestAppConfiguration()
                 .ConfigureServices()
                 .Build();
-            
+
             ActivatorUtilities.CreateInstance<PublishingCompletionService>(host.Services);
         }
     }
@@ -76,10 +76,10 @@ public class PublishingCompletionServiceTests
                 var releasePublishingStatus2 = new ReleasePublishingStatusBuilder(releasePublishingKey2)
                     .WhereFilesStatusIs(ReleasePublishingStatusFilesStage.NotStarted)
                     .Build();
-                
+
                 var notReadyKeys = new List<ReleasePublishingKey>()
                 {
-                    releasePublishingKey1, 
+                    releasePublishingKey1,
                     releasePublishingKey2
                 };
 
@@ -141,10 +141,10 @@ public class PublishingCompletionServiceTests
                     .Build();
 
                 // Assign the release versions a status id
-                ReleasePublishingKey[] readyKeys = 
+                ReleasePublishingKey[] readyKeys =
                 [
-                    new(_releaseVersion1.Id, ReleaseStatusId:Guid.NewGuid()), 
-                    new(_releaseVersion2.Id, ReleaseStatusId:Guid.NewGuid()), 
+                    new(_releaseVersion1.Id, ReleaseStatusId: Guid.NewGuid()),
+                    new(_releaseVersion2.Id, ReleaseStatusId: Guid.NewGuid()),
                 ];
 
                 // Set the Status Service to report on whether a release version is ready to be published or not ie Complete 
@@ -156,7 +156,7 @@ public class PublishingCompletionServiceTests
                             .WhereContentStatusIs(ReleasePublishingStatusContentStage.Complete)
                             .Build());
                 }
-                
+
                 // Add Release Versions and their Publications to the mock Database
                 _contentDbContext.With(_releaseVersion1);
                 _contentDbContext.With(_releaseVersion2);
@@ -183,10 +183,10 @@ public class PublishingCompletionServiceTests
                     // Create some other keys that we'll set to "not complete"
                     ReleasePublishingKey[] notReadyKeys =
                     [
-                        new(Guid.NewGuid(), Guid.NewGuid()), 
+                        new(Guid.NewGuid(), Guid.NewGuid()),
                         new(Guid.NewGuid(), Guid.NewGuid()),
                     ];
-                
+
                     foreach (var notReadyKey in notReadyKeys)
                     {
                         _releasePublishingStatusService.WhereGetReturns(
@@ -212,13 +212,14 @@ public class PublishingCompletionServiceTests
                             readyKey,
                             ReleasePublishingStatusPublishingStage.Started);
                     }
+
                     // Update Publishing Stage Was Not Called
                     foreach (var notReadyKey in notReadyKeys)
                     {
                         _releasePublishingStatusService.Assert.UpdatePublishingStageWasNotCalled(notReadyKey);
                     }
                 }
-                
+
                 [Fact]
                 public async Task PublishingStatusSetToComplete()
                 {
@@ -226,10 +227,10 @@ public class PublishingCompletionServiceTests
                     // Create some other keys that we'll set to "not complete"
                     ReleasePublishingKey[] notReadyKeys =
                     [
-                        new(Guid.NewGuid(), Guid.NewGuid()), 
+                        new(Guid.NewGuid(), Guid.NewGuid()),
                         new(Guid.NewGuid(), Guid.NewGuid()),
                     ];
-                
+
                     foreach (var notReadyKey in notReadyKeys)
                     {
                         _releasePublishingStatusService.WhereGetReturns(
@@ -255,6 +256,7 @@ public class PublishingCompletionServiceTests
                             readyKey,
                             ReleasePublishingStatusPublishingStage.Complete);
                     }
+
                     // Not ready Keys were not set to anything
                     foreach (var notReadyKey in notReadyKeys)
                     {
@@ -262,7 +264,7 @@ public class PublishingCompletionServiceTests
                     }
                 }
             }
-            
+
             public class CompletePublishingTests : ReadyTests
             {
                 [Fact]
@@ -271,7 +273,7 @@ public class PublishingCompletionServiceTests
                     // ARRANGE
                     var readyKeys = SetupHappyPath();
                     var sut = GetSut();
-                    
+
                     // ACT
                     await sut.CompletePublishingIfAllPriorStagesComplete(readyKeys);
 
@@ -290,20 +292,26 @@ public class PublishingCompletionServiceTests
                     var releaseVersion = _releaseService.Get(releaseVersionId);
                     _methodologyService.WhereGetLatestVersionByReleaseReturnsNoMethodologies(releaseVersion);
                 }
-                
+
                 private void SetupMethodologies(Guid releaseVersionId, MethodologyVersion methodologyToPublish)
                 {
                     var releaseVersion = _releaseService.Get(releaseVersionId);
                     _methodologyService.WhereGetLatestVersionByReleaseReturns(releaseVersion, methodologyToPublish);
                     _methodologyService.WhereIsBeingPublishedAlongsideRelease(methodologyToPublish, releaseVersion);
                 }
-                
-                private void SetupMethodologies(Guid releaseVersionId, MethodologyVersion methodologyToPublish, MethodologyVersion methodologyNotToPublish)
+
+                private void SetupMethodologies(
+                    Guid releaseVersionId,
+                    MethodologyVersion methodologyToPublish,
+                    MethodologyVersion methodologyNotToPublish)
                 {
                     var releaseVersion = _releaseService.Get(releaseVersionId);
-                    _methodologyService.WhereGetLatestVersionByReleaseReturns(releaseVersion, methodologyToPublish, methodologyNotToPublish);
+                    _methodologyService.WhereGetLatestVersionByReleaseReturns(releaseVersion,
+                        methodologyToPublish,
+                        methodologyNotToPublish);
                     _methodologyService.WhereIsBeingPublishedAlongsideRelease(methodologyToPublish, releaseVersion);
-                    _methodologyService.WhereIsNotBeingPublishedAlongsideRelease(methodologyNotToPublish, releaseVersion);
+                    _methodologyService.WhereIsNotBeingPublishedAlongsideRelease(methodologyNotToPublish,
+                        releaseVersion);
                 }
 
                 [Fact]
@@ -315,23 +323,23 @@ public class PublishingCompletionServiceTests
                     {
                         SetupNoMethodologies(key.ReleaseVersionId);
                     }
-                    
+
                     var sut = GetSut();
-                    
+
                     // ACT
                     await sut.CompletePublishingIfAllPriorStagesComplete(readyKeys);
 
                     // ASSERT
                     _methodologyService.Assert.NoMethodologiesPublished();
                 }
-                
+
                 [Fact]
                 public async Task WhenHasMethodology_ThenMethodologyPublished()
                 {
                     // ARRANGE
                     var readyKeys = SetupHappyPath();
                     var methodologies = new MethodologyVersion[readyKeys.Count];
-                    
+
                     for (var i = 0; i < readyKeys.Count; i++)
                     {
                         var key = readyKeys[i];
@@ -340,7 +348,7 @@ public class PublishingCompletionServiceTests
                     }
 
                     var sut = GetSut();
-                    
+
                     // ACT
                     await sut.CompletePublishingIfAllPriorStagesComplete(readyKeys);
 
@@ -350,7 +358,7 @@ public class PublishingCompletionServiceTests
                         _methodologyService.Assert.MethodologyPublished(methodology);
                     }
                 }
-                
+
                 [Fact]
                 public async Task WhenHasSomeMethodologiesToPublish_ThenOnlyMethodologiesToBePublishedArePublished()
                 {
@@ -358,17 +366,19 @@ public class PublishingCompletionServiceTests
                     var readyKeys = SetupHappyPath();
                     var methodologiesToPublish = new MethodologyVersion[readyKeys.Count];
                     var methodologiesNotToPublish = new MethodologyVersion[readyKeys.Count];
-                    
+
                     for (var i = 0; i < readyKeys.Count; i++)
                     {
                         var key = readyKeys[i];
                         methodologiesToPublish[i] = new MethodologyVersion();
                         methodologiesNotToPublish[i] = new MethodologyVersion();
-                        SetupMethodologies(key.ReleaseVersionId, methodologiesToPublish[i], methodologiesNotToPublish[i]);
+                        SetupMethodologies(key.ReleaseVersionId,
+                            methodologiesToPublish[i],
+                            methodologiesNotToPublish[i]);
                     }
 
                     var sut = GetSut();
-                    
+
                     // ACT
                     await sut.CompletePublishingIfAllPriorStagesComplete(readyKeys);
 
@@ -377,6 +387,7 @@ public class PublishingCompletionServiceTests
                     {
                         _methodologyService.Assert.MethodologyPublished(methodology);
                     }
+
                     foreach (var methodology in methodologiesNotToPublish)
                     {
                         _methodologyService.Assert.MethodologyNotPublished(methodology);
@@ -392,7 +403,7 @@ public class PublishingCompletionServiceTests
                     // ARRANGE
                     var readyKeys = SetupHappyPath();
                     var sut = GetSut();
-                    
+
                     // ACT
                     await sut.CompletePublishingIfAllPriorStagesComplete(readyKeys);
 
@@ -400,7 +411,7 @@ public class PublishingCompletionServiceTests
                     _contentDbContext.Assert.PublicationsLatestPublishedReleaseVersionIdIs(PublicationId1, _releaseVersion1.Id);
                     _contentDbContext.Assert.PublicationsLatestPublishedReleaseVersionIdIs(PublicationId2, _releaseVersion2.Id);
                 }
-                
+
                 [Fact]
                 public async Task WhenPublishedReleaseVersionIsNotLatestVersion_ThenPublicationLatestReleaseVersionSetToLatestReleaseVersion()
                 {
@@ -413,10 +424,12 @@ public class PublishingCompletionServiceTests
                         .Build();
 
                     // Set that release version "1 version 2" is the latest for the Publication
-                    _releaseService.WherePublicationLatestPublishedReleaseVersionIs(releaseVersion1V2.Release.PublicationId, releaseVersion1V2);
-                    
+                    _releaseService.WherePublicationLatestPublishedReleaseVersionIs(
+                        releaseVersion1V2.Release.PublicationId,
+                        releaseVersion1V2);
+
                     var sut = GetSut();
-                    
+
                     // ACT
                     await sut.CompletePublishingIfAllPriorStagesComplete(readyKeys);
 
@@ -449,7 +462,7 @@ public class PublishingCompletionServiceTests
                     // ARRANGE
                     var readyKeys = SetupHappyPath();
 
-                    // Set publication 1 to have published releases prior to the current publishing run
+                    // Set publication 1 to have a published release prior to the current publishing run
                     WherePreviousPublicationLatestPublishedReleaseVersionIs(
                         publicationId: PublicationId1,
                         releaseVersion: new ReleaseVersionBuilder()
@@ -513,7 +526,7 @@ public class PublishingCompletionServiceTests
                     // ASSERT
                     _contentService.Assert.DeletePreviousVersionsDownloadFilesCalled(_releaseVersion1.Id, _releaseVersion2.Id);
                 }
-                
+
                 [Fact]
                 public async Task PreviousVersionsContentDeleted()
                 {
@@ -527,7 +540,7 @@ public class PublishingCompletionServiceTests
                     // ASSERT
                     _contentService.Assert.DeletePreviousVersionsContentCalled(_releaseVersion1.Id, _releaseVersion2.Id);
                 }
-                
+
                 [Fact]
                 public async Task CachedTaxonomyBlobsUpdated()
                 {
@@ -559,7 +572,7 @@ public class PublishingCompletionServiceTests
                     _notificationsService.Assert.NotifySubscribersIfApplicableCalled(_releaseVersion1.Id, _releaseVersion2.Id);
                 }
             }
-            
+
             public class RedirectsCacheServiceTests : ReadyTests
             {
                 [Fact]
@@ -593,7 +606,7 @@ public class PublishingCompletionServiceTests
                     _dataSetPublishingService.Assert.DataSetsWerePublished(_releaseVersion1.Id, _releaseVersion2.Id);
                 }
             }
-            
+
             public class EventRaiserTests : ReadyTests
             {
                 [Fact]
@@ -625,8 +638,8 @@ public class PublishingCompletionServiceTests
                             }
                         ]
                     };
-  
-                    _publisherEventRaiser.Assert.EventWasRaised(evt => evt == expectedInfo);
+
+                    _publisherEventRaiser.Assert.ReleaseVersionPublishedEventWasRaised(evt => evt == expectedInfo);
                 }
 
                 [Fact]
@@ -641,7 +654,10 @@ public class PublishingCompletionServiceTests
                             .WithReleaseSlug("release-slug-previous"))
                         .Build();
 
+                    // Set publication 1 to have a published release prior to the current publishing run
                     WherePreviousPublicationLatestPublishedReleaseVersionIs(publicationId: PublicationId1, releaseVersion: previousReleaseVersion);
+
+                    // Set release version 1 to be the latest published release version after publishing
                     _releaseService.WherePublicationLatestPublishedReleaseVersionIs(PublicationId1, _releaseVersion1);
 
                     // ACT
@@ -666,7 +682,7 @@ public class PublishingCompletionServiceTests
                             }
                         ]
                     };
-                    _publisherEventRaiser.Assert.EventWasRaised(evt => evt == expectedInfo); 
+                    _publisherEventRaiser.Assert.ReleaseVersionPublishedEventWasRaised(evt => evt == expectedInfo);
                 }
 
                 [Fact]
@@ -680,12 +696,14 @@ public class PublishingCompletionServiceTests
                         .ForRelease(_releaseVersion1.Release)
                         .Build();
 
-                    // Set that release version 1V2 is the latest, not release version 1
+                    // Set publication 1 to have published release version 1V2 prior to the current publishing run
+                    WherePreviousPublicationLatestPublishedReleaseVersionIs(publicationId: PublicationId1, releaseVersion: releaseVersion1V2);
+
+                    // Set release version 1V2 to be the latest after publishing, not release version 1
                     _releaseService.WherePublicationLatestPublishedReleaseVersionIs(PublicationId1, releaseVersion1V2);
-                    WherePreviousPublicationLatestPublishedReleaseVersionIs(PublicationId1, releaseVersion1V2);
-                    
+
                     var sut = GetSut();
-                    
+
                     // ACT
                     await sut.CompletePublishingIfAllPriorStagesComplete(readyKeys);
 
@@ -709,7 +727,59 @@ public class PublishingCompletionServiceTests
                         ]
                     };
 
-                    _publisherEventRaiser.Assert.EventWasRaised(evt => evt == expectedInfo);
+                    _publisherEventRaiser.Assert.ReleaseVersionPublishedEventWasRaised(evt => evt == expectedInfo);
+                }
+
+                [Fact]
+                public async Task GivenASupersededPublication_WhenPublicationIsNotAlreadyPublished_ThenPublicationArchivedEventRaised()
+                {
+                    // ARRANGE
+                    var readyKeys = SetupHappyPath();
+
+                    // Create a publication that is superseded by publication 1.
+                    // Publication 1 has no published releases prior to the current publishing run
+                    var supersededPublication = new PublicationBuilder(Guid.NewGuid(), "publication-slug-superseded")
+                        .SupersededBy(_releaseVersion1.Release.Publication.Id)
+                        .Build();
+                    _contentDbContext.With(supersededPublication);
+
+                    var sut = GetSut();
+
+                    // ACT
+                    await sut.CompletePublishingIfAllPriorStagesComplete(readyKeys);
+
+                    // ASSERT
+                    _publisherEventRaiser.Assert.PublicationArchivedEventWasRaised(supersededPublication);
+                }
+
+                [Fact]
+                public async Task GivenASupersededPublication_WhenPublicationIsAlreadyPublished_ThenPublicationArchivedEventNotRaised()
+                {
+                    // ARRANGE
+                    var readyKeys = SetupHappyPath();
+
+                    // Set publication 1 to have a published release prior to the current publishing run
+                    WherePreviousPublicationLatestPublishedReleaseVersionIs(
+                        publicationId: PublicationId1,
+                        releaseVersion: new ReleaseVersionBuilder()
+                            .WithPublicationId(PublicationId1)
+                            .ForRelease(release => release
+                                .WithReleaseSlug("release-slug-previous"))
+                            .Build());
+
+                    // Create a publication that is superseded by publication 1
+                    var supersededPublication = new PublicationBuilder(Guid.NewGuid(), "publication-slug-superseded")
+                        .SupersededBy(_releaseVersion1.Release.Publication.Id)
+                        .Build();
+                    _contentDbContext.With(supersededPublication);
+
+                    var sut = GetSut();
+
+                    // ACT
+                    await sut.CompletePublishingIfAllPriorStagesComplete(readyKeys);
+
+                    // ASSERT
+                    _publisherEventRaiser.Assert.PublicationArchivedEventWasNotRaised();
                 }
             }
 
