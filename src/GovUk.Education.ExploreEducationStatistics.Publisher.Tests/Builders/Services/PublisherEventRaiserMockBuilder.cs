@@ -17,16 +17,16 @@ public class PublisherEventRaiserMockBuilder
     public PublisherEventRaiserMockBuilder()
     {
         _mock
-            .Setup(m => m.RaiseReleaseVersionPublishedEvents(
+            .Setup(m => m.OnReleaseVersionsPublished(
                 It.IsAny<IReadOnlyList<PublishedPublicationInfo>>()))
             .Returns(Task.CompletedTask);
     }
 
     public class Asserter(Mock<IPublisherEventRaiser> mock)
     {
-        public void EventWasRaised(Func<PublishedPublicationInfo, bool> expected)
+        public void ReleaseVersionPublishedEventWasRaised(Func<PublishedPublicationInfo, bool> expected)
         {
-            mock.Verify(m => m.RaiseReleaseVersionPublishedEvents(
+            mock.Verify(m => m.OnReleaseVersionsPublished(
                 It.Is<IReadOnlyList<PublishedPublicationInfo>>(
                     actual => actual.Any(expected))));
         }

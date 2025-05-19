@@ -59,7 +59,7 @@ public class PublisherEventRaiserTests
             };
 
             // ACT
-            await sut.RaiseReleaseVersionPublishedEvents([info]);
+            await sut.OnReleaseVersionsPublished([info]);
 
             // ASSERT
             var expectedEvent = new ReleaseVersionPublishedEvent(
@@ -140,7 +140,7 @@ public class PublisherEventRaiserTests
             };
 
             // ACT
-            await sut.RaiseReleaseVersionPublishedEvents(infos);
+            await sut.OnReleaseVersionsPublished(infos);
 
             // ASSERT
             var expectedEvents = infos.SelectMany(info =>
@@ -229,7 +229,7 @@ public class PublisherEventRaiserTests
             };
 
             // ACT
-            await sut.RaiseReleaseVersionPublishedEvents([info]);
+            await sut.OnReleaseVersionsPublished([info]);
 
             // ASSERT
             // Check unit test output for logs

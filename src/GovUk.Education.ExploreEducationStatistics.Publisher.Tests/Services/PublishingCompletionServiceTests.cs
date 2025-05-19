@@ -626,7 +626,7 @@ public class PublishingCompletionServiceTests
                         ]
                     };
   
-                    _publisherEventRaiser.Assert.EventWasRaised(evt => evt == expectedInfo);
+                    _publisherEventRaiser.Assert.ReleaseVersionPublishedEventWasRaised(evt => evt == expectedInfo);
                 }
 
                 [Fact]
@@ -669,7 +669,7 @@ public class PublishingCompletionServiceTests
                             }
                         ]
                     };
-                    _publisherEventRaiser.Assert.EventWasRaised(evt => evt == expectedInfo); 
+                    _publisherEventRaiser.Assert.ReleaseVersionPublishedEventWasRaised(evt => evt == expectedInfo); 
                 }
 
                 [Fact]
@@ -714,7 +714,7 @@ public class PublishingCompletionServiceTests
                         ]
                     };
 
-                    _publisherEventRaiser.Assert.EventWasRaised(evt => evt == expectedInfo);
+                    _publisherEventRaiser.Assert.ReleaseVersionPublishedEventWasRaised(evt => evt == expectedInfo);
                 }
             }
 

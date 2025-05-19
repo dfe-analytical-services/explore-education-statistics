@@ -93,7 +93,7 @@ public class PublishingCompletionService(
 
         await dataSetPublishingService.PublishDataSets(releaseVersionIdsToUpdate);
 
-        await publisherEventRaiser.RaiseReleaseVersionPublishedEvents(publishedPublicationInfos);
+        await publisherEventRaiser.OnReleaseVersionsPublished(publishedPublicationInfos);
 
         await prePublishingStagesComplete
             .ToAsyncEnumerable()

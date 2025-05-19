@@ -13,10 +13,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services;
 public class PublisherEventRaiser(IEventRaiser eventRaiser) : IPublisherEventRaiser
 {
     /// <summary>
-    /// On Release Version Published
+    /// Publishes events for release versions that have been published.
     /// </summary>
-    /// <param name="publishedPublications">information about the one or more publications that have been published</param>
-    public async Task RaiseReleaseVersionPublishedEvents(
+    /// <param name="publishedPublications">A list of publications, each containing information about the publication
+    /// and its associated release versions that have been published.
+    /// </param>
+    public async Task OnReleaseVersionsPublished(
         IReadOnlyList<PublishedPublicationInfo> publishedPublications)
     {
         var events = publishedPublications.SelectMany(publication =>
