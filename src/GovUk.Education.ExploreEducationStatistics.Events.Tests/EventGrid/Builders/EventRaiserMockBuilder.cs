@@ -14,9 +14,9 @@ public class EventRaiserMockBuilder
             where TEventBuilder : IEvent
             => Xunit.Assert.True(parent._mock.EventWasRaised(expectedEvent));
 
-        public void EventsRaised<TEventBuilder>(IEnumerable<TEventBuilder> expectedEvents) 
+        public void EventsRaised<TEventBuilder>(IEnumerable<TEventBuilder> expectedEvents)
             where TEventBuilder : IEvent
-            => Xunit.Assert.All(expectedEvents, e => Xunit.Assert.True( parent._mock.EventWasRaised(e)));
+            => Xunit.Assert.All(expectedEvents, e => Xunit.Assert.True(parent._mock.EventWasRaised(e)));
 
         public void NoEventRaised() 
             => Xunit.Assert.False(parent._mock.EventWasRaised());

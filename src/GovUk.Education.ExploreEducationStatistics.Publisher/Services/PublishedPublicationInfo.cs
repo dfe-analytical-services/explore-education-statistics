@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
+using Generator.Equals;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services;
 
-public record PublishedPublicationInfo
+[Equatable]
+public partial record PublishedPublicationInfo
 {
     public required Guid PublicationId { get; init; }
 
@@ -35,6 +36,7 @@ public record PublishedPublicationInfo
     /// <summary>
     /// The list of information about published release versions for a publication.
     /// </summary>
+    [UnorderedEquality]
     public required IReadOnlyList<PublishedReleaseVersionInfo> PublishedReleaseVersions { get; init; }
 
     /// <summary>
@@ -42,35 +44,4 @@ public record PublishedPublicationInfo
     /// </summary>
     ///
     public bool WasAlreadyPublished => PreviousLatestPublishedReleaseVersionId != null;
-
-    public virtual bool Equals(PublishedPublicationInfo? other)
-    {
-        if (other is null)
-        {
-            return false;
-        }
-
-        if (ReferenceEquals(this, other))
-        {
-            return true;
-        }
-
-        return PublicationId.Equals(other.PublicationId) &&
-               PublicationSlug == other.PublicationSlug &&
-               LatestPublishedReleaseId.Equals(other.LatestPublishedReleaseId) &&
-               LatestPublishedReleaseVersionId.Equals(other.LatestPublishedReleaseVersionId) &&
-               Nullable.Equals(PreviousLatestPublishedReleaseId, other.PreviousLatestPublishedReleaseId) &&
-               Nullable.Equals(PreviousLatestPublishedReleaseVersionId,
-                   other.PreviousLatestPublishedReleaseVersionId) &&
-               PublishedReleaseVersions.SequenceEqual(other.PublishedReleaseVersions);
-    }
-
-    public override int GetHashCode() => HashCode.Combine(
-        PublicationId,
-        PublicationSlug,
-        LatestPublishedReleaseId,
-        LatestPublishedReleaseVersionId,
-        PreviousLatestPublishedReleaseId,
-        PreviousLatestPublishedReleaseVersionId,
-        PublishedReleaseVersions);
 }
