@@ -11,7 +11,9 @@ public class RefreshSearchableDocumentFunctionTests
 {
     private readonly SearchableDocumentCreatorMockBuilder _searchableDocumentCreatorMockBuilder = new();
     
-    private RefreshSearchableDocumentFunction GetSut() => new(_searchableDocumentCreatorMockBuilder.Build());
+    private RefreshSearchableDocumentFunction GetSut() => new(
+        _searchableDocumentCreatorMockBuilder.Build(), 
+        new TestableCommandHandler());
     
     [Fact]
     public void Can_instantiate_SUT() => Assert.NotNull(GetSut());

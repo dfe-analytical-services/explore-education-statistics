@@ -62,6 +62,7 @@ public static class HostBuilderExtension
                     .AddTransient<IFullSearchableDocumentResetter, FullSearchableDocumentResetter>()
                     // Functions
                     .AddTransient<IEventGridEventHandler, EventGridEventHandler>()
+                    .AddTransient<ICommandHandler, CommandHandler>()
                     .AddHealthChecks()
                     // Clients
                     .AddTransient<ISearchIndexerClient, SearchIndexerClient>()

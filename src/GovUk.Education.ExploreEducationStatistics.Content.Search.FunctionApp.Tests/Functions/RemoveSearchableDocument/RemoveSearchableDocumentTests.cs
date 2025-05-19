@@ -11,7 +11,8 @@ public class RemoveSearchableDocumentTests
     private readonly SearchableDocumentRemoverMockBuilder _searchableDocumentRemoverMockBuilder = new();
     private RemoveSearchableDocumentFunction GetSut() => new(
         new NullLogger<RemoveSearchableDocumentFunction>(),
-        _searchableDocumentRemoverMockBuilder.Build());
+        _searchableDocumentRemoverMockBuilder.Build(), 
+        new TestableCommandHandler());
 
     [Fact]
     public void CanInstantiateSut() => Assert.NotNull(GetSut());
