@@ -1,6 +1,6 @@
-namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Requests;
+using GovUk.Education.ExploreEducationStatistics.Analytics.Common.Interfaces;
 
-public interface IAnalyticsCaptureRequestBase;
+namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Requests;
 
 public record CaptureDataSetVersionQueryRequest(
     Guid DataSetId,

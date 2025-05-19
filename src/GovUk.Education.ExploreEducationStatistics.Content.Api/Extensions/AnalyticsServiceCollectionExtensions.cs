@@ -1,7 +1,8 @@
+using GovUk.Education.ExploreEducationStatistics.Analytics.Common;
+using GovUk.Education.ExploreEducationStatistics.Analytics.Common.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Services;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Strategies;
-using GovUk.Education.ExploreEducationStatistics.Content.Services.Strategies.Interfaces;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;

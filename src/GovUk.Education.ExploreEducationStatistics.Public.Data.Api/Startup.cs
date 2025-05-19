@@ -20,8 +20,6 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services.Security;
-using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Strategies;
-using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Strategies.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Swagger;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.DuckDb;
