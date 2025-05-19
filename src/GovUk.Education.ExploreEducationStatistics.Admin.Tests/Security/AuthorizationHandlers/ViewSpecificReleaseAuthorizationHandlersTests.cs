@@ -88,7 +88,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                     ReleaseVersion,
                     rolesExpectedToSucceed: new[]
                     {
-                        ReleaseRole.Viewer, ReleaseRole.Lead, ReleaseRole.Contributor, ReleaseRole.Approver
+                        ReleaseRole.Viewer, ReleaseRole.Contributor, ReleaseRole.Approver
                     });
             }
 

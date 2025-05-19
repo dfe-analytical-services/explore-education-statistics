@@ -161,7 +161,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             public async Task EditorsOrApproversOnAnyOwningPublicationReleaseCanViewMethodology()
             {
                 var expectedReleaseRolesToPass =
-                    ListOf(ReleaseRole.Approver, ReleaseRole.Contributor, ReleaseRole.Lead);
+                    ListOf(ReleaseRole.Approver, ReleaseRole.Contributor);
 
                 await ForEachReleaseRoleAsync(async releaseRole =>
                 {
