@@ -449,7 +449,7 @@ public class PublishingCompletionServiceTests
                     // ARRANGE
                     var readyKeys = SetupHappyPath();
 
-                    // Set publication 1 to have published releases prior to the current publishing run
+                    // Set publication 1 to have a published release prior to the current publishing run
                     WherePreviousPublicationLatestPublishedReleaseVersionIs(
                         publicationId: PublicationId1,
                         releaseVersion: new ReleaseVersionBuilder()
@@ -641,7 +641,10 @@ public class PublishingCompletionServiceTests
                             .WithReleaseSlug("release-slug-previous"))
                         .Build();
 
+                    // Set publication 1 to have a published release prior to the current publishing run
                     WherePreviousPublicationLatestPublishedReleaseVersionIs(publicationId: PublicationId1, releaseVersion: previousReleaseVersion);
+
+                    // Set release version 1 to be the latest published release version after publishing
                     _releaseService.WherePublicationLatestPublishedReleaseVersionIs(PublicationId1, _releaseVersion1);
 
                     // ACT
@@ -680,10 +683,12 @@ public class PublishingCompletionServiceTests
                         .ForRelease(_releaseVersion1.Release)
                         .Build();
 
-                    // Set that release version 1V2 is the latest, not release version 1
+                    // Set publication 1 to have published release version 1V2 prior to the current publishing run
+                    WherePreviousPublicationLatestPublishedReleaseVersionIs(publicationId: PublicationId1, releaseVersion: releaseVersion1V2);
+
+                    // Set release version 1V2 to be the latest after publishing, not release version 1
                     _releaseService.WherePublicationLatestPublishedReleaseVersionIs(PublicationId1, releaseVersion1V2);
-                    WherePreviousPublicationLatestPublishedReleaseVersionIs(PublicationId1, releaseVersion1V2);
-                    
+
                     var sut = GetSut();
                     
                     // ACT
