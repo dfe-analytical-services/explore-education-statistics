@@ -4,11 +4,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.
 
 public class TestableCommandHandler : ICommandHandler
 {
-    public Task<TResponse?> Handle<TCommand, TResponse>(
+    public Task<TResponse> Handle<TCommand, TResponse>(
         Func<TCommand, CancellationToken, Task<TResponse>> commandHandler,
         TCommand commandMessage,
         CancellationToken cancellationToken) =>
-        commandHandler(commandMessage, cancellationToken)!;
+        commandHandler(commandMessage, cancellationToken);
 
     public Task Handle<TCommand>(
         Func<TCommand, CancellationToken, Task> commandHandler,
@@ -16,10 +16,10 @@ public class TestableCommandHandler : ICommandHandler
         CancellationToken cancellationToken) =>
         commandHandler(commandMessage, cancellationToken);
 
-    public Task<TResponse?> Handle<TResponse>(
+    public Task<TResponse> Handle<TResponse>(
         Func<CancellationToken, Task<TResponse>> commandHandler,
         CancellationToken cancellationToken) =>
-        commandHandler(cancellationToken)!;
+        commandHandler(cancellationToken);
 
     public Task Handle(
         Func<CancellationToken, Task> commandHandler,
