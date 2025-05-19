@@ -5,17 +5,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Events;
 
 public record ReleaseVersionPublishedEvent : IEvent
 {
-    public ReleaseVersionPublishedEvent(ReleaseVersionPublishedEventInfo releaseVersionPublishedEvent)
+    public ReleaseVersionPublishedEvent(ReleaseVersionPublishedEventInfo eventInfo)
     {
-        Subject = releaseVersionPublishedEvent.ReleaseVersionId.ToString();
+        Subject = eventInfo.ReleaseVersionId.ToString();
         Payload = new EventPayload
         {
-            ReleaseId = releaseVersionPublishedEvent.ReleaseId,
-            ReleaseSlug = releaseVersionPublishedEvent.ReleaseSlug,
-            PublicationId = releaseVersionPublishedEvent.PublicationId,
-            PublicationSlug = releaseVersionPublishedEvent.PublicationSlug,
-            LatestPublishedReleaseVersionId = releaseVersionPublishedEvent.LatestPublishedReleaseVersionId,
-            PreviousLatestPublishedReleaseId = releaseVersionPublishedEvent.PreviousLatestPublishedReleaseId,
+            ReleaseId = eventInfo.ReleaseId,
+            ReleaseSlug = eventInfo.ReleaseSlug,
+            PublicationId = eventInfo.PublicationId,
+            PublicationSlug = eventInfo.PublicationSlug,
+            LatestPublishedReleaseId = eventInfo.LatestPublishedReleaseId,
+            LatestPublishedReleaseVersionId = eventInfo.LatestPublishedReleaseVersionId,
+            PreviousLatestPublishedReleaseId = eventInfo.PreviousLatestPublishedReleaseId,
+            PreviousLatestPublishedReleaseVersionId = eventInfo.PreviousLatestPublishedReleaseVersionId
         };
     }
 
@@ -40,8 +42,10 @@ public record ReleaseVersionPublishedEvent : IEvent
         public required string ReleaseSlug { get; init; }
         public required Guid PublicationId { get; init; }
         public required string PublicationSlug { get; init; }
+        public required Guid LatestPublishedReleaseId { get; init; }
         public required Guid LatestPublishedReleaseVersionId { get; init; }
         public Guid? PreviousLatestPublishedReleaseId { get; init; }
+        public Guid? PreviousLatestPublishedReleaseVersionId { get; init; }
     }
     public EventPayload Payload { get; }
     
@@ -75,6 +79,10 @@ public record ReleaseVersionPublishedEvent : IEvent
         public required string PublicationSlug { get; init; }
 
         /// <summary>
+        /// </summary>
+        public required Guid LatestPublishedReleaseId { get; init; }
+
+        /// <summary>
         /// The release version that has been published may not be the latest.
         /// This property contains the latest published release version id.
         /// </summary>
@@ -84,5 +92,9 @@ public record ReleaseVersionPublishedEvent : IEvent
         /// The Release Id of the previous "latest release version"
         /// </summary>
         public required Guid? PreviousLatestPublishedReleaseId { get; init; }
+
+        /// <summary>
+        /// </summary>
+        public required Guid? PreviousLatestPublishedReleaseVersionId { get; init; }
     }
 }

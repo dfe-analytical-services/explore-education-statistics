@@ -98,6 +98,8 @@ public class PublisherEventRaiserTests
                     ReleaseSlug = info.PublishedReleaseVersions[0].ReleaseSlug,
                     ReleaseVersionId = info.PublishedReleaseVersions[0].ReleaseVersionId,
                     PreviousLatestPublishedReleaseId = info.PreviousLatestPublishedReleaseId,
+                    PreviousLatestPublishedReleaseVersionId = info.PreviousLatestPublishedReleaseVersionId,
+                    LatestPublishedReleaseId = info.LatestPublishedReleaseId,
                     LatestPublishedReleaseVersionId = info.LatestPublishedReleaseVersionId
                 });
             _eventRaiserMockBuilder.Assert.EventsRaised([expectedEvent]);
@@ -181,6 +183,8 @@ public class PublisherEventRaiserTests
                             ReleaseSlug = version.ReleaseSlug,
                             ReleaseVersionId = version.ReleaseVersionId,
                             PreviousLatestPublishedReleaseId = info.PreviousLatestPublishedReleaseId,
+                            PreviousLatestPublishedReleaseVersionId = info.PreviousLatestPublishedReleaseVersionId,
+                            LatestPublishedReleaseId = info.LatestPublishedReleaseId,
                             LatestPublishedReleaseVersionId = info.LatestPublishedReleaseVersionId
                         }))).ToList();
 
