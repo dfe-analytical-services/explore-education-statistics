@@ -2,7 +2,7 @@
 
 public interface ICommandHandler
 {
-    Task<TResponse> Handle<TCommand, TResponse>(
+    Task<TResponse?> Handle<TCommand, TResponse>(
         Func<TCommand, CancellationToken, Task<TResponse>> commandHandler, 
         TCommand commandMessage,
         CancellationToken cancellationToken);
@@ -12,7 +12,7 @@ public interface ICommandHandler
         TCommand commandMessage,
         CancellationToken cancellationToken);
     
-    Task<TResponse> Handle<TResponse>(
+    Task<TResponse?> Handle<TResponse>(
         Func<CancellationToken, Task<TResponse>> commandHandler, 
         CancellationToken cancellationToken);
     

@@ -18,7 +18,7 @@ public class FullResetFunction(
         FunctionContext context) =>
         await commandHandler.Handle(
             ResetSearchableDocument,
-            context.CancellationToken);
+            context.CancellationToken) ?? [];
 
     private async Task<RefreshSearchableDocumentMessageDto[]> ResetSearchableDocument(CancellationToken cancellationToken)
     {

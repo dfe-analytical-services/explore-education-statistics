@@ -1,4 +1,4 @@
-﻿using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.CommandHandlers.RefreshSearchableDocument.Dto;
+using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.CommandHandlers.RefreshSearchableDocument.Dto;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Services;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Services.Core;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Services.CreateSearchableDocuments;
@@ -19,7 +19,7 @@ public class RefreshSearchableDocumentFunction(
         await commandHandler.Handle(
             RefreshSearchableDocument,
             message,
-            context.CancellationToken);
+            context.CancellationToken) ?? [];
 
     private async Task<SearchableDocumentCreatedMessageDto[]> RefreshSearchableDocument(
         RefreshSearchableDocumentMessageDto message, 

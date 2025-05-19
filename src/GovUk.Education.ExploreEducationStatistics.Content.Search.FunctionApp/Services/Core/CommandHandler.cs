@@ -4,7 +4,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.
 
 public class CommandHandler(ILogger<CommandHandler> logger) : ICommandHandler
 {
-    public async Task<TResponse> Handle<TCommand, TResponse>(
+    public async Task<TResponse?> Handle<TCommand, TResponse>(
         Func<TCommand, CancellationToken, Task<TResponse>> commandHandler, 
         TCommand commandMessage,
         CancellationToken cancellationToken)
@@ -19,6 +19,7 @@ public class CommandHandler(ILogger<CommandHandler> logger) : ICommandHandler
         catch (TaskCanceledException)
         {
             logger.LogWarning("Task was cancelled.");
+            return default;
         }
         catch (Exception e)
         {
@@ -49,7 +50,7 @@ public class CommandHandler(ILogger<CommandHandler> logger) : ICommandHandler
         }
     }
 
-    public async Task<TResponse> Handle<TResponse>(
+    public async Task<TResponse?> Handle<TResponse>(
         Func<CancellationToken, Task<TResponse>> commandHandler,
         CancellationToken cancellationToken)
     {
@@ -63,6 +64,7 @@ public class CommandHandler(ILogger<CommandHandler> logger) : ICommandHandler
         catch (TaskCanceledException)
         {
             logger.LogWarning("Task was cancelled.");
+            return default;
         }
         catch (Exception e)
         {
