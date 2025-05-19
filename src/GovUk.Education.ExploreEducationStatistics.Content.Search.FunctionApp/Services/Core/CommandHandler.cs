@@ -13,7 +13,7 @@ public class CommandHandler(ILogger<CommandHandler> logger) : ICommandHandler
         try
         {
             var response = await commandHandler(commandMessage, cancellationToken);
-            logger.LogDebug("Handled command: {@Command}  Response:{@Response}", commandMessage, response);
+            logger.LogDebug("Handled command: {@Command}. Response:{@Response}", commandMessage, response);
             return response;
         }
         catch (TaskCanceledException)
@@ -58,7 +58,7 @@ public class CommandHandler(ILogger<CommandHandler> logger) : ICommandHandler
         try
         {
             var response = await commandHandler(cancellationToken);
-            logger.LogDebug("Handled command: Response:{@Response}", response);
+            logger.LogDebug("Handled command. Response:{@Response}", response);
             return response;
         }
         catch (TaskCanceledException)

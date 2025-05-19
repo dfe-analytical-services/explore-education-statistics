@@ -6,7 +6,7 @@ public class AzureBlobStorageException : Exception
     public string BlobName { get; }
 
     public AzureBlobStorageException(string containerName, string blobName, string errorReason) : base(
-        $"Error with Blob \"{blobName}\" in container \"{containerName}\": ${errorReason}")
+        $"""Error with Blob "{blobName}" in container "{containerName}": ${errorReason}""")
     {
         ContainerName = containerName;
         BlobName = blobName;

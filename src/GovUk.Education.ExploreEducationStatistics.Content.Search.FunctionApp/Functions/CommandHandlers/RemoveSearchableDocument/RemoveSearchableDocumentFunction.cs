@@ -31,6 +31,6 @@ public class RemoveSearchableDocumentFunction(
             cancellationToken);
 
         logger.LogInformation(
-            "Removed searchable document \"{ReleaseId}\". Response: {@response}", releaseId, response);
+            """Removed searchable document "{ReleaseId}". Response: {@response}""", releaseId, response);
     }
 }

@@ -32,7 +32,7 @@ public class RemovePublicationSearchableDocumentsFunction(
             cancellationToken);
 
         logger.LogInformation(
-            "Removed searchable documents for publication \"{PublicationSlug}\". Response: {@response}", 
+            """Removed searchable documents for publication "{PublicationSlug}". Response: {@response}""", 
             message.PublicationSlug, 
             response);
     }
