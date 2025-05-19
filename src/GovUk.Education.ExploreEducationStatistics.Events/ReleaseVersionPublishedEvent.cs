@@ -14,8 +14,8 @@ public record ReleaseVersionPublishedEvent : IEvent
             ReleaseSlug = releaseVersionPublishedEvent.ReleaseSlug,
             PublicationId = releaseVersionPublishedEvent.PublicationId,
             PublicationSlug = releaseVersionPublishedEvent.PublicationSlug,
-            PublicationLatestPublishedReleaseVersionId = releaseVersionPublishedEvent.PublicationLatestPublishedReleaseVersionId,
-            PreviousLatestReleaseId = releaseVersionPublishedEvent.PreviousLatestReleaseId,
+            LatestPublishedReleaseVersionId = releaseVersionPublishedEvent.LatestPublishedReleaseVersionId,
+            PreviousLatestPublishedReleaseId = releaseVersionPublishedEvent.PreviousLatestPublishedReleaseId,
         };
     }
 
@@ -36,12 +36,12 @@ public record ReleaseVersionPublishedEvent : IEvent
     /// </summary>
     public record EventPayload
     {
-        public required Guid ReleaseId {get;init;}
+        public required Guid ReleaseId { get; init; }
         public required string ReleaseSlug { get; init; }
         public required Guid PublicationId { get; init; }
         public required string PublicationSlug { get; init; }
-        public required Guid PublicationLatestPublishedReleaseVersionId { get; init; }    
-        public Guid? PreviousLatestReleaseId { get; init; }
+        public required Guid LatestPublishedReleaseVersionId { get; init; }
+        public Guid? PreviousLatestPublishedReleaseId { get; init; }
     }
     public EventPayload Payload { get; }
     
@@ -52,37 +52,37 @@ public record ReleaseVersionPublishedEvent : IEvent
         /// <summary>
         /// Newly published release version id
         /// </summary>
-        public Guid ReleaseVersionId { get; init; }
-    
+        public required Guid ReleaseVersionId { get; init; }
+
         /// <summary>
         /// The Release Id for the newly published release version
         /// </summary>
-        public Guid ReleaseId {get;init;}
-        
+        public required Guid ReleaseId { get; init; }
+
         /// <summary>
         /// The release slug for the newly published release version
         /// </summary>
-        public string ReleaseSlug { get; init; } = string.Empty;
-        
+        public required string ReleaseSlug { get; init; }
+
         /// <summary>
         /// The publication id for the newly published release version
         /// </summary>
-        public Guid PublicationId { get; init; }
-        
+        public required Guid PublicationId { get; init; }
+
         /// <summary>
         /// The publication slug for the newly published release version
         /// </summary>
-        public string PublicationSlug { get; init; } = string.Empty;
-        
+        public required string PublicationSlug { get; init; }
+
         /// <summary>
         /// The release version that has been published may not be the latest.
         /// This property contains the latest published release version id.
         /// </summary>
-        public Guid PublicationLatestPublishedReleaseVersionId { get; init; }
-        
+        public required Guid LatestPublishedReleaseVersionId { get; init; }
+
         /// <summary>
         /// The Release Id of the previous "latest release version"
         /// </summary>
-        public Guid? PreviousLatestReleaseId { get; init; }
+        public required Guid? PreviousLatestPublishedReleaseId { get; init; }
     }
 }
