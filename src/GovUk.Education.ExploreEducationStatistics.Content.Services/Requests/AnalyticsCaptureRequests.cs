@@ -1,9 +1,8 @@
 #nullable enable
 using System;
+using GovUk.Education.ExploreEducationStatistics.Analytics.Common.Interfaces;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Requests;
-
-public interface IAnalyticsCaptureRequestBase;
 
 /// <summary>
 /// To capture data relating to a zip download request for analytics.
