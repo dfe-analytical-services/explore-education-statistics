@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
@@ -127,13 +126,13 @@ public class PublishingCompletionService(
             .ToAsyncEnumerable()
             .SelectAwait(group => PublishPublication(
                 publicationId: group.Key,
-                publishedReleaseVersions: group.ToImmutableList()))
+                publishedReleaseVersions: group.ToList()))
             .ToListAsync();
     }
 
     private async ValueTask<PublishedPublicationInfo> PublishPublication(
         Guid publicationId,
-        IImmutableList<PublishedReleaseVersionInfo> publishedReleaseVersions)
+        IReadOnlyList<PublishedReleaseVersionInfo> publishedReleaseVersions)
     {
         var publication = await contentDbContext.Publications
             .Include(p => p.LatestPublishedReleaseVersion)
@@ -165,14 +164,14 @@ public class PublishingCompletionService(
     {
         // Archived publications are those replaced by another publication with at least one published release.
         // Filter publications from this run, excluding those already published.
-        var publicationIds = publications
+        var newlyPublishedPublicationIds = publications
             .Where(p => !p.WasAlreadyPublished)
             .Select(p => p.PublicationId)
             .ToList();
 
         // Find publications that should now be archived because they have been replaced by these publications
         var archivedPublications = await contentDbContext.Publications
-            .Where(p => p.SupersededById != null && publicationIds.Contains(p.SupersededById.Value))
+            .Where(p => p.SupersededById != null && newlyPublishedPublicationIds.Contains(p.SupersededById.Value))
             .ToListAsync();
 
         foreach (var archivedPublication in archivedPublications)

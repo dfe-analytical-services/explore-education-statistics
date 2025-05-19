@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Collections.Immutable;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services;
@@ -35,7 +35,7 @@ public record PublishedPublicationInfo
     /// <summary>
     /// The list of information about published release versions for a publication.
     /// </summary>
-    public required IImmutableList<PublishedReleaseVersionInfo> PublishedReleaseVersions { get; init; }
+    public required IReadOnlyList<PublishedReleaseVersionInfo> PublishedReleaseVersions { get; init; }
 
     /// <summary>
     /// Indicates whether the publication was already published before the publishing run.
