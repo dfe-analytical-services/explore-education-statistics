@@ -16,6 +16,10 @@ public class CommandHandler(ILogger<CommandHandler> logger) : ICommandHandler
             logger.LogDebug("Handled command: {@Command}  Response:{@Response}", commandMessage, response);
             return response;
         }
+        catch (TaskCanceledException)
+        {
+            logger.LogWarning("Task was cancelled.");
+        }
         catch (Exception e)
         {
             logger.LogError(e, "Error handling command: {@Command}", commandMessage);
@@ -33,6 +37,10 @@ public class CommandHandler(ILogger<CommandHandler> logger) : ICommandHandler
         {
             await commandHandler(commandMessage, cancellationToken);
             logger.LogDebug("Handled command: {@Command}", commandMessage);
+        }
+        catch (TaskCanceledException)
+        {
+            logger.LogWarning("Task was cancelled.");
         }
         catch (Exception e)
         {
@@ -52,6 +60,10 @@ public class CommandHandler(ILogger<CommandHandler> logger) : ICommandHandler
             logger.LogDebug("Handled command: Response:{@Response}", response);
             return response;
         }
+        catch (TaskCanceledException)
+        {
+            logger.LogWarning("Task was cancelled.");
+        }
         catch (Exception e)
         {
             logger.LogError(e, "Error handling command.");
@@ -67,6 +79,10 @@ public class CommandHandler(ILogger<CommandHandler> logger) : ICommandHandler
         {
             await commandHandler(cancellationToken);
             logger.LogDebug("Handled command.");
+        }
+        catch (TaskCanceledException)
+        {
+            logger.LogWarning("Task was cancelled.");
         }
         catch (Exception e)
         {
