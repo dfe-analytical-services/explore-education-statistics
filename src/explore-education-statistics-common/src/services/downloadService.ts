@@ -2,8 +2,6 @@ import { contentApi } from '@common/services/api';
 import downloadFile from '@common/utils/file/downloadFile';
 import qs from 'qs';
 
-type FromPage = 'ReleaseUsefulInfo' | 'ReleaseDownloads' | 'DataCatalogue';
-
 const downloadService = {
   getFile(releaseVersionId: string, fileId: string): Promise<Blob> {
     return contentApi.get<Blob>(
