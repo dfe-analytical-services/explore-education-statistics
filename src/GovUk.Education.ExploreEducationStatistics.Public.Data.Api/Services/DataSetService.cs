@@ -48,23 +48,11 @@ internal class DataSetService(
                 dataSetVersion: dataSetVersion,
                 cancellationToken: cancellationToken)
             .OnSuccessDo(userService.CheckCanViewDataSetVersion)
-            .OnSuccessDo(async dsv =>
-            {
-                try
-                {
-                    await analyticsService.CaptureDataSetVersionCall(
-                        dataSetVersionId: dsv.Id,
-                        type: DataSetVersionCallType.DownloadCsv,
-                        requestedDataSetVersion: dataSetVersion,
-                        cancellationToken: cancellationToken);
-                }
-                catch (Exception e)
-                {
-                    logger.LogError(
-                        exception: e,
-                        message: """Error whilst capturing analytics for "Download CSV" call""");
-                }
-            })
+            .OnSuccessDo(dsv => CaptureDataSetVersionCallForAnalytics(
+                dataSetVersionId: dsv.Id, 
+                dataSetVersion: dataSetVersion,
+                type: DataSetVersionCallType.DownloadCsv,
+                cancellationToken: cancellationToken))
             .OnSuccess(DownloadDataSetVersionToStream);
     }
 
@@ -154,6 +142,14 @@ internal class DataSetService(
                 dataSetVersion: dataSetVersion,
                 cancellationToken: cancellationToken)
             .OnSuccessDo(userService.CheckCanViewDataSetVersion)
+            .OnSuccessDo(dsv => CaptureDataSetVersionCallForAnalytics(
+                dataSetVersionId: dsv.Id, 
+                dataSetVersion: dataSetVersion,
+                type: DataSetVersionCallType.GetMetadata,
+                parameters: types != null 
+                    ? new GetMetadataAnalyticsParameters(types)
+                    : null,
+                cancellationToken: cancellationToken))
             .OnSuccessDo(dsv => LoadMeta(dsv, types, cancellationToken))
             .OnSuccess(MapVersionMeta);
     }
@@ -373,6 +369,32 @@ internal class DataSetService(
             Locations = locations,
             TimePeriods = timePeriods,
         };
+    }
+
+    private async Task CaptureDataSetVersionCallForAnalytics(
+        Guid dataSetVersionId,
+        string? dataSetVersion,
+        DataSetVersionCallType type,
+        object? parameters = null,
+        CancellationToken cancellationToken = default) 
+    {
+        try
+        {
+            await analyticsService.CaptureDataSetVersionCall(
+                dataSetVersionId: dataSetVersionId,
+                type: type,
+                requestedDataSetVersion: dataSetVersion,
+                parameters: parameters,
+                cancellationToken: cancellationToken);
+        }
+        catch (Exception e)
+        {
+            logger.LogError(
+                exception: e,
+                message: """Error whilst capturing analytics for "{Type}" call for DataSetVersion {Id}""",
+                type,
+                dataSetVersionId);
+        }
     }
 
     private static FilterOptionsViewModel MapFilterOptions(FilterMeta filterMeta)
