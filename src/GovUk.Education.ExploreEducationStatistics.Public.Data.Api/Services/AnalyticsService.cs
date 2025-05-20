@@ -23,12 +23,7 @@ public class AnalyticsService(
         var dataSetVersion = await publicDataDbContext
             .DataSetVersions
             .Include(dsv => dsv.DataSet)
-            .SingleOrDefaultAsync(dsv => dsv.Id == dataSetVersionId, cancellationToken);
-
-        if (dataSetVersion == null)
-        {
-            return;
-        }
+            .SingleAsync(dsv => dsv.Id == dataSetVersionId, cancellationToken);
 
         var request = new CaptureDataSetVersionCallRequest(
             DataSetId: dataSetVersion.DataSetId,
