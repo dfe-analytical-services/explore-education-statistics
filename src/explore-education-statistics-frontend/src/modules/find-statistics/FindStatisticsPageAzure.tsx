@@ -69,7 +69,7 @@ const FindStatisticsPage: NextPage = () => {
 
   const themesWithResultCounts = themes
     .map(theme => {
-      const facetedResult = themeFacetResults.find(
+      const facetedResult = themeFacetResults?.find(
         result => theme.id === result.value,
       );
       const count = facetedResult?.count ?? 0;
@@ -83,7 +83,7 @@ const FindStatisticsPage: NextPage = () => {
 
   const releaseTypesWithResultCounts = Object.keys(releaseTypes)
     .map(type => {
-      const facetedResult = releaseTypeFacetResults.find(
+      const facetedResult = releaseTypeFacetResults?.find(
         result => type === result.value,
       );
 
