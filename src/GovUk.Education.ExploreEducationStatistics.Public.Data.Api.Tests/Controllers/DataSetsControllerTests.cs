@@ -1,5 +1,6 @@
 using System.Globalization;
 using System.Net.Mime;
+using System.Text.Json;
 using CsvHelper;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
@@ -22,7 +23,6 @@ using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Primitives;
-using Newtonsoft.Json;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Controllers;
 
@@ -1943,7 +1943,7 @@ public abstract class DataSetsControllerTests(TestApplicationFactory testApp) : 
                 (PreviewTokenSummary?, string?) previewTokenAndRequestedDataSetVersion)
             {
                 var (expectedPreviewToken, requestedDataSetVersion) = previewTokenAndRequestedDataSetVersion;
-                
+
                 DataSet dataSet = DataFixture
                     .DefaultDataSet()
                     .WithStatusPublished();
@@ -1960,7 +1960,7 @@ public abstract class DataSetsControllerTests(TestApplicationFactory testApp) : 
                             .WithLabel(expectedPreviewToken.Label)
                             .WithCreated(expectedPreviewToken.Created)
                             .WithExpiry(expectedPreviewToken.Expiry)
-                            .Generate(1) 
+                            .Generate(1)
                         : [])
                     .FinishWith(dsv => dataSet.LatestLiveVersion = dsv);
 
@@ -1975,14 +1975,14 @@ public abstract class DataSetsControllerTests(TestApplicationFactory testApp) : 
                 var persistedPreviewToken = dataSetVersion
                     .PreviewTokens
                     .SingleOrDefault();
-                
+
                 var response = await DownloadDataSet(
                     dataSetId: dataSet.Id,
                     dataSetVersion: requestedDataSetVersion,
                     previewTokenId: persistedPreviewToken?.Id);
-                
+
                 response.AssertOk();
-                
+
                 var results = await DecompressGZippedCsv(response);
                 Assert.Equal(CsvData, results);
 
@@ -1998,7 +1998,8 @@ public abstract class DataSetsControllerTests(TestApplicationFactory testApp) : 
                 var analyticFile = Assert.Single(analyticsFiles);
                 var contents = await File.ReadAllTextAsync(analyticFile);
 
-                var capturedCall = JsonConvert.DeserializeObject<CaptureDataSetVersionCallRequest>(contents);
+                var capturedCall = JsonSerializer.Deserialize<CaptureDataSetVersionCallRequest>(contents,
+                    new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
 
                 Assert.NotNull(capturedCall);
                 Assert.Equal(DataSetVersionCallType.DownloadCsv, capturedCall.Type);

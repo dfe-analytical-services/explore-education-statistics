@@ -33,7 +33,7 @@ public enum DataSetVersionCallType
     GetMetadata,
     GetSummary,
     DownloadCsv,
-    GetChanges
+    GetChanges,
 }
 
 public record PreviewTokenRequest(
