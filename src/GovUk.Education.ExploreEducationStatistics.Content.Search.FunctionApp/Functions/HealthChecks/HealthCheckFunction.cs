@@ -16,9 +16,15 @@ public class HealthCheckFunction(IEnumerable<IHealthCheckStrategy> strategies)
         HttpRequest httpRequest,
         CancellationToken cancellationToken)
     {
+        // Execute strategies sequentially so as not to interleave the logs.
+        var results = await strategies
+            .ToAsyncEnumerable()
+            .SelectAwait(async strategy => await strategy.Run(cancellationToken))
+            .ToArrayAsync(cancellationToken: cancellationToken);
+        
         var healthCheckResponse = new HealthCheckResponse
         {
-            Results = await Task.WhenAll(strategies.Select(s => s.Run(cancellationToken)))
+            Results = results
         };
 
         return healthCheckResponse.IsHealthy
