@@ -44,7 +44,6 @@
     <PackageReference Include="System.Memory.Data" Version="7.0.0" />
     <PackageReference Include="System.Text.Json" Version="8.0.5" />
     <PackageReference Include="Thinktecture.EntityFrameworkCore.SqlServer" Version="8.4.0" />
-    <PackageReference Include="Cronos" Version="0.9.0" />
     <PackageReference Include="Microsoft.Identity.Web" Version="2.21.1" />
   </ItemGroup>
 
@@ -116,6 +115,7 @@
     <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Content.Services\GovUk.Education.ExploreEducationStatistics.Content.Services.csproj" />
     <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Data.Processor.Model\GovUk.Education.ExploreEducationStatistics.Data.Processor.Model.csproj" />
     <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Data.Services\GovUk.Education.ExploreEducationStatistics.Data.Services.csproj" />
+    <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Events\GovUk.Education.ExploreEducationStatistics.Events.csproj" />
     <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Public.Data.Model\GovUk.Education.ExploreEducationStatistics.Public.Data.Model.csproj" />
     <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Requests\GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Requests.csproj" />
     <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.ViewModels\GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.ViewModels.csproj" />

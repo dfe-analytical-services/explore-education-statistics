@@ -12,6 +12,23 @@ public class AzureBlobStorageClient(
 {
     internal BlobServiceClient BlobServiceClient { get; } = blobServiceClient;
 
+    public async Task<bool> DeleteBlobIfExists(
+        string containerName,
+        string blobName,
+        CancellationToken cancellationToken = default)
+    {
+        var blobContainerClient = BlobServiceClient.GetBlobContainerClient(containerName);
+        try
+        {
+            return await blobContainerClient.DeleteBlobIfExistsAsync(blobName, cancellationToken: cancellationToken);
+        }
+        catch (Exception e)
+        {
+            logger.LogError(e, "Failed to delete blob {ContainerName}/{BlobName}", containerName, blobName);
+            throw;
+        }
+    }
+
     public async Task UploadBlob(
         string containerName,
         string blobName,
@@ -40,5 +57,29 @@ public class AzureBlobStorageClient(
     {
         var blobContainerClient = BlobServiceClient.GetBlobContainerClient(containerName);
         return await blobContainerClient.ExistsAsync(cancellationToken);
+    }
+
+    public async Task DeleteAllBlobsFromContainer(string containerName, CancellationToken cancellationToken = default)
+    {
+        var blobContainerClient = BlobServiceClient.GetBlobContainerClient(containerName);
+        var blobNames = await GetAllBlobNames(blobContainerClient, cancellationToken);
+
+        await Task.WhenAll(
+            blobNames
+                .Select(blobName => 
+                    blobContainerClient.DeleteBlobIfExistsAsync(blobName, cancellationToken: cancellationToken)));
+    }
+
+    private static async Task<IList<string>> GetAllBlobNames(
+        BlobContainerClient blobContainerClient,
+        CancellationToken cancellationToken)
+    {
+        var asyncPageable = blobContainerClient.GetBlobsAsync(cancellationToken: cancellationToken);
+        var blobNames = new List<string>();
+        await foreach (var blobItem in asyncPageable)
+        {
+            blobNames.Add(blobItem.Name);
+        }
+        return blobNames;
     }
 }

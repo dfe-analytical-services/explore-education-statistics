@@ -244,7 +244,7 @@ internal class DataSetService(
         string? dataSetVersion = null,
         CancellationToken cancellationToken = default)
     {
-        if (dataSetVersion is null)
+        if (dataSetVersion is null or "*")
         {
             return await publicDataDbContext.DataSets
                 .AsNoTracking()
@@ -254,7 +254,15 @@ internal class DataSetService(
                 .SingleOrNotFoundAsync(cancellationToken);
         }
 
-        return await publicDataDbContext.DataSetVersions
+        return dataSetVersion.Contains('*')
+            ? await publicDataDbContext.DataSetVersions
+                .AsNoTracking()
+                .WherePublishedStatus()
+                .FindByVersion(
+                    dataSetId: dataSetId,
+                    version: dataSetVersion,
+                    cancellationToken: cancellationToken)
+            : await publicDataDbContext.DataSetVersions
             .AsNoTracking()
             .FindByVersion(
                 dataSetId: dataSetId,

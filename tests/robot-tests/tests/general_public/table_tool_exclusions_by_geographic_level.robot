@@ -138,16 +138,16 @@ Create table again
     ...    xpath://*[@data-testid="dataTableCaption" and text()="'Exclusions by geographic level' for State-funded secondary in Bury, Sheffield and York between 2006/07 and 2008/09"]
 
 Validate results table column headings
-    user checks table column heading contains    1    1    2006/07
+    user checks table column heading contains    1    1    2008/09
     user checks table column heading contains    1    2    2007/08
-    user checks table column heading contains    1    3    2008/09
+    user checks table column heading contains    1    3    2006/07
 
 Validate Bury Number of fixed period exclusions row
     ${row}=    user gets row with group and indicator    Bury    Number of fixed period exclusions
     user checks row contains heading    ${row}    Number of fixed period exclusions
-    user checks row cell contains text    ${row}    1    1,539
+    user checks row cell contains text    ${row}    1    1,298
     user checks row cell contains text    ${row}    2    1,469
-    user checks row cell contains text    ${row}    3    1,298
+    user checks row cell contains text    ${row}    3    1,539
 
 User generates a permanent link
     user waits until page contains button    Generate shareable link    %{WAIT_MEDIUM}
@@ -165,63 +165,63 @@ User validates permalink contains correct date
     user checks page contains element    xpath://*[@data-testid="created-date"]//strong//time[text()="${date}"]
 
 User validates permalink table headers
-    user checks table column heading contains    1    1    2006/07
+    user checks table column heading contains    1    1    2008/09
     user checks table column heading contains    1    2    2007/08
-    user checks table column heading contains    1    3    2008/09
+    user checks table column heading contains    1    3    2006/07
 
 User validates permalink table rows for Bury
     ${row}=    user gets row with group and indicator    Bury    Number of fixed period exclusions
     user checks row contains heading    ${row}    Number of fixed period exclusions
-    user checks row cell contains text    ${row}    1    1,539
+    user checks row cell contains text    ${row}    1    1,298
     user checks row cell contains text    ${row}    2    1,469
-    user checks row cell contains text    ${row}    3    1,298
+    user checks row cell contains text    ${row}    3    1,539
 
     ${row}=    user gets row with group and indicator    Bury    Number of permanent exclusions
     user checks row contains heading    ${row}    Number of permanent exclusions
-    user checks row cell contains text    ${row}    1    74
+    user checks row cell contains text    ${row}    1    65
     user checks row cell contains text    ${row}    2    75
-    user checks row cell contains text    ${row}    3    65
+    user checks row cell contains text    ${row}    3    74
 
     ${row}=    user gets row with group and indicator    Bury    Number of pupils
     user checks row contains heading    ${row}    Number of pupils
-    user checks row cell contains text    ${row}    1    11,618
+    user checks row cell contains text    ${row}    1    11,217
     user checks row cell contains text    ${row}    2    11,389
-    user checks row cell contains text    ${row}    3    11,217
+    user checks row cell contains text    ${row}    3    11,618
 
 User validates permalink table rows for Sheffield
     ${row}=    user gets row with group and indicator    Sheffield    Number of fixed period exclusions
     user checks row contains heading    ${row}    Number of fixed period exclusions
-    user checks row cell contains text    ${row}    1    5,351
+    user checks row cell contains text    ${row}    1    3,374
     user checks row cell contains text    ${row}    2    3,869
-    user checks row cell contains text    ${row}    3    3,374
+    user checks row cell contains text    ${row}    3    5,351
 
     ${row}=    user gets row with group and indicator    Sheffield    Number of permanent exclusions
     user checks row contains heading    ${row}    Number of permanent exclusions
-    user checks row cell contains text    ${row}    1    12
+    user checks row cell contains text    ${row}    1    4
     user checks row cell contains text    ${row}    2    8
-    user checks row cell contains text    ${row}    3    4
+    user checks row cell contains text    ${row}    3    12
 
     ${row}=    user gets row with group and indicator    Sheffield    Number of pupils
     user checks row contains heading    ${row}    Number of pupils
-    user checks row cell contains text    ${row}    1    31,261
+    user checks row cell contains text    ${row}    1    30,948
     user checks row cell contains text    ${row}    2    31,105
-    user checks row cell contains text    ${row}    3    30,948
+    user checks row cell contains text    ${row}    3    31,261
 
 User validates permalink table rows for York
     ${row}=    user gets row with group and indicator    York    Number of fixed period exclusions
     user checks row contains heading    ${row}    Number of fixed period exclusions
-    user checks row cell contains text    ${row}    1    1,073
+    user checks row cell contains text    ${row}    1    892
     user checks row cell contains text    ${row}    2    1,214
-    user checks row cell contains text    ${row}    3    892
+    user checks row cell contains text    ${row}    3    1,073
 
     ${row}=    user gets row with group and indicator    York    Number of permanent exclusions
     user checks row contains heading    ${row}    Number of permanent exclusions
-    user checks row cell contains text    ${row}    1    55
+    user checks row cell contains text    ${row}    1    3
     user checks row cell contains text    ${row}    2    25
-    user checks row cell contains text    ${row}    3    3
+    user checks row cell contains text    ${row}    3    55
 
     ${row}=    user gets row with group and indicator    York    Number of pupils
     user checks row contains heading    ${row}    Number of pupils
-    user checks row cell contains text    ${row}    1    10,179
+    user checks row cell contains text    ${row}    1    9,870
     user checks row cell contains text    ${row}    2    9,955
-    user checks row cell contains text    ${row}    3    9,870
+    user checks row cell contains text    ${row}    3    10,179

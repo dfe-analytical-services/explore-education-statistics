@@ -25,7 +25,6 @@ using GovUk.Education.ExploreEducationStatistics.Data.Services.Utils;
 using GovUk.Education.ExploreEducationStatistics.Data.ViewModels.Meta;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using static GovUk.Education.ExploreEducationStatistics.Common.Validators.ValidationUtils;

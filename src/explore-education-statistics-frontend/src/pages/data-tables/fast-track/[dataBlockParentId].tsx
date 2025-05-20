@@ -65,6 +65,7 @@ export const getServerSideProps: GetServerSideProps<TableToolPageProps> =
           },
           latestRelease: {
             title: fastTrack.latestReleaseTitle,
+            slug: fastTrack.latestReleaseSlug,
           },
         },
         subjectMeta,

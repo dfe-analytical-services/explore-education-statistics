@@ -306,8 +306,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             // Publishing a scheduled release relies on two Azure Functions which are triggered by cron expressions.
             // These notes will refer to them as functions (1) and (2):
-            // PublishReleases (1) - Runs tasks for the releases that are scheduled to be published.
-            // PublishStagedReleaseContent (2) - Runs after (1) and completes publishing of releases.
+            // StageScheduledReleases (1) - Runs tasks for the releases that are scheduled to be published.
+            // PublishScheduledReleases (2) - Runs after (1) and completes publishing of releases.
 
             // The cron expressions are configurable per environment to allow different schedules for testing.
 
@@ -338,19 +338,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
             // Publishing won't occur unless there's an occurrence of (1) between the publishing range
             var nextOccurrenceUtc = GetNextOccurrenceForCronExpression(
-                cronExpression: _options.PublishReleasesCronSchedule,
+                cronExpression: _options.StageScheduledReleasesFunctionCronSchedule,
                 fromUtc: fromUtc,
                 toUtc: toUtc,
-                timeZoneInfo: ukTimeZone);
+                timeZone: ukTimeZone);
 
             if (nextOccurrenceUtc.HasValue)
             {
                 // Publishing won't occur unless there's an occurrence of (2) after (1) but before the end of the range
                 return GetNextOccurrenceForCronExpression(
-                    cronExpression: _options.PublishReleaseContentCronSchedule,
+                    cronExpression: _options.PublishScheduledReleasesFunctionCronSchedule,
                     fromUtc: nextOccurrenceUtc.Value,
                     toUtc: toUtc,
-                    timeZoneInfo: ukTimeZone).HasValue;
+                    timeZone: ukTimeZone).HasValue;
             }
 
             return false;
@@ -360,7 +360,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             string cronExpression,
             DateTime fromUtc,
             DateTime toUtc,
-            TimeZoneInfo timeZoneInfo,
+            TimeZoneInfo timeZone,
             bool fromInclusive = true,
             bool toInclusive = true)
         {
@@ -369,7 +369,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             var expression = CronExpression.Parse(cronExpression,
                 CronExpressionHasSecondPrecision(cronExpression) ? CronFormat.IncludeSeconds : CronFormat.Standard);
 
-            var occurrences = expression.GetOccurrences(fromUtc, toUtc, timeZoneInfo, fromInclusive, toInclusive)
+            var occurrences = expression.GetOccurrences(fromUtc, toUtc, timeZone, fromInclusive, toInclusive)
                 .ToList();
             return occurrences.Any() ? occurrences[0] : null;
         }

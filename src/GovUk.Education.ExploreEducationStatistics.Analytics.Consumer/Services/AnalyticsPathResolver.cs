@@ -21,7 +21,16 @@ public class AnalyticsPathResolver : IAnalyticsPathResolver
             );
         }
         
-        _basePath = GetBasePath(options.Value.BasePath, environment);
+        var originalPath = options.Value.BasePath;
+        if (environment.IsDevelopment())
+        {
+            _basePath = Path.Combine(PathUtils.ProjectRootPath, PathUtils.OsPath(originalPath));
+        }
+        else
+        {
+            _basePath = originalPath;
+        }
+
     }
 
     public string BasePath()
@@ -29,14 +38,15 @@ public class AnalyticsPathResolver : IAnalyticsPathResolver
         return _basePath;
     }
 
+    private string ReportsDirectoryPath()
+    {
+        return Path.Combine(_basePath, "reports");
+    }
+
+    // PublicApiQueries
     public string PublicApiQueriesDirectoryPath()
     {
         return Path.Combine(_basePath, "public-api", "queries");
-    }
-
-    public string PublicApiQueriesProcessingDirectoryPath()
-    {
-        return Path.Combine(PublicApiQueriesDirectoryPath(), "processing");
     }
 
     public string PublicApiQueriesReportsDirectoryPath()
@@ -44,18 +54,36 @@ public class AnalyticsPathResolver : IAnalyticsPathResolver
         return Path.Combine(ReportsDirectoryPath(), "public-api", "queries");
     }
     
-    private string ReportsDirectoryPath()
+    // PublicApiDataSets
+    public string PublicApiDataSetCallsDirectoryPath()
     {
-        return Path.Combine(_basePath, "reports");
+        return Path.Combine(_basePath, "public-api", "data-sets");
     }
 
-    private string GetBasePath(string originalPath, IHostEnvironment environment)
+    public string PublicApiDataSetCallsReportsDirectoryPath()
     {
-        if (!environment.IsDevelopment())
-        {
-            return originalPath;
-        }
-        
-        return Path.Combine(PathUtils.ProjectRootPath, PathUtils.OsPath(originalPath));
+        return Path.Combine(PublicApiDataSetCallsDirectoryPath(), "public-api", "data-sets");
+    }
+
+    // PublicApiDataSetVersions
+    public string PublicApiDataSetVersionCallsDirectoryPath()
+    {
+        return Path.Combine(_basePath, "public-api", "data-set-versions");
+    }
+
+    public string PublicApiDataSetVersionCallsReportsDirectoryPath()
+    {
+        return Path.Combine(PublicApiDataSetVersionCallsDirectoryPath(), "public-api", "data-set-versions");
+    }
+
+    // PublicZipDownloads
+    public string PublicZipDownloadsDirectoryPath()
+    {
+        return Path.Combine(_basePath, "public", "zip-downloads");
+    }
+
+    public string PublicZipDownloadsReportsDirectoryPath()
+    {
+        return Path.Combine(ReportsDirectoryPath(), "public", "zip-downloads");
     }
 }

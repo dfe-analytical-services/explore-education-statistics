@@ -20,10 +20,10 @@ public class DataSetsController(
     : ControllerBase
 {
     /// <summary>
-    /// Get a data set’s summary
+    /// Get a data set's summary
     /// </summary>
     /// <remarks>
-    /// Gets a specific data set’s summary details.
+    /// Gets a data set's summary details.
     /// </remarks>
     [HttpGet("{dataSetId:guid}")]
     [Produces(MediaTypeNames.Application.Json)]
@@ -42,7 +42,7 @@ public class DataSetsController(
     }
 
     /// <summary>
-    /// Get a data set’s metadata
+    /// Get a data set's metadata
     /// </summary>
     /// <remarks>
     /// Get the metadata about a data set. Use this to create data set queries.
@@ -281,7 +281,7 @@ public class DataSetsController(
     )]
     [SwaggerResponse(403, type: typeof(ProblemDetailsViewModel), contentTypes: MediaTypeNames.Application.Json)]
     [SwaggerResponse(404, type: typeof(ProblemDetailsViewModel), contentTypes: MediaTypeNames.Application.Json)]
-    public async Task<ActionResult> DownloadDataSetCsv(
+    public async Task<ActionResult> DownloadDataSetCsv( // TODO EES-6007 analytics
         [SwaggerParameter("The ID of the data set.")] Guid dataSetId,
         [SwaggerParameter("""
                           The data set version e.g. 1.0, 1.1, 2.0, etc.

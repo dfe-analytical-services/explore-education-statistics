@@ -2,8 +2,16 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services.Interf
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Services;
 
-public class TestAnalyticsPathResolver : IAnalyticsPathResolver
+public class TestAnalyticsPathResolver : IAnalyticsPathResolver, IDisposable
 {
+    public void Dispose()
+    {
+        if (Directory.Exists(_basePath))
+        {
+            Directory.Delete(_basePath, recursive: true);
+        }
+    }
+
     private readonly string _basePath = Path.Combine(
         Path.GetTempPath(),
         "ExploreEducationStatistics",

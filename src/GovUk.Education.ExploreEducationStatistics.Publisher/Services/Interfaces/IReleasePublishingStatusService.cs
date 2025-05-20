@@ -13,22 +13,43 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfac
             bool immediate,
             IEnumerable<ReleasePublishingStatusLogMessage>? logMessages = null);
 
-        Task<IReadOnlyList<ReleasePublishingKey>> GetWherePublishingDueToday(
-            ReleasePublishingStatusContentStage? content = null,
-            ReleasePublishingStatusFilesStage? files = null,
-            ReleasePublishingStatusPublishingStage? publishing = null,
-            ReleasePublishingStatusOverallStage? overall = null);
+        /// <summary>
+        /// Retrieves a list of release publishing keys for release versions scheduled for publishing,
+        /// relative to a specified date.
+        /// </summary>
+        /// <param name="comparison">The type of date comparison to perform.</param>
+        /// <param name="referenceDate">The date used for the comparison.</param>
+        /// <returns>
+        /// A read-only list of <see cref="ReleasePublishingKey"/> objects representing the release versions
+        /// scheduled for publishing relative to the specified date.
+        /// </returns>
+        Task<IReadOnlyList<ReleasePublishingKey>> GetScheduledReleasesForPublishingRelativeToDate(
+            DateComparison comparison,
+            DateTimeOffset referenceDate);
 
-        Task<IReadOnlyList<ReleasePublishingKey>> GetWherePublishingDueTodayOrInFuture(
-            IReadOnlyList<Guid> releaseVersionIds,
-            ReleasePublishingStatusContentStage? content = null,
-            ReleasePublishingStatusFilesStage? files = null,
-            ReleasePublishingStatusPublishingStage? publishing = null,
-            ReleasePublishingStatusOverallStage? overall = null);
+        /// <summary>
+        /// Retrieves a list of release publishing keys for release versions that are ready to be published at their
+        /// scheduled time.
+        /// </summary>
+        /// <returns>
+        /// A read-only list of <see cref="ReleasePublishingKey"/> objects representing the release versions
+        /// ready for scheduled publishing.
+        /// </returns>
+        Task<IReadOnlyList<ReleasePublishingKey>> GetScheduledReleasesReadyForPublishing();
 
-        Task<List<ReleasePublishingStatus>> GetAllByOverallStage(
+        /// <summary>
+        /// Retrieves a list of release publishing keys for a specific release version
+        /// that match the provided overall publishing stages.
+        /// </summary>
+        /// <param name="releaseVersionId">The unique identifier of the release version.</param>
+        /// <param name="overallStages">An array of <see cref="ReleasePublishingStatusOverallStage"/> values representing
+        /// the overall publishing stages to match.</param>
+        /// <returns>
+        /// A read-only list of <see cref="ReleasePublishingKey"/> objects that match the specified criteria.
+        /// </returns>
+        Task<IReadOnlyList<ReleasePublishingKey>> GetReleasesWithOverallStages(
             Guid releaseVersionId,
-            params ReleasePublishingStatusOverallStage[] overallStages);
+            ReleasePublishingStatusOverallStage[] overallStages);
 
         Task<ReleasePublishingStatus> Get(ReleasePublishingKey releasePublishingKey);
 

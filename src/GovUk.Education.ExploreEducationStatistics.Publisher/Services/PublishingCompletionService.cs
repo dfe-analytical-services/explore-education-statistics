@@ -75,38 +75,10 @@ public class PublishingCompletionService(
                 }
             });
 
-        var publishedReleaseVersionInfos = await contentDbContext
-            .ReleaseVersions
-            .Where(rv => releaseVersionIdsToUpdate.Contains(rv.Id))
-            .Select(rv => new PublishedReleaseVersionInfo
-            {
-                ReleaseVersionId = rv.Id, 
-                ReleaseId = rv.ReleaseId,
-                ReleaseSlug = rv.Release.Slug,
-                PublicationId = rv.Release.PublicationId
-            })
-            .Distinct()
-            .ToListAsync();
+        var publishedReleaseVersionInfos = await BuildPublishedReleaseVersionInfos(releaseVersionIdsToUpdate);
+        var publishedPublicationInfos = await PublishPublications(publishedReleaseVersionInfos);
 
-        publishedReleaseVersionInfos = await publishedReleaseVersionInfos
-            .ToAsyncEnumerable()
-            .SelectAwait(UpdateLatestPublishedReleaseVersionForPublication)
-            .ToListAsync();
-
-        var directlyRelatedPublicationIds = publishedReleaseVersionInfos.Select(info => info.PublicationId).Distinct().ToList();
-        
-        // Update the cached publication and any cached superseded publications.
-        // If this is the first live release of the publication, the superseding is now enforced
-        var publicationSlugsToUpdate = await contentDbContext
-            .Publications
-            .Where(p => directlyRelatedPublicationIds.Contains(p.Id) ||
-                        (p.SupersededById != null && directlyRelatedPublicationIds.Contains(p.SupersededById.Value)))
-            .Select(p => p.Slug)
-            .ToListAsync();
-
-        await publicationSlugsToUpdate
-            .ToAsyncEnumerable()
-            .ForEachAwaitAsync(publicationCacheService.UpdatePublication);
+        await HandleArchivedPublications(publishedPublicationInfos);
 
         await contentService.DeletePreviousVersionsDownloadFiles(releaseVersionIdsToUpdate);
         await contentService.DeletePreviousVersionsContent(releaseVersionIdsToUpdate);
@@ -121,8 +93,8 @@ public class PublishingCompletionService(
 
         await dataSetPublishingService.PublishDataSets(releaseVersionIdsToUpdate);
 
-        await publisherEventRaiser.RaiseReleaseVersionPublishedEvents(publishedReleaseVersionInfos);
-        
+        await publisherEventRaiser.OnReleaseVersionsPublished(publishedPublicationInfos);
+
         await prePublishingStagesComplete
             .ToAsyncEnumerable()
             .ForEachAwaitAsync(async status =>
@@ -130,31 +102,88 @@ public class PublishingCompletionService(
                     .UpdatePublishingStage(status.AsTableRowKey(), ReleasePublishingStatusPublishingStage.Complete));
     }
 
-    public record PublishedReleaseVersionInfo
+    private async ValueTask<List<PublishedReleaseVersionInfo>>
+        BuildPublishedReleaseVersionInfos(IReadOnlyList<Guid> releaseVersionIds)
     {
-        public Guid ReleaseVersionId { get; init; }
-        public Guid ReleaseId {get;init;}
-        public string ReleaseSlug { get; init; } = string.Empty;
-        public Guid PublicationId { get; init; }
-        public string PublicationSlug { get; init; } = string.Empty;
-        public Guid PublicationLatestPublishedReleaseVersionId { get; init; }
+        return await contentDbContext
+            .ReleaseVersions
+            .Where(rv => releaseVersionIds.Contains(rv.Id))
+            .Select(rv => new PublishedReleaseVersionInfo
+            {
+                ReleaseVersionId = rv.Id,
+                ReleaseId = rv.ReleaseId,
+                ReleaseSlug = rv.Release.Slug,
+                PublicationId = rv.Release.PublicationId
+            })
+            .ToListAsync();
     }
 
-    private async ValueTask<PublishedReleaseVersionInfo> UpdateLatestPublishedReleaseVersionForPublication(PublishedReleaseVersionInfo info)
+    private async ValueTask<List<PublishedPublicationInfo>> PublishPublications(
+        IReadOnlyList<PublishedReleaseVersionInfo> releaseVersions)
+    {
+        return await releaseVersions
+            .GroupBy(info => info.PublicationId)
+            .ToAsyncEnumerable()
+            .SelectAwait(group => PublishPublication(
+                publicationId: group.Key,
+                publishedReleaseVersions: group.ToList()))
+            .ToListAsync();
+    }
+
+    private async ValueTask<PublishedPublicationInfo> PublishPublication(
+        Guid publicationId,
+        IReadOnlyList<PublishedReleaseVersionInfo> publishedReleaseVersions)
     {
         var publication = await contentDbContext.Publications
-            .SingleAsync(p => p.Id == info.PublicationId);
+            .Include(p => p.LatestPublishedReleaseVersion)
+            .SingleAsync(p => p.Id == publicationId);
 
-        var latestPublishedReleaseVersion = await releaseService.GetLatestPublishedReleaseVersion(info.PublicationId);
+        var previousLatestPublishedReleaseVersion = publication.LatestPublishedReleaseVersion;
 
+        // Update the latest published releaseVersion for the publication
+        var latestPublishedReleaseVersion = await releaseService.GetLatestPublishedReleaseVersion(publicationId);
         publication.LatestPublishedReleaseVersionId = latestPublishedReleaseVersion.Id;
-
         await contentDbContext.SaveChangesAsync();
-        
-        return info with
+
+        // Invalidate the cache for the publication
+        await publicationCacheService.UpdatePublication(publication.Slug);
+
+        return new PublishedPublicationInfo
         {
-            PublicationLatestPublishedReleaseVersionId = latestPublishedReleaseVersion.Id,
-            PublicationSlug = publication.Slug
+            PublicationId = publication.Id,
+            PublicationSlug = publication.Slug,
+            LatestPublishedReleaseId = latestPublishedReleaseVersion.ReleaseId,
+            LatestPublishedReleaseVersionId = latestPublishedReleaseVersion.Id,
+            PreviousLatestPublishedReleaseId = previousLatestPublishedReleaseVersion?.ReleaseId,
+            PreviousLatestPublishedReleaseVersionId = previousLatestPublishedReleaseVersion?.Id,
+            PublishedReleaseVersions = publishedReleaseVersions
         };
+    }
+
+    private async Task HandleArchivedPublications(IReadOnlyList<PublishedPublicationInfo> publications)
+    {
+        // Archived publications are those replaced by another publication with at least one published release.
+        // Filter publications from this run, excluding those already published.
+        var newlyPublishedPublicationIds = publications
+            .Where(p => !p.WasAlreadyPublished)
+            .Select(p => p.PublicationId)
+            .ToList();
+
+        // Find publications that should now be archived because they have been replaced by these publications
+        var archivedPublications = await contentDbContext.Publications
+            .Where(p => p.SupersededById != null && newlyPublishedPublicationIds.Contains(p.SupersededById.Value))
+            .ToListAsync();
+
+        foreach (var archivedPublication in archivedPublications)
+        {
+            // Invalidate the cache of the publication to reflect its new archived status
+            await publicationCacheService.UpdatePublication(archivedPublication.Slug);
+
+            // Raise an event to indicate the publication has been archived
+            await publisherEventRaiser.OnPublicationArchived(
+                archivedPublication.Id,
+                archivedPublication.Slug,
+                archivedPublication.SupersededById!.Value);
+        }
     }
 }

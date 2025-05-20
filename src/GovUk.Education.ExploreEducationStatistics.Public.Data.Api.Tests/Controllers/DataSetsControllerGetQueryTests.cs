@@ -3,7 +3,6 @@ using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
-using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Requests;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services;
@@ -30,7 +29,7 @@ using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockU
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Controllers;
 
-public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory testApp) : IntegrationTestFixture(testApp)
+public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory testApp) : IntegrationTestFixtureWithCommonTestDataSetup(testApp)
 {
     private const string BaseUrl = "v1/data-sets";
 
@@ -104,6 +103,45 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
             );
 
             response.AssertNotFound();
+        }
+        
+        [Theory]
+        [MemberData(nameof(DataSetVersionStatusQueryTheoryData.NonPublishedStatus),
+            MemberType = typeof(DataSetVersionStatusQueryTheoryData))]
+        public async Task WildCardSpecified_RequestsNonPublishedVersion_Returns404(DataSetVersionStatus versionStatus)
+        {
+            var (dataSet, versions) = await SetupDataSetWithSpecifiedVersionStatuses(versionStatus);
+            
+            var response = await QueryDataSet(
+                dataSetId: dataSet.Id,
+                dataSetVersion: "2.*",
+                previewTokenId: versions.Last().PreviewTokens[0].Id,
+                indicators: [AbsenceSchoolData.IndicatorSessAuthorised]);
+
+            response.AssertNotFound();
+        }
+        
+        [Fact]
+        public async Task WildCardSpecified_RequestsPublishedVersion_Returns200()
+        {
+            var (dataSet, versions) = await SetupDataSetWithSpecifiedVersionStatuses(DataSetVersionStatus.Published);
+            
+            var response = await QueryDataSet(
+                dataSetId: dataSet.Id,
+                dataSetVersion: "2.*",
+                previewTokenId: versions.Last().PreviewTokens[0].Id,
+                indicators: [AbsenceSchoolData.IndicatorSessAuthorised]);
+
+            response.AssertOk();
+            
+            var viewModel = response.AssertOk<DataSetQueryPaginatedResultsViewModel>(useSystemJson: true);
+            Assert.Equal(1, viewModel.Paging.Page);
+            Assert.Equal(1, viewModel.Paging.TotalPages);
+            Assert.Equal(216, viewModel.Paging.TotalResults);
+
+            Assert.Empty(viewModel.Warnings);
+
+            Assert.Equal(216, viewModel.Results.Count);
         }
     }
 
@@ -2962,9 +3000,9 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
         public async Task ExceptionThrownByQueryAnalyticsManager_SuccessfulResultsStillReturned()
         {
             // Set up the manager to throw an exception when the service attempts to add a query to it.
-            var analyticsManagerMock = new Mock<IQueryAnalyticsManager>(MockBehavior.Strict);
+            var analyticsManagerMock = new Mock<IAnalyticsManager>(MockBehavior.Strict);
             analyticsManagerMock
-                .Setup(m => m.AddQuery(
+                .Setup(m => m.Add(
                     It.IsAny<CaptureDataSetVersionQueryRequest>(), 
                     It.IsAny<CancellationToken>()))
                 .Throws(new Exception("Error"));
@@ -3132,6 +3170,7 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
 
         return dataSetVersion;
     }
+
 
     private WebApplicationFactory<Startup> BuildApp()
     {

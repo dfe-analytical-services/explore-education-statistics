@@ -4,7 +4,6 @@ using GovUk.Education.ExploreEducationStatistics.Common.Validators;
 using GovUk.Education.ExploreEducationStatistics.Common.Validators.ErrorDetails;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Requests;
-using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Validators;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Validators.ErrorDetails;
 using ValidationMessages = GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Validators.ValidationMessages;
 

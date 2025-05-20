@@ -1,7 +1,9 @@
-﻿using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.RefreshSearchableDocument;
-using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.RefreshSearchableDocument.Dto;
+﻿using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.CommandHandlers.RefreshSearchableDocument;
+using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.CommandHandlers.RefreshSearchableDocument.Dto;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Services;
+using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Services.CreateSearchableDocuments;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Tests.Builders;
+using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Tests.TheoryDataHelpers;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Tests.Functions.RefreshSearchableDocument;
 
@@ -9,7 +11,9 @@ public class RefreshSearchableDocumentFunctionTests
 {
     private readonly SearchableDocumentCreatorMockBuilder _searchableDocumentCreatorMockBuilder = new();
     
-    private RefreshSearchableDocumentFunction GetSut() => new(_searchableDocumentCreatorMockBuilder.Build());
+    private RefreshSearchableDocumentFunction GetSut() => new(
+        _searchableDocumentCreatorMockBuilder.Build(), 
+        new TestableCommandHandler());
     
     [Fact]
     public void Can_instantiate_SUT() => Assert.NotNull(GetSut());
@@ -33,8 +37,7 @@ public class RefreshSearchableDocumentFunctionTests
     }
     
     [Theory]
-    [InlineData("")]
-    [InlineData(null)]
+    [MemberData(nameof(TheoryDatas.Blank.Strings), MemberType = typeof(TheoryDatas.Blank))]
     public async Task WhenMessageHasNoPublicationSlug_ThenDocumentCreatorNotCalled(string? blankPublicationSlug)
     {
         // ARRANGE

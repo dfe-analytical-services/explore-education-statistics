@@ -33,25 +33,28 @@ switch ($dataSourceType)
 {
     "azureblob" {
         $dataSourceDefinition = @{
-            'name' = $dataSourceName;
-            'type' = $dataSourceType;
+            'name' = $dataSourceName
+            'type' = $dataSourceType
             'container' = @{
-                'name' = $dataSourceContainerName;
-                'query' = $dataSourceContainerQuery;
-            };
+                'name' = $dataSourceContainerName
+                'query' = $dataSourceContainerQuery
+            }
             'credentials' = @{
-                'connectionString' = $dataSourceConnectionString;
-            };
+                'connectionString' = $dataSourceConnectionString
+            }
             'dataDeletionDetectionPolicy' = @{
-                '@odata.type' = '#Microsoft.Azure.Search.NativeBlobSoftDeleteDeletionDetectionPolicy';
-            };
+                '@odata.type' = '#Microsoft.Azure.Search.NativeBlobSoftDeleteDeletionDetectionPolicy'
+            }
         }
         $indexerDefinition = @{
-            'name' = $indexerName;
-            'disabled' = $indexerDisabled -eq 'true';
-            'targetIndexName' = $indexDefinition.name;
-            'dataSourceName' = $dataSourceName;
-            'schedule' = $indexerScheduleInterval.Length -gt 0 ? @{ 'interval' = $indexerScheduleInterval } : $null;
+            'name' = $indexerName
+            'disabled' = $indexerDisabled -eq 'true'
+            'targetIndexName' = $indexDefinition.name
+            'dataSourceName' = $dataSourceName
+            'schedule' = $indexerScheduleInterval.Length -gt 0 ? @{ 
+                'interval' = $indexerScheduleInterval
+                'startTime' = '2025-01-01T00:00:00Z'
+            } : $null
         }
     }
     default {
@@ -66,7 +69,7 @@ try {
         -Method 'PUT' `
         -Uri "$uri/indexes/$($indexDefinition.name)?api-version=$apiVersion" `
         -Headers  $headers `
-        -Body (ConvertTo-Json $indexDefinition)
+        -Body (ConvertTo-Json -Compress -Depth 100 $indexDefinition)
 
     if ($dataSourceContainerName.Length -gt 0 -and $dataSourceConnectionString.Length -gt 0)
     {
@@ -75,14 +78,14 @@ try {
             -Method 'PUT' `
             -Uri "$uri/datasources/$($dataSourceDefinition['name'])?api-version=$apiVersion" `
             -Headers $headers `
-            -Body (ConvertTo-Json $dataSourceDefinition)
+            -Body (ConvertTo-Json -Compress -Depth 100 $dataSourceDefinition)
 
         # https://learn.microsoft.com/rest/api/searchservice/create-indexer
         Invoke-WebRequest `
             -Method 'PUT' `
             -Uri "$uri/indexers/$($indexerDefinition['name'])?api-version=$apiVersion" `
             -Headers $headers `
-            -Body (ConvertTo-Json $indexerDefinition)
+            -Body (ConvertTo-Json -Compress -Depth 100 $indexerDefinition)
     }
     $DeploymentScriptOutputs['result'] = 'Success'
 } catch {

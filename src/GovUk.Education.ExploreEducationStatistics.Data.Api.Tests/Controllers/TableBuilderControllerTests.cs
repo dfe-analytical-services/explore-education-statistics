@@ -566,6 +566,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
             viewModel.FullTable.AssertDeepEqualTo(_tableBuilderResults);
             Assert.True(viewModel.LatestData);
             Assert.Equal(release.Title, viewModel.LatestReleaseTitle);
+            Assert.Equal(release.Slug, viewModel.LatestReleaseSlug);
 
             var queryViewModel = viewModel.Query;
             Assert.NotNull(queryViewModel);
@@ -683,6 +684,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
             Assert.Equal(releaseVersion.Type, viewModel.ReleaseType);
             Assert.False(viewModel.LatestData);
             Assert.Equal(release2021.Title, viewModel.LatestReleaseTitle);
+            Assert.Equal(release2021.Slug, viewModel.LatestReleaseSlug);
         }
 
         private WebApplicationFactory<Startup> SetupApp(

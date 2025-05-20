@@ -84,6 +84,7 @@ const PublicationReleaseHeadlinesSection = ({
       releaseVersionId={releaseVersionId}
       getInfographic={getReleaseFile}
       dataBlock={keyStatisticsSecondarySection.content[0]}
+      dataBlockStaleTime={Infinity}
       firstTabs={summaryTab}
     />
   );

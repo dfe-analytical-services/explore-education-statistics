@@ -19,6 +19,8 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Content.Services.Requests;
+using Microsoft.Extensions.Logging;
 using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainers;
@@ -246,6 +248,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     (stream, _, _) => { stream.WriteText("Test data guidance blob"); }
                 );
 
+            // This should not happen during normal usage, as the public frontend doesn't allow users to request
+            // multiple files. At the time of writing, the service only officially allows users to download all data
+            // sets for a release (if fileIds is null) or a specific data set. But this endpoint takes an array of
+            // files as this is what the old Data catalogue page allowed.
+            var logger = new Mock<ILogger<ReleaseFileService>>(MockBehavior.Strict);
+            var expectedWarning =
+                "We only record analytics for zip downloads for an entire release or one specific data set. So this means someone manually attempted to download a zip with more than one specific file?";
+            MockUtils.ExpectLogMessage(logger, LogLevel.Warning, expectedWarning);
+
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
                 var path = GenerateZipFilePath();
@@ -254,7 +265,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 var service = SetupReleaseFileService(
                     contentDbContext: contentDbContext,
                     publicBlobStorageService: publicBlobStorageService.Object,
-                    dataGuidanceFileWriter: dataGuidanceFileWriter.Object);
+                    dataGuidanceFileWriter: dataGuidanceFileWriter.Object,
+                    logger: logger.Object);
 
                 var fileIds = releaseFiles.Select(file => file.FileId).ToList();
 
@@ -285,13 +297,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
         }
 
         [Fact]
-        public async Task ZipFilesToStream_DataGuidanceForMultipleDataFiles()
+        public async Task ZipFilesToStream_DataGuidanceForSingleDataFile()
         {
             ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion()
                 .WithRelease(_dataFixture.DefaultRelease()
                     .WithPublication(_dataFixture.DefaultPublication()));
 
-            var releaseFile1 = new ReleaseFile
+            var releaseFile = new ReleaseFile
             {
                 ReleaseVersion = releaseVersion,
                 File = new Model.File
@@ -301,37 +313,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     Type = FileType.Data
                 }
             };
-            var releaseFile2 = new ReleaseFile
-            {
-                ReleaseVersion = releaseVersion,
-                File = new Model.File
-                {
-                    RootPath = Guid.NewGuid(),
-                    Filename = "data-2.csv",
-                    Type = FileType.Data
-                }
-            };
-            var releaseFiles = ListOf(releaseFile1, releaseFile2);
 
             var contentDbContextId = Guid.NewGuid().ToString();
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
                 contentDbContext.ReleaseVersions.Add(releaseVersion);
-                contentDbContext.ReleaseFiles.AddRange(releaseFiles);
+                contentDbContext.ReleaseFiles.AddRange(releaseFile);
                 await contentDbContext.SaveChangesAsync();
             }
 
             var publicBlobStorageService = new Mock<IPublicBlobStorageService>(MockBehavior.Strict);
 
             publicBlobStorageService
-                .SetupCheckBlobExists(PublicReleaseFiles, releaseFile1.PublicPath(), true);
+                .SetupCheckBlobExists(PublicReleaseFiles, releaseFile.PublicPath(), true);
             publicBlobStorageService
-                .SetupCheckBlobExists(PublicReleaseFiles, releaseFile2.PublicPath(), true);
-            publicBlobStorageService
-                .SetupDownloadToStream(PublicReleaseFiles, releaseFile1.PublicPath(), "Test data 1 blob");
-            publicBlobStorageService
-                .SetupDownloadToStream(PublicReleaseFiles, releaseFile2.PublicPath(), "Test data 2 blob");
+                .SetupDownloadToStream(PublicReleaseFiles, releaseFile.PublicPath(), "Test data 1 blob");
 
             var dataGuidanceFileWriter = new Mock<IDataGuidanceFileWriter>(MockBehavior.Strict);
 
@@ -340,12 +337,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     s => s.WriteToStream(
                         It.IsAny<Stream>(),
                         It.Is<ReleaseVersion>(rv => rv.Id == releaseVersion.Id),
-                        ListOf(releaseFile1.FileId, releaseFile2.FileId))
+                        ListOf(releaseFile.FileId))
                 )
                 .Returns<Stream, ReleaseVersion, IEnumerable<Guid>?>((stream, _, _) => Task.FromResult(stream))
                 .Callback<Stream, ReleaseVersion, IEnumerable<Guid>?>(
                     (stream, _, _) => { stream.WriteText("Test data guidance blob"); }
                 );
+
+            var captureRequest = new CaptureZipDownloadRequest
+            (
+                PublicationName: releaseVersion.Release.Publication.Title,
+                ReleaseVersionId: releaseVersion.Id,
+                ReleaseName: releaseVersion.Release.Title,
+                ReleaseLabel: releaseVersion.Release.Label,
+                SubjectId: releaseFile.File.SubjectId,
+                DataSetTitle: releaseFile.Name
+            );
+            var analyticsManager = new Mock<IAnalyticsManager>(MockBehavior.Strict);
+            analyticsManager.Setup(m => m.Add(
+                    ItIs.DeepEqualTo(captureRequest),
+                    It.IsAny<CancellationToken>()))
+                .Returns(Task.CompletedTask);
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
@@ -355,15 +367,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 var service = SetupReleaseFileService(
                     contentDbContext: contentDbContext,
                     publicBlobStorageService: publicBlobStorageService.Object,
-                    dataGuidanceFileWriter: dataGuidanceFileWriter.Object);
+                    dataGuidanceFileWriter: dataGuidanceFileWriter.Object,
+                    analyticsManager: analyticsManager.Object);
 
-                var fileIds = releaseFiles.Select(file => file.FileId).ToList();
+                var fileId = releaseFile.FileId;
 
                 var result = await service.ZipFilesToStream(
                     releaseVersionId: releaseVersion.Id,
                     outputStream: stream,
-                    fileIds: fileIds
-                );
+                    fileIds: [fileId]);
 
                 MockUtils.VerifyAllMocks(publicBlobStorageService, dataGuidanceFileWriter);
 
@@ -372,115 +384,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 using var zip = ZipFile.OpenRead(path);
 
                 // Entries are sorted alphabetically
-                Assert.Equal(3, zip.Entries.Count);
+                Assert.Equal(2, zip.Entries.Count);
                 Assert.Equal("data/data-1.csv", zip.Entries[0].FullName);
                 Assert.Equal("Test data 1 blob", zip.Entries[0].Open().ReadToEnd());
 
-                Assert.Equal("data/data-2.csv", zip.Entries[1].FullName);
-                Assert.Equal("Test data 2 blob", zip.Entries[1].Open().ReadToEnd());
-
                 // Data guidance is generated if there is at least one data file
-                Assert.Equal("data-guidance/data-guidance.txt", zip.Entries[2].FullName);
-                Assert.Equal("Test data guidance blob", zip.Entries[2].Open().ReadToEnd());
-            }
-        }
-
-        [Fact]
-        public async Task ZipFilesToStream_OrderedAlphabetically()
-        {
-            ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion()
-                .WithRelease(_dataFixture.DefaultRelease()
-                    .WithPublication(_dataFixture.DefaultPublication()));
-
-            var releaseFile1 = new ReleaseFile
-            {
-                ReleaseVersion = releaseVersion,
-                File = new Model.File
-                {
-                    RootPath = Guid.NewGuid(),
-                    Filename = "test-2.pdf",
-                    Type = Ancillary,
-                }
-            };
-            var releaseFile2 = new ReleaseFile
-            {
-                ReleaseVersion = releaseVersion,
-                File = new Model.File
-                {
-                    RootPath = Guid.NewGuid(),
-                    Filename = "test-3.pdf",
-                    Type = Ancillary
-                }
-            };
-            var releaseFile3 = new ReleaseFile
-            {
-                ReleaseVersion = releaseVersion,
-                File = new Model.File
-                {
-                    RootPath = Guid.NewGuid(),
-                    Filename = "test-1.pdf",
-                    Type = Ancillary
-                }
-            };
-            var releaseFiles = ListOf(releaseFile1, releaseFile2, releaseFile3);
-
-            var contentDbContextId = Guid.NewGuid().ToString();
-
-            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
-            {
-                contentDbContext.ReleaseVersions.Add(releaseVersion);
-                contentDbContext.ReleaseFiles.AddRange(releaseFiles);
-                await contentDbContext.SaveChangesAsync();
-            }
-
-            var path = GenerateZipFilePath();
-            var stream = File.OpenWrite(path);
-
-            var publicBlobStorageService = new Mock<IPublicBlobStorageService>(MockBehavior.Strict);
-
-            publicBlobStorageService
-                .SetupCheckBlobExists(PublicReleaseFiles, releaseFile1.PublicPath(), true);
-            publicBlobStorageService
-                .SetupCheckBlobExists(PublicReleaseFiles, releaseFile2.PublicPath(), true);
-            publicBlobStorageService
-                .SetupCheckBlobExists(PublicReleaseFiles, releaseFile3.PublicPath(), true);
-            publicBlobStorageService
-                .SetupDownloadToStream(PublicReleaseFiles, releaseFile1.PublicPath(), "Test 2 blob");
-            publicBlobStorageService
-                .SetupDownloadToStream(PublicReleaseFiles, releaseFile2.PublicPath(), "Test 3 blob");
-            publicBlobStorageService
-                .SetupDownloadToStream(PublicReleaseFiles, releaseFile3.PublicPath(), "Test 1 blob");
-
-            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
-            {
-                var service = SetupReleaseFileService(
-                    contentDbContext: contentDbContext,
-                    publicBlobStorageService: publicBlobStorageService.Object);
-
-                var fileIds = releaseFiles.Select(file => file.FileId).ToList();
-
-                var result = await service.ZipFilesToStream(
-                    releaseVersionId: releaseVersion.Id,
-                    outputStream: stream,
-                    fileIds: fileIds
-                );
-
-                MockUtils.VerifyAllMocks(publicBlobStorageService);
-
-                result.AssertRight();
-
-                using var zip = ZipFile.OpenRead(path);
-
-                // Entries are sorted alphabetically
-                Assert.Equal(3, zip.Entries.Count);
-                Assert.Equal("supporting-files/test-1.pdf", zip.Entries[0].FullName);
-                Assert.Equal("Test 1 blob", zip.Entries[0].Open().ReadToEnd());
-
-                Assert.Equal("supporting-files/test-2.pdf", zip.Entries[1].FullName);
-                Assert.Equal("Test 2 blob", zip.Entries[1].Open().ReadToEnd());
-
-                Assert.Equal("supporting-files/test-3.pdf", zip.Entries[2].FullName);
-                Assert.Equal("Test 3 blob", zip.Entries[2].Open().ReadToEnd());
+                Assert.Equal("data-guidance/data-guidance.txt", zip.Entries[1].FullName);
+                Assert.Equal("Test data guidance blob", zip.Entries[1].Open().ReadToEnd());
             }
         }
 
@@ -548,11 +458,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
             var publicBlobStorageService = new Mock<IPublicBlobStorageService>(MockBehavior.Strict);
 
+            var captureRequest = new CaptureZipDownloadRequest
+            (
+                PublicationName: releaseVersion.Release.Publication.Title,
+                ReleaseVersionId: releaseVersion.Id,
+                ReleaseName: releaseVersion.Release.Title,
+                ReleaseLabel: releaseVersion.Release.Label
+            );
+            var analyticsManager = new Mock<IAnalyticsManager>(MockBehavior.Strict);
+            analyticsManager.Setup(m => m.Add(
+                    ItIs.DeepEqualTo(captureRequest),
+                    It.IsAny<CancellationToken>()))
+                .Returns(Task.CompletedTask);
+
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
                 var service = SetupReleaseFileService(
                     contentDbContext: contentDbContext,
-                    publicBlobStorageService: publicBlobStorageService.Object);
+                    publicBlobStorageService: publicBlobStorageService.Object,
+                    analyticsManager: analyticsManager.Object);
 
                 var fileIds = releaseFiles.Select(file => file.FileId).ToList();
 
@@ -579,7 +503,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 .WithRelease(_dataFixture.DefaultRelease()
                     .WithPublication(_dataFixture.DefaultPublication()));
 
-            var releaseFile1 = new ReleaseFile
+            var releaseFile = new ReleaseFile
             {
                 ReleaseVersion = releaseVersion,
                 File = new Model.File
@@ -589,25 +513,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     Type = FileType.Data,
                 }
             };
-            var releaseFile2 = new ReleaseFile
-            {
-                ReleaseVersion = releaseVersion,
-                File = new Model.File
-                {
-                    RootPath = Guid.NewGuid(),
-                    Filename = "ancillary.pdf",
-                    Type = Ancillary
-                }
-            };
-
-            var releaseFiles = ListOf(releaseFile1, releaseFile2);
 
             var contentDbContextId = Guid.NewGuid().ToString();
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
                 contentDbContext.ReleaseVersions.Add(releaseVersion);
-                contentDbContext.ReleaseFiles.AddRange(releaseFiles);
+                contentDbContext.ReleaseFiles.AddRange(releaseFile);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -616,22 +528,33 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
             var publicBlobStorageService = new Mock<IPublicBlobStorageService>(MockBehavior.Strict);
 
-            // Files do not exist in blob storage
-            publicBlobStorageService.SetupCheckBlobExists(PublicReleaseFiles, releaseFile1.PublicPath(), false);
-            publicBlobStorageService.SetupCheckBlobExists(PublicReleaseFiles, releaseFile2.PublicPath(), false);
+            // File does not exist in blob storage
+            publicBlobStorageService.SetupCheckBlobExists(PublicReleaseFiles, releaseFile.PublicPath(), false);
+
+            var request = new CaptureZipDownloadRequest
+            (
+                PublicationName: releaseVersion.Release.Publication.Title,
+                ReleaseVersionId: releaseVersion.Id,
+                ReleaseName: releaseVersion.Release.Title,
+                ReleaseLabel: releaseVersion.Release.Label
+            );
+            var analyticsManager = new Mock<IAnalyticsManager>(MockBehavior.Strict);
+            analyticsManager.Setup(m => m.Add(
+                    ItIs.DeepEqualTo(request),
+                    It.IsAny<CancellationToken>()))
+                .Returns(Task.CompletedTask);
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
                 var service = SetupReleaseFileService(
                     contentDbContext: contentDbContext,
-                    publicBlobStorageService: publicBlobStorageService.Object);
-
-                var fileIds = releaseFiles.Select(file => file.FileId).ToList();
+                    publicBlobStorageService: publicBlobStorageService.Object,
+                    analyticsManager: analyticsManager.Object);
 
                 var result = await service.ZipFilesToStream(
                     releaseVersionId: releaseVersion.Id,
                     outputStream: stream,
-                    fileIds: fileIds
+                    fileIds: [releaseFile.FileId]
                 );
 
                 MockUtils.VerifyAllMocks(publicBlobStorageService);
@@ -689,11 +612,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
             var publicBlobStorageService = new Mock<IPublicBlobStorageService>(MockBehavior.Strict);
 
+            var request = new CaptureZipDownloadRequest
+            (
+                PublicationName: releaseVersion.Release.Publication.Title,
+                ReleaseVersionId: releaseVersion.Id,
+                ReleaseName: releaseVersion.Release.Title,
+                ReleaseLabel: releaseVersion.Release.Label
+            );
+            var analyticsManager = new Mock<IAnalyticsManager>(MockBehavior.Strict);
+            analyticsManager.Setup(m => m.Add(
+                    ItIs.DeepEqualTo(request),
+                    It.IsAny<CancellationToken>()))
+                .Returns(Task.CompletedTask);
+
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
                 var service = SetupReleaseFileService(
                     contentDbContext: contentDbContext,
-                    publicBlobStorageService: publicBlobStorageService.Object);
+                    publicBlobStorageService: publicBlobStorageService.Object,
+                    analyticsManager: analyticsManager.Object);
 
                 var fileIds = releaseFiles.Select(file => file.FileId).ToList();
 
@@ -733,11 +670,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
             var publicBlobStorageService = new Mock<IPublicBlobStorageService>(MockBehavior.Strict);
 
+            var request = new CaptureZipDownloadRequest
+            (
+                PublicationName: releaseVersion.Release.Publication.Title,
+                ReleaseVersionId: releaseVersion.Id,
+                ReleaseName: releaseVersion.Release.Title,
+                ReleaseLabel: releaseVersion.Release.Label
+            );
+            var analyticsManager = new Mock<IAnalyticsManager>(MockBehavior.Strict);
+            analyticsManager.Setup(m => m.Add(
+                    ItIs.DeepEqualTo(request),
+                    It.IsAny<CancellationToken>()))
+                .Returns(Task.CompletedTask);
+
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
                 var service = SetupReleaseFileService(
                     contentDbContext: contentDbContext,
-                    publicBlobStorageService: publicBlobStorageService.Object);
+                    publicBlobStorageService: publicBlobStorageService.Object,
+                    analyticsManager: analyticsManager.Object);
 
                 var fileIds = ListOf(Guid.NewGuid(), Guid.NewGuid());
                 var result = await service.ZipFilesToStream(releaseVersion.Id, stream, fileIds);
@@ -812,11 +763,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     cancellationToken: tokenSource.Token)
                 .Callback(() => tokenSource.Cancel());
 
+            // This should not happen during normal usage, as the public frontend doesn't allow users to request
+            // multiple files. At the time of writing, the service only officially allows users to download all data
+            // sets for a release (if fileIds is null) or a specific data set. But this endpoint takes an array of
+            // files as this is what the old Data catalogue page allowed.
+            var logger = new Mock<ILogger<ReleaseFileService>>(MockBehavior.Strict);
+            var expectedWarning =
+                "We only record analytics for zip downloads for an entire release or one specific data set. So this means someone manually attempted to download a zip with more than one specific file?";
+            MockUtils.ExpectLogMessage(logger, LogLevel.Warning, expectedWarning);
+
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
                 var service = SetupReleaseFileService(
                     contentDbContext: contentDbContext,
-                    publicBlobStorageService: publicBlobStorageService.Object);
+                    publicBlobStorageService: publicBlobStorageService.Object,
+                    logger: logger.Object);
 
                 var fileIds = releaseFiles.Select(file => file.FileId).ToList();
 
@@ -925,6 +886,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     (stream, _, _) => { stream.WriteText("Test data guidance blob"); }
                 );
 
+            var request = new CaptureZipDownloadRequest
+            (
+                PublicationName: releaseVersion.Release.Publication.Title,
+                ReleaseVersionId: releaseVersion.Id,
+                ReleaseName: releaseVersion.Release.Title,
+                ReleaseLabel: releaseVersion.Release.Label
+            );
+            var analyticsManager = new Mock<IAnalyticsManager>(MockBehavior.Strict);
+            analyticsManager.Setup(m => m.Add(
+                    ItIs.DeepEqualTo(request),
+                    It.IsAny<CancellationToken>()))
+                .Returns(Task.CompletedTask);
+
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
                 var path = GenerateZipFilePath();
@@ -933,7 +907,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 var service = SetupReleaseFileService(
                     contentDbContext: contentDbContext,
                     publicBlobStorageService: publicBlobStorageService.Object,
-                    dataGuidanceFileWriter: dataGuidanceFileWriter.Object);
+                    dataGuidanceFileWriter: dataGuidanceFileWriter.Object,
+                    analyticsManager: analyticsManager.Object);
 
                 var result = await service.ZipFilesToStream(
                     releaseVersionId: releaseVersion.Id,
@@ -996,6 +971,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             publicBlobStorageService
                 .SetupDownloadToStream(PublicReleaseFiles, allFilesZipPath, "Test cached all files zip");
 
+            var request = new CaptureZipDownloadRequest
+            (
+                PublicationName: releaseVersion.Release.Publication.Title,
+                ReleaseVersionId: releaseVersion.Id,
+                ReleaseName: releaseVersion.Release.Title,
+                ReleaseLabel: releaseVersion.Release.Label
+            );
+            var analyticsManager = new Mock<IAnalyticsManager>(MockBehavior.Strict);
+            analyticsManager.Setup(m => m.Add(
+                    ItIs.DeepEqualTo(request),
+                    It.IsAny<CancellationToken>()))
+                .Returns(Task.CompletedTask);
+
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
                 var path = GenerateZipFilePath();
@@ -1003,7 +991,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
                 var service = SetupReleaseFileService(
                     contentDbContext: contentDbContext,
-                    publicBlobStorageService: publicBlobStorageService.Object);
+                    publicBlobStorageService: publicBlobStorageService.Object,
+                    analyticsManager: analyticsManager.Object);
 
                 var result = await service.ZipFilesToStream(
                     releaseVersionId: releaseVersion.Id,
@@ -1086,6 +1075,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 )
                 .Returns(Task.CompletedTask);
 
+            var request = new CaptureZipDownloadRequest
+            (
+                PublicationName: releaseVersion.Release.Publication.Title,
+                ReleaseVersionId: releaseVersion.Id,
+                ReleaseName: releaseVersion.Release.Title,
+                ReleaseLabel: releaseVersion.Release.Label
+            );
+
+            var analyticsManager = new Mock<IAnalyticsManager>(MockBehavior.Strict);
+            analyticsManager.Setup(m => m.Add(
+                    ItIs.DeepEqualTo(request),
+                    It.IsAny<CancellationToken>()))
+                .Returns(Task.CompletedTask);
+
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
                 var path = GenerateZipFilePath();
@@ -1093,7 +1096,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
                 var service = SetupReleaseFileService(
                     contentDbContext: contentDbContext,
-                    publicBlobStorageService: publicBlobStorageService.Object);
+                    publicBlobStorageService: publicBlobStorageService.Object,
+                    analyticsManager: analyticsManager.Object);
 
                 var result = await service.ZipFilesToStream(
                     releaseVersionId: releaseVersion.Id,
@@ -1126,14 +1130,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             IPersistenceHelper<ContentDbContext>? contentPersistenceHelper = null,
             IPublicBlobStorageService? publicBlobStorageService = null,
             IDataGuidanceFileWriter? dataGuidanceFileWriter = null,
-            IUserService? userService = null)
+            IUserService? userService = null,
+            IAnalyticsManager? analyticsManager = null,
+            ILogger<ReleaseFileService>? logger = null)
         {
             return new(
                 contentDbContext,
                 contentPersistenceHelper ?? new PersistenceHelper<ContentDbContext>(contentDbContext),
                 publicBlobStorageService ?? Mock.Of<IPublicBlobStorageService>(MockBehavior.Strict),
                 dataGuidanceFileWriter ?? Mock.Of<IDataGuidanceFileWriter>(MockBehavior.Strict),
-                userService ?? MockUtils.AlwaysTrueUserService().Object
+                userService ?? MockUtils.AlwaysTrueUserService().Object,
+                analyticsManager ?? Mock.Of<IAnalyticsManager>(),
+                logger ?? Mock.Of<ILogger<ReleaseFileService>>(MockBehavior.Strict)
             );
         }
     }

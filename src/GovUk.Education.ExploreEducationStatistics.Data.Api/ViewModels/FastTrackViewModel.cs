@@ -33,5 +33,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels
         public bool LatestData { get; set; }
 
         public string LatestReleaseTitle { get; set; }
+ 
+        public string LatestReleaseSlug { get; set; }
     }
 }

@@ -8,7 +8,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
 
 public record ReleaseSummaryViewModel
 {
+    /// <summary>
+    /// The ReleaseVersion id
+    /// </summary>
     public required Guid Id { get; init; }
+
+    public required Guid ReleaseId { get; init; }
 
     public required string Title { get; init; }
 
@@ -38,6 +43,7 @@ public record ReleaseSummaryViewModel
     public ReleaseSummaryViewModel(ReleaseCacheViewModel release, PublicationCacheViewModel publication)
     {
         Id = release.Id;
+        ReleaseId = release.ReleaseId;
         Title = release.Title;
         Slug = release.Slug;
         YearTitle = release.YearTitle;
@@ -53,6 +59,7 @@ public record ReleaseSummaryViewModel
     public ReleaseSummaryViewModel(ReleaseVersion releaseVersion, bool latestPublishedRelease)
     {
         Id = releaseVersion.Id;
+        ReleaseId = releaseVersion.Release.Id;
         Title = releaseVersion.Release.Title;
         Slug = releaseVersion.Release.Slug;
         YearTitle = releaseVersion.Release.YearTitle;

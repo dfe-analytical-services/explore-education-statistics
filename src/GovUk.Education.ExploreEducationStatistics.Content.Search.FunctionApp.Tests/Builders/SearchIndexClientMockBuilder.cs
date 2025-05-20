@@ -5,8 +5,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.
 
 public class SearchIndexClientMockBuilder
 {
-    private readonly Mock<ISearchIndexClient> _mock = new(MockBehavior.Strict);
-    public ISearchIndexClient Build()
+    private readonly Mock<ISearchIndexerClient> _mock = new(MockBehavior.Strict);
+    public ISearchIndexerClient Build()
     {
         _mock
             .Setup(m => m.RunIndexer(It.IsAny<CancellationToken>()))
@@ -16,7 +16,7 @@ public class SearchIndexClientMockBuilder
     }
 
     public Asserter Assert => new Asserter(_mock);
-    public class Asserter(Mock<ISearchIndexClient> mock)
+    public class Asserter(Mock<ISearchIndexerClient> mock)
     {
         public void IndexerRun() => mock.Verify(m => m.RunIndexer(It.IsAny<CancellationToken>()), Times.Once);
     }

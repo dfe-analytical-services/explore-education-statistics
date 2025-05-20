@@ -1,11 +1,8 @@
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Extensions;
-using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Services.Interfaces;
 using Microsoft.Azure.Functions.Worker;
-using Microsoft.EntityFrameworkCore;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Functions;
 

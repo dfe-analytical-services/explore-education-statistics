@@ -1,4 +1,6 @@
-﻿namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Clients.AzureSearch;
+﻿using Azure.Search.Documents.Indexes.Models;
+
+namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Clients.AzureSearch;
 
 /// <summary>
 /// A thin wrapper around Azure's SearchIndexerClient to allow it to be mocked
@@ -13,6 +15,13 @@ public class AzureSearchIndexerClientWrapper(
 
     public async Task RunIndexerAsync(string indexerName, CancellationToken cancellationToken) =>
         await azureSearchIndexerClient.RunIndexerAsync(indexerName, cancellationToken);
+
+    public async Task<bool> IsIndexerRunningAsync(string indexerName, CancellationToken cancellationToken)
+    {
+        var response = await azureSearchIndexerClient.GetIndexerStatusAsync(indexerName, cancellationToken);
+        return response.HasValue 
+               && response.Value.LastResult.Status == IndexerExecutionStatus.InProgress;
+    }
 
     public async Task<bool> IndexerExists(string indexerName, CancellationToken cancellationToken)
     {

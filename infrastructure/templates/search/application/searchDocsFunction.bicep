@@ -48,26 +48,20 @@ param applicationInsightsConnectionString string = ''
 @description('Specifies whether or not the Search Docs Function App already exists.')
 param functionAppExists bool
 
-@description('The name of the queue that is used when a publication is changed.')
-param publicationChangedQueueName string = 'publication-changed-queue'
-
-@description('The name of the queue that is used when the latest published release of a publication changes due to reordering.')
-param publicationLatestPublishedReleaseReorderedQueueName string = 'publication-latest-published-release-reordered-queue'
-
-@description('The name of the queue that is used when a searchable document requires a refresh.')
-param refreshSearchableDocumentQueueName string = 'refresh-searchable-document-queue'
-
-@description('The name of the queue that is used when a release slug is changed.')
-param releaseSlugChangedQueueName string = 'release-slug-changed-queue'
-
-@description('The name of the queue that is used when a release version is published.')
-param releaseVersionPublishedQueueName string = 'release-version-published-queue'
-
-@description('The name of the queue that is used when a searchable document is created.')
-param searchableDocumentCreatedQueueName string = 'search-document-created-queue'
-
-@description('The name of the queue that is used when a theme is updated.')
-param themeUpdatedQueueName string = 'theme-updated-queue'
+@description('Specifies the names of the storage queues that trigger functions within the Search Docs Function App.')
+param storageQueueNames SearchStorageQueueNames = {
+  publicationArchived: 'publication-archived-queue'
+  publicationChanged: 'publication-changed-queue'
+  publicationLatestPublishedReleaseReordered: 'publication-latest-published-release-reordered-queue'
+  publicationRestored: 'publication-restored-queue'
+  refreshSearchableDocument: 'refresh-searchable-document-queue'
+  releaseSlugChanged: 'release-slug-changed-queue'
+  releaseVersionPublished: 'release-version-published-queue'
+  removePublicationSearchableDocuments: 'remove-publication-searchable-documents-queue'
+  removeSearchableDocument: 'remove-searchable-document-queue'
+  searchableDocumentCreated: 'search-document-created-queue'
+  themeUpdated: 'theme-updated-queue'
+}
 
 @description('Specifies a set of tags with which to tag the resource in Azure.')
 param tagValues object
@@ -138,32 +132,48 @@ module functionAppModule '../../common/components/functionApp.bicep' = {
         value: contentApiUrl
       }
       {
+        name: 'PublicationArchivedQueueName'
+        value: storageQueueNames.publicationArchived
+      }
+      {
         name: 'PublicationChangedQueueName'
-        value: publicationChangedQueueName
+        value: storageQueueNames.publicationChanged
       }
       {
         name: 'PublicationLatestPublishedReleaseReorderedQueueName'
-        value: publicationLatestPublishedReleaseReorderedQueueName
+        value: storageQueueNames.publicationLatestPublishedReleaseReordered
+      }
+      {
+        name: 'PublicationRestoredQueueName'
+        value: storageQueueNames.publicationRestored
       }
       {
         name: 'RefreshSearchableDocumentQueueName'
-        value: refreshSearchableDocumentQueueName
+        value: storageQueueNames.refreshSearchableDocument
       }
       {
         name: 'ReleaseSlugChangedQueueName'
-        value: releaseSlugChangedQueueName
+        value: storageQueueNames.releaseSlugChanged
       }
       {
         name: 'ReleaseVersionPublishedQueueName'
-        value: releaseVersionPublishedQueueName
+        value: storageQueueNames.releaseVersionPublished
+      }
+      {
+        name: 'RemovePublicationSearchableDocumentsQueueName'
+        value: storageQueueNames.removePublicationSearchableDocuments
+      }
+      {
+        name: 'RemoveSearchableDocumentQueueName'
+        value: storageQueueNames.removeSearchableDocument
       }
       {
         name: 'SearchableDocumentCreatedQueueName'
-        value: searchableDocumentCreatedQueueName
+        value: storageQueueNames.searchableDocumentCreated
       }
       {
         name: 'ThemeUpdatedQueueName'
-        value: themeUpdatedQueueName
+        value: storageQueueNames.themeUpdated
       }
     ]
     functionAppExists: functionAppExists
@@ -219,27 +229,11 @@ module functionAppStorageAccountQueueServiceModule '../../common/components/queu
   name: 'searchDocsFunctionAppStorageAccountQueueServiceModuleDeploy'
   params: {
     storageAccountName: functionAppModule.outputs.storageAccountName
-    queueNames: [
-      publicationChangedQueueName
-      publicationLatestPublishedReleaseReorderedQueueName
-      refreshSearchableDocumentQueueName
-      releaseSlugChangedQueueName
-      releaseVersionPublishedQueueName
-      searchableDocumentCreatedQueueName
-      themeUpdatedQueueName
-    ]
+    queueNames: map(items(storageQueueNames), item => item.value)
   }
 }
 
 output functionAppName string = functionAppModule.outputs.name
 output functionAppUrl string = functionAppModule.outputs.url
 output functionAppStorageAccountName string = functionAppModule.outputs.storageAccountName
-output storageQueueNames SearchStorageQueueNames = {
-  publicationChangedQueueName: publicationChangedQueueName
-  publicationLatestPublishedReleaseReorderedQueueName: publicationLatestPublishedReleaseReorderedQueueName
-  refreshSearchableDocumentQueueName: refreshSearchableDocumentQueueName
-  releaseSlugChangedQueueName: releaseSlugChangedQueueName
-  releaseVersionPublishedQueueName: releaseVersionPublishedQueueName
-  searchableDocumentCreatedQueueName: searchableDocumentCreatedQueueName
-  themeUpdatedQueueName: themeUpdatedQueueName
-}
+output storageQueueNames SearchStorageQueueNames = storageQueueNames

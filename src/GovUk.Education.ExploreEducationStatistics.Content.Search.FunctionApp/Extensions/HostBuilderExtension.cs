@@ -4,7 +4,10 @@ using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Clie
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Clients.AzureSearch;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Clients.ContentApi;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Options;
-using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Services;
+using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Services.Core;
+using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Services.CreateSearchableDocuments;
+using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Services.RemoveSearchableDocument;
+using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Services.ResetSearchableDocuments;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -54,11 +57,14 @@ public static class HostBuilderExtension
                     })
                     // Services
                     .AddTransient<ISearchableDocumentCreator, SearchableDocumentCreator>()
+                    .AddTransient<ISearchableDocumentRemover, SearchableDocumentRemover>()
+                    .AddTransient<IFullSearchableDocumentResetter, FullSearchableDocumentResetter>()
                     // Functions
                     .AddTransient<IEventGridEventHandler, EventGridEventHandler>()
+                    .AddTransient<ICommandHandler, CommandHandler>()
                     .AddHealthChecks()
                     // Clients
-                    .AddTransient<ISearchIndexClient, SearchIndexClient>()
+                    .AddTransient<ISearchIndexerClient, SearchIndexerClient>()
                     .AddTransient<IAzureSearchIndexerClientFactory, AzureSearchIndexerClientFactory>()
                     .AddTransient<IAzureBlobStorageClient, AzureBlobStorageClient>()
                     .AddAzureClientsInline(

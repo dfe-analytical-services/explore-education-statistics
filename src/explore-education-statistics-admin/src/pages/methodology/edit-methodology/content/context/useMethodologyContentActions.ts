@@ -193,6 +193,8 @@ export default function useMethodologyContentActions() {
         sectionKey,
       },
     });
+
+    return content;
   }
 
   async function updateContentSectionHeading({

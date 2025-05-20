@@ -126,7 +126,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                         Id = Guid.NewGuid(),
                         ApprovalStatus = ReleaseApprovalStatus.Draft
                     },
-                    ReleaseRole.Approver, ReleaseRole.Contributor, ReleaseRole.Lead);
+                    ReleaseRole.Approver, ReleaseRole.Contributor);
             }
 
             [Fact]
@@ -142,7 +142,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                         Id = Guid.NewGuid(),
                         ApprovalStatus = ReleaseApprovalStatus.Approved
                     },
-                    ReleaseRole.Approver, ReleaseRole.Contributor, ReleaseRole.Lead);
+                    ReleaseRole.Approver, ReleaseRole.Contributor);
             }
         }
 

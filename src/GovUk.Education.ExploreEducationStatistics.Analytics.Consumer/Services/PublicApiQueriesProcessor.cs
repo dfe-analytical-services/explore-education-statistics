@@ -1,125 +1,120 @@
 using GovUk.Education.ExploreEducationStatistics.Analytics.Consumer.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Analytics.Consumer.Services.Workflow;
 using GovUk.Education.ExploreEducationStatistics.Common.DuckDb.DuckDb;
+using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using Microsoft.Extensions.Logging;
 
 namespace GovUk.Education.ExploreEducationStatistics.Analytics.Consumer.Services;
 
 public class PublicApiQueriesProcessor(
-    DuckDbConnection duckDbConnection,
     IAnalyticsPathResolver pathResolver,
-    ILogger<PublicApiQueriesProcessor> logger) : IRequestFileProcessor
+    ILogger<PublicApiQueriesProcessor> logger,
+    IWorkflowActor<PublicApiQueriesProcessor>? workflowActor = null) : IRequestFileProcessor
 {
+    private readonly IWorkflowActor<PublicApiQueriesProcessor> _workflowActor 
+        = workflowActor ?? new WorkflowActor();
+    
     public Task Process()
     {
-        logger.LogInformation($"{nameof(PublicApiQueriesProcessor)} triggered");
+        var workflow = new ProcessRequestFilesWorkflow<PublicApiQueriesProcessor>(
+            sourceDirectory: pathResolver.PublicApiQueriesDirectoryPath(),
+            reportsDirectory: pathResolver.PublicApiQueriesReportsDirectoryPath(),
+            actor: _workflowActor,
+            logger: logger);
 
-        var sourceDirectory = pathResolver.PublicApiQueriesDirectoryPath();
+        return workflow.Process();
+    }
 
-        if (!Directory.Exists(sourceDirectory))
+    private class WorkflowActor : IWorkflowActor<PublicApiQueriesProcessor>
+    {
+        public async Task InitialiseDuckDb(DuckDbConnection connection)
         {
-            logger.LogInformation("No data set queries to process");
-            return Task.CompletedTask;
+            await connection.ExecuteNonQueryAsync(@"
+                CREATE TABLE queries (
+                    queryVersionHash VARCHAR,
+                    queryHash VARCHAR,
+                    dataSetId UUID,
+                    dataSetVersionId UUID,
+                    dataSetVersion VARCHAR,
+                    dataSetTitle VARCHAR,
+                    resultsCount INT,
+                    totalRowsCount INT,
+                    startTime DATETIME,
+                    endTime DATETIME,
+                    query JSON
+                );
+            ");
         }
-        
-        var filesToProcess = Directory
-            .GetFiles(sourceDirectory)
-            .Select(Path.GetFileName)
-            .Cast<string>()
-            .ToList();
 
-        if (filesToProcess.Count == 0)
+        public async Task ProcessSourceFile(string sourceFilePath, DuckDbConnection connection)
         {
-            logger.LogInformation("No data set queries to process");
-            return Task.CompletedTask;
+            await connection.ExecuteNonQueryAsync($@"
+                INSERT INTO queries BY NAME (
+                    SELECT
+                        MD5(CONCAT(query, dataSetVersionId)) AS queryVersionHash,
+                        MD5(query) AS queryHash,
+                        *
+                    FROM read_json('{sourceFilePath}', 
+                        format='unstructured',
+                        columns = {{
+                            dataSetId: UUID, 
+                            dataSetVersionId: UUID,
+                            dataSetVersion: VARCHAR,
+                            dataSetTitle: VARCHAR,
+                            resultsCount: INT,
+                            totalRowsCount: INT,
+                            startTime: DATETIME,
+                            endTime: DATETIME,
+                            query: JSON
+                        }})
+                   )
+            ");
         }
-        
-        logger.LogInformation("Found {Count} data set queries to process", filesToProcess.Count);
 
-        var processingDirectory = pathResolver.PublicApiQueriesProcessingDirectoryPath();
-        var reportsDirectory = pathResolver.PublicApiQueriesReportsDirectoryPath();
-        
-        Directory.CreateDirectory(processingDirectory);
-        Directory.CreateDirectory(reportsDirectory);
-
-        Parallel.ForEach(filesToProcess, file =>
+        public async Task CreateParquetReports(string reportsFolderPathAndFilenamePrefix, DuckDbConnection connection)
         {
-            var originalPath = Path.Combine(sourceDirectory, file);
-            var newPath = Path.Combine(processingDirectory, file);
-            File.Move(originalPath, newPath);
-        });
-        
-        duckDbConnection.Open();
-        
-        duckDbConnection.ExecuteNonQuery("install json; load json");
+            await connection.ExecuteNonQueryAsync(@"
+                CREATE TABLE queryReport AS 
+                SELECT
+                    queryVersionHash ,
+                    FIRST(queryHash) AS queryHash,
+                    FIRST(dataSetId) AS dataSetId,
+                    FIRST(dataSetVersionId) AS dataSetVersionId,
+                    FIRST(dataSetVersion) AS dataSetVersion,
+                    FIRST(dataSetTitle) AS dataSetTitle,
+                    FIRST(resultsCount) AS resultsCount,
+                    FIRST(totalRowsCount) AS totalRowsCount,
+                    FIRST(query) AS query,
+                    CAST(COUNT(queryHash) AS INT) AS queryExecutions
+                FROM queries
+                GROUP BY queryVersionHash
+                ORDER BY queryVersionHash");
+    
+            await connection.ExecuteNonQueryAsync(@"
+                CREATE TABLE queryAccessReport AS 
+                SELECT 
+                    queryVersionHash,
+                    dataSetVersionId,
+                    startTime,
+                    endTime,
+                    CAST(EXTRACT('milliseconds' FROM EndTime - StartTime) AS INT) AS durationMillis
+                FROM queries
+                ORDER BY queryHash, startTime
+            ");
 
-        duckDbConnection.ExecuteNonQuery($@"
-            CREATE TABLE queries AS 
-            SELECT
-                MD5(CONCAT(query, dataSetVersionId)) AS queryVersionHash,
-                MD5(query) AS queryHash,
-                *
-            FROM read_json('{processingDirectory}/*.json', 
-                format='auto',
-                columns = {{
-                    dataSetId: UUID, 
-                    dataSetVersionId: UUID,
-                    dataSetVersion: VARCHAR,
-                    dataSetTitle: VARCHAR,
-                    resultsCount: INT,
-                    totalRowsCount: INT,
-                    startTime: DATETIME,
-                    endTime: DATETIME,
-                    query: JSON
-                }})");
+            var queryReportFilePath = 
+                $"{reportsFolderPathAndFilenamePrefix}_public-api-queries.parquet";
+    
+            await connection.ExecuteNonQueryAsync($@"
+                COPY (SELECT * FROM queryReport)
+                TO '{queryReportFilePath}' (FORMAT 'parquet', CODEC 'zstd')");
 
-        duckDbConnection.ExecuteNonQuery(@"
-            CREATE TABLE queryReport AS 
-            SELECT 
-                queryVersionHash ,
-                FIRST(queryHash) AS queryHash,
-                FIRST(dataSetId) AS dataSetId,
-                FIRST(dataSetVersionId) AS dataSetVersionId,
-                FIRST(dataSetVersion) AS dataSetVersion,
-                FIRST(dataSetTitle) AS dataSetTitle,
-                FIRST(resultsCount) AS resultsCount,
-                FIRST(totalRowsCount) AS totalRowsCount,
-                FIRST(query) AS query,
-                CAST(COUNT(queryHash) AS INT) AS queryExecutions
-            FROM queries
-            GROUP BY queryVersionHash
-            ORDER BY queryVersionHash");
-        
-        duckDbConnection.ExecuteNonQuery(@"
-            CREATE TABLE queryAccessReport AS 
-            SELECT 
-                queryVersionHash,
-                dataSetVersionId,
-                startTime,
-                endTime,
-                CAST(EXTRACT('milliseconds' FROM EndTime - StartTime) AS INT) AS durationMillis
-            FROM queries
-            ORDER BY queryHash, startTime");
+            var queryAccessReportFilePath = 
+                $"{reportsFolderPathAndFilenamePrefix}_public-api-query-access.parquet";
 
-        var reportFilenamePrefix = DateTime.UtcNow.ToString("yyyyMMdd-HHmmss");
-        
-        var queryReportFilename = Path.Combine(
-            reportsDirectory, 
-            $"{reportFilenamePrefix}_public-api-queries.parquet");
-        
-        var queryAccessReportFilename = Path.Combine(
-            reportsDirectory, 
-            $"{reportFilenamePrefix}_public-api-query-access.parquet");
-
-        duckDbConnection.ExecuteNonQuery($@"
-            COPY (SELECT * FROM queryReport)
-            TO '{queryReportFilename}' (FORMAT 'parquet', CODEC 'zstd')");
-        
-        duckDbConnection.ExecuteNonQuery($@"
-            COPY (SELECT * FROM queryAccessReport)
-            TO '{queryAccessReportFilename}' (FORMAT 'parquet', CODEC 'zstd')");
-        
-        Directory.Delete(processingDirectory, recursive: true);
-        
-        return Task.CompletedTask;
+            await connection.ExecuteNonQueryAsync($@"
+                COPY (SELECT * FROM queryAccessReport)
+                TO '{queryAccessReportFilePath}' (FORMAT 'parquet', CODEC 'zstd')");
+        }
     }
 }

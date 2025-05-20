@@ -18,7 +18,7 @@ using Moq;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Controllers;
 
-public abstract class DataSetVersionsControllerTests(TestApplicationFactory testApp) : IntegrationTestFixture(testApp)
+public abstract class DataSetVersionsControllerTests(TestApplicationFactory testApp) : IntegrationTestFixtureWithCommonTestDataSetup(testApp)
 {
     private const string BaseUrl = "v1/data-sets";
 
@@ -689,6 +689,67 @@ public abstract class DataSetVersionsControllerTests(TestApplicationFactory test
                 previewTokenId: dataSetVersion.PreviewTokens[0].Id);
 
             response.AssertForbidden();
+        }
+        
+        [Fact]
+        public async Task WildCardSpecified_RequestedPublished_Returns200()
+        {
+            var (dataSet, dataSetVersions) = await SetupDataSetWithSpecifiedVersionStatuses(DataSetVersionStatus.Published);
+            
+            var dataSetVersion = dataSetVersions.FirstOrDefault(dsv => dsv.PublicVersion == "2.1");
+            
+            var response = await GetDataSetVersion(
+                dataSetId: dataSet.Id,
+                dataSetVersion: "2.*"
+            );
+
+            var viewModel = response.AssertOk<DataSetVersionViewModel>(useSystemJson: true);
+
+            Assert.NotNull(viewModel);
+            Assert.Equal(dataSetVersion.PublicVersion, viewModel.Version);
+            Assert.Equal(dataSetVersion.VersionType, viewModel.Type);
+            Assert.Equal(dataSetVersion.Status, viewModel.Status);
+            Assert.Equal(
+                dataSetVersion.Published.TruncateNanoseconds(),
+                viewModel.Published
+            );
+
+            Assert.Equal(dataSetVersion.Notes, viewModel.Notes);
+            Assert.Equal(dataSetVersion.TotalResults, viewModel.TotalResults);
+
+            Assert.Equal(dataSetVersion.Release.DataSetFileId, viewModel.File.Id);
+
+            Assert.Equal(dataSetVersion.Release.Title, viewModel.Release.Title);
+            Assert.Equal(dataSetVersion.Release.Slug, viewModel.Release.Slug);
+
+            Assert.Equal(
+                TimePeriodFormatter.FormatLabel(
+                    dataSetVersion.MetaSummary!.TimePeriodRange.Start.Period,
+                    dataSetVersion.MetaSummary.TimePeriodRange.Start.Code),
+                viewModel.TimePeriods.Start);
+            Assert.Equal(
+                TimePeriodFormatter.FormatLabel(
+                    dataSetVersion.MetaSummary.TimePeriodRange.End.Period,
+                    dataSetVersion.MetaSummary.TimePeriodRange.End.Code),
+                viewModel.TimePeriods.End);
+            Assert.Equal(dataSetVersion.MetaSummary.GeographicLevels, viewModel.GeographicLevels);
+            Assert.Equal(dataSetVersion.MetaSummary.Filters, viewModel.Filters);
+            Assert.Equal(dataSetVersion.MetaSummary.Indicators, viewModel.Indicators);
+        }
+        
+        [Theory]
+        [MemberData(nameof(DataSetVersionStatusViewTheoryData.NonPublishedStatus),
+            MemberType = typeof(DataSetVersionStatusViewTheoryData))]
+        public async Task WildCardSpecified_RequestedNonPublished_Returns404(DataSetVersionStatus dataSetVersionStatus)
+        {
+            var (dataSet, dataSetVersions) = await SetupDataSetWithSpecifiedVersionStatuses(dataSetVersionStatus);
+            
+            var response = await GetDataSetVersion(
+                dataSetId: dataSet.Id,
+                dataSetVersion: "2.*",
+                previewTokenId: dataSetVersions.Last().PreviewTokens[0].Id);
+
+            response.AssertNotFound();
         }
 
         private async Task<HttpResponseMessage> GetDataSetVersion(
@@ -1721,6 +1782,35 @@ public abstract class DataSetVersionsControllerTests(TestApplicationFactory test
             response.AssertOk();
         }
 
+        [Fact]
+        public async Task WildCardSpecified_RequestedPublished_Returns200()
+        {
+            var (dataSet, dataSetVersions) = await SetupDataSetWithSpecifiedVersionStatuses(DataSetVersionStatus.Published);
+            
+            var response = await GetDataSetVersionChanges(
+                dataSetId: dataSet.Id,
+                dataSetVersion: "2.*",
+                previewTokenId: dataSetVersions.Last().PreviewTokens[0].Id);
+
+            response.AssertOk();
+        }
+
+
+        [Theory]
+        [MemberData(nameof(DataSetVersionStatusViewTheoryData.NonPublishedStatus),
+            MemberType = typeof(DataSetVersionStatusViewTheoryData))]
+        public async Task WildCardSpecified_RequestedNonPublished_Returns404(DataSetVersionStatus dataSetVersionStatus)
+        {
+            var (dataSet, dataSetVersions) = await SetupDataSetWithSpecifiedVersionStatuses(dataSetVersionStatus);
+            
+            var response = await GetDataSetVersionChanges(
+                dataSetId: dataSet.Id,
+                dataSetVersion: "2.*",
+                previewTokenId: dataSetVersions.Last().PreviewTokens[0].Id);
+
+            response.AssertNotFound();
+        }
+        
         private async Task<HttpResponseMessage> GetDataSetVersionChanges(
             Guid dataSetId,
             string dataSetVersion,

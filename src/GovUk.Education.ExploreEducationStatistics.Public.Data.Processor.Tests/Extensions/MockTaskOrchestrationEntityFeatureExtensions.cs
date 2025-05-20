@@ -13,10 +13,10 @@ internal static class MockTaskOrchestrationEntityFeatureExtensions
     {
         return mock.Setup(entityFeature => entityFeature.LockEntitiesAsync(
                 new EntityInstanceId(nameof(ActivityLock), name)))
-            .ReturnsAsync(new NoopAsyncDisposable());
+            .ReturnsAsync(new NoOpAsyncDisposable());
     }
 
-    private sealed class NoopAsyncDisposable : IAsyncDisposable
+    private sealed class NoOpAsyncDisposable : IAsyncDisposable
     {
         ValueTask IAsyncDisposable.DisposeAsync() => ValueTask.CompletedTask;
     }

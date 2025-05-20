@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Options;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
@@ -58,14 +59,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             Assert.Empty(result);
         }
 
-        [Fact]
-        public async Task ValidateDataFilesForUpload_Valid_Replacement()
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public async Task ValidateDataFilesForUpload_Valid_Replacement(bool enableReplacementOfPublicApiDataSets)
         {
             var releaseVersion = new ReleaseVersion
             {
                 Id = Guid.NewGuid(),
             };
 
+            
             var toBeReplacedSubjectId = Guid.NewGuid();
 
             var toBeReplacedReleaseFile = _fixture.DefaultReleaseFile()
@@ -75,8 +79,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .WithType(FileType.Data)
                     .WithFilename("test.csv")
                     .WithSubjectId(toBeReplacedSubjectId))
+                //.WithPublicApiDataSetId(publicApiDataSetId) -> see comment below
                 .Generate();
 
+            //Once EES-5779 is finished, this test's set up WILL contain value for the
+            //configuration of publicApiDataSetID and will still expect the result to be valid 
+            toBeReplacedReleaseFile.PublicApiDataSetId = enableReplacementOfPublicApiDataSets 
+                ? Guid.NewGuid() //Mocked api data set ID
+                : null;
+            
             var toBeReplacedMetaReleaseFile = _fixture.DefaultReleaseFile()
                 .WithReleaseVersion(releaseVersion)
                 .WithFile(_fixture.DefaultFile()
@@ -94,7 +105,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var context = InMemoryContentDbContext(contentDbContextId))
             {
-                var (service, fileTypeService) = BuildService(context);
+                var (service, fileTypeService) = BuildService(contentDbContext: context, enableReplacementOfPublicApiDataSets: enableReplacementOfPublicApiDataSets);
 
                 // NOTE: Not necessary, but in this test case new files have same name as the files they're replacing
                 var dataFile = CreateFormFileMock(toBeReplacedReleaseFile.File.Filename).Object;
@@ -607,10 +618,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             }
         }
 
-        [Fact]
-        public async Task ValidateDataFilesForUpload_Replacement_HasApiDataSet()
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public async Task ValidateDataFilesForUpload_Replacement_HasApiDataSet(bool enableReplacementOfPublicApiDataSets)
         {
-            var releaseVersion = new ReleaseVersion { Id = Guid.NewGuid(), };
+            //TODO: This test will be deleted when EES-5779 is complete.
+            // Its coverage will be replaced by the tweak made to
+            // ValidateDataFilesForUpload_Valid_Replacement which will ensure that if a replacement has an 
+            // API data set, then it is still valid (because EES-5779 allows this now).
+            var releaseVersion = new ReleaseVersion { Id = Guid.NewGuid() };
 
             var toBeReplacedSubjectId = Guid.NewGuid();
 
@@ -641,7 +658,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var context = DbUtils.InMemoryApplicationDbContext(contentDbContextId))
             {
-                var (service, fileTypeService) = BuildService(context);
+                var (service, fileTypeService) = BuildService(contentDbContext: context, enableReplacementOfPublicApiDataSets: enableReplacementOfPublicApiDataSets);
 
                 var dataFile = CreateFormFileMock(toBeReplacedReleaseFile.File.Filename).Object;
                 var metaFile = CreateFormFileMock(toBeReplacedMetaReleaseFile.File.Filename).Object;
@@ -666,12 +683,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 VerifyAllMocks(fileTypeService);
 
-                AssertHasErrors(errors, [
-                    ValidationMessages.GenerateErrorCannotReplaceDataSetWithApiDataSet("Data set title"),
-                ]);
+                if (enableReplacementOfPublicApiDataSets)
+                {
+                    AssertDoesNotContainErrors(errors, [
+                        ValidationMessages.GenerateErrorCannotReplaceDataSetWithApiDataSet("Data set title"),
+                    ]);                    
+                }
+                else
+                {
+                    AssertHasErrors(errors, [
+                        ValidationMessages.GenerateErrorCannotReplaceDataSetWithApiDataSet("Data set title"),
+                    ]);   
+                }
+                
             }
         }
-
+        
         [Fact]
         public async Task ValidateFileForUpload_FileCannotBeEmpty()
         {
@@ -731,13 +758,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             )
             BuildService(
                 ContentDbContext? contentDbContext = null,
-                IFileTypeService? fileTypeService = null)
+                IFileTypeService? fileTypeService = null,
+                bool enableReplacementOfPublicApiDataSets = false)
         {
             var fileTypeServiceMock = new Mock<IFileTypeService>(Strict);
 
+            var options = Microsoft.Extensions.Options.Options.Create(new FeatureFlags()
+            {
+                EnableReplacementOfPublicApiDataSets = enableReplacementOfPublicApiDataSets
+            });
+
             var service = new FileUploadsValidatorService(
                 fileTypeService ?? fileTypeServiceMock.Object,
-                contentDbContext!);
+                contentDbContext!,
+                options);
 
             return (service, fileTypeServiceMock);
         }

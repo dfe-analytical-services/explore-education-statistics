@@ -83,7 +83,6 @@ using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Common.Services.EventGrid;
 using Thinktecture;
 using static GovUk.Education.ExploreEducationStatistics.Common.Utils.StartupUtils;
 using ContentGlossaryService = GovUk.Education.ExploreEducationStatistics.Content.Services.GlossaryService;
@@ -129,6 +128,8 @@ using ThemeService = GovUk.Education.ExploreEducationStatistics.Admin.Services.T
 using IReleaseService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IReleaseService;
 using ReleaseService = GovUk.Education.ExploreEducationStatistics.Admin.Services.ReleaseService;
 using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
+using GovUk.Education.ExploreEducationStatistics.Events.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Options;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin
 {
@@ -240,10 +241,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             // cause the data source builder to throw a host exception.
             if (!hostEnvironment.IsIntegrationTest())
             {
-                var publicDataDbConnectionString = configuration.GetConnectionString("PublicDataDb")!;
                 // TODO EES-5073 Remove this check when the Public Data db is available in all Azure environments.
                 if (publicDataDbExists)
                 {
+                    var publicDataDbConnectionString = configuration.GetConnectionString("PublicDataDb")!;
                     services.AddPsqlDbContext<PublicDataDbContext>(publicDataDbConnectionString, hostEnvironment);
                 }
             }
@@ -382,7 +383,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                 configuration.GetRequiredSection(TableBuilderOptions.Section));
             services.Configure<OpenIdConnectSpaClientOptions>(
                 configuration.GetSection(OpenIdConnectSpaClientOptions.Section));
-            
+            services.Configure<FeatureFlags>(
+                configuration.GetSection(FeatureFlags.Section));
             services.Configure<RouteOptions>(options => options.LowercaseUrls = true);
 
             StartupSecurityConfiguration.ConfigureAuthorizationPolicies(services);
@@ -844,6 +846,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
         public Task<Either<ActionResult, ProcessDataSetVersionResponseViewModel>> CreateNextDataSetVersionMappings(
             Guid dataSetId,
             Guid releaseFileId,
+            Guid? dataSetVersionToReplaceId = null,
             CancellationToken cancellationToken = default) => throw new NotImplementedException();
 
         public Task<Either<ActionResult, ProcessDataSetVersionResponseViewModel>> CompleteNextDataSetVersionImport(
@@ -902,6 +905,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
         public Task<Either<ActionResult, DataSetVersionSummaryViewModel>> CreateNextVersion(
             Guid releaseFileId,
             Guid dataSetId,
+            Guid? dataSetVersionToReplaceId = null,
             CancellationToken cancellationToken = default) => throw new NotImplementedException();
 
         public Task<Either<ActionResult, DataSetVersionSummaryViewModel>> CompleteNextVersionImport(

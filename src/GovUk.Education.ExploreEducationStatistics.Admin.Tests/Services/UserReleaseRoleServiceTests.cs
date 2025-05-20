@@ -2,7 +2,6 @@
 using System;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
-using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
@@ -49,7 +48,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 User = new User { Id = Guid.NewGuid() },
                 ReleaseVersion = publication.ReleaseVersions[0],
-                Role = Lead,
+                Role = Approver,
             };
             var userReleaseRoleIgnored2 = new UserReleaseRole // Ignored because Deleted set
             {

@@ -481,18 +481,18 @@
       "type": "bool",
       "defaultValue": true
     },
-    "publishReleasesCronSchedule": {
+    "stageScheduledReleasesFunctionCronSchedule": {
       "type": "string",
-      "defaultValue": "0 0 0 * * *",
+      "defaultValue": "0 5 0 * * *",
       "metadata": {
-        "description": "Cron string that is used to control the schedule of the Publish Releases Function in the Publisher App"
+        "description": "Cron string that is used to control the schedule of the StageScheduledReleases function in the Publisher Function App"
       }
     },
-    "publishReleaseContentCronSchedule": {
+    "publishScheduledReleasesFunctionCronSchedule": {
       "type": "string",
       "defaultValue": "0 30 9 * * *",
       "metadata": {
-        "description": "Cron string that is used to control the schedule of the Publish Release Content Function in the Publisher App"
+        "description": "Cron string that is used to control the schedule of the PublishScheduledReleases function in the Publisher Function App"
       }
     },
     "preReleaseMinutesBeforeStart": {
@@ -585,9 +585,12 @@
         "description": "Maximum number of table cells that a table builder query could potentially render for a request to be valid"
       }
     },
-    "timeZone": {
+    "publisherFunctionAppTimeZone": {
       "type": "string",
-      "defaultValue": "GMT Standard Time"
+      "defaultValue": "GMT Standard Time",
+      "metadata": {
+        "description": "The time zone of the Publisher Function App. This time zone is used for evaluating Cron expressions of the functions running with Cron triggers and altering it will change the time of execution of these functions. The name of this time zone depends on the operating system and plan on which the function app runs."
+      }
     },
     "branch": {
       "type": "string",
@@ -749,6 +752,20 @@
       "type": "string",
       "metadata": {
         "description": "The Client ID of a manually-created App Registration that represents the Public API Container App in Entra ID"
+      }
+    },
+    "analyticsEnabled": {
+      "type": "bool",
+      "defaultValue": true,
+      "metadata": {
+        "description": "Whether analytics is enabled"
+      }
+    },
+    "analyticsFileShareMountPath": {
+      "type": "string",
+      "defaultValue": "\\mounts\\analytics",
+      "metadata": {
+        "description": "Where analytics request files are saved before being processed"
       }
     }
   },
@@ -1230,6 +1247,10 @@
       ]
     },
     "templateBaseUrl": "[concat('https://raw.githubusercontent.com/dfe-analytical-services/explore-education-statistics/', parameters('branch'), '/infrastructure/templates/')]",
+    "keyVaultCertificateUserRoleDefinitionId": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', 'db79e9a7-68ee-4b58-9aeb-b90e7c24fcba')]",
+    "keyVaultCertificateUserPrincipalRefs": [
+      "[concat('Microsoft.Web/sites/', variables('publicAppName'))]"
+    ],
     "keyVaultSecretsUserRoleDefinitionId": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '4633458b-17de-408a-b874-0445c86b69e6')]",
     "keyVaultSecretsUserPrincipalRefs": [
       "[concat('Microsoft.Web/sites/', variables('adminAppName'))]",
@@ -1242,6 +1263,8 @@
     "publicDataFileShareMountPathWindows": "\\mounts\\public-api-data",
     "publicDataFileShareName": "[concat(parameters('subscription'), '-ees-papi-share-data')]",
     "publicDataStorageAccountName": "[concat(parameters('subscription'), 'eespapisa')]",
+    "analyticsFileShareName": "[concat(parameters('subscription'), '-ees-share-anlyt')]",
+    "analyticsStorageAccountName": "[concat(parameters('subscription'), 'eessaanlyt')]",
     "eventGridTopicNamePublicationChanged": "[concat(parameters('subscription'), '-', parameters('environment'), '-evgt-publication-changed')]",
     "eventGridTopicNameReleaseChanged": "[concat(parameters('subscription'), '-', parameters('environment'), '-evgt-release-changed')]",
     "eventGridTopicNameReleaseVersionChanged": "[concat(parameters('subscription'), '-', parameters('environment'), '-evgt-release-version-changed')]",
@@ -1574,9 +1597,32 @@
       "properties": {
         "APPINSIGHTS_INSTRUMENTATIONKEY": "[reference(resourceId('microsoft.insights/components/', variables('contentAppInsights')), '2020-02-02').InstrumentationKey]",
         "WEBSITE_NODE_DEFAULT_VERSION": "20.16.0",
+        "WEBSITE_CONTENTOVERVNET": "1",
         "WEBSITE_RUN_FROM_PACKAGE": "1",
         "PublicStorage": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-storage-public'), '2018-02-14').secretUriWithVersion, ')')]",
-        "enableSwagger": "[parameters('enableSwagger')]"
+        "enableSwagger": "[parameters('enableSwagger')]",
+        "Analytics__Enabled": "[parameters('analyticsEnabled')]",
+        "Analytics__BasePath": "[parameters('analyticsFileShareMountPath')]"
+      }
+    },
+    {
+      "condition": "[parameters('analyticsEnabled')]",
+      "name": "[concat(variables('contentAppName'), '/azurestorageaccounts')]",
+      "type": "Microsoft.Web/sites/config",
+      "location": "[resourceGroup().location]",
+      "apiVersion": "2019-08-01",
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/sites', variables('contentAppName'))]"
+      ],
+      "properties": {
+        "[variables('analyticsFileShareName')]": {
+          "type": "AzureFiles",
+          "accountName": "[variables('analyticsStorageAccountName')]",
+          "accessKey": "[listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('analyticsStorageAccountName')), '2018-02-01').keys[0].value]",
+          "shareName": "[variables('analyticsFileShareName')]",
+          "mountPath": "[parameters('analyticsFileShareMountPath')]",
+          "protocol": "Smb"
+        }
       }
     },
     {
@@ -1843,8 +1889,8 @@
         "PublicStorage": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-storage-public')).secretUriWithVersion, ')')]",
         "PublisherStorage": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-storage-publisher'), '2018-02-14').secretUriWithVersion, ')')]",
         "PreReleaseAccess__AccessWindow__MinutesBeforeReleaseTimeStart": "[parameters('preReleaseMinutesBeforeStart')]",
-        "ReleaseApproval__PublishReleasesCronSchedule": "[parameters('publishReleasesCronSchedule')]",
-        "ReleaseApproval__PublishReleaseContentCronSchedule": "[parameters('publishReleaseContentCronSchedule')]",
+        "ReleaseApproval__StageScheduledReleasesFunctionCronSchedule": "[parameters('stageScheduledReleasesFunctionCronSchedule')]",
+        "ReleaseApproval__PublishScheduledReleasesFunctionCronSchedule": "[parameters('publishScheduledReleasesFunctionCronSchedule')]",
         "TableBuilder__MaxTableCellsAllowed": "[parameters('tableBuilderMaxTableCellsAllowed')]",
         "PublicApp__Url": "[variables('publicAppUrl')]",
         "PublicDataDbExists": "[parameters('publicDataDbExists')]",
@@ -3366,20 +3412,22 @@
         "AzureWebJobs.StageScheduledReleaseVersionsImmediately.Disabled": "[not(parameters('immediatePublicationOfScheduledReleaseVersionsEnabled'))]",
         "AzureWebJobs.PublishStagedReleaseVersionContentImmediately.Disabled": "[not(parameters('immediatePublicationOfScheduledReleaseVersionsEnabled'))]",
         "WEBSITE_CONTENTOVERVNET": "1",
-        "WEBSITE_TIME_ZONE": "[parameters('timeZone')]",
+        "WEBSITE_TIME_ZONE": "[parameters('publisherFunctionAppTimeZone')]",
         "WEBSITE_RUN_FROM_PACKAGE": "1",
         "FUNCTIONS_EXTENSION_VERSION": "~4",
         "FUNCTIONS_WORKER_RUNTIME": "dotnet-isolated",
         "APPINSIGHTS_INSTRUMENTATIONKEY": "[reference(resourceId('microsoft.insights/components/', variables('publisherAppInsights')), '2020-02-02').InstrumentationKey]",
-        "App__PublishReleasesCronSchedule": "[parameters('publishReleasesCronSchedule')]",
-        "App__PublishReleaseContentCronSchedule": "[parameters('publishReleaseContentCronSchedule')]",
+        "App__StageScheduledReleasesFunctionCronSchedule": "[parameters('stageScheduledReleasesFunctionCronSchedule')]",
+        "App__PublishScheduledReleasesFunctionCronSchedule": "[parameters('publishScheduledReleasesFunctionCronSchedule')]",
         "App__PrivateStorageConnectionString": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-storage-core')).secretUriWithVersion, ')')]",
         "App__NotifierStorageConnectionString": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-storage-notifications')).secretUriWithVersion, ')')]",
         "App__PublicStorageConnectionString": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-storage-public')).secretUriWithVersion, ')')]",
         "App__PublisherStorageConnectionString": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-storage-publisher')).secretUriWithVersion, ')')]",
         "DataFiles__BasePath": "[variables('publicDataFileShareMountPathWindows')]",
-        "EventGrid__EventTopics__0__Key": "ReleaseVersionChangedEvent",
-        "EventGrid__EventTopics__0__TopicEndpoint": "[if(parameters('eventGridTopicsExist'), reference(resourceId('Microsoft.EventGrid/topics', variables('eventGridTopicNameReleaseVersionChanged')), '2025-02-15').endpoint, '')]",
+        "EventGrid__EventTopics__0__Key": "PublicationChangedEvent",
+        "EventGrid__EventTopics__0__TopicEndpoint": "[if(parameters('eventGridTopicsExist'), reference(resourceId('Microsoft.EventGrid/topics', variables('eventGridTopicNamePublicationChanged')), '2025-02-15').endpoint, '')]",
+        "EventGrid__EventTopics__1__Key": "ReleaseVersionChangedEvent",
+        "EventGrid__EventTopics__1__TopicEndpoint": "[if(parameters('eventGridTopicsExist'), reference(resourceId('Microsoft.EventGrid/topics', variables('eventGridTopicNameReleaseVersionChanged')), '2025-02-15').endpoint, '')]",
         "PublicDataDbExists": "[parameters('publicDataDbExists')]"
       }
     },
@@ -3957,6 +4005,21 @@
           }
         }
       ]
+    },
+    {
+      "copy": {
+        "name": "keyVaultCertificateUsersCopy",
+        "count": "[length(variables('keyVaultCertificateUserPrincipalRefs'))]"
+      },
+      "type": "Microsoft.KeyVault/vaults/providers/roleAssignments",
+      "apiVersion": "2022-04-01",
+      "name": "[concat(variables('keyVaultName'), '/Microsoft.Authorization/', guid(resourceId('Microsoft.KeyVault/vaults',  variables('keyVaultName')), variables('keyVaultCertificateUserRoleDefinitionId'), variables('keyVaultCertificateUserPrincipalRefs')[copyIndex()]))]",
+      "properties": {
+        "roleDefinitionId": "[variables('keyVaultCertificateUserRoleDefinitionId')]",
+        "principalId": "[reference(variables('keyVaultCertificateUserPrincipalRefs')[copyIndex()], '2022-09-01', 'Full').identity.principalId]",
+        "scope": "[resourceId('Microsoft.KeyVault/vaults', variables('keyVaultName'))]",
+        "principalType": "ServicePrincipal"
+      }
     },
     {
       "copy": {

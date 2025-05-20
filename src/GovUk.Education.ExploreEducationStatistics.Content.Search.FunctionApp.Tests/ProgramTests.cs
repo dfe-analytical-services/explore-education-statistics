@@ -1,13 +1,11 @@
 ﻿using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Clients.AzureBlobStorage;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Clients.ContentApi;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Extensions;
-using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.OnReleaseSlugChanged;
-using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.OnReleaseVersionPublished;
-using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.OnThemeUpdated;
-using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.RefreshSearchableDocument;
-using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.ReindexSearchableDocuments;
+using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.CommandHandlers.ReindexSearchableDocuments;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Options;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Services;
+using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Services.CreateSearchableDocuments;
+using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Services.RemoveSearchableDocument;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Tests.Extensions;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -31,7 +29,7 @@ public class ProgramTests
 
     private IHost GetSut() => GetSutWithConfig(FullConfig);
 
-    private IHost GetSutWithConfig(params string[] jsonConfig) => GetSut(builder => 
+    private IHost GetSutWithConfig(params string[] jsonConfig) => GetSut(builder =>
         builder.ConfigureAppConfiguration((_, configurationBuilder) =>
         {
             foreach (var s in jsonConfig)
@@ -39,8 +37,9 @@ public class ProgramTests
                 configurationBuilder.AddJsonString(s);
             }
         }));
-    
-    private IHost GetSut(Func<IHostBuilder, IHostBuilder> modifyHostBuilder) => modifyHostBuilder(new HostBuilder()).BuildHost();
+
+    private IHost GetSut(Func<IHostBuilder, IHostBuilder> modifyHostBuilder) =>
+        modifyHostBuilder(new HostBuilder()).BuildHost();
 
     public class BasicTests : ProgramTests
     {
@@ -57,7 +56,7 @@ public class ProgramTests
             {
                 // ARRANGE
                 var sut = GetSut();
-                
+
                 // ACT
                 var httpClient = sut.Services.GetRequiredService<System.Net.Http.HttpClient>();
 
@@ -65,7 +64,7 @@ public class ProgramTests
                 Assert.NotNull(httpClient);
             }
         }
-        
+
         public class SearchableDocumentCreatorTests : ProgramTests
         {
             [Fact]
@@ -73,16 +72,33 @@ public class ProgramTests
             {
                 // ARRANGE
                 var sut = GetSut();
-            
+
                 // ACT
                 var actual = sut.Services.GetRequiredService<ISearchableDocumentCreator>();
-            
+
                 // ASSERT
                 Assert.NotNull(actual);
                 Assert.IsType<SearchableDocumentCreator>(actual);
             }
         }
-        
+
+        public class SearchableDocumentRemoverTests : ProgramTests
+        {
+            [Fact]
+            public void Should_resolve_ISearchableDocumentRemover()
+            {
+                // ARRANGE
+                var sut = GetSut();
+
+                // ACT
+                var actual = sut.Services.GetRequiredService<ISearchableDocumentRemover>();
+
+                // ASSERT
+                Assert.NotNull(actual);
+                Assert.IsType<SearchableDocumentRemover>(actual);
+            }
+        }
+
         public class ClientApiTests : GivenConfiguredHostTests
         {
             [Fact]
@@ -97,7 +113,7 @@ public class ProgramTests
                      }
                     }
                     """);
-                
+
                 // ACT
                 var actual = sut.Services.GetRequiredService<IContentApiClient>();
 
@@ -106,7 +122,7 @@ public class ProgramTests
                 var contentApiClient = Assert.IsType<ContentApiClient>(actual);
                 Assert.Equal("http://my.test.url:123/", contentApiClient.HttpClient.BaseAddress?.ToString());
             }
-            
+
             [Fact]
             public void WhenBaseAddressIsNotConfiguredShouldThrowOnStartup()
             {
@@ -128,7 +144,7 @@ public class ProgramTests
                 Assert.NotNull(options);
             }
         }
-        
+
         public class AzureBlobStorageClientApiTests : GivenConfiguredHostTests
         {
             [Fact]
@@ -155,7 +171,7 @@ public class ProgramTests
                 Assert.Equal("https://mystorageaccount.blob.core.windows.net/", blobServiceClient.Uri.ToString());
                 Assert.Equal("mystorageaccount", blobServiceClient.AccountName);
             }
-            
+
             [Fact]
             public void WhenConnectionStringNotConfiguredShouldNotThrowOnStartUp()
             {
@@ -177,7 +193,7 @@ public class ProgramTests
                 var options = host.Services.GetRequiredService<IOptions<ContentApiOptions>>();
                 Assert.NotNull(options);
             }
-            
+
             [Fact]
             public void WhenContainerNameNotConfiguredShouldNotThrowOnStartup()
             {
@@ -200,7 +216,7 @@ public class ProgramTests
                 Assert.NotNull(options);
             }
         }
-        
+
         public class ReindexSearchableDocumentsFunctionTests : ProgramTests
         {
             [Fact]
@@ -208,36 +224,36 @@ public class ProgramTests
             {
                 // ARRANGE
                 var sut = GetSut();
-            
+
                 // ACT
                 var actual = ActivatorUtilities.CreateInstance<ReindexSearchableDocumentsFunction>(sut.Services);
-            
+
                 // ASSERT
                 Assert.NotNull(actual);
             }
-            
+
             [Fact]
             public void GivenNotConfigured_WhenResolvingReindexSearchableDocumentsFunction_ThenShouldResolve()
             {
                 // ARRANGE
                 var sut = GetSutWithConfig("{}");
-            
+
                 // ACT
                 var actual = sut.Services.GetRequiredService<IOptions<ReindexSearchableDocumentsFunction>>();
-                
+
                 // ASSERT
                 Assert.NotNull(actual);
             }
-            
+
             [Fact]
             public void GivenNotConfigured_WhenResolvingAzureSearchOptions_ThenShouldResolve()
             {
                 // ARRANGE
                 var sut = GetSutWithConfig("{}");
-            
+
                 // ACT
                 var options = sut.Services.GetRequiredService<IOptions<AzureSearchOptions>>();
-                
+
                 // ASSERT
                 Assert.NotNull(options.Value);
                 Assert.Equal(string.Empty, options.Value.SearchServiceEndpoint);
@@ -245,7 +261,7 @@ public class ProgramTests
                 Assert.Equal(string.Empty, options.Value.IndexerName);
             }
         }
-        
+
         public class ResolveFunctionTests : ProgramTests
         {
             public static TheoryData<Type> GetAzureFunctionTypes()
@@ -253,9 +269,10 @@ public class ProgramTests
                 var types = typeof(Program)
                     .Assembly
                     .GetTypes()
-                    .Where(type => type.Namespace?.StartsWith("GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.") == true)
+                    .Where(type => type.Namespace?.StartsWith(
+                            "GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.") == true)
                     .Where(type => type.Name.EndsWith("Function"));
-                
+
                 return new TheoryData<Type>(types);
             }
 
@@ -265,10 +282,10 @@ public class ProgramTests
             {
                 // ARRANGE
                 var sut = GetSut();
-            
+
                 // ACT
                 var actual = ActivatorUtilities.CreateInstance(sut.Services, functionType);
-            
+
                 // ASSERT
                 Assert.NotNull(actual);
             }

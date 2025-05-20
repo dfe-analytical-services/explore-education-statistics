@@ -18,14 +18,24 @@ var eventGridCustomTopicSubscriptions = [
     topicName: eventTopics.publicationChanged
     subscriptions: [
       {
+        name: 'publication-archived'
+        includedEventTypes: ['publication-archived']
+        queueName: storageQueueNames.publicationArchived
+      }
+      {
         name: 'publication-changed'
         includedEventTypes: ['publication-changed']
-        queueName: storageQueueNames.publicationChangedQueueName
+        queueName: storageQueueNames.publicationChanged
       }
       {
         name: 'publication-latest-published-release-reordered'
         includedEventTypes: ['publication-latest-published-release-reordered']
-        queueName: storageQueueNames.publicationLatestPublishedReleaseReorderedQueueName
+        queueName: storageQueueNames.publicationLatestPublishedReleaseReordered
+      }
+      {
+        name: 'publication-restored'
+        includedEventTypes: ['publication-restored']
+        queueName: storageQueueNames.publicationRestored
       }
     ]
   }
@@ -35,7 +45,7 @@ var eventGridCustomTopicSubscriptions = [
       {
         name: 'release-slug-changed'
         includedEventTypes: ['release-slug-changed']
-        queueName: storageQueueNames.releaseSlugChangedQueueName
+        queueName: storageQueueNames.releaseSlugChanged
       }
     ]
   }
@@ -45,7 +55,7 @@ var eventGridCustomTopicSubscriptions = [
       {
         name: 'release-version-published'
         includedEventTypes: ['release-version-published']
-        queueName: storageQueueNames.releaseVersionPublishedQueueName
+        queueName: storageQueueNames.releaseVersionPublished
       }
     ]
   }
@@ -55,7 +65,7 @@ var eventGridCustomTopicSubscriptions = [
       {
         name: 'theme-changed'
         includedEventTypes: ['theme-changed']
-        queueName: storageQueueNames.themeUpdatedQueueName
+        queueName: storageQueueNames.themeUpdated
       }
     ]
   }

@@ -10,6 +10,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Database;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.ModelBinding;
 using GovUk.Education.ExploreEducationStatistics.Common.Rules;
+using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Options;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Repository;
@@ -19,6 +20,8 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services.Security;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Strategies;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Strategies.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Swagger;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.DuckDb;
@@ -33,9 +36,6 @@ using Microsoft.AspNetCore.Rewrite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Swashbuckle.AspNetCore.SwaggerGen;
-using AnalyticsOptions = GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Options.AnalyticsOptions;
-using AnalyticsPathResolver = GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services.AnalyticsPathResolver;
-using IAnalyticsPathResolver = GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services.Interfaces.IAnalyticsPathResolver;
 using RequestTimeoutOptions = GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Options.RequestTimeoutOptions;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api;
@@ -254,17 +254,9 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
         services.AddScoped<IParquetLocationRepository, ParquetLocationRepository>();
         services.AddScoped<IParquetTimePeriodRepository, ParquetTimePeriodRepository>();
 
-        if (_analyticsOptions.Enabled)
-        {
-            services.AddSingleton<IQueryAnalyticsManager, QueryAnalyticsManager>();
-            services.AddHostedService<QueryAnalyticsConsumer>();
-            services.AddSingleton<IAnalyticsPathResolver, AnalyticsPathResolver>();
-            services.AddSingleton<IQueryAnalyticsWriter, QueryAnalyticsWriter>();
-        }
-        else
-        {
-            services.AddSingleton<IQueryAnalyticsManager, NoopQueryAnalyticsManager>();
-        }
+        services.AddAnalytics(hostEnvironment, configuration);
+
+        services.AddSingleton<DateTimeProvider>();
     }
 
     // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -373,19 +365,5 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
         var migrations = serviceScope.ServiceProvider.GetServices<ICustomMigration>();
 
         migrations.ForEach(migration => migration.Apply());
-    }
-
-    private class NoopQueryAnalyticsManager : IQueryAnalyticsManager
-    {
-        public Task AddQuery(CaptureDataSetVersionQueryRequest request, CancellationToken cancellationToken)
-        {
-            return Task.CompletedTask;
-        }
-
-        public async ValueTask<CaptureDataSetVersionQueryRequest> ReadQuery(CancellationToken cancellationToken)
-        {
-            await Task.Delay(Timeout.Infinite, cancellationToken);
-            return default!;
-        }
     }
 }

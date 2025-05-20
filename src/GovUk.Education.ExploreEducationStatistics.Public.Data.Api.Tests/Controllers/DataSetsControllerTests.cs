@@ -23,7 +23,7 @@ using Microsoft.Extensions.Primitives;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Controllers;
 
-public abstract class DataSetsControllerTests(TestApplicationFactory testApp) : IntegrationTestFixture(testApp)
+public abstract class DataSetsControllerTests(TestApplicationFactory testApp) : IntegrationTestFixtureWithCommonTestDataSetup(testApp)
 {
     private const string BaseUrl = "v1/data-sets";
 
@@ -765,6 +765,29 @@ public abstract class DataSetsControllerTests(TestApplicationFactory testApp) : 
                 var response = await GetDataSetMeta(dataSetId: dataSet.Id, dataSetVersion: "1.0");
 
                 response.AssertNotFound();
+            }
+            
+            [Theory]
+            [MemberData(nameof(DataSetVersionStatusQueryTheoryData.NonPublishedStatus),
+                MemberType = typeof(DataSetVersionStatusQueryTheoryData))]
+            public async Task WildCardSpecified_RequestsNonPublishedVersion_Returns404(DataSetVersionStatus versionStatus)
+            {
+                var (dataSet, _) = await SetupDataSetWithSpecifiedVersionStatuses(versionStatus);
+            
+                var response = await GetDataSetMeta(dataSetId: dataSet.Id, dataSetVersion: "2.*");
+
+                response.AssertNotFound();
+            }
+        
+            [Fact]
+            public async Task WildCardSpecified_RequestsPublishedVersion_Returns200()
+            {
+                var (dataSet, _) = await SetupDataSetWithSpecifiedVersionStatuses(DataSetVersionStatus.Published);
+            
+                var response = await GetDataSetMeta(dataSetId: dataSet.Id, dataSetVersion: "2.*");
+
+                var viewModel = response.AssertOk<DataSetMetaViewModel>(useSystemJson: true);
+                Assert.NotNull(viewModel);
             }
         }
 
@@ -1581,6 +1604,86 @@ public abstract class DataSetsControllerTests(TestApplicationFactory testApp) : 
                 });
 
                 var response = await DownloadDataSet(dataSet.Id, "2.0");
+
+                response.AssertNotFound();
+            }
+        
+            [Fact]
+            public async Task WildCardSpecified_RequestsPublishedVersion_Returns200()
+            {
+                DataSet dataSet = DataFixture
+                    .DefaultDataSet()
+                    .WithStatusPublished();
+
+                await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
+
+                DataSetVersion dataSetVersion1 = DataFixture
+                    .DefaultDataSetVersion()
+                    .WithVersionNumber(major: 1, minor: 0, patch: 0)
+                    .WithStatusPublished()
+                    .WithDataSet(dataSet);
+                DataSetVersion dataSetVersion2 = DataFixture
+                    .DefaultDataSetVersion()
+                    .WithVersionNumber(major: 2, minor: 0, patch: 0)
+                    .WithStatusPublished()
+                    .WithDataSet(dataSet);
+                DataSetVersion requestedDataSetVersion = DataFixture
+                    .DefaultDataSetVersion()
+                    .WithStatus(DataSetVersionStatus.Published)
+                    .WithVersionNumber(major: 2, minor: 1, patch: 0)
+                    .WithDataSet(dataSet)
+                    .FinishWith(dsv => dataSet.LatestLiveVersion = dsv);
+
+                await TestApp.AddTestData<PublicDataDbContext>(context =>
+                {
+                    context.DataSetVersions.AddRange([dataSetVersion1, dataSetVersion2, requestedDataSetVersion]);
+                    context.DataSets.Update(dataSet);
+                });
+
+                await CreateGZippedTestCsv(requestedDataSetVersion, CsvData);
+
+                var response = await DownloadDataSet(dataSet.Id, "2.*");
+
+                response.AssertOk();
+            }
+            
+            [Theory]
+            [MemberData(nameof(DataSetVersionStatusViewTheoryData.NonPublishedStatus),
+                MemberType = typeof(DataSetVersionStatusViewTheoryData))]
+            public async Task WildCardSpecified_RequestsNonPublishedVersion_Returns404(DataSetVersionStatus versionStatus)
+            {
+                DataSet dataSet = DataFixture
+                    .DefaultDataSet()
+                    .WithStatusPublished();
+
+                await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
+
+                DataSetVersion liveDataSetVersion = DataFixture
+                    .DefaultDataSetVersion()
+                    .WithVersionNumber(major: 1, minor: 0, patch: 0)
+                    .WithStatusPublished()
+                    .WithDataSet(dataSet)
+                    .FinishWith(dsv => dataSet.LatestLiveVersion = dsv);
+                DataSetVersion dataSetVersion1 = DataFixture
+                    .DefaultDataSetVersion()
+                    .WithVersionNumber(major: 2, minor: 0, patch: 0)
+                    .WithStatus(versionStatus)
+                    .WithDataSet(dataSet);
+                DataSetVersion dataSetVersion2 = DataFixture
+                    .DefaultDataSetVersion()
+                    .WithStatus(versionStatus)
+                    .WithVersionNumber(major: 2, minor: 1, patch: 0)
+                    .WithDataSet(dataSet);
+
+                await TestApp.AddTestData<PublicDataDbContext>(context =>
+                {
+                    context.DataSetVersions.AddRange([dataSetVersion1, dataSetVersion2, liveDataSetVersion]);
+                    context.DataSets.Update(dataSet);
+                });
+
+                await CreateGZippedTestCsv(liveDataSetVersion, CsvData);
+
+                var response = await DownloadDataSet(dataSet.Id, "2.*");
 
                 response.AssertNotFound();
             }

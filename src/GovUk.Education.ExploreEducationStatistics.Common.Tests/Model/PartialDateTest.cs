@@ -1,5 +1,4 @@
 #nullable enable
-using System;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using Xunit;
 

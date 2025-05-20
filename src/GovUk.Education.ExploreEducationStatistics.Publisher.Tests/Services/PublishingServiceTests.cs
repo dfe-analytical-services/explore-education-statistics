@@ -411,8 +411,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 PublicStorageConnectionString = PublicStorageConnectionString,
                 NotifierStorageConnectionString = string.Empty,
                 PublisherStorageConnectionString = string.Empty,
-                PublishReleaseContentCronSchedule = string.Empty,
-                PublishReleasesCronSchedule = string.Empty
+                PublishScheduledReleasesFunctionCronSchedule = string.Empty,
+                StageScheduledReleasesFunctionCronSchedule = string.Empty
             }.ToOptionsWrapper();
         }
     }

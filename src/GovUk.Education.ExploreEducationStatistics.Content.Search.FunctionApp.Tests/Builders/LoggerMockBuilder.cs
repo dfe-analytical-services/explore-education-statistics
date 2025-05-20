@@ -10,13 +10,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.
 public class LoggerMockBuilder<T>
 {
     private MockLogger? _logger;
-    
+    private Action<string>? _logAction;
     /// <summary>
     /// Build the <summary cref="ILogger{T}" /> instance. Pass in the instance of <summary cref="ITestOutputHelper" /> injected into the xunit test class. 
     /// </summary>
-    public ILogger<T> Build() => _logger = new MockLogger();
+    public ILogger<T> Build() => _logger = new MockLogger(_logAction);
 
-    private class MockLogger() : ILogger<T>
+    public LoggerMockBuilder<T> WithLogAction(Action<string>? logAction)
+    {
+        _logAction = logAction;
+        return this;
+    }
+    
+    private class MockLogger(Action<string>? output = null) : ILogger<T>
     {
         public List<LogItem> LogItems { get; } = new();
         public IDisposable? BeginScope<TState>(TState state) where TState : notnull => throw new NotImplementedException();
@@ -26,6 +32,7 @@ public class LoggerMockBuilder<T>
         public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception? exception, Func<TState, Exception?, string> formatter)
         {
             LogItems.Add(new LogItem(logLevel, formatter(state, exception)));
+            output?.Invoke(formatter(state, exception));
         }
     }
     

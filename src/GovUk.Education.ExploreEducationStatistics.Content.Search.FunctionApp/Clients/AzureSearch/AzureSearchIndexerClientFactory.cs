@@ -1,6 +1,5 @@
 ﻿using Azure;
 using Azure.Identity;
-using Azure.Search.Documents.Indexes;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Options;
 using Microsoft.Extensions.Options;
 
@@ -19,6 +18,6 @@ public class AzureSearchIndexerClientFactory(IOptions<AzureSearchOptions> option
     public IAzureSearchIndexerClient Create() =>
         new AzureSearchIndexerClientWrapper(
             string.IsNullOrEmpty(_accessKey)
-                ? new SearchIndexerClient(new Uri(_searchServiceEndpoint), new DefaultAzureCredential())
-                : new SearchIndexerClient(new Uri(_searchServiceEndpoint), new AzureKeyCredential(_accessKey)));
+                ? new Azure.Search.Documents.Indexes.SearchIndexerClient(new Uri(_searchServiceEndpoint), new DefaultAzureCredential())
+                : new Azure.Search.Documents.Indexes.SearchIndexerClient(new Uri(_searchServiceEndpoint), new AzureKeyCredential(_accessKey)));
 }

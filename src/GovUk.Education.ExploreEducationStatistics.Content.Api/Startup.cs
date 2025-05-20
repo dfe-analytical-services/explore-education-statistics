@@ -11,6 +11,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Requests;
 using GovUk.Education.ExploreEducationStatistics.Common.Rules;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Content.Api.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
@@ -46,17 +47,10 @@ using ReleaseService = GovUk.Education.ExploreEducationStatistics.Content.Servic
 namespace GovUk.Education.ExploreEducationStatistics.Content.Api
 {
     [ExcludeFromCodeCoverage]
-    public class Startup
+    public class Startup(
+        IConfiguration configuration,
+        IHostEnvironment hostEnvironment)
     {
-        private IConfiguration Configuration { get; }
-        private IHostEnvironment HostEnvironment { get; }
-
-        public Startup(IConfiguration configuration, IHostEnvironment hostEnvironment)
-        {
-            Configuration = configuration;
-            HostEnvironment = hostEnvironment;
-        }
-
         // This method gets called by the runtime. Use this method to add services to the container.
         public virtual void ConfigureServices(IServiceCollection services)
         {
@@ -90,24 +84,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api
 
             services.AddDbContext<StatisticsDbContext>(options =>
                 options
-                    .UseSqlServer(Configuration.GetConnectionString("StatisticsDb"),
+                    .UseSqlServer(configuration.GetConnectionString("StatisticsDb"),
                         providerOptions => 
                             providerOptions
                                 .MigrationsAssembly("GovUk.Education.ExploreEducationStatistics.Data.Model")
                                 .EnableCustomRetryOnFailure()
                     )
-                    .EnableSensitiveDataLogging(HostEnvironment.IsDevelopment())
+                    .EnableSensitiveDataLogging(hostEnvironment.IsDevelopment())
             );
 
             services.AddDbContext<ContentDbContext>(options =>
                 options
-                    .UseSqlServer(Configuration.GetConnectionString("ContentDb"),
+                    .UseSqlServer(configuration.GetConnectionString("ContentDb"),
                         providerOptions => 
                             providerOptions
                                 .MigrationsAssembly(typeof(Startup).Assembly.FullName)
                                 .EnableCustomRetryOnFailure()
                     )
-                    .EnableSensitiveDataLogging(HostEnvironment.IsDevelopment())
+                    .EnableSensitiveDataLogging(hostEnvironment.IsDevelopment())
             );
 
             // Adds Brotli and Gzip compressing
@@ -127,15 +121,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api
             });
 
             services.AddCors();
+
+            // Options - to allow them to be injected into services
+            services.AddOptions<AnalyticsOptions>()
+                .Bind(configuration.GetSection(AnalyticsOptions.Section));
+
+            // Services
             services.AddSingleton<IPublicBlobStorageService, PublicBlobStorageService>(provider =>
-                new PublicBlobStorageService(Configuration.GetValue<string>("PublicStorage"),
+                new PublicBlobStorageService(configuration.GetValue<string>("PublicStorage"),
                     provider.GetRequiredService<ILogger<IBlobStorageService>>()));
             services.AddTransient<IBlobCacheService, BlobCacheService>(provider => new BlobCacheService(
                 provider.GetRequiredService<IPublicBlobStorageService>(),
                 provider.GetRequiredService<ILogger<BlobCacheService>>()));
             services.AddSingleton<IMemoryCacheService>(provider =>
             {
-                var memoryCacheConfig = Configuration.GetSection("MemoryCache");
+                var memoryCacheConfig = configuration.GetSection("MemoryCache");
                 var maxCacheSizeMb = memoryCacheConfig.GetValue<int>("MaxCacheSizeMb");
                 var expirationScanFrequencySeconds = memoryCacheConfig.GetValue<int>("ExpirationScanFrequencySeconds");
                 return new MemoryCacheService(
@@ -176,6 +176,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api
             services.AddTransient<IRedirectsCacheService, RedirectsCacheService>();
             services.AddTransient<IRedirectsService, RedirectsService>();
 
+            services.AddAnalytics(hostEnvironment, configuration);
+
+            services.AddSingleton<DateTimeProvider>();
+
             StartupSecurityConfiguration.ConfigureAuthorizationPolicies(services);
             StartupSecurityConfiguration.ConfigureResourceBasedAuthorization(services);
 
@@ -193,7 +197,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api
             BlobCacheAttribute.AddService("public", app.ApplicationServices.GetRequiredService<IBlobCacheService>());
 
             // Register the MemoryCacheService only if the Memory Caching is enabled. 
-            var memoryCacheConfig = Configuration.GetSection("MemoryCache");
+            var memoryCacheConfig = configuration.GetSection("MemoryCache");
             if (memoryCacheConfig.GetValue("Enabled", false))
             {
                 MemoryCacheAttribute.SetOverrideConfiguration(memoryCacheConfig.GetSection("Overrides"));
@@ -213,7 +217,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api
             var rewriteOptions = new RewriteOptions()
                 .Add(new LowercasePathRule());
 
-            if(Configuration.GetValue<bool>("enableSwagger"))
+            if(configuration.GetValue<bool>("enableSwagger"))
             {
                 app.UseSwagger();
                 app.UseSwaggerUI(c =>

@@ -4,7 +4,6 @@ using GovUk.Education.ExploreEducationStatistics.Common.Database;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Functions;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
-using GovUk.Education.ExploreEducationStatistics.Common.Services.EventGrid;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Security;
@@ -20,6 +19,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Services.Mappings;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Events.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Services;
@@ -62,6 +62,12 @@ public static class PublisherHostBuilderExtensions
                 // TODO EES-5013 Why can't this be controlled through application settings?
                 logging.AddFilter("Microsoft.EntityFrameworkCore.Database.Command", LogLevel.Warning);
             })
+            .ConfigureServices();
+    }
+    
+    public static IHostBuilder ConfigureServices(this IHostBuilder hostBuilder)
+    {
+        return hostBuilder
             .ConfigureServices((hostContext, services) =>
             {
                 var configuration = hostContext.Configuration;
@@ -83,6 +89,7 @@ public static class PublisherHostBuilderExtensions
                         options.UseSqlServer(
                             ConnectionUtils.GetAzureSqlConnectionString("StatisticsDb"),
                             providerOptions => providerOptions.EnableCustomRetryOnFailure()))
+                    .AddSingleton(TimeProvider.System)
                     .AddSingleton<IFileStorageService, FileStorageService>(provider =>
                         new FileStorageService(
                             provider.GetRequiredService<IOptions<AppOptions>>().Value.PublisherStorageConnectionString))
@@ -171,9 +178,9 @@ public static class PublisherHostBuilderExtensions
                 // cause the data source builder to throw a host exception.
                 if (!hostEnvironment.IsIntegrationTest())
                 {
-                    var connectionString = ConnectionUtils.GetPostgreSqlConnectionString("PublicDataDb")!;
                     if (publicDataDbExists)
                     {
+                        var connectionString = ConnectionUtils.GetPostgreSqlConnectionString("PublicDataDb")!;
                         services.AddFunctionAppPsqlDbContext<PublicDataDbContext>(connectionString, hostContext);
                     }
                 }

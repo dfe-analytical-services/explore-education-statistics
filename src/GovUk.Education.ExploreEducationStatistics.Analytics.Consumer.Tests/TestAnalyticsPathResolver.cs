@@ -23,16 +23,43 @@ public class TestAnalyticsPathResolver : IAnalyticsPathResolver, IDisposable
         return _basePath;
     }
 
+    // PublicApiQueries
     public string PublicApiQueriesDirectoryPath()
     {
-        return Path.Combine(_basePath, "public-api");
-    }
-
-    public string PublicApiQueriesProcessingDirectoryPath() {
-        return Path.Combine(_basePath, "public-api", "processing");
+        return Path.Combine(_basePath, "public-api", "queries");
     }
 
     public string PublicApiQueriesReportsDirectoryPath() {
-        return Path.Combine(_basePath, "reports", "public-api", "reports");
+        return Path.Combine(_basePath, "reports", "public-api", "queries");
+    }
+    
+    // PublicApiDataSets
+    public string PublicApiDataSetCallsDirectoryPath()
+    {
+        return Path.Combine(_basePath, "public-api", "data-sets");
+    }
+
+    public string PublicApiDataSetCallsReportsDirectoryPath() {
+        return Path.Combine(_basePath, "reports", "public-api", "data-sets");
+    }
+    
+    // PublicApiDataSetVersions
+    public string PublicApiDataSetVersionCallsDirectoryPath()
+    {
+        return Path.Combine(_basePath, "public-api", "data-set-versions");
+    }
+
+    public string PublicApiDataSetVersionCallsReportsDirectoryPath() {
+        return Path.Combine(_basePath, "reports", "public-api", "data-set-versions");
+    }
+
+    // PublicZipDownloads
+    public string PublicZipDownloadsDirectoryPath()
+    {
+        return Path.Combine(_basePath, "public", "zip-downloads");
+    }
+
+    public string PublicZipDownloadsReportsDirectoryPath() {
+        return Path.Combine(_basePath, "reports", "public", "zip-downloads");
     }
 }
