@@ -1,5 +1,6 @@
 using System.Globalization;
 using System.Net.Mime;
+using System.Text.Json;
 using CsvHelper;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
@@ -7,6 +8,8 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Model;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Requests;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Fixture;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.TheoryData;
@@ -1904,9 +1907,129 @@ public abstract class DataSetsControllerTests(TestApplicationFactory testApp) : 
             }
         }
 
+        public class AnalyticsEnabledTests : DownloadDataSetCsvTests, IDisposable
+        {
+            public AnalyticsEnabledTests(TestApplicationFactory testApp) : base(testApp)
+            {
+                testApp.AddAppSettings("appsettings.AnalyticsEnabled.json");
+            }
+
+            public void Dispose()
+            {
+                var queriesDirectory = GetAnalyticsPathResolver().PublicApiDataSetVersionCallsDirectoryPath();
+                if (Directory.Exists(queriesDirectory))
+                {
+                    Directory.Delete(queriesDirectory, recursive: true);
+                }
+            }
+
+            public record PreviewTokenSummary(
+                string Label,
+                DateTimeOffset Created,
+                DateTimeOffset Expiry);
+
+            public static readonly TheoryData<(PreviewTokenSummary?, string?)>
+                PreviewTokensAndRequestedDataSetVersions =
+                [
+                    (null, null),
+                    (new PreviewTokenSummary(Label: "Preview token",
+                        Created: DateTimeOffset.UtcNow.AddDays(-1),
+                        Expiry: DateTimeOffset.UtcNow.AddDays(1)), "1.0.*")
+                ];
+
+            [Theory]
+            [MemberData(nameof(PreviewTokensAndRequestedDataSetVersions))]
+            public async Task AnalyticsRequestCaptured(
+                (PreviewTokenSummary?, string?) previewTokenAndRequestedDataSetVersion)
+            {
+                var (expectedPreviewToken, requestedDataSetVersion) = previewTokenAndRequestedDataSetVersion;
+                
+                DataSet dataSet = DataFixture
+                    .DefaultDataSet()
+                    .WithStatusPublished();
+
+                await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
+
+                DataSetVersion dataSetVersion = DataFixture
+                    .DefaultDataSetVersion()
+                    .WithStatus(DataSetVersionStatus.Published)
+                    .WithDataSet(dataSet)
+                    .WithPreviewTokens(expectedPreviewToken != null
+                        ? DataFixture
+                            .DefaultPreviewToken()
+                            .WithLabel(expectedPreviewToken.Label)
+                            .WithCreated(expectedPreviewToken.Created)
+                            .WithExpiry(expectedPreviewToken.Expiry)
+                            .Generate(1) 
+                        : [])
+                    .FinishWith(dsv => dataSet.LatestLiveVersion = dsv);
+
+                await TestApp.AddTestData<PublicDataDbContext>(context =>
+                {
+                    context.DataSetVersions.Add(dataSetVersion);
+                    context.DataSets.Update(dataSet);
+                });
+
+                await CreateGZippedTestCsv(dataSetVersion, CsvData);
+
+                var persistedPreviewToken = dataSetVersion
+                    .PreviewTokens
+                    .SingleOrDefault();
+                
+                var response = await DownloadDataSet(
+                    dataSetId: dataSet.Id,
+                    dataSetVersion: requestedDataSetVersion,
+                    previewTokenId: persistedPreviewToken?.Id);
+                
+                response.AssertOk();
+                
+                var results = await DecompressGZippedCsv(response);
+                Assert.Equal(CsvData, results);
+
+                // Add a slight delay as the writing of the analytics capture is non-blocking
+                // and could occur slightly after the Controller response is returned to the user.
+                Thread.Sleep(2000);
+
+                var analyticsPath = GetAnalyticsPathResolver().PublicApiDataSetVersionCallsDirectoryPath();
+
+                // Expect the successful call to have been recorded for analytics.
+                Assert.True(Directory.Exists(analyticsPath));
+                var analyticsFiles = Directory.GetFiles(analyticsPath);
+                var analyticFile = Assert.Single(analyticsFiles);
+                var contents = await File.ReadAllTextAsync(analyticFile);
+
+                var capturedCall = JsonSerializer.Deserialize<CaptureDataSetVersionCallRequest>(contents,
+                    new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+
+                Assert.NotNull(capturedCall);
+                Assert.Equal(DataSetVersionCallType.DownloadCsv, capturedCall.Type);
+                Assert.Equal(dataSet.Id, capturedCall.DataSetId);
+                Assert.Equal(dataSet.Title, capturedCall.DataSetTitle);
+                Assert.Equal(dataSetVersion.Id, capturedCall.DataSetVersionId);
+                Assert.Equal(dataSetVersion.SemVersion().ToString(), capturedCall.DataSetVersion);
+                Assert.Equal(requestedDataSetVersion, capturedCall.RequestedDataSetVersion);
+                Assert.Null(capturedCall.Parameters);
+                capturedCall.StartTime.AssertUtcNow(withinMillis: 5000);
+
+                if (expectedPreviewToken == null)
+                {
+                    Assert.Null(capturedCall.PreviewToken);
+                }
+                else
+                {
+                    Assert.NotNull(persistedPreviewToken);
+                    Assert.NotNull(capturedCall.PreviewToken);
+                    Assert.Equal(expectedPreviewToken.Label, capturedCall.PreviewToken.Label);
+                    Assert.Equal(dataSetVersion.Id, capturedCall.PreviewToken.DataSetVersionId);
+                    Assert.Equal(expectedPreviewToken.Created.TruncateMicroseconds(), capturedCall.PreviewToken.Created);
+                    Assert.Equal(expectedPreviewToken.Expiry.TruncateMicroseconds(), capturedCall.PreviewToken.Expiry);
+                }
+            }
+        }
+
         private async Task CreateGZippedTestCsv(DataSetVersion dataSetVersion, IReadOnlyList<TestClass> csvData)
         {
-            var dataSetVersionPathResolver = TestApp.Services.GetRequiredService<IDataSetVersionPathResolver>();
+            var dataSetVersionPathResolver = BuildApp().Services.GetRequiredService<IDataSetVersionPathResolver>();
 
             await using var memStream = new MemoryStream();
             await using var streamWriter = new StreamWriter(memStream);
@@ -1962,6 +2085,11 @@ public abstract class DataSetsControllerTests(TestApplicationFactory testApp) : 
             public string FirstColumn { get; init; } = null!;
             public string SecondColumn { get; init; } = null!;
         }
+    }
+
+    private IAnalyticsPathResolver GetAnalyticsPathResolver()
+    {
+        return BuildApp().Services.GetRequiredService<IAnalyticsPathResolver>();
     }
 
     private WebApplicationFactory<Startup> BuildApp()
