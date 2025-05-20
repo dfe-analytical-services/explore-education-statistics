@@ -1,6 +1,5 @@
 using System.Globalization;
 using System.Net.Mime;
-using System.Text.Json;
 using CsvHelper;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
@@ -23,6 +22,7 @@ using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Primitives;
+using Newtonsoft.Json;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Controllers;
 
@@ -1998,8 +1998,7 @@ public abstract class DataSetsControllerTests(TestApplicationFactory testApp) : 
                 var analyticFile = Assert.Single(analyticsFiles);
                 var contents = await File.ReadAllTextAsync(analyticFile);
 
-                var capturedCall = JsonSerializer.Deserialize<CaptureDataSetVersionCallRequest>(contents,
-                    new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                var capturedCall = JsonConvert.DeserializeObject<CaptureDataSetVersionCallRequest>(contents);
 
                 Assert.NotNull(capturedCall);
                 Assert.Equal(DataSetVersionCallType.DownloadCsv, capturedCall.Type);
