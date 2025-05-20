@@ -1,3 +1,6 @@
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
+
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Requests;
 
 public interface IAnalyticsCaptureRequestBase;
@@ -20,7 +23,8 @@ public record CaptureDataSetVersionCallRequest(
     string DataSetTitle,
     PreviewTokenRequest? PreviewToken,
     string? RequestedDataSetVersion,
-    DateTimeOffset StartTime,
+    DateTimeOffset StartTime, 
+    [property:JsonConverter(typeof(StringEnumConverter))]
     DataSetVersionCallType Type,
     object? Parameters = null
 ) : IAnalyticsCaptureRequestBase;
@@ -32,7 +36,6 @@ public enum DataSetVersionCallType
     DownloadCsv,
     GetChanges
 }
-
 
 public record PreviewTokenRequest(
     string Label,

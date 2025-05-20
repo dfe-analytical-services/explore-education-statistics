@@ -72,17 +72,18 @@ public abstract class PublicApiDataSetVersionCallsProcessorTests
 
             AssertReportRowOk(
                 queryReportRow,
-                expectedType: "GetDataSetVersionMetadata",
+                expectedType: "GetSummary",
                 expectPreviewToken: false,
-                expectedStartTime: DateTime.Parse("2025-02-24T02:07:44.850Z"),
+                expectedStartTime: DateTime.Parse("2025-02-28T03:07:44.850Z"),
+                expectedRequestedDataSetVersion: null,
                 expectedParameters: null);
         }
         
         [Fact]
-        public async Task WithPreviewTokens_CapturedInReport()
+        public async Task WithPreviewTokenAndRequestedDataSetVersion_CapturedInReport()
         {
             using var pathResolver = new TestAnalyticsPathResolver();
-            SetupRequestFile(pathResolver, "WithPreviewTokens.json");
+            SetupRequestFile(pathResolver, "WithPreviewTokenAndRequestedDataSetVersion.json");
 
             var service = BuildService(pathResolver: pathResolver);
             await service.Process();
@@ -106,9 +107,10 @@ public abstract class PublicApiDataSetVersionCallsProcessorTests
 
             AssertReportRowOk(
                 queryReportRow,
-                expectedType: "GetDataSetVersionSummary",
+                expectedType: "DownloadCsv",
                 expectPreviewToken: true,
-                expectedStartTime: DateTime.Parse("2025-02-28T03:07:44.850Z"),
+                expectedStartTime: DateTime.Parse("2025-02-26T03:07:44.850Z"),
+                expectedRequestedDataSetVersion: "1.*",
                 expectedParameters: null);
         }
         
@@ -140,9 +142,10 @@ public abstract class PublicApiDataSetVersionCallsProcessorTests
 
             AssertReportRowOk(
                 queryReportRow,
-                expectedType: "GetDataSetVersionMetadata",
+                expectedType: "GetMetadata",
                 expectPreviewToken: false,
                 expectedStartTime: DateTime.Parse("2025-02-24T03:07:44.850Z"),
+                expectedRequestedDataSetVersion: null,
                 expectedParameters: """{"types":["Filters","Indicators","Locations","TimePeriods"]}""");
         }
         
@@ -152,7 +155,7 @@ public abstract class PublicApiDataSetVersionCallsProcessorTests
             using var pathResolver = new TestAnalyticsPathResolver();
             SetupRequestFile(pathResolver, "WithCoreDataSetVersionDetails.json");
             SetupRequestFile(pathResolver, "WithParameters.json");
-            SetupRequestFile(pathResolver, "WithPreviewTokens.json");
+            SetupRequestFile(pathResolver, "WithPreviewTokenAndRequestedDataSetVersion.json");
 
             var service = BuildService(pathResolver: pathResolver);
             await service.Process();
@@ -175,23 +178,26 @@ public abstract class PublicApiDataSetVersionCallsProcessorTests
             
             AssertReportRowOk(
                 reportRows[0],
-                expectedType: "GetDataSetVersionMetadata",
-                expectPreviewToken: false,
-                expectedStartTime: DateTime.Parse("2025-02-24T02:07:44.850Z"),
-                expectedParameters: null);
-            
-            AssertReportRowOk(
-                reportRows[1],
-                expectedType: "GetDataSetVersionMetadata",
+                expectedType: "GetMetadata",
                 expectPreviewToken: false,
                 expectedStartTime: DateTime.Parse("2025-02-24T03:07:44.850Z"),
+                expectedRequestedDataSetVersion: null,
                 expectedParameters: """{"types":["Filters","Indicators","Locations","TimePeriods"]}""");
             
             AssertReportRowOk(
-                reportRows[2],
-                expectedType: "GetDataSetVersionSummary",
+                reportRows[1],
+                expectedType: "DownloadCsv",
                 expectPreviewToken: true,
+                expectedStartTime: DateTime.Parse("2025-02-26T03:07:44.850Z"),
+                expectedRequestedDataSetVersion: "1.*",
+                expectedParameters: null);
+            
+            AssertReportRowOk(
+                reportRows[2],
+                expectedType: "GetSummary",
+                expectPreviewToken: false,
                 expectedStartTime: DateTime.Parse("2025-02-28T03:07:44.850Z"),
+                expectedRequestedDataSetVersion: null,
                 expectedParameters: null);
         }
 
@@ -210,13 +216,14 @@ public abstract class PublicApiDataSetVersionCallsProcessorTests
         string expectedType,
         DateTime expectedStartTime,
         bool expectPreviewToken,
+        string? expectedRequestedDataSetVersion,
         string? expectedParameters)
     {
         Assert.Equal(expectedType, queryReportRow.Type);
         Assert.Equal(Guid.Parse("01d29401-7274-a871-a8db-d4bc4e98c324"), queryReportRow.DataSetId);
         Assert.Equal(Guid.Parse("01d29401-7974-1276-a06b-b28a6a5385c6"), queryReportRow.DataSetVersionId);
         Assert.Equal("1.2.0", queryReportRow.DataSetVersion);
-        Assert.Equal("1.*", queryReportRow.RequestedDataSetVersion);
+        Assert.Equal(expectedRequestedDataSetVersion, queryReportRow.RequestedDataSetVersion);
         Assert.Equal("Data Set 1", queryReportRow.DataSetTitle);
         Assert.Equal(expectedStartTime, queryReportRow.StartTime);
 
@@ -276,7 +283,7 @@ public abstract class PublicApiDataSetVersionCallsProcessorTests
         public string DataSetVersion { get; init; } = string.Empty;
         public Guid DataSetVersionId { get; init; }
         public string? Parameters { get; init; }
-        public string RequestedDataSetVersion { get; init; } = string.Empty;
+        public string? RequestedDataSetVersion { get; init; }
         public string? PreviewTokenLabel { get; init; }
         public Guid? PreviewTokenDataSetVersionId { get; init; }
         public DateTime? PreviewTokenCreated { get; init; }
