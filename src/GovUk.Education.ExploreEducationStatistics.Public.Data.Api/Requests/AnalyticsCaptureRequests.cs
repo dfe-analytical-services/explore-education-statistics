@@ -1,3 +1,4 @@
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Model;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using GovUk.Education.ExploreEducationStatistics.Analytics.Common.Interfaces;
@@ -35,6 +36,10 @@ public enum DataSetVersionCallType
     DownloadCsv,
     GetChanges
 }
+
+public record GetMetadataAnalyticsParameters(
+    [property:JsonProperty(ItemConverterType=typeof(StringEnumConverter))]
+    IEnumerable<DataSetMetaType> Types);
 
 public record PreviewTokenRequest(
     string Label,
