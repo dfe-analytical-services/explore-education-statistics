@@ -12,46 +12,25 @@ public class AnalyticsWritePublicApiQueryStrategy(
     IAnalyticsPathResolver analyticsPathResolver,
     DateTimeProvider dateTimeProvider,
     ILogger<AnalyticsWritePublicApiQueryStrategy> logger
-    ) : IAnalyticsWriteStrategy
+    ) : IAnalyticsWriteStrategy<CaptureDataSetVersionQueryRequest>
 {
     public Type RequestType => typeof(CaptureDataSetVersionQueryRequest);
 
-    public async Task Report(IAnalyticsCaptureRequestBase request, CancellationToken cancellationToken)
+    public string GetDirectory() => analyticsPathResolver.PublicApiQueriesDirectoryPath();
+
+    public string GetFilename(CaptureDataSetVersionQueryRequest request)
     {
-        if (request is not CaptureDataSetVersionQueryRequest queryRequest)
-        {
-            throw new ArgumentException($"request isn't a {nameof(CaptureDataSetVersionQueryRequest)}");
-        }
+            return $"{dateTimeProvider.UtcNow:yyyyMMdd-HHmmss}_{request.DataSetVersionId}_{RandomUtils.RandomString()}.json";
+    }
 
-        logger.LogInformation(
-            "Capturing query for analytics for data set {DataSetTitle}",
-            queryRequest.DataSetTitle);
+    public string SerialiseRequest(CaptureDataSetVersionQueryRequest request)
+    {
+        var requestToSerialise = request with { Query = DataSetQueryNormalisationUtil.NormaliseQuery(request.Query) };
 
-        var requestToSerialise = queryRequest with { Query = DataSetQueryNormalisationUtil.NormaliseQuery(queryRequest.Query) };
-        var directory = analyticsPathResolver.PublicApiQueriesDirectoryPath();
-        var filename =
-            $"{dateTimeProvider.UtcNow:yyyyMMdd-HHmmss}_{queryRequest.DataSetVersionId}_{RandomUtils.RandomString()}.json";
-
-        try
-        {
-            Directory.CreateDirectory(directory);
-
-            var filePath = Path.Combine(directory, filename);
-
-            var serialisedRequest = JsonSerializationUtils.Serialize(
+        return JsonSerializationUtils.Serialize(
                 obj: requestToSerialise,
                 formatting: Formatting.Indented,
                 orderedProperties: true,
                 camelCase: true);
-
-            await File.WriteAllTextAsync(filePath, contents: serialisedRequest, cancellationToken: cancellationToken);
-        }
-        catch (Exception e)
-        {
-            logger.LogError(
-                e,
-                "Error whilst writing {RequestTypeName} to disk",
-                request!.GetType().ToString());
-        }
     }
 }

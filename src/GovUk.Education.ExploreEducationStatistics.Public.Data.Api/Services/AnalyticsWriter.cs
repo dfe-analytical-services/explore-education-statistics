@@ -4,19 +4,46 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Strategies.Inte
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services;
 
-public class AnalyticsWriter(IEnumerable<IAnalyticsWriteStrategy> strategies) : IAnalyticsWriter
+public class AnalyticsWriter(
+    IEnumerable<IAnalyticsWriteStrategyBase> strategies,
+    ILogger<AnalyticsWriter> logger) : IAnalyticsWriter
 {
-    private readonly Dictionary<Type, IAnalyticsWriteStrategy> _strategyByRequestType =
+    private readonly Dictionary<Type, IAnalyticsWriteStrategyBase> _strategyByRequestType =
         strategies.ToDictionary(strategy => strategy.RequestType);
 
     public async Task Report(IAnalyticsCaptureRequestBase request, CancellationToken cancellationToken)
     {
-        var success = _strategyByRequestType.TryGetValue(request.GetType(), out var strategy);
-        if (!success)
+        if (!_strategyByRequestType.TryGetValue(request.GetType(), out var strategy))
         {
             throw new Exception($"No write strategy for request type {request.GetType()}");
         }
 
-        await strategy!.Report(request, cancellationToken);
+        var genericStrategy = strategy as IAnalyticsWriteStrategy<IAnalyticsCaptureRequestBase>
+                              ?? throw new Exception("WAAAA!");
+
+        logger.LogInformation(
+            "Capturing query for request {Request}",
+            request);
+
+        var directory = genericStrategy.GetDirectory();
+        var filename = genericStrategy.GetFilename(request);
+
+        try
+        {
+            Directory.CreateDirectory(directory);
+
+            var filePath = Path.Combine(directory, filename);
+
+            var serialisedRequest = genericStrategy.SerialiseRequest(request);
+
+            await File.WriteAllTextAsync(filePath, contents: serialisedRequest, cancellationToken: cancellationToken);
+        }
+        catch (Exception e)
+        {
+            logger.LogError(
+                e,
+                "Error whilst writing {RequestTypeName} to disk",
+                request.GetType().ToString());
+        }
     }
 }
