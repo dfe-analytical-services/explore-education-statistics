@@ -1,5 +1,5 @@
-using System.Text.RegularExpressions;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Requests;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Strategies;
@@ -101,12 +101,12 @@ public abstract class AnalyticsWriteDataSetVersionCallsStrategyTests
                 DataSetVersion: "1.2.0",
                 DataSetTitle: "Data Set 1",
                 StartTime: DateTime.Parse("2025-02-24T03:07:44.850Z"),
-                Parameters: new Parameters(
+                Parameters: new GetMetadataAnalyticsParameters(
                     Types: [
-                        "Filters",
-                        "Indicators",
-                        "Locations",
-                        "TimePeriods"
+                        DataSetMetaType.Filters,
+                        DataSetMetaType.Indicators,
+                        DataSetMetaType.Locations,
+                        DataSetMetaType.TimePeriods
                     ]),
                 PreviewToken: null,
                 RequestedDataSetVersion: null,
@@ -129,7 +129,5 @@ public abstract class AnalyticsWriteDataSetVersionCallsStrategyTests
                 dateTimeProvider ?? new DateTimeProvider(),
                 Mock.Of<ILogger<AnalyticsWriteDataSetVersionCallsStrategy>>());
         }
-
-        private record Parameters(string[] Types);
     }
 }
