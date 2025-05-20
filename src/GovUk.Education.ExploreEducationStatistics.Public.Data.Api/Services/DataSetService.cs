@@ -1,8 +1,10 @@
+using System.Net.Mime;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Model;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Requests;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Security.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.ViewModels;
@@ -13,14 +15,15 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.Services.Interfaces
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Utils;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using System.Net.Mime;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services;
 
 internal class DataSetService(
     PublicDataDbContext publicDataDbContext,
     IDataSetVersionPathResolver dataSetVersionPathResolver,
-    IUserService userService)
+    IUserService userService,
+    IAnalyticsService analyticsService,
+    ILogger<DataSetService> logger)
     : IDataSetService
 {
     public async Task<Either<ActionResult, DataSetViewModel>> GetDataSet(
@@ -45,6 +48,23 @@ internal class DataSetService(
                 dataSetVersion: dataSetVersion,
                 cancellationToken: cancellationToken)
             .OnSuccessDo(userService.CheckCanViewDataSetVersion)
+            .OnSuccessDo(async dsv =>
+            {
+                try
+                {
+                    await analyticsService.CaptureDataSetVersionCall(
+                        dataSetVersionId: dsv.Id,
+                        type: DataSetVersionCallType.DownloadCsv,
+                        requestedDataSetVersion: dataSetVersion,
+                        cancellationToken: cancellationToken);
+                }
+                catch (Exception e)
+                {
+                    logger.LogError(
+                        exception: e,
+                        message: """Error whilst capturing analytics for "Download CSV" call""");
+                }
+            })
             .OnSuccess(DownloadDataSetVersionToStream);
     }
 
@@ -52,7 +72,7 @@ internal class DataSetService(
     {
         var csvDataPath = dataSetVersionPathResolver.CsvDataPath(dataSetVersion);
 
-        var fileStream = new FileStream(csvDataPath, FileMode.Open, FileAccess.Read, FileShare.Read); 
+        var fileStream = new FileStream(csvDataPath, FileMode.Open, FileAccess.Read, FileShare.Read);
 
         return new FileStreamResult(fileStream, MediaTypeNames.Text.Csv)
         {
@@ -263,11 +283,11 @@ internal class DataSetService(
                     version: dataSetVersion,
                     cancellationToken: cancellationToken)
             : await publicDataDbContext.DataSetVersions
-            .AsNoTracking()
-            .FindByVersion(
-                dataSetId: dataSetId,
-                version: dataSetVersion,
-                cancellationToken: cancellationToken);
+                .AsNoTracking()
+                .FindByVersion(
+                    dataSetId: dataSetId,
+                    version: dataSetVersion,
+                    cancellationToken: cancellationToken);
     }
 
     private async Task LoadMeta(

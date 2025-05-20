@@ -191,10 +191,11 @@ public class QueryDataSetVersionAuthorizationHandlerTests
         var requestFeature = new HttpRequestFeature { Headers = new HeaderDictionary(requestHeaders?.ToDictionary()) };
         httpContext.Features.Set<IHttpRequestFeature>(requestFeature);
 
-        var previewTokenService = new PreviewTokenService(publicDataDbContext);
+        var previewTokenService = new PreviewTokenService(
+            publicDataDbContext: publicDataDbContext,
+            httpContextAccessor: new HttpContextAccessor { HttpContext = httpContext });
 
         return new QueryDataSetVersionAuthorizationHandler(
-            new HttpContextAccessor { HttpContext = httpContext },
             previewTokenService);
     }
 }
