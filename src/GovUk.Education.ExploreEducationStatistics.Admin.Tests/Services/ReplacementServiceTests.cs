@@ -1696,16 +1696,34 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             }
         }
 
+        /// <summary>
+        /// Please note this test will reduce in the number of cases when the feature flag has been removed from it.
+        /// </summary>
+        /// <param name="locationsComplete">Whether the user has inserted any manual mapping candidate selections for locations</param> 
+        /// <param name="filtersComplete">Whether the user has inserted any manual mapping candidate selections for filters</param>
+        /// <param name="majorVersionUpdate">Whether the user has uploaded a file that results in a major version update</param>
+        /// <param name="expectedValidValue">The expected value for the scenario set up</param>
+        /// <param name="enableReplacementOfPublicApiDataSets">Whether the feature flag for EES-5779 is switched on or off</param>
         [Theory]
-        [InlineData(true, true, true, true)]
-        [InlineData(false, true, false, true)]
-        [InlineData(true, false, false, true)]
-        [InlineData(false, false, false, true)]
-        [InlineData(true, true, false, false)]
-        [InlineData(false, true, false, false)]
-        [InlineData(true, false, false, false)]
-        [InlineData(false, false, false, false)]
-        public async Task GetReplacementPlan_FileIsLinkedToPublicApiDataSet_ReplacementValidated(bool locationsComplete, bool filtersComplete, bool expectedValidValue, bool enableReplacementOfPublicApiDataSets)
+        //When user has uploaded major version data set
+        [InlineData(true, true, true, false, true)]
+        [InlineData(false, true, true, false, true)]
+        [InlineData(true, false, true, false, true)]
+        [InlineData(false, false, true, false, true)]
+        [InlineData(true, true, true, false, false)]
+        [InlineData(false, true, true, false, false)]
+        [InlineData(true, false, true, false, false)]
+        [InlineData(false, false, true, false, false)]
+        //When user has uploaded minor version data set
+        [InlineData(true, true, false, true, true)]
+        [InlineData(false, true, false, false, true)]
+        [InlineData(true, false, false, false, true)]
+        [InlineData(false, false, false, false, true)]
+        [InlineData(true, true, false, false, false)]
+        [InlineData(false, true, false, false, false)]
+        [InlineData(true, false, false, false, false)]
+        [InlineData(false, false, false, false, false)]
+        public async Task GetReplacementPlan_FileIsLinkedToPublicApiDataSet_ReplacementValidated(bool locationsComplete, bool filtersComplete, bool  majorVersionUpdate, bool expectedValidValue, bool enableReplacementOfPublicApiDataSets)
         {
             DataSet dataSet = _fixture
                 .DefaultDataSet();
@@ -1774,6 +1792,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             timePeriodService.Setup(service => service.GetTimePeriods(replacementReleaseSubject.SubjectId))
                 .ReturnsAsync(new List<(int Year, TimeIdentifier TimeIdentifier)>());
 
+            var dataSetVersionMappingService = new Mock<IDataSetVersionMappingService>(Strict);
+            dataSetVersionMappingService.Setup(mock =>
+                mock.IsMajorVersionUpdate(dataSetVersion.Id, It.IsAny<CancellationToken>()))
+                .ReturnsAsync(majorVersionUpdate);
+            
             var options = Microsoft.Extensions.Options.Options.Create(new FeatureFlags()
             {
                 EnableReplacementOfPublicApiDataSets = enableReplacementOfPublicApiDataSets
@@ -1799,6 +1822,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     timePeriodService: timePeriodService.Object,
                     locationRepository: locationRepository.Object,
                     dataSetService: dataSetService.Object,
+                    dataSetVersionMappingService: dataSetVersionMappingService.Object,
                     featureFlags: options
                     );
 
@@ -1818,9 +1842,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(dataSetVersion.PublicVersion, replacementPlan.ApiDataSetVersionPlan.Version);
                 if (enableReplacementOfPublicApiDataSets)
                 {
-                    Assert.Equal(replacementPlan.ApiDataSetVersionPlan.MappingStatus!.LocationsComplete, locationsComplete);
-                    Assert.Equal(replacementPlan.ApiDataSetVersionPlan.MappingStatus.FiltersComplete, filtersComplete);
-                    Assert.Equal(replacementPlan.ApiDataSetVersionPlan.Valid, expectedValidValue);
+                    Assert.Equal(locationsComplete, replacementPlan.ApiDataSetVersionPlan.MappingStatus!.LocationsComplete);
+                    Assert.Equal(filtersComplete, replacementPlan.ApiDataSetVersionPlan.MappingStatus.FiltersComplete);
+                    Assert.Equal(expectedValidValue, replacementPlan.ApiDataSetVersionPlan.Valid);
                 }
                 else
                 {
@@ -2810,6 +2834,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     FiltersComplete = true,
                     LocationsComplete = true
                 });
+            
+            var dataSetVersionMappingService = new Mock<IDataSetVersionMappingService>(Strict);
+            dataSetVersionMappingService.Setup(mock =>
+                    mock.IsMajorVersionUpdate(dataSetVersion.Id, It.IsAny<CancellationToken>()))
+                .ReturnsAsync(false);
+
             var options = Microsoft.Extensions.Options.Options.Create(new FeatureFlags()
             {
                 EnableReplacementOfPublicApiDataSets = enableReplacementOfPublicApiDataSets
@@ -2836,7 +2866,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     releaseVersionService: releaseVersionService.Object,
                     dataSetVersionService: dataSetVersionService.Object,
                     featureFlags: options,
-                    dataSetService: dataSetService.Object);
+                    dataSetService: dataSetService.Object,
+                    dataSetVersionMappingService: dataSetVersionMappingService.Object);
 
                 var result = await replacementService.Replace(
                     releaseVersionId: releaseVersion.Id,
@@ -4562,6 +4593,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             ICacheKeyService? cacheKeyService = null,
             IPrivateBlobCacheService? privateBlobCacheService = null,
             IDataSetService? dataSetService = null,
+            IDataSetVersionMappingService? dataSetVersionMappingService = null,
             IOptions<FeatureFlags>? featureFlags = null
             )
         {
@@ -4584,6 +4616,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 cacheKeyService ?? Mock.Of<ICacheKeyService>(Strict),
                 privateBlobCacheService ?? Mock.Of<IPrivateBlobCacheService>(Strict),
                 dataSetService ?? Mock.Of<IDataSetService>(Strict),
+                dataSetVersionMappingService ?? Mock.Of<IDataSetVersionMappingService>(Strict),
                 featureFlags
             );
         }

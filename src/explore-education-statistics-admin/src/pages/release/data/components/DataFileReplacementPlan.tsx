@@ -96,7 +96,7 @@ const DataFileReplacementPlan = ({
         hasIncompleteLocationMapping: false,
         hasIncompleteFilterMapping: false,
         hasIncompleteMapping: false,
-        hasMajorVersionUpdate: true,
+        hasMajorVersionUpdate: false,
       };
     }
 
@@ -458,25 +458,27 @@ const DataFileReplacementPlan = ({
 
           {hasDataSetVersionPlan && (
             <>
-              <h3 className="govuk-heading-m">
-                <Tag colour={hasMajorVersionUpdate ? 'red' : 'green'}>
-                  {`Api data set status: ${
-                    hasMajorVersionUpdate ? 'ERROR' : 'OK'
-                  }`}
-                </Tag>
-              </h3>
-
               {hasMajorVersionUpdate ? (
-                <p>
-                  Please{' '}
-                  {apiDataSetsTabRoute && (
-                    <Link to={apiDataSetsTabRoute} unvisited>
-                      head over to the API data sets tab
-                    </Link>
-                  )}{' '}
-                  and restart because there is a breaking change resulting in a
-                  major version increment.
-                </p>
+                <>
+                  <h3 className="govuk-heading-m">
+                    <Tag colour={hasMajorVersionUpdate ? 'red' : 'green'}>
+                      {`Api data set status: ${
+                        hasMajorVersionUpdate ? 'ERROR' : 'OK'
+                      }`}
+                    </Tag>
+                  </h3>
+                  <p>
+                    Please cancel this data replacement and upload a new data
+                    file that doesn't create a breaking change. To see the
+                    breaking changes, please{' '}
+                    {apiDataSetsTabRoute && (
+                      <Link to={apiDataSetsTabRoute} unvisited>
+                        head over to the API data sets tab
+                      </Link>
+                    )}
+                    .
+                  </p>
+                </>
               ) : (
                 <>
                   <h3 className="govuk-heading-m">
