@@ -1989,6 +1989,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var fileUploadsValidatorService = new Mock<IFileUploadsValidatorService>(Strict);
             var dataImportService = new Mock<IDataImportService>(Strict);
             var dataSetVersionService = new Mock<IDataSetVersionService>(Strict);
+            var dataSetVersionRepository = new Mock<IDataSetVersionRepository>(Strict);
             var options = Microsoft.Extensions.Options.Options.Create(new FeatureFlags()
             {
                 EnableReplacementOfPublicApiDataSets = enableReplacementOfPublicApiDataSets
@@ -2033,12 +2034,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 if (enableReplacementOfPublicApiDataSets)
                 {
-                    dataSetVersionService.Setup(mock => 
-                        mock.GetDataSetVersion(
-                            It.IsAny<Guid>(),
-                            It.IsAny<SemVersion>(), 
-                            It.IsAny<CancellationToken>()
-                            )).ReturnsAsync(dataSetVersion);
+                    dataSetVersionRepository.Setup(mock =>
+                            mock.GetDataSetVersion(
+                                dataSetVersion.DataSetId,
+                                dataSetVersion.SemVersion(),
+                                It.IsAny<CancellationToken>()))
+                        .ReturnsAsync(dataSetVersion);
 
                     dataSetVersionService.Setup(mock =>
                         mock.CreateNextVersion(
@@ -2057,7 +2058,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         File = new IdTitleViewModel()
                     });
                 }
-                    
+                
                 var service = SetupReleaseDataFileService(
                     contentDbContext: contentDbContext,
                     statisticsDbContext: statisticsDbContext,
@@ -2065,6 +2066,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     fileUploadsValidatorService: fileUploadsValidatorService.Object,
                     dataImportService: dataImportService.Object,
                     dataSetVersionService: dataSetVersionService.Object,
+                    dataSetVersionRepository: dataSetVersionRepository.Object,
                     featureFlags: options);
 
                 var result = await service.Upload(
@@ -2078,7 +2080,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 if (enableReplacementOfPublicApiDataSets)
                 {
-                    MockUtils.VerifyAllMocks(privateBlobStorageService, fileUploadsValidatorService, dataImportService, dataSetVersionService);
+                    MockUtils.VerifyAllMocks(privateBlobStorageService, fileUploadsValidatorService, dataImportService, dataSetVersionService, dataSetVersionRepository);
                 }
                 else
                 {

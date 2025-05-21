@@ -34,58 +34,26 @@ using Unit = GovUk.Education.ExploreEducationStatistics.Common.Model.Unit;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 {
-    public class ReplacementService : IReplacementService
+    public class ReplacementService(
+        ContentDbContext contentDbContext,
+        StatisticsDbContext statisticsDbContext,
+        IFilterRepository filterRepository,
+        IIndicatorRepository indicatorRepository,
+        IIndicatorGroupRepository indicatorGroupRepository,
+        ILocationRepository locationRepository,
+        IFootnoteRepository footnoteRepository,
+        IReleaseVersionService releaseVersionService,
+        IDataSetVersionService dataSetVersionService,
+        ITimePeriodService timePeriodService,
+        IUserService userService,
+        ICacheKeyService cacheKeyService,
+        IPrivateBlobCacheService privateCacheService,
+        IDataSetService dataSetService,
+        IDataSetVersionMappingService dataSetVersionMappingService,
+        IOptions<FeatureFlags> featureFlags)
+        : IReplacementService
     {
-        private readonly ContentDbContext _contentDbContext;
-        private readonly StatisticsDbContext _statisticsDbContext;
-        private readonly IDataSetService _dataSetService;
-        private readonly IOptions<FeatureFlags> _featureFlags;
-        private readonly IFilterRepository _filterRepository;
-        private readonly IIndicatorRepository _indicatorRepository;
-        private readonly IIndicatorGroupRepository _indicatorGroupRepository;
-        private readonly ILocationRepository _locationRepository;
-        private readonly IFootnoteRepository _footnoteRepository;
-        private readonly IReleaseVersionService _releaseVersionService;
-        private readonly IDataSetVersionService _dataSetVersionService;
-        private readonly ITimePeriodService _timePeriodService;
-        private readonly IUserService _userService;
-        private readonly ICacheKeyService _cacheKeyService;
-        private readonly IPrivateBlobCacheService _privateCacheService;
-
         private static IComparer<string> LabelComparer { get; } = new LabelRelationalComparer();
-
-        public ReplacementService(ContentDbContext contentDbContext,
-            StatisticsDbContext statisticsDbContext,
-            IFilterRepository filterRepository,
-            IIndicatorRepository indicatorRepository,
-            IIndicatorGroupRepository indicatorGroupRepository,
-            ILocationRepository locationRepository,
-            IFootnoteRepository footnoteRepository,
-            IReleaseVersionService releaseVersionService,
-            IDataSetVersionService dataSetVersionService,
-            ITimePeriodService timePeriodService,
-            IUserService userService,
-            ICacheKeyService cacheKeyService,
-            IPrivateBlobCacheService privateCacheService,
-            IDataSetService dataSetService,
-            IOptions<FeatureFlags> featureFlags)
-        {
-            _contentDbContext = contentDbContext;
-            _statisticsDbContext = statisticsDbContext;
-            _filterRepository = filterRepository;
-            _indicatorRepository = indicatorRepository;
-            _indicatorGroupRepository = indicatorGroupRepository;
-            _locationRepository = locationRepository;
-            _footnoteRepository = footnoteRepository;
-            _releaseVersionService = releaseVersionService;
-            _dataSetVersionService = dataSetVersionService;
-            _timePeriodService = timePeriodService;
-            _userService = userService;
-            _cacheKeyService = cacheKeyService;
-            _dataSetService = dataSetService;
-            _featureFlags = featureFlags;
-            _privateCacheService = privateCacheService;
-        }
 
         public async Task<Either<ActionResult, DataReplacementPlanViewModel>> GetReplacementPlan(
             Guid releaseVersionId,
@@ -93,9 +61,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             Guid replacementFileId,
             CancellationToken cancellationToken = default)
         {
-            return await _contentDbContext.ReleaseVersions
+            return await contentDbContext.ReleaseVersions
                 .FirstOrNotFoundAsync(rv => rv.Id == releaseVersionId, cancellationToken: cancellationToken)
-                .OnSuccess(_userService.CheckCanUpdateReleaseVersion)
+                .OnSuccess(userService.CheckCanUpdateReleaseVersion)
                 .OnSuccess(() => CheckReleaseFilesExist(releaseVersionId: releaseVersionId,
                     originalFileId: originalFileId,
                     replacementFileId: replacementFileId))
@@ -103,7 +71,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 {
                     var (originalReleaseFile, replacementReleaseFile) = tuple;
 
-                    return await GetLinkedDataSetVersion(_featureFlags.Value.EnableReplacementOfPublicApiDataSets ? replacementReleaseFile : originalReleaseFile, cancellationToken)
+                    return await GetLinkedDataSetVersion(featureFlags.Value.EnableReplacementOfPublicApiDataSets ? replacementReleaseFile : originalReleaseFile, cancellationToken)
                         .OnSuccess(replacementApiDataSetVersion => (originalReleaseFile, replacementReleaseFile, replacementApiDataSetVersion));
                 })
                 .OnSuccess(async tuple =>
@@ -149,7 +117,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 Status = replacementApiDataSetVersion.Status,
                 Valid = false,
             };
-            if (!_featureFlags.Value.EnableReplacementOfPublicApiDataSets || replacementApiDataSetVersion.VersionPatch <= 0)
+            if (!featureFlags.Value.EnableReplacementOfPublicApiDataSets || replacementApiDataSetVersion.VersionPatch <= 0)
             { 
                 return apiDataSetVersionPlan;
             }
@@ -157,15 +125,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             //more things than just the values { FiltersComplete: true, LocationsComplete: true }. It will
             //also include whether the user has 'finalized' the data set version mapping & whether the version has
             //a breaking change and results in a major version increment. 
-            var mapping = await _dataSetService.GetMappingStatus(replacementApiDataSetVersion.Id, cancellationToken);
-
+            var mapping = await dataSetService.GetMappingStatus(replacementApiDataSetVersion.Id, cancellationToken);
+            var isMajorVersionUpdate = await dataSetVersionMappingService.IsMajorVersionUpdate(apiDataSetVersionPlan.Id, cancellationToken);
             apiDataSetVersionPlan.MappingStatus = new ReplacementApiDataSetVersionPlanViewModel.MappingCompletionStatusViewModel
             {
                 Complete = replacementApiDataSetVersion.Status == DataSetVersionStatus.Draft,
                 FiltersComplete = mapping?.FiltersComplete ?? false,
                 LocationsComplete = mapping?.LocationsComplete ?? false,
-                HasMajorVersionUpdate = replacementApiDataSetVersion is { VersionMinor: 0 }
+                HasMajorVersionUpdate = isMajorVersionUpdate
             };
+            apiDataSetVersionPlan.Valid = apiDataSetVersionPlan.ValidDefinition;
             return apiDataSetVersionPlan;
         }
         public async Task<Either<ActionResult, Unit>> Replace(
@@ -230,8 +199,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     // Replace data guidance
                     replacementReleaseFile.Summary = originalReleaseFile.Summary;
 
-                    await _contentDbContext.SaveChangesAsync();
-                    await _statisticsDbContext.SaveChangesAsync();
+                    await contentDbContext.SaveChangesAsync();
+                    await statisticsDbContext.SaveChangesAsync();
 
                     return await RemoveOriginalSubjectAndFileFromRelease(releaseVersionId, originalFileId,
                         replacementFileId);
@@ -247,7 +216,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 return (DataSetVersion)null!;
             }
 
-            return await _dataSetVersionService.GetDataSetVersion(
+            return await dataSetVersionService.GetDataSetVersion(
                 releaseFile.PublicApiDataSetId.Value,
                 releaseFile.PublicApiDataSetVersion!,
                 cancellationToken)
@@ -262,12 +231,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 Guid originalFileId,
                 Guid replacementFileId)
         {
-            return await _contentDbContext.ReleaseFiles
+            return await contentDbContext.ReleaseFiles
                 .Include(rf => rf.File)
                 .FirstOrNotFoundAsync(rf => rf.ReleaseVersionId == releaseVersionId
                                             && rf.FileId == originalFileId
                                             && rf.File.Type == FileType.Data)
-                .OnSuccessCombineWith(async _ => await _contentDbContext.ReleaseFiles
+                .OnSuccessCombineWith(async _ => await contentDbContext.ReleaseFiles
                     .Include(rf => rf.File)
                     .FirstOrNotFoundAsync(rf => rf.ReleaseVersionId == releaseVersionId
                                                 && rf.FileId == replacementFileId
@@ -277,17 +246,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         private async Task<ReplacementSubjectMeta> GetReplacementSubjectMeta(Guid subjectId)
         {
-            var filtersIncludingItems = await _filterRepository.GetFiltersIncludingItems(subjectId);
+            var filtersIncludingItems = await filterRepository.GetFiltersIncludingItems(subjectId);
 
             var filters = filtersIncludingItems
                 .ToDictionary(filter => filter.Name, filter => filter);
 
-            var indicators = _indicatorRepository.GetIndicators(subjectId)
+            var indicators = indicatorRepository.GetIndicators(subjectId)
                 .ToDictionary(indicator => indicator.Name, indicator => indicator);
 
-            var locations = await _locationRepository.GetDistinctForSubject(subjectId);
+            var locations = await locationRepository.GetDistinctForSubject(subjectId);
 
-            var timePeriods = await _timePeriodService.GetTimePeriods(subjectId);
+            var timePeriods = await timePeriodService.GetTimePeriods(subjectId);
 
             return new ReplacementSubjectMeta
             {
@@ -302,7 +271,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             Guid subjectId,
             ReplacementSubjectMeta replacementSubjectMeta)
         {
-            return _contentDbContext
+            return contentDbContext
                 .ContentBlocks
                 .Where(block => block.ReleaseVersionId == releaseVersionId)
                 .OfType<DataBlock>()
@@ -334,7 +303,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             Guid subjectId,
             ReplacementSubjectMeta replacementSubjectMeta)
         {
-            var footnotes = await _footnoteRepository.GetFootnotes(releaseVersionId: releaseVersionId,
+            var footnotes = await footnoteRepository.GetFootnotes(releaseVersionId: releaseVersionId,
                 subjectId: subjectId);
             return footnotes
                 .Select(footnote => ValidateFootnote(footnote, replacementSubjectMeta))
@@ -444,7 +413,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .Query
                 .Filters;
 
-            var existingFilterNames = _statisticsDbContext
+            var existingFilterNames = statisticsDbContext
                 .FilterItem
                 .AsQueryable()
                 .Where(fi => existingFilterItemIds.Contains(fi.Id))
@@ -480,7 +449,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             DataBlock dataBlock,
             ReplacementSubjectMeta replacementSubjectMeta)
         {
-            return _statisticsDbContext.FilterItem
+            return statisticsDbContext.FilterItem
                 .AsQueryable()
                 .Where(filterItem => dataBlock.Query.Filters.Contains(filterItem.Id))
                 .Include(filterItem => filterItem.FilterGroup)
@@ -519,7 +488,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             DataBlock dataBlock,
             ReplacementSubjectMeta replacementSubjectMeta)
         {
-            return _statisticsDbContext.Indicator
+            return statisticsDbContext.Indicator
                 .Include(indicator => indicator.IndicatorGroup)
                 .Where(indicator => dataBlock.Query.Indicators.Contains(indicator.Id))
                 .ToList()
@@ -541,7 +510,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             DataBlock dataBlock,
             ReplacementSubjectMeta replacementSubjectMeta)
         {
-            return _statisticsDbContext.Location
+            return statisticsDbContext.Location
                 .AsNoTracking()
                 .Where(location => dataBlock.Query.LocationIds.Contains(location.Id))
                 .ToList()
@@ -706,12 +675,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private async Task ReplaceLinksForDataBlock(DataBlockReplacementPlanViewModel replacementPlan,
             Guid replacementSubjectId)
         {
-            var dataBlock = await _contentDbContext.ContentBlocks
+            var dataBlock = await contentDbContext.ContentBlocks
                 .AsQueryable()
                 .OfType<DataBlock>()
                 .SingleAsync(block => block.Id == replacementPlan.Id);
 
-            _contentDbContext.Update(dataBlock);
+            contentDbContext.Update(dataBlock);
 
             dataBlock.Query.SubjectId = replacementSubjectId;
             ReplaceDataBlockQueryFilters(replacementPlan, dataBlock);
@@ -1102,15 +1071,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         private async Task ReplaceFootnoteSubject(Guid footnoteId, Guid originalSubjectId, Guid replacementSubjectId)
         {
-            var subjectFootnote = await _statisticsDbContext.SubjectFootnote
+            var subjectFootnote = await statisticsDbContext.SubjectFootnote
                 .AsQueryable()
                 .Where(f =>
                     f.FootnoteId == footnoteId && f.SubjectId == originalSubjectId).SingleOrDefaultAsync();
 
             if (subjectFootnote != null)
             {
-                _statisticsDbContext.Remove(subjectFootnote);
-                await _statisticsDbContext.SubjectFootnote.AddAsync(new SubjectFootnote
+                statisticsDbContext.Remove(subjectFootnote);
+                await statisticsDbContext.SubjectFootnote.AddAsync(new SubjectFootnote
                 {
                     FootnoteId = footnoteId,
                     SubjectId = replacementSubjectId
@@ -1120,14 +1089,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         private async Task ReplaceFootnoteFilter(Guid footnoteId, TargetableReplacementViewModel plan)
         {
-            var filterFootnote = await _statisticsDbContext.FilterFootnote
+            var filterFootnote = await statisticsDbContext.FilterFootnote
                 .AsQueryable()
                 .SingleAsync(f =>
                     f.FootnoteId == footnoteId && f.FilterId == plan.Id
                 );
 
-            _statisticsDbContext.Remove(filterFootnote);
-            await _statisticsDbContext.FilterFootnote.AddAsync(new FilterFootnote
+            statisticsDbContext.Remove(filterFootnote);
+            await statisticsDbContext.FilterFootnote.AddAsync(new FilterFootnote
             {
                 FootnoteId = footnoteId,
                 FilterId = plan.TargetValue
@@ -1136,14 +1105,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         private async Task ReplaceFootnoteFilterGroup(Guid footnoteId, TargetableReplacementViewModel plan)
         {
-            var filterGroupFootnote = await _statisticsDbContext.FilterGroupFootnote
+            var filterGroupFootnote = await statisticsDbContext.FilterGroupFootnote
                 .AsQueryable()
                 .SingleAsync(f =>
                     f.FootnoteId == footnoteId && f.FilterGroupId == plan.Id
                 );
 
-            _statisticsDbContext.Remove(filterGroupFootnote);
-            await _statisticsDbContext.FilterGroupFootnote.AddAsync(new FilterGroupFootnote
+            statisticsDbContext.Remove(filterGroupFootnote);
+            await statisticsDbContext.FilterGroupFootnote.AddAsync(new FilterGroupFootnote
             {
                 FootnoteId = footnoteId,
                 FilterGroupId = plan.TargetValue
@@ -1152,14 +1121,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         private async Task ReplaceFootnoteFilterItem(Guid footnoteId, TargetableReplacementViewModel plan)
         {
-            var filterItemFootnote = await _statisticsDbContext.FilterItemFootnote
+            var filterItemFootnote = await statisticsDbContext.FilterItemFootnote
                 .AsQueryable()
                 .SingleAsync(f =>
                     f.FootnoteId == footnoteId && f.FilterItemId == plan.Id
                 );
 
-            _statisticsDbContext.Remove(filterItemFootnote);
-            await _statisticsDbContext.FilterItemFootnote.AddAsync(new FilterItemFootnote
+            statisticsDbContext.Remove(filterItemFootnote);
+            await statisticsDbContext.FilterItemFootnote.AddAsync(new FilterItemFootnote
             {
                 FootnoteId = footnoteId,
                 FilterItemId = plan.TargetValue
@@ -1168,14 +1137,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         private async Task ReplaceIndicatorFootnote(Guid footnoteId, TargetableReplacementViewModel plan)
         {
-            var indicatorFootnote = await _statisticsDbContext.IndicatorFootnote
+            var indicatorFootnote = await statisticsDbContext.IndicatorFootnote
                 .AsQueryable()
                 .SingleAsync(f =>
                     f.FootnoteId == footnoteId && f.IndicatorId == plan.Id
                 );
 
-            _statisticsDbContext.Remove(indicatorFootnote);
-            await _statisticsDbContext.IndicatorFootnote.AddAsync(new IndicatorFootnote
+            statisticsDbContext.Remove(indicatorFootnote);
+            await statisticsDbContext.IndicatorFootnote.AddAsync(new IndicatorFootnote
             {
                 FootnoteId = footnoteId,
                 IndicatorId = plan.TargetValue
@@ -1192,9 +1161,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             }
 
             var originalFilters =
-                await _filterRepository.GetFiltersIncludingItems(originalReleaseFile.File.SubjectId!.Value);
+                await filterRepository.GetFiltersIncludingItems(originalReleaseFile.File.SubjectId!.Value);
             var replacementFilters =
-                await _filterRepository.GetFiltersIncludingItems(replacementReleaseFile.File.SubjectId!.Value);
+                await filterRepository.GetFiltersIncludingItems(replacementReleaseFile.File.SubjectId!.Value);
 
             return ReplacementServiceHelper.ReplaceFilterSequence(
                 originalFilters: originalFilters,
@@ -1213,9 +1182,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             }
 
             var originalIndicatorGroups =
-                await _indicatorGroupRepository.GetIndicatorGroups(originalReleaseFile.File.SubjectId!.Value);
+                await indicatorGroupRepository.GetIndicatorGroups(originalReleaseFile.File.SubjectId!.Value);
             var replacementIndicatorGroups =
-                await _indicatorGroupRepository.GetIndicatorGroups(replacementReleaseFile.File.SubjectId!.Value);
+                await indicatorGroupRepository.GetIndicatorGroups(replacementReleaseFile.File.SubjectId!.Value);
 
             return ReplacementServiceHelper.ReplaceIndicatorSequence(
                 originalIndicatorGroups: originalIndicatorGroups,
@@ -1242,9 +1211,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     originalFile.ReplacedById = null;
                     replacementFile.ReplacingId = null;
 
-                    await _contentDbContext.SaveChangesAsync();
+                    await contentDbContext.SaveChangesAsync();
 
-                    return await _releaseVersionService.RemoveDataFiles(releaseVersionId: releaseVersionId,
+                    return await releaseVersionService.RemoveDataFiles(releaseVersionId: releaseVersionId,
                         fileId: originalFileId);
                 });
         }
@@ -1252,10 +1221,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private Task<Either<ActionResult, Unit>> InvalidateDataBlockCachedResults(
             DataBlockReplacementPlanViewModel plan, Guid releaseVersionId)
         {
-            return _cacheKeyService
+            return cacheKeyService
                 .CreateCacheKeyForDataBlock(releaseVersionId: releaseVersionId,
                     dataBlockId: plan.Id)
-                .OnSuccessVoid(_privateCacheService.DeleteItemAsync);
+                .OnSuccessVoid(privateCacheService.DeleteItemAsync);
         }
 
         private static Guid ReplacementPlanOriginalId(TargetableReplacementViewModel plan)

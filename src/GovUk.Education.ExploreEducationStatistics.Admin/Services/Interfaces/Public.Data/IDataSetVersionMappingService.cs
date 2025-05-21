@@ -28,4 +28,8 @@ public interface IDataSetVersionMappingService
         Guid nextDataSetVersionId,
         BatchFilterOptionMappingUpdatesRequest request,
         CancellationToken cancellationToken = default);
+    
+    public Task<bool> IsMajorVersionUpdate(
+        Guid nextDataSetVersionId,
+        CancellationToken cancellationToken = default);
 }
