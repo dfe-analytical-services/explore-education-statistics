@@ -118,6 +118,7 @@ module searchDocsFunctionModule 'application/searchDocsFunction.bicep' = {
       ],
       maintenanceFirewallRules
     )
+    logAnalyticsWorkspaceId: monitoringModule.outputs.logAnalyticsWorkspaceId
     searchServiceEndpoint: searchServiceModule.outputs.searchServiceEndpoint
     searchServiceIndexerName: searchServiceModule.outputs.searchServiceIndexerName
     searchServiceName: searchServiceModule.outputs.searchServiceName
