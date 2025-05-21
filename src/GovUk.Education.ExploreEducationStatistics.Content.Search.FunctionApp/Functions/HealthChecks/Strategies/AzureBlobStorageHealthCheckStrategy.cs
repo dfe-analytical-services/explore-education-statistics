@@ -55,7 +55,7 @@ internal class AzureBlobStorageHealthCheckStrategy(
                 $"Error occurred whilst trying to check for Azure blob storage container '{containerName}': {e.Message}");
         }
 
-        logger.LogInformation("Healthcheck was successful: Azure blob storage container '{ContainerName}' is found.", containerName);
+        logger.LogInformation("Health check was successful: Azure blob storage container '{ContainerName}' is found.", containerName);
         return new HealthCheckResult(
             this,
             true, 

@@ -33,10 +33,10 @@ internal class AzureSearchHealthCheckStrategy(
         catch (Exception e)
         {
             logger.LogWarning(e, "Could not connect to Azure Search Indexer: {Message}", e.Message);
-            return new HealthCheckResult(this, false, $"Error occurred whilst trying to run healthcheck for Azure Search Indexer: {e.Message}");
+            return new HealthCheckResult(this, false, $"Error occurred whilst trying to run health check for Azure Search Indexer: {e.Message}");
         }
 
-        logger.LogInformation("Healthcheck was successful: Azure Search Indexer is found.");
+        logger.LogInformation("Health check was successful: Azure Search Indexer is found.");
         return new HealthCheckResult(this, true, "Connection to Azure Search Indexer:OK");
     }
 }

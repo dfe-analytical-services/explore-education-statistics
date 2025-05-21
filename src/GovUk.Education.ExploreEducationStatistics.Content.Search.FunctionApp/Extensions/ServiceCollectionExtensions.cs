@@ -1,4 +1,4 @@
-﻿using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Clients.AzureBlobStorage;
+using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Clients.AzureBlobStorage;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Clients.AzureSearch;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Clients.ContentApi;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.HealthChecks.Strategies;
@@ -22,7 +22,7 @@ public static class ServiceCollectionExtensions
             .AddTransient<IHealthCheckStrategy, ContentApiHealthCheckStrategy>()
             .AddTransient<IHealthCheckStrategy, AzureBlobStorageHealthCheckStrategy>()
             .AddTransient<IHealthCheckStrategy, AzureSearchHealthCheckStrategy>()
-            // Factories to allow Healthcheck to evaluate config before attempting to instantiate clients
+            // Factories to allow Health check to evaluate config before attempting to instantiate clients
             .AddTransient<Func<IContentApiClient>>(sp => sp.GetRequiredService<IContentApiClient>)
             .AddTransient<Func<IAzureBlobStorageClient>>(sp => sp.GetRequiredService<IAzureBlobStorageClient>)
             .AddTransient<Func<ISearchIndexerClient>>(sp => sp.GetRequiredService<ISearchIndexerClient>);

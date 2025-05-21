@@ -44,7 +44,7 @@ public class HealthCheckFunction(IEnumerable<IHealthCheckStrategy> strategies, I
             }
             catch (Exception e)
             {
-                logger.LogError(e, "Error occurred whilst trying to run healthcheck: {Message} {StrategyType}", e.Message, strategy.GetType().Name);
+                logger.LogError(e, "Error occurred whilst trying to run health check: {StrategyType}", strategy.GetType());
                 return new HealthCheckResult(strategy, false, $"Exception: {e.Message}");
             }
         }
