@@ -8,7 +8,7 @@ public record ReleaseVersionPublishedEventDto
     public Guid ReleaseVersionId { get; init; }
 
     /// <summary>
-    /// The Release Id for the newly published release version
+    /// The release id for the newly published release version
     /// </summary>
     public Guid? ReleaseId { get; init; }
 
@@ -28,20 +28,24 @@ public record ReleaseVersionPublishedEventDto
     public string? PublicationSlug { get; init; }
 
     /// <summary>
+    /// The published release version might not belong to the publication's latest published release.
+    /// This property contains the publication's latest published release id.
     /// </summary>
     public Guid? LatestPublishedReleaseId { get; init; }
 
     /// <summary>
-    /// The Release Version Id of the current "latest release version".
+    /// The published release version might not belong to the publication's latest published release.
+    /// This property contains the latest published release version id of the publication's latest published release.
     /// </summary>
     public Guid? LatestPublishedReleaseVersionId { get; init; }
 
     /// <summary>
-    /// The Release Id of the previous "latest release version"
+    /// The publication's latest published release id before the release version was published.
     /// </summary>
     public Guid? PreviousLatestPublishedReleaseId { get; init; }
 
     /// <summary>
+    /// The latest published release version id of the publication's latest published release before the release version was published.
     /// </summary>
     public Guid? PreviousLatestPublishedReleaseVersionId { get; init; }
 
