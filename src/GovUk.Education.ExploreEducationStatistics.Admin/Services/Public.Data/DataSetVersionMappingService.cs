@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Admin.Repositories.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
@@ -22,7 +23,6 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
-using Npgsql;
 using ErrorViewModel = GovUk.Education.ExploreEducationStatistics.Common.ViewModels.ErrorViewModel;
 using ValidationUtils = GovUk.Education.ExploreEducationStatistics.Common.Validators.ValidationUtils;
 
@@ -33,7 +33,7 @@ public class DataSetVersionMappingService(
     IUserService userService,
     PublicDataDbContext publicDataDbContext,
     ContentDbContext contentDbContext,
-    IDataSetService dataSetService,
+    IMappingTypesRepository mappingTypesRepository,
     IOptions<FeatureFlags> featureFlags)
     : IDataSetVersionMappingService
 {
@@ -81,6 +81,33 @@ public class DataSetVersionMappingService(
             .CheckIsBauUser()
             .OnSuccess(() => CheckMappingExists(nextDataSetVersionId, cancellationToken))
             .OnSuccess(mapping => mapping.FilterMappingPlan);
+    }
+
+    /// <summary>
+    /// Determines whether a dataset version mapping requires a major version update by analyzing
+    /// the mapping types of locations and filters. Returns true if there are any locations or filters
+    /// that cannot be mapped (NoMappingTypes) or if there are any deletion-based major version changes.
+    /// </summary>
+    /// <param name="nextDataSetVersionId">The ID of the target dataset version to check</param>
+    /// <param name="cancellationToken">Optional cancellation token</param>
+    /// <returns>True if a major version update is required, false otherwise</returns>
+    public async Task<bool> IsMajorVersionUpdate(
+        Guid nextDataSetVersionId,
+        CancellationToken cancellationToken = default)
+    {
+        var locationOptionMappingTypes = await GetLocationOptionMappingTypes(
+            targetDataSetVersionId: nextDataSetVersionId,
+            cancellationToken: cancellationToken);
+
+        var filterAndOptionMappingTypes = await GetFilterAndOptionMappingTypes(
+            targetDataSetVersionId: nextDataSetVersionId,
+            cancellationToken: cancellationToken);
+
+        return await IsMajorVersionUpdate(
+            nextDataSetVersionId,
+            locationOptionMappingTypes,
+            filterAndOptionMappingTypes,
+            cancellationToken);
     }
 
     public Task<Either<ActionResult, BatchFilterOptionMappingUpdatesResponseViewModel>>
@@ -183,6 +210,11 @@ public class DataSetVersionMappingService(
             filterMappingTypes,
             cancellationToken);
 
+        var isReplacement = await publicDataDbContext.DataSetVersionImports
+            .AnyAsync(i => i.DataSetVersionToReplaceId != null 
+                           && i.DataSetVersionToReplaceId == sourceDataSetVersion.Id,
+                cancellationToken) && targetDataSetVersion.VersionPatch > 0;
+
         if (isMajorVersionUpdate)
         {
             targetDataSetVersion.VersionMajor = sourceDataSetVersion.VersionMajor + 1;
@@ -191,9 +223,13 @@ public class DataSetVersionMappingService(
         }
         else
         {
-            targetDataSetVersion.VersionMajor = sourceDataSetVersion.VersionMajor;
-            targetDataSetVersion.VersionMinor = sourceDataSetVersion.VersionMinor + 1;
-            targetDataSetVersion.VersionPatch = 0;
+            if (!isReplacement)
+            {
+                // Don't increase the patch or minor numbers if you're replacing a data set version.
+                targetDataSetVersion.VersionMajor = sourceDataSetVersion.VersionMajor;
+                targetDataSetVersion.VersionMinor = sourceDataSetVersion.VersionMinor + 1;
+                targetDataSetVersion.VersionPatch = 0;
+            }
         }
 
         await publicDataDbContext.SaveChangesAsync(cancellationToken);
@@ -225,13 +261,9 @@ public class DataSetVersionMappingService(
         {
             return true;
         }
-
-        return await publicDataDbContext.DataSetVersionMappings
-            .Where(mapping => mapping.TargetDataSetVersionId == targetDataSetVersionId)
-            .Select(mapping => mapping.HasDeletedIndicators
-                               || mapping.HasDeletedGeographicLevels
-                               || mapping.HasDeletedTimePeriods)
-            .SingleOrDefaultAsync(cancellationToken);
+        return await mappingTypesRepository.HasDeletionMajorVersionChangesAsync(
+            targetDataSetVersionId,
+            cancellationToken);
     }
 
     private async Task UpdateMappingCompleteFlags(
@@ -269,59 +301,13 @@ public class DataSetVersionMappingService(
 
     private async Task<List<LocationMappingTypes>> GetLocationOptionMappingTypes(
         Guid targetDataSetVersionId,
-        CancellationToken cancellationToken)
-    {
-        var targetDataSetVersionIdParam = new NpgsqlParameter("targetDataSetVersionId", targetDataSetVersionId);
-
-        // Find the distinct mapping types for location options across location levels
-        // that still have candidates (and haven't been deleted).
-        return await publicDataDbContext.Database
-            .SqlQueryRaw<LocationMappingTypes>(
-                $$$"""
-                   SELECT DISTINCT
-                       CASE WHEN Level.value -> '{{{nameof(LocationLevelMappings.Candidates)}}}' = '{{}}' 
-                           THEN '{{{nameof(MappingType.AutoNone)}}}'
-                           ELSE '{{{nameof(MappingType.AutoMapped)}}}'
-                       END "{{{nameof(LocationMappingTypes.LocationLevelRaw)}}}",
-                       OptionMappingType "{{{nameof(LocationMappingTypes.LocationOptionRaw)}}}"
-                   FROM
-                       "{{{nameof(PublicDataDbContext.DataSetVersionMappings)}}}" Mapping,
-                       jsonb_each(Mapping."{{{nameof(DataSetVersionMapping.LocationMappingPlan)}}}"
-                                    -> '{{{nameof(LocationMappingPlan.Levels)}}}') Level,
-                       jsonb_each(Level.value -> '{{{nameof(LocationLevelMappings.Mappings)}}}') OptionMapping,
-                       jsonb_extract_path_text(OptionMapping.value, '{{{nameof(LocationOptionMapping.Type)}}}') OptionMappingType
-                   WHERE "{{{nameof(DataSetVersionMapping.TargetDataSetVersionId)}}}" = @targetDataSetVersionId
-                   """,
-                parameters: [targetDataSetVersionIdParam])
-            .ToListAsync(cancellationToken);
-    }
+        CancellationToken cancellationToken) =>
+        await mappingTypesRepository.GetLocationOptionMappingTypes(targetDataSetVersionId, cancellationToken);
 
     private async Task<List<FilterMappingTypes>> GetFilterAndOptionMappingTypes(
         Guid targetDataSetVersionId,
-        CancellationToken cancellationToken)
-    {
-        var targetDataSetVersionIdParam = new NpgsqlParameter("targetDataSetVersionId", targetDataSetVersionId);
-
-        // Find all the distinct combinations of parent filters' mapping types against the distinct
-        // mapping types of their children.
-        return await publicDataDbContext.Database
-            .SqlQueryRaw<FilterMappingTypes>(
-                $"""
-                 SELECT DISTINCT 
-                     FilterMappingType "{nameof(FilterMappingTypes.FilterRaw)}", 
-                     OptionMappingType "{nameof(FilterMappingTypes.FilterOptionRaw)}" 
-                 FROM 
-                     "{nameof(PublicDataDbContext.DataSetVersionMappings)}" Mapping,
-                     jsonb_each(Mapping."{nameof(DataSetVersionMapping.FilterMappingPlan)}" 
-                                    -> '{nameof(FilterMappingPlan.Mappings)}') FilterMapping,
-                     jsonb_each(FilterMapping.value -> '{nameof(FilterMapping.OptionMappings)}') OptionMapping,
-                     jsonb_extract_path_text(FilterMapping.value, '{nameof(FilterMapping.Type)}') FilterMappingType,
-                     jsonb_extract_path_text(OptionMapping.value, '{nameof(FilterOptionMapping.Type)}') OptionMappingType
-                 WHERE "{nameof(DataSetVersionMapping.TargetDataSetVersionId)}" = @targetDataSetVersionId
-                 """,
-                parameters: [targetDataSetVersionIdParam])
-            .ToListAsync(cancellationToken);
-    }
+        CancellationToken cancellationToken) =>
+        await mappingTypesRepository.GetFilterOptionMappingTypes(targetDataSetVersionId, cancellationToken);
 
     /// <summary>
     /// Given a batch of Location mapping update requests, this method will validate that the chosen mapping candidates
@@ -618,27 +604,5 @@ public class DataSetVersionMappingService(
             .SingleOrNotFoundAsync(
                 mapping => mapping.TargetDataSetVersionId == nextDataSetVersionId,
                 cancellationToken);
-    }
-
-    private record FilterMappingTypes
-    {
-        public required string FilterRaw { get; init; }
-
-        public required string FilterOptionRaw { get; init; }
-
-        public MappingType Filter => EnumUtil.GetFromEnumValue<MappingType>(FilterRaw);
-
-        public MappingType FilterOption => EnumUtil.GetFromEnumValue<MappingType>(FilterOptionRaw);
-    }
-
-    private record LocationMappingTypes
-    {
-        public required string LocationLevelRaw { get; init; }
-
-        public required string LocationOptionRaw { get; init; }
-
-        public MappingType LocationLevel => EnumUtil.GetFromEnumValue<MappingType>(LocationLevelRaw);
-
-        public MappingType LocationOption => EnumUtil.GetFromEnumValue<MappingType>(LocationOptionRaw);
     }
 }
