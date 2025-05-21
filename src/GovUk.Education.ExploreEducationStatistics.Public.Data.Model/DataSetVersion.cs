@@ -25,10 +25,6 @@ public class DataSetVersion : ICreatedUpdatedTimestamps<DateTimeOffset, DateTime
 
     public required int VersionMinor { get; set; }
 
-    // Not using this currently, but it's being considered for
-    // data replacement version numbers in future functionality.
-    // We're including this now so that the column exists and is
-    // in the right position. Remove if not needed in the end.
     public int VersionPatch { get; set; }
 
     public required string Notes { get; set; }
