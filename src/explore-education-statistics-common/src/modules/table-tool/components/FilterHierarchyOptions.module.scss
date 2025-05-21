@@ -10,6 +10,9 @@
 
   &__expanded {
     background: govuk-colour('light-grey');
+  }
+
+  &__expanded:not(:last-child) {
     margin-bottom: govuk-spacing(4);
   }
 }

@@ -1,5 +1,9 @@
 @import '~govuk-frontend/dist/govuk/base';
 
+.search {
+  max-width: map-get($govuk-breakpoints, 'desktop');
+}
+
 .tier {
   background: govuk-colour('light-grey');
   padding: govuk-spacing(2);

@@ -174,8 +174,8 @@ export default function FiltersForm({
 
         return [
           hierachyKey,
-          initialValues?.filters.filter(
-            optionId => !hierarchyOptionValues.includes(optionId),
+          initialValues?.filters.filter(optionId =>
+            hierarchyOptionValues.includes(optionId),
           ) ?? [],
         ];
       }),
@@ -394,9 +394,9 @@ export default function FiltersForm({
                       {filterHierarchies.map(filterHierarchy => {
                         if (filterHierarchy.length === 0) return null;
 
-                        const hierarchyName = `filterHierarchies.${
-                          filterHierarchy.at(-1)?.childFilterId ?? ''
-                        }`;
+                        const filterName =
+                          filterHierarchy.at(-1)?.childFilterId ?? '';
+                        const hierarchyName = `filterHierarchies.${filterName}`;
 
                         return (
                           <FilterHierarchy
@@ -405,6 +405,16 @@ export default function FiltersForm({
                             disabled={formState.isSubmitting}
                             key={hierarchyName}
                             name={hierarchyName}
+                            open={openFilterGroups.includes(filterName)}
+                            onToggle={isOpen => {
+                              setOpenFilterGroups(groups =>
+                                isOpen
+                                  ? [...groups, filterName]
+                                  : groups.filter(
+                                      group => group !== filterName,
+                                    ),
+                              );
+                            }}
                           />
                         );
                       })}
