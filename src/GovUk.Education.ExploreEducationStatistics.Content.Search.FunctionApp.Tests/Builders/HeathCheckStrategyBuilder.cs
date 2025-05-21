@@ -12,8 +12,12 @@ public class HealthCheckStrategyMockBuilder
     public IHealthCheckStrategy Build()
     {
         _mock
+            .Setup(m => m.Description)
+            .Returns(() => "Mock Health Check Strategy");
+        
+        _mock
             .Setup(m => m.Run(It.IsAny<CancellationToken>()))
-            .ReturnsAsync(new HealthCheckResult(_healthCheckIsSuccessful, _healthCheckMessage));
+            .ReturnsAsync(new HealthCheckResult(_mock.Object, _healthCheckIsSuccessful, _healthCheckMessage));
         
         return _mock.Object;
     }
