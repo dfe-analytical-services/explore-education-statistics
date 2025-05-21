@@ -29,12 +29,6 @@ public class DataSetVersionRepository(
             .Where(dsv => releaseFileIds.Contains(dsv.Release.ReleaseFileId))
             .ToListAsync();
     }
-    public async Task<DataSetVersion> GetDataSetVersion(Guid dataSetVersionId)
-    {
-        return await publicDataDbContext
-            .DataSetVersions
-            .FirstOrDefaultAsync(x => x.Id == dataSetVersionId);
-    }
     
     public async Task<DataSetVersion> GetDataSetVersion(Guid dataSetId,
         SemVersion version,

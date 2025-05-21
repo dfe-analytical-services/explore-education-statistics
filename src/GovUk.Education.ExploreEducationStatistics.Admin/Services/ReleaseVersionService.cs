@@ -599,7 +599,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                             Id = tuple.apiDataSetVersion.Id,
                             Version = tuple.apiDataSetVersion.PublicVersion,
                             Status = tuple.apiDataSetVersion.Status,
-                            Valid = false
+                            Valid = featureFlags.Value.EnableReplacementOfPublicApiDataSets
                         };
 
                     return new DeleteDataFilePlanViewModel
@@ -608,7 +608,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         SubjectId = tuple.subject.Id,
                         DeleteDataBlockPlan = await dataBlockService.GetDeletePlan(releaseVersionId, tuple.subject),
                         FootnoteIds = footnotes.Select(footnote => footnote.Id).ToList(),
-                        DeleteApiDataSetVersionPlan = linkedApiDataSetVersionDeletionPlan
+                        ApiDataSetVersionPlan = linkedApiDataSetVersionDeletionPlan
                     };
                 });
         }
@@ -634,7 +634,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 })
                 .OnSuccess(_ => GetDeleteDataFilePlan(releaseVersionId, fileId))
                 .OnSuccessDo(deletePlan => dataBlockService.DeleteDataBlocks(deletePlan.DeleteDataBlockPlan))
-                .OnSuccessVoid(async deletePlan =>
+                .OnSuccessDo(async deletePlan =>
                 {
                     await releaseSubjectRepository.DeleteReleaseSubject(releaseVersionId: releaseVersionId,
                         subjectId: deletePlan.SubjectId);
@@ -642,9 +642,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         releaseVersionId: releaseVersionId,
                         subjectId: deletePlan.SubjectId));
                 })
+                .OnSuccessDo(DeleteApiDataSetVersionIfAttached)
                 .OnSuccessVoid(() => releaseDataFileService.Delete(releaseVersionId, fileId));
         }
 
+        private async Task<Either<ActionResult, Unit>> DeleteApiDataSetVersionIfAttached(DeleteDataFilePlanViewModel deletePlan)
+        {
+            return !featureFlags.Value.EnableReplacementOfPublicApiDataSets || deletePlan.ApiDataSetVersionPlan == null
+                ? Unit.Instance
+                : await dataSetVersionService.DeleteVersion(dataSetVersionId: deletePlan.ApiDataSetVersionPlan.Id);
+        }
         public async Task<Either<ActionResult, DataImportStatusViewModel>> GetDataFileImportStatus(
             Guid releaseVersionId,
             Guid fileId)
