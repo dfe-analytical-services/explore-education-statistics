@@ -10,6 +10,7 @@ internal class AzureBlobStorageHealthCheckStrategy(
     ILogger<AzureBlobStorageHealthCheckStrategy> logger,
     IOptions<AppOptions> appOptions) : IHealthCheckStrategy
 {
+    public string Description => "Azure blob storage check";
     public async Task<HealthCheckResult> Run(CancellationToken cancellationToken)
     {
         logger.LogInformation("Running Azure blob storage health check");
@@ -17,14 +18,16 @@ internal class AzureBlobStorageHealthCheckStrategy(
         if (!appOptions.Value.IsValid(out var errorMessage))
         {
             logger.LogWarning("Azure blob storage health check failed: Provider options are not valid. {@Options}", appOptions.Value);
-            return new HealthCheckResult(false,  errorMessage);
+            return new HealthCheckResult(this, false,  errorMessage);
         }
         
         var containerName = appOptions.Value.SearchableDocumentsContainerName;
         if (string.IsNullOrWhiteSpace(containerName))
         {
             logger.LogWarning("Azure blob storage health check failed: Container name is not specified in configuration.");
-            return new HealthCheckResult(false,
+            return new HealthCheckResult(
+                this, 
+                false,
                 $"Azure blob storage container name is not specified in {AppOptions.Section}.{nameof(AppOptions.SearchableDocumentsContainerName)}");
         }
 
@@ -36,7 +39,9 @@ internal class AzureBlobStorageHealthCheckStrategy(
             if (!containerExists)
             {
                 logger.LogWarning("Azure blob storage container '{ContainerName}' is not found.", containerName);
-                return new HealthCheckResult(false,
+                return new HealthCheckResult(
+                    this,
+                    false,
                     $"Azure blob storage container '{containerName}' is not found");
             }
 
@@ -44,10 +49,16 @@ internal class AzureBlobStorageHealthCheckStrategy(
         catch (Exception e)
         {
             logger.LogError(e, "Error occurred whilst trying to check for Azure blob storage container '{ContainerName}': {Message}", containerName, e.Message);
-            return new HealthCheckResult(false, $"Error occurred whilst trying to check for Azure blob storage container '{containerName}': {e.Message}");
+            return new HealthCheckResult(
+                this,
+                false, 
+                $"Error occurred whilst trying to check for Azure blob storage container '{containerName}': {e.Message}");
         }
 
         logger.LogInformation("Healthcheck was successful: Azure blob storage container '{ContainerName}' is found.", containerName);
-        return new HealthCheckResult(true, "Connection to Azure blob storage container:OK");
+        return new HealthCheckResult(
+            this,
+            true, 
+            "Connection to Azure blob storage container:OK");
     }
 }

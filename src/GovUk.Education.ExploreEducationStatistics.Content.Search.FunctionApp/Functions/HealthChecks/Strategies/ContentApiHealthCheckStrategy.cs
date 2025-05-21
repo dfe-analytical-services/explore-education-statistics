@@ -10,6 +10,7 @@ internal class ContentApiHealthCheckStrategy(
     ILogger<ContentApiHealthCheckStrategy> logger,
     Func<IContentApiClient> contentApiClientFactory) : IHealthCheckStrategy
 {
+    public string Description => "Content API check";
     public async Task<HealthCheckResult> Run(CancellationToken cancellationToken)
     {
         logger.LogInformation("Running Content API health check");
@@ -17,7 +18,7 @@ internal class ContentApiHealthCheckStrategy(
         if (!options.Value.IsValid(out var errorMessage))
         {
             logger.LogWarning("Content API health check failed: Provider options are not valid. {@Options}", options.Value);
-            return new HealthCheckResult(false,  errorMessage);
+            return new HealthCheckResult(this, false,  errorMessage);
         }
         
         logger.LogInformation("Making Ping call to Content API...");
@@ -31,6 +32,7 @@ internal class ContentApiHealthCheckStrategy(
         logger.LogInformation("Result:{ResultMessage}", resultMessage);
         
         return new(
+            this,
             pingResult.WasSuccesssful, 
             resultMessage);
     }
