@@ -47,6 +47,12 @@ param appSettings {
 @description('The Application Insights connection string that is associated with this resource.')
 param applicationInsightsConnectionString string
 
+@description('Enable diagnostic setting to send logs and metrics to Log Analytics.')
+param diagnosticSettingEnabled bool = false
+
+@description('The id of the Log Analytics workspace to which logs and metrics will be sent.')
+param logAnalyticsWorkspaceId string?
+
 @description('Specifies whether to grant the Function App role-based access to storage account queue data.')
 param deployQueueRoleAssignment bool = false
 
@@ -402,6 +408,15 @@ module expectedHttpStatusCodeAlerts '../../public-api/components/alerts/dynamicM
     }
   }
 ]
+
+module diagnosticSetting 'monitoring/functionAppDiagnosticSetting.bicep' = if (diagnosticSettingEnabled) {
+  name: '${functionAppName}DiagnosticSettingModuleDeploy'
+  params: {
+    functionAppName: functionApp.name
+    diagnosticSettingName: 'Send all logs and metrics to Log Analytics'
+    logAnalyticsWorkspaceId: logAnalyticsWorkspaceId
+  }
+}
 
 output name string = functionApp.name
 output url string = 'https://${functionApp.name}.azurewebsites.net'
