@@ -32,8 +32,7 @@ public class DataSetVersionMappingService(
     IUserService userService,
     PublicDataDbContext publicDataDbContext,
     ContentDbContext contentDbContext,
-    IMappingTypesRepository mappingTypesRepository,
-    IOptions<FeatureFlags> featureFlags)
+    IMappingTypesRepository mappingTypesRepository)
     : IDataSetVersionMappingService
 {
     private static readonly MappingType[] IncompleteMappingTypes =
