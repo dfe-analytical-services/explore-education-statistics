@@ -60,6 +60,7 @@ var resourcePrefix = '${subscription}-ees'
 var resourceNames = {
   existingResources: {
     adminApp: '${subscription}-as-ees-admin'
+    logAnalyticsWorkspace: '${resourcePrefix}-${abbreviations.operationalInsightsWorkspaces}'
     publisherFunction: '${subscription}-fa-ees-publisher'
     keyVault: '${subscription}-kv-ees-01'
     vNet: '${subscription}-vnet-ees'
@@ -72,9 +73,8 @@ var resourceNames = {
   }
 }
 
-// Create a shared Application Insights resource for Search resources to use.
-module applicationInsightsModule 'application/searchApplicationInsights.bicep' = {
-  name: 'searchApplicationInsightsModule'
+module monitoringModule 'application/monitoring.bicep' = {
+  name: 'monitoringModule'
   params: {
     location: location
     resourcePrefix: resourcePrefix
@@ -125,7 +125,7 @@ module searchDocsFunctionModule 'application/searchDocsFunction.bicep' = {
     searchStorageAccountConnectionStringSecretName: searchServiceModule.outputs.searchStorageAccountConnectionStringSecretName
     searchableDocumentsContainerName: searchServiceModule.outputs.searchableDocumentsContainerName
     storageFirewallRules: maintenanceIpRanges
-    applicationInsightsConnectionString: applicationInsightsModule.outputs.applicationInsightsConnectionString
+    applicationInsightsConnectionString: monitoringModule.outputs.applicationInsightsConnectionString
     tagValues: tagValues
     deployAlerts: deployAlerts
   }
