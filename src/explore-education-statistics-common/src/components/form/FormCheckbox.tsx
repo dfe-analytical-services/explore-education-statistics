@@ -25,6 +25,7 @@ export interface FormCheckboxProps {
   hint?: string | ReactNode;
   hintSmall?: boolean;
   label: string;
+  renderLabel?: (label: string) => string | ReactNode;
   boldLabel?: boolean;
   name: string;
   onBlur?: FocusEventHandler<HTMLInputElement>;
@@ -43,6 +44,7 @@ const FormCheckbox = ({
   hint,
   hintSmall = false,
   label,
+  renderLabel,
   boldLabel = false,
   name,
   onBlur,
@@ -92,7 +94,7 @@ const FormCheckbox = ({
           )}
           htmlFor={id}
         >
-          {label}
+          {renderLabel ? renderLabel(label) : label}
         </label>
         {hint && (
           <div
