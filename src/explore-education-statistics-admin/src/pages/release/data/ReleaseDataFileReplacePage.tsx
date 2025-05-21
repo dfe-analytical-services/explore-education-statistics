@@ -134,10 +134,31 @@ const ReleaseDataFileReplacePage = ({
       },
     });
   };
-
+  const cancelBodyText = dataFile?.publicApiDataSetId ? (
+    <>
+      <p>
+        Are you sure you want to cancel this data replacement and remove the
+        attached draft API version?
+      </p>
+      <p>
+        Note that this data replacement has an associated draft API data set
+        version update. The API data set update will also be cancelled and
+        removed by this action.
+      </p>
+    </>
+  ) : (
+    <>
+      Are you sure you want to cancel this data replacement? The pending +
+      replacement data file will be deleted.?
+    </>
+  );
   const replacementCancelButton = (
     <ModalConfirm
-      title="Cancel data replacement"
+      title={
+        dataFile?.publicApiDataSetId
+          ? 'Cancel data replacement and remove draft API'
+          : 'Cancel data replacement'
+      }
       triggerButton={
         <Button variant="secondary">Cancel data replacement</Button>
       }
@@ -152,10 +173,7 @@ const ReleaseDataFileReplacePage = ({
         fetchDataFile();
       }}
     >
-      <p>
-        Are you sure you want to cancel this data replacement? The pending
-        replacement data file will be deleted.
-      </p>
+      <p>{cancelBodyText}</p>
     </ModalConfirm>
   );
 
