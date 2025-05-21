@@ -74,7 +74,7 @@ public class OnReleaseVersionPublishedFunctionTests
         // If the newly published release version is for a different release then the new searchable
         // document will be created using its new ReleaseId.
         // Therefore, the existing, previously latest searchable document needs to be removed.
-        Assert.Equal([new RemoveSearchableDocumentDto{ ReleaseId = payload.PreviousLatestReleaseId }], response.RemoveSearchableDocuments);
+        Assert.Equal([new RemoveSearchableDocumentDto{ ReleaseId = payload.PreviousLatestPublishedReleaseId }], response.RemoveSearchableDocuments);
     }
     
     [Fact]
@@ -118,8 +118,8 @@ public class OnReleaseVersionPublishedFunctionTests
                     ReleaseSlug = "this-is-a-release-slug",
                     PublicationId = Guid.NewGuid(),
                     PublicationSlug = "this-is-a-publication-slug",
-                    PublicationLatestPublishedReleaseVersionId = newlyPublishedLatestReleaseVersionId,
-                    PreviousLatestReleaseId = newlyPublishedLatestReleaseId
+                    LatestPublishedReleaseVersionId = newlyPublishedLatestReleaseVersionId,
+                    PreviousLatestPublishedReleaseId = newlyPublishedLatestReleaseId
                 };
             }
         }
@@ -134,14 +134,14 @@ public class OnReleaseVersionPublishedFunctionTests
             Base with
             {
                 // Latest release version id is something other than the release version just published
-                PublicationLatestPublishedReleaseVersionId = Guid.NewGuid()
+                LatestPublishedReleaseVersionId = Guid.NewGuid()
             };
 
         public static ReleaseVersionPublishedEventDto NewlyPublishedIsForNewLatestRelease => 
             Base with
             {
                 // The previous release id is a different release
-                PreviousLatestReleaseId = Guid.NewGuid()
+                PreviousLatestPublishedReleaseId = Guid.NewGuid()
             };
 
         public static ReleaseVersionPublishedEventDto NewlyPublishedIsForSameRelease => Base;
