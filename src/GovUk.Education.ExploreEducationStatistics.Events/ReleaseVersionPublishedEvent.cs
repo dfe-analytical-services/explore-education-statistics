@@ -44,8 +44,8 @@ public record ReleaseVersionPublishedEvent : IEvent
         public required string PublicationSlug { get; init; }
         public required Guid LatestPublishedReleaseId { get; init; }
         public required Guid LatestPublishedReleaseVersionId { get; init; }
-        public Guid? PreviousLatestPublishedReleaseId { get; init; }
-        public Guid? PreviousLatestPublishedReleaseVersionId { get; init; }
+        public required Guid? PreviousLatestPublishedReleaseId { get; init; }
+        public required Guid? PreviousLatestPublishedReleaseVersionId { get; init; }
     }
     public EventPayload Payload { get; }
     
