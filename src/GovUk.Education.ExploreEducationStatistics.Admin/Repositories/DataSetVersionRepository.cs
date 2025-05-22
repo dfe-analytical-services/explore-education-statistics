@@ -30,7 +30,8 @@ public class DataSetVersionRepository(
             .ToListAsync();
     }
     
-    public async Task<DataSetVersion> GetDataSetVersion(Guid dataSetId,
+    public async Task<DataSetVersion> GetDataSetVersion(
+        Guid dataSetId,
         SemVersion version,
         CancellationToken cancellationToken = default)
     {
