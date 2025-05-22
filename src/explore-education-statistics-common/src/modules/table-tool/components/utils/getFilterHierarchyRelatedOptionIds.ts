@@ -2,22 +2,29 @@ import { SubjectMeta } from '@common/services/tableBuilderService';
 import { Dictionary } from '@common/types';
 import mapValues from 'lodash/mapValues';
 import { FiltersFormValues } from '../FiltersForm';
+import {
+  getOptionChildTotalsRecursively,
+  getOptionParentsRecursively,
+} from './filterHierarchiesShim';
 import { OptionLabelsMap } from './getFilterHierarchyLabelsMap';
 
 /**
- * Amends submitted option id lists to include parent option id(s) and child total option id(s)
- * @param selectedValues submitted selected filter options
+ * Augments filterHierarchySelections to dictionarys where the key is the selected option and the value is all related options
+ * @param filterHierarchySelections submitted selected filter options
  * @param filterHierarchies the hierarchies to sift through to find appropriate parent and child related ids to add to return value
  * @param optionLabelsMap to help locate total options
- * @returns a amended list of selected option ids to include option parent ids and child total ids to help API select appropriate tabel rows to return
  */
-export default function getFilterHierarchyRelatedOptionIds(
-  selectedValues: FiltersFormValues['filterHierarchies'],
+export default function augmentFilterHierarchySelections(
+  filterHierarchySelections: FiltersFormValues['filterHierarchies'],
   filterHierarchies: SubjectMeta['filterHierarchies'],
   optionLabelsMap: OptionLabelsMap,
-): FiltersFormValues['filterHierarchies'] {
+): Dictionary<Dictionary<string[]>> {
   if (!filterHierarchies) {
-    return selectedValues;
+    return mapValues(filterHierarchySelections, hierarchySelections =>
+      Object.fromEntries(
+        hierarchySelections.map(fhSelection => [fhSelection, [fhSelection]]),
+      ),
+    );
   }
 
   // flatten and merge *all* FilterHierarchyTier["hierarchies"] together,
@@ -34,55 +41,23 @@ export default function getFilterHierarchyRelatedOptionIds(
     ),
   );
 
-  const selectedRelatedValues = mapValues(selectedValues, selectedOptionIds => {
-    return Array.from(
-      new Set( // remove duplicate ids
-        selectedOptionIds.flatMap(optionId => {
-          return getOptionChildTotalsRecursively(
-            getOptionParentsRecursively([optionId], optionParentRelationsMap),
-            optionChildrenRelationsMap,
-            optionLabelsMap,
-          );
+  const augmentedFilterHierarchySelections = mapValues(
+    filterHierarchySelections,
+    selectedOptionIds => {
+      return Object.fromEntries(
+        selectedOptionIds.map(optionId => {
+          return [
+            optionId,
+            getOptionChildTotalsRecursively(
+              getOptionParentsRecursively([optionId], optionParentRelationsMap),
+              optionChildrenRelationsMap,
+              optionLabelsMap,
+            ),
+          ];
         }),
-      ),
-    );
-  });
-  return selectedRelatedValues;
-}
-
-function getOptionParentsRecursively(
-  optionIds: string[],
-  optionParentRelationsMap: Dictionary<string>,
-): string[] {
-  const optionId = optionIds[0] ?? '';
-  const parentOptionId = optionParentRelationsMap[optionId];
-
-  if (!parentOptionId) {
-    return optionIds;
-  }
-  return getOptionParentsRecursively(
-    [parentOptionId, ...optionIds],
-    optionParentRelationsMap,
+      );
+    },
   );
-}
 
-function getOptionChildTotalsRecursively(
-  optionIds: string[],
-  optionChildrenRelationsMap: Dictionary<string[]>,
-  optionLabelsMap: OptionLabelsMap,
-) {
-  const parentOptionId = optionIds.at(-1) ?? '';
-
-  const childTotalId = optionChildrenRelationsMap[parentOptionId]?.find(
-    childOptionId =>
-      optionLabelsMap[childOptionId]?.toLocaleLowerCase() === 'total',
-  );
-  if (!childTotalId) {
-    return optionIds;
-  }
-  return getOptionChildTotalsRecursively(
-    [...optionIds, childTotalId],
-    optionChildrenRelationsMap,
-    optionLabelsMap,
-  );
+  return augmentedFilterHierarchySelections;
 }
