@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Analytics.Common;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Requests;
@@ -29,21 +30,27 @@ public class AnalyticsWritePublicZipDownloadStrategyTests
                 pathResolver: pathResolver);
 
             var releaseVersionId1 = Guid.Parse("5d3c0aec-c147-48ce-ae26-ef765ffa4a5b");
-            await strategy.Report(new CaptureZipDownloadRequest(
-                    "publication name 1",
-                    releaseVersionId1,
-                    "release name 1",
-                    "release label 1"),
+            await strategy.Report(new CaptureZipDownloadRequest
+                {
+                    PublicationName = "publication name 1",
+                    ReleaseVersionId = releaseVersionId1,
+                    ReleaseName = "release name 1",
+                    ReleaseLabel = "release label 1",
+                    FromPage = AnalyticsFromPage.DataCatalogue
+                },
                 default);
 
             var releaseVersionId2 = Guid.Parse("254d53e4-1194-4285-82bd-d8a3b7c0853d");
-            await strategy.Report(new CaptureZipDownloadRequest(
-                    "publication name 2",
-                    releaseVersionId2,
-                    "release name 2",
-                    "release label 2",
-                    SubjectId: Guid.Parse("39132b60-d4a0-4b62-befe-ba10cea4b30e"),
-                    DataSetTitle: "data set title 2"),
+            await strategy.Report(new CaptureZipDownloadRequest
+                {
+                    PublicationName = "publication name 2",
+                    ReleaseVersionId = releaseVersionId2,
+                    ReleaseName = "release name 2",
+                    ReleaseLabel = "release label 2",
+                    FromPage = AnalyticsFromPage.ReleaseUsefulInfo,
+                    SubjectId = Guid.Parse("39132b60-d4a0-4b62-befe-ba10cea4b30e"),
+                    DataSetTitle = "data set title 2",
+                },
                 default);
 
             var files = Directory.GetFiles(pathResolver.PublicZipDownloadsDirectoryPath())

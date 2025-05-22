@@ -75,6 +75,15 @@ export default function DataSetFilePage({
     useState<PageSectionId>('dataSetDetails');
   const [fullScreenPreview, toggleFullScreenPreview] = useToggle(false);
 
+  const handleDownload = async () => {
+    await downloadService.downloadZip(release.id, 'DataCatalogue', file.id);
+
+    logEvent({
+      category: 'Data catalogue - data set page',
+      action: 'Data set file download',
+      label: `Publication: ${release.publication.title}, Release: ${release.title}, Data set: ${title}`,
+    });
+  };
   const [handleScroll] = useDebouncedCallback(() => {
     const sections = document.querySelectorAll('[data-page-section]');
 
@@ -190,19 +199,7 @@ export default function DataSetFilePage({
                 'govuk-!-margin-bottom-0',
                 styles.infoDownloadButton,
               )}
-              onClick={async () => {
-                await downloadService.downloadZip(
-                  release.id,
-                  'DataCatalogue',
-                  file.id,
-                );
-
-                logEvent({
-                  category: 'Data catalogue - data set page',
-                  action: 'Data set file download',
-                  label: `Publication: ${release.publication.title}, Release: ${release.title}, Data set: ${title}`,
-                });
-              }}
+              onClick={handleDownload}
             >
               Download data set (ZIP)
             </Button>
@@ -253,19 +250,7 @@ export default function DataSetFilePage({
                 dataSetFileId={dataSetFile.id}
                 hasApiDataSet={!!apiDataSet}
                 tableToolLink={`/data-tables/${release.publication.slug}/${release.slug}?subjectId=${file.subjectId}`}
-                onDownload={async () => {
-                  await downloadService.downloadZip(
-                    release.id,
-                    'DataCatalogue',
-                    file.id,
-                  );
-
-                  logEvent({
-                    category: 'Data catalogue - data set page',
-                    action: 'Data set file download',
-                    label: `Publication: ${release.publication.title}, Release: ${release.title}, Data set: ${title}`,
-                  });
-                }}
+                onDownload={handleDownload}
               />
 
               {apiDataSet && apiDataSetVersion && (
