@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Analytics.Common;
 using GovUk.Education.ExploreEducationStatistics.Analytics.Common.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
@@ -81,7 +82,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                         return await service.ZipFilesToStream(
                             releaseVersionId: releaseVersion.Id,
                             outputStream: Stream.Null,
-                            fromPage: FromPage.DataCatalogue,
+                            fromPage: AnalyticsFromPage.DataCatalogue,
                             fileIds: [Guid.NewGuid()]
                         );
                     }

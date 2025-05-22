@@ -214,9 +214,9 @@ public abstract class PublicZipDownloadsProcessorTests
         Guid ReleaseVersionId,
         string ReleaseName,
         string? ReleaseLabel,
+        string FromPage,
         Guid? SubjectId = null,
-        string? DataSetTitle = null,
-        string? FromPage = null);
+        string? DataSetTitle = null);
 
     // ReSharper disable once ClassNeverInstantiated.Local
     private record ZipDownloadReportLine(
@@ -227,6 +227,6 @@ public abstract class PublicZipDownloadsProcessorTests
         string ReleaseLabel,
         Guid? SubjectId,
         string? DataSetTitle,
-        string? FromPage,
+        string FromPage,
         int Downloads);
 }
