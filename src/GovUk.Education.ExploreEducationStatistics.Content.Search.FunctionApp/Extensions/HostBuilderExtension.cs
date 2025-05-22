@@ -32,7 +32,7 @@ public static class HostBuilderExtension
         .ConfigureServices(
             (context, services) =>
                 services
-                    .ConfigureLogging()
+                    .ConfigureLogging(context.Configuration)
                     // Config
                     .Configure<AppOptions>(context.Configuration.GetSection(AppOptions.Section))
                     .Configure<ContentApiOptions>(context.Configuration.GetSection(ContentApiOptions.Section))

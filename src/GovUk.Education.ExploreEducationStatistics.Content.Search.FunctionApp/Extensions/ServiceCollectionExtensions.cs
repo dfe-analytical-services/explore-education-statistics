@@ -5,6 +5,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Func
 using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Azure;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Serilog;
@@ -33,25 +34,31 @@ public static class ServiceCollectionExtensions
             .AddTransient<Func<ISearchIndexerClient>>(sp => sp.GetRequiredService<ISearchIndexerClient>);
 
     public static IServiceCollection ConfigureLogging(
-        this IServiceCollection serviceCollection) =>
+        this IServiceCollection serviceCollection,
+        IConfiguration configuration) =>
         serviceCollection
+            .SetupAppInsights()
             .AddLogging(lb =>
             {
                 // Prevent the default Azure Function logging provider from logging.
                 // Instead, let Serilog handle that.
                 lb.SetMinimumLevel(LogLevel.None);
-                
+
+                // Resolve the telemetry configuration that was registered by SetupAppInsights
+                var telemetryConfiguration = serviceCollection.BuildServiceProvider().GetRequiredService<TelemetryConfiguration>();
+
                 // Setup Serilog to log to the Console and to App Insights
                 lb.AddSerilog(
                     new LoggerConfiguration()
+                        .ReadFrom.Configuration(configuration)
                         .Enrich.WithExceptionDetails()
+                        .Enrich.FromLogContext()
                         .WriteTo.Console()
-                        .WriteTo.ApplicationInsights(TelemetryConfiguration.CreateDefault(), TelemetryConverter.Traces)
+                        .WriteTo.ApplicationInsights(telemetryConfiguration, TelemetryConverter.Traces)
                         .CreateLogger(),
                     dispose: true
                 );
             })
-            .SetupAppInsights()
         ;
 
     private static IServiceCollection SetupAppInsights(this IServiceCollection serviceCollection) =>
@@ -66,6 +73,9 @@ public static class ServiceCollectionExtensions
             .Configure<LoggerFilterOptions>(
                 options =>
                 {
+                    // The Application Insights SDK adds a default logging filter that instructs ILogger to capture
+                    // only Warning and more severe logs. Application Insights requires an explicit override.
+                    
                     // Find the built-in App Insights logging rule
                     var defaultRule = options.Rules.FirstOrDefault(
                         rule => rule.ProviderName ==
