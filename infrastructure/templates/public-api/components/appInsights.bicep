@@ -6,6 +6,9 @@ param location string
 @description('Specifies the Application Insights name')
 param appInsightsName string
 
+@description('Resource Id of the log analytics workspace which the data will be ingested to.')
+param logAnalyticsWorkspaceId string?
+
 @description('Whether to create or update Azure Monitor alerts during this deploy')
 param alerts {
   exceptionCount: bool
@@ -27,6 +30,7 @@ resource applicationInsights 'Microsoft.Insights/components@2020-02-02' = {
     Application_Type: kind
     publicNetworkAccessForIngestion: 'Enabled'
     publicNetworkAccessForQuery: 'Enabled'
+    WorkspaceResourceId: logAnalyticsWorkspaceId
   }
   tags: tagValues
 }

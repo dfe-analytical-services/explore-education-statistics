@@ -13,11 +13,17 @@ param location string
 @description('Specifies a set of tags with which to tag the resource in Azure.')
 param tagValues object
 
+// Shared log analytics workspace. Currently the Public API deployment is responsible for creating this.
+resource logAnalyticsWorkspace 'Microsoft.OperationalInsights/workspaces@2025-02-01' existing = {
+  name: resourceNames.existingResources.logAnalyticsWorkspace
+}
+
 module applicationInsightsModule '../../public-api/components/appInsights.bicep' = {
   name: 'applicationInsightsModuleDeploy'
   params: {
     location: location
     appInsightsName: '${resourcePrefix}-${abbreviations.insightsComponents}-search'
+    logAnalyticsWorkspaceId: logAnalyticsWorkspace.id
     alerts: {
       exceptionCount: true
       exceptionServerCount: true
@@ -30,3 +36,5 @@ module applicationInsightsModule '../../public-api/components/appInsights.bicep'
 
 output applicationInsightsConnectionString string = applicationInsightsModule.outputs.applicationInsightsConnectionString
 output applicationInsightsName string = applicationInsightsModule.outputs.applicationInsightsName
+output logAnalyticsWorkspaceId string = logAnalyticsWorkspace.id
+output logAnalyticsWorkspaceName string = logAnalyticsWorkspace.name
