@@ -2902,7 +2902,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
 
 
-        private ReleaseDataFileService SetupReleaseDataFileService(ContentDbContext contentDbContext,
+        private ReleaseDataFileService SetupReleaseDataFileService(
+            ContentDbContext contentDbContext,
             StatisticsDbContext? statisticsDbContext = null,
             IPersistenceHelper<ContentDbContext>? contentPersistenceHelper = null,
             IPrivateBlobStorageService? privateBlobStorageService = null,

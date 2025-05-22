@@ -11,5 +11,8 @@ public interface IDataSetVersionRepository
 {
     Task<List<DataSetVersion>> GetDataSetVersions(Guid releaseVersionId);
 
-    Task<DataSetVersion> GetDataSetVersion(Guid dataSetId, SemVersion version, CancellationToken cancellationToken = default);
+    Task<DataSetVersion> GetDataSetVersion(
+        Guid dataSetId,
+        SemVersion version,
+        CancellationToken cancellationToken = default);
 }
