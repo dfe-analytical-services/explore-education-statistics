@@ -47,8 +47,10 @@ public class PublisherEventRaiser(IEventRaiser eventRaiser) : IPublisherEventRai
                         ReleaseVersionId = releaseVersion.ReleaseVersionId,
                         PublicationId = publication.PublicationId,
                         PublicationSlug = publication.PublicationSlug,
-                        PreviousLatestReleaseId = publication.PreviousLatestPublishedReleaseId,
-                        PublicationLatestPublishedReleaseVersionId = publication.LatestPublishedReleaseVersionId
+                        PreviousLatestPublishedReleaseId = publication.PreviousLatestPublishedReleaseId,
+                        PreviousLatestPublishedReleaseVersionId = publication.PreviousLatestPublishedReleaseVersionId,
+                        LatestPublishedReleaseId = publication.LatestPublishedReleaseId,
+                        LatestPublishedReleaseVersionId = publication.LatestPublishedReleaseVersionId
                     })))
             .ToList();
 

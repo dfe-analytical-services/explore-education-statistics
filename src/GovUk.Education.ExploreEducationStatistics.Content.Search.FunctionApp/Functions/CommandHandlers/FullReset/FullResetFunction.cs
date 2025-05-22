@@ -3,6 +3,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Serv
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Services.ResetSearchableDocuments;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Azure.Functions.Worker;
+#pragma warning disable IDE0060 // Suppress Remove unused parameter HttpRequest
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.CommandHandlers.FullReset;
 
@@ -14,7 +15,7 @@ public class FullResetFunction(
     [QueueOutput("%RefreshSearchableDocumentQueueName%")]
     public async Task<RefreshSearchableDocumentMessageDto[]> FullSearchableDocumentsReset(
         [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = nameof(FullSearchableDocumentsReset))]
-        HttpRequest _,
+        HttpRequest ignored, // The binding name _ is invalid
         FunctionContext context) =>
         await commandHandler.Handle(
             ResetSearchableDocument,

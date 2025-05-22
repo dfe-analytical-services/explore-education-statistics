@@ -26,7 +26,7 @@ public class OnReleaseVersionPublishedFunction(IEventGridEventHandler eventGridE
                             RefreshSearchableDocumentMessages = 
                                 [ new RefreshSearchableDocumentMessageDto { PublicationSlug = payload.PublicationSlug } ],
                             RemoveSearchableDocuments = payload.NewlyPublishedReleaseVersionIsForDifferentRelease
-                                ? [ new RemoveSearchableDocumentDto { ReleaseId = payload.PreviousLatestReleaseId } ]
+                                ? [ new RemoveSearchableDocumentDto { ReleaseId = payload.PreviousLatestPublishedReleaseId } ]
                                 : []
                         }));
 }

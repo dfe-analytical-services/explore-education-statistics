@@ -1,12 +1,8 @@
-#nullable enable
-using System;
-using System.Threading;
-using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Analytics.Common.Interfaces;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
-namespace GovUk.Education.ExploreEducationStatistics.Content.Services;
+namespace GovUk.Education.ExploreEducationStatistics.Analytics.Common;
 
 public class AnalyticsConsumer(
     IAnalyticsManager analyticsManager,

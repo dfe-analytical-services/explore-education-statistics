@@ -3,10 +3,11 @@ using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Func
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
+using Microsoft.Extensions.Logging;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.HealthChecks;
 
-public class HealthCheckFunction(IEnumerable<IHealthCheckStrategy> strategies)
+public class HealthCheckFunction(IEnumerable<IHealthCheckStrategy> strategies, ILogger<HealthCheckFunction> logger)
 {
     [Function(nameof(HealthCheck))]
     [Produces("application/json")]
@@ -16,9 +17,16 @@ public class HealthCheckFunction(IEnumerable<IHealthCheckStrategy> strategies)
         HttpRequest httpRequest,
         CancellationToken cancellationToken)
     {
+        // Execute strategies sequentially so as not to interleave the logs.
+        var results = await strategies
+            .ToAsyncEnumerable()
+            .SelectAwait(async strategy => await Run(strategy))
+            .Select(result => (HealthCheckResultViewModel) result)
+            .ToArrayAsync(cancellationToken: cancellationToken);
+        
         var healthCheckResponse = new HealthCheckResponse
         {
-            Results = await Task.WhenAll(strategies.Select(s => s.Run(cancellationToken)))
+            Results = results
         };
 
         return healthCheckResponse.IsHealthy
@@ -27,5 +35,18 @@ public class HealthCheckFunction(IEnumerable<IHealthCheckStrategy> strategies)
             {
                 StatusCode = StatusCodes.Status500InternalServerError
             };
+
+        async Task<HealthCheckResult> Run(IHealthCheckStrategy strategy)
+        {
+            try
+            {
+                return await strategy.Run(cancellationToken);
+            }
+            catch (Exception e)
+            {
+                logger.LogError(e, "Error occurred whilst trying to run health check: {StrategyType}", strategy.GetType());
+                return new HealthCheckResult(strategy, false, $"Exception: {e.Message}");
+            }
+        }
     }
 }
