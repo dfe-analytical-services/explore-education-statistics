@@ -2,11 +2,13 @@
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Clients.AzureSearch;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Clients.ContentApi;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.HealthChecks.Strategies;
+using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Azure;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Serilog;
+using Serilog.Exceptions;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Extensions;
 
@@ -31,26 +33,59 @@ public static class ServiceCollectionExtensions
             .AddTransient<Func<ISearchIndexerClient>>(sp => sp.GetRequiredService<ISearchIndexerClient>);
 
     public static IServiceCollection ConfigureLogging(
-        this IServiceCollection serviceCollection,
-        IConfiguration configuration) =>
+        this IServiceCollection serviceCollection) =>
         serviceCollection
+            .AddLogging(lb =>
+            {
+                // Prevent the default Azure Function logging provider from logging.
+                // Instead, let Serilog handle that.
+                lb.SetMinimumLevel(LogLevel.None);
+                
+                // Setup Serilog to log to the Console and to App Insights
+                lb.AddSerilog(
+                    new LoggerConfiguration()
+                        .Enrich.WithExceptionDetails()
+                        .WriteTo.Console()
+                        .WriteTo.ApplicationInsights(TelemetryConfiguration.CreateDefault(), TelemetryConverter.Traces)
+                        .CreateLogger(),
+                    dispose: true
+                );
+            })
+            .SetupAppInsights()
+        ;
+
+    private static IServiceCollection SetupAppInsights(this IServiceCollection serviceCollection) =>
+        serviceCollection
+            // Setup App Insights, so that metrics are recorded
             .AddApplicationInsightsTelemetryWorkerService()
             .ConfigureFunctionsApplicationInsights()
+            .PreventDefaultAppInsightsLogging();
+
+    private static IServiceCollection PreventDefaultAppInsightsLogging(this IServiceCollection serviceCollection) =>
+        serviceCollection
             .Configure<LoggerFilterOptions>(
                 options =>
                 {
-                    // The Application Insights SDK adds a default logging filter that instructs ILogger to capture
-                    // only Warning and more severe logs. Application Insights requires an explicit override.
-                    // Log levels can also be configured using appsettings.json.
-                    // For more information, see https://learn.microsoft.com/en-us/azure/azure-monitor/app/worker-service#ilogger-logs
-                    var toRemove = options.Rules.FirstOrDefault(
-                        rule =>
-                            rule.ProviderName ==
-                            "Microsoft.Extensions.Logging.ApplicationInsights.ApplicationInsightsLoggerProvider");
+                    // Find the built-in App Insights logging rule
+                    var defaultRule = options.Rules.FirstOrDefault(
+                        rule => rule.ProviderName ==
+                                "Microsoft.Extensions.Logging.ApplicationInsights.ApplicationInsightsLoggerProvider");
 
-                    if (toRemove is not null)
+                    if (defaultRule is not null)
                     {
-                        options.Rules.Remove(toRemove);
+                        // Remove the default rule
+                        options.Rules.Remove(defaultRule);
+
+                        // Create a new rule, manually setting the log level to None
+                        // to prevent the function from logging to App Insights.
+                        // Let Serilog handle the logging.
+                        options.Rules.Add(
+                            new LoggerFilterRule(
+                                defaultRule.ProviderName,
+                                defaultRule.CategoryName,
+                                LogLevel.None,
+                                defaultRule.Filter
+                            ));
                     }
                 });
 }
