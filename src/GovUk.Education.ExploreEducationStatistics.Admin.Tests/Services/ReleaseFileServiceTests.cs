@@ -7,6 +7,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
@@ -14,6 +15,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Moq;
@@ -24,8 +26,6 @@ using System.IO.Compression;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
-using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainers;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
@@ -2450,7 +2450,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var formFile = CreateFormFileMock(filename, "application/pdf").Object;
             var privateBlobStorageService = new Mock<IPrivateBlobStorageService>(Strict);
-            var fileUploadsValidatorService = new Mock<IFileUploadsValidatorService>(Strict);
+            var fileValidatorService = new Mock<IFileValidatorService>(Strict);
 
             privateBlobStorageService.Setup(mock =>
                 mock.UploadFile(PrivateReleaseFiles,
@@ -2459,7 +2459,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     formFile
                 )).Returns(Task.CompletedTask);
 
-            fileUploadsValidatorService.Setup(mock =>
+            fileValidatorService.Setup(mock =>
                     mock.ValidateFileForUpload(formFile, Ancillary))
                 .ReturnsAsync(Unit.Instance);
 
@@ -2467,7 +2467,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 var service = SetupReleaseFileService(contentDbContext: contentDbContext,
                     privateBlobStorageService: privateBlobStorageService.Object,
-                    fileUploadsValidatorService: fileUploadsValidatorService.Object);
+                    fileValidatorService: fileValidatorService.Object);
 
                 var result = await service.UploadAncillary(
                     releaseVersion.Id,
@@ -2479,11 +2479,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     }
                 );
 
-                MockUtils.VerifyAllMocks(privateBlobStorageService, fileUploadsValidatorService);
+                MockUtils.VerifyAllMocks(privateBlobStorageService, fileValidatorService);
 
                 var fileInfo = result.AssertRight();
 
-                fileUploadsValidatorService.Verify(mock =>
+                fileValidatorService.Verify(mock =>
                     mock.ValidateFileForUpload(formFile, Ancillary), Times.Once);
 
                 privateBlobStorageService.Verify(mock =>
@@ -2558,7 +2558,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var newFormFile = CreateFormFileMock("newAncillary.pdf", "application/pdf").Object;
             var privateBlobStorageService = new Mock<IPrivateBlobStorageService>(Strict);
-            var fileUploadsValidatorService = new Mock<IFileUploadsValidatorService>(Strict);
+            var fileValidatorService = new Mock<IFileValidatorService>(Strict);
 
             privateBlobStorageService.Setup(mock =>
                     mock.DeleteBlob(
@@ -2573,7 +2573,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     newFormFile
                 )).Returns(Task.CompletedTask);
 
-            fileUploadsValidatorService.Setup(mock =>
+            fileValidatorService.Setup(mock =>
                     mock.ValidateFileForUpload(newFormFile, Ancillary))
                 .ReturnsAsync(Unit.Instance);
 
@@ -2581,7 +2581,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 var service = SetupReleaseFileService(contentDbContext: contentDbContext,
                     privateBlobStorageService: privateBlobStorageService.Object,
-                    fileUploadsValidatorService: fileUploadsValidatorService.Object);
+                    fileValidatorService: fileValidatorService.Object);
 
                 var result = await service.UpdateAncillary(
                     releaseVersionId: releaseVersion.Id,
@@ -2593,11 +2593,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         Summary = "New ancillary summary",
                     });
 
-                MockUtils.VerifyAllMocks(privateBlobStorageService, fileUploadsValidatorService);
+                MockUtils.VerifyAllMocks(privateBlobStorageService, fileValidatorService);
 
                 var fileInfo = result.AssertRight();
 
-                fileUploadsValidatorService.Verify(mock =>
+                fileValidatorService.Verify(mock =>
                     mock.ValidateFileForUpload(newFormFile, Ancillary), Times.Once);
 
                 privateBlobStorageService.Verify(mock =>
@@ -2688,7 +2688,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var newFormFile = CreateFormFileMock("newAncillary.pdf", "application/pdf").Object;
             var privateBlobStorageService = new Mock<IPrivateBlobStorageService>(Strict);
-            var fileUploadsValidatorService = new Mock<IFileUploadsValidatorService>(Strict);
+            var fileValidatorService = new Mock<IFileValidatorService>(Strict);
 
             privateBlobStorageService.Setup(mock =>
                 mock.UploadFile(PrivateReleaseFiles,
@@ -2697,7 +2697,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     newFormFile
                 )).Returns(Task.CompletedTask);
 
-            fileUploadsValidatorService.Setup(mock =>
+            fileValidatorService.Setup(mock =>
                     mock.ValidateFileForUpload(newFormFile, Ancillary))
                 .ReturnsAsync(Unit.Instance);
 
@@ -2705,7 +2705,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 var service = SetupReleaseFileService(contentDbContext: contentDbContext,
                     privateBlobStorageService: privateBlobStorageService.Object,
-                    fileUploadsValidatorService: fileUploadsValidatorService.Object);
+                    fileValidatorService: fileValidatorService.Object);
 
                 var result = await service.UpdateAncillary(
                     releaseVersionId: releaseVersion.Id,
@@ -2717,11 +2717,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         Summary = "New ancillary summary",
                     });
 
-                MockUtils.VerifyAllMocks(privateBlobStorageService, fileUploadsValidatorService);
+                MockUtils.VerifyAllMocks(privateBlobStorageService, fileValidatorService);
 
                 var fileInfo = result.AssertRight();
 
-                fileUploadsValidatorService.Verify(mock =>
+                fileValidatorService.Verify(mock =>
                     mock.ValidateFileForUpload(newFormFile, Ancillary), Times.Once);
 
                 privateBlobStorageService.Verify(mock =>
@@ -2845,7 +2845,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var formFile = CreateFormFileMock(filename, "image/png").Object;
             var privateBlobStorageService = new Mock<IPrivateBlobStorageService>(Strict);
-            var fileUploadsValidatorService = new Mock<IFileUploadsValidatorService>(Strict);
+            var fileValidatorService = new Mock<IFileValidatorService>(Strict);
 
             privateBlobStorageService.Setup(mock =>
                 mock.UploadFile(PrivateReleaseFiles,
@@ -2854,7 +2854,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     formFile
                 )).Returns(Task.CompletedTask);
 
-            fileUploadsValidatorService.Setup(mock =>
+            fileValidatorService.Setup(mock =>
                     mock.ValidateFileForUpload(formFile, Chart))
                 .ReturnsAsync(Unit.Instance);
 
@@ -2862,15 +2862,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 var service = SetupReleaseFileService(contentDbContext: contentDbContext,
                     privateBlobStorageService: privateBlobStorageService.Object,
-                    fileUploadsValidatorService: fileUploadsValidatorService.Object);
+                    fileValidatorService: fileValidatorService.Object);
 
                 var result = await service.UploadChart(releaseVersion.Id, formFile);
 
-                MockUtils.VerifyAllMocks(privateBlobStorageService, fileUploadsValidatorService);
+                MockUtils.VerifyAllMocks(privateBlobStorageService, fileValidatorService);
 
                 Assert.True(result.IsRight);
 
-                fileUploadsValidatorService.Verify(mock =>
+                fileValidatorService.Verify(mock =>
                     mock.ValidateFileForUpload(formFile, Chart), Times.Once);
 
                 privateBlobStorageService.Verify(mock =>
@@ -2921,7 +2921,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             IPersistenceHelper<ContentDbContext>? contentPersistenceHelper = null,
             IPrivateBlobStorageService? privateBlobStorageService = null,
             IFileRepository? fileRepository = null,
-            IFileUploadsValidatorService? fileUploadsValidatorService = null,
+            IFileValidatorService? fileValidatorService = null,
             IReleaseFileRepository? releaseFileRepository = null,
             IDataGuidanceFileWriter? dataGuidanceFileWriter = null,
             IUserService? userService = null)
@@ -2934,7 +2934,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 contentPersistenceHelper ?? new PersistenceHelper<ContentDbContext>(contentDbContext),
                 privateBlobStorageService ?? Mock.Of<IPrivateBlobStorageService>(Strict),
                 fileRepository ?? new FileRepository(contentDbContext),
-                fileUploadsValidatorService ?? Mock.Of<IFileUploadsValidatorService>(Strict),
+                fileValidatorService ?? Mock.Of<IFileValidatorService>(Strict),
                 releaseFileRepository ?? new ReleaseFileRepository(contentDbContext),
                 dataGuidanceFileWriter ?? Mock.Of<IDataGuidanceFileWriter>(Strict),
                 userService ?? MockUtils.AlwaysTrueUserService(_user.Id).Object

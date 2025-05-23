@@ -37,23 +37,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
             Guid releaseVersionId,
             IFormFile dataFormFile,
             IFormFile metaFormFile,
-            string? dataSetTitle,
-            Guid? replacingFileId);
+            string dataSetTitle,
+            Guid? replacingFileId,
+            CancellationToken cancellationToken);
 
-        Task<Either<ActionResult, DataFileInfo>> UploadAsZip(
+        Task<Either<ActionResult, DataFileInfo>> UploadFromZip(
             Guid releaseVersionId,
             IFormFile zipFormFile,
-            string? dataSetTitle,
-            Guid? replacingFileId);
+            string dataSetTitle,
+            Guid? replacingFileId,
+            CancellationToken cancellationToken);
 
-        Task<Either<ActionResult, List<ArchiveDataSetFileViewModel>>> ValidateAndUploadBulkZip(
+        Task<Either<ActionResult, List<ZipDataSetFileViewModel>>> UploadFromBulkZip(
             Guid releaseVersionId,
-            IFormFile zipFile,
+            IFormFile zipFormFile,
             CancellationToken cancellationToken);
 
         Task<Either<ActionResult, List<DataFileInfo>>> SaveDataSetsFromTemporaryBlobStorage(
             Guid releaseVersionId,
-            List<ArchiveDataSetFileViewModel> archiveDataSetFiles,
+            List<ZipDataSetFileViewModel> dataSetFiles,
             CancellationToken cancellationToken);
     }
 }
