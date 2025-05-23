@@ -297,6 +297,7 @@ public class DataSetsController(
             )
             .OnSuccess(fileStreamResult =>
             {
+                HttpContext.Response.Headers["X-Robots-Tag"] = "noindex";
                 HttpContext.Response.Headers.ContentEncoding = ContentEncodings.Gzip;
 
                 return fileStreamResult;
