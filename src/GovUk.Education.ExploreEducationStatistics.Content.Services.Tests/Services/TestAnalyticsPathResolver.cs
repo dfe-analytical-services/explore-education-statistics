@@ -24,4 +24,9 @@ public class TestAnalyticsPathResolver : IAnalyticsPathResolver, IDisposable
     {
         return Path.Combine(_basePath, "PublicZipDownloads");
     }
+
+    public string PublicDataSetFileDownloadsDirectoryPath()
+    {
+        return Path.Combine(_basePath, "PublicDataSetFileDownloads");
+    }
 }

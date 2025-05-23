@@ -28,3 +28,9 @@ public record CaptureZipDownloadRequest : IAnalyticsCaptureRequestBase
     public string? DataSetTitle = null;
 };
 
+public record CaptureDataSetFileDownloadRequest(
+    string PublicationName,
+    Guid ReleaseVersionId,
+    string ReleaseName,
+    Guid SubjectId,
+    string DataSetTitle) : IAnalyticsCaptureRequestBase;
