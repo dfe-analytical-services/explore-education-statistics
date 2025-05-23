@@ -333,7 +333,7 @@ describe('FindStatisticsPageAzure', () => {
   });
 
   test('renders correctly when filtered by theme and has results', async () => {
-    mockRouter.setCurrentUrl('/find-statistics?azsearch=true&themeId=theme-2');
+    mockRouter.setCurrentUrl('/find-statistics?themeId=theme-2');
     publicationService.listPublications.mockResolvedValue({
       results: [
         { ...testPublications[1], highlightContent: undefined },
@@ -562,7 +562,7 @@ describe('FindStatisticsPageAzure', () => {
   });
 
   test('adding filters', async () => {
-    mockRouter.setCurrentUrl('/find-statistics?azsearch=true');
+    mockRouter.setCurrentUrl('/find-statistics');
 
     publicationService.listPublications
       .mockResolvedValueOnce({
@@ -600,7 +600,7 @@ describe('FindStatisticsPageAzure', () => {
 
     expect(mockRouter).toMatchObject({
       pathname: '/find-statistics',
-      query: { azsearch: 'true', releaseType: 'AdHocStatistics' },
+      query: { releaseType: 'AdHocStatistics' },
     });
 
     await waitFor(() => {
@@ -629,7 +629,6 @@ describe('FindStatisticsPageAzure', () => {
     expect(mockRouter).toMatchObject({
       pathname: '/find-statistics',
       query: {
-        azsearch: 'true',
         releaseType: 'AdHocStatistics',
         themeId: 'theme-1',
       },
@@ -659,7 +658,7 @@ describe('FindStatisticsPageAzure', () => {
 
   test('removing filters', async () => {
     mockRouter.setCurrentUrl(
-      '/find-statistics?azsearch=true&releaseType=AccreditedOfficialStatistics&themeId=theme-2',
+      '/find-statistics?releaseType=AccreditedOfficialStatistics&themeId=theme-2',
     );
 
     publicationService.listPublications
@@ -702,6 +701,22 @@ describe('FindStatisticsPageAzure', () => {
       within(screen.getByTestId('publicationsList')).getAllByRole('listitem'),
     ).toHaveLength(1);
 
+    const releaseTypesSelect = screen.getByLabelText('Filter by Release type');
+    const releaseTypes = within(releaseTypesSelect).getAllByRole(
+      'option',
+    ) as HTMLOptionElement[];
+
+    expect(releaseTypes[0]).toHaveTextContent('All release types');
+    expect(releaseTypes[0].selected).toBe(false);
+
+    expect(releaseTypes[1]).toHaveTextContent(
+      'Accredited official statistics (1)',
+    );
+    expect(releaseTypes[1].selected).toBe(true);
+
+    expect(releaseTypes[2]).toHaveTextContent('Official statistics (0)');
+    expect(releaseTypes[2].selected).toBe(false);
+
     // remove release type filter
     await user.click(
       screen.getByRole('button', {
@@ -711,7 +726,7 @@ describe('FindStatisticsPageAzure', () => {
 
     expect(mockRouter).toMatchObject({
       pathname: '/find-statistics',
-      query: { azsearch: 'true', themeId: 'theme-2' },
+      query: { themeId: 'theme-2' },
     });
 
     await waitFor(() => {
@@ -736,6 +751,26 @@ describe('FindStatisticsPageAzure', () => {
       within(screen.getByTestId('publicationsList')).getAllByRole('listitem'),
     ).toHaveLength(2);
 
+    const updatedReleaseTypeSelect = screen.getByLabelText(
+      'Filter by Release type',
+    );
+    const updatedReleaseTypes = within(updatedReleaseTypeSelect).getAllByRole(
+      'option',
+    ) as HTMLOptionElement[];
+    expect(updatedReleaseTypes[0]).toHaveTextContent('All release types');
+    expect(updatedReleaseTypes[0].selected).toBe(true);
+
+    expect(updatedReleaseTypes[1]).toHaveTextContent(
+      'Accredited official statistics (1)',
+    );
+    expect(updatedReleaseTypes[1].selected).toBe(false);
+
+    expect(updatedReleaseTypes[2]).toHaveTextContent(
+      'Experimental statistics (1)',
+    );
+    expect(updatedReleaseTypes[2]).toHaveValue('ExperimentalStatistics');
+    expect(updatedReleaseTypes[2].selected).toBe(false);
+
     // Remove theme filter
     await user.click(
       screen.getByRole('button', { name: 'Remove filter: Theme: Theme 2' }),
@@ -743,7 +778,6 @@ describe('FindStatisticsPageAzure', () => {
 
     expect(mockRouter).toMatchObject({
       pathname: '/find-statistics',
-      query: { azsearch: 'true' },
     });
 
     await waitFor(() => {
@@ -768,272 +802,280 @@ describe('FindStatisticsPageAzure', () => {
     ).toHaveLength(3);
   });
 
-  // test('searching', async () => {
-  //   publicationService.listPublications
-  //     .mockResolvedValueOnce({
-  //       results: testPublications,
-  //       paging: testPaging,
-  //     })
-  //     .mockResolvedValueOnce({
-  //       results: [testPublications[0], testPublications[1]],
-  //       paging: { ...testPaging, totalPages: 1, totalResults: 2 },
-  //     });
+  test('searching', async () => {
+    publicationService.listPublications
+      .mockResolvedValueOnce({
+        results: testPublications,
+        paging: testPaging,
+        facets: testFacetResults,
+      })
+      .mockResolvedValueOnce({
+        results: [testPublications[0], testPublications[1]],
+        paging: { ...testPaging, totalPages: 1, totalResults: 2 },
+        facets: testFacetResultsSearched,
+      });
 
-  //   const { user } = render(<FindStatisticsPage useAzureSearch />);
+    const { user } = render(<FindStatisticsPage useAzureSearch />);
 
-  //   await waitFor(() => {
-  //     expect(screen.getByText('30 results')).toBeInTheDocument();
-  //   });
+    await waitFor(() => {
+      expect(
+        screen.getByText('30 results, page 1 of 3, showing all publications'),
+      ).toBeInTheDocument();
+    });
 
-  //   expect(
-  //     screen.getByText('Page 1 of 3, showing all publications'),
-  //   ).toBeInTheDocument();
+    expect(
+      within(screen.getByTestId('publicationsList')).getAllByRole('listitem'),
+    ).toHaveLength(3);
 
-  //   expect(
-  //     within(screen.getByTestId('publicationsList')).getAllByRole('listitem'),
-  //   ).toHaveLength(3);
+    await user.type(screen.getByLabelText('Search publications'), 'Find me');
+    await user.click(screen.getByRole('button', { name: 'Search' }));
 
-  //   await user.type(screen.getByLabelText('Search publications'), 'Find me');
-  //   await user.click(screen.getByRole('button', { name: 'Search' }));
+    expect(mockRouter).toMatchObject({
+      pathname: '/find-statistics',
+      query: { search: 'Find me', sortBy: 'newest' },
+    });
 
-  //   expect(mockRouter).toMatchObject({
-  //     pathname: '/find-statistics',
-  //     query: { search: 'Find me', sortBy: 'newest' },
-  //   });
+    await waitFor(() => {
+      expect(screen.getByText('2 results')).toBeInTheDocument();
+    });
 
-  //   await waitFor(() => {
-  //     expect(screen.getByText('2 results')).toBeInTheDocument();
-  //   });
+    expect(
+      screen.getByRole('button', { name: 'Remove filter: Search: Find me' }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: 'Reset filters' }),
+    ).toBeInTheDocument();
+  });
 
-  //   expect(
-  //     screen.getByRole('button', { name: 'Remove filter: Search Find me' }),
-  //   ).toBeInTheDocument();
-  //   expect(
-  //     screen.getByRole('button', { name: 'Reset filters' }),
-  //   ).toBeInTheDocument();
-  // });
+  test('removing search', async () => {
+    mockRouter.setCurrentUrl('/find-statistics?search=Find+me');
 
-  // test('removing search', async () => {
-  //   mockRouter.setCurrentUrl('/find-statistics?search=Find+me');
+    publicationService.listPublications
+      .mockResolvedValueOnce({
+        results: [testPublications[0]],
+        paging: { ...testPaging, totalPages: 1, totalResults: 1 },
+        facets: testFacetResultsSearchedOneResult,
+      })
+      .mockResolvedValueOnce({
+        results: testPublications,
+        paging: testPaging,
+        facets: testFacetResults,
+      });
 
-  //   publicationService.listPublications
-  //     .mockResolvedValueOnce({
-  //       results: [testPublications[0]],
-  //       paging: { ...testPaging, totalPages: 1, totalResults: 1 },
-  //     })
-  //     .mockResolvedValueOnce({
-  //       results: testPublications,
-  //       paging: testPaging,
-  //     });
+    const { user } = render(<FindStatisticsPage useAzureSearch />);
 
-  //   const { user } = render(<FindStatisticsPage useAzureSearch />);
+    await waitFor(() => {
+      expect(
+        screen.getByText('1 result, page 1 of 1, filtered by:'),
+      ).toBeInTheDocument();
+    });
+    expect(
+      screen.getByRole('button', {
+        name: 'Remove filter: Search: Find me',
+      }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: 'Reset filters' }),
+    ).toBeInTheDocument();
+    expect(
+      within(screen.getByTestId('publicationsList')).getAllByRole('listitem'),
+    ).toHaveLength(1);
 
-  //   await waitFor(() => {
-  //     expect(screen.getByText('1 result, page 1 of 1, filtered by:')).toBeInTheDocument();
-  //   });
+    await user.click(
+      screen.getByRole('button', {
+        name: 'Remove filter: Search: Find me',
+      }),
+    );
 
-  //     screen.getByRole('button', {
-  //       name: 'Remove filter: Search Find me',
-  //     }),
-  //   ).toBeInTheDocument();
-  //   expect(
-  //     screen.getByRole('button', { name: 'Reset filters' }),
-  //   ).toBeInTheDocument();
-  //   expect(
-  //     within(screen.getByTestId('publicationsList')).getAllByRole('listitem'),
-  //   ).toHaveLength(1);
+    expect(mockRouter).toMatchObject({
+      pathname: '/find-statistics',
+      query: { sortBy: 'newest' },
+    });
 
-  //   await user.click(
-  //     screen.getByRole('button', {
-  //       name: 'Remove filter: Search Find me',
-  //     }),
-  //   );
+    await waitFor(() => {
+      expect(
+        screen.getByText('30 results, page 1 of 3, showing all publications'),
+      ).toBeInTheDocument();
+    });
 
-  //   expect(mockRouter).toMatchObject({
-  //     pathname: '/find-statistics',
-  //     query: { sortBy: 'newest' },
-  //   });
+    expect(
+      screen.queryByRole('button', { name: 'Remove filter: Search: Find me' }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: 'Reset filters' }),
+    ).not.toBeInTheDocument();
+    expect(
+      within(screen.getByTestId('publicationsList')).getAllByRole('listitem'),
+    ).toHaveLength(3);
+  });
 
-  //   await waitFor(() => {
-  //     expect(screen.getByText('30 results')).toBeInTheDocument();
-  //   });
+  test('sorting', async () => {
+    publicationService.listPublications.mockResolvedValue({
+      results: testPublications,
+      paging: testPaging,
+      facets: testFacetResults,
+    });
 
-  //   expect(
-  //     screen.getByText('Page 1 of 3, showing all publications'),
-  //   ).toBeInTheDocument();
-  //   expect(
-  //     screen.queryByRole('button', { name: 'Remove filter: Search Find me' }),
-  //   ).not.toBeInTheDocument();
-  //   expect(
-  //     screen.queryByRole('button', { name: 'Reset filters' }),
-  //   ).not.toBeInTheDocument();
-  //   expect(
-  //     within(screen.getByTestId('publicationsList')).getAllByRole('listitem'),
-  //   ).toHaveLength(3);
-  // });
+    const { user } = render(<FindStatisticsPage useAzureSearch />);
 
-  // test('sorting', async () => {
-  //   publicationService.listPublications.mockResolvedValue({
-  //     results: testPublications,
-  //     paging: testPaging,
-  //   });
+    await waitFor(() => {
+      expect(screen.getByText('30 results')).toBeInTheDocument();
+    });
 
-  //   const { user } = render(<FindStatisticsPage useAzureSearch />);
+    const sortSelect = screen.getByLabelText('Sort by');
+    const sortOptions = within(sortSelect).getAllByRole(
+      'option',
+    ) as HTMLOptionElement[];
+    expect(sortOptions).toHaveLength(3);
+    expect(sortOptions[0]).toHaveTextContent('Newest');
+    expect(sortOptions[0]).toHaveValue('newest');
+    expect(sortOptions[0].selected).toBe(true);
+    expect(sortOptions[1]).toHaveTextContent('Oldest');
+    expect(sortOptions[1]).toHaveValue('oldest');
+    expect(sortOptions[1].selected).toBe(false);
+    expect(sortOptions[2]).toHaveTextContent('A to Z');
+    expect(sortOptions[2]).toHaveValue('title');
+    expect(sortOptions[2].selected).toBe(false);
 
-  //   await waitFor(() => {
-  //     expect(screen.getByText('30 results')).toBeInTheDocument();
-  //   });
+    await user.selectOptions(screen.getByLabelText('Sort by'), ['A to Z']);
 
-  //   const sortGroup = within(
-  //     screen.getByRole('group', { name: 'Sort results' }),
-  //   );
-  //   const sortOptions = sortGroup.getAllByRole('radio');
-  //   expect(sortOptions).toHaveLength(3);
-  //   expect(sortOptions[0]).toEqual(sortGroup.getByLabelText('Newest'));
-  //   expect(sortOptions[0]).toBeChecked();
-  //   expect(sortOptions[1]).toEqual(sortGroup.getByLabelText('Oldest'));
-  //   expect(sortOptions[1]).not.toBeChecked();
-  //   expect(sortOptions[2]).toEqual(sortGroup.getByLabelText('A to Z'));
-  //   expect(sortOptions[2]).not.toBeChecked();
+    await waitFor(() => {
+      expect(mockRouter).toMatchObject({
+        pathname: '/find-statistics',
+        query: { sortBy: 'title' },
+      });
+    });
 
-  //   await user.click(sortGroup.getByLabelText('A to Z'));
+    expect(sortOptions[0]).toHaveTextContent('Newest');
+    expect(sortOptions[0]).toHaveValue('newest');
+    expect(sortOptions[0].selected).toBe(false);
+    expect(sortOptions[1]).toHaveTextContent('Oldest');
+    expect(sortOptions[1]).toHaveValue('oldest');
+    expect(sortOptions[1].selected).toBe(false);
+    expect(sortOptions[2]).toHaveTextContent('A to Z');
+    expect(sortOptions[2]).toHaveValue('title');
+    expect(sortOptions[2].selected).toBe(true);
+  });
 
-  //   await waitFor(() => {
-  //     expect(mockRouter).toMatchObject({
-  //       pathname: '/find-statistics',
-  //       query: { sortBy: 'title' },
-  //     });
-  //   });
+  test('adds the relevance sort option when applying a search filter', async () => {
+    publicationService.listPublications
+      .mockResolvedValueOnce({
+        results: testPublications,
+        paging: testPaging,
+        facets: testFacetResults,
+      })
+      .mockResolvedValueOnce({
+        results: [testPublications[0], testPublications[1]],
+        paging: { ...testPaging, totalPages: 1, totalResults: 2 },
+        facets: testFacetResultsSearched,
+      });
 
-  //   expect(sortOptions[0]).toEqual(sortGroup.getByLabelText('Newest'));
-  //   expect(sortOptions[0]).not.toBeChecked();
-  //   expect(sortOptions[1]).toEqual(sortGroup.getByLabelText('Oldest'));
-  //   expect(sortOptions[1]).not.toBeChecked();
-  //   expect(sortOptions[2]).toEqual(sortGroup.getByLabelText('A to Z'));
-  //   expect(sortOptions[2]).toBeChecked();
-  // });
+    const { user } = render(<FindStatisticsPage useAzureSearch />);
 
-  // test('adds the relevance sort option when applying a search filter', async () => {
-  //   publicationService.listPublications
-  //     .mockResolvedValueOnce({
-  //       results: testPublications,
-  //       paging: testPaging,
-  //     })
-  //     .mockResolvedValueOnce({
-  //       results: [testPublications[0], testPublications[1]],
-  //       paging: { ...testPaging, totalPages: 1, totalResults: 2 },
-  //     });
+    await waitFor(() => {
+      expect(screen.getByText('30 results')).toBeInTheDocument();
+    });
 
-  //   const { user } = render(<FindStatisticsPage useAzureSearch />);
+    const sortSelect = screen.getByLabelText('Sort by');
+    const sortOptions = within(sortSelect).getAllByRole(
+      'option',
+    ) as HTMLOptionElement[];
+    expect(sortOptions).toHaveLength(3);
+    expect(sortOptions[0]).toHaveTextContent('Newest');
+    expect(sortOptions[0].selected).toBe(true);
+    expect(sortOptions[1]).toHaveTextContent('Oldest');
+    expect(sortOptions[1].selected).toBe(false);
+    expect(sortOptions[2]).toHaveTextContent('A to Z');
+    expect(sortOptions[2].selected).toBe(false);
 
-  //   await waitFor(() => {
-  //     expect(screen.getByText('30 results')).toBeInTheDocument();
-  //   });
+    await user.type(screen.getByLabelText('Search publications'), 'Find me');
+    await user.click(screen.getByRole('button', { name: 'Search' }));
 
-  //   expect(
-  //     within(screen.getByTestId('publicationsList')).getAllByRole('listitem'),
-  //   ).toHaveLength(3);
+    await waitFor(() => {
+      expect(screen.getByText('2 results')).toBeInTheDocument();
+    });
 
-  //   const sortGroup = within(
-  //     screen.getByRole('group', { name: 'Sort results' }),
-  //   );
-  //   const sortOptions = sortGroup.getAllByRole('radio');
-  //   expect(sortOptions).toHaveLength(3);
-  //   expect(sortOptions[0]).toEqual(sortGroup.getByLabelText('Newest'));
-  //   expect(sortOptions[0]).toBeChecked();
-  //   expect(sortOptions[1]).toEqual(sortGroup.getByLabelText('Oldest'));
-  //   expect(sortOptions[1]).not.toBeChecked();
-  //   expect(sortOptions[2]).toEqual(sortGroup.getByLabelText('A to Z'));
-  //   expect(sortOptions[2]).not.toBeChecked();
+    expect(
+      screen.getByRole('button', { name: 'Remove filter: Search: Find me' }),
+    ).toBeInTheDocument();
 
-  //   await user.type(screen.getByLabelText('Search publications'), 'Find me');
-  //   await user.click(screen.getByRole('button', { name: 'Search' }));
+    const updatedSortSelect = screen.getByLabelText('Sort by');
+    const updatedSortOptions = within(updatedSortSelect).getAllByRole(
+      'option',
+    ) as HTMLOptionElement[];
+    expect(updatedSortOptions).toHaveLength(4);
+    expect(updatedSortOptions[3]).toHaveTextContent('Relevance');
+    expect(updatedSortOptions[3]).toHaveValue('relevance');
+    expect(updatedSortOptions[3].selected).toBe(false);
+  });
 
-  //   await waitFor(() => {
-  //     expect(screen.getByText('2 results')).toBeInTheDocument();
-  //   });
+  test('Reset filters', async () => {
+    mockRouter.setCurrentUrl(
+      '/find-statistics?releaseType=AdHocStatistics&search=find+me&themeId=theme-1',
+    );
+    publicationService.listPublications
+      .mockResolvedValueOnce({
+        results: [testPublications[1], testPublications[2]],
+        paging: { ...testPaging, totalPages: 1, totalResults: 2 },
+        facets: testFacetResultsSearched,
+      })
+      .mockResolvedValueOnce({
+        results: testPublications,
+        paging: testPaging,
+        facets: testFacetResults,
+      });
 
-  //   expect(
-  //     screen.getByRole('button', { name: 'Remove filter: Search Find me' }),
-  //   ).toBeInTheDocument();
+    const { user } = render(<FindStatisticsPage useAzureSearch />);
 
-  //   const updatedSortOptions = sortGroup.getAllByRole('radio');
-  //   expect(updatedSortOptions).toHaveLength(4);
-  //   expect(updatedSortOptions[0]).toEqual(sortGroup.getByLabelText('Newest'));
-  //   expect(updatedSortOptions[0]).toBeChecked();
-  //   expect(updatedSortOptions[1]).toEqual(sortGroup.getByLabelText('Oldest'));
-  //   expect(updatedSortOptions[1]).not.toBeChecked();
-  //   expect(updatedSortOptions[2]).toEqual(sortGroup.getByLabelText('A to Z'));
-  //   expect(updatedSortOptions[2]).not.toBeChecked();
-  //   expect(updatedSortOptions[3]).toEqual(
-  //     sortGroup.getByLabelText('Relevance'),
-  //   );
-  //   expect(updatedSortOptions[3]).not.toBeChecked();
-  // });
+    await waitFor(() => {
+      expect(
+        screen.getByText('2 results, page 1 of 1, filtered by:'),
+      ).toBeInTheDocument();
+    });
 
-  // test('Reset filters', async () => {
-  //   mockRouter.setCurrentUrl(
-  //     '/find-statistics?releaseType=AdHocStatistics&search=find+me&themeId=theme-1',
-  //   );
-  //   publicationService.listPublications
-  //     .mockResolvedValueOnce({
-  //       results: [testPublications[1], testPublications[2]],
-  //       paging: { ...testPaging, totalPages: 1, totalResults: 2 },
-  //     })
-  //     .mockResolvedValueOnce({
-  //       results: testPublications,
-  //       paging: testPaging,
-  //     });
+    expect(
+      screen.getByRole('button', { name: 'Remove filter: Search: find me' }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', {
+        name: 'Remove filter: Release type: Ad hoc statistics',
+      }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: 'Remove filter: Theme: Theme 1' }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: 'Reset filters' }),
+    ).toBeInTheDocument();
 
-  //   const { user } = render(<FindStatisticsPage useAzureSearch />);
+    const publicationsList = within(screen.getByTestId('publicationsList'));
+    expect(publicationsList.getAllByRole('listitem')).toHaveLength(2);
 
-  //   await waitFor(() => {
-  //     expect(screen.getByText('2 results, page 1 of 1, filtered by:')).toBeInTheDocument();
-  //   });
+    await user.click(screen.getByRole('button', { name: 'Reset filters' }));
 
-  //     screen.getByRole('button', { name: 'Remove filter: Search find me' }),
-  //   ).toBeInTheDocument();
-  //   expect(
-  //     screen.getByRole('button', {
-  //       name: 'Remove filter: Release type Ad hoc statistics',
-  //     }),
-  //   ).toBeInTheDocument();
-  //   expect(
-  //     screen.getByRole('button', { name: 'Remove filter: Theme Theme 1' }),
-  //   ).toBeInTheDocument();
-  //   expect(
-  //     screen.getByRole('button', { name: 'Reset filters' }),
-  //   ).toBeInTheDocument();
+    await waitFor(() => {
+      expect(
+        screen.getByText('30 results, page 1 of 3, showing all publications'),
+      ).toBeInTheDocument();
+    });
 
-  //   const publicationsList = within(screen.getByTestId('publicationsList'));
-  //   expect(publicationsList.getAllByRole('listitem')).toHaveLength(2);
-
-  //   await user.click(screen.getByRole('button', { name: 'Reset filters' }));
-
-  //   await waitFor(() => {
-  //     expect(screen.getByText('30 results')).toBeInTheDocument();
-  //   });
-
-  //   expect(mockRouter).toMatchObject({
-  //     pathname: '/find-statistics',
-  //     query: {},
-  //   });
-  //   expect(
-  //     screen.getByText('Page 1 of 3, showing all publications'),
-  //   ).toBeInTheDocument();
-  //   expect(
-  //     screen.queryByRole('button', { name: 'Remove filter: Search find me' }),
-  //   ).not.toBeInTheDocument();
-  //   expect(
-  //     screen.queryByRole('button', {
-  //       name: 'Remove filter: Release type Ad hoc statistics',
-  //     }),
-  //   ).not.toBeInTheDocument();
-  //   expect(
-  //     screen.queryByRole('button', { name: 'Remove filter: Theme Theme 1' }),
-  //   ).not.toBeInTheDocument();
-  //   expect(
-  //     screen.queryByRole('button', { name: 'Reset filters' }),
-  //   ).not.toBeInTheDocument();
-  // });
+    expect(mockRouter).toMatchObject({
+      pathname: '/find-statistics',
+      query: {},
+    });
+    expect(
+      screen.queryByRole('button', { name: 'Remove filter: Search: find me' }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', {
+        name: 'Remove filter: Release type: Ad hoc statistics',
+      }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: 'Remove filter: Theme: Theme 1' }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: 'Reset filters' }),
+    ).not.toBeInTheDocument();
+  });
 });
