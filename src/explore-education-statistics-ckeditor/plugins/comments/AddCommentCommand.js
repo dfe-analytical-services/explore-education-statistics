@@ -7,17 +7,18 @@ import { markerTypes } from './constants';
 export default class AddCommentCommand extends Command {
   execute(options) {
     const { editor } = this;
-    const range = editor.model.document.selection.getFirstRange();
 
     editor.model.change(writer => {
-      if (editor.model.markers.has(markerTypes.commentPlaceholder)) {
-        writer.removeMarker(markerTypes.commentPlaceholder);
-      }
+      [...editor.model.markers].forEach(marker => {
+        if (marker.name === markerTypes.commentPlaceholder) {
+          writer.addMarker(`${markerTypes.comment}:${options.id}`, {
+            affectsData: true,
+            range: marker.getRange(),
+            usingOperation: true,
+          });
 
-      writer.addMarker(`${markerTypes.comment}:${options.id}`, {
-        affectsData: true,
-        range,
-        usingOperation: true,
+          writer.removeMarker(marker.name);
+        }
       });
     });
   }
