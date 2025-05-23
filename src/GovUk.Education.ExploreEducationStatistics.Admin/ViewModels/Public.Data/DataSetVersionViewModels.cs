@@ -82,8 +82,9 @@ public record DataSetLiveVersionSummaryViewModel : DataSetVersionSummaryViewMode
 public record MappingStatusViewModel
 {
     public required bool LocationsComplete { get; init; }
-    
     public required bool FiltersComplete { get; init; }
+    public bool? HasMajorVersionUpdate { get; init; } 
+    public bool? Complete { get; set; }
 }
 
 public record DataSetVersionInfoViewModel 

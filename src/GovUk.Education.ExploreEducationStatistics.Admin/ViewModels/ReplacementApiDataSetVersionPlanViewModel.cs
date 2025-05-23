@@ -17,14 +17,8 @@ public record ReplacementApiDataSetVersionPlanViewModel
 
     public DataSetVersionStatus Status { get; init; }
 
-    public MappingCompletionStatusViewModel? MappingStatus { get; set; }
+    public MappingStatusViewModel? MappingStatus { get; set; }
 
-    public bool Valid { get; set; }//TODO: please note, this is kept as is for backward (feature flagging) compatibility with the rest of the code.
+    public bool Valid { get; set; } //TODO: please note, this is kept as is for backward (feature flagging) compatibility with the rest of the code.
     public bool ValidDefinition => MappingStatus is { Complete: true, FiltersComplete: true, LocationsComplete: true, HasMajorVersionUpdate: false };
-
-    public record MappingCompletionStatusViewModel : MappingStatusViewModel
-    {
-        public bool HasMajorVersionUpdate { get; set; } 
-        public required bool Complete { get; init; }
-    }
 }

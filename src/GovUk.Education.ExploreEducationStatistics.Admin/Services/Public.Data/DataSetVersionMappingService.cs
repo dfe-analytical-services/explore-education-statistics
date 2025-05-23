@@ -95,19 +95,37 @@ public class DataSetVersionMappingService(
         Guid nextDataSetVersionId,
         CancellationToken cancellationToken = default)
     {
-        var locationOptionMappingTypes = await GetLocationOptionMappingTypes(
-            targetDataSetVersionId: nextDataSetVersionId,
-            cancellationToken: cancellationToken);
+        var locationOptionMappingTypes = await mappingTypesRepository.GetLocationOptionMappingTypes(
+            nextDataSetVersionId, 
+            cancellationToken);
 
-        var filterAndOptionMappingTypes = await GetFilterAndOptionMappingTypes(
-            targetDataSetVersionId: nextDataSetVersionId,
-            cancellationToken: cancellationToken);
+        var filterAndOptionMappingTypes = await mappingTypesRepository.GetFilterOptionMappingTypes(
+                nextDataSetVersionId, 
+                cancellationToken);
 
         return await IsMajorVersionUpdate(
             nextDataSetVersionId,
             locationOptionMappingTypes,
             filterAndOptionMappingTypes,
             cancellationToken);
+    }
+
+    public async Task<MappingStatusViewModel?> GetMappingStatus(Guid nextDataSetVersionId, CancellationToken cancellationToken = default)
+    {
+        bool? isMajorVersionUpdate = featureFlags.Value.EnableReplacementOfPublicApiDataSets
+                ? await IsMajorVersionUpdate(nextDataSetVersionId, cancellationToken)
+                : null;
+
+        return await publicDataDbContext
+            .DataSetVersionMappings
+            .Where(mapping => mapping.TargetDataSetVersionId == nextDataSetVersionId)
+            .Select(mapping => new MappingStatusViewModel
+            {
+                LocationsComplete = mapping.LocationMappingsComplete,
+                FiltersComplete = mapping.FilterMappingsComplete,
+                HasMajorVersionUpdate = isMajorVersionUpdate
+            })
+            .SingleOrDefaultAsync(cancellationToken);
     }
 
     public Task<Either<ActionResult, BatchFilterOptionMappingUpdatesResponseViewModel>>
@@ -165,13 +183,14 @@ public class DataSetVersionMappingService(
 
     private async Task UpdateMappingsCompleteAndVersion(Guid nextDataSetVersionId, CancellationToken cancellationToken)
     {
-        var locationOptionMappingTypes = await GetLocationOptionMappingTypes(
-            targetDataSetVersionId: nextDataSetVersionId,
-            cancellationToken: cancellationToken);
+        var locationOptionMappingTypes = await mappingTypesRepository.GetLocationOptionMappingTypes(
+            nextDataSetVersionId, 
+            cancellationToken);
 
-        var filterAndOptionMappingTypes = await GetFilterAndOptionMappingTypes(
-            targetDataSetVersionId: nextDataSetVersionId,
-            cancellationToken: cancellationToken);
+        var filterAndOptionMappingTypes = await mappingTypesRepository.GetFilterOptionMappingTypes(
+            nextDataSetVersionId, 
+            cancellationToken);
+
 
         await UpdateMappingCompleteFlags(
             nextDataSetVersionId: nextDataSetVersionId,
@@ -289,16 +308,6 @@ public class DataSetVersionMappingService(
                     .SetProperty(mapping => mapping.FilterMappingsComplete, filterMappingsComplete),
                 cancellationToken: cancellationToken);
     }
-
-    private async Task<List<LocationMappingTypes>> GetLocationOptionMappingTypes(
-        Guid targetDataSetVersionId,
-        CancellationToken cancellationToken) =>
-        await mappingTypesRepository.GetLocationOptionMappingTypes(targetDataSetVersionId, cancellationToken);
-
-    private async Task<List<FilterMappingTypes>> GetFilterAndOptionMappingTypes(
-        Guid targetDataSetVersionId,
-        CancellationToken cancellationToken) =>
-        await mappingTypesRepository.GetFilterOptionMappingTypes(targetDataSetVersionId, cancellationToken);
 
     /// <summary>
     /// Given a batch of Location mapping update requests, this method will validate that the chosen mapping candidates

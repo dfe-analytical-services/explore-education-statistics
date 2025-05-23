@@ -517,6 +517,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                     new DataSetService(provider.GetRequiredService<ContentDbContext>(),
                         provider.GetService<PublicDataDbContext>(),
                         provider.GetRequiredService<IProcessorClient>(),
+                        provider.GetRequiredService<IDataSetVersionMappingService>(),
                         provider.GetRequiredService<IUserService>()));
 
                 services.AddTransient<IDataSetVersionService, NoOpDataSetVersionService>();
@@ -971,7 +972,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                 CancellationToken cancellationToken = default) =>
             throw new NotImplementedException();
 
-        public Task<bool> IsMajorVersionUpdate(Guid nextDataSetVersionId, CancellationToken cancellationToken = default) => throw new NotImplementedException();
+        public Task<MappingStatusViewModel> GetMappingStatus(Guid nextDataSetVersionId, CancellationToken cancellationToken = default) => throw new NotImplementedException();
     }
 
     internal class NoOpPreviewTokenService : IPreviewTokenService
