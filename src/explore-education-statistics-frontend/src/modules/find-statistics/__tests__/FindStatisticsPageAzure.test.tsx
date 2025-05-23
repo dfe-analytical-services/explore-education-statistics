@@ -7,6 +7,7 @@ import {
   testFacetNoResults,
   testFacetResults,
   testFacetResultsSearched,
+  testFacetResultsSearchedOneResult,
 } from '@frontend/modules/find-statistics/__tests__/__data__/testFacetData';
 import { testPublications } from '@frontend/modules/find-statistics/__tests__/__data__/testPublications';
 import { testThemeSummaries } from '@frontend/modules/find-statistics/__tests__/__data__/testThemeData';
@@ -14,7 +15,7 @@ import { screen, waitFor, within } from '@testing-library/react';
 import React from 'react';
 import mockRouter from 'next-router-mock';
 
-const mockIsMedia = false;
+let mockIsMedia = false;
 jest.mock('@common/hooks/useMedia', () => ({
   useMobileMedia: () => {
     return {
@@ -34,6 +35,7 @@ const themeService = _themeService as jest.Mocked<typeof _themeService>;
 jest.mock('@azure/search-documents', () => ({
   SearchClient: jest.fn(),
   AzureKeyCredential: jest.fn(),
+  odata: jest.fn(),
 }));
 
 describe('FindStatisticsPageAzure', () => {
@@ -333,7 +335,10 @@ describe('FindStatisticsPageAzure', () => {
   test('renders correctly when filtered by theme and has results', async () => {
     mockRouter.setCurrentUrl('/find-statistics?azsearch=true&themeId=theme-2');
     publicationService.listPublications.mockResolvedValue({
-      results: [testPublications[1], testPublications[2]],
+      results: [
+        { ...testPublications[1], highlightContent: undefined },
+        testPublications[2],
+      ],
       paging: { ...testPaging, totalPages: 1, totalResults: 2 },
       facets: testFacetResultsSearched,
     });
@@ -370,365 +375,398 @@ describe('FindStatisticsPageAzure', () => {
     ).not.toBeInTheDocument();
   });
 
-  // test('renders correctly when filtered by theme and has no results', async () => {
-  //   mockRouter.setCurrentUrl('/find-statistics?themeId=theme-2');
-  //   publicationService.listPublications.mockResolvedValue({
-  //     results: [],
-  //     paging: { ...testPaging, totalPages: 0, totalResults: 0 },
-  //   });
-
-  //   render(<FindStatisticsPage useAzureSearch />);
-
-  //   expect(
-  //     await screen.findByText('There are no matching results.'),
-  //   ).toBeInTheDocument();
-
-  //   expect(screen.getByText('0 results, 0 pages, filtered by:')).toBeInTheDocument();
-
-  //   expect(
-  //     screen.getByRole('button', { name: 'Remove filter: Theme Theme 2' }),
-  //   ).toBeInTheDocument();
-
-  //   expect(
-  //     screen.getByRole('button', { name: 'Reset filters' }),
-  //   ).toBeInTheDocument();
-
-  //   expect(screen.queryByTestId('publicationsList')).not.toBeInTheDocument();
-  // });
-
-  // test('renders correctly when filtered by release type and has results', async () => {
-  //   mockRouter.setCurrentUrl('/find-statistics?releaseType=AdHocStatistics');
-  //   publicationService.listPublications.mockResolvedValue({
-  //     results: [testPublications[1], testPublications[2]],
-  //     paging: { ...testPaging, totalPages: 1, totalResults: 2 },
-  //   });
-
-  //   render(<FindStatisticsPage useAzureSearch />);
-
-  //   await waitFor(() => {
-  //     expect(screen.getByText('2 results, page 1 of 1, filtered by:')).toBeInTheDocument();
-  //   });
-
-  //   expect(
-  //     screen.getByRole('button', {
-  //       name: 'Remove filter: Release type Ad hoc statistics',
-  //     }),
-  //   ).toBeInTheDocument();
-
-  //   expect(
-  //     screen.getByRole('button', { name: 'Reset filters' }),
-  //   ).toBeInTheDocument();
-
-  //   const publicationsList = within(screen.getByTestId('publicationsList'));
-  //   expect(publicationsList.getAllByRole('listitem')).toHaveLength(2);
-
-  //   expect(
-  //     publicationsList.getByRole('heading', { name: 'Publication 2' }),
-  //   ).toBeInTheDocument();
-
-  //   expect(
-  //     publicationsList.getByRole('heading', { name: 'Publication 3' }),
-  //   ).toBeInTheDocument();
-
-  //   expect(
-  //     screen.queryByText('There are no matching results.'),
-  //   ).not.toBeInTheDocument();
-  // });
-
-  // test('renders correctly when filtered by release type and has no results', async () => {
-  //   mockRouter.setCurrentUrl(
-  //     '/find-statistics?releaseType=ExperimentalStatistics',
-  //   );
-  //   publicationService.listPublications.mockResolvedValue({
-  //     results: [],
-  //     paging: { ...testPaging, totalPages: 0, totalResults: 0 },
-  //   });
-
-  //   render(<FindStatisticsPage useAzureSearch />);
-
-  //   expect(
-  //     await screen.findByText('There are no matching results.'),
-  //   ).toBeInTheDocument(), 0 pages, filtered by:;
-
-  //   expect(
-  //     screen.getByRole('button', {
-  //       name: 'Remove filter: Release type Experimental statistics',
-  //     }),
-  //   ).toBeInTheDocument();
-
-  //   expect(
-  //     screen.getByRole('button', { name: 'Reset filters' }),
-  //   ).toBeInTheDocument();
-
-  //   expect(screen.queryByTestId('publicationsList')).not.toBeInTheDocument();
-  // });
-
-  // test('renders correctly with all filters and search', async () => {
-  //   mockRouter.setCurrentUrl(
-  //     '/find-statistics?releaseType=AdHocStatistics&search=find+me&themeId=theme-1',
-  //   );
-  //   publicationService.listPublications.mockResolvedValue({
-  //     results: [testPublications[1], testPublications[2]],
-  //     paging: { ...testPaging, totalPages: 1, totalResults: 2 },
-  //   });
-
-  //   render(<FindStatisticsPage useAzureSearch />);
-
-  //   await waitFor(() => {
-  //     expect(screen.getByText('2 results, page 1 of 1, filtered by:')).toBeInTheDocument();
-  //   });
-
-  //   expect(
-  //     screen.getByRole('button', { name: 'Remove filter: Search find me' }),
-  //   ).toBeInTheDocument();
-
-  //   expect(
-  //     screen.getByRole('button', {
-  //       name: 'Remove filter: Release type Ad hoc statistics',
-  //     }),
-  //   ).toBeInTheDocument();
-
-  //   expect(
-  //     screen.getByRole('button', { name: 'Remove filter: Theme Theme 1' }),
-  //   ).toBeInTheDocument();
-
-  //   expect(
-  //     screen.getByRole('button', { name: 'Reset filters' }),
-  //   ).toBeInTheDocument();
-
-  //   const publicationsList = within(screen.getByTestId('publicationsList'));
-  //   expect(publicationsList.getAllByRole('listitem')).toHaveLength(2);
-
-  //   expect(
-  //     publicationsList.getByRole('heading', { name: 'Publication 2' }),
-  //   ).toBeInTheDocument();
-
-  //   expect(
-  //     publicationsList.getByRole('heading', { name: 'Publication 3' }),
-  //   ).toBeInTheDocument();
-  // });
-
-  // test('renders the desktop filters', async () => {
-  //   publicationService.listPublications.mockResolvedValue({
-  //     results: testPublications,
-  //     paging: testPaging,
-  //   });
-
-  //   render(<FindStatisticsPage useAzureSearch />);
-
-  //   expect(screen.getByLabelText('Filter by Theme')).toBeInTheDocument();
-  //   expect(screen.getByLabelText('Filter by Release type')).toBeInTheDocument();
-
-  //   expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
-  // });
-
-  // test('renders the mobile filters', async () => {
-  //   mockIsMedia = true;
-  //   publicationService.listPublications.mockResolvedValue({
-  //     results: testPublications,
-  //     paging: testPaging,
-  //   });
-
-  //   const { user } = render(<FindStatisticsPage useAzureSearch />);
-
-  //   await user.click(screen.getByRole('button', { name: 'Filter results' }));
-
-  //   const modal = within(screen.getByRole('dialog'));
-
-  //   expect(modal.getByLabelText('Filter by Theme')).toBeInTheDocument();
-  //   expect(modal.getByLabelText('Filter by Release type')).toBeInTheDocument();
-  //   expect(
-  //     modal.getByRole('button', { name: 'Back to results' }),
-  //   ).toBeInTheDocument();
-
-  //   mockIsMedia = false;
-  // });
-
-  // test('adding filters', async () => {
-  //   publicationService.listPublications
-  //     .mockResolvedValueOnce({
-  //       results: testPublications,
-  //       paging: testPaging,
-  //     })
-  //     .mockResolvedValueOnce({
-  //       results: [testPublications[0], testPublications[1]],
-  //       paging: { ...testPaging, totalPages: 1, totalResults: 2 },
-  //     })
-  //     .mockResolvedValueOnce({
-  //       results: [testPublications[0]],
-  //       paging: { ...testPaging, totalPages: 1, totalResults: 1 },
-  //     });
-
-  //   const { user } = render(<FindStatisticsPage useAzureSearch />);
-
-  //   await waitFor(() => {
-  //     expect(screen.getByText('30 results')).toBeInTheDocument();
-  //   });
-
-  //   expect(
-  //     screen.getByText('Page 1 of 3, showing all publications'),
-  //   ).toBeInTheDocument();
-
-  //   expect(
-  //     within(screen.getByTestId('publicationsList')).getAllByRole('listitem'),
-  //   ).toHaveLength(3);
-
-  //   // Add release type filter
-  //   await user.selectOptions(screen.getByLabelText('Filter by Release type'), [
-  //     'AdHocStatistics',
-  //   ]);
-
-  //   expect(mockRouter).toMatchObject({
-  //     pathname: '/find-statistics',
-  //     query: { releaseType: 'AdHocStatistics' },
-  //   });
-
-  //   await waitFor(() => {
-  //     expect(screen.getByText('2 results, page 1 of 1, filtered by:')).toBeInTheDocument();
-  //   });
-
-  //     screen.getByRole('button', {
-  //       name: 'Remove filter: Release type Ad hoc statistics',
-  //     }),
-  //   ).toBeInTheDocument();
-  //   expect(
-  //     screen.getByRole('button', { name: 'Reset filters' }),
-  //   ).toBeInTheDocument();
-  //   expect(
-  //     within(screen.getByTestId('publicationsList')).getAllByRole('listitem'),
-  //   ).toHaveLength(2);
-
-  //   // Add theme filter
-  //   await user.selectOptions(screen.getByLabelText('Filter by Theme'), [
-  //     'theme-1',
-  //   ]);
-
-  //   expect(mockRouter).toMatchObject({
-  //     pathname: '/find-statistics',
-  //     query: { releaseType: 'AdHocStatistics', themeId: 'theme-1' },
-  //   });
-
-  //   await waitFor(() => {
-  //     expect(screen.getByText('1 result, page 1 of 1, filtered by:')).toBeInTheDocument();
-  //   });
-
-  //     screen.getByRole('button', {
-  //       name: 'Remove filter: Release type Ad hoc statistics',
-  //     }),
-  //   ).toBeInTheDocument();
-  //   expect(
-  //     screen.getByRole('button', { name: 'Remove filter: Theme Theme 1' }),
-  //   ).toBeInTheDocument();
-  //   expect(
-  //     screen.getByRole('button', { name: 'Reset filters' }),
-  //   ).toBeInTheDocument();
-  //   expect(
-  //     within(screen.getByTestId('publicationsList')).getAllByRole('listitem'),
-  //   ).toHaveLength(1);
-  // });
-
-  // test('removing filters', async () => {
-  //   mockRouter.setCurrentUrl(
-  //     '/find-statistics?releaseType=AccreditedOfficialStatistics&themeId=theme-2',
-  //   );
-
-  //   publicationService.listPublications
-  //     .mockResolvedValueOnce({
-  //       results: [testPublications[0]],
-  //       paging: { ...testPaging, totalPages: 1, totalResults: 1 },
-  //     })
-  //     .mockResolvedValueOnce({
-  //       results: [testPublications[0], testPublications[1]],
-  //       paging: { ...testPaging, totalPages: 1, totalResults: 2 },
-  //     })
-  //     .mockResolvedValueOnce({
-  //       results: testPublications,
-  //       paging: testPaging,
-  //     });
-
-  //   const { user } = render(<FindStatisticsPage useAzureSearch />);
-
-  //   await waitFor(() => {
-  //     expect(screen.getByText('1 result, page 1 of 1, filtered by:')).toBeInTheDocument();
-  //   });
-
-  //     screen.getByRole('button', {
-  //       name: 'Remove filter: Release type Accredited official statistics',
-  //     }),
-  //   ).toBeInTheDocument();
-  //   expect(
-  //     screen.getByRole('button', { name: 'Remove filter: Theme Theme 2' }),
-  //   ).toBeInTheDocument();
-  //   expect(
-  //     screen.getByRole('button', { name: 'Reset filters' }),
-  //   ).toBeInTheDocument();
-  //   expect(
-  //     within(screen.getByTestId('publicationsList')).getAllByRole('listitem'),
-  //   ).toHaveLength(1);
-
-  //   // remove release type filter
-  //   await user.click(
-  //     screen.getByRole('button', {
-  //       name: 'Remove filter: Release type Accredited official statistics',
-  //     }),
-  //   );
-
-  //   expect(mockRouter).toMatchObject({
-  //     pathname: '/find-statistics',
-  //     query: { themeId: 'theme-2' },
-  //   });
-
-  //   await waitFor(() => {
-  //     expect(screen.getByText('2 results, page 1 of 1, filtered by:')).toBeInTheDocument();
-  //   });
-
-  //     screen.queryByRole('button', {
-  //       name: 'Remove filter: Release type Accredited official statistics',
-  //     }),
-  //   ).not.toBeInTheDocument();
-  //   expect(
-  //     screen.getByRole('button', { name: 'Remove filter: Theme Theme 2' }),
-  //   ).toBeInTheDocument();
-  //   expect(
-  //     screen.getByRole('button', { name: 'Reset filters' }),
-  //   ).toBeInTheDocument();
-
-  //   expect(
-  //     within(screen.getByTestId('publicationsList')).getAllByRole('listitem'),
-  //   ).toHaveLength(2);
-
-  //   // Remove theme filter
-  //   await user.click(
-  //     screen.getByRole('button', { name: 'Remove filter: Theme Theme 2' }),
-  //   );
-
-  //   expect(mockRouter).toMatchObject({
-  //     pathname: '/find-statistics',
-  //     query: {},
-  //   });
-
-  //   await waitFor(() => {
-  //     expect(screen.getByText('30 results')).toBeInTheDocument();
-  //   });
-
-  //   expect(
-  //     screen.getByText('Page 1 of 3, showing all publications'),
-  //   ).toBeInTheDocument();
-  //   expect(
-  //     screen.queryByRole('button', {
-  //       name: 'Remove filter: Release type Accredited official statistics',
-  //     }),
-  //   ).not.toBeInTheDocument();
-  //   expect(
-  //     screen.queryByRole('button', { name: 'Remove filter: Theme Theme 2' }),
-  //   ).not.toBeInTheDocument();
-  //   expect(
-  //     screen.queryByRole('button', { name: 'Reset filters' }),
-  //   ).not.toBeInTheDocument();
-  //   expect(
-  //     within(screen.getByTestId('publicationsList')).getAllByRole('listitem'),
-  //   ).toHaveLength(3);
-  // });
+  test('renders correctly when filtered by theme and has no results', async () => {
+    mockRouter.setCurrentUrl('/find-statistics?themeId=theme-2');
+    publicationService.listPublications.mockResolvedValue({
+      results: [],
+      paging: { ...testPaging, totalPages: 0, totalResults: 0 },
+      facets: testFacetNoResults,
+    });
+
+    render(<FindStatisticsPage useAzureSearch />);
+
+    expect(
+      await screen.findByText('There are no matching results.'),
+    ).toBeInTheDocument();
+
+    expect(
+      screen.getByText('0 results, 0 pages, filtered by:'),
+    ).toBeInTheDocument();
+
+    expect(
+      screen.getByRole('button', { name: 'Remove filter: Theme: Theme 2' }),
+    ).toBeInTheDocument();
+
+    expect(
+      screen.getByRole('button', { name: 'Reset filters' }),
+    ).toBeInTheDocument();
+
+    expect(screen.queryByTestId('publicationsList')).not.toBeInTheDocument();
+  });
+
+  test('renders correctly when filtered by release type and has results', async () => {
+    mockRouter.setCurrentUrl('/find-statistics?releaseType=AdHocStatistics');
+    publicationService.listPublications.mockResolvedValue({
+      results: [testPublications[1], testPublications[2]],
+      paging: { ...testPaging, totalPages: 1, totalResults: 2 },
+      facets: testFacetResultsSearched,
+    });
+
+    render(<FindStatisticsPage useAzureSearch />);
+
+    await waitFor(() => {
+      expect(
+        screen.getByText('2 results, page 1 of 1, filtered by:'),
+      ).toBeInTheDocument();
+    });
+
+    expect(
+      screen.getByRole('button', {
+        name: 'Remove filter: Release type: Ad hoc statistics',
+      }),
+    ).toBeInTheDocument();
+
+    expect(
+      screen.getByRole('button', { name: 'Reset filters' }),
+    ).toBeInTheDocument();
+
+    const publicationsList = within(screen.getByTestId('publicationsList'));
+    expect(publicationsList.getAllByRole('listitem')).toHaveLength(2);
+
+    expect(
+      publicationsList.getByRole('heading', { name: 'Publication 2' }),
+    ).toBeInTheDocument();
+
+    expect(
+      publicationsList.getByRole('heading', { name: 'Publication 3' }),
+    ).toBeInTheDocument();
+
+    expect(
+      screen.queryByText('There are no matching results.'),
+    ).not.toBeInTheDocument();
+  });
+
+  test('renders correctly when filtered by release type and has no results', async () => {
+    mockRouter.setCurrentUrl(
+      '/find-statistics?releaseType=ExperimentalStatistics',
+    );
+    publicationService.listPublications.mockResolvedValue({
+      results: [],
+      paging: { ...testPaging, totalPages: 0, totalResults: 0 },
+      facets: testFacetNoResults,
+    });
+
+    render(<FindStatisticsPage useAzureSearch />);
+
+    expect(
+      await screen.findByText('There are no matching results.'),
+    ).toBeInTheDocument();
+
+    expect(
+      screen.getByRole('button', {
+        name: 'Remove filter: Release type: Experimental statistics',
+      }),
+    ).toBeInTheDocument();
+
+    expect(
+      screen.getByRole('button', { name: 'Reset filters' }),
+    ).toBeInTheDocument();
+
+    expect(screen.queryByTestId('publicationsList')).not.toBeInTheDocument();
+  });
+
+  test('renders correctly with all filters and search', async () => {
+    mockRouter.setCurrentUrl(
+      '/find-statistics?releaseType=AdHocStatistics&search=find+me&themeId=theme-1',
+    );
+    publicationService.listPublications.mockResolvedValue({
+      results: [testPublications[1], testPublications[2]],
+      paging: { ...testPaging, totalPages: 1, totalResults: 2 },
+      facets: testFacetResultsSearched,
+    });
+
+    render(<FindStatisticsPage useAzureSearch />);
+
+    await waitFor(() => {
+      expect(
+        screen.getByText('2 results, page 1 of 1, filtered by:'),
+      ).toBeInTheDocument();
+    });
+
+    expect(
+      screen.getByRole('button', { name: 'Remove filter: Search: find me' }),
+    ).toBeInTheDocument();
+
+    expect(
+      screen.getByRole('button', {
+        name: 'Remove filter: Release type: Ad hoc statistics',
+      }),
+    ).toBeInTheDocument();
+
+    expect(
+      screen.getByRole('button', { name: 'Remove filter: Theme: Theme 1' }),
+    ).toBeInTheDocument();
+
+    expect(
+      screen.getByRole('button', { name: 'Reset filters' }),
+    ).toBeInTheDocument();
+
+    const publicationsList = within(screen.getByTestId('publicationsList'));
+    expect(publicationsList.getAllByRole('listitem')).toHaveLength(2);
+
+    expect(
+      publicationsList.getByRole('heading', { name: 'Publication 2' }),
+    ).toBeInTheDocument();
+
+    expect(
+      publicationsList.getByRole('heading', { name: 'Publication 3' }),
+    ).toBeInTheDocument();
+  });
+
+  test('renders the desktop filters', async () => {
+    publicationService.listPublications.mockResolvedValue({
+      results: testPublications,
+      paging: testPaging,
+      facets: testFacetResults,
+    });
+
+    render(<FindStatisticsPage useAzureSearch />);
+
+    expect(screen.getByLabelText('Filter by Theme')).toBeInTheDocument();
+    expect(screen.getByLabelText('Filter by Release type')).toBeInTheDocument();
+
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+  });
+
+  test('renders the mobile filters', async () => {
+    mockIsMedia = true;
+    publicationService.listPublications.mockResolvedValue({
+      results: testPublications,
+      paging: testPaging,
+      facets: testFacetResults,
+    });
+
+    const { user } = render(<FindStatisticsPage useAzureSearch />);
+
+    await user.click(screen.getByRole('button', { name: 'Filter results' }));
+
+    const modal = within(screen.getByRole('dialog'));
+
+    expect(modal.getByLabelText('Filter by Theme')).toBeInTheDocument();
+    expect(modal.getByLabelText('Filter by Release type')).toBeInTheDocument();
+    expect(
+      modal.getByRole('button', { name: 'Back to results' }),
+    ).toBeInTheDocument();
+
+    mockIsMedia = false;
+  });
+
+  test('adding filters', async () => {
+    mockRouter.setCurrentUrl('/find-statistics?azsearch=true');
+
+    publicationService.listPublications
+      .mockResolvedValueOnce({
+        results: testPublications,
+        paging: testPaging,
+        facets: testFacetResults,
+      })
+      .mockResolvedValueOnce({
+        results: [testPublications[0], testPublications[1]],
+        paging: { ...testPaging, totalPages: 1, totalResults: 2 },
+        facets: testFacetResultsSearched,
+      })
+      .mockResolvedValueOnce({
+        results: [testPublications[0]],
+        paging: { ...testPaging, totalPages: 1, totalResults: 1 },
+        facets: testFacetResultsSearchedOneResult,
+      });
+
+    const { user } = render(<FindStatisticsPage useAzureSearch />);
+
+    await waitFor(() => {
+      expect(
+        screen.getByText('30 results, page 1 of 3, showing all publications'),
+      ).toBeInTheDocument();
+    });
+
+    expect(
+      within(screen.getByTestId('publicationsList')).getAllByRole('listitem'),
+    ).toHaveLength(3);
+
+    // Add release type filter
+    await user.selectOptions(screen.getByLabelText('Filter by Release type'), [
+      'AdHocStatistics',
+    ]);
+
+    expect(mockRouter).toMatchObject({
+      pathname: '/find-statistics',
+      query: { azsearch: 'true', releaseType: 'AdHocStatistics' },
+    });
+
+    await waitFor(() => {
+      expect(
+        screen.getByText('2 results, page 1 of 1, filtered by:'),
+      ).toBeInTheDocument();
+    });
+
+    expect(
+      screen.getByRole('button', {
+        name: 'Remove filter: Release type: Ad hoc statistics',
+      }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: 'Reset filters' }),
+    ).toBeInTheDocument();
+    expect(
+      within(screen.getByTestId('publicationsList')).getAllByRole('listitem'),
+    ).toHaveLength(2);
+
+    // Add theme filter
+    await user.selectOptions(screen.getByLabelText('Filter by Theme'), [
+      'theme-1',
+    ]);
+
+    expect(mockRouter).toMatchObject({
+      pathname: '/find-statistics',
+      query: {
+        azsearch: 'true',
+        releaseType: 'AdHocStatistics',
+        themeId: 'theme-1',
+      },
+    });
+
+    await waitFor(() => {
+      expect(
+        screen.getByText('1 result, page 1 of 1, filtered by:'),
+      ).toBeInTheDocument();
+    });
+
+    expect(
+      screen.getByRole('button', {
+        name: 'Remove filter: Release type: Ad hoc statistics',
+      }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: 'Remove filter: Theme: Theme 1' }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: 'Reset filters' }),
+    ).toBeInTheDocument();
+    expect(
+      within(screen.getByTestId('publicationsList')).getAllByRole('listitem'),
+    ).toHaveLength(1);
+  });
+
+  test('removing filters', async () => {
+    mockRouter.setCurrentUrl(
+      '/find-statistics?azsearch=true&releaseType=AccreditedOfficialStatistics&themeId=theme-2',
+    );
+
+    publicationService.listPublications
+      .mockResolvedValueOnce({
+        results: [testPublications[0]],
+        paging: { ...testPaging, totalPages: 1, totalResults: 1 },
+        facets: testFacetResultsSearchedOneResult,
+      })
+      .mockResolvedValueOnce({
+        results: [testPublications[0], testPublications[1]],
+        paging: { ...testPaging, totalPages: 1, totalResults: 2 },
+        facets: testFacetResultsSearched,
+      })
+      .mockResolvedValueOnce({
+        results: testPublications,
+        paging: testPaging,
+        facets: testFacetResults,
+      });
+
+    const { user } = render(<FindStatisticsPage useAzureSearch />);
+
+    await waitFor(() => {
+      expect(
+        screen.getByText('1 result, page 1 of 1, filtered by:'),
+      ).toBeInTheDocument();
+    });
+
+    expect(
+      screen.getByRole('button', {
+        name: 'Remove filter: Release type: Accredited official statistics',
+      }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: 'Remove filter: Theme: Theme 2' }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: 'Reset filters' }),
+    ).toBeInTheDocument();
+    expect(
+      within(screen.getByTestId('publicationsList')).getAllByRole('listitem'),
+    ).toHaveLength(1);
+
+    // remove release type filter
+    await user.click(
+      screen.getByRole('button', {
+        name: 'Remove filter: Release type: Accredited official statistics',
+      }),
+    );
+
+    expect(mockRouter).toMatchObject({
+      pathname: '/find-statistics',
+      query: { azsearch: 'true', themeId: 'theme-2' },
+    });
+
+    await waitFor(() => {
+      expect(
+        screen.getByText('2 results, page 1 of 1, filtered by:'),
+      ).toBeInTheDocument();
+    });
+
+    expect(
+      screen.queryByRole('button', {
+        name: 'Remove filter: Release type Accredited official statistics',
+      }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: 'Remove filter: Theme: Theme 2' }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: 'Reset filters' }),
+    ).toBeInTheDocument();
+
+    expect(
+      within(screen.getByTestId('publicationsList')).getAllByRole('listitem'),
+    ).toHaveLength(2);
+
+    // Remove theme filter
+    await user.click(
+      screen.getByRole('button', { name: 'Remove filter: Theme: Theme 2' }),
+    );
+
+    expect(mockRouter).toMatchObject({
+      pathname: '/find-statistics',
+      query: { azsearch: 'true' },
+    });
+
+    await waitFor(() => {
+      expect(
+        screen.getByText('30 results, page 1 of 3, showing all publications'),
+      ).toBeInTheDocument();
+    });
+
+    expect(
+      screen.queryByRole('button', {
+        name: 'Remove filter: Release type Accredited official statistics',
+      }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: 'Remove filter: Theme: Theme 2' }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: 'Reset filters' }),
+    ).not.toBeInTheDocument();
+    expect(
+      within(screen.getByTestId('publicationsList')).getAllByRole('listitem'),
+    ).toHaveLength(3);
+  });
 
   // test('searching', async () => {
   //   publicationService.listPublications
