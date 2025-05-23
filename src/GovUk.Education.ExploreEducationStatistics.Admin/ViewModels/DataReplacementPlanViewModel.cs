@@ -14,7 +14,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
     {
         public IEnumerable<DataBlockReplacementPlanViewModel> DataBlocks { get; init; } = [];
         public IEnumerable<FootnoteReplacementPlanViewModel> Footnotes { get; init; } = [];
-        public ApiDataSetVersionPlanViewModel? ApiDataSetVersionPlan { get; init; }
+        public ReplacementApiDataSetVersionPlanViewModel? ApiDataSetVersionPlan { get; init; }
         public Guid OriginalSubjectId { get; init; }
         public Guid ReplacementSubjectId { get; init; }
 

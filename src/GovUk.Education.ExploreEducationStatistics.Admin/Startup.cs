@@ -83,6 +83,8 @@ using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Admin.Repositories;
+using GovUk.Education.ExploreEducationStatistics.Admin.Repositories.Interfaces;
 using Thinktecture;
 using static GovUk.Education.ExploreEducationStatistics.Common.Utils.StartupUtils;
 using ContentGlossaryService = GovUk.Education.ExploreEducationStatistics.Content.Services.GlossaryService;
@@ -503,6 +505,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                 services.AddTransient<IDataSetVersionMappingService, DataSetVersionMappingService>();
                 services.AddTransient<IPreviewTokenService, PreviewTokenService>();
                 services.AddTransient<IDataSetVersionRepository, DataSetVersionRepository>();
+                services.AddScoped<IMappingTypesRepository, MappingTypesRepository>();
             }
             else
             {
@@ -514,12 +517,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                     new DataSetService(provider.GetRequiredService<ContentDbContext>(),
                         provider.GetService<PublicDataDbContext>(),
                         provider.GetRequiredService<IProcessorClient>(),
+                        provider.GetRequiredService<IDataSetVersionMappingService>(),
                         provider.GetRequiredService<IUserService>()));
 
                 services.AddTransient<IDataSetVersionService, NoOpDataSetVersionService>();
                 services.AddTransient<IDataSetVersionMappingService, NoOpDataSetVersionMappingService>();
                 services.AddTransient<IPreviewTokenService, NoOpPreviewTokenService>();
                 services.AddTransient<IDataSetVersionRepository, NoOpDataSetVersionRepository>();
+                services.AddScoped<IMappingTypesRepository, NoOpMappingTypesRepository>();
             }
 
             services.AddTransient<INotificationClient>(s =>
@@ -966,6 +971,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                 BatchFilterOptionMappingUpdatesRequest request,
                 CancellationToken cancellationToken = default) =>
             throw new NotImplementedException();
+
+        public Task<MappingStatusViewModel> GetMappingStatus(Guid nextDataSetVersionId, CancellationToken cancellationToken = default) => throw new NotImplementedException();
     }
 
     internal class NoOpPreviewTokenService : IPreviewTokenService
@@ -998,5 +1005,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
         {
             return Task.FromResult(new List<DataSetVersion>());
         }
+
+        public Task<DataSetVersion> GetDataSetVersion(Guid dataSetVersionId) => throw new NotImplementedException();
+
+        public Task<DataSetVersion> GetDataSetVersion(Guid dataSetId, SemVersion version, CancellationToken cancellationToken = default) => throw new NotImplementedException();
+    }
+
+    internal class NoOpMappingTypesRepository : IMappingTypesRepository
+    {
+        public Task<List<LocationMappingTypes>> GetLocationOptionMappingTypes(Guid targetDataSetVersionId, CancellationToken cancellationToken = default) => throw new NotImplementedException();
+
+        public Task<List<FilterMappingTypes>> GetFilterOptionMappingTypes(Guid targetDataSetVersionId, CancellationToken cancellationToken = default) => throw new NotImplementedException();
+        
+        public Task<bool> HasDeletionMajorVersionChanges(Guid targetDataSetVersionId, CancellationToken cancellationToken = default) => throw new NotImplementedException();
     }
 }

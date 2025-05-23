@@ -171,8 +171,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var service = SetupReleaseDataFileService(
                     contentDbContext: contentDbContext,
                     privateBlobStorageService: privateBlobStorageService.Object,
-                    dataImportService: dataImportService.Object,
-                    releaseFileService: releaseFileService.Object);
+                    releaseFileService: releaseFileService.Object,
+                    dataImportService: dataImportService.Object);
 
                 var result = await service.Delete(releaseVersionId: releaseVersion.Id,
                     fileId: releaseDataFile.File.Id);
@@ -342,8 +342,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var service = SetupReleaseDataFileService(
                     contentDbContext: contentDbContext,
                     privateBlobStorageService: privateBlobStorageService.Object,
-                    dataImportService: dataImportService.Object,
-                    releaseFileService: releaseFileService.Object);
+                    releaseFileService: releaseFileService.Object,
+                    dataImportService: dataImportService.Object);
 
                 var result = await service.Delete(releaseVersionId: releaseVersion.Id,
                     fileId: replacementDataFile.Id);
@@ -481,8 +481,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var service = SetupReleaseDataFileService(
                     contentDbContext: contentDbContext,
                     privateBlobStorageService: privateBlobStorageService.Object,
-                    dataImportService: dataImportService.Object,
-                    releaseFileService: releaseFileService.Object);
+                    releaseFileService: releaseFileService.Object,
+                    dataImportService: dataImportService.Object);
 
                 var result = await service.Delete(amendmentRelease.Id, dataFile.Id);
 
@@ -610,8 +610,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var service = SetupReleaseDataFileService(
                     contentDbContext: contentDbContext,
                     privateBlobStorageService: privateBlobStorageService.Object,
-                    dataImportService: dataImportService.Object,
-                    releaseFileService: releaseFileService.Object);
+                    releaseFileService: releaseFileService.Object,
+                    dataImportService: dataImportService.Object);
 
                 var result = await service.Delete(releaseVersion.Id, dataFile.Id);
 
@@ -731,10 +731,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
                 var service = SetupReleaseDataFileService(
-                    contentDbContext: contentDbContext,
+                    contentDbContext: contentDbContext, 
                     privateBlobStorageService: privateBlobStorageService.Object,
-                    dataImportService: dataImportService.Object,
-                    releaseFileService: releaseFileService.Object);
+                    releaseFileService: releaseFileService.Object,
+                    dataImportService: dataImportService.Object);
 
                 var result = await service.DeleteAll(releaseVersion.Id);
 
@@ -865,10 +865,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
                 var service = SetupReleaseDataFileService(
-                    contentDbContext: contentDbContext,
+                    contentDbContext: contentDbContext, 
                     privateBlobStorageService: privateBlobStorageService.Object,
-                    dataImportService: dataImportService.Object,
-                    releaseFileService: releaseFileService.Object);
+                    releaseFileService: releaseFileService.Object,
+                    dataImportService: dataImportService.Object);
 
                 var result = await service.DeleteAll(amendmentRelease.Id);
 
@@ -1337,8 +1337,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
                 var service = SetupReleaseDataFileService(
-                    contentDbContext: contentDbContext
-                );
+                    contentDbContext: contentDbContext);
 
                 var result = await service.ReorderDataFiles(
                     releaseVersion.Id,
@@ -1855,10 +1854,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     contentDbContext: contentDbContext,
                     statisticsDbContext: statisticsDbContext,
                     privateBlobStorageService: privateBlobStorageService.Object,
-                    dataImportService: dataImportService.Object,
                     fileUploadsValidatorService: fileUploadsValidatorService.Object,
-                    featureFlags: options
-                );
+                    dataImportService: dataImportService.Object,
+                    featureFlags: options);
 
                 var result = await service.Upload(
                     releaseVersionId: releaseVersion.Id,
@@ -1991,6 +1989,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var fileUploadsValidatorService = new Mock<IFileUploadsValidatorService>(Strict);
             var dataImportService = new Mock<IDataImportService>(Strict);
             var dataSetVersionService = new Mock<IDataSetVersionService>(Strict);
+            var dataSetVersionRepository = new Mock<IDataSetVersionRepository>(Strict);
             var options = Microsoft.Extensions.Options.Options.Create(new FeatureFlags()
             {
                 EnableReplacementOfPublicApiDataSets = enableReplacementOfPublicApiDataSets
@@ -2035,12 +2034,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 if (enableReplacementOfPublicApiDataSets)
                 {
-                    dataSetVersionService.Setup(mock => 
-                        mock.GetDataSetVersion(
-                            It.IsAny<Guid>(),
-                            It.IsAny<SemVersion>(), 
-                            It.IsAny<CancellationToken>()
-                            )).ReturnsAsync(dataSetVersion);
+                    dataSetVersionRepository.Setup(mock =>
+                            mock.GetDataSetVersion(
+                                dataSetVersion.DataSetId,
+                                dataSetVersion.SemVersion(),
+                                It.IsAny<CancellationToken>()))
+                        .ReturnsAsync(dataSetVersion);
 
                     dataSetVersionService.Setup(mock =>
                         mock.CreateNextVersion(
@@ -2059,16 +2058,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         File = new IdTitleViewModel()
                     });
                 }
-                    
+                
                 var service = SetupReleaseDataFileService(
                     contentDbContext: contentDbContext,
                     statisticsDbContext: statisticsDbContext,
                     privateBlobStorageService: privateBlobStorageService.Object,
-                    dataImportService: dataImportService.Object,
                     fileUploadsValidatorService: fileUploadsValidatorService.Object,
+                    dataImportService: dataImportService.Object,
                     dataSetVersionService: dataSetVersionService.Object,
-                    featureFlags: options
-                );
+                    dataSetVersionRepository: dataSetVersionRepository.Object,
+                    featureFlags: options);
 
                 var result = await service.Upload(
                     releaseVersionId: releaseVersion.Id,
@@ -2081,7 +2080,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 if (enableReplacementOfPublicApiDataSets)
                 {
-                    MockUtils.VerifyAllMocks(privateBlobStorageService, fileUploadsValidatorService, dataImportService, dataSetVersionService);
+                    MockUtils.VerifyAllMocks(privateBlobStorageService, fileUploadsValidatorService, dataImportService, dataSetVersionService, dataSetVersionRepository);
                 }
                 else
                 {
@@ -2275,10 +2274,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     contentDbContext: contentDbContext,
                     statisticsDbContext: statisticsDbContext,
                     privateBlobStorageService: privateBlobStorageService.Object,
-                    dataImportService: dataImportService.Object,
                     fileUploadsValidatorService: fileUploadsValidatorService.Object,
-                    featureFlags: options
-                );
+                    dataImportService: dataImportService.Object,
+                    featureFlags: options);
 
                 var result = await service.Upload(
                     releaseVersionId: releaseVersion.Id,
@@ -2392,10 +2390,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     contentDbContext: contentDbContext,
                     statisticsDbContext: statisticsDbContext,
                     privateBlobStorageService: privateBlobStorageService.Object,
-                    dataImportService: dataImportService.Object,
                     dataArchiveValidationService: dataArchiveValidationService.Object,
-                    fileUploadsValidatorService: fileUploadsValidatorService.Object
-                );
+                    fileUploadsValidatorService: fileUploadsValidatorService.Object,
+                    dataImportService: dataImportService.Object);
 
                 var result = (await service.UploadAsZip(
                     releaseVersionId: releaseVersion.Id,
@@ -2546,10 +2543,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     contentDbContext: contentDbContext,
                     statisticsDbContext: statisticsDbContext,
                     privateBlobStorageService: privateBlobStorageService.Object,
-                    dataImportService: dataImportService.Object,
                     dataArchiveValidationService: dataArchiveValidationService.Object,
-                    fileUploadsValidatorService: fileUploadsValidatorService.Object
-                );
+                    fileUploadsValidatorService: fileUploadsValidatorService.Object,
+                    dataImportService: dataImportService.Object);
 
                 var result = await service.UploadAsZip(
                     releaseVersionId: releaseVersion.Id,
@@ -2689,10 +2685,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     contentDbContext: contentDbContext,
                     statisticsDbContext: statisticsDbContext,
                     privateBlobStorageService: privateBlobStorageService.Object,
-                    dataImportService: dataImportService.Object,
                     dataArchiveValidationService: dataArchiveValidationService.Object,
-                    fileUploadsValidatorService: fileUploadsValidatorService.Object
-                );
+                    fileUploadsValidatorService: fileUploadsValidatorService.Object,
+                    dataImportService: dataImportService.Object);
 
                 var result = (await service.UploadAsZip(
                     releaseVersionId: releaseVersion.Id,
@@ -2823,7 +2818,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 // Act & Assert
                 (await service
-                    .ValidateAndUploadBulkZip(releaseVersion.Id, archive, default))
+                    .ValidateAndUploadBulkZip(releaseVersion.Id, archive, CancellationToken.None))
                     .AssertBadRequestWithValidationProblem();
 
                 MockUtils.VerifyAllMocks(dataArchiveValidationService);
@@ -2877,18 +2872,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         It.IsAny<Stream>(),
                         ContentTypes.Csv,
                         null,
-                        default
+                        CancellationToken.None
                     )).Returns(Task.CompletedTask);
 
                 var service = SetupReleaseDataFileService(
                     contentDbContext: contentDbContext,
-                    dataArchiveValidationService: dataArchiveValidationService.Object,
-                    fileUploadsValidatorService: fileUploadsValidatorService.Object,
-                    privateBlobStorageService: privateBlobStorageService.Object
-                );
+                    privateBlobStorageService: privateBlobStorageService.Object, dataArchiveValidationService: dataArchiveValidationService.Object, fileUploadsValidatorService: fileUploadsValidatorService.Object);
 
                 var result = (await service
-                    .ValidateAndUploadBulkZip(releaseVersion.Id, archive, default))
+                    .ValidateAndUploadBulkZip(releaseVersion.Id, archive, CancellationToken.None))
                     .AssertRight();
 
                 MockUtils.VerifyAllMocks(
@@ -2925,6 +2917,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             IDataImportService? dataImportService = null,
             IUserService? userService = null,
             IDataSetVersionService? dataSetVersionService = null,
+            IDataSetVersionRepository? dataSetVersionRepository = null,
             IOptions<FeatureFlags>? featureFlags = null)
         {
             contentDbContext.Users.Add(_user);
@@ -2946,8 +2939,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 dataImportService ?? Mock.Of<IDataImportService>(Strict),
                 userService ?? MockUtils.AlwaysTrueUserService(_user.Id).Object,
                 dataSetVersionService ?? Mock.Of<IDataSetVersionService>(Strict),
-                featureFlags ?? Mock.Of<IOptions<FeatureFlags>>(Strict)
-            );
+                featureFlags ?? Mock.Of<IOptions<FeatureFlags>>(Strict),
+                dataSetVersionRepository ?? new Mock<IDataSetVersionRepository>(MockBehavior.Strict).Object);
         }
     }
 }

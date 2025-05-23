@@ -240,7 +240,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             IReleaseDataFileRepository? releaseDataFileRepository = null,
             IDataImportService? dataImportService = null,
             IUserService? userService = null,
-            IDataSetVersionService? dataSetVersionService = null
+            IDataSetVersionService? dataSetVersionService = null,
+            IDataSetVersionRepository? dataSetVersionRepository = null
             )
         {
             contentDbContext ??= new Mock<ContentDbContext>().Object;
@@ -261,8 +262,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 dataImportService ?? new Mock<IDataImportService>(MockBehavior.Strict).Object,
                 userService ?? new Mock<IUserService>().Object,
                 dataSetVersionService ?? new Mock<IDataSetVersionService>(MockBehavior.Strict).Object,
-                Microsoft.Extensions.Options.Options.Create(new FeatureFlags())
-            );
+                Microsoft.Extensions.Options.Options.Create(new FeatureFlags()),
+                dataSetVersionRepository ?? new Mock<IDataSetVersionRepository>(MockBehavior.Strict).Object);
         }
 
         private Mock<IPersistenceHelper<ContentDbContext>> DefaultPersistenceHelperMock()

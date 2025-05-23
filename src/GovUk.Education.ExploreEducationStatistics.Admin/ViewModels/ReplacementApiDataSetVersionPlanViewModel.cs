@@ -5,7 +5,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Public.Data;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 
-public record DeleteApiDataSetVersionPlanViewModel
+public record ReplacementApiDataSetVersionPlanViewModel
 {
     public Guid DataSetId { get; init; }
 
@@ -17,11 +17,8 @@ public record DeleteApiDataSetVersionPlanViewModel
 
     public DataSetVersionStatus Status { get; init; }
 
-    public bool Valid { get; set; }
-}
-
-public record ApiDataSetVersionPlanViewModel : DeleteApiDataSetVersionPlanViewModel
-{
     public MappingStatusViewModel? MappingStatus { get; set; }
-    
+
+    public bool Valid { get; set; } //TODO: please note, this is kept as is for backward (feature flagging) compatibility with the rest of the code.
+    public bool ValidDefinition => MappingStatus is { Complete: true, FiltersComplete: true, LocationsComplete: true, HasMajorVersionUpdate: false };
 }

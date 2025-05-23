@@ -48,7 +48,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         IDataImportService dataImportService,
         IUserService userService,
         IDataSetVersionService dataSetVersionService,
-        IOptions<FeatureFlags> featureFlags)
+        IOptions<FeatureFlags> featureFlags,
+        IDataSetVersionRepository dataSetVersionRepository)
         : IReleaseDataFileService
     {
         public async Task<Either<ActionResult, Unit>> Delete(Guid releaseVersionId,
@@ -309,17 +310,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                     // Creates a new data set version to enable replacement. 
                                     //Please note this will is WIP, EES-5996 and will address failure,
                                     //and any refactor that may be required
-                                    await dataSetVersionService.GetDataSetVersion(
-                                            replacedReleaseDataFile!.PublicApiDataSetId!.Value,
-                                            replacedReleaseDataFile.PublicApiDataSetVersion!)
-                                        .OnSuccessDo(async dataSetVersion =>
-                                        {
-                                            await dataSetVersionService.CreateNextVersion(
-                                                dataReleaseFile.Id,
-                                                replacedReleaseDataFile.PublicApiDataSetId.Value,
-                                                dataSetVersion.Id
-                                            ); 
-                                        });
+                                    var versionToReplace = await dataSetVersionRepository.GetDataSetVersion(
+                                        replacedReleaseDataFile!.PublicApiDataSetId!.Value,
+                                        replacedReleaseDataFile.PublicApiDataSetVersion!);
+
+                                    await dataSetVersionService.CreateNextVersion(
+                                        dataReleaseFile.Id,
+                                        replacedReleaseDataFile.PublicApiDataSetId.Value,
+                                        versionToReplace.Id
+                                    ); 
                                 }
                             }
                             var dataImport = await dataImportService.Import(

@@ -329,6 +329,8 @@ describe('DataReplacementPlan', () => {
       mappingStatus: {
         locationsComplete: false,
         filtersComplete: false,
+        hasMajorVersionUpdate: false,
+        complete: false,
       },
       valid: false,
     },
@@ -417,10 +419,10 @@ describe('DataReplacementPlan', () => {
       );
       await waitFor(() => {
         expect(
-          screen.getByText('Api Data Set Filters: ERROR'),
+          screen.getByText('Api data set Filters: ERROR'),
         ).toBeInTheDocument();
         expect(
-          screen.getByText('Api Data Set Locations: ERROR'),
+          screen.getByText('Api data set Locations: ERROR'),
         ).toBeInTheDocument();
       });
     });
@@ -441,10 +443,10 @@ describe('DataReplacementPlan', () => {
         </MemoryRouter>,
       );
       await waitFor(() => {
-        expect(() => screen.getByText('Api Data Set Filters: ERROR')).toThrow(
+        expect(() => screen.getByText('Api data set Filters: ERROR')).toThrow(
           'Unable to find an element',
         );
-        expect(() => screen.getByText('Api Data Set Locations: ERROR')).toThrow(
+        expect(() => screen.getByText('Api data set Locations: ERROR')).toThrow(
           'Unable to find an element',
         );
       });
@@ -480,10 +482,10 @@ describe('DataReplacementPlan', () => {
         </FeatureFlagProvider>,
       );
       await waitFor(() => {
-        expect(() => screen.getByText('Api Data Set Filters: ERROR')).toThrow(
+        expect(() => screen.getByText('Api data set Filters: ERROR')).toThrow(
           'Unable to find an element',
         );
-        expect(() => screen.getByText('Api Data Set Locations: ERROR')).toThrow(
+        expect(() => screen.getByText('Api data set Locations: ERROR')).toThrow(
           'Unable to find an element',
         );
       });
