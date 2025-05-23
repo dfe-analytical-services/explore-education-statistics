@@ -632,7 +632,7 @@ describe('DataCataloguePage', () => {
         releaseInfo.getByText('This is the latest data'),
       ).toBeInTheDocument();
       expect(
-        releaseInfo.getByRole('link', {
+        releaseInfo.getByRole('button', {
           name: 'Download 1 data set (ZIP)',
         }),
       ).toBeInTheDocument();
@@ -745,7 +745,7 @@ describe('DataCataloguePage', () => {
         releaseInfo.getByText('This is not the latest data'),
       ).toBeInTheDocument();
       expect(
-        releaseInfo.getByRole('link', {
+        releaseInfo.getByRole('button', {
           name: 'Download all 2 data sets (ZIP)',
         }),
       ).toBeInTheDocument();
@@ -919,7 +919,7 @@ describe('DataCataloguePage', () => {
       });
 
       expect(
-        screen.queryByRole('link', {
+        screen.queryByRole('button', {
           name: 'Download all 2 data sets (ZIP)',
         }),
       ).not.toBeInTheDocument();

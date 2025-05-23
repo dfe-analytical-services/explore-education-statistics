@@ -7,6 +7,7 @@ using System.Linq;
 using System.Net.Mime;
 using System.Threading;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Analytics.Common;
 using GovUk.Education.ExploreEducationStatistics.Analytics.Common.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
@@ -125,6 +126,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
         public async Task<Either<ActionResult, Unit>> ZipFilesToStream(
             Guid releaseVersionId,
             Stream outputStream,
+            AnalyticsFromPage fromPage,
             IEnumerable<Guid>? fileIds = null,
             CancellationToken cancellationToken = default)
         {
@@ -159,7 +161,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
                             await DoZipFilesToStream(releaseFiles, releaseVersion, outputStream, cancellationToken);
                         }
 
-                        await RecordZipDownloadAnalytics(releaseVersion, releaseFiles, cancellationToken);
+                        await RecordZipDownloadAnalytics(releaseVersion, releaseFiles, fromPage, cancellationToken);
                     }
                 );
         }
@@ -299,6 +301,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
         private async Task RecordZipDownloadAnalytics(
             ReleaseVersion releaseVersion,
             List<ReleaseFile>? releaseFiles,
+            AnalyticsFromPage fromPage,
             CancellationToken cancellationToken)
         {
             if (releaseFiles is not null && releaseFiles.Count > 1)
@@ -317,13 +320,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
             }
 
             await analyticsManager.Add(
-                new CaptureZipDownloadRequest(
-                    releaseVersion.Release.Publication.Title,
-                    releaseVersion.Id,
-                    releaseVersion.Release.Title,
-                    releaseVersion.Release.Label,
-                    subjectId,
-                    dataSetName),
+                new CaptureZipDownloadRequest
+                {
+                    PublicationName = releaseVersion.Release.Publication.Title,
+                    ReleaseVersionId = releaseVersion.Id,
+                    ReleaseName = releaseVersion.Release.Title,
+                    ReleaseLabel = releaseVersion.Release.Label,
+                    FromPage = fromPage,
+                    SubjectId = subjectId,
+                    DataSetTitle = dataSetName,
+                },
                 cancellationToken);
         }
     }
