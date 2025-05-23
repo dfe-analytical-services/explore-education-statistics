@@ -19,17 +19,17 @@ public interface IDataSetVersionMappingService
         Guid nextDataSetVersionId,
         BatchLocationMappingUpdatesRequest request,
         CancellationToken cancellationToken = default);
-    
+
     Task<Either<ActionResult, FilterMappingPlan>> GetFilterMappings(
         Guid nextDataSetVersionId,
         CancellationToken cancellationToken = default);
-    
+
     Task<Either<ActionResult, BatchFilterOptionMappingUpdatesResponseViewModel>> ApplyBatchFilterOptionMappingUpdates(
         Guid nextDataSetVersionId,
         BatchFilterOptionMappingUpdatesRequest request,
         CancellationToken cancellationToken = default);
-    
-    public Task<bool> IsMajorVersionUpdate(
+
+    Task<MappingStatusViewModel> GetMappingStatus(
         Guid nextDataSetVersionId,
         CancellationToken cancellationToken = default);
 }

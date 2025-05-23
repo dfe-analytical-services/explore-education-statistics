@@ -1767,16 +1767,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         .SetPublicApiDataSetVersion(dataSetVersion.SemVersion()))
                 .GenerateTuple2();
 
-            var dataSetService = new Mock<IDataSetService>(Strict);
-            dataSetService.Setup(service => service.GetMappingStatus(
-                    It.IsAny<Guid>(),
-                    It.IsAny<CancellationToken>()))
-                .ReturnsAsync(new MappingStatusViewModel
-                {
-                    FiltersComplete = filtersComplete,
-                    LocationsComplete = locationsComplete
-                });
- 
             var dataSetVersionService = new Mock<IDataSetVersionService>(Strict);
             dataSetVersionService.Setup(mock => mock.GetDataSetVersion(
                 originalReleaseFile.PublicApiDataSetId!.Value,
@@ -1793,9 +1783,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 .ReturnsAsync(new List<(int Year, TimeIdentifier TimeIdentifier)>());
 
             var dataSetVersionMappingService = new Mock<IDataSetVersionMappingService>(Strict);
-            dataSetVersionMappingService.Setup(mock =>
-                mock.IsMajorVersionUpdate(dataSetVersion.Id, It.IsAny<CancellationToken>()))
-                .ReturnsAsync(majorVersionUpdate);
+            dataSetVersionMappingService.Setup(service => service.GetMappingStatus(
+                    It.IsAny<Guid>(),
+                    It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new MappingStatusViewModel
+                {
+                    FiltersComplete = filtersComplete,
+                    LocationsComplete = locationsComplete,
+                    HasMajorVersionUpdate = majorVersionUpdate
+                });
             
             var options = Microsoft.Extensions.Options.Options.Create(new FeatureFlags()
             {
@@ -1821,7 +1817,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     dataSetVersionService: dataSetVersionService.Object,
                     timePeriodService: timePeriodService.Object,
                     locationRepository: locationRepository.Object,
-                    dataSetService: dataSetService.Object,
                     dataSetVersionMappingService: dataSetVersionMappingService.Object,
                     featureFlags: options
                     );
@@ -2824,9 +2819,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var releaseVersionService = new Mock<IReleaseVersionService>(Strict);
             releaseVersionService.Setup(service => service.RemoveDataFiles(releaseVersion.Id, originalFile.Id))
                 .ReturnsAsync(Unit.Instance);
-
-            var dataSetService = new Mock<IDataSetService>(Strict);
-            dataSetService.Setup(service => service.GetMappingStatus(
+            
+            var dataSetVersionMappingService = new Mock<IDataSetVersionMappingService>(Strict);
+            dataSetVersionMappingService.Setup(service => service.GetMappingStatus(
                     It.IsAny<Guid>(),
                     It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new MappingStatusViewModel
@@ -2834,12 +2829,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     FiltersComplete = true,
                     LocationsComplete = true
                 });
-            
-            var dataSetVersionMappingService = new Mock<IDataSetVersionMappingService>(Strict);
-            dataSetVersionMappingService.Setup(mock =>
-                    mock.IsMajorVersionUpdate(dataSetVersion.Id, It.IsAny<CancellationToken>()))
-                .ReturnsAsync(false);
-
             var options = Microsoft.Extensions.Options.Options.Create(new FeatureFlags()
             {
                 EnableReplacementOfPublicApiDataSets = enableReplacementOfPublicApiDataSets
@@ -2866,7 +2855,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     releaseVersionService: releaseVersionService.Object,
                     dataSetVersionService: dataSetVersionService.Object,
                     featureFlags: options,
-                    dataSetService: dataSetService.Object,
                     dataSetVersionMappingService: dataSetVersionMappingService.Object);
 
                 var result = await replacementService.Replace(
@@ -2882,7 +2870,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         timePeriodService,
                         dataSetVersionService,
                         releaseVersionService,
-                        dataSetService);
+                        dataSetVersionMappingService);
                     result.AssertRight();
                 }
                 else
@@ -4592,7 +4580,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             ITimePeriodService? timePeriodService = null,
             ICacheKeyService? cacheKeyService = null,
             IPrivateBlobCacheService? privateBlobCacheService = null,
-            IDataSetService? dataSetService = null,
             IDataSetVersionMappingService? dataSetVersionMappingService = null,
             IOptions<FeatureFlags>? featureFlags = null
             )
@@ -4615,7 +4602,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 AlwaysTrueUserService().Object,
                 cacheKeyService ?? Mock.Of<ICacheKeyService>(Strict),
                 privateBlobCacheService ?? Mock.Of<IPrivateBlobCacheService>(Strict),
-                dataSetService ?? Mock.Of<IDataSetService>(Strict),
                 dataSetVersionMappingService ?? Mock.Of<IDataSetVersionMappingService>(Strict),
                 featureFlags
             );
