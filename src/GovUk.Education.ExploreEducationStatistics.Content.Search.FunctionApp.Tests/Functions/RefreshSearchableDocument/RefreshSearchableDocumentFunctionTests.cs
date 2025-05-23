@@ -1,6 +1,5 @@
 ﻿using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.CommandHandlers.RefreshSearchableDocument;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.CommandHandlers.RefreshSearchableDocument.Dto;
-using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Services;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Services.CreateSearchableDocuments;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Tests.Builders;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Tests.TheoryDataHelpers;
@@ -11,7 +10,9 @@ public class RefreshSearchableDocumentFunctionTests
 {
     private readonly SearchableDocumentCreatorMockBuilder _searchableDocumentCreatorMockBuilder = new();
     
-    private RefreshSearchableDocumentFunction GetSut() => new(_searchableDocumentCreatorMockBuilder.Build());
+    private RefreshSearchableDocumentFunction GetSut() => new(
+        _searchableDocumentCreatorMockBuilder.Build(), 
+        new TestableCommandHandler());
     
     [Fact]
     public void Can_instantiate_SUT() => Assert.NotNull(GetSut());

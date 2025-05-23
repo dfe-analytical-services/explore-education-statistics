@@ -25,6 +25,11 @@ public static class PreviewTokenGeneratorExtensions
         Guid createdByUserId)
         => generator.ForInstance(s => s.SetCreatedByUserId(createdByUserId));
 
+    public static Generator<PreviewToken> WithCreated(
+        this Generator<PreviewToken> generator,
+        DateTimeOffset created)
+        => generator.ForInstance(s => s.SetCreated(created));
+
     public static Generator<PreviewToken> WithExpiry(
         this Generator<PreviewToken> generator,
         DateTimeOffset expiry)
@@ -61,6 +66,11 @@ public static class PreviewTokenGeneratorExtensions
         this InstanceSetters<PreviewToken> instanceSetter,
         Guid createdByUserId)
         => instanceSetter.Set(pt => pt.CreatedByUserId, createdByUserId);
+
+    public static InstanceSetters<PreviewToken> SetCreated(
+        this InstanceSetters<PreviewToken> instanceSetter,
+        DateTimeOffset created)
+        => instanceSetter.Set(pt => pt.Created, created);
 
     public static InstanceSetters<PreviewToken> SetExpiry(
         this InstanceSetters<PreviewToken> instanceSetter,

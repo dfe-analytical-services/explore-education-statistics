@@ -2,6 +2,8 @@ using System.Reflection;
 using System.Security.Cryptography;
 using System.Text;
 using GovUk.Education.ExploreEducationStatistics.Analytics.Consumer.Services;
+using GovUk.Education.ExploreEducationStatistics.Analytics.Consumer.Services.Workflow;
+using GovUk.Education.ExploreEducationStatistics.Analytics.Consumer.Tests.Services.Workflow.MockBuilders;
 using GovUk.Education.ExploreEducationStatistics.Common.DuckDb.DuckDb;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using InterpolatedSql.Dapper;
@@ -22,40 +24,33 @@ public abstract class PublicZipDownloadsProcessorTests
     public class ProcessTests : PublicZipDownloadsProcessorTests
     {
         [Fact]
-        public async Task NoSourceFolder_NoReportProduced()
+        public async Task ProcessorUsesWorkflow()
         {
             using var pathResolver = new TestAnalyticsPathResolver();
+            SetupRequestFile(pathResolver, "ZipDownloadRequestFile_NoSubjectId.json");
+
+            var workflowActorBuilder = new WorkflowActorMockBuilder<PublicZipDownloadsProcessor>();
+            
+            var workflowActor = workflowActorBuilder 
+                .WhereDuckDbInitialisedWithErrors()
+                .Build();
 
             var service = BuildService(
-                pathResolver: pathResolver);
-            await service.Process();
+                pathResolver: pathResolver,
+                workflowActor: workflowActor);
+            
+            await Assert.ThrowsAsync<ArgumentException>(service.Process);
 
-            Assert.False(Directory.Exists(ProcessingDirectoryPath(pathResolver)));
-            Assert.False(Directory.Exists(pathResolver.PublicZipDownloadsReportsDirectoryPath()));
-        }
-
-        [Fact]
-        public async Task NoRequestFilesToConsume_NoReportProduced()
-        {
-            using var pathResolver = new TestAnalyticsPathResolver();
-
-            Directory.CreateDirectory(pathResolver.PublicZipDownloadsDirectoryPath());
-
-            var service = BuildService(
-                pathResolver: pathResolver);
-            await service.Process();
-
-            // Check that as there were no files to process, no working directories were
-            // created as a result.
-            Assert.False(Directory.Exists(ProcessingDirectoryPath(pathResolver)));
-            Assert.False(Directory.Exists(pathResolver.PublicZipDownloadsReportsDirectoryPath()));
+            workflowActorBuilder
+                .Assert
+                .InitialiseDuckDbCalled();
         }
 
         [Fact]
         public async Task SingleRequestFileNoSubjectId_ProducesOneReportRow()
         {
             using var pathResolver = new TestAnalyticsPathResolver();
-            SetupZipDownloadRequest(pathResolver, "ZipDownloadRequestFile_NoSubjectId.json");
+            SetupRequestFile(pathResolver, "ZipDownloadRequestFile_NoSubjectId.json");
 
             var service = BuildService(
                 pathResolver: pathResolver);
@@ -72,7 +67,7 @@ public abstract class PublicZipDownloadsProcessorTests
             var duckDbConnection = new DuckDbConnection();
             duckDbConnection.Open();
 
-            var zipDownloadReportRows = await ReadZipDownloadReport(duckDbConnection, zipDownloadsReport);
+            var zipDownloadReportRows = await ReadReport(duckDbConnection, zipDownloadsReport);
 
             // Check that the single recorded zip download has resulted in a
             // single line in the report and the values match the
@@ -80,7 +75,7 @@ public abstract class PublicZipDownloadsProcessorTests
             // match the expected values also.
             var zipDownloadReportRow = Assert.Single(zipDownloadReportRows);
 
-            await AssertZipDownloadReportRow(
+            await AssertReportRow(
                 zipDownloadReportRow,
                 "ZipDownloadRequestFile_NoSubjectId.json",
                 1);
@@ -91,8 +86,8 @@ public abstract class PublicZipDownloadsProcessorTests
         {
             using var pathResolver = new TestAnalyticsPathResolver();
 
-            SetupZipDownloadRequest(pathResolver, "ZipDownloadRequestFile_NoSubjectId.json");
-            SetupZipDownloadRequest(pathResolver, "ZipDownloadRequestFile_WithSubjectId.json");
+            SetupRequestFile(pathResolver, "ZipDownloadRequestFile_NoSubjectId.json");
+            SetupRequestFile(pathResolver, "ZipDownloadRequestFile_WithSubjectId.json");
 
             var service = BuildService(
                 pathResolver: pathResolver);
@@ -106,16 +101,16 @@ public abstract class PublicZipDownloadsProcessorTests
             var duckDbConnection = new DuckDbConnection();
             duckDbConnection.Open();
 
-            var zipDownloadReportRows = await ReadZipDownloadReport(duckDbConnection, zipDownloadsReport);
+            var zipDownloadReportRows = await ReadReport(duckDbConnection, zipDownloadsReport);
 
             Assert.Equal(2, zipDownloadReportRows.Count);
 
-            await AssertZipDownloadReportRow(
+            await AssertReportRow(
                 zipDownloadReportRows[0],
                 "ZipDownloadRequestFile_NoSubjectId.json",
                 1);
 
-            await AssertZipDownloadReportRow(
+            await AssertReportRow(
                 zipDownloadReportRows[1],
                 "ZipDownloadRequestFile_WithSubjectId.json",
                 1);
@@ -126,8 +121,8 @@ public abstract class PublicZipDownloadsProcessorTests
         {
             using var pathResolver = new TestAnalyticsPathResolver();
 
-            SetupZipDownloadRequest(pathResolver, "ZipDownloadRequestFile_WithSubjectId.json");
-            SetupZipDownloadRequest(pathResolver, "ZipDownloadRequestFile_WithSubjectId_Copy.json");
+            SetupRequestFile(pathResolver, "ZipDownloadRequestFile_WithSubjectId.json");
+            SetupRequestFile(pathResolver, "ZipDownloadRequestFile_WithSubjectId_Copy.json");
 
             var service = BuildService(
                 pathResolver: pathResolver);
@@ -141,17 +136,17 @@ public abstract class PublicZipDownloadsProcessorTests
             var duckDbConnection = new DuckDbConnection();
             duckDbConnection.Open();
 
-            var zipDownloadReportRows = await ReadZipDownloadReport(duckDbConnection, zipDownloadsReport);
+            var zipDownloadReportRows = await ReadReport(duckDbConnection, zipDownloadsReport);
 
             var zipDownloadReportRow = Assert.Single(zipDownloadReportRows);
 
-            await AssertZipDownloadReportRow(
+            await AssertReportRow(
                 zipDownloadReportRow,
                 "ZipDownloadRequestFile_WithSubjectId.json",
                 2);
         }
 
-        private static async Task<List<ZipDownloadReportLine>> ReadZipDownloadReport(DuckDbConnection duckDbConnection, string reportFile)
+        private static async Task<List<ZipDownloadReportLine>> ReadReport(DuckDbConnection duckDbConnection, string reportFile)
         {
             return (await duckDbConnection
                     .SqlBuilder($"SELECT * FROM read_parquet('{reportFile:raw}')")
@@ -162,14 +157,16 @@ public abstract class PublicZipDownloadsProcessorTests
     }
 
     private PublicZipDownloadsProcessor BuildService(
-        TestAnalyticsPathResolver pathResolver)
+        TestAnalyticsPathResolver pathResolver,
+        IWorkflowActor<PublicZipDownloadsProcessor>? workflowActor = null)
     {
         return new PublicZipDownloadsProcessor(
             pathResolver: pathResolver,
-            Mock.Of<ILogger<PublicZipDownloadsProcessor>>());
+            Mock.Of<ILogger<PublicZipDownloadsProcessor>>(),
+            workflowActor: workflowActor);
     }
 
-    private void SetupZipDownloadRequest(TestAnalyticsPathResolver pathResolver, string filename)
+    private void SetupRequestFile(TestAnalyticsPathResolver pathResolver, string filename)
     {
         Directory.CreateDirectory(pathResolver.PublicZipDownloadsDirectoryPath());
 
@@ -177,7 +174,7 @@ public abstract class PublicZipDownloadsProcessorTests
         File.Copy(sourceFilePath, Path.Combine(pathResolver.PublicZipDownloadsDirectoryPath(), filename));
     }
 
-    private async Task AssertZipDownloadReportRow(
+    private async Task AssertReportRow(
         ZipDownloadReportLine row,
         string jsonFileName,
         int numRequests)

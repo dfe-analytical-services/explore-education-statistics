@@ -33,12 +33,11 @@ describe('ReleaseAccessForm', () => {
 
     const roleSelect = screen.getByLabelText('Release role');
     const roles = within(roleSelect).getAllByRole('option');
-    expect(roles).toHaveLength(5);
+    expect(roles).toHaveLength(4);
     expect(roles[0]).toHaveTextContent('Approver');
     expect(roles[1]).toHaveTextContent('Contributor');
-    expect(roles[2]).toHaveTextContent('Lead');
-    expect(roles[3]).toHaveTextContent('PrereleaseViewer');
-    expect(roles[4]).toHaveTextContent('Viewer');
+    expect(roles[2]).toHaveTextContent('PrereleaseViewer');
+    expect(roles[3]).toHaveTextContent('Viewer');
 
     expect(
       screen.getByRole('button', { name: 'Add release access' }),

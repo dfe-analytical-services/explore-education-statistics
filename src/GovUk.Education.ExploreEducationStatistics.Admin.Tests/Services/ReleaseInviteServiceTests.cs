@@ -648,7 +648,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 .ForIndex(0, s => s.SetReleaseVersion(publication.Releases[0].Versions[0]))
                 .ForRange(1..4, s => s.SetReleaseVersion(publication.Releases[1].Versions[0]))
                 .ForIndex(2, s => s.SetEmail("notRemoved@test.com"))
-                .ForIndex(3, s => s.SetRole(Lead))
+                .ForIndex(3, s => s.SetRole(PrereleaseViewer))
                 .ForIndex(4, s => s.SetReleaseVersion(otherPublication.Releases[0].Versions[0]))
                 .GenerateList(5);
 

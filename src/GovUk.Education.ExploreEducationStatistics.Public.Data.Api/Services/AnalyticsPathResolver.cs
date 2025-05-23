@@ -9,7 +9,7 @@ public class AnalyticsPathResolver : IAnalyticsPathResolver
 {
     private readonly string _basePath;
 
-    public AnalyticsPathResolver(IOptions<AnalyticsOptions> options, IWebHostEnvironment environment)
+    public AnalyticsPathResolver(IOptions<AnalyticsOptions> options)
     {
         if (options.Value.BasePath.IsNullOrWhitespace())
         {
@@ -27,5 +27,10 @@ public class AnalyticsPathResolver : IAnalyticsPathResolver
     public string PublicApiQueriesDirectoryPath()
     {
         return Path.Combine(BasePath(), "public-api", "queries");
+    }
+    
+    public string PublicApiDataSetVersionCallsDirectoryPath()
+    {
+        return Path.Combine(BasePath(), "public-api", "data-set-versions");
     }
 }

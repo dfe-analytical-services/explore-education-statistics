@@ -8,6 +8,9 @@ param contentApiUrl string
 @description('The IP address ranges that can access the Search Docs Function App endpoints.')
 param functionAppFirewallRules FirewallRule[]
 
+@description('The id of the Log Analytics workspace which logs and metrics will be sent to.')
+param logAnalyticsWorkspaceId string
+
 @description('Specifies the base URL of the Search Service endpoint for interacting with the data plane REST API. For example: https://[search-service-name].search.windows.net')
 param searchServiceEndpoint string
 
@@ -188,6 +191,8 @@ module functionAppModule '../../common/components/functionApp.bicep' = {
     functionAppRuntime: 'dotnet-isolated'
     functionAppRuntimeVersion: '8.0'
     deployQueueRoleAssignment: true
+    diagnosticSettingEnabled: true
+    logAnalyticsWorkspaceId: logAnalyticsWorkspaceId
     storageAccountName: '${replace(resourcePrefix, '-', '')}${abbreviations.storageStorageAccounts}searchdocsfn'
     storageAccountPublicNetworkAccessEnabled: false
     publicNetworkAccessEnabled: true

@@ -26,7 +26,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             await AssertHandlerSucceedsWithCorrectClaims
                 <Tuple<Publication, ReleaseRole>, UpdateReleaseRoleRequirement>(
                     CreateHandler,
-                    TupleOf(new Publication(), ReleaseRole.Lead),
+                    TupleOf(new Publication(), ReleaseRole.PrereleaseViewer),
                     ManageAnyUser
                 );
         }

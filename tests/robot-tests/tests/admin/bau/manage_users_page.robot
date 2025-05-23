@@ -81,10 +81,9 @@ Check the initial manage user page
 
     user checks select contains option    name:releaseId    ${PUBLICATION_NAME} - ${RELEASE_NAME}
     user checks select contains option    name:releaseId    ${PUBLICATION_2_NAME} - ${RELEASE_2_NAME}
-    user checks select contains x options    name:releaseRole    5
+    user checks select contains x options    name:releaseRole    4
     user checks select contains option    name:releaseRole    Approver
     user checks select contains option    name:releaseRole    Contributor
-    user checks select contains option    name:releaseRole    Lead
     user checks select contains option    name:releaseRole    PrereleaseViewer
     user checks select contains option    name:releaseRole    Viewer
 

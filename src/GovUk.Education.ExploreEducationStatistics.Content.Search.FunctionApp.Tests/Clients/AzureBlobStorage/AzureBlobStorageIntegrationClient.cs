@@ -55,12 +55,12 @@ public class AzureBlobStorageIntegrationHelper
             var response = await blobClient.DeleteAsync(DeleteSnapshotsOption.IncludeSnapshots, cancellationToken: cancellationToken);
             if (response.IsError)
             {
-                throw new Exception($"Blob \"{blobName}\" could not be deleted from container \"{containerName}\". {response.ReasonPhrase}({response.Status})");
+                throw new Exception($"""Blob "{blobName}" could not be deleted from container "{containerName}". {response.ReasonPhrase}({response.Status})""");
             }
         }
         catch (Exception e)
         {
-            throw new Exception($"Blob \"{blobName}\" could not be deleted from container \"{containerName}\". {e.Message}");
+            throw new Exception($"""Blob "{blobName}" could not be deleted from container "{containerName}". {e.Message}""");
         }
     }
 }

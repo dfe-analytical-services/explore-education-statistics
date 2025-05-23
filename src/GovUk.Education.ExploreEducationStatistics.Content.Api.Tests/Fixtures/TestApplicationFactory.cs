@@ -4,6 +4,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using Microsoft.Extensions.Hosting;
 using Moq;
@@ -27,7 +28,8 @@ public sealed class TestApplicationFactory : TestApplicationFactory<Startup>
                 services
                     .UseInMemoryDbContext<ContentDbContext>()
                     .UseInMemoryDbContext<StatisticsDbContext>()
-                    .ReplaceService(new Mock<IPublicBlobStorageService>());
+                    .ReplaceService(new Mock<IPublicBlobStorageService>())
+                    .ReplaceService(new Mock<IAnalyticsPathResolver>());
             });
     }
 }

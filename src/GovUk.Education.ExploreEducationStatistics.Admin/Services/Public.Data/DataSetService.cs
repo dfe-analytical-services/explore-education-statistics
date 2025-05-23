@@ -263,7 +263,7 @@ internal class DataSetService(
         };
     }
 
-    private async Task<MappingStatusViewModel?> GetMappingStatus(
+    public async Task<MappingStatusViewModel?> GetMappingStatus(
         Guid nextDataSetVersionId,
         CancellationToken cancellationToken)
     {

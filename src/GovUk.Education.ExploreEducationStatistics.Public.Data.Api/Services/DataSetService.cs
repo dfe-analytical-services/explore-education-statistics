@@ -1,8 +1,10 @@
+using System.Net.Mime;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Model;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Requests;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Security.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.ViewModels;
@@ -13,14 +15,15 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.Services.Interfaces
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Utils;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using System.Net.Mime;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services;
 
 internal class DataSetService(
     PublicDataDbContext publicDataDbContext,
     IDataSetVersionPathResolver dataSetVersionPathResolver,
-    IUserService userService)
+    IUserService userService,
+    IAnalyticsService analyticsService,
+    ILogger<DataSetService> logger)
     : IDataSetService
 {
     public async Task<Either<ActionResult, DataSetViewModel>> GetDataSet(
@@ -45,6 +48,11 @@ internal class DataSetService(
                 dataSetVersion: dataSetVersion,
                 cancellationToken: cancellationToken)
             .OnSuccessDo(userService.CheckCanViewDataSetVersion)
+            .OnSuccessDo(dsv => CaptureDataSetVersionCallForAnalytics(
+                dataSetVersionId: dsv.Id, 
+                dataSetVersion: dataSetVersion,
+                type: DataSetVersionCallType.DownloadCsv,
+                cancellationToken: cancellationToken))
             .OnSuccess(DownloadDataSetVersionToStream);
     }
 
@@ -52,7 +60,7 @@ internal class DataSetService(
     {
         var csvDataPath = dataSetVersionPathResolver.CsvDataPath(dataSetVersion);
 
-        var fileStream = new FileStream(csvDataPath, FileMode.Open, FileAccess.Read, FileShare.Read); 
+        var fileStream = new FileStream(csvDataPath, FileMode.Open, FileAccess.Read, FileShare.Read);
 
         return new FileStreamResult(fileStream, MediaTypeNames.Text.Csv)
         {
@@ -134,6 +142,14 @@ internal class DataSetService(
                 dataSetVersion: dataSetVersion,
                 cancellationToken: cancellationToken)
             .OnSuccessDo(userService.CheckCanViewDataSetVersion)
+            .OnSuccessDo(dsv => CaptureDataSetVersionCallForAnalytics(
+                dataSetVersionId: dsv.Id, 
+                dataSetVersion: dataSetVersion,
+                type: DataSetVersionCallType.GetMetadata,
+                parameters: types != null 
+                    ? new GetMetadataAnalyticsParameters(types)
+                    : null,
+                cancellationToken: cancellationToken))
             .OnSuccessDo(dsv => LoadMeta(dsv, types, cancellationToken))
             .OnSuccess(MapVersionMeta);
     }
@@ -263,11 +279,11 @@ internal class DataSetService(
                     version: dataSetVersion,
                     cancellationToken: cancellationToken)
             : await publicDataDbContext.DataSetVersions
-            .AsNoTracking()
-            .FindByVersion(
-                dataSetId: dataSetId,
-                version: dataSetVersion,
-                cancellationToken: cancellationToken);
+                .AsNoTracking()
+                .FindByVersion(
+                    dataSetId: dataSetId,
+                    version: dataSetVersion,
+                    cancellationToken: cancellationToken);
     }
 
     private async Task LoadMeta(
@@ -353,6 +369,32 @@ internal class DataSetService(
             Locations = locations,
             TimePeriods = timePeriods,
         };
+    }
+
+    private async Task CaptureDataSetVersionCallForAnalytics(
+        Guid dataSetVersionId,
+        string? dataSetVersion,
+        DataSetVersionCallType type,
+        object? parameters = null,
+        CancellationToken cancellationToken = default) 
+    {
+        try
+        {
+            await analyticsService.CaptureDataSetVersionCall(
+                dataSetVersionId: dataSetVersionId,
+                type: type,
+                requestedDataSetVersion: dataSetVersion,
+                parameters: parameters,
+                cancellationToken: cancellationToken);
+        }
+        catch (Exception e)
+        {
+            logger.LogError(
+                exception: e,
+                message: """Error whilst capturing analytics for "{Type}" call for DataSetVersion {Id}""",
+                type,
+                dataSetVersionId);
+        }
     }
 
     private static FilterOptionsViewModel MapFilterOptions(FilterMeta filterMeta)

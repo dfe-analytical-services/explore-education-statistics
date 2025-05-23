@@ -18,16 +18,14 @@ public class AuthorizationHandlerService
 {
     private static readonly ReleaseRole[] ReleaseEditorRoles =
     {
-        ReleaseRole.Contributor,
-        ReleaseRole.Lead
+        ReleaseRole.Contributor
     };
 
     public static readonly ReleaseRole[] UnrestrictedReleaseViewerRoles =
     {
         ReleaseRole.Viewer,
         ReleaseRole.Contributor,
-        ReleaseRole.Approver,
-        ReleaseRole.Lead
+        ReleaseRole.Approver
     };
 
     public static readonly List<ReleaseRole> ReleaseEditorAndApproverRoles =

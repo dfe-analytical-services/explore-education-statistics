@@ -1,0 +1,15 @@
+﻿{
+  "dataSetId": "01d29401-7274-a871-a8db-d4bc4e98c324",
+  "dataSetTitle": "Data Set 1",
+  "dataSetVersion": "1.2.0",
+  "dataSetVersionId": "01d29401-7974-1276-a06b-b28a6a5385c6",
+  "previewToken": {
+    "created": "2025-02-23T11:02:44.850Z",
+    "dataSetVersionId": "01d29401-7974-1276-a06b-b28a6a5385c6",
+    "expiry": "2025-02-24T11:02:44.850Z",
+    "label": "Preview token content"
+  },
+  "requestedDataSetVersion": "1.*",
+  "startTime": "2025-02-26T03:07:44.850Z",
+  "type": "DownloadCsv"
+}

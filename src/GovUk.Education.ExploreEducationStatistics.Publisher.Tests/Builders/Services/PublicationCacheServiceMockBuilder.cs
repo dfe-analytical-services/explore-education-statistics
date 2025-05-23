@@ -26,5 +26,10 @@ public class PublicationCacheServiceMockBuilder
         {
             mock.Verify(m => m.UpdatePublication(publicationSlug), Times.Once);
         }
+
+        public void PublicationNotUpdated(string publicationSlug)
+        {
+            mock.Verify(m => m.UpdatePublication(publicationSlug), Times.Never);
+        }
     }
 }

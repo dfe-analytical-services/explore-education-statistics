@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Azure.Data.Tables;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Options;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
@@ -11,6 +12,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Options;
 using Xunit;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Tests;
@@ -90,6 +92,12 @@ public abstract class FunctionsIntegrationTest<TFunctionsIntegrationTestFixture>
     protected TService GetRequiredService<TService>()
     {
         return _host.Services.GetRequiredService<TService>();
+    }
+
+    protected void SetDataSetVersionReplacementFeatureFlag(bool flag)
+    {
+        var options = GetRequiredService<IOptions<FeatureFlags>>().Value;
+        options.EnableReplacementOfPublicApiDataSets = flag;
     }
 }
 

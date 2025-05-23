@@ -9,6 +9,11 @@ public interface IAnalyticsPathResolver
 
     string PublicApiQueriesReportsDirectoryPath();
     
+    // PublicApiDataSetCalls
+    string PublicApiDataSetCallsDirectoryPath();
+
+    string PublicApiDataSetCallsReportsDirectoryPath();
+    
     // PublicApiDataSetVersionCalls
     string PublicApiDataSetVersionCallsDirectoryPath();
 

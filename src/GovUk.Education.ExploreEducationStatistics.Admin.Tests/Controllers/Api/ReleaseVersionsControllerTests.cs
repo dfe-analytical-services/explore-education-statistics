@@ -9,6 +9,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
@@ -20,9 +21,13 @@ using Microsoft.EntityFrameworkCore;
 using Moq;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Net.Http.Json;
+using System.Net.Mime;
+using System.Reflection;
 using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
@@ -39,11 +44,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
     public class ReleaseVersionsControllerUnitTests
     {
         private readonly Guid _releaseVersionId = Guid.NewGuid();
-        private readonly Guid _publicationId = Guid.NewGuid();
 
         [Fact]
         public async Task UploadDataSet_Success()
         {
+            // Arrange
             var dataFile = MockFile("datafile.csv");
             var metaFile = MockFile("metafile.csv");
 
@@ -60,18 +65,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                     dataFile,
                     metaFile,
                     "Data set title",
-                    null))
+                    null,
+                    default))
                 .ReturnsAsync(dataFileInfo);
 
-            // Call the method under test
+            // Act
             var controller = BuildController(releaseDataFileService: releaseDataFileService.Object);
 
-            var result = await controller.UploadDataSet(releaseVersionId: _releaseVersionId,
-                replacingFileId: null,
-                title: "Data set title",
-                file: dataFile,
-                metaFile: metaFile);
+            var result = await controller.UploadDataSet(
+                new()
+                {
+                    ReleaseVersionId = _releaseVersionId,
+                    Title = "Data set title",
+                    DataFile = dataFile,
+                    MetaFile = metaFile,
+                    ReplacingFileId = null
+                },
+                cancellationToken: default);
 
+            // Assert
             VerifyAllMocks(releaseDataFileService);
 
             var dataFileInfoResult = result.AssertOkResult();
@@ -79,8 +91,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         }
 
         [Fact]
-        public async Task UploadDataSet_Fail_ValidationProblem()
+        public async Task UploadDataSet_InvalidRequest_ReturnsValidationProblems()
         {
+            // Arrange
             var dataFile = MockFile("datafile.csv");
             var metaFile = MockFile("metafile.csv");
 
@@ -90,18 +103,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                     dataFile,
                     metaFile,
                     "Data set title",
-                    null))
+                    null,
+                    default))
                 .ReturnsAsync(ValidationActionResult(CannotOverwriteFile));
 
             var controller = BuildController(releaseDataFileService: releaseDataFileService.Object);
 
-            // Call the method under test
-            var result = await controller.UploadDataSet(releaseVersionId: _releaseVersionId,
-                replacingFileId: null,
-                title: "Data set title",
-                file: dataFile,
-                metaFile: metaFile);
+            // Act
+            var result = await controller.UploadDataSet(
+                new()
+                {
+                    ReleaseVersionId = _releaseVersionId,
+                    Title = "Data set title",
+                    DataFile = dataFile,
+                    MetaFile = metaFile,
+                    ReplacingFileId = null
+                },
+                cancellationToken: default);
 
+            // Assert
             VerifyAllMocks(releaseDataFileService);
 
             result.AssertValidationProblem(CannotOverwriteFile);
@@ -110,6 +130,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         [Fact]
         public async Task GetDataFileInfo_Returns_A_List_Of_Files()
         {
+            // Arrange
             var testFiles = new List<DataFileInfo>
             {
                 new()
@@ -134,8 +155,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
 
             var controller = BuildController(releaseDataFileService: releaseDataFileService.Object);
 
-            // Call the method under test
+            // Act
             var result = await controller.GetDataFileInfo(_releaseVersionId);
+
+            // Assert
             VerifyAllMocks(releaseDataFileService);
 
             var unboxed = result.AssertOkResult();
@@ -146,6 +169,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         [Fact]
         public async Task DeleteDataFiles_Success()
         {
+            // Arrange
             var releaseVersionService = new Mock<IReleaseVersionService>(Strict);
 
             var fileId = Guid.NewGuid();
@@ -156,8 +180,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
 
             var controller = BuildController(releaseVersionService: releaseVersionService.Object);
 
+            // Act
             var result = await controller.DeleteDataFiles(releaseVersionId: _releaseVersionId,
                 fileId: fileId);
+
+            // Assert
             VerifyAllMocks(releaseVersionService);
 
             Assert.IsAssignableFrom<NoContentResult>(result);
@@ -166,6 +193,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         [Fact]
         public async Task DeleteDataFiles_Fail_UnableToFindMetaFileToDelete()
         {
+            // Arrange
             var releaseVersionService = new Mock<IReleaseVersionService>(Strict);
 
             var fileId = Guid.NewGuid();
@@ -176,8 +204,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
 
             var controller = BuildController(releaseVersionService: releaseVersionService.Object);
 
+            // Act
             var result = await controller.DeleteDataFiles(releaseVersionId: _releaseVersionId,
                 fileId: fileId);
+
+            // Assert
             VerifyAllMocks(releaseVersionService);
 
             result.AssertValidationProblem(UnableToFindMetadataFileToDelete);
@@ -186,6 +217,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         [Fact]
         public async Task UpdateReleaseVersion_Returns_Ok()
         {
+            // Arrange
             var releaseVersionService = new Mock<IReleaseVersionService>(Strict);
 
             releaseVersionService
@@ -197,8 +229,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
 
             var controller = BuildController(releaseVersionService: releaseVersionService.Object);
 
-            // Method under test
+            // Act
             var result = await controller.UpdateReleaseVersion(new ReleaseVersionUpdateRequest(), _releaseVersionId);
+
+            // Assert
             VerifyAllMocks(releaseVersionService);
 
             var unboxed = result.AssertOkResult();
@@ -208,6 +242,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         [Fact]
         public async Task GetTemplateRelease_Returns_Ok()
         {
+            // Arrange
             var releaseVersionService = new Mock<IReleaseVersionService>(Strict);
 
             var templateReleaseResult =
@@ -219,8 +254,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
 
             var controller = BuildController(releaseVersionService.Object);
 
-            // Method under test
+            // Act
             var result = await controller.GetTemplateRelease(_releaseVersionId);
+
+            // Assert
             VerifyAllMocks(releaseVersionService);
 
             result.AssertOkResult();
@@ -229,6 +266,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         [Fact]
         public async Task CancelFileImport()
         {
+            // Arrange
             var importService = new Mock<IDataImportService>(Strict);
 
             var fileId = Guid.NewGuid();
@@ -239,8 +277,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
 
             var controller = BuildController(importService: importService.Object);
 
+            // Act
             var result = await controller.CancelFileImport(releaseVersionId: _releaseVersionId,
                 fileId: fileId);
+
+            // Assert
             VerifyAllMocks(importService);
 
             result.AssertAccepted();
@@ -249,6 +290,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         [Fact]
         public async Task CancelFileImport_Fail_Forbidden()
         {
+            // Arrange
             var importService = new Mock<IDataImportService>(Strict);
 
             var fileId = Guid.NewGuid();
@@ -259,8 +301,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
 
             var controller = BuildController(importService: importService.Object);
 
-            var result = await controller.CancelFileImport(releaseVersionId: _releaseVersionId,
+            // Act
+            var result = await controller.CancelFileImport(
+                releaseVersionId: _releaseVersionId,
                 fileId: fileId);
+
+            // Assert
             VerifyAllMocks(importService);
 
             result.AssertForbidden();
@@ -269,6 +315,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         [Fact]
         public async Task GetDeleteDataFilePlan()
         {
+            // Arrange
             var releaseVersionService = new Mock<IReleaseVersionService>(Strict);
 
             var fileId = Guid.NewGuid();
@@ -281,8 +328,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
 
             var controller = BuildController(releaseVersionService: releaseVersionService.Object);
 
-            var result = await controller.GetDeleteDataFilePlan(releaseVersionId: _releaseVersionId,
+            // Act
+            var result = await controller.GetDeleteDataFilePlan(
+                releaseVersionId: _releaseVersionId,
                 fileId: fileId);
+
+            // Assert
             VerifyAllMocks(releaseVersionService);
 
             result.AssertOkResult(deleteDataFilePlan);
@@ -291,6 +342,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         [Fact]
         public async Task GetDeleteReleaseVersionPlan()
         {
+            // Arrange
             var releaseVersionService = new Mock<IReleaseVersionService>(Strict);
 
             var deleteReleasePlan = new DeleteReleasePlanViewModel();
@@ -301,7 +353,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
 
             var controller = BuildController(releaseVersionService: releaseVersionService.Object);
 
+            // Act
             var result = await controller.GetDeleteReleaseVersionPlan(_releaseVersionId, It.IsAny<CancellationToken>());
+
+            // Assert
             VerifyAllMocks(releaseVersionService);
 
             result.AssertOkResult(deleteReleasePlan);
@@ -310,6 +365,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         [Fact]
         public async Task DeleteReleaseVersion_Returns_NoContent()
         {
+            // Arrange
             var releaseVersionService = new Mock<IReleaseVersionService>(Strict);
 
             releaseVersionService
@@ -318,7 +374,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
 
             var controller = BuildController(releaseVersionService: releaseVersionService.Object);
 
+            // Act
             var result = await controller.DeleteReleaseVersion(_releaseVersionId, default);
+
+            // Assert
             VerifyAllMocks(releaseVersionService);
 
             Assert.IsAssignableFrom<NoContentResult>(result);
@@ -327,6 +386,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         [Fact]
         public async Task DeleteReleaseVersion_Returns_NotFound()
         {
+            // Arrange
             var releaseVersionService = new Mock<IReleaseVersionService>(Strict);
 
             releaseVersionService
@@ -335,7 +395,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
 
             var controller = BuildController(releaseVersionService: releaseVersionService.Object);
 
+            // Act
             var result = await controller.DeleteReleaseVersion(_releaseVersionId, default);
+
+            // Assert
             VerifyAllMocks(releaseVersionService);
 
             result.AssertNotFoundResult();
@@ -344,6 +407,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         [Fact]
         public async Task DeleteReleaseVersion_Returns_ValidationProblem()
         {
+            // Arrange
             var releaseVersionService = new Mock<IReleaseVersionService>(Strict);
 
             releaseVersionService
@@ -356,7 +420,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
 
             var controller = BuildController(releaseVersionService: releaseVersionService.Object);
 
+            // Act
             var result = await controller.DeleteReleaseVersion(_releaseVersionId, default);
+
+            // Assert
             VerifyAllMocks(releaseVersionService);
 
             var validationProblem = result.AssertBadRequestWithValidationProblem();
@@ -369,6 +436,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         [Fact]
         public async Task CreateReleaseStatus()
         {
+            // Arrange
             var releaseApprovalService = new Mock<IReleaseApprovalService>(Strict);
             var releaseVersionService = new Mock<IReleaseVersionService>(Strict);
 
@@ -387,8 +455,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                 releaseApprovalService: releaseApprovalService.Object,
                 releaseVersionService: releaseVersionService.Object);
 
-            // Call the method under test
+            // Act
             var result = await controller.CreateReleaseStatus(request, _releaseVersionId);
+
+            // Assert
             VerifyAllMocks(releaseApprovalService, releaseVersionService);
 
             result.AssertOkResult(returnedReleaseViewModel);
@@ -397,6 +467,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         [Fact]
         public async Task ListReleasesForApproval()
         {
+            // Arrange
             var releases = ListOf(new ReleaseVersionSummaryViewModel
             {
                 Id = Guid.NewGuid()
@@ -411,7 +482,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             var controller = BuildController(
                 releaseVersionService: releaseVersionService.Object);
 
+            // Act
             var result = await controller.ListUsersReleasesForApproval();
+
+            // Assert
             VerifyAllMocks(releaseVersionService);
 
             result.AssertOkResult(releases);
@@ -420,6 +494,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         [Fact]
         public async Task CreateReleaseAmendment()
         {
+            // Arrange
             var originalReleaseVersionId = Guid.NewGuid();
 
             var amendmentCreatedResponse = new IdViewModel(Guid.NewGuid());
@@ -433,22 +508,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             var controller = BuildController(
                 releaseAmendmentService: releaseAmendmentService.Object);
 
+            // Act
             var result = await controller.CreateReleaseAmendment(originalReleaseVersionId);
+
+            // Assert
             VerifyAllMocks(releaseAmendmentService);
 
             result.AssertOkResult(amendmentCreatedResponse);
         }
 
         [Fact]
-        public async Task UploadBulkZipDataSetsToTempStorage()
+        public async Task UploadDataSetAsBulkZip()
         {
             // Arrange
-            var dataSetFiles = new List<ArchiveDataSetFileViewModel>();
+            var dataSetFiles = new List<ZipDataSetFileViewModel>();
 
             var releaseDataFileService = new Mock<IReleaseDataFileService>(Strict);
 
             releaseDataFileService
-                .Setup(s => s.ValidateAndUploadBulkZip(
+                .Setup(s => s.UploadFromBulkZip(
                     It.IsAny<Guid>(),
                     It.IsAny<IFormFile>(),
                     default))
@@ -457,9 +535,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             var controller = BuildController(releaseDataFileService: releaseDataFileService.Object);
 
             // Act
-            var result = await controller.UploadBulkZipDataSetsToTempStorage(
-                Guid.NewGuid(),
-                MockFile("bulk.zip"),
+            var result = await controller.UploadDataSetAsBulkZip(
+                new()
+                {
+                    ReleaseVersionId = Guid.NewGuid(),
+                    ZipFile = MockFile("bulk.zip")
+                },
                 default);
 
             // Assert
@@ -477,9 +558,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                 new() { FileName = "one.csv", Name = "Data set title", Size = "1024" },
             };
 
-            var importRequests = new List<ArchiveDataSetFileViewModel>
+            var importRequests = new List<ZipDataSetFileViewModel>
             {
-                new(){ DataFileId = Guid.NewGuid(), MetaFileId = Guid.NewGuid(), Title = "Data set title", DataFilename = "one.csv", MetaFilename = "one.meta.csv", DataFileSize = 1024, MetaFileSize = 128 }
+                new(){ DataFileId = Guid.NewGuid(), MetaFileId = Guid.NewGuid(), Title = "Data set title", DataFileName = "one.csv", MetaFileName = "one.meta.csv", DataFileSize = 1024, MetaFileSize = 128 }
             };
 
             var releaseDataFileService = new Mock<IReleaseDataFileService>(Strict);
@@ -487,7 +568,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             releaseDataFileService
                 .Setup(s => s.SaveDataSetsFromTemporaryBlobStorage(
                     It.IsAny<Guid>(),
-                    It.IsAny<List<ArchiveDataSetFileViewModel>>(),
+                    It.IsAny<List<ZipDataSetFileViewModel>>(),
                     default))
                 .ReturnsAsync(dataFileInfo);
 
@@ -495,9 +576,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
 
             // Act
             var result = await controller.ImportBulkZipDataSetsFromTempStorage(
-                Guid.NewGuid(),
-                importRequests,
-                default);
+                releaseVersionId: Guid.NewGuid(),
+                dataSetFiles: importRequests,
+                cancellationToken: default);
 
             // Assert
             VerifyAllMocks(releaseDataFileService);
@@ -537,11 +618,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
 
     public abstract class ReleaseVersionsControllerIntegrationTests(TestApplicationFactory testApp) : IntegrationTestFixture(testApp)
     {
+        public override async Task InitializeAsync() => await InitializeWithAzurite();
+
+        private WebApplicationFactory<TestStartup> BuildApp(
+                ClaimsPrincipal? user = null)
+        {
+            return WithAzurite(
+                testApp: TestApp.SetUser(user ?? DataFixture.BauUser()),
+                enabled: true);
+        }
+
         public class UpdateReleaseTests(TestApplicationFactory testApp) : ReleaseVersionsControllerIntegrationTests(testApp)
         {
             [Fact]
             public async Task Success()
             {
+                // Arrange
                 Publication publication = DataFixture.DefaultPublication()
                     .WithReleases(
                         [
@@ -560,6 +652,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                 var newPreReleaseAccessList = "new-list";
                 var expectedNewSlug = "2021-22-q1-initial";
 
+                // Act
                 var response = await UpdateRelease(
                     releaseVersionId: publication.Releases[0].Versions[0].Id,
                     year: newYear,
@@ -567,14 +660,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                     label: newLabel,
                     preReleaseAccessList: newPreReleaseAccessList);
 
+                // Assert
                 var viewModel = response.AssertOk<ReleaseVersionViewModel>();
 
                 var contentDbContext = TestApp.GetDbContext<ContentDbContext>();
 
-                var updatedPublication = contentDbContext.Publications
+                var updatedPublication = await contentDbContext.Publications
                     .Include(p => p.Releases)
                     .ThenInclude(r => r.Versions)
-                    .Single(p => p.Id == publication.Id);
+                    .SingleAsync(p => p.Id == publication.Id);
 
                 Assert.Equal(publication.Id, viewModel.PublicationId);
                 Assert.Equal(newYear, viewModel.Year);
@@ -589,7 +683,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                 Assert.Equal(expectedNewSlug, release.Slug);
 
                 var releaseVersion = Assert.Single(release.Versions);
-                Assert.Equal(publication.Id, releaseVersion.PublicationId);
+                Assert.Equal(publication.Id, releaseVersion.Release.PublicationId);
                 Assert.Equal(release.Id, releaseVersion.ReleaseId);
 
                 var releaseSeriesItem = Assert.Single(updatedPublication.ReleaseSeries);
@@ -612,6 +706,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                 string? expectedNewLabel,
                 string expectedNewSlug)
             {
+                // Arrange
                 Publication publication = DataFixture.DefaultPublication()
                     .WithReleases(
                         [
@@ -624,20 +719,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                 await TestApp.AddTestData<ContentDbContext>(
                     context => context.Publications.Add(publication));
 
+                // Act
                 var response = await UpdateRelease(
                     releaseVersionId: publication.Releases[0].Versions[0].Id,
                     year: 2020,
                     timePeriodCoverage: TimeIdentifier.AcademicYear,
                     label: newLabel);
 
+                // Assert
                 var viewModel = response.AssertOk<ReleaseVersionViewModel>();
 
                 var contentDbContext = TestApp.GetDbContext<ContentDbContext>();
 
-                var updatedPublication = contentDbContext.Publications
+                var updatedPublication = await contentDbContext.Publications
                     .Include(p => p.Releases)
                     .ThenInclude(r => r.Versions)
-                    .Single(p => p.Id == publication.Id);
+                    .SingleAsync(p => p.Id == publication.Id);
 
                 Assert.Equal(expectedNewSlug, viewModel.Slug);
 
@@ -649,6 +746,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             [Fact]
             public async Task ReleaseVersionNotFirstVersion_YearChanged()
             {
+                // Arrange
                 Publication publication = DataFixture.DefaultPublication()
                     .WithReleases(
                         DataFixture
@@ -661,12 +759,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                 await TestApp.AddTestData<ContentDbContext>(
                     context => context.Publications.Add(publication));
 
+                // Act
                 var response = await UpdateRelease(
                     releaseVersionId: publication.Releases[0].Versions[1].Id,
                     year: 2021,
                     timePeriodCoverage: TimeIdentifier.AcademicYear,
                     label: null);
 
+                // Assert
                 var validationProblem = response.AssertValidationProblem();
 
                 var error = Assert.Single(validationProblem.Errors);
@@ -677,6 +777,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             [Fact]
             public async Task ReleaseVersionNotFirstVersion_TimePeriodCoverageChanged()
             {
+                // Arrange
                 Publication publication = DataFixture.DefaultPublication()
                     .WithReleases(
                         DataFixture
@@ -689,12 +790,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                 await TestApp.AddTestData<ContentDbContext>(
                     context => context.Publications.Add(publication));
 
+                // Act
                 var response = await UpdateRelease(
                     releaseVersionId: publication.Releases[0].Versions[1].Id,
                     year: 2020,
                     timePeriodCoverage: TimeIdentifier.AcademicYearQ1,
                     label: null);
 
+                // Assert
                 var validationProblem = response.AssertValidationProblem();
 
                 var error = Assert.Single(validationProblem.Errors);
@@ -705,6 +808,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             [Fact]
             public async Task ReleaseVersionNotFirstVersion_LabelChanged()
             {
+                // Arrange
                 Publication publication = DataFixture.DefaultPublication()
                     .WithReleases(
                         DataFixture
@@ -717,12 +821,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                 await TestApp.AddTestData<ContentDbContext>(
                     context => context.Publications.Add(publication));
 
+                // Act
                 var response = await UpdateRelease(
                     releaseVersionId: publication.Releases[0].Versions[1].Id,
                     year: 2020,
                     timePeriodCoverage: TimeIdentifier.AcademicYear,
                     label: "initial");
 
+                // Assert
                 var validationProblem = response.AssertValidationProblem();
 
                 var error = Assert.Single(validationProblem.Errors);
@@ -733,6 +839,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             [Fact]
             public async Task ReleaseVersionIsPublished()
             {
+                // Arrange
                 Publication publication = DataFixture.DefaultPublication()
                     .WithReleases([
                         DataFixture
@@ -742,30 +849,35 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                 await TestApp.AddTestData<ContentDbContext>(
                     context => context.Publications.Add(publication));
 
+                // Act
                 var response = await UpdateRelease(
                     releaseVersionId: publication.Releases[0].Versions[0].Id,
                     year: 2020,
                     timePeriodCoverage: TimeIdentifier.AcademicYear,
                     label: null);
 
+                // Assert
                 response.AssertForbidden();
             }
 
             [Fact]
             public async Task ReleaseVersionNotFound()
             {
+                // Act
                 var response = await UpdateRelease(
                     releaseVersionId: Guid.NewGuid(),
                     year: 2020,
                     timePeriodCoverage: TimeIdentifier.AcademicYear,
                     label: null);
 
+                // Assert
                 response.AssertNotFound();
             }
 
             [Fact]
             public async Task UserDoesNotHavePermission()
             {
+                // Arrange
                 Publication publication = DataFixture.DefaultPublication()
                     .WithReleases([
                         DataFixture
@@ -777,6 +889,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
 
                 var client = BuildApp(DataFixture.AuthenticatedUser()).CreateClient();
 
+                // Act
                 var response = await UpdateRelease(
                     releaseVersionId: publication.Releases[0].Versions[0].Id,
                     year: 2020,
@@ -784,12 +897,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                     label: null,
                     client: client);
 
+                // Assert
                 response.AssertForbidden();
             }
 
             [Fact]
             public async Task ReleaseTypeInvalid()
             {
+                // Arrange
                 Publication publication = DataFixture.DefaultPublication()
                     .WithReleases([
                         DataFixture
@@ -799,6 +914,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                 await TestApp.AddTestData<ContentDbContext>(
                     context => context.Publications.Add(publication));
 
+                // Act
                 var response = await UpdateRelease(
                     releaseVersionId: publication.Releases[0].Versions[0].Id,
                     year: 2020,
@@ -806,6 +922,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                     label: null,
                     type: ReleaseType.ExperimentalStatistics);
 
+                // Assert
                 var validationProblem = response.AssertValidationProblem();
 
                 var error = Assert.Single(validationProblem.Errors);
@@ -828,6 +945,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                 string? label,
                 string existingReleaseSlug)
             {
+                // Arrange
                 Publication publication = DataFixture.DefaultPublication()
                     .WithReleases(
                         DataFixture
@@ -839,12 +957,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                 await TestApp.AddTestData<ContentDbContext>(
                     context => context.Publications.Add(publication));
 
+                // Act
                 var response = await UpdateRelease(
                     releaseVersionId: publication.Releases[0].Versions[0].Id,
                     year: year,
                     timePeriodCoverage: timePeriodCoverage,
                     label: label);
 
+                // Assert
                 var validationProblem = response.AssertValidationProblem();
 
                 var error = Assert.Single(validationProblem.Errors);
@@ -925,6 +1045,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             [Fact]
             public async Task LabelOver50Characters()
             {
+                // Arrange
                 Publication publication = DataFixture.DefaultPublication()
                     .WithReleases([
                             DataFixture
@@ -934,24 +1055,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                 await TestApp.AddTestData<ContentDbContext>(
                     context => context.Publications.Add(publication));
 
+                // Act
                 var response = await UpdateRelease(
                     releaseVersionId: publication.Releases[0].Versions[0].Id,
                     year: 2020,
                     timePeriodCoverage: TimeIdentifier.AcademicYear,
                     label: new string('a', 51));
 
+                // Assert
                 var validationProblem = response.AssertValidationProblem();
 
                 var error = Assert.Single(validationProblem.Errors);
 
                 Assert.Equal($"The field {nameof(ReleaseCreateRequest.Label)} must be a string or array type with a maximum length of '50'.", error.Message);
                 Assert.Equal(nameof(ReleaseCreateRequest.Label), error.Path);
-            }
-
-            private WebApplicationFactory<TestStartup> BuildApp(
-                ClaimsPrincipal? user = null)
-            {
-                return TestApp.SetUser(user ?? DataFixture.BauUser());
             }
 
             private async Task<HttpResponseMessage> UpdateRelease(
@@ -975,6 +1092,366 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                 };
 
                 return await client.PatchAsJsonAsync($"api/releaseVersions/{releaseVersionId}", request);
+            }
+        }
+
+        public class UploadDataSetTests(TestApplicationFactory testApp) : ReleaseVersionsControllerIntegrationTests(testApp)
+        {
+            [Fact]
+            public async Task UploadDataSet_InvalidRequest_ReturnsValidationProblems()
+            {
+                // Act
+                var response = await UploadDataSet(
+                    releaseVersionId: Guid.Empty,
+                    dataSetTitle: "",
+                    dataFileName: "",
+                    metaFileName: "");
+
+                // Assert
+                var validationProblem = response.AssertValidationProblem();
+
+                Assert.Equal("Must not be empty.", validationProblem.Errors[0].Message);
+                Assert.Equal("Data set title cannot be empty", validationProblem.Errors[1].Message);
+                Assert.Equal("File 'Data File' either empty or not found.", validationProblem.Errors[2].Message);
+                Assert.Equal("File 'Meta File' either empty or not found.", validationProblem.Errors[3].Message);
+            }
+
+            [Fact]
+            public async Task UploadDataSet_ValidRequest_ReturnsViewModel()
+            {
+                // Arrange
+                Publication publication = DataFixture.DefaultPublication()
+                    .WithReleases(
+                        [
+                            DataFixture
+                                .DefaultRelease(publishedVersions: 0, draftVersion: true, year: 2020)
+                                .WithTimePeriodCoverage(TimeIdentifier.AcademicYear)
+                                .WithLabel(null)
+                        ]);
+
+                await TestApp.AddTestData<ContentDbContext>(context => context.Publications.Add(publication));
+
+                // Act
+                var response = await UploadDataSet(
+                    releaseVersionId: publication.Releases[0].Versions[0].Id,
+                    dataSetTitle: "Test title",
+                    dataFileName: "test-data.csv",
+                    metaFileName: "test-data.meta.csv");
+
+                // Assert
+                var viewModel = response.AssertOk<DataFileInfo>();
+
+                Assert.Equal("Test title", viewModel.Name);
+                Assert.Equal("test-data.csv", viewModel.FileName);
+                Assert.Equal("test-data.meta.csv", viewModel.MetaFileName);
+                Assert.NotNull(viewModel.Id);
+                Assert.NotNull(viewModel.MetaFileId);
+                Assert.Equal("csv", viewModel.Extension);
+                Assert.Equal("434 B", viewModel.Size);
+                Assert.Equal(DataImportStatus.QUEUED, viewModel.Status);
+                Assert.Equal(FileType.Data, viewModel.Type);
+            }
+
+            [Fact]
+            public async Task UploadDataSetAsZip_ValidRequest_ReturnsDataFileInfo()
+            {
+                // Arrange
+                Publication publication = DataFixture.DefaultPublication()
+                    .WithReleases(
+                        [
+                            DataFixture
+                                .DefaultRelease(publishedVersions: 0, draftVersion: true, year: 2020)
+                                .WithTimePeriodCoverage(TimeIdentifier.AcademicYear)
+                                .WithLabel(null)
+                        ]);
+
+                await TestApp.AddTestData<ContentDbContext>(context => context.Publications.Add(publication));
+
+                // Act
+                var response = await UploadDataSetAsZip(
+                    releaseVersionId: publication.Releases[0].Versions[0].Id,
+                    dataSetTitle: "Test title",
+                    fileName: "data-zip-valid.zip");
+
+                // Assert
+                var dataFileInfo = response.AssertOk<DataFileInfo>();
+
+                Assert.Equal("Test title", dataFileInfo.Name);
+                Assert.Equal("csvfile.csv", dataFileInfo.FileName);
+                Assert.Equal("csvfile.meta.csv", dataFileInfo.MetaFileName);
+                Assert.Equal(DataImportStatus.QUEUED, dataFileInfo.Status);
+                Assert.Equal(FileType.Data, dataFileInfo.Type);
+            }
+
+            [Fact]
+            public async Task UploadDataSetAsZip_InvalidRequest_ReturnsValidationProblems()
+            {
+                // Act
+                var response = await UploadDataSetAsZip(
+                    releaseVersionId: Guid.Empty,
+                    dataSetTitle: "",
+                    fileName: "");
+
+                // Assert
+                var validationProblem = response.AssertValidationProblem();
+
+                Assert.Equal("Must not be empty.", validationProblem.Errors[0].Message);
+                Assert.Equal("Data set title cannot be empty", validationProblem.Errors[1].Message);
+                Assert.Equal("File 'Zip File' either empty or not found.", validationProblem.Errors[2].Message);
+            }
+
+            [Fact]
+            public async Task UploadDataSetAsBulkZip_ValidRequest_ReturnsViewModel()
+            {
+                // Arrange
+                Publication publication = DataFixture.DefaultPublication()
+                    .WithReleases(
+                        [
+                            DataFixture
+                                .DefaultRelease(publishedVersions: 0, draftVersion: true, year: 2020)
+                                .WithTimePeriodCoverage(TimeIdentifier.AcademicYear)
+                                .WithLabel(null)
+                        ]);
+
+                await TestApp.AddTestData<ContentDbContext>(context => context.Publications.Add(publication));
+
+                // Act
+                var response = await UploadDataSetAsBulkZip(
+                    releaseVersionId: publication.Releases[0].Versions[0].Id,
+                    fileName: "bulk-data-zip-valid.zip");
+
+                // Assert
+                var viewModel = response.AssertOk<List<ZipDataSetFileViewModel>>();
+                var dataSet1 = viewModel[0];
+                var dataSet2 = viewModel[1];
+
+                Assert.Equal("First data set", dataSet1.Title);
+                Assert.Equal("one.csv", dataSet1.DataFileName);
+                Assert.Equal("one.meta.csv", dataSet1.MetaFileName);
+                Assert.Equal(696, dataSet1.DataFileSize);
+                Assert.Equal(210, dataSet1.MetaFileSize);
+                Assert.Null(dataSet1.ReplacingFileId);
+                Assert.NotEqual(Guid.Empty, dataSet1.DataFileId);
+                Assert.NotEqual(Guid.Empty, dataSet1.MetaFileId);
+
+                Assert.Equal("Second data set", dataSet2.Title);
+                Assert.Equal("two.csv", dataSet2.DataFileName);
+                Assert.Equal("two.meta.csv", dataSet2.MetaFileName);
+                Assert.Equal(2085, dataSet2.DataFileSize);
+                Assert.Equal(318, dataSet2.MetaFileSize);
+                Assert.Null(dataSet2.ReplacingFileId);
+                Assert.NotEqual(Guid.Empty, dataSet2.DataFileId);
+                Assert.NotEqual(Guid.Empty, dataSet2.MetaFileId);
+            }
+
+            [Fact]
+            public async Task UploadDataSetAsBulkZip_ValidRequestWithReplacement_ReturnsViewModelWithReplacementId()
+            {
+                // Arrange
+                var releaseFileToBeReplaced = DataFixture.DefaultReleaseFile()
+                    .WithName("First data set")
+                    .WithReleaseVersion(DataFixture.DefaultReleaseVersion()
+                        .WithRelease(DataFixture.DefaultRelease()
+                            .WithPublication(DataFixture.DefaultPublication())))
+                        .WithFile(DataFixture.DefaultFile(FileType.Data))
+                    .Generate();
+
+                await TestApp.AddTestData<ContentDbContext>(context => context.ReleaseFiles.Add(releaseFileToBeReplaced));
+
+                // Act
+                var response = await UploadDataSetAsBulkZip(
+                    releaseVersionId: releaseFileToBeReplaced.ReleaseVersionId,
+                    fileName: "bulk-data-zip-valid.zip");
+
+                // Assert
+                var viewModel = response.AssertOk<List<ZipDataSetFileViewModel>>();
+                var dataSet1 = viewModel[0];
+                var dataSet2 = viewModel[1];
+
+                Assert.Equal("First data set", dataSet1.Title);
+                Assert.Equal("one.csv", dataSet1.DataFileName);
+                Assert.Equal("one.meta.csv", dataSet1.MetaFileName);
+                Assert.Equal(696, dataSet1.DataFileSize);
+                Assert.Equal(210, dataSet1.MetaFileSize);
+                Assert.NotNull(dataSet1.ReplacingFileId);
+                Assert.NotEqual(Guid.Empty, dataSet1.DataFileId);
+                Assert.NotEqual(Guid.Empty, dataSet1.MetaFileId);
+
+                Assert.Equal("Second data set", dataSet2.Title);
+                Assert.Equal("two.csv", dataSet2.DataFileName);
+                Assert.Equal("two.meta.csv", dataSet2.MetaFileName);
+                Assert.Equal(2085, dataSet2.DataFileSize);
+                Assert.Equal(318, dataSet2.MetaFileSize);
+                Assert.Null(dataSet2.ReplacingFileId);
+                Assert.NotEqual(Guid.Empty, dataSet2.DataFileId);
+                Assert.NotEqual(Guid.Empty, dataSet2.MetaFileId);
+            }
+
+            [Fact]
+            public async Task UploadDataSetAsBulkZip_InvalidRequest_ReturnsValidationProblems()
+            {
+                // Act
+                var response = await UploadDataSetAsBulkZip(
+                    releaseVersionId: Guid.Empty,
+                    fileName: "");
+
+                // Assert
+                var validationProblem = response.AssertValidationProblem();
+
+                Assert.Equal("Must not be empty.", validationProblem.Errors[0].Message);
+                Assert.Equal("File 'Zip File' either empty or not found.", validationProblem.Errors[1].Message);
+            }
+
+            [Fact]
+            public async Task UploadDataSetAsBulkZip_IndexFileMissing_ReturnsValidationProblems()
+            {
+                // Arrange
+                Publication publication = DataFixture.DefaultPublication()
+                    .WithReleases(
+                        [
+                            DataFixture
+                                .DefaultRelease(publishedVersions: 0, draftVersion: true, year: 2020)
+                                .WithTimePeriodCoverage(TimeIdentifier.AcademicYear)
+                                .WithLabel(null)
+                        ]);
+
+                await TestApp.AddTestData<ContentDbContext>(context => context.Publications.Add(publication));
+
+                // Act
+                var response = await UploadDataSetAsBulkZip(
+                    releaseVersionId: publication.Releases[0].Versions[0].Id,
+                    fileName: "bulk-data-zip-invalid-no-datasetnames-csv.zip");
+
+                // Assert
+                var validationProblem = response.AssertValidationProblem();
+
+                Assert.Equal("For bulk imports, the ZIP must include dataset_names.csv", validationProblem.Errors[0].Message);
+            }
+
+            [Fact]
+            public async Task ImportBulkZipDataSetsFromTempStorage_InvalidRequest_ReturnsValidationProblems()
+            {
+                // Act
+                var response = await ImportBulkZipDataSetsFromTempStorage(
+                    releaseVersionId: Guid.Empty,
+                    dataSetFiles: []);
+
+                // Assert
+                response.AssertNotFound();
+            }
+
+            private async Task<HttpResponseMessage> UploadDataSet(
+                Guid releaseVersionId,
+                string dataSetTitle,
+                string dataFileName,
+                string metaFileName,
+                HttpClient? client = null)
+            {
+                client ??= BuildApp().CreateClient();
+
+                var dataFilePath = Path.Combine(
+                    Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!,
+                    "Resources", dataFileName);
+
+                var metaFilePath = Path.Combine(
+                    Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!,
+                    "Resources", metaFileName);
+
+                var multipartContent = new MultipartFormDataContent
+                {
+                    { new StringContent(releaseVersionId.ToString()), "ReleaseVersionId" },
+                    { new StringContent(dataSetTitle), "Title" },
+                };
+
+                try
+                {
+                    var dataFileContent = new ByteArrayContent(await System.IO.File.ReadAllBytesAsync(dataFilePath));
+                    dataFileContent.Headers.ContentType = MediaTypeHeaderValue.Parse(MediaTypeNames.Text.Csv);
+                    multipartContent.Add(dataFileContent, "DataFile", dataFileName);
+
+                    var metaFileContent = new ByteArrayContent(await System.IO.File.ReadAllBytesAsync(metaFilePath));
+                    metaFileContent.Headers.ContentType = MediaTypeHeaderValue.Parse(MediaTypeNames.Text.Csv);
+                    multipartContent.Add(metaFileContent, "MetaFile", metaFileName);
+                }
+                catch
+                {
+                    multipartContent.Add(new ByteArrayContent([]), "DataFile", "empty.csv");
+                    multipartContent.Add(new ByteArrayContent([]), "MetaFile", "empty.csv");
+                }
+
+                return await client.PostAsync($"api/releaseVersions/data", multipartContent);
+            }
+
+            private async Task<HttpResponseMessage> UploadDataSetAsZip(
+                Guid releaseVersionId,
+                string dataSetTitle,
+                string fileName,
+                HttpClient? client = null)
+            {
+                client ??= BuildApp().CreateClient();
+
+                var filePath = Path.Combine(
+                    Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!,
+                    "Resources", fileName);
+
+                var multipartContent = new MultipartFormDataContent
+                {
+                    { new StringContent(releaseVersionId.ToString()), "ReleaseVersionId" },
+                    { new StringContent(dataSetTitle), "Title" },
+                };
+
+                try
+                {
+                    var fileContent = new ByteArrayContent(await System.IO.File.ReadAllBytesAsync(filePath));
+                    fileContent.Headers.ContentType = MediaTypeHeaderValue.Parse(MediaTypeNames.Application.Zip);
+                    multipartContent.Add(fileContent, "ZipFile", fileName);
+                }
+                catch
+                {
+                    multipartContent.Add(new ByteArrayContent([]), "ZipFile", "empty.zip");
+                }
+
+                return await client.PostAsync($"api/releaseVersions/zip-data", multipartContent);
+            }
+
+            private async Task<HttpResponseMessage> UploadDataSetAsBulkZip(
+                Guid releaseVersionId,
+                string fileName,
+                HttpClient? client = null)
+            {
+                client ??= BuildApp().CreateClient();
+
+                var filePath = Path.Combine(
+                    Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!,
+                    "Resources", fileName);
+
+                var multipartContent = new MultipartFormDataContent
+                {
+                    { new StringContent(releaseVersionId.ToString()), "ReleaseVersionId" },
+                };
+
+                try
+                {
+                    var fileContent = new ByteArrayContent(await System.IO.File.ReadAllBytesAsync(filePath));
+                    fileContent.Headers.ContentType = MediaTypeHeaderValue.Parse(MediaTypeNames.Application.Zip);
+                    multipartContent.Add(fileContent, "ZipFile", fileName);
+                }
+                catch
+                {
+                    multipartContent.Add(new ByteArrayContent([]), "ZipFile", "empty.zip");
+                }
+
+                return await client.PostAsync($"api/releaseVersions/upload-bulk-zip-data", multipartContent);
+            }
+
+            private async Task<HttpResponseMessage> ImportBulkZipDataSetsFromTempStorage(
+                Guid releaseVersionId,
+                List<ZipDataSetFileViewModel> dataSetFiles,
+                HttpClient? client = null)
+            {
+                client ??= BuildApp().CreateClient();
+
+                return await client.PostAsJsonAsync($"api/release/{releaseVersionId}/import-bulk-zip-data", dataSetFiles);
             }
         }
     }

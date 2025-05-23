@@ -52,7 +52,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                         new UserReleaseRoleRepository(contentDbContext),
                         new UserPublicationRoleRepository(contentDbContext),
                         Mock.Of<IPreReleaseService>(Strict))),
-                ReleaseRole.Approver, ReleaseRole.Contributor, ReleaseRole.Lead);
+                ReleaseRole.Approver, ReleaseRole.Contributor);
         }
     }
 }

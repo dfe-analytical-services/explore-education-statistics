@@ -1,28 +1,31 @@
 using GovUk.Education.ExploreEducationStatistics.Analytics.Consumer.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Analytics.Consumer.Services.Workflow;
 using GovUk.Education.ExploreEducationStatistics.Common.DuckDb.DuckDb;
+using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using Microsoft.Extensions.Logging;
 
 namespace GovUk.Education.ExploreEducationStatistics.Analytics.Consumer.Services;
 
 public class PublicApiDataSetVersionCallsProcessor(
     IAnalyticsPathResolver pathResolver,
-    ILogger<PublicApiDataSetVersionCallsProcessor> logger)
-    : IRequestFileProcessor
+    ILogger<PublicApiDataSetVersionCallsProcessor> logger,
+    IWorkflowActor<PublicApiDataSetVersionCallsProcessor>? workflowActor = null) : IRequestFileProcessor
 {
+    private readonly IWorkflowActor<PublicApiDataSetVersionCallsProcessor> _workflowActor 
+        = workflowActor ?? new WorkflowActor();
+    
     public Task Process()
     {
-        var workflow = new ProcessRequestFilesWorkflow(
-            processorName: GetType().Name,
+        var workflow = new ProcessRequestFilesWorkflow<PublicApiDataSetVersionCallsProcessor>(
             sourceDirectory: pathResolver.PublicApiDataSetVersionCallsDirectoryPath(),
             reportsDirectory: pathResolver.PublicApiDataSetVersionCallsReportsDirectoryPath(),
-            actor: new WorkflowActor(),
+            actor: _workflowActor,
             logger: logger);
 
         return workflow.Process();
     }
 
-    private class WorkflowActor : IWorkflowActor
+    private class WorkflowActor : IWorkflowActor<PublicApiDataSetVersionCallsProcessor>
     {
         public async Task InitialiseDuckDb(DuckDbConnection connection)
         {
@@ -53,10 +56,10 @@ public class PublicApiDataSetVersionCallsProcessor(
             ");
         }
 
-        public async Task CreateParquetReports(string reportsFilePathAndFilenamePrefix, DuckDbConnection connection)
+        public async Task CreateParquetReports(string reportsFolderPathAndFilenamePrefix, DuckDbConnection connection)
         {
             var reportFilePath = 
-                $"{reportsFilePathAndFilenamePrefix}_public-api-data-set-version-calls.parquet";
+                $"{reportsFolderPathAndFilenamePrefix}_public-api-data-set-version-calls.parquet";
         
             await connection.ExecuteNonQueryAsync($@"
                 COPY (

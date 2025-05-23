@@ -20,6 +20,11 @@ public class TestAnalyticsPathResolver : IAnalyticsPathResolver, IDisposable
 
     public string PublicApiQueriesDirectoryPath()
     {
-        return Path.Combine(_basePath, "PublicApiQueries");
+        return Path.Combine(_basePath, "queries");
+    }
+
+    public string PublicApiDataSetVersionCallsDirectoryPath()
+    {
+        return Path.Combine(_basePath, "data-set-versions");
     }
 }

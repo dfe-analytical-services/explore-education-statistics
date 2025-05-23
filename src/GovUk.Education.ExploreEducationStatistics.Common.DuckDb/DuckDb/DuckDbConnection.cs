@@ -29,13 +29,6 @@ public class DuckDbConnection(string connectionString = DuckDBConnectionStringBu
         };
     }
 
-    public DuckDbCommand CreateCommand(string commandText)
-    {
-        var command = CreateCommand();
-        command.CommandText = commandText;
-        return command;
-    }
-    
     public async Task<int> ExecuteNonQueryAsync(string commandText)
     {
         await using var command = CreateCommand();

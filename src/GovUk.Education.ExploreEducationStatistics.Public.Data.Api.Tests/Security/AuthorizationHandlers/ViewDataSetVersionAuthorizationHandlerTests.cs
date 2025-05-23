@@ -321,7 +321,9 @@ public class ViewDataSetVersionAuthorizationHandlerTests
             .SetupGet(s => s.EnvironmentName)
             .Returns(environmentName ?? Environments.Production);
 
-        var previewTokenService = new PreviewTokenService(dbContext);
+        var previewTokenService = new PreviewTokenService(
+            publicDataDbContext: dbContext,
+            httpContextAccessor: httpContextAccessor);
 
         var authorizationHandlerService = new AuthorizationHandlerService(
             httpContextAccessor: httpContextAccessor,

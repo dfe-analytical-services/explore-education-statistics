@@ -7,10 +7,6 @@
         "excludedTypes": "Request;Exception;Trace"
       },
       "enableLiveMetricsFilters": true
-    },
-    "logLevel": {
-      "default": "Error",
-      "Function": "Information"
     }
   },
   "extensions": {

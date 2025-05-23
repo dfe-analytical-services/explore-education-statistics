@@ -94,9 +94,6 @@
     },
     "immediatePublicationOfScheduledReleaseVersionsEnabled": {
       "value": true
-    },
-    "eventGridTopicsExist": {
-      "value": false
     }
   }
 }

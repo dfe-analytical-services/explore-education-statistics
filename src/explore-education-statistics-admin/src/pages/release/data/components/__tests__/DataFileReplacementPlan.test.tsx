@@ -8,6 +8,7 @@ import { render, screen, waitFor, within } from '@testing-library/react';
 import React from 'react';
 import { MemoryRouter } from 'react-router';
 import userEvent from '@testing-library/user-event';
+import { FeatureFlagProvider } from '@admin/contexts/FeatureFlagContext';
 
 jest.mock('@admin/services/dataBlockService');
 jest.mock('@admin/services/dataReplacementService');
@@ -319,6 +320,18 @@ describe('DataReplacementPlan', () => {
         indicatorGroups: {},
       },
     ],
+    apiDataSetVersionPlan: {
+      id: 'version-1',
+      dataSetId: 'data-set-1',
+      name: 'Version 1',
+      version: '1.0',
+      status: 'Draft',
+      mappingStatus: {
+        locationsComplete: false,
+        filtersComplete: false,
+      },
+      valid: false,
+    },
     originalSubjectId: 'subject-1',
     replacementSubjectId: 'subject-2',
     valid: false,
@@ -367,8 +380,115 @@ describe('DataReplacementPlan', () => {
     ],
     originalSubjectId: 'subject-1',
     replacementSubjectId: 'subject-2',
+    apiDataSetVersionPlan: {
+      id: 'version-1',
+      dataSetId: 'data-set-1',
+      name: 'Version 1',
+      version: '1.0',
+      status: 'Draft',
+      mappingStatus: {
+        locationsComplete: true,
+        filtersComplete: true,
+      },
+      valid: true,
+    },
     valid: true,
   };
+
+  describe('feature flagged enableReplacementOfPublicApiDataSets section renders with invalid plan ', () => {
+    test('renders the section when the feature flag enableReplacementOfPublicApiDataSets is turned on', async () => {
+      dataReplacementService.getReplacementPlan.mockResolvedValue(
+        testReplacementPlan,
+      );
+      render(
+        <FeatureFlagProvider
+          initialFlags={{ enableReplacementOfPublicApiDataSets: true }}
+        >
+          <MemoryRouter>
+            <DataFileReplacementPlan
+              cancelButton={<button type="button">Cancel</button>}
+              publicationId="publication-1"
+              releaseVersionId="release-1"
+              fileId="file-1"
+              replacementFileId="file-2"
+            />
+          </MemoryRouter>
+        </FeatureFlagProvider>,
+      );
+      await waitFor(() => {
+        expect(
+          screen.getByText('Api Data Set Filters: ERROR'),
+        ).toBeInTheDocument();
+        expect(
+          screen.getByText('Api Data Set Locations: ERROR'),
+        ).toBeInTheDocument();
+      });
+    });
+
+    test('doesnt render the section when the feature flag enableReplacementOfPublicApiDataSets is turned off', async () => {
+      dataReplacementService.getReplacementPlan.mockResolvedValue(
+        testReplacementPlan,
+      );
+      render(
+        <MemoryRouter>
+          <DataFileReplacementPlan
+            cancelButton={<button type="button">Cancel</button>}
+            publicationId="publication-1"
+            releaseVersionId="release-1"
+            fileId="file-1"
+            replacementFileId="file-2"
+          />
+        </MemoryRouter>,
+      );
+      await waitFor(() => {
+        expect(() => screen.getByText('Api Data Set Filters: ERROR')).toThrow(
+          'Unable to find an element',
+        );
+        expect(() => screen.getByText('Api Data Set Locations: ERROR')).toThrow(
+          'Unable to find an element',
+        );
+      });
+    });
+
+    test('doesnt render the section when the feature flag enableReplacementOfPublicApiDataSets is turned and no mapping status is defined', async () => {
+      dataReplacementService.getReplacementPlan.mockResolvedValue({
+        ...testReplacementPlan,
+        apiDataSetVersionPlan: {
+          id: 'version-1',
+          dataSetId: 'data-set-1',
+          name: 'Version 1',
+          version: '1.0',
+          status: 'Draft',
+          valid: false,
+        },
+      });
+      render(
+        <FeatureFlagProvider
+          initialFlags={{
+            enableReplacementOfPublicApiDataSets: true,
+          }}
+        >
+          <MemoryRouter>
+            <DataFileReplacementPlan
+              cancelButton={<button type="button">Cancel</button>}
+              publicationId="publication-1"
+              releaseVersionId="release-1"
+              fileId="file-1"
+              replacementFileId="file-2"
+            />
+          </MemoryRouter>
+        </FeatureFlagProvider>,
+      );
+      await waitFor(() => {
+        expect(() => screen.getByText('Api Data Set Filters: ERROR')).toThrow(
+          'Unable to find an element',
+        );
+        expect(() => screen.getByText('Api Data Set Locations: ERROR')).toThrow(
+          'Unable to find an element',
+        );
+      });
+    });
+  });
 
   test('renders correctly with invalid plan', async () => {
     dataReplacementService.getReplacementPlan.mockResolvedValue(

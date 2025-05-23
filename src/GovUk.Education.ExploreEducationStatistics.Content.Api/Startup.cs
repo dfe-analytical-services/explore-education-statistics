@@ -1,6 +1,5 @@
 #nullable enable
 using System;
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using FluentValidation;
 using GovUk.Education.ExploreEducationStatistics.Common.Cache;
@@ -12,6 +11,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Requests;
 using GovUk.Education.ExploreEducationStatistics.Common.Rules;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Content.Api.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
@@ -22,9 +22,6 @@ using GovUk.Education.ExploreEducationStatistics.Content.Services;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Cache;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.Cache;
-using GovUk.Education.ExploreEducationStatistics.Content.Services.Requests;
-using GovUk.Education.ExploreEducationStatistics.Content.Services.Strategies;
-using GovUk.Education.ExploreEducationStatistics.Content.Services.Strategies.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
@@ -54,10 +51,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api
         IConfiguration configuration,
         IHostEnvironment hostEnvironment)
     {
-        private readonly AnalyticsOptions _analyticsOptions = configuration
-            .GetSection(AnalyticsOptions.Section)
-            .Get<AnalyticsOptions>()!;
-
         // This method gets called by the runtime. Use this method to add services to the container.
         public virtual void ConfigureServices(IServiceCollection services)
         {
@@ -183,37 +176,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api
             services.AddTransient<IRedirectsCacheService, RedirectsCacheService>();
             services.AddTransient<IRedirectsService, RedirectsService>();
 
-            if (_analyticsOptions is { Enabled: true })
-            {
-                services.AddSingleton<IAnalyticsManager, AnalyticsManager>();
-                services.AddSingleton<IAnalyticsWriter, AnalyticsWriter>();
-                services.AddHostedService<AnalyticsConsumer>();
+            services.AddAnalytics(hostEnvironment, configuration);
 
-                if (hostEnvironment.IsDevelopment())
-                {
-                    services.AddSingleton<IAnalyticsPathResolver, LocalAnalyticsPathResolver>();
-                }
-                else
-                {
-                    services.AddSingleton<IAnalyticsPathResolver, AnalyticsPathResolver>();
-                }
-
-                services.AddSingleton<AnalyticsWritePublicZipDownloadStrategy>();
-
-                services.AddSingleton<IDictionary<Type, IAnalyticsWriteStrategy>>(provider =>
-                    new Dictionary<Type, IAnalyticsWriteStrategy>
-                    {
-                        {
-                            typeof(CaptureZipDownloadRequest),
-                            provider.GetRequiredService<AnalyticsWritePublicZipDownloadStrategy>()
-                        },
-                    }
-                );
-            }
-            else
-            {
-                services.AddSingleton<IAnalyticsManager, NoOpAnalyticsManager>();
-            }
+            services.AddSingleton<DateTimeProvider>();
 
             StartupSecurityConfiguration.ConfigureAuthorizationPolicies(services);
             StartupSecurityConfiguration.ConfigureResourceBasedAuthorization(services);

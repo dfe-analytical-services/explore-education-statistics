@@ -36,24 +36,13 @@ public class AuthorizationHandlerService(
     
     public async Task<bool> RequestHasValidPreviewToken(DataSet dataSet)
     {
-        return TryGetPreviewToken(out var previewToken) && 
-               await previewTokenService.ValidatePreviewTokenForDataSet(
-                   previewToken: previewToken.ToString(),
-                   dataSetId: dataSet.Id);
+        return await previewTokenService
+            .ValidatePreviewTokenForDataSet(dataSetId: dataSet.Id);
     }
 
     public async Task<bool> RequestHasValidPreviewToken(DataSetVersion dataSetVersion)
     {
-        return TryGetPreviewToken(out var previewToken) && 
-               await previewTokenService.ValidatePreviewTokenForDataSetVersion(
-                   previewToken: previewToken.ToString(),
-                   dataSetVersionId: dataSetVersion.Id);
-    }
-
-    private bool TryGetPreviewToken(out StringValues previewToken)
-    {
-        return httpContextAccessor.HttpContext.TryGetRequestHeader(
-            RequestHeaderNames.PreviewToken,
-            out previewToken);       
+        return await previewTokenService
+            .ValidatePreviewTokenForDataSetVersion(dataSetVersionId: dataSetVersion.Id);
     }
 }

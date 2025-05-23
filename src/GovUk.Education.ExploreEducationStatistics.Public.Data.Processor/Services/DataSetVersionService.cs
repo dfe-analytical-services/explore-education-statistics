@@ -1,5 +1,6 @@
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Options;
 using GovUk.Education.ExploreEducationStatistics.Common.Validators;
 using GovUk.Education.ExploreEducationStatistics.Common.Validators.ErrorDetails;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
@@ -27,6 +28,7 @@ internal class DataSetVersionService(
     PublicDataDbContext publicDataDbContext,
     IReleaseFileRepository releaseFileRepository,
     IDataSetVersionPathResolver dataSetVersionPathResolver,
+    IOptions<FeatureFlags> featureFlags,
     IOptions<AppOptions> options) : IDataSetVersionService
 {
     public async Task<Either<ActionResult, Guid>> CreateInitialVersion(
@@ -49,14 +51,21 @@ internal class DataSetVersionService(
         Guid dataSetId,
         Guid releaseFileId,
         Guid instanceId,
+        Guid? dataSetVersionToReplaceId = null,
         CancellationToken cancellationToken = default)
     {
         return await GetDataSet(dataSetId, cancellationToken)
-            .OnSuccess(ValidateNextDataSet)
-            .OnSuccess(dataSet => CreateDataSetVersion(
+            .OnSuccess(ds => ValidateCanCreateNextDataSetVersion(ds, dataSetVersionToReplaceId))
+            .OnSuccess(dataSet => (featureFlags.Value.EnableReplacementOfPublicApiDataSets 
+                                   && dataSetVersionToReplaceId is not null
+                    ? ValidateDataSetVersionToReplace(dataSet, dataSetVersionToReplaceId.Value)
+                    : (DataSetVersion?)null)
+                .OnSuccess(previousDataSetVersionToReplace => (dataSet, previousDataSetVersionToReplace)))
+            .OnSuccess(dataSetAndDataSetVersion => CreateDataSetVersion(
                 releaseFileId: releaseFileId,
                 instanceId: instanceId,
-                dataSet: dataSet,
+                dataSet: dataSetAndDataSetVersion.dataSet,
+                previousDataSetVersionToReplace: dataSetAndDataSetVersion.previousDataSetVersionToReplace,
                 cancellationToken: cancellationToken))
             .OnSuccess(dataSetVersion => dataSetVersion.Id);
     }
@@ -68,13 +77,15 @@ internal class DataSetVersionService(
     {
         return await publicDataDbContext.RequireTransaction(() =>
             GetReleaseFiles(releaseVersionId, cancellationToken)
-                .OnSuccessCombineWith(async releaseFiles => await GetDataSetVersions(releaseFiles, cancellationToken))
-                .OnSuccess(releaseFilesAndDataSetVersions => 
-                    (releaseFiles: releaseFilesAndDataSetVersions.Item1, dataSetVersions: releaseFilesAndDataSetVersions.Item2))
+                .OnSuccess(async releaseFiles => await GetDataSetVersions(releaseFiles, cancellationToken)
+                    .OnSuccess(dataSetVersions => (releaseFiles, dataSetVersions))
+                    .OnSuccess(releaseFilesAndDataSetVersions =>
+                        (releaseFilesAndDataSetVersions.releaseFiles, releaseFilesAndDataSetVersions.dataSetVersions)))
                 .OnSuccessDo(releaseFilesAndDataSetVersions =>
                     CheckCanDeleteDataSetVersions(releaseFilesAndDataSetVersions.dataSetVersions, forceDeleteAll))
                 .OnSuccessDo(async releaseFilesAndDataSetVersions =>
-                    await UnlinkReleaseFilesFromApiDataSets(releaseFilesAndDataSetVersions.releaseFiles, cancellationToken))
+                    await UnlinkReleaseFilesFromApiDataSets(releaseFilesAndDataSetVersions.releaseFiles,
+                        cancellationToken))
                 .OnSuccessDo(async releaseFilesAndDataSetVersions =>
                     await DeleteDataSetVersions(releaseFilesAndDataSetVersions.dataSetVersions, cancellationToken))
                 .OnSuccessVoid(releaseFilesAndDataSetVersions =>
@@ -177,7 +188,7 @@ internal class DataSetVersionService(
         var canDelete = await CanDeleteDataSetVersion(
             dataSetVersion: dataSetVersion,
             forceDeleteAll);
-        
+
         if (canDelete)
         {
             return Unit.Instance;
@@ -335,22 +346,36 @@ internal class DataSetVersionService(
         return dataSet;
     }
 
-    private Either<ActionResult, DataSet> ValidateNextDataSet(DataSet dataSet)
+    private static Either<ActionResult, DataSet> ValidateCanCreateNextDataSetVersion(DataSet dataSet, Guid? dataSetVersionToReplaceId)
     {
-        if (dataSet.LatestLiveVersionId is null)
-        {
-            return ValidationUtils.ValidationResult(CreateDataSetIdError(
-                message: ValidationMessages.DataSetNoLiveVersion,
-                dataSetId: dataSet.Id));
-        }
+        var isNotReplacingAndIsMissingLiveVersion =
+            dataSetVersionToReplaceId is null && dataSet.LatestLiveVersionId is null;
 
-        return dataSet;
+        //TODO: Action for EES-5996: Reword the validation error message to be more appropriate when EES-5779 is LIVE.
+        return isNotReplacingAndIsMissingLiveVersion 
+            ? ValidationUtils.ValidationResult(CreateDataSetIdError(
+                message: ValidationMessages.DataSetNoLiveVersion,
+                dataSetId: dataSet.Id))
+            : dataSet;
+    }
+
+    private Either<ActionResult, DataSetVersion?> ValidateDataSetVersionToReplace(DataSet dataSet, Guid dataSetVersionToReplaceId)
+    {
+        var previousVersion = dataSet.Versions
+            .FirstOrDefault(dv => dataSetVersionToReplaceId == dv.Id);
+
+        return previousVersion is null
+            ? ValidationUtils.ValidationResult(CreateDataSetIdError(
+                message: ValidationMessages.NextDataSetVersionNotFound,
+                dataSetId: dataSet.Id))
+            : previousVersion;
     }
 
     private async Task<Either<ActionResult, DataSetVersion>> CreateDataSetVersion(
         Guid releaseFileId,
         Guid instanceId,
         DataSet dataSet,
+        DataSetVersion? previousDataSetVersionToReplace = null,
         CancellationToken cancellationToken = default)
     {
         return await publicDataDbContext.RequireTransaction(async () =>
@@ -359,16 +384,19 @@ internal class DataSetVersionService(
                     await ValidateReleaseFileAndDataSet(
                             releaseFile,
                             dataSet,
+                            previousDataSetVersionToReplace?.PublicVersion,
                             cancellationToken)
                         .OnSuccess(async () =>
                             await CreateDataSetVersion(
                                 dataSet,
                                 releaseFile,
+                                previousDataSetVersionToReplace,
                                 cancellationToken))
                         .OnSuccessDo(async dataSetVersion =>
                             await CreateDataSetVersionImport(
                                 dataSetVersion,
                                 instanceId,
+                                previousDataSetVersionToReplace,
                                 cancellationToken))
                         .OnSuccessDo(async dataSetVersion =>
                             await UpdateReleaseFilePublicDataSetVersionId(
@@ -397,7 +425,8 @@ internal class DataSetVersionService(
     private async Task<Either<ActionResult, Unit>> ValidateReleaseFileAndDataSet(
         ReleaseFile releaseFile,
         DataSet dataSet,
-        CancellationToken cancellationToken)
+        string? dataSetVersionToReplace = null,
+        CancellationToken cancellationToken = default)
     {
         // ReleaseFile must not already have a DataSetVersion
         if (await publicDataDbContext.DataSetVersions.AnyAsync(
@@ -457,6 +486,15 @@ internal class DataSetVersionService(
             .Select(version => version.Release.ReleaseFileId)
             .ToList();
 
+        if (featureFlags.Value.EnableReplacementOfPublicApiDataSets && dataSetVersionToReplace is not null)
+        {
+            //`dataSetVersionToReplace` gets initiated when in an amendment.
+            //When in an amendment, we are modifying one of the previous release ID and so the
+            //selected release ID will be found because it will attempt to 'patch/replace' existing data.
+            //Therefore, we can skip validation that ensures data file is in a different release to current release.  
+            return ValidationResult();
+        }
+        
         var previousReleaseIds = await GetReleaseIdsForReleaseFiles(
             contentDbContext,
             previousReleaseFileIds,
@@ -475,16 +513,22 @@ internal class DataSetVersionService(
                 releaseFileId: releaseFile.Id));
         }
 
-        return errors.Count == 0 ? Unit.Instance : ValidationUtils.ValidationResult(errors);
+        return ValidationResult();
+
+        Either<ActionResult, Unit> ValidationResult() => 
+            errors.Count == 0 ? Unit.Instance : ValidationUtils.ValidationResult(errors);
     }
 
     private async Task<DataSetVersion> CreateDataSetVersion(
         DataSet dataSet,
         ReleaseFile releaseFile,
+        DataSetVersion? previousVersionToPatch,
         CancellationToken cancellationToken)
     {
-        var nextVersion = dataSet.LatestLiveVersion?.DefaultNextVersion()
-                          ?? new SemVersion(major: 1, minor: 0, patch: 0);
+        var nextVersion = featureFlags.Value.EnableReplacementOfPublicApiDataSets && previousVersionToPatch is not null
+            ? previousVersionToPatch.NextPatchVersion()
+            : dataSet.LatestLiveVersion?.DefaultNextVersion()
+              ?? new SemVersion(major: 1, minor: 0, patch: 0);
 
         var dataSetVersion = new DataSetVersion
         {
@@ -516,13 +560,15 @@ internal class DataSetVersionService(
     private async Task CreateDataSetVersionImport(
         DataSetVersion dataSetVersion,
         Guid instanceId,
-        CancellationToken cancellationToken)
+        DataSetVersion? dataSetVersionToReplace = null,
+        CancellationToken cancellationToken = default)
     {
         var dataSetVersionImport = new DataSetVersionImport
         {
             DataSetVersionId = dataSetVersion.Id,
             InstanceId = instanceId,
-            Stage = DataSetVersionImportStage.Pending
+            Stage = DataSetVersionImportStage.Pending,
+            DataSetVersionToReplaceId = dataSetVersionToReplace?.Id
         };
 
         publicDataDbContext.DataSetVersionImports.Add(dataSetVersionImport);

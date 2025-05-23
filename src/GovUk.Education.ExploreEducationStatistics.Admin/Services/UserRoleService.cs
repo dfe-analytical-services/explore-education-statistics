@@ -241,7 +241,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             {
                 case Viewer:
                 case Contributor:
-                case Lead:
                 case Approver:
                     return RoleNames.Analyst;
                 case PrereleaseViewer:

@@ -33,14 +33,24 @@ public class TestAnalyticsPathResolver : IAnalyticsPathResolver, IDisposable
         return Path.Combine(_basePath, "reports", "public-api", "queries");
     }
     
-    // PublicApiQueries
+    // PublicApiDataSets
+    public string PublicApiDataSetCallsDirectoryPath()
+    {
+        return Path.Combine(_basePath, "public-api", "data-sets");
+    }
+
+    public string PublicApiDataSetCallsReportsDirectoryPath() {
+        return Path.Combine(_basePath, "reports", "public-api", "data-sets");
+    }
+    
+    // PublicApiDataSetVersions
     public string PublicApiDataSetVersionCallsDirectoryPath()
     {
-        return Path.Combine(_basePath, "public-api", "get-meta");
+        return Path.Combine(_basePath, "public-api", "data-set-versions");
     }
 
     public string PublicApiDataSetVersionCallsReportsDirectoryPath() {
-        return Path.Combine(_basePath, "reports", "public-api", "get-meta");
+        return Path.Combine(_basePath, "reports", "public-api", "data-set-versions");
     }
 
     // PublicZipDownloads

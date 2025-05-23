@@ -1,9 +1,9 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 
@@ -89,6 +89,11 @@ public static class FileGeneratorExtensions
         this Generator<File> generator,
         List<GeographicLevel> geographicLevels)
         => generator.ForInstance(s => s.SetDataSetFileVersionGeographicLevels(geographicLevels));
+
+    public static Generator<File> WithCreatedByUser(
+        this Generator<File> generator,
+        User user)
+        => generator.ForInstance(s => s.SetFileCreatedByUser(user));
 
     public static InstanceSetters<File> SetDefaults(this InstanceSetters<File> setters, FileType? fileType)
         => fileType switch
@@ -220,4 +225,9 @@ public static class FileGeneratorExtensions
                     DataSetFileVersion = file,
                     GeographicLevel = gl,
                 }).ToList());
+
+    public static InstanceSetters<File> SetFileCreatedByUser(
+        this InstanceSetters<File> setters,
+        User? user)
+        => setters.Set(f => f.CreatedBy, user);
 }

@@ -251,7 +251,9 @@ public class ViewDataSetAuthorizationHandlerTests
         requestHeaders?.ForEach(header => 
             headers.Append(header.Key, header.Value));
 
-        var previewTokenService = new PreviewTokenService(dbContext);
+        var previewTokenService = new PreviewTokenService(
+            publicDataDbContext: dbContext,
+            httpContextAccessor: httpContextAccessor);
 
         var authorizationHandlerService = new AuthorizationHandlerService(
             httpContextAccessor: httpContextAccessor,

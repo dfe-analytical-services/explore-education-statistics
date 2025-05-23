@@ -1,6 +1,7 @@
 import Link from '@admin/components/Link';
 import DataFileSummaryList from '@admin/pages/release/data/components/DataFileSummaryList';
 import DataUploadCancelButton from '@admin/pages/release/data/components/DataUploadCancelButton';
+import { useFeatureFlag } from '@admin/contexts/FeatureFlagContext';
 import ImporterStatus, {
   terminalImportStatuses,
 } from '@admin/pages/release/data/components/ImporterStatus';
@@ -44,6 +45,13 @@ export default function DataFilesTableRow({
   onConfirmDelete,
   onStatusChange,
 }: Props) {
+  const isNewReplaceDsvFeatureEnabled = useFeatureFlag(
+    'enableReplacementOfPublicApiDataSets',
+  );
+  const allowReplacementOfDataFile = isNewReplaceDsvFeatureEnabled
+    ? true
+    : dataFile.publicApiDataSetId == null;
+
   return (
     <tr key={dataFile.title}>
       <td data-testid="Title" className={styles.title}>
@@ -91,7 +99,7 @@ export default function DataFilesTableRow({
                     >
                       Edit title
                     </Link>
-                    {dataFile.publicApiDataSetId ? (
+                    {!allowReplacementOfDataFile ? (
                       <Modal
                         showClose
                         title="Cannot replace data"
@@ -109,7 +117,7 @@ export default function DataFilesTableRow({
                               {
                                 publicationId,
                                 releaseVersionId,
-                                dataSetId: dataFile.publicApiDataSetId,
+                                dataSetId: dataFile.publicApiDataSetId ?? '',
                               },
                             )}
                           >
