@@ -4,6 +4,8 @@ using System.Text.Encodings.Web;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Services;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -81,6 +83,9 @@ public class TestApplicationFactory : TestApplicationFactory<Startup>
                 services
                     .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                     .AddScheme<AuthenticationSchemeOptions, TestAuthHandler>(JwtBearerDefaults.AuthenticationScheme, null);
+
+                services
+                    .ReplaceService<IAnalyticsPathResolver>(new TestAnalyticsPathResolver(), optional: true);
             });
     }
     

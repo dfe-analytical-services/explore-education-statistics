@@ -61,10 +61,6 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
         .GetSection(AppInsightsOptions.Section)
         .Get<AppInsightsOptions>()!;
     
-    private readonly AnalyticsOptions _analyticsOptions = configuration
-        .GetRequiredSection(AnalyticsOptions.Section)
-        .Get<AnalyticsOptions>()!;
-
     // This method gets called by the runtime. Use this method to add services to the container.
     public void ConfigureServices(IServiceCollection services)
     {

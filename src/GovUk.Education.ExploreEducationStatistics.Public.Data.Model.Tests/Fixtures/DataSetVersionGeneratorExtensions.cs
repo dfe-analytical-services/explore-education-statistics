@@ -197,6 +197,11 @@ public static class DataSetVersionGeneratorExtensions
 
     public static Generator<DataSetVersion> WithPreviewTokens(
         this Generator<DataSetVersion> generator,
+        IEnumerable<PreviewToken> previewTokens)
+        => generator.WithPreviewTokens(() => previewTokens);
+
+    public static Generator<DataSetVersion> WithPreviewTokens(
+        this Generator<DataSetVersion> generator,
         Func<IEnumerable<PreviewToken>> previewTokens)
         => generator.ForInstance(s => s.SetPreviewTokens(previewTokens));
 

@@ -18,6 +18,8 @@ public static class AnalyticsServiceCollectionExtensions
             .GetSection(AnalyticsOptions.Section)
             .Get<AnalyticsOptions>();
 
+        services.AddTransient<IAnalyticsService, AnalyticsService>();
+
         if (analyticsOptions is { Enabled: false })
         {
             services.AddSingleton<IAnalyticsManager, NoOpAnalyticsManager>();
@@ -38,6 +40,7 @@ public static class AnalyticsServiceCollectionExtensions
         }
 
         services.AddTransient<IAnalyticsWriteStrategy, AnalyticsWritePublicApiQueryStrategy>();
+        services.AddTransient<IAnalyticsWriteStrategy, AnalyticsWriteDataSetVersionCallsStrategy>();
 
         return services;
     }
