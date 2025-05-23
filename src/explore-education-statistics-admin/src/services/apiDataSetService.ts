@@ -70,6 +70,7 @@ export interface ApiDataSetDraftVersion extends ApiDataSetVersion {
   mappingStatus?: {
     locationsComplete: boolean;
     filtersComplete: boolean;
+    hasMajorVersionUpdate: boolean | null;
   };
 }
 
