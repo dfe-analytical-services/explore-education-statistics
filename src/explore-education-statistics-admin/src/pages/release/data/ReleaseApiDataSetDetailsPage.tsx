@@ -359,13 +359,13 @@ export default function ReleaseApiDataSetDetailsPage() {
                         <Tag
                           colour={
                             dataSet.draftVersion.mappingStatus
-                              ?.locationsComplete
+                              ?.locationsComplete && !showRejectedError
                               ? 'blue'
                               : 'red'
                           }
                         >
                           {dataSet.draftVersion.mappingStatus?.locationsComplete
-                            ? 'Complete'
+                            ? getCompleteText()
                             : 'Incomplete'}
                         </Tag>
                       }
@@ -392,13 +392,14 @@ export default function ReleaseApiDataSetDetailsPage() {
                       status={
                         <Tag
                           colour={
-                            dataSet.draftVersion.mappingStatus?.filtersComplete
+                            dataSet.draftVersion.mappingStatus
+                              ?.filtersComplete && !showRejectedError
                               ? 'blue'
                               : 'red'
                           }
                         >
                           {dataSet.draftVersion.mappingStatus?.filtersComplete
-                            ? 'Complete'
+                            ? getCompleteText()
                             : 'Incomplete'}
                         </Tag>
                       }
@@ -486,6 +487,10 @@ export default function ReleaseApiDataSetDetailsPage() {
       </LoadingSpinner>
     </>
   );
+
+  function getCompleteText(): React.ReactNode {
+    return showRejectedError ? 'Complete but incompatible' : 'Complete';
+  }
 }
 
 function getDataSetStatusColour(status: DataSetStatus): TagProps['colour'] {
