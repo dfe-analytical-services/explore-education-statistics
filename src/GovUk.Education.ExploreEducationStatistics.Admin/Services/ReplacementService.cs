@@ -48,7 +48,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         IUserService userService,
         ICacheKeyService cacheKeyService,
         IPrivateBlobCacheService privateCacheService,
-        IDataSetService dataSetService,
         IDataSetVersionMappingService dataSetVersionMappingService,
         IOptions<FeatureFlags> featureFlags)
         : IReplacementService
@@ -125,15 +124,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             //more things than just the values { FiltersComplete: true, LocationsComplete: true }. It will
             //also include whether the user has 'finalized' the data set version mapping & whether the version has
             //a breaking change and results in a major version increment. 
-            var mapping = await dataSetService.GetMappingStatus(replacementApiDataSetVersion.Id, cancellationToken);
-            var isMajorVersionUpdate = await dataSetVersionMappingService.IsMajorVersionUpdate(apiDataSetVersionPlan.Id, cancellationToken);
-            apiDataSetVersionPlan.MappingStatus = new ReplacementApiDataSetVersionPlanViewModel.MappingCompletionStatusViewModel
-            {
-                Complete = replacementApiDataSetVersion.Status == DataSetVersionStatus.Draft,
-                FiltersComplete = mapping?.FiltersComplete ?? false,
-                LocationsComplete = mapping?.LocationsComplete ?? false,
-                HasMajorVersionUpdate = isMajorVersionUpdate
-            };
+            apiDataSetVersionPlan.MappingStatus =  await dataSetVersionMappingService.GetMappingStatus(replacementApiDataSetVersion.Id, cancellationToken);
+            apiDataSetVersionPlan.MappingStatus.Complete = replacementApiDataSetVersion.Status == DataSetVersionStatus.Draft;
             apiDataSetVersionPlan.Valid = apiDataSetVersionPlan.ValidDefinition;
             return apiDataSetVersionPlan;
         }
