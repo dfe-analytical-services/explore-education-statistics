@@ -31,6 +31,7 @@ import TaskListItem from '@common/components/TaskListItem';
 import { useQuery } from '@tanstack/react-query';
 import React, { useEffect, useState } from 'react';
 import { generatePath, useHistory, useParams } from 'react-router-dom';
+import { useFeatureFlag } from '@admin/contexts/FeatureFlagContext';
 
 export type DataSetFinalisingStatus = 'finalising' | 'finalised' | undefined;
 
@@ -228,6 +229,19 @@ export default function ReleaseApiDataSetDetailsPage() {
     />
   ) : null;
 
+  const isNewReplaceDsvFeatureEnabled = useFeatureFlag(
+    'enableReplacementOfPublicApiDataSets',
+  );
+  const versionArr = dataSet?.draftVersion?.version?.split('.') || [];
+  const isPatch = isNewReplaceDsvFeatureEnabled
+    ? versionArr?.length === 3 && parseInt(versionArr[2], 10) > 0
+    : false;
+
+  const showRejectedError = isPatch
+    ? dataSet?.draftVersion?.mappingStatus &&
+      dataSet.draftVersion.mappingStatus.hasMajorVersionUpdate
+    : false;
+
   const mappingComplete =
     dataSet?.draftVersion?.mappingStatus &&
     dataSet.draftVersion.mappingStatus.filtersComplete &&
@@ -259,16 +273,59 @@ export default function ReleaseApiDataSetDetailsPage() {
             <span className="govuk-caption-l">API data set details</span>
             <h2>{dataSet.title}</h2>
 
-            {mappingComplete && dataSet.draftVersion && (
-              <ApiDataSetFinaliseBanner
-                dataSetId={dataSetId}
-                dataSetVersionId={dataSet.draftVersion.id}
-                draftVersionStatus={dataSet.draftVersion.status}
-                finalisingStatus={finalisingStatus}
-                publicationId={releaseVersion.publicationId}
-                releaseVersionId={releaseVersion.id}
-                onFinalise={handleFinalise}
-              />
+            {showRejectedError ? (
+              <div
+                className="govuk-error-summary"
+                aria-labelledby="error-summary-title"
+                role="alert"
+                tabIndex={-1}
+                data-module="govuk-error-summary"
+              >
+                <h2
+                  className="govuk-error-summary__title"
+                  id="error-summary-title"
+                >
+                  Incompatible patch data file uploaded
+                </h2>
+                <div className="govuk-error-summary__body">
+                  <ul className="govuk-list govuk-error-summary__list">
+                    <li>
+                      <div className="govuk-warning-text">
+                        <span
+                          className="govuk-warning-text__icon"
+                          aria-hidden="true"
+                        >
+                          !
+                        </span>
+                        <strong className="govuk-warning-text__text">
+                          <span className="govuk-visually-hidden">Warning</span>
+                          This API data set can not be published because it has
+                          a major version update.
+                        </strong>
+                      </div>
+                      The data file uploaded has resulted in a major version
+                      update which is not allowed. Please remove this draft api
+                      data set and upload a new data file which does not result
+                      in a major version update. To see where the major version
+                      update occurred, please use the api location or filters
+                      status table below.
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            ) : (
+              mappingComplete &&
+              dataSet.draftVersion && (
+                <ApiDataSetFinaliseBanner
+                  dataSetId={dataSetId}
+                  dataSetVersionId={dataSet.draftVersion.id}
+                  draftVersionStatus={dataSet.draftVersion.status}
+                  finalisingStatus={finalisingStatus}
+                  publicationId={releaseVersion.publicationId}
+                  releaseVersionId={releaseVersion.id}
+                  onFinalise={handleFinalise}
+                />
+              )
             )}
 
             <SummaryList

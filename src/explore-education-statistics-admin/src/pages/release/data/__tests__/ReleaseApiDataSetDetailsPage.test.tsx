@@ -17,6 +17,7 @@ import render from '@common-test/render';
 import { screen, waitFor, within } from '@testing-library/react';
 import React from 'react';
 import { generatePath, MemoryRouter, Route } from 'react-router-dom';
+import { FeatureFlagProvider } from '@admin/contexts/FeatureFlagContext';
 
 jest.mock('@admin/services/apiDataSetService');
 jest.mock('@admin/services/apiDataSetVersionService');
@@ -644,6 +645,7 @@ describe('ReleaseApiDataSetDetailsPage', () => {
           mappingStatus: {
             filtersComplete: true,
             locationsComplete: true,
+            hasMajorVersionUpdate: null,
           },
         },
         latestLiveVersion: testLiveVersion,
@@ -679,6 +681,7 @@ describe('ReleaseApiDataSetDetailsPage', () => {
           mappingStatus: {
             filtersComplete: true,
             locationsComplete: true,
+            hasMajorVersionUpdate: null,
           },
         },
         latestLiveVersion: testLiveVersion,
@@ -691,6 +694,7 @@ describe('ReleaseApiDataSetDetailsPage', () => {
           mappingStatus: {
             filtersComplete: true,
             locationsComplete: true,
+            hasMajorVersionUpdate: null,
           },
         },
         latestLiveVersion: testLiveVersion,
@@ -774,6 +778,7 @@ describe('ReleaseApiDataSetDetailsPage', () => {
           mappingStatus: {
             filtersComplete: true,
             locationsComplete: true,
+            hasMajorVersionUpdate: null,
           },
         },
         latestLiveVersion: testLiveVersion,
@@ -845,34 +850,143 @@ describe('ReleaseApiDataSetDetailsPage', () => {
     });
   });
 
+  test('renders error summary when draft version has a major version update and feature flag for replacement is turned on', async () => {
+    apiDataSetService.getDataSet.mockResolvedValue({
+      ...testDataSet,
+      draftVersion: {
+        ...testDraftVersion,
+        version: '2.0.1',
+        mappingStatus: {
+          hasMajorVersionUpdate: true,
+          locationsComplete: false,
+          filtersComplete: false,
+        },
+      },
+    });
+
+    const options = { enableReplacementOfPublicApiDataSets: true };
+    renderPage(options);
+
+    await waitFor(() => {
+      expect(
+        screen.getByText(
+          'This API data set can not be published because it has a major version update.',
+        ),
+      ).toBeInTheDocument();
+    });
+  });
+
+  test('Does not render error summary when draft version has a major version update and feature flag for replacement is turned off', async () => {
+    apiDataSetService.getDataSet.mockResolvedValue({
+      ...testDataSet,
+      draftVersion: {
+        ...testDraftVersion,
+        version: '2.0.1',
+        mappingStatus: {
+          hasMajorVersionUpdate: true,
+          locationsComplete: false,
+          filtersComplete: false,
+        },
+      },
+    });
+
+    renderPage();
+
+    await waitFor(() => {
+      expect(() =>
+        screen.getByText(
+          'This API data set can not be published because it has a major version update.',
+        ),
+      ).toThrow('Unable to find an element');
+    });
+  });
+
+  test('does not render error summary when draft version does not have a major version update', async () => {
+    apiDataSetService.getDataSet.mockResolvedValue({
+      ...testDataSet,
+      draftVersion: {
+        ...testDraftVersion,
+        version: '1.0.1',
+        mappingStatus: {
+          hasMajorVersionUpdate: false,
+          locationsComplete: false,
+          filtersComplete: false,
+        },
+      },
+    });
+
+    renderPage();
+
+    await waitFor(() => {
+      expect(() =>
+        screen.getByText(
+          'This API data set can not be published because it has a major version update.',
+        ),
+      ).toThrow('Unable to find an element');
+    });
+  });
+
+  test('does not render error summary when draft version is not a patch version', async () => {
+    apiDataSetService.getDataSet.mockResolvedValue({
+      ...testDataSet,
+      draftVersion: {
+        ...testDraftVersion,
+        version: '2.0',
+        mappingStatus: {
+          hasMajorVersionUpdate: true,
+          locationsComplete: false,
+          filtersComplete: false,
+        },
+      },
+    });
+
+    renderPage();
+
+    await waitFor(() => {
+      expect(() =>
+        screen.getByText(
+          'This API data set can not be published because it has a major version update.',
+        ),
+      ).toThrow('Unable to find an element');
+    });
+  });
+
   function renderPage(options?: {
     releaseVersion?: ReleaseVersion;
     dataSetId?: string;
+    enableReplacementOfPublicApiDataSets?: boolean;
   }) {
     const { releaseVersion = testDraftRelease, dataSetId = 'data-set-id' } =
       options ?? {};
 
     return render(
       <TestConfigContextProvider>
-        <ReleaseVersionContextProvider releaseVersion={releaseVersion}>
-          <MemoryRouter
-            initialEntries={[
-              generatePath<ReleaseDataSetRouteParams>(
-                releaseApiDataSetDetailsRoute.path,
-                {
-                  publicationId: releaseVersion.publicationId,
-                  releaseVersionId: releaseVersion.id,
-                  dataSetId,
-                },
-              ),
-            ]}
-          >
-            <Route
-              component={ReleaseApiDataSetDetailsPage}
-              path={releaseApiDataSetDetailsRoute.path}
-            />
-          </MemoryRouter>
-        </ReleaseVersionContextProvider>
+        <FeatureFlagProvider
+          initialFlags={{
+            enableReplacementOfPublicApiDataSets:
+              options?.enableReplacementOfPublicApiDataSets ?? false,
+          }}
+        >
+          <ReleaseVersionContextProvider releaseVersion={releaseVersion}>
+            <MemoryRouter
+              initialEntries={[
+                generatePath<ReleaseDataSetRouteParams>(
+                  releaseApiDataSetDetailsRoute.path,
+                  {
+                    publicationId: releaseVersion.publicationId,
+                    releaseVersionId: releaseVersion.id,
+                    dataSetId,
+                  },
+                ),
+              ]}
+            >
+              <Route
+                component={ReleaseApiDataSetDetailsPage}
+                path={releaseApiDataSetDetailsRoute.path}
+              />
+            </MemoryRouter>
+          </ReleaseVersionContextProvider>
+        </FeatureFlagProvider>
       </TestConfigContextProvider>,
     );
   }
