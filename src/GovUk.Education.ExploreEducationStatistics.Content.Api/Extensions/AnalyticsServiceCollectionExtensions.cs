@@ -40,6 +40,7 @@ public static class AnalyticsServiceCollectionExtensions
         }
 
         services.AddTransient<IAnalyticsWriteStrategy, AnalyticsWritePublicZipDownloadStrategy>();
+        services.AddTransient<IAnalyticsWriteStrategy, AnalyticsWritePublicDataSetFileDownloadStrategy>();
 
         return services;
     }

@@ -60,12 +60,13 @@ public class DataSetFilesController : ControllerBase
             .HandleFailuresOrOk();
     }
 
-    [HttpGet("data-set-files/{dataSetFileId:guid}/download")] // TODO EES-5979 analytics
+    [HttpGet("data-set-files/{dataSetFileId:guid}/download")]
     public async Task<ActionResult> DownloadDataSetFile(
-        Guid dataSetFileId)
+        Guid dataSetFileId,
+        CancellationToken cancellationToken)
     {
         return await _dataSetFileService
-            .DownloadDataSetFile(dataSetFileId);
+            .DownloadDataSetFile(dataSetFileId, cancellationToken);
     }
 
     [HttpGet("data-set-files/sitemap-items")]

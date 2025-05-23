@@ -14,3 +14,10 @@ public record CaptureZipDownloadRequest(
     string? ReleaseLabel,
     Guid? SubjectId = null,
     string? DataSetTitle = null) : IAnalyticsCaptureRequestBase;
+
+public record CaptureDataSetFileDownloadRequest(
+    string PublicationName,
+    Guid ReleaseVersionId,
+    string ReleaseName,
+    Guid SubjectId,
+    string DataSetTitle) : IAnalyticsCaptureRequestBase;
