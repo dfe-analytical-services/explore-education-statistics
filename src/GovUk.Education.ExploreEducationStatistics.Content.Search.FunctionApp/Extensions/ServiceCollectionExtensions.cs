@@ -44,16 +44,14 @@ public static class ServiceCollectionExtensions
                 // Instead, let Serilog handle that.
                 lb.SetMinimumLevel(LogLevel.None);
 
-                // Resolve the telemetry configuration that was registered by SetupAppInsights
+                // Resolve the telemetry configuration that was registered by SetupAppInsights.
+                // Note: It's a bit naughty resolving it here and potentially might not be ready.
                 var telemetryConfiguration = serviceCollection.BuildServiceProvider().GetRequiredService<TelemetryConfiguration>();
 
                 // Setup Serilog to log to the Console and to App Insights
                 lb.AddSerilog(
                     new LoggerConfiguration()
                         .ReadFrom.Configuration(configuration)
-                        .Enrich.WithExceptionDetails()
-                        .Enrich.FromLogContext()
-                        .WriteTo.Console()
                         .WriteTo.ApplicationInsights(telemetryConfiguration, TelemetryConverter.Traces)
                         .CreateLogger(),
                     dispose: true
