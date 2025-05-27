@@ -30,8 +30,8 @@ public class AnalyticsPathResolver : IAnalyticsPathResolver
         return Path.Combine(_basePath, "public", "zip-downloads");
     }
 
-    public string PublicDataSetFileDownloadsDirectoryPath()
+    public string PublicCsvDownloadsDirectoryPath()
     {
-        return Path.Combine(_basePath, "public", "data-set-file-downloads");
+        return Path.Combine(_basePath, "public", "csv-downloads");
     }
 }

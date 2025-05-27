@@ -5,32 +5,32 @@ using Microsoft.Extensions.Logging;
 
 namespace GovUk.Education.ExploreEducationStatistics.Analytics.Consumer.Services;
 
-public class PublicDataSetFileDownloadsProcessor(
+public class PublicCsvDownloadsProcessor(
     IAnalyticsPathResolver pathResolver,
-    ILogger<PublicDataSetFileDownloadsProcessor> logger,
-    IWorkflowActor<PublicDataSetFileDownloadsProcessor>? workflowActor = null) : IRequestFileProcessor
+    ILogger<PublicCsvDownloadsProcessor> logger,
+    IWorkflowActor<PublicCsvDownloadsProcessor>? workflowActor = null) : IRequestFileProcessor
 {
-    private readonly IWorkflowActor<PublicDataSetFileDownloadsProcessor> _workflowActor
+    private readonly IWorkflowActor<PublicCsvDownloadsProcessor> _workflowActor
         = workflowActor ?? new WorkflowActor();
 
     public Task Process() {
     
-        var workflow = new ProcessRequestFilesWorkflow<PublicDataSetFileDownloadsProcessor>(
-            sourceDirectory: pathResolver.PublicDataSetFileDownloadsDirectoryPath(),
-            reportsDirectory: pathResolver.PublicDataSetFileDownloadsReportsDirectoryPath(),
+        var workflow = new ProcessRequestFilesWorkflow<PublicCsvDownloadsProcessor>(
+            sourceDirectory: pathResolver.PublicCsvDownloadsDirectoryPath(),
+            reportsDirectory: pathResolver.PublicCsvDownloadsReportsDirectoryPath(),
             actor: _workflowActor,
             logger: logger);
 
         return workflow.Process();
     }
 
-    private class WorkflowActor : IWorkflowActor<PublicDataSetFileDownloadsProcessor>
+    private class WorkflowActor : IWorkflowActor<PublicCsvDownloadsProcessor>
     {
         public async Task InitialiseDuckDb(DuckDbConnection connection)
         {
             await connection.ExecuteNonQueryAsync(@"
-                CREATE TABLE dataSetFileDownloads (
-                    dataSetFileDownloadHash VARCHAR,
+                CREATE TABLE csvDownloads (
+                    csvDownloadHash VARCHAR,
                     publicationName VARCHAR,
                     releaseVersionId UUID,
                     releaseName VARCHAR,
@@ -44,9 +44,9 @@ public class PublicDataSetFileDownloadsProcessor(
         public async Task ProcessSourceFile(string sourceFilePath, DuckDbConnection connection)
         {
             await connection.ExecuteNonQueryAsync($@"
-                INSERT INTO dataSetFileDownloads BY NAME (
+                INSERT INTO csvDownloads BY NAME (
                     SELECT
-                        MD5(CONCAT(subjectId, releaseVersionId)) AS dataSetFileDownloadHash,
+                        MD5(CONCAT(subjectId, releaseVersionId)) AS csvDownloadHash,
                         *
                     FROM read_json('{sourceFilePath}', 
                         format='unstructured',
@@ -66,26 +66,26 @@ public class PublicDataSetFileDownloadsProcessor(
         public async Task CreateParquetReports(string reportsFolderPathAndFilenamePrefix, DuckDbConnection connection)
         {
             await connection.ExecuteNonQueryAsync(@"
-                CREATE TABLE dataSetFileDownloadsReport AS 
+                CREATE TABLE csvDownloadsReport AS 
                 SELECT 
-                    dataSetFileDownloadHash,
+                    csvDownloadHash,
                     FIRST(publicationName) AS publicationName,
                     FIRST(releaseVersionId) AS releaseVersionId,
                     FIRST(releaseName) AS releaseName,
                     FIRST(releaseLabel) AS releaseLabel,
                     FIRST(subjectId) AS subjectId,
                     FIRST(dataSetTitle) AS dataSetTitle,
-                    CAST(COUNT(dataSetFileDownloadHash) AS INT) AS downloads
-                FROM dataSetFileDownloads
-                GROUP BY dataSetFileDownloadHash
-                ORDER BY dataSetFileDownloadHash
+                    CAST(COUNT(csvDownloadHash) AS INT) AS downloads
+                FROM csvDownloads
+                GROUP BY csvDownloadHash
+                ORDER BY csvDownloadHash
             ");
         
             var reportFilePath = 
                 $"{reportsFolderPathAndFilenamePrefix}_public-csv-downloads.parquet";
 
             await connection.ExecuteNonQueryAsync($@"
-                COPY (SELECT * FROM dataSetFileDownloadsReport)
+                COPY (SELECT * FROM csvDownloadsReport)
                 TO '{reportFilePath}' (FORMAT 'parquet', CODEC 'zstd')");
         }
     }

@@ -442,7 +442,7 @@ public class DataSetFileService(
             return;
         }
 
-        await analyticsManager.Add(new CaptureDataSetFileDownloadRequest(
+        await analyticsManager.Add(new CaptureCsvDownloadRequest(
             releaseFile.ReleaseVersion.Release.Publication.Title,
             releaseFile.ReleaseVersionId,
             releaseFile.ReleaseVersion.Release.Title,

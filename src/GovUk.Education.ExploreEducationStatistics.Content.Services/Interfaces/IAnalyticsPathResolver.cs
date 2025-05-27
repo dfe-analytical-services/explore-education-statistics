@@ -5,5 +5,5 @@ public interface IAnalyticsPathResolver
 {
     string PublicZipDownloadsDirectoryPath();
 
-    string PublicDataSetFileDownloadsDirectoryPath();
+    string PublicCsvDownloadsDirectoryPath();
 }

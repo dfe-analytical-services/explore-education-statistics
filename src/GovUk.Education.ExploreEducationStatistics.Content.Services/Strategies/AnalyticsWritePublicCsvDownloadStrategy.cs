@@ -13,30 +13,30 @@ using Newtonsoft.Json;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Strategies;
 
-public class AnalyticsWritePublicDataSetFileDownloadStrategy( // @MarkFix write tests
+public class AnalyticsWritePublicCsvDownloadStrategy( // @MarkFix write tests
     IAnalyticsPathResolver analyticsPathResolver,
     DateTimeProvider dateTimeProvider,
-    ILogger<AnalyticsWritePublicDataSetFileDownloadStrategy> logger
+    ILogger<AnalyticsWritePublicCsvDownloadStrategy> logger
     ) : IAnalyticsWriteStrategy
 {
-    public Type RequestType => typeof(CaptureDataSetFileDownloadRequest);
+    public Type RequestType => typeof(CaptureCsvDownloadRequest);
 
     public async Task Report(IAnalyticsCaptureRequestBase request, CancellationToken cancellationToken)
     {
-        if (request is not CaptureDataSetFileDownloadRequest dataSetFileDownloadRequest)
+        if (request is not CaptureCsvDownloadRequest csvDownloadRequest)
         {
-            throw new ArgumentException($"request isn't a {nameof(CaptureDataSetFileDownloadRequest)}");
+            throw new ArgumentException($"request isn't a {nameof(CaptureCsvDownloadRequest)}");
         }
 
         logger.LogInformation(
             "Capturing {RequestTypeName} for releaseVersion {ReleaseVersionId} and subjectId {SubjectId}",
-            dataSetFileDownloadRequest.GetType().ToString(),
-            dataSetFileDownloadRequest.ReleaseVersionId,
-            dataSetFileDownloadRequest.SubjectId);
+            csvDownloadRequest.GetType().ToString(),
+            csvDownloadRequest.ReleaseVersionId,
+            csvDownloadRequest.SubjectId);
 
-        var directory = analyticsPathResolver.PublicDataSetFileDownloadsDirectoryPath();
+        var directory = analyticsPathResolver.PublicCsvDownloadsDirectoryPath();
         var filename =
-            $"{dateTimeProvider.UtcNow:yyyyMMdd-HHmmss}_{dataSetFileDownloadRequest.ReleaseVersionId}_{dataSetFileDownloadRequest.SubjectId}_{RandomUtils.RandomString()}.json";
+            $"{dateTimeProvider.UtcNow:yyyyMMdd-HHmmss}_{csvDownloadRequest.ReleaseVersionId}_{csvDownloadRequest.SubjectId}_{RandomUtils.RandomString()}.json";
 
         try
         {
@@ -45,7 +45,7 @@ public class AnalyticsWritePublicDataSetFileDownloadStrategy( // @MarkFix write 
             var filePath = Path.Combine(directory, filename);
 
             var serialisedRequest = JsonSerializationUtils.Serialize(
-                obj: dataSetFileDownloadRequest,
+                obj: csvDownloadRequest,
                 formatting: Formatting.Indented,
                 orderedProperties: true,
                 camelCase: true);
