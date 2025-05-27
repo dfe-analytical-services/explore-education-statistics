@@ -1499,8 +1499,6 @@ describe('FiltersForm', () => {
         filterHierarchies: {
           'filter-5709a7b4': [
             entryLevelOption.getAttribute('value'), // 'option-ae8fc558',
-            'option-dcbf7d26',
-            'option-9f53e999',
             engineeringOption.getAttribute('value'), // 'option-5687872a',
             civilEngineering.getAttribute('value'), // 'option-99087931',
           ],
