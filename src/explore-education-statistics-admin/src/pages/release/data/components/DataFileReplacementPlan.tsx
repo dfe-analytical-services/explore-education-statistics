@@ -312,7 +312,7 @@ const DataFileReplacementPlan = ({
             </Details>
           ))}
 
-          <h3 className="govuk-heading-m">
+          <h3 className="govuk-heading-m govuk-!-padding-top-4">
             <Tag colour={hasInvalidFootnotes ? 'red' : 'green'}>
               {`Footnotes: ${hasInvalidFootnotes ? 'ERROR' : 'OK'}`}
             </Tag>
@@ -459,7 +459,7 @@ const DataFileReplacementPlan = ({
             <>
               {hasMajorVersionUpdate ? (
                 <>
-                  <h3 className="govuk-heading-m">
+                  <h3 className="govuk-heading-m govuk-!-padding-top-4">
                     <Tag colour={hasMajorVersionUpdate ? 'red' : 'green'}>
                       {`API data set status: ${
                         hasMajorVersionUpdate ? 'ERROR' : 'OK'
@@ -480,7 +480,7 @@ const DataFileReplacementPlan = ({
                 </>
               ) : (
                 <>
-                  <h3 className="govuk-heading-m">
+                  <h3 className="govuk-heading-m govuk-!-padding-top-4">
                     <Tag colour={hasIncompleteFilterMapping ? 'red' : 'green'}>
                       {`API data set Filters: ${
                         hasIncompleteFilterMapping ? 'ERROR' : 'OK'
@@ -502,7 +502,7 @@ const DataFileReplacementPlan = ({
                     <p>No manual mapping required for API data set filters.</p>
                   )}
 
-                  <h3 className="govuk-heading-m">
+                  <h3 className="govuk-heading-m govuk-!-padding-top-4">
                     <Tag
                       colour={hasIncompleteLocationMapping ? 'red' : 'green'}
                     >
@@ -527,7 +527,7 @@ const DataFileReplacementPlan = ({
                       No manual mapping required for API data set locations.
                     </p>
                   )}
-                  <h3 className="govuk-heading-m">
+                  <h3 className="govuk-heading-m govuk-!-padding-top-4">
                     <Tag colour={isNotReadyToPublish ? 'red' : 'green'}>
                       {`API data set has to be finalized: ${
                         isNotReadyToPublish ? 'ERROR' : 'OK'
