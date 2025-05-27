@@ -43,7 +43,7 @@ public class ViewSpecificPreReleaseSummaryAuthorizationHandlersTests
             {
                 Id = Guid.NewGuid()
             },
-            ReleaseRole.Viewer, ReleaseRole.Contributor, ReleaseRole.Approver, ReleaseRole.PrereleaseViewer);
+            ReleaseRole.Contributor, ReleaseRole.Approver, ReleaseRole.PrereleaseViewer);
     }
 
     [Fact]

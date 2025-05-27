@@ -110,7 +110,7 @@ describe('PublicationAccessForm', () => {
       {
         id: 'pr-id-1',
         publication: 'Publication 1',
-        role: 'Viewer',
+        role: 'Approver',
         userName: 'Analyst1 User1',
         email: 'analyst1@example.com',
       },
@@ -131,6 +131,6 @@ describe('PublicationAccessForm', () => {
     const rows = screen.getAllByRole('row');
     expect(rows.length).toBe(3);
     expect(within(rows[1]).getByText('Publication 1')).toBeInTheDocument();
-    expect(within(rows[1]).getByText('Viewer')).toBeInTheDocument();
+    expect(within(rows[1]).getByText('Approver')).toBeInTheDocument();
   });
 });

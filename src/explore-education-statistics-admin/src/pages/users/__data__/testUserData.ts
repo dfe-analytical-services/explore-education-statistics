@@ -11,7 +11,7 @@ export const testUser: User = {
     {
       id: 'pr-id-1',
       publication: 'Publication 1',
-      role: 'Viewer',
+      role: 'Approver',
       userName: 'Analyst1 User1',
       email: 'analyst1@example.com',
     },
@@ -28,7 +28,7 @@ export const testUser: User = {
       id: 'rr-id-1',
       publication: 'Publication 1',
       release: 'Release 2',
-      role: 'Viewer',
+      role: 'Contributor',
     },
     {
       id: 'rr-id-2',
@@ -93,7 +93,7 @@ export const testRoles: Role[] = [
 
 export const testResourceRoles: ResourceRoles = {
   Publication: ['Approver', 'Owner'],
-  Release: ['Approver', 'Contributor', 'PrereleaseViewer', 'Viewer'],
+  Release: ['Approver', 'Contributor', 'PrereleaseViewer'],
 };
 
 export const testReleases: IdTitlePair[] = [
