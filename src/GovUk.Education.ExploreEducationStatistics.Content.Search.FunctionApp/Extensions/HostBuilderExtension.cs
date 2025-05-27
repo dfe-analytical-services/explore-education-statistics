@@ -20,7 +20,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.
 public static class HostBuilderExtension
 {
     public static IHost BuildHost(this IHostBuilder hostBuilder) => hostBuilder
-        .InitialiseSerilog()
         .ConfigureFunctionsWebApplication()
         .ConfigureAppConfiguration(
             (context, configurationBuilder) =>
@@ -74,7 +73,7 @@ public static class HostBuilderExtension
         )
         .Build();
 
-    private static IHostBuilder InitialiseSerilog(this IHostBuilder hostBuilder)
+    public static IHostBuilder InitialiseSerilog(this IHostBuilder hostBuilder)
     {
         // Setup Serilog
         // https://github.com/serilog/serilog-aspnetcore
