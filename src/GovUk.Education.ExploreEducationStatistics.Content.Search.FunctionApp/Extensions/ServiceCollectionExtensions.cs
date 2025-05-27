@@ -2,7 +2,6 @@
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Clients.AzureSearch;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Clients.ContentApi;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.HealthChecks.Strategies;
-using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Azure;
 using Microsoft.Extensions.Configuration;
@@ -38,26 +37,11 @@ public static class ServiceCollectionExtensions
         IConfiguration configuration) =>
         serviceCollection
             .SetupAppInsights()
+            .AddSerilog((services, loggerConfiguration) => loggerConfiguration.ConfigureSerilogLogger(services, configuration))
             .AddLogging(lb =>
-            {
                 // Prevent the default Azure Function logging provider from logging.
                 // Instead, let Serilog handle that.
-                lb.SetMinimumLevel(LogLevel.None);
-
-                // Resolve the telemetry configuration that was registered by SetupAppInsights.
-                // Note: It's a bit naughty resolving it here and potentially might not be ready.
-                var telemetryConfiguration = serviceCollection.BuildServiceProvider().GetRequiredService<TelemetryConfiguration>();
-
-                // Setup Serilog to log to the Console and to App Insights
-                lb.AddSerilog(
-                    new LoggerConfiguration()
-                        .ReadFrom.Configuration(configuration)
-                        .WriteTo.ApplicationInsights(telemetryConfiguration, TelemetryConverter.Traces)
-                        .AddEnrichers()
-                        .CreateLogger(),
-                    dispose: true
-                );
-            })
+                lb.SetMinimumLevel(LogLevel.None))
         ;
 
     private static IServiceCollection SetupAppInsights(this IServiceCollection serviceCollection) =>
@@ -97,13 +81,4 @@ public static class ServiceCollectionExtensions
                             ));
                     }
                 });
-    
-    
-    private static LoggerConfiguration AddEnrichers(this LoggerConfiguration loggerConfiguration) =>
-        // To simply the config, specify the common enrichers here.
-        // "Enrich": [ "FromLogContext", "WithExceptionDetails", "WithThreadId" ]
-        loggerConfiguration
-            .Enrich.FromLogContext()
-            .Enrich.WithExceptionDetails()
-            .Enrich.WithThreadId();
 }
