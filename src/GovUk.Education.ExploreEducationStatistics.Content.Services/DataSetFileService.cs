@@ -290,7 +290,7 @@ public class DataSetFileService(
             return new NotFoundResult();
         }
 
-        await RecordDownloadDataSetFileAnalytics(releaseFile, cancellationToken);
+        await RecordCsvDownloadAnalytics(releaseFile, cancellationToken);
 
         var stream = await publicBlobStorageService.StreamBlob(
             containerName: BlobContainers.PublicReleaseFiles,
@@ -431,7 +431,7 @@ public class DataSetFileService(
         };
     }
 
-    private async Task RecordDownloadDataSetFileAnalytics(
+    private async Task RecordCsvDownloadAnalytics(
         ReleaseFile releaseFile, CancellationToken cancellationToken)
     {
         var subjectId = releaseFile.File.SubjectId;

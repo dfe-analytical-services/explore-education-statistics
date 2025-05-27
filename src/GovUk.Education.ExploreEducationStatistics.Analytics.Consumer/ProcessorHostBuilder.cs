@@ -45,7 +45,6 @@ public static class ProcessorHostBuilder
                     .AddTransient<IRequestFileProcessor, PublicApiQueriesProcessor>()
                     .AddTransient<IRequestFileProcessor, PublicZipDownloadsProcessor>()
                     .AddTransient<IRequestFileProcessor, PublicCsvDownloadsProcessor>();
-                    // @MarkFix write PublicCsvDownloadProcessor tests
             });
     }
 }

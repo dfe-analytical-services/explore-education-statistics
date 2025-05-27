@@ -13,7 +13,7 @@ using Newtonsoft.Json;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Strategies;
 
-public class AnalyticsWritePublicCsvDownloadStrategy( // @MarkFix write tests
+public class AnalyticsWritePublicCsvDownloadStrategy(
     IAnalyticsPathResolver analyticsPathResolver,
     DateTimeProvider dateTimeProvider,
     ILogger<AnalyticsWritePublicCsvDownloadStrategy> logger

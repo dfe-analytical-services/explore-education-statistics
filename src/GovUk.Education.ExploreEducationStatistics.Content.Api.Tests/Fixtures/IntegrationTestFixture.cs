@@ -11,6 +11,8 @@ using Testcontainers.Azurite;
 using Xunit;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Content.Services.Tests.Services;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
@@ -58,11 +60,18 @@ public abstract class IntegrationTestFixture(TestApplicationFactory testApp) :
         await _azuriteContainer.DisposeAsync();
     }
 
-    public WebApplicationFactory<Startup> WithAzurite(bool enabled = true)
+    public WebApplicationFactory<Startup> WithAzurite(
+        bool enabled = true,
+        bool withAnalytics = false)
     {
         if (!enabled)
         {
             return TestApp;
+        }
+
+        if (withAnalytics)
+        {
+            TestApp.AddAppSettings("appsettings.IntegrationTest.AnalyticsEnabled.json");
         }
 
         if (_azuriteContainer.State != TestcontainersStates.Running)
@@ -89,6 +98,12 @@ public abstract class IntegrationTestFixture(TestApplicationFactory testApp) :
                             sp.GetRequiredService<ILogger<IBlobStorageService>>()
                         )
                     );
+
+                    if (withAnalytics)
+                    {
+                        services.ReplaceService<IAnalyticsPathResolver>(sp =>
+                            new TestAnalyticsPathResolver());
+                    }
                 });
         });
     }

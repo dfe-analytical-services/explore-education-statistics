@@ -40,7 +40,6 @@ public static class AnalyticsServiceCollectionExtensions
 
         services.AddTransient<IAnalyticsWriteStrategy, AnalyticsWritePublicApiQueryStrategy>();
         services.AddTransient<IAnalyticsWriteStrategy, AnalyticsWriteDataSetVersionCallsStrategy>();
-        services.AddTransient<IAnalyticsWriteStrategy, AnalyticsWrite();
 
         return services;
     }
