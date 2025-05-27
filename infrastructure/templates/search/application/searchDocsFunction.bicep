@@ -11,9 +11,6 @@ param functionAppFirewallRules FirewallRule[]
 @description('The id of the Log Analytics workspace which logs and metrics will be sent to.')
 param logAnalyticsWorkspaceId string
 
-@description('Specifies the base URL of the Search Service endpoint for interacting with the data plane REST API. For example: https://[search-service-name].search.windows.net')
-param searchServiceEndpoint string
-
 @description('Specifies the Search Service indexer name.')
 param searchServiceIndexerName string
 
@@ -123,8 +120,7 @@ module functionAppModule '../../common/components/functionApp.bicep' = {
       }
       {
         name: 'AzureSearch__SearchServiceEndpoint'
-        // Should be able to replace this with searchService.properties.endpoint in future using API version 2025-02-01-preview or later
-        value: searchServiceEndpoint
+        value: searchService.properties.endpoint
       }
       {
         name: 'AzureSearch__IndexerName'
