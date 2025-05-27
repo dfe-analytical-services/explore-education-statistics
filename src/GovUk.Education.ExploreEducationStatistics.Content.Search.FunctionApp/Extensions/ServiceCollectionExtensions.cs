@@ -53,6 +53,7 @@ public static class ServiceCollectionExtensions
                     new LoggerConfiguration()
                         .ReadFrom.Configuration(configuration)
                         .WriteTo.ApplicationInsights(telemetryConfiguration, TelemetryConverter.Traces)
+                        .AddEnrichers()
                         .CreateLogger(),
                     dispose: true
                 );
@@ -96,4 +97,13 @@ public static class ServiceCollectionExtensions
                             ));
                     }
                 });
+    
+    
+    private static LoggerConfiguration AddEnrichers(this LoggerConfiguration loggerConfiguration) =>
+        // To simply the config, specify the common enrichers here.
+        // "Enrich": [ "FromLogContext", "WithExceptionDetails", "WithThreadId" ]
+        loggerConfiguration
+            .Enrich.FromLogContext()
+            .Enrich.WithExceptionDetails()
+            .Enrich.WithThreadId();
 }
