@@ -55,7 +55,7 @@ export const ConfiguredFeatureFlagProvider = ({
   children,
 }: {
   children?: ReactNode;
-}): React.FC => {
+}) => {
   return (
     <FeatureFlagProvider initialFlags={DEFAULT_FLAGS}>
       {children}

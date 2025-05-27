@@ -225,17 +225,26 @@ public class DataSetVersionMappingService(
             filterMappingTypes,
             cancellationToken);
 
-        if (isMajorVersionUpdate)
-        {
-            targetDataSetVersion.VersionMajor = sourceDataSetVersion.VersionMajor + 1;
-            targetDataSetVersion.VersionMinor = 0;
-            targetDataSetVersion.VersionPatch = 0;
-        }
-        else
-        {
-            targetDataSetVersion.VersionMajor = sourceDataSetVersion.VersionMajor;
-            targetDataSetVersion.VersionMinor = sourceDataSetVersion.VersionMinor + 1;
-            targetDataSetVersion.VersionPatch = 0;
+        var isReplacement = await publicDataDbContext.DataSetVersionImports
+            .AnyAsync(i => i.DataSetVersionToReplaceId != null 
+                           && i.DataSetVersionToReplaceId == sourceDataSetVersion.Id,
+                cancellationToken) && targetDataSetVersion.VersionPatch > 0;
+        var skipSettingVersionNumber = isReplacement && featureFlags.Value.EnableReplacementOfPublicApiDataSets;
+
+        if (!skipSettingVersionNumber)
+        {   
+            if (isMajorVersionUpdate)
+            {
+                targetDataSetVersion.VersionMajor = sourceDataSetVersion.VersionMajor + 1;
+                targetDataSetVersion.VersionMinor = 0;
+                targetDataSetVersion.VersionPatch = 0;
+            }
+            else
+            {
+                targetDataSetVersion.VersionMajor = sourceDataSetVersion.VersionMajor;
+                targetDataSetVersion.VersionMinor = sourceDataSetVersion.VersionMinor + 1;
+                targetDataSetVersion.VersionPatch = 0;
+            }
         }
 
         await publicDataDbContext.SaveChangesAsync(cancellationToken);
