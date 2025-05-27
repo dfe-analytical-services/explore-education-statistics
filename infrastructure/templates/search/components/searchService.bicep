@@ -70,7 +70,7 @@ resource userAssignedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@
   name: userAssignedIdentityName
 }
 
-resource searchService 'Microsoft.Search/searchServices@2024-06-01-preview' = {
+resource searchService 'Microsoft.Search/searchServices@2025-02-01-preview' = {
   name: name
   location: location
   sku: {
@@ -100,6 +100,6 @@ resource searchService 'Microsoft.Search/searchServices@2024-06-01-preview' = {
   tags: tagValues
 }
 
-output searchServiceEndpoint string = 'https://${searchService.name}.search.windows.net'
+output searchServiceEndpoint string = searchService.properties.endpoint
 output searchServiceIdentityPrincipalId string = systemAssignedIdentity ? searchService.identity.principalId : ''
 output searchServiceName string = searchService.name
