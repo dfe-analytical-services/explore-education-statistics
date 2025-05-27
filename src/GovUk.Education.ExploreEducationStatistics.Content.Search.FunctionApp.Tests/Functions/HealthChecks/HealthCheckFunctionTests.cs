@@ -29,7 +29,7 @@ public class HealthCheckFunctionTests
         var sut = GetSut(strategies);
         
         // ACT
-        var result = await sut.HealthCheck(null!, CancellationToken.None);
+        var result = await sut.FullHealthCheck(null!, CancellationToken.None);
         
         // ASSERT
         Assert.NotNull(result);
@@ -59,7 +59,7 @@ public class HealthCheckFunctionTests
         var sut = GetSut(strategies);
         
         // ACT
-        var result = await sut.HealthCheck(null!, CancellationToken.None);
+        var result = await sut.FullHealthCheck(null!, CancellationToken.None);
         
         // ASSERT
         Assert.NotNull(result);
@@ -82,7 +82,7 @@ public class HealthCheckFunctionTests
         var sut = GetSut(strategies);
         
         // ACT
-        var result = await sut.HealthCheck(null!, CancellationToken.None);
+        var result = await sut.FullHealthCheck(null!, CancellationToken.None);
         
         // ASSERT
         Assert.NotNull(result);
