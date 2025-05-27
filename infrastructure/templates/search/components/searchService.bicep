@@ -70,7 +70,7 @@ resource userAssignedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@
   name: userAssignedIdentityName
 }
 
-resource searchService 'Microsoft.Search/searchServices@2024-06-01-preview' = {
+resource searchService 'Microsoft.Search/searchServices@2025-02-01-preview' = {
   name: name
   location: location
   sku: {
