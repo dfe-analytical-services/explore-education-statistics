@@ -32,5 +32,6 @@ public record CaptureDataSetFileDownloadRequest(
     string PublicationName,
     Guid ReleaseVersionId,
     string ReleaseName,
+    string? ReleaseLabel,
     Guid SubjectId,
     string DataSetTitle) : IAnalyticsCaptureRequestBase;

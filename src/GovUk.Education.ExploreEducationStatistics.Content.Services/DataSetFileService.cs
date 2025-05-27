@@ -446,6 +446,7 @@ public class DataSetFileService(
             releaseFile.ReleaseVersion.Release.Publication.Title,
             releaseFile.ReleaseVersionId,
             releaseFile.ReleaseVersion.Release.Title,
+            releaseFile.ReleaseVersion.Release.Label,
             subjectId.Value,
             releaseFile.Name ?? "No data set title"
         ), cancellationToken);
