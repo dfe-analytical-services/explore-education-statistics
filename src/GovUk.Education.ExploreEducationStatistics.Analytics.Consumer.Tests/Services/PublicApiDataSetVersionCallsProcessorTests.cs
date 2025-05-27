@@ -1,5 +1,7 @@
 using System.Reflection;
 using GovUk.Education.ExploreEducationStatistics.Analytics.Consumer.Services;
+using GovUk.Education.ExploreEducationStatistics.Analytics.Consumer.Services.Workflow;
+using GovUk.Education.ExploreEducationStatistics.Analytics.Consumer.Tests.Services.Workflow.MockBuilders;
 using GovUk.Education.ExploreEducationStatistics.Common.DuckDb.DuckDb;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using InterpolatedSql.Dapper;
@@ -20,40 +22,33 @@ public abstract class PublicApiDataSetVersionCallsProcessorTests
     public class ProcessTests : PublicApiDataSetVersionCallsProcessorTests
     {
         [Fact]
-        public async Task NoSourceFolder_NoReportsProduced()
+        public async Task ProcessorUsesWorkflow()
         {
             using var pathResolver = new TestAnalyticsPathResolver();
+            SetupRequestFile(pathResolver, "WithCoreDataSetVersionDetails.json");
+
+            var workflowActorBuilder = new WorkflowActorMockBuilder<PublicApiDataSetVersionCallsProcessor>();
+            
+            var workflowActor = workflowActorBuilder 
+                .WhereDuckDbInitialisedWithErrors()
+                .Build();
 
             var service = BuildService(
-                pathResolver: pathResolver);
-            await service.Process();
+                pathResolver: pathResolver,
+                workflowActor: workflowActor);
+            
+            await Assert.ThrowsAsync<ArgumentException>(service.Process);
 
-            Assert.False(Directory.Exists(ProcessingDirectoryPath(pathResolver)));
-            Assert.False(Directory.Exists(pathResolver.PublicApiDataSetVersionCallsReportsDirectoryPath()));
-        }
-
-        [Fact]
-        public async Task NoSourceQueriesToConsume_NoReportsProduced()
-        {
-            using var pathResolver = new TestAnalyticsPathResolver();
-
-            Directory.CreateDirectory(pathResolver.PublicApiDataSetVersionCallsDirectoryPath());
-
-            var service = BuildService(
-                pathResolver: pathResolver);
-            await service.Process();
-
-            // Check that as there were no files to process, no working directories were
-            // created as a result.
-            Assert.False(Directory.Exists(ProcessingDirectoryPath(pathResolver)));
-            Assert.False(Directory.Exists(pathResolver.PublicApiDataSetVersionCallsReportsDirectoryPath()));
+            workflowActorBuilder
+                .Assert
+                .InitialiseDuckDbCalled();
         }
 
         [Fact]
         public async Task CoreDataSetVersionDetails_CapturedInReport()
         {
             using var pathResolver = new TestAnalyticsPathResolver();
-            SetupQueryRequest(pathResolver, "WithCoreDataSetVersionDetails.json");
+            SetupRequestFile(pathResolver, "WithCoreDataSetVersionDetails.json");
 
             var service = BuildService(pathResolver: pathResolver);
             await service.Process();
@@ -68,26 +63,27 @@ public abstract class PublicApiDataSetVersionCallsProcessorTests
             var duckDbConnection = new DuckDbConnection();
             duckDbConnection.Open();
 
-            var reportRows = await ReadGetMetaReport(duckDbConnection, queryReportFile);
+            var reportRows = await ReadReport(duckDbConnection, queryReportFile);
 
             // Check that the single recorded query has resulted in a
             // single line in the query report and the values match the
             // values from the original JSON file.
             var queryReportRow = Assert.Single(reportRows);
 
-            AssertDataSetVersionCallReportRowOk(
+            AssertReportRowOk(
                 queryReportRow,
-                expectedType: "GetDataSetVersionMetadata",
+                expectedType: "GetSummary",
                 expectPreviewToken: false,
-                expectedStartTime: DateTime.Parse("2025-02-24T02:07:44.850Z"),
+                expectedStartTime: DateTime.Parse("2025-02-28T03:07:44.850Z"),
+                expectedRequestedDataSetVersion: null,
                 expectedParameters: null);
         }
         
         [Fact]
-        public async Task WithPreviewTokens_CapturedInReport()
+        public async Task WithPreviewTokenAndRequestedDataSetVersion_CapturedInReport()
         {
             using var pathResolver = new TestAnalyticsPathResolver();
-            SetupQueryRequest(pathResolver, "WithPreviewTokens.json");
+            SetupRequestFile(pathResolver, "WithPreviewTokenAndRequestedDataSetVersion.json");
 
             var service = BuildService(pathResolver: pathResolver);
             await service.Process();
@@ -102,18 +98,19 @@ public abstract class PublicApiDataSetVersionCallsProcessorTests
             var duckDbConnection = new DuckDbConnection();
             duckDbConnection.Open();
 
-            var reportRows = await ReadGetMetaReport(duckDbConnection, queryReportFile);
+            var reportRows = await ReadReport(duckDbConnection, queryReportFile);
 
             // Check that the single recorded query has resulted in a
             // single line in the query report and the values match the
             // values from the original JSON file.
             var queryReportRow = Assert.Single(reportRows);
 
-            AssertDataSetVersionCallReportRowOk(
+            AssertReportRowOk(
                 queryReportRow,
-                expectedType: "GetDataSetVersionSummary",
+                expectedType: "DownloadCsv",
                 expectPreviewToken: true,
-                expectedStartTime: DateTime.Parse("2025-02-28T03:07:44.850Z"),
+                expectedStartTime: DateTime.Parse("2025-02-26T03:07:44.850Z"),
+                expectedRequestedDataSetVersion: "1.*",
                 expectedParameters: null);
         }
         
@@ -121,7 +118,7 @@ public abstract class PublicApiDataSetVersionCallsProcessorTests
         public async Task WithParameters_CapturedInReport()
         {
             using var pathResolver = new TestAnalyticsPathResolver();
-            SetupQueryRequest(pathResolver, "WithParameters.json");
+            SetupRequestFile(pathResolver, "WithParameters.json");
 
             var service = BuildService(pathResolver: pathResolver);
             await service.Process();
@@ -136,18 +133,19 @@ public abstract class PublicApiDataSetVersionCallsProcessorTests
             var duckDbConnection = new DuckDbConnection();
             duckDbConnection.Open();
 
-            var reportRows = await ReadGetMetaReport(duckDbConnection, queryReportFile);
+            var reportRows = await ReadReport(duckDbConnection, queryReportFile);
 
             // Check that the single recorded query has resulted in a
             // single line in the query report and the values match the
             // values from the original JSON file.
             var queryReportRow = Assert.Single(reportRows);
 
-            AssertDataSetVersionCallReportRowOk(
+            AssertReportRowOk(
                 queryReportRow,
-                expectedType: "GetDataSetVersionMetadata",
+                expectedType: "GetMetadata",
                 expectPreviewToken: false,
                 expectedStartTime: DateTime.Parse("2025-02-24T03:07:44.850Z"),
+                expectedRequestedDataSetVersion: null,
                 expectedParameters: """{"types":["Filters","Indicators","Locations","TimePeriods"]}""");
         }
         
@@ -155,9 +153,9 @@ public abstract class PublicApiDataSetVersionCallsProcessorTests
         public async Task MultipleCalls_CapturedInReport()
         {
             using var pathResolver = new TestAnalyticsPathResolver();
-            SetupQueryRequest(pathResolver, "WithCoreDataSetVersionDetails.json");
-            SetupQueryRequest(pathResolver, "WithParameters.json");
-            SetupQueryRequest(pathResolver, "WithPreviewTokens.json");
+            SetupRequestFile(pathResolver, "WithCoreDataSetVersionDetails.json");
+            SetupRequestFile(pathResolver, "WithParameters.json");
+            SetupRequestFile(pathResolver, "WithPreviewTokenAndRequestedDataSetVersion.json");
 
             var service = BuildService(pathResolver: pathResolver);
             await service.Process();
@@ -172,35 +170,38 @@ public abstract class PublicApiDataSetVersionCallsProcessorTests
             var duckDbConnection = new DuckDbConnection();
             duckDbConnection.Open();
 
-            var reportRows = await ReadGetMetaReport(duckDbConnection, queryReportFile);
+            var reportRows = await ReadReport(duckDbConnection, queryReportFile);
 
             // Check that the 3 recorded queries have resulted in 3 lines in the query report
             // and the order is in ascending date order.
             Assert.Equal(3, reportRows.Count);
             
-            AssertDataSetVersionCallReportRowOk(
+            AssertReportRowOk(
                 reportRows[0],
-                expectedType: "GetDataSetVersionMetadata",
-                expectPreviewToken: false,
-                expectedStartTime: DateTime.Parse("2025-02-24T02:07:44.850Z"),
-                expectedParameters: null);
-            
-            AssertDataSetVersionCallReportRowOk(
-                reportRows[1],
-                expectedType: "GetDataSetVersionMetadata",
+                expectedType: "GetMetadata",
                 expectPreviewToken: false,
                 expectedStartTime: DateTime.Parse("2025-02-24T03:07:44.850Z"),
+                expectedRequestedDataSetVersion: null,
                 expectedParameters: """{"types":["Filters","Indicators","Locations","TimePeriods"]}""");
             
-            AssertDataSetVersionCallReportRowOk(
-                reportRows[2],
-                expectedType: "GetDataSetVersionSummary",
+            AssertReportRowOk(
+                reportRows[1],
+                expectedType: "DownloadCsv",
                 expectPreviewToken: true,
+                expectedStartTime: DateTime.Parse("2025-02-26T03:07:44.850Z"),
+                expectedRequestedDataSetVersion: "1.*",
+                expectedParameters: null);
+            
+            AssertReportRowOk(
+                reportRows[2],
+                expectedType: "GetSummary",
+                expectPreviewToken: false,
                 expectedStartTime: DateTime.Parse("2025-02-28T03:07:44.850Z"),
+                expectedRequestedDataSetVersion: null,
                 expectedParameters: null);
         }
 
-        private static async Task<List<QueryReportLine>> ReadGetMetaReport(DuckDbConnection duckDbConnection, string queryReportFile)
+        private static async Task<List<QueryReportLine>> ReadReport(DuckDbConnection duckDbConnection, string queryReportFile)
         {
             return (await duckDbConnection
                     .SqlBuilder($"SELECT * FROM read_parquet('{queryReportFile:raw}')")
@@ -210,18 +211,19 @@ public abstract class PublicApiDataSetVersionCallsProcessorTests
         }
     }
     
-    private static void AssertDataSetVersionCallReportRowOk(
+    private static void AssertReportRowOk(
         QueryReportLine queryReportRow,
         string expectedType,
         DateTime expectedStartTime,
         bool expectPreviewToken,
+        string? expectedRequestedDataSetVersion,
         string? expectedParameters)
     {
         Assert.Equal(expectedType, queryReportRow.Type);
         Assert.Equal(Guid.Parse("01d29401-7274-a871-a8db-d4bc4e98c324"), queryReportRow.DataSetId);
         Assert.Equal(Guid.Parse("01d29401-7974-1276-a06b-b28a6a5385c6"), queryReportRow.DataSetVersionId);
         Assert.Equal("1.2.0", queryReportRow.DataSetVersion);
-        Assert.Equal("1.*", queryReportRow.RequestedDataSetVersion);
+        Assert.Equal(expectedRequestedDataSetVersion, queryReportRow.RequestedDataSetVersion);
         Assert.Equal("Data Set 1", queryReportRow.DataSetTitle);
         Assert.Equal(expectedStartTime, queryReportRow.StartTime);
 
@@ -251,14 +253,16 @@ public abstract class PublicApiDataSetVersionCallsProcessorTests
     }
 
     private PublicApiDataSetVersionCallsProcessor BuildService(
-        TestAnalyticsPathResolver pathResolver)
+        TestAnalyticsPathResolver pathResolver,
+        IWorkflowActor<PublicApiDataSetVersionCallsProcessor>? workflowActor = null)
     {
         return new PublicApiDataSetVersionCallsProcessor(
             pathResolver: pathResolver,
-            Mock.Of<ILogger<PublicApiDataSetVersionCallsProcessor>>());
+            logger: Mock.Of<ILogger<PublicApiDataSetVersionCallsProcessor>>(),
+            workflowActor: workflowActor);
     }
 
-    private void SetupQueryRequest(TestAnalyticsPathResolver pathResolver, string filename)
+    private void SetupRequestFile(TestAnalyticsPathResolver pathResolver, string filename)
     {
         Directory.CreateDirectory(pathResolver.PublicApiDataSetVersionCallsDirectoryPath());
 
@@ -279,7 +283,7 @@ public abstract class PublicApiDataSetVersionCallsProcessorTests
         public string DataSetVersion { get; init; } = string.Empty;
         public Guid DataSetVersionId { get; init; }
         public string? Parameters { get; init; }
-        public string RequestedDataSetVersion { get; init; } = string.Empty;
+        public string? RequestedDataSetVersion { get; init; }
         public string? PreviewTokenLabel { get; init; }
         public Guid? PreviewTokenDataSetVersionId { get; init; }
         public DateTime? PreviewTokenCreated { get; init; }

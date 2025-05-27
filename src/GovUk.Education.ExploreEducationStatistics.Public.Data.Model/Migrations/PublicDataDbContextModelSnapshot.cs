@@ -18,7 +18,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.7")
+                .HasAnnotation("ProductVersion", "8.0.14")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
@@ -145,6 +145,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                     b.Property<Guid>("DataSetVersionId")
                         .HasColumnType("uuid");
 
+                    b.Property<Guid?>("DataSetVersionToReplaceId")
+                        .HasColumnType("uuid");
+
                     b.Property<Guid>("InstanceId")
                         .HasColumnType("uuid");
 
@@ -158,6 +161,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                     b.HasKey("Id");
 
                     b.HasIndex("DataSetVersionId");
+
+                    b.HasIndex("DataSetVersionToReplaceId");
 
                     b.HasIndex("InstanceId")
                         .IsUnique();
@@ -956,7 +961,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.DataSetVersion", "DataSetVersionToReplace")
+                        .WithMany()
+                        .HasForeignKey("DataSetVersionToReplaceId");
+
                     b.Navigation("DataSetVersion");
+
+                    b.Navigation("DataSetVersionToReplace");
                 });
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.DataSetVersionMapping", b =>

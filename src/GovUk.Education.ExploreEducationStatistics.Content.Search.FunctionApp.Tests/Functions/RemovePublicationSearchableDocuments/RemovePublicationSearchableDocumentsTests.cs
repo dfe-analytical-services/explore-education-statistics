@@ -13,7 +13,8 @@ public class RemovePublicationSearchableDocumentsTests
 
     private RemovePublicationSearchableDocumentsFunction GetSut() => new(
         new NullLogger<RemovePublicationSearchableDocumentsFunction>(),
-        _searchableDocumentRemoverMockBuilder.Build());
+        _searchableDocumentRemoverMockBuilder.Build(),
+        new TestableCommandHandler());
 
     [Fact]
     public void CanInstantiateSut() => Assert.NotNull(GetSut());

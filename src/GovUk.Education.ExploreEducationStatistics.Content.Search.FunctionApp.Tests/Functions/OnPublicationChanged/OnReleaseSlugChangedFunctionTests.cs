@@ -1,6 +1,5 @@
 ﻿using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.EventHandlers.OnPublicationChanged;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.EventHandlers.OnPublicationChanged.Dtos;
-using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Services;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Services.Core;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Tests.Builders;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Tests.TheoryDataHelpers;

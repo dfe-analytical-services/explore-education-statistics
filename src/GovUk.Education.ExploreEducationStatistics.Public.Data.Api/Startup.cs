@@ -10,6 +10,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Database;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.ModelBinding;
 using GovUk.Education.ExploreEducationStatistics.Common.Rules;
+using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Options;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Repository;
@@ -60,10 +61,6 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
         .GetSection(AppInsightsOptions.Section)
         .Get<AppInsightsOptions>()!;
     
-    private readonly AnalyticsOptions _analyticsOptions = configuration
-        .GetRequiredSection(AnalyticsOptions.Section)
-        .Get<AnalyticsOptions>()!;
-
     // This method gets called by the runtime. Use this method to add services to the container.
     public void ConfigureServices(IServiceCollection services)
     {
@@ -251,25 +248,9 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
         services.AddScoped<IParquetLocationRepository, ParquetLocationRepository>();
         services.AddScoped<IParquetTimePeriodRepository, ParquetTimePeriodRepository>();
 
-        if (_analyticsOptions.Enabled)
-        {
-            services.AddSingleton<IQueryAnalyticsManager, QueryAnalyticsManager>();
-            services.AddHostedService<QueryAnalyticsConsumer>();
-            services.AddSingleton<IQueryAnalyticsWriter, QueryAnalyticsWriter>();
+        services.AddAnalytics(hostEnvironment, configuration);
 
-            if (hostEnvironment.IsDevelopment())
-            {
-                services.AddSingleton<IAnalyticsPathResolver, LocalAnalyticsPathResolver>();
-            }
-            else
-            {
-                services.AddSingleton<IAnalyticsPathResolver, AnalyticsPathResolver>();
-            }
-        }
-        else
-        {
-            services.AddSingleton<IQueryAnalyticsManager, NoOpQueryAnalyticsManager>();
-        }
+        services.AddSingleton<DateTimeProvider>();
     }
 
     // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

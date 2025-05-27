@@ -19,6 +19,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Semver;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Public.Data;
 
@@ -43,12 +44,14 @@ internal class ProcessorClient(
     public async Task<Either<ActionResult, ProcessDataSetVersionResponseViewModel>> CreateNextDataSetVersionMappings(
         Guid dataSetId,
         Guid releaseFileId,
+        Guid? dataSetVersionToReplaceId = null,
         CancellationToken cancellationToken = default)
     {
         var request = new NextDataSetVersionMappingsCreateRequest
         {
             ReleaseFileId = releaseFileId,
-            DataSetId = dataSetId
+            DataSetId = dataSetId,
+            DataSetVersionToReplaceId = dataSetVersionToReplaceId
         };
 
         return await SendPost<NextDataSetVersionMappingsCreateRequest, ProcessDataSetVersionResponseViewModel>(

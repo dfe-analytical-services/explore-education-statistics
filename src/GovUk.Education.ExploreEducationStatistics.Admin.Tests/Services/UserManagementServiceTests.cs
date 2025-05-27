@@ -916,7 +916,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     new UserReleaseInvite
                     {
                         Email = "should.not@be.removed",
-                        Role = ReleaseRole.Lead
+                        Role = ReleaseRole.Approver
                     });
                 await contentDbContext.UserPublicationInvites.AddRangeAsync(
                     new UserPublicationInvite

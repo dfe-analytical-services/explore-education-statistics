@@ -49,56 +49,37 @@ public class AnalyticsPathResolver : IAnalyticsPathResolver
         return Path.Combine(_basePath, "public-api", "queries");
     }
 
-    public string PublicApiQueriesProcessingDirectoryPath()
-    {
-        return Path.Combine(PublicApiQueriesDirectoryPath(), "processing");
-    }
-
-    public string PublicApiQueriesFailuresDirectoryPath()
-    {
-        return Path.Combine(PublicApiQueriesDirectoryPath(), "failures");
-    }
-
     public string PublicApiQueriesReportsDirectoryPath()
     {
         return Path.Combine(ReportsDirectoryPath(), "public-api", "queries");
     }
     
-    // PublicApiQueries
+    // PublicApiDataSets
+    public string PublicApiDataSetCallsDirectoryPath()
+    {
+        return Path.Combine(_basePath, "public-api", "data-sets");
+    }
+
+    public string PublicApiDataSetCallsReportsDirectoryPath()
+    {
+        return Path.Combine(PublicApiDataSetCallsDirectoryPath(), "public-api", "data-sets");
+    }
+
+    // PublicApiDataSetVersions
     public string PublicApiDataSetVersionCallsDirectoryPath()
     {
-        return Path.Combine(_basePath, "public-api", "get-meta");
-    }
-
-    public string PublicApiDataSetVersionCallsProcessingDirectoryPath()
-    {
-        return Path.Combine(PublicApiDataSetVersionCallsDirectoryPath(), "processing");
-    }
-
-    public string PublicApiDataSetVersionCallsFailuresDirectoryPath()
-    {
-        return Path.Combine(PublicApiDataSetVersionCallsDirectoryPath(), "failures");
+        return Path.Combine(_basePath, "public-api", "data-set-versions");
     }
 
     public string PublicApiDataSetVersionCallsReportsDirectoryPath()
     {
-        return Path.Combine(PublicApiDataSetVersionCallsDirectoryPath(), "public-api", "get-meta");
+        return Path.Combine(PublicApiDataSetVersionCallsDirectoryPath(), "public-api", "data-set-versions");
     }
 
     // PublicZipDownloads
     public string PublicZipDownloadsDirectoryPath()
     {
         return Path.Combine(_basePath, "public", "zip-downloads");
-    }
-
-    public string PublicZipDownloadsProcessingDirectoryPath()
-    {
-        return Path.Combine(PublicZipDownloadsDirectoryPath(), "processing");
-    }
-
-    public string PublicZipDownloadsFailuresDirectoryPath()
-    {
-        return Path.Combine(PublicZipDownloadsDirectoryPath(), "failures");
     }
 
     public string PublicZipDownloadsReportsDirectoryPath()

@@ -40,9 +40,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils
         public static IFormFile CreateFormFileFromResource(string fileName, string? newFileName = null)
         {
             var filePath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!,
-                "Resources" + Path.DirectorySeparatorChar + fileName);
+                "Resources", fileName);
 
             return CreateFormFileFromResourceWithPath(filePath, newFileName ?? fileName);
+        }
+
+        public static string GetPathForFile(string fileName)
+        {
+            return Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!,
+                "Resources", fileName);
         }
 
         public static IFormFile CreateFormFileFromResourceWithPath(string filePath, string fileName)

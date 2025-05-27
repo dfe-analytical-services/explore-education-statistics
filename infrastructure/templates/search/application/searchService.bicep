@@ -64,7 +64,7 @@ module searchServiceModule '../components/searchService.bicep' = {
   params: {
     name: searchServiceName
     location: location
-    ipRules: [] // TODO EES-5940 - Should be searchServiceIpRules
+    ipRules: searchServiceIpRules
     publicNetworkAccess: 'Enabled'
     sku: 'basic'
     systemAssignedIdentity: true
@@ -77,7 +77,7 @@ module searchStorageAccountModule '../../public-api/components/storageAccount.bi
   params: {
     location: location
     storageAccountName: '${replace(resourcePrefix, '-', '')}${abbreviations.storageStorageAccounts}search'
-    publicNetworkAccessEnabled: false
+    publicNetworkAccessEnabled: true
     firewallRules: storageIpRules
     sku: 'Standard_LRS'
     kind: 'StorageV2'

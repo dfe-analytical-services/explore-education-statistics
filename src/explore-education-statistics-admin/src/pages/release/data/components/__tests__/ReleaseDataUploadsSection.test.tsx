@@ -1053,10 +1053,10 @@ describe('ReleaseDataUploadsSection', () => {
     test('successful submit with bulk zip file refetches data files', async () => {
       const data: ArchiveDataSetFile = {
         dataFileId: 'data-file-1',
-        dataFilename: 'test.csv',
+        dataFileName: 'test.csv',
         dataFileSize: 1024,
         metaFileId: 'meta-file-1',
-        metaFilename: 'test.meta.csv',
+        metaFileName: 'test.meta.csv',
         metaFileSize: 128,
         title: 'Data set 1',
       };

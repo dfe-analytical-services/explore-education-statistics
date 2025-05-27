@@ -2,6 +2,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Database;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Semver;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 
@@ -23,6 +24,10 @@ public class DataSetVersionImport : ICreatedUpdatedTimestamps<DateTimeOffset, Da
 
     public DateTimeOffset? Updated { get; set; }
 
+    public Guid? DataSetVersionToReplaceId { get; init; }
+    
+    public DataSetVersion? DataSetVersionToReplace { get; init; }
+    
     internal class Config : IEntityTypeConfiguration<DataSetVersionImport>
     {
         public void Configure(EntityTypeBuilder<DataSetVersionImport> builder)
@@ -35,6 +40,10 @@ public class DataSetVersionImport : ICreatedUpdatedTimestamps<DateTimeOffset, Da
 
             builder.HasIndex(i => i.InstanceId)
                 .IsUnique();
+
+            builder.HasOne(i => i.DataSetVersionToReplace)
+                .WithMany()
+                .HasForeignKey(i => i.DataSetVersionToReplaceId);
         }
     }
 }

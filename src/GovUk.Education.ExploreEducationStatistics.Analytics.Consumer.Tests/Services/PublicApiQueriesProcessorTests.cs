@@ -1,5 +1,7 @@
 using System.Reflection;
 using GovUk.Education.ExploreEducationStatistics.Analytics.Consumer.Services;
+using GovUk.Education.ExploreEducationStatistics.Analytics.Consumer.Services.Workflow;
+using GovUk.Education.ExploreEducationStatistics.Analytics.Consumer.Tests.Services.Workflow.MockBuilders;
 using GovUk.Education.ExploreEducationStatistics.Common.DuckDb.DuckDb;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using InterpolatedSql.Dapper;
@@ -20,40 +22,33 @@ public abstract class PublicApiQueriesProcessorTests
     public class ProcessTests : PublicApiQueriesProcessorTests
     {
         [Fact]
-        public async Task NoSourceFolder_NoReportsProduced()
+        public async Task ProcessorUsesWorkflow()
         {
             using var pathResolver = new TestAnalyticsPathResolver();
+            SetupRequestFile(pathResolver, "Query1Request.json");
+
+            var workflowActorBuilder = new WorkflowActorMockBuilder<PublicApiQueriesProcessor>();
+            
+            var workflowActor = workflowActorBuilder 
+                .WhereDuckDbInitialisedWithErrors()
+                .Build();
 
             var service = BuildService(
-                pathResolver: pathResolver);
-            await service.Process();
+                pathResolver: pathResolver,
+                workflowActor: workflowActor);
+            
+            await Assert.ThrowsAsync<ArgumentException>(service.Process);
 
-            Assert.False(Directory.Exists(ProcessingDirectoryPath(pathResolver)));
-            Assert.False(Directory.Exists(pathResolver.PublicApiQueriesReportsDirectoryPath()));
-        }
-
-        [Fact]
-        public async Task NoSourceQueriesToConsume_NoReportsProduced()
-        {
-            using var pathResolver = new TestAnalyticsPathResolver();
-
-            Directory.CreateDirectory(pathResolver.PublicApiQueriesDirectoryPath());
-
-            var service = BuildService(
-                pathResolver: pathResolver);
-            await service.Process();
-
-            // Check that as there were no files to process, no working directories were
-            // created as a result.
-            Assert.False(Directory.Exists(ProcessingDirectoryPath(pathResolver)));
-            Assert.False(Directory.Exists(pathResolver.PublicApiQueriesReportsDirectoryPath()));
+            workflowActorBuilder
+                .Assert
+                .InitialiseDuckDbCalled();
         }
 
         [Fact]
         public async Task SingleSourceQuery_ProducesOneReportRow()
         {
             using var pathResolver = new TestAnalyticsPathResolver();
-            SetupQueryRequest(pathResolver, "Query1Request.json");
+            SetupRequestFile(pathResolver, "Query1Request.json");
 
             var service = BuildService(
                 pathResolver: pathResolver);
@@ -114,8 +109,8 @@ public abstract class PublicApiQueriesProcessorTests
         {
             using var pathResolver = new TestAnalyticsPathResolver();
 
-            SetupQueryRequest(pathResolver, "Query1Request.json");
-            SetupQueryRequest(pathResolver, "Query2Request1.json");
+            SetupRequestFile(pathResolver, "Query1Request.json");
+            SetupRequestFile(pathResolver, "Query2Request1.json");
 
             var service = BuildService(
                 pathResolver: pathResolver);
@@ -199,9 +194,9 @@ public abstract class PublicApiQueriesProcessorTests
         {
             using var pathResolver = new TestAnalyticsPathResolver();
 
-            SetupQueryRequest(pathResolver, "Query2Request1.json");
-            SetupQueryRequest(pathResolver, "Query2Request2.json");
-            SetupQueryRequest(pathResolver, "Query2Request3.json");
+            SetupRequestFile(pathResolver, "Query2Request1.json");
+            SetupRequestFile(pathResolver, "Query2Request2.json");
+            SetupRequestFile(pathResolver, "Query2Request3.json");
 
             var service = BuildService(
                 pathResolver: pathResolver);
@@ -289,8 +284,8 @@ public abstract class PublicApiQueriesProcessorTests
         {
             using var pathResolver = new TestAnalyticsPathResolver();
 
-            SetupQueryRequest(pathResolver, "Query1Request.json");
-            SetupQueryRequest(pathResolver, "Query1RequestMinorVersionUpdate.json");
+            SetupRequestFile(pathResolver, "Query1Request.json");
+            SetupRequestFile(pathResolver, "Query1RequestMinorVersionUpdate.json");
 
             var service = BuildService(
                 pathResolver: pathResolver);
@@ -382,14 +377,16 @@ public abstract class PublicApiQueriesProcessorTests
     }
 
     private PublicApiQueriesProcessor BuildService(
-        TestAnalyticsPathResolver pathResolver)
+        TestAnalyticsPathResolver pathResolver,
+        IWorkflowActor<PublicApiQueriesProcessor>? workflowActor = null)
     {
         return new PublicApiQueriesProcessor(
             pathResolver: pathResolver,
-            Mock.Of<ILogger<PublicApiQueriesProcessor>>());
+            Mock.Of<ILogger<PublicApiQueriesProcessor>>(),
+            workflowActor: workflowActor);
     }
 
-    private void SetupQueryRequest(TestAnalyticsPathResolver pathResolver, string filename)
+    private void SetupRequestFile(TestAnalyticsPathResolver pathResolver, string filename)
     {
         Directory.CreateDirectory(pathResolver.PublicApiQueriesDirectoryPath());
 

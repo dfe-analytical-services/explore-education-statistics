@@ -91,11 +91,27 @@ export interface DataBlockReplacementPlan {
   timePeriods?: TimePeriodsReplacement;
 }
 
+export interface MappingStatus {
+  locationsComplete: boolean;
+  filtersComplete: boolean;
+}
+
+export interface ApiDataSetVersionPlan {
+  id: string;
+  dataSetId: string;
+  name: string;
+  version: string;
+  status: string;
+  mappingStatus?: MappingStatus;
+  valid: boolean;
+}
+
 export interface DataReplacementPlan {
   originalSubjectId: string;
   replacementSubjectId: string;
   dataBlocks: DataBlockReplacementPlan[];
   footnotes: FootnoteReplacementPlan[];
+  apiDataSetVersionPlan: ApiDataSetVersionPlan;
   valid: boolean;
 }
 
