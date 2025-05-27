@@ -2876,14 +2876,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
               
                 if (enableReplacementOfPublicApiDataSets)
                 {
-                    //Once EES-5779 is enabled, replacing file linked to API data set is possible.
                     VerifyAllMocks(
                         locationRepository,
                         timePeriodService,
                         dataSetVersionService,
-                        releaseVersionService,
                         dataSetVersionMappingService);
-                    result.AssertRight();
                 }
                 else
                 {
@@ -2891,8 +2888,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         locationRepository,
                         timePeriodService,
                         dataSetVersionService);
-                    result.AssertBadRequest(ReplacementMustBeValid);
                 }
+                result.AssertBadRequest(ReplacementMustBeValid);
             }
         }
         [Fact]

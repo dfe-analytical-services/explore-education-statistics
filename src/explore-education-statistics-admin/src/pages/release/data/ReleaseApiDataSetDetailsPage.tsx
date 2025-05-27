@@ -285,24 +285,12 @@ export default function ReleaseApiDataSetDetailsPage() {
                   className="govuk-error-summary__title"
                   id="error-summary-title"
                 >
-                  Incompatible patch data file uploaded
+                  This API data set can not be published because it has a major
+                  version update.
                 </h2>
                 <div className="govuk-error-summary__body">
                   <ul className="govuk-list govuk-error-summary__list">
                     <li>
-                      <div className="govuk-warning-text">
-                        <span
-                          className="govuk-warning-text__icon"
-                          aria-hidden="true"
-                        >
-                          !
-                        </span>
-                        <strong className="govuk-warning-text__text">
-                          <span className="govuk-visually-hidden">Warning</span>
-                          This API data set can not be published because it has
-                          a major version update.
-                        </strong>
-                      </div>
                       The data file uploaded has resulted in a major version
                       update which is not allowed. Please remove this draft api
                       data set and upload a new data file which does not result
