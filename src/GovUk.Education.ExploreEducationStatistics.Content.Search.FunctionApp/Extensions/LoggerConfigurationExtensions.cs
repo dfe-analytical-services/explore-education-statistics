@@ -28,20 +28,13 @@ public static class LoggerConfigurationExtensions
     public static LoggerConfiguration ConfigureSerilogLogger(
         this LoggerConfiguration logger,
         IServiceProvider services,
-        IConfiguration configuration)
-    {
-        var telemetryConfiguration = services.GetRequiredService<TelemetryConfiguration>();
-        Log.Logger.Information("Telemetry Configuration: {@TelemetryConfiguration}", telemetryConfiguration);
-        Log.Logger.Information("Telemetry Configuration ConnectionString: {TelemetryConfigurationConnectionString}", telemetryConfiguration.ConnectionString);
-        Log.Logger.Information("Telemetry Configuration InstrumentationKey: {InstrumentationKey}", telemetryConfiguration.InstrumentationKey);
-        
-        return logger
+        IConfiguration configuration) =>
+        logger
             .ConfigureBootstrapLogger()
             // .ReadFrom.Configuration(configuration)
             .WriteTo.ApplicationInsights(
-                telemetryConfiguration,
+                services.GetRequiredService<TelemetryConfiguration>(),
                 TelemetryConverter.Traces);
-    }
 
     private static LoggerConfiguration AddEnrichers(this LoggerConfiguration loggerConfiguration) =>
         // To simply the config, specify the common enrichers here.
