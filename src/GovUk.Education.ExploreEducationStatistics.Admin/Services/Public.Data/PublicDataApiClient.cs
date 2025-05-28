@@ -12,6 +12,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Publi
 using GovUk.Education.ExploreEducationStatistics.Admin.Options;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Utils.Requests;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Hosting;
@@ -47,6 +48,10 @@ public class PublicDataApiClient(
     {
         await AddBearerToken(cancellationToken);
 
+        // Add an HTTP header to signal to the Public API that this call originates from the
+        // EES service.
+        httpClient.DefaultRequestHeaders.Add(RequestHeaderNames.RequestSource, "EES Admin");
+            
         var response = await requestFunction();
 
         if (!response.IsSuccessStatusCode)

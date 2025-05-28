@@ -1,6 +1,7 @@
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Requests;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Security.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.ViewModels;
@@ -14,7 +15,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services;
 
 public class DataSetVersionChangeService(
     PublicDataDbContext publicDataDbContext,
-    IUserService userService)
+    IUserService userService,
+    IAnalyticsService analyticsService)
     : IDataSetVersionChangeService
 {
     public Task<Either<ActionResult, DataSetVersionChangesViewModel>> GetChanges(
@@ -29,6 +31,11 @@ public class DataSetVersionChangeService(
                 version: dataSetVersion,
                 cancellationToken: cancellationToken)
             .OnSuccessDo(userService.CheckCanViewDataSetVersion)
+            .OnSuccessDo(dsv => analyticsService.CaptureDataSetVersionCall(
+                dataSetVersionId: dsv.Id,
+                type: DataSetVersionCallType.GetChanges,
+                requestedDataSetVersion: dataSetVersion,
+                cancellationToken: cancellationToken))
             .OnSuccess(dsv => LoadChanges(dsv, cancellationToken))
             .OnSuccess(MapChanges);
     }

@@ -3,24 +3,44 @@ using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Requests;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Fixture;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Services;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.TheoryData;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Utils;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Utils.Requests;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.WebUtilities;
 using Moq;
+using Newtonsoft.Json;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Controllers;
 
 public abstract class DataSetVersionsControllerTests(TestApplicationFactory testApp) : IntegrationTestFixtureWithCommonTestDataSetup(testApp)
 {
     private const string BaseUrl = "v1/data-sets";
+
+    public record PreviewTokenSummary(
+        string Label,
+        DateTimeOffset Created,
+        DateTimeOffset Expiry);
+
+    public static readonly TheoryData<PreviewTokenSummary>
+        PreviewTokens =
+        [
+            null,
+            new(Label: "Preview token",
+                Created: DateTimeOffset.UtcNow.AddDays(-1),
+                Expiry: DateTimeOffset.UtcNow.AddDays(1))
+        ];
+
+    private readonly TestAnalyticsPathResolver _analyticsPathResolver = new();
 
     public class ListDataSetVersionsTests(TestApplicationFactory testApp) : DataSetVersionsControllerTests(testApp)
     {
@@ -695,8 +715,8 @@ public abstract class DataSetVersionsControllerTests(TestApplicationFactory test
         public async Task WildCardSpecified_RequestedPublished_Returns200()
         {
             var (dataSet, dataSetVersions) = await SetupDataSetWithSpecifiedVersionStatuses(DataSetVersionStatus.Published);
-            
-            var dataSetVersion = dataSetVersions.FirstOrDefault(dsv => dsv.PublicVersion == "2.1");
+
+            var dataSetVersion = dataSetVersions.First(dsv => dsv.PublicVersion == "2.1");
             
             var response = await GetDataSetVersion(
                 dataSetId: dataSet.Id,
@@ -758,8 +778,9 @@ public abstract class DataSetVersionsControllerTests(TestApplicationFactory test
             Guid? previewTokenId = null,
             IContentApiClient? contentApiClient = null)
         {
-            var client = BuildApp(contentApiClient).CreateClient();
-            client.AddPreviewTokenHeader(previewTokenId);
+            var client = BuildApp(contentApiClient)
+                .CreateClient()
+                .WithPreviewTokenHeader(previewTokenId);
 
             var uri = new Uri($"{BaseUrl}/{dataSetId}/versions/{dataSetVersion}", UriKind.Relative);
 
@@ -1751,7 +1772,6 @@ public abstract class DataSetVersionsControllerTests(TestApplicationFactory test
             response.AssertForbidden();
         }
 
-
         [Theory]
         [MemberData(nameof(DataSetVersionStatusViewTheoryData.UnavailableStatuses),
             MemberType = typeof(DataSetVersionStatusViewTheoryData))]
@@ -1769,10 +1789,10 @@ public abstract class DataSetVersionsControllerTests(TestApplicationFactory test
                 .WithStatus(dataSetVersionStatus)
                 .WithDataSetId(dataSet.Id);
 
-            var userWithCorrectRole = DataFixture.AdminAccessUser();
-
             await TestApp
                 .AddTestData<PublicDataDbContext>(context => context.DataSetVersions.Add(dataSetVersion));
+
+            var userWithCorrectRole = DataFixture.AdminAccessUser();
 
             var response = await GetDataSetVersionChanges(
                 dataSetId: dataSet.Id,
@@ -1795,7 +1815,6 @@ public abstract class DataSetVersionsControllerTests(TestApplicationFactory test
             response.AssertOk();
         }
 
-
         [Theory]
         [MemberData(nameof(DataSetVersionStatusViewTheoryData.NonPublishedStatus),
             MemberType = typeof(DataSetVersionStatusViewTheoryData))]
@@ -1810,19 +1829,196 @@ public abstract class DataSetVersionsControllerTests(TestApplicationFactory test
 
             response.AssertNotFound();
         }
-        
+
+        public class AnalyticsEnabledTests : GetDataSetVersionChangesTests, IDisposable
+        {
+            public AnalyticsEnabledTests(TestApplicationFactory testApp) : base(testApp)
+            {
+                testApp.AddAppSettings("appsettings.AnalyticsEnabled.json");
+            }
+
+            public void Dispose()
+            {
+                var queriesDirectory = _analyticsPathResolver.PublicApiDataSetVersionCallsDirectoryPath();
+                if (Directory.Exists(queriesDirectory))
+                {
+                    Directory.Delete(queriesDirectory, recursive: true);
+                }
+            }
+
+            [Theory]
+            [MemberData(nameof(PreviewTokens))]
+            public async Task AnalyticsRequestCaptured(
+                PreviewTokenSummary? expectedPreviewToken)
+            {
+                DataSet dataSet = DataFixture
+                    .DefaultDataSet()
+                    .WithStatusPublished();
+
+                await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
+
+                DataSetVersion oldDataSetVersion = DataFixture
+                    .DefaultDataSetVersion(filters: 3, indicators: 0, locations: 0, timePeriods: 2)
+                    .WithVersionNumber(major: 1, minor: 0)
+                    .WithDataSetId(dataSet.Id)
+                    .WithStatusPublished();
+
+                DataSetVersion dataSetVersion = DataFixture
+                    .DefaultDataSetVersion(filters: 0, indicators: 0, locations: 0, timePeriods: 2)
+                    .WithVersionNumber(major: 2, minor: 0)
+                    .WithDataSetId(dataSet.Id)
+                    .WithStatusPublished()
+                    .WithFilterMetas(() => DataFixture.DefaultFilterMeta(options: 3)
+                        .ForIndex(2, s => s.SetPublicId(oldDataSetVersion.FilterMetas[2].PublicId))
+                        .GenerateList(3))
+                    .WithPreviewTokens(expectedPreviewToken != null
+                        ? DataFixture
+                            .DefaultPreviewToken()
+                            .WithLabel(expectedPreviewToken.Label)
+                            .WithCreated(expectedPreviewToken.Created)
+                            .WithExpiry(expectedPreviewToken.Expiry)
+                            .Generate(1)
+                        : []);
+
+                await TestApp.AddTestData<PublicDataDbContext>(context =>
+                {
+                    context.DataSetVersions.AddRange(oldDataSetVersion, dataSetVersion);
+                });
+
+                var filterMetaChanges = DataFixture
+                    .DefaultFilterMetaChange()
+                    .WithDataSetVersionId(dataSetVersion.Id)
+                    .WithPreviousStateId(oldDataSetVersion.FilterMetas[0].Id)
+                    .GenerateList(1);
+
+                await TestApp.AddTestData<PublicDataDbContext>(context =>
+                {
+                    context.FilterMetaChanges.AddRange(filterMetaChanges);
+                });
+
+                var persistedPreviewToken = dataSetVersion
+                    .PreviewTokens
+                    .SingleOrDefault();
+
+                var response = await GetDataSetVersionChanges(
+                    dataSetId: dataSet.Id,
+                    dataSetVersion: dataSetVersion.PublicVersion,
+                    previewTokenId: persistedPreviewToken?.Id);
+
+                response.AssertOk<DataSetVersionChangesViewModel>(useSystemJson: true);
+
+                // Add a slight delay as the writing of the analytics capture is non-blocking
+                // and could occur slightly after the Controller response is returned to the user.
+                Thread.Sleep(2000);
+
+                var analyticsPath = _analyticsPathResolver.PublicApiDataSetVersionCallsDirectoryPath();
+
+                // Expect the successful call to have been recorded for analytics.
+                Assert.True(Directory.Exists(analyticsPath));
+                var analyticsFiles = Directory.GetFiles(analyticsPath);
+                var analyticFile = Assert.Single(analyticsFiles);
+                var contents = await File.ReadAllTextAsync(analyticFile);
+
+                var capturedCall = JsonConvert.DeserializeObject<CaptureDataSetVersionCallRequest>(contents);
+
+                Assert.NotNull(capturedCall);
+                Assert.Equal(DataSetVersionCallType.GetChanges, capturedCall.Type);
+                Assert.Equal(dataSet.Id, capturedCall.DataSetId);
+                Assert.Equal(dataSet.Title, capturedCall.DataSetTitle);
+                Assert.Equal(dataSetVersion.Id, capturedCall.DataSetVersionId);
+                Assert.Equal(dataSetVersion.SemVersion().ToString(), capturedCall.DataSetVersion);
+                Assert.Equal(dataSetVersion.PublicVersion, capturedCall.RequestedDataSetVersion);
+                Assert.Null(capturedCall.Parameters);
+                capturedCall.StartTime.AssertUtcNow(withinMillis: 5000);
+
+                if (expectedPreviewToken == null)
+                {
+                    Assert.Null(capturedCall.PreviewToken);
+                }
+                else
+                {
+                    Assert.NotNull(persistedPreviewToken);
+                    Assert.NotNull(capturedCall.PreviewToken);
+                    Assert.Equal(expectedPreviewToken.Label, capturedCall.PreviewToken.Label);
+                    Assert.Equal(dataSetVersion.Id, capturedCall.PreviewToken.DataSetVersionId);
+                    Assert.Equal(expectedPreviewToken.Created.TruncateMicroseconds(),
+                        capturedCall.PreviewToken.Created);
+                    Assert.Equal(expectedPreviewToken.Expiry.TruncateMicroseconds(), capturedCall.PreviewToken.Expiry);
+                }
+            }
+
+            [Fact]
+            public async Task RequestFromEes_AnalyticsRequestNotCaptured()
+            {
+                DataSet dataSet = DataFixture
+                    .DefaultDataSet()
+                    .WithStatusPublished();
+
+                await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
+
+                DataSetVersion oldDataSetVersion = DataFixture
+                    .DefaultDataSetVersion(filters: 3, indicators: 0, locations: 0, timePeriods: 2)
+                    .WithVersionNumber(major: 1, minor: 0)
+                    .WithDataSetId(dataSet.Id)
+                    .WithStatusPublished();
+
+                DataSetVersion dataSetVersion = DataFixture
+                    .DefaultDataSetVersion(filters: 0, indicators: 0, locations: 0, timePeriods: 2)
+                    .WithVersionNumber(major: 2, minor: 0)
+                    .WithDataSetId(dataSet.Id)
+                    .WithStatusPublished()
+                    .WithFilterMetas(() => DataFixture.DefaultFilterMeta(options: 3)
+                        .ForIndex(2, s => s.SetPublicId(oldDataSetVersion.FilterMetas[2].PublicId))
+                        .GenerateList(3));
+
+                await TestApp.AddTestData<PublicDataDbContext>(context =>
+                {
+                    context.DataSetVersions.AddRange(oldDataSetVersion, dataSetVersion);
+                });
+
+                var filterMetaChanges = DataFixture
+                    .DefaultFilterMetaChange()
+                    .WithDataSetVersionId(dataSetVersion.Id)
+                    .WithPreviousStateId(oldDataSetVersion.FilterMetas[0].Id)
+                    .GenerateList(1);
+
+                await TestApp.AddTestData<PublicDataDbContext>(context =>
+                {
+                    context.FilterMetaChanges.AddRange(filterMetaChanges);
+                });
+
+                var response = await GetDataSetVersionChanges(
+                    dataSetId: dataSet.Id,
+                    dataSetVersion: dataSetVersion.PublicVersion,
+                    additionalHeaders: new Dictionary<string, string> { { RequestHeaderNames.RequestSource, "EES" } });
+
+                response.AssertOk<DataSetVersionChangesViewModel>(useSystemJson: true);
+
+                // Add a slight delay as the writing of the analytics capture is non-blocking
+                // and could occur slightly after the Controller response is returned to the user.
+                Thread.Sleep(2000);
+
+                var analyticsPath = _analyticsPathResolver.PublicApiDataSetVersionCallsDirectoryPath();
+
+                // Expect the successful call to have been omitted from analytics because it originates
+                // from the EES service.
+                Assert.False(Directory.Exists(analyticsPath));
+            }
+        }
+
         private async Task<HttpResponseMessage> GetDataSetVersionChanges(
             Guid dataSetId,
             string dataSetVersion,
+            IContentApiClient? contentApiClient = null,
             Guid? previewTokenId = null,
             ClaimsPrincipal? user = null,
-            IContentApiClient? contentApiClient = null)
+            Dictionary<string, string>? additionalHeaders = null)
         {
-            var client = BuildApp(
-                    contentApiClient: contentApiClient,
-                    user: user)
-                .CreateClient();
-            client.AddPreviewTokenHeader(previewTokenId);
+            var client = BuildApp(contentApiClient)
+                .WithUser(user)
+                .CreateClient()
+                .WithPreviewTokenHeader(previewTokenId)
+                .WithAdditionalHeaders(additionalHeaders);
 
             var uri = new Uri($"{BaseUrl}/{dataSetId}/versions/{dataSetVersion}/changes", UriKind.Relative);
 
@@ -1831,14 +2027,11 @@ public abstract class DataSetVersionsControllerTests(TestApplicationFactory test
     }
 
     private WebApplicationFactory<Startup> BuildApp(
-        IContentApiClient? contentApiClient = null,
-        ClaimsPrincipal? user = null)
+        IContentApiClient? contentApiClient = null)
     {
         return TestApp
-            .SetUser(user)
-            .ConfigureServices(services =>
-            {
-                services.ReplaceService(contentApiClient ?? Mock.Of<IContentApiClient>());
-            });
+            .ConfigureServices(services => services
+                .ReplaceService(contentApiClient ?? Mock.Of<IContentApiClient>())
+                .ReplaceService<IAnalyticsPathResolver>(_analyticsPathResolver, optional: true));
     }
 }
