@@ -3,7 +3,6 @@
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.CommandHandlers.
     ReindexSearchableDocuments;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Tests.Builders;
-using Microsoft.Extensions.Logging.Abstractions;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Tests.Functions.
     ReindexSearchableDocuments;
@@ -13,7 +12,6 @@ public class ReindexSearchableDocumentsFunctionTests
     private readonly SearchIndexClientMockBuilder _searchIndexClientMockBuilder = new();
 
     private ReindexSearchableDocumentsFunction GetSut() => new(
-        new NullLogger<ReindexSearchableDocumentsFunction>(),
         _searchIndexClientMockBuilder.Build(),
         new TestableCommandHandler());
 
