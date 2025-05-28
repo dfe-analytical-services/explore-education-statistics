@@ -2,7 +2,7 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services.Interfaces.Security;
 
-public interface IAuthorizationHandlerService
+public interface IAuthorizationService
 {
     bool CanAccessUnpublishedData();
 

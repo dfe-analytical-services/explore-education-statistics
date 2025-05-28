@@ -2,6 +2,7 @@ using GovUk.Education.ExploreEducationStatistics.Analytics.Common.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Requests;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using Microsoft.EntityFrameworkCore;
 
@@ -10,8 +11,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services;
 public class AnalyticsService(
     IAnalyticsManager analyticsManager,
     IPreviewTokenService previewTokenService,
+    IAuthorizationService authorizationService,
     PublicDataDbContext publicDataDbContext,
-    DateTimeProvider dateTimeProvider) : IAnalyticsService
+    DateTimeProvider dateTimeProvider,
+    ILogger<AnalyticsService> logger) : IAnalyticsService
 {
     public async Task CaptureDataSetVersionCall(
         Guid dataSetVersionId,
@@ -20,23 +23,47 @@ public class AnalyticsService(
         object? parameters = null,
         CancellationToken cancellationToken = default)
     {
-        var dataSetVersion = await publicDataDbContext
-            .DataSetVersions
-            .Include(dsv => dsv.DataSet)
-            .SingleAsync(dsv => dsv.Id == dataSetVersionId, cancellationToken);
+        try
+        {
+            // Filter out any non-public calls from analytics.
+            if (authorizationService.CanAccessUnpublishedData())
+            {
+                logger.LogDebug(
+                    message: """
+                             Ignoring capturing analytics for "{Type}" call for DataSetVersion {Id}
+                             for privileged user's call.
+                             """,
+                    type,
+                    dataSetVersionId);
+                return;
+            }
 
-        var request = new CaptureDataSetVersionCallRequest(
-            DataSetId: dataSetVersion.DataSetId,
-            DataSetVersionId: dataSetVersion.Id,
-            DataSetVersion: dataSetVersion.SemVersion().ToString(),
-            DataSetTitle: dataSetVersion.DataSet.Title,
-            Parameters: parameters,
-            PreviewToken: await GetPreviewTokenRequest(),
-            RequestedDataSetVersion: requestedDataSetVersion,
-            StartTime: dateTimeProvider.UtcNow,
-            Type: type);
-        
-        await analyticsManager.Add(request, cancellationToken);
+            var dataSetVersion = await publicDataDbContext
+                .DataSetVersions
+                .Include(dsv => dsv.DataSet)
+                .SingleAsync(dsv => dsv.Id == dataSetVersionId, cancellationToken);
+
+            var request = new CaptureDataSetVersionCallRequest(
+                DataSetId: dataSetVersion.DataSetId,
+                DataSetVersionId: dataSetVersion.Id,
+                DataSetVersion: dataSetVersion.SemVersion().ToString(),
+                DataSetTitle: dataSetVersion.DataSet.Title,
+                Parameters: parameters,
+                PreviewToken: await GetPreviewTokenRequest(),
+                RequestedDataSetVersion: requestedDataSetVersion,
+                StartTime: dateTimeProvider.UtcNow,
+                Type: type);
+
+            await analyticsManager.Add(request, cancellationToken);
+        }
+        catch (Exception e)
+        {
+            logger.LogError(
+                exception: e,
+                message: """Error whilst capturing analytics for "{Type}" call for DataSetVersion {Id}""",
+                type,
+                dataSetVersionId);
+        }
     }
 
     private async Task<PreviewTokenRequest?> GetPreviewTokenRequest()

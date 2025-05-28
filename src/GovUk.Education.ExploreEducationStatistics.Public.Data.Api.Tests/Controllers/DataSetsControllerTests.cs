@@ -1,5 +1,6 @@
 using System.Globalization;
 using System.Net.Mime;
+using System.Security.Claims;
 using CsvHelper;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
@@ -1520,15 +1521,65 @@ public abstract class DataSetsControllerTests(TestApplicationFactory testApp) : 
                     Assert.Equal(expectedPreviewToken.Expiry.TruncateMicroseconds(), capturedCall.PreviewToken.Expiry);
                 }
             }
+
+            [Fact]
+            public async Task AdminRequest_AnalyticsRequestNotCaptured()
+            {
+                DataSet dataSet = DataFixture
+                    .DefaultDataSet()
+                    .WithStatusPublished();
+
+                await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
+
+                DataSetVersion dataSetVersion = DataFixture
+                    .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 3)
+                    .WithStatusPublished()
+                    .WithDataSetId(dataSet.Id)
+                    .WithFilterMetas(() =>
+                    [
+                        DataFixture
+                            .DefaultFilterMeta()
+                            .WithLabel("filter 1")
+                    ])
+                    .FinishWith(dsv => dataSet.LatestLiveVersion = dsv);
+
+                await TestApp.AddTestData<PublicDataDbContext>(context =>
+                {
+                    context.DataSetVersions.Add(dataSetVersion);
+                    context.DataSets.Update(dataSet);
+                });
+
+                var adminAppUser = DataFixture.AdminAccessUser();
+
+                var response = await GetDataSetMeta(
+                    dataSetId: dataSet.Id,
+                    user: adminAppUser);
+
+                response.AssertOk<DataSetMetaViewModel>(useSystemJson: true);
+
+                // Add a slight delay as the writing of the analytics capture is non-blocking
+                // and could occur slightly after the Controller response is returned to the user.
+                Thread.Sleep(2000);
+
+                var analyticsPath = GetAnalyticsPathResolver().PublicApiDataSetVersionCallsDirectoryPath();
+
+                // Expect the successful call to have been omitted from analytics because it originates
+                // from the Admin App.
+                Assert.False(Directory.Exists(analyticsPath));
+            }
         }
 
         private async Task<HttpResponseMessage> GetDataSetMeta(
             Guid dataSetId,
             string? dataSetVersion = null,
             IReadOnlyList<string>? types = null,
-            Guid? previewTokenId = null)
+            Guid? previewTokenId = null,
+            ClaimsPrincipal? user = null)
         {
-            var client = BuildApp().CreateClient();
+            var client = BuildApp()
+                .WithUser(user)
+                .CreateClient();
+            
             client.AddPreviewTokenHeader(previewTokenId);
 
             var query = new Dictionary<string, string?>
@@ -2068,10 +2119,10 @@ public abstract class DataSetsControllerTests(TestApplicationFactory testApp) : 
 
             public void Dispose()
             {
-                var queriesDirectory = GetAnalyticsPathResolver().PublicApiDataSetVersionCallsDirectoryPath();
-                if (Directory.Exists(queriesDirectory))
+                var analyticsCapturePath = GetAnalyticsPathResolver().PublicApiDataSetVersionCallsDirectoryPath();
+                if (Directory.Exists(analyticsCapturePath))
                 {
-                    Directory.Delete(queriesDirectory, recursive: true);
+                    Directory.Delete(analyticsCapturePath, recursive: true);
                 }
             }
 
@@ -2162,8 +2213,50 @@ public abstract class DataSetsControllerTests(TestApplicationFactory testApp) : 
                     Assert.Equal(expectedPreviewToken.Expiry.TruncateMicroseconds(), capturedCall.PreviewToken.Expiry);
                 }
             }
-        }
 
+            [Fact]
+            public async Task AdminRequest_AnalyticsRequestNotCaptured()
+            {
+                DataSet dataSet = DataFixture
+                    .DefaultDataSet()
+                    .WithStatusPublished();
+
+                await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
+
+                DataSetVersion dataSetVersion = DataFixture
+                    .DefaultDataSetVersion()
+                    .WithStatus(DataSetVersionStatus.Published)
+                    .WithDataSet(dataSet)
+                    .FinishWith(dsv => dataSet.LatestLiveVersion = dsv);
+
+                await TestApp.AddTestData<PublicDataDbContext>(context =>
+                {
+                    context.DataSetVersions.Add(dataSetVersion);
+                    context.DataSets.Update(dataSet);
+                });
+
+                await CreateGZippedTestCsv(dataSetVersion, CsvData);
+
+                var adminAppUser = DataFixture.AdminAccessUser();
+
+                var response = await DownloadDataSet(
+                    dataSetId: dataSet.Id,
+                    user: adminAppUser);
+
+                response.AssertOk();
+
+                // Add a slight delay as the writing of the analytics capture is non-blocking
+                // and could occur slightly after the Controller response is returned to the user.
+                Thread.Sleep(2000);
+
+                var analyticsPath = GetAnalyticsPathResolver().PublicApiDataSetVersionCallsDirectoryPath();
+
+                // Expect the successful call to have been omitted from analytics because it originates
+                // from the Admin App.
+                Assert.False(Directory.Exists(analyticsPath));
+            }
+        }
+            
         private async Task CreateGZippedTestCsv(DataSetVersion dataSetVersion, IReadOnlyList<TestClass> csvData)
         {
             var dataSetVersionPathResolver = BuildApp().Services.GetRequiredService<IDataSetVersionPathResolver>();
@@ -2200,9 +2293,13 @@ public abstract class DataSetsControllerTests(TestApplicationFactory testApp) : 
         private async Task<HttpResponseMessage> DownloadDataSet(
             Guid dataSetId,
             string? dataSetVersion = null,
-            Guid? previewTokenId = null)
+            Guid? previewTokenId = null,
+            ClaimsPrincipal? user = null)
         {
-            var client = BuildApp().CreateClient();
+            var client = BuildApp()
+                .WithUser(user)
+                .CreateClient();
+            
             client.AddPreviewTokenHeader(previewTokenId);
 
             var query = new Dictionary<string, StringValues>();

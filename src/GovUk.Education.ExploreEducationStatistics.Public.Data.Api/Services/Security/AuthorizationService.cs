@@ -8,11 +8,10 @@ using Microsoft.Extensions.Primitives;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services.Security;
 
-public class AuthorizationHandlerService(
+public class AuthorizationService(
     IHttpContextAccessor httpContextAccessor,
     IWebHostEnvironment environment,
-    IPreviewTokenService previewTokenService)
-    : IAuthorizationHandlerService
+    IPreviewTokenService previewTokenService) : IAuthorizationService
 {
     public bool CanAccessUnpublishedData()
     {

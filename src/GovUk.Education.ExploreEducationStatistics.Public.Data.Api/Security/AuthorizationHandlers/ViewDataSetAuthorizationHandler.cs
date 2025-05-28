@@ -1,12 +1,14 @@
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using Microsoft.AspNetCore.Authorization;
+using IAuthorizationService =
+    GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services.Interfaces.Security.IAuthorizationService;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Security.AuthorizationHandlers;
 
 public class ViewDataSetRequirement : IAuthorizationRequirement;
 
-public class ViewDataSetAuthorizationHandler(IAuthorizationHandlerService authorizationHandlerService)
+public class ViewDataSetAuthorizationHandler(IAuthorizationService authorizationService)
     : AuthorizationHandler<ViewDataSetRequirement, DataSet>
 {
     protected override async Task HandleRequirementAsync(
@@ -20,7 +22,7 @@ public class ViewDataSetAuthorizationHandler(IAuthorizationHandlerService author
             return;
         }
 
-        if (await authorizationHandlerService.RequestHasValidPreviewToken(dataSet))
+        if (await authorizationService.RequestHasValidPreviewToken(dataSet))
         {
             context.Succeed(requirement);
         }

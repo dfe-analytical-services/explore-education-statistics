@@ -325,7 +325,7 @@ public class ViewDataSetVersionAuthorizationHandlerTests
             publicDataDbContext: dbContext,
             httpContextAccessor: httpContextAccessor);
 
-        var authorizationHandlerService = new AuthorizationHandlerService(
+        var authorizationHandlerService = new AuthorizationService(
             httpContextAccessor: httpContextAccessor,
             environment: environment.Object,
             previewTokenService);

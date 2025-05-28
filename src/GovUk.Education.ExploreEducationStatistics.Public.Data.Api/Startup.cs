@@ -231,7 +231,7 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
 
         services.AddSecurity();
 
-        services.AddScoped<IAuthorizationHandlerService, AuthorizationHandlerService>();
+        services.AddScoped<IAuthorizationService, AuthorizationService>();
 
         services.AddScoped<IPreviewTokenService, PreviewTokenService>();
 
