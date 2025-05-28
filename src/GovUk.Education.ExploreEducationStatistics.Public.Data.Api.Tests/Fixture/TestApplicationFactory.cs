@@ -125,7 +125,8 @@ public class TestApplicationFactory : TestApplicationFactory<Startup>
 
 public static class TestWebApplicationFactoryExtensions
 {
-    public static WebApplicationFactory<Startup> WithUser(this WebApplicationFactory<Startup> factory,
+    public static WebApplicationFactory<Startup> WithUser(
+        this WebApplicationFactory<Startup> factory,
         ClaimsPrincipal? user)
     {
         var authHandler = factory.Services.GetRequiredService<TestApplicationFactory.TestAuthHandlerUserProvider>();
