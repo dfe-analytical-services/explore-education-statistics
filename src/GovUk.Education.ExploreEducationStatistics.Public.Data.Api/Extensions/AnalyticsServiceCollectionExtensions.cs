@@ -18,14 +18,13 @@ public static class AnalyticsServiceCollectionExtensions
             .GetSection(AnalyticsOptions.Section)
             .Get<AnalyticsOptions>();
 
-        services.AddTransient<IAnalyticsService, AnalyticsService>();
-
         if (analyticsOptions is { Enabled: false })
         {
-            services.AddSingleton<IAnalyticsManager, NoOpAnalyticsManager>();
+            services.AddTransient<IAnalyticsService, NoOpAnalyticsService>();
             return services;
         }
 
+        services.AddTransient<IAnalyticsService, AnalyticsService>();
         services.AddSingleton<IAnalyticsManager, AnalyticsManager>();
         services.AddSingleton<IAnalyticsWriter, AnalyticsWriter>();
         services.AddHostedService<AnalyticsConsumer>();
