@@ -4,6 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Serilog;
 using Serilog.Events;
 using Serilog.Exceptions;
+using Serilog.Formatting.Compact;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Extensions;
 
@@ -16,7 +17,7 @@ public static class LoggerConfigurationExtensions
         this LoggerConfiguration logger) =>
         logger
             // default log level settings from ASP.NET Core Visual Studio template (appsettings.json)
-            .MinimumLevel.Information()
+            .MinimumLevel.Debug()
             .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
             .MinimumLevel.Override("Microsoft.Hosting.Lifetime", LogEventLevel.Information)
             // remove noisy HttpClient logs
@@ -29,7 +30,8 @@ public static class LoggerConfigurationExtensions
         IServiceProvider services,
         IConfiguration configuration) =>
         logger
-            .ReadFrom.Configuration(configuration)
+            .ConfigureBootstrapLogger()
+            // .ReadFrom.Configuration(configuration)
             .WriteTo.ApplicationInsights(services.GetRequiredService<TelemetryConfiguration>(), TelemetryConverter.Traces);
 
     private static LoggerConfiguration AddEnrichers(this LoggerConfiguration loggerConfiguration) =>

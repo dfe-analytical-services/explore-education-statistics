@@ -2,6 +2,5 @@ using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Exte
 using Microsoft.Extensions.Hosting;
 
 await new HostBuilder()
-            .InitialiseSerilog()
             .BuildHost()
             .RunAsync();

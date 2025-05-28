@@ -8,7 +8,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Serilog;
-using Serilog.Exceptions;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Extensions;
 
@@ -37,11 +36,10 @@ public static class ServiceCollectionExtensions
         IConfiguration configuration) =>
         serviceCollection
             .SetupAppInsights()
-            .AddSerilog((services, loggerConfiguration) => loggerConfiguration.ConfigureSerilogLogger(services, configuration))
-            .AddLogging(lb =>
-                // Prevent the default Azure Function logging provider from logging.
-                // Instead, let Serilog handle that.
-                lb.SetMinimumLevel(LogLevel.None))
+            .AddSerilog(
+                (serviceProvider, loggerConfiguration) => 
+                    loggerConfiguration
+                    .ConfigureSerilogLogger(serviceProvider, configuration))
         ;
 
     private static IServiceCollection SetupAppInsights(this IServiceCollection serviceCollection) =>
@@ -49,36 +47,20 @@ public static class ServiceCollectionExtensions
             // Setup App Insights, so that metrics are recorded
             .AddApplicationInsightsTelemetryWorkerService()
             .ConfigureFunctionsApplicationInsights()
-            .PreventDefaultAppInsightsLogging();
+            .RemoveAppInsightsLoggingLevelRestriction();
 
-    private static IServiceCollection PreventDefaultAppInsightsLogging(this IServiceCollection serviceCollection) =>
+    private static IServiceCollection RemoveAppInsightsLoggingLevelRestriction(this IServiceCollection serviceCollection) =>
         serviceCollection
             .Configure<LoggerFilterOptions>(
                 options =>
                 {
-                    // The Application Insights SDK adds a default logging filter that instructs ILogger to capture
-                    // only Warning and more severe logs. Application Insights requires an explicit override.
-                    
-                    // Find the built-in App Insights logging rule
                     var defaultRule = options.Rules.FirstOrDefault(
                         rule => rule.ProviderName ==
                                 "Microsoft.Extensions.Logging.ApplicationInsights.ApplicationInsightsLoggerProvider");
-
+                    
                     if (defaultRule is not null)
                     {
-                        // Remove the default rule
                         options.Rules.Remove(defaultRule);
-
-                        // Create a new rule, manually setting the log level to None
-                        // to prevent the function from logging to App Insights.
-                        // Let Serilog handle the logging.
-                        options.Rules.Add(
-                            new LoggerFilterRule(
-                                defaultRule.ProviderName,
-                                defaultRule.CategoryName,
-                                LogLevel.None,
-                                defaultRule.Filter
-                            ));
                     }
                 });
 }
