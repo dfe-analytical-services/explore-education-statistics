@@ -81,6 +81,7 @@ internal class DataSetQueryService(
             .OnSuccessDo(userService.CheckCanQueryDataSetVersion)
             .OnSuccess(dsv => RunQueryWithAnalytics(
                 dataSetVersion: dsv,
+                requestedDataSetVersion: dataSetVersion,
                 query: query,
                 cancellationToken: cancellationToken
             ))
@@ -102,6 +103,7 @@ internal class DataSetQueryService(
             .OnSuccessDo(userService.CheckCanQueryDataSetVersion)
             .OnSuccess(dsv => RunQueryWithAnalytics(
                 dataSetVersion: dsv,
+                requestedDataSetVersion: dataSetVersion,
                 query: request,
                 cancellationToken: cancellationToken,
                 baseCriteriaPath: "criteria"
@@ -137,6 +139,7 @@ internal class DataSetQueryService(
 
     private async Task<Either<ActionResult, DataSetQueryPaginatedResultsViewModel>> RunQueryWithAnalytics(
         DataSetVersion dataSetVersion,
+        string? requestedDataSetVersion,
         DataSetQueryRequest query,
         CancellationToken cancellationToken,
         string baseCriteriaPath = "")
@@ -151,6 +154,7 @@ internal class DataSetQueryService(
                 baseCriteriaPath: baseCriteriaPath)
             .OnSuccessDo(results => analyticsService.CaptureDataSetVersionQuery(
                 dataSetVersion: dataSetVersion,
+                requestedDataSetVersion: requestedDataSetVersion,
                 query: query,
                 results: results,
                 startTime: startTime,

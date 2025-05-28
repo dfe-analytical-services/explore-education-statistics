@@ -10,6 +10,8 @@ public record CaptureDataSetVersionQueryRequest(
     Guid DataSetVersionId,
     string DataSetVersion,
     string DataSetTitle,
+    PreviewTokenRequest? PreviewToken,
+    string? RequestedDataSetVersion,
     int ResultsCount,
     int TotalRowsCount,
     DateTime StartTime,
