@@ -1,4 +1,5 @@
 import ButtonText from '@common/components/ButtonText';
+import ContentHtml from '@common/components/ContentHtml';
 import DetailsMenu from '@common/components/DetailsMenu';
 import { FormCheckbox, FormTextSearchInput } from '@common/components/form';
 import VisuallyHidden from '@common/components/VisuallyHidden';
@@ -47,16 +48,16 @@ function FilterHierarchyOptions({
 
       // text matching search term emboldened
       const regex = new RegExp(hierarchySearchTerm, 'gi');
-      const newText = optionTree.label.replace(
-        regex,
-        `<strong data-testid="search-highlight">$&</strong>`,
-      );
+      const labelHtml = optionTree.label.replace(regex, `<em>$&</em>`);
       return (
-        // eslint-disable-next-line react/no-danger
-        <span dangerouslySetInnerHTML={{ __html: newText }} />
+        <ContentHtml
+          testId="search-highlight"
+          html={labelHtml}
+          sanitizeOptions={{ allowedTags: ['em'] }}
+        />
       );
     },
-    [hierarchySearchTerm],
+    [hierarchySearchTerm, optionTree],
   );
 
   const filteredOptions = useMemo(() => {
@@ -132,24 +133,26 @@ function FilterHierarchyOptions({
           onToggle={() => toggleOptions(optionTree.value)}
           className={styles.detailsMenu}
         >
-          {level !== 0 && optionTree.options.length > 6 && (
-            <div className={styles.search}>
-              <FormTextSearchInput
-                id={`${name}-search`}
-                name={`${name}-search`}
-                label={`Search ${
-                  optionTree.label
-                } (${optionTree.childFilterLabel?.toLocaleLowerCase()})`}
-                width={20}
-                onChange={event => setSearchTerm(event.target.value)}
-                onKeyPress={event => {
-                  if (event.key === 'Enter') {
-                    event.preventDefault();
-                  }
-                }}
-              />
-            </div>
-          )}
+          {level !== 0 &&
+            optionTree.options.length > 6 &&
+            !hierarchySearchTerm && (
+              <div className={styles.search}>
+                <FormTextSearchInput
+                  id={`${name}-search`}
+                  name={`${name}-search`}
+                  label={`Search ${
+                    optionTree.label
+                  } (${optionTree.childFilterLabel?.toLocaleLowerCase()})`}
+                  width={20}
+                  onChange={event => setSearchTerm(event.target.value)}
+                  onKeyPress={event => {
+                    if (event.key === 'Enter') {
+                      event.preventDefault();
+                    }
+                  }}
+                />
+              </div>
+            )}
           <div>
             {filteredOptions.length > 1 && (
               <ButtonText

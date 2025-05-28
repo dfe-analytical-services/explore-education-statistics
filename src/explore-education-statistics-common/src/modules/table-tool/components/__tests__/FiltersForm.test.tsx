@@ -1531,7 +1531,7 @@ describe('FiltersForm', () => {
       expect(fhErrorLink).toBeInTheDocument();
       // clicking error summary link focuses the fh area
       const fhFieldset = screen.getByText(
-        'Browse all name of course being studied',
+        'Browse all tiers of name of course being studied',
       );
       expect(fhFieldset.parentElement?.getAttribute('id')).toEqual(
         fhErrorLink.getAttribute('href')?.slice(1),
@@ -1568,7 +1568,7 @@ describe('FiltersForm', () => {
       await userEvent.click(screen.getByRole('button', { name: 'Search' }));
       expect(
         screen.getByText(
-          `Search 'engineering' in all tiers and name of course being studied`,
+          `Searching 'engineering' in all tiers of name of course being studied`,
         ),
       ).toBeInTheDocument();
       const clearSearchButton = screen.getByRole('button', {
@@ -1610,7 +1610,9 @@ describe('FiltersForm', () => {
 
       // see labels with search term contain the matching term text in bold
       searchHighlights.forEach(highlight =>
-        expect(highlight.nodeName).toEqual('STRONG'),
+        expect(
+          within(highlight).getByText('engineering', { exact: false }).nodeName,
+        ).toEqual('EM'),
       );
 
       expect(within(optionsContainer).getAllByRole('checkbox')).toHaveLength(4);
@@ -1651,7 +1653,7 @@ describe('FiltersForm', () => {
       await userEvent.click(screen.getByRole('button', { name: 'Search' }));
 
       const searchDescription = screen.getByText(
-        `Search 'bricklaying' in all tiers and name of course being studied`,
+        `Searching 'bricklaying' in all tiers of name of course being studied`,
       );
       expect(searchDescription).toBeInTheDocument();
 
@@ -1668,7 +1670,7 @@ describe('FiltersForm', () => {
 
       // expect UI to be resetted
       expect(searchDescription).toHaveTextContent(
-        'Browse all name of course being studied',
+        'Browse all tiers of name of course being studied',
       );
       expect(within(optionsContainer).getAllByRole('checkbox')).toHaveLength(
         22,
@@ -1680,7 +1682,7 @@ describe('FiltersForm', () => {
 
       // see options list has changed
       expect(searchDescription).toHaveTextContent(
-        `Search 'engineering' in all tiers and name of course being studied`,
+        `Searching 'engineering' in all tiers of name of course being studied`,
       );
       expect(within(optionsContainer).getAllByRole('checkbox')).toHaveLength(4);
 
@@ -1692,7 +1694,7 @@ describe('FiltersForm', () => {
 
       // expect UI to be resetted
       expect(searchDescription).toHaveTextContent(
-        'Browse all name of course being studied',
+        'Browse all tiers of name of course being studied',
       );
       expect(within(optionsContainer).getAllByRole('checkbox')).toHaveLength(
         22,

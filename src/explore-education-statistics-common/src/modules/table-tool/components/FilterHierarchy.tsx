@@ -81,20 +81,37 @@ function FilterHierarchy({
     [setExpandedOptionsList],
   );
 
-  const rootOptionTrees = useMemo(() => {
+  const { rootOptionTrees, searchLegend } = useMemo(() => {
     const optionTrees = getRootOptionTrees(
       filterHierarchy,
       optionLabelsMap,
       hierarchySearchTerm,
     );
+    if (optionTrees.length === 0) {
+      return {
+        rootOptionTrees: [],
+        searchLegend: `No options found, searching '${hierarchySearchTerm}' in all tiers of ${legend.toLowerCase()}, please expand your search`,
+      };
+    }
+
     if (hierarchySearchTerm) {
       expandAllOptions(optionTrees);
     } else {
       setExpandedOptionsList([]);
     }
 
-    return optionTrees;
-  }, [filterHierarchy, optionLabelsMap, hierarchySearchTerm, expandAllOptions]);
+    const searchHint = hierarchySearchTerm
+      ? `Searching '${hierarchySearchTerm}' in all tiers of ${legend.toLowerCase()}`
+      : `Browse all tiers of ${legend.toLowerCase()}`;
+
+    return { rootOptionTrees: optionTrees, searchLegend: searchHint };
+  }, [
+    filterHierarchy,
+    optionLabelsMap,
+    hierarchySearchTerm,
+    legend,
+    expandAllOptions,
+  ]);
 
   const selectedValues = useWatch({ name });
 
@@ -129,6 +146,64 @@ function FilterHierarchy({
       summaryAfter={<FormCheckboxSelectedCount name={name} />}
       onToggle={onToggle}
     >
+      <Modal
+        title={`${legend} tiers`}
+        triggerButton={
+          <ButtonText className="govuk-!-margin-bottom-5">
+            What are {legend.toLocaleLowerCase()} tiers?
+          </ButtonText>
+        }
+        showClose
+        closeText="Close"
+      >
+        {filterLabels.map((filterLabel, index) => {
+          const isFirst = index === 0;
+          const isLast = index + 1 === filterLabels.length;
+
+          return (
+            <div
+              key={filterLabel}
+              className={classNames(styles.tier, {
+                [styles.subTier]: !isFirst,
+              })}
+              data-testid="modal-tier-description-section"
+            >
+              <h3 className="govuk-heading-s">
+                {filterLabel} (tier {index + 1})
+              </h3>
+              {isFirst && !isLast && (
+                <>
+                  <p>This is a top level category.</p>
+                  <p>
+                    Selecting a tier 1 option provides a total value for all sub
+                    categories associated to this area
+                  </p>
+                </>
+              )}
+              {!isFirst && !isLast && (
+                <>
+                  <p>This is a sub category of tier {index}.</p>
+                  <p>
+                    Selected a tier {index + 1} option provides a total value
+                    for all {filterLabels[index + 1].toLowerCase()} options
+                    associated to this area
+                  </p>
+                </>
+              )}
+              {isLast && (
+                <>
+                  <p>These are the individual {filterLabel.toLowerCase()}</p>
+                  <p>
+                    If you're not sure about a specific{' '}
+                    {filterLabel.toLowerCase()} options, then you can also use
+                    the browse feature to find via related parent tiers
+                  </p>
+                </>
+              )}
+            </div>
+          );
+        })}
+      </Modal>
       <FormSearchBar
         id={`${name}-search`}
         name={`${name}-search`}
@@ -141,73 +216,11 @@ function FilterHierarchy({
       />
       <FormFieldset
         id={id}
-        legend={
-          hierarchySearchTerm
-            ? `Search '${hierarchySearchTerm}' in all tiers and ${legend.toLowerCase()}`
-            : `Browse all ${legend.toLowerCase()}`
-        }
+        legend={searchLegend}
         legendSize="s"
         useFormId={false}
         error={errorMessage?.toString()}
       >
-        <Modal
-          title={`${legend} tiers`}
-          triggerButton={
-            <ButtonText>
-              What are {legend.toLocaleLowerCase()} tiers?
-            </ButtonText>
-          }
-          showClose
-          closeText="Close"
-        >
-          {filterLabels.map((filterLabel, index) => {
-            const isFirst = index === 0;
-            const isLast = index + 1 === filterLabels.length;
-
-            return (
-              <div
-                key={filterLabel}
-                className={classNames(styles.tier, {
-                  [styles.subTier]: !isFirst,
-                })}
-                data-testid="modal-tier-description-section"
-              >
-                <h3 className="govuk-heading-s">
-                  {filterLabel} (tier {index + 1})
-                </h3>
-                {isFirst && !isLast && (
-                  <>
-                    <p>This is a top level category.</p>
-                    <p>
-                      Selecting a tier 1 option provides a total value for all
-                      sub categories associated to this area
-                    </p>
-                  </>
-                )}
-                {!isFirst && !isLast && (
-                  <>
-                    <p>This is a sub category of tier {index}.</p>
-                    <p>
-                      Selected a tier {index + 1} option provides a total value
-                      for all {filterLabels[index + 1].toLowerCase()} options
-                      associated to this area
-                    </p>
-                  </>
-                )}
-                {isLast && (
-                  <>
-                    <p>These are the individual {filterLabel.toLowerCase()}</p>
-                    <p>
-                      If you're not sure about a specific{' '}
-                      {filterLabel.toLowerCase()} options, then you can also use
-                      the browse feature to find via related parent tiers
-                    </p>
-                  </>
-                )}
-              </div>
-            );
-          })}
-        </Modal>
         <div data-testid="filter-hierarchy-options">
           {rootOptionTrees.map(optionTree => {
             return (

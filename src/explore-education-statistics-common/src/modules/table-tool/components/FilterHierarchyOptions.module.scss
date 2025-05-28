@@ -15,6 +15,13 @@
   &__expanded:not(:last-child) {
     margin-bottom: govuk-spacing(4);
   }
+
+  em {
+    background-color: govuk-colour('yellow');
+    color: govuk-colour('black');
+    font-style: normal;
+    font-weight: bold;
+  }
 }
 
 .detailsMenu {

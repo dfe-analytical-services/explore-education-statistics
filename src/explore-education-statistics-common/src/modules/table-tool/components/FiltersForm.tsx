@@ -562,7 +562,7 @@ export default function FiltersForm({
                             const isThisTotal =
                               optionLabelsMap[relatedOptionId].toLowerCase() ===
                               'total';
-                            if (isThisTotal) {
+                            if (isThisTotal && index !== 0) {
                               return null;
                             }
 
@@ -570,8 +570,7 @@ export default function FiltersForm({
                               relatedOptionId === optionId ? (
                                 <strong>
                                   {optionLabelsMap[relatedOptionId]}{' '}
-                                  {isNextTotal && ` (total)`}
-                                  <VisuallyHidden>(selected)</VisuallyHidden>
+                                  {!isThisTotal && isNextTotal && ` (total)`}
                                 </strong>
                               ) : (
                                 optionLabelsMap[relatedOptionId]
@@ -590,7 +589,6 @@ export default function FiltersForm({
                               </span>
                             );
                           })}
-                          {}
                         </li>
                       ))}
                     </CollapsibleList>
