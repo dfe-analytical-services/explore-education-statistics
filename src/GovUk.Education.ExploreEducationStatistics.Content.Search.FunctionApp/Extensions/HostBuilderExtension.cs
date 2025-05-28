@@ -13,6 +13,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using Microsoft.Net.Http.Headers;
+using Serilog;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Extensions;
 
@@ -71,4 +72,17 @@ public static class HostBuilderExtension
                         })
         )
         .Build();
+
+    public static IHostBuilder InitialiseSerilog(this IHostBuilder hostBuilder)
+    {
+        // Setup Serilog
+        // https://github.com/serilog/serilog-aspnetcore
+        Log.Logger = new LoggerConfiguration()
+            // Because we can't access appsettings before creating the HostBuilder we'll use a bootstrap logger
+            // without configuration specific initialization first and replace it after the HostBuilder was created.
+            // See https://github.com/serilog/serilog-aspnetcore#two-stage-initialization
+            .ConfigureBootstrapLogger()
+            .CreateBootstrapLogger();
+        return hostBuilder;
+    }
 }
