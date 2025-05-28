@@ -9,6 +9,7 @@ import FormattedDate from '@common/components/FormattedDate';
 import Tag from '@common/components/Tag';
 import { useQuery } from '@tanstack/react-query';
 import React, { ReactNode } from 'react';
+import { useFeatureFlag } from '@admin/contexts/FeatureFlagContext';
 import apiDataSetQueries from '@admin/queries/apiDataSetQueries';
 import getDataSetVersionStatusText from './utils/getDataSetVersionStatusText';
 
@@ -29,9 +30,14 @@ const DataFileDetailsTable = ({
   onStatusChange,
   onReplacementStatusChange,
 }: Props) => {
-  const replacementFileHasApi =
-    dataFile.publicApiDataSetId !== undefined &&
-    dataFile.replacedBy !== undefined;
+  const isNewReplaceDsvFeatureEnabled = useFeatureFlag(
+    'enableReplacementOfPublicApiDataSets',
+  );
+  const replacementFileHasApi = isNewReplaceDsvFeatureEnabled
+    ? dataFile.publicApiDataSetId !== undefined &&
+      dataFile.replacedBy !== undefined
+    : false;
+
   const { data: dataSet, isLoading } = useQuery({
     ...(dataFile.publicApiDataSetId
       ? apiDataSetQueries.get(dataFile.publicApiDataSetId)
@@ -41,6 +47,7 @@ const DataFileDetailsTable = ({
       return data?.draftVersion?.status === 'Processing' ? 3000 : false;
     },
   });
+
   const tagColor = dataSet?.draftVersion?.status === 'Draft' ? 'green' : 'red';
 
   return (

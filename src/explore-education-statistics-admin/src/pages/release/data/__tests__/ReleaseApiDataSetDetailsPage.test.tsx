@@ -858,8 +858,8 @@ describe('ReleaseApiDataSetDetailsPage', () => {
         version: '2.0.1',
         mappingStatus: {
           hasMajorVersionUpdate: true,
-          locationsComplete: false,
-          filtersComplete: false,
+          locationsComplete: true,
+          filtersComplete: true,
         },
       },
     });
@@ -873,6 +873,10 @@ describe('ReleaseApiDataSetDetailsPage', () => {
           'This API data set can not be published because it has a major version update.',
         ),
       ).toBeInTheDocument();
+
+      expect(() =>
+        screen.getByText('Draft API data set version is ready to be published'),
+      ).toThrow('Unable to find an element');
     });
   });
 
@@ -884,8 +888,8 @@ describe('ReleaseApiDataSetDetailsPage', () => {
         version: '2.0.1',
         mappingStatus: {
           hasMajorVersionUpdate: true,
-          locationsComplete: false,
-          filtersComplete: false,
+          locationsComplete: true,
+          filtersComplete: true,
         },
       },
     });
@@ -893,6 +897,10 @@ describe('ReleaseApiDataSetDetailsPage', () => {
     renderPage();
 
     await waitFor(() => {
+      expect(
+        screen.getByText('Draft API data set version is ready to be published'),
+      ).toBeInTheDocument();
+
       expect(() =>
         screen.getByText(
           'This API data set can not be published because it has a major version update.',
@@ -934,8 +942,8 @@ describe('ReleaseApiDataSetDetailsPage', () => {
         version: '2.0',
         mappingStatus: {
           hasMajorVersionUpdate: true,
-          locationsComplete: false,
-          filtersComplete: false,
+          locationsComplete: true,
+          filtersComplete: true,
         },
       },
     });

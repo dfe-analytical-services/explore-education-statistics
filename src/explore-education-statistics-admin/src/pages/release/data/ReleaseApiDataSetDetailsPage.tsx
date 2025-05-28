@@ -18,7 +18,7 @@ import {
   ReleaseDataSetRouteParams,
   ReleaseRouteParams,
 } from '@admin/routes/releaseRoutes';
-import { DataSetStatus } from '@admin/services/apiDataSetService';
+import { ApiDataSet, DataSetStatus } from '@admin/services/apiDataSetService';
 import apiDataSetVersionService from '@admin/services/apiDataSetVersionService';
 import ContentHtml from '@common/components/ContentHtml';
 import LoadingSpinner from '@common/components/LoadingSpinner';
@@ -67,6 +67,23 @@ export default function ReleaseApiDataSetDetailsPage() {
       setFinalisingStatus('finalised');
     }
   }, [finalisingStatus, dataSet?.draftVersion?.status, setFinalisingStatus]);
+
+  const shouldShowRejectedError = (
+    apiDataSet: ApiDataSet | undefined,
+    isNewReplaceDsvFeatureEnabled: boolean,
+  ): boolean => {
+    const versionParts = apiDataSet?.draftVersion?.version?.split('.') || [];
+    const isPatch = isNewReplaceDsvFeatureEnabled
+      ? versionParts?.length === 3 && parseInt(versionParts[2], 10) > 0
+      : false;
+
+    return isPatch
+      ? !!(
+          apiDataSet?.draftVersion?.mappingStatus &&
+          apiDataSet.draftVersion.mappingStatus.hasMajorVersionUpdate
+        )
+      : false;
+  };
 
   const handleFinalise = async () => {
     if (dataSet?.draftVersion) {
@@ -232,15 +249,11 @@ export default function ReleaseApiDataSetDetailsPage() {
   const isNewReplaceDsvFeatureEnabled = useFeatureFlag(
     'enableReplacementOfPublicApiDataSets',
   );
-  const versionArr = dataSet?.draftVersion?.version?.split('.') || [];
-  const isPatch = isNewReplaceDsvFeatureEnabled
-    ? versionArr?.length === 3 && parseInt(versionArr[2], 10) > 0
-    : false;
 
-  const showRejectedError = isPatch
-    ? dataSet?.draftVersion?.mappingStatus &&
-      dataSet.draftVersion.mappingStatus.hasMajorVersionUpdate
-    : false;
+  const showRejectedError = shouldShowRejectedError(
+    dataSet,
+    isNewReplaceDsvFeatureEnabled,
+  );
 
   const mappingComplete =
     dataSet?.draftVersion?.mappingStatus &&
