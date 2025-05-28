@@ -31,7 +31,6 @@ jobs:
                 action: validate
                 serviceConnection: ${{ parameters.serviceConnection }}
                 parameterFile: $(paramFile)
-                deployAlerts: false
                 deploySearchConfig: false
                 githubSourceRef: $(Build.SourceBranch)
                 searchDocsFunctionAppExists: false
@@ -49,7 +48,6 @@ jobs:
                 action: create
                 serviceConnection: ${{ parameters.serviceConnection }}
                 parameterFile: $(paramFile)
-                deployAlerts: $(deployAlerts)
                 deploySearchConfig: $(deploySearchConfig)
                 githubSourceRef: $(Build.SourceBranch)
                 searchDocsFunctionAppExists: $(searchDocsFunctionAppExists)

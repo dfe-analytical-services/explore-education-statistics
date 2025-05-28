@@ -2,9 +2,6 @@ import { abbreviations } from '../../common/abbreviations.bicep'
 import { IpRange } from '../../common/types.bicep'
 import { ResourceNames } from '../types.bicep'
 
-@description('Whether to create/update Azure Monitor alerts during this deploy.')
-param deployAlerts bool
-
 @description('Whether to deploy the Search service configuration to create/update the data source, index and indexer.')
 param deploySearchConfig bool
 
@@ -82,11 +79,11 @@ module searchStorageAccountModule '../../public-api/components/storageAccount.bi
     sku: 'Standard_LRS'
     kind: 'StorageV2'
     keyVaultName: keyVault.name
-    alerts: deployAlerts ? {
+    alerts: {
       availability: true
       latency: true
       alertsGroupName: resourceNames.existingResources.alertsGroup
-    } : null
+    }
     privateEndpointSubnetIds: {
       blob: searchStoragePrivateEndpointSubnet.id
     }

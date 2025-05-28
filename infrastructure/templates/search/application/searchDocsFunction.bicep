@@ -30,9 +30,6 @@ param searchableDocumentsContainerName string
 @description('The IP address ranges that can access the Search Docs Function App storage accounts.')
 param storageFirewallRules IpRange[]
 
-@description('Whether to create/update Azure Monitor alerts during this deploy.')
-param deployAlerts bool
-
 @description('Specifies common resource naming variables.')
 param resourceNames ResourceNames
 
@@ -199,20 +196,18 @@ module functionAppModule '../../common/components/functionApp.bicep' = {
       storageAccounts: searchDocsFunctionPrivateEndpointSubnet.id
     }
     outboundSubnetId: outboundVnetSubnet.id
-    alerts: deployAlerts
-      ? {
-          cpuPercentage: true
-          functionAppHealth: true
-          httpErrors: true
-          memoryPercentage: true
-          storageAccountAvailability: true
-          storageLatency: false
-          fileServiceAvailability: true
-          fileServiceLatency: false
-          fileServiceCapacity: true
-          alertsGroupName: resourceNames.existingResources.alertsGroup
-        }
-      : null
+    alerts: {
+      cpuPercentage: true
+      functionAppHealth: true
+      httpErrors: true
+      memoryPercentage: true
+      storageAccountAvailability: true
+      storageLatency: false
+      fileServiceAvailability: true
+      fileServiceLatency: false
+      fileServiceCapacity: true
+      alertsGroupName: resourceNames.existingResources.alertsGroup
+    }
     tagValues: tagValues
   }
 }
