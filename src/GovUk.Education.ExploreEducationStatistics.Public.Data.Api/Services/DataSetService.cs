@@ -22,8 +22,7 @@ internal class DataSetService(
     PublicDataDbContext publicDataDbContext,
     IDataSetVersionPathResolver dataSetVersionPathResolver,
     IUserService userService,
-    IAnalyticsService analyticsService,
-    ILogger<DataSetService> logger)
+    IAnalyticsService analyticsService)
     : IDataSetService
 {
     public async Task<Either<ActionResult, DataSetViewModel>> GetDataSet(
@@ -48,10 +47,10 @@ internal class DataSetService(
                 dataSetVersion: dataSetVersion,
                 cancellationToken: cancellationToken)
             .OnSuccessDo(userService.CheckCanViewDataSetVersion)
-            .OnSuccessDo(dsv => CaptureDataSetVersionCallForAnalytics(
+            .OnSuccessDo(dsv => analyticsService.CaptureDataSetVersionCall(
                 dataSetVersionId: dsv.Id, 
-                dataSetVersion: dataSetVersion,
                 type: DataSetVersionCallType.DownloadCsv,
+                requestedDataSetVersion: dataSetVersion,
                 cancellationToken: cancellationToken))
             .OnSuccess(DownloadDataSetVersionToStream);
     }
@@ -142,10 +141,10 @@ internal class DataSetService(
                 dataSetVersion: dataSetVersion,
                 cancellationToken: cancellationToken)
             .OnSuccessDo(userService.CheckCanViewDataSetVersion)
-            .OnSuccessDo(dsv => CaptureDataSetVersionCallForAnalytics(
+            .OnSuccessDo(dsv => analyticsService.CaptureDataSetVersionCall(
                 dataSetVersionId: dsv.Id, 
-                dataSetVersion: dataSetVersion,
                 type: DataSetVersionCallType.GetMetadata,
+                requestedDataSetVersion: dataSetVersion,
                 parameters: types != null 
                     ? new GetMetadataAnalyticsParameters(types)
                     : null,
@@ -369,32 +368,6 @@ internal class DataSetService(
             Locations = locations,
             TimePeriods = timePeriods,
         };
-    }
-
-    private async Task CaptureDataSetVersionCallForAnalytics(
-        Guid dataSetVersionId,
-        string? dataSetVersion,
-        DataSetVersionCallType type,
-        object? parameters = null,
-        CancellationToken cancellationToken = default) 
-    {
-        try
-        {
-            await analyticsService.CaptureDataSetVersionCall(
-                dataSetVersionId: dataSetVersionId,
-                type: type,
-                requestedDataSetVersion: dataSetVersion,
-                parameters: parameters,
-                cancellationToken: cancellationToken);
-        }
-        catch (Exception e)
-        {
-            logger.LogError(
-                exception: e,
-                message: """Error whilst capturing analytics for "{Type}" call for DataSetVersion {Id}""",
-                type,
-                dataSetVersionId);
-        }
     }
 
     private static FilterOptionsViewModel MapFilterOptions(FilterMeta filterMeta)

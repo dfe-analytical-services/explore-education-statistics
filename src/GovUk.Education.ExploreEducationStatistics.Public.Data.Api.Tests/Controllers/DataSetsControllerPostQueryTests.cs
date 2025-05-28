@@ -4098,8 +4098,9 @@ public abstract class DataSetsControllerPostQueryTests(TestApplicationFactory te
             query["dataSetVersion"] = dataSetVersion;
         }
 
-        var client = (app ?? BuildApp()).CreateClient();
-        client.AddPreviewTokenHeader(previewTokenId);
+        var client = (app ?? BuildApp())
+            .CreateClient()
+            .WithPreviewTokenHeader(previewTokenId);
 
         var uri = QueryHelpers.AddQueryString($"{BaseUrl}/{dataSetId}/query", query);
 
