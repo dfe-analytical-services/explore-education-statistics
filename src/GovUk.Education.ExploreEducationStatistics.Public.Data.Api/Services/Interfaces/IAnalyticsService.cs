@@ -15,6 +15,7 @@ public interface IAnalyticsService
 
     Task CaptureDataSetVersionQuery(
         DataSetVersion dataSetVersion,
+        string? requestedDataSetVersion,
         DataSetQueryRequest query,
         DataSetQueryPaginatedResultsViewModel results,
         DateTime startTime,

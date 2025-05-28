@@ -16,7 +16,7 @@ public abstract class AnalyticsWritePublicApiQueryStrategyTests
         private const string SnapshotPrefix = $"{nameof(AnalyticsWritePublicApiQueryStrategyTests)}.{nameof(ReportTests)}";
         
         [Fact]
-        public async Task Success()
+        public async Task CallWrittenSuccessfully_WithCoreQueryDetails()
         {
             using var pathResolver = new TestAnalyticsPathResolver();
             var service = BuildStrategy(pathResolver);
@@ -26,39 +26,61 @@ public abstract class AnalyticsWritePublicApiQueryStrategyTests
                 DataSetVersionId: new Guid("0da7c640-80a8-44e2-8028-fc529bcedcb1"),
                 DataSetVersion: "2.3.1",
                 DataSetTitle: "Data Set Title",
+                PreviewToken: null,
+                RequestedDataSetVersion: null,
                 Query: DataSetQueryRequestTestData.NestedQuery1,
                 ResultsCount: 55,
                 TotalRowsCount: 5100,
                 StartTime: DateTime.Parse("2025-02-20T12:00:00.000Z"),
                 EndTime: DateTime.Parse("2025-02-20T12:00:10.234Z")), default);
-            
-            await service.Report(new CaptureDataSetVersionQueryRequest(
-                DataSetId: new Guid("72e16c8c-2dc0-4063-bdf6-ee52bd127ebe"),
-                DataSetVersionId: new Guid("bb68fd95-1231-498c-8858-b061d739ae17"),
-                DataSetVersion: "3.0.0",
-                DataSetTitle: "Data Set Title 2",
-                Query: DataSetQueryRequestTestData.NestedQuery2,
-                ResultsCount: 120,
-                TotalRowsCount: 10000,
-                StartTime: DateTime.Parse("2025-02-20T01:00:00.000Z"),
-                EndTime: DateTime.Parse("2025-02-20T01:00:10.999Z")), default);
 
             var files = Directory
                 .GetFiles(pathResolver.PublicApiQueriesDirectoryPath())
                 .Order()
                 .ToList();
             
-            Assert.Equal(2, files.Count);
+            var file = Assert.Single(files);
+            var fileContents = await File.ReadAllTextAsync(file);
             
-            var file1Contents = await File.ReadAllTextAsync(files[0]);
             Snapshot.Match(
-                currentResult: file1Contents,
-                snapshotName: $"{SnapshotPrefix}.{nameof(Success)}.Query1");
+                currentResult: fileContents,
+                snapshotName: $"{SnapshotPrefix}.{nameof(CallWrittenSuccessfully_WithCoreQueryDetails)}");
+        }
+        
+        [Fact]
+        public async Task CallWrittenSuccessfully_WithPreviewTokenAndRequestedDataSetVersion()
+        {
+            using var pathResolver = new TestAnalyticsPathResolver();
+            var service = BuildStrategy(pathResolver);
+
+            await service.Report(new CaptureDataSetVersionQueryRequest(
+                DataSetId: new Guid("acb97c97-89c9-4b74-88e7-39c27f6bab63"),
+                DataSetVersionId: new Guid("0da7c640-80a8-44e2-8028-fc529bcedcb1"),
+                DataSetVersion: "2.3.1",
+                DataSetTitle: "Data Set Title",
+                new PreviewTokenRequest(
+                    Label: "Preview token content",
+                    DataSetVersionId: new Guid("01d29401-7974-1276-a06b-b28a6a5385c6"),
+                    Created: DateTime.Parse("2025-02-23T11:02:44.850Z"),
+                    Expiry: DateTime.Parse("2025-02-24T11:02:44.850Z")),
+                RequestedDataSetVersion: "1.*",
+                Query: DataSetQueryRequestTestData.NestedQuery1,
+                ResultsCount: 55,
+                TotalRowsCount: 5100,
+                StartTime: DateTime.Parse("2025-02-20T12:00:00.000Z"),
+                EndTime: DateTime.Parse("2025-02-20T12:00:10.234Z")), default);
+
+            var files = Directory
+                .GetFiles(pathResolver.PublicApiQueriesDirectoryPath())
+                .Order()
+                .ToList();
             
-            var file2Contents = await File.ReadAllTextAsync(files[1]);
+            var file = Assert.Single(files);
+            var fileContents = await File.ReadAllTextAsync(file);
+            
             Snapshot.Match(
-                currentResult: file2Contents,
-                snapshotName: $"{SnapshotPrefix}.{nameof(Success)}.Query2");
+                currentResult: fileContents,
+                snapshotName: $"{SnapshotPrefix}.{nameof(CallWrittenSuccessfully_WithPreviewTokenAndRequestedDataSetVersion)}");
         }
 
         private static AnalyticsWritePublicApiQueryStrategy BuildStrategy(

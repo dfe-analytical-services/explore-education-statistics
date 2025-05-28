@@ -68,6 +68,7 @@ public class AnalyticsService(
     
     public async Task CaptureDataSetVersionQuery(
         DataSetVersion dataSetVersion,
+        string? requestedDataSetVersion,
         DataSetQueryRequest query,
         DataSetQueryPaginatedResultsViewModel results,
         DateTime startTime,
@@ -89,6 +90,8 @@ public class AnalyticsService(
                     DataSetVersionId: dataSetVersion.Id,
                     DataSetVersion: dataSetVersion.SemVersion().ToString(),
                     DataSetTitle: dataSetVersion.DataSet.Title,
+                    PreviewToken: await GetPreviewTokenRequest(),
+                    RequestedDataSetVersion: requestedDataSetVersion,
                     Query: query,
                     ResultsCount: results.Results.Count,
                     TotalRowsCount: results.Paging.TotalResults,
@@ -144,6 +147,7 @@ public class NoOpAnalyticsService : IAnalyticsService
 
     public Task CaptureDataSetVersionQuery(
         DataSetVersion dataSetVersion,
+        string? requestedDataSetVersion,
         DataSetQueryRequest query,
         DataSetQueryPaginatedResultsViewModel results,
         DateTime startTime,
