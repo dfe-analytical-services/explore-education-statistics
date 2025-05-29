@@ -3,18 +3,21 @@ import DetailsMenu from '@common/components/DetailsMenu';
 import { FormFieldset } from '@common/components/form';
 import { useFormIdContext } from '@common/components/form/contexts/FormIdContext';
 import FormCheckboxSelectedCount from '@common/components/form/FormCheckboxSelectedCount';
+import FormSearchBar from '@common/components/form/FormSearchBar';
 import Modal from '@common/components/Modal';
 import { SubjectMetaFilterHierarchy } from '@common/services/tableBuilderService';
+import { Dictionary } from '@common/types';
 import sortAlphabeticalTotalsFirst from '@common/utils/sortAlphabeticalTotalsFirst';
 import classNames from 'classnames';
 import get from 'lodash/get';
 import React, { memo, useCallback, useEffect, useMemo, useState } from 'react';
 import { useFormContext, useWatch } from 'react-hook-form';
-import FormSearchBar from '@common/components/form/FormSearchBar';
 import styles from './FilterHierarchy.module.scss';
 import FilterHierarchyOptions, {
   FilterHierarchyOption,
+  SelectedChildren,
 } from './FilterHierarchyOptions';
+import augmentFilterHierarchySelections from './utils/augmentFilterHierarchySelections';
 import { OptionLabelsMap } from './utils/getFilterHierarchyLabelsMap';
 
 export interface FilterHierarchyProps {
@@ -114,6 +117,45 @@ function FilterHierarchy({
   ]);
 
   const selectedValues = useWatch({ name });
+
+  const selectedChildren: SelectedChildren = useMemo(() => {
+    if (!selectedValues?.length) {
+      return {
+        optionsWithSelectedChildren: [],
+        optionsWithSelectedChildrenCountMap: {},
+      };
+    }
+
+    const augmentedSelectedValues = augmentFilterHierarchySelections(
+      { [name]: selectedValues },
+      [filterHierarchy],
+      optionLabelsMap,
+    );
+
+    const optionIdsWithSelectedChildren = Object.entries(
+      augmentedSelectedValues[name],
+    ).map(([selectedOptionId, relatedOptionIds]) =>
+      relatedOptionIds.filter(optionId => optionId !== selectedOptionId),
+    );
+
+    // a list of options with selected (grand)children
+    const optionsWithSelectedChildren = Array.from(
+      new Set(...optionIdsWithSelectedChildren),
+    );
+
+    // a count map, [key] being the option id that has selected (grand)children, [value] being count of selected (grand)children
+    const optionsWithSelectedChildrenCountMap = optionIdsWithSelectedChildren
+      .flat()
+      .reduce((acc: Dictionary<number>, item) => {
+        acc[item] = (acc[item] || 0) + 1;
+        return acc;
+      }, {});
+
+    return {
+      optionsWithSelectedChildren,
+      optionsWithSelectedChildrenCountMap,
+    };
+  }, [selectedValues, filterHierarchy, name, optionLabelsMap]);
 
   const toggleOptions = useCallback(
     (optionId: string) => {
@@ -234,6 +276,7 @@ function FilterHierarchy({
                 toggleOptions={toggleOptions}
                 expandedOptionsList={expandedOptionsList}
                 hierarchySearchTerm={hierarchySearchTerm}
+                selectedChildren={selectedChildren}
               />
             );
           })}
