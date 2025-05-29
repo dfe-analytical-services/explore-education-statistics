@@ -37,6 +37,8 @@ public class PublicApiQueriesProcessor(
                     dataSetVersionId UUID,
                     dataSetVersion VARCHAR,
                     dataSetTitle VARCHAR,
+                    previewToken JSON,
+                    requestedDataSetVersion VARCHAR,
                     resultsCount INT,
                     totalRowsCount INT,
                     startTime DATETIME,
@@ -61,6 +63,8 @@ public class PublicApiQueriesProcessor(
                             dataSetVersionId: UUID,
                             dataSetVersion: VARCHAR,
                             dataSetTitle: VARCHAR,
+                            previewToken: JSON,
+                            requestedDataSetVersion: VARCHAR,
                             resultsCount: INT,
                             totalRowsCount: INT,
                             startTime: DATETIME,
@@ -97,7 +101,12 @@ public class PublicApiQueriesProcessor(
                     dataSetVersionId,
                     startTime,
                     endTime,
-                    CAST(EXTRACT('milliseconds' FROM EndTime - StartTime) AS INT) AS durationMillis
+                    CAST(EXTRACT('milliseconds' FROM EndTime - StartTime) AS INT) AS durationMillis,
+                    previewToken->>'label' AS previewTokenLabel,
+                    CAST(previewToken->>'dataSetVersionId' AS UUID) AS previewTokenDataSetVersionId,
+                    CAST(previewToken->>'created' AS DATETIME) AS previewTokenCreated,
+                    CAST(previewToken->>'expiry' AS DATETIME) AS previewTokenExpiry,
+                    requestedDataSetVersion
                 FROM queries
                 ORDER BY queryHash, startTime
             ");

@@ -20,12 +20,12 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Services.Tests;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Utils.Requests;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Primitives;
 using Moq;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
-using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Controllers;
 
@@ -2991,16 +2991,59 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
             // Check that the folder for capturing queries for analytics was never created.
             Assert.False(Directory.Exists(_analyticsPathResolver.PublicApiQueriesDirectoryPath()));
         }
-    }
-    
-    public class QueryAnalyticsExceptionTests(TestApplicationFactory testApp)
-        : DataSetsControllerGetQueryTests(testApp)
-    {
+
+        [Fact]
+        public async Task RequestFromEes_NotCapturedByAnalytics()
+        {
+            var dataSetVersion = await SetupDefaultDataSetVersion();
+
+            var response = await QueryDataSet(
+                dataSetId: dataSetVersion.DataSetId,
+                indicators: [AbsenceSchoolData.IndicatorEnrolments],
+                queryParameters: new Dictionary<string, StringValues>
+                {
+                    { "filters.eq", AbsenceSchoolData.FilterSchoolTypeTotal },
+                    { "geographicLevels.eq", "NAT" },
+                    { "timePeriods.eq", "2020/2021|AY" },
+                    { "locations.eq", $"NAT|id|{AbsenceSchoolData.LocationNatEngland}" }
+                },
+                sorts: ["timePeriod|Asc"],
+                debug: true,
+                page: 2,
+                pageSize: 3,
+                additionalHeaders: new Dictionary<string, string> { { RequestHeaderNames.RequestSource, "EES" } });
+
+            var viewModel = response.AssertOk<DataSetQueryPaginatedResultsViewModel>(useSystemJson: true);
+
+            // There are 4 results for the query above, but we are requesting page 2 and a page size of 3,
+            // and so this 2nd page only displays the final single result of the 4.
+            Assert.Single(viewModel.Results);
+
+            // Add a slight delay as the writing of the query details for analytics is non-blocking
+            // and could occur slightly after the query result is returned to the user.
+            Thread.Sleep(2000);
+
+            var analyticsPath = _analyticsPathResolver.PublicApiQueriesDirectoryPath();
+
+            // Expect the successful call to have been omitted from analytics because it originates
+            // from the EES service.
+            Assert.False(Directory.Exists(analyticsPath));
+        }
+        
         [Fact]
         public async Task ExceptionThrownByQueryAnalyticsManager_SuccessfulResultsStillReturned()
         {
             // Set up the manager to throw an exception when the service attempts to add a query to it.
             var analyticsManagerMock = new Mock<IAnalyticsManager>(MockBehavior.Strict);
+            
+            analyticsManagerMock
+                .Setup(m => m.Read(It.IsAny<CancellationToken>()))
+                .Returns(async () =>
+                {
+                    await Task.Delay(Timeout.Infinite);
+                    return null!;
+                });
+            
             analyticsManagerMock
                 .Setup(m => m.Add(
                     It.IsAny<CaptureDataSetVersionQueryRequest>(), 
@@ -3028,7 +3071,10 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
             );
 
             // Verify that the manager threw the Exception as planned.
-            VerifyAllMocks(analyticsManagerMock);
+            analyticsManagerMock
+                .Verify(s => s.Add(
+                    It.IsAny<CaptureDataSetVersionQueryRequest>(), 
+                    It.IsAny<CancellationToken>()));
 
             // Verify that despite the Exception being thrown, the service still returned
             // the expected successful query.
@@ -3088,7 +3134,8 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
         bool? debug = null,
         IDictionary<string, StringValues>? queryParameters = null,
         Guid? previewTokenId = null,
-        WebApplicationFactory<Startup>? app = null)
+        WebApplicationFactory<Startup>? app = null,
+        Dictionary<string, string>? additionalHeaders = null)
     {
         var query = new Dictionary<string, StringValues>
         {
@@ -3127,7 +3174,8 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
 
         var client = (app ?? BuildApp())
             .CreateClient()
-            .WithPreviewTokenHeader(previewTokenId);
+            .WithPreviewTokenHeader(previewTokenId)
+            .WithAdditionalHeaders(additionalHeaders);
 
         var uri = QueryHelpers.AddQueryString($"{BaseUrl}/{dataSetId}/query", query);
 
@@ -3239,3 +3287,4 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
         public required HashSet<string> Indicators { get; init; } = [];
     }
 }
+
