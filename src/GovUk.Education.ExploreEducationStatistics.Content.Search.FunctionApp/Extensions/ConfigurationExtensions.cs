@@ -14,6 +14,22 @@ public static class ConfigurationExtensions
         Log.Logger.Information("""
                                Loading configuration from "{AppSettingsFilename}"
                                """, path);
+
+        var appSettingsFile = new FileInfo(path);
+        if (appSettingsFile.Exists)
+        {
+            Log.Logger.Information("""
+                               Configuration file found: "{AppSettingsFullFilename}" - Contents:
+                               """, appSettingsFile.FullName);
+            Log.Logger.Information("{FileContents}", appSettingsFile.OpenText().ReadToEnd());
+        }
+        else
+        {
+            Log.Logger.Information("""
+                               Configuration file not found: "{AppSettingsFilename}"
+                               """, path);
+        }
+
         return builder.AddJsonFile(path, optional, reloadOnChange);
     }   
 }
