@@ -13,6 +13,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Tests.Services;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
@@ -60,27 +61,41 @@ public abstract class IntegrationTestFixture(TestApplicationFactory testApp) :
         await _azuriteContainer.DisposeAsync();
     }
 
-    public WebApplicationFactory<Startup> WithAzurite(
-        bool enabled = true,
-        bool withAnalytics = false)
+    public WebApplicationFactory<Startup> BuildWebApplicationFactory(
+        List<Action<IWebHostBuilder>> webHostBuilderConfigFuncs)
     {
-        if (!enabled)
+        return TestApp.WithWebHostBuilder(builder =>
         {
-            return TestApp;
-        }
+            foreach (var configFunc in webHostBuilderConfigFuncs)
+            {
+                configFunc(builder);
+            }
+        });
+    }
 
-        if (withAnalytics)
+    public Action<IWebHostBuilder> WithAnalytics()
+    {
+        TestApp.AddAppSettings("appsettings.IntegrationTest.AnalyticsEnabled.json");
+
+        return builder =>
         {
-            TestApp.AddAppSettings("appsettings.IntegrationTest.AnalyticsEnabled.json");
-        }
+            builder.ConfigureServices(services =>
+            {
+                services.ReplaceService<IAnalyticsPathResolver>(sp =>
+                    new TestAnalyticsPathResolver(), optional: true);
+            });
+        };
+    }
 
+    public Action<IWebHostBuilder> WithAzurite()
+    {
         if (_azuriteContainer.State != TestcontainersStates.Running)
         {
             throw new InvalidOperationException(
                 $"Azurite container must be started via '{nameof(StartAzurite)}' method first");
         }
 
-        return TestApp.WithWebHostBuilder(builder =>
+        return builder =>
         {
             builder
                 .ConfigureAppConfiguration((_, config) =>
@@ -98,13 +113,7 @@ public abstract class IntegrationTestFixture(TestApplicationFactory testApp) :
                             sp.GetRequiredService<ILogger<IBlobStorageService>>()
                         )
                     );
-
-                    if (withAnalytics)
-                    {
-                        services.ReplaceService<IAnalyticsPathResolver>(sp =>
-                            new TestAnalyticsPathResolver());
-                    }
                 });
-        });
+        };
     }
 }

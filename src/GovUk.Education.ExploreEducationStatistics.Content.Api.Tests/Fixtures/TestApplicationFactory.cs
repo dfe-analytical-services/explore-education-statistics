@@ -55,7 +55,7 @@ public sealed class TestApplicationFactory : TestApplicationFactory<Startup>
                     .UseInMemoryDbContext<ContentDbContext>()
                     .UseInMemoryDbContext<StatisticsDbContext>()
                     .ReplaceService(new Mock<IPublicBlobStorageService>())
-                    .ReplaceService(new Mock<IAnalyticsPathResolver>());
+                    .ReplaceService(new Mock<IAnalyticsPathResolver>(), optional: true);
             });
     }
 }

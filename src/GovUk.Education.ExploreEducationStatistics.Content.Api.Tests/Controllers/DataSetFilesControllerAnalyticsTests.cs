@@ -1,4 +1,6 @@
 #nullable enable
+using System;
+using System.Collections.Generic;
 using GovUk.Education.ExploreEducationStatistics.Common;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
@@ -19,6 +21,7 @@ using System.Net;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Tests.Services;
+using Microsoft.AspNetCore.Hosting;
 using Snapshooter.Xunit;
 using Xunit;
 
@@ -90,9 +93,19 @@ public abstract class DataSetFilesControllerAnalyticsTests : IntegrationTestFixt
         bool enableAzurite = false,
         bool enableAnalytics = false)
     {
-        return WithAzurite(
-                enabled: enableAzurite,
-                withAnalytics: enableAnalytics)
+        List<Action<IWebHostBuilder>> configFuncs = [];
+
+        if (enableAzurite)
+        {
+            configFuncs.Add(WithAzurite());
+        }
+
+        if (enableAnalytics)
+        {
+            configFuncs.Add(WithAnalytics());
+        }
+
+        return BuildWebApplicationFactory(configFuncs)
             .ConfigureServices(services =>
             {
                 services.ReplaceService(MemoryCacheService);
@@ -105,12 +118,6 @@ public abstract class DataSetFilesControllerAnalyticsTests : IntegrationTestFixt
                 if (statisticsDbContext is not null)
                 {
                     services.ReplaceService(statisticsDbContext);
-                }
-
-                if (enableAnalytics)
-                {
-                    services.ReplaceService<IAnalyticsPathResolver>(sp =>
-                        new TestAnalyticsPathResolver());
                 }
             });
     }
