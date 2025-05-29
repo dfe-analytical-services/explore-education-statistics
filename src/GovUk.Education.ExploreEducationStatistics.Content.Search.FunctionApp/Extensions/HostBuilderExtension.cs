@@ -24,6 +24,7 @@ public static class HostBuilderExtension
         .ConfigureAppConfiguration(
             (context, configurationBuilder) =>
                 configurationBuilder
+                    .SetBasePath(context.HostingEnvironment)
                     .AddJsonFileAndLog("appsettings.json", false, false)
                     .AddJsonFileAndLog(
                         $"appsettings.{context.HostingEnvironment.EnvironmentName}.json",
