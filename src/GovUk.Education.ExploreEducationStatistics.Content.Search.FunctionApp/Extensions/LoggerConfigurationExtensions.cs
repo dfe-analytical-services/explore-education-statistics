@@ -5,6 +5,7 @@ using Serilog;
 using Serilog.Events;
 using Serilog.Exceptions;
 using Serilog.Formatting.Compact;
+using Serilog.Formatting.Display;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Extensions;
 
@@ -27,14 +28,11 @@ public static class LoggerConfigurationExtensions
 
     public static LoggerConfiguration ConfigureSerilogLogger(
         this LoggerConfiguration logger,
-        IServiceProvider services,
         IConfiguration configuration) =>
         logger
-            .ConfigureBootstrapLogger()
-            // .ReadFrom.Configuration(configuration)
-            .WriteTo.ApplicationInsights(
-                services.GetRequiredService<TelemetryConfiguration>(),
-                TelemetryConverter.Traces);
+            .AddEnrichers()
+            .ReadFrom.Configuration(configuration)
+        ;
 
     private static LoggerConfiguration AddEnrichers(this LoggerConfiguration loggerConfiguration) =>
         // To simply the config, specify the common enrichers here.

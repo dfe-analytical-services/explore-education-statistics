@@ -37,10 +37,11 @@ public static class ServiceCollectionExtensions
         IConfiguration configuration) =>
         serviceCollection
             .SetupAppInsights()
-            .AddSerilog(
-                (serviceProvider, loggerConfiguration) => 
-                    loggerConfiguration
-                    .ConfigureSerilogLogger(serviceProvider, configuration))
+            .AddSerilog(loggerConfiguration => loggerConfiguration.ConfigureSerilogLogger(configuration))
+            .AddLogging(lb =>
+                // Prevent the default Azure Function logging provider from logging to the console.
+                // Instead, let Serilog do that.
+                lb.SetMinimumLevel(LogLevel.None))
         ;
 
     private static IServiceCollection SetupAppInsights(this IServiceCollection serviceCollection) =>
@@ -55,6 +56,10 @@ public static class ServiceCollectionExtensions
             .Configure<LoggerFilterOptions>(
                 options =>
                 {
+                    // The Application Insights SDK adds a default logging filter that instructs ILogger to capture
+                    // only Warning and more severe logs. Application Insights requires an explicit override.
+                    // Log levels can also be configured using appsettings.json.
+                    // For more information, see https://learn.microsoft.com/en-us/azure/azure-monitor/app/worker-service#ilogger-logs
                     var defaultRule = options.Rules.FirstOrDefault(
                         rule => rule.ProviderName ==
                                 "Microsoft.Extensions.Logging.ApplicationInsights.ApplicationInsightsLoggerProvider");
