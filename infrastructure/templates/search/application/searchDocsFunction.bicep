@@ -8,8 +8,8 @@ param contentApiUrl string
 @description('The IP address ranges that can access the Search Docs Function App endpoints.')
 param functionAppFirewallRules FirewallRule[]
 
-@description('Specifies the base URL of the Search Service endpoint for interacting with the data plane REST API. For example: https://[search-service-name].search.windows.net')
-param searchServiceEndpoint string
+@description('The id of the Log Analytics workspace which logs and metrics will be sent to.')
+param logAnalyticsWorkspaceId string
 
 @description('Specifies the Search Service indexer name.')
 param searchServiceIndexerName string
@@ -29,9 +29,6 @@ param searchableDocumentsContainerName string
 
 @description('The IP address ranges that can access the Search Docs Function App storage accounts.')
 param storageFirewallRules IpRange[]
-
-@description('Whether to create/update Azure Monitor alerts during this deploy.')
-param deployAlerts bool
 
 @description('Specifies common resource naming variables.')
 param resourceNames ResourceNames
@@ -98,7 +95,7 @@ resource searchableDocumentsContainer 'Microsoft.Storage/storageAccounts/blobSer
   name: searchableDocumentsContainerName
 }
 
-resource searchService 'Microsoft.Search/searchServices@2024-06-01-preview' existing = {
+resource searchService 'Microsoft.Search/searchServices@2025-02-01-preview' existing = {
   name: searchServiceName
 }
 
@@ -120,8 +117,7 @@ module functionAppModule '../../common/components/functionApp.bicep' = {
       }
       {
         name: 'AzureSearch__SearchServiceEndpoint'
-        // Should be able to replace this with searchService.properties.endpoint in future using API version 2025-02-01-preview or later
-        value: searchServiceEndpoint
+        value: searchService.properties.endpoint
       }
       {
         name: 'AzureSearch__IndexerName'
@@ -188,6 +184,8 @@ module functionAppModule '../../common/components/functionApp.bicep' = {
     functionAppRuntime: 'dotnet-isolated'
     functionAppRuntimeVersion: '8.0'
     deployQueueRoleAssignment: true
+    diagnosticSettingEnabled: true
+    logAnalyticsWorkspaceId: logAnalyticsWorkspaceId
     storageAccountName: '${replace(resourcePrefix, '-', '')}${abbreviations.storageStorageAccounts}searchdocsfn'
     storageAccountPublicNetworkAccessEnabled: false
     publicNetworkAccessEnabled: true
@@ -198,20 +196,18 @@ module functionAppModule '../../common/components/functionApp.bicep' = {
       storageAccounts: searchDocsFunctionPrivateEndpointSubnet.id
     }
     outboundSubnetId: outboundVnetSubnet.id
-    alerts: deployAlerts
-      ? {
-          cpuPercentage: true
-          functionAppHealth: true
-          httpErrors: true
-          memoryPercentage: true
-          storageAccountAvailability: true
-          storageLatency: false
-          fileServiceAvailability: true
-          fileServiceLatency: false
-          fileServiceCapacity: true
-          alertsGroupName: resourceNames.existingResources.alertsGroup
-        }
-      : null
+    alerts: {
+      cpuPercentage: true
+      functionAppHealth: true
+      httpErrors: true
+      memoryPercentage: true
+      storageAccountAvailability: true
+      storageLatency: false
+      fileServiceAvailability: true
+      fileServiceLatency: false
+      fileServiceCapacity: true
+      alertsGroupName: resourceNames.existingResources.alertsGroup
+    }
     tagValues: tagValues
   }
 }

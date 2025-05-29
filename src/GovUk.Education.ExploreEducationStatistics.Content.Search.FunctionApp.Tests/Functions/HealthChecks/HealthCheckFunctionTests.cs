@@ -4,12 +4,14 @@ using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Func
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.HealthChecks.Strategies;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Tests.Builders;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging.Abstractions;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Tests.Functions.HealthChecks;
 
 public class HealthCheckFunctionTests
 {
-    private HealthCheckFunction GetSut(IEnumerable<IHealthCheckStrategy> strategies) => new(strategies);
+    private HealthCheckFunction GetSut(IEnumerable<IHealthCheckStrategy> strategies) => 
+        new(strategies, new NullLogger<HealthCheckFunction>());
 
     [Fact]
     public void Can_instantiate_sut() => Assert.NotNull(GetSut([]));
@@ -27,7 +29,7 @@ public class HealthCheckFunctionTests
         var sut = GetSut(strategies);
         
         // ACT
-        var result = await sut.HealthCheck(null!, CancellationToken.None);
+        var result = await sut.FullHealthCheck(null!, CancellationToken.None);
         
         // ASSERT
         Assert.NotNull(result);
@@ -57,7 +59,7 @@ public class HealthCheckFunctionTests
         var sut = GetSut(strategies);
         
         // ACT
-        var result = await sut.HealthCheck(null!, CancellationToken.None);
+        var result = await sut.FullHealthCheck(null!, CancellationToken.None);
         
         // ASSERT
         Assert.NotNull(result);
@@ -80,17 +82,17 @@ public class HealthCheckFunctionTests
         var sut = GetSut(strategies);
         
         // ACT
-        var result = await sut.HealthCheck(null!, CancellationToken.None);
+        var result = await sut.FullHealthCheck(null!, CancellationToken.None);
         
         // ASSERT
         Assert.NotNull(result);
         var okResult = Assert.IsType<ObjectResult>(result);
         var healthCheckResult = Assert.IsType<HealthCheckResponse>(okResult.Value);
-        var expectedResults = new[]
+        var expectedResults = new HealthCheckResultViewModel[]
         {
-            new HealthCheckResult(true, "Result one"),
-            new HealthCheckResult(false, "Result two"),
-            new HealthCheckResult(true, "Result three")
+            new HealthCheckResult(strategies[0], true, "Result one"),
+            new HealthCheckResult(strategies[1], false, "Result two"),
+            new HealthCheckResult(strategies[2], true, "Result three")
         };
         Assert.Equal(expectedResults, healthCheckResult.Results);
     }

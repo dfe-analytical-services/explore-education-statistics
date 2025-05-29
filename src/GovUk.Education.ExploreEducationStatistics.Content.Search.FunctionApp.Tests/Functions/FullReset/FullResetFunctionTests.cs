@@ -9,7 +9,9 @@ public class FullResetFunctionTests
 {
     private readonly FullSearchableDocumentResetterMockBuilder _fullSearchableDocumentResetter = new();
     
-    private FullResetFunction GetSut() => new(_fullSearchableDocumentResetter.Build());
+    private FullResetFunction GetSut() => new(
+        _fullSearchableDocumentResetter.Build(), 
+        new TestableCommandHandler());
     
     [Fact]
     public void Can_instantiate_Sut() => Assert.NotNull(GetSut());

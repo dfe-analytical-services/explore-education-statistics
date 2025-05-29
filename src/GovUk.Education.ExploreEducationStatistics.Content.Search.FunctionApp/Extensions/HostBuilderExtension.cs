@@ -1,21 +1,19 @@
-﻿using Azure.Identity;
+using Azure.Identity;
 using Azure.Storage.Blobs;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Clients.AzureBlobStorage;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Clients.AzureSearch;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Clients.ContentApi;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Options;
-using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Services;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Services.Core;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Services.CreateSearchableDocuments;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Services.RemoveSearchableDocument;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Services.ResetSearchableDocuments;
-using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.Net.Http.Headers;
+using Serilog;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Extensions;
 
@@ -35,33 +33,18 @@ public static class HostBuilderExtension
         .ConfigureServices(
             (context, services) =>
                 services
-                    .AddApplicationInsightsTelemetryWorkerService()
-                    .ConfigureFunctionsApplicationInsights()
+                    .ConfigureLogging(context.Configuration)
                     // Config
                     .Configure<AppOptions>(context.Configuration.GetSection(AppOptions.Section))
                     .Configure<ContentApiOptions>(context.Configuration.GetSection(ContentApiOptions.Section))
                     .Configure<AzureSearchOptions>(context.Configuration.GetSection(AzureSearchOptions.Section))
-                    .Configure<LoggerFilterOptions>(options =>
-                    {
-                        // The Application Insights SDK adds a default logging filter that instructs ILogger to capture
-                        // only Warning and more severe logs. Application Insights requires an explicit override.
-                        // Log levels can also be configured using appsettings.json.
-                        // For more information, see https://learn.microsoft.com/en-us/azure/azure-monitor/app/worker-service#ilogger-logs
-                        var toRemove = options.Rules.FirstOrDefault(rule =>
-                            rule.ProviderName ==
-                            "Microsoft.Extensions.Logging.ApplicationInsights.ApplicationInsightsLoggerProvider");
-
-                        if (toRemove is not null)
-                        {
-                            options.Rules.Remove(toRemove);
-                        }
-                    })
                     // Services
                     .AddTransient<ISearchableDocumentCreator, SearchableDocumentCreator>()
                     .AddTransient<ISearchableDocumentRemover, SearchableDocumentRemover>()
                     .AddTransient<IFullSearchableDocumentResetter, FullSearchableDocumentResetter>()
                     // Functions
                     .AddTransient<IEventGridEventHandler, EventGridEventHandler>()
+                    .AddTransient<ICommandHandler, CommandHandler>()
                     .AddHealthChecks()
                     // Clients
                     .AddTransient<ISearchIndexerClient, SearchIndexerClient>()
@@ -89,4 +72,17 @@ public static class HostBuilderExtension
                         })
         )
         .Build();
+
+    public static IHostBuilder InitialiseSerilog(this IHostBuilder hostBuilder)
+    {
+        // Setup Serilog
+        // https://github.com/serilog/serilog-aspnetcore
+        Log.Logger = new LoggerConfiguration()
+            // Because we can't access appsettings before creating the HostBuilder we'll use a bootstrap logger
+            // without configuration specific initialization first and replace it after the HostBuilder was created.
+            // See https://github.com/serilog/serilog-aspnetcore#two-stage-initialization
+            .ConfigureBootstrapLogger()
+            .CreateBootstrapLogger();
+        return hostBuilder;
+    }
 }

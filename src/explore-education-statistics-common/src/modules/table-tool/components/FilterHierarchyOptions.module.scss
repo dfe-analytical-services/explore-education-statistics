@@ -10,7 +10,17 @@
 
   &__expanded {
     background: govuk-colour('light-grey');
+  }
+
+  &__expanded:not(:last-child) {
     margin-bottom: govuk-spacing(4);
+  }
+
+  em {
+    background-color: govuk-colour('yellow');
+    color: govuk-colour('black');
+    font-style: normal;
+    font-weight: bold;
   }
 }
 

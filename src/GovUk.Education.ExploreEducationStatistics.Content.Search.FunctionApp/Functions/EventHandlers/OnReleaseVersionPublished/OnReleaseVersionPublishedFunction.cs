@@ -2,7 +2,6 @@ using Azure.Messaging.EventGrid;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.CommandHandlers.RefreshSearchableDocument.Dto;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.CommandHandlers.RemoveSearchableDocument.Dto;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.EventHandlers.OnReleaseVersionPublished.Dtos;
-using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Services;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Services.Core;
 using Microsoft.Azure.Functions.Worker;
 
@@ -27,7 +26,7 @@ public class OnReleaseVersionPublishedFunction(IEventGridEventHandler eventGridE
                             RefreshSearchableDocumentMessages = 
                                 [ new RefreshSearchableDocumentMessageDto { PublicationSlug = payload.PublicationSlug } ],
                             RemoveSearchableDocuments = payload.NewlyPublishedReleaseVersionIsForDifferentRelease
-                                ? [ new RemoveSearchableDocumentDto { ReleaseId = payload.PreviousLatestReleaseId } ]
+                                ? [ new RemoveSearchableDocumentDto { ReleaseId = payload.PreviousLatestPublishedReleaseId } ]
                                 : []
                         }));
 }

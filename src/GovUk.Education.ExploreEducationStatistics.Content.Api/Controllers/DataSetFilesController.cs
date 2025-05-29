@@ -64,6 +64,8 @@ public class DataSetFilesController : ControllerBase
     public async Task<ActionResult> DownloadDataSetFile(
         Guid dataSetFileId)
     {
+        HttpContext.Response.Headers["X-Robots-Tag"] = "noindex";
+
         return await _dataSetFileService
             .DownloadDataSetFile(dataSetFileId);
     }

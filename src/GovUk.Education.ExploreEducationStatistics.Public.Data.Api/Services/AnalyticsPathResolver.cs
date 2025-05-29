@@ -28,4 +28,9 @@ public class AnalyticsPathResolver : IAnalyticsPathResolver
     {
         return Path.Combine(BasePath(), "public-api", "queries");
     }
+    
+    public string PublicApiDataSetVersionCallsDirectoryPath()
+    {
+        return Path.Combine(BasePath(), "public-api", "data-set-versions");
+    }
 }

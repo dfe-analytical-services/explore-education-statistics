@@ -23,9 +23,6 @@ param resourceTags {
 @description('Tagging : Date Provisioned. Used for tagging resources created by this infrastructure pipeline.')
 param dateProvisioned string = utcNow('u')
 
-@description('Whether to create/update Azure Monitor alerts during this deploy.')
-param deployAlerts bool = false
-
 @description('Whether to deploy the Search service configuration to create/update the data source, index and indexer.')
 param deploySearchConfig bool = false
 
@@ -60,6 +57,7 @@ var resourcePrefix = '${subscription}-ees'
 var resourceNames = {
   existingResources: {
     adminApp: '${subscription}-as-ees-admin'
+    logAnalyticsWorkspace: '${resourcePrefix}-${abbreviations.operationalInsightsWorkspaces}'
     publisherFunction: '${subscription}-fa-ees-publisher'
     keyVault: '${subscription}-kv-ees-01'
     vNet: '${subscription}-vnet-ees'
@@ -72,9 +70,8 @@ var resourceNames = {
   }
 }
 
-// Create a shared Application Insights resource for Search resources to use.
-module applicationInsightsModule 'application/searchApplicationInsights.bicep' = {
-  name: 'searchApplicationInsightsModule'
+module monitoringModule 'application/monitoring.bicep' = {
+  name: 'monitoringModule'
   params: {
     location: location
     resourcePrefix: resourcePrefix
@@ -118,16 +115,15 @@ module searchDocsFunctionModule 'application/searchDocsFunction.bicep' = {
       ],
       maintenanceFirewallRules
     )
-    searchServiceEndpoint: searchServiceModule.outputs.searchServiceEndpoint
+    logAnalyticsWorkspaceId: monitoringModule.outputs.logAnalyticsWorkspaceId
     searchServiceIndexerName: searchServiceModule.outputs.searchServiceIndexerName
     searchServiceName: searchServiceModule.outputs.searchServiceName
     searchStorageAccountName: searchServiceModule.outputs.searchStorageAccountName
     searchStorageAccountConnectionStringSecretName: searchServiceModule.outputs.searchStorageAccountConnectionStringSecretName
     searchableDocumentsContainerName: searchServiceModule.outputs.searchableDocumentsContainerName
     storageFirewallRules: maintenanceIpRanges
-    applicationInsightsConnectionString: applicationInsightsModule.outputs.applicationInsightsConnectionString
+    applicationInsightsConnectionString: monitoringModule.outputs.applicationInsightsConnectionString
     tagValues: tagValues
-    deployAlerts: deployAlerts
   }
 }
 
@@ -153,7 +149,6 @@ module searchServiceModule 'application/searchService.bicep' = {
     resourcePrefix: resourcePrefix
     searchServiceIpRules: []
     storageIpRules: maintenanceIpRanges
-    deployAlerts: deployAlerts
     deploySearchConfig: deploySearchConfig
     tagValues: tagValues
   }

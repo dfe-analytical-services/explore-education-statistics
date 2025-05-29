@@ -101,6 +101,9 @@
     "maxStatsDbSizeBytes": {
       "value": 2199023255552
     },
+    "azureSearchExists": {
+      "value": false
+    },
     "eventGridTopicsExist": {
       "value": false
     }

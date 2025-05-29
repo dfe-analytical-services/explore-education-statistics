@@ -41,7 +41,7 @@ param indexerScheduleInterval string = ''
 @description('Specifies the location for all resources.')
 param location string
 
-resource searchService 'Microsoft.Search/searchServices@2022-09-01' existing = {
+resource searchService 'Microsoft.Search/searchServices@2025-02-01-preview' existing = {
   name: searchServiceName
 }
 

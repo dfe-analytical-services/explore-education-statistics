@@ -1,8 +1,4 @@
 #nullable enable
-using System;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
@@ -17,6 +13,10 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interf
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System;
+using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
 using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainers;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
 
@@ -27,21 +27,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly ContentDbContext _contentDbContext;
         private readonly IPersistenceHelper<ContentDbContext> _persistenceHelper;
         private readonly IPrivateBlobStorageService _privateBlobStorageService;
-        private readonly IFileUploadsValidatorService _fileUploadsValidatorService;
+        private readonly IFileValidatorService _fileValidatorService;
         private readonly IReleaseFileRepository _releaseFileRepository;
         private readonly IUserService _userService;
 
         public ReleaseImageService(ContentDbContext contentDbContext,
             IPersistenceHelper<ContentDbContext> persistenceHelper,
             IPrivateBlobStorageService privateBlobStorageService,
-            IFileUploadsValidatorService fileUploadsValidatorService,
+            IFileValidatorService fileValidatorService,
             IReleaseFileRepository releaseFileRepository,
             IUserService userService)
         {
             _contentDbContext = contentDbContext;
             _persistenceHelper = persistenceHelper;
             _privateBlobStorageService = privateBlobStorageService;
-            _fileUploadsValidatorService = fileUploadsValidatorService;
+            _fileValidatorService = fileValidatorService;
             _releaseFileRepository = releaseFileRepository;
             _userService = userService;
         }
@@ -69,7 +69,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return _persistenceHelper
                 .CheckEntityExists<ReleaseVersion>(releaseVersionId)
                 .OnSuccess(_userService.CheckCanUpdateReleaseVersion)
-                .OnSuccess(async () => await _fileUploadsValidatorService.ValidateFileForUpload(formFile, Image))
+                .OnSuccess(async () => await _fileValidatorService.ValidateFileForUpload(formFile, Image))
                 .OnSuccess(async () => await Upload(
                     releaseVersionId,
                     Image,

@@ -19,7 +19,7 @@ var rolesToRoleIds = {
   'Search Service Contributor': '7ca78c08-252a-4471-8644-bb5ff32d4ba0'
 }
 
-resource searchService 'Microsoft.Search/searchServices@2024-06-01-preview' existing = {
+resource searchService 'Microsoft.Search/searchServices@2025-02-01-preview' existing = {
   name: searchServiceName
 }
 

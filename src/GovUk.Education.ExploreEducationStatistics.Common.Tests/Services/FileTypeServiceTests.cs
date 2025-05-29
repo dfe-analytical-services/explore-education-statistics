@@ -1,16 +1,15 @@
 #nullable enable
+using GovUk.Education.ExploreEducationStatistics.Common.Services;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Configuration;
+using Moq;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Common.Services;
-using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Configuration;
-using Moq;
 using Xunit;
-using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileTypeService;
 using static GovUk.Education.ExploreEducationStatistics.Common.Validators.FileTypeValidationUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
@@ -18,7 +17,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
     class FileInfo
     {
         public readonly string Filename;
-        
+
         // we have a possible list of matching mime types that we'd expect to see, that potentially change when run
         // on different operating systems, but are considered valid either way 
         public readonly string[] ExpectedMimeTypes;
@@ -29,20 +28,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
             ExpectedMimeTypes = expectedMimeTypes;
         }
     }
-    
+
     public class FileTypeServiceTests
     {
         private static readonly FileInfo Doc = new("test.doc", "application/msword");
-        
+
         private static readonly FileInfo Docx = new("test.docx",
             "application/vnd.openxmlformats-officedocument.wordprocessingml.document");
-        
+
         private static readonly FileInfo Ods = new("test.ods",
             "application/vnd.oasis.opendocument.spreadsheet");
-        
+
         private static readonly FileInfo Odt = new("test.odt",
             "application/vnd.oasis.opendocument.text");
-        
+
         private static readonly FileInfo Xls = new("test.xls", "application/vnd.ms-excel");
         private static readonly FileInfo Xlsx = new("test.xlsx", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
         private static readonly FileInfo Xlsx2 = new("test2.xlsx", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
@@ -58,7 +57,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
         private static readonly FileInfo Svg = new("test.svg", "image/svg+xml");
         private static readonly FileInfo SvgNoXml = new("test-no-xml.svg", "image/svg+xml");
         private static readonly FileInfo Zip = new("test.zip", "application/x-compressed");
-        
+
         private static readonly List<FileInfo> ImageTypes =
         [
             Bmp,
@@ -66,7 +65,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
             Jpg,
             Png,
         ];
-        
+
         private static readonly List<FileInfo> CsvTypes =
         [
             Csv,
@@ -75,11 +74,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
             Txt,
         ];
 
-        private static readonly List<FileInfo> ArchiveTypes =
+        private static readonly List<FileInfo> ZipTypes =
         [
             Zip,
         ];
-        
+
         private static readonly List<FileInfo> AllTypes =
         [
             Doc,
@@ -100,37 +99,37 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
             Png,
             Zip,
         ];
-        
+
         [Fact]
         public async Task GetMimeType_Doc()
         {
             await AssertMimeTypeCorrect(Doc);
         }
-        
+
         [Fact]
         public async Task GetMimeType_Docx()
         {
             await AssertMimeTypeCorrect(Docx);
         }
-        
+
         [Fact]
         public async Task GetMimeType_Ods()
         {
             await AssertMimeTypeCorrect(Ods);
         }
-        
+
         [Fact]
         public async Task GetMimeType_Odt()
         {
             await AssertMimeTypeCorrect(Odt);
         }
-        
+
         [Fact]
         public async Task GetMimeType_Xls()
         {
             await AssertMimeTypeCorrect(Xls);
         }
-        
+
         [Fact]
         public async Task GetMimeType_Xlsx()
         {
@@ -148,31 +147,31 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
         {
             await AssertMimeTypeCorrect(Csv);
         }
-        
+
         [Fact]
         public async Task GetMimeType_Pdf()
         {
             await AssertMimeTypeCorrect(Pdf);
         }
-        
+
         [Fact]
         public async Task GetMimeType_Bmp()
         {
             await AssertMimeTypeCorrect(Bmp);
         }
-        
+
         [Fact]
         public async Task GetMimeType_Jpg()
         {
             await AssertMimeTypeCorrect(Jpg);
         }
-        
+
         [Fact]
         public async Task GetMimeType_Gif()
         {
             await AssertMimeTypeCorrect(Gif);
         }
-        
+
         [Fact]
         public async Task GetMimeType_Png()
         {
@@ -196,7 +195,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
         {
             await AssertMimeTypeCorrect(Txt);
         }
-        
+
         [Fact]
         public async Task HasMatchingMimeType_ValidChartFileUploads()
         {
@@ -207,7 +206,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
                 await AssertHasMatchingMimeType(type, AllowedChartFileTypes.ToList(), expectedToSucceed);
             }
         }
-        
+
         [Fact]
         public async Task HasMatchingMimeType_ValidAncillaryFileUploads()
         {
@@ -217,7 +216,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
                 await AssertHasMatchingMimeType(type, AllowedAncillaryFileTypes.ToList(), true);
             }
         }
-        
+
         [Fact]
         public async Task HasMatchingMimeType_ValidCsvFileUploads()
         {
@@ -229,14 +228,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
                 await AssertHasMatchingMimeType(type, AllowedCsvMimeTypes.ToList(), expectedToSucceed);
             }
         }
-        
+
         [Fact]
-        public async Task HasMatchingMimeType_ValidArchiveFileUploads()
+        public async Task HasMatchingMimeType_ValidZipFileUploads()
         {
             foreach (var type in AllTypes)
             {
-                var expectedToSucceed = ArchiveTypes.Contains(type);
-                await AssertHasMatchingMimeType(type, AllowedArchiveMimeTypes.ToList(), expectedToSucceed);
+                var expectedToSucceed = ZipTypes.Contains(type);
+                await AssertHasMatchingMimeType(type, AllowedZipFileMimeTypes.ToList(), expectedToSucceed);
             }
         }
 
@@ -254,7 +253,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
                 var fileInfo = type;
 
                 var filePath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!,
-                    "Resources" + Path.DirectorySeparatorChar + fileInfo.Filename);
+                    "Resources", fileInfo.Filename);
 
                 var formFile = new Mock<IFormFile>();
                 formFile
@@ -275,14 +274,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
             var service = BuildService();
 
             var filePath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!,
-                "Resources" + Path.DirectorySeparatorChar + fileInfo.Filename);
+                "Resources", fileInfo.Filename);
 
             var formFile = new Mock<IFormFile>();
             formFile
                 .Setup(f => f.OpenReadStream())
                 .Returns(() => File.OpenRead(filePath));
 
-            var result = service.HasMatchingEncodingType(formFile.Object, AllowedArchiveEncodingTypes);
+            var result = service.HasMatchingEncodingType(formFile.Object, AllowedZipFileEncodingTypes);
 
             Assert.True(result);
         }
@@ -299,11 +298,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
                 var fileInfo = type;
 
                 var filePath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!,
-                    "Resources" + Path.DirectorySeparatorChar + fileInfo.Filename);
+                    "Resources", fileInfo.Filename);
 
                 await using var stream = File.OpenRead(filePath);
 
-                var result = await service.IsValidCsvFile(stream);
+                var result = await service.HasCsvFileType(stream);
 
                 Assert.Equal(expectedToSucceed, result);
             }
@@ -316,19 +315,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
 
             foreach (var type in AllTypes)
             {
-                var expectedToSucceed = ArchiveTypes.Contains(type);
+                var expectedToSucceed = ZipTypes.Contains(type);
 
                 var fileInfo = type;
 
                 var filePath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!,
-                    "Resources" + Path.DirectorySeparatorChar + fileInfo.Filename);
+                    "Resources", fileInfo.Filename);
 
                 var formFile = new Mock<IFormFile>();
                 formFile
                     .Setup(f => f.OpenReadStream())
                     .Returns(() => File.OpenRead(filePath));
 
-                var result = await service.IsValidZipFile(formFile.Object);
+                var result = await service.HasZipFileType(formFile.Object);
 
                 Assert.Equal(expectedToSucceed, result);
             }
@@ -339,34 +338,34 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
             var service = BuildService();
 
             var filePath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!,
-                "Resources" + Path.DirectorySeparatorChar + fileInfo.Filename);
-            
+                "Resources", fileInfo.Filename);
+
             var formFile = new Mock<IFormFile>();
             formFile
                 .Setup(f => f.OpenReadStream())
                 .Returns(() => File.OpenRead(filePath));
-            
+
             var result = await service.GetMimeType(formFile.Object);
-            
-            Assert.True(fileInfo.ExpectedMimeTypes.Contains(result), 
+
+            Assert.True(fileInfo.ExpectedMimeTypes.Contains(result),
                 "Expected " + result + " to be contained in the expected mime types list");
         }
-        
+
         private static async Task AssertHasMatchingMimeType(FileInfo fileInfo, List<Regex> availableMimeTypes,
             bool expectedToSucceed)
         {
             var service = BuildService();
 
             var filePath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!,
-                "Resources" + Path.DirectorySeparatorChar + fileInfo.Filename);
-            
+                "Resources", fileInfo.Filename);
+
             var formFile = new Mock<IFormFile>();
             formFile
                 .Setup(f => f.OpenReadStream())
                 .Returns(() => File.OpenRead(filePath));
-            
+
             var result = await service.HasMatchingMimeType(formFile.Object, availableMimeTypes);
-            
+
             Assert.Equal(expectedToSucceed, result);
         }
 

@@ -50,15 +50,17 @@ const fileErrorMappings = {
     'DataSetTitleShouldNotContainSpecialCharacters',
   DataSetTitleShouldBeUnique: 'DataTitleShouldBeUnique',
   DataAndMetaFilesCannotHaveSameName: 'DataAndMetaFilesCannotHaveSameName',
-  FilenameCannotContainSpacesOrSpecialCharacters:
-    'FilenameCannotContainSpacesOrSpecialCharacters',
-  FilenameMustEndDotCsv: 'FilenameMustEndDotCsv',
-  MetaFilenameMustEndDotMetaDotCsv: 'MetaFilenameMustEndDotMetaDotCsv',
-  FileNameTooLong: 'FileNameTooLong',
-  FilenameNotUnique: 'FilenameNotUnique',
+  FileNameCannotContainSpaces: 'FileNameCannotContainSpaces',
+  FileNameCannotContainSpecialCharacters:
+    'FileNameCannotContainSpecialCharacters',
+  FileNameMustEndDotCsv: 'FileNameMustEndDotCsv',
+  MetaFileNameMustEndDotMetaDotCsv: 'MetaFileNameMustEndDotMetaDotCsv',
+  FileNameLengthInvalid: 'FileNameLengthInvalid',
+  FileNameNotUnique: 'FileNameNotUnique',
   FileSizeMustNotBeZero: 'FileSizeMustNotBeZero',
   MustBeCsvFile: 'MustBeCsvFile',
   CannotReplaceDataSetWithApiDataSet: 'CannotReplaceDataSetWithApiDataSet',
+  InvalidFileTypeForReplacement: 'InvalidFileTypeForReplacement',
 };
 
 function baseErrorMappings(
@@ -70,7 +72,7 @@ function baseErrorMappings(
         target: 'bulkZipFile' as FieldName<DataFileUploadFormValues>,
         messages: {
           ...fileErrorMappings,
-          ZipFilenameMustEndDotZip: 'ZipFilenameMustEndDotZip',
+          ZipFileNameMustEndDotZip: 'ZipFileNameMustEndDotZip',
           MustBeZipFile: 'MustBeZipFile',
           BulkDataZipMustContainDataSetNamesCsv:
             'BulkDataZipMustContainDataSetNamesCsv',
@@ -78,8 +80,8 @@ function baseErrorMappings(
           DataSetNamesCsvIncorrectHeaders: 'DataSetNamesCsvIncorrectHeaders',
           DataSetNamesCsvFilenamesShouldNotEndDotCsv:
             'DataSetNamesCsvFilenamesShouldNotEndDotCsv',
-          DataSetNamesCsvFilenamesShouldBeUnique:
-            'DataSetNamesCsvFilenamesShouldBeUnique',
+          DataSetNamesCsvFileNamesShouldBeUnique:
+            'DataSetNamesCsvFileNamesShouldBeUnique',
           FileNotFoundInZip: 'FileNotFoundInZip',
           ZipContainsUnusedFiles: 'ZipContainsUnusedFiles',
           DataReplacementAlreadyInProgress:
@@ -98,7 +100,6 @@ function baseErrorMappings(
           ...fileErrorMappings,
           ZipFilenameMustEndDotZip: 'ZipFilenameMustEndDotZip',
           MustBeZipFile: 'MustBeZipFile',
-          DataZipFileShouldContainTwoFiles: 'DataZipFileShouldContainTwoFiles',
         },
       }),
     ];
