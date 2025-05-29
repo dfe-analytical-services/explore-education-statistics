@@ -3,6 +3,11 @@ import { Dictionary } from '@common/types';
 
 export type OptionLabelsMap = Dictionary<string>;
 
+/**
+ * Maps all filters and filter options by their id with their label strings
+ * @param filters subject meta filters
+ * @returns dictionary of filter and filter option labels, keyed by their id
+ */
 export default function getFilterHierarchyLabelsMap(
   filters: SubjectMetaFilter[],
 ): OptionLabelsMap {
