@@ -3,6 +3,8 @@ using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Requests;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.ViewModels;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Utils.Requests;
 using Microsoft.EntityFrameworkCore;
@@ -66,6 +68,48 @@ public class AnalyticsService(
                 dataSetVersionId);
         }
     }
+    
+    public async Task CaptureDataSetVersionQuery(
+        DataSetVersion dataSetVersion,
+        string? requestedDataSetVersion,
+        DataSetQueryRequest query,
+        DataSetQueryPaginatedResultsViewModel results,
+        DateTime startTime,
+        CancellationToken cancellationToken)
+    {
+        try
+        {
+            if (!IncludeAnalyticsCall())
+            {
+                logger.LogDebug(
+                    message: "Ignoring capturing analytics for Public API query for DataSetVersion {Id}.",
+                    dataSetVersion.Id);
+                return;
+            }
+
+            await analyticsManager.Add(
+                request: new CaptureDataSetVersionQueryRequest(
+                    DataSetId: dataSetVersion.DataSetId,
+                    DataSetVersionId: dataSetVersion.Id,
+                    DataSetVersion: dataSetVersion.SemVersion().ToString(),
+                    DataSetTitle: dataSetVersion.DataSet.Title,
+                    PreviewToken: await GetPreviewTokenRequest(),
+                    RequestedDataSetVersion: requestedDataSetVersion,
+                    Query: query,
+                    ResultsCount: results.Results.Count,
+                    TotalRowsCount: results.Paging.TotalResults,
+                    StartTime: startTime,
+                    EndTime: DateTime.UtcNow),
+                cancellationToken: cancellationToken);
+        }
+        catch (Exception e)
+        {
+            logger.LogError(
+                exception: e,
+                message: "Error whilst capturing analytics for Public API query for DataSetVersion {Id}",
+                dataSetVersion.Id);
+        }
+    }
 
     private async Task<PreviewTokenRequest?> GetPreviewTokenRequest()
     {
@@ -83,6 +127,9 @@ public class AnalyticsService(
             Expiry: previewToken.Expiry);
     }
 
+    /// <summary>
+    /// Filter out any calls from analytics that originate from the EES service itself.
+    /// </summary>
     private bool IncludeAnalyticsCall()
     {
         return !httpContextAccessor
@@ -99,6 +146,17 @@ public class NoOpAnalyticsService : IAnalyticsService
         string? requestedDataSetVersion,
         object? parameters = null,
         CancellationToken cancellationToken = default)
+    {
+        return Task.CompletedTask;
+    }
+
+    public Task CaptureDataSetVersionQuery(
+        DataSetVersion dataSetVersion,
+        string? requestedDataSetVersion,
+        DataSetQueryRequest query,
+        DataSetQueryPaginatedResultsViewModel results,
+        DateTime startTime,
+        CancellationToken cancellationToken)
     {
         return Task.CompletedTask;
     }
