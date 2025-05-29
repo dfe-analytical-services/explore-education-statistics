@@ -38,10 +38,6 @@ public static class ServiceCollectionExtensions
         serviceCollection
             .SetupAppInsights()
             .AddSerilog(loggerConfiguration => loggerConfiguration.ConfigureSerilogLogger(configuration))
-            .AddLogging(lb =>
-                // Prevent the default Azure Function logging provider from logging to the console.
-                // Instead, let Serilog do that.
-                lb.SetMinimumLevel(LogLevel.None))
         ;
 
     private static IServiceCollection SetupAppInsights(this IServiceCollection serviceCollection) =>

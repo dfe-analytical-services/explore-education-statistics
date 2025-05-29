@@ -24,10 +24,10 @@ public static class HostBuilderExtension
         .ConfigureAppConfiguration(
             (context, configurationBuilder) =>
                 configurationBuilder
-                    .AddJsonFile($"appsettings.json", true, false)
-                    .AddJsonFile(
+                    .AddJsonFile($"appsettings.json", false, false)
+                    .AddJsonFileAndLog(
                         $"appsettings.{context.HostingEnvironment.EnvironmentName}.json",
-                        true,
+                        false,
                         false)
                     .AddEnvironmentVariables())
         .ConfigureServices(
@@ -83,6 +83,7 @@ public static class HostBuilderExtension
             // See https://github.com/serilog/serilog-aspnetcore#two-stage-initialization
             .ConfigureBootstrapLogger()
             .CreateBootstrapLogger();
+        
         return hostBuilder;
     }
 }
