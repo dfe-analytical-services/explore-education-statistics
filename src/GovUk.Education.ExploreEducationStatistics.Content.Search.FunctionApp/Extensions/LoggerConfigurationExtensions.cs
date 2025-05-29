@@ -1,11 +1,7 @@
-﻿using Microsoft.ApplicationInsights.Extensibility;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.Configuration;
 using Serilog;
 using Serilog.Events;
 using Serilog.Exceptions;
-using Serilog.Formatting.Compact;
-using Serilog.Formatting.Display;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Extensions;
 
@@ -31,8 +27,7 @@ public static class LoggerConfigurationExtensions
         IConfiguration configuration) =>
         logger
             .AddEnrichers()
-            .ReadFrom.Configuration(configuration)
-        ;
+            .ReadFrom.Configuration(configuration);
 
     private static LoggerConfiguration AddEnrichers(this LoggerConfiguration loggerConfiguration) =>
         // To simply the config, specify the common enrichers here.
