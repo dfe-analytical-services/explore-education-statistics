@@ -19,8 +19,8 @@ public static class ConfigurationExtensions
         if (appSettingsFile.Exists)
         {
             Log.Logger.Information("""
-                               Configuration file found: "{AppSettingsFilename}" - Contents:
-                               """, path);
+                               Configuration file found: "{AppSettingsFullFilename}" - Contents:
+                               """, appSettingsFile.FullName);
             Log.Logger.Information("{FileContents}", appSettingsFile.OpenText().ReadToEnd());
         }
         else
