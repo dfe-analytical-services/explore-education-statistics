@@ -17,7 +17,7 @@ import FilterResetButtonAzureSearch from '@frontend/components/FilterResetButton
 import FiltersMobile from '@frontend/components/FiltersMobile';
 import Page from '@frontend/components/Page';
 import Pagination from '@frontend/components/Pagination';
-import SearchForm from '@frontend/components/SearchForm';
+import SearchForm from '@frontend/components/SearchFormAzure';
 import { SortOption } from '@frontend/components/SortControls';
 import FiltersAzureSearch from '@frontend/modules/find-statistics/components/FiltersAzureSearch';
 import PublicationSummary from '@frontend/modules/find-statistics/components/PublicationSummary';

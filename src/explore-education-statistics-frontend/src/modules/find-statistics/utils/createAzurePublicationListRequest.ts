@@ -24,7 +24,7 @@ export default function createAzurePublicationListRequest(
     themeId,
   } = getParamsFromQuery(query);
 
-  const { sort } = getSortParams(sortBy);
+  const orderBy = getSortParam(sortBy);
 
   let filter: string | undefined;
   if (releaseType && themeId) {
@@ -45,34 +45,26 @@ export default function createAzurePublicationListRequest(
       page: parseNumber(query.page) ?? 1,
       releaseType,
       search,
-      orderBy: sort,
+      orderBy,
       themeId,
     },
     value => typeof value === 'undefined',
   );
 }
 
-function getSortParams(sortBy: PublicationSortOption): {
-  sort: AzurePublicationOrderByParam;
-} {
-  if (sortBy === 'relevance') {
-    return {
-      sort: undefined,
-    };
+function getSortParam(
+  sortBy: PublicationSortOption,
+): AzurePublicationOrderByParam {
+  switch (sortBy) {
+    case 'relevance':
+      return undefined;
+    case 'title':
+      return 'title asc';
+    case 'oldest':
+      return 'published asc';
+    default:
+      return 'published desc';
   }
-  if (sortBy === 'title') {
-    return {
-      sort: 'title asc',
-    };
-  }
-  if (sortBy === 'oldest') {
-    return {
-      sort: 'published asc',
-    };
-  }
-  return {
-    sort: 'published desc',
-  };
 }
 
 export function getParamsFromQuery(query: FindStatisticsPageQuery) {
