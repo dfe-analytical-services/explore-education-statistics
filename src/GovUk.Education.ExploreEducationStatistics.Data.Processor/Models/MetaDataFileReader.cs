@@ -6,6 +6,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
+using GovUk.Education.ExploreEducationStatistics.Data.Processor.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Models;
@@ -47,7 +48,7 @@ public class MetaDataFileReader
             FilterHint = ReadMetaColumnValue(MetaColumns.filter_hint, rowValues),
             AutoSelectFilterItemLabel = ReadMetaColumnValue(MetaColumns.filter_default, rowValues),
             IndicatorGrouping = ReadMetaColumnValue(MetaColumns.indicator_grouping, rowValues),
-            IndicatorUnit = EnumUtil.GetFromEnumValue<IndicatorUnit>(!indicatorUnit.IsNullOrEmpty() ? indicatorUnit : ""),
+            IndicatorUnit = EnumUtil.GetFromEnumValue<IndicatorUnit>(indicatorUnit.DefaultsTo("")),
             DecimalPlaces = !indicatorDp.IsNullOrEmpty() ? int.Parse(indicatorDp!) : null
         };
     }
@@ -87,7 +88,7 @@ public class MetaDataFileReader
         });
 
         var indicatorGroups = indicatorRows
-            .GroupBy(row => row.IndicatorGrouping)
+            .GroupBy(row => row.IndicatorGrouping!)
             .ToDictionary(
                 rows => rows.Key,
                 rows => new IndicatorGroup(rows.Key, subject.Id));
@@ -95,7 +96,7 @@ public class MetaDataFileReader
         return indicatorRows
             .Select(row =>
             {
-                var indicatorGroup = indicatorGroups.GetValueOrDefault(row.IndicatorGrouping)!;
+                var indicatorGroup = indicatorGroups.GetValueOrDefault(row.IndicatorGrouping!)!;
 
                 return (
                     indicator:
