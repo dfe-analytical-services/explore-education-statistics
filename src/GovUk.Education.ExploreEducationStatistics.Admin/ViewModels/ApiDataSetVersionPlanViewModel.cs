@@ -5,7 +5,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Public.Data;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 
-public record ReplacementApiDataSetVersionPlanViewModel
+public abstract record ApiDataSetVersionPlanViewModel
 {
     public Guid DataSetId { get; init; }
 
@@ -19,6 +19,14 @@ public record ReplacementApiDataSetVersionPlanViewModel
 
     public MappingStatusViewModel? MappingStatus { get; set; }
 
-    public bool Valid { get; set; } //TODO: please note, this is kept as is for backward (feature flagging) compatibility with the rest of the code.
-    public bool ValidDefinition => MappingStatus is { Complete: true, FiltersComplete: true, LocationsComplete: true, HasMajorVersionUpdate: false };
+    public bool FinishedMapping => Status == DataSetVersionStatus.Draft;
+    
+    public bool Valid { get; set; }
+}
+
+public record DeleteApiDataSetVersionPlanViewModel : ApiDataSetVersionPlanViewModel;
+
+public record ReplaceApiDataSetVersionPlanViewModel : ApiDataSetVersionPlanViewModel
+{
+    //public override bool Valid { get; set; } TODO: override Valid with auto-calculated value when EES-5779 is ready
 }

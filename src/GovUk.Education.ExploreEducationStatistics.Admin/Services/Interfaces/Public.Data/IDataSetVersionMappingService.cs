@@ -30,6 +30,6 @@ public interface IDataSetVersionMappingService
         CancellationToken cancellationToken = default);
 
     Task<MappingStatusViewModel> GetMappingStatus(
-        Guid nextDataSetVersionId,
+        Guid dataSetVersionId,
         CancellationToken cancellationToken = default);
 }

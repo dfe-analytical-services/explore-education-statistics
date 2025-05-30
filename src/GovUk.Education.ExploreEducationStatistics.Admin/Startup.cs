@@ -89,7 +89,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Admin.Repositories;
-using GovUk.Education.ExploreEducationStatistics.Admin.Repositories.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Admin.Repositories.Public.Data;
+using GovUk.Education.ExploreEducationStatistics.Admin.Repositories.Public.Data.Interfaces;
 using Thinktecture;
 using static GovUk.Education.ExploreEducationStatistics.Common.Utils.StartupUtils;
 using ContentGlossaryService = GovUk.Education.ExploreEducationStatistics.Content.Services.GlossaryService;
@@ -976,7 +977,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                 CancellationToken cancellationToken = default) =>
             throw new NotImplementedException();
 
-        public Task<MappingStatusViewModel> GetMappingStatus(Guid nextDataSetVersionId, CancellationToken cancellationToken = default) => throw new NotImplementedException();
+        public Task<MappingStatusViewModel> GetMappingStatus(Guid dataSetVersionId, CancellationToken cancellationToken = default) => throw new NotImplementedException();
     }
 
     internal class NoOpPreviewTokenService : IPreviewTokenService

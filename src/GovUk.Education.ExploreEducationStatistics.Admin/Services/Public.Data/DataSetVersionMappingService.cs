@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Admin.Repositories.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Admin.Repositories.Public.Data.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
@@ -16,7 +16,6 @@ using GovUk.Education.ExploreEducationStatistics.Common.Options;
 using GovUk.Education.ExploreEducationStatistics.Common.Requests;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
-using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
@@ -88,37 +87,37 @@ public class DataSetVersionMappingService(
     /// the mapping types of locations and filters. Returns true if there are any locations or filters
     /// that cannot be mapped (NoMappingTypes) or if there are any deletion-based major version changes.
     /// </summary>
-    /// <param name="nextDataSetVersionId">The ID of the target dataset version to check</param>
+    /// <param name="dataSetVersionId">The ID of the target dataset version to check</param>
     /// <param name="cancellationToken">Optional cancellation token</param>
     /// <returns>True if a major version update is required, false otherwise</returns>
     public async Task<bool> IsMajorVersionUpdate(
-        Guid nextDataSetVersionId,
+        Guid dataSetVersionId,
         CancellationToken cancellationToken = default)
     {
         var locationOptionMappingTypes = await mappingTypesRepository.GetLocationOptionMappingTypes(
-            nextDataSetVersionId, 
+            dataSetVersionId, 
             cancellationToken);
 
         var filterAndOptionMappingTypes = await mappingTypesRepository.GetFilterOptionMappingTypes(
-                nextDataSetVersionId, 
+                dataSetVersionId, 
                 cancellationToken);
 
         return await IsMajorVersionUpdate(
-            nextDataSetVersionId,
+            dataSetVersionId,
             locationOptionMappingTypes,
             filterAndOptionMappingTypes,
             cancellationToken);
     }
 
-    public async Task<MappingStatusViewModel?> GetMappingStatus(Guid nextDataSetVersionId, CancellationToken cancellationToken = default)
+    public async Task<MappingStatusViewModel?> GetMappingStatus(Guid dataSetVersionId, CancellationToken cancellationToken = default)
     {
         bool? isMajorVersionUpdate = featureFlags.Value.EnableReplacementOfPublicApiDataSets
-                ? await IsMajorVersionUpdate(nextDataSetVersionId, cancellationToken)
+                ? await IsMajorVersionUpdate(dataSetVersionId, cancellationToken)
                 : null;
 
         return await publicDataDbContext
             .DataSetVersionMappings
-            .Where(mapping => mapping.TargetDataSetVersionId == nextDataSetVersionId)
+            .Where(mapping => mapping.TargetDataSetVersionId == dataSetVersionId)
             .Select(mapping => new MappingStatusViewModel
             {
                 LocationsComplete = mapping.LocationMappingsComplete,
@@ -271,9 +270,29 @@ public class DataSetVersionMappingService(
         {
             return true;
         }
-        return await mappingTypesRepository.HasDeletionMajorVersionChanges(
+
+        return await HasDeletionChanges(
             targetDataSetVersionId,
             cancellationToken);
+    }
+    
+    /// <summary>
+    /// Checks if there are any major version changes due to deletions in indicators, geographic levels, or time periods
+    /// for a specific target dataset version.
+    /// </summary>
+    /// <param name="targetDataSetVersionId">The ID of the target dataset version to check</param>
+    /// <param name="cancellationToken">Optional cancellation token</param>
+    /// <returns>True if there are any deletion-based major version changes, false otherwise</returns>
+    public async Task<bool> HasDeletionChanges(
+        Guid targetDataSetVersionId, 
+        CancellationToken cancellationToken = default)
+    {
+        return await publicDataDbContext.DataSetVersionMappings
+            .Where(mapping => mapping.TargetDataSetVersionId == targetDataSetVersionId)
+            .Select(mapping => mapping.HasDeletedIndicators
+                               || mapping.HasDeletedGeographicLevels
+                               || mapping.HasDeletedTimePeriods)
+            .SingleOrDefaultAsync(cancellationToken);
     }
 
     private async Task UpdateMappingCompleteFlags(

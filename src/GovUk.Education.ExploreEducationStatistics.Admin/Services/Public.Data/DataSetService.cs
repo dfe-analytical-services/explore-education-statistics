@@ -158,7 +158,7 @@ internal class DataSetService(
             : MapDraftVersion(
                 dataSetVersion: dataSet.LatestDraftVersion,
                 mappingStatus: await dataSetVersionMappingService.GetMappingStatus(
-                    nextDataSetVersionId: dataSet.LatestDraftVersion.Id,
+                    dataSetVersionId: dataSet.LatestDraftVersion.Id,
                     cancellationToken),
                 releaseFilesByDataSetVersionId[dataSet.LatestDraftVersion.Id]
             );

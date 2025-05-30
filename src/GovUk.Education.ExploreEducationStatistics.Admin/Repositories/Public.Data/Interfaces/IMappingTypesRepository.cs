@@ -4,7 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Public.Data;
 
-namespace GovUk.Education.ExploreEducationStatistics.Admin.Repositories.Interfaces;
+namespace GovUk.Education.ExploreEducationStatistics.Admin.Repositories.Public.Data.Interfaces;
 
 public interface IMappingTypesRepository
 {
@@ -13,10 +13,6 @@ public interface IMappingTypesRepository
         CancellationToken cancellationToken = default);
 
     public Task<List<FilterMappingTypes>> GetFilterOptionMappingTypes(
-        Guid targetDataSetVersionId,
-        CancellationToken cancellationToken = default);
-
-    public Task<bool> HasDeletionMajorVersionChanges(
         Guid targetDataSetVersionId,
         CancellationToken cancellationToken = default);
 }

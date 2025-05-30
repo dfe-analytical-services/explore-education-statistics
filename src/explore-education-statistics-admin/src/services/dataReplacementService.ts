@@ -95,7 +95,6 @@ export interface MappingStatus {
   locationsComplete: boolean;
   filtersComplete: boolean;
   hasMajorVersionUpdate: boolean;
-  complete: boolean;
 }
 
 export interface ApiDataSetVersionPlan {
@@ -105,6 +104,7 @@ export interface ApiDataSetVersionPlan {
   version: string;
   status: string;
   mappingStatus?: MappingStatus;
+  finishedMapping: boolean;
   valid: boolean;
 }
 

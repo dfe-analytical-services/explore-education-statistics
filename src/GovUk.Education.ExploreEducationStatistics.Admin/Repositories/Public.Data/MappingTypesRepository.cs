@@ -1,16 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Admin.Repositories.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Admin.Repositories.Public.Data.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using Microsoft.EntityFrameworkCore;
 using Npgsql;
 
-namespace GovUk.Education.ExploreEducationStatistics.Admin.Repositories;
+namespace GovUk.Education.ExploreEducationStatistics.Admin.Repositories.Public.Data;
 
 public class MappingTypesRepository(PublicDataDbContext context) : IMappingTypesRepository
 {
@@ -69,23 +68,4 @@ public class MappingTypesRepository(PublicDataDbContext context) : IMappingTypes
                 parameters: [targetDataSetVersionIdParam])
             .ToListAsync(cancellationToken);
     }
-    /// <summary>
-    /// Checks if there are any major version changes due to deletions in indicators, geographic levels, or time periods
-    /// for a specific target dataset version.
-    /// </summary>
-    /// <param name="targetDataSetVersionId">The ID of the target dataset version to check</param>
-    /// <param name="cancellationToken">Optional cancellation token</param>
-    /// <returns>True if there are any deletion-based major version changes, false otherwise</returns>
-    public async Task<bool> HasDeletionMajorVersionChanges(
-        Guid targetDataSetVersionId, 
-        CancellationToken cancellationToken = default)
-    {
-        return await _context.DataSetVersionMappings
-            .Where(mapping => mapping.TargetDataSetVersionId == targetDataSetVersionId)
-            .Select(mapping => mapping.HasDeletedIndicators
-                               || mapping.HasDeletedGeographicLevels
-                               || mapping.HasDeletedTimePeriods)
-            .SingleOrDefaultAsync(cancellationToken);
-    }
-
 }

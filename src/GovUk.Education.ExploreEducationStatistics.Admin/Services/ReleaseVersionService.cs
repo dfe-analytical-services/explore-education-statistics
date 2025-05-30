@@ -32,6 +32,7 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using Semver;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyApprovalStatus;
@@ -62,7 +63,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         IProcessorClient processorClient,
         IPrivateBlobCacheService privateCacheService,
         IReleaseSlugValidator releaseSlugValidator,
-        IOptions<FeatureFlags> featureFlags) : IReleaseVersionService
+        IOptions<FeatureFlags> featureFlags,
+        IDataSetVersionRepository dataSetVersionRepository) : IReleaseVersionService
     {
         public async Task<Either<ActionResult, ReleaseVersionViewModel>> GetRelease(Guid releaseVersionId)
         {
@@ -592,14 +594,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
                     var linkedApiDataSetVersionDeletionPlan = tuple.apiDataSetVersion is null
                         ? null
-                        : new ReplacementApiDataSetVersionPlanViewModel
+                        : new DeleteApiDataSetVersionPlanViewModel
                         {
                             DataSetId = tuple.apiDataSetVersion.DataSetId,
                             DataSetTitle = tuple.apiDataSetVersion.DataSet.Title,
                             Id = tuple.apiDataSetVersion.Id,
                             Version = tuple.apiDataSetVersion.PublicVersion,
                             Status = tuple.apiDataSetVersion.Status,
-                            Valid = featureFlags.Value.EnableReplacementOfPublicApiDataSets
+                            Valid = featureFlags.Value.EnableReplacementOfPublicApiDataSets && tuple.apiDataSetVersion.Status != DataSetVersionStatus.Published
                         };
 
                     return new DeleteDataFilePlanViewModel
@@ -768,17 +770,34 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 return ValidationActionResult(CannotRemoveDataFilesOnceReleaseApproved);
             }
 
-            if (!featureFlags.Value.EnableReplacementOfPublicApiDataSets && releaseFile.PublicApiDataSetId is not null)
+            if (releaseFile.PublicApiDataSetId is null)
             {
-                return ValidationUtils.ValidationResult(new ErrorViewModel
+                return Unit.Instance;
+            }
+
+          
+            return await ShouldPreventApiDataSetDeletion(
+                featureFlags.Value.EnableReplacementOfPublicApiDataSets,
+                releaseFile.PublicApiDataSetId.Value,
+                releaseFile.PublicApiDataSetVersion) 
+                ? ValidationUtils.ValidationResult(new ErrorViewModel
                 {
                     Code = ValidationMessages.CannotDeleteApiDataSetReleaseFile.Code,
                     Message = ValidationMessages.CannotDeleteApiDataSetReleaseFile.Message,
                     Detail = new ApiDataSetErrorDetail(releaseFile.PublicApiDataSetId.Value)
-                });
-            }
+                }) 
+                : Unit.Instance;
 
-            return Unit.Instance;
+            async Task<bool> ShouldPreventApiDataSetDeletion(
+                bool isReplacementEnabled,
+                Guid apiDataSetId,
+                SemVersion? version)
+            {
+                var dataSetVersion = await dataSetVersionRepository
+                    .GetDataSetVersion(apiDataSetId, version);
+
+                return !isReplacementEnabled && dataSetVersion.Status == DataSetVersionStatus.Published;
+            }
         }
 
         private IList<MethodologyVersion> GetMethodologiesScheduledWithRelease(Guid releaseVersionId)

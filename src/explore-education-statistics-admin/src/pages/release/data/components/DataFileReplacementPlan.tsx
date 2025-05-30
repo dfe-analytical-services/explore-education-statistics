@@ -106,8 +106,7 @@ const DataFileReplacementPlan = ({
         !plan?.apiDataSetVersionPlan?.mappingStatus?.locationsComplete,
       hasIncompleteFilterMapping:
         !plan?.apiDataSetVersionPlan?.mappingStatus?.filtersComplete,
-      hasIncompleteMapping:
-        !plan?.apiDataSetVersionPlan?.mappingStatus?.complete,
+      hasIncompleteMapping: !plan?.apiDataSetVersionPlan?.finishedMapping,
       hasMajorVersionUpdate:
         plan?.apiDataSetVersionPlan?.mappingStatus?.hasMajorVersionUpdate,
     };

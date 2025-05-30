@@ -388,7 +388,8 @@ public class ReleaseVersionServicePermissionTests
              featureFlags: Microsoft.Extensions.Options.Options.Create(new FeatureFlags()
              {
                  EnableReplacementOfPublicApiDataSets = enableReplacementOfPublicApiDataSets
-             })
+             }),
+            Mock.Of<IDataSetVersionRepository>()
         );
     }
 }
