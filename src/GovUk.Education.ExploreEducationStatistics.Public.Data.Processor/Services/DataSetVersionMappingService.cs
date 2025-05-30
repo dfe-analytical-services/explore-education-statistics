@@ -22,7 +22,7 @@ internal class DataSetVersionMappingService(
     IDataSetMetaService dataSetMetaService,
     PublicDataDbContext publicDataDbContext,
     ContentDbContext contentDbContext,
-    IOptions<FeatureFlags> featureFlags)
+    IOptions<FeatureFlagsOptions> featureFlags)
     : IDataSetVersionMappingService
 {
     private static readonly MappingType[] IncompleteMappingTypes =

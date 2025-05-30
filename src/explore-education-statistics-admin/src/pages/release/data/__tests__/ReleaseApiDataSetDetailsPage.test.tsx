@@ -17,7 +17,6 @@ import render from '@common-test/render';
 import { screen, waitFor, within } from '@testing-library/react';
 import React from 'react';
 import { generatePath, MemoryRouter, Route } from 'react-router-dom';
-import { FeatureFlagProvider } from '@admin/contexts/FeatureFlagContext';
 
 jest.mock('@admin/services/apiDataSetService');
 jest.mock('@admin/services/apiDataSetVersionService');
@@ -106,6 +105,27 @@ describe('ReleaseApiDataSetDetailsPage', () => {
     timePeriods: {
       start: '2018',
       end: '2024',
+    },
+  };
+
+  const defaultTestConfig = {
+    appInsightsKey: '',
+    publicAppUrl: 'http://localhost',
+    publicApiUrl: 'http://public-api',
+    publicApiDocsUrl: 'http://public-api-docs',
+    permittedEmbedUrlDomains: ['https://department-for-education.shinyapps.io'],
+    oidc: {
+      clientId: '',
+      authority: '',
+      knownAuthorities: [''],
+      adminApiScope: '',
+      authorityMetadata: {
+        authorizationEndpoint: '',
+        tokenEndpoint: '',
+        issuer: '',
+        userInfoEndpoint: '',
+        endSessionEndpoint: '',
+      },
     },
   };
 
@@ -968,33 +988,32 @@ describe('ReleaseApiDataSetDetailsPage', () => {
       options ?? {};
 
     return render(
-      <TestConfigContextProvider>
-        <FeatureFlagProvider
-          initialFlags={{
-            enableReplacementOfPublicApiDataSets:
-              options?.enableReplacementOfPublicApiDataSets ?? false,
-          }}
-        >
-          <ReleaseVersionContextProvider releaseVersion={releaseVersion}>
-            <MemoryRouter
-              initialEntries={[
-                generatePath<ReleaseDataSetRouteParams>(
-                  releaseApiDataSetDetailsRoute.path,
-                  {
-                    publicationId: releaseVersion.publicationId,
-                    releaseVersionId: releaseVersion.id,
-                    dataSetId,
-                  },
-                ),
-              ]}
-            >
-              <Route
-                component={ReleaseApiDataSetDetailsPage}
-                path={releaseApiDataSetDetailsRoute.path}
-              />
-            </MemoryRouter>
-          </ReleaseVersionContextProvider>
-        </FeatureFlagProvider>
+      <TestConfigContextProvider
+        config={{
+          ...defaultTestConfig,
+          enableReplacementOfPublicApiDataSets:
+            options?.enableReplacementOfPublicApiDataSets ?? false,
+        }}
+      >
+        <ReleaseVersionContextProvider releaseVersion={releaseVersion}>
+          <MemoryRouter
+            initialEntries={[
+              generatePath<ReleaseDataSetRouteParams>(
+                releaseApiDataSetDetailsRoute.path,
+                {
+                  publicationId: releaseVersion.publicationId,
+                  releaseVersionId: releaseVersion.id,
+                  dataSetId,
+                },
+              ),
+            ]}
+          >
+            <Route
+              component={ReleaseApiDataSetDetailsPage}
+              path={releaseApiDataSetDetailsRoute.path}
+            />
+          </MemoryRouter>
+        </ReleaseVersionContextProvider>
       </TestConfigContextProvider>,
     );
   }

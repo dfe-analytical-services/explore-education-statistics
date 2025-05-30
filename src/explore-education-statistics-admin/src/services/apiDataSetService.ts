@@ -56,6 +56,7 @@ export interface ApiDataSetVersion {
   status: DataSetVersionStatus;
   type: DataSetVersionType;
   file: IdTitlePair;
+  originalFileId: string;
   notes?: string;
   releaseVersion: IdTitlePair;
   totalResults: number;
@@ -69,7 +70,9 @@ export interface ApiDataSetDraftVersion extends ApiDataSetVersion {
   indicators?: string[];
   mappingStatus?: {
     locationsComplete: boolean;
+    locationsHaveMajorChange: boolean;
     filtersComplete: boolean;
+    filtersHaveMajorChange: boolean;
     hasMajorVersionUpdate: boolean | null;
   };
 }

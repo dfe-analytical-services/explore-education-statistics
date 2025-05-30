@@ -152,6 +152,17 @@ internal class DataSetService(
     private async Task<DataSetViewModel> MapDataSet(DataSet dataSet, CancellationToken cancellationToken)
     {
         var releaseFilesByDataSetVersionId = await GetReleaseFilesByDataSetVersionId(dataSet, cancellationToken);
+        ReleaseFile? riginalReleaseFile = null;
+        if (dataSet.LatestDraftVersion is { VersionPatch: > 0 })
+        {
+            var lastDataSetVersionNumber = dataSet.LatestDraftVersion.SemVersion()
+                .WithPatch(dataSet.LatestDraftVersion.VersionPatch - 1);
+            var lastDataSetVersion = dataSet.Versions.SingleOrDefault(dsv => dsv.SemVersion() == lastDataSetVersionNumber);
+            if (lastDataSetVersion != null)
+            {
+                riginalReleaseFile = releaseFilesByDataSetVersionId[ lastDataSetVersion.Id];
+            }
+        }
 
         var draftVersion = dataSet.LatestDraftVersion is null
             ? null
@@ -160,7 +171,8 @@ internal class DataSetService(
                 mappingStatus: await dataSetVersionMappingService.GetMappingStatus(
                     dataSetVersionId: dataSet.LatestDraftVersion.Id,
                     cancellationToken),
-                releaseFilesByDataSetVersionId[dataSet.LatestDraftVersion.Id]
+                releaseFile: releaseFilesByDataSetVersionId[dataSet.LatestDraftVersion.Id],
+                  riginalReleaseFile
             );
 
         var latestLiveVersion = dataSet.LatestLiveVersion is null
@@ -240,7 +252,8 @@ internal class DataSetService(
     private static DataSetDraftVersionViewModel MapDraftVersion(
         DataSetVersion dataSetVersion,
         MappingStatusViewModel? mappingStatus,
-        ReleaseFile releaseFile)
+        ReleaseFile releaseFile,
+        ReleaseFile? originalReleaseFile)
     {
         return new DataSetDraftVersionViewModel
         {
@@ -249,6 +262,7 @@ internal class DataSetService(
             Status = dataSetVersion.Status,
             Type = dataSetVersion.VersionType,
             File = MapVersionFile(releaseFile),
+            OriginalFileId = originalReleaseFile?.FileId,
             ReleaseVersion = MapReleaseVersion(releaseFile.ReleaseVersion),
             TotalResults = dataSetVersion.TotalResults,
             Notes = dataSetVersion.Notes,

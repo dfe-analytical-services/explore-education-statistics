@@ -774,6 +774,13 @@
       "metadata": {
         "description": "Where analytics request files are saved before being processed"
       }
+    },
+    "enableReplacementOfPublicApiDataSets": {
+      "type": "bool",
+      "defaultValue": false,
+      "metadata": {
+        "description": "Feature flag to control the replacement of public API data sets"
+      }
     }
   },
   "variables": {
@@ -1908,7 +1915,8 @@
         "PublicDataApi__DocsUrl": "[concat('https://', parameters('publicApiDocsUrl'))]",
         "PublicDataApi__AppRegistrationClientId": "[parameters('apiAppRegistrationClientId')]",
         "PublicDataProcessor__Url": "[concat('https://', variables('publicDataProcessorName'), '.azurewebsites.net')]",
-        "PublicDataProcessor__AppRegistrationClientId": "[parameters('publicDataProcessorAppRegistrationClientId')]"
+        "PublicDataProcessor__AppRegistrationClientId": "[parameters('publicDataProcessorAppRegistrationClientId')]",
+        "FeatureFlag__EnableReplacementOfPublicApiDataSets": "[parameters('enableReplacementOfPublicApiDataSets')]"
         // "ScreenerApi__Url": "[concat('https://', variables('screenerApiName'), '.azurewebsites.net')]",
         // "ScreenerApi__AppRegistrationClientId": "[parameters('screenerApiAppRegistrationClientId')]"
       }
@@ -3440,7 +3448,8 @@
         "EventGrid__EventTopics__0__TopicEndpoint": "[if(parameters('eventGridTopicsExist'), reference(resourceId('Microsoft.EventGrid/topics', variables('eventGridTopicNamePublicationChanged')), '2025-02-15').endpoint, '')]",
         "EventGrid__EventTopics__1__Key": "ReleaseVersionChangedEvent",
         "EventGrid__EventTopics__1__TopicEndpoint": "[if(parameters('eventGridTopicsExist'), reference(resourceId('Microsoft.EventGrid/topics', variables('eventGridTopicNameReleaseVersionChanged')), '2025-02-15').endpoint, '')]",
-        "PublicDataDbExists": "[parameters('publicDataDbExists')]"
+        "PublicDataDbExists": "[parameters('publicDataDbExists')]",
+        "FeatureFlag__EnableReplacementOfPublicApiDataSets": "[parameters('enableReplacementOfPublicApiDataSets')]"
       }
     },
     {

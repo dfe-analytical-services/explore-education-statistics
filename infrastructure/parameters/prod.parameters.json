@@ -103,6 +103,9 @@
     },
     "eventGridTopicsExist": {
       "value": false
+    },
+    "enableReplacementOfPublicApiDataSets" : {
+      "value": false
     }
   }
 }

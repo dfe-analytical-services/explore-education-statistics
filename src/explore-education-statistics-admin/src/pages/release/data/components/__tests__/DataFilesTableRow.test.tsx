@@ -1,11 +1,8 @@
-﻿import { FeatureFlags } from '@admin/config/featureFlags';
-import { FeatureFlagProvider } from '@admin/contexts/FeatureFlagContext';
-import DataFilesTableRow from '@admin/pages/release/data/components/DataFilesTableRow';
-import { DataFile } from '@admin/services/releaseDataFileService';
-import render from '@common-test/render';
-import React from 'react';
+﻿import React from 'react';
 import { MemoryRouter } from 'react-router-dom';
-import { screen, waitFor } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { TestConfigContextProvider } from '@admin/contexts/ConfigContext';
+import DataFilesTableRow from '../DataFilesTableRow';
 
 describe('DataFilesTableRow', () => {
   const baseProps = {
@@ -28,6 +25,27 @@ describe('DataFilesTableRow', () => {
     permissions: { canCancelImport: false },
   };
 
+  const defaultTestConfig = {
+    appInsightsKey: '',
+    publicAppUrl: 'http://localhost',
+    publicApiUrl: 'http://public-api',
+    publicApiDocsUrl: 'http://public-api-docs',
+    permittedEmbedUrlDomains: ['https://department-for-education.shinyapps.io'],
+    oidc: {
+      clientId: '',
+      authority: '',
+      knownAuthorities: [''],
+      adminApiScope: '',
+      authorityMetadata: {
+        authorizationEndpoint: '',
+        tokenEndpoint: '',
+        issuer: '',
+        userInfoEndpoint: '',
+        endSessionEndpoint: '',
+      },
+    },
+  };
+
   beforeEach(() => {
     jest.clearAllMocks();
   });
@@ -35,20 +53,35 @@ describe('DataFilesTableRow', () => {
   describe('when feature flag enableReplacementOfPublicApiDataSets is toggled', () => {
     test('shows no API modal that stops the user when feature flag enableReplacementOfPublicApiDataSets is enabled', async () => {
       const dataFile = { ...mockDataFile, publicApiDataSetId: 'dataset-1' };
-      const testFeatureFlag: FeatureFlags = {
-        enableReplacementOfPublicApiDataSets: true,
-      };
-      const { user } = render(
-        <FeatureFlagProvider initialFlags={testFeatureFlag}>
+
+      render(
+        <TestConfigContextProvider
+          config={{
+            ...defaultTestConfig,
+            enableReplacementOfPublicApiDataSets: true,
+          }}
+        >
           <MemoryRouter>
-            <DataFilesTableRow {...baseProps} dataFile={dataFile} />
+            <table>
+              <thead>
+                <tr>
+                  <th scope="col">Title</th>
+                  <th scope="col">Size</th>
+                  <th scope="col">Status</th>
+                  <th scope="col">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <DataFilesTableRow {...baseProps} dataFile={dataFile} />
+              </tbody>
+            </table>
           </MemoryRouter>
-        </FeatureFlagProvider>,
+        </TestConfigContextProvider>,
       );
       const replaceLink = screen.getByText('Replace data');
       expect(replaceLink).toBeInTheDocument();
 
-      await user.click(replaceLink);
+      fireEvent.click(replaceLink);
 
       await waitFor(() => {
         expect(
@@ -59,20 +92,35 @@ describe('DataFilesTableRow', () => {
 
     test('shows - modal that stops the user, when feature flag enableReplacementOfPublicApiDataSets is disabled', async () => {
       const dataFile = { ...mockDataFile, publicApiDataSetId: 'dataset-1' };
-      const testFeatureFlag: FeatureFlags = {
-        enableReplacementOfPublicApiDataSets: false,
-      };
-      const { user } = render(
-        <FeatureFlagProvider initialFlags={testFeatureFlag}>
+
+      render(
+        <TestConfigContextProvider
+          config={{
+            ...defaultTestConfig,
+            enableReplacementOfPublicApiDataSets: false,
+          }}
+        >
           <MemoryRouter>
-            <DataFilesTableRow {...baseProps} dataFile={dataFile} />
+            <table>
+              <thead>
+                <tr>
+                  <th scope="col">Title</th>
+                  <th scope="col">Size</th>
+                  <th scope="col">Status</th>
+                  <th scope="col">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <DataFilesTableRow {...baseProps} dataFile={dataFile} />
+              </tbody>
+            </table>
           </MemoryRouter>
-        </FeatureFlagProvider>,
+        </TestConfigContextProvider>,
       );
       const replaceLink = screen.getByText('Replace data');
       expect(replaceLink).toBeInTheDocument();
 
-      await user.click(replaceLink);
+      fireEvent.click(replaceLink);
 
       await waitFor(() => {
         expect(

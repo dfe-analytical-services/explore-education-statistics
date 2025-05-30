@@ -1804,7 +1804,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     HasMajorVersionUpdate = majorVersionUpdate
                 });
             
-            var options = Microsoft.Extensions.Options.Options.Create(new FeatureFlags()
+            var options = Microsoft.Extensions.Options.Options.Create(new FeatureFlagsOptions()
             {
                 EnableReplacementOfPublicApiDataSets = enableReplacementOfPublicApiDataSets
             });
@@ -2835,7 +2835,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     LocationsComplete = true,
                     HasMajorVersionUpdate = false
                 });
-            var options = Microsoft.Extensions.Options.Options.Create(new FeatureFlags()
+            var options = Microsoft.Extensions.Options.Options.Create(new FeatureFlagsOptions()
             {
                 EnableReplacementOfPublicApiDataSets = enableReplacementOfPublicApiDataSets
             });
@@ -4590,10 +4590,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             ICacheKeyService? cacheKeyService = null,
             IPrivateBlobCacheService? privateBlobCacheService = null,
             IDataSetVersionMappingService? dataSetVersionMappingService = null,
-            IOptions<FeatureFlags>? featureFlags = null
+            IOptions<FeatureFlagsOptions>? featureFlags = null
             )
         {
-            featureFlags ??= Microsoft.Extensions.Options.Options.Create(new FeatureFlags()
+            featureFlags ??= Microsoft.Extensions.Options.Options.Create(new FeatureFlagsOptions()
             {
                 EnableReplacementOfPublicApiDataSets = false
             });

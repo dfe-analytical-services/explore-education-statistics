@@ -112,6 +112,9 @@
     },
     "immediatePublicationOfScheduledReleaseVersionsEnabled": {
       "value": true
+    },
+    "enableReplacementOfPublicApiDataSets" : {
+      "value": true
     }
   }
 }
