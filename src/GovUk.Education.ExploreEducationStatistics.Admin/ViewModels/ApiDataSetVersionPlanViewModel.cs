@@ -16,10 +16,6 @@ public abstract record ApiDataSetVersionPlanViewModel
     public string Version { get; init; } = null!;
 
     public DataSetVersionStatus Status { get; init; }
-
-    public MappingStatusViewModel? MappingStatus { get; set; }
-
-    public bool FinishedMapping => Status == DataSetVersionStatus.Draft;
     
     public bool Valid { get; set; }
 }
@@ -28,5 +24,9 @@ public record DeleteApiDataSetVersionPlanViewModel : ApiDataSetVersionPlanViewMo
 
 public record ReplaceApiDataSetVersionPlanViewModel : ApiDataSetVersionPlanViewModel
 {
+    public MappingStatusViewModel? MappingStatus { get; set; }
+    
+    public bool FinishedMapping => Status == DataSetVersionStatus.Draft;
+    
     //public override bool Valid { get; set; } TODO: override Valid with auto-calculated value when EES-5779 is ready
 }

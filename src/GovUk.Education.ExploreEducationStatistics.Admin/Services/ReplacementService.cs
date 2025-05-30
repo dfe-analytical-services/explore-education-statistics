@@ -106,7 +106,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             
         }
         
-        private async Task<ApiDataSetVersionPlanViewModel?> GetApiVersionPlanViewModel(DataSetVersion replacementApiDataSetVersion, CancellationToken cancellationToken)
+        private async Task<ReplaceApiDataSetVersionPlanViewModel?> GetApiVersionPlanViewModel(DataSetVersion replacementApiDataSetVersion, CancellationToken cancellationToken)
         {
             var apiDataSetVersionPlan = new ReplaceApiDataSetVersionPlanViewModel
             {
