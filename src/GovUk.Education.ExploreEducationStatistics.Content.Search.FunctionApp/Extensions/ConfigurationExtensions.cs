@@ -10,6 +10,7 @@ public static class ConfigurationExtensions
     {
         Log.Logger.Information("Directory.GetCurrentDirectory() = {CurrentDirectory}", Directory.GetCurrentDirectory());
         Log.Logger.Information("context.HostingEnvironment.ContentRootPath = {ContentRootPath}", hostEnvironment.ContentRootPath);
+        Log.Logger.Information("HostingEnvironment = {@HostingEnvironment}", hostEnvironment);
         if (hostEnvironment.IsProduction())
         {
             Log.Logger.Information("Setting base path to: /home/site/wwwroot");
