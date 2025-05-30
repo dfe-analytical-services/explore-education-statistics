@@ -14,7 +14,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Validators;
     AllowMultiple = true)]
 public class ContainsOnlyAttribute(params object[] allowedValues) : ValidationAttribute
 {
-    public IEnumerable<object> AllowedValues { get; } = allowedValues;
+    private IEnumerable<object> AllowedValues { get; } = allowedValues;
 
     public string? AllowedValuesProvider { get; set; }
 
@@ -26,7 +26,8 @@ public class ContainsOnlyAttribute(params object[] allowedValues) : ValidationAt
         {
             throw new ArgumentException(
                 $"Validated value must implement {nameof(IEnumerable)}",
-                validationContext.MemberName
+                // ReSharper disable once ConditionalAccessQualifierIsNonNullableAccordingToAPIContract
+                validationContext?.MemberName
             );
         }
 
@@ -58,11 +59,12 @@ public class ContainsOnlyAttribute(params object[] allowedValues) : ValidationAt
                 MemberTypes.Field | MemberTypes.Property | MemberTypes.Method,
                 BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Static
             )
-            .FirstOrDefault() 
-                     ?? throw new ArgumentException(
-                            $"{nameof(AllowedValuesProvider)} must reference a field or method in {type.FullName}",
-                            AllowedValuesProvider
-                     );
+            .FirstOrDefault()
+                ?? throw new ArgumentException(
+                    $"{nameof(AllowedValuesProvider)} must reference a field or method in {type.FullName}",
+                    AllowedValuesProvider
+                );
+
         var providedValues = member.MemberType switch
         {
             MemberTypes.Field => ((FieldInfo)member).GetValue(instance),
