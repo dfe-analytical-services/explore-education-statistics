@@ -357,7 +357,7 @@ public class DataSetFileStorageTests
             await contentDbContext.SaveChangesAsync();
         }
 
-        var dataSet = new ZipDataSetFileViewModel
+        var dataSet = new DataSetUploadResultViewModel
         {
             Title = dataSetName,
             DataFileId = Guid.NewGuid(),

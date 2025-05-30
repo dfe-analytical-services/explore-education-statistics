@@ -48,7 +48,7 @@ public class DataSetFileBuilder
             };
     }
 
-    public async Task<List<ZipDataSetFileViewModel>> BuildViewModelsFromZip(bool withReplacement = false)
+    public async Task<List<DataSetUploadResultViewModel>> BuildViewModelsFromZip(bool withReplacement = false)
     {
         _fileName ??= "bulk-data-zip-valid.zip";
 
