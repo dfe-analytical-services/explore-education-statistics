@@ -33,11 +33,10 @@ describe('ReleaseAccessForm', () => {
 
     const roleSelect = screen.getByLabelText('Release role');
     const roles = within(roleSelect).getAllByRole('option');
-    expect(roles).toHaveLength(4);
+    expect(roles).toHaveLength(3);
     expect(roles[0]).toHaveTextContent('Approver');
     expect(roles[1]).toHaveTextContent('Contributor');
     expect(roles[2]).toHaveTextContent('PrereleaseViewer');
-    expect(roles[3]).toHaveTextContent('Viewer');
 
     expect(
       screen.getByRole('button', { name: 'Add release access' }),
@@ -120,6 +119,6 @@ describe('ReleaseAccessForm', () => {
     expect(rows.length).toBe(3);
     expect(within(rows[1]).getByText('Publication 1')).toBeInTheDocument();
     expect(within(rows[1]).getByText('Release 2')).toBeInTheDocument();
-    expect(within(rows[1]).getByText('Viewer')).toBeInTheDocument();
+    expect(within(rows[1]).getByText('Contributor')).toBeInTheDocument();
   });
 });

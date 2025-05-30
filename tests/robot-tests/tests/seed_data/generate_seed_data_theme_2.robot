@@ -55,19 +55,6 @@ Create new publications and published releases - for Publication Approver
     user gives analyst publication approver access
     ...    ${ROLE_PERMISSIONS_PUBLICATION_APPROVER_PUBLICATION}
 
-Create new publications and published releases - for Release Viewer
-    ${PUBLICATION_ID}=    user creates test publication via api
-    ...    ${ROLE_PERMISSIONS_RELEASE_VIEWER_PUBLICATION}
-    ...    ${THEME_ID}
-
-    user creates releases in all states for publication
-    ...    ${PUBLICATION_ID}
-    ...    ${ROLE_PERMISSIONS_RELEASE_VIEWER_PUBLICATION}
-
-    user gives release access to all releases of publication to analyst
-    ...    ${ROLE_PERMISSIONS_RELEASE_VIEWER_PUBLICATION}
-    ...    Viewer
-
 Create new publications and published releases - for Release Contributor
     ${PUBLICATION_ID}=    user creates test publication via api
     ...    ${ROLE_PERMISSIONS_RELEASE_CONTRIBUTOR_PUBLICATION}

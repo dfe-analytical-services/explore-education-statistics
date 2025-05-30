@@ -1,16 +1,16 @@
 import ModalConfirm from '@common/components/ModalConfirm';
 import WarningMessage from '@common/components/WarningMessage';
-import { ArchiveDataSetFile } from 'src/services/releaseDataFileService';
+import { DataSetUploadResult } from 'src/services/releaseDataFileService';
 import React from 'react';
 
 interface Props {
-  bulkUploadPlan: ArchiveDataSetFile[];
-  onConfirm: (bulkUploadPlan: ArchiveDataSetFile[]) => void;
+  uploadResults: DataSetUploadResult[];
+  onConfirm: (uploadResult: DataSetUploadResult[]) => void;
   onCancel: () => void;
 }
 
-export default function BulkZipUploadModalConfirm({
-  bulkUploadPlan,
+export default function DataSetUploadModalConfirm({
+  uploadResults,
   onConfirm,
   onCancel,
 }: Props) {
@@ -18,7 +18,7 @@ export default function BulkZipUploadModalConfirm({
     <ModalConfirm
       title="Upload summary"
       open
-      onConfirm={() => onConfirm(bulkUploadPlan)}
+      onConfirm={() => onConfirm(uploadResults)}
       onExit={onCancel}
       onCancel={onCancel}
     >
@@ -31,12 +31,12 @@ export default function BulkZipUploadModalConfirm({
           </tr>
         </thead>
         <tbody>
-          {bulkUploadPlan.map(archiveDataSet => (
-            <tr key={archiveDataSet.title}>
-              <td>{archiveDataSet.title}</td>
-              <td>{archiveDataSet.dataFileName}</td>
+          {uploadResults.map(uploadResult => (
+            <tr key={uploadResult.title}>
+              <td>{uploadResult.title}</td>
+              <td>{uploadResult.dataFileName}</td>
               <td>
-                {archiveDataSet.replacingFileId && (
+                {uploadResult.replacingFileId && (
                   <WarningMessage className="govuk-!-margin-0 govuk-!-padding-0">
                     Upload will initiate a file replacement
                   </WarningMessage>

@@ -20,7 +20,7 @@ public class EventGridEventHandler(ILogger<EventGridEventHandler> logger) : IEve
         try
         {
             var response = await handler(payload, context.CancellationToken);
-            logger.LogDebug("{FunctionName} completed. {Response}", context.FunctionDefinition.Name, response);
+            logger.LogDebug("{FunctionName} completed. {@Response}", context.FunctionDefinition.Name, response);
             return response;
         }
         catch (Exception e)

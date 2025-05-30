@@ -38,7 +38,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                 await AssertReleaseVersionHandlerSucceedsWithCorrectReleaseRoles<ViewReleaseStatusHistoryRequirement>(
                     CreateHandler,
                     new ReleaseVersion(),
-                    ReleaseRole.Viewer,
                     ReleaseRole.Contributor,
                     ReleaseRole.Approver
                 );

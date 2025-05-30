@@ -86,10 +86,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                         return CreateHandler(contentDbContext);
                     },
                     ReleaseVersion,
-                    rolesExpectedToSucceed: new[]
-                    {
-                        ReleaseRole.Viewer, ReleaseRole.Contributor, ReleaseRole.Approver
-                    });
+                    rolesExpectedToSucceed:
+                    [
+                        ReleaseRole.Contributor, ReleaseRole.Approver
+                    ]);
             }
 
             [Fact]

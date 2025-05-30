@@ -239,7 +239,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             switch (role)
             {
-                case Viewer:
                 case Contributor:
                 case Approver:
                     return RoleNames.Analyst;

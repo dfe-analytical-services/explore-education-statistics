@@ -52,11 +52,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             var dataFile = MockFile("datafile.csv");
             var metaFile = MockFile("metafile.csv");
 
-            var dataFileInfo = new DataFileInfo
+            var uploadResultVms = new List<DataSetUploadResultViewModel>
             {
-                Name = "Data set title",
-                FileName = "data-set.csv",
-                Size = "1 Kb",
+                new()
+                {
+                    Title = "Data set title",
+                    DataFileId = Guid.NewGuid(),
+                    DataFileName = "data.csv",
+                    DataFileSize = 123,
+                    MetaFileId = Guid.NewGuid(),
+                    MetaFileName = "data.meta.csv",
+                    MetaFileSize = 12,
+                },
             };
 
             var releaseDataFileService = new Mock<IReleaseDataFileService>(Strict);
@@ -67,7 +74,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                     "Data set title",
                     null,
                     default))
-                .ReturnsAsync(dataFileInfo);
+                .ReturnsAsync(uploadResultVms);
 
             // Act
             var controller = BuildController(releaseDataFileService: releaseDataFileService.Object);
@@ -86,8 +93,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             // Assert
             VerifyAllMocks(releaseDataFileService);
 
-            var dataFileInfoResult = result.AssertOkResult();
-            Assert.Equal("Data set title", dataFileInfoResult.Name);
+            var uploadResults = result.AssertOkResult();
+            var uploadResult = Assert.Single(uploadResults);
+            Assert.Equal("Data set title", uploadResult.Title);
+            Assert.Equal(uploadResultVms[0].DataFileId, uploadResult.DataFileId);
+            Assert.Equal(uploadResultVms[0].DataFileName, uploadResult.DataFileName);
+            Assert.Equal(uploadResultVms[0].DataFileSize, uploadResult.DataFileSize);
+            Assert.Equal(uploadResultVms[0].MetaFileName, uploadResult.MetaFileName);
+            Assert.Equal(uploadResultVms[0].MetaFileSize, uploadResult.MetaFileSize);
+            Assert.Equal(uploadResultVms[0].MetaFileId, uploadResult.MetaFileId);
         }
 
         [Fact]
@@ -521,7 +535,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         public async Task UploadDataSetAsBulkZip()
         {
             // Arrange
-            var dataSetFiles = new List<ZipDataSetFileViewModel>();
+            var uploadResultVms = new List<DataSetUploadResultViewModel>();
 
             var releaseDataFileService = new Mock<IReleaseDataFileService>(Strict);
 
@@ -530,7 +544,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                     It.IsAny<Guid>(),
                     It.IsAny<IFormFile>(),
                     default))
-                .ReturnsAsync(dataSetFiles);
+                .ReturnsAsync(uploadResultVms);
 
             var controller = BuildController(releaseDataFileService: releaseDataFileService.Object);
 
@@ -546,7 +560,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             // Assert
             VerifyAllMocks(releaseDataFileService);
 
-            result.AssertOkResult(dataSetFiles);
+            result.AssertOkResult(uploadResultVms);
         }
 
         [Fact]
@@ -558,7 +572,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                 new() { FileName = "one.csv", Name = "Data set title", Size = "1024" },
             };
 
-            var importRequests = new List<ZipDataSetFileViewModel>
+            var importRequests = new List<DataSetUploadResultViewModel>
             {
                 new(){ DataFileId = Guid.NewGuid(), MetaFileId = Guid.NewGuid(), Title = "Data set title", DataFileName = "one.csv", MetaFileName = "one.meta.csv", DataFileSize = 1024, MetaFileSize = 128 }
             };
@@ -568,7 +582,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             releaseDataFileService
                 .Setup(s => s.SaveDataSetsFromTemporaryBlobStorage(
                     It.IsAny<Guid>(),
-                    It.IsAny<List<ZipDataSetFileViewModel>>(),
+                    It.IsAny<List<DataSetUploadResultViewModel>>(),
                     default))
                 .ReturnsAsync(dataFileInfo);
 
@@ -1139,17 +1153,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                     metaFileName: "test-data.meta.csv");
 
                 // Assert
-                var viewModel = response.AssertOk<DataFileInfo>();
+                var uploadResult = response.AssertOk<List<DataSetUploadResultViewModel>>();
+                var dataSet = Assert.Single(uploadResult);
 
-                Assert.Equal("Test title", viewModel.Name);
-                Assert.Equal("test-data.csv", viewModel.FileName);
-                Assert.Equal("test-data.meta.csv", viewModel.MetaFileName);
-                Assert.NotNull(viewModel.Id);
-                Assert.NotNull(viewModel.MetaFileId);
-                Assert.Equal("csv", viewModel.Extension);
-                Assert.Equal("434 B", viewModel.Size);
-                Assert.Equal(DataImportStatus.QUEUED, viewModel.Status);
-                Assert.Equal(FileType.Data, viewModel.Type);
+                Assert.Equal("Test title", dataSet.Title);
+                Assert.Equal("test-data.csv", dataSet.DataFileName);
+                Assert.Equal("test-data.meta.csv", dataSet.MetaFileName);
+                Assert.Equal(434, dataSet.DataFileSize);
+                Assert.Equal(157, dataSet.MetaFileSize);
+                Assert.Null(dataSet.ReplacingFileId);
+                Assert.NotEqual(Guid.Empty, dataSet.DataFileId);
+                Assert.NotEqual(Guid.Empty, dataSet.MetaFileId);
             }
 
             [Fact]
@@ -1174,13 +1188,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                     fileName: "data-zip-valid.zip");
 
                 // Assert
-                var dataFileInfo = response.AssertOk<DataFileInfo>();
+                var uploadResult = response.AssertOk<List<DataSetUploadResultViewModel>>();
+                var dataSet = Assert.Single(uploadResult);
 
-                Assert.Equal("Test title", dataFileInfo.Name);
-                Assert.Equal("csvfile.csv", dataFileInfo.FileName);
-                Assert.Equal("csvfile.meta.csv", dataFileInfo.MetaFileName);
-                Assert.Equal(DataImportStatus.QUEUED, dataFileInfo.Status);
-                Assert.Equal(FileType.Data, dataFileInfo.Type);
+                Assert.Equal("Test title", dataSet.Title);
+                Assert.Equal("csvfile.csv", dataSet.DataFileName);
+                Assert.Equal("csvfile.meta.csv", dataSet.MetaFileName);
+                Assert.Equal(15933, dataSet.DataFileSize);
+                Assert.Equal(157, dataSet.MetaFileSize);
+                Assert.Null(dataSet.ReplacingFileId);
+                Assert.NotEqual(Guid.Empty, dataSet.DataFileId);
+                Assert.NotEqual(Guid.Empty, dataSet.MetaFileId);
             }
 
             [Fact]
@@ -1221,9 +1239,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                     fileName: "bulk-data-zip-valid.zip");
 
                 // Assert
-                var viewModel = response.AssertOk<List<ZipDataSetFileViewModel>>();
-                var dataSet1 = viewModel[0];
-                var dataSet2 = viewModel[1];
+                var uploadResultVms = response.AssertOk<List<DataSetUploadResultViewModel>>();
+                var dataSet1 = uploadResultVms[0];
+                var dataSet2 = uploadResultVms[1];
 
                 Assert.Equal("First data set", dataSet1.Title);
                 Assert.Equal("one.csv", dataSet1.DataFileName);
@@ -1264,9 +1282,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                     fileName: "bulk-data-zip-valid.zip");
 
                 // Assert
-                var viewModel = response.AssertOk<List<ZipDataSetFileViewModel>>();
-                var dataSet1 = viewModel[0];
-                var dataSet2 = viewModel[1];
+                var uploadResultVms = response.AssertOk<List<DataSetUploadResultViewModel>>();
+                var dataSet1 = uploadResultVms[0];
+                var dataSet2 = uploadResultVms[1];
 
                 Assert.Equal("First data set", dataSet1.Title);
                 Assert.Equal("one.csv", dataSet1.DataFileName);
@@ -1446,7 +1464,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
 
             private async Task<HttpResponseMessage> ImportBulkZipDataSetsFromTempStorage(
                 Guid releaseVersionId,
-                List<ZipDataSetFileViewModel> dataSetFiles,
+                List<DataSetUploadResultViewModel> dataSetFiles,
                 HttpClient? client = null)
             {
                 client ??= BuildApp().CreateClient();

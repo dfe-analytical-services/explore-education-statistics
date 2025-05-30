@@ -23,7 +23,6 @@ public class AuthorizationHandlerService
 
     public static readonly ReleaseRole[] UnrestrictedReleaseViewerRoles =
     {
-        ReleaseRole.Viewer,
         ReleaseRole.Contributor,
         ReleaseRole.Approver
     };

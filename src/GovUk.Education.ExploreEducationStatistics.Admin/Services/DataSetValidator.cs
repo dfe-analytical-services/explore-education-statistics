@@ -72,8 +72,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     return errors;
                 }
 
-                // TODO (EES-5708): The `performAutoReplacement` condition can be removed once upload methods are aligned
-                // Auto-replacement is currently only available for bulk zip uploads (EES-5708)
+                // TODO (EES-5708/6176): The `performAutoReplacement` condition can be removed once upload methods are aligned
+                // Auto-replacement is currently only available for bulk zip uploads, and replacements triggered via the UI
                 if (performAutoReplacement || featureFlags.Value.EnableReplacementOfPublicApiDataSets)
                 {
                     await GetReplacingFileIfExists(dataSet.ReleaseVersionId, dataSet.Title)

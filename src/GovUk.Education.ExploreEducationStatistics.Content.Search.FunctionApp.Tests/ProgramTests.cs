@@ -38,7 +38,9 @@ public class ProgramTests
         }));
 
     private IHost GetSut(Func<IHostBuilder, IHostBuilder> modifyHostBuilder) =>
-        modifyHostBuilder(new HostBuilder()).BuildHost();
+        modifyHostBuilder(new HostBuilder().UseEnvironment("Development"))
+            .ConfigureHostServices()
+            .Build();
 
     public class BasicTests : ProgramTests
     {
