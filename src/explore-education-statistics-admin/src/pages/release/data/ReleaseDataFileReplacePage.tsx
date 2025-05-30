@@ -134,33 +134,30 @@ const ReleaseDataFileReplacePage = ({
       },
     });
   };
-  const cancelText =
-    dataFile?.publicApiDataSetId === undefined
-      ? 'Cancel data replacement'
-      : 'Cancel data replacement & delete attached draft API version';
-  const cancelBodyText =
-    dataFile?.publicApiDataSetId === undefined ? (
-      <>
-        Are you sure you want to cancel this data replacement? The pending +
-        replacement data file will be deleted.?
-      </>
-    ) : (
-      <>
-        <p>
-          Are you sure you want to cancel this data replacement and remove the
-          attached draft API version?
-        </p>
-        <p>
-          Please note this doesn't affect the current live API data set in any
-          way. You can reassign a data set version at any time prior to this
-          release being published.
-        </p>
-      </>
-    );
+  const cancelBodyText = dataFile?.publicApiDataSetId ? (
+    <>
+      <p>
+        Are you sure you want to cancel this data replacement and remove the
+        attached draft API version?
+      </p>
+      <p>
+        Please note this doesn't affect the current live API data set in any
+        way. You can reassign a data set version at any time prior to this
+        release being published.
+      </p>
+    </>
+  ) : (
+    <>
+      Are you sure you want to cancel this data replacement? The pending +
+      replacement data file will be deleted.?
+    </>
+  );
   const replacementCancelButton = (
     <ModalConfirm
-      title={cancelText}
-      triggerButton={<Button variant="secondary">{cancelText}</Button>}
+      title="Cancel data replacement"
+      triggerButton={
+        <Button variant="secondary">Cancel data replacement</Button>
+      }
       onConfirm={async () => {
         if (replacementDataFile?.id) {
           await releaseDataFileService.deleteDataFiles(

@@ -12,7 +12,7 @@ public static class ValidationMessages
 {
     public static readonly LocalizableMessage CannotDeleteApiDataSetReleaseFile = new(
         Code: nameof(CannotDeleteApiDataSetReleaseFile),
-        Message: "The file cannot be deleted as it is linked to an API data set."
+        Message: "The file cannot be deleted as it is linked to a published API data set."
     );
 
     public static readonly LocalizableMessage DataSetVersionStatusNotDraft = new(
