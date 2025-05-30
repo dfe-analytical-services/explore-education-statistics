@@ -105,9 +105,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
             
         }
-        private async Task<ReplacementApiDataSetVersionPlanViewModel?> GetApiVersionPlanViewModel(DataSetVersion replacementApiDataSetVersion, CancellationToken cancellationToken)
+        
+        private async Task<ApiDataSetVersionPlanViewModel?> GetApiVersionPlanViewModel(DataSetVersion replacementApiDataSetVersion, CancellationToken cancellationToken)
         {
-            var apiDataSetVersionPlan = new ReplacementApiDataSetVersionPlanViewModel
+            var apiDataSetVersionPlan = new ReplaceApiDataSetVersionPlanViewModel
             {
                 DataSetId = replacementApiDataSetVersion.DataSetId,
                 DataSetTitle = replacementApiDataSetVersion.DataSet.Title,
@@ -116,19 +117,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 Status = replacementApiDataSetVersion.Status,
                 Valid = false,
             };
-            if (!featureFlags.Value.EnableReplacementOfPublicApiDataSets || replacementApiDataSetVersion.VersionPatch <= 0)
+            if (!featureFlags.Value.EnableReplacementOfPublicApiDataSets || replacementApiDataSetVersion.VersionPatch == 0)
             { 
                 return apiDataSetVersionPlan;
             }
-            //TODO: Please note EES-5779 PR Note this will be updated in an upcomming PR - Valid's value will take into account
-            //more things than just the values { FiltersComplete: true, LocationsComplete: true }. It will
-            //also include whether the user has 'finalized' the data set version mapping & whether the version has
-            //a breaking change and results in a major version increment. 
-            apiDataSetVersionPlan.MappingStatus =  await dataSetVersionMappingService.GetMappingStatus(replacementApiDataSetVersion.Id, cancellationToken);
-            apiDataSetVersionPlan.MappingStatus.Complete = replacementApiDataSetVersion.Status == DataSetVersionStatus.Draft;
-            apiDataSetVersionPlan.Valid = apiDataSetVersionPlan.ValidDefinition;
+ 
+            var mappingStatus =  await dataSetVersionMappingService.GetMappingStatus(replacementApiDataSetVersion.Id, cancellationToken);
+            apiDataSetVersionPlan.MappingStatus = mappingStatus;
+            apiDataSetVersionPlan.Valid = apiDataSetVersionPlan.FinishedMapping && mappingStatus is
+            {
+                FiltersComplete: true,
+                LocationsComplete: true,
+                HasMajorVersionUpdate: false
+            };
             return apiDataSetVersionPlan;
         }
+        
         public async Task<Either<ActionResult, Unit>> Replace(
             Guid releaseVersionId,
             Guid originalFileId,
