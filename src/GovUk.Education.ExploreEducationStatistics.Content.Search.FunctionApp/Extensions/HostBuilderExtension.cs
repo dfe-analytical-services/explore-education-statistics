@@ -24,13 +24,32 @@ public static class HostBuilderExtension
         .ConfigureAppConfiguration(
             (context, configurationBuilder) =>
                 configurationBuilder
+                    .SetBasePath(context.HostingEnvironment)
                     .AddJsonFileAndLog("appsettings.json", false, false)
                     .AddJsonFileAndLog(
                         $"appsettings.{context.HostingEnvironment.EnvironmentName}.json",
                         false,
                         false)
                     .AddEnvironmentVariables())
-        .ConfigureServices(
+        .ConfigureHostServices()
+        .Build();
+
+    public static IHostBuilder InitialiseSerilog(this IHostBuilder hostBuilder)
+    {
+        // Setup Serilog
+        // https://github.com/serilog/serilog-aspnetcore
+        Log.Logger = new LoggerConfiguration()
+            // Because we can't access appsettings before creating the HostBuilder we'll use a bootstrap logger
+            // without configuration specific initialization first and replace it after the HostBuilder was created.
+            // See https://github.com/serilog/serilog-aspnetcore#two-stage-initialization
+            .ConfigureBootstrapLogger()
+            .CreateBootstrapLogger();
+        
+        return hostBuilder;
+    }
+
+    internal static IHostBuilder ConfigureHostServices(this IHostBuilder hostBuilder) =>
+        hostBuilder.ConfigureServices(
             (context, services) =>
                 services
                     .ConfigureLogging(context.Configuration)
@@ -70,20 +89,5 @@ public static class HostBuilderExtension
                                 HeaderNames.UserAgent,
                                 "EES Content Search Function App");
                         })
-        )
-        .Build();
-
-    public static IHostBuilder InitialiseSerilog(this IHostBuilder hostBuilder)
-    {
-        // Setup Serilog
-        // https://github.com/serilog/serilog-aspnetcore
-        Log.Logger = new LoggerConfiguration()
-            // Because we can't access appsettings before creating the HostBuilder we'll use a bootstrap logger
-            // without configuration specific initialization first and replace it after the HostBuilder was created.
-            // See https://github.com/serilog/serilog-aspnetcore#two-stage-initialization
-            .ConfigureBootstrapLogger()
-            .CreateBootstrapLogger();
-        
-        return hostBuilder;
-    }
+        );
 }

@@ -1,10 +1,24 @@
 ﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Hosting;
 using Serilog;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Extensions;
 
 public static class ConfigurationExtensions
 {
+    public static IConfigurationBuilder SetBasePath(this IConfigurationBuilder builder, IHostEnvironment hostEnvironment)
+    {
+        Log.Logger.Information("Directory.GetCurrentDirectory() = {CurrentDirectory}", Directory.GetCurrentDirectory());
+        Log.Logger.Information("context.HostingEnvironment.ContentRootPath = {ContentRootPath}", hostEnvironment.ContentRootPath);
+        Log.Logger.Information("HostingEnvironment = {@HostingEnvironment}", hostEnvironment);
+        if (hostEnvironment.IsProduction())
+        {
+            Log.Logger.Information("Setting base path to: /home/site/wwwroot");
+            builder.SetBasePath("/home/site/wwwroot");
+        }
+
+        return builder;
+    }
     public static IConfigurationBuilder AddJsonFileAndLog(
         this IConfigurationBuilder builder,
         string path,
