@@ -132,9 +132,9 @@ const ReleaseDataFileReplacePage = ({
         attached draft API version?
       </p>
       <p>
-        Please note this doesn't affect the current live API data set in any
-        way. You can reassign a data set version at any time prior to this
-        release being published.
+        Note that this data replacement has an associated draft API data set
+        version update. The API data set update will also be cancelled and
+        removed by this action.
       </p>
     </>
   ) : (
@@ -145,7 +145,11 @@ const ReleaseDataFileReplacePage = ({
   );
   const replacementCancelButton = (
     <ModalConfirm
-      title="Cancel data replacement"
+      title={
+        dataFile?.publicApiDataSetId
+          ? 'Cancel data replacement and remove draft API'
+          : 'Cancel data replacement'
+      }
       triggerButton={
         <Button variant="secondary">Cancel data replacement</Button>
       }
