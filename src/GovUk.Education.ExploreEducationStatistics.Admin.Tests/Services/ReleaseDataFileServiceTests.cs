@@ -1799,7 +1799,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var privateBlobStorageService = new Mock<IPrivateBlobStorageService>(Strict);
             var dataSetFileStorage = new Mock<IDataSetFileStorage>(Strict);
 
-            var dataSetFile = new ZipDataSetFileViewModel
+            var dataSetFile = new DataSetUploadResultViewModel
             {
                 Title = dataSetName,
                 DataFileId = dataFile.Id,
@@ -1820,7 +1820,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             dataSetFileStorage
                 .Setup(mock => mock.MoveDataSetsToPermanentStorage(
                     It.IsAny<Guid>(),
-                    It.IsAny<List<ZipDataSetFileViewModel>>(),
+                    It.IsAny<List<DataSetUploadResultViewModel>>(),
                     It.IsAny<CancellationToken>()))
                 .Returns(Task.FromResult(releaseFiles));
 

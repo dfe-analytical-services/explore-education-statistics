@@ -33,7 +33,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
             Guid releaseVersionId,
             List<Guid> fileIds);
 
-        Task<Either<ActionResult, DataFileInfo>> Upload(
+        Task<Either<ActionResult, List<DataSetUploadResultViewModel>>> Upload(
             Guid releaseVersionId,
             IFormFile dataFormFile,
             IFormFile metaFormFile,
@@ -41,21 +41,36 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
             Guid? replacingFileId,
             CancellationToken cancellationToken);
 
-        Task<Either<ActionResult, DataFileInfo>> UploadFromZip(
+        Task<Either<ActionResult, DataFileInfo>> UploadForReplacement(
+            Guid releaseVersionId,
+            IFormFile dataFormFile,
+            IFormFile metaFormFile,
+            string dataSetTitle,
+            Guid? replacingFileId,
+            CancellationToken cancellationToken);
+
+        Task<Either<ActionResult, List<DataSetUploadResultViewModel>>> UploadFromZip(
             Guid releaseVersionId,
             IFormFile zipFormFile,
             string dataSetTitle,
             Guid? replacingFileId,
             CancellationToken cancellationToken);
 
-        Task<Either<ActionResult, List<ZipDataSetFileViewModel>>> UploadFromBulkZip(
+        Task<Either<ActionResult, DataFileInfo>> UploadFromZipForReplacement(
+            Guid releaseVersionId,
+            IFormFile zipFormFile,
+            string dataSetTitle,
+            Guid? replacingFileId,
+            CancellationToken cancellationToken);
+
+        Task<Either<ActionResult, List<DataSetUploadResultViewModel>>> UploadFromBulkZip(
             Guid releaseVersionId,
             IFormFile zipFormFile,
             CancellationToken cancellationToken);
 
         Task<Either<ActionResult, List<DataFileInfo>>> SaveDataSetsFromTemporaryBlobStorage(
             Guid releaseVersionId,
-            List<ZipDataSetFileViewModel> dataSetFiles,
+            List<DataSetUploadResultViewModel> dataSetFiles,
             CancellationToken cancellationToken);
     }
 }

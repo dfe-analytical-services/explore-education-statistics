@@ -98,7 +98,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         [HttpPost("releaseVersions/data")]
         [DisableRequestSizeLimit]
         [RequestFormLimits(ValueLengthLimit = int.MaxValue, MultipartBodyLengthLimit = int.MaxValue)]
-        public async Task<ActionResult<DataFileInfo>> UploadDataSet(
+        public async Task<ActionResult<List<DataSetUploadResultViewModel>>> UploadDataSet(
             [FromForm] UploadDataSetRequest request,
             CancellationToken cancellationToken)
         {
@@ -113,10 +113,29 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                 .HandleFailuresOrOk();
         }
 
+        // TODO (EES-6176): Remove once manual replacement process has been consolidated to use UploadDataSet
+        [HttpPost("releaseVersions/replacement-data")]
+        [DisableRequestSizeLimit]
+        [RequestFormLimits(ValueLengthLimit = int.MaxValue, MultipartBodyLengthLimit = int.MaxValue)]
+        public async Task<ActionResult<DataFileInfo>> UploadDataSetForReplacement(
+            [FromForm] UploadDataSetRequest request,
+            CancellationToken cancellationToken)
+        {
+            return await _releaseDataFileService
+                .UploadForReplacement(
+                    request.ReleaseVersionId,
+                    request.DataFile,
+                    request.MetaFile,
+                    request.Title,
+                    request.ReplacingFileId,
+                    cancellationToken)
+                .HandleFailuresOrOk();
+        }
+
         [HttpPost("releaseVersions/zip-data")]
         [DisableRequestSizeLimit]
         [RequestFormLimits(ValueLengthLimit = int.MaxValue, MultipartBodyLengthLimit = int.MaxValue)]
-        public async Task<ActionResult<DataFileInfo>> UploadDataSetAsZip(
+        public async Task<ActionResult<List<DataSetUploadResultViewModel>>> UploadDataSetAsZip(
             [FromForm] UploadDataSetAsZipRequest request,
             CancellationToken cancellationToken)
         {
@@ -130,10 +149,28 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                 .HandleFailuresOrOk();
         }
 
+        // TODO (EES-6176): Remove once manual replacement process has been consolidated to use UploadDataSetAsZip
+        [HttpPost("releaseVersions/replacement-zip-data")]
+        [DisableRequestSizeLimit]
+        [RequestFormLimits(ValueLengthLimit = int.MaxValue, MultipartBodyLengthLimit = int.MaxValue)]
+        public async Task<ActionResult<DataFileInfo>> UploadDataSetAsZipForReplacement(
+            [FromForm] UploadDataSetAsZipRequest request,
+            CancellationToken cancellationToken)
+        {
+            return await _releaseDataFileService
+                .UploadFromZipForReplacement(
+                    request.ReleaseVersionId,
+                    request.ZipFile,
+                    request.Title,
+                    request.ReplacingFileId,
+                    cancellationToken)
+                .HandleFailuresOrOk();
+        }
+
         [HttpPost("releaseVersions/upload-bulk-zip-data")]
         [DisableRequestSizeLimit]
         [RequestFormLimits(ValueLengthLimit = int.MaxValue, MultipartBodyLengthLimit = int.MaxValue)]
-        public async Task<ActionResult<List<ZipDataSetFileViewModel>>> UploadDataSetAsBulkZip(
+        public async Task<ActionResult<List<DataSetUploadResultViewModel>>> UploadDataSetAsBulkZip(
             [FromForm] UploadDataSetAsBulkZipRequest request,
             CancellationToken cancellationToken)
         {
@@ -142,11 +179,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                 .HandleFailuresOrOk();
         }
 
-        // We intend to change this route, to make these endpoints more consistent, as per EES-5895
-        [HttpPost("release/{releaseVersionId:guid}/import-bulk-zip-data")]
+        [HttpPost("releases/{releaseVersionId:guid}/import-data-sets")]
         public async Task<ActionResult<List<DataFileInfo>>> ImportBulkZipDataSetsFromTempStorage(
             Guid releaseVersionId,
-            List<ZipDataSetFileViewModel> dataSetFiles,
+            List<DataSetUploadResultViewModel> dataSetFiles,
             CancellationToken cancellationToken)
         {
             return await _releaseDataFileService
