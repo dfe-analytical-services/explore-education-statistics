@@ -104,7 +104,7 @@ public class MemoryCacheAttributeTests : IClassFixture<CacheTestFixture>, IDispo
 
         _memoryCacheService
             .Setup(s => s.GetItem(cacheKey, typeof(TestValue)))
-            .Returns(null);
+            .Returns((object?)null);
 
         var args = new List<object>();
 
@@ -141,7 +141,7 @@ public class MemoryCacheAttributeTests : IClassFixture<CacheTestFixture>, IDispo
 
         _memoryCacheService
             .Setup(s => s.GetItem(cacheKey, typeof(TestValue)))
-            .Returns(null);
+            .Returns((object?)null);
 
         var args = new List<object>();
 
@@ -174,7 +174,7 @@ public class MemoryCacheAttributeTests : IClassFixture<CacheTestFixture>, IDispo
 
         targetMemoryCacheService
             .Setup(s => s.GetItem(cacheKey, typeof(TestValue)))
-            .Returns(null);
+            .Returns((object?)null);
 
         var args = new List<object>();
 
@@ -208,7 +208,7 @@ public class MemoryCacheAttributeTests : IClassFixture<CacheTestFixture>, IDispo
 
         _memoryCacheService
             .Setup(s => s.GetItem(cacheKey, typeof(TestValue)))
-            .Returns(null);
+            .Returns((object?)null);
 
         var args = new List<object>();
 
@@ -244,7 +244,7 @@ public class MemoryCacheAttributeTests : IClassFixture<CacheTestFixture>, IDispo
 
         _memoryCacheService
             .Setup(s => s.GetItem(cacheKey, typeof(TestValue)))
-            .Returns(null);
+            .Returns((object?)null);
 
         var args = new List<object>();
 
@@ -283,7 +283,7 @@ public class MemoryCacheAttributeTests : IClassFixture<CacheTestFixture>, IDispo
 
         _memoryCacheService
             .Setup(s => s.GetItem(cacheKey, typeof(TestValue)))
-            .Returns(null);
+            .Returns((object?)null);
 
         var args = new List<object>();
 
@@ -368,7 +368,7 @@ public class MemoryCacheAttributeTests : IClassFixture<CacheTestFixture>, IDispo
         // in MemoryCacheAttribute#GetAsync
         _memoryCacheService
             .Setup(s => s.GetItem(cacheKey, typeof(TestValue)))
-            .Returns(null);
+            .Returns((object?)null);
 
         var args = new List<object>();
 
