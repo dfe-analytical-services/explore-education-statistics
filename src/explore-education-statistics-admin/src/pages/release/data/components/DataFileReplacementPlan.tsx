@@ -2,7 +2,6 @@ import ButtonLink from '@admin/components/ButtonLink';
 import mergeReplacementFootnoteFilters from '@admin/pages/release/data/components/utils/mergeReplacementFootnoteFilters';
 import {
   releaseApiDataSetDetailsRoute,
-  ReleaseRouteParams,
   releaseDataBlockEditRoute,
   ReleaseDataBlockRouteParams,
   ReleaseFootnoteRouteParams,
@@ -31,7 +30,6 @@ import React, { ReactNode, useMemo } from 'react';
 import { generatePath } from 'react-router';
 import sanitizeHtml from '@common/utils/sanitizeHtml';
 import { useAuthContext } from '@admin/contexts/AuthContext';
-import releaseDataPageTabIds from '@admin/pages/release/data/utils/releaseDataPageTabIds';
 import Link from '@admin/components/Link';
 import { useConfig } from '@admin/contexts/ConfigContext';
 
