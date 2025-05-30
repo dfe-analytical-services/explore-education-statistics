@@ -1,49 +1,21 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
-using Serilog;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Extensions;
 
 public static class ConfigurationExtensions
 {
-    public static IConfigurationBuilder SetBasePath(this IConfigurationBuilder builder, IHostEnvironment hostEnvironment)
-    {
-        Log.Logger.Information("Directory.GetCurrentDirectory() = {CurrentDirectory}", Directory.GetCurrentDirectory());
-        Log.Logger.Information("context.HostingEnvironment.ContentRootPath = {ContentRootPath}", hostEnvironment.ContentRootPath);
-        Log.Logger.Information("HostingEnvironment = {@HostingEnvironment}", hostEnvironment);
-        if (hostEnvironment.IsProduction())
-        {
-            Log.Logger.Information("Setting base path to: /home/site/wwwroot");
-            builder.SetBasePath("/home/site/wwwroot");
-        }
-
-        return builder;
-    }
-    public static IConfigurationBuilder AddJsonFileAndLog(
-        this IConfigurationBuilder builder,
-        string path,
-        bool optional,
-        bool reloadOnChange)
-    {
-        Log.Logger.Information("""
-                               Loading configuration from "{AppSettingsFilename}"
-                               """, path);
-
-        var appSettingsFile = new FileInfo(path);
-        if (appSettingsFile.Exists)
-        {
-            Log.Logger.Information("""
-                               Configuration file found: "{AppSettingsFullFilename}" - Contents:
-                               """, appSettingsFile.FullName);
-            Log.Logger.Information("{FileContents}", appSettingsFile.OpenText().ReadToEnd());
-        }
-        else
-        {
-            Log.Logger.Information("""
-                               Configuration file not found: "{AppSettingsFilename}"
-                               """, path);
-        }
-
-        return builder.AddJsonFile(path, optional, reloadOnChange);
-    }   
+    /// <summary>
+    /// When running in Azure, the default path from which it attempts to load appsettings.Production.json is wrong.
+    /// context.HostingEnvironment.ContentRootPath = "/azure-functions-host"
+    /// However, the file resides in the current directory, "/home/site/wwwroot".
+    /// See: https://stackoverflow.com/questions/78119200/appsettings-for-azurefunction-on-net-8-isolated
+    /// </summary>
+    /// <param name="builder"></param>
+    /// <param name="hostEnvironment"></param>
+    /// <returns></returns>
+    public static IConfigurationBuilder SetBasePath(this IConfigurationBuilder builder, IHostEnvironment hostEnvironment) => 
+        hostEnvironment.IsProduction() 
+            ? builder.SetBasePath(Directory.GetCurrentDirectory()) // "/home/site/wwwroot" 
+            : builder;
 }
