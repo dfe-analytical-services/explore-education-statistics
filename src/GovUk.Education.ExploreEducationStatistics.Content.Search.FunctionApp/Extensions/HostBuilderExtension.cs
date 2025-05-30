@@ -24,12 +24,19 @@ public static class HostBuilderExtension
         .ConfigureAppConfiguration(
             (context, configurationBuilder) =>
                 configurationBuilder
-                    .SetBasePath(context.HostingEnvironment)
-                    .AddJsonFileAndLog("appsettings.json", false, false)
-                    .AddJsonFileAndLog(
+                    // When running in Azure, the default path from which it attempts to load appsettings.Production.json is wrong.
+                    // context.HostingEnvironment.ContentRootPath = "/azure-functions-host"
+                    // However, the file resides in the current directory, "/home/site/wwwroot".
+                    // See: https://stackoverflow.com/questions/78119200/appsettings-for-azurefunction-on-net-8-isolated
+                    .SetBasePath(Directory.GetCurrentDirectory())
+                    .AddJsonFile(
+                        "appsettings.json", 
+                        optional:false, 
+                        reloadOnChange:false)
+                    .AddJsonFile(
                         $"appsettings.{context.HostingEnvironment.EnvironmentName}.json",
-                        false,
-                        false)
+                        optional:false,
+                        reloadOnChange:false)
                     .AddEnvironmentVariables())
         .ConfigureHostServices()
         .Build();
