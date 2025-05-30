@@ -47,6 +47,12 @@ public class DataSetFileStorage(
         if (dataSet.ReplacingFile is not null)
         {
             replacedReleaseDataFile = await GetReplacedReleaseFile(releaseVersionId, dataSet.ReplacingFile.Id);
+
+            if (replacedReleaseDataFile is not null)
+            {
+                replacedReleaseDataFile.File.ReplacedById = dataSet.ReplacingFile.Id;
+                await contentDbContext.SaveChangesAsync(cancellationToken);
+            }
         }
 
         var releaseDataFileOrder = await GetNextDataFileOrder(releaseVersionId, replacedReleaseDataFile?.File.Id);
@@ -157,18 +163,18 @@ public class DataSetFileStorage(
         await dataSet.MetaFile.FileStream.DisposeAsync();
     }
 
-    public async Task<List<ZipDataSetFileViewModel>> UploadDataSetsToTemporaryStorage(
+    public async Task<List<DataSetUploadResultViewModel>> UploadDataSetsToTemporaryStorage(
         Guid releaseVersionId,
         List<DataSet> dataSets,
         CancellationToken cancellationToken)
     {
-        var viewModels = new List<ZipDataSetFileViewModel>();
+        var viewModels = new List<DataSetUploadResultViewModel>();
 
         foreach (var dataSet in dataSets)
         {
             var uploadResult = await UploadDataSetToTemporaryStorage(releaseVersionId, dataSet, cancellationToken);
 
-            viewModels.Add(new ZipDataSetFileViewModel
+            viewModels.Add(new DataSetUploadResultViewModel
             {
                 Title = dataSet.Title,
                 DataFileId = uploadResult.DataFileId,
@@ -224,7 +230,7 @@ public class DataSetFileStorage(
 
     public async Task<List<ReleaseFile>> MoveDataSetsToPermanentStorage(
         Guid releaseVersionId,
-        List<ZipDataSetFileViewModel> dataSets,
+        List<DataSetUploadResultViewModel> dataSets,
         CancellationToken cancellationToken)
     {
         var releaseFiles = new List<ReleaseFile>();
