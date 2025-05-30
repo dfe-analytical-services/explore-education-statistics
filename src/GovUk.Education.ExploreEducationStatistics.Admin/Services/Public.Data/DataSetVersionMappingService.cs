@@ -12,7 +12,6 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
-using GovUk.Education.ExploreEducationStatistics.Common.Options;
 using GovUk.Education.ExploreEducationStatistics.Common.Requests;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
@@ -33,7 +32,7 @@ public class DataSetVersionMappingService(
     PublicDataDbContext publicDataDbContext,
     ContentDbContext contentDbContext,
     IMappingTypesRepository mappingTypesRepository,
-    IOptions<FeatureFlags> featureFlags)
+    IOptions<FeatureFlagsOptions> featureFlags)
     : IDataSetVersionMappingService
 {
     private static readonly MappingType[] IncompleteMappingTypes =
@@ -112,6 +111,19 @@ public class DataSetVersionMappingService(
     public async Task<MappingStatusViewModel?> GetMappingStatus(Guid dataSetVersionId, CancellationToken cancellationToken = default)
     {
         var isMajorVersionUpdate = await IsMajorVersionUpdate(dataSetVersionId, cancellationToken);
+        var locationIsMajor = locationOptionMappingTypes.Any(types => NoMappingTypes.Contains(types.LocationLevel)
+                                                                  || NoMappingTypes.Contains(types.LocationOption));
+
+        var filtersIsMajor = filterAndOptionMappingTypes.Any(types => NoMappingTypes.Contains(types.Filter)
+                                                                      ||  NoMappingTypes.Contains(types.FilterOption));
+
+        bool? isMajorVersionUpdate = featureFlags.Value.EnableReplacementOfPublicApiDataSets
+                ? await IsMajorVersionUpdate(
+                    nextDataSetVersionId,
+                    locationOptionMappingTypes,
+                    filterAndOptionMappingTypes,
+                    cancellationToken) 
+                : null;
 
         return await publicDataDbContext
             .DataSetVersionMappings
@@ -120,6 +132,8 @@ public class DataSetVersionMappingService(
             {
                 LocationsComplete = mapping.LocationMappingsComplete,
                 FiltersComplete = mapping.FilterMappingsComplete,
+                LocationsHaveMajorChange = locationIsMajor,
+                FiltersHaveMajorChange = filtersIsMajor,
                 HasMajorVersionUpdate = isMajorVersionUpdate
             })
             .SingleOrDefaultAsync(cancellationToken);
@@ -260,7 +274,7 @@ public class DataSetVersionMappingService(
         await contentDbContext.SaveChangesAsync(cancellationToken);
     }
 
-    private async Task<bool> IsMajorVersionUpdate(
+    public async Task<bool> IsMajorVersionUpdate(
         Guid targetDataSetVersionId,
         List<LocationMappingTypes> locationMappingTypes,
         List<FilterMappingTypes> filterMappingTypes,

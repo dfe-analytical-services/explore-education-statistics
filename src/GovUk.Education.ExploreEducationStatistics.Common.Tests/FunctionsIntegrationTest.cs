@@ -96,7 +96,7 @@ public abstract class FunctionsIntegrationTest<TFunctionsIntegrationTestFixture>
 
     protected void SetDataSetVersionReplacementFeatureFlag(bool flag)
     {
-        var options = GetRequiredService<IOptions<FeatureFlags>>().Value;
+        var options = GetRequiredService<IOptions<FeatureFlagsOptions>>().Value;
         options.EnableReplacementOfPublicApiDataSets = flag;
     }
 }

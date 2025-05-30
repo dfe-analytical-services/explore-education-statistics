@@ -1,12 +1,13 @@
 import ButtonLink from '@admin/components/ButtonLink';
 import mergeReplacementFootnoteFilters from '@admin/pages/release/data/components/utils/mergeReplacementFootnoteFilters';
 import {
-  releaseDataRoute,
+  releaseApiDataSetDetailsRoute,
   ReleaseRouteParams,
   releaseDataBlockEditRoute,
   ReleaseDataBlockRouteParams,
   ReleaseFootnoteRouteParams,
   releaseFootnotesEditRoute,
+  ReleaseDataSetRouteParams,
 } from '@admin/routes/releaseRoutes';
 import dataBlockService from '@admin/services/dataBlockService';
 import dataReplacementService from '@admin/services/dataReplacementService';
@@ -32,7 +33,7 @@ import sanitizeHtml from '@common/utils/sanitizeHtml';
 import { useAuthContext } from '@admin/contexts/AuthContext';
 import releaseDataPageTabIds from '@admin/pages/release/data/utils/releaseDataPageTabIds';
 import Link from '@admin/components/Link';
-import { useFeatureFlag } from '@admin/contexts/FeatureFlagContext';
+import { useConfig } from '@admin/contexts/ConfigContext';
 
 interface Props {
   cancelButton: ReactNode;
@@ -79,9 +80,9 @@ const DataFileReplacementPlan = ({
     () => plan?.footnotes.some(footnote => !footnote.valid) ?? false,
     [plan],
   );
-  const isNewReplaceDsvFeatureEnabled = useFeatureFlag(
-    'enableReplacementOfPublicApiDataSets',
-  );
+  const {
+    enableReplacementOfPublicApiDataSets: isNewReplaceDsvFeatureEnabled,
+  } = useConfig();
 
   const {
     hasDataSetVersionPlan,
@@ -113,21 +114,27 @@ const DataFileReplacementPlan = ({
   }, [plan, isNewReplaceDsvFeatureEnabled]);
 
   const { user } = useAuthContext();
+  const dataSetId = plan?.apiDataSetVersionPlan?.dataSetId;
 
-  const releaseRouteParams = useMemo<ReleaseRouteParams>(
-    () => ({
-      releaseVersionId,
-      publicationId,
-    }),
-    [releaseVersionId, publicationId],
+  const releaseRouteParams = useMemo<ReleaseDataSetRouteParams | undefined>(
+    () =>
+      dataSetId
+        ? {
+            releaseVersionId,
+            publicationId,
+            dataSetId,
+          }
+        : undefined,
+    [releaseVersionId, publicationId, dataSetId],
   );
 
-  const apiDataSetsTabRoute = user?.permissions.isBauUser
-    ? `${generatePath<ReleaseRouteParams>(
-        releaseDataRoute.path,
-        releaseRouteParams,
-      )}#${releaseDataPageTabIds.apiDataSets}`
-    : undefined;
+  const apiDataSetsTabRoute =
+    user?.permissions.isBauUser && releaseRouteParams
+      ? `${generatePath<ReleaseDataSetRouteParams>(
+          releaseApiDataSetDetailsRoute.path,
+          releaseRouteParams,
+        )}`
+      : undefined;
 
   if (error) {
     return (
@@ -312,7 +319,7 @@ const DataFileReplacementPlan = ({
             </Details>
           ))}
 
-          <h3 className="govuk-heading-m">
+          <h3 className="govuk-heading govuk-!-padding-top-4">
             <Tag colour={hasInvalidFootnotes ? 'red' : 'green'}>
               {`Footnotes: ${hasInvalidFootnotes ? 'ERROR' : 'OK'}`}
             </Tag>
@@ -459,7 +466,7 @@ const DataFileReplacementPlan = ({
             <>
               {hasMajorVersionUpdate ? (
                 <>
-                  <h3 className="govuk-heading-m">
+                  <h3 className="govuk-heading-m govuk-!-padding-top-4">
                     <Tag colour={hasMajorVersionUpdate ? 'red' : 'green'}>
                       {`API data set status: ${
                         hasMajorVersionUpdate ? 'ERROR' : 'OK'
@@ -480,7 +487,7 @@ const DataFileReplacementPlan = ({
                 </>
               ) : (
                 <>
-                  <h3 className="govuk-heading-m">
+                  <h3 className="govuk-heading-m govuk-!-padding-top-4">
                     <Tag colour={hasIncompleteFilterMapping ? 'red' : 'green'}>
                       {`API data set Filters: ${
                         hasIncompleteFilterMapping ? 'ERROR' : 'OK'
@@ -502,7 +509,7 @@ const DataFileReplacementPlan = ({
                     <p>No manual mapping required for API data set filters.</p>
                   )}
 
-                  <h3 className="govuk-heading-m">
+                  <h3 className="govuk-heading-m govuk-!-padding-top-4">
                     <Tag
                       colour={hasIncompleteLocationMapping ? 'red' : 'green'}
                     >
@@ -527,7 +534,7 @@ const DataFileReplacementPlan = ({
                       No manual mapping required for API data set locations.
                     </p>
                   )}
-                  <h3 className="govuk-heading-m">
+                  <h3 className="govuk-heading-m govuk-!-padding-top-4">
                     <Tag colour={hasNotCompletedImporting ? 'red' : 'green'}>
                       {`API data set has to be finalized: ${
                         hasNotCompletedImporting ? 'ERROR' : 'OK'

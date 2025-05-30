@@ -28,7 +28,7 @@ internal class DataSetVersionService(
     PublicDataDbContext publicDataDbContext,
     IReleaseFileRepository releaseFileRepository,
     IDataSetVersionPathResolver dataSetVersionPathResolver,
-    IOptions<FeatureFlags> featureFlags,
+    IOptions<FeatureFlagsOptions> featureFlags,
     IOptions<AppOptions> options) : IDataSetVersionService
 {
     public async Task<Either<ActionResult, Guid>> CreateInitialVersion(

@@ -16,4 +16,6 @@ public record ConfigViewModel
     public required string[] PermittedEmbedUrlDomains { get; init; }
 
     public required OpenIdConnectSpaClientOptions Oidc { get; init; }
+
+    public bool EnableReplacementOfPublicApiDataSets { get; init; }
 }

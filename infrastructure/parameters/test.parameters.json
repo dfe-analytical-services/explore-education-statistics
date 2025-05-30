@@ -94,6 +94,12 @@
     },
     "immediatePublicationOfScheduledReleaseVersionsEnabled": {
       "value": true
+    },
+    "eventGridTopicsExist": {
+      "value": false
+    },
+    "enableReplacementOfPublicApiDataSets" : {
+      "value": false
     }
   }
 }

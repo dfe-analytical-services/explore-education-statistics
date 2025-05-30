@@ -49,7 +49,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         ICacheKeyService cacheKeyService,
         IPrivateBlobCacheService privateCacheService,
         IDataSetVersionMappingService dataSetVersionMappingService,
-        IOptions<FeatureFlags> featureFlags)
+        IOptions<FeatureFlagsOptions> featureFlags)
         : IReplacementService
     {
         private static IComparer<string> LabelComparer { get; } = new LabelRelationalComparer();

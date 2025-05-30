@@ -97,8 +97,8 @@ public static class ProcessorHostBuilder
                             provider.GetRequiredService<ILogger<IBlobStorageService>>()))
                     .Configure<AppOptions>(
                         hostBuilderContext.Configuration.GetSection(AppOptions.Section))
-                    .Configure<FeatureFlags>(
-                        hostBuilderContext.Configuration.GetSection(FeatureFlags.Section))
+                    .Configure<FeatureFlagsOptions>(
+                        hostBuilderContext.Configuration.GetSection(FeatureFlagsOptions.Section))
                     .Configure<DataFilesOptions>(
                         hostBuilderContext.Configuration.GetSection(DataFilesOptions.Section));
                 

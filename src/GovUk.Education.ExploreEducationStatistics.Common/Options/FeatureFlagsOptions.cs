@@ -1,6 +1,6 @@
 ﻿namespace GovUk.Education.ExploreEducationStatistics.Common.Options;
 
-public class FeatureFlags
+public class FeatureFlagsOptions
 {
     /// <summary>
     /// Whilst EES-5779 is being developed, this prevents

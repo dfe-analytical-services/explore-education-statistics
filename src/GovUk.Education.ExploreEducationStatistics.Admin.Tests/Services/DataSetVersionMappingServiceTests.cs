@@ -167,7 +167,7 @@ public class DataSetVersionMappingServiceTests
         IPostgreSqlRepository? mockPostgreSqlRepository = null,
         IUserService? mockUserService = null,
         IMappingTypesRepository? mockMappingTypesRepository = null,
-        IOptions<FeatureFlags>? mockFeatureFlags = null)
+        IOptions<FeatureFlagsOptions>? mockFeatureFlags = null)
     {
         return new DataSetVersionMappingService(
             mockPostgreSqlRepository ?? Mock.Of<IPostgreSqlRepository>(behavior: MockBehavior.Strict),
@@ -175,7 +175,7 @@ public class DataSetVersionMappingServiceTests
             publicDataDbContext,
             contentDbContext,
             mockMappingTypesRepository ?? Mock.Of<IMappingTypesRepository>(behavior: MockBehavior.Strict),
-            mockFeatureFlags ?? Microsoft.Extensions.Options.Options.Create(new FeatureFlags
+            mockFeatureFlags ?? Microsoft.Extensions.Options.Options.Create(new FeatureFlagsOptions
             {
                 EnableReplacementOfPublicApiDataSets = false
             }));
