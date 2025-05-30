@@ -110,7 +110,6 @@ export interface TableToolWizardProps {
     publicationTitle: string,
     subjectName: string,
   ) => void;
-  showFilterHierachies?: boolean;
 }
 
 export default function TableToolWizard({
@@ -131,7 +130,6 @@ export default function TableToolWizard({
   onSubjectStepBack,
   onSubmit,
   onTableQueryError,
-  showFilterHierachies,
 }: TableToolWizardProps) {
   const [state, updateState] = useImmer<TableToolState>({
     initialStep: 1,
@@ -617,7 +615,6 @@ export default function TableToolWizard({
                   showTableQueryErrorDownload={showTableQueryErrorDownload}
                   onTableQueryError={onTableQueryError}
                   onSubmit={handleFiltersFormSubmit}
-                  showFilterHierarchies={showFilterHierachies}
                 />
               )}
             </WizardStep>
