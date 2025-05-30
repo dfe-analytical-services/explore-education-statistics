@@ -27,6 +27,7 @@ export interface FilterHierarchyProps {
   disabled?: boolean;
   name: string;
   open?: boolean;
+  isActive?: boolean;
   onToggle?: (isOpen: boolean) => void;
 }
 
@@ -37,6 +38,7 @@ function FilterHierarchy({
   name,
   disabled,
   open,
+  isActive = true,
   onToggle,
 }: FilterHierarchyProps) {
   const {
@@ -121,39 +123,42 @@ function FilterHierarchy({
   const selectedChildren: SelectedChildren = useMemo(() => {
     if (!selectedValues?.length) {
       return {
-        optionsWithSelectedChildren: [],
-        optionsWithSelectedChildrenCountMap: {},
+        valuesRelatedToSelectedValues: [],
+        valuesRelatedToSelectedValuesCountMap: {},
       };
     }
 
-    const augmentedSelectedValues = augmentFilterHierarchySelections(
+    const selectedValuesRelatedValuesMap = augmentFilterHierarchySelections(
       { [name]: selectedValues },
       [filterHierarchy],
       optionLabelsMap,
     );
 
-    const optionIdsWithSelectedChildren = Object.entries(
-      augmentedSelectedValues[name],
-    ).map(([selectedOptionId, relatedOptionIds]) =>
-      relatedOptionIds.filter(optionId => optionId !== selectedOptionId),
-    );
-
-    // a list of options with selected (grand)children
-    const optionsWithSelectedChildren = Array.from(
-      new Set(...optionIdsWithSelectedChildren),
-    );
+    const relatedValuesWithSelectedValuesRemoved = Object.entries(
+      selectedValuesRelatedValuesMap[name],
+    )
+      .map(([selectedOptionId, relatedOptionIds]) =>
+        relatedOptionIds.filter(optionId => optionId !== selectedOptionId),
+      )
+      .flat();
 
     // a count map, [key] being the option id that has selected (grand)children, [value] being count of selected (grand)children
-    const optionsWithSelectedChildrenCountMap = optionIdsWithSelectedChildren
-      .flat()
-      .reduce((acc: Dictionary<number>, item) => {
-        acc[item] = (acc[item] || 0) + 1;
-        return acc;
-      }, {});
+    const valuesRelatedToSelectedValuesCountMap =
+      relatedValuesWithSelectedValuesRemoved
+        .flat()
+        .reduce((acc: Dictionary<number>, item) => {
+          acc[item] = (acc[item] || 0) + 1;
+          return acc;
+        }, {});
+
+    const uniqueRelatedValues = Array.from(
+      // remove all duplications
+      new Set([...relatedValuesWithSelectedValuesRemoved]),
+    );
 
     return {
-      optionsWithSelectedChildren,
-      optionsWithSelectedChildrenCountMap,
+      valuesRelatedToSelectedValues: uniqueRelatedValues,
+      valuesRelatedToSelectedValuesCountMap,
     };
   }, [selectedValues, filterHierarchy, name, optionLabelsMap]);
 
@@ -168,6 +173,19 @@ function FilterHierarchy({
     },
     [setExpandedOptionsList, expandedOptionsList],
   );
+
+  const expandSelectedOptions = useCallback(() => {
+    return setExpandedOptionsList(
+      selectedChildren.valuesRelatedToSelectedValues,
+    );
+  }, [setExpandedOptionsList, selectedChildren]);
+
+  useEffect(() => {
+    if (isActive) {
+      expandSelectedOptions();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isActive]);
 
   // Groups with an error are opened, so add them to the list of open
   // filters to prevent the group collapsing as soon as you select

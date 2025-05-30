@@ -406,6 +406,7 @@ export default function FiltersForm({
                             key={hierarchyName}
                             name={hierarchyName}
                             open={openFilterGroups.includes(filterName)}
+                            isActive={isActive}
                             onToggle={isOpen => {
                               setOpenFilterGroups(groups =>
                                 isOpen

@@ -19,8 +19,8 @@ export type FilterHierarchyOption = {
 };
 
 export type SelectedChildren = {
-  optionsWithSelectedChildren: string[];
-  optionsWithSelectedChildrenCountMap: Dictionary<number>;
+  valuesRelatedToSelectedValues: string[];
+  valuesRelatedToSelectedValuesCountMap: Dictionary<number>;
 };
 interface FilterHierarchyOptionsProps {
   disabled?: boolean;
@@ -49,12 +49,12 @@ function FilterHierarchyOptions({
 
   const renderSelectedCount = useCallback(() => {
     if (
-      !selectedChildren.optionsWithSelectedChildrenCountMap[optionTree.value]
+      !selectedChildren.valuesRelatedToSelectedValuesCountMap[optionTree.value]
     ) {
       return null;
     }
     const selectedChildrenCount =
-      selectedChildren.optionsWithSelectedChildrenCountMap[optionTree.value];
+      selectedChildren.valuesRelatedToSelectedValuesCountMap[optionTree.value];
     return (
       <Tag className="govuk-!-margin-left-2 govuk-!-font-size-16">
         <span className="govuk-visually-hidden"> - </span>
