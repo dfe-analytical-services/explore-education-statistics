@@ -289,8 +289,11 @@ export default function ReleaseApiDataSetDetailsPage() {
         <ul className="govuk-list govuk-error-summary__list">
           <li>
             The data file uploaded has resulted in a major version update which
-            is not allowed. Please select a mapping configuration that does not
-            result in a major version or cancel the ongoing replacement
+            is not allowed in release amendments. Major version type changes
+            (e.g. removing data rows, ...) can only be made as part of new
+            releases. For further guidance, contact the EES team. Please select
+            a mapping configuration that does not result in a major version or
+            cancel the ongoing replacement
             <Link to={replaceTabRoute} test-id="cancel-replacement-link">
               by clicking here
             </Link>
