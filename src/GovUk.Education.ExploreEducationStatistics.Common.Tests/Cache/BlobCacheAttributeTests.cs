@@ -129,7 +129,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Cache
 
             _blobCacheService
                 .Setup(s => s.GetItem(cacheKey, typeof(TestValue)))
-                .Returns(null);
+                .Returns((object?)null);
 
             var args = new List<object>();
 
@@ -157,7 +157,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Cache
 
             _blobCacheService
                 .Setup(s => s.GetItemAsync(cacheKey, typeof(TestValue)))
-                .ReturnsAsync(null);
+                .ReturnsAsync((object?)null);
 
             var args = new List<object>();
 
@@ -190,7 +190,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Cache
 
             targetBlobCacheService
                 .Setup(s => s.GetItemAsync(cacheKey, typeof(TestValue)))
-                .ReturnsAsync(null);
+                .ReturnsAsync((object?)null);
 
             var args = new List<object>();
 

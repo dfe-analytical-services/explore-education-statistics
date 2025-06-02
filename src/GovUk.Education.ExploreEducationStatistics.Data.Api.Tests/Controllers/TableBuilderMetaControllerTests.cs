@@ -58,7 +58,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
 
             mocks.cacheService
                 .Setup(s => s.GetItemAsync(cacheKey, typeof(SubjectMetaViewModel)))
-                .ReturnsAsync(null);
+                .ReturnsAsync((object?)null);
 
             mocks.cacheService
                 .Setup(s => s.SetItemAsync<object>(cacheKey, subjectMetaViewModel))
@@ -101,7 +101,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
 
             mocks.cacheService
                 .Setup(s => s.GetItemAsync(cacheKey, typeof(SubjectMetaViewModel)))
-                .ReturnsAsync(null);
+                .ReturnsAsync((object?)null);
 
             mocks.cacheService
                 .Setup(s => s.SetItemAsync<object>(cacheKey, subjectMetaViewModel))

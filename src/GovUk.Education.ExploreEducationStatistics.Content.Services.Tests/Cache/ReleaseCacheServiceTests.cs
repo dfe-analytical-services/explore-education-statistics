@@ -102,7 +102,7 @@ public class ReleaseCacheServiceTests : CacheServiceTestFixture
 
         PublicBlobCacheService
             .Setup(s => s.GetItemAsync(cacheKey, typeof(ReleaseCacheViewModel)))
-            .ReturnsAsync(null);
+            .ReturnsAsync((object?)null);
 
         PublicBlobCacheService
             .Setup(s => s.SetItemAsync<object>(cacheKey, _releaseViewModel))
@@ -147,7 +147,7 @@ public class ReleaseCacheServiceTests : CacheServiceTestFixture
 
         PublicBlobCacheService
             .Setup(s => s.GetItemAsync(cacheKey, typeof(ReleaseCacheViewModel)))
-            .ReturnsAsync(null);
+            .ReturnsAsync((object?)null);
 
         var releaseService = new Mock<IReleaseService>(Strict);
 
@@ -170,7 +170,7 @@ public class ReleaseCacheServiceTests : CacheServiceTestFixture
 
         PublicBlobCacheService
             .Setup(s => s.GetItemAsync(cacheKey, typeof(ReleaseCacheViewModel)))
-            .ReturnsAsync(null);
+            .ReturnsAsync((object?)null);
 
         PublicBlobCacheService
             .Setup(s => s.SetItemAsync<object>(cacheKey, _releaseViewModel))
@@ -215,7 +215,7 @@ public class ReleaseCacheServiceTests : CacheServiceTestFixture
 
         PublicBlobCacheService
             .Setup(s => s.GetItemAsync(cacheKey, typeof(ReleaseCacheViewModel)))
-            .ReturnsAsync(null);
+            .ReturnsAsync((object?)null);
 
         var releaseService = new Mock<IReleaseService>(Strict);
 

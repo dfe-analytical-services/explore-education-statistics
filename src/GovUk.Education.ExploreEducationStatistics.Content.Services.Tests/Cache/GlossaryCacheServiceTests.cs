@@ -32,7 +32,7 @@ public class GlossaryCacheServiceTests : CacheServiceTestFixture
 
         PublicBlobCacheService
             .Setup(s => s.GetItemAsync(cacheKey, typeof(List<GlossaryCategoryViewModel>)))
-            .ReturnsAsync(null);
+            .ReturnsAsync((object?)null);
 
         PublicBlobCacheService
             .Setup(s => s.SetItemAsync<object>(cacheKey, _glossary))
