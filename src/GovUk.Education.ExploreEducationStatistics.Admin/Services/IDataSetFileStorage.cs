@@ -36,7 +36,7 @@ public interface IDataSetFileStorage
     /// The data sets are uploaded to temporary storage in the first instance. Once the upload has been manually confirmed, the files are then moved to permanent storage.
     /// </remarks>
     /// <returns>A summary of each data set.</returns>
-    Task<List<ZipDataSetFileViewModel>> UploadDataSetsToTemporaryStorage(
+    Task<List<DataSetUploadResultViewModel>> UploadDataSetsToTemporaryStorage(
         Guid releaseVersionId,
         List<DataSet> dataSets,
         CancellationToken cancellationToken);
@@ -55,6 +55,6 @@ public interface IDataSetFileStorage
     /// <returns>A collection of the entities which represent the data set files.</returns>
     Task<List<ReleaseFile>> MoveDataSetsToPermanentStorage(
         Guid releaseVersionId,
-        List<ZipDataSetFileViewModel> dataSets,
+        List<DataSetUploadResultViewModel> dataSets,
         CancellationToken cancellationToken);
 }

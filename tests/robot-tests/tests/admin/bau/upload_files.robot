@@ -33,8 +33,10 @@ Upload a ZIP file file
     user waits until page contains element    id:dataFileUploadForm-zipFile
     user chooses file    id:dataFileUploadForm-zipFile    ${FILES_DIR}upload-zip-test.zip
     user clicks button    Upload data files
-
-    user waits until h2 is visible    Uploaded data files
+    user waits until modal is visible    Upload summary
+    user waits until modal table cell contains    1    1    Absence in PRUs
+    user clicks button    Confirm
+    user waits until modal is not visible    Upload summary
     user waits until page contains data uploads table
 
     # To ensure "Data file size" and "Number of rows" will be filled

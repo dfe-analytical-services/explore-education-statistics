@@ -3,7 +3,7 @@ using System;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 
-public record ZipDataSetFileViewModel
+public record DataSetUploadResultViewModel
 {
     public string Title { get; set; } = string.Empty;
 

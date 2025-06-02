@@ -574,7 +574,11 @@ user uploads subject
     user chooses file    id:dataFileUploadForm-dataFile    ${FOLDER}${SUBJECT_FILE}
     user chooses file    id:dataFileUploadForm-metadataFile    ${FOLDER}${META_FILE}
     user clicks button    Upload data files
-    user waits until h2 is visible    Uploaded data files    %{WAIT_LONG}
+    user waits until modal is visible    Upload summary
+    user waits until modal table cell contains    1    1    ${SUBJECT_NAME}
+    user waits until modal table cell contains    1    2    ${SUBJECT_FILE}
+    user clicks button    Confirm
+    user waits until modal is not visible    Upload summary
     user waits until page contains element    testid:Data files table
 
     IF    "${IMPORT_STATUS}" != "Importing"
