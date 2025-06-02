@@ -1017,7 +1017,5 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
         public Task<List<LocationMappingTypes>> GetLocationOptionMappingTypes(Guid targetDataSetVersionId, CancellationToken cancellationToken = default) => throw new NotImplementedException();
 
         public Task<List<FilterMappingTypes>> GetFilterOptionMappingTypes(Guid targetDataSetVersionId, CancellationToken cancellationToken = default) => throw new NotImplementedException();
-        
-        public Task<bool> HasDeletionMajorVersionChanges(Guid targetDataSetVersionId, CancellationToken cancellationToken = default) => throw new NotImplementedException();
     }
 }

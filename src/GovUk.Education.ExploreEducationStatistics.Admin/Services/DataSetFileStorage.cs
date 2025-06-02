@@ -98,7 +98,7 @@ public class DataSetFileStorage(
             var dataSetVersion = await dataSetVersionRepository.GetDataSetVersion(
                     replacedReleaseDataFile!.PublicApiDataSetId!.Value,
                     replacedReleaseDataFile.PublicApiDataSetVersion!,
-                    cancellationToken) ?? throw new NullReferenceException("The data set version needed to patch as part of this replacement was not found.");
+                    cancellationToken) ?? throw new ArgumentNullException("The data set version needed to patch as part of this replacement was not found.");
             
             await dataSetVersionService.CreateNextVersion(
                 dataReleaseFile.Id,
