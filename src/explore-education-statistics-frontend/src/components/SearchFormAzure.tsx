@@ -39,6 +39,7 @@ export default function SearchForm({
           label={label}
           labelSize="m"
           name="search"
+          type="search"
         />
       </Form>
     </FormProvider>
