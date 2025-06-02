@@ -99,7 +99,7 @@
       "value": false
     },
     "enableReplacementOfPublicApiDataSets" : {
-      "value": false
+      "value": true
     }
   }
 }
