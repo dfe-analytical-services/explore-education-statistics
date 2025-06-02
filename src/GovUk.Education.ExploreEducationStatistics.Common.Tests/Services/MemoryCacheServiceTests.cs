@@ -316,7 +316,7 @@ public class MemoryCacheServiceTests
         public CacheItemPriority Priority { get; set; }
         public long? Size { get; set; }
         public TimeSpan? SlidingExpiration { get; set; }
-        public object Value { get; set; } = null!;
+        public object? Value { get; set; } = null;
 
         public void Dispose()
         {
