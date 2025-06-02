@@ -795,6 +795,13 @@ Aside from unit tests for each project, we maintain suites of Robot Framework te
 
 See the [Robot Framework tests README](tests/robot-tests/README.md) for more information.
 
+## Troubleshooting
+
+### The Function Apps aren't running
+
+If any of the Function Apps (Processor, Publisher or Public Processor) won't spin up successfully, and you're hitting a `Value cannot be null. (Parameter: 'provider')` error,
+try upgrading your [Azure Functions Core Tools version](https://github.com/Azure/azure-functions-core-tools).
+
 ## License
 
 This application is licensed under the MIT License.
