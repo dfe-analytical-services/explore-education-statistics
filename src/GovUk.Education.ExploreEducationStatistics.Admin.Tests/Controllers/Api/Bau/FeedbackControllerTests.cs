@@ -16,6 +16,7 @@ public class FeedbackControllerTests(TestApplicationFactory testApp) : Integrati
 {
     private static readonly DateTime Now = DateTime.UtcNow;
     private const string BaseUrl = "api/feedback";
+    // ReSharper disable once InconsistentNaming
     private readonly List<Feedback> Feedback =
     [
         new()
