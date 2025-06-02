@@ -33,7 +33,8 @@ public class DataSetFileStorage(
     IDataImportService dataImportService,
     IUserService userService,
     IDataSetVersionService dataSetVersionService,
-    IOptions<FeatureFlags> featureFlags) : IDataSetFileStorage
+    IOptions<FeatureFlags> featureFlags,
+    IDataSetVersionRepository dataSetVersionRepository) : IDataSetFileStorage
 {
     public async Task<DataFileInfo> UploadDataSet(
         Guid releaseVersionId,
@@ -94,22 +95,17 @@ public class DataSetFileStorage(
                 rf.PublicApiDataSetId != null,
                 cancellationToken))
         {
-            // Creates a new data set version to enable replacement. 
-            // Please note this is WIP, EES-5996 and will address failure,
-            // and any refactor that may be required
-            await dataSetVersionService.GetDataSetVersion(
+            var dataSetVersion = await dataSetVersionRepository.GetDataSetVersion(
                     replacedReleaseDataFile!.PublicApiDataSetId!.Value,
                     replacedReleaseDataFile.PublicApiDataSetVersion!,
-                    cancellationToken)
-                .OnSuccessDo(async dataSetVersion =>
-                {
-                    await dataSetVersionService.CreateNextVersion(
-                        dataReleaseFile.Id,
-                        replacedReleaseDataFile.PublicApiDataSetId.Value,
-                        dataSetVersion.Id,
-                        cancellationToken
-                    );
-                });
+                    cancellationToken) ?? throw new NullReferenceException("The data set version needed to patch as part of this replacement was not found.");
+            
+            await dataSetVersionService.CreateNextVersion(
+                dataReleaseFile.Id,
+                replacedReleaseDataFile.PublicApiDataSetId.Value,
+                dataSetVersion.Id,
+                cancellationToken
+            );
         }
 
         var dataImport = await dataImportService.Import(subjectId, dataFile, metaFile);
