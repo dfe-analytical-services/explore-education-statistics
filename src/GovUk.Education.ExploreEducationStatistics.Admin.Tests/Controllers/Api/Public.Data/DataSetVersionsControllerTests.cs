@@ -1037,6 +1037,7 @@ public abstract class DataSetVersionsControllerTests(
 
         private record MockedChanges
         {
+            // ReSharper disable once UnusedAutoPropertyAccessor.Local
             public List<string> Changes { get; init; } = [];
         }
     }
