@@ -78,6 +78,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{259A0E76-88E3-422E-B43D-CA0E9DE6E48B}"
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
+		..\global.json = ..\global.json
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GovUk.Education.ExploreEducationStatistics.Public.Data.Utils", "GovUk.Education.ExploreEducationStatistics.Public.Data.Utils\GovUk.Education.ExploreEducationStatistics.Public.Data.Utils.csproj", "{825096EE-DD5F-44F6-9784-67655C46372E}"
