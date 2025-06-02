@@ -26,6 +26,9 @@ param indexDefinitionsBasePath string = 'infrastructure/templates/search/applica
 @description('Specifies the name of the indexer to create/update.')
 param indexerName string = '${indexName}-indexer'
 
+@description('The URL of the Public site.')
+param publicSiteUrl string
+
 @description('Name of the searchable documents container in the Search storage account.')
 param searchableDocumentsContainerName string = 'searchable-documents'
 
@@ -117,8 +120,13 @@ module searchServiceConfigModule '../components/searchServiceConfig.bicep' = if 
     dataSourceConnectionString: 'ResourceId=${searchStorageAccountModule.outputs.storageAccountId};'
     dataSourceContainerName: searchableDocumentsContainerName
     dataSourceType: 'azureblob'
-    indexerName: indexerName
     indexDefinitionUri: '${gitHubRawContentBaseUrl}/${githubSourceRef}/${indexDefinitionsBasePath}/${indexDefinitionFilename}'
+    indexCorsAllowedOrigins: [
+      'http://localhost:3000'
+      'https://localhost:3000'
+      publicSiteUrl
+    ]
+    indexerName: indexerName
     indexerScheduleInterval: 'PT5M'
     searchServiceName: searchServiceModule.outputs.searchServiceName
     location: location

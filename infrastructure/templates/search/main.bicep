@@ -29,6 +29,9 @@ param deploySearchConfig bool = false
 @description('The URL of the Content API.')
 param contentApiUrl string
 
+@description('The URL of the Public site.')
+param publicSiteUrl string
+
 @description('Specifies whether or not the Search Docs Function App already exists.')
 param searchDocsFunctionAppExists bool = true
 
@@ -145,6 +148,7 @@ module searchServiceModule 'application/searchService.bicep' = {
     location: location
     githubSourceRef: githubSourceRef
     indexName: 'index-1'
+    publicSiteUrl: publicSiteUrl
     resourceNames: resourceNames
     resourcePrefix: resourcePrefix
     searchServiceIpRules: []
