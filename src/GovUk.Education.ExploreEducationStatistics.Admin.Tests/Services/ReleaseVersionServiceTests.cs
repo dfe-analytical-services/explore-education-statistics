@@ -40,6 +40,7 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Tests.Fixture
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Moq;
+using Semver;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.MapperUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
@@ -619,44 +620,21 @@ public abstract class ReleaseVersionServiceTests
             var releaseDataFileService = new Mock<IReleaseDataFileService>(Strict);
             var dataImportService = new Mock<IDataImportService>(Strict);
             var dataSetVersionService = new Mock<IDataSetVersionService>(Strict);
+            var footnoteRepository = new Mock<IFootnoteRepository>(Strict);
+            var dataSetVersionRepository = new Mock<IDataSetVersionRepository>(Strict);
 
             dataImportService.Setup(service => service.GetImport(file.Id))
                 .ReturnsAsync(new DataImport { Status = DataImportStatus.COMPLETE });
-            
-            dataSetVersionService.Setup(service => service.GetDataSetVersion(
-                    releaseFile.PublicApiDataSetId!.Value,
-                    releaseFile.PublicApiDataSetVersion!,
-                    It.IsAny<CancellationToken>()))
-                .ReturnsAsync(dataSetVersion);
-            
-            dataSetVersionService.Setup(service => service.DeleteVersion(
-                    dataSetVersion.Id,
-                    It.IsAny<CancellationToken>()))
-                .ReturnsAsync(Unit.Instance);
-            
             
             releaseDataFileService
                 .Setup(service => service.Delete(releaseVersion.Id, file.Id, false))
                 .ReturnsAsync(Unit.Instance);
             
-            var footnoteRepository = new Mock<IFootnoteRepository>(Strict);
             var dataBlockService = new Mock<IDataBlockService>(Strict);
             var releaseSubjectRepository = new Mock<IReleaseSubjectRepository>(Strict);
-
             var deleteDataBlockPlan = new DeleteDataBlockPlanViewModel();
-            dataBlockService.Setup(service =>
-                    service.GetDeletePlan(releaseVersion.Id, It.Is<Subject>(s => s.Id == subject.Id)))
-                .ReturnsAsync(deleteDataBlockPlan);
-
-            dataBlockService.Setup(service =>
-                    service.DeleteDataBlocks(It.IsAny<DeleteDataBlockPlanViewModel>()))
-                .ReturnsAsync(Unit.Instance);
             var privateCacheService = new Mock<IPrivateBlobCacheService>(Strict);
-
-            var footnote = new Footnote { Id = Guid.NewGuid() };
-            footnoteRepository.Setup(service => service.GetFootnotes(releaseVersion.Id, subject.Id))
-                .ReturnsAsync([footnote]);
-            
+          
             releaseSubjectRepository
                 .Setup(service => service.DeleteReleaseSubject(releaseVersion.Id, subject.Id, true))
                 .Returns(Task.CompletedTask);
@@ -665,17 +643,51 @@ public abstract class ReleaseVersionServiceTests
                     service.DeleteItemAsync(new PrivateSubjectMetaCacheKey(releaseVersion.Id, subject.Id)))
                 .Returns(Task.CompletedTask);
             
+            if (enableReplacementOfPublicApiDataSets)
+            {
+                dataSetVersionService.Setup(service => service.GetDataSetVersion(
+                        releaseFile.PublicApiDataSetId!.Value,
+                        releaseFile.PublicApiDataSetVersion!,
+                        It.IsAny<CancellationToken>()))
+                    .ReturnsAsync(dataSetVersion);
+
+                dataSetVersionService.Setup(service => service.DeleteVersion(
+                        It.IsAny<Guid>(),
+                        It.IsAny<CancellationToken>()))
+                    .ReturnsAsync(Unit.Instance);
+                
+                var footnote = new Footnote { Id = Guid.NewGuid() };
+                footnoteRepository.Setup(service => service.GetFootnotes(releaseVersion.Id, subject.Id))
+                    .ReturnsAsync([footnote]);
+                
+                dataBlockService.Setup(service =>
+                        service.GetDeletePlan(releaseVersion.Id, It.Is<Subject>(s => s.Id == subject.Id)))
+                    .ReturnsAsync(deleteDataBlockPlan);
+                
+                dataBlockService.Setup(service =>
+                        service.DeleteDataBlocks(It.IsAny<DeleteDataBlockPlanViewModel>()))
+                    .ReturnsAsync(Unit.Instance);
+            }
+            else
+            {
+                
+                dataSetVersionRepository.Setup(repo => repo.GetDataSetVersion(
+                        It.IsAny<Guid>(),
+                        It.IsAny<SemVersion>(),
+                        It.IsAny<CancellationToken>()))
+                    .ReturnsAsync(dataSetVersion);
+            }
             
             await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
             {
-
                 var releaseVersionService = BuildService(
                     contentDbContext: contentDbContext,
                     statisticsDbContext: statisticsDbContext,
                     dataSetVersionService: dataSetVersionService.Object,
                     dataImportService: dataImportService.Object,
                     dataBlockService: dataBlockService.Object,
+                    dataSetVersionRepository: dataSetVersionRepository.Object,
                     footnoteRepository: footnoteRepository.Object,
                     releaseSubjectRepository: releaseSubjectRepository.Object,
                     privateCacheService: privateCacheService.Object,
@@ -686,7 +698,7 @@ public abstract class ReleaseVersionServiceTests
                     releaseVersionId: releaseVersion.Id,
                     fileId: file.Id);
 
-                VerifyAllMocks(dataImportService);
+                VerifyAllMocks(dataImportService, dataSetVersionService, footnoteRepository, dataBlockService, dataSetVersionRepository);
                 if (enableReplacementOfPublicApiDataSets)
                 {
                     result.AssertRight();
@@ -2479,6 +2491,7 @@ public abstract class ReleaseVersionServiceTests
         IProcessorClient? processorClient = null,
         IPrivateBlobCacheService? privateCacheService = null,
         IReleaseSlugValidator? releaseSlugValidator = null,
+        IDataSetVersionRepository? dataSetVersionRepository = null,
         bool enableReplacementOfPublicApiDataSets = false)
     {
         var userService = AlwaysTrueUserService();
@@ -2511,7 +2524,7 @@ public abstract class ReleaseVersionServiceTests
             {
                 EnableReplacementOfPublicApiDataSets = enableReplacementOfPublicApiDataSets
             }),
-            Mock.Of<IDataSetVersionRepository>()
+            dataSetVersionRepository ?? Mock.Of<IDataSetVersionRepository>()
         );
     }
 }
