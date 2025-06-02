@@ -35,7 +35,7 @@ public class ReleaseControllerCachingTests : CacheServiceTestFixture
             .Setup(s => s.GetItem(
                 new GetLatestReleaseCacheKey(PublicationSlug),
                 typeof(ReleaseViewModel)))
-            .Returns(null);
+            .Returns((object?)null);
 
         var methodologySummaries = new List<MethodologyVersionSummaryViewModel>();
         var publicationCacheViewModel = new PublicationCacheViewModel
@@ -109,7 +109,7 @@ public class ReleaseControllerCachingTests : CacheServiceTestFixture
             .Setup(s => s.GetItem(
                 new GetReleaseCacheKey(PublicationSlug, ReleaseSlug),
                 typeof(ReleaseViewModel)))
-            .Returns(null);
+            .Returns((object?)null);
 
         var methodologySummaries = new List<MethodologyVersionSummaryViewModel>();
         var publicationCacheViewModel = new PublicationCacheViewModel

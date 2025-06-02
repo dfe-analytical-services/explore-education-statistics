@@ -70,7 +70,7 @@ public class PublicationControllerCachingTests : CacheServiceTestFixture
             .Setup(s => s.GetItem(
                 new ListPublicationsGetCacheKey(_getQuery),
                 typeof(PaginatedListViewModel<PublicationSearchResultViewModel>)))
-            .Returns(null);
+            .Returns((object?)null);
 
         var expectedCacheConfiguration = new MemoryCacheConfiguration(
             10, CrontabSchedule.Parse(HalfHourlyExpirySchedule));
@@ -130,7 +130,7 @@ public class PublicationControllerCachingTests : CacheServiceTestFixture
             .Setup(s => s.GetItem(
                 new ListPublicationsPostCacheKey(_postQuery),
                 typeof(PaginatedListViewModel<PublicationSearchResultViewModel>)))
-            .Returns(null);
+            .Returns((object?)null);
 
         var expectedCacheConfiguration = new MemoryCacheConfiguration(
             10, CrontabSchedule.Parse(HalfHourlyExpirySchedule));
