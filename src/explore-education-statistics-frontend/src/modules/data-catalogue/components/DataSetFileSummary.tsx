@@ -18,6 +18,7 @@ import { logEvent } from '@frontend/services/googleAnalyticsService';
 import classNames from 'classnames';
 import orderBy from 'lodash/orderBy';
 import React, { createElement, useEffect } from 'react';
+import formatPretty from '@common/utils/number/formatPretty';
 
 const maxContentLength = 300;
 
@@ -39,6 +40,7 @@ export default function DataSetFileSummary({
     content,
     fileId,
     meta: {
+      numDataFileRows = undefined,
       timePeriodRange = {
         from: undefined,
         to: undefined,
@@ -139,6 +141,14 @@ export default function DataSetFileSummary({
           {publication.title}
         </SummaryListItem>
         <SummaryListItem term="Release">{release.title}</SummaryListItem>
+        {numDataFileRows && (
+          <SummaryListItem
+            className={classNames({ 'dfe-js-hidden': !showDetails })}
+            term="Number of rows"
+          >
+            {formatPretty(numDataFileRows)}
+          </SummaryListItem>
+        )}
         {geographicLevels && geographicLevels.length > 0 && (
           <SummaryListItem
             className={classNames({

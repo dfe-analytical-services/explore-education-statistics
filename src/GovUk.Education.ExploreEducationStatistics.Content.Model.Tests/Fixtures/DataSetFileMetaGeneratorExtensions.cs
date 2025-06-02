@@ -15,6 +15,7 @@ public static class DataSetFileMetaGeneratorExtensions
 
     public static InstanceSetters<DataSetFileMeta> SetDefaults(this InstanceSetters<DataSetFileMeta> setters)
         => setters
+            .SetNumDataFileRows(9393)
             .SetTimePeriodRange(new TimePeriodRangeMeta
             {
                 Start = new TimePeriodRangeBoundMeta { TimeIdentifier = TimeIdentifier.CalendarYear, Period = "2000", },
@@ -34,6 +35,12 @@ public static class DataSetFileMetaGeneratorExtensions
                     ColumnName = "indicator_1",
                 },
             ]);
+
+    public static Generator<DataSetFileMeta> WithNumDataFileRows(
+        this Generator<DataSetFileMeta> generator,
+        int numOfRows)
+        => generator.ForInstance(s => s.SetNumDataFileRows(numOfRows));
+
     public static Generator<DataSetFileMeta> WithTimePeriodRange(
         this Generator<DataSetFileMeta> generator,
         TimePeriodRangeMeta timePeriodRange)
@@ -48,6 +55,11 @@ public static class DataSetFileMetaGeneratorExtensions
         this Generator<DataSetFileMeta> generator,
         List<IndicatorMeta> indicators)
         => generator.ForInstance(s => s.SetIndicators(indicators));
+
+    public static InstanceSetters<DataSetFileMeta> SetNumDataFileRows(
+        this InstanceSetters<DataSetFileMeta> setters,
+        int numOfRows)
+        => setters.Set(s => s.NumDataFileRows, numOfRows);
 
     public static InstanceSetters<DataSetFileMeta> SetTimePeriodRange(
         this InstanceSetters<DataSetFileMeta> setters,

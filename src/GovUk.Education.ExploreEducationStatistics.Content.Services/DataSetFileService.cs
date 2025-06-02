@@ -317,6 +317,7 @@ public class DataSetFileService(
 
         return new DataSetFileMetaViewModel
         {
+            NumDataFileRows = meta.NumDataFileRows,
             GeographicLevels = dataSetFileVersionGeographicLevels
                 .Select(gl => gl.GeographicLevel.GetEnumLabel())
                 .ToList(),

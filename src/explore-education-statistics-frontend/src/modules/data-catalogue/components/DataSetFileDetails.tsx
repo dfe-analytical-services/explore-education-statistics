@@ -13,6 +13,7 @@ import ReleaseTypeSection from '@common/modules/release/components/ReleaseTypeSe
 import getTimePeriodString from '@common/modules/table-tool/utils/getTimePeriodString';
 import orderBy from 'lodash/orderBy';
 import React from 'react';
+import formatPretty from '@common/utils/number/formatPretty';
 
 interface Props {
   apiDataSetId?: string;
@@ -26,7 +27,13 @@ export default function DataSetFileDetails({
   const {
     release,
     file: {
-      meta: { timePeriodRange, filters, geographicLevels, indicators },
+      meta: {
+        numDataFileRows,
+        timePeriodRange,
+        filters,
+        geographicLevels,
+        indicators,
+      },
     },
     title,
   } = dataSetFile;
@@ -74,6 +81,11 @@ export default function DataSetFileDetails({
           </Modal>
         </SummaryListItem>
 
+        {numDataFileRows && (
+          <SummaryListItem term="Number of rows">
+            {formatPretty(numDataFileRows)}
+          </SummaryListItem>
+        )}
         {geographicLevels && geographicLevels.length > 0 && (
           <SummaryListItem term="Geographic levels">
             {orderBy(geographicLevels).join(', ')}

@@ -49,6 +49,9 @@ describe('DataSetFileSummary', () => {
     );
 
     expect(
+      within(screen.getByTestId('Number of rows')).getByText('11'),
+    ).toBeInTheDocument();
+    expect(
       within(screen.getByTestId('Geographic levels')).getByText(
         'Local authority, National, Regional',
       ),
@@ -81,6 +84,9 @@ describe('DataSetFileSummary', () => {
       <DataSetFileSummary dataSetFile={testDataSetFileSummaries[0]} expanded />,
     );
 
+    expect(
+      within(screen.getByTestId('Number of rows')).getByText('11'),
+    ).toBeInTheDocument();
     expect(
       within(screen.getByTestId('Geographic levels')).getByText(
         'Local authority, National, Regional',
