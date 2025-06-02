@@ -255,6 +255,13 @@ describe('FindStatisticsPageAzure', () => {
       await publicationsList.findByText('find me highlight'),
     ).toBeVisible();
 
+    const searchHighlight = publicationsList.getByTestId('search-highlight');
+
+    expect(
+      within(searchHighlight).getByText('find me highlight', { exact: false })
+        .nodeName,
+    ).toEqual('EM');
+
     expect(
       publicationsList.getByRole('heading', { name: 'Publication 3' }),
     ).toBeInTheDocument();
