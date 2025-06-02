@@ -1,4 +1,5 @@
 #nullable enable
+using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using System;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
@@ -7,17 +8,23 @@ public record DataSetUploadResultViewModel
 {
     public string Title { get; set; } = string.Empty;
 
-    public string DataFileName { get; set; } = string.Empty;
+    public required string DataFileName { get; set; }
+
+    public required string DataFilePath { get; set; }
 
     public Guid DataFileId { get; set; }
 
     public long DataFileSize { get; set; }
 
-    public string MetaFileName { get; set; } = string.Empty;
+    public required string MetaFileName { get; set; }
+
+    public required string MetaFilePath { get; set; }
 
     public Guid MetaFileId { get; set; }
 
     public long MetaFileSize { get; set; }
 
     public Guid? ReplacingFileId { get; set; }
+
+    public DataSetScreenerResult? ScreenerResult { get; set; }
 }
