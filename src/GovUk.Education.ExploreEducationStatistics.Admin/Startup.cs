@@ -1011,9 +1011,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
         {
             return Task.FromResult(new List<DataSetVersion>());
         }
-
-        public Task<DataSetVersion> GetDataSetVersion(Guid dataSetVersionId) => throw new NotImplementedException();
-
+        
         public Task<DataSetVersion> GetDataSetVersion(Guid dataSetId, SemVersion version, CancellationToken cancellationToken = default) => throw new NotImplementedException();
     }
 
@@ -1022,7 +1020,5 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
         public Task<List<LocationMappingTypes>> GetLocationOptionMappingTypes(Guid targetDataSetVersionId, CancellationToken cancellationToken = default) => throw new NotImplementedException();
 
         public Task<List<FilterMappingTypes>> GetFilterOptionMappingTypes(Guid targetDataSetVersionId, CancellationToken cancellationToken = default) => throw new NotImplementedException();
-        
-        public Task<bool> HasDeletionMajorVersionChanges(Guid targetDataSetVersionId, CancellationToken cancellationToken = default) => throw new NotImplementedException();
     }
 }
