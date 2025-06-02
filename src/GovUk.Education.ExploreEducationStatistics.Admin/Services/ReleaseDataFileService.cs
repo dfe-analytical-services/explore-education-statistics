@@ -43,7 +43,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         IUserService userService,
         IDataSetFileStorage dataSetFileStorage,
         IDataBlockService dataBlockService,
-        IFootnoteRepository footnoteRepository) : IReleaseDataFileService
+        IFootnoteRepository footnoteRepository,
+        IDataSetScreenerClient dataSetScreenerClient) : IReleaseDataFileService
     {
         public async Task<Either<ActionResult, Unit>> Delete(
             Guid releaseVersionId,
@@ -277,7 +278,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         .OnSuccess(async replacingFile
                             => await ValidateDataSetCsvPair(releaseVersionId, dataFormFile, metaFormFile, dataSetTitle, replacingFile))
                         .OnSuccess(async dataSet
-                            => await dataSetFileStorage.UploadDataSetsToTemporaryStorage(releaseVersionId, [dataSet], cancellationToken));
+                            => await dataSetFileStorage.UploadDataSetsToTemporaryStorage(releaseVersionId, [dataSet], cancellationToken))
+                        .OnSuccess(async dataSets
+                            => await dataSetScreenerClient.ScreenDataSet(dataSets));
                 });
         }
 
@@ -321,7 +324,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         .OnSuccess(async replacingFile
                             => await ValidateDataSetZip(releaseVersionId, zipFormFile, dataSetTitle, replacingFile))
                         .OnSuccess(async dataSet
-                            => await dataSetFileStorage.UploadDataSetsToTemporaryStorage(releaseVersionId, [dataSet], cancellationToken));
+                            => await dataSetFileStorage.UploadDataSetsToTemporaryStorage(releaseVersionId, [dataSet], cancellationToken))
+                        .OnSuccess(async dataSets
+                            => await dataSetScreenerClient.ScreenDataSet(dataSets));
                 });
         }
 
@@ -358,7 +363,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(async _
                     => await ValidateBulkDataSetZip(releaseVersionId, zipFormFile))
                 .OnSuccess(async dataSets
-                    => await dataSetFileStorage.UploadDataSetsToTemporaryStorage(releaseVersionId, dataSets, cancellationToken));
+                    => await dataSetFileStorage.UploadDataSetsToTemporaryStorage(releaseVersionId, dataSets, cancellationToken))
+                .OnSuccess(async dataSets
+                    => await dataSetScreenerClient.ScreenDataSet(dataSets));
         }
 
         private async Task<Either<ActionResult, DataSet>> ValidateDataSetCsvPair(

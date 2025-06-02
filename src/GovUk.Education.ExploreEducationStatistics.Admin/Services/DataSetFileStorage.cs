@@ -200,9 +200,11 @@ public class DataSetFileStorage(
                 Title = dataSet.Title,
                 DataFileId = uploadResult.DataFileId,
                 DataFileName = dataSet.DataFile.FileName,
+                DataFilePath = $"{FileStoragePathUtils.FilesPath(releaseVersionId, FileType.Data)}{uploadResult.DataFileId}",
                 DataFileSize = dataSet.DataFile.FileSize,
                 MetaFileId = uploadResult.MetaFileId,
                 MetaFileName = dataSet.MetaFile.FileName,
+                MetaFilePath = $"{FileStoragePathUtils.FilesPath(releaseVersionId, FileType.Metadata)}{uploadResult.MetaFileId}",
                 MetaFileSize = dataSet.MetaFile.FileSize,
                 ReplacingFileId = dataSet.ReplacingFile?.Id,
             });

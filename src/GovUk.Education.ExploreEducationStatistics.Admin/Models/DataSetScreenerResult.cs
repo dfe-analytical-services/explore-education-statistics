@@ -1,12 +1,11 @@
 #nullable enable
-
 using System;
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Models;
 
-public class DataScreenerResponse
+public class DataSetScreenerResult
 {
     // TODO (EES-5353): The screening result will need to be persisted somewhere in the backend.
     // If a user attempts to confirm a data set for import, the result should be validated.
@@ -16,6 +15,7 @@ public class DataScreenerResponse
 
     // TODO (EES-5353): Discuss if this can just be a boolean (e.g. "Passed", "IsSuccessful")
     [JsonPropertyName("overall_stage")]
+    [JsonConverter(typeof(JsonStringEnumConverter))]
     public ScreenerResult Result { get; set; }
 
     [JsonPropertyName("overall_message")]
