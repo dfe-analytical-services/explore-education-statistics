@@ -84,25 +84,16 @@ public class TestApplicationFactory : TestApplicationFactory<Startup>
                     .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                     .AddScheme<AuthenticationSchemeOptions, TestAuthHandler>(JwtBearerDefaults.AuthenticationScheme, null);
 
+                services.AddSingleton<TestAuthHandlerUserProvider>();
+                
                 services
                     .ReplaceService<IAnalyticsPathResolver>(new TestAnalyticsPathResolver(), optional: true);
             });
     }
-    
-    /// <summary>
-    /// This method adds an authenticated User in the form of a ClaimsPrincipal to the HttpContext.
-    /// </summary>
-    /// <param name="user"></param>
-    /// <returns></returns>
-    public WebApplicationFactory<Startup> SetUser(ClaimsPrincipal? user)
+
+    internal class TestAuthHandlerUserProvider
     {
-        return this.ConfigureServices(services =>
-        {
-            if (user != null)
-            {
-                services.AddScoped(_ => user);
-            }
-        });
+        public ClaimsPrincipal? User { get; set; }
     }
     
     /// <summary>
@@ -113,19 +104,32 @@ public class TestApplicationFactory : TestApplicationFactory<Startup>
         IOptionsMonitor<AuthenticationSchemeOptions> options,
         ILoggerFactory logger,
         UrlEncoder encoder,
-        ClaimsPrincipal? claimsPrincipal = null)
+        TestAuthHandlerUserProvider userProvider)
         : AuthenticationHandler<AuthenticationSchemeOptions>(options, logger, encoder)
     {
         protected override Task<AuthenticateResult> HandleAuthenticateAsync()
         {
-            if (claimsPrincipal == null)
+            var user = userProvider.User;
+
+            if (user == null)
             {
                 return Task.FromResult(AuthenticateResult.NoResult());
             }
 
-            var ticket = new AuthenticationTicket(claimsPrincipal, JwtBearerDefaults.AuthenticationScheme);
+            var ticket = new AuthenticationTicket(user, JwtBearerDefaults.AuthenticationScheme);
             var result = AuthenticateResult.Success(ticket);
             return Task.FromResult(result);
         }
+    }
+}
+
+public static class TestWebApplicationFactoryExtensions
+{
+    public static WebApplicationFactory<Startup> WithUser(this WebApplicationFactory<Startup> factory,
+        ClaimsPrincipal? user)
+    {
+        var authHandler = factory.Services.GetRequiredService<TestApplicationFactory.TestAuthHandlerUserProvider>();
+        authHandler.User = user;
+        return factory;
     }
 }

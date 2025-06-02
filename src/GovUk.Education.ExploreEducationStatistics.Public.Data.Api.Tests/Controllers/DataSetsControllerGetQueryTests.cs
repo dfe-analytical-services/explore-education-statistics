@@ -6,7 +6,6 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Requests;
-using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Fixture;
@@ -3126,8 +3125,9 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
             query.AddRange(queryParameters);
         }
 
-        var client = (app ?? BuildApp()).CreateClient();
-        client.AddPreviewTokenHeader(previewTokenId);
+        var client = (app ?? BuildApp())
+            .CreateClient()
+            .WithPreviewTokenHeader(previewTokenId);
 
         var uri = QueryHelpers.AddQueryString($"{BaseUrl}/{dataSetId}/query", query);
 
