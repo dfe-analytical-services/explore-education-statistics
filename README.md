@@ -799,7 +799,7 @@ See the [Robot Framework tests README](tests/robot-tests/README.md) for more inf
 
 ### The Function Apps aren't running
 
-If either of the Function Apps (Processor, Publisher or Public Processor) won't spin up successfully, and you're hitting a `Value cannot be null. (Parameter: 'provider')` error,
+If any of the Function Apps (Processor, Publisher or Public Processor) won't spin up successfully, and you're hitting a `Value cannot be null. (Parameter: 'provider')` error,
 try upgrading your [Azure Functions Core Tools version](https://github.com/Azure/azure-functions-core-tools).
 
 ## License
