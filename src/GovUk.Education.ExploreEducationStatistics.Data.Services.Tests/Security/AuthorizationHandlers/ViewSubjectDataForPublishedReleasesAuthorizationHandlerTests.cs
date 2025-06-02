@@ -50,8 +50,8 @@ public class ViewSubjectDataForPublishedReleasesAuthorizationHandlerTests
             var handler = BuildHandler(contentDbContext);
 
             var authContext = new AuthorizationHandlerContext(
-                new IAuthorizationRequirement[] {Activator.CreateInstance<ViewSubjectDataRequirement>()},
-                null,
+                [Activator.CreateInstance<ViewSubjectDataRequirement>()],
+                _dataFixture.Generator<ClaimsPrincipal>(),
                 releaseSubject);
 
             await handler.HandleAsync(authContext);
@@ -89,8 +89,8 @@ public class ViewSubjectDataForPublishedReleasesAuthorizationHandlerTests
             var handler = BuildHandler(contentDbContext);
 
             var authContext = new AuthorizationHandlerContext(
-                new IAuthorizationRequirement[] { Activator.CreateInstance<ViewSubjectDataRequirement>() },
-                null,
+                [Activator.CreateInstance<ViewSubjectDataRequirement>()],
+                _dataFixture.Generator<ClaimsPrincipal>(),
                 releaseSubject);
 
             await handler.HandleAsync(authContext);
