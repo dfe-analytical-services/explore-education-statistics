@@ -34,6 +34,7 @@ const cspConnectSrc = [
   `${process.env.DATA_API_BASE_URL}/`,
   `${process.env.NOTIFICATION_API_BASE_URL}/`,
   `${process.env.PUBLIC_API_BASE_URL}/`,
+  `${process.env.AZURE_SEARCH_ENDPOINT}`,
   'https://*.googletagmanager.com',
   'https://*.google-analytics.com',
   'https://*.analytics.google.com',
