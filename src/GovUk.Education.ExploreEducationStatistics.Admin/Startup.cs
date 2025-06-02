@@ -600,13 +600,13 @@ public class Startup(
         services.AddTransient<IFileValidatorService, FileValidatorService>();
         services.AddTransient<IReleaseFileBlobService, PrivateReleaseFileBlobService>();
         services.AddTransient<IPrivateBlobStorageService, PrivateBlobStorageService>(provider =>
-            new PrivateBlobStorageService(configuration.GetValue<string>("CoreStorage").ThrowIfBlank("Core Storage Connection String"),
+            new PrivateBlobStorageService(configuration.GetRequiredValue("CoreStorage"),
                 provider.GetRequiredService<ILogger<IBlobStorageService>>()));
         services.AddTransient<IPublicBlobStorageService, PublicBlobStorageService>(provider => 
-            new PublicBlobStorageService(configuration.GetValue<string>("PublicStorage").ThrowIfBlank("Public Storage Connection String"),
+            new PublicBlobStorageService(configuration.GetRequiredValue("PublicStorage"),
             provider.GetRequiredService<ILogger<IBlobStorageService>>()));
         services.AddTransient<IPublisherTableStorageService, PublisherTableStorageService>(_ =>
-            new PublisherTableStorageService(configuration.GetValue<string>("PublisherStorage").ThrowIfBlank("Publisher Storage Connection String")));
+            new PublisherTableStorageService(configuration.GetRequiredValue("PublisherStorage")));
         services.AddSingleton<IGuidGenerator, SequentialGuidGenerator>();
         AddPersistenceHelper<ContentDbContext>(services);
         AddPersistenceHelper<StatisticsDbContext>(services);
@@ -627,9 +627,9 @@ public class Startup(
         services.AddTransient<IPrivateBlobCacheService, PrivateBlobCacheService>();
         services.AddTransient<ICacheKeyService, CacheKeyService>();
         services.AddSingleton<IDataProcessorClient, DataProcessorClient>(_ =>
-            new DataProcessorClient(configuration.GetValue<string>("CoreStorage").ThrowIfBlank("Core Storage Connection String")));
+            new DataProcessorClient(configuration.GetRequiredValue("CoreStorage")));
         services.AddSingleton<IPublisherClient, PublisherClient>(_ =>
-            new PublisherClient(configuration.GetValue<string>("PublisherStorage").ThrowIfBlank("Publisher Storage Connection String")));
+            new PublisherClient(configuration.GetRequiredValue("PublisherStorage")));
 
         /*
          * Swagger
@@ -738,8 +738,7 @@ public class Startup(
             {
                 var loginAuthorityUrl = configuration
                     .GetRequiredSection("OpenIdConnectIdentityFramework")
-                    .GetValue<string>("Authority")
-                    .ThrowIfBlank("OpenIdConnectIdentityFramework.Authority");
+                    .GetRequiredValue("Authority");
                 var loginAuthorityUri = new Uri(loginAuthorityUrl);
                 s
                     .CustomSources(loginAuthorityUri.GetLeftPart(UriPartial.Authority))
