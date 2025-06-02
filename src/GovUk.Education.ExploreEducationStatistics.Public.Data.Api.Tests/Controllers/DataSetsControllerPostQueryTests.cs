@@ -8,6 +8,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Requests;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Analytics;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Fixture;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Resources.DataFiles.AbsenceSchool;
@@ -3915,16 +3916,12 @@ public abstract class DataSetsControllerPostQueryTests(TestApplicationFactory te
                 Debug = true
             };
 
-            capturedQuery.Query.AssertDeepEqualTo(expectedRequest);
-
-            Assert.Equal(capturedQuery.DataSetId, dataSetVersion.DataSetId);
-            Assert.Equal(capturedQuery.DataSetVersionId, dataSetVersion.Id);
-            Assert.Equal(1, capturedQuery.ResultsCount);
-            Assert.Equal(4, capturedQuery.TotalRowsCount);
-
-            capturedQuery.StartTime.AssertUtcNow(withinMillis: 5000);
-            capturedQuery.EndTime.AssertUtcNow(withinMillis: 5000);
-            Assert.True(capturedQuery.EndTime > capturedQuery.StartTime);
+            await AnalyticsTestAssertions.AssertDataSetVersionQueryAnalyticsCaptured(
+                dataSetVersion: dataSetVersion,
+                expectedAnalyticsPath: _analyticsPathResolver.PublicApiQueriesDirectoryPath(),
+                expectedRequest: expectedRequest,
+                expectedResultsCount: 1,
+                expectedTotalRows: 4);
         }
 
         [Fact]
@@ -3949,15 +3946,12 @@ public abstract class DataSetsControllerPostQueryTests(TestApplicationFactory te
                 dataSetId: dataSetVersion.DataSetId,
                 request: request
             );
-            
-            // Add a slight delay as the writing of the query details for analytics is non-blocking
-            // and could occur slightly after the query result is returned to the user.
-            Thread.Sleep(2000);
-
-            // Check that the folder for capturing queries for analytics was never created.
-            Assert.False(Directory.Exists(_analyticsPathResolver.PublicApiQueriesDirectoryPath()));
 
             response.AssertBadRequest();
+            
+            // Check that the folder for capturing queries for analytics was never created.
+            AnalyticsTestAssertions.AssertAnalyticsCallNotCaptured(
+                _analyticsPathResolver.PublicApiQueriesDirectoryPath());
         }
         
         [Fact]
@@ -4012,15 +4006,10 @@ public abstract class DataSetsControllerPostQueryTests(TestApplicationFactory te
             
             response.AssertOk<DataSetQueryPaginatedResultsViewModel>(useSystemJson: true);
             
-            // Add a slight delay as the writing of the query details for analytics is non-blocking
-            // and could occur slightly after the query result is returned to the user.
-            Thread.Sleep(2000);
-
-            var analyticsPath = _analyticsPathResolver.PublicApiQueriesDirectoryPath();
-            
             // Expect the successful call to have been omitted from analytics because it originates
             // from the Admin App.
-            Assert.False(Directory.Exists(analyticsPath));
+            AnalyticsTestAssertions.AssertAnalyticsCallNotCaptured(
+                _analyticsPathResolver.PublicApiQueriesDirectoryPath());
         }
         
         [Fact]
@@ -4143,15 +4132,10 @@ public abstract class DataSetsControllerPostQueryTests(TestApplicationFactory te
             // and so this 2nd page only displays the final single result of the 4.
             Assert.Single(viewModel.Results);
             
-            // Add a slight delay as the writing of the query details for analytics is non-blocking
-            // and could occur slightly after the query result is returned to the user.
-            Thread.Sleep(2000);
-
-            var publicApiQueriesPath = _analyticsPathResolver.PublicApiQueriesDirectoryPath();
-            
             // Expect the successful query not to have recorded its query for analytics, as this
             // feature was not enabled via appsettings.
-            Assert.False(Directory.Exists(publicApiQueriesPath));
+            AnalyticsTestAssertions.AssertAnalyticsCallNotCaptured(
+                _analyticsPathResolver.PublicApiQueriesDirectoryPath());
         }
     }
     

@@ -1,8 +1,12 @@
+using System.Diagnostics;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Requests;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Resources.DataFiles.AbsenceSchool;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using Newtonsoft.Json;
+using JsonSerializer = System.Text.Json.JsonSerializer;
+using JsonSerializerOptions = System.Text.Json.JsonSerializerOptions;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Analytics;
 
@@ -43,12 +47,10 @@ public static class AnalyticsTestAssertions
         string? expectedRequestedDataSetVersion,
         AnalyticsTheoryData.PreviewTokenSummary? expectedPreviewToken)
     {
-        // Add a slight delay as the writing of the analytics capture is non-blocking
-        // and could occur slightly after the Controller response is returned to the user.
-        Thread.Sleep(2000);
-
         // Expect the successful call to have been recorded for analytics.
-        Assert.True(Directory.Exists(expectedAnalyticsPath));
+        WaitForDirectoryToExist(expectedAnalyticsPath);
+        WaitForFilesToExistInDirectory(expectedAnalyticsPath);
+
         var analyticsFiles = Directory.GetFiles(expectedAnalyticsPath);
         var analyticFile = Assert.Single(analyticsFiles);
         var contents = await File.ReadAllTextAsync(analyticFile);
@@ -93,6 +95,40 @@ public static class AnalyticsTestAssertions
         }
     }
 
+    public static async Task AssertDataSetVersionQueryAnalyticsCaptured(
+        DataSetVersion dataSetVersion,
+        string expectedAnalyticsPath,
+        DataSetQueryRequest expectedRequest,
+        int expectedResultsCount,
+        int expectedTotalRows)
+    {
+        // Add a slight delay as the writing of the query details for analytics is non-blocking
+        // and could occur slightly after the query result is returned to the user.
+        WaitForDirectoryToExist(expectedAnalyticsPath);
+        WaitForFilesToExistInDirectory(expectedAnalyticsPath);
+
+        var queryFiles = Directory.GetFiles(expectedAnalyticsPath);
+        var queryFile = Assert.Single(queryFiles);
+        var contents = await File.ReadAllTextAsync(queryFile);
+        var capturedQuery = JsonSerializer.Deserialize<CaptureDataSetVersionQueryRequest>(contents, new JsonSerializerOptions
+        {
+            PropertyNameCaseInsensitive = true
+        });
+        
+        Assert.NotNull(capturedQuery);
+
+        capturedQuery.Query.AssertDeepEqualTo(expectedRequest);
+
+        Assert.Equal(capturedQuery.DataSetId, dataSetVersion.DataSetId);
+        Assert.Equal(capturedQuery.DataSetVersionId, dataSetVersion.Id);
+        Assert.Equal(expectedResultsCount, capturedQuery.ResultsCount);
+        Assert.Equal(expectedTotalRows, capturedQuery.TotalRowsCount);
+
+        capturedQuery.StartTime.AssertUtcNow(withinMillis: 5000);
+        capturedQuery.EndTime.AssertUtcNow(withinMillis: 5000);
+        Assert.True(capturedQuery.EndTime > capturedQuery.StartTime);
+    }
+
     public static void AssertAnalyticsCallNotCaptured(string expectedAnalyticsPath)
     {
         // Add a slight delay as the writing of the analytics capture is non-blocking
@@ -101,5 +137,47 @@ public static class AnalyticsTestAssertions
 
         // Expect that nothing was recorded for analytics.
         Assert.False(Directory.Exists(expectedAnalyticsPath));
+    }
+
+    // Allow waiting for a slight delay, as the writing of the analytics capture is non-blocking
+    // and could occur slightly after the Controller response is returned to the user.
+    private static void WaitForDirectoryToExist(string expectedPath, int timeoutMillis = 2000)
+    {
+        WaitForConditionToBeTrue(
+            conditionTest: () => Directory.Exists(expectedPath),
+            failureMessage: $"Directory {expectedPath} does not exist after {timeoutMillis} milliseconds",
+            timeoutMillis: timeoutMillis);
+    }
+    
+    // Allow waiting for a slight delay, as the writing of the analytics capture is non-blocking
+    // and could occur slightly after the Controller response is returned to the user.
+    private static void WaitForFilesToExistInDirectory(string expectedPath, int timeoutMillis = 2000)
+    {
+        WaitForConditionToBeTrue(
+            conditionTest: () => Directory.GetFiles(expectedPath).Length > 0,
+            failureMessage: $"Directory {expectedPath} does not exist after {timeoutMillis} milliseconds",
+            timeoutMillis: timeoutMillis);
+    }
+    
+    // Allow waiting for a slight delay, as the writing of the analytics capture is non-blocking
+    // and could occur slightly after the Controller response is returned to the user.
+    private static void WaitForConditionToBeTrue(
+        Func<bool> conditionTest,
+        string failureMessage,
+        int timeoutMillis = 2000)
+    {
+        var stopwatch = Stopwatch.StartNew();
+        
+        while (stopwatch.ElapsedMilliseconds <= timeoutMillis)
+        {
+            if (conditionTest())
+            {
+                return;
+            }
+            
+            Thread.Sleep(100);
+        }
+        
+        Assert.Fail(failureMessage);
     }
 }
