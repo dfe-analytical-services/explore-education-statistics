@@ -504,22 +504,9 @@ public class SignInControllerTests(TestApplicationFactory testApp) : Integration
         }
     }
 
-    private static List<IdentityRole> GetGlobalRoles()
-    {
-        return new List<IdentityRole>
-        {
-            new()
-            {
-                Id = "role-1",
-                Name = "Role 1",
-                NormalizedName = "ROLE 1"
-            },
-            new()
-            {
-                Id = "role-2",
-                Name = "Role 2",
-                NormalizedName = "ROLE 2"
-            }
-        };
-    }
+    private static List<IdentityRole> GetGlobalRoles() =>
+    [
+        new() { Id = "role-1", Name = "Role 1", NormalizedName = "ROLE 1" },
+        new() { Id = "role-2", Name = "Role 2", NormalizedName = "ROLE 2" }
+    ];
 }
