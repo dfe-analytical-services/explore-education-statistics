@@ -1,5 +1,5 @@
 {
-  "num_datasets": "1004 data sets",
+  "num_datasets": "1005 data sets",
   "themes": [
     {
       "publications": [
@@ -160,7 +160,8 @@
         "Multi-academy trust performance measures at key stage 2",
         "Multiplication tables check attainment",
         "Phonics screening check attainment",
-        "Provisional T Level results"
+        "Provisional T Level results",
+        "School counts by average Progress 8 scores for disadvantaged White British pupils"
       ],
       "theme_heading": "School and college outcomes and performance"
     },
