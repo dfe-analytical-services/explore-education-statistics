@@ -2816,10 +2816,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             timePeriodService.Setup(service => service.GetTimePeriods(replacementReleaseSubject.SubjectId))
                 .ReturnsAsync(new List<(int Year, TimeIdentifier TimeIdentifier)>());
             
-            var releaseVersionService = new Mock<IReleaseVersionService>(Strict);
-            releaseVersionService.Setup(service => service.RemoveDataFiles(releaseVersion.Id, originalFile.Id))
-                .ReturnsAsync(Unit.Instance);
-            
             var dataSetVersionMappingService = new Mock<IDataSetVersionMappingService>(Strict);
             dataSetVersionMappingService.Setup(service => service.GetMappingStatus(
                     It.IsAny<Guid>(),
@@ -2852,7 +2848,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     statisticsDbContext,
                     locationRepository: locationRepository.Object,
                     timePeriodService: timePeriodService.Object,
-                    releaseVersionService: releaseVersionService.Object,
                     dataSetVersionService: dataSetVersionService.Object,
                     featureFlags: options,
                     dataSetVersionMappingService: dataSetVersionMappingService.Object);
@@ -2869,9 +2864,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         locationRepository,
                         timePeriodService,
                         dataSetVersionService,
-                        releaseVersionService,
                         dataSetVersionMappingService);
-                    result.AssertRight();
                 }
                 else
                 {
@@ -2879,8 +2872,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         locationRepository,
                         timePeriodService,
                         dataSetVersionService);
-                    result.AssertBadRequest(ReplacementMustBeValid);
                 }
+                result.AssertBadRequest(ReplacementMustBeValid);
             }
         }
         [Fact]
