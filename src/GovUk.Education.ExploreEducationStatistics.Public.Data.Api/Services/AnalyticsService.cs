@@ -79,6 +79,8 @@ public class AnalyticsService(
     {
         try
         {
+            // Filter out any calls from analytics that originate from the EES service itself
+            // so that we're capturing only those made by public users.
             if (!IncludeAnalyticsCall())
             {
                 logger.LogDebug(
@@ -128,7 +130,8 @@ public class AnalyticsService(
     }
 
     /// <summary>
-    /// Filter out any calls from analytics that originate from the EES service itself.
+    /// Filter out any calls from analytics that originate from the EES service itself
+    /// so that we're capturing only those made by public users.
     /// </summary>
     private bool IncludeAnalyticsCall()
     {
