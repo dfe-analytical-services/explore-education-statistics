@@ -270,7 +270,7 @@ export default function ReleaseApiDataSetDetailsPage() {
     ? {
         publicationId: releaseVersion.publicationId,
         releaseVersionId: releaseVersion.id,
-        fileId: dataSet?.draftVersion?.originalFileId,
+        fileId: dataSet?.draftVersion?.originalFileId as string,
       }
     : undefined;
   const replaceTabRoute = replaceRouteParams
