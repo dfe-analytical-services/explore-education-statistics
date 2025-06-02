@@ -428,6 +428,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
 
             services.AddTransient<IReleaseDataFileService, ReleaseDataFileService>();
             services.AddTransient<IDataSetFileStorage, DataSetFileStorage>();
+            services.AddScoped<IDataSetScreenerClient, DataSetScreenerClient>();
             services.AddTransient<IDataGuidanceFileWriter, DataGuidanceFileWriter>();
             services.AddTransient<IReleaseFileService, ReleaseFileService>();
             services.AddTransient<IReleaseImageService, ReleaseImageService>();
