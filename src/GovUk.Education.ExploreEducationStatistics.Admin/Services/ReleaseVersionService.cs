@@ -793,10 +793,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 Guid apiDataSetId,
                 SemVersion? version)
             {
-                var dataSetVersion = await dataSetVersionRepository
-                    .GetDataSetVersion(apiDataSetId, version);
-
-                return !isReplacementEnabled && dataSetVersion.Status == DataSetVersionStatus.Published;
+                return !isReplacementEnabled && (await dataSetVersionRepository
+                    .GetDataSetVersion(apiDataSetId, version)).Status != DataSetVersionStatus.Published;
             }
         }
 
