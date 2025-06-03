@@ -32,6 +32,10 @@ param indexDefinitionUri string
 @description('Specifies the name of the indexer to create/update.')
 param indexerName string
 
+@description('Specifies a list of URIs that JavaScript code served from these origins will be allowed access to the index. To allow access to all origins, specify \'*\' as a single item.')
+@minLength(1)
+param indexCorsAllowedOrigins string[]
+
 @description('Specifies whether the indexer is disabled. Set this property if you want to create the indexer definition without immediately running it.')
 param indexerDisabled bool = false
 
@@ -74,7 +78,7 @@ resource deploymentScript 'Microsoft.Resources/deploymentScripts@2023-08-01' = {
   }
   properties: {
     azPowerShellVersion: '13.2'
-    arguments: '-searchServiceName \\"${searchService.name}\\" -indexDefinitionFilename \\"${indexDefinitionFilename}\\" -indexerName \\"${indexerName}\\" -indexerDisabled \\"${indexerDisabled}\\" -indexerScheduleInterval \\"${indexerScheduleInterval}\\" -dataSourceName \\"${dataSourceName}\\" -dataSourceType \\"${dataSourceType}\\" -dataSourceConnectionString \\"${dataSourceConnectionString}\\" -dataSourceContainerName \\"${dataSourceContainerName}\\" -dataSourceContainerQuery \\"${dataSourceContainerQuery}\\"'
+    arguments: '-searchServiceName ${searchService.name} -indexDefinitionFilename ${indexDefinitionFilename} -indexCorsAllowedOrigins ${join(indexCorsAllowedOrigins, ',')} -indexerName ${indexerName} -indexerDisabled ${indexerDisabled} -indexerScheduleInterval ${indexerScheduleInterval} -dataSourceName ${dataSourceName} -dataSourceType ${dataSourceType} -dataSourceConnectionString \\"${dataSourceConnectionString}\\" -dataSourceContainerName ${dataSourceContainerName} -dataSourceContainerQuery \\"${dataSourceContainerQuery}\\"'
     scriptContent: loadTextContent('../scripts/SetupSearchService.ps1')
     supportingScriptUris: [
       indexDefinitionUri
