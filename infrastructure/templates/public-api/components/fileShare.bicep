@@ -1,5 +1,4 @@
-import { responseTimeConfig } from 'alerts/dynamicAlertConfig.bicep'
-import { staticAverageLessThanHundred, staticMaxGreaterThanZero, staticAverageGreaterThanZero, capacity } from 'alerts/staticAlertConfig.bicep'
+import { staticAverageLessThanHundred, staticAverageGreaterThanZero } from 'alerts/staticAlertConfig.bicep'
 import { AllValuesForDimension } from 'alerts/types.bicep'
 import { percentage, gbsToBytes } from '../functions.bicep'
 
@@ -10,7 +9,7 @@ param fileShareQuotaGbs int = 6
 param fileShareName string
 
 @description('Type of the file share access tier')
-@allowed(['Cool','Hot','Premium','TransactionOptimized'])
+@allowed(['Cool', 'Hot', 'Premium', 'TransactionOptimized'])
 param fileShareAccessTier string = 'Hot'
 
 @description('Name of the Storage Account')
@@ -37,7 +36,7 @@ resource fileService 'Microsoft.Storage/storageAccounts/fileServices@2023-05-01'
 }
 
 resource fileShare 'Microsoft.Storage/storageAccounts/fileServices/shares@2023-05-01' = {
-  name:  fileShareName
+  name: fileShareName
   parent: fileService
   properties: {
     accessTier: fileShareAccessTier
