@@ -4,6 +4,7 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Options;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Strategies;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Extensions;
 
@@ -41,6 +42,9 @@ public static class AnalyticsServiceCollectionExtensions
         services.AddTransient<IAnalyticsWriteStrategy, AnalyticsWriteDataSetCallsStrategy>();
         services.AddTransient<IAnalyticsWriteStrategy, AnalyticsWriteDataSetVersionCallsStrategy>();
         services.AddTransient<IAnalyticsWriteStrategy, AnalyticsWritePublicApiQueryStrategy>();
+        services.AddTransient(
+            typeof(ICommonAnalyticsWriteStrategyWorkflow<>),
+            typeof(CommonAnalyticsWriteStrategyWorkflow<>));
         return services;
     }
 }

@@ -126,8 +126,9 @@ public abstract class AnalyticsWriteDataSetVersionCallsStrategyTests
         {
             return new AnalyticsWriteDataSetVersionCallsStrategy(
                 pathResolver,
-                dateTimeProvider ?? new DateTimeProvider(),
-                Mock.Of<ILogger<AnalyticsWriteDataSetVersionCallsStrategy>>());
+                new CommonAnalyticsWriteStrategyWorkflow<CaptureDataSetVersionCallRequest>(
+                    dateTimeProvider: dateTimeProvider ?? new DateTimeProvider(),
+                    Mock.Of<ILogger<CommonAnalyticsWriteStrategyWorkflow<CaptureDataSetVersionCallRequest>>>()));
         }
     }
 }
