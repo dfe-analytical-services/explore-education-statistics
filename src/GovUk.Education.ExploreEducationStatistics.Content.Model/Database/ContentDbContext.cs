@@ -65,6 +65,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
         public virtual DbSet<DataBlock> DataBlocks { get; set; }
         public virtual DbSet<DataBlockParent> DataBlockParents { get; set; }
         public virtual DbSet<DataBlockVersion> DataBlockVersions { get; set; }
+        public virtual DbSet<DataSetUpload> DataSetUploads { get; set; }
         public virtual DbSet<DataImport> DataImports { get; set; }
         public virtual DbSet<DataImportError> DataImportErrors { get; set; }
         public virtual DbSet<HtmlBlock> HtmlBlocks { get; set; }
@@ -100,6 +101,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             ConfigureComment(modelBuilder);
+            ConfigureDataSetUpload(modelBuilder);
             ConfigureDataImport(modelBuilder);
             ConfigureDataImportError(modelBuilder);
             ConfigureMethodology(modelBuilder);
@@ -155,6 +157,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 .HasConversion(
                     v => v,
                     v => v.HasValue ? DateTime.SpecifyKind(v.Value, DateTimeKind.Utc) : null);
+        }
+
+        private static void ConfigureDataSetUpload(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<DataSetUpload>()
+                .Property(upload => upload.Status)
+                .HasConversion(new EnumToStringConverter<DataSetUploadStatus>());
         }
 
         private static void ConfigureDataImport(ModelBuilder modelBuilder)
