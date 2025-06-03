@@ -435,6 +435,7 @@ public class DataSetFileService(
         ReleaseFile releaseFile, CancellationToken cancellationToken)
     {
         var subjectId = releaseFile.File.SubjectId;
+
         if (!subjectId.HasValue)
         {
             logger.LogWarning("ReleaseFile does not have a SubjectId set. ReleaseId: {ReleaseVersionId} FileId: {FileId}",
@@ -442,14 +443,24 @@ public class DataSetFileService(
             return;
         }
 
-        await analyticsManager.Add(new CaptureCsvDownloadRequest(
-            releaseFile.ReleaseVersion.Release.Publication.Title,
-            releaseFile.ReleaseVersionId,
-            releaseFile.ReleaseVersion.Release.Title,
-            releaseFile.ReleaseVersion.Release.Label,
-            subjectId.Value,
-            releaseFile.Name ?? "No data set title"
-        ), cancellationToken);
+        try
+        {
+            await analyticsManager.Add(new CaptureCsvDownloadRequest(
+                releaseFile.ReleaseVersion.Release.Publication.Title,
+                releaseFile.ReleaseVersionId,
+                releaseFile.ReleaseVersion.Release.Title,
+                releaseFile.ReleaseVersion.Release.Label,
+                subjectId.Value,
+                releaseFile.Name ?? "No data set title"
+            ), cancellationToken);
+        }
+        catch (Exception e)
+        {
+            logger.LogError(
+                exception: e,
+                message: "Error whilst capturing csv download analytics for subject {SubjectId}",
+                subjectId);
+        }
     }
 }
 
