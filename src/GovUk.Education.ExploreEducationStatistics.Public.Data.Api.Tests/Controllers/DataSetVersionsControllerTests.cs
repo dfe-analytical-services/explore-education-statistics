@@ -15,7 +15,6 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Utils;
-using GovUk.Education.ExploreEducationStatistics.Public.Data.Utils.Requests;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.WebUtilities;
 using Moq;
@@ -854,8 +853,7 @@ public abstract class DataSetVersionsControllerTests(TestApplicationFactory test
             var response = await GetDataSetVersion(
                 dataSetId: dataSet.Id,
                 dataSetVersion: dataSetVersion.PublicVersion,
-                additionalHeaders: new Dictionary<string, string> { { RequestHeaderNames.RequestSource, "EES" } } 
-            );
+                requestSource: "EES");
 
             response.AssertOk<DataSetVersionViewModel>(useSystemJson: true);
 
@@ -867,13 +865,13 @@ public abstract class DataSetVersionsControllerTests(TestApplicationFactory test
             Guid dataSetId,
             string dataSetVersion,
             Guid? previewTokenId = null,
-            Dictionary<string, string>? additionalHeaders = null,
+            string? requestSource = null,
             IContentApiClient? contentApiClient = null)
         {
             var client = BuildApp(contentApiClient)
                 .CreateClient()
                 .WithPreviewTokenHeader(previewTokenId)
-                .WithAdditionalHeaders(additionalHeaders);
+                .WithRequestSourceHeader(requestSource);
 
             var uri = new Uri($"{BaseUrl}/{dataSetId}/versions/{dataSetVersion}", UriKind.Relative);
 
@@ -2053,7 +2051,7 @@ public abstract class DataSetVersionsControllerTests(TestApplicationFactory test
                 var response = await GetDataSetVersionChanges(
                     dataSetId: dataSet.Id,
                     dataSetVersion: dataSetVersion.PublicVersion,
-                    additionalHeaders: new Dictionary<string, string> { { RequestHeaderNames.RequestSource, "EES" } });
+                    requestSource: "EES");
 
                 response.AssertOk<DataSetVersionChangesViewModel>(useSystemJson: true);
 
@@ -2068,13 +2066,13 @@ public abstract class DataSetVersionsControllerTests(TestApplicationFactory test
             IContentApiClient? contentApiClient = null,
             Guid? previewTokenId = null,
             ClaimsPrincipal? user = null,
-            Dictionary<string, string>? additionalHeaders = null)
+            string? requestSource = null)
         {
             var client = BuildApp(contentApiClient)
                 .WithUser(user)
                 .CreateClient()
                 .WithPreviewTokenHeader(previewTokenId)
-                .WithAdditionalHeaders(additionalHeaders);
+                .WithRequestSourceHeader(requestSource);
 
             var uri = new Uri($"{BaseUrl}/{dataSetId}/versions/{dataSetVersion}/changes", UriKind.Relative);
 

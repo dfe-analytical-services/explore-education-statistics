@@ -9,11 +9,26 @@ public static class HttpClientExtensions
         this HttpClient client,
         Guid? previewToken)
     {
-        if (previewToken != null)
+        return client.WithOptionalHeader(RequestHeaderNames.PreviewToken, previewToken?.ToString());
+    }
+    
+    public static HttpClient WithRequestSourceHeader(
+        this HttpClient client,
+        string? requestSource)
+    {
+        return client.WithOptionalHeader(RequestHeaderNames.RequestSource, requestSource);
+    }
+    
+    private static HttpClient WithOptionalHeader(
+        this HttpClient client,
+        string headerName,
+        string? headerValue)
+    {
+        if (headerValue != null)
         {
             client.WithAdditionalHeaders(new Dictionary<string, string>
             {
-                { RequestHeaderNames.PreviewToken, previewToken.Value.ToString() }
+                { headerName, headerValue }
             });
         }
 

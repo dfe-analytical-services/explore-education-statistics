@@ -4,5 +4,7 @@ public interface IAnalyticsPathResolver
 {
     string PublicApiQueriesDirectoryPath();
     
+    string PublicApiDataSetCallsDirectoryPath();
+    
     string PublicApiDataSetVersionCallsDirectoryPath();
 }

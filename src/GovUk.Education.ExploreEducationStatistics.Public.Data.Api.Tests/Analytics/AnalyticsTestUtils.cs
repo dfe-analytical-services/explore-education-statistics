@@ -2,7 +2,6 @@ using System.Diagnostics;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Requests;
-using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Resources.DataFiles.AbsenceSchool;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using Newtonsoft.Json;
 using JsonSerializer = System.Text.Json.JsonSerializer;
@@ -38,6 +37,44 @@ public static class AnalyticsTheoryData
 
 public static class AnalyticsTestAssertions
 {
+    public static async Task AssertDataSetAnalyticsCallCaptured(
+        DataSet dataSet,
+        DataSetCallType expectedType,
+        string expectedAnalyticsPath,
+        AnalyticsTheoryData.PreviewTokenSummary? expectedPreviewToken,
+        Guid? expectedPreviewTokenDataSetVersionId)
+    {
+        // Expect the successful call to have been recorded for analytics.
+        WaitForDirectoryToExist(expectedAnalyticsPath);
+        WaitForFilesToExistInDirectory(expectedAnalyticsPath);
+
+        var analyticsFiles = Directory.GetFiles(expectedAnalyticsPath);
+        var analyticFile = Assert.Single(analyticsFiles);
+        var contents = await File.ReadAllTextAsync(analyticFile);
+
+        var capturedCall = JsonConvert.DeserializeObject<CaptureDataSetCallRequest>(contents);
+
+        Assert.NotNull(capturedCall);
+        Assert.Equal(expectedType, capturedCall.Type);
+        Assert.Equal(dataSet.Id, capturedCall.DataSetId);
+        Assert.Equal(dataSet.Title, capturedCall.DataSetTitle);
+        capturedCall.StartTime.AssertUtcNow(withinMillis: 5000);
+
+        if (expectedPreviewToken == null)
+        {
+            Assert.Null(capturedCall.PreviewToken);
+        }
+        else
+        {
+            Assert.NotNull(capturedCall.PreviewToken);
+            Assert.Equal(expectedPreviewToken.Label, capturedCall.PreviewToken.Label);
+            Assert.Equal(expectedPreviewTokenDataSetVersionId, capturedCall.PreviewToken.DataSetVersionId);
+            Assert.Equal(expectedPreviewToken.Created.TruncateMicroseconds(),
+                capturedCall.PreviewToken.Created);
+            Assert.Equal(expectedPreviewToken.Expiry.TruncateMicroseconds(), capturedCall.PreviewToken.Expiry);
+        }
+    }
+    
     public static async Task AssertDataSetVersionAnalyticsCallCaptured(
         DataSet dataSet,
         DataSetVersion dataSetVersion,
