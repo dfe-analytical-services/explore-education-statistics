@@ -319,18 +319,40 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
                 dataSetName = releaseFiles[0].Name;
             }
 
-            await analyticsManager.Add(
-                new CaptureZipDownloadRequest
+            try
+            {
+                await analyticsManager.Add(
+                    new CaptureZipDownloadRequest
+                    {
+                        PublicationName = releaseVersion.Release.Publication.Title,
+                        ReleaseVersionId = releaseVersion.Id,
+                        ReleaseName = releaseVersion.Release.Title,
+                        ReleaseLabel = releaseVersion.Release.Label,
+                        FromPage = fromPage,
+                        SubjectId = subjectId,
+                        DataSetTitle = dataSetName,
+                    },
+                    cancellationToken);
+            }
+            catch (Exception e)
+            {
+                if (subjectId == null)
                 {
-                    PublicationName = releaseVersion.Release.Publication.Title,
-                    ReleaseVersionId = releaseVersion.Id,
-                    ReleaseName = releaseVersion.Release.Title,
-                    ReleaseLabel = releaseVersion.Release.Label,
-                    FromPage = fromPage,
-                    SubjectId = subjectId,
-                    DataSetTitle = dataSetName,
-                },
-                cancellationToken);
+                    logger.LogError(
+                        exception: e,
+                        message: "Error whilst capturing zip download analytics for releaseVersion {ReleaseVersion}",
+                        releaseVersion.Id);
+                }
+                else
+                {
+                    logger.LogError(
+                        exception: e,
+                        message: "Error whilst capturing zip download analytics for releaseVersion {ReleaseVersionId} and subject {SubjectId}",
+                        releaseVersion.Id,
+                        subjectId);
+
+                }
+            }
         }
     }
 }

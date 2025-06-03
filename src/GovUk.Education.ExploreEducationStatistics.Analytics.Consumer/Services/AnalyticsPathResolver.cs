@@ -86,4 +86,15 @@ public class AnalyticsPathResolver : IAnalyticsPathResolver
     {
         return Path.Combine(ReportsDirectoryPath(), "public", "zip-downloads");
     }
+
+    // PublicDataSetFileDownloads
+    public string PublicCsvDownloadsDirectoryPath()
+    {
+        return Path.Combine(_basePath, "public", "csv-downloads");
+    }
+
+    public string PublicCsvDownloadsReportsDirectoryPath()
+    {
+        return Path.Combine(ReportsDirectoryPath(), "public", "csv-downloads");
+    }
 }
