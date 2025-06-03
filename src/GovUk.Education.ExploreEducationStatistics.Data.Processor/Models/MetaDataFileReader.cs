@@ -96,7 +96,7 @@ public class MetaDataFileReader
         return indicatorRows
             .Select(row =>
             {
-                var indicatorGroup = indicatorGroups.GetValueOrDefault(row.IndicatorGrouping!)!;
+                var indicatorGroup = indicatorGroups[row.IndicatorGrouping!];
 
                 return (
                     indicator:

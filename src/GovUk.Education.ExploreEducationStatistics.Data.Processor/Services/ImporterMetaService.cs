@@ -147,7 +147,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             return indicatorRows
                 .Select(row =>
                 {
-                    var indicatorGroup = indicatorGroups.GetValueOrDefault(row.IndicatorGrouping!)!;
+                    var indicatorGroup = indicatorGroups[row.IndicatorGrouping!];
 
                     return (
                         indicator:
