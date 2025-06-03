@@ -111,18 +111,18 @@ function mapFile({ name, ...file }: DataFileInfo): DataFile {
 }
 
 const releaseDataFileService = {
-  getDataFiles(releaseId: string): Promise<DataFile[]> {
-    return client
-      .get<DataFileInfo[]>(`/release/${releaseId}/data`)
-      .then(response => {
-        const dataFiles = response.filter(file => file.metaFileName.length > 0);
-        return dataFiles.map(mapFile);
-      });
+  async getDataFiles(releaseId: string): Promise<DataFile[]> {
+    const response = await client.get<DataFileInfo[]>(
+      `/releaseVersions/${releaseId}/data`,
+    );
+    const dataFiles = response.filter(file => file.metaFileName.length > 0);
+    return dataFiles.map(mapFile);
   },
-  getDataFile(releaseId: string, fileId: string): Promise<DataFile> {
-    return client
-      .get<DataFileInfo>(`/release/${releaseId}/data/${fileId}`)
-      .then(mapFile);
+  async getDataFile(releaseId: string, fileId: string): Promise<DataFile> {
+    const result = await client.get<DataFileInfo>(
+      `/releaseVersions/${releaseId}/data/${fileId}`,
+    );
+    return mapFile(result);
   },
   getDataSetAccoutrementsSummary(
     releaseVersionId: string,
@@ -221,22 +221,22 @@ const releaseDataFileService = {
     dataSetUploadResults: DataSetUploadResult[],
   ): Promise<DataFile[]> {
     const files = await client.post<DataFileInfo[]>(
-      `/releases/${releaseId}/import-data-sets`,
+      `/releaseVersions/${releaseId}/import-data-sets`,
       dataSetUploadResults,
     );
 
     return files.map(file => mapFile(file));
   },
-  updateDataFilesOrder(
+  async updateDataFilesOrder(
     releaseId: string,
     order: string[],
   ): Promise<DataFile[]> {
-    return client
-      .put<DataFileInfo[]>(`/release/${releaseId}/data/order`, order)
-      .then(response => {
-        const dataFiles = response.filter(file => file.metaFileName.length > 0);
-        return dataFiles.map(mapFile);
-      });
+    const response = await client.put<DataFileInfo[]>(
+      `/release/${releaseId}/data/order`,
+      order,
+    );
+    const dataFiles = response.filter(file => file.metaFileName.length > 0);
+    return dataFiles.map(mapFile);
   },
   getDataFileImportStatus(
     releaseId: string,
@@ -258,9 +258,14 @@ const releaseDataFileService = {
   deleteDataFiles(releaseId: string, fileId: string): Promise<void> {
     return client.delete<void>(`/release/${releaseId}/data/${fileId}`);
   },
-  downloadFile(releaseId: string, id: string, fileName: string): Promise<void> {
-    return client
-      .get<Blob>(`/release/${releaseId}/file/${id}/download`, {
+  async downloadFile(
+    releaseId: string,
+    id: string,
+    fileName: string,
+  ): Promise<void> {
+    const response = await client.get<Blob>(
+      `/release/${releaseId}/file/${id}/download`,
+      {
         responseType: 'blob',
       })
       .then(response => downloadFile({ file: response, fileName }));
