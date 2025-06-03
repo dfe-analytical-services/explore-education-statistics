@@ -67,8 +67,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                 .HandleFailuresOrOk();
         }
 
-        // We intend to change this route, to make these endpoints more consistent, as per EES-5895
-        [HttpGet("release/{releaseVersionId:guid}/data/{fileId:guid}")]
+        [HttpGet("releaseVersions/{releaseVersionId:guid}/data/{fileId:guid}")]
         public async Task<ActionResult<DataFileInfo>> GetDataFileInfo(Guid releaseVersionId, Guid fileId)
         {
             return await _releaseDataFileService
@@ -76,8 +75,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                 .HandleFailuresOrOk();
         }
 
-        // We intend to change this route, to make these endpoints more consistent, as per EES-5895
-        [HttpGet("release/{releaseVersionId:guid}/data")]
+        [HttpGet("releaseVersions/{releaseVersionId:guid}/data")]
         public async Task<ActionResult<List<DataFileInfo>>> GetDataFileInfo(Guid releaseVersionId)
         {
             return await _releaseDataFileService
@@ -179,7 +177,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                 .HandleFailuresOrOk();
         }
 
-        [HttpPost("releases/{releaseVersionId:guid}/import-data-sets")]
+        [HttpPost("releaseVersions/{releaseVersionId:guid}/import-data-sets")]
         public async Task<ActionResult<List<DataFileInfo>>> ImportBulkZipDataSetsFromTempStorage(
             Guid releaseVersionId,
             List<DataSetUploadResultViewModel> dataSetFiles,
