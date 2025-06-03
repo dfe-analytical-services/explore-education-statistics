@@ -6,6 +6,7 @@ using System.Linq;
 using System.Net.Mime;
 using System.Threading;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Analytics.Common;
 using GovUk.Education.ExploreEducationStatistics.Analytics.Common.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
@@ -274,7 +275,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 var result = await service.ZipFilesToStream(
                     releaseVersionId: releaseVersion.Id,
                     outputStream: stream,
-                    fileIds: fileIds
+                    fileIds: fileIds,
+                    fromPage: AnalyticsFromPage.DataCatalogue
                 );
 
                 MockUtils.VerifyAllMocks(publicBlobStorageService, dataGuidanceFileWriter);
@@ -346,14 +348,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 );
 
             var captureRequest = new CaptureZipDownloadRequest
-            (
-                PublicationName: releaseVersion.Release.Publication.Title,
-                ReleaseVersionId: releaseVersion.Id,
-                ReleaseName: releaseVersion.Release.Title,
-                ReleaseLabel: releaseVersion.Release.Label,
-                SubjectId: releaseFile.File.SubjectId,
-                DataSetTitle: releaseFile.Name
-            );
+            {
+                PublicationName =  releaseVersion.Release.Publication.Title,
+                ReleaseVersionId =  releaseVersion.Id,
+                ReleaseName =  releaseVersion.Release.Title,
+                ReleaseLabel =  releaseVersion.Release.Label,
+                SubjectId =  releaseFile.File.SubjectId,
+                DataSetTitle =  releaseFile.Name,
+                FromPage =  AnalyticsFromPage.DataCatalogue,
+            };
             var analyticsManager = new Mock<IAnalyticsManager>(MockBehavior.Strict);
             analyticsManager.Setup(m => m.Add(
                     ItIs.DeepEqualTo(captureRequest),
@@ -376,7 +379,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 var result = await service.ZipFilesToStream(
                     releaseVersionId: releaseVersion.Id,
                     outputStream: stream,
-                    fileIds: [fileId]);
+                    fileIds: [fileId],
+                    fromPage: AnalyticsFromPage.DataCatalogue);
 
                 MockUtils.VerifyAllMocks(publicBlobStorageService, dataGuidanceFileWriter);
 
@@ -460,12 +464,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             var publicBlobStorageService = new Mock<IPublicBlobStorageService>(MockBehavior.Strict);
 
             var captureRequest = new CaptureZipDownloadRequest
-            (
-                PublicationName: releaseVersion.Release.Publication.Title,
-                ReleaseVersionId: releaseVersion.Id,
-                ReleaseName: releaseVersion.Release.Title,
-                ReleaseLabel: releaseVersion.Release.Label
-            );
+            {
+                PublicationName = releaseVersion.Release.Publication.Title,
+                ReleaseVersionId = releaseVersion.Id,
+                ReleaseName = releaseVersion.Release.Title,
+                ReleaseLabel = releaseVersion.Release.Label,
+                FromPage = AnalyticsFromPage.ReleaseUsefulInfo,
+            };
             var analyticsManager = new Mock<IAnalyticsManager>(MockBehavior.Strict);
             analyticsManager.Setup(m => m.Add(
                     ItIs.DeepEqualTo(captureRequest),
@@ -484,6 +489,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 var result = await service.ZipFilesToStream(
                     releaseVersionId: releaseVersion.Id,
                     outputStream: stream,
+                    fromPage: AnalyticsFromPage.ReleaseUsefulInfo,
                     fileIds: fileIds
                 );
 
@@ -533,12 +539,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             publicBlobStorageService.SetupCheckBlobExists(PublicReleaseFiles, releaseFile.PublicPath(), false);
 
             var request = new CaptureZipDownloadRequest
-            (
-                PublicationName: releaseVersion.Release.Publication.Title,
-                ReleaseVersionId: releaseVersion.Id,
-                ReleaseName: releaseVersion.Release.Title,
-                ReleaseLabel: releaseVersion.Release.Label
-            );
+            {
+                PublicationName =  releaseVersion.Release.Publication.Title,
+                ReleaseVersionId =  releaseVersion.Id,
+                ReleaseName =  releaseVersion.Release.Title,
+                ReleaseLabel =  releaseVersion.Release.Label,
+                FromPage = AnalyticsFromPage.DataCatalogue,
+            };
             var analyticsManager = new Mock<IAnalyticsManager>(MockBehavior.Strict);
             analyticsManager.Setup(m => m.Add(
                     ItIs.DeepEqualTo(request),
@@ -555,6 +562,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 var result = await service.ZipFilesToStream(
                     releaseVersionId: releaseVersion.Id,
                     outputStream: stream,
+                    fromPage: AnalyticsFromPage.DataCatalogue,
                     fileIds: [releaseFile.FileId]
                 );
 
@@ -614,12 +622,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             var publicBlobStorageService = new Mock<IPublicBlobStorageService>(MockBehavior.Strict);
 
             var request = new CaptureZipDownloadRequest
-            (
-                PublicationName: releaseVersion.Release.Publication.Title,
-                ReleaseVersionId: releaseVersion.Id,
-                ReleaseName: releaseVersion.Release.Title,
-                ReleaseLabel: releaseVersion.Release.Label
-            );
+            {
+                PublicationName = releaseVersion.Release.Publication.Title,
+                ReleaseVersionId = releaseVersion.Id,
+                ReleaseName = releaseVersion.Release.Title,
+                ReleaseLabel = releaseVersion.Release.Label,
+                FromPage = AnalyticsFromPage.ReleaseDownloads,
+            };
             var analyticsManager = new Mock<IAnalyticsManager>(MockBehavior.Strict);
             analyticsManager.Setup(m => m.Add(
                     ItIs.DeepEqualTo(request),
@@ -638,6 +647,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 var result = await service.ZipFilesToStream(
                     releaseVersionId: releaseVersion.Id,
                     outputStream: stream,
+                    fromPage: AnalyticsFromPage.ReleaseDownloads,
                     fileIds: fileIds
                 );
 
@@ -672,12 +682,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             var publicBlobStorageService = new Mock<IPublicBlobStorageService>(MockBehavior.Strict);
 
             var request = new CaptureZipDownloadRequest
-            (
-                PublicationName: releaseVersion.Release.Publication.Title,
-                ReleaseVersionId: releaseVersion.Id,
-                ReleaseName: releaseVersion.Release.Title,
-                ReleaseLabel: releaseVersion.Release.Label
-            );
+            {
+                PublicationName = releaseVersion.Release.Publication.Title,
+                ReleaseVersionId = releaseVersion.Id,
+                ReleaseName = releaseVersion.Release.Title,
+                ReleaseLabel = releaseVersion.Release.Label,
+                FromPage = AnalyticsFromPage.ReleaseUsefulInfo,
+            };
             var analyticsManager = new Mock<IAnalyticsManager>(MockBehavior.Strict);
             analyticsManager.Setup(m => m.Add(
                     ItIs.DeepEqualTo(request),
@@ -692,7 +703,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     analyticsManager: analyticsManager.Object);
 
                 var fileIds = ListOf(Guid.NewGuid(), Guid.NewGuid());
-                var result = await service.ZipFilesToStream(releaseVersion.Id, stream, fileIds);
+                var result = await service.ZipFilesToStream(
+                    releaseVersion.Id,
+                    stream,
+                    AnalyticsFromPage.ReleaseUsefulInfo,
+                    fileIds);
 
                 MockUtils.VerifyAllMocks(publicBlobStorageService);
 
@@ -785,6 +800,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 var result = await service.ZipFilesToStream(
                     releaseVersionId: releaseVersion.Id,
                     outputStream: stream,
+                    fromPage: AnalyticsFromPage.DataCatalogue,
                     fileIds: fileIds,
                     cancellationToken: tokenSource.Token
                 );
@@ -888,12 +904,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 );
 
             var request = new CaptureZipDownloadRequest
-            (
-                PublicationName: releaseVersion.Release.Publication.Title,
-                ReleaseVersionId: releaseVersion.Id,
-                ReleaseName: releaseVersion.Release.Title,
-                ReleaseLabel: releaseVersion.Release.Label
-            );
+            {
+                PublicationName = releaseVersion.Release.Publication.Title,
+                ReleaseVersionId = releaseVersion.Id,
+                ReleaseName = releaseVersion.Release.Title,
+                ReleaseLabel = releaseVersion.Release.Label,
+                FromPage = AnalyticsFromPage.ReleaseDownloads,
+            };
             var analyticsManager = new Mock<IAnalyticsManager>(MockBehavior.Strict);
             analyticsManager.Setup(m => m.Add(
                     ItIs.DeepEqualTo(request),
@@ -913,6 +930,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
                 var result = await service.ZipFilesToStream(
                     releaseVersionId: releaseVersion.Id,
+                    fromPage: AnalyticsFromPage.ReleaseDownloads,
                     outputStream: stream
                 );
 
@@ -973,12 +991,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 .SetupDownloadToStream(PublicReleaseFiles, allFilesZipPath, "Test cached all files zip");
 
             var request = new CaptureZipDownloadRequest
-            (
-                PublicationName: releaseVersion.Release.Publication.Title,
-                ReleaseVersionId: releaseVersion.Id,
-                ReleaseName: releaseVersion.Release.Title,
-                ReleaseLabel: releaseVersion.Release.Label
-            );
+            {
+                PublicationName = releaseVersion.Release.Publication.Title,
+                ReleaseVersionId = releaseVersion.Id,
+                ReleaseName = releaseVersion.Release.Title,
+                ReleaseLabel = releaseVersion.Release.Label,
+                FromPage = AnalyticsFromPage.DataCatalogue,
+            };
             var analyticsManager = new Mock<IAnalyticsManager>(MockBehavior.Strict);
             analyticsManager.Setup(m => m.Add(
                     ItIs.DeepEqualTo(request),
@@ -997,6 +1016,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
                 var result = await service.ZipFilesToStream(
                     releaseVersionId: releaseVersion.Id,
+                    fromPage: AnalyticsFromPage.DataCatalogue,
                     outputStream: stream
                 );
 
@@ -1077,12 +1097,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 .Returns(Task.CompletedTask);
 
             var request = new CaptureZipDownloadRequest
-            (
-                PublicationName: releaseVersion.Release.Publication.Title,
-                ReleaseVersionId: releaseVersion.Id,
-                ReleaseName: releaseVersion.Release.Title,
-                ReleaseLabel: releaseVersion.Release.Label
-            );
+            {
+                PublicationName = releaseVersion.Release.Publication.Title,
+                ReleaseVersionId = releaseVersion.Id,
+                ReleaseName = releaseVersion.Release.Title,
+                ReleaseLabel = releaseVersion.Release.Label,
+                FromPage = AnalyticsFromPage.ReleaseUsefulInfo,
+            };
 
             var analyticsManager = new Mock<IAnalyticsManager>(MockBehavior.Strict);
             analyticsManager.Setup(m => m.Add(
@@ -1102,6 +1123,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
                 var result = await service.ZipFilesToStream(
                     releaseVersionId: releaseVersion.Id,
+                    fromPage: AnalyticsFromPage.ReleaseUsefulInfo,
                     outputStream: stream
                 );
 
