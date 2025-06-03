@@ -266,7 +266,7 @@ export default function ReleaseApiDataSetDetailsPage() {
     (dataSet?.draftVersion?.status === 'Draft' ||
       dataSet?.draftVersion?.status === 'Mapping');
 
-  const replaceRouteParams = dataSet?.draftVersion?.file?.id
+  const replaceRouteParams = dataSet?.draftVersion?.originalFileId
     ? {
         publicationId: releaseVersion.publicationId,
         releaseVersionId: releaseVersion.id,
