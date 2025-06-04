@@ -135,17 +135,24 @@ public abstract class ReleaseVersionServiceTests
             }
         }
 
-        [Theory]
-        [InlineData(true)]
-        [InlineData(false)]
-        public async Task FileIsLinkedToPublicApiDataSet_InvalidPlan(bool enableReplacementOfPublicApiDataSets)
+        [Theory] 
+        [InlineData(DataSetVersionStatus.Mapping, true, true)] 
+        [InlineData(DataSetVersionStatus.Draft, true, true)] 
+        [InlineData(DataSetVersionStatus.Mapping, false, false)]
+        [InlineData(DataSetVersionStatus.Published, true, false)] 
+        [InlineData(DataSetVersionStatus.Published, false, false)]
+        [InlineData(DataSetVersionStatus.Draft, false, false)]
+        public async Task FileIsLinkedToPublicApiDataSet_DataSetVersionStatusCondition_PlanValidity(
+            DataSetVersionStatus dataSetVersionStatus, 
+            bool enableReplacementOfPublicApiDataSets,
+            bool expected)
         {
-            //TODO: EES-5996 This test will be redundant once the functionality is in place do replace data set versions. 
             DataSet dataSet = _dataFixture
                 .DefaultDataSet();
 
             DataSetVersion dataSetVersion = _dataFixture
                 .DefaultDataSetVersion()
+                .WithStatus(dataSetVersionStatus)
                 .WithDataSet(dataSet);
 
             ReleaseVersion releaseVersion = _dataFixture
@@ -229,8 +236,8 @@ public abstract class ReleaseVersionServiceTests
                 Assert.Equal(dataSetVersion.Id, deleteDataFilePlan.ApiDataSetVersionPlan.Id);
                 Assert.Equal(dataSetVersion.PublicVersion, deleteDataFilePlan.ApiDataSetVersionPlan.Version);
                 Assert.Equal(dataSetVersion.Status, deleteDataFilePlan.ApiDataSetVersionPlan.Status);
-                Assert.Equal(deleteDataFilePlan.ApiDataSetVersionPlan.Valid, enableReplacementOfPublicApiDataSets);
-                Assert.Equal(deleteDataFilePlan.Valid, enableReplacementOfPublicApiDataSets);
+                Assert.Equal(deleteDataFilePlan.ApiDataSetVersionPlan.Valid, expected);
+                Assert.Equal(deleteDataFilePlan.Valid, expected);
             }
         }
     }
