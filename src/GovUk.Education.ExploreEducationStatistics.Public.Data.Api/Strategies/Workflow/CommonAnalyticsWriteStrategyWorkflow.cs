@@ -3,7 +3,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using Newtonsoft.Json;
 
-namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Strategies;
+namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Strategies.Workflow;
 
 public interface ICommonAnalyticsWriteStrategyWorkflow<TAnalyticsRequest>
     where TAnalyticsRequest : IAnalyticsCaptureRequestBase

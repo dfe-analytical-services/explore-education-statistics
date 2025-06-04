@@ -1,4 +1,3 @@
-using GovUk.Education.ExploreEducationStatistics.Analytics.Consumer.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Analytics.Consumer.Services.Workflow;
 using GovUk.Education.ExploreEducationStatistics.Analytics.Consumer.Tests.Services.Workflow.MockBuilders;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
@@ -18,14 +17,14 @@ public abstract class ProcessRequestFilesWorkflowTests
         private static readonly string FailuresFolder = Path.Combine(SourceFolder, "failures");
         
         private readonly FileAccessorMockBuilder _fileAccessorMockBuilder;
-        private readonly WorkflowActorMockBuilder<IRequestFileProcessor> _workflowActorMockBuilder;
+        private readonly WorkflowActorMockBuilder _workflowActorMockBuilder;
         private readonly FileAccessorMockBuilder.Asserter _fileAccessorAsserter;
-        private readonly WorkflowActorMockBuilder<IRequestFileProcessor>.Asserter _workflowActorAsserter;
+        private readonly WorkflowActorMockBuilder.Asserter _workflowActorAsserter;
 
         public ProcessTests()
         {
             _fileAccessorMockBuilder = new FileAccessorMockBuilder();
-            _workflowActorMockBuilder = new WorkflowActorMockBuilder<IRequestFileProcessor>();
+            _workflowActorMockBuilder = new WorkflowActorMockBuilder();
             _fileAccessorAsserter = _fileAccessorMockBuilder.Assert;
             _workflowActorAsserter = _workflowActorMockBuilder.Assert;
         }
@@ -37,11 +36,9 @@ public abstract class ProcessRequestFilesWorkflowTests
                 .WhereDirectoryDoesNotExist(SourceFolder)
                 .Build();
 
-            var workflow = BuildWorkflow(
-                actor: _workflowActorMockBuilder.Build(),
-                fileAccessor: fileAccessor);
+            var workflow = BuildWorkflow(fileAccessor: fileAccessor);
 
-            await workflow.Process();
+            await workflow.Process(_workflowActorMockBuilder.Build());
             
             // Ensure no reports were generated or reports folder created
             // because no source folder existed.
@@ -56,11 +53,9 @@ public abstract class ProcessRequestFilesWorkflowTests
                 .WhereFileListForDirectoryIs(SourceFolder, [])
                 .Build();
             
-            var workflow = BuildWorkflow(
-                actor: _workflowActorMockBuilder.Build(),
-                fileAccessor: fileAccessor);
-            
-            await workflow.Process();
+            var workflow = BuildWorkflow(fileAccessor: fileAccessor);
+
+            await workflow.Process(_workflowActorMockBuilder.Build());
             
             // Ensure no reports were generated or reports folder created
             // because no source files existed.
@@ -108,11 +103,10 @@ public abstract class ProcessRequestFilesWorkflowTests
                     reportsFilenamePrefix: "20220316-120102");
             
             var workflow = BuildWorkflow(
-                actor: _workflowActorMockBuilder.Build(),
                 fileAccessor: _fileAccessorMockBuilder.Build(),
                 dateTimeProvider: new DateTimeProvider(DateTime.Parse("2022-03-16T12:01:02Z")));
 
-            await workflow.Process();
+            await workflow.Process(_workflowActorMockBuilder.Build());
 
             _fileAccessorAsserter
                 .DirectoryExistsCalledFor(SourceFolder)
@@ -157,10 +151,10 @@ public abstract class ProcessRequestFilesWorkflowTests
                 .WhereDuckDbInitialisedWithErrors();
 
             var workflow = BuildWorkflow(
-                actor: _workflowActorMockBuilder.Build(),
                 fileAccessor: _fileAccessorMockBuilder.Build());
 
-            await Assert.ThrowsAsync<ArgumentException>(workflow.Process);
+            await Assert.ThrowsAsync<ArgumentException>(() => 
+                workflow.Process(_workflowActorMockBuilder.Build()));
 
             _fileAccessorAsserter
                 .DirectoryExistsCalledFor(SourceFolder)
@@ -222,11 +216,10 @@ public abstract class ProcessRequestFilesWorkflowTests
                     reportsFilenamePrefix: "20220316-120102");
             
             var workflow = BuildWorkflow(
-                actor: _workflowActorMockBuilder.Build(),
                 fileAccessor: _fileAccessorMockBuilder.Build(),
                 dateTimeProvider: new DateTimeProvider(DateTime.Parse("2022-03-16T12:01:02Z")));
 
-            await workflow.Process();
+            await workflow.Process(_workflowActorMockBuilder.Build());
 
             _fileAccessorAsserter
                 .DirectoryExistsCalledFor(SourceFolder)
@@ -304,10 +297,9 @@ public abstract class ProcessRequestFilesWorkflowTests
                 .WhereDirectoryIsDeleted(ProcessingFolder);
             
             var workflow = BuildWorkflow(
-                actor: _workflowActorMockBuilder.Build(),
                 fileAccessor: _fileAccessorMockBuilder.Build());
 
-            await workflow.Process();
+            await workflow.Process(_workflowActorMockBuilder.Build());
 
             _fileAccessorAsserter
                 .DirectoryExistsCalledFor(SourceFolder)
@@ -377,11 +369,11 @@ public abstract class ProcessRequestFilesWorkflowTests
                     reportsFilenamePrefix: "20220316-120102");
             
             var workflow = BuildWorkflow(
-                actor: _workflowActorMockBuilder.Build(),
                 fileAccessor: _fileAccessorMockBuilder.Build(),
                 dateTimeProvider: new DateTimeProvider(DateTime.Parse("2022-03-16T12:01:02Z")));
 
-            await Assert.ThrowsAsync<ArgumentException>(workflow.Process);
+            await Assert.ThrowsAsync<ArgumentException>(() => 
+                workflow.Process(_workflowActorMockBuilder.Build()));
 
             _fileAccessorAsserter
                 .DirectoryExistsCalledFor(SourceFolder)
@@ -411,16 +403,12 @@ public abstract class ProcessRequestFilesWorkflowTests
         }
     }
 
-    private ProcessRequestFilesWorkflow<IRequestFileProcessor> BuildWorkflow(
-        IWorkflowActor<IRequestFileProcessor> actor,
+    private ProcessRequestFilesWorkflow BuildWorkflow(
         IFileAccessor fileAccessor,
         DateTimeProvider? dateTimeProvider = null)
     {
         return new(
-            sourceDirectory: "source",
-            reportsDirectory: "reports",
-            actor: actor,
-            Mock.Of<ILogger<IRequestFileProcessor>>(),
+            Mock.Of<ILogger<ProcessRequestFilesWorkflow>>(),
             dateTimeProvider: dateTimeProvider ?? new DateTimeProvider(),
             fileAccessor: fileAccessor);
     }
