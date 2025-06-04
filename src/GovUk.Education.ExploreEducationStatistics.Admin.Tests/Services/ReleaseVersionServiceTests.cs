@@ -582,15 +582,20 @@ public abstract class ReleaseVersionServiceTests
         }
 
         [Theory]
-        [InlineData(true)]
-        [InlineData(false)]
-        public async Task FileIsLinkedToPublicApiDataSet_ValidationProblem(bool enableReplacementOfPublicApiDataSets)
+        [InlineData(DataSetVersionStatus.Draft, true, true)]
+        [InlineData(DataSetVersionStatus.Draft, false, false)]
+        [InlineData(DataSetVersionStatus.Mapping, true, true)]
+        [InlineData(DataSetVersionStatus.Mapping, false, true)]
+        [InlineData(DataSetVersionStatus.Published, false, false)]
+        [InlineData(DataSetVersionStatus.Published, true, false)]
+        public async Task FileIsLinkedToPublicApiDataSet_ValidationProblem(DataSetVersionStatus dataSetVersionStatus, bool enableReplacementOfPublicApiDataSets, bool expected)
         {
             DataSet dataSet = _dataFixture
                 .DefaultDataSet();
 
             DataSetVersion dataSetVersion = _dataFixture
                 .DefaultDataSetVersion()
+                .WithStatus(dataSetVersionStatus)
                 .WithDataSet(dataSet);
             
             ReleaseVersion releaseVersion = _dataFixture
@@ -654,21 +659,24 @@ public abstract class ReleaseVersionServiceTests
                     releaseFile.PublicApiDataSetVersion!,
                     It.IsAny<CancellationToken>()))
                 .ReturnsAsync(dataSetVersion);
-            if (enableReplacementOfPublicApiDataSets)
+            
+            var shouldAllowRemovalOfDataFiles = enableReplacementOfPublicApiDataSets && dataSetVersionStatus != DataSetVersionStatus.Published;
+            
+            if (shouldAllowRemovalOfDataFiles)
             {
                 dataSetVersionService.Setup(service => service.DeleteVersion(
                         It.IsAny<Guid>(),
                         It.IsAny<CancellationToken>()))
-                    .ReturnsAsync(Unit.Instance);
-                
+                    .ReturnsAsync(Unit.Instance);     
+                    
                 var footnote = new Footnote { Id = Guid.NewGuid() };
                 footnoteRepository.Setup(service => service.GetFootnotes(releaseVersion.Id, subject.Id))
                     .ReturnsAsync([footnote]);
-                
+
                 dataBlockService.Setup(service =>
                         service.GetDeletePlan(releaseVersion.Id, It.Is<Subject>(s => s.Id == subject.Id)))
                     .ReturnsAsync(deleteDataBlockPlan);
-                
+
                 dataBlockService.Setup(service =>
                         service.DeleteDataBlocks(It.IsAny<DeleteDataBlockPlanViewModel>()))
                     .ReturnsAsync(Unit.Instance);
@@ -694,7 +702,7 @@ public abstract class ReleaseVersionServiceTests
                     fileId: file.Id);
 
                 VerifyAllMocks(dataImportService, dataSetVersionService, footnoteRepository, dataBlockService);
-                if (enableReplacementOfPublicApiDataSets)
+                if (shouldAllowRemovalOfDataFiles)
                 {
                     result.AssertRight();
                 }
