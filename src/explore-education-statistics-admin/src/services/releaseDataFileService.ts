@@ -62,13 +62,12 @@ export type UploadZipDataFileRequest = {
 };
 
 export type DataSetUploadResult = {
-  title: string;
+  id: string;
+  dataSetTitle: string;
   dataFileName: string;
-  dataFileId: string;
-  dataFileSize: number;
   metaFileName: string;
-  metaFileId: string;
-  metaFileSize: number;
+  status: string;
+  screenerResult: object | undefined;
   replacingFileId?: string;
 };
 
@@ -218,11 +217,11 @@ const releaseDataFileService = {
   },
   async importDataSets(
     releaseId: string,
-    dataSetUploadResults: DataSetUploadResult[],
+    dataSetUploadIds: string[],
   ): Promise<DataFile[]> {
     const files = await client.post<DataFileInfo[]>(
       `/releaseVersions/${releaseId}/import-data-sets`,
-      dataSetUploadResults,
+      dataSetUploadIds,
     );
 
     return files.map(file => mapFile(file));

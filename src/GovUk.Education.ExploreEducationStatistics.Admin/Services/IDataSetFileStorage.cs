@@ -1,6 +1,6 @@
 #nullable enable
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
-using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using System;
 using System.Collections.Generic;
@@ -36,7 +36,7 @@ public interface IDataSetFileStorage
     /// The data sets are uploaded to temporary storage in the first instance. Once the upload has been manually confirmed, the files are then moved to permanent storage.
     /// </remarks>
     /// <returns>A summary of each data set.</returns>
-    Task<List<DataSetUploadResultViewModel>> UploadDataSetsToTemporaryStorage(
+    Task<List<DataSetUpload>> UploadDataSetsToTemporaryStorage(
         Guid releaseVersionId,
         List<DataSet> dataSets,
         CancellationToken cancellationToken);
@@ -55,6 +55,11 @@ public interface IDataSetFileStorage
     /// <returns>A collection of the entities which represent the data set files.</returns>
     Task<List<ReleaseFile>> MoveDataSetsToPermanentStorage(
         Guid releaseVersionId,
-        List<DataSetUploadResultViewModel> dataSets,
+        List<DataSetUpload> dataSetUploads,
+        CancellationToken cancellationToken);
+
+    Task AddScreenerResultToUpload(
+        Guid dataSetUploadId,
+        DataSetScreenerResult screenerResult,
         CancellationToken cancellationToken);
 }

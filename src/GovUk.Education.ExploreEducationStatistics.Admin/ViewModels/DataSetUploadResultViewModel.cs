@@ -1,9 +1,10 @@
 #nullable enable
-using GovUk.Education.ExploreEducationStatistics.Admin.Models;
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using System;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 
+// TODO: Remove?
 public record DataSetUploadResultViewModel
 {
     public string Title { get; set; } = string.Empty;

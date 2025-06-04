@@ -70,10 +70,10 @@ export default function ReleaseDataUploadsSection({
   );
 
   const confirmDataSetImport = useCallback(
-    async (dataSetUploadResults: DataSetUploadResult[]) => {
+    async (dataSetUploadIds: string[]) => {
       await releaseDataFileService.importDataSets(
         releaseVersionId,
-        dataSetUploadResults,
+        dataSetUploadIds,
       );
 
       setUploadResults(undefined);

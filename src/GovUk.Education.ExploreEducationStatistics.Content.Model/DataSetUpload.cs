@@ -22,6 +22,8 @@ public record DataSetUpload : ICreatedTimestamp<DateTime>
 
     public required string DataFileName { get; init; }
 
+    public required long DataFileSizeInBytes { get; init; }
+
     public string DataFilePath
         => $"{FileStoragePathUtils.FilesPath(ReleaseVersionId, FileType.Data)}{DataFileId}";
 
@@ -29,11 +31,17 @@ public record DataSetUpload : ICreatedTimestamp<DateTime>
 
     public required string MetaFileName { get; init; }
 
+    public required long MetaFileSizeInBytes { get; init; }
+
     public string MetaFilePath
         => $"{FileStoragePathUtils.FilesPath(ReleaseVersionId, FileType.Metadata)}{MetaFileId}";
 
+    public Guid? ReplacingFileId { get; init; } // TODO: This value hasn't been mapped/implemented anywhere yet
+
     [JsonConverter(typeof(EnumToEnumValueJsonConverter<DataSetUploadStatus>))]
     public required DataSetUploadStatus Status { get; set; }
+
+    public DataSetScreenerResult? ScreenerResult { get; set; }
 
     public DateTime Created { get; set; }
 }

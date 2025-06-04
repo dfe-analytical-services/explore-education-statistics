@@ -205,6 +205,29 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         .ToList();
 
                     return await BuildDataFileViewModels(filesExcludingReplacements);
+                })
+                .OnSuccessCombineWith(async files
+                    => await dataSetUploadRepository.ListAll(releaseVersionId))
+                .OnSuccess(dataFilesAndUploads =>
+                {
+                    var (files, uploads) = dataFilesAndUploads;
+
+                    var filesFromUploads = new List<DataFileInfo>();
+                    foreach (var upload in uploads)
+                    {
+                        filesFromUploads.Add(new DataFileInfo
+                        {
+                            Id = upload.Id,
+                            FileName = upload.DataFileName,
+                            Name = upload.DataSetTitle,
+                            Size = "0kb", // TODO: Map the file size from elsewhere
+                            MetaFileName = upload.MetaFileName,
+                        });
+                    }
+
+                    files.AddRange(filesFromUploads);
+
+                    return files;
                 });
         }
 
@@ -260,7 +283,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
-        public async Task<Either<ActionResult, List<DataSetUploadResultViewModel>>> Upload(
+        public async Task<Either<ActionResult, List<DataSetUploadViewModel>>> Upload(
             Guid releaseVersionId,
             IFormFile dataFormFile,
             IFormFile metaFormFile,
@@ -279,8 +302,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                             => await ValidateDataSetCsvPair(releaseVersionId, dataFormFile, metaFormFile, dataSetTitle, replacingFile))
                         .OnSuccess(async dataSet
                             => await dataSetFileStorage.UploadDataSetsToTemporaryStorage(releaseVersionId, [dataSet], cancellationToken))
-                        .OnSuccess(async dataSets
-                            => await dataSetScreenerClient.ScreenDataSet(dataSets));
+                        .OnSuccess(async dataSetUploads
+                            => await ScreenDataSetUploads(dataSetUploads, cancellationToken));
                 });
         }
 
@@ -307,7 +330,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
-        public async Task<Either<ActionResult, List<DataSetUploadResultViewModel>>> UploadFromZip(
+        public async Task<Either<ActionResult, List<DataSetUploadViewModel>>> UploadFromZip(
             Guid releaseVersionId,
             IFormFile zipFormFile,
             string dataSetTitle,
@@ -325,8 +348,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                             => await ValidateDataSetZip(releaseVersionId, zipFormFile, dataSetTitle, replacingFile))
                         .OnSuccess(async dataSet
                             => await dataSetFileStorage.UploadDataSetsToTemporaryStorage(releaseVersionId, [dataSet], cancellationToken))
-                        .OnSuccess(async dataSets
-                            => await dataSetScreenerClient.ScreenDataSet(dataSets));
+                        .OnSuccess(async dataSetUploads
+                            => await ScreenDataSetUploads(dataSetUploads, cancellationToken));
                 });
         }
 
@@ -352,7 +375,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
-        public async Task<Either<ActionResult, List<DataSetUploadResultViewModel>>> UploadFromBulkZip(
+        public async Task<Either<ActionResult, List<DataSetUploadViewModel>>> UploadFromBulkZip(
             Guid releaseVersionId,
             IFormFile zipFormFile,
             CancellationToken cancellationToken)
@@ -364,8 +387,65 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     => await ValidateBulkDataSetZip(releaseVersionId, zipFormFile))
                 .OnSuccess(async dataSets
                     => await dataSetFileStorage.UploadDataSetsToTemporaryStorage(releaseVersionId, dataSets, cancellationToken))
-                .OnSuccess(async dataSets
-                    => await dataSetScreenerClient.ScreenDataSet(dataSets));
+                .OnSuccess(async dataSetUploads
+                    => await ScreenDataSetUploads(dataSetUploads, cancellationToken));
+        }
+
+        private async Task<List<DataSetUploadViewModel>> ScreenDataSetUploads(
+            List<DataSetUpload> dataSetUploads,
+            CancellationToken cancellationToken)
+        {
+            var tasks = dataSetUploads.Select(async dataSetUpload =>
+            {
+                var request = BuildScreenerRequest(dataSetUpload);
+                var result = await dataSetScreenerClient.ScreenDataSet(request, cancellationToken);
+
+                await dataSetFileStorage.AddScreenerResultToUpload(dataSetUpload.Id, result, cancellationToken);
+
+                return BuildUploadViewModel(dataSetUpload, result);
+            });
+
+            return [.. await Task.WhenAll(tasks)];
+        }
+
+        private static DataSetUploadViewModel BuildUploadViewModel(
+            DataSetUpload dataSetUpload,
+            DataSetScreenerResult screenerResult)
+        {
+            return new DataSetUploadViewModel
+            {
+                Id = dataSetUpload.Id,
+                DataFileName = dataSetUpload.DataFileName,
+                DataSetTitle = dataSetUpload.DataSetTitle,
+                MetaFileName = dataSetUpload.MetaFileName,
+                Status = GetDataSetUploadStatus(screenerResult),
+                ScreenerResult = screenerResult,
+            };
+        }
+
+        private static DataSetUploadStatus GetDataSetUploadStatus(DataSetScreenerResult screenerResult)
+        {
+            return screenerResult.Result switch
+            {
+                ScreenerResult.Passed => screenerResult.TestResults.Any(test => test.TestResult == TestResult.WARNING)
+                    ? DataSetUploadStatus.CompletePendingReview
+                    : DataSetUploadStatus.CompletePendingImport,
+                ScreenerResult.Failed => DataSetUploadStatus.Failed,
+                _ => throw new ArgumentOutOfRangeException(nameof(screenerResult), screenerResult, null),
+            };
+        }
+
+        private static Requests.DataSetScreenerRequest BuildScreenerRequest(DataSetUpload dataSet)
+        {
+            return new()
+            {
+                // TODO: Update screener API to accept a container name rather than hard-coded
+                StorageContainerName = "releases-temp",
+                DataFileName = dataSet.DataFileName,
+                DataFilePath = dataSet.DataFilePath,
+                MetaFileName = dataSet.MetaFileName,
+                MetaFilePath = dataSet.MetaFilePath,
+            };
         }
 
         private async Task<Either<ActionResult, DataSet>> ValidateDataSetCsvPair(
@@ -522,32 +602,40 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         public async Task<Either<ActionResult, List<DataFileInfo>>> SaveDataSetsFromTemporaryBlobStorage(
             Guid releaseVersionId,
-            List<DataSetUploadResultViewModel> dataSetFiles,
+            List<Guid> dataSetUploadIds,
             CancellationToken cancellationToken)
         {
             return await persistenceHelper
                 .CheckEntityExists<ReleaseVersion>(releaseVersionId)
                 .OnSuccess(userService.CheckCanUpdateReleaseVersion)
-                .OnSuccess(() => dataSetFiles
-                    .Select(dataSet => ValidateTempDataSetFileExistence(releaseVersionId, dataSet))
+                .OnSuccess(() => dataSetUploadIds
+                    .Select(dataSetUploadId => ValidateTempDataSetFileExistence(releaseVersionId, dataSetUploadId, cancellationToken))
                     .OnSuccessAll())
-                .OnSuccess(async _ =>
+                .OnSuccess(async dataSetUploads =>
                 {
-                    var releaseFiles = await dataSetFileStorage.MoveDataSetsToPermanentStorage(releaseVersionId, dataSetFiles, cancellationToken);
+                    var releaseFiles = await dataSetFileStorage.MoveDataSetsToPermanentStorage(releaseVersionId, dataSetUploads, cancellationToken);
                     return await BuildDataFileViewModels(releaseFiles);
                 });
         }
 
-        private async Task<Either<ActionResult, Unit>> ValidateTempDataSetFileExistence(
+        private async Task<Either<ActionResult, DataSetUpload>> ValidateTempDataSetFileExistence(
             Guid releaseVersionId,
-            DataSetUploadResultViewModel dataSet)
+            Guid dataSetUploadId,
+            CancellationToken cancellationToken)
         {
-            var dataBlobExists = await privateBlobStorageService.CheckBlobExists(PrivateReleaseTempFiles, $"{FileExtensions.Path(releaseVersionId, FileType.Data, dataSet.DataFileId)}");
-            var metaBlobExists = await privateBlobStorageService.CheckBlobExists(PrivateReleaseTempFiles, $"{FileExtensions.Path(releaseVersionId, FileType.Metadata, dataSet.MetaFileId)}");
+            // TODO: Replace both exceptions with proper error response
+            var dataSetUpload = await contentDbContext.DataSetUploads.FirstOrDefaultAsync(upload =>
+                dataSetUploadId == upload.Id &&
+                upload.ReleaseVersionId == releaseVersionId,
+                cancellationToken)
+                    ?? throw new Exception("Data set upload not found");
+
+            var dataBlobExists = await privateBlobStorageService.CheckBlobExists(PrivateReleaseTempFiles, dataSetUpload.DataFilePath);
+            var metaBlobExists = await privateBlobStorageService.CheckBlobExists(PrivateReleaseTempFiles, dataSetUpload.MetaFilePath);
 
             return !dataBlobExists || !metaBlobExists
                 ? throw new Exception("Unable to locate temporary files at the locations specified")
-                : Unit.Instance;
+                : dataSetUpload;
         }
 
         private async Task<DataFileInfo> BuildDataFileViewModel(ReleaseFile releaseFile)
