@@ -459,8 +459,8 @@ public abstract class DataSetVersionsControllerTests(TestApplicationFactory test
                 
                 var response = await ListDataSetVersions(
                     dataSetId: dataSet.Id,
-                    page: 1,
-                    pageSize: 1,
+                    page: 2,
+                    pageSize: 10,
                     previewTokenId: persistedPreviewToken?.Id);
 
                 response.AssertOk<DataSetVersionPaginatedListViewModel>(useSystemJson: true);
@@ -469,6 +469,7 @@ public abstract class DataSetVersionsControllerTests(TestApplicationFactory test
                     dataSet: dataSet,
                     expectedType: DataSetCallType.GetVersions,
                     expectedAnalyticsPath: _analyticsPathResolver.PublicApiDataSetCallsDirectoryPath(),
+                    expectedParameters: new PaginationParameters(Page: 2, PageSize: 10),
                     expectedPreviewToken: expectedPreviewToken,
                     expectedPreviewTokenDataSetVersionId: persistedPreviewToken?.DataSetVersionId);
             }

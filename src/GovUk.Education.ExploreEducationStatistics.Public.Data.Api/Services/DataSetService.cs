@@ -138,6 +138,7 @@ internal class DataSetService(
             .OnSuccessDo(ds => analyticsService.CaptureDataSetCall(
                 dataSetId: ds.Id,
                 type: DataSetCallType.GetVersions,
+                parameters: new PaginationParameters(Page: page, PageSize: pageSize),
                 cancellationToken: cancellationToken))
             .OnSuccess(dataSet => ListPaginatedVersions(
                 dataSet: dataSet,

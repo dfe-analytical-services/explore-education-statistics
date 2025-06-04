@@ -22,6 +22,7 @@ public class AnalyticsService(
     public async Task CaptureDataSetCall(
         Guid dataSetId,
         DataSetCallType type,
+        object? parameters = null,
         CancellationToken cancellationToken = default)
     {
         try
@@ -45,6 +46,7 @@ public class AnalyticsService(
             var request = new CaptureDataSetCallRequest(
                 DataSetId: dataSet.Id,
                 DataSetTitle: dataSet.Title,
+                Parameters: parameters,
                 PreviewToken: await GetPreviewTokenRequest(),
                 StartTime: dateTimeProvider.UtcNow,
                 Type: type);
@@ -187,6 +189,7 @@ public class NoOpAnalyticsService : IAnalyticsService
     public Task CaptureDataSetCall(
         Guid dataSetId,
         DataSetCallType type,
+        object? parameters = null,
         CancellationToken cancellationToken = default)
     {
         return Task.CompletedTask;

@@ -11,7 +11,8 @@ public record CaptureDataSetCallRequest(
     PreviewTokenRequest? PreviewToken,
     DateTimeOffset StartTime,
     [property:JsonConverter(typeof(StringEnumConverter))]
-    DataSetCallType Type
+    DataSetCallType Type,
+    object? Parameters = null
 ) : IAnalyticsCaptureRequestBase;
 
 public record CaptureDataSetVersionQueryRequest(
@@ -63,3 +64,7 @@ public record PreviewTokenRequest(
     Guid DataSetVersionId,
     DateTimeOffset Created,
     DateTimeOffset Expiry);
+
+public record PaginationParameters(
+    int Page,
+    int PageSize);

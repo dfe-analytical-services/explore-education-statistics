@@ -41,6 +41,7 @@ public static class AnalyticsTestAssertions
         DataSet dataSet,
         DataSetCallType expectedType,
         string expectedAnalyticsPath,
+        object? expectedParameters,
         AnalyticsTheoryData.PreviewTokenSummary? expectedPreviewToken,
         Guid? expectedPreviewTokenDataSetVersionId)
     {
@@ -59,6 +60,20 @@ public static class AnalyticsTestAssertions
         Assert.Equal(dataSet.Id, capturedCall.DataSetId);
         Assert.Equal(dataSet.Title, capturedCall.DataSetTitle);
         capturedCall.StartTime.AssertUtcNow(withinMillis: 5000);
+        
+        if (expectedParameters == null)
+        {
+            Assert.Null(capturedCall.Parameters);
+        }
+        else
+        {
+            // Expect any additional parameters to have been recorded. 
+            Assert.NotNull(capturedCall.Parameters);
+            var parameters = JsonConvert.DeserializeObject(
+                capturedCall.Parameters.ToString()!, expectedParameters.GetType());
+            Assert.NotNull(parameters);
+            parameters.AssertDeepEqualTo(expectedParameters);
+        }
 
         if (expectedPreviewToken == null)
         {
