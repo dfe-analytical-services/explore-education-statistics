@@ -5,7 +5,7 @@ import React from 'react';
 
 interface Props {
   uploadResults: DataSetUploadResult[];
-  onConfirm: (uploadResult: DataSetUploadResult[]) => void;
+  onConfirm: (uploadResult: string[]) => void;
   onCancel: () => void;
 }
 
@@ -18,7 +18,7 @@ export default function DataSetUploadModalConfirm({
     <ModalConfirm
       title="Upload summary"
       open
-      onConfirm={() => onConfirm(uploadResults)}
+      onConfirm={() => onConfirm(uploadResults.map(upload => upload.id))}
       onExit={onCancel}
       onCancel={onCancel}
     >
@@ -32,8 +32,8 @@ export default function DataSetUploadModalConfirm({
         </thead>
         <tbody>
           {uploadResults.map(uploadResult => (
-            <tr key={uploadResult.title}>
-              <td>{uploadResult.title}</td>
+            <tr key={uploadResult.id}>
+              <td>{uploadResult.dataSetTitle}</td>
               <td>{uploadResult.dataFileName}</td>
               <td>
                 {uploadResult.replacingFileId && (
