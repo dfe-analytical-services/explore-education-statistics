@@ -661,7 +661,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         private async Task<Either<ActionResult, Unit>> DeleteApiDataSetVersionIfAttached(DeleteDataFilePlanViewModel deletePlan)
         {
-            return !featureFlags.Value.EnableReplacementOfPublicApiDataSets || deletePlan.ApiDataSetVersionPlan == null
+            return !featureFlags.Value.EnableReplacementOfPublicApiDataSets || deletePlan.ApiDataSetVersionPlan == null || !deletePlan.Valid
                 ? Unit.Instance
                 : await dataSetVersionService.DeleteVersion(dataSetVersionId: deletePlan.ApiDataSetVersionPlan.Id);
         }
