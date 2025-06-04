@@ -420,7 +420,6 @@ public class DataSetFileStorageTests
             dataImportService ?? Mock.Of<IDataImportService>(Strict),
             userService ?? MockUtils.AlwaysTrueUserService(_user.Id).Object,
             dataSetVersionService ?? Mock.Of<IDataSetVersionService>(Strict),
-            featureFlags ?? Mock.Of<IOptions<FeatureFlags>>(Strict),
-            Mock.Of<IDataSetVersionRepository>(Strict));
+            featureFlags ?? Mock.Of<IOptions<FeatureFlags>>(Strict));
     }
 }
