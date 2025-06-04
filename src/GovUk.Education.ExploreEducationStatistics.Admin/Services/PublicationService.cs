@@ -598,7 +598,7 @@ public class PublicationService(
                             .LatestReleaseVersion(releaseId: releaseId, publishedOnly: true)
                             .SingleOrDefaultAsync())?.Id;
 
-                        if (latestPublishedReleaseVersionIdForReleaseId.HasValue)
+                        if (latestPublishedReleaseVersionIdForReleaseId != null)
                         {
                             releaseAndVersions.Add(new ReleaseAndVersion(releaseId, latestPublishedReleaseVersionIdForReleaseId.Value));
                         }
@@ -607,7 +607,7 @@ public class PublicationService(
                 }
 
                 // Get the about-to-be replaced release and version.
-                var oldLatestPublishedReleaseAndVersion = publication.LatestPublishedReleaseVersionId.HasValue
+                var oldLatestPublishedReleaseAndVersion = publication.LatestPublishedReleaseVersionId != null
                     ? allPublishedReleasesAndLatestVersion.Single(rav =>
                         rav.ReleaseVersionId == publication.LatestPublishedReleaseVersionId)
                     : null;
@@ -641,7 +641,7 @@ public class PublicationService(
 
                     // The reordering of the series implies that there was already a published release version,
                     // therefore, this should always have a value
-                    if (oldLatestPublishedReleaseAndVersion is not null)
+                    if (oldLatestPublishedReleaseAndVersion != null)
                     {
                         await adminEventRaiser.OnPublicationLatestPublishedReleaseReordered(
                             publication,
@@ -675,7 +675,7 @@ public class PublicationService(
             return ValidationActionResult(PublicationSlugUsedByRedirect);
         }
 
-        if (publicationId.HasValue &&
+        if (publicationId != null &&
             context.PublicationMethodologies.Any(pm =>
                 pm.Publication.Id == publicationId
                 && pm.Owner)
