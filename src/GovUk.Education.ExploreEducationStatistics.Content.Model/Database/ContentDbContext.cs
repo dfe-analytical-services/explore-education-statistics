@@ -162,6 +162,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
             modelBuilder.Entity<DataSetUpload>()
                 .Property(upload => upload.Status)
                 .HasConversion(new EnumToStringConverter<DataSetUploadStatus>());
+
+            modelBuilder.Entity<DataSetUpload>()
+                .Property(upload => upload.ScreenerResult)
+                .HasConversion(
+                    r => JsonConvert.SerializeObject(r),
+                    r => JsonConvert.DeserializeObject<DataSetScreenerResult>(r));
         }
 
         private static void ConfigureDataImport(ModelBuilder modelBuilder)

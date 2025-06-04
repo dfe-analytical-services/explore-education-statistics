@@ -1,11 +1,13 @@
-using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
-using System.Collections.Generic;
+using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 
 public interface IDataSetScreenerClient
 {
-    Task<List<DataSetUploadResultViewModel>> ScreenDataSet(
-        List<DataSetUploadResultViewModel> dataSets);
+    Task<DataSetScreenerResult> ScreenDataSet(
+        DataSetScreenerRequest dataSetRequest,
+        CancellationToken cancellationToken);
 }

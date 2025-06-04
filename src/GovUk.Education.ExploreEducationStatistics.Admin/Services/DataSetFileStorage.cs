@@ -3,7 +3,6 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
-using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Options;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
@@ -184,40 +183,26 @@ public class DataSetFileStorage(
         await dataSet.MetaFile.FileStream.DisposeAsync();
     }
 
-    public async Task<List<DataSetUploadResultViewModel>> UploadDataSetsToTemporaryStorage(
+    public async Task<List<DataSetUpload>> UploadDataSetsToTemporaryStorage(
         Guid releaseVersionId,
         List<DataSet> dataSets,
         CancellationToken cancellationToken)
     {
-        var viewModels = new List<DataSetUploadResultViewModel>();
-
+        var uploads = new List<DataSetUpload>();
+        // refactor with Select
         foreach (var dataSet in dataSets)
         {
-            var uploadResult = await UploadDataSetToTemporaryStorage(releaseVersionId, dataSet, cancellationToken);
-
-            viewModels.Add(new DataSetUploadResultViewModel
-            {
-                Title = dataSet.Title,
-                DataFileId = uploadResult.DataFileId,
-                DataFileName = dataSet.DataFile.FileName,
-                DataFilePath = $"{FileStoragePathUtils.FilesPath(releaseVersionId, FileType.Data)}{uploadResult.DataFileId}",
-                DataFileSize = dataSet.DataFile.FileSize,
-                MetaFileId = uploadResult.MetaFileId,
-                MetaFileName = dataSet.MetaFile.FileName,
-                MetaFilePath = $"{FileStoragePathUtils.FilesPath(releaseVersionId, FileType.Metadata)}{uploadResult.MetaFileId}",
-                MetaFileSize = dataSet.MetaFile.FileSize,
-                ReplacingFileId = dataSet.ReplacingFile?.Id,
-            });
+            uploads.Add(await UploadDataSetToTemporaryStorage(releaseVersionId, dataSet, cancellationToken));
         }
 
-        return viewModels;
+        return uploads;
     }
 
     /// <summary>
     /// Upload the supplied data set files to temporary blob storage.
     /// </summary>
     /// <returns>An object consisting of newly generated IDs representing the uploaded files. The IDs are used to locate the files in virtual storage.</returns>
-    private async Task<DataSetUploadResult> UploadDataSetToTemporaryStorage(
+    private async Task<DataSetUpload> UploadDataSetToTemporaryStorage(
         Guid releaseVersionId,
         DataSet dataSet,
         CancellationToken cancellationToken)
@@ -244,27 +229,50 @@ public class DataSetFileStorage(
         await dataSet.DataFile.FileStream.DisposeAsync();
         await dataSet.MetaFile.FileStream.DisposeAsync();
 
-        return new DataSetUploadResult
+        var dataSetUpload = new DataSetUpload
         {
+            ReleaseVersionId = releaseVersionId,
+            DataSetTitle = dataSet.Title,
             DataFileId = dataFileId,
-            MetaFileId = metaFileId
+            DataFileName = dataSet.DataFile.FileName,
+            DataFileSizeInBytes = dataSet.DataFile.FileSize,
+            MetaFileId = metaFileId,
+            MetaFileName = dataSet.MetaFile.FileName,
+            MetaFileSizeInBytes = dataSet.MetaFile.FileSize,
+            Status = DataSetUploadStatus.Screening, // Add "Uploading", then update to "Screening" when it actually starts?
         };
+
+        await contentDbContext.DataSetUploads.AddAsync(dataSetUpload, cancellationToken);
+        await contentDbContext.SaveChangesAsync(cancellationToken);
+
+        return dataSetUpload;
+    }
+
+    public async Task AddScreenerResultToUpload(
+        Guid dataSetUploadId,
+        DataSetScreenerResult screenerResult,
+        CancellationToken cancellationToken)
+    {
+        var upload = await contentDbContext.DataSetUploads.SingleAsync(upload => upload.Id == dataSetUploadId, cancellationToken);
+        upload.ScreenerResult = screenerResult;
+
+        await contentDbContext.SaveChangesAsync(cancellationToken);
     }
 
     public async Task<List<ReleaseFile>> MoveDataSetsToPermanentStorage(
         Guid releaseVersionId,
-        List<DataSetUploadResultViewModel> dataSets,
+        List<DataSetUpload> dataSetUploads,
         CancellationToken cancellationToken)
     {
         var releaseFiles = new List<ReleaseFile>();
 
-        foreach (var dataSetFile in dataSets)
+        foreach (var dataSetUpload in dataSetUploads)
         {
             var subjectId = await releaseVersionRepository.CreateStatisticsDbReleaseAndSubjectHierarchy(releaseVersionId);
 
-            var replacingFile = dataSetFile.ReplacingFileId is null
+            var replacingFile = dataSetUpload.ReplacingFileId is null
                 ? null
-                : await contentDbContext.Files.FirstAsync(f => f.Id == dataSetFile.ReplacingFileId, cancellationToken);
+                : await contentDbContext.Files.FirstAsync(f => f.Id == dataSetUpload.ReplacingFileId, cancellationToken);
 
             ReleaseFile? replacedReleaseDataFile = null;
 
@@ -278,15 +286,15 @@ public class DataSetFileStorage(
             var dataFile = await releaseDataFileRepository.Create(
                 releaseVersionId,
                 subjectId,
-                dataSetFile.DataFileName,
-                contentLength: dataSetFile.DataFileSize,
+                dataSetUpload.DataFileName,
+                contentLength: dataSetUpload.DataFileSizeInBytes,
                 type: FileType.Data,
                 createdById: userService.GetUserId(),
-                name: dataSetFile.Title,
+                name: dataSetUpload.DataSetTitle,
                 replacingDataFile: replacingFile,
                 order: releaseDataFileOrder);
 
-            var sourceDataFilePath = FileExtensions.Path(releaseVersionId, FileType.Data, dataSetFile.DataFileId);
+            var sourceDataFilePath = FileExtensions.Path(releaseVersionId, FileType.Data, dataSetUpload.DataFileId);
             var destinationDataFilePath = FileExtensions.Path(releaseVersionId, FileType.Data, dataFile.Id); // Same path, but a new ID has been generated by the creation step above
 
             var dataReleaseFile = await contentDbContext.ReleaseFiles
@@ -301,12 +309,12 @@ public class DataSetFileStorage(
             var metaFile = await releaseDataFileRepository.Create(
                 releaseVersionId,
                 subjectId,
-                dataSetFile.MetaFileName,
-                dataSetFile.MetaFileSize,
+                dataSetUpload.MetaFileName,
+                dataSetUpload.MetaFileSizeInBytes,
                 type: FileType.Metadata,
                 createdById: userService.GetUserId());
 
-            var sourceMetaFilePath = FileExtensions.Path(releaseVersionId, FileType.Metadata, dataSetFile.MetaFileId);
+            var sourceMetaFilePath = FileExtensions.Path(releaseVersionId, FileType.Metadata, dataSetUpload.MetaFileId);
             var destinationMetaFilePath = FileExtensions.Path(releaseVersionId, FileType.Metadata, metaFile.Id); // Same path, but a new ID has been generated by the creation step above
 
             await privateBlobStorageService.MoveBlob(PrivateReleaseTempFiles, sourceDataFilePath, destinationDataFilePath, PrivateReleaseFiles);
