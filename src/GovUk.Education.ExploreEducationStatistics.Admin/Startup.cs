@@ -514,7 +514,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                 // This is allowing for the PublicDataDbContext to be null.
                 services.AddTransient<IDataSetService, DataSetService>(provider =>
                     new DataSetService(provider.GetRequiredService<ContentDbContext>(),
-                        provider.GetRequiredService<PublicDataDbContext>(),
+                        provider.GetService<PublicDataDbContext>()!,
                         provider.GetRequiredService<IProcessorClient>(),
                         provider.GetRequiredService<IUserService>()));
 
