@@ -215,8 +215,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                         UserPublicationRoles = ListOf(
                             new UserPublicationRole
                             {
-                                PublicationId = publicationId, 
-                                UserId = user.GetUserId(), 
+                                PublicationId = publicationId,
+                                UserId = user.GetUserId(),
                                 Role = role
                             }),
                         ExpectedToPass = publicationRolesExpectedToPass.Contains(role),
