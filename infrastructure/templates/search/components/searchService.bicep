@@ -1,6 +1,7 @@
 // Originally sourced from https://github.com/Azure/azure-quickstart-templates/blob/master/quickstarts/microsoft.search/azure-search-create/main.bicep.
 
 import { IpRange } from '../../common/types.bicep'
+import { dynamicAverageGreaterThan, dynamicTotalGreaterThan } from '../../public-api/components/alerts/dynamicAlertConfig.bicep'
 
 @description('Service name must only contain lowercase letters, digits or dashes, cannot use dash as the first two or last one characters, cannot contain consecutive dashes, and is limited between 2 and 60 characters in length.')
 @minLength(2)
@@ -61,6 +62,14 @@ param userAssignedIdentityName string = ''
 @description('Location for all resources.')
 param location string
 
+@description('Whether to create or update Azure Monitor alerts during this deploy')
+param alerts {
+  searchLatency: bool
+  searchQueriesPerSecond: bool
+  throttledSearchQueriesPercentage: bool
+  alertsGroupName: string
+}?
+
 @description('A set of tags with which to tag the resource in Azure')
 param tagValues object
 
@@ -98,6 +107,72 @@ resource searchService 'Microsoft.Search/searchServices@2025-02-01-preview' = {
     hostingMode: hostingMode
   }
   tags: tagValues
+}
+
+module searchLatencyAlert '../../public-api/components/alerts/dynamicMetricAlert.bicep' = if (alerts != null && alerts!.searchLatency) {
+  name: '${name}SearchLatencyDeploy'
+  params: {
+    resourceName: searchService.name
+    resourceMetric: {
+      resourceType: 'Microsoft.Search/searchServices'
+      metric: 'SearchLatency'
+    }
+    config: {
+      ...dynamicAverageGreaterThan
+      nameSuffix: 'latency'
+      sensitivity: 'Medium'
+      evaluationFrequency: 'PT1M'
+      evaluationPeriods: 4
+      minFailingEvaluationPeriods: 4
+      windowSize: 'PT5M'
+    }
+    alertsGroupName: alerts!.alertsGroupName
+    tagValues: tagValues
+  }
+}
+
+module searchQueriesPerSecondAlert '../../public-api/components/alerts/dynamicMetricAlert.bicep' = if (alerts != null && alerts!.searchQueriesPerSecond) {
+  name: '${name}SearchQueriesPerSecondDeploy'
+  params: {
+    resourceName: searchService.name
+    resourceMetric: {
+      resourceType: 'Microsoft.Search/searchServices'
+      metric: 'SearchQueriesPerSecond'
+    }
+    config: {
+      ...dynamicAverageGreaterThan
+      nameSuffix: 'queries-per-second'
+      sensitivity: 'Low'
+      evaluationFrequency: 'PT1M'
+      evaluationPeriods: 4
+      minFailingEvaluationPeriods: 4
+      windowSize: 'PT5M'
+    }
+    alertsGroupName: alerts!.alertsGroupName
+    tagValues: tagValues
+  }
+}
+
+module throttledSearchQueriesPercentageAlert '../../public-api/components/alerts/dynamicMetricAlert.bicep' = if (alerts != null && alerts!.throttledSearchQueriesPercentage) {
+  name: '${name}ThrottledSearchQueriesPercentageDeploy'
+  params: {
+    resourceName: searchService.name
+    resourceMetric: {
+      resourceType: 'Microsoft.Search/searchServices'
+      metric: 'ThrottledSearchQueriesPercentage'
+    }
+    config: {
+      ...dynamicTotalGreaterThan
+      nameSuffix: 'throttled-queries-percentage'
+      sensitivity: 'Medium'
+      evaluationFrequency: 'PT1M'
+      evaluationPeriods: 4
+      minFailingEvaluationPeriods: 4
+      windowSize: 'PT5M'
+    }
+    alertsGroupName: alerts!.alertsGroupName
+    tagValues: tagValues
+  }
 }
 
 output searchServiceEndpoint string = searchService.properties.endpoint
