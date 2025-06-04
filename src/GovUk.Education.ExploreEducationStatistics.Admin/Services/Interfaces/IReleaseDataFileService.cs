@@ -37,7 +37,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
             Guid releaseVersionId,
             List<Guid> fileIds);
 
-        Task<Either<ActionResult, List<DataSetUploadResultViewModel>>> Upload(
+        Task<Either<ActionResult, List<DataSetUploadViewModel>>> Upload(
             Guid releaseVersionId,
             IFormFile dataFormFile,
             IFormFile metaFormFile,
@@ -53,7 +53,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
             Guid? replacingFileId,
             CancellationToken cancellationToken);
 
-        Task<Either<ActionResult, List<DataSetUploadResultViewModel>>> UploadFromZip(
+        Task<Either<ActionResult, List<DataSetUploadViewModel>>> UploadFromZip(
             Guid releaseVersionId,
             IFormFile zipFormFile,
             string dataSetTitle,
@@ -67,14 +67,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
             Guid? replacingFileId,
             CancellationToken cancellationToken);
 
-        Task<Either<ActionResult, List<DataSetUploadResultViewModel>>> UploadFromBulkZip(
+        Task<Either<ActionResult, List<DataSetUploadViewModel>>> UploadFromBulkZip(
             Guid releaseVersionId,
             IFormFile zipFormFile,
             CancellationToken cancellationToken);
 
         Task<Either<ActionResult, List<DataFileInfo>>> SaveDataSetsFromTemporaryBlobStorage(
             Guid releaseVersionId,
-            List<DataSetUploadResultViewModel> dataSetFiles,
+            List<Guid> dataSetUploadIds,
             CancellationToken cancellationToken);
     }
 }
