@@ -10,6 +10,12 @@ param location string
 @description('A list of IP network rules to allow access to the resource from specific public internet IP address ranges.')
 param ipRules IpRange[]
 
+@description('Whether to create or update Azure Monitor alerts during this deploy')
+param alerts {
+  customTopicUnmatchedEventCount: bool
+  alertsGroupName: string
+}?
+
 @description('Specifies a set of tags with which to tag the resource in Azure.')
 param tagValues object
 
@@ -26,6 +32,12 @@ module eventGridCustomTopicModule 'eventGridCustomTopic.bicep' = [
       ipRules: ipRules
       publicNetworkAccess: 'Enabled'
       systemAssignedIdentity: true
+      alerts: alerts != null
+        ? {
+            unmatchedEventCount: alerts!.customTopicUnmatchedEventCount
+            alertsGroupName: alerts!.alertsGroupName
+          }
+        : null
       tagValues: tagValues
     }
   }

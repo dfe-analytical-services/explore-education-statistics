@@ -43,6 +43,22 @@ type ContainerAppMetric = {
     | 'RestartCount'
 }
 
+type EventGridCustomTopicMetric = {
+  resourceType: 'Microsoft.EventGrid/topics'
+  metric:
+    | 'AdvancedFilterEvaluationCount'
+    | 'DeadLetteredCount'
+    | 'DeliveryAttemptFailCount'
+    | 'DeliverySuccessCount'
+    | 'DestinationProcessingDurationInMs'
+    | 'DroppedEventCount'
+    | 'MatchedEventCount'
+    | 'PublishFailCount'
+    | 'PublishSuccessCount'
+    | 'PublishSuccessLatencyInMs'
+    | 'UnmatchedEventCount'
+}
+
 type FileServiceMetric = {
   resourceType: 'Microsoft.Storage/storageAccounts/fileServices'
   metric:
@@ -117,6 +133,7 @@ type ResourceMetric =
   | AppServicePlanMetric
   | ContainerAppMetric
   | ContainerAppMetric
+  | EventGridCustomTopicMetric
   | FileServiceMetric
   | PostgreSqlMetric
   | SearchServiceMetric

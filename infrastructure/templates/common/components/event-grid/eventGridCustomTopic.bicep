@@ -1,4 +1,5 @@
 import { IpRange } from '../../types.bicep'
+import { staticTotalGreaterThanZero } from '../../../public-api/components/alerts/staticAlertConfig.bicep'
 
 @description('The resource name.')
 @minLength(3)
@@ -26,6 +27,12 @@ param systemAssignedIdentity bool = false
 
 @description('The name of a user-assigned managed identity to assign to the resource.')
 param userAssignedIdentityName string = ''
+
+@description('Whether to create or update Azure Monitor alerts during this deploy')
+param alerts {
+  unmatchedEventCount: bool
+  alertsGroupName: string
+}?
 
 @description('A set of tags with which to tag the resource in Azure')
 param tagValues object
@@ -59,6 +66,23 @@ resource topic 'Microsoft.EventGrid/topics@2025-02-15' = {
     dataResidencyBoundary: 'WithinRegion'
   }
   tags: tagValues
+}
+
+module unmatchedEventCountAlert '../../../public-api/components/alerts/staticMetricAlert.bicep' = if (alerts != null && alerts!.unmatchedEventCount) {
+  name: '${name}UnmatchedEventCountDeploy'
+  params: {
+    resourceName: topic.name
+    resourceMetric: {
+      resourceType: 'Microsoft.EventGrid/topics'
+      metric: 'UnmatchedEventCount'
+    }
+    config: {
+      ...staticTotalGreaterThanZero
+      nameSuffix: 'unmatched-events'
+    }
+    alertsGroupName: alerts!.alertsGroupName
+    tagValues: tagValues
+  }
 }
 
 output name string = topic.name
