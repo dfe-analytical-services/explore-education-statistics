@@ -4,6 +4,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMigrations
 {
     [DbContext(typeof(ContentDbContext))]
-    partial class ContentDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250603160617_EES5999_UpdateDataSetUploadTable")]
+    partial class EES5999_UpdateDataSetUploadTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -358,9 +361,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<long>("DataFileSizeInBytes")
-                        .HasColumnType("bigint");
-
                     b.Property<string>("DataSetTitle")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -372,13 +372,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<long>("MetaFileSizeInBytes")
-                        .HasColumnType("bigint");
-
                     b.Property<Guid>("ReleaseVersionId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid?>("ReplacingFileId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("ScreenerResult")

@@ -1,7 +1,7 @@
 #nullable enable
 using System.Text.Json.Serialization;
 
-namespace GovUk.Education.ExploreEducationStatistics.Admin.Models;
+namespace GovUk.Education.ExploreEducationStatistics.Common.Model;
 
 public class DataScreenerTestResult
 {
