@@ -1699,31 +1699,30 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         /// <summary>
         /// Please note this test will reduce in the number of cases when the feature flag has been removed from it.
         /// </summary>
-        /// <param name="locationsComplete">Whether the user has inserted any manual mapping candidate selections for locations</param> 
-        /// <param name="filtersComplete">Whether the user has inserted any manual mapping candidate selections for filters</param>
+        /// <param name="dataSetVersionStatus">The data set version status of the replaced file's API data set version</param>
         /// <param name="majorVersionUpdate">Whether the user has uploaded a file that results in a major version update</param>
         /// <param name="expectedValidValue">The expected value for the scenario set up</param>
         /// <param name="enableReplacementOfPublicApiDataSets">Whether the feature flag for EES-5779 is switched on or off</param>
         [Theory]
         //When user has uploaded major version data set
-        [InlineData(true, true, true, false, true)]
-        [InlineData(false, true, true, false, true)]
-        [InlineData(true, false, true, false, true)]
-        [InlineData(false, false, true, false, true)]
-        [InlineData(true, true, true, false, false)]
-        [InlineData(false, true, true, false, false)]
-        [InlineData(true, false, true, false, false)]
-        [InlineData(false, false, true, false, false)]
-        //When user has uploaded minor version data set
-        [InlineData(true, true, false, true, true)]
-        [InlineData(false, true, false, false, true)]
-        [InlineData(true, false, false, false, true)]
-        [InlineData(false, false, false, false, true)]
-        [InlineData(true, true, false, false, false)]
-        [InlineData(false, true, false, false, false)]
-        [InlineData(true, false, false, false, false)]
-        [InlineData(false, false, false, false, false)]
-        public async Task GetReplacementPlan_FileIsLinkedToPublicApiDataSet_ReplacementValidated(bool locationsComplete, bool filtersComplete, bool  majorVersionUpdate, bool expectedValidValue, bool enableReplacementOfPublicApiDataSets)
+        [InlineData(DataSetVersionStatus.Published, true, false, true)]
+        [InlineData(DataSetVersionStatus.Mapping, true, false, true)]
+        [InlineData(DataSetVersionStatus.Draft, true, false, true)]
+        [InlineData(DataSetVersionStatus.Published, true, false, false)]
+        [InlineData(DataSetVersionStatus.Mapping, true, false, false)]
+        [InlineData(DataSetVersionStatus.Draft, true, false, false)]
+        //When user has uploaded minor version
+        [InlineData(DataSetVersionStatus.Published, false, false, true)]
+        [InlineData(DataSetVersionStatus.Mapping, false, false, true)]
+        [InlineData(DataSetVersionStatus.Draft, false, true, true)]
+        [InlineData(DataSetVersionStatus.Published, false, false, false)]
+        [InlineData(DataSetVersionStatus.Mapping, false, false, false)]
+        [InlineData(DataSetVersionStatus.Draft, false, false, false)]
+        public async Task GetReplacementPlan_FileIsLinkedToPublicApiDataSet_ReplacementValidated(
+            DataSetVersionStatus dataSetVersionStatus, 
+            bool  majorVersionUpdate,
+            bool expectedValidValue, 
+            bool enableReplacementOfPublicApiDataSets)
         {
             DataSet dataSet = _fixture
                 .DefaultDataSet();
@@ -1731,6 +1730,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             DataSetVersion dataSetVersion = _fixture
                 .DefaultDataSetVersion()
                 .WithVersionNumber(major: 1, minor: 1, patch: 1)
+                .WithStatus(dataSetVersionStatus)
                 .WithDataSet(dataSet);
 
             Content.Model.ReleaseVersion releaseVersion = _fixture
@@ -1788,8 +1788,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new MappingStatusViewModel
                 {
-                    FiltersComplete = filtersComplete,
-                    LocationsComplete = locationsComplete,
+                    FiltersComplete = true,
+                    LocationsComplete = true,
                     HasMajorVersionUpdate = majorVersionUpdate
                 });
             
@@ -1837,8 +1837,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(dataSetVersion.PublicVersion, replacementPlan.ApiDataSetVersionPlan.Version);
                 if (enableReplacementOfPublicApiDataSets)
                 {
-                    Assert.Equal(locationsComplete, replacementPlan.ApiDataSetVersionPlan.MappingStatus!.LocationsComplete);
-                    Assert.Equal(filtersComplete, replacementPlan.ApiDataSetVersionPlan.MappingStatus.FiltersComplete);
                     Assert.Equal(expectedValidValue, replacementPlan.ApiDataSetVersionPlan.Valid);
                 }
                 else

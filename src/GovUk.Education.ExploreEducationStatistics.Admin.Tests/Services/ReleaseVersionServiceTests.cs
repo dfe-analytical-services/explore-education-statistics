@@ -621,7 +621,6 @@ public abstract class ReleaseVersionServiceTests
             var dataImportService = new Mock<IDataImportService>(Strict);
             var dataSetVersionService = new Mock<IDataSetVersionService>(Strict);
             var footnoteRepository = new Mock<IFootnoteRepository>(Strict);
-            var dataSetVersionRepository = new Mock<IDataSetVersionRepository>(Strict);
 
             dataImportService.Setup(service => service.GetImport(file.Id))
                 .ReturnsAsync(new DataImport { Status = DataImportStatus.COMPLETE });
@@ -677,7 +676,6 @@ public abstract class ReleaseVersionServiceTests
                     dataSetVersionService: dataSetVersionService.Object,
                     dataImportService: dataImportService.Object,
                     dataBlockService: dataBlockService.Object,
-                    dataSetVersionRepository: dataSetVersionRepository.Object,
                     footnoteRepository: footnoteRepository.Object,
                     releaseSubjectRepository: releaseSubjectRepository.Object,
                     privateCacheService: privateCacheService.Object,
@@ -688,7 +686,7 @@ public abstract class ReleaseVersionServiceTests
                     releaseVersionId: releaseVersion.Id,
                     fileId: file.Id);
 
-                VerifyAllMocks(dataImportService, dataSetVersionService, footnoteRepository, dataBlockService, dataSetVersionRepository);
+                VerifyAllMocks(dataImportService, dataSetVersionService, footnoteRepository, dataBlockService);
                 if (enableReplacementOfPublicApiDataSets)
                 {
                     result.AssertRight();
@@ -2481,7 +2479,6 @@ public abstract class ReleaseVersionServiceTests
         IProcessorClient? processorClient = null,
         IPrivateBlobCacheService? privateCacheService = null,
         IReleaseSlugValidator? releaseSlugValidator = null,
-        IDataSetVersionRepository? dataSetVersionRepository = null,
         bool enableReplacementOfPublicApiDataSets = false)
     {
         var userService = AlwaysTrueUserService();

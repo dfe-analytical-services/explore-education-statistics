@@ -33,8 +33,7 @@ public class DataSetFileStorage(
     IDataImportService dataImportService,
     IUserService userService,
     IDataSetVersionService dataSetVersionService,
-    IOptions<FeatureFlags> featureFlags,
-    IDataSetVersionRepository dataSetVersionRepository) : IDataSetFileStorage
+    IOptions<FeatureFlags> featureFlags) : IDataSetFileStorage
 {
     public async Task<DataFileInfo> UploadDataSet(
         Guid releaseVersionId,
