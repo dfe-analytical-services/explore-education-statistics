@@ -17,16 +17,16 @@ public abstract record ApiDataSetVersionPlanViewModel
 
     public DataSetVersionStatus Status { get; init; }
     
-    public bool Valid { get; set; }
+    public bool Valid { get; init; } //TODO: override Valid with auto-calculated in inherrited records when EES-5779 is ready
 }
 
 public record DeleteApiDataSetVersionPlanViewModel : ApiDataSetVersionPlanViewModel;
 
 public record ReplaceApiDataSetVersionPlanViewModel : ApiDataSetVersionPlanViewModel
 {
-    public MappingStatusViewModel? MappingStatus { get; set; }
+    public MappingStatusViewModel? MappingStatus { get; init; }
     
-    public bool FinishedMapping => Status == DataSetVersionStatus.Draft;
+    public bool FinishedImporting => Status == DataSetVersionStatus.Draft;
     
     //public override bool Valid { get; set; } TODO: override Valid with auto-calculated value when EES-5779 is ready
 }

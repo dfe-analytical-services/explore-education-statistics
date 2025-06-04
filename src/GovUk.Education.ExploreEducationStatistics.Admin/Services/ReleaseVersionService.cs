@@ -63,8 +63,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         IProcessorClient processorClient,
         IPrivateBlobCacheService privateCacheService,
         IReleaseSlugValidator releaseSlugValidator,
-        IOptions<FeatureFlags> featureFlags,
-        IDataSetVersionRepository dataSetVersionRepository) : IReleaseVersionService
+        IOptions<FeatureFlags> featureFlags) : IReleaseVersionService
     {
         public async Task<Either<ActionResult, ReleaseVersionViewModel>> GetRelease(Guid releaseVersionId)
         {
@@ -601,7 +600,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                             Id = tuple.apiDataSetVersion.Id,
                             Version = tuple.apiDataSetVersion.PublicVersion,
                             Status = tuple.apiDataSetVersion.Status,
-                            Valid = featureFlags.Value.EnableReplacementOfPublicApiDataSets && tuple.apiDataSetVersion.Status != DataSetVersionStatus.Published
+                            Valid = ShouldAllowApiDataSetDeletion(tuple.apiDataSetVersion.Status) 
                         };
 
                     return new DeleteDataFilePlanViewModel
@@ -620,16 +619,28 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return await context.ReleaseVersions
                 .SingleOrNotFoundAsync(rv => rv.Id == releaseVersionId)
                 .OnSuccess(userService.CheckCanUpdateReleaseVersion)
-                .OnSuccess(() => CheckReleaseDataFileExists(releaseVersionId: releaseVersionId, fileId: fileId))
-                .OnSuccessDo(releaseFile => CheckCanDeleteDataFiles(releaseVersionId, releaseFile))
-                .OnSuccessDo(async releaseFile =>
+                .OnSuccess(() => CheckReleaseDataFileExists(
+                    releaseVersionId: releaseVersionId, 
+                    fileId: fileId))
+                .OnSuccess(async releaseFile =>  (releaseFile.PublicApiDataSetId is null 
+                    ? (DataSetVersion)null! 
+                    : await dataSetVersionService
+                    .GetDataSetVersion(
+                        releaseFile.PublicApiDataSetId.Value, 
+                        releaseFile.PublicApiDataSetVersion!))
+                    .OnSuccess(dataSetVersion => (releaseFile, dataSetVersion)))
+                .OnSuccessDo(releaseFileAndVersion => CheckCanDeleteDataFiles(
+                    releaseVersionId, 
+                    releaseFileAndVersion.releaseFile, 
+                    releaseFileAndVersion.dataSetVersion?.Status ?? null))
+                .OnSuccessDo(async releaseFileAndVersion =>
                 {
                     // Delete any replacement that might exist
-                    if (releaseFile.File.ReplacedById.HasValue)
+                    if (releaseFileAndVersion.releaseFile.File.ReplacedById.HasValue)
                     {
                         return await RemoveDataFiles(
                             releaseVersionId: releaseVersionId,
-                            fileId: releaseFile.File.ReplacedById.Value);
+                            fileId: releaseFileAndVersion.releaseFile.File.ReplacedById.Value);
                     }
 
                     return Unit.Instance;
@@ -654,6 +665,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 ? Unit.Instance
                 : await dataSetVersionService.DeleteVersion(dataSetVersionId: deletePlan.ApiDataSetVersionPlan.Id);
         }
+        
         public async Task<Either<ActionResult, DataImportStatusViewModel>> GetDataFileImportStatus(
             Guid releaseVersionId,
             Guid fileId)
@@ -755,7 +767,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         }
 
         private async Task<Either<ActionResult, Unit>> CheckCanDeleteDataFiles(
-            Guid releaseVersionId, ReleaseFile releaseFile)
+            Guid releaseVersionId, ReleaseFile releaseFile, DataSetVersionStatus? versionStatus)
         {
             var import = await dataImportService.GetImport(releaseFile.FileId);
             var importStatus = import?.Status ?? DataImportStatus.NOT_FOUND;
@@ -774,28 +786,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             {
                 return Unit.Instance;
             }
-
           
-            return await ShouldPreventApiDataSetDeletion(
-                featureFlags.Value.EnableReplacementOfPublicApiDataSets,
-                releaseFile.PublicApiDataSetId.Value,
-                releaseFile.PublicApiDataSetVersion) 
-                ? ValidationUtils.ValidationResult(new ErrorViewModel
+            return ShouldAllowApiDataSetDeletion(versionStatus!.Value) 
+                ? Unit.Instance 
+                :  ValidationUtils.ValidationResult(new ErrorViewModel
                 {
                     Code = ValidationMessages.CannotDeleteApiDataSetReleaseFile.Code,
                     Message = ValidationMessages.CannotDeleteApiDataSetReleaseFile.Message,
                     Detail = new ApiDataSetErrorDetail(releaseFile.PublicApiDataSetId.Value)
-                }) 
-                : Unit.Instance;
+                });
+        }
 
-            async Task<bool> ShouldPreventApiDataSetDeletion(
-                bool isReplacementEnabled,
-                Guid apiDataSetId,
-                SemVersion? version)
-            {
-                return !isReplacementEnabled && (await dataSetVersionRepository
-                    .GetDataSetVersion(apiDataSetId, version)).Status != DataSetVersionStatus.Published;
-            }
+        private bool ShouldAllowApiDataSetDeletion(DataSetVersionStatus? dataSetVersionStatus)
+        {
+            return featureFlags.Value.EnableReplacementOfPublicApiDataSets
+                   && dataSetVersionStatus is not DataSetVersionStatus.Published;
         }
 
         private IList<MethodologyVersion> GetMethodologiesScheduledWithRelease(Guid releaseVersionId)

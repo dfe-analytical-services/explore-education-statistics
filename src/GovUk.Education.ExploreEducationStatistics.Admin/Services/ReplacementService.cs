@@ -117,20 +117,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 Status = replacementApiDataSetVersion.Status,
                 Valid = false,
             };
+
             if (!featureFlags.Value.EnableReplacementOfPublicApiDataSets || replacementApiDataSetVersion.VersionPatch == 0)
             { 
                 return apiDataSetVersionPlan;
             }
  
             var mappingStatus =  await dataSetVersionMappingService.GetMappingStatus(replacementApiDataSetVersion.Id, cancellationToken);
-            apiDataSetVersionPlan.MappingStatus = mappingStatus;
-            apiDataSetVersionPlan.Valid = apiDataSetVersionPlan.FinishedMapping && mappingStatus is
+
+            return apiDataSetVersionPlan with
             {
-                FiltersComplete: true,
-                LocationsComplete: true,
-                HasMajorVersionUpdate: false
+                MappingStatus = mappingStatus, 
+                Valid = mappingStatus is { HasMajorVersionUpdate: false } && apiDataSetVersionPlan.FinishedImporting
             };
-            return apiDataSetVersionPlan;
         }
         
         public async Task<Either<ActionResult, Unit>> Replace(
