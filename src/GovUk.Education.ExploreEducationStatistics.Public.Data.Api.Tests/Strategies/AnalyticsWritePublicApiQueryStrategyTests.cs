@@ -89,8 +89,9 @@ public abstract class AnalyticsWritePublicApiQueryStrategyTests
         {
             return new AnalyticsWritePublicApiQueryStrategy(
                 pathResolver,
-                dateTimeProvider ?? new DateTimeProvider(),
-                Mock.Of<ILogger<AnalyticsWritePublicApiQueryStrategy>>());
+                new CommonAnalyticsWriteStrategyWorkflow<CaptureDataSetVersionQueryRequest>(
+                    dateTimeProvider: dateTimeProvider ?? new DateTimeProvider(),
+                    Mock.Of<ILogger<CommonAnalyticsWriteStrategyWorkflow<CaptureDataSetVersionQueryRequest>>>()));
         }
     }
 }
