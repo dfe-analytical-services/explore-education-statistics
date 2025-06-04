@@ -9,7 +9,9 @@ public record PublicationLatestPublishedReleaseReorderedEvent : IEvent
         Guid publicationId,
         string publicationTitle,
         string publicationSlug,
+        Guid latestPublishedReleaseId,
         Guid latestPublishedReleaseVersionId,
+        Guid previousReleaseId,
         Guid previousReleaseVersionId)
     {
         Subject = publicationId.ToString();
@@ -17,7 +19,9 @@ public record PublicationLatestPublishedReleaseReorderedEvent : IEvent
         {
             Title = publicationTitle,
             Slug = publicationSlug,
+            LatestPublishedReleaseId = latestPublishedReleaseId,
             LatestPublishedReleaseVersionId = latestPublishedReleaseVersionId,
+            PreviousReleaseId = previousReleaseId,
             PreviousReleaseVersionId = previousReleaseVersionId
         };
     }
@@ -41,10 +45,12 @@ public record PublicationLatestPublishedReleaseReorderedEvent : IEvent
     
     public record EventPayload
     {
-        public string Title { get; init; }
-        public string Slug { get; init; }
-        public Guid LatestPublishedReleaseVersionId { get; init; }
-        public Guid PreviousReleaseVersionId { get; init; }
+        public required string Title { get; init; }
+        public required string Slug { get; init; }
+        public required Guid LatestPublishedReleaseId { get; init; }
+        public required Guid LatestPublishedReleaseVersionId { get; init; }
+        public required Guid PreviousReleaseId { get; init; }
+        public required Guid PreviousReleaseVersionId { get; init; }
     }
 
     public EventGridEvent ToEventGridEvent() => new(Subject, EventType, DataVersion, Payload);

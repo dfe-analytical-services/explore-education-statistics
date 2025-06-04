@@ -30,8 +30,8 @@ public class OnPublicationLatestPublishedReleaseReorderedFunction(IEventGridEven
 
                 // Remove the previous "latest" release version's searchable document 
                 RemoveSearchableDocumentDto[] removeSearchableDocuments =
-                    payload.PreviousReleaseVersionId.HasNonEmptyValue()
-                        ? [ new RemoveSearchableDocumentDto{ ReleaseId = payload.PreviousReleaseVersionId.Value} ]
+                    payload.PreviousReleaseId.HasNonEmptyValue()
+                        ? [ new RemoveSearchableDocumentDto{ ReleaseId = payload.PreviousReleaseId.Value} ]
                         : [];
                 
                 return Task.FromResult(new OnPublicationLatestPublishedReleaseReorderedOutput
