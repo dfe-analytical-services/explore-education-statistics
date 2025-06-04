@@ -2823,7 +2823,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 .ReturnsAsync(new MappingStatusViewModel
                 {
                     FiltersComplete = true,
-                    LocationsComplete = true
+                    LocationsComplete = true,
+                    HasMajorVersionUpdate = false
                 });
             var options = Microsoft.Extensions.Options.Options.Create(new FeatureFlags()
             {
@@ -2832,6 +2833,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             
             var contentDbContextId = Guid.NewGuid().ToString();
             var statisticsDbContextId = Guid.NewGuid().ToString();
+            var releaseVersionService = new Mock<IReleaseVersionService>(Strict);
+            if (enableReplacementOfPublicApiDataSets)
+            {
+                releaseVersionService.Setup(service => service.RemoveDataFiles(It.IsAny<Guid>(), It.IsAny<Guid>()))
+                    .ReturnsAsync(Unit.Instance);
+            }
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
@@ -2850,7 +2857,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     timePeriodService: timePeriodService.Object,
                     dataSetVersionService: dataSetVersionService.Object,
                     featureFlags: options,
-                    dataSetVersionMappingService: dataSetVersionMappingService.Object);
+                    dataSetVersionMappingService: dataSetVersionMappingService.Object,
+                    releaseVersionService: releaseVersionService.Object);
 
                 var result = await replacementService.Replace(
                     releaseVersionId: releaseVersion.Id,
@@ -2864,7 +2872,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         locationRepository,
                         timePeriodService,
                         dataSetVersionService,
+                        releaseVersionService,
                         dataSetVersionMappingService);
+                    result.AssertRight();
                 }
                 else
                 {
@@ -2872,8 +2882,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         locationRepository,
                         timePeriodService,
                         dataSetVersionService);
+                    result.AssertBadRequest(ReplacementMustBeValid);
                 }
-                result.AssertBadRequest(ReplacementMustBeValid);
             }
         }
         [Fact]

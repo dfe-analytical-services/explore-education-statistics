@@ -111,9 +111,7 @@ public class DataSetVersionMappingService(
 
     public async Task<MappingStatusViewModel?> GetMappingStatus(Guid dataSetVersionId, CancellationToken cancellationToken = default)
     {
-        bool? isMajorVersionUpdate = featureFlags.Value.EnableReplacementOfPublicApiDataSets
-                ? await IsMajorVersionUpdate(dataSetVersionId, cancellationToken)
-                : null;
+        var isMajorVersionUpdate = await IsMajorVersionUpdate(dataSetVersionId, cancellationToken);
 
         return await publicDataDbContext
             .DataSetVersionMappings

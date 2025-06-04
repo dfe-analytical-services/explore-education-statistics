@@ -643,14 +643,13 @@ public abstract class ReleaseVersionServiceTests
                     service.DeleteItemAsync(new PrivateSubjectMetaCacheKey(releaseVersion.Id, subject.Id)))
                 .Returns(Task.CompletedTask);
             
+            dataSetVersionService.Setup(service => service.GetDataSetVersion(
+                    releaseFile.PublicApiDataSetId!.Value,
+                    releaseFile.PublicApiDataSetVersion!,
+                    It.IsAny<CancellationToken>()))
+                .ReturnsAsync(dataSetVersion);
             if (enableReplacementOfPublicApiDataSets)
             {
-                dataSetVersionService.Setup(service => service.GetDataSetVersion(
-                        releaseFile.PublicApiDataSetId!.Value,
-                        releaseFile.PublicApiDataSetVersion!,
-                        It.IsAny<CancellationToken>()))
-                    .ReturnsAsync(dataSetVersion);
-
                 dataSetVersionService.Setup(service => service.DeleteVersion(
                         It.IsAny<Guid>(),
                         It.IsAny<CancellationToken>()))
@@ -667,15 +666,6 @@ public abstract class ReleaseVersionServiceTests
                 dataBlockService.Setup(service =>
                         service.DeleteDataBlocks(It.IsAny<DeleteDataBlockPlanViewModel>()))
                     .ReturnsAsync(Unit.Instance);
-            }
-            else
-            {
-                
-                dataSetVersionRepository.Setup(repo => repo.GetDataSetVersion(
-                        It.IsAny<Guid>(),
-                        It.IsAny<SemVersion>(),
-                        It.IsAny<CancellationToken>()))
-                    .ReturnsAsync(dataSetVersion);
             }
             
             await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
@@ -2523,8 +2513,7 @@ public abstract class ReleaseVersionServiceTests
             featureFlags: Microsoft.Extensions.Options.Options.Create(new FeatureFlags()
             {
                 EnableReplacementOfPublicApiDataSets = enableReplacementOfPublicApiDataSets
-            }),
-            dataSetVersionRepository ?? Mock.Of<IDataSetVersionRepository>()
+            })
         );
     }
 }

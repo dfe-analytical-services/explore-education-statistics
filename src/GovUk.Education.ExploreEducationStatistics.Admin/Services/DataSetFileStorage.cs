@@ -86,26 +86,19 @@ public class DataSetFileStorage(
             createdById: userService.GetUserId());
 
         await UploadDataSetToReleaseStorage(releaseVersionId, dataFile.Id, metaFile.Id, dataSet, cancellationToken);
-
-        if (featureFlags.Value.EnableReplacementOfPublicApiDataSets &&
-            dataSet.ReplacingFile is not null &&
-            await contentDbContext.ReleaseFiles.AnyAsync(rf =>
+        
+        var releaseFileHasApiDataSet = await contentDbContext.ReleaseFiles.AnyAsync(rf =>
                 rf.ReleaseVersionId == releaseVersionId &&
                 rf.Name == dataSet.Title &&
                 rf.PublicApiDataSetId != null,
-                cancellationToken))
-        {
-            var dataSetVersion = await dataSetVersionRepository.GetDataSetVersion(
-                    replacedReleaseDataFile!.PublicApiDataSetId!.Value,
-                    replacedReleaseDataFile.PublicApiDataSetVersion!,
-                    cancellationToken) ?? throw new ArgumentNullException("The data set version needed to patch as part of this replacement was not found.");
-            
-            await dataSetVersionService.CreateNextVersion(
-                dataReleaseFile.Id,
-                replacedReleaseDataFile.PublicApiDataSetId.Value,
-                dataSetVersion.Id,
-                cancellationToken
-            );
+            cancellationToken);
+
+        if (featureFlags.Value.EnableReplacementOfPublicApiDataSets 
+            && dataSet.ReplacingFile is not null 
+            && releaseFileHasApiDataSet
+            && replacedReleaseDataFile is not null)
+        { 
+            await CreateNextDraftDataSetVersion(cancellationToken, replacedReleaseDataFile, dataReleaseFile);
         }
 
         var dataImport = await dataImportService.Import(subjectId, dataFile, metaFile);
@@ -129,6 +122,29 @@ public class DataSetFileStorage(
             PublicApiDataSetId = dataReleaseFile.PublicApiDataSetId,
             PublicApiDataSetVersion = dataReleaseFile.PublicApiDataSetVersionString,
         };
+    }
+
+    private async Task CreateNextDraftDataSetVersion(
+        CancellationToken cancellationToken,
+        ReleaseFile replacedReleaseDataFile,
+        ReleaseFile dataReleaseFile)
+    {
+        var dataSetId = replacedReleaseDataFile.PublicApiDataSetId;
+        var errorDetails =
+            $"Data set id: {dataSetId?.ToString()}\n" +
+            $"Data set version: {replacedReleaseDataFile.PublicApiDataSetVersion?.Major}.{replacedReleaseDataFile.PublicApiDataSetVersion?.Minor}.{replacedReleaseDataFile.PublicApiDataSetVersion?.Patch}";
+
+        await dataSetVersionService.GetDataSetVersion(dataSetId!.Value,
+                replacedReleaseDataFile?.PublicApiDataSetVersion!,
+                cancellationToken)
+            .OnFailureDo(_ => throw new Exception("Failed to find the data set version attached to the release file that is being replaced.\n" + errorDetails))
+            .OnSuccessDo(async dataSetVersion =>
+                await dataSetVersionService.CreateNextVersion(
+                        dataReleaseFile.Id,
+                        replacedReleaseDataFile!.PublicApiDataSetId!.Value,
+                        dataSetVersion.Id,
+                        cancellationToken
+                    ).OnFailureDo(_ => throw new Exception("Failed to create next draft version.\n" + errorDetails)));
     }
 
     private async Task UploadDataSetToReleaseStorage(

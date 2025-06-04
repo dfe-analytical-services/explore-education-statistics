@@ -87,7 +87,7 @@ const DataFileReplacementPlan = ({
     hasDataSetVersionPlan,
     hasIncompleteLocationMapping,
     hasIncompleteFilterMapping,
-    hasIncompleteMapping,
+    hasNotCompletedImporting,
     hasMajorVersionUpdate,
   } = useMemo(() => {
     if (!isNewReplaceDsvFeatureEnabled) {
@@ -95,7 +95,7 @@ const DataFileReplacementPlan = ({
         hasDataSetVersionPlan: false,
         hasIncompleteLocationMapping: false,
         hasIncompleteFilterMapping: false,
-        hasIncompleteMapping: false,
+        hasNotCompletedImporting: false,
         hasMajorVersionUpdate: false,
       };
     }
@@ -106,7 +106,7 @@ const DataFileReplacementPlan = ({
         !plan?.apiDataSetVersionPlan?.mappingStatus?.locationsComplete,
       hasIncompleteFilterMapping:
         !plan?.apiDataSetVersionPlan?.mappingStatus?.filtersComplete,
-      hasIncompleteMapping: !plan?.apiDataSetVersionPlan?.finishedMapping,
+      hasNotCompletedImporting: !plan?.apiDataSetVersionPlan?.finishedImporting,
       hasMajorVersionUpdate:
         plan?.apiDataSetVersionPlan?.mappingStatus?.hasMajorVersionUpdate,
     };
@@ -528,14 +528,14 @@ const DataFileReplacementPlan = ({
                     </p>
                   )}
                   <h3 className="govuk-heading-m">
-                    <Tag colour={hasIncompleteMapping ? 'red' : 'green'}>
+                    <Tag colour={hasNotCompletedImporting ? 'red' : 'green'}>
                       {`Api data set has to be finalized: ${
-                        hasIncompleteMapping ? 'ERROR' : 'OK'
+                        hasNotCompletedImporting ? 'ERROR' : 'OK'
                       }`}
                     </Tag>
                   </h3>
 
-                  {hasIncompleteMapping ? (
+                  {hasNotCompletedImporting ? (
                     <p>
                       Please{' '}
                       {apiDataSetsTabRoute && (
