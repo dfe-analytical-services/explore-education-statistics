@@ -7,6 +7,7 @@ export interface FormTextInputProps extends FormBaseInputProps {
   defaultValue?: string;
   pattern?: string;
   value?: string;
+  type?: 'text' | 'search';
 }
 
 export default function FormTextInput({
