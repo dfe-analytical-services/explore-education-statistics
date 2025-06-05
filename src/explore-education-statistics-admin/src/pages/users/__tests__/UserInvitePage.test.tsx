@@ -459,7 +459,7 @@ describe('UserInvitePage', () => {
         { releaseId: 'release-1-id', releaseRole: 'Approver' },
       ],
       userPublicationRoles: [
-        { publicationId: 'publication-1-id', publicationRole: 'Approver' },
+        { publicationId: 'publication-1-id', publicationRole: 'Allower' },
       ],
     });
   });

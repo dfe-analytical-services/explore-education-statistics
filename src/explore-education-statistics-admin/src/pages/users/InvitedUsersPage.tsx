@@ -1,6 +1,7 @@
 import Link from '@admin/components/Link';
 import Page from '@admin/components/Page';
 import userService, { PendingInvite } from '@admin/services/userService';
+import publicationRoleDisplayName from '@admin/utils/publicationRoleDisplayName';
 import ButtonText from '@common/components/ButtonText';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import React, { useCallback, useEffect, useState } from 'react';
@@ -101,7 +102,16 @@ const InvitedUsersPage = () => {
                             publicationRole => {
                               return (
                                 <li key={publicationRole.id}>
-                                  {`${publicationRole.publication} - ${publicationRole.role}`}
+                                  {
+                                    // Temporarily transforming the displayed role name whilst we have the temporary 'Allower'
+                                    // publication role. Once the new 'Approver' role is introduced in STEP 9 (EES-6196) of the permissions
+                                    // rework, this can be reverted to display the role without transformation.
+                                    `${
+                                      publicationRole.publication
+                                    } - ${publicationRoleDisplayName(
+                                      publicationRole.role,
+                                    )}`
+                                  }
                                 </li>
                               );
                             },

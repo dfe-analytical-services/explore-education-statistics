@@ -12,6 +12,8 @@ import { mapFieldErrors } from '@common/validation/serverValidations';
 import FormFieldSelect from '@common/components/form/FormFieldSelect';
 import orderBy from 'lodash/orderBy';
 import React from 'react';
+import { PublicationRole } from '@admin/services/types/PublicationRole';
+import publicationRoleDisplayName from '@admin/utils/publicationRoleDisplayName';
 
 const addPublicationFormErrorMappings = [
   mapFieldErrors<FormValues>({
@@ -24,12 +26,12 @@ const addPublicationFormErrorMappings = [
 
 interface FormValues {
   publicationId: string;
-  publicationRole: string;
+  publicationRole: PublicationRole;
 }
 
 interface Props {
   publications?: IdTitlePair[];
-  publicationRoles?: string[];
+  publicationRoles?: PublicationRole[];
   user: User;
   onUpdate: () => void;
 }
@@ -92,7 +94,10 @@ export default function PublicationAccessForm({
                     label="Publication role"
                     name="publicationRole"
                     options={publicationRoles?.map(role => ({
-                      label: role,
+                      // Temporarily transforming the displayed role name whilst we have the temporary 'Allower'
+                      // publication role. Once the new 'Approver' role is introduced in STEP 9 (EES-6196) of the permissions
+                      // rework, this can be reverted to display the role without transformation.
+                      label: publicationRoleDisplayName(role),
                       value: role,
                     }))}
                   />
@@ -136,7 +141,12 @@ export default function PublicationAccessForm({
                         {userPublicationRole.publication}
                       </td>
                       <td className="govuk-table__cell">
-                        {userPublicationRole.role}
+                        {
+                          // Temporarily transforming the displayed role name whilst we have the temporary 'Allower'
+                          // publication role. Once the new 'Approver' role is introduced in STEP 9 (EES-6196) of the permissions
+                          // rework, this can be reverted to display the role without transformation.
+                          publicationRoleDisplayName(userPublicationRole.role)
+                        }
                       </td>
                       <td className="govuk-table__cell">
                         <ButtonText
