@@ -223,10 +223,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                         UnexpectedFailMessage =
                             $"Expected having role {role} on the Publication to have made the handler succeed",
                     });
-            });
-
-            await ForEachPublicationRoleAsync(async role =>
-            {
+            
                 // Test the handler fails without the role on the correct Publication or the correct User
                 await AssertHandlerHandlesPublicationRoleScenarioSuccessfully<TRequirement>(handlerSupplier,
                     new PublicationRoleTestScenario
