@@ -19,6 +19,48 @@ public class AnalyticsService(
     IHttpContextAccessor httpContextAccessor,
     ILogger<AnalyticsService> logger) : IAnalyticsService
 {
+    public async Task CaptureDataSetCall(
+        Guid dataSetId,
+        DataSetCallType type,
+        CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            // Filter out any non-public calls from analytics.
+            if (!IncludeAnalyticsCall())
+            {
+                logger.LogDebug(
+                    message: """
+                             Ignoring capturing analytics for "{Type}" call for DataSet {Id}.
+                             """,
+                    type,
+                    dataSetId);
+                return;
+            }
+
+            var dataSet = await publicDataDbContext
+                .DataSets
+                .SingleAsync(ds => ds.Id == dataSetId, cancellationToken);
+
+            var request = new CaptureDataSetCallRequest(
+                DataSetId: dataSet.Id,
+                DataSetTitle: dataSet.Title,
+                PreviewToken: await GetPreviewTokenRequest(),
+                StartTime: dateTimeProvider.UtcNow,
+                Type: type);
+
+            await analyticsManager.Add(request, cancellationToken);
+        }
+        catch (Exception e)
+        {
+            logger.LogError(
+                exception: e,
+                message: """Error whilst capturing analytics for "{Type}" call for DataSet {Id}""",
+                type,
+                dataSetId);
+        }
+    }
+    
     public async Task CaptureDataSetVersionCall(
         Guid dataSetVersionId,
         DataSetVersionCallType type,
@@ -33,8 +75,7 @@ public class AnalyticsService(
             {
                 logger.LogDebug(
                     message: """
-                             Ignoring capturing analytics for "{Type}" call for DataSetVersion {Id}
-                             for privileged user's call.
+                             Ignoring capturing analytics for "{Type}" call for DataSetVersion {Id}.
                              """,
                     type,
                     dataSetVersionId);
@@ -143,6 +184,14 @@ public class AnalyticsService(
 
 public class NoOpAnalyticsService : IAnalyticsService
 {
+    public Task CaptureDataSetCall(
+        Guid dataSetId,
+        DataSetCallType type,
+        CancellationToken cancellationToken = default)
+    {
+        return Task.CompletedTask;
+    }
+
     public Task CaptureDataSetVersionCall(
         Guid dataSetVersionId,
         DataSetVersionCallType type,

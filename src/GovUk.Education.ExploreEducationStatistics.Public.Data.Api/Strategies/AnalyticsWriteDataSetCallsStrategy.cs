@@ -7,29 +7,29 @@ using IAnalyticsPathResolver = GovUk.Education.ExploreEducationStatistics.Public
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Strategies;
 
-public class AnalyticsWriteDataSetVersionCallsStrategy(
+public class AnalyticsWriteDataSetCallsStrategy(
     IAnalyticsPathResolver analyticsPathResolver,
     DateTimeProvider dateTimeProvider,
-    ILogger<AnalyticsWriteDataSetVersionCallsStrategy> logger
+    ILogger<AnalyticsWriteDataSetCallsStrategy> logger
     ) : IAnalyticsWriteStrategy
 {
-    public Type RequestType => typeof(CaptureDataSetVersionCallRequest);
+    public Type RequestType => typeof(CaptureDataSetCallRequest);
 
     public async Task Report(IAnalyticsCaptureRequestBase request, CancellationToken cancellationToken)
     {
-        if (request is not CaptureDataSetVersionCallRequest callRequest)
+        if (request is not CaptureDataSetCallRequest callRequest)
         {
-            throw new ArgumentException($"request isn't a {nameof(CaptureDataSetVersionCallRequest)}");
+            throw new ArgumentException($"request isn't a {nameof(CaptureDataSetCallRequest)}");
         }
         
         logger.LogInformation(
-            "Capturing DataSetVersion-level call of type {Type} for analytics - for data set {DataSetTitle}",
+            "Capturing DataSet-level call of type {Type} for analytics - for data set {DataSetTitle}",
             callRequest.Type,
             callRequest.DataSetTitle);
 
-        var directory = analyticsPathResolver.PublicApiDataSetVersionCallsDirectoryPath();
+        var directory = analyticsPathResolver.PublicApiDataSetCallsDirectoryPath();
         var filename =
-            $"{dateTimeProvider.UtcNow:yyyyMMdd-HHmmss}_{callRequest.DataSetVersionId}_{RandomUtils.RandomString()}.json";
+            $"{dateTimeProvider.UtcNow:yyyyMMdd-HHmmss}_{callRequest.DataSetId}_{RandomUtils.RandomString()}.json";
 
         try
         {
