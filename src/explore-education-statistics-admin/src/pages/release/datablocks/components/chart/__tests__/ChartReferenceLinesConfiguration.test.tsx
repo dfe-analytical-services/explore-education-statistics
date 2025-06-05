@@ -72,18 +72,12 @@ describe('ChartReferenceLinesConfiguration', () => {
     id: 'xaxis',
     title: 'X Axis (major axis)',
     type: 'major',
-    capabilities: {
-      canRotateLabel: false,
-    },
   };
   const testMinorAxisDefinition: ChartDefinitionAxis = {
     axis: 'y',
     id: 'yaxis',
     title: 'Y Axis (minor axis)',
     type: 'minor',
-    capabilities: {
-      canRotateLabel: true,
-    },
   };
 
   const testTable = testFullTable;
