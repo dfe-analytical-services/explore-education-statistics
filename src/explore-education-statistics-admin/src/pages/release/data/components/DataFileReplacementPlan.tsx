@@ -461,7 +461,7 @@ const DataFileReplacementPlan = ({
                 <>
                   <h3 className="govuk-heading-m">
                     <Tag colour={hasMajorVersionUpdate ? 'red' : 'green'}>
-                      {`Api data set status: ${
+                      {`API data set status: ${
                         hasMajorVersionUpdate ? 'ERROR' : 'OK'
                       }`}
                     </Tag>
@@ -482,7 +482,7 @@ const DataFileReplacementPlan = ({
                 <>
                   <h3 className="govuk-heading-m">
                     <Tag colour={hasIncompleteFilterMapping ? 'red' : 'green'}>
-                      {`Api data set Filters: ${
+                      {`API data set Filters: ${
                         hasIncompleteFilterMapping ? 'ERROR' : 'OK'
                       }`}
                     </Tag>
@@ -499,14 +499,14 @@ const DataFileReplacementPlan = ({
                       and complete manual mapping process for filters.
                     </p>
                   ) : (
-                    <p>No manual mapping required for Api data set filters.</p>
+                    <p>No manual mapping required for API data set filters.</p>
                   )}
 
                   <h3 className="govuk-heading-m">
                     <Tag
                       colour={hasIncompleteLocationMapping ? 'red' : 'green'}
                     >
-                      {`Api data set Locations: ${
+                      {`API data set Locations: ${
                         hasIncompleteLocationMapping ? 'ERROR' : 'OK'
                       }`}
                     </Tag>
@@ -524,12 +524,12 @@ const DataFileReplacementPlan = ({
                     </p>
                   ) : (
                     <p>
-                      No manual mapping required for Api data set locations.
+                      No manual mapping required for API data set locations.
                     </p>
                   )}
                   <h3 className="govuk-heading-m">
                     <Tag colour={hasNotCompletedImporting ? 'red' : 'green'}>
-                      {`Api data set has to be finalized: ${
+                      {`API data set has to be finalized: ${
                         hasNotCompletedImporting ? 'ERROR' : 'OK'
                       }`}
                     </Tag>
@@ -546,7 +546,7 @@ const DataFileReplacementPlan = ({
                       and finalize the data set version mapping process.
                     </p>
                   ) : (
-                    <p>No actions required for Api data set version mapping.</p>
+                    <p>No actions required for API data set version mapping.</p>
                   )}
                 </>
               )}

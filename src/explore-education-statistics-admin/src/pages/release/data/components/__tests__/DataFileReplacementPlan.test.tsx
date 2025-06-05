@@ -421,10 +421,10 @@ describe('DataReplacementPlan', () => {
       );
       await waitFor(() => {
         expect(
-          screen.getByText('Api data set Filters: ERROR'),
+          screen.getByText('API data set Filters: ERROR'),
         ).toBeInTheDocument();
         expect(
-          screen.getByText('Api data set Locations: ERROR'),
+          screen.getByText('API data set Locations: ERROR'),
         ).toBeInTheDocument();
       });
     });
@@ -445,10 +445,10 @@ describe('DataReplacementPlan', () => {
         </MemoryRouter>,
       );
       await waitFor(() => {
-        expect(() => screen.getByText('Api data set Filters: ERROR')).toThrow(
+        expect(() => screen.getByText('API data set Filters: ERROR')).toThrow(
           'Unable to find an element',
         );
-        expect(() => screen.getByText('Api data set Locations: ERROR')).toThrow(
+        expect(() => screen.getByText('API data set Locations: ERROR')).toThrow(
           'Unable to find an element',
         );
       });
@@ -485,10 +485,10 @@ describe('DataReplacementPlan', () => {
         </FeatureFlagProvider>,
       );
       await waitFor(() => {
-        expect(() => screen.getByText('Api data set Filters: ERROR')).toThrow(
+        expect(() => screen.getByText('API data set Filters: ERROR')).toThrow(
           'Unable to find an element',
         );
-        expect(() => screen.getByText('Api data set Locations: ERROR')).toThrow(
+        expect(() => screen.getByText('API data set Locations: ERROR')).toThrow(
           'Unable to find an element',
         );
       });
