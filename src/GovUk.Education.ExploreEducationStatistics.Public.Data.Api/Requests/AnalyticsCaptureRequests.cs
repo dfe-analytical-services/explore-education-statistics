@@ -5,6 +5,15 @@ using GovUk.Education.ExploreEducationStatistics.Analytics.Common.Interfaces;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Requests;
 
+public record CaptureDataSetCallRequest(
+    Guid DataSetId,
+    string DataSetTitle,
+    PreviewTokenRequest? PreviewToken,
+    DateTimeOffset StartTime,
+    [property:JsonConverter(typeof(StringEnumConverter))]
+    DataSetCallType Type
+) : IAnalyticsCaptureRequestBase;
+
 public record CaptureDataSetVersionQueryRequest(
     Guid DataSetId,
     Guid DataSetVersionId,
@@ -30,6 +39,12 @@ public record CaptureDataSetVersionCallRequest(
     DataSetVersionCallType Type,
     object? Parameters = null
 ) : IAnalyticsCaptureRequestBase;
+
+public enum DataSetCallType
+{
+    GetSummary,
+    GetVersions
+}
 
 public enum DataSetVersionCallType
 {

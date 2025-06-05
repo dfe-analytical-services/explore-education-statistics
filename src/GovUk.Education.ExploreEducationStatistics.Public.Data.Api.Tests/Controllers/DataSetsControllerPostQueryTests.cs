@@ -22,7 +22,6 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Services.Tests;
-using GovUk.Education.ExploreEducationStatistics.Public.Data.Utils.Requests;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Primitives;
@@ -4002,7 +4001,7 @@ public abstract class DataSetsControllerPostQueryTests(TestApplicationFactory te
             var response = await QueryDataSet(
                 dataSetId: dataSetVersion.DataSetId,
                 request: request,
-                additionalHeaders: new Dictionary<string, string> { { RequestHeaderNames.RequestSource, "EES" } });
+                requestSource: "EES");
             
             response.AssertOk<DataSetQueryPaginatedResultsViewModel>(useSystemJson: true);
             
@@ -4145,7 +4144,7 @@ public abstract class DataSetsControllerPostQueryTests(TestApplicationFactory te
         string? dataSetVersion = null,
         Guid? previewTokenId = null,
         WebApplicationFactory<Startup>? app = null,
-        Dictionary<string, string>? additionalHeaders = null)
+        string? requestSource = null)
     {
         var query = new Dictionary<string, StringValues>();
 
@@ -4157,7 +4156,7 @@ public abstract class DataSetsControllerPostQueryTests(TestApplicationFactory te
         var client = (app ?? BuildApp())
             .CreateClient()
             .WithPreviewTokenHeader(previewTokenId)
-            .WithAdditionalHeaders(additionalHeaders);
+            .WithRequestSourceHeader(requestSource);
 
         var uri = QueryHelpers.AddQueryString($"{BaseUrl}/{dataSetId}/query", query);
 

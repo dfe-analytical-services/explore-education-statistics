@@ -38,9 +38,9 @@ public static class AnalyticsServiceCollectionExtensions
             services.AddSingleton<IAnalyticsPathResolver, AnalyticsPathResolver>();
         }
 
-        services.AddTransient<IAnalyticsWriteStrategy, AnalyticsWritePublicApiQueryStrategy>();
+        services.AddTransient<IAnalyticsWriteStrategy, AnalyticsWriteDataSetCallsStrategy>();
         services.AddTransient<IAnalyticsWriteStrategy, AnalyticsWriteDataSetVersionCallsStrategy>();
-
+        services.AddTransient<IAnalyticsWriteStrategy, AnalyticsWritePublicApiQueryStrategy>();
         return services;
     }
 }
