@@ -709,17 +709,13 @@ If you're using a custom BaseIntermediateOutputPath or MSBuildProjectExtensionsP
 Use the --msbuildprojectextensionspath option
 ```
 Then what you should do is set the value of the option parameter `msbuildprojectextensionspath`  to the `artifacts` folder of the application you are making changes to; for example:
-1) for the Admin applcation:
+1) for the Admin applcation (ContentDbContext):
 ```sh
-dotnet ef migrations add EES1234_TESTTTT --context ContentDbContext --output-dir Migrations/ContentMigrations -v --msbuildprojectextensionspath C:\Users\USERNAMERepo\explore-education-statistics\src\EES\src\artifacts\obj\GovUk.Education.ExploreEducationStatistics.Admin\
+dotnet ef migrations add <TICKET_NUMBER>_<MIGRATION_DESCRIPTION> --context ContentDbContext --output-dir Migrations/ContentMigrations -v --msbuildprojectextensionspath ~\<REPOSITORY_DIRECTORY>\explore-education-statistics\src\EES\src\artifacts\obj\GovUk.Education.ExploreEducationStatistics.Admin\
 ```
 2) for the public data API:
 ```sh
-dotnet ef migrations add EES1234_TESTTTT --context PublicDataDbContext --project ../GovUk.Education.ExploreEducationStatistics.Public.Data.Model -v --msbuildprojectextensionspath C:\Users\USERNAMERepo\explore-education-statistics\src\artifacts\obj\GovUk.Education.ExploreEducationStatistics.Public.Data.Model\
-```
-3) To update the public data API:
-```sh
-dotnet ef database update EES1234_TESTTTT --msbuildprojectextensionspath C:\Users\USERNAMERepo\explore-education-statistics\explore-education-statistics\src\artifacts\obj\GovUk.Education.ExploreEducationStatistics.Public.Data.Api\
+dotnet ef migrations add <TICKET_NUMBER>_<MIGRATION_DESCRIPTION> --context PublicDataDbContext --project ../GovUk.Education.ExploreEducationStatistics.Public.Data.Model -v --msbuildprojectextensionspath ~\<REPOSITORY_DIRECTORY>\explore-education-statistics\src\artifacts\obj\GovUk.Education.ExploreEducationStatistics.Public.Data.Model\
 ```
 
 
