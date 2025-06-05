@@ -1,6 +1,5 @@
 *** Settings ***
 Resource            ../libs/public-common.robot
-Resource            ../seed_data/seed_data_theme_1_constants.robot
 
 Suite Setup         user opens the browser
 Suite Teardown      user closes the browser
