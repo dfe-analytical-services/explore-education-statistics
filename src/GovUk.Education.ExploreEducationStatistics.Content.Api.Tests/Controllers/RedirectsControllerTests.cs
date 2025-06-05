@@ -12,6 +12,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Cache;
 using GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
@@ -415,6 +416,9 @@ public abstract class RedirectsControllerTests(TestApplicationFactory testApp) :
 
     private WebApplicationFactory<Startup> BuildApp(bool enableAzurite = false)
     {
-        return WithAzurite(enabled: enableAzurite);
+        List<Action<IWebHostBuilder>> configFuncs = enableAzurite
+            ? [WithAzurite()]
+            : [];
+        return BuildWebApplicationFactory(configFuncs);
     }
 }

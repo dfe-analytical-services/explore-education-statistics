@@ -34,7 +34,9 @@ public class AdminEventRaiserMockBuilder
     private static readonly Expression<Func<IAdminEventRaiser, Task>> OnPublicationLatestPublishedReleaseReordered =
         m => m.OnPublicationLatestPublishedReleaseReordered(
             It.IsAny<Publication>(),
-            It.IsAny<Guid>());
+            It.IsAny<Guid>(),
+            It.IsAny<Guid>()
+            );
 
     private static readonly Expression<Func<IAdminEventRaiser, Task>> OnPublicationRestored =
         m => m.OnPublicationRestored(
@@ -65,10 +67,17 @@ public class AdminEventRaiserMockBuilder
         _mock
             .Setup(m => m.OnPublicationLatestPublishedReleaseReordered(
                 It.IsAny<Publication>(),
+                It.IsAny<Guid>(),
                 It.IsAny<Guid>()))
-            .Callback((Publication publication, Guid oldLatestPublishedReleaseVersionId) =>
+            .Callback((
+                    Publication publication, 
+                    Guid oldLatestPublishedReleaseId,
+                    Guid oldLatestPublishedReleaseVersionId) =>
                 _invocations
-                    .Add(new InvokeArguments(publication, oldLatestPublishedReleaseVersionId)))
+                    .Add(new InvokeArguments(
+                        publication, 
+                        oldLatestPublishedReleaseId,
+                        oldLatestPublishedReleaseVersionId)))
             .Returns(Task.CompletedTask);
 
         _mock
@@ -76,7 +85,12 @@ public class AdminEventRaiserMockBuilder
             .Returns(Task.CompletedTask);
     }
 
-    private record InvokeArguments(Publication Publication, Guid OldLatestPublishedReleaseVersionId);
+    private record InvokeArguments(
+        Publication Publication, 
+        Guid OldLatestPublishedReleaseId,
+        Guid OldLatestPublishedReleaseVersionId)
+    {
+    }
 
     public class Asserter(AdminEventRaiserMockBuilder mockBuilder)
     {
@@ -134,13 +148,16 @@ public class AdminEventRaiserMockBuilder
 
         public void OnPublicationLatestPublishedReleaseReorderedWasRaised(
             Publication publication,
+            Guid previousReleaseId,
             Guid previousReleaseVersionId)
         {
             var expectedEvent = new PublicationLatestPublishedReleaseReorderedEvent(
                 publication.Id,
                 publication.Title,
                 publication.Slug,
+                publication.LatestPublishedReleaseVersion?.ReleaseId ?? throw new ArgumentException("Publication does not have latest published release version child object.", nameof(publication)),
                 publication.LatestPublishedReleaseVersionId!.Value,
+                previousReleaseId,
                 previousReleaseVersionId);
 
             Xunit.Assert.Single(
@@ -150,7 +167,9 @@ public class AdminEventRaiserMockBuilder
                         inv.Publication.Id,
                         inv.Publication.Title,
                         inv.Publication.Slug,
+                        inv.Publication.LatestPublishedReleaseVersion!.ReleaseId,
                         inv.Publication.LatestPublishedReleaseVersionId!.Value,
+                        inv.OldLatestPublishedReleaseId,
                         inv.OldLatestPublishedReleaseVersionId)
                     == expectedEvent);
         }

@@ -129,7 +129,7 @@ public class ProcessorClientTests
 
             _mockHttp.VerifyNoOutstandingExpectation();
 
-            var right = response.AssertRight();
+            response.AssertRight();
         }
 
         [Fact]

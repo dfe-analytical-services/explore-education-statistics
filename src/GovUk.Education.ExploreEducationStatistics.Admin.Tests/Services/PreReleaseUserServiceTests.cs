@@ -647,7 +647,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var preReleaseUser = Assert.Single(preReleaseUsers);
 
                 Assert.NotNull(preReleaseUser);
-                Assert.Equal("test@test.com", preReleaseUser!.Email);
+                Assert.Equal("test@test.com", preReleaseUser.Email);
             }
 
             await using (var context = InMemoryApplicationDbContext(contextId))
@@ -655,7 +655,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var savedUserReleaseRole = Assert.Single(context.UserReleaseRoles);
 
                 Assert.NotNull(savedUserReleaseRole);
-                Assert.Equal(releaseVersion.Id, savedUserReleaseRole!.ReleaseVersionId);
+                Assert.Equal(releaseVersion.Id, savedUserReleaseRole.ReleaseVersionId);
                 Assert.Equal(ReleaseRole.PrereleaseViewer, savedUserReleaseRole.Role);
                 Assert.Equal(user.Id, savedUserReleaseRole.UserId);
 
@@ -769,7 +769,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var preReleaseUser = Assert.Single(preReleaseUsers);
 
                 Assert.NotNull(preReleaseUser);
-                Assert.Equal("test@test.com", preReleaseUser!.Email);
+                Assert.Equal("test@test.com", preReleaseUser.Email);
             }
 
             await using (var context = InMemoryApplicationDbContext(contextId))
@@ -777,7 +777,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var savedUserReleaseRole = Assert.Single(context.UserReleaseRoles);
 
                 Assert.NotNull(savedUserReleaseRole);
-                Assert.Equal(releaseVersion.Id, savedUserReleaseRole!.ReleaseVersionId);
+                Assert.Equal(releaseVersion.Id, savedUserReleaseRole.ReleaseVersionId);
                 Assert.Equal(ReleaseRole.PrereleaseViewer, savedUserReleaseRole.Role);
                 Assert.Equal(user.Id, savedUserReleaseRole.UserId);
 
@@ -851,7 +851,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var preReleaseUser = Assert.Single(preReleaseUsers);
 
                 Assert.NotNull(preReleaseUser);
-                Assert.Equal("test@test.com", preReleaseUser!.Email);
+                Assert.Equal("test@test.com", preReleaseUser.Email);
             }
 
             await using (var context = InMemoryApplicationDbContext(contextId))
@@ -859,7 +859,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var releaseInvite = Assert.Single(context.UserReleaseInvites);
 
                 Assert.NotNull(releaseInvite);
-                Assert.Equal(releaseVersion.Id, releaseInvite!.ReleaseVersionId);
+                Assert.Equal(releaseVersion.Id, releaseInvite.ReleaseVersionId);
                 Assert.Equal("test@test.com", releaseInvite.Email);
                 Assert.Equal(ReleaseRole.PrereleaseViewer, releaseInvite.Role);
                 Assert.True(releaseInvite.EmailSent); // Email sent immediately for approved release
@@ -870,7 +870,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var userInvite = Assert.Single(userAndRolesDbContext.UserInvites);
 
                 Assert.NotNull(userInvite);
-                Assert.Equal("test@test.com", userInvite!.Email);
+                Assert.Equal("test@test.com", userInvite.Email);
                 Assert.Equal(Role.PrereleaseUser.GetEnumValue(), userInvite.RoleId);
                 Assert.False(userInvite.Accepted);
             }
@@ -972,7 +972,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var preReleaseUser = Assert.Single(preReleaseUsers);
 
                 Assert.NotNull(preReleaseUser);
-                Assert.Equal("test@test.com", preReleaseUser!.Email);
+                Assert.Equal("test@test.com", preReleaseUser.Email);
             }
 
             await using (var context = InMemoryApplicationDbContext(contextId))
@@ -980,7 +980,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var releaseInvite = Assert.Single(context.UserReleaseInvites);
 
                 Assert.NotNull(releaseInvite);
-                Assert.Equal(releaseVersion.Id, releaseInvite!.ReleaseVersionId);
+                Assert.Equal(releaseVersion.Id, releaseInvite.ReleaseVersionId);
                 Assert.Equal("test@test.com", releaseInvite.Email);
                 Assert.Equal(ReleaseRole.PrereleaseViewer, releaseInvite.Role);
                 Assert.False(releaseInvite.EmailSent); // Email not sent immediately for unapproved releases
@@ -991,7 +991,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var userInvite = Assert.Single(userAndRolesDbContext.UserInvites);
 
                 Assert.NotNull(userInvite);
-                Assert.Equal("test@test.com", userInvite!.Email);
+                Assert.Equal("test@test.com", userInvite.Email);
                 Assert.Equal(Role.PrereleaseUser.GetEnumValue(), userInvite.RoleId);
                 Assert.False(userInvite.Accepted);
             }
@@ -1743,7 +1743,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var savedUserInvite = Assert.Single(userAndRolesDbContext.UserInvites);
                 Assert.NotNull(savedUserInvite);
-                Assert.Equal("test@test.com", savedUserInvite!.Email);
+                Assert.Equal("test@test.com", savedUserInvite.Email);
             }
         }
 

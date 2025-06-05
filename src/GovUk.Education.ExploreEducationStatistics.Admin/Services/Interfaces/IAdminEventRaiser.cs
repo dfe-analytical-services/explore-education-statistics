@@ -24,6 +24,7 @@ public interface IAdminEventRaiser
 
     Task OnPublicationLatestPublishedReleaseReordered(
         Publication publication,
+        Guid previousLatestPublishedReleaseId,
         Guid previousLatestPublishedReleaseVersionId);
 
     Task OnPublicationRestored(

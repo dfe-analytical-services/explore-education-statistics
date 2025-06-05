@@ -587,21 +587,34 @@ public class PublicationService(
 
                 // Work out the publication's new latest published release version (if any).
                 // This is the latest published version of the first release which has a published version 
-                Guid? latestPublishedReleaseVersionId = null;
-                foreach (var releaseId in updatedSeriesReleaseIds)
-                {
-                    latestPublishedReleaseVersionId = (await context.ReleaseVersions
-                        .LatestReleaseVersion(releaseId: releaseId, publishedOnly: true)
-                        .SingleOrDefaultAsync())?.Id;
+                var allPublishedReleasesAndLatestVersion = await GetAllPublishedReleasesAndLatestVersions();
 
-                    if (latestPublishedReleaseVersionId != null)
+                async Task<ICollection<ReleaseAndVersion>> GetAllPublishedReleasesAndLatestVersions()
+                {
+                    var releaseAndVersions = new List<ReleaseAndVersion>();
+                    foreach (var releaseId in updatedSeriesReleaseIds)
                     {
-                        break;
+                        var latestPublishedReleaseVersionIdForReleaseId = (await context.ReleaseVersions
+                            .LatestReleaseVersion(releaseId: releaseId, publishedOnly: true)
+                            .SingleOrDefaultAsync())?.Id;
+
+                        if (latestPublishedReleaseVersionIdForReleaseId != null)
+                        {
+                            releaseAndVersions.Add(new ReleaseAndVersion(releaseId, latestPublishedReleaseVersionIdForReleaseId.Value));
+                        }
                     }
+                    return releaseAndVersions;
                 }
 
-                var oldLatestPublishedReleaseVersionId = publication.LatestPublishedReleaseVersionId;
-                publication.LatestPublishedReleaseVersionId = latestPublishedReleaseVersionId;
+                // Get the about-to-be replaced release and version.
+                var oldLatestPublishedReleaseAndVersion = publication.LatestPublishedReleaseVersionId != null
+                    ? allPublishedReleasesAndLatestVersion.Single(rav =>
+                        rav.ReleaseVersionId == publication.LatestPublishedReleaseVersionId)
+                    : null;
+
+                // Set the latest published release version
+                var newLatestPublishedReleaseAndVersion = allPublishedReleasesAndLatestVersion.FirstOrDefault();
+                publication.LatestPublishedReleaseVersionId = newLatestPublishedReleaseAndVersion?.ReleaseVersionId;
 
                 publication.ReleaseSeries = updatedReleaseSeriesItems
                     .Select(request => new ReleaseSeriesItem
@@ -619,19 +632,21 @@ public class PublicationService(
 
                 // If the publication's latest published release version has changed,
                 // update the publication's cached latest release version
-                if (oldLatestPublishedReleaseVersionId != latestPublishedReleaseVersionId &&
-                    latestPublishedReleaseVersionId.HasValue)
+                if (oldLatestPublishedReleaseAndVersion != newLatestPublishedReleaseAndVersion 
+                    && newLatestPublishedReleaseAndVersion != null)
                 {
-                    await releaseCacheService.UpdateRelease(releaseVersionId: latestPublishedReleaseVersionId.Value,
+                    await releaseCacheService.UpdateRelease(
+                        releaseVersionId: newLatestPublishedReleaseAndVersion.ReleaseVersionId,
                         publicationSlug: publication.Slug);
 
                     // The reordering of the series implies that there was already a published release version,
                     // therefore, this should always have a value
-                    if (oldLatestPublishedReleaseVersionId.HasValue)
+                    if (oldLatestPublishedReleaseAndVersion != null)
                     {
                         await adminEventRaiser.OnPublicationLatestPublishedReleaseReordered(
                             publication,
-                            oldLatestPublishedReleaseVersionId.Value);
+                            oldLatestPublishedReleaseAndVersion.ReleaseId,
+                            oldLatestPublishedReleaseAndVersion.ReleaseVersionId);
                     }
                 }
 
@@ -660,7 +675,7 @@ public class PublicationService(
             return ValidationActionResult(PublicationSlugUsedByRedirect);
         }
 
-        if (publicationId.HasValue &&
+        if (publicationId != null &&
             context.PublicationMethodologies.Any(pm =>
                 pm.Publication.Id == publicationId
                 && pm.Owner)
@@ -723,4 +738,6 @@ public class PublicationService(
             _ => throw new Exception(),
         };
     }
+    
+    private record ReleaseAndVersion(Guid ReleaseId, Guid ReleaseVersionId);
 }

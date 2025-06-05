@@ -18,6 +18,9 @@ public class DuckDbParameter : DuckDBParameter
         // By not setting `ParameterName`, we go force the usage of auto-incrementing
         // positional parameters (i.e. ?) which seem to work reliably.
         get => string.Empty;
+#pragma warning disable CS8765 // Nullability of type of parameter doesn't match overridden member (possibly because of nullability attributes).
+        // ReSharper disable once ValueParameterNotUsed
         set => base.ParameterName = string.Empty;
+#pragma warning restore CS8765 // Nullability of type of parameter doesn't match overridden member (possibly because of nullability attributes).
     }
 }

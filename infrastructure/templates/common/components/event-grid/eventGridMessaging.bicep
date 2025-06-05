@@ -1,4 +1,3 @@
-import { abbreviations } from '../../abbreviations.bicep'
 import { buildFullyQualifiedTopicName } from '../../functions.bicep'
 import { IpRange } from '../../types.bicep'
 
