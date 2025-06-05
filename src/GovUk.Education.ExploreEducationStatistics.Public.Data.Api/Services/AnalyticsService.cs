@@ -19,6 +19,20 @@ public class AnalyticsService(
     IHttpContextAccessor httpContextAccessor,
     ILogger<AnalyticsService> logger) : IAnalyticsService
 {
+    public async Task CaptureTopLevelCall(
+        TopLevelCallType type,
+        object? parameters = null,
+        CancellationToken cancellationToken = default)
+    {
+        await DoCaptureCall(
+            requestSupplier: () => Task.FromResult(
+                new CaptureTopLevelCallRequest(
+                    Type: type,
+                    Parameters: parameters,
+                    StartTime: dateTimeProvider.UtcNow)),
+            cancellationToken: cancellationToken);
+    }
+    
     public async Task CaptureDataSetCall(
         Guid dataSetId,
         DataSetCallType type,
@@ -159,6 +173,14 @@ public class AnalyticsService(
 
 public class NoOpAnalyticsService : IAnalyticsService
 {
+    public Task CaptureTopLevelCall(
+        TopLevelCallType type,
+        object? parameters = null,
+        CancellationToken cancellationToken = default)
+    {
+        return Task.CompletedTask;
+    }
+
     public Task CaptureDataSetCall(
         Guid dataSetId,
         DataSetCallType type,

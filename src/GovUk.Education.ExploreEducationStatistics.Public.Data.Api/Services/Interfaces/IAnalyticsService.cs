@@ -6,6 +6,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services.In
 
 public interface IAnalyticsService
 {
+    Task CaptureTopLevelCall(
+        TopLevelCallType type,
+        object? parameters = null,
+        CancellationToken cancellationToken = default);
+    
     Task CaptureDataSetCall(
         Guid dataSetId,
         DataSetCallType type,
