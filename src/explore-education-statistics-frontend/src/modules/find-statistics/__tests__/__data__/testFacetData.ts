@@ -29,22 +29,18 @@ const testReleaseTypeFacetResults: FacetResult[] = [
   },
 ];
 
-// eslint-disable-next-line import/prefer-default-export
 export const testFacetResults = {
   releaseType: testReleaseTypeFacetResults,
   themeId: testFacetThemeResults,
 };
-// eslint-disable-next-line import/prefer-default-export
 export const testFacetResultsSearched = {
   releaseType: [testReleaseTypeFacetResults[0], testReleaseTypeFacetResults[1]],
   themeId: [testFacetThemeResults[1], testFacetThemeResults[2]],
 };
-// eslint-disable-next-line import/prefer-default-export
 export const testFacetResultsSearchedOneResult = {
   releaseType: [testReleaseTypeFacetResults[0]],
   themeId: [testFacetThemeResults[2]],
 };
-// eslint-disable-next-line import/prefer-default-export
 export const testFacetNoResults = {
   releaseType: [],
   themeId: [],
