@@ -744,8 +744,7 @@ public abstract class ReleasesControllerIntegrationTests(TestApplicationFactory 
             Assert.False(releaseRedirectsExist);
 
             // Check that the redirects cache is untouched
-            var newRedirectsCachedValue = await publicBlobCacheService.GetItemAsync(redirectsCacheKey, typeof(RedirectsViewModel))
-                as RedirectsViewModel;
+            await publicBlobCacheService.GetItemAsync(redirectsCacheKey, typeof(RedirectsViewModel));
 
             Assert.Empty(oldRedirectsCachedViewModel.PublicationRedirects);
             Assert.Empty(oldRedirectsCachedViewModel.MethodologyRedirects);
@@ -860,8 +859,7 @@ public abstract class ReleasesControllerIntegrationTests(TestApplicationFactory 
             Assert.False(releaseRedirectExists);
 
             // Check that the redirects cache is untouched
-            var newRedirectsCachedValue = await publicBlobCacheService.GetItemAsync(redirectsCacheKey, typeof(RedirectsViewModel))
-                as RedirectsViewModel;
+            await publicBlobCacheService.GetItemAsync(redirectsCacheKey, typeof(RedirectsViewModel));
 
             Assert.Empty(oldRedirectsCachedViewModel.PublicationRedirects);
             Assert.Empty(oldRedirectsCachedViewModel.MethodologyRedirects);
