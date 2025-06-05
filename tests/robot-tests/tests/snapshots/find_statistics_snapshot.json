@@ -217,6 +217,13 @@
     "theme": "UK education and training statistics"
   },
   {
+    "publication_summary": "Estimate of the number of pupils DfE expects to benefit from expanding the criteria for eligibility to free school meals.",
+    "publication_title": "Estimate of additional children claiming Free School Meals following expansion of eligibility",
+    "published": "5 Jun 2025",
+    "release_type": "Ad hoc statistics",
+    "theme": "Pupils and schools"
+  },
+  {
     "publication_summary": "Initial outputs from DfE's Childcare Experiences Survey (aka \u201cYour Childcare\u201d), understanding working parents' experiences of the expanded childcare entitlement",
     "publication_title": "Expansion to early childcare entitlements: Childcare Experiences Survey",
     "published": "12 May 2025",
@@ -275,7 +282,7 @@
   {
     "publication_summary": "Official statistics on labour market outcomes such as salaries and employment rates, for graduates, non-graduates and postgraduates.",
     "publication_title": "Graduate labour market statistics",
-    "published": "27 Jun 2024",
+    "published": "5 Jun 2025",
     "release_type": "Official statistics in development",
     "theme": "Higher education"
   },
@@ -590,7 +597,7 @@
   {
     "publication_summary": "Annual statistics on teachers and support staff (TAs) in England. Age, gender, ethnicity, pupil teacher ratio (PTR), retention, pay, subject taught and absence.",
     "publication_title": "School workforce in England",
-    "published": "6 Jun 2024",
+    "published": "5 Jun 2025",
     "release_type": "Accredited official statistics",
     "theme": "Teachers and school workforce"
   },
@@ -604,7 +611,7 @@
   {
     "publication_summary": "School and pupil statistics for England including age, gender, free school meals (FSM), ethnicity, English as additional language (EAL), class size.",
     "publication_title": "Schools, pupils and their characteristics",
-    "published": "6 Jun 2024",
+    "published": "5 Jun 2025",
     "release_type": "Accredited official statistics",
     "theme": "Pupils and schools"
   },
