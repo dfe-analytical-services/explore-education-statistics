@@ -1,22 +1,16 @@
 import React from 'react';
+import { logEvent } from '@frontend/services/googleAnalyticsService';
 import ButtonLink from './ButtonLink';
 import styles from './HomepageCard.module.scss';
 
 interface Props {
-  buttonTestId: string;
   buttonText: string;
   destination: string;
   text: string;
   title: string;
 }
 
-const HomepageCard = ({
-  buttonTestId,
-  buttonText,
-  destination,
-  text,
-  title,
-}: Props) => {
+const HomepageCard = ({ buttonText, destination, text, title }: Props) => {
   return (
     <div className="govuk-grid-column-one-third dfe-card__item">
       <div className="dfe-card">
@@ -24,8 +18,14 @@ const HomepageCard = ({
         <p className="govuk-!-margin-top-2">{text}</p>
         <ButtonLink
           to={destination}
-          data-testid={buttonTestId}
           className="govuk-button--start"
+          onClick={() =>
+            logEvent({
+              category: 'Homepage',
+              action: 'Homepage link clicked',
+              label: title,
+            })
+          }
         >
           {buttonText}
           <svg

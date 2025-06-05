@@ -1,9 +1,17 @@
 import HomepageCard from '@frontend/components/HomepageCard';
 import Link from '@frontend/components/Link';
 import Page from '@frontend/components/Page';
+import { logEvent } from '@frontend/services/googleAnalyticsService';
 import React from 'react';
 
 function HomePage() {
+  const logLinkClick = (label: string) =>
+    logEvent({
+      category: 'Homepage',
+      action: 'Homepage link clicked',
+      label,
+    });
+
   return (
     <Page title="Explore our statistics and data" isHomepage>
       <div className="govuk-grid-row dfe-card__container">
@@ -12,7 +20,6 @@ function HomePage() {
           text="Find statistical summaries to help you understand and analyse our
               range of statistics."
           destination="/find-statistics"
-          buttonTestId="home--find-statistics-link"
           buttonText="Explore"
         />
         <HomepageCard
@@ -20,14 +27,12 @@ function HomePage() {
           text="Browse all of the available open data and choose files to explore
           or download."
           destination="/data-tables"
-          buttonTestId="home--data-catalogue-link"
           buttonText="Browse"
         />
         <HomepageCard
           title="Create your own tables"
           text="Explore our range of data and build your own tables from it."
           destination="/data-tables"
-          buttonTestId="home--table-tool-link"
           buttonText="Create"
         />
       </div>
@@ -37,7 +42,10 @@ function HomePage() {
       <div className="govuk-grid-row">
         <div className="govuk-grid-column-two-thirds">
           <h3 className="govuk-!-margin-bottom-1">
-            <Link to="https://www.gov.uk/search/research-and-statistics?content_store_document_type=upcoming_statistics&organisations%5B%5D=department-for-education&order=updated-newest">
+            <Link
+              to="https://www.gov.uk/search/research-and-statistics?content_store_document_type=upcoming_statistics&organisations%5B%5D=department-for-education&order=updated-newest"
+              onClick={() => logLinkClick('Statistics release calendar')}
+            >
               Statistics release calendar
             </Link>
           </h3>
@@ -47,7 +55,9 @@ function HomePage() {
           </p>
 
           <h3 className="govuk-!-margin-bottom-1">
-            <Link to="/methodology">Methodology</Link>
+            <Link to="/methodology" onClick={() => logLinkClick('Methodology')}>
+              Methodology
+            </Link>
           </h3>
           <p className="govuk-caption-m">
             Browse to find out more about the methodology behind our statistics
@@ -55,7 +65,9 @@ function HomePage() {
           </p>
 
           <h3 className="govuk-!-margin-bottom-1">
-            <Link to="/glossary">Glossary</Link>
+            <Link to="/glossary" onClick={() => logLinkClick('Glossary')}>
+              Glossary
+            </Link>
           </h3>
           <p className="govuk-caption-m">
             Browse our A to Z list of definitions for terms used across our
@@ -75,7 +87,10 @@ function HomePage() {
             services provided by the Department for Education (DfE):
           </p>
           <h3 className="govuk-heading-s govuk-!-margin-bottom-0">
-            <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics">
+            <a
+              href="https://www.gov.uk/government/organisations/department-for-education/about/statistics"
+              onClick={() => logLinkClick('Statistics at DfE')}
+            >
               Statistics at DfE
             </a>
           </h3>
@@ -84,7 +99,12 @@ function HomePage() {
             and ad hoc publications, as well as related education statistics.
           </p>
           <h3 className="govuk-heading-s govuk-!-margin-bottom-0">
-            <a href="https://www.gov.uk/school-performance-tables">
+            <a
+              href="https://www.gov.uk/school-performance-tables"
+              onClick={() =>
+                logLinkClick('Compare school and college performance')
+              }
+            >
               Compare school and college performance
             </a>
           </h3>
@@ -93,7 +113,10 @@ function HomePage() {
             special needs schools and colleges.
           </p>
           <h3 className="govuk-heading-s govuk-!-margin-bottom-0">
-            <a href="https://www.get-information-schools.service.gov.uk/">
+            <a
+              href="https://www.get-information-schools.service.gov.uk/"
+              onClick={() => logLinkClick('Get information about schools')}
+            >
               Get information about schools
             </a>
           </h3>
@@ -102,7 +125,12 @@ function HomePage() {
             educational organisations and governors in England.
           </p>
           <h3 className="govuk-heading-s govuk-!-margin-bottom-0">
-            <a href="https://financial-benchmarking-and-insights-tool.education.gov.uk/">
+            <a
+              href="https://financial-benchmarking-and-insights-tool.education.gov.uk/"
+              onClick={() =>
+                logLinkClick('Financial Benchmarking and Insights Tool')
+              }
+            >
               Financial Benchmarking and Insights Tool
             </a>
           </h3>
