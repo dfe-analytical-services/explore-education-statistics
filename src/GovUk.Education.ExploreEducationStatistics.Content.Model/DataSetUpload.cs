@@ -48,8 +48,8 @@ public record DataSetUpload : ICreatedTimestamp<DateTime>
 
 public enum DataSetUploadStatus
 {
-    Screening,
-    CompletePendingReview,
-    CompletePendingImport,
-    Failed,
+    SCREENING,
+    FAILED_SCREENING,
+    PENDING_REVIEW,
+    PENDING_IMPORT,
 }

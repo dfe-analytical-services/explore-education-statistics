@@ -239,7 +239,7 @@ public class DataSetFileStorage(
             MetaFileId = metaFileId,
             MetaFileName = dataSet.MetaFile.FileName,
             MetaFileSizeInBytes = dataSet.MetaFile.FileSize,
-            Status = DataSetUploadStatus.Screening, // Add "Uploading", then update to "Screening" when it actually starts?
+            Status = DataSetUploadStatus.SCREENING,
         };
 
         await contentDbContext.DataSetUploads.AddAsync(dataSetUpload, cancellationToken);
