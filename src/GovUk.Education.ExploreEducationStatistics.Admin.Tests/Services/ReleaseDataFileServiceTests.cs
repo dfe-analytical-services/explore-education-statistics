@@ -39,11 +39,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
     {
         private readonly DataFixture _fixture = new();
 
-        private readonly ReleaseVersion _releaseVersion = new()
-        {
-            Id = Guid.NewGuid()
-        };
-
         private readonly User _user = new()
         {
             Id = Guid.NewGuid(),
