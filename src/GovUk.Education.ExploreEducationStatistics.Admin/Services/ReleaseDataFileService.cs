@@ -428,9 +428,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return screenerResult.Result switch
             {
                 ScreenerResult.Passed => screenerResult.TestResults.Any(test => test.TestResult == TestResult.WARNING)
-                    ? DataSetUploadStatus.CompletePendingReview
-                    : DataSetUploadStatus.CompletePendingImport,
-                ScreenerResult.Failed => DataSetUploadStatus.Failed,
+                    ? DataSetUploadStatus.PENDING_REVIEW
+                    : DataSetUploadStatus.PENDING_IMPORT,
+                ScreenerResult.Failed => DataSetUploadStatus.FAILED_SCREENING,
                 _ => throw new ArgumentOutOfRangeException(nameof(screenerResult), screenerResult, null),
             };
         }
@@ -614,6 +614,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(async dataSetUploads =>
                 {
                     var releaseFiles = await dataSetFileStorage.MoveDataSetsToPermanentStorage(releaseVersionId, dataSetUploads, cancellationToken);
+
+                    // Remove upload records once the files are ready for import
+                    contentDbContext.DataSetUploads.RemoveRange(dataSetUploads);
+                    await contentDbContext.SaveChangesAsync(cancellationToken);
+
                     return await BuildDataFileViewModels(releaseFiles);
                 });
         }
