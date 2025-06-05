@@ -1630,7 +1630,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     Email = "test@test.com"
                 },
                 Publication = releaseVersion.Release.Publication,
-                Role = PublicationRole.Approver
+                Role = PublicationRole.Allower
             };
 
             var contextId = Guid.NewGuid().ToString();

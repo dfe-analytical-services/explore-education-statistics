@@ -2760,7 +2760,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 User = user,
                 Publication = releaseVersion.Release.Publication,
-                Role = PublicationRole.Approver
+                Role = PublicationRole.Allower
             };
 
             var userTwo = new User
@@ -2784,7 +2784,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 User = userTwo,
                 Publication = releaseVersion.Release.Publication,
-                Role = PublicationRole.Approver
+                Role = PublicationRole.Allower
             };
 
             var contentDbContextId = Guid.NewGuid().ToString();

@@ -60,7 +60,7 @@ public class ViewSpecificPreReleaseSummaryAuthorizationHandlersTests
                 PublicationId = publication.Id,
                 Publication = publication
             },
-            PublicationRole.Owner, PublicationRole.Approver);
+            PublicationRole.Owner, PublicationRole.Allower);
     }
 
     private static ViewSpecificPreReleaseSummaryAuthorizationHandler CreateHandler(ContentDbContext contentDbContext)

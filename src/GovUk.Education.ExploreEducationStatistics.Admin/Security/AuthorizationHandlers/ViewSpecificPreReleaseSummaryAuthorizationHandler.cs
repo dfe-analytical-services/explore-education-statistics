@@ -43,7 +43,7 @@ public class ViewSpecificPreReleaseSummaryAuthorizationHandler
                     context.User.GetUserId(),
                     releaseVersion.PublicationId,
                     releaseVersion.Id,
-                    ListOf(PublicationRole.Owner, PublicationRole.Approver),
+                    ListOf(PublicationRole.Owner, PublicationRole.Allower),
                     UnrestrictedReleaseViewerAndPrereleaseViewerRoles))
         {
             context.Succeed(requirement);

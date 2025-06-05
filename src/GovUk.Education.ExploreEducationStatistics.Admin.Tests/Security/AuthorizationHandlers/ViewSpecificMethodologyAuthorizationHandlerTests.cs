@@ -121,7 +121,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                             s.GetOwningPublication(MethodologyVersion.MethodologyId))
                         .ReturnsAsync(OwningPublication);
 
-                    var expectedToPassByRole = ListOf(PublicationRole.Owner, PublicationRole.Approver)
+                    var expectedToPassByRole = ListOf(PublicationRole.Owner, PublicationRole.Allower)
                         .Contains(publicationRole);
 
                     userPublicationRoleRepository

@@ -162,7 +162,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                                     },
                                     releaseVersion,
                                     Owner,
-                                    Approver
+                                    Allower
                                 );
                             }
                             else
@@ -180,7 +180,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                                         return CreateHandler(releaseStatusRepository, context);
                                     },
                                     releaseVersion,
-                                    Approver
+                                    Allower
                                 );
                             }
                         }
@@ -347,7 +347,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                                     },
                                     releaseVersion,
                                     Owner,
-                                    Approver
+                                    Allower
                                 );
                             }
                             else
@@ -364,7 +364,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                                         return CreateHandler(releaseStatusRepository, context);
                                     },
                                     releaseVersion,
-                                    Approver
+                                    Allower
                                 );
                             }
                         }
@@ -506,7 +506,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                                     return CreateHandler(releaseStatusRepository, context);
                                 },
                                 releaseVersion,
-                                Approver
+                                Allower
                             );
                         }
                     );

@@ -87,7 +87,7 @@ public class ViewSpecificPublicationReleaseTeamAccessAuthorizationHandlersTests
             VerifyAllMocks(userPublicationRoleRepository);
 
             Assert.Equal(
-                ListOf(PublicationRole.Owner, PublicationRole.Approver).Contains(role),
+                ListOf(PublicationRole.Owner, PublicationRole.Allower).Contains(role),
                 authContext.HasSucceeded);
         });
     }

@@ -69,7 +69,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                         return CreateHandler(contentDbContext);
                     },
                     ReleaseVersion,
-                    rolesExpectedToSucceed: new[] { PublicationRole.Owner, PublicationRole.Approver });
+                    rolesExpectedToSucceed: new[] { PublicationRole.Owner, PublicationRole.Allower });
             }
         }
 
