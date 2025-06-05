@@ -28,6 +28,7 @@ Verify can accept cookie banner
 
 Validate homepage
     user checks page contains element    link:Explore
+    user checks page contains element    link:Browse
     user checks page contains element    link:Create
 
     user waits until h2 is visible    Supporting information

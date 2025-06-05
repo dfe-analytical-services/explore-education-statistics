@@ -1,4 +1,4 @@
-import ButtonLink from '@frontend/components/ButtonLink';
+import HomepageCard from '@frontend/components/HomepageCard';
 import Link from '@frontend/components/Link';
 import Page from '@frontend/components/Page';
 import React from 'react';
@@ -7,62 +7,29 @@ function HomePage() {
   return (
     <Page title="Explore our statistics and data" isHomepage>
       <div className="govuk-grid-row dfe-card__container">
-        <div className="govuk-grid-column-one-half dfe-card__item">
-          <div className="dfe-card">
-            <h2 className="govuk-!-margin-bottom-0">
-              Find statistics and data
-            </h2>
-            <p className="govuk-!-margin-top-2">
-              Browse statistical summaries and download associated data to help
-              you understand and analyse our range of statistics.
-            </p>
-            <ButtonLink
-              to="/find-statistics"
-              data-testid="home--find-statistics-link"
-              className="govuk-button--start"
-            >
-              Explore
-              <svg
-                className="govuk-button__start-icon"
-                xmlns="http://www.w3.org/2000/svg"
-                width="17.5"
-                height="19"
-                viewBox="0 0 33 40"
-                aria-hidden="true"
-                focusable="false"
-              >
-                <path fill="currentColor" d="M0 0h13l20 20-20 20H0l20-20z" />
-              </svg>
-            </ButtonLink>
-          </div>
-        </div>
-        <div className="govuk-grid-column-one-half dfe-card__item">
-          <div className="dfe-card">
-            <h2 className="govuk-!-margin-bottom-0">Create your own tables</h2>
-
-            <p className="govuk-!-margin-top-2">
-              Explore our range of data and build your own tables from it.
-            </p>
-            <ButtonLink
-              to="/data-tables"
-              data-testid="home--table-tool-link"
-              className="govuk-button--start"
-            >
-              Create
-              <svg
-                className="govuk-button__start-icon"
-                xmlns="http://www.w3.org/2000/svg"
-                width="17.5"
-                height="19"
-                viewBox="0 0 33 40"
-                aria-hidden="true"
-                focusable="false"
-              >
-                <path fill="currentColor" d="M0 0h13l20 20-20 20H0l20-20z" />
-              </svg>
-            </ButtonLink>
-          </div>
-        </div>
+        <HomepageCard
+          title="Find statistics and data"
+          text="Find statistical summaries to help you understand and analyse our
+              range of statistics."
+          destination="/find-statistics"
+          buttonTestId="home--find-statistics-link"
+          buttonText="Explore"
+        />
+        <HomepageCard
+          title="Browse data catalogue"
+          text="Browse all of the available open data and choose files to explore
+          or download."
+          destination="/data-tables"
+          buttonTestId="home--data-catalogue-link"
+          buttonText="Browse"
+        />
+        <HomepageCard
+          title="Create your own tables"
+          text="Explore our range of data and build your own tables from it."
+          destination="/data-tables"
+          buttonTestId="home--table-tool-link"
+          buttonText="Create"
+        />
       </div>
 
       <h2 className="govuk-!-margin-top-6">Supporting information</h2>
@@ -77,13 +44,6 @@ function HomePage() {
           <p className="govuk-caption-m">
             Browse our upcoming official statistics releases and their expected
             publication dates.
-          </p>
-
-          <h3 className="govuk-!-margin-bottom-1">
-            <Link to="/data-catalogue">Data catalogue</Link>
-          </h3>
-          <p className="govuk-caption-m">
-            View all of the open data available and choose files to download.
           </p>
 
           <h3 className="govuk-!-margin-bottom-1">
