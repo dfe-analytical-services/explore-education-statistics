@@ -1,13 +1,12 @@
 *** Settings ***
 Resource            ../libs/public-common.robot
 Resource            ../seed_data/seed_data_theme_1_constants.robot
-Resource            ../seed_data/seed_data_theme_2_constants.robot
 
 Suite Setup         user opens the browser
 Suite Teardown      user closes the browser
 Test Setup          fail test fast if required
 
-Force Tags          Dev    PreProd    Prod
+Force Tags          GeneralPublic    Dev    PreProd    Prod
 
 
 *** Test Cases ***
@@ -32,16 +31,19 @@ Validate sort controls exist
     user checks select contains option    id:filters-form-sortBy    Oldest
     user checks select contains option    id:filters-form-sortBy    A to Z
 
-Validate publications list exists
+Validate publications list exists and all publications are shown
     user checks page contains element    testid:publicationsList
+    user checks page contains element    xpath://p[contains(text(),"showing all publications")]
 
-Searching
+Search publications
     user clicks element    id:searchForm-search
     user presses keys    pupil absence
     user clicks button    Search
     user checks page contains button    pupil absence
     user checks page does not contain element    css:[class="govuk-warning-text"]
+    user checks page does not contain element    xpath://p[contains(text(),"showing all publications")]
 
-Removing search
+Validate search is reset by clearing search term
     user clicks button    pupil absence
-    user waits until page does not contain button    ${PUPIL_ABSENCE_PUBLICATION_TITLE}
+    user waits until page does not contain button    pupil absence
+    user checks page contains element    xpath://p[contains(text(),"showing all publications")]
