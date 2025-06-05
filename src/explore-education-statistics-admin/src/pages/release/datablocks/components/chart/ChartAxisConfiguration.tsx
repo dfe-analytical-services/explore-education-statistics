@@ -238,6 +238,8 @@ const ChartAxisConfiguration = ({
       });
       // referenceLines are removable, so don't merge - update instead
       result.referenceLines = [...refLines];
+      result.decimalPlaces = values.decimalPlaces;
+
       return omit(result, ['labelRotated', 'labelText', 'labelWidth']);
     },
     [axisConfiguration],
@@ -278,7 +280,8 @@ const ChartAxisConfiguration = ({
       min: Yup.number(),
       visible: Yup.boolean(),
       unit: Yup.string(),
-      decimalPlaces: Yup.number().positive(
+      decimalPlaces: Yup.number().min(
+        0,
         'Displayed decimal places must be positive',
       ),
       labelText: Yup.string(),

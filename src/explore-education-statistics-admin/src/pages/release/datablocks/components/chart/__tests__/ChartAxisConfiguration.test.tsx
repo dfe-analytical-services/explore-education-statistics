@@ -504,6 +504,30 @@ describe('ChartAxisConfiguration', () => {
         }),
       ).toHaveAttribute('href', '#chartBuilder-minor-decimalPlaces');
     });
+
+    test.only('allows decimal places to be set to 0', async () => {
+      const { user } = render(
+        <ChartBuilderFormsContextProvider initialForms={testFormState}>
+          <ChartAxisConfiguration
+            id="chartBuilder-minor"
+            type="minor"
+            axesConfiguration={testAxesConfiguration}
+            definition={verticalBarBlockDefinition}
+            data={testTable.results}
+            meta={testTable.subjectMeta}
+            onChange={noop}
+            onSubmit={noop}
+          />
+        </ChartBuilderFormsContextProvider>,
+      );
+      await user.clear(screen.getByLabelText('Displayed decimal places'));
+      await user.type(screen.getByLabelText('Displayed decimal places'), '0');
+      await user.click(
+        screen.getByRole('button', { name: 'Save chart options' }),
+      );
+
+      expect(screen.queryByText('There is a problem')).not.toBeInTheDocument();
+    });
   });
 
   describe('group data by', () => {
