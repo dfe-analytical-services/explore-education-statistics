@@ -28,8 +28,12 @@ param systemAssignedIdentity bool = false
 @description('The name of a user-assigned managed identity to assign to the resource.')
 param userAssignedIdentityName string = ''
 
-@description('Whether to create or update Azure Monitor alerts during this deploy')
+@description('Specifies which alert rules to enable. If the optional alerts parameter is not provided, no alert rules will be created or updated.')
 param alerts {
+  deadLetteredCount: bool
+  deliveryAttemptFailCount: bool
+  droppedEventCount: bool
+  publishFailCount: bool
   unmatchedEventCount: bool
   alertsGroupName: string
 }?
@@ -68,9 +72,82 @@ resource topic 'Microsoft.EventGrid/topics@2025-02-15' = {
   tags: tagValues
 }
 
-module unmatchedEventCountAlert '../../../public-api/components/alerts/staticMetricAlert.bicep' = if (alerts != null && alerts!.unmatchedEventCount) {
+module deadLetteredCountAlert '../../../public-api/components/alerts/staticMetricAlert.bicep' = if (alerts != null) {
+  name: '${name}DeadLetteredCountDeploy'
+  params: {
+    enabled: alerts!.deadLetteredCount
+    resourceName: topic.name
+    resourceMetric: {
+      resourceType: 'Microsoft.EventGrid/topics'
+      metric: 'DeadLetteredCount'
+    }
+    config: {
+      ...staticTotalGreaterThanZero
+      nameSuffix: 'dead-lettered-count'
+    }
+    alertsGroupName: alerts!.alertsGroupName
+    tagValues: tagValues
+  }
+}
+
+module droppedEventCount '../../../public-api/components/alerts/staticMetricAlert.bicep' = if (alerts != null) {
+  name: '${name}DroppedEventCountDeploy'
+  params: {
+    enabled: alerts!.droppedEventCount
+    resourceName: topic.name
+    resourceMetric: {
+      resourceType: 'Microsoft.EventGrid/topics'
+      metric: 'DroppedEventCount'
+    }
+    config: {
+      ...staticTotalGreaterThanZero
+      nameSuffix: 'dropped-event-count'
+    }
+    alertsGroupName: alerts!.alertsGroupName
+    tagValues: tagValues
+  }
+}
+
+module deliveryAttemptFailCountAlert '../../../public-api/components/alerts/staticMetricAlert.bicep' = if (alerts != null) {
+  name: '${name}DeliveryAttemptFailCountDeploy'
+  params: {
+    enabled: alerts!.deliveryAttemptFailCount
+    resourceName: topic.name
+    resourceMetric: {
+      resourceType: 'Microsoft.EventGrid/topics'
+      metric: 'DeliveryAttemptFailCount'
+    }
+    config: {
+      ...staticTotalGreaterThanZero
+      nameSuffix: 'delivery-attempt-fail-count'
+    }
+    alertsGroupName: alerts!.alertsGroupName
+    tagValues: tagValues
+  }
+}
+
+module publishFailCountAlert '../../../public-api/components/alerts/staticMetricAlert.bicep' = if (alerts != null) {
+  name: '${name}PublishFailCountDeploy'
+  params: {
+    enabled: alerts!.publishFailCount
+    resourceName: topic.name
+    resourceMetric: {
+      resourceType: 'Microsoft.EventGrid/topics'
+      metric: 'PublishFailCount'
+    }
+    config: {
+      ...staticTotalGreaterThanZero
+      nameSuffix: 'publish-fail-count'
+    }
+    alertsGroupName: alerts!.alertsGroupName
+    tagValues: tagValues
+  }
+}
+
+module unmatchedEventCountAlert '../../../public-api/components/alerts/staticMetricAlert.bicep' = if (alerts != null) {
   name: '${name}UnmatchedEventCountDeploy'
   params: {
+    enabled: alerts!.unmatchedEventCount
     resourceName: topic.name
     resourceMetric: {
       resourceType: 'Microsoft.EventGrid/topics'
@@ -78,7 +155,7 @@ module unmatchedEventCountAlert '../../../public-api/components/alerts/staticMet
     }
     config: {
       ...staticTotalGreaterThanZero
-      nameSuffix: 'unmatched-events'
+      nameSuffix: 'unmatched-event-count'
     }
     alertsGroupName: alerts!.alertsGroupName
     tagValues: tagValues
