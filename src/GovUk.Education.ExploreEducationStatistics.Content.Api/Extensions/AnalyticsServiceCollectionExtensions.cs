@@ -20,7 +20,7 @@ public static class AnalyticsServiceCollectionExtensions
             .GetSection(AnalyticsOptions.Section)
             .Get<AnalyticsOptions>();
 
-        if (analyticsOptions is { Enabled: false })
+        if (analyticsOptions is null or { Enabled: false })
         {
             services.AddSingleton<IAnalyticsManager, NoOpAnalyticsManager>();
             return services;
@@ -40,6 +40,7 @@ public static class AnalyticsServiceCollectionExtensions
         }
 
         services.AddTransient<IAnalyticsWriteStrategy, AnalyticsWritePublicZipDownloadStrategy>();
+        services.AddTransient<IAnalyticsWriteStrategy, AnalyticsWritePublicCsvDownloadStrategy>();
 
         return services;
     }

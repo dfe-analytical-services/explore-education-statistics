@@ -1,6 +1,7 @@
 param(
     [string] [Parameter(Mandatory=$true)] $searchServiceName,
     [string] [Parameter(Mandatory=$true)] $indexDefinitionFilename,
+    [string[]] [Parameter(Mandatory=$true)] $indexCorsAllowedOrigins,
     [string] [Parameter(Mandatory=$true)] $indexerName,
     [string] [Parameter(Mandatory=$true)] [AllowEmptyString()] $indexerScheduleInterval,
     [string] [Parameter(Mandatory=$true)] $dataSourceName,
@@ -23,10 +24,15 @@ $indexDefinitionPath = Join-Path -Path ${Env:AZ_SCRIPTS_PATH_INPUT_DIRECTORY} -C
 $indexDefinition = Get-Content -Path $indexDefinitionPath -Raw | ConvertFrom-Json
 $indexerDefinition = $null
 
-# Use this variable to store output values which can then be referenced by the deployment template.
-# Outputs can also be viewed under Details of the Deployment Script resource in Azure Portal after deployment
-$DeploymentScriptOutputs = @{}
-$DeploymentScriptOutputs['indexName'] = $indexDefinition.name
+# Add CORS options to the index definition
+if ($indexDefinition.PSObject.Properties.Name -contains 'corsOptions') {
+    Write-Error "CORS options were found in the index definition file. Expecting CORS options to only be set by this script."
+    throw "CORS options were found in the index definition file. Expecting CORS options to only be set by this script."
+}
+$indexDefinition | Add-Member -MemberType NoteProperty -Name 'corsOptions' -Value @{
+    'allowedOrigins' = $indexCorsAllowedOrigins
+    'maxAgeInSeconds' = 300 # The duration in seconds that browsers should cache CORS preflight responses for.
+}
 
 # Create the data source and indexer definitions
 switch ($dataSourceType)
@@ -60,6 +66,24 @@ switch ($dataSourceType)
     default {
         throw "Unsupported data source type $dataSourceType"
     }
+}
+
+# Use this variable to store output values which can then be referenced by the deployment template.
+# Outputs can also be viewed under Details of the Deployment Script resource in Azure Portal after deployment for troubleshooting.
+$DeploymentScriptOutputs = @{
+    dataSourceName = $dataSourceName
+    dataSourceType = $dataSourceType
+    dataSourceConnectionString = $dataSourceConnectionString
+    dataSourceContainerName = $dataSourceContainerName
+    dataSourceContainerQuery = $dataSourceContainerQuery
+    indexDefinitionFilename = $indexDefinitionFilename
+    indexName = $indexDefinition.name
+    indexCorsAllowedOrigins = $indexDefinition.corsOptions.allowedOrigins
+    indexCorsAllowedOriginsLength = $indexDefinition.corsOptions.allowedOrigins.Length
+    indexerDisabled = $indexerDisabled
+    indexerName = $indexerName
+    indexerScheduleInterval = $indexerScheduleInterval
+    searchServiceName = $searchServiceName
 }
 
 try {

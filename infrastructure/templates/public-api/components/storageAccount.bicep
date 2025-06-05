@@ -1,4 +1,3 @@
-import { responseTimeConfig } from 'alerts/dynamicAlertConfig.bicep'
 import { staticAverageLessThanHundred, staticAverageGreaterThanZero } from 'alerts/staticAlertConfig.bicep'
 import { IpRange, StorageAccountPrivateEndpoints } from '../types.bicep'
 

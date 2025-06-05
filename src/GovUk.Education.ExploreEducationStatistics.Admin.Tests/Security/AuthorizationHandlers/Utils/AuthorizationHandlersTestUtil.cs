@@ -223,35 +223,32 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                         UnexpectedFailMessage =
                             $"Expected having role {role} on the Publication to have made the handler succeed",
                     });
-
-                await ForEachPublicationRoleAsync(async role =>
-                {
-                    // Test the handler fails without the role on the correct Publication or the correct User
-                    await AssertHandlerHandlesPublicationRoleScenarioSuccessfully<TRequirement>(handlerSupplier,
-                        new PublicationRoleTestScenario
-                        {
-                            User = user,
-                            Entity = entity,
-                            // Setup a UserPublicationRole for this Publication but a different User
-                            UserPublicationRoles = ListOf(
-                                new UserPublicationRole
-                                {
-                                    PublicationId = publicationId,
-                                    UserId = Guid.NewGuid(),
-                                    Role = role
-                                },
-                                // Setup a UserPublicationRoles for this User but a different Publication
-                                new UserPublicationRole
-                                {
-                                    PublicationId = Guid.NewGuid(),
-                                    UserId = user.GetUserId(),
-                                    Role = role
-                                }),
-                            ExpectedToPass = false,
-                            UnexpectedPassMessage =
-                                $"Expected not having {role} role on the Publication would have made the handler fail"
-                        });
-                });
+            
+                // Test the handler fails without the role on the correct Publication or the correct User
+                await AssertHandlerHandlesPublicationRoleScenarioSuccessfully<TRequirement>(handlerSupplier,
+                    new PublicationRoleTestScenario
+                    {
+                        User = user,
+                        Entity = entity,
+                        // Setup a UserPublicationRole for this Publication but a different User
+                        UserPublicationRoles = ListOf(
+                            new UserPublicationRole
+                            {
+                                PublicationId = publicationId, 
+                                UserId = Guid.NewGuid(), 
+                                Role = role
+                            },
+                            // Setup a UserPublicationRoles for this User but a different Publication
+                            new UserPublicationRole
+                            {
+                                PublicationId = Guid.NewGuid(), 
+                                UserId = user.GetUserId(), 
+                                Role = role
+                            }),
+                        ExpectedToPass = false,
+                        UnexpectedPassMessage =
+                            $"Expected not having {role} role on the Publication would have made the handler fail"
+                    });
             });
         }
 

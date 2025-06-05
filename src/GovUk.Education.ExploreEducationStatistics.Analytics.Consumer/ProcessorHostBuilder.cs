@@ -45,6 +45,7 @@ public static class ProcessorHostBuilder
                     .AddTransient<IRequestFileProcessor, PublicApiDataSetVersionCallsProcessor>()
                     .AddTransient<IRequestFileProcessor, PublicApiQueriesProcessor>()
                     .AddTransient<IRequestFileProcessor, PublicZipDownloadsProcessor>()
+                    .AddTransient<IRequestFileProcessor, PublicCsvDownloadsProcessor>()
                     .AddTransient<IProcessRequestFilesWorkflow, ProcessRequestFilesWorkflow>();
             });
     }

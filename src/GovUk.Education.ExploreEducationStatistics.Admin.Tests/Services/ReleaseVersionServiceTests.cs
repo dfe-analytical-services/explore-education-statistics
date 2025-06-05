@@ -1840,22 +1840,21 @@ public abstract class ReleaseVersionServiceTests
 
             await using var statisticsDbContext = InMemoryStatisticsDbContext(contextId);
             await using var contentDbContext = InMemoryApplicationDbContext(contextId);
-            {
-                var releaseVersionService = BuildService(
-                    contentDbContext: contentDbContext,
-                    statisticsDbContext: statisticsDbContext,
-                    processorClient: processorClient.Object);
 
-                var result = await releaseVersionService.DeleteTestReleaseVersion(releaseVersion.Id);
+            var releaseVersionService = BuildService(
+                contentDbContext: contentDbContext,
+                statisticsDbContext: statisticsDbContext,
+                processorClient: processorClient.Object);
 
-                VerifyAllMocks(processorClient);
+            var result = await releaseVersionService.DeleteTestReleaseVersion(releaseVersion.Id);
 
-                var validationProblem = result.AssertBadRequestWithValidationProblem();
+            VerifyAllMocks(processorClient);
 
-                validationProblem.AssertHasError(
-                    expectedPath: "error path",
-                    expectedCode: "error code");
-            }
+            var validationProblem = result.AssertBadRequestWithValidationProblem();
+
+            validationProblem.AssertHasError(
+                expectedPath: "error path",
+                expectedCode: "error code");
         }
 
         [Fact]

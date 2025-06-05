@@ -23,4 +23,9 @@ public interface IAnalyticsPathResolver
     string PublicZipDownloadsDirectoryPath();
 
     string PublicZipDownloadsReportsDirectoryPath();
+
+    // PublicCsvDownloads
+    string PublicCsvDownloadsDirectoryPath();
+
+    string PublicCsvDownloadsReportsDirectoryPath();
 }

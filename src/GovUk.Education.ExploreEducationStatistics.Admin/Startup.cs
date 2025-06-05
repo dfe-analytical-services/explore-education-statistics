@@ -87,6 +87,7 @@ using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Admin.Extensions;
 using Thinktecture;
 using static GovUk.Education.ExploreEducationStatistics.Common.Utils.StartupUtils;
 using ContentGlossaryService = GovUk.Education.ExploreEducationStatistics.Content.Services.GlossaryService;
@@ -198,7 +199,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddResponseCompression(options => { options.EnableForHttps = true; });
 
             // In production, the React files will be served from this directory
-            services.AddSpaStaticFiles(configuration => { configuration.RootPath = "wwwroot"; });
+            services.AddSpaStaticFiles(config => { config.RootPath = "wwwroot"; });
             services.Configure<RouteOptions>(options => options.LowercaseUrls = true);
 
             /*
@@ -396,10 +397,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             /*
              * Services
              */
-
-            var coreStorageConnectionString = configuration.GetValue<string>("CoreStorage");
-            var publisherStorageConnectionString = configuration.GetValue<string>("PublisherStorage");
-
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
             // This service is responsible for handling calls immediately following successful login into the Admin SPA.
@@ -517,7 +514,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                 // This is allowing for the PublicDataDbContext to be null.
                 services.AddTransient<IDataSetService, DataSetService>(provider =>
                     new DataSetService(provider.GetRequiredService<ContentDbContext>(),
-                        provider.GetService<PublicDataDbContext>(),
+                        provider.GetService<PublicDataDbContext>()!,
                         provider.GetRequiredService<IProcessorClient>(),
                         provider.GetRequiredService<IUserService>()));
 
@@ -590,7 +587,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                     timePeriodService: provider.GetRequiredService<ITimePeriodService>(),
                     userService: provider.GetRequiredService<IUserService>(),
                     locationOptions: provider.GetRequiredService<IOptions<LocationsOptions>>()
-                    ));
+                ));
             services.AddTransient<ISubjectResultMetaService, SubjectResultMetaService>();
             services.AddTransient<ISubjectCsvMetaService, SubjectCsvMetaService>();
             services.AddSingleton<DataServiceMemoryCache<BoundaryLevel>, DataServiceMemoryCache<BoundaryLevel>>();
@@ -603,13 +600,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<IFileValidatorService, FileValidatorService>();
             services.AddTransient<IReleaseFileBlobService, PrivateReleaseFileBlobService>();
             services.AddTransient<IPrivateBlobStorageService, PrivateBlobStorageService>(provider =>
-                new PrivateBlobStorageService(configuration.GetValue<string>("CoreStorage"),
+                new PrivateBlobStorageService(configuration.GetRequiredValue("CoreStorage"),
                     provider.GetRequiredService<ILogger<IBlobStorageService>>()));
-            services.AddTransient<IPublicBlobStorageService, PublicBlobStorageService>(provider =>
-                new PublicBlobStorageService(configuration.GetValue<string>("PublicStorage"),
+            services.AddTransient<IPublicBlobStorageService, PublicBlobStorageService>(provider => 
+                new PublicBlobStorageService(configuration.GetRequiredValue("PublicStorage"),
                     provider.GetRequiredService<ILogger<IBlobStorageService>>()));
             services.AddTransient<IPublisherTableStorageService, PublisherTableStorageService>(_ =>
-                new PublisherTableStorageService(publisherStorageConnectionString));
+                new PublisherTableStorageService(configuration.GetRequiredValue("PublisherStorage")));
             services.AddSingleton<IGuidGenerator, SequentialGuidGenerator>();
             AddPersistenceHelper<ContentDbContext>(services);
             AddPersistenceHelper<StatisticsDbContext>(services);
@@ -630,15 +627,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<IPrivateBlobCacheService, PrivateBlobCacheService>();
             services.AddTransient<ICacheKeyService, CacheKeyService>();
             services.AddSingleton<IDataProcessorClient, DataProcessorClient>(_ =>
-                new DataProcessorClient(coreStorageConnectionString));
+                new DataProcessorClient(configuration.GetRequiredValue("CoreStorage")));
             services.AddSingleton<IPublisherClient, PublisherClient>(_ =>
-                new PublisherClient(publisherStorageConnectionString));
+                new PublisherClient(configuration.GetRequiredValue("PublisherStorage")));
 
             /*
              * Swagger
              */
-
             if (configuration.GetValue<bool>("App:EnableSwagger"))
+            {
                 services.AddSwaggerGen(c =>
                 {
                     c.SwaggerDoc("v1",
@@ -668,10 +665,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                                     Id = "Bearer"
                                 }
                             },
-                            new[] { string.Empty }
+                            [string.Empty]
                         }
                     });
                 });
+            }
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -738,8 +736,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                 .FontSources(s => s.Self())
                 .FormActions(s =>
                 {
-                    var loginAuthorityUrl = configuration.GetRequiredSection("OpenIdConnectIdentityFramework")
-                        .GetValue<string>("Authority");
+                    var loginAuthorityUrl = configuration
+                        .GetRequiredSection("OpenIdConnectIdentityFramework")
+                        .GetRequiredValue("Authority");
                     var loginAuthorityUri = new Uri(loginAuthorityUrl);
                     s
                         .CustomSources(loginAuthorityUri.GetLeftPart(UriPartial.Authority))

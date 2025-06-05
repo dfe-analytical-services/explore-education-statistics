@@ -62,7 +62,7 @@ public class AnalyticsPathResolver : IAnalyticsPathResolver
 
     public string PublicApiDataSetCallsReportsDirectoryPath()
     {
-        return Path.Combine(PublicApiDataSetCallsDirectoryPath(), "public-api", "data-sets");
+        return Path.Combine(ReportsDirectoryPath(), "public-api", "data-sets");
     }
 
     // PublicApiDataSetVersions
@@ -73,7 +73,7 @@ public class AnalyticsPathResolver : IAnalyticsPathResolver
 
     public string PublicApiDataSetVersionCallsReportsDirectoryPath()
     {
-        return Path.Combine(PublicApiDataSetVersionCallsDirectoryPath(), "public-api", "data-set-versions");
+        return Path.Combine(ReportsDirectoryPath(), "public-api", "data-set-versions");
     }
 
     // PublicZipDownloads
@@ -85,5 +85,16 @@ public class AnalyticsPathResolver : IAnalyticsPathResolver
     public string PublicZipDownloadsReportsDirectoryPath()
     {
         return Path.Combine(ReportsDirectoryPath(), "public", "zip-downloads");
+    }
+
+    // PublicDataSetFileDownloads
+    public string PublicCsvDownloadsDirectoryPath()
+    {
+        return Path.Combine(_basePath, "public", "csv-downloads");
+    }
+
+    public string PublicCsvDownloadsReportsDirectoryPath()
+    {
+        return Path.Combine(ReportsDirectoryPath(), "public", "csv-downloads");
     }
 }
