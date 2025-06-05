@@ -39,9 +39,9 @@ public record PublicationChangedEvent : IEvent
     
     public record EventPayload
     {
-        public string Title { get; init; }
-        public string Summary { get; init; }
-        public string Slug { get; init; }
+        public required string Title { get; init; }
+        public required string Summary { get; init; }
+        public required string Slug { get; init; }
     }
 
     public EventGridEvent ToEventGridEvent() => new(Subject, EventType, DataVersion, Payload);
