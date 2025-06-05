@@ -32,17 +32,17 @@ Validate sort controls exist
 
 Validate publications list exists and all publications are shown
     user checks page contains element    testid:publicationsList
-    user checks page contains element    xpath://p[contains(text(),"showing all publications")]
+    user checks page contains    showing all publications
 
 Search publications
     user clicks element    id:searchForm-search
     user presses keys    pupil absence
     user clicks button    Search
     user checks page contains button    pupil absence
-    user checks page does not contain element    css:[class="govuk-warning-text"]
-    user checks page does not contain element    xpath://p[contains(text(),"showing all publications")]
+    user checks page does not contain    Cannot load publications
+    user checks page does not contain    showing all publications
 
 Validate search is reset by clearing search term
     user clicks button    pupil absence
     user waits until page does not contain button    pupil absence
-    user checks page contains element    xpath://p[contains(text(),"showing all publications")]
+    user checks page contains    showing all publications
