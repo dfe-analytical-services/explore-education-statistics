@@ -125,7 +125,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         {
             var persistenceHelper = MockUtils.MockPersistenceHelper<ContentDbContext>();
             MockUtils.SetupCall(persistenceHelper, ReleaseVersion.Id, ReleaseVersion);
-            MockUtils.SetupCall<ContentDbContext, DataBlockVersion>(persistenceHelper, DataBlockVersion);
+            MockUtils.SetupCall(persistenceHelper, DataBlockVersion);
             return persistenceHelper;
         }
 

@@ -29,7 +29,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 
         public async Task<MethodologyVersion> Get(Guid methodologyVersionId)
         {
-            return await _context.MethodologyVersions.FindAsync(methodologyVersionId);
+            return await _context.MethodologyVersions.FindAsync(methodologyVersionId)
+                ?? throw new KeyNotFoundException($"MethodologyVersion not found with Id {methodologyVersionId}");
         }
 
         public async Task<List<MethodologyVersion>> GetLatestVersionByRelease(ReleaseVersion releaseVersion)

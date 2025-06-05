@@ -656,9 +656,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         Order = 3
                     });
 
-                var DataBlockViewModel = result.AssertRight();
-                Assert.Equal(dataBlockVersion.Id, DataBlockViewModel.Id);
-                Assert.Equal(dataBlockParent.Id, DataBlockViewModel.DataBlockParentId);
+                var dataBlockViewModel = result.AssertRight();
+                Assert.Equal(dataBlockVersion.Id, dataBlockViewModel.Id);
+                Assert.Equal(dataBlockParent.Id, dataBlockViewModel.DataBlockParentId);
             }
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))

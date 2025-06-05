@@ -72,12 +72,19 @@ public class AdminEventRaiser(IEventRaiser eventRaiser) : IAdminEventRaiser
     /// It is assumed that the publication LatestPublishedReleaseVersionId has a value assigned to it.
     /// If it is null, then no event will be raised.
     /// </summary>
-    /// <param name="publication">The publication whose latest published release has been reordered.</param>
+    /// <param name="publication">
+    /// The publication whose latest published release has been reordered.
+    /// Ensure publication.LatestPublishedReleaseVersion is populated
+    /// </param>
+    /// <param name="previousLatestPublishedReleaseId">
+    /// The unique identifier of the previous latest published release.
+    /// </param>
     /// <param name="previousLatestPublishedReleaseVersionId">
     /// The unique identifier of the previous latest published release version.
     /// </param>
     public async Task OnPublicationLatestPublishedReleaseReordered(
         Publication publication,
+        Guid previousLatestPublishedReleaseId,
         Guid previousLatestPublishedReleaseVersionId)
     {
         // Should the publication not have a latest published release version for some reason, do nothing.
@@ -86,12 +93,19 @@ public class AdminEventRaiser(IEventRaiser eventRaiser) : IAdminEventRaiser
             return;
         }
 
+        if (publication.LatestPublishedReleaseVersion is null)
+        {
+            throw new ArgumentException("The latest published release version object can not be null.");
+        }
+
         await eventRaiser.RaiseEvent(
             new PublicationLatestPublishedReleaseReorderedEvent(
                 publication.Id,
                 publication.Title,
                 publication.Slug,
+                publication.LatestPublishedReleaseVersion.ReleaseId,
                 publication.LatestPublishedReleaseVersionId.Value,
+                previousLatestPublishedReleaseId,
                 previousLatestPublishedReleaseVersionId));
     }
 

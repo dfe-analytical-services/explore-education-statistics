@@ -31,4 +31,9 @@ public class LocalAnalyticsPathResolver : IAnalyticsPathResolver
     {
         return Path.Combine(_basePath, "public", "zip-downloads");
     }
+
+    public string PublicCsvDownloadsDirectoryPath()
+    {
+        return Path.Combine(_basePath, "public", "csv-downloads");
+    }
 }

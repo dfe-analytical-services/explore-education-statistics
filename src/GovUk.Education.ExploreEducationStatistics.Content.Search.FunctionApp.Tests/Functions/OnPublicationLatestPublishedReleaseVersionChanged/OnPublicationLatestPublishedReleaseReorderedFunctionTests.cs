@@ -45,10 +45,10 @@ public class OnPublicationLatestPublishedReleaseReorderedFunctionTests
     [Theory]
     [InlineData(true)]
     [InlineData(false)]
-    public async Task GivenEvent_OnlyWhenPayloadContainsPreviousReleaseVersionId_ThenRemoveSearchableDocumentReturned(bool hasPreviousReleaseVersionId)
+    public async Task GivenEvent_OnlyWhenPayloadContainsPreviousReleaseId_ThenRemoveSearchableDocumentReturned(bool hasPreviousReleaseId)
     {
         // ARRANGE
-        Guid? previousReleaseVersionId = hasPreviousReleaseVersionId 
+        Guid? previousReleaseId = hasPreviousReleaseId 
                                             ? Guid.NewGuid() 
                                             : null;
 
@@ -56,7 +56,7 @@ public class OnPublicationLatestPublishedReleaseReorderedFunctionTests
             .WithPayload(new PublicationLatestPublishedReleaseReorderedEventDto
             {
                 Slug = "this-is-a-publication-slug",
-                PreviousReleaseVersionId = previousReleaseVersionId
+                PreviousReleaseId = previousReleaseId
             })
             .Build();
 
@@ -70,8 +70,8 @@ public class OnPublicationLatestPublishedReleaseReorderedFunctionTests
         // ASSERT
         Assert.NotNull(response);
 
-        RemoveSearchableDocumentDto[] expected = hasPreviousReleaseVersionId
-            ? [new RemoveSearchableDocumentDto{ ReleaseId = previousReleaseVersionId! }]
+        RemoveSearchableDocumentDto[] expected = hasPreviousReleaseId
+            ? [new RemoveSearchableDocumentDto{ ReleaseId = previousReleaseId! }]
             : [];
         Assert.Equal(expected, response.RemoveSearchableDocuments);
     }
