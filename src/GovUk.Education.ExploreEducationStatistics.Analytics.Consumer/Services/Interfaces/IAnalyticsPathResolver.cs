@@ -4,10 +4,10 @@ public interface IAnalyticsPathResolver
 {
     string GetBasePath();
     
-    // PublicApiQueries
-    string PublicApiQueriesDirectoryPath();
+    // PublicTopLevelCalls
+    string PublicApiTopLevelCallsDirectoryPath();
 
-    string PublicApiQueriesReportsDirectoryPath();
+    string PublicApiTopLevelCallsReportsDirectoryPath();
     
     // PublicApiDataSetCalls
     string PublicApiDataSetCallsDirectoryPath();
@@ -18,6 +18,11 @@ public interface IAnalyticsPathResolver
     string PublicApiDataSetVersionCallsDirectoryPath();
 
     string PublicApiDataSetVersionCallsReportsDirectoryPath();
+    
+    // PublicApiQueries
+    string PublicApiQueriesDirectoryPath();
+
+    string PublicApiQueriesReportsDirectoryPath();
 
     // PublicZipDownloads
     string PublicZipDownloadsDirectoryPath();

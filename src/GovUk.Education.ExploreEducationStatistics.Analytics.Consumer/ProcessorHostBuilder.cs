@@ -41,6 +41,7 @@ public static class ProcessorHostBuilder
 
                 // To be used by ConsumeAnalyticsRequestFilesFunction
                 services
+                    .AddTransient<IRequestFileProcessor, PublicApiTopLevelCallsProcessor>()
                     .AddTransient<IRequestFileProcessor, PublicApiDataSetCallsProcessor>()
                     .AddTransient<IRequestFileProcessor, PublicApiDataSetVersionCallsProcessor>()
                     .AddTransient<IRequestFileProcessor, PublicApiQueriesProcessor>()
