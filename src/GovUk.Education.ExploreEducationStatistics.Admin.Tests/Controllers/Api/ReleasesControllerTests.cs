@@ -686,7 +686,7 @@ public abstract class ReleasesControllerIntegrationTests(TestApplicationFactory 
             var newSlugReleaseCachedValue = await publicBlobCacheService.GetItemAsync(newSlugReleaseCacheKey, typeof(ReleaseCacheViewModel));
 
             var publicationCacheKey = new PublicationCacheKey(publication.Slug);
-            var publicationCacheValue = await publicBlobCacheService.GetItemAsync(newSlugReleaseCacheKey, typeof(ReleaseCacheViewModel));
+            var publicationCacheValue = await publicBlobCacheService.GetItemAsync(publicationCacheKey, typeof(ReleaseCacheViewModel));
 
             // Checking that there isn't any cache for the old release view-model
             Assert.Null(oldSlugReleaseCachedValue);
