@@ -10,6 +10,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Requests;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Analytics;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Fixture;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.TheoryData;
@@ -24,7 +25,6 @@ using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Primitives;
-using Newtonsoft.Json;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Controllers;
 
@@ -32,20 +32,6 @@ public abstract class DataSetsControllerTests(TestApplicationFactory testApp) : 
 {
     private const string BaseUrl = "v1/data-sets";
     
-    public record PreviewTokenSummary(
-        string Label,
-        DateTimeOffset Created,
-        DateTimeOffset Expiry);
-
-    public static readonly TheoryData<(PreviewTokenSummary?, string?)>
-        PreviewTokensAndRequestedDataSetVersions =
-        [
-            (null, null),
-            (new PreviewTokenSummary(Label: "Preview token",
-                Created: DateTimeOffset.UtcNow.AddDays(-1),
-                Expiry: DateTimeOffset.UtcNow.AddDays(1)), "1.0.*")
-        ];
-
     public abstract class GetDataSetTests(TestApplicationFactory testApp) : DataSetsControllerTests(testApp)
     {
         public class PublishedDataSetTests(TestApplicationFactory testApp) : GetDataSetTests(testApp)
@@ -1403,12 +1389,12 @@ public abstract class DataSetsControllerTests(TestApplicationFactory testApp) : 
                 }
             }
             
-            public static readonly TheoryData<(PreviewTokenSummary?, string?, DataSetMetaType[]?)>
+            public static readonly TheoryData<(AnalyticsTheoryData.PreviewTokenSummary?, string?, DataSetMetaType[]?)>
                 PreviewTokensRequestedDataSetVersionsAndTypes =
                 [
                     (null, null, null),
                     (
-                        new PreviewTokenSummary(Label: "Preview token",
+                        new AnalyticsTheoryData.PreviewTokenSummary(Label: "Preview token",
                             Created: DateTimeOffset.UtcNow.AddDays(-1),
                             Expiry: DateTimeOffset.UtcNow.AddDays(1)),
                         "1.0.*",
@@ -1418,7 +1404,7 @@ public abstract class DataSetsControllerTests(TestApplicationFactory testApp) : 
             [Theory]
             [MemberData(nameof(PreviewTokensRequestedDataSetVersionsAndTypes))]
             public async Task AnalyticsRequestCaptured(
-                (PreviewTokenSummary?, string?, DataSetMetaType[]? types) previewTokenRequestedDataSetVersionAndParameters)
+                (AnalyticsTheoryData.PreviewTokenSummary?, string?, DataSetMetaType[]? types) previewTokenRequestedDataSetVersionAndParameters)
             {
                 var (expectedPreviewToken, requestedDataSetVersion, types)
                     = previewTokenRequestedDataSetVersionAndParameters;
@@ -1471,57 +1457,18 @@ public abstract class DataSetsControllerTests(TestApplicationFactory testApp) : 
                 Assert.NotNull(content);
                 Assert.Equal("filter 1", content.Filters.Single().Label);
 
-                // Add a slight delay as the writing of the analytics capture is non-blocking
-                // and could occur slightly after the Controller response is returned to the user.
-                Thread.Sleep(2000);
-
-                var analyticsPath = GetAnalyticsPathResolver().PublicApiDataSetVersionCallsDirectoryPath();
-
-                // Expect the successful call to have been recorded for analytics.
-                Assert.True(Directory.Exists(analyticsPath));
-                var analyticsFiles = Directory.GetFiles(analyticsPath);
-                var analyticFile = Assert.Single(analyticsFiles);
-                var contents = await File.ReadAllTextAsync(analyticFile);
-
-                var capturedCall = JsonConvert.DeserializeObject<CaptureDataSetVersionCallRequest>(contents);
-
-                Assert.NotNull(capturedCall);
-                Assert.Equal(DataSetVersionCallType.GetMetadata, capturedCall.Type);
-                Assert.Equal(dataSet.Id, capturedCall.DataSetId);
-                Assert.Equal(dataSet.Title, capturedCall.DataSetTitle);
-                Assert.Equal(dataSetVersion.Id, capturedCall.DataSetVersionId);
-                Assert.Equal(dataSetVersion.SemVersion().ToString(), capturedCall.DataSetVersion);
-                Assert.Equal(requestedDataSetVersion, capturedCall.RequestedDataSetVersion);
-
-                if (types == null)
-                {
-                    Assert.Null(capturedCall.Parameters);
-                }
-                else
-                {
-                    // Expect the requested metadata types to have been recorded as the call's parameters. 
-                    Assert.NotNull(capturedCall.Parameters);
-                    var parameters = JsonConvert.DeserializeObject<GetMetadataAnalyticsParameters>(
-                        capturedCall.Parameters.ToString()!);
-                    Assert.NotNull(parameters);
-                    Assert.Equal([DataSetMetaType.Filters, DataSetMetaType.Locations], parameters.Types);
-                }
+                var expectedParameters = types != null 
+                    ? new GetMetadataAnalyticsParameters(Types: types.ToList()) 
+                    : null;
                 
-                capturedCall.StartTime.AssertUtcNow(withinMillis: 5000);
-
-                if (expectedPreviewToken == null)
-                {
-                    Assert.Null(capturedCall.PreviewToken);
-                }
-                else
-                {
-                    Assert.NotNull(persistedPreviewToken);
-                    Assert.NotNull(capturedCall.PreviewToken);
-                    Assert.Equal(expectedPreviewToken.Label, capturedCall.PreviewToken.Label);
-                    Assert.Equal(dataSetVersion.Id, capturedCall.PreviewToken.DataSetVersionId);
-                    Assert.Equal(expectedPreviewToken.Created.TruncateMicroseconds(), capturedCall.PreviewToken.Created);
-                    Assert.Equal(expectedPreviewToken.Expiry.TruncateMicroseconds(), capturedCall.PreviewToken.Expiry);
-                }
+                await AnalyticsTestAssertions.AssertDataSetVersionAnalyticsCallCaptured(
+                    dataSet: dataSet,
+                    dataSetVersion: dataSetVersion,
+                    expectedType: DataSetVersionCallType.GetMetadata,
+                    expectedParameters: expectedParameters,
+                    expectedAnalyticsPath: GetAnalyticsPathResolver().PublicApiDataSetVersionCallsDirectoryPath(),
+                    expectedRequestedDataSetVersion: requestedDataSetVersion,
+                    expectedPreviewToken: expectedPreviewToken);
             }
             
             [Fact]
@@ -1557,15 +1504,8 @@ public abstract class DataSetsControllerTests(TestApplicationFactory testApp) : 
 
                 response.AssertOk<DataSetMetaViewModel>(useSystemJson: true);
 
-                // Add a slight delay as the writing of the analytics capture is non-blocking
-                // and could occur slightly after the Controller response is returned to the user.
-                Thread.Sleep(2000);
-
-                var analyticsPath = GetAnalyticsPathResolver().PublicApiDataSetVersionCallsDirectoryPath();
-
-                // Expect the successful call to have been omitted from analytics because it originates
-                // from the EES service.
-                Assert.False(Directory.Exists(analyticsPath));
+                AnalyticsTestAssertions.AssertAnalyticsCallNotCaptured(
+                    GetAnalyticsPathResolver().PublicApiDataSetVersionCallsDirectoryPath());
             }
         }
 
@@ -2126,9 +2066,10 @@ public abstract class DataSetsControllerTests(TestApplicationFactory testApp) : 
             }
 
             [Theory]
-            [MemberData(nameof(PreviewTokensAndRequestedDataSetVersions))]
+            [MemberData(nameof(AnalyticsTheoryData.PreviewTokensAndRequestedDataSetVersions),
+                MemberType = typeof(AnalyticsTheoryData))]
             public async Task AnalyticsRequestCaptured(
-                (PreviewTokenSummary?, string?) previewTokenAndRequestedDataSetVersion)
+                (AnalyticsTheoryData.PreviewTokenSummary?, string?) previewTokenAndRequestedDataSetVersion)
             {
                 var (expectedPreviewToken, requestedDataSetVersion) = previewTokenAndRequestedDataSetVersion;
                 
@@ -2173,44 +2114,15 @@ public abstract class DataSetsControllerTests(TestApplicationFactory testApp) : 
                 
                 var results = await DecompressGZippedCsv(response);
                 Assert.Equal(CsvData, results);
-
-                // Add a slight delay as the writing of the analytics capture is non-blocking
-                // and could occur slightly after the Controller response is returned to the user.
-                Thread.Sleep(2000);
-
-                var analyticsPath = GetAnalyticsPathResolver().PublicApiDataSetVersionCallsDirectoryPath();
-
-                // Expect the successful call to have been recorded for analytics.
-                Assert.True(Directory.Exists(analyticsPath));
-                var analyticsFiles = Directory.GetFiles(analyticsPath);
-                var analyticFile = Assert.Single(analyticsFiles);
-                var contents = await File.ReadAllTextAsync(analyticFile);
-
-                var capturedCall = JsonConvert.DeserializeObject<CaptureDataSetVersionCallRequest>(contents);
-
-                Assert.NotNull(capturedCall);
-                Assert.Equal(DataSetVersionCallType.DownloadCsv, capturedCall.Type);
-                Assert.Equal(dataSet.Id, capturedCall.DataSetId);
-                Assert.Equal(dataSet.Title, capturedCall.DataSetTitle);
-                Assert.Equal(dataSetVersion.Id, capturedCall.DataSetVersionId);
-                Assert.Equal(dataSetVersion.SemVersion().ToString(), capturedCall.DataSetVersion);
-                Assert.Equal(requestedDataSetVersion, capturedCall.RequestedDataSetVersion);
-                Assert.Null(capturedCall.Parameters);
-                capturedCall.StartTime.AssertUtcNow(withinMillis: 5000);
-
-                if (expectedPreviewToken == null)
-                {
-                    Assert.Null(capturedCall.PreviewToken);
-                }
-                else
-                {
-                    Assert.NotNull(persistedPreviewToken);
-                    Assert.NotNull(capturedCall.PreviewToken);
-                    Assert.Equal(expectedPreviewToken.Label, capturedCall.PreviewToken.Label);
-                    Assert.Equal(dataSetVersion.Id, capturedCall.PreviewToken.DataSetVersionId);
-                    Assert.Equal(expectedPreviewToken.Created.TruncateMicroseconds(), capturedCall.PreviewToken.Created);
-                    Assert.Equal(expectedPreviewToken.Expiry.TruncateMicroseconds(), capturedCall.PreviewToken.Expiry);
-                }
+                
+                await AnalyticsTestAssertions.AssertDataSetVersionAnalyticsCallCaptured(
+                    dataSet: dataSet,
+                    dataSetVersion: dataSetVersion,
+                    expectedType: DataSetVersionCallType.DownloadCsv,
+                    expectedParameters: null,
+                    expectedAnalyticsPath: GetAnalyticsPathResolver().PublicApiDataSetVersionCallsDirectoryPath(),
+                    expectedRequestedDataSetVersion: requestedDataSetVersion,
+                    expectedPreviewToken: expectedPreviewToken);
             }
             
             [Fact]
@@ -2242,15 +2154,8 @@ public abstract class DataSetsControllerTests(TestApplicationFactory testApp) : 
 
                 response.AssertOk();
 
-                // Add a slight delay as the writing of the analytics capture is non-blocking
-                // and could occur slightly after the Controller response is returned to the user.
-                Thread.Sleep(2000);
-
-                var analyticsPath = GetAnalyticsPathResolver().PublicApiDataSetVersionCallsDirectoryPath();
-
-                // Expect the successful call to have been omitted from analytics because it originates
-                // from EES.
-                Assert.False(Directory.Exists(analyticsPath));
+                AnalyticsTestAssertions.AssertAnalyticsCallNotCaptured(
+                    GetAnalyticsPathResolver().PublicApiDataSetVersionCallsDirectoryPath());
             }
         }
             

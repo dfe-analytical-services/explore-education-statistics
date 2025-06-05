@@ -110,6 +110,11 @@ internal class DataSetService(
                 version: dataSetVersion,
                 cancellationToken: cancellationToken)
             .OnSuccessDo(userService.CheckCanViewDataSetVersion)
+            .OnSuccessDo(dsv => analyticsService.CaptureDataSetVersionCall(
+                dataSetVersionId: dsv.Id,
+                type: DataSetVersionCallType.GetSummary,
+                requestedDataSetVersion: dataSetVersion,
+                cancellationToken: cancellationToken))
             .OnSuccess(MapDataSetVersion);
     }
 
