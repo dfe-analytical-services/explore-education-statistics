@@ -62,7 +62,7 @@ param userAssignedIdentityName string = ''
 @description('Location for all resources.')
 param location string
 
-@description('Whether to create or update Azure Monitor alerts during this deploy')
+@description('Specifies which alert rules to enable. If the optional alerts parameter is not provided, no alert rules will be created or updated.')
 param alerts {
   searchLatency: bool
   searchQueriesPerSecond: bool
@@ -109,9 +109,10 @@ resource searchService 'Microsoft.Search/searchServices@2025-02-01-preview' = {
   tags: tagValues
 }
 
-module searchLatencyAlert '../../public-api/components/alerts/dynamicMetricAlert.bicep' = if (alerts != null && alerts!.searchLatency) {
+module searchLatencyAlert '../../public-api/components/alerts/dynamicMetricAlert.bicep' = if (alerts != null) {
   name: '${name}SearchLatencyDeploy'
   params: {
+    enabled: alerts!.searchLatency
     resourceName: searchService.name
     resourceMetric: {
       resourceType: 'Microsoft.Search/searchServices'
@@ -131,9 +132,10 @@ module searchLatencyAlert '../../public-api/components/alerts/dynamicMetricAlert
   }
 }
 
-module searchQueriesPerSecondAlert '../../public-api/components/alerts/dynamicMetricAlert.bicep' = if (alerts != null && alerts!.searchQueriesPerSecond) {
+module searchQueriesPerSecondAlert '../../public-api/components/alerts/dynamicMetricAlert.bicep' = if (alerts != null) {
   name: '${name}SearchQueriesPerSecondDeploy'
   params: {
+    enabled: alerts!.searchQueriesPerSecond
     resourceName: searchService.name
     resourceMetric: {
       resourceType: 'Microsoft.Search/searchServices'
@@ -153,9 +155,10 @@ module searchQueriesPerSecondAlert '../../public-api/components/alerts/dynamicMe
   }
 }
 
-module throttledSearchQueriesPercentageAlert '../../public-api/components/alerts/dynamicMetricAlert.bicep' = if (alerts != null && alerts!.throttledSearchQueriesPercentage) {
+module throttledSearchQueriesPercentageAlert '../../public-api/components/alerts/dynamicMetricAlert.bicep' = if (alerts != null) {
   name: '${name}ThrottledSearchQueriesPercentageDeploy'
   params: {
+    enabled: alerts!.throttledSearchQueriesPercentage
     resourceName: searchService.name
     resourceMetric: {
       resourceType: 'Microsoft.Search/searchServices'
