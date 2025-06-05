@@ -33,6 +33,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Hosting;
 using Xunit;
 using File = GovUk.Education.ExploreEducationStatistics.Content.Model.File;
 using ReleaseVersion = GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseVersion;
@@ -2515,7 +2516,10 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
         StatisticsDbContext? statisticsDbContext = null,
         bool enableAzurite = false)
     {
-        return WithAzurite(enabled: enableAzurite)
+        List<Action<IWebHostBuilder>> configFuncs = enableAzurite
+            ? [WithAzurite()]
+            : [];
+        return BuildWebApplicationFactory(configFuncs)
             .ConfigureServices(services =>
             {
                 services.ReplaceService(MemoryCacheService);

@@ -963,7 +963,7 @@ public class ThemeServiceTests
             var contextId = Guid.NewGuid().ToString();
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                context.AddRange(publications);
+                context.Publications.AddRange(publications);
                 await context.SaveChangesAsync();
             }
 
@@ -1008,7 +1008,7 @@ public class ThemeServiceTests
             var contextId = Guid.NewGuid().ToString();
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                context.AddRange(publications);
+                context.Publications.AddRange(publications);
                 await context.SaveChangesAsync();
             }
 
@@ -1048,7 +1048,7 @@ public class ThemeServiceTests
             var contextId = Guid.NewGuid().ToString();
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                context.AddRange(publications);
+                context.Publications.AddRange(publications);
                 await context.SaveChangesAsync();
             }
 

@@ -38,7 +38,8 @@ public class PublicZipDownloadsProcessor(
                     releaseName VARCHAR,
                     releaseLabel VARCHAR,
                     subjectId UUID,
-                    dataSetTitle VARCHAR
+                    dataSetTitle VARCHAR,
+                    fromPage VARCHAR
                 )
             ");
         }
@@ -58,7 +59,8 @@ public class PublicZipDownloadsProcessor(
                             releaseName: VARCHAR,
                             releaseLabel: VARCHAR,
                             subjectId: UUID,
-                            dataSetTitle: VARCHAR
+                            dataSetTitle: VARCHAR,
+                            fromPage: VARCHAR
                         }}
                     )
                  )
@@ -77,12 +79,13 @@ public class PublicZipDownloadsProcessor(
                     FIRST(releaseLabel) AS releaseLabel,
                     FIRST(subjectId) AS subjectId,
                     FIRST(dataSetTitle) AS dataSetTitle,
+                    FIRST(fromPage) AS fromPage,
                     CAST(COUNT(zipDownloadHash) AS INT) AS downloads
                 FROM zipDownloads
                 GROUP BY zipDownloadHash
                 ORDER BY zipDownloadHash
             ");
-        
+
             var reportFilePath = 
                 $"{reportsFolderPathAndFilenamePrefix}_public-zip-downloads.parquet";
 

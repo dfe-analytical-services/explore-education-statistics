@@ -110,10 +110,10 @@ public abstract class IntegrationTestFixture(TestApplicationFactory testApp) :
                             sp.GetRequiredService<ILogger<IBlobStorageService>>()
                         )
                     );
-                    services.ReplaceService<IPublisherTableStorageService>(sp =>
+                    services.ReplaceService<IPublisherTableStorageService>(_ =>
                         new PublisherTableStorageService(_azuriteContainer.GetConnectionString())
                     );
-                    services.ReplaceService<IDataProcessorClient>(sp =>
+                    services.ReplaceService<IDataProcessorClient>(_ =>
                         new DataProcessorClient(_azuriteContainer.GetConnectionString())
                     );
                     services.AddTransient<IPublicBlobCacheService, PublicBlobCacheService>();
