@@ -25,42 +25,22 @@ public class AnalyticsService(
         object? parameters = null,
         CancellationToken cancellationToken = default)
     {
-        try
-        {
-            // Filter out any non-public calls from analytics.
-            if (!IncludeAnalyticsCall())
+        await DoCaptureCall(
+            requestSupplier: async () =>
             {
-                logger.LogDebug(
-                    message: """
-                             Ignoring capturing analytics for "{Type}" call for DataSet {Id}.
-                             """,
-                    type,
-                    dataSetId);
-                return;
-            }
+                var dataSet = await publicDataDbContext
+                    .DataSets
+                    .SingleAsync(ds => ds.Id == dataSetId, cancellationToken);
 
-            var dataSet = await publicDataDbContext
-                .DataSets
-                .SingleAsync(ds => ds.Id == dataSetId, cancellationToken);
-
-            var request = new CaptureDataSetCallRequest(
-                DataSetId: dataSet.Id,
-                DataSetTitle: dataSet.Title,
-                Parameters: parameters,
-                PreviewToken: await GetPreviewTokenRequest(),
-                StartTime: dateTimeProvider.UtcNow,
-                Type: type);
-
-            await analyticsManager.Add(request, cancellationToken);
-        }
-        catch (Exception e)
-        {
-            logger.LogError(
-                exception: e,
-                message: """Error whilst capturing analytics for "{Type}" call for DataSet {Id}""",
-                type,
-                dataSetId);
-        }
+                return new CaptureDataSetCallRequest(
+                    DataSetId: dataSet.Id,
+                    DataSetTitle: dataSet.Title,
+                    Parameters: parameters,
+                    PreviewToken: await GetPreviewTokenRequest(),
+                    StartTime: dateTimeProvider.UtcNow,
+                    Type: type);
+            },
+            cancellationToken: cancellationToken);
     }
     
     public async Task CaptureDataSetVersionCall(
@@ -70,46 +50,26 @@ public class AnalyticsService(
         object? parameters = null,
         CancellationToken cancellationToken = default)
     {
-        try
-        {
-            // Filter out any non-public calls from analytics.
-            if (!IncludeAnalyticsCall())
+        await DoCaptureCall(
+            requestSupplier: async () =>
             {
-                logger.LogDebug(
-                    message: """
-                             Ignoring capturing analytics for "{Type}" call for DataSetVersion {Id}.
-                             """,
-                    type,
-                    dataSetVersionId);
-                return;
-            }
+                var dataSetVersion = await publicDataDbContext
+                    .DataSetVersions
+                    .Include(dsv => dsv.DataSet)
+                    .SingleAsync(dsv => dsv.Id == dataSetVersionId, cancellationToken);
 
-            var dataSetVersion = await publicDataDbContext
-                .DataSetVersions
-                .Include(dsv => dsv.DataSet)
-                .SingleAsync(dsv => dsv.Id == dataSetVersionId, cancellationToken);
-
-            var request = new CaptureDataSetVersionCallRequest(
-                DataSetId: dataSetVersion.DataSetId,
-                DataSetVersionId: dataSetVersion.Id,
-                DataSetVersion: dataSetVersion.SemVersion().ToString(),
-                DataSetTitle: dataSetVersion.DataSet.Title,
-                Parameters: parameters,
-                PreviewToken: await GetPreviewTokenRequest(),
-                RequestedDataSetVersion: requestedDataSetVersion,
-                StartTime: dateTimeProvider.UtcNow,
-                Type: type);
-
-            await analyticsManager.Add(request, cancellationToken);
-        }
-        catch (Exception e)
-        {
-            logger.LogError(
-                exception: e,
-                message: """Error whilst capturing analytics for "{Type}" call for DataSetVersion {Id}""",
-                type,
-                dataSetVersionId);
-        }
+                return new CaptureDataSetVersionCallRequest(
+                    DataSetId: dataSetVersion.DataSetId,
+                    DataSetVersionId: dataSetVersion.Id,
+                    DataSetVersion: dataSetVersion.SemVersion().ToString(),
+                    DataSetTitle: dataSetVersion.DataSet.Title,
+                    Parameters: parameters,
+                    PreviewToken: await GetPreviewTokenRequest(),
+                    RequestedDataSetVersion: requestedDataSetVersion,
+                    StartTime: dateTimeProvider.UtcNow,
+                    Type: type);
+            },
+            cancellationToken: cancellationToken);
     }
     
     public async Task CaptureDataSetVersionQuery(
@@ -120,20 +80,9 @@ public class AnalyticsService(
         DateTime startTime,
         CancellationToken cancellationToken)
     {
-        try
-        {
-            // Filter out any calls from analytics that originate from the EES service itself
-            // so that we're capturing only those made by public users.
-            if (!IncludeAnalyticsCall())
-            {
-                logger.LogDebug(
-                    message: "Ignoring capturing analytics for Public API query for DataSetVersion {Id}.",
-                    dataSetVersion.Id);
-                return;
-            }
-
-            await analyticsManager.Add(
-                request: new CaptureDataSetVersionQueryRequest(
+        await DoCaptureCall(
+            requestSupplier: async () =>
+                new CaptureDataSetVersionQueryRequest(
                     DataSetId: dataSetVersion.DataSetId,
                     DataSetVersionId: dataSetVersion.Id,
                     DataSetVersion: dataSetVersion.SemVersion().ToString(),
@@ -145,14 +94,38 @@ public class AnalyticsService(
                     TotalRowsCount: results.Paging.TotalResults,
                     StartTime: startTime,
                     EndTime: DateTime.UtcNow),
-                cancellationToken: cancellationToken);
+            cancellationToken: cancellationToken);
+    }
+
+    private async Task DoCaptureCall<TAnalyticsCaptureRequest>(
+        Func<Task<TAnalyticsCaptureRequest>> requestSupplier,
+        CancellationToken cancellationToken = default)
+        where TAnalyticsCaptureRequest : IAnalyticsCaptureRequestBase
+    {
+        try
+        {
+            // Filter out any calls from analytics that originate from the EES service itself
+            // so that we're capturing only those made by public users.
+            if (!IncludeAnalyticsCall())
+            {
+                logger.LogDebug(
+                    message: """
+                             Ignoring capturing analytics for call of type "{Type}".
+                             """,
+                    typeof(TAnalyticsCaptureRequest).Name);
+                return;
+            }
+
+            var request = await requestSupplier();
+
+            await analyticsManager.Add(request, cancellationToken);
         }
         catch (Exception e)
         {
             logger.LogError(
                 exception: e,
-                message: "Error whilst capturing analytics for Public API query for DataSetVersion {Id}",
-                dataSetVersion.Id);
+                message: """Error whilst capturing analytics for "{Type}" call""",
+                typeof(TAnalyticsCaptureRequest).Name);
         }
     }
 
