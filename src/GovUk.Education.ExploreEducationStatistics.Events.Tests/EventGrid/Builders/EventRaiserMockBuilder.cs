@@ -28,7 +28,7 @@ public class EventRaiserMockBuilder
 
         private Task AddEvent<TEventBuilder>(TEventBuilder @event)
         {
-            _events.Add(@event);
+            _events.Add(@event ?? throw new ArgumentNullException(nameof(@event)));
             return Task.CompletedTask;
         }
         private Task AddEvents<TEventBuilder>(IEnumerable<TEventBuilder> @events)
@@ -38,7 +38,7 @@ public class EventRaiserMockBuilder
         }
 
         public bool EventWasRaised<TEventBuilder>(TEventBuilder expectedEvent) => 
-            _events.OfType<TEventBuilder>().Any(actual => actual.Equals(expectedEvent));
+            _events.OfType<TEventBuilder>().Any(actual => actual!.Equals(expectedEvent));
 
         public bool EventWasRaised() => _events.Any();
 
