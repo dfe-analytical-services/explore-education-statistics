@@ -39,11 +39,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
     {
         private readonly DataFixture _fixture = new();
 
-        private readonly ReleaseVersion _releaseVersion = new()
-        {
-            Id = Guid.NewGuid()
-        };
-
         private readonly User _user = new()
         {
             Id = Guid.NewGuid(),
@@ -1395,7 +1390,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 ReleaseVersion = releaseVersion,
                 Name = "Test subject 1",
                 PublicApiDataSetId = Guid.NewGuid(),
-                PublicApiDataSetVersion = "1.0.1",
+                PublicApiDataSetVersion = SemVersion.Parse("1.0.1", SemVersionStyles.Any),
                 File = new File
                 {
                     Filename = "test-data-1.csv",
