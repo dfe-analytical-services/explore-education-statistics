@@ -33,6 +33,24 @@ public class AnalyticsService(
             cancellationToken: cancellationToken);
     }
     
+    public async Task CapturePublicationCall(
+        Guid publicationId,
+        string publicationTitle,
+        PublicationCallType type,
+        object? parameters = null,
+        CancellationToken cancellationToken = default)
+    {
+        await DoCaptureCall(
+            requestSupplier: () => Task.FromResult(
+                new CapturePublicationCallRequest(
+                    PublicationId: publicationId,
+                    PublicationTitle: publicationTitle,
+                    Parameters: parameters,
+                    StartTime: dateTimeProvider.UtcNow,
+                    Type: type)),
+            cancellationToken: cancellationToken);
+    }
+    
     public async Task CaptureDataSetCall(
         Guid dataSetId,
         DataSetCallType type,
@@ -175,6 +193,16 @@ public class NoOpAnalyticsService : IAnalyticsService
 {
     public Task CaptureTopLevelCall(
         TopLevelCallType type,
+        object? parameters = null,
+        CancellationToken cancellationToken = default)
+    {
+        return Task.CompletedTask;
+    }
+
+    public Task CapturePublicationCall(
+        Guid publicationId,
+        string publicationTitle,
+        PublicationCallType type,
         object? parameters = null,
         CancellationToken cancellationToken = default)
     {

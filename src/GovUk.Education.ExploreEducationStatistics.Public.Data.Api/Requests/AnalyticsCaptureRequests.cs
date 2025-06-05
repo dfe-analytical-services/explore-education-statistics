@@ -12,6 +12,15 @@ public record CaptureTopLevelCallRequest(
     object? Parameters = null
 ) : IAnalyticsCaptureRequestBase;
 
+public record CapturePublicationCallRequest(
+    Guid PublicationId,
+    string PublicationTitle,
+    DateTimeOffset StartTime,
+    [property:JsonConverter(typeof(StringEnumConverter))]
+    PublicationCallType Type,
+    object? Parameters = null
+) : IAnalyticsCaptureRequestBase;
+
 public record CaptureDataSetCallRequest(
     Guid DataSetId,
     string DataSetTitle,
@@ -51,6 +60,12 @@ public record CaptureDataSetVersionCallRequest(
 public enum TopLevelCallType
 {
     GetPublications
+}
+
+public enum PublicationCallType
+{
+    GetSummary,
+    GetDataSets
 }
 
 public enum DataSetCallType
