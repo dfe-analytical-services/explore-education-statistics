@@ -176,7 +176,7 @@ export default function PreReleaseUserAccessForm({
                   label="Invite new users by email"
                   name="emails"
                   className="govuk-!-width-one-third"
-                  hint={`Invite up to ${inviteLimit} users at a time. Enter each email address on a new line.`}
+                  hint={`Invite up to ${inviteLimit} users at a time. Enter each email address on a new line. Jobshare and mailbox accounts will not be able to access EES pre-release, use individual accounts where possible.`}
                   rows={15}
                 />
 
