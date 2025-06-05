@@ -1037,7 +1037,7 @@ public abstract class DataSetVersionsControllerTests(
 
         private record MockedChanges
         {
-            // ReSharper disable once UnusedAutoPropertyAccessor.Local
+            // ReSharper disable once UnusedAutoPropertyAccessor.Local - the Test response is accessed in a Deep Assert, which the compiler can not determine.
             public List<string> Changes { get; init; } = [];
         }
     }
