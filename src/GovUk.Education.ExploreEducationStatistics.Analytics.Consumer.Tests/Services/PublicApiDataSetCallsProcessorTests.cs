@@ -1,7 +1,6 @@
 using System.Reflection;
 using GovUk.Education.ExploreEducationStatistics.Analytics.Consumer.Services;
 using GovUk.Education.ExploreEducationStatistics.Analytics.Consumer.Services.Workflow;
-using GovUk.Education.ExploreEducationStatistics.Analytics.Consumer.Tests.Services.Workflow.MockBuilders;
 using GovUk.Education.ExploreEducationStatistics.Common.DuckDb.DuckDb;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using InterpolatedSql.Dapper;
@@ -25,23 +24,20 @@ public abstract class PublicApiDataSetCallsProcessorTests
         public async Task ProcessorUsesWorkflow()
         {
             using var pathResolver = new TestAnalyticsPathResolver();
-            SetupRequestFile(pathResolver, "WithCoreDataSetDetails.json");
 
-            var workflowActorBuilder = new WorkflowActorMockBuilder<PublicApiDataSetCallsProcessor>();
+            var workflow = new Mock<IProcessRequestFilesWorkflow>(MockBehavior.Strict);
+
+            workflow
+                .Setup(s => s.Process(It.IsAny<IWorkflowActor>()))
+                .Returns(Task.CompletedTask);
             
-            var workflowActor = workflowActorBuilder 
-                .WhereDuckDbInitialisedWithErrors()
-                .Build();
-
             var service = BuildService(
                 pathResolver: pathResolver,
-                workflowActor: workflowActor);
+                workflow: workflow.Object);
             
-            await Assert.ThrowsAsync<ArgumentException>(service.Process);
+            await service.Process();
 
-            workflowActorBuilder
-                .Assert
-                .InitialiseDuckDbCalled();
+            workflow.Verify(s => s.Process(It.IsAny<IWorkflowActor>()), Times.Once);
         }
 
         [Fact]
@@ -244,12 +240,12 @@ public abstract class PublicApiDataSetCallsProcessorTests
 
     private PublicApiDataSetCallsProcessor BuildService(
         TestAnalyticsPathResolver pathResolver,
-        IWorkflowActor<PublicApiDataSetCallsProcessor>? workflowActor = null)
+        IProcessRequestFilesWorkflow? workflow = null)
     {
         return new PublicApiDataSetCallsProcessor(
             pathResolver: pathResolver,
-            logger: Mock.Of<ILogger<PublicApiDataSetCallsProcessor>>(),
-            workflowActor: workflowActor);
+            workflow: workflow ?? new ProcessRequestFilesWorkflow(
+                logger: Mock.Of<ILogger<ProcessRequestFilesWorkflow>>()));
     }
 
     private void SetupRequestFile(TestAnalyticsPathResolver pathResolver, string filename)

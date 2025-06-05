@@ -5,6 +5,11 @@ using Microsoft.Extensions.Logging;
 
 namespace GovUk.Education.ExploreEducationStatistics.Analytics.Consumer.Services.Workflow;
 
+public interface IProcessRequestFilesWorkflow
+{
+    Task Process(IWorkflowActor actor);
+}
+
 /// <summary>
 /// This class represents a common workflow that a number of IRequestFileProcessor
 /// implementations use in order to generate their Parquet report files.
@@ -22,15 +27,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Analytics.Consumer.Services
 /// implementation-specific steps along the way. 
 /// 
 /// </summary>
-/// <param name="sourceDirectory">
-///     Folder in which to find the source files to read in this workflow.
-/// </param>
-/// <param name="reportsDirectory">
-///     Folder in which to generate the Parquet report files in this workflow.
-/// </param>
-/// <param name="actor">
-///     The <see cref="IWorkflowActor{TRequestFileProcessor}" /> implementation being guided through the workflow.
-/// </param>
 /// <param name="logger">
 ///     Logger from the associated Processor.
 /// </param>
@@ -41,25 +37,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Analytics.Consumer.Services
 /// <param name="dateTimeProvider">
 ///     Optional <see cref="DateTimeProvider"/>. If not provided, defaults to providing the current time.  
 /// </param>
-public class ProcessRequestFilesWorkflow<TRequestFileProcessor>(
-    string sourceDirectory,
-    string reportsDirectory,
-    IWorkflowActor<TRequestFileProcessor> actor, 
-    ILogger<IRequestFileProcessor> logger,
+public class ProcessRequestFilesWorkflow(
+    ILogger<ProcessRequestFilesWorkflow> logger,
     IFileAccessor? fileAccessor = null,
     DateTimeProvider? dateTimeProvider = null)
-    where TRequestFileProcessor : IRequestFileProcessor
+    : IProcessRequestFilesWorkflow
 {
-    private readonly string _processingDirectory = Path.Combine(sourceDirectory, "processing");
-    private readonly string _failuresDirectory = Path.Combine(sourceDirectory, "failures");
     private readonly IFileAccessor _fileAccessor = fileAccessor ?? new FilesystemFileAccessor();
     private readonly DateTimeProvider _dateTimeProvider = dateTimeProvider ?? new DateTimeProvider();
 
-    public async Task Process()
+    public async Task Process(IWorkflowActor actor)
     {
-        var processorName = typeof(TRequestFileProcessor).Name;
+        var processorName = actor.GetType().Name;
         
         logger.LogInformation("{Processor} triggered", processorName);
+
+        var sourceDirectory = actor.GetSourceDirectory();
+        var reportsDirectory = actor.GetReportsDirectory();
+        var processingDirectory = Path.Combine(sourceDirectory, "processing");
+        var failuresDirectory = Path.Combine(sourceDirectory, "failures");
         
         if (!_fileAccessor.DirectoryExists(sourceDirectory))
         {
@@ -83,12 +79,12 @@ public class ProcessRequestFilesWorkflow<TRequestFileProcessor>(
 
         await actor.InitialiseDuckDb(duckDbConnection);
 
-        _fileAccessor.CreateDirectory(_processingDirectory);
+        _fileAccessor.CreateDirectory(processingDirectory);
 
         Parallel.ForEach(filesToProcess, file =>
         {
             var originalPath = Path.Combine(sourceDirectory, file);
-            var newPath = Path.Combine(_processingDirectory, file);
+            var newPath = Path.Combine(processingDirectory, file);
             _fileAccessor.Move(originalPath, newPath);
         });
 
@@ -99,7 +95,7 @@ public class ProcessRequestFilesWorkflow<TRequestFileProcessor>(
             try
             {
                 await actor.ProcessSourceFile(
-                    sourceFilePath: Path.Combine(_processingDirectory, filename),
+                    sourceFilePath: Path.Combine(processingDirectory, filename),
                     connection: duckDbConnection);
 
                 someFilesProcessedSuccessfully = true;
@@ -107,11 +103,14 @@ public class ProcessRequestFilesWorkflow<TRequestFileProcessor>(
             catch (Exception e)
             {
                 logger.LogError(e, "Failed to process request file {Filename}", filename);
-                MoveBadFileToFailuresDirectory(filename);
+                MoveBadFileToFailuresDirectory(
+                    filename: filename,
+                    processingDirectory: processingDirectory,
+                    failuresDirectory: failuresDirectory);
             }
         }
 
-        _fileAccessor.DeleteDirectory(_processingDirectory);
+        _fileAccessor.DeleteDirectory(processingDirectory);
 
         // If no files were successfully processed, there is no need to generate
         // reports, so exit early.
@@ -131,14 +130,17 @@ public class ProcessRequestFilesWorkflow<TRequestFileProcessor>(
             connection: duckDbConnection);
     }
 
-    private void MoveBadFileToFailuresDirectory(string filename)
+    private void MoveBadFileToFailuresDirectory(
+        string filename,
+        string processingDirectory,
+        string failuresDirectory)
     {
         try
         {
-            _fileAccessor.CreateDirectory(_failuresDirectory);
+            _fileAccessor.CreateDirectory(failuresDirectory);
 
-            var fileSourcePath = Path.Combine(_processingDirectory, filename);
-            var fileDestPath = Path.Combine(_failuresDirectory, filename);
+            var fileSourcePath = Path.Combine(processingDirectory, filename);
+            var fileDestPath = Path.Combine(failuresDirectory, filename);
             _fileAccessor.Move(fileSourcePath, fileDestPath);
         }
         catch (Exception e)
@@ -207,16 +209,19 @@ internal class FilesystemFileAccessor : IFileAccessor
 
 /// <summary>
 /// This class represents an actor who is guided through the workflow
-/// as implemented in <see cref="ProcessRequestFilesWorkflow{TRequestFileProcessor}"/>.
+/// as implemented in <see cref="ProcessRequestFilesWorkflow"/>.
 ///
 /// This class is responsible for implementing steps that
 /// are carried out during the workflow that are specific to individual
 /// use cases e.g. collecting data about and generating Parquet report
 /// files for Public API queries.
 /// </summary>
-public interface IWorkflowActor<TRequestFileProcessor>
-    where TRequestFileProcessor : IRequestFileProcessor
+public interface IWorkflowActor
 {
+    string GetSourceDirectory();
+    
+    string GetReportsDirectory();
+
     /// <summary>
     /// Create any initial tables and state needed for collecting information
     /// from source files.
