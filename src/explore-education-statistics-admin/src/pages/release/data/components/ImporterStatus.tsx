@@ -17,9 +17,17 @@ export const getImportStatusLabel = (
 ): string | undefined => {
   switch (statusCode) {
     case 'NOT_FOUND':
-      return 'Not Found';
+      return 'Not found';
     case 'UPLOADING':
       return 'Uploading';
+    case 'SCREENING':
+      return 'Screening';
+    case 'FAILED_SCREENING':
+      return 'Failed screening';
+    case 'PENDING_REVIEW':
+      return 'Pending review';
+    case 'PENDING_IMPORT':
+      return 'Pending import';
     case 'QUEUED':
       return 'Queued';
     case 'PROCESSING_ARCHIVE_FILE':
@@ -49,6 +57,8 @@ const getImportStatusColour = (
   switch (statusCode) {
     case 'NOT_FOUND':
     case 'UPLOADING':
+    case 'SCREENING':
+    case 'PENDING_REVIEW':
     case 'QUEUED':
     case 'PROCESSING_ARCHIVE_FILE':
     case 'STAGE_1':
@@ -56,8 +66,10 @@ const getImportStatusColour = (
     case 'STAGE_3':
     case 'CANCELLING':
       return 'orange';
+    case 'PENDING_IMPORT':
     case 'COMPLETE':
       return 'green';
+    case 'FAILED_SCREENING':
     case 'FAILED':
     case 'CANCELLED':
       return 'red';

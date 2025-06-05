@@ -71,9 +71,13 @@ export interface DataFileUpdateRequest {
 }
 
 export type ImportStatusCode =
+  | 'UPLOADING'
+  | 'SCREENING'
+  | 'FAILED_SCREENING'
+  | 'PENDING_REVIEW'
+  | 'PENDING_IMPORT'
   | 'COMPLETE'
   | 'QUEUED'
-  | 'UPLOADING'
   | 'PROCESSING_ARCHIVE_FILE'
   | 'STAGE_1'
   | 'STAGE_2'
