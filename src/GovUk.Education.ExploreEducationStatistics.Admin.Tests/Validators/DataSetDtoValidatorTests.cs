@@ -10,13 +10,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Validators;
 
 public class DataSetDtoValidatorTests
 {
-    private readonly DataSetDto.Validator _validator;
-
-    public DataSetDtoValidatorTests()
-    {
-        _validator = new();
-    }
-
     [Fact]
     public async Task DataSetDto_Valid_ReturnsNoErrors()
     {
@@ -24,7 +17,7 @@ public class DataSetDtoValidatorTests
         var dto = await new DataSetDtoBuilder().Build();
 
         // Act
-        var result = await _validator.TestValidateAsync(dto);
+        var result = await new DataSetDto.Validator().TestValidateAsync(dto);
 
         // Assert
         result.ShouldNotHaveAnyValidationErrors();
@@ -39,7 +32,7 @@ public class DataSetDtoValidatorTests
             .Build();
 
         // Act
-        var result = await _validator.TestValidateAsync(dto);
+        var result = await new DataSetDto.Validator().TestValidateAsync(dto);
 
         // Assert
         result.ShouldHaveValidationErrorFor(dto => dto.ReleaseVersionId)
@@ -56,7 +49,7 @@ public class DataSetDtoValidatorTests
             .Build();
 
         // Act
-        var result = await _validator.TestValidateAsync(dto);
+        var result = await new DataSetDto.Validator().TestValidateAsync(dto);
 
         // Assert
         result.ShouldHaveValidationErrorFor(dto => dto.Title)
@@ -75,7 +68,7 @@ public class DataSetDtoValidatorTests
             .Build();
 
         // Act
-        var result = await _validator.TestValidateAsync(dto);
+        var result = await new DataSetDto.Validator().TestValidateAsync(dto);
 
         // Assert
         result.ShouldHaveValidationErrorFor(dto => dto.Title)
@@ -94,7 +87,7 @@ public class DataSetDtoValidatorTests
             .Build();
 
         // Act
-        var result = await _validator.TestValidateAsync(dto);
+        var result = await new DataSetDto.Validator().TestValidateAsync(dto);
 
         // Assert
         result.ShouldHaveValidationErrorFor(dto => dto.DataFile)
@@ -113,7 +106,7 @@ public class DataSetDtoValidatorTests
             .Build();
 
         // Act
-        var result = await _validator.TestValidateAsync(dto);
+        var result = await new DataSetDto.Validator().TestValidateAsync(dto);
 
         // Assert
         result.ShouldHaveValidationErrorFor(dto => dto.DataFile)
@@ -132,7 +125,7 @@ public class DataSetDtoValidatorTests
             .Build();
 
         // Act
-        var result = await _validator.TestValidateAsync(dto);
+        var result = await new DataSetDto.Validator().TestValidateAsync(dto);
 
         // Assert
         result.ShouldHaveValidationErrorFor(dto => dto.DataFile)
@@ -151,7 +144,7 @@ public class DataSetDtoValidatorTests
             .Build();
 
         // Act
-        var result = await _validator.TestValidateAsync(dto);
+        var result = await new DataSetDto.Validator().TestValidateAsync(dto);
 
         // Assert
         result.ShouldHaveValidationErrorFor(dto => dto.MetaFile)
@@ -170,7 +163,7 @@ public class DataSetDtoValidatorTests
             .Build();
 
         // Act
-        var result = await _validator.TestValidateAsync(dto);
+        var result = await new DataSetDto.Validator().TestValidateAsync(dto);
 
         // Assert
         result.ShouldHaveValidationErrorFor(dto => dto.ReplacingFile)
