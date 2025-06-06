@@ -48,7 +48,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 .DefaultPublication()
                 .WithReleases([_fixture.DefaultRelease(publishedVersions: 1)]);
 
-            var releaseVersion = publication.ReleaseVersions.Single();
+            var releaseVersion = publication
+                .Releases.Single()
+                .Versions.Single();
 
             ReleaseSubject releaseSubject = _fixture
                 .DefaultReleaseSubject()
@@ -241,7 +243,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 .DefaultPublication()
                 .WithReleases([_fixture.DefaultRelease(publishedVersions: 1)]);
 
-            var releaseVersion = publication.ReleaseVersions.Single();
+            var releaseVersion = publication
+                .Releases.Single()
+                .Versions.Single();
 
             ReleaseSubject releaseSubject = _fixture
                 .DefaultReleaseSubject()
@@ -285,7 +289,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 .DefaultPublication()
                 .WithReleases([_fixture.DefaultRelease(publishedVersions: 1)]);
 
-            var releaseVersion = publication.ReleaseVersions.Single();
+            var releaseVersion = publication
+                .Releases.Single()
+                .Versions.Single();
 
             // Set up a ReleaseSubject that references a non-existent publication
             ReleaseSubject releaseSubject = _fixture
@@ -363,7 +369,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 .DefaultPublication()
                 .WithReleases([_fixture.DefaultRelease(publishedVersions: 1)]);
 
-            var releaseVersion = publication.ReleaseVersions.Single();
+            var releaseVersion = publication
+                .Releases.Single()
+                .Versions.Single();
 
             ReleaseSubject releaseSubject = _fixture
                 .DefaultReleaseSubject()
@@ -404,13 +412,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 var filterItemRepository = new Mock<IFilterItemRepository>(Strict);
 
                 filterItemRepository
-                    .Setup(s => s.CountFilterItemsByFilter(query.Filters))
+                    .Setup(s => s.CountFilterItemsByFilter(query.GetFilterItemIds()))
                     .ReturnsAsync(new Dictionary<Guid, int>
                     {
                         {
                             // For the purpose of calculating the potential table size,
                             // treat all the Filter Items as belonging to the same Filter
-                            Guid.NewGuid(), query.Filters.Count()
+                            Guid.NewGuid(), query.GetFilterItemIds().Count()
                         }
                     });
 
@@ -444,7 +452,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 .DefaultPublication()
                 .WithReleases([_fixture.DefaultRelease(publishedVersions: 1)]);
 
-            var releaseVersion = publication.ReleaseVersions.Single();
+            var releaseVersion = publication
+                .Releases.Single()
+                .Versions.Single();
 
             ReleaseSubject releaseSubject = _fixture
                 .DefaultReleaseSubject()
@@ -632,7 +642,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 .DefaultPublication()
                 .WithReleases([_fixture.DefaultRelease(publishedVersions: 1)]);
 
-            var releaseVersion = publication.ReleaseVersions.Single();
+            var releaseVersion = publication
+                .Releases.Single()
+                .Versions.Single();
 
             ReleaseSubject releaseSubject = _fixture
                 .DefaultReleaseSubject()
@@ -677,7 +689,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 .DefaultPublication()
                 .WithReleases([_fixture.DefaultRelease(publishedVersions: 1)]);
 
-            var releaseVersion = publication.ReleaseVersions.Single();
+            var releaseVersion = publication
+                .Releases.Single()
+                .Versions.Single();
 
             ReleaseSubject releaseSubject = _fixture
                 .DefaultReleaseSubject()
@@ -722,7 +736,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 .DefaultPublication()
                 .WithReleases([_fixture.DefaultRelease(publishedVersions: 1)]);
 
-            var releaseVersion = publication.ReleaseVersions.Single();
+            var releaseVersion = publication
+                .Releases.Single()
+                .Versions.Single();
 
             ReleaseSubject releaseSubject = _fixture
                 .DefaultReleaseSubject()
@@ -763,13 +779,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
                 filterItemRepository
                     .Setup(s => s.CountFilterItemsByFilter(
-                        query.Filters))
+                        query.GetFilterItemIds()))
                     .ReturnsAsync(new Dictionary<Guid, int>
                     {
                         {
                             // For the purpose of calculating the potential table size,
                             // treat all the Filter Items as belonging to the same Filter
-                            Guid.NewGuid(), query.Filters.Count()
+                            Guid.NewGuid(), query.GetFilterItemIds().Count()
                         }
                     });
 
@@ -808,14 +824,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 .ForIndex(0, s =>
                     s.SetGroupCsvColumn("filter_0_grouping")
                         .SetFilterGroups(_fixture.DefaultFilterGroup(filterItemCount: 1)
-                            .ForInstance(s => s.Set(
+                            .ForInstance(setters => setters.Set(
                                 fg => fg.Label,
                                 (_, _, context) => $"Filter group {context.FixtureTypeIndex}"))
                             .Generate(2)))
                 .ForIndex(1, s =>
                     s.SetGroupCsvColumn("filter_1_grouping")
                         .SetFilterGroups(_fixture.DefaultFilterGroup(filterItemCount: 1)
-                            .ForInstance(s => s.Set(
+                            .ForInstance(setters => setters.Set(
                                 fg => fg.Label,
                                 (_, _, context) => $"Filter group {context.FixtureTypeIndex}"))
                             .Generate(2)))
@@ -882,7 +898,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 .DefaultReleaseSubject()
                 .WithReleaseVersion(_fixture
                     .DefaultStatsReleaseVersion()
-                    .WithId(publication.ReleaseVersions[0].Id)
+                    .WithId(publication.Releases[0].Versions[0].Id)
                     .WithPublicationId(publication.Id))
                 .WithSubject(_fixture.DefaultSubject()
                     .WithFilters(filters)
@@ -1039,7 +1055,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 .DefaultPublication()
                 .WithReleases([_fixture.DefaultRelease(publishedVersions: 1)]);
 
-            var releaseVersion = publication.ReleaseVersions.Single();
+            var releaseVersion = publication
+                .Releases.Single()
+                .Versions.Single();
 
             ReleaseSubject releaseSubject = _fixture
                 .DefaultReleaseSubject()
@@ -1085,7 +1103,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 .DefaultPublication()
                 .WithReleases([_fixture.DefaultRelease(publishedVersions: 1)]);
 
-            var releaseVersion = publication.ReleaseVersions.Single();
+            var releaseVersion = publication
+                .Releases.Single()
+                .Versions.Single();
 
             ReleaseSubject releaseSubject = _fixture
                 .DefaultReleaseSubject()
@@ -1126,13 +1146,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 var filterItemRepository = new Mock<IFilterItemRepository>(Strict);
 
                 filterItemRepository
-                    .Setup(s => s.CountFilterItemsByFilter(query.Filters))
+                    .Setup(s => s.CountFilterItemsByFilter(query.GetFilterItemIds()))
                     .ReturnsAsync(new Dictionary<Guid, int>
                     {
                         {
                             // For the purpose of calculating the potential table size,
                             // treat all the Filter Items as belonging to the same Filter
-                            Guid.NewGuid(), query.Filters.Count()
+                            Guid.NewGuid(), query.GetFilterItemIds().Count()
                         }
                     });
 
@@ -1168,20 +1188,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 .DefaultPublication()
                 .WithReleases([_fixture.DefaultRelease(publishedVersions: 1)]);
 
-            var releaseVersion = publication.ReleaseVersions.Single();
+            var releaseVersion = publication
+                .Releases.Single()
+                .Versions.Single();
 
             var filters = _fixture.DefaultFilter()
                 .ForIndex(0, s =>
                     s.SetGroupCsvColumn("filter_0_grouping")
                         .SetFilterGroups(_fixture.DefaultFilterGroup(filterItemCount: 1)
-                            .ForInstance(s => s.Set(
+                            .ForInstance(setters => setters.Set(
                                 fg => fg.Label,
                                 (_, _, context) => $"Filter group {context.FixtureTypeIndex}"))
                             .Generate(2)))
                 .ForIndex(1, s =>
                     s.SetGroupCsvColumn("filter_1_grouping")
                         .SetFilterGroups(_fixture.DefaultFilterGroup(filterItemCount: 1)
-                            .ForInstance(s => s.Set(
+                            .ForInstance(setters => setters.Set(
                                 fg => fg.Label,
                                 (_, _, context) => $"Filter group {context.FixtureTypeIndex}"))
                             .Generate(2)))
@@ -1352,7 +1374,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 .DefaultPublication()
                 .WithReleases([_fixture.DefaultRelease(publishedVersions: 1)]);
 
-            var releaseVersion = publication.ReleaseVersions.Single();
+            var releaseVersion = publication
+                .Releases.Single()
+                .Versions.Single();
 
             ReleaseSubject releaseSubject = _fixture
                 .DefaultReleaseSubject()
@@ -1486,7 +1510,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 .DefaultPublication()
                 .WithReleases([_fixture.DefaultRelease(publishedVersions: 1)]);
 
-            var releaseVersion = publication.ReleaseVersions.Single();
+            var releaseVersion = publication
+                .Releases.Single()
+                .Versions.Single();
 
             ReleaseSubject releaseSubject = _fixture
                 .DefaultReleaseSubject()
@@ -1535,7 +1561,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 .DefaultPublication()
                 .WithReleases([_fixture.DefaultRelease(publishedVersions: 1)]);
 
-            var releaseVersion = publication.ReleaseVersions.Single();
+            var releaseVersion = publication
+                .Releases.Single()
+                .Versions.Single();
 
             ReleaseSubject releaseSubject = _fixture
                 .DefaultReleaseSubject()
@@ -1581,7 +1609,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 .DefaultPublication()
                 .WithReleases([_fixture.DefaultRelease(publishedVersions: 1)]);
 
-            var releaseVersion = publication.ReleaseVersions.Single();
+            var releaseVersion = publication
+                .Releases.Single()
+                .Versions.Single();
 
             ReleaseSubject releaseSubject = _fixture
                 .DefaultReleaseSubject()
@@ -1621,13 +1651,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 var filterItemRepository = new Mock<IFilterItemRepository>(Strict);
 
                 filterItemRepository
-                    .Setup(s => s.CountFilterItemsByFilter(query.Filters))
+                    .Setup(s => s.CountFilterItemsByFilter(query.GetFilterItemIds()))
                     .ReturnsAsync(new Dictionary<Guid, int>
                     {
                         {
                             // For the purpose of calculating the potential table size,
                             // treat all the Filter Items as belonging to the same Filter
-                            Guid.NewGuid(), query.Filters.Count()
+                            Guid.NewGuid(), query.GetFilterItemIds().Count()
                         }
                     });
 

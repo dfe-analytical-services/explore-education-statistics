@@ -65,6 +65,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
             Indicators = new List<Guid> // use collection expression -> test failures
             {
                 Guid.NewGuid()
+            },
+            FilterHierarchyOptions = new Dictionary<Guid, List<List<Guid>>>
+            {
+                { Guid.NewGuid(), [[Guid.NewGuid(), Guid.NewGuid()], [Guid.NewGuid(), Guid.NewGuid()]] },
+                { Guid.NewGuid(), [[Guid.NewGuid(), Guid.NewGuid()]] },
+                { Guid.NewGuid(), [[Guid.NewGuid(), Guid.NewGuid()]] },
+                { Guid.NewGuid(), [[Guid.NewGuid(), Guid.NewGuid()], [Guid.NewGuid(), Guid.NewGuid()]] },
             }
         };
 
@@ -573,7 +580,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
             Assert.Equal(publication.Id, queryViewModel.PublicationId);
             Assert.Equal(FullTableQuery.SubjectId, viewModel.Query.SubjectId);
             Assert.Equal(FullTableQuery.TimePeriod, viewModel.Query.TimePeriod);
-            Assert.Equal(FullTableQuery.Filters, viewModel.Query.Filters);
+            Assert.Equal(FullTableQuery.GetNonHierarchicalFilterItemIds(), viewModel.Query.GetNonHierarchicalFilterItemIds());
+            viewModel.Query.FilterHierarchyOptions.AssertDeepEqualTo(FullTableQuery.FilterHierarchyOptions);
             Assert.Equal(FullTableQuery.Indicators, viewModel.Query.Indicators);
             Assert.Equal(FullTableQuery.LocationIds, viewModel.Query.LocationIds);
         }

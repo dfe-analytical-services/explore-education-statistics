@@ -110,7 +110,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                             {
                                 SubjectMeta = subjectMetaViewModel,
                                 Results = observations.Select(observation =>
-                                    ObservationViewModelBuilder.BuildObservation(observation, query.Indicators))
+                                    ObservationViewModelBuilder.BuildObservation(observation, query.Indicators)),
                             };
                         });
                 });
@@ -212,7 +212,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 
         private async Task<int> GetMaximumTableCellCount(FullTableQuery query)
         {
-            var filterItemIds = query.Filters.ToList();
+            var filterItemIds = query.GetFilterItemIds();
+
             var countsOfFilterItemsByFilter = filterItemIds.Count == 0
                 ? new List<int>()
                 : (await _filterItemRepository.CountFilterItemsByFilter(filterItemIds))
