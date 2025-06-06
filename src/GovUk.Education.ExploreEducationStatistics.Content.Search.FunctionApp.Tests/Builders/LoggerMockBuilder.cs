@@ -25,7 +25,7 @@ public class LoggerMockBuilder<T>
     private class MockLogger(Action<string>? output = null) : ILogger<T>
     {
         public List<LogItem> LogItems { get; } = new();
-        public IDisposable? BeginScope<TState>(TState state) where TState : notnull => throw new NotImplementedException();
+        public IDisposable BeginScope<TState>(TState state) where TState : notnull => throw new NotImplementedException();
 
         public bool IsEnabled(LogLevel logLevel) => throw new NotImplementedException();
 
