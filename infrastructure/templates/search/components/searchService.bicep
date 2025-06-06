@@ -110,7 +110,7 @@ resource searchService 'Microsoft.Search/searchServices@2025-02-01-preview' = {
 }
 
 module searchLatencyAlert '../../public-api/components/alerts/dynamicMetricAlert.bicep' = if (alerts != null) {
-  name: '${name}SearchLatencyDeploy'
+  name: '${name}SrchLatDeploy'
   params: {
     enabled: alerts!.searchLatency
     resourceName: searchService.name
@@ -133,7 +133,7 @@ module searchLatencyAlert '../../public-api/components/alerts/dynamicMetricAlert
 }
 
 module searchQueriesPerSecondAlert '../../public-api/components/alerts/dynamicMetricAlert.bicep' = if (alerts != null) {
-  name: '${name}SearchQueriesPerSecondDeploy'
+  name: '${name}SearchQPSDeploy'
   params: {
     enabled: alerts!.searchQueriesPerSecond
     resourceName: searchService.name
@@ -156,7 +156,7 @@ module searchQueriesPerSecondAlert '../../public-api/components/alerts/dynamicMe
 }
 
 module throttledSearchQueriesPercentageAlert '../../public-api/components/alerts/dynamicMetricAlert.bicep' = if (alerts != null) {
-  name: '${name}ThrottledSearchQueriesPercentageDeploy'
+  name: '${name}ThrSQPctDeploy'
   params: {
     enabled: alerts!.throttledSearchQueriesPercentage
     resourceName: searchService.name

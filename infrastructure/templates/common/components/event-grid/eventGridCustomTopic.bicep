@@ -73,7 +73,7 @@ resource topic 'Microsoft.EventGrid/topics@2025-02-15' = {
 }
 
 module deadLetteredCountAlert '../../../public-api/components/alerts/staticMetricAlert.bicep' = if (alerts != null) {
-  name: '${name}DeadLetteredCountDeploy'
+  name: '${name}DeadLttrDeploy'
   params: {
     enabled: alerts!.deadLetteredCount
     resourceName: topic.name
@@ -92,7 +92,7 @@ module deadLetteredCountAlert '../../../public-api/components/alerts/staticMetri
 }
 
 module droppedEventCount '../../../public-api/components/alerts/staticMetricAlert.bicep' = if (alerts != null) {
-  name: '${name}DroppedEventCountDeploy'
+  name: '${name}DropEvntDeploy'
   params: {
     enabled: alerts!.droppedEventCount
     resourceName: topic.name
@@ -111,7 +111,7 @@ module droppedEventCount '../../../public-api/components/alerts/staticMetricAler
 }
 
 module deliveryAttemptFailCountAlert '../../../public-api/components/alerts/staticMetricAlert.bicep' = if (alerts != null) {
-  name: '${name}DeliveryAttemptFailCountDeploy'
+  name: '${name}DlvAttFlDeploy'
   params: {
     enabled: alerts!.deliveryAttemptFailCount
     resourceName: topic.name
@@ -130,7 +130,7 @@ module deliveryAttemptFailCountAlert '../../../public-api/components/alerts/stat
 }
 
 module publishFailCountAlert '../../../public-api/components/alerts/staticMetricAlert.bicep' = if (alerts != null) {
-  name: '${name}PublishFailCountDeploy'
+  name: '${name}PubFailDeploy'
   params: {
     enabled: alerts!.publishFailCount
     resourceName: topic.name
@@ -149,7 +149,7 @@ module publishFailCountAlert '../../../public-api/components/alerts/staticMetric
 }
 
 module unmatchedEventCountAlert '../../../public-api/components/alerts/staticMetricAlert.bicep' = if (alerts != null) {
-  name: '${name}UnmatchedEventCountDeploy'
+  name: '${name}UnmtEvtDeploy'
   params: {
     enabled: alerts!.unmatchedEventCount
     resourceName: topic.name
