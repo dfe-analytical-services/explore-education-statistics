@@ -722,13 +722,6 @@
         "description": "The password to log in to the Container registry"
       }
     },
-    "eventGridTopicsExist": {
-      "type": "bool",
-      "defaultValue": true,
-      "metadata": {
-        "description": "Flag to determine if the Event Grid topics exist. TODO EES-6024 remove this when Event Grid topics are available in every environment"
-      }
-    },
     "searchIndexName" : {
       "type": "string",
       "defaultValue": "index-1",
@@ -1866,11 +1859,11 @@
         "App__EnableThemeDeletion": "[parameters('enableThemeDeletion')]",
         "Azure__SignalR__ConnectionString": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-signalr-admin-connectionstring'), '2018-02-14').secretUriWithVersion, ')')]",
         "EventGrid__EventTopics__0__Key": "PublicationChangedEvent",
-        "EventGrid__EventTopics__0__TopicEndpoint": "[if(parameters('eventGridTopicsExist'), reference(resourceId('Microsoft.EventGrid/topics', variables('eventGridTopicNamePublicationChanged')), '2025-02-15').endpoint, '')]",
+        "EventGrid__EventTopics__0__TopicEndpoint": "[reference(resourceId('Microsoft.EventGrid/topics', variables('eventGridTopicNamePublicationChanged')), '2025-02-15').endpoint]",
         "EventGrid__EventTopics__1__Key": "ReleaseChangedEvent",
-        "EventGrid__EventTopics__1__TopicEndpoint": "[if(parameters('eventGridTopicsExist'), reference(resourceId('Microsoft.EventGrid/topics', variables('eventGridTopicNameReleaseChanged')), '2025-02-15').endpoint, '')]",
+        "EventGrid__EventTopics__1__TopicEndpoint": "[reference(resourceId('Microsoft.EventGrid/topics', variables('eventGridTopicNameReleaseChanged')), '2025-02-15').endpoint]",
         "EventGrid__EventTopics__2__Key": "ThemeChangedEvent",
-        "EventGrid__EventTopics__2__TopicEndpoint": "[if(parameters('eventGridTopicsExist'), reference(resourceId('Microsoft.EventGrid/topics', variables('eventGridTopicNameThemeChanged')), '2025-02-15').endpoint, '')]",
+        "EventGrid__EventTopics__2__TopicEndpoint": "[reference(resourceId('Microsoft.EventGrid/topics', variables('eventGridTopicNameThemeChanged')), '2025-02-15').endpoint]",
         "IdentityServer__IssuerUri": "[concat('urn=', parameters('adminUri'))]",
         "IdentityServer__Key__Name": "[concat('CN=', parameters('adminUri'))]",
         "Notify__ApiKey": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-admin-govuknotify-api-key'), '2018-02-14').secretUriWithVersion, ')')]",
@@ -3437,9 +3430,9 @@
         "App__PublisherStorageConnectionString": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-storage-publisher')).secretUriWithVersion, ')')]",
         "DataFiles__BasePath": "[variables('publicDataFileShareMountPathWindows')]",
         "EventGrid__EventTopics__0__Key": "PublicationChangedEvent",
-        "EventGrid__EventTopics__0__TopicEndpoint": "[if(parameters('eventGridTopicsExist'), reference(resourceId('Microsoft.EventGrid/topics', variables('eventGridTopicNamePublicationChanged')), '2025-02-15').endpoint, '')]",
+        "EventGrid__EventTopics__0__TopicEndpoint": "[reference(resourceId('Microsoft.EventGrid/topics', variables('eventGridTopicNamePublicationChanged')), '2025-02-15').endpoint]",
         "EventGrid__EventTopics__1__Key": "ReleaseVersionChangedEvent",
-        "EventGrid__EventTopics__1__TopicEndpoint": "[if(parameters('eventGridTopicsExist'), reference(resourceId('Microsoft.EventGrid/topics', variables('eventGridTopicNameReleaseVersionChanged')), '2025-02-15').endpoint, '')]",
+        "EventGrid__EventTopics__1__TopicEndpoint": "[reference(resourceId('Microsoft.EventGrid/topics', variables('eventGridTopicNameReleaseVersionChanged')), '2025-02-15').endpoint]",
         "PublicDataDbExists": "[parameters('publicDataDbExists')]"
       }
     },
