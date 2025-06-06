@@ -26,179 +26,178 @@ using static Moq.MockBehavior;
 using ReleaseVersionRepository =
     GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.ReleaseVersionRepository;
 
-namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers
+namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers;
+
+// ReSharper disable once ClassNeverInstantiated.Global
+public class ViewSpecificReleaseAuthorizationHandlersTests
 {
-    // ReSharper disable once ClassNeverInstantiated.Global
-    public class ViewSpecificReleaseAuthorizationHandlersTests
+    private static readonly ReleaseVersion ReleaseVersion = new()
     {
-        private static readonly ReleaseVersion ReleaseVersion = new()
+        Id = Guid.NewGuid(),
+        Publication = new Publication { Id = Guid.NewGuid() }
+    };
+
+    private static readonly DataFixture DataFixture = new();
+
+    public class ClaimsTests
+    {
+        [Fact]
+        public async Task HasAccessAllReleasesClaim()
         {
-            Id = Guid.NewGuid(),
-            Publication = new Publication { Id = Guid.NewGuid() }
-        };
-
-        private static readonly DataFixture DataFixture = new();
-
-        public class ClaimsTests
-        {
-            [Fact]
-            public async Task HasAccessAllReleasesClaim()
-            {
-                // Assert that any users with the "AccessAllReleases" claim can view an arbitrary Release
-                // (and no other claim allows this)
-                await AssertHandlerSucceedsWithCorrectClaims<ReleaseVersion, ViewReleaseRequirement>(
-                    contentDbContext =>
-                    {
-                        contentDbContext.Attach(ReleaseVersion);
-                        return CreateHandler(contentDbContext);
-                    },
-                    ReleaseVersion,
-                    claimsExpectedToSucceed: AccessAllReleases);
-            }
-        }
-
-        public class PublicationRoleTests
-        {
-            [Fact]
-            public async Task HasOwnerOrApproverRoleOnParentPublication()
-            {
-                await AssertReleaseVersionHandlerSucceedsWithCorrectPublicationRoles<ViewReleaseRequirement>(
-                    contentDbContext =>
-                    {
-                        contentDbContext.Attach(ReleaseVersion);
-                        return CreateHandler(contentDbContext);
-                    },
-                    ReleaseVersion,
-                    rolesExpectedToSucceed: new[] { PublicationRole.Owner, PublicationRole.Approver });
-            }
-        }
-
-        public class ReleaseRoleTests
-        {
-            [Fact]
-            public async Task UnrestrictedViewerRoleOnRelease()
-            {
-                // Assert that a User who has any unrestricted viewer role on a Release can view the Release
-                await AssertReleaseVersionHandlerSucceedsWithCorrectReleaseRoles<ViewReleaseRequirement>(
-                    contentDbContext =>
-                    {
-                        contentDbContext.Attach(ReleaseVersion);
-                        return CreateHandler(contentDbContext);
-                    },
-                    ReleaseVersion,
-                    rolesExpectedToSucceed:
-                    [
-                        ReleaseRole.Contributor, ReleaseRole.Approver
-                    ]);
-            }
-
-            [Fact]
-            public async Task PreReleaseUser_WithinPreReleaseAccessWindow()
-            {
-                var userId = Guid.NewGuid();
-
-                var successScenario = new ReleaseVersionHandlerTestScenario
+            // Assert that any users with the "AccessAllReleases" claim can view an arbitrary Release
+            // (and no other claim allows this)
+            await AssertHandlerSucceedsWithCorrectClaims<ReleaseVersion, ViewReleaseRequirement>(
+                contentDbContext =>
                 {
-                    Entity = ReleaseVersion,
-                    User = DataFixture.AuthenticatedUser(userId: userId),
-                    UserReleaseRoles = new List<UserReleaseRole>
-                    {
-                        new()
-                        {
-                            ReleaseVersionId = ReleaseVersion.Id,
-                            UserId = userId,
-                            Role = ReleaseRole.PrereleaseViewer
-                        }
-                    },
-                    ExpectedToPass = true,
-                    UnexpectedFailMessage =
-                        "Expected the test to succeed because the Pre Release window is currently open"
-                };
-
-                var preReleaseService = new Mock<IPreReleaseService>(Strict);
-
-                preReleaseService
-                    .Setup(s => s.GetPreReleaseWindowStatus(ReleaseVersion, It.IsAny<DateTime>()))
-                    .Returns(new PreReleaseWindowStatus { Access = PreReleaseAccess.Within });
-
-                // Assert that a User who specifically has the Pre Release role will cause this handler to succeed
-                // if the Pre Release window is currently open.
-                await AssertReleaseVersionHandlerHandlesScenarioSuccessfully<ViewReleaseRequirement>(
-                    contentDbContext => CreateHandler(contentDbContext, preReleaseService.Object),
-                    successScenario);
-
-                VerifyAllMocks(preReleaseService);
-            }
-
-            [Fact]
-            public async Task PreReleaseUser_OutsidePreReleaseAccessWindow()
-            {
-                var userId = Guid.NewGuid();
-
-                var failureScenario = new ReleaseVersionHandlerTestScenario
-                {
-                    Entity = ReleaseVersion,
-                    User = DataFixture.AuthenticatedUser(userId: userId),
-                    UserReleaseRoles = new List<UserReleaseRole>
-                    {
-                        new()
-                        {
-                            ReleaseVersionId = ReleaseVersion.Id,
-                            UserId = userId,
-                            Role = ReleaseRole.PrereleaseViewer
-                        }
-                    },
-                    ExpectedToPass = false,
-                    UnexpectedPassMessage =
-                        "Expected the test to fail because the Pre Release window is not open at the " +
-                        "current time"
-                };
-
-                await GetEnums<PreReleaseAccess>()
-                    .Where(value => value != PreReleaseAccess.Within)
-                    .ToList()
-                    .ToAsyncEnumerable()
-                    .ForEachAwaitAsync(async access =>
-                    {
-                        var preReleaseService = new Mock<IPreReleaseService>(Strict);
-
-                        preReleaseService
-                            .Setup(s => s.GetPreReleaseWindowStatus(ReleaseVersion, It.IsAny<DateTime>()))
-                            .Returns(new PreReleaseWindowStatus { Access = access });
-
-                        // Assert that a User who specifically has the Pre Release role will cause this handler to fail
-                        // IF the Pre Release window is NOT open
-                        await AssertReleaseVersionHandlerHandlesScenarioSuccessfully<ViewReleaseRequirement>(
-                            contentDbContext =>
-                            {
-                                contentDbContext.Attach(ReleaseVersion);
-                                return CreateHandler(contentDbContext, preReleaseService.Object);
-                            },
-                            failureScenario);
-
-                        VerifyAllMocks(preReleaseService);
-                    });
-            }
+                    contentDbContext.Attach(ReleaseVersion);
+                    return CreateHandler(contentDbContext);
+                },
+                ReleaseVersion,
+                claimsExpectedToSucceed: AccessAllReleases);
         }
+    }
 
-        private static ViewSpecificReleaseAuthorizationHandler CreateHandler(
-            ContentDbContext contentDbContext,
-            IPreReleaseService? preReleaseService = null)
+    public class PublicationRoleTests
+    {
+        [Fact]
+        public async Task HasOwnerOrApproverRoleOnParentPublication()
         {
-            return new ViewSpecificReleaseAuthorizationHandler(
-                new AuthorizationHandlerService(
-                    new ReleaseVersionRepository(contentDbContext),
-                    new UserReleaseRoleRepository(contentDbContext),
-                    new UserPublicationRoleRepository(contentDbContext),
-                    preReleaseService ?? new PreReleaseService(
-                        new PreReleaseAccessOptions
-                        {
-                            AccessWindow = new AccessWindowOptions
-                            {
-                                MinutesBeforeReleaseTimeStart = 200,
-                            }
-                        }.ToOptionsWrapper()
-                    )));
+            await AssertReleaseVersionHandlerSucceedsWithCorrectPublicationRoles<ViewReleaseRequirement>(
+                contentDbContext =>
+                {
+                    contentDbContext.Attach(ReleaseVersion);
+                    return CreateHandler(contentDbContext);
+                },
+                ReleaseVersion,
+                rolesExpectedToSucceed: new[] { PublicationRole.Owner, PublicationRole.Approver });
         }
+    }
+
+    public class ReleaseRoleTests
+    {
+        [Fact]
+        public async Task UnrestrictedViewerRoleOnRelease()
+        {
+            // Assert that a User who has any unrestricted viewer role on a Release can view the Release
+            await AssertReleaseVersionHandlerSucceedsWithCorrectReleaseRoles<ViewReleaseRequirement>(
+                contentDbContext =>
+                {
+                    contentDbContext.Attach(ReleaseVersion);
+                    return CreateHandler(contentDbContext);
+                },
+                ReleaseVersion,
+                rolesExpectedToSucceed:
+                [
+                    ReleaseRole.Contributor, ReleaseRole.Approver
+                ]);
+        }
+
+        [Fact]
+        public async Task PreReleaseUser_WithinPreReleaseAccessWindow()
+        {
+            var userId = Guid.NewGuid();
+
+            var successScenario = new ReleaseVersionHandlerTestScenario
+            {
+                Entity = ReleaseVersion,
+                User = DataFixture.AuthenticatedUser(userId: userId),
+                UserReleaseRoles = new List<UserReleaseRole>
+                {
+                    new()
+                    {
+                        ReleaseVersionId = ReleaseVersion.Id,
+                        UserId = userId,
+                        Role = ReleaseRole.PrereleaseViewer
+                    }
+                },
+                ExpectedToPass = true,
+                UnexpectedFailMessage =
+                    "Expected the test to succeed because the Pre Release window is currently open"
+            };
+
+            var preReleaseService = new Mock<IPreReleaseService>(Strict);
+
+            preReleaseService
+                .Setup(s => s.GetPreReleaseWindowStatus(ReleaseVersion, It.IsAny<DateTime>()))
+                .Returns(new PreReleaseWindowStatus { Access = PreReleaseAccess.Within });
+
+            // Assert that a User who specifically has the Pre Release role will cause this handler to succeed
+            // if the Pre Release window is currently open.
+            await AssertReleaseVersionHandlerHandlesScenarioSuccessfully<ViewReleaseRequirement>(
+                contentDbContext => CreateHandler(contentDbContext, preReleaseService.Object),
+                successScenario);
+
+            VerifyAllMocks(preReleaseService);
+        }
+
+        [Fact]
+        public async Task PreReleaseUser_OutsidePreReleaseAccessWindow()
+        {
+            var userId = Guid.NewGuid();
+
+            var failureScenario = new ReleaseVersionHandlerTestScenario
+            {
+                Entity = ReleaseVersion,
+                User = DataFixture.AuthenticatedUser(userId: userId),
+                UserReleaseRoles = new List<UserReleaseRole>
+                {
+                    new()
+                    {
+                        ReleaseVersionId = ReleaseVersion.Id,
+                        UserId = userId,
+                        Role = ReleaseRole.PrereleaseViewer
+                    }
+                },
+                ExpectedToPass = false,
+                UnexpectedPassMessage =
+                    "Expected the test to fail because the Pre Release window is not open at the " +
+                    "current time"
+            };
+
+            await GetEnums<PreReleaseAccess>()
+                .Where(value => value != PreReleaseAccess.Within)
+                .ToList()
+                .ToAsyncEnumerable()
+                .ForEachAwaitAsync(async access =>
+                {
+                    var preReleaseService = new Mock<IPreReleaseService>(Strict);
+
+                    preReleaseService
+                        .Setup(s => s.GetPreReleaseWindowStatus(ReleaseVersion, It.IsAny<DateTime>()))
+                        .Returns(new PreReleaseWindowStatus { Access = access });
+
+                    // Assert that a User who specifically has the Pre Release role will cause this handler to fail
+                    // IF the Pre Release window is NOT open
+                    await AssertReleaseVersionHandlerHandlesScenarioSuccessfully<ViewReleaseRequirement>(
+                        contentDbContext =>
+                        {
+                            contentDbContext.Attach(ReleaseVersion);
+                            return CreateHandler(contentDbContext, preReleaseService.Object);
+                        },
+                        failureScenario);
+
+                    VerifyAllMocks(preReleaseService);
+                });
+        }
+    }
+
+    private static ViewSpecificReleaseAuthorizationHandler CreateHandler(
+        ContentDbContext contentDbContext,
+        IPreReleaseService? preReleaseService = null)
+    {
+        return new ViewSpecificReleaseAuthorizationHandler(
+            new AuthorizationHandlerService(
+                new ReleaseVersionRepository(contentDbContext),
+                new UserReleaseRoleRepository(contentDbContext),
+                new UserPublicationRoleRepository(contentDbContext),
+                preReleaseService ?? new PreReleaseService(
+                    new PreReleaseAccessOptions
+                    {
+                        AccessWindow = new AccessWindowOptions
+                        {
+                            MinutesBeforeReleaseTimeStart = 200,
+                        }
+                    }.ToOptionsWrapper()
+                )));
     }
 }

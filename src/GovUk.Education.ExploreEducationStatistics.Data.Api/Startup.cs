@@ -51,246 +51,245 @@ using GovUk.Education.ExploreEducationStatistics.Data.Services.Options;
 using Thinktecture;
 using static GovUk.Education.ExploreEducationStatistics.Common.Utils.StartupUtils;
 
-namespace GovUk.Education.ExploreEducationStatistics.Data.Api
+namespace GovUk.Education.ExploreEducationStatistics.Data.Api;
+
+[ExcludeFromCodeCoverage]
+public class Startup
 {
-    [ExcludeFromCodeCoverage]
-    public class Startup
+    private IConfiguration Configuration { get; }
+    private IHostEnvironment HostEnvironment { get; }
+
+    public Startup(IConfiguration configuration, IHostEnvironment hostEnvironment)
     {
-        private IConfiguration Configuration { get; }
-        private IHostEnvironment HostEnvironment { get; }
+        Configuration = configuration;
+        HostEnvironment = hostEnvironment;
+    }
 
-        public Startup(IConfiguration configuration, IHostEnvironment hostEnvironment)
+    // This method gets called by the runtime. Use this method to add services to the container.
+    public void ConfigureServices(IServiceCollection services)
+    {
+        services.AddHealthChecks();
+
+        services.AddApplicationInsightsTelemetry()
+            .AddApplicationInsightsTelemetryProcessor<SensitiveDataTelemetryProcessor>();
+
+        services.AddMvc(options =>
+            {
+                options.Filters.Add(new OperationCancelledExceptionFilter());
+                options.Filters.Add(new ProblemDetailsResultFilter());
+                options.RespectBrowserAcceptHeader = true;
+                options.ReturnHttpNotAcceptable = true;
+                options.EnableEndpointRouting = false;
+            })
+            .AddNewtonsoftJson(options =>
+            {
+                options.SerializerSettings.NullValueHandling = NullValueHandling.Ignore;
+            });
+
+        services.AddControllers(options =>
         {
-            Configuration = configuration;
-            HostEnvironment = hostEnvironment;
-        }
+            options.AddCommaSeparatedQueryModelBinderProvider();
+            options.AddTrimStringBinderProvider();
+        });
 
-        // This method gets called by the runtime. Use this method to add services to the container.
-        public void ConfigureServices(IServiceCollection services)
+        services.AddFluentValidation();
+        services.AddValidatorsFromAssembly(typeof(FullTableQueryRequest.Validator).Assembly); // Adds *all* validators from Common
+
+        services.AddDbContext<StatisticsDbContext>(options =>
+            options
+                .UseSqlServer(Configuration.GetConnectionString("StatisticsDb"),
+                    providerOptions =>
+                        providerOptions
+                            .MigrationsAssembly("GovUk.Education.ExploreEducationStatistics.Data.Model")
+                            .AddBulkOperationSupport()
+                            .EnableCustomRetryOnFailure()
+                )
+                .EnableSensitiveDataLogging(HostEnvironment.IsDevelopment())
+        );
+
+        services.AddDbContext<ContentDbContext>(options =>
+            options
+                .UseSqlServer(Configuration.GetConnectionString("ContentDb"),
+                    providerOptions =>
+                        providerOptions
+                            .MigrationsAssembly(typeof(Startup).Assembly.FullName)
+                            .EnableCustomRetryOnFailure()
+                )
+                .EnableSensitiveDataLogging(HostEnvironment.IsDevelopment())
+        );
+
+        // Adds Brotli and Gzip compressing
+        services.AddResponseCompression(options =>
         {
-            services.AddHealthChecks();
+            options.EnableForHttps = true;
+        });
 
-            services.AddApplicationInsightsTelemetry()
-                .AddApplicationInsightsTelemetryProcessor<SensitiveDataTelemetryProcessor>();
-
-            services.AddMvc(options =>
-                {
-                    options.Filters.Add(new OperationCancelledExceptionFilter());
-                    options.Filters.Add(new ProblemDetailsResultFilter());
-                    options.RespectBrowserAcceptHeader = true;
-                    options.ReturnHttpNotAcceptable = true;
-                    options.EnableEndpointRouting = false;
-                })
-                .AddNewtonsoftJson(options =>
-                {
-                    options.SerializerSettings.NullValueHandling = NullValueHandling.Ignore;
-                });
-
-            services.AddControllers(options =>
-            {
-                options.AddCommaSeparatedQueryModelBinderProvider();
-                options.AddTrimStringBinderProvider();
-            });
-
-            services.AddFluentValidation();
-            services.AddValidatorsFromAssembly(typeof(FullTableQueryRequest.Validator).Assembly); // Adds *all* validators from Common
-
-            services.AddDbContext<StatisticsDbContext>(options =>
-                options
-                    .UseSqlServer(Configuration.GetConnectionString("StatisticsDb"),
-                        providerOptions =>
-                            providerOptions
-                                .MigrationsAssembly("GovUk.Education.ExploreEducationStatistics.Data.Model")
-                                .AddBulkOperationSupport()
-                                .EnableCustomRetryOnFailure()
-                    )
-                    .EnableSensitiveDataLogging(HostEnvironment.IsDevelopment())
-            );
-
-            services.AddDbContext<ContentDbContext>(options =>
-                options
-                    .UseSqlServer(Configuration.GetConnectionString("ContentDb"),
-                        providerOptions =>
-                            providerOptions
-                                .MigrationsAssembly(typeof(Startup).Assembly.FullName)
-                                .EnableCustomRetryOnFailure()
-                    )
-                    .EnableSensitiveDataLogging(HostEnvironment.IsDevelopment())
-            );
-
-            // Adds Brotli and Gzip compressing
-            services.AddResponseCompression(options =>
-            {
-                options.EnableForHttps = true;
-            });
-
-            // Register the Swagger generator, defining 1 or more Swagger documents
-            services.AddSwaggerGen(c =>
-            {
-                c.SwaggerDoc("v1", new OpenApiInfo { Title = "Explore education statistics - Data API", Version = "v1" });
-            });
-
-            //
-            // Services
-            //
-
-            services.Configure<LocationsOptions>(Configuration.GetSection(LocationsOptions.Section));
-            services.Configure<TableBuilderOptions>(Configuration.GetSection(TableBuilderOptions.Section));
-
-            services.AddSingleton<IPublicBlobStorageService, PublicBlobStorageService>(provider =>
-                new PublicBlobStorageService(Configuration.GetValue<string>("PublicStorage"),
-                    provider.GetRequiredService<ILogger<IBlobStorageService>>()));
-            services.AddTransient<IBlobCacheService, BlobCacheService>(provider => new BlobCacheService(
-                provider.GetRequiredService<IPublicBlobStorageService>(),
-                provider.GetRequiredService<ILogger<BlobCacheService>>()
-            ));
-            services.AddTransient<IBoundaryLevelRepository, BoundaryLevelRepository>();
-            services.AddTransient<ITableBuilderService, TableBuilderService>();
-            services.AddTransient<IDataBlockService, DataBlockService>();
-            services.AddTransient<IReleaseService, ReleaseService>();
-            services.AddTransient<IReleaseSubjectService, ReleaseSubjectService>();
-            services.AddTransient<ISubjectResultMetaService, SubjectResultMetaService>();
-            services.AddTransient<ISubjectCsvMetaService, SubjectCsvMetaService>();
-            services.AddTransient<ISubjectMetaService, SubjectMetaService>();
-            services.AddTransient<IReleaseFileBlobService, PublicReleaseFileBlobService>();
-            services.AddTransient<IFilterItemRepository, FilterItemRepository>();
-            services.AddTransient<IFilterRepository, FilterRepository>();
-            services.AddTransient<IFootnoteRepository, FootnoteRepository>();
-            services.AddTransient<IFrontendService, FrontendService>();
-            services.AddTransient<IBoundaryDataRepository, BoundaryDataRepository>();
-            services.AddTransient<IIndicatorGroupRepository, IndicatorGroupRepository>();
-            services.AddTransient<IIndicatorRepository, IndicatorRepository>();
-            services.AddTransient<ILocationRepository, LocationRepository>();
-            services.AddTransient<IObservationService, ObservationService>();
-            services.AddTransient<IReleaseVersionRepository, ReleaseVersionRepository>();
-            services.AddTransient<IReleaseDataFileRepository, ReleaseDataFileRepository>();
-            services.AddTransient<IReleaseSubjectRepository, ReleaseSubjectRepository>();
-            services.AddTransient<ISubjectRepository, SubjectRepository>();
-            services.AddTransient<IDataGuidanceDataSetService, DataGuidanceDataSetService>();
-            services.AddTransient<ITimePeriodService, TimePeriodService>();
-            services.AddTransient<IPermalinkService, PermalinkService>();
-            services.AddTransient<IPermalinkCsvMetaService, PermalinkCsvMetaService>();
-            services.AddTransient<IPublicationRepository, PublicationRepository>();
-            services.AddSingleton<DataServiceMemoryCache<BoundaryLevel>, DataServiceMemoryCache<BoundaryLevel>>();
-            services.AddSingleton<DataServiceMemoryCache<BoundaryData>, DataServiceMemoryCache<BoundaryData>>();
-            services.AddTransient<IUserService, UserService>();
-            services.AddTransient<ICacheKeyService, CacheKeyService>();
-            services.AddTransient<ILocationService, LocationService>();
-
-            services
-                .AddAuthentication(options =>
-                {
-                    options.DefaultAuthenticateScheme = "defaultScheme";
-                    options.DefaultForbidScheme = "defaultScheme";
-                    options.AddScheme<DefaultAuthenticationHandler>("defaultScheme", "Default Scheme");
-                });
-
-            services.AddAuthorization(options =>
-            {
-                // does this use have permission to view a specific Release?
-                options.AddPolicy(ContentSecurityPolicies.CanViewSpecificReleaseVersion.ToString(), policy =>
-                    policy.Requirements.Add(new ViewReleaseRequirement()));
-
-                // does this user have permission to view the subject data of a specific Release?
-                options.AddPolicy(DataSecurityPolicies.CanViewSubjectData.ToString(), policy =>
-                    policy.Requirements.Add(new ViewSubjectDataRequirement()));
-            });
-
-            services.AddHttpClient("PublicApp", httpClient =>
-            {
-                var publicAppOptions = new PublicAppOptions();
-                Configuration.GetSection("PublicApp").Bind(publicAppOptions);
-
-                httpClient.BaseAddress = new Uri(publicAppOptions.Url);
-
-                if (publicAppOptions.BasicAuth)
-                {
-                    httpClient.DefaultRequestHeaders.Authorization =
-                        new AuthenticationHeaderValue("Basic",
-                            Convert.ToBase64String(Encoding.UTF8.GetBytes(
-                                $"{publicAppOptions.BasicAuthUsername}:{publicAppOptions.BasicAuthPassword}")));
-                }
-
-                httpClient.DefaultRequestHeaders.Add(HeaderNames.UserAgent, "DataApi");
-            });
-
-            services.AddTransient<IAuthorizationHandler, ViewReleaseAuthorizationHandler>();
-            services.AddTransient<IAuthorizationHandler, ViewSubjectDataForPublishedReleasesAuthorizationHandler>();
-
-            services.AddCors();
-            services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
-
-            AddPersistenceHelper<StatisticsDbContext>(services);
-            AddPersistenceHelper<ContentDbContext>(services);
-        }
-
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        // Register the Swagger generator, defining 1 or more Swagger documents
+        services.AddSwaggerGen(c =>
         {
-            // Enable caching and register any caching services.
-            CacheAspect.Enabled = true;
-            BlobCacheAttribute.AddService("default", app.ApplicationServices.GetRequiredService<IBlobCacheService>());
-            // Enable cancellation aspects and register request timeout configuration.
-            CancellationTokenTimeoutAspect.Enabled = true;
-            CancellationTokenTimeoutAttribute.SetTimeoutConfiguration(Configuration.GetSection("RequestTimeouts"));
+            c.SwaggerDoc("v1", new OpenApiInfo { Title = "Explore education statistics - Data API", Version = "v1" });
+        });
 
-            if (env.IsDevelopment())
+        //
+        // Services
+        //
+
+        services.Configure<LocationsOptions>(Configuration.GetSection(LocationsOptions.Section));
+        services.Configure<TableBuilderOptions>(Configuration.GetSection(TableBuilderOptions.Section));
+
+        services.AddSingleton<IPublicBlobStorageService, PublicBlobStorageService>(provider =>
+            new PublicBlobStorageService(Configuration.GetValue<string>("PublicStorage"),
+                provider.GetRequiredService<ILogger<IBlobStorageService>>()));
+        services.AddTransient<IBlobCacheService, BlobCacheService>(provider => new BlobCacheService(
+            provider.GetRequiredService<IPublicBlobStorageService>(),
+            provider.GetRequiredService<ILogger<BlobCacheService>>()
+        ));
+        services.AddTransient<IBoundaryLevelRepository, BoundaryLevelRepository>();
+        services.AddTransient<ITableBuilderService, TableBuilderService>();
+        services.AddTransient<IDataBlockService, DataBlockService>();
+        services.AddTransient<IReleaseService, ReleaseService>();
+        services.AddTransient<IReleaseSubjectService, ReleaseSubjectService>();
+        services.AddTransient<ISubjectResultMetaService, SubjectResultMetaService>();
+        services.AddTransient<ISubjectCsvMetaService, SubjectCsvMetaService>();
+        services.AddTransient<ISubjectMetaService, SubjectMetaService>();
+        services.AddTransient<IReleaseFileBlobService, PublicReleaseFileBlobService>();
+        services.AddTransient<IFilterItemRepository, FilterItemRepository>();
+        services.AddTransient<IFilterRepository, FilterRepository>();
+        services.AddTransient<IFootnoteRepository, FootnoteRepository>();
+        services.AddTransient<IFrontendService, FrontendService>();
+        services.AddTransient<IBoundaryDataRepository, BoundaryDataRepository>();
+        services.AddTransient<IIndicatorGroupRepository, IndicatorGroupRepository>();
+        services.AddTransient<IIndicatorRepository, IndicatorRepository>();
+        services.AddTransient<ILocationRepository, LocationRepository>();
+        services.AddTransient<IObservationService, ObservationService>();
+        services.AddTransient<IReleaseVersionRepository, ReleaseVersionRepository>();
+        services.AddTransient<IReleaseDataFileRepository, ReleaseDataFileRepository>();
+        services.AddTransient<IReleaseSubjectRepository, ReleaseSubjectRepository>();
+        services.AddTransient<ISubjectRepository, SubjectRepository>();
+        services.AddTransient<IDataGuidanceDataSetService, DataGuidanceDataSetService>();
+        services.AddTransient<ITimePeriodService, TimePeriodService>();
+        services.AddTransient<IPermalinkService, PermalinkService>();
+        services.AddTransient<IPermalinkCsvMetaService, PermalinkCsvMetaService>();
+        services.AddTransient<IPublicationRepository, PublicationRepository>();
+        services.AddSingleton<DataServiceMemoryCache<BoundaryLevel>, DataServiceMemoryCache<BoundaryLevel>>();
+        services.AddSingleton<DataServiceMemoryCache<BoundaryData>, DataServiceMemoryCache<BoundaryData>>();
+        services.AddTransient<IUserService, UserService>();
+        services.AddTransient<ICacheKeyService, CacheKeyService>();
+        services.AddTransient<ILocationService, LocationService>();
+
+        services
+            .AddAuthentication(options =>
             {
-                app.UseDeveloperExceptionPage();
-            }
-            else
+                options.DefaultAuthenticateScheme = "defaultScheme";
+                options.DefaultForbidScheme = "defaultScheme";
+                options.AddScheme<DefaultAuthenticationHandler>("defaultScheme", "Default Scheme");
+            });
+
+        services.AddAuthorization(options =>
+        {
+            // does this use have permission to view a specific Release?
+            options.AddPolicy(ContentSecurityPolicies.CanViewSpecificReleaseVersion.ToString(), policy =>
+                policy.Requirements.Add(new ViewReleaseRequirement()));
+
+            // does this user have permission to view the subject data of a specific Release?
+            options.AddPolicy(DataSecurityPolicies.CanViewSubjectData.ToString(), policy =>
+                policy.Requirements.Add(new ViewSubjectDataRequirement()));
+        });
+
+        services.AddHttpClient("PublicApp", httpClient =>
+        {
+            var publicAppOptions = new PublicAppOptions();
+            Configuration.GetSection("PublicApp").Bind(publicAppOptions);
+
+            httpClient.BaseAddress = new Uri(publicAppOptions.Url);
+
+            if (publicAppOptions.BasicAuth)
             {
-                app.UseHttpsRedirection();
-                app.UseHsts(hsts => hsts.MaxAge(365).IncludeSubdomains());
+                httpClient.DefaultRequestHeaders.Authorization =
+                    new AuthenticationHeaderValue("Basic",
+                        Convert.ToBase64String(Encoding.UTF8.GetBytes(
+                            $"{publicAppOptions.BasicAuthUsername}:{publicAppOptions.BasicAuthPassword}")));
             }
 
-            var rewriteOptions = new RewriteOptions()
-                .Add(new LowercasePathRule());
+            httpClient.DefaultRequestHeaders.Add(HeaderNames.UserAgent, "DataApi");
+        });
 
-            if (Configuration.GetValue<bool>("enableSwagger"))
-            {
-                app.UseSwagger();
-                app.UseSwaggerUI(c =>
-                {
-                    c.SwaggerEndpoint("/swagger/v1/swagger.json", "Data API V1");
-                    c.RoutePrefix = "docs";
-                });
+        services.AddTransient<IAuthorizationHandler, ViewReleaseAuthorizationHandler>();
+        services.AddTransient<IAuthorizationHandler, ViewSubjectDataForPublishedReleasesAuthorizationHandler>();
 
-                rewriteOptions.AddRedirect("^$", "docs");
-            }
+        services.AddCors();
+        services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
-            app.UseRewriter(rewriteOptions);
+        AddPersistenceHelper<StatisticsDbContext>(services);
+        AddPersistenceHelper<ContentDbContext>(services);
+    }
 
-            // ReSharper disable once CommentTypo
-            // Adds Brotli and Gzip compressing
-            app.UseResponseCompression();
+    // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
+    public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+    {
+        // Enable caching and register any caching services.
+        CacheAspect.Enabled = true;
+        BlobCacheAttribute.AddService("default", app.ApplicationServices.GetRequiredService<IBlobCacheService>());
+        // Enable cancellation aspects and register request timeout configuration.
+        CancellationTokenTimeoutAspect.Enabled = true;
+        CancellationTokenTimeoutAttribute.SetTimeoutConfiguration(Configuration.GetSection("RequestTimeouts"));
 
-            app.UseCors(options => options
-                .WithOrigins(
-                    "http://localhost:3000",
-                    "http://localhost:3001",
-                    "https://localhost:3000",
-                    "https://localhost:3001")
-                .AllowAnyMethod()
-                .AllowAnyHeader());
-
-            app.UseMvc();
-            app.UseHealthChecks("/api/health");
-
-            app.ServerFeatures.Get<IServerAddressesFeature>()
-                ?.Addresses
-                .ForEach(address => Console.WriteLine($"Server listening on address: {address}"));
-        }
-
-        private record PublicAppOptions
+        if (env.IsDevelopment())
         {
-            public string Url { get; init; } = string.Empty;
-
-            public bool BasicAuth { get; init; }
-
-            public string BasicAuthUsername { get; init; } = string.Empty;
-
-            public string BasicAuthPassword { get; init; } = string.Empty;
+            app.UseDeveloperExceptionPage();
         }
+        else
+        {
+            app.UseHttpsRedirection();
+            app.UseHsts(hsts => hsts.MaxAge(365).IncludeSubdomains());
+        }
+
+        var rewriteOptions = new RewriteOptions()
+            .Add(new LowercasePathRule());
+
+        if (Configuration.GetValue<bool>("enableSwagger"))
+        {
+            app.UseSwagger();
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "Data API V1");
+                c.RoutePrefix = "docs";
+            });
+
+            rewriteOptions.AddRedirect("^$", "docs");
+        }
+
+        app.UseRewriter(rewriteOptions);
+
+        // ReSharper disable once CommentTypo
+        // Adds Brotli and Gzip compressing
+        app.UseResponseCompression();
+
+        app.UseCors(options => options
+            .WithOrigins(
+                "http://localhost:3000",
+                "http://localhost:3001",
+                "https://localhost:3000",
+                "https://localhost:3001")
+            .AllowAnyMethod()
+            .AllowAnyHeader());
+
+        app.UseMvc();
+        app.UseHealthChecks("/api/health");
+
+        app.ServerFeatures.Get<IServerAddressesFeature>()
+            ?.Addresses
+            .ForEach(address => Console.WriteLine($"Server listening on address: {address}"));
+    }
+
+    private record PublicAppOptions
+    {
+        public string Url { get; init; } = string.Empty;
+
+        public bool BasicAuth { get; init; }
+
+        public string BasicAuthUsername { get; init; } = string.Empty;
+
+        public string BasicAuthPassword { get; init; } = string.Empty;
     }
 }

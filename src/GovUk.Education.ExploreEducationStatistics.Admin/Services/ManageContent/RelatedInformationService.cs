@@ -13,88 +13,87 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageContent
+namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageContent;
+
+public class RelatedInformationService(
+    ContentDbContext context,
+    IPersistenceHelper<ContentDbContext> persistenceHelper,
+    IUserService userService) : IRelatedInformationService
 {
-    public class RelatedInformationService(
-        ContentDbContext context,
-        IPersistenceHelper<ContentDbContext> persistenceHelper,
-        IUserService userService) : IRelatedInformationService
+    public Task<Either<ActionResult, List<Link>>> GetRelatedInformationAsync(Guid releaseVersionId)
     {
-        public Task<Either<ActionResult, List<Link>>> GetRelatedInformationAsync(Guid releaseVersionId)
-        {
-            return persistenceHelper
-                .CheckEntityExists<ReleaseVersion>(releaseVersionId)
-                .OnSuccess(releaseVersion => releaseVersion.RelatedInformation);
-        }
+        return persistenceHelper
+            .CheckEntityExists<ReleaseVersion>(releaseVersionId)
+            .OnSuccess(releaseVersion => releaseVersion.RelatedInformation);
+    }
 
-        public Task<Either<ActionResult, List<Link>>> AddRelatedInformationAsync(Guid releaseVersionId,
-            CreateUpdateLinkRequest request)
-        {
-            return persistenceHelper
-                .CheckEntityExists<ReleaseVersion>(releaseVersionId)
-                .OnSuccess(userService.CheckCanUpdateReleaseVersion)
-                .OnSuccess(async releaseVersion =>
+    public Task<Either<ActionResult, List<Link>>> AddRelatedInformationAsync(Guid releaseVersionId,
+        CreateUpdateLinkRequest request)
+    {
+        return persistenceHelper
+            .CheckEntityExists<ReleaseVersion>(releaseVersionId)
+            .OnSuccess(userService.CheckCanUpdateReleaseVersion)
+            .OnSuccess(async releaseVersion =>
+            {
+                if (releaseVersion.RelatedInformation == null)
                 {
-                    if (releaseVersion.RelatedInformation == null)
-                    {
-                        releaseVersion.RelatedInformation = new List<Link>();
-                    }
+                    releaseVersion.RelatedInformation = new List<Link>();
+                }
 
-                    releaseVersion.RelatedInformation.Add(new Link
+                releaseVersion.RelatedInformation.Add(new Link
+                {
+                    Id = Guid.NewGuid(),
+                    Description = request.Description,
+                    Url = request.Url
+                });
+
+                context.ReleaseVersions.Update(releaseVersion);
+                await context.SaveChangesAsync();
+                return releaseVersion.RelatedInformation;
+            });
+    }
+
+    public Task<Either<ActionResult, List<Link>>> UpdateRelatedInformation(
+        Guid releaseVersionId,
+        List<CreateUpdateLinkRequest> updatedLinkRequests,
+        CancellationToken cancellationToken = default)
+    {
+        return persistenceHelper
+            .CheckEntityExists<ReleaseVersion>(releaseVersionId)
+            .OnSuccess(userService.CheckCanUpdateReleaseVersion)
+            .OnSuccess(async releaseVersion =>
+            {
+                var updatedLinks = new List<Link>();
+
+                updatedLinkRequests.ForEach(r => updatedLinks.Add(
+                    new Link
                     {
                         Id = Guid.NewGuid(),
-                        Description = request.Description,
-                        Url = request.Url
-                    });
+                        Description = r.Description,
+                        Url = r.Url
+                    }));
 
-                    context.ReleaseVersions.Update(releaseVersion);
-                    await context.SaveChangesAsync();
-                    return releaseVersion.RelatedInformation;
-                });
-        }
+                releaseVersion.RelatedInformation = updatedLinks;
+                await context.SaveChangesAsync(cancellationToken);
 
-        public Task<Either<ActionResult, List<Link>>> UpdateRelatedInformation(
-            Guid releaseVersionId,
-            List<CreateUpdateLinkRequest> updatedLinkRequests,
-            CancellationToken cancellationToken = default)
-        {
-            return persistenceHelper
-                .CheckEntityExists<ReleaseVersion>(releaseVersionId)
-                .OnSuccess(userService.CheckCanUpdateReleaseVersion)
-                .OnSuccess(async releaseVersion =>
-                {
-                    var updatedLinks = new List<Link>();
+                return releaseVersion.RelatedInformation;
+            });
+    }
 
-                    updatedLinkRequests.ForEach(r => updatedLinks.Add(
-                        new Link
-                        {
-                            Id = Guid.NewGuid(),
-                            Description = r.Description,
-                            Url = r.Url
-                        }));
+    public Task<Either<ActionResult, List<Link>>> DeleteRelatedInformationAsync(Guid releaseVersionId,
+        Guid relatedInformationId)
+    {
+        return persistenceHelper
+            .CheckEntityExists<ReleaseVersion>(releaseVersionId)
+            .OnSuccess(userService.CheckCanUpdateReleaseVersion)
+            .OnSuccess(async releaseVersion =>
+            {
+                releaseVersion.RelatedInformation.Remove(
+                    releaseVersion.RelatedInformation.Find(item => item.Id == relatedInformationId));
 
-                    releaseVersion.RelatedInformation = updatedLinks;
-                    await context.SaveChangesAsync(cancellationToken);
-
-                    return releaseVersion.RelatedInformation;
-                });
-        }
-
-        public Task<Either<ActionResult, List<Link>>> DeleteRelatedInformationAsync(Guid releaseVersionId,
-            Guid relatedInformationId)
-        {
-            return persistenceHelper
-                .CheckEntityExists<ReleaseVersion>(releaseVersionId)
-                .OnSuccess(userService.CheckCanUpdateReleaseVersion)
-                .OnSuccess(async releaseVersion =>
-                {
-                    releaseVersion.RelatedInformation.Remove(
-                        releaseVersion.RelatedInformation.Find(item => item.Id == relatedInformationId));
-
-                    context.ReleaseVersions.Update(releaseVersion);
-                    await context.SaveChangesAsync();
-                    return releaseVersion.RelatedInformation;
-                });
-        }
+                context.ReleaseVersions.Update(releaseVersion);
+                await context.SaveChangesAsync();
+                return releaseVersion.RelatedInformation;
+            });
     }
 }

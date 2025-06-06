@@ -34,22 +34,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.
                 return resource;
             }
 
-            return new ForbidResult();
-        }
+        return new ForbidResult();
+    }
 
-        public static async Task<Either<ActionResult, Unit>> CheckPolicy<TPolicy>(
-            this IUserService userService,
-            TPolicy policy)
-            where TPolicy : Enum
+    public static async Task<Either<ActionResult, Unit>> CheckPolicy<TPolicy>(
+        this IUserService userService,
+        TPolicy policy)
+        where TPolicy : Enum
+    {
+        var result = await userService.MatchesPolicy(policy);
+
+        if (result)
         {
-            var result = await userService.MatchesPolicy(policy);
-
-            if (result)
-            {
-                return Unit.Instance;
-            }
-
-            return new ForbidResult();
+            return Unit.Instance;
         }
+
+        return new ForbidResult();
     }
 }

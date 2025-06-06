@@ -19,9 +19,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.Sql(
-                "UPDATE ReleaseVersions SET Type = 'NationalStatistics' WHERE Type = 'AccreditedOfficialStatistics'");
+        migrationBuilder.Sql(
+            "UPDATE ReleaseVersions SET Type = 'NationalStatistics' WHERE Type = 'AccreditedOfficialStatistics'");
 
-        }
     }
 }

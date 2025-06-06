@@ -5,58 +5,57 @@ using System.Text.RegularExpressions;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using HtmlAgilityPack;
 
-namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
+namespace GovUk.Education.ExploreEducationStatistics.Admin.Services;
+
+public static class HtmlImageUtil
 {
-    public static class HtmlImageUtil
+    public static List<Guid> GetMethodologyImages(string htmlContent)
     {
-        public static List<Guid> GetMethodologyImages(string htmlContent)
+        var idCapturingRegex = new Regex(@"^/api/methodologies/{methodologyId}/images/(.+)$");
+        return GetImages(htmlContent, idCapturingRegex);
+    }
+
+    // TODO EES-5901 - migrate all content placeholders to be "releaseVersionId" and then remove the legacy
+    // "releaseId" checks below.
+    public static List<Guid> GetReleaseImages(string htmlContent)
+    {
+        var idCapturingRegex = new Regex(@"^/api/releases/{(releaseId|releaseVersionId)}/images/(.+)$");
+        return GetImages(htmlContent, idCapturingRegex);
+    }
+
+    private static List<Guid> GetImages(string htmlContent, Regex idCapturingRegex)
+    {
+        if (htmlContent.IsNullOrEmpty())
         {
-            var idCapturingRegex = new Regex(@"^/api/methodologies/{methodologyId}/images/(.+)$");
-            return GetImages(htmlContent, idCapturingRegex);
+            return new List<Guid>();
         }
 
-        // TODO EES-5901 - migrate all content placeholders to be "releaseVersionId" and then remove the legacy
-        // "releaseId" checks below.
-        public static List<Guid> GetReleaseImages(string htmlContent)
-        {
-            var idCapturingRegex = new Regex(@"^/api/releases/{(releaseId|releaseVersionId)}/images/(.+)$");
-            return GetImages(htmlContent, idCapturingRegex);
-        }
+        var htmlDocument = ParseContentAsHtml(htmlContent);
+        var imageIds = htmlDocument.DocumentNode.SelectNodes("//img")
+            .Select(node => node.Attributes["src"].Value)
+            .Select(srcVal => idCapturingRegex.Match(srcVal))
+            .Where(match => match.Success)
+            .Select(match => match.Groups[^1].Value)
+            .ToList();
 
-        private static List<Guid> GetImages(string htmlContent, Regex idCapturingRegex)
-        {
-            if (htmlContent.IsNullOrEmpty())
-            {
-                return new List<Guid>();
-            }
+        // Convert to Guids, removing any that are malformed
+        return ParseIdsAsGuids(imageIds);
+    }
 
-            var htmlDocument = ParseContentAsHtml(htmlContent);
-            var imageIds = htmlDocument.DocumentNode.SelectNodes("//img")
-                .Select(node => node.Attributes["src"].Value)
-                .Select(srcVal => idCapturingRegex.Match(srcVal))
-                .Where(match => match.Success)
-                .Select(match => match.Groups[^1].Value)
-                .ToList();
+    private static HtmlDocument ParseContentAsHtml(string htmlContent)
+    {
+        var htmlDoc = new HtmlDocument();
+        htmlDoc.LoadHtml(htmlContent);
+        htmlDoc.OptionEmptyCollection = true;
+        return htmlDoc;
+    }
 
-            // Convert to Guids, removing any that are malformed
-            return ParseIdsAsGuids(imageIds);
-        }
-
-        private static HtmlDocument ParseContentAsHtml(string htmlContent)
-        {
-            var htmlDoc = new HtmlDocument();
-            htmlDoc.LoadHtml(htmlContent);
-            htmlDoc.OptionEmptyCollection = true;
-            return htmlDoc;
-        }
-
-        private static List<Guid> ParseIdsAsGuids(IEnumerable<string> ids)
-        {
-            return ids
-                .Select(id => Guid.TryParse(id, out var idAsGuid) ? idAsGuid : (Guid?) null)
-                .Where(id => id.HasValue)
-                .Select(id => id.Value)
-                .ToList();
-        }
+    private static List<Guid> ParseIdsAsGuids(IEnumerable<string> ids)
+    {
+        return ids
+            .Select(id => Guid.TryParse(id, out var idAsGuid) ? idAsGuid : (Guid?) null)
+            .Where(id => id.HasValue)
+            .Select(id => id.Value)
+            .ToList();
     }
 }

@@ -8,53 +8,52 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityC
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyApprovalStatus;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.PublicationRole;
 
-namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers
+namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers;
+
+public class DeleteSpecificMethodologyRequirement : IAuthorizationRequirement
 {
-    public class DeleteSpecificMethodologyRequirement : IAuthorizationRequirement
+}
+
+public class DeleteSpecificMethodologyAuthorizationHandler
+    : AuthorizationHandler<DeleteSpecificMethodologyRequirement, MethodologyVersion>
+{
+    private readonly IMethodologyRepository _methodologyRepository;
+    private readonly AuthorizationHandlerService _authorizationHandlerService;
+
+    public DeleteSpecificMethodologyAuthorizationHandler(
+        IMethodologyRepository methodologyRepository,
+        AuthorizationHandlerService authorizationHandlerService)
     {
+        _methodologyRepository = methodologyRepository;
+        _authorizationHandlerService = authorizationHandlerService;
     }
 
-    public class DeleteSpecificMethodologyAuthorizationHandler
-        : AuthorizationHandler<DeleteSpecificMethodologyRequirement, MethodologyVersion>
+    protected override async Task HandleRequirementAsync(
+        AuthorizationHandlerContext context,
+        DeleteSpecificMethodologyRequirement requirement,
+        MethodologyVersion methodologyVersion)
     {
-        private readonly IMethodologyRepository _methodologyRepository;
-        private readonly AuthorizationHandlerService _authorizationHandlerService;
-
-        public DeleteSpecificMethodologyAuthorizationHandler(
-            IMethodologyRepository methodologyRepository,
-            AuthorizationHandlerService authorizationHandlerService)
+        if (methodologyVersion.Status == Approved)
         {
-            _methodologyRepository = methodologyRepository;
-            _authorizationHandlerService = authorizationHandlerService;
+            return;
         }
 
-        protected override async Task HandleRequirementAsync(
-            AuthorizationHandlerContext context,
-            DeleteSpecificMethodologyRequirement requirement,
-            MethodologyVersion methodologyVersion)
+        if (SecurityUtils.HasClaim(context.User, DeleteAllMethodologies))
         {
-            if (methodologyVersion.Status == Approved)
-            {
-                return;
-            }
+            context.Succeed(requirement);
+            return;
+        }
 
-            if (SecurityUtils.HasClaim(context.User, DeleteAllMethodologies))
-            {
-                context.Succeed(requirement);
-                return;
-            }
-
-            var owningPublication =
-                await _methodologyRepository.GetOwningPublication(methodologyVersion.MethodologyId);
+        var owningPublication =
+            await _methodologyRepository.GetOwningPublication(methodologyVersion.MethodologyId);
             
-            if (await _authorizationHandlerService
-                    .HasRolesOnPublication(
-                        context.User.GetUserId(),
-                        owningPublication.Id,
-                        Owner))
-            {
-                context.Succeed(requirement);
-            }
+        if (await _authorizationHandlerService
+                .HasRolesOnPublication(
+                    context.User.GetUserId(),
+                    owningPublication.Id,
+                    Owner))
+        {
+            context.Succeed(requirement);
         }
     }
 }

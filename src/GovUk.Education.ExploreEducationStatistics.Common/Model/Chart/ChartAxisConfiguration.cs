@@ -5,98 +5,97 @@ using System.Runtime.Serialization;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
-namespace GovUk.Education.ExploreEducationStatistics.Common.Model.Chart
+namespace GovUk.Education.ExploreEducationStatistics.Common.Model.Chart;
+
+public class ChartAxisConfiguration
 {
-    public class ChartAxisConfiguration
-    {
-        public string Name = null!;
+    public string Name = null!;
 
-        [JsonConverter(typeof(StringEnumConverter))]
-        public AxisType Type;
+    [JsonConverter(typeof(StringEnumConverter))]
+    public AxisType Type;
 
-        [JsonConverter(typeof(StringEnumConverter))]
-        public AxisGroupBy? GroupBy;
+    [JsonConverter(typeof(StringEnumConverter))]
+    public AxisGroupBy? GroupBy;
 
-        public string? GroupByFilter;
-        public bool GroupByFilterGroups;
+    public string? GroupByFilter;
+    public bool GroupByFilterGroups;
 
-        public string SortBy = null!;
-        public bool SortAsc = true;
+    public string SortBy = null!;
+    public bool SortAsc = true;
 
-        public List<ChartDataSet> DataSets = new();
-        public List<AxisReferenceLine> ReferenceLines = new();
-        public bool Visible = true;
-        public string Title = null!;
-        public string Unit = null!;
-        public int? DecimalPlaces;
-        public bool ShowGrid = true;
+    public List<ChartDataSet> DataSets = new();
+    public List<AxisReferenceLine> ReferenceLines = new();
+    public bool Visible = true;
+    public string Title = null!;
+    public string Unit = null!;
+    public int? DecimalPlaces;
+    public bool ShowGrid = true;
 
-        public AxisLabel Label = null!;
+    public AxisLabel Label = null!;
 
-        public int? Min;
-        public int? Max;
-        public int? Size;
+    public int? Min;
+    public int? Max;
+    public int? Size;
 
-        [JsonConverter(typeof(StringEnumConverter))]
-        public AxisTickConfig TickConfig;
+    [JsonConverter(typeof(StringEnumConverter))]
+    public AxisTickConfig TickConfig;
 
-        public int? TickSpacing;
-    }
+    public int? TickSpacing;
+}
 
-    [SuppressMessage("ReSharper", "InconsistentNaming")]
-    public enum AxisGroupBy
-    {
-        timePeriod,
-        locations,
-        filters,
-        indicators
-    }
+[SuppressMessage("ReSharper", "InconsistentNaming")]
+public enum AxisGroupBy
+{
+    timePeriod,
+    locations,
+    filters,
+    indicators
+}
 
-    [SuppressMessage("ReSharper", "InconsistentNaming")]
-    public enum AxisType
-    {
-        major,
-        minor
-    }
+[SuppressMessage("ReSharper", "InconsistentNaming")]
+public enum AxisType
+{
+    major,
+    minor
+}
 
-    public class AxisLabel
-    {
-        public string Text = null!;
-        public int? Width;
-        public bool? Rotated;
-    }
+public class AxisLabel
+{
+    public string Text = null!;
+    public int? Width;
+    public bool? Rotated;
+}
 
-    public class AxisReferenceLine
-    {
-        public string Label = null!;
-        public string Position = null!;
+public class AxisReferenceLine
+{
+    public string Label = null!;
+    public string Position = null!;
         
-        [JsonConverter(typeof(StringEnumConverter))]
-        public AxisReferenceLineStyle? Style;
+    [JsonConverter(typeof(StringEnumConverter))]
+    public AxisReferenceLineStyle? Style;
 
-        public int? LabelWidth;
+    public int? LabelWidth;
 
-        public int? OtherAxisPosition;
+    public int? OtherAxisPosition;
 
-        public string? OtherAxisStart;
+    public string? OtherAxisStart;
 
-        public string? OtherAxisEnd;
-    }
+    public string? OtherAxisEnd;
+}
 
-    [SuppressMessage("ReSharper", "InconsistentNaming")]
-    public enum AxisTickConfig
-    {
-        [EnumMember(Value = "default")] Default,
-        startEnd,
-        showAll,
-        custom
-    }
+[SuppressMessage("ReSharper", "InconsistentNaming")]
+public enum AxisTickConfig
+{
+    [EnumMember(Value = "default")] Default,
+    startEnd,
+    showAll,
+    custom
+}
 
-    [SuppressMessage("ReSharper", "InconsistentNaming")]
-    public enum AxisReferenceLineStyle
-    {
-        dashed,
-        solid,
-        none
-    }
+[SuppressMessage("ReSharper", "InconsistentNaming")]
+public enum AxisReferenceLineStyle
+{
+    dashed,
+    solid,
+    none
 }

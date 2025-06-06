@@ -14,93 +14,92 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
+namespace GovUk.Education.ExploreEducationStatistics.Admin.Services;
+
+public class DataImportService(
+    ContentDbContext contentDbContext,
+    IDataImportRepository dataImportRepository,
+    IDataProcessorClient dataProcessorClient,
+    IReleaseFileService releaseFileService,
+    IUserService userService)
+    : IDataImportService
 {
-    public class DataImportService(
-        ContentDbContext contentDbContext,
-        IDataImportRepository dataImportRepository,
-        IDataProcessorClient dataProcessorClient,
-        IReleaseFileService releaseFileService,
-        IUserService userService)
-        : IDataImportService
+    public async Task<DataImport?> GetImport(Guid fileId)
     {
-        public async Task<DataImport?> GetImport(Guid fileId)
-        {
-            return await dataImportRepository.GetByFileId(fileId);
-        }
+        return await dataImportRepository.GetByFileId(fileId);
+    }
 
-        public async Task<Either<ActionResult, Unit>> CancelImport(
-            Guid releaseVersionId,
-            Guid fileId)
-        {
-            return await releaseFileService.CheckFileExists(releaseVersionId: releaseVersionId,
-                    fileId: fileId,
-                    FileType.Data)
-                .OnSuccess(userService.CheckCanCancelFileImport)
-                .OnSuccessVoid(async file =>
+    public async Task<Either<ActionResult, Unit>> CancelImport(
+        Guid releaseVersionId,
+        Guid fileId)
+    {
+        return await releaseFileService.CheckFileExists(releaseVersionId: releaseVersionId,
+                fileId: fileId,
+                FileType.Data)
+            .OnSuccess(userService.CheckCanCancelFileImport)
+            .OnSuccessVoid(async file =>
+            {
+                var import = await dataImportRepository.GetByFileId(file.Id);
+                if (import != null)
                 {
-                    var import = await dataImportRepository.GetByFileId(file.Id);
-                    if (import != null)
-                    {
-                        await dataProcessorClient.CancelImport(import.Id);
-                    }
-                });
-        }
-
-        public async Task DeleteImport(Guid fileId)
-        {
-            await dataImportRepository.DeleteByFileId(fileId);
-        }
-
-        public async Task<bool> HasIncompleteImports(Guid releaseVersionId)
-        {
-            return await contentDbContext.ReleaseFiles
-                .AsQueryable()
-                .Where(rf => rf.ReleaseVersionId == releaseVersionId)
-                .Join(contentDbContext.DataImports,
-                    rf => rf.FileId,
-                    i => i.FileId,
-                    (file, import) => import)
-                .AnyAsync(import => import.Status != DataImportStatus.COMPLETE);
-        }
-
-        public async Task<DataImportStatusViewModel> GetImportStatus(Guid fileId)
-        {
-            var import = await dataImportRepository.GetByFileId(fileId);
-
-            if (import == null)
-            {
-                return DataImportStatusViewModel.NotFound();
-            }
-
-            await contentDbContext.Entry(import)
-                .Collection(i => i.Errors)
-                .LoadAsync();
-
-            return new DataImportStatusViewModel
-            {
-                Errors = import.Errors.Select(error => error.Message).ToList(),
-                PercentageComplete = import.PercentageComplete(),
-                StagePercentageComplete = import.StagePercentageComplete,
-                TotalRows = import.TotalRows,
-                Status = import.Status
-            };
-        }
-
-        public async Task<DataImport> Import(Guid subjectId, File dataFile, File metaFile, File? sourceZipFile = null)
-        {
-            var import = await dataImportRepository.Add(new DataImport
-            {
-                Created = DateTime.UtcNow,
-                FileId = dataFile.Id,
-                MetaFileId = metaFile.Id,
-                SubjectId = subjectId,
-                Status = DataImportStatus.QUEUED,
-                ZipFileId = sourceZipFile?.Id,
+                    await dataProcessorClient.CancelImport(import.Id);
+                }
             });
+    }
 
-            await dataProcessorClient.Import(import.Id);
-            return import;
+    public async Task DeleteImport(Guid fileId)
+    {
+        await dataImportRepository.DeleteByFileId(fileId);
+    }
+
+    public async Task<bool> HasIncompleteImports(Guid releaseVersionId)
+    {
+        return await contentDbContext.ReleaseFiles
+            .AsQueryable()
+            .Where(rf => rf.ReleaseVersionId == releaseVersionId)
+            .Join(contentDbContext.DataImports,
+                rf => rf.FileId,
+                i => i.FileId,
+                (file, import) => import)
+            .AnyAsync(import => import.Status != DataImportStatus.COMPLETE);
+    }
+
+    public async Task<DataImportStatusViewModel> GetImportStatus(Guid fileId)
+    {
+        var import = await dataImportRepository.GetByFileId(fileId);
+
+        if (import == null)
+        {
+            return DataImportStatusViewModel.NotFound();
         }
+
+        await contentDbContext.Entry(import)
+            .Collection(i => i.Errors)
+            .LoadAsync();
+
+        return new DataImportStatusViewModel
+        {
+            Errors = import.Errors.Select(error => error.Message).ToList(),
+            PercentageComplete = import.PercentageComplete(),
+            StagePercentageComplete = import.StagePercentageComplete,
+            TotalRows = import.TotalRows,
+            Status = import.Status
+        };
+    }
+
+    public async Task<DataImport> Import(Guid subjectId, File dataFile, File metaFile, File? sourceZipFile = null)
+    {
+        var import = await dataImportRepository.Add(new DataImport
+        {
+            Created = DateTime.UtcNow,
+            FileId = dataFile.Id,
+            MetaFileId = metaFile.Id,
+            SubjectId = subjectId,
+            Status = DataImportStatus.QUEUED,
+            ZipFileId = sourceZipFile?.Id,
+        });
+
+        await dataProcessorClient.Import(import.Id);
+        return import;
     }
 }

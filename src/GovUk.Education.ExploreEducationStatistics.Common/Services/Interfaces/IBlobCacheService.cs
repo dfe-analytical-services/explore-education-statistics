@@ -2,12 +2,11 @@
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Cache.Interfaces;
 
-namespace GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces
+namespace GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
+
+public interface IBlobCacheService : ICacheService<IBlobCacheKey>
 {
-    public interface IBlobCacheService : ICacheService<IBlobCacheKey>
-    {
-        Task DeleteItemAsync(IBlobCacheKey cacheKey);
+    Task DeleteItemAsync(IBlobCacheKey cacheKey);
         
-        Task DeleteCacheFolderAsync(IBlobCacheKey cacheFolderKey);
-    }
+    Task DeleteCacheFolderAsync(IBlobCacheKey cacheFolderKey);
 }

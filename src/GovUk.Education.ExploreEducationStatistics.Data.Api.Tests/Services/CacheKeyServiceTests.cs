@@ -11,46 +11,45 @@ using GovUk.Education.ExploreEducationStatistics.Data.Api.Services;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Utils.ContentDbUtils;
 
-namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
+namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services;
+
+public class CacheKeyServiceTests
 {
-    public class CacheKeyServiceTests
+    private readonly DataFixture _dataFixture = new();
+
+    [Fact]
+    public async Task CreateCacheKeyForReleaseSubjects()
     {
-        private readonly DataFixture _dataFixture = new();
+        ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion()
+            .WithRelease(_dataFixture.DefaultRelease()
+                .WithPublication(_dataFixture.DefaultPublication()
+                    .WithSlug("publication-slug")));
 
-        [Fact]
-        public async Task CreateCacheKeyForReleaseSubjects()
+        var contentDbContextId = Guid.NewGuid().ToString();
+
+        await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
         {
-            ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion()
-                .WithRelease(_dataFixture.DefaultRelease()
-                    .WithPublication(_dataFixture.DefaultPublication()
-                        .WithSlug("publication-slug")));
-
-            var contentDbContextId = Guid.NewGuid().ToString();
-
-            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
-            {
-                contentDbContext.ReleaseVersions.AddRange(releaseVersion);
-                await contentDbContext.SaveChangesAsync();
-            }
-
-            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
-            {
-                var service = BuildService(contentDbContext);
-
-                var result = await service.CreateCacheKeyForReleaseSubjects(releaseVersion.Id);
-
-                var cacheKey = result.AssertRight();
-                Assert.Equal(BlobContainers.PublicContent, cacheKey.Container);
-                Assert.Equal(releaseVersion.Id, cacheKey.ReleaseVersionId);
-                Assert.Equal(
-                    $"publications/{releaseVersion.Release.Publication.Slug}/releases/{releaseVersion.Release.Slug}/subjects.json",
-                    cacheKey.Key);
-            }
+            contentDbContext.ReleaseVersions.AddRange(releaseVersion);
+            await contentDbContext.SaveChangesAsync();
         }
 
-        private static CacheKeyService BuildService(ContentDbContext contentDbContext)
+        await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
         {
-            return new CacheKeyService(contentDbContext);
+            var service = BuildService(contentDbContext);
+
+            var result = await service.CreateCacheKeyForReleaseSubjects(releaseVersion.Id);
+
+            var cacheKey = result.AssertRight();
+            Assert.Equal(BlobContainers.PublicContent, cacheKey.Container);
+            Assert.Equal(releaseVersion.Id, cacheKey.ReleaseVersionId);
+            Assert.Equal(
+                $"publications/{releaseVersion.Release.Publication.Slug}/releases/{releaseVersion.Release.Slug}/subjects.json",
+                cacheKey.Key);
         }
+    }
+
+    private static CacheKeyService BuildService(ContentDbContext contentDbContext)
+    {
+        return new CacheKeyService(contentDbContext);
     }
 }

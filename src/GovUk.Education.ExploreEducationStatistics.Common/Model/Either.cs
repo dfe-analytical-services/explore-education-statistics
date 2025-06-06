@@ -4,672 +4,671 @@ using System.Linq;
 using System.Threading.Tasks;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 
-namespace GovUk.Education.ExploreEducationStatistics.Common.Model
+namespace GovUk.Education.ExploreEducationStatistics.Common.Model;
+
+public class Either<TL, TR>
 {
-    public class Either<TL, TR>
+    private readonly TL _left;
+    private readonly TR _right;
+
+    public Either(TL left)
     {
-        private readonly TL _left;
-        private readonly TR _right;
-
-        public Either(TL left)
-        {
-            _left = left;
-            IsLeft = true;
-        }
-
-        public Either(TR right)
-        {
-            _right = right;
-            IsLeft = false;
-        }
-
-        public bool IsLeft { get; }
-
-        public bool IsRight => !IsLeft;
-
-        public TL Left => IsLeft ? _left : throw new ArgumentException("Calling Left on a Right");
-
-        public TR Right => !IsLeft ? _right : throw new ArgumentException("Calling Right on a Left");
-
-        private Either<TL, T> Map<T>(Func<TR, T> func) =>
-            IsLeft ? new Either<TL, T>(Left) : new Either<TL, T>(func.Invoke(Right));
-
-        public Either<TL, T> OnSuccess<T>(Func<TR, T> func) => Map(func);
-
-        public async Task<Either<TL, T>> OnSuccess<T>(Func<Task<Either<TL, T>>> func)
-        {
-            if (IsLeft)
-            {
-                return _left;
-            }
-
-            return await func();
-        }
-
-        public async Task<Either<TL, T>> OnSuccess<T>(Func<TR, Task<Either<TL, T>>> func)
-        {
-            if (IsLeft)
-            {
-                return _left;
-            }
-
-            return await func.Invoke(_right);
-        }
-
-        public Either<TL, T> OnSuccess<T>(Func<T> func) => Map(_ => func.Invoke());
-
-        public Either<TL, T> OnSuccess<T>(Func<TR, Either<TL, T>> func) => IsLeft ? Left : func.Invoke(Right);
-
-        /// <summary>
-        /// If the current Either is failing, the function provided here can take the failure and transform it to
-        /// another type of failure.
-        /// </summary>
-        public Either<T, TR> OnFailure<T>(Func<TL, Either<T, TR>> func) => IsLeft ? func.Invoke(Left) : Right;
-
-        public Either<TL, TR> OrElse(Func<TR> func) => IsLeft ? func() : Right;
-
-        public Either<TL, TR> OrElse(Func<TL, TR> func) => IsLeft ? func(Left) : Right;
-
-        public T Fold<T>(Func<TL, T> leftFunc, Func<TR, T> rightFunc) => IsRight ? rightFunc(Right) : leftFunc(Left);
-
-        public T FoldLeft<T>(Func<TL, T> leftFunc, T defaultValue) => IsLeft ? leftFunc(Left) : defaultValue;
-
-        public T FoldRight<T>(Func<TR, T> rightFunc, T defaultValue) => IsRight ? rightFunc(Right) : defaultValue;
-
-        public static implicit operator Either<TL, TR>(TL left) => new(left);
-
-        public static implicit operator Either<TL, TR>(TR right) => new(right);
+        _left = left;
+        IsLeft = true;
     }
 
-    public static class EitherExtensions
+    public Either(TR right)
     {
-        /// <summary>
-        /// If all Eithers in the provided list are successful, return a list of the successful results. Otherwise,
-        /// return a list of the failure results.
-        /// </summary>
-        public static Either<List<TFailure>, List<TSuccess>> AggregateSuccessesAndFailures<TFailure, TSuccess>(
-            this IEnumerable<Either<TFailure, TSuccess>> items)
+        _right = right;
+        IsLeft = false;
+    }
+
+    public bool IsLeft { get; }
+
+    public bool IsRight => !IsLeft;
+
+    public TL Left => IsLeft ? _left : throw new ArgumentException("Calling Left on a Right");
+
+    public TR Right => !IsLeft ? _right : throw new ArgumentException("Calling Right on a Left");
+
+    private Either<TL, T> Map<T>(Func<TR, T> func) =>
+        IsLeft ? new Either<TL, T>(Left) : new Either<TL, T>(func.Invoke(Right));
+
+    public Either<TL, T> OnSuccess<T>(Func<TR, T> func) => Map(func);
+
+    public async Task<Either<TL, T>> OnSuccess<T>(Func<Task<Either<TL, T>>> func)
+    {
+        if (IsLeft)
         {
-            var successes = new List<TSuccess>();
-            var failures = new List<TFailure>();
-
-            foreach (var either in items)
-            {
-                if (either.IsLeft)
-                {
-                    failures.Add(either.Left);
-                }
-                else
-                {
-                    successes.Add(either.Right);
-                }
-            }
-
-            return failures.Count > 0 ? failures : successes;
+            return _left;
         }
 
-        /// <summary>
-        /// If all Eithers in the provided list are successful, return Unit.Instance. Otherwise, return the first
-        /// failure.
-        /// </summary>
-        public static Either<TFailure, Unit> OnSuccessAllReturnVoid<TFailure, TSuccess>(
-            this IEnumerable<Either<TFailure, TSuccess>> items)
+        return await func();
+    }
+
+    public async Task<Either<TL, T>> OnSuccess<T>(Func<TR, Task<Either<TL, T>>> func)
+    {
+        if (IsLeft)
         {
-            var result = items
-                .AggregateSuccessesAndFailures()
-                .OnSuccessVoid();
-
-            if (result.IsLeft)
-            {
-                return result.Left.FirstOrDefault();
-            }
-
-            return result.Right;
+            return _left;
         }
 
-        public static Either<TFailure, Unit> OnSuccessVoid<TFailure, TSuccess>(
-            this Either<TFailure, TSuccess> either)
+        return await func.Invoke(_right);
+    }
+
+    public Either<TL, T> OnSuccess<T>(Func<T> func) => Map(_ => func.Invoke());
+
+    public Either<TL, T> OnSuccess<T>(Func<TR, Either<TL, T>> func) => IsLeft ? Left : func.Invoke(Right);
+
+    /// <summary>
+    /// If the current Either is failing, the function provided here can take the failure and transform it to
+    /// another type of failure.
+    /// </summary>
+    public Either<T, TR> OnFailure<T>(Func<TL, Either<T, TR>> func) => IsLeft ? func.Invoke(Left) : Right;
+
+    public Either<TL, TR> OrElse(Func<TR> func) => IsLeft ? func() : Right;
+
+    public Either<TL, TR> OrElse(Func<TL, TR> func) => IsLeft ? func(Left) : Right;
+
+    public T Fold<T>(Func<TL, T> leftFunc, Func<TR, T> rightFunc) => IsRight ? rightFunc(Right) : leftFunc(Left);
+
+    public T FoldLeft<T>(Func<TL, T> leftFunc, T defaultValue) => IsLeft ? leftFunc(Left) : defaultValue;
+
+    public T FoldRight<T>(Func<TR, T> rightFunc, T defaultValue) => IsRight ? rightFunc(Right) : defaultValue;
+
+    public static implicit operator Either<TL, TR>(TL left) => new(left);
+
+    public static implicit operator Either<TL, TR>(TR right) => new(right);
+}
+
+public static class EitherExtensions
+{
+    /// <summary>
+    /// If all Eithers in the provided list are successful, return a list of the successful results. Otherwise,
+    /// return a list of the failure results.
+    /// </summary>
+    public static Either<List<TFailure>, List<TSuccess>> AggregateSuccessesAndFailures<TFailure, TSuccess>(
+        this IEnumerable<Either<TFailure, TSuccess>> items)
+    {
+        var successes = new List<TSuccess>();
+        var failures = new List<TFailure>();
+
+        foreach (var either in items)
         {
             if (either.IsLeft)
             {
-                return either.Left;
+                failures.Add(either.Left);
             }
-
-            return Unit.Instance;
+            else
+            {
+                successes.Add(either.Right);
+            }
         }
+
+        return failures.Count > 0 ? failures : successes;
     }
 
-    public static class EitherTaskExtensions
+    /// <summary>
+    /// If all Eithers in the provided list are successful, return Unit.Instance. Otherwise, return the first
+    /// failure.
+    /// </summary>
+    public static Either<TFailure, Unit> OnSuccessAllReturnVoid<TFailure, TSuccess>(
+        this IEnumerable<Either<TFailure, TSuccess>> items)
     {
-        public static async Task<bool> IsLeft<TFailure, TSuccess>(this Task<Either<TFailure, TSuccess>> task)
+        var result = items
+            .AggregateSuccessesAndFailures()
+            .OnSuccessVoid();
+
+        if (result.IsLeft)
         {
-            return (await task).IsLeft;
+            return result.Left.FirstOrDefault();
         }
 
-        public static async Task<bool> IsRight<TFailure, TSuccess>(this Task<Either<TFailure, TSuccess>> task)
+        return result.Right;
+    }
+
+    public static Either<TFailure, Unit> OnSuccessVoid<TFailure, TSuccess>(
+        this Either<TFailure, TSuccess> either)
+    {
+        if (either.IsLeft)
         {
-            return (await task).IsRight;
+            return either.Left;
         }
 
-        public static async Task<Either<TFailure, TSuccess>> OnSuccessDo<TFailure, TSuccess>(
-            this Task<Either<TFailure, TSuccess>> task,
-            Action successTask)
+        return Unit.Instance;
+    }
+}
+
+public static class EitherTaskExtensions
+{
+    public static async Task<bool> IsLeft<TFailure, TSuccess>(this Task<Either<TFailure, TSuccess>> task)
+    {
+        return (await task).IsLeft;
+    }
+
+    public static async Task<bool> IsRight<TFailure, TSuccess>(this Task<Either<TFailure, TSuccess>> task)
+    {
+        return (await task).IsRight;
+    }
+
+    public static async Task<Either<TFailure, TSuccess>> OnSuccessDo<TFailure, TSuccess>(
+        this Task<Either<TFailure, TSuccess>> task,
+        Action successTask)
+    {
+        return await task.OnSuccessDo(_ => successTask());
+    }
+
+    public static async Task<Either<TFailure, TSuccess>> OnSuccessDo<TFailure, TSuccess>(
+        this Task<Either<TFailure, TSuccess>> task,
+        Func<Task> successTask)
+    {
+        return await task.OnSuccessDo(async _ => await successTask());
+    }
+
+    public static async Task<Either<TFailure, TSuccess>> OnSuccessDo<TFailure, TSuccess>(
+        this Task<Either<TFailure, TSuccess>> task,
+        Action<TSuccess> successTask)
+    {
+        var firstResult = await task;
+
+        if (firstResult.IsLeft)
         {
-            return await task.OnSuccessDo(_ => successTask());
+            return firstResult.Left;
         }
 
-        public static async Task<Either<TFailure, TSuccess>> OnSuccessDo<TFailure, TSuccess>(
-            this Task<Either<TFailure, TSuccess>> task,
-            Func<Task> successTask)
+        successTask(firstResult.Right);
+        return firstResult.Right;
+    }
+
+    public static async Task<Either<TFailure, TSuccess>> OnSuccessDo<TFailure, TSuccess>(
+        this Task<Either<TFailure, TSuccess>> task,
+        Func<TSuccess, Task> successTask)
+    {
+        var firstResult = await task;
+
+        if (firstResult.IsLeft)
         {
-            return await task.OnSuccessDo(async _ => await successTask());
+            return firstResult.Left;
         }
 
-        public static async Task<Either<TFailure, TSuccess>> OnSuccessDo<TFailure, TSuccess>(
-            this Task<Either<TFailure, TSuccess>> task,
-            Action<TSuccess> successTask)
+        await successTask(firstResult.Right);
+        return firstResult.Right;
+    }
+
+    public static async Task<Either<TFailure, TSuccess1>> OnSuccessDo<TFailure, TSuccess1, TSuccess2>(
+        this Task<Either<TFailure, TSuccess1>> task,
+        Func<Task<Either<TFailure, TSuccess2>>> successTask)
+    {
+        return await task.OnSuccessDo(async _ => await successTask());
+    }
+
+    public static async Task<Either<TFailure, TSuccess1>> OnSuccessDo<TFailure, TSuccess1, TSuccess2>(
+        this Task<Either<TFailure, TSuccess1>> task,
+        Func<Either<TFailure, TSuccess2>> successTask)
+    {
+        return await task.OnSuccessDo(async _ => await Task.FromResult(successTask()));
+    }
+
+    public static async Task<Either<TFailure, TSuccess1>> OnSuccessDo<TFailure, TSuccess1, TSuccess2>(
+        this Task<Either<TFailure, TSuccess1>> task,
+        Func<TSuccess1, Either<TFailure, TSuccess2>> successTask)
+    {
+        return await task.OnSuccessDo(async result => await Task.FromResult(successTask(result)));
+    }
+
+    public static async Task<Either<TFailure, TSuccess1>> OnSuccessDo<TFailure, TSuccess1, TSuccess2>(
+        this Task<Either<TFailure, TSuccess1>> task,
+        Func<TSuccess1, Task<Either<TFailure, TSuccess2>>> successTask)
+    {
+        var firstResult = await task;
+
+        if (firstResult.IsLeft)
         {
-            var firstResult = await task;
+            return firstResult.Left;
+        }
 
-            if (firstResult.IsLeft)
-            {
-                return firstResult.Left;
-            }
+        var result = await successTask(firstResult.Right);
 
-            successTask(firstResult.Right);
+        if (result.IsRight)
+        {
             return firstResult.Right;
         }
 
-        public static async Task<Either<TFailure, TSuccess>> OnSuccessDo<TFailure, TSuccess>(
-            this Task<Either<TFailure, TSuccess>> task,
-            Func<TSuccess, Task> successTask)
+        return result.Left;
+    }
+
+    /**
+     * Convenience method so that the chained function can be
+     * void and doesn't have to explicitly return a Unit.
+     */
+    public static async Task<Either<TFailure, Unit>> OnSuccessVoid<TFailure, TSuccess>(
+        this Task<Either<TFailure, TSuccess>> task,
+        Func<Task> func)
+    {
+        var firstResult = await task;
+
+        if (firstResult.IsLeft)
         {
-            var firstResult = await task;
-
-            if (firstResult.IsLeft)
-            {
-                return firstResult.Left;
-            }
-
-            await successTask(firstResult.Right);
-            return firstResult.Right;
+            return firstResult.Left;
         }
 
-        public static async Task<Either<TFailure, TSuccess1>> OnSuccessDo<TFailure, TSuccess1, TSuccess2>(
-            this Task<Either<TFailure, TSuccess1>> task,
-            Func<Task<Either<TFailure, TSuccess2>>> successTask)
+        await func();
+
+        return Unit.Instance;
+    }
+
+    /**
+     * Convenience method so that the chained function can be
+     * void and doesn't have to explicitly return a Unit.
+     */
+    public static async Task<Either<TFailure, Unit>> OnSuccessVoid<TFailure, TSuccess>(
+        this Task<Either<TFailure, TSuccess>> task,
+        Action<TSuccess> action)
+    {
+        var firstResult = await task;
+
+        if (firstResult.IsLeft)
         {
-            return await task.OnSuccessDo(async _ => await successTask());
+            return firstResult.Left;
         }
 
-        public static async Task<Either<TFailure, TSuccess1>> OnSuccessDo<TFailure, TSuccess1, TSuccess2>(
-            this Task<Either<TFailure, TSuccess1>> task,
-            Func<Either<TFailure, TSuccess2>> successTask)
+        action(firstResult.Right);
+
+        return Unit.Instance;
+    }
+
+    /**
+     * Convenience method so that the chained function can be
+     * void and doesn't have to explicitly return a Unit.
+     */
+    public static async Task<Either<TFailure, Unit>> OnSuccessVoid<TFailure, TSuccess>(
+        this Task<Either<TFailure, TSuccess>> task,
+        Action action)
+    {
+        var firstResult = await task;
+
+        if (firstResult.IsLeft)
         {
-            return await task.OnSuccessDo(async _ => await Task.FromResult(successTask()));
+            return firstResult.Left;
         }
 
-        public static async Task<Either<TFailure, TSuccess1>> OnSuccessDo<TFailure, TSuccess1, TSuccess2>(
-            this Task<Either<TFailure, TSuccess1>> task,
-            Func<TSuccess1, Either<TFailure, TSuccess2>> successTask)
+        action();
+
+        return Unit.Instance;
+    }
+
+    /**
+     * Convenience method so that the success chain can be converted to a Unit without having to explicitly supply
+     * it.
+     */
+    public static Task<Either<TFailure, Unit>> OnSuccessVoid<TFailure, TSuccess>(
+        this Task<Either<TFailure, TSuccess>> task)
+    {
+        return OnSuccessVoid(task, () => { });
+    }
+
+    public static async Task<Either<TFailure, TSuccess2>> OnSuccess<TFailure, TSuccess1, TSuccess2>(
+        this Task<Either<TFailure, TSuccess1>> task,
+        Func<Task<TSuccess2>> func)
+    {
+        var firstResult = await task;
+
+        if (firstResult.IsLeft)
         {
-            return await task.OnSuccessDo(async result => await Task.FromResult(successTask(result)));
+            return firstResult.Left;
         }
 
-        public static async Task<Either<TFailure, TSuccess1>> OnSuccessDo<TFailure, TSuccess1, TSuccess2>(
-            this Task<Either<TFailure, TSuccess1>> task,
-            Func<TSuccess1, Task<Either<TFailure, TSuccess2>>> successTask)
+        return await func();
+    }
+
+    [Obsolete("Use OnSuccessDo or OnSuccessVoid for chaining a non-generic Task")]
+    public static async Task<Either<TFailure, Unit>> OnSuccess<TFailure, TSuccess1>(
+        this Task<Either<TFailure, TSuccess1>> task,
+        Func<TSuccess1, Task> func)
+    {
+        return await task.OnSuccessVoid(func);
+    }
+
+    public static async Task<Either<TFailure, TSuccess2>> OnSuccess<TFailure, TSuccess1, TSuccess2>(
+        this Task<Either<TFailure, TSuccess1>> task,
+        Func<Task<Either<TFailure, TSuccess2>>> func)
+    {
+        var firstResult = await task;
+
+        if (firstResult.IsLeft)
         {
-            var firstResult = await task;
-
-            if (firstResult.IsLeft)
-            {
-                return firstResult.Left;
-            }
-
-            var result = await successTask(firstResult.Right);
-
-            if (result.IsRight)
-            {
-                return firstResult.Right;
-            }
-
-            return result.Left;
+            return firstResult.Left;
         }
 
-        /**
-         * Convenience method so that the chained function can be
-         * void and doesn't have to explicitly return a Unit.
-         */
-        public static async Task<Either<TFailure, Unit>> OnSuccessVoid<TFailure, TSuccess>(
-            this Task<Either<TFailure, TSuccess>> task,
-            Func<Task> func)
+        return await func();
+    }
+
+    /**
+     * Convenience method so that the chained function can be
+     * void and doesn't have to explicitly return a Unit.
+     */
+    public static async Task<Either<TFailure, Unit>> OnSuccessVoid<TFailure, TSuccess>(
+        this Task<Either<TFailure, TSuccess>> task,
+        Func<TSuccess, Task> func)
+    {
+        var firstResult = await task;
+
+        if (firstResult.IsLeft)
         {
-            var firstResult = await task;
-
-            if (firstResult.IsLeft)
-            {
-                return firstResult.Left;
-            }
-
-            await func();
-
-            return Unit.Instance;
+            return firstResult.Left;
         }
 
-        /**
-         * Convenience method so that the chained function can be
-         * void and doesn't have to explicitly return a Unit.
-         */
-        public static async Task<Either<TFailure, Unit>> OnSuccessVoid<TFailure, TSuccess>(
-            this Task<Either<TFailure, TSuccess>> task,
-            Action<TSuccess> action)
+        await func(firstResult.Right);
+
+        return Unit.Instance;
+    }
+
+    /**
+     * Convenience method so that the chained function can be
+     * void and doesn't have to explicitly return a Unit.
+     */
+    public static Task<Either<TFailure, Unit>> OnSuccessVoid<TFailure, TSuccess1, TSuccess2>(
+        this Task<Either<TFailure, TSuccess1>> task,
+        Func<TSuccess1, Task<Either<TFailure, TSuccess2>>> task2)
+    {
+        return task
+            .OnSuccess(task2.Invoke)
+            .OnSuccessVoid();
+    }
+
+    /**
+     * Convenience method so that the chained function can be
+     * void and doesn't have to explicitly return a Unit.
+     */
+    public static Task<Either<TFailure, Unit>> OnSuccessVoid<TFailure, TSuccess1, TSuccess2>(
+        this Task<Either<TFailure, TSuccess1>> task,
+        Func<Task<Either<TFailure, TSuccess2>>> func)
+    {
+        return task
+            .OnSuccess(func.Invoke)
+            .OnSuccessVoid();
+    }
+
+
+    public static async Task<Either<TFailure, TSuccess2>> OnSuccess<TFailure, TSuccess1, TSuccess2>(
+        this Task<Either<TFailure, TSuccess1>> task,
+        Func<TSuccess1, TSuccess2> func)
+    {
+        return await task.OnSuccess(async success => await Task.FromResult(func(success)));
+    }
+
+    /**
+     * Allows 2 OnSuccess(...) calls to be chained and the next OnSuccess() to receive a Tuple containing both of
+     * the results.  If either OnSuccess(...) fails, the entire result fails and additionally, if the first result
+     * fails, the second OnSuccess(...) will not be called.
+     *
+     * When C# allows better destructuring, we will be able to destructure the resulting Tuple much better.
+     */
+    public static async Task<Either<TFailure, Tuple<TSuccess1, TSuccess2>>>
+        OnSuccessCombineWith<TFailure, TSuccess1, TSuccess2>(
+            this Either<TFailure, TSuccess1> task,
+            Func<TSuccess1, Task<Either<TFailure, TSuccess2>>> func)
+    {
+        return await task.OnSuccess(success =>
         {
-            var firstResult = await task;
+            return func(success).OnSuccess(combinator => TupleOf(success, combinator));
+        });
+    }
 
-            if (firstResult.IsLeft)
-            {
-                return firstResult.Left;
-            }
-
-            action(firstResult.Right);
-
-            return Unit.Instance;
-        }
-
-        /**
-         * Convenience method so that the chained function can be
-         * void and doesn't have to explicitly return a Unit.
-         */
-        public static async Task<Either<TFailure, Unit>> OnSuccessVoid<TFailure, TSuccess>(
-            this Task<Either<TFailure, TSuccess>> task,
-            Action action)
-        {
-            var firstResult = await task;
-
-            if (firstResult.IsLeft)
-            {
-                return firstResult.Left;
-            }
-
-            action();
-
-            return Unit.Instance;
-        }
-
-        /**
-         * Convenience method so that the success chain can be converted to a Unit without having to explicitly supply
-         * it.
-         */
-        public static Task<Either<TFailure, Unit>> OnSuccessVoid<TFailure, TSuccess>(
-            this Task<Either<TFailure, TSuccess>> task)
-        {
-            return OnSuccessVoid(task, () => { });
-        }
-
-        public static async Task<Either<TFailure, TSuccess2>> OnSuccess<TFailure, TSuccess1, TSuccess2>(
-            this Task<Either<TFailure, TSuccess1>> task,
-            Func<Task<TSuccess2>> func)
-        {
-            var firstResult = await task;
-
-            if (firstResult.IsLeft)
-            {
-                return firstResult.Left;
-            }
-
-            return await func();
-        }
-
-        [Obsolete("Use OnSuccessDo or OnSuccessVoid for chaining a non-generic Task")]
-        public static async Task<Either<TFailure, Unit>> OnSuccess<TFailure, TSuccess1>(
-            this Task<Either<TFailure, TSuccess1>> task,
-            Func<TSuccess1, Task> func)
-        {
-            return await task.OnSuccessVoid(func);
-        }
-
-        public static async Task<Either<TFailure, TSuccess2>> OnSuccess<TFailure, TSuccess1, TSuccess2>(
-            this Task<Either<TFailure, TSuccess1>> task,
-            Func<Task<Either<TFailure, TSuccess2>>> func)
-        {
-            var firstResult = await task;
-
-            if (firstResult.IsLeft)
-            {
-                return firstResult.Left;
-            }
-
-            return await func();
-        }
-
-        /**
-         * Convenience method so that the chained function can be
-         * void and doesn't have to explicitly return a Unit.
-         */
-        public static async Task<Either<TFailure, Unit>> OnSuccessVoid<TFailure, TSuccess>(
-            this Task<Either<TFailure, TSuccess>> task,
-            Func<TSuccess, Task> func)
-        {
-            var firstResult = await task;
-
-            if (firstResult.IsLeft)
-            {
-                return firstResult.Left;
-            }
-
-            await func(firstResult.Right);
-
-            return Unit.Instance;
-        }
-
-        /**
-         * Convenience method so that the chained function can be
-         * void and doesn't have to explicitly return a Unit.
-         */
-        public static Task<Either<TFailure, Unit>> OnSuccessVoid<TFailure, TSuccess1, TSuccess2>(
-            this Task<Either<TFailure, TSuccess1>> task,
-            Func<TSuccess1, Task<Either<TFailure, TSuccess2>>> task2)
-        {
-            return task
-                .OnSuccess(task2.Invoke)
-                .OnSuccessVoid();
-        }
-
-        /**
-         * Convenience method so that the chained function can be
-         * void and doesn't have to explicitly return a Unit.
-         */
-        public static Task<Either<TFailure, Unit>> OnSuccessVoid<TFailure, TSuccess1, TSuccess2>(
-            this Task<Either<TFailure, TSuccess1>> task,
-            Func<Task<Either<TFailure, TSuccess2>>> func)
-        {
-            return task
-                .OnSuccess(func.Invoke)
-                .OnSuccessVoid();
-        }
-
-
-        public static async Task<Either<TFailure, TSuccess2>> OnSuccess<TFailure, TSuccess1, TSuccess2>(
-            this Task<Either<TFailure, TSuccess1>> task,
-            Func<TSuccess1, TSuccess2> func)
-        {
-            return await task.OnSuccess(async success => await Task.FromResult(func(success)));
-        }
-
-        /**
-         * Allows 2 OnSuccess(...) calls to be chained and the next OnSuccess() to receive a Tuple containing both of
-         * the results.  If either OnSuccess(...) fails, the entire result fails and additionally, if the first result
-         * fails, the second OnSuccess(...) will not be called.
-         *
-         * When C# allows better destructuring, we will be able to destructure the resulting Tuple much better.
-         */
-        public static async Task<Either<TFailure, Tuple<TSuccess1, TSuccess2>>>
-            OnSuccessCombineWith<TFailure, TSuccess1, TSuccess2>(
-                this Either<TFailure, TSuccess1> task,
-                Func<TSuccess1, Task<Either<TFailure, TSuccess2>>> func)
-        {
-            return await task.OnSuccess(success =>
-            {
-                return func(success).OnSuccess(combinator => TupleOf(success, combinator));
-            });
-        }
-
-        /**
-         * Allows 2 OnSuccess(...) calls to be chained and the next OnSuccess() to receive a Tuple containing both of
-         * the results.  If either OnSuccess(...) fails, the entire result fails and additionally, if the first result
-         * fails, the second OnSuccess(...) will not be called.
-         *
-         * When C# allows better destructuring, we will be able to destructure the resulting Tuple much better.
-         */
-        public static async Task<Either<TFailure, Tuple<TSuccess1, TSuccess2>>>
-            OnSuccessCombineWith<TFailure, TSuccess1, TSuccess2>(
-                this Task<Either<TFailure, TSuccess1>> task,
-                Func<TSuccess1, Task<Either<TFailure, TSuccess2>>> func)
-        {
-            return await task.OnSuccess(success =>
-            {
-                return func(success).OnSuccess(combinator => TupleOf(success, combinator));
-            });
-        }
-
-        /**
-         * Allows 3 OnSuccess(...) calls to be chained and the next OnSuccess() to receive a Tuple containing all 3 of
-         * the results.  If any OnSuccess(...) fails, the entire result fails and additionally, if the first result
-         * fails, the subsequent OnSuccess(...) will not be called.
-         *
-         * When C# allows better destructuring, we will be able to destructure the resulting Tuple much better.
-         */
-        public static async Task<Either<TFailure, Tuple<TSuccess1, TSuccess2, TSuccess3>>>
-            OnSuccessCombineWith<TFailure, TSuccess1, TSuccess2, TSuccess3>(
-                this Task<Either<TFailure, Tuple<TSuccess1, TSuccess2>>> task,
-                Func<Tuple<TSuccess1, TSuccess2>, Task<Either<TFailure, TSuccess3>>> func)
-        {
-            return await task.OnSuccess(success =>
-            {
-                return func(success).OnSuccess(combinator =>
-                    new Tuple<TSuccess1, TSuccess2, TSuccess3>(success.Item1, success.Item2, combinator));
-            });
-        }
-
-        /**
-         * Allows 2 OnSuccess(...) calls to be chained and the next OnSuccess() to receive a Tuple containing both of
-         * the results.  If either OnSuccess(...) fails, the entire result fails and additionally, if the first result
-         * fails, the second OnSuccess(...) will not be called.
-         *
-         * When C# allows better destructuring, we will be able to destructure the resulting Tuple much better.
-         */
-        public static async Task<Either<TFailure, Tuple<TSuccess1, TSuccess2>>>
-            OnSuccessCombineWith<TFailure, TSuccess1, TSuccess2>(
-                this Task<Either<TFailure, TSuccess1>> task,
-                Func<TSuccess1, Either<TFailure, TSuccess2>> func)
-        {
-            return await task.OnSuccess(success =>
-            {
-                return func(success).OnSuccess(combinator => TupleOf(success, combinator));
-            });
-        }
-
-        public static async Task<Either<TFailure, TSuccess2>> OnSuccess<TFailure, TSuccess1, TSuccess2>(
-            this Task<Either<TFailure, TSuccess1>> task,
-            Func<TSuccess1, Task<TSuccess2>> func)
-        {
-            var firstResult = await task;
-
-            if (firstResult.IsLeft)
-            {
-                return firstResult.Left;
-            }
-
-            return await func(firstResult.Right);
-        }
-
-        public static async Task<Either<TFailure, TSuccess2>> OnSuccess<TFailure, TSuccess1, TSuccess2>(
-            this Task<Either<TFailure, TSuccess1>> task,
-            Func<TSuccess1, Either<TFailure, TSuccess2>> func)
-        {
-            return await task.OnSuccess(async success => await Task.FromResult(func(success)));
-        }
-
-        public static async Task<Either<TFailure, TSuccess2>> OnSuccess<TFailure, TSuccess1, TSuccess2>(
+    /**
+     * Allows 2 OnSuccess(...) calls to be chained and the next OnSuccess() to receive a Tuple containing both of
+     * the results.  If either OnSuccess(...) fails, the entire result fails and additionally, if the first result
+     * fails, the second OnSuccess(...) will not be called.
+     *
+     * When C# allows better destructuring, we will be able to destructure the resulting Tuple much better.
+     */
+    public static async Task<Either<TFailure, Tuple<TSuccess1, TSuccess2>>>
+        OnSuccessCombineWith<TFailure, TSuccess1, TSuccess2>(
             this Task<Either<TFailure, TSuccess1>> task,
             Func<TSuccess1, Task<Either<TFailure, TSuccess2>>> func)
+    {
+        return await task.OnSuccess(success =>
         {
-            var firstResult = await task;
+            return func(success).OnSuccess(combinator => TupleOf(success, combinator));
+        });
+    }
 
-            if (firstResult.IsLeft)
-            {
-                return firstResult.Left;
-            }
-
-            return await func(firstResult.Right);
-        }
-
-        public static async Task<Either<Unit, TSuccess>> OnFailureVoid<TFailure, TSuccess>(
-            this Task<Either<TFailure, TSuccess>> task,
-            Action<TFailure> failureTask)
+    /**
+     * Allows 3 OnSuccess(...) calls to be chained and the next OnSuccess() to receive a Tuple containing all 3 of
+     * the results.  If any OnSuccess(...) fails, the entire result fails and additionally, if the first result
+     * fails, the subsequent OnSuccess(...) will not be called.
+     *
+     * When C# allows better destructuring, we will be able to destructure the resulting Tuple much better.
+     */
+    public static async Task<Either<TFailure, Tuple<TSuccess1, TSuccess2, TSuccess3>>>
+        OnSuccessCombineWith<TFailure, TSuccess1, TSuccess2, TSuccess3>(
+            this Task<Either<TFailure, Tuple<TSuccess1, TSuccess2>>> task,
+            Func<Tuple<TSuccess1, TSuccess2>, Task<Either<TFailure, TSuccess3>>> func)
+    {
+        return await task.OnSuccess(success =>
         {
-            var firstResult = await task;
+            return func(success).OnSuccess(combinator =>
+                new Tuple<TSuccess1, TSuccess2, TSuccess3>(success.Item1, success.Item2, combinator));
+        });
+    }
 
-            if (firstResult.IsRight)
-            {
-                return firstResult.Right;
-            }
-
-            failureTask(firstResult.Left);
-            return Unit.Instance;
-        }
-
-        public static async Task<Either<TFailure, TSuccess>> OnFailureDo<TFailure, TSuccess>(
-            this Task<Either<TFailure, TSuccess>> task,
-            Func<TFailure, Task> failureTask)
+    /**
+     * Allows 2 OnSuccess(...) calls to be chained and the next OnSuccess() to receive a Tuple containing both of
+     * the results.  If either OnSuccess(...) fails, the entire result fails and additionally, if the first result
+     * fails, the second OnSuccess(...) will not be called.
+     *
+     * When C# allows better destructuring, we will be able to destructure the resulting Tuple much better.
+     */
+    public static async Task<Either<TFailure, Tuple<TSuccess1, TSuccess2>>>
+        OnSuccessCombineWith<TFailure, TSuccess1, TSuccess2>(
+            this Task<Either<TFailure, TSuccess1>> task,
+            Func<TSuccess1, Either<TFailure, TSuccess2>> func)
+    {
+        return await task.OnSuccess(success =>
         {
-            var firstResult = await task;
+            return func(success).OnSuccess(combinator => TupleOf(success, combinator));
+        });
+    }
 
-            if (firstResult.IsRight)
-            {
-                return firstResult.Right;
-            }
+    public static async Task<Either<TFailure, TSuccess2>> OnSuccess<TFailure, TSuccess1, TSuccess2>(
+        this Task<Either<TFailure, TSuccess1>> task,
+        Func<TSuccess1, Task<TSuccess2>> func)
+    {
+        var firstResult = await task;
 
-            await failureTask(firstResult.Left);
+        if (firstResult.IsLeft)
+        {
             return firstResult.Left;
         }
 
-        public static async Task<Either<TFailure, TSuccess>> OnFailureDo<TFailure, TSuccess>(
-            this Task<Either<TFailure, TSuccess>> task,
-            Action<TFailure> failureAction)
+        return await func(firstResult.Right);
+    }
+
+    public static async Task<Either<TFailure, TSuccess2>> OnSuccess<TFailure, TSuccess1, TSuccess2>(
+        this Task<Either<TFailure, TSuccess1>> task,
+        Func<TSuccess1, Either<TFailure, TSuccess2>> func)
+    {
+        return await task.OnSuccess(async success => await Task.FromResult(func(success)));
+    }
+
+    public static async Task<Either<TFailure, TSuccess2>> OnSuccess<TFailure, TSuccess1, TSuccess2>(
+        this Task<Either<TFailure, TSuccess1>> task,
+        Func<TSuccess1, Task<Either<TFailure, TSuccess2>>> func)
+    {
+        var firstResult = await task;
+
+        if (firstResult.IsLeft)
         {
-            var firstResult = await task;
-
-            if (firstResult.IsRight)
-            {
-                return firstResult.Right;
-            }
-
-            failureAction(firstResult.Left);
             return firstResult.Left;
         }
 
-        /// <summary>
-        /// Map a failure result to a new failure result of the same type.
-        /// </summary>
-        public static async Task<Either<TFailure, TSuccess>> OnFailureFailWith<TFailure, TSuccess>(
-            this Task<Either<TFailure, TSuccess>> task,
-            Func<TFailure> func)
+        return await func(firstResult.Right);
+    }
+
+    public static async Task<Either<Unit, TSuccess>> OnFailureVoid<TFailure, TSuccess>(
+        this Task<Either<TFailure, TSuccess>> task,
+        Action<TFailure> failureTask)
+    {
+        var firstResult = await task;
+
+        if (firstResult.IsRight)
         {
-            return await task.OnFailureFailWith(async _ => await Task.FromResult(func()));
+            return firstResult.Right;
         }
 
-        /// <summary>
-        /// Map a failure result to a new failure result of the same type.
-        /// </summary>
-        public static async Task<Either<TFailure, TSuccess>> OnFailureFailWith<TFailure, TSuccess>(
-            this Task<Either<TFailure, TSuccess>> task,
-            Func<TFailure, TFailure> func)
+        failureTask(firstResult.Left);
+        return Unit.Instance;
+    }
+
+    public static async Task<Either<TFailure, TSuccess>> OnFailureDo<TFailure, TSuccess>(
+        this Task<Either<TFailure, TSuccess>> task,
+        Func<TFailure, Task> failureTask)
+    {
+        var firstResult = await task;
+
+        if (firstResult.IsRight)
         {
-            return await task.OnFailureFailWith(async result => await Task.FromResult(func(result)));
+            return firstResult.Right;
         }
 
-        /// <summary>
-        /// Map a failure result to a new failure result of the same type.
-        /// </summary>
-        public static async Task<Either<TFailure, TSuccess>> OnFailureFailWith<TFailure, TSuccess>(
-            this Task<Either<TFailure, TSuccess>> task,
-            Func<TFailure, Task<TFailure>> func)
-        {
-            var firstResult = await task;
+        await failureTask(firstResult.Left);
+        return firstResult.Left;
+    }
 
-            if (firstResult.IsRight)
+    public static async Task<Either<TFailure, TSuccess>> OnFailureDo<TFailure, TSuccess>(
+        this Task<Either<TFailure, TSuccess>> task,
+        Action<TFailure> failureAction)
+    {
+        var firstResult = await task;
+
+        if (firstResult.IsRight)
+        {
+            return firstResult.Right;
+        }
+
+        failureAction(firstResult.Left);
+        return firstResult.Left;
+    }
+
+    /// <summary>
+    /// Map a failure result to a new failure result of the same type.
+    /// </summary>
+    public static async Task<Either<TFailure, TSuccess>> OnFailureFailWith<TFailure, TSuccess>(
+        this Task<Either<TFailure, TSuccess>> task,
+        Func<TFailure> func)
+    {
+        return await task.OnFailureFailWith(async _ => await Task.FromResult(func()));
+    }
+
+    /// <summary>
+    /// Map a failure result to a new failure result of the same type.
+    /// </summary>
+    public static async Task<Either<TFailure, TSuccess>> OnFailureFailWith<TFailure, TSuccess>(
+        this Task<Either<TFailure, TSuccess>> task,
+        Func<TFailure, TFailure> func)
+    {
+        return await task.OnFailureFailWith(async result => await Task.FromResult(func(result)));
+    }
+
+    /// <summary>
+    /// Map a failure result to a new failure result of the same type.
+    /// </summary>
+    public static async Task<Either<TFailure, TSuccess>> OnFailureFailWith<TFailure, TSuccess>(
+        this Task<Either<TFailure, TSuccess>> task,
+        Func<TFailure, Task<TFailure>> func)
+    {
+        var firstResult = await task;
+
+        if (firstResult.IsRight)
+        {
+            return firstResult.Right;
+        }
+
+        return await func(firstResult.Left);
+    }
+
+    /// <summary>
+    /// If the previous Either failed, perform the given action and then handle it as a success case anyway.
+    /// This allows a prior step to fail but overall be treated as a success (unless a subsequent step happens to
+    /// fail after this one).
+    /// </summary>
+    public static async Task<Either<TFailure, TSuccess>> OnFailureSucceedWith<TFailure, TSuccess>(
+        this Task<Either<TFailure, TSuccess>> task,
+        Func<TFailure, Task<TSuccess>> func)
+    {
+        var firstResult = await task;
+
+        if (firstResult.IsRight)
+        {
+            return firstResult.Right;
+        }
+
+        return await func(firstResult.Left);
+    }
+
+    public static async Task<TSuccess> OrElse<TFailure, TSuccess>(
+        this Task<Either<TFailure, TSuccess>> task,
+        Func<Task<TSuccess>> func)
+    {
+        var firstResult = await task;
+
+        if (firstResult.IsRight)
+        {
+            return firstResult.Right;
+        }
+
+        return await func();
+    }
+
+    public static async Task<Either<TFailure, TSuccess>> OrElse<TFailure, TSuccess>(
+        this Task<Either<TFailure, TSuccess>> task,
+        Func<Task<Either<TFailure, TSuccess>>> func)
+    {
+        var firstResult = await task;
+
+        if (firstResult.IsRight)
+        {
+            return firstResult.Right;
+        }
+
+        return await func();
+    }
+
+    public static async Task<TSuccess> OrElse<TFailure, TSuccess>(
+        this Task<Either<TFailure, TSuccess>> task,
+        Func<TSuccess> func)
+    {
+        var firstResult = await task;
+
+        if (firstResult.IsRight)
+        {
+            return firstResult.Right;
+        }
+
+        return func();
+    }
+
+    public static async Task<Either<TFailure, List<TSuccess>>> OnSuccessAll<TFailure, TSuccess>(
+        this IEnumerable<Task<Either<TFailure, TSuccess>>> tasks)
+    {
+        var result = new List<TSuccess>();
+        foreach (var task in tasks)
+        {
+            var r = await task;
+            if (r.IsLeft)
             {
-                return firstResult.Right;
+                return r.Left;
             }
 
-            return await func(firstResult.Left);
+            result.Add(r.Right);
         }
 
-        /// <summary>
-        /// If the previous Either failed, perform the given action and then handle it as a success case anyway.
-        /// This allows a prior step to fail but overall be treated as a success (unless a subsequent step happens to
-        /// fail after this one).
-        /// </summary>
-        public static async Task<Either<TFailure, TSuccess>> OnFailureSucceedWith<TFailure, TSuccess>(
-            this Task<Either<TFailure, TSuccess>> task,
-            Func<TFailure, Task<TSuccess>> func)
-        {
-            var firstResult = await task;
+        return result;
+    }
 
-            if (firstResult.IsRight)
-            {
-                return firstResult.Right;
-            }
-
-            return await func(firstResult.Left);
-        }
-
-        public static async Task<TSuccess> OrElse<TFailure, TSuccess>(
-            this Task<Either<TFailure, TSuccess>> task,
-            Func<Task<TSuccess>> func)
-        {
-            var firstResult = await task;
-
-            if (firstResult.IsRight)
-            {
-                return firstResult.Right;
-            }
-
-            return await func();
-        }
-
-        public static async Task<Either<TFailure, TSuccess>> OrElse<TFailure, TSuccess>(
-            this Task<Either<TFailure, TSuccess>> task,
-            Func<Task<Either<TFailure, TSuccess>>> func)
-        {
-            var firstResult = await task;
-
-            if (firstResult.IsRight)
-            {
-                return firstResult.Right;
-            }
-
-            return await func();
-        }
-
-        public static async Task<TSuccess> OrElse<TFailure, TSuccess>(
-            this Task<Either<TFailure, TSuccess>> task,
-            Func<TSuccess> func)
-        {
-            var firstResult = await task;
-
-            if (firstResult.IsRight)
-            {
-                return firstResult.Right;
-            }
-
-            return func();
-        }
-
-        public static async Task<Either<TFailure, List<TSuccess>>> OnSuccessAll<TFailure, TSuccess>(
-            this IEnumerable<Task<Either<TFailure, TSuccess>>> tasks)
-        {
-            var result = new List<TSuccess>();
-            foreach (var task in tasks)
-            {
-                var r = await task;
-                if (r.IsLeft)
-                {
-                    return r.Left;
-                }
-
-                result.Add(r.Right);
-            }
-
-            return result;
-        }
-
-        public static Task<Either<TFailure, Unit>> OnSuccessAllReturnVoid<TFailure, TSuccess>(
-            this IEnumerable<Task<Either<TFailure, TSuccess>>> tasks)
-        {
-            return tasks.OnSuccessAll().OnSuccessVoid();
-        }
+    public static Task<Either<TFailure, Unit>> OnSuccessAllReturnVoid<TFailure, TSuccess>(
+        this IEnumerable<Task<Either<TFailure, TSuccess>>> tasks)
+    {
+        return tasks.OnSuccessAll().OnSuccessVoid();
     }
 }

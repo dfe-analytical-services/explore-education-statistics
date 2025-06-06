@@ -11,56 +11,55 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Repository
+namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Repository;
+
+public class BoundaryLevelRepository(
+    StatisticsDbContext context) : IBoundaryLevelRepository
 {
-    public class BoundaryLevelRepository(
-        StatisticsDbContext context) : IBoundaryLevelRepository
+    public IEnumerable<BoundaryLevel> FindByGeographicLevels(IEnumerable<GeographicLevel> geographicLevels)
     {
-        public IEnumerable<BoundaryLevel> FindByGeographicLevels(IEnumerable<GeographicLevel> geographicLevels)
-        {
-            return context.BoundaryLevel
-                .Where(level => geographicLevels.Contains(level.Level))
-                .OrderByDescending(level => level.Published);
-        }
+        return context.BoundaryLevel
+            .Where(level => geographicLevels.Contains(level.Level))
+            .OrderByDescending(level => level.Published);
+    }
 
-        public async Task<BoundaryLevel> CreateBoundaryLevel(
-            GeographicLevel level,
-            string label,
-            DateTime published,
-            FeatureCollection featureCollection,
-            CancellationToken cancellationToken = default)
+    public async Task<BoundaryLevel> CreateBoundaryLevel(
+        GeographicLevel level,
+        string label,
+        DateTime published,
+        FeatureCollection featureCollection,
+        CancellationToken cancellationToken = default)
+    {
+        return await context.RequireTransaction(async () =>
         {
-            return await context.RequireTransaction(async () =>
+            var entry = await context.BoundaryLevel.AddAsync(new()
             {
-                var entry = await context.BoundaryLevel.AddAsync(new()
-                {
-                    Level = level,
-                    Label = label,
-                    Published = published,
-                });
-
-                var boundaryLevel = entry.Entity;
-                var boundaryData = MapBoundaryDataFromCollection(featureCollection, boundaryLevel);
-
-                await context.BoundaryData.AddRangeAsync(boundaryData, cancellationToken);
-                await context.SaveChangesAsync(cancellationToken);
-
-                return boundaryLevel;
+                Level = level,
+                Label = label,
+                Published = published,
             });
-        }
 
-        private static List<BoundaryData> MapBoundaryDataFromCollection(
-            FeatureCollection featureCollection,
-            BoundaryLevel boundaryLevel)
-        {
-            return featureCollection.Features
-                .Select(feature => new BoundaryData
-                {
-                    BoundaryLevel = boundaryLevel,
-                    Code = BoundaryDataUtils.GetCode(feature.Properties),
-                    Name = BoundaryDataUtils.GetName(feature.Properties),
-                    GeoJson = feature
-                }).ToList();
-        }
+            var boundaryLevel = entry.Entity;
+            var boundaryData = MapBoundaryDataFromCollection(featureCollection, boundaryLevel);
+
+            await context.BoundaryData.AddRangeAsync(boundaryData, cancellationToken);
+            await context.SaveChangesAsync(cancellationToken);
+
+            return boundaryLevel;
+        });
+    }
+
+    private static List<BoundaryData> MapBoundaryDataFromCollection(
+        FeatureCollection featureCollection,
+        BoundaryLevel boundaryLevel)
+    {
+        return featureCollection.Features
+            .Select(feature => new BoundaryData
+            {
+                BoundaryLevel = boundaryLevel,
+                Code = BoundaryDataUtils.GetCode(feature.Properties),
+                Name = BoundaryDataUtils.GetName(feature.Properties),
+                GeoJson = feature
+            }).ToList();
     }
 }

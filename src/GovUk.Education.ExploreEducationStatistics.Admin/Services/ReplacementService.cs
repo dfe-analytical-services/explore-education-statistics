@@ -32,1242 +32,1241 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.Validat
 using IReleaseVersionService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IReleaseVersionService;
 using Unit = GovUk.Education.ExploreEducationStatistics.Common.Model.Unit;
 
-namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
+namespace GovUk.Education.ExploreEducationStatistics.Admin.Services;
+
+public class ReplacementService : IReplacementService
 {
-    public class ReplacementService : IReplacementService
+    private readonly ContentDbContext _contentDbContext;
+    private readonly StatisticsDbContext _statisticsDbContext;
+    private readonly IDataSetService _dataSetService;
+    private readonly IOptions<FeatureFlags> _featureFlags;
+    private readonly IFilterRepository _filterRepository;
+    private readonly IIndicatorRepository _indicatorRepository;
+    private readonly IIndicatorGroupRepository _indicatorGroupRepository;
+    private readonly ILocationRepository _locationRepository;
+    private readonly IFootnoteRepository _footnoteRepository;
+    private readonly IReleaseVersionService _releaseVersionService;
+    private readonly IDataSetVersionService _dataSetVersionService;
+    private readonly ITimePeriodService _timePeriodService;
+    private readonly IUserService _userService;
+    private readonly ICacheKeyService _cacheKeyService;
+    private readonly IPrivateBlobCacheService _privateCacheService;
+
+    private static IComparer<string> LabelComparer { get; } = new LabelRelationalComparer();
+
+    public ReplacementService(ContentDbContext contentDbContext,
+        StatisticsDbContext statisticsDbContext,
+        IFilterRepository filterRepository,
+        IIndicatorRepository indicatorRepository,
+        IIndicatorGroupRepository indicatorGroupRepository,
+        ILocationRepository locationRepository,
+        IFootnoteRepository footnoteRepository,
+        IReleaseVersionService releaseVersionService,
+        IDataSetVersionService dataSetVersionService,
+        ITimePeriodService timePeriodService,
+        IUserService userService,
+        ICacheKeyService cacheKeyService,
+        IPrivateBlobCacheService privateCacheService,
+        IDataSetService dataSetService,
+        IOptions<FeatureFlags> featureFlags)
     {
-        private readonly ContentDbContext _contentDbContext;
-        private readonly StatisticsDbContext _statisticsDbContext;
-        private readonly IDataSetService _dataSetService;
-        private readonly IOptions<FeatureFlags> _featureFlags;
-        private readonly IFilterRepository _filterRepository;
-        private readonly IIndicatorRepository _indicatorRepository;
-        private readonly IIndicatorGroupRepository _indicatorGroupRepository;
-        private readonly ILocationRepository _locationRepository;
-        private readonly IFootnoteRepository _footnoteRepository;
-        private readonly IReleaseVersionService _releaseVersionService;
-        private readonly IDataSetVersionService _dataSetVersionService;
-        private readonly ITimePeriodService _timePeriodService;
-        private readonly IUserService _userService;
-        private readonly ICacheKeyService _cacheKeyService;
-        private readonly IPrivateBlobCacheService _privateCacheService;
+        _contentDbContext = contentDbContext;
+        _statisticsDbContext = statisticsDbContext;
+        _filterRepository = filterRepository;
+        _indicatorRepository = indicatorRepository;
+        _indicatorGroupRepository = indicatorGroupRepository;
+        _locationRepository = locationRepository;
+        _footnoteRepository = footnoteRepository;
+        _releaseVersionService = releaseVersionService;
+        _dataSetVersionService = dataSetVersionService;
+        _timePeriodService = timePeriodService;
+        _userService = userService;
+        _cacheKeyService = cacheKeyService;
+        _dataSetService = dataSetService;
+        _featureFlags = featureFlags;
+        _privateCacheService = privateCacheService;
+    }
 
-        private static IComparer<string> LabelComparer { get; } = new LabelRelationalComparer();
+    public async Task<Either<ActionResult, DataReplacementPlanViewModel>> GetReplacementPlan(
+        Guid releaseVersionId,
+        Guid originalFileId,
+        Guid replacementFileId,
+        CancellationToken cancellationToken = default)
+    {
+        return await _contentDbContext.ReleaseVersions
+            .FirstOrNotFoundAsync(rv => rv.Id == releaseVersionId, cancellationToken: cancellationToken)
+            .OnSuccess(_userService.CheckCanUpdateReleaseVersion)
+            .OnSuccess(() => CheckReleaseFilesExist(releaseVersionId: releaseVersionId,
+                originalFileId: originalFileId,
+                replacementFileId: replacementFileId))
+            .OnSuccess(async tuple =>
+            {
+                var (originalReleaseFile, replacementReleaseFile) = tuple;
 
-        public ReplacementService(ContentDbContext contentDbContext,
-            StatisticsDbContext statisticsDbContext,
-            IFilterRepository filterRepository,
-            IIndicatorRepository indicatorRepository,
-            IIndicatorGroupRepository indicatorGroupRepository,
-            ILocationRepository locationRepository,
-            IFootnoteRepository footnoteRepository,
-            IReleaseVersionService releaseVersionService,
-            IDataSetVersionService dataSetVersionService,
-            ITimePeriodService timePeriodService,
-            IUserService userService,
-            ICacheKeyService cacheKeyService,
-            IPrivateBlobCacheService privateCacheService,
-            IDataSetService dataSetService,
-            IOptions<FeatureFlags> featureFlags)
-        {
-            _contentDbContext = contentDbContext;
-            _statisticsDbContext = statisticsDbContext;
-            _filterRepository = filterRepository;
-            _indicatorRepository = indicatorRepository;
-            _indicatorGroupRepository = indicatorGroupRepository;
-            _locationRepository = locationRepository;
-            _footnoteRepository = footnoteRepository;
-            _releaseVersionService = releaseVersionService;
-            _dataSetVersionService = dataSetVersionService;
-            _timePeriodService = timePeriodService;
-            _userService = userService;
-            _cacheKeyService = cacheKeyService;
-            _dataSetService = dataSetService;
-            _featureFlags = featureFlags;
-            _privateCacheService = privateCacheService;
-        }
+                return await GetLinkedDataSetVersion(_featureFlags.Value.EnableReplacementOfPublicApiDataSets ? replacementReleaseFile : originalReleaseFile, cancellationToken)
+                    .OnSuccess(replacementApiDataSetVersion => (originalReleaseFile, replacementReleaseFile, replacementApiDataSetVersion));
+            })
+            .OnSuccess(async tuple =>
+            {
+                var originalFile = tuple.originalReleaseFile.File;
+                var replacementFile = tuple.replacementReleaseFile.File;
 
-        public async Task<Either<ActionResult, DataReplacementPlanViewModel>> GetReplacementPlan(
-            Guid releaseVersionId,
-            Guid originalFileId,
-            Guid replacementFileId,
-            CancellationToken cancellationToken = default)
-        {
-            return await _contentDbContext.ReleaseVersions
-                .FirstOrNotFoundAsync(rv => rv.Id == releaseVersionId, cancellationToken: cancellationToken)
-                .OnSuccess(_userService.CheckCanUpdateReleaseVersion)
-                .OnSuccess(() => CheckReleaseFilesExist(releaseVersionId: releaseVersionId,
-                    originalFileId: originalFileId,
-                    replacementFileId: replacementFileId))
-                .OnSuccess(async tuple =>
+                var originalSubjectId = originalFile.SubjectId!.Value;
+                var replacementSubjectId = replacementFile.SubjectId!.Value;
+
+                var replacementSubjectMeta = await GetReplacementSubjectMeta(replacementSubjectId);
+
+                var dataBlocks = ValidateDataBlocks(releaseVersionId: releaseVersionId,
+                    subjectId: originalSubjectId,
+                    replacementSubjectMeta);
+                var footnotes = await ValidateFootnotes(releaseVersionId: releaseVersionId,
+                    subjectId: originalSubjectId,
+                    replacementSubjectMeta);
+
+                var apiDataSetVersionPlan = tuple.replacementApiDataSetVersion is null ? null 
+                    : await GetApiVersionPlanViewModel(tuple.replacementApiDataSetVersion, cancellationToken);
+
+                return new DataReplacementPlanViewModel
                 {
-                    var (originalReleaseFile, replacementReleaseFile) = tuple;
-
-                    return await GetLinkedDataSetVersion(_featureFlags.Value.EnableReplacementOfPublicApiDataSets ? replacementReleaseFile : originalReleaseFile, cancellationToken)
-                        .OnSuccess(replacementApiDataSetVersion => (originalReleaseFile, replacementReleaseFile, replacementApiDataSetVersion));
-                })
-                .OnSuccess(async tuple =>
-                {
-                    var originalFile = tuple.originalReleaseFile.File;
-                    var replacementFile = tuple.replacementReleaseFile.File;
-
-                    var originalSubjectId = originalFile.SubjectId!.Value;
-                    var replacementSubjectId = replacementFile.SubjectId!.Value;
-
-                    var replacementSubjectMeta = await GetReplacementSubjectMeta(replacementSubjectId);
-
-                    var dataBlocks = ValidateDataBlocks(releaseVersionId: releaseVersionId,
-                        subjectId: originalSubjectId,
-                        replacementSubjectMeta);
-                    var footnotes = await ValidateFootnotes(releaseVersionId: releaseVersionId,
-                        subjectId: originalSubjectId,
-                        replacementSubjectMeta);
-
-                    var apiDataSetVersionPlan = tuple.replacementApiDataSetVersion is null ? null 
-                        : await GetApiVersionPlanViewModel(tuple.replacementApiDataSetVersion, cancellationToken);
-
-                    return new DataReplacementPlanViewModel
-                    {
-                        DataBlocks = dataBlocks,
-                        Footnotes = footnotes,
-                        ApiDataSetVersionPlan = apiDataSetVersionPlan,
-                        OriginalSubjectId = originalSubjectId,
-                        ReplacementSubjectId = replacementSubjectId,
-                    };
-                });
+                    DataBlocks = dataBlocks,
+                    Footnotes = footnotes,
+                    ApiDataSetVersionPlan = apiDataSetVersionPlan,
+                    OriginalSubjectId = originalSubjectId,
+                    ReplacementSubjectId = replacementSubjectId,
+                };
+            });
 
             
-        }
-        private async Task<ApiDataSetVersionPlanViewModel?> GetApiVersionPlanViewModel(DataSetVersion replacementApiDataSetVersion, CancellationToken cancellationToken)
+    }
+    private async Task<ApiDataSetVersionPlanViewModel?> GetApiVersionPlanViewModel(DataSetVersion replacementApiDataSetVersion, CancellationToken cancellationToken)
+    {
+        var apiDataSetVersionPlan = new ApiDataSetVersionPlanViewModel
         {
-            var apiDataSetVersionPlan = new ApiDataSetVersionPlanViewModel
-                {
-                    DataSetId = replacementApiDataSetVersion.DataSetId,
-                    DataSetTitle = replacementApiDataSetVersion.DataSet.Title,
-                    Id = replacementApiDataSetVersion.Id,
-                    Version = replacementApiDataSetVersion.PublicVersion,
-                    Status = replacementApiDataSetVersion.Status,
-                    Valid = false,
-                };
-            if (_featureFlags.Value.EnableReplacementOfPublicApiDataSets && replacementApiDataSetVersion.VersionPatch > 0)
-            { 
-                //TODO: Please note EES-5779 PR Note this will be updated in an upcomming PR - Valid's value will take into account
-                //more things than just the values { FiltersComplete: true, LocationsComplete: true }. It will
-                //also include whether the user has 'finalized' the data set version mapping & whether the version has
-                //a breaking change and results in a major version increment. 
-                apiDataSetVersionPlan.MappingStatus = await _dataSetService.GetMappingStatus(replacementApiDataSetVersion.Id, cancellationToken);
-                apiDataSetVersionPlan.Valid = apiDataSetVersionPlan.MappingStatus is
-                    { FiltersComplete: true, LocationsComplete: true };
-            }
-
-            return apiDataSetVersionPlan;
-        }
-        public async Task<Either<ActionResult, Unit>> Replace(
-            Guid releaseVersionId,
-            Guid originalFileId,
-            Guid replacementFileId)
-        {
-            return await GetReplacementPlan(releaseVersionId, originalFileId, replacementFileId)
-                .OnSuccessDo<ActionResult, DataReplacementPlanViewModel, Unit>(plan =>
-                    !plan.Valid ? ValidationActionResult(ReplacementMustBeValid) : Unit.Instance)
-                .OnSuccessCombineWith(_ => CheckReleaseFilesExist(releaseVersionId: releaseVersionId,
-                    originalFileId: originalFileId,
-                    replacementFileId: replacementFileId))
-                .OnSuccess(planAndReleaseFiles =>
-                {
-                    var (plan, (originalReleaseFile, replacementReleaseFile)) = planAndReleaseFiles;
-
-                    // It should be possible to replace a file with any other file provided there is a valid plan,
-                    // but we want to ensure that the replacement file has been created through the designated process.
-                    // The replacement upload process links the replacement file to the original, allowing us to
-                    // identify files with ongoing data replacements and filter out replacement files from the regular
-                    // data files view.
-                    if (originalReleaseFile.File.ReplacedById != replacementFileId)
-                    {
-                        throw new InvalidOperationException(
-                            "Original file has no link with the replacement file");
-                    }
-
-                    if (replacementReleaseFile.File.ReplacingId != originalFileId)
-                    {
-                        throw new InvalidOperationException(
-                            "Replacement file has no link with the original file");
-                    }
-
-                    return (plan, originalReleaseFile, replacementReleaseFile);
-                })
-                .OnSuccess(async planAndReleaseFiles =>
-                {
-                    var (plan, originalReleaseFile, replacementReleaseFile) = planAndReleaseFiles;
-
-                    var originalSubjectId = plan.OriginalSubjectId;
-                    var replacementSubjectId = plan.ReplacementSubjectId;
-
-                    await plan.DataBlocks
-                        .ToAsyncEnumerable()
-                        .ForEachAwaitAsync(async dataBlockPlan =>
-                        {
-                            await InvalidateDataBlockCachedResults(dataBlockPlan, releaseVersionId);
-                            await ReplaceLinksForDataBlock(dataBlockPlan, replacementSubjectId);
-                        });
-
-                    await plan.Footnotes
-                        .ToAsyncEnumerable()
-                        .ForEachAwaitAsync(footnotePlan =>
-                            ReplaceLinksForFootnote(footnotePlan, originalSubjectId, replacementSubjectId));
-
-                    replacementReleaseFile.FilterSequence =
-                        await ReplaceFilterSequence(originalReleaseFile, replacementReleaseFile);
-                    replacementReleaseFile.IndicatorSequence =
-                        await ReplaceIndicatorSequence(originalReleaseFile, replacementReleaseFile);
-
-                    // Replace data guidance
-                    replacementReleaseFile.Summary = originalReleaseFile.Summary;
-
-                    await _contentDbContext.SaveChangesAsync();
-                    await _statisticsDbContext.SaveChangesAsync();
-
-                    return await RemoveOriginalSubjectAndFileFromRelease(releaseVersionId, originalFileId,
-                        replacementFileId);
-                });
+            DataSetId = replacementApiDataSetVersion.DataSetId,
+            DataSetTitle = replacementApiDataSetVersion.DataSet.Title,
+            Id = replacementApiDataSetVersion.Id,
+            Version = replacementApiDataSetVersion.PublicVersion,
+            Status = replacementApiDataSetVersion.Status,
+            Valid = false,
+        };
+        if (_featureFlags.Value.EnableReplacementOfPublicApiDataSets && replacementApiDataSetVersion.VersionPatch > 0)
+        { 
+            //TODO: Please note EES-5779 PR Note this will be updated in an upcomming PR - Valid's value will take into account
+            //more things than just the values { FiltersComplete: true, LocationsComplete: true }. It will
+            //also include whether the user has 'finalized' the data set version mapping & whether the version has
+            //a breaking change and results in a major version increment. 
+            apiDataSetVersionPlan.MappingStatus = await _dataSetService.GetMappingStatus(replacementApiDataSetVersion.Id, cancellationToken);
+            apiDataSetVersionPlan.Valid = apiDataSetVersionPlan.MappingStatus is
+                { FiltersComplete: true, LocationsComplete: true };
         }
 
-        private async Task<Either<ActionResult, DataSetVersion?>> GetLinkedDataSetVersion(
-            ReleaseFile releaseFile,
-            CancellationToken cancellationToken = default)
-        {
-            if (releaseFile.PublicApiDataSetId is null)
+        return apiDataSetVersionPlan;
+    }
+    public async Task<Either<ActionResult, Unit>> Replace(
+        Guid releaseVersionId,
+        Guid originalFileId,
+        Guid replacementFileId)
+    {
+        return await GetReplacementPlan(releaseVersionId, originalFileId, replacementFileId)
+            .OnSuccessDo<ActionResult, DataReplacementPlanViewModel, Unit>(plan =>
+                !plan.Valid ? ValidationActionResult(ReplacementMustBeValid) : Unit.Instance)
+            .OnSuccessCombineWith(_ => CheckReleaseFilesExist(releaseVersionId: releaseVersionId,
+                originalFileId: originalFileId,
+                replacementFileId: replacementFileId))
+            .OnSuccess(planAndReleaseFiles =>
             {
-                return (DataSetVersion)null!;
-            }
+                var (plan, (originalReleaseFile, replacementReleaseFile)) = planAndReleaseFiles;
 
-            return await _dataSetVersionService.GetDataSetVersion(
+                // It should be possible to replace a file with any other file provided there is a valid plan,
+                // but we want to ensure that the replacement file has been created through the designated process.
+                // The replacement upload process links the replacement file to the original, allowing us to
+                // identify files with ongoing data replacements and filter out replacement files from the regular
+                // data files view.
+                if (originalReleaseFile.File.ReplacedById != replacementFileId)
+                {
+                    throw new InvalidOperationException(
+                        "Original file has no link with the replacement file");
+                }
+
+                if (replacementReleaseFile.File.ReplacingId != originalFileId)
+                {
+                    throw new InvalidOperationException(
+                        "Replacement file has no link with the original file");
+                }
+
+                return (plan, originalReleaseFile, replacementReleaseFile);
+            })
+            .OnSuccess(async planAndReleaseFiles =>
+            {
+                var (plan, originalReleaseFile, replacementReleaseFile) = planAndReleaseFiles;
+
+                var originalSubjectId = plan.OriginalSubjectId;
+                var replacementSubjectId = plan.ReplacementSubjectId;
+
+                await plan.DataBlocks
+                    .ToAsyncEnumerable()
+                    .ForEachAwaitAsync(async dataBlockPlan =>
+                    {
+                        await InvalidateDataBlockCachedResults(dataBlockPlan, releaseVersionId);
+                        await ReplaceLinksForDataBlock(dataBlockPlan, replacementSubjectId);
+                    });
+
+                await plan.Footnotes
+                    .ToAsyncEnumerable()
+                    .ForEachAwaitAsync(footnotePlan =>
+                        ReplaceLinksForFootnote(footnotePlan, originalSubjectId, replacementSubjectId));
+
+                replacementReleaseFile.FilterSequence =
+                    await ReplaceFilterSequence(originalReleaseFile, replacementReleaseFile);
+                replacementReleaseFile.IndicatorSequence =
+                    await ReplaceIndicatorSequence(originalReleaseFile, replacementReleaseFile);
+
+                // Replace data guidance
+                replacementReleaseFile.Summary = originalReleaseFile.Summary;
+
+                await _contentDbContext.SaveChangesAsync();
+                await _statisticsDbContext.SaveChangesAsync();
+
+                return await RemoveOriginalSubjectAndFileFromRelease(releaseVersionId, originalFileId,
+                    replacementFileId);
+            });
+    }
+
+    private async Task<Either<ActionResult, DataSetVersion?>> GetLinkedDataSetVersion(
+        ReleaseFile releaseFile,
+        CancellationToken cancellationToken = default)
+    {
+        if (releaseFile.PublicApiDataSetId is null)
+        {
+            return (DataSetVersion)null!;
+        }
+
+        return await _dataSetVersionService.GetDataSetVersion(
                 releaseFile.PublicApiDataSetId.Value,
                 releaseFile.PublicApiDataSetVersion!,
                 cancellationToken)
-                .OnSuccess(dsv => (DataSetVersion?)dsv)
-                .OnFailureDo(_ => throw new ApplicationException(
-                    $"API data set version could not be found. Data set ID: '{releaseFile.PublicApiDataSetId}', version: '{releaseFile.PublicApiDataSetVersion}'"));
-        }
+            .OnSuccess(dsv => (DataSetVersion?)dsv)
+            .OnFailureDo(_ => throw new ApplicationException(
+                $"API data set version could not be found. Data set ID: '{releaseFile.PublicApiDataSetId}', version: '{releaseFile.PublicApiDataSetVersion}'"));
+    }
 
-        private async Task<Either<ActionResult, (ReleaseFile originalReleaseFile, ReleaseFile replacementReleaseFile)>>
-            CheckReleaseFilesExist(
-                Guid releaseVersionId,
-                Guid originalFileId,
-                Guid replacementFileId)
-        {
-            return await _contentDbContext.ReleaseFiles
+    private async Task<Either<ActionResult, (ReleaseFile originalReleaseFile, ReleaseFile replacementReleaseFile)>>
+        CheckReleaseFilesExist(
+            Guid releaseVersionId,
+            Guid originalFileId,
+            Guid replacementFileId)
+    {
+        return await _contentDbContext.ReleaseFiles
+            .Include(rf => rf.File)
+            .FirstOrNotFoundAsync(rf => rf.ReleaseVersionId == releaseVersionId
+                                        && rf.FileId == originalFileId
+                                        && rf.File.Type == FileType.Data)
+            .OnSuccessCombineWith(async _ => await _contentDbContext.ReleaseFiles
                 .Include(rf => rf.File)
                 .FirstOrNotFoundAsync(rf => rf.ReleaseVersionId == releaseVersionId
-                                            && rf.FileId == originalFileId
-                                            && rf.File.Type == FileType.Data)
-                .OnSuccessCombineWith(async _ => await _contentDbContext.ReleaseFiles
-                    .Include(rf => rf.File)
-                    .FirstOrNotFoundAsync(rf => rf.ReleaseVersionId == releaseVersionId
-                                                && rf.FileId == replacementFileId
-                                                && rf.File.Type == FileType.Data))
-                .OnSuccess(releaseFiles => releaseFiles.ToValueTuple());
-        }
+                                            && rf.FileId == replacementFileId
+                                            && rf.File.Type == FileType.Data))
+            .OnSuccess(releaseFiles => releaseFiles.ToValueTuple());
+    }
 
-        private async Task<ReplacementSubjectMeta> GetReplacementSubjectMeta(Guid subjectId)
+    private async Task<ReplacementSubjectMeta> GetReplacementSubjectMeta(Guid subjectId)
+    {
+        var filtersIncludingItems = await _filterRepository.GetFiltersIncludingItems(subjectId);
+
+        var filters = filtersIncludingItems
+            .ToDictionary(filter => filter.Name, filter => filter);
+
+        var indicators = _indicatorRepository.GetIndicators(subjectId)
+            .ToDictionary(indicator => indicator.Name, indicator => indicator);
+
+        var locations = await _locationRepository.GetDistinctForSubject(subjectId);
+
+        var timePeriods = await _timePeriodService.GetTimePeriods(subjectId);
+
+        return new ReplacementSubjectMeta
         {
-            var filtersIncludingItems = await _filterRepository.GetFiltersIncludingItems(subjectId);
+            Filters = filters,
+            Indicators = indicators,
+            Locations = locations,
+            TimePeriods = timePeriods
+        };
+    }
 
-            var filters = filtersIncludingItems
-                .ToDictionary(filter => filter.Name, filter => filter);
+    private List<DataBlockReplacementPlanViewModel> ValidateDataBlocks(Guid releaseVersionId,
+        Guid subjectId,
+        ReplacementSubjectMeta replacementSubjectMeta)
+    {
+        return _contentDbContext
+            .ContentBlocks
+            .Where(block => block.ReleaseVersionId == releaseVersionId)
+            .OfType<DataBlock>()
+            .ToList()
+            .Where(dataBlock => dataBlock.Query.SubjectId == subjectId)
+            .Select(dataBlock => ValidateDataBlock(dataBlock, replacementSubjectMeta))
+            .ToList();
+    }
 
-            var indicators = _indicatorRepository.GetIndicators(subjectId)
-                .ToDictionary(indicator => indicator.Name, indicator => indicator);
+    private DataBlockReplacementPlanViewModel ValidateDataBlock(DataBlock dataBlock,
+        ReplacementSubjectMeta replacementSubjectMeta)
+    {
+        var existingFilters = ValidateFiltersForDataBlock(dataBlock, replacementSubjectMeta);
+        var newlyIntroducedFilters = FindNewlyIntroducedFiltersForDataBlock(dataBlock, replacementSubjectMeta);
+        var indicatorGroups = ValidateIndicatorGroupsForDataBlock(dataBlock, replacementSubjectMeta);
+        var locations = ValidateLocationsForDataBlock(dataBlock, replacementSubjectMeta);
+        var timePeriods = ValidateTimePeriodsForDataBlock(dataBlock, replacementSubjectMeta);
 
-            var locations = await _locationRepository.GetDistinctForSubject(subjectId);
+        return new DataBlockReplacementPlanViewModel(dataBlock.Id,
+            dataBlock.Name,
+            existingFilters,
+            newlyIntroducedFilters,
+            indicatorGroups,
+            locations,
+            timePeriods);
+    }
 
-            var timePeriods = await _timePeriodService.GetTimePeriods(subjectId);
+    private async Task<List<FootnoteReplacementPlanViewModel>> ValidateFootnotes(Guid releaseVersionId,
+        Guid subjectId,
+        ReplacementSubjectMeta replacementSubjectMeta)
+    {
+        var footnotes = await _footnoteRepository.GetFootnotes(releaseVersionId: releaseVersionId,
+            subjectId: subjectId);
+        return footnotes
+            .Select(footnote => ValidateFootnote(footnote, replacementSubjectMeta))
+            .ToList();
+    }
 
-            return new ReplacementSubjectMeta
-            {
-                Filters = filters,
-                Indicators = indicators,
-                Locations = locations,
-                TimePeriods = timePeriods
-            };
-        }
+    private static FootnoteReplacementPlanViewModel ValidateFootnote(
+        Footnote footnote,
+        ReplacementSubjectMeta replacementSubjectMeta)
+    {
+        var filters = ValidateFiltersForFootnote(footnote, replacementSubjectMeta);
+        var filterGroups = ValidateFilterGroupsForFootnote(footnote, replacementSubjectMeta);
+        var filterItems = ValidateFilterItemsForFootnote(footnote, replacementSubjectMeta);
+        var indicatorGroups = ValidateIndicatorGroupsForFootnote(footnote, replacementSubjectMeta);
 
-        private List<DataBlockReplacementPlanViewModel> ValidateDataBlocks(Guid releaseVersionId,
-            Guid subjectId,
-            ReplacementSubjectMeta replacementSubjectMeta)
-        {
-            return _contentDbContext
-                .ContentBlocks
-                .Where(block => block.ReleaseVersionId == releaseVersionId)
-                .OfType<DataBlock>()
-                .ToList()
-                .Where(dataBlock => dataBlock.Query.SubjectId == subjectId)
-                .Select(dataBlock => ValidateDataBlock(dataBlock, replacementSubjectMeta))
-                .ToList();
-        }
+        return new FootnoteReplacementPlanViewModel(
+            footnote.Id,
+            footnote.Content,
+            filters,
+            filterGroups,
+            filterItems,
+            indicatorGroups);
+    }
 
-        private DataBlockReplacementPlanViewModel ValidateDataBlock(DataBlock dataBlock,
-            ReplacementSubjectMeta replacementSubjectMeta)
-        {
-            var existingFilters = ValidateFiltersForDataBlock(dataBlock, replacementSubjectMeta);
-            var newlyIntroducedFilters = FindNewlyIntroducedFiltersForDataBlock(dataBlock, replacementSubjectMeta);
-            var indicatorGroups = ValidateIndicatorGroupsForDataBlock(dataBlock, replacementSubjectMeta);
-            var locations = ValidateLocationsForDataBlock(dataBlock, replacementSubjectMeta);
-            var timePeriods = ValidateTimePeriodsForDataBlock(dataBlock, replacementSubjectMeta);
+    private static List<FootnoteFilterReplacementViewModel> ValidateFiltersForFootnote(
+        Footnote footnote,
+        ReplacementSubjectMeta replacementSubjectMeta)
+    {
+        return footnote.Filters
+            .Select(filterFootnote => filterFootnote.Filter)
+            .OrderBy(filter => filter.Label, LabelComparer)
+            .Select(filter => new FootnoteFilterReplacementViewModel(
+                id: filter.Id,
+                label: filter.Label,
+                target: FindReplacementFilter(replacementSubjectMeta, filter.Name)?.Id
+            ))
+            .ToList();
+    }
 
-            return new DataBlockReplacementPlanViewModel(dataBlock.Id,
-                dataBlock.Name,
-                existingFilters,
-                newlyIntroducedFilters,
-                indicatorGroups,
-                locations,
-                timePeriods);
-        }
-
-        private async Task<List<FootnoteReplacementPlanViewModel>> ValidateFootnotes(Guid releaseVersionId,
-            Guid subjectId,
-            ReplacementSubjectMeta replacementSubjectMeta)
-        {
-            var footnotes = await _footnoteRepository.GetFootnotes(releaseVersionId: releaseVersionId,
-                subjectId: subjectId);
-            return footnotes
-                .Select(footnote => ValidateFootnote(footnote, replacementSubjectMeta))
-                .ToList();
-        }
-
-        private static FootnoteReplacementPlanViewModel ValidateFootnote(
-            Footnote footnote,
-            ReplacementSubjectMeta replacementSubjectMeta)
-        {
-            var filters = ValidateFiltersForFootnote(footnote, replacementSubjectMeta);
-            var filterGroups = ValidateFilterGroupsForFootnote(footnote, replacementSubjectMeta);
-            var filterItems = ValidateFilterItemsForFootnote(footnote, replacementSubjectMeta);
-            var indicatorGroups = ValidateIndicatorGroupsForFootnote(footnote, replacementSubjectMeta);
-
-            return new FootnoteReplacementPlanViewModel(
-                footnote.Id,
-                footnote.Content,
-                filters,
-                filterGroups,
-                filterItems,
-                indicatorGroups);
-        }
-
-        private static List<FootnoteFilterReplacementViewModel> ValidateFiltersForFootnote(
-            Footnote footnote,
-            ReplacementSubjectMeta replacementSubjectMeta)
-        {
-            return footnote.Filters
-                .Select(filterFootnote => filterFootnote.Filter)
-                .OrderBy(filter => filter.Label, LabelComparer)
-                .Select(filter => new FootnoteFilterReplacementViewModel(
-                    id: filter.Id,
-                    label: filter.Label,
-                    target: FindReplacementFilter(replacementSubjectMeta, filter.Name)?.Id
-                ))
-                .ToList();
-        }
-
-        private static List<FootnoteFilterGroupReplacementViewModel> ValidateFilterGroupsForFootnote(Footnote footnote,
-            ReplacementSubjectMeta replacementSubjectMeta)
-        {
-            return footnote.FilterGroups
-                .Select(filterGroupFootnote => filterGroupFootnote.FilterGroup)
-                .OrderBy(filterGroup => filterGroup.Label, LabelComparer)
-                .Select(filterGroup => new FootnoteFilterGroupReplacementViewModel(
-                    id: filterGroup.Id,
-                    label: filterGroup.Label,
-                    filterId: filterGroup.FilterId,
-                    filterLabel: filterGroup.Filter.Label,
-                    target: FindReplacementFilterGroup(
-                        replacementSubjectMeta,
-                        filterGroup.Filter.Name,
-                        filterGroup.Label
-                    )?.Id
-                ))
-                .ToList();
-        }
-
-        private static List<FootnoteFilterItemReplacementViewModel> ValidateFilterItemsForFootnote(Footnote footnote,
-            ReplacementSubjectMeta replacementSubjectMeta)
-        {
-            return footnote.FilterItems
-                .Select(filterItemFootnote => filterItemFootnote.FilterItem)
-                .OrderBy(filterItem => filterItem.Label, LabelComparer)
-                .Select(filterItem => new FootnoteFilterItemReplacementViewModel(
-                    id: filterItem.Id,
-                    label: filterItem.Label,
-                    filterId: filterItem.FilterGroup.FilterId,
-                    filterLabel: filterItem.FilterGroup.Filter.Label,
-                    filterGroupId: filterItem.FilterGroupId,
-                    filterGroupLabel: filterItem.FilterGroup.Label,
-                    target: FindReplacementFilterItem(
-                        replacementSubjectMeta,
-                        filterItem.FilterGroup.Filter.Name,
-                        filterItem.FilterGroup.Label,
-                        filterItem.Label
-                    )?.Id
-                ))
-                .ToList();
-        }
-
-        private static Dictionary<Guid, IndicatorGroupReplacementViewModel> ValidateIndicatorGroupsForFootnote(
-            Footnote footnote,
-            ReplacementSubjectMeta replacementSubjectMeta)
-        {
-            return footnote.Indicators
-                .Select(indicatorFootnote => indicatorFootnote.Indicator)
-                .GroupBy(indicatorFootnote => indicatorFootnote.IndicatorGroup)
-                .OrderBy(group => group.Key.Label, LabelComparer)
-                .ToDictionary(
-                    group => group.Key.Id,
-                    group => new IndicatorGroupReplacementViewModel(
-                        id: group.Key.Id,
-                        label: group.Key.Label,
-                        indicators: group.Select(indicator =>
-                            ValidateIndicatorForReplacement(indicator, replacementSubjectMeta))
-                    )
-                );
-        }
-
-        private List<FilterReplacementViewModel> FindNewlyIntroducedFiltersForDataBlock(
-            DataBlock dataBlock,
-            ReplacementSubjectMeta replacementSubjectMeta)
-        {
-            var existingFilterItemIds = dataBlock
-                .Query
-                .Filters;
-
-            var existingFilterNames = _statisticsDbContext
-                .FilterItem
-                .AsQueryable()
-                .Where(fi => existingFilterItemIds.Contains(fi.Id))
-                .Select(fi => fi.FilterGroup.Filter)
-                .Select(f => f.Name)
-                .Distinct()
-                .ToList();
-
-            return replacementSubjectMeta
-                .Filters
-                .Select(d => d.Value)
-                .ToList()
-                .Where(f => !existingFilterNames.Contains(f.Name))
-                .Select(CreateNewlyIntroducedFilterReplacementViewModel)
-                .ToList();
-        }
-
-        private static FilterReplacementViewModel CreateNewlyIntroducedFilterReplacementViewModel(Filter filter)
-        {
-            var filterGroupReplacementViewModels = filter
-                .FilterGroups
-                .Select(fg => new FilterGroupReplacementViewModel(fg.Id, fg.Label, fg
-                    .FilterItems
-                    .Select(fi => new FilterItemReplacementViewModel(fi.Id, fi.Label, null)))
-                )
-                .ToDictionary(f => f.Id);
-
-            return new FilterReplacementViewModel(filter.Id, filter.Label, filter.Name,
-                filterGroupReplacementViewModels);
-        }
-
-        private Dictionary<Guid, FilterReplacementViewModel> ValidateFiltersForDataBlock(
-            DataBlock dataBlock,
-            ReplacementSubjectMeta replacementSubjectMeta)
-        {
-            return _statisticsDbContext.FilterItem
-                .AsQueryable()
-                .Where(filterItem => dataBlock.Query.Filters.Contains(filterItem.Id))
-                .Include(filterItem => filterItem.FilterGroup)
-                .ThenInclude(filterGroup => filterGroup.Filter)
-                .ToList()
-                .GroupBy(filterItem => filterItem.FilterGroup.Filter)
-                .OrderBy(filter => filter.Key.Label, LabelComparer)
-                .ToDictionary(
-                    filter => filter.Key.Id,
-                    filter =>
-                    {
-                        return new FilterReplacementViewModel(
-                            id: filter.Key.Id,
-                            name: filter.Key.Name,
-                            label: filter.Key.Label,
-                            groups: filter
-                                .GroupBy(filterItem => filterItem.FilterGroup)
-                                .OrderBy(group => group.Key.Label, LabelComparer)
-                                .ToDictionary(
-                                    group => group.Key.Id,
-                                    group => ValidateFilterGroupForReplacement(
-                                        new FilterGroup
-                                        {
-                                            Id = group.Key.Id,
-                                            Label = group.Key.Label,
-                                            FilterItems = group.Key.FilterItems.Intersect(filter).ToList()
-                                        },
-                                        replacementSubjectMeta)
-                                )
-                        );
-                    }
-                );
-        }
-
-        private Dictionary<Guid, IndicatorGroupReplacementViewModel> ValidateIndicatorGroupsForDataBlock(
-            DataBlock dataBlock,
-            ReplacementSubjectMeta replacementSubjectMeta)
-        {
-            return _statisticsDbContext.Indicator
-                .Include(indicator => indicator.IndicatorGroup)
-                .Where(indicator => dataBlock.Query.Indicators.Contains(indicator.Id))
-                .ToList()
-                .GroupBy(indicator => indicator.IndicatorGroup)
-                .OrderBy(group => group.Key.Label, LabelComparer)
-                .ToDictionary(
-                    group => group.Key.Id,
-                    group => new IndicatorGroupReplacementViewModel(
-                        id: group.Key.Id,
-                        label: group.Key.Label,
-                        indicators: group
-                            .Select(indicator => ValidateIndicatorForReplacement(indicator, replacementSubjectMeta))
-                            .OrderBy(indicator => indicator.Label, LabelComparer)
-                    )
-                );
-        }
-
-        private Dictionary<string, LocationReplacementViewModel> ValidateLocationsForDataBlock(
-            DataBlock dataBlock,
-            ReplacementSubjectMeta replacementSubjectMeta)
-        {
-            return _statisticsDbContext.Location
-                .AsNoTracking()
-                .Where(location => dataBlock.Query.LocationIds.Contains(location.Id))
-                .ToList()
-                .GroupBy(location => location.GeographicLevel)
-                .ToDictionary(group => group.Key.ToString(),
-                    group =>
-                        new LocationReplacementViewModel(
-                            label: group.Key.ToString(),
-                            locationAttributes: group
-                                .Select(location =>
-                                    ValidateLocationForReplacement(
-                                        location: location,
-                                        level: group.Key,
-                                        replacementSubjectMeta: replacementSubjectMeta))
-                                .OrderBy(location => location.Label, LabelComparer)
-                        )
-                );
-        }
-
-        private static TimePeriodRangeReplacementViewModel ValidateTimePeriodsForDataBlock(
-            DataBlock dataBlock,
-            ReplacementSubjectMeta replacementSubjectMeta)
-        {
-            return new TimePeriodRangeReplacementViewModel(
-                start: ValidateTimePeriodForReplacement(
-                    dataBlock.Query.TimePeriod.StartYear,
-                    dataBlock.Query.TimePeriod.StartCode,
-                    replacementSubjectMeta
-                ),
-                end: ValidateTimePeriodForReplacement(
-                    dataBlock.Query.TimePeriod.EndYear,
-                    dataBlock.Query.TimePeriod.EndCode,
-                    replacementSubjectMeta
-                )
-            );
-        }
-
-        private static TimePeriodReplacementViewModel ValidateTimePeriodForReplacement(
-            int year,
-            TimeIdentifier code,
-            ReplacementSubjectMeta replacementSubjectMeta)
-        {
-            return new TimePeriodReplacementViewModel(
-                year: year,
-                code: code,
-                valid: replacementSubjectMeta.TimePeriods.Contains((year, code))
-            );
-        }
-
-        private static FilterGroupReplacementViewModel ValidateFilterGroupForReplacement(
-            FilterGroup filterGroup,
-            ReplacementSubjectMeta replacementSubjectMeta)
-        {
-            return new FilterGroupReplacementViewModel(
+    private static List<FootnoteFilterGroupReplacementViewModel> ValidateFilterGroupsForFootnote(Footnote footnote,
+        ReplacementSubjectMeta replacementSubjectMeta)
+    {
+        return footnote.FilterGroups
+            .Select(filterGroupFootnote => filterGroupFootnote.FilterGroup)
+            .OrderBy(filterGroup => filterGroup.Label, LabelComparer)
+            .Select(filterGroup => new FootnoteFilterGroupReplacementViewModel(
                 id: filterGroup.Id,
                 label: filterGroup.Label,
-                filters: filterGroup.FilterItems
-                    .Select(item => ValidateFilterItemForReplacement(item, replacementSubjectMeta))
-                    .OrderBy(item => item.Label, LabelComparer)
-            );
-        }
+                filterId: filterGroup.FilterId,
+                filterLabel: filterGroup.Filter.Label,
+                target: FindReplacementFilterGroup(
+                    replacementSubjectMeta,
+                    filterGroup.Filter.Name,
+                    filterGroup.Label
+                )?.Id
+            ))
+            .ToList();
+    }
 
-        private static FilterItemReplacementViewModel ValidateFilterItemForReplacement(
-            FilterItem filterItem,
-            ReplacementSubjectMeta replacementSubjectMeta)
-        {
-            return new FilterItemReplacementViewModel(
+    private static List<FootnoteFilterItemReplacementViewModel> ValidateFilterItemsForFootnote(Footnote footnote,
+        ReplacementSubjectMeta replacementSubjectMeta)
+    {
+        return footnote.FilterItems
+            .Select(filterItemFootnote => filterItemFootnote.FilterItem)
+            .OrderBy(filterItem => filterItem.Label, LabelComparer)
+            .Select(filterItem => new FootnoteFilterItemReplacementViewModel(
                 id: filterItem.Id,
                 label: filterItem.Label,
+                filterId: filterItem.FilterGroup.FilterId,
+                filterLabel: filterItem.FilterGroup.Filter.Label,
+                filterGroupId: filterItem.FilterGroupId,
+                filterGroupLabel: filterItem.FilterGroup.Label,
                 target: FindReplacementFilterItem(
                     replacementSubjectMeta,
                     filterItem.FilterGroup.Filter.Name,
                     filterItem.FilterGroup.Label,
-                    filterItem.Label)?.Id
+                    filterItem.Label
+                )?.Id
+            ))
+            .ToList();
+    }
+
+    private static Dictionary<Guid, IndicatorGroupReplacementViewModel> ValidateIndicatorGroupsForFootnote(
+        Footnote footnote,
+        ReplacementSubjectMeta replacementSubjectMeta)
+    {
+        return footnote.Indicators
+            .Select(indicatorFootnote => indicatorFootnote.Indicator)
+            .GroupBy(indicatorFootnote => indicatorFootnote.IndicatorGroup)
+            .OrderBy(group => group.Key.Label, LabelComparer)
+            .ToDictionary(
+                group => group.Key.Id,
+                group => new IndicatorGroupReplacementViewModel(
+                    id: group.Key.Id,
+                    label: group.Key.Label,
+                    indicators: group.Select(indicator =>
+                        ValidateIndicatorForReplacement(indicator, replacementSubjectMeta))
+                )
             );
-        }
+    }
 
-        private static IndicatorReplacementViewModel ValidateIndicatorForReplacement(
-            Indicator indicator,
-            ReplacementSubjectMeta replacementSubjectMeta)
-        {
-            return new IndicatorReplacementViewModel(
-                id: indicator.Id,
-                name: indicator.Name,
-                label: indicator.Label,
-                target: FindReplacementIndicator(replacementSubjectMeta, indicator.Name)
+    private List<FilterReplacementViewModel> FindNewlyIntroducedFiltersForDataBlock(
+        DataBlock dataBlock,
+        ReplacementSubjectMeta replacementSubjectMeta)
+    {
+        var existingFilterItemIds = dataBlock
+            .Query
+            .Filters;
+
+        var existingFilterNames = _statisticsDbContext
+            .FilterItem
+            .AsQueryable()
+            .Where(fi => existingFilterItemIds.Contains(fi.Id))
+            .Select(fi => fi.FilterGroup.Filter)
+            .Select(f => f.Name)
+            .Distinct()
+            .ToList();
+
+        return replacementSubjectMeta
+            .Filters
+            .Select(d => d.Value)
+            .ToList()
+            .Where(f => !existingFilterNames.Contains(f.Name))
+            .Select(CreateNewlyIntroducedFilterReplacementViewModel)
+            .ToList();
+    }
+
+    private static FilterReplacementViewModel CreateNewlyIntroducedFilterReplacementViewModel(Filter filter)
+    {
+        var filterGroupReplacementViewModels = filter
+            .FilterGroups
+            .Select(fg => new FilterGroupReplacementViewModel(fg.Id, fg.Label, fg
+                .FilterItems
+                .Select(fi => new FilterItemReplacementViewModel(fi.Id, fi.Label, null)))
+            )
+            .ToDictionary(f => f.Id);
+
+        return new FilterReplacementViewModel(filter.Id, filter.Label, filter.Name,
+            filterGroupReplacementViewModels);
+    }
+
+    private Dictionary<Guid, FilterReplacementViewModel> ValidateFiltersForDataBlock(
+        DataBlock dataBlock,
+        ReplacementSubjectMeta replacementSubjectMeta)
+    {
+        return _statisticsDbContext.FilterItem
+            .AsQueryable()
+            .Where(filterItem => dataBlock.Query.Filters.Contains(filterItem.Id))
+            .Include(filterItem => filterItem.FilterGroup)
+            .ThenInclude(filterGroup => filterGroup.Filter)
+            .ToList()
+            .GroupBy(filterItem => filterItem.FilterGroup.Filter)
+            .OrderBy(filter => filter.Key.Label, LabelComparer)
+            .ToDictionary(
+                filter => filter.Key.Id,
+                filter =>
+                {
+                    return new FilterReplacementViewModel(
+                        id: filter.Key.Id,
+                        name: filter.Key.Name,
+                        label: filter.Key.Label,
+                        groups: filter
+                            .GroupBy(filterItem => filterItem.FilterGroup)
+                            .OrderBy(group => group.Key.Label, LabelComparer)
+                            .ToDictionary(
+                                group => group.Key.Id,
+                                group => ValidateFilterGroupForReplacement(
+                                    new FilterGroup
+                                    {
+                                        Id = group.Key.Id,
+                                        Label = group.Key.Label,
+                                        FilterItems = group.Key.FilterItems.Intersect(filter).ToList()
+                                    },
+                                    replacementSubjectMeta)
+                            )
+                    );
+                }
             );
-        }
+    }
 
-        private static LocationAttributeReplacementViewModel ValidateLocationForReplacement(
-            Location location,
-            GeographicLevel level,
-            ReplacementSubjectMeta replacementSubjectMeta)
-        {
-            var locationAttribute = location.ToLocationAttribute();
-            var code = locationAttribute.GetCodeOrFallback();
-
-            // If the replacement subject contains the same location by id then use it,
-            // otherwise try to find a location with the same code
-            var target = replacementSubjectMeta.Locations
-                             .SingleOrDefault(l => l.Id == location.Id)?.Id ??
-                         FindReplacementLocation(replacementSubjectMeta, level, code);
-
-            return new LocationAttributeReplacementViewModel(
-                id: location.Id,
-                code: code,
-                label: locationAttribute.Name ?? string.Empty,
-                target: target
+    private Dictionary<Guid, IndicatorGroupReplacementViewModel> ValidateIndicatorGroupsForDataBlock(
+        DataBlock dataBlock,
+        ReplacementSubjectMeta replacementSubjectMeta)
+    {
+        return _statisticsDbContext.Indicator
+            .Include(indicator => indicator.IndicatorGroup)
+            .Where(indicator => dataBlock.Query.Indicators.Contains(indicator.Id))
+            .ToList()
+            .GroupBy(indicator => indicator.IndicatorGroup)
+            .OrderBy(group => group.Key.Label, LabelComparer)
+            .ToDictionary(
+                group => group.Key.Id,
+                group => new IndicatorGroupReplacementViewModel(
+                    id: group.Key.Id,
+                    label: group.Key.Label,
+                    indicators: group
+                        .Select(indicator => ValidateIndicatorForReplacement(indicator, replacementSubjectMeta))
+                        .OrderBy(indicator => indicator.Label, LabelComparer)
+                )
             );
-        }
+    }
 
-        private static Filter? FindReplacementFilter(ReplacementSubjectMeta replacementSubjectMeta,
-            string filterName)
-        {
-            return replacementSubjectMeta.Filters.GetValueOrDefault(filterName);
-        }
+    private Dictionary<string, LocationReplacementViewModel> ValidateLocationsForDataBlock(
+        DataBlock dataBlock,
+        ReplacementSubjectMeta replacementSubjectMeta)
+    {
+        return _statisticsDbContext.Location
+            .AsNoTracking()
+            .Where(location => dataBlock.Query.LocationIds.Contains(location.Id))
+            .ToList()
+            .GroupBy(location => location.GeographicLevel)
+            .ToDictionary(group => group.Key.ToString(),
+                group =>
+                    new LocationReplacementViewModel(
+                        label: group.Key.ToString(),
+                        locationAttributes: group
+                            .Select(location =>
+                                ValidateLocationForReplacement(
+                                    location: location,
+                                    level: group.Key,
+                                    replacementSubjectMeta: replacementSubjectMeta))
+                            .OrderBy(location => location.Label, LabelComparer)
+                    )
+            );
+    }
 
-        private static FilterGroup? FindReplacementFilterGroup(ReplacementSubjectMeta replacementSubjectMeta,
-            string filterName,
-            string filterGroupLabel)
-        {
-            var replacementFilter = FindReplacementFilter(replacementSubjectMeta, filterName);
-            return replacementFilter?.FilterGroups.SingleOrDefault(filterGroup =>
-                filterGroup.Label == filterGroupLabel);
-        }
+    private static TimePeriodRangeReplacementViewModel ValidateTimePeriodsForDataBlock(
+        DataBlock dataBlock,
+        ReplacementSubjectMeta replacementSubjectMeta)
+    {
+        return new TimePeriodRangeReplacementViewModel(
+            start: ValidateTimePeriodForReplacement(
+                dataBlock.Query.TimePeriod.StartYear,
+                dataBlock.Query.TimePeriod.StartCode,
+                replacementSubjectMeta
+            ),
+            end: ValidateTimePeriodForReplacement(
+                dataBlock.Query.TimePeriod.EndYear,
+                dataBlock.Query.TimePeriod.EndCode,
+                replacementSubjectMeta
+            )
+        );
+    }
 
-        private static FilterItem? FindReplacementFilterItem(ReplacementSubjectMeta replacementSubjectMeta,
-            string filterName,
-            string filterGroupLabel,
-            string filterItemLabel)
-        {
-            var replacementFilterGroup =
-                FindReplacementFilterGroup(replacementSubjectMeta, filterName, filterGroupLabel);
-            return replacementFilterGroup?.FilterItems.SingleOrDefault(filterItem =>
-                filterItem.Label == filterItemLabel);
-        }
+    private static TimePeriodReplacementViewModel ValidateTimePeriodForReplacement(
+        int year,
+        TimeIdentifier code,
+        ReplacementSubjectMeta replacementSubjectMeta)
+    {
+        return new TimePeriodReplacementViewModel(
+            year: year,
+            code: code,
+            valid: replacementSubjectMeta.TimePeriods.Contains((year, code))
+        );
+    }
 
-        private static Guid? FindReplacementIndicator(ReplacementSubjectMeta replacementSubjectMeta,
-            string indicatorName)
-        {
-            return replacementSubjectMeta.Indicators.GetValueOrDefault(indicatorName)?.Id;
-        }
+    private static FilterGroupReplacementViewModel ValidateFilterGroupForReplacement(
+        FilterGroup filterGroup,
+        ReplacementSubjectMeta replacementSubjectMeta)
+    {
+        return new FilterGroupReplacementViewModel(
+            id: filterGroup.Id,
+            label: filterGroup.Label,
+            filters: filterGroup.FilterItems
+                .Select(item => ValidateFilterItemForReplacement(item, replacementSubjectMeta))
+                .OrderBy(item => item.Label, LabelComparer)
+        );
+    }
 
-        private static Guid? FindReplacementLocation(ReplacementSubjectMeta replacementSubjectMeta,
-            GeographicLevel level,
-            string locationCode)
-        {
-            var candidateReplacements = replacementSubjectMeta.Locations
-                .Where(location =>
-                    // Filter by level as the other locations are unlikely to have matching codes
-                    // and even if they did we shouldn't target a replacement location with a different level
-                    location.GeographicLevel == level &&
-                    location.ToLocationAttribute().GetCodeOrFallback() == locationCode)
-                .ToList();
+    private static FilterItemReplacementViewModel ValidateFilterItemForReplacement(
+        FilterItem filterItem,
+        ReplacementSubjectMeta replacementSubjectMeta)
+    {
+        return new FilterItemReplacementViewModel(
+            id: filterItem.Id,
+            label: filterItem.Label,
+            target: FindReplacementFilterItem(
+                replacementSubjectMeta,
+                filterItem.FilterGroup.Filter.Name,
+                filterItem.FilterGroup.Label,
+                filterItem.Label)?.Id
+        );
+    }
 
-            // Only return a location if there's exactly one.
-            // We could try and reduce the chance of there being multiple by matching on name as well as code,
-            // but this would restrict replacements from correcting location names.
-            return candidateReplacements.Count == 1 ? candidateReplacements[0].Id : null;
-        }
+    private static IndicatorReplacementViewModel ValidateIndicatorForReplacement(
+        Indicator indicator,
+        ReplacementSubjectMeta replacementSubjectMeta)
+    {
+        return new IndicatorReplacementViewModel(
+            id: indicator.Id,
+            name: indicator.Name,
+            label: indicator.Label,
+            target: FindReplacementIndicator(replacementSubjectMeta, indicator.Name)
+        );
+    }
 
-        private async Task ReplaceLinksForDataBlock(DataBlockReplacementPlanViewModel replacementPlan,
-            Guid replacementSubjectId)
-        {
-            var dataBlock = await _contentDbContext.ContentBlocks
-                .AsQueryable()
-                .OfType<DataBlock>()
-                .SingleAsync(block => block.Id == replacementPlan.Id);
+    private static LocationAttributeReplacementViewModel ValidateLocationForReplacement(
+        Location location,
+        GeographicLevel level,
+        ReplacementSubjectMeta replacementSubjectMeta)
+    {
+        var locationAttribute = location.ToLocationAttribute();
+        var code = locationAttribute.GetCodeOrFallback();
 
-            _contentDbContext.Update(dataBlock);
+        // If the replacement subject contains the same location by id then use it,
+        // otherwise try to find a location with the same code
+        var target = replacementSubjectMeta.Locations
+                         .SingleOrDefault(l => l.Id == location.Id)?.Id ??
+                     FindReplacementLocation(replacementSubjectMeta, level, code);
 
-            dataBlock.Query.SubjectId = replacementSubjectId;
-            ReplaceDataBlockQueryFilters(replacementPlan, dataBlock);
-            ReplaceDataBlockQueryIndicators(replacementPlan, dataBlock);
-            ReplaceDataBlockQueryLocations(replacementPlan, dataBlock);
+        return new LocationAttributeReplacementViewModel(
+            id: location.Id,
+            code: code,
+            label: locationAttribute.Name ?? string.Empty,
+            target: target
+        );
+    }
 
-            var filterItemTargets = replacementPlan.Filters
-                .SelectMany(filter =>
-                    filter.Value.Groups.SelectMany(group => group.Value.Filters))
-                .ToDictionary(ReplacementPlanOriginalId, ReplacementPlanTargetId);
-            var indicatorTargets = replacementPlan.IndicatorGroups
-                .SelectMany(group => group.Value.Indicators)
-                .ToDictionary(ReplacementPlanOriginalId, ReplacementPlanTargetId);
-            var locationTargets = replacementPlan.Locations
-                .Values
-                .SelectMany(group => group.LocationAttributes)
-                .ToDictionary(ReplacementPlanOriginalId, ReplacementPlanTargetId);
+    private static Filter? FindReplacementFilter(ReplacementSubjectMeta replacementSubjectMeta,
+        string filterName)
+    {
+        return replacementSubjectMeta.Filters.GetValueOrDefault(filterName);
+    }
 
-            ReplaceDataBlockTableHeaders(
-                filterItemTargets: filterItemTargets,
-                indicatorTargets: indicatorTargets,
-                locationTargets: locationTargets,
-                dataBlock);
-            ReplaceDataBlockCharts(
-                filterItemTargets: filterItemTargets,
-                indicatorTargets: indicatorTargets,
-                locationTargets: locationTargets,
-                dataBlock);
-        }
+    private static FilterGroup? FindReplacementFilterGroup(ReplacementSubjectMeta replacementSubjectMeta,
+        string filterName,
+        string filterGroupLabel)
+    {
+        var replacementFilter = FindReplacementFilter(replacementSubjectMeta, filterName);
+        return replacementFilter?.FilterGroups.SingleOrDefault(filterGroup =>
+            filterGroup.Label == filterGroupLabel);
+    }
 
-        private static void ReplaceDataBlockQueryFilters(DataBlockReplacementPlanViewModel replacementPlan,
-            DataBlock dataBlock)
-        {
-            var filterItems = dataBlock.Query.Filters.ToList();
+    private static FilterItem? FindReplacementFilterItem(ReplacementSubjectMeta replacementSubjectMeta,
+        string filterName,
+        string filterGroupLabel,
+        string filterItemLabel)
+    {
+        var replacementFilterGroup =
+            FindReplacementFilterGroup(replacementSubjectMeta, filterName, filterGroupLabel);
+        return replacementFilterGroup?.FilterItems.SingleOrDefault(filterItem =>
+            filterItem.Label == filterItemLabel);
+    }
 
-            replacementPlan.Filters
-                .SelectMany(filter =>
-                    filter.Value.Groups.SelectMany(group => group.Value.Filters))
-                .ToList()
-                .ForEach(plan =>
-                {
-                    filterItems.Remove(plan.Id);
-                    filterItems.Add(plan.TargetValue);
-                });
+    private static Guid? FindReplacementIndicator(ReplacementSubjectMeta replacementSubjectMeta,
+        string indicatorName)
+    {
+        return replacementSubjectMeta.Indicators.GetValueOrDefault(indicatorName)?.Id;
+    }
 
-            dataBlock.Query.Filters = filterItems;
-        }
+    private static Guid? FindReplacementLocation(ReplacementSubjectMeta replacementSubjectMeta,
+        GeographicLevel level,
+        string locationCode)
+    {
+        var candidateReplacements = replacementSubjectMeta.Locations
+            .Where(location =>
+                // Filter by level as the other locations are unlikely to have matching codes
+                // and even if they did we shouldn't target a replacement location with a different level
+                location.GeographicLevel == level &&
+                location.ToLocationAttribute().GetCodeOrFallback() == locationCode)
+            .ToList();
 
-        private static void ReplaceDataBlockQueryIndicators(DataBlockReplacementPlanViewModel replacementPlan,
-            DataBlock dataBlock)
-        {
-            var indicators = dataBlock.Query.Indicators.ToList();
+        // Only return a location if there's exactly one.
+        // We could try and reduce the chance of there being multiple by matching on name as well as code,
+        // but this would restrict replacements from correcting location names.
+        return candidateReplacements.Count == 1 ? candidateReplacements[0].Id : null;
+    }
 
-            replacementPlan.IndicatorGroups
-                .SelectMany(group => group.Value.Indicators)
-                .ToList()
-                .ForEach(plan =>
-                {
-                    indicators.Remove(plan.Id);
-                    indicators.Add(plan.TargetValue);
-                });
+    private async Task ReplaceLinksForDataBlock(DataBlockReplacementPlanViewModel replacementPlan,
+        Guid replacementSubjectId)
+    {
+        var dataBlock = await _contentDbContext.ContentBlocks
+            .AsQueryable()
+            .OfType<DataBlock>()
+            .SingleAsync(block => block.Id == replacementPlan.Id);
 
-            dataBlock.Query.Indicators = indicators;
-        }
+        _contentDbContext.Update(dataBlock);
 
-        private static void ReplaceDataBlockQueryLocations(DataBlockReplacementPlanViewModel replacementPlan,
-            DataBlock dataBlock)
-        {
-            var locations = dataBlock.Query.LocationIds.ToList();
+        dataBlock.Query.SubjectId = replacementSubjectId;
+        ReplaceDataBlockQueryFilters(replacementPlan, dataBlock);
+        ReplaceDataBlockQueryIndicators(replacementPlan, dataBlock);
+        ReplaceDataBlockQueryLocations(replacementPlan, dataBlock);
 
-            replacementPlan.Locations
-                .Values
-                .SelectMany(group => group.LocationAttributes)
-                .ToList()
-                .ForEach(plan =>
-                {
-                    locations.Remove(plan.Id);
-                    locations.Add(plan.TargetValue);
-                });
+        var filterItemTargets = replacementPlan.Filters
+            .SelectMany(filter =>
+                filter.Value.Groups.SelectMany(group => group.Value.Filters))
+            .ToDictionary(ReplacementPlanOriginalId, ReplacementPlanTargetId);
+        var indicatorTargets = replacementPlan.IndicatorGroups
+            .SelectMany(group => group.Value.Indicators)
+            .ToDictionary(ReplacementPlanOriginalId, ReplacementPlanTargetId);
+        var locationTargets = replacementPlan.Locations
+            .Values
+            .SelectMany(group => group.LocationAttributes)
+            .ToDictionary(ReplacementPlanOriginalId, ReplacementPlanTargetId);
 
-            dataBlock.Query.LocationIds = locations;
-        }
+        ReplaceDataBlockTableHeaders(
+            filterItemTargets: filterItemTargets,
+            indicatorTargets: indicatorTargets,
+            locationTargets: locationTargets,
+            dataBlock);
+        ReplaceDataBlockCharts(
+            filterItemTargets: filterItemTargets,
+            indicatorTargets: indicatorTargets,
+            locationTargets: locationTargets,
+            dataBlock);
+    }
 
-        private static void ReplaceDataBlockTableHeaders(
-            IReadOnlyDictionary<Guid, Guid> filterItemTargets,
-            IReadOnlyDictionary<Guid, Guid> indicatorTargets,
-            IReadOnlyDictionary<Guid, Guid> locationTargets,
-            DataBlock dataBlock)
-        {
-            var tableHeaders = dataBlock.Table.TableHeaders;
+    private static void ReplaceDataBlockQueryFilters(DataBlockReplacementPlanViewModel replacementPlan,
+        DataBlock dataBlock)
+    {
+        var filterItems = dataBlock.Query.Filters.ToList();
 
-            // Replace Columns
-            ReplaceDataBlockTableHeaders(
-                tableHeaders.Columns.FilterByType(TableHeaderType.Filter), dataBlock, filterItemTargets);
-            ReplaceDataBlockTableHeaders(
-                tableHeaders.Columns.FilterByType(TableHeaderType.Indicator), dataBlock, indicatorTargets);
-            ReplaceDataBlockTableHeaders(
-                tableHeaders.Columns.FilterByType(TableHeaderType.Location), dataBlock, locationTargets);
-
-            // Replace Rows
-            ReplaceDataBlockTableHeaders(
-                tableHeaders.Rows.FilterByType(TableHeaderType.Filter), dataBlock, filterItemTargets);
-            ReplaceDataBlockTableHeaders(
-                tableHeaders.Rows.FilterByType(TableHeaderType.Indicator), dataBlock, indicatorTargets);
-            ReplaceDataBlockTableHeaders(
-                tableHeaders.Rows.FilterByType(TableHeaderType.Location), dataBlock, locationTargets);
-
-            // Replace Column Groups
-            tableHeaders.ColumnGroups.ForEach(group =>
+        replacementPlan.Filters
+            .SelectMany(filter =>
+                filter.Value.Groups.SelectMany(group => group.Value.Filters))
+            .ToList()
+            .ForEach(plan =>
             {
-                ReplaceDataBlockTableHeaders(
-                    group.FilterByType(TableHeaderType.Filter), dataBlock, filterItemTargets);
-
-                ReplaceDataBlockTableHeaders(
-                    group.FilterByType(TableHeaderType.Indicator), dataBlock, indicatorTargets);
-
-                ReplaceDataBlockTableHeaders(
-                    group.FilterByType(TableHeaderType.Location), dataBlock, locationTargets);
+                filterItems.Remove(plan.Id);
+                filterItems.Add(plan.TargetValue);
             });
 
-            // Replace Row Groups
-            tableHeaders.RowGroups.ForEach(group =>
+        dataBlock.Query.Filters = filterItems;
+    }
+
+    private static void ReplaceDataBlockQueryIndicators(DataBlockReplacementPlanViewModel replacementPlan,
+        DataBlock dataBlock)
+    {
+        var indicators = dataBlock.Query.Indicators.ToList();
+
+        replacementPlan.IndicatorGroups
+            .SelectMany(group => group.Value.Indicators)
+            .ToList()
+            .ForEach(plan =>
             {
-                ReplaceDataBlockTableHeaders(
-                    group.FilterByType(TableHeaderType.Filter), dataBlock, filterItemTargets);
-
-                ReplaceDataBlockTableHeaders(
-                    group.FilterByType(TableHeaderType.Indicator), dataBlock, indicatorTargets);
-
-                ReplaceDataBlockTableHeaders(
-                    group.FilterByType(TableHeaderType.Location), dataBlock, locationTargets);
+                indicators.Remove(plan.Id);
+                indicators.Add(plan.TargetValue);
             });
-        }
 
-        private static void ReplaceDataBlockTableHeaders(
-            List<TableHeader> tableHeaders,
-            DataBlock dataBlock,
-            IReadOnlyDictionary<Guid, Guid> targets)
-        {
-            foreach (var tableHeader in tableHeaders)
+        dataBlock.Query.Indicators = indicators;
+    }
+
+    private static void ReplaceDataBlockQueryLocations(DataBlockReplacementPlanViewModel replacementPlan,
+        DataBlock dataBlock)
+    {
+        var locations = dataBlock.Query.LocationIds.ToList();
+
+        replacementPlan.Locations
+            .Values
+            .SelectMany(group => group.LocationAttributes)
+            .ToList()
+            .ForEach(plan =>
             {
-                if (Guid.TryParse(tableHeader.Value, out var idAsGuid))
+                locations.Remove(plan.Id);
+                locations.Add(plan.TargetValue);
+            });
+
+        dataBlock.Query.LocationIds = locations;
+    }
+
+    private static void ReplaceDataBlockTableHeaders(
+        IReadOnlyDictionary<Guid, Guid> filterItemTargets,
+        IReadOnlyDictionary<Guid, Guid> indicatorTargets,
+        IReadOnlyDictionary<Guid, Guid> locationTargets,
+        DataBlock dataBlock)
+    {
+        var tableHeaders = dataBlock.Table.TableHeaders;
+
+        // Replace Columns
+        ReplaceDataBlockTableHeaders(
+            tableHeaders.Columns.FilterByType(TableHeaderType.Filter), dataBlock, filterItemTargets);
+        ReplaceDataBlockTableHeaders(
+            tableHeaders.Columns.FilterByType(TableHeaderType.Indicator), dataBlock, indicatorTargets);
+        ReplaceDataBlockTableHeaders(
+            tableHeaders.Columns.FilterByType(TableHeaderType.Location), dataBlock, locationTargets);
+
+        // Replace Rows
+        ReplaceDataBlockTableHeaders(
+            tableHeaders.Rows.FilterByType(TableHeaderType.Filter), dataBlock, filterItemTargets);
+        ReplaceDataBlockTableHeaders(
+            tableHeaders.Rows.FilterByType(TableHeaderType.Indicator), dataBlock, indicatorTargets);
+        ReplaceDataBlockTableHeaders(
+            tableHeaders.Rows.FilterByType(TableHeaderType.Location), dataBlock, locationTargets);
+
+        // Replace Column Groups
+        tableHeaders.ColumnGroups.ForEach(group =>
+        {
+            ReplaceDataBlockTableHeaders(
+                group.FilterByType(TableHeaderType.Filter), dataBlock, filterItemTargets);
+
+            ReplaceDataBlockTableHeaders(
+                group.FilterByType(TableHeaderType.Indicator), dataBlock, indicatorTargets);
+
+            ReplaceDataBlockTableHeaders(
+                group.FilterByType(TableHeaderType.Location), dataBlock, locationTargets);
+        });
+
+        // Replace Row Groups
+        tableHeaders.RowGroups.ForEach(group =>
+        {
+            ReplaceDataBlockTableHeaders(
+                group.FilterByType(TableHeaderType.Filter), dataBlock, filterItemTargets);
+
+            ReplaceDataBlockTableHeaders(
+                group.FilterByType(TableHeaderType.Indicator), dataBlock, indicatorTargets);
+
+            ReplaceDataBlockTableHeaders(
+                group.FilterByType(TableHeaderType.Location), dataBlock, locationTargets);
+        });
+    }
+
+    private static void ReplaceDataBlockTableHeaders(
+        List<TableHeader> tableHeaders,
+        DataBlock dataBlock,
+        IReadOnlyDictionary<Guid, Guid> targets)
+    {
+        foreach (var tableHeader in tableHeaders)
+        {
+            if (Guid.TryParse(tableHeader.Value, out var idAsGuid))
+            {
+                if (targets.TryGetValue(idAsGuid, out var targetId))
                 {
-                    if (targets.TryGetValue(idAsGuid, out var targetId))
-                    {
-                        tableHeader.Value = targetId.ToString();
-                    }
-                    else
-                    {
-                        throw new InvalidOperationException(
-                            $"Expected target replacement value for dataBlock {dataBlock.Id} {tableHeader.Type} table header value: {idAsGuid}");
-                    }
+                    tableHeader.Value = targetId.ToString();
                 }
                 else
                 {
                     throw new InvalidOperationException(
-                        $"Expected Guid for dataBlock {dataBlock.Id} {tableHeader.Type} table header value but found: {tableHeader.Value}");
+                        $"Expected target replacement value for dataBlock {dataBlock.Id} {tableHeader.Type} table header value: {idAsGuid}");
                 }
             }
+            else
+            {
+                throw new InvalidOperationException(
+                    $"Expected Guid for dataBlock {dataBlock.Id} {tableHeader.Type} table header value but found: {tableHeader.Value}");
+            }
         }
+    }
 
-        private static void ReplaceDataBlockCharts(
-            IReadOnlyDictionary<Guid, Guid> filterItemTargets,
-            IReadOnlyDictionary<Guid, Guid> indicatorTargets,
-            IReadOnlyDictionary<Guid, Guid> locationTargets,
-            DataBlock dataBlock)
-        {
-            dataBlock.Charts.ForEach(
-                chart =>
+    private static void ReplaceDataBlockCharts(
+        IReadOnlyDictionary<Guid, Guid> filterItemTargets,
+        IReadOnlyDictionary<Guid, Guid> indicatorTargets,
+        IReadOnlyDictionary<Guid, Guid> locationTargets,
+        DataBlock dataBlock)
+    {
+        dataBlock.Charts.ForEach(
+            chart =>
+            {
+                ReplaceChartMajorAxisDataSets(
+                    filterItemTargets: filterItemTargets,
+                    indicatorTargets: indicatorTargets,
+                    locationTargets: locationTargets,
+                    dataBlock,
+                    chart);
+                ReplaceChartLegendDataSets(
+                    filterItemTargets: filterItemTargets,
+                    indicatorTargets: indicatorTargets,
+                    locationTargets: locationTargets,
+                    dataBlock,
+                    chart);
+                if (chart is MapChart mapChart)
                 {
-                    ReplaceChartMajorAxisDataSets(
+                    ReplaceMapChartDataSetConfigs(
                         filterItemTargets: filterItemTargets,
                         indicatorTargets: indicatorTargets,
                         locationTargets: locationTargets,
                         dataBlock,
-                        chart);
-                    ReplaceChartLegendDataSets(
-                        filterItemTargets: filterItemTargets,
-                        indicatorTargets: indicatorTargets,
-                        locationTargets: locationTargets,
-                        dataBlock,
-                        chart);
-                    if (chart is MapChart mapChart)
+                        mapChart);
+                }
+            }
+        );
+    }
+
+    private static void ReplaceMapChartDataSetConfigs(
+        IReadOnlyDictionary<Guid, Guid> filterItemTargets,
+        IReadOnlyDictionary<Guid, Guid> indicatorTargets,
+        IReadOnlyDictionary<Guid, Guid> locationTargets,
+        DataBlock dataBlock,
+        MapChart mapChart)
+    {
+        mapChart.Map.DataSetConfigs.ForEach(
+            dataSetConfig =>
+            {
+                var dataSet = dataSetConfig.DataSet;
+
+                dataSet.Filters = dataSet.Filters.Select(
+                    filter =>
                     {
-                        ReplaceMapChartDataSetConfigs(
-                            filterItemTargets: filterItemTargets,
-                            indicatorTargets: indicatorTargets,
-                            locationTargets: locationTargets,
-                            dataBlock,
-                            mapChart);
+                        if (filterItemTargets.TryGetValue(filter, out var targetFilterId))
+                        {
+                            return targetFilterId;
+                        }
+
+                        throw new InvalidOperationException(
+                            $"Expected target replacement value for dataBlock {dataBlock.Id} chart data set config filter: {filter}"
+                        );
+                    }
+                ).ToList();
+
+                if (dataSet.Indicator.HasValue
+                    && indicatorTargets.TryGetValue(dataSet.Indicator.Value, out var targetIndicatorId))
+                {
+                    dataSet.Indicator = targetIndicatorId;
+                }
+                else
+                {
+                    throw new InvalidOperationException(
+                        $"Expected target replacement value for dataBlock {dataBlock.Id} chart data set config indicator: {dataSet.Indicator}"
+                    );
+                }
+
+                if (dataSet.Location != null)
+                {
+                    if (locationTargets.TryGetValue(dataSet.Location.Value, out var targetLocationId))
+                    {
+                        dataSet.Location.Value = targetLocationId;
+                    }
+                    else
+                    {
+                        throw new InvalidOperationException(
+                            $"Expected target replacement value for dataBlock {dataBlock.Id} chart data set config location: {dataSet.Location.Value}"
+                        );
                     }
                 }
-            );
-        }
+            });
+    }
 
-        private static void ReplaceMapChartDataSetConfigs(
-            IReadOnlyDictionary<Guid, Guid> filterItemTargets,
-            IReadOnlyDictionary<Guid, Guid> indicatorTargets,
-            IReadOnlyDictionary<Guid, Guid> locationTargets,
-            DataBlock dataBlock,
-            MapChart mapChart)
-        {
-            mapChart.Map.DataSetConfigs.ForEach(
-                dataSetConfig =>
-                {
-                    var dataSet = dataSetConfig.DataSet;
+    private static void ReplaceChartLegendDataSets(
+        IReadOnlyDictionary<Guid, Guid> filterItemTargets,
+        IReadOnlyDictionary<Guid, Guid> indicatorTargets,
+        IReadOnlyDictionary<Guid, Guid> locationTargets,
+        DataBlock dataBlock,
+        IChart chart)
+    {
+        chart.Legend?.Items.ForEach(
+            item =>
+            {
+                var dataSet = item.DataSet;
 
-                    dataSet.Filters = dataSet.Filters.Select(
-                        filter =>
+                dataSet.Filters = dataSet.Filters.Select(
+                    filter =>
+                    {
+                        if (filterItemTargets.TryGetValue(filter, out var targetFilterId))
                         {
-                            if (filterItemTargets.TryGetValue(filter, out var targetFilterId))
-                            {
-                                return targetFilterId;
-                            }
-
-                            throw new InvalidOperationException(
-                                $"Expected target replacement value for dataBlock {dataBlock.Id} chart data set config filter: {filter}"
-                            );
+                            return targetFilterId;
                         }
-                    ).ToList();
 
-                    if (dataSet.Indicator.HasValue
-                        && indicatorTargets.TryGetValue(dataSet.Indicator.Value, out var targetIndicatorId))
+                        throw new InvalidOperationException(
+                            $"Expected target replacement value for dataBlock {dataBlock.Id} chart legend data set filter: {filter}"
+                        );
+                    }
+                ).ToList();
+
+
+                if (dataSet.Indicator.HasValue)
+                {
+                    if (indicatorTargets.TryGetValue(dataSet.Indicator.Value, out var targetIndicatorId))
                     {
                         dataSet.Indicator = targetIndicatorId;
                     }
                     else
                     {
                         throw new InvalidOperationException(
-                            $"Expected target replacement value for dataBlock {dataBlock.Id} chart data set config indicator: {dataSet.Indicator}"
+                            $"Expected target replacement value for dataBlock {dataBlock.Id} chart legend data set indicator: {dataSet.Indicator}"
                         );
                     }
-
-                    if (dataSet.Location != null)
-                    {
-                        if (locationTargets.TryGetValue(dataSet.Location.Value, out var targetLocationId))
-                        {
-                            dataSet.Location.Value = targetLocationId;
-                        }
-                        else
-                        {
-                            throw new InvalidOperationException(
-                                $"Expected target replacement value for dataBlock {dataBlock.Id} chart data set config location: {dataSet.Location.Value}"
-                            );
-                        }
-                    }
-                });
-        }
-
-        private static void ReplaceChartLegendDataSets(
-            IReadOnlyDictionary<Guid, Guid> filterItemTargets,
-            IReadOnlyDictionary<Guid, Guid> indicatorTargets,
-            IReadOnlyDictionary<Guid, Guid> locationTargets,
-            DataBlock dataBlock,
-            IChart chart)
-        {
-            chart.Legend?.Items.ForEach(
-                item =>
-                {
-                    var dataSet = item.DataSet;
-
-                    dataSet.Filters = dataSet.Filters.Select(
-                        filter =>
-                        {
-                            if (filterItemTargets.TryGetValue(filter, out var targetFilterId))
-                            {
-                                return targetFilterId;
-                            }
-
-                            throw new InvalidOperationException(
-                                $"Expected target replacement value for dataBlock {dataBlock.Id} chart legend data set filter: {filter}"
-                            );
-                        }
-                    ).ToList();
-
-
-                    if (dataSet.Indicator.HasValue)
-                    {
-                        if (indicatorTargets.TryGetValue(dataSet.Indicator.Value, out var targetIndicatorId))
-                        {
-                            dataSet.Indicator = targetIndicatorId;
-                        }
-                        else
-                        {
-                            throw new InvalidOperationException(
-                                $"Expected target replacement value for dataBlock {dataBlock.Id} chart legend data set indicator: {dataSet.Indicator}"
-                            );
-                        }
-                    }
-
-                    if (dataSet.Location != null)
-                    {
-                        if (locationTargets.TryGetValue(dataSet.Location.Value, out var targetLocationId))
-                        {
-                            dataSet.Location.Value = targetLocationId;
-                        }
-                        else
-                        {
-                            throw new InvalidOperationException(
-                                $"Expected target replacement value for dataBlock {dataBlock.Id} chart legend data set location: {dataSet.Location.Value}"
-                            );
-                        }
-                    }
                 }
-            );
-        }
 
-        private static void ReplaceChartMajorAxisDataSets(
-            IReadOnlyDictionary<Guid, Guid> filterItemTargets,
-            IReadOnlyDictionary<Guid, Guid> indicatorTargets,
-            IReadOnlyDictionary<Guid, Guid> locationTargets,
-            DataBlock dataBlock,
-            IChart chart)
-        {
-            chart.Axes?.GetValueOrDefault("major")?.DataSets.ForEach(
-                dataSet =>
+                if (dataSet.Location != null)
                 {
-                    dataSet.Filters = dataSet.Filters.Select(
-                        filter =>
-                        {
-                            if (filterItemTargets.TryGetValue(filter, out var targetFilterId))
-                            {
-                                return targetFilterId;
-                            }
-
-                            throw new InvalidOperationException(
-                                $"Expected target replacement value for dataBlock {dataBlock.Id} chart data set filter: {filter}"
-                            );
-                        }
-                    ).ToList();
-
-                    if (dataSet.Indicator.HasValue
-                        && indicatorTargets.TryGetValue(dataSet.Indicator.Value, out var targetIndicatorId))
+                    if (locationTargets.TryGetValue(dataSet.Location.Value, out var targetLocationId))
                     {
-                        dataSet.Indicator = targetIndicatorId;
+                        dataSet.Location.Value = targetLocationId;
                     }
                     else
                     {
                         throw new InvalidOperationException(
-                            $"Expected target replacement value for dataBlock {dataBlock.Id} chart data set indicator: {dataSet.Indicator}"
+                            $"Expected target replacement value for dataBlock {dataBlock.Id} chart legend data set location: {dataSet.Location.Value}"
                         );
                     }
+                }
+            }
+        );
+    }
 
-                    if (dataSet.Location != null)
+    private static void ReplaceChartMajorAxisDataSets(
+        IReadOnlyDictionary<Guid, Guid> filterItemTargets,
+        IReadOnlyDictionary<Guid, Guid> indicatorTargets,
+        IReadOnlyDictionary<Guid, Guid> locationTargets,
+        DataBlock dataBlock,
+        IChart chart)
+    {
+        chart.Axes?.GetValueOrDefault("major")?.DataSets.ForEach(
+            dataSet =>
+            {
+                dataSet.Filters = dataSet.Filters.Select(
+                    filter =>
                     {
-                        if (locationTargets.TryGetValue(dataSet.Location.Value, out var targetLocationId))
+                        if (filterItemTargets.TryGetValue(filter, out var targetFilterId))
                         {
-                            dataSet.Location.Value = targetLocationId;
+                            return targetFilterId;
                         }
-                        else
-                        {
-                            throw new InvalidOperationException(
-                                $"Expected target replacement value for dataBlock {dataBlock.Id} chart data set location: {dataSet.Location.Value}"
-                            );
-                        }
+
+                        throw new InvalidOperationException(
+                            $"Expected target replacement value for dataBlock {dataBlock.Id} chart data set filter: {filter}"
+                        );
+                    }
+                ).ToList();
+
+                if (dataSet.Indicator.HasValue
+                    && indicatorTargets.TryGetValue(dataSet.Indicator.Value, out var targetIndicatorId))
+                {
+                    dataSet.Indicator = targetIndicatorId;
+                }
+                else
+                {
+                    throw new InvalidOperationException(
+                        $"Expected target replacement value for dataBlock {dataBlock.Id} chart data set indicator: {dataSet.Indicator}"
+                    );
+                }
+
+                if (dataSet.Location != null)
+                {
+                    if (locationTargets.TryGetValue(dataSet.Location.Value, out var targetLocationId))
+                    {
+                        dataSet.Location.Value = targetLocationId;
+                    }
+                    else
+                    {
+                        throw new InvalidOperationException(
+                            $"Expected target replacement value for dataBlock {dataBlock.Id} chart data set location: {dataSet.Location.Value}"
+                        );
                     }
                 }
+            }
+        );
+    }
+
+    private async Task ReplaceLinksForFootnote(FootnoteReplacementPlanViewModel replacementPlan,
+        Guid originalSubjectId,
+        Guid replacementSubjectId)
+    {
+        await ReplaceFootnoteSubject(replacementPlan.Id, originalSubjectId, replacementSubjectId);
+
+        await replacementPlan.Filters
+            .ToAsyncEnumerable()
+            .ForEachAwaitAsync(async plan =>
+                await ReplaceFootnoteFilter(replacementPlan.Id, plan));
+
+        await replacementPlan.FilterGroups
+            .ToAsyncEnumerable()
+            .ForEachAwaitAsync(async plan =>
+                await ReplaceFootnoteFilterGroup(replacementPlan.Id, plan));
+
+        await replacementPlan.FilterItems
+            .ToAsyncEnumerable()
+            .ForEachAwaitAsync(async plan =>
+                await ReplaceFootnoteFilterItem(replacementPlan.Id, plan));
+
+        await replacementPlan.IndicatorGroups
+            .SelectMany(group => group.Value.Indicators)
+            .ToAsyncEnumerable()
+            .ForEachAwaitAsync(async plan =>
+                await ReplaceIndicatorFootnote(replacementPlan.Id, plan));
+    }
+
+    private async Task ReplaceFootnoteSubject(Guid footnoteId, Guid originalSubjectId, Guid replacementSubjectId)
+    {
+        var subjectFootnote = await _statisticsDbContext.SubjectFootnote
+            .AsQueryable()
+            .Where(f =>
+                f.FootnoteId == footnoteId && f.SubjectId == originalSubjectId).SingleOrDefaultAsync();
+
+        if (subjectFootnote != null)
+        {
+            _statisticsDbContext.Remove(subjectFootnote);
+            await _statisticsDbContext.SubjectFootnote.AddAsync(new SubjectFootnote
+            {
+                FootnoteId = footnoteId,
+                SubjectId = replacementSubjectId
+            });
+        }
+    }
+
+    private async Task ReplaceFootnoteFilter(Guid footnoteId, TargetableReplacementViewModel plan)
+    {
+        var filterFootnote = await _statisticsDbContext.FilterFootnote
+            .AsQueryable()
+            .SingleAsync(f =>
+                f.FootnoteId == footnoteId && f.FilterId == plan.Id
             );
+
+        _statisticsDbContext.Remove(filterFootnote);
+        await _statisticsDbContext.FilterFootnote.AddAsync(new FilterFootnote
+        {
+            FootnoteId = footnoteId,
+            FilterId = plan.TargetValue
+        });
+    }
+
+    private async Task ReplaceFootnoteFilterGroup(Guid footnoteId, TargetableReplacementViewModel plan)
+    {
+        var filterGroupFootnote = await _statisticsDbContext.FilterGroupFootnote
+            .AsQueryable()
+            .SingleAsync(f =>
+                f.FootnoteId == footnoteId && f.FilterGroupId == plan.Id
+            );
+
+        _statisticsDbContext.Remove(filterGroupFootnote);
+        await _statisticsDbContext.FilterGroupFootnote.AddAsync(new FilterGroupFootnote
+        {
+            FootnoteId = footnoteId,
+            FilterGroupId = plan.TargetValue
+        });
+    }
+
+    private async Task ReplaceFootnoteFilterItem(Guid footnoteId, TargetableReplacementViewModel plan)
+    {
+        var filterItemFootnote = await _statisticsDbContext.FilterItemFootnote
+            .AsQueryable()
+            .SingleAsync(f =>
+                f.FootnoteId == footnoteId && f.FilterItemId == plan.Id
+            );
+
+        _statisticsDbContext.Remove(filterItemFootnote);
+        await _statisticsDbContext.FilterItemFootnote.AddAsync(new FilterItemFootnote
+        {
+            FootnoteId = footnoteId,
+            FilterItemId = plan.TargetValue
+        });
+    }
+
+    private async Task ReplaceIndicatorFootnote(Guid footnoteId, TargetableReplacementViewModel plan)
+    {
+        var indicatorFootnote = await _statisticsDbContext.IndicatorFootnote
+            .AsQueryable()
+            .SingleAsync(f =>
+                f.FootnoteId == footnoteId && f.IndicatorId == plan.Id
+            );
+
+        _statisticsDbContext.Remove(indicatorFootnote);
+        await _statisticsDbContext.IndicatorFootnote.AddAsync(new IndicatorFootnote
+        {
+            FootnoteId = footnoteId,
+            IndicatorId = plan.TargetValue
+        });
+    }
+
+    private async Task<List<FilterSequenceEntry>?> ReplaceFilterSequence(ReleaseFile originalReleaseFile,
+        ReleaseFile replacementReleaseFile)
+    {
+        // If the sequence is undefined then leave it so we continue to fallback to ordering by label alphabetically
+        if (originalReleaseFile.FilterSequence == null)
+        {
+            return null;
         }
 
-        private async Task ReplaceLinksForFootnote(FootnoteReplacementPlanViewModel replacementPlan,
-            Guid originalSubjectId,
-            Guid replacementSubjectId)
+        var originalFilters =
+            await _filterRepository.GetFiltersIncludingItems(originalReleaseFile.File.SubjectId!.Value);
+        var replacementFilters =
+            await _filterRepository.GetFiltersIncludingItems(replacementReleaseFile.File.SubjectId!.Value);
+
+        return ReplacementServiceHelper.ReplaceFilterSequence(
+            originalFilters: originalFilters,
+            replacementFilters: replacementFilters,
+            originalReleaseFile);
+    }
+
+    private async Task<List<IndicatorGroupSequenceEntry>?> ReplaceIndicatorSequence(
+        ReleaseFile originalReleaseFile,
+        ReleaseFile replacementReleaseFile)
+    {
+        // If the sequence is undefined then leave it so we continue to fallback to ordering by label alphabetically
+        if (originalReleaseFile.IndicatorSequence == null)
         {
-            await ReplaceFootnoteSubject(replacementPlan.Id, originalSubjectId, replacementSubjectId);
-
-            await replacementPlan.Filters
-                .ToAsyncEnumerable()
-                .ForEachAwaitAsync(async plan =>
-                    await ReplaceFootnoteFilter(replacementPlan.Id, plan));
-
-            await replacementPlan.FilterGroups
-                .ToAsyncEnumerable()
-                .ForEachAwaitAsync(async plan =>
-                    await ReplaceFootnoteFilterGroup(replacementPlan.Id, plan));
-
-            await replacementPlan.FilterItems
-                .ToAsyncEnumerable()
-                .ForEachAwaitAsync(async plan =>
-                    await ReplaceFootnoteFilterItem(replacementPlan.Id, plan));
-
-            await replacementPlan.IndicatorGroups
-                .SelectMany(group => group.Value.Indicators)
-                .ToAsyncEnumerable()
-                .ForEachAwaitAsync(async plan =>
-                    await ReplaceIndicatorFootnote(replacementPlan.Id, plan));
+            return null;
         }
 
-        private async Task ReplaceFootnoteSubject(Guid footnoteId, Guid originalSubjectId, Guid replacementSubjectId)
-        {
-            var subjectFootnote = await _statisticsDbContext.SubjectFootnote
-                .AsQueryable()
-                .Where(f =>
-                    f.FootnoteId == footnoteId && f.SubjectId == originalSubjectId).SingleOrDefaultAsync();
+        var originalIndicatorGroups =
+            await _indicatorGroupRepository.GetIndicatorGroups(originalReleaseFile.File.SubjectId!.Value);
+        var replacementIndicatorGroups =
+            await _indicatorGroupRepository.GetIndicatorGroups(replacementReleaseFile.File.SubjectId!.Value);
 
-            if (subjectFootnote != null)
+        return ReplacementServiceHelper.ReplaceIndicatorSequence(
+            originalIndicatorGroups: originalIndicatorGroups,
+            replacementIndicatorGroups: replacementIndicatorGroups,
+            originalReleaseFile);
+    }
+
+    private async Task<Either<ActionResult, Unit>> RemoveOriginalSubjectAndFileFromRelease(
+        Guid releaseVersionId,
+        Guid originalFileId,
+        Guid replacementFileId)
+    {
+        // First, unlink the original file from the replacement before removing it.
+        // Ordinarily, removing a file from a Release deletes any associated replacement
+        // so that there's no possibility of abandoned replacements being orphaned from their original files.
+        return await CheckReleaseFilesExist(releaseVersionId: releaseVersionId,
+                originalFileId: originalFileId,
+                replacementFileId: replacementFileId)
+            .OnSuccess(async releaseFiles =>
             {
-                _statisticsDbContext.Remove(subjectFootnote);
-                await _statisticsDbContext.SubjectFootnote.AddAsync(new SubjectFootnote
-                {
-                    FootnoteId = footnoteId,
-                    SubjectId = replacementSubjectId
-                });
-            }
-        }
+                var originalFile = releaseFiles.originalReleaseFile.File;
+                var replacementFile = releaseFiles.replacementReleaseFile.File;
 
-        private async Task ReplaceFootnoteFilter(Guid footnoteId, TargetableReplacementViewModel plan)
-        {
-            var filterFootnote = await _statisticsDbContext.FilterFootnote
-                .AsQueryable()
-                .SingleAsync(f =>
-                    f.FootnoteId == footnoteId && f.FilterId == plan.Id
-                );
+                originalFile.ReplacedById = null;
+                replacementFile.ReplacingId = null;
 
-            _statisticsDbContext.Remove(filterFootnote);
-            await _statisticsDbContext.FilterFootnote.AddAsync(new FilterFootnote
-            {
-                FootnoteId = footnoteId,
-                FilterId = plan.TargetValue
+                await _contentDbContext.SaveChangesAsync();
+
+                return await _releaseVersionService.RemoveDataFiles(releaseVersionId: releaseVersionId,
+                    fileId: originalFileId);
             });
-        }
+    }
 
-        private async Task ReplaceFootnoteFilterGroup(Guid footnoteId, TargetableReplacementViewModel plan)
-        {
-            var filterGroupFootnote = await _statisticsDbContext.FilterGroupFootnote
-                .AsQueryable()
-                .SingleAsync(f =>
-                    f.FootnoteId == footnoteId && f.FilterGroupId == plan.Id
-                );
+    private Task<Either<ActionResult, Unit>> InvalidateDataBlockCachedResults(
+        DataBlockReplacementPlanViewModel plan, Guid releaseVersionId)
+    {
+        return _cacheKeyService
+            .CreateCacheKeyForDataBlock(releaseVersionId: releaseVersionId,
+                dataBlockId: plan.Id)
+            .OnSuccessVoid(_privateCacheService.DeleteItemAsync);
+    }
 
-            _statisticsDbContext.Remove(filterGroupFootnote);
-            await _statisticsDbContext.FilterGroupFootnote.AddAsync(new FilterGroupFootnote
-            {
-                FootnoteId = footnoteId,
-                FilterGroupId = plan.TargetValue
-            });
-        }
+    private static Guid ReplacementPlanOriginalId(TargetableReplacementViewModel plan)
+    {
+        return plan.Id;
+    }
 
-        private async Task ReplaceFootnoteFilterItem(Guid footnoteId, TargetableReplacementViewModel plan)
-        {
-            var filterItemFootnote = await _statisticsDbContext.FilterItemFootnote
-                .AsQueryable()
-                .SingleAsync(f =>
-                    f.FootnoteId == footnoteId && f.FilterItemId == plan.Id
-                );
+    private static Guid ReplacementPlanTargetId(TargetableReplacementViewModel plan)
+    {
+        return plan.TargetValue;
+    }
 
-            _statisticsDbContext.Remove(filterItemFootnote);
-            await _statisticsDbContext.FilterItemFootnote.AddAsync(new FilterItemFootnote
-            {
-                FootnoteId = footnoteId,
-                FilterItemId = plan.TargetValue
-            });
-        }
-
-        private async Task ReplaceIndicatorFootnote(Guid footnoteId, TargetableReplacementViewModel plan)
-        {
-            var indicatorFootnote = await _statisticsDbContext.IndicatorFootnote
-                .AsQueryable()
-                .SingleAsync(f =>
-                    f.FootnoteId == footnoteId && f.IndicatorId == plan.Id
-                );
-
-            _statisticsDbContext.Remove(indicatorFootnote);
-            await _statisticsDbContext.IndicatorFootnote.AddAsync(new IndicatorFootnote
-            {
-                FootnoteId = footnoteId,
-                IndicatorId = plan.TargetValue
-            });
-        }
-
-        private async Task<List<FilterSequenceEntry>?> ReplaceFilterSequence(ReleaseFile originalReleaseFile,
-            ReleaseFile replacementReleaseFile)
-        {
-            // If the sequence is undefined then leave it so we continue to fallback to ordering by label alphabetically
-            if (originalReleaseFile.FilterSequence == null)
-            {
-                return null;
-            }
-
-            var originalFilters =
-                await _filterRepository.GetFiltersIncludingItems(originalReleaseFile.File.SubjectId!.Value);
-            var replacementFilters =
-                await _filterRepository.GetFiltersIncludingItems(replacementReleaseFile.File.SubjectId!.Value);
-
-            return ReplacementServiceHelper.ReplaceFilterSequence(
-                originalFilters: originalFilters,
-                replacementFilters: replacementFilters,
-                originalReleaseFile);
-        }
-
-        private async Task<List<IndicatorGroupSequenceEntry>?> ReplaceIndicatorSequence(
-            ReleaseFile originalReleaseFile,
-            ReleaseFile replacementReleaseFile)
-        {
-            // If the sequence is undefined then leave it so we continue to fallback to ordering by label alphabetically
-            if (originalReleaseFile.IndicatorSequence == null)
-            {
-                return null;
-            }
-
-            var originalIndicatorGroups =
-                await _indicatorGroupRepository.GetIndicatorGroups(originalReleaseFile.File.SubjectId!.Value);
-            var replacementIndicatorGroups =
-                await _indicatorGroupRepository.GetIndicatorGroups(replacementReleaseFile.File.SubjectId!.Value);
-
-            return ReplacementServiceHelper.ReplaceIndicatorSequence(
-                originalIndicatorGroups: originalIndicatorGroups,
-                replacementIndicatorGroups: replacementIndicatorGroups,
-                originalReleaseFile);
-        }
-
-        private async Task<Either<ActionResult, Unit>> RemoveOriginalSubjectAndFileFromRelease(
-            Guid releaseVersionId,
-            Guid originalFileId,
-            Guid replacementFileId)
-        {
-            // First, unlink the original file from the replacement before removing it.
-            // Ordinarily, removing a file from a Release deletes any associated replacement
-            // so that there's no possibility of abandoned replacements being orphaned from their original files.
-            return await CheckReleaseFilesExist(releaseVersionId: releaseVersionId,
-                    originalFileId: originalFileId,
-                    replacementFileId: replacementFileId)
-                .OnSuccess(async releaseFiles =>
-                {
-                    var originalFile = releaseFiles.originalReleaseFile.File;
-                    var replacementFile = releaseFiles.replacementReleaseFile.File;
-
-                    originalFile.ReplacedById = null;
-                    replacementFile.ReplacingId = null;
-
-                    await _contentDbContext.SaveChangesAsync();
-
-                    return await _releaseVersionService.RemoveDataFiles(releaseVersionId: releaseVersionId,
-                        fileId: originalFileId);
-                });
-        }
-
-        private Task<Either<ActionResult, Unit>> InvalidateDataBlockCachedResults(
-            DataBlockReplacementPlanViewModel plan, Guid releaseVersionId)
-        {
-            return _cacheKeyService
-                .CreateCacheKeyForDataBlock(releaseVersionId: releaseVersionId,
-                    dataBlockId: plan.Id)
-                .OnSuccessVoid(_privateCacheService.DeleteItemAsync);
-        }
-
-        private static Guid ReplacementPlanOriginalId(TargetableReplacementViewModel plan)
-        {
-            return plan.Id;
-        }
-
-        private static Guid ReplacementPlanTargetId(TargetableReplacementViewModel plan)
-        {
-            return plan.TargetValue;
-        }
-
-        private class ReplacementSubjectMeta
-        {
-            public Dictionary<string, Filter> Filters { get; set; } = new();
-            public Dictionary<string, Indicator> Indicators { get; set; } = new();
-            public IList<Location> Locations { get; set; } = null!;
-            public IList<(int Year, TimeIdentifier TimeIdentifier)> TimePeriods { get; set; } = null!;
-        }
+    private class ReplacementSubjectMeta
+    {
+        public Dictionary<string, Filter> Filters { get; set; } = new();
+        public Dictionary<string, Indicator> Indicators { get; set; } = new();
+        public IList<Location> Locations { get; set; } = null!;
+        public IList<(int Year, TimeIdentifier TimeIdentifier)> TimePeriods { get; set; } = null!;
     }
 }

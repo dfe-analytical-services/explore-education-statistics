@@ -6,49 +6,48 @@ using Microsoft.AspNetCore.Authorization;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityClaimTypes;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.PublicationRole;
 
-namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers
+namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers;
+
+public class DropMethodologyLinkRequirement : IAuthorizationRequirement
 {
-    public class DropMethodologyLinkRequirement : IAuthorizationRequirement
+}
+
+public class DropMethodologyLinkAuthorizationHandler
+    : AuthorizationHandler<DropMethodologyLinkRequirement, PublicationMethodology>
+{
+    private readonly AuthorizationHandlerService _authorizationHandlerService;
+
+    public DropMethodologyLinkAuthorizationHandler(
+        AuthorizationHandlerService authorizationHandlerService)
     {
+        _authorizationHandlerService = authorizationHandlerService;
     }
 
-    public class DropMethodologyLinkAuthorizationHandler
-        : AuthorizationHandler<DropMethodologyLinkRequirement, PublicationMethodology>
+    protected override async Task HandleRequirementAsync(
+        AuthorizationHandlerContext context,
+        DropMethodologyLinkRequirement requirement,
+        PublicationMethodology link)
     {
-        private readonly AuthorizationHandlerService _authorizationHandlerService;
-
-        public DropMethodologyLinkAuthorizationHandler(
-            AuthorizationHandlerService authorizationHandlerService)
+        if (link.Owner)
         {
-            _authorizationHandlerService = authorizationHandlerService;
+            // No user is allowed to drop the link between a methodology and its owning publication 
+            return;
         }
 
-        protected override async Task HandleRequirementAsync(
-            AuthorizationHandlerContext context,
-            DropMethodologyLinkRequirement requirement,
-            PublicationMethodology link)
+        // Allow users who can adopt methodologies to also drop them
+        if (SecurityUtils.HasClaim(context.User, AdoptAnyMethodology))
         {
-            if (link.Owner)
-            {
-                // No user is allowed to drop the link between a methodology and its owning publication 
-                return;
-            }
-
-            // Allow users who can adopt methodologies to also drop them
-            if (SecurityUtils.HasClaim(context.User, AdoptAnyMethodology))
-            {
-                context.Succeed(requirement);
-                return;
-            }
+            context.Succeed(requirement);
+            return;
+        }
             
-            if (await _authorizationHandlerService
-                    .HasRolesOnPublication(
-                        context.User.GetUserId(),
-                        link.PublicationId,
-                        Owner))
-            {
-                context.Succeed(requirement);
-            }
+        if (await _authorizationHandlerService
+                .HasRolesOnPublication(
+                    context.User.GetUserId(),
+                    link.PublicationId,
+                    Owner))
+        {
+            context.Succeed(requirement);
         }
     }
 }

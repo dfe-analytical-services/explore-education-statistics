@@ -7,25 +7,24 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
-namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologies
+namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologies;
+
+public class ManageMethodologyContentViewModel
 {
-    public class ManageMethodologyContentViewModel
-    {
-        public Guid Id { get; set; }
+    public Guid Id { get; set; }
 
-        public string Slug { get; set; } = string.Empty;
+    public string Slug { get; set; } = string.Empty;
 
-        public string Title { get; set; } = string.Empty;
+    public string Title { get; set; } = string.Empty;
 
-        [JsonConverter(typeof(StringEnumConverter))]
-        public MethodologyApprovalStatus Status { get; set; }
+    [JsonConverter(typeof(StringEnumConverter))]
+    public MethodologyApprovalStatus Status { get; set; }
 
-        public DateTime? Published { get; set; }
+    public DateTime? Published { get; set; }
 
-        public List<ContentSectionViewModel> Content { get; set; } = new List<ContentSectionViewModel>();
+    public List<ContentSectionViewModel> Content { get; set; } = new List<ContentSectionViewModel>();
 
-        public List<ContentSectionViewModel> Annexes { get; set; } = new List<ContentSectionViewModel>();
+    public List<ContentSectionViewModel> Annexes { get; set; } = new List<ContentSectionViewModel>();
 
-        public List<MethodologyNoteViewModel> Notes { get; set; } = new List<MethodologyNoteViewModel>();
-    }
+    public List<MethodologyNoteViewModel> Notes { get; set; } = new List<MethodologyNoteViewModel>();
 }

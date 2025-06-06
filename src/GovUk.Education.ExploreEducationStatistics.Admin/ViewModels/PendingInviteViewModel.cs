@@ -1,16 +1,15 @@
 #nullable enable
 using System.Collections.Generic;
 
-namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
-{
-    public class PendingInviteViewModel
-    {
-        public string Email { get; set; } = string.Empty;
-        
-        public string? Role { get; set; }
+namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 
-        public List<UserPublicationRoleViewModel> UserPublicationRoles { get; set; } = new();
+public class PendingInviteViewModel
+{
+    public string Email { get; set; } = string.Empty;
         
-        public List<UserReleaseRoleViewModel> UserReleaseRoles { get; set; } = new();
-    }
+    public string? Role { get; set; }
+
+    public List<UserPublicationRoleViewModel> UserPublicationRoles { get; set; } = new();
+        
+    public List<UserReleaseRoleViewModel> UserReleaseRoles { get; set; } = new();
 }

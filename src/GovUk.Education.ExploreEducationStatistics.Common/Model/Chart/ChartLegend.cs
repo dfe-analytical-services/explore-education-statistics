@@ -4,37 +4,36 @@ using System.Diagnostics.CodeAnalysis;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
-namespace GovUk.Education.ExploreEducationStatistics.Common.Model.Chart
+namespace GovUk.Education.ExploreEducationStatistics.Common.Model.Chart;
+
+public class ChartLegend
 {
-    public class ChartLegend
-    {
-        public ChartLegendPosition? Position;
-        public List<ChartLegendItem> Items = new List<ChartLegendItem>();
-    }
+    public ChartLegendPosition? Position;
+    public List<ChartLegendItem> Items = new List<ChartLegendItem>();
+}
 
-    [SuppressMessage("ReSharper", "InconsistentNaming")]
+[SuppressMessage("ReSharper", "InconsistentNaming")]
+[JsonConverter(typeof(StringEnumConverter))]
+public enum ChartLegendPosition
+{
+    none,
+    bottom,
+    top,
+    inline
+}
+
+public class ChartLegendItem
+{
+    public ChartBaseDataSet DataSet;
+    public string Label;
+    public string Colour;
+
     [JsonConverter(typeof(StringEnumConverter))]
-    public enum ChartLegendPosition
-    {
-        none,
-        bottom,
-        top,
-        inline
-    }
+    public ChartLineSymbol? Symbol;
 
-    public class ChartLegendItem
-    {
-        public ChartBaseDataSet DataSet;
-        public string Label;
-        public string Colour;
+    [JsonConverter(typeof(StringEnumConverter))]
+    public ChartLineStyle? LineStyle;
 
-        [JsonConverter(typeof(StringEnumConverter))]
-        public ChartLineSymbol? Symbol;
-
-        [JsonConverter(typeof(StringEnumConverter))]
-        public ChartLineStyle? LineStyle;
-
-        [JsonConverter(typeof(StringEnumConverter))]
-        public ChartInlinePosition? InlinePosition;
-    }
+    [JsonConverter(typeof(StringEnumConverter))]
+    public ChartInlinePosition? InlinePosition;
 }

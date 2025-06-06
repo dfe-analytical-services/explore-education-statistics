@@ -5,27 +5,26 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using Newtonsoft.Json;
 using System;
 
-namespace GovUk.Education.ExploreEducationStatistics.Admin.Models
+namespace GovUk.Education.ExploreEducationStatistics.Admin.Models;
+
+public record DataFileInfo : FileInfo
 {
-    public record DataFileInfo : FileInfo
-    {
-        public override FileType Type { get; set; } = FileType.Data;
+    public override FileType Type { get; set; } = FileType.Data;
 
-        public Guid? MetaFileId { get; set; }
+    public Guid? MetaFileId { get; set; }
 
-        public string MetaFileName { get; set; } = string.Empty;
+    public string MetaFileName { get; set; } = string.Empty;
 
-        public int? Rows { get; set; }
+    public int? Rows { get; set; }
 
-        public Guid? ReplacedBy { get; set; }
+    public Guid? ReplacedBy { get; set; }
 
-        [JsonConverter(typeof(EnumToEnumValueJsonConverter<DataImportStatus>))]
-        public DataImportStatus Status { get; set; }
+    [JsonConverter(typeof(EnumToEnumValueJsonConverter<DataImportStatus>))]
+    public DataImportStatus Status { get; set; }
 
-        public DataFilePermissions Permissions { get; set; } = new();
+    public DataFilePermissions Permissions { get; set; } = new();
 
-        public Guid? PublicApiDataSetId { get; set; }
+    public Guid? PublicApiDataSetId { get; set; }
 
-        public string? PublicApiDataSetVersion { get; set; }
-    }
+    public string? PublicApiDataSetVersion { get; set; }
 }
