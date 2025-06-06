@@ -70,11 +70,11 @@ describe('FindStatisticsPageAzure', () => {
       ),
     ).toBeInTheDocument();
 
-    await waitFor(() => {
-      expect(
-        screen.getByText('30 results, page 1 of 3, showing all publications'),
-      ).toBeInTheDocument();
-    });
+    expect(
+      await screen.findByText(
+        '30 results, page 1 of 3, showing all publications',
+      ),
+    ).toBeInTheDocument();
 
     expect(screen.getByLabelText('Search publications')).toBeInTheDocument();
 
@@ -207,11 +207,9 @@ describe('FindStatisticsPageAzure', () => {
     });
     render(<FindStatisticsPage useAzureSearch />);
 
-    await waitFor(() => {
-      expect(
-        screen.getByText('No data currently published.'),
-      ).toBeInTheDocument();
-    });
+    expect(
+      await screen.findByText('No data currently published.'),
+    ).toBeInTheDocument();
 
     expect(screen.queryByTestId('publicationsList')).not.toBeInTheDocument();
 
@@ -230,11 +228,9 @@ describe('FindStatisticsPageAzure', () => {
 
     render(<FindStatisticsPage useAzureSearch />);
 
-    await waitFor(() => {
-      expect(
-        screen.getByText('2 results, page 1 of 1, filtered by:'),
-      ).toBeInTheDocument();
-    });
+    expect(
+      await screen.findByText('2 results, page 1 of 1, filtered by:'),
+    ).toBeInTheDocument();
 
     expect(
       screen.getByRole('button', { name: 'Remove filter: Search: Find me' }),
@@ -316,11 +312,9 @@ describe('FindStatisticsPageAzure', () => {
 
     render(<FindStatisticsPage useAzureSearch />);
 
-    await waitFor(() => {
-      expect(
-        screen.getByText('0 results, 0 pages, filtered by:'),
-      ).toBeInTheDocument();
-    });
+    expect(
+      await screen.findByText('0 results, 0 pages, filtered by:'),
+    ).toBeInTheDocument();
 
     expect(
       screen.getByRole('button', {
@@ -352,11 +346,9 @@ describe('FindStatisticsPageAzure', () => {
 
     render(<FindStatisticsPage useAzureSearch />);
 
-    await waitFor(() => {
-      expect(
-        screen.getByText('2 results, page 1 of 1, filtered by:'),
-      ).toBeInTheDocument();
-    });
+    expect(
+      await screen.findByText('2 results, page 1 of 1, filtered by:'),
+    ).toBeInTheDocument();
 
     expect(
       screen.getByRole('button', { name: 'Remove filter: Theme: Theme 2' }),
@@ -421,11 +413,9 @@ describe('FindStatisticsPageAzure', () => {
 
     render(<FindStatisticsPage useAzureSearch />);
 
-    await waitFor(() => {
-      expect(
-        screen.getByText('2 results, page 1 of 1, filtered by:'),
-      ).toBeInTheDocument();
-    });
+    expect(
+      await screen.findByText('2 results, page 1 of 1, filtered by:'),
+    ).toBeInTheDocument();
 
     expect(
       screen.getByRole('button', {
@@ -494,11 +484,9 @@ describe('FindStatisticsPageAzure', () => {
 
     render(<FindStatisticsPage useAzureSearch />);
 
-    await waitFor(() => {
-      expect(
-        screen.getByText('2 results, page 1 of 1, filtered by:'),
-      ).toBeInTheDocument();
-    });
+    expect(
+      await screen.findByText('2 results, page 1 of 1, filtered by:'),
+    ).toBeInTheDocument();
 
     expect(
       screen.getByRole('button', { name: 'Remove filter: Search: find me' }),
@@ -590,11 +578,11 @@ describe('FindStatisticsPageAzure', () => {
 
     const { user } = render(<FindStatisticsPage useAzureSearch />);
 
-    await waitFor(() => {
-      expect(
-        screen.getByText('30 results, page 1 of 3, showing all publications'),
-      ).toBeInTheDocument();
-    });
+    expect(
+      await screen.findByText(
+        '30 results, page 1 of 3, showing all publications',
+      ),
+    ).toBeInTheDocument();
 
     expect(
       within(screen.getByTestId('publicationsList')).getAllByRole('listitem'),
@@ -610,11 +598,9 @@ describe('FindStatisticsPageAzure', () => {
       query: { releaseType: 'AdHocStatistics' },
     });
 
-    await waitFor(() => {
-      expect(
-        screen.getByText('2 results, page 1 of 1, filtered by:'),
-      ).toBeInTheDocument();
-    });
+    expect(
+      await screen.findByText('2 results, page 1 of 1, filtered by:'),
+    ).toBeInTheDocument();
 
     expect(
       screen.getByRole('button', {
@@ -641,11 +627,9 @@ describe('FindStatisticsPageAzure', () => {
       },
     });
 
-    await waitFor(() => {
-      expect(
-        screen.getByText('1 result, page 1 of 1, filtered by:'),
-      ).toBeInTheDocument();
-    });
+    expect(
+      await screen.findByText('1 result, page 1 of 1, filtered by:'),
+    ).toBeInTheDocument();
 
     expect(
       screen.getByRole('button', {
@@ -687,11 +671,9 @@ describe('FindStatisticsPageAzure', () => {
 
     const { user } = render(<FindStatisticsPage useAzureSearch />);
 
-    await waitFor(() => {
-      expect(
-        screen.getByText('1 result, page 1 of 1, filtered by:'),
-      ).toBeInTheDocument();
-    });
+    expect(
+      await screen.findByText('1 result, page 1 of 1, filtered by:'),
+    ).toBeInTheDocument();
 
     expect(
       screen.getByRole('button', {
@@ -736,11 +718,9 @@ describe('FindStatisticsPageAzure', () => {
       query: { themeId: 'theme-2' },
     });
 
-    await waitFor(() => {
-      expect(
-        screen.getByText('2 results, page 1 of 1, filtered by:'),
-      ).toBeInTheDocument();
-    });
+    expect(
+      await screen.findByText('2 results, page 1 of 1, filtered by:'),
+    ).toBeInTheDocument();
 
     expect(
       screen.queryByRole('button', {
@@ -787,11 +767,11 @@ describe('FindStatisticsPageAzure', () => {
       pathname: '/find-statistics',
     });
 
-    await waitFor(() => {
-      expect(
-        screen.getByText('30 results, page 1 of 3, showing all publications'),
-      ).toBeInTheDocument();
-    });
+    expect(
+      await screen.findByText(
+        '30 results, page 1 of 3, showing all publications',
+      ),
+    ).toBeInTheDocument();
 
     expect(
       screen.queryByRole('button', {
@@ -824,11 +804,11 @@ describe('FindStatisticsPageAzure', () => {
 
     const { user } = render(<FindStatisticsPage useAzureSearch />);
 
-    await waitFor(() => {
-      expect(
-        screen.getByText('30 results, page 1 of 3, showing all publications'),
-      ).toBeInTheDocument();
-    });
+    expect(
+      await screen.findByText(
+        '30 results, page 1 of 3, showing all publications',
+      ),
+    ).toBeInTheDocument();
 
     expect(
       within(screen.getByTestId('publicationsList')).getAllByRole('listitem'),
@@ -842,9 +822,7 @@ describe('FindStatisticsPageAzure', () => {
       query: { search: 'Find me', sortBy: 'newest' },
     });
 
-    await waitFor(() => {
-      expect(screen.getByText('2 results')).toBeInTheDocument();
-    });
+    expect(await screen.findByText('2 results')).toBeInTheDocument();
 
     expect(
       screen.getByRole('button', { name: 'Remove filter: Search: Find me' }),
@@ -871,11 +849,9 @@ describe('FindStatisticsPageAzure', () => {
 
     const { user } = render(<FindStatisticsPage useAzureSearch />);
 
-    await waitFor(() => {
-      expect(
-        screen.getByText('1 result, page 1 of 1, filtered by:'),
-      ).toBeInTheDocument();
-    });
+    expect(
+      await screen.findByText('1 result, page 1 of 1, filtered by:'),
+    ).toBeInTheDocument();
     expect(
       screen.getByRole('button', {
         name: 'Remove filter: Search: Find me',
@@ -899,11 +875,11 @@ describe('FindStatisticsPageAzure', () => {
       query: { sortBy: 'newest' },
     });
 
-    await waitFor(() => {
-      expect(
-        screen.getByText('30 results, page 1 of 3, showing all publications'),
-      ).toBeInTheDocument();
-    });
+    expect(
+      await screen.findByText(
+        '30 results, page 1 of 3, showing all publications',
+      ),
+    ).toBeInTheDocument();
 
     expect(
       screen.queryByRole('button', { name: 'Remove filter: Search: Find me' }),
@@ -925,9 +901,7 @@ describe('FindStatisticsPageAzure', () => {
 
     const { user } = render(<FindStatisticsPage useAzureSearch />);
 
-    await waitFor(() => {
-      expect(screen.getByText('30 results')).toBeInTheDocument();
-    });
+    expect(await screen.findByText('30 results')).toBeInTheDocument();
 
     const sortSelect = screen.getByLabelText('Sort by');
     const sortOptions = within(sortSelect).getAllByRole(
@@ -979,9 +953,7 @@ describe('FindStatisticsPageAzure', () => {
 
     const { user } = render(<FindStatisticsPage useAzureSearch />);
 
-    await waitFor(() => {
-      expect(screen.getByText('30 results')).toBeInTheDocument();
-    });
+    expect(await screen.findByText('30 results')).toBeInTheDocument();
 
     const sortSelect = screen.getByLabelText('Sort by');
     const sortOptions = within(sortSelect).getAllByRole(
@@ -998,9 +970,7 @@ describe('FindStatisticsPageAzure', () => {
     await user.type(screen.getByLabelText('Search publications'), 'Find me');
     await user.click(screen.getByRole('button', { name: 'Search' }));
 
-    await waitFor(() => {
-      expect(screen.getByText('2 results')).toBeInTheDocument();
-    });
+    expect(await screen.findByText('2 results')).toBeInTheDocument();
 
     expect(
       screen.getByRole('button', { name: 'Remove filter: Search: Find me' }),
@@ -1034,11 +1004,9 @@ describe('FindStatisticsPageAzure', () => {
 
     const { user } = render(<FindStatisticsPage useAzureSearch />);
 
-    await waitFor(() => {
-      expect(
-        screen.getByText('2 results, page 1 of 1, filtered by:'),
-      ).toBeInTheDocument();
-    });
+    expect(
+      await screen.findByText('2 results, page 1 of 1, filtered by:'),
+    ).toBeInTheDocument();
 
     expect(
       screen.getByRole('button', { name: 'Remove filter: Search: find me' }),
@@ -1060,11 +1028,11 @@ describe('FindStatisticsPageAzure', () => {
 
     await user.click(screen.getByRole('button', { name: 'Reset filters' }));
 
-    await waitFor(() => {
-      expect(
-        screen.getByText('30 results, page 1 of 3, showing all publications'),
-      ).toBeInTheDocument();
-    });
+    expect(
+      await screen.findByText(
+        '30 results, page 1 of 3, showing all publications',
+      ),
+    ).toBeInTheDocument();
 
     expect(mockRouter).toMatchObject({
       pathname: '/find-statistics',
