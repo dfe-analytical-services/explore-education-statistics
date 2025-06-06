@@ -698,7 +698,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Cache
         }
 
         [Fact]
-        public async void NoParams_TaskEither_Left()
+        public async Task NoParams_TaskEither_Left()
         {
             var cacheKey = new TestCacheKey();
 
