@@ -9,6 +9,7 @@ public interface IAnalyticsService
     Task CaptureDataSetCall(
         Guid dataSetId,
         DataSetCallType type,
+        object? parameters = null,
         CancellationToken cancellationToken = default);
     
     Task CaptureDataSetVersionCall(

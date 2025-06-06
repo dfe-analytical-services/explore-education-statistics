@@ -27,230 +27,456 @@ public abstract class DataSetVersionsControllerTests(TestApplicationFactory test
 
     private readonly TestAnalyticsPathResolver _analyticsPathResolver = new();
 
-    public class ListDataSetVersionsTests(TestApplicationFactory testApp) : DataSetVersionsControllerTests(testApp)
+    public abstract class ListDataSetVersionsTests(TestApplicationFactory testApp) : DataSetVersionsControllerTests(testApp)
     {
-        [Theory]
-        [InlineData(1, 2, 1)]
-        [InlineData(1, 2, 2)]
-        [InlineData(1, 2, 9)]
-        [InlineData(1, 3, 2)]
-        [InlineData(2, 2, 9)]
-        public async Task MultipleAvailableVersionsForRequestedDataSet_Returns200_PaginatedCorrectly(
-            int page,
-            int pageSize,
-            int numberOfAvailableDataSetVersions)
+        public abstract class PublicDataSetVersionsTests(TestApplicationFactory testApp) : ListDataSetVersionsTests(testApp)
         {
-            DataSet dataSet = DataFixture
-                .DefaultDataSet()
-                .WithStatusPublished();
-
-            await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
-
-            var dataSetVersions = DataFixture
-                .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 3)
-                .WithStatusPublished()
-                .WithDataSetId(dataSet.Id)
-                .GenerateList(numberOfAvailableDataSetVersions);
-
-            await TestApp.AddTestData<PublicDataDbContext>(context =>
-                context.DataSetVersions.AddRange(dataSetVersions));
-
-            var pagedDataSetVersions = dataSetVersions
-                .OrderByDescending(dsv => dsv.VersionMajor)
-                .ThenByDescending(dsv => dsv.VersionMinor)
-                .Skip((page - 1) * pageSize)
-                .Take(pageSize)
-                .ToList();
-
-            var response = await ListDataSetVersions(
-                dataSetId: dataSet.Id,
-                page: page,
-                pageSize: pageSize);
-
-            var viewModel = response.AssertOk<DataSetVersionPaginatedListViewModel>(useSystemJson: true);
-
-            Assert.NotNull(viewModel);
-            Assert.Equal(page, viewModel.Paging.Page);
-            Assert.Equal(pageSize, viewModel.Paging.PageSize);
-            Assert.Equal(numberOfAvailableDataSetVersions, viewModel.Paging.TotalResults);
-            Assert.Equal(pagedDataSetVersions.Count, viewModel.Results.Count);
-        }
-
-        [Fact]
-        public async Task MultipleAvailableVersionsForRequestedDataSet_Returns200_OrderedCorrectly()
-        {
-            DataSet dataSet = DataFixture
-                .DefaultDataSet()
-                .WithStatusPublished();
-
-            await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
-
-            var dataSetVersions = DataFixture
-                .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 3)
-                .WithStatusPublished()
-                .WithDataSetId(dataSet.Id)
-                .ForIndex(0, dsv => dsv.SetVersionNumber(1, 0))
-                .ForIndex(1, dsv => dsv.SetVersionNumber(1, 1))
-                .ForIndex(2, dsv => dsv.SetVersionNumber(3, 1))
-                .ForIndex(3, dsv => dsv.SetVersionNumber(3, 0))
-                .ForIndex(4, dsv => dsv.SetVersionNumber(2, 0))
-                .ForIndex(5, dsv => dsv.SetVersionNumber(2, 1))
-                .GenerateList();
-
-            await TestApp.AddTestData<PublicDataDbContext>(context =>
+            [Theory]
+            [InlineData(1, 2, 1)]
+            [InlineData(1, 2, 2)]
+            [InlineData(1, 2, 9)]
+            [InlineData(1, 3, 2)]
+            [InlineData(2, 2, 9)]
+            public async Task MultipleAvailableVersionsForRequestedDataSet_Returns200_PaginatedCorrectly(
+                int page,
+                int pageSize,
+                int numberOfAvailableDataSetVersions)
             {
-                context.DataSetVersions.AddRange(dataSetVersions);
-            });
+                DataSet dataSet = DataFixture
+                    .DefaultDataSet()
+                    .WithStatusPublished();
 
-            var page1Response = await ListDataSetVersions(
-                dataSetId: dataSet.Id,
-                page: 1,
-                pageSize: 3);
+                await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
 
-            var page1ViewModel = page1Response.AssertOk<DataSetVersionPaginatedListViewModel>(useSystemJson: true);
+                var dataSetVersions = DataFixture
+                    .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 3)
+                    .WithStatusPublished()
+                    .WithDataSetId(dataSet.Id)
+                    .GenerateList(numberOfAvailableDataSetVersions);
 
-            Assert.Equal(3, page1ViewModel.Results.Count);
-            Assert.Equal("3.1", page1ViewModel.Results[0].Version);
-            Assert.Equal("3.0", page1ViewModel.Results[1].Version);
-            Assert.Equal("2.1", page1ViewModel.Results[2].Version);
+                await TestApp.AddTestData<PublicDataDbContext>(context =>
+                    context.DataSetVersions.AddRange(dataSetVersions));
 
-            var page2Response = await ListDataSetVersions(
-                dataSetId: dataSet.Id,
-                page: 2,
-                pageSize: 3);
+                var pagedDataSetVersions = dataSetVersions
+                    .OrderByDescending(dsv => dsv.VersionMajor)
+                    .ThenByDescending(dsv => dsv.VersionMinor)
+                    .Skip((page - 1) * pageSize)
+                    .Take(pageSize)
+                    .ToList();
 
-            var page2ViewModel = page2Response.AssertOk<DataSetVersionPaginatedListViewModel>(useSystemJson: true);
+                var response = await ListDataSetVersions(
+                    dataSetId: dataSet.Id,
+                    page: page,
+                    pageSize: pageSize);
 
-            Assert.Equal(3, page2ViewModel.Results.Count);
-            Assert.Equal("2.0", page2ViewModel.Results[0].Version);
-            Assert.Equal("1.1", page2ViewModel.Results[1].Version);
-            Assert.Equal("1.0", page2ViewModel.Results[2].Version);
-        }
+                var viewModel = response.AssertOk<DataSetVersionPaginatedListViewModel>(useSystemJson: true);
 
-        [Theory]
-        [MemberData(nameof(DataSetVersionStatusViewTheoryData.AvailableStatuses),
-            MemberType = typeof(DataSetVersionStatusViewTheoryData))]
-        public async Task DataSetVersionIsAvailable_Returns200_CorrectViewModel(
-            DataSetVersionStatus dataSetVersionStatus)
-        {
-            DataSet dataSet = DataFixture
-                .DefaultDataSet()
-                .WithStatusPublished();
-
-            await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
-
-            var dataSetVersionGenerator = DataFixture
-                .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 3)
-                .WithStatus(dataSetVersionStatus)
-                .WithPublished(DateTimeOffset.UtcNow)
-                .WithDataSetId(dataSet.Id);
-
-            DataSetVersion dataSetVersion = dataSetVersionStatus == DataSetVersionStatus.Withdrawn
-                ? dataSetVersionGenerator.WithWithdrawn(DateTimeOffset.UtcNow)
-                : dataSetVersionGenerator;
-
-            await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSetVersions.Add(dataSetVersion));
-
-            var response = await ListDataSetVersions(
-                dataSetId: dataSet.Id,
-                page: 1,
-                pageSize: 1);
-
-            var viewModel = response.AssertOk<DataSetVersionPaginatedListViewModel>(useSystemJson: true);
-
-            Assert.NotNull(viewModel);
-            Assert.Equal(1, viewModel.Paging.Page);
-            Assert.Equal(1, viewModel.Paging.PageSize);
-            Assert.Equal(1, viewModel.Paging.TotalResults);
-
-            var result = Assert.Single(viewModel.Results);
-
-            Assert.Equal(dataSetVersion.PublicVersion, result.Version);
-            Assert.Equal(dataSetVersion.VersionType, result.Type);
-            Assert.Equal(dataSetVersion.Status, result.Status);
-            Assert.Equal(
-                dataSetVersion.Published.TruncateNanoseconds(),
-                result.Published
-            );
-            if (dataSetVersionStatus == DataSetVersionStatus.Withdrawn)
-            {
-                Assert.Equal(
-                    dataSetVersion.Withdrawn.TruncateNanoseconds(),
-                    result.Withdrawn
-                );
+                Assert.NotNull(viewModel);
+                Assert.Equal(page, viewModel.Paging.Page);
+                Assert.Equal(pageSize, viewModel.Paging.PageSize);
+                Assert.Equal(numberOfAvailableDataSetVersions, viewModel.Paging.TotalResults);
+                Assert.Equal(pagedDataSetVersions.Count, viewModel.Results.Count);
             }
 
-            Assert.Equal(dataSetVersion.Notes, result.Notes);
-            Assert.Equal(dataSetVersion.TotalResults, result.TotalResults);
+            [Fact]
+            public async Task MultipleAvailableVersionsForRequestedDataSet_Returns200_OrderedCorrectly()
+            {
+                DataSet dataSet = DataFixture
+                    .DefaultDataSet()
+                    .WithStatusPublished();
 
-            Assert.Equal(dataSetVersion.Release.DataSetFileId, result.File.Id);
+                await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
 
-            Assert.Equal(dataSetVersion.Release.Title, result.Release.Title);
-            Assert.Equal(dataSetVersion.Release.Slug, result.Release.Slug);
+                var dataSetVersions = DataFixture
+                    .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 3)
+                    .WithStatusPublished()
+                    .WithDataSetId(dataSet.Id)
+                    .ForIndex(0, dsv => dsv.SetVersionNumber(1, 0))
+                    .ForIndex(1, dsv => dsv.SetVersionNumber(1, 1))
+                    .ForIndex(2, dsv => dsv.SetVersionNumber(3, 1))
+                    .ForIndex(3, dsv => dsv.SetVersionNumber(3, 0))
+                    .ForIndex(4, dsv => dsv.SetVersionNumber(2, 0))
+                    .ForIndex(5, dsv => dsv.SetVersionNumber(2, 1))
+                    .GenerateList();
 
-            Assert.Equal(
-                TimePeriodFormatter.FormatLabel(
-                    dataSetVersion.MetaSummary!.TimePeriodRange.Start.Period,
-                    dataSetVersion.MetaSummary.TimePeriodRange.Start.Code),
-                result.TimePeriods.Start);
-            Assert.Equal(
-                TimePeriodFormatter.FormatLabel(
-                    dataSetVersion.MetaSummary.TimePeriodRange.End.Period,
-                    dataSetVersion.MetaSummary.TimePeriodRange.End.Code),
-                result.TimePeriods.End);
-            Assert.Equal(dataSetVersion.MetaSummary.GeographicLevels, result.GeographicLevels);
-            Assert.Equal(dataSetVersion.MetaSummary.Filters, result.Filters);
-            Assert.Equal(dataSetVersion.MetaSummary.Indicators, result.Indicators);
+                await TestApp.AddTestData<PublicDataDbContext>(context =>
+                {
+                    context.DataSetVersions.AddRange(dataSetVersions);
+                });
+
+                var page1Response = await ListDataSetVersions(
+                    dataSetId: dataSet.Id,
+                    page: 1,
+                    pageSize: 3);
+
+                var page1ViewModel = page1Response.AssertOk<DataSetVersionPaginatedListViewModel>(useSystemJson: true);
+
+                Assert.Equal(3, page1ViewModel.Results.Count);
+                Assert.Equal("3.1", page1ViewModel.Results[0].Version);
+                Assert.Equal("3.0", page1ViewModel.Results[1].Version);
+                Assert.Equal("2.1", page1ViewModel.Results[2].Version);
+
+                var page2Response = await ListDataSetVersions(
+                    dataSetId: dataSet.Id,
+                    page: 2,
+                    pageSize: 3);
+
+                var page2ViewModel = page2Response.AssertOk<DataSetVersionPaginatedListViewModel>(useSystemJson: true);
+
+                Assert.Equal(3, page2ViewModel.Results.Count);
+                Assert.Equal("2.0", page2ViewModel.Results[0].Version);
+                Assert.Equal("1.1", page2ViewModel.Results[1].Version);
+                Assert.Equal("1.0", page2ViewModel.Results[2].Version);
+            }
+
+            [Theory]
+            [MemberData(nameof(DataSetVersionStatusViewTheoryData.AvailableStatuses),
+                MemberType = typeof(DataSetVersionStatusViewTheoryData))]
+            public async Task DataSetVersionIsAvailable_Returns200_CorrectViewModel(
+                DataSetVersionStatus dataSetVersionStatus)
+            {
+                DataSet dataSet = DataFixture
+                    .DefaultDataSet()
+                    .WithStatusPublished();
+
+                await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
+
+                var dataSetVersionGenerator = DataFixture
+                    .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 3)
+                    .WithStatus(dataSetVersionStatus)
+                    .WithPublished(DateTimeOffset.UtcNow)
+                    .WithDataSetId(dataSet.Id);
+
+                DataSetVersion dataSetVersion = dataSetVersionStatus == DataSetVersionStatus.Withdrawn
+                    ? dataSetVersionGenerator.WithWithdrawn(DateTimeOffset.UtcNow)
+                    : dataSetVersionGenerator;
+
+                await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSetVersions.Add(dataSetVersion));
+
+                var response = await ListDataSetVersions(
+                    dataSetId: dataSet.Id,
+                    page: 1,
+                    pageSize: 1);
+
+                var viewModel = response.AssertOk<DataSetVersionPaginatedListViewModel>(useSystemJson: true);
+
+                Assert.NotNull(viewModel);
+                Assert.Equal(1, viewModel.Paging.Page);
+                Assert.Equal(1, viewModel.Paging.PageSize);
+                Assert.Equal(1, viewModel.Paging.TotalResults);
+
+                var result = Assert.Single(viewModel.Results);
+
+                Assert.Equal(dataSetVersion.PublicVersion, result.Version);
+                Assert.Equal(dataSetVersion.VersionType, result.Type);
+                Assert.Equal(dataSetVersion.Status, result.Status);
+                Assert.Equal(
+                    dataSetVersion.Published.TruncateNanoseconds(),
+                    result.Published
+                );
+                if (dataSetVersionStatus == DataSetVersionStatus.Withdrawn)
+                {
+                    Assert.Equal(
+                        dataSetVersion.Withdrawn.TruncateNanoseconds(),
+                        result.Withdrawn
+                    );
+                }
+
+                Assert.Equal(dataSetVersion.Notes, result.Notes);
+                Assert.Equal(dataSetVersion.TotalResults, result.TotalResults);
+
+                Assert.Equal(dataSetVersion.Release.DataSetFileId, result.File.Id);
+
+                Assert.Equal(dataSetVersion.Release.Title, result.Release.Title);
+                Assert.Equal(dataSetVersion.Release.Slug, result.Release.Slug);
+
+                Assert.Equal(
+                    TimePeriodFormatter.FormatLabel(
+                        dataSetVersion.MetaSummary!.TimePeriodRange.Start.Period,
+                        dataSetVersion.MetaSummary.TimePeriodRange.Start.Code),
+                    result.TimePeriods.Start);
+                Assert.Equal(
+                    TimePeriodFormatter.FormatLabel(
+                        dataSetVersion.MetaSummary.TimePeriodRange.End.Period,
+                        dataSetVersion.MetaSummary.TimePeriodRange.End.Code),
+                    result.TimePeriods.End);
+                Assert.Equal(dataSetVersion.MetaSummary.GeographicLevels, result.GeographicLevels);
+                Assert.Equal(dataSetVersion.MetaSummary.Filters, result.Filters);
+                Assert.Equal(dataSetVersion.MetaSummary.Indicators, result.Indicators);
+            }
+
+            [Fact]
+            public async Task AvailableVersionForOtherDataSet_Returns200_OnlyVersionForRequestedDataSet()
+            {
+                DataSet dataSet1 = DataFixture
+                    .DefaultDataSet()
+                    .WithStatusPublished();
+
+                DataSet dataSet2 = DataFixture
+                    .DefaultDataSet()
+                    .WithStatusPublished();
+
+                await TestApp.AddTestData<PublicDataDbContext>(context =>
+                    context.DataSets.AddRange(dataSet1, dataSet2));
+
+                DataSetVersion dataSet1Version = DataFixture
+                    .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 3)
+                    .WithStatusPublished()
+                    .WithVersionNumber(1, 1)
+                    .WithDataSetId(dataSet1.Id);
+
+                DataSetVersion dataSet2Version = DataFixture
+                    .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 3)
+                    .WithStatusPublished()
+                    .WithVersionNumber(2, 2)
+                    .WithDataSetId(dataSet2.Id);
+
+                await TestApp.AddTestData<PublicDataDbContext>(context =>
+                    context.DataSetVersions.AddRange(dataSet1Version, dataSet2Version));
+
+                var response = await ListDataSetVersions(
+                    dataSetId: dataSet1.Id,
+                    page: 1,
+                    pageSize: 1);
+
+                var viewModel = response.AssertOk<DataSetVersionPaginatedListViewModel>(useSystemJson: true);
+
+                Assert.NotNull(viewModel);
+                Assert.Equal(1, viewModel.Paging.Page);
+                Assert.Equal(1, viewModel.Paging.PageSize);
+                Assert.Equal(1, viewModel.Paging.TotalResults);
+                var result = Assert.Single(viewModel.Results);
+                Assert.Equal(dataSet1Version.PublicVersion, result.Version);
+            }
+
+            [Theory]
+            [MemberData(nameof(DataSetVersionStatusViewTheoryData.UnavailableStatuses),
+                MemberType = typeof(DataSetVersionStatusViewTheoryData))]
+            public async Task DataSetVersionUnavailable_Returns200_EmptyList(DataSetVersionStatus dataSetVersionStatus)
+            {
+                DataSet dataSet = DataFixture
+                    .DefaultDataSet()
+                    .WithStatusPublished();
+
+                await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
+
+                DataSetVersion dataSetVersion = DataFixture
+                    .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 3)
+                    .WithStatus(dataSetVersionStatus)
+                    .WithDataSetId(dataSet.Id);
+
+                await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSetVersions.Add(dataSetVersion));
+
+                var response = await ListDataSetVersions(
+                    dataSetId: dataSet.Id,
+                    page: 1,
+                    pageSize: 1);
+
+                var viewModel = response.AssertOk<DataSetVersionPaginatedListViewModel>(useSystemJson: true);
+
+                Assert.NotNull(viewModel);
+                Assert.Equal(1, viewModel.Paging.Page);
+                Assert.Equal(1, viewModel.Paging.PageSize);
+                Assert.Equal(0, viewModel.Paging.TotalResults);
+                Assert.Empty(viewModel.Results);
+            }
+
+            [Fact]
+            public async Task NoDataSetVersions_Returns200_EmptyList()
+            {
+                DataSet dataSet = DataFixture
+                    .DefaultDataSet()
+                    .WithStatusPublished();
+
+                await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
+
+                var response = await ListDataSetVersions(
+                    dataSetId: dataSet.Id,
+                    page: 1,
+                    pageSize: 1);
+
+                var viewModel = response.AssertOk<DataSetVersionPaginatedListViewModel>(useSystemJson: true);
+
+                Assert.NotNull(viewModel);
+                Assert.Equal(1, viewModel.Paging.Page);
+                Assert.Equal(1, viewModel.Paging.PageSize);
+                Assert.Equal(0, viewModel.Paging.TotalResults);
+                Assert.Empty(viewModel.Results);
+            }
+
+            [Fact]
+            public async Task PageTooBig_Returns200_EmptyList()
+            {
+                const int page = 2;
+                const int pageSize = 2;
+                const int numberOfDataSetVersions = 2;
+
+                DataSet dataSet = DataFixture
+                    .DefaultDataSet()
+                    .WithStatusPublished();
+
+                await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
+
+                var dataSetVersions = DataFixture
+                    .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 3)
+                    .WithStatusPublished()
+                    .WithDataSetId(dataSet.Id)
+                    .GenerateList(numberOfDataSetVersions);
+
+                await TestApp.AddTestData<PublicDataDbContext>(context =>
+                    context.DataSetVersions.AddRange(dataSetVersions));
+
+                var response = await ListDataSetVersions(
+                    dataSetId: dataSet.Id,
+                    page: page,
+                    pageSize: pageSize);
+
+                var viewModel = response.AssertOk<DataSetVersionPaginatedListViewModel>(useSystemJson: true);
+
+                Assert.NotNull(viewModel);
+                Assert.Equal(page, viewModel.Paging.Page);
+                Assert.Equal(pageSize, viewModel.Paging.PageSize);
+                Assert.Equal(numberOfDataSetVersions, viewModel.Paging.TotalResults);
+                Assert.Empty(viewModel.Results);
+            }
+
+            [Theory]
+            [InlineData(0)]
+            [InlineData(-1)]
+            public async Task PageTooSmall_Returns400(int page)
+            {
+                var response = await ListDataSetVersions(
+                    dataSetId: Guid.NewGuid(),
+                    page: page,
+                    pageSize: 1);
+
+                var validationProblem = response.AssertValidationProblem();
+
+                Assert.Single(validationProblem.Errors);
+
+                validationProblem.AssertHasGreaterThanOrEqualError("page", comparisonValue: 1);
+            }
+
+            [Theory]
+            [InlineData(0)]
+            [InlineData(-1)]
+            [InlineData(21)]
+            public async Task PageSizeOutOfBounds_Returns400(int pageSize)
+            {
+                var response = await ListDataSetVersions(
+                    dataSetId: Guid.NewGuid(),
+                    page: 1,
+                    pageSize: pageSize);
+
+                var validationProblem = response.AssertValidationProblem();
+
+                Assert.Single(validationProblem.Errors);
+
+                validationProblem.AssertHasInclusiveBetweenError("pageSize", from: 1, to: 20);
+            }
+
+            [Theory]
+            [MemberData(nameof(DataSetStatusTheoryData.UnavailableStatuses),
+                MemberType = typeof(DataSetStatusTheoryData))]
+            public async Task UnavailableDataSet_Returns503(DataSetStatus status)
+            {
+                DataSet dataSet = DataFixture
+                    .DefaultDataSet()
+                    .WithStatus(status);
+
+                await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
+
+                var response = await ListDataSetVersions(dataSetId: dataSet.Id);
+
+                response.AssertForbidden();
+            }
+
+            [Fact]
+            public async Task InvalidDataSetId_Returns404()
+            {
+                var client = TestApp.CreateClient();
+
+                var query = new Dictionary<string, string?>
+                {
+                    { "page", "1" },
+                    { "pageSize", "1" },
+                };
+
+                var uri = QueryHelpers.AddQueryString($"{BaseUrl}/not_a_valid_guid/versions", query);
+
+                var response = await client.GetAsync(uri);
+
+                response.AssertNotFound();
+            }
+        }
+        
+        public class AnalyticsEnabledTests : ListDataSetVersionsTests, IDisposable
+        {
+            public AnalyticsEnabledTests(TestApplicationFactory testApp) : base(testApp)
+            {
+                testApp.AddAppSettings("appsettings.AnalyticsEnabled.json");
+            }
+
+            public void Dispose()
+            {
+                var queriesDirectory = _analyticsPathResolver.PublicApiDataSetVersionCallsDirectoryPath();
+                if (Directory.Exists(queriesDirectory))
+                {
+                    Directory.Delete(queriesDirectory, recursive: true);
+                }
+            }
+
+            [Theory]
+            [MemberData(nameof(AnalyticsTheoryData.PreviewTokens), MemberType = typeof(AnalyticsTheoryData))]
+            public async Task AnalyticsRequestCaptured(
+                AnalyticsTheoryData.PreviewTokenSummary? expectedPreviewToken)
+            {
+                DataSet dataSet = DataFixture
+                    .DefaultDataSet()
+                    .WithStatusPublished();
+
+                await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
+
+                DataSetVersion dataSetVersion = DataFixture
+                    .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 3)
+                    .WithStatus(DataSetVersionStatus.Published)
+                    .WithPublished(DateTimeOffset.UtcNow)
+                    .WithDataSetId(dataSet.Id)
+                    .WithPreviewTokens(expectedPreviewToken != null
+                        ? DataFixture
+                            .DefaultPreviewToken()
+                            .WithLabel(expectedPreviewToken.Label)
+                            .WithCreated(expectedPreviewToken.Created)
+                            .WithExpiry(expectedPreviewToken.Expiry)
+                            .Generate(1)
+                        : []);
+
+                await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSetVersions.Add(dataSetVersion));
+
+                var persistedPreviewToken = dataSetVersion
+                    .PreviewTokens
+                    .SingleOrDefault();
+                
+                var response = await ListDataSetVersions(
+                    dataSetId: dataSet.Id,
+                    page: 2,
+                    pageSize: 10,
+                    previewTokenId: persistedPreviewToken?.Id);
+
+                response.AssertOk<DataSetVersionPaginatedListViewModel>(useSystemJson: true);
+
+                await AnalyticsTestAssertions.AssertDataSetAnalyticsCallCaptured(
+                    dataSet: dataSet,
+                    expectedType: DataSetCallType.GetVersions,
+                    expectedAnalyticsPath: _analyticsPathResolver.PublicApiDataSetCallsDirectoryPath(),
+                    expectedParameters: new PaginationParameters(Page: 2, PageSize: 10),
+                    expectedPreviewToken: expectedPreviewToken,
+                    expectedPreviewTokenDataSetVersionId: persistedPreviewToken?.DataSetVersionId);
+            }
         }
 
         [Fact]
-        public async Task AvailableVersionForOtherDataSet_Returns200_OnlyVersionForRequestedDataSet()
-        {
-            DataSet dataSet1 = DataFixture
-                .DefaultDataSet()
-                .WithStatusPublished();
-
-            DataSet dataSet2 = DataFixture
-                .DefaultDataSet()
-                .WithStatusPublished();
-
-            await TestApp.AddTestData<PublicDataDbContext>(context =>
-                context.DataSets.AddRange(dataSet1, dataSet2));
-
-            DataSetVersion dataSet1Version = DataFixture
-                .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 3)
-                .WithStatusPublished()
-                .WithVersionNumber(1, 1)
-                .WithDataSetId(dataSet1.Id);
-
-            DataSetVersion dataSet2Version = DataFixture
-                .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 3)
-                .WithStatusPublished()
-                .WithVersionNumber(2, 2)
-                .WithDataSetId(dataSet2.Id);
-
-            await TestApp.AddTestData<PublicDataDbContext>(context =>
-                context.DataSetVersions.AddRange(dataSet1Version, dataSet2Version));
-
-            var response = await ListDataSetVersions(
-                dataSetId: dataSet1.Id,
-                page: 1,
-                pageSize: 1);
-
-            var viewModel = response.AssertOk<DataSetVersionPaginatedListViewModel>(useSystemJson: true);
-
-            Assert.NotNull(viewModel);
-            Assert.Equal(1, viewModel.Paging.Page);
-            Assert.Equal(1, viewModel.Paging.PageSize);
-            Assert.Equal(1, viewModel.Paging.TotalResults);
-            var result = Assert.Single(viewModel.Results);
-            Assert.Equal(dataSet1Version.PublicVersion, result.Version);
-        }
-
-        [Theory]
-        [MemberData(nameof(DataSetVersionStatusViewTheoryData.UnavailableStatuses),
-            MemberType = typeof(DataSetVersionStatusViewTheoryData))]
-        public async Task DataSetVersionUnavailable_Returns200_EmptyList(DataSetVersionStatus dataSetVersionStatus)
+        public async Task RequestFromEes_AnalyticsRequestNotCaptured()
         {
             DataSet dataSet = DataFixture
                 .DefaultDataSet()
@@ -260,7 +486,8 @@ public abstract class DataSetVersionsControllerTests(TestApplicationFactory test
 
             DataSetVersion dataSetVersion = DataFixture
                 .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 3)
-                .WithStatus(dataSetVersionStatus)
+                .WithStatus(DataSetVersionStatus.Published)
+                .WithPublished(DateTimeOffset.UtcNow)
                 .WithDataSetId(dataSet.Id);
 
             await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSetVersions.Add(dataSetVersion));
@@ -268,149 +495,21 @@ public abstract class DataSetVersionsControllerTests(TestApplicationFactory test
             var response = await ListDataSetVersions(
                 dataSetId: dataSet.Id,
                 page: 1,
-                pageSize: 1);
+                pageSize: 1,
+                requestSource: "EES");
 
-            var viewModel = response.AssertOk<DataSetVersionPaginatedListViewModel>(useSystemJson: true);
+            response.AssertOk<DataSetVersionPaginatedListViewModel>(useSystemJson: true);
 
-            Assert.NotNull(viewModel);
-            Assert.Equal(1, viewModel.Paging.Page);
-            Assert.Equal(1, viewModel.Paging.PageSize);
-            Assert.Equal(0, viewModel.Paging.TotalResults);
-            Assert.Empty(viewModel.Results);
-        }
-
-        [Fact]
-        public async Task NoDataSetVersions_Returns200_EmptyList()
-        {
-            DataSet dataSet = DataFixture
-                .DefaultDataSet()
-                .WithStatusPublished();
-
-            await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
-
-            var response = await ListDataSetVersions(
-                dataSetId: dataSet.Id,
-                page: 1,
-                pageSize: 1);
-
-            var viewModel = response.AssertOk<DataSetVersionPaginatedListViewModel>(useSystemJson: true);
-
-            Assert.NotNull(viewModel);
-            Assert.Equal(1, viewModel.Paging.Page);
-            Assert.Equal(1, viewModel.Paging.PageSize);
-            Assert.Equal(0, viewModel.Paging.TotalResults);
-            Assert.Empty(viewModel.Results);
-        }
-
-        [Fact]
-        public async Task PageTooBig_Returns200_EmptyList()
-        {
-            const int page = 2;
-            const int pageSize = 2;
-            const int numberOfDataSetVersions = 2;
-
-            DataSet dataSet = DataFixture
-                .DefaultDataSet()
-                .WithStatusPublished();
-
-            await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
-
-            var dataSetVersions = DataFixture
-                .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 3)
-                .WithStatusPublished()
-                .WithDataSetId(dataSet.Id)
-                .GenerateList(numberOfDataSetVersions);
-
-            await TestApp.AddTestData<PublicDataDbContext>(context =>
-                context.DataSetVersions.AddRange(dataSetVersions));
-
-            var response = await ListDataSetVersions(
-                dataSetId: dataSet.Id,
-                page: page,
-                pageSize: pageSize);
-
-            var viewModel = response.AssertOk<DataSetVersionPaginatedListViewModel>(useSystemJson: true);
-
-            Assert.NotNull(viewModel);
-            Assert.Equal(page, viewModel.Paging.Page);
-            Assert.Equal(pageSize, viewModel.Paging.PageSize);
-            Assert.Equal(numberOfDataSetVersions, viewModel.Paging.TotalResults);
-            Assert.Empty(viewModel.Results);
-        }
-
-        [Theory]
-        [InlineData(0)]
-        [InlineData(-1)]
-        public async Task PageTooSmall_Returns400(int page)
-        {
-            var response = await ListDataSetVersions(
-                dataSetId: Guid.NewGuid(),
-                page: page,
-                pageSize: 1);
-
-            var validationProblem = response.AssertValidationProblem();
-
-            Assert.Single(validationProblem.Errors);
-
-            validationProblem.AssertHasGreaterThanOrEqualError("page", comparisonValue: 1);
-        }
-
-        [Theory]
-        [InlineData(0)]
-        [InlineData(-1)]
-        [InlineData(21)]
-        public async Task PageSizeOutOfBounds_Returns400(int pageSize)
-        {
-            var response = await ListDataSetVersions(
-                dataSetId: Guid.NewGuid(),
-                page: 1,
-                pageSize: pageSize);
-
-            var validationProblem = response.AssertValidationProblem();
-
-            Assert.Single(validationProblem.Errors);
-
-            validationProblem.AssertHasInclusiveBetweenError("pageSize", from: 1, to: 20);
-        }
-
-        [Theory]
-        [MemberData(nameof(DataSetStatusTheoryData.UnavailableStatuses),
-            MemberType = typeof(DataSetStatusTheoryData))]
-        public async Task UnavailableDataSet_Returns503(DataSetStatus status)
-        {
-            DataSet dataSet = DataFixture
-                .DefaultDataSet()
-                .WithStatus(status);
-
-            await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
-
-            var response = await ListDataSetVersions(dataSetId: dataSet.Id);
-
-            response.AssertForbidden();
-        }
-
-        [Fact]
-        public async Task InvalidDataSetId_Returns404()
-        {
-            var client = TestApp.CreateClient();
-
-            var query = new Dictionary<string, string?>
-            {
-                { "page", "1" },
-                { "pageSize", "1" },
-            };
-
-            var uri = QueryHelpers.AddQueryString($"{BaseUrl}/not_a_valid_guid/versions", query);
-
-            var response = await client.GetAsync(uri);
-
-            response.AssertNotFound();
+            AnalyticsTestAssertions.AssertAnalyticsCallNotCaptured(
+                _analyticsPathResolver.PublicApiDataSetCallsDirectoryPath());
         }
 
         private async Task<HttpResponseMessage> ListDataSetVersions(
             Guid dataSetId,
             int? page = null,
             int? pageSize = null,
+            Guid? previewTokenId = null,
+            string? requestSource = null,
             IContentApiClient? contentApiClient = null)
         {
             var query = new Dictionary<string, string?>
@@ -421,7 +520,10 @@ public abstract class DataSetVersionsControllerTests(TestApplicationFactory test
 
             var uri = QueryHelpers.AddQueryString($"{BaseUrl}/{dataSetId}/versions", query);
 
-            var client = BuildApp(contentApiClient).CreateClient();
+            var client = BuildApp(contentApiClient)
+                .CreateClient()
+                .WithPreviewTokenHeader(previewTokenId)
+                .WithRequestSourceHeader(requestSource);
 
             return await client.GetAsync(uri);
         }
