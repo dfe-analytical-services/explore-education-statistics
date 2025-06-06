@@ -48,7 +48,7 @@ public class ProcessRequestFilesWorkflow(
 
     public async Task Process(IWorkflowActor actor)
     {
-        var processorName = actor.GetType().Name;
+        var processorName = actor.GetType().FullName;
         
         logger.LogInformation("{Processor} triggered", processorName);
 

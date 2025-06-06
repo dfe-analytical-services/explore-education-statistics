@@ -5,6 +5,13 @@ using GovUk.Education.ExploreEducationStatistics.Analytics.Common.Interfaces;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Requests;
 
+public record CaptureTopLevelCallRequest(
+    DateTimeOffset StartTime,
+    [property: JsonConverter(typeof(StringEnumConverter))]
+    TopLevelCallType Type,
+    object? Parameters = null
+) : IAnalyticsCaptureRequestBase;
+
 public record CaptureDataSetCallRequest(
     Guid DataSetId,
     string DataSetTitle,
@@ -40,6 +47,11 @@ public record CaptureDataSetVersionCallRequest(
     DataSetVersionCallType Type,
     object? Parameters = null
 ) : IAnalyticsCaptureRequestBase;
+
+public enum TopLevelCallType
+{
+    GetPublications
+}
 
 public enum DataSetCallType
 {
