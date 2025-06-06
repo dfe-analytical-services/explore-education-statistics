@@ -1,4 +1,3 @@
-using System.Text.Json;
 using GovUk.Education.ExploreEducationStatistics.Analytics.Common.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
@@ -7,6 +6,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Requests;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Analytics;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Fixture;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Resources.DataFiles.AbsenceSchool;
@@ -20,7 +20,6 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Services.Tests;
-using GovUk.Education.ExploreEducationStatistics.Public.Data.Utils.Requests;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Primitives;
@@ -2898,23 +2897,6 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
             // There are 4 results for the query above, but we are requesting page 2 and a page size of 3,
             // and so this 2nd page only displays the final single result of the 4.
             Assert.Single(viewModel.Results);
-            
-            // Add a slight delay as the writing of the query details for analytics is non-blocking
-            // and could occur slightly after the query result is returned to the user.
-            Thread.Sleep(2000);
-
-            var publicApiQueriesPath = _analyticsPathResolver.PublicApiQueriesDirectoryPath();
-            
-            // Expect the successful query to have recorded its query for analytics.
-            Assert.True(Directory.Exists(publicApiQueriesPath));
-            var queryFiles = Directory.GetFiles(publicApiQueriesPath);
-            var queryFile = Assert.Single(queryFiles);
-            var contents = await File.ReadAllTextAsync(queryFile);
-            var capturedQuery = JsonSerializer.Deserialize<CaptureDataSetVersionQueryRequest>(contents, new JsonSerializerOptions
-            {
-                PropertyNameCaseInsensitive = true
-            });
-            Assert.NotNull(capturedQuery);
 
             var expectedRequest = new DataSetQueryRequest
             {
@@ -2955,19 +2937,15 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
                 }),
                 Debug = true
             };
-
-            capturedQuery.Query.AssertDeepEqualTo(expectedRequest);
-
-            Assert.Equal(capturedQuery.DataSetId, dataSetVersion.DataSetId);
-            Assert.Equal(capturedQuery.DataSetVersionId, dataSetVersion.Id);
-            Assert.Equal(1, capturedQuery.ResultsCount);
-            Assert.Equal(4, capturedQuery.TotalRowsCount);
-
-            capturedQuery.StartTime.AssertUtcNow(withinMillis: 5000);
-            capturedQuery.EndTime.AssertUtcNow(withinMillis: 5000);
-            Assert.True(capturedQuery.EndTime > capturedQuery.StartTime);
+            
+            await AnalyticsTestAssertions.AssertDataSetVersionQueryAnalyticsCaptured(
+                dataSetVersion: dataSetVersion,
+                expectedAnalyticsPath: _analyticsPathResolver.PublicApiQueriesDirectoryPath(),
+                expectedRequest: expectedRequest,
+                expectedResultsCount: 1,
+                expectedTotalRows: 4);
         }
-        
+
         [Fact]
         public async Task UnsuccessfulQuery_NotCapturedByAnalytics()
         {
@@ -2984,12 +2962,9 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
 
             response.AssertBadRequest();
             
-            // Add a slight delay as the writing of the query details for analytics is non-blocking
-            // and could occur slightly after the query result is returned to the user.
-            Thread.Sleep(2000);
-
             // Check that the folder for capturing queries for analytics was never created.
-            Assert.False(Directory.Exists(_analyticsPathResolver.PublicApiQueriesDirectoryPath()));
+            AnalyticsTestAssertions.AssertAnalyticsCallNotCaptured(
+                _analyticsPathResolver.PublicApiQueriesDirectoryPath());
         }
 
         [Fact]
@@ -3011,23 +2986,18 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
                 debug: true,
                 page: 2,
                 pageSize: 3,
-                additionalHeaders: new Dictionary<string, string> { { RequestHeaderNames.RequestSource, "EES" } });
+                requestSource: "EES");
 
             var viewModel = response.AssertOk<DataSetQueryPaginatedResultsViewModel>(useSystemJson: true);
 
             // There are 4 results for the query above, but we are requesting page 2 and a page size of 3,
             // and so this 2nd page only displays the final single result of the 4.
             Assert.Single(viewModel.Results);
-
-            // Add a slight delay as the writing of the query details for analytics is non-blocking
-            // and could occur slightly after the query result is returned to the user.
-            Thread.Sleep(2000);
-
-            var analyticsPath = _analyticsPathResolver.PublicApiQueriesDirectoryPath();
-
+            
             // Expect the successful call to have been omitted from analytics because it originates
             // from the EES service.
-            Assert.False(Directory.Exists(analyticsPath));
+            AnalyticsTestAssertions.AssertAnalyticsCallNotCaptured(
+                _analyticsPathResolver.PublicApiQueriesDirectoryPath());
         }
         
         [Fact]
@@ -3112,15 +3082,10 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
             // and so this 2nd page only displays the final single result of the 4.
             Assert.Single(viewModel.Results);
             
-            // Add a slight delay as the writing of the query details for analytics is non-blocking
-            // and could occur slightly after the query result is returned to the user.
-            Thread.Sleep(2000);
-
-            var publicApiQueriesPath = _analyticsPathResolver.PublicApiQueriesDirectoryPath();
-            
             // Expect the successful query not to have recorded its query for analytics, as this
             // feature was disabled by appsettings.
-            Assert.False(Directory.Exists(publicApiQueriesPath));
+            AnalyticsTestAssertions.AssertAnalyticsCallNotCaptured(
+                _analyticsPathResolver.PublicApiQueriesDirectoryPath());
         }
     }
         
@@ -3135,7 +3100,7 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
         IDictionary<string, StringValues>? queryParameters = null,
         Guid? previewTokenId = null,
         WebApplicationFactory<Startup>? app = null,
-        Dictionary<string, string>? additionalHeaders = null)
+        string? requestSource = null)
     {
         var query = new Dictionary<string, StringValues>
         {
@@ -3175,7 +3140,7 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
         var client = (app ?? BuildApp())
             .CreateClient()
             .WithPreviewTokenHeader(previewTokenId)
-            .WithAdditionalHeaders(additionalHeaders);
+            .WithRequestSourceHeader(requestSource);
 
         var uri = QueryHelpers.AddQueryString($"{BaseUrl}/{dataSetId}/query", query);
 

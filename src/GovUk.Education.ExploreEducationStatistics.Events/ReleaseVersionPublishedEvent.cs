@@ -11,6 +11,7 @@ public record ReleaseVersionPublishedEvent : IEvent
         Payload = new EventPayload
         {
             ReleaseId = eventInfo.ReleaseId,
+            ReleaseVersionId = eventInfo.ReleaseVersionId,
             ReleaseSlug = eventInfo.ReleaseSlug,
             PublicationId = eventInfo.PublicationId,
             PublicationSlug = eventInfo.PublicationSlug,
@@ -39,6 +40,7 @@ public record ReleaseVersionPublishedEvent : IEvent
     public record EventPayload
     {
         public required Guid ReleaseId { get; init; }
+        public required Guid ReleaseVersionId { get; set; }
         public required string ReleaseSlug { get; init; }
         public required Guid PublicationId { get; init; }
         public required string PublicationSlug { get; init; }

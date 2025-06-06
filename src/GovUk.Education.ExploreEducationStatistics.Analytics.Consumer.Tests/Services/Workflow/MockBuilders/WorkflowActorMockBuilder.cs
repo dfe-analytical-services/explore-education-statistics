@@ -1,5 +1,4 @@
 using System.Data;
-using GovUk.Education.ExploreEducationStatistics.Analytics.Consumer.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Analytics.Consumer.Services.Workflow;
 using GovUk.Education.ExploreEducationStatistics.Common.DuckDb.DuckDb;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
@@ -7,22 +6,29 @@ using Moq;
 
 namespace GovUk.Education.ExploreEducationStatistics.Analytics.Consumer.Tests.Services.Workflow.MockBuilders;
 
-public class WorkflowActorMockBuilder<TRequestFileProcessor>
-    where TRequestFileProcessor : IRequestFileProcessor
+public class WorkflowActorMockBuilder
 {
-    private readonly Mock<IWorkflowActor<TRequestFileProcessor>> _mock = new(MockBehavior.Strict);
+    private readonly Mock<IWorkflowActor> _mock = new(MockBehavior.Strict);
 
     public WorkflowActorMockBuilder()
     {
         Assert = new Asserter(_mock);
     }
     
-    public IWorkflowActor<TRequestFileProcessor> Build()
+    public IWorkflowActor Build()
     {
+        _mock
+            .Setup(s => s.GetSourceDirectory())
+            .Returns("source");
+            
+        _mock
+            .Setup(s => s.GetReportsDirectory())
+            .Returns("reports");
+
         return _mock.Object;
     }
 
-    public WorkflowActorMockBuilder<TRequestFileProcessor> WhereDuckDbInitialisedSuccessfully()
+    public WorkflowActorMockBuilder WhereDuckDbInitialisedSuccessfully()
     {
         _mock
             .Setup(m => m.InitialiseDuckDb(ItIsOpenDuckDbConnection()))
@@ -30,7 +36,7 @@ public class WorkflowActorMockBuilder<TRequestFileProcessor>
         return this;
     }
     
-    public WorkflowActorMockBuilder<TRequestFileProcessor> WhereDuckDbInitialisedWithErrors()
+    public WorkflowActorMockBuilder WhereDuckDbInitialisedWithErrors()
     {
         _mock
             .Setup(m => m.InitialiseDuckDb(ItIsOpenDuckDbConnection()))
@@ -38,7 +44,7 @@ public class WorkflowActorMockBuilder<TRequestFileProcessor>
         return this;
     }
 
-    public WorkflowActorMockBuilder<TRequestFileProcessor> WhereSourceFilesAreProcessedSuccessfully(
+    public WorkflowActorMockBuilder WhereSourceFilesAreProcessedSuccessfully(
         string processingFolder,
         IEnumerable<string> sourceFiles)
     {
@@ -53,7 +59,7 @@ public class WorkflowActorMockBuilder<TRequestFileProcessor>
         return this;
     }
 
-    public WorkflowActorMockBuilder<TRequestFileProcessor> WhereSourceFilesAreProcessedWithErrors(
+    public WorkflowActorMockBuilder WhereSourceFilesAreProcessedWithErrors(
         string processingFolder,
         IEnumerable<string> sourceFiles)
     {
@@ -68,7 +74,7 @@ public class WorkflowActorMockBuilder<TRequestFileProcessor>
         return this;
     }
     
-    public WorkflowActorMockBuilder<TRequestFileProcessor> WhereReportsAreGeneratedSuccessfully(
+    public WorkflowActorMockBuilder WhereReportsAreGeneratedSuccessfully(
         string reportsFolder,
         string reportsFilenamePrefix)
     {
@@ -80,7 +86,7 @@ public class WorkflowActorMockBuilder<TRequestFileProcessor>
         return this;
     }
     
-    public WorkflowActorMockBuilder<TRequestFileProcessor> WhereReportsAreGeneratedWithErrors(
+    public WorkflowActorMockBuilder WhereReportsAreGeneratedWithErrors(
         string reportsFolder,
         string reportsFilenamePrefix)
     {
@@ -94,7 +100,7 @@ public class WorkflowActorMockBuilder<TRequestFileProcessor>
 
     public Asserter Assert { get; }
 
-    public class Asserter(Mock<IWorkflowActor<TRequestFileProcessor>> mock)
+    public class Asserter(Mock<IWorkflowActor> mock)
     {
         public Asserter InitialiseDuckDbCalled()
         {

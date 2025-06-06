@@ -29,11 +29,16 @@ internal class DataSetService(
         Guid dataSetId,
         CancellationToken cancellationToken = default)
     {
-        return await publicDataDbContext.DataSets
+        return await publicDataDbContext
+            .DataSets
             .AsNoTracking()
             .Include(ds => ds.LatestLiveVersion)
             .SingleOrNotFoundAsync(ds => ds.Id == dataSetId, cancellationToken: cancellationToken)
             .OnSuccessDo(userService.CheckCanViewDataSet)
+            .OnSuccessDo(ds => analyticsService.CaptureDataSetCall(
+                dataSetId: ds.Id,
+                type: DataSetCallType.GetSummary,
+                cancellationToken: cancellationToken))
             .OnSuccess(MapDataSet);
     }
 
@@ -103,13 +108,19 @@ internal class DataSetService(
         string dataSetVersion,
         CancellationToken cancellationToken = default)
     {
-        return await publicDataDbContext.DataSetVersions
+        return await publicDataDbContext
+            .DataSetVersions
             .AsNoTracking()
             .FindByVersion(
                 dataSetId: dataSetId,
                 version: dataSetVersion,
                 cancellationToken: cancellationToken)
             .OnSuccessDo(userService.CheckCanViewDataSetVersion)
+            .OnSuccessDo(dsv => analyticsService.CaptureDataSetVersionCall(
+                dataSetVersionId: dsv.Id,
+                type: DataSetVersionCallType.GetSummary,
+                requestedDataSetVersion: dataSetVersion,
+                cancellationToken: cancellationToken))
             .OnSuccess(MapDataSetVersion);
     }
 
@@ -119,10 +130,16 @@ internal class DataSetService(
         int pageSize,
         CancellationToken cancellationToken = default)
     {
-        return await publicDataDbContext.DataSets
+        return await publicDataDbContext
+            .DataSets
             .AsNoTracking()
             .SingleOrNotFoundAsync(ds => ds.Id == dataSetId, cancellationToken: cancellationToken)
             .OnSuccessDo(userService.CheckCanViewDataSet)
+            .OnSuccessDo(ds => analyticsService.CaptureDataSetCall(
+                dataSetId: ds.Id,
+                type: DataSetCallType.GetVersions,
+                parameters: new PaginationParameters(Page: page, PageSize: pageSize),
+                cancellationToken: cancellationToken))
             .OnSuccess(dataSet => ListPaginatedVersions(
                 dataSet: dataSet,
                 page: page,
@@ -159,7 +176,8 @@ internal class DataSetService(
         int pageSize,
         CancellationToken cancellationToken = default)
     {
-        var queryable = publicDataDbContext.DataSetVersions
+        var queryable = publicDataDbContext
+            .DataSetVersions
             .AsNoTracking()
             .Where(ds => ds.DataSetId == dataSet.Id)
             .WherePublicStatus();

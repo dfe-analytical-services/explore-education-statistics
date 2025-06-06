@@ -2,12 +2,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Analytics.Consumer.Services
 
 public interface IAnalyticsPathResolver
 {
-    string BasePath();
+    string GetBasePath();
+    
+    // PublicTopLevelCalls
+    string PublicApiTopLevelCallsDirectoryPath();
 
-    // PublicApiQueries
-    string PublicApiQueriesDirectoryPath();
-
-    string PublicApiQueriesReportsDirectoryPath();
+    string PublicApiTopLevelCallsReportsDirectoryPath();
     
     // PublicApiDataSetCalls
     string PublicApiDataSetCallsDirectoryPath();
@@ -18,6 +18,11 @@ public interface IAnalyticsPathResolver
     string PublicApiDataSetVersionCallsDirectoryPath();
 
     string PublicApiDataSetVersionCallsReportsDirectoryPath();
+    
+    // PublicApiQueries
+    string PublicApiQueriesDirectoryPath();
+
+    string PublicApiQueriesReportsDirectoryPath();
 
     // PublicZipDownloads
     string PublicZipDownloadsDirectoryPath();

@@ -210,7 +210,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         }
 
         [Fact]
-        public async void CreateMethodologyAmendment_Returns_Ok()
+        public async Task CreateMethodologyAmendment_Returns_Ok()
         {
             var methodologyAmendmentService = new Mock<IMethodologyAmendmentService>(Strict);
 
@@ -229,7 +229,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         }
 
         [Fact]
-        public async void DeleteMethodologyVersion_Returns_NoContent()
+        public async Task DeleteMethodologyVersion_Returns_NoContent()
         {
             var methodologyService = new Mock<IMethodologyService>(Strict);
 
@@ -247,7 +247,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         }
 
         [Fact]
-        public async void ListMethodologyVersionsForApproval()
+        public async Task ListMethodologyVersionsForApproval()
         {
             var methodologyVersions = ListOf(new MethodologyVersionViewModel
             {

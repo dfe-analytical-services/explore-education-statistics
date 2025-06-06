@@ -5,6 +5,32 @@ using GovUk.Education.ExploreEducationStatistics.Analytics.Common.Interfaces;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Requests;
 
+public record CaptureTopLevelCallRequest(
+    DateTimeOffset StartTime,
+    [property: JsonConverter(typeof(StringEnumConverter))]
+    TopLevelCallType Type,
+    object? Parameters = null
+) : IAnalyticsCaptureRequestBase;
+
+public record CapturePublicationCallRequest(
+    Guid PublicationId,
+    string PublicationTitle,
+    DateTimeOffset StartTime,
+    [property:JsonConverter(typeof(StringEnumConverter))]
+    PublicationCallType Type,
+    object? Parameters = null
+) : IAnalyticsCaptureRequestBase;
+
+public record CaptureDataSetCallRequest(
+    Guid DataSetId,
+    string DataSetTitle,
+    PreviewTokenRequest? PreviewToken,
+    DateTimeOffset StartTime,
+    [property:JsonConverter(typeof(StringEnumConverter))]
+    DataSetCallType Type,
+    object? Parameters = null
+) : IAnalyticsCaptureRequestBase;
+
 public record CaptureDataSetVersionQueryRequest(
     Guid DataSetId,
     Guid DataSetVersionId,
@@ -31,6 +57,23 @@ public record CaptureDataSetVersionCallRequest(
     object? Parameters = null
 ) : IAnalyticsCaptureRequestBase;
 
+public enum TopLevelCallType
+{
+    GetPublications
+}
+
+public enum PublicationCallType
+{
+    GetSummary,
+    GetDataSets
+}
+
+public enum DataSetCallType
+{
+    GetSummary,
+    GetVersions
+}
+
 public enum DataSetVersionCallType
 {
     GetMetadata,
@@ -48,3 +91,7 @@ public record PreviewTokenRequest(
     Guid DataSetVersionId,
     DateTimeOffset Created,
     DateTimeOffset Expiry);
+
+public record PaginationParameters(
+    int Page,
+    int PageSize);

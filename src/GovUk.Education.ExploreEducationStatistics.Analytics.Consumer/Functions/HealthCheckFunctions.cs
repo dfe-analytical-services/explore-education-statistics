@@ -39,7 +39,7 @@ public class HealthCheckFunctions(
         
         try
         {
-            if (Directory.Exists(pathResolver.BasePath()))
+            if (Directory.Exists(pathResolver.GetBasePath()))
             {
                 return HealthCheckSummary.Healthy();
             }

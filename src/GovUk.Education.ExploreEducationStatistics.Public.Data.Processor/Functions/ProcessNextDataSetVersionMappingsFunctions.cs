@@ -2,7 +2,6 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Services.Interfaces;
 using Microsoft.Azure.Functions.Worker;
-using Semver;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Functions;
 

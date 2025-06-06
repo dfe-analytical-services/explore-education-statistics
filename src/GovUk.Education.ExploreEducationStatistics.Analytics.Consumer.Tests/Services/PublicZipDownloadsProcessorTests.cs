@@ -3,7 +3,6 @@ using System.Security.Cryptography;
 using System.Text;
 using GovUk.Education.ExploreEducationStatistics.Analytics.Consumer.Services;
 using GovUk.Education.ExploreEducationStatistics.Analytics.Consumer.Services.Workflow;
-using GovUk.Education.ExploreEducationStatistics.Analytics.Consumer.Tests.Services.Workflow.MockBuilders;
 using GovUk.Education.ExploreEducationStatistics.Common.DuckDb.DuckDb;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using InterpolatedSql.Dapper;
@@ -27,23 +26,20 @@ public abstract class PublicZipDownloadsProcessorTests
         public async Task ProcessorUsesWorkflow()
         {
             using var pathResolver = new TestAnalyticsPathResolver();
-            SetupRequestFile(pathResolver, "ZipDownloadRequestFile_NoSubjectId.json");
 
-            var workflowActorBuilder = new WorkflowActorMockBuilder<PublicZipDownloadsProcessor>();
+            var workflow = new Mock<IProcessRequestFilesWorkflow>(MockBehavior.Strict);
+
+            workflow
+                .Setup(s => s.Process(It.IsAny<IWorkflowActor>()))
+                .Returns(Task.CompletedTask);
             
-            var workflowActor = workflowActorBuilder 
-                .WhereDuckDbInitialisedWithErrors()
-                .Build();
-
             var service = BuildService(
                 pathResolver: pathResolver,
-                workflowActor: workflowActor);
+                workflow: workflow.Object);
             
-            await Assert.ThrowsAsync<ArgumentException>(service.Process);
+            await service.Process();
 
-            workflowActorBuilder
-                .Assert
-                .InitialiseDuckDbCalled();
+            workflow.Verify(s => s.Process(It.IsAny<IWorkflowActor>()), Times.Once);
         }
 
         [Fact]
@@ -155,15 +151,15 @@ public abstract class PublicZipDownloadsProcessorTests
                 .ToList();
         }
     }
-
+    
     private PublicZipDownloadsProcessor BuildService(
         TestAnalyticsPathResolver pathResolver,
-        IWorkflowActor<PublicZipDownloadsProcessor>? workflowActor = null)
+        IProcessRequestFilesWorkflow? workflow = null)
     {
         return new PublicZipDownloadsProcessor(
             pathResolver: pathResolver,
-            Mock.Of<ILogger<PublicZipDownloadsProcessor>>(),
-            workflowActor: workflowActor);
+            workflow: workflow ?? new ProcessRequestFilesWorkflow(
+                logger: Mock.Of<ILogger<ProcessRequestFilesWorkflow>>()));
     }
 
     private void SetupRequestFile(TestAnalyticsPathResolver pathResolver, string filename)
