@@ -59,9 +59,6 @@ describe('chartBuilderReducer', () => {
         id: 'xaxis',
         title: 'X Axis',
         type: 'major',
-        capabilities: {
-          canRotateLabel: false,
-        },
         defaults: {
           groupBy: 'timePeriod',
           min: 0,
@@ -79,9 +76,6 @@ describe('chartBuilderReducer', () => {
         id: 'yaxis',
         title: 'Y Axis',
         type: 'minor',
-        capabilities: {
-          canRotateLabel: true,
-        },
       },
     },
   };

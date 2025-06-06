@@ -3,7 +3,6 @@ using System.Security.Cryptography;
 using System.Text;
 using GovUk.Education.ExploreEducationStatistics.Analytics.Consumer.Services;
 using GovUk.Education.ExploreEducationStatistics.Analytics.Consumer.Services.Workflow;
-using GovUk.Education.ExploreEducationStatistics.Analytics.Consumer.Tests.Services.Workflow.MockBuilders;
 using GovUk.Education.ExploreEducationStatistics.Common.DuckDb.DuckDb;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using InterpolatedSql.Dapper;
@@ -27,23 +26,20 @@ public abstract class PublicCsvDownloadsProcessorTests
         public async Task ProcessorUsesWorkflow()
         {
             using var pathResolver = new TestAnalyticsPathResolver();
-            SetupRequestFile(pathResolver, "CsvDownloadRequestFile1.json");
 
-            var workflowActorBuilder = new WorkflowActorMockBuilder<PublicCsvDownloadsProcessor>();
-            
-            var workflowActor = workflowActorBuilder 
-                .WhereDuckDbInitialisedWithErrors()
-                .Build();
+            var workflow = new Mock<IProcessRequestFilesWorkflow>(MockBehavior.Strict);
+
+            workflow
+                .Setup(s => s.Process(It.IsAny<IWorkflowActor>()))
+                .Returns(Task.CompletedTask);
 
             var service = BuildService(
                 pathResolver: pathResolver,
-                workflowActor: workflowActor);
-            
-            await Assert.ThrowsAsync<ArgumentException>(service.Process);
+                workflow: workflow.Object);
 
-            workflowActorBuilder
-                .Assert
-                .InitialiseDuckDbCalled();
+            await service.Process();
+
+            workflow.Verify(s => s.Process(It.IsAny<IWorkflowActor>()), Times.Once);
         }
 
         [Fact]
@@ -114,7 +110,8 @@ public abstract class PublicCsvDownloadsProcessorTests
                 2);
         }
 
-        private static async Task<List<CsvDownloadReportLine>> ReadReport(DuckDbConnection duckDbConnection, string reportFile)
+        private static async Task<List<CsvDownloadReportLine>> ReadReport(DuckDbConnection duckDbConnection,
+            string reportFile)
         {
             return (await duckDbConnection
                     .SqlBuilder($"SELECT * FROM read_parquet('{reportFile:raw}')")
@@ -124,14 +121,14 @@ public abstract class PublicCsvDownloadsProcessorTests
         }
     }
 
-    private static PublicCsvDownloadsProcessor BuildService(
+    private PublicCsvDownloadsProcessor BuildService(
         TestAnalyticsPathResolver pathResolver,
-        IWorkflowActor<PublicCsvDownloadsProcessor>? workflowActor = null)
+        IProcessRequestFilesWorkflow? workflow = null)
     {
         return new PublicCsvDownloadsProcessor(
             pathResolver: pathResolver,
-            Mock.Of<ILogger<PublicCsvDownloadsProcessor>>(),
-            workflowActor: workflowActor);
+            workflow: workflow ?? new ProcessRequestFilesWorkflow(
+                logger: Mock.Of<ILogger<ProcessRequestFilesWorkflow>>()));
     }
 
     private void SetupRequestFile(TestAnalyticsPathResolver pathResolver, string filename)
@@ -169,7 +166,7 @@ public abstract class PublicCsvDownloadsProcessorTests
         Assert.Equal(hashSb.ToString(), row.CsvDownloadHash);
         Assert.Equal(numRequests, row.Downloads);
     }
-    
+
     private static string ProcessingDirectoryPath(TestAnalyticsPathResolver pathResolver)
     {
         return Path.Combine(pathResolver.PublicCsvDownloadsDirectoryPath(), "processing");

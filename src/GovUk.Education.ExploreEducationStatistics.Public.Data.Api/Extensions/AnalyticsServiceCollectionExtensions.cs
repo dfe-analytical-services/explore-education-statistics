@@ -38,9 +38,17 @@ public static class AnalyticsServiceCollectionExtensions
             services.AddSingleton<IAnalyticsPathResolver, AnalyticsPathResolver>();
         }
 
-        services.AddTransient<IAnalyticsWriteStrategy, AnalyticsWriteDataSetCallsStrategy>();
-        services.AddTransient<IAnalyticsWriteStrategy, AnalyticsWriteDataSetVersionCallsStrategy>();
-        services.AddTransient<IAnalyticsWriteStrategy, AnalyticsWritePublicApiQueryStrategy>();
+        services
+            .AddTransient<IAnalyticsWriteStrategy, AnalyticsWriteTopLevelCallsStrategy>()
+            .AddTransient<IAnalyticsWriteStrategy, AnalyticsWritePublicationCallsStrategy>()
+            .AddTransient<IAnalyticsWriteStrategy, AnalyticsWriteDataSetCallsStrategy>()
+            .AddTransient<IAnalyticsWriteStrategy, AnalyticsWriteDataSetVersionCallsStrategy>()
+            .AddTransient<IAnalyticsWriteStrategy, AnalyticsWritePublicApiQueryStrategy>();
+        
+        services.AddTransient(
+            typeof(ICommonAnalyticsWriteStrategyWorkflow<>),
+            typeof(CommonAnalyticsWriteStrategyWorkflow<>));
+        
         return services;
     }
 }

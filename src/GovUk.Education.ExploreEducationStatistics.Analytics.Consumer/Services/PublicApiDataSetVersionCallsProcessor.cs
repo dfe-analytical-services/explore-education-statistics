@@ -1,32 +1,34 @@
 using GovUk.Education.ExploreEducationStatistics.Analytics.Consumer.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Analytics.Consumer.Services.Workflow;
 using GovUk.Education.ExploreEducationStatistics.Common.DuckDb.DuckDb;
-using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using Microsoft.Extensions.Logging;
 
 namespace GovUk.Education.ExploreEducationStatistics.Analytics.Consumer.Services;
 
 public class PublicApiDataSetVersionCallsProcessor(
     IAnalyticsPathResolver pathResolver,
-    ILogger<PublicApiDataSetVersionCallsProcessor> logger,
-    IWorkflowActor<PublicApiDataSetVersionCallsProcessor>? workflowActor = null) : IRequestFileProcessor
+    IProcessRequestFilesWorkflow workflow) : IRequestFileProcessor
 {
-    private readonly IWorkflowActor<PublicApiDataSetVersionCallsProcessor> _workflowActor 
-        = workflowActor ?? new WorkflowActor();
-    
     public Task Process()
     {
-        var workflow = new ProcessRequestFilesWorkflow<PublicApiDataSetVersionCallsProcessor>(
+        return workflow.Process(new WorkflowActor(
             sourceDirectory: pathResolver.PublicApiDataSetVersionCallsDirectoryPath(),
-            reportsDirectory: pathResolver.PublicApiDataSetVersionCallsReportsDirectoryPath(),
-            actor: _workflowActor,
-            logger: logger);
-
-        return workflow.Process();
+            reportsDirectory: pathResolver.PublicApiDataSetVersionCallsReportsDirectoryPath()));
     }
 
-    private class WorkflowActor : IWorkflowActor<PublicApiDataSetVersionCallsProcessor>
+    private class WorkflowActor(string sourceDirectory, string reportsDirectory) 
+        : IWorkflowActor
     {
+        public string GetSourceDirectory()
+        {
+            return sourceDirectory;
+        }
+
+        public string GetReportsDirectory()
+        {
+            return reportsDirectory;
+        }
+        
         public async Task InitialiseDuckDb(DuckDbConnection connection)
         {
             await connection.ExecuteNonQueryAsync(@"

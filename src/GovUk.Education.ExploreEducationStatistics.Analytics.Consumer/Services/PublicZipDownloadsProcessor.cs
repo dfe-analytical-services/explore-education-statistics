@@ -1,31 +1,33 @@
 using GovUk.Education.ExploreEducationStatistics.Analytics.Consumer.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Analytics.Consumer.Services.Workflow;
 using GovUk.Education.ExploreEducationStatistics.Common.DuckDb.DuckDb;
-using Microsoft.Extensions.Logging;
 
 namespace GovUk.Education.ExploreEducationStatistics.Analytics.Consumer.Services;
 
 public class PublicZipDownloadsProcessor(
     IAnalyticsPathResolver pathResolver,
-    ILogger<PublicZipDownloadsProcessor> logger,
-    IWorkflowActor<PublicZipDownloadsProcessor>? workflowActor = null) : IRequestFileProcessor
+    IProcessRequestFilesWorkflow workflow) : IRequestFileProcessor
 {
-    private readonly IWorkflowActor<PublicZipDownloadsProcessor> _workflowActor 
-        = workflowActor ?? new WorkflowActor();
-    
-    public Task Process() {
-    
-        var workflow = new ProcessRequestFilesWorkflow<PublicZipDownloadsProcessor>(
+    public Task Process()
+    {
+        return workflow.Process(new WorkflowActor(
             sourceDirectory: pathResolver.PublicZipDownloadsDirectoryPath(),
-            reportsDirectory: pathResolver.PublicZipDownloadsReportsDirectoryPath(),
-            actor: _workflowActor,
-            logger: logger);
-
-        return workflow.Process();
+            reportsDirectory: pathResolver.PublicZipDownloadsReportsDirectoryPath()));
     }
 
-    private class WorkflowActor : IWorkflowActor<PublicZipDownloadsProcessor>
+    private class WorkflowActor(string sourceDirectory, string reportsDirectory) 
+        : IWorkflowActor
     {
+        public string GetSourceDirectory()
+        {
+            return sourceDirectory;
+        }
+
+        public string GetReportsDirectory()
+        {
+            return reportsDirectory;
+        }
+        
         public async Task InitialiseDuckDb(DuckDbConnection connection)
         {
             await connection.ExecuteNonQueryAsync(@"

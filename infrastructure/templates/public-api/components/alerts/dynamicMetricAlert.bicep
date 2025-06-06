@@ -30,6 +30,9 @@ param ignoreDataBefore string?
 @description('Name of the Alerts Group used to send alert messages.')
 param alertsGroupName string
 
+@description('Flag that indicates whether the metric alert is enabled.')
+param enabled bool = true
+
 @description('Tags with which to tag the resource in Azure.')
 param tagValues object
 
@@ -45,7 +48,7 @@ resource metricAlertRule 'Microsoft.Insights/metricAlerts@2018-03-01' = {
   name: '${resourceName}-${config.nameSuffix}'
   location: 'Global'
   properties: {
-    enabled: true
+    enabled: enabled
     scopes: resourceIds
     targetResourceType: resourceMetric.resourceType
     severity: severityLevel

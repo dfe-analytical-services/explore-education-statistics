@@ -239,7 +239,7 @@ describe('ChartAxisConfiguration', () => {
     expect(handleChange).toHaveBeenCalledWith<[AxisConfiguration]>({
       ...testMajorAxisConfiguration,
       groupByFilterGroups: undefined,
-      label: { rotated: false, text: '', width: undefined },
+      label: { text: '', width: undefined },
       max: 1,
       size: 20,
     });
@@ -425,7 +425,6 @@ describe('ChartAxisConfiguration', () => {
         visible: true,
         unit: '',
         label: {
-          rotated: false,
           text: '',
           width: undefined,
         },
@@ -574,7 +573,6 @@ describe('ChartAxisConfiguration', () => {
           unit: '',
           label: {
             text: '',
-            rotated: false,
             width: undefined,
           },
         };
@@ -630,7 +628,6 @@ describe('ChartAxisConfiguration', () => {
           unit: '',
           label: {
             text: '',
-            rotated: false,
             width: undefined,
           },
         };
@@ -774,7 +771,7 @@ describe('ChartAxisConfiguration', () => {
           unit: '',
           label: {
             text: '',
-            rotated: false,
+
             widht: undefined,
           },
         });
@@ -951,7 +948,6 @@ describe('ChartAxisConfiguration', () => {
           unit: '',
           label: {
             text: '',
-            rotated: false,
             width: undefined,
           },
         };
@@ -1075,7 +1071,6 @@ describe('ChartAxisConfiguration', () => {
           unit: '',
           label: {
             text: '',
-            rotated: false,
             width: undefined,
           },
         };
@@ -1165,7 +1160,7 @@ describe('ChartAxisConfiguration', () => {
         unit: '',
         label: {
           text: '',
-          rotated: false,
+
           width: undefined,
         },
       };
@@ -1237,7 +1232,6 @@ describe('ChartAxisConfiguration', () => {
           unit: '',
           label: {
             text: '',
-            rotated: false,
             width: undefined,
           },
         };

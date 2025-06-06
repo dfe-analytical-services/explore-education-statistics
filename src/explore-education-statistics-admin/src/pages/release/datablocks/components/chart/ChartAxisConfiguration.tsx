@@ -60,7 +60,6 @@ export interface ChartAxisConfigurationFormValues
     AxisConfiguration,
     'dataSets' | 'type' | 'label' | 'referenceLines'
   > {
-  labelRotated?: boolean;
   labelText?: string;
   labelWidth?: number | null;
   referenceLines?: FormReferenceLine[];
@@ -228,7 +227,6 @@ const ChartAxisConfiguration = ({
         // set using the `type` prop (which uses the axis key)
         // type,
         label: {
-          rotated: values.labelRotated,
           text: values.labelText,
           width: values.labelWidth,
         },
@@ -240,7 +238,7 @@ const ChartAxisConfiguration = ({
       result.referenceLines = [...refLines];
       result.decimalPlaces = values.decimalPlaces;
 
-      return omit(result, ['labelRotated', 'labelText', 'labelWidth']);
+      return omit(result, ['labelText', 'labelWidth']);
     },
     [axisConfiguration],
   );
@@ -295,12 +293,6 @@ const ChartAxisConfiguration = ({
           'Choose a valid group by',
         ),
         groupByFilter: Yup.string(),
-      });
-    }
-
-    if (axisDefinition?.capabilities.canRotateLabel) {
-      schema = schema.shape({
-        labelRotated: Yup.boolean(),
       });
     }
 
@@ -445,7 +437,6 @@ const ChartAxisConfiguration = ({
     return schema;
   }, [
     axisDefinition?.axis,
-    axisDefinition?.capabilities.canRotateLabel,
     capabilities.canShowAllMajorAxisTicks,
     capabilities.canSort,
     capabilities.hasGridLines,
@@ -467,7 +458,6 @@ const ChartAxisConfiguration = ({
           type === 'major' && !values?.max
             ? parseNumber(limitOptions[limitOptions.length - 1]?.value)
             : values?.max,
-        labelRotated: values?.label?.rotated ?? false,
         labelText: values?.label?.text ?? '',
         labelWidth: values?.label?.width ?? undefined,
         decimalPlaces: values?.decimalPlaces ?? undefined,
@@ -643,13 +633,6 @@ const ChartAxisConfiguration = ({
                       width={5}
                       min={0}
                     />
-
-                    {validationSchema.fields.labelRotated && (
-                      <FormFieldCheckbox
-                        name="labelRotated"
-                        label="Rotate 90 degrees"
-                      />
-                    )}
                   </FormFieldset>
                 </FormFieldset>
               </div>

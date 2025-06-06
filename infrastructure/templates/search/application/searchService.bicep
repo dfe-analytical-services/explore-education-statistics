@@ -68,6 +68,12 @@ module searchServiceModule '../components/searchService.bicep' = {
     publicNetworkAccess: 'Enabled'
     sku: 'basic'
     systemAssignedIdentity: true
+    alerts: {
+      searchLatency: true
+      searchQueriesPerSecond: true
+      throttledSearchQueriesPercentage: true
+      alertsGroupName: resourceNames.existingResources.alertsGroup
+    }
     tagValues: tagValues
   }
 }

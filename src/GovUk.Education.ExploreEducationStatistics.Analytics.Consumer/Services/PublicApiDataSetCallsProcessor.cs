@@ -1,31 +1,33 @@
 using GovUk.Education.ExploreEducationStatistics.Analytics.Consumer.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Analytics.Consumer.Services.Workflow;
 using GovUk.Education.ExploreEducationStatistics.Common.DuckDb.DuckDb;
-using Microsoft.Extensions.Logging;
 
 namespace GovUk.Education.ExploreEducationStatistics.Analytics.Consumer.Services;
 
 public class PublicApiDataSetCallsProcessor(
     IAnalyticsPathResolver pathResolver,
-    ILogger<PublicApiDataSetCallsProcessor> logger,
-    IWorkflowActor<PublicApiDataSetCallsProcessor>? workflowActor = null) : IRequestFileProcessor
+    IProcessRequestFilesWorkflow workflow) : IRequestFileProcessor
 {
-    private readonly IWorkflowActor<PublicApiDataSetCallsProcessor> _workflowActor 
-        = workflowActor ?? new WorkflowActor();
-    
     public Task Process()
     {
-        var workflow = new ProcessRequestFilesWorkflow<PublicApiDataSetCallsProcessor>(
+        return workflow.Process(new WorkflowActor(
             sourceDirectory: pathResolver.PublicApiDataSetCallsDirectoryPath(),
-            reportsDirectory: pathResolver.PublicApiDataSetCallsReportsDirectoryPath(),
-            actor: _workflowActor,
-            logger: logger);
-
-        return workflow.Process();
+            reportsDirectory: pathResolver.PublicApiDataSetCallsReportsDirectoryPath()));
     }
 
-    private class WorkflowActor : IWorkflowActor<PublicApiDataSetCallsProcessor>
+    private class WorkflowActor(string sourceDirectory, string reportsDirectory) 
+        : IWorkflowActor
     {
+        public string GetSourceDirectory()
+        {
+            return sourceDirectory;
+        }
+
+        public string GetReportsDirectory()
+        {
+            return reportsDirectory;
+        }
+
         public async Task InitialiseDuckDb(DuckDbConnection connection)
         {
             await connection.ExecuteNonQueryAsync(@"
@@ -55,7 +57,7 @@ public class PublicApiDataSetCallsProcessor(
         public async Task CreateParquetReports(string reportsFolderPathAndFilenamePrefix, DuckDbConnection connection)
         {
             var reportFilePath = 
-                $"{reportsFolderPathAndFilenamePrefix}_public-api-data-set-version-calls.parquet";
+                $"{reportsFolderPathAndFilenamePrefix}_public-api-data-set-calls.parquet";
         
             await connection.ExecuteNonQueryAsync($@"
                 COPY (

@@ -34,7 +34,7 @@ type AppServicePlanMetric = {
 type ContainerAppMetric = {
   resourceType: 'Microsoft.App/containerApps'
   metric:
-    | 'CpuPercentage' 
+    | 'CpuPercentage'
     | 'MemoryPercentage'
     | 'ResiliencyConnectTimeouts'
     | 'ResiliencyRequestRetries'
@@ -81,6 +81,16 @@ type PostgreSqlMetric = {
     | 'storage_percent'
 }
 
+type SearchServiceMetric = {
+  resourceType: 'Microsoft.Search/searchServices'
+  metric:
+    | 'DocumentsProcessedCount'
+    | 'SearchLatency'
+    | 'SearchQueriesPerSecond'
+    | 'SkillExecutionCount'
+    | 'ThrottledSearchQueriesPercentage'
+}
+
 type SiteMetric = {
   resourceType: 'Microsoft.Web/sites'
   metric:
@@ -101,13 +111,14 @@ type StorageAccountMetric = {
 
 @export()
 @discriminator('resourceType')
-type ResourceMetric = 
-| AppGatewayMetric
-| AppInsightsMetric
-| AppServicePlanMetric
-| ContainerAppMetric
-| ContainerAppMetric
-| FileServiceMetric
-| PostgreSqlMetric
-| SiteMetric
-| StorageAccountMetric
+type ResourceMetric =
+  | AppGatewayMetric
+  | AppInsightsMetric
+  | AppServicePlanMetric
+  | ContainerAppMetric
+  | ContainerAppMetric
+  | FileServiceMetric
+  | PostgreSqlMetric
+  | SearchServiceMetric
+  | SiteMetric
+  | StorageAccountMetric

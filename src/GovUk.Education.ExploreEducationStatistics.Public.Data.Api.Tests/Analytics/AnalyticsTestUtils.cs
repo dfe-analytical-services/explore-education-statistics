@@ -1,9 +1,11 @@
 using System.Diagnostics;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Requests;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using Newtonsoft.Json;
+using File = System.IO.File;
 using JsonSerializer = System.Text.Json.JsonSerializer;
 using JsonSerializerOptions = System.Text.Json.JsonSerializerOptions;
 
@@ -37,10 +39,82 @@ public static class AnalyticsTheoryData
 
 public static class AnalyticsTestAssertions
 {
+    public static async Task AssertTopLevelAnalyticsCallCaptured(
+        TopLevelCallType expectedType,
+        string expectedAnalyticsPath,
+        object? expectedParameters)
+    {
+        // Expect the successful call to have been recorded for analytics.
+        WaitForDirectoryToExist(expectedAnalyticsPath);
+        WaitForFilesToExistInDirectory(expectedAnalyticsPath);
+
+        var analyticsFiles = Directory.GetFiles(expectedAnalyticsPath);
+        var analyticFile = Assert.Single(analyticsFiles);
+        var contents = await File.ReadAllTextAsync(analyticFile);
+
+        var capturedCall = JsonConvert.DeserializeObject<CaptureTopLevelCallRequest>(contents);
+
+        Assert.NotNull(capturedCall);
+        Assert.Equal(expectedType, capturedCall.Type);
+        capturedCall.StartTime.AssertUtcNow(withinMillis: 5000);
+        
+        if (expectedParameters == null)
+        {
+            Assert.Null(capturedCall.Parameters);
+        }
+        else
+        {
+            // Expect any additional parameters to have been recorded. 
+            Assert.NotNull(capturedCall.Parameters);
+            var parameters = JsonConvert.DeserializeObject(
+                capturedCall.Parameters.ToString()!, expectedParameters.GetType());
+            Assert.NotNull(parameters);
+            parameters.AssertDeepEqualTo(expectedParameters);
+        }
+    }
+
+    public static async Task AssertPublicationAnalyticsCallCaptured(
+        PublishedPublicationSummaryViewModel publicationViewModel,
+        PublicationCallType expectedType,
+        string expectedAnalyticsPath,
+        object? expectedParameters)
+    {
+        // Expect the successful call to have been recorded for analytics.
+        WaitForDirectoryToExist(expectedAnalyticsPath);
+        WaitForFilesToExistInDirectory(expectedAnalyticsPath);
+
+        var analyticsFiles = Directory.GetFiles(expectedAnalyticsPath);
+        var analyticFile = Assert.Single(analyticsFiles);
+        var contents = await File.ReadAllTextAsync(analyticFile);
+
+        var capturedCall = JsonConvert.DeserializeObject<CapturePublicationCallRequest>(contents);
+
+        Assert.NotNull(capturedCall);
+        Assert.Equal(expectedType, capturedCall.Type);
+        Assert.Equal(publicationViewModel.Id, capturedCall.PublicationId);
+        Assert.Equal(publicationViewModel.Title, capturedCall.PublicationTitle);
+        capturedCall.StartTime.AssertUtcNow(withinMillis: 5000);
+
+        if (expectedParameters == null)
+        {
+            Assert.Null(capturedCall.Parameters);
+        }
+        else
+        {
+            // Expect any additional parameters to have been recorded. 
+            Assert.NotNull(capturedCall.Parameters);
+            var parameters = JsonConvert.DeserializeObject(
+                capturedCall.Parameters.ToString()!, expectedParameters.GetType());
+            Assert.NotNull(parameters);
+            parameters.AssertDeepEqualTo(expectedParameters);
+        }
+    }
+
     public static async Task AssertDataSetAnalyticsCallCaptured(
         DataSet dataSet,
         DataSetCallType expectedType,
         string expectedAnalyticsPath,
+        object? expectedParameters,
         AnalyticsTheoryData.PreviewTokenSummary? expectedPreviewToken,
         Guid? expectedPreviewTokenDataSetVersionId)
     {
@@ -59,6 +133,20 @@ public static class AnalyticsTestAssertions
         Assert.Equal(dataSet.Id, capturedCall.DataSetId);
         Assert.Equal(dataSet.Title, capturedCall.DataSetTitle);
         capturedCall.StartTime.AssertUtcNow(withinMillis: 5000);
+        
+        if (expectedParameters == null)
+        {
+            Assert.Null(capturedCall.Parameters);
+        }
+        else
+        {
+            // Expect any additional parameters to have been recorded. 
+            Assert.NotNull(capturedCall.Parameters);
+            var parameters = JsonConvert.DeserializeObject(
+                capturedCall.Parameters.ToString()!, expectedParameters.GetType());
+            Assert.NotNull(parameters);
+            parameters.AssertDeepEqualTo(expectedParameters);
+        }
 
         if (expectedPreviewToken == null)
         {

@@ -378,6 +378,7 @@ public abstract class DataSetsControllerTests(TestApplicationFactory testApp) : 
                     dataSet: dataSet,
                     expectedType: DataSetCallType.GetSummary,
                     expectedAnalyticsPath: GetAnalyticsPathResolver().PublicApiDataSetCallsDirectoryPath(),
+                    expectedParameters: null,
                     expectedPreviewToken: expectedPreviewToken,
                     expectedPreviewTokenDataSetVersionId: persistedPreviewToken?.DataSetVersionId);
             }

@@ -1,6 +1,7 @@
 using GovUk.Education.ExploreEducationStatistics.Analytics.Consumer.Options;
 using GovUk.Education.ExploreEducationStatistics.Analytics.Consumer.Services;
 using GovUk.Education.ExploreEducationStatistics.Analytics.Consumer.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Analytics.Consumer.Services.Workflow;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -40,11 +41,13 @@ public static class ProcessorHostBuilder
 
                 // To be used by ConsumeAnalyticsRequestFilesFunction
                 services
+                    .AddTransient<IRequestFileProcessor, PublicApiTopLevelCallsProcessor>()
                     .AddTransient<IRequestFileProcessor, PublicApiDataSetCallsProcessor>()
                     .AddTransient<IRequestFileProcessor, PublicApiDataSetVersionCallsProcessor>()
                     .AddTransient<IRequestFileProcessor, PublicApiQueriesProcessor>()
                     .AddTransient<IRequestFileProcessor, PublicZipDownloadsProcessor>()
-                    .AddTransient<IRequestFileProcessor, PublicCsvDownloadsProcessor>();
+                    .AddTransient<IRequestFileProcessor, PublicCsvDownloadsProcessor>()
+                    .AddTransient<IProcessRequestFilesWorkflow, ProcessRequestFilesWorkflow>();
             });
     }
 }

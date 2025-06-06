@@ -1,6 +1,5 @@
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Options;
-using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services.Interfaces;
 using Microsoft.Extensions.Options;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services;

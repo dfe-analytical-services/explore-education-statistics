@@ -545,12 +545,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 Assert.Equal(2, amendmentMethodologyFiles.Count());
 
                 var methodologyFile1ForAmendment =
-                    Assert.Single(amendmentMethodologyFiles
-                        .Where(f => f.FileId == originalMethodologyFile1.FileId));
+                    Assert.Single(amendmentMethodologyFiles, 
+                        f => f.FileId == originalMethodologyFile1.FileId);
 
                 var methodologyFile2ForAmendment =
-                    Assert.Single(amendmentMethodologyFiles
-                        .Where(f => f.FileId == originalMethodologyFile2.FileId));
+                    Assert.Single(amendmentMethodologyFiles, 
+                        f => f.FileId == originalMethodologyFile2.FileId);
 
                 Assert.NotEqual(originalMethodologyFile1.Id, methodologyFile1ForAmendment.Id);
                 Assert.NotEqual(originalMethodologyFile2.Id, methodologyFile2ForAmendment.Id);
