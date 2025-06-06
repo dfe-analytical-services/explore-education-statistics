@@ -1,5 +1,4 @@
 ﻿#nullable enable
-using System;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;

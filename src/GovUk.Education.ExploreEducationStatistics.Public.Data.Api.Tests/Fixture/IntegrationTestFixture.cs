@@ -1,4 +1,3 @@
-using System.Security.Claims;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Fixture;

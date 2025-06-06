@@ -2,7 +2,6 @@ using GovUk.Education.ExploreEducationStatistics.Common.Database;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Semver;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 
