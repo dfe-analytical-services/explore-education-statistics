@@ -72,81 +72,81 @@ resource topic 'Microsoft.EventGrid/topics@2025-02-15' = {
   tags: tagValues
 }
 
-// module deadLetteredCountAlert '../../../public-api/components/alerts/staticMetricAlert.bicep' = if (alerts != null) {
-//   name: '${name}DeadLetteredCountDeploy'
-//   params: {
-//     enabled: alerts!.deadLetteredCount
-//     resourceName: topic.name
-//     resourceMetric: {
-//       resourceType: 'Microsoft.EventGrid/topics'
-//       metric: 'DeadLetteredCount'
-//       dimensions: []
-//     }
-//     config: {
-//       ...staticTotalGreaterThanZero
-//       nameSuffix: 'dead-lettered-count'
-//     }
-//     alertsGroupName: alerts!.alertsGroupName
-//     tagValues: tagValues
-//   }
-// }
+module deadLetteredCountAlert '../../../public-api/components/alerts/staticMetricAlert.bicep' = if (alerts != null && topic.name == 's101d01-ees-evgt-publication-changed') {
+  name: '${name}DeadLetteredCountDeploy'
+  params: {
+    enabled: alerts!.deadLetteredCount
+    resourceName: topic.name
+    resourceMetric: {
+      resourceType: 'Microsoft.EventGrid/topics'
+      metric: 'DeadLetteredCount'
+      dimensions: []
+    }
+    config: {
+      ...staticTotalGreaterThanZero
+      nameSuffix: 'dead-lettered-count'
+    }
+    alertsGroupName: alerts!.alertsGroupName
+    tagValues: tagValues
+  }
+}
 
-// module droppedEventCount '../../../public-api/components/alerts/staticMetricAlert.bicep' = if (alerts != null) {
-//   name: '${name}DroppedEventCountDeploy'
-//   params: {
-//     enabled: alerts!.droppedEventCount
-//     resourceName: topic.name
-//     resourceMetric: {
-//       resourceType: 'Microsoft.EventGrid/topics'
-//       metric: 'DroppedEventCount'
-//       dimensions: []
-//     }
-//     config: {
-//       ...staticTotalGreaterThanZero
-//       nameSuffix: 'dropped-event-count'
-//     }
-//     alertsGroupName: alerts!.alertsGroupName
-//     tagValues: tagValues
-//   }
-// }
+module droppedEventCount '../../../public-api/components/alerts/staticMetricAlert.bicep' = if (alerts != null && topic.name == 's101d01-ees-evgt-publication-changed') {
+  name: '${name}DroppedEventCountDeploy'
+  params: {
+    enabled: alerts!.droppedEventCount
+    resourceName: topic.name
+    resourceMetric: {
+      resourceType: 'Microsoft.EventGrid/topics'
+      metric: 'DroppedEventCount'
+      dimensions: []
+    }
+    config: {
+      ...staticTotalGreaterThanZero
+      nameSuffix: 'dropped-event-count'
+    }
+    alertsGroupName: alerts!.alertsGroupName
+    tagValues: tagValues
+  }
+}
 
-// module deliveryAttemptFailCountAlert '../../../public-api/components/alerts/staticMetricAlert.bicep' = if (alerts != null) {
-//   name: '${name}DeliveryAttemptFailCountDeploy'
-//   params: {
-//     enabled: alerts!.deliveryAttemptFailCount
-//     resourceName: topic.name
-//     resourceMetric: {
-//       resourceType: 'Microsoft.EventGrid/topics'
-//       metric: 'DeliveryAttemptFailCount'
-//       dimensions: []
-//     }
-//     config: {
-//       ...staticTotalGreaterThanZero
-//       nameSuffix: 'delivery-attempt-fail-count'
-//     }
-//     alertsGroupName: alerts!.alertsGroupName
-//     tagValues: tagValues
-//   }
-// }
+module deliveryAttemptFailCountAlert '../../../public-api/components/alerts/staticMetricAlert.bicep' = if (alerts != null && topic.name == 's101d01-ees-evgt-publication-changed') {
+  name: '${name}DeliveryAttemptFailCountDeploy'
+  params: {
+    enabled: alerts!.deliveryAttemptFailCount
+    resourceName: topic.name
+    resourceMetric: {
+      resourceType: 'Microsoft.EventGrid/topics'
+      metric: 'DeliveryAttemptFailCount'
+      dimensions: []
+    }
+    config: {
+      ...staticTotalGreaterThanZero
+      nameSuffix: 'delivery-attempt-fail-count'
+    }
+    alertsGroupName: alerts!.alertsGroupName
+    tagValues: tagValues
+  }
+}
 
-// module publishFailCountAlert '../../../public-api/components/alerts/staticMetricAlert.bicep' = if (alerts != null) {
-//   name: '${name}PublishFailCountDeploy'
-//   params: {
-//     enabled: alerts!.publishFailCount
-//     resourceName: topic.name
-//     resourceMetric: {
-//       resourceType: 'Microsoft.EventGrid/topics'
-//       metric: 'PublishFailCount'
-//       dimensions: []
-//     }
-//     config: {
-//       ...staticTotalGreaterThanZero
-//       nameSuffix: 'publish-fail-count'
-//     }
-//     alertsGroupName: alerts!.alertsGroupName
-//     tagValues: tagValues
-//   }
-// }
+module publishFailCountAlert '../../../public-api/components/alerts/staticMetricAlert.bicep' = if (alerts != null && topic.name == 's101d01-ees-evgt-publication-changed') {
+  name: '${name}PublishFailCountDeploy'
+  params: {
+    enabled: alerts!.publishFailCount
+    resourceName: topic.name
+    resourceMetric: {
+      resourceType: 'Microsoft.EventGrid/topics'
+      metric: 'PublishFailCount'
+      dimensions: []
+    }
+    config: {
+      ...staticTotalGreaterThanZero
+      nameSuffix: 'publish-fail-count'
+    }
+    alertsGroupName: alerts!.alertsGroupName
+    tagValues: tagValues
+  }
+}
 
 module unmatchedEventCountAlert '../../../public-api/components/alerts/staticMetricAlert.bicep' = if (alerts != null && topic.name == 's101d01-ees-evgt-publication-changed') {
   name: '${name}UnmatchedEventCountDeploy'
