@@ -11,7 +11,8 @@ public abstract class AnalyticsPathResolverBase : IAnalyticsPathResolver
     private static readonly string[] PublicApiDataSetVersionsSubPath = ["public-api", "data-set-versions"];
     private static readonly string[] PublicApiQueriesSubPath = ["public-api", "queries"];
     private static readonly string[] PublicZipDownloadsSubPath = ["public", "zip-downloads"];
-    
+    private static readonly string[] PublicCsvDownloadsSubPath = ["public", "csv-downloads"];
+        
     // PublicApiTopLevel
     public string PublicApiTopLevelCallsDirectoryPath()
     {
@@ -65,6 +66,17 @@ public abstract class AnalyticsPathResolverBase : IAnalyticsPathResolver
     public string PublicZipDownloadsReportsDirectoryPath()
     {
         return Path.Combine([ReportsDirectoryPath(), ..PublicZipDownloadsSubPath]);
+    }
+
+    // PublicCsvDownloads
+    public string PublicCsvDownloadsDirectoryPath()
+    {
+        return Path.Combine([GetBasePath(), ..PublicCsvDownloadsSubPath]);
+    }
+
+    public string PublicCsvDownloadsReportsDirectoryPath()
+    {
+        return Path.Combine([ReportsDirectoryPath(), ..PublicCsvDownloadsSubPath]);
     }
     
     private string ReportsDirectoryPath()

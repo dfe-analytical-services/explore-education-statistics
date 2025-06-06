@@ -32,11 +32,11 @@ public abstract class PublicCsvDownloadsProcessorTests
             workflow
                 .Setup(s => s.Process(It.IsAny<IWorkflowActor>()))
                 .Returns(Task.CompletedTask);
-            
+
             var service = BuildService(
                 pathResolver: pathResolver,
                 workflow: workflow.Object);
-            
+
             await service.Process();
 
             workflow.Verify(s => s.Process(It.IsAny<IWorkflowActor>()), Times.Once);
@@ -110,7 +110,8 @@ public abstract class PublicCsvDownloadsProcessorTests
                 2);
         }
 
-        private static async Task<List<CsvDownloadReportLine>> ReadReport(DuckDbConnection duckDbConnection, string reportFile)
+        private static async Task<List<CsvDownloadReportLine>> ReadReport(DuckDbConnection duckDbConnection,
+            string reportFile)
         {
             return (await duckDbConnection
                     .SqlBuilder($"SELECT * FROM read_parquet('{reportFile:raw}')")
@@ -165,7 +166,7 @@ public abstract class PublicCsvDownloadsProcessorTests
         Assert.Equal(hashSb.ToString(), row.CsvDownloadHash);
         Assert.Equal(numRequests, row.Downloads);
     }
-    
+
     private static string ProcessingDirectoryPath(TestAnalyticsPathResolver pathResolver)
     {
         return Path.Combine(pathResolver.PublicCsvDownloadsDirectoryPath(), "processing");
