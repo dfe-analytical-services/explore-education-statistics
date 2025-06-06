@@ -80,6 +80,7 @@ module deadLetteredCountAlert '../../../public-api/components/alerts/staticMetri
     resourceMetric: {
       resourceType: 'Microsoft.EventGrid/topics'
       metric: 'DeadLetteredCount'
+      dimensions: []
     }
     config: {
       ...staticTotalGreaterThanZero
@@ -98,6 +99,7 @@ module droppedEventCount '../../../public-api/components/alerts/staticMetricAler
     resourceMetric: {
       resourceType: 'Microsoft.EventGrid/topics'
       metric: 'DroppedEventCount'
+      dimensions: []
     }
     config: {
       ...staticTotalGreaterThanZero
@@ -116,6 +118,7 @@ module deliveryAttemptFailCountAlert '../../../public-api/components/alerts/stat
     resourceMetric: {
       resourceType: 'Microsoft.EventGrid/topics'
       metric: 'DeliveryAttemptFailCount'
+      dimensions: []
     }
     config: {
       ...staticTotalGreaterThanZero
@@ -134,6 +137,7 @@ module publishFailCountAlert '../../../public-api/components/alerts/staticMetric
     resourceMetric: {
       resourceType: 'Microsoft.EventGrid/topics'
       metric: 'PublishFailCount'
+      dimensions: []
     }
     config: {
       ...staticTotalGreaterThanZero
@@ -152,6 +156,7 @@ module unmatchedEventCountAlert '../../../public-api/components/alerts/staticMet
     resourceMetric: {
       resourceType: 'Microsoft.EventGrid/topics'
       metric: 'UnmatchedEventCount'
+      dimensions: []
     }
     config: {
       ...staticTotalGreaterThanZero
