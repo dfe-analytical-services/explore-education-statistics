@@ -130,7 +130,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
         public async Task<ActionResult<FastTrackViewModel>> QueryForFastTrack(Guid dataBlockParentId)
         {
             return await GetLatestPublishedDataBlockVersion(dataBlockParentId)
-                .OnSuccessCombineWith(dataBlockVersion => GetDataBlockTableResult(dataBlockVersion))
+                .OnSuccessCombineWith(GetDataBlockTableResult)
                 .OnSuccessCombineWith(async tuple =>
                 {
                     var (dataBlockVersion, _) = tuple;

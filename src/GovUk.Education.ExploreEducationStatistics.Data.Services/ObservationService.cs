@@ -45,7 +45,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                 .GetMatchingObservationsQuery(
                     _context,
                     query.SubjectId,
-                    query.Filters?.ToList(),
+                    query.GetFilterItemIds(),
                     query.LocationIds,
                     query.TimePeriod,
                     cancellationToken);
@@ -84,8 +84,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             Task<(string, IList<SqlParameter>, IList<IAsyncDisposable>)> GetMatchingObservationsQuery(
                 StatisticsDbContext context,
                 Guid subjectId,
-                IList<Guid>? filterItemIds,
-                IList<Guid>? locationIds,
+                IList<Guid> filterItemIds,
+                IList<Guid> locationIds,
                 TimePeriodQuery? timePeriodQuery,
                 CancellationToken cancellationToken);
         }
@@ -98,18 +98,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             public async Task<(string, IList<SqlParameter>, IList<IAsyncDisposable>)> GetMatchingObservationsQuery(
                 StatisticsDbContext context,
                 Guid subjectId,
-                IList<Guid>? filterItemIds,
-                IList<Guid>? locationIds,
+                IList<Guid> filterItemIds,
+                IList<Guid> locationIds,
                 TimePeriodQuery? timePeriodQuery,
                 CancellationToken cancellationToken)
             {
                 await TempTableCreator.CreateTemporaryTable<MatchedObservation>(context, cancellationToken);
 
-                var (locationIdsClause, locationIdsTempTable) = !locationIds.IsNullOrEmpty()
+                var (locationIdsClause, locationIdsTempTable) = locationIds.Count > 0
                     ? await GetLocationsClause(context, locationIds!, cancellationToken)
                     : default;
 
-                var (filterItemIdsClause, filterItemIdTempTables) = !filterItemIds.IsNullOrEmpty()
+                var (filterItemIdsClause, filterItemIdTempTables) = filterItemIds.Count > 0
                     ? await GetSelectedFilterItemIdsClause(context, subjectId, filterItemIds!, cancellationToken)
                     : default;
 

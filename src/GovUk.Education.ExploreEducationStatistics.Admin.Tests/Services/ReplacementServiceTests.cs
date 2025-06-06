@@ -2895,6 +2895,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 }
             }
         }
+
         [Fact]
         public async Task Replace()
         {
@@ -3107,7 +3108,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     Filters = new[] {originalFilterItem1.Id, originalFilterItem2.Id},
                     Indicators = new[] {originalIndicator.Id},
                     LocationIds = ListOf(originalLocation.Id),
-                    TimePeriod = timePeriod
+                    TimePeriod = timePeriod,
+                    FilterHierarchyOptions = null, // it is null by default, but included to be visible to you, dear test reader
                 },
                 Table = new TableBuilderConfiguration
                 {
@@ -3350,10 +3352,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Single(replacedDataBlock.Query.Indicators);
                 Assert.Equal(replacementIndicator.Id, replacedDataBlock.Query.Indicators.First());
 
-                var replacedFilterItemIds = replacedDataBlock.Query.Filters.ToList();
+                var replacedFilterItemIds = replacedDataBlock.Query.GetFilterItemIds().ToList(); // all filterItems including those in FilterHierarchyOptions
                 Assert.Equal(2, replacedFilterItemIds.Count);
                 Assert.Equal(replacementFilterItem1.Id, replacedFilterItemIds[0]);
                 Assert.Equal(replacementFilterItem2.Id, replacedFilterItemIds[1]);
+
+                Assert.Null(replacedDataBlock.Query.FilterHierarchyOptions);
 
                 var replacedLocationId = Assert.Single(replacedDataBlock.Query.LocationIds);
                 Assert.Equal(replacementLocation.Id, replacedLocationId);
@@ -3486,6 +3490,395 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Null(updatedReleaseFile.IndicatorSequence);
             }
         }
+
+        [Fact]
+        public async Task Replace_ReplacesFilterHierarchyOptions()
+        {
+            var releaseVersion = _fixture.DefaultReleaseVersion().Generate();
+
+            var statsReleaseVersion = _fixture.DefaultStatsReleaseVersion()
+                .WithId(releaseVersion.Id)
+                .Generate();
+
+            var (originalReleaseSubject, replacementReleaseSubject) = _fixture.DefaultReleaseSubject()
+                .WithReleaseVersion(statsReleaseVersion)
+                .WithSubjects(_fixture.DefaultSubject().Generate(2))
+                .GenerateTuple2();
+
+            var originalFilter1Id = Guid.NewGuid();
+            var originalFilter2Id = Guid.NewGuid();
+
+            var originalFilterItem1Id = Guid.NewGuid();
+            var originalFilterItem2Id = Guid.NewGuid();
+
+            var originalFile = new File
+            {
+                Type = FileType.Data,
+                SubjectId = originalReleaseSubject.SubjectId,
+                FilterHierarchies = [
+                    new DataSetFileFilterHierarchy(
+                        FilterIds: [ originalFilter1Id, originalFilter2Id, ],
+                        Tiers: [
+                            new Dictionary<Guid, List<Guid>>
+                            {
+                                { originalFilterItem1Id, [originalFilterItem2Id] }
+                            },
+                        ]
+                    ),
+                ],
+            };
+
+            var replacementFile = new File
+            {
+                Type = FileType.Data,
+                SubjectId = replacementReleaseSubject.SubjectId,
+                Replacing = originalFile
+            };
+
+            originalFile.ReplacedBy = replacementFile;
+
+            var originalReleaseFile = new ReleaseFile
+            {
+                ReleaseVersion = releaseVersion,
+                File = originalFile,
+                Summary = "Original data set guidance"
+            };
+
+            var replacementReleaseFile = new ReleaseFile
+            {
+                ReleaseVersion = releaseVersion,
+                File = replacementFile,
+                Summary = null
+            };
+
+            var originalFilter1 = new Filter
+            {
+                Id = originalFilter1Id,
+                Label = "Test filter 1 - not changing",
+                Name = "test_filter_1_not_changing",
+                Subject = originalReleaseSubject.Subject,
+                FilterGroups = new List<FilterGroup>
+                {
+                    new()
+                    {
+                        Label = "Default group - not changing",
+                        FilterItems = new List<FilterItem>
+                        {
+                            new()
+                            {
+                                Id = originalFilterItem1Id,
+                                Label = "Test filter item - not changing"
+                            },
+                        }
+                    }
+                }
+            };
+
+            var originalFilter2 = new Filter
+            {
+                Id = originalFilter2Id,
+                Label = "Test filter 2 - not changing",
+                Name = "test_filter_2_not_changing",
+                Subject = originalReleaseSubject.Subject,
+                FilterGroups = new List<FilterGroup>
+                {
+                    new()
+                    {
+                        Label = "Default group - not changing",
+                        FilterItems = new List<FilterItem>
+                        {
+                            new()
+                            {
+                                Id = originalFilterItem2Id,
+                                Label = "Test filter item - not changing"
+                            },
+                        }
+                    },
+                }
+            };
+
+            var replacementFilter1 = new Filter
+            {
+                Label = "Test filter 1 - not changing",
+                Name = "test_filter_1_not_changing",
+                Subject = replacementReleaseSubject.Subject,
+                FilterGroups = new List<FilterGroup>
+                {
+                    new()
+                    {
+                        Label = "Default group - not changing",
+                        FilterItems = new List<FilterItem>
+                        {
+                            new()
+                            {
+                                Id = Guid.NewGuid(),
+                                Label = "Test filter item - not changing"
+                            },
+                        }
+                    },
+                }
+            };
+
+            var replacementFilter2 = new Filter
+            {
+                Label = "Test filter 2 - not changing",
+                Name = "test_filter_2_not_changing",
+                Subject = replacementReleaseSubject.Subject,
+                FilterGroups = new List<FilterGroup>
+                {
+                    new()
+                    {
+                        Label = "Default group - not changing",
+                        FilterItems = new List<FilterItem>
+                        {
+                            new()
+                            {
+                                Id = Guid.NewGuid(),
+                                Label = "Test filter item - not changing"
+                            },
+                        }
+                    },
+                }
+            };
+
+            var originalIndicator = new Indicator
+            {
+                Id = Guid.NewGuid(),
+                Label = "Indicator - not changing",
+                Name = "indicator_not_changing"
+            };
+
+            var replacementIndicator = new Indicator
+            {
+                Label = "Indicator - not changing",
+                Name = "indicator_not_changing"
+            };
+
+            var originalIndicatorGroup = new IndicatorGroup
+            {
+                Label = "Default group - not changing",
+                Subject = originalReleaseSubject.Subject,
+                Indicators = new List<Indicator>
+                {
+                    originalIndicator
+                }
+            };
+
+            var replacementIndicatorGroup = new IndicatorGroup
+            {
+                Label = "Default group - not changing",
+                Subject = replacementReleaseSubject.Subject,
+                Indicators = new List<Indicator>
+                {
+                    replacementIndicator
+                }
+            };
+
+            var originalLocation = new Location
+            {
+                Id = Guid.NewGuid(),
+                GeographicLevel = GeographicLevel.LocalAuthority,
+                LocalAuthority = _derby
+            };
+
+            var replacementLocation = new Location
+            {
+                Id = Guid.NewGuid(),
+                GeographicLevel = GeographicLevel.LocalAuthority,
+                Country = _england,
+                LocalAuthority = _derby
+            };
+
+            var timePeriod = new TimePeriodQuery
+            {
+                StartYear = 2019,
+                StartCode = CalendarYear,
+                EndYear = 2020,
+                EndCode = CalendarYear
+            };
+
+            var dataBlock = new DataBlock
+            {
+                Name = "Test DataBlock",
+                Query = new FullTableQuery
+                {
+                    SubjectId = originalReleaseSubject.SubjectId,
+                    Filters = [],
+                    Indicators = new[] {originalIndicator.Id},
+                    LocationIds = ListOf(originalLocation.Id),
+                    TimePeriod = timePeriod,
+                    FilterHierarchyOptions = new Dictionary<Guid, List<List<Guid>>>
+                    {
+                        // This would actually be an invalid data set, as there should also be two
+                        // additional Total filterItems for both filters in a filter hierarchy
+                        { originalFilter2.Id, [[originalFilterItem1Id, originalFilterItem2Id]] }
+                    }
+
+                },
+                Table = new TableBuilderConfiguration
+                {
+                    TableHeaders = new TableHeaders
+                    {
+                        ColumnGroups = new List<List<TableHeader>>
+                        {
+                            new()
+                            {
+                                TableHeader.NewLocationHeader(GeographicLevel.LocalAuthority,
+                                    originalLocation.Id.ToString())
+                            }
+                        },
+                        Columns = new List<TableHeader>
+                        {
+                            new("2019_CY", TableHeaderType.TimePeriod),
+                            new("2020_CY", TableHeaderType.TimePeriod)
+                        },
+                        RowGroups = new List<List<TableHeader>>
+                        {
+                            new()
+                            {
+                                new TableHeader(originalFilterItem1Id.ToString(), TableHeaderType.Filter),
+                                new TableHeader(originalFilterItem2Id.ToString(), TableHeaderType.Filter)
+                            }
+                        },
+                        Rows = new List<TableHeader>
+                        {
+                            new(originalIndicator.Id.ToString(), TableHeaderType.Indicator)
+                        }
+                    }
+                },
+                Charts = [],
+                ReleaseVersion = releaseVersion
+            };
+
+            var dataBlockVersion = new DataBlockVersion
+            {
+                Id = dataBlock.Id,
+                ContentBlock = dataBlock
+            };
+
+            var locationRepository = new Mock<ILocationRepository>(Strict);
+            locationRepository.Setup(service => service.GetDistinctForSubject(replacementReleaseSubject.SubjectId))
+                .ReturnsAsync(new List<Location>
+                {
+                    replacementLocation
+                });
+
+            var timePeriodService = new Mock<ITimePeriodService>(Strict);
+            timePeriodService.Setup(service => service.GetTimePeriods(replacementReleaseSubject.SubjectId))
+                .ReturnsAsync(new List<(int Year, TimeIdentifier TimeIdentifier)>
+                {
+                    (2019, CalendarYear),
+                    (2020, CalendarYear)
+                });
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            var statisticsDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                contentDbContext.ReleaseVersions.AddRange(releaseVersion);
+                contentDbContext.Files.AddRange(originalFile, replacementFile);
+                contentDbContext.ReleaseFiles.AddRange(originalReleaseFile,
+                    replacementReleaseFile);
+                contentDbContext.DataBlockVersions.AddRange(dataBlockVersion);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            {
+                statisticsDbContext.ReleaseVersion.AddRange(statsReleaseVersion);
+                statisticsDbContext.ReleaseSubject.AddRange(originalReleaseSubject,
+                    replacementReleaseSubject);
+                statisticsDbContext.Filter.AddRange(originalFilter1, originalFilter2,
+                    replacementFilter1, replacementFilter2);
+                statisticsDbContext.IndicatorGroup.AddRange(originalIndicatorGroup,
+                    replacementIndicatorGroup);
+                statisticsDbContext.Location.AddRange(originalLocation);
+                await statisticsDbContext.SaveChangesAsync();
+            }
+
+            var releaseVersionService = new Mock<IReleaseVersionService>(Strict);
+            releaseVersionService.Setup(service => service.RemoveDataFiles(releaseVersion.Id, originalFile.Id))
+                .ReturnsAsync(Unit.Instance);
+
+            var cacheKey = new DataBlockTableResultCacheKey(dataBlockVersion);
+
+            var cacheKeyService = new Mock<ICacheKeyService>(Strict);
+            cacheKeyService.Setup(service =>
+                    service.CreateCacheKeyForDataBlock(dataBlock.ReleaseVersionId, dataBlock.Id))
+                .ReturnsAsync(cacheKey);
+
+            var privateBlobCacheService = new Mock<IPrivateBlobCacheService>(Strict);
+            privateBlobCacheService.Setup(service => service.DeleteItemAsync(cacheKey))
+                .Returns(Task.CompletedTask);
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            {
+                var replacementService = BuildReplacementService(contentDbContext,
+                    statisticsDbContext,
+                    privateBlobCacheService: privateBlobCacheService.Object,
+                    cacheKeyService: cacheKeyService.Object,
+                    locationRepository: locationRepository.Object,
+                    releaseVersionService: releaseVersionService.Object,
+                    timePeriodService: timePeriodService.Object);
+
+                var result = await replacementService.Replace(
+                    releaseVersionId: releaseVersion.Id,
+                    originalFileId: originalFile.Id,
+                    replacementFileId: replacementFile.Id);
+
+                VerifyAllMocks(privateBlobCacheService,
+                    cacheKeyService,
+                    locationRepository,
+                    releaseVersionService,
+                    timePeriodService);
+
+                result.AssertRight();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                // Check that the original file was unlinked from the replacement before the mock call to remove it.
+                var originalFileUpdated = await contentDbContext.Files.FindAsync(originalFile.Id);
+                Assert.NotNull(originalFileUpdated);
+                Assert.Null(originalFileUpdated.ReplacedById);
+
+                // Check that the replacement file was unlinked from the original.
+                var replacementFileUpdated = await contentDbContext.Files.FindAsync(replacementFile.Id);
+                Assert.NotNull(replacementFileUpdated);
+                Assert.Null(replacementFileUpdated.ReplacingId);
+
+                var replacedDataBlock = await contentDbContext.DataBlocks
+                    .FirstAsync(db => db.Id == dataBlock.Id);
+                Assert.Equal(dataBlock.Name, replacedDataBlock.Name);
+                Assert.Equal(replacementReleaseSubject.SubjectId, replacedDataBlock.Query.SubjectId);
+
+                Assert.Single(replacedDataBlock.Query.Indicators);
+                Assert.Equal(replacementIndicator.Id, replacedDataBlock.Query.Indicators.First());
+
+                var replacedLocationId = Assert.Single(replacedDataBlock.Query.LocationIds);
+                Assert.Equal(replacementLocation.Id, replacedLocationId);
+
+                Assert.NotNull(replacedDataBlock.Query.TimePeriod);
+                timePeriod.AssertDeepEqualTo(replacedDataBlock.Query.TimePeriod);
+
+                Assert.Empty(replacedDataBlock.Query.GetNonHierarchicalFilterItemIds());
+
+                var hierarchyOptions = replacedDataBlock.Query.FilterHierarchyOptions;
+                Assert.NotNull(hierarchyOptions);
+
+                var dictKey = Assert.Single(hierarchyOptions.Keys);
+
+                Assert.Equal(replacementFilter2.Id, dictKey);
+                Assert.Equal(hierarchyOptions[dictKey],
+                    [[
+                        replacementFilter1.FilterGroups[0].FilterItems[0].Id,
+                        replacementFilter2.FilterGroups[0].FilterItems[0].Id
+                    ]]);
+            }
+        }
+
 
         [Fact]
         public async Task Replace_MapChart_ReplacesChartDataSetConfigs()
