@@ -57,6 +57,11 @@ type EventGridCustomTopicMetric = {
     | 'PublishSuccessCount'
     | 'PublishSuccessLatencyInMs'
     | 'UnmatchedEventCount'
+  dimensions: {
+    name: 'DeadLetterReason' | 'DropReason' | 'Error' | 'ErrorType' | 'EventSubscriptionName'
+    operator: DimensionOperator?
+    values: string[]
+  }[]?
 }
 
 type FileServiceMetric = {
