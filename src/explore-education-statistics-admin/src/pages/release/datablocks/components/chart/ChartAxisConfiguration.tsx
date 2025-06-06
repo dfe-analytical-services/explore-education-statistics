@@ -612,6 +612,7 @@ const ChartAxisConfiguration = ({
                               name="decimalPlaces"
                               hint="Leave blank to set default from metadata"
                               width={10}
+                              min={0}
                             />
                           )}
                         </>
