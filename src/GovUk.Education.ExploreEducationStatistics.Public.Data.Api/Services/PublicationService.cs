@@ -51,7 +51,8 @@ internal class PublicationService(
             .OnSuccessDo(() => analyticsService.CaptureTopLevelCall(
                 type: TopLevelCallType.GetPublications,
                 parameters: new PaginationParameters(Page: page, PageSize: pageSize),
-                cancellationToken: cancellationToken));
+                cancellationToken: cancellationToken)
+            );
     }
 
     public async Task<Either<ActionResult, PublicationSummaryViewModel>> GetPublication(
@@ -67,7 +68,13 @@ internal class PublicationService(
                 Slug = publication.Slug,
                 Summary = publication.Summary,
                 LastPublished = publication.Published
-            });
+            })
+            .OnSuccessDo(viewModel => analyticsService.CapturePublicationCall(
+                publicationId: viewModel.Id,
+                publicationTitle: viewModel.Title,
+                type: PublicationCallType.GetSummary,
+                cancellationToken: cancellationToken)
+            );
     }
 
     private async Task<Either<ActionResult, HashSet<Guid>>> GetPublishedDataSetPublicationIds(

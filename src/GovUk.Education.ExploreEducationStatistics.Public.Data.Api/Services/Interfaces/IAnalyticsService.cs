@@ -11,6 +11,13 @@ public interface IAnalyticsService
         object? parameters = null,
         CancellationToken cancellationToken = default);
     
+    Task CapturePublicationCall(
+        Guid publicationId,
+        string publicationTitle,
+        PublicationCallType type,
+        object? parameters = null,
+        CancellationToken cancellationToken = default);
+    
     Task CaptureDataSetCall(
         Guid dataSetId,
         DataSetCallType type,

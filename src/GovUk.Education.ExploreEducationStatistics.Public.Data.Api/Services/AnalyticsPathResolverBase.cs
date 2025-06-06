@@ -11,6 +11,11 @@ public abstract class AnalyticsPathResolverBase : IAnalyticsPathResolver
         return Path.Combine(GetBasePath(), "public-api", "top-level");
     }
 
+    public string PublicApiPublicationCallsDirectoryPath()
+    {
+        return Path.Combine(GetBasePath(), "public-api", "publications");
+    }
+
     public string PublicApiDataSetCallsDirectoryPath()
     {
         return Path.Combine(GetBasePath(), "public-api", "data-sets");
