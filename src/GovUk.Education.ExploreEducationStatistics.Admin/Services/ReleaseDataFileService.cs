@@ -133,7 +133,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 forceDelete: forceDelete);
         }
 
-        public async Task<Either<ActionResult, DataFileInfo>> GetInfo(Guid releaseVersionId,
+        public async Task<Either<ActionResult, DataSetInfoViewModel>> GetInfo(Guid releaseVersionId,
             Guid fileId)
         {
             return await persistenceHelper
@@ -143,10 +143,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     rf.FileId == fileId)
                 .Include(rf => rf.ReleaseVersion))
                 .OnSuccessDo(rf => userService.CheckCanViewReleaseVersion(rf.ReleaseVersion))
-                .OnSuccess(BuildDataFileViewModel);
+                .OnSuccessCombineWith(async releaseFile => await dataSetUploadRepository.GetForDataFile(releaseFile.FileId)) // hopefully this value is the same thing
+                .OnSuccess(releaseFileAndUploadData =>
+                {
+                    var (releaseFile, uploadData) = releaseFileAndUploadData;
+                    return BuildDataSetInfoViewModel(releaseFile, uploadData);
+                });
         }
 
-        public async Task<Either<ActionResult, List<DataFileInfo>>> ListAll(Guid releaseVersionId)
+        public async Task<Either<ActionResult, List<DataSetInfoViewModel>>> ListAll(Guid releaseVersionId) // TODO: Add canc token to controller and pass it along to calls
         {
             return await persistenceHelper
                 .CheckEntityExists<ReleaseVersion>(releaseVersionId)
@@ -162,34 +167,41 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         .ThenBy(releaseFile => releaseFile.Name) // For subjects existing before ordering was added
                         .ToList();
 
-                    return await BuildDataFileViewModels(filesExcludingReplacements);
-                })
-                .OnSuccessCombineWith(async files
-                    => await dataSetUploadRepository.ListAll(releaseVersionId))
-                .OnSuccess(dataFilesAndUploads =>
-                {
-                    var (files, uploads) = dataFilesAndUploads;
-
-                    var filesFromUploads = new List<DataFileInfo>();
-                    foreach (var upload in uploads)
+                    var viewModels = new List<DataSetInfoViewModel>();
+                    foreach (var releaseFile in filesExcludingReplacements)
                     {
-                        filesFromUploads.Add(new DataFileInfo
-                        {
-                            Id = upload.Id,
-                            FileName = upload.DataFileName,
-                            Name = upload.DataSetTitle,
-                            Size = "0kb", // TODO: Map the file size from elsewhere
-                            MetaFileName = upload.MetaFileName,
-                        });
+                        await dataSetUploadRepository
+                            .GetForDataFile(releaseFile.FileId) // hopefully this value is the same thing
+                            .OnSuccessVoid(async uploadData => viewModels.Add(await BuildDataSetInfoViewModel(releaseFile, uploadData)));
                     }
 
-                    files.AddRange(filesFromUploads);
 
-                    return files;
+                    // WAIT A MO, THERE SHOULDN'T BE ANY UPLOADS ASSOCIATED TO A RELEASE FILE AS THEY'D HAVE BEEN DELETED PRIOR TO IMPORT
+                    // UNLESS IT'S A PENDING REPLACEMENT???
+
+                    // this is only fetching uploads if they relate to a releasefile, but that won't always be the case
+                    // (i.e. a new data set upload which hasn't been imported yet)
+
+                    // get standalone uploads
+                    var uploads = await dataSetUploadRepository
+                        .ListAll(releaseVersionId)
+                        .OnSuccess(uploads =>
+                        {
+                            // exclude any which were already fetched with a releasefile
+                            var filteredUploads = uploads.Where(u => view)
+
+                            // build those viewmodels
+                            // ...
+
+                            return filteredUploads;
+                        });
+
+                    // then return both
+                    return viewModels;
                 });
         }
 
-        public async Task<Either<ActionResult, List<DataFileInfo>>> ReorderDataFiles(
+        public async Task<Either<ActionResult, List<DataSetInfoViewModel>>> ReorderDataFiles(
             Guid releaseVersionId,
             List<Guid> fileIds)
         {
@@ -241,7 +253,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
-        public async Task<Either<ActionResult, List<DataSetUploadViewModel>>> Upload(
+        public async Task<Either<ActionResult, List<DataSetInfoViewModel>>> Upload(
             Guid releaseVersionId,
             IFormFile dataFormFile,
             IFormFile metaFormFile,
@@ -288,7 +300,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
-        public async Task<Either<ActionResult, List<DataSetUploadViewModel>>> UploadFromZip(
+        public async Task<Either<ActionResult, List<DataSetInfoViewModel>>> UploadFromZip(
             Guid releaseVersionId,
             IFormFile zipFormFile,
             string dataSetTitle,
@@ -333,7 +345,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
-        public async Task<Either<ActionResult, List<DataSetUploadViewModel>>> UploadFromBulkZip(
+        public async Task<Either<ActionResult, List<DataSetInfoViewModel>>> UploadFromBulkZip(
             Guid releaseVersionId,
             IFormFile zipFormFile,
             CancellationToken cancellationToken)
@@ -349,7 +361,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     => await ScreenDataSetUploads(dataSetUploads, cancellationToken));
         }
 
-        private async Task<List<DataSetUploadViewModel>> ScreenDataSetUploads(
+        private async Task<List<DataSetInfoViewModel>> ScreenDataSetUploads(
             List<DataSetUpload> dataSetUploads,
             CancellationToken cancellationToken)
         {
@@ -360,24 +372,44 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
                 await dataSetFileStorage.AddScreenerResultToUpload(dataSetUpload.Id, result, cancellationToken);
 
-                return BuildUploadViewModel(dataSetUpload, result);
+                return BuildDataSetInfoViewModel(dataSetUpload, result);
             });
 
             return [.. await Task.WhenAll(tasks)];
         }
 
-        private static DataSetUploadViewModel BuildUploadViewModel(
+        private static DataSetInfoViewModel BuildDataSetInfoViewModel(
             DataSetUpload dataSetUpload,
-            DataSetScreenerResult screenerResult)
+            DataSetScreenerResult screenerResult) // might not be needed, seems to already be in dataSetUpload.ScreenerResult (prob using local EF entity rather than refetching)
         {
-            return new DataSetUploadViewModel
+            return new DataSetInfoViewModel
             {
-                Id = dataSetUpload.Id,
+                DataFileSize = dataSetUpload.DataFileSizeInBytes,
+                MetaFileSize = dataSetUpload.MetaFileSizeInBytes,
+                Created = dataSetUpload.Created,
+                DataFileId = dataSetUpload.DataFileId,
+                DataSetUpload = new()
+                {
+                    Id = dataSetUpload.Id,
+                    DataSetTitle = dataSetUpload.DataSetTitle, // duplicated in main model, remove later
+                    DataFileName = dataSetUpload.DataFileName, // duplicated in main model, remove later
+                    MetaFileName = dataSetUpload.MetaFileName, // duplicated in main model, remove later
+                    Status = dataSetUpload.Status,
+                    ScreenerResult = screenerResult,
+                },
+                MetaFileId = dataSetUpload.MetaFileId,
+                //Permissions = 
+                //PublicApiDataSetId = 
+                //PublicApiDataSetVersion = 
+                ReplacedBy = dataSetUpload.ReplacingFileId,
+                //Summary = not set yet
+                //UserName = 
+                // Rows = don't know this until import
+                // Id = this represents the ReleaseFileId, which doesn't exist in this context
                 DataFileName = dataSetUpload.DataFileName,
                 DataSetTitle = dataSetUpload.DataSetTitle,
                 MetaFileName = dataSetUpload.MetaFileName,
-                Status = GetDataSetUploadStatus(screenerResult),
-                ScreenerResult = screenerResult,
+                //Status = import status, not relevent yet
             };
         }
 
@@ -558,7 +590,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             };
         }
 
-        public async Task<Either<ActionResult, List<DataFileInfo>>> SaveDataSetsFromTemporaryBlobStorage(
+        public async Task<Either<ActionResult, Unit>> SaveDataSetsFromTemporaryBlobStorage(
             Guid releaseVersionId,
             List<Guid> dataSetUploadIds,
             CancellationToken cancellationToken)
@@ -569,15 +601,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(() => dataSetUploadIds
                     .Select(dataSetUploadId => ValidateTempDataSetFileExistence(releaseVersionId, dataSetUploadId, cancellationToken))
                     .OnSuccessAll())
-                .OnSuccess(async dataSetUploads =>
+                .OnSuccessVoid(async dataSetUploads =>
                 {
-                    var releaseFiles = await dataSetFileStorage.MoveDataSetsToPermanentStorage(releaseVersionId, dataSetUploads, cancellationToken);
+                    await dataSetFileStorage.MoveDataSetsToPermanentStorage(releaseVersionId, dataSetUploads, cancellationToken);
 
                     // Remove upload records once the files are ready for import
                     contentDbContext.DataSetUploads.RemoveRange(dataSetUploads);
                     await contentDbContext.SaveChangesAsync(cancellationToken);
-
-                    return await BuildDataFileViewModels(releaseFiles);
                 });
         }
 
@@ -676,6 +706,41 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     PublicApiDataSetVersion = releaseFile.PublicApiDataSetVersionString,
                 };
             }).ToList();
+        }
+
+        private async Task<DataSetInfoViewModel> BuildDataSetInfoViewModel(
+            ReleaseFile releaseFile,
+            DataSetUploadViewModel? dataSetUpload)
+        {
+            var dataImport = await contentDbContext.DataImports
+                .AsSplitQuery()
+                .Include(di => di.File)
+                .ThenInclude(f => f.CreatedBy)
+                .Include(di => di.MetaFile)
+                .SingleAsync(di => di.FileId == releaseFile.FileId);
+
+            var permissions = await userService.GetDataFilePermissions(dataImport.File);
+
+            return new DataSetInfoViewModel
+            {
+                Id = releaseFile.FileId, // same value as DataFileId
+                DataSetTitle = releaseFile.Name ?? "Unknown",
+                DataFileId = releaseFile.FileId, // might not be needed
+                DataFileName = releaseFile.File.Filename,
+                DataFileSize = releaseFile.File.ContentLength, // changed from string
+                MetaFileSize = 0, // fix this
+                MetaFileId = dataImport.MetaFile.Id,
+                MetaFileName = dataImport.MetaFile.Filename,
+                ReplacedBy = releaseFile.File.ReplacedById,
+                Rows = dataImport.TotalRows,
+                UserName = releaseFile.File.CreatedBy?.Email ?? "",
+                Status = dataImport.Status,
+                Created = releaseFile.File.Created,
+                Permissions = permissions,
+                PublicApiDataSetId = releaseFile.PublicApiDataSetId,
+                PublicApiDataSetVersion = releaseFile.PublicApiDataSetVersionString,
+                DataSetUpload = dataSetUpload,
+            };
         }
 
         /// <summary>

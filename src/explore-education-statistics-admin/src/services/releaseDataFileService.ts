@@ -209,13 +209,11 @@ const releaseDataFileService = {
   async importDataSets(
     releaseId: string,
     dataSetUploadIds: string[],
-  ): Promise<DataFile[]> {
-    const files = await client.post<DataFileInfo[]>(
+  ): Promise<void> {
+    await client.post<DataFileInfo[]>(
       `/releaseVersions/${releaseId}/import-data-sets`,
       dataSetUploadIds,
     );
-
-    return files.map(file => mapFile(file));
   },
   async updateDataFilesOrder(
     releaseId: string,

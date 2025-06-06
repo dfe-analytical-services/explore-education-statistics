@@ -71,7 +71,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         }
 
         [HttpGet("releaseVersions/{releaseVersionId:guid}/data/{fileId:guid}")]
-        public async Task<ActionResult<DataFileInfo>> GetDataFileInfo(Guid releaseVersionId, Guid fileId)
+        public async Task<ActionResult<DataSetInfoViewModel>> GetDataFileInfo(Guid releaseVersionId, Guid fileId)
         {
             return await _releaseDataFileService
                 .GetInfo(releaseVersionId, fileId)
@@ -79,7 +79,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         }
 
         [HttpGet("releaseVersions/{releaseVersionId:guid}/data")]
-        public async Task<ActionResult<List<DataFileInfo>>> GetDataFileInfo(Guid releaseVersionId)
+        public async Task<ActionResult<List<DataSetInfoViewModel>>> GetDataFileInfo(Guid releaseVersionId)
         {
             return await _releaseDataFileService
                 .ListAll(releaseVersionId)
@@ -90,7 +90,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         // TODO: Update the endpoint on FE/BE
         // TODO: Update to accommodate for files and uploads
         [HttpPut("release/{releaseVersionId:guid}/data/order")]
-        public async Task<ActionResult<List<DataFileInfo>>> ReorderDataFiles(
+        public async Task<ActionResult<List<DataSetInfoViewModel>>> ReorderDataFiles(
             Guid releaseVersionId,
             List<Guid> fileIds) // will likely need 2 lists, one for files and one for uploads
         {
@@ -102,7 +102,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         [HttpPost("releaseVersions/data")]
         [DisableRequestSizeLimit]
         [RequestFormLimits(ValueLengthLimit = int.MaxValue, MultipartBodyLengthLimit = int.MaxValue)]
-        public async Task<ActionResult<List<DataSetUploadViewModel>>> UploadDataSet(
+        public async Task<ActionResult<List<DataSetInfoViewModel>>> UploadDataSet(
             [FromForm] UploadDataSetRequest request,
             CancellationToken cancellationToken)
         {
@@ -139,7 +139,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         [HttpPost("releaseVersions/zip-data")]
         [DisableRequestSizeLimit]
         [RequestFormLimits(ValueLengthLimit = int.MaxValue, MultipartBodyLengthLimit = int.MaxValue)]
-        public async Task<ActionResult<List<DataSetUploadViewModel>>> UploadDataSetAsZip(
+        public async Task<ActionResult<List<DataSetInfoViewModel>>> UploadDataSetAsZip(
             [FromForm] UploadDataSetAsZipRequest request,
             CancellationToken cancellationToken)
         {
@@ -174,7 +174,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         [HttpPost("releaseVersions/upload-bulk-zip-data")]
         [DisableRequestSizeLimit]
         [RequestFormLimits(ValueLengthLimit = int.MaxValue, MultipartBodyLengthLimit = int.MaxValue)]
-        public async Task<ActionResult<List<DataSetUploadViewModel>>> UploadDataSetAsBulkZip(
+        public async Task<ActionResult<List<DataSetInfoViewModel>>> UploadDataSetAsBulkZip(
             [FromForm] UploadDataSetAsBulkZipRequest request,
             CancellationToken cancellationToken)
         {
@@ -184,7 +184,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         }
 
         [HttpPost("releaseVersions/{releaseVersionId:guid}/import-data-sets")]
-        public async Task<ActionResult<List<DataFileInfo>>> ImportBulkZipDataSetsFromTempStorage(
+        public async Task<ActionResult<Unit>> ImportBulkZipDataSetsFromTempStorage(
             Guid releaseVersionId,
             List<Guid> dataSetUploadIds,
             CancellationToken cancellationToken)
