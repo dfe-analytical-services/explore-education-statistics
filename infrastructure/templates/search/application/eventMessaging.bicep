@@ -41,12 +41,12 @@ module eventGridMessagingModule '../../common/components/event-grid/eventGridMes
     customTopicNames: topicNames
     ipRules: ipRules
     resourcePrefix: resourcePrefix
-    alerts: {
-      customTopicDeadLetteredCount: true
-      customTopicDeliveryAttemptFailCount: true
-      customTopicDroppedEventCount: true
-      customTopicPublishFailCount: true
-      customTopicUnmatchedEventCount: true
+    customTopicAlerts: {
+      deadLetteredCount: true
+      deliveryAttemptFailCount: true
+      droppedEventCount: true
+      publishFailCount: true
+      unmatchedEventCount: true
       alertsGroupName: resourceNames.existingResources.alertsGroup
     }
     tagValues: tagValues

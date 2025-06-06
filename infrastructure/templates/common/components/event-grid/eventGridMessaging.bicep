@@ -10,13 +10,13 @@ param location string
 @description('A list of IP network rules to allow access to the resource from specific public internet IP address ranges.')
 param ipRules IpRange[]
 
-@description('Specifies which alert rules to enable. If the optional alerts parameter is not provided, no alert rules will be created or updated.')
-param alerts {
-  customTopicDeadLetteredCount: bool
-  customTopicDeliveryAttemptFailCount: bool
-  customTopicDroppedEventCount: bool
-  customTopicPublishFailCount: bool
-  customTopicUnmatchedEventCount: bool
+@description('Specifies which custom topic alert rules to enable. If the optional alerts parameter is not provided, no alert rules will be created or updated.')
+param customTopicAlerts {
+  deadLetteredCount: bool
+  deliveryAttemptFailCount: bool
+  droppedEventCount: bool
+  publishFailCount: bool
+  unmatchedEventCount: bool
   alertsGroupName: string
 }?
 
@@ -36,16 +36,7 @@ module eventGridCustomTopicModule 'eventGridCustomTopic.bicep' = [
       ipRules: ipRules
       publicNetworkAccess: 'Enabled'
       systemAssignedIdentity: true
-      alerts: alerts != null
-        ? {
-            deadLetteredCount: alerts!.customTopicDeadLetteredCount
-            deliveryAttemptFailCount: alerts!.customTopicDeliveryAttemptFailCount
-            droppedEventCount: alerts!.customTopicDroppedEventCount
-            publishFailCount: alerts!.customTopicPublishFailCount
-            unmatchedEventCount: alerts!.customTopicUnmatchedEventCount
-            alertsGroupName: alerts!.alertsGroupName
-          }
-        : null
+      alerts: customTopicAlerts
       tagValues: tagValues
     }
   }
