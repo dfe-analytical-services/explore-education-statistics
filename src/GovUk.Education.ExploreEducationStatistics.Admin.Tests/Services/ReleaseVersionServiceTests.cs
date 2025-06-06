@@ -1886,17 +1886,16 @@ public abstract class ReleaseVersionServiceTests
 
             await using var statisticsDbContext = InMemoryStatisticsDbContext(contextId);
             await using var contentDbContext = InMemoryApplicationDbContext(contextId);
-            {
-                var releaseVersionService = BuildService(
-                    contentDbContext: contentDbContext,
-                    statisticsDbContext: statisticsDbContext,
-                    processorClient: processorClient.Object);
+            
+            var releaseVersionService = BuildService(
+                contentDbContext: contentDbContext,
+                statisticsDbContext: statisticsDbContext,
+                processorClient: processorClient.Object);
 
-                await Assert.ThrowsAsync<HttpRequestException>(async () =>
-                    await releaseVersionService.DeleteTestReleaseVersion(releaseVersion.Id));
+            await Assert.ThrowsAsync<HttpRequestException>(async () =>
+                await releaseVersionService.DeleteTestReleaseVersion(releaseVersion.Id));
 
-                VerifyAllMocks(processorClient);
-            }
+            VerifyAllMocks(processorClient);
         }
     }
 
