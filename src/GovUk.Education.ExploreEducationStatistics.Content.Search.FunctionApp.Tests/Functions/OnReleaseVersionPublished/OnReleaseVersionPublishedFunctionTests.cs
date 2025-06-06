@@ -99,6 +99,25 @@ public class OnReleaseVersionPublishedFunctionTests
         // the previous searchable document does not need to be removed.
         Assert.Empty(response.RemoveSearchableDocuments);
     }
+    
+    [Fact]
+    public async Task GivenEvent_WhenPublishedReleaseVersionIsTheFirstRelease_ThenNoSearchableDocumentIsRemoved()
+    {
+        // ARRANGE
+        var payload = NewReleaseVersionPublishedEvents.NewlyPublishedIsTheFirstRelease;
+        
+        var eventGridEvent = new EventGridEventBuilder()
+            .WithPayload(payload)
+            .Build();
+
+        var sut = GetSut();
+        
+        // ACT
+        var response = await sut.OnReleaseVersionPublished(eventGridEvent, new FunctionContextMockBuilder().Build());
+        
+        // ASSERT
+        Assert.Empty(response.RemoveSearchableDocuments);
+    }
 
     private static class NewReleaseVersionPublishedEvents
     {
@@ -145,5 +164,11 @@ public class OnReleaseVersionPublishedFunctionTests
             };
 
         public static ReleaseVersionPublishedEventDto NewlyPublishedIsForSameRelease => Base;
+        
+        public static ReleaseVersionPublishedEventDto NewlyPublishedIsTheFirstRelease => Base with
+        {
+            PreviousLatestPublishedReleaseId = null,
+            PreviousLatestPublishedReleaseVersionId = null
+        };
     }
 }
