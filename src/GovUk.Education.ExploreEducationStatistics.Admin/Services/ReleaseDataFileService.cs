@@ -147,7 +147,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(releaseFileAndUploadData =>
                 {
                     var (releaseFile, uploadData) = releaseFileAndUploadData;
-                    return BuildDataSetInfoViewModel(releaseFile, uploadData);
+                    return BuildDataSetInfoForFileViewModel(releaseFile, uploadData);
                 });
         }
 
@@ -167,37 +167,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         .ThenBy(releaseFile => releaseFile.Name) // For subjects existing before ordering was added
                         .ToList();
 
-                    var viewModels = new List<DataSetInfoViewModel>();
-                    foreach (var releaseFile in filesExcludingReplacements)
-                    {
-                        await dataSetUploadRepository
-                            .GetForDataFile(releaseFile.FileId) // hopefully this value is the same thing
-                            .OnSuccessVoid(async uploadData => viewModels.Add(await BuildDataSetInfoViewModel(releaseFile, uploadData)));
-                    }
+                    var fileViewModels = await filesExcludingReplacements.SelectAsync(async releaseFile
+                        => await BuildDataSetInfoForFileViewModel(releaseFile));
 
+                    var allViewModels = fileViewModels.ToList();
 
-                    // WAIT A MO, THERE SHOULDN'T BE ANY UPLOADS ASSOCIATED TO A RELEASE FILE AS THEY'D HAVE BEEN DELETED PRIOR TO IMPORT
-                    // UNLESS IT'S A PENDING REPLACEMENT???
+                    await dataSetUploadRepository
+                        .ListAll(releaseVersionId, default)
+                        .OnSuccessVoid(uploads
+                            => allViewModels.AddRange(uploads.Select(upload => BuildDataSetInfoForUploadViewModel(upload))));
 
-                    // this is only fetching uploads if they relate to a releasefile, but that won't always be the case
-                    // (i.e. a new data set upload which hasn't been imported yet)
-
-                    // get standalone uploads
-                    var uploads = await dataSetUploadRepository
-                        .ListAll(releaseVersionId)
-                        .OnSuccess(uploads =>
-                        {
-                            // exclude any which were already fetched with a releasefile
-                            var filteredUploads = uploads.Where(u => view)
-
-                            // build those viewmodels
-                            // ...
-
-                            return filteredUploads;
-                        });
-
-                    // then return both
-                    return viewModels;
+                    return allViewModels;
                 });
         }
 
@@ -372,15 +352,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
                 await dataSetFileStorage.AddScreenerResultToUpload(dataSetUpload.Id, result, cancellationToken);
 
-                return BuildDataSetInfoViewModel(dataSetUpload, result);
+                return BuildDataSetInfoForUploadViewModel(dataSetUpload);
             });
 
             return [.. await Task.WhenAll(tasks)];
         }
 
-        private static DataSetInfoViewModel BuildDataSetInfoViewModel(
-            DataSetUpload dataSetUpload,
-            DataSetScreenerResult screenerResult) // might not be needed, seems to already be in dataSetUpload.ScreenerResult (prob using local EF entity rather than refetching)
+        private static DataSetInfoViewModel BuildDataSetInfoForUploadViewModel(DataSetUpload dataSetUpload)
         {
             return new DataSetInfoViewModel
             {
@@ -395,7 +373,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     DataFileName = dataSetUpload.DataFileName, // duplicated in main model, remove later
                     MetaFileName = dataSetUpload.MetaFileName, // duplicated in main model, remove later
                     Status = dataSetUpload.Status,
-                    ScreenerResult = screenerResult,
+                    ScreenerResult = dataSetUpload.ScreenerResult,
                 },
                 MetaFileId = dataSetUpload.MetaFileId,
                 //Permissions = 
@@ -708,9 +686,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             }).ToList();
         }
 
-        private async Task<DataSetInfoViewModel> BuildDataSetInfoViewModel(
+        private async Task<DataSetInfoViewModel> BuildDataSetInfoForFileViewModel(
             ReleaseFile releaseFile,
-            DataSetUploadViewModel? dataSetUpload)
+            DataSetUploadViewModel? dataSetUpload = null)
         {
             var dataImport = await contentDbContext.DataImports
                 .AsSplitQuery()

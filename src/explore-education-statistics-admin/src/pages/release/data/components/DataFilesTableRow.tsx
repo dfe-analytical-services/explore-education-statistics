@@ -16,6 +16,7 @@ import {
 import {
   DataFile,
   DataFileImportStatus,
+  DataSetInfo,
 } from '@admin/services/releaseDataFileService';
 import ButtonGroup from '@common/components/ButtonGroup';
 import ButtonText from '@common/components/ButtonText';
@@ -27,12 +28,12 @@ import DeleteDataFileModal from './DeleteDataFileModal';
 
 interface Props {
   canUpdateRelease?: boolean;
-  dataFile: DataFile;
+  dataFile: DataSetInfo;
   publicationId: string;
   releaseVersionId: string;
   onConfirmDelete: (deletedFileId: string) => void;
   onStatusChange: (
-    dataFile: DataFile,
+    dataFile: DataSetInfo,
     importStatus: DataFileImportStatus,
   ) => Promise<void>;
 }
@@ -53,12 +54,12 @@ export default function DataFilesTableRow({
     : dataFile.publicApiDataSetId == null;
 
   return (
-    <tr key={dataFile.title}>
+    <tr key={dataFile.dataSetTitle}>
       <td data-testid="Title" className={styles.title}>
-        {dataFile.title}
+        {dataFile.dataSetTitle}
       </td>
       <td data-testid="Size" className={styles.fileSize}>
-        {dataFile.fileSize.size.toLocaleString()} {dataFile.fileSize.unit}
+        {dataFile.dataFileSize} bytes
       </td>
       <td data-testid="Status">
         <ImporterStatus
@@ -93,7 +94,7 @@ export default function DataFilesTableRow({
                         {
                           publicationId,
                           releaseVersionId,
-                          fileId: dataFile.id,
+                          fileId: dataFile.dataFileId,
                         },
                       )}
                     >
@@ -132,7 +133,7 @@ export default function DataFilesTableRow({
                           {
                             publicationId,
                             releaseVersionId,
-                            fileId: dataFile.id,
+                            fileId: dataFile.dataFileId,
                           },
                         )}
                       >
@@ -172,7 +173,7 @@ export default function DataFilesTableRow({
                   <DeleteDataFileModal
                     dataFile={dataFile}
                     releaseVersionId={releaseVersionId}
-                    onConfirm={() => onConfirmDelete(dataFile.id)}
+                    onConfirm={() => onConfirmDelete(dataFile.dataFileId)}
                   />
                 )}
               </>
@@ -180,7 +181,7 @@ export default function DataFilesTableRow({
           {dataFile.permissions.canCancelImport && (
             <DataUploadCancelButton
               releaseVersionId={releaseVersionId}
-              fileId={dataFile.id}
+              fileId={dataFile.dataFileId}
             />
           )}
         </ButtonGroup>

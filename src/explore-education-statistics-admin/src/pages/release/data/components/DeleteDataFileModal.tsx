@@ -1,6 +1,7 @@
 import releaseDataFileQueries from '@admin/queries/releaseDataFileQueries';
 import releaseDataFileService, {
   DataFile,
+  DataSetInfo,
 } from '@admin/services/releaseDataFileService';
 import ButtonText from '@common/components/ButtonText';
 import LoadingSpinner from '@common/components/LoadingSpinner';
@@ -11,7 +12,7 @@ import { useQuery } from '@tanstack/react-query';
 import React, { useCallback } from 'react';
 
 interface Props {
-  dataFile: DataFile;
+  dataFile: DataSetInfo;
   releaseVersionId: string;
   onConfirm: () => void;
 }
@@ -23,7 +24,10 @@ export default function DeleteDataFileModal({
 }: Props) {
   const [open, toggleOpen] = useToggle(false);
   const { data: plan, isLoading } = useQuery({
-    ...releaseDataFileQueries.getDeleteFilePlan(releaseVersionId, dataFile.id),
+    ...releaseDataFileQueries.getDeleteFilePlan(
+      releaseVersionId,
+      dataFile.dataFileId,
+    ),
     enabled: open,
   });
 
@@ -31,7 +35,7 @@ export default function DeleteDataFileModal({
     try {
       await releaseDataFileService.deleteDataFiles(
         releaseVersionId,
-        dataFile.id,
+        dataFile.dataFileId,
       );
 
       onConfirm();
@@ -53,7 +57,8 @@ export default function DeleteDataFileModal({
       onConfirm={handleDeleteConfirm}
     >
       <p>
-        Are you sure you want to delete <strong>{dataFile.title}</strong>?
+        Are you sure you want to delete <strong>{dataFile.dataSetTitle}</strong>
+        ?
       </p>
       <p>This data will no longer be available for use in this release.</p>
 

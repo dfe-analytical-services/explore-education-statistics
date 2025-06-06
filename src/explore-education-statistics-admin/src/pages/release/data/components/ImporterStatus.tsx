@@ -1,6 +1,7 @@
 import releaseDataFileService, {
   DataFile,
   DataFileImportStatus,
+  DataSetInfo,
   ImportStatusCode,
 } from '@admin/services/releaseDataFileService';
 import Details from '@common/components/Details';
@@ -91,13 +92,13 @@ type StatusState = Pick<
 >;
 
 export type ImporterStatusChangeHandler = (
-  dataFile: DataFile,
+  dataFile: DataSetInfo,
   status: DataFileImportStatus,
 ) => void;
 
 interface ImporterStatusProps {
   className?: string;
-  dataFile: DataFile;
+  dataFile: DataSetInfo;
   hideErrors?: boolean;
   releaseVersionId: string;
   onStatusChange?: ImporterStatusChangeHandler;
@@ -117,7 +118,7 @@ const ImporterStatus = ({
   const fetchStatus = useCallback(async () => {
     const nextStatus = await releaseDataFileService.getDataFileImportStatus(
       releaseVersionId,
-      dataFile,
+      dataFile.dataFileId,
     );
 
     setCurrentStatus(nextStatus);

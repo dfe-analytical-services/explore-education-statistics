@@ -3,6 +3,7 @@ import ImporterStatus, {
 } from '@admin/pages/release/data/components/ImporterStatus';
 import releaseDataFileService, {
   DataFile,
+  DataSetInfo,
 } from '@admin/services/releaseDataFileService';
 import ButtonText from '@common/components/ButtonText';
 import FormattedDate from '@common/components/FormattedDate';
@@ -11,7 +12,7 @@ import SummaryListItem from '@common/components/SummaryListItem';
 import React from 'react';
 
 interface Props {
-  dataFile: DataFile;
+  dataFile: DataSetInfo;
   releaseVersionId: string;
   onStatusChange: ImporterStatusChangeHandler;
 }
@@ -23,18 +24,18 @@ export default function DataFileSummaryList({
 }: Props) {
   return (
     <SummaryList testId="Data file details">
-      <SummaryListItem term="Title">{dataFile.title}</SummaryListItem>
+      <SummaryListItem term="Title">{dataFile.dataSetTitle}</SummaryListItem>
       <SummaryListItem term="Data file">
         <ButtonText
           onClick={() =>
             releaseDataFileService.downloadFile(
               releaseVersionId,
-              dataFile.id,
-              dataFile.fileName,
+              dataFile.dataFileId,
+              dataFile.dataFileName,
             )
           }
         >
-          {dataFile.fileName}
+          {dataFile.dataFileName}
         </ButtonText>
       </SummaryListItem>
       <SummaryListItem term="Meta file">
@@ -51,7 +52,7 @@ export default function DataFileSummaryList({
         </ButtonText>
       </SummaryListItem>
       <SummaryListItem term="Size">
-        {`${dataFile.fileSize.size.toLocaleString()} ${dataFile.fileSize.unit}`}
+        {`${dataFile.dataFileSize} bytes`}
       </SummaryListItem>
       <SummaryListItem term="Number of rows">
         {dataFile.rows?.toLocaleString() ?? 'Unknown'}

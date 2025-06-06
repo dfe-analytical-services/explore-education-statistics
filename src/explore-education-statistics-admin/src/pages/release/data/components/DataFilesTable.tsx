@@ -1,6 +1,7 @@
 import {
   DataFile,
   DataFileImportStatus,
+  DataSetInfo,
 } from '@admin/services/releaseDataFileService';
 import React from 'react';
 import styles from './DataFilesTable.module.scss';
@@ -9,13 +10,13 @@ import DataFilesTableRow from './DataFilesTableRow';
 interface Props {
   canUpdateRelease?: boolean;
   caption: string;
-  dataFiles: DataFile[];
+  dataFiles: DataSetInfo[];
   publicationId: string;
   releaseVersionId: string;
   testId?: string;
   onDeleteFile: (deletedFileId: string) => void;
   onStatusChange: (
-    dataFile: DataFile,
+    dataFile: DataSetInfo,
     importStatus: DataFileImportStatus,
   ) => Promise<void>;
 }
@@ -48,7 +49,7 @@ export default function DataFilesTable({
           <DataFilesTableRow
             canUpdateRelease={canUpdateRelease}
             dataFile={dataFile}
-            key={dataFile.title}
+            key={dataFile.dataSetTitle}
             publicationId={publicationId}
             releaseVersionId={releaseVersionId}
             onConfirmDelete={onDeleteFile}

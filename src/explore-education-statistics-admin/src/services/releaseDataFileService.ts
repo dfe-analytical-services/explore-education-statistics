@@ -16,6 +16,50 @@ interface DataFileInfo extends FileInfo {
   permissions: DataFilePermissions;
 }
 
+export interface DataSetInfo {
+  id: string | undefined;
+  extension: string;
+  summary: string | undefined;
+  dataSetTitle: string;
+  dataFileId: string;
+  dataFileName: string;
+  dataFileSize: number;
+  rows: number | undefined;
+  metaFileId: string;
+  metaFileName: string;
+  metaFileSize: number;
+  status: ImportStatusCode;
+  permissions: DataFilePermissions;
+  publicApiDataSetId: string | undefined;
+  publicApiDataSetVersion: string | undefined;
+  dataSetUpload: DataSetUpload | undefined;
+  created: string;
+  userName: string;
+  replacedBy?: string;
+}
+
+export interface DataSetUpload {
+  id: string;
+  dataSetTitle: string;
+  dataFileName: string;
+  metaFileName: string;
+  status: DataSetUploadStatus;
+  screenerResult: ScreenerResultDetails;
+}
+
+export interface ScreenerResultDetails {
+  result: ScreenerOverallResult;
+  message: string;
+  testResults: ScreenerTestSummary[];
+}
+
+export interface ScreenerTestSummary {
+  testFunctionName: string;
+  testResult: ScreenerTestResult;
+  notes: string | undefined;
+  stage: ScreenerTestStage;
+}
+
 export interface DeleteDataFilePlan {
   deleteDataBlockPlan: DeleteDataBlockPlan;
   footnoteIds: string[];
@@ -87,6 +131,23 @@ export type ImportStatusCode =
   | 'CANCELLING'
   | 'CANCELLED';
 
+export type DataSetUploadStatus =
+  | 'SCREENING'
+  | 'FAILED_SCREENING'
+  | 'PENDING_REVIEW'
+  | 'PENDING_IMPORT';
+
+export type ScreenerOverallResult = 'Passed' | 'Failed';
+
+export type ScreenerTestResult = 'PASS' | 'FAIL' | 'WARNING';
+
+export type ScreenerTestStage =
+  | 'InitialFileValidation'
+  | 'PreScreening1'
+  | 'PreScreening2'
+  | 'FullChecks'
+  | 'Passed';
+
 export interface DataFileImportStatus {
   status: ImportStatusCode;
   percentageComplete: number;
@@ -97,7 +158,6 @@ export interface DataFileImportStatus {
 
 function mapFile({ name, ...file }: DataFileInfo): DataFile {
   const [size, unit] = file.size.split(' ');
-
   return {
     ...file,
     title: name,
@@ -109,18 +169,18 @@ function mapFile({ name, ...file }: DataFileInfo): DataFile {
 }
 
 const releaseDataFileService = {
-  async getDataFiles(releaseId: string): Promise<DataFile[]> {
-    const response = await client.get<DataFileInfo[]>(
+  async getDataFiles(releaseId: string): Promise<DataSetInfo[]> {
+    const response = await client.get<DataSetInfo[]>(
       `/releaseVersions/${releaseId}/data`,
     );
     const dataFiles = response.filter(file => file.metaFileName.length > 0);
-    return dataFiles.map(mapFile);
+    return dataFiles;
   },
-  async getDataFile(releaseId: string, fileId: string): Promise<DataFile> {
-    const result = await client.get<DataFileInfo>(
+  async getDataFile(releaseId: string, fileId: string): Promise<DataSetInfo> {
+    const result = await client.get<DataSetInfo>(
       `/releaseVersions/${releaseId}/data/${fileId}`,
     );
-    return mapFile(result);
+    return result;
   },
   async uploadDataSetFilePairForReplacement(
     releaseId: string,
@@ -228,10 +288,10 @@ const releaseDataFileService = {
   },
   getDataFileImportStatus(
     releaseId: string,
-    dataFile: DataFile,
+    dataFileId: string,
   ): Promise<DataFileImportStatus> {
     return client.get<DataFileImportStatus>(
-      `/release/${releaseId}/data/${dataFile.id}/import/status`,
+      `/release/${releaseId}/data/${dataFileId}/import/status`,
     );
   },
 
