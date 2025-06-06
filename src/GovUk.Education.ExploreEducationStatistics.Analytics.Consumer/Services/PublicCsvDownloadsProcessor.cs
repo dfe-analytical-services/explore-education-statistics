@@ -8,13 +8,14 @@ public class PublicCsvDownloadsProcessor(
     IAnalyticsPathResolver pathResolver,
     IProcessRequestFilesWorkflow workflow) : IRequestFileProcessor
 {
-    public Task Process() {
+    public Task Process()
+    {
         return workflow.Process(new WorkflowActor(
             sourceDirectory: pathResolver.PublicCsvDownloadsDirectoryPath(),
             reportsDirectory: pathResolver.PublicCsvDownloadsReportsDirectoryPath()));
     }
 
-    private class WorkflowActor(string sourceDirectory, string reportsDirectory) 
+    private class WorkflowActor(string sourceDirectory, string reportsDirectory)
         : IWorkflowActor
     {
         public string GetSourceDirectory()
@@ -26,7 +27,7 @@ public class PublicCsvDownloadsProcessor(
         {
             return reportsDirectory;
         }
-        
+
         public async Task InitialiseDuckDb(DuckDbConnection connection)
         {
             await connection.ExecuteNonQueryAsync(@"
@@ -81,8 +82,8 @@ public class PublicCsvDownloadsProcessor(
                 GROUP BY csvDownloadHash
                 ORDER BY csvDownloadHash
             ");
-        
-            var reportFilePath = 
+
+            var reportFilePath =
                 $"{reportsFolderPathAndFilenamePrefix}_public-csv-downloads.parquet";
 
             await connection.ExecuteNonQueryAsync($@"
