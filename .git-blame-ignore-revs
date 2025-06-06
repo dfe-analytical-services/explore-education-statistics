@@ -1,0 +1,19 @@
+# --------------------------------------------------------------------------------------------------------------
+# This file is used to ignore specific commits in git blame output.
+# The commits listed here will not be shown in the blame output, making it easier to read the history of a file.
+# Note: This file is typically used to ignore large refactorings, formatting changes, or other commits that do 
+# not affect the logic of the code.
+
+# Format:
+# Each line should contain a commit hash that you want to ignore.
+
+# To use this file:
+# Execute the following command in the repository directory to set the ignore file for git blame:
+# git config blame.ignoreRevsFile .git-blame-ignore-revs
+# To enable this globally, you can use:
+# git config --global blame.ignoreRevsFile .git-blame-ignore-revs
+
+# More information: https://www.git-tower.com/blog/how-to-exclude-commits-from-git-blame
+# --------------------------------------------------------------------------------------------------------------
+# Converted solution to filescoped namespaces
+df69e3986c933b7c16ff3e28365be07f0742292d
