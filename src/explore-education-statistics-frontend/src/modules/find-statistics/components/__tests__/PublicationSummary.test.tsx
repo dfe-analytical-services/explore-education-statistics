@@ -22,4 +22,14 @@ describe('PublicationSummary', () => {
     expect(screen.getByTestId('Published')).toHaveTextContent('8 Jun 2021');
     expect(screen.getByTestId('Theme')).toHaveTextContent('Theme 1');
   });
+
+  test('renders summary content with html highlight', () => {
+    render(<PublicationSummary publication={testPublications[1]} />);
+
+    const searchHighlight = screen.getByTestId('search-highlight');
+    expect(
+      within(searchHighlight).getByText('find me highlight', { exact: false })
+        .nodeName,
+    ).toEqual('EM');
+  });
 });

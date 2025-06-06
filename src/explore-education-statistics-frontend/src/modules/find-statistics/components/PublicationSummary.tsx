@@ -37,6 +37,7 @@ const PublicationSummary = ({ publication }: Props) => {
           html={`<p>${highlightContent}</p>`}
           sanitizeOptions={{ allowedTags: ['em'] }}
           className={styles.highlightContent}
+          testId="search-highlight"
         />
       )}
 
