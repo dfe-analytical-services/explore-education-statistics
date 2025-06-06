@@ -49,7 +49,7 @@ public class PublicZipDownloadsProcessor(
             await connection.ExecuteNonQueryAsync($@"
                 INSERT INTO zipDownloads BY NAME (
                     SELECT
-                        MD5(CONCAT(subjectId, releaseVersionId)) AS zipDownloadHash,
+                        MD5(CONCAT(subjectId, releaseVersionId, fromPage)) AS zipDownloadHash,
                         *
                     FROM read_json('{sourceFilePath}', 
                         format='unstructured',
