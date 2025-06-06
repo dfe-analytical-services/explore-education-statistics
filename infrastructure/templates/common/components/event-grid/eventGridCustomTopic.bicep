@@ -111,7 +111,7 @@ module droppedEventCount '../../../public-api/components/alerts/staticMetricAler
 }
 
 module deliveryAttemptFailCountAlert '../../../public-api/components/alerts/staticMetricAlert.bicep' = if (alerts != null && topic.name == 's101d01-ees-evgt-publication-changed') {
-  name: '${name}DeliveryAttemptFailCountDeploy'
+  name: '${name}DeliveryAttemptFailDeploy'
   params: {
     enabled: alerts!.deliveryAttemptFailCount
     resourceName: topic.name
