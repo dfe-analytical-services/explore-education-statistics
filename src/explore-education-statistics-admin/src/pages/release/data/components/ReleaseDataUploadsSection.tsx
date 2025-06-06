@@ -279,7 +279,7 @@ export default function ReleaseDataUploadsSection({
                     publicationId={publicationId}
                     releaseVersionId={releaseVersionId}
                     testId="Data file replacements table"
-                    onConfirmReplacement={refetchDataFiles}
+                    onConfirmAction={refetchDataFiles}
                   />
                 )}
 

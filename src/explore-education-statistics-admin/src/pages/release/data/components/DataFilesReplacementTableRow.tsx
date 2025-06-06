@@ -26,14 +26,14 @@ interface Props {
   dataFile: DataFile;
   publicationId: string;
   releaseVersionId: string;
-  onConfirmReplacement?: () => void;
+  onConfirmAction?: () => void;
 }
 
 export default function DataFilesReplacementTableRow({
   dataFile,
   publicationId,
   releaseVersionId,
-  onConfirmReplacement,
+  onConfirmAction,
 }: Props) {
   const [fetchPlan, toggleFetchPlan] = useToggle(false);
 
@@ -60,7 +60,7 @@ export default function DataFilesReplacementTableRow({
   }, [replacementDataFile?.status, toggleFetchPlan]);
 
   const handleStatusChange = (
-    file: DataFile,
+    _file: DataFile,
     importStatus: DataFileImportStatus,
   ) => {
     if (importStatus.status === 'COMPLETE') {
@@ -119,45 +119,41 @@ export default function DataFilesReplacementTableRow({
           >
             View details
           </Link>
-          {plan?.valid && (
-            <>
-              {plan.valid && (
-                <ButtonText
-                  onClick={async () => {
-                    await dataReplacementService.replaceData(
-                      releaseVersionId,
-                      dataFile.id,
-                      replacementDataFile.id,
-                    );
-
-                    onConfirmReplacement?.();
-                  }}
-                >
-                  Confirm replacement
-                </ButtonText>
-              )}
-              <ModalConfirm
-                title="Cancel data replacement"
-                triggerButton={
-                  <ButtonText variant="secondary">
-                    Cancel replacement
-                  </ButtonText>
-                }
-                onConfirm={async () => {
-                  await releaseDataFileService.deleteDataFiles(
+          <>
+            <ModalConfirm
+              title="Cancel data replacement"
+              triggerButton={
+                <ButtonText variant="secondary">Cancel replacement</ButtonText>
+              }
+              onConfirm={async () => {
+                await releaseDataFileService.deleteDataFiles(
+                  releaseVersionId,
+                  replacementDataFile.id,
+                );
+                onConfirmAction?.();
+              }}
+            >
+              <p>
+                Are you sure you want to cancel this data replacement? The
+                pending replacement data file will be deleted.
+              </p>
+            </ModalConfirm>
+            {plan?.valid && (
+              <ButtonText
+                onClick={async () => {
+                  await dataReplacementService.replaceData(
                     releaseVersionId,
+                    dataFile.id,
                     replacementDataFile.id,
                   );
-                  onConfirmReplacement?.();
+
+                  onConfirmAction?.();
                 }}
               >
-                <p>
-                  Are you sure you want to cancel this data replacement? The
-                  pending replacement data file will be deleted.
-                </p>
-              </ModalConfirm>
-            </>
-          )}
+                Confirm replacement
+              </ButtonText>
+            )}
+          </>
         </ButtonGroup>
       </td>
     </tr>

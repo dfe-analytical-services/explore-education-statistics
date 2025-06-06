@@ -128,8 +128,5 @@ describe('DataFilesReplacementTableRow', () => {
     expect(
       within(cells[3]).queryByRole('button', { name: 'Confirm replacement' }),
     ).not.toBeInTheDocument();
-    expect(
-      within(cells[3]).queryByRole('button', { name: 'Cancel replacement' }),
-    ).not.toBeInTheDocument();
   });
 });

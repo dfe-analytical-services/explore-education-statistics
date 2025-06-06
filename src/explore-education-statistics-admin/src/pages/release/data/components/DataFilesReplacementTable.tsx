@@ -9,7 +9,7 @@ interface Props {
   publicationId: string;
   releaseVersionId: string;
   testId?: string;
-  onConfirmReplacement?: () => void;
+  onConfirmAction?: () => void;
 }
 
 export default function DataFilesReplacementTable({
@@ -18,7 +18,7 @@ export default function DataFilesReplacementTable({
   publicationId,
   releaseVersionId,
   testId,
-  onConfirmReplacement,
+  onConfirmAction,
 }: Props) {
   return (
     <table className={styles.table} data-testid={testId}>
@@ -40,7 +40,7 @@ export default function DataFilesReplacementTable({
             key={dataFile.title}
             publicationId={publicationId}
             releaseVersionId={releaseVersionId}
-            onConfirmReplacement={onConfirmReplacement}
+            onConfirmAction={onConfirmAction}
           />
         ))}
       </tbody>
