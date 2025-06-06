@@ -300,9 +300,6 @@ export const horizontalBarBlockDefinition: ChartDefinition = {
       id: 'major',
       title: 'Y Axis (major axis)',
       type: 'major',
-      capabilities: {
-        canRotateLabel: true,
-      },
       defaults: {
         groupBy: 'timePeriod',
         min: 0,
@@ -323,9 +320,6 @@ export const horizontalBarBlockDefinition: ChartDefinition = {
       id: 'minor',
       title: 'X Axis (minor axis)',
       type: 'minor',
-      capabilities: {
-        canRotateLabel: false,
-      },
       defaults: {
         showGrid: true,
         size: 50,
