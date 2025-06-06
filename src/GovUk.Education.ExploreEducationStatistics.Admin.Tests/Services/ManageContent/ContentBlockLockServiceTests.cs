@@ -11,6 +11,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.AspNetCore.SignalR;
+using Microsoft.EntityFrameworkCore;
 using Moq;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityPolicies;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
@@ -587,7 +588,7 @@ public class ContentBlockLockServiceTests
 
         await using (var contentDbContext = InMemoryContentDbContext(contextId))
         {
-            ContentBlockUnlockViewModel viewModel = null!;
+            ContentBlockUnlockViewModel? viewModel = null;
 
             var match = new CaptureMatch<ContentBlockUnlockViewModel>(
                 value => { viewModel = value; }
@@ -613,6 +614,7 @@ public class ContentBlockLockServiceTests
 
             result.AssertRight();
 
+            Assert.NotNull(viewModel);
             Assert.Equal(viewModel.Id, contentBlock.Id);
             Assert.Equal(viewModel.SectionId, contentBlock.ContentSectionId);
             Assert.Equal(viewModel.ReleaseVersionId, releaseVersion.Id);
@@ -620,9 +622,11 @@ public class ContentBlockLockServiceTests
 
         await using (var contentDbContext = InMemoryContentDbContext(contextId))
         {
-            var savedContentBlock = await contentDbContext.ContentBlocks.FindAsync(contentBlock.Id);
-
-            Assert.Null(savedContentBlock!.Locked);
+            var savedContentBlock = await contentDbContext.ContentBlocks
+                .Include(cb => cb.LockedBy)
+                .FirstAsync(cb => cb.Id == contentBlock.Id);
+            
+            Assert.Null(savedContentBlock.Locked);
             Assert.Null(savedContentBlock.LockedBy);
             Assert.Null(savedContentBlock.LockedById);
         }
@@ -672,7 +676,7 @@ public class ContentBlockLockServiceTests
 
         await using (var contentDbContext = InMemoryContentDbContext(contextId))
         {
-            ContentBlockUnlockViewModel viewModel = null!;
+            ContentBlockUnlockViewModel? viewModel = null;
 
             var match = new CaptureMatch<ContentBlockUnlockViewModel>(
                 value => { viewModel = value; }
@@ -698,6 +702,7 @@ public class ContentBlockLockServiceTests
 
             result.AssertRight();
 
+            Assert.NotNull(viewModel);
             Assert.Equal(viewModel.Id, contentBlock.Id);
             Assert.Equal(viewModel.SectionId, contentBlock.ContentSectionId);
             Assert.Equal(viewModel.ReleaseVersionId, releaseVersion.Id);
@@ -705,9 +710,11 @@ public class ContentBlockLockServiceTests
 
         await using (var contentDbContext = InMemoryContentDbContext(contextId))
         {
-            var savedContentBlock = await contentDbContext.ContentBlocks.FindAsync(contentBlock.Id);
+            var savedContentBlock = await contentDbContext.ContentBlocks
+                .Include(cb => cb.LockedBy)
+                .FirstAsync(cb => cb.Id == contentBlock.Id);
 
-            Assert.Null(savedContentBlock!.Locked);
+            Assert.Null(savedContentBlock.Locked);
             Assert.Null(savedContentBlock.LockedBy);
             Assert.Null(savedContentBlock.LockedById);
         }
@@ -820,7 +827,7 @@ public class ContentBlockLockServiceTests
 
         await using (var contentDbContext = InMemoryContentDbContext(contextId))
         {
-            ContentBlockUnlockViewModel viewModel = null!;
+            ContentBlockUnlockViewModel? viewModel = null;
 
             var match = new CaptureMatch<ContentBlockUnlockViewModel>(
                 value => { viewModel = value; }
@@ -846,6 +853,7 @@ public class ContentBlockLockServiceTests
 
             result.AssertRight();
 
+            Assert.NotNull(viewModel);
             Assert.Equal(viewModel.Id, contentBlock.Id);
             Assert.Equal(viewModel.SectionId, contentBlock.ContentSectionId);
             Assert.Equal(viewModel.ReleaseVersionId, releaseVersion.Id);
@@ -853,9 +861,11 @@ public class ContentBlockLockServiceTests
 
         await using (var contentDbContext = InMemoryContentDbContext(contextId))
         {
-            var savedContentBlock = await contentDbContext.ContentBlocks.FindAsync(contentBlock.Id);
+            var savedContentBlock = await contentDbContext.ContentBlocks
+                .Include(cb => cb.LockedBy)
+                .FirstAsync(cb => cb.Id == contentBlock.Id);
 
-            Assert.Null(savedContentBlock!.Locked);
+            Assert.Null(savedContentBlock.Locked);
             Assert.Null(savedContentBlock.LockedBy);
             Assert.Null(savedContentBlock.LockedById);
         }
