@@ -23,12 +23,21 @@ public class OnReleaseVersionPublishedFunction(IEventGridEventHandler eventGridE
                         ? OnReleaseVersionPublishedOutput.Empty
                         : new OnReleaseVersionPublishedOutput
                         {
-                            RefreshSearchableDocumentMessages = 
-                                [ new RefreshSearchableDocumentMessageDto { PublicationSlug = payload.PublicationSlug } ],
-                            RemoveSearchableDocuments = payload.NewlyPublishedReleaseVersionIsForDifferentRelease
-                                ? [ new RemoveSearchableDocumentDto { ReleaseId = payload.PreviousLatestPublishedReleaseId } ]
-                                : []
+                            RefreshSearchableDocumentMessages = BuildRefreshSearchableDocumentMessages(payload),
+                            RemoveSearchableDocuments = BuildRemoveSearchableDocumentsCommands(payload)
                         }));
+
+    private static RefreshSearchableDocumentMessageDto[] BuildRefreshSearchableDocumentMessages(ReleaseVersionPublishedEventDto payload) => 
+        [ new() { PublicationSlug = payload.PublicationSlug } ];
+
+    private static RemoveSearchableDocumentDto[] BuildRemoveSearchableDocumentsCommands(ReleaseVersionPublishedEventDto payload) =>
+        payload is
+        {
+            NewlyPublishedReleaseVersionIsForDifferentRelease: true, 
+            PreviousLatestPublishedReleaseId: not null
+        }
+            ? [ new RemoveSearchableDocumentDto { ReleaseId = payload.PreviousLatestPublishedReleaseId } ]
+            : [];
 }
 
 public record OnReleaseVersionPublishedOutput
