@@ -22,6 +22,7 @@ export type SelectedChildren = {
   valuesRelatedToSelectedValues: string[];
   valuesRelatedToSelectedValuesCountMap: Dictionary<number>;
 };
+
 interface FilterHierarchyOptionsProps {
   disabled?: boolean;
   expandedOptionsList: string[];
@@ -61,7 +62,10 @@ function FilterHierarchyOptions({
         {selectedChildrenCount} selected
       </Tag>
     );
-  }, [optionTree, selectedChildren]);
+  }, [
+    optionTree.value,
+    selectedChildren.valuesRelatedToSelectedValuesCountMap,
+  ]);
   const renderLabel = useCallback(
     (label: string) => {
       const termIndex = label.toLowerCase().indexOf(hierarchySearchTerm);

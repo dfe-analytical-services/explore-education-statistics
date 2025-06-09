@@ -17,8 +17,12 @@ import FilterHierarchyOptions, {
   FilterHierarchyOption,
   SelectedChildren,
 } from './FilterHierarchyOptions';
-import augmentFilterHierarchySelections from './utils/augmentFilterHierarchySelections';
 import { OptionLabelsMap } from './utils/getFilterHierarchyLabelsMap';
+import augmentFilterHierarchySelections from './utils/augmentFilterHierarchySelections';
+import {
+  hierarchyOptionsFromString,
+  hierarchyOptionsToString,
+} from './utils/filterHierarchiesConversion';
 
 export interface FilterHierarchyProps {
   optionLabelsMap: OptionLabelsMap;
@@ -118,9 +122,21 @@ function FilterHierarchy({
     expandAllOptions,
   ]);
 
-  const selectedValues = useWatch({ name });
+  const getOptionUniqueValue = useCallback(
+    (optionValue: string): string => {
+      return hierarchyOptionsToString(
+        augmentFilterHierarchySelections(
+          { [name]: [optionValue] },
+          [filterHierarchy],
+          optionLabelsMap,
+        )[name][optionValue],
+      );
+    },
+    [filterHierarchy, name, optionLabelsMap],
+  );
 
-  const selectedChildren: SelectedChildren = useMemo(() => {
+  const selectedValues = useWatch({ name });
+  const optionsWithSelectedChildren: SelectedChildren = useMemo(() => {
     if (!selectedValues?.length) {
       return {
         valuesRelatedToSelectedValues: [],
@@ -128,39 +144,47 @@ function FilterHierarchy({
       };
     }
 
-    const selectedValuesRelatedValuesMap = augmentFilterHierarchySelections(
-      { [name]: selectedValues },
-      [filterHierarchy],
-      optionLabelsMap,
-    );
+    const tierTotals = filterHierarchy.map(hierarchyTier => {
+      return Object.values(hierarchyTier.hierarchy)
+        .flat()
+        .find(
+          optionId => optionLabelsMap[optionId].toLocaleLowerCase() === 'total',
+        )!;
+    });
 
-    const relatedValuesWithSelectedValuesRemoved = Object.entries(
-      selectedValuesRelatedValuesMap[name],
-    )
-      .map(([selectedOptionId, relatedOptionIds]) =>
-        relatedOptionIds.filter(optionId => optionId !== selectedOptionId),
-      )
+    // includes duplicates
+    const ancestorsWithSelectedChildren = selectedValues
+      .map((optionValue: string) => {
+        // find related values that aren't totals
+        const nonTotalRelatedOptions = hierarchyOptionsFromString(
+          optionValue,
+        ).filter((optionId: string) => !tierTotals.includes(optionId));
+
+        // remove bottom value, as this is the selected options, we want ancestors only
+        const relatedAncestors = nonTotalRelatedOptions.slice(0, -1);
+
+        return relatedAncestors.map(getOptionUniqueValue);
+      })
       .flat();
 
-    // a count map, [key] being the option id that has selected (grand)children, [value] being count of selected (grand)children
-    const valuesRelatedToSelectedValuesCountMap =
-      relatedValuesWithSelectedValuesRemoved
-        .flat()
-        .reduce((acc: Dictionary<number>, item) => {
-          acc[item] = (acc[item] || 0) + 1;
-          return acc;
-        }, {});
+    // count duplicates, store them in a dictionary keyed by their unique value, with count as value
+    const valuesRelatedToSelectedValuesCountMap = ancestorsWithSelectedChildren
+      .flat()
+      .reduce((acc: Dictionary<number>, item: string) => {
+        acc[item] = (acc[item] || 0) + 1;
+        return acc;
+      }, {});
 
+    // remove all duplicates
     const uniqueRelatedValues = Array.from(
-      // remove all duplications
-      new Set([...relatedValuesWithSelectedValuesRemoved]),
+      new Set([...ancestorsWithSelectedChildren]),
     );
 
     return {
       valuesRelatedToSelectedValues: uniqueRelatedValues,
       valuesRelatedToSelectedValuesCountMap,
     };
-  }, [selectedValues, filterHierarchy, name, optionLabelsMap]);
+  }, [selectedValues, filterHierarchy, optionLabelsMap, getOptionUniqueValue]);
 
   const toggleOptions = useCallback(
     (optionId: string) => {
@@ -176,9 +200,9 @@ function FilterHierarchy({
 
   const expandSelectedOptions = useCallback(() => {
     return setExpandedOptionsList(
-      selectedChildren.valuesRelatedToSelectedValues,
+      optionsWithSelectedChildren.valuesRelatedToSelectedValues,
     );
-  }, [setExpandedOptionsList, selectedChildren]);
+  }, [setExpandedOptionsList, optionsWithSelectedChildren]);
 
   useEffect(() => {
     if (isActive) {
@@ -294,7 +318,7 @@ function FilterHierarchy({
                 toggleOptions={toggleOptions}
                 expandedOptionsList={expandedOptionsList}
                 hierarchySearchTerm={hierarchySearchTerm}
-                selectedChildren={selectedChildren}
+                selectedChildren={optionsWithSelectedChildren}
               />
             );
           })}
@@ -310,40 +334,70 @@ function getRootOptionTrees(
   hierarchySearchTerm: string,
 ): FilterHierarchyOption[] {
   const rootOptionIds = Object.keys(filterHierarchy[0].hierarchy);
-  return mapOptionTreesRecursively(
-    0,
-    rootOptionIds,
+
+  const tierTotals = filterHierarchy.map(hierarchyTier => {
+    return Object.values(hierarchyTier.hierarchy)
+      .flat()
+      .find(
+        optionId => optionLabelsMap[optionId].toLocaleLowerCase() === 'total',
+      )!;
+  });
+
+  return mapOptionTreesRecursively({
+    tier: 0,
+    optionIds: rootOptionIds,
     filterHierarchy,
     optionLabelsMap,
+    tierTotals,
     hierarchySearchTerm,
-  )!;
+    ancestorIds: [],
+  })!;
 }
 
-function mapOptionTreesRecursively(
-  tier: number,
-  optionIds: string[],
-  filterHierarchy: SubjectMetaFilterHierarchy,
-  optionLabelsMap: OptionLabelsMap,
-  hierarchySearchTerm: string,
-): FilterHierarchyOption[] | undefined {
+function mapOptionTreesRecursively({
+  tier,
+  optionIds,
+  filterHierarchy,
+  optionLabelsMap,
+  tierTotals,
+  hierarchySearchTerm,
+  ancestorIds = [],
+}: {
+  tier: number;
+  optionIds: string[];
+  filterHierarchy: SubjectMetaFilterHierarchy;
+  optionLabelsMap: OptionLabelsMap;
+  tierTotals: string[];
+  hierarchySearchTerm: string;
+  ancestorIds: string[];
+}): FilterHierarchyOption[] | undefined {
   if (optionIds.length === 0) {
     return undefined;
   }
   const unfilteredOptionsTree = optionIds.map(optionId => {
     const childOptionIds = filterHierarchy[tier]?.hierarchy[optionId] ?? [];
 
+    // join ancestor ids, option id and child total ids into one unique option value string
+    const optionValue = hierarchyOptionsToString([
+      ...ancestorIds,
+      optionId,
+      ...tierTotals.slice(tier),
+    ]);
+
     return {
-      value: optionId,
+      value: optionValue,
       label: optionLabelsMap[optionId]?.trim() ?? '',
       filterLabel: optionLabelsMap[filterHierarchy[tier]?.filterId] ?? '',
       childFilterLabel: optionLabelsMap[filterHierarchy[tier]?.childFilterId],
-      options: mapOptionTreesRecursively(
-        tier + 1,
-        childOptionIds,
+      options: mapOptionTreesRecursively({
+        tier: tier + 1,
+        optionIds: childOptionIds,
         filterHierarchy,
         optionLabelsMap,
+        tierTotals,
         hierarchySearchTerm,
-      ),
+        ancestorIds: [...ancestorIds, optionId],
+      }),
     };
   });
 
@@ -357,6 +411,7 @@ function mapOptionTreesRecursively(
     return optionsTree;
   }
 
+  // filter option tree options based on search term
   return optionsTree.filter(option => {
     const hasOptions = (option.options?.length ?? 0) > 0;
     const hasSearchTerm = option.label

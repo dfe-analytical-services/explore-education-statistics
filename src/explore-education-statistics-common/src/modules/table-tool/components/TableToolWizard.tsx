@@ -38,13 +38,13 @@ import tableBuilderService, {
   Subject,
   SubjectMeta,
 } from '@common/services/tableBuilderService';
+import { Dictionary } from '@common/types';
 import locationLevelsMap, {
   LocationLevelKey,
 } from '@common/utils/locationLevelsMap';
-import { Dictionary } from 'lodash';
 import React, { ReactElement, ReactNode, useMemo, useState } from 'react';
 import { useImmer } from 'use-immer';
-import filterHierarchiesShim from './utils/filterHierarchiesShim';
+import { converHierarchiesFormToQuery } from './utils/filterHierarchiesConversion';
 
 const defaultLocationStepTitle = 'Choose locations';
 const defaultDataSetStepTitle = 'Select a data set';
@@ -445,9 +445,8 @@ export default function TableToolWizard({
 
     const updatedReleaseTableDataQuery: ReleaseTableDataQuery = {
       ...state.query,
-      filters: Object.values(filters)
-        .flat()
-        .concat(Object.values(filterHierarchies).flat()),
+      filters: Object.values(filters).flat(),
+      filterHierarchyOptions: converHierarchiesFormToQuery(filterHierarchies),
       indicators,
     };
 
@@ -456,10 +455,9 @@ export default function TableToolWizard({
         subjectId: updatedReleaseTableDataQuery.subjectId,
         locationIds: updatedReleaseTableDataQuery.locationIds,
         timePeriod: updatedReleaseTableDataQuery.timePeriod,
-        filters: filterHierarchiesShim(
-          updatedReleaseTableDataQuery.filters,
-          state.subjectMeta,
-        ),
+        filters: updatedReleaseTableDataQuery.filters,
+        filterHierarchyOptions:
+          updatedReleaseTableDataQuery.filterHierarchyOptions,
         indicators: updatedReleaseTableDataQuery.indicators,
       } as FullTableQuery,
       updatedReleaseTableDataQuery.releaseVersionId,
@@ -603,6 +601,7 @@ export default function TableToolWizard({
                   initialValues={{
                     indicators: state.query.indicators,
                     filters: state.query.filters,
+                    filterHierarchies: state.query.filterHierarchyOptions,
                   }}
                   selectedPublication={state.selectedPublication}
                   stepTitle={stepTitles.filter}

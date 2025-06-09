@@ -18,7 +18,11 @@ import WizardStepFormActions from '@common/modules/table-tool/components/WizardS
 import WizardStepHeading from '@common/modules/table-tool/components/WizardStepHeading';
 import WizardStepSummary from '@common/modules/table-tool/components/WizardStepSummary';
 import { SelectedPublication } from '@common/modules/table-tool/types/selectedPublication';
-import { Subject, SubjectMeta } from '@common/services/tableBuilderService';
+import {
+  FullTableQuery,
+  Subject,
+  SubjectMeta,
+} from '@common/services/tableBuilderService';
 import { Dictionary } from '@common/types';
 import {
   getErrorCode,
@@ -32,7 +36,10 @@ import React, { useCallback, useMemo, useState } from 'react';
 import { ObjectSchema } from 'yup';
 import FilterHierarchy from './FilterHierarchy';
 import getFilterHierarchyLabelsMap from './utils/getFilterHierarchyLabelsMap';
-import augmentFilterHierarchySelections from './utils/augmentFilterHierarchySelections';
+import {
+  converHierarchiesQueryToForm,
+  hierarchyOptionsFromString,
+} from './utils/filterHierarchiesConversion';
 
 export interface FiltersFormValues {
   indicators: string[];
@@ -53,8 +60,9 @@ export type TableQueryErrorCode = (typeof TableQueryErrorCodes)[number];
 
 interface Props extends InjectedWizardProps {
   initialValues?: {
-    indicators: string[];
-    filters: string[];
+    indicators: FullTableQuery['indicators'];
+    filters: FullTableQuery['filters'];
+    filterHierarchies: FullTableQuery['filterHierarchyOptions'];
   };
   selectedPublication?: SelectedPublication;
   showTableQueryErrorDownload?: boolean;
@@ -84,16 +92,9 @@ export default function FiltersForm({
 
   const [tableQueryError, setTableQueryError] = useState<TableQueryErrorCode>();
   const [previousValues, setPreviousValues] = useState<FiltersFormValues>();
-  const [
-    augmentedPreviousHierarchyValues,
-    setAugmentedPreviousHierarchyValues,
-  ] = useState<Dictionary<Dictionary<string[]>>>();
-
   const [openFilterGroups, setOpenFilterGroups] = useState<string[]>([]);
 
-  const filterHierarchies = useMemo(() => {
-    return subjectMeta.filterHierarchies ?? [];
-  }, [subjectMeta]);
+  const { filterHierarchies = [] } = subjectMeta;
 
   const hierarchiedFilterIds = useMemo(() => {
     return (
@@ -106,7 +107,7 @@ export default function FiltersForm({
     );
   }, [filterHierarchies]);
 
-  const standardFilters = useMemo(() => {
+  const simpleFilters = useMemo(() => {
     return orderBy(
       Object.entries(subjectMeta.filters).filter(
         ([_, filter]) => !hierarchiedFilterIds.includes(filter.id),
@@ -137,7 +138,7 @@ export default function FiltersForm({
         ? [indicatorValues[0].options[0].value]
         : initialValues?.indicators ?? [];
 
-    const filters = mapValues(Object.fromEntries(standardFilters), filter => {
+    const filters = mapValues(Object.fromEntries(simpleFilters), filter => {
       const filterGroupOptions = Object.values(filter.options);
 
       // Automatically select when only one group in filter, with only one option in it.
@@ -161,32 +162,30 @@ export default function FiltersForm({
       return [];
     });
 
-    const initialFilterHierarchyValues = Object.fromEntries(
-      // Set up intitial value for each hierachy,
-      // include initialValue filters if they're in the hierarchy
-      filterHierarchies.map(tiers => {
-        const hierachyKey = tiers.at(-1)!.childFilterId;
+    const initialFilterHierarchyValues: FiltersFormValues['filterHierarchies'] =
+      !initialValues?.filterHierarchies
+        ? {}
+        : Object.fromEntries(
+            // Set up intitial value for each hierachy,
+            // include initialValue filters if they're in the hierarchy
+            filterHierarchies.map(tiers => {
+              const hierarchyKey = tiers.at(-1)!.childFilterId;
 
-        const hierarchyOptionValues = tiers
-          .flatMap(tier => Object.values(tier.hierarchy))
-          .flat()
-          .concat(Object.keys(tiers[0].hierarchy));
-
-        return [
-          hierachyKey,
-          initialValues?.filters.filter(optionId =>
-            hierarchyOptionValues.includes(optionId),
-          ) ?? [],
-        ];
-      }),
-    );
+              return [
+                hierarchyKey,
+                converHierarchiesQueryToForm(initialValues.filterHierarchies!)[
+                  hierarchyKey
+                ],
+              ];
+            }),
+          );
 
     return {
       filters,
       indicators,
       filterHierarchies: initialFilterHierarchyValues,
     };
-  }, [initialValues, subjectMeta, standardFilters, filterHierarchies]);
+  }, [initialValues, subjectMeta, simpleFilters, filterHierarchies]);
 
   const stepHeading = (
     <WizardStepHeading {...stepProps}>{stepTitle}</WizardStepHeading>
@@ -195,13 +194,6 @@ export default function FiltersForm({
   const handleSubmit = useCallback(
     async (values: FiltersFormValues) => {
       setPreviousValues({ ...values });
-      setAugmentedPreviousHierarchyValues(
-        augmentFilterHierarchySelections(
-          values.filterHierarchies,
-          filterHierarchies,
-          optionLabelsMap,
-        ),
-      );
 
       try {
         setTableQueryError(undefined);
@@ -233,11 +225,9 @@ export default function FiltersForm({
       }
     },
     [
-      filterHierarchies,
       goToNextStep,
       onSubmit,
       onTableQueryError,
-      optionLabelsMap,
       selectedPublication?.title,
       subject?.name,
     ],
@@ -245,12 +235,12 @@ export default function FiltersForm({
 
   const allFilterGroupKeys = useMemo(
     () => [
-      ...standardFilters.map(([key]) => key),
+      ...simpleFilters.map(([key]) => key),
       ...(subjectMeta.filterHierarchies ?? []).map(
         tiers => tiers.at(-1)?.childFilterId ?? '',
       ),
     ],
-    [standardFilters, subjectMeta],
+    [simpleFilters, subjectMeta],
   );
 
   const allFiltersOpen = openFilterGroups.length === allFilterGroupKeys.length;
@@ -267,7 +257,7 @@ export default function FiltersForm({
         .of(Yup.string().defined())
         .min(1, 'Select at least one option from indicators'),
       filters: Yup.object(
-        mapValues(Object.fromEntries(standardFilters), filter => {
+        mapValues(Object.fromEntries(simpleFilters), filter => {
           const label = filter.legend.toLowerCase();
 
           return Yup.array()
@@ -297,7 +287,7 @@ export default function FiltersForm({
         ),
       ),
     });
-  }, [standardFilters, filterHierarchies, optionLabelsMap]);
+  }, [simpleFilters, filterHierarchies, optionLabelsMap]);
 
   const filtersIncludeTotal = Object.values(subjectMeta.filters).some(
     filter => filter.autoSelectFilterItemId,
@@ -349,7 +339,7 @@ export default function FiltersForm({
                     order={[]}
                   />
 
-                  {standardFilters.length + hierarchiedFilterIds.length > 0 && (
+                  {simpleFilters.length + hierarchiedFilterIds.length > 0 && (
                     <FormFieldset
                       error={
                         getError('filters') ?? getError('filterHierarchies')
@@ -370,7 +360,7 @@ export default function FiltersForm({
                                 : ''
                             }`}
                           </span>
-                          {standardFilters.length > 1 && (
+                          {simpleFilters.length > 1 && (
                             <ButtonText
                               ariaExpanded={allFiltersOpen}
                               ariaControls="filterGroups"
@@ -420,7 +410,7 @@ export default function FiltersForm({
                         );
                       })}
                       <div id="filterGroups">
-                        {standardFilters.map(([filterKey, filterGroup]) => {
+                        {simpleFilters.map(([filterKey, filterGroup]) => {
                           const filterName = `filters.${filterKey}`;
                           const orderedFilterGroupOptions = orderBy(
                             Object.values(filterGroup.options),
@@ -506,7 +496,7 @@ export default function FiltersForm({
                     ))}
                 </CollapsibleList>
               </SummaryListItem>
-              {standardFilters
+              {simpleFilters
                 .filter(([groupKey]) => !!values.filters[groupKey])
                 .map(([filterGroupKey, filterGroup]) => (
                   <SummaryListItem
@@ -529,65 +519,78 @@ export default function FiltersForm({
                     </CollapsibleList>
                   </SummaryListItem>
                 ))}
-              {augmentedPreviousHierarchyValues &&
-                Object.keys(values.filterHierarchies).map(filterGroupKey => (
+
+              {Object.entries(values.filterHierarchies).map(
+                ([hierarchyKey, hierarchyOptions]) => (
                   <SummaryListItem
-                    key={filterGroupKey}
-                    term={optionLabelsMap[filterGroupKey]}
+                    key={hierarchyKey}
+                    term={optionLabelsMap[hierarchyKey]}
                   >
                     <CollapsibleList
-                      id={`filtersList-${filterGroupKey}`}
+                      id={`filtersList-${hierarchyKey}`}
                       itemName="filter"
                       itemNamePlural="filters"
                       listClassName={styles.augmentedFilters}
                     >
-                      {Object.entries(
-                        augmentedPreviousHierarchyValues[filterGroupKey],
-                      )?.map(([optionId, relatedOptions]) => (
-                        <li key={optionId}>
-                          {relatedOptions.map((relatedOptionId, index) => {
-                            const isLast = index === relatedOptions.length - 1;
-                            const isNextTotal = !isLast
-                              ? optionLabelsMap[
-                                  relatedOptions[index + 1]
-                                ].toLowerCase() === 'total'
-                              : false;
+                      {!!hierarchyOptions &&
+                        hierarchyOptions?.map(relatedOptionsString => {
+                          const relatedOptionsList =
+                            hierarchyOptionsFromString(relatedOptionsString);
+                          return (
+                            <li key={relatedOptionsString}>
+                              {relatedOptionsList.map(
+                                (relatedOptionId, index) => {
+                                  const isLast =
+                                    index === relatedOptionsList.length - 1;
+                                  const isNextTotal = !isLast
+                                    ? optionLabelsMap[
+                                        relatedOptionsList[index + 1]
+                                      ]?.toLowerCase() === 'total'
+                                    : false;
 
-                            const isThisTotal =
-                              optionLabelsMap[relatedOptionId].toLowerCase() ===
-                              'total';
-                            if (isThisTotal && index !== 0) {
-                              return null;
-                            }
+                                  const isThisTotal =
+                                    optionLabelsMap[
+                                      relatedOptionId
+                                    ]?.toLowerCase() === 'total';
+                                  if (isThisTotal && index !== 0) {
+                                    return null;
+                                  }
 
-                            const relatedOptionLabel =
-                              relatedOptionId === optionId ? (
-                                <strong>
-                                  {optionLabelsMap[relatedOptionId]}{' '}
-                                  {!isThisTotal && isNextTotal && ` (total)`}
-                                </strong>
-                              ) : (
-                                optionLabelsMap[relatedOptionId]
-                              );
-                            return (
-                              <span
-                                key={`augmentedOption-${optionId}-${relatedOptionId}`}
-                              >
-                                {relatedOptionLabel}
-                                {!isLast && !isNextTotal && (
-                                  <span
-                                    aria-hidden
-                                    className={styles.separator}
-                                  />
-                                )}
-                              </span>
-                            );
-                          })}
-                        </li>
-                      ))}
+                                  const relatedOptionLabel =
+                                    isLast || isNextTotal ? (
+                                      <strong>
+                                        {`${optionLabelsMap[relatedOptionId]}${
+                                          !isThisTotal && isNextTotal
+                                            ? ` (total)`
+                                            : ''
+                                        }`}
+                                      </strong>
+                                    ) : (
+                                      optionLabelsMap[relatedOptionId]
+                                    );
+                                  return (
+                                    <span
+                                      // eslint-disable-next-line react/no-array-index-key
+                                      key={`option-${relatedOptionsString}-[${index}]`}
+                                    >
+                                      {relatedOptionLabel}
+                                      {!isLast && !isNextTotal && (
+                                        <span
+                                          aria-hidden
+                                          className={styles.separator}
+                                        />
+                                      )}
+                                    </span>
+                                  );
+                                },
+                              )}
+                            </li>
+                          );
+                        })}
                     </CollapsibleList>
                   </SummaryListItem>
-                ))}
+                ),
+              )}
             </SummaryList>
 
             <ResetFormOnPreviousStep {...stepProps} onReset={reset} />

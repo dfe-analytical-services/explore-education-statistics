@@ -509,6 +509,7 @@ describe('FiltersForm', () => {
         stepTitle="Choose your filters"
         initialValues={{
           filters: ['state-funded-secondary', 'ethnicity-major-asian-total'],
+          filterHierarchies: {},
           indicators: ['unauthorised-absence-rate'],
         }}
         subject={testSubject}
@@ -529,6 +530,7 @@ describe('FiltersForm', () => {
         stepTitle="Choose your filters"
         initialValues={{
           filters: ['state-funded-secondary', 'ethnicity-major-asian-total'],
+          filterHierarchies: {},
           indicators: ['unauthorised-absence-rate'],
         }}
         subject={testSubject}
@@ -1315,7 +1317,6 @@ describe('FiltersForm', () => {
           subject={testSubject}
           subjectMeta={subjectMetaWithFilterHierarchy}
           onSubmit={noop}
-          showFilterHierarchies
         />,
       );
 
@@ -1437,7 +1438,6 @@ describe('FiltersForm', () => {
           subject={testSubject}
           subjectMeta={subjectMetaWithFilterHierarchy}
           onSubmit={onSubmit}
-          showFilterHierarchies
         />,
       );
 
@@ -1515,7 +1515,6 @@ describe('FiltersForm', () => {
           subject={testSubject}
           subjectMeta={subjectMetaWithFilterHierarchy}
           onSubmit={jest.fn}
-          showFilterHierarchies
         />,
       );
       // attempt to submit no filter hierarchy selectiosn
@@ -1545,7 +1544,6 @@ describe('FiltersForm', () => {
           subject={testSubject}
           subjectMeta={subjectMetaWithFilterHierarchy}
           onSubmit={noop}
-          showFilterHierarchies
         />,
       );
 
@@ -1630,7 +1628,6 @@ describe('FiltersForm', () => {
           subject={testSubject}
           subjectMeta={subjectMetaWithFilterHierarchy}
           onSubmit={noop}
-          showFilterHierarchies
         />,
       );
 

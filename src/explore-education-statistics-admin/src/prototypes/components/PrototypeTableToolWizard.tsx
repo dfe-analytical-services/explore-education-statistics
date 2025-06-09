@@ -436,6 +436,7 @@ const PrototypeTableToolWizard = ({
                   {...stepProps}
                   initialValues={{
                     indicators: state.query.indicators,
+                    filterHierarchies: {},
                     filters: state.query.filters,
                   }}
                   selectedPublication={state.selectedPublication}
