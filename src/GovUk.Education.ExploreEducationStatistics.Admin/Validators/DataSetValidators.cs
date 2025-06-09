@@ -11,19 +11,19 @@ public static class DataSetValidators
         this IRuleBuilder<T, FileDto> ruleBuilder)
     {
         return ruleBuilder
-            .Must((root, dto, context) =>
+            .Must((_, dto, context) =>
             {
                 context.MessageFormatter.AppendArgument("FileName", dto.FileName);
                 return FileNameValidators.MeetsLengthRequirements(dto.FileName);
             })
                 .WithMessage(ValidationMessages.FileNameLengthInvalid, "{FileName}", FileNameValidators.MaxFileNameSize.ToString())
-            .Must((root, dto, context) =>
+            .Must((_, dto, context) =>
             {
                 context.MessageFormatter.AppendArgument("FileName", dto.FileName);
                 return !FileNameValidators.ContainsSpaces(dto.FileName);
             })
                 .WithMessage(ValidationMessages.FileNameCannotContainSpaces, "{FileName}")
-            .Must((root, dto, context) =>
+            .Must((_, dto, context) =>
             {
                 context.MessageFormatter.AppendArgument("FileName", dto.FileName);
                 return !FileNameValidators.ContainsSpecialChars(dto.FileName);
@@ -35,7 +35,7 @@ public static class DataSetValidators
         this IRuleBuilder<T, FileDto> ruleBuilder)
     {
         return ruleBuilder
-            .Must((root, dto, context) =>
+            .Must((_, dto, context) =>
             {
                 context.MessageFormatter.AppendArgument("FileName", dto.FileName);
                 return dto.FileStream.Length > 0;
@@ -57,7 +57,7 @@ public static class DataSetValidators
     {
         return ruleBuilder
             .MustBeValidFile()
-            .Must((root, dto, context) =>
+            .Must((_, dto, context) =>
             {
                 context.MessageFormatter.AppendArgument("FileName", dto.FileName);
                 return dto.FileName.ToLower().EndsWith(Constants.DataSet.DataFileExtension);
@@ -71,7 +71,7 @@ public static class DataSetValidators
     {
         return ruleBuilder
             .MustBeValidFile()
-            .Must((root, dto, context) =>
+            .Must((_, dto, context) =>
             {
                 context.MessageFormatter.AppendArgument("FileName", dto.FileName);
                 return dto.FileName.ToLower().EndsWith(Constants.DataSet.MetaFileExtension);
