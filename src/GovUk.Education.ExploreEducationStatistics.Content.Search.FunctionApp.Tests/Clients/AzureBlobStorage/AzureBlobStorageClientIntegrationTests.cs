@@ -93,6 +93,19 @@ public class AzureBlobStorageClientIntegrationTests
                 // ACT
                 await sut.DeleteAllBlobsFromContainer(IntegrationTestContainerName);
             }
+            
+            [Fact(Skip = "This integration test list all blobs from the specified container in the Azure Storage Account.")]
+            public async Task ListAllBlobsInContainer()
+            {
+                // ARRANGE
+                var sut = GetSut();
+                
+                // ACT
+                var blobNames = await sut.ListBlobsInContainer(IntegrationTestContainerName);
+                
+                // ASSERT
+                Assert.NotEmpty(blobNames);
+            }
         }    
     }
 }
