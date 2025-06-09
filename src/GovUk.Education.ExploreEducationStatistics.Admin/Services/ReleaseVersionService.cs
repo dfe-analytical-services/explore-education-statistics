@@ -512,7 +512,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
             var indirectReleasesWithApprovalRole = await context
                 .UserPublicationRoles
-                .Where(role => role.UserId == userId && role.Role == PublicationRole.Approver)
+                .Where(role => role.UserId == userId && role.Role == PublicationRole.Allower)
                 .SelectMany(role => role.Publication.ReleaseVersions.Select(releaseVersion => releaseVersion.Id))
                 .ToListAsync();
 

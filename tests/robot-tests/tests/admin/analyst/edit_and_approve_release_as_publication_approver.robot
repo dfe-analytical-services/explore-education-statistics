@@ -33,7 +33,7 @@ Assign publication approver permissions to analyst1
     user adds publication role to user via api
     ...    EES-test.ANALYST1@education.gov.uk
     ...    ${PUBLICATION_ID}
-    ...    Approver
+    ...    Allower
 
 Sign in as analyst1 and check that the Team access page now contains the Publication Approver details
     user signs in as analyst1

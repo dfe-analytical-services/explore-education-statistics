@@ -99,7 +99,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                                 rolesExpectedToSucceed: new[]
                                 {
                                     PublicationRole.Owner,
-                                    PublicationRole.Approver
+                                    PublicationRole.Allower
                                 });
                         }
                     );

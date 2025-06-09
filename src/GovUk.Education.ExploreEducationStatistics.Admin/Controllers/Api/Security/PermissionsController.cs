@@ -189,7 +189,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Secur
         private async Task<bool> IsPublicationApprover()
         {
             return (await _publicationRoleRepository.GetDistinctRolesByUser(_userService.GetUserId()))
-                .Contains(PublicationRole.Approver);
+                .Contains(PublicationRole.Allower);
         }
     }
 }

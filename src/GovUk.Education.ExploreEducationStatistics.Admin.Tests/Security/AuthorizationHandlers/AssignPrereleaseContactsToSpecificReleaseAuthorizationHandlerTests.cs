@@ -80,7 +80,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                         return CreateHandler(contentDbContext);
                     },
                     releaseVersion,
-                    PublicationRole.Owner, PublicationRole.Approver);
+                    PublicationRole.Owner, PublicationRole.Allower);
             }
 
             [Fact]
@@ -107,7 +107,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                         return CreateHandler(contentDbContext);
                     },
                     releaseVersion,
-                    PublicationRole.Owner, PublicationRole.Approver);
+                    PublicationRole.Owner, PublicationRole.Allower);
             }
         }
 

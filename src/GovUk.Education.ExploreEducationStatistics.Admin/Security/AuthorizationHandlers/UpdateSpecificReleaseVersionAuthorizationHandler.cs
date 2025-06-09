@@ -37,7 +37,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
                 return;
             }
 
-            var allowedPublicationRoles = ListOf(PublicationRole.Owner, PublicationRole.Approver);
+            var allowedPublicationRoles = ListOf(PublicationRole.Owner, PublicationRole.Allower);
             var allowedReleaseRoles = ReleaseEditorAndApproverRoles;
 
             if (await _authorizationHandlerService

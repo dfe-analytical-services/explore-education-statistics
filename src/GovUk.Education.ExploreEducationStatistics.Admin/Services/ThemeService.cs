@@ -360,7 +360,7 @@ public class ThemeService : IThemeService
                 .AsQueryable()
                 .Where(userPublicationRole =>
                     userPublicationRole.UserId == userId &&
-                    ListOf(Owner, Approver).Contains(userPublicationRole.Role))
+                    ListOf(Owner, Allower).Contains(userPublicationRole.Role))
                 .Select(userPublicationRole => userPublicationRole.Publication))
             .Select(publication => publication.Theme)
             .Distinct()

@@ -57,7 +57,7 @@ public class MarkMethodologyAsApprovedAuthorizationHandler :
                 .HasRolesOnPublicationOrAnyReleaseVersion(
                     context.User.GetUserId(),
                     owningPublication.Id,
-                    ListOf(PublicationRole.Approver),
+                    ListOf(PublicationRole.Allower),
                     ListOf(ReleaseRole.Approver)))
         {
             context.Succeed(requirement);

@@ -2279,7 +2279,7 @@ public abstract class ReleaseVersionServiceTests
             var approverPublicationRoleForUser = _fixture
                 .DefaultUserPublicationRole()
                 .WithUser(User)
-                .WithRole(PublicationRole.Approver)
+                .WithRole(PublicationRole.Allower)
                 .WithPublication(publications[1])
                 .Generate();
 
@@ -2293,7 +2293,7 @@ public abstract class ReleaseVersionServiceTests
             var approverPublicationRolesForOtherUser = _fixture
                 .DefaultUserPublicationRole()
                 .WithUser(otherUser)
-                .WithRole(PublicationRole.Approver)
+                .WithRole(PublicationRole.Allower)
                 .WithPublications(publications)
                 .GenerateList();
 
@@ -2349,7 +2349,7 @@ public abstract class ReleaseVersionServiceTests
             var approverPublicationRoleForUser = _fixture
                 .DefaultUserPublicationRole()
                 .WithUser(User)
-                .WithRole(PublicationRole.Approver)
+                .WithRole(PublicationRole.Allower)
                 .WithPublication(publication)
                 .Generate();
 

@@ -30,9 +30,9 @@ public class SignInControllerTests(TestApplicationFactory testApp) : Integration
         [InlineData("VALID-USER@education.gov.uk", "VALID-USER@education.gov.uk", "FirstName", "LastName",
             "FirstName LastName", "Role 1", null, null)]
         [InlineData("VALID-USER@education.gov.uk", null, "FirstName", "LastName", null, "Role 1", "Approver", null)]
-        [InlineData("VALID-USER@education.gov.uk", null, "FirstName", "LastName", null, "Role 1", null, "Approver")]
+        [InlineData("VALID-USER@education.gov.uk", null, "FirstName", "LastName", null, "Role 1", null, "Allower")]
         [InlineData("VALID-USER@education.gov.uk", null, "FirstName", "LastName", null, "Role 1", "Contributor",
-            "Approver")]
+            "Allower")]
         public async Task Success(
             string? emailClaimValue,
             string? nameClaimValue,
@@ -147,7 +147,7 @@ public class SignInControllerTests(TestApplicationFactory testApp) : Integration
                 {
                     PublicationId = publicationId,
                     Email = unrelatedUserEmail,
-                    Role = PublicationRole.Approver,
+                    Role = PublicationRole.Allower,
                     Created = DateTime.UtcNow.AddDays(-1),
                 });
 
@@ -274,7 +274,7 @@ public class SignInControllerTests(TestApplicationFactory testApp) : Integration
                 {
                     PublicationId = releaseVersion.Publication.Id,
                     Email = email.ToLower(),
-                    Role = PublicationRole.Approver,
+                    Role = PublicationRole.Allower,
                     Created = DateTime.UtcNow.AddDays(-1),
                 });
             });
@@ -386,7 +386,7 @@ public class SignInControllerTests(TestApplicationFactory testApp) : Integration
                 {
                     PublicationId = releaseVersion.Publication.Id,
                     Email = email.ToLower(),
-                    Role = PublicationRole.Approver,
+                    Role = PublicationRole.Allower,
                     Created = DateTime.UtcNow.AddDays(-1),
                 });
             });

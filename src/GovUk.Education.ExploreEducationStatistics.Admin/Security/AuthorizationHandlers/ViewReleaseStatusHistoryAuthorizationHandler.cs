@@ -38,7 +38,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
                         context.User.GetUserId(),
                         releaseVersion.PublicationId,
                         releaseVersion.Id,
-                        ListOf(PublicationRole.Owner, PublicationRole.Approver),
+                        ListOf(PublicationRole.Owner, PublicationRole.Allower),
                         UnrestrictedReleaseViewerRoles))
             {
                 context.Succeed(requirement);

@@ -26,7 +26,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             UserPublicationRole userPublicationRoleApprover = _dataFixture.DefaultUserPublicationRole()
                 .WithUser(user)
                 .WithPublication(_dataFixture.DefaultPublication().WithTheme(theme))
-                .WithRole(PublicationRole.Approver);
+                .WithRole(PublicationRole.Allower);
 
             UserPublicationRole userPublicationRoleOwner = _dataFixture.DefaultUserPublicationRole()
                 .WithUser(user)
@@ -95,7 +95,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 .WithUser(user)
                 .WithPublication(_dataFixture.DefaultPublication()
                     .WithTheme(_dataFixture.DefaultTheme()))
-                .WithRole(PublicationRole.Approver);
+                .WithRole(PublicationRole.Allower);
 
             UserPublicationRole userPublicationRoleOwner = _dataFixture.DefaultUserPublicationRole()
                 .WithUser(user)

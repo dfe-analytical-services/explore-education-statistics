@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 using System;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
@@ -25,7 +25,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var userPublicationRole2 = new UserPublicationRoleCreateRequest
             {
                 PublicationId = Guid.NewGuid(),
-                PublicationRole = Approver,
+                PublicationRole = Allower,
             };
             var existingPublicationInvite = new UserPublicationInvite
             {

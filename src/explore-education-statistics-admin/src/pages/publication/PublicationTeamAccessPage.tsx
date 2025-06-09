@@ -20,6 +20,7 @@ import { UserPublicationRole } from '@admin/services/userService';
 import orderBy from 'lodash/orderBy';
 import ButtonLink from '@admin/components/ButtonLink';
 import PublicationReleaseAccess from '@admin/pages/publication/components/PublicationReleaseAccess';
+import publicationRoleDisplayName from '@admin/utils/publicationRoleDisplayName';
 
 interface Model {
   releases: ReleaseVersionSummary[];
@@ -66,7 +67,7 @@ const PublicationTeamAccessPage = ({
       releases,
       publicationRoles,
       publicationApprovers: publicationRoles.filter(
-        publicationRole => publicationRole.role === 'Approver',
+        publicationRole => publicationRole.role === 'Allower',
       ),
       publicationOwners: publicationRoles.filter(
         publicationRole => publicationRole.role === 'Owner',
@@ -111,7 +112,14 @@ const PublicationTeamAccessPage = ({
                 <tr key={`${role.id}_${role.role}`}>
                   <td>{role.userName}</td>
                   <td>{role.email}</td>
-                  <td>{role.role}</td>
+                  <td>
+                    {
+                      // Temporarily transforming the displayed role name whilst we have the temporary 'Allower'
+                      // publication role. Once the new 'Approver' role is introduced in STEP 10 of the permissions
+                      // rework, this can be reverted to display the role without transformation.
+                      publicationRoleDisplayName(role.role)
+                    }
+                  </td>
                 </tr>
               ))}
             </tbody>

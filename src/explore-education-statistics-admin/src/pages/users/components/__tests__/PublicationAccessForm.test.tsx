@@ -76,7 +76,7 @@ describe('PublicationAccessForm', () => {
       'user-1-id',
       {
         publicationId: 'publication-1-id',
-        publicationRole: 'Approver',
+        publicationRole: 'Allower',
       },
     );
     expect(handleUpdate).toHaveBeenCalledTimes(1);
@@ -110,7 +110,7 @@ describe('PublicationAccessForm', () => {
       {
         id: 'pr-id-1',
         publication: 'Publication 1',
-        role: 'Approver',
+        role: 'Allower',
         userName: 'Analyst1 User1',
         email: 'analyst1@example.com',
       },

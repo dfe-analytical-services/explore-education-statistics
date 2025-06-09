@@ -2918,7 +2918,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                     .DefaultUserPublicationRole()
                     .WithUser(User)
                     .WithPublication(publication)
-                    .WithRole(PublicationRole.Approver)
+                    .WithRole(PublicationRole.Allower)
                     .Generate();
 
                 var contentDbContextId = Guid.NewGuid().ToString();
@@ -2971,7 +2971,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                     .DefaultUserPublicationRole()
                     .WithUser(User)
                     .WithPublication(publication)
-                    .WithRole(PublicationRole.Approver)
+                    .WithRole(PublicationRole.Allower)
                     .Generate();
 
                 var contentDbContextId = Guid.NewGuid().ToString();
@@ -3013,7 +3013,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                     .DefaultUserPublicationRole()
                     .WithUser(User)
                     .WithPublication(publication)
-                    .WithRole(PublicationRole.Approver)
+                    .WithRole(PublicationRole.Allower)
                     .Generate();
 
                 var contentDbContextId = Guid.NewGuid().ToString();
@@ -3098,7 +3098,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                     .DefaultUserPublicationRole()
                     .WithUser(otherUser)
                     .WithPublication(publication)
-                    .WithRole(PublicationRole.Approver)
+                    .WithRole(PublicationRole.Allower)
                     .Generate();
 
                 var contentDbContextId = Guid.NewGuid().ToString();
@@ -3426,7 +3426,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                     .DefaultUserPublicationRole()
                     .WithUser(User)
                     .WithPublication(publication)
-                    .WithRole(PublicationRole.Approver)
+                    .WithRole(PublicationRole.Allower)
                     .Generate();
 
                 var releaseRoleForUser = _fixture
