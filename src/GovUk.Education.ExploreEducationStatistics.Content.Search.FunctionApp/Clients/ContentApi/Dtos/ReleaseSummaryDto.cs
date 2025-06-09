@@ -23,14 +23,14 @@ public record ReleaseSummaryDto
             ReleaseId = ReleaseId.ThrowIfBlank(nameof(ReleaseId)),
             Title = Title.ThrowIfBlank(nameof(Title)),
             Slug = Slug.ThrowIfBlank(nameof(Slug)),
-            YearTitle = YearTitle.ThrowIfBlank(nameof(YearTitle)),
-            CoverageTitle = CoverageTitle.ThrowIfBlank(nameof(CoverageTitle)),
-            Published = Published.ThrowIfBlank(nameof(Published)),
-            Type = Type.ThrowIfBlank(nameof(Type)),
-            LatestRelease = LatestRelease.ThrowIfBlank(nameof(LatestRelease)),
-            PublicationId = Publication.ThrowIfBlank(nameof(Publication)).Id.ThrowIfBlank("Publication Id"),
-            PublicationTitle = Publication.ThrowIfBlank(nameof(Publication)).Title.ThrowIfBlank("Publication Title"),
-            PublicationSlug = Publication.ThrowIfBlank(nameof(Publication)).Slug.ThrowIfBlank("Publication Slug")
+            YearTitle = YearTitle,
+            CoverageTitle = CoverageTitle,
+            Published = Published,
+            Type = Type,
+            IsLatestRelease = LatestRelease,
+            PublicationId = Publication?.Id,
+            PublicationTitle = Publication?.Title,
+            PublicationSlug = Publication?.Slug
         };
 }
 

@@ -6,13 +6,13 @@ public record ReleaseSummary
     public required string ReleaseId { get; init; }
     public required string Title { get; init; }
     public required string Slug { get; init; }
-    public required string YearTitle { get; init; }
-    public required string CoverageTitle { get; init; }
-    public DateTimeOffset Published { get; init; }
-    public required string Type { get; init; }
-    public bool LatestRelease { get; init; }
+    public string? YearTitle { get; init; }
+    public string? CoverageTitle { get; init; }
+    public DateTimeOffset? Published { get; init; }
+    public string? Type { get; init; }
+    public bool? IsLatestRelease { get; init; }
     
-    public required string PublicationId { get; init; }
-    public required string PublicationTitle { get; init; }
-    public required string PublicationSlug { get; init; }
+    public string? PublicationId { get; init; }
+    public string? PublicationTitle { get; init; }
+    public string? PublicationSlug { get; init; }
 }

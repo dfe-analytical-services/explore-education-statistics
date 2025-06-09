@@ -2,6 +2,7 @@
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Clients.AzureSearch;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Clients.ContentApi;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.HealthChecks.Strategies;
+using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Services.CheckSearchableDocuments;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Azure;
 using Microsoft.Extensions.Configuration;
@@ -31,6 +32,14 @@ public static class ServiceCollectionExtensions
             .AddTransient<Func<IContentApiClient>>(sp => sp.GetRequiredService<IContentApiClient>)
             .AddTransient<Func<IAzureBlobStorageClient>>(sp => sp.GetRequiredService<IAzureBlobStorageClient>)
             .AddTransient<Func<ISearchIndexerClient>>(sp => sp.GetRequiredService<ISearchIndexerClient>);
+
+    
+    public static IServiceCollection AddSearchDocumentChecker(this IServiceCollection serviceCollection) =>
+        serviceCollection
+            .AddTransient<SearchableDocumentChecker>()
+            .AddTransient<IReleaseSummaryRetriever, ReleaseSummaryRetriever>()
+            .AddTransient<IBlobNameLister, BlobNameLister>()
+    ;
 
     public static IServiceCollection ConfigureLogging(
         this IServiceCollection serviceCollection,
