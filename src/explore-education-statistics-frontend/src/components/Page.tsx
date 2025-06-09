@@ -1,5 +1,4 @@
 import PhaseBanner from '@common/components/PhaseBanner';
-import NotificationBanner from '@common/components/NotificationBanner';
 import CookieBanner from '@frontend/components/CookieBanner';
 import UserTestingBanner from '@frontend/components/UserTestingBanner';
 import classNames from 'classnames';
@@ -10,7 +9,6 @@ import PageHeader from './PageHeader';
 import PageMeta, { PageMetaProps } from './PageMeta';
 import PageTitle from './PageTitle';
 import Feedback from './Feedback';
-import Link from './Link';
 
 type Props = {
   includeDefaultMetaTitle?: boolean;
