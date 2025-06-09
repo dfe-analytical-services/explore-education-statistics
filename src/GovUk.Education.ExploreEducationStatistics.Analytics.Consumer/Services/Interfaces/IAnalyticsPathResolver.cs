@@ -4,10 +4,15 @@ public interface IAnalyticsPathResolver
 {
     string GetBasePath();
     
-    // PublicTopLevelCalls
+    // PublicApiTopLevelCalls
     string PublicApiTopLevelCallsDirectoryPath();
 
     string PublicApiTopLevelCallsReportsDirectoryPath();
+
+    // PublicApiPublicationLevelCalls
+    string PublicApiPublicationCallsDirectoryPath();
+    
+    string PublicApiPublicationCallsReportsDirectoryPath();
     
     // PublicApiDataSetCalls
     string PublicApiDataSetCallsDirectoryPath();

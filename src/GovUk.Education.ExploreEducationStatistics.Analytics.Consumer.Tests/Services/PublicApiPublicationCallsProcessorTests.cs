@@ -10,15 +10,15 @@ using Xunit;
 
 namespace GovUk.Education.ExploreEducationStatistics.Analytics.Consumer.Tests.Services;
 
-public abstract class PublicApiDataSetCallsProcessorTests
+public abstract class PublicApiPublicationCallsProcessorTests
 {
     private readonly string _queryResourcesPath = Path.Combine(
         Assembly.GetExecutingAssembly().GetDirectoryPath(),
         "Resources",
         "PublicApi",
-        "DataSetCalls");
+        "PublicationCalls");
 
-    public class ProcessTests : PublicApiDataSetCallsProcessorTests
+    public class ProcessTests : PublicApiPublicationCallsProcessorTests
     {
         [Fact]
         public async Task ProcessorUsesWorkflow()
@@ -41,18 +41,18 @@ public abstract class PublicApiDataSetCallsProcessorTests
         }
 
         [Fact]
-        public async Task CoreDataSetDetails_CapturedInReport()
+        public async Task CorePublicationDetails_CapturedInReport()
         {
             using var pathResolver = new TestAnalyticsPathResolver();
-            SetupRequestFile(pathResolver, "WithCoreDataSetDetails.json");
+            SetupRequestFile(pathResolver, "WithCorePublicationDetails.json");
 
             var service = BuildService(pathResolver: pathResolver);
             await service.Process();
 
             Assert.False(Directory.Exists(ProcessingDirectoryPath(pathResolver)));
-            Assert.True(Directory.Exists(pathResolver.PublicApiDataSetCallsReportsDirectoryPath()));
+            Assert.True(Directory.Exists(pathResolver.PublicApiPublicationCallsReportsDirectoryPath()));
 
-            var reports = Directory.GetFiles(pathResolver.PublicApiDataSetCallsReportsDirectoryPath());
+            var reports = Directory.GetFiles(pathResolver.PublicApiPublicationCallsReportsDirectoryPath());
 
             var queryReportFile = Assert.Single(reports);
 
@@ -68,42 +68,7 @@ public abstract class PublicApiDataSetCallsProcessorTests
 
             AssertReportRowOk(
                 queryReportRow,
-                expectedType: "GetDataSetSummary",
-                expectPreviewToken: false,
-                expectedStartTime: DateTime.Parse("2025-02-24T02:07:44.850Z"),
-                expectedParameters: null);
-        }
-        
-        [Fact]
-        public async Task WithPreviewTokens_CapturedInReport()
-        {
-            using var pathResolver = new TestAnalyticsPathResolver();
-            SetupRequestFile(pathResolver, "WithPreviewTokens.json");
-
-            var service = BuildService(pathResolver: pathResolver);
-            await service.Process();
-
-            Assert.False(Directory.Exists(ProcessingDirectoryPath(pathResolver)));
-            Assert.True(Directory.Exists(pathResolver.PublicApiDataSetCallsReportsDirectoryPath()));
-
-            var reports = Directory.GetFiles(pathResolver.PublicApiDataSetCallsReportsDirectoryPath());
-
-            var queryReportFile = Assert.Single(reports);
-
-            var duckDbConnection = new DuckDbConnection();
-            duckDbConnection.Open();
-
-            var reportRows = await ReadReport(duckDbConnection, queryReportFile);
-
-            // Check that the single recorded query has resulted in a
-            // single line in the query report and the values match the
-            // values from the original JSON file.
-            var queryReportRow = Assert.Single(reportRows);
-
-            AssertReportRowOk(
-                queryReportRow,
-                expectedType: "GetDataSetSummary",
-                expectPreviewToken: true,
+                expectedType: "GetSummary",
                 expectedStartTime: DateTime.Parse("2025-02-28T03:07:44.850Z"),
                 expectedParameters: null);
         }
@@ -118,9 +83,9 @@ public abstract class PublicApiDataSetCallsProcessorTests
             await service.Process();
 
             Assert.False(Directory.Exists(ProcessingDirectoryPath(pathResolver)));
-            Assert.True(Directory.Exists(pathResolver.PublicApiDataSetCallsReportsDirectoryPath()));
+            Assert.True(Directory.Exists(pathResolver.PublicApiPublicationCallsReportsDirectoryPath()));
 
-            var reports = Directory.GetFiles(pathResolver.PublicApiDataSetCallsReportsDirectoryPath());
+            var reports = Directory.GetFiles(pathResolver.PublicApiPublicationCallsReportsDirectoryPath());
 
             var queryReportFile = Assert.Single(reports);
 
@@ -136,9 +101,8 @@ public abstract class PublicApiDataSetCallsProcessorTests
 
             AssertReportRowOk(
                 queryReportRow,
-                expectedType: "ListVersions",
-                expectPreviewToken: false,
-                expectedStartTime: DateTime.Parse("2025-02-24T03:07:44.850Z"),
+                expectedType: "GetDataSets",
+                expectedStartTime: DateTime.Parse("2025-02-26T03:07:44.850Z"),
                 expectedParameters: """{"page":1,"pageSize":10}""");
         }
         
@@ -146,17 +110,16 @@ public abstract class PublicApiDataSetCallsProcessorTests
         public async Task MultipleCalls_CapturedInReport()
         {
             using var pathResolver = new TestAnalyticsPathResolver();
-            SetupRequestFile(pathResolver, "WithCoreDataSetDetails.json");
+            SetupRequestFile(pathResolver, "WithCorePublicationDetails.json");
             SetupRequestFile(pathResolver, "WithParameters.json");
-            SetupRequestFile(pathResolver, "WithPreviewTokens.json");
 
             var service = BuildService(pathResolver: pathResolver);
             await service.Process();
 
             Assert.False(Directory.Exists(ProcessingDirectoryPath(pathResolver)));
-            Assert.True(Directory.Exists(pathResolver.PublicApiDataSetCallsReportsDirectoryPath()));
+            Assert.True(Directory.Exists(pathResolver.PublicApiPublicationCallsReportsDirectoryPath()));
 
-            var reports = Directory.GetFiles(pathResolver.PublicApiDataSetCallsReportsDirectoryPath());
+            var reports = Directory.GetFiles(pathResolver.PublicApiPublicationCallsReportsDirectoryPath());
 
             var queryReportFile = Assert.Single(reports);
 
@@ -165,38 +128,31 @@ public abstract class PublicApiDataSetCallsProcessorTests
 
             var reportRows = await ReadReport(duckDbConnection, queryReportFile);
 
-            // Check that the 3 recorded queries have resulted in 3 lines in the query report
+            // Check that the 2 recorded queries have resulted in 2 lines in the query report
             // and the order is in ascending date order.
-            Assert.Equal(3, reportRows.Count);
+            Assert.Equal(2, reportRows.Count);
             
             AssertReportRowOk(
                 reportRows[0],
-                expectedType: "GetDataSetSummary",
-                expectPreviewToken: false,
-                expectedStartTime: DateTime.Parse("2025-02-24T02:07:44.850Z"),
-                expectedParameters: null);
-            
-            AssertReportRowOk(
-                reportRows[1],
-                expectedType: "ListVersions",
-                expectPreviewToken: false,
-                expectedStartTime: DateTime.Parse("2025-02-24T03:07:44.850Z"),
+                expectedType: "GetDataSets",
+                expectedStartTime: DateTime.Parse("2025-02-26T03:07:44.850Z"),
                 expectedParameters: """{"page":1,"pageSize":10}""");
             
             AssertReportRowOk(
-                reportRows[2],
-                expectedType: "GetDataSetSummary",
-                expectPreviewToken: true,
+                reportRows[1],
+                expectedType: "GetSummary",
                 expectedStartTime: DateTime.Parse("2025-02-28T03:07:44.850Z"),
                 expectedParameters: null);
         }
 
-        private static async Task<List<QueryReportLine>> ReadReport(DuckDbConnection duckDbConnection, string queryReportFile)
+        private static async Task<List<QueryReportLine>> ReadReport(
+            DuckDbConnection duckDbConnection,
+            string queryReportFile)
         {
             return (await duckDbConnection
                     .SqlBuilder($"SELECT * FROM read_parquet('{queryReportFile:raw}')")
                     .QueryAsync<QueryReportLine>())
-                .OrderBy(row => row.DataSetTitle)
+                .OrderBy(row => row.PublicationTitle)
                 .ToList();
         }
     }
@@ -205,12 +161,11 @@ public abstract class PublicApiDataSetCallsProcessorTests
         QueryReportLine queryReportRow,
         string expectedType,
         DateTime expectedStartTime,
-        bool expectPreviewToken,
         string? expectedParameters)
     {
         Assert.Equal(expectedType, queryReportRow.Type);
-        Assert.Equal(Guid.Parse("01d29401-7274-a871-a8db-d4bc4e98c324"), queryReportRow.DataSetId);
-        Assert.Equal("Data Set 1", queryReportRow.DataSetTitle);
+        Assert.Equal(Guid.Parse("01d29401-7274-a871-a8db-d4bc4e98c324"), queryReportRow.PublicationId);
+        Assert.Equal("Publication 1", queryReportRow.PublicationTitle);
         Assert.Equal(expectedStartTime, queryReportRow.StartTime);
 
         if (expectedParameters != null)
@@ -221,28 +176,13 @@ public abstract class PublicApiDataSetCallsProcessorTests
         {
             Assert.Null(queryReportRow.Parameters);
         }
-
-        if (expectPreviewToken)
-        {
-            Assert.Equal("Preview token content", queryReportRow.PreviewTokenLabel);
-            Assert.Equal(DateTime.Parse("2025-02-23T11:02:44.850Z"), queryReportRow.PreviewTokenCreated);
-            Assert.Equal(DateTime.Parse("2025-02-24T11:02:44.850Z"), queryReportRow.PreviewTokenExpiry);
-            Assert.Equal(Guid.Parse("01d29401-7974-1276-a06b-b28a6a5385c6"), queryReportRow.PreviewTokenDataSetVersionId);
-        }
-        else
-        {
-            Assert.Null(queryReportRow.PreviewTokenLabel);
-            Assert.Null(queryReportRow.PreviewTokenCreated);
-            Assert.Null(queryReportRow.PreviewTokenExpiry);
-            Assert.Null(queryReportRow.PreviewTokenDataSetVersionId);
-        }
     }
 
-    private PublicApiDataSetCallsProcessor BuildService(
+    private PublicApiPublicationCallsProcessor BuildService(
         TestAnalyticsPathResolver pathResolver,
         IProcessRequestFilesWorkflow? workflow = null)
     {
-        return new PublicApiDataSetCallsProcessor(
+        return new PublicApiPublicationCallsProcessor(
             pathResolver: pathResolver,
             workflow: workflow ?? new ProcessRequestFilesWorkflow(
                 logger: Mock.Of<ILogger<ProcessRequestFilesWorkflow>>()));
@@ -250,27 +190,23 @@ public abstract class PublicApiDataSetCallsProcessorTests
 
     private void SetupRequestFile(TestAnalyticsPathResolver pathResolver, string filename)
     {
-        Directory.CreateDirectory(pathResolver.PublicApiDataSetCallsDirectoryPath());
+        Directory.CreateDirectory(pathResolver.PublicApiPublicationCallsDirectoryPath());
 
         var sourceFilePath = Path.Combine(_queryResourcesPath, filename);
-        File.Copy(sourceFilePath, Path.Combine(pathResolver.PublicApiDataSetCallsDirectoryPath(), filename));
+        File.Copy(sourceFilePath, Path.Combine(pathResolver.PublicApiPublicationCallsDirectoryPath(), filename));
     }
     
     private static string ProcessingDirectoryPath(TestAnalyticsPathResolver pathResolver)
     {
-        return Path.Combine(pathResolver.PublicApiDataSetCallsDirectoryPath(), "processing");
+        return Path.Combine(pathResolver.PublicApiPublicationCallsDirectoryPath(), "processing");
     }
     
     // ReSharper disable once ClassNeverInstantiated.Local
     private record QueryReportLine
     {
-        public Guid DataSetId { get; init; }
-        public string DataSetTitle { get; init; } = string.Empty;
+        public Guid PublicationId { get; init; }
+        public string PublicationTitle { get; init; } = string.Empty;
         public string? Parameters { get; init; }
-        public string? PreviewTokenLabel { get; init; }
-        public Guid? PreviewTokenDataSetVersionId { get; init; }
-        public DateTime? PreviewTokenCreated { get; init; }
-        public DateTime? PreviewTokenExpiry { get; init; }
         public DateTime StartTime { get; init; }
         public string Type { get; init; } = string.Empty;
     }

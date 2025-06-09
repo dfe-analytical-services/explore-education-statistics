@@ -7,6 +7,7 @@ public abstract class AnalyticsPathResolverBase : IAnalyticsPathResolver
     public abstract string GetBasePath();
 
     private static readonly string[] PublicApiTopLevelSubPath = ["public-api", "top-level"];
+    private static readonly string[] PublicApiPublicationSubPath = ["public-api", "publications"];
     private static readonly string[] PublicApiDataSetsSubPath = ["public-api", "data-sets"];
     private static readonly string[] PublicApiDataSetVersionsSubPath = ["public-api", "data-set-versions"];
     private static readonly string[] PublicApiQueriesSubPath = ["public-api", "queries"];
@@ -22,6 +23,17 @@ public abstract class AnalyticsPathResolverBase : IAnalyticsPathResolver
     public string PublicApiTopLevelCallsReportsDirectoryPath()
     {
         return Path.Combine([ReportsDirectoryPath(), ..PublicApiTopLevelSubPath]);
+    }
+    
+    // PublicApiPublicationLevel
+    public string PublicApiPublicationCallsDirectoryPath()
+    {
+        return Path.Combine([GetBasePath(), ..PublicApiPublicationSubPath]);
+    }
+
+    public string PublicApiPublicationCallsReportsDirectoryPath()
+    {
+        return Path.Combine([ReportsDirectoryPath(), ..PublicApiPublicationSubPath]);
     }
     
     // PublicApiDataSets
