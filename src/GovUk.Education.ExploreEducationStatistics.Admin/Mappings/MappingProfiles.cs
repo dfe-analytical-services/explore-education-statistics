@@ -222,6 +222,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
                 .ForMember(dest => dest.Type,
                     m => m.MapFrom(dataSetVersion =>
                         dataSetVersion.VersionType));
+
+            CreateMap<DataSetUpload, DataSetUploadViewModel>();
         }
 
         private void CreateContentBlockMap()
