@@ -504,7 +504,7 @@ describe('ChartAxisConfiguration', () => {
       ).toHaveAttribute('href', '#chartBuilder-minor-decimalPlaces');
     });
 
-    test.only('allows decimal places to be set to 0', async () => {
+    test('allows decimal places to be set to 0', async () => {
       const { user } = render(
         <ChartBuilderFormsContextProvider initialForms={testFormState}>
           <ChartAxisConfiguration
