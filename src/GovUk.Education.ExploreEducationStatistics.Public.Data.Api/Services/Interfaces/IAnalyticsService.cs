@@ -10,6 +10,18 @@ public interface IAnalyticsService
         TopLevelCallType type,
         object? parameters = null,
         CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Favour the CapturePublicationCall method that accepts a
+    /// "publicationTitle" parameter as this prevents the need to
+    /// call the Content API in order to fetch additional Publication's
+    /// details.
+    /// </summary>
+    Task CapturePublicationCall(
+        Guid publicationId,
+        PublicationCallType type,
+        object? parameters = null,
+        CancellationToken cancellationToken = default);
     
     Task CapturePublicationCall(
         Guid publicationId,

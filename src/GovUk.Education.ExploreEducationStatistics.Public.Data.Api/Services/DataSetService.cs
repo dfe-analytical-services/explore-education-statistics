@@ -96,6 +96,12 @@ internal class DataSetService(
             .Select(MapDataSet)
             .ToList();
 
+        await analyticsService.CapturePublicationCall(
+            publicationId: publicationId,
+            type: PublicationCallType.GetDataSets,
+            parameters: new PaginationParameters(Page: page, PageSize: pageSize),
+            cancellationToken: cancellationToken);
+        
         return new DataSetPaginatedListViewModel
         {
             Results = dataSets,
