@@ -42,7 +42,11 @@ public class FullResetFunctionTests
     {
         // Arrange
         var publications = Enumerable.Range(0, numberOfPublications)
-            .Select(i => new PublicationInfo{ PublicationSlug = $"publication-slug-{i}"})
+            .Select(i => new PublicationInfo
+            {
+                PublicationSlug = $"publication-slug-{i}",
+                LatestReleaseSlug = $"release-slug-{i}"
+            })
             .ToArray();
         _fullSearchableDocumentResetter.WherePublicationsReturnedAre(publications);
             

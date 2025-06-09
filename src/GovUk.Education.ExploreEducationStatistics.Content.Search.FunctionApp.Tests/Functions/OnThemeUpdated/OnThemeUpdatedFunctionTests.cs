@@ -35,7 +35,7 @@ public class OnThemeUpdatedFunctionTests
         var publicationSlugs = Enumerable.Range(0, numberOfPublications)
             .Select(i => $"publication-slug-{i}")
             .ToArray();
-        var publications = publicationSlugs.Select(slug => new PublicationInfo{ PublicationSlug = slug }).ToArray(); 
+        var publications = publicationSlugs.Select(slug => new PublicationInfo{ PublicationSlug = slug, LatestReleaseSlug = $"release for {slug}"}).ToArray(); 
         
         _contentApiMockBuilder.WhereThemeHasPublications(publications);
         

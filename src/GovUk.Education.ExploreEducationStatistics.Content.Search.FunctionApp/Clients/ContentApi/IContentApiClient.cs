@@ -49,4 +49,12 @@ public interface IContentApiClient
     /// <returns>An array of information objects, one per live publication.</returns>
     /// <exception cref="GetPaginatedItemsException">Thrown if the call to the API was unsuccessful</exception>
     Task<PublicationInfo[]> GetAllLivePublicationInfos(CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Retrieve the Release Summary for the specified publication slug and release slug
+    /// </summary>
+    Task<ReleaseSummary> GetReleaseSummary(
+        string publicationSlug,
+        string releaseSlug,
+        CancellationToken cancellationToken = default);
 }
