@@ -1,6 +1,8 @@
 #nullable enable
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 using System;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
@@ -15,6 +17,7 @@ public record DataSetUploadViewModel
 
     public required string MetaFileName { get; init; }
 
+    [JsonConverter(typeof(StringEnumConverter))]
     public required DataSetUploadStatus Status { get; set; }
 
     public DataSetScreenerResult? ScreenerResult { get; set; }

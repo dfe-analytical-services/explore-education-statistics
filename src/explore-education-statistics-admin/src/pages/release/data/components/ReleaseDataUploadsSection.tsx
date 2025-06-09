@@ -8,6 +8,7 @@ import releaseDataFileService, {
   DataSetUploadResult,
   DataFile,
   DataFileImportStatus,
+  DataSetUpload,
 } from '@admin/services/releaseDataFileService';
 import DataSetUploadModalConfirm from '@admin/pages/release/data/components/DataSetUploadModalConfirm';
 import DataFilesTable from '@admin/pages/release/data/components/DataFilesTable';
@@ -19,6 +20,7 @@ import WarningMessage from '@common/components/WarningMessage';
 import useToggle from '@common/hooks/useToggle';
 import { useQuery } from '@tanstack/react-query';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import DataFilesTable from './DataFilesTable';
 
 interface Props {
   publicationId: string;
@@ -34,6 +36,9 @@ export default function ReleaseDataUploadsSection({
   onDataFilesChange,
 }: Props) {
   const [allDataFiles, setAllDataFiles] = useState<DataFile[]>([]);
+  const [allDataSetUploads, setAllDataSetUploads] = useState<DataSetUpload[]>(
+    [],
+  );
   const [uploadResults, setUploadResults] = useState<DataSetUploadResult[]>();
   const [isReordering, toggleReordering] = useToggle(false);
 
@@ -43,11 +48,18 @@ export default function ReleaseDataUploadsSection({
     refetch: refetchDataFiles,
   } = useQuery(releaseDataFileQueries.list(releaseVersionId));
 
+  const {
+    data: initialDataSetUploads,
+    isLoading: isLoadingUploads,
+    refetch: refetchDataSetUploads,
+  } = useQuery(releaseDataFileQueries.listUploads(releaseVersionId));
+
   // Store the data files on state so we can reliably update them
   // when the permissions/status change.
   useEffect(() => {
     setAllDataFiles(initialDataFiles ?? []);
-  }, [initialDataFiles]);
+    setAllDataSetUploads(initialDataSetUploads ?? []);
+  }, [initialDataFiles, initialDataSetUploads]);
 
   useEffect(() => {
     onDataFilesChange?.(allDataFiles);
@@ -69,18 +81,18 @@ export default function ReleaseDataUploadsSection({
     [allDataFiles],
   );
 
-  const confirmDataSetImport = useCallback(
-    async (dataSetUploadIds: string[]) => {
-      await releaseDataFileService.importDataSets(
-        releaseVersionId,
-        dataSetUploadIds,
-      );
+  // const confirmDataSetImport = useCallback(
+  //   async (dataSetUploadIds: string[]) => {
+  //     await releaseDataFileService.importDataSets(
+  //       releaseVersionId,
+  //       dataSetUploadIds,
+  //     );
 
-      setUploadResults(undefined);
-      await refetchDataFiles();
-    },
-    [releaseVersionId, setUploadResults, refetchDataFiles],
-  );
+  //     setUploadResults(undefined);
+  //     await refetchDataFiles();
+  //   },
+  //   [releaseVersionId, setUploadResults, refetchDataFiles],
+  // );
 
   const handleStatusChange = useCallback(
     async (dataFile: DataFile, { totalRows, status }: DataFileImportStatus) => {
@@ -128,52 +140,41 @@ export default function ReleaseDataUploadsSection({
             return;
           }
 
-          const uploadResponse =
-            await releaseDataFileService.uploadDataSetFilePair(
-              releaseVersionId,
-              {
-                title: values.title,
-                dataFile: values.dataFile as File,
-                metadataFile: values.metadataFile as File,
-              },
-            );
-
-          await refetchDataFiles();
-          setUploadResults(uploadResponse);
+          await releaseDataFileService.uploadDataSetFilePair(releaseVersionId, {
+            title: values.title,
+            dataFile: values.dataFile as File,
+            metadataFile: values.metadataFile as File,
+          });
           break;
         }
         case 'zip': {
           if (!values.title) {
             return;
           }
-          const uploadResponse =
-            await releaseDataFileService.uploadZippedDataSetFilePair(
-              releaseVersionId,
-              {
-                title: values.title,
-                zipFile: values.zipFile as File,
-              },
-            );
-
-          await refetchDataFiles();
-          setUploadResults(uploadResponse);
+          await releaseDataFileService.uploadZippedDataSetFilePair(
+            releaseVersionId,
+            {
+              title: values.title,
+              zipFile: values.zipFile as File,
+            },
+          );
           break;
         }
         case 'bulkZip': {
-          const uploadResponse =
-            await releaseDataFileService.uploadBulkZipDataSetFile(
-              releaseVersionId,
-              values.bulkZipFile!,
-            );
-
-          setUploadResults(uploadResponse);
+          await releaseDataFileService.uploadBulkZipDataSetFile(
+            releaseVersionId,
+            values.bulkZipFile!,
+          );
           break;
         }
         default:
           break;
       }
+
+      await refetchDataFiles();
+      await refetchDataSetUploads();
     },
-    [releaseVersionId, refetchDataFiles],
+    [releaseVersionId, refetchDataFiles, refetchDataSetUploads],
   );
 
   const handleConfirmReordering = useCallback(
@@ -224,19 +225,7 @@ export default function ReleaseDataUploadsSection({
         </ul>
       </InsetText>
       {canUpdateRelease ? (
-        <>
-          <DataFileUploadForm
-            dataFiles={allDataFiles}
-            onSubmit={handleSubmit}
-          />
-          {uploadResults === undefined || uploadResults.length === 0 ? null : (
-            <DataSetUploadModalConfirm
-              uploadResults={uploadResults}
-              onConfirm={confirmDataSetImport}
-              onCancel={() => setUploadResults(undefined)}
-            />
-          )}
-        </>
+        <DataFileUploadForm dataFiles={allDataFiles} onSubmit={handleSubmit} />
       ) : (
         <WarningMessage>
           This release has been approved, and can no longer be updated.
@@ -245,8 +234,8 @@ export default function ReleaseDataUploadsSection({
 
       <hr className="govuk-!-margin-top-6 govuk-!-margin-bottom-6" />
 
-      <LoadingSpinner loading={isLoading}>
-        {allDataFiles.length > 0 ? (
+      <LoadingSpinner loading={isLoading || isLoadingUploads}>
+        {allDataFiles.length > 0 || allDataSetUploads.length > 0 ? (
           <>
             <h2>Uploaded data files</h2>
 
@@ -276,6 +265,7 @@ export default function ReleaseDataUploadsSection({
                   <DataFilesReplacementTable
                     caption="Data file replacements"
                     dataFiles={replacedDataFiles}
+                    dataSetUploads={allDataSetUploads}
                     publicationId={publicationId}
                     releaseVersionId={releaseVersionId}
                     testId="Data file replacements table"
@@ -283,18 +273,20 @@ export default function ReleaseDataUploadsSection({
                   />
                 )}
 
-                {dataFiles.length > 0 && (
-                  <DataFilesTable
-                    canUpdateRelease={canUpdateRelease}
-                    caption="Data files"
-                    dataFiles={dataFiles}
-                    publicationId={publicationId}
-                    releaseVersionId={releaseVersionId}
-                    testId="Data files table"
-                    onDeleteFile={handleDeleteConfirm}
-                    onStatusChange={handleStatusChange}
-                  />
-                )}
+                {dataFiles.length > 0 ||
+                  (allDataSetUploads.length > 0 && (
+                    <DataFilesTable
+                      canUpdateRelease={canUpdateRelease}
+                      caption="Data files"
+                      dataFiles={dataFiles}
+                      dataSetUploads={allDataSetUploads}
+                      publicationId={publicationId}
+                      releaseVersionId={releaseVersionId}
+                      testId="Data files table"
+                      onDeleteFile={handleDeleteConfirm}
+                      onStatusChange={handleStatusChange}
+                    />
+                  ))}
               </>
             )}
           </>

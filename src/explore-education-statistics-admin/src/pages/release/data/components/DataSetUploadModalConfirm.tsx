@@ -1,10 +1,10 @@
 import ModalConfirm from '@common/components/ModalConfirm';
 import WarningMessage from '@common/components/WarningMessage';
-import { DataSetUploadResult } from 'src/services/releaseDataFileService';
+import { DataSetInfo } from 'src/services/releaseDataFileService';
 import React from 'react';
 
 interface Props {
-  uploadResults: DataSetUploadResult[];
+  uploadResults: DataSetInfo[];
   onConfirm: (uploadResult: string[]) => void;
   onCancel: () => void;
 }
@@ -18,7 +18,7 @@ export default function DataSetUploadModalConfirm({
     <ModalConfirm
       title="Upload summary"
       open
-      onConfirm={() => onConfirm(uploadResults.map(upload => upload.id))}
+      onConfirm={() => onConfirm(uploadResults.map(upload => upload.id!))}
       onExit={onCancel}
       onCancel={onCancel}
     >
@@ -36,7 +36,7 @@ export default function DataSetUploadModalConfirm({
               <td>{uploadResult.dataSetTitle}</td>
               <td>{uploadResult.dataFileName}</td>
               <td>
-                {uploadResult.replacingFileId && (
+                {uploadResult.replacedBy && ( // was replacingById (likely cause issues)
                   <WarningMessage className="govuk-!-margin-0 govuk-!-padding-0">
                     Upload will initiate a file replacement
                   </WarningMessage>

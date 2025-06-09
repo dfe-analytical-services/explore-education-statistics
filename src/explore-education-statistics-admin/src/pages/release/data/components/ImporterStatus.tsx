@@ -117,7 +117,7 @@ const ImporterStatus = ({
   const fetchStatus = useCallback(async () => {
     const nextStatus = await releaseDataFileService.getDataFileImportStatus(
       releaseVersionId,
-      dataFile,
+      dataFile.id,
     );
 
     setCurrentStatus(nextStatus);
