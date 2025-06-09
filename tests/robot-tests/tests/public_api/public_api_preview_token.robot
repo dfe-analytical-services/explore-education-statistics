@@ -248,7 +248,6 @@ Add headline text block to Content page
     user adds content to headlines text block    Headline text block text
 
 Approve release
-    user clicks link    Sign off
     user approves release for immediate publication
 
 Verify newly published release is on Find Statistics page

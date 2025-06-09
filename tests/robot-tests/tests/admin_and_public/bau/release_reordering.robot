@@ -108,7 +108,6 @@ Add headline text block to first release content page
     user adds content to headlines text block    Headline text block text
 
 Approve first release
-    user clicks link    Sign off
     user approves original release for immediate publication
 
 Validate first release has latest release status in publication release order
@@ -295,7 +294,6 @@ Add headline text block to second release content page
     user adds content to headlines text block    Headline text block text
 
 Approve second release
-    user clicks link    Sign off
     user approves original release for immediate publication
 
 Validate second release has latest release status in publication release order

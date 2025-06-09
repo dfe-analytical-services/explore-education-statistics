@@ -161,7 +161,6 @@ Add headline text block in the content page
     user adds content to headlines text block    Headline text block text
 
 Approve first release
-    user clicks link    Sign off
     user approves release for immediate publication
 
 User creates second release
@@ -174,7 +173,6 @@ Add headline text block to Content page (second release)
     user adds content to headlines text block    Headline text block text
 
 Approve second release
-    user clicks link    Sign off
     user approves release for immediate publication
 
 Check that first release does not contains the latest data

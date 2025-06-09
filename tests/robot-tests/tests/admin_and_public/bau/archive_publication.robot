@@ -52,7 +52,6 @@ Add headline text block to archive-publication content
     user adds content to headlines text block    Headline text block text
 
 Go to "Sign off" page and approve archive-publication release
-    user clicks link    Sign off
     user approves original release for immediate publication
 
 Create new publication to supersede other publication and release via API
@@ -201,7 +200,6 @@ Add headline text block to superseding-publication content
     user adds content to headlines text block    Headline text block text
 
 Go to "Sign off" page and approve superseding-publication release
-    user clicks link    Sign off
     user approves original release for immediate publication
     user waits until page contains element    id:release-process-status-Complete    %{WAIT_MEDIUM}
 

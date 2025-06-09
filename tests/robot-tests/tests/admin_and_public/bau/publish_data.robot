@@ -57,7 +57,6 @@ Add public prerelease access list
     ...    Test public access list
 
 Go to "Sign off" page and approve release
-    user clicks link    Sign off
     user approves original release for immediate publication
 
 Create another release for the same publication
@@ -519,7 +518,6 @@ Add public prerelease access list again
     user creates public prerelease access list    Test public access list
 
 Approve release
-    user clicks link    Sign off
     user approves original release for immediate publication
 
 Verify newly published release is on Find Statistics page

@@ -78,7 +78,6 @@ Click glossary info icon and validate glossary entry
     user checks page does not contain    When a pupil misses (or is absent from) at least 1 possible school session.
 
 Approve release
-    user clicks link    Sign off
     user approves original release for immediate publication
 
 Verify newly published release is on Find Statistics page
