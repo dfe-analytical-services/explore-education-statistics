@@ -1,13 +1,11 @@
 #nullable enable
 using System;
-using System.IO;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
-using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
 using Microsoft.Extensions.Options;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Services;
 
-public class AnalyticsPathResolver : IAnalyticsPathResolver
+public class AnalyticsPathResolver : AnalyticsPathResolverBase
 {
     private readonly string _basePath;
 
@@ -25,13 +23,8 @@ public class AnalyticsPathResolver : IAnalyticsPathResolver
         _basePath = options.Value.BasePath;
     }
 
-    public string PublicZipDownloadsDirectoryPath()
+    protected override string GetBasePath()
     {
-        return Path.Combine(_basePath, "public", "zip-downloads");
-    }
-
-    public string PublicCsvDownloadsDirectoryPath()
-    {
-        return Path.Combine(_basePath, "public", "csv-downloads");
+        return _basePath;
     }
 }
