@@ -13,11 +13,14 @@ Force Tags          Admin    Local    Dev    AltersData
 
 *** Variables ***
 ${PUBLICATION_NAME}=                    UI tests - publish methodology publication update %{RUN_IDENTIFIER}
-${PUBLIC_METHODOLOGY_URL_ENDING}=       /methodology/ui-tests-publish-methodology-publication-update-%{RUN_IDENTIFIER}
 ${PUBLICATION_NAME_UPDATED}=            ${PUBLICATION_NAME} updated
-${PUBLIC_PUBLICATION_URL_ENDING}=       /find-statistics/ui-tests-publish-methodology-publication-update-%{RUN_IDENTIFIER}
-${RELEASE_NAME}=                        Academic year Q1
-${ACADEMIC_YEAR}=                       /2046-47
+${PUBLIC_METHODOLOGY_URL}=              %{PUBLIC_URL}/methodology/ui-tests-publish-methodology-publication-update-%{RUN_IDENTIFIER}
+${PUBLIC_METHODOLOGY_URL_UPDATED}=      ${PUBLIC_METHODOLOGY_URL}-methodology-update
+${PUBLIC_PUBLICATION_URL}=              %{PUBLIC_URL}/find-statistics/ui-tests-publish-methodology-publication-update-%{RUN_IDENTIFIER}
+${PUBLIC_PUBLICATION_URL_UPDATED}=      ${PUBLIC_PUBLICATION_URL}-updated
+${RELEASE_1_NAME}=                      Academic year 2046/47
+${RELEASE_2_NAME}=                      Academic year Q1 2050/51
+${RELEASE_3_NAME}=                      Academic year Q1 2051/52
 
 
 *** Test Cases ***
@@ -53,8 +56,15 @@ Navigate to release and add headline text block
     user adds headlines text block
     user adds content to headlines text block    Headline text block text
 
-Publish release
+Publish first release
     user approves release for immediate publication
+
+Get public first release link
+    ${PUBLIC_RELEASE_1_LINK}=    user gets url public release will be accessible at
+    Set Suite Variable    ${PUBLIC_RELEASE_1_LINK}
+
+Verify newly published release is on Find Statistics page
+    user checks publication is on find statistics page    ${PUBLICATION_NAME}
 
 Update publication details
     user navigates to details on publication page    ${PUBLICATION_NAME}
@@ -63,8 +73,8 @@ Update publication details
     user enters text into element    label:Publication title    ${PUBLICATION_NAME_UPDATED}
     user clicks button    Update publication details
     ${modal}=    user waits until modal is visible    Confirm publication changes
-    user checks input field contains    id:before-url    ${PUBLIC_PUBLICATION_URL_ENDING}
-    user checks input field contains    id:after-url    ${PUBLIC_PUBLICATION_URL_ENDING}-updated
+    user checks input field contains    id:before-url    ${PUBLIC_PUBLICATION_URL}
+    user checks input field contains    id:after-url    ${PUBLIC_PUBLICATION_URL_UPDATED}
     user clicks button    Confirm    ${modal}
     user waits until modal is not visible    Confirm publication changes
     user checks summary list contains    Publication title    ${PUBLICATION_NAME_UPDATED}
@@ -101,15 +111,13 @@ Check publication is updated on dashboard
 
     user waits until page contains link    ${PUBLICATION_NAME_UPDATED}
 
-Validate publication redirect works
-    user navigates to    %{PUBLIC_URL}${PUBLIC_PUBLICATION_URL_ENDING}${ACADEMIC_YEAR}
-    user waits until h1 is visible    ${PUBLICATION_NAME_UPDATED}
-    user checks url contains    %{PUBLIC_URL}${PUBLIC_PUBLICATION_URL_ENDING}-updated${ACADEMIC_YEAR}
-
-Go to public release page
+Verify updated publication title is on Find Statistics page
     user checks publication is on find statistics page    ${PUBLICATION_NAME_UPDATED}
-    user clicks link    ${PUBLICATION_NAME_UPDATED}
-    user waits until h1 is visible    ${PUBLICATION_NAME_UPDATED}    %{WAIT_MEDIUM}
+
+Validate publication redirect works
+    user navigates to    ${PUBLIC_RELEASE_1_LINK}
+    user waits until h1 is visible    ${PUBLICATION_NAME_UPDATED}
+    user checks url contains    ${PUBLIC_PUBLICATION_URL_UPDATED}/2046-47
 
 Validate publication details are updated on public page
     user checks page contains    Team name updated
@@ -147,27 +155,15 @@ Navigate to sign-off page and approve the methodology immediately
     user waits for caches to expire
 
 Validate methodology re-directs works for the updated publication methodology
-    user navigates to    %{PUBLIC_URL}${PUBLIC_METHODOLOGY_URL_ENDING}
+    user navigates to    ${PUBLIC_METHODOLOGY_URL}
     user waits until h1 is visible    ${PUBLICATION_NAME}-methodology update
-    user checks url contains    %{PUBLIC_URL}${PUBLIC_METHODOLOGY_URL_ENDING}-methodology-update
+    user checks url contains    ${PUBLIC_METHODOLOGY_URL_UPDATED}
 
 User creates a new release with different academic year
     user navigates to publication page from dashboard    ${PUBLICATION_NAME_UPDATED}
-    user creates release from publication page    ${PUBLICATION_NAME_UPDATED}    ${RELEASE_NAME}    2050
+    user creates release from publication page    ${PUBLICATION_NAME_UPDATED}    Academic year Q1    2050
 
 Add headline text block in the content page
-    user navigates to content page    ${PUBLICATION_NAME_UPDATED}
-    user adds headlines text block
-    user adds content to headlines text block    Headline text block text
-
-Approve first release
-    user approves release for immediate publication
-
-User creates second release
-    user navigates to publication page from dashboard    ${PUBLICATION_NAME_UPDATED}
-    user creates release from publication page    ${PUBLICATION_NAME_UPDATED}    ${RELEASE_NAME}    2051
-
-Add headline text block to Content page (second release)
     user navigates to content page    ${PUBLICATION_NAME_UPDATED}
     user adds headlines text block
     user adds content to headlines text block    Headline text block text
@@ -175,12 +171,32 @@ Add headline text block to Content page (second release)
 Approve second release
     user approves release for immediate publication
 
-Check that first release does not contains the latest data
-    user navigates to    %{PUBLIC_URL}${PUBLIC_PUBLICATION_URL_ENDING}-updated/2050-51-q1
+Get public second release link
+    ${PUBLIC_RELEASE_2_LINK}=    user gets url public release will be accessible at
+    Set Suite Variable    ${PUBLIC_RELEASE_2_LINK}
+
+User creates third release
+    user navigates to publication page from dashboard    ${PUBLICATION_NAME_UPDATED}
+    user creates release from publication page    ${PUBLICATION_NAME_UPDATED}    Academic year Q1    2051
+
+Add headline text block to Content page (second release)
+    user navigates to content page    ${PUBLICATION_NAME_UPDATED}
+    user adds headlines text block
+    user adds content to headlines text block    Headline text block text
+
+Approve third release
+    user approves release for immediate publication
+
+Get public third release link
+    ${PUBLIC_RELEASE_3_LINK}=    user gets url public release will be accessible at
+    Set Suite Variable    ${PUBLIC_RELEASE_3_LINK}
+
+Check that second release does not contains the latest data
+    user navigates to    ${PUBLIC_RELEASE_2_LINK}
     user checks page does not contain    This is the latest data
     user checks page contains    This is not the latest data
 
-Check that second release contains the latest data
-    user navigates to    %{PUBLIC_URL}${PUBLIC_PUBLICATION_URL_ENDING}-updated/2051-52-q1
+Check that third release contains the latest data
+    user navigates to    ${PUBLIC_RELEASE_3_LINK}
     user checks page does not contain    This is not the latest data
     user checks page contains    This is the latest data
