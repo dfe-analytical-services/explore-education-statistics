@@ -3,6 +3,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Analytics.Common;
+using GovUk.Education.ExploreEducationStatistics.Analytics.Common.Strategies;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Requests;
@@ -80,12 +81,12 @@ public class AnalyticsWritePublicZipDownloadStrategyTests
 
     private AnalyticsWritePublicZipDownloadStrategy BuildStrategy(
         IAnalyticsPathResolver pathResolver,
-        DateTimeProvider? dateTimeProvider = null,
-        ILogger<AnalyticsWritePublicZipDownloadStrategy>? logger = null)
+        DateTimeProvider? dateTimeProvider = null)
     {
         return new AnalyticsWritePublicZipDownloadStrategy(
             pathResolver,
-            dateTimeProvider ?? new DateTimeProvider(),
-            logger ?? Mock.Of<ILogger<AnalyticsWritePublicZipDownloadStrategy>>());
+            new CommonAnalyticsWriteStrategyWorkflow<CaptureZipDownloadRequest>(
+                dateTimeProvider: dateTimeProvider ?? new DateTimeProvider(),
+                Mock.Of<ILogger<CommonAnalyticsWriteStrategyWorkflow<CaptureZipDownloadRequest>>>()));
     }
 }
