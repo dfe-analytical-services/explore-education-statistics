@@ -46,7 +46,7 @@ public abstract class PublicZipDownloadsProcessorTests
         public async Task SingleRequestFileNoSubjectId_ProducesOneReportRow()
         {
             using var pathResolver = new TestAnalyticsPathResolver();
-            SetupRequestFile(pathResolver, "ZipDownloadRequestFile_NoSubjectId.json");
+            SetupRequestFile(pathResolver, "ZipDownloadRequestFile_NoSubjectId_ReleaseUsefulInfo.json");
 
             var service = BuildService(
                 pathResolver: pathResolver);
@@ -73,16 +73,16 @@ public abstract class PublicZipDownloadsProcessorTests
 
             await AssertReportRow(
                 zipDownloadReportRow,
-                "ZipDownloadRequestFile_NoSubjectId.json",
+                "ZipDownloadRequestFile_NoSubjectId_ReleaseUsefulInfo.json",
                 1);
         }
 
         [Fact]
-        public async Task TwoDifferentSourceQueries_ProduceTwoDistinctReportRows()
+        public async Task TwoDifferentSourceQueries_ProduceTwoDistinctReportRows_DifferentReleaseVersion()
         {
             using var pathResolver = new TestAnalyticsPathResolver();
 
-            SetupRequestFile(pathResolver, "ZipDownloadRequestFile_NoSubjectId.json");
+            SetupRequestFile(pathResolver, "ZipDownloadRequestFile_NoSubjectId_ReleaseUsefulInfo.json");
             SetupRequestFile(pathResolver, "ZipDownloadRequestFile_WithSubjectId.json");
 
             var service = BuildService(
@@ -103,12 +103,47 @@ public abstract class PublicZipDownloadsProcessorTests
 
             await AssertReportRow(
                 zipDownloadReportRows[0],
-                "ZipDownloadRequestFile_NoSubjectId.json",
+                "ZipDownloadRequestFile_NoSubjectId_ReleaseUsefulInfo.json",
                 1);
 
             await AssertReportRow(
                 zipDownloadReportRows[1],
                 "ZipDownloadRequestFile_WithSubjectId.json",
+                1);
+        }
+
+        [Fact]
+        public async Task TwoDifferentSourceQueries_ProduceTwoDistinctReportRows_SameReleaseDifferentFromPage()
+        {
+            using var pathResolver = new TestAnalyticsPathResolver();
+
+            SetupRequestFile(pathResolver, "ZipDownloadRequestFile_NoSubjectId_ReleaseUsefulInfo.json");
+            SetupRequestFile(pathResolver, "ZipDownloadRequestFile_NoSubjectId_ReleaseDownloads.json");
+
+            var service = BuildService(
+                pathResolver: pathResolver);
+            await service.Process();
+
+            var reports = Directory.GetFiles(pathResolver.PublicZipDownloadsReportsDirectoryPath());
+            var zipDownloadsReport = Assert.Single(reports);
+
+            Assert.EndsWith("public-zip-downloads.parquet", zipDownloadsReport);
+
+            var duckDbConnection = new DuckDbConnection();
+            duckDbConnection.Open();
+
+            var zipDownloadReportRows = await ReadReport(duckDbConnection, zipDownloadsReport);
+
+            Assert.Equal(2, zipDownloadReportRows.Count);
+
+            await AssertReportRow(
+                zipDownloadReportRows[0],
+                "ZipDownloadRequestFile_NoSubjectId_ReleaseDownloads.json",
+                1);
+
+            await AssertReportRow(
+                zipDownloadReportRows[1],
+                "ZipDownloadRequestFile_NoSubjectId_ReleaseUsefulInfo.json",
                 1);
         }
 
@@ -190,7 +225,7 @@ public abstract class PublicZipDownloadsProcessorTests
 
         // Generate expected ZipDownloadHash
         var subjectIdStr = request.SubjectId == null ? "" : request.SubjectId.ToString()!.ToLower();
-        var strToHash = $"{subjectIdStr}{request.ReleaseVersionId.ToString().ToLower()}";
+        var strToHash = $"{subjectIdStr}{request.ReleaseVersionId.ToString().ToLower()}{request.FromPage}";
         var bytesToHash = Encoding.UTF8.GetBytes(strToHash);
         var hash = MD5.Create().ComputeHash(bytesToHash);
         var hashSb = new StringBuilder();
