@@ -86,13 +86,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                 .HandleFailuresOrOk();
         }
 
+        [HttpGet("releaseVersions/{releaseVersionId:guid}/uploads")]
+        public async Task<ActionResult<List<DataSetUploadViewModel>>> GetDataSetUploads(Guid releaseVersionId)
+        {
+            return await _dataSetUploadRepository
+                .ListAll(releaseVersionId)
+                .HandleFailuresOrOk();
+        }
+
         // We intend to change this route, to make these endpoints more consistent, as per EES-5895
-        // TODO: Update the endpoint on FE/BE
-        // TODO: Update to accommodate for files and uploads
         [HttpPut("release/{releaseVersionId:guid}/data/order")]
         public async Task<ActionResult<List<DataFileInfo>>> ReorderDataFiles(
             Guid releaseVersionId,
-            List<Guid> fileIds) // will likely need 2 lists, one for files and one for uploads
+            List<Guid> fileIds)
         {
             return await _releaseDataFileService
                 .ReorderDataFiles(releaseVersionId, fileIds)
@@ -184,7 +190,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         }
 
         [HttpPost("releaseVersions/{releaseVersionId:guid}/import-data-sets")]
-        public async Task<ActionResult<List<DataFileInfo>>> ImportBulkZipDataSetsFromTempStorage(
+        public async Task<ActionResult<Unit>> ImportBulkZipDataSetsFromTempStorage(
             Guid releaseVersionId,
             List<Guid> dataSetUploadIds,
             CancellationToken cancellationToken)

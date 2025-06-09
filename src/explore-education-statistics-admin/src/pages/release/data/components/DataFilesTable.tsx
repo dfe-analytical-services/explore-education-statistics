@@ -1,15 +1,20 @@
 import {
   DataFile,
   DataFileImportStatus,
+  DataSetUpload,
 } from '@admin/services/releaseDataFileService';
 import styles from '@admin/pages/release/data/components/DataFilesTable.module.scss';
 import DataFilesTableRow from '@admin/pages/release/data/components/DataFilesTableRow';
 import React from 'react';
+import styles from './DataFilesTable.module.scss';
+import DataFilesTableRow from './DataFilesTableRow';
+import DataFilesTableUploadRow from './DataFilesTableUploadsRow';
 
 interface Props {
   canUpdateRelease?: boolean;
   caption: string;
   dataFiles: DataFile[];
+  dataSetUploads: DataSetUpload[];
   publicationId: string;
   releaseVersionId: string;
   testId?: string;
@@ -24,6 +29,7 @@ export default function DataFilesTable({
   canUpdateRelease,
   caption,
   dataFiles,
+  dataSetUploads,
   publicationId,
   releaseVersionId,
   testId,
@@ -48,11 +54,20 @@ export default function DataFilesTable({
           <DataFilesTableRow
             canUpdateRelease={canUpdateRelease}
             dataFile={dataFile}
-            key={dataFile.title}
+            key={dataFile.id}
             publicationId={publicationId}
             releaseVersionId={releaseVersionId}
             onConfirmDelete={onDeleteFile}
             onStatusChange={onStatusChange}
+          />
+        ))}
+        {dataSetUploads.map(upload => (
+          <DataFilesTableUploadRow
+            canUpdateRelease={canUpdateRelease}
+            dataSetUpload={upload}
+            key={upload.id}
+            publicationId={publicationId}
+            releaseVersionId={releaseVersionId}
           />
         ))}
       </tbody>

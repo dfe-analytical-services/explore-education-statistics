@@ -1,4 +1,5 @@
 #nullable enable
+using Newtonsoft.Json.Converters;
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
 
@@ -8,7 +9,7 @@ public class DataSetScreenerResult
 {
     // TODO (EES-5353): Discuss if this can just be a boolean (e.g. "Passed", "IsSuccessful")
     [JsonPropertyName("overall_stage")]
-    [JsonConverter(typeof(JsonStringEnumConverter))]
+    [Newtonsoft.Json.JsonConverter(typeof(StringEnumConverter))]
     public ScreenerResult Result { get; set; }
 
     [JsonPropertyName("overall_message")]
