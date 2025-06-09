@@ -31,14 +31,14 @@ Upload subject
     user uploads subject and waits until complete    UI test subject    upload-file-test.csv
     ...    upload-file-test.meta.csv
 
-Check release isn't publically visible
-    user clicks link    Sign off
-    user waits until page finishes loading
-    user waits until page contains element    testid:public-release-url
-    ${PUBLIC_RELEASE_LINK}=    Get Value    testid:public-release-url
-    check that variable is not empty    PUBLIC_RELEASE_LINK    ${PUBLIC_RELEASE_LINK}
+Navigate to release Sign off page
+    user navigates to release Sign off page
+
+Get public release link
+    ${PUBLIC_RELEASE_LINK}=    user gets url public release will be accessible at
     Set Suite Variable    ${PUBLIC_RELEASE_LINK}
 
+Check release isn't publicly visible
     user navigates to    ${PUBLIC_RELEASE_LINK}
     user waits until page contains    Page not found
     user checks page does not contain    ${RELEASE_NAME}

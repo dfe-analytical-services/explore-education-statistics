@@ -268,9 +268,7 @@ Verify release is scheduled
     user checks summary list contains    Next release expected    December 3001
 
 Get public release link
-    user waits until page contains element    testid:public-release-url
-    ${PUBLIC_RELEASE_LINK}=    Get Value    xpath://*[@data-testid="public-release-url"]
-    check that variable is not empty    PUBLIC_RELEASE_LINK    ${PUBLIC_RELEASE_LINK}
+    ${PUBLIC_RELEASE_LINK}=    user gets url public release will be accessible at
     Set Suite Variable    ${PUBLIC_RELEASE_LINK}
 
 Publish the scheduled release
