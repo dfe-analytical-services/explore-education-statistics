@@ -15,7 +15,7 @@ public static class DataSetFileMetaGeneratorExtensions
 
     public static InstanceSetters<DataSetFileMeta> SetDefaults(this InstanceSetters<DataSetFileMeta> setters)
         => setters
-            .SetNumDataFileRows(9393)
+            .SetDefault(d => d.NumDataFileRows)
             .SetTimePeriodRange(new TimePeriodRangeMeta
             {
                 Start = new TimePeriodRangeBoundMeta { TimeIdentifier = TimeIdentifier.CalendarYear, Period = "2000", },
