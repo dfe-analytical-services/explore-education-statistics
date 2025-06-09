@@ -86,6 +86,7 @@ Validate publication redirect works
     user checks url contains    %{PUBLIC_URL}${PUBLIC_PUBLICATION_URL_ENDING}-updated${ACADEMIC_YEAR}
 
 Go to public release page
+    # TODO EES-6063 - Remove this
     user checks publication is on find statistics page    ${PUBLICATION_NAME_UPDATED}
     user clicks link    ${PUBLICATION_NAME_UPDATED}
     user waits until h1 is visible    ${PUBLICATION_NAME_UPDATED}    %{WAIT_MEDIUM}

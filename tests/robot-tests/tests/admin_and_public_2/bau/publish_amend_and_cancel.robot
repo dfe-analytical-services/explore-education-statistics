@@ -182,6 +182,7 @@ Publish the scheduled release
     user waits for caches to expire
 
 Verify newly published release is on Find Statistics page
+    # TODO EES-6063 - Remove this
     user checks publication is on find statistics page    ${PUBLICATION_NAME}
 
 Navigate to newly published release page

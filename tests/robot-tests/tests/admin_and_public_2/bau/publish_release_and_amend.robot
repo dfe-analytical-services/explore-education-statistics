@@ -278,6 +278,7 @@ Publish the scheduled release
     set suite variable    ${EXPECTED_PUBLISHED_DATE}
 
 Verify newly published release is on Find Statistics page
+    # TODO EES-6063 - Remove this
     user checks publication is on find statistics page    ${PUBLICATION_NAME}
 
 Navigate to newly published release page
@@ -755,6 +756,7 @@ Approve amendment for scheduled release
     set suite variable    ${EXPECTED_PUBLISHED_DATE}
 
 Verify amendment is on Find Statistics page again
+    # TODO EES-6063 - Remove this
     user waits for caches to expire
     user checks publication is on find statistics page    ${PUBLICATION_NAME}
 

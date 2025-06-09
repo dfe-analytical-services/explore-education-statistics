@@ -64,6 +64,7 @@ Get public first release link
     Set Suite Variable    ${PUBLIC_RELEASE_1_LINK}
 
 Verify newly published release is on Find Statistics page
+    # TODO EES-6063 - Remove this
     user checks publication is on find statistics page    ${PUBLICATION_NAME}
 
 Update publication details
@@ -112,6 +113,7 @@ Check publication is updated on dashboard
     user waits until page contains link    ${PUBLICATION_NAME_UPDATED}
 
 Verify updated publication title is on Find Statistics page
+    # TODO EES-6063 - Remove this
     user checks publication is on find statistics page    ${PUBLICATION_NAME_UPDATED}
 
 Validate publication redirect works

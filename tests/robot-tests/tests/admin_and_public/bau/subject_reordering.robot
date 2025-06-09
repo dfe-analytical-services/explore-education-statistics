@@ -230,6 +230,7 @@ Check subject order in data catalogue
     ...    locator=xpath://*[@data-testid="data-set-file-list"]/li/h4
 
 Check subject order in data guidance
+    # TODO EES-6063 - Remove this
     user checks publication is on find statistics page    ${PUBLICATION_NAME}
     user clicks link    ${PUBLICATION_NAME}
 
