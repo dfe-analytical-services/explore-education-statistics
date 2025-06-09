@@ -35,7 +35,7 @@ public static class ReleaseSearchableDocumentExtensions
             { SearchableDocumentAzureBlobMetadataKeys.PublicationSlug, releaseSearchableDocument.PublicationSlug },
             { SearchableDocumentAzureBlobMetadataKeys.ThemeId, releaseSearchableDocument.ThemeId.ToString() },
             { SearchableDocumentAzureBlobMetadataKeys.ThemeTitle, ToMetadataSafeString(releaseSearchableDocument.ThemeTitle) },
-            { SearchableDocumentAzureBlobMetadataKeys.Published, releaseSearchableDocument.Published.ToUniversalTime().ToString("yyyy-MM-ddThh:mm:ssZ") ?? string.Empty },
+            { SearchableDocumentAzureBlobMetadataKeys.Published, releaseSearchableDocument.Published.ToUniversalTime().ToString("yyyy-MM-ddThh:mm:ssZ") },
             { SearchableDocumentAzureBlobMetadataKeys.Summary, ToMetadataSafeString(releaseSearchableDocument.Summary) },
             { SearchableDocumentAzureBlobMetadataKeys.Title, ToMetadataSafeString(releaseSearchableDocument.PublicationTitle) },
             { SearchableDocumentAzureBlobMetadataKeys.ReleaseType, releaseSearchableDocument.ReleaseType },

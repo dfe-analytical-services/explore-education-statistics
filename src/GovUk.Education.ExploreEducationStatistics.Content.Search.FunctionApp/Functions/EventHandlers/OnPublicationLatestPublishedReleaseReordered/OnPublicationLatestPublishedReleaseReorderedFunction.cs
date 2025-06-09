@@ -18,7 +18,7 @@ public class OnPublicationLatestPublishedReleaseReorderedFunction(IEventGridEven
         await eventGridEventHandler.Handle<PublicationLatestPublishedReleaseReorderedEventDto, OnPublicationLatestPublishedReleaseReorderedOutput>(
             context, 
             eventDto,
-            (payload, ct) =>
+            (payload, _) =>
             {
                 if (string.IsNullOrEmpty(payload.Slug))
                 {

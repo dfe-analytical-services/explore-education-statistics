@@ -9,7 +9,7 @@ internal class LoggingHealthCheck(ILogger<LoggingHealthCheck> logger) : IHealthC
     {
         logger.LogDebug("Logging health check test at Debug level");
         logger.LogInformation("Logging health check test at Information level");
-        logger.LogWarning("Logging health check test at Warning level with structured logging test of {TestObject}", new TestObject());
+        logger.LogWarning("Logging health check test at Warning level with structured logging test of {@TestObject}", new TestObject());
 
         try
         {
@@ -25,6 +25,7 @@ internal class LoggingHealthCheck(ILogger<LoggingHealthCheck> logger) : IHealthC
 
     private class TestObject
     {
+        // ReSharper disable UnusedMember.Local -- These properties are used to test the structured logging
         public string TestProperty { get; set; } = "Test Value";
         public object[] TestArray { get; set; } = { "Test Array Value 1", "Test Array Value 2" };
     }
