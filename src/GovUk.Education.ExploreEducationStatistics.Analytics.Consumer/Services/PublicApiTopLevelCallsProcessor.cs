@@ -24,7 +24,7 @@ public class PublicApiTopLevelCallsProcessor(
         public override async Task InitialiseDuckDb(DuckDbConnection connection)
         {
             await connection.ExecuteNonQueryAsync(@"
-                CREATE TABLE SourceTable (
+                CREATE TABLE sourceTable (
                     parameters JSON,
                     startTime DATETIME,
                     type VARCHAR

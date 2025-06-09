@@ -31,7 +31,7 @@ public class PublicCsvDownloadsProcessor(
         public async Task InitialiseDuckDb(DuckDbConnection connection)
         {
             await connection.ExecuteNonQueryAsync(@"
-                CREATE TABLE csvDownloads (
+                CREATE TABLE sourceTable (
                     csvDownloadHash VARCHAR,
                     publicationName VARCHAR,
                     releaseVersionId UUID,
@@ -46,7 +46,7 @@ public class PublicCsvDownloadsProcessor(
         public async Task ProcessSourceFile(string sourceFilePath, DuckDbConnection connection)
         {
             await connection.ExecuteNonQueryAsync($@"
-                INSERT INTO csvDownloads BY NAME (
+                INSERT INTO sourceTable BY NAME (
                     SELECT
                         MD5(CONCAT(subjectId, releaseVersionId)) AS csvDownloadHash,
                         *
@@ -78,7 +78,7 @@ public class PublicCsvDownloadsProcessor(
                     FIRST(subjectId) AS subjectId,
                     FIRST(dataSetTitle) AS dataSetTitle,
                     CAST(COUNT(csvDownloadHash) AS INT) AS downloads
-                FROM csvDownloads
+                FROM sourceTable
                 GROUP BY csvDownloadHash
                 ORDER BY csvDownloadHash
             ");

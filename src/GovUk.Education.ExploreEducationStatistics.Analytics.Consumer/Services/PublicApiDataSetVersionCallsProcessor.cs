@@ -1,7 +1,7 @@
+using GovUk.Education.ExploreEducationStatistics.Analytics.Consumer.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Analytics.Consumer.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Analytics.Consumer.Services.Workflow;
 using GovUk.Education.ExploreEducationStatistics.Common.DuckDb.DuckDb;
-using Microsoft.Extensions.Logging;
 
 namespace GovUk.Education.ExploreEducationStatistics.Analytics.Consumer.Services;
 
@@ -32,7 +32,7 @@ public class PublicApiDataSetVersionCallsProcessor(
         public async Task InitialiseDuckDb(DuckDbConnection connection)
         {
             await connection.ExecuteNonQueryAsync(@"
-                CREATE TABLE DataSetVersionCalls (
+                CREATE TABLE sourceTable (
                     dataSetId UUID,
                     dataSetTitle VARCHAR,
                     dataSetVersion VARCHAR,
@@ -48,14 +48,9 @@ public class PublicApiDataSetVersionCallsProcessor(
 
         public async Task ProcessSourceFile(string sourceFilePath, DuckDbConnection connection)
         {
-            await connection.ExecuteNonQueryAsync($@"
-                INSERT INTO DataSetVersionCalls BY NAME (
-                    SELECT *
-                    FROM read_json('{sourceFilePath}', 
-                        format='unstructured'
-                    )
-                 )
-            ");
+            await connection.DirectCopyJsonIntoDuckDbTable(
+                jsonFilePath: sourceFilePath,
+                tableName: "sourceTable");
         }
 
         public async Task CreateParquetReports(string reportsFolderPathAndFilenamePrefix, DuckDbConnection connection)
@@ -70,7 +65,7 @@ public class PublicApiDataSetVersionCallsProcessor(
                     CAST(previewToken->>'dataSetVersionId' AS UUID) AS previewTokenDataSetVersionId,
                     CAST(previewToken->>'created' AS DATETIME) AS previewTokenCreated,
                     CAST(previewToken->>'expiry' AS DATETIME) AS previewTokenExpiry 
-                    FROM DataSetVersionCalls 
+                    FROM sourceTable 
                     ORDER BY startTime ASC
                 )
                 TO '{reportFilePath}' (FORMAT 'parquet', CODEC 'zstd')

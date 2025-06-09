@@ -1,3 +1,4 @@
+using GovUk.Education.ExploreEducationStatistics.Analytics.Consumer.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Analytics.Consumer.Services.Workflow;
 using GovUk.Education.ExploreEducationStatistics.Common.DuckDb.DuckDb;
 
@@ -34,39 +35,25 @@ public abstract class DirectJsonCopyWorkflowActorBase(
 
     /// <summary>
     /// This method must be implemented to create the initial table into which the JSON
-    /// source files will be imported. The table should always be called "SourceTable".
+    /// source files will be imported. The table should always be called "sourceTable".
     /// </summary>
     /// <param name="connection">An open DuckDb connection.</param>
     public abstract Task InitialiseDuckDb(DuckDbConnection connection);
 
     public async Task ProcessSourceFile(string sourceFilePath, DuckDbConnection connection)
     {
-        // Read JSON files directly into SourceTable with no additional transformations
-        // or logic.
-        await connection.ExecuteNonQueryAsync($@"
-            INSERT INTO SourceTable BY NAME (
-                SELECT *
-                FROM read_json('{sourceFilePath}', 
-                    format='unstructured'
-                )
-             )
-        ");
+        await connection.DirectCopyJsonIntoDuckDbTable(
+            jsonFilePath: sourceFilePath,
+            tableName: "sourceTable");
     }
 
     public async Task CreateParquetReports(string reportsFolderPathAndFilenamePrefix, DuckDbConnection connection)
     {
         var reportFilePath = 
             $"{reportsFolderPathAndFilenamePrefix}_public-api-{reportFilenamePart}-calls.parquet";
-        
-        // Write a Parquet report file directly from the contents of the SourceTable, with
-        // no additional transformations or logic.
-        await connection.ExecuteNonQueryAsync($@"
-            COPY (
-                SELECT *
-                FROM SourceTable
-                ORDER BY startTime ASC
-            )
-            TO '{reportFilePath}' (FORMAT 'parquet', CODEC 'zstd')
-        ");
+
+        await connection.DirectCopyDuckDbTableIntoParquetFile(
+            tableName: "sourceTable",
+            parquetFilePath: reportFilePath);
     }
 }
