@@ -185,6 +185,10 @@ Add headline text block to Content page
 Publish release
     user approves original release for immediate publication
 
+Get public release link
+    ${PUBLIC_RELEASE_LINK}    user gets url public release will be accessible at
+    Set Suite Variable    ${PUBLIC_RELEASE_LINK}
+
 Check subjects can no longer be re-ordered after release has been published
     user clicks link    Data and files
     user waits until page contains data uploads table
@@ -229,14 +233,15 @@ Check subject order in data catalogue
     ...    Four
     ...    locator=xpath://*[@data-testid="data-set-file-list"]/li/h4
 
-Check subject order in data guidance
+Verify newly published release is on Find Statistics page
     # TODO EES-6063 - Remove this
     user checks publication is on find statistics page    ${PUBLICATION_NAME}
-    user clicks link    ${PUBLICATION_NAME}
 
-    user waits until h1 is visible    ${PUBLICATION_NAME}    %{WAIT_MEDIUM}
+Verify newly published release is public
+    user navigates to public release page    ${PUBLIC_RELEASE_LINK}    ${PUBLICATION_NAME}    ${RELEASE_NAME}
+
+Check subject order in data guidance
     user clicks link    Data guidance
-
     user waits until page contains element    id:dataFiles
     user checks accordion is in position    One    1    id:dataFiles
     user checks accordion is in position    Two    2    id:dataFiles

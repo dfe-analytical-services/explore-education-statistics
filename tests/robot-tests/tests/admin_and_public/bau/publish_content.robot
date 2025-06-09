@@ -80,15 +80,18 @@ Click glossary info icon and validate glossary entry
 Approve release
     user approves original release for immediate publication
 
+Get public release link
+    ${PUBLIC_RELEASE_LINK}=    user gets url public release will be accessible at
+    Set Suite Variable    ${PUBLIC_RELEASE_LINK}
+
 Verify newly published release is on Find Statistics page
     # TODO EES-6063 - Remove this
     user checks publication is on find statistics page    ${PUBLICATION_NAME}
 
-Navigate to published release page
-    user clicks link    ${PUBLICATION_NAME}
-    user waits until h1 is visible    ${PUBLICATION_NAME}    %{WAIT_MEDIUM}
+Verify newly published release is public
+    user navigates to public release page    ${PUBLIC_RELEASE_LINK}    ${PUBLICATION_NAME}    ${RELEASE_NAME}
 
-    user waits until page contains title caption    ${RELEASE_NAME}    %{WAIT_MEDIUM}
+Check latest release is correct
     user checks page contains    This is the latest data
 
 Check latest release contains related dashboards section

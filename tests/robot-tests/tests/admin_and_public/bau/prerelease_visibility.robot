@@ -32,7 +32,7 @@ Upload subject
     ...    upload-file-test.meta.csv
 
 Navigate to release Sign off page
-    user navigates to release Sign off page
+    user navigates to Sign off page
 
 Get public release link
     ${PUBLIC_RELEASE_LINK}=    user gets url public release will be accessible at

@@ -67,6 +67,9 @@ Verify newly published release is on Find Statistics page
     # TODO EES-6063 - Remove this
     user checks publication is on find statistics page    ${PUBLICATION_NAME}
 
+Verify newly published release is public
+    user navigates to public release page    ${PUBLIC_RELEASE_1_LINK}    ${PUBLICATION_NAME}    ${RELEASE_1_NAME}
+
 Update publication details
     user navigates to details on publication page    ${PUBLICATION_NAME}
     user clicks button    Edit publication details
@@ -117,8 +120,10 @@ Verify updated publication title is on Find Statistics page
     user checks publication is on find statistics page    ${PUBLICATION_NAME_UPDATED}
 
 Validate publication redirect works
-    user navigates to    ${PUBLIC_RELEASE_1_LINK}
-    user waits until h1 is visible    ${PUBLICATION_NAME_UPDATED}
+    user navigates to public release page
+    ...    ${PUBLIC_RELEASE_1_LINK}
+    ...    ${PUBLICATION_NAME_UPDATED}
+    ...    ${RELEASE_1_NAME}
     user checks url contains    ${PUBLIC_PUBLICATION_URL_UPDATED}/2046-47
 
 Validate publication details are updated on public page
@@ -194,11 +199,17 @@ Get public third release link
     Set Suite Variable    ${PUBLIC_RELEASE_3_LINK}
 
 Check that second release does not contains the latest data
-    user navigates to    ${PUBLIC_RELEASE_2_LINK}
+    user navigates to public release page
+    ...    ${PUBLIC_RELEASE_2_LINK}
+    ...    ${PUBLICATION_NAME_UPDATED}
+    ...    ${RELEASE_2_NAME}
     user checks page does not contain    This is the latest data
     user checks page contains    This is not the latest data
 
 Check that third release contains the latest data
-    user navigates to    ${PUBLIC_RELEASE_3_LINK}
+    user navigates to public release page
+    ...    ${PUBLIC_RELEASE_3_LINK}
+    ...    ${PUBLICATION_NAME_UPDATED}
+    ...    ${RELEASE_3_NAME}
     user checks page does not contain    This is not the latest data
     user checks page contains    This is the latest data
