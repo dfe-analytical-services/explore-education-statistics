@@ -15,6 +15,12 @@ const releaseDataFileQueries = createQueryKeys('releaseDataFile', {
         releaseDataFileService.getDataFile(releaseVersionId, dataFileId),
     };
   },
+  listUploads(releaseId: string) {
+    return {
+      queryKey: [releaseId],
+      queryFn: () => releaseDataFileService.getDataSetUploads(releaseId),
+    };
+  },
   getDeleteFilePlan(releaseVersionId: string, dataFileId: string) {
     return {
       queryKey: [releaseVersionId, dataFileId],

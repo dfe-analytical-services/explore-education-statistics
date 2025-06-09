@@ -16,6 +16,50 @@ interface DataFileInfo extends FileInfo {
   permissions: DataFilePermissions;
 }
 
+export interface DataSetInfo {
+  id: string | undefined;
+  extension: string;
+  summary: string | undefined;
+  dataSetTitle: string;
+  dataFileId: string;
+  dataFileName: string;
+  dataFileSize: number;
+  rows: number | undefined;
+  metaFileId: string;
+  metaFileName: string;
+  metaFileSize: number;
+  status: ImportStatusCode;
+  permissions: DataFilePermissions;
+  publicApiDataSetId: string | undefined;
+  publicApiDataSetVersion: string | undefined;
+  dataSetUpload: DataSetUpload | undefined;
+  created: string;
+  userName: string;
+  replacedBy?: string;
+}
+
+export interface DataSetUpload {
+  id: string;
+  dataSetTitle: string;
+  dataFileName: string;
+  metaFileName: string;
+  status: DataSetUploadStatus;
+  screenerResult: ScreenerResultDetails;
+}
+
+export interface ScreenerResultDetails {
+  result: ScreenerOverallResult;
+  message: string;
+  testResults: ScreenerTestSummary[];
+}
+
+export interface ScreenerTestSummary {
+  testFunctionName: string;
+  testResult: ScreenerTestResult;
+  notes: string | undefined;
+  stage: ScreenerTestStage;
+}
+
 export interface DeleteDataFilePlan {
   deleteDataBlockPlan: DeleteDataBlockPlan;
   footnoteIds: string[];
@@ -92,6 +136,23 @@ export type ImportStatusCode =
   | 'CANCELLING'
   | 'CANCELLED';
 
+export type DataSetUploadStatus =
+  | 'SCREENING'
+  | 'FAILED_SCREENING'
+  | 'PENDING_REVIEW'
+  | 'PENDING_IMPORT';
+
+export type ScreenerOverallResult = 'Passed' | 'Failed';
+
+export type ScreenerTestResult = 'PASS' | 'FAIL' | 'WARNING';
+
+export type ScreenerTestStage =
+  | 'InitialFileValidation'
+  | 'PreScreening1'
+  | 'PreScreening2'
+  | 'FullChecks'
+  | 'Passed';
+
 export interface DataFileImportStatus {
   status: ImportStatusCode;
   percentageComplete: number;
@@ -126,6 +187,9 @@ const releaseDataFileService = {
       `/releaseVersions/${releaseId}/data/${fileId}`,
     );
     return mapFile(result);
+  },
+  async getDataSetUploads(releaseId: string): Promise<DataSetUpload[]> {
+    return client.get<DataSetUpload[]>(`/releaseVersions/${releaseId}/uploads`);
   },
   getDataSetAccoutrementsSummary(
     releaseVersionId: string,
@@ -174,6 +238,7 @@ const releaseDataFileService = {
 
     return mapFile(file);
   },
+  // TODO: Convert function return to void
   async uploadDataSetFilePair(
     releaseId: string,
     request: UploadDataFilesRequest,
@@ -189,6 +254,7 @@ const releaseDataFileService = {
 
     return client.post<DataSetUploadResult[]>('/releaseVersions/data', data);
   },
+  // TODO: Convert function return to void
   async uploadZippedDataSetFilePair(
     releaseId: string,
     request: UploadZipDataFileRequest,
@@ -206,6 +272,7 @@ const releaseDataFileService = {
       data,
     );
   },
+  // TODO: Convert function return to void
   async uploadBulkZipDataSetFile(
     releaseId: string,
     zipFile: File,
@@ -222,13 +289,11 @@ const releaseDataFileService = {
   async importDataSets(
     releaseId: string,
     dataSetUploadIds: string[],
-  ): Promise<DataFile[]> {
-    const files = await client.post<DataFileInfo[]>(
+  ): Promise<void> {
+    await client.post<DataFileInfo[]>(
       `/releaseVersions/${releaseId}/import-data-sets`,
       dataSetUploadIds,
     );
-
-    return files.map(file => mapFile(file));
   },
   async updateDataFilesOrder(
     releaseId: string,
@@ -243,10 +308,10 @@ const releaseDataFileService = {
   },
   getDataFileImportStatus(
     releaseId: string,
-    dataFile: DataFile,
+    dataFileId: string,
   ): Promise<DataFileImportStatus> {
     return client.get<DataFileImportStatus>(
-      `/release/${releaseId}/data/${dataFile.id}/import/status`,
+      `/release/${releaseId}/data/${dataFileId}/import/status`,
     );
   },
 

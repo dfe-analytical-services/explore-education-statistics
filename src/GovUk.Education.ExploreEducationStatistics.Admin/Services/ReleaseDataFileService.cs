@@ -205,29 +205,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         .ToList();
 
                     return await BuildDataFileViewModels(filesExcludingReplacements);
-                })
-                .OnSuccessCombineWith(async files
-                    => await dataSetUploadRepository.ListAll(releaseVersionId))
-                .OnSuccess(dataFilesAndUploads =>
-                {
-                    var (files, uploads) = dataFilesAndUploads;
-
-                    var filesFromUploads = new List<DataFileInfo>();
-                    foreach (var upload in uploads)
-                    {
-                        filesFromUploads.Add(new DataFileInfo
-                        {
-                            Id = upload.Id,
-                            FileName = upload.DataFileName,
-                            Name = upload.DataSetTitle,
-                            Size = "0kb", // TODO: Map the file size from elsewhere
-                            MetaFileName = upload.MetaFileName,
-                        });
-                    }
-
-                    files.AddRange(filesFromUploads);
-
-                    return files;
                 });
         }
 
@@ -600,7 +577,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             };
         }
 
-        public async Task<Either<ActionResult, List<DataFileInfo>>> SaveDataSetsFromTemporaryBlobStorage(
+        public async Task<Either<ActionResult, Unit>> SaveDataSetsFromTemporaryBlobStorage(
             Guid releaseVersionId,
             List<Guid> dataSetUploadIds,
             CancellationToken cancellationToken)
@@ -611,15 +588,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(() => dataSetUploadIds
                     .Select(dataSetUploadId => ValidateTempDataSetFileExistence(releaseVersionId, dataSetUploadId, cancellationToken))
                     .OnSuccessAll())
-                .OnSuccess(async dataSetUploads =>
+                .OnSuccessVoid(async dataSetUploads =>
                 {
-                    var releaseFiles = await dataSetFileStorage.MoveDataSetsToPermanentStorage(releaseVersionId, dataSetUploads, cancellationToken);
+                    await dataSetFileStorage.MoveDataSetsToPermanentStorage(releaseVersionId, dataSetUploads, cancellationToken);
 
                     // Remove upload records once the files are ready for import
                     contentDbContext.DataSetUploads.RemoveRange(dataSetUploads);
                     await contentDbContext.SaveChangesAsync(cancellationToken);
-
-                    return await BuildDataFileViewModels(releaseFiles);
                 });
         }
 
