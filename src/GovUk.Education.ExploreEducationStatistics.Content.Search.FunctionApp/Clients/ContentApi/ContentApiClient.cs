@@ -1,4 +1,5 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Net.Http.Json;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Clients.ContentApi.Dtos;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Domain;
@@ -74,7 +75,7 @@ internal class ContentApiClient(HttpClient httpClient) : IContentApiClient
                     publicationSlug,
                     error.ErrorMessage),
 
-            _ => throw new ArgumentOutOfRangeException()
+            _ => throw new UnreachableException()
         };
     }
 
@@ -87,7 +88,7 @@ internal class ContentApiClient(HttpClient httpClient) : IContentApiClient
         {
             GetResponse<PaginatedResultDto<PublicationDto>>.Success => (true, null),
             GetResponse<PaginatedResultDto<PublicationDto>>.Error error => (false, error.ErrorMessage),
-            _ => throw new ArgumentOutOfRangeException()
+            _ => throw new UnreachableException()
         };
     }
 
@@ -148,7 +149,7 @@ internal class ContentApiClient(HttpClient httpClient) : IContentApiClient
                     releaseSlug,
                     error.ErrorMessage),
 
-            _ => throw new ArgumentOutOfRangeException()
+            _ => throw new UnreachableException()
         };
     }
     
