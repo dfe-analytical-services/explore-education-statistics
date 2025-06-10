@@ -519,7 +519,7 @@ Upload replacement data
     user checks headed table body row cell contains    Metadata file    1    dates.meta.csv
     user checks headed table body row cell contains    Number of rows    1    118    wait=%{WAIT_SMALL}
     user checks headed table body row cell contains    Data file size    1    17 Kb    wait=%{WAIT_SMALL}
-    user checks headed table body row cell contains    Status    1    Replacement in progress    wait=%{WAIT_LONG}
+    user checks headed table body row cell contains    Status    1    Complete    wait=%{WAIT_LONG}
 
     user checks headed table body row cell contains    Title    2    Dates test subject
     user checks headed table body row cell contains    Data file    2    dates-replacement.csv
