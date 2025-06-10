@@ -44,18 +44,18 @@ export interface DataSetUpload {
   dataFileName: string;
   metaFileName: string;
   status: DataSetUploadStatus;
-  screenerResult: ScreenerResultDetails;
+  screenerResult: ScreenerResult;
 }
 
-export interface ScreenerResultDetails {
-  result: ScreenerOverallResult;
+export interface ScreenerResult {
+  overallResult: ScreenerOverallResult;
   message: string;
   testResults: ScreenerTestSummary[];
 }
 
 export interface ScreenerTestSummary {
   testFunctionName: string;
-  testResult: ScreenerTestResult;
+  result: ScreenerTestResult;
   notes: string | undefined;
   stage: ScreenerTestStage;
 }
@@ -272,6 +272,12 @@ const releaseDataFileService = {
       'releaseVersions/upload-bulk-zip-data',
       data,
     );
+  },
+  async deleteDataSetUpload(
+    releaseId: string,
+    uploadId: string,
+  ): Promise<void> {
+    await client.delete(`/releaseVersions/${releaseId}/upload/${uploadId}`);
   },
   async importDataSets(
     releaseId: string,

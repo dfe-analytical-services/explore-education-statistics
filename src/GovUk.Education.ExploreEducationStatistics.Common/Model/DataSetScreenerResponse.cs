@@ -1,16 +1,15 @@
 #nullable enable
-using Newtonsoft.Json.Converters;
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Model;
 
-public class DataSetScreenerResult
+public class DataSetScreenerResponse
 {
     // TODO (EES-5353): Discuss if this can just be a boolean (e.g. "Passed", "IsSuccessful")
     [JsonPropertyName("overall_stage")]
-    [Newtonsoft.Json.JsonConverter(typeof(StringEnumConverter))]
-    public ScreenerResult Result { get; set; }
+    [JsonConverter(typeof(JsonStringEnumConverter))]
+    public ScreenerResult OverallResult { get; set; }
 
     [JsonPropertyName("overall_message")]
     public required string Message { get; set; }

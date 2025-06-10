@@ -60,6 +60,6 @@ public interface IDataSetFileStorage
 
     Task AddScreenerResultToUpload(
         Guid dataSetUploadId,
-        DataSetScreenerResult screenerResult,
+        DataSetScreenerResponse screenerResult,
         CancellationToken cancellationToken);
 }
