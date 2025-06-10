@@ -14,7 +14,7 @@ import TabsSection from '@common/components/TabsSection';
 import WarningMessage from '@common/components/WarningMessage';
 import DataSetUploadSummaryList from './DataSetUploadSummaryList';
 import dataSetUploadTabIds from '../utils/dataSetUploadTabIds';
-import ScreenerResultSummaryList from './ScreenerResultSummaryList';
+import ScreenerResultsList from './ScreenerResultsList';
 import { terminalImportStatuses } from './ImporterStatus';
 import styles from './DataFilesTable.module.scss';
 
@@ -81,7 +81,7 @@ export default function DataFilesTableUploadRow({
                     </WarningMessage>
                   </>
                 )}
-                <ScreenerResultSummaryList
+                <ScreenerResultsList
                   screenerResult={dataSetUpload.screenerResult}
                   showAll={false}
                 />
@@ -95,7 +95,7 @@ export default function DataFilesTableUploadRow({
                   {dataSetUpload.screenerResult.testResults.length} tests
                   checked against this file
                 </h3>
-                <ScreenerResultSummaryList
+                <ScreenerResultsList
                   screenerResult={dataSetUpload.screenerResult}
                   showAll
                 />
