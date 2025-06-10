@@ -38,16 +38,14 @@ public static class ServiceCollectionExtensions
         serviceCollection
             .AddTransient<SearchableDocumentChecker>()
             .AddTransient<IReleaseSummaryRetriever, ReleaseSummaryRetriever>()
-            .AddTransient<IBlobNameLister, BlobNameLister>()
-    ;
+            .AddTransient<IBlobNameLister, BlobNameLister>();
 
     public static IServiceCollection ConfigureLogging(
         this IServiceCollection serviceCollection,
         IConfiguration configuration) =>
         serviceCollection
             .SetupAppInsights()
-            .AddSerilog(loggerConfiguration => loggerConfiguration.ConfigureSerilogLogger(configuration))
-        ;
+            .AddSerilog(loggerConfiguration => loggerConfiguration.ConfigureSerilogLogger(configuration));
 
     private static IServiceCollection SetupAppInsights(this IServiceCollection serviceCollection) =>
         serviceCollection
