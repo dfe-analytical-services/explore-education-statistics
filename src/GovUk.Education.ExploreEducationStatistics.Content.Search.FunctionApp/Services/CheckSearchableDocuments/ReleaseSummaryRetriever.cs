@@ -22,7 +22,7 @@ public class ReleaseSummaryRetriever(Func<IContentApiClient> contentApiClientFac
         var releaseSummaries = 
             await allLivePublicationInfos
                 .ToAsyncEnumerable()
-                .SelectAwait<PublicationInfo, ReleaseSummary>(
+                .SelectAwait(
                     async publicationInfo =>
                         await contentApiClient.GetReleaseSummary(
                             publicationInfo.PublicationSlug,
