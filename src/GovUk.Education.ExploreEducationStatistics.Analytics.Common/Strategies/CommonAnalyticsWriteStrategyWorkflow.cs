@@ -1,9 +1,10 @@
 using GovUk.Education.ExploreEducationStatistics.Analytics.Common.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
-using Newtonsoft.Json;
+using Microsoft.Extensions.Logging;
+using Formatting = Newtonsoft.Json.Formatting;
 
-namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Strategies;
+namespace GovUk.Education.ExploreEducationStatistics.Analytics.Common.Strategies;
 
 public interface ICommonAnalyticsWriteStrategyWorkflow<TAnalyticsRequest>
     where TAnalyticsRequest : IAnalyticsCaptureRequestBase
