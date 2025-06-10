@@ -18,7 +18,7 @@ public class DataSetScreenerClient(IHttpClientFactory httpClientFactory) : IData
         PropertyNamingPolicy = JsonNamingPolicy.CamelCase, // API is case sensitive
     };
 
-    public async Task<DataSetScreenerResult> ScreenDataSet(
+    public async Task<DataSetScreenerResponse> ScreenDataSet(
         DataSetScreenerRequest dataSetRequest,
         CancellationToken cancellationToken)
     {
@@ -29,7 +29,7 @@ public class DataSetScreenerClient(IHttpClientFactory httpClientFactory) : IData
         var response = await client.PostAsync("http://localhost/api/screen", content);
 
         return response.IsSuccessStatusCode
-            ? await response.Content.ReadFromJsonAsync<DataSetScreenerResult>(cancellationToken)
+            ? await response.Content.ReadFromJsonAsync<DataSetScreenerResponse>(cancellationToken)
             : throw new Exception("Screening process failed");
     }
 }

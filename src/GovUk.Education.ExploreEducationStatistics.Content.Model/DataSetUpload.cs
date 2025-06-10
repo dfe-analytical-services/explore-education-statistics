@@ -41,7 +41,7 @@ public record DataSetUpload : ICreatedTimestamp<DateTime>
     [JsonConverter(typeof(EnumToEnumValueJsonConverter<DataSetUploadStatus>))]
     public required DataSetUploadStatus Status { get; set; }
 
-    public DataSetScreenerResult? ScreenerResult { get; set; }
+    public DataSetScreenerResponse? ScreenerResult { get; set; }
 
     public DateTime Created { get; set; }
 }

@@ -345,7 +345,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         private static DataSetUploadViewModel BuildUploadViewModel(
             DataSetUpload dataSetUpload,
-            DataSetScreenerResult screenerResult)
+            DataSetScreenerResponse screenerResult)
         {
             return new DataSetUploadViewModel
             {
@@ -358,11 +358,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             };
         }
 
-        private static DataSetUploadStatus GetDataSetUploadStatus(DataSetScreenerResult screenerResult)
+        private static DataSetUploadStatus GetDataSetUploadStatus(DataSetScreenerResponse screenerResult)
         {
-            return screenerResult.Result switch
+            return screenerResult.OverallResult switch
             {
-                ScreenerResult.Passed => screenerResult.TestResults.Any(test => test.TestResult == TestResult.WARNING)
+                ScreenerResult.Passed => screenerResult.TestResults.Any(test => test.Result == TestResult.WARNING)
                     ? DataSetUploadStatus.PENDING_REVIEW
                     : DataSetUploadStatus.PENDING_IMPORT,
                 ScreenerResult.Failed => DataSetUploadStatus.FAILED_SCREENING,
