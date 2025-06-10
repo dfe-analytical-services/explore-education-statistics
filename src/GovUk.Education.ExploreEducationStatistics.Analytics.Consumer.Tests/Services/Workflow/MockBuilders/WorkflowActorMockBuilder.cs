@@ -44,37 +44,29 @@ public class WorkflowActorMockBuilder
         return this;
     }
 
-    public WorkflowActorMockBuilder WhereSourceFilesAreProcessedSuccessfully(
-        string processingFolder,
-        IEnumerable<string> sourceFiles)
+    public WorkflowActorMockBuilder WhereSourceFileBatchIsProcessedSuccessfully(
+        string batchProcessingFolder)
     {
-        sourceFiles.ForEach(file =>
-        {
-            _mock
-                .Setup(a => a.ProcessSourceFile(
-                    Path.Combine(processingFolder, file),
-                    ItIsOpenDuckDbConnection()))
-                .Returns(Task.CompletedTask);
-        });
+        _mock
+            .Setup(a => a.ProcessSourceFiles(
+                batchProcessingFolder,
+                ItIsOpenDuckDbConnection()))
+            .Returns(Task.CompletedTask);
         return this;
     }
 
     public WorkflowActorMockBuilder WhereSourceFilesAreProcessedWithErrors(
-        string processingFolder,
-        IEnumerable<string> sourceFiles)
+        string batchProcessingFolder)
     {
-        sourceFiles.ForEach(file =>
-        {
-            _mock
-                .Setup(a => a.ProcessSourceFile(
-                    Path.Combine(processingFolder, file),
-                    ItIsOpenDuckDbConnection()))
-                .ThrowsAsync(new ArgumentException($"Mock error processing file {file}"));
-        });
+        _mock
+            .Setup(a => a.ProcessSourceFiles(
+                batchProcessingFolder,
+                ItIsOpenDuckDbConnection()))
+            .ThrowsAsync(new ArgumentException($"Mock error processing batch folder {batchProcessingFolder}"));
         return this;
     }
     
-    public WorkflowActorMockBuilder WhereReportsAreGeneratedSuccessfully(
+    public WorkflowActorMockBuilder WhereReportsAreCreatedSuccessfully(
         string reportsFolder,
         string reportsFilenamePrefix)
     {
@@ -109,19 +101,15 @@ public class WorkflowActorMockBuilder
                 Times.Once);
             return this;
         }
-        
-        public Asserter ProcessSourceFileCalledFor(
-            string processingFolder,
-            IEnumerable<string> sourceFiles)
+
+        public Asserter ProcessSourceFileBatchCalledFor(
+            string batchProcessingDirectory)
         {
-            sourceFiles.ForEach(file =>
-            {
-                mock.Verify(a => 
-                    a.ProcessSourceFile(
-                        Path.Combine(processingFolder, file),
+            mock.Verify(a =>
+                    a.ProcessSourceFiles(
+                        batchProcessingDirectory,
                         It.IsAny<DuckDbConnection>()),
-                    Times.Once);
-            });
+                Times.Once);
             return this;
         }
         

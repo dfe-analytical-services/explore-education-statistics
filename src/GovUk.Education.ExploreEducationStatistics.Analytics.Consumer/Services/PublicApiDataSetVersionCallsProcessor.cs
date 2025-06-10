@@ -46,10 +46,10 @@ public class PublicApiDataSetVersionCallsProcessor(
             ");
         }
 
-        public async Task ProcessSourceFile(string sourceFilePath, DuckDbConnection connection)
+        public async Task ProcessSourceFiles(string sourceFilesDirectory, DuckDbConnection connection)
         {
             await connection.DirectCopyJsonIntoDuckDbTable(
-                jsonFilePath: sourceFilePath,
+                jsonFilePath: sourceFilesDirectory,
                 tableName: "sourceTable");
         }
 

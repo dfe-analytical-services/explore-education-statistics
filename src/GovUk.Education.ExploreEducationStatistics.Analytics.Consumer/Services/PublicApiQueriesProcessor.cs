@@ -50,7 +50,7 @@ public class PublicApiQueriesProcessor(
             ");
         }
 
-        public async Task ProcessSourceFile(string sourceFilePath, DuckDbConnection connection)
+        public async Task ProcessSourceFiles(string sourceFilesDirectory, DuckDbConnection connection)
         {
             await connection.ExecuteNonQueryAsync($@"
                 INSERT INTO sourceTable BY NAME (
@@ -58,7 +58,7 @@ public class PublicApiQueriesProcessor(
                         MD5(CONCAT(query, dataSetVersionId)) AS queryVersionHash,
                         MD5(query) AS queryHash,
                         *
-                    FROM read_json('{sourceFilePath}', 
+                    FROM read_json('{sourceFilesDirectory}', 
                         format='unstructured',
                         columns = {{
                             dataSetId: UUID, 
