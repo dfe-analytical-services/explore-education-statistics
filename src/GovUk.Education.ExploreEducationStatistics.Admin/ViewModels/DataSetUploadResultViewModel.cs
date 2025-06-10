@@ -27,5 +27,5 @@ public record DataSetUploadResultViewModel
 
     public Guid? ReplacingFileId { get; set; }
 
-    public DataSetScreenerResult? ScreenerResult { get; set; }
+    public DataSetScreenerResponse? ScreenerResult { get; set; }
 }

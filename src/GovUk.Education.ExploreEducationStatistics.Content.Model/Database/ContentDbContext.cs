@@ -165,11 +165,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 .Property(upload => upload.Status)
                 .HasConversion(new EnumToStringConverter<DataSetUploadStatus>());
 
+            //modelBuilder.Entity<DataSetUpload>(entity =>
+            //{
+            //    entity.OwnsOne(dataSetUpload => dataSetUpload.ScreenerResult, b =>
+            //    {
+            //        b.Property(e => e.OverallResult).HasConversion<ScreenerResult>();
+            //        b.OwnsMany(c => c.TestResults, testResult =>
+            //        {
+            //            testResult.Property(e => e.Result).HasConversion<TestResult>();
+            //            testResult.Property(e => e.Stage).HasConversion<Stage>();
+            //        });
+            //    });
+            //});
+
             modelBuilder.Entity<DataSetUpload>()
                 .Property(upload => upload.ScreenerResult)
                 .HasConversion(
                     r => JsonConvert.SerializeObject(r),
-                    r => JsonConvert.DeserializeObject<DataSetScreenerResult>(r));
+                    r => JsonConvert.DeserializeObject<DataSetScreenerResponse>(r));
         }
 
         private static void ConfigureDataImport(ModelBuilder modelBuilder)

@@ -1,47 +1,58 @@
-import Link from '@admin/components/Link';
-import {
-  releaseDataFileRoute,
-  ReleaseDataFileRouteParams,
-} from '@admin/routes/releaseRoutes';
-import { DataSetUpload } from '@admin/services/releaseDataFileService';
+import releaseDataFileService, {
+  DataSetUpload,
+} from '@admin/services/releaseDataFileService';
 import ButtonGroup from '@common/components/ButtonGroup';
 import ButtonText from '@common/components/ButtonText';
 import Modal from '@common/components/Modal';
-import React from 'react';
-import { generatePath } from 'react-router';
+import React, { useCallback } from 'react';
 import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
 import WarningMessage from '@common/components/WarningMessage';
+import ModalConfirm from '@common/components/ModalConfirm';
+import useToggle from '@common/hooks/useToggle';
+import logger from '@common/services/logger';
 import DataSetUploadSummaryList from './DataSetUploadSummaryList';
 import dataSetUploadTabIds from '../utils/dataSetUploadTabIds';
 import ScreenerResultsList from './ScreenerResultsList';
-import { terminalImportStatuses } from './ImporterStatus';
 import styles from './DataFilesTable.module.scss';
 
 interface Props {
   canUpdateRelease?: boolean;
   dataSetUpload: DataSetUpload;
-  publicationId: string;
   releaseVersionId: string;
 }
 
 export default function DataFilesTableUploadRow({
   canUpdateRelease,
   dataSetUpload,
-  publicationId,
   releaseVersionId,
 }: Props) {
+  const [open, toggleOpen] = useToggle(false);
+
   const hasFailures = dataSetUpload.screenerResult.testResults.some(
-    result => result.testResult === 'FAIL',
+    testResult => testResult.result === 'FAIL',
   );
   const hasWarnings = dataSetUpload.screenerResult.testResults.some(
-    result => result.testResult === 'WARNING',
+    testResult => testResult.result === 'WARNING',
   );
   let tabTitle = '';
 
   if (hasFailures && hasWarnings) tabTitle = 'Failures & warnings';
   if (hasFailures && !hasWarnings) tabTitle = 'Failures';
   if (!hasFailures && hasWarnings) tabTitle = 'Warnings';
+
+  const handleDeleteConfirm = useCallback(async () => {
+    try {
+      await releaseDataFileService.deleteDataSetUpload(
+        releaseVersionId,
+        dataSetUpload.id,
+      );
+    } catch (err) {
+      logger.error(err);
+    } finally {
+      toggleOpen.off();
+    }
+  }, [releaseVersionId, dataSetUpload.id, toggleOpen]);
 
   return (
     <tr key={dataSetUpload.dataSetTitle}>
@@ -56,15 +67,15 @@ export default function DataFilesTableUploadRow({
         <ButtonGroup className={styles.actions}>
           <Modal
             showClose
-            title="Data file details"
+            title="Data set details"
             triggerButton={<ButtonText>View details</ButtonText>}
           >
-            <Tabs id="data-and-files-tabs">
+            <Tabs id="data-set-upload-tabs">
               <TabsSection
                 id={dataSetUploadTabIds.screenerFailuresAndWarnings}
                 title={tabTitle}
               >
-                {dataSetUpload.screenerResult.result === 'Failed' ? (
+                {dataSetUpload.screenerResult.overallResult === 'Failed' ? (
                   <>
                     <h3>Screener test failures</h3>
                     <WarningMessage>
@@ -108,21 +119,22 @@ export default function DataFilesTableUploadRow({
               </TabsSection>
             </Tabs>
           </Modal>
-          {canUpdateRelease &&
-            terminalImportStatuses.includes(dataSetUpload.status) && (
-              <Link
-                to={generatePath<ReleaseDataFileRouteParams>(
-                  releaseDataFileRoute.path,
-                  {
-                    publicationId,
-                    releaseVersionId,
-                    fileId: dataSetUpload.id,
-                  },
-                )}
-              >
-                Edit title
-              </Link>
-            )}
+          {canUpdateRelease && (
+            <ModalConfirm
+              open={open}
+              title="Confirm deletion of selected data files"
+              triggerButton={
+                <ButtonText onClick={toggleOpen.on}>Delete file</ButtonText>
+              }
+              onConfirm={handleDeleteConfirm}
+            >
+              <p>
+                Are you sure you want to delete{' '}
+                <strong>{dataSetUpload.dataSetTitle}</strong>?
+              </p>
+              <p>This data set has not yet been imported.</p>
+            </ModalConfirm>
+          )}
         </ButtonGroup>
       </td>
     </tr>

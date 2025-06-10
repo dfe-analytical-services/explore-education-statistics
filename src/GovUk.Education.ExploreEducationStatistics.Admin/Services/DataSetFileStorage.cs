@@ -250,7 +250,7 @@ public class DataSetFileStorage(
 
     public async Task AddScreenerResultToUpload(
         Guid dataSetUploadId,
-        DataSetScreenerResult screenerResult,
+        DataSetScreenerResponse screenerResult,
         CancellationToken cancellationToken)
     {
         var upload = await contentDbContext.DataSetUploads.SingleAsync(upload => upload.Id == dataSetUploadId, cancellationToken);

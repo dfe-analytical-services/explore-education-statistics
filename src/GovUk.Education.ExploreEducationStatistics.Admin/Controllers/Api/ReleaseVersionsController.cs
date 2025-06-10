@@ -98,10 +98,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         }
 
         [HttpGet("releaseVersions/{releaseVersionId:guid}/uploads")]
-        public async Task<ActionResult<List<DataSetUploadViewModel>>> GetDataSetUploads(Guid releaseVersionId)
+        public async Task<ActionResult<List<DataSetUploadViewModel>>> GetDataSetUploads(
+            Guid releaseVersionId,
+            CancellationToken cancellationToken)
         {
             return await _dataSetUploadRepository
-                .ListAll(releaseVersionId)
+                .ListAll(releaseVersionId, cancellationToken)
+                .HandleFailuresOrOk();
+        }
+
+        [HttpDelete("releaseVersions/{releaseVersionId:guid}/upload/{dataSetUploadId:guid}")]
+        public async Task<ActionResult<Unit>> DeleteDataSetUploads(
+            Guid releaseVersionId,
+            Guid dataSetUploadId,
+            CancellationToken cancellationToken)
+        {
+            return await _dataSetUploadRepository
+                .Delete(releaseVersionId, dataSetUploadId, cancellationToken)
                 .HandleFailuresOrOk();
         }
 
