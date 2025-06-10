@@ -5,7 +5,6 @@ import DataFileUploadForm, {
 import releaseDataFileQueries from '@admin/queries/releaseDataFileQueries';
 import permissionService from '@admin/services/permissionService';
 import releaseDataFileService, {
-  DataSetUploadResult,
   DataFile,
   DataFileImportStatus,
   DataSetUpload,
@@ -39,7 +38,7 @@ export default function ReleaseDataUploadsSection({
   const [allDataSetUploads, setAllDataSetUploads] = useState<DataSetUpload[]>(
     [],
   );
-  const [uploadResults, setUploadResults] = useState<DataSetUploadResult[]>();
+  // const [uploadResults, setUploadResults] = useState<DataSetUploadResult[]>();
   const [isReordering, toggleReordering] = useToggle(false);
 
   const {
