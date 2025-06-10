@@ -156,8 +156,8 @@ public class ContentApiClientTests(ITestOutputHelper output)
         public async Task GetReleaseSummary()
         {
             var sut = GetSut();
-            var publicationSlug = "lee-s-first-publication";
-            var releaseSlug = "2024-25-q1";
+            var publicationSlug = "seed-publication-pupil-absence-in-schools-in-england";
+            var releaseSlug = "2016-17";
             var releaseSummary = await sut.GetReleaseSummary(publicationSlug, releaseSlug);
             PrintAsJson(releaseSummary);
         }
