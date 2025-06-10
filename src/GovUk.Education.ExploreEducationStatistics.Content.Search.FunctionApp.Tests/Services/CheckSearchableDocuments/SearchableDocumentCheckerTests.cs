@@ -73,7 +73,7 @@ public class SearchableDocumentCheckerTests
 
         // Assert
         Assert.NotNull(report);
-        Assert.Equal(new[]{"release-2"}, report.MissingBlobs);
+        Assert.Equal(["release-2"], report.MissingBlobs);
         Assert.Empty(report.ExtraneousBlobs);
         Assert.Equal(2, report.OkBlobCount);
         Assert.Equal(2, report.TotalBlobCount);
@@ -110,7 +110,7 @@ public class SearchableDocumentCheckerTests
         // Assert
         Assert.NotNull(report);
         Assert.Empty(report.MissingBlobs);
-        Assert.Equal(new[]{"release-4"}, report.ExtraneousBlobs);
+        Assert.Equal(["release-4"], report.ExtraneousBlobs);
         Assert.Equal(3, report.OkBlobCount);
         Assert.Equal(4, report.TotalBlobCount);
         Assert.Equal(3, report.TotalPublicationCount);
@@ -177,8 +177,8 @@ public class SearchableDocumentCheckerTests
 
         // Assert
         Assert.NotNull(report);
-        Assert.Equal(new[]{"release-6", "release-7", "release-8", "release-9"}, report.MissingBlobs);
-        Assert.Equal(new[]{"release-1", "release-2", "release-3"}, report.ExtraneousBlobs);
+        Assert.Equal(["release-6", "release-7", "release-8", "release-9"], report.MissingBlobs);
+        Assert.Equal(["release-1", "release-2", "release-3"], report.ExtraneousBlobs);
         Assert.Equal(2, report.OkBlobCount);
         Assert.Equal(5, report.TotalBlobCount);
         Assert.Equal(6, report.TotalPublicationCount);
