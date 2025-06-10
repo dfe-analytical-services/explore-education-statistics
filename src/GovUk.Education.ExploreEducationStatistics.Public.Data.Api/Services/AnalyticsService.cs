@@ -66,13 +66,13 @@ public class AnalyticsService(
         CancellationToken cancellationToken = default)
     {
         await DoCaptureCall(
-            requestSupplier: () => Task.FromResult(
+            requestSupplier: () => Task.FromResult<CapturePublicationCallRequest?>(
                 new CapturePublicationCallRequest(
                     PublicationId: publicationId,
                     PublicationTitle: publicationTitle,
                     Parameters: parameters,
                     StartTime: dateTimeProvider.UtcNow,
-                    Type: type))!,
+                    Type: type)),
             cancellationToken: cancellationToken);
     }
     
