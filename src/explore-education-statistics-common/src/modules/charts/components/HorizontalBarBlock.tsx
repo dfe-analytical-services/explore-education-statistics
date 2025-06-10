@@ -135,6 +135,7 @@ const HorizontalBarBlock = ({
           stackOffset={stacked ? 'sign' : undefined}
           margin={{
             left: 30,
+            top: 20,
           }}
         >
           <CartesianGrid
