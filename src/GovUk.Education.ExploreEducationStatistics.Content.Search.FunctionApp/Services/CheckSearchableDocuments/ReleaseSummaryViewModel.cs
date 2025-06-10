@@ -4,21 +4,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.
 
 public record ReleaseSummaryViewModel
 {
-    public string Id { get; private init; }
-    public string ReleaseId { get; private init; }
-    public string Title { get; private init; }
-    public string Slug { get; private init; }
-    public string? YearTitle { get; private init; }
-    public string? CoverageTitle { get; private init; }
-    public DateTimeOffset? Published { get; private init; }
-    public string? Type { get; private init; }
-    public bool? IsLatestRelease { get; private init; }
+    public string Id { get; init; }
+    public string ReleaseId { get; init; }
+    public string Title { get; init; }
+    public string Slug { get; init; }
+    public string? YearTitle { get; init; }
+    public string? CoverageTitle { get; init; }
+    public DateTimeOffset? Published { get; init; }
+    public string? Type { get; init; }
+    public bool? IsLatestRelease { get; init; }
     
-    public string? PublicationId { get; private init; }
-    public string? PublicationTitle { get; private init; }
-    public string? PublicationSlug { get; private init; }
-    
-    public ReleaseSummaryViewModel(ReleaseSummary releaseSummary)
+    public string? PublicationId { get; init; }
+    public string? PublicationTitle { get; init; }
+    public string? PublicationSlug { get; init; }
+
+    private ReleaseSummaryViewModel(ReleaseSummary releaseSummary)
     {
         Id = releaseSummary.Id;
         ReleaseId = releaseSummary.ReleaseId;
