@@ -790,8 +790,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     var errorMessage =
                         "Failed to find the data set version expected to be linked to the release file that is being deleted for the " +
                         $"data set id: {releaseFile.PublicApiDataSetId.Value} and the data set version number: {releaseFile.PublicApiDataSetVersionString}. This has occured when creating the next draft version.";
-                    logger.LogError(errorMessage);
-                    throw new DataSetVersionNotFoundException(errorMessage);
+                    var notFoundException = new DataSetVersionNotFoundException(errorMessage);
+                    logger.LogError(notFoundException, errorMessage);
+                    throw notFoundException;
                 }).OnSuccess(dsv => versionStatus = dsv.Status);
             
             return ShouldAllowApiDataSetDeletion(versionStatus!.Value) 

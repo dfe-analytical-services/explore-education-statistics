@@ -20,6 +20,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Security;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.Cache;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
+using Microsoft.Extensions.Logging;
 using Moq;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityPolicies;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
@@ -387,7 +388,8 @@ public class ReleaseVersionServicePermissionTests
              featureFlags: Microsoft.Extensions.Options.Options.Create(new FeatureFlags()
              {
                  EnableReplacementOfPublicApiDataSets = enableReplacementOfPublicApiDataSets
-             })
+             }),
+            Mock.Of<ILogger<ReleaseVersionService>>()
         );
     }
 }
