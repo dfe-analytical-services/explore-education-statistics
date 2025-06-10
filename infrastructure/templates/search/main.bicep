@@ -61,20 +61,20 @@ var resourceNames = {
   existingResources: {
     adminApp: '${subscription}-as-ees-admin'
     logAnalyticsWorkspace: '${resourcePrefix}-${abbreviations.operationalInsightsWorkspaces}'
-    publisherFunction: '${subscription}-fa-ees-publisher'
-    keyVault: '${subscription}-kv-ees-01'
-    vNet: '${subscription}-vnet-ees'
-    alertsGroup: '${subscription}-ag-ees-alertedusers'
+    publisherFunction: '${subscription}-${abbreviations.webSitesFunctions}-ees-publisher'
+    keyVault: '${subscription}-${abbreviations.keyVaultVaults}-ees-01'
+    vNet: '${subscription}-${abbreviations.networkVirtualNetworks}-ees'
+    alertsGroup: '${subscription}-${abbreviations.insightsActionGroups}-ees-alertedusers'
     subnets: {
-      searchDocsFunction: '${resourcePrefix}-snet-${abbreviations.webSitesFunctions}-searchdocs'
-      searchDocsFunctionPrivateEndpoints: '${resourcePrefix}-snet-${abbreviations.webSitesFunctions}-searchdocs-pep'
-      searchStoragePrivateEndpoints: '${resourcePrefix}-snet-${abbreviations.storageStorageAccounts}-search-pep'
+      searchDocsFunction: '${resourcePrefix}-${abbreviations.networkVirtualNetworksSubnets}-${abbreviations.webSitesFunctions}-searchdocs'
+      searchDocsFunctionPrivateEndpoints: '${resourcePrefix}-${abbreviations.networkVirtualNetworksSubnets}-${abbreviations.webSitesFunctions}-searchdocs-pep'
+      searchStoragePrivateEndpoints: '${resourcePrefix}-${abbreviations.networkVirtualNetworksSubnets}-${abbreviations.storageStorageAccounts}-search-pep'
     }
   }
 }
 
 module monitoringModule 'application/monitoring.bicep' = {
-  name: 'monitoringModule'
+  name: 'monitoringModuleDeploy'
   params: {
     location: location
     resourcePrefix: resourcePrefix
@@ -89,7 +89,7 @@ module monitoringModule 'application/monitoring.bicep' = {
 // and the Publisher Function App.
 // The Search Service relies on this infrastructure to subscribe to events.
 module eventMessagingModule 'application/eventMessaging.bicep' = {
-  name: 'eventMessagingModule'
+  name: 'eventMessagingModuleDeploy'
   params: {
     location: location
     ipRules: [] // TODO EES-6036 Should be maintenanceIpRanges
@@ -99,8 +99,8 @@ module eventMessagingModule 'application/eventMessaging.bicep' = {
   }
 }
 
-module searchDocsFunctionModule 'application/searchDocsFunction.bicep' = {
-  name: 'searchDocsFunctionModule'
+module searchDocsFunctionAppModule 'application/searchDocsFunctionApp.bicep' = {
+  name: 'searchDocsFunctionAppApplicationModuleDeploy'
   params: {
     location: location
     resourceNames: resourceNames
@@ -131,11 +131,11 @@ module searchDocsFunctionModule 'application/searchDocsFunction.bicep' = {
 }
 
 module searchDocsFunctionEventSubscriptionsModule 'application/searchDocsFunctionEventSubscriptions.bicep' = {
-  name: 'searchDocsFunctionEventSubscriptionsModule'
+  name: 'searchDocsFunctionEventSubscriptionsModuleDeploy'
   params: {
     resourcePrefix: resourcePrefix
-    searchDocsFunctionAppStorageAccountName: searchDocsFunctionModule.outputs.functionAppStorageAccountName
-    storageQueueNames: searchDocsFunctionModule.outputs.storageQueueNames
+    searchDocsFunctionAppStorageAccountName: searchDocsFunctionAppModule.outputs.functionAppStorageAccountName
+    storageQueueNames: searchDocsFunctionAppModule.outputs.storageQueueNames
   }
   dependsOn: [
     eventMessagingModule
@@ -143,7 +143,7 @@ module searchDocsFunctionEventSubscriptionsModule 'application/searchDocsFunctio
 }
 
 module searchServiceModule 'application/searchService.bicep' = {
-  name: 'searchServiceModule'
+  name: 'searchServiceApplicationModuleDeploy'
   params: {
     location: location
     githubSourceRef: githubSourceRef
@@ -151,12 +151,12 @@ module searchServiceModule 'application/searchService.bicep' = {
     publicSiteUrl: publicSiteUrl
     resourceNames: resourceNames
     resourcePrefix: resourcePrefix
-    searchServiceIpRules: []
+    searchServiceIpRules: [] // No restrictions applied as the resource is intended to be publicly accessible.
     storageIpRules: maintenanceIpRanges
     deploySearchConfig: deploySearchConfig
     tagValues: tagValues
   }
 }
 
-output searchDocsFunctionAppUrl string = searchDocsFunctionModule.outputs.functionAppUrl
+output searchDocsFunctionAppUrl string = searchDocsFunctionAppModule.outputs.functionAppUrl
 output searchServiceEndpoint string = searchServiceModule.outputs.searchServiceEndpoint
