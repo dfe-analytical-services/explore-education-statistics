@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Analytics.Common.Strategies;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Requests;
@@ -77,12 +78,12 @@ public class AnalyticsWritePublicCsvDownloadStrategyTests
 
     private AnalyticsWritePublicCsvDownloadStrategy BuildStrategy(
         IAnalyticsPathResolver pathResolver,
-        DateTimeProvider? dateTimeProvider = null,
-        ILogger<AnalyticsWritePublicCsvDownloadStrategy>? logger = null)
+        DateTimeProvider? dateTimeProvider = null)
     {
         return new AnalyticsWritePublicCsvDownloadStrategy(
             pathResolver,
-            dateTimeProvider ?? new DateTimeProvider(),
-            logger ?? Mock.Of<ILogger<AnalyticsWritePublicCsvDownloadStrategy>>());
+            new CommonAnalyticsWriteStrategyWorkflow<CaptureCsvDownloadRequest>(
+                dateTimeProvider: dateTimeProvider ?? new DateTimeProvider(),
+                Mock.Of<ILogger<CommonAnalyticsWriteStrategyWorkflow<CaptureCsvDownloadRequest>>>()));
     }
 }

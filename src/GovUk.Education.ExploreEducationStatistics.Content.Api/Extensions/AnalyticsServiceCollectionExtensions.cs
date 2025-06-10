@@ -1,5 +1,6 @@
 using GovUk.Education.ExploreEducationStatistics.Analytics.Common;
 using GovUk.Education.ExploreEducationStatistics.Analytics.Common.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Analytics.Common.Strategies;
 using GovUk.Education.ExploreEducationStatistics.Content.Services;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Strategies;
@@ -41,6 +42,10 @@ public static class AnalyticsServiceCollectionExtensions
 
         services.AddTransient<IAnalyticsWriteStrategy, AnalyticsWritePublicZipDownloadStrategy>();
         services.AddTransient<IAnalyticsWriteStrategy, AnalyticsWritePublicCsvDownloadStrategy>();
+        
+        services.AddTransient(
+            typeof(ICommonAnalyticsWriteStrategyWorkflow<>),
+            typeof(CommonAnalyticsWriteStrategyWorkflow<>));
 
         return services;
     }
