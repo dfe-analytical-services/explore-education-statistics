@@ -6,6 +6,9 @@ import _releaseDataFileService, {
   UploadZipDataFileRequest,
   DataSetUploadResult,
 } from '@admin/services/releaseDataFileService';
+import _dataReplacementService, {
+  DataReplacementPlan,
+} from '@admin/services/dataReplacementService';
 import { screen, waitFor, within } from '@testing-library/react';
 import React from 'react';
 import { MemoryRouter } from 'react-router';
@@ -16,9 +19,11 @@ import render from '@common-test/render';
 
 jest.mock('@admin/services/releaseDataFileService');
 jest.mock('@admin/services/permissionService');
+jest.mock('@admin/services/dataReplacementService');
 
 const releaseDataFileService = jest.mocked(_releaseDataFileService);
 const permissionService = jest.mocked(_permissionService);
+const dataReplacementService = jest.mocked(_dataReplacementService);
 
 describe('ReleaseDataUploadsSection', () => {
   const testDataFiles: DataFile[] = [
@@ -110,6 +115,22 @@ describe('ReleaseDataUploadsSection', () => {
     totalRows: 100,
   };
 
+  const testValidReplacementPlan: DataReplacementPlan = {
+    valid: true,
+    dataBlocks: [],
+    footnotes: [],
+    originalSubjectId: 'subject-1',
+    replacementSubjectId: 'subject-1',
+    apiDataSetVersionPlan: {
+      id: '',
+      dataSetId: '',
+      name: '',
+      version: '',
+      status: '',
+      valid: false,
+    },
+  };
+
   test('renders uploaded data files table', async () => {
     releaseDataFileService.getDataFiles.mockResolvedValue(testDataFiles);
     releaseDataFileService.getDataFileImportStatus.mockResolvedValue(
@@ -152,11 +173,25 @@ describe('ReleaseDataUploadsSection', () => {
   test('renders data files replacements table', async () => {
     releaseDataFileService.getDataFiles.mockResolvedValue([
       { ...testDataFiles[0], replacedBy: 'data-replacement-1' },
-      { ...testDataFiles[1], replacedBy: 'data-replacement-1' },
+      { ...testDataFiles[1], replacedBy: 'data-replacement-2' },
     ]);
 
     releaseDataFileService.getDataFileImportStatus.mockResolvedValue(
       testCompleteImportStatus,
+    );
+
+    releaseDataFileService.getDataFile.mockResolvedValueOnce({
+      ...testDataFiles[0],
+      id: 'data-replacement-1',
+    });
+
+    releaseDataFileService.getDataFile.mockResolvedValueOnce({
+      ...testDataFiles[1],
+      id: 'data-replacement-2',
+    });
+
+    dataReplacementService.getReplacementPlan.mockResolvedValue(
+      testValidReplacementPlan,
     );
 
     render(
@@ -171,6 +206,8 @@ describe('ReleaseDataUploadsSection', () => {
 
     expect(await screen.findByText('Uploaded data files')).toBeInTheDocument();
 
+    expect(await screen.findByText('Test data 2')).toBeInTheDocument();
+
     const replacementRows = getAllFileTableRows('Data file replacements');
 
     expect(replacementRows).toHaveLength(3);
@@ -181,9 +218,7 @@ describe('ReleaseDataUploadsSection', () => {
       'Test data 1',
     );
     expect(replacementRow1.getByTestId('Size')).toHaveTextContent('50 Kb');
-    expect(replacementRow1.getByTestId('Status')).toHaveTextContent(
-      'Replacement in progress',
-    );
+    expect(replacementRow1.getByTestId('Status')).toHaveTextContent('Complete');
 
     const replacementRow2 = within(replacementRows[2]);
 
@@ -191,9 +226,7 @@ describe('ReleaseDataUploadsSection', () => {
       'Test data 2',
     );
     expect(replacementRow2.getByTestId('Size')).toHaveTextContent('100 Kb');
-    expect(replacementRow2.getByTestId('Status')).toHaveTextContent(
-      'Replacement in progress',
-    );
+    expect(replacementRow2.getByTestId('Status')).toHaveTextContent('Complete');
   });
 
   test('renders data files and data file replacements tables', async () => {
@@ -206,6 +239,15 @@ describe('ReleaseDataUploadsSection', () => {
       testCompleteImportStatus,
     );
 
+    releaseDataFileService.getDataFile.mockResolvedValue({
+      ...testDataFiles[0],
+      id: 'data-replacement-1',
+    });
+
+    dataReplacementService.getReplacementPlan.mockResolvedValue(
+      testValidReplacementPlan,
+    );
+
     render(
       <MemoryRouter>
         <ReleaseDataUploadsSection
@@ -217,6 +259,7 @@ describe('ReleaseDataUploadsSection', () => {
     );
 
     expect(await screen.findByText('Uploaded data files')).toBeInTheDocument();
+    expect(await screen.findByText('Test data 1')).toBeInTheDocument();
 
     const replacementRows = getAllFileTableRows('Data file replacements');
 
@@ -228,9 +271,7 @@ describe('ReleaseDataUploadsSection', () => {
       'Test data 1',
     );
     expect(replacementRow1.getByTestId('Size')).toHaveTextContent('50 Kb');
-    expect(replacementRow1.getByTestId('Status')).toHaveTextContent(
-      'Replacement in progress',
-    );
+    expect(replacementRow1.getByTestId('Status')).toHaveTextContent('Complete');
 
     const fileTableRows = getAllFileTableRows('Data files');
 
@@ -323,75 +364,6 @@ describe('ReleaseDataUploadsSection', () => {
 
       expect(modal.getByTestId('Date uploaded')).toHaveTextContent(
         '1 July 2020, 12:00',
-      );
-    });
-
-    test('renders details of data file replacement when opened', async () => {
-      releaseDataFileService.getDataFiles.mockResolvedValue([
-        {
-          ...testDataFiles[0],
-          replacedBy: 'data-replacement-1',
-        },
-      ]);
-      releaseDataFileService.getDataFileImportStatus.mockResolvedValue(
-        testCompleteImportStatus,
-      );
-
-      const { user } = render(
-        <MemoryRouter>
-          <ReleaseDataUploadsSection
-            publicationId="publication-1"
-            releaseVersionId="release-1"
-            canUpdateRelease
-          />
-        </MemoryRouter>,
-      );
-
-      expect(releaseDataFileService.getDataFiles).toHaveBeenCalledWith(
-        'release-1',
-      );
-
-      expect(
-        await screen.findByText('Uploaded data files'),
-      ).toBeInTheDocument();
-
-      const replacementRows = getAllFileTableRows('Data file replacements');
-
-      expect(replacementRows).toHaveLength(2);
-
-      const replacementRow = within(replacementRows[1]);
-
-      await user.click(
-        replacementRow.getByRole('button', { name: 'View details' }),
-      );
-
-      expect(await screen.findByText('Data file details')).toBeInTheDocument();
-
-      const modal = within(screen.getByRole('dialog'));
-
-      expect(modal.getByTestId('Title')).toHaveTextContent('Test data 1');
-
-      expect(
-        within(modal.getByTestId('Data file')).getByRole('button'),
-      ).toHaveTextContent('data-1.csv');
-      expect(
-        within(modal.getByTestId('Meta file')).getByRole('button'),
-      ).toHaveTextContent('data-1.meta.csv');
-
-      expect(modal.getByTestId('Size')).toHaveTextContent('50 Kb');
-      expect(modal.getByTestId('Number of rows')).toHaveTextContent('100');
-      expect(modal.getByTestId('Status')).toHaveTextContent(
-        'Replacement in progress',
-      );
-
-      expect(
-        within(modal.getByTestId('Uploaded by')).getByRole('link', {
-          name: 'user1@test.com',
-        }),
-      ).toHaveAttribute('href', 'mailto:user1@test.com');
-
-      expect(modal.getByTestId('Date uploaded')).toHaveTextContent(
-        '12 June 2020, 12:00',
       );
     });
   });
