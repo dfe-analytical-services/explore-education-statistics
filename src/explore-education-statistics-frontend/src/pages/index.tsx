@@ -26,7 +26,7 @@ function HomePage() {
           title="Browse data catalogue"
           text="Browse all of the available open data and choose files to explore
           or download."
-          destination="/data-tables"
+          destination="/data-catalogue"
           buttonText="Browse"
         />
         <HomepageCard
