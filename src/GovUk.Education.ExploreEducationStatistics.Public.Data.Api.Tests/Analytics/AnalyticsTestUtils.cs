@@ -74,7 +74,8 @@ public static class AnalyticsTestAssertions
     }
 
     public static async Task AssertPublicationAnalyticsCallCaptured(
-        PublishedPublicationSummaryViewModel publicationViewModel,
+        Guid publicationId,
+        string publicationTitle,
         PublicationCallType expectedType,
         string expectedAnalyticsPath,
         object? expectedParameters)
@@ -91,8 +92,8 @@ public static class AnalyticsTestAssertions
 
         Assert.NotNull(capturedCall);
         Assert.Equal(expectedType, capturedCall.Type);
-        Assert.Equal(publicationViewModel.Id, capturedCall.PublicationId);
-        Assert.Equal(publicationViewModel.Title, capturedCall.PublicationTitle);
+        Assert.Equal(publicationId, capturedCall.PublicationId);
+        Assert.Equal(publicationTitle, capturedCall.PublicationTitle);
         capturedCall.StartTime.AssertUtcNow(withinMillis: 5000);
 
         if (expectedParameters == null)

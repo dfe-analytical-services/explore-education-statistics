@@ -1,5 +1,6 @@
 using GovUk.Education.ExploreEducationStatistics.Analytics.Common.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Requests;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services.Interfaces;
@@ -15,6 +16,7 @@ public class AnalyticsService(
     IAnalyticsManager analyticsManager,
     IPreviewTokenService previewTokenService,
     PublicDataDbContext publicDataDbContext,
+    IContentApiClient contentApiClient,
     DateTimeProvider dateTimeProvider,
     IHttpContextAccessor httpContextAccessor,
     ILogger<AnalyticsService> logger) : IAnalyticsService
@@ -29,7 +31,30 @@ public class AnalyticsService(
                 new CaptureTopLevelCallRequest(
                     Type: type,
                     Parameters: parameters,
-                    StartTime: dateTimeProvider.UtcNow)),
+                    StartTime: dateTimeProvider.UtcNow))!,
+            cancellationToken: cancellationToken);
+    }
+
+    public async Task CapturePublicationCall(
+        Guid publicationId,
+        PublicationCallType type,
+        object? parameters = null,
+        CancellationToken cancellationToken = default)
+    {
+        await DoCaptureCall(
+            requestSupplier: async () =>
+            {
+                return await contentApiClient
+                    .GetPublication(publicationId, cancellationToken)
+                    .OnSuccess(publication =>
+                        new CapturePublicationCallRequest(
+                            PublicationId: publicationId,
+                            PublicationTitle: publication.Title,
+                            Parameters: parameters,
+                            StartTime: dateTimeProvider.UtcNow,
+                            Type: type))!
+                    .OrElse(CapturePublicationCallRequest? () => null);
+            },
             cancellationToken: cancellationToken);
     }
     
@@ -41,7 +66,7 @@ public class AnalyticsService(
         CancellationToken cancellationToken = default)
     {
         await DoCaptureCall(
-            requestSupplier: () => Task.FromResult(
+            requestSupplier: () => Task.FromResult<CapturePublicationCallRequest?>(
                 new CapturePublicationCallRequest(
                     PublicationId: publicationId,
                     PublicationTitle: publicationTitle,
@@ -130,7 +155,7 @@ public class AnalyticsService(
     }
 
     private async Task DoCaptureCall<TAnalyticsCaptureRequest>(
-        Func<Task<TAnalyticsCaptureRequest>> requestSupplier,
+        Func<Task<TAnalyticsCaptureRequest?>> requestSupplier,
         CancellationToken cancellationToken = default)
         where TAnalyticsCaptureRequest : IAnalyticsCaptureRequestBase
     {
@@ -149,6 +174,11 @@ public class AnalyticsService(
             }
 
             var request = await requestSupplier();
+
+            if (request == null)
+            {
+                return;
+            }
 
             await analyticsManager.Add(request, cancellationToken);
         }
@@ -193,6 +223,15 @@ public class NoOpAnalyticsService : IAnalyticsService
 {
     public Task CaptureTopLevelCall(
         TopLevelCallType type,
+        object? parameters = null,
+        CancellationToken cancellationToken = default)
+    {
+        return Task.CompletedTask;
+    }
+
+    public Task CapturePublicationCall(
+        Guid publicationId,
+        PublicationCallType type,
         object? parameters = null,
         CancellationToken cancellationToken = default)
     {
