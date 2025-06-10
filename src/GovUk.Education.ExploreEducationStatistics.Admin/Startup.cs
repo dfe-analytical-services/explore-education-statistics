@@ -1,10 +1,14 @@
 #nullable enable
 using FluentValidation;
 using GovUk.Education.ExploreEducationStatistics.Admin.Database;
+using GovUk.Education.ExploreEducationStatistics.Admin.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Admin.Hubs;
 using GovUk.Education.ExploreEducationStatistics.Admin.Hubs.Filters;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Options;
+using GovUk.Education.ExploreEducationStatistics.Admin.Repositories;
+using GovUk.Education.ExploreEducationStatistics.Admin.Repositories.Public.Data;
+using GovUk.Education.ExploreEducationStatistics.Admin.Repositories.Public.Data.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
@@ -24,6 +28,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Cache;
 using GovUk.Education.ExploreEducationStatistics.Common.Cancellation;
 using GovUk.Education.ExploreEducationStatistics.Common.Config;
+using GovUk.Education.ExploreEducationStatistics.Common.Converters;
 using GovUk.Education.ExploreEducationStatistics.Common.Database;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
@@ -85,13 +90,9 @@ using Semver;
 using System;
 using System.Collections.Generic;
 using System.Net.Http;
+using System.Text.Json.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Admin.Extensions;
-using GovUk.Education.ExploreEducationStatistics.Common.Converters;
-using GovUk.Education.ExploreEducationStatistics.Admin.Repositories;
-using GovUk.Education.ExploreEducationStatistics.Admin.Repositories.Public.Data;
-using GovUk.Education.ExploreEducationStatistics.Admin.Repositories.Public.Data.Interfaces;
 using Thinktecture;
 using static GovUk.Education.ExploreEducationStatistics.Common.Utils.StartupUtils;
 using ContentGlossaryService = GovUk.Education.ExploreEducationStatistics.Content.Services.GlossaryService;
@@ -198,7 +199,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                 {
                     options.SerializerSettings.Converters.Add(new FilterHierarchiesOptionsConverter());
                     options.SerializerSettings.NullValueHandling = NullValueHandling.Ignore;
-                });
+                })
+                .AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
 
             // Adds Brotli and Gzip compressing
             services.AddResponseCompression(options => { options.EnableForHttps = true; });
@@ -612,7 +614,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<IPrivateBlobStorageService, PrivateBlobStorageService>(provider =>
                 new PrivateBlobStorageService(configuration.GetRequiredValue("CoreStorage"),
                     provider.GetRequiredService<ILogger<IBlobStorageService>>()));
-            services.AddTransient<IPublicBlobStorageService, PublicBlobStorageService>(provider => 
+            services.AddTransient<IPublicBlobStorageService, PublicBlobStorageService>(provider =>
                 new PublicBlobStorageService(configuration.GetRequiredValue("PublicStorage"),
                     provider.GetRequiredService<ILogger<IBlobStorageService>>()));
             services.AddTransient<IPublisherTableStorageService, PublisherTableStorageService>(_ =>

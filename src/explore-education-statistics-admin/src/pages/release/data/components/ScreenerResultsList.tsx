@@ -1,8 +1,8 @@
-import { ScreenerResultDetails } from '@admin/services/releaseDataFileService';
+import { ScreenerResult } from '@admin/services/releaseDataFileService';
 import React from 'react';
 
 interface Props {
-  screenerResult: ScreenerResultDetails;
+  screenerResult: ScreenerResult;
   showAll: boolean | undefined;
 }
 
@@ -10,24 +10,24 @@ export default function ScreenerResultsList({
   screenerResult,
   showAll,
 }: Props) {
-  const results = showAll
+  const testResults = showAll
     ? screenerResult.testResults
     : screenerResult.testResults.filter(
-        result =>
-          result.testResult === 'FAIL' || result.testResult === 'WARNING',
+        testResult =>
+          testResult.result === 'FAIL' || testResult.result === 'WARNING',
       );
 
   return (
     <table>
       <tbody>
-        {results.map(result => (
-          <tr key={results.indexOf(result)}>
+        {testResults.map(testResult => (
+          <tr key={testResults.indexOf(testResult)}>
             <td>
-              <strong>{result.testFunctionName}</strong>
+              <strong>{testResult.testFunctionName}</strong>
               <br />
-              {result.notes}
+              {testResult.notes}
             </td>
-            <td style={{ verticalAlign: 'middle' }}>{result.testResult}</td>
+            <td style={{ verticalAlign: 'middle' }}>{testResult.result}</td>
           </tr>
         ))}
       </tbody>

@@ -1,5 +1,4 @@
 #nullable enable
-using Newtonsoft.Json.Converters;
 using System.Text.Json.Serialization;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Model;
@@ -10,15 +9,15 @@ public class DataScreenerTestResult
     public required string TestFunctionName { get; set; }
 
     [JsonPropertyName("result")]
-    [Newtonsoft.Json.JsonConverter(typeof(StringEnumConverter))]
-    public TestResult TestResult { get; set; }
+    [JsonConverter(typeof(JsonStringEnumConverter))]
+    public TestResult Result { get; set; }
 
     // TODO (EES-5353): The screener currently returns a single string, but the intention is for it to return a List
     [JsonPropertyName("message")]
     public string? Notes { get; set; }
 
     [JsonPropertyName("stage")]
-    [Newtonsoft.Json.JsonConverter(typeof(StringEnumConverter))]
+    [JsonConverter(typeof(JsonStringEnumConverter))]
     public Stage Stage { get; set; }
 }
 
