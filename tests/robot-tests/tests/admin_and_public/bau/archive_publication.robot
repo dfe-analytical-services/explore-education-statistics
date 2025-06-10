@@ -54,6 +54,10 @@ Add headline text block to archive-publication content
 Go to "Sign off" page and approve archive-publication release
     user approves original release for immediate publication
 
+Get archive-release link
+    ${PUBLICATION_URL_ARCHIVE}=    user gets url public release will be accessible at
+    Set Suite Variable    ${PUBLICATION_URL_ARCHIVE}
+
 Create new publication to supersede other publication and release via API
     ${PUBLICATION_ID_SUPERSEDE}=    user creates test publication via api    ${PUBLICATION_NAME_SUPERSEDE}
     user creates test release via api    ${PUBLICATION_ID_SUPERSEDE}    FY    2000
@@ -91,13 +95,13 @@ Check cannot create a methodology for archive-publication
     user checks page does not contain button    Create new methodology
 
 Validate that archive-publication appears correctly on Find stats page
+    # TODO EES-6063 - Remove this
     user checks publication is on find statistics page    ${PUBLICATION_NAME_ARCHIVE}
-    user clicks link    ${PUBLICATION_NAME_ARCHIVE}
 
-    user waits until h1 is visible    ${PUBLICATION_NAME_ARCHIVE}    %{WAIT_MEDIUM}
+Verify that archive-publication is publicly accessible
+    user navigates to public release page    ${PUBLICATION_URL_ARCHIVE}    ${PUBLICATION_NAME_ARCHIVE}
+    ...    ${RELEASE_NAME_ARCHIVE}
     user waits until page contains    This is the latest data
-    ${PUBLICATION_ARCHIVE_URL}=    user gets url
-    set suite variable    ${PUBLICATION_ARCHIVE_URL}
 
 Check that archive-publication subject appears correctly on Data tables page
     user navigates to data tables page on public frontend
@@ -203,21 +207,25 @@ Go to "Sign off" page and approve superseding-publication release
     user approves original release for immediate publication
     user waits until page contains element    id:release-process-status-Complete    %{WAIT_MEDIUM}
 
+Get superseding-release link
+    ${PUBLICATION_URL_SUPERSEDE}=    user gets url public release will be accessible at
+    Set Suite Variable    ${PUBLICATION_URL_SUPERSEDE}
+
 Check archive-publication is now archived and superseding-publication now appears on Find stats page
+    # TODO EES-6063 - Remove this
     sleep    1    # Prevent intermittent failure where Find Stats page loads before cache is cleared
     user checks publication is on find statistics page    ${PUBLICATION_NAME_SUPERSEDE}
     user checks page does not contain    ${PUBLICATION_NAME_ARCHIVE}
 
 Check public superseding-publication release page displays correctly
-    user clicks link    ${PUBLICATION_NAME_SUPERSEDE}
-
-    user waits until h1 is visible    ${PUBLICATION_NAME_SUPERSEDE}    %{WAIT_MEDIUM}
+    user navigates to public release page    ${PUBLICATION_URL_SUPERSEDE}    ${PUBLICATION_NAME_SUPERSEDE}
+    ...    ${RELEASE_NAME_SUPERSEDE}
     user waits until page contains    This is the latest data
 
 Check public archive-publication release page displays correctly
     user waits for caches to expire
 
-    user navigates to    ${PUBLICATION_ARCHIVE_URL}
+    user navigates to    ${PUBLICATION_URL_ARCHIVE}
     user waits until h1 is visible    ${PUBLICATION_NAME_ARCHIVE}    %{WAIT_MEDIUM}
     user checks page does not contain    This is the latest data
 
@@ -341,6 +349,7 @@ Check public Find stats page and check archive-publication is no longer archived
     [Documentation]    Failing due to https://dfedigital.atlassian.net/browse/EES-4269
     [Tags]    Failing
 
+    # TODO EES-6063 - Remove this
     user checks publication is on find statistics page    ${PUBLICATION_NAME_SUPERSEDE}
     user checks publication is on find statistics page    ${PUBLICATION_NAME_ARCHIVE}
 
@@ -348,8 +357,8 @@ Check public archive-publication release page displays correctly after being una
     [Documentation]    Failing due to https://dfedigital.atlassian.net/browse/EES-4269
     [Tags]    Failing
 
-    user clicks link    ${PUBLICATION_NAME_ARCHIVE}
-
+    user navigates to public release page    ${PUBLICATION_URL_ARCHIVE}    ${PUBLICATION_NAME_ARCHIVE}
+    ...    ${RELEASE_NAME_ARCHIVE}
     user waits until h1 is visible    ${PUBLICATION_NAME_ARCHIVE}    %{WAIT_MEDIUM}
     user waits until page contains    This is the latest data
 
