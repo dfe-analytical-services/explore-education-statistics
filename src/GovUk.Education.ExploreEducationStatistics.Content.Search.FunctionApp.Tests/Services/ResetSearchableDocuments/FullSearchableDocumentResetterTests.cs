@@ -43,7 +43,8 @@ public class FullSearchableDocumentResetterTests
         var publications = Enumerable.Range(0, numberOfPublications)
             .Select(i => new PublicationInfo
             {
-                PublicationSlug = $"publication-slug-{i}"
+                PublicationSlug = $"publication-slug-{i}",
+                LatestReleaseSlug = $"release-slug-{i}"
             })
             .ToArray(); 
 
