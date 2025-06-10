@@ -8,6 +8,8 @@ type ResourceNames = {
     vNet: string
     alertsGroup: string
     subnets: {
+      adminApp: string
+      publisherFunction: string
       searchDocsFunction: string
       searchDocsFunctionPrivateEndpoints: string
       searchStoragePrivateEndpoints: string

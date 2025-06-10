@@ -66,6 +66,8 @@ var resourceNames = {
     vNet: '${subscription}-${abbreviations.networkVirtualNetworks}-ees'
     alertsGroup: '${subscription}-${abbreviations.insightsActionGroups}-ees-alertedusers'
     subnets: {
+      adminApp: '${subscription}-${abbreviations.networkVirtualNetworksSubnets}-ees-admin'
+      publisherFunction: '${subscription}-${abbreviations.networkVirtualNetworksSubnets}-ees-publisher'
       searchDocsFunction: '${resourcePrefix}-${abbreviations.networkVirtualNetworksSubnets}-${abbreviations.webSitesFunctions}-searchdocs'
       searchDocsFunctionPrivateEndpoints: '${resourcePrefix}-${abbreviations.networkVirtualNetworksSubnets}-${abbreviations.webSitesFunctions}-searchdocs-pep'
       searchStoragePrivateEndpoints: '${resourcePrefix}-${abbreviations.networkVirtualNetworksSubnets}-${abbreviations.storageStorageAccounts}-search-pep'
@@ -83,6 +85,13 @@ module monitoringModule 'application/monitoring.bicep' = {
   }
 }
 
+module virtualNetworkModule 'application/shared/virtualNetwork.bicep' = {
+  name: 'virtualNetworkModuleDeploy'
+  params: {
+    resourceNames: resourceNames
+  }
+}
+
 // Provision the event messaging infrastructure utilised by EES for communication between services.
 // While not exclusively part of the Search service infrastructure, it is included here to support
 // other services that publish events but are not yet defined in Bicep such as the Admin App Service
@@ -92,7 +101,23 @@ module eventMessagingModule 'application/eventMessaging.bicep' = {
   name: 'eventMessagingModuleDeploy'
   params: {
     location: location
-    ipRules: [] // TODO EES-6036 Should be maintenanceIpRanges
+    ipRules: union(
+      [
+        {
+          name: 'Admin App Service subnet range'
+          cidr: virtualNetworkModule.outputs.adminAppServiceSubnetCidr
+          tag: 'Default'
+          priority: 100
+        }
+        {
+          name: 'Publisher Function App subnet range'
+          cidr: virtualNetworkModule.outputs.publisherFunctionAppSubnetCidr
+          tag: 'Default'
+          priority: 100
+        }
+      ],
+      maintenanceFirewallRules
+    )
     resourcePrefix: resourcePrefix
     resourceNames: resourceNames
     tagValues: tagValues
