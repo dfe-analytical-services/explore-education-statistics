@@ -31,7 +31,7 @@ public class PublicZipDownloadsProcessor(
         public async Task InitialiseDuckDb(DuckDbConnection connection)
         {
             await connection.ExecuteNonQueryAsync(@"
-                CREATE TABLE zipDownloads (
+                CREATE TABLE sourceTable (
                     zipDownloadHash VARCHAR,
                     publicationName VARCHAR,
                     releaseVersionId UUID,
@@ -47,7 +47,7 @@ public class PublicZipDownloadsProcessor(
         public async Task ProcessSourceFile(string sourceFilePath, DuckDbConnection connection)
         {
             await connection.ExecuteNonQueryAsync($@"
-                INSERT INTO zipDownloads BY NAME (
+                INSERT INTO sourceTable BY NAME (
                     SELECT
                         MD5(CONCAT(subjectId, releaseVersionId, fromPage)) AS zipDownloadHash,
                         *
@@ -81,7 +81,7 @@ public class PublicZipDownloadsProcessor(
                     FIRST(dataSetTitle) AS dataSetTitle,
                     FIRST(fromPage) AS fromPage,
                     CAST(COUNT(zipDownloadHash) AS INT) AS downloads
-                FROM zipDownloads
+                FROM sourceTable
                 GROUP BY zipDownloadHash
                 ORDER BY zipDownloadHash
             ");

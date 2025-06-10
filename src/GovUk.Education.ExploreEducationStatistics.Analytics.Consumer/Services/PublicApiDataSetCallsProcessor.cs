@@ -1,3 +1,4 @@
+using GovUk.Education.ExploreEducationStatistics.Analytics.Consumer.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Analytics.Consumer.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Analytics.Consumer.Services.Workflow;
 using GovUk.Education.ExploreEducationStatistics.Common.DuckDb.DuckDb;
@@ -31,7 +32,7 @@ public class PublicApiDataSetCallsProcessor(
         public async Task InitialiseDuckDb(DuckDbConnection connection)
         {
             await connection.ExecuteNonQueryAsync(@"
-                CREATE TABLE DataSetCalls (
+                CREATE TABLE sourceTable (
                     dataSetId UUID,
                     dataSetTitle VARCHAR,
                     parameters JSON,
@@ -44,14 +45,9 @@ public class PublicApiDataSetCallsProcessor(
 
         public async Task ProcessSourceFile(string sourceFilePath, DuckDbConnection connection)
         {
-            await connection.ExecuteNonQueryAsync($@"
-                INSERT INTO DataSetCalls BY NAME (
-                    SELECT *
-                    FROM read_json('{sourceFilePath}', 
-                        format='unstructured'
-                    )
-                 )
-            ");
+            await connection.DirectCopyJsonIntoDuckDbTable(
+                jsonFilePath: sourceFilePath,
+                tableName: "sourceTable");
         }
 
         public async Task CreateParquetReports(string reportsFolderPathAndFilenamePrefix, DuckDbConnection connection)
@@ -66,7 +62,7 @@ public class PublicApiDataSetCallsProcessor(
                     CAST(previewToken->>'dataSetVersionId' AS UUID) AS previewTokenDataSetVersionId,
                     CAST(previewToken->>'created' AS DATETIME) AS previewTokenCreated,
                     CAST(previewToken->>'expiry' AS DATETIME) AS previewTokenExpiry 
-                    FROM DataSetCalls 
+                    FROM sourceTable 
                     ORDER BY startTime ASC
                 )
                 TO '{reportFilePath}' (FORMAT 'parquet', CODEC 'zstd')

@@ -32,7 +32,7 @@ public class PublicApiQueriesProcessor(
         public async Task InitialiseDuckDb(DuckDbConnection connection)
         {
             await connection.ExecuteNonQueryAsync(@"
-                CREATE TABLE queries (
+                CREATE TABLE sourceTable (
                     queryVersionHash VARCHAR,
                     queryHash VARCHAR,
                     dataSetId UUID,
@@ -53,7 +53,7 @@ public class PublicApiQueriesProcessor(
         public async Task ProcessSourceFile(string sourceFilePath, DuckDbConnection connection)
         {
             await connection.ExecuteNonQueryAsync($@"
-                INSERT INTO queries BY NAME (
+                INSERT INTO sourceTable BY NAME (
                     SELECT
                         MD5(CONCAT(query, dataSetVersionId)) AS queryVersionHash,
                         MD5(query) AS queryHash,
@@ -92,7 +92,7 @@ public class PublicApiQueriesProcessor(
                     FIRST(totalRowsCount) AS totalRowsCount,
                     FIRST(query) AS query,
                     CAST(COUNT(queryHash) AS INT) AS queryExecutions
-                FROM queries
+                FROM sourceTable
                 GROUP BY queryVersionHash
                 ORDER BY queryVersionHash");
     
@@ -109,7 +109,7 @@ public class PublicApiQueriesProcessor(
                     CAST(previewToken->>'created' AS DATETIME) AS previewTokenCreated,
                     CAST(previewToken->>'expiry' AS DATETIME) AS previewTokenExpiry,
                     requestedDataSetVersion
-                FROM queries
+                FROM sourceTable
                 ORDER BY queryHash, startTime
             ");
 
