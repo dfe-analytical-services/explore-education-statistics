@@ -4,7 +4,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.
 
 public class SearchableDocumentChecker(IBlobNameLister blobNameLister, IReleaseSummaryRetriever releaseSummaryRetriever)
 {
-    public async Task<Report> RunCheck(CancellationToken cancellationToken = default)
+    public async Task<CheckSearchableDocumentsReport> RunCheck(CancellationToken cancellationToken = default)
     {
         // Get a list of all blobs
         var blobNames = await blobNameLister.ListBlobsInContainer(cancellationToken);
@@ -17,7 +17,7 @@ public class SearchableDocumentChecker(IBlobNameLister blobNameLister, IReleaseS
         // Compare the list of release summaries with the list of blobs
         var (leftOnly, both, rightOnly) = expectedReleaseIds.Diff(blobNames);
 
-        return new Report
+        return new CheckSearchableDocumentsReport
         {
             OkBlobCount = both.Length,
             TotalBlobCount = blobNames.Count,
