@@ -29,7 +29,7 @@ public class AnalyticsWritePublicCsvDownloadStrategy(
     {
         public override string GetFilenamePart(CaptureCsvDownloadRequest request)
         {
-            return request.ReleaseVersionId.ToString();
+            return $"{request.ReleaseVersionId}_{request.SubjectId}";
         }
     }
 }
