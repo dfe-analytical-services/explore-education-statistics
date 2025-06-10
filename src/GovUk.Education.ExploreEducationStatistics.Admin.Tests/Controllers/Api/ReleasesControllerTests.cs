@@ -744,11 +744,11 @@ public abstract class ReleasesControllerIntegrationTests(TestApplicationFactory 
             Assert.False(releaseRedirectsExist);
 
             // Check that the redirects cache is untouched
-            await publicBlobCacheService.GetItemAsync(redirectsCacheKey, typeof(RedirectsViewModel));
-
-            Assert.Empty(oldRedirectsCachedViewModel.PublicationRedirects);
-            Assert.Empty(oldRedirectsCachedViewModel.MethodologyRedirects);
-            Assert.Empty(oldRedirectsCachedViewModel.ReleaseRedirectsByPublicationSlug);
+            var newRedirectsCachedValue= Assert.IsType<RedirectsViewModel>(await publicBlobCacheService.GetItemAsync(redirectsCacheKey, typeof(RedirectsViewModel)));
+            
+            Assert.Empty(newRedirectsCachedValue.PublicationRedirects);
+            Assert.Empty(newRedirectsCachedValue.MethodologyRedirects);
+            Assert.Empty(newRedirectsCachedValue.ReleaseRedirectsByPublicationSlug);
         }
 
         [Fact]
@@ -859,11 +859,11 @@ public abstract class ReleasesControllerIntegrationTests(TestApplicationFactory 
             Assert.False(releaseRedirectExists);
 
             // Check that the redirects cache is untouched
-            await publicBlobCacheService.GetItemAsync(redirectsCacheKey, typeof(RedirectsViewModel));
+            var newRedirectsCachedViewModel = Assert.IsType<RedirectsViewModel>(await publicBlobCacheService.GetItemAsync(redirectsCacheKey, typeof(RedirectsViewModel)));
 
-            Assert.Empty(oldRedirectsCachedViewModel.PublicationRedirects);
-            Assert.Empty(oldRedirectsCachedViewModel.MethodologyRedirects);
-            Assert.Empty(oldRedirectsCachedViewModel.ReleaseRedirectsByPublicationSlug);
+            Assert.Empty(newRedirectsCachedViewModel.PublicationRedirects);
+            Assert.Empty(newRedirectsCachedViewModel.MethodologyRedirects);
+            Assert.Empty(newRedirectsCachedViewModel.ReleaseRedirectsByPublicationSlug);
         }
 
         [Fact]
