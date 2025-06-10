@@ -1,6 +1,4 @@
 import { ScreenerResultDetails } from '@admin/services/releaseDataFileService';
-import SummaryList from '@common/components/SummaryList';
-import SummaryListItem from '@common/components/SummaryListItem';
 import React from 'react';
 
 interface Props {
@@ -8,7 +6,7 @@ interface Props {
   showAll: boolean | undefined;
 }
 
-export default function ScreenerResultSummaryList({
+export default function ScreenerResultsList({
   screenerResult,
   showAll,
 }: Props) {
@@ -20,15 +18,19 @@ export default function ScreenerResultSummaryList({
       );
 
   return (
-    <SummaryList>
-      {results.map(result => (
-        <SummaryListItem
-          key={result.testFunctionName}
-          term={`${result.testFunctionName}\n${result.notes}`}
-        >
-          {result.testResult}
-        </SummaryListItem>
-      ))}
-    </SummaryList>
+    <table>
+      <tbody>
+        {results.map(result => (
+          <tr key={results.indexOf(result)}>
+            <td>
+              <strong>{result.testFunctionName}</strong>
+              <br />
+              {result.notes}
+            </td>
+            <td style={{ verticalAlign: 'middle' }}>{result.testResult}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
   );
 }
