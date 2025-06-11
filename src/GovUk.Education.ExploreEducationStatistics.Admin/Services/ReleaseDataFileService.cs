@@ -1,5 +1,7 @@
 #nullable enable
+using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
+using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
@@ -44,7 +46,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         IDataSetFileStorage dataSetFileStorage,
         IDataBlockService dataBlockService,
         IFootnoteRepository footnoteRepository,
-        IDataSetScreenerClient dataSetScreenerClient) : IReleaseDataFileService
+        IDataSetScreenerClient dataSetScreenerClient,
+        IMapper _mapper) : IReleaseDataFileService
     {
         public async Task<Either<ActionResult, Unit>> Delete(
             Guid releaseVersionId,
@@ -374,55 +377,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             var tasks = dataSetUploads.Select(async dataSetUpload =>
             {
-                var request = BuildScreenerRequest(dataSetUpload);
+                var request = _mapper.Map<DataSetScreenerRequest>(dataSetUpload);
                 var result = await dataSetScreenerClient.ScreenDataSet(request, cancellationToken);
 
                 await dataSetFileStorage.AddScreenerResultToUpload(dataSetUpload.Id, result, cancellationToken);
 
-                return BuildUploadViewModel(dataSetUpload, result);
+                return _mapper.Map<DataSetUploadViewModel>(dataSetUpload);
             });
 
             return [.. await Task.WhenAll(tasks)];
-        }
-
-        private static DataSetUploadViewModel BuildUploadViewModel(
-            DataSetUpload dataSetUpload,
-            DataSetScreenerResponse screenerResult)
-        {
-            return new DataSetUploadViewModel
-            {
-                Id = dataSetUpload.Id,
-                DataFileName = dataSetUpload.DataFileName,
-                DataSetTitle = dataSetUpload.DataSetTitle,
-                MetaFileName = dataSetUpload.MetaFileName,
-                Status = GetDataSetUploadStatus(screenerResult),
-                ScreenerResult = screenerResult,
-            };
-        }
-
-        private static DataSetUploadStatus GetDataSetUploadStatus(DataSetScreenerResponse screenerResult)
-        {
-            return screenerResult.OverallResult switch
-            {
-                ScreenerResult.Passed => screenerResult.TestResults.Any(test => test.Result == TestResult.WARNING)
-                    ? DataSetUploadStatus.PENDING_REVIEW
-                    : DataSetUploadStatus.PENDING_IMPORT,
-                ScreenerResult.Failed => DataSetUploadStatus.FAILED_SCREENING,
-                _ => throw new ArgumentOutOfRangeException(nameof(screenerResult), screenerResult, null),
-            };
-        }
-
-        private static Requests.DataSetScreenerRequest BuildScreenerRequest(DataSetUpload dataSet)
-        {
-            return new()
-            {
-                // TODO: Update screener API to accept a container name rather than hard-coded
-                StorageContainerName = "releases-temp",
-                DataFileName = dataSet.DataFileName,
-                DataFilePath = dataSet.DataFilePath,
-                MetaFileName = dataSet.MetaFileName,
-                MetaFilePath = dataSet.MetaFilePath,
-            };
         }
 
         private async Task<Either<ActionResult, DataSet>> ValidateDataSetCsvPair(
