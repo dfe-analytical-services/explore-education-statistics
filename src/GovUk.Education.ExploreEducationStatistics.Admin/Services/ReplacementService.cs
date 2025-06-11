@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Admin.Exceptions;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Cache;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Public.Data;
@@ -217,7 +216,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 releaseFile.PublicApiDataSetVersion!,
                 cancellationToken)
                 .OnSuccess(dsv => (DataSetVersion?)dsv)
-                .OnFailureDo(_ => throw new DataSetVersionNotFoundException(
+                .OnFailureDo(_ => throw new InvalidOperationException(
                     $"API data set version could not be found. Data set ID: '{releaseFile.PublicApiDataSetId}', version: '{releaseFile.PublicApiDataSetVersion}'"));
         }
 

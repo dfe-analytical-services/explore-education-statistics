@@ -6,7 +6,6 @@ using System.Linq;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Admin.Exceptions;
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
@@ -143,10 +142,20 @@ public abstract class ReleaseVersionServiceTests
         [InlineData(DataSetVersionStatus.Published, true, false)] 
         [InlineData(DataSetVersionStatus.Published, false, false)]
         [InlineData(DataSetVersionStatus.Draft, false, false)]
+        [InlineData(DataSetVersionStatus.Processing, true, true)]
+        [InlineData(DataSetVersionStatus.Failed, true, true)]
+        [InlineData(DataSetVersionStatus.Deprecated, true, false)]
+        [InlineData(DataSetVersionStatus.Withdrawn, true, false)]
+        [InlineData(DataSetVersionStatus.Cancelled, true, true)]
+        [InlineData(DataSetVersionStatus.Processing, false, false)]
+        [InlineData(DataSetVersionStatus.Failed, false, false)]
+        [InlineData(DataSetVersionStatus.Deprecated, false, false)]
+        [InlineData(DataSetVersionStatus.Withdrawn, false, false)]
+        [InlineData(DataSetVersionStatus.Cancelled, false, false)]
         public async Task FileIsLinkedToPublicApiDataSet_DataSetVersionStatusCondition_PlanValidity(
             DataSetVersionStatus dataSetVersionStatus, 
             bool enableReplacementOfPublicApiDataSets,
-            bool expected)
+            bool expectedValidValue)
         {
             DataSet dataSet = _dataFixture
                 .DefaultDataSet();
@@ -237,8 +246,8 @@ public abstract class ReleaseVersionServiceTests
                 Assert.Equal(dataSetVersion.Id, deleteDataFilePlan.ApiDataSetVersionPlan.Id);
                 Assert.Equal(dataSetVersion.PublicVersion, deleteDataFilePlan.ApiDataSetVersionPlan.Version);
                 Assert.Equal(dataSetVersion.Status, deleteDataFilePlan.ApiDataSetVersionPlan.Status);
-                Assert.Equal(deleteDataFilePlan.ApiDataSetVersionPlan.Valid, expected);
-                Assert.Equal(deleteDataFilePlan.Valid, expected);
+                Assert.Equal(expectedValidValue, deleteDataFilePlan.ApiDataSetVersionPlan.Valid);
+                Assert.Equal(expectedValidValue, deleteDataFilePlan.Valid);
             }
         }
     }
@@ -635,7 +644,7 @@ public abstract class ReleaseVersionServiceTests
                     enableReplacementOfPublicApiDataSets: true,
                     logger: logger.Object);
 
-                var exception = await Assert.ThrowsAsync<DataSetVersionNotFoundException>(
+                var exception = await Assert.ThrowsAsync<InvalidOperationException>(
                     async () => 
                         await releaseVersionService.RemoveDataFiles(
                             releaseVersionId: releaseVersion.Id,

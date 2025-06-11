@@ -1701,28 +1701,39 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         /// </summary>
         /// <param name="dataSetVersionStatus">The data set version status of the replaced file's API data set version</param>
         /// <param name="majorVersionUpdate">Whether the user has uploaded a file that results in a major version update</param>
-        /// <param name="expectedValidValue">The expected value for the scenario set up</param>
         /// <param name="enableReplacementOfPublicApiDataSets">Whether the feature flag for EES-5779 is switched on or off</param>
+        /// <param name="expectedValidValue">The expected value for the scenario set up</param>
         [Theory]
         //When user has uploaded major version data set
-        [InlineData(DataSetVersionStatus.Published, true, false, true)]
-        [InlineData(DataSetVersionStatus.Mapping, true, false, true)]
-        [InlineData(DataSetVersionStatus.Draft, true, false, true)]
+        [InlineData(DataSetVersionStatus.Published, true, true, false)]
+        [InlineData(DataSetVersionStatus.Mapping, true, true, false)]
+        [InlineData(DataSetVersionStatus.Draft, true, true, false)]
         [InlineData(DataSetVersionStatus.Published, true, false, false)]
         [InlineData(DataSetVersionStatus.Mapping, true, false, false)]
         [InlineData(DataSetVersionStatus.Draft, true, false, false)]
         //When user has uploaded minor version
-        [InlineData(DataSetVersionStatus.Published, false, false, true)]
-        [InlineData(DataSetVersionStatus.Mapping, false, false, true)]
+        [InlineData(DataSetVersionStatus.Published, false, true, false)]
+        [InlineData(DataSetVersionStatus.Mapping, false, true, false)]
         [InlineData(DataSetVersionStatus.Draft, false, true, true)]
         [InlineData(DataSetVersionStatus.Published, false, false, false)]
         [InlineData(DataSetVersionStatus.Mapping, false, false, false)]
         [InlineData(DataSetVersionStatus.Draft, false, false, false)]
+        //When API data set version status is not appropriate to be replaced
+        [InlineData(DataSetVersionStatus.Processing, false, true, false)]
+        [InlineData(DataSetVersionStatus.Failed, false, true, false)]
+        [InlineData(DataSetVersionStatus.Deprecated, false, true, false)]
+        [InlineData(DataSetVersionStatus.Withdrawn, false, true, false)]
+        [InlineData(DataSetVersionStatus.Cancelled, false, true, false)]
+        [InlineData(DataSetVersionStatus.Processing, false, false, false)]
+        [InlineData(DataSetVersionStatus.Failed, false, false, false)]
+        [InlineData(DataSetVersionStatus.Deprecated, false, false, false)]
+        [InlineData(DataSetVersionStatus.Withdrawn, false, false, false)]
+        [InlineData(DataSetVersionStatus.Cancelled, false, false, false)]
         public async Task GetReplacementPlan_FileIsLinkedToPublicApiDataSet_ReplacementValidated(
             DataSetVersionStatus dataSetVersionStatus, 
             bool  majorVersionUpdate,
-            bool expectedValidValue, 
-            bool enableReplacementOfPublicApiDataSets)
+            bool enableReplacementOfPublicApiDataSets, 
+            bool expectedValidValue)
         {
             DataSet dataSet = _fixture
                 .DefaultDataSet();

@@ -5,7 +5,6 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using AutoMapper;
-using GovUk.Education.ExploreEducationStatistics.Admin.Exceptions;
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Public.Data;
@@ -756,8 +755,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     releaseFile.PublicApiDataSetVersion!,
                     cancellationToken)
                 .OnSuccess(dsv => (DataSetVersion?)dsv)
-                .OnFailureDo(_ => throw new DataSetVersionNotFoundException(
-                    $"API data set version could not be found. Data set ID: '{releaseFile.PublicApiDataSetId}', version: '{releaseFile.PublicApiDataSetVersion}'"));
+                .OnFailureDo(_ =>
+                {
+                    logger.LogError(
+                        $"API data set version associated with release file could not be found. Data set ID: '{releaseFile.PublicApiDataSetId}', version: '{releaseFile.PublicApiDataSetVersion}', release file ID: '{releaseFile.Id}'.");
+                    throw new InvalidOperationException(
+                        "Failed to find the associated API data set version for the release file.");
+                });
         }
 
         private async Task<Either<ActionResult, Unit>> CheckCanDeleteDataFiles(Guid releaseVersionId, ReleaseFile releaseFile)
@@ -787,11 +791,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     releaseFile.PublicApiDataSetVersion!)
                 .OnFailureDo(_ =>
                 {
-                    var errorMessage =
-                        "Failed to find the data set version expected to be linked to the release file that is being deleted for the " +
-                        $"data set id: {releaseFile.PublicApiDataSetId.Value} and the data set version number: {releaseFile.PublicApiDataSetVersionString}. This has occured when creating the next draft version.";
-                    var notFoundException = new DataSetVersionNotFoundException(errorMessage);
-                    logger.LogError(notFoundException, errorMessage);
+                    var errorMessage = "Failed to find the data set version expected to be linked to the release file that is being deleted.";
+                    var notFoundException = new InvalidOperationException(errorMessage);
+                    logger.LogError(notFoundException, errorMessage + $" Details: Data set id: {releaseFile.PublicApiDataSetId.Value} and the data set version number: {releaseFile.PublicApiDataSetVersionString}.");
                     throw notFoundException;
                 }).OnSuccess(dsv => versionStatus = dsv.Status);
             
