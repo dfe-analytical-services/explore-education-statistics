@@ -3,4 +3,5 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.
 public record PublicationInfo
 {
     public required string PublicationSlug { get; init; }
+    public required string LatestReleaseSlug { get; init; }
 }

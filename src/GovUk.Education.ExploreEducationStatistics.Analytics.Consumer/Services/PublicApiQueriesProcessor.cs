@@ -1,42 +1,46 @@
 using GovUk.Education.ExploreEducationStatistics.Analytics.Consumer.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Analytics.Consumer.Services.Workflow;
 using GovUk.Education.ExploreEducationStatistics.Common.DuckDb.DuckDb;
-using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using Microsoft.Extensions.Logging;
 
 namespace GovUk.Education.ExploreEducationStatistics.Analytics.Consumer.Services;
 
 public class PublicApiQueriesProcessor(
     IAnalyticsPathResolver pathResolver,
-    ILogger<PublicApiQueriesProcessor> logger,
-    IWorkflowActor<PublicApiQueriesProcessor>? workflowActor = null) : IRequestFileProcessor
+    IProcessRequestFilesWorkflow workflow) : IRequestFileProcessor
 {
-    private readonly IWorkflowActor<PublicApiQueriesProcessor> _workflowActor 
-        = workflowActor ?? new WorkflowActor();
-    
     public Task Process()
     {
-        var workflow = new ProcessRequestFilesWorkflow<PublicApiQueriesProcessor>(
+        return workflow.Process(new WorkflowActor(
             sourceDirectory: pathResolver.PublicApiQueriesDirectoryPath(),
-            reportsDirectory: pathResolver.PublicApiQueriesReportsDirectoryPath(),
-            actor: _workflowActor,
-            logger: logger);
-
-        return workflow.Process();
+            reportsDirectory: pathResolver.PublicApiQueriesReportsDirectoryPath()));
     }
 
-    private class WorkflowActor : IWorkflowActor<PublicApiQueriesProcessor>
+    private class WorkflowActor(string sourceDirectory, string reportsDirectory) 
+        : IWorkflowActor
     {
+        public string GetSourceDirectory()
+        {
+            return sourceDirectory;
+        }
+
+        public string GetReportsDirectory()
+        {
+            return reportsDirectory;
+        }
+        
         public async Task InitialiseDuckDb(DuckDbConnection connection)
         {
             await connection.ExecuteNonQueryAsync(@"
-                CREATE TABLE queries (
+                CREATE TABLE sourceTable (
                     queryVersionHash VARCHAR,
                     queryHash VARCHAR,
                     dataSetId UUID,
                     dataSetVersionId UUID,
                     dataSetVersion VARCHAR,
                     dataSetTitle VARCHAR,
+                    previewToken JSON,
+                    requestedDataSetVersion VARCHAR,
                     resultsCount INT,
                     totalRowsCount INT,
                     startTime DATETIME,
@@ -49,7 +53,7 @@ public class PublicApiQueriesProcessor(
         public async Task ProcessSourceFile(string sourceFilePath, DuckDbConnection connection)
         {
             await connection.ExecuteNonQueryAsync($@"
-                INSERT INTO queries BY NAME (
+                INSERT INTO sourceTable BY NAME (
                     SELECT
                         MD5(CONCAT(query, dataSetVersionId)) AS queryVersionHash,
                         MD5(query) AS queryHash,
@@ -61,6 +65,8 @@ public class PublicApiQueriesProcessor(
                             dataSetVersionId: UUID,
                             dataSetVersion: VARCHAR,
                             dataSetTitle: VARCHAR,
+                            previewToken: JSON,
+                            requestedDataSetVersion: VARCHAR,
                             resultsCount: INT,
                             totalRowsCount: INT,
                             startTime: DATETIME,
@@ -86,7 +92,7 @@ public class PublicApiQueriesProcessor(
                     FIRST(totalRowsCount) AS totalRowsCount,
                     FIRST(query) AS query,
                     CAST(COUNT(queryHash) AS INT) AS queryExecutions
-                FROM queries
+                FROM sourceTable
                 GROUP BY queryVersionHash
                 ORDER BY queryVersionHash");
     
@@ -97,8 +103,13 @@ public class PublicApiQueriesProcessor(
                     dataSetVersionId,
                     startTime,
                     endTime,
-                    CAST(EXTRACT('milliseconds' FROM EndTime - StartTime) AS INT) AS durationMillis
-                FROM queries
+                    CAST(EXTRACT('milliseconds' FROM EndTime - StartTime) AS INT) AS durationMillis,
+                    previewToken->>'label' AS previewTokenLabel,
+                    CAST(previewToken->>'dataSetVersionId' AS UUID) AS previewTokenDataSetVersionId,
+                    CAST(previewToken->>'created' AS DATETIME) AS previewTokenCreated,
+                    CAST(previewToken->>'expiry' AS DATETIME) AS previewTokenExpiry,
+                    requestedDataSetVersion
+                FROM sourceTable
                 ORDER BY queryHash, startTime
             ");
 

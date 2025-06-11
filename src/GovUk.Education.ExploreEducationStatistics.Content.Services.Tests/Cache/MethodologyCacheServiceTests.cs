@@ -64,7 +64,7 @@ public class MethodologyCacheServiceTests : CacheServiceTestFixture
     {
         PublicBlobCacheService
             .Setup(s => s.GetItemAsync(new AllMethodologiesCacheKey(), typeof(List<AllMethodologiesThemeViewModel>)))
-            .ReturnsAsync(null);
+            .ReturnsAsync((object?)null);
 
         var methodologyService = new Mock<IMethodologyService>(Strict);
 
@@ -108,7 +108,7 @@ public class MethodologyCacheServiceTests : CacheServiceTestFixture
 
         PublicBlobCacheService
             .Setup(s => s.GetItemAsync(new AllMethodologiesCacheKey(), typeof(List<AllMethodologiesThemeViewModel>)))
-            .ReturnsAsync(null);
+            .ReturnsAsync((object?)null);
 
         var methodologyService = new Mock<IMethodologyService>(Strict);
 

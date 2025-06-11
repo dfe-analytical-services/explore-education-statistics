@@ -729,6 +729,13 @@
         "description": "Flag to determine if the Event Grid topics exist. TODO EES-6024 remove this when Event Grid topics are available in every environment"
       }
     },
+    "searchIndexName" : {
+      "type": "string",
+      "defaultValue": "index-1",
+      "metadata": {
+        "description": "The name of the Azure AI Search index used by the public frontend application"
+      }
+    },
     "publicDataDbExists": {
       "type": "bool",
       "defaultValue": true,
@@ -1268,7 +1275,9 @@
     "eventGridTopicNamePublicationChanged": "[concat(parameters('subscription'), '-', parameters('environment'), '-evgt-publication-changed')]",
     "eventGridTopicNameReleaseChanged": "[concat(parameters('subscription'), '-', parameters('environment'), '-evgt-release-changed')]",
     "eventGridTopicNameReleaseVersionChanged": "[concat(parameters('subscription'), '-', parameters('environment'), '-evgt-release-version-changed')]",
-    "eventGridTopicNameThemeChanged": "[concat(parameters('subscription'), '-', parameters('environment'), '-evgt-theme-changed')]"
+    "eventGridTopicNameThemeChanged": "[concat(parameters('subscription'), '-', parameters('environment'), '-evgt-theme-changed')]",
+    "searchServiceName": "[concat(parameters('subscription'), '-', parameters('environment'), '-srch')]",
+    "searchServiceApiVersion": "2025-02-01-preview"
   },
   "resources": [
     {
@@ -2204,6 +2213,9 @@
       "properties": {
         "APP_ENV": "[parameters('environmentName')]",
         "APPINSIGHTS_INSTRUMENTATIONKEY": "[reference(resourceId('microsoft.insights/components/', variables('publicAppInsights')), '2020-02-02').InstrumentationKey]",
+        "AZURE_SEARCH_ENDPOINT": "[reference(resourceId('Microsoft.Search/searchServices', variables('searchServiceName')), variables('searchServiceApiVersion')).endpoint]",
+        "AZURE_SEARCH_INDEX": "[parameters('searchIndexName')]",
+        "AZURE_SEARCH_QUERY_KEY": "[listQueryKeys(resourceId('Microsoft.Search/searchServices', variables('searchServiceName')), variables('searchServiceApiVersion')).value[0].key]",
         "BASIC_AUTH": "[parameters('publicAppBasicAuth')]",
         "BASIC_AUTH_USERNAME": "[parameters('publicAppBasicAuthUsername')]",
         "BASIC_AUTH_PASSWORD": "[parameters('publicAppBasicAuthPassword')]",

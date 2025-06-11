@@ -1395,7 +1395,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             Assert.True(result.Right.ContainsKey("Release"));
 
             Assert.Equal(2, result.Right["Publication"].Count);
-            Assert.Equal(4, result.Right["Release"].Count);
+            Assert.Equal(3, result.Right["Release"].Count);
         }
 
         [Fact]
@@ -2760,7 +2760,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 User = user,
                 Publication = releaseVersion.Release.Publication,
-                Role = PublicationRole.Approver
+                Role = PublicationRole.Allower
             };
 
             var userTwo = new User
@@ -2784,7 +2784,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 User = userTwo,
                 Publication = releaseVersion.Release.Publication,
-                Role = PublicationRole.Approver
+                Role = PublicationRole.Allower
             };
 
             var contentDbContextId = Guid.NewGuid().ToString();

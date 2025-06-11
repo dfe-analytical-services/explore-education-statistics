@@ -174,6 +174,7 @@ public class ThemeServiceTests
 
             var savedTheme = await context.Themes.FindAsync(result.Right.Id);
 
+            Assert.NotNull(savedTheme);
             Assert.Equal("Updated theme", savedTheme.Title);
             Assert.Equal("updated-theme", savedTheme.Slug);
             Assert.Equal("Updated summary", savedTheme.Summary);
@@ -963,7 +964,7 @@ public class ThemeServiceTests
             var contextId = Guid.NewGuid().ToString();
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                context.AddRange(publications);
+                context.Publications.AddRange(publications);
                 await context.SaveChangesAsync();
             }
 
@@ -1008,7 +1009,7 @@ public class ThemeServiceTests
             var contextId = Guid.NewGuid().ToString();
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                context.AddRange(publications);
+                context.Publications.AddRange(publications);
                 await context.SaveChangesAsync();
             }
 
@@ -1048,7 +1049,7 @@ public class ThemeServiceTests
             var contextId = Guid.NewGuid().ToString();
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                context.AddRange(publications);
+                context.Publications.AddRange(publications);
                 await context.SaveChangesAsync();
             }
 

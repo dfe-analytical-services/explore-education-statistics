@@ -118,7 +118,7 @@ describe('PublicationTeamAccessPage', () => {
       {
         id: 'role-3',
         publication: 'publication',
-        role: 'Approver',
+        role: 'Allower',
         userName: 'Analyst2 User2',
         email: 'analyst2@example.com',
       },
@@ -261,14 +261,14 @@ describe('PublicationTeamAccessPage', () => {
       {
         id: 'role-1',
         publication: 'publication',
-        role: 'Approver',
+        role: 'Allower',
         userName: 'Analyst1 User1',
         email: 'analyst1@example.com',
       },
       {
         id: 'role-2',
         publication: 'publication',
-        role: 'Approver',
+        role: 'Allower',
         userName: 'Analyst2 User2',
         email: 'analyst2@example.com',
       },

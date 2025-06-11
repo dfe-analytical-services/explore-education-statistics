@@ -290,9 +290,6 @@ export const lineChartBlockDefinition: ChartDefinition = {
       id: 'xaxis',
       title: 'X Axis (major axis)',
       type: 'major',
-      capabilities: {
-        canRotateLabel: false,
-      },
       defaults: {
         groupBy: 'timePeriod',
         min: 0,
@@ -310,9 +307,6 @@ export const lineChartBlockDefinition: ChartDefinition = {
       id: 'yaxis',
       title: 'Y Axis (minor axis)',
       type: 'minor',
-      capabilities: {
-        canRotateLabel: true,
-      },
       defaults: {
         showGrid: true,
         tickConfig: 'default',

@@ -9,6 +9,9 @@ import releaseDataFileService, {
   DataFile,
   DataFileImportStatus,
 } from '@admin/services/releaseDataFileService';
+import DataSetUploadModalConfirm from '@admin/pages/release/data/components/DataSetUploadModalConfirm';
+import DataFilesTable from '@admin/pages/release/data/components/DataFilesTable';
+import DataFilesReplacementTable from '@admin/pages/release/data/components/DataFilesReplacementTable';
 import Button from '@common/components/Button';
 import InsetText from '@common/components/InsetText';
 import LoadingSpinner from '@common/components/LoadingSpinner';
@@ -16,8 +19,6 @@ import WarningMessage from '@common/components/WarningMessage';
 import useToggle from '@common/hooks/useToggle';
 import { useQuery } from '@tanstack/react-query';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import DataSetUploadModalConfirm from './DataSetUploadModalConfirm';
-import DataFilesTable from './DataFilesTable';
 
 interface Props {
   publicationId: string;
@@ -56,6 +57,12 @@ export default function ReleaseDataUploadsSection({
     () => allDataFiles.filter(dataFile => dataFile.replacedBy),
     [allDataFiles],
   );
+
+  // TODO - bulk confirmation of replacements
+  //  const validReplacedDataFiles = replacedDataFiles.filter(
+  //   file => file.status === 'COMPLETE',
+  // );
+  // const allowBulkConfirm = validReplacedDataFiles.length > 1;
 
   const dataFiles = useMemo(
     () => allDataFiles.filter(dataFile => !dataFile.replacedBy),
@@ -99,6 +106,7 @@ export default function ReleaseDataUploadsSection({
                 rows: totalRows,
                 status,
                 permissions,
+                replacedBy: file.replacedBy,
               },
         ),
       );
@@ -181,6 +189,9 @@ export default function ReleaseDataUploadsSection({
     [releaseVersionId, toggleReordering],
   );
 
+  // TODO - bulk confirmation of replacements
+  // const handleConfirmAllReplacements = () => {};
+
   return (
     <>
       <h2>Add data file to release</h2>
@@ -240,9 +251,17 @@ export default function ReleaseDataUploadsSection({
             <h2>Uploaded data files</h2>
 
             {!isReordering && allDataFiles.length > 1 && (
-              <Button onClick={toggleReordering.on} variant="secondary">
-                Reorder data files
-              </Button>
+              <div className="dfe-flex dfe-justify-content--space-between">
+                <Button onClick={toggleReordering.on} variant="secondary">
+                  Reorder data files
+                </Button>
+                {/* TODO - bulk confirmation of replacements */}
+                {/* {allowBulkConfirm && (
+                  <Button onClick={handleConfirmAllReplacements}>
+                    Confirm all valid replacements
+                  </Button>
+                )} */}
+              </div>
             )}
 
             {isReordering ? (
@@ -254,15 +273,13 @@ export default function ReleaseDataUploadsSection({
             ) : (
               <>
                 {replacedDataFiles.length > 0 && (
-                  <DataFilesTable
-                    canUpdateRelease={canUpdateRelease}
+                  <DataFilesReplacementTable
                     caption="Data file replacements"
                     dataFiles={replacedDataFiles}
                     publicationId={publicationId}
                     releaseVersionId={releaseVersionId}
                     testId="Data file replacements table"
-                    onDeleteFile={handleDeleteConfirm}
-                    onStatusChange={handleStatusChange}
+                    onConfirmAction={refetchDataFiles}
                   />
                 )}
 

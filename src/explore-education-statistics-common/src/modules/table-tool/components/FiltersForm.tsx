@@ -32,7 +32,7 @@ import React, { useCallback, useMemo, useState } from 'react';
 import { ObjectSchema } from 'yup';
 import FilterHierarchy from './FilterHierarchy';
 import getFilterHierarchyLabelsMap from './utils/getFilterHierarchyLabelsMap';
-import getFilterHierarchyRelatedOptionIds from './utils/getFilterHierarchyRelatedOptionIds';
+import augmentFilterHierarchySelections from './utils/augmentFilterHierarchySelections';
 
 export interface FiltersFormValues {
   indicators: string[];
@@ -40,7 +40,9 @@ export interface FiltersFormValues {
   filterHierarchies: Dictionary<string[]>;
 }
 
-export type FilterFormSubmitHandler = (values: FiltersFormValues) => void;
+export type FilterFormSubmitHandler = (
+  values: Omit<FiltersFormValues, 'filterHierachies'>,
+) => void;
 
 const TableQueryErrorCodes = [
   'QueryExceedsMaxAllowableTableSize',
@@ -84,6 +86,11 @@ export default function FiltersForm({
 
   const [tableQueryError, setTableQueryError] = useState<TableQueryErrorCode>();
   const [previousValues, setPreviousValues] = useState<FiltersFormValues>();
+  const [
+    augmentedPreviousHierarchyValues,
+    setAugmentedPreviousHierarchyValues,
+  ] = useState<Dictionary<Dictionary<string[]>>>();
+
   const [openFilterGroups, setOpenFilterGroups] = useState<string[]>([]);
 
   const filterHierarchies = useMemo(() => {
@@ -174,8 +181,8 @@ export default function FiltersForm({
 
         return [
           hierachyKey,
-          initialValues?.filters.filter(
-            optionId => !hierarchyOptionValues.includes(optionId),
+          initialValues?.filters.filter(optionId =>
+            hierarchyOptionValues.includes(optionId),
           ) ?? [],
         ];
       }),
@@ -195,19 +202,19 @@ export default function FiltersForm({
   const handleSubmit = useCallback(
     async (values: FiltersFormValues) => {
       setPreviousValues({ ...values });
+      setAugmentedPreviousHierarchyValues(
+        augmentFilterHierarchySelections(
+          values.filterHierarchies,
+          filterHierarchies,
+          optionLabelsMap,
+        ),
+      );
 
       try {
         setTableQueryError(undefined);
 
         await goToNextStep(async () => {
-          await onSubmit({
-            ...values,
-            filterHierarchies: getFilterHierarchyRelatedOptionIds(
-              values.filterHierarchies,
-              filterHierarchies,
-              optionLabelsMap,
-            ),
-          });
+          await onSubmit(values);
         });
       } catch (error) {
         if (
@@ -394,9 +401,9 @@ export default function FiltersForm({
                       {filterHierarchies.map(filterHierarchy => {
                         if (filterHierarchy.length === 0) return null;
 
-                        const hierarchyName = `filterHierarchies.${
-                          filterHierarchy.at(-1)?.childFilterId ?? ''
-                        }`;
+                        const filterName =
+                          filterHierarchy.at(-1)?.childFilterId ?? '';
+                        const hierarchyName = `filterHierarchies.${filterName}`;
 
                         return (
                           <FilterHierarchy
@@ -405,6 +412,16 @@ export default function FiltersForm({
                             disabled={formState.isSubmitting}
                             key={hierarchyName}
                             name={hierarchyName}
+                            open={openFilterGroups.includes(filterName)}
+                            onToggle={isOpen => {
+                              setOpenFilterGroups(groups =>
+                                isOpen
+                                  ? [...groups, filterName]
+                                  : groups.filter(
+                                      group => group !== filterName,
+                                    ),
+                              );
+                            }}
                           />
                         );
                       })}
@@ -518,8 +535,8 @@ export default function FiltersForm({
                     </CollapsibleList>
                   </SummaryListItem>
                 ))}
-              {Object.entries(values.filterHierarchies).map(
-                ([filterGroupKey, selectedOptions]) => (
+              {augmentedPreviousHierarchyValues &&
+                Object.keys(values.filterHierarchies).map(filterGroupKey => (
                   <SummaryListItem
                     key={filterGroupKey}
                     term={optionLabelsMap[filterGroupKey]}
@@ -528,14 +545,55 @@ export default function FiltersForm({
                       id={`filtersList-${filterGroupKey}`}
                       itemName="filter"
                       itemNamePlural="filters"
+                      listClassName={styles.augmentedFilters}
                     >
-                      {selectedOptions.map(optionId => (
-                        <li key={optionId}>{optionLabelsMap[optionId]}</li>
+                      {Object.entries(
+                        augmentedPreviousHierarchyValues[filterGroupKey],
+                      )?.map(([optionId, relatedOptions]) => (
+                        <li key={optionId}>
+                          {relatedOptions.map((relatedOptionId, index) => {
+                            const isLast = index === relatedOptions.length - 1;
+                            const isNextTotal = !isLast
+                              ? optionLabelsMap[
+                                  relatedOptions[index + 1]
+                                ].toLowerCase() === 'total'
+                              : false;
+
+                            const isThisTotal =
+                              optionLabelsMap[relatedOptionId].toLowerCase() ===
+                              'total';
+                            if (isThisTotal && index !== 0) {
+                              return null;
+                            }
+
+                            const relatedOptionLabel =
+                              relatedOptionId === optionId ? (
+                                <strong>
+                                  {optionLabelsMap[relatedOptionId]}{' '}
+                                  {!isThisTotal && isNextTotal && ` (total)`}
+                                </strong>
+                              ) : (
+                                optionLabelsMap[relatedOptionId]
+                              );
+                            return (
+                              <span
+                                key={`augmentedOption-${optionId}-${relatedOptionId}`}
+                              >
+                                {relatedOptionLabel}
+                                {!isLast && !isNextTotal && (
+                                  <span
+                                    aria-hidden
+                                    className={styles.separator}
+                                  />
+                                )}
+                              </span>
+                            );
+                          })}
+                        </li>
                       ))}
                     </CollapsibleList>
                   </SummaryListItem>
-                ),
-              )}
+                ))}
             </SummaryList>
 
             <ResetFormOnPreviousStep {...stepProps} onReset={reset} />

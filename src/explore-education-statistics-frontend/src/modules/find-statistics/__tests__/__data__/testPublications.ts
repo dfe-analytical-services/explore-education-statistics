@@ -21,10 +21,10 @@ export const testPublications: PublicationListSummary[] = [
     slug: 'publication-2-slug',
     latestReleaseSlug: 'latest-release-slug-2',
     summary: 'Publication 2 summary',
+    highlightContent: 'test <em>find me highlight</em> content',
     theme: 'Theme 2',
     title: 'Publication 2',
   },
-
   {
     id: '3',
     published: new Date('2021-08-08T00:00:00'),

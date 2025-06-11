@@ -43,7 +43,7 @@ public class ViewSpecificPreReleaseSummaryAuthorizationHandlersTests
             {
                 Id = Guid.NewGuid()
             },
-            ReleaseRole.Viewer, ReleaseRole.Contributor, ReleaseRole.Approver, ReleaseRole.PrereleaseViewer);
+            ReleaseRole.Contributor, ReleaseRole.Approver, ReleaseRole.PrereleaseViewer);
     }
 
     [Fact]
@@ -60,7 +60,7 @@ public class ViewSpecificPreReleaseSummaryAuthorizationHandlersTests
                 PublicationId = publication.Id,
                 Publication = publication
             },
-            PublicationRole.Owner, PublicationRole.Approver);
+            PublicationRole.Owner, PublicationRole.Allower);
     }
 
     private static ViewSpecificPreReleaseSummaryAuthorizationHandler CreateHandler(ContentDbContext contentDbContext)

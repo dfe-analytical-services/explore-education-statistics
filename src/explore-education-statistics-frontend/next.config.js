@@ -23,6 +23,9 @@ const nextConfig = {
     APPINSIGHTS_INSTRUMENTATIONKEY: process.env.APPINSIGHTS_INSTRUMENTATIONKEY,
     GA_TRACKING_ID: process.env.GA_TRACKING_ID,
     PUBLIC_URL: process.env.PUBLIC_URL,
+    AZURE_SEARCH_QUERY_KEY: process.env.AZURE_SEARCH_QUERY_KEY,
+    AZURE_SEARCH_ENDPOINT: process.env.AZURE_SEARCH_ENDPOINT,
+    AZURE_SEARCH_INDEX: process.env.AZURE_SEARCH_INDEX,
   },
   async headers() {
     return [

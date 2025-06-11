@@ -1,5 +1,6 @@
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Requests;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
@@ -10,7 +11,10 @@ using PublicationSummaryViewModel = GovUk.Education.ExploreEducationStatistics.P
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services;
 
-internal class PublicationService(PublicDataDbContext publicDataDbContext, IContentApiClient contentApiClient)
+internal class PublicationService(
+    PublicDataDbContext publicDataDbContext,
+    IContentApiClient contentApiClient,
+    IAnalyticsService analyticsService)
     : IPublicationService
 {
     public async Task<Either<ActionResult, PublicationPaginatedListViewModel>> ListPublications(
@@ -19,7 +23,8 @@ internal class PublicationService(PublicDataDbContext publicDataDbContext, ICont
         string? search = null,
         CancellationToken cancellationToken = default)
     {
-        return await GetPublishedDataSetPublicationIds()
+        return await
+            GetPublishedDataSetPublicationIds(cancellationToken)
             .OnSuccess(async publicationIds =>
                 await contentApiClient.ListPublications(
                     page: page, 
@@ -29,7 +34,10 @@ internal class PublicationService(PublicDataDbContext publicDataDbContext, ICont
                     cancellationToken: cancellationToken))
             .OnSuccess(paginatedPublications =>
             {
-                var results = paginatedPublications.Results.Select(MapPublication).ToList();
+                var results = paginatedPublications
+                    .Results
+                    .Select(MapPublication)
+                    .ToList();
 
                 return new PublicationPaginatedListViewModel
                 {
@@ -39,7 +47,12 @@ internal class PublicationService(PublicDataDbContext publicDataDbContext, ICont
                         page: paginatedPublications.Paging.Page,
                         pageSize: paginatedPublications.Paging.PageSize),
                 };
-            });
+            })
+            .OnSuccessDo(() => analyticsService.CaptureTopLevelCall(
+                type: TopLevelCallType.GetPublications,
+                parameters: new PaginationParameters(Page: page, PageSize: pageSize),
+                cancellationToken: cancellationToken)
+            );
     }
 
     public async Task<Either<ActionResult, PublicationSummaryViewModel>> GetPublication(
@@ -55,7 +68,13 @@ internal class PublicationService(PublicDataDbContext publicDataDbContext, ICont
                 Slug = publication.Slug,
                 Summary = publication.Summary,
                 LastPublished = publication.Published
-            });
+            })
+            .OnSuccessDo(viewModel => analyticsService.CapturePublicationCall(
+                publicationId: viewModel.Id,
+                publicationTitle: viewModel.Title,
+                type: PublicationCallType.GetSummary,
+                cancellationToken: cancellationToken)
+            );
     }
 
     private async Task<Either<ActionResult, HashSet<Guid>>> GetPublishedDataSetPublicationIds(

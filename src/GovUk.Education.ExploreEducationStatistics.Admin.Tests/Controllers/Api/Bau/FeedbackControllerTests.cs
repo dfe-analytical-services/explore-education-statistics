@@ -16,7 +16,7 @@ public class FeedbackControllerTests(TestApplicationFactory testApp) : Integrati
 {
     private static readonly DateTime Now = DateTime.UtcNow;
     private const string BaseUrl = "api/feedback";
-    private readonly List<Feedback> Feedback =
+    private readonly List<Feedback> _feedback =
     [
         new()
         {
@@ -61,7 +61,7 @@ public class FeedbackControllerTests(TestApplicationFactory testApp) : Integrati
     {
         // Arrange
         await TestApp.AddTestData<ContentDbContext>(context
-            => context.Feedback.AddRange(Feedback));
+            => context.Feedback.AddRange(_feedback));
 
         var client = TestApp
             .SetUser(DataFixture.BauUser())
@@ -74,8 +74,8 @@ public class FeedbackControllerTests(TestApplicationFactory testApp) : Integrati
         var result = response.AssertOk<List<FeedbackViewModel>>();
 
         Assert.Equal(2, result.Count);
-        Assert.Equivalent(Feedback[0], result[0]);
-        Assert.Equivalent(Feedback[2], result[1]);
+        Assert.Equivalent(_feedback[0], result[0]);
+        Assert.Equivalent(_feedback[2], result[1]);
     }
 
     [Fact]
@@ -83,7 +83,7 @@ public class FeedbackControllerTests(TestApplicationFactory testApp) : Integrati
     {
         // Arrange
         await TestApp.AddTestData<ContentDbContext>(context
-            => context.Feedback.AddRange(Feedback));
+            => context.Feedback.AddRange(_feedback));
 
         var client = TestApp
             .SetUser(DataFixture.BauUser())
@@ -96,7 +96,7 @@ public class FeedbackControllerTests(TestApplicationFactory testApp) : Integrati
         var result = response.AssertOk<List<FeedbackViewModel>>();
 
         Assert.Equal(3, result.Count);
-        Assert.Equivalent(Feedback, result);
+        Assert.Equivalent(_feedback, result);
     }
 
     [Fact]

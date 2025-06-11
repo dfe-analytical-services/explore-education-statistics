@@ -10,7 +10,6 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Fixture;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
-using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.AspNetCore.Identity;
@@ -19,8 +18,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
 
 public class SignInControllerTests(TestApplicationFactory testApp) : IntegrationTestFixture(testApp)
 {
-    private static readonly DataFixture DataFixture = new();
-
     public class RegistrationTests(TestApplicationFactory testApp) : SignInControllerTests(testApp)
     {
         [Theory]
@@ -33,9 +30,9 @@ public class SignInControllerTests(TestApplicationFactory testApp) : Integration
         [InlineData("VALID-USER@education.gov.uk", "VALID-USER@education.gov.uk", "FirstName", "LastName",
             "FirstName LastName", "Role 1", null, null)]
         [InlineData("VALID-USER@education.gov.uk", null, "FirstName", "LastName", null, "Role 1", "Approver", null)]
-        [InlineData("VALID-USER@education.gov.uk", null, "FirstName", "LastName", null, "Role 1", null, "Approver")]
+        [InlineData("VALID-USER@education.gov.uk", null, "FirstName", "LastName", null, "Role 1", null, "Allower")]
         [InlineData("VALID-USER@education.gov.uk", null, "FirstName", "LastName", null, "Role 1", "Contributor",
-            "Approver")]
+            "Allower")]
         public async Task Success(
             string? emailClaimValue,
             string? nameClaimValue,
@@ -150,7 +147,7 @@ public class SignInControllerTests(TestApplicationFactory testApp) : Integration
                 {
                     PublicationId = publicationId,
                     Email = unrelatedUserEmail,
-                    Role = PublicationRole.Approver,
+                    Role = PublicationRole.Allower,
                     Created = DateTime.UtcNow.AddDays(-1),
                 });
 
@@ -277,7 +274,7 @@ public class SignInControllerTests(TestApplicationFactory testApp) : Integration
                 {
                     PublicationId = releaseVersion.Publication.Id,
                     Email = email.ToLower(),
-                    Role = PublicationRole.Approver,
+                    Role = PublicationRole.Allower,
                     Created = DateTime.UtcNow.AddDays(-1),
                 });
             });
@@ -389,7 +386,7 @@ public class SignInControllerTests(TestApplicationFactory testApp) : Integration
                 {
                     PublicationId = releaseVersion.Publication.Id,
                     Email = email.ToLower(),
-                    Role = PublicationRole.Approver,
+                    Role = PublicationRole.Allower,
                     Created = DateTime.UtcNow.AddDays(-1),
                 });
             });
@@ -507,22 +504,9 @@ public class SignInControllerTests(TestApplicationFactory testApp) : Integration
         }
     }
 
-    private static List<IdentityRole> GetGlobalRoles()
-    {
-        return new List<IdentityRole>
-        {
-            new()
-            {
-                Id = "role-1",
-                Name = "Role 1",
-                NormalizedName = "ROLE 1"
-            },
-            new()
-            {
-                Id = "role-2",
-                Name = "Role 2",
-                NormalizedName = "ROLE 2"
-            }
-        };
-    }
+    private static List<IdentityRole> GetGlobalRoles() =>
+    [
+        new() { Id = "role-1", Name = "Role 1", NormalizedName = "ROLE 1" },
+        new() { Id = "role-2", Name = "Role 2", NormalizedName = "ROLE 2" }
+    ];
 }

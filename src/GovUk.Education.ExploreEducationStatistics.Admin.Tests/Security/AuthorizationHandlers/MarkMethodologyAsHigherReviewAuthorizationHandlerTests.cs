@@ -144,7 +144,7 @@ public class MarkMethodologyAsHigherReviewAuthorizationHandlerTests
             await ForEachPublicationRoleAsync(async publicationRole =>
             {
                 var expectedToPassByPublicationRole =
-                    publicationRole is Approver or Owner;
+                    publicationRole is Allower or Owner;
 
                 var (
                     handler,
@@ -200,7 +200,7 @@ public class MarkMethodologyAsHigherReviewAuthorizationHandlerTests
             await ForEachPublicationRoleAsync(async publicationRole =>
             {
                 var expectedToPassByPublicationRole =
-                    publicationRole is Approver;
+                    publicationRole is Allower;
 
                 var (
                     handler,

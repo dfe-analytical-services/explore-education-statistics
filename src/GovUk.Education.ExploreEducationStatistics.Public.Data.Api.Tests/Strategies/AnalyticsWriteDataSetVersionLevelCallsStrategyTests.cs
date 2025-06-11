@@ -1,3 +1,4 @@
+using GovUk.Education.ExploreEducationStatistics.Analytics.Common.Strategies;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Requests;
@@ -126,8 +127,9 @@ public abstract class AnalyticsWriteDataSetVersionCallsStrategyTests
         {
             return new AnalyticsWriteDataSetVersionCallsStrategy(
                 pathResolver,
-                dateTimeProvider ?? new DateTimeProvider(),
-                Mock.Of<ILogger<AnalyticsWriteDataSetVersionCallsStrategy>>());
+                new CommonAnalyticsWriteStrategyWorkflow<CaptureDataSetVersionCallRequest>(
+                    dateTimeProvider: dateTimeProvider ?? new DateTimeProvider(),
+                    Mock.Of<ILogger<CommonAnalyticsWriteStrategyWorkflow<CaptureDataSetVersionCallRequest>>>()));
         }
     }
 }

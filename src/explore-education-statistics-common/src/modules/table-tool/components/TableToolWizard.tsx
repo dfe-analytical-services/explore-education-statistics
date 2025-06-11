@@ -1,9 +1,9 @@
 import SubmitError from '@common/components/form/util/SubmitError';
 import WarningMessage from '@common/components/WarningMessage';
-import locationLevelsMap, {
-  LocationLevelKey,
-} from '@common/utils/locationLevelsMap';
 import { ConfirmContextProvider } from '@common/contexts/ConfirmContext';
+import DataSetStep, {
+  DataSetFormSubmitHandler,
+} from '@common/modules/table-tool/components/DataSetStep';
 import FiltersForm, {
   FilterFormSubmitHandler,
   TableQueryErrorCode,
@@ -14,9 +14,6 @@ import PreviousStepModalConfirm from '@common/modules/table-tool/components/Prev
 import PublicationForm, {
   PublicationFormSubmitHandler,
 } from '@common/modules/table-tool/components/PublicationForm';
-import DataSetStep, {
-  DataSetFormSubmitHandler,
-} from '@common/modules/table-tool/components/DataSetStep';
 import TimePeriodForm, {
   TimePeriodFormSubmitHandler,
 } from '@common/modules/table-tool/components/TimePeriodForm';
@@ -41,9 +38,13 @@ import tableBuilderService, {
   Subject,
   SubjectMeta,
 } from '@common/services/tableBuilderService';
+import locationLevelsMap, {
+  LocationLevelKey,
+} from '@common/utils/locationLevelsMap';
+import { Dictionary } from 'lodash';
 import React, { ReactElement, ReactNode, useMemo, useState } from 'react';
 import { useImmer } from 'use-immer';
-import { Dictionary } from 'lodash';
+import filterHierarchiesShim from './utils/filterHierarchiesShim';
 
 const defaultLocationStepTitle = 'Choose locations';
 const defaultDataSetStepTitle = 'Select a data set';
@@ -457,7 +458,10 @@ export default function TableToolWizard({
         subjectId: updatedReleaseTableDataQuery.subjectId,
         locationIds: updatedReleaseTableDataQuery.locationIds,
         timePeriod: updatedReleaseTableDataQuery.timePeriod,
-        filters: updatedReleaseTableDataQuery.filters,
+        filters: filterHierarchiesShim(
+          updatedReleaseTableDataQuery.filters,
+          state.subjectMeta,
+        ),
         indicators: updatedReleaseTableDataQuery.indicators,
       } as FullTableQuery,
       updatedReleaseTableDataQuery.releaseVersionId,

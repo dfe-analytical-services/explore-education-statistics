@@ -1,0 +1,8 @@
+﻿{
+  "parameters": {
+    "page": 1,
+    "pageSize": 10
+  },
+  "startTime": "2025-02-26T03:07:44.850Z",
+  "type": "GetPublications"
+}

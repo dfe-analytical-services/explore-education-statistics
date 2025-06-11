@@ -3227,11 +3227,13 @@ public class PublicationServiceTests
         var release2021 = publication.Releases.Single(r => r.Year == 2021);
         var release2022 = publication.Releases.Single(r => r.Year == 2022);
 
+        var originalLatestPublishedReleaseId = release2022.Id;
         var originalLatestPublishedReleaseVersionId = release2022.Versions[1].Id;
         var expectedLatestPublishedReleaseVersionId = release2021.Versions[0].Id;
 
         // Check the publication's latest published release version in the generated test data setup
         Assert.Equal(originalLatestPublishedReleaseVersionId, publication.LatestPublishedReleaseVersionId);
+        Assert.NotNull(publication.LatestPublishedReleaseVersion);
 
         // Check the expected order of the release series items in the generated test data setup
         Assert.Equal(3, publication.ReleaseSeries.Count);
@@ -3295,6 +3297,7 @@ public class PublicationServiceTests
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
             var actualPublication = await contentDbContext.Publications
+                .Include(p => p.LatestPublishedReleaseVersion)
                 .SingleAsync(p => p.Id == publication.Id);
 
             var actualReleaseSeries = actualPublication.ReleaseSeries;
@@ -3311,6 +3314,7 @@ public class PublicationServiceTests
             
             AssertOnPublicationLatestPublishedReleaseReorderedWasRaised(
                 actualPublication,
+                originalLatestPublishedReleaseId,
                 originalLatestPublishedReleaseVersionId);
         }
     }
@@ -3334,11 +3338,13 @@ public class PublicationServiceTests
         var release2021 = publication.Releases.Single(r => r.Year == 2021);
         var release2022 = publication.Releases.Single(r => r.Year == 2022);
 
+        var originalLatestPublishedReleaseId = release2022.Id;
         var originalLatestPublishedReleaseVersionId = release2022.Versions[1].Id;
         var expectedLatestPublishedReleaseVersionId = release2020.Versions[0].Id;
 
         // Check the publication's latest published release version in the generated test data setup
         Assert.Equal(originalLatestPublishedReleaseVersionId, publication.LatestPublishedReleaseVersionId);
+        Assert.NotNull(publication.LatestPublishedReleaseVersion);
 
         // Check the expected order of the release series items in the generated test data setup
         Assert.Equal(3, publication.ReleaseSeries.Count);
@@ -3402,6 +3408,7 @@ public class PublicationServiceTests
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
             var actualPublication = await contentDbContext.Publications
+                .Include(p => p.LatestPublishedReleaseVersion)
                 .SingleAsync(p => p.Id == publication.Id);
 
             var actualReleaseSeries = actualPublication.ReleaseSeries;
@@ -3418,6 +3425,7 @@ public class PublicationServiceTests
 
             AssertOnPublicationLatestPublishedReleaseReorderedWasRaised(
                 actualPublication,
+                originalLatestPublishedReleaseId,
                 originalLatestPublishedReleaseVersionId);
         }
     }
@@ -3650,9 +3658,11 @@ public class PublicationServiceTests
 
     private void AssertOnPublicationLatestPublishedReleaseReorderedWasRaised(
         Publication publication,
+        Guid previousReleaseId,
         Guid previousReleaseVersionId) =>
         _adminEventRaiserMockBuilder.Assert.OnPublicationLatestPublishedReleaseReorderedWasRaised(
             publication,
+            previousReleaseId,
             previousReleaseVersionId);
 
     private void AssertOnPublicationRestoredEventRaised(

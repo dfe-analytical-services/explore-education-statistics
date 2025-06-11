@@ -22,19 +22,23 @@ internal class DataSetService(
     PublicDataDbContext publicDataDbContext,
     IDataSetVersionPathResolver dataSetVersionPathResolver,
     IUserService userService,
-    IAnalyticsService analyticsService,
-    ILogger<DataSetService> logger)
+    IAnalyticsService analyticsService)
     : IDataSetService
 {
     public async Task<Either<ActionResult, DataSetViewModel>> GetDataSet(
         Guid dataSetId,
         CancellationToken cancellationToken = default)
     {
-        return await publicDataDbContext.DataSets
+        return await publicDataDbContext
+            .DataSets
             .AsNoTracking()
             .Include(ds => ds.LatestLiveVersion)
             .SingleOrNotFoundAsync(ds => ds.Id == dataSetId, cancellationToken: cancellationToken)
             .OnSuccessDo(userService.CheckCanViewDataSet)
+            .OnSuccessDo(ds => analyticsService.CaptureDataSetCall(
+                dataSetId: ds.Id,
+                type: DataSetCallType.GetSummary,
+                cancellationToken: cancellationToken))
             .OnSuccess(MapDataSet);
     }
 
@@ -48,10 +52,10 @@ internal class DataSetService(
                 dataSetVersion: dataSetVersion,
                 cancellationToken: cancellationToken)
             .OnSuccessDo(userService.CheckCanViewDataSetVersion)
-            .OnSuccessDo(dsv => CaptureDataSetVersionCallForAnalytics(
+            .OnSuccessDo(dsv => analyticsService.CaptureDataSetVersionCall(
                 dataSetVersionId: dsv.Id, 
-                dataSetVersion: dataSetVersion,
                 type: DataSetVersionCallType.DownloadCsv,
+                requestedDataSetVersion: dataSetVersion,
                 cancellationToken: cancellationToken))
             .OnSuccess(DownloadDataSetVersionToStream);
     }
@@ -92,6 +96,12 @@ internal class DataSetService(
             .Select(MapDataSet)
             .ToList();
 
+        await analyticsService.CapturePublicationCall(
+            publicationId: publicationId,
+            type: PublicationCallType.GetDataSets,
+            parameters: new PaginationParameters(Page: page, PageSize: pageSize),
+            cancellationToken: cancellationToken);
+        
         return new DataSetPaginatedListViewModel
         {
             Results = dataSets,
@@ -104,13 +114,19 @@ internal class DataSetService(
         string dataSetVersion,
         CancellationToken cancellationToken = default)
     {
-        return await publicDataDbContext.DataSetVersions
+        return await publicDataDbContext
+            .DataSetVersions
             .AsNoTracking()
             .FindByVersion(
                 dataSetId: dataSetId,
                 version: dataSetVersion,
                 cancellationToken: cancellationToken)
             .OnSuccessDo(userService.CheckCanViewDataSetVersion)
+            .OnSuccessDo(dsv => analyticsService.CaptureDataSetVersionCall(
+                dataSetVersionId: dsv.Id,
+                type: DataSetVersionCallType.GetSummary,
+                requestedDataSetVersion: dataSetVersion,
+                cancellationToken: cancellationToken))
             .OnSuccess(MapDataSetVersion);
     }
 
@@ -120,10 +136,16 @@ internal class DataSetService(
         int pageSize,
         CancellationToken cancellationToken = default)
     {
-        return await publicDataDbContext.DataSets
+        return await publicDataDbContext
+            .DataSets
             .AsNoTracking()
             .SingleOrNotFoundAsync(ds => ds.Id == dataSetId, cancellationToken: cancellationToken)
             .OnSuccessDo(userService.CheckCanViewDataSet)
+            .OnSuccessDo(ds => analyticsService.CaptureDataSetCall(
+                dataSetId: ds.Id,
+                type: DataSetCallType.GetVersions,
+                parameters: new PaginationParameters(Page: page, PageSize: pageSize),
+                cancellationToken: cancellationToken))
             .OnSuccess(dataSet => ListPaginatedVersions(
                 dataSet: dataSet,
                 page: page,
@@ -142,10 +164,10 @@ internal class DataSetService(
                 dataSetVersion: dataSetVersion,
                 cancellationToken: cancellationToken)
             .OnSuccessDo(userService.CheckCanViewDataSetVersion)
-            .OnSuccessDo(dsv => CaptureDataSetVersionCallForAnalytics(
+            .OnSuccessDo(dsv => analyticsService.CaptureDataSetVersionCall(
                 dataSetVersionId: dsv.Id, 
-                dataSetVersion: dataSetVersion,
                 type: DataSetVersionCallType.GetMetadata,
+                requestedDataSetVersion: dataSetVersion,
                 parameters: types != null 
                     ? new GetMetadataAnalyticsParameters(types)
                     : null,
@@ -160,7 +182,8 @@ internal class DataSetService(
         int pageSize,
         CancellationToken cancellationToken = default)
     {
-        var queryable = publicDataDbContext.DataSetVersions
+        var queryable = publicDataDbContext
+            .DataSetVersions
             .AsNoTracking()
             .Where(ds => ds.DataSetId == dataSet.Id)
             .WherePublicStatus();
@@ -369,32 +392,6 @@ internal class DataSetService(
             Locations = locations,
             TimePeriods = timePeriods,
         };
-    }
-
-    private async Task CaptureDataSetVersionCallForAnalytics(
-        Guid dataSetVersionId,
-        string? dataSetVersion,
-        DataSetVersionCallType type,
-        object? parameters = null,
-        CancellationToken cancellationToken = default) 
-    {
-        try
-        {
-            await analyticsService.CaptureDataSetVersionCall(
-                dataSetVersionId: dataSetVersionId,
-                type: type,
-                requestedDataSetVersion: dataSetVersion,
-                parameters: parameters,
-                cancellationToken: cancellationToken);
-        }
-        catch (Exception e)
-        {
-            logger.LogError(
-                exception: e,
-                message: """Error whilst capturing analytics for "{Type}" call for DataSetVersion {Id}""",
-                type,
-                dataSetVersionId);
-        }
     }
 
     private static FilterOptionsViewModel MapFilterOptions(FilterMeta filterMeta)

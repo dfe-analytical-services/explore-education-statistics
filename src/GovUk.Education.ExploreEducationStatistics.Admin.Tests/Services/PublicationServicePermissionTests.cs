@@ -388,7 +388,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task GetPublication()
         {
-            var userService = AlwaysTrueUserService();
+            AlwaysTrueUserService();
 
             _publication.Theme = _theme;
 
@@ -553,7 +553,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task ListReleaseVersions()
         {
-            var userService = AlwaysTrueUserService();
+            AlwaysTrueUserService();
 
             await PermissionTestUtil.PolicyCheckBuilder()
                 .SetupResourceCheckToFail(_publication, SecurityPolicies.CanViewSpecificPublication)

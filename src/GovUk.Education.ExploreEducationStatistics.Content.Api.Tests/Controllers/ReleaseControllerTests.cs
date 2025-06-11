@@ -32,7 +32,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
             MemoryCacheService
                 .Setup(s => s.GetItem(
                     It.IsAny<IMemoryCacheKey>(), typeof(ReleaseViewModel)))
-                .Returns(null);
+                .Returns((object?)null);
 
             MemoryCacheService
                 .Setup(s => s.SetItem<object>(

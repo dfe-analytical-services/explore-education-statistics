@@ -52,6 +52,7 @@ export interface ReferenceLine {
 
 export interface Label {
   text: string;
+  // This property can't be set on new charts since EES-6134.
   rotated?: boolean;
   width?: number;
 }
@@ -184,17 +185,12 @@ export interface ChartDefinition {
   };
 }
 
-export interface ChartDefinitionAxisCapabilities {
-  canRotateLabel: boolean;
-}
-
 export interface ChartDefinitionAxis {
   axis?: Axis;
   id: string;
   title: string;
   type: AxisType;
   hide?: boolean;
-  capabilities: ChartDefinitionAxisCapabilities;
   defaults?: NestedPartial<AxisConfiguration>;
   constants?: {
     groupBy?: AxisGroupBy;

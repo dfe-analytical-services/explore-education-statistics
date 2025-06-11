@@ -34,13 +34,34 @@ type AppServicePlanMetric = {
 type ContainerAppMetric = {
   resourceType: 'Microsoft.App/containerApps'
   metric:
-    | 'CpuPercentage' 
+    | 'CpuPercentage'
     | 'MemoryPercentage'
     | 'ResiliencyConnectTimeouts'
     | 'ResiliencyRequestRetries'
     | 'ResiliencyRequestTimeouts'
     | 'ResponseTime'
     | 'RestartCount'
+}
+
+type EventGridCustomTopicMetric = {
+  resourceType: 'Microsoft.EventGrid/topics'
+  metric:
+    | 'AdvancedFilterEvaluationCount'
+    | 'DeadLetteredCount'
+    | 'DeliveryAttemptFailCount'
+    | 'DeliverySuccessCount'
+    | 'DestinationProcessingDurationInMs'
+    | 'DroppedEventCount'
+    | 'MatchedEventCount'
+    | 'PublishFailCount'
+    | 'PublishSuccessCount'
+    | 'PublishSuccessLatencyInMs'
+    | 'UnmatchedEventCount'
+  dimensions: {
+    name: 'DeadLetterReason' | 'DropReason' | 'Error' | 'ErrorType' | 'EventSubscriptionName'
+    operator: DimensionOperator?
+    values: string[]
+  }[]?
 }
 
 type FileServiceMetric = {
@@ -81,6 +102,16 @@ type PostgreSqlMetric = {
     | 'storage_percent'
 }
 
+type SearchServiceMetric = {
+  resourceType: 'Microsoft.Search/searchServices'
+  metric:
+    | 'DocumentsProcessedCount'
+    | 'SearchLatency'
+    | 'SearchQueriesPerSecond'
+    | 'SkillExecutionCount'
+    | 'ThrottledSearchQueriesPercentage'
+}
+
 type SiteMetric = {
   resourceType: 'Microsoft.Web/sites'
   metric:
@@ -101,13 +132,15 @@ type StorageAccountMetric = {
 
 @export()
 @discriminator('resourceType')
-type ResourceMetric = 
-| AppGatewayMetric
-| AppInsightsMetric
-| AppServicePlanMetric
-| ContainerAppMetric
-| ContainerAppMetric
-| FileServiceMetric
-| PostgreSqlMetric
-| SiteMetric
-| StorageAccountMetric
+type ResourceMetric =
+  | AppGatewayMetric
+  | AppInsightsMetric
+  | AppServicePlanMetric
+  | ContainerAppMetric
+  | ContainerAppMetric
+  | EventGridCustomTopicMetric
+  | FileServiceMetric
+  | PostgreSqlMetric
+  | SearchServiceMetric
+  | SiteMetric
+  | StorageAccountMetric

@@ -11,10 +11,12 @@ import orderBy from 'lodash/orderBy';
 import { PublicationSummary } from '@common/services/publicationService';
 import FormFieldSelect from '@common/components/form/FormFieldSelect';
 import { useFormContext } from 'react-hook-form';
+import { PublicationRole } from '@admin/services/types/PublicationRole';
+import publicationRoleDisplayName from '@admin/utils/publicationRoleDisplayName';
 
 interface Props {
   publications?: PublicationSummary[];
-  publicationRoles?: string[];
+  publicationRoles?: PublicationRole[];
 }
 
 export default function InviteUserPublicationRoleForm({
@@ -107,7 +109,10 @@ export default function InviteUserPublicationRoleForm({
         name="publicationRole"
         placeholder="Choose publication role"
         options={publicationRoles?.map(role => ({
-          label: role,
+          // Temporarily transforming the displayed role name whilst we have the temporary 'Allower'
+          // publication role. Once the new 'Approver' role is introduced in STEP 9 (EES-6196) of the permissions
+          // rework, this can be reverted to display the role without transformation.
+          label: publicationRoleDisplayName(role),
           value: role,
         }))}
       />
@@ -145,7 +150,11 @@ export default function InviteUserPublicationRoleForm({
                       .title
                   }
                 </td>
-                <td>{userPublicationRole.publicationRole}</td>
+                <td>
+                  {publicationRoleDisplayName(
+                    userPublicationRole.publicationRole,
+                  )}
+                </td>
                 <td>
                   <ButtonText
                     onClick={() => {

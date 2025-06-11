@@ -72,7 +72,7 @@ const TableToolFinalStep = ({
     >
       {table && tableHeaders && (
         <>
-          <div className="govuk-!-margin-bottom-3 dfe-flex dfe-align-items-start dfe-justify-content--space-between">
+          <div className="govuk-!-margin-bottom-3 dfe-flex dfe-flex-wrap dfe-align-items-start dfe-justify-content--space-between dfe-gap-3">
             {publication?.isSuperseded ? (
               <WarningMessage testId="superseded-warning">
                 This publication has been superseded by{' '}
@@ -89,14 +89,12 @@ const TableToolFinalStep = ({
                   <Tag>This is the latest data</Tag>
                 ) : (
                   <>
-                    <div className="govuk-!-margin-bottom-3">
-                      <Tag colour="orange">
-                        This data is not from the latest release
-                      </Tag>
-                    </div>
+                    <Tag colour="orange">
+                      This data is not from the latest release
+                    </Tag>
 
                     <Link
-                      className="govuk-!-display-none-print"
+                      className="govuk-!-margin-bottom-1 govuk-!-display-none-print"
                       unvisited
                       to={`/find-statistics/${selectedPublication.slug}/${selectedPublication.latestRelease.slug}`}
                       testId="View latest data link"

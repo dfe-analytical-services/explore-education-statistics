@@ -1840,22 +1840,21 @@ public abstract class ReleaseVersionServiceTests
 
             await using var statisticsDbContext = InMemoryStatisticsDbContext(contextId);
             await using var contentDbContext = InMemoryApplicationDbContext(contextId);
-            {
-                var releaseVersionService = BuildService(
-                    contentDbContext: contentDbContext,
-                    statisticsDbContext: statisticsDbContext,
-                    processorClient: processorClient.Object);
 
-                var result = await releaseVersionService.DeleteTestReleaseVersion(releaseVersion.Id);
+            var releaseVersionService = BuildService(
+                contentDbContext: contentDbContext,
+                statisticsDbContext: statisticsDbContext,
+                processorClient: processorClient.Object);
 
-                VerifyAllMocks(processorClient);
+            var result = await releaseVersionService.DeleteTestReleaseVersion(releaseVersion.Id);
 
-                var validationProblem = result.AssertBadRequestWithValidationProblem();
+            VerifyAllMocks(processorClient);
 
-                validationProblem.AssertHasError(
-                    expectedPath: "error path",
-                    expectedCode: "error code");
-            }
+            var validationProblem = result.AssertBadRequestWithValidationProblem();
+
+            validationProblem.AssertHasError(
+                expectedPath: "error path",
+                expectedCode: "error code");
         }
 
         [Fact]
@@ -2280,7 +2279,7 @@ public abstract class ReleaseVersionServiceTests
             var approverPublicationRoleForUser = _fixture
                 .DefaultUserPublicationRole()
                 .WithUser(User)
-                .WithRole(PublicationRole.Approver)
+                .WithRole(PublicationRole.Allower)
                 .WithPublication(publications[1])
                 .Generate();
 
@@ -2294,7 +2293,7 @@ public abstract class ReleaseVersionServiceTests
             var approverPublicationRolesForOtherUser = _fixture
                 .DefaultUserPublicationRole()
                 .WithUser(otherUser)
-                .WithRole(PublicationRole.Approver)
+                .WithRole(PublicationRole.Allower)
                 .WithPublications(publications)
                 .GenerateList();
 
@@ -2350,7 +2349,7 @@ public abstract class ReleaseVersionServiceTests
             var approverPublicationRoleForUser = _fixture
                 .DefaultUserPublicationRole()
                 .WithUser(User)
-                .WithRole(PublicationRole.Approver)
+                .WithRole(PublicationRole.Allower)
                 .WithPublication(publication)
                 .Generate();
 

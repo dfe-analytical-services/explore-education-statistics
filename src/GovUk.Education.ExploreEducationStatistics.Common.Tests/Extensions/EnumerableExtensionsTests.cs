@@ -239,10 +239,9 @@ public class EnumerableExtensionsTests
     [Fact]
     public async Task ForEachAsync_SuccessfulEitherList()
     {
-        Either<Unit, List<int>> results =
+        var results =
             await new List<int> { 1, 2 }
-                .ForEachAsync(async value =>
-                    await GetSuccessfulEither(value));
+                .ForEachAsync(GetSuccessfulEither);
 
         Assert.True(results.IsRight);
 
@@ -255,7 +254,7 @@ public class EnumerableExtensionsTests
     [Fact]
     public async Task ForEachAsync_FailingEither()
     {
-        Either<Unit, List<int>> results =
+        var results =
             await new List<int> { 1, -1, 2 }
                 .ForEachAsync(async value =>
                 {
@@ -275,7 +274,7 @@ public class EnumerableExtensionsTests
     {
         var list = new List<int> { 1, 2, 3 };
         var results = list.SelectNullSafe(value => value * 2).ToList();
-        Assert.Equal(new List<int> { 2, 4, 6 }, results);
+        Assert.Equal([2, 4, 6], results);
     }
 
     [Fact]
@@ -362,7 +361,7 @@ public class EnumerableExtensionsTests
         var source = Enumerable.Empty<string>();
         var values = Enumerable.Empty<string>();
 
-        bool containsAll = source.ContainsAll(values);
+        var containsAll = source.ContainsAll(values);
 
         Assert.True(containsAll);
     }
@@ -373,7 +372,7 @@ public class EnumerableExtensionsTests
         var source = Enumerable.Empty<string>();
         var values = new List<string>() { "" };
 
-        bool containsAll = source.ContainsAll(values);
+        var containsAll = source.ContainsAll(values);
 
         Assert.False(containsAll);
     }
@@ -384,7 +383,7 @@ public class EnumerableExtensionsTests
         var source = new List<string>() { "" };
         var values = Enumerable.Empty<string>();
 
-        bool containsAll = source.ContainsAll(values);
+        var containsAll = source.ContainsAll(values);
 
         Assert.True(containsAll);
     }
@@ -392,28 +391,28 @@ public class EnumerableExtensionsTests
     [Fact]
     public void ContainsAll_BothNullLists_ThrowsArgumentNullException()
     {
-        IEnumerable<string> source = null;
-        IEnumerable<string> values = null;
+        IEnumerable<string>? source = null;
+        IEnumerable<string>? values = null;
 
-        Assert.Throws<ArgumentNullException>(() => source.ContainsAll(values));
+        Assert.Throws<ArgumentNullException>(() => source!.ContainsAll(values!));
     }
 
     [Fact]
     public void ContainsAll_SourceListIsNull_ThrowsArgumentNullException()
     {
-        IEnumerable<string> source = null;
+        IEnumerable<string>? source = null;
         var values = new List<string>() { "" };
 
-        Assert.Throws<ArgumentNullException>(() => source.ContainsAll(values));
+        Assert.Throws<ArgumentNullException>(() => source!.ContainsAll(values));
     }
 
     [Fact]
     public void ContainsAll_ValuesListIsNull_ThrowsArgumentNullException()
     {
         var source = new List<string>() { "" };
-        IEnumerable<string> values = null;
+        IEnumerable<string>? values = null;
 
-        Assert.Throws<ArgumentNullException>(() => source.ContainsAll(values));
+        Assert.Throws<ArgumentNullException>(() => source.ContainsAll(values!));
     }
 
     [Fact]
@@ -422,7 +421,7 @@ public class EnumerableExtensionsTests
         var source = new List<string>() { "a", "b", "c" };
         var values = new List<string>() { "d" };
 
-        bool containsAll = source.ContainsAll(values);
+        var containsAll = source.ContainsAll(values);
 
         Assert.False(containsAll);
     }
@@ -433,7 +432,7 @@ public class EnumerableExtensionsTests
         var source = new List<string>() { "a", "b", "c" };
         var values = new List<string>() { "a", "d" };
 
-        bool containsAll = source.ContainsAll(values);
+        var containsAll = source.ContainsAll(values);
 
         Assert.False(containsAll);
     }
@@ -444,7 +443,7 @@ public class EnumerableExtensionsTests
         var source = new List<string>() { "a", "b", "c" };
         var values = new List<string>() { "a", "b" };
 
-        bool containsAll = source.ContainsAll(values);
+        var containsAll = source.ContainsAll(values);
 
         Assert.True(containsAll);
     }
@@ -549,15 +548,5 @@ public class EnumerableExtensionsTests
     {
         await Task.Delay(5);
         return Unit.Instance;
-    }
-
-    private class TestClass
-    {
-        public readonly int Value;
-
-        public TestClass(int value)
-        {
-            Value = value;
-        }
     }
 }

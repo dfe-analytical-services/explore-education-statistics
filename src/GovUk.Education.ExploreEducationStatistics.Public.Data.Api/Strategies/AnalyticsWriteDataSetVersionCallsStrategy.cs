@@ -1,55 +1,31 @@
 using GovUk.Education.ExploreEducationStatistics.Analytics.Common.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Common.Services;
-using GovUk.Education.ExploreEducationStatistics.Common.Utils;
+using GovUk.Education.ExploreEducationStatistics.Analytics.Common.Strategies;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Requests;
-using Newtonsoft.Json;
 using IAnalyticsPathResolver = GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services.Interfaces.IAnalyticsPathResolver;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Strategies;
 
 public class AnalyticsWriteDataSetVersionCallsStrategy(
     IAnalyticsPathResolver analyticsPathResolver,
-    DateTimeProvider dateTimeProvider,
-    ILogger<AnalyticsWriteDataSetVersionCallsStrategy> logger
+    ICommonAnalyticsWriteStrategyWorkflow<CaptureDataSetVersionCallRequest> workflow 
     ) : IAnalyticsWriteStrategy
 {
+    private readonly IWorkflowActor<CaptureDataSetVersionCallRequest> _workflowActor =
+        new WorkflowActor(analyticsPath: analyticsPathResolver.PublicApiDataSetVersionCallsDirectoryPath());
+        
     public Type RequestType => typeof(CaptureDataSetVersionCallRequest);
 
     public async Task Report(IAnalyticsCaptureRequestBase request, CancellationToken cancellationToken)
     {
-        if (request is not CaptureDataSetVersionCallRequest queryRequest)
+        await workflow.Report(_workflowActor, request, cancellationToken);
+    }
+
+    private class WorkflowActor(string analyticsPath) 
+        : WorkflowActorBase<CaptureDataSetVersionCallRequest>(analyticsPath)
+    {
+        public override string GetFilenamePart(CaptureDataSetVersionCallRequest request)
         {
-            throw new ArgumentException($"request isn't a {nameof(CaptureDataSetVersionQueryRequest)}");
-        }
-        
-        logger.LogInformation(
-            "Capturing query for analytics for data set {DataSetTitle}",
-            queryRequest.DataSetTitle);
-
-        var directory = analyticsPathResolver.PublicApiDataSetVersionCallsDirectoryPath();
-        var filename =
-            $"{dateTimeProvider.UtcNow:yyyyMMdd-HHmmss}_{queryRequest.DataSetVersionId}_{RandomUtils.RandomString()}.json";
-
-        try
-        {
-            Directory.CreateDirectory(directory);
-
-            var filePath = Path.Combine(directory, filename);
-
-            var serialisedRequest = JsonSerializationUtils.Serialize(
-                obj: queryRequest,
-                formatting: Formatting.Indented,
-                orderedProperties: true,
-                camelCase: true);
-
-            await File.WriteAllTextAsync(filePath, contents: serialisedRequest, cancellationToken: cancellationToken);
-        }
-        catch (Exception e)
-        {
-            logger.LogError(
-                e,
-                "Error whilst writing {RequestTypeName} to disk",
-                queryRequest.GetType().ToString());
+            return request.DataSetVersionId.ToString();
         }
     }
 }

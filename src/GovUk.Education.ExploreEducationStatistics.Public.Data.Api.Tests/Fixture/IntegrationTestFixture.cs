@@ -7,7 +7,7 @@ public abstract class IntegrationTestFixture(TestApplicationFactory testApp) : I
     protected readonly DataFixture DataFixture = new();
 
     protected readonly TestApplicationFactory TestApp = testApp;
-
+    
     public async Task InitializeAsync()
     {
         await TestApp.Initialize();

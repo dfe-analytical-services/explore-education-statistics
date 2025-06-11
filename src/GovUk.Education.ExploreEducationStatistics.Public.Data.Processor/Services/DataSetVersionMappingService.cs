@@ -13,7 +13,6 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Services.
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
-using Semver;
 using ValidationMessages =
     GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Requests.Validators.ValidationMessages;
 

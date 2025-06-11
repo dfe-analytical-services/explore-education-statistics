@@ -11,16 +11,19 @@ public class EventGridEventHandler(ILogger<EventGridEventHandler> logger) : IEve
         EventGridEvent eventGridEvent,
         Func<TPayload, CancellationToken, Task<TResponse>> handler)
     {
-        logger.LogDebug("{FunctionName} triggered: {@EventGridEvent}", context.FunctionDefinition.Name, eventGridEvent);
-        
-        var payload = eventGridEvent.Data.ToObjectFromJson<TPayload>() 
-                      ?? throw new Exception(
-                          $"Unable to deserialise the payload of event into type {typeof(TPayload).Name}");
+        var payload = eventGridEvent.Data.ToObjectFromJson<TPayload>(); 
 
+        logger.LogDebug("{FunctionName} triggered: {@EventGridEvent} {@Payload}", context.FunctionDefinition.Name, eventGridEvent, payload);
+
+        if (payload is null)
+        {
+            throw new Exception($"Unable to deserialise the payload of event into type {typeof(TPayload).Name}");
+        }
+        
         try
         {
             var response = await handler(payload, context.CancellationToken);
-            logger.LogDebug("{FunctionName} completed. {Response}", context.FunctionDefinition.Name, response);
+            logger.LogDebug("{FunctionName} completed. {@Response}", context.FunctionDefinition.Name, response);
             return response;
         }
         catch (Exception e)

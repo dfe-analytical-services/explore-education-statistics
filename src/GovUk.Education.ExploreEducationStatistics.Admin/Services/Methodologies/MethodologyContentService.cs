@@ -357,7 +357,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
         private static ContentBlock CreateContentBlockForType(ContentBlockType type)
         {
             var classType = GetContentBlockClassTypeFromEnumValue(type);
-            var newContentBlock = (ContentBlock) Activator.CreateInstance(classType);
+            var newContentBlock = (ContentBlock) (Activator.CreateInstance(classType) 
+                                                  ?? throw new ArgumentException($"Could not create content block for {type} with class type {classType}"));
             newContentBlock.Id = Guid.NewGuid();
             newContentBlock.Created = DateTime.UtcNow;
             return newContentBlock;

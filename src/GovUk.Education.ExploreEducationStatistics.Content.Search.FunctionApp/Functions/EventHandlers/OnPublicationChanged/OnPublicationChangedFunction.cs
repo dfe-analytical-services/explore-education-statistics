@@ -17,7 +17,7 @@ public class OnPublicationChangedFunction(IEventGridEventHandler eventGridEventH
         await eventGridEventHandler.Handle<PublicationChangedEventDto, RefreshSearchableDocumentMessageDto[]>(
             context, 
             eventDto,
-            (payload, ct) => 
+            (payload, _) => 
                 Task.FromResult<RefreshSearchableDocumentMessageDto[]>(
                     string.IsNullOrEmpty(payload.Slug)
                     ? []

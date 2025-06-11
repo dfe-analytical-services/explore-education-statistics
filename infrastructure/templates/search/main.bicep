@@ -23,14 +23,14 @@ param resourceTags {
 @description('Tagging : Date Provisioned. Used for tagging resources created by this infrastructure pipeline.')
 param dateProvisioned string = utcNow('u')
 
-@description('Whether to create/update Azure Monitor alerts during this deploy.')
-param deployAlerts bool = false
-
 @description('Whether to deploy the Search service configuration to create/update the data source, index and indexer.')
 param deploySearchConfig bool = false
 
 @description('The URL of the Content API.')
 param contentApiUrl string
+
+@description('The URL of the Public site.')
+param publicSiteUrl string
 
 @description('Specifies whether or not the Search Docs Function App already exists.')
 param searchDocsFunctionAppExists bool = true
@@ -119,7 +119,6 @@ module searchDocsFunctionModule 'application/searchDocsFunction.bicep' = {
       maintenanceFirewallRules
     )
     logAnalyticsWorkspaceId: monitoringModule.outputs.logAnalyticsWorkspaceId
-    searchServiceEndpoint: searchServiceModule.outputs.searchServiceEndpoint
     searchServiceIndexerName: searchServiceModule.outputs.searchServiceIndexerName
     searchServiceName: searchServiceModule.outputs.searchServiceName
     searchStorageAccountName: searchServiceModule.outputs.searchStorageAccountName
@@ -128,7 +127,6 @@ module searchDocsFunctionModule 'application/searchDocsFunction.bicep' = {
     storageFirewallRules: maintenanceIpRanges
     applicationInsightsConnectionString: monitoringModule.outputs.applicationInsightsConnectionString
     tagValues: tagValues
-    deployAlerts: deployAlerts
   }
 }
 
@@ -150,11 +148,11 @@ module searchServiceModule 'application/searchService.bicep' = {
     location: location
     githubSourceRef: githubSourceRef
     indexName: 'index-1'
+    publicSiteUrl: publicSiteUrl
     resourceNames: resourceNames
     resourcePrefix: resourcePrefix
     searchServiceIpRules: []
     storageIpRules: maintenanceIpRanges
-    deployAlerts: deployAlerts
     deploySearchConfig: deploySearchConfig
     tagValues: tagValues
   }

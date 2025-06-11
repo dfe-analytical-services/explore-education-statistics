@@ -4,5 +4,5 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.
 
 public class PerformResetResponse
 {
-    public PublicationInfo[] AllPublications { get; init; }
+    public required PublicationInfo[] AllPublications { get; init; }
 }

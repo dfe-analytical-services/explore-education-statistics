@@ -47,7 +47,7 @@ public class RefreshSearchableDocumentFunctionTests
         };
         
         // ACT
-        var response = await sut.RefreshSearchableDocument(command, new FunctionContextMockBuilder().Build());
+        await sut.RefreshSearchableDocument(command, new FunctionContextMockBuilder().Build());
 
         // ASSERT
         _searchableDocumentCreatorMockBuilder.Assert.CreateSearchableDocumentNotCalled();

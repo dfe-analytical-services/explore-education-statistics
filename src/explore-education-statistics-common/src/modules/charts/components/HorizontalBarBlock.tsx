@@ -135,6 +135,7 @@ const HorizontalBarBlock = ({
           stackOffset={stacked ? 'sign' : undefined}
           margin={{
             left: 30,
+            top: 20,
           }}
         >
           <CartesianGrid
@@ -300,9 +301,6 @@ export const horizontalBarBlockDefinition: ChartDefinition = {
       id: 'major',
       title: 'Y Axis (major axis)',
       type: 'major',
-      capabilities: {
-        canRotateLabel: true,
-      },
       defaults: {
         groupBy: 'timePeriod',
         min: 0,
@@ -323,9 +321,6 @@ export const horizontalBarBlockDefinition: ChartDefinition = {
       id: 'minor',
       title: 'X Axis (minor axis)',
       type: 'minor',
-      capabilities: {
-        canRotateLabel: false,
-      },
       defaults: {
         showGrid: true,
         size: 50,

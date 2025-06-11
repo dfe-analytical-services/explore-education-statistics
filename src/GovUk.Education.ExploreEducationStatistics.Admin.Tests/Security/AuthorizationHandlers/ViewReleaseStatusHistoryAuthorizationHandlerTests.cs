@@ -38,7 +38,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                 await AssertReleaseVersionHandlerSucceedsWithCorrectReleaseRoles<ViewReleaseStatusHistoryRequirement>(
                     CreateHandler,
                     new ReleaseVersion(),
-                    ReleaseRole.Viewer,
                     ReleaseRole.Contributor,
                     ReleaseRole.Approver
                 );
@@ -57,7 +56,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                         Publication = new Publication()
                     },
                     PublicationRole.Owner,
-                    PublicationRole.Approver
+                    PublicationRole.Allower
                 );
             }
         }

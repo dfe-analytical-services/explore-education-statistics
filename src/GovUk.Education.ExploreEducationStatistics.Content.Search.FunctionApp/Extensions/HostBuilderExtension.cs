@@ -1,4 +1,4 @@
-﻿using Azure.Identity;
+using Azure.Identity;
 using Azure.Storage.Blobs;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Clients.AzureBlobStorage;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Clients.AzureSearch;
@@ -13,6 +13,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using Microsoft.Net.Http.Headers;
+using Serilog;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Extensions;
 
@@ -23,13 +24,39 @@ public static class HostBuilderExtension
         .ConfigureAppConfiguration(
             (context, configurationBuilder) =>
                 configurationBuilder
-                    .AddJsonFile($"appsettings.json", true, false)
+                    // When running in Azure, the default path from which it attempts to load appsettings.Production.json is wrong.
+                    // context.HostingEnvironment.ContentRootPath = "/azure-functions-host"
+                    // However, the file resides in the current directory, "/home/site/wwwroot".
+                    // See: https://stackoverflow.com/questions/78119200/appsettings-for-azurefunction-on-net-8-isolated
+                    .SetBasePath(Directory.GetCurrentDirectory())
+                    .AddJsonFile(
+                        "appsettings.json", 
+                        optional:false, 
+                        reloadOnChange:false)
                     .AddJsonFile(
                         $"appsettings.{context.HostingEnvironment.EnvironmentName}.json",
-                        true,
-                        false)
+                        optional:false,
+                        reloadOnChange:false)
                     .AddEnvironmentVariables())
-        .ConfigureServices(
+        .ConfigureHostServices()
+        .Build();
+
+    public static IHostBuilder InitialiseSerilog(this IHostBuilder hostBuilder)
+    {
+        // Setup Serilog
+        // https://github.com/serilog/serilog-aspnetcore
+        Log.Logger = new LoggerConfiguration()
+            // Because we can't access appsettings before creating the HostBuilder we'll use a bootstrap logger
+            // without configuration specific initialization first and replace it after the HostBuilder was created.
+            // See https://github.com/serilog/serilog-aspnetcore#two-stage-initialization
+            .ConfigureBootstrapLogger()
+            .CreateBootstrapLogger();
+        
+        return hostBuilder;
+    }
+
+    internal static IHostBuilder ConfigureHostServices(this IHostBuilder hostBuilder) =>
+        hostBuilder.ConfigureServices(
             (context, services) =>
                 services
                     .ConfigureLogging(context.Configuration)
@@ -41,6 +68,7 @@ public static class HostBuilderExtension
                     .AddTransient<ISearchableDocumentCreator, SearchableDocumentCreator>()
                     .AddTransient<ISearchableDocumentRemover, SearchableDocumentRemover>()
                     .AddTransient<IFullSearchableDocumentResetter, FullSearchableDocumentResetter>()
+                    .AddSearchDocumentChecker()
                     // Functions
                     .AddTransient<IEventGridEventHandler, EventGridEventHandler>()
                     .AddTransient<ICommandHandler, CommandHandler>()
@@ -69,6 +97,5 @@ public static class HostBuilderExtension
                                 HeaderNames.UserAgent,
                                 "EES Content Search Function App");
                         })
-        )
-        .Build();
+        );
 }

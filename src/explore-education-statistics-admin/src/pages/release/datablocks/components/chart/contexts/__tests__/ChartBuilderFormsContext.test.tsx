@@ -254,9 +254,6 @@ describe('useChartBuilderFormsContext', () => {
               id: 'major',
               title: 'Major axis',
               defaults: {},
-              capabilities: {
-                canRotateLabel: false,
-              },
             },
           },
           name: '',
@@ -321,9 +318,6 @@ describe('useChartBuilderFormsContext', () => {
             id: 'major',
             title: 'Major axis',
             defaults: {},
-            capabilities: {
-              canRotateLabel: false,
-            },
           },
         },
         name: '',
@@ -420,9 +414,6 @@ describe('useChartBuilderFormsContext', () => {
             id: 'major',
             title: 'Major axis',
             defaults: {},
-            capabilities: {
-              canRotateLabel: false,
-            },
           },
         },
         name: '',
@@ -472,9 +463,6 @@ describe('useChartBuilderFormsContext', () => {
                 id: 'major',
                 title: 'Major axis',
                 defaults: {},
-                capabilities: {
-                  canRotateLabel: false,
-                },
               },
             },
             name: '',
@@ -547,9 +535,6 @@ describe('useChartBuilderFormsContext', () => {
               id: 'minor',
               title: 'Minor axis',
               defaults: {},
-              capabilities: {
-                canRotateLabel: false,
-              },
             },
           },
           name: '',
@@ -608,9 +593,6 @@ describe('useChartBuilderFormsContext', () => {
             id: 'minor',
             title: 'Minor axis',
             defaults: {},
-            capabilities: {
-              canRotateLabel: false,
-            },
           },
         },
         name: '',
@@ -689,9 +671,6 @@ describe('useChartBuilderFormsContext', () => {
             id: 'minor',
             title: 'Minor axis',
             defaults: {},
-            capabilities: {
-              canRotateLabel: false,
-            },
           },
         },
         name: '',
@@ -735,9 +714,6 @@ describe('useChartBuilderFormsContext', () => {
                 id: 'minor',
                 title: 'Minor axis',
                 defaults: {},
-                capabilities: {
-                  canRotateLabel: false,
-                },
               },
             },
             name: '',

@@ -1,5 +1,6 @@
 import client from '@admin/services/utils/service';
 import { IdTitlePair } from 'src/services/types/common';
+import { PublicationRole } from './types/PublicationRole';
 
 export interface UserStatus {
   id: string;
@@ -27,7 +28,7 @@ export interface UserReleaseRole {
 export interface UserPublicationRole {
   id: string;
   publication: string;
-  role: string;
+  role: PublicationRole;
   userName: string;
   email: string;
 }
@@ -39,14 +40,17 @@ export interface UserReleaseRoleSubmission {
 
 export interface UserPublicationRoleSubmission {
   publicationId: string;
-  publicationRole: string;
+  publicationRole: PublicationRole;
 }
 
 export interface UserInvite {
   email: string;
   roleId: string;
   userReleaseRoles: { releaseId: string; releaseRole: string }[];
-  userPublicationRoles: { publicationId: string; publicationRole: string }[];
+  userPublicationRoles: {
+    publicationId: string;
+    publicationRole: PublicationRole;
+  }[];
 }
 
 export interface PendingInvite {
@@ -68,7 +72,7 @@ export interface Role {
 }
 
 export interface ResourceRoles {
-  Publication?: string[];
+  Publication?: PublicationRole[];
   Release?: string[];
 }
 
