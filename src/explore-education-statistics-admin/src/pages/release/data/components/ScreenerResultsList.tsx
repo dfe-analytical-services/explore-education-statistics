@@ -13,8 +13,7 @@ export default function ScreenerResultsList({
   const testResults = showAll
     ? screenerResult.testResults
     : screenerResult.testResults.filter(
-        testResult =>
-          testResult.result === 'FAIL' || testResult.result === 'WARNING',
+        testResult => testResult.result === 1 || testResult.result === 2, // FAIL || WARNING
       );
 
   return (
