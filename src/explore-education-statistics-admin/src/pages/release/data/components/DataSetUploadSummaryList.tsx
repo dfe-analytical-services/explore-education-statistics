@@ -9,6 +9,8 @@ interface Props {
 }
 
 export default function DataSetUploadSummaryList({ dataSetUpload }: Props) {
+  const uploadedByUrl = `mailto:${dataSetUpload.uploadedBy}`;
+
   return (
     <SummaryList testId="Data file details">
       <SummaryListItem term="Title">
@@ -20,13 +22,17 @@ export default function DataSetUploadSummaryList({ dataSetUpload }: Props) {
       <SummaryListItem term="Meta file">
         {dataSetUpload.metaFileName}
       </SummaryListItem>
-      <SummaryListItem term="Size">999999 bytes</SummaryListItem>
+      <SummaryListItem term="Size">
+        {dataSetUpload.dataFileSizeInBytes} bytes
+      </SummaryListItem>
       <SummaryListItem term="Status">{dataSetUpload.status}</SummaryListItem>
       <SummaryListItem term="Uploaded by">
-        <a href="mailto:'joe.bloggs@acme.com">joe.bloggs@acme.com</a>
+        <a href={uploadedByUrl}>{dataSetUpload.uploadedBy}</a>
       </SummaryListItem>
       <SummaryListItem term="Date uploaded">
-        <FormattedDate format="d MMMM yyyy, HH:mm">1970-01-01</FormattedDate>
+        <FormattedDate format="d MMMM yyyy, HH:mm">
+          {dataSetUpload.created}
+        </FormattedDate>
       </SummaryListItem>
     </SummaryList>
   );

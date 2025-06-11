@@ -42,9 +42,13 @@ export interface DataSetUpload {
   id: string;
   dataSetTitle: string;
   dataFileName: string;
+  dataFileSizeInBytes: number;
   metaFileName: string;
+  metaFileSizeInBytes: number;
   status: DataSetUploadStatus;
   screenerResult: ScreenerResult;
+  created: Date;
+  uploadedBy: string;
 }
 
 export interface ScreenerResult {

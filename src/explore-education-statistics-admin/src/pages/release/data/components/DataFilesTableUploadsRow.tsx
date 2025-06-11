@@ -12,7 +12,7 @@ import useToggle from '@common/hooks/useToggle';
 import logger from '@common/services/logger';
 import DataSetUploadSummaryList from './DataSetUploadSummaryList';
 import dataSetUploadTabIds from '../utils/dataSetUploadTabIds';
-import ScreenerResultsList from './ScreenerResultsList';
+import ScreenerResultsTable from './ScreenerResultsTable';
 import styles from './DataFilesTable.module.scss';
 
 interface Props {
@@ -69,7 +69,7 @@ export default function DataFilesTableUploadRow({
         {dataSetUpload.dataSetTitle}
       </td>
       <td data-testid="Size" className={styles.fileSize}>
-        999 Kb
+        {dataSetUpload.dataFileSizeInBytes} bytes
       </td>
       <td data-testid="Status">{dataSetUpload.status}</td>
       <td data-testid="Actions">
@@ -110,7 +110,7 @@ export default function DataFilesTableUploadRow({
                       </WarningMessage>
                     </>
                   )}
-                  <ScreenerResultsList
+                  <ScreenerResultsTable
                     screenerResult={dataSetUpload.screenerResult}
                     showAll={false}
                   />
@@ -125,7 +125,7 @@ export default function DataFilesTableUploadRow({
                   {dataSetUpload.screenerResult.testResults.length} tests
                   checked against this file
                 </h3>
-                <ScreenerResultsList
+                <ScreenerResultsTable
                   screenerResult={dataSetUpload.screenerResult}
                   showAll
                 />
