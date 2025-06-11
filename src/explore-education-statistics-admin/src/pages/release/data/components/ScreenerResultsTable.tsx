@@ -6,7 +6,7 @@ interface Props {
   showAll: boolean | undefined;
 }
 
-export default function ScreenerResultsList({
+export default function ScreenerResultsTable({
   screenerResult,
   showAll,
 }: Props) {
