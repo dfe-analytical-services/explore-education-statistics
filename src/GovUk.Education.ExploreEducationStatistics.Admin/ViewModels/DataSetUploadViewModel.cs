@@ -15,10 +15,18 @@ public record DataSetUploadViewModel
 
     public required string DataFileName { get; init; }
 
+    public required long DataFileSizeInBytes { get; init; }
+
     public required string MetaFileName { get; init; }
+
+    public required long MetaFileSizeInBytes { get; init; }
 
     [JsonConverter(typeof(StringEnumConverter))]
     public required DataSetUploadStatus Status { get; set; }
 
     public DataSetScreenerResponse? ScreenerResult { get; set; }
+
+    public required DateTime Created { get; set; }
+
+    public required string UploadedBy { get; set; }
 }

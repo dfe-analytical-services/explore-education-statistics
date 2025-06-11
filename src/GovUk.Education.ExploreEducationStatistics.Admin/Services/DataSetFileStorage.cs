@@ -189,7 +189,7 @@ public class DataSetFileStorage(
         CancellationToken cancellationToken)
     {
         var uploads = new List<DataSetUpload>();
-        // refactor with Select
+        // TODO: Refactor with Select
         foreach (var dataSet in dataSets)
         {
             uploads.Add(await UploadDataSetToTemporaryStorage(releaseVersionId, dataSet, cancellationToken));
@@ -240,6 +240,7 @@ public class DataSetFileStorage(
             MetaFileName = dataSet.MetaFile.FileName,
             MetaFileSizeInBytes = dataSet.MetaFile.FileSize,
             Status = DataSetUploadStatus.SCREENING,
+            UploadedBy = userService.GetProfileFromClaims().Email,
         };
 
         await contentDbContext.DataSetUploads.AddAsync(dataSetUpload, cancellationToken);

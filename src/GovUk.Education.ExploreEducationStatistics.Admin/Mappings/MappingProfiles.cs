@@ -5,6 +5,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ManageContent;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Mappings;
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
@@ -223,7 +224,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
                     m => m.MapFrom(dataSetVersion =>
                         dataSetVersion.VersionType));
 
-            CreateMap<DataSetUpload, DataSetUploadViewModel>();
+            CreateMap<DataSetUpload, DataSetUploadViewModel>()
+                .ForMember(dest => dest.Status,
+                    m => m.MapFrom(upload =>
+                        GetDataSetUploadStatus(upload.ScreenerResult)));
+
+            CreateMap<DataSetUpload, DataSetScreenerRequest>()
+                .BeforeMap((s, d) => d.StorageContainerName = "releases-temp");
+        }
+
+        private static DataSetUploadStatus GetDataSetUploadStatus(DataSetScreenerResponse screenerResult)
+        {
+            return screenerResult.OverallResult switch
+            {
+                ScreenerResult.Passed => screenerResult.TestResults.Any(test => test.Result == TestResult.WARNING)
+                    ? DataSetUploadStatus.PENDING_REVIEW
+                    : DataSetUploadStatus.PENDING_IMPORT,
+                ScreenerResult.Failed => DataSetUploadStatus.FAILED_SCREENING,
+                _ => throw new ArgumentOutOfRangeException(nameof(screenerResult), screenerResult, null),
+            };
         }
 
         private void CreateContentBlockMap()
