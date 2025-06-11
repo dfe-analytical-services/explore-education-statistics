@@ -144,7 +144,7 @@ export type DataSetUploadStatus =
 
 export type ScreenerOverallResult = 'Passed' | 'Failed';
 
-export type ScreenerTestResult = 'PASS' | 'FAIL' | 'WARNING';
+export type ScreenerTestResult = 0 | 1 | 2; // TODO: Replace with 'PASS' | 'FAIL' | 'WARNING' once JSON status issue is resolved
 
 export type ScreenerTestStage =
   | 'InitialFileValidation'

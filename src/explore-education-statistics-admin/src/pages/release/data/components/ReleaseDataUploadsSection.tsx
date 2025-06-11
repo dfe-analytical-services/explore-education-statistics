@@ -38,7 +38,6 @@ export default function ReleaseDataUploadsSection({
   const [allDataSetUploads, setAllDataSetUploads] = useState<DataSetUpload[]>(
     [],
   );
-  // const [uploadResults, setUploadResults] = useState<DataSetUploadResult[]>();
   const [isReordering, toggleReordering] = useToggle(false);
 
   const {
@@ -80,19 +79,6 @@ export default function ReleaseDataUploadsSection({
     [allDataFiles],
   );
 
-  // const confirmDataSetImport = useCallback(
-  //   async (dataSetUploadIds: string[]) => {
-  //     await releaseDataFileService.importDataSets(
-  //       releaseVersionId,
-  //       dataSetUploadIds,
-  //     );
-
-  //     setUploadResults(undefined);
-  //     await refetchDataFiles();
-  //   },
-  //   [releaseVersionId, setUploadResults, refetchDataFiles],
-  // );
-
   const handleStatusChange = useCallback(
     async (dataFile: DataFile, { totalRows, status }: DataFileImportStatus) => {
       // EES-5732 UI tests related to data replacement sometimes fail
@@ -123,6 +109,32 @@ export default function ReleaseDataUploadsSection({
       );
     },
     [releaseVersionId],
+  );
+
+  const handleDataSetImport = useCallback(
+    async (dataSetUploadIds: string[]) => {
+      await releaseDataFileService.importDataSets(
+        releaseVersionId,
+        dataSetUploadIds,
+      );
+
+      setAllDataSetUploads(uploads =>
+        uploads.filter(upload => !dataSetUploadIds.includes(upload.id)),
+      );
+
+      await refetchDataFiles();
+      await refetchDataSetUploads();
+    },
+    [releaseVersionId, refetchDataFiles, refetchDataSetUploads],
+  );
+
+  const handleDeleteUploadConfirm = useCallback(
+    async (deletedUploadId: string) => {
+      setAllDataSetUploads(uploads =>
+        uploads.filter(upload => upload.id !== deletedUploadId),
+      );
+    },
+    [],
   );
 
   const handleDeleteConfirm = useCallback(async (deletedFileId: string) => {
@@ -269,23 +281,28 @@ export default function ReleaseDataUploadsSection({
                     releaseVersionId={releaseVersionId}
                     testId="Data file replacements table"
                     onConfirmAction={refetchDataFiles}
+                    onDeleteFile={handleDeleteConfirm}
+                    onDeleteUpload={handleDeleteUploadConfirm}
+                    onDataSetImport={handleDataSetImport}
+                    onStatusChange={handleStatusChange}
                   />
                 )}
 
-                {dataFiles.length > 0 ||
-                  (allDataSetUploads.length > 0 && (
-                    <DataFilesTable
-                      canUpdateRelease={canUpdateRelease}
-                      caption="Data files"
-                      dataFiles={dataFiles}
-                      dataSetUploads={allDataSetUploads}
-                      publicationId={publicationId}
-                      releaseVersionId={releaseVersionId}
-                      testId="Data files table"
-                      onDeleteFile={handleDeleteConfirm}
-                      onStatusChange={handleStatusChange}
-                    />
-                  ))}
+                {(dataFiles.length > 0 || allDataSetUploads.length > 0) && (
+                  <DataFilesTable
+                    canUpdateRelease={canUpdateRelease}
+                    caption="Data files"
+                    dataFiles={dataFiles}
+                    dataSetUploads={allDataSetUploads}
+                    publicationId={publicationId}
+                    releaseVersionId={releaseVersionId}
+                    testId="Data files table"
+                    onDeleteFile={handleDeleteConfirm}
+                    onDeleteUpload={handleDeleteUploadConfirm}
+                    onDataSetImport={handleDataSetImport}
+                    onStatusChange={handleStatusChange}
+                  />
+                )}
               </>
             )}
           </>
