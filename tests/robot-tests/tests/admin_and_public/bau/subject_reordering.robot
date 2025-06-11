@@ -137,7 +137,7 @@ Reorder subject that is being replaced
     user checks table cell contains    3    1    Four    testid:Data files table
 
 Complete data replacement
-    user clicks link in table cell    1    4    Replace data    testid:Data file replacements table
+    user clicks link in table cell    1    4    View details    testid:Data file replacements table
 
     user waits until page contains    Data blocks: OK
     user waits until page contains    Footnotes: OK
