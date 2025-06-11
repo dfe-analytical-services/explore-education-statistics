@@ -1,5 +1,6 @@
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Clients.ContentApi;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Domain;
+using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Exceptions;
 using Moq;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Tests.Builders;
@@ -39,6 +40,20 @@ internal class ContentApiClientMockBuilder
             .Setup(m => m.GetAllLivePublicationInfos(
                 It.IsAny<CancellationToken>()))
             .ReturnsAsync(() => _publications ?? []);
+        
+        _mock
+            .Setup(m => m.GetReleaseSummary(
+                It.IsAny<string>(),
+                It.IsAny<string>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync((string publicationSlug, string releaseSlug, CancellationToken _) => new ReleaseSummary
+            {
+                Id = Guid.NewGuid().ToString(),
+                ReleaseId = Guid.NewGuid().ToString(),
+                Title = "Release title",
+                Slug = releaseSlug,
+                PublicationSlug = publicationSlug
+            });
     }
 
     public IContentApiClient Build()
@@ -78,6 +93,37 @@ internal class ContentApiClientMockBuilder
         return this;
     }
 
+    public ContentApiClientMockBuilder WhereGetReleaseSummaryReturns(
+        string publicationSlug,
+        string releaseSlug,
+        ReleaseSummary releaseSummary)
+    {
+        _mock
+            .Setup(m => m.GetReleaseSummary(
+                publicationSlug,
+                releaseSlug,
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync(releaseSummary);
+        return this;
+    }
+    
+    public ContentApiClientMockBuilder WhereGetReleaseSummaryThrows(
+        string publicationSlug,
+        string releaseSlug,
+        Exception? exception = null)
+    {
+        _mock
+            .Setup(m => m.GetReleaseSummary(
+                publicationSlug,
+                releaseSlug,
+                It.IsAny<CancellationToken>()))
+            .Throws((string ps, string rs, CancellationToken _) =>
+                new UnableToGetReleaseSummaryForPublicationException(
+                    ps, rs, "This is a test exception. GetReleaseSummary error."));
+        
+        return this;
+    }
+
     public Asserter Assert { get; }
 
     public class Asserter(Mock<IContentApiClient> mock)
@@ -97,6 +143,16 @@ internal class ContentApiClientMockBuilder
         public void ReleasesRequestedForPublication(string publicationSlug)
         {
             mock.Verify(m => m.GetReleasesForPublication(publicationSlug, It.IsAny<CancellationToken>()), Times.Once);
+        }
+
+        public void ReleaseSummaryRequestedForPublication(string publicationSlug, string releaseSlug)
+        {
+            mock
+                .Verify(m => m.GetReleaseSummary(
+                    publicationSlug,
+                    releaseSlug,
+                    It.IsAny<CancellationToken>()),
+                Times.Once);
         }
     }
 }
