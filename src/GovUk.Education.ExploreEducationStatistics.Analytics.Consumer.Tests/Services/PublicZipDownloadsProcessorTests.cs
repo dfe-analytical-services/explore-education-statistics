@@ -52,7 +52,13 @@ public abstract class PublicZipDownloadsProcessorTests
                 pathResolver: pathResolver);
             await service.Process();
 
-            Assert.False(Directory.Exists(ProcessingDirectoryPath(pathResolver)));
+            // The root processing folder is safe to leave behind.
+            Assert.True(Directory.Exists(ProcessingDirectoryPath(pathResolver)));
+            
+            // The temporary processing folder that was set up for this run of the processor
+            // should have been cleared away.
+            Assert.False(Directory.Exists(TemporaryProcessingDirectoryPath(pathResolver)));
+            
             Assert.True(Directory.Exists(pathResolver.PublicZipDownloadsReportsDirectoryPath()));
 
             var reports = Directory.GetFiles(pathResolver.PublicZipDownloadsReportsDirectoryPath());
@@ -159,7 +165,8 @@ public abstract class PublicZipDownloadsProcessorTests
         return new PublicZipDownloadsProcessor(
             pathResolver: pathResolver,
             workflow: workflow ?? new ProcessRequestFilesWorkflow(
-                logger: Mock.Of<ILogger<ProcessRequestFilesWorkflow>>()));
+                logger: Mock.Of<ILogger<ProcessRequestFilesWorkflow>>(),
+                temporaryProcessingFolderNameGenerator: () => "temp-processing-folder"));
     }
 
     private void SetupRequestFile(TestAnalyticsPathResolver pathResolver, string filename)
@@ -203,6 +210,11 @@ public abstract class PublicZipDownloadsProcessorTests
     private static string ProcessingDirectoryPath(TestAnalyticsPathResolver pathResolver)
     {
         return Path.Combine(pathResolver.PublicZipDownloadsDirectoryPath(), "processing");
+    }
+    
+    private static string TemporaryProcessingDirectoryPath(TestAnalyticsPathResolver pathResolver)
+    {
+        return Path.Combine(ProcessingDirectoryPath(pathResolver), "temp-processing-folder");
     }
 
     public record CaptureZipDownloadRequest(

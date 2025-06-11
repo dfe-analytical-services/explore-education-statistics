@@ -156,7 +156,7 @@ public class ProcessRequestFilesWorkflow(
         try
         {
             await actor.ProcessSourceFiles(
-                sourceFilesDirectory: batchDirectory,
+                sourceFilesDirectory: Path.Combine(batchDirectory, "*"),
                 connection: duckDbConnection);
 
             return true;

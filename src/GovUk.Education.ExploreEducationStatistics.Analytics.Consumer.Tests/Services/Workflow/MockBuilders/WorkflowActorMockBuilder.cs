@@ -49,7 +49,7 @@ public class WorkflowActorMockBuilder
     {
         _mock
             .Setup(a => a.ProcessSourceFiles(
-                batchProcessingFolder,
+                Path.Combine(batchProcessingFolder, "*"),
                 ItIsOpenDuckDbConnection()))
             .Returns(Task.CompletedTask);
         return this;
@@ -107,7 +107,7 @@ public class WorkflowActorMockBuilder
         {
             mock.Verify(a =>
                     a.ProcessSourceFiles(
-                        batchProcessingDirectory,
+                        Path.Combine(batchProcessingDirectory, "*"),
                         It.IsAny<DuckDbConnection>()),
                 Times.Once);
             return this;
