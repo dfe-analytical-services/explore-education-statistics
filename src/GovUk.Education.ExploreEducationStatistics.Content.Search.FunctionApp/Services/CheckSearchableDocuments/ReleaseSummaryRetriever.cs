@@ -1,5 +1,7 @@
 ﻿using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Clients.ContentApi;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Domain;
+using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Exceptions;
+using Microsoft.Extensions.Logging;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Services.CheckSearchableDocuments;
 
@@ -9,7 +11,9 @@ public interface IReleaseSummaryRetriever
         CancellationToken cancellationToken = default);
 }
 
-public class ReleaseSummaryRetriever(Func<IContentApiClient> contentApiClientFactory) : IReleaseSummaryRetriever
+public class ReleaseSummaryRetriever(
+    Func<IContentApiClient> contentApiClientFactory,
+    ILogger<ReleaseSummaryRetriever> logger) : IReleaseSummaryRetriever
 {
     public async Task<IList<ReleaseSummary>> GetAllPublishedReleaseSummaries(
         CancellationToken cancellationToken = default)
@@ -24,10 +28,21 @@ public class ReleaseSummaryRetriever(Func<IContentApiClient> contentApiClientFac
                 .ToAsyncEnumerable()
                 .SelectAwait(
                     async publicationInfo =>
-                        await contentApiClient.GetReleaseSummary(
-                            publicationInfo.PublicationSlug,
-                            publicationInfo.LatestReleaseSlug,
-                            cancellationToken))
+                    {
+                        try
+                        {
+                            return await contentApiClient.GetReleaseSummary(
+                                publicationInfo.PublicationSlug,
+                                publicationInfo.LatestReleaseSlug,
+                                cancellationToken);
+                        }
+                        catch (UnableToGetReleaseSummaryForPublicationException ex)
+                        {
+                            logger.LogError(ex, "Call to ContentApi GetReleaseSummary failed: {PublicationSlug} {LatestReleaseSlug}", publicationInfo.PublicationSlug, publicationInfo.LatestReleaseSlug);
+                            return null;
+                        }
+                    })
+                .OfType<ReleaseSummary>()
                 .ToArrayAsync(cancellationToken);
         
         return releaseSummaries;
