@@ -1,7 +1,9 @@
 #nullable enable
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using System;
+using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Public.Data;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Extensions;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 
@@ -26,7 +28,9 @@ public record ReplaceApiDataSetVersionPlanViewModel : ApiDataSetVersionPlanViewM
 {
     public MappingStatusViewModel? MappingStatus { get; init; }
     
-    public bool FinishedImporting => Status == DataSetVersionStatus.Draft;
+    public bool FinishedImporting => 
+        DataSetVersionAuthExtensions.PublicStatuses.Contains(Status) 
+        || Status == DataSetVersionStatus.Draft;
     
     //public override bool Valid { get; set; } TODO: override Valid with auto-calculated value when EES-5779 is ready
 }
