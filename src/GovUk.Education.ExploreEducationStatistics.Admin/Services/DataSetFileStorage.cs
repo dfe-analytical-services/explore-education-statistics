@@ -256,6 +256,22 @@ public class DataSetFileStorage(
         var upload = await contentDbContext.DataSetUploads.SingleAsync(upload => upload.Id == dataSetUploadId, cancellationToken);
         upload.ScreenerResult = screenerResult;
 
+        var hasWarnings = screenerResult.TestResults.Any(test => test.Result == TestResult.WARNING);
+        var hasFailures = screenerResult.TestResults.Any(test => test.Result == TestResult.FAIL);
+
+        if (hasWarnings)
+        {
+            upload.Status = DataSetUploadStatus.PENDING_REVIEW;
+        }
+        else if (hasFailures)
+        {
+            upload.Status = DataSetUploadStatus.FAILED_SCREENING;
+        }
+        else
+        {
+            upload.Status = DataSetUploadStatus.PENDING_IMPORT;
+        }
+
         await contentDbContext.SaveChangesAsync(cancellationToken);
     }
 

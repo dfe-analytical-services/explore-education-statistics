@@ -3,7 +3,6 @@ import releaseDataFileService, {
 } from '@admin/services/releaseDataFileService';
 import ButtonGroup from '@common/components/ButtonGroup';
 import ButtonText from '@common/components/ButtonText';
-import Modal from '@common/components/Modal';
 import React, { useCallback } from 'react';
 import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
@@ -20,20 +19,25 @@ interface Props {
   canUpdateRelease?: boolean;
   dataSetUpload: DataSetUpload;
   releaseVersionId: string;
+  onConfirmDelete: (deletedUploadId: string) => void;
+  onConfirmImport: (uploadIds: string[]) => void;
 }
 
 export default function DataFilesTableUploadRow({
   canUpdateRelease,
   dataSetUpload,
   releaseVersionId,
+  onConfirmDelete,
+  onConfirmImport,
 }: Props) {
-  const [open, toggleOpen] = useToggle(false);
+  const [openImportConfirm, toggleOpenImportConfirm] = useToggle(false);
+  const [openDeleteConfirm, toggleOpenDeleteConfirm] = useToggle(false);
 
   const hasFailures = dataSetUpload.screenerResult.testResults.some(
-    testResult => testResult.result === 'FAIL',
+    testResult => testResult.result === 1, // FAIL
   );
   const hasWarnings = dataSetUpload.screenerResult.testResults.some(
-    testResult => testResult.result === 'WARNING',
+    testResult => testResult.result === 2, // WARNING
   );
   let tabTitle = '';
 
@@ -47,12 +51,17 @@ export default function DataFilesTableUploadRow({
         releaseVersionId,
         dataSetUpload.id,
       );
+      onConfirmDelete(dataSetUpload.id);
     } catch (err) {
       logger.error(err);
     } finally {
-      toggleOpen.off();
+      toggleOpenDeleteConfirm.off();
     }
-  }, [releaseVersionId, dataSetUpload.id, toggleOpen]);
+  }, [releaseVersionId, dataSetUpload.id, toggleOpenDeleteConfirm]);
+
+  const confirmText = hasWarnings
+    ? 'Continue import with warnings'
+    : 'Continue import';
 
   return (
     <tr key={dataSetUpload.dataSetTitle}>
@@ -65,38 +74,48 @@ export default function DataFilesTableUploadRow({
       <td data-testid="Status">{dataSetUpload.status}</td>
       <td data-testid="Actions">
         <ButtonGroup className={styles.actions}>
-          <Modal
-            showClose
+          <ModalConfirm
             title="Data set details"
-            triggerButton={<ButtonText>View details</ButtonText>}
+            open={openImportConfirm}
+            onConfirm={() => onConfirmImport([dataSetUpload.id])} // TODO: Add permissions check?
+            // TODO: Confirmation button should be hidden/disabled unless dataSetUpload.status is PENDING_IMPORT
+            confirmText={confirmText}
+            triggerButton={
+              <ButtonText onClick={toggleOpenImportConfirm.on}>
+                View details
+              </ButtonText>
+            }
           >
             <Tabs id="data-set-upload-tabs">
-              <TabsSection
-                id={dataSetUploadTabIds.screenerFailuresAndWarnings}
-                title={tabTitle}
-              >
-                {dataSetUpload.screenerResult.overallResult === 'Failed' ? (
-                  <>
-                    <h3>Screener test failures</h3>
-                    <WarningMessage>
-                      You will need to delete this file, fix the failed tests
-                      and upload again
-                    </WarningMessage>
-                  </>
-                ) : (
-                  <>
-                    <h3>Screener test warnings</h3>
-                    <WarningMessage>
-                      You will need to review each warning before continuing the
-                      file upload
-                    </WarningMessage>
-                  </>
-                )}
-                <ScreenerResultsList
-                  screenerResult={dataSetUpload.screenerResult}
-                  showAll={false}
-                />
-              </TabsSection>
+              {(hasFailures || hasWarnings) && (
+                <TabsSection
+                  id={dataSetUploadTabIds.screenerFailuresAndWarnings}
+                  title={tabTitle}
+                >
+                  {hasFailures ? (
+                    // TODO: This condition can be replaced with `overallResult` once it returns a reliable response
+                    <>
+                      <h3>Screener test failures</h3>
+                      <WarningMessage>
+                        You will need to delete this file, fix the failed tests
+                        and upload again
+                      </WarningMessage>
+                    </>
+                  ) : (
+                    <>
+                      <h3>Screener test warnings</h3>
+                      <WarningMessage>
+                        You will need to review each warning before continuing
+                        the file upload
+                      </WarningMessage>
+                    </>
+                  )}
+                  <ScreenerResultsList
+                    screenerResult={dataSetUpload.screenerResult}
+                    showAll={false}
+                  />
+                </TabsSection>
+              )}
               <TabsSection
                 id={dataSetUploadTabIds.screenerResults}
                 title="All tests"
@@ -118,13 +137,15 @@ export default function DataFilesTableUploadRow({
                 <DataSetUploadSummaryList dataSetUpload={dataSetUpload} />
               </TabsSection>
             </Tabs>
-          </Modal>
+          </ModalConfirm>
           {canUpdateRelease && (
             <ModalConfirm
-              open={open}
+              open={openDeleteConfirm}
               title="Confirm deletion of selected data files"
               triggerButton={
-                <ButtonText onClick={toggleOpen.on}>Delete file</ButtonText>
+                <ButtonText onClick={toggleOpenDeleteConfirm.on}>
+                  Delete file
+                </ButtonText>
               }
               onConfirm={handleDeleteConfirm}
             >

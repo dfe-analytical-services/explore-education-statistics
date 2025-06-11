@@ -19,6 +19,8 @@ interface Props {
   releaseVersionId: string;
   testId?: string;
   onDeleteFile: (deletedFileId: string) => void;
+  onDeleteUpload: (deletedUploadId: string) => void;
+  onDataSetImport: (dataSetImportIds: string[]) => void;
   onStatusChange: (
     dataFile: DataFile,
     importStatus: DataFileImportStatus,
@@ -34,6 +36,8 @@ export default function DataFilesTable({
   releaseVersionId,
   testId,
   onDeleteFile,
+  onDeleteUpload,
+  onDataSetImport,
   onStatusChange,
 }: Props) {
   return (
@@ -66,8 +70,9 @@ export default function DataFilesTable({
             canUpdateRelease={canUpdateRelease}
             dataSetUpload={upload}
             key={upload.id}
-            publicationId={publicationId}
             releaseVersionId={releaseVersionId}
+            onConfirmDelete={onDeleteUpload}
+            onConfirmImport={onDataSetImport}
           />
         ))}
       </tbody>
