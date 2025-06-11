@@ -30,7 +30,7 @@ describe('ReleaseDataFilePage', () => {
       version: '',
       status: '',
       valid: false,
-      finishedImporting: false,
+      readyToPublish: false,
     },
     valid: true,
   };

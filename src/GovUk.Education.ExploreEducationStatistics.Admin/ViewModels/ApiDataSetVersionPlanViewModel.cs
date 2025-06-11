@@ -28,9 +28,7 @@ public record ReplaceApiDataSetVersionPlanViewModel : ApiDataSetVersionPlanViewM
 {
     public MappingStatusViewModel? MappingStatus { get; init; }
     
-    public bool FinishedImporting => 
-        DataSetVersionAuthExtensions.PublicStatuses.Contains(Status) 
-        || Status == DataSetVersionStatus.Draft;
+    public bool ReadyToPublish => Status == DataSetVersionStatus.Draft;
     
     //public override bool Valid { get; set; } TODO: override Valid with auto-calculated value when EES-5779 is ready
 }

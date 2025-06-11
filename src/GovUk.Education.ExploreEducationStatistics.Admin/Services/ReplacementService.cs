@@ -128,7 +128,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return apiDataSetVersionPlan with
             {
                 MappingStatus = mappingStatus, 
-                Valid = mappingStatus is { HasMajorVersionUpdate: false } && apiDataSetVersionPlan.FinishedImporting
+                Valid = mappingStatus is { HasMajorVersionUpdate: false } && apiDataSetVersionPlan.ReadyToPublish
             };
         }
         

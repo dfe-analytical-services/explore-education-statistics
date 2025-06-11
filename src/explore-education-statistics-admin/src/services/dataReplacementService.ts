@@ -104,7 +104,7 @@ export interface ApiDataSetVersionPlan {
   version: string;
   status: string;
   mappingStatus?: MappingStatus;
-  finishedImporting: boolean;
+  readyToPublish: boolean;
   valid: boolean;
 }
 
