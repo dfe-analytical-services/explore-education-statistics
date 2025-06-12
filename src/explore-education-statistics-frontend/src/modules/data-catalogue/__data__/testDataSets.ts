@@ -72,6 +72,7 @@ export const testDataSetFileSummaries: DataSetFileSummary[] = [
     filename: 'file-name-1',
     fileSize: '100 kb',
     meta: {
+      numDataFileRows: 11,
       timePeriodRange: {
         from: '2010',
         to: '2020',
@@ -106,6 +107,7 @@ export const testDataSetFileSummaries: DataSetFileSummary[] = [
     filename: 'file-name-2',
     fileSize: '100 kb',
     meta: {
+      numDataFileRows: 12,
       timePeriodRange: {
         from: '2010',
         to: '2020',
@@ -140,6 +142,7 @@ export const testDataSetFileSummaries: DataSetFileSummary[] = [
     filename: 'file-name-3',
     fileSize: '100 kb',
     meta: {
+      numDataFileRows: 13,
       timePeriodRange: {
         from: '2010',
         to: '2020',
@@ -176,6 +179,7 @@ export const testDataSetFile: DataSetFile = {
     name: 'file name',
     size: 'file size',
     meta: {
+      numDataFileRows: 65,
       timePeriodRange: {
         from: '2023',
         to: '2024',
