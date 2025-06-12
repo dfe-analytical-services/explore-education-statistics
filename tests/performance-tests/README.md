@@ -329,7 +329,7 @@ Full sets of options per test are available below as examples:
 * DATA_FILE - default value is "small-file.csv" which is in source control. See notes above on the use
   of large ZIP files.
 
-`pnpm --environment=dev --users=bau1 perftest dist/import.test.js
+`pnpm --environment=dev perftest dist/import.test.js
 -e PUBLICATION_TITLE="Import publication" -e DATA_FILE="big-file1.zip"`
 
 #### getReleasePage.test.js
@@ -350,7 +350,7 @@ fine-tuned further using the common override parameters defined in
 * DATA_FILE - default value is "small-file.csv" which is in source control. See notes above on the use
   of large ZIP files.
 
-`pnpm --environment=dev --users=bau1 perftest dist/publicTableBuilderQuery.test.js
+`pnpm --environment=dev perftest dist/publicTableBuilderQuery.test.js
 -e PUBLICATION_TITLE="Public table builder query" -e DATA_FILE="big-file1.zip"`
 
 #### adminTableBuilderQuery.test.js
@@ -359,7 +359,7 @@ fine-tuned further using the common override parameters defined in
 * DATA_FILE - default value is "small-file.csv" which is in source control. See notes above on the use
   of large ZIP files.
 
-`pnpm --environment=dev --users=bau1 perftest dist/adminTableBuilderQuery.test.js
+`pnpm --environment=dev perftest dist/adminTableBuilderQuery.test.js
 -e PUBLICATION_TITLE="Admin table builder query" -e DATA_FILE="big-file1.zip"`
 
 #### publicApiDataSetQuery.test.js
@@ -425,19 +425,19 @@ A number of parameters can be used to limit the candidate data sets to suit the 
 * DATA_SET_TITLES_TO_INCLUDE - a comma-separated list of data set titles, which will cause the test to only use those
   data sets during the run. The default value is undefined, which does not filter data sets by title.
 
-  `pnpm --environment=dev --users=bau1 perftest dist/publicApiDataSetQuery.test.js
+  `pnpm --environment=dev perftest dist/publicApiDataSetQuery.test.js
   -e DATA_SET_TITLES_TO_INCLUDE="Data Set 1"`
 
 * DATA_SET_TITLES_TO_EXCLUDE - a comma-separated list of data set titles, which will cause the test to avoid using those
   data sets during the run. The default value is undefined, which does not filter out any data sets by title.
 
-  `pnpm --environment=dev --users=bau1 perftest dist/publicApiDataSetQuery.test.js
+  `pnpm --environment=dev perftest dist/publicApiDataSetQuery.test.js
   -e DATA_SET_TITLES_TO_EXCLUDE="Data Set 1"`  
 
 * DATA_SET_MAX_ROWS - the maximum number of rows for data sets to be used in this run. The default value
   is undefined, which does not filter data sets by their size.
 
-  `pnpm --environment=dev --users=bau1 perftest dist/publicApiDataSetQuery.test.js
+  `pnpm --environment=dev perftest dist/publicApiDataSetQuery.test.js
   -e DATA_SET_MAX_ROWS=1000000`
 
 Additionally, generated queries can be simple or complex.  Simple queries use a limited number of available facets 
@@ -449,7 +449,7 @@ This can be controlled with the following parameter:
 * QUERY_COMPLEXITY - default value is "simple", which generates simple small queries. Other value is "complex"
   which generates nested queries with more complex operators.
 
-  `pnpm --environment=dev --users=bau1 perftest dist/publicApiDataSetQuery.test.js
+  `pnpm --environment=dev perftest dist/publicApiDataSetQuery.test.js
   -e QUERY_COMPLEXITY=complex`
 
 ## Transpiling and Bundling
