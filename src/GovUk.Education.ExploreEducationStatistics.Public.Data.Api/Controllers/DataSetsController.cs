@@ -246,6 +246,10 @@ public class DataSetsController(
     ///
     /// Unlike the `GET` endpoint, the `POST` endpoint allows condition criteria (`and`, `or`, `not`)
     /// and consequently can express more complex queries.
+    ///
+    /// A `POST` request without a body is allowed but must include a `Content-Type: application/json`
+    /// header. A `POST` request without a body will return a paginated set of unfiltered results and
+    /// will include values for all indicators.
     /// </remarks>
     [HttpPost("{dataSetId:guid}/query")]
     [Consumes(MediaTypeNames.Application.Json)]

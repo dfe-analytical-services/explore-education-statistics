@@ -591,7 +591,7 @@
           "DataSets"
         ],
         "summary": "Query a data set (POST)",
-        "description": "Query a data set using a `POST` request, returning the filtered results.\n            \nNote that for simpler queries or exploratory testing, there is also GET variant of this endpoint\nonly handles a smaller subset of querying functionality. However, for most use-cases,\nthis endpoint is recommended as it provides the complete set of functionality.\n            \nUnlike the `GET` endpoint, the `POST` endpoint allows condition criteria (`and`, `or`, `not`)\nand consequently can express more complex queries.",
+        "description": "Query a data set using a `POST` request, returning the filtered results.\n            \nNote that for simpler queries or exploratory testing, there is also GET variant of this endpoint\nonly handles a smaller subset of querying functionality. However, for most use-cases,\nthis endpoint is recommended as it provides the complete set of functionality.\n            \nUnlike the `GET` endpoint, the `POST` endpoint allows condition criteria (`and`, `or`, `not`)\nand consequently can express more complex queries.\n            \nA `POST` request without a body is allowed but must include a `application/json` Content-Type\nheader. A `POST` request without a body will return a paginated set of all results.",
         "operationId": "QueryDataSetPost",
         "parameters": [
           {
