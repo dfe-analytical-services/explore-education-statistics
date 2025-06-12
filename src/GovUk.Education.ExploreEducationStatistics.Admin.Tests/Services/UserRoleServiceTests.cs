@@ -1,8 +1,4 @@
 #nullable enable
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Database;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
@@ -18,6 +14,10 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Moq;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Models.GlobalRoles;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Utils.AdminMockUtils;
@@ -1396,6 +1396,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             Assert.Equal(2, result.Right["Publication"].Count);
             Assert.Equal(3, result.Right["Release"].Count);
+
+            Assert.Contains(nameof(Owner), result.Right["Publication"]);
+            Assert.Contains(nameof(Allower), result.Right["Publication"]);
+
+            Assert.Contains(nameof(Contributor), result.Right["Release"]);
+            Assert.Contains(nameof(ReleaseRole.Approver), result.Right["Release"]);
+            Assert.Contains(nameof(PrereleaseViewer), result.Right["Release"]);
         }
 
         [Fact]
@@ -1561,6 +1568,55 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             }
         }
 
+        // This test will be changed when we start introducing the use of the NEW publication roles in the 
+        // UI, in STEP 9 (EES-6196) of the Permissions Rework. For now, we want to
+        // filter out any usage of the NEW roles.
+        [Fact]
+        public async Task GetPublicationRolesForUser_InvalidRolesNotReturned()
+        {
+            var user = new User
+            {
+                FirstName = "User",
+                LastName = "1",
+                Email = "user1@example.com"
+            };
+
+            var userPublicationRole1 = _dataFixture.DefaultUserPublicationRole()
+                .WithUser(user)
+                .WithPublication(_dataFixture.DefaultPublication())
+                .WithRole(PublicationRole.Approver);
+
+            var userPublicationRole2 = _dataFixture.DefaultUserPublicationRole()
+                .WithUser(user)
+                .WithPublication(_dataFixture.DefaultPublication())
+                .WithRole(Drafter);
+
+            // Role assignment for a different user
+            var userPublicationRole3 = _dataFixture.DefaultUserPublicationRole()
+                .WithUser(new User())
+                .WithPublication(_dataFixture.DefaultPublication())
+                .WithRole(Drafter);
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using var contentDbContext = InMemoryApplicationDbContext(contentDbContextId);
+            await contentDbContext.Users.AddAsync(user);
+            await contentDbContext.UserPublicationRoles.AddRangeAsync(
+                userPublicationRole1,
+                userPublicationRole2,
+                userPublicationRole3);
+            await contentDbContext.SaveChangesAsync();
+
+            var service = SetupUserRoleService(contentDbContext: contentDbContext);
+
+            var result = await service.GetPublicationRolesForUser(user.Id);
+
+            result.AssertRight();
+
+            var userPublicationRoles = result.Right;
+            Assert.Empty(userPublicationRoles);
+        }
+
         [Fact]
         public async Task GetPublicationRolesForUser_NoUser()
         {
@@ -1652,6 +1708,67 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(Owner, userPublicationRoles[1].Role);
                 Assert.Equal("user2@example.com", userPublicationRoles[1].Email);
             }
+        }
+
+        // This test will be changed when we start introducing the use of the NEW publication roles in the 
+        // UI, in STEP 9 (EES-6196) of the Permissions Rework. For now, we want to
+        // filter out any usage of the NEW roles.
+        [Fact]
+        public async Task GetPublicationRolesForPublication_InvalidRolesNotReturned()
+        {
+            var user1 = new User
+            {
+                FirstName = "User",
+                LastName = "1",
+                Email = "user1@example.com"
+            };
+
+            var user2 = new User
+            {
+                FirstName = "User",
+                LastName = "2",
+                Email = "user2@example.com"
+            };
+
+            var publication1 = _dataFixture.DefaultPublication()
+                .Generate();
+            var publication2 = _dataFixture.DefaultPublication()
+                .Generate();
+
+            var userPublicationRole1 = _dataFixture.DefaultUserPublicationRole()
+                .WithUser(user1)
+                .WithPublication(publication1)
+                .WithRole(PublicationRole.Approver);
+
+            var userPublicationRole2 = _dataFixture.DefaultUserPublicationRole()
+                .WithUser(user2)
+                .WithPublication(publication1)
+                .WithRole(PublicationRole.Approver);
+
+            // Role assignment for a different publication
+            var userPublicationRole3 = _dataFixture.DefaultUserPublicationRole()
+                .WithUser(user2)
+                .WithPublication(publication2)
+                .WithRole(Drafter);
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using var contentDbContext = InMemoryApplicationDbContext(contentDbContextId);
+            await contentDbContext.Users.AddRangeAsync(user1, user2);
+            await contentDbContext.UserPublicationRoles.AddRangeAsync(
+                userPublicationRole1,
+                userPublicationRole2,
+                userPublicationRole3);
+            await contentDbContext.SaveChangesAsync();
+
+            var service = SetupUserRoleService(contentDbContext: contentDbContext);
+
+            var result = await service.GetPublicationRolesForPublication(publication1.Id);
+
+            result.AssertRight();
+
+            var userPublicationRoles = result.Right;
+            Assert.Empty(userPublicationRoles);
         }
 
         [Fact]
@@ -2760,7 +2877,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 User = user,
                 Publication = releaseVersion.Release.Publication,
-                Role = PublicationRole.Allower
+                Role = Allower
             };
 
             var userTwo = new User
@@ -2784,7 +2901,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 User = userTwo,
                 Publication = releaseVersion.Release.Publication,
-                Role = PublicationRole.Allower
+                Role = Allower
             };
 
             var contentDbContextId = Guid.NewGuid().ToString();
