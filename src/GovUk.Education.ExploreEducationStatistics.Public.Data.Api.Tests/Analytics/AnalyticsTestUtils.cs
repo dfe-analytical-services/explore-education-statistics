@@ -1,7 +1,6 @@
 using System.Diagnostics;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
-using GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Requests;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using Newtonsoft.Json;
@@ -45,15 +44,13 @@ public static class AnalyticsTestAssertions
         object? expectedParameters)
     {
         // Expect the successful call to have been recorded for analytics.
-        WaitForDirectoryToExist(expectedAnalyticsPath);
-        WaitForFilesToExistInDirectory(expectedAnalyticsPath);
+        await WaitForDirectoryToExist(expectedAnalyticsPath);
+        await WaitForFilesToExistInDirectory(expectedAnalyticsPath);
 
         var analyticsFiles = Directory.GetFiles(expectedAnalyticsPath);
         var analyticFile = Assert.Single(analyticsFiles);
-        var contents = await File.ReadAllTextAsync(analyticFile);
-
-        var capturedCall = JsonConvert.DeserializeObject<CaptureTopLevelCallRequest>(contents);
-
+        var capturedCall = await ReadFile<CaptureTopLevelCallRequest>(analyticFile);
+        
         Assert.NotNull(capturedCall);
         Assert.Equal(expectedType, capturedCall.Type);
         capturedCall.StartTime.AssertUtcNow(withinMillis: 5000);
@@ -81,14 +78,12 @@ public static class AnalyticsTestAssertions
         object? expectedParameters)
     {
         // Expect the successful call to have been recorded for analytics.
-        WaitForDirectoryToExist(expectedAnalyticsPath);
-        WaitForFilesToExistInDirectory(expectedAnalyticsPath);
+        await WaitForDirectoryToExist(expectedAnalyticsPath);
+        await WaitForFilesToExistInDirectory(expectedAnalyticsPath);
 
         var analyticsFiles = Directory.GetFiles(expectedAnalyticsPath);
         var analyticFile = Assert.Single(analyticsFiles);
-        var contents = await File.ReadAllTextAsync(analyticFile);
-
-        var capturedCall = JsonConvert.DeserializeObject<CapturePublicationCallRequest>(contents);
+        var capturedCall = await ReadFile<CapturePublicationCallRequest>(analyticFile);
 
         Assert.NotNull(capturedCall);
         Assert.Equal(expectedType, capturedCall.Type);
@@ -120,14 +115,12 @@ public static class AnalyticsTestAssertions
         Guid? expectedPreviewTokenDataSetVersionId)
     {
         // Expect the successful call to have been recorded for analytics.
-        WaitForDirectoryToExist(expectedAnalyticsPath);
-        WaitForFilesToExistInDirectory(expectedAnalyticsPath);
+        await WaitForDirectoryToExist(expectedAnalyticsPath);
+        await WaitForFilesToExistInDirectory(expectedAnalyticsPath);
 
         var analyticsFiles = Directory.GetFiles(expectedAnalyticsPath);
         var analyticFile = Assert.Single(analyticsFiles);
-        var contents = await File.ReadAllTextAsync(analyticFile);
-
-        var capturedCall = JsonConvert.DeserializeObject<CaptureDataSetCallRequest>(contents);
+        var capturedCall = await ReadFile<CaptureDataSetCallRequest>(analyticFile);
 
         Assert.NotNull(capturedCall);
         Assert.Equal(expectedType, capturedCall.Type);
@@ -174,14 +167,12 @@ public static class AnalyticsTestAssertions
         AnalyticsTheoryData.PreviewTokenSummary? expectedPreviewToken)
     {
         // Expect the successful call to have been recorded for analytics.
-        WaitForDirectoryToExist(expectedAnalyticsPath);
-        WaitForFilesToExistInDirectory(expectedAnalyticsPath);
+        await WaitForDirectoryToExist(expectedAnalyticsPath);
+        await WaitForFilesToExistInDirectory(expectedAnalyticsPath);
 
         var analyticsFiles = Directory.GetFiles(expectedAnalyticsPath);
         var analyticFile = Assert.Single(analyticsFiles);
-        var contents = await File.ReadAllTextAsync(analyticFile);
-
-        var capturedCall = JsonConvert.DeserializeObject<CaptureDataSetVersionCallRequest>(contents);
+        var capturedCall = await ReadFile<CaptureDataSetVersionCallRequest>(analyticFile);
 
         Assert.NotNull(capturedCall);
         Assert.Equal(expectedType, capturedCall.Type);
@@ -230,16 +221,12 @@ public static class AnalyticsTestAssertions
     {
         // Add a slight delay as the writing of the query details for analytics is non-blocking
         // and could occur slightly after the query result is returned to the user.
-        WaitForDirectoryToExist(expectedAnalyticsPath);
-        WaitForFilesToExistInDirectory(expectedAnalyticsPath);
+        await WaitForDirectoryToExist(expectedAnalyticsPath);
+        await WaitForFilesToExistInDirectory(expectedAnalyticsPath);
 
         var queryFiles = Directory.GetFiles(expectedAnalyticsPath);
         var queryFile = Assert.Single(queryFiles);
-        var contents = await File.ReadAllTextAsync(queryFile);
-        var capturedQuery = JsonSerializer.Deserialize<CaptureDataSetVersionQueryRequest>(contents, new JsonSerializerOptions
-        {
-            PropertyNameCaseInsensitive = true
-        });
+        var capturedQuery = await ReadFile<CaptureDataSetVersionQueryRequest>(queryFile, useSystemJson: false);
         
         Assert.NotNull(capturedQuery);
 
@@ -267,9 +254,9 @@ public static class AnalyticsTestAssertions
 
     // Allow waiting for a slight delay, as the writing of the analytics capture is non-blocking
     // and could occur slightly after the Controller response is returned to the user.
-    private static void WaitForDirectoryToExist(string expectedPath, int timeoutMillis = 5000)
+    private static async Task WaitForDirectoryToExist(string expectedPath, int timeoutMillis = 5000)
     {
-        WaitForConditionToBeTrue(
+        await WaitForConditionToBeTrue(
             conditionTest: () => Directory.Exists(expectedPath),
             failureMessage: $"Directory {expectedPath} does not exist after {timeoutMillis} milliseconds",
             timeoutMillis: timeoutMillis);
@@ -277,9 +264,9 @@ public static class AnalyticsTestAssertions
     
     // Allow waiting for a slight delay, as the writing of the analytics capture is non-blocking
     // and could occur slightly after the Controller response is returned to the user.
-    private static void WaitForFilesToExistInDirectory(string expectedPath, int timeoutMillis = 5000)
+    private static async Task WaitForFilesToExistInDirectory(string expectedPath, int timeoutMillis = 5000)
     {
-        WaitForConditionToBeTrue(
+        await WaitForConditionToBeTrue(
             conditionTest: () => Directory.GetFiles(expectedPath).Length > 0,
             failureMessage: $"Directory {expectedPath} does not exist after {timeoutMillis} milliseconds",
             timeoutMillis: timeoutMillis);
@@ -287,8 +274,8 @@ public static class AnalyticsTestAssertions
     
     // Allow waiting for a slight delay, as the writing of the analytics capture is non-blocking
     // and could occur slightly after the Controller response is returned to the user.
-    private static void WaitForConditionToBeTrue(
-        Func<bool> conditionTest,
+    private static async Task WaitForConditionToBeTrue(
+        Func<Task<bool>> conditionTest,
         string failureMessage,
         int timeoutMillis = 2000)
     {
@@ -296,14 +283,43 @@ public static class AnalyticsTestAssertions
         
         while (stopwatch.ElapsedMilliseconds <= timeoutMillis)
         {
-            if (conditionTest())
+            if (await conditionTest())
             {
                 return;
             }
             
-            Thread.Sleep(100);
+            await Task.Delay(100);
         }
         
         Assert.Fail(failureMessage);
+    }
+
+    private static async Task<TResult?> ReadFile<TResult>(string filePath, bool useSystemJson = true)
+    {
+        var result = default(TResult?);
+        
+        // Wait for the JSON file to be fully written before reading successfully.
+        await WaitForConditionToBeTrue(async () =>
+        {
+            var contents = await File.ReadAllTextAsync(filePath);
+            result = useSystemJson
+                ? JsonConvert.DeserializeObject<TResult>(contents)
+                : JsonSerializer.Deserialize<TResult>(contents,
+                    new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+            return result != null;
+        }, "Failed to read analytics JSON file");
+
+        return result;
+    }
+
+    private static async Task WaitForConditionToBeTrue(
+        Func<bool> conditionTest,
+        string failureMessage,
+        int timeoutMillis = 2000)
+    {
+        await WaitForConditionToBeTrue(
+            () => Task.FromResult(conditionTest()),
+            failureMessage,
+            timeoutMillis);
     }
 }
