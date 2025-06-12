@@ -1,4 +1,5 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Net.Http.Json;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Clients.ContentApi.Dtos;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Domain;
@@ -19,6 +20,9 @@ internal class ContentApiClient(HttpClient httpClient) : IContentApiClient
 
     private const string GetPublicationsByThemePageEndpointFormat =
         "/api/publications?ThemeId={1}&Page={0}";
+
+    private const string GetPublicationReleaseSummaryEndpointFormat =
+        "/api/publications/{0}/releases/{1}/summary";
 
     private record GetResponse<T>
     {
@@ -71,7 +75,7 @@ internal class ContentApiClient(HttpClient httpClient) : IContentApiClient
                     publicationSlug,
                     error.ErrorMessage),
 
-            _ => throw new ArgumentOutOfRangeException()
+            _ => throw new UnreachableException()
         };
     }
 
@@ -84,7 +88,7 @@ internal class ContentApiClient(HttpClient httpClient) : IContentApiClient
         {
             GetResponse<PaginatedResultDto<PublicationDto>>.Success => (true, null),
             GetResponse<PaginatedResultDto<PublicationDto>>.Error error => (false, error.ErrorMessage),
-            _ => throw new ArgumentOutOfRangeException()
+            _ => throw new UnreachableException()
         };
     }
 
@@ -95,7 +99,12 @@ internal class ContentApiClient(HttpClient httpClient) : IContentApiClient
                 cancellationToken);
         return publicationDtos
             .Where(dto => !string.IsNullOrEmpty(dto.Slug))
-            .Select(dto => new PublicationInfo { PublicationSlug = dto.Slug! })
+            .Where(dto => !string.IsNullOrEmpty(dto.LatestReleaseSlug))
+            .Select(dto => new PublicationInfo
+            {
+                PublicationSlug = dto.Slug!,
+                LatestReleaseSlug = dto.LatestReleaseSlug!
+            })
             .ToArray();
     }
 
@@ -122,15 +131,42 @@ internal class ContentApiClient(HttpClient httpClient) : IContentApiClient
         };
     }
 
+    public async Task<ReleaseSummary> GetReleaseSummary(
+        string publicationSlug,
+        string releaseSlug,
+        CancellationToken cancellationToken = default)
+    {
+        var response = await Get<ReleaseSummaryDto>(BuildGetPublicationReleaseSummaryEndpoint(publicationSlug, releaseSlug), cancellationToken);
+        
+        return response switch
+        {
+            GetResponse<ReleaseSummaryDto>.Success success =>
+                success.Result.ToModel(),
+
+            GetResponse<ReleaseSummaryDto>.Error error =>
+                throw new UnableToGetReleaseSummaryForPublicationException(
+                    publicationSlug,
+                    releaseSlug,
+                    error.ErrorMessage),
+
+            _ => throw new UnreachableException()
+        };
+    }
+    
     public async Task<PublicationInfo[]> GetAllLivePublicationInfos(CancellationToken cancellationToken)
     {
         var publicationDtos =
             await GetAllPaginatedItems<PublicationDto>(page => BuildGetPublicationsPageEndpoint(page, numberOfItems:30),
                 cancellationToken);
-        
+
         return publicationDtos
             .Where(dto => !string.IsNullOrEmpty(dto.Slug))
-            .Select(dto => new PublicationInfo { PublicationSlug = dto.Slug! })
+            .Where(dto => !string.IsNullOrEmpty(dto.LatestReleaseSlug))
+            .Select(dto => new PublicationInfo
+            {
+                PublicationSlug = dto.Slug!,
+                LatestReleaseSlug = dto.LatestReleaseSlug!
+            })
             .ToArray();
     }
 
@@ -181,4 +217,7 @@ internal class ContentApiClient(HttpClient httpClient) : IContentApiClient
 
     private string BuildGetPublicationsByThemePageEndpoint(Guid themeId, int page = 1) =>
         string.Format(GetPublicationsByThemePageEndpointFormat, page, themeId.ToString());
+    
+    private string BuildGetPublicationReleaseSummaryEndpoint(string publicationSlug, string releaseSlug) =>
+        string.Format(GetPublicationReleaseSummaryEndpointFormat, publicationSlug, releaseSlug);
 }

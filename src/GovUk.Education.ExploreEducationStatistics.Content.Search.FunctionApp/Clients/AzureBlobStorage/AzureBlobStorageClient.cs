@@ -70,6 +70,14 @@ public class AzureBlobStorageClient(
                     blobContainerClient.DeleteBlobIfExistsAsync(blobName, cancellationToken: cancellationToken)));
     }
 
+    public async Task<IList<string>> ListBlobsInContainer(
+        string containerName,
+        CancellationToken cancellationToken = default)
+    {
+        var blobContainerClient = BlobServiceClient.GetBlobContainerClient(containerName);
+        return await GetAllBlobNames(blobContainerClient, cancellationToken);
+    }
+    
     private static async Task<IList<string>> GetAllBlobNames(
         BlobContainerClient blobContainerClient,
         CancellationToken cancellationToken)

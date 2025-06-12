@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+using System.Reflection;
+using System.Text.Json;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Clients.ContentApi;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Domain;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Exceptions;
@@ -16,6 +17,7 @@ public class ContentApiClientTests(ITestOutputHelper output)
     }
 
     protected void Print(string s) => output.WriteLine(s);
+    protected void PrintAsJson<T>(T obj) => output.WriteLine(JsonSerializer.Serialize(obj, new JsonSerializerOptions { WriteIndented = true }));
 
     /// <summary>
     /// Separately assert that each of the public properties of two instances of an object are equal.
@@ -148,6 +150,16 @@ public class ContentApiClientTests(ITestOutputHelper output)
             {
                 Print(publicationInfo.ToString());
             }
+        }
+        
+        [Fact(Skip = "Call Content API to get release summary for publication and release slug")]
+        public async Task GetReleaseSummary()
+        {
+            var sut = GetSut();
+            var publicationSlug = "seed-publication-pupil-absence-in-schools-in-england";
+            var releaseSlug = "2016-17";
+            var releaseSummary = await sut.GetReleaseSummary(publicationSlug, releaseSlug);
+            PrintAsJson(releaseSummary);
         }
     }
 }

@@ -151,7 +151,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             await context.SaveChangesAsync();
         }
 
-        public async Task WriteDataSetFileMeta(Guid fileId, Guid subjectId)
+        public async Task WriteDataSetFileMeta(Guid fileId, Guid subjectId, int? numDataFileRows)
         {
             await using var contentDbContext = _dbContextSupplier.CreateDbContext<ContentDbContext>();
             await using var statisticsDbContext = _dbContextSupplier.CreateDbContext<StatisticsDbContext>();
@@ -207,6 +207,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 
             var dataSetFileMeta = new DataSetFileMeta
             {
+                NumDataFileRows = numDataFileRows,
                 TimePeriodRange = new TimePeriodRangeMeta
                 {
                     Start = timePeriods.First(),

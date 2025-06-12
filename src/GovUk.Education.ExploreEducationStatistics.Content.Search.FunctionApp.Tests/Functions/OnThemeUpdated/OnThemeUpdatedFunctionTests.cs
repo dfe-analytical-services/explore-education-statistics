@@ -32,10 +32,13 @@ public class OnThemeUpdatedFunctionTests
             .WithSubject(themeId.ToString())
             .Build();
         var sut = GetSut();
-        var publicationSlugs = Enumerable.Range(0, numberOfPublications)
-            .Select(i => $"publication-slug-{i}")
+        var publications = Enumerable.Range(0, numberOfPublications)
+            .Select(i => new PublicationInfo
+            {
+                PublicationSlug = $"publication-slug-{i}",
+                LatestReleaseSlug = $"release-slug-{i}"
+            })
             .ToArray();
-        var publications = publicationSlugs.Select(slug => new PublicationInfo{ PublicationSlug = slug }).ToArray(); 
         
         _contentApiMockBuilder.WhereThemeHasPublications(publications);
         
@@ -45,6 +48,6 @@ public class OnThemeUpdatedFunctionTests
         // ASSERT
         _contentApiMockBuilder.Assert.PublicationsRequestedForThemeId(themeId);
         Assert.Equal(numberOfPublications, response.Length);
-        Assert.Equal(publicationSlugs, response.Select(message => message.PublicationSlug));
+        Assert.Equal(publications.Select(p => p.PublicationSlug), response.Select(message => message.PublicationSlug));
     }
 }

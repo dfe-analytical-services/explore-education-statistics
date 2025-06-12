@@ -2048,6 +2048,8 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
 
             var dataSetFileMeta = file.DataSetFileMeta;
 
+            Assert.Equal(0, viewModel.File.Meta.NumDataFileRows);
+
             Assert.Equal(new DataSetFileTimePeriodRangeViewModel
             {
                 From = TimePeriodLabelFormatter.Format(

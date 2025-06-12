@@ -267,7 +267,7 @@ public static class AnalyticsTestAssertions
 
     // Allow waiting for a slight delay, as the writing of the analytics capture is non-blocking
     // and could occur slightly after the Controller response is returned to the user.
-    private static void WaitForDirectoryToExist(string expectedPath, int timeoutMillis = 2000)
+    private static void WaitForDirectoryToExist(string expectedPath, int timeoutMillis = 5000)
     {
         WaitForConditionToBeTrue(
             conditionTest: () => Directory.Exists(expectedPath),
@@ -277,7 +277,7 @@ public static class AnalyticsTestAssertions
     
     // Allow waiting for a slight delay, as the writing of the analytics capture is non-blocking
     // and could occur slightly after the Controller response is returned to the user.
-    private static void WaitForFilesToExistInDirectory(string expectedPath, int timeoutMillis = 2000)
+    private static void WaitForFilesToExistInDirectory(string expectedPath, int timeoutMillis = 5000)
     {
         WaitForConditionToBeTrue(
             conditionTest: () => Directory.GetFiles(expectedPath).Length > 0,
