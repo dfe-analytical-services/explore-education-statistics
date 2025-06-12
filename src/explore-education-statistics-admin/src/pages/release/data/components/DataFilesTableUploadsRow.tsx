@@ -57,7 +57,12 @@ export default function DataFilesTableUploadRow({
     } finally {
       toggleOpenDeleteConfirm.off();
     }
-  }, [releaseVersionId, dataSetUpload.id, toggleOpenDeleteConfirm]);
+  }, [
+    releaseVersionId,
+    dataSetUpload.id,
+    toggleOpenDeleteConfirm,
+    onConfirmDelete,
+  ]);
 
   const confirmText = hasWarnings
     ? 'Continue import with warnings'
@@ -77,6 +82,7 @@ export default function DataFilesTableUploadRow({
           <ModalConfirm
             title="Data set details"
             open={openImportConfirm}
+            hideConfirm={hasFailures}
             onConfirm={() => onConfirmImport([dataSetUpload.id])} // TODO: Add permissions check?
             // TODO: Confirmation button should be hidden/disabled unless dataSetUpload.status is PENDING_IMPORT
             confirmText={confirmText}

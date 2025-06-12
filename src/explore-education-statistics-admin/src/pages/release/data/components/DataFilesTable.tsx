@@ -3,11 +3,9 @@ import {
   DataFileImportStatus,
   DataSetUpload,
 } from '@admin/services/releaseDataFileService';
-import styles from '@admin/pages/release/data/components/DataFilesTable.module.scss';
 import DataFilesTableRow from '@admin/pages/release/data/components/DataFilesTableRow';
 import React from 'react';
 import styles from './DataFilesTable.module.scss';
-import DataFilesTableRow from './DataFilesTableRow';
 import DataFilesTableUploadRow from './DataFilesTableUploadsRow';
 
 interface Props {

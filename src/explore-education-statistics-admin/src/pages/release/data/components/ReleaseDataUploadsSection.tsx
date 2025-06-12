@@ -9,7 +9,6 @@ import releaseDataFileService, {
   DataFileImportStatus,
   DataSetUpload,
 } from '@admin/services/releaseDataFileService';
-import DataSetUploadModalConfirm from '@admin/pages/release/data/components/DataSetUploadModalConfirm';
 import DataFilesTable from '@admin/pages/release/data/components/DataFilesTable';
 import DataFilesReplacementTable from '@admin/pages/release/data/components/DataFilesReplacementTable';
 import Button from '@common/components/Button';
@@ -19,7 +18,6 @@ import WarningMessage from '@common/components/WarningMessage';
 import useToggle from '@common/hooks/useToggle';
 import { useQuery } from '@tanstack/react-query';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import DataFilesTable from './DataFilesTable';
 
 interface Props {
   publicationId: string;
@@ -276,15 +274,10 @@ export default function ReleaseDataUploadsSection({
                   <DataFilesReplacementTable
                     caption="Data file replacements"
                     dataFiles={replacedDataFiles}
-                    dataSetUploads={allDataSetUploads}
                     publicationId={publicationId}
                     releaseVersionId={releaseVersionId}
                     testId="Data file replacements table"
                     onConfirmAction={refetchDataFiles}
-                    onDeleteFile={handleDeleteConfirm}
-                    onDeleteUpload={handleDeleteUploadConfirm}
-                    onDataSetImport={handleDataSetImport}
-                    onStatusChange={handleStatusChange}
                   />
                 )}
 
