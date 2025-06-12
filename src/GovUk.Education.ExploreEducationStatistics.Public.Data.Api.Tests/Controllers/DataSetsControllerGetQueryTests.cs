@@ -317,22 +317,6 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
         }
 
         [Fact]
-        public async Task MissingParam_Returns400()
-        {
-            var dataSetVersion = await SetupDefaultDataSetVersion();
-
-            var client = BuildApp().CreateClient();
-
-            var response = await client.GetAsync($"{BaseUrl}/{dataSetVersion.DataSetId}/query");
-
-            var validationProblem = response.AssertValidationProblem();
-
-            Assert.Single(validationProblem.Errors);
-
-            validationProblem.AssertHasRequiredValueError("indicators");
-        }
-
-        [Fact]
         public async Task NotFound_Returns400()
         {
             var dataSetVersion = await SetupDefaultDataSetVersion();
@@ -1975,14 +1959,17 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
             Assert.Equal(0.241600007f, sessUnauthorisedPercent.Min());
         }
 
-        [Fact]
-        public async Task AllIndicators_Returns200_CorrectResultIds()
+        [Theory]
+        [InlineData(false)]
+        [InlineData(true)]
+        public async Task AllIndicators_Returns200_CorrectResultIds(bool includeIndicatorsQueryParam)
         {
             var dataSetVersion = await SetupDefaultDataSetVersion();
 
             var response = await QueryDataSet(
                 dataSetId: dataSetVersion.DataSetId,
-                indicators:
+                indicators: includeIndicatorsQueryParam
+                    ?
                 [
                     AbsenceSchoolData.IndicatorEnrolments,
                     AbsenceSchoolData.IndicatorSessAuthorised,
@@ -1990,6 +1977,7 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
                     AbsenceSchoolData.IndicatorSessUnauthorised,
                     AbsenceSchoolData.IndicatorSessUnauthorisedPercent,
                 ]
+                    : null
             );
 
             var viewModel = response.AssertOk<DataSetQueryPaginatedResultsViewModel>(useSystemJson: true);
@@ -3091,7 +3079,7 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
         
     private async Task<HttpResponseMessage> QueryDataSet(
         Guid dataSetId,
-        IEnumerable<string> indicators,
+        IEnumerable<string>? indicators,
         string? dataSetVersion = null,
         int? page = null,
         int? pageSize = null,
@@ -3102,10 +3090,12 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
         WebApplicationFactory<Startup>? app = null,
         string? requestSource = null)
     {
-        var query = new Dictionary<string, StringValues>
+        var query = new Dictionary<string, StringValues>();
+
+        if (indicators is not null)
         {
-            { "indicators", indicators.ToArray() }
-        };
+            query["indicators"] = indicators.ToArray();
+        }
 
         if (dataSetVersion is not null)
         {

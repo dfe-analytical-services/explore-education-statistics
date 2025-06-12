@@ -283,26 +283,6 @@ public abstract class DataSetsControllerPostQueryTests(TestApplicationFactory te
     public class IndicatorValidationTests(TestApplicationFactory testApp) : DataSetsControllerPostQueryTests(testApp)
     {
         [Fact]
-        public async Task Empty_Returns400()
-        {
-            var dataSetVersion = await SetupDefaultDataSetVersion();
-
-            var response = await QueryDataSet(
-                dataSetId: dataSetVersion.DataSetId,
-                request: new DataSetQueryRequest
-                {
-                    Indicators = []
-                }
-            );
-
-            var validationProblem = response.AssertValidationProblem();
-
-            Assert.Single(validationProblem.Errors);
-
-            validationProblem.AssertHasNotEmptyError("indicators");
-        }
-
-        [Fact]
         public async Task Blank_Returns400()
         {
             var dataSetVersion = await SetupDefaultDataSetVersion();
@@ -343,25 +323,6 @@ public abstract class DataSetsControllerPostQueryTests(TestApplicationFactory te
 
             validationProblem.AssertHasMaximumLengthError("indicators[0]", maxLength: 40);
             validationProblem.AssertHasMaximumLengthError("indicators[1]", maxLength: 40);
-        }
-
-        [Fact]
-        public async Task MissingParam_Returns400()
-        {
-            var dataSetVersion = await SetupDefaultDataSetVersion();
-
-            var client = BuildApp().CreateClient();
-
-            var response = await client.PostAsJsonAsync(
-                $"{BaseUrl}/{dataSetVersion.DataSetId}/query",
-                new {}
-            );
-
-            var validationProblem = response.AssertValidationProblem();
-
-            Assert.Single(validationProblem.Errors);
-
-            validationProblem.AssertHasNotEmptyError("indicators");
         }
 
         [Fact]
@@ -1890,8 +1851,10 @@ public abstract class DataSetsControllerPostQueryTests(TestApplicationFactory te
             Assert.Equal("577798", result.Values[AbsenceSchoolData.IndicatorSessAuthorised]);
         }
 
-        [Fact]
-        public async Task AllIndicators_Returns200_ResultValuesInAllowedRanges()
+        [Theory]
+        [InlineData(false)]
+        [InlineData(true)]
+        public async Task AllIndicators_Returns200_ResultValuesInAllowedRanges(bool includeIndicatorsQueryParam)
         {
             var dataSetVersion = await SetupDefaultDataSetVersion();
 
@@ -1899,7 +1862,8 @@ public abstract class DataSetsControllerPostQueryTests(TestApplicationFactory te
                 dataSetId: dataSetVersion.DataSetId,
                 request: new DataSetQueryRequest
                 {
-                    Indicators =
+                    Indicators = includeIndicatorsQueryParam
+                        ? 
                     [
                         AbsenceSchoolData.IndicatorEnrolments,
                         AbsenceSchoolData.IndicatorSessAuthorised,
@@ -1907,6 +1871,7 @@ public abstract class DataSetsControllerPostQueryTests(TestApplicationFactory te
                         AbsenceSchoolData.IndicatorSessUnauthorised,
                         AbsenceSchoolData.IndicatorSessUnauthorisedPercent,
                     ]
+                        : null
                 }
             );
 

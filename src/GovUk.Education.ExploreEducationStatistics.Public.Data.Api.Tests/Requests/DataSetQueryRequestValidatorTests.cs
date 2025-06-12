@@ -200,10 +200,11 @@ public class DataSetQueryRequestValidatorTests
     public class IndicatorsTests : DataSetQueryRequestValidatorTests
     {
         [Theory]
+        [InlineData(null)]
         [InlineData("indicator1")]
         [InlineData("indicator1111111111111111111111111111111")]
         [InlineData("indicator1", "indicator2")]
-        public void Success(params string[] indicators)
+        public void Success(params string[]? indicators)
         {
             var query = new DataSetQueryRequest
             {
@@ -211,19 +212,6 @@ public class DataSetQueryRequestValidatorTests
             };
 
             _validator.TestValidate(query).ShouldNotHaveAnyValidationErrors();
-        }
-
-        [Fact]
-        public void Failure_Empty()
-        {
-            var query = new DataSetQueryRequest
-            {
-                Indicators = []
-            };
-
-            _validator.TestValidate(query)
-                .ShouldHaveValidationErrorFor(q => q.Indicators)
-                .WithErrorCode(FluentValidationKeys.NotEmptyValidator);
         }
 
         [Fact]

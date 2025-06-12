@@ -35,7 +35,7 @@ public record DataSetGetQueryRequest
     /// The IDs of indicators to return values for.
     /// </summary>
     [FromQuery, QuerySeparator]
-    public required IReadOnlyList<string> Indicators { get; init; }
+    public required IReadOnlyList<string>? Indicators { get; init; }
 
     /// <summary>
     /// The sorts to apply to the results. Sorts at the start of the
@@ -52,6 +52,7 @@ public record DataSetGetQueryRequest
     ///
     /// This **should not** be enabled in a production environment.
     /// </summary>
+    // ReSharper disable once UnusedAutoPropertyAccessor.Global
     public bool Debug { get; init; }
 
     /// <summary>
@@ -86,8 +87,6 @@ public record DataSetGetQueryRequest
                 .SetValidator(new DataSetGetQueryTimePeriods.Validator()!)
                 .When(q => q.TimePeriods is not null);
 
-            RuleFor(q => q.Indicators)
-                .NotEmpty();
             RuleForEach(q => q.Indicators)
                 .NotEmpty()
                 .MaximumLength(40);
@@ -102,6 +101,7 @@ public record DataSetGetQueryRequest
 
             RuleFor(request => request.Page)
                 .GreaterThanOrEqualTo(1);
+            
             RuleFor(request => request.PageSize)
                 .InclusiveBetween(1, 10000);
         }

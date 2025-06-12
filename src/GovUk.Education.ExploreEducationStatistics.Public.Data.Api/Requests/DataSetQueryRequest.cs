@@ -17,7 +17,7 @@ public record DataSetQueryRequest
     /// The IDs of indicators in the data set to return values for.
     /// </summary>
     /// <example>["C2ySJ", "q4X3J"]</example>
-    public IReadOnlyList<string> Indicators { get; init; } = [];
+    public IReadOnlyList<string>? Indicators { get; init; }
 
     /// <summary>
     /// The sorts to sort the results by. Sorts at the start of the
@@ -51,8 +51,6 @@ public record DataSetQueryRequest
     {
         public Validator()
         {
-            RuleFor(q => q.Indicators)
-                .NotEmpty();
             RuleForEach(q => q.Indicators)
                 .NotEmpty()
                 .MaximumLength(40);
@@ -77,6 +75,7 @@ public record DataSetQueryRequest
 
             RuleFor(request => request.Page)
                 .GreaterThanOrEqualTo(1);
+            
             RuleFor(request => request.PageSize)
                 .InclusiveBetween(1, 10000);
         }
