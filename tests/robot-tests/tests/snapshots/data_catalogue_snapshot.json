@@ -1,5 +1,5 @@
 {
-  "num_datasets": "1002 data sets",
+  "num_datasets": "1011 data sets",
   "themes": [
     {
       "publications": [
@@ -18,7 +18,8 @@
         "Looked after children aged 16 to 17 in independent or semi-independent placements",
         "Outcomes for children in need, including children looked after by local authorities in England",
         "Outcomes of children in need, including looked after children",
-        "Serious incident notifications"
+        "Serious incident notifications",
+        "Stability measures for children looked after in England"
       ],
       "theme_heading": "Children's social care"
     },
