@@ -2073,21 +2073,25 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
             Assert.Contains(AbsenceSchoolData.IndicatorSessUnauthorisedPercent, meta.Indicators);
         }
 
-        [Fact]
-        public async Task AllIndicators_Returns200_CorrectDebuggedResultLabels()
+        [Theory]
+        [InlineData(false)]
+        [InlineData(true)]
+        public async Task AllIndicators_Returns200_CorrectDebuggedResultLabels(bool includeIndicatorsQueryParam)
         {
             var dataSetVersion = await SetupDefaultDataSetVersion();
 
             var response = await QueryDataSet(
                 dataSetId: dataSetVersion.DataSetId,
-                indicators:
+                indicators: includeIndicatorsQueryParam
+                    ? 
                 [
                     AbsenceSchoolData.IndicatorEnrolments,
                     AbsenceSchoolData.IndicatorSessAuthorised,
                     AbsenceSchoolData.IndicatorSessPossible,
                     AbsenceSchoolData.IndicatorSessUnauthorised,
                     AbsenceSchoolData.IndicatorSessUnauthorisedPercent,
-                ],
+                ]
+                    : null,
                 debug: true
             );
 

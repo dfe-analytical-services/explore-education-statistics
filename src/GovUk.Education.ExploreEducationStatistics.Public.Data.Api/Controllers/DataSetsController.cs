@@ -226,7 +226,11 @@ public class DataSetsController(
         CancellationToken cancellationToken)
     {
         return await dataSetQueryService
-            .Query(dataSetId, request, dataSetVersion, cancellationToken)
+            .Query(
+                dataSetId: dataSetId,
+                request: request,
+                dataSetVersion: dataSetVersion,
+                cancellationToken: cancellationToken)
             .HandleFailuresOrOk();
     }
 
@@ -256,11 +260,15 @@ public class DataSetsController(
                           The data set version e.g. 1.0, 1.1, 2.0, etc.
                           Wildcard versions are supported. For example, `2.*` returns the latest minor version in the v2 series.
                           """)][FromQuery] string? dataSetVersion,
-        [FromBody] DataSetQueryRequest request,
+        [FromBody] DataSetQueryRequest? request,
         CancellationToken cancellationToken)
     {
         return await dataSetQueryService
-            .Query(dataSetId, request, dataSetVersion, cancellationToken)
+            .Query(
+                dataSetId: dataSetId,
+                request: request ?? new DataSetQueryRequest(),
+                dataSetVersion: dataSetVersion,
+                cancellationToken: cancellationToken)
             .HandleFailuresOrOk();
     }
 
