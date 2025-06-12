@@ -14,7 +14,8 @@ public record DataSetQueryRequest
     public IDataSetQueryCriteria? Criteria { get; init; }
 
     /// <summary>
-    /// The IDs of indicators in the data set to return values for.
+    /// The IDs of indicators to return values for.
+    /// Omitting this parameter will select all indicators.
     /// </summary>
     /// <example>["C2ySJ", "q4X3J"]</example>
     public IReadOnlyList<string>? Indicators { get; init; }

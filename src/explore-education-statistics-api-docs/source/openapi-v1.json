@@ -21,8 +21,8 @@
         "tags": [
           "DataSets"
         ],
-        "summary": "Get a data set’s summary",
-        "description": "Gets a specific data set’s summary details.",
+        "summary": "Get a data set's summary",
+        "description": "Gets a data set's summary details.",
         "operationId": "GetDataSet",
         "parameters": [
           {
@@ -78,14 +78,14 @@
         "tags": [
           "DataSets"
         ],
-        "summary": "Get a data set’s metadata",
+        "summary": "Get a data set's metadata",
         "description": "Get the metadata about a data set. Use this to create data set queries.",
         "operationId": "GetDataSetMeta",
         "parameters": [
           {
             "name": "types",
             "in": "query",
-            "description": "The types of meta to get for the requested data set version.\r\n\r\nCan be any combination of the following:\r\n\r\n- `Filters` - include all meta relating to *filters*\r\n- `Indicators` - include all meta relating to *indicators*\r\n- `Locations` - include all meta relating to *locations*\r\n- `TimePeriods` - include all meta relating to *time periods*",
+            "description": "The types of meta to get for the requested data set version.\n\nCan be any combination of the following:\n\n- `Filters` - include all meta relating to *filters*\n- `Indicators` - include all meta relating to *indicators*\n- `Locations` - include all meta relating to *locations*\n- `TimePeriods` - include all meta relating to *time periods*",
             "schema": {
               "type": "array",
               "items": {
@@ -97,7 +97,7 @@
                 ],
                 "type": "string"
               },
-              "description": "The types of meta to get for the requested data set version.\r\n\r\nCan be any combination of the following:\r\n\r\n- `Filters` - include all meta relating to *filters*\r\n- `Indicators` - include all meta relating to *indicators*\r\n- `Locations` - include all meta relating to *locations*\r\n- `TimePeriods` - include all meta relating to *time periods*",
+              "description": "The types of meta to get for the requested data set version.\n\nCan be any combination of the following:\n\n- `Filters` - include all meta relating to *filters*\n- `Indicators` - include all meta relating to *indicators*\n- `Locations` - include all meta relating to *locations*\n- `TimePeriods` - include all meta relating to *time periods*",
               "nullable": true,
               "example": [
                 "Filters",
@@ -171,7 +171,7 @@
           "DataSets"
         ],
         "summary": "Query a data set (GET)",
-        "description": "Query a data set using a `GET` request, returning the filtered results.\r\n            \r\nNote that there is a `POST` variant of this endpoint which provides a more complete set\r\nof querying functionality. The `GET` variant is only recommended for initial exploratory\r\ntesting or simple queries that do not need advanced functionality.\r\n            \r\nUnlike the `POST` variant, this endpoint does not allow condition clauses (`and`, `or`, `not`)\r\nand consequently cannot express more complex queries. Use the `POST` variant instead for these\r\ntypes of queries.\r\n            \r\n## Indicators\r\n            \r\nThe `indicators` query parameter is required and **at least one** indicator must be specified.\r\n            \r\nEach indicator should be a string containing the indicator ID e.g. `4xbOu`, `8g1RI`.\r\n            \r\n## Filters\r\n            \r\nThe `filters` query parameter is used to filter by other filter options (not locations,\r\ngeographic levels or time periods).\r\n            \r\nEach filter should be a string containing the required filter option ID e.g. `z4FQE`, `DcQeg`.\r\n            \r\n## Geographic levels\r\n            \r\nThe `geographicLevels` query parameter is used to filter results by geographic level.\r\n            \r\nThe geographic levels are specified as codes, and can be one of the following:\r\n            \r\n- `EDA` - English devolved area\r\n- `INST` - Institution\r\n- `LA` - Local authority\r\n- `LAD` - Local authority district\r\n- `LEP` - Local enterprise partnership\r\n- `LSIP` - Local skills improvement plan area\r\n- `MCA` - Mayoral combined authority\r\n- `MAT` - MAT\r\n- `NAT` - National\r\n- `OA` - Opportunity area\r\n- `PA` - Planning area\r\n- `PCON` - Parliamentary constituency\r\n- `PROV` - Provider\r\n- `REG` - Regional\r\n- `RSC` - RSC region\r\n- `SCH` - School\r\n- `SPON` - Sponsor\r\n- `WARD` - Ward\r\n            \r\n## Locations\r\n            \r\nThe `locations` query parameter is used to filter results by location.\r\n            \r\nThe locations should be strings formatted like `{level}|{property}|{value}` where:\r\n            \r\n- `{level}` is the location's level code (e.g. `NAT`, `REG`, `LA`)\r\n- `{property}` is the name of the identifying property to match on (e.g. `id, `code`, `urn`)\r\n- `{value}` is the value for the property to match\r\n            \r\nAn ID or a code can be used to identify a location, with the following differences:\r\n            \r\n- IDs only match a **single location**\r\n- Codes may match **multiple locations**\r\n            \r\nWhilst codes are generally unique to a single location, they can be used for multiple locations.\r\nThis may match more results than you expect so it's recommended to use IDs where possible.\r\n            \r\n### Examples\r\n            \r\n- `LA|code|E08000019` matches any local authority with code `E08000019`\r\n- `REG|id|6bQgZ` matches any region with ID `6bQgZ`\r\n- `SCH|urn|140821` matches any school with URN `140821`\r\n            \r\n## Time periods\r\n            \r\nThe `timePeriods` query parameter is used to filter results by time period.\r\n            \r\nThe time periods should be strings formatted like `{period}|{code}` where:\r\n            \r\n- `period` is the time period or range (e.g. `2020` or `2020/2021`)\r\n- `code` is the code identifying the time period type (e.g. `AY`, `CY`, `M1`, `W20`)\r\n            \r\nThe `period` should be a single year like `2020`, or a range like `2020/2021`.\r\nCurrently, only years (or year ranges) are supported.\r\n            \r\nSome time period types span two years e.g. financial year part 2 (`P2`), or may fall in a\r\nlatter year e.g. academic year summer term (`T3`). For these types, a singular year `period`\r\nlike `2020` is considered as `2020/2021`.\r\n            \r\nFor example, a `period` value of `2020` is applicable to the following time periods:\r\n            \r\n- 2020 calendar year\r\n- 2020/2021 academic year\r\n- 2020/2021 financial year part 2 (October to March)\r\n- 2020/2021 academic year's summer term\r\n            \r\nIf you wish to be more explicit, you may use a range for the `period` e.g. `2020/2021`.\r\nHowever, a range cannot be used with time period types which only span a single year,\r\nfor example, `2020/21` cannot be used with `CY`, `M` or `W` codes.\r\n            \r\n### Examples\r\n            \r\n- `2020|AY` is the 2020/21 academic year\r\n- `2021|FY` is the 2021/22 financial year\r\n- `2020|T3` is the 2020/21 academic year's summer term\r\n- `2020|P2` is the 2020/21 financial year part 2 (October to March)\r\n- `2020|CY` is the 2020 calendar year\r\n- `2020|W32` is 2020 week 32\r\n- `2020/2021|AY` is the 2020/21 academic year\r\n- `2021/2022|FY` is the 2021/22 financial year\r\n            \r\n## Sorts\r\n            \r\nThe `sorts` query parameter is used to sort the results.\r\n            \r\nSorts are applied in the order they are provided and should be strings\r\nformatted like `{field}|{direction}` where:\r\n            \r\n- `field` is the name of the field to sort e.g. `timePeriod`\r\n- `direction` is the direction to sort in e.g. ascending (`Asc`) or descending (`Desc`)\r\n            \r\nThe `field` can be one of the following:\r\n            \r\n- `timePeriod` to sort by time period\r\n- `geographicLevel` to sort by the geographic level of the data\r\n- `location|{level}` to sort by locations in a geographic level where `{level}` is the level code (e.g. `REG`, `LA`)\r\n- `filter|{id}` to sort by the options in a filter where `{id}` is the filter ID (e.g. `3RxWP`)\r\n- `indicator|{id}` to sort by the values in a indicator where `{id}` is the indicator ID (e.g. `6VfPgZ`)\r\n            \r\n### Examples\r\n            \r\n- `timePeriod|Desc` sorts by time period in descending order\r\n- `geographicLevel|Asc` sorts by geographic level in ascending order\r\n- `location|REG|Asc` sorts by regions in ascending order\r\n- `filter|3RxWP|Desc` sorts by options in filter `3RxWP` in descending order\r\n- `indicator|7a1dk|Asc` sorts by values in indicator `7a1dk` in ascending order",
+        "description": "Query a data set using a `GET` request, returning the filtered results.\n            \nNote that there is a `POST` variant of this endpoint which provides a more complete set\nof querying functionality. The `GET` variant is only recommended for initial exploratory\ntesting or simple queries that do not need advanced functionality.\n            \nUnlike the `POST` variant, this endpoint does not allow condition clauses (`and`, `or`, `not`)\nand consequently cannot express more complex queries. Use the `POST` variant instead for these\ntypes of queries.\n            \n## Indicators\n            \nThe `indicators` query parameter is required and **at least one** indicator must be specified.\n            \nEach indicator should be a string containing the indicator ID e.g. `4xbOu`, `8g1RI`.\n            \n## Filters\n            \nThe `filters` query parameter is used to filter by other filter options (not locations,\ngeographic levels or time periods).\n            \nEach filter should be a string containing the required filter option ID e.g. `z4FQE`, `DcQeg`.\n            \n## Geographic levels\n            \nThe `geographicLevels` query parameter is used to filter results by geographic level.\n            \nThe geographic levels are specified as codes, and can be one of the following:\n            \n- `EDA` - English devolved area\n- `INST` - Institution\n- `LA` - Local authority\n- `LAD` - Local authority district\n- `LEP` - Local enterprise partnership\n- `LSIP` - Local skills improvement plan area\n- `MCA` - Mayoral combined authority\n- `MAT` - MAT\n- `NAT` - National\n- `OA` - Opportunity area\n- `PA` - Planning area\n- `PCON` - Parliamentary constituency\n- `PROV` - Provider\n- `REG` - Regional\n- `RSC` - RSC region\n- `SCH` - School\n- `SPON` - Sponsor\n- `WARD` - Ward\n            \n## Locations\n            \nThe `locations` query parameter is used to filter results by location.\n            \nThe locations should be strings formatted like `{level}|{property}|{value}` where:\n            \n- `{level}` is the location's level code (e.g. `NAT`, `REG`, `LA`)\n- `{property}` is the name of the identifying property to match on (e.g. `id, `code`, `urn`)\n- `{value}` is the value for the property to match\n            \nAn ID or a code can be used to identify a location, with the following differences:\n            \n- IDs only match a **single location**\n- Codes may match **multiple locations**\n            \nWhilst codes are generally unique to a single location, they can be used for multiple locations.\nThis may match more results than you expect so it's recommended to use IDs where possible.\n            \n### Examples\n            \n- `LA|code|E08000019` matches any local authority with code `E08000019`\n- `REG|id|6bQgZ` matches any region with ID `6bQgZ`\n- `SCH|urn|140821` matches any school with URN `140821`\n            \n## Time periods\n            \nThe `timePeriods` query parameter is used to filter results by time period.\n            \nThe time periods should be strings formatted like `{period}|{code}` where:\n            \n- `period` is the time period or range (e.g. `2020` or `2020/2021`)\n- `code` is the code identifying the time period type (e.g. `AY`, `CY`, `M1`, `W20`)\n            \nThe `period` should be a single year like `2020`, or a range like `2020/2021`.\nCurrently, only years (or year ranges) are supported.\n            \nSome time period types span two years e.g. financial year part 2 (`P2`), or may fall in a\nlatter year e.g. academic year summer term (`T3`). For these types, a singular year `period`\nlike `2020` is considered as `2020/2021`.\n            \nFor example, a `period` value of `2020` is applicable to the following time periods:\n            \n- 2020 calendar year\n- 2020/2021 academic year\n- 2020/2021 financial year part 2 (October to March)\n- 2020/2021 academic year's summer term\n            \nIf you wish to be more explicit, you may use a range for the `period` e.g. `2020/2021`.\nHowever, a range cannot be used with time period types which only span a single year,\nfor example, `2020/21` cannot be used with `CY`, `M` or `W` codes.\n            \n### Examples\n            \n- `2020|AY` is the 2020/21 academic year\n- `2021|FY` is the 2021/22 financial year\n- `2020|T3` is the 2020/21 academic year's summer term\n- `2020|P2` is the 2020/21 financial year part 2 (October to March)\n- `2020|CY` is the 2020 calendar year\n- `2020|W32` is 2020 week 32\n- `2020/2021|AY` is the 2020/21 academic year\n- `2021/2022|FY` is the 2021/22 financial year\n            \n## Sorts\n            \nThe `sorts` query parameter is used to sort the results.\n            \nSorts are applied in the order they are provided and should be strings\nformatted like `{field}|{direction}` where:\n            \n- `field` is the name of the field to sort e.g. `timePeriod`\n- `direction` is the direction to sort in e.g. ascending (`Asc`) or descending (`Desc`)\n            \nThe `field` can be one of the following:\n            \n- `timePeriod` to sort by time period\n- `geographicLevel` to sort by the geographic level of the data\n- `location|{level}` to sort by locations in a geographic level where `{level}` is the level code (e.g. `REG`, `LA`)\n- `filter|{id}` to sort by the options in a filter where `{id}` is the filter ID (e.g. `3RxWP`)\n- `indicator|{id}` to sort by the values in a indicator where `{id}` is the indicator ID (e.g. `6VfPgZ`)\n            \n### Examples\n            \n- `timePeriod|Desc` sorts by time period in descending order\n- `geographicLevel|Asc` sorts by geographic level in ascending order\n- `location|REG|Asc` sorts by regions in ascending order\n- `filter|3RxWP|Desc` sorts by options in filter `3RxWP` in descending order\n- `indicator|7a1dk|Asc` sorts by values in indicator `7a1dk` in ascending order",
         "operationId": "QueryDataSetGet",
         "parameters": [
           {
@@ -441,7 +441,7 @@
           {
             "name": "timePeriods.gt",
             "in": "query",
-            "description": "Filter the results to be in a time period that is\r\nchronologically greater than the one specified.",
+            "description": "Filter the results to be in a time period that is\nchronologically greater than the one specified.",
             "schema": {
               "type": "string",
               "example": "2017/2018|AY"
@@ -451,7 +451,7 @@
           {
             "name": "timePeriods.gte",
             "in": "query",
-            "description": "Filter the results to be in a time period that is\r\nchronologically greater than or equal to the one specified.",
+            "description": "Filter the results to be in a time period that is\nchronologically greater than or equal to the one specified.",
             "schema": {
               "type": "string",
               "example": "2017|CY"
@@ -461,7 +461,7 @@
           {
             "name": "timePeriods.lt",
             "in": "query",
-            "description": "Filter the results to be in a time period that is\r\nchronologically less than the one specified.",
+            "description": "Filter the results to be in a time period that is\nchronologically less than the one specified.",
             "schema": {
               "type": "string",
               "example": "2023/2024|AY"
@@ -471,7 +471,7 @@
           {
             "name": "timePeriods.lte",
             "in": "query",
-            "description": "Filter the results to be in a time period that is\r\nchronologically less than or equal to the one specified.",
+            "description": "Filter the results to be in a time period that is\nchronologically less than or equal to the one specified.",
             "schema": {
               "type": "string",
               "example": "2023|CY"
@@ -481,36 +481,37 @@
           {
             "name": "indicators",
             "in": "query",
-            "description": "The IDs of indicators to return values for.",
+            "description": "The IDs of indicators to return values for.\nOmitting this parameter will select all indicators.",
             "required": true,
             "schema": {
               "type": "array",
               "items": {
                 "type": "string"
               },
-              "description": "The IDs of indicators to return values for."
+              "description": "The IDs of indicators to return values for.\nOmitting this parameter will select all indicators.",
+              "nullable": true
             }
           },
           {
             "name": "sorts",
             "in": "query",
-            "description": "The sorts to apply to the results. Sorts at the start of the\r\nlist will be applied first.\r\n            \r\nBy default, results are sorted by time period in descending order.",
+            "description": "The sorts to apply to the results. Sorts at the start of the\nlist will be applied first.\n            \nBy default, results are sorted by time period in descending order.",
             "schema": {
               "type": "array",
               "items": {
                 "type": "string"
               },
-              "description": "The sorts to apply to the results. Sorts at the start of the\r\nlist will be applied first.\r\n            \r\nBy default, results are sorted by time period in descending order.",
+              "description": "The sorts to apply to the results. Sorts at the start of the\nlist will be applied first.\n            \nBy default, results are sorted by time period in descending order.",
               "nullable": true
             }
           },
           {
             "name": "debug",
             "in": "query",
-            "description": "Enable debug mode. Results will be formatted with human-readable\r\nlabels to assist in identification.\r\n            \r\nThis **should not** be enabled in a production environment.",
+            "description": "Enable debug mode. Results will be formatted with human-readable\nlabels to assist in identification.\n            \nThis **should not** be enabled in a production environment.",
             "schema": {
               "type": "boolean",
-              "description": "Enable debug mode. Results will be formatted with human-readable\r\nlabels to assist in identification.\r\n            \r\nThis **should not** be enabled in a production environment."
+              "description": "Enable debug mode. Results will be formatted with human-readable\nlabels to assist in identification.\n            \nThis **should not** be enabled in a production environment."
             }
           },
           {
@@ -590,7 +591,7 @@
           "DataSets"
         ],
         "summary": "Query a data set (POST)",
-        "description": "Query a data set using a `POST` request, returning the filtered results.\r\n            \r\nNote that for simpler queries or exploratory testing, there is also GET variant of this endpoint\r\nonly handles a smaller subset of querying functionality. However, for most use-cases,\r\nthis endpoint is recommended as it provides the complete set of functionality.\r\n            \r\nUnlike the `GET` endpoint, the `POST` endpoint allows condition criteria (`and`, `or`, `not`)\r\nand consequently can express more complex queries.",
+        "description": "Query a data set using a `POST` request, returning the filtered results.\n            \nNote that for simpler queries or exploratory testing, there is also GET variant of this endpoint\nonly handles a smaller subset of querying functionality. However, for most use-cases,\nthis endpoint is recommended as it provides the complete set of functionality.\n            \nUnlike the `GET` endpoint, the `POST` endpoint allows condition criteria (`and`, `or`, `not`)\nand consequently can express more complex queries.",
         "operationId": "QueryDataSetPost",
         "parameters": [
           {
@@ -679,7 +680,7 @@
           "DataSets"
         ],
         "summary": "Download a data set as CSV",
-        "description": "The CSV response will render its metadata in a human-readable format (instead of\r\nmachine-readable IDs). The CSV is not subject to the same backward compatibility\r\nguarantees as the data set's JSON representation in other endpoints.",
+        "description": "The CSV response will render its metadata in a human-readable format (instead of\nmachine-readable IDs). The CSV is not subject to the same backward compatibility\nguarantees as the data set's JSON representation in other endpoints.",
         "operationId": "DownloadDataSetCsv",
         "parameters": [
           {
@@ -743,8 +744,8 @@
         "tags": [
           "DataSetVersions"
         ],
-        "summary": "List a data set’s versions",
-        "description": "List a data set’s versions. Only provides summary information of each version.",
+        "summary": "List a data set's versions",
+        "description": "List a data set's versions. Only provides summary information of each version.",
         "operationId": "ListDataSetVersions",
         "parameters": [
           {
@@ -825,8 +826,8 @@
         "tags": [
           "DataSetVersions"
         ],
-        "summary": "Get a data set version",
-        "description": "Get a data set version's summary details.",
+        "summary": "Get a data set version's summary",
+        "description": "Gets a data set version's summary details.",
         "operationId": "GetDataSetVersion",
         "parameters": [
           {
@@ -1032,8 +1033,8 @@
         "tags": [
           "Publications"
         ],
-        "summary": "Get a publication’s details",
-        "description": "Get a specific publication's summary details.",
+        "summary": "Get a publication's details",
+        "description": "Get a publication's summary details.",
         "operationId": "GetPublication",
         "parameters": [
           {
@@ -1079,7 +1080,7 @@
         "tags": [
           "Publications"
         ],
-        "summary": "List a publication’s data sets",
+        "summary": "List a publication's data sets",
         "description": "Lists summary details of all the data sets related to a publication.",
         "operationId": "ListPublicationDataSets",
         "parameters": [
@@ -1349,7 +1350,7 @@
           }
         },
         "additionalProperties": false,
-        "description": "The location option criteria to filter results by in a data set GET query.\r\n            \r\nThe results can be matched by either the location option's ID or a code.\r\nNote the following differences:\r\n            \r\n- IDs only match a **single location**\r\n- Codes may match **multiple locations**\r\n            \r\nWhilst codes are generally unique to a single location, they can be\r\nused for multiple locations. This may match more results than you\r\nexpect so it's recommended to use IDs where possible."
+        "description": "The location option criteria to filter results by in a data set GET query.\n            \nThe results can be matched by either the location option's ID or a code.\nNote the following differences:\n            \n- IDs only match a **single location**\n- Codes may match **multiple locations**\n            \nWhilst codes are generally unique to a single location, they can be\nused for multiple locations. This may match more results than you\nexpect so it's recommended to use IDs where possible."
       },
       "DataSetGetQueryRequest": {
         "required": [
@@ -1394,26 +1395,26 @@
             "nullable": true
           },
           "indicators": {
-            "minItems": 1,
             "type": "array",
             "items": {
               "maxLength": 40,
               "minLength": 1,
               "type": "string"
             },
-            "description": "The IDs of indicators to return values for."
+            "description": "The IDs of indicators to return values for.\nOmitting this parameter will select all indicators.",
+            "nullable": true
           },
           "sorts": {
             "type": "array",
             "items": {
               "type": "string"
             },
-            "description": "The sorts to apply to the results. Sorts at the start of the\r\nlist will be applied first.\r\n            \r\nBy default, results are sorted by time period in descending order.",
+            "description": "The sorts to apply to the results. Sorts at the start of the\nlist will be applied first.\n            \nBy default, results are sorted by time period in descending order.",
             "nullable": true
           },
           "debug": {
             "type": "boolean",
-            "description": "Enable debug mode. Results will be formatted with human-readable\r\nlabels to assist in identification.\r\n            \r\nThis **should not** be enabled in a production environment."
+            "description": "Enable debug mode. Results will be formatted with human-readable\nlabels to assist in identification.\n            \nThis **should not** be enabled in a production environment."
           },
           "page": {
             "minimum": 1,
@@ -1477,25 +1478,25 @@
           },
           "gt": {
             "type": "string",
-            "description": "Filter the results to be in a time period that is\r\nchronologically greater than the one specified.",
+            "description": "Filter the results to be in a time period that is\nchronologically greater than the one specified.",
             "nullable": true,
             "example": "2017/2018|AY"
           },
           "gte": {
             "type": "string",
-            "description": "Filter the results to be in a time period that is\r\nchronologically greater than or equal to the one specified.",
+            "description": "Filter the results to be in a time period that is\nchronologically greater than or equal to the one specified.",
             "nullable": true,
             "example": "2017|CY"
           },
           "lt": {
             "type": "string",
-            "description": "Filter the results to be in a time period that is\r\nchronologically less than the one specified.",
+            "description": "Filter the results to be in a time period that is\nchronologically less than the one specified.",
             "nullable": true,
             "example": "2023/2024|AY"
           },
           "lte": {
             "type": "string",
-            "description": "Filter the results to be in a time period that is\r\nchronologically less than or equal to the one specified.",
+            "description": "Filter the results to be in a time period that is\nchronologically less than or equal to the one specified.",
             "nullable": true,
             "example": "2023|CY"
           }
@@ -1638,7 +1639,7 @@
               ],
               "type": "string"
             },
-            "description": "The types of meta to get for the requested data set version.\r\n\r\nCan be any combination of the following:\r\n\r\n- `Filters` - include all meta relating to *filters*\r\n- `Indicators` - include all meta relating to *indicators*\r\n- `Locations` - include all meta relating to *locations*\r\n- `TimePeriods` - include all meta relating to *time periods*",
+            "description": "The types of meta to get for the requested data set version.\n\nCan be any combination of the following:\n\n- `Filters` - include all meta relating to *filters*\n- `Indicators` - include all meta relating to *indicators*\n- `Locations` - include all meta relating to *locations*\n- `TimePeriods` - include all meta relating to *time periods*",
             "nullable": true,
             "example": [
               "Filters",
@@ -1767,7 +1768,7 @@
           }
         },
         "additionalProperties": false,
-        "description": "A condition criteria where one or more sub-criteria must all resolve\r\nto true for the overall query to match any results.\r\n            \r\nThis is equivalent to the `AND` operator in SQL."
+        "description": "A condition criteria where one or more sub-criteria must all resolve\nto true for the overall query to match any results.\n            \nThis is equivalent to the `AND` operator in SQL."
       },
       "DataSetQueryCriteriaFacets": {
         "type": "object",
@@ -1810,7 +1811,7 @@
           }
         },
         "additionalProperties": false,
-        "description": "A set of criteria specifying which facets the query should match results with.\r\n            \r\nAll parts of the criteria must resolve to true to match a result."
+        "description": "A set of criteria specifying which facets the query should match results with.\n            \nAll parts of the criteria must resolve to true to match a result."
       },
       "DataSetQueryCriteriaFilters": {
         "type": "object",
@@ -2027,7 +2028,7 @@
           }
         },
         "additionalProperties": false,
-        "description": "The location option criteria to filter results by in a data set query.\r\n            \r\nThe results can be matched by either the location option's ID or a code.\r\nNote the following differences:\r\n            \r\n- IDs only match a **single location**\r\n- Codes may match **multiple locations**\r\n            \r\nWhilst codes are generally unique to a single location, they can be\r\nused for multiple locations. This may match more results than you\r\nexpect so it's recommended to use IDs where possible."
+        "description": "The location option criteria to filter results by in a data set query.\n            \nThe results can be matched by either the location option's ID or a code.\nNote the following differences:\n            \n- IDs only match a **single location**\n- Codes may match **multiple locations**\n            \nWhilst codes are generally unique to a single location, they can be\nused for multiple locations. This may match more results than you\nexpect so it's recommended to use IDs where possible."
       },
       "DataSetQueryCriteriaNot": {
         "required": [
@@ -2059,7 +2060,7 @@
           }
         },
         "additionalProperties": false,
-        "description": "A condition criteria where its sub-criteria must resolve\r\nto *false* for the overall query to match any results.\r\n            \r\nThis is equivalent to the `NOT` operator in SQL."
+        "description": "A condition criteria where its sub-criteria must resolve\nto *false* for the overall query to match any results.\n            \nThis is equivalent to the `NOT` operator in SQL."
       },
       "DataSetQueryCriteriaOr": {
         "required": [
@@ -2105,7 +2106,7 @@
           }
         },
         "additionalProperties": false,
-        "description": "A condition criteria where at least one sub-criteria must resolve\r\nto true for the overall query to match any results.\r\n            \r\nThis is equivalent to the `OR` operator in SQL."
+        "description": "A condition criteria where at least one sub-criteria must resolve\nto true for the overall query to match any results.\n            \nThis is equivalent to the `OR` operator in SQL."
       },
       "DataSetQueryCriteriaTimePeriods": {
         "type": "object",
@@ -2150,7 +2151,7 @@
                 "$ref": "#/components/schemas/DataSetQueryTimePeriod"
               }
             ],
-            "description": "Filter the results to be in a time period that is\r\nchronologically greater than the one specified.",
+            "description": "Filter the results to be in a time period that is\nchronologically greater than the one specified.",
             "nullable": true
           },
           "gte": {
@@ -2159,7 +2160,7 @@
                 "$ref": "#/components/schemas/DataSetQueryTimePeriod"
               }
             ],
-            "description": "Filter the results to be in a time period that is\r\nchronologically greater than or equal to the one specified.",
+            "description": "Filter the results to be in a time period that is\nchronologically greater than or equal to the one specified.",
             "nullable": true
           },
           "lt": {
@@ -2168,7 +2169,7 @@
                 "$ref": "#/components/schemas/DataSetQueryTimePeriod"
               }
             ],
-            "description": "Filter the results to be in a time period that is\r\nchronologically less than the one specified.",
+            "description": "Filter the results to be in a time period that is\nchronologically less than the one specified.",
             "nullable": true
           },
           "lte": {
@@ -2177,7 +2178,7 @@
                 "$ref": "#/components/schemas/DataSetQueryTimePeriod"
               }
             ],
-            "description": "Filter the results to be in a time period that is\r\nchronologically less than or equal to the one specified.",
+            "description": "Filter the results to be in a time period that is\nchronologically less than or equal to the one specified.",
             "nullable": true
           }
         },
@@ -2195,7 +2196,7 @@
             "maxLength": 30,
             "minLength": 1,
             "type": "string",
-            "description": "The code of the location. This may be an ONS code, or some\r\nother code that identifies the location.",
+            "description": "The code of the location. This may be an ONS code, or some\nother code that identifies the location.",
             "example": "E12000003"
           },
           "level": {
@@ -2205,12 +2206,12 @@
                 "$ref": "#/components/schemas/GeographicLevelCode"
               }
             ],
-            "description": "The geographic level of the location.\r\n            \r\nThis should be a valid geographic level code e.g. `NAT`, `REG`, `LA`.",
+            "description": "The geographic level of the location.\n            \nThis should be a valid geographic level code e.g. `NAT`, `REG`, `LA`.",
             "example": "NAT"
           }
         },
         "additionalProperties": false,
-        "description": "A location (identified by a code) to filter results by.\r\n            \r\nNote that location codes may correspond to multiple locations in the same geographic level."
+        "description": "A location (identified by a code) to filter results by.\n            \nNote that location codes may correspond to multiple locations in the same geographic level."
       },
       "DataSetQueryLocationId": {
         "required": [
@@ -2223,7 +2224,7 @@
             "maxLength": 10,
             "minLength": 1,
             "type": "string",
-            "description": "The ID of the location. If specified, this will be used\r\ninstead of any codes or other types of identifier.",
+            "description": "The ID of the location. If specified, this will be used\ninstead of any codes or other types of identifier.",
             "example": "2tYX"
           },
           "level": {
@@ -2233,12 +2234,12 @@
                 "$ref": "#/components/schemas/GeographicLevelCode"
               }
             ],
-            "description": "The geographic level of the location.\r\n            \r\nThis should be a valid geographic level code e.g. `NAT`, `REG`, `LA`.",
+            "description": "The geographic level of the location.\n            \nThis should be a valid geographic level code e.g. `NAT`, `REG`, `LA`.",
             "example": "NAT"
           }
         },
         "additionalProperties": false,
-        "description": "A location (identified by an ID) to filter results by.\r\n            \r\nNote that location IDs are guaranteed to be unique to a single location\r\nunlike location codes (which may correspond to multiple locations)."
+        "description": "A location (identified by an ID) to filter results by.\n            \nNote that location IDs are guaranteed to be unique to a single location\nunlike location codes (which may correspond to multiple locations)."
       },
       "DataSetQueryLocationLocalAuthorityCode": {
         "required": [
@@ -2251,7 +2252,7 @@
             "maxLength": 30,
             "minLength": 1,
             "type": "string",
-            "description": "The ONS code of the local authority. This is typically 9 characters\r\nin the standard ONS format for local authorities e.g. `E08000019`,\r\nbut may be a combination of multiple codes e.g. `E08000019 / E08000020`.",
+            "description": "The ONS code of the local authority. This is typically 9 characters\nin the standard ONS format for local authorities e.g. `E08000019`,\nbut may be a combination of multiple codes e.g. `E08000019 / E08000020`.",
             "example": "E08000019"
           },
           "level": {
@@ -2279,7 +2280,7 @@
             "maxLength": 20,
             "minLength": 1,
             "type": "string",
-            "description": "The old code (previously the LEA code) of the local authority.\r\nThis is typically a 3-digit number e.g. `318`, but may be a\r\ncombination of multiple codes e.g. `318 / 319`.",
+            "description": "The old code (previously the LEA code) of the local authority.\nThis is typically a 3-digit number e.g. `318`, but may be a\ncombination of multiple codes e.g. `318 / 319`.",
             "example": "373"
           },
           "level": {
@@ -2307,7 +2308,7 @@
             "maxLength": 20,
             "minLength": 1,
             "type": "string",
-            "description": "The UKPRN (UK provider reference number) of the provider.\r\nThis is typically an 8-digit number.",
+            "description": "The UKPRN (UK provider reference number) of the provider.\nThis is typically an 8-digit number.",
             "example": "123454678"
           },
           "level": {
@@ -2336,7 +2337,7 @@
             "maxLength": 20,
             "minLength": 1,
             "type": "string",
-            "description": "The LAESTAB (local authority establishment number) of the school.\r\nThis is typically a 7-digit number.",
+            "description": "The LAESTAB (local authority establishment number) of the school.\nThis is typically a 7-digit number.",
             "example": "1234567"
           },
           "level": {
@@ -2360,7 +2361,7 @@
             "maxLength": 20,
             "minLength": 1,
             "type": "string",
-            "description": "The URN (unique reference number) of the school.\r\nThis is typically a 6-digit number.",
+            "description": "The URN (unique reference number) of the school.\nThis is typically a 6-digit number.",
             "example": "123456"
           },
           "level": {
@@ -2437,14 +2438,14 @@
             "nullable": true
           },
           "indicators": {
-            "minItems": 1,
             "type": "array",
             "items": {
               "maxLength": 40,
               "minLength": 1,
               "type": "string"
             },
-            "description": "The IDs of indicators in the data set to return values for.",
+            "description": "The IDs of indicators to return values for.\nOmitting this parameter will select all indicators.",
+            "nullable": true,
             "example": [
               "C2ySJ",
               "q4X3J"
@@ -2455,12 +2456,12 @@
             "items": {
               "$ref": "#/components/schemas/DataSetQuerySort"
             },
-            "description": "The sorts to sort the results by. Sorts at the start of the\r\nlist will be applied first.\r\n            \r\nBy default, results are sorted by time period in descending order.",
+            "description": "The sorts to sort the results by. Sorts at the start of the\nlist will be applied first.\n            \nBy default, results are sorted by time period in descending order.",
             "nullable": true
           },
           "debug": {
             "type": "boolean",
-            "description": "Enable debug mode. Results will be formatted with human-readable\r\nlabels to assist in identification.\r\n            \r\nThis **should not** be enabled in a production environment."
+            "description": "Enable debug mode. Results will be formatted with human-readable\nlabels to assist in identification.\n            \nThis **should not** be enabled in a production environment."
           },
           "page": {
             "minimum": 1,
@@ -2512,7 +2513,7 @@
             "additionalProperties": {
               "type": "string"
             },
-            "description": "The locations relevant to this result's data.\r\n            \r\nThis is a dictionary where the key is the location's geographic\r\nlevel and the value is the location's ID.",
+            "description": "The locations relevant to this result's data.\n            \nThis is a dictionary where the key is the location's geographic\nlevel and the value is the location's ID.",
             "example": {
               "NAT": "04bTr",
               "REG": "4veOu",
@@ -2524,7 +2525,7 @@
             "additionalProperties": {
               "type": "string"
             },
-            "description": "The filters associated with this result.\r\n            \r\nThis is a dictionary where the key is the filter ID and\r\nthe value is the specific filter option ID.",
+            "description": "The filters associated with this result.\n            \nThis is a dictionary where the key is the filter ID and\nthe value is the specific filter option ID.",
             "example": {
               "ups2K": "n0WqP",
               "j51wV": "AnZsi",
@@ -2536,7 +2537,7 @@
             "additionalProperties": {
               "type": "string"
             },
-            "description": "The data values for the result's indicators.\r\n            \r\nThis is a dictionary where the key is the indicator ID\r\nand the value is the data value.",
+            "description": "The data values for the result's indicators.\n            \nThis is a dictionary where the key is the indicator ID\nand the value is the data value.",
             "example": {
               "wLcft": "23593018",
               "4S8Ou": "50.342",
@@ -2558,7 +2559,7 @@
             "maxLength": 40,
             "minLength": 1,
             "type": "string",
-            "description": "The name of the field to sort by. This can be one of the following:\r\n            \r\n- `timePeriod` to sort by time period\r\n- `geographicLevel` to sort by the geographic level of the data\r\n- `location|{level}` to sort by locations in a geographic level where `{level}` is the level code (e.g. `REG`, `LA`)\r\n- `filter|{id}` to sort by the options in a filter where `{id}` is the filter ID (e.g. `3RxWP`)\r\n- `indicator|{id}` to sort by the values in a indicator where `{id}` is the indicator ID (e.g. `6VfPgZ`)",
+            "description": "The name of the field to sort by. This can be one of the following:\n            \n- `timePeriod` to sort by time period\n- `geographicLevel` to sort by the geographic level of the data\n- `location|{level}` to sort by locations in a geographic level where `{level}` is the level code (e.g. `REG`, `LA`)\n- `filter|{id}` to sort by the options in a filter where `{id}` is the filter ID (e.g. `3RxWP`)\n- `indicator|{id}` to sort by the values in a indicator where `{id}` is the indicator ID (e.g. `6VfPgZ`)",
             "example": "timePeriod"
           },
           "direction": {
@@ -2567,12 +2568,12 @@
               "Desc"
             ],
             "type": "string",
-            "description": "The direction to sort by. This can be one of the following:\r\n            \r\n- `Asc` - sort by ascending order\r\n- `Desc` - sort by descending order",
+            "description": "The direction to sort by. This can be one of the following:\n            \n- `Asc` - sort by ascending order\n- `Desc` - sort by descending order",
             "example": "Asc"
           }
         },
         "additionalProperties": false,
-        "description": "Specifies how the results from a data set query should be sorted.\r\n            \r\nThis consists of a field in the data set and a direction to sort by."
+        "description": "Specifies how the results from a data set query should be sorted.\n            \nThis consists of a field in the data set and a direction to sort by."
       },
       "DataSetQueryTimePeriod": {
         "required": [
@@ -2583,7 +2584,7 @@
         "properties": {
           "period": {
             "type": "string",
-            "description": "The time period to match results by.\r\n            \r\nThis should be a single year like `2020` or a range like `2020/2021`.",
+            "description": "The time period to match results by.\n            \nThis should be a single year like `2020` or a range like `2020/2021`.",
             "example": "2020/2021"
           },
           "code": {
@@ -2593,12 +2594,12 @@
                 "$ref": "#/components/schemas/TimePeriodCode"
               }
             ],
-            "description": "The code identifying the time period type to match results by.\r\n            \r\nThis should be a valid time period code e.g. `AY`, `CY`, `M1`, `W20`.",
+            "description": "The code identifying the time period type to match results by.\n            \nThis should be a valid time period code e.g. `AY`, `CY`, `M1`, `W20`.",
             "example": "AY"
           }
         },
         "additionalProperties": false,
-        "description": "A time period to filter results by.\r\n            \r\n- `period` is the time period or range (e.g. `2020` or `2020/2021`)\r\n- `code` is the code identifying the time period type (e.g. `AY`, `CY`, `M1`, `W20`)\r\n            \r\nThe `period` should be a single year like `2020`, or a range like `2020/2021`.\r\nCurrently, only years (or year ranges) are supported.\r\n            \r\nSome time period types span two years e.g. financial year part 2 (`P2`), or may fall in a\r\nlatter year e.g. academic year summer term (`T3`). For these types, a singular year `period`\r\nlike `2020` is considered as `2020/2021`.\r\n            \r\nFor example, a `period` value of `2020` is applicable to the following time periods:\r\n            \r\n- 2020 calendar year\r\n- 2020/2021 academic year\r\n- 2020/2021 financial year part 2 (October to March)\r\n- 2020/2021 academic year's summer term\r\n            \r\nIf you wish to be more explicit, you may use a range for the `period` e.g. `2020/2021`.\r\nHowever, a range cannot be used with time period types which only span a single year,\r\nfor example, `2020/21` cannot be used with `CY`, `M` or `W` codes.\r\n            \r\nSome examples:\r\n            \r\n- `2020|AY` is the 2020/21 academic year\r\n- `2021|FY` is the 2021/22 financial year\r\n- `2020|T3` is the 2020/21 academic year's summer term\r\n- `2020|P2` is the 2020/21 financial year part 2 (October to March)\r\n- `2020|CY` is the 2020 calendar year\r\n- `2020|W32` is 2020 week 32\r\n- `2020/2021|AY` is the 2020/21 academic year\r\n- `2021/2022|FY` is the 2021/22 financial year"
+        "description": "A time period to filter results by.\n            \n- `period` is the time period or range (e.g. `2020` or `2020/2021`)\n- `code` is the code identifying the time period type (e.g. `AY`, `CY`, `M1`, `W20`)\n            \nThe `period` should be a single year like `2020`, or a range like `2020/2021`.\nCurrently, only years (or year ranges) are supported.\n            \nSome time period types span two years e.g. financial year part 2 (`P2`), or may fall in a\nlatter year e.g. academic year summer term (`T3`). For these types, a singular year `period`\nlike `2020` is considered as `2020/2021`.\n            \nFor example, a `period` value of `2020` is applicable to the following time periods:\n            \n- 2020 calendar year\n- 2020/2021 academic year\n- 2020/2021 financial year part 2 (October to March)\n- 2020/2021 academic year's summer term\n            \nIf you wish to be more explicit, you may use a range for the `period` e.g. `2020/2021`.\nHowever, a range cannot be used with time period types which only span a single year,\nfor example, `2020/21` cannot be used with `CY`, `M` or `W` codes.\n            \nSome examples:\n            \n- `2020|AY` is the 2020/21 academic year\n- `2021|FY` is the 2021/22 financial year\n- `2020|T3` is the 2020/21 academic year's summer term\n- `2020|P2` is the 2020/21 financial year part 2 (October to March)\n- `2020|CY` is the 2020 calendar year\n- `2020|W32` is 2020 week 32\n- `2020/2021|AY` is the 2020/21 academic year\n- `2021/2022|FY` is the 2021/22 financial year"
       },
       "DataSetStatus": {
         "enum": [
@@ -2761,7 +2762,7 @@
                 "$ref": "#/components/schemas/DataSetVersionType"
               }
             ],
-            "description": "The version type. Can be one of the following:\r\n            \r\n- `Major` - backwards incompatible changes are being introduced\r\n- `Minor` - backwards compatible changes are being introduced\r\n            \r\nMajor versions typically indicate that some action may be required\r\nto ensure code that consumes the data set continues to work.\r\n            \r\nMinor versions should not cause issues in the functionality of existing code.",
+            "description": "The version type. Can be one of the following:\n            \n- `Major` - backwards incompatible changes are being introduced\n- `Minor` - backwards compatible changes are being introduced\n            \nMajor versions typically indicate that some action may be required\nto ensure code that consumes the data set continues to work.\n            \nMinor versions should not cause issues in the functionality of existing code.",
             "example": "Major"
           },
           "status": {
@@ -2770,7 +2771,7 @@
                 "$ref": "#/components/schemas/DataSetVersionStatus"
               }
             ],
-            "description": "The version’s status. Can be one of the following:\r\n            \r\n- `Published` - the version is published and can be used\r\n- `Deprecated` - the version is being deprecated and will not be usable in the future\r\n- `Withdrawn` - the version has been withdrawn and can no longer be used",
+            "description": "The version’s status. Can be one of the following:\n            \n- `Published` - the version is published and can be used\n- `Deprecated` - the version is being deprecated and will not be usable in the future\n- `Withdrawn` - the version has been withdrawn and can no longer be used",
             "example": "Published"
           },
           "published": {
@@ -2911,7 +2912,7 @@
                 "$ref": "#/components/schemas/DataSetStatus"
               }
             ],
-            "description": "The status of the data set. Can be one of the following:\r\n            \r\n- `Published` - the data set has been published and will receive updates\r\n- `Deprecated` - the data set is being discontinued and will no longer receive updates\r\n- `Withdrawn` - the data set has been withdrawn and can no longer be used",
+            "description": "The status of the data set. Can be one of the following:\n            \n- `Published` - the data set has been published and will receive updates\n- `Deprecated` - the data set is being discontinued and will no longer receive updates\n- `Withdrawn` - the data set has been withdrawn and can no longer be used",
             "example": "Published"
           },
           "supersedingDataSetId": {
@@ -2948,17 +2949,17 @@
           },
           "path": {
             "type": "string",
-            "description": "The path to the property on the request that the error relates to.\r\nMay be omitted or empty if no specific property of the\r\nrequest relates to the error (it is a 'global' error).",
+            "description": "The path to the property on the request that the error relates to.\nMay be omitted or empty if no specific property of the\nrequest relates to the error (it is a 'global' error).",
             "nullable": true,
             "example": "person.name"
           },
           "code": {
             "type": "string",
-            "description": "The error's machine-readable code. Can be used for further\r\nprocessing of the error before presenting to users.\r\nMay be omitted if there is none.",
+            "description": "The error's machine-readable code. Can be used for further\nprocessing of the error before presenting to users.\nMay be omitted if there is none.",
             "example": "MaximumLength"
           },
           "detail": {
-            "description": "Additional detail about the error that can be used to provide\r\nmore context to users. May be omitted if there is none.",
+            "description": "Additional detail about the error that can be used to provide\nmore context to users. May be omitted if there is none.",
             "nullable": true,
             "example": {
               "maxLength": 50
@@ -2966,7 +2967,7 @@
           }
         },
         "additionalProperties": false,
-        "description": "Describes an error that occurred with the request. This will typically\r\nneed to be rectified before the request can be fully processed."
+        "description": "Describes an error that occurred with the request. This will typically\nneed to be rectified before the request can be fully processed."
       },
       "FilterChangeViewModel": {
         "type": "object",
@@ -2977,7 +2978,7 @@
                 "$ref": "#/components/schemas/FilterViewModel"
               }
             ],
-            "description": "The current state after the change was made.\r\nIf the change is an addition, this will be null.",
+            "description": "The current state after the change was made.\nIf the change is an addition, this will be null.",
             "nullable": true
           },
           "previousState": {
@@ -2986,7 +2987,7 @@
                 "$ref": "#/components/schemas/FilterViewModel"
               }
             ],
-            "description": "The previous state before the change was made.\r\nIf the change is a deletion, this will be null.",
+            "description": "The previous state before the change was made.\nIf the change is a deletion, this will be null.",
             "nullable": true
           }
         },
@@ -3002,7 +3003,7 @@
                 "$ref": "#/components/schemas/FilterOptionViewModel"
               }
             ],
-            "description": "The current state after the change was made.\r\nIf the change is an addition, this will be null.",
+            "description": "The current state after the change was made.\nIf the change is an addition, this will be null.",
             "nullable": true
           },
           "previousState": {
@@ -3011,7 +3012,7 @@
                 "$ref": "#/components/schemas/FilterOptionViewModel"
               }
             ],
-            "description": "The previous state before the change was made.\r\nIf the change is a deletion, this will be null.",
+            "description": "The previous state before the change was made.\nIf the change is a deletion, this will be null.",
             "nullable": true
           }
         },
@@ -3103,7 +3104,7 @@
           }
         },
         "additionalProperties": false,
-        "description": "The options available for a filterable characteristic about the data set\r\n(excluding geography or time)."
+        "description": "The options available for a filterable characteristic about the data set\n(excluding geography or time)."
       },
       "FilterViewModel": {
         "required": [
@@ -3146,7 +3147,7 @@
                 "$ref": "#/components/schemas/GeographicLevelViewModel"
               }
             ],
-            "description": "The current state after the change was made.\r\nIf the change is an addition, this will be null.",
+            "description": "The current state after the change was made.\nIf the change is an addition, this will be null.",
             "nullable": true
           },
           "previousState": {
@@ -3155,7 +3156,7 @@
                 "$ref": "#/components/schemas/GeographicLevelViewModel"
               }
             ],
-            "description": "The previous state before the change was made.\r\nIf the change is a deletion, this will be null.",
+            "description": "The previous state before the change was made.\nIf the change is a deletion, this will be null.",
             "nullable": true
           }
         },
@@ -3221,7 +3222,7 @@
                 "$ref": "#/components/schemas/IndicatorViewModel"
               }
             ],
-            "description": "The current state after the change was made.\r\nIf the change is an addition, this will be null.",
+            "description": "The current state after the change was made.\nIf the change is an addition, this will be null.",
             "nullable": true
           },
           "previousState": {
@@ -3230,7 +3231,7 @@
                 "$ref": "#/components/schemas/IndicatorViewModel"
               }
             ],
-            "description": "The previous state before the change was made.\r\nIf the change is a deletion, this will be null.",
+            "description": "The previous state before the change was made.\nIf the change is a deletion, this will be null.",
             "nullable": true
           }
         },
@@ -3327,7 +3328,7 @@
                 "$ref": "#/components/schemas/LocationGroupViewModel"
               }
             ],
-            "description": "The current state after the change was made.\r\nIf the change is an addition, this will be null.",
+            "description": "The current state after the change was made.\nIf the change is an addition, this will be null.",
             "nullable": true
           },
           "previousState": {
@@ -3336,7 +3337,7 @@
                 "$ref": "#/components/schemas/LocationGroupViewModel"
               }
             ],
-            "description": "The previous state before the change was made.\r\nIf the change is a deletion, this will be null.",
+            "description": "The previous state before the change was made.\nIf the change is a deletion, this will be null.",
             "nullable": true
           }
         },
@@ -3453,7 +3454,7 @@
                 "$ref": "#/components/schemas/LocationSchoolOptionViewModel"
               }
             ],
-            "description": "The current state after the change was made.\r\nIf the change is an addition, this will be null.",
+            "description": "The current state after the change was made.\nIf the change is an addition, this will be null.",
             "nullable": true
           },
           "previousState": {
@@ -3474,7 +3475,7 @@
                 "$ref": "#/components/schemas/LocationSchoolOptionViewModel"
               }
             ],
-            "description": "The previous state before the change was made.\r\nIf the change is a deletion, this will be null.",
+            "description": "The previous state before the change was made.\nIf the change is a deletion, this will be null.",
             "nullable": true
           }
         },
@@ -3638,7 +3639,7 @@
           "type": {
             "minLength": 1,
             "type": "string",
-            "description": "A URI reference (RFC3986) that identifies the problem type. It should\r\nprovide human-readable documentation for the problem type.",
+            "description": "A URI reference (RFC3986) that identifies the problem type. It should\nprovide human-readable documentation for the problem type.",
             "example": "https://tools.ietf.org/html/rfc9110#section-15.5.1"
           },
           "title": {
@@ -3661,13 +3662,13 @@
           },
           "instance": {
             "type": "string",
-            "description": "A URI reference that identifies the specific occurrence of the problem.\r\nIt may or may not yield further information about the problem.",
+            "description": "A URI reference that identifies the specific occurrence of the problem.\nIt may or may not yield further information about the problem.",
             "nullable": true,
             "example": "https://example.com"
           }
         },
         "additionalProperties": { },
-        "description": "Describes a problem that occurred whilst processing the request.\r\nThe format is based on RFC7807."
+        "description": "Describes a problem that occurred whilst processing the request.\nThe format is based on RFC7807."
       },
       "PublicationListRequest": {
         "type": "object",
@@ -3871,7 +3872,7 @@
                 "$ref": "#/components/schemas/TimePeriodOptionViewModel"
               }
             ],
-            "description": "The current state after the change was made.\r\nIf the change is an addition, this will be null.",
+            "description": "The current state after the change was made.\nIf the change is an addition, this will be null.",
             "nullable": true
           },
           "previousState": {
@@ -3880,7 +3881,7 @@
                 "$ref": "#/components/schemas/TimePeriodOptionViewModel"
               }
             ],
-            "description": "The previous state before the change was made.\r\nIf the change is a deletion, this will be null.",
+            "description": "The previous state before the change was made.\nIf the change is a deletion, this will be null.",
             "nullable": true
           }
         },
@@ -3974,7 +3975,7 @@
           "type": {
             "minLength": 1,
             "type": "string",
-            "description": "A URI reference (RFC3986) that identifies the problem type. It should\r\nprovide human-readable documentation for the problem type.",
+            "description": "A URI reference (RFC3986) that identifies the problem type. It should\nprovide human-readable documentation for the problem type.",
             "example": "https://tools.ietf.org/html/rfc9110#section-15.5.1"
           },
           "title": {
@@ -3991,7 +3992,7 @@
           },
           "instance": {
             "type": "string",
-            "description": "A URI reference that identifies the specific occurrence of the problem.\r\nIt may or may not yield further information about the problem.",
+            "description": "A URI reference that identifies the specific occurrence of the problem.\nIt may or may not yield further information about the problem.",
             "nullable": true,
             "example": "https://example.com"
           },
@@ -4010,7 +4011,7 @@
           }
         },
         "additionalProperties": { },
-        "description": "A validation problem that has occurred with the API request.\r\nThis type of response will be composed of one or more errors\r\nrelating to the request and its properties."
+        "description": "A validation problem that has occurred with the API request.\nThis type of response will be composed of one or more errors\nrelating to the request and its properties."
       },
       "WarningViewModel": {
         "required": [
@@ -4026,17 +4027,17 @@
           },
           "path": {
             "type": "string",
-            "description": "The path to the property on the request that the warning relates to.\r\nMay be omitted or be empty if no specific property of the\r\nrequest relates to the warning (it is a 'global' warning).",
+            "description": "The path to the property on the request that the warning relates to.\nMay be omitted or be empty if no specific property of the\nrequest relates to the warning (it is a 'global' warning).",
             "nullable": true,
             "example": "results"
           },
           "code": {
             "type": "string",
-            "description": "The warning's machine-readable code. Can be used for further\r\nprocessing of the warning before presenting to users.",
+            "description": "The warning's machine-readable code. Can be used for further\nprocessing of the warning before presenting to users.",
             "example": "NoResults"
           },
           "detail": {
-            "description": "Additional detail about the warning that can be used to provide\r\nmore context to users. May be omitted if there is none.",
+            "description": "Additional detail about the warning that can be used to provide\nmore context to users. May be omitted if there is none.",
             "nullable": true,
             "example": {
               "total": 0
@@ -4044,7 +4045,7 @@
           }
         },
         "additionalProperties": false,
-        "description": "A warning that points to a potential issue. This is not a critical error,\r\nbut may require attention to get the desired response."
+        "description": "A warning that points to a potential issue. This is not a critical error,\nbut may require attention to get the desired response."
       }
     }
   }
