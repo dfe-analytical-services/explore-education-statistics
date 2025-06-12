@@ -135,6 +135,20 @@ public static class ValidationMessages
         Message: "Failed to read dataset_names.csv. Exception: {0}"
     );
 
+    public static ErrorViewModel GenerateErrorDataSetIsNotInAnImportableState()
+    {
+        return new ErrorViewModel
+        {
+            Code = DataSetIsNotInAnImportableState.Code,
+            Message = DataSetIsNotInAnImportableState.Message,
+        };
+    }
+
+    public static readonly LocalizableMessage DataSetIsNotInAnImportableState = new(
+        Code: nameof(DataSetIsNotInAnImportableState),
+        Message: "Data set cannot be imported. Ensure it has been screened, and that there are no errors"
+    );
+
     public static ErrorViewModel GenerateErrorDataSetNamesCsvReaderException(string exception)
     {
         return new ErrorViewModel

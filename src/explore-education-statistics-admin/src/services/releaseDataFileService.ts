@@ -124,14 +124,8 @@ export interface DataFileUpdateRequest {
 }
 
 export type ImportStatusCode =
-  | 'UPLOADING'
-  | 'SCREENING'
-  | 'FAILED_SCREENING'
-  | 'PENDING_REVIEW'
-  | 'PENDING_IMPORT'
   | 'COMPLETE'
   | 'QUEUED'
-  | 'PROCESSING_ARCHIVE_FILE'
   | 'STAGE_1'
   | 'STAGE_2'
   | 'STAGE_3'
@@ -141,6 +135,7 @@ export type ImportStatusCode =
   | 'CANCELLED';
 
 export type DataSetUploadStatus =
+  | 'UPLOADING'
   | 'SCREENING'
   | 'FAILED_SCREENING'
   | 'PENDING_REVIEW'

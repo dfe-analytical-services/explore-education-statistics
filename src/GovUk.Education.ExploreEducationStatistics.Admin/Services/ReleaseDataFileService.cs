@@ -548,14 +548,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return await persistenceHelper
                 .CheckEntityExists<ReleaseVersion>(releaseVersionId)
                 .OnSuccess(userService.CheckCanUpdateReleaseVersion)
-                .OnSuccess(() => dataSetUploadIds
+                .OnSuccess(_ => dataSetUploadIds
                     .Select(dataSetUploadId => ValidateTempDataSetFileExistence(releaseVersionId, dataSetUploadId, cancellationToken))
+                    .OnSuccessAll())
+                .OnSuccess(dataSetUploads => dataSetUploads
+                    .Select(ValidateDataSetCanBeImported)
                     .OnSuccessAll())
                 .OnSuccessVoid(async dataSetUploads =>
                 {
                     await dataSetFileStorage.MoveDataSetsToPermanentStorage(releaseVersionId, dataSetUploads, cancellationToken);
 
-                    // Remove upload records once the files are ready for import
+                    // Upload records are no longer needed once the files have been queued for import
                     contentDbContext.DataSetUploads.RemoveRange(dataSetUploads);
                     await contentDbContext.SaveChangesAsync(cancellationToken);
                 });
@@ -578,6 +581,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
             return !dataBlobExists || !metaBlobExists
                 ? throw new Exception("Unable to locate temporary files at the locations specified")
+                : dataSetUpload;
+        }
+
+        // TODO: This doesn't need to be an async task. Find out expected pattern for use with results pattern
+        private static async Task<Either<ActionResult, DataSetUpload>> ValidateDataSetCanBeImported(DataSetUpload dataSetUpload)
+        {
+            return dataSetUpload.Status is not DataSetUploadStatus.PENDING_REVIEW and not DataSetUploadStatus.PENDING_IMPORT
+                ? Common.Validators.ValidationUtils.ValidationResult(ValidationMessages.GenerateErrorDataSetIsNotInAnImportableState())
                 : dataSetUpload;
         }
 

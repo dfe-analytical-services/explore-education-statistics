@@ -18,20 +18,8 @@ export const getImportStatusLabel = (
   switch (statusCode) {
     case 'NOT_FOUND':
       return 'Not found';
-    case 'UPLOADING':
-      return 'Uploading';
-    case 'SCREENING':
-      return 'Screening';
-    case 'FAILED_SCREENING':
-      return 'Failed screening';
-    case 'PENDING_REVIEW':
-      return 'Pending review';
-    case 'PENDING_IMPORT':
-      return 'Pending import';
     case 'QUEUED':
       return 'Queued';
-    case 'PROCESSING_ARCHIVE_FILE':
-      return 'Processing archive file';
     case 'STAGE_1':
       return 'Validating';
     case 'STAGE_2':
@@ -56,20 +44,14 @@ const getImportStatusColour = (
 ): TagProps['colour'] => {
   switch (statusCode) {
     case 'NOT_FOUND':
-    case 'UPLOADING':
-    case 'SCREENING':
-    case 'PENDING_REVIEW':
     case 'QUEUED':
-    case 'PROCESSING_ARCHIVE_FILE':
     case 'STAGE_1':
     case 'STAGE_2':
     case 'STAGE_3':
     case 'CANCELLING':
       return 'orange';
-    case 'PENDING_IMPORT':
     case 'COMPLETE':
       return 'green';
-    case 'FAILED_SCREENING':
     case 'FAILED':
     case 'CANCELLED':
       return 'red';
