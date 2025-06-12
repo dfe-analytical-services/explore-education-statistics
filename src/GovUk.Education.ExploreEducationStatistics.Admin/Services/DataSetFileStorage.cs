@@ -229,6 +229,23 @@ public class DataSetFileStorage(
         await dataSet.DataFile.FileStream.DisposeAsync();
         await dataSet.MetaFile.FileStream.DisposeAsync();
 
+        return await CreateOrReplaceExistingDbRecord(releaseVersionId, dataSet, dataFileId, metaFileId, cancellationToken);
+    }
+
+    private async Task<DataSetUpload> CreateOrReplaceExistingDbRecord(Guid releaseVersionId, DataSet dataSet, Guid dataFileId, Guid metaFileId, CancellationToken cancellationToken)
+    {
+        var existingUpload = await contentDbContext.DataSetUploads.SingleOrDefaultAsync(upload =>
+            (upload.ReleaseVersionId == releaseVersionId && upload.DataSetTitle == dataSet.Title) ||
+            (upload.ReleaseVersionId == releaseVersionId && upload.DataFileName == dataSet.DataFile.FileName && upload.MetaFileName == dataSet.MetaFile.FileName),
+            cancellationToken);
+
+        if (existingUpload is not null)
+        {
+            contentDbContext.DataSetUploads.Remove(existingUpload);
+            await privateBlobStorageService.DeleteBlob(PrivateReleaseTempFiles, existingUpload.DataFilePath);
+            await privateBlobStorageService.DeleteBlob(PrivateReleaseTempFiles, existingUpload.MetaFilePath);
+        }
+
         var dataSetUpload = new DataSetUpload
         {
             ReleaseVersionId = releaseVersionId,
@@ -241,6 +258,7 @@ public class DataSetFileStorage(
             MetaFileSizeInBytes = dataSet.MetaFile.FileSize,
             Status = DataSetUploadStatus.SCREENING,
             UploadedBy = userService.GetProfileFromClaims().Email,
+            ReplacingFileId = dataSet.ReplacingFile?.Id
         };
 
         await contentDbContext.DataSetUploads.AddAsync(dataSetUpload, cancellationToken);
