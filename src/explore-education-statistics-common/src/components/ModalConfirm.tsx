@@ -15,6 +15,7 @@ interface Props {
   hiddenConfirmingText?: string;
   open?: boolean;
   showCancel?: boolean;
+  hideConfirm?: boolean;
   submitButtonVariant?: 'secondary' | 'warning';
   title: string;
   triggerButton?: ReactNode;
@@ -33,6 +34,7 @@ export default function ModalConfirm({
   hiddenConfirmingText = 'Confirming',
   open: initialOpen = false,
   showCancel = true,
+  hideConfirm = false,
   submitButtonVariant,
   title,
   triggerButton,
@@ -118,13 +120,15 @@ export default function ModalConfirm({
           </Button>
         )}
 
-        <Button
-          disabled={isCancelling}
-          variant={submitButtonVariant}
-          onClick={handleConfirm}
-        >
-          {confirmText}
-        </Button>
+        {!hideConfirm && (
+          <Button
+            disabled={isCancelling}
+            variant={submitButtonVariant}
+            onClick={handleConfirm}
+          >
+            {confirmText}
+          </Button>
+        )}
 
         <LoadingSpinner
           alert
