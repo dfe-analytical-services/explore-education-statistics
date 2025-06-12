@@ -74,6 +74,7 @@ public class ThemeServiceTests
 
         var savedTheme = await context.Themes.FindAsync(result.Right.Id);
 
+        Assert.NotNull(savedTheme);
         Assert.Equal("Test theme", savedTheme.Title);
         Assert.Equal("test-theme", savedTheme.Slug);
         Assert.Equal("Test summary", savedTheme.Summary);

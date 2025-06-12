@@ -16,7 +16,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
 {
     public class MethodologyControllerTests
     {
-        private readonly string sitemapItemLastModifiedTime = "2024-01-03T10:14:23.00Z";
+        private const string SitemapItemLastModifiedTime = "2024-01-03T10:14:23.00Z";
 
         [Fact]
         public async Task GetLatestMethodologyBySlug()
@@ -69,7 +69,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
                     new()
                     {
                         Slug = "test-methodology",
-                        LastModified = DateTime.Parse(sitemapItemLastModifiedTime)
+                        LastModified = DateTime.Parse(SitemapItemLastModifiedTime)
                     }
                 });
 

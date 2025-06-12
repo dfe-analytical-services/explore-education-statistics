@@ -232,7 +232,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             IUserService? userService = null)
         {
             return new ReleaseFileService(
-                contentDbContext ?? Mock.Of<ContentDbContext>(),
+                contentDbContext ??= Mock.Of<ContentDbContext>(),
                 contentPersistenceHelper ?? DefaultPersistenceHelperMock().Object,
                 privateBlobStorageService ?? Mock.Of<IPrivateBlobStorageService>(),
                 fileRepository ?? new FileRepository(contentDbContext),
