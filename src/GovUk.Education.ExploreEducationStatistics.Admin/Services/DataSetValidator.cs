@@ -21,7 +21,7 @@ using File = GovUk.Education.ExploreEducationStatistics.Content.Model.File;
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 {
     public class DataSetValidator(
-        ContentDbContext context,
+        ContentDbContext contentDbContext,
         IOptions<FeatureFlagsOptions> featureFlags) : IDataSetValidator
     {
         public async Task<Either<List<ErrorViewModel>, DataSet>> ValidateDataSet(
@@ -189,7 +189,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             string dataSetName)
         {
             // We replace files with the same title. If there is no ReleaseFile with the same title, it's a new data set.
-            var releaseFileToBeReplaced = await context.ReleaseFiles
+            var releaseFileToBeReplaced = await contentDbContext.ReleaseFiles
                 .Include(rf => rf.File)
                 .Where(rf =>
                     rf.ReleaseVersionId == releaseVersionId &&
@@ -206,7 +206,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             Guid releaseVersionId,
             string dataSetName)
         {
-            return await context.ReleaseFiles
+            return await contentDbContext.ReleaseFiles
                 .SingleOrDefaultAsync(rf =>
                     rf.ReleaseVersionId == releaseVersionId &&
                     rf.Name == dataSetName &&
@@ -266,7 +266,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             if (!isReplacement) // if it's a replacement, we get the title from the replacement which is already validated as unique
             {
-                var dataSetNameExists = context.ReleaseFiles
+                var dataSetNameExists = contentDbContext.ReleaseFiles
                     .Include(rf => rf.File)
                     .Any(rf =>
                         rf.ReleaseVersionId == releaseVersionId
@@ -287,7 +287,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             FileType type,
             string filename)
         {
-            return context
+            return contentDbContext
                 .ReleaseFiles
                 .Include(rf => rf.File)
                 .Where(rf => rf.ReleaseVersionId == releaseVersionId && rf.File.Type == type)
