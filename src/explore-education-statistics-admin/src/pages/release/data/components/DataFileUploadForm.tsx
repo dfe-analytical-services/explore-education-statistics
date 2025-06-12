@@ -61,6 +61,7 @@ const fileErrorMappings = {
   MustBeCsvFile: 'MustBeCsvFile',
   CannotReplaceDataSetWithApiDataSet: 'CannotReplaceDataSetWithApiDataSet',
   InvalidFileTypeForReplacement: 'InvalidFileTypeForReplacement',
+  DataSetIsNotInAnImportableState: 'DataSetIsNotInAnImportableState',
 };
 
 function baseErrorMappings(

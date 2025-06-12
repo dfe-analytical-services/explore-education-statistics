@@ -203,7 +203,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         }
 
         [HttpPost("releaseVersions/{releaseVersionId:guid}/import-data-sets")]
-        public async Task<ActionResult<Unit>> ImportBulkZipDataSetsFromTempStorage(
+        public async Task<ActionResult<Unit>> ImportDataSetsFromTempStorage(
             Guid releaseVersionId,
             List<Guid> dataSetUploadIds,
             CancellationToken cancellationToken)
