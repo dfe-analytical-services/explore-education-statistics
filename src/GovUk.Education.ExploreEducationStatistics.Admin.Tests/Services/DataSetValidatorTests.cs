@@ -274,7 +274,7 @@ public class DataSetValidatorTests
         context.ReleaseFiles.AddRange(existingDataReleaseFile, existingMetaReleaseFile);
         await context.SaveChangesAsync();
 
-        var featureFlagOptions = Microsoft.Extensions.Options.Options.Create(new FeatureFlags()
+        var featureFlagOptions = Microsoft.Extensions.Options.Options.Create(new FeatureFlagsOptions()
         {
             EnableReplacementOfPublicApiDataSets = false
         });
@@ -578,7 +578,7 @@ public class DataSetValidatorTests
 
     private static DataSetValidator BuildService(
         ContentDbContext? contentDbContext = null,
-        IOptions<FeatureFlags>? featureFlags = null)
+        IOptions<FeatureFlagsOptions>? featureFlags = null)
     {
         return new DataSetValidator(
             contentDbContext!,

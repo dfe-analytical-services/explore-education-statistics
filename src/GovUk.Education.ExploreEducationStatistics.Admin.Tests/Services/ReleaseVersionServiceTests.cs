@@ -2613,7 +2613,7 @@ public abstract class ReleaseVersionServiceTests
             processorClient ?? Mock.Of<IProcessorClient>(Strict),
             privateCacheService ?? Mock.Of<IPrivateBlobCacheService>(Strict),
             releaseSlugValidator ?? new ReleaseSlugValidatorMockBuilder().Build(),
-            featureFlags: Microsoft.Extensions.Options.Options.Create(new FeatureFlags()
+            featureFlags: Microsoft.Extensions.Options.Options.Create(new FeatureFlagsOptions()
             {
                 EnableReplacementOfPublicApiDataSets = enableReplacementOfPublicApiDataSets
             }),
