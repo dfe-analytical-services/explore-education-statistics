@@ -1207,7 +1207,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     replacementFile.ReplacingId = null;
 
                     await contentDbContext.SaveChangesAsync();
-
+                    
                     return await releaseVersionService.RemoveDataFiles(releaseVersionId: releaseVersionId,
                         fileId: originalFileId);
                 });
