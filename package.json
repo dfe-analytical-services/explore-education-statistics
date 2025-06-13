@@ -4,7 +4,7 @@
   "type": "module",
   "packageManager": "pnpm@8.8.0",
   "engines": {
-    "node": "20.16.0",
+    "node": "20.19.2",
     "pnpm": ">=8.8.0"
   },
   "devDependencies": {
