@@ -133,9 +133,9 @@ describe('ChartAxisConfiguration', () => {
     const generalSection = within(
       screen.getByRole('group', { name: 'General' }),
     );
-    expect(generalSection.getByLabelText('Size of axis (pixels)')).toHaveValue(
-      50,
-    );
+    expect(
+      generalSection.getByLabelText('Size of axis (pixels)'),
+    ).toHaveNumericValue(50);
     expect(generalSection.getByLabelText('Show grid lines')).toBeChecked();
     expect(generalSection.getByLabelText('Show axis')).toBeChecked();
     expect(generalSection.getByLabelText('Displayed unit')).toHaveValue('');
@@ -170,7 +170,7 @@ describe('ChartAxisConfiguration', () => {
 
     const labelsSection = within(screen.getByRole('group', { name: 'Labels' }));
     expect(labelsSection.getByLabelText('Label')).toHaveValue('');
-    expect(labelsSection.getByLabelText('Width (pixels)')).toHaveValue(null);
+    expect(labelsSection.getByLabelText('Width (pixels)')).toHaveValue('');
 
     const sortingSection = within(
       screen.getByRole('group', { name: 'Sorting' }),

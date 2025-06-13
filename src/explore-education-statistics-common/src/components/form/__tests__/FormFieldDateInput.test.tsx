@@ -200,9 +200,9 @@ describe('FormFieldDateInput', () => {
     await userEvent.type(screen.getByLabelText('Month'), '12');
     await userEvent.type(screen.getByLabelText('Year'), '2020');
 
-    expect(screen.getByLabelText('Day')).toHaveValue(10);
-    expect(screen.getByLabelText('Month')).toHaveValue(12);
-    expect(screen.getByLabelText('Year')).toHaveValue(2020);
+    expect(screen.getByLabelText('Day')).toHaveNumericValue(10);
+    expect(screen.getByLabelText('Month')).toHaveNumericValue(12);
+    expect(screen.getByLabelText('Year')).toHaveNumericValue(2020);
 
     await userEvent.click(screen.getByRole('button', { name: 'Submit' }));
 
@@ -233,9 +233,9 @@ describe('FormFieldDateInput', () => {
     await userEvent.type(screen.getByLabelText('Month'), '12');
     await userEvent.type(screen.getByLabelText('Year'), '2020');
 
-    expect(screen.getByLabelText('Day')).toHaveValue(32);
-    expect(screen.getByLabelText('Month')).toHaveValue(12);
-    expect(screen.getByLabelText('Year')).toHaveValue(2020);
+    expect(screen.getByLabelText('Day')).toHaveNumericValue(32);
+    expect(screen.getByLabelText('Month')).toHaveNumericValue(12);
+    expect(screen.getByLabelText('Year')).toHaveNumericValue(2020);
 
     await userEvent.click(screen.getByRole('button', { name: 'Submit' }));
 
@@ -262,7 +262,7 @@ describe('FormFieldDateInput', () => {
 
     await userEvent.type(screen.getByLabelText('Day'), '10');
 
-    expect(screen.getByLabelText('Day')).toHaveValue(10);
+    expect(screen.getByLabelText('Day')).toHaveNumericValue(10);
 
     await userEvent.click(screen.getByRole('button', { name: 'Submit' }));
 
@@ -328,9 +328,9 @@ describe('FormFieldDateInput', () => {
     await userEvent.type(screen.getByLabelText('Month'), '6');
     await userEvent.type(screen.getByLabelText('Year'), '2020');
 
-    expect(screen.getByLabelText('Day')).toHaveValue(15);
-    expect(screen.getByLabelText('Month')).toHaveValue(6);
-    expect(screen.getByLabelText('Year')).toHaveValue(2020);
+    expect(screen.getByLabelText('Day')).toHaveNumericValue(15);
+    expect(screen.getByLabelText('Month')).toHaveNumericValue(6);
+    expect(screen.getByLabelText('Year')).toHaveNumericValue(2020);
 
     await userEvent.click(screen.getByRole('button', { name: 'Submit' }));
 
@@ -364,7 +364,7 @@ describe('FormFieldDateInput', () => {
 
     await userEvent.type(screen.getByLabelText('Day'), '15');
 
-    expect(screen.getByLabelText('Day')).toHaveValue(15);
+    expect(screen.getByLabelText('Day')).toHaveNumericValue(15);
 
     await userEvent.click(screen.getByRole('button', { name: 'Submit' }));
 
@@ -398,9 +398,9 @@ describe('FormFieldDateInput', () => {
     await userEvent.type(screen.getByLabelText('Month'), '6');
     await userEvent.type(screen.getByLabelText('Year'), '2020');
 
-    expect(screen.getByLabelText('Day')).toHaveValue(32);
-    expect(screen.getByLabelText('Month')).toHaveValue(6);
-    expect(screen.getByLabelText('Year')).toHaveValue(2020);
+    expect(screen.getByLabelText('Day')).toHaveNumericValue(32);
+    expect(screen.getByLabelText('Month')).toHaveNumericValue(6);
+    expect(screen.getByLabelText('Year')).toHaveNumericValue(2020);
 
     await userEvent.click(screen.getByRole('button', { name: 'Submit' }));
 
