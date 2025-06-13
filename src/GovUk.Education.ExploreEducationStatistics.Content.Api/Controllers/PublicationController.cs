@@ -110,5 +110,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
             CancellationToken cancellationToken = default) =>
             await _publicationService.ListSitemapItems(cancellationToken)
                 .HandleFailuresOrOk();
+        
+        [HttpGet("publicationInfos")]
+        public async Task<ActionResult<IList<PublicationInfoViewModel>>> ListPublicationInfos(
+            [FromQuery] GetPublicationInfosRequest request, 
+            CancellationToken cancellationToken = default) =>
+            Ok(await _publicationService.ListPublicationInfos(request.ThemeId, cancellationToken));
     }
 }
