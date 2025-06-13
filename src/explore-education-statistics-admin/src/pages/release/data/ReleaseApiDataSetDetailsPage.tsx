@@ -282,24 +282,29 @@ export default function ReleaseApiDataSetDetailsPage() {
   const majorVersionErrorSummary = (
     <div className="govuk-inset-text InsetText_error__ZDwli" role="alert">
       <h2 className="govuk-error-summary__title" id="error-summary-title">
-        This API data set can not be published because it has a major version
-        update.
+        This API data set can not be published because it incomplete or has a
+        major version update.
       </h2>
       <div className="govuk-error-summary__body">
         <ul className="govuk-list govuk-error-summary__list">
           <li>
-            The data file uploaded has resulted in a major version update which
-            is not allowed in release amendments. Major version type changes
-            (e.g. removing data rows, ...) can only be made as part of new
-            releases. For further guidance, contact the EES team. Please select
-            a mapping configuration that does not result in a major version or
-            cancel the ongoing replacement
-            <Link to={replaceTabRoute} test-id="cancel-replacement-link">
-              by clicking here
-            </Link>
-            . and upload a new data file which does not result in a major
-            version update.
+            The data file uploaded has incomplete sections or has resulted in a
+            major version update which is not allowed in release amendments.
+            Major version type changes can only be made as part of new releases.
           </li>
+          <li>
+            Please select a mapping configuration that does not result in a
+            major version.
+          </li>
+          <li>
+            Alternatively cancel the ongoing replacement{' '}
+            <Link to={replaceTabRoute} test-id="cancel  -replacement-link">
+              by clicking here
+            </Link>{' '}
+            and upload a new data file which does not result in a major version
+            update.
+          </li>
+          <li>For further guidance, contact the EES team.</li>
         </ul>
       </div>
     </div>
