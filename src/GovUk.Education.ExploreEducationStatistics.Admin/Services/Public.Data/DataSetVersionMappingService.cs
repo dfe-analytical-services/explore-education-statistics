@@ -96,7 +96,7 @@ public class DataSetVersionMappingService(
 
         var filtersIsMajor = filterAndOptionMappingTypes.Any(types => NoMappingTypes.Contains(types.Filter) ||  NoMappingTypes.Contains(types.FilterOption));
 
-        bool? isMajorVersionUpdate = await IsMajorVersionUpdate(
+        var isMajorVersionUpdate = await IsMajorVersionUpdate(
                 dataSetVersionId,
                     locationOptionMappingTypes,
                     filterAndOptionMappingTypes,
@@ -217,13 +217,12 @@ public class DataSetVersionMappingService(
             filterMappingTypes,
             cancellationToken);
 
-        var isReplacement = await publicDataDbContext.DataSetVersionImports
+        var isReplacingAPIDataFile = await publicDataDbContext.DataSetVersionImports
             .AnyAsync(i => i.DataSetVersionToReplaceId != null 
                            && i.DataSetVersionToReplaceId == sourceDataSetVersion.Id,
                 cancellationToken) && targetDataSetVersion.VersionPatch > 0;
-        var skipSettingVersionNumber = isReplacement && featureFlags.Value.EnableReplacementOfPublicApiDataSets;
 
-        if (!skipSettingVersionNumber)
+        if (!isReplacingAPIDataFile)
         {   
             if (isMajorVersionUpdate)
             {
@@ -255,24 +254,11 @@ public class DataSetVersionMappingService(
         Guid targetDataSetVersionId,
         List<LocationMappingTypes> locationMappingTypes,
         List<FilterMappingTypes> filterMappingTypes,
-        CancellationToken cancellationToken)
-    {
-        if (locationMappingTypes.Any(types => NoMappingTypes.Contains(types.LocationLevel)
-                                               || NoMappingTypes.Contains(types.LocationOption)))
-        {
-            return true;
-        }
-
-        if (filterMappingTypes.Any(types => NoMappingTypes.Contains(types.Filter)
-                                            ||  NoMappingTypes.Contains(types.FilterOption)))
-        {
-            return true;
-        }
-        
-        return await HasDeletionChanges(
-            targetDataSetVersionId,
-            cancellationToken);
-    }
+        CancellationToken cancellationToken) => locationMappingTypes
+                   .Any(types => NoMappingTypes.Contains(types.LocationLevel) || NoMappingTypes.Contains(types.LocationOption))
+                || filterMappingTypes
+                    .Any(types => NoMappingTypes.Contains(types.Filter) ||  NoMappingTypes.Contains(types.FilterOption))
+                || await HasDeletionChanges(targetDataSetVersionId, cancellationToken);
     
     /// <summary>
     /// Checks if there are any major version changes due to deletions in indicators, geographic levels, or time periods

@@ -13,7 +13,7 @@ describe('DataFilesTableRow', () => {
     onStatusChange: jest.fn(),
   };
 
-  const mockDataFile: DataFile = {
+  const mockDataFile = {
     fileName: '',
     metaFileName: '',
     metaFileId: '',

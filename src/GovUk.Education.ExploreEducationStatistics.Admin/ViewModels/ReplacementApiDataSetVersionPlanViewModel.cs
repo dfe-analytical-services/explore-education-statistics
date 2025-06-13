@@ -20,5 +20,4 @@ public record ReplacementApiDataSetVersionPlanViewModel
     public MappingStatusViewModel? MappingStatus { get; set; }
 
     public bool Valid { get; set; } //TODO: please note, this is kept as is for backward (feature flagging) compatibility with the rest of the code.
-    public bool ValidDefinition => MappingStatus is { Complete: true, FiltersComplete: true, LocationsComplete: true, HasMajorVersionUpdate: false };
 }

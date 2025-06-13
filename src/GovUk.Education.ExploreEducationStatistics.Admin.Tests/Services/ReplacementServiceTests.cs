@@ -2881,6 +2881,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         timePeriodService,
                         dataSetVersionService,
                         dataSetVersionMappingService);
+                    result.AssertRight();
                 }
                 else
                 {
@@ -2888,8 +2889,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         locationRepository,
                         timePeriodService,
                         dataSetVersionService);
+                    result.AssertBadRequest(ReplacementMustBeValid);
                 }
-                result.AssertBadRequest(ReplacementMustBeValid);
             }
         }
         [Fact]

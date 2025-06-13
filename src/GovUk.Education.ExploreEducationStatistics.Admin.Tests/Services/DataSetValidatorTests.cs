@@ -274,14 +274,14 @@ public class DataSetValidatorTests
         context.ReleaseFiles.AddRange(existingDataReleaseFile, existingMetaReleaseFile);
         await context.SaveChangesAsync();
 
-        var featureFlagOptions = Microsoft.Extensions.Options.Options.Create(new FeatureFlags()
+        var featureFlagsOptions = Microsoft.Extensions.Options.Options.Create(new FeatureFlagsOptions()
         {
             EnableReplacementOfPublicApiDataSets = false
         });
 
         var sut = BuildService(
             context,
-            featureFlagOptions);
+            featureFlagsOptions);
 
         // Act
         var result = await sut.ValidateDataSet(dataSetDto, performAutoReplacement: true);
@@ -578,7 +578,7 @@ public class DataSetValidatorTests
 
     private static DataSetValidator BuildService(
         ContentDbContext? contentDbContext = null,
-        IOptions<FeatureFlags>? featureFlags = null)
+        IOptions<FeatureFlagsOptions>? featureFlags = null)
     {
         return new DataSetValidator(
             contentDbContext!,

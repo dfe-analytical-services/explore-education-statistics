@@ -64,7 +64,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         IProcessorClient processorClient,
         IPrivateBlobCacheService privateCacheService,
         IReleaseSlugValidator releaseSlugValidator,
-        IOptions<FeatureFlags> featureFlags,
+        IOptions<FeatureFlagsOptions> featureFlags,
         ILogger<ReleaseVersionService> logger) : IReleaseVersionService
     {
         public async Task<Either<ActionResult, ReleaseVersionViewModel>> GetRelease(Guid releaseVersionId)
