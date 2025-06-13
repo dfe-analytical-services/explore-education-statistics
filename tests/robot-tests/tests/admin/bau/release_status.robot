@@ -269,7 +269,6 @@ Publish new release from adopted publication and make an amendment
     user navigates to content page    ${ADOPTED_PUBLICATION_NAME}
     user adds headlines text block
     user adds content to headlines text block    Headline text block text
-    user clicks link    Sign off
     user approves release for immediate publication
 
     user navigates to admin dashboard    Bau1
@@ -295,7 +294,6 @@ Navigate to contents page and add a release note
     user clicks button    Save note
 
 Publish the release immediately
-    user clicks link    Sign off
     user approves release for immediate publication
 
 Create third release
@@ -392,5 +390,4 @@ Add headline text block to Content page
     user waits until data upload is completed    ${SUBJECT_NAME}-updated
 
 Publish the release immediately
-    user clicks link    Sign off
     user approves release for immediate publication

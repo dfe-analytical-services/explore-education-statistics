@@ -268,9 +268,7 @@ Verify release is scheduled
     user checks summary list contains    Next release expected    December 3001
 
 Get public release link
-    user waits until page contains element    testid:public-release-url
-    ${PUBLIC_RELEASE_LINK}=    Get Value    xpath://*[@data-testid="public-release-url"]
-    check that variable is not empty    PUBLIC_RELEASE_LINK    ${PUBLIC_RELEASE_LINK}
+    ${PUBLIC_RELEASE_LINK}=    user gets url public release will be accessible at
     Set Suite Variable    ${PUBLIC_RELEASE_LINK}
 
 Publish the scheduled release
@@ -280,15 +278,14 @@ Publish the scheduled release
     set suite variable    ${EXPECTED_PUBLISHED_DATE}
 
 Verify newly published release is on Find Statistics page
+    # TODO EES-6063 - Remove this
     user checks publication is on find statistics page    ${PUBLICATION_NAME}
 
-Navigate to newly published release page
-    user clicks link    ${PUBLICATION_NAME}
-    user waits until h1 is visible    ${PUBLICATION_NAME}    %{WAIT_MEDIUM}
+Verify newly published release is public
+    user navigates to public release page    ${PUBLIC_RELEASE_LINK}    ${PUBLICATION_NAME}    ${RELEASE_NAME}
 
-Verify release URL and page caption
+Verify release URL
     user checks url contains    %{PUBLIC_URL}/find-statistics/ui-tests-publish-release-and-amend-%{RUN_IDENTIFIER}
-    user waits until page contains title caption    ${RELEASE_NAME}
 
 Verify publish and update dates
     user checks summary list contains    Published    ${EXPECTED_PUBLISHED_DATE}
@@ -757,14 +754,12 @@ Approve amendment for scheduled release
     set suite variable    ${EXPECTED_PUBLISHED_DATE}
 
 Verify amendment is on Find Statistics page again
+    # TODO EES-6063 - Remove this
     user waits for caches to expire
     user checks publication is on find statistics page    ${PUBLICATION_NAME}
 
 Navigate to amendment release page
-    user clicks link    ${PUBLICATION_NAME}
-    user waits until h1 is visible    ${PUBLICATION_NAME}    %{WAIT_MEDIUM}
-
-    user waits until page contains title caption    ${RELEASE_NAME}
+    user navigates to public release page    ${PUBLIC_RELEASE_LINK}    ${PUBLICATION_NAME}    ${RELEASE_NAME}
 
     user checks url contains    %{PUBLIC_URL}/find-statistics/ui-tests-publish-release-and-amend-%{RUN_IDENTIFIER}
 

@@ -396,12 +396,19 @@ Add headline text block to Content page
     user adds headlines text block
     user adds content to headlines text block    Headline text block text
 
-Approve first release
-    user clicks link    Sign off
+Approve release
     user approves release for immediate publication
 
+Get public release link
+    ${PUBLIC_RELEASE_LINK}    user gets url public release will be accessible at
+    Set Suite Variable    ${PUBLIC_RELEASE_LINK}
+
 Verify newly published release is on Find Statistics page
+    # TODO EES-6063 - Remove this
     user checks publication is on find statistics page    ${PUBLICATION_NAME}
+
+Verify newly published release is public
+    user navigates to public release page    ${PUBLIC_RELEASE_LINK}    ${PUBLICATION_NAME}    ${RELEASE_NAME}
 
 Go to public table tool page
     user navigates to data tables page on public frontend

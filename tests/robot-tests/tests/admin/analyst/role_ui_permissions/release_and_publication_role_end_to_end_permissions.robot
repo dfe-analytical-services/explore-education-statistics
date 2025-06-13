@@ -229,7 +229,6 @@ Check release approver can create a release note
     user waits until element contains    css:#release-notes li:nth-of-type(1) p    Test release note one
 
 Check release approver can publish a release
-    user clicks link    Sign off
     user approves original release for immediate publication
 
 Swap the release approver role for publication owner now that the publication is live
