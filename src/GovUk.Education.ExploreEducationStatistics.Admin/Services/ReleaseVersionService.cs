@@ -616,13 +616,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
-        public async Task<Either<ActionResult, Unit>> RemoveDataFiles(Guid releaseVersionId, Guid fileId)
+        public async Task<Either<ActionResult, Unit>> RemoveDataFiles(Guid releaseVersionId, Guid fileId, bool removeDraftApi = false)
         {
             return await context.ReleaseVersions
                 .SingleOrNotFoundAsync(rv => rv.Id == releaseVersionId)
                 .OnSuccess(userService.CheckCanUpdateReleaseVersion)
                 .OnSuccess(() => CheckReleaseDataFileExists(releaseVersionId: releaseVersionId, fileId: fileId))
-                .OnSuccessDo(releaseFile => CheckCanDeleteDataFiles(releaseVersionId, releaseFile))
+                .OnSuccessDo(releaseFile => CheckCanDeleteDataFiles(releaseVersionId, releaseFile, removeDraftApi))
                 .OnSuccessDo(async releaseFile =>
                 {
                     // Delete any replacement that might exist
@@ -630,7 +630,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     {
                         return await RemoveDataFiles(
                             releaseVersionId: releaseVersionId,
-                            fileId: releaseFile.File.ReplacedById.Value);
+                            fileId: releaseFile.File.ReplacedById.Value,
+                            removeDraftApi: true);
                     }
 
                     return Unit.Instance;
@@ -645,14 +646,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         releaseVersionId: releaseVersionId,
                         subjectId: deletePlan.SubjectId));
                 })
-                .OnSuccessDo(DeleteApiDataSetVersionIfAttached)
+                .OnSuccessDo(deletePlan => DeleteApiDataSetVersionIfAttached(deletePlan, removeDraftApi))
                 .OnSuccessVoid(() => releaseDataFileService.Delete(releaseVersionId, fileId));
         }
 
-        private async Task<Either<ActionResult, Unit>> DeleteApiDataSetVersionIfAttached(DeleteDataFilePlanViewModel deletePlan)
+        private async Task<Either<ActionResult, Unit>> DeleteApiDataSetVersionIfAttached(DeleteDataFilePlanViewModel deletePlan, bool removeDraftApi = false)
         {
             return !featureFlags.Value.EnableReplacementOfPublicApiDataSets 
-                   || deletePlan.ApiDataSetVersionPlan == null
+                   || deletePlan.ApiDataSetVersionPlan == null 
+                   || !removeDraftApi
                 ? Unit.Instance
                 : !deletePlan.Valid 
                     ? throw new InvalidOperationException("Deletion plan has indicated this deletion does not meet requirements to make it valid to proceed with deletion.") 
@@ -764,7 +766,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
-        private async Task<Either<ActionResult, Unit>> CheckCanDeleteDataFiles(Guid releaseVersionId, ReleaseFile releaseFile)
+        private async Task<Either<ActionResult, Unit>> CheckCanDeleteDataFiles(Guid releaseVersionId, ReleaseFile releaseFile, bool removeDraftApi = false)
         {
             var import = await dataImportService.GetImport(releaseFile.FileId);
             var importStatus = import?.Status ?? DataImportStatus.NOT_FOUND;
@@ -779,7 +781,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 return ValidationActionResult(CannotRemoveDataFilesOnceReleaseApproved);
             }
 
-            if (releaseFile.PublicApiDataSetId is null)
+            if (releaseFile.PublicApiDataSetId is null || !removeDraftApi)
             {
                 return Unit.Instance;
             }
