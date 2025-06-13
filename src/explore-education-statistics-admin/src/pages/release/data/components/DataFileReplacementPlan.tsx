@@ -87,12 +87,16 @@ const DataFileReplacementPlan = ({
     hasDataSetVersionPlan,
     hasIncompleteLocationMapping,
     hasIncompleteFilterMapping,
+    isNotReadyToPublish,
+    hasMajorVersionUpdate,
   } = useMemo(() => {
     if (!isNewReplaceDsvFeatureEnabled) {
       return {
         hasDataSetVersionPlan: false,
         hasIncompleteLocationMapping: false,
         hasIncompleteFilterMapping: false,
+        isNotReadyToPublish: false,
+        hasMajorVersionUpdate: false,
       };
     }
 
@@ -102,6 +106,9 @@ const DataFileReplacementPlan = ({
         !plan?.apiDataSetVersionPlan?.mappingStatus?.locationsComplete,
       hasIncompleteFilterMapping:
         !plan?.apiDataSetVersionPlan?.mappingStatus?.filtersComplete,
+      isNotReadyToPublish: !plan?.apiDataSetVersionPlan?.readyToPublish,
+      hasMajorVersionUpdate:
+        plan?.apiDataSetVersionPlan?.mappingStatus?.hasMajorVersionUpdate,
     };
   }, [plan, isNewReplaceDsvFeatureEnabled]);
 
@@ -450,48 +457,98 @@ const DataFileReplacementPlan = ({
 
           {hasDataSetVersionPlan && (
             <>
-              <h3 className="govuk-heading-m">
-                <Tag colour={hasIncompleteFilterMapping ? 'red' : 'green'}>
-                  {`Api Data Set Filters: ${
-                    hasIncompleteFilterMapping ? 'ERROR' : 'OK'
-                  }`}
-                </Tag>
-              </h3>
-
-              {hasIncompleteFilterMapping ? (
-                <p>
-                  Please{' '}
-                  {apiDataSetsTabRoute && (
-                    <Link to={apiDataSetsTabRoute} unvisited>
-                      head over to the API data sets tab
-                    </Link>
-                  )}{' '}
-                  and complete manual mapping process for filters.
-                </p>
+              {hasMajorVersionUpdate ? (
+                <>
+                  <h3 className="govuk-heading-m">
+                    <Tag colour={hasMajorVersionUpdate ? 'red' : 'green'}>
+                      {`API data set status: ${
+                        hasMajorVersionUpdate ? 'ERROR' : 'OK'
+                      }`}
+                    </Tag>
+                  </h3>
+                  <p>
+                    Please cancel this data replacement and upload a new data
+                    file that doesn't create a breaking change. To see the
+                    breaking changes, please{' '}
+                    {apiDataSetsTabRoute && (
+                      <Link to={apiDataSetsTabRoute} unvisited>
+                        go to the API data sets tab
+                      </Link>
+                    )}
+                    .
+                  </p>
+                </>
               ) : (
-                <p>No manual mapping required for Api Data set filters.</p>
-              )}
+                <>
+                  <h3 className="govuk-heading-m">
+                    <Tag colour={hasIncompleteFilterMapping ? 'red' : 'green'}>
+                      {`API data set Filters: ${
+                        hasIncompleteFilterMapping ? 'ERROR' : 'OK'
+                      }`}
+                    </Tag>
+                  </h3>
 
-              <h3 className="govuk-heading-m">
-                <Tag colour={hasIncompleteLocationMapping ? 'red' : 'green'}>
-                  {`Api Data Set Locations: ${
-                    hasIncompleteLocationMapping ? 'ERROR' : 'OK'
-                  }`}
-                </Tag>
-              </h3>
+                  {hasIncompleteFilterMapping ? (
+                    <p>
+                      Please{' '}
+                      {apiDataSetsTabRoute && (
+                        <Link to={apiDataSetsTabRoute} unvisited>
+                          go to the API data sets tab
+                        </Link>
+                      )}{' '}
+                      and complete manual mapping process for filters.
+                    </p>
+                  ) : (
+                    <p>No manual mapping required for API data set filters.</p>
+                  )}
 
-              {hasIncompleteLocationMapping ? (
-                <p>
-                  Please{' '}
-                  {apiDataSetsTabRoute && (
-                    <Link to={apiDataSetsTabRoute} unvisited>
-                      head over to the API data sets tab
-                    </Link>
-                  )}{' '}
-                  and complete manual mapping process for locations.
-                </p>
-              ) : (
-                <p>No manual mapping required for Api Data set locations.</p>
+                  <h3 className="govuk-heading-m">
+                    <Tag
+                      colour={hasIncompleteLocationMapping ? 'red' : 'green'}
+                    >
+                      {`API data set Locations: ${
+                        hasIncompleteLocationMapping ? 'ERROR' : 'OK'
+                      }`}
+                    </Tag>
+                  </h3>
+
+                  {hasIncompleteLocationMapping ? (
+                    <p>
+                      Please{' '}
+                      {apiDataSetsTabRoute && (
+                        <Link to={apiDataSetsTabRoute} unvisited>
+                          go to the API data sets tab
+                        </Link>
+                      )}{' '}
+                      and complete manual mapping process for locations.
+                    </p>
+                  ) : (
+                    <p>
+                      No manual mapping required for API data set locations.
+                    </p>
+                  )}
+                  <h3 className="govuk-heading-m">
+                    <Tag colour={isNotReadyToPublish ? 'red' : 'green'}>
+                      {`API data set has to be finalized: ${
+                        isNotReadyToPublish ? 'ERROR' : 'OK'
+                      }`}
+                    </Tag>
+                  </h3>
+
+                  {isNotReadyToPublish ? (
+                    <p>
+                      Please{' '}
+                      {apiDataSetsTabRoute && (
+                        <Link to={apiDataSetsTabRoute} unvisited>
+                          go to the API data sets tab
+                        </Link>
+                      )}{' '}
+                      and finalize the data set version mapping process.
+                    </p>
+                  ) : (
+                    <p>No actions required for API data set version mapping.</p>
+                  )}
+                </>
               )}
             </>
           )}

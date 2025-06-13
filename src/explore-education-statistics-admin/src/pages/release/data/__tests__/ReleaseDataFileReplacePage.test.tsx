@@ -86,6 +86,7 @@ describe('ReleaseDataFileReplacePage', () => {
       name: '',
       version: '',
       status: '',
+      readyToPublish: false,
       valid: false,
     },
   };

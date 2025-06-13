@@ -50,7 +50,7 @@ internal class DataSetVersionMappingService(
             .SingleAsync(dsv => dsv.Id == nextDataSetVersionId, cancellationToken);
 
         var sourceVersion = featureFlags.Value.EnableReplacementOfPublicApiDataSets && dataSetVersionToReplaceId is not null
-            ? nextVersion.DataSet.Versions.FirstOrDefault(v => v.Id == dataSetVersionToReplaceId )
+            ? nextVersion.DataSet.Versions.SingleOrDefault(v => v.Id == dataSetVersionToReplaceId)
             : nextVersion.DataSet.LatestLiveVersion;
         
         if (featureFlags.Value.EnableReplacementOfPublicApiDataSets 

@@ -128,6 +128,7 @@ describe('ReleaseDataUploadsSection', () => {
       version: '',
       status: '',
       valid: false,
+      readyToPublish: false,
     },
   };
 

@@ -20,6 +20,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainers;
 using IReleaseVersionRepository = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IReleaseVersionRepository;
 
@@ -33,7 +34,8 @@ public class DataSetFileStorage(
     IDataImportService dataImportService,
     IUserService userService,
     IDataSetVersionService dataSetVersionService,
-    IOptions<FeatureFlags> featureFlags) : IDataSetFileStorage
+    IOptions<FeatureFlags> featureFlags, 
+    ILogger<DataSetFileStorage> logger) : IDataSetFileStorage
 {
     public async Task<DataFileInfo> UploadDataSet(
         Guid releaseVersionId,
@@ -85,31 +87,18 @@ public class DataSetFileStorage(
             createdById: userService.GetUserId());
 
         await UploadDataSetToReleaseStorage(releaseVersionId, dataFile.Id, metaFile.Id, dataSet, cancellationToken);
-
-        if (featureFlags.Value.EnableReplacementOfPublicApiDataSets &&
-            dataSet.ReplacingFile is not null &&
-            await contentDbContext.ReleaseFiles.AnyAsync(rf =>
+        
+        var releaseFileHasApiDataSet = await contentDbContext.ReleaseFiles.AnyAsync(rf =>
                 rf.ReleaseVersionId == releaseVersionId &&
                 rf.Name == dataSet.Title &&
                 rf.PublicApiDataSetId != null,
-                cancellationToken))
-        {
-            // Creates a new data set version to enable replacement. 
-            // Please note this is WIP, EES-5996 and will address failure,
-            // and any refactor that may be required
-            await dataSetVersionService.GetDataSetVersion(
-                    replacedReleaseDataFile!.PublicApiDataSetId!.Value,
-                    replacedReleaseDataFile.PublicApiDataSetVersion!,
-                    cancellationToken)
-                .OnSuccessDo(async dataSetVersion =>
-                {
-                    await dataSetVersionService.CreateNextVersion(
-                        dataReleaseFile.Id,
-                        replacedReleaseDataFile.PublicApiDataSetId.Value,
-                        dataSetVersion.Id,
-                        cancellationToken
-                    );
-                });
+            cancellationToken);
+
+        if (featureFlags.Value.EnableReplacementOfPublicApiDataSets 
+            && dataSet.ReplacingFile is not null 
+            && releaseFileHasApiDataSet)
+        { 
+            await CreateNextDraftDataSetVersion(cancellationToken, replacedReleaseDataFile!, dataReleaseFile);
         }
 
         var dataImport = await dataImportService.Import(subjectId, dataFile, metaFile);
@@ -133,6 +122,38 @@ public class DataSetFileStorage(
             PublicApiDataSetId = dataReleaseFile.PublicApiDataSetId,
             PublicApiDataSetVersion = dataReleaseFile.PublicApiDataSetVersionString,
         };
+    }
+
+    private async Task CreateNextDraftDataSetVersion(
+        CancellationToken cancellationToken,
+        ReleaseFile replacedReleaseDataFile,
+        ReleaseFile dataReleaseFile)
+    {
+        var dataSetId = replacedReleaseDataFile.PublicApiDataSetId;
+
+        await dataSetVersionService.GetDataSetVersion(dataSetId!.Value,
+                replacedReleaseDataFile.PublicApiDataSetVersion!,
+                cancellationToken)
+            .OnFailureDo(_ =>
+            {
+                var errorMessage =
+                    "Failed to find the data set version expected to be linked to the release file that is being replaced for the " +
+                    $"data set id: {dataSetId} and the data set version number: {replacedReleaseDataFile.PublicApiDataSetVersionString}. This has occured when creating the next draft version.";
+                logger.LogError(errorMessage);
+                throw new InvalidOperationException("Failed to find the associated API data set version for the release file.");
+            })
+            .OnSuccessDo(async dataSetVersion =>
+                await dataSetVersionService.CreateNextVersion(
+                        dataReleaseFile.Id,
+                        replacedReleaseDataFile!.PublicApiDataSetId!.Value,
+                        dataSetVersion.Id,
+                        cancellationToken
+                    ).OnFailureDo(_ =>
+                {
+                    var errorMessage = $"Failed whilst creating the next draft version for the data set id: {dataSetId} and the data set version number: {replacedReleaseDataFile.PublicApiDataSetVersionString}.";
+                    logger.LogError(errorMessage);
+                    throw new InvalidOperationException("Failure detected when creating the next draft version for the data file uploaded.");
+                }));
     }
 
     private async Task UploadDataSetToReleaseStorage(

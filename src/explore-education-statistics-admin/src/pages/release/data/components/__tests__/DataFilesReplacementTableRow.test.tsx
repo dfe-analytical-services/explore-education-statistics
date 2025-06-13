@@ -54,6 +54,7 @@ describe('DataFilesReplacementTableRow', () => {
       version: '',
       status: '',
       valid: true,
+      readyToPublish: false,
     },
     valid: true,
   };

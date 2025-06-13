@@ -60,7 +60,7 @@ public abstract class DataReplacementControllerTests
                         })
                 ],
                 Footnotes = [],
-                ApiDataSetVersionPlan = new ApiDataSetVersionPlanViewModel
+                ApiDataSetVersionPlan = new ReplaceApiDataSetVersionPlanViewModel
                 {
                     DataSetId = Guid.NewGuid(),
                     DataSetTitle = "my data set",

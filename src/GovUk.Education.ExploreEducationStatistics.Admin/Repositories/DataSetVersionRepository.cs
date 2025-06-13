@@ -8,7 +8,7 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using Microsoft.EntityFrameworkCore;
 
-namespace GovUk.Education.ExploreEducationStatistics.Admin.Services;
+namespace GovUk.Education.ExploreEducationStatistics.Admin.Repositories;
 
 public class DataSetVersionRepository(
     ContentDbContext contentDbContext,
