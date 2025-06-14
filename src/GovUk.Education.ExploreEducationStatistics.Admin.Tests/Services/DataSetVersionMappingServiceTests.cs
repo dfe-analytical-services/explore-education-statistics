@@ -95,6 +95,47 @@ public class DataSetVersionMappingServiceTests
     }
     
     [Theory]
+    [InlineData("AutoNone", "AutoNone", "AutoNone", "AutoNone", false, false)]
+    [InlineData("AutoMapped", "AutoNone", "AutoNone", "AutoNone", false, false)]
+    [InlineData("AutoMapped", "AutoMapped", "AutoNone", "AutoNone", true, false)]
+    [InlineData("AutoMapped", "AutoMapped", "AutoMapped", "AutoNone", true, false)]
+    [InlineData("ManualNone", "ManualNone", "ManualNone", "ManualNone", false, false)]
+    [InlineData("AutoMapped", "ManualNone", "ManualNone", "ManualNone", false, false)]
+    [InlineData("AutoMapped", "AutoMapped", "ManualNone", "ManualNone", true, false)]
+    [InlineData("ManualNone", "ManualNone", "AutoMapped", "AutoMapped",  false, true)]
+    
+    public async Task GetMappingStatus(
+        string locationMappingTypesOption, 
+        string locationMappingTypesLevel,
+        string filterMappingTypesOption, 
+        string filterMappingTypesLevel,
+        bool majorVersionInLocations,
+        bool majorVersionInFilters)
+    {
+        // Arrange
+        var targetDataSetVersionId = Guid.NewGuid();
+
+        SetupDbContext(targetDataSetVersionId);
+
+        var contextId = Guid.NewGuid().ToString();
+        await using var contentDbContext = InMemoryApplicationDbContext(contextId);
+        
+        var service = CreateService(
+            publicDataDbContext: _publicDataDbContextMock.Object, 
+            contentDbContext: contentDbContext);
+
+        SetupMockMappingTypes(locationMappingTypesLevel, locationMappingTypesOption, filterMappingTypesLevel,
+            filterMappingTypesOption, targetDataSetVersionId);
+        // Act
+
+        var result = await service.GetMappingStatus(targetDataSetVersionId);
+        // Assert
+        Assert.Equal(majorVersionInLocations, result.FiltersHaveMajorChange);
+        Assert.Equal(majorVersionInFilters, result.LocationsHaveMajorChange);
+    }
+
+    
+    [Theory]
     [InlineData(false, false, false, false)]
     [InlineData(true, false, false, true)]
     [InlineData(false, true, false, true)]

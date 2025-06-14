@@ -282,8 +282,8 @@ export default function ReleaseApiDataSetDetailsPage() {
   const majorVersionErrorSummary = (
     <div className="govuk-inset-text InsetText_error__ZDwli" role="alert">
       <h2 className="govuk-error-summary__title" id="error-summary-title">
-        This API data set can not be published because it incomplete or has a
-        major version update.
+        This API data set can not be published because it is either incomplete
+        or has a major version update.
       </h2>
       <div className="govuk-error-summary__body">
         <ul className="govuk-list govuk-error-summary__list">
