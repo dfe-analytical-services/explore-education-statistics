@@ -1801,7 +1801,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 {
                     FiltersComplete = true,
                     LocationsComplete = true,
-                    HasMajorVersionUpdate = majorVersionUpdate
+                    HasMajorVersionUpdate = majorVersionUpdate,
+                    FiltersHaveMajorChange = false,
+                    LocationsHaveMajorChange = false
                 });
             
             var options = Microsoft.Extensions.Options.Options.Create(new FeatureFlagsOptions()
@@ -2833,7 +2835,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 {
                     FiltersComplete = true,
                     LocationsComplete = true,
-                    HasMajorVersionUpdate = false
+                    HasMajorVersionUpdate = false,
+                    FiltersHaveMajorChange = false,
+                    LocationsHaveMajorChange = false
                 });
             var options = Microsoft.Extensions.Options.Options.Create(new FeatureFlagsOptions()
             {
@@ -2845,7 +2849,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var releaseVersionService = new Mock<IReleaseVersionService>(Strict);
             if (enableReplacementOfPublicApiDataSets)
             {
-                releaseVersionService.Setup(service => service.RemoveDataFiles(It.IsAny<Guid>(), It.IsAny<Guid>()))
+                releaseVersionService.Setup(service => service.RemoveDataFiles(It.IsAny<Guid>(), It.IsAny<Guid>(), It.IsAny<bool>()))
                     .ReturnsAsync(Unit.Instance);
             }
 
@@ -3290,7 +3294,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             }
 
             var releaseVersionService = new Mock<IReleaseVersionService>(Strict);
-            releaseVersionService.Setup(service => service.RemoveDataFiles(releaseVersion.Id, originalFile.Id))
+            releaseVersionService.Setup(service => service.RemoveDataFiles(releaseVersion.Id, originalFile.Id, false))
                 .ReturnsAsync(Unit.Instance);
 
             var cacheKey = new DataBlockTableResultCacheKey(dataBlockVersion);
@@ -4188,7 +4192,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 .Returns(Task.CompletedTask);
 
             var releaseVersionService = new Mock<IReleaseVersionService>(Strict);
-            releaseVersionService.Setup(service => service.RemoveDataFiles(releaseVersion.Id, originalFile.Id))
+            releaseVersionService.Setup(service => service.RemoveDataFiles(releaseVersion.Id, originalFile.Id, It.IsAny<bool>()))
                 .ReturnsAsync(Unit.Instance);
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -4480,7 +4484,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var releaseVersionService = new Mock<IReleaseVersionService>(Strict);
             releaseVersionService.Setup(service => service.RemoveDataFiles(
-                releaseVersion.Id, originalFile.Id)).ReturnsAsync(Unit.Instance);
+                releaseVersion.Id, originalFile.Id, It.IsAny<bool>())).ReturnsAsync(Unit.Instance);
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
@@ -4689,7 +4693,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 .ReturnsAsync(new List<(int Year, TimeIdentifier TimeIdentifier)>());
 
             var releaseVersionService = new Mock<IReleaseVersionService>(Strict);
-            releaseVersionService.Setup(service => service.RemoveDataFiles(releaseVersion.Id, originalFile.Id))
+            releaseVersionService.Setup(service => service.RemoveDataFiles(releaseVersion.Id, originalFile.Id, It.IsAny<bool>()))
                 .ReturnsAsync(Unit.Instance);
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -4883,7 +4887,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 .ReturnsAsync(new List<(int Year, TimeIdentifier TimeIdentifier)>());
 
             var releaseVersionService = new Mock<IReleaseVersionService>(Strict);
-            releaseVersionService.Setup(service => service.RemoveDataFiles(contentRelease.Id, originalFile.Id))
+            releaseVersionService.Setup(service => service.RemoveDataFiles(contentRelease.Id, originalFile.Id, It.IsAny<bool>()))
                 .ReturnsAsync(Unit.Instance);
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))

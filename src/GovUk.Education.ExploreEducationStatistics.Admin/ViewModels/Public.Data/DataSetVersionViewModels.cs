@@ -89,9 +89,9 @@ public record MappingStatusViewModel
     
     public required bool HasMajorVersionUpdate { get; init; } 
 
-    public bool? LocationsHaveMajorChange { get; init; }
+    public required bool LocationsHaveMajorChange { get; init; }
 
-    public bool? FiltersHaveMajorChange { get; init; }
+    public required bool FiltersHaveMajorChange { get; init; }
 }
 
 public record DataSetVersionInfoViewModel 
