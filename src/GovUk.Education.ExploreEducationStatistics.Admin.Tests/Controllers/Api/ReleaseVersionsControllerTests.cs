@@ -301,7 +301,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             var fileId = Guid.NewGuid();
 
             releaseVersionService
-                .Setup(service => service.RemoveDataFiles(_releaseVersionId, fileId))
+                .Setup(service => service.RemoveDataFiles(_releaseVersionId, fileId, It.IsAny<bool>()))
                 .ReturnsAsync(Unit.Instance);
 
             var controller = BuildController(releaseVersionService: releaseVersionService.Object);
@@ -325,7 +325,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             var fileId = Guid.NewGuid();
 
             releaseVersionService
-                .Setup(service => service.RemoveDataFiles(_releaseVersionId, fileId))
+                .Setup(service => service.RemoveDataFiles(_releaseVersionId, fileId, It.IsAny<bool>()))
                 .ReturnsAsync(ValidationActionResult(UnableToFindMetadataFileToDelete));
 
             var controller = BuildController(releaseVersionService: releaseVersionService.Object);
