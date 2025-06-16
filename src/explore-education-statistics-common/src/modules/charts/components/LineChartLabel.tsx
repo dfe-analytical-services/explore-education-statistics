@@ -1,3 +1,4 @@
+import chunkLabelToFitCharLimit from '@common/modules/charts/components/utils/chunkLabelToFitCharLimit';
 import { LineChartDataLabelPosition } from '@common/modules/charts/types/chart';
 import { LegendInlinePosition } from '@common/modules/charts/types/legend';
 import formatPretty from '@common/utils/number/formatPretty';
@@ -65,18 +66,43 @@ export default function LineChartLabel({
 
   // Legend as the label - only render for the last data point in the line.
   if (isLegendLabel && isLastItem) {
-    const defaultDy = position === 'below' ? 16 : -6;
+    const lineHeight = 16;
+
+    let defaultDy = 0;
+    if (position === 'below') {
+      defaultDy = lineHeight;
+    } else if (position === 'above') {
+      defaultDy = -6;
+    }
+    const dy = defaultDy - inlinePositionOffset; // User can nudge lines up or down with this offset
+    const isPositionRight = position === 'right';
 
     return (
       <text
-        dy={defaultDy + inlinePositionOffset * -1}
+        dy={dy}
         fill={colour}
         fontSize={14}
-        textAnchor="end"
+        textAnchor={isPositionRight ? 'start' : 'end'}
         x={x}
         y={y}
       >
-        <tspan>{name}</tspan>
+        {isPositionRight ? (
+          // SVG <text> does not line wrap automatically :(
+          // So wrap it manually into array of <tspan>s so it fits in chart margin
+          chunkLabelToFitCharLimit(name).map((lineOfLabel, lineIndex) => (
+            <tspan
+              key={lineOfLabel}
+              dx={30} // Shift right to account for xAxis padding
+              dy={dy + lineIndex * lineHeight} // Shift each line down
+              x={x}
+              y={y}
+            >
+              {lineOfLabel}
+            </tspan>
+          ))
+        ) : (
+          <tspan>{name}</tspan>
+        )}
       </text>
     );
   }
