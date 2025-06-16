@@ -7,15 +7,20 @@ public record PublicationInfoViewModel
     public Guid PublicationId { get; init; }
     public required string PublicationSlug { get; init; }
 
-    public required Guid? LatestPublishedReleaseId { get; init; }
-    public required string? LatestPublishedReleaseSlug { get; init; }
-
+    public ReleaseInfoViewModel? LatestPublishedRelease { get; init; }
+    
     public static PublicationInfoViewModel FromEntity(Publication publication) =>
         new()
         {
             PublicationId = publication.Id,
             PublicationSlug = publication.Slug,
-            LatestPublishedReleaseId = publication.LatestPublishedReleaseVersion?.ReleaseId,
-            LatestPublishedReleaseSlug = publication.LatestPublishedReleaseVersion?.Release.Slug
+            LatestPublishedRelease = 
+                publication.LatestPublishedReleaseVersion != null
+                    ? new ReleaseInfoViewModel
+                        {
+                            ReleaseId = publication.LatestPublishedReleaseVersion.ReleaseId,
+                            ReleaseSlug = publication.LatestPublishedReleaseVersion.Release.Slug
+                        } 
+                    : null
         };
 }

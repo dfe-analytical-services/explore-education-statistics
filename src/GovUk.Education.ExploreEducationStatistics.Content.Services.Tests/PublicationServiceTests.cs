@@ -2078,8 +2078,9 @@ public abstract class PublicationServiceTests
                     var (expected, actual) = x;
                     Assert.Equal(expected.Id, actual.PublicationId);
                     Assert.Equal(expected.Slug, actual.PublicationSlug);
-                    Assert.Equal(expected.LatestPublishedReleaseVersion?.Release.Slug, actual.LatestPublishedReleaseSlug);
-                    Assert.Equal(expected.LatestPublishedReleaseVersion?.Release.Id, actual.LatestPublishedReleaseId);
+                    Assert.NotNull(actual.LatestPublishedRelease);
+                    Assert.Equal(expected.LatestPublishedReleaseVersion?.Release.Slug, actual.LatestPublishedRelease.ReleaseSlug);
+                    Assert.Equal(expected.LatestPublishedReleaseVersion?.Release.Id, actual.LatestPublishedRelease.ReleaseId);
                 });
         }
 
