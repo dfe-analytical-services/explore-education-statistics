@@ -34,7 +34,7 @@ public class DataSetFileStorage(
     IDataImportService dataImportService,
     IUserService userService,
     IDataSetVersionService dataSetVersionService,
-    IOptions<FeatureFlags> featureFlags, 
+    IOptions<FeatureFlagsOptions> featureFlags, 
     ILogger<DataSetFileStorage> logger) : IDataSetFileStorage
 {
     public async Task<DataFileInfo> UploadDataSet(
