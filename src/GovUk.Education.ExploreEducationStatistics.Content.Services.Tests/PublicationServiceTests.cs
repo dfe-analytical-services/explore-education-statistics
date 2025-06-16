@@ -2038,35 +2038,49 @@ public abstract class PublicationServiceTests
                     .Select(_ => GeneratePublicationWithPublishedSuperceded())
                     .ToArray();
 
-            var allPublications = publishedPublications
+            var allPublicationsSplitInto3Groups = publishedPublications
                 .Concat(unpublishedPublications)
                 .Concat(publishedPublicationsWithUnpublishedSuperseded)
                 .Concat(supersededPublications)
                 .Concat(supersededPublications.Select(p => p.SupersededBy).OfType<Publication>())
                 .ToArray()
-                .Shuffle(seed:12345);
+                .DistributeIntoGroups(3); // Distribute all of the different types of publications into 3 groups
 
-            var theme1Publications = allPublications.Take(allPublications.Length / 3).ToArray();
             var themes = new List<Theme>
             {
-                GenerateTheme(theme1Publications),
-                GenerateTheme(allPublications.Skip(allPublications.Length / 3).Take(allPublications.Length / 3)),
-                GenerateTheme(allPublications.Skip(allPublications.Length * 2 / 3)),
+                GenerateTheme(allPublicationsSplitInto3Groups[0].Shuffle()),
+                GenerateTheme(allPublicationsSplitInto3Groups[1].Shuffle()),
+                GenerateTheme(allPublicationsSplitInto3Groups[2].Shuffle())
             };
 
             await AddToDatabase(themes);
             
             // Act
-            var results = await ListPublicationInfos(themes.First().Id);
+            IList<PublicationInfoViewModel>[] resultsByTheme =
+            [
+                await ListPublicationInfos(themes[0].Id),
+                await ListPublicationInfos(themes[1].Id),
+                await ListPublicationInfos(themes[2].Id)
+            ];
 
             // Assert
             var expectedPublications = publishedPublications
                 .Concat(publishedPublicationsWithUnpublishedSuperseded)
                 .Concat(supersededPublications.Select(p => p.SupersededBy).OfType<Publication>())
-                .Intersect(theme1Publications)
                 .ToArray();
             
-            AssertPublicationInfosAsExpected(expectedPublications, results);
+            IList<Publication>[] expectedPublicationsByTheme =
+            [
+                expectedPublications.Intersect(allPublicationsSplitInto3Groups[0]).ToList(),
+                expectedPublications.Intersect(allPublicationsSplitInto3Groups[1]).ToList(),
+                expectedPublications.Intersect(allPublicationsSplitInto3Groups[2]).ToList()
+            ];
+            
+            Assert.All([0,1,2],
+                i =>
+                {
+                    AssertPublicationInfosAsExpected(expectedPublicationsByTheme[i], resultsByTheme[i]);
+                });
         }
         
         private void AssertPublicationInfosAsExpected(IList<Publication> expectedPublications, IList<PublicationInfoViewModel> actualPublicationInfoViewModels)
