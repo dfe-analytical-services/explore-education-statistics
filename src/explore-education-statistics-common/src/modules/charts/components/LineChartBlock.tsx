@@ -196,12 +196,12 @@ const LineChartBlock = ({
                   decimalPlaces={dataSet.indicator.decimalPlaces}
                   index={props.index}
                   isDataLabel={showDataLabels}
+                  isLastItem={props.index === chartData.length - 1}
                   isLegendLabel={legend.position === 'inline'}
                   name={config.label}
                   position={
                     showDataLabels ? dataLabelPosition : config.inlinePosition
                   }
-                  totalDataPoints={chartData.length}
                   unit={dataSet.indicator.unit}
                   value={props.value}
                   x={props.x}
@@ -281,7 +281,7 @@ export const lineChartBlockDefinition: ChartDefinition = {
   },
   legend: {
     defaults: {
-      position: 'bottom',
+      position: 'inline',
     },
   },
   axes: {

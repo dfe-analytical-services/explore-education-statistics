@@ -100,7 +100,7 @@ const ChartLegendConfiguration = ({
       symbol: capabilities.hasSymbols ? 'none' : undefined,
       lineStyle: capabilities.hasLineStyle ? 'solid' : undefined,
       inlinePosition: capabilities.canPositionLegendInline
-        ? 'above'
+        ? 'right'
         : undefined,
     };
 
@@ -148,7 +148,7 @@ const ChartLegendConfiguration = ({
     if (capabilities.canPositionLegendInline) {
       itemSchema = itemSchema.shape({
         inlinePosition: Yup.string().oneOf<LegendInlinePosition>(
-          ['above', 'below'],
+          ['above', 'below', 'right'],
           params =>
             `Choose a valid position for legend item ${getLegendItemNumber(
               params.path as string,

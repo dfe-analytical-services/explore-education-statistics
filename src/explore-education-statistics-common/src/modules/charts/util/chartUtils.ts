@@ -34,7 +34,11 @@ export const symbols: ChartSymbol[] = [
 
 export const lineStyles: LineStyle[] = ['dashed', 'dotted', 'solid'];
 
-export const legendInlinePositions: LegendInlinePosition[] = ['above', 'below'];
+export const legendInlinePositions: LegendInlinePosition[] = [
+  'above',
+  'below',
+  'right',
+];
 
 export const lineChartDataLabelPositions = ['above', 'below'];
 

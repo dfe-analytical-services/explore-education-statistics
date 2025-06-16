@@ -20,4 +20,4 @@ export interface LegendItem extends LegendItemConfiguration {
   dataSet: DataSet;
 }
 
-export type LegendInlinePosition = 'above' | 'below';
+export type LegendInlinePosition = 'above' | 'below' | 'right';
