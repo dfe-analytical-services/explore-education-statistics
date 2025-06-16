@@ -10,7 +10,7 @@ public class ArrayExtensionsTests
     {
         var source = Enumerable.Range(1,10).ToArray();
         var expected = source.ToArray();
-        var shuffled = source.Shuffle();
+        var _ = source.Shuffle();
         Assert.Equal(expected, source);
     }
     

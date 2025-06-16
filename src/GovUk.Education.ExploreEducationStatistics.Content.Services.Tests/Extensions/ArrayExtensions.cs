@@ -1,9 +1,11 @@
 ﻿using System;
+using System.Diagnostics.Contracts;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests.Extensions;
 
 public static class ArrayExtensions
 {
+    [Pure]
     public static T[] Shuffle<T>(this T[] array, int? seed = null)
     {
         var shuffledArray = new T[array.Length];
