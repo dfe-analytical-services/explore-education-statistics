@@ -255,8 +255,14 @@ const releaseDataFileService = {
       `/release/${releaseId}/data/${dataFileId}/delete-plan`,
     );
   },
-  deleteDataFiles(releaseId: string, fileId: string): Promise<void> {
-    return client.delete<void>(`/release/${releaseId}/data/${fileId}`);
+  deleteDataFiles(
+    releaseId: string,
+    fileId: string,
+    removeApiVersion: boolean,
+  ): Promise<void> {
+    return client.delete<void>(`/release/${releaseId}/data/${fileId}`, {
+      params: { removeApiVersion },
+    });
   },
   deleteDataFilesWithApi(releaseId: string, fileId: string): Promise<void> {
     return client.delete<void>(`/release/${releaseId}/data/${fileId}/with-api`);
