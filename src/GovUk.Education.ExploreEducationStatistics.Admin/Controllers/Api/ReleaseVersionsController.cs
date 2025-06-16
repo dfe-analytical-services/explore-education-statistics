@@ -363,11 +363,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
 
         // We intend to change this route, to make these endpoints more consistent, as per EES-5895
         [HttpDelete("release/{releaseVersionId:guid}/data/{fileId:guid}")]
-        public async Task<ActionResult> DeleteDataFiles(Guid releaseVersionId, Guid fileId)
+        public async Task<ActionResult> DeleteDataFiles(Guid releaseVersionId, Guid fileId, bool removeApiVersion = false)
         {
             return await _releaseVersionService
                 .RemoveDataFiles(releaseVersionId: releaseVersionId,
-                    fileId: fileId)
+                    fileId: fileId,
+                    removeApiVersion: removeApiVersion)
                 .HandleFailuresOrNoContent();
         }
 
