@@ -1913,7 +1913,7 @@ public abstract class PublicationServiceTests
     public class ListPublicationInfosTests : PublicationServiceTests
     {
         [Fact]
-        public async Task GivenPublications_WhenListPublicationInfos_ThenReturnsPublicationInfos()
+        public async Task GivenPublishedPublications_WhenListPublicationInfos_ThenReturnsPublicationInfos()
         {
             // Arrange
             var publishedPublications = 
@@ -1938,7 +1938,7 @@ public abstract class PublicationServiceTests
         }
         
         [Fact]
-        public async Task GivenUnpublishedPublications_WhenListPublicationInfos_ThenReturnsOnlyPublishedPublicationInfos()
+        public async Task GivenPublishedAndUnpublishedPublications_WhenListPublicationInfos_ThenReturnsOnlyPublishedPublicationInfos()
         {
             // Arrange
             var publishedPublications = 
@@ -1969,7 +1969,7 @@ public abstract class PublicationServiceTests
         }
 
         [Fact]
-        public async Task GivenSupersededPublications_WhenListPublicationInfos_ThenReturnsOnlyUnsupersededPublicationInfos()
+        public async Task GivenPublishedPublicationsSomeOfWhichAreSuperseded_WhenListPublicationInfos_ThenReturnsOnlyUnsupersededPublicationInfos()
         {
             // Arrange
             var publishedPublications = 
@@ -2011,7 +2011,7 @@ public abstract class PublicationServiceTests
         }
 
         [Fact]
-        public async Task GivenPublications_WhenListPublicationInfosByThemeIs_ThenReturnsPublicationInfosInTheme()
+        public async Task GivenAVarietyOfPublications_WhenListPublicationInfosByThemeIdIsCalled_ThenReturnsPublishedPublicationInfosInTheme()
         {
             // Arrange
             var publishedPublications = 
