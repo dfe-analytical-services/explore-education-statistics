@@ -1,5 +1,5 @@
-using GovUk.Education.ExploreEducationStatistics.Analytics.Consumer.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.DuckDb.DuckDb;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using Microsoft.Extensions.Logging;
 
@@ -40,7 +40,9 @@ public interface IProcessRequestFilesWorkflow
 public class ProcessRequestFilesWorkflow(
     ILogger<ProcessRequestFilesWorkflow> logger,
     IFileAccessor? fileAccessor = null,
-    DateTimeProvider? dateTimeProvider = null)
+    DateTimeProvider? dateTimeProvider = null,
+    Func<string>? temporaryProcessingFolderNameGenerator = null,
+    int batchSize = 100)
     : IProcessRequestFilesWorkflow
 {
     private readonly IFileAccessor _fileAccessor = fileAccessor ?? new FilesystemFileAccessor();
@@ -54,8 +56,7 @@ public class ProcessRequestFilesWorkflow(
 
         var sourceDirectory = actor.GetSourceDirectory();
         var reportsDirectory = actor.GetReportsDirectory();
-        var processingDirectory = Path.Combine(sourceDirectory, "processing");
-        var failuresDirectory = Path.Combine(sourceDirectory, "failures");
+        var baseProcessingDirectory = Path.Combine(sourceDirectory, "processing");
         
         if (!_fileAccessor.DirectoryExists(sourceDirectory))
         {
@@ -63,7 +64,10 @@ public class ProcessRequestFilesWorkflow(
             return;
         }
 
-        var filesToProcess = _fileAccessor.ListFiles(sourceDirectory);
+        var filesToProcess = _fileAccessor
+            .ListFiles(sourceDirectory)
+            .Order()
+            .ToList();
 
         if (filesToProcess.Count == 0)
         {
@@ -79,42 +83,57 @@ public class ProcessRequestFilesWorkflow(
 
         await actor.InitialiseDuckDb(duckDbConnection);
 
-        _fileAccessor.CreateDirectory(processingDirectory);
+        var temporaryProcessingDirectoryName = 
+            temporaryProcessingFolderNameGenerator?.Invoke() ?? Guid.NewGuid().ToString();
 
-        Parallel.ForEach(filesToProcess, file =>
-        {
-            var originalPath = Path.Combine(sourceDirectory, file);
-            var newPath = Path.Combine(processingDirectory, file);
-            _fileAccessor.Move(originalPath, newPath);
-        });
+        var temporaryProcessingDirectory = Path.Combine(
+            baseProcessingDirectory,
+            temporaryProcessingDirectoryName);
 
-        var someFilesProcessedSuccessfully = false;
+        var fileBatches = filesToProcess
+            .Batch(batchSize)
+            .Select(batch => batch.ToList())
+            .ToList();
         
-        foreach (var filename in filesToProcess)
+        // For each batch of files to process, move them into their own folder
+        // under an overarching temporary processing folder.
+        fileBatches.ForEach((batchFilenames, index) =>
         {
-            try
-            {
-                await actor.ProcessSourceFile(
-                    sourceFilePath: Path.Combine(processingDirectory, filename),
-                    connection: duckDbConnection);
+            var batchNumber = index + 1;
 
-                someFilesProcessedSuccessfully = true;
-            }
-            catch (Exception e)
-            {
-                logger.LogError(e, "Failed to process request file {Filename}", filename);
-                MoveBadFileToFailuresDirectory(
-                    filename: filename,
-                    processingDirectory: processingDirectory,
-                    failuresDirectory: failuresDirectory);
-            }
-        }
+            var batchDirectory = GetBatchDirectoryPath(
+                temporaryProcessingDirectory: temporaryProcessingDirectory,
+                batchNumber: batchNumber);
 
-        _fileAccessor.DeleteDirectory(processingDirectory);
+            MoveFileBatch(
+                filenames: batchFilenames,
+                sourceDirectory: sourceDirectory,
+                targetDirectory: batchDirectory,
+                createTargetDirectory: true);
+        });
+        
+        var batchProcessingResults = Enumerable
+            .Range(start: 1, count: fileBatches.Count)
+            .SelectAsync(async batchNumber => await ProcessFileBatch(
+                actor: actor,
+                sourceDirectory: sourceDirectory,
+                temporaryProcessingDirectory: temporaryProcessingDirectory,
+                temporaryProcessingDirectoryName: temporaryProcessingDirectoryName,
+                batchNumber: batchNumber,
+                // ReSharper disable once AccessToDisposedClosure
+                duckDbConnection: duckDbConnection));
+
+        await batchProcessingResults;
+
+        var someFileBatchesProcessedSuccessfully = batchProcessingResults
+            .Result
+            .Any(result => result);
+
+        _fileAccessor.DeleteDirectory(temporaryProcessingDirectory);
 
         // If no files were successfully processed, there is no need to generate
         // reports, so exit early.
-        if (!someFilesProcessedSuccessfully)
+        if (!someFileBatchesProcessedSuccessfully)
         {
             return;
         }
@@ -130,23 +149,89 @@ public class ProcessRequestFilesWorkflow(
             connection: duckDbConnection);
     }
 
-    private void MoveBadFileToFailuresDirectory(
-        string filename,
-        string processingDirectory,
-        string failuresDirectory)
+    private async Task<bool> ProcessFileBatch(
+        IWorkflowActor actor,
+        string sourceDirectory,
+        string temporaryProcessingDirectory,
+        string temporaryProcessingDirectoryName,
+        int batchNumber,
+        DuckDbConnection duckDbConnection)
     {
+        var batchDirectory = GetBatchDirectoryPath(
+            temporaryProcessingDirectory: temporaryProcessingDirectory,
+            batchNumber: batchNumber);
+
         try
         {
-            _fileAccessor.CreateDirectory(failuresDirectory);
+            await actor.ProcessSourceFiles(
+                sourceFilesDirectory: Path.Combine(batchDirectory, "*"),
+                connection: duckDbConnection);
 
-            var fileSourcePath = Path.Combine(processingDirectory, filename);
-            var fileDestPath = Path.Combine(failuresDirectory, filename);
-            _fileAccessor.Move(fileSourcePath, fileDestPath);
+            return true;
         }
         catch (Exception e)
         {
-            logger.LogError(e, "Failed to move bad file to failures directory {Filename}", filename);
+            logger.LogError(e, "Failed to process request file batch");
+            
+            var failuresDirectory = Path.Combine(
+                sourceDirectory,
+                "failures",
+                temporaryProcessingDirectoryName);
+
+            _fileAccessor.CreateDirectory(failuresDirectory);
+            
+            MoveBadBatchDirectoryToFailuresDirectory(
+                batchDirectory: batchDirectory,
+                failuresDirectory: failuresDirectory,
+                batchNumber: batchNumber);
+
+            return false;
         }
+    }
+
+    private static string GetBatchDirectoryPath(
+        string temporaryProcessingDirectory,
+        int batchNumber)
+    {
+        return Path.Combine(
+            temporaryProcessingDirectory,
+            batchNumber.ToString());
+    }
+
+    private void MoveBadBatchDirectoryToFailuresDirectory(
+        string batchDirectory,
+        string failuresDirectory,
+        int batchNumber)
+    {
+        try
+        {
+            _fileAccessor.Move(
+                sourcePath: batchDirectory,
+                destinationPath: Path.Combine(failuresDirectory, batchNumber.ToString()));
+        }
+        catch (Exception e)
+        {
+            logger.LogError(e, "Failed to move bad file batch to failures directory");
+        }
+    }
+
+    private void MoveFileBatch(
+        IEnumerable<string> filenames,
+        string sourceDirectory,
+        string targetDirectory,
+        bool createTargetDirectory = true)
+    {
+        if (createTargetDirectory)
+        {
+            _fileAccessor.CreateDirectory(targetDirectory);
+        }
+
+        Parallel.ForEach(filenames, filename =>
+        {
+            var fileSourcePath = Path.Combine(sourceDirectory, filename);
+            var fileDestPath = Path.Combine(targetDirectory, filename);
+            _fileAccessor.Move(fileSourcePath, fileDestPath);
+        });
     }
 }
 
@@ -232,14 +317,11 @@ public interface IWorkflowActor
     /// Given a source file, process it, generally by reading it into DuckDb
     /// into tables set up at the beginning of the workflow.
     /// </summary>
-    /// <param name="sourceFilePath">
-    /// The fully-qualified filepath for the source
-    /// file to process.
-    /// </param>
+    /// <param name="sourceFilesDirectory"></param>
     /// <param name="connection">
-    /// An open DuckDB connection that supports JSON reading and Parquet writing.
+    ///     An open DuckDB connection that supports JSON reading and Parquet writing.
     /// </param>
-    Task ProcessSourceFile(string sourceFilePath, DuckDbConnection connection);
+    Task ProcessSourceFiles(string sourceFilesDirectory, DuckDbConnection connection);
 
     /// <summary>
     /// Create one or more Parquet report files based on the source files that

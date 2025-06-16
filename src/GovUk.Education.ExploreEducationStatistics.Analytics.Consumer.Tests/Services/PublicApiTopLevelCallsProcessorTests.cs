@@ -49,7 +49,13 @@ public abstract class PublicApiTopLevelCallsProcessorTests
             var service = BuildService(pathResolver: pathResolver);
             await service.Process();
 
-            Assert.False(Directory.Exists(ProcessingDirectoryPath(pathResolver)));
+            // The root processing folder is safe to leave behind.
+            Assert.True(Directory.Exists(ProcessingDirectoryPath(pathResolver)));
+            
+            // The temporary processing folder that was set up for this run of the processor
+            // should have been cleared away.
+            Assert.False(Directory.Exists(TemporaryProcessingDirectoryPath(pathResolver)));
+            
             Assert.True(Directory.Exists(pathResolver.PublicApiTopLevelCallsReportsDirectoryPath()));
 
             var reports = Directory.GetFiles(pathResolver.PublicApiTopLevelCallsReportsDirectoryPath());
@@ -82,7 +88,8 @@ public abstract class PublicApiTopLevelCallsProcessorTests
             var service = BuildService(pathResolver: pathResolver);
             await service.Process();
 
-            Assert.False(Directory.Exists(ProcessingDirectoryPath(pathResolver)));
+            Assert.True(Directory.Exists(ProcessingDirectoryPath(pathResolver)));
+            Assert.False(Directory.Exists(TemporaryProcessingDirectoryPath(pathResolver)));
             Assert.True(Directory.Exists(pathResolver.PublicApiTopLevelCallsReportsDirectoryPath()));
 
             var reports = Directory.GetFiles(pathResolver.PublicApiTopLevelCallsReportsDirectoryPath());
@@ -116,7 +123,8 @@ public abstract class PublicApiTopLevelCallsProcessorTests
             var service = BuildService(pathResolver: pathResolver);
             await service.Process();
 
-            Assert.False(Directory.Exists(ProcessingDirectoryPath(pathResolver)));
+            Assert.True(Directory.Exists(ProcessingDirectoryPath(pathResolver)));
+            Assert.False(Directory.Exists(TemporaryProcessingDirectoryPath(pathResolver)));
             Assert.True(Directory.Exists(pathResolver.PublicApiTopLevelCallsReportsDirectoryPath()));
 
             var reports = Directory.GetFiles(pathResolver.PublicApiTopLevelCallsReportsDirectoryPath());
@@ -181,7 +189,8 @@ public abstract class PublicApiTopLevelCallsProcessorTests
         return new PublicApiTopLevelCallsProcessor(
             pathResolver: pathResolver,
             workflow: workflow ?? new ProcessRequestFilesWorkflow(
-                logger: Mock.Of<ILogger<ProcessRequestFilesWorkflow>>()));
+                logger: Mock.Of<ILogger<ProcessRequestFilesWorkflow>>(),
+                temporaryProcessingFolderNameGenerator: () => "temp-processing-folder"));
     }
 
     private void SetupRequestFile(TestAnalyticsPathResolver pathResolver, string filename)
@@ -195,6 +204,11 @@ public abstract class PublicApiTopLevelCallsProcessorTests
     private static string ProcessingDirectoryPath(TestAnalyticsPathResolver pathResolver)
     {
         return Path.Combine(pathResolver.PublicApiTopLevelCallsDirectoryPath(), "processing");
+    }
+    
+    private static string TemporaryProcessingDirectoryPath(TestAnalyticsPathResolver pathResolver)
+    {
+        return Path.Combine(ProcessingDirectoryPath(pathResolver), "temp-processing-folder");
     }
     
     // ReSharper disable once ClassNeverInstantiated.Local
