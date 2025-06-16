@@ -157,8 +157,8 @@ export default function ChartLegendItems({
                             label="Y Offset"
                             formGroup={false}
                             showError={false}
-                            min={-30}
-                            max={30}
+                            min={-100}
+                            max={100}
                           />
                         </div>
                       </>
