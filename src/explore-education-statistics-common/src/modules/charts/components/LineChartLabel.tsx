@@ -9,9 +9,9 @@ interface Props {
   index: number;
   isDataLabel?: boolean;
   isLegendLabel?: boolean;
+  isLastItem?: boolean;
   name: string;
   position?: LineChartDataLabelPosition | LegendInlinePosition;
-  totalDataPoints: number;
   unit?: string;
   value?: string | number;
   x?: string | number;
@@ -24,16 +24,16 @@ export default function LineChartLabel({
   index,
   isDataLabel = false,
   isLegendLabel = false,
+  isLastItem = false,
   name,
   position,
-  totalDataPoints,
   unit,
   value,
   x,
   y,
 }: Props) {
   const getTextAnchor = () => {
-    if (index === totalDataPoints - 1) {
+    if (isLastItem) {
       return 'end';
     }
     if (index === 0) {
@@ -62,7 +62,7 @@ export default function LineChartLabel({
   }
 
   // Legend as the label - only render for the last data point in the line.
-  if (isLegendLabel && index === totalDataPoints - 1) {
+  if (isLegendLabel && isLastItem) {
     return (
       <text
         dy={position === 'above' ? '-6' : '16'}
