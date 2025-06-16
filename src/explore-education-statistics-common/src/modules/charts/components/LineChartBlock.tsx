@@ -105,6 +105,12 @@ const LineChartBlock = ({
   const chartHasNegativeValues =
     (parseNumber(minorDomainTicks.domain?.[0]) ?? 0) < 0;
 
+  const rightMargin =
+    legend.position === 'inline' &&
+    legend.items.some(legendItem => legendItem.inlinePosition === 'right')
+      ? 160 // Arbitrary number that covers max width of labels
+      : 0;
+
   if (!chartData.length) {
     return <p className="govuk-!-margin-top-5">No data to display.</p>;
   }
@@ -128,6 +134,7 @@ const LineChartBlock = ({
           margin={{
             left: 30,
             top: 20,
+            right: rightMargin,
           }}
         >
           <Tooltip
