@@ -32,4 +32,8 @@ public interface IPublicationService
 
     Task<Either<ActionResult, List<PublicationSitemapItemViewModel>>> ListSitemapItems(
         CancellationToken cancellationToken = default);
+
+    Task<IList<PublicationInfoViewModel>> ListPublicationInfos(
+        Guid? themeId = null,
+        CancellationToken cancellationToken = default);
 }
