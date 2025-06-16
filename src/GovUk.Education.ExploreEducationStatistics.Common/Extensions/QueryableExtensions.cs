@@ -67,4 +67,21 @@ public static class QueryableExtensions
     {
         return source.Skip((page - 1) * pageSize).Take(pageSize);
     }
+    
+    /// <summary>
+    /// Facilitate declaring an optional Where clause inline.
+    /// </summary>
+    /// <param name="source">An IQueryable&lt;out T&gt; to return elements from</param>
+    /// <param name="predicate">If the predicate resolves to true, the Where clause will be appended to the query</param>
+    /// <typeparam name="T">The type of the data in the data source.</typeparam>
+    /// <returns>An IQueryable&lt;out T&gt; optionally filtered by the specified Where clause depending on the value of predicate.</returns>
+    public static ConditionalQueryable<T> If<T>(this IQueryable<T> source, bool predicate) => new(source, predicate);
+    
+    public class ConditionalQueryable<T>(IQueryable<T> source, bool predicate)
+    {
+        public IQueryable<T> ThenWhere(Expression<Func<T, bool>> whereClause) =>
+            predicate
+                ? source.Where(whereClause) 
+                : source;
+    }
 }
