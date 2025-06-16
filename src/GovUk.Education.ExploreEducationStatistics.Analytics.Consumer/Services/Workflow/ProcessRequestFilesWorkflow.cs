@@ -85,26 +85,41 @@ public class ProcessRequestFilesWorkflow(
 
         var temporaryProcessingDirectoryName = 
             temporaryProcessingFolderNameGenerator?.Invoke() ?? Guid.NewGuid().ToString();
-        
+
         var temporaryProcessingDirectory = Path.Combine(
             baseProcessingDirectory,
             temporaryProcessingDirectoryName);
 
-        MoveFileBatch(
-            filenames: filesToProcess,
-            sourceDirectory: sourceDirectory,
-            targetDirectory: temporaryProcessingDirectory,
-            createTargetDirectory: true);
-
-        var batchProcessingResults = filesToProcess
+        var fileBatches = filesToProcess
             .Batch(batchSize)
-            .SelectAsyncWithIndex(async (fileBatch, batchIndex) => await ProcessFileBatch(
+            .Select(batch => batch.ToList())
+            .ToList();
+        
+        // For each batch of files to process, move them into their own folder
+        // under an overarching temporary processing folder.
+        fileBatches.ForEach((batchFilenames, index) =>
+        {
+            var batchNumber = index + 1;
+
+            var batchDirectory = GetBatchDirectoryPath(
+                temporaryProcessingDirectory: temporaryProcessingDirectory,
+                batchNumber: batchNumber);
+
+            MoveFileBatch(
+                filenames: batchFilenames,
+                sourceDirectory: sourceDirectory,
+                targetDirectory: batchDirectory,
+                createTargetDirectory: true);
+        });
+        
+        var batchProcessingResults = Enumerable
+            .Range(start: 1, count: fileBatches.Count)
+            .SelectAsync(async batchNumber => await ProcessFileBatch(
                 actor: actor,
-                fileBatch: fileBatch,
                 sourceDirectory: sourceDirectory,
                 temporaryProcessingDirectory: temporaryProcessingDirectory,
                 temporaryProcessingDirectoryName: temporaryProcessingDirectoryName,
-                batchNumber: batchIndex + 1,
+                batchNumber: batchNumber,
                 // ReSharper disable once AccessToDisposedClosure
                 duckDbConnection: duckDbConnection));
 
@@ -136,22 +151,15 @@ public class ProcessRequestFilesWorkflow(
 
     private async Task<bool> ProcessFileBatch(
         IWorkflowActor actor,
-        IEnumerable<string> fileBatch,
         string sourceDirectory,
         string temporaryProcessingDirectory,
         string temporaryProcessingDirectoryName,
         int batchNumber,
         DuckDbConnection duckDbConnection)
     {
-        var batchFilenames = fileBatch.ToList();
-
-        var batchDirectory = Path.Combine(temporaryProcessingDirectory, batchNumber.ToString());
-
-        MoveFileBatch(
-            filenames: batchFilenames,
-            sourceDirectory: temporaryProcessingDirectory,
-            targetDirectory: batchDirectory,
-            createTargetDirectory: true);
+        var batchDirectory = GetBatchDirectoryPath(
+            temporaryProcessingDirectory: temporaryProcessingDirectory,
+            batchNumber: batchNumber);
 
         try
         {
@@ -179,6 +187,15 @@ public class ProcessRequestFilesWorkflow(
 
             return false;
         }
+    }
+
+    private static string GetBatchDirectoryPath(
+        string temporaryProcessingDirectory,
+        int batchNumber)
+    {
+        return Path.Combine(
+            temporaryProcessingDirectory,
+            batchNumber.ToString());
     }
 
     private void MoveBadBatchDirectoryToFailuresDirectory(

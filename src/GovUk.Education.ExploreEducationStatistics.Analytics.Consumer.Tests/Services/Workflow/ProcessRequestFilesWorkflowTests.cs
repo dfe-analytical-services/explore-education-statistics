@@ -83,11 +83,6 @@ public abstract class ProcessRequestFilesWorkflowTests
 
             // The workflow calls the implementation to set up its source tables.
             _workflowActorMockBuilder.WhereDuckDbInitialisedSuccessfully();
-
-            // The workflow sets up a temporary processing folder within the root "processing" folder
-            // and moves all current files into it.  It will be files from within this temporary folder
-            // that will be processed by this run of the function.
-            _fileAccessorMockBuilder.WhereTemporaryProcessingFolderIsSetUpForThisRun(sourceFiles);
             
             List<(string, string[])> batchProcessingFoldersAndFiles = 
             [
@@ -131,7 +126,6 @@ public abstract class ProcessRequestFilesWorkflowTests
 
             _fileAccessorAsserter.SourceFilesChecked();
             _workflowActorAsserter.InitialiseDuckDbCalled();
-            _fileAccessorAsserter.TemporaryProcessingFolderWasSetUpForThisRun(sourceFiles: sourceFiles);
 
             batchProcessingFoldersAndFiles.ForEach(folderAndFiles =>
             {
@@ -159,8 +153,7 @@ public abstract class ProcessRequestFilesWorkflowTests
             string[] sourceFiles = ["file1", "file2"];
             
             _fileAccessorMockBuilder
-                .WhereSourceFilesExist(sourceFiles)
-                .WhereTemporaryProcessingFolderIsSetUpForThisRun(sourceFiles);
+                .WhereSourceFilesExist(sourceFiles);
 
             _workflowActorMockBuilder.WhereDuckDbInitialisedWithErrors();
 
@@ -193,12 +186,6 @@ public abstract class ProcessRequestFilesWorkflowTests
 
             // The workflow calls the implementation to set up its source tables.
             _workflowActorMockBuilder.WhereDuckDbInitialisedSuccessfully();
-
-            // The workflow sets up a temporary processing folder within the root "processing" folder
-            // and moves all current files into it.  It will be files from within this temporary folder
-            // that will be processed by this run of the function.
-            _fileAccessorMockBuilder
-                .WhereTemporaryProcessingFolderIsSetUpForThisRun(sourceFiles);
             
             // Batch 1 is processed successfully.
             _fileAccessorMockBuilder
@@ -258,7 +245,6 @@ public abstract class ProcessRequestFilesWorkflowTests
             _workflowActorAsserter.InitialiseDuckDbCalled();
 
             _fileAccessorAsserter
-                .TemporaryProcessingFolderWasSetUpForThisRun(sourceFiles: sourceFiles)
                 .BatchOfFilesWasPreparedForProcessing(
                     batchProcessingDirectory: batch1ProcessingDirectory,
                     sourceFiles: batch1Files)
@@ -302,12 +288,6 @@ public abstract class ProcessRequestFilesWorkflowTests
 
             // The workflow calls the implementation to set up its source tables.
             _workflowActorMockBuilder.WhereDuckDbInitialisedSuccessfully();
-
-            // The workflow sets up a temporary processing folder within the root "processing" folder
-            // and moves all current files into it.  It will be files from within this temporary folder
-            // that will be processed by this run of the function.
-            _fileAccessorMockBuilder
-                .WhereTemporaryProcessingFolderIsSetUpForThisRun(sourceFiles);
             
             List<(string, string[], int)> batchProcessingFoldersAndFiles = 
             [
@@ -351,9 +331,6 @@ public abstract class ProcessRequestFilesWorkflowTests
 
             _fileAccessorAsserter.SourceFilesChecked();
             _workflowActorAsserter.InitialiseDuckDbCalled();
-
-            _fileAccessorAsserter
-                .TemporaryProcessingFolderWasSetUpForThisRun(sourceFiles);
                 
             batchProcessingFoldersAndFiles.ForEach(folderAndFiles =>
             {
@@ -389,11 +366,10 @@ public abstract class ProcessRequestFilesWorkflowTests
             // The workflow calls the implementation to set up its source tables.
             _workflowActorMockBuilder.WhereDuckDbInitialisedSuccessfully();
 
-            // The workflow sets up a temporary processing folder within the root "processing" folder
-            // and moves all current files into it.  It will be files from within this temporary folder
-            // that will be processed by this run of the function.
+            // The workflow sets up a batch folder for each batch of files within a parent temporary
+            // processing folder within the root "processing" folder, and moves each batch of files
+            // into their respective batch folder.
             _fileAccessorMockBuilder
-                .WhereTemporaryProcessingFolderIsSetUpForThisRun(sourceFiles)
                 .WhereBatchOfFilesIsPreparedForProcessing(
                     batchProcessingDirectory: batchProcessingDirectory,
                     sourceFiles: sourceFiles);
@@ -427,7 +403,6 @@ public abstract class ProcessRequestFilesWorkflowTests
             _workflowActorAsserter.InitialiseDuckDbCalled();
 
             _fileAccessorAsserter
-                .TemporaryProcessingFolderWasSetUpForThisRun(sourceFiles: sourceFiles)
                 .BatchOfFilesWasPreparedForProcessing(
                     batchProcessingDirectory: batchProcessingDirectory,
                     sourceFiles: sourceFiles);
@@ -473,23 +448,6 @@ public static class FileAccessorMockBuilderExtensions
     }
 
     /// <summary>
-    /// The workflow sets up a temporary processing folder within the root "processing" folder
-    /// and moves all current files into it.  It will be files from within this temporary folder
-    /// that will be processed by this run of the function.
-    /// </summary>
-    public static FileAccessorMockBuilder WhereTemporaryProcessingFolderIsSetUpForThisRun(
-        this FileAccessorMockBuilder fileAccessorMockBuilder,
-        IEnumerable<string> sourceFiles)
-    {
-        return fileAccessorMockBuilder
-            .WhereDirectoryIsCreated(ProcessRequestFilesWorkflowTests.TemporaryProcessingDirectory)
-            .WhereFilesAreMovedBetweenFolders(
-                sourceFiles: sourceFiles,
-                sourceDirectory: ProcessRequestFilesWorkflowTests.SourceFolder,
-                destinationDirectory: ProcessRequestFilesWorkflowTests.TemporaryProcessingDirectory);
-    }
-
-    /// <summary>
     /// For each batch of files to process, a separate batch folder is created and the files within
     /// processed by the implementation.
     /// </summary>
@@ -502,7 +460,7 @@ public static class FileAccessorMockBuilderExtensions
             .WhereDirectoryIsCreated(batchProcessingDirectory)
             .WhereFilesAreMovedBetweenFolders(
                 sourceFiles: sourceFiles,
-                sourceDirectory: ProcessRequestFilesWorkflowTests.TemporaryProcessingDirectory,
+                sourceDirectory: ProcessRequestFilesWorkflowTests.SourceFolder,
                 destinationDirectory: batchProcessingDirectory);
     }
     
@@ -557,23 +515,6 @@ public static class FileAccessorMockBuilderAsserterExtensions
             .FileListForDirectoryCalledFor(ProcessRequestFilesWorkflowTests.SourceFolder);
     }
     
-    /// <summary>
-    /// The workflow sets up a temporary processing folder within the root "processing" folder
-    /// and moves all current files into it.  It will be files from within this temporary folder
-    /// that will be processed by this run of the function.
-    /// </summary>
-    public static FileAccessorMockBuilder.Asserter TemporaryProcessingFolderWasSetUpForThisRun(
-        this FileAccessorMockBuilder.Asserter asserter,
-        IEnumerable<string> sourceFiles)
-    {
-        return asserter
-            .CreateDirectoryCalledFor(ProcessRequestFilesWorkflowTests.TemporaryProcessingDirectory)
-            .MoveBetweenFoldersCalledFor(
-                files: sourceFiles,
-                sourceDirectory: ProcessRequestFilesWorkflowTests.SourceFolder,
-                destinationDirectory: ProcessRequestFilesWorkflowTests.TemporaryProcessingDirectory);
-    }
-    
     public static FileAccessorMockBuilder.Asserter BatchOfFilesWasPreparedForProcessing(
         this FileAccessorMockBuilder.Asserter asserter,
         string batchProcessingDirectory,
@@ -583,7 +524,7 @@ public static class FileAccessorMockBuilderAsserterExtensions
             .CreateDirectoryCalledFor(batchProcessingDirectory)
             .MoveBetweenFoldersCalledFor(
                 files: sourceFiles,
-                sourceDirectory: ProcessRequestFilesWorkflowTests.TemporaryProcessingDirectory,
+                sourceDirectory: ProcessRequestFilesWorkflowTests.SourceFolder,
                 destinationDirectory: batchProcessingDirectory);
     }
     
