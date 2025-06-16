@@ -137,8 +137,10 @@ public class ThemeService : IThemeService
             .Where(p => p.ThemeId == themeId)
             .Select(p => p.Slug)
             .ToListAsync();
-        
-        await Task.WhenAll(themePublicationsSlugs.Select(InvalidatePublicationCacheSafe));
+            
+        await themePublicationsSlugs
+            .ToAsyncEnumerable()
+            .ForEachAwaitAsync(InvalidatePublicationCacheSafe);
     }
 
     private async Task InvalidatePublicationCacheSafe(string publicationSlug)
