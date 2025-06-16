@@ -7,6 +7,7 @@ interface Props {
   colour: string;
   decimalPlaces?: number;
   index: number;
+  inlinePositionOffset?: number;
   isDataLabel?: boolean;
   isLegendLabel?: boolean;
   isLastItem?: boolean;
@@ -22,6 +23,7 @@ export default function LineChartLabel({
   colour,
   decimalPlaces,
   index,
+  inlinePositionOffset = 0,
   isDataLabel = false,
   isLegendLabel = false,
   isLastItem = false,
@@ -63,9 +65,11 @@ export default function LineChartLabel({
 
   // Legend as the label - only render for the last data point in the line.
   if (isLegendLabel && isLastItem) {
+    const defaultDy = position === 'below' ? 16 : -6;
+
     return (
       <text
-        dy={position === 'above' ? '-6' : '16'}
+        dy={defaultDy + inlinePositionOffset * -1}
         fill={colour}
         fontSize={14}
         textAnchor="end"

@@ -14,6 +14,7 @@ export interface LegendItemConfiguration {
   symbol?: ChartSymbol;
   lineStyle?: LineStyle;
   inlinePosition?: LegendInlinePosition;
+  inlinePositionOffset?: number;
 }
 
 export interface LegendItem extends LegendItemConfiguration {

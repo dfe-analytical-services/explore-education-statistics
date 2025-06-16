@@ -14,6 +14,7 @@ import FormFieldTextInput from '@common/components/form/FormFieldTextInput';
 import FormFieldColourInput from '@common/components/form/FormFieldColourInput';
 import Effect from '@common/components/Effect';
 import useDebouncedCallback from '@common/hooks/useDebouncedCallback';
+import FormFieldNumberInput from '@common/components/form/FormFieldNumberInput';
 import FormFieldset from '@common/components/form/FormFieldset';
 import FormFieldSelect from '@common/components/form/FormFieldSelect';
 import FormSelect, { SelectOption } from '@common/components/form/FormSelect';
@@ -139,16 +140,28 @@ export default function ChartLegendItems({
                     )}
 
                     {position === 'inline' && (
-                      <div className={styles.configurationInput}>
-                        <FormFieldSelect
-                          name={`items.${index}.inlinePosition`}
-                          label="Position"
-                          order={FormSelect.unordered}
-                          formGroup={false}
-                          showError={false}
-                          options={inlinePositionOptions}
-                        />
-                      </div>
+                      <>
+                        <div className={styles.configurationInput}>
+                          <FormFieldSelect
+                            name={`items.${index}.inlinePosition`}
+                            label="Position"
+                            order={FormSelect.unordered}
+                            formGroup={false}
+                            showError={false}
+                            options={inlinePositionOptions}
+                          />
+                        </div>
+                        <div className={styles.numberInput}>
+                          <FormFieldNumberInput
+                            name={`items.${index}.inlinePositionOffset`}
+                            label="Y Offset"
+                            formGroup={false}
+                            showError={false}
+                            min={-30}
+                            max={30}
+                          />
+                        </div>
+                      </>
                     )}
                   </div>
                 </FormFieldset>
