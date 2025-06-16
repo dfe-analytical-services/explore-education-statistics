@@ -195,6 +195,7 @@ const LineChartBlock = ({
                   colour={config.colour}
                   decimalPlaces={dataSet.indicator.decimalPlaces}
                   index={props.index}
+                  inlinePositionOffset={config.inlinePositionOffset}
                   isDataLabel={showDataLabels}
                   isLastItem={props.index === chartData.length - 1}
                   isLegendLabel={legend.position === 'inline'}

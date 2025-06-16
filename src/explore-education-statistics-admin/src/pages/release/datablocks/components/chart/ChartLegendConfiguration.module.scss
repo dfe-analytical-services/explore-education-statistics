@@ -20,6 +20,16 @@
   }
 }
 
+.numberInput {
+  composes: configurationInput;
+  flex-grow: 1;
+  min-width: 140px;
+
+  input {
+    width: 5ch;
+  }
+}
+
 .labelInput {
   composes: configurationInput;
   flex-grow: 1;

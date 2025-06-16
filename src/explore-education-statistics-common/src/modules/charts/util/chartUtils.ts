@@ -15,10 +15,10 @@ export const colours: string[] = [
 ];
 
 export const legendPositions: LegendPosition[] = [
+  'inline',
   'bottom',
   'top',
   'none',
-  'inline',
 ];
 
 export const symbols: ChartSymbol[] = [

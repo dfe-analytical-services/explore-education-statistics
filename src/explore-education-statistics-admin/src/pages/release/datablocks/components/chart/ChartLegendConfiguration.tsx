@@ -143,6 +143,10 @@ const ChartLegendConfiguration = ({
       symbol: Yup.string<ChartSymbol>().optional(),
       lineStyle: Yup.string<LineStyle>().optional(),
       inlinePosition: Yup.string<LegendInlinePosition>().optional(),
+      inlinePositionOffset: Yup.number()
+        .min(-30, 'Offset must be between -30 and 30')
+        .max(30, 'Offset must be between -30 and 30')
+        .optional(),
     });
 
     if (capabilities.canPositionLegendInline) {
