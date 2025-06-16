@@ -86,10 +86,13 @@ public class DataSetsController(
     ///
     /// ## Indicators
     ///
-    /// The `indicators` query parameter is required and **at least one** indicator must be specified.
+    /// The `indicators` query parameter is used to include only specific values in the data set
+    /// results.
     ///
     /// Each indicator should be a string containing the indicator ID e.g. `4xbOu`, `8g1RI`.
     ///
+    /// Omitting the `indicators` parameter will return values for all indicators.
+    /// 
     /// ## Filters
     ///
     /// The `filters` query parameter is used to filter by other filter options (not locations,
@@ -226,7 +229,11 @@ public class DataSetsController(
         CancellationToken cancellationToken)
     {
         return await dataSetQueryService
-            .Query(dataSetId, request, dataSetVersion, cancellationToken)
+            .Query(
+                dataSetId: dataSetId,
+                request: request,
+                dataSetVersion: dataSetVersion,
+                cancellationToken: cancellationToken)
             .HandleFailuresOrOk();
     }
 
@@ -242,6 +249,11 @@ public class DataSetsController(
     ///
     /// Unlike the `GET` endpoint, the `POST` endpoint allows condition criteria (`and`, `or`, `not`)
     /// and consequently can express more complex queries.
+    ///
+    /// A `POST` request without a body will return a paginated set of unfiltered results and will include
+    /// values for all indicators.
+    ///
+    /// A `Content-Type` request header of `application/json` is required.
     /// </remarks>
     [HttpPost("{dataSetId:guid}/query")]
     [Consumes(MediaTypeNames.Application.Json)]
@@ -256,11 +268,15 @@ public class DataSetsController(
                           The data set version e.g. 1.0, 1.1, 2.0, etc.
                           Wildcard versions are supported. For example, `2.*` returns the latest minor version in the v2 series.
                           """)][FromQuery] string? dataSetVersion,
-        [FromBody] DataSetQueryRequest request,
+        [FromBody] DataSetQueryRequest? request,
         CancellationToken cancellationToken)
     {
         return await dataSetQueryService
-            .Query(dataSetId, request, dataSetVersion, cancellationToken)
+            .Query(
+                dataSetId: dataSetId,
+                request: request ?? new DataSetQueryRequest(),
+                dataSetVersion: dataSetVersion,
+                cancellationToken: cancellationToken)
             .HandleFailuresOrOk();
     }
 
