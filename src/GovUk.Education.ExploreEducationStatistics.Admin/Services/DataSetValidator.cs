@@ -1,4 +1,8 @@
 #nullable enable
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
@@ -12,10 +16,6 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using File = GovUk.Education.ExploreEducationStatistics.Content.Model.File;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
@@ -24,8 +24,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         ContentDbContext context,
         IOptions<FeatureFlagsOptions> featureFlags) : IDataSetValidator
     {
-        public const int MaxFilenameSize = 150;
-
         public async Task<Either<List<ErrorViewModel>, DataSet>> ValidateDataSet(
             DataSetDto dataSet,
             bool performAutoReplacement = false) // TODO (EES-5708): This flag will be removed once upload methods are aligned. Currently auto-replacement is only available via bulk uploads
@@ -82,8 +80,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             }
 
             return errors.Count > 0
-                ? (Either<List<ErrorViewModel>, DataSet>)errors
-                : (Either<List<ErrorViewModel>, DataSet>)new DataSet
+                ? errors
+                : new DataSet
                 {
                     Title = dataSet.Title,
                     DataFile = dataFile,
@@ -160,8 +158,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             errors.AddRange(CheckBulkDataZipForUnusedFiles(dataSetIndex.DataSetIndexItems, dataSetFiles));
 
             return errors.Count > 0
-                ? (Either<List<ErrorViewModel>, DataSetIndex>)errors
-                : (Either<List<ErrorViewModel>, DataSetIndex>)dataSetIndex;
+                ? errors
+                : dataSetIndex;
         }
 
         private static List<ErrorViewModel> CheckBulkDataZipForMissingFiles(
@@ -200,8 +198,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .ToListAsync();
 
             return releaseFileToBeReplaced.Count > 1
-                ? (Either<ErrorViewModel, File?>)ValidationMessages.GenerateErrorDataReplacementAlreadyInProgress()
-                : (Either<ErrorViewModel, File?>)(releaseFileToBeReplaced.SingleOrDefault()?.File);
+                ? ValidationMessages.GenerateErrorDataReplacementAlreadyInProgress()
+                : releaseFileToBeReplaced.SingleOrDefault()?.File;
         }
 
         private async Task<ReleaseFile?> GetReplacingFileWithApiDataSetIfExists(
@@ -302,11 +300,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             string dataFileName,
             File? replacingFile = null)
         {
-            // - Original uploads' data filename is not unique if a ReleaseFile exists with the same filename.
-            // - With replacement uploads, we can ignore a preexisting ReleaseFile if it is the file being replaced -
+            // Original uploads' data filename is not unique if a ReleaseFile exists with the same filename.
+            // With replacement uploads, we can ignore a preexisting ReleaseFile if it is the file being replaced -
             // we only care if the preexisting duplicate ReleaseFile name isn't the file being replaced.
             if (IsFileExisting(releaseVersionId, FileType.Data, dataFileName) &&
-                (replacingFile == null || replacingFile.Filename != dataFileName))
+                (replacingFile == null || !replacingFile.Filename.Equals(dataFileName, StringComparison.CurrentCultureIgnoreCase)))
             {
                 return [ValidationMessages.GenerateErrorFileNameNotUnique(dataFileName, FileType.Data)];
             }
