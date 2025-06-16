@@ -1981,13 +1981,13 @@ public abstract class PublicationServiceTests
             var publishedPublicationsWithUnpublishedSuperseded = 
                     Enumerable
                     .Range(1, 4)
-                    .Select(_ => GeneratePublicationWithUnpublishedSuperceded())
+                    .Select(_ => GeneratePublicationWithUnpublishedSuperseded())
                     .ToArray();
             
             var supersededPublications = 
                     Enumerable
                     .Range(1, 5)
-                    .Select(_ => GeneratePublicationWithPublishedSuperceded())
+                    .Select(_ => GeneratePublicationWithPublishedSuperseded())
                     .ToArray();
 
             var themes = new List<Theme>
@@ -2023,7 +2023,7 @@ public abstract class PublicationServiceTests
             var supersededPublications = 
                     Enumerable
                     .Range(1, 3)
-                    .Select(i => GeneratePublicationWithPublishedSuperceded(publishedPublications[i - 1]))
+                    .Select(i => GeneratePublicationWithPublishedSuperseded(publishedPublications[i - 1]))
                     .ToArray();
 
             var themes = new List<Theme>
@@ -2061,13 +2061,13 @@ public abstract class PublicationServiceTests
             var publishedPublicationsWithUnpublishedSuperseded = 
                 Enumerable
                     .Range(1, 6)
-                    .Select(_ => GeneratePublicationWithUnpublishedSuperceded())
+                    .Select(_ => GeneratePublicationWithUnpublishedSuperseded())
                     .ToArray();
             
             var supersededPublications = 
                 Enumerable
                     .Range(1, 6)
-                    .Select(_ => GeneratePublicationWithPublishedSuperceded())
+                    .Select(_ => GeneratePublicationWithPublishedSuperseded())
                     .ToArray();
 
             var allPublicationsSplitInto3Groups = publishedPublications
@@ -2152,10 +2152,10 @@ public abstract class PublicationServiceTests
                 .DefaultPublication()
                 .Generate();
 
-        private Publication GeneratePublicationWithPublishedSuperceded(Publication? supercededBy = null) =>
+        private Publication GeneratePublicationWithPublishedSuperseded(Publication? supersededBy = null) =>
             _dataFixture
                 .DefaultPublication()
-                .WithSupersededBy(supercededBy ?? GeneratePublishedPublication())
+                .WithSupersededBy(supersededBy ?? GeneratePublishedPublication())
                 .WithLatestPublishedReleaseVersion(
                     _dataFixture
                         .DefaultReleaseVersion()
@@ -2164,7 +2164,7 @@ public abstract class PublicationServiceTests
                                 .DefaultRelease()))
                 .Generate();
     
-        private Publication GeneratePublicationWithUnpublishedSuperceded() =>
+        private Publication GeneratePublicationWithUnpublishedSuperseded() =>
             _dataFixture
                 .DefaultPublication()
                 .WithSupersededBy(GenerateUnpublishedPublication())
