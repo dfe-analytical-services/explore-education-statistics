@@ -95,14 +95,14 @@ public class DataSetVersionMappingServiceTests
     }
     
     [Theory]
-    [InlineData("AutoNone", "AutoNone", "AutoNone", "AutoNone", false, false)]
-    [InlineData("AutoMapped", "AutoNone", "AutoNone", "AutoNone", false, false)]
-    [InlineData("AutoMapped", "AutoMapped", "AutoNone", "AutoNone", true, false)]
-    [InlineData("AutoMapped", "AutoMapped", "AutoMapped", "AutoNone", true, false)]
-    [InlineData("ManualNone", "ManualNone", "ManualNone", "ManualNone", false, false)]
-    [InlineData("AutoMapped", "ManualNone", "ManualNone", "ManualNone", false, false)]
-    [InlineData("AutoMapped", "AutoMapped", "ManualNone", "ManualNone", true, false)]
-    [InlineData("ManualNone", "ManualNone", "AutoMapped", "AutoMapped",  false, true)]
+    [InlineData("AutoNone", "AutoNone", "AutoNone", "AutoNone", true, true)]
+    [InlineData("AutoMapped", "AutoNone", "AutoNone", "AutoNone", true, true)]
+    [InlineData("AutoMapped", "AutoMapped", "AutoNone", "AutoNone", false, true)]
+    [InlineData("AutoMapped", "AutoMapped", "AutoMapped", "AutoNone", false, true)]
+    [InlineData("ManualNone", "ManualNone", "ManualNone", "ManualNone", true, true)]
+    [InlineData("AutoMapped", "ManualNone", "ManualNone", "ManualNone", true, true)]
+    [InlineData("AutoMapped", "AutoMapped", "ManualNone", "ManualNone", false, true)]
+    [InlineData("ManualNone", "ManualNone", "AutoMapped", "AutoMapped",  true, false)]
     
     public async Task GetMappingStatus(
         string locationMappingTypesOption, 
@@ -120,18 +120,22 @@ public class DataSetVersionMappingServiceTests
         var contextId = Guid.NewGuid().ToString();
         await using var contentDbContext = InMemoryApplicationDbContext(contextId);
         
+        var mockMappingTypesRepository = SetupMockMappingTypes(locationMappingTypesLevel, locationMappingTypesOption, filterMappingTypesLevel,
+            filterMappingTypesOption, targetDataSetVersionId);
+        
         var service = CreateService(
             publicDataDbContext: _publicDataDbContextMock.Object, 
-            contentDbContext: contentDbContext);
+            contentDbContext: contentDbContext,
+            mockMappingTypesRepository: mockMappingTypesRepository.Object);
 
-        SetupMockMappingTypes(locationMappingTypesLevel, locationMappingTypesOption, filterMappingTypesLevel,
-            filterMappingTypesOption, targetDataSetVersionId);
         // Act
 
         var result = await service.GetMappingStatus(targetDataSetVersionId);
+        
         // Assert
-        Assert.Equal(majorVersionInLocations, result.FiltersHaveMajorChange);
-        Assert.Equal(majorVersionInFilters, result.LocationsHaveMajorChange);
+        Assert.NotNull(result);
+        Assert.Equal(majorVersionInLocations, result.LocationsHaveMajorChange);
+        Assert.Equal(majorVersionInFilters, result.FiltersHaveMajorChange);
     }
 
     
