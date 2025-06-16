@@ -10,7 +10,9 @@ public static class ArrayExtensions
     {
         var shuffledArray = new T[array.Length];
         array.CopyTo(shuffledArray, 0);
+        
         var rnd = seed.HasValue ? new Random(seed.Value) : new Random();
+        
         for (var i = shuffledArray.Length-1; i > 0 ; i--)
         {
             var swapIndex = rnd.NextInt64(i + 1);
