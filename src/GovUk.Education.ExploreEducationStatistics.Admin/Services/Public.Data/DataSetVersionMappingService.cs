@@ -96,11 +96,9 @@ public class DataSetVersionMappingService(
 
         var filtersIsMajor = filterAndOptionMappingTypes.Any(types => NoMappingTypes.Contains(types.Filter) ||  NoMappingTypes.Contains(types.FilterOption));
 
-        var isMajorVersionUpdate = await IsMajorVersionUpdate(
-                dataSetVersionId,
-                    locationOptionMappingTypes,
-                    filterAndOptionMappingTypes,
-                    cancellationToken);
+        var isMajorVersionUpdate = locationIsMajor 
+                                   || filtersIsMajor 
+                                   || await HasDeletionChanges(dataSetVersionId, cancellationToken);
 
         return await publicDataDbContext
             .DataSetVersionMappings
