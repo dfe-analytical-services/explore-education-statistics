@@ -2011,6 +2011,38 @@ public abstract class PublicationServiceTests
         }
 
         [Fact]
+        public async Task GivenPublishedPublicationsSomeOfWhichAreSupersededByEachOther_WhenListPublicationInfos_ThenReturnsOnlyUnsupersededPublicationInfosOnce()
+        {
+            // Arrange
+            var publishedPublications = 
+                    Enumerable
+                    .Range(1, 3)
+                    .Select(_ => GeneratePublishedPublication())
+                    .ToArray();
+            
+            var supersededPublications = 
+                    Enumerable
+                    .Range(1, 3)
+                    .Select(i => GeneratePublicationWithPublishedSuperceded(publishedPublications[i - 1]))
+                    .ToArray();
+
+            var themes = new List<Theme>
+            {
+                GenerateTheme(publishedPublications.Take(1), supersededPublications.Take(1)),
+                GenerateTheme(publishedPublications.Skip(1), supersededPublications.Skip(1))
+            };
+
+            await AddToDatabase(themes);
+            
+            // Act
+            var results = await ListPublicationInfos();
+
+            // Assert
+            var expectedPublications = publishedPublications.ToArray();
+            AssertPublicationInfosAsExpected(expectedPublications, results);
+        }
+
+        [Fact]
         public async Task GivenAVarietyOfPublications_WhenListPublicationInfosByThemeIdIsCalled_ThenReturnsPublishedPublicationInfosInTheme()
         {
             // Arrange
@@ -2120,10 +2152,10 @@ public abstract class PublicationServiceTests
                 .DefaultPublication()
                 .Generate();
 
-        private Publication GeneratePublicationWithPublishedSuperceded() =>
+        private Publication GeneratePublicationWithPublishedSuperceded(Publication? supercededBy = null) =>
             _dataFixture
                 .DefaultPublication()
-                .WithSupersededBy(GeneratePublishedPublication())
+                .WithSupersededBy(supercededBy ?? GeneratePublishedPublication())
                 .WithLatestPublishedReleaseVersion(
                     _dataFixture
                         .DefaultReleaseVersion()
