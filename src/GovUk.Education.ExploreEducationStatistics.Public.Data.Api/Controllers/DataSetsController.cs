@@ -86,10 +86,13 @@ public class DataSetsController(
     ///
     /// ## Indicators
     ///
-    /// The `indicators` query parameter is required and **at least one** indicator must be specified.
+    /// The `indicators` query parameter is used to include only specific values in the data set
+    /// results.
     ///
     /// Each indicator should be a string containing the indicator ID e.g. `4xbOu`, `8g1RI`.
     ///
+    /// Omitting the `indicators` parameter will return values for all indicators.
+    /// 
     /// ## Filters
     ///
     /// The `filters` query parameter is used to filter by other filter options (not locations,
@@ -247,9 +250,10 @@ public class DataSetsController(
     /// Unlike the `GET` endpoint, the `POST` endpoint allows condition criteria (`and`, `or`, `not`)
     /// and consequently can express more complex queries.
     ///
-    /// A `POST` request without a body is allowed but must include a `Content-Type: application/json`
-    /// header. A `POST` request without a body will return a paginated set of unfiltered results and
-    /// will include values for all indicators.
+    /// A `POST` request without a body will return a paginated set of unfiltered results and will include
+    /// values for all indicators.
+    ///
+    /// A `Content-Type` request header of `application/json` is required.
     /// </remarks>
     [HttpPost("{dataSetId:guid}/query")]
     [Consumes(MediaTypeNames.Application.Json)]

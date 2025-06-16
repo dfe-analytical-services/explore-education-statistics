@@ -15,7 +15,8 @@ public record DataSetQueryRequest
 
     /// <summary>
     /// The IDs of indicators to return values for.
-    /// Omitting this parameter will select all indicators.
+    /// 
+    /// Omitting this parameter will return values for all indicators.
     /// </summary>
     /// <example>["C2ySJ", "q4X3J"]</example>
     public IReadOnlyList<string>? Indicators { get; init; }
