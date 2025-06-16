@@ -979,10 +979,10 @@ describe('ReleaseApiDataSetDetailsPage', () => {
         version: '2.0.1',
         mappingStatus: {
           hasMajorVersionUpdate: true,
-          locationsComplete: false,
-          filtersComplete: true,
-          filtersHaveMajorChange: true,
-          locationsHaveMajorChange: false,
+          locationsComplete: true,
+          filtersComplete: false,
+          filtersHaveMajorChange: false,
+          locationsHaveMajorChange: true,
         },
       },
     });
@@ -1008,12 +1008,12 @@ describe('ReleaseApiDataSetDetailsPage', () => {
       const mapFiltersTask = within(screen.getByTestId('map-filters-task'));
 
       expect(
-        mapFiltersTask.queryByText('Major Change', {
+        mapLocationsTask.queryByText('Major Change', {
           selector: 'strong',
         }),
       ).toBeInTheDocument();
       expect(
-        mapLocationsTask.queryByText('Incomplete', {
+        mapFiltersTask.queryByText('Incomplete', {
           selector: 'strong',
         }),
       ).toBeInTheDocument();
@@ -1077,10 +1077,10 @@ describe('ReleaseApiDataSetDetailsPage', () => {
         version: '2.0.1',
         mappingStatus: {
           hasMajorVersionUpdate: true,
-          locationsComplete: false,
-          filtersComplete: true,
-          filtersHaveMajorChange: true,
-          locationsHaveMajorChange: false,
+          locationsComplete: true,
+          filtersComplete: false,
+          filtersHaveMajorChange: false,
+          locationsHaveMajorChange: true,
         },
       },
     });
@@ -1106,12 +1106,12 @@ describe('ReleaseApiDataSetDetailsPage', () => {
       const mapFiltersTask = within(screen.getByTestId('map-filters-task'));
 
       expect(
-        mapFiltersTask.queryByText('Major Change', {
+        mapLocationsTask.queryByText('Major Change', {
           selector: 'strong',
         }),
       ).not.toBeInTheDocument();
       expect(
-        mapLocationsTask.queryByText('Incomplete', {
+        mapFiltersTask.queryByText('Incomplete', {
           selector: 'strong',
         }),
       ).toBeInTheDocument();
@@ -1168,11 +1168,14 @@ describe('ReleaseApiDataSetDetailsPage', () => {
     renderPage();
 
     await waitFor(() => {
-      expect(() =>
-        screen.getByText(
-          'The data file uploaded has incomplete sections or has resulted in a major version update which is not allowed in release amendments.',
+      expect(
+        screen.queryByText(
+          'This API data set can not be published because it is either incomplete or has a major version update.',
+          {
+            selector: 'h2',
+          },
         ),
-      ).toThrow('Unable to find an element');
+      ).not.toBeInTheDocument();
     });
   });
 
