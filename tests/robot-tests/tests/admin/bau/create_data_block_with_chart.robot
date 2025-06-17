@@ -460,9 +460,9 @@ Validate changing data sets
     user clicks button    Add data set
 
     user checks chart inline legend item contains    id:chartBuilderPreview    1
-    ...    Admission Numbers (Nailsea Youngwood)
-    user checks chart inline legend item contains    id:chartBuilderPreview    2    Admission Numbers (Syon)
-    user checks chart inline legend item contains    id:chartBuilderPreview    3    Admission Numbers (Barnsley)
+    ...    Admission Numbers(Nailsea Youngwood)
+    user checks chart inline legend item contains    id:chartBuilderPreview    2    Admission Numbers(Syon)
+    user checks chart inline legend item contains    id:chartBuilderPreview    3    Admission Numbers(Barnsley)
 
     user checks table body has x rows    3    testid:chart-data-sets
 
@@ -477,7 +477,8 @@ Configure line chart data sets
     user chooses select option    id:chartDataSetsConfigurationForm-location    Nailsea Youngwood
     user clicks button    Add data set
 
-    user checks chart legend item contains    id:chartBuilderPreview    1    Admission Numbers (Nailsea Youngwood)
+    user checks chart inline legend item contains    id:chartBuilderPreview    1
+    ...    Admission Numbers(Nailsea Youngwood)
 
     user clicks link    Legend
     user chooses select option    id:chartLegendConfigurationForm-items-0-symbol    Circle
@@ -496,7 +497,8 @@ Validate basic line chart preview
 
     user checks chart title contains    id:chartBuilderPreview    Test chart title
     user checks chart subtitle contains    id:chartBuilderPreview    Test chart subtitle
-    user checks chart legend item contains    id:chartBuilderPreview    1    Admission Numbers (Nailsea Youngwood)
+    user checks chart inline legend item contains    id:chartBuilderPreview    1
+    ...    Admission Numbers(Nailsea Youngwood)
 
     user checks chart height    id:chartBuilderPreview    400
     user checks chart width    id:chartBuilderPreview    900
@@ -571,7 +573,7 @@ Validate line chart embeds correctly
 
     user checks chart title contains    ${datablock}    Test chart title
     user checks chart subtitle contains    ${datablock}    Test chart subtitle
-    user checks chart legend item contains    ${datablock}    1    Admission Numbers (Nailsea Youngwood)
+    user checks chart inline legend item contains    ${datablock}    1    Admission Numbers(Nailsea Youngwood)
 
     user checks chart height    ${datablock}    400
     user checks chart width    ${datablock}    900
