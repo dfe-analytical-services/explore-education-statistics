@@ -15,6 +15,7 @@ import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
 import WarningMessage from '@common/components/WarningMessage';
 import useAsyncRetry from '@common/hooks/useAsyncRetry';
+import getMapInitialBoundaryLevel from '@common/modules/charts/components/utils/getMapInitialBoundaryLevel';
 import isOrphanedDataSet from '@common/modules/charts/util/isOrphanedDataSet';
 import { InitialTableToolState } from '@common/modules/table-tool/components/TableToolWizard';
 import getInitialStepSubjectMeta from '@common/modules/table-tool/components/utils/getInitialStepSubjectMeta';
@@ -100,7 +101,21 @@ const DataBlockPageTabs = ({
       };
     }
 
-    const table = mapFullTable(tableData);
+    const table = mapFullTable({
+      ...tableData,
+      subjectMeta: {
+        ...tableData.subjectMeta,
+        locations:
+          dataBlock.charts[0]?.type !== 'map'
+            ? tableData.subjectMeta.locations
+            : // for maps, set TableDataSubjectMeta location values to LocationGeoJsonOption[], instead of LocationOption[]
+              await tableBuilderService.getDataBlockGeoJson(
+                releaseVersionId,
+                dataBlock.dataBlockParentId,
+                getMapInitialBoundaryLevel(dataBlock.charts[0]),
+              ),
+      },
+    });
 
     try {
       const tableHeaders = mapTableHeadersConfig(
