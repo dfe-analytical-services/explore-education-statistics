@@ -477,7 +477,8 @@ const DataFileReplacementPlan = ({
                     breaking changes, please{' '}
                     {apiDataSetsTabRoute && (
                       <Link to={apiDataSetsTabRoute} unvisited>
-                        go to the API data sets tab
+                        go to the API data sets tab (Link requires BAU
+                        permissions)
                       </Link>
                     )}
                     .
@@ -498,7 +499,8 @@ const DataFileReplacementPlan = ({
                       Please{' '}
                       {apiDataSetsTabRoute && (
                         <Link to={apiDataSetsTabRoute} unvisited>
-                          go to the API data sets tab
+                          go to the API data sets tab (Link requires BAU
+                          permissions)
                         </Link>
                       )}{' '}
                       and complete manual mapping process for filters.
@@ -522,7 +524,8 @@ const DataFileReplacementPlan = ({
                       Please{' '}
                       {apiDataSetsTabRoute && (
                         <Link to={apiDataSetsTabRoute} unvisited>
-                          go to the API data sets tab
+                          go to the API data sets tab (Link requires BAU
+                          permissions)
                         </Link>
                       )}{' '}
                       and complete manual mapping process for locations.
@@ -545,7 +548,8 @@ const DataFileReplacementPlan = ({
                       Please{' '}
                       {apiDataSetsTabRoute && (
                         <Link to={apiDataSetsTabRoute} unvisited>
-                          go to the API data sets tab
+                          go to the API data sets tab (Link requires BAU
+                          permissions)
                         </Link>
                       )}{' '}
                       and finalize the data set version mapping process.

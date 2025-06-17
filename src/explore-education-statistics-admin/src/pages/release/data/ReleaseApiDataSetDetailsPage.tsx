@@ -297,9 +297,10 @@ export default function ReleaseApiDataSetDetailsPage() {
             major version.
           </li>
           <li>
-            Alternatively cancel the ongoing replacement{' '}
-            <Link to={replaceTabRoute} test-id="cancel  -replacement-link">
-              by clicking here
+            Alternatively{' '}
+            <Link to={replaceTabRoute} test-id="cancel-replacement-link">
+              {' '}
+              cancel the ongoing replacement
             </Link>{' '}
             and upload a new data file which does not result in a major version
             update.
@@ -383,6 +384,7 @@ export default function ReleaseApiDataSetDetailsPage() {
                         >
                           {dataSet.draftVersion.mappingStatus?.locationsComplete
                             ? getCompleteText(
+                                showRejectedError,
                                 dataSet.draftVersion.mappingStatus
                                   ?.locationsHaveMajorChange,
                               )
@@ -422,6 +424,7 @@ export default function ReleaseApiDataSetDetailsPage() {
                         >
                           {dataSet.draftVersion.mappingStatus?.filtersComplete
                             ? getCompleteText(
+                                showRejectedError,
                                 dataSet.draftVersion.mappingStatus
                                   ?.filtersHaveMajorChange,
                               )
@@ -513,8 +516,13 @@ export default function ReleaseApiDataSetDetailsPage() {
     </>
   );
 
-  function getCompleteText(majorVersionFound: boolean): React.ReactNode {
-    return showRejectedError && majorVersionFound ? 'Major Change' : 'Complete';
+  function getCompleteText(
+    rejectedErrorShown: boolean,
+    majorVersionFound: boolean,
+  ): React.ReactNode {
+    return rejectedErrorShown && majorVersionFound
+      ? 'Major Change'
+      : 'Complete';
   }
 }
 

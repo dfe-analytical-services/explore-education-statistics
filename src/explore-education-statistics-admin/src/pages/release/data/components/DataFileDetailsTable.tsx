@@ -180,7 +180,7 @@ const DataFileDetailsTable = ({
         </tr>
         {replacementFileHasApi && (
           <tr>
-            <th scope="row">API data set attachment status</th>
+            <th scope="row">API data set status</th>
             <td data-testid="Status">
               <div className="dfe-flex dfe-align-items--center">
                 <Tag colour="blue">Replacement in progress</Tag>
