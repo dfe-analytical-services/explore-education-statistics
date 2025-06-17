@@ -39,7 +39,7 @@ const CookiesPage: NextPage = () => {
         your computer.
       </p>
       <p>
-        Find out more about`{' '}
+        Find out more about{' '}
         <a rel="external" href="http://www.aboutcookies.org/">
           how to manage cookies.
         </a>

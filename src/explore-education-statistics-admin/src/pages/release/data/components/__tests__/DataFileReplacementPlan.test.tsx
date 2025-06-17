@@ -1245,6 +1245,7 @@ describe('DataReplacementPlan', () => {
       'file-2',
     );
   });
+
   function renderWithTestConfig(
     children: React.ReactNode,
     enableReplacementFeatureFlag: boolean = false,
