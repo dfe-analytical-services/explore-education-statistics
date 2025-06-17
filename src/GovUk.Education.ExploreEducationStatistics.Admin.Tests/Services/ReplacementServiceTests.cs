@@ -3109,7 +3109,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     Indicators = new[] {originalIndicator.Id},
                     LocationIds = ListOf(originalLocation.Id),
                     TimePeriod = timePeriod,
-                    FilterHierarchyOptions = null, // it is null by default, but included to be visible to you, dear test reader
+                    FilterHierarchiesOptions = null, // it is null by default, but included to be visible to you, dear test reader
                 },
                 Table = new TableBuilderConfiguration
                 {
@@ -3352,12 +3352,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Single(replacedDataBlock.Query.Indicators);
                 Assert.Equal(replacementIndicator.Id, replacedDataBlock.Query.Indicators.First());
 
-                var replacedFilterItemIds = replacedDataBlock.Query.GetFilterItemIds().ToList(); // all filterItems including those in FilterHierarchyOptions
+                var replacedFilterItemIds = replacedDataBlock.Query.GetFilterItemIds().ToList(); // all filterItems including those in FilterHierarchiesOptions
                 Assert.Equal(2, replacedFilterItemIds.Count);
                 Assert.Equal(replacementFilterItem1.Id, replacedFilterItemIds[0]);
                 Assert.Equal(replacementFilterItem2.Id, replacedFilterItemIds[1]);
 
-                Assert.Null(replacedDataBlock.Query.FilterHierarchyOptions);
+                Assert.Null(replacedDataBlock.Query.FilterHierarchiesOptions);
 
                 var replacedLocationId = Assert.Single(replacedDataBlock.Query.LocationIds);
                 Assert.Equal(replacementLocation.Id, replacedLocationId);
@@ -3492,7 +3492,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async Task Replace_ReplacesFilterHierarchyOptions()
+        public async Task Replace_ReplacesFilterHierarchiesOptions()
         {
             var releaseVersion = _fixture.DefaultReleaseVersion().Generate();
 
@@ -3707,11 +3707,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     Indicators = new[] {originalIndicator.Id},
                     LocationIds = ListOf(originalLocation.Id),
                     TimePeriod = timePeriod,
-                    FilterHierarchyOptions = new Dictionary<Guid, List<List<Guid>>>
+                    FilterHierarchiesOptions = new List<FilterHierarchyOptions>
                     {
-                        // This would actually be an invalid data set, as there should also be two
-                        // additional Total filterItems for both filters in a filter hierarchy
-                        { originalFilter2.Id, [[originalFilterItem1Id, originalFilterItem2Id]] }
+                        new()
+                        {
+                            LeafFilterId = originalFilter2.Id,
+                            // This would actually be an invalid data set, as there should also be two
+                            // additional Total filterItems for both filters in a filter hierarchy
+                            Options = [[originalFilterItem1Id, originalFilterItem2Id]],
+                        }
                     }
 
                 },
@@ -3865,17 +3869,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 Assert.Empty(replacedDataBlock.Query.GetNonHierarchicalFilterItemIds());
 
-                var hierarchyOptions = replacedDataBlock.Query.FilterHierarchyOptions;
-                Assert.NotNull(hierarchyOptions);
+                var hierarchiesOptions = replacedDataBlock.Query.FilterHierarchiesOptions;
+                Assert.NotNull(hierarchiesOptions);
 
-                var dictKey = Assert.Single(hierarchyOptions.Keys);
+                var hierarchyOptions = Assert.Single(hierarchiesOptions);
 
-                Assert.Equal(replacementFilter2.Id, dictKey);
-                Assert.Equal(hierarchyOptions[dictKey],
-                    [[
+                Assert.Equal(replacementFilter2.Id, hierarchyOptions.LeafFilterId);
+                Assert.Equal([[
                         replacementFilter1.FilterGroups[0].FilterItems[0].Id,
                         replacementFilter2.FilterGroups[0].FilterItems[0].Id
-                    ]]);
+                    ]],
+                    hierarchyOptions.Options);
             }
         }
 

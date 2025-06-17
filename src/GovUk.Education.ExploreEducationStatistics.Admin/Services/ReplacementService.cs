@@ -13,6 +13,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Chart;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
+using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
 using GovUk.Education.ExploreEducationStatistics.Common.Options;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
@@ -695,7 +696,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .Where(plan => plan.Value.Target != null)
                 .ToDictionary(plan => plan.Value.Id, plan => plan.Value.Target!.Value);
 
-            ReplaceDataBlockQueryFilterHierarchyOptions(filterTargets, filterItemTargets, dataBlock);
+            ReplaceDataBlockQueryFilterHierarchiesOptions(filterTargets, filterItemTargets, dataBlock);
             ReplaceDataBlockQueryIndicators(replacementPlan, dataBlock);
             ReplaceDataBlockQueryLocations(replacementPlan, dataBlock);
 
@@ -729,24 +730,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .ToList();
         }
 
-        private static void ReplaceDataBlockQueryFilterHierarchyOptions(
+        private static void ReplaceDataBlockQueryFilterHierarchiesOptions(
             Dictionary<Guid, Guid> filterTargets,
             Dictionary<Guid, Guid> filterItemTargets,
             DataBlock dataBlock)
         {
-            var originalFilterHierarchyOptions = dataBlock.Query.FilterHierarchyOptions;
-            if (originalFilterHierarchyOptions is null || originalFilterHierarchyOptions.Keys.Count == 0)
+            var originalFilterHierarchiesOptions = dataBlock.Query.FilterHierarchiesOptions;
+            if (originalFilterHierarchiesOptions is null || originalFilterHierarchiesOptions.Count == 0)
             {
-                dataBlock.Query.FilterHierarchyOptions = null;
+                dataBlock.Query.FilterHierarchiesOptions = null;
                 return;
             }
 
-            var newFilterHierarchyOptions = new Dictionary<Guid, List<List<Guid>>>();
+            var newFilterHierarchiesOptions = new List<FilterHierarchyOptions>();
 
-            foreach (var originalFilterId in originalFilterHierarchyOptions.Keys) // for each filter hierarchy
-
+            foreach (var originalHierarchyOptions in originalFilterHierarchiesOptions) // for each filter hierarchy
             {
-                var originalOptions = originalFilterHierarchyOptions[originalFilterId]; // list of selected options for that filter hierarchy
+                var originalOptions = originalHierarchyOptions.Options;
                 var newOptions = originalOptions
                         .Select(originalOption =>
                             originalOption // a filter hierarchy option is a list of filterItemIds, one per filter/tier
@@ -754,11 +754,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                 .ToList())
                         .ToList();
 
-                var replacementFilterId = filterTargets[originalFilterId];
-                newFilterHierarchyOptions.Add(replacementFilterId, newOptions);
+                var replacementFilterId = filterTargets[originalHierarchyOptions.LeafFilterId];
+                newFilterHierarchiesOptions.Add(new FilterHierarchyOptions
+                {
+                    LeafFilterId = replacementFilterId,
+                    Options = newOptions,
+                });
             }
 
-            dataBlock.Query.FilterHierarchyOptions = newFilterHierarchyOptions;
+            dataBlock.Query.FilterHierarchiesOptions = newFilterHierarchiesOptions;
         }
 
         private static void ReplaceDataBlockQueryIndicators(DataBlockReplacementPlanViewModel replacementPlan,

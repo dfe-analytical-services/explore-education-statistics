@@ -47,6 +47,7 @@ using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Net.Http.Headers;
 using System.Text;
+using GovUk.Education.ExploreEducationStatistics.Common.Converters;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Options;
 using Thinktecture;
 using static GovUk.Education.ExploreEducationStatistics.Common.Utils.StartupUtils;
@@ -83,6 +84,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
                 })
                 .AddNewtonsoftJson(options =>
                 {
+                    options.SerializerSettings.Converters.Add(new FilterHierarchiesOptionsConverter());
                     options.SerializerSettings.NullValueHandling = NullValueHandling.Ignore;
                 });
 
@@ -90,6 +92,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
             {
                 options.AddCommaSeparatedQueryModelBinderProvider();
                 options.AddTrimStringBinderProvider();
+                options.AddFilterHierarchiesOptionsModelBinderProvider();
             });
 
             services.AddFluentValidation();

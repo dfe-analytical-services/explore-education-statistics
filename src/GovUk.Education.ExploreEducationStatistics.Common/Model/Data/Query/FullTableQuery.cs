@@ -2,9 +2,17 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using GovUk.Education.ExploreEducationStatistics.Common.Converters;
+using Newtonsoft.Json;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query
 {
+    public record FilterHierarchyOptions
+    {
+        public Guid LeafFilterId { get; set; }
+        public List<FilterHierarchyOption> Options { get; set; } = [];
+    }
+
     public record FullTableQuery
     {
         public Guid SubjectId { get; set; }
@@ -22,10 +30,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query
 
         public IEnumerable<Guid> Indicators { get; set; } = new List<Guid>();
 
-        // FilterHierarchyOptions.Values are a list of a list of FilterItemIds, all associated with a particular filter hierarchy,
+        // List<FilterHierarchyOption> is all the options selected for a specific hierarchy.
+        // The Dictionary potentially stores FilterHierarchyOptions for multiple hierarchies
         // and each list of Guids associated with a particular filter hierarchy option/checkbox.
-        // FilterHierarchyOptions Key is the leaf FilterId for the hierarchy the Value's FilterItemIds are associated with.
-        public IDictionary<Guid, List<List<Guid>>>? FilterHierarchyOptions { get; set; } = null;
+        // FilterHierarchiesOptions Key is the leaf FilterId for the hierarchy the Value's FilterItemIds are associated with.
+        [JsonConverter(typeof(FilterHierarchiesOptionsConverter))]
+        public List<FilterHierarchyOptions>? FilterHierarchiesOptions { get; set; } = null;
 
         public IEnumerable<Guid> GetNonHierarchicalFilterItemIds()
         {
@@ -37,16 +47,59 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query
         public List<Guid> GetFilterItemIds()
         {
             var filterItemIds = GetNonHierarchicalFilterItemIds().ToList();
-            if (FilterHierarchyOptions != null)
+            if (FilterHierarchiesOptions != null)
             {
-                filterItemIds.AddRange(FilterHierarchyOptions
-                    .SelectMany(keyValue =>
-                        keyValue.Value.SelectMany(hierarchyOption => hierarchyOption)));
+                filterItemIds.AddRange(FilterHierarchiesOptions
+                    .SelectMany(filterHierarchyOptions => filterHierarchyOptions.Options
+                            .SelectMany(hierarchyOption => hierarchyOption)));
             }
 
-            // NOTE: We don't include FilterHierarchyOptions.Keys as they are filterIds, not filterItemIds
+            // NOTE: We don't include FilterHierarchiesOptions.LeafFilterIds as they are filterIds, not filterItemIds
 
             return filterItemIds.Distinct().ToList();
+        }
+
+        public static IDictionary<Guid, List<FilterHierarchyOption>>? FilterHierarchiesOptionsAsDictionary(List<FilterHierarchyOptions>? hierarchiesOptions) // @MarkFix remove when Json output formatter is done
+        {
+            if (hierarchiesOptions is null)
+            {
+                return null;
+            }
+
+            var result = new Dictionary<Guid, List<FilterHierarchyOption>>();
+
+            foreach (var hierarchyOptions in hierarchiesOptions)
+            {
+                var leafFilterId = hierarchyOptions.LeafFilterId;
+                result.Add(leafFilterId, hierarchyOptions.Options);
+            }
+
+            return result;
+        }
+
+        public static List<FilterHierarchyOptions>? CreateFilterHierarchiesOptionsFromJson(string json) // @MarkFix should live somewhere else?
+        {
+            var hierarchyOptionsDict =
+                JsonConvert.DeserializeObject<IDictionary<Guid, List<FilterHierarchyOption>>>(json);
+
+            if (hierarchyOptionsDict == null || !hierarchyOptionsDict.Any())
+            {
+                return null;
+            }
+
+            List<FilterHierarchyOptions> result = [];
+
+            foreach (var key in hierarchyOptionsDict.Keys)
+            {
+                var hierarchyOptions = hierarchyOptionsDict[key];
+                result.Add(new FilterHierarchyOptions
+                {
+                    LeafFilterId = key,
+                    Options = hierarchyOptions
+                });
+            }
+
+            return result;
         }
     }
 }

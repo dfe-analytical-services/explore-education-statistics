@@ -66,12 +66,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
             {
                 Guid.NewGuid()
             },
-            FilterHierarchyOptions = new Dictionary<Guid, List<List<Guid>>>
+            FilterHierarchiesOptions = new List<FilterHierarchyOptions>
             {
-                { Guid.NewGuid(), [[Guid.NewGuid(), Guid.NewGuid()], [Guid.NewGuid(), Guid.NewGuid()]] },
-                { Guid.NewGuid(), [[Guid.NewGuid(), Guid.NewGuid()]] },
-                { Guid.NewGuid(), [[Guid.NewGuid(), Guid.NewGuid()]] },
-                { Guid.NewGuid(), [[Guid.NewGuid(), Guid.NewGuid()], [Guid.NewGuid(), Guid.NewGuid()]] },
+                new() { LeafFilterId = Guid.NewGuid(), Options = [[Guid.NewGuid(), Guid.NewGuid()], [Guid.NewGuid(), Guid.NewGuid()]] },
+                new() { LeafFilterId = Guid.NewGuid(), Options = [[Guid.NewGuid(), Guid.NewGuid()]] },
+                new() { LeafFilterId = Guid.NewGuid(), Options = [[Guid.NewGuid(), Guid.NewGuid()]] },
+                new() { LeafFilterId = Guid.NewGuid(), Options = [[Guid.NewGuid(), Guid.NewGuid()], [Guid.NewGuid(), Guid.NewGuid()]] },
             }
         };
 
@@ -581,7 +581,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
             Assert.Equal(FullTableQuery.SubjectId, viewModel.Query.SubjectId);
             Assert.Equal(FullTableQuery.TimePeriod, viewModel.Query.TimePeriod);
             Assert.Equal(FullTableQuery.GetNonHierarchicalFilterItemIds(), viewModel.Query.GetNonHierarchicalFilterItemIds());
-            viewModel.Query.FilterHierarchyOptions.AssertDeepEqualTo(FullTableQuery.FilterHierarchyOptions);
+            viewModel.Query.FilterHierarchiesOptions.AssertDeepEqualTo(FullTableQuery.FilterHierarchiesOptions);
             Assert.Equal(FullTableQuery.Indicators, viewModel.Query.Indicators);
             Assert.Equal(FullTableQuery.LocationIds, viewModel.Query.LocationIds);
         }
