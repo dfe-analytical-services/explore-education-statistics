@@ -414,14 +414,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 },
             };
 
-            // Setup multiple geographic levels of data where some but not all of the levels have a hierarchy applied.
-            List<Location> locations = [];
-
             var options = new LocationsOptions
             {
-                Hierarchies = new Dictionary<GeographicLevel, List<string>>
-                {
-                }
+                Hierarchies = []
             }.ToOptionsWrapper();
 
             var statisticsDbContextId = Guid.NewGuid().ToString();
@@ -457,7 +452,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
             locationRepository
                 .Setup(s => s.GetDistinctForSubject(releaseSubject.SubjectId))
-                .ReturnsAsync(locations);
+                .ReturnsAsync([]);
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
@@ -484,10 +479,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
                 var viewModel = Assert.IsAssignableFrom<SubjectMetaViewModel>(result);
 
-                var locationViewModels = viewModel.Locations;
-
-                // Result has Country, Region and Local Authority levels
-                Assert.Empty(locationViewModels);
+                Assert.Empty(viewModel.Locations);
                 Assert.Empty(viewModel.Filters);
                 Assert.Empty(viewModel.Indicators);
                 Assert.Empty(viewModel.TimePeriod.Options);

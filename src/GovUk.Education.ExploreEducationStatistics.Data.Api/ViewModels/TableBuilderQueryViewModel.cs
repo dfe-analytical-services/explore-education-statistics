@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using GovUk.Education.ExploreEducationStatistics.Common.Converters;
+using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
 using Newtonsoft.Json;
 
@@ -22,7 +23,7 @@ public record TableBuilderQueryViewModel
     public IEnumerable<Guid> LocationIds { get; init; }
 
     [JsonConverter(typeof(FilterHierarchiesOptionsConverter))]
-    public List<FilterHierarchyOptions>? FilterHierarchiesOptions { get; init; } // @MarkFix add JSON output formatter
+    public List<FilterHierarchyOptions>? FilterHierarchiesOptions { get; init; }
 
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
     public TableBuilderQueryViewModel() // For Newtonsoft.Json
