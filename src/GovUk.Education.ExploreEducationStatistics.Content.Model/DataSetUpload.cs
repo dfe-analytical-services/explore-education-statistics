@@ -36,7 +36,7 @@ public record DataSetUpload : ICreatedTimestamp<DateTime>
     public string MetaFilePath
         => $"{FileStoragePathUtils.FilesPath(ReleaseVersionId, FileType.Metadata)}{MetaFileId}";
 
-    public Guid? ReplacingFileId { get; init; } // TODO: This value hasn't been mapped/implemented anywhere yet
+    public Guid? ReplacingFileId { get; init; }
 
     [JsonConverter(typeof(EnumToEnumValueJsonConverter<DataSetUploadStatus>))]
     public required DataSetUploadStatus Status { get; set; }
