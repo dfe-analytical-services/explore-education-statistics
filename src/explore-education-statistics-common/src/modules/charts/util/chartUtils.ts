@@ -1,6 +1,7 @@
 import { ChartSymbol, LineStyle } from '@common/modules/charts/types/chart';
 import {
   LegendInlinePosition,
+  LegendLabelColour,
   LegendPosition,
 } from '@common/modules/charts/types/legend';
 
@@ -39,6 +40,8 @@ export const legendInlinePositions: LegendInlinePosition[] = [
   'above',
   'below',
 ];
+
+export const legendLabelColours: LegendLabelColour[] = ['black', 'inherit'];
 
 export const lineChartDataLabelPositions = ['above', 'below'];
 

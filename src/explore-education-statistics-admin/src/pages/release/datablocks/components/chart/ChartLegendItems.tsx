@@ -5,6 +5,7 @@ import {
   colours,
   lineStyles,
   symbols,
+  legendLabelColours,
 } from '@common/modules/charts/util/chartUtils';
 import {
   LegendConfiguration,
@@ -33,6 +34,13 @@ const lineStyleOptions: SelectOption[] = lineStyles.map(lineStyle => ({
   label: upperFirst(lineStyle),
   value: lineStyle,
 }));
+
+const legendLabelColourOptions: SelectOption[] = legendLabelColours.map(
+  colour => ({
+    label: upperFirst(colour),
+    value: colour,
+  }),
+);
 
 const inlinePositionOptions: SelectOption[] = legendInlinePositions.map(
   position => ({
@@ -95,7 +103,7 @@ export default function ChartLegendItems({
                     fieldErrorDetails[0] ? fieldErrorDetails[0].message : ''
                   }
                 >
-                  <div className="dfe-flex dfe-justify-content--space-between">
+                  <div className="dfe-flex">
                     <div className={styles.labelInput}>
                       <FormFieldTextInput
                         name={`items.${index}.label`}
@@ -107,12 +115,24 @@ export default function ChartLegendItems({
                     <div className={styles.colourInput}>
                       <FormFieldColourInput
                         name={`items.${index}.colour`}
-                        label="Colour"
+                        label="Line Colour"
                         colours={colours}
                         formGroup={false}
                         showError={false}
                       />
                     </div>
+
+                    {capabilities.hasLineStyle && position === 'inline' && (
+                      <div className={styles.configurationInput}>
+                        <FormFieldSelect
+                          name={`items.${index}.labelColour`}
+                          label="Label Colour"
+                          formGroup={false}
+                          showError={false}
+                          options={legendLabelColourOptions}
+                        />
+                      </div>
+                    )}
 
                     {capabilities.hasSymbols && (
                       <div className={styles.configurationInput}>
@@ -139,7 +159,7 @@ export default function ChartLegendItems({
                       </div>
                     )}
 
-                    {position === 'inline' && (
+                    {capabilities.hasLineStyle && position === 'inline' && (
                       <>
                         <div className={styles.configurationInput}>
                           <FormFieldSelect

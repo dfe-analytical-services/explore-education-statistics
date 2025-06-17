@@ -22,11 +22,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model.Chart
         inline
     }
 
+    [SuppressMessage("ReSharper", "InconsistentNaming")]
+    [JsonConverter(typeof(StringEnumConverter))]
+    public enum ChartLegendLabelColour
+    {
+        black, inherit
+    }
+
     public class ChartLegendItem
     {
         public ChartBaseDataSet DataSet;
         public string Label;
         public string Colour;
+
+        [JsonConverter(typeof(StringEnumConverter))]
+        public ChartLegendLabelColour? LabelColour;
 
         [JsonConverter(typeof(StringEnumConverter))]
         public ChartLineSymbol? Symbol;

@@ -206,6 +206,7 @@ const LineChartBlock = ({
                   isDataLabel={showDataLabels}
                   isLastItem={props.index === chartData.length - 1}
                   isLegendLabel={legend.position === 'inline'}
+                  labelColour={config.labelColour}
                   name={config.label}
                   position={
                     showDataLabels ? dataLabelPosition : config.inlinePosition

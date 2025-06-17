@@ -1,6 +1,9 @@
 import chunkLabelToFitCharLimit from '@common/modules/charts/components/utils/chunkLabelToFitCharLimit';
 import { LineChartDataLabelPosition } from '@common/modules/charts/types/chart';
-import { LegendInlinePosition } from '@common/modules/charts/types/legend';
+import {
+  LegendInlinePosition,
+  LegendLabelColour,
+} from '@common/modules/charts/types/legend';
 import formatPretty from '@common/utils/number/formatPretty';
 import React from 'react';
 
@@ -12,6 +15,7 @@ interface Props {
   isDataLabel?: boolean;
   isLegendLabel?: boolean;
   isLastItem?: boolean;
+  labelColour?: LegendLabelColour;
   name: string;
   position?: LineChartDataLabelPosition | LegendInlinePosition;
   unit?: string;
@@ -28,6 +32,7 @@ export default function LineChartLabel({
   isDataLabel = false,
   isLegendLabel = false,
   isLastItem = false,
+  labelColour = 'inherit',
   name,
   position,
   unit,
@@ -80,7 +85,7 @@ export default function LineChartLabel({
     return (
       <text
         dy={dy}
-        fill={colour}
+        fill={labelColour === 'black' ? '#000' : colour}
         fontSize={14}
         textAnchor={isPositionRight ? 'start' : 'end'}
         x={x}

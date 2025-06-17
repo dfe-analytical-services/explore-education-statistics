@@ -13,16 +13,20 @@
 .configurationInput {
   align-items: center;
   display: flex;
-  margin-right: govuk-spacing(4);
+  flex-shrink: 0;
+  margin-right: govuk-spacing(6);
 
   label {
     margin-right: govuk-spacing(2);
+  }
+
+  select {
+    min-width: 6em;
   }
 }
 
 .numberInput {
   composes: configurationInput;
-  flex-grow: 1;
   min-width: 140px;
 
   input {
@@ -32,7 +36,6 @@
 
 .labelInput {
   composes: configurationInput;
-  flex-grow: 1;
   min-width: 200px;
 }
 

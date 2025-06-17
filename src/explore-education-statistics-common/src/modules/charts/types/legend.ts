@@ -11,6 +11,7 @@ export interface LegendConfiguration {
 export interface LegendItemConfiguration {
   label: string;
   colour: string;
+  labelColour?: LegendLabelColour;
   symbol?: ChartSymbol;
   lineStyle?: LineStyle;
   inlinePosition?: LegendInlinePosition;
@@ -22,3 +23,5 @@ export interface LegendItem extends LegendItemConfiguration {
 }
 
 export type LegendInlinePosition = 'above' | 'below' | 'right';
+
+export type LegendLabelColour = 'black' | 'inherit';
