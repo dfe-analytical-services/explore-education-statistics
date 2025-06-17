@@ -21,7 +21,7 @@ public class RemoveSearchableDocumentFunction(
     private async Task RemoveSearchableDocument(RemoveSearchableDocumentDto message, CancellationToken cancellationToken)
     {
         var releaseId = message.ReleaseId;
-        if (!releaseId.HasNonEmptyValue())
+        if (releaseId.IsBlank())
         {
             return;
         }
