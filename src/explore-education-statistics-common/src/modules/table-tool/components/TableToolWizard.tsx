@@ -446,7 +446,7 @@ export default function TableToolWizard({
     const updatedReleaseTableDataQuery: ReleaseTableDataQuery = {
       ...state.query,
       filters: Object.values(filters).flat(),
-      filterHierarchyOptions: converHierarchiesFormToQuery(filterHierarchies),
+      filterHierarchiesOptions: converHierarchiesFormToQuery(filterHierarchies),
       indicators,
     };
 
@@ -456,8 +456,8 @@ export default function TableToolWizard({
         locationIds: updatedReleaseTableDataQuery.locationIds,
         timePeriod: updatedReleaseTableDataQuery.timePeriod,
         filters: updatedReleaseTableDataQuery.filters,
-        filterHierarchyOptions:
-          updatedReleaseTableDataQuery.filterHierarchyOptions,
+        filterHierarchiesOptions:
+          updatedReleaseTableDataQuery.filterHierarchiesOptions,
         indicators: updatedReleaseTableDataQuery.indicators,
       } as FullTableQuery,
       updatedReleaseTableDataQuery.releaseVersionId,
@@ -601,7 +601,7 @@ export default function TableToolWizard({
                   initialValues={{
                     indicators: state.query.indicators,
                     filters: state.query.filters,
-                    filterHierarchies: state.query.filterHierarchyOptions,
+                    filterHierarchies: state.query.filterHierarchiesOptions,
                   }}
                   selectedPublication={state.selectedPublication}
                   stepTitle={stepTitles.filter}

@@ -162,7 +162,7 @@ export interface FullTableQuery {
   locationIds: string[];
   timePeriod?: TimePeriodQuery;
   filters: string[];
-  filterHierarchyOptions?: Dictionary<string[][]>;
+  filterHierarchiesOptions?: Dictionary<string[][]>;
   indicators: string[];
 }
 

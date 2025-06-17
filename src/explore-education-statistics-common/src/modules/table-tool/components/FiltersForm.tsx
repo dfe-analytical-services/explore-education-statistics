@@ -62,7 +62,7 @@ interface Props extends InjectedWizardProps {
   initialValues?: {
     indicators: FullTableQuery['indicators'];
     filters: FullTableQuery['filters'];
-    filterHierarchies: FullTableQuery['filterHierarchyOptions'];
+    filterHierarchies: FullTableQuery['filterHierarchiesOptions'];
   };
   selectedPublication?: SelectedPublication;
   showTableQueryErrorDownload?: boolean;

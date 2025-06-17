@@ -20,14 +20,14 @@ export function hierarchyOptionsFromString(relatedOptions: string): string[] {
 
 export function converHierarchiesFormToQuery(
   filterHierarchies: FiltersFormValues['filterHierarchies'],
-): FullTableQuery['filterHierarchyOptions'] {
+): FullTableQuery['filterHierarchiesOptions'] {
   return mapValues(filterHierarchies, selectedHierarchyOptions =>
     selectedHierarchyOptions.map(hierarchyOptionsFromString),
   );
 }
 
 export function converHierarchiesQueryToForm(
-  filterHierarchies: FullTableQuery['filterHierarchyOptions'],
+  filterHierarchies: FullTableQuery['filterHierarchiesOptions'],
 ): FiltersFormValues['filterHierarchies'] {
   return mapValues(filterHierarchies, selectedHierarchyOptions =>
     selectedHierarchyOptions.map(hierarchyOptionsToString),
