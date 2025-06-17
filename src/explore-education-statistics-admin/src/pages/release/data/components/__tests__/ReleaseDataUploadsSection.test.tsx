@@ -170,7 +170,7 @@ describe('ReleaseDataUploadsSection', () => {
     releaseDataFileService.getDataFileImportStatus.mockResolvedValue(
       testCompleteImportStatus,
     );
-    
+
     releaseDataFileService.getDataFile.mockResolvedValueOnce({
       ...testDataFiles[0],
       id: 'data-replacement-1',
