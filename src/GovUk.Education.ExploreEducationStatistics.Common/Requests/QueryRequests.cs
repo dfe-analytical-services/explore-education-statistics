@@ -18,8 +18,7 @@ public record FullTableQueryRequest
 
     public IEnumerable<Guid> Indicators { get; set; } = new List<Guid>();
 
-    public IDictionary<Guid, List<List<Guid>>>? FilterHierarchyOptions { get; set; }
-        = new Dictionary<Guid, List<List<Guid>>>();
+    public List<FilterHierarchyOptions>? FilterHierarchiesOptions { get; set; } = null;
 
     public FullTableQuery AsFullTableQuery()
     {
@@ -30,7 +29,7 @@ public record FullTableQueryRequest
             TimePeriod = this.TimePeriod,
             Filters = this.Filters,
             Indicators = this.Indicators,
-            FilterHierarchyOptions = this.FilterHierarchyOptions,
+            FilterHierarchiesOptions = this.FilterHierarchiesOptions,
         };
     }
 
@@ -44,7 +43,7 @@ public record FullTableQueryRequest
                 .NotNull();
 
             // NOTE: No rule for filters - a data set might have no filters!
-            // NOTE: No rule for filterHierarchyOptions - a data set might not have a filter hierarchy!
+            // NOTE: No rule for filterHierarchiesOptions - a data set might not have a filter hierarchy!
 
             RuleFor(context => context.Indicators)
                 .NotEmpty();
@@ -72,7 +71,7 @@ public class LocationsOrTimePeriodsQueryRequest
             TimePeriod = this.TimePeriod,
             Filters = [],
             Indicators = [],
-            FilterHierarchyOptions = null,
+            FilterHierarchiesOptions = null,
         };
     }
 

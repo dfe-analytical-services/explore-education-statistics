@@ -1,7 +1,9 @@
 #nullable enable
 using System;
 using System.Collections.Generic;
+using GovUk.Education.ExploreEducationStatistics.Common.Converters;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
+using Newtonsoft.Json;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels;
 
@@ -19,7 +21,8 @@ public record TableBuilderQueryViewModel
     public IEnumerable<Guid> Indicators { get; init; }
     public IEnumerable<Guid> LocationIds { get; init; }
 
-    public IDictionary<Guid, List<List<Guid>>>? FilterHierarchyOptions { get; init; }
+    [JsonConverter(typeof(FilterHierarchiesOptionsConverter))]
+    public List<FilterHierarchyOptions>? FilterHierarchiesOptions { get; init; } // @MarkFix add JSON output formatter
 
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
     public TableBuilderQueryViewModel() // For Newtonsoft.Json
@@ -35,7 +38,7 @@ public record TableBuilderQueryViewModel
         Filters = query.GetNonHierarchicalFilterItemIds();
         Indicators = query.Indicators;
         LocationIds = query.LocationIds;
-        FilterHierarchyOptions = query.FilterHierarchyOptions;
+        FilterHierarchiesOptions = query.FilterHierarchiesOptions;
     }
 
     public IEnumerable<Guid> GetNonHierarchicalFilterItemIds()

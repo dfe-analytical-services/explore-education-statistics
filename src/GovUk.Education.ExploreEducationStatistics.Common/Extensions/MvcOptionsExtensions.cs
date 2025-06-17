@@ -13,6 +13,11 @@ public static class MvcOptionsExtensions
         options.ModelBinderProviders.Insert(0, new SeparatedQueryModelBinderProvider(","));
     }
 
+    public static void AddFilterHierarchiesOptionsModelBinderProvider(this MvcOptions options)
+    {
+        options.ModelBinderProviders.Insert(0, new FilterHierarchiesOptionsModelBinderProvider());
+    }
+
     public static void AddTrimStringBinderProvider(this MvcOptions option)
     {
         var simpleTypeModelBinderProvider = option.ModelBinderProviders
