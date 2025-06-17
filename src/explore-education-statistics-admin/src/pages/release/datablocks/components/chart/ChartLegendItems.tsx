@@ -115,7 +115,7 @@ export default function ChartLegendItems({
                     <div className={styles.colourInput}>
                       <FormFieldColourInput
                         name={`items.${index}.colour`}
-                        label="Line Colour"
+                        label="Colour"
                         colours={colours}
                         formGroup={false}
                         showError={false}
