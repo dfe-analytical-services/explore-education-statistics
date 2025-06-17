@@ -18,6 +18,7 @@ import {
   LegendItemConfiguration,
   LegendPosition,
   LegendInlinePosition,
+  LegendLabelColour,
 } from '@common/modules/charts/types/legend';
 import { legendPositions } from '@common/modules/charts/util/chartUtils';
 import createDataSetCategories from '@common/modules/charts/util/createDataSetCategories';
@@ -99,6 +100,7 @@ const ChartLegendConfiguration = ({
     const defaultConfig: Partial<LegendItemConfiguration> = {
       symbol: capabilities.hasSymbols ? 'none' : undefined,
       lineStyle: capabilities.hasLineStyle ? 'solid' : undefined,
+      labelColour: capabilities.canPositionLegendInline ? 'black' : undefined,
       inlinePosition: capabilities.canPositionLegendInline
         ? 'right'
         : undefined,
@@ -140,7 +142,7 @@ const ChartLegendConfiguration = ({
             params.path as string,
           )}`,
       ),
-      labelColour: Yup.boolean().optional(),
+      labelColour: Yup.string<LegendLabelColour>().optional(),
       symbol: Yup.string<ChartSymbol>().optional(),
       lineStyle: Yup.string<LineStyle>().optional(),
       inlinePosition: Yup.string<LegendInlinePosition>().optional(),
