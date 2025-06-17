@@ -459,9 +459,10 @@ Validate changing data sets
     user chooses select option    id:chartDataSetsConfigurationForm-location    Barnsley
     user clicks button    Add data set
 
-    user checks chart legend item contains    id:chartBuilderPreview    1    Admission Numbers (Nailsea Youngwood)
-    user checks chart legend item contains    id:chartBuilderPreview    2    Admission Numbers (Syon)
-    user checks chart legend item contains    id:chartBuilderPreview    3    Admission Numbers (Barnsley)
+    user checks chart inline legend item contains    id:chartBuilderPreview    1
+    ...    Admission Numbers (Nailsea Youngwood)
+    user checks chart inline legend item contains    id:chartBuilderPreview    2    Admission Numbers (Syon)
+    user checks chart inline legend item contains    id:chartBuilderPreview    3    Admission Numbers (Barnsley)
 
     user checks table body has x rows    3    testid:chart-data-sets
 
