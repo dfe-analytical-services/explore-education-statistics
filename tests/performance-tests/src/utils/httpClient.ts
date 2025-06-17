@@ -156,6 +156,7 @@ export default class HttpClient {
 
   private logErrorResponse(response: RefinedResponse<'text'>) {
     if (response.headers['Www-Authenticate']) {
+      // eslint-disable-next-line no-console
       console.log(
         `Got response with status "${
           response.status
@@ -164,6 +165,7 @@ export default class HttpClient {
         )}"`,
       );
     } else {
+      // eslint-disable-next-line no-console
       console.log(
         `Got response with status "${response.status}" - "${JSON.stringify(
           response,
