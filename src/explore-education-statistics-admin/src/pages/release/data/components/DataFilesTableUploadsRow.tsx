@@ -103,8 +103,9 @@ export default function DataFilesTableUploadRow({
                     <>
                       <h3>Screener test failures</h3>
                       <WarningMessage>
-                        You will need to delete this file, fix the failed tests
-                        and upload again
+                        You will need to delete this file (close this window,
+                        and select "Delete files"), fix the failed tests and
+                        upload again
                       </WarningMessage>
                     </>
                   ) : (
@@ -150,7 +151,7 @@ export default function DataFilesTableUploadRow({
               title="Confirm deletion of selected data files"
               triggerButton={
                 <ButtonText onClick={toggleOpenDeleteConfirm.on}>
-                  Delete file
+                  Delete files
                 </ButtonText>
               }
               onConfirm={handleDeleteConfirm}
