@@ -50,6 +50,14 @@ export default function ReleaseDataUploadsSection({
     refetch: refetchDataSetUploads,
   } = useQuery(releaseDataFileQueries.listUploads(releaseVersionId));
 
+  const uploadsWithoutReplacements = allDataSetUploads.filter(
+    upload => !upload.replacingFileId,
+  );
+
+  const uploadsWithReplacements = allDataSetUploads.filter(
+    upload => upload.replacingFileId,
+  );
+
   // Store the data files on state so we can reliably update them
   // when the permissions/status change.
   useEffect(() => {
@@ -270,23 +278,28 @@ export default function ReleaseDataUploadsSection({
               />
             ) : (
               <>
-                {replacedDataFiles.length > 0 && (
+                {(replacedDataFiles.length > 0 ||
+                  uploadsWithReplacements.length > 0) && (
                   <DataFilesReplacementTable
                     caption="Data file replacements"
                     dataFiles={replacedDataFiles}
+                    dataSetUploads={uploadsWithReplacements}
                     publicationId={publicationId}
                     releaseVersionId={releaseVersionId}
                     testId="Data file replacements table"
                     onConfirmAction={refetchDataFiles}
+                    onDeleteUpload={handleDeleteUploadConfirm}
+                    onDataSetImport={handleDataSetImport}
                   />
                 )}
 
-                {(dataFiles.length > 0 || allDataSetUploads.length > 0) && (
+                {(dataFiles.length > 0 ||
+                  uploadsWithoutReplacements.length > 0) && (
                   <DataFilesTable
                     canUpdateRelease={canUpdateRelease}
                     caption="Data files"
                     dataFiles={dataFiles}
-                    dataSetUploads={allDataSetUploads}
+                    dataSetUploads={uploadsWithoutReplacements}
                     publicationId={publicationId}
                     releaseVersionId={releaseVersionId}
                     testId="Data files table"

@@ -1,24 +1,34 @@
-import { DataFile } from '@admin/services/releaseDataFileService';
+import {
+  DataFile,
+  DataSetUpload,
+} from '@admin/services/releaseDataFileService';
 import styles from '@admin/pages/release/data/components/DataFilesTable.module.scss';
 import DataFileReplacementTableRow from '@admin/pages/release/data/components/DataFilesReplacementTableRow';
 import React from 'react';
+import DataFilesTableUploadRow from './DataFilesTableUploadsRow';
 
 interface Props {
   caption: string;
   dataFiles: DataFile[];
+  dataSetUploads: DataSetUpload[];
   publicationId: string;
   releaseVersionId: string;
   testId?: string;
   onConfirmAction?: () => void;
+  onDeleteUpload: (deletedUploadId: string) => void;
+  onDataSetImport: (dataSetImportIds: string[]) => void;
 }
 
 export default function DataFilesReplacementTable({
   caption,
   dataFiles,
+  dataSetUploads,
   publicationId,
   releaseVersionId,
   testId,
   onConfirmAction,
+  onDeleteUpload,
+  onDataSetImport,
 }: Props) {
   return (
     <table className={styles.table} data-testid={testId}>
@@ -41,6 +51,15 @@ export default function DataFilesReplacementTable({
             publicationId={publicationId}
             releaseVersionId={releaseVersionId}
             onConfirmAction={onConfirmAction}
+          />
+        ))}
+        {dataSetUploads.map(upload => (
+          <DataFilesTableUploadRow
+            dataSetUpload={upload}
+            key={upload.id}
+            releaseVersionId={releaseVersionId}
+            onConfirmDelete={onDeleteUpload}
+            onConfirmImport={onDataSetImport}
           />
         ))}
       </tbody>

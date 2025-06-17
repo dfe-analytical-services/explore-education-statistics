@@ -29,4 +29,6 @@ public record DataSetUploadViewModel
     public required DateTime Created { get; set; }
 
     public required string UploadedBy { get; set; }
+
+    public Guid? ReplacingFileId { get; init; }
 }
