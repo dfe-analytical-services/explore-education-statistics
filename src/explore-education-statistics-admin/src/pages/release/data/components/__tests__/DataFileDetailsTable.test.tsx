@@ -31,7 +31,7 @@ describe('DataFileDetailsTable - replacementFileHasApi logic', () => {
     jest.clearAllMocks();
   });
 
-  it('does not render API data set attachment status row when publicApiDataSetId is undefined', () => {
+  it('does not render API data set status row when publicApiDataSetId is undefined', () => {
     setUpMocksUseQuery();
 
     renderWithFeatureFlag(
@@ -47,13 +47,11 @@ describe('DataFileDetailsTable - replacementFileHasApi logic', () => {
     );
 
     expect(screen.queryByText('Data file import status')).toBeInTheDocument();
-    expect(
-      screen.queryByText('API data set attachment status'),
-    ).not.toBeInTheDocument();
+    expect(screen.queryByText('API data set status')).not.toBeInTheDocument();
     expect(screen.queryByText('Ready')).not.toBeInTheDocument();
   });
 
-  it('does not render API data set attachment status row when replacedBy is undefined', () => {
+  it('does not render API data set status row when replacedBy is undefined', () => {
     setUpMocksUseQuery();
 
     renderWithFeatureFlag(
@@ -69,13 +67,11 @@ describe('DataFileDetailsTable - replacementFileHasApi logic', () => {
     );
 
     expect(screen.queryByText('Data file import status')).toBeInTheDocument();
-    expect(
-      screen.queryByText('API data set attachment status'),
-    ).not.toBeInTheDocument();
+    expect(screen.queryByText('API data set status')).not.toBeInTheDocument();
     expect(screen.queryByText('Ready')).not.toBeInTheDocument();
   });
 
-  it('renders Ready tag API data set attachment status row when publicApiDataSetId and replacedBy are defined', () => {
+  it('renders Ready tag API data set status row when publicApiDataSetId and replacedBy are defined', () => {
     setUpMocksUseQuery();
 
     renderWithFeatureFlag(
@@ -96,9 +92,7 @@ describe('DataFileDetailsTable - replacementFileHasApi logic', () => {
       />,
     );
 
-    expect(
-      screen.getByText('API data set attachment status'),
-    ).toBeInTheDocument();
+    expect(screen.getByText('API data set status')).toBeInTheDocument();
     expect(screen.queryByText('Action required')).not.toBeInTheDocument();
     expect(screen.getByText('Ready')).toBeInTheDocument();
   });
@@ -124,9 +118,7 @@ describe('DataFileDetailsTable - replacementFileHasApi logic', () => {
       />,
     );
 
-    expect(
-      screen.getByText('API data set attachment status'),
-    ).toBeInTheDocument();
+    expect(screen.getByText('API data set status')).toBeInTheDocument();
     expect(screen.queryByText('Ready')).not.toBeInTheDocument();
     expect(screen.getByText('Action required')).toBeInTheDocument();
   });
@@ -152,14 +144,12 @@ describe('DataFileDetailsTable - replacementFileHasApi logic', () => {
       />,
     );
 
-    expect(
-      screen.getByText('API data set attachment status'),
-    ).toBeInTheDocument();
+    expect(screen.getByText('API data set status')).toBeInTheDocument();
     expect(screen.getByText('Processing')).toBeInTheDocument();
     expect(screen.queryByText('Ready')).not.toBeInTheDocument();
   });
 
-  it('does not render API data set attachment status row when publicApiDataSetId and replacedBy are defined but the API replacement feature flag is off', () => {
+  it('does not render API data set status row when publicApiDataSetId and replacedBy are defined but the API replacement feature flag is off', () => {
     setUpMocksUseQuery();
 
     renderWithFeatureFlag(
@@ -180,9 +170,7 @@ describe('DataFileDetailsTable - replacementFileHasApi logic', () => {
       />,
     );
 
-    expect(
-      screen.queryByText('API data set attachment status'),
-    ).not.toBeInTheDocument();
+    expect(screen.queryByText('API data set status')).not.toBeInTheDocument();
     expect(screen.queryByText('Ready')).not.toBeInTheDocument();
   });
 

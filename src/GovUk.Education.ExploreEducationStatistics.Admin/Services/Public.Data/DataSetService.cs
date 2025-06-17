@@ -152,15 +152,17 @@ internal class DataSetService(
     private async Task<DataSetViewModel> MapDataSet(DataSet dataSet, CancellationToken cancellationToken)
     {
         var releaseFilesByDataSetVersionId = await GetReleaseFilesByDataSetVersionId(dataSet, cancellationToken);
+        
         ReleaseFile? originalReleaseFile = null;
         if (dataSet.LatestDraftVersion is { VersionPatch: > 0 })
         {
+            //Get the release file belonging to the data file that has been patched 
             var lastDataSetVersionNumber = dataSet.LatestDraftVersion.SemVersion()
                 .WithPatch(dataSet.LatestDraftVersion.VersionPatch - 1);
             var lastDataSetVersion = dataSet.Versions.SingleOrDefault(dsv => dsv.SemVersion() == lastDataSetVersionNumber);
             if (lastDataSetVersion != null)
             {
-                originalReleaseFile = releaseFilesByDataSetVersionId[ lastDataSetVersion.Id];
+                originalReleaseFile = releaseFilesByDataSetVersionId[lastDataSetVersion.Id];
             }
         }
 
@@ -172,7 +174,7 @@ internal class DataSetService(
                     dataSetVersionId: dataSet.LatestDraftVersion.Id,
                     cancellationToken),
                 releaseFile: releaseFilesByDataSetVersionId[dataSet.LatestDraftVersion.Id],
-                  originalReleaseFile
+                originalReleaseFile: originalReleaseFile
             );
 
         var latestLiveVersion = dataSet.LatestLiveVersion is null
