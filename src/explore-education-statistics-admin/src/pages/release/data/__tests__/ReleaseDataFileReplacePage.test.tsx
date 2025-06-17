@@ -552,6 +552,7 @@ describe('ReleaseDataFileReplacePage', () => {
       expect(releaseDataFileService.deleteDataFiles).toHaveBeenCalledWith(
         'release-1',
         'data-2',
+        true,
       );
     });
   });
