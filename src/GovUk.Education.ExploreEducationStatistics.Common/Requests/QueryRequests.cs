@@ -18,7 +18,7 @@ public record FullTableQueryRequest
 
     public IEnumerable<Guid> Indicators { get; set; } = new List<Guid>();
 
-    public List<FilterHierarchyOptions>? FilterHierarchiesOptions { get; set; } = null;
+    public IDictionary<Guid, List<List<Guid>>>? FilterHierarchiesOptions { get; set; } = null;
 
     public FullTableQuery AsFullTableQuery()
     {
@@ -29,7 +29,8 @@ public record FullTableQueryRequest
             TimePeriod = this.TimePeriod,
             Filters = this.Filters,
             Indicators = this.Indicators,
-            FilterHierarchiesOptions = this.FilterHierarchiesOptions,
+            FilterHierarchiesOptions =
+                FullTableQuery.CreateFilterHierarchiesOptionsFromDictionary(this.FilterHierarchiesOptions),
         };
     }
 

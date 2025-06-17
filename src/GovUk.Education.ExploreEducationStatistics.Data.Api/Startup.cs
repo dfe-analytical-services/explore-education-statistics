@@ -92,7 +92,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
             {
                 options.AddCommaSeparatedQueryModelBinderProvider();
                 options.AddTrimStringBinderProvider();
-                options.AddFilterHierarchiesOptionsModelBinderProvider();
             });
 
             services.AddFluentValidation();

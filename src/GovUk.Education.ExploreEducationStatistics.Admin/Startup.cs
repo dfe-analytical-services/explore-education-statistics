@@ -174,7 +174,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                 {
                     options.AddCommaSeparatedQueryModelBinderProvider();
                     options.AddTrimStringBinderProvider();
-                    options.AddFilterHierarchiesOptionsModelBinderProvider();
                 })
                 .AddControllersAsServices();
 

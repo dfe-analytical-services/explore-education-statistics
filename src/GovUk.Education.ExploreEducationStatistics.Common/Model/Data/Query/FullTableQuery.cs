@@ -79,19 +79,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query
 
         public static List<FilterHierarchyOptions>? CreateFilterHierarchiesOptionsFromJson(string json) // @MarkFix should live somewhere else?
         {
-            var hierarchyOptionsDict =
+            var hierarchiesOptionsDict =
                 JsonConvert.DeserializeObject<IDictionary<Guid, List<FilterHierarchyOption>>>(json);
 
-            if (hierarchyOptionsDict == null || !hierarchyOptionsDict.Any())
+            return CreateFilterHierarchiesOptionsFromDictionary(hierarchiesOptionsDict);
+        }
+
+        public static List<FilterHierarchyOptions>? CreateFilterHierarchiesOptionsFromDictionary(IDictionary<Guid, List<List<Guid>>>? hierarchiesOptionsDict) // @MarkFix should live somewhere else?
+        {
+            if (hierarchiesOptionsDict == null || !hierarchiesOptionsDict.Any())
             {
                 return null;
             }
 
             List<FilterHierarchyOptions> result = [];
 
-            foreach (var key in hierarchyOptionsDict.Keys)
+            foreach (var key in hierarchiesOptionsDict.Keys)
             {
-                var hierarchyOptions = hierarchyOptionsDict[key];
+                var hierarchyOptions = hierarchiesOptionsDict[key];
                 result.Add(new FilterHierarchyOptions
                 {
                     LeafFilterId = key,
