@@ -18,7 +18,7 @@ export function hierarchyOptionsFromString(relatedOptions: string): string[] {
   return relatedOptions.split(fhAncestrySeparator);
 }
 
-export function converHierarchiesFormToQuery(
+export function convertHierarchiesFormToQuery(
   filterHierarchies: FiltersFormValues['filterHierarchies'],
 ): FullTableQuery['filterHierarchiesOptions'] {
   return mapValues(filterHierarchies, selectedHierarchyOptions =>
@@ -26,7 +26,7 @@ export function converHierarchiesFormToQuery(
   );
 }
 
-export function converHierarchiesQueryToForm(
+export function convertHierarchiesQueryToForm(
   filterHierarchies: FullTableQuery['filterHierarchiesOptions'],
 ): FiltersFormValues['filterHierarchies'] {
   return mapValues(filterHierarchies, selectedHierarchyOptions =>

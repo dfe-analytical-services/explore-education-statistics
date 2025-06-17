@@ -49,16 +49,14 @@ function FilterHierarchyOptions({
   const [searchTerm, setSearchTerm] = useState<string>('');
 
   const renderSelectedCount = useCallback(() => {
-    if (
-      !selectedChildren.valuesRelatedToSelectedValuesCountMap[optionTree.value]
-    ) {
-      return null;
-    }
     const selectedChildrenCount =
       selectedChildren.valuesRelatedToSelectedValuesCountMap[optionTree.value];
+
+    if (!selectedChildrenCount) {
+      return null;
+    }
     return (
       <Tag className="govuk-!-margin-left-2 govuk-!-font-size-16">
-        <span className="govuk-visually-hidden"> - </span>
         {selectedChildrenCount} selected
       </Tag>
     );

@@ -143,22 +143,21 @@ Save datablock
     user clicks button    Save data block
 
 Reload created datablock
-    user navigates to content page    ${PUBLICATION_NAME}
+    user reloads page
     user clicks link    Data blocks
     user waits until h2 is visible    Data blocks
-    user clicks button containing text    Edit block
+    user clicks link containing text    Edit block
     user waits until h2 is visible    Data source
 
-# This is broke currently
-# Validate step 5 options
-#    user checks previous table tool step contains    4    Indicators    Number of achievers
-#    user checks previous table tool step contains    4    Ethnicity minor    Asian (total)
-#    user checks previous table tool step contains    4    Ethnicity minor    Chinese
-#    user checks previous table tool step contains    4    Ethnicity minor    Indian
-#    user checks previous table tool step contains    4    Learning aim title    Total
-#    user checks previous table tool step contains    4    Learning aim title    Cycle Mechanics
-#    user checks previous table tool step contains    4    Learning aim title    Games Design and Development
-#    user checks previous table tool step contains    4    Learning aim title    IT Users (ITQ)
+Validate step 5 options
+    user checks previous table tool step contains    4    Indicators    Number of achievers
+    user checks previous table tool step contains    4    Ethnicity minor    Asian (total)
+    user checks previous table tool step contains    4    Ethnicity minor    Chinese
+    user checks previous table tool step contains    4    Ethnicity minor    Indian
+    user checks previous table tool step contains    4    Learning aim title    Total
+    user checks previous table tool step contains    4    Learning aim title    Cycle Mechanics
+    user checks previous table tool step contains    4    Learning aim title    Games Design and Development
+    user checks previous table tool step contains    4    Learning aim title    IT Users (ITQ)
 
 Validate row headings
     user checks table column heading contains    1    1    Asian
@@ -201,6 +200,7 @@ Approve first release
     user approves release for immediate publication
 
 Verify newly published release is on Find Statistics page
+    # TODO EES-6063 - Remove this
     user checks publication is on find statistics page    ${PUBLICATION_NAME}
 
 Go to public table tool page

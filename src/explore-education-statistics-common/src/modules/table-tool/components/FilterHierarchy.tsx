@@ -17,7 +17,10 @@ import FilterHierarchyOptions, {
   FilterHierarchyOption,
   SelectedChildren,
 } from './FilterHierarchyOptions';
-import { OptionLabelsMap } from './utils/getFilterHierarchyLabelsMap';
+import {
+  isOptionTotal,
+  OptionLabelsMap,
+} from './utils/getFilterHierarchyLabelsMap';
 import augmentFilterHierarchySelections from './utils/augmentFilterHierarchySelections';
 import {
   hierarchyOptionsFromString,
@@ -31,7 +34,6 @@ export interface FilterHierarchyProps {
   disabled?: boolean;
   name: string;
   open?: boolean;
-  isActive?: boolean;
   onToggle?: (isOpen: boolean) => void;
 }
 
@@ -42,7 +44,6 @@ function FilterHierarchy({
   name,
   disabled,
   open,
-  isActive = true,
   onToggle,
 }: FilterHierarchyProps) {
   const {
@@ -135,7 +136,7 @@ function FilterHierarchy({
     [filterHierarchy, name, optionLabelsMap],
   );
 
-  const selectedValues = useWatch({ name });
+  const selectedValues = useWatch({ name }) as string[];
   const optionsWithSelectedChildren: SelectedChildren = useMemo(() => {
     if (!selectedValues?.length) {
       return {
@@ -147,9 +148,7 @@ function FilterHierarchy({
     const tierTotals = filterHierarchy.map(hierarchyTier => {
       return Object.values(hierarchyTier.hierarchy)
         .flat()
-        .find(
-          optionId => optionLabelsMap[optionId].toLocaleLowerCase() === 'total',
-        )!;
+        .find(optionId => isOptionTotal(optionLabelsMap, optionId))!;
     });
 
     // includes duplicates
@@ -205,11 +204,9 @@ function FilterHierarchy({
   }, [setExpandedOptionsList, optionsWithSelectedChildren]);
 
   useEffect(() => {
-    if (isActive) {
-      expandSelectedOptions();
-    }
+    expandSelectedOptions();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isActive]);
+  }, []);
 
   // Groups with an error are opened, so add them to the list of open
   // filters to prevent the group collapsing as soon as you select
@@ -268,7 +265,7 @@ function FilterHierarchy({
                 <>
                   <p>This is a sub category of tier {index}.</p>
                   <p>
-                    Selected a tier {index + 1} option provides a total value
+                    Selecting a tier {index + 1} option provides a total value
                     for all {filterLabels[index + 1].toLowerCase()} options
                     associated to this area
                   </p>
@@ -338,9 +335,7 @@ function getRootOptionTrees(
   const tierTotals = filterHierarchy.map(hierarchyTier => {
     return Object.values(hierarchyTier.hierarchy)
       .flat()
-      .find(
-        optionId => optionLabelsMap[optionId].toLocaleLowerCase() === 'total',
-      )!;
+      .find(optionId => isOptionTotal(optionLabelsMap, optionId))!;
   });
 
   return mapOptionTreesRecursively({

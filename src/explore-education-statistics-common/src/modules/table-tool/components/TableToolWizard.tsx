@@ -44,7 +44,7 @@ import locationLevelsMap, {
 } from '@common/utils/locationLevelsMap';
 import React, { ReactElement, ReactNode, useMemo, useState } from 'react';
 import { useImmer } from 'use-immer';
-import { converHierarchiesFormToQuery } from './utils/filterHierarchiesConversion';
+import { convertHierarchiesFormToQuery } from './utils/filterHierarchiesConversion';
 
 const defaultLocationStepTitle = 'Choose locations';
 const defaultDataSetStepTitle = 'Select a data set';
@@ -446,7 +446,8 @@ export default function TableToolWizard({
     const updatedReleaseTableDataQuery: ReleaseTableDataQuery = {
       ...state.query,
       filters: Object.values(filters).flat(),
-      filterHierarchiesOptions: converHierarchiesFormToQuery(filterHierarchies),
+      filterHierarchiesOptions:
+        convertHierarchiesFormToQuery(filterHierarchies),
       indicators,
     };
 

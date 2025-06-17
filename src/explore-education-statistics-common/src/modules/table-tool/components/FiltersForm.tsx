@@ -35,9 +35,11 @@ import orderBy from 'lodash/orderBy';
 import React, { useCallback, useMemo, useState } from 'react';
 import { ObjectSchema } from 'yup';
 import FilterHierarchy from './FilterHierarchy';
-import getFilterHierarchyLabelsMap from './utils/getFilterHierarchyLabelsMap';
+import getFilterHierarchyLabelsMap, {
+  isOptionTotal,
+} from './utils/getFilterHierarchyLabelsMap';
 import {
-  converHierarchiesQueryToForm,
+  convertHierarchiesQueryToForm,
   hierarchyOptionsFromString,
 } from './utils/filterHierarchiesConversion';
 
@@ -173,7 +175,7 @@ export default function FiltersForm({
 
               return [
                 hierarchyKey,
-                converHierarchiesQueryToForm(initialValues.filterHierarchies!)[
+                convertHierarchiesQueryToForm(initialValues.filterHierarchies!)[
                   hierarchyKey
                 ],
               ];
@@ -396,7 +398,6 @@ export default function FiltersForm({
                             key={hierarchyName}
                             name={hierarchyName}
                             open={openFilterGroups.includes(filterName)}
-                            isActive={isActive}
                             onToggle={isOpen => {
                               setOpenFilterGroups(groups =>
                                 isOpen
@@ -409,41 +410,45 @@ export default function FiltersForm({
                           />
                         );
                       })}
-                      <div id="filterGroups">
-                        {simpleFilters.map(([filterKey, filterGroup]) => {
-                          const filterName = `filters.${filterKey}`;
-                          const orderedFilterGroupOptions = orderBy(
-                            Object.values(filterGroup.options),
-                            'order',
-                          );
+                      {!simpleFilters.length ? null : (
+                        <div id="filterGroups">
+                          {simpleFilters.map(([filterKey, filterGroup]) => {
+                            const filterName = `filters.${filterKey}`;
+                            const orderedFilterGroupOptions = orderBy(
+                              Object.values(filterGroup.options),
+                              'order',
+                            );
 
-                          return (
-                            <FormFieldCheckboxGroupsMenu
-                              disabled={formState.isSubmitting}
-                              groupLabel={filterGroup.legend}
-                              hint={filterGroup.hint}
-                              key={filterKey}
-                              legend={filterGroup.legend}
-                              name={filterName}
-                              open={openFilterGroups.includes(filterKey)}
-                              options={orderedFilterGroupOptions.map(group => ({
-                                legend: group.label,
-                                options: group.options,
-                              }))}
-                              order={[]}
-                              onToggle={isOpen => {
-                                setOpenFilterGroups(groups =>
-                                  isOpen
-                                    ? [...groups, filterKey]
-                                    : groups.filter(
-                                        group => group !== filterKey,
-                                      ),
-                                );
-                              }}
-                            />
-                          );
-                        })}
-                      </div>
+                            return (
+                              <FormFieldCheckboxGroupsMenu
+                                disabled={formState.isSubmitting}
+                                groupLabel={filterGroup.legend}
+                                hint={filterGroup.hint}
+                                key={filterKey}
+                                legend={filterGroup.legend}
+                                name={filterName}
+                                open={openFilterGroups.includes(filterKey)}
+                                options={orderedFilterGroupOptions.map(
+                                  group => ({
+                                    legend: group.label,
+                                    options: group.options,
+                                  }),
+                                )}
+                                order={[]}
+                                onToggle={isOpen => {
+                                  setOpenFilterGroups(groups =>
+                                    isOpen
+                                      ? [...groups, filterKey]
+                                      : groups.filter(
+                                          group => group !== filterKey,
+                                        ),
+                                  );
+                                }}
+                              />
+                            );
+                          })}
+                        </div>
+                      )}
                     </FormFieldset>
                   )}
                 </div>
@@ -543,15 +548,16 @@ export default function FiltersForm({
                                   const isLast =
                                     index === relatedOptionsList.length - 1;
                                   const isNextTotal = !isLast
-                                    ? optionLabelsMap[
-                                        relatedOptionsList[index + 1]
-                                      ]?.toLowerCase() === 'total'
+                                    ? isOptionTotal(
+                                        optionLabelsMap,
+                                        relatedOptionsList[index + 1],
+                                      )
                                     : false;
 
-                                  const isThisTotal =
-                                    optionLabelsMap[
-                                      relatedOptionId
-                                    ]?.toLowerCase() === 'total';
+                                  const isThisTotal = isOptionTotal(
+                                    optionLabelsMap,
+                                    relatedOptionId,
+                                  );
                                   if (isThisTotal && index !== 0) {
                                     return null;
                                   }
@@ -570,8 +576,7 @@ export default function FiltersForm({
                                     );
                                   return (
                                     <span
-                                      // eslint-disable-next-line react/no-array-index-key
-                                      key={`option-${relatedOptionsString}-[${index}]`}
+                                      key={`option-${relatedOptionsString}-${relatedOptionId}`}
                                     >
                                       {relatedOptionLabel}
                                       {!isLast && !isNextTotal && (
