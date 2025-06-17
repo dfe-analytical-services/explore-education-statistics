@@ -123,7 +123,7 @@ public class ContentApiClientTests(ITestOutputHelper output)
             var publicationsForTheme = await sut.GetPublicationsForTheme(themeId);
             foreach (var publicationInfo in publicationsForTheme)
             {
-                Print(publicationInfo.PublicationSlug);
+                PrintAsJson(publicationInfo);
             }
         }
 
@@ -160,6 +160,29 @@ public class ContentApiClientTests(ITestOutputHelper output)
             var releaseSlug = "2016-17";
             var releaseSummary = await sut.GetReleaseSummary(publicationSlug, releaseSlug);
             PrintAsJson(releaseSummary);
+        }
+        
+        [Fact(Skip = "Ping Content API")]
+        public async Task Ping()
+        {
+            var sut = GetSut();
+            var result = await sut.Ping();
+            Print($"Success: {result.WasSuccesssful}");
+            Print($"ErrorMessage: {result.ErrorMessage ?? "<null>"}");
+        }
+
+        [Fact(Skip = "Call Content API to get a searchable document")]
+        public async Task GetSearchableDocument()
+        {
+            // ARRANGE
+            var sut = GetSut();
+            var publicationSlug = "seed-publication-permanent-and-fixed-period-exclusions-in-england";
+
+            // ACT
+            var result = await sut.GetPublicationLatestReleaseSearchableDocument(publicationSlug);
+
+            // ASSERT
+            PrintAsJson(result);
         }
     }
 }
