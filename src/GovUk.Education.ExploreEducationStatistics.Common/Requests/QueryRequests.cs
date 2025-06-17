@@ -3,6 +3,7 @@ using FluentValidation;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
 using System;
 using System.Collections.Generic;
+using static GovUk.Education.ExploreEducationStatistics.Common.Utils.FilterHierarchiesOptionsUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Requests;
 
@@ -18,7 +19,7 @@ public record FullTableQueryRequest
 
     public IEnumerable<Guid> Indicators { get; set; } = new List<Guid>();
 
-    public IDictionary<Guid, List<List<Guid>>>? FilterHierarchiesOptions { get; set; } = null;
+    public IDictionary<Guid, List<FilterHierarchyOption>>? FilterHierarchiesOptions { get; set; } = null;
 
     public FullTableQuery AsFullTableQuery()
     {
@@ -30,7 +31,7 @@ public record FullTableQueryRequest
             Filters = this.Filters,
             Indicators = this.Indicators,
             FilterHierarchiesOptions =
-                FullTableQuery.CreateFilterHierarchiesOptionsFromDictionary(this.FilterHierarchiesOptions),
+                CreateFilterHierarchiesOptionsFromDictionary(this.FilterHierarchiesOptions),
         };
     }
 

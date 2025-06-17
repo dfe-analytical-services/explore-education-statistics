@@ -2,8 +2,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
+using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using Newtonsoft.Json;
+using static GovUk.Education.ExploreEducationStatistics.Common.Utils.FilterHierarchiesOptionsUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Converters
 {
@@ -37,7 +38,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Converters
                 return;
             }
 
-            var dictionary = FullTableQuery.FilterHierarchiesOptionsAsDictionary(value);
+            var dictionary = FilterHierarchiesOptionsAsDictionary(value);
 
             serializer.Serialize(writer, dictionary);
         }

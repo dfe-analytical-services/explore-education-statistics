@@ -3354,6 +3354,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var replacedFilterItemIds = replacedDataBlock.Query.GetFilterItemIds().ToList(); // all filterItems including those in FilterHierarchiesOptions
                 Assert.Equal(2, replacedFilterItemIds.Count);
+                Assert.Equal(2, replacedDataBlock.Query.GetNonHierarchicalFilterItemIds().Count()); // all filter items for the query are in `Filters` - there are no hierarchical filter items in the query
                 Assert.Equal(replacementFilterItem1.Id, replacedFilterItemIds[0]);
                 Assert.Equal(replacementFilterItem2.Id, replacedFilterItemIds[1]);
 
@@ -3882,7 +3883,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     hierarchyOptions.Options);
             }
         }
-
 
         [Fact]
         public async Task Replace_MapChart_ReplacesChartDataSetConfigs()
