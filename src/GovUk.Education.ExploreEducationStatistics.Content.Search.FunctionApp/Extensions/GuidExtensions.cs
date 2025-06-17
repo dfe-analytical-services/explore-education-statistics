@@ -5,5 +5,5 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.
 public static class GuidExtensions
 {
     public static bool IsBlank([NotNullWhen(false)]this Guid? guid) => 
-        !guid.HasValue || guid == Guid.Empty;
+        !guid.HasValue || guid.Value == Guid.Empty;
 }
