@@ -648,7 +648,8 @@ public abstract class ReleaseVersionServiceTests
                     async () => 
                         await releaseVersionService.RemoveDataFiles(
                             releaseVersionId: releaseVersion.Id,
-                            fileId: file.Id));
+                            fileId: file.Id,
+                            removeApiVersion: true));
 
                 // Verify the exception message
                 Assert.Contains(
@@ -755,7 +756,8 @@ public abstract class ReleaseVersionServiceTests
 
                 var result = await releaseVersionService.RemoveDataFiles(
                     releaseVersionId: releaseVersion.Id,
-                    fileId: file.Id);
+                    fileId: file.Id,
+                    removeApiVersion: true);
 
                 VerifyAllMocks(dataImportService, dataSetVersionService, footnoteRepository, dataBlockService);
                 if (shouldAllowRemovalOfDataFiles)

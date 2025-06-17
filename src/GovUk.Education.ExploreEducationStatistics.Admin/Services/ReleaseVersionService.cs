@@ -766,7 +766,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
-        private async Task<Either<ActionResult, Unit>> CheckCanDeleteDataFiles(Guid releaseVersionId, ReleaseFile releaseFile, bool removeDraftApi = false)
+        private async Task<Either<ActionResult, Unit>> CheckCanDeleteDataFiles(Guid releaseVersionId, ReleaseFile releaseFile, bool removingApiVersion = false)
         {
             var import = await dataImportService.GetImport(releaseFile.FileId);
             var importStatus = import?.Status ?? DataImportStatus.NOT_FOUND;
@@ -781,7 +781,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 return ValidationActionResult(CannotRemoveDataFilesOnceReleaseApproved);
             }
 
-            if (releaseFile.PublicApiDataSetId is null || !removeDraftApi)
+            if (releaseFile.PublicApiDataSetId is null || !removingApiVersion)
             {
                 return Unit.Instance;
             }
