@@ -10,10 +10,15 @@ import WarningMessage from '@common/components/WarningMessage';
 import ModalConfirm from '@common/components/ModalConfirm';
 import useToggle from '@common/hooks/useToggle';
 import logger from '@common/services/logger';
+import Tag from '@common/components/Tag';
 import DataSetUploadSummaryList from './DataSetUploadSummaryList';
 import dataSetUploadTabIds from '../utils/dataSetUploadTabIds';
 import ScreenerResultsTable from './ScreenerResultsTable';
 import styles from './DataFilesTable.module.scss';
+import {
+  getDataSetUploadStatusColour,
+  getDataSetUploadStatusLabel,
+} from './ImporterStatus';
 
 interface Props {
   canUpdateRelease?: boolean;
@@ -34,10 +39,10 @@ export default function DataFilesTableUploadRow({
   const [openDeleteConfirm, toggleOpenDeleteConfirm] = useToggle(false);
 
   const hasFailures = dataSetUpload.screenerResult.testResults.some(
-    testResult => testResult.result === 1, // FAIL
+    testResult => testResult.result === 'FAIL',
   );
   const hasWarnings = dataSetUpload.screenerResult.testResults.some(
-    testResult => testResult.result === 2, // WARNING
+    testResult => testResult.result === 'WARNING',
   );
   let tabTitle = '';
 
@@ -74,17 +79,20 @@ export default function DataFilesTableUploadRow({
         {dataSetUpload.dataSetTitle}
       </td>
       <td data-testid="Size" className={styles.fileSize}>
-        {dataSetUpload.dataFileSizeInBytes} bytes
+        {dataSetUpload.dataFileSizeInBytes}
       </td>
-      <td data-testid="Status">{dataSetUpload.status}</td>
+      <td data-testid="Status">
+        <Tag colour={getDataSetUploadStatusColour(dataSetUpload.status)}>
+          {getDataSetUploadStatusLabel(dataSetUpload.status)}
+        </Tag>
+      </td>
       <td data-testid="Actions">
         <ButtonGroup className={styles.actions}>
           <ModalConfirm
             title="Data set details"
             open={openImportConfirm}
             hideConfirm={hasFailures}
-            onConfirm={() => onConfirmImport([dataSetUpload.id])} // TODO: Add permissions check?
-            // TODO: Confirmation button should be hidden/disabled unless dataSetUpload.status is PENDING_IMPORT
+            onConfirm={() => onConfirmImport([dataSetUpload.id])}
             confirmText={confirmText}
             triggerButton={
               <ButtonText onClick={toggleOpenImportConfirm.on}>
@@ -99,7 +107,7 @@ export default function DataFilesTableUploadRow({
                   title={tabTitle}
                 >
                   {hasFailures ? (
-                    // TODO: This condition can be replaced with `overallResult` once it returns a reliable response
+                    // TODO (EES-5353): This condition can be replaced with `overallResult` once it returns a reliable response
                     <>
                       <h3>Screener test failures</h3>
                       <WarningMessage>
