@@ -308,8 +308,10 @@ public abstract class ReleaseServiceTests
 
     public class UpdateReleaseTests(ITestOutputHelper output) : ReleaseServiceTests
     {
-        [Fact]
-        public async Task GivenLiveRelease_WhenSlugUpdated_ThenEventRaised()
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public async Task GivenLiveRelease_WhenSlugUpdated_ThenEventRaised(bool isPublicationArchived)
         {
             // ARRANGE
             var expectedPublicationId = Guid.NewGuid();
@@ -320,10 +322,16 @@ public abstract class ReleaseServiceTests
             var timePeriod = TimeIdentifier.April;
             
             var expectedNewReleaseSlug = NamingUtils.CreateReleaseSlug(year, timePeriod, label);
-            
+
+            var supersedingPublication = _dataFixture
+                .DefaultPublication()
+                .WithLatestPublishedReleaseVersion(_dataFixture.DefaultReleaseVersion());
+
             var publication = _dataFixture.DefaultPublication()
                 .WithId(expectedPublicationId)
                 .WithSlug(expectedPublicationSlug)
+                .If(isPublicationArchived)
+                    .Then(p => p.WithSupersededBy(supersedingPublication))
                 .Generate();
 
             var release = _dataFixture.DefaultRelease()
@@ -338,12 +346,16 @@ public abstract class ReleaseServiceTests
                 .WithPublished(new DateTime(2025, 04, 01, 09, 16, 00)) // Release Version is live (ie has been published)
                 .Generate();
 
-            await using var context = InMemoryApplicationDbContext(Guid.NewGuid().ToString());
-            context.Publications.Add(publication);
-            context.Releases.Add(release);
-            context.ReleaseVersions.Add(releaseVersion);
-            await context.SaveChangesAsync();
-
+            var dbContextId = Guid.NewGuid().ToString();
+            
+            await using(var context = InMemoryApplicationDbContext(dbContextId))
+            {
+                context.Publications.Add(publication);
+                context.Releases.Add(release);
+                context.ReleaseVersions.Add(releaseVersion);
+                await context.SaveChangesAsync();
+            }
+            
             var releaseVersionService = new ReleaseVersionServiceMockBuilder()
                                             .WhereGetReleaseVersionReturns(releaseVersion.Id);
 
@@ -351,9 +363,11 @@ public abstract class ReleaseServiceTests
                 .SetNoReleaseVersionStatus(releaseVersion.Id);
 
             var adminEventRaiser = new AdminEventRaiserMockBuilder();
+
+            await using var context2 = InMemoryApplicationDbContext(dbContextId);
             
             var sut = BuildService(
-                                    context,
+                                    context2,
                                     releaseVersionService: releaseVersionService.Build(),
                                     releaseCacheService: new ReleaseCacheServiceMockBuilder().Build(),
                                     publicationCacheService: new PublicationCacheServiceMockBuilder().Build(),
@@ -381,7 +395,8 @@ public abstract class ReleaseServiceTests
                 expectedReleaseId,
                 expectedNewReleaseSlug,
                 expectedPublicationId,
-                expectedPublicationSlug
+                expectedPublicationSlug,
+                isPublicationArchived
                 );
         }
         

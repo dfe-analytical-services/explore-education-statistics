@@ -20,7 +20,8 @@ public class AdminEventRaiserMockBuilder
             It.IsAny<Guid>(),
             It.IsAny<string>(),
             It.IsAny<Guid>(),
-            It.IsAny<string>());
+            It.IsAny<string>(),
+            It.IsAny<bool>());
 
     private static readonly Expression<Func<IAdminEventRaiser, Task>> OnPublicationArchived =
         m => m.OnPublicationArchived(
@@ -102,12 +103,14 @@ public class AdminEventRaiserMockBuilder
             Guid? expectedReleaseId = null,
             string? expectedNewReleaseSlug = null,
             Guid? expectedPublicationId = null,
-            string? expectedPublicationSlug = null) => 
+            string? expectedPublicationSlug = null,
+            bool? expectedIsPublicationArchived = null) => 
             mockBuilder._mock.Verify(m => m.OnReleaseSlugChanged(
                     It.Is<Guid>(releaseId => expectedReleaseId == null || releaseId == expectedReleaseId), 
                     It.Is<string>(newReleaseSlug => expectedNewReleaseSlug == null || newReleaseSlug == expectedNewReleaseSlug), 
                     It.Is<Guid>(publicationId => expectedPublicationId == null || publicationId == expectedPublicationId), 
-                    It.Is<string>(publicationSlug => expectedPublicationSlug == null || publicationSlug == expectedPublicationSlug)),
+                    It.Is<string>(publicationSlug => expectedPublicationSlug == null || publicationSlug == expectedPublicationSlug),
+                    It.Is<bool>(isPublicationArchived => expectedIsPublicationArchived == null || isPublicationArchived == expectedIsPublicationArchived)),
                 Times.Once);
 
         public void OnReleaseSlugChangedWasNotRaised() =>

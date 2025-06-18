@@ -39,8 +39,10 @@ public class AdminEventRaiserTests
         _eventRaiserMockBuilder.Assert.EventRaised(expectedEvent);
     }
 
-    [Fact]
-    public async Task WhenOnReleaseSlugChanged_ThenEventPublished()
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public async Task WhenOnReleaseSlugChanged_ThenEventPublished(bool isPublicationArchived)
     {
         // ARRANGE
         var releaseId = Guid.NewGuid();
@@ -55,14 +57,16 @@ public class AdminEventRaiserTests
             releaseId,
             newReleaseSlug,
             publicationId,
-            publicationSlug);
+            publicationSlug,
+            isPublicationArchived);
 
         // ASSERT
         var expectedEvent = new ReleaseSlugChangedEvent(
             releaseId,
             newReleaseSlug,
             publicationId,
-            publicationSlug);
+            publicationSlug,
+            isPublicationArchived);
         _eventRaiserMockBuilder.Assert.EventRaised(expectedEvent);
     }
 

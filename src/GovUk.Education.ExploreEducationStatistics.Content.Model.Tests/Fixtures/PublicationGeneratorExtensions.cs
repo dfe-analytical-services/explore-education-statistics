@@ -305,4 +305,16 @@ public static class PublicationGeneratorExtensions
         this InstanceSetters<Publication> setters,
         DateTime? updated)
         => setters.Set(p => p.Updated, updated);
+
+    public static ConditionalGeneratorDeclaration If(this Generator<Publication> generator, bool condition) =>
+        new(condition, generator);
+        
+
+    public class ConditionalGeneratorDeclaration(bool condition, Generator<Publication> generator)
+    {
+        public Generator<Publication> Then(Func<Generator<Publication>, Generator<Publication>> action) =>
+            condition
+                ? action(generator)
+                : generator;
+    }
 }
