@@ -17,6 +17,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
+using Microsoft.Extensions.Options;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -308,7 +309,7 @@ public class DataSetFileStorage(
                 && replacingFile is not null
                 && replacedReleaseDataFile!.PublicApiDataSetId != null)
             { 
-                await CreateNextDraftDataSetVersion(cancellationToken, replacedReleaseDataFile!, dataReleaseFile);
+                await CreateNextDraftDataSetVersion(dataReleaseFile.Id, replacedReleaseDataFile, cancellationToken);
             }
 
             await dataImportService.Import(subjectId, dataFile, metaFile);
