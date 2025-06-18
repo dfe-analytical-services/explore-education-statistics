@@ -477,8 +477,9 @@ const DataFileReplacementPlan = ({
                     breaking changes, please{' '}
                     {apiDataSetsTabRoute && (
                       <Link to={apiDataSetsTabRoute} unvisited>
-                        go to the API data sets tab (Link requires BAU
-                        permissions)
+                        go to the API data sets tab (This page is currently only
+                        accessible to certain users, please contact the EES team
+                        for support with API data sets)
                       </Link>
                     )}
                     .
@@ -499,8 +500,9 @@ const DataFileReplacementPlan = ({
                       Please{' '}
                       {apiDataSetsTabRoute && (
                         <Link to={apiDataSetsTabRoute} unvisited>
-                          go to the API data sets tab (Link requires BAU
-                          permissions)
+                          go to the API data sets tab (This page is currently
+                          only accessible to certain users, please contact the
+                          EES team for support with API data sets)
                         </Link>
                       )}{' '}
                       and complete manual mapping process for filters.
@@ -524,8 +526,9 @@ const DataFileReplacementPlan = ({
                       Please{' '}
                       {apiDataSetsTabRoute && (
                         <Link to={apiDataSetsTabRoute} unvisited>
-                          go to the API data sets tab (Link requires BAU
-                          permissions)
+                          go to the API data sets tab (This page is currently
+                          only accessible to certain users, please contact the
+                          EES team for support with API data sets)
                         </Link>
                       )}{' '}
                       and complete manual mapping process for locations.
@@ -548,8 +551,9 @@ const DataFileReplacementPlan = ({
                       Please{' '}
                       {apiDataSetsTabRoute && (
                         <Link to={apiDataSetsTabRoute} unvisited>
-                          go to the API data sets tab (Link requires BAU
-                          permissions)
+                          go to the API data sets tab (This page is currently
+                          only accessible to certain users, please contact the
+                          EES team for support with API data sets)
                         </Link>
                       )}{' '}
                       and finalize the data set version mapping process.
