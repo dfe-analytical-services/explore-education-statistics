@@ -5,6 +5,7 @@
     "FUNCTIONS_WORKER_RUNTIME": "dotnet-isolated",
     "PublicationArchivedQueueName": "publication-archived-queue",
     "PublicationChangedQueueName": "publication-changed-queue",
+    "PublicationDeletedQueueName": "publication-deleted-queue",
     "PublicationLatestPublishedReleaseReorderedQueueName" : "publication-latest-published-release-reordered-queue",
     "PublicationRestoredQueueName": "publication-restored-queue",
     "RefreshSearchableDocumentQueueName": "refresh-searchable-document-queue",
