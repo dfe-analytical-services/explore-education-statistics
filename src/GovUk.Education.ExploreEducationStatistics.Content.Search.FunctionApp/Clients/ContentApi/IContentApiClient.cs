@@ -20,7 +20,7 @@ public interface IContentApiClient
     /// A simple call to check whether the Content API is available
     /// </summary>
     /// <returns>true if Content API responded, otherwise false and any error message</returns>
-    Task<(bool WasSuccesssful, string? ErrorMessage)> Ping(CancellationToken cancellationToken);
+    Task<(bool WasSuccesssful, string? ErrorMessage)> Ping(CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Given a Theme, get the Publications

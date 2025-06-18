@@ -369,7 +369,7 @@ public class PublicationService : IPublicationService
                 p.LatestPublishedReleaseVersionId.HasValue 
                 // Is not superseded/archived
                 && (p.SupersededById == null || !p.SupersededBy!.LatestPublishedReleaseVersionId.HasValue))
-            .If(themeId.IsNotBlank())
+            .If(!themeId.IsBlank())
                 .ThenWhere(p => p.ThemeId == themeId!.Value)
             .Select(publication => PublicationInfoViewModel.FromEntity(publication))
             .ToListAsync(cancellationToken);
