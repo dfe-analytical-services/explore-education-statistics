@@ -18,7 +18,8 @@ public record ReleaseVersionPublishedEvent : IEvent
             LatestPublishedReleaseId = eventInfo.LatestPublishedReleaseId,
             LatestPublishedReleaseVersionId = eventInfo.LatestPublishedReleaseVersionId,
             PreviousLatestPublishedReleaseId = eventInfo.PreviousLatestPublishedReleaseId,
-            PreviousLatestPublishedReleaseVersionId = eventInfo.PreviousLatestPublishedReleaseVersionId
+            PreviousLatestPublishedReleaseVersionId = eventInfo.PreviousLatestPublishedReleaseVersionId,
+            IsPublicationArchived = eventInfo.IsPublicationArchived
         };
     }
 
@@ -48,6 +49,7 @@ public record ReleaseVersionPublishedEvent : IEvent
         public required Guid LatestPublishedReleaseVersionId { get; init; }
         public required Guid? PreviousLatestPublishedReleaseId { get; init; }
         public required Guid? PreviousLatestPublishedReleaseVersionId { get; init; }
+        public required bool IsPublicationArchived { get; init; }
     }
     public EventPayload Payload { get; }
     
@@ -101,5 +103,10 @@ public record ReleaseVersionPublishedEvent : IEvent
         /// The latest published release version id of the publication's latest published release before the release version was published.
         /// </summary>
         public required Guid? PreviousLatestPublishedReleaseVersionId { get; init; }
+        
+        /// <summary>
+        /// Indicates whether the associated publication is archived
+        /// </summary>
+        public required bool IsPublicationArchived { get; init; }
     }
 }
