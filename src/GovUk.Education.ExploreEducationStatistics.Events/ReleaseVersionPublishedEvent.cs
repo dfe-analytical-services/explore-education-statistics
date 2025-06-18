@@ -25,11 +25,11 @@ public record ReleaseVersionPublishedEvent : IEvent
 
     // Changes to this event should also increment the version accordingly.
     public const string DataVersion = "1.0";
-    public const string EventType = "release-version-published";
-    
+    public const string EventType = ReleaseVersionChangedEventTypes.ReleaseVersionPublished;
+
     // Which Topic endpoint to use from the appsettings
     public static string EventTopicOptionsKey => "ReleaseVersionChangedEvent";
-    
+
     /// <summary>
     /// The ReleaseVersionId is the subject
     /// </summary>
@@ -51,8 +51,9 @@ public record ReleaseVersionPublishedEvent : IEvent
         public required Guid? PreviousLatestPublishedReleaseVersionId { get; init; }
         public required bool IsPublicationArchived { get; init; }
     }
+
     public EventPayload Payload { get; }
-    
+
     public EventGridEvent ToEventGridEvent() => new(Subject, EventType, DataVersion, Payload);
 
     public record ReleaseVersionPublishedEventInfo

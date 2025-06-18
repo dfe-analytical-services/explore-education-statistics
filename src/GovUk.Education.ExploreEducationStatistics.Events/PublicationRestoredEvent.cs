@@ -20,7 +20,7 @@ public record PublicationRestoredEvent : IEvent
 
     // Changes to this event should also increment the version accordingly.
     private const string DataVersion = "1.0";
-    private const string EventType = "publication-restored";
+    private const string EventType = PublicationChangedEventTypes.PublicationRestored;
 
     // Which Topic endpoint to use from the appsettings
     public static string EventTopicOptionsKey => "PublicationChangedEvent";
