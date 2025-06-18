@@ -25,7 +25,7 @@ public record ReleaseSlugChangedEvent : IEvent
     private const string EventType = ReleaseChangedEventTypes.ReleaseSlugChanged;
 
     // Which Topic endpoint to use from the appsettings
-    public static string EventTopicOptionsKey => "ReleaseChangedEvent";
+    public static string EventTopicOptionsKey => EventTopicOptionsKeys.ReleaseChanged;
 
     /// <summary>
     /// The ThemeId is the subject

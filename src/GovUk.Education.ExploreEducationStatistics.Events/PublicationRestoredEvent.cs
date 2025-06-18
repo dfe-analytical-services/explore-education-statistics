@@ -23,7 +23,7 @@ public record PublicationRestoredEvent : IEvent
     private const string EventType = PublicationChangedEventTypes.PublicationRestored;
 
     // Which Topic endpoint to use from the appsettings
-    public static string EventTopicOptionsKey => "PublicationChangedEvent";
+    public static string EventTopicOptionsKey => EventTopicOptionsKeys.PublicationChanged;
 
     /// <summary>
     /// The PublicationId is the subject

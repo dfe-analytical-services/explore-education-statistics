@@ -25,7 +25,7 @@ public record ThemeChangedEvent : IEvent
     private const string EventType = ThemeChangedEventTypes.ThemeChanged;
 
     // Which Topic endpoint to use from the appsettings
-    public static string EventTopicOptionsKey => "ThemeChangedEvent";
+    public static string EventTopicOptionsKey => EventTopicOptionsKeys.ThemeChanged;
 
     /// <summary>
     /// The ThemeId is the subject

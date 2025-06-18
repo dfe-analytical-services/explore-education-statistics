@@ -28,7 +28,7 @@ public record ReleaseVersionPublishedEvent : IEvent
     public const string EventType = ReleaseVersionChangedEventTypes.ReleaseVersionPublished;
 
     // Which Topic endpoint to use from the appsettings
-    public static string EventTopicOptionsKey => "ReleaseVersionChangedEvent";
+    public static string EventTopicOptionsKey => EventTopicOptionsKeys.ReleaseVersionChanged;
 
     /// <summary>
     /// The ReleaseVersionId is the subject
