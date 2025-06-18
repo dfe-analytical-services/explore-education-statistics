@@ -91,18 +91,11 @@ public class DataSetFileStorage(
             createdById: userService.GetUserId());
 
         await UploadDataSetToReleaseStorage(releaseVersionId, dataFile.Id, metaFile.Id, dataSet, cancellationToken);
-
-        var releaseFileHasApiDataSet = await contentDbContext.ReleaseFiles.AnyAsync(rf =>
-                rf.ReleaseVersionId == releaseVersionId &&
-                rf.Name == dataSet.Title &&
-                rf.PublicApiDataSetId != null,
-            cancellationToken);
-
-        if (featureFlags.Value.EnableReplacementOfPublicApiDataSets
-            && dataSet.ReplacingFile is not null
-            && replacedReleaseDataFile is not null
-            && releaseFileHasApiDataSet)
-        {
+        
+        if (featureFlags.Value.EnableReplacementOfPublicApiDataSets 
+            && dataSet.ReplacingFile is not null 
+            && replacedReleaseDataFile!.PublicApiDataSetId != null)
+        { 
             await CreateNextDraftDataSetVersion(dataReleaseFile.Id, replacedReleaseDataFile, cancellationToken);
         }
 
