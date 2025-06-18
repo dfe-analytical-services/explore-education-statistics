@@ -79,7 +79,7 @@ export default function DataFilesTableUploadRow({
         {dataSetUpload.dataSetTitle}
       </td>
       <td data-testid="Size" className={styles.fileSize}>
-        {dataSetUpload.dataFileSizeInBytes}
+        {dataSetUpload.dataFileSize}
       </td>
       <td data-testid="Status">
         <Tag colour={getDataSetUploadStatusColour(dataSetUpload.status)}>

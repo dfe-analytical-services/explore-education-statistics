@@ -1,8 +1,8 @@
 #nullable enable
+using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
@@ -218,7 +218,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         var service = SetupReleaseDataFileService(userService: userService.Object);
                         return service.SaveDataSetsFromTemporaryBlobStorage(
                             releaseVersionId: _releaseVersion.Id,
-                            dataSetFiles: new Mock<List<DataSetUploadResultViewModel>>().Object,
+                            dataSetUploadIds: [],
                             cancellationToken: default);
                     }
                 );
@@ -234,7 +234,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             IReleaseFileService? releaseFileService = null,
             IDataImportService? dataImportService = null,
             IDataSetFileStorage? dataSetFileStorage = null,
-            IUserService? userService = null)
+            IUserService? userService = null,
+            IDataSetScreenerClient? dataSetScreenerClient = null,
+            IMapper? mapper = null)
         {
             contentDbContext ??= new Mock<ContentDbContext>().Object;
             privateBlobStorageService ??= new Mock<IPrivateBlobStorageService>(MockBehavior.Strict).Object;
@@ -251,7 +253,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 releaseFileService ?? new Mock<IReleaseFileService>(MockBehavior.Strict).Object,
                 dataImportService,
                 userService,
-                dataSetFileStorage ?? new Mock<IDataSetFileStorage>(MockBehavior.Strict).Object
+                dataSetFileStorage ?? new Mock<IDataSetFileStorage>(MockBehavior.Strict).Object,
+                dataSetScreenerClient ?? new Mock<IDataSetScreenerClient>(MockBehavior.Strict).Object,
+                mapper ?? new Mock<IMapper>(MockBehavior.Strict).Object
             );
         }
 

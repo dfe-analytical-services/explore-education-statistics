@@ -1,7 +1,8 @@
 #nullable enable
+using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
+using GovUk.Education.ExploreEducationStatistics.Admin.Tests.MockBuilders;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
@@ -1755,17 +1756,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async Task SaveDataSetsFromTemporaryBlobStorage_Success_ReturnsUploadSummary()
+        public async Task SaveDataSetsFromTemporaryBlobStorage_Success_ReturnsOk()
         {
             // Arrange
-            var dataSetName = "Test Data Set";
+            ReleaseVersion releaseVersion = _fixture.DefaultReleaseVersion()
+                .WithRelease(_fixture.DefaultRelease()
+                    .WithPublication(_fixture.DefaultPublication()));
 
             var dataFile = _fixture
                 .DefaultFile()
                 .WithType(FileType.Data)
                 .Generate();
 
-            var metaFile = _fixture.DefaultFile().WithType(FileType.Metadata).Generate();
+            var metaFile = _fixture
+                .DefaultFile()
+                .WithType(FileType.Metadata)
+                .Generate();
+
+            var dataSetUpload = new DataSetUploadMockBuilder()
+                .WithReleaseVersionId(releaseVersion.Id)
+                .BuildEntity();
 
             var import = new DataImport
             {
@@ -1780,34 +1790,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 _fixture.DefaultReleaseFile().WithFile(dataFile).Generate(),
             };
 
-            ReleaseVersion releaseVersion = _fixture.DefaultReleaseVersion()
-                .WithRelease(_fixture.DefaultRelease()
-                    .WithPublication(_fixture.DefaultPublication()));
-
             var contentDbContextId = Guid.NewGuid().ToString();
             await using var contentDbContext = InMemoryApplicationDbContext(contentDbContextId);
 
             contentDbContext.ReleaseVersions.Add(releaseVersion);
             contentDbContext.DataImports.Add(import);
+            contentDbContext.DataSetUploads.Add(dataSetUpload);
             await contentDbContext.SaveChangesAsync();
 
             var privateBlobStorageService = new Mock<IPrivateBlobStorageService>(Strict);
             var dataSetFileStorage = new Mock<IDataSetFileStorage>(Strict);
 
-            var dataSetFile = new DataSetUploadResultViewModel
-            {
-                Title = dataSetName,
-                DataFileId = dataFile.Id,
-                DataFileName = dataFile.Filename,
-                DataFileSize = 434,
-                MetaFileId = metaFile.Id,
-                MetaFileName = metaFile.Filename,
-                MetaFileSize = 157,
-                ReplacingFileId = null,
-            };
-
-            var dataPath = $"{releaseVersion.Id}/data/{dataSetFile.DataFileId}";
-            var metaPath = $"{releaseVersion.Id}/data/{dataSetFile.MetaFileId}";
+            var dataPath = $"{releaseVersion.Id}/data/{dataSetUpload.DataFileId}";
+            var metaPath = $"{releaseVersion.Id}/data/{dataSetUpload.MetaFileId}";
 
             privateBlobStorageService.SetupCheckBlobExists(PrivateReleaseTempFiles, dataPath, exists: true);
             privateBlobStorageService.SetupCheckBlobExists(PrivateReleaseTempFiles, metaPath, exists: true);
@@ -1815,7 +1810,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             dataSetFileStorage
                 .Setup(mock => mock.MoveDataSetsToPermanentStorage(
                     It.IsAny<Guid>(),
-                    It.IsAny<List<DataSetUploadResultViewModel>>(),
+                    It.IsAny<List<DataSetUpload>>(),
                     It.IsAny<CancellationToken>()))
                 .Returns(Task.FromResult(releaseFiles));
 
@@ -1827,21 +1822,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             // Act
             var result = await service.SaveDataSetsFromTemporaryBlobStorage(
                 releaseVersion.Id,
-                [dataSetFile],
+                [dataSetUpload.Id],
                 cancellationToken: default);
 
             // Assert
             MockUtils.VerifyAllMocks(privateBlobStorageService, dataSetFileStorage);
+            result.AssertRight();
+            Assert.Empty(contentDbContext.DataSetUploads);
+        }
 
-            var files = result.AssertRight();
-            var dataFileInfo = files.Single();
-            Assert.Equal(releaseFiles[0].Name, dataFileInfo.Name);
-            Assert.Equal(dataFile.Id, dataFileInfo.Id);
-            Assert.Equal(dataFile.Filename, dataFileInfo.FileName);
-            Assert.Equal(metaFile.Id, dataFileInfo.MetaFileId);
-            Assert.Equal(metaFile.Filename, dataFileInfo.MetaFileName);
-            Assert.Equal(QUEUED, dataFileInfo.Status);
-            Assert.Equal(FileType.Data, dataFileInfo.Type);
+        public async Task SaveDataSetsFromTemporaryBlobStorage_InvalidUploadStatus_ReturnsFail()
+        {
+            // Arrange
+            // Act
+            // Assert
         }
 
         private ReleaseDataFileService SetupReleaseDataFileService(
@@ -1854,7 +1848,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             IReleaseFileService? releaseFileService = null,
             IDataImportService? dataImportService = null,
             IDataSetFileStorage? dataSetFileStorage = null,
-            IUserService? userService = null)
+            IUserService? userService = null,
+            IDataSetScreenerClient? dataSetScreenerClient = null,
+            IMapper? mapper = null)
         {
             contentDbContext.Users.Add(_user);
             contentDbContext.SaveChanges();
@@ -1869,7 +1865,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 releaseFileService ?? Mock.Of<IReleaseFileService>(Strict),
                 dataImportService ?? Mock.Of<IDataImportService>(Strict),
                 userService ?? MockUtils.AlwaysTrueUserService(_user.Id).Object,
-                dataSetFileStorage ?? Mock.Of<IDataSetFileStorage>(Strict)
+                dataSetFileStorage ?? Mock.Of<IDataSetFileStorage>(Strict),
+                dataSetScreenerClient ?? Mock.Of<IDataSetScreenerClient>(Strict),
+                mapper ?? Mock.Of<IMapper>(Strict)
             );
         }
     }

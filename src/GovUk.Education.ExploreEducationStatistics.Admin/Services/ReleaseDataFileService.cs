@@ -515,7 +515,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .CheckEntityExists<ReleaseVersion>(releaseVersionId)
                 .OnSuccess(userService.CheckCanUpdateReleaseVersion)
                 .OnSuccess(_ => dataSetUploadIds
-                    .Select(dataSetUploadId => ValidateTempDataSetFileExistence(releaseVersionId, dataSetUploadId, cancellationToken))
+                    .Select(dataSetUploadId => ValidateDataSetUploadExistence(releaseVersionId, dataSetUploadId, cancellationToken))
                     .OnSuccessAll())
                 .OnSuccess(dataSetUploads => dataSetUploads
                     .Select(ValidateDataSetCanBeImported)
@@ -530,7 +530,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
-        private async Task<Either<ActionResult, DataSetUpload>> ValidateTempDataSetFileExistence(
+        private async Task<Either<ActionResult, DataSetUpload>> ValidateDataSetUploadExistence(
             Guid releaseVersionId,
             Guid dataSetUploadId,
             CancellationToken cancellationToken)

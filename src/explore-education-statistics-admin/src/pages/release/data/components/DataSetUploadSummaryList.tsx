@@ -28,7 +28,7 @@ export default function DataSetUploadSummaryList({ dataSetUpload }: Props) {
         {dataSetUpload.metaFileName}
       </SummaryListItem>
       <SummaryListItem term="Size">
-        {dataSetUpload.dataFileSizeInBytes}
+        {dataSetUpload.dataFileSize}
       </SummaryListItem>
       <SummaryListItem term="Status">
         <Tag colour={getDataSetUploadStatusColour(dataSetUpload.status)}>
