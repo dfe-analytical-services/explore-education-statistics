@@ -17,9 +17,9 @@ const downloadService = {
   ): Promise<void> {
     const query = qs.stringify({ fileIds }, { arrayFormat: 'comma' });
 
-    downloadFile(
-      `${contentApi.baseURL}/releases/${releaseVersionId}/files?${query}`,
-    );
+    downloadFile({
+      file: `${contentApi.baseURL}/releases/${releaseVersionId}/files?${query}`,
+    });
   },
 };
 
