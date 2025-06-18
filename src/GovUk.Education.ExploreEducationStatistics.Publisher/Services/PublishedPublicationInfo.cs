@@ -44,4 +44,9 @@ public partial record PublishedPublicationInfo
     /// </summary>
     ///
     public bool WasAlreadyPublished => PreviousLatestPublishedReleaseVersionId != null;
+    
+    /// <summary>
+    /// Indicated whether the publication is archived/superseded
+    /// </summary>
+    public required bool IsPublicationArchived { get; init; }
 }
