@@ -92,7 +92,7 @@ public class DataSetFileStorage(
             && dataSet.ReplacingFile is not null 
             && replacedReleaseDataFile!.PublicApiDataSetId != null)
         { 
-            await CreateNextDraftDataSetVersion(cancellationToken, replacedReleaseDataFile!, dataReleaseFile);
+            await CreateNextDraftDataSetVersion(dataReleaseFile.Id, replacedReleaseDataFile, cancellationToken);
         }
 
         var dataImport = await dataImportService.Import(subjectId, dataFile, metaFile);
@@ -119,9 +119,9 @@ public class DataSetFileStorage(
     }
 
     private async Task CreateNextDraftDataSetVersion(
-        CancellationToken cancellationToken,
+        Guid dataReleaseFileId,
         ReleaseFile replacedReleaseDataFile,
-        ReleaseFile dataReleaseFile)
+        CancellationToken cancellationToken)
     {
         var dataSetId = replacedReleaseDataFile.PublicApiDataSetId;
 
@@ -138,7 +138,7 @@ public class DataSetFileStorage(
             })
             .OnSuccessDo(async dataSetVersion =>
                 await dataSetVersionService.CreateNextVersion(
-                        dataReleaseFile.Id,
+                        dataReleaseFileId,
                         replacedReleaseDataFile!.PublicApiDataSetId!.Value,
                         dataSetVersion.Id,
                         cancellationToken
