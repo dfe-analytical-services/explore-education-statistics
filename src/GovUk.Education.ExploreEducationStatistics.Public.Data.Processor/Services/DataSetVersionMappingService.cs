@@ -157,6 +157,7 @@ internal class DataSetVersionMappingService(
         {
             mapping.TargetDataSetVersion.VersionMajor += 1;
             mapping.TargetDataSetVersion.VersionMinor = 0;
+            mapping.TargetDataSetVersion.VersionPatch = 0;
         }
 
         publicDataDbContext.DataSetVersionMappings.Update(mapping);
