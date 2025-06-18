@@ -1291,9 +1291,19 @@ public class PublicationServiceTests
         }
     }
 
-    [Fact]
-    public async Task UpdatePublication_TitleChangesPublicationAndMethodologySlug()
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public async Task UpdatePublication_TitleChangesPublicationAndMethodologySlug(bool isPublicationArchived)
     {
+        var supersedingPublication = isPublicationArchived 
+            ? new Publication
+                {
+                    Id = Guid.NewGuid(), 
+                    LatestPublishedReleaseVersionId = Guid.NewGuid()
+                } 
+            : null;
+        
         var publication = new Publication
         {
             Slug = "old-title",
@@ -1307,6 +1317,8 @@ public class PublicationServiceTests
                 TeamEmail = "old.smith@test.com",
             },
             LatestPublishedReleaseVersion = new ReleaseVersion(),
+            SupersededById = supersedingPublication?.Id,
+            SupersededBy = supersedingPublication
         };
 
         var methodologyVersionId = Guid.NewGuid();
@@ -1384,6 +1396,7 @@ public class PublicationServiceTests
                     ThemeId = publication.ThemeId,
                     Title = "New title",
                     Summary = "New summary",
+                    SupersededById = supersedingPublication?.Id
                 }
             );
 
@@ -1401,6 +1414,7 @@ public class PublicationServiceTests
             var updatedPublication = await context.Publications
                 .Include(p => p.Contact)
                 .Include(p => p.Theme)
+                .Include(p => p.SupersededBy)
                 .SingleAsync(p => p.Title == "New title");
 
             Assert.True(updatedPublication.Live);
@@ -1417,6 +1431,7 @@ public class PublicationServiceTests
             var redirect = Assert.Single(publicationRedirects);
             Assert.Equal(publication.Id, redirect.PublicationId);
             Assert.Equal("old-title", redirect.Slug);
+            
             AssertOnPublicationChangedEventRaised(updatedPublication);
         }
     }
