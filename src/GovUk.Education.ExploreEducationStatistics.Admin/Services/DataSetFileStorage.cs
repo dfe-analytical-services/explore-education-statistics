@@ -393,7 +393,7 @@ public class DataSetFileStorage(
                 && replacingFile is not null
                 && replacedReleaseDataFile!.PublicApiDataSetId != null)
             { 
-                await CreateNextDraftDataSetVersion(cancellationToken, replacedReleaseDataFile!, dataReleaseFile);
+                await CreateDraftDataSetVersion(dataReleaseFile.Id, replacedReleaseDataFile, cancellationToken);
             }
 
             await dataImportService.Import(subjectId, dataFile, metaFile);
