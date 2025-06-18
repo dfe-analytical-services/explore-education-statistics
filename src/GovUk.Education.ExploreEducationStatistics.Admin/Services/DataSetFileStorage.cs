@@ -13,13 +13,13 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
 using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainers;
 using IReleaseVersionRepository = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IReleaseVersionRepository;
 
@@ -33,7 +33,7 @@ public class DataSetFileStorage(
     IDataImportService dataImportService,
     IUserService userService,
     IDataSetVersionService dataSetVersionService,
-    IOptions<FeatureFlagsOptions> featureFlags, 
+    IOptions<FeatureFlagsOptions> featureFlags,
     ILogger<DataSetFileStorage> logger) : IDataSetFileStorage
 {
     public async Task<DataFileInfo> UploadDataSet(
@@ -86,17 +86,17 @@ public class DataSetFileStorage(
             createdById: userService.GetUserId());
 
         await UploadDataSetToReleaseStorage(releaseVersionId, dataFile.Id, metaFile.Id, dataSet, cancellationToken);
-        
+
         var releaseFileHasApiDataSet = await contentDbContext.ReleaseFiles.AnyAsync(rf =>
                 rf.ReleaseVersionId == releaseVersionId &&
                 rf.Name == dataSet.Title &&
                 rf.PublicApiDataSetId != null,
             cancellationToken);
 
-        if (featureFlags.Value.EnableReplacementOfPublicApiDataSets 
-            && dataSet.ReplacingFile is not null 
+        if (featureFlags.Value.EnableReplacementOfPublicApiDataSets
+            && dataSet.ReplacingFile is not null
             && releaseFileHasApiDataSet)
-        { 
+        {
             await CreateNextDraftDataSetVersion(cancellationToken, replacedReleaseDataFile!, dataReleaseFile);
         }
 
@@ -184,24 +184,22 @@ public class DataSetFileStorage(
     }
 
     public async Task<List<DataSetUpload>> UploadDataSetsToTemporaryStorage(
-        Guid releaseVersionId,
-        List<DataSet> dataSets,
-        CancellationToken cancellationToken)
+    Guid releaseVersionId,
+    List<DataSet> dataSets,
+    CancellationToken cancellationToken)
     {
-        var uploads = new List<DataSetUpload>();
-        // TODO: Refactor with Select
-        foreach (var dataSet in dataSets)
-        {
-            uploads.Add(await UploadDataSetToTemporaryStorage(releaseVersionId, dataSet, cancellationToken));
-        }
+        var uploadTasks = dataSets.Select(dataSet
+            => UploadDataSetToTemporaryStorage(releaseVersionId, dataSet, cancellationToken));
 
-        return uploads;
+        var uploads = await Task.WhenAll(uploadTasks);
+
+        return [.. uploads];
     }
 
     /// <summary>
     /// Upload the supplied data set files to temporary blob storage.
     /// </summary>
-    /// <returns>An object consisting of newly generated IDs representing the uploaded files. The IDs are used to locate the files in virtual storage.</returns>
+    /// <returns>An entity representing the uploaded files. The IDs are used to locate the files in virtual storage.</returns>
     private async Task<DataSetUpload> UploadDataSetToTemporaryStorage(
         Guid releaseVersionId,
         DataSet dataSet,
@@ -229,24 +227,7 @@ public class DataSetFileStorage(
         await dataSet.DataFile.FileStream.DisposeAsync();
         await dataSet.MetaFile.FileStream.DisposeAsync();
 
-        return await CreateOrReplaceExistingDbRecord(releaseVersionId, dataSet, dataFileId, metaFileId, cancellationToken);
-    }
-
-    private async Task<DataSetUpload> CreateOrReplaceExistingDbRecord(Guid releaseVersionId, DataSet dataSet, Guid dataFileId, Guid metaFileId, CancellationToken cancellationToken)
-    {
-        var existingUpload = await contentDbContext.DataSetUploads.SingleOrDefaultAsync(upload =>
-            (upload.ReleaseVersionId == releaseVersionId && upload.DataSetTitle == dataSet.Title) ||
-            (upload.ReleaseVersionId == releaseVersionId && upload.DataFileName == dataSet.DataFile.FileName && upload.MetaFileName == dataSet.MetaFile.FileName),
-            cancellationToken);
-
-        if (existingUpload is not null)
-        {
-            contentDbContext.DataSetUploads.Remove(existingUpload);
-            await privateBlobStorageService.DeleteBlob(PrivateReleaseTempFiles, existingUpload.DataFilePath);
-            await privateBlobStorageService.DeleteBlob(PrivateReleaseTempFiles, existingUpload.MetaFilePath);
-        }
-
-        var dataSetUpload = new DataSetUpload
+        return new DataSetUpload
         {
             ReleaseVersionId = releaseVersionId,
             DataSetTitle = dataSet.Title,
@@ -260,6 +241,21 @@ public class DataSetFileStorage(
             UploadedBy = userService.GetProfileFromClaims().Email,
             ReplacingFileId = dataSet.ReplacingFile?.Id
         };
+    }
+
+    public async Task<DataSetUpload> CreateOrReplaceExistingDbRecord(Guid releaseVersionId, DataSetUpload dataSetUpload, CancellationToken cancellationToken)
+    {
+        var existingUpload = await contentDbContext.DataSetUploads.SingleOrDefaultAsync(existingUpload =>
+            (existingUpload.ReleaseVersionId == releaseVersionId && existingUpload.DataSetTitle == dataSetUpload.DataSetTitle) ||
+            (existingUpload.ReleaseVersionId == releaseVersionId && existingUpload.DataFileName == dataSetUpload.DataFileName && existingUpload.MetaFileName == dataSetUpload.MetaFileName),
+            cancellationToken);
+
+        if (existingUpload is not null)
+        {
+            contentDbContext.DataSetUploads.Remove(existingUpload);
+            await privateBlobStorageService.DeleteBlob(PrivateReleaseTempFiles, existingUpload.DataFilePath);
+            await privateBlobStorageService.DeleteBlob(PrivateReleaseTempFiles, existingUpload.MetaFilePath);
+        }
 
         await contentDbContext.DataSetUploads.AddAsync(dataSetUpload, cancellationToken);
         await contentDbContext.SaveChangesAsync(cancellationToken);
