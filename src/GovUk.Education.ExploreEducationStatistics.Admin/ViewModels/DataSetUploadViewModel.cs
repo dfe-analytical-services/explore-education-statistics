@@ -11,11 +11,11 @@ public record DataSetUploadViewModel
 
     public required string DataFileName { get; init; }
 
-    public required string DataFileSizeInBytes { get; init; }
+    public required string DataFileSize { get; init; }
 
     public required string MetaFileName { get; init; }
 
-    public required string MetaFileSizeInBytes { get; init; }
+    public required string MetaFileSize { get; init; }
 
     public required string Status { get; set; }
 

@@ -42,9 +42,9 @@ export interface DataSetUpload {
   id: string;
   dataSetTitle: string;
   dataFileName: string;
-  dataFileSizeInBytes: number;
+  dataFileSize: string;
   metaFileName: string;
-  metaFileSizeInBytes: number;
+  metaFileSize: string;
   status: DataSetUploadStatus;
   screenerResult: ScreenerResult;
   created: Date;
@@ -107,16 +107,6 @@ export type UploadDataFilesRequest = {
 export type UploadZipDataFileRequest = {
   title: string;
   zipFile: File;
-  replacingFileId?: string;
-};
-
-export type DataSetUploadResult = {
-  id: string;
-  dataSetTitle: string;
-  dataFileName: string;
-  metaFileName: string;
-  status: string;
-  screenerResult: object | undefined;
   replacingFileId?: string;
 };
 
@@ -241,7 +231,7 @@ const releaseDataFileService = {
   async uploadDataSetFilePair(
     releaseId: string,
     request: UploadDataFilesRequest,
-  ): Promise<DataSetUploadResult[]> {
+  ): Promise<void> {
     const { dataFile, metadataFile, title, replacingFileId } = request;
 
     const data = new FormData();
@@ -251,12 +241,12 @@ const releaseDataFileService = {
     data.append('metaFile', metadataFile);
     data.append('replacingFileId', replacingFileId ?? '');
 
-    return client.post<DataSetUploadResult[]>('/releaseVersions/data', data);
+    return client.post('/releaseVersions/data', data);
   },
   async uploadZippedDataSetFilePair(
     releaseId: string,
     request: UploadZipDataFileRequest,
-  ): Promise<DataSetUploadResult[]> {
+  ): Promise<void> {
     const { zipFile, title, replacingFileId } = request;
 
     const data = new FormData();
@@ -265,23 +255,17 @@ const releaseDataFileService = {
     data.append('zipFile', zipFile);
     data.append('replacingFileId', replacingFileId ?? '');
 
-    return client.post<DataSetUploadResult[]>(
-      '/releaseVersions/zip-data',
-      data,
-    );
+    return client.post('/releaseVersions/zip-data', data);
   },
   async uploadBulkZipDataSetFile(
     releaseId: string,
     zipFile: File,
-  ): Promise<DataSetUploadResult[]> {
+  ): Promise<void> {
     const data = new FormData();
     data.append('releaseVersionId', releaseId);
     data.append('zipFile', zipFile);
 
-    return client.post<DataSetUploadResult[]>(
-      'releaseVersions/upload-bulk-zip-data',
-      data,
-    );
+    return client.post('releaseVersions/upload-bulk-zip-data', data);
   },
   async deleteDataSetUpload(
     releaseId: string,
