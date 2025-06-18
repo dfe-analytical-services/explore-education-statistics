@@ -18,14 +18,20 @@ public class ContentDbContextMockBuilder
         _inMemoryContentDbContext = ContentDbUtils.InMemoryContentDbContext(_dbContextId);
     }
     public Asserter Assert => new(_inMemoryContentDbContext);
+    
+    /// <summary>
+    /// Note: It is intended that this method is called during the creation of the SUT, at the last moment
+    /// before the ACT phase. This is because the in-memory db context that was created for the ARRANGE phase
+    /// is disposed and a new instance created. This ensures that any queries performed by the SUT are correctly
+    /// rehydrating any child entities through .Include declarations. 
+    /// </summary>
+    /// <returns></returns>
     public ContentDbContext Build()
     {
         // Dispose of the ARRANGE db context
         _inMemoryContentDbContext.Dispose();
         
         // Create a new db context for the ACT and ASSERT phase.
-        // This ensures any queries performed by the SUT are correctly rehydrating any
-        // child entities through .Include declarations.
         _inMemoryContentDbContext = ContentDbUtils.InMemoryContentDbContext(_dbContextId);
         return _inMemoryContentDbContext;
     }

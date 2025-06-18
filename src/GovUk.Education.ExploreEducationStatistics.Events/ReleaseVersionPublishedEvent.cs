@@ -105,7 +105,7 @@ public record ReleaseVersionPublishedEvent : IEvent
         public required Guid? PreviousLatestPublishedReleaseVersionId { get; init; }
         
         /// <summary>
-        /// Indicates whether the parent publication is archived
+        /// Indicates whether the associated publication is archived
         /// </summary>
         public required bool IsPublicationArchived { get; init; }
     }
