@@ -1,7 +1,9 @@
 import releaseDataFileService, {
   DataFile,
   DataFileImportStatus,
+  DataSetUploadStatus,
   ImportStatusCode,
+  ScreenerTestResult,
 } from '@admin/services/releaseDataFileService';
 import Details from '@common/components/Details';
 import LoadingSpinner from '@common/components/LoadingSpinner';
@@ -11,6 +13,72 @@ import WarningMessage from '@common/components/WarningMessage';
 import useInterval from '@common/hooks/useInterval';
 import useMounted from '@common/hooks/useMounted';
 import React, { useCallback, useEffect, useState } from 'react';
+
+export const getDataSetUploadStatusLabel = (
+  statusCode: DataSetUploadStatus,
+): string | undefined => {
+  switch (statusCode) {
+    case 'UPLOADING':
+      return 'Uploading';
+    case 'SCREENING':
+      return 'Screening';
+    case 'PENDING_REVIEW':
+      return 'Pending review';
+    case 'PENDING_IMPORT':
+      return 'Pending import';
+    case 'FAILED_SCREENING':
+      return 'Failed screening';
+    default:
+      return undefined;
+  }
+};
+
+export const getDataSetUploadStatusColour = (
+  statusCode: DataSetUploadStatus,
+): TagProps['colour'] => {
+  switch (statusCode) {
+    case 'PENDING_REVIEW':
+    case 'SCREENING':
+    case 'UPLOADING':
+      return 'orange';
+    case 'PENDING_IMPORT':
+      return 'green';
+    case 'FAILED_SCREENING':
+      return 'red';
+    default:
+      return undefined;
+  }
+};
+
+export const getScreenerTestResultStatusLabel = (
+  statusCode: ScreenerTestResult,
+): string | undefined => {
+  switch (statusCode) {
+    case 'WARNING':
+      return 'Warning';
+    case 'PASS':
+      return 'Pass';
+    case 'FAIL':
+      return 'Fail';
+    default:
+      return undefined;
+  }
+};
+
+export const getScreenerTestResultStatusColour = (
+  statusCode: ScreenerTestResult,
+): TagProps['colour'] => {
+  switch (statusCode) {
+    case 'WARNING':
+      return 'orange';
+    case 'PASS':
+      return 'green';
+    case 'FAIL':
+      return 'red';
+    default:
+      return undefined;
+  }
+};
 
 export const getImportStatusLabel = (
   statusCode: ImportStatusCode,

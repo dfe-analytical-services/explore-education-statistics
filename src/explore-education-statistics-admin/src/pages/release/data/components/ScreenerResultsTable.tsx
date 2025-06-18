@@ -1,5 +1,10 @@
 import { ScreenerResult } from '@admin/services/releaseDataFileService';
 import React from 'react';
+import Tag from '@common/components/Tag';
+import {
+  getScreenerTestResultStatusColour,
+  getScreenerTestResultStatusLabel,
+} from './ImporterStatus';
 
 interface Props {
   screenerResult: ScreenerResult;
@@ -13,7 +18,8 @@ export default function ScreenerResultsTable({
   const testResults = showAll
     ? screenerResult.testResults
     : screenerResult.testResults.filter(
-        testResult => testResult.result === 1 || testResult.result === 2, // FAIL || WARNING
+        testResult =>
+          testResult.result === 'FAIL' || testResult.result === 'WARNING',
       );
 
   return (
@@ -26,7 +32,13 @@ export default function ScreenerResultsTable({
               <br />
               {testResult.notes}
             </td>
-            <td style={{ verticalAlign: 'middle' }}>{testResult.result}</td>
+            <td style={{ verticalAlign: 'middle' }}>
+              <Tag
+                colour={getScreenerTestResultStatusColour(testResult.result)}
+              >
+                {getScreenerTestResultStatusLabel(testResult.result)}
+              </Tag>
+            </td>
           </tr>
         ))}
       </tbody>
