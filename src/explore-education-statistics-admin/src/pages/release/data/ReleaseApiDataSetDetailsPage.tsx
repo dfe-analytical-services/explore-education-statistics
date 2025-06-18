@@ -71,16 +71,16 @@ export default function ReleaseApiDataSetDetailsPage() {
     }
   }, [finalisingStatus, dataSet?.draftVersion?.status, setFinalisingStatus]);
 
+  const versionParts = dataSet?.draftVersion?.version?.split('.') || [];
+  const isPatch = isNewReplaceDsvFeatureEnabled
+    ? versionParts?.length === 3 && parseInt(versionParts[2], 10) > 0
+    : false;
+
   const shouldShowRejectedError = (
     apiDataSet: ApiDataSet | undefined,
-    hasNewReplaceDsvFeatureEnabled: boolean | undefined,
+    isPatchDataSetVersion: boolean,
   ): boolean => {
-    const versionParts = apiDataSet?.draftVersion?.version?.split('.') || [];
-    const isPatch = hasNewReplaceDsvFeatureEnabled
-      ? versionParts?.length === 3 && parseInt(versionParts[2], 10) > 0
-      : false;
-
-    return isPatch
+    return isPatchDataSetVersion
       ? !!(
           apiDataSet?.draftVersion?.mappingStatus &&
           apiDataSet.draftVersion.mappingStatus.hasMajorVersionUpdate
@@ -249,10 +249,7 @@ export default function ReleaseApiDataSetDetailsPage() {
     />
   ) : null;
 
-  const showRejectedError = shouldShowRejectedError(
-    dataSet,
-    isNewReplaceDsvFeatureEnabled,
-  );
+  const showRejectedError = shouldShowRejectedError(dataSet, isPatch);
 
   const mappingComplete =
     dataSet?.draftVersion?.mappingStatus &&
@@ -374,12 +371,15 @@ export default function ReleaseApiDataSetDetailsPage() {
                       status={
                         <Tag
                           colour={
-                            dataSet.draftVersion.mappingStatus
-                              ?.locationsComplete &&
-                            !dataSet.draftVersion.mappingStatus
-                              ?.locationsHaveMajorChange
-                              ? 'blue'
-                              : 'red'
+                            (
+                              dataSet.draftVersion.mappingStatus
+                                ?.locationsComplete && isPatch
+                                ? dataSet.draftVersion.mappingStatus
+                                    ?.locationsHaveMajorChange
+                                : false
+                            )
+                              ? 'red'
+                              : 'blue'
                           }
                         >
                           {dataSet.draftVersion.mappingStatus?.locationsComplete
@@ -414,12 +414,15 @@ export default function ReleaseApiDataSetDetailsPage() {
                       status={
                         <Tag
                           colour={
-                            dataSet.draftVersion.mappingStatus
-                              ?.filtersComplete &&
-                            !dataSet.draftVersion.mappingStatus
-                              ?.filtersHaveMajorChange
-                              ? 'blue'
-                              : 'red'
+                            (
+                              dataSet.draftVersion.mappingStatus
+                                ?.filtersComplete && isPatch
+                                ? dataSet.draftVersion.mappingStatus
+                                    ?.filtersHaveMajorChange
+                                : false
+                            )
+                              ? 'red'
+                              : 'blue'
                           }
                         >
                           {dataSet.draftVersion.mappingStatus?.filtersComplete
