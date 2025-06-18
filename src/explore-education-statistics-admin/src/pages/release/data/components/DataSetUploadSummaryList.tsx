@@ -2,7 +2,12 @@ import { DataSetUpload } from '@admin/services/releaseDataFileService';
 import FormattedDate from '@common/components/FormattedDate';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
+import Tag from '@common/components/Tag';
 import React from 'react';
+import {
+  getDataSetUploadStatusColour,
+  getDataSetUploadStatusLabel,
+} from './ImporterStatus';
 
 interface Props {
   dataSetUpload: DataSetUpload;
@@ -23,9 +28,13 @@ export default function DataSetUploadSummaryList({ dataSetUpload }: Props) {
         {dataSetUpload.metaFileName}
       </SummaryListItem>
       <SummaryListItem term="Size">
-        {dataSetUpload.dataFileSizeInBytes} bytes
+        {dataSetUpload.dataFileSizeInBytes}
       </SummaryListItem>
-      <SummaryListItem term="Status">{dataSetUpload.status}</SummaryListItem>
+      <SummaryListItem term="Status">
+        <Tag colour={getDataSetUploadStatusColour(dataSetUpload.status)}>
+          {getDataSetUploadStatusLabel(dataSetUpload.status)}
+        </Tag>
+      </SummaryListItem>{' '}
       <SummaryListItem term="Uploaded by">
         <a href={uploadedByUrl}>{dataSetUpload.uploadedBy}</a>
       </SummaryListItem>

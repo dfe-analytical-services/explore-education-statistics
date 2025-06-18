@@ -17,7 +17,6 @@ public class DataScreenerTestResult
     public string? Notes { get; set; }
 
     [JsonPropertyName("stage")]
-    [JsonConverter(typeof(JsonStringEnumConverter))]
     public Stage Stage { get; set; }
 }
 

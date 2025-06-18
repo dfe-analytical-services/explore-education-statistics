@@ -14,6 +14,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Text.Json;
 
 // ReSharper disable StringLiteralTypo
 namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
@@ -162,27 +163,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
         private static void ConfigureDataSetUpload(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<DataSetUpload>()
-                .Property(upload => upload.Status)
-                .HasConversion(new EnumToStringConverter<DataSetUploadStatus>());
-
-            //modelBuilder.Entity<DataSetUpload>(entity =>
-            //{
-            //    entity.OwnsOne(dataSetUpload => dataSetUpload.ScreenerResult, b =>
-            //    {
-            //        b.Property(e => e.OverallResult).HasConversion<ScreenerResult>();
-            //        b.OwnsMany(c => c.TestResults, testResult =>
-            //        {
-            //            testResult.Property(e => e.Result).HasConversion<TestResult>();
-            //            testResult.Property(e => e.Stage).HasConversion<Stage>();
-            //        });
-            //    });
-            //});
-
-            modelBuilder.Entity<DataSetUpload>()
                 .Property(upload => upload.ScreenerResult)
                 .HasConversion(
-                    r => JsonConvert.SerializeObject(r),
-                    r => JsonConvert.DeserializeObject<DataSetScreenerResponse>(r));
+                    r => System.Text.Json.JsonSerializer.Serialize(r, (JsonSerializerOptions)null),
+                    r => System.Text.Json.JsonSerializer.Deserialize<DataSetScreenerResponse>(r, (JsonSerializerOptions)null));
         }
 
         private static void ConfigureDataImport(ModelBuilder modelBuilder)
