@@ -225,7 +225,6 @@ const releaseDataFileService = {
 
     return mapFile(file);
   },
-  // TODO: Convert function return to void
   async uploadDataSetFilePair(
     releaseId: string,
     request: UploadDataFilesRequest,
@@ -241,7 +240,6 @@ const releaseDataFileService = {
 
     return client.post<DataSetUploadResult[]>('/releaseVersions/data', data);
   },
-  // TODO: Convert function return to void
   async uploadZippedDataSetFilePair(
     releaseId: string,
     request: UploadZipDataFileRequest,
@@ -259,7 +257,6 @@ const releaseDataFileService = {
       data,
     );
   },
-  // TODO: Convert function return to void
   async uploadBulkZipDataSetFile(
     releaseId: string,
     zipFile: File,
