@@ -4,7 +4,7 @@ import _releaseDataFileService, {
   DataFile,
   UploadDataFilesRequest,
   UploadZipDataFileRequest,
-  DataSetUploadResult,
+  DataSetUpload,
 } from '@admin/services/releaseDataFileService';
 import _dataReplacementService, {
   DataReplacementPlan,
@@ -84,14 +84,29 @@ describe('ReleaseDataUploadsSection', () => {
     },
   };
 
-  const testUploadResult: DataSetUploadResult = {
-    dataFileId: 'data-file-1',
+  const testUploadResult: DataSetUpload = {
     dataFileName: 'test.csv',
-    dataFileSize: 1024,
-    metaFileId: 'meta-file-1',
+    dataSetTitle: 'Data set 1',
     metaFileName: 'test.meta.csv',
-    metaFileSize: 128,
-    title: 'Data set 1',
+    status: 'SCREENING',
+    created: new Date('2000-01-01'),
+    dataFileSize: '50 Kb',
+    id: 'test-data',
+    metaFileSize: '50 B',
+    replacingFileId: undefined,
+    uploadedBy: 'user1@test.com',
+    screenerResult: {
+      message: 'message',
+      overallResult: 'Passed',
+      testResults: [
+        {
+          notes: 'notes',
+          result: 'PASS',
+          stage: 'Passed',
+          testFunctionName: 'testFunctionName',
+        },
+      ],
+    },
   };
 
   const testQueuedImportStatus: DataFileImportStatus = {
@@ -924,9 +939,6 @@ describe('ReleaseDataUploadsSection', () => {
     });
 
     test('successful import with CSV files refetches data files', async () => {
-      releaseDataFileService.uploadDataSetFilePair.mockResolvedValue([
-        testUploadResult,
-      ]);
       releaseDataFileService.getDataFileImportStatus.mockResolvedValue(
         testQueuedImportStatus,
       );
@@ -974,9 +986,6 @@ describe('ReleaseDataUploadsSection', () => {
     });
 
     test('successful import with zip file refetches data files', async () => {
-      releaseDataFileService.uploadZippedDataSetFilePair.mockResolvedValue([
-        testUploadResult,
-      ]);
       releaseDataFileService.getDataFileImportStatus.mockResolvedValue(
         testQueuedImportStatus,
       );
@@ -1019,14 +1028,6 @@ describe('ReleaseDataUploadsSection', () => {
     });
 
     test('successful import with bulk zip file refetches data files', async () => {
-      releaseDataFileService.uploadBulkZipDataSetFile.mockResolvedValue([
-        testUploadResult,
-      ]);
-
-      releaseDataFileService.importDataSets.mockResolvedValue([
-        testImportedDataFile,
-      ]);
-
       releaseDataFileService.getDataFileImportStatus.mockResolvedValue(
         testQueuedImportStatus,
       );
@@ -1062,14 +1063,6 @@ describe('ReleaseDataUploadsSection', () => {
 
     test('updates the file size after importing CSV file when status changes', async () => {
       // we don't display rows :/
-      releaseDataFileService.uploadDataSetFilePair.mockResolvedValue([
-        testUploadResult,
-      ]);
-
-      releaseDataFileService.importDataSets.mockResolvedValue([
-        testImportedDataFile,
-      ]);
-
       releaseDataFileService.getDataFileImportStatus
         .mockResolvedValue(testQueuedImportStatus)
         .mockResolvedValueOnce(testImportingImportStatus);
@@ -1148,14 +1141,6 @@ describe('ReleaseDataUploadsSection', () => {
     });
 
     test('updates the file size after importing ZIP file when status changes', async () => {
-      releaseDataFileService.uploadZippedDataSetFilePair.mockResolvedValue([
-        testUploadResult,
-      ]);
-
-      releaseDataFileService.importDataSets.mockResolvedValue([
-        testImportedDataFile,
-      ]);
-
       releaseDataFileService.getDataFileImportStatus
         .mockResolvedValue(testQueuedImportStatus)
         .mockResolvedValueOnce(testImportingImportStatus);

@@ -4,7 +4,6 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.MockBuilders;
-using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Options;
@@ -17,13 +16,13 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
 using System;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainers;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.DataImportStatus;
@@ -238,13 +237,13 @@ public class DataSetFileStorageTests
         privateBlobStorageService.Verify();
 
         var uploadSummary = Assert.Single(uploadSummaries);
-        Assert.Equal(dataSetName, uploadSummary.Title);
+        Assert.Equal(dataSetName, uploadSummary.DataSetTitle);
         Assert.NotEqual(Guid.Empty, uploadSummary.DataFileId);
         Assert.Equal("test-data.csv", uploadSummary.DataFileName);
-        Assert.Equal(434, uploadSummary.DataFileSize);
+        Assert.Equal(434, uploadSummary.DataFileSizeInBytes);
         Assert.NotEqual(Guid.Empty, uploadSummary.MetaFileId);
         Assert.Equal("test-data.meta.csv", uploadSummary.MetaFileName);
-        Assert.Equal(157, uploadSummary.MetaFileSize);
+        Assert.Equal(157, uploadSummary.MetaFileSizeInBytes);
         Assert.Null(uploadSummary.ReplacingFileId);
     }
 
@@ -358,15 +357,18 @@ public class DataSetFileStorageTests
             await contentDbContext.SaveChangesAsync();
         }
 
-        var dataSet = new DataSetUploadResultViewModel
+        var dataSet = new DataSetUpload
         {
-            Title = dataSetName,
+            ReleaseVersionId = releaseVersion.Id,
+            DataSetTitle = dataSetName,
             DataFileId = Guid.NewGuid(),
             DataFileName = dataFileName,
-            DataFileSize = 434,
+            DataFileSizeInBytes = 434,
             MetaFileId = Guid.NewGuid(),
             MetaFileName = metaFileName,
-            MetaFileSize = 157,
+            MetaFileSizeInBytes = 157,
+            Status = DataSetUploadStatus.SCREENING,
+            UploadedBy = _user.Email,
             ReplacingFileId = originalDataFile.Id,
         };
 

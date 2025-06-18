@@ -229,10 +229,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
                 .ForMember(dest => dest.Status,
                     m => m.MapFrom(upload =>
                         GetDataSetUploadStatus(upload.ScreenerResult)))
-                .ForMember(dest => dest.DataFileSizeInBytes,
+                .ForMember(dest => dest.DataFileSize,
                     m => m.MapFrom(upload =>
                         FileExtensions.DisplaySize(upload.DataFileSizeInBytes)))
-                .ForMember(dest => dest.MetaFileSizeInBytes,
+                .ForMember(dest => dest.MetaFileSize,
                     m => m.MapFrom(upload =>
                         FileExtensions.DisplaySize(upload.MetaFileSizeInBytes)));
 
