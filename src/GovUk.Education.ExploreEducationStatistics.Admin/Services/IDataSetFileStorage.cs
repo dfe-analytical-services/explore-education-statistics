@@ -62,4 +62,14 @@ public interface IDataSetFileStorage
         Guid dataSetUploadId,
         DataSetScreenerResponse screenerResult,
         CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Overwrite an existing data set record in the database with a new one.
+    /// </summary>
+    /// <remarks>Allows an upload which previously failed screening to be easily overwritten, without the need for manual deletion.</remarks>
+    /// <returns>The new entity.</returns>
+    Task<DataSetUpload> CreateOrReplaceExistingDbRecord(
+        Guid releaseVersionId,
+        DataSetUpload dataSet,
+        CancellationToken cancellationToken);
 }

@@ -282,8 +282,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                             => await ValidateDataSetCsvPair(releaseVersionId, dataFormFile, metaFormFile, dataSetTitle, replacingFile))
                         .OnSuccess(async dataSet
                             => await dataSetFileStorage.UploadDataSetsToTemporaryStorage(releaseVersionId, [dataSet], cancellationToken))
+                        .OnSuccess(dataSetUploads
+                            => dataSetUploads.SelectAsync(dataSetUpload
+                                => dataSetFileStorage.CreateOrReplaceExistingDbRecord(releaseVersionId, dataSetUpload, cancellationToken)))
                         .OnSuccess(async dataSetUploads
-                            => await ScreenDataSetUploads(dataSetUploads, cancellationToken));
+                            => await ScreenDataSetUploads([.. dataSetUploads], cancellationToken));
                 });
         }
 
@@ -328,8 +331,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                             => await ValidateDataSetZip(releaseVersionId, zipFormFile, dataSetTitle, replacingFile))
                         .OnSuccess(async dataSet
                             => await dataSetFileStorage.UploadDataSetsToTemporaryStorage(releaseVersionId, [dataSet], cancellationToken))
+                        .OnSuccess(dataSetUploads
+                            => dataSetUploads.SelectAsync(dataSetUpload
+                                => dataSetFileStorage.CreateOrReplaceExistingDbRecord(releaseVersionId, dataSetUpload, cancellationToken)))
                         .OnSuccess(async dataSetUploads
-                            => await ScreenDataSetUploads(dataSetUploads, cancellationToken));
+                            => await ScreenDataSetUploads([.. dataSetUploads], cancellationToken));
                 });
         }
 
@@ -367,8 +373,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     => await ValidateBulkDataSetZip(releaseVersionId, zipFormFile))
                 .OnSuccess(async dataSets
                     => await dataSetFileStorage.UploadDataSetsToTemporaryStorage(releaseVersionId, dataSets, cancellationToken))
+                .OnSuccess(dataSetUploads
+                    => dataSetUploads.SelectAsync(dataSetUpload
+                        => dataSetFileStorage.CreateOrReplaceExistingDbRecord(releaseVersionId, dataSetUpload, cancellationToken)))
                 .OnSuccess(async dataSetUploads
-                    => await ScreenDataSetUploads(dataSetUploads, cancellationToken));
+                    => await ScreenDataSetUploads([.. dataSetUploads], cancellationToken));
         }
 
         private async Task<List<DataSetUploadViewModel>> ScreenDataSetUploads(
