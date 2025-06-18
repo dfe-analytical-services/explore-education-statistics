@@ -49,6 +49,7 @@ param functionAppExists bool
 param storageQueueNames SearchStorageQueueNames = {
   publicationArchived: 'publication-archived-queue'
   publicationChanged: 'publication-changed-queue'
+  publicationDeleted: 'publication-deleted-queue'
   publicationLatestPublishedReleaseReordered: 'publication-latest-published-release-reordered-queue'
   publicationRestored: 'publication-restored-queue'
   refreshSearchableDocument: 'refresh-searchable-document-queue'
@@ -134,6 +135,10 @@ module functionAppModule '../../common/components/functionApp.bicep' = {
       {
         name: 'PublicationChangedQueueName'
         value: storageQueueNames.publicationChanged
+      }
+      {
+        name: 'PublicationDeletedQueueName'
+        value: storageQueueNames.publicationDeleted
       }
       {
         name: 'PublicationLatestPublishedReleaseReorderedQueueName'
