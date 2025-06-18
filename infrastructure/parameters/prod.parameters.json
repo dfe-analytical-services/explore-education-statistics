@@ -100,9 +100,6 @@
     },
     "maxStatsDbSizeBytes": {
       "value": 2199023255552
-    },
-    "eventGridTopicsExist": {
-      "value": false
     }
   }
 }
