@@ -36,6 +36,7 @@ public class DataSetFileStorage(
     IOptions<FeatureFlagsOptions> featureFlags,
     ILogger<DataSetFileStorage> logger) : IDataSetFileStorage
 {
+    // TODO (EES-6176): Remove once manual replacement processes have been consolidated to use Upload* methods.
     public async Task<DataFileInfo> UploadDataSet(
         Guid releaseVersionId,
         DataSet dataSet,
@@ -97,7 +98,7 @@ public class DataSetFileStorage(
             && dataSet.ReplacingFile is not null
             && releaseFileHasApiDataSet)
         {
-            await CreateNextDraftDataSetVersion(cancellationToken, replacedReleaseDataFile!, dataReleaseFile);
+            await CreateNextDraftDataSetVersion(dataReleaseFile.Id, replacedReleaseDataFile, cancellationToken);
         }
 
         var dataImport = await dataImportService.Import(subjectId, dataFile, metaFile);
@@ -124,9 +125,9 @@ public class DataSetFileStorage(
     }
 
     private async Task CreateNextDraftDataSetVersion(
-        CancellationToken cancellationToken,
+        Guid dataReleaseFileId,
         ReleaseFile replacedReleaseDataFile,
-        ReleaseFile dataReleaseFile)
+        CancellationToken cancellationToken)
     {
         var dataSetId = replacedReleaseDataFile.PublicApiDataSetId;
 
@@ -143,7 +144,7 @@ public class DataSetFileStorage(
             })
             .OnSuccessDo(async dataSetVersion =>
                 await dataSetVersionService.CreateNextVersion(
-                        dataReleaseFile.Id,
+                        dataReleaseFileId,
                         replacedReleaseDataFile!.PublicApiDataSetId!.Value,
                         dataSetVersion.Id,
                         cancellationToken

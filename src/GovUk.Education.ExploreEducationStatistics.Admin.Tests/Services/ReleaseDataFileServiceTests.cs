@@ -1756,7 +1756,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async Task SaveDataSetsFromTemporaryBlobStorage_Success_ReturnsOk()
+        public async Task SaveDataSetsFromTemporaryBlobStorage_Valid_ReturnsSuccess()
         {
             // Arrange
             ReleaseVersion releaseVersion = _fixture.DefaultReleaseVersion()
@@ -1831,11 +1831,69 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             Assert.Empty(contentDbContext.DataSetUploads);
         }
 
-        public async Task SaveDataSetsFromTemporaryBlobStorage_InvalidUploadStatus_ReturnsFail()
+        [Fact]
+        public async Task SaveDataSetsFromTemporaryBlobStorage_InvalidUploadStatus_ReturnsFailure()
         {
             // Arrange
+            ReleaseVersion releaseVersion = _fixture.DefaultReleaseVersion()
+                .WithRelease(_fixture.DefaultRelease()
+                    .WithPublication(_fixture.DefaultPublication()));
+
+            var dataFile = _fixture
+                .DefaultFile()
+                .WithType(FileType.Data)
+                .Generate();
+
+            var metaFile = _fixture
+                .DefaultFile()
+                .WithType(FileType.Metadata)
+                .Generate();
+
+            var dataSetUpload = new DataSetUploadMockBuilder()
+                .WithReleaseVersionId(releaseVersion.Id)
+                .WithFailingTests()
+                .BuildEntity();
+
+            var import = new DataImport
+            {
+                File = dataFile,
+                FileId = dataFile.Id,
+                MetaFile = metaFile,
+                MetaFileId = metaFile.Id,
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using var contentDbContext = InMemoryApplicationDbContext(contentDbContextId);
+
+            contentDbContext.ReleaseVersions.Add(releaseVersion);
+            contentDbContext.DataImports.Add(import);
+            contentDbContext.DataSetUploads.Add(dataSetUpload);
+            await contentDbContext.SaveChangesAsync();
+
+            var privateBlobStorageService = new Mock<IPrivateBlobStorageService>(Strict);
+            var dataSetFileStorage = new Mock<IDataSetFileStorage>(Strict);
+
+            var dataPath = $"{releaseVersion.Id}/data/{dataSetUpload.DataFileId}";
+            var metaPath = $"{releaseVersion.Id}/data/{dataSetUpload.MetaFileId}";
+
+            privateBlobStorageService.SetupCheckBlobExists(PrivateReleaseTempFiles, dataPath, exists: true);
+            privateBlobStorageService.SetupCheckBlobExists(PrivateReleaseTempFiles, metaPath, exists: true);
+
+            var service = SetupReleaseDataFileService(
+                contentDbContext: contentDbContext,
+                privateBlobStorageService: privateBlobStorageService.Object,
+                dataSetFileStorage: dataSetFileStorage.Object);
+
             // Act
+            var result = await service.SaveDataSetsFromTemporaryBlobStorage(
+                releaseVersion.Id,
+                [dataSetUpload.Id],
+                cancellationToken: default);
+
             // Assert
+            MockUtils.VerifyAllMocks(privateBlobStorageService, dataSetFileStorage);
+            result.AssertLeft();
+            Assert.Single(contentDbContext.DataSetUploads);
         }
 
         private ReleaseDataFileService SetupReleaseDataFileService(
