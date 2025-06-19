@@ -30,15 +30,18 @@ public class AdminEventRaiser(IEventRaiser eventRaiser) : IAdminEventRaiser
     /// <param name="newReleaseSlug">The new slug for the release.</param>
     /// <param name="publicationId">The unique identifier of the associated publication.</param>
     /// <param name="publicationSlug">The slug of the associated publication.</param>
+    /// <param name="isPublicationArchived">Indicates whether the associated publication is archived.</param>
     public async Task OnReleaseSlugChanged(
         Guid releaseId,
         string newReleaseSlug,
         Guid publicationId,
-        string publicationSlug) =>
+        string publicationSlug,
+        bool isPublicationArchived) =>
         await eventRaiser.RaiseEvent(new ReleaseSlugChangedEvent(releaseId,
             newReleaseSlug,
             publicationId,
-            publicationSlug));
+            publicationSlug,
+            isPublicationArchived));
 
     /// <summary>
     /// Publishes an event when a publication is archived.

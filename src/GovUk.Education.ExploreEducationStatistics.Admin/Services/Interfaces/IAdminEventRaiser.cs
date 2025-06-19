@@ -13,7 +13,8 @@ public interface IAdminEventRaiser
         Guid releaseId,
         string newReleaseSlug,
         Guid publicationId,
-        string publicationSlug);
+        string publicationSlug,
+        bool isPublicationArchived);
 
     Task OnPublicationArchived(
         Guid publicationId,
