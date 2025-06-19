@@ -550,6 +550,7 @@ public class PublicationService(
         List<ReleaseSeriesItemUpdateRequest> updatedReleaseSeriesItems)
     {
         return await context.Publications
+            .Include(p => p.SupersededBy)
             .FirstOrNotFoundAsync(p => p.Id == publicationId)
             .OnSuccess(userService.CheckCanManageReleaseSeries)
             .OnSuccess(async publication =>

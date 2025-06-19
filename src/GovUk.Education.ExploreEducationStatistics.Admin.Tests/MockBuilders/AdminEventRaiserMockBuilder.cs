@@ -164,7 +164,8 @@ public class AdminEventRaiserMockBuilder
                 publication.LatestPublishedReleaseVersion?.ReleaseId ?? throw new ArgumentException("Publication does not have latest published release version child object.", nameof(publication)),
                 publication.LatestPublishedReleaseVersionId!.Value,
                 previousReleaseId,
-                previousReleaseVersionId);
+                previousReleaseVersionId,
+                publication.IsArchived());
 
             Xunit.Assert.Single(
                 mockBuilder._invocations,
@@ -176,7 +177,8 @@ public class AdminEventRaiserMockBuilder
                         inv.Publication.LatestPublishedReleaseVersion!.ReleaseId,
                         inv.Publication.LatestPublishedReleaseVersionId!.Value,
                         inv.OldLatestPublishedReleaseId,
-                        inv.OldLatestPublishedReleaseVersionId)
+                        inv.OldLatestPublishedReleaseVersionId,
+                        inv.Publication.IsArchived())
                     == expectedEvent);
         }
 

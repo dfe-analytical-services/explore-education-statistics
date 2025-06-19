@@ -187,7 +187,51 @@ public class AdminEventRaiserTests
             publication.LatestPublishedReleaseVersion.ReleaseId,
             publication.LatestPublishedReleaseVersionId.Value,
             previousLatestPublishedReleaseId,
+            previousLatestPublishedReleaseVersionId,
+            isPublicationArchived: false);
+        _eventRaiserMockBuilder.Assert.EventRaised(expectedEvent);
+    }
+
+    [Fact]
+    public async Task GivenPublicationIsArchived_WhenOnPublicationLatestPublishedReleaseReordered_ThenEventPublishedWithIsPublicationArchivedTrue()
+    {
+        // ARRANGE
+        var supersedingPublication = new Publication
+        {
+            Id = Guid.NewGuid(), LatestPublishedReleaseVersionId = Guid.NewGuid()
+        };
+        
+        var publication = new Publication
+        {
+            Id = Guid.NewGuid(),
+            Title = "Publication title",
+            Slug = "publication-slug",
+            LatestPublishedReleaseVersionId = Guid.NewGuid(),
+            LatestPublishedReleaseVersion = new ReleaseVersion{ ReleaseId = Guid.NewGuid() },
+            SupersededById = supersedingPublication.Id,
+            SupersededBy = supersedingPublication,
+        };
+        var previousLatestPublishedReleaseId = Guid.NewGuid();
+        var previousLatestPublishedReleaseVersionId = Guid.NewGuid();
+
+        var sut = GetSut();
+
+        // ACT
+        await sut.OnPublicationLatestPublishedReleaseReordered(
+            publication,
+            previousLatestPublishedReleaseId,
             previousLatestPublishedReleaseVersionId);
+
+        // ASSERT
+        var expectedEvent = new PublicationLatestPublishedReleaseReorderedEvent(
+            publication.Id,
+            publication.Title,
+            publication.Slug,
+            publication.LatestPublishedReleaseVersion.ReleaseId,
+            publication.LatestPublishedReleaseVersionId.Value,
+            previousLatestPublishedReleaseId,
+            previousLatestPublishedReleaseVersionId,
+            isPublicationArchived: true);
         _eventRaiserMockBuilder.Assert.EventRaised(expectedEvent);
     }
 

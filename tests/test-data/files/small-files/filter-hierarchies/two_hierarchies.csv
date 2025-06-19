@@ -1,0 +1,50 @@
+time_period,time_identifier,geographic_level,country_code,country_name,old_la_code,new_la_code,la_name,animal_type,breed,primary_living_condition,specific_environment,ind_one
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Total,Total,Total,Total,1
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Total,Total,Domestic Home,Total,2
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Total,Total,Domestic Home,House with garden,3
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Total,Total,Domestic Home,Apartment,4
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Total,Total,Shelter,Total,5
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Total,Total,Shelter,Non-profit shelter,6
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Total,Total,Shelter,Farm animal sanctuary,7
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Total,Total,Total,8
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Total,Domestic Home,Total,9
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Total,Domestic Home,House with garden,10
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Total,Domestic Home,Apartment,11
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Total,Shelter,Total,12
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Total,Shelter,Non-profit shelter,13
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Total,Shelter,Farm animal sanctuary,14
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Cat,Total,Total,Total,15
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Cat,Total,Domestic Home,Total,16
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Cat,Total,Domestic Home,House with garden,17
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Cat,Total,Domestic Home,Apartment,18
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Cat,Total,Shelter,Total,19
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Cat,Total,Shelter,Non-profit shelter,20
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Cat,Total,Shelter,Farm animal sanctuary,21
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Affenpinscher,Total,Total,22
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Affenpinscher,Domestic Home,Total,23
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Affenpinscher,Domestic Home,House with garden,24
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Affenpinscher,Domestic Home,Apartment,25
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Affenpinscher,Shelter,Total,26
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Affenpinscher,Shelter,Non-profit shelter,27
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Affenpinscher,Shelter,Farm animal sanctuary,28
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Aidi,Total,Total,29
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Aidi,Domestic Home,Total,30
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Aidi,Domestic Home,House with garden,31
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Aidi,Domestic Home,Apartment,32
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Aidi,Shelter,Total,33
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Aidi,Shelter,Non-profit shelter,34
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Aidi,Shelter,Farm animal sanctuary,35
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Cat,Abyssinian,Total,Total,36
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Cat,Abyssinian,Domestic Home,Total,37
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Cat,Abyssinian,Domestic Home,House with garden,38
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Cat,Abyssinian,Domestic Home,Apartment,39
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Cat,Abyssinian,Shelter,Total,40
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Cat,Abyssinian,Shelter,Non-profit shelter,41
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Cat,Abyssinian,Shelter,Farm animal sanctuary,42
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Cat,Aegean,Total,Total,43
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Cat,Aegean,Domestic Home,Total,44
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Cat,Aegean,Domestic Home,House with garden,45
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Cat,Aegean,Domestic Home,Apartment,46
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Cat,Aegean,Shelter,Total,47
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Cat,Aegean,Shelter,Non-profit shelter,48
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Cat,Aegean,Shelter,Farm animal sanctuary,49

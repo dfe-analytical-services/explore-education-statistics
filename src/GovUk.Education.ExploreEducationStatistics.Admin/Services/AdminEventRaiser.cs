@@ -111,7 +111,8 @@ public class AdminEventRaiser(IEventRaiser eventRaiser) : IAdminEventRaiser
                 publication.LatestPublishedReleaseVersion.ReleaseId,
                 publication.LatestPublishedReleaseVersionId.Value,
                 previousLatestPublishedReleaseId,
-                previousLatestPublishedReleaseVersionId));
+                previousLatestPublishedReleaseVersionId,
+                publication.IsArchived()));
     }
 
     /// <summary>
