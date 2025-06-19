@@ -3223,21 +3223,31 @@ public class PublicationServiceTests
         AssertOnPublicationChangedEventsNotRaised();
     }
 
-    [Fact]
-    public async Task UpdateReleaseSeries_UpdatesLatestPublishedReleaseVersion()
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public async Task UpdateReleaseSeries_UpdatesLatestPublishedReleaseVersion(bool isPublicationArchived)
     {
-        Publication publication = _dataFixture
-            .DefaultPublication()
-            .WithReleases([
-                _dataFixture
-                    .DefaultRelease(publishedVersions: 1, year: 2020),
-                _dataFixture
-                    .DefaultRelease(publishedVersions: 1, draftVersion: true, year: 2021),
-                _dataFixture
-                    .DefaultRelease(publishedVersions: 2, draftVersion: true, year: 2022)
-            ])
-            .WithTheme(_dataFixture.DefaultTheme());
+        var publicationBuilder = _dataFixture
+                .DefaultPublication()
+                .WithReleases([
+                    _dataFixture
+                        .DefaultRelease(publishedVersions: 1, year: 2020),
+                    _dataFixture
+                        .DefaultRelease(publishedVersions: 1, draftVersion: true, year: 2021),
+                    _dataFixture
+                        .DefaultRelease(publishedVersions: 2, draftVersion: true, year: 2022)
+                ])
+                .WithTheme(_dataFixture.DefaultTheme());
 
+        if (isPublicationArchived)
+        {
+           publicationBuilder.WithSupersededBy(
+               _dataFixture.DefaultPublication()
+                   .WithLatestPublishedReleaseVersion(_dataFixture.DefaultReleaseVersion()));
+        }
+
+        var publication = publicationBuilder.Generate();        
         var release2020 = publication.Releases.Single(r => r.Year == 2020);
         var release2021 = publication.Releases.Single(r => r.Year == 2021);
         var release2022 = publication.Releases.Single(r => r.Year == 2022);
@@ -3313,6 +3323,7 @@ public class PublicationServiceTests
         {
             var actualPublication = await contentDbContext.Publications
                 .Include(p => p.LatestPublishedReleaseVersion)
+                .Include(p => p.SupersededBy)
                 .SingleAsync(p => p.Id == publication.Id);
 
             var actualReleaseSeries = actualPublication.ReleaseSeries;
@@ -3334,10 +3345,12 @@ public class PublicationServiceTests
         }
     }
 
-    [Fact]
-    public async Task UpdateReleaseSeries_UpdatesLatestPublishedReleaseVersion_SkipsUnpublishedReleases()
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public async Task UpdateReleaseSeries_UpdatesLatestPublishedReleaseVersion_SkipsUnpublishedReleases(bool isPublicationArchived)
     {
-        Publication publication = _dataFixture
+        var publicationBuilder = _dataFixture
             .DefaultPublication()
             .WithReleases([
                 _dataFixture
@@ -3349,6 +3362,14 @@ public class PublicationServiceTests
             ])
             .WithTheme(_dataFixture.DefaultTheme());
 
+        if (isPublicationArchived)
+        {
+            publicationBuilder.WithSupersededBy(
+                _dataFixture.DefaultPublication()
+                    .WithLatestPublishedReleaseVersion(_dataFixture.DefaultReleaseVersion()));
+        }
+        
+        var publication = publicationBuilder.Generate();
         var release2020 = publication.Releases.Single(r => r.Year == 2020);
         var release2021 = publication.Releases.Single(r => r.Year == 2021);
         var release2022 = publication.Releases.Single(r => r.Year == 2022);
@@ -3424,6 +3445,7 @@ public class PublicationServiceTests
         {
             var actualPublication = await contentDbContext.Publications
                 .Include(p => p.LatestPublishedReleaseVersion)
+                .Include(p => p.SupersededBy)
                 .SingleAsync(p => p.Id == publication.Id);
 
             var actualReleaseSeries = actualPublication.ReleaseSeries;

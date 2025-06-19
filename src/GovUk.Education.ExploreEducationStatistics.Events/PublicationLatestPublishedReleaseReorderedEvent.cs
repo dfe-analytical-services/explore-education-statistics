@@ -12,7 +12,8 @@ public record PublicationLatestPublishedReleaseReorderedEvent : IEvent
         Guid latestPublishedReleaseId,
         Guid latestPublishedReleaseVersionId,
         Guid previousReleaseId,
-        Guid previousReleaseVersionId)
+        Guid previousReleaseVersionId,
+        bool isPublicationArchived)
     {
         Subject = publicationId.ToString();
         Payload = new EventPayload
@@ -22,7 +23,8 @@ public record PublicationLatestPublishedReleaseReorderedEvent : IEvent
             LatestPublishedReleaseId = latestPublishedReleaseId,
             LatestPublishedReleaseVersionId = latestPublishedReleaseVersionId,
             PreviousReleaseId = previousReleaseId,
-            PreviousReleaseVersionId = previousReleaseVersionId
+            PreviousReleaseVersionId = previousReleaseVersionId,
+            IsPublicationArchived = isPublicationArchived
         };
     }
 
@@ -51,6 +53,7 @@ public record PublicationLatestPublishedReleaseReorderedEvent : IEvent
         public required Guid LatestPublishedReleaseVersionId { get; init; }
         public required Guid PreviousReleaseId { get; init; }
         public required Guid PreviousReleaseVersionId { get; init; }
+        public required bool IsPublicationArchived { get; set; }
     }
 
     public EventGridEvent ToEventGridEvent() => new(Subject, EventType, DataVersion, Payload);
