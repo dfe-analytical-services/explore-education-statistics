@@ -320,7 +320,7 @@ public abstract class ReleaseServiceTests
             var label = "this is the new label";
             var year = 2025;
             var timePeriod = TimeIdentifier.April;
-            
+
             var expectedNewReleaseSlug = NamingUtils.CreateReleaseSlug(year, timePeriod, label);
 
             var supersedingPublication = _dataFixture
@@ -331,7 +331,7 @@ public abstract class ReleaseServiceTests
                 .WithId(expectedPublicationId)
                 .WithSlug(expectedPublicationSlug)
                 .If(isPublicationArchived)
-                    .Then(p => p.WithSupersededBy(supersedingPublication))
+                .Then(p => p.WithSupersededBy(supersedingPublication))
                 .Generate();
 
             var release = _dataFixture.DefaultRelease()
@@ -340,66 +340,64 @@ public abstract class ReleaseServiceTests
                 .WithYear(year)
                 .WithTimePeriodCoverage(timePeriod)
                 .Generate();
-            
+
             var releaseVersion = _dataFixture.DefaultReleaseVersion()
                 .WithRelease(release)
                 .WithPublished(new DateTime(2025, 04, 01, 09, 16, 00)) // Release Version is live (ie has been published)
                 .Generate();
 
             var dbContextId = Guid.NewGuid().ToString();
-            
-            await using(var context = InMemoryApplicationDbContext(dbContextId))
+
+            await using (var context = InMemoryApplicationDbContext(dbContextId))
             {
                 context.Publications.Add(publication);
                 context.Releases.Add(release);
                 context.ReleaseVersions.Add(releaseVersion);
                 await context.SaveChangesAsync();
             }
-            
+
             var releaseVersionService = new ReleaseVersionServiceMockBuilder()
-                                            .WhereGetReleaseVersionReturns(releaseVersion.Id);
+                .WhereGetReleaseVersionReturns(releaseVersion.Id);
 
             var releasePublishingStatusRepository = new ReleasePublishingStatusRepositoryMockBuilder()
                 .SetNoReleaseVersionStatus(releaseVersion.Id);
 
             var adminEventRaiser = new AdminEventRaiserMockBuilder();
 
-            await using var context2 = InMemoryApplicationDbContext(dbContextId);
-            
-            var sut = BuildService(
-                                    context2,
-                                    releaseVersionService: releaseVersionService.Build(),
-                                    releaseCacheService: new ReleaseCacheServiceMockBuilder().Build(),
-                                    publicationCacheService: new PublicationCacheServiceMockBuilder().Build(),
-                                    redirectsCacheService: new RedirectsCacheServiceMockBuilder().Build(),
-                                    releasePublishingStatusRepository: releasePublishingStatusRepository.Build(),
-                                    adminEventRaiser: adminEventRaiser.Build());
-            
-            var request = new ReleaseUpdateRequest
+            await using (var context = InMemoryApplicationDbContext(dbContextId))
             {
-                Label = label
-            };
+                var sut = BuildService(
+                    context,
+                    releaseVersionService: releaseVersionService.Build(),
+                    releaseCacheService: new ReleaseCacheServiceMockBuilder().Build(),
+                    publicationCacheService: new PublicationCacheServiceMockBuilder().Build(),
+                    redirectsCacheService: new RedirectsCacheServiceMockBuilder().Build(),
+                    releasePublishingStatusRepository: releasePublishingStatusRepository.Build(),
+                    adminEventRaiser: adminEventRaiser.Build());
 
-            // ACT
-            var result = await sut.UpdateRelease(release.Id, request);
-            
-            // ASSERT
-            result.AssertRight();
-            
-            output.WriteLine($"Expected Release Id: {expectedReleaseId}");
-            output.WriteLine($"Expected New Release Slug: {expectedNewReleaseSlug}");
-            output.WriteLine($"Expected Publication Id: {expectedPublicationId}");
-            output.WriteLine($"Expected Publication Slug: {expectedPublicationSlug}");
-            
-            adminEventRaiser.Assert.OnReleaseSlugChangedWasRaised(
-                expectedReleaseId,
-                expectedNewReleaseSlug,
-                expectedPublicationId,
-                expectedPublicationSlug,
-                isPublicationArchived
+                var request = new ReleaseUpdateRequest { Label = label };
+
+                // ACT
+                var result = await sut.UpdateRelease(release.Id, request);
+
+                // ASSERT
+                result.AssertRight();
+
+                output.WriteLine($"Expected Release Id: {expectedReleaseId}");
+                output.WriteLine($"Expected New Release Slug: {expectedNewReleaseSlug}");
+                output.WriteLine($"Expected Publication Id: {expectedPublicationId}");
+                output.WriteLine($"Expected Publication Slug: {expectedPublicationSlug}");
+
+                adminEventRaiser.Assert.OnReleaseSlugChangedWasRaised(
+                    expectedReleaseId,
+                    expectedNewReleaseSlug,
+                    expectedPublicationId,
+                    expectedPublicationSlug,
+                    isPublicationArchived
                 );
+            }
         }
-        
+
         [Fact]
         public async Task GivenReleaseThatIsNotPublished_WhenSlugUpdated_ThenNoEventRaised()
         {
