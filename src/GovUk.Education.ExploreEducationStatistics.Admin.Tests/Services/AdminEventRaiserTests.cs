@@ -156,17 +156,57 @@ public class AdminEventRaiserTests
         _eventRaiserMockBuilder.Assert.EventRaised(expectedEvent);
     }
 
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public async Task WhenOnPublicationDeleted_ThenEventPublished(bool hasPublishedReleaseVersion)
+    {
+        // ARRANGE
+        var publicationId = Guid.NewGuid();
+        const string publicationSlug = "publication-slug";
+        var latestPublishedReleaseVersion = hasPublishedReleaseVersion
+            ? new ReleaseVersion
+            {
+                Id = Guid.NewGuid(),
+                ReleaseId = Guid.NewGuid()
+            }
+            : null;
+
+        var sut = GetSut();
+
+        // ACT
+        await sut.OnPublicationDeleted(
+            publicationId,
+            publicationSlug,
+            latestPublishedReleaseId: latestPublishedReleaseVersion?.ReleaseId,
+            latestPublishedReleaseVersionId: latestPublishedReleaseVersion?.Id);
+
+        // ASSERT
+        var expectedEvent = new PublicationDeletedEvent(
+            publicationId,
+            publicationSlug,
+            latestPublishedReleaseVersion?.ReleaseId,
+            latestPublishedReleaseVersion?.Id);
+        _eventRaiserMockBuilder.Assert.EventRaised(expectedEvent);
+    }
+
     [Fact]
     public async Task WhenOnPublicationLatestPublishedReleaseReordered_ThenEventPublished()
     {
         // ARRANGE
+        var latestPublishedReleaseVersion = new ReleaseVersion
+        {
+            Id = Guid.NewGuid(),
+            ReleaseId = Guid.NewGuid()
+        };
+
         var publication = new Publication
         {
             Id = Guid.NewGuid(),
             Title = "Publication title",
             Slug = "publication-slug",
-            LatestPublishedReleaseVersionId = Guid.NewGuid(),
-            LatestPublishedReleaseVersion = new ReleaseVersion{ ReleaseId = Guid.NewGuid() }
+            LatestPublishedReleaseVersionId = latestPublishedReleaseVersion.Id,
+            LatestPublishedReleaseVersion = latestPublishedReleaseVersion
         };
         var previousLatestPublishedReleaseId = Guid.NewGuid();
         var previousLatestPublishedReleaseVersionId = Guid.NewGuid();
