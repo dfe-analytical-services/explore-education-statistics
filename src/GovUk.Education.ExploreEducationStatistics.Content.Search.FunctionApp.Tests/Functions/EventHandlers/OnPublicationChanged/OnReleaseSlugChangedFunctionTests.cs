@@ -14,13 +14,15 @@ public class OnPublicationChangedFunctionTests
     [Fact]
     public void Can_instantiate_Sut() => Assert.NotNull(GetSut());
 
-    [Fact]
-    public async Task GivenEvent_WhenPayloadContainsSlug_ThenRefreshSearchableDocumentMessageDtoReturned()
+    [Theory]
+    [MemberData(nameof(TheoryDatas.Blank.Bools), MemberType = typeof(TheoryDatas.Blank))]
+    public async Task GivenEvent_WhenPayloadContainsSlugAndPublicationIsNotArchived_ThenRefreshSearchableDocumentMessageDtoReturned(bool? isPublicationArchived)
     {
         // ARRANGE
         var payload = new PublicationChangedEventDto
         {
             Slug = "this-is-a-publication-slug",
+            IsPublicationArchived = isPublicationArchived
         };
 
         var eventGridEvent = new EventGridEventBuilder()
@@ -46,6 +48,29 @@ public class OnPublicationChangedFunctionTests
         var payload = new PublicationChangedEventDto
         {
             Slug = blankSlug,
+        };
+
+        var eventGridEvent = new EventGridEventBuilder()
+            .WithPayload(payload)
+            .Build();
+
+        var sut = GetSut();
+        
+        // ACT
+        var response = await sut.OnPublicationChanged(eventGridEvent, new FunctionContextMockBuilder().Build());
+        
+        // ASSERT
+        Assert.Empty(response);
+    }
+
+    [Fact]
+    public async Task GivenEvent_WhenPublicationIsArchived_ThenNothingIsReturned()
+    {
+        // ARRANGE
+        var payload = new PublicationChangedEventDto
+        {
+            Slug = "this-is-a-publication-slug",
+            IsPublicationArchived = true
         };
 
         var eventGridEvent = new EventGridEventBuilder()
