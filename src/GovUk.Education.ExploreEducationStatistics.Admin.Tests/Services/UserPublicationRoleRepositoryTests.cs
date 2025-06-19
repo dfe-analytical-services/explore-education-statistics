@@ -1,12 +1,18 @@
 #nullable enable
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Enums;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using Microsoft.EntityFrameworkCore;
+using Moq;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services;
@@ -79,6 +85,80 @@ public abstract class UserPublicationRoleRepositoryTests
                 userPublicationRole.Created.AssertUtcNow();
                 Assert.Equal(createdBy.Id, userPublicationRole.CreatedById);
                 Assert.Null(userPublicationRole.EmailSent);
+            }
+        }
+        
+        [Fact]
+        public async Task NewPermissionsSystemPublicationRolesToRemoveAndCreateFromOldRole()
+        {
+            User user = _fixture.DefaultUser();
+            User createdBy = _fixture.DefaultUser();
+            Publication publication = _fixture.DefaultPublication();
+            UserPublicationRole existingPublicationRole = _fixture.DefaultUserPublicationRole()
+                .WithUser(user)
+                .WithPublication(publication)
+                .WithRole(PublicationRole.Drafter);
+            
+            var publicationRoleToCreate = PublicationRole.Owner;
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                contentDbContext.Users.AddRange(user, createdBy);
+                contentDbContext.Publications.Add(publication);
+                contentDbContext.UserPublicationRoles.Add(existingPublicationRole);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            var newPermissionsSystemHelperMock = new Mock<INewPermissionsSystemHelper>();
+            newPermissionsSystemHelperMock
+                .Setup(rvr => rvr.DetermineNewPermissionsSystemChanges(
+                    publicationRoleToCreate,
+                    user.Id,
+                    publication.Id))
+                .ReturnsAsync((PublicationRole.Drafter, PublicationRole.Approver));
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var repository = CreateRepository(contentDbContext, newPermissionsSystemHelperMock.Object);
+
+                var result = await repository.Create(user.Id, publication.Id, publicationRoleToCreate, createdBy.Id);
+
+                Assert.NotNull(result);
+
+                Assert.NotEqual(Guid.Empty, result.Id);
+                Assert.Equal(user.Id, result.UserId);
+                Assert.Equal(publication.Id, result.PublicationId);
+                Assert.Equal(publicationRoleToCreate, result.Role);
+                result.Created.AssertUtcNow();
+                Assert.Equal(createdBy.Id, result.CreatedById);
+                Assert.Null(result.EmailSent);
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var userPublicationRoles = await contentDbContext.UserPublicationRoles.ToListAsync();
+
+                // Should be 2 as the 'Drafter` role has been removed and replaced with the `Approver` role,
+                // and the `Owner` role has been created.
+                Assert.Equal(2, userPublicationRoles.Count);
+
+                Assert.NotEqual(Guid.Empty, userPublicationRoles[0].Id);
+                Assert.Equal(user.Id, userPublicationRoles[0].UserId);
+                Assert.Equal(publication.Id, userPublicationRoles[0].PublicationId);
+                Assert.Equal(publicationRoleToCreate, userPublicationRoles[0].Role);
+                userPublicationRoles[0].Created.AssertUtcNow();
+                Assert.Equal(createdBy.Id, userPublicationRoles[0].CreatedById);
+                Assert.Null(userPublicationRoles[0].EmailSent);
+
+                Assert.NotEqual(Guid.Empty, userPublicationRoles[1].Id);
+                Assert.Equal(user.Id, userPublicationRoles[1].UserId);
+                Assert.Equal(publication.Id, userPublicationRoles[1].PublicationId);
+                Assert.Equal(PublicationRole.Approver, userPublicationRoles[1].Role);
+                userPublicationRoles[1].Created.AssertUtcNow();
+                Assert.Equal(createdBy.Id, userPublicationRoles[1].CreatedById);
+                Assert.Null(userPublicationRoles[1].EmailSent);
             }
         }
     }
@@ -2541,10 +2621,22 @@ public abstract class UserPublicationRoleRepositoryTests
         }
     }
 
-    private static UserPublicationRoleRepository CreateRepository(ContentDbContext? contentDbContext = null)
+    private static UserPublicationRoleRepository CreateRepository(
+        ContentDbContext? contentDbContext = null,
+        INewPermissionsSystemHelper? newPermissionsSystemHelper = null)
     {
         contentDbContext ??= InMemoryApplicationDbContext();
 
-        return new(contentDbContext);
+        var newPermissionsSystemHelperMock = new Mock<INewPermissionsSystemHelper>();
+        newPermissionsSystemHelperMock
+            .Setup(rvr => rvr.DetermineNewPermissionsSystemChanges(
+                It.IsAny<PublicationRole>(), 
+                It.IsAny<Guid>(),
+                It.IsAny<Guid>()))
+            .ReturnsAsync((null, null));
+        
+        return new(
+            contentDbContext,
+            newPermissionsSystemHelper ?? newPermissionsSystemHelperMock.Object);
     }
 }
