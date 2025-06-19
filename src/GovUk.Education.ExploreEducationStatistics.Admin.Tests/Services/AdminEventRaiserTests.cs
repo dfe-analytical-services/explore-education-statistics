@@ -116,7 +116,43 @@ public class AdminEventRaiserTests
             publication.Id,
             publication.Slug,
             publication.Title,
-            publication.Summary);
+            publication.Summary,
+            isPublicationArchived: false);
+        _eventRaiserMockBuilder.Assert.EventRaised(expectedEvent);
+    }
+    
+    [Fact]
+    public async Task GivenPublicationIsArchived_WhenOnPublicationChanged_ThenEventPublishedWithIsPublicationArchivedTrue()
+    {
+        // ARRANGE
+        var supersedingPublication = new Publication
+        {
+            Id = Guid.NewGuid(), 
+            LatestPublishedReleaseVersionId = Guid.NewGuid()
+        };
+        
+        var publication = new Publication
+        {
+            Id = Guid.NewGuid(),
+            Title = "Publication title",
+            Summary = "This is the publication summary",
+            Slug = "publication-slug",
+            SupersededById = supersedingPublication.Id,
+            SupersededBy = supersedingPublication
+        };
+
+        var sut = GetSut();
+
+        // ACT
+        await sut.OnPublicationChanged(publication);
+
+        // ASSERT
+        var expectedEvent = new PublicationChangedEvent(
+            publication.Id,
+            publication.Slug,
+            publication.Title,
+            publication.Summary,
+            isPublicationArchived: true);
         _eventRaiserMockBuilder.Assert.EventRaised(expectedEvent);
     }
 

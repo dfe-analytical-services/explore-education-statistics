@@ -127,7 +127,10 @@ public class PublicationService(
         PublicationSaveRequest updatedPublication)
     {
         return await persistenceHelper
-            .CheckEntityExists<Publication>(publicationId)
+            .CheckEntityExists<Publication>(
+                publicationId,
+                publication => publication.Include(p => p.SupersededBy)
+                )
             .OnSuccess(userService.CheckCanUpdatePublicationSummary)
             .OnSuccessDo(async publication =>
             {

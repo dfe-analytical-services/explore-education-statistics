@@ -9,14 +9,16 @@ public record PublicationChangedEvent : IEvent
         Guid publicationId,
         string publicationSlug,
         string publicationTitle,
-        string publicationSummary)
+        string publicationSummary,
+        bool isPublicationArchived)
     {
         Subject = publicationId.ToString();
         Payload = new EventPayload
         {
             Title = publicationTitle,
             Summary = publicationSummary,
-            Slug = publicationSlug
+            Slug = publicationSlug,
+            IsPublicationArchived = isPublicationArchived
         };
     }
 
@@ -42,6 +44,7 @@ public record PublicationChangedEvent : IEvent
         public required string Title { get; init; }
         public required string Summary { get; init; }
         public required string Slug { get; init; }
+        public required bool IsPublicationArchived { get; init; }
     }
 
     public EventGridEvent ToEventGridEvent() => new(Subject, EventType, DataVersion, Payload);

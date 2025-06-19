@@ -5,6 +5,7 @@ using System.Linq.Expressions;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Events;
 using Moq;
 
@@ -135,14 +136,16 @@ public class AdminEventRaiserMockBuilder
                 publication.Id,
                 publication.Slug,
                 publication.Title,
-                publication.Summary);
+                publication.Summary,
+                publication.IsArchived());
 
             mockBuilder._mock.Verify(m => m.OnPublicationChanged(It.Is<Publication>(p =>
                     new PublicationChangedEvent(
                         p.Id,
                         p.Slug,
                         p.Title,
-                        p.Summary) == expectedEvent)),
+                        p.Summary,
+                        p.IsArchived()) == expectedEvent)),
                 Times.Once);
         }
 

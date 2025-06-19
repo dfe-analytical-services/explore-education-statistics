@@ -3,6 +3,7 @@ using System;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Events;
 using GovUk.Education.ExploreEducationStatistics.Events.EventGrid;
 
@@ -67,7 +68,8 @@ public class AdminEventRaiser(IEventRaiser eventRaiser) : IAdminEventRaiser
             publication.Id,
             publication.Slug,
             publication.Title,
-            publication.Summary
+            publication.Summary,
+            publication.IsArchived()
         ));
 
     /// <summary>
