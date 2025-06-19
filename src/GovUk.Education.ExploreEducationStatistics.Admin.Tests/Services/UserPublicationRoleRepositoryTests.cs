@@ -1,11 +1,17 @@
 #nullable enable
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using Microsoft.EntityFrameworkCore;
+using Moq;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services;
@@ -13,57 +19,132 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services;
 public abstract class UserPublicationRoleRepositoryTests
 {
     private readonly DataFixture _fixture = new();
-
-    public class CreateTests : UserPublicationRoleRepositoryTests
+    
+    [Fact]
+    public async Task TryCreate()
     {
-        [Fact]
-        public async Task Create()
+        var user = new User();
+        var createdBy = new User();
+        var publication = new Publication();
+        var publicationRole = PublicationRole.Owner;
+        
+        var contentDbContextId = Guid.NewGuid().ToString();
+
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
-            var user = new User();
+            await contentDbContext.Users.AddRangeAsync(user, createdBy);
+            await contentDbContext.Publications.AddAsync(publication);
+            await contentDbContext.SaveChangesAsync();
+        }
 
-            var createdBy = new User();
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        {
+            var repository = CreateRepository(contentDbContext);
 
-            var publication = new Publication();
+            var result = await repository.TryCreate(
+                userId: user.Id, 
+                publicationId: publication.Id, 
+                publicationRole: publicationRole, 
+                createdById: createdBy.Id);
 
-            var contentDbContextId = Guid.NewGuid().ToString();
+            Assert.NotNull(result);
 
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                await contentDbContext.Users.AddRangeAsync(user, createdBy);
-                await contentDbContext.Publications.AddAsync(publication);
-                await contentDbContext.SaveChangesAsync();
-            }
+            Assert.NotEqual(Guid.Empty, result.Id);
+            Assert.Equal(user.Id, result.UserId);
+            Assert.Equal(publication.Id, result.PublicationId);
+            Assert.Equal(publicationRole, result.Role);
+            result.Created.AssertUtcNow();
+            Assert.Equal(createdBy.Id, result.CreatedById);
+        }
 
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                var repository = CreateRepository(contentDbContext);
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        {
+            var userPublicationRoles = await contentDbContext.UserPublicationRoles.ToListAsync();
+            var userPublicationRole = Assert.Single(userPublicationRoles);
 
-                var result = await repository.Create(user.Id, publication.Id, PublicationRole.Owner, createdBy.Id);
-
-                Assert.NotEqual(Guid.Empty, result.Id);
-                Assert.Equal(user.Id, result.UserId);
-                Assert.Equal(publication.Id, result.PublicationId);
-                Assert.Equal(PublicationRole.Owner, result.Role);
-                result.Created.AssertUtcNow();
-                Assert.Equal(createdBy.Id, result.CreatedById);
-            }
-
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                var userPublicationRoles = await contentDbContext.UserPublicationRoles.ToListAsync();
-                var userPublicationRole = Assert.Single(userPublicationRoles);
-
-                Assert.NotEqual(Guid.Empty, userPublicationRole.Id);
-                Assert.Equal(user.Id, userPublicationRole.UserId);
-                Assert.Equal(publication.Id, userPublicationRole.PublicationId);
-                Assert.Equal(PublicationRole.Owner, userPublicationRole.Role);
-                userPublicationRole.Created.AssertUtcNow();
-                Assert.Equal(createdBy.Id, userPublicationRole.CreatedById);
-            }
+            Assert.NotEqual(Guid.Empty, userPublicationRole.Id);
+            Assert.Equal(user.Id, userPublicationRole.UserId);
+            Assert.Equal(publication.Id, userPublicationRole.PublicationId);
+            Assert.Equal(publicationRole, userPublicationRole.Role);
+            userPublicationRole.Created.AssertUtcNow();
+            Assert.Equal(createdBy.Id, userPublicationRole.CreatedById);
         }
     }
 
-    public class UserHasRoleOnPublication_TrueIfRoleExistsTests : UserPublicationRoleRepositoryTests
+    [Fact]
+    public async Task TryCreate_NewPermissionsSystemPublicationRolesToRemoveAndCreateFromOldRole()
+    {
+        var user = new User();
+        var createdBy = new User();
+        var publication = _fixture.DefaultPublication()
+            .Generate();
+        var existingPublicationRole = _fixture.DefaultUserPublicationRole()
+            .WithUser(user)
+            .WithPublication(publication)
+            .WithRole(PublicationRole.Drafter)
+            .Generate();
+
+        var contentDbContextId = Guid.NewGuid().ToString();
+
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        {
+            contentDbContext.Users.AddRange(user, createdBy);
+            contentDbContext.Publications.Add(publication);
+            contentDbContext.UserPublicationRoles.Add(existingPublicationRole);
+            await contentDbContext.SaveChangesAsync();
+        }
+
+        var oldPublicationRole = PublicationRole.Owner;
+
+        var newPermissionsSystemHelperMock = new Mock<INewPermissionsSystemHelper>();
+        newPermissionsSystemHelperMock
+            .Setup(rvr => rvr.DetermineNewPermissionsSystemChanges(
+                oldPublicationRole,
+                user.Id,
+                publication.Id))
+            .ReturnsAsync((PublicationRole.Drafter, PublicationRole.Approver));
+
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        {
+            var repository = CreateRepository(contentDbContext, newPermissionsSystemHelperMock.Object);
+
+            var result = await repository.TryCreate(user.Id, publication.Id, oldPublicationRole, createdBy.Id);
+
+            Assert.NotNull(result);
+
+            Assert.NotEqual(Guid.Empty, result.Id);
+            Assert.Equal(user.Id, result.UserId);
+            Assert.Equal(publication.Id, result.PublicationId);
+            Assert.Equal(oldPublicationRole, result.Role);
+            result.Created.AssertUtcNow();
+            Assert.Equal(createdBy.Id, result.CreatedById);
+        }
+
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        {
+            var userPublicationRoles = await contentDbContext.UserPublicationRoles.ToListAsync();
+
+            // Should be 2 as the 'Drafter` role has been removed and replaced with the `Approver` role,
+            // and the `Owner` role has been created.
+            Assert.Equal(2, userPublicationRoles.Count);
+
+            Assert.NotEqual(Guid.Empty, userPublicationRoles[0].Id);
+            Assert.Equal(user.Id, userPublicationRoles[0].UserId);
+            Assert.Equal(publication.Id, userPublicationRoles[0].PublicationId);
+            Assert.Equal(oldPublicationRole, userPublicationRoles[0].Role);
+            userPublicationRoles[0].Created.AssertUtcNow();
+            Assert.Equal(createdBy.Id, userPublicationRoles[0].CreatedById);
+
+            Assert.NotEqual(Guid.Empty, userPublicationRoles[1].Id);
+            Assert.Equal(user.Id, userPublicationRoles[1].UserId);
+            Assert.Equal(publication.Id, userPublicationRoles[1].PublicationId);
+            Assert.Equal(PublicationRole.Approver, userPublicationRoles[1].Role);
+            userPublicationRoles[1].Created.AssertUtcNow();
+            Assert.Equal(createdBy.Id, userPublicationRoles[1].CreatedById);
+        }
+    }
+
+    public class UserHasRoleOnPublicationTests : UserPublicationRoleRepositoryTests
     {
         [Fact]
         public async Task UserHasRoleOnPublication_TrueIfRoleExists()
@@ -180,7 +261,7 @@ public abstract class UserPublicationRoleRepositoryTests
 
                 var result = await repository.GetDistinctRolesByUser(user1.Id);
 
-                // Expect only distinct roles to be returned, therefore the 2nd "Owner" role is filtered out.
+                // Expect only distinct roles to be returned, therefore the 2nd "PublicationRole.Owner" role is filtered out.
                 Assert.Equal([PublicationRole.Owner, PublicationRole.Allower], result);
             }
         }
@@ -585,8 +666,19 @@ public abstract class UserPublicationRoleRepositoryTests
     }
 
     private static UserPublicationRoleRepository CreateRepository(
-        ContentDbContext contentDbContext)
+        ContentDbContext contentDbContext,
+        INewPermissionsSystemHelper? newPermissionsSystemHelper = null)
     {
-        return new(contentDbContext);
+        var newPermissionsSystemHelperMock = new Mock<INewPermissionsSystemHelper>();
+        newPermissionsSystemHelperMock
+            .Setup(rvr => rvr.DetermineNewPermissionsSystemChanges(
+                It.IsAny<PublicationRole>(), 
+                It.IsAny<Guid>(),
+                It.IsAny<Guid>()))
+            .ReturnsAsync((null, null));
+
+        return new(
+            contentDbContext,
+            newPermissionsSystemHelper ?? newPermissionsSystemHelperMock.Object);
     }
 }
