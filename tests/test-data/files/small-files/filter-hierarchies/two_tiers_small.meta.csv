@@ -1,5 +1,4 @@
 col_name,col_type,label,indicator_grouping,indicator_unit,indicator_dp,filter_hint,filter_grouping_column,parent_filter
 ind_one,Indicator,Indicator one,,,,,,
-filter_one,Filter,Filter one,,,,,,
-filter_two,Filter,Filter two,,,,,,filter_one
-filter_three,Filter,Filter three,,,,,,filter_two
+animal_type,Filter,Type of animal,,,,,,
+breed,Filter,Breed,,,,,,animal_type
