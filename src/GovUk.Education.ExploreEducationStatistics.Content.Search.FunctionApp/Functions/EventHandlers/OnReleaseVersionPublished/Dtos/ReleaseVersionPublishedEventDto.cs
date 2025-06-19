@@ -58,4 +58,9 @@ public record ReleaseVersionPublishedEventDto
     /// Has a different release become the new latest?
     /// </summary>
     public bool NewlyPublishedReleaseVersionIsForDifferentRelease => PreviousLatestPublishedReleaseId != ReleaseId;
+    
+    /// <summary>
+    /// Indicates whether the associated publication is archived
+    /// </summary>
+    public bool? IsPublicationArchived { get; init; }
 }
