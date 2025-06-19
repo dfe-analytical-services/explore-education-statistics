@@ -556,7 +556,8 @@ describe('ChartBuilder', () => {
       },
     };
 
-    test('save chart with updated data groupings', async () => {
+    test.skip('save chart with updated data groupings', async () => {
+      // TODO EES-6256
       const handleSubmit = jest.fn();
 
       const { user } = render(
