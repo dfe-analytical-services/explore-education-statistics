@@ -66,10 +66,10 @@ public class UserRoleService(UsersAndRolesDbContext usersAndRolesDbContext,
                     {
                         var (user, publication) = tuple;
 
-                        await userPublicationRoleRepository.Create(
+                        await userPublicationRoleRepository.TryCreate(
                             userId: userId,
                             publicationId: publication.Id,
-                            role: role,
+                            publicationRole: role,
                             createdById: userService.GetUserId());
 
                         await UpgradeToGlobalRoleIfRequired(GetAssociatedGlobalRoleNameForPublicationRole(role), user);

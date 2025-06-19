@@ -7,7 +7,7 @@ public interface IUserReleaseRoleRepository
 {
     Task<UserReleaseRole> Create(Guid userId,
         Guid releaseVersionId,
-        ReleaseRole role,
+        ReleaseRole releaseRole,
         Guid createdById);
 
     Task<UserReleaseRole> CreateIfNotExists(Guid userId,

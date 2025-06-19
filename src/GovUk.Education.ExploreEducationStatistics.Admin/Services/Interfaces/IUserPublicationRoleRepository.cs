@@ -5,9 +5,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 
 public interface IUserPublicationRoleRepository
 {
-    Task<UserPublicationRole> Create(Guid userId,
+    Task<UserPublicationRole?> TryCreate(Guid userId,
         Guid publicationId,
-        PublicationRole role,
+        PublicationRole publicationRole,
         Guid createdById);
 
     Task<List<PublicationRole>> GetDistinctRolesByUser(Guid userId);
@@ -38,3 +38,4 @@ public interface IUserPublicationRoleRepository
         Guid userId,
         CancellationToken cancellationToken = default);
 }
+

@@ -1,15 +1,61 @@
 #nullable enable
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Util;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.EntityFrameworkCore;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services;
 
-public class UserPublicationRoleRepository(ContentDbContext contentDbContext) :
-    UserResourceRoleRepositoryBase<UserPublicationRoleRepository, UserPublicationRole, Publication, PublicationRole>(contentDbContext),
+public class UserPublicationRoleRepository(
+    ContentDbContext contentDbContext,
+    INewPermissionsSystemHelper newPermissionsSystemHelper) :
+    UserResourceRoleRepositoryBase<UserPublicationRoleRepository, UserPublicationRole, Publication, PublicationRole>(
+        contentDbContext),
     IUserPublicationRoleRepository
 {
+    public async Task<UserPublicationRole?> TryCreate(
+        Guid userId, 
+        Guid publicationId, 
+        PublicationRole publicationRole, 
+        Guid createdById)
+    {
+        var (newSystemPublicationRoleToRemove, newSystemPublicationRoleToCreate) =
+            await newPermissionsSystemHelper.DetermineNewPermissionsSystemChanges(
+                publicationRoleToCreate: publicationRole, 
+                userId: userId, 
+                publicationId: publicationId);
+
+        if (newSystemPublicationRoleToRemove.HasValue)
+        {
+            var userPublicationRole = await GetUserPublicationRole(
+                userId: userId,
+                publicationId: publicationId,
+                role: newSystemPublicationRoleToRemove.Value);
+
+            await Remove(userPublicationRole!, createdById);
+        }
+
+        UserPublicationRole? createdNewPermissionsSystemPublicationRole = null;
+
+        if (newSystemPublicationRoleToCreate.HasValue)
+        {
+            createdNewPermissionsSystemPublicationRole = await Create(
+                userId: userId,
+                resourceId: publicationId, 
+                role: newSystemPublicationRoleToCreate.Value,
+                createdById:createdById);
+        }
+
+        return publicationRole.IsNewPermissionsSystemPublicationRole()
+            ? createdNewPermissionsSystemPublicationRole
+            : await Create(
+                userId: userId,
+                resourceId: publicationId,
+                role: publicationRole,
+                createdById: createdById);
+    }
+    
     protected override IQueryable<UserPublicationRole> GetResourceRolesQueryByResourceId(Guid publicationId)
     {
         return ContentDbContext

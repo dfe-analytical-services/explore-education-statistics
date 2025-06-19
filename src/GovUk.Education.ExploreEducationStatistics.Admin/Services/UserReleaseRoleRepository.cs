@@ -9,10 +9,49 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services;
 
 public class UserReleaseRoleRepository(
     ContentDbContext contentDbContext,
+    INewPermissionsSystemHelper newPermissionsSystemHelper,
+    IUserPublicationRoleRepository userPublicationRoleRepository,
     ILogger<UserReleaseRoleRepository> logger) :
     UserResourceRoleRepositoryBase<UserReleaseRoleRepository, UserReleaseRole, ReleaseVersion, ReleaseRole>(contentDbContext),
     IUserReleaseRoleRepository
 {
+    public async Task<UserReleaseRole> Create(Guid userId, Guid releaseVersionId, ReleaseRole releaseRole, Guid createdById)
+    {
+        var publicationId = await ContentDbContext
+            .ReleaseVersions
+            .Where(r => r.Id == releaseVersionId)
+            .Select(r => r.Release.PublicationId)
+            .SingleAsync();
+
+        var (newSystemPublicationRoleToRemove, newSystemPublicationRoleToCreate) = 
+            await newPermissionsSystemHelper.DetermineNewPermissionsSystemChanges(releaseRole, userId, publicationId);
+
+        if (newSystemPublicationRoleToRemove.HasValue)
+        {
+            var userPublicationRole = await userPublicationRoleRepository.GetUserPublicationRole(
+                userId: userId,
+                publicationId: publicationId,
+                role: newSystemPublicationRoleToRemove.Value);
+
+            await userPublicationRoleRepository.Remove(userPublicationRole!, createdById);
+        }
+
+        if (newSystemPublicationRoleToCreate.HasValue)
+        {
+            await userPublicationRoleRepository.TryCreate(
+                userId: userId,
+                publicationId: publicationId,
+                publicationRole: newSystemPublicationRoleToCreate.Value,
+                createdById: createdById);
+        }
+
+        return await Create(
+            userId: userId,
+            resourceId: releaseVersionId,
+            role: releaseRole,
+            createdById: createdById);
+    }
+    
     protected override IQueryable<UserReleaseRole> GetResourceRolesQueryByResourceId(Guid releaseVersionId)
     {
         return ContentDbContext

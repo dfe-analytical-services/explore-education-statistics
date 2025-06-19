@@ -14,7 +14,7 @@ public abstract class UserResourceRoleRepositoryBase<TParent, TResourceRole, TRe
 {
     protected readonly ContentDbContext ContentDbContext = contentDbContext;
 
-    public async Task<TResourceRole> Create(Guid userId, Guid resourceId, TRoleEnum role, Guid createdById)
+    protected async Task<TResourceRole> Create(Guid userId, Guid resourceId, TRoleEnum role, Guid createdById)
     {
         var newResourceRole = NewResourceRole(userId, resourceId, role, createdById);
 
@@ -163,7 +163,7 @@ public abstract class UserResourceRoleRepositoryBase<TParent, TResourceRole, TRe
                 r.Role.Equals(role));
     }
 
-    private static TResourceRole NewResourceRole(Guid userId, Guid resourceId, TRoleEnum role, Guid createdById)
+    protected static TResourceRole NewResourceRole(Guid userId, Guid resourceId, TRoleEnum role, Guid createdById)
     {
         var resourceRole = Activator.CreateInstance<TResourceRole>();
         resourceRole.UserId = userId;
