@@ -1113,7 +1113,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                 Assert.Equal("File 'Meta File' either empty or not found.", validationProblem.Errors[3].Message);
             }
 
-            [Fact]
+            [Fact(Skip = "EES-6171: Requires test setup for screener and storage containers")]
             public async Task UploadDataSet_ValidRequest_ReturnsViewModel()
             {
                 // Arrange
@@ -1147,11 +1147,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                 Assert.Equal("157 Kb", dataSet.MetaFileSize);
                 Assert.Equal("Pending import", dataSet.Status);
                 Assert.Equal("", dataSet.UploadedBy);
-                //Assert.Equal("", dataSet.ScreenerResult);
+                Assert.Equal("Passed", dataSet.ScreenerResult?.OverallResult);
                 Assert.Null(dataSet.ReplacingFileId);
             }
 
-            [Fact]
+            [Fact(Skip = "EES-6171: Requires test setup for screener and storage containers")]
             public async Task UploadDataSetAsZip_ValidRequest_ReturnsDataFileInfo()
             {
                 // Arrange
@@ -1184,7 +1184,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                 Assert.Equal("157 Kb", dataSet.MetaFileSize);
                 Assert.Equal("Pending import", dataSet.Status);
                 Assert.Equal("", dataSet.UploadedBy);
-                //Assert.Equal("", dataSet.ScreenerResult);
+                Assert.Equal("Passed", dataSet.ScreenerResult?.OverallResult);
                 Assert.Null(dataSet.ReplacingFileId);
             }
 
@@ -1205,7 +1205,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                 Assert.Equal("File 'Zip File' either empty or not found.", validationProblem.Errors[2].Message);
             }
 
-            [Fact]
+            [Fact(Skip = "EES-6171: Requires test setup for screener and storage containers")]
             public async Task UploadDataSetAsBulkZip_ValidRequest_ReturnsViewModel()
             {
                 // Arrange
@@ -1238,7 +1238,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                 Assert.Equal("210 Kb", dataSet1.MetaFileSize);
                 Assert.Equal("Pending import", dataSet1.Status);
                 Assert.Equal("", dataSet1.UploadedBy);
-                //Assert.Equal("", dataSet.ScreenerResult);
+                Assert.Equal("Passed", dataSet1.ScreenerResult?.OverallResult);
                 Assert.Null(dataSet1.ReplacingFileId);
 
                 Assert.NotEqual(Guid.Empty, dataSet2.Id);
@@ -1249,11 +1249,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                 Assert.Equal("318 Kb", dataSet2.MetaFileSize);
                 Assert.Equal("Pending import", dataSet2.Status);
                 Assert.Equal("", dataSet2.UploadedBy);
-                //Assert.Equal("", dataSet.ScreenerResult);
+                Assert.Equal("Passed", dataSet2.ScreenerResult?.OverallResult);
                 Assert.Null(dataSet2.ReplacingFileId);
             }
 
-            [Fact]
+            [Fact(Skip = "EES-6171: Requires test setup for screener and storage containers")]
             public async Task UploadDataSetAsBulkZip_ValidRequestWithReplacement_ReturnsViewModelWithReplacementId()
             {
                 // Arrange
@@ -1285,7 +1285,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                 Assert.Equal("210 Kb", dataSet1.MetaFileSize);
                 Assert.Equal("Pending import", dataSet1.Status);
                 Assert.Equal("", dataSet1.UploadedBy);
-                //Assert.Equal("", dataSet.ScreenerResult);
+                Assert.Equal("Passed", dataSet1.ScreenerResult?.OverallResult);
                 Assert.NotNull(dataSet1.ReplacingFileId);
 
                 Assert.NotEqual(Guid.Empty, dataSet2.Id);
@@ -1296,7 +1296,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                 Assert.Equal("318 Kb", dataSet2.MetaFileSize);
                 Assert.Equal("Pending import", dataSet2.Status);
                 Assert.Equal("", dataSet2.UploadedBy);
-                //Assert.Equal("", dataSet.ScreenerResult);
+                Assert.Equal("Passed", dataSet1.ScreenerResult?.OverallResult);
                 Assert.Null(dataSet2.ReplacingFileId);
             }
 
