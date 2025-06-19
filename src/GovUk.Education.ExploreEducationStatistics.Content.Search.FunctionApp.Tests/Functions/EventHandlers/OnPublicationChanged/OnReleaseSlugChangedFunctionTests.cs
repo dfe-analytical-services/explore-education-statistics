@@ -5,7 +5,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Test
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Tests.TheoryDataHelpers;
 using Microsoft.Extensions.Logging.Abstractions;
 
-namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Tests.Functions.OnPublicationChanged;
+namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Tests.Functions.EventHandlers.OnPublicationChanged;
 
 public class OnPublicationChangedFunctionTests
 {
