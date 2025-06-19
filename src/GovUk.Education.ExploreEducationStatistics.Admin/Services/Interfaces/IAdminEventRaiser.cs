@@ -23,6 +23,12 @@ public interface IAdminEventRaiser
 
     Task OnPublicationChanged(Publication publication);
 
+    Task OnPublicationDeleted(
+        Guid publicationId,
+        string publicationSlug,
+        Guid? latestPublishedReleaseId,
+        Guid? latestPublishedReleaseVersionId);
+
     Task OnPublicationLatestPublishedReleaseReordered(
         Publication publication,
         Guid previousLatestPublishedReleaseId,
