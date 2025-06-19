@@ -3,6 +3,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.Enums;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Util;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Queries;
@@ -10,7 +11,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services;
 
-public class UserPublicationRoleRepository(ContentDbContext contentDbContext) : IUserPublicationRoleRepository
+public class UserPublicationRoleRepository(ContentDbContext contentDbContext, INewPermissionsSystemHelper newPermissionsSystemHelper) : IUserPublicationRoleRepository
 {
     public async Task<UserPublicationRole> Create(
         Guid userId,
@@ -21,19 +22,47 @@ public class UserPublicationRoleRepository(ContentDbContext contentDbContext) : 
         CancellationToken cancellationToken = default
     )
     {
-        var newUserPublicationRole = new UserPublicationRole
+        createdDate ??= createdDate?.ToUniversalTime() ?? DateTime.UtcNow;
+        
+        var (newSystemPublicationRoleToRemove, newSystemPublicationRoleToCreate) =
+            await newPermissionsSystemHelper.DetermineNewPermissionsSystemChanges(
+                publicationRoleToCreate: role, 
+                userId: userId, 
+                publicationId: publicationId);
+
+        if (newSystemPublicationRoleToRemove.HasValue)
         {
-            UserId = userId,
-            PublicationId = publicationId,
-            Role = role,
-            Created = createdDate?.ToUniversalTime() ?? DateTime.UtcNow,
-            CreatedById = createdById,
-        };
+            var userPublicationRole = await GetByCompositeKey(
+                userId: userId,
+                publicationId: publicationId,
+                role: newSystemPublicationRoleToRemove.Value,
+                cancellationToken: cancellationToken);
 
-        contentDbContext.UserPublicationRoles.Add(newUserPublicationRole);
-        await contentDbContext.SaveChangesAsync(cancellationToken);
+            await Remove(userPublicationRole!, cancellationToken);
+        }
 
-        return newUserPublicationRole;
+        UserPublicationRole? createdNewPermissionsSystemPublicationRole = null;
+
+        if (newSystemPublicationRoleToCreate.HasValue)
+        {
+            createdNewPermissionsSystemPublicationRole = await Create(
+                userId: userId,
+                publicationId: publicationId, 
+                role: newSystemPublicationRoleToCreate.Value,
+                createdById: createdById,
+                createdDate: createdDate,
+                cancellationToken: cancellationToken);
+        }
+
+        return role.IsNewPermissionsSystemPublicationRole()
+            ? createdNewPermissionsSystemPublicationRole
+            : await Create(
+                userId: userId,
+                publicationId: publicationId,
+                role: role,
+                createdById: createdById,
+                createdDate: createdDate,
+                cancellationToken: cancellationToken);
     }
 
     public async Task<List<UserPublicationRole>> CreateManyIfNotExists(
@@ -199,5 +228,29 @@ public class UserPublicationRoleRepository(ContentDbContext contentDbContext) : 
         userPublicationRole.EmailSent = dateSent ?? DateTimeOffset.UtcNow;
 
         await contentDbContext.SaveChangesAsync(cancellationToken);
+    }
+    
+    private async Task<UserPublicationRole> Create(
+        Guid userId,
+        Guid publicationId,
+        PublicationRole role,
+        Guid createdById,
+        DateTime createdDate,
+        CancellationToken cancellationToken
+    )
+    {
+        var newUserPublicationRole = new UserPublicationRole
+        {
+            UserId = userId,
+            PublicationId = publicationId,
+            Role = role,
+            Created = createdDate,
+            CreatedById = createdById,
+        };
+
+        contentDbContext.UserPublicationRoles.Add(newUserPublicationRole);
+        await contentDbContext.SaveChangesAsync(cancellationToken);
+
+        return newUserPublicationRole;
     }
 }
