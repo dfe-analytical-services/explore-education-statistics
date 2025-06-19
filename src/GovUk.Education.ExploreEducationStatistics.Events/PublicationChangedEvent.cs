@@ -44,7 +44,7 @@ public record PublicationChangedEvent : IEvent
         public required string Title { get; init; }
         public required string Summary { get; init; }
         public required string Slug { get; init; }
-        public required bool IsPublicationArchived { get; set; }
+        public required bool IsPublicationArchived { get; init; }
     }
 
     public EventGridEvent ToEventGridEvent() => new(Subject, EventType, DataVersion, Payload);
