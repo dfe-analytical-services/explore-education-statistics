@@ -20,7 +20,7 @@ public class OnPublicationLatestPublishedReleaseReorderedFunction(IEventGridEven
             eventDto,
             (payload, _) =>
             {
-                if (string.IsNullOrEmpty(payload.Slug))
+                if (string.IsNullOrEmpty(payload.Slug) || payload.IsPublicationArchived == true)
                 {
                     return Task.FromResult(OnPublicationLatestPublishedReleaseReorderedOutput.Empty);
                 }
