@@ -70,6 +70,6 @@ public interface IDataSetFileStorage
     /// <returns>The new entity.</returns>
     Task<DataSetUpload> CreateOrReplaceExistingDbRecord(
         Guid releaseVersionId,
-        DataSetUpload dataSet,
+        DataSetUpload dataSetUpload,
         CancellationToken cancellationToken);
 }

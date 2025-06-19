@@ -3,12 +3,15 @@ using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using System;
+using System.Collections.Generic;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.MockBuilders;
 
 public class DataSetUploadMockBuilder
 {
     private Guid? _releaseVersionId;
+    private ScreenerResult? _screenerResult;
+    private List<DataScreenerTestResult>? _testResults;
 
     public DataSetUpload BuildEntity()
     {
@@ -22,14 +25,16 @@ public class DataSetUploadMockBuilder
             MetaFileId = Guid.NewGuid(),
             MetaFileName = "meta.data.csv",
             MetaFileSizeInBytes = 157,
-            Status = DataSetUploadStatus.PENDING_IMPORT,
+            Status = _screenerResult == ScreenerResult.Failed
+                ? DataSetUploadStatus.FAILED_SCREENING
+                : DataSetUploadStatus.PENDING_IMPORT,
             UploadedBy = "test@test.com",
             Created = DateTime.UtcNow,
             ScreenerResult = new DataSetScreenerResponse
             {
-                OverallResult = ScreenerResult.Passed,
-                Message = "Screener passed",
-                TestResults =
+                OverallResult = _screenerResult ?? ScreenerResult.Passed,
+                Message = "Screening complete",
+                TestResults = _testResults ??
                 [
                     new()
                     {
@@ -49,12 +54,6 @@ public class DataSetUploadMockBuilder
             },
             ReplacingFileId = null,
         };
-    }
-
-    public DataSetUploadMockBuilder WithReleaseVersionId(Guid releaseVersionId)
-    {
-        _releaseVersionId = releaseVersionId;
-        return this;
     }
 
     public static DataSetUploadViewModel BuildViewModel()
@@ -94,5 +93,59 @@ public class DataSetUploadMockBuilder
                 ]
             }
         };
+    }
+
+    public DataSetUploadMockBuilder WithReleaseVersionId(Guid releaseVersionId)
+    {
+        _releaseVersionId = releaseVersionId;
+        return this;
+    }
+
+    public DataSetUploadMockBuilder WithFailingTests()
+    {
+        _screenerResult = ScreenerResult.Failed;
+        _testResults =
+        [
+            new()
+            {
+                TestFunctionName = "TestFunction1",
+                Notes = "Test 1 failed",
+                Stage = Stage.PreScreening1,
+                Result = TestResult.FAIL,
+            },
+            new()
+            {
+                TestFunctionName = "TestFunction2",
+                Notes = "Test 2 failed",
+                Stage = Stage.PreScreening1,
+                Result = TestResult.FAIL,
+            },
+        ];
+
+        return this;
+    }
+
+    public DataSetUploadMockBuilder WithWarningTests()
+    {
+        _screenerResult = ScreenerResult.Passed;
+        _testResults =
+        [
+            new()
+            {
+                TestFunctionName = "TestFunction1",
+                Notes = "Test 1 passed with a warning",
+                Stage = Stage.Passed,
+                Result = TestResult.WARNING,
+            },
+            new()
+            {
+                TestFunctionName = "TestFunction2",
+                Notes = "Test 2 passed with a warning",
+                Stage = Stage.Passed,
+                Result = TestResult.WARNING,
+            },
+        ];
+
+        return this;
     }
 }
