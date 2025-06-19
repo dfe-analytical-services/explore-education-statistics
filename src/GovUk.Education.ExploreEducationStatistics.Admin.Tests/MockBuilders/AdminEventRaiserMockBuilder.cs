@@ -33,6 +33,13 @@ public class AdminEventRaiserMockBuilder
     private static readonly Expression<Func<IAdminEventRaiser, Task>> OnPublicationChanged =
         m => m.OnPublicationChanged(It.IsAny<Publication>());
 
+    private static readonly Expression<Func<IAdminEventRaiser, Task>> OnPublicationDeleted =
+        m => m.OnPublicationDeleted(
+            It.IsAny<Guid>(),
+            It.IsAny<string>(),
+            It.IsAny<Guid?>(),
+            It.IsAny<Guid?>());
+
     private static readonly Expression<Func<IAdminEventRaiser, Task>> OnPublicationLatestPublishedReleaseReordered =
         m => m.OnPublicationLatestPublishedReleaseReordered(
             It.IsAny<Publication>(),
@@ -67,6 +74,10 @@ public class AdminEventRaiserMockBuilder
             .Returns(Task.CompletedTask);
 
         _mock
+            .Setup(OnPublicationDeleted)
+            .Returns(Task.CompletedTask);
+
+        _mock
             .Setup(m => m.OnPublicationLatestPublishedReleaseReordered(
                 It.IsAny<Publication>(),
                 It.IsAny<Guid>(),
@@ -96,7 +107,7 @@ public class AdminEventRaiserMockBuilder
 
     public class Asserter(AdminEventRaiserMockBuilder mockBuilder)
     {
-        public void ThatOnThemeUpdatedRaised(Func<Theme, bool>? predicate = null) =>
+        public void OnThemeUpdatedWasRaised(Func<Theme, bool>? predicate = null) =>
             mockBuilder._mock.Verify(m => m.OnThemeUpdated(It.Is<Theme>(t => predicate == null || predicate(t))),
                 Times.Once);
 
@@ -152,6 +163,22 @@ public class AdminEventRaiserMockBuilder
         private void OnPublicationChangedWasNotRaised() =>
             mockBuilder._mock.Verify(OnPublicationChanged, Times.Never);
 
+        public void OnPublicationDeletedWasRaised(
+            Guid? publicationId = null,
+            string? publicationSlug = null,
+            Guid? latestPublishedReleaseId = null,
+            Guid? latestPublishedReleaseVersionId = null) =>
+            mockBuilder._mock.Verify(m => m.OnPublicationDeleted(
+                    It.Is<Guid>(actual => publicationId == null || actual == publicationId),
+                    It.Is<string>(actual => publicationSlug == null || actual == publicationSlug),
+                    It.Is<Guid?>(actual => latestPublishedReleaseId == null || actual == latestPublishedReleaseId),
+                    It.Is<Guid?>(actual =>
+                        latestPublishedReleaseVersionId == null || actual == latestPublishedReleaseVersionId)),
+                Times.Once);
+
+        private void OnPublicationDeletedWasNotRaised() =>
+            mockBuilder._mock.Verify(OnPublicationDeleted, Times.Never);
+
         public void OnPublicationLatestPublishedReleaseReorderedWasRaised(
             Publication publication,
             Guid previousReleaseId,
@@ -203,6 +230,7 @@ public class AdminEventRaiserMockBuilder
         {
             OnPublicationArchivedWasNotRaised();
             OnPublicationChangedWasNotRaised();
+            OnPublicationDeletedWasNotRaised();
             OnPublicationLatestPublishedReleaseReorderedWasNotRaised();
             OnPublicationRestoredWasNotRaised();
         }

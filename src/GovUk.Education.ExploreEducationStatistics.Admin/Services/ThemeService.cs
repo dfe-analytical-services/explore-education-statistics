@@ -11,6 +11,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Metho
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
@@ -196,10 +197,9 @@ public class ThemeService : IThemeService
         CancellationToken cancellationToken = default)
     {
         return await _userService.CheckCanManageAllTaxonomy()
-            .OnSuccess(() =>
-                _persistenceHelper.CheckEntityExists<Theme>(themeId, q => q.Include(t => t.Publications)))
+            .OnSuccess(() => _contentDbContext.Themes.FirstOrNotFoundAsync(t => t.Id == themeId, cancellationToken))
             .OnSuccessDo(CheckCanDeleteTheme)
-            .OnSuccessDo(theme => DeletePublicationsForTheme(theme, cancellationToken))
+            .OnSuccessDo(() => DeletePublicationsForTheme(themeId, cancellationToken))
             .OnSuccessVoid(async theme =>
             {
                 _contentDbContext.Themes.Remove(theme);
@@ -210,19 +210,19 @@ public class ThemeService : IThemeService
     }
 
     private async Task<Either<List<ActionResult>, Unit>> DeletePublicationsForTheme(
-        Theme theme, CancellationToken cancellationToken)
+        Guid themeId,
+        CancellationToken cancellationToken)
     {
-        var publicationIds = theme
-            .Publications
-            .Select(publication => publication.Id)
-            .ToList();
+        var publicationIds = await _contentDbContext.Publications
+            .Where(p => p.ThemeId == themeId)
+            .Select(p => p.Id)
+            .ToListAsync(cancellationToken);
 
         var deletePublicationResults = await publicationIds
             .ToAsyncEnumerable()
             .SelectAwait(async publicationId =>
-                await DeleteMethodologiesForPublication(publicationId)
-                    .OnSuccess(() => DeleteReleaseVersionsForPublication(publicationId))
-                    .OnSuccess(() => DeletePublication(publicationId)))
+                await DeleteMethodologiesForPublication(publicationId, cancellationToken)
+                    .OnSuccess(() => DeletePublication(publicationId, cancellationToken)))
             .ToListAsync(cancellationToken);
 
         return deletePublicationResults
@@ -231,35 +231,33 @@ public class ThemeService : IThemeService
     }
 
     private async Task<Either<ActionResult, Unit>> DeleteMethodologiesForPublication(
-        Guid publicationId)
+        Guid publicationId,
+        CancellationToken cancellationToken)
     {
         var methodologyIdsToDelete = await _contentDbContext
             .PublicationMethodologies
-            .AsQueryable()
             .Where(pm => pm.Owner && pm.PublicationId == publicationId)
             .Select(pm => pm.MethodologyId)
-            .ToListAsync();
+            .ToListAsync(cancellationToken);
 
         return await methodologyIdsToDelete
             .Select(methodologyId => _methodologyService.DeleteMethodology(methodologyId, true))
             .OnSuccessAllReturnVoid();
     }
 
-    private async Task<Either<ActionResult, Unit>> DeleteReleaseVersionsForPublication(Guid publicationId)
+    private async Task<Either<ActionResult, Unit>> DeletePublication(
+        Guid publicationId,
+        CancellationToken cancellationToken)
     {
-        var publications = await _contentDbContext
+        var publication = await _contentDbContext
             .Publications
-            .Where(publication => publication.Id == publicationId)
-            .ToListAsync();
+            .Include(p => p.LatestPublishedReleaseVersion)
+            .Include(p => p.Contact)
+            .FirstAsync(p => p.Id == publicationId, cancellationToken);
 
-        publications.ForEach(publication =>
-        {
-            publication.LatestPublishedReleaseVersion = null;
-            publication.LatestPublishedReleaseVersionId = null;
-        });
-
-        _contentDbContext.UpdateRange(publications);
-        await _contentDbContext.SaveChangesAsync();
+        // Capture the latest publication release version before it is deleted
+        // so that it can be used to raise an event after the publication is deleted.
+        var latestPublicationReleaseVersion = publication.LatestPublishedReleaseVersion;
 
         // Some Content Db Releases may be soft-deleted and therefore not visible.
         // Ignore the query filter to make sure they are found
@@ -268,8 +266,8 @@ public class ThemeService : IThemeService
             .AsNoTracking()
             .IgnoreQueryFilters()
             .Include(rv => rv.Release)
-            .Where(rv => rv.PublicationId == publicationId)
-            .ToListAsync();
+            .Where(rv => rv.Release.PublicationId == publicationId)
+            .ToListAsync(cancellationToken);
 
         var releaseVersionsAndDataSetVersions = await releaseVersionsToDelete
             .ToAsyncEnumerable()
@@ -281,7 +279,7 @@ public class ThemeService : IThemeService
                     ReleaseVersion: rv,
                     DataSetVersions: dataSetVersions);
             })
-            .ToListAsync();
+            .ToListAsync(cancellationToken);
 
         var releaseVersionIdsInDeleteOrder = releaseVersionsAndDataSetVersions
             .Order(new DependentReleaseVersionDeleteOrderComparator())
@@ -289,21 +287,21 @@ public class ThemeService : IThemeService
             .ToList();
 
         return await releaseVersionIdsInDeleteOrder
-            .Select(releaseVersionId => _releaseVersionService.DeleteTestReleaseVersion(releaseVersionId))
-            .OnSuccessAllReturnVoid();
-    }
+            .Select(releaseVersionId =>
+                _releaseVersionService.DeleteTestReleaseVersion(releaseVersionId, cancellationToken))
+            .OnSuccessAll()
+            .OnSuccessVoid(async () =>
+            {
+                _contentDbContext.Publications.Remove(publication);
+                _contentDbContext.Contacts.Remove(publication.Contact);
+                await _contentDbContext.SaveChangesAsync(cancellationToken);
 
-    private async Task<Either<ActionResult, Unit>> DeletePublication(Guid publicationId)
-    {
-        var publication = await _contentDbContext
-            .Publications
-            .Include(publication => publication.Contact)
-            .SingleAsync(publication => publication.Id == publicationId);
-
-        _contentDbContext.Publications.RemoveRange(publication);
-        _contentDbContext.Contacts.RemoveRange(publication.Contact);
-        await _contentDbContext.SaveChangesAsync();
-        return Unit.Instance;
+                await _eventRaiser.OnPublicationDeleted(
+                    publication.Id,
+                    publication.Slug,
+                    latestPublicationReleaseVersion?.ReleaseId,
+                    latestPublicationReleaseVersion?.Id);
+            });
     }
 
     public async Task<Either<ActionResult, Unit>> DeleteUITestThemes(CancellationToken cancellationToken = default)
