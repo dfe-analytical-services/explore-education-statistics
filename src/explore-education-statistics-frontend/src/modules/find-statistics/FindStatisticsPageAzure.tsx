@@ -165,13 +165,17 @@ const FindStatisticsPage: NextPage = () => {
     filterType: PublicationFilter;
     nextValue: string;
   }) => {
+    // If performing a search (by search term), reset sortBy to relevance
+    const nextSortBy =
+      filterType === 'search' && nextValue.length > 0 ? 'relevance' : sortBy;
+
     const newParams =
       nextValue === 'all'
         ? omit(router.query, 'page', filterType)
         : {
             ...omit(router.query, 'page'),
             [filterType]: nextValue,
-            sortBy,
+            sortBy: nextSortBy,
           };
 
     await updateQueryParams(newParams);
