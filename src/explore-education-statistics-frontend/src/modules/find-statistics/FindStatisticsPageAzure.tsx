@@ -385,7 +385,7 @@ const FindStatisticsPage: NextPage = () => {
                 )}
               </>
             )}
-            {page && totalPages && (
+            {page && !!totalPages && (
               <Pagination
                 currentPage={page}
                 shallow
