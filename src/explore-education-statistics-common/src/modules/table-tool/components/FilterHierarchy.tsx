@@ -381,7 +381,7 @@ function mapOptionTreesRecursively({
 
     return {
       value: optionValue,
-      label: optionLabelsMap[optionId]?.trim() ?? '',
+      label: optionLabelsMap[optionId]?.trim(),
       filterLabel: optionLabelsMap[filterHierarchy[tier]?.filterId] ?? '',
       childFilterLabel: optionLabelsMap[filterHierarchy[tier]?.childFilterId],
       options: mapOptionTreesRecursively({
@@ -397,6 +397,7 @@ function mapOptionTreesRecursively({
   });
 
   const optionsTree = unfilteredOptionsTree
+    .filter(option => !!option.label)
     .filter(
       option => tier === 0 || option.label.toLocaleLowerCase() !== 'total',
     )
