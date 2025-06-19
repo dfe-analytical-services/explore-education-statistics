@@ -21,12 +21,12 @@ public static class PublicationGeneratorExtensions
             .SetDefault(p => p.Slug)
             .SetDefault(p => p.Summary)
             .SetDefault(p => p.Title)
-            .Set((_, p) => p.Contact = new Contact
+            .SetContact(new Contact
             {
-                Id = p.Id,
-                ContactName = $"Contact name for {p.Id}",
+                Id = Guid.NewGuid(),
+                ContactName = "Contact name",
                 TeamEmail = "test@example.com",
-                TeamName = $"Team name for {p.Id}",
+                TeamName = "Team name",
                 ContactTelNo = "01234 567890"
             });
 
@@ -221,7 +221,13 @@ public static class PublicationGeneratorExtensions
     private static InstanceSetters<Publication> SetContact(
         this InstanceSetters<Publication> setters,
         Contact contact)
-        => setters.Set(p => p.Contact, contact);
+        => setters.Set(p => p.Contact, contact)
+            .SetContactId(contact.Id);
+
+    private static InstanceSetters<Publication> SetContactId(
+        this InstanceSetters<Publication> setters,
+        Guid contactId)
+        => setters.Set(p => p.ContactId, contactId);
 
     private static InstanceSetters<Publication> SetExternalMethodology(
         this InstanceSetters<Publication> setters,
