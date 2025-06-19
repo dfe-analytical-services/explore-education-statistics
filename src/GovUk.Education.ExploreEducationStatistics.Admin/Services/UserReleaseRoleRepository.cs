@@ -10,7 +10,10 @@ using Microsoft.EntityFrameworkCore;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services;
 
-public class UserReleaseRoleRepository(ContentDbContext contentDbContext) : IUserReleaseRoleRepository
+public class UserReleaseRoleRepository(
+    ContentDbContext contentDbContext, 
+    INewPermissionsSystemHelper newPermissionsSystemHelper,
+    IUserPublicationRoleRepository userPublicationRoleRepository) : IUserReleaseRoleRepository
 {
     public async Task<UserReleaseRole> Create(
         Guid userId,
@@ -21,12 +24,48 @@ public class UserReleaseRoleRepository(ContentDbContext contentDbContext) : IUse
         CancellationToken cancellationToken = default
     )
     {
+        createdDate ??= createdDate?.ToUniversalTime() ?? DateTime.UtcNow;
+        
+        var publicationId = await contentDbContext
+            .ReleaseVersions
+            .Where(r => r.Id == releaseVersionId)
+            .Select(r => r.Release.PublicationId)
+            .SingleAsync(cancellationToken);
+
+        var (newSystemPublicationRoleToRemove, newSystemPublicationRoleToCreate) = 
+            await newPermissionsSystemHelper.DetermineNewPermissionsSystemChanges(
+                releaseRoleToCreate: role, 
+                userId: userId, 
+                publicationId: publicationId);
+
+        if (newSystemPublicationRoleToRemove.HasValue)
+        {
+            var userPublicationRole = await userPublicationRoleRepository.GetByCompositeKey(
+                userId: userId,
+                publicationId: publicationId,
+                role: newSystemPublicationRoleToRemove.Value,
+                cancellationToken: cancellationToken);
+
+            await userPublicationRoleRepository.Remove(userPublicationRole!, cancellationToken);
+        }
+
+        if (newSystemPublicationRoleToCreate.HasValue)
+        {
+            await userPublicationRoleRepository.Create(
+                userId: userId,
+                publicationId: publicationId,
+                role: newSystemPublicationRoleToCreate.Value,
+                createdById: createdById,
+                createdDate: createdDate,
+                cancellationToken: cancellationToken);
+        }
+        
         var newUserReleaseRole = new UserReleaseRole
         {
             UserId = userId,
             ReleaseVersionId = releaseVersionId,
             Role = role,
-            Created = createdDate?.ToUniversalTime() ?? DateTime.UtcNow,
+            Created = createdDate,
             CreatedById = createdById,
         };
 
