@@ -698,12 +698,10 @@ describe('FindStatisticsPageAzure', () => {
     expect(releaseTypes[0]).toHaveTextContent('All release types');
     expect(releaseTypes[0].selected).toBe(false);
 
-    expect(releaseTypes[1]).toHaveTextContent(
-      'Accredited official statistics (1)',
-    );
+    expect(releaseTypes[1]).toHaveTextContent('Accredited official statistics');
     expect(releaseTypes[1].selected).toBe(true);
 
-    expect(releaseTypes[2]).toHaveTextContent('Official statistics (0)');
+    expect(releaseTypes[2]).toHaveTextContent('Official statistics');
     expect(releaseTypes[2].selected).toBe(false);
 
     // remove release type filter
