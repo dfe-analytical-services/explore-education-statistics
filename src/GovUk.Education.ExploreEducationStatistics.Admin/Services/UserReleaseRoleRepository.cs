@@ -10,11 +10,47 @@ using Microsoft.EntityFrameworkCore;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 {
-    public class UserReleaseRoleRepository :
-        AbstractUserResourceRoleRepository<UserReleaseRole, ReleaseVersion, ReleaseRole>, IUserReleaseRoleRepository
+    public class UserReleaseRoleRepository(
+        ContentDbContext contentDbContext, 
+        INewPermissionsSystemHelper newPermissionsSystemHelper, 
+        IUserPublicationRoleRepository userPublicationRoleRepository) :
+        AbstractUserResourceRoleRepository<UserReleaseRole, ReleaseVersion, ReleaseRole>(contentDbContext), IUserReleaseRoleRepository
     {
-        public UserReleaseRoleRepository(ContentDbContext contentDbContext) : base(contentDbContext)
+        public async Task<UserReleaseRole> Create(Guid userId, Guid releaseVersionId, ReleaseRole releaseRole, Guid createdById)
         {
+            var publicationId = await ContentDbContext
+                .ReleaseVersions
+                .Where(r => r.Id == releaseVersionId)
+                .Select(r => r.Release.PublicationId)
+                .SingleAsync();
+
+            var (newSystemPublicationRoleToRemove, newSystemPublicationRoleToCreate) = 
+                await newPermissionsSystemHelper.DetermineNewPermissionsSystemChanges(releaseRole, userId, publicationId);
+
+            if (newSystemPublicationRoleToRemove.HasValue)
+            {
+                var userPublicationRole = await userPublicationRoleRepository.GetUserPublicationRole(
+                    userId: userId,
+                    publicationId: publicationId,
+                    role: newSystemPublicationRoleToRemove.Value);
+
+                await userPublicationRoleRepository.Remove(userPublicationRole!, createdById);
+            }
+
+            if (newSystemPublicationRoleToCreate.HasValue)
+            {
+                await userPublicationRoleRepository.TryCreate(
+                    userId: userId,
+                    publicationId: publicationId,
+                    publicationRole: newSystemPublicationRoleToCreate.Value,
+                    createdById: createdById);
+            }
+
+            return await Create(
+                userId: userId,
+                resourceId: releaseVersionId,
+                role: releaseRole,
+                createdById: createdById);
         }
 
         protected override IQueryable<UserReleaseRole> GetResourceRolesQueryByResourceId(Guid releaseVersionId)
