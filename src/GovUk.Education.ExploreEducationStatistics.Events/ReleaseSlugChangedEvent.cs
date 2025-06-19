@@ -44,7 +44,7 @@ public record ReleaseSlugChangedEvent : IEvent
         public required string NewReleaseSlug { get; init; }
         public required string PublicationId { get; init; }
         public required string PublicationSlug { get; init; }
-        public required bool IsPublicationArchived { get; set; }
+        public required bool IsPublicationArchived { get; init; }
     }
 
     public EventGridEvent ToEventGridEvent() => new(Subject, EventType, DataVersion, Payload);
