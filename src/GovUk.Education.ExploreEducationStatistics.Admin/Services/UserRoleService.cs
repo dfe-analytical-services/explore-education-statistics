@@ -98,10 +98,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         {
                             var (user, publication) = tuple;
 
-                            await _userPublicationRoleRepository.Create(
+                            await _userPublicationRoleRepository.TryCreate(
                                 userId: userId,
                                 publicationId: publication.Id,
-                                role: role,
+                                publicationRole: role,
                                 createdById: _userService.GetUserId());
 
                             await UpgradeToGlobalRoleIfRequired(GetAssociatedGlobalRoleNameForPublicationRole(role), user);

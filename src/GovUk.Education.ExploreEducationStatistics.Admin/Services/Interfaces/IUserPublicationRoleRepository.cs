@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -8,9 +8,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 {
     public interface IUserPublicationRoleRepository
     {
-        Task<UserPublicationRole> Create(Guid userId,
+        Task<UserPublicationRole?> TryCreate(Guid userId,
             Guid publicationId,
-            PublicationRole role,
+            PublicationRole publicationRole,
             Guid createdById);
 
         Task<List<PublicationRole>> GetDistinctRolesByUser(Guid userId);
@@ -21,7 +21,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
         Task<bool> UserHasRoleOnPublication(Guid userId,
             Guid publicationId,
             PublicationRole role);
-        
+
+        Task<UserPublicationRole?> GetUserPublicationRole(Guid userId, Guid publicationId, PublicationRole role);
+
+        Task Remove(UserPublicationRole userPublicationRole, Guid deletedById);
+
         Task RemoveMany(List<UserPublicationRole> userPublicationRoles, Guid deletedById);
     }
 }

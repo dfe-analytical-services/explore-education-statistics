@@ -175,7 +175,7 @@ public class SignInService : ISignInService
             .ForEachAwaitAsync(invite => _releaseRoleRepository.Create(
                 userId: newUserId,
                 releaseVersionId: invite.ReleaseVersionId,
-                role: invite.Role,
+                releaseRole: invite.Role,
                 createdById: invite.CreatedById));
     }
 
@@ -184,10 +184,10 @@ public class SignInService : ISignInService
         var publicationInvites = await _publicationInviteRepository.ListByEmail(email);
         await publicationInvites
             .ToAsyncEnumerable()
-            .ForEachAwaitAsync(invite => _publicationRoleRepository.Create(
+            .ForEachAwaitAsync(invite => _publicationRoleRepository.TryCreate(
                 userId: newUserId,
                 publicationId: invite.PublicationId,
-                role: invite.Role,
+                publicationRole: invite.Role,
                 createdById: invite.CreatedById));
     }
 
