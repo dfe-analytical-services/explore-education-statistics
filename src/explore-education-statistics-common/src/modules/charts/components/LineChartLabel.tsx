@@ -55,7 +55,7 @@ export default function LineChartLabel({
     return (
       <text
         dy={position === 'above' ? '-10' : '20'}
-        fill={colour}
+        fill={labelColour === 'black' ? '#000' : colour}
         fontSize={14}
         textAnchor={getTextAnchor()}
         x={x}

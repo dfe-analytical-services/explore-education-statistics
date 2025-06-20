@@ -10,7 +10,10 @@ import {
   LineChartDataLabelPosition,
 } from '@common/modules/charts/types/chart';
 import { DataSetCategory } from '@common/modules/charts/types/dataSet';
-import { LegendConfiguration } from '@common/modules/charts/types/legend';
+import {
+  LegendConfiguration,
+  LegendLabelColour,
+} from '@common/modules/charts/types/legend';
 import { axisTickStyle } from '@common/modules/charts/util/chartUtils';
 import createDataSetCategories, {
   toChartData,
@@ -52,6 +55,7 @@ const lineStyles: Dictionary<string> = {
 };
 
 export interface LineChartProps extends ChartProps {
+  dataLabelColour?: LegendLabelColour;
   dataLabelPosition?: LineChartDataLabelPosition;
   legend: LegendConfiguration;
   axes: {
@@ -70,6 +74,7 @@ const LineChartBlock = ({
   width,
   includeNonNumericData,
   showDataLabels,
+  dataLabelColour = 'inherit',
   dataLabelPosition,
 }: LineChartProps) => {
   const [legendProps, renderLegend] = useLegend();
@@ -206,7 +211,9 @@ const LineChartBlock = ({
                   isDataLabel={showDataLabels}
                   isLastItem={props.index === chartData.length - 1}
                   isLegendLabel={legend.position === 'inline'}
-                  labelColour={config.labelColour}
+                  labelColour={
+                    showDataLabels ? dataLabelColour : config.labelColour
+                  }
                   name={config.label}
                   position={
                     showDataLabels ? dataLabelPosition : config.inlinePosition
@@ -267,6 +274,7 @@ export const lineChartBlockDefinition: ChartDefinition = {
     canIncludeNonNumericData: true,
     canPositionLegendInline: true,
     canSetBarThickness: false,
+    canSetDataLabelColour: true,
     canSetDataLabelPosition: true,
     canShowDataLabels: true,
     canShowAllMajorAxisTicks: false,

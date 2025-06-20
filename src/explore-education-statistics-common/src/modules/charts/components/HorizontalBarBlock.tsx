@@ -267,6 +267,7 @@ export const horizontalBarBlockDefinition: ChartDefinition = {
     canIncludeNonNumericData: true,
     canPositionLegendInline: false,
     canSetBarThickness: true,
+    canSetDataLabelColour: false,
     canSetDataLabelPosition: true,
     canShowDataLabels: true,
     canShowAllMajorAxisTicks: false,
