@@ -12,13 +12,15 @@ const downloadService = {
     if (fileId !== undefined) {
       downloadFile(
         // TODO EES-6034 this endpoint now only needs to accept a single fileId, not potential list of files
-        `${contentApi.baseURL}/releases/${releaseVersionId}/files?fromPage=${fromPage}&fileIds=${fileId}`,
+        {
+          file: `${contentApi.baseURL}/releases/${releaseVersionId}/files?fromPage=${fromPage}&fileIds=${fileId}`,
+        },
       );
     } else {
       // If no fileId is provided, download zip with all data sets for release version
-      downloadFile(
-        `${contentApi.baseURL}/releases/${releaseVersionId}/files?fromPage=${fromPage}`,
-      );
+      downloadFile({
+        file: `${contentApi.baseURL}/releases/${releaseVersionId}/files?fromPage=${fromPage}`,
+      });
     }
   },
 };
