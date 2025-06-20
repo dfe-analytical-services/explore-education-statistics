@@ -90,7 +90,6 @@ export default function LineChartLabel({
         textAnchor={isPositionRight ? 'start' : 'end'}
         x={x}
         y={y}
-        data-testid="inline-legend-label"
       >
         {isPositionRight ? (
           // SVG <text> does not line wrap automatically :(
