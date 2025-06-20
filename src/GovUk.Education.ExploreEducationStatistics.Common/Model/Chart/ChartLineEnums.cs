@@ -26,6 +26,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model.Chart
     [SuppressMessage("ReSharper", "InconsistentNaming")]
     public enum ChartInlinePosition
     {
-        above, below
+        above, below, right
     }
 }

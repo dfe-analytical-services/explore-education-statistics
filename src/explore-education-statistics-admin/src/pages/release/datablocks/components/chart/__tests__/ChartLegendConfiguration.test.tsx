@@ -545,7 +545,7 @@ describe('ChartLegendConfiguration', () => {
     expect(legendItem1.queryByLabelText('Style')).not.toBeInTheDocument();
   });
 
-  test('renders the item position field when the legend position is `inline`', () => {
+  test('renders the item position, label colour and y offset fields when the legend position is `inline`', () => {
     render(
       <ChartBuilderFormsContextProvider initialForms={testFormState}>
         <ChartLegendConfiguration
@@ -600,9 +600,11 @@ describe('ChartLegendConfiguration', () => {
 
     expect(legendItem1.getByLabelText('Label')).toHaveValue('Legend item 1');
     expect(legendItem1.getByLabelText('Colour')).toHaveValue('#ff0000');
+    expect(legendItem1.getByLabelText('Label Colour')).toHaveValue('black');
     expect(legendItem1.getByLabelText('Symbol')).toHaveValue('none');
     expect(legendItem1.getByLabelText('Style')).toHaveValue('solid');
-    expect(legendItem1.getByLabelText('Position')).toHaveValue('above');
+    expect(legendItem1.getByLabelText('Position')).toHaveValue('right');
+    expect(legendItem1.queryByLabelText('Y Offset')).toBeInTheDocument();
   });
 
   test('calls `onChange` handler if form values change', async () => {
@@ -656,6 +658,9 @@ describe('ChartLegendConfiguration', () => {
       'Updated legend item 1',
     );
 
+    await user.clear(legendItem1.getByLabelText('Y Offset'));
+    await user.type(legendItem1.getByLabelText('Y Offset'), '20');
+
     await user.selectOptions(legendItem1.getByLabelText('Position'), 'below');
 
     expect(handleChange).toHaveBeenCalledWith<[LegendConfiguration]>({
@@ -665,9 +670,11 @@ describe('ChartLegendConfiguration', () => {
           dataSet,
           label: 'Updated legend item 1',
           colour: '#12436D',
+          labelColour: 'black',
           lineStyle: 'solid',
           symbol: 'none',
           inlinePosition: 'below',
+          inlinePositionOffset: 20,
         },
       ],
     });
@@ -960,9 +967,11 @@ describe('ChartLegendConfiguration', () => {
             },
             label: 'Updated legend item 1',
             colour: '#d53880',
+            labelColour: 'black',
             lineStyle: 'dotted',
             symbol: 'diamond',
             inlinePosition: 'below',
+            inlinePositionOffset: undefined,
           },
         ],
       };

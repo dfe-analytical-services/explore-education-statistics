@@ -105,6 +105,12 @@ const LineChartBlock = ({
   const chartHasNegativeValues =
     (parseNumber(minorDomainTicks.domain?.[0]) ?? 0) < 0;
 
+  const rightMargin =
+    legend.position === 'inline' &&
+    legend.items.some(legendItem => legendItem.inlinePosition === 'right')
+      ? 160 // Arbitrary number that covers max width of labels
+      : 0;
+
   if (!chartData.length) {
     return <p className="govuk-!-margin-top-5">No data to display.</p>;
   }
@@ -128,6 +134,7 @@ const LineChartBlock = ({
           margin={{
             left: 30,
             top: 20,
+            right: rightMargin,
           }}
         >
           <Tooltip
@@ -195,13 +202,15 @@ const LineChartBlock = ({
                   colour={config.colour}
                   decimalPlaces={dataSet.indicator.decimalPlaces}
                   index={props.index}
+                  inlinePositionOffset={config.inlinePositionOffset}
                   isDataLabel={showDataLabels}
+                  isLastItem={props.index === chartData.length - 1}
                   isLegendLabel={legend.position === 'inline'}
+                  labelColour={config.labelColour}
                   name={config.label}
                   position={
                     showDataLabels ? dataLabelPosition : config.inlinePosition
                   }
-                  totalDataPoints={chartData.length}
                   unit={dataSet.indicator.unit}
                   value={props.value}
                   x={props.x}
@@ -281,7 +290,7 @@ export const lineChartBlockDefinition: ChartDefinition = {
   },
   legend: {
     defaults: {
-      position: 'bottom',
+      position: 'inline',
     },
   },
   axes: {

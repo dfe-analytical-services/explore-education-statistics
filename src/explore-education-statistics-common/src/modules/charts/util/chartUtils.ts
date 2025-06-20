@@ -1,6 +1,7 @@
 import { ChartSymbol, LineStyle } from '@common/modules/charts/types/chart';
 import {
   LegendInlinePosition,
+  LegendLabelColour,
   LegendPosition,
 } from '@common/modules/charts/types/legend';
 
@@ -15,10 +16,10 @@ export const colours: string[] = [
 ];
 
 export const legendPositions: LegendPosition[] = [
+  'inline',
   'bottom',
   'top',
   'none',
-  'inline',
 ];
 
 export const symbols: ChartSymbol[] = [
@@ -34,7 +35,13 @@ export const symbols: ChartSymbol[] = [
 
 export const lineStyles: LineStyle[] = ['dashed', 'dotted', 'solid'];
 
-export const legendInlinePositions: LegendInlinePosition[] = ['above', 'below'];
+export const legendInlinePositions: LegendInlinePosition[] = [
+  'right',
+  'above',
+  'below',
+];
+
+export const legendLabelColours: LegendLabelColour[] = ['black', 'inherit'];
 
 export const lineChartDataLabelPositions = ['above', 'below'];
 
