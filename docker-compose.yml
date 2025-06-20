@@ -51,5 +51,13 @@ services:
       POSTGRES_DB: public_data
       POSTGRES_PASSWORD: password
 
+  data-screener:
+    build:
+      context: ../ees-screener-api
+    ports:
+      - "80:80"
+    depends_on:
+      - data-storage
+
 volumes:
   data-storage-data:
