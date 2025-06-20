@@ -367,8 +367,8 @@ describe('ChartConfiguration', () => {
     expect(screen.getByLabelText('Alt text')).toHaveValue(
       'This is the alt text',
     );
-    expect(screen.getByLabelText('Height (pixels)')).toHaveValue(600);
-    expect(screen.getByLabelText('Width (pixels)')).toHaveValue(400);
+    expect(screen.getByLabelText('Height (pixels)')).toHaveNumericValue(600);
+    expect(screen.getByLabelText('Width (pixels)')).toHaveNumericValue(400);
     expect(
       screen.getByLabelText('Include data sets with non-numerical values'),
     ).toBeChecked();

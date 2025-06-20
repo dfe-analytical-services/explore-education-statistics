@@ -9,7 +9,8 @@ exports[`FormNumberInput renders correctly with minimal props 1`] = `
 <input name="test"
        class="govuk-input"
        id="test-input"
-       type="number"
+       inputmode="numeric"
+       type="text"
        value
 >
 `;

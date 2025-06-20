@@ -89,9 +89,9 @@ describe('ReleaseNoteForm', () => {
       expect(
         screen.getByRole('group', { name: 'Edit date' }),
       ).toBeInTheDocument();
-      expect(screen.getByLabelText('Day')).toHaveValue(1);
-      expect(screen.getByLabelText('Month')).toHaveValue(1);
-      expect(screen.getByLabelText('Year')).toHaveValue(2024);
+      expect(screen.getByLabelText('Day')).toHaveNumericValue(1);
+      expect(screen.getByLabelText('Month')).toHaveNumericValue(1);
+      expect(screen.getByLabelText('Year')).toHaveNumericValue(2024);
       expect(screen.getByLabelText('Edit release note')).toHaveValue(
         'Test note',
       );

@@ -17,7 +17,8 @@ exports[`FormFieldDateInput renders correctly 1`] = `
       <input name="startDate.day"
              class="govuk-input govuk-input--width-2"
              id="startDate-day"
-             type="number"
+             inputmode="numeric"
+             type="text"
              value
       >
     </div>
@@ -30,7 +31,8 @@ exports[`FormFieldDateInput renders correctly 1`] = `
       <input name="startDate.month"
              class="govuk-input govuk-input--width-2"
              id="startDate-month"
-             type="number"
+             inputmode="numeric"
+             type="text"
              value
       >
     </div>
@@ -43,7 +45,8 @@ exports[`FormFieldDateInput renders correctly 1`] = `
       <input name="startDate.year"
              class="govuk-input govuk-input--width-4"
              id="startDate-year"
-             type="number"
+             inputmode="numeric"
+             type="text"
              value
       >
     </div>
