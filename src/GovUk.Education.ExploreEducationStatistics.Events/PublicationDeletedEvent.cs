@@ -8,15 +8,13 @@ public record PublicationDeletedEvent : IEvent
     public PublicationDeletedEvent(
         Guid publicationId,
         string publicationSlug,
-        Guid? latestPublishedReleaseId,
-        Guid? latestPublishedReleaseVersionId)
+        LatestPublishedReleaseInfo? latestPublishedRelease)
     {
         Subject = publicationId.ToString();
         Payload = new EventPayload
         {
             PublicationSlug = publicationSlug,
-            LatestPublishedReleaseId = latestPublishedReleaseId,
-            LatestPublishedReleaseVersionId = latestPublishedReleaseVersionId
+            LatestPublishedRelease = latestPublishedRelease
         };
     }
 
@@ -40,8 +38,7 @@ public record PublicationDeletedEvent : IEvent
     public record EventPayload
     {
         public required string PublicationSlug { get; init; }
-        public required Guid? LatestPublishedReleaseId { get; init; }
-        public required Guid? LatestPublishedReleaseVersionId { get; init; }
+        public required LatestPublishedReleaseInfo? LatestPublishedRelease { get; init; }
     }
 
     public EventGridEvent ToEventGridEvent() => new(Subject, EventType, DataVersion, Payload);

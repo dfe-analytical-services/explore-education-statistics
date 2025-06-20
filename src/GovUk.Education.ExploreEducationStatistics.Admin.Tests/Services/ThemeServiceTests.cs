@@ -23,6 +23,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.Cache;
+using GovUk.Education.ExploreEducationStatistics.Events;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Tests.Fixtures;
@@ -383,8 +384,13 @@ public class ThemeServiceTests
                 adminEventRaiser.Assert.OnPublicationDeletedWasRaised(
                     publication.Id,
                     publication.Slug,
-                    publication.LatestPublishedReleaseVersion?.ReleaseId,
-                    publication.LatestPublishedReleaseVersionId
+                    publication.LatestPublishedReleaseVersion != null
+                        ? new LatestPublishedReleaseInfo
+                        {
+                            LatestPublishedReleaseId = publication.LatestPublishedReleaseVersion.ReleaseId,
+                            LatestPublishedReleaseVersionId = publication.LatestPublishedReleaseVersion.Id
+                        }
+                        : null
                 );
             }
         }

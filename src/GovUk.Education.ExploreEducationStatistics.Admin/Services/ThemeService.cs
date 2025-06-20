@@ -18,6 +18,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.Cache;
+using GovUk.Education.ExploreEducationStatistics.Events;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -255,9 +256,15 @@ public class ThemeService : IThemeService
             .Include(p => p.Contact)
             .FirstAsync(p => p.Id == publicationId, cancellationToken);
 
-        // Capture the latest publication release version before it is deleted
-        // so that it can be used to raise an event after the publication is deleted.
-        var latestPublicationReleaseVersion = publication.LatestPublishedReleaseVersion;
+        // Capture details of the latest published release before it is deleted
+        // so that they can be used to raise an event after the publication is deleted.
+        var latestPublicationRelease = publication.LatestPublishedReleaseVersion != null
+            ? new LatestPublishedReleaseInfo
+            {
+                LatestPublishedReleaseId = publication.LatestPublishedReleaseVersion!.ReleaseId,
+                LatestPublishedReleaseVersionId = publication.LatestPublishedReleaseVersion.Id
+            }
+            : null;
 
         // Some Content Db Releases may be soft-deleted and therefore not visible.
         // Ignore the query filter to make sure they are found
@@ -299,8 +306,7 @@ public class ThemeService : IThemeService
                 await _eventRaiser.OnPublicationDeleted(
                     publication.Id,
                     publication.Slug,
-                    latestPublicationReleaseVersion?.ReleaseId,
-                    latestPublicationReleaseVersion?.Id);
+                    latestPublicationRelease);
             });
     }
 
