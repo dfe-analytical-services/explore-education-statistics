@@ -159,16 +159,16 @@ public class AdminEventRaiserTests
     [Theory]
     [InlineData(true)]
     [InlineData(false)]
-    public async Task WhenOnPublicationDeleted_ThenEventPublished(bool hasPublishedReleaseVersion)
+    public async Task WhenOnPublicationDeleted_ThenEventPublished(bool hasPublishedRelease)
     {
         // ARRANGE
         var publicationId = Guid.NewGuid();
         const string publicationSlug = "publication-slug";
-        var latestPublishedReleaseVersion = hasPublishedReleaseVersion
-            ? new ReleaseVersion
+        var latestPublishedRelease = hasPublishedRelease
+            ? new LatestPublishedReleaseInfo
             {
-                Id = Guid.NewGuid(),
-                ReleaseId = Guid.NewGuid()
+                LatestPublishedReleaseId = Guid.NewGuid(),
+                LatestPublishedReleaseVersionId = Guid.NewGuid()
             }
             : null;
 
@@ -178,15 +178,13 @@ public class AdminEventRaiserTests
         await sut.OnPublicationDeleted(
             publicationId,
             publicationSlug,
-            latestPublishedReleaseId: latestPublishedReleaseVersion?.ReleaseId,
-            latestPublishedReleaseVersionId: latestPublishedReleaseVersion?.Id);
+            latestPublishedRelease);
 
         // ASSERT
         var expectedEvent = new PublicationDeletedEvent(
             publicationId,
             publicationSlug,
-            latestPublishedReleaseVersion?.ReleaseId,
-            latestPublishedReleaseVersion?.Id);
+            latestPublishedRelease);
         _eventRaiserMockBuilder.Assert.EventRaised(expectedEvent);
     }
 

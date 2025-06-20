@@ -2,6 +2,7 @@
 using System;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
+using GovUk.Education.ExploreEducationStatistics.Events;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 
@@ -26,8 +27,7 @@ public interface IAdminEventRaiser
     Task OnPublicationDeleted(
         Guid publicationId,
         string publicationSlug,
-        Guid? latestPublishedReleaseId,
-        Guid? latestPublishedReleaseVersionId);
+        LatestPublishedReleaseInfo? latestPublishedRelease);
 
     Task OnPublicationLatestPublishedReleaseReordered(
         Publication publication,
