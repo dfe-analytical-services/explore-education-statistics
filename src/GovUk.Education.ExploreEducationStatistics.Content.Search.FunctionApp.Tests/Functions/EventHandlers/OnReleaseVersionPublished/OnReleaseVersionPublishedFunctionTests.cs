@@ -78,7 +78,12 @@ public class OnReleaseVersionPublishedFunctionTests
         // document will be created using its new ReleaseId.
         // Therefore, the existing, previously latest searchable document needs to be removed.
         Assert.Equal(
-            [new RemoveSearchableDocumentDto { ReleaseId = payload.PreviousLatestPublishedReleaseId }],
+            [
+                new RemoveSearchableDocumentDto
+                {
+                    ReleaseId = payload.PreviousLatestPublishedReleaseId
+                }
+            ],
             response.RemoveSearchableDocuments);
     }
 
@@ -103,10 +108,6 @@ public class OnReleaseVersionPublishedFunctionTests
         var response = await sut.OnReleaseVersionPublished(eventGridEvent, new FunctionContextMockBuilder().Build());
 
         // ASSERT
-        // The searchable documents are keyed on the latest Release Id.
-        // If the newly published release version is for a different release then the new searchable
-        // document will be created using its new ReleaseId.
-        // Therefore, the existing, previously latest searchable document needs to be removed.
         Assert.Empty(response.RemoveSearchableDocuments);
     }
 
@@ -126,10 +127,6 @@ public class OnReleaseVersionPublishedFunctionTests
         var response = await sut.OnReleaseVersionPublished(eventGridEvent, new FunctionContextMockBuilder().Build());
 
         // ASSERT
-        // The searchable documents are keyed on the latest Release Id.
-        // If the newly published release version is an amendment of the latest release version, then it
-        // is for the same Release and therefore the current searchable document will be overwritten and
-        // the previous searchable document does not need to be removed.
         Assert.Empty(response.RemoveSearchableDocuments);
     }
 
@@ -176,7 +173,7 @@ public class OnReleaseVersionPublishedFunctionTests
     
     [Theory]
     [MemberData(nameof(EventsThatRefreshSearchableDocument))]
-    public async Task GivenPublicationIsArchived_WhenReleaseVersionPublished_ThenSearchableDocumentIsRefreshed(ReleaseVersionPublishedEventDto payload)
+    public async Task GivenPublicationIsArchived_WhenReleaseVersionPublished_ThenNoSearchableDocumentIsRefreshed(ReleaseVersionPublishedEventDto payload)
     {
         // ARRANGE
         var eventGridEvent = new EventGridEventBuilder()
