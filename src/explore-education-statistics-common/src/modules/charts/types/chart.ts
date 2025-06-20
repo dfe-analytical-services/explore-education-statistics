@@ -4,7 +4,10 @@ import { lineChartBlockDefinition } from '@common/modules/charts/components/Line
 import { mapBlockDefinition } from '@common/modules/charts/components/MapBlock';
 import { verticalBarBlockDefinition } from '@common/modules/charts/components/VerticalBarBlock';
 import { DataSet } from '@common/modules/charts/types/dataSet';
-import { LegendConfiguration } from '@common/modules/charts/types/legend';
+import {
+  LegendConfiguration,
+  LegendLabelColour,
+} from '@common/modules/charts/types/legend';
 import { FullTableMeta } from '@common/modules/table-tool/types/fullTable';
 import { TableDataResult } from '@common/services/tableBuilderService';
 import { NestedPartial } from '@common/types';
@@ -137,6 +140,7 @@ export interface ChartCapabilities {
   canIncludeNonNumericData: boolean;
   canPositionLegendInline: boolean;
   canSetBarThickness: boolean;
+  canSetDataLabelColour: boolean;
   canSetDataLabelPosition: boolean;
   canShowDataLabels: boolean;
   canShowAllMajorAxisTicks: boolean;
@@ -164,6 +168,7 @@ export interface ChartDefinitionOptions {
   includeNonNumericData?: boolean;
   showDataLabels?: boolean;
   dataLabelPosition?: BarChartDataLabelPosition | LineChartDataLabelPosition;
+  dataLabelColour?: LegendLabelColour;
   // Map options
   boundaryLevel?: number;
   dataClassification?: DataGroupingType;

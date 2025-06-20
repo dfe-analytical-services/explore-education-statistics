@@ -17,9 +17,13 @@ import {
   BarChartDataLabelPosition,
   LineChartDataLabelPosition,
 } from '@common/modules/charts/types/chart';
-import { LegendPosition } from '@common/modules/charts/types/legend';
+import {
+  LegendLabelColour,
+  LegendPosition,
+} from '@common/modules/charts/types/legend';
 import {
   barChartDataLabelPositions,
+  legendLabelColours,
   lineChartDataLabelPositions,
 } from '@common/modules/charts/util/chartUtils';
 import { ValidationProblemDetails } from '@common/services/types/problemDetails';
@@ -32,6 +36,7 @@ import Yup from '@common/validation/yup';
 import capitalize from 'lodash/capitalize';
 import merge from 'lodash/merge';
 import pick from 'lodash/pick';
+import upperFirst from 'lodash/upperFirst';
 import React, {
   ChangeEvent,
   ReactNode,
@@ -96,6 +101,11 @@ const ChartConfiguration = ({
       return { label: capitalize(position), value: position };
     });
   }, [definition.type]);
+
+  const legendLabelOptions = legendLabelColours.map(position => ({
+    label: upperFirst(position),
+    value: position,
+  }));
 
   const titleMaxLength = 220;
   const altTextMaxLength = 220;
@@ -207,10 +217,19 @@ const ChartConfiguration = ({
       });
     }
 
+    if (definition.capabilities.canSetDataLabelColour) {
+      schema = schema.shape({
+        dataLabelColour: Yup.string()
+          .oneOf<LegendLabelColour>(['inherit', 'black'])
+          .optional(),
+      });
+    }
+
     return schema;
   }, [
     definition.capabilities.canIncludeNonNumericData,
     definition.capabilities.canSetBarThickness,
+    definition.capabilities.canSetDataLabelColour,
     definition.capabilities.canSetDataLabelPosition,
     definition.capabilities.canShowDataLabels,
     definition.capabilities.stackable,
@@ -428,14 +447,24 @@ const ChartConfiguration = ({
                 label="Show data labels"
                 showError={!!formState.errors.showDataLabels}
                 conditional={
-                  validationSchema.fields.dataLabelPosition && (
-                    <FormFieldSelect<FormValues>
-                      label="Data label position"
-                      name="dataLabelPosition"
-                      order={[]}
-                      options={dataLabelPositionOptions}
-                    />
-                  )
+                  <>
+                    {validationSchema.fields.dataLabelPosition && (
+                      <FormFieldSelect<FormValues>
+                        label="Data label position"
+                        name="dataLabelPosition"
+                        order={[]}
+                        options={dataLabelPositionOptions}
+                      />
+                    )}
+                    {validationSchema.fields.dataLabelColour && (
+                      <FormFieldSelect<FormValues>
+                        label="Data label colour"
+                        name="dataLabelColour"
+                        order={[]}
+                        options={legendLabelOptions}
+                      />
+                    )}
+                  </>
                 }
               />
             )}
