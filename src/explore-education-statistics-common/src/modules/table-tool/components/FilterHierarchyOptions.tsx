@@ -2,7 +2,9 @@ import ButtonText from '@common/components/ButtonText';
 import ContentHtml from '@common/components/ContentHtml';
 import DetailsMenu from '@common/components/DetailsMenu';
 import { FormCheckbox, FormTextSearchInput } from '@common/components/form';
+import Tag from '@common/components/Tag';
 import VisuallyHidden from '@common/components/VisuallyHidden';
+import { Dictionary } from '@common/types';
 import classNames from 'classnames';
 import React, { memo, useCallback, useMemo, useState } from 'react';
 import { useFormContext } from 'react-hook-form';
@@ -16,6 +18,11 @@ export type FilterHierarchyOption = {
   options?: FilterHierarchyOption[];
 };
 
+export type SelectedChildren = {
+  valuesRelatedToSelectedValues: string[];
+  valuesRelatedToSelectedValuesCountMap: Dictionary<number>;
+};
+
 interface FilterHierarchyOptionsProps {
   disabled?: boolean;
   expandedOptionsList: string[];
@@ -25,6 +32,7 @@ interface FilterHierarchyOptionsProps {
   optionTree: FilterHierarchyOption;
   selectedValues: string[];
   toggleOptions: (optionId: string) => void;
+  selectedChildren: SelectedChildren;
 }
 
 function FilterHierarchyOptions({
@@ -36,9 +44,26 @@ function FilterHierarchyOptions({
   expandedOptionsList,
   hierarchySearchTerm,
   toggleOptions,
+  selectedChildren,
 }: FilterHierarchyOptionsProps) {
   const [searchTerm, setSearchTerm] = useState<string>('');
 
+  const renderSelectedCount = useCallback(() => {
+    const selectedChildrenCount =
+      selectedChildren.valuesRelatedToSelectedValuesCountMap[optionTree.value];
+
+    if (!selectedChildrenCount) {
+      return null;
+    }
+    return (
+      <Tag className="govuk-!-margin-left-2 govuk-!-font-size-16">
+        {selectedChildrenCount} selected
+      </Tag>
+    );
+  }, [
+    optionTree.value,
+    selectedChildren.valuesRelatedToSelectedValuesCountMap,
+  ]);
   const renderLabel = useCallback(
     (label: string) => {
       const termIndex = label.toLowerCase().indexOf(hierarchySearchTerm);
@@ -128,6 +153,7 @@ function FilterHierarchyOptions({
           summary={`${
             isExpanded ? 'Close' : 'Show'
           } ${optionTree.childFilterLabel?.toLocaleLowerCase()}`}
+          summaryAfter={renderSelectedCount()}
           hiddenText={`options for ${optionTree.label.toLocaleLowerCase()}`}
           open={isExpanded}
           onToggle={() => toggleOptions(optionTree.value)}
@@ -179,6 +205,7 @@ function FilterHierarchyOptions({
                 selectedValues={selectedValues}
                 level={level + 1}
                 hierarchySearchTerm={hierarchySearchTerm}
+                selectedChildren={selectedChildren}
               />
             ))}
           </div>
