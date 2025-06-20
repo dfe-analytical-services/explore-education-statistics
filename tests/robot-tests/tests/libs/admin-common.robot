@@ -544,6 +544,8 @@ user navigates to admin dashboard
     ...    css:[data-testid='theme-publications'],[data-testid='no-permission-to-access-releases']
     ...    %{WAIT_SMALL}
 
+# no longer accurate
+
 user uploads subject and waits until complete
     [Arguments]
     ...    ${SUBJECT_NAME}
@@ -557,7 +559,7 @@ user uploads subject and waits until complete
     ...    Complete
     ...    ${FOLDER}
 
-user uploads subject and waits until importing
+user uploads subject and waits until pending import
     [Arguments]
     ...    ${SUBJECT_NAME}
     ...    ${SUBJECT_FILE}
@@ -567,7 +569,7 @@ user uploads subject and waits until importing
     ...    ${SUBJECT_NAME}
     ...    ${SUBJECT_FILE}
     ...    ${META_FILE}
-    ...    Importing
+    ...    Pending import
     ...    ${FOLDER}
 
 user uploads subject
@@ -583,14 +585,14 @@ user uploads subject
     user chooses file    id:dataFileUploadForm-dataFile    ${FOLDER}${SUBJECT_FILE}
     user chooses file    id:dataFileUploadForm-metadataFile    ${FOLDER}${META_FILE}
     user clicks button    Upload data files
-    user waits until modal is visible    Upload summary
-    user waits until modal table cell contains    1    1    ${SUBJECT_NAME}
-    user waits until modal table cell contains    1    2    ${SUBJECT_FILE}
-    user clicks button    Confirm
-    user waits until modal is not visible    Upload summary
+    # user waits until modal is visible    Upload summary
+    # user waits until modal table cell contains    1    1    ${SUBJECT_NAME}
+    # user waits until modal table cell contains    1    2    ${SUBJECT_FILE}
+    # user clicks button    Confirm
+    # user waits until modal is not visible    Upload summary
     user waits until page contains element    testid:Data files table
 
-    IF    "${IMPORT_STATUS}" != "Importing"
+    IF    "${IMPORT_STATUS}" != "Pending import"
         user waits until page finishes loading
     END
 
@@ -600,6 +602,15 @@ user uploads subject
     ${status_cell}=    user gets testid element    Status    %{WAIT_SMALL}    ${row}
     user scrolls to element    ${status_cell}
     user waits until element contains    ${status_cell}    ${IMPORT_STATUS}    %{WAIT_DATA_FILE_IMPORT}
+
+user confirms upload to begin import
+    [Arguments]
+    ...    ${SUBJECT_NAME}
+    ${row}=    user gets table row    ${SUBJECT_NAME}    testid:Data files table
+    ${button}=    user gets button element    View details    ${row}
+    user clicks element    ${button}
+    user clicks button    Continue import
+    user waits until data file import is complete    ${SUBJECT_NAME}
 
 user waits until data upload is completed
     [Arguments]
