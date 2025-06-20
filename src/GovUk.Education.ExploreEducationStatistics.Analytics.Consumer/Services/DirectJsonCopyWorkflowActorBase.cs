@@ -40,10 +40,10 @@ public abstract class DirectJsonCopyWorkflowActorBase(
     /// <param name="connection">An open DuckDb connection.</param>
     public abstract Task InitialiseDuckDb(DuckDbConnection connection);
 
-    public async Task ProcessSourceFile(string sourceFilePath, DuckDbConnection connection)
+    public async Task ProcessSourceFiles(string sourceFilesDirectory, DuckDbConnection connection)
     {
         await connection.DirectCopyJsonIntoDuckDbTable(
-            jsonFilePath: sourceFilePath,
+            jsonFilePath: sourceFilesDirectory,
             tableName: "sourceTable");
     }
 

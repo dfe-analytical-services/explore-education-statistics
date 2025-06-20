@@ -1612,7 +1612,8 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
                     [GeographicLevel.Country, GeographicLevel.LocalAuthority], geographicLevels));
 
                 var originalMeta = releaseFile.File.DataSetFileMeta;
-
+                Assert.NotNull(originalMeta);
+                
                 Assert.Equal(new DataSetFileTimePeriodRangeViewModel
                 {
                     From = TimePeriodLabelFormatter.Format(
@@ -2047,6 +2048,8 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
                 viewModel.File.Meta.GeographicLevels);
 
             var dataSetFileMeta = file.DataSetFileMeta;
+
+            Assert.Equal(0, viewModel.File.Meta.NumDataFileRows);
 
             Assert.Equal(new DataSetFileTimePeriodRangeViewModel
             {

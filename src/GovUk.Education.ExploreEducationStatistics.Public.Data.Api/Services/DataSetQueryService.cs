@@ -277,6 +277,11 @@ internal class DataSetQueryService(
         Dictionary<string, string> indicatorColumnsById,
         QueryState queryState)
     {
+        if (request.Indicators == null)
+        {
+            return [.. indicatorColumnsById.Values];
+        }
+        
         var validIndicatorColumns = new HashSet<string>();
         var invalidIndicatorIds = new HashSet<string>();
 

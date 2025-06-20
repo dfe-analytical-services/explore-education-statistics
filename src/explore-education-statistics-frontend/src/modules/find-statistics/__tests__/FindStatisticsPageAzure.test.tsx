@@ -219,7 +219,9 @@ describe('FindStatisticsPageAzure', () => {
   });
 
   test('renders correctly when searched and has results', async () => {
-    mockRouter.setCurrentUrl('/find-statistics?search=Find+me');
+    mockRouter.setCurrentUrl(
+      '/find-statistics?search=Find+me&sortBy=relevance',
+    );
     publicationService.listPublications.mockResolvedValue({
       results: [testPublications[1], testPublications[2]],
       paging: { ...testPaging, totalPages: 1, totalResults: 2 },
@@ -273,7 +275,7 @@ describe('FindStatisticsPageAzure', () => {
     expect(sortOptions).toHaveLength(4);
     expect(sortOptions[3]).toHaveTextContent('Relevance');
     expect(sortOptions[3]).toHaveValue('relevance');
-    expect(sortOptions[3].selected).toBe(false);
+    expect(sortOptions[3].selected).toBe(true);
 
     const themesSelect = screen.getByLabelText('Filter by Theme');
     const themes = within(themesSelect).getAllByRole(
@@ -698,12 +700,10 @@ describe('FindStatisticsPageAzure', () => {
     expect(releaseTypes[0]).toHaveTextContent('All release types');
     expect(releaseTypes[0].selected).toBe(false);
 
-    expect(releaseTypes[1]).toHaveTextContent(
-      'Accredited official statistics (1)',
-    );
+    expect(releaseTypes[1]).toHaveTextContent('Accredited official statistics');
     expect(releaseTypes[1].selected).toBe(true);
 
-    expect(releaseTypes[2]).toHaveTextContent('Official statistics (0)');
+    expect(releaseTypes[2]).toHaveTextContent('Official statistics');
     expect(releaseTypes[2].selected).toBe(false);
 
     // remove release type filter
@@ -819,7 +819,7 @@ describe('FindStatisticsPageAzure', () => {
 
     expect(mockRouter).toMatchObject({
       pathname: '/find-statistics',
-      query: { search: 'Find me', sortBy: 'newest' },
+      query: { search: 'Find me', sortBy: 'relevance' },
     });
 
     expect(await screen.findByText('2 results')).toBeInTheDocument();
@@ -983,7 +983,7 @@ describe('FindStatisticsPageAzure', () => {
     expect(updatedSortOptions).toHaveLength(4);
     expect(updatedSortOptions[3]).toHaveTextContent('Relevance');
     expect(updatedSortOptions[3]).toHaveValue('relevance');
-    expect(updatedSortOptions[3].selected).toBe(false);
+    expect(updatedSortOptions[3].selected).toBe(true);
   });
 
   test('Reset filters', async () => {

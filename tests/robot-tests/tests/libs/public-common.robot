@@ -19,6 +19,7 @@ user checks release update
     user waits until element contains    css:#releaseLastUpdates li:nth-of-type(${number}) p    ${text}
 
 user checks publication is on find statistics page
+    # TODO EES-6063 - Remove this
     [Arguments]    ${publication_name}
     user navigates to public find statistics page
     user clicks element    id:searchForm-search
@@ -56,6 +57,14 @@ user goes to release page via breadcrumb
 
     user waits until h1 is visible    ${publication}
     user waits until page contains title caption    ${release}
+
+user navigates to public release page
+    [Arguments]    ${public_release_url}    ${publication_name}    ${release_name}=${EMPTY}
+    user navigates to    ${public_release_url}
+    user waits until h1 is visible    ${publication_name}
+    IF    "${release_name}" != ""
+        user waits until page contains title caption    ${release_name}
+    END
 
 user navigates to public find statistics page
     environment variable should be set    PUBLIC_URL

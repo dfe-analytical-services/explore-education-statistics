@@ -109,7 +109,6 @@ Add public prerelease access list
     user creates public prerelease access list    Test public access list
 
 Approve release
-    user clicks link    Sign off
     user approves original release for immediate publication
 
 Go to public Table Tool page
@@ -427,7 +426,6 @@ Add release note for new release amendment
     user waits until element contains    css:#release-notes li:nth-of-type(1) p    Test release note two
 
 Go to "Sign off" to approve amended release for immediate publication
-    user clicks link    Sign off
     user approves amended release for immediate publication
 
 Go to public Table Tool page for amendment

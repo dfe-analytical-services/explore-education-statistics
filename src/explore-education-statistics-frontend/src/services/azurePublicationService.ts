@@ -76,7 +76,7 @@ const azurePublicationService = {
       searchMode: 'any',
       scoringProfile: 'scoring-profile-1',
       highlightFields: 'content',
-      facets: ['themeId,count:60,sort:count', 'releaseType'],
+      facets: ['themeId,count:150,sort:count', 'releaseType'],
       filter,
       orderBy: orderBy ? [orderBy] : undefined,
       select: [
@@ -93,13 +93,14 @@ const azurePublicationService = {
     });
 
     // Transform response into <PaginatedListWithAzureFacets<PublicationListSummary>>
-    const { count, results, facets = {} } = searchResults;
+    const { count = 0, results, facets = {} } = searchResults;
+    const pageSize = 10;
     const publicationsResult = {
       paging: {
-        totalPages: Math.floor((count || 0) / 10) + 1,
-        totalResults: count || 0,
+        totalPages: count === 0 ? 0 : Math.floor((count - 1) / pageSize) + 1,
+        totalResults: count,
         page,
-        pageSize: 10,
+        pageSize,
       },
       results: [] as PublicationListSummary[],
       facets,

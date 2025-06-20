@@ -81,7 +81,7 @@ public abstract class IntegrationTestFixture(TestApplicationFactory testApp) :
         {
             builder.ConfigureServices(services =>
             {
-                services.ReplaceService<IAnalyticsPathResolver>(sp =>
+                services.ReplaceService<IAnalyticsPathResolver>(_ =>
                     new TestAnalyticsPathResolver(), optional: true);
             });
         };

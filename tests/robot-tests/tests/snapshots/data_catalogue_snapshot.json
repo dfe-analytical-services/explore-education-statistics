@@ -1,5 +1,5 @@
 {
-  "num_datasets": "1002 data sets",
+  "num_datasets": "1013 data sets",
   "themes": [
     {
       "publications": [
@@ -18,7 +18,8 @@
         "Looked after children aged 16 to 17 in independent or semi-independent placements",
         "Outcomes for children in need, including children looked after by local authorities in England",
         "Outcomes of children in need, including looked after children",
-        "Serious incident notifications"
+        "Serious incident notifications",
+        "Stability measures for children looked after in England"
       ],
       "theme_heading": "Children's social care"
     },
@@ -131,6 +132,7 @@
         "National pupil projections",
         "National Tutoring Programme",
         "Parental responsibility measures",
+        "Primary and secondary school applications and offers",
         "Pupil absence in schools in England",
         "Pupil absence in schools in England: autumn and spring terms",
         "Pupil absence in schools in England: autumn term",
@@ -141,7 +143,6 @@
         "School places sufficiency survey",
         "Schools eligible for RISE intervention",
         "Schools, pupils and their characteristics",
-        "Secondary and primary school applications and offers",
         "Special educational needs in England",
         "Suspensions and permanent exclusions in England",
         "The link between absence and attainment at KS2 and KS4"

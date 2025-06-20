@@ -678,22 +678,31 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
         private static void ConfigureUserPublicationRole(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<UserPublicationRole>()
-                .Property(r => r.Created)
+                .Property(upr => upr.Created)
                 .HasConversion(
                     v => v,
                     v => v.HasValue ? DateTime.SpecifyKind(v.Value, DateTimeKind.Utc) : null);
 
             modelBuilder.Entity<UserPublicationRole>()
-                .HasOne(r => r.CreatedBy)
+                .HasOne(upr => upr.CreatedBy)
                 .WithMany()
                 .OnDelete(DeleteBehavior.NoAction);
 
             modelBuilder.Entity<UserPublicationRole>()
-                .Property(r => r.Role)
+                .Property(upr => upr.Role)
                 .HasConversion(new EnumToStringConverter<PublicationRole>());
 
+            // This will be changed when we start introducing the use of the NEW publication roles in the 
+            // UI, in STEP 9 (EES-6196) of the Permissions Rework. For now, we want to
+            // filter out any usage of the NEW roles.
+            var unusedRoles = new[]
+            {
+                PublicationRole.Approver,
+                PublicationRole.Drafter
+            };
+
             modelBuilder.Entity<UserPublicationRole>()
-                .HasQueryFilter(p => p.Deleted == null);
+                .HasQueryFilter(upr => upr.Deleted == null && !unusedRoles.Contains(upr.Role));
         }
 
         private static void ConfigureUserReleaseRole(ModelBuilder modelBuilder)

@@ -102,7 +102,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
         {
             return new(
                 persistenceHelper ?? DefaultPersistenceHelperMock().Object,
-                contentDbContext ?? Mock.Of<ContentDbContext>(),
+                contentDbContext ??= Mock.Of<ContentDbContext>(),
                 methodologyContentService ?? Mock.Of<IMethodologyContentService>(Strict),
                 methodologyFileRepository ?? new MethodologyFileRepository(contentDbContext),
                 methodologyVersionRepository ?? Mock.Of<IMethodologyVersionRepository>(Strict),

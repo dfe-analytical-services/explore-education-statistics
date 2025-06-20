@@ -48,7 +48,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
                 File = file,
                 SubjectId = Guid.NewGuid(),
                 Status = STAGE_3,
-                ExpectedImportedRows = 2
+                ExpectedImportedRows = 2,
+                TotalRows = 65,
             };
 
             var dataImportService = new Mock<IDataImportService>(Strict);
@@ -61,7 +62,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
             dataImportService
                 .Setup(s => s.WriteDataSetFileMeta(
                     import.FileId,
-                    import.SubjectId))
+                    import.SubjectId,
+                    import.TotalRows))
                 .Returns(Task.CompletedTask);
 
             var statisticsDbContextId = Guid.NewGuid().ToString();
@@ -223,7 +225,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
                         File = file,
                         SubjectId = Guid.NewGuid(),
                         Status = finishedStatus,
-                        ExpectedImportedRows = 2
+                        ExpectedImportedRows = 2,
+                        TotalRows = 93,
                     };
 
                     var dataImportService = new Mock<IDataImportService>(Strict);
@@ -231,7 +234,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
                     {
                         dataImportService.Setup(mock => mock.WriteDataSetFileMeta(
                                 import.FileId,
-                                import.SubjectId))
+                                import.SubjectId,
+                                import.TotalRows))
                             .Returns(Task.CompletedTask);
                     }
 

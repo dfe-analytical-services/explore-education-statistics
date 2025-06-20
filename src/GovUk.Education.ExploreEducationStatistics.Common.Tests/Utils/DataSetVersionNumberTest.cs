@@ -53,6 +53,7 @@ public static class DataSetVersionNumberTest
             Assert.Null(wildcardVersion);
         }
     }
+
     public class TryParseTests
     {
         [Theory]

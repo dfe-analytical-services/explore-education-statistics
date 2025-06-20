@@ -44,14 +44,14 @@ public class PublicZipDownloadsProcessor(
             ");
         }
 
-        public async Task ProcessSourceFile(string sourceFilePath, DuckDbConnection connection)
+        public async Task ProcessSourceFiles(string sourceFilesDirectory, DuckDbConnection connection)
         {
             await connection.ExecuteNonQueryAsync($@"
                 INSERT INTO sourceTable BY NAME (
                     SELECT
                         MD5(CONCAT(subjectId, releaseVersionId, fromPage)) AS zipDownloadHash,
                         *
-                    FROM read_json('{sourceFilePath}', 
+                    FROM read_json('{sourceFilesDirectory}', 
                         format='unstructured',
                         columns = {{
                             publicationName: VARCHAR,

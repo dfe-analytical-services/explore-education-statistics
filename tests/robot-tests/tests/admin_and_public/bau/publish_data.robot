@@ -57,7 +57,6 @@ Add public prerelease access list
     ...    Test public access list
 
 Go to "Sign off" page and approve release
-    user clicks link    Sign off
     user approves original release for immediate publication
 
 Create another release for the same publication
@@ -519,20 +518,21 @@ Add public prerelease access list again
     user creates public prerelease access list    Test public access list
 
 Approve release
-    user clicks link    Sign off
     user approves original release for immediate publication
 
-Verify newly published release is on Find Statistics page
-    user waits for caches to expire
+Get public release link
+    ${PUBLIC_RELEASE_LINK}=    user gets url public release will be accessible at
+    Set Suite Variable    ${PUBLIC_RELEASE_LINK}
 
+Verify newly published release is on Find Statistics page
+    # TODO EES-6063 - Remove this
+    user waits for caches to expire
     user checks publication is on find statistics page    ${PUBLICATION_NAME}
 
-Navigate to published release page
-    user clicks link    ${PUBLICATION_NAME}
-    user waits until h1 is visible    ${PUBLICATION_NAME}    %{WAIT_MEDIUM}
+Verify newly published release is public
+    user navigates to public release page    ${PUBLIC_RELEASE_LINK}    ${PUBLICATION_NAME}    ${RELEASE_2_NAME}
 
 Check latest release is correct
-    user waits until page contains title caption    ${RELEASE_2_NAME}    %{WAIT_MEDIUM}
     user checks page contains    This is the latest data
     user checks page contains    View releases (1)
 

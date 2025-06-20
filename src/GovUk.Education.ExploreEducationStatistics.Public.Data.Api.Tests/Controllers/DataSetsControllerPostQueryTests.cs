@@ -283,26 +283,6 @@ public abstract class DataSetsControllerPostQueryTests(TestApplicationFactory te
     public class IndicatorValidationTests(TestApplicationFactory testApp) : DataSetsControllerPostQueryTests(testApp)
     {
         [Fact]
-        public async Task Empty_Returns400()
-        {
-            var dataSetVersion = await SetupDefaultDataSetVersion();
-
-            var response = await QueryDataSet(
-                dataSetId: dataSetVersion.DataSetId,
-                request: new DataSetQueryRequest
-                {
-                    Indicators = []
-                }
-            );
-
-            var validationProblem = response.AssertValidationProblem();
-
-            Assert.Single(validationProblem.Errors);
-
-            validationProblem.AssertHasNotEmptyError("indicators");
-        }
-
-        [Fact]
         public async Task Blank_Returns400()
         {
             var dataSetVersion = await SetupDefaultDataSetVersion();
@@ -343,25 +323,6 @@ public abstract class DataSetsControllerPostQueryTests(TestApplicationFactory te
 
             validationProblem.AssertHasMaximumLengthError("indicators[0]", maxLength: 40);
             validationProblem.AssertHasMaximumLengthError("indicators[1]", maxLength: 40);
-        }
-
-        [Fact]
-        public async Task MissingParam_Returns400()
-        {
-            var dataSetVersion = await SetupDefaultDataSetVersion();
-
-            var client = BuildApp().CreateClient();
-
-            var response = await client.PostAsJsonAsync(
-                $"{BaseUrl}/{dataSetVersion.DataSetId}/query",
-                new {}
-            );
-
-            var validationProblem = response.AssertValidationProblem();
-
-            Assert.Single(validationProblem.Errors);
-
-            validationProblem.AssertHasNotEmptyError("indicators");
         }
 
         [Fact]
@@ -1950,8 +1911,10 @@ public abstract class DataSetsControllerPostQueryTests(TestApplicationFactory te
             Assert.Equal(0.241600007f, sessUnauthorisedPercent.Min());
         }
 
-        [Fact]
-        public async Task AllIndicators_Returns200_CorrectResultIds()
+        [Theory]
+        [InlineData(false)]
+        [InlineData(true)]
+        public async Task AllIndicators_Returns200_CorrectResultIds(bool includeIndicatorsQueryParam)
         {
             var dataSetVersion = await SetupDefaultDataSetVersion();
 
@@ -1959,7 +1922,8 @@ public abstract class DataSetsControllerPostQueryTests(TestApplicationFactory te
                 dataSetId: dataSetVersion.DataSetId,
                 request: new DataSetQueryRequest
                 {
-                    Indicators =
+                    Indicators = includeIndicatorsQueryParam
+                        ? 
                     [
                         AbsenceSchoolData.IndicatorEnrolments,
                         AbsenceSchoolData.IndicatorSessAuthorised,
@@ -1967,6 +1931,7 @@ public abstract class DataSetsControllerPostQueryTests(TestApplicationFactory te
                         AbsenceSchoolData.IndicatorSessUnauthorised,
                         AbsenceSchoolData.IndicatorSessUnauthorisedPercent,
                     ]
+                        : null
                 }
             );
 
@@ -2063,8 +2028,10 @@ public abstract class DataSetsControllerPostQueryTests(TestApplicationFactory te
             Assert.Contains(AbsenceSchoolData.IndicatorSessUnauthorisedPercent, meta.Indicators);
         }
 
-        [Fact]
-        public async Task AllIndicators_Returns200_CorrectDebuggedResultLabels()
+        [Theory]
+        [InlineData(false)]
+        [InlineData(true)]
+        public async Task AllIndicators_Returns200_CorrectDebuggedResultLabels(bool includeIndicatorsQueryParam)
         {
             var dataSetVersion = await SetupDefaultDataSetVersion();
 
@@ -2072,14 +2039,16 @@ public abstract class DataSetsControllerPostQueryTests(TestApplicationFactory te
                 dataSetId: dataSetVersion.DataSetId,
                 request: new DataSetQueryRequest
                 {
-                    Indicators =
+                    Indicators = includeIndicatorsQueryParam
+                        ?
                     [
                         AbsenceSchoolData.IndicatorEnrolments,
                         AbsenceSchoolData.IndicatorSessAuthorised,
                         AbsenceSchoolData.IndicatorSessPossible,
                         AbsenceSchoolData.IndicatorSessUnauthorised,
                         AbsenceSchoolData.IndicatorSessUnauthorisedPercent,
-                    ],
+                    ]
+                        : null,
                     Debug = true
                 }
             );
@@ -2305,6 +2274,57 @@ public abstract class DataSetsControllerPostQueryTests(TestApplicationFactory te
             Assert.Equal(2, result.Values.Count);
             Assert.Equal("752009", result.Values[AbsenceSchoolData.IndicatorEnrolments]);
             Assert.Equal("262396", result.Values[AbsenceSchoolData.IndicatorSessAuthorised]);
+        }
+        
+        [Fact]
+        public async Task NoFacets_Returns200AndAllResults()
+        {
+            var dataSetVersion = await SetupDefaultDataSetVersion();
+
+            var response = await QueryDataSet(
+                dataSetId: dataSetVersion.DataSetId,
+                request: null);
+
+            var viewModel = response.AssertOk<DataSetQueryPaginatedResultsViewModel>(useSystemJson: true);
+
+            Assert.Equal(216, viewModel.Results.Count);
+
+            // This equates to the row of data.parquet with id 169 - the first in the data set
+            // that has options for all 3 filters.
+            var fullResult = viewModel
+                .Results
+                .First(r => r.Values[AbsenceSchoolData.IndicatorEnrolments] == "296352");
+
+            Assert.Equal(AbsenceSchoolData.FilterNcYear4, fullResult.Filters[AbsenceSchoolData.FilterNcYear]);
+            Assert.Equal(
+                AbsenceSchoolData.FilterSchoolTypePrimary,
+                fullResult.Filters[AbsenceSchoolData.FilterSchoolType]
+            );
+            Assert.Equal(
+                AbsenceSchoolData.FilterAcademyTypePrimarySponsorLed,
+                fullResult.Filters[AbsenceSchoolData.FilterAcademyType]
+            );
+
+            Assert.Equal(GeographicLevel.LocalAuthority, fullResult.GeographicLevel);
+
+            Assert.Equal(4, fullResult.Locations.Count);
+            Assert.Equal(AbsenceSchoolData.LocationNatEngland, fullResult.Locations["NAT"]);
+            Assert.Equal(AbsenceSchoolData.LocationRegionYorkshire, fullResult.Locations["REG"]);
+            Assert.Equal(AbsenceSchoolData.LocationLaBarnsley, fullResult.Locations["LA"]);
+            Assert.Equal(
+                AbsenceSchoolData.LocationSchoolHoylandPrimary,
+                fullResult.Locations["SCH"]
+            );
+
+            Assert.Equal(TimeIdentifier.AcademicYear, fullResult.TimePeriod.Code);
+            Assert.Equal("2020/2021", fullResult.TimePeriod.Period);
+
+            Assert.Equal(5, fullResult.Values.Count);
+            Assert.Equal("296352", fullResult.Values[AbsenceSchoolData.IndicatorEnrolments]);
+            Assert.Equal("1002108", fullResult.Values[AbsenceSchoolData.IndicatorSessAuthorised]);
+            Assert.Equal("7368540", fullResult.Values[AbsenceSchoolData.IndicatorSessPossible]);
+            Assert.Equal("285622", fullResult.Values[AbsenceSchoolData.IndicatorSessUnauthorised]);
+            Assert.Equal("3.9876", fullResult.Values[AbsenceSchoolData.IndicatorSessUnauthorisedPercent]);
         }
     }
 
@@ -4140,7 +4160,7 @@ public abstract class DataSetsControllerPostQueryTests(TestApplicationFactory te
     
     private async Task<HttpResponseMessage> QueryDataSet(
         Guid dataSetId,
-        DataSetQueryRequest request,
+        DataSetQueryRequest? request,
         string? dataSetVersion = null,
         Guid? previewTokenId = null,
         WebApplicationFactory<Startup>? app = null,

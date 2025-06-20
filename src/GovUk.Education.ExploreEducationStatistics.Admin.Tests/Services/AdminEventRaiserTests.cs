@@ -39,8 +39,10 @@ public class AdminEventRaiserTests
         _eventRaiserMockBuilder.Assert.EventRaised(expectedEvent);
     }
 
-    [Fact]
-    public async Task WhenOnReleaseSlugChanged_ThenEventPublished()
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public async Task WhenOnReleaseSlugChanged_ThenEventPublished(bool isPublicationArchived)
     {
         // ARRANGE
         var releaseId = Guid.NewGuid();
@@ -55,14 +57,16 @@ public class AdminEventRaiserTests
             releaseId,
             newReleaseSlug,
             publicationId,
-            publicationSlug);
+            publicationSlug,
+            isPublicationArchived);
 
         // ASSERT
         var expectedEvent = new ReleaseSlugChangedEvent(
             releaseId,
             newReleaseSlug,
             publicationId,
-            publicationSlug);
+            publicationSlug,
+            isPublicationArchived);
         _eventRaiserMockBuilder.Assert.EventRaised(expectedEvent);
     }
 
@@ -112,7 +116,43 @@ public class AdminEventRaiserTests
             publication.Id,
             publication.Slug,
             publication.Title,
-            publication.Summary);
+            publication.Summary,
+            isPublicationArchived: false);
+        _eventRaiserMockBuilder.Assert.EventRaised(expectedEvent);
+    }
+    
+    [Fact]
+    public async Task GivenPublicationIsArchived_WhenOnPublicationChanged_ThenEventPublishedWithIsPublicationArchivedTrue()
+    {
+        // ARRANGE
+        var supersedingPublication = new Publication
+        {
+            Id = Guid.NewGuid(), 
+            LatestPublishedReleaseVersionId = Guid.NewGuid()
+        };
+        
+        var publication = new Publication
+        {
+            Id = Guid.NewGuid(),
+            Title = "Publication title",
+            Summary = "This is the publication summary",
+            Slug = "publication-slug",
+            SupersededById = supersedingPublication.Id,
+            SupersededBy = supersedingPublication
+        };
+
+        var sut = GetSut();
+
+        // ACT
+        await sut.OnPublicationChanged(publication);
+
+        // ASSERT
+        var expectedEvent = new PublicationChangedEvent(
+            publication.Id,
+            publication.Slug,
+            publication.Title,
+            publication.Summary,
+            isPublicationArchived: true);
         _eventRaiserMockBuilder.Assert.EventRaised(expectedEvent);
     }
 
@@ -147,7 +187,51 @@ public class AdminEventRaiserTests
             publication.LatestPublishedReleaseVersion.ReleaseId,
             publication.LatestPublishedReleaseVersionId.Value,
             previousLatestPublishedReleaseId,
+            previousLatestPublishedReleaseVersionId,
+            isPublicationArchived: false);
+        _eventRaiserMockBuilder.Assert.EventRaised(expectedEvent);
+    }
+
+    [Fact]
+    public async Task GivenPublicationIsArchived_WhenOnPublicationLatestPublishedReleaseReordered_ThenEventPublishedWithIsPublicationArchivedTrue()
+    {
+        // ARRANGE
+        var supersedingPublication = new Publication
+        {
+            Id = Guid.NewGuid(), LatestPublishedReleaseVersionId = Guid.NewGuid()
+        };
+        
+        var publication = new Publication
+        {
+            Id = Guid.NewGuid(),
+            Title = "Publication title",
+            Slug = "publication-slug",
+            LatestPublishedReleaseVersionId = Guid.NewGuid(),
+            LatestPublishedReleaseVersion = new ReleaseVersion{ ReleaseId = Guid.NewGuid() },
+            SupersededById = supersedingPublication.Id,
+            SupersededBy = supersedingPublication,
+        };
+        var previousLatestPublishedReleaseId = Guid.NewGuid();
+        var previousLatestPublishedReleaseVersionId = Guid.NewGuid();
+
+        var sut = GetSut();
+
+        // ACT
+        await sut.OnPublicationLatestPublishedReleaseReordered(
+            publication,
+            previousLatestPublishedReleaseId,
             previousLatestPublishedReleaseVersionId);
+
+        // ASSERT
+        var expectedEvent = new PublicationLatestPublishedReleaseReorderedEvent(
+            publication.Id,
+            publication.Title,
+            publication.Slug,
+            publication.LatestPublishedReleaseVersion.ReleaseId,
+            publication.LatestPublishedReleaseVersionId.Value,
+            previousLatestPublishedReleaseId,
+            previousLatestPublishedReleaseVersionId,
+            isPublicationArchived: true);
         _eventRaiserMockBuilder.Assert.EventRaised(expectedEvent);
     }
 

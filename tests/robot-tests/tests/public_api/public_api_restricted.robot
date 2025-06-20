@@ -160,7 +160,6 @@ Add headline text block to Content page
     user adds content to headlines text block    Headline text block text
 
 Approve first release
-    user clicks link    Sign off
     user approves release for immediate publication
 
 Navigate to admin and create an amendment

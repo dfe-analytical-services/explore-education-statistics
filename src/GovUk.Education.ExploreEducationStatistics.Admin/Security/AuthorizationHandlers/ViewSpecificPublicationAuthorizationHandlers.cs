@@ -40,12 +40,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
                 return;
             }
 
+            // This will be changed when we start introducing the use of the NEW publication roles in the 
+            // authorisation handlers, in STEP 8 (EES-6194) of the Permissions Rework. For now, we want to
+            // filter out any usage of the NEW roles.
+            var validPublicationRoles = EnumUtil.GetEnums<PublicationRole>()
+                .Except([PublicationRole.Approver, PublicationRole.Drafter]);
+
             // If the user has any PublicationRole on the Publication, they can see it.
             if (await _authorizationHandlerService
                     .HasRolesOnPublication(
                         context.User.GetUserId(),
                         publication.Id,
-                        EnumUtil.GetEnumsArray<PublicationRole>()))
+                        [.. validPublicationRoles]))
             {
                 context.Succeed(requirement);
                 return;

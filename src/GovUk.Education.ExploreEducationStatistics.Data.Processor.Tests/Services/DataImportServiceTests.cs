@@ -215,6 +215,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
         [Fact]
         public async Task WriteDataSetMetaFile_Success()
         {
+            var totalRows = 9393;
+
             var subject = _fixture.DefaultSubject()
                 .Generate();
 
@@ -285,7 +287,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
                 contentDbContextId,
                 statisticsDbContextId);
 
-            await service.WriteDataSetFileMeta(file.Id, subject.Id);
+            await service.WriteDataSetFileMeta(file.Id, subject.Id, totalRows);
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
@@ -303,6 +305,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
 
                 Assert.NotNull(updatedFile.DataSetFileMeta);
                 var meta = updatedFile.DataSetFileMeta;
+
+                Assert.Equal(totalRows, meta.NumDataFileRows);
 
                 Assert.Equal("2000", meta.TimePeriodRange.Start.Period);
                 Assert.Equal(TimeIdentifier.April, meta.TimePeriodRange.Start.TimeIdentifier);

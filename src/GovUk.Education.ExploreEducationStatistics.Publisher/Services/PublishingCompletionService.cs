@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.Cache;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
@@ -136,6 +137,7 @@ public class PublishingCompletionService(
     {
         var publication = await contentDbContext.Publications
             .Include(p => p.LatestPublishedReleaseVersion)
+            .Include(p => p.SupersededBy)
             .SingleAsync(p => p.Id == publicationId);
 
         var previousLatestPublishedReleaseVersion = publication.LatestPublishedReleaseVersion;
@@ -156,7 +158,8 @@ public class PublishingCompletionService(
             LatestPublishedReleaseVersionId = latestPublishedReleaseVersion.Id,
             PreviousLatestPublishedReleaseId = previousLatestPublishedReleaseVersion?.ReleaseId,
             PreviousLatestPublishedReleaseVersionId = previousLatestPublishedReleaseVersion?.Id,
-            PublishedReleaseVersions = publishedReleaseVersions
+            PublishedReleaseVersions = publishedReleaseVersions,
+            IsPublicationArchived = publication.IsArchived()
         };
     }
 

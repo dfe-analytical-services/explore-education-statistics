@@ -67,39 +67,52 @@ const FindStatisticsPage: NextPage = () => {
   const { themeId: themeFacetResults, releaseType: releaseTypeFacetResults } =
     facets;
 
-  const themesWithResultCounts = themes
-    .map(theme => {
-      const facetedResult = themeFacetResults?.find(
-        result => theme.id === result.value,
-      );
-      const count = facetedResult?.count ?? 0;
-      return {
-        label: `${theme.title} (${count})`,
-        value: theme.id,
-        count,
-      };
-    })
-    .sort((a, b) => b.count - a.count);
-
-  const releaseTypesWithResultCounts = Object.keys(releaseTypes)
-    .map(type => {
-      const facetedResult = releaseTypeFacetResults?.find(
-        result => type === result.value,
-      );
-
-      const title = releaseTypes[type as ReleaseType];
-      const count = facetedResult?.count ?? 0;
-      return {
-        label: `${title} (${count})`,
-        value: type,
-        count,
-      };
-    })
-    .sort((a, b) => b.count - a.count);
-
   const { releaseType, search, sortBy, themeId } = getParamsFromQuery(
     router.query,
   );
+
+  const themesWithResultCounts = !themeId
+    ? themes
+        .map(theme => {
+          const facetedResult = themeFacetResults?.find(
+            result => theme.id === result.value,
+          );
+          const count = facetedResult?.count ?? 0;
+          return {
+            label: `${theme.title} (${count})`,
+            value: theme.id,
+            count,
+          };
+        })
+        .sort((a, b) => b.count - a.count)
+    : themes.map(theme => ({
+        label: theme.title,
+        value: theme.id,
+      }));
+
+  const releaseTypesWithResultCounts = !releaseType
+    ? Object.keys(releaseTypes)
+        .map(type => {
+          const facetedResult = releaseTypeFacetResults?.find(
+            result => type === result.value,
+          );
+
+          const title = releaseTypes[type as ReleaseType];
+          const count = facetedResult?.count ?? 0;
+          return {
+            label: `${title} (${count})`,
+            value: type,
+            count,
+          };
+        })
+        .sort((a, b) => b.count - a.count)
+    : Object.keys(releaseTypes).map(type => {
+        const title = releaseTypes[type as ReleaseType];
+        return {
+          label: title,
+          value: type,
+        };
+      });
 
   const isFiltered = !!search || !!releaseType || !!themeId;
 
@@ -165,13 +178,17 @@ const FindStatisticsPage: NextPage = () => {
     filterType: PublicationFilter;
     nextValue: string;
   }) => {
+    // If performing a search (by search term), reset sortBy to relevance
+    const nextSortBy =
+      filterType === 'search' && nextValue.length > 0 ? 'relevance' : sortBy;
+
     const newParams =
       nextValue === 'all'
         ? omit(router.query, 'page', filterType)
         : {
             ...omit(router.query, 'page'),
             [filterType]: nextValue,
-            sortBy,
+            sortBy: nextSortBy,
           };
 
     await updateQueryParams(newParams);
@@ -372,7 +389,7 @@ const FindStatisticsPage: NextPage = () => {
                 )}
               </>
             )}
-            {page && totalPages && (
+            {page && !!totalPages && (
               <Pagination
                 currentPage={page}
                 shallow

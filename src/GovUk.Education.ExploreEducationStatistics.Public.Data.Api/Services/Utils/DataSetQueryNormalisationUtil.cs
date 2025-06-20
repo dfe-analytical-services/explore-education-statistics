@@ -11,7 +11,7 @@ public static class DataSetQueryNormalisationUtil
         return original with
         {
             Indicators = original
-                .Indicators
+                .Indicators?
                 .Order()
                 .ToList(),
             

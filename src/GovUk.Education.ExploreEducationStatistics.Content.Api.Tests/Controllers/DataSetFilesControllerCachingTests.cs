@@ -73,6 +73,7 @@ public abstract class DataSetFilesControllerCachingTests : CacheServiceTestFixtu
                     },
                     Meta = new DataSetFileMetaViewModel
                     {
+                        NumDataFileRows = 9393,
                         GeographicLevels = [GeographicLevel.Country.GetEnumLabel()],
                         TimePeriodRange = new DataSetFileTimePeriodRangeViewModel
                         {

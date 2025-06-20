@@ -292,11 +292,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .CheckCanManageAllUsers()
                 .OnSuccess(_ =>
                 {
+                    // This will be changed when we start introducing the use of the NEW publication roles in the 
+                    // UI, in STEP 9 (EES-6196) of the Permissions Rework. For now, we want to
+                    // filter out any usage of the NEW roles.
+                    HashSet<string> publicationRolesNamesToFilter = [nameof(PublicationRole.Approver), nameof(PublicationRole.Drafter)];
+
                     return new Dictionary<string, List<string>>
                     {
                         {
                             "Publication",
                             Enum.GetNames(typeof(PublicationRole))
+                                .Where(name => !publicationRolesNamesToFilter.Contains(name))
                                 .OrderBy(name => name)
                                 .ToList()
                         },

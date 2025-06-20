@@ -146,7 +146,6 @@ Unapprove the Methodology
     user clicks element    xpath://*[text()="Edit"]    ${ROW}
     user waits until h2 is visible    Methodology summary
 
-    user clicks link    Sign off
     user changes methodology status to Draft
 
     user navigates to methodologies on publication page    ${PUBLICATION_NAME}

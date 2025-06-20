@@ -39,7 +39,7 @@ export interface FormBaseInputProps
 
 interface HiddenProps {
   defaultValue?: string | number;
-  type?: 'text' | 'number' | 'color' | 'search';
+  type?: 'text' | 'color' | 'search';
   value?: string | number;
 }
 

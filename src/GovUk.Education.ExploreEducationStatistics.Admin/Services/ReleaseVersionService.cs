@@ -16,6 +16,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Cache;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Options;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
@@ -28,8 +29,11 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Cache;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyApprovalStatus;
@@ -59,7 +63,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         IDataSetVersionService dataSetVersionService,
         IProcessorClient processorClient,
         IPrivateBlobCacheService privateCacheService,
-        IReleaseSlugValidator releaseSlugValidator) : IReleaseVersionService
+        IReleaseSlugValidator releaseSlugValidator,
+        IOptions<FeatureFlagsOptions> featureFlags,
+        ILogger<ReleaseVersionService> logger) : IReleaseVersionService
     {
         public async Task<Either<ActionResult, ReleaseVersionViewModel>> GetRelease(Guid releaseVersionId)
         {
@@ -596,7 +602,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                             Id = tuple.apiDataSetVersion.Id,
                             Version = tuple.apiDataSetVersion.PublicVersion,
                             Status = tuple.apiDataSetVersion.Status,
-                            Valid = false
+                            Valid = ShouldAllowApiDataSetDeletion(tuple.apiDataSetVersion.Status) 
                         };
 
                     return new DeleteDataFilePlanViewModel
@@ -605,7 +611,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         SubjectId = tuple.subject.Id,
                         DeleteDataBlockPlan = await dataBlockService.GetDeletePlan(releaseVersionId, tuple.subject),
                         FootnoteIds = footnotes.Select(footnote => footnote.Id).ToList(),
-                        DeleteApiDataSetVersionPlan = linkedApiDataSetVersionDeletionPlan
+                        ApiDataSetVersionPlan = linkedApiDataSetVersionDeletionPlan
                     };
                 });
         }
@@ -631,7 +637,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 })
                 .OnSuccess(_ => GetDeleteDataFilePlan(releaseVersionId, fileId))
                 .OnSuccessDo(deletePlan => dataBlockService.DeleteDataBlocks(deletePlan.DeleteDataBlockPlan))
-                .OnSuccessVoid(async deletePlan =>
+                .OnSuccessDo(async deletePlan =>
                 {
                     await releaseSubjectRepository.DeleteReleaseSubject(releaseVersionId: releaseVersionId,
                         subjectId: deletePlan.SubjectId);
@@ -639,9 +645,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         releaseVersionId: releaseVersionId,
                         subjectId: deletePlan.SubjectId));
                 })
+                .OnSuccessDo(DeleteApiDataSetVersionIfAttached)
                 .OnSuccessVoid(() => releaseDataFileService.Delete(releaseVersionId, fileId));
         }
 
+        private async Task<Either<ActionResult, Unit>> DeleteApiDataSetVersionIfAttached(DeleteDataFilePlanViewModel deletePlan)
+        {
+            return !featureFlags.Value.EnableReplacementOfPublicApiDataSets 
+                   || deletePlan.ApiDataSetVersionPlan == null
+                ? Unit.Instance
+                : !deletePlan.Valid 
+                    ? throw new InvalidOperationException("Deletion plan has indicated this deletion does not meet requirements to make it valid to proceed with deletion.") 
+                    : await dataSetVersionService.DeleteVersion(dataSetVersionId: deletePlan.ApiDataSetVersionPlan.Id);
+        }
+        
         public async Task<Either<ActionResult, DataImportStatusViewModel>> GetDataFileImportStatus(
             Guid releaseVersionId,
             Guid fileId)
@@ -738,12 +755,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     releaseFile.PublicApiDataSetVersion!,
                     cancellationToken)
                 .OnSuccess(dsv => (DataSetVersion?)dsv)
-                .OnFailureDo(_ => throw new ApplicationException(
-                    $"API data set version could not be found. Data set ID: '{releaseFile.PublicApiDataSetId}', version: '{releaseFile.PublicApiDataSetVersion}'"));
+                .OnFailureDo(_ =>
+                {
+                    logger.LogError(
+                        $"API data set version associated with release file could not be found. Data set ID: '{releaseFile.PublicApiDataSetId}', version: '{releaseFile.PublicApiDataSetVersion}', release file ID: '{releaseFile.Id}'.");
+                    throw new InvalidOperationException(
+                        "Failed to find the associated API data set version for the release file.");
+                });
         }
 
-        private async Task<Either<ActionResult, Unit>> CheckCanDeleteDataFiles(
-            Guid releaseVersionId, ReleaseFile releaseFile)
+        private async Task<Either<ActionResult, Unit>> CheckCanDeleteDataFiles(Guid releaseVersionId, ReleaseFile releaseFile)
         {
             var import = await dataImportService.GetImport(releaseFile.FileId);
             var importStatus = import?.Status ?? DataImportStatus.NOT_FOUND;
@@ -758,17 +779,38 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 return ValidationActionResult(CannotRemoveDataFilesOnceReleaseApproved);
             }
 
-            if (releaseFile.PublicApiDataSetId is not null)
+            if (releaseFile.PublicApiDataSetId is null)
             {
-                return ValidationUtils.ValidationResult(new ErrorViewModel
+                return Unit.Instance;
+            }
+
+            DataSetVersionStatus? versionStatus = null;
+            await dataSetVersionService
+                .GetDataSetVersion(
+                    releaseFile.PublicApiDataSetId.Value,
+                    releaseFile.PublicApiDataSetVersion!)
+                .OnFailureDo(_ =>
+                {
+                    var errorMessage = "Failed to find the data set version expected to be linked to the release file that is being deleted.";
+                    var notFoundException = new InvalidOperationException(errorMessage);
+                    logger.LogError(notFoundException, errorMessage + $" Details: Data set id: {releaseFile.PublicApiDataSetId.Value} and the data set version number: {releaseFile.PublicApiDataSetVersionString}.");
+                    throw notFoundException;
+                }).OnSuccess(dsv => versionStatus = dsv.Status);
+            
+            return ShouldAllowApiDataSetDeletion(versionStatus!.Value) 
+                ? Unit.Instance 
+                :  ValidationUtils.ValidationResult(new ErrorViewModel
                 {
                     Code = ValidationMessages.CannotDeleteApiDataSetReleaseFile.Code,
                     Message = ValidationMessages.CannotDeleteApiDataSetReleaseFile.Message,
                     Detail = new ApiDataSetErrorDetail(releaseFile.PublicApiDataSetId.Value)
                 });
-            }
+        }
 
-            return Unit.Instance;
+        private bool ShouldAllowApiDataSetDeletion(DataSetVersionStatus? dataSetVersionStatus)
+        {
+            return featureFlags.Value.EnableReplacementOfPublicApiDataSets
+                   && DataSetVersionAuthExtensions.PublicStatuses.All(status => status != dataSetVersionStatus);
         }
 
         private IList<MethodologyVersion> GetMethodologiesScheduledWithRelease(Guid releaseVersionId)

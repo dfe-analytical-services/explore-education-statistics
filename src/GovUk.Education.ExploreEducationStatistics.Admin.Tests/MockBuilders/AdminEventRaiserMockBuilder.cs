@@ -5,6 +5,7 @@ using System.Linq.Expressions;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Events;
 using Moq;
 
@@ -20,7 +21,8 @@ public class AdminEventRaiserMockBuilder
             It.IsAny<Guid>(),
             It.IsAny<string>(),
             It.IsAny<Guid>(),
-            It.IsAny<string>());
+            It.IsAny<string>(),
+            It.IsAny<bool>());
 
     private static readonly Expression<Func<IAdminEventRaiser, Task>> OnPublicationArchived =
         m => m.OnPublicationArchived(
@@ -102,12 +104,14 @@ public class AdminEventRaiserMockBuilder
             Guid? expectedReleaseId = null,
             string? expectedNewReleaseSlug = null,
             Guid? expectedPublicationId = null,
-            string? expectedPublicationSlug = null) => 
+            string? expectedPublicationSlug = null,
+            bool? expectedIsPublicationArchived = null) => 
             mockBuilder._mock.Verify(m => m.OnReleaseSlugChanged(
                     It.Is<Guid>(releaseId => expectedReleaseId == null || releaseId == expectedReleaseId), 
                     It.Is<string>(newReleaseSlug => expectedNewReleaseSlug == null || newReleaseSlug == expectedNewReleaseSlug), 
                     It.Is<Guid>(publicationId => expectedPublicationId == null || publicationId == expectedPublicationId), 
-                    It.Is<string>(publicationSlug => expectedPublicationSlug == null || publicationSlug == expectedPublicationSlug)),
+                    It.Is<string>(publicationSlug => expectedPublicationSlug == null || publicationSlug == expectedPublicationSlug),
+                    It.Is<bool>(isPublicationArchived => expectedIsPublicationArchived == null || isPublicationArchived == expectedIsPublicationArchived)),
                 Times.Once);
 
         public void OnReleaseSlugChangedWasNotRaised() =>
@@ -132,14 +136,16 @@ public class AdminEventRaiserMockBuilder
                 publication.Id,
                 publication.Slug,
                 publication.Title,
-                publication.Summary);
+                publication.Summary,
+                publication.IsArchived());
 
             mockBuilder._mock.Verify(m => m.OnPublicationChanged(It.Is<Publication>(p =>
                     new PublicationChangedEvent(
                         p.Id,
                         p.Slug,
                         p.Title,
-                        p.Summary) == expectedEvent)),
+                        p.Summary,
+                        p.IsArchived()) == expectedEvent)),
                 Times.Once);
         }
 
@@ -158,7 +164,8 @@ public class AdminEventRaiserMockBuilder
                 publication.LatestPublishedReleaseVersion?.ReleaseId ?? throw new ArgumentException("Publication does not have latest published release version child object.", nameof(publication)),
                 publication.LatestPublishedReleaseVersionId!.Value,
                 previousReleaseId,
-                previousReleaseVersionId);
+                previousReleaseVersionId,
+                publication.IsArchived());
 
             Xunit.Assert.Single(
                 mockBuilder._invocations,
@@ -170,7 +177,8 @@ public class AdminEventRaiserMockBuilder
                         inv.Publication.LatestPublishedReleaseVersion!.ReleaseId,
                         inv.Publication.LatestPublishedReleaseVersionId!.Value,
                         inv.OldLatestPublishedReleaseId,
-                        inv.OldLatestPublishedReleaseVersionId)
+                        inv.OldLatestPublishedReleaseVersionId,
+                        inv.Publication.IsArchived())
                     == expectedEvent);
         }
 

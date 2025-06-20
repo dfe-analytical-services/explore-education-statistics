@@ -1,0 +1,397 @@
+time_period,time_identifier,geographic_level,country_code,country_name,old_la_code,new_la_code,la_name,animal_type,breed,ind_one
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Total,Total,999
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Total,111
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Cat,Total,112
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Affenpinscher,222
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Afghan Hound,51
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Aidi,422
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Airedale Terrier,83
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Akita,172
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Akita Inu,82
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Alano Español,82
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Alaskan Klee Kai,219
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Alaskan Malamute,389
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Alpine Dachsbracke,325
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,American Akita,256
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,American Bulldog,38
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,American Cocker Spaniel,286
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,American English Coonhound,5
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,American Eskimo Dog,288
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,American Foxhound,329
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,American Hairless Terrier,5
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,American Leopard Hound,236
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,American Pit Bull Terrier,78
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,American Staffordshire Terrier,204
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,American Water Spaniel,176
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Anatolian Shepherd Dog,395
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Anglo-Français de Petite Vénerie,7
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Appenzeller Sennenhund,160
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Ariegeois,48
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Australian Cattle Dog,17
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Australian Kelpie,181
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Australian Shepherd,118
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Australian Silky Terrier,299
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Australian Stumpy Tail Cattle Dog,452
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Australian Terrier,25
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Azawakh,459
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Barbet,225
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Basenji,150
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Basset Artésien Normand,108
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Basset Bleu de Gascogne,195
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Basset Fauve de Bretagne,351
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Basset Hound,2
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Bavarian Mountain Hound,162
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Beagle,250
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Beagle-Harrier,437
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Bearded Collie,305
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Beauceron,425
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Bedlington Terrier,101
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Belgian Laekenois,443
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Belgian Malinois,191
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Belgian Sheepdog,20
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Belgian Tervuren,219
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Bergamasco Sheepdog,329
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Berger Picard,161
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Bernese Mountain Dog,140
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Bichon Frise,77
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Biewer Terrier,467
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Black and Tan Coonhound,203
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Black Russian Terrier,293
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Bloodhound,119
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Bluetick Coonhound,178
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Boerboel,418
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Bohemian Shepherd,340
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Bolognese,487
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Border Collie,489
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Border Terrier,167
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Borzoi,250
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Boston Terrier,212
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Bouvier des Flandres,151
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Boxer,46
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Boykin Spaniel,19
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Bracco Italiano,204
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Braque d'Auvergne,211
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Braque du Bourbonnais,202
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Braque Francais Pyrenean,297
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Braque Saint-Germain,195
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Briard,368
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Brittany,383
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Broholmer,281
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Brussels Griffon,6
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Bull Terrier,241
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Bulldog,387
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Bullmastiff,114
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Cairn Terrier,28
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Canaan Dog,114
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Cane Corso,272
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Cardigan Welsh Corgi,355
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Carolina Dog,455
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Catahoula Leopard Dog,411
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Caucasian Shepherd Dog,92
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Cavalier King Charles Spaniel,149
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Central Asian Shepherd Dog,332
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Cesky Terrier,155
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Chesapeake Bay Retriever,39
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Chihuahua,396
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Chinese Crested,105
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Chinese Shar-Pei,185
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Chinook,22
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Chow Chow,392
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Cirneco dell'Etna,235
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Clumber Spaniel,323
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Collie,185
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Coton de Tulear,481
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Curly-Coated Retriever,89
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Czechoslovakian Vlcak,114
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Dachshund,141
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Dalmatian,194
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Dandie Dinmont Terrier,228
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Danish-Swedish Farmdog,145
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Doberman Pinscher,150
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Dogo Argentino,369
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Dogue de Bordeaux,386
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Drentsche Patrijshond,374
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Drever,341
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Dutch Shepherd,390
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,English Cocker Spaniel,136
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,English Foxhound,451
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,English Setter,168
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,English Springer Spaniel,384
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,English Toy Spaniel,249
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Entlebucher Mountain Dog,132
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Estrela Mountain Dog,300
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Eurasian,127
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Field Spaniel,448
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Finnish Lapphund,174
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Finnish Spitz,66
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Flat-Coated Retriever,424
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Fox Terrier (Smooth),150
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Fox Terrier (Wire),263
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,French Bulldog,262
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,French Spaniel,95
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,German Longhaired Pointer,149
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,German Pinscher,329
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,German Shepherd Dog,329
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,German Shorthaired Pointer,63
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,German Spaniel (Deutscher Wachtelhund),34
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,German Wirehaired Pointer,112
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Giant Schnauzer,461
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Glen of Imaal Terrier,313
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Golden Retriever,236
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Gordon Setter,479
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Grand Basset Griffon Vendéen,229
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Grand Bleu de Gascogne,73
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Great Dane,356
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Great Pyrenees,52
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Greater Swiss Mountain Dog,302
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Greyhound,260
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Hamiltonstovare,274
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Hanoverian Scenthound,150
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Harrier,429
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Havanese,182
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Hovawart,212
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Ibizan Hound,352
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Icelandic Sheepdog,216
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Irish Red and White Setter,386
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Irish Setter,142
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Irish Terrier,21
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Irish Water Spaniel,451
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Irish Wolfhound,90
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Italian Greyhound,121
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Jack Russell Terrier,26
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Jagdterrier,494
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Japanese Chin,485
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Japanese Spitz,348
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Japanese Terrier,398
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Jindo,171
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Kai Ken,33
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Karelian Bear Dog,418
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Keeshond,247
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Kerry Blue Terrier,283
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Kishu Ken,278
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Komondor,389
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Kooikerhondje,408
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Korean Mastiff,7
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Kromfohrlander,446
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Kuvasz,490
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Labrador Retriever,212
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Lagotto Romagnolo,478
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Lakeland Terrier,450
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Lancashire Heeler,473
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Leonberger,269
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Lhasa Apso,355
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Lowchen,425
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Maltese,406
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Manchester Terrier,249
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Mastiff,186
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Miniature American Shepherd,363
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Miniature Bull Terrier,110
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Miniature Pinscher,455
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Miniature Poodle,240
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Miniature Schnauzer,399
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Mudi,138
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Neapolitan Mastiff,426
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Newfoundland,193
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Norfolk Terrier,228
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Norrbottenspets,80
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Norwegian Buhund,288
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Norwegian Elkhound,118
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Norwegian Lundehund,239
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Norwich Terrier,417
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Nova Scotia Duck Tolling Retriever,91
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Old English Sheepdog,380
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Otterhound,455
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Papillon,500
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Parson Russell Terrier,230
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Pekingese,96
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Pembroke Welsh Corgi,351
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Perro de Presa Canario,236
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Peruvian Inca Orchid,265
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Petit Basset Griffon Vendéen,72
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Pharaoh Hound,64
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Plott Hound,263
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Pointer,76
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Polish Lowland Sheepdog,285
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Pomeranian,416
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Poodle (Standard),34
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Poodle (Toy),34
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Porcelaine,262
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Portuguese Podengo,105
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Portuguese Podengo Pequeno,40
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Portuguese Pointer,67
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Portuguese Sheepdog,377
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Portuguese Water Dog,208
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Pudelpointer,294
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Pug,71
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Puli,276
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Pumi,397
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Pyrenean Mastiff,260
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Pyrenean Shepherd,15
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Rafeiro do Alentejo,77
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Rat Terrier,33
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Redbone Coonhound,329
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Rhodesian Ridgeback,219
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Rottweiler,289
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Russian Toy,488
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Russian Tsvetnaya Bolonka,293
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Saluki,280
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Samoyed,70
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Schapendoes,18
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Schillerstovare,315
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Schipperke,88
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Scottish Deerhound,59
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Scottish Terrier,85
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Sealyham Terrier,348
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Segugio Italiano,108
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Shetland Sheepdog,455
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Shiba Inu,429
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Shih Tzu,306
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Shikoku,97
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Siberian Husky,60
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Silken Windhound,306
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Skye Terrier,10
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Sloughi,160
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Slovakian Wirehaired Pointer,243
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Small Munsterlander,146
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Soft Coated Wheaten Terrier,390
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Spanish Mastiff,282
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Spanish Water Dog,281
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Spinone Italiano,403
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,St. Bernard,269
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Staffordshire Bull Terrier,474
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Standard Schnauzer,229
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Sussex Spaniel,310
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Swedish Lapphund,179
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Swedish Vallhund,410
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Taiwan Dog,138
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Tibetan Mastiff,189
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Tibetan Spaniel,50
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Tibetan Terrier,366
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Tornjak,96
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Tosa Inu,328
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Toy Fox Terrier,43
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Treeing Walker Coonhound,80
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Vizsla,478
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Weimaraner,435
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Welsh Springer Spaniel,303
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Welsh Terrier,96
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,West Highland White Terrier,308
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Wetterhoun,271
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Whippet,189
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Wirehaired Pointing Griffon,287
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Xoloitzcuintli,490
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Yakutian Laika,87
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Yorkshire Terrier,236
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Cat,Abyssinian,201
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Cat,Aegean,346
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Cat,American Bobtail,133
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Cat,American Curl,293
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Cat,American Polydactyl,116
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Cat,American Shorthair,473
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Cat,American Wirehair,194
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Cat,Aphrodite,60
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Cat,Aphrodite's Giant,267
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Cat,Arabian Mau,359
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Cat,Asian,323
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Cat,Asian Semi-longhair,318
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Cat,Australian Mist,180
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Cat,Balinese,329
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Cat,Bambino,37
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Cat,Bengal,287
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Cat,Birman,234
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Cat,Bombay,122
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Cat,Bramble,94
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Cat,Brazilian Shorthair,413
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Cat,British Longhair,254
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Cat,British Shorthair,383
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Cat,Burmese,13
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Cat,Burmilla,341
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Cat,California Spangled,369
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Cat,Chantilly-Tiffany,66
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Cat,Chartreux,6
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Cat,Chausie,481
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Cat,Cheetoh,324
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Cat,Colorpoint Shorthair,489
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Cat,Cornish Rex,208
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Cat,Cymric,335
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Cat,Cyprus,265
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Cat,Devon Rex,82
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Cat,Donskoy,485
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Cat,Dragon Li,115
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Cat,Dwelf,119
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Cat,Egyptian Mau,197
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Cat,Elf Cat,18
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Cat,European Shorthair,216
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Cat,Exotic Shorthair,6
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Cat,Foldex,306
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Cat,Genetta,441
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Cat,German Rex,58
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Cat,Havana Brown,452
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Cat,Highlander,91
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Cat,Himalayan,77
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Cat,Japanese Bobtail,189
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Cat,Javanese,458
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Cat,Kanaani,212
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Cat,Khao Manee,326
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Cat,Kinkalow,426
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Cat,Korat,430
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Cat,Korean Bobtail,275
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Cat,Korn Ja,432
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Cat,Kurilian Bobtail,168
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Cat,LaPerm,21
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Cat,Lambkin,329
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Cat,Lykoi,194
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Cat,Maine Coon,381
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Cat,Manx,121
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Cat,Mekong Bobtail,63
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Cat,Minskin,6
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Cat,Minuet,37
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Cat,Munchkin,82
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Cat,Nebelung,59
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Cat,Norwegian Forest Cat,417
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Cat,Ocicat,210
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Cat,Ojos Azules,217
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Cat,Oriental Bicolor,181
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Cat,Oriental Longhair,412
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Cat,Oriental Shorthair,480
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Cat,Owyhee Bob,439
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Cat,Persian,354
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Cat,Peterbald,453
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Cat,Pixie-bob,352
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Cat,Raas,388
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Cat,Ragamuffin,242
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Cat,Ragdoll,406
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Cat,Russian Blue,464
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Cat,"Russian White, Black and Tabby",464
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Cat,Sam Sawet,54
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Cat,Savannah,183
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Cat,Scottish Fold,390
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Cat,Scottish Straight,64
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Cat,Selkirk Rex,304
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Cat,Serengeti,102
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Cat,Serrade petit,308
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Cat,Siamese,188
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Cat,Siberian,201
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Cat,Singapura,329
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Cat,Skookum,107
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Cat,Snowshoe,235
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Cat,Sokoke,359
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Cat,Sokoke Forest Cat,158
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Cat,Somali,223
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Cat,Sphynx,122
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Cat,Suphalak,320
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Cat,Tennessee Rex,475
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Cat,Thai,112
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Cat,Thai Blue Point,460
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Cat,Thai Lilac,165
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Cat,Tonkinese,229
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Cat,Toybob,350
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Cat,Toyger,339
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Cat,Turkish Angora,267
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Cat,Turkish Van,138
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Cat,Ukrainian Levkoy,482
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Cat,Van Cat,399
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Cat,Viverral,365
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Cat,Wila Krungthep,6
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Cat,Wookiee Cat,317
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Cat,York Chocolate,98
