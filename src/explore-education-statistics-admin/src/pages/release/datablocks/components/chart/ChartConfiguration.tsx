@@ -265,8 +265,9 @@ const ChartConfiguration = ({
   );
 
   const handleChange = useCallback(
-    ({ ...values }: FormValues) => {
-      onChange(normalizeValues(values));
+    ({ width, ...values }: FormValues) => {
+      // allow width to be set to undefined
+      onChange({ ...normalizeValues(values), width });
     },
     [normalizeValues, onChange],
   );
