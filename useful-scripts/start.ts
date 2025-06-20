@@ -7,6 +7,7 @@ import fs from 'node:fs';
 import { EOL } from 'node:os';
 import path from 'node:path';
 import process from 'node:process';
+import { spawnSync } from 'node:child_process';
 import splitLines from 'split2';
 import kill from 'tree-kill';
 import delay from './utils/delay';
@@ -19,7 +20,13 @@ import { ExecaChildProcessWithoutNullStreams } from './utils/types';
 
 const __dirname = getDirname(import.meta.url);
 const __filename = getFilename(import.meta.url);
+const accountRoot = path.resolve(__dirname, '../..');
 const projectRoot = path.resolve(__dirname, '..');
+
+const screenerRepositoryName = 'ees-screener-api';
+const screenerLocalDir = `${accountRoot}/${screenerRepositoryName}`;
+const screenerRepoUrl =
+  'https://github.com/dfe-analytical-services/ees-screener-api';
 
 const allowedDockerServices = [
   'db',
@@ -342,6 +349,12 @@ async function startDockerServices() {
       args.push('--build', '--force-recreate');
     }
 
+    cloneRequiredRepository(
+      screenerRepositoryName,
+      screenerLocalDir,
+      screenerRepoUrl,
+    );
+
     await $$`docker compose up ${[...args, ...dockerServicesToStart]}`;
 
     await delay(1000);
@@ -531,4 +544,34 @@ function logService(service: ServiceName, message: string): void {
   const { colour } = serviceSchemas[service];
 
   console.info(`${colour(`[${service}]`)} ${message}`);
+}
+
+function cloneRequiredRepository(
+  repositoryName: string,
+  localDirectory: string,
+  repositoryUrl: string,
+) {
+  const localDirectoryExists = fs.existsSync(localDirectory);
+
+  if (!localDirectoryExists) {
+    console.log(`Cloning required repository '${repositoryName}'`);
+    const clone = spawnSync('git', ['clone', repositoryUrl, localDirectory], {
+      stdio: 'inherit',
+    });
+    if (clone.status !== 0) {
+      console.error(`Failed to clone repository '${repositoryName}'`);
+      process.exit(clone.status || 1);
+    }
+  } else {
+    console.log(
+      `Repository '${repositoryName}' already exists locally, pulling latest changes`,
+    );
+    const pull = spawnSync('git', ['-C', localDirectory, 'pull'], {
+      stdio: 'inherit',
+    });
+    if (pull.status !== 0) {
+      console.error(`Failed to pull repository '${repositoryName}'`);
+      process.exit(pull.status || 1);
+    }
+  }
 }
