@@ -1052,7 +1052,6 @@ describe('ReleaseDataUploadsSection', () => {
       await user.click(
         screen.getByRole('button', { name: 'Upload data files' }),
       );
-      await user.click(screen.getByRole('button', { name: 'Confirm' }));
 
       await waitFor(() => {
         expect(releaseDataFileService.getDataFiles).toHaveBeenCalledWith(
@@ -1109,8 +1108,6 @@ describe('ReleaseDataUploadsSection', () => {
         screen.getByRole('button', { name: 'Upload data files' }),
       );
 
-      await user.click(screen.getByRole('button', { name: 'Confirm' }));
-
       await waitFor(() => {
         expect(
           releaseDataFileService.uploadDataSetFilePair,
@@ -1134,7 +1131,7 @@ describe('ReleaseDataUploadsSection', () => {
       await waitFor(() =>
         expect(
           releaseDataFileService.getDataFileImportStatus,
-        ).toHaveBeenCalledWith('release-1', testUploadedDataFile2),
+        ).toHaveBeenCalledWith('release-1', 'file-1'),
       );
 
       expect(fileTableRow3.getByTestId('Size')).toHaveTextContent('150 Kb');
@@ -1182,8 +1179,6 @@ describe('ReleaseDataUploadsSection', () => {
         screen.getByRole('button', { name: 'Upload data files' }),
       );
 
-      await user.click(screen.getByRole('button', { name: 'Confirm' }));
-
       await waitFor(() =>
         expect(
           releaseDataFileService.uploadZippedDataSetFilePair,
@@ -1202,7 +1197,7 @@ describe('ReleaseDataUploadsSection', () => {
       await waitFor(() =>
         expect(
           releaseDataFileService.getDataFileImportStatus,
-        ).toHaveBeenCalledWith('release-1', testUploadedDataFile2),
+        ).toHaveBeenCalledWith('release-1', 'file-1'),
       );
 
       expect(fileTableRow3.getByTestId('Size')).toHaveTextContent('150 Kb');
