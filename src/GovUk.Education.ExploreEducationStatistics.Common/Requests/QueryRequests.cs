@@ -3,6 +3,7 @@ using FluentValidation;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
 using System;
 using System.Collections.Generic;
+using static GovUk.Education.ExploreEducationStatistics.Common.Utils.FilterHierarchiesOptionsUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Requests;
 
@@ -18,6 +19,8 @@ public record FullTableQueryRequest
 
     public IEnumerable<Guid> Indicators { get; set; } = new List<Guid>();
 
+    public IDictionary<Guid, List<FilterHierarchyOption>>? FilterHierarchiesOptions { get; set; } = null;
+
     public FullTableQuery AsFullTableQuery()
     {
         return new FullTableQuery
@@ -27,6 +30,8 @@ public record FullTableQueryRequest
             TimePeriod = this.TimePeriod,
             Filters = this.Filters,
             Indicators = this.Indicators,
+            FilterHierarchiesOptions =
+                CreateFilterHierarchiesOptionsFromDictionary(this.FilterHierarchiesOptions),
         };
     }
 
@@ -40,6 +45,7 @@ public record FullTableQueryRequest
                 .NotNull();
 
             // NOTE: No rule for filters - a data set might have no filters!
+            // NOTE: No rule for filterHierarchiesOptions - a data set might not have a filter hierarchy!
 
             RuleFor(context => context.Indicators)
                 .NotEmpty();
@@ -67,6 +73,7 @@ public class LocationsOrTimePeriodsQueryRequest
             TimePeriod = this.TimePeriod,
             Filters = [],
             Indicators = [],
+            FilterHierarchiesOptions = null,
         };
     }
 

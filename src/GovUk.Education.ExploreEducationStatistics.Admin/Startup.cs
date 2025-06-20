@@ -88,6 +88,7 @@ using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Converters;
 using GovUk.Education.ExploreEducationStatistics.Admin.Repositories;
 using GovUk.Education.ExploreEducationStatistics.Admin.Repositories.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Admin.Repositories.Public.Data.Interfaces;
@@ -195,6 +196,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                 })
                 .AddNewtonsoftJson(options =>
                 {
+                    options.SerializerSettings.Converters.Add(new FilterHierarchiesOptionsConverter());
                     options.SerializerSettings.NullValueHandling = NullValueHandling.Ignore;
                 });
 
