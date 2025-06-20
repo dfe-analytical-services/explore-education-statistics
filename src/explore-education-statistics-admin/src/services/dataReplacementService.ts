@@ -129,11 +129,11 @@ const dataReplacementService = {
   },
   replaceData(
     releaseVersionId: string,
-    fileId: string,
-    replacementFileId: string,
+    replacementFileIds: string[],
   ): Promise<void> {
     return client.post(
-      `releases/${releaseVersionId}/data/${fileId}/replacement/${replacementFileId}`,
+      `releases/${releaseVersionId}/data/replacements`,
+      { replacementFileIds }, // @MarkFix you'll want to run `pnpm tsc`
     );
   },
 };

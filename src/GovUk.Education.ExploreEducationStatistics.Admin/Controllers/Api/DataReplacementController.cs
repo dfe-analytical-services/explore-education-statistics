@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
@@ -38,15 +39,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                 .HandleFailuresOrOk();
         }
 
-        [HttpPost("releases/{releaseVersionId:guid}/data/{fileId:guid}/replacement/{replacementFileId:guid}")]
+        // @MarkFix Before the frontend calls this endpoint, it calls the above replacement-plan endpoint - why?
+        // @MarkFix and the frontend refetches all the data for the other files that have been imported before doing the replacement?
+        // @MarkFix how does the frontend handle large files - does Data and files page properly show that it is still in progress?
+        [HttpPost("releases/{releaseVersionId:guid}/data/replacements")]
         public async Task<ActionResult<Unit>> Replace(Guid releaseVersionId,
-            Guid fileId,
-            Guid replacementFileId)
+            [FromBody] List<Guid> replacementFileIds)
         {
             return await _replacementService.Replace(
                     releaseVersionId: releaseVersionId,
-                    originalFileId: fileId,
-                    replacementFileId: replacementFileId
+                    replacementFileIds: replacementFileIds
                 )
                 .HandleFailuresOrOk();
         }

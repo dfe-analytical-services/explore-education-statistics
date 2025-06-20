@@ -1,5 +1,6 @@
 #nullable enable
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
@@ -18,7 +19,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 
         Task<Either<ActionResult, Unit>> Replace(
             Guid releaseVersionId,
-            Guid originalFileId,
-            Guid replacementFileId);
+            List<Guid> replacementFileIds);
     }
 }

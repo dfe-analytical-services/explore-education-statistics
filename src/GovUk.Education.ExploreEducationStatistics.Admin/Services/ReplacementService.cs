@@ -135,72 +135,81 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         
         public async Task<Either<ActionResult, Unit>> Replace(
             Guid releaseVersionId,
-            Guid originalFileId,
-            Guid replacementFileId)
+            List<Guid> replacementFileIds)
         {
-            return await GetReplacementPlan(releaseVersionId, originalFileId, replacementFileId)
-                .OnSuccessDo<ActionResult, DataReplacementPlanViewModel, Unit>(plan =>
-                    !plan.Valid ? ValidationActionResult(ReplacementMustBeValid) : Unit.Instance)
-                .OnSuccessCombineWith(_ => CheckReleaseFilesExist(releaseVersionId: releaseVersionId,
-                    originalFileId: originalFileId,
-                    replacementFileId: replacementFileId))
-                .OnSuccess(planAndReleaseFiles =>
-                {
-                    var (plan, (originalReleaseFile, replacementReleaseFile)) = planAndReleaseFiles;
+            foreach (var replacementFileId in replacementFileIds)
+            {
+                var originalFileId = contentDbContext.Files
+                    .Where(f => f.Id == replacementFileId && f.ReplacingId != null)
+                    .Select(f => f.ReplacingId!.Value)
+                    .Single();
 
-                    // It should be possible to replace a file with any other file provided there is a valid plan,
-                    // but we want to ensure that the replacement file has been created through the designated process.
-                    // The replacement upload process links the replacement file to the original, allowing us to
-                    // identify files with ongoing data replacements and filter out replacement files from the regular
-                    // data files view.
-                    if (originalReleaseFile.File.ReplacedById != replacementFileId)
+                // @MarkFix do we want to do something if they've asked to replace a file that isn't replacing anything? Maybe two people press the replace all button at the same time?
+
+                return await GetReplacementPlan(releaseVersionId, originalFileId, replacementFileId)
+                    .OnSuccessDo<ActionResult, DataReplacementPlanViewModel, Unit>(plan =>
+                        !plan.Valid ? ValidationActionResult(ReplacementMustBeValid) : Unit.Instance)
+                    .OnSuccessCombineWith(_ => CheckReleaseFilesExist(releaseVersionId: releaseVersionId,
+                        originalFileId: originalFileId,
+                        replacementFileId: replacementFileId))
+                    .OnSuccess(planAndReleaseFiles =>
                     {
-                        throw new InvalidOperationException(
-                            "Original file has no link with the replacement file");
-                    }
+                        var (plan, (originalReleaseFile, replacementReleaseFile)) = planAndReleaseFiles;
 
-                    if (replacementReleaseFile.File.ReplacingId != originalFileId)
-                    {
-                        throw new InvalidOperationException(
-                            "Replacement file has no link with the original file");
-                    }
-
-                    return (plan, originalReleaseFile, replacementReleaseFile);
-                })
-                .OnSuccess(async planAndReleaseFiles =>
-                {
-                    var (plan, originalReleaseFile, replacementReleaseFile) = planAndReleaseFiles;
-
-                    var originalSubjectId = plan.OriginalSubjectId;
-                    var replacementSubjectId = plan.ReplacementSubjectId;
-
-                    await plan.DataBlocks
-                        .ToAsyncEnumerable()
-                        .ForEachAwaitAsync(async dataBlockPlan =>
+                        // It should be possible to replace a file with any other file provided there is a valid plan,
+                        // but we want to ensure that the replacement file has been created through the designated process.
+                        // The replacement upload process links the replacement file to the original, allowing us to
+                        // identify files with ongoing data replacements and filter out replacement files from the regular
+                        // data files view.
+                        if (originalReleaseFile.File.ReplacedById != replacementFileId)
                         {
-                            await InvalidateDataBlockCachedResults(dataBlockPlan, releaseVersionId);
-                            await ReplaceLinksForDataBlock(dataBlockPlan, replacementSubjectId);
-                        });
+                            throw new InvalidOperationException(
+                                "Original file has no link with the replacement file");
+                        }
 
-                    await plan.Footnotes
-                        .ToAsyncEnumerable()
-                        .ForEachAwaitAsync(footnotePlan =>
-                            ReplaceLinksForFootnote(footnotePlan, originalSubjectId, replacementSubjectId));
+                        if (replacementReleaseFile.File.ReplacingId != originalFileId)
+                        {
+                            throw new InvalidOperationException(
+                                "Replacement file has no link with the original file");
+                        }
 
-                    replacementReleaseFile.FilterSequence =
-                        await ReplaceFilterSequence(originalReleaseFile, replacementReleaseFile);
-                    replacementReleaseFile.IndicatorSequence =
-                        await ReplaceIndicatorSequence(originalReleaseFile, replacementReleaseFile);
+                        return (plan, originalReleaseFile, replacementReleaseFile);
+                    })
+                    .OnSuccess(async planAndReleaseFiles =>
+                    {
+                        var (plan, originalReleaseFile, replacementReleaseFile) = planAndReleaseFiles;
 
-                    // Replace data guidance
-                    replacementReleaseFile.Summary = originalReleaseFile.Summary;
+                        var originalSubjectId = plan.OriginalSubjectId;
+                        var replacementSubjectId = plan.ReplacementSubjectId;
 
-                    await contentDbContext.SaveChangesAsync();
-                    await statisticsDbContext.SaveChangesAsync();
+                        await plan.DataBlocks
+                            .ToAsyncEnumerable()
+                            .ForEachAwaitAsync(async dataBlockPlan =>
+                            {
+                                await InvalidateDataBlockCachedResults(dataBlockPlan, releaseVersionId);
+                                await ReplaceLinksForDataBlock(dataBlockPlan, replacementSubjectId);
+                            });
 
-                    return await RemoveOriginalSubjectAndFileFromRelease(releaseVersionId, originalFileId,
-                        replacementFileId);
-                });
+                        await plan.Footnotes
+                            .ToAsyncEnumerable()
+                            .ForEachAwaitAsync(footnotePlan =>
+                                ReplaceLinksForFootnote(footnotePlan, originalSubjectId, replacementSubjectId));
+
+                        replacementReleaseFile.FilterSequence =
+                            await ReplaceFilterSequence(originalReleaseFile, replacementReleaseFile);
+                        replacementReleaseFile.IndicatorSequence =
+                            await ReplaceIndicatorSequence(originalReleaseFile, replacementReleaseFile);
+
+                        // Replace data guidance
+                        replacementReleaseFile.Summary = originalReleaseFile.Summary;
+
+                        await contentDbContext.SaveChangesAsync();
+                        await statisticsDbContext.SaveChangesAsync();
+
+                        return await RemoveOriginalSubjectAndFileFromRelease(releaseVersionId, originalFileId,
+                            replacementFileId);
+                    });
+            }
         }
 
         private async Task<Either<ActionResult, DataSetVersion?>> GetLinkedDataSetVersion(
