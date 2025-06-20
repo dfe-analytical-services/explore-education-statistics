@@ -11,8 +11,15 @@ export default function sanitiseFileName(
   const name = fileName.replace(/[|*?"/<>:]/g, '').trim();
 
   if (extension) {
-    const hasExtension = name.split('.').at(-1) === extension;
-    if (hasExtension) return name;
+    const hasExtension =
+      name.split('.').at(-1)?.toLocaleLowerCase() ===
+      extension.toLocaleLowerCase();
+
+    if (hasExtension) {
+      // prefers the typed lowercase extension
+      return [...name.split('.').slice(0, -1), extension].join('.');
+    }
+
     return `${name}.${extension}`;
   }
 

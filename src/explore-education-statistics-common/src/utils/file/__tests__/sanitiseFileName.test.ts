@@ -15,6 +15,7 @@ describe('sanitiseFileName', () => {
     expect(sanitiseFileName(`file.png`, 'png')).toBe('file.png');
     expect(sanitiseFileName(`file.png`, 'csv')).toBe('file.png.csv');
     expect(sanitiseFileName(`file.meta.png`, 'csv')).toBe('file.meta.png.csv');
+    expect(sanitiseFileName(`File.Meta.CSV`, 'csv')).toBe('File.Meta.csv');
   });
 
   test('trims the file name', () => {
