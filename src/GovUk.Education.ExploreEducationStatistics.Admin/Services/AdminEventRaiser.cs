@@ -73,6 +73,26 @@ public class AdminEventRaiser(IEventRaiser eventRaiser) : IAdminEventRaiser
         ));
 
     /// <summary>
+    /// Publishes an event when a publication is deleted.
+    /// </summary>
+    /// <param name="publicationId">The unique identifier of the publication that has been deleted.</param>
+    /// <param name="publicationSlug">The slug of the publication that has been deleted.</param>
+    /// <param name="latestPublishedRelease">
+    /// Details of the latest published release associated with the publication that has been deleted.
+    /// </param>
+    public async Task OnPublicationDeleted(
+        Guid publicationId,
+        string publicationSlug,
+        LatestPublishedReleaseInfo? latestPublishedRelease)
+    {
+        await eventRaiser.RaiseEvent(new PublicationDeletedEvent(
+            publicationId,
+            publicationSlug,
+            latestPublishedRelease
+        ));
+    }
+
+    /// <summary>
     /// On Publication Latest Published Release Reordered.
     /// It is assumed that the publication LatestPublishedReleaseVersionId has a value assigned to it.
     /// If it is null, then no event will be raised.

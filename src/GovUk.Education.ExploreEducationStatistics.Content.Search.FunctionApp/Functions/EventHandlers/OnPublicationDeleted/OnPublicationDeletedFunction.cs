@@ -1,5 +1,4 @@
 ﻿using Azure.Messaging.EventGrid;
-using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.CommandHandlers.RemoveSearchableDocument.Dto;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.EventHandlers.OnPublicationDeleted.Dtos;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Services.Core;
@@ -19,7 +18,13 @@ public class OnPublicationDeletedFunction(IEventGridEventHandler eventGridEventH
             eventDto,
             (payload, _) =>
                 Task.FromResult<RemoveSearchableDocumentDto[]>(
-                    payload.LatestPublishedReleaseId.IsBlank()
-                        ? []
-                        : [new RemoveSearchableDocumentDto { ReleaseId = payload.LatestPublishedReleaseId }]));
+                    payload.LatestPublishedRelease != null
+                        ?
+                        [
+                            new RemoveSearchableDocumentDto
+                            {
+                                ReleaseId = payload.LatestPublishedRelease.LatestPublishedReleaseId
+                            }
+                        ]
+                        : []));
 }

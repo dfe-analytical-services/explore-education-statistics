@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Options;
 using GovUk.Education.ExploreEducationStatistics.Admin.Repositories;
+using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Methodologies;
@@ -17,13 +18,16 @@ using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Secu
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
+using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.Cache;
+using GovUk.Education.ExploreEducationStatistics.Events;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Tests.Fixtures;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
@@ -142,17 +146,17 @@ public class ThemeServiceTests
         {
             // Arrange
             var publishingService = new Mock<IPublishingService>(Strict);
-                publishingService
-                    .Setup(s => s.TaxonomyChanged(It.IsAny<CancellationToken>()))
-                    .ReturnsAsync(Unit.Instance);
+            publishingService
+                .Setup(s => s.TaxonomyChanged(It.IsAny<CancellationToken>()))
+                .ReturnsAsync(Unit.Instance);
 
-            var eventRaiser = new AdminEventRaiserMockBuilder();
+            var adminEventRaiser = new AdminEventRaiserMockBuilder();
             var publicationCacheService = new PublicationCacheServiceMockBuilder();
-            
+
             var service = SetupThemeService(
                 contentDbContext: context,
                 publishingService: publishingService.Object,
-                adminEventRaiser: eventRaiser.Build(),
+                adminEventRaiser: adminEventRaiser.Build(),
                 publicationCacheService: publicationCacheService.Build());
 
             // Act
@@ -180,8 +184,8 @@ public class ThemeServiceTests
             Assert.Equal("Updated theme", savedTheme.Title);
             Assert.Equal("updated-theme", savedTheme.Slug);
             Assert.Equal("Updated summary", savedTheme.Summary);
-            
-            eventRaiser.Assert.ThatOnThemeUpdatedRaised(actual => actual == savedTheme);
+
+            adminEventRaiser.Assert.OnThemeUpdatedWasRaised(actual => actual == savedTheme);
 
             Assert.All(
                 expectedPublicationSlugs,
@@ -299,58 +303,66 @@ public class ThemeServiceTests
     [Fact]
     public async Task DeleteTheme()
     {
-        var releaseVersionId = Guid.NewGuid();
+        Theme theme = _fixture.DefaultTheme()
+            .WithTitle("UI test theme to delete");
 
-        var theme = new Theme
-        {
-            Id = Guid.NewGuid(),
-            Title = "UI test theme to delete"
-        };
+        Publication publication1 = _fixture.DefaultPublication()
+            .WithReleases([
+                _fixture.DefaultRelease(publishedVersions: 1),
+                _fixture.DefaultRelease(publishedVersions: 1)
+            ])
+            .WithTheme(theme);
 
-        ReleaseVersion releaseVersion = _fixture
-            .DefaultReleaseVersion()
-            .WithId(releaseVersionId)
-            .WithRelease(_fixture.DefaultRelease()
-                .WithPublication(_fixture
-                    .DefaultPublication()
-                    .WithTheme(theme)));
+        Publication publication2 = _fixture.DefaultPublication()
+            .WithReleases([_fixture.DefaultRelease(publishedVersions: 0, draftVersion: true)])
+            .WithTheme(theme);
+        
+        Publication publication3 = _fixture.DefaultPublication()
+            .WithTheme(theme);
+
+        Publication[] publications =
+        [
+            publication1,
+            publication2,
+            publication3
+        ];
 
         Methodology methodology = _fixture
             .DefaultMethodology()
-            .WithOwningPublication(releaseVersion.Publication);
+            .WithOwningPublication(publication1);
 
         var contextId = Guid.NewGuid().ToString();
 
         await using (var contentContext = InMemoryApplicationDbContext(contextId))
         {
-            contentContext.ReleaseVersions.Add(releaseVersion);
+            contentContext.Publications.AddRange(publications);
             contentContext.Methodologies.Add(methodology);
             await contentContext.SaveChangesAsync();
         }
 
         await using (var contentContext = InMemoryApplicationDbContext(contextId))
         {
-            Assert.Equal(1, contentContext.Publications.Count());
+            Assert.Equal(1, contentContext.Themes.Count());
+            Assert.Equal(3, contentContext.Publications.Count());
+            Assert.Equal(3, contentContext.Contacts.Count());
             Assert.Equal(1, contentContext.PublicationMethodologies.Count());
-            Assert.Equal(1, contentContext.ReleaseVersions.Count());
+            Assert.Equal(1, contentContext.Methodologies.Count());
+            Assert.Equal(3, contentContext.Releases.Count());
+            Assert.Equal(3, contentContext.ReleaseVersions.Count());
         }
 
-        var releaseDataFileService = new Mock<IReleaseDataFileService>(Strict);
+        var adminEventRaiser = new AdminEventRaiserMockBuilder();
         var methodologyService = new Mock<IMethodologyService>(Strict);
         var publishingService = new Mock<IPublishingService>(Strict);
-        var releaseVersionService = new Mock<IReleaseVersionService>(Strict);
 
         await using (var contentContext = InMemoryApplicationDbContext(contextId))
         {
             var service = SetupThemeService(
                 contentContext,
+                adminEventRaiser: adminEventRaiser.Build(),
                 methodologyService: methodologyService.Object,
                 publishingService: publishingService.Object,
-                releaseVersionService: releaseVersionService.Object);
-
-            releaseVersionService
-                .Setup(s => s.DeleteTestReleaseVersion(releaseVersionId, CancellationToken.None))
-                .ReturnsAsync(Unit.Instance);
+                releaseVersionService: new TestReleaseVersionService(contentContext));
 
             methodologyService
                 .Setup(s => s.DeleteMethodology(methodology.Id, true))
@@ -361,14 +373,34 @@ public class ThemeServiceTests
 
             var result = await service.DeleteTheme(theme.Id);
 
-            VerifyAllMocks(releaseDataFileService,
+            VerifyAllMocks(
                 methodologyService,
-                publishingService,
-                releaseVersionService);
+                publishingService);
 
             result.AssertRight();
 
+            foreach (var publication in publications)
+            {
+                adminEventRaiser.Assert.OnPublicationDeletedWasRaised(
+                    publication.Id,
+                    publication.Slug,
+                    publication.LatestPublishedReleaseVersion != null
+                        ? new LatestPublishedReleaseInfo
+                        {
+                            LatestPublishedReleaseId = publication.LatestPublishedReleaseVersion.ReleaseId,
+                            LatestPublishedReleaseVersionId = publication.LatestPublishedReleaseVersion.Id
+                        }
+                        : null
+                );
+            }
+        }
+
+        await using (var contentContext = InMemoryApplicationDbContext(contextId))
+        {
+            Assert.Empty(contentContext.Themes);
             Assert.Empty(contentContext.Publications);
+            Assert.Empty(contentContext.ReleaseVersions);
+            Assert.Empty(contentContext.Contacts);
         }
     }
 
@@ -768,7 +800,7 @@ public class ThemeServiceTests
 
         Methodology methodology = _fixture
             .DefaultMethodology()
-            .WithOwningPublication(releaseVersion.Publication);
+            .WithOwningPublication(releaseVersion.Release.Publication);
 
         var otherReleaseVersionId = Guid.NewGuid();
 
@@ -788,7 +820,7 @@ public class ThemeServiceTests
 
         Methodology otherMethodology = _fixture
             .DefaultMethodology()
-            .WithOwningPublication(otherReleaseVersion.Publication);
+            .WithOwningPublication(otherReleaseVersion.Release.Publication);
 
         var contextId = Guid.NewGuid().ToString();
 
@@ -1113,5 +1145,59 @@ public class ThemeServiceTests
             publicationCacheService ?? new PublicationCacheServiceMockBuilder().Build(),
             NullLogger<ThemeService>.Instance
         );
+    }
+
+    private class TestReleaseVersionService(ContentDbContext context) : IReleaseVersionService
+    {
+        public async Task<Either<ActionResult, Unit>> DeleteTestReleaseVersion(Guid releaseVersionId, CancellationToken cancellationToken)
+        {
+            var releaseVersion = await context.ReleaseVersions
+                .FirstAsync(rv => rv.Id == releaseVersionId, cancellationToken);
+            context.ReleaseVersions.Remove(releaseVersion);
+            await context.SaveChangesAsync(cancellationToken);
+            return Unit.Instance;
+        }
+
+        public Task<Either<ActionResult, DeleteReleasePlanViewModel>> GetDeleteReleaseVersionPlan(
+            Guid releaseVersionId, CancellationToken cancellationToken = default)
+            => throw new NotImplementedException();
+
+        public Task<Either<ActionResult, Unit>> DeleteReleaseVersion(
+            Guid releaseVersionId, CancellationToken cancellationToken = default) =>
+            throw new NotImplementedException();
+
+        public Task<Either<ActionResult, ReleaseVersionViewModel>> GetRelease(Guid releaseVersionId) =>
+            throw new NotImplementedException();
+
+        public Task<Either<ActionResult, ReleasePublicationStatusViewModel>> GetReleasePublicationStatus(
+            Guid releaseVersionId) => throw new NotImplementedException();
+
+        public Task<Either<ActionResult, ReleaseVersionViewModel>> UpdateReleaseVersion(
+            Guid releaseVersionId, ReleaseVersionUpdateRequest request) => throw new NotImplementedException();
+
+        public Task<Either<ActionResult, Unit>> UpdateReleasePublished(
+            Guid releaseVersionId, ReleasePublishedUpdateRequest request) => throw new NotImplementedException();
+
+        public Task<Either<ActionResult, IdTitleViewModel>> GetLatestPublishedRelease(Guid publicationId) =>
+            throw new NotImplementedException();
+
+        public Task<Either<ActionResult, List<ReleaseVersionSummaryViewModel>>> ListReleasesWithStatuses(
+            params ReleaseApprovalStatus[] releaseApprovalStatues) => throw new NotImplementedException();
+
+        public Task<Either<ActionResult, List<ReleaseVersionSummaryViewModel>>> ListUsersReleasesForApproval() =>
+            throw new NotImplementedException();
+
+        public Task<Either<ActionResult, List<ReleaseVersionSummaryViewModel>>> ListScheduledReleases() =>
+            throw new NotImplementedException();
+
+        public Task<Either<ActionResult, DeleteDataFilePlanViewModel>> GetDeleteDataFilePlan(
+            Guid releaseVersionId, Guid fileId, CancellationToken cancellationToken = default) =>
+            throw new NotImplementedException();
+
+        public Task<Either<ActionResult, Unit>> RemoveDataFiles(Guid releaseVersionId, Guid fileId) =>
+            throw new NotImplementedException();
+
+        public Task<Either<ActionResult, DataImportStatusViewModel>> GetDataFileImportStatus(
+            Guid releaseVersionId, Guid fileId) => throw new NotImplementedException();
     }
 }
