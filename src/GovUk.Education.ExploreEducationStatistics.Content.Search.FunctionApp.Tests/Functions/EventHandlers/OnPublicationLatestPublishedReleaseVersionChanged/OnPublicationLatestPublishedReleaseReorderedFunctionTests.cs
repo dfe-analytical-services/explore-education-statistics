@@ -6,7 +6,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Test
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Tests.TheoryDataHelpers;
 using Microsoft.Extensions.Logging.Abstractions;
 
-namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Tests.Functions.OnPublicationLatestPublishedReleaseVersionChanged;
+namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Tests.Functions.EventHandlers.OnPublicationLatestPublishedReleaseVersionChanged;
 
 public class OnPublicationLatestPublishedReleaseReorderedFunctionTests
 {
@@ -15,13 +15,15 @@ public class OnPublicationLatestPublishedReleaseReorderedFunctionTests
     [Fact]
     public void Can_instantiate_Sut() => Assert.NotNull(GetSut());
 
-    [Fact]
-    public async Task GivenEvent_WhenPayloadContainsSlug_ThenRefreshSearchableDocumentsReturned()
+    [Theory]
+    [MemberData(nameof(TheoryDatas.Blank.Bools), MemberType = typeof(TheoryDatas.Blank))]
+    public async Task GivenEvent_WhenPayloadContainsSlugAndPublicationIsNotArchived_ThenRefreshSearchableDocumentsReturned(bool? isPublicationArchived)
     {
         // ARRANGE
         var payload = new PublicationLatestPublishedReleaseReorderedEventDto
         {
             Slug = "this-is-a-publication-slug",
+            IsPublicationArchived = isPublicationArchived
         };
 
         var eventGridEvent = new EventGridEventBuilder()
@@ -84,6 +86,31 @@ public class OnPublicationLatestPublishedReleaseReorderedFunctionTests
         var payload = new PublicationLatestPublishedReleaseReorderedEventDto
         {
             Slug = blankSlug,
+        };
+
+        var eventGridEvent = new EventGridEventBuilder()
+            .WithPayload(payload)
+            .Build();
+
+        var sut = GetSut();
+        
+        // ACT
+        var response = await sut.OnPublicationLatestPublishedReleaseReordered(
+            eventGridEvent, 
+            new FunctionContextMockBuilder().Build());
+        
+        // ASSERT
+        Assert.Equal(OnPublicationLatestPublishedReleaseReorderedOutput.Empty, response);
+    }
+    
+    [Fact]
+    public async Task GivenEvent_WhenPublicationIsArchived_ThenNothingIsReturned()
+    {
+        // ARRANGE
+        var payload = new PublicationLatestPublishedReleaseReorderedEventDto
+        {
+            Slug = "this-is-a-publication-slug",
+            IsPublicationArchived = true
         };
 
         var eventGridEvent = new EventGridEventBuilder()

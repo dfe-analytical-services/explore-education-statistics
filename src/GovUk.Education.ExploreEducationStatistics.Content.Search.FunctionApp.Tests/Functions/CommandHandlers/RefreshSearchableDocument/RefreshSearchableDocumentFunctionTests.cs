@@ -4,7 +4,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Serv
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Tests.Builders;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Tests.TheoryDataHelpers;
 
-namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Tests.Functions.RefreshSearchableDocument;
+namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Tests.Functions.CommandHandlers.RefreshSearchableDocument;
 
 public class RefreshSearchableDocumentFunctionTests
 {

@@ -4,7 +4,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Test
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Tests.TheoryDataHelpers;
 using Microsoft.Extensions.Logging.Abstractions;
 
-namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Tests.Functions.
+namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Tests.Functions.CommandHandlers.
     RemovePublicationSearchableDocuments;
 
 public class RemovePublicationSearchableDocumentsTests

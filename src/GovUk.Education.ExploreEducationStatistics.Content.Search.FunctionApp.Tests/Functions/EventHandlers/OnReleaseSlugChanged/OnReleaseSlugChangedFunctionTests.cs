@@ -5,7 +5,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Test
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Tests.TheoryDataHelpers;
 using Microsoft.Extensions.Logging.Abstractions;
 
-namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Tests.Functions.OnReleaseSlugChanged;
+namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Tests.Functions.EventHandlers.OnReleaseSlugChanged;
 
 public class OnReleaseSlugChangedFunctionTests
 {
@@ -14,13 +14,15 @@ public class OnReleaseSlugChangedFunctionTests
     [Fact]
     public void Can_instantiate_Sut() => Assert.NotNull(GetSut());
 
-    [Fact]
-    public async Task GivenEvent_WhenPayloadContainsPublicationSlug_ThenRefreshSearchableDocumentMessageDtoReturned()
+    [Theory]
+    [MemberData(nameof(TheoryDatas.Blank.Bools), MemberType = typeof(TheoryDatas.Blank))]
+    public async Task GivenEvent_WhenPayloadContainsPublicationSlug_ThenRefreshSearchableDocumentMessageDtoReturned(bool? isPublicationArchived)
     {
         // ARRANGE
         var payload = new ReleaseSlugChangedEventDto
         {
             PublicationSlug = "this-is-a-publication-slug",
+            IsPublicationArchived = isPublicationArchived
         };
 
         var eventGridEvent = new EventGridEventBuilder()
@@ -46,6 +48,29 @@ public class OnReleaseSlugChangedFunctionTests
         var payload = new ReleaseSlugChangedEventDto
         {
             PublicationSlug = blankPublicationSlug,
+        };
+
+        var eventGridEvent = new EventGridEventBuilder()
+            .WithPayload(payload)
+            .Build();
+
+        var sut = GetSut();
+        
+        // ACT
+        var response = await sut.OnReleaseSlugChangedEvent(eventGridEvent, new FunctionContextMockBuilder().Build());
+        
+        // ASSERT
+        Assert.Empty(response);
+    }
+   
+    [Fact]
+    public async Task GivenEvent_WhenPublicationIsArchived_ThenNothingIsReturned()
+    {
+        // ARRANGE
+        var payload = new ReleaseSlugChangedEventDto
+        {
+            PublicationSlug = "this-is-a-publication-slug",
+            IsPublicationArchived = true
         };
 
         var eventGridEvent = new EventGridEventBuilder()
