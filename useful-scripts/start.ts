@@ -26,6 +26,7 @@ const allowedDockerServices = [
   'data-storage',
   'idp',
   'public-api-db',
+  'data-screener',
 ] as const;
 
 type DockerService = (typeof allowedDockerServices)[number];
@@ -81,6 +82,7 @@ const allowedServiceNames = [
   'db',
   'dataStorage',
   'searchFunctionApp',
+  'dataScreener',
 ] as const;
 
 type ServiceName = (typeof allowedServiceNames)[number];
@@ -94,8 +96,8 @@ const serviceSchemas: Record<ServiceName, ServiceSchema> = {
       return fs.existsSync(
         path.join(projectRoot, this.root, 'appsettings.Idp.json'),
       )
-        ? ['db', 'data-storage', 'public-api-db']
-        : ['db', 'data-storage', 'public-api-db', 'idp'];
+        ? ['db', 'data-storage', 'public-api-db', 'data-screener']
+        : ['db', 'data-storage', 'public-api-db', 'idp', 'data-screener'];
     },
   },
   analytics: {
@@ -173,6 +175,11 @@ const serviceSchemas: Record<ServiceName, ServiceSchema> = {
     port: 7075,
     type: 'func',
     dockerServices: ['data-storage'],
+  },
+  dataScreener: {
+    colour: chalk.rgb(0, 255, 221),
+    service: 'data-screener',
+    type: 'docker',
   },
   idp: {
     service: 'idp',
