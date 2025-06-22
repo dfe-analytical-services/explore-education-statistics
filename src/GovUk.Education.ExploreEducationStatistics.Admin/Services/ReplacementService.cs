@@ -129,7 +129,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return apiDataSetVersionPlan with
             {
                 MappingStatus = mappingStatus, 
-                Valid = mappingStatus is { HasMajorVersionUpdate: false } && apiDataSetVersionPlan.ReadyToPublish
+                Valid = mappingStatus is { IsMajorVersionUpdate: false } && apiDataSetVersionPlan.ReadyToPublish
             };
         }
         
@@ -1249,8 +1249,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
                     await contentDbContext.SaveChangesAsync();
                     // removeApiVersion is set to false here as we shouldn't delete the previous API version for the original data file being replaced, we only create new patch versions. 
-                    return await releaseVersionService.RemoveDataFiles(releaseVersionId: releaseVersionId,
-                        fileId: originalFileId, removeApiVersion: false);
+                    return await releaseVersionService.RemoveDataFiles(
+                        releaseVersionId: releaseVersionId,
+                        fileId: originalFileId, 
+                        removeApiVersion: false);
                 });
         }
 

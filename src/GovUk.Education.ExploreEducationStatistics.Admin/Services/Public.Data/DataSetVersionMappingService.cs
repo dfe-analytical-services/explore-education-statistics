@@ -90,15 +90,9 @@ public class DataSetVersionMappingService(
         var filterAndOptionMappingTypes = await mappingTypesRepository.GetFilterOptionMappingTypes(
             dataSetVersionId, 
             cancellationToken);
-
-        var locationIsMajor = locationOptionMappingTypes
-            .Any(types => NoMappingTypes.Contains(types.LocationLevel) || NoMappingTypes.Contains(types.LocationOption));
-
-        var filtersIsMajor = filterAndOptionMappingTypes.Any(types => NoMappingTypes.Contains(types.Filter) ||  NoMappingTypes.Contains(types.FilterOption));
-
-        var isMajorVersionUpdate = locationIsMajor 
-                                   || filtersIsMajor 
-                                   || await HasDeletionChanges(dataSetVersionId, cancellationToken);
+        
+       var majorChangesStatus = await GetMajorChangesStatus(dataSetVersionId, locationOptionMappingTypes, filterAndOptionMappingTypes, cancellationToken);
+       
 
         return await publicDataDbContext
             .DataSetVersionMappings
@@ -107,9 +101,9 @@ public class DataSetVersionMappingService(
             {
                 LocationsComplete = mapping.LocationMappingsComplete,
                 FiltersComplete = mapping.FilterMappingsComplete,
-                LocationsHaveMajorChange = locationIsMajor,
-                FiltersHaveMajorChange = filtersIsMajor,
-                HasMajorVersionUpdate = isMajorVersionUpdate
+                LocationsHaveMajorChange = majorChangesStatus.LocationsHaveMajorChange,
+                FiltersHaveMajorChange = majorChangesStatus.FiltersHaveMajorChange,
+                HasDeletionChanges = majorChangesStatus.HasDeletionChanges
             })
             .SingleOrDefaultAsync(cancellationToken);
     }
@@ -208,35 +202,27 @@ public class DataSetVersionMappingService(
             .Where(mapping => mapping.TargetDataSetVersionId == nextDataSetVersionId)
             .Select(nextVersion => nextVersion.TargetDataSetVersion)
             .SingleAsync(cancellationToken);
-        
-        var isMajorVersionUpdate = await IsMajorVersionUpdate(
+
+        var majorChangesStatus = await GetMajorChangesStatus(
             nextDataSetVersionId,
             locationMappingTypes,
             filterMappingTypes,
             cancellationToken);
 
-        var isReplacingAPIDataFile = await publicDataDbContext.DataSetVersionImports
+        var isReplacingApiDataFile = await publicDataDbContext.DataSetVersionImports
             .AnyAsync(i => i.DataSetVersionToReplaceId != null 
                            && i.DataSetVersionToReplaceId == sourceDataSetVersion.Id,
-                cancellationToken) && targetDataSetVersion.VersionPatch > 0;
+                cancellationToken);
 
-        if (!isReplacingAPIDataFile)
-        {   
-            if (isMajorVersionUpdate)
-            {
-                targetDataSetVersion.VersionMajor = sourceDataSetVersion.VersionMajor + 1;
-                targetDataSetVersion.VersionMinor = 0;
-                targetDataSetVersion.VersionPatch = 0;
-            }
-            else
-            {
-                targetDataSetVersion.VersionMajor = sourceDataSetVersion.VersionMajor;
-                targetDataSetVersion.VersionMinor = sourceDataSetVersion.VersionMinor + 1;
-                targetDataSetVersion.VersionPatch = 0;
-            }
+        if (!isReplacingApiDataFile)
+        {
+            UpgradeToNewMajorOrMinorVersion(
+                majorChangesStatus.IsMajorVersionUpdate, 
+                targetDataSetVersion, 
+                sourceDataSetVersion);
+            await publicDataDbContext.SaveChangesAsync(cancellationToken);
         }
 
-        await publicDataDbContext.SaveChangesAsync(cancellationToken);
 
         var releaseFile = await contentDbContext
             .ReleaseFiles
@@ -248,16 +234,45 @@ public class DataSetVersionMappingService(
         await contentDbContext.SaveChangesAsync(cancellationToken);
     }
 
-    public async Task<bool> IsMajorVersionUpdate(
-        Guid targetDataSetVersionId,
+    private static void UpgradeToNewMajorOrMinorVersion(
+        bool isMajorVersionUpdate,
+        DataSetVersion targetDataSetVersion,
+        DataSetVersion sourceDataSetVersion)
+    {
+        if (isMajorVersionUpdate)
+        {
+            targetDataSetVersion.VersionMajor = sourceDataSetVersion.VersionMajor + 1;
+            targetDataSetVersion.VersionMinor = 0;
+            targetDataSetVersion.VersionPatch = 0;
+        }
+        else
+        {
+            targetDataSetVersion.VersionMajor = sourceDataSetVersion.VersionMajor;
+            targetDataSetVersion.VersionMinor = sourceDataSetVersion.VersionMinor + 1;
+            targetDataSetVersion.VersionPatch = 0;
+        }
+    }
+
+    public async Task<MajorChangesStatus> GetMajorChangesStatus(
+        Guid dataSetVersionId, 
         List<LocationMappingTypes> locationMappingTypes,
         List<FilterMappingTypes> filterMappingTypes,
-        CancellationToken cancellationToken) => locationMappingTypes
-                   .Any(types => NoMappingTypes.Contains(types.LocationLevel) || NoMappingTypes.Contains(types.LocationOption))
-                || filterMappingTypes
-                    .Any(types => NoMappingTypes.Contains(types.Filter) ||  NoMappingTypes.Contains(types.FilterOption))
-                || await HasDeletionChanges(targetDataSetVersionId, cancellationToken);
-    
+        CancellationToken cancellationToken = default)
+    {
+        var majorChangesStatus = new MajorChangesStatus
+        {
+            FiltersHaveMajorChange = filterMappingTypes
+                .Any(types => NoMappingTypes.Contains(types.Filter) 
+                              ||  NoMappingTypes.Contains(types.FilterOption)),
+            LocationsHaveMajorChange = locationMappingTypes
+                .Any(types => NoMappingTypes.Contains(types.LocationLevel) 
+                              || NoMappingTypes.Contains(types.LocationOption)),
+            HasDeletionChanges = await HasDeletionChanges(
+                dataSetVersionId, 
+                cancellationToken)
+        };
+        return majorChangesStatus;
+    }
     /// <summary>
     /// Checks if there are any major version changes due to deletions in indicators, geographic levels, or time periods
     /// for a specific target dataset version.
