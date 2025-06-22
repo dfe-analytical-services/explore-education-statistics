@@ -20,10 +20,13 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainers;
+using DataSet = GovUk.Education.ExploreEducationStatistics.Admin.Models.DataSet;
 using IReleaseVersionRepository = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IReleaseVersionRepository;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services;
@@ -37,7 +40,8 @@ public class DataSetFileStorage(
     IDataImportService dataImportService,
     IUserService userService,
     IDataSetVersionService dataSetVersionService,
-    IOptions<FeatureFlagsOptions> featureFlags,
+    IDataSetService dataSetService,
+    IOptions<FeatureFlagsOptions> featureFlags, 
     ILogger<DataSetFileStorage> logger) : IDataSetFileStorage
 {
     // TODO (EES-6176): Remove once manual replacement processes have been consolidated to use Upload* methods.
@@ -96,7 +100,7 @@ public class DataSetFileStorage(
             && dataSet.ReplacingFile is not null 
             && replacedReleaseDataFile!.PublicApiDataSetId != null)
         { 
-            await CreateNextDraftDataSetVersion(dataReleaseFile.Id, replacedReleaseDataFile, cancellationToken);
+            await CreateDraftDataSetVersion(dataReleaseFile.Id, replacedReleaseDataFile, cancellationToken);
         }
 
         var dataImport = await dataImportService.Import(subjectId, dataFile, metaFile);
@@ -122,7 +126,7 @@ public class DataSetFileStorage(
         };
     }
 
-    private async Task CreateNextDraftDataSetVersion(
+    private async Task CreateDraftDataSetVersion(
         Guid dataReleaseFileId,
         ReleaseFile replacedReleaseDataFile,
         CancellationToken cancellationToken)
@@ -141,17 +145,99 @@ public class DataSetFileStorage(
                 throw new InvalidOperationException("Failed to find the associated API data set version for the release file.");
             })
             .OnSuccessDo(async dataSetVersion =>
-                await dataSetVersionService.CreateNextVersion(
-                        dataReleaseFileId,
-                        replacedReleaseDataFile!.PublicApiDataSetId!.Value,
-                        dataSetVersion.Id,
-                        cancellationToken
-                    ).OnFailureDo(_ =>
                 {
-                    var errorMessage = $"Failed whilst creating the next draft version for the data set id: {dataSetId} and the data set version number: {replacedReleaseDataFile.PublicApiDataSetVersionString}.";
+                    if (dataSetVersion.IsFirstVersion && dataSetVersion.Status != DataSetVersionStatus.Published)
+                    {
+                        await DeleteAndRecreateInitialDataSetVersion(dataReleaseFileId, cancellationToken, dataSetVersion, dataSetId);
+                    }
+                    else if (dataSetVersion.Status != DataSetVersionStatus.Published)
+                    {
+                        await DeleteAndRecreateDataSetVersion(dataReleaseFileId, replacedReleaseDataFile, cancellationToken, dataSetVersion, dataSetId);
+                    }
+                    else
+                    {
+                        await CreateNextDataSetVersion(dataReleaseFileId, replacedReleaseDataFile, cancellationToken, dataSetVersion, dataSetId);
+                    }
+                }
+                );
+    }
+
+    private async Task CreateNextDataSetVersion(
+        Guid dataReleaseFileId,
+        ReleaseFile replacedReleaseDataFile,
+        CancellationToken cancellationToken,
+        DataSetVersion dataSetVersion,
+        [DisallowNull] Guid? dataSetId)
+    {
+        await dataSetVersionService.CreateNextVersion(
+            dataReleaseFileId,
+            replacedReleaseDataFile!.PublicApiDataSetId!.Value,
+            dataSetVersion.Id,
+            cancellationToken
+        ).OnFailureDo(_ =>
+        {
+            var errorMessage =
+                $"Failed whilst creating the next draft version for the data set id: {dataSetId} and the data set version number: {replacedReleaseDataFile.PublicApiDataSetVersionString}.";
+            logger.LogError(errorMessage);
+            throw new InvalidOperationException(
+                "Failure detected when creating the next draft version for the data file uploaded.");
+        });
+    }
+
+    private async Task DeleteAndRecreateDataSetVersion(
+        Guid dataReleaseFileId,
+        ReleaseFile replacedReleaseDataFile,
+        CancellationToken cancellationToken,
+        DataSetVersion dataSetVersion,
+        [DisallowNull] Guid? dataSetId)
+    {
+        await dataSetVersionService.DeleteVersion(dataSetVersion.Id, cancellationToken)
+            .OnSuccessVoid(async _ =>
+            {
+                await dataSetVersionService.CreateNextVersion(
+                    dataReleaseFileId,
+                    replacedReleaseDataFile!.PublicApiDataSetId!.Value,
+                    dataSetVersion.Id,
+                    cancellationToken
+                ).OnFailureDo(_ =>
+                {
+                    var errorMessage =
+                        $"Failed whilst creating the next draft version for the data set id: {dataSetId} and the data set version number: {replacedReleaseDataFile.PublicApiDataSetVersionString}.";
                     logger.LogError(errorMessage);
-                    throw new InvalidOperationException("Failure detected when creating the next draft version for the data file uploaded.");
-                }));
+                    throw new InvalidOperationException(
+                        "Failure detected when creating the next draft version for the data file uploaded.");
+                });
+            })
+            .OnFailureVoid(_ =>
+            {
+                var errorMessage = $"Failed whilst deleting the draft version for the data set id: {dataSetId}.";
+                logger.LogError(errorMessage);
+                throw new InvalidOperationException(
+                    "Failure detected when deleting the draft version for the data file uploaded.");
+            });
+    }
+
+    private async Task DeleteAndRecreateInitialDataSetVersion(Guid dataReleaseFileId, CancellationToken cancellationToken, DataSetVersion dataSetVersion, [DisallowNull] Guid? dataSetId)
+    {
+        await dataSetVersionService.DeleteVersion(dataSetVersion.Id, cancellationToken)
+            .OnSuccessVoid(async _ =>
+            {
+                await dataSetService.CreateDataSet(dataReleaseFileId, cancellationToken)
+                    .OnFailureDo(_ =>
+                    {
+                        var errorMessage =
+                            $"Failed whilst creating the initial draft version for the data set id: {dataSetId}";
+                        logger.LogError(errorMessage);
+                        throw new InvalidOperationException(
+                            "Failed whilst creating the initial draft version ");
+                    });
+            })
+            .OnFailureVoid(_ =>
+            {
+                var errorMessage = $"Failed whilst deleting the initial draft version for the data set id: {dataSetId}.";
+                logger.LogError(errorMessage);
+                throw new InvalidOperationException("Failed whilst deleting initial the draft version.");
+            });
     }
 
     private async Task UploadDataSetToReleaseStorage(

@@ -82,14 +82,14 @@ public class DataSetVersionMappingServiceTests
             mockMappingTypesRepository: mockMappingTypesRepository.Object);
 
         // Act
-        var result = await service.IsMajorVersionUpdate(
+        var result = await service.GetMajorChangesStatus(
             targetDataSetVersionId,
             locationMappingTypes,
             filterMappingTypes,
             CancellationToken.None);
 
         // Assert
-        Assert.Equal(expectedMajorVersion, result);
+        Assert.Equal(expectedMajorVersion, result.IsMajorVersionUpdate);
     }
     
     [Theory]

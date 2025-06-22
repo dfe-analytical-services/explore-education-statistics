@@ -154,16 +154,15 @@ internal class DataSetService(
         var releaseFilesByDataSetVersionId = await GetReleaseFilesByDataSetVersionId(dataSet, cancellationToken);
         
         ReleaseFile? originalReleaseFile = null;
-        if (dataSet.LatestDraftVersion is { VersionPatch: > 0 })
+        //Get the release file belonging to the data file that has been patched 
+        var versionNumberBeforePatch = dataSet.LatestDraftVersion?.SemVersion()
+            .WithPatch(dataSet.LatestDraftVersion.VersionPatch - 1);
+        var versionBeforePatch = versionNumberBeforePatch is not null
+            ? dataSet.Versions.SingleOrDefault(dsv => dsv.SemVersion() == versionNumberBeforePatch)
+            : null;
+        if (versionBeforePatch != null)
         {
-            //Get the release file belonging to the data file that has been patched 
-            var lastDataSetVersionNumber = dataSet.LatestDraftVersion.SemVersion()
-                .WithPatch(dataSet.LatestDraftVersion.VersionPatch - 1);
-            var lastDataSetVersion = dataSet.Versions.SingleOrDefault(dsv => dsv.SemVersion() == lastDataSetVersionNumber);
-            if (lastDataSetVersion != null)
-            {
-                originalReleaseFile = releaseFilesByDataSetVersionId[lastDataSetVersion.Id];
-            }
+            originalReleaseFile = releaseFilesByDataSetVersionId[versionBeforePatch.Id];
         }
 
         var draftVersion = dataSet.LatestDraftVersion is null
