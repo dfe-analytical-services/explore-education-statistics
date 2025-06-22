@@ -404,6 +404,7 @@ public class DataSetFileStorageTests
         IDataImportService? dataImportService = null,
         IUserService? userService = null,
         IDataSetVersionService? dataSetVersionService = null,
+        IDataSetService? dataSetService = null,
         IOptions<FeatureFlagsOptions>? featureFlags = null,
         bool addDefaultUser = true)
     {
@@ -421,6 +422,7 @@ public class DataSetFileStorageTests
             dataImportService ?? Mock.Of<IDataImportService>(Strict),
             userService ?? MockUtils.AlwaysTrueUserService(_user.Id).Object,
             dataSetVersionService ?? Mock.Of<IDataSetVersionService>(Strict),
+            dataSetService ?? Mock.Of<IDataSetService>(Strict),
             featureFlags ?? Mock.Of<IOptions<FeatureFlagsOptions>>(Strict),
             Mock.Of<ILogger<DataSetFileStorage>>(Strict));
     }
