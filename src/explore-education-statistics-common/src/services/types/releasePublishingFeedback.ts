@@ -1,5 +1,5 @@
 export interface ReleasePublishingFeedbackRequest {
-  token: string;
+  emailToken: string;
   response: ReleasePublishingFeedbackResponse;
   additionalFeedback?: string;
 }

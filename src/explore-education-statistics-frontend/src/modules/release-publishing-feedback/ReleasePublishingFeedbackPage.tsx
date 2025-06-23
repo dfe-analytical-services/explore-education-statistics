@@ -23,12 +23,12 @@ interface FormValues {
 }
 
 interface Props {
-  token: string;
+  emailToken: string;
   initialResponse: ReleasePublishingFeedbackResponse;
 }
 
 const ReleasePublishingFeedbackPage: NextPage<Props> = ({
-  token,
+  emailToken,
   initialResponse,
 }) => {
   const handleFormSubmit = async ({
@@ -36,7 +36,7 @@ const ReleasePublishingFeedbackPage: NextPage<Props> = ({
     additionalFeedback,
   }: FormValues) => {
     await releasePublishingFeedbackService.sendFeedback({
-      token,
+      emailToken,
       response,
       additionalFeedback: additionalFeedback?.length
         ? additionalFeedback
@@ -146,7 +146,7 @@ export const getServerSideProps: GetServerSideProps<Props> = withAxiosHandler(
     const { token, response } = query;
     return {
       props: {
-        token: token as string,
+        emailToken: token as string,
         initialResponse: response as ReleasePublishingFeedbackResponse,
       },
     };

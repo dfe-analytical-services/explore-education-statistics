@@ -14,7 +14,7 @@ describe('ReleasePublishingFeedbackPage', () => {
   test('renders', async () => {
     render(
       <ReleasePublishingFeedbackPage
-        token="test-token"
+        emailToken="test-token"
         initialResponse="VerySatisfied"
       />,
     );
@@ -65,7 +65,7 @@ describe('ReleasePublishingFeedbackPage', () => {
 
     const { user } = render(
       <ReleasePublishingFeedbackPage
-        token="test-token"
+        emailToken="test-token"
         initialResponse="VerySatisfied"
       />,
     );
@@ -94,7 +94,7 @@ describe('ReleasePublishingFeedbackPage', () => {
 
     const { user } = render(
       <ReleasePublishingFeedbackPage
-        token="test-token"
+        emailToken="test-token"
         initialResponse="VerySatisfied"
       />,
     );
