@@ -128,9 +128,11 @@ const ReleasePublishingFeedbackPage: NextPage<Props> = ({
                 </ButtonGroup>
               </Form>
             ) : (
-              <Panel headingTag="h2" title="Feedback received">
-                <p>Thank you.</p>
-              </Panel>
+              <div aria-live="polite">
+                <Panel headingTag="h2" title="Feedback received">
+                  <p>Thank you.</p>
+                </Panel>
+              </div>
             )}
           </LoadingSpinner>
         )}
