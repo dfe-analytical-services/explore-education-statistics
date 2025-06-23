@@ -50,6 +50,19 @@ export default function DataFilesTableUploadRow({
   if (hasFailures && !hasWarnings) tabTitle = 'Failures';
   if (!hasFailures && hasWarnings) tabTitle = 'Warnings';
 
+  const failuresNoticeMessage = (
+    <WarningMessage>
+      You will need to delete this file (close this window, and select "Delete
+      files"), fix the failed tests and upload again
+    </WarningMessage>
+  );
+
+  const warningsNoticeMessage = (
+    <WarningMessage>
+      You will need to review each warning before continuing the file upload
+    </WarningMessage>
+  );
+
   const handleDeleteConfirm = useCallback(async () => {
     try {
       await releaseDataFileService.deleteDataSetUpload(
@@ -105,26 +118,14 @@ export default function DataFilesTableUploadRow({
                 <TabsSection
                   id={dataSetUploadTabIds.screenerFailuresAndWarnings}
                   title={tabTitle}
+                  headingTitle={
+                    hasFailures
+                      ? 'Screener test failures'
+                      : 'Screener test warnings'
+                  }
                 >
-                  {hasFailures ? (
-                    // TODO (EES-5353): This condition can be replaced with `overallResult` once it returns a reliable response
-                    <>
-                      <h3>Screener test failures</h3>
-                      <WarningMessage>
-                        You will need to delete this file (close this window,
-                        and select "Delete files"), fix the failed tests and
-                        upload again
-                      </WarningMessage>
-                    </>
-                  ) : (
-                    <>
-                      <h3>Screener test warnings</h3>
-                      <WarningMessage>
-                        You will need to review each warning before continuing
-                        the file upload
-                      </WarningMessage>
-                    </>
-                  )}
+                  {hasFailures && failuresNoticeMessage}
+                  {hasWarnings && !hasFailures && warningsNoticeMessage}
                   <ScreenerResultsTable
                     screenerResult={dataSetUpload.screenerResult}
                     showAll={false}
@@ -134,12 +135,10 @@ export default function DataFilesTableUploadRow({
               <TabsSection
                 id={dataSetUploadTabIds.screenerResults}
                 title="All tests"
+                headingTitle={`Full breakdown of ${dataSetUpload.screenerResult.testResults.length} tests checked against this file`}
               >
-                <h3>
-                  Full breakdown of{' '}
-                  {dataSetUpload.screenerResult.testResults.length} tests
-                  checked against this file
-                </h3>
+                {hasFailures && failuresNoticeMessage}
+                {hasWarnings && !hasFailures && warningsNoticeMessage}
                 <ScreenerResultsTable
                   screenerResult={dataSetUpload.screenerResult}
                   showAll
@@ -148,7 +147,10 @@ export default function DataFilesTableUploadRow({
               <TabsSection
                 id={dataSetUploadTabIds.fileDetails}
                 title="File details"
+                headingTitle="File details"
               >
+                {hasFailures && failuresNoticeMessage}
+                {hasWarnings && !hasFailures && warningsNoticeMessage}
                 <DataSetUploadSummaryList dataSetUpload={dataSetUpload} />
               </TabsSection>
             </Tabs>
