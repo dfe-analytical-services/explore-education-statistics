@@ -12,17 +12,17 @@ using System.Threading.Tasks;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api.Bau;
 
-public class FeedbackControllerTests(TestApplicationFactory testApp) : IntegrationTestFixture(testApp)
+public class PageFeedbackControllerTests(TestApplicationFactory testApp) : IntegrationTestFixture(testApp)
 {
     private static readonly DateTime Now = DateTime.UtcNow;
-    private const string BaseUrl = "api/feedback";
-    private readonly List<Feedback> _feedback =
+    private const string BaseUrl = "api/feedback/page";
+    private readonly List<PageFeedback> _feedback =
     [
         new()
         {
             Id = Guid.NewGuid(),
             Created = Now,
-            Response = FeedbackResponse.Useful,
+            Response = PageFeedbackResponse.Useful,
             Url = "/",
             UserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
             Context = "",
@@ -34,7 +34,7 @@ public class FeedbackControllerTests(TestApplicationFactory testApp) : Integrati
         {
             Id = Guid.NewGuid(),
             Created = Now,
-            Response = FeedbackResponse.NotUseful,
+            Response = PageFeedbackResponse.NotUseful,
             Url = "/",
             UserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
             Context = "What were you doing?",
@@ -46,7 +46,7 @@ public class FeedbackControllerTests(TestApplicationFactory testApp) : Integrati
         {
             Id = Guid.NewGuid(),
             Created = Now,
-            Response = FeedbackResponse.ProblemEncountered,
+            Response = PageFeedbackResponse.ProblemEncountered,
             Url = "/",
             UserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
             Context = "What were you doing?",
@@ -61,7 +61,7 @@ public class FeedbackControllerTests(TestApplicationFactory testApp) : Integrati
     {
         // Arrange
         await TestApp.AddTestData<ContentDbContext>(context
-            => context.Feedback.AddRange(_feedback));
+            => context.PageFeedback.AddRange(_feedback));
 
         var client = TestApp
             .SetUser(DataFixture.BauUser())
@@ -71,7 +71,7 @@ public class FeedbackControllerTests(TestApplicationFactory testApp) : Integrati
         var response = await client.GetAsync(BaseUrl);
 
         // Assert
-        var result = response.AssertOk<List<FeedbackViewModel>>();
+        var result = response.AssertOk<List<PageFeedbackViewModel>>();
 
         Assert.Equal(2, result.Count);
         Assert.Equivalent(_feedback[0], result[0]);
@@ -83,7 +83,7 @@ public class FeedbackControllerTests(TestApplicationFactory testApp) : Integrati
     {
         // Arrange
         await TestApp.AddTestData<ContentDbContext>(context
-            => context.Feedback.AddRange(_feedback));
+            => context.PageFeedback.AddRange(_feedback));
 
         var client = TestApp
             .SetUser(DataFixture.BauUser())
@@ -93,7 +93,7 @@ public class FeedbackControllerTests(TestApplicationFactory testApp) : Integrati
         var response = await client.GetAsync(BaseUrl + "?showRead=true");
 
         // Assert
-        var result = response.AssertOk<List<FeedbackViewModel>>();
+        var result = response.AssertOk<List<PageFeedbackViewModel>>();
 
         Assert.Equal(3, result.Count);
         Assert.Equivalent(_feedback, result);
@@ -103,16 +103,16 @@ public class FeedbackControllerTests(TestApplicationFactory testApp) : Integrati
     public async Task ToggleReadStatus_Success()
     {
         // Arrange
-        var feedback = new Feedback
+        var feedback = new PageFeedback
         {
             Id = Guid.NewGuid(),
-            Response = FeedbackResponse.Useful,
+            Response = PageFeedbackResponse.Useful,
             Url = "/",
             Read = false,
         };
 
         await TestApp.AddTestData<ContentDbContext>(context
-            => context.Feedback.Add(feedback));
+            => context.PageFeedback.Add(feedback));
 
         await using var context = TestApp.GetDbContext<ContentDbContext>();
 
@@ -124,7 +124,7 @@ public class FeedbackControllerTests(TestApplicationFactory testApp) : Integrati
         await client.PatchAsync($"{BaseUrl}/{feedback.Id}", content: null);
 
         // Assert
-        var saved = await context.Feedback.FirstAsync();
+        var saved = await context.PageFeedback.FirstAsync();
 
         Assert.True(saved.Read);
     }

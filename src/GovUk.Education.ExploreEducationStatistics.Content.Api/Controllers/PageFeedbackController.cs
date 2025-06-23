@@ -8,24 +8,24 @@ using System.Threading.Tasks;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers;
 
-[Route("api/[controller]")]
+[Route("api/feedback/page")]
 [ApiController]
-public class FeedbackController(ContentDbContext context) : ControllerBase
+public class PageFeedbackController(ContentDbContext context) : ControllerBase
 {
     [HttpPost]
     public async Task<ActionResult> CreateFeedback(
-            [FromBody] FeedbackCreateRequest request,
+            [FromBody] PageFeedbackCreateRequest request,
             CancellationToken cancellationToken)
     {
-        await context.Feedback.AddAsync(MapToEntity(request), cancellationToken);
+        await context.PageFeedback.AddAsync(MapToEntity(request), cancellationToken);
         await context.SaveChangesAsync(cancellationToken);
 
         return new CreatedResult();
     }
 
-    private static Feedback MapToEntity(FeedbackCreateRequest request)
+    private static PageFeedback MapToEntity(PageFeedbackCreateRequest request)
     {
-        return new Feedback
+        return new PageFeedback
         {
             UserAgent = request.UserAgent,
             Url = request.Url,
