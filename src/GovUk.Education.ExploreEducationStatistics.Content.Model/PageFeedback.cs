@@ -5,7 +5,7 @@ using System;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Model;
 
-public record Feedback : ICreatedTimestamp<DateTime>
+public record PageFeedback : ICreatedTimestamp<DateTime>
 {
     public Guid Id { get; set; }
 
@@ -15,7 +15,7 @@ public record Feedback : ICreatedTimestamp<DateTime>
 
     public string? UserAgent { get; set; }
 
-    public FeedbackResponse Response { get; set; }
+    public PageFeedbackResponse Response { get; set; }
 
     public string? Context { get; set; }
 

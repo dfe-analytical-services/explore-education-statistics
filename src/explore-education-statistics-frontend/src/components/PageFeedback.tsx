@@ -1,16 +1,16 @@
 import VisuallyHidden from '@common/components/VisuallyHidden';
-import styles from '@frontend/components/Feedback.module.scss';
+import styles from '@frontend/components/PageFeedback.module.scss';
 import Button from '@common/components/Button';
 import classNames from 'classnames';
 import { useMemo, useState } from 'react';
 import FormProvider from '@common/components/form/FormProvider';
 import { Form, FormFieldTextArea } from '@common/components/form';
 import ButtonGroup from '@common/components/ButtonGroup';
-import feedbackService from '@frontend/services/feedbackService';
+import pageFeedbackService from '@frontend/services/pageFeedbackService';
 import {
-  FeedbackRequest,
-  FeedbackResponse,
-} from '@common/services/types/feedback';
+  PageFeedbackRequest,
+  PageFeedbackResponse,
+} from '@common/services/types/pageFeedback';
 import Yup from '@common/validation/yup';
 import { ObjectSchema } from 'yup';
 
@@ -24,12 +24,12 @@ interface FormValues {
 
 const feedbackLimit = 2000;
 
-export default function Feedback() {
+export default function PageFeedback() {
   const [bannerState, setBannerState] = useState<BannerState>('initial');
-  const [response, setResponse] = useState<FeedbackResponse | undefined>();
+  const [response, setResponse] = useState<PageFeedbackResponse | undefined>();
 
   const handleUsefulFeedback = async () => {
-    await feedbackService.sendFeedback({
+    await pageFeedbackService.sendFeedback({
       url: window.location.pathname,
       userAgent: navigator.userAgent.substring(0, 250),
       response: 'Useful',
@@ -43,12 +43,12 @@ export default function Feedback() {
     setBannerState('initial');
   };
 
-  const handleSubmit = async (values: FeedbackRequest) => {
+  const handleSubmit = async (values: PageFeedbackRequest) => {
     if (!response) {
       throw new Error('Response has not been set');
     }
 
-    await feedbackService.sendFeedback({
+    await pageFeedbackService.sendFeedback({
       url: window.location.pathname,
       userAgent: navigator.userAgent.substring(0, 250),
       response,
@@ -148,7 +148,7 @@ export default function Feedback() {
             return (
               <Form id="feedbackForm" onSubmit={handleSubmit}>
                 {response && (
-                  <FormFieldTextArea<FeedbackRequest>
+                  <FormFieldTextArea<PageFeedbackRequest>
                     label="What were you doing?"
                     name="context"
                     rows={3}
@@ -157,7 +157,7 @@ export default function Feedback() {
                 )}
 
                 {response === 'NotUseful' && (
-                  <FormFieldTextArea<FeedbackRequest>
+                  <FormFieldTextArea<PageFeedbackRequest>
                     label="What were you hoping to achieve?"
                     name="intent"
                     rows={3}
@@ -166,7 +166,7 @@ export default function Feedback() {
                 )}
 
                 {response === 'ProblemEncountered' && (
-                  <FormFieldTextArea<FeedbackRequest>
+                  <FormFieldTextArea<PageFeedbackRequest>
                     label="What went wrong?"
                     name="issue"
                     rows={3}

@@ -1,17 +1,17 @@
-import Feedback from '@frontend/components/Feedback';
+import PageFeedback from '@frontend/components/PageFeedback';
 import { render, screen, waitFor } from '@testing-library/react';
 import React from 'react';
 import userEvent from '@testing-library/user-event';
-import _feedbackService from '@frontend/services/feedbackService';
-import { FeedbackRequest } from '@common/services/types/feedback';
+import _feedbackService from '@frontend/services/pageFeedbackService';
+import { PageFeedbackRequest } from '@common/services/types/pageFeedback';
 
-jest.mock('@frontend/services/feedbackService');
+jest.mock('@frontend/services/pageFeedbackService');
 
 const feedbackService = jest.mocked(_feedbackService);
 
 describe('Feedback', () => {
   test('renders initial state correctly', () => {
-    render(<Feedback />);
+    render(<PageFeedback />);
 
     expect(screen.getByText('Is this page useful?')).toBeInTheDocument();
     expect(
@@ -36,7 +36,7 @@ describe('Feedback', () => {
   test('renders correctly and submits when "Yes" is selected', async () => {
     const user = userEvent.setup();
 
-    render(<Feedback />);
+    render(<PageFeedback />);
 
     await user.click(
       screen.getByRole('button', { name: 'Yes this page is useful' }),
@@ -44,7 +44,7 @@ describe('Feedback', () => {
 
     await waitFor(() => {
       expect(feedbackService.sendFeedback).toHaveBeenCalledWith(
-        expect.objectContaining<Omit<FeedbackRequest, 'userAgent'>>({
+        expect.objectContaining<Omit<PageFeedbackRequest, 'userAgent'>>({
           url: '/',
           response: 'Useful',
         }),
@@ -57,7 +57,7 @@ describe('Feedback', () => {
   test('renders correctly when "No" is selected', async () => {
     const user = userEvent.setup();
 
-    render(<Feedback />);
+    render(<PageFeedback />);
 
     expect(
       screen.queryByLabelText('What were you doing?'),
@@ -79,7 +79,7 @@ describe('Feedback', () => {
   test('submits correctly when "No" is selected', async () => {
     const user = userEvent.setup();
 
-    render(<Feedback />);
+    render(<PageFeedback />);
 
     await user.click(
       screen.getByRole('button', { name: 'No this page is not useful' }),
@@ -96,7 +96,7 @@ describe('Feedback', () => {
 
     await waitFor(() => {
       expect(feedbackService.sendFeedback).toHaveBeenCalledWith(
-        expect.objectContaining<Omit<FeedbackRequest, 'userAgent'>>({
+        expect.objectContaining<Omit<PageFeedbackRequest, 'userAgent'>>({
           url: '/',
           response: 'NotUseful',
           context: 'test context',
@@ -111,7 +111,7 @@ describe('Feedback', () => {
   test('renders correctly when "Report a problem with this page" is selected', async () => {
     const user = userEvent.setup();
 
-    render(<Feedback />);
+    render(<PageFeedback />);
 
     expect(
       screen.queryByLabelText('What were you doing?'),
@@ -129,7 +129,7 @@ describe('Feedback', () => {
   test('submits correctly when "Report a problem with this page" is selected', async () => {
     const user = userEvent.setup();
 
-    render(<Feedback />);
+    render(<PageFeedback />);
 
     await user.click(
       screen.getByRole('button', { name: 'Report a problem with this page' }),
@@ -144,7 +144,7 @@ describe('Feedback', () => {
 
     await waitFor(() => {
       expect(feedbackService.sendFeedback).toHaveBeenCalledWith(
-        expect.objectContaining<Omit<FeedbackRequest, 'userAgent'>>({
+        expect.objectContaining<Omit<PageFeedbackRequest, 'userAgent'>>({
           url: '/',
           response: 'ProblemEncountered',
           context: 'test context',

@@ -3,7 +3,7 @@ using System;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 
-public class FeedbackViewModel
+public class PageFeedbackViewModel
 {
     public Guid Id { get; set; }
 

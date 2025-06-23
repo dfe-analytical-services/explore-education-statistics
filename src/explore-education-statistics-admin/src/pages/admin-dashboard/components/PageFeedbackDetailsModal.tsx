@@ -1,17 +1,17 @@
 import React from 'react';
 import ButtonText from '@common/components/ButtonText';
 import Modal from '@common/components/Modal';
-import { FeedbackViewModel } from '@common/services/types/feedback';
+import { PageFeedbackViewModel } from '@common/services/types/pageFeedback';
 import FormattedDate from '@common/components/FormattedDate';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
-import { getResponseText } from '@admin/pages/bau/FeedbackPage';
+import { getResponseText } from '@admin/pages/bau/PageFeedbackPage';
 
 interface Props {
-  feedback: FeedbackViewModel;
+  feedback: PageFeedbackViewModel;
 }
 
-export default function FeedbackDetailsModal({ feedback }: Props) {
+export default function PageFeedbackDetailsModal({ feedback }: Props) {
   return (
     <Modal
       title="Feedback details"

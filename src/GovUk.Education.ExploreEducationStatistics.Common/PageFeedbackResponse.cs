@@ -2,7 +2,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Database;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common;
 
-public enum FeedbackResponse
+public enum PageFeedbackResponse
 {
     [EnumLabelValue("Useful")]
     Useful,

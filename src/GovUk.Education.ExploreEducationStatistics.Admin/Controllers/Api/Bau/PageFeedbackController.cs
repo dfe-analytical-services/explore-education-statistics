@@ -16,14 +16,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Bau;
 [Route("api")]
 [ApiController]
 [Authorize(Roles = RoleNames.BauUser)]
-public class FeedbackController(ContentDbContext context) : ControllerBase
+public class PageFeedbackController(ContentDbContext context) : ControllerBase
 {
-    [HttpGet("feedback")]
+    [HttpGet("feedback/page")]
     public async Task<ActionResult> ListFeedback(
         [FromQuery] bool showRead,
         CancellationToken cancellationToken)
     {
-        var query = context.Feedback
+        var query = context.PageFeedback
             .OrderByDescending(x => x.Created)
             .AsQueryable();
 
@@ -39,10 +39,10 @@ public class FeedbackController(ContentDbContext context) : ControllerBase
         return Ok(feedback);
     }
 
-    [HttpPatch("feedback/{id:guid}")]
+    [HttpPatch("feedback/page/{id:guid}")]
     public async Task<ActionResult> ToggleReadStatus(Guid id)
     {
-        var feedback = await context.Feedback.FindAsync(id);
+        var feedback = await context.PageFeedback.FindAsync(id);
 
         if (feedback == null)
         {
@@ -56,9 +56,9 @@ public class FeedbackController(ContentDbContext context) : ControllerBase
         return NoContent();
     }
 
-    private static FeedbackViewModel MapToViewModel(Feedback entity)
+    private static PageFeedbackViewModel MapToViewModel(PageFeedback entity)
     {
-        return new FeedbackViewModel
+        return new PageFeedbackViewModel
         {
             Id = entity.Id,
             UserAgent = entity.UserAgent,
