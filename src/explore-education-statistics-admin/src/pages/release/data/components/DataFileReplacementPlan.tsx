@@ -152,6 +152,102 @@ const DataFileReplacementPlan = ({
     </Tag>
   );
 
+  const majorVersionErrorTag = (
+    <>
+      <h3 className="govuk-heading-m govuk-!-padding-top-4">
+        <Tag colour={hasMajorVersionUpdate ? 'red' : 'green'}>
+          {`API data set status: ${hasMajorVersionUpdate ? 'ERROR' : 'OK'}`}
+        </Tag>
+      </h3>
+      <p>
+        Please cancel this data replacement and upload a new data file that
+        doesn't create a breaking change. To see the breaking changes, please{' '}
+        {apiDataSetsTabRoute && (
+          <Link to={apiDataSetsTabRoute} unvisited>
+            go to the API data sets tab (This page is currently only accessible
+            to certain users, please contact the EES team for support with API
+            data sets)
+          </Link>
+        )}
+        .
+      </p>
+    </>
+  );
+  const locationsAndFiltersErrorTags = (
+    <>
+      <h3 className="govuk-heading-m govuk-!-padding-top-4">
+        <Tag colour={hasIncompleteFilterMapping ? 'red' : 'green'}>
+          {`API data set Filters: ${
+            hasIncompleteFilterMapping ? 'ERROR' : 'OK'
+          }`}
+        </Tag>
+      </h3>
+
+      {hasIncompleteFilterMapping ? (
+        <p>
+          Please{' '}
+          {apiDataSetsTabRoute && (
+            <Link to={apiDataSetsTabRoute} unvisited>
+              go to the API data sets tab (This page is currently only
+              accessible to certain users, please contact the EES team for
+              support with API data sets)
+            </Link>
+          )}{' '}
+          and complete manual mapping process for filters.
+        </p>
+      ) : (
+        <p>No manual mapping required for API data set filters.</p>
+      )}
+
+      <h3 className="govuk-heading-m govuk-!-padding-top-4">
+        <Tag colour={hasIncompleteLocationMapping ? 'red' : 'green'}>
+          {`API data set Locations: ${
+            hasIncompleteLocationMapping ? 'ERROR' : 'OK'
+          }`}
+        </Tag>
+      </h3>
+
+      {hasIncompleteLocationMapping ? (
+        <p>
+          Please{' '}
+          {apiDataSetsTabRoute && (
+            <Link to={apiDataSetsTabRoute} unvisited>
+              go to the API data sets tab (This page is currently only
+              accessible to certain users, please contact the EES team for
+              support with API data sets)
+            </Link>
+          )}{' '}
+          and complete manual mapping process for locations.
+        </p>
+      ) : (
+        <p>No manual mapping required for API data set locations.</p>
+      )}
+      <h3 className="govuk-heading-m govuk-!-padding-top-4">
+        <Tag colour={isNotReadyToPublish ? 'red' : 'green'}>
+          {`API data set has to be finalized: ${
+            isNotReadyToPublish ? 'ERROR' : 'OK'
+          }`}
+        </Tag>
+      </h3>
+
+      {isNotReadyToPublish ? (
+        <p>
+          Please{' '}
+          {apiDataSetsTabRoute && (
+            <Link to={apiDataSetsTabRoute} unvisited>
+              go to the API data sets tab (This page is currently only
+              accessible to certain users, please contact the EES team for
+              support with API data sets)
+            </Link>
+          )}{' '}
+          and finalize the data set version mapping process.
+        </p>
+      ) : (
+        <p>No actions required for API data set version mapping.</p>
+      )}
+    </>
+  );
+
   return (
     <LoadingSpinner loading={isLoading}>
       {plan && (
@@ -462,107 +558,9 @@ const DataFileReplacementPlan = ({
 
           {hasDataSetVersionPlan && (
             <>
-              {hasMajorVersionUpdate ? (
-                <>
-                  <h3 className="govuk-heading-m govuk-!-padding-top-4">
-                    <Tag colour={hasMajorVersionUpdate ? 'red' : 'green'}>
-                      {`API data set status: ${
-                        hasMajorVersionUpdate ? 'ERROR' : 'OK'
-                      }`}
-                    </Tag>
-                  </h3>
-                  <p>
-                    Please cancel this data replacement and upload a new data
-                    file that doesn't create a breaking change. To see the
-                    breaking changes, please{' '}
-                    {apiDataSetsTabRoute && (
-                      <Link to={apiDataSetsTabRoute} unvisited>
-                        go to the API data sets tab (This page is currently only
-                        accessible to certain users, please contact the EES team
-                        for support with API data sets)
-                      </Link>
-                    )}
-                    .
-                  </p>
-                </>
-              ) : (
-                <>
-                  <h3 className="govuk-heading-m govuk-!-padding-top-4">
-                    <Tag colour={hasIncompleteFilterMapping ? 'red' : 'green'}>
-                      {`API data set Filters: ${
-                        hasIncompleteFilterMapping ? 'ERROR' : 'OK'
-                      }`}
-                    </Tag>
-                  </h3>
-
-                  {hasIncompleteFilterMapping ? (
-                    <p>
-                      Please{' '}
-                      {apiDataSetsTabRoute && (
-                        <Link to={apiDataSetsTabRoute} unvisited>
-                          go to the API data sets tab (This page is currently
-                          only accessible to certain users, please contact the
-                          EES team for support with API data sets)
-                        </Link>
-                      )}{' '}
-                      and complete manual mapping process for filters.
-                    </p>
-                  ) : (
-                    <p>No manual mapping required for API data set filters.</p>
-                  )}
-
-                  <h3 className="govuk-heading-m govuk-!-padding-top-4">
-                    <Tag
-                      colour={hasIncompleteLocationMapping ? 'red' : 'green'}
-                    >
-                      {`API data set Locations: ${
-                        hasIncompleteLocationMapping ? 'ERROR' : 'OK'
-                      }`}
-                    </Tag>
-                  </h3>
-
-                  {hasIncompleteLocationMapping ? (
-                    <p>
-                      Please{' '}
-                      {apiDataSetsTabRoute && (
-                        <Link to={apiDataSetsTabRoute} unvisited>
-                          go to the API data sets tab (This page is currently
-                          only accessible to certain users, please contact the
-                          EES team for support with API data sets)
-                        </Link>
-                      )}{' '}
-                      and complete manual mapping process for locations.
-                    </p>
-                  ) : (
-                    <p>
-                      No manual mapping required for API data set locations.
-                    </p>
-                  )}
-                  <h3 className="govuk-heading-m govuk-!-padding-top-4">
-                    <Tag colour={isNotReadyToPublish ? 'red' : 'green'}>
-                      {`API data set has to be finalized: ${
-                        isNotReadyToPublish ? 'ERROR' : 'OK'
-                      }`}
-                    </Tag>
-                  </h3>
-
-                  {isNotReadyToPublish ? (
-                    <p>
-                      Please{' '}
-                      {apiDataSetsTabRoute && (
-                        <Link to={apiDataSetsTabRoute} unvisited>
-                          go to the API data sets tab (This page is currently
-                          only accessible to certain users, please contact the
-                          EES team for support with API data sets)
-                        </Link>
-                      )}{' '}
-                      and finalize the data set version mapping process.
-                    </p>
-                  ) : (
-                    <p>No actions required for API data set version mapping.</p>
-                  )}
-                </>
-              )}
+              {hasMajorVersionUpdate
+                ? majorVersionErrorTag
+                : locationsAndFiltersErrorTags}
             </>
           )}
 
