@@ -31,6 +31,8 @@ internal class AzureBlobStorageClientMockBuilder
                 It.IsAny<string>(),
                 It.IsAny<string>(),
                 It.IsAny<Blob>(),
+                It.IsAny<string>(),
+                It.IsAny<string?>(),
                 It.IsAny<CancellationToken>()))
             .Returns(Task.CompletedTask);
 
@@ -82,12 +84,17 @@ internal class AzureBlobStorageClientMockBuilder
         public void BlobWasUploaded(
             string? containerName = null,
             string? blobName = null,
+            string? contentType = null,
+            string? contentEncoding = null,
             Func<Blob, bool>? whereBlob = null)
         {
             mock.Verify(m => m.UploadBlob(
                     It.Is<string>(actualContainerName => containerName == null || actualContainerName == containerName),
                     It.Is<string>(actualBlobName => blobName == null || actualBlobName == blobName),
                     It.Is<Blob>(blob => whereBlob == null || whereBlob(blob)),
+                    It.Is<string>(actualContentType => contentType == null || actualContentType == contentType),
+                    It.Is<string?>(actualContentEncoding =>
+                        contentEncoding == null || actualContentEncoding == contentEncoding),
                     It.IsAny<CancellationToken>()),
                 Times.Once);
         }

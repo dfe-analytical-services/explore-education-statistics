@@ -1,3 +1,4 @@
+using System.Net.Mime;
 using Azure.Storage.Blobs;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Clients.AzureBlobStorage;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Exceptions;
@@ -46,10 +47,15 @@ public class AzureBlobStorageClientIntegrationTests
                     {"key2", "value2"},
                     {"timestamp", DateTimeOffset.Now.ToString("u")}
                 });
-                
+                const string contentType = MediaTypeNames.Text.Plain;
+
                 // ACT
-                await sut.UploadBlob(IntegrationTestContainerName, uniqueBlobName, blob);
-                
+                await sut.UploadBlob(
+                    IntegrationTestContainerName,
+                    uniqueBlobName,
+                    blob,
+                    contentType);
+
                 // ASSERT
                 var actual = await AzureBlobStorageIntegrationHelper.DownloadAsync(sut.BlobServiceClient, IntegrationTestContainerName, uniqueBlobName);
                 Assert.Equal(blob, actual);
