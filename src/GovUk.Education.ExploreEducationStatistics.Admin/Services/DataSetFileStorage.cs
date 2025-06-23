@@ -146,20 +146,18 @@ public class DataSetFileStorage(
             })
             .OnSuccessDo(async dataSetVersion =>
                 {
-                    // TODO: Resolve errors then uncomment.
-                    // if (dataSetVersion.IsFirstVersion && dataSetVersion.Status != DataSetVersionStatus.Published)
-                    // {
-                    //     await DeleteAndRecreateInitialDataSetVersion(dataReleaseFileId, cancellationToken, dataSetVersion, dataSetId);
-                    // }
-                    // else if (dataSetVersion.Status != DataSetVersionStatus.Published)
-                    // {
-                    //     await DeleteAndRecreateDataSetVersion(dataReleaseFileId, replacedReleaseDataFile, cancellationToken, dataSetVersion, dataSetId);
-                    // }
-                    // else
-                    // {
-                    //     await CreateNextDataSetVersion(dataReleaseFileId, replacedReleaseDataFile, cancellationToken, dataSetVersion, dataSetId);
-                    // }
-                    await CreateNextDataSetVersion(dataReleaseFileId, replacedReleaseDataFile, cancellationToken, dataSetVersion, dataSetId);
+                    if (dataSetVersion.IsFirstVersion && dataSetVersion.Status != DataSetVersionStatus.Published)
+                    {
+                        await DeleteAndRecreateInitialDataSetVersion(dataReleaseFileId, cancellationToken, dataSetVersion, dataSetId);
+                    }
+                    else if (dataSetVersion.Status != DataSetVersionStatus.Published)
+                    {
+                        await DeleteAndRecreateDataSetVersion(dataReleaseFileId, replacedReleaseDataFile, cancellationToken, dataSetVersion, dataSetId);
+                    }
+                    else
+                    {
+                        await CreateNextDataSetVersion(dataReleaseFileId, replacedReleaseDataFile, cancellationToken, dataSetVersion, dataSetId);
+                    }
                 }
                 );
     }
@@ -172,9 +170,9 @@ public class DataSetFileStorage(
         [DisallowNull] Guid? dataSetId)
     {
         await dataSetVersionService.CreateNextVersion(
-            dataReleaseFileId,
-            replacedReleaseDataFile!.PublicApiDataSetId!.Value,
-            dataSetVersion.Id,
+            releaseFileId: dataReleaseFileId,
+            dataSetId: replacedReleaseDataFile!.PublicApiDataSetId!.Value,
+            dataSetVersionToReplaceId: dataSetVersion.Id,
             cancellationToken
         ).OnFailureDo(_ =>
         {
@@ -197,9 +195,9 @@ public class DataSetFileStorage(
             .OnSuccessVoid(async _ =>
             {
                 await dataSetVersionService.CreateNextVersion(
-                    dataReleaseFileId,
-                    replacedReleaseDataFile!.PublicApiDataSetId!.Value,
-                    dataSetVersion.Id,
+                    releaseFileId: dataReleaseFileId,
+                    dataSetId: replacedReleaseDataFile!.PublicApiDataSetId!.Value,
+                    dataSetVersionToReplaceId: null,
                     cancellationToken
                 ).OnFailureDo(_ =>
                 {
