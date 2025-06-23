@@ -299,6 +299,10 @@ export function chartBuilderReducer(
             ...defaultLegend,
             ...(action.payload.legend.defaults ?? {}),
             ...(draft.legend ?? {}),
+            ...(!action.payload.capabilities.canPositionLegendInline &&
+            draft.legend?.position === 'inline'
+              ? { position: action.payload.legend.defaults?.position }
+              : {}),
           };
         } else {
           draft.legend = undefined;
