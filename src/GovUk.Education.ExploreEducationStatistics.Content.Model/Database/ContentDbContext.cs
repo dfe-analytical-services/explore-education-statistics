@@ -87,6 +87,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
         public virtual DbSet<UserReleaseInvite> UserReleaseInvites { get; set; }
         public virtual DbSet<UserPublicationInvite> UserPublicationInvites { get; set; }
         public virtual DbSet<PageFeedback> PageFeedback { get; set; }
+        public virtual DbSet<ReleasePublishingFeedback> ReleasePublishingFeedback { get; set; }
 
         [DbFunction]
         public virtual IQueryable<FreeTextRank> PublicationsFreeTextTable(string searchTerm) =>
@@ -134,6 +135,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
             ConfigureDataBlockParent(modelBuilder);
             ConfigureDataBlockVersion(modelBuilder);
             ConfigurePageFeedback(modelBuilder);
+            ConfigureReleasePublishingFeedback(modelBuilder);
 
             // Apply model configuration for types which implement IEntityTypeConfiguration
             modelBuilder.ApplyConfigurationsFromAssembly(typeof(ContentDbContext).Assembly);
@@ -872,6 +874,55 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 .HasConversion(new EnumToStringConverter<PageFeedbackResponse>())
                 .IsRequired()
                 .HasMaxLength(50);
+        }
+        
+        private static void ConfigureReleasePublishingFeedback(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<ReleasePublishingFeedback>()
+                .HasOne(rf => rf.ReleaseVersion)
+                .WithMany()
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<ReleasePublishingFeedback>()
+                .Property(feedback => feedback.EmailToken)
+                .IsRequired()
+                .HasMaxLength(55);
+            
+            modelBuilder.Entity<ReleasePublishingFeedback>()
+                .Property(feedback => feedback.UserPublicationRole)
+                .HasConversion(new EnumToStringConverter<PublicationRole>())
+                .IsRequired();
+            
+            modelBuilder.Entity<ReleasePublishingFeedback>()
+                .Property(feedback => feedback.Response)
+                .HasConversion(new EnumToStringConverter<ReleasePublishingFeedbackResponse>())
+                .IsRequired()
+                .HasMaxLength(50);
+
+            modelBuilder.Entity<ReleasePublishingFeedback>()
+                .Property(feedback => feedback.EmailToken)
+                .IsRequired()
+                .HasMaxLength(55);
+            
+            modelBuilder.Entity<ReleasePublishingFeedback>()
+                .HasIndex(feedback => feedback.EmailToken)
+                .IsUnique();
+            
+            modelBuilder.Entity<ReleasePublishingFeedback>()
+                .Property(feedback => feedback.Created)
+                .HasConversion(
+                    v => v,
+                    v => DateTime.SpecifyKind(v, DateTimeKind.Utc));
+
+            modelBuilder.Entity<ReleasePublishingFeedback>()
+                .Property(feedback => feedback.FeedbackReceived)
+                .HasConversion(
+                    v => v,
+                    v => v.HasValue ? DateTime.SpecifyKind(v.Value, DateTimeKind.Utc) : null);
+            
+            modelBuilder.Entity<ReleasePublishingFeedback>()
+                .Property(feedback => feedback.AdditionalFeedback)
+                .HasMaxLength(2000);
         }
     }
 

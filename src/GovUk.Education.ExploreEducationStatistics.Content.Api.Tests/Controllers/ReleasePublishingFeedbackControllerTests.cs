@@ -23,8 +23,8 @@ public class ReleasePublishingFeedbackControllerTests(TestApplicationFactory tes
         var existingFeedback = new ReleasePublishingFeedback
         {
             Id = Guid.NewGuid(),
-            Token = Guid.NewGuid().ToString(),
-            Role = PublicationRole.Owner,
+            EmailToken = Guid.NewGuid().ToString(),
+            UserPublicationRole = PublicationRole.Owner,
             ReleaseVersionId = Guid.NewGuid(),
             Created = DateTime.UtcNow.AddDays(-1)
         };
@@ -33,7 +33,7 @@ public class ReleasePublishingFeedbackControllerTests(TestApplicationFactory tes
             context.ReleasePublishingFeedback.Add(existingFeedback));
 
         var request = new ReleasePublishingFeedbackUpdateRequest(
-            Token: existingFeedback.Token,
+            EmailToken: existingFeedback.EmailToken,
             Response: ReleasePublishingFeedbackResponse.Satisfied,
             AdditionalFeedback: "Great publishing experience!");
         
@@ -54,9 +54,9 @@ public class ReleasePublishingFeedbackControllerTests(TestApplicationFactory tes
         updatedFeedback.FeedbackReceived.AssertUtcNow();
         
         // Assert that other fields were left untouched.
-        Assert.Equal(existingFeedback.Token, updatedFeedback.Token);
+        Assert.Equal(existingFeedback.EmailToken, updatedFeedback.EmailToken);
         Assert.Equal(existingFeedback.Created, updatedFeedback.Created);
-        Assert.Equal(existingFeedback.Role, updatedFeedback.Role);
+        Assert.Equal(existingFeedback.UserPublicationRole, updatedFeedback.UserPublicationRole);
         Assert.Equal(existingFeedback.ReleaseVersionId, updatedFeedback.ReleaseVersionId);
     }
 
@@ -66,8 +66,8 @@ public class ReleasePublishingFeedbackControllerTests(TestApplicationFactory tes
         var existingFeedback = new ReleasePublishingFeedback
         {
             Id = Guid.NewGuid(),
-            Token = Guid.NewGuid().ToString(),
-            Role = PublicationRole.Owner,
+            EmailToken = Guid.NewGuid().ToString(),
+            UserPublicationRole = PublicationRole.Owner,
             ReleaseVersionId = Guid.NewGuid(),
             Created = DateTime.UtcNow.AddDays(-1)
         };
@@ -76,7 +76,7 @@ public class ReleasePublishingFeedbackControllerTests(TestApplicationFactory tes
             context.ReleasePublishingFeedback.Add(existingFeedback));
 
         var request = new ReleasePublishingFeedbackUpdateRequest(
-            Token: "",
+            EmailToken: "",
             Response: (ReleasePublishingFeedbackResponse) 20,
             AdditionalFeedback: new string('b', 2001));
 
@@ -91,7 +91,7 @@ public class ReleasePublishingFeedbackControllerTests(TestApplicationFactory tes
         Assert.Equal(3, validationProblems.Errors.Count);
 
         validationProblems.AssertHasNotEmptyError(
-            nameof(ReleasePublishingFeedbackUpdateRequest.Token)
+            nameof(ReleasePublishingFeedbackUpdateRequest.EmailToken)
                 .ToLowerFirst());
         validationProblems.AssertHasEnumError(
             nameof(ReleasePublishingFeedbackUpdateRequest.Response)
@@ -107,8 +107,8 @@ public class ReleasePublishingFeedbackControllerTests(TestApplicationFactory tes
         var existingFeedback = new ReleasePublishingFeedback
         {
             Id = Guid.NewGuid(),
-            Token = Guid.NewGuid().ToString(),
-            Role = PublicationRole.Owner,
+            EmailToken = Guid.NewGuid().ToString(),
+            UserPublicationRole = PublicationRole.Owner,
             ReleaseVersionId = Guid.NewGuid(),
             Created = DateTime.UtcNow.AddDays(-1)
         };
@@ -117,7 +117,7 @@ public class ReleasePublishingFeedbackControllerTests(TestApplicationFactory tes
             context.ReleasePublishingFeedback.Add(existingFeedback));
 
         var request = new ReleasePublishingFeedbackUpdateRequest(
-            Token: Guid.NewGuid().ToString(),
+            EmailToken: Guid.NewGuid().ToString(),
             Response: ReleasePublishingFeedbackResponse.Satisfied);
 
         // Arrange

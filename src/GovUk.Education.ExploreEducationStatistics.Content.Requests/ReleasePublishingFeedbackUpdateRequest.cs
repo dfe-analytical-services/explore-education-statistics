@@ -8,14 +8,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Requests;
 public record ReleasePublishingFeedbackUpdateRequest(
     [JsonConverter(typeof(StringEnumConverter))]
     ReleasePublishingFeedbackResponse Response,
-    string Token,
+    string EmailToken,
     string? AdditionalFeedback = null)
 {
     public class Validator : AbstractValidator<ReleasePublishingFeedbackUpdateRequest>
     {
         public Validator()
         {
-            RuleFor(request => request.Token)
+            RuleFor(request => request.EmailToken)
                 .NotEmpty()
                 .MaximumLength(55);
             
