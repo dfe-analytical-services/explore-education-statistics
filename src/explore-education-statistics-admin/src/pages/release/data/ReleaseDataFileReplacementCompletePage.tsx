@@ -7,30 +7,27 @@ import {
   ReleaseFootnoteRouteParams,
   releaseFootnotesRoute,
 } from '@admin/routes/releaseRoutes';
-import dataReplacementService from '@admin/services/dataReplacementService';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import WarningMessage from '@common/components/WarningMessage';
 import useAsyncRetry from '@common/hooks/useAsyncRetry';
 import sanitizeHtml from '@common/utils/sanitizeHtml';
 import React from 'react';
 import { generatePath, RouteComponentProps } from 'react-router';
+import releaseDataFileService from '@admin/services/releaseDataFileService';
 
 const ReleaseDataFileReplacementCompletePage = ({
   match,
 }: RouteComponentProps<ReleaseDataFileReplaceRouteParams>) => {
   const { publicationId, releaseVersionId, fileId } = match.params;
 
-  // Run the replacement plan against itself so we can just get the
-  // data blocks and footnotes in a convenient way.
   const {
-    value: plan,
+    value: dataSetAccoutrements,
     isLoading,
     error,
   } = useAsyncRetry(
     () =>
-      dataReplacementService.getReplacementPlan(
+      releaseDataFileService.getDataSetAccoutrementsSummary(
         releaseVersionId,
-        fileId,
         fileId,
       ),
     [releaseVersionId, fileId],
@@ -73,16 +70,16 @@ const ReleaseDataFileReplacementCompletePage = ({
       </WarningMessage>
 
       <LoadingSpinner loading={isLoading}>
-        {plan && (
+        {dataSetAccoutrements && (
           <>
             <h3>Data blocks</h3>
 
-            {plan.dataBlocks.length > 0 ? (
+            {dataSetAccoutrements.dataBlocks.length > 0 ? (
               <>
                 <p>Please check the following data blocks:</p>
 
                 <ul>
-                  {plan.dataBlocks.map(dataBlock => (
+                  {dataSetAccoutrements.dataBlocks.map(dataBlock => (
                     <li key={dataBlock.id}>
                       <Link
                         unvisited
@@ -107,12 +104,12 @@ const ReleaseDataFileReplacementCompletePage = ({
 
             <h3>Footnotes</h3>
 
-            {plan.footnotes.length > 0 ? (
+            {dataSetAccoutrements.footnotes.length > 0 ? (
               <>
                 <p>Please check the following footnotes:</p>
 
                 <ul className="govuk-list">
-                  {plan.footnotes.map(footnote => (
+                  {dataSetAccoutrements.footnotes.map(footnote => (
                     <li key={footnote.id}>
                       <Link
                         unvisited

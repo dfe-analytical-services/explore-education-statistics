@@ -27,6 +27,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
         Task<Either<ActionResult, DataFileInfo>> GetInfo(Guid releaseVersionId,
             Guid fileId);
 
+        Task<Either<ActionResult, DataSetAccoutrementsViewModel>> GetAccoutrementsSummary(
+            Guid releaseVersionId,
+            Guid fileId);
+
         Task<Either<ActionResult, List<DataFileInfo>>> ListAll(Guid releaseVersionId);
 
         Task<Either<ActionResult, List<DataFileInfo>>> ReorderDataFiles(

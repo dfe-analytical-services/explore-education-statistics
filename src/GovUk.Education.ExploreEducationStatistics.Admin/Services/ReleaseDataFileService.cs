@@ -23,6 +23,7 @@ using System.IO.Compression;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainers;
@@ -40,7 +41,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         IReleaseFileService releaseFileService,
         IDataImportService dataImportService,
         IUserService userService,
-        IDataSetFileStorage dataSetFileStorage) : IReleaseDataFileService
+        IDataSetFileStorage dataSetFileStorage,
+        IDataBlockService dataBlockService,
+        IFootnoteRepository footnoteRepository) : IReleaseDataFileService
     {
         public async Task<Either<ActionResult, Unit>> Delete(
             Guid releaseVersionId,
@@ -142,6 +145,45 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .Include(rf => rf.ReleaseVersion))
                 .OnSuccessDo(rf => userService.CheckCanViewReleaseVersion(rf.ReleaseVersion))
                 .OnSuccess(BuildDataFileViewModel);
+        }
+
+        public async Task<Either<ActionResult, DataSetAccoutrementsViewModel>> GetAccoutrementsSummary(
+            Guid releaseVersionId,
+            Guid fileId)
+        {
+            return await persistenceHelper
+                .CheckEntityExists<ReleaseFile>(q => q
+                    .Include(releaseFile => releaseFile.File)
+                    .Where(releaseFile =>
+                        releaseFile.ReleaseVersionId == releaseVersionId
+                        && releaseFile.FileId == fileId
+                        && releaseFile.File.Type == FileType.Data))
+                .OnSuccessDo(releaseFile => userService.CheckCanViewReleaseVersion(releaseFile.ReleaseVersion))
+                .OnSuccess(async releaseFile =>
+                {
+                    var dataBlocks = (await dataBlockService.ListDataBlocks(
+                        releaseFile.ReleaseVersionId))
+                        .Where(dataBlock => dataBlock.Query.SubjectId == releaseFile.File.SubjectId)
+                        .ToList();
+
+                    var footnotes = await footnoteRepository.GetFootnotes(
+                        releaseVersionId: releaseFile.ReleaseVersionId,
+                        subjectId: releaseFile.File.SubjectId);
+
+                    return new DataSetAccoutrementsViewModel
+                    {
+                        DataBlocks = dataBlocks.Select(db => new DataBlockAccoutrementViewModel
+                        {
+                            Id = db.Id,
+                            Name = db.Name,
+                        }).ToList(),
+                        Footnotes = footnotes.Select(fn => new FootnoteAccoutrementViewModel
+                        {
+                            Id = fn.Id,
+                            Content = fn.Content,
+                        }).ToList(),
+                    };
+                });
         }
 
         public async Task<Either<ActionResult, List<DataFileInfo>>> ListAll(Guid releaseVersionId)
@@ -348,8 +390,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         private async Task<Either<ActionResult, DataSet>> ValidateAndBuildDataSet(
             Guid releaseVersionId,
-            FileDto dataFile,
-            FileDto metaFile,
+            FileDto? dataFile,
+            FileDto? metaFile,
             string dataSetTitle,
             File? replacingFile,
             bool performAutoReplacement = false)

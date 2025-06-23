@@ -17,6 +17,8 @@ using Moq;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityPolicies;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.PermissionTestUtils;
@@ -120,6 +122,37 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                             contentPersistenceHelper: persistenceHelper.Object);
                         return service.GetInfo(releaseVersionId: releaseFile.ReleaseVersion.Id,
                             fileId: releaseFile.File.Id);
+                    }
+                );
+        }
+
+        [Fact]
+        public async Task GetAccoutrementsSummary()
+        {
+            var releaseFile = new ReleaseFile
+            {
+                ReleaseVersion = _releaseVersion,
+                File = new File
+                {
+                    Id = Guid.NewGuid(),
+                    Type = FileType.Data,
+                }
+            };
+
+            var persistenceHelper =
+                MockUtils.MockPersistenceHelper<ContentDbContext, ReleaseFile>(releaseFile);
+
+            await PolicyCheckBuilder<ContentSecurityPolicies>()
+                .SetupResourceCheckToFail(_releaseVersion, ContentSecurityPolicies.CanViewSpecificReleaseVersion)
+                .AssertForbidden(
+                    userService =>
+                    {
+                        var service = SetupReleaseDataFileService(
+                            contentPersistenceHelper: persistenceHelper.Object,
+                            userService: userService.Object);
+                        return service.GetAccoutrementsSummary(
+                            releaseVersionId: releaseFile.ReleaseVersionId,
+                            fileId: releaseFile.FileId);
                     }
                 );
         }
@@ -233,25 +266,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             IReleaseFileRepository? releaseFileRepository = null,
             IReleaseFileService? releaseFileService = null,
             IDataImportService? dataImportService = null,
+            IUserService? userService = null,
             IDataSetFileStorage? dataSetFileStorage = null,
-            IUserService? userService = null)
+            IDataBlockService? dataBlockService = null,
+            IFootnoteRepository? footnoteRepository = null)
         {
             contentDbContext ??= new Mock<ContentDbContext>().Object;
-            privateBlobStorageService ??= new Mock<IPrivateBlobStorageService>(MockBehavior.Strict).Object;
-            dataImportService ??= new Mock<IDataImportService>(MockBehavior.Strict).Object;
-            userService ??= new Mock<IUserService>(MockBehavior.Strict).Object;
 
             return new ReleaseDataFileService(
                 contentDbContext,
                 contentPersistenceHelper ?? DefaultPersistenceHelperMock().Object,
-                privateBlobStorageService,
+                privateBlobStorageService ?? new Mock<IPrivateBlobStorageService>(MockBehavior.Strict).Object,
                 dataSetValidator ?? new Mock<IDataSetValidator>(MockBehavior.Strict).Object,
                 fileRepository ?? new FileRepository(contentDbContext),
                 releaseFileRepository ?? new ReleaseFileRepository(contentDbContext),
                 releaseFileService ?? new Mock<IReleaseFileService>(MockBehavior.Strict).Object,
-                dataImportService,
-                userService,
-                dataSetFileStorage ?? new Mock<IDataSetFileStorage>(MockBehavior.Strict).Object
+                dataImportService ?? new Mock<IDataImportService>(MockBehavior.Strict).Object,
+                userService ?? new Mock<IUserService>(MockBehavior.Strict).Object,
+                dataSetFileStorage ?? new Mock<IDataSetFileStorage>(MockBehavior.Strict).Object,
+                dataBlockService ?? new Mock<IDataBlockService>(MockBehavior.Strict).Object,
+                footnoteRepository ?? new Mock<IFootnoteRepository>(MockBehavior.Strict).Object
             );
         }
 
