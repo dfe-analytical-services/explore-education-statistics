@@ -34,15 +34,16 @@ const DataFileDetailsTable = ({
     enableReplacementOfPublicApiDataSets: isNewReplaceDsvFeatureEnabled,
   } = useConfig();
   const replacementFileHasApi = isNewReplaceDsvFeatureEnabled
-    ? dataFile.publicApiDataSetId !== undefined &&
+    ? (replacementDataFile?.publicApiDataSetId !== undefined ||
+        dataFile.publicApiDataSetId !== undefined) &&
       dataFile.replacedBy !== undefined
     : false;
 
+  const publicApiDataSetId =
+    dataFile.publicApiDataSetId ?? replacementDataFile?.publicApiDataSetId;
   const { data: dataSet, isLoading } = useQuery({
-    ...(dataFile.publicApiDataSetId
-      ? apiDataSetQueries.get(dataFile.publicApiDataSetId)
-      : {}),
-    enabled: !!dataFile.publicApiDataSetId,
+    ...(publicApiDataSetId ? apiDataSetQueries.get(publicApiDataSetId) : {}),
+    enabled: !!publicApiDataSetId,
     refetchInterval: data => {
       return data?.draftVersion?.status === 'Processing' ? 3000 : false;
     },
