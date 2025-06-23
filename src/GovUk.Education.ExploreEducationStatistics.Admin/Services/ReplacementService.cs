@@ -13,7 +13,6 @@ using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Chart;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
-using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
 using GovUk.Education.ExploreEducationStatistics.Common.Options;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
@@ -57,54 +56,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         public async Task<Either<ActionResult, DataReplacementPlanViewModel>> GetReplacementPlan(
             Guid releaseVersionId,
-            Guid originalFileId,
-            Guid replacementFileId,
-            CancellationToken cancellationToken = default)
+            Guid replacementReleaseFileId,
+            CancellationToken cancellationToken = default) // @MarkFix check cancellationTokens are passed
         {
             return await contentDbContext.ReleaseVersions
                 .FirstOrNotFoundAsync(rv => rv.Id == releaseVersionId, cancellationToken: cancellationToken)
                 .OnSuccess(userService.CheckCanUpdateReleaseVersion)
-                .OnSuccess(() => CheckReleaseFilesExist(releaseVersionId: releaseVersionId,
-                    originalFileId: originalFileId,
-                    replacementFileId: replacementFileId))
-                .OnSuccess(async tuple =>
+                .OnSuccess(releaseVersion => CheckReleaseFilesExist(releaseVersion.Id, replacementReleaseFileId))
+                .OnSuccess(async releaseFiles =>
                 {
-                    var (originalReleaseFile, replacementReleaseFile) = tuple;
-
-                    return await GetLinkedDataSetVersion(featureFlags.Value.EnableReplacementOfPublicApiDataSets ? replacementReleaseFile : originalReleaseFile, cancellationToken)
-                        .OnSuccess(replacementApiDataSetVersion => (originalReleaseFile, replacementReleaseFile, replacementApiDataSetVersion));
-                })
-                .OnSuccess(async tuple =>
-                {
-                    var originalFile = tuple.originalReleaseFile.File;
-                    var replacementFile = tuple.replacementReleaseFile.File;
-
-                    var originalSubjectId = originalFile.SubjectId!.Value;
-                    var replacementSubjectId = replacementFile.SubjectId!.Value;
-
-                    var replacementSubjectMeta = await GetReplacementSubjectMeta(replacementSubjectId);
-
-                    var dataBlocks = ValidateDataBlocks(releaseVersionId: releaseVersionId,
-                        subjectId: originalSubjectId,
-                        replacementSubjectMeta);
-                    var footnotes = await ValidateFootnotes(releaseVersionId: releaseVersionId,
-                        subjectId: originalSubjectId,
-                        replacementSubjectMeta);
-
-                    var apiDataSetVersionPlan = tuple.replacementApiDataSetVersion is null ? null 
-                        : await GetApiVersionPlanViewModel(tuple.replacementApiDataSetVersion, cancellationToken);
-
-                    return new DataReplacementPlanViewModel
-                    {
-                        DataBlocks = dataBlocks,
-                        Footnotes = footnotes,
-                        ApiDataSetVersionPlan = apiDataSetVersionPlan,
-                        OriginalSubjectId = originalSubjectId,
-                        ReplacementSubjectId = replacementSubjectId,
-                    };
+                    var (originalReleaseFile, replacementReleaseFile) = releaseFiles;
+                    return await GenerateReplacementPlan(
+                        releaseVersionId,
+                        originalReleaseFile,
+                        replacementReleaseFile,
+                        cancellationToken);
                 });
-
-            
         }
         
         private async Task<ReplaceApiDataSetVersionPlanViewModel?> GetApiVersionPlanViewModel(DataSetVersion replacementApiDataSetVersion, CancellationToken cancellationToken)
@@ -135,71 +102,111 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         
         public async Task<Either<ActionResult, Unit>> Replace(
             Guid releaseVersionId,
-            Guid originalFileId,
-            Guid replacementFileId)
+            List<Guid> replacementFileIds,
+            CancellationToken cancellationToken)
         {
-            return await GetReplacementPlan(releaseVersionId, originalFileId, replacementFileId)
-                .OnSuccessDo<ActionResult, DataReplacementPlanViewModel, Unit>(plan =>
-                    !plan.Valid ? ValidationActionResult(ReplacementMustBeValid) : Unit.Instance)
-                .OnSuccessCombineWith(_ => CheckReleaseFilesExist(releaseVersionId: releaseVersionId,
-                    originalFileId: originalFileId,
-                    replacementFileId: replacementFileId))
-                .OnSuccess(planAndReleaseFiles =>
+            return await contentDbContext.ReleaseVersions
+                .FirstOrNotFoundAsync(rv => rv.Id == releaseVersionId, cancellationToken: cancellationToken)
+                .OnSuccess(userService.CheckCanUpdateReleaseVersion)
+                .OnSuccessVoid(async _ =>
                 {
-                    var (plan, (originalReleaseFile, replacementReleaseFile)) = planAndReleaseFiles;
-
-                    // It should be possible to replace a file with any other file provided there is a valid plan,
-                    // but we want to ensure that the replacement file has been created through the designated process.
-                    // The replacement upload process links the replacement file to the original, allowing us to
-                    // identify files with ongoing data replacements and filter out replacement files from the regular
-                    // data files view.
-                    if (originalReleaseFile.File.ReplacedById != replacementFileId)
+                    foreach (var replacementFileId in replacementFileIds)
                     {
-                        throw new InvalidOperationException(
-                            "Original file has no link with the replacement file");
-                    }
+                        // @MarkFix check all releaseFiles exist at the start?
+                        await CheckReleaseFilesExist(
+                                releaseVersionId,
+                                replacementFileId)
+                            .OnSuccessCombineWith(async tuple => await GenerateReplacementPlan(
+                                releaseVersionId,
+                                tuple.originalReleaseFile,
+                                tuple.replacementReleaseFile,
+                                cancellationToken))
+                            .OnSuccessDo(releaseFilesAndPlan =>
+                            {
+                                var (_, plan) = releaseFilesAndPlan;
+                                return !plan.Valid
+                                    ? new Either<ActionResult, Unit>(ValidationActionResult(ReplacementMustBeValid))
+                                    : Unit.Instance;
+                            })
+                            .OnSuccess(async releaseFilesAndPlan =>
+                            {
+                                var ((originalReleaseFile, replacementReleaseFile), plan) = releaseFilesAndPlan;
 
-                    if (replacementReleaseFile.File.ReplacingId != originalFileId)
-                    {
-                        throw new InvalidOperationException(
-                            "Replacement file has no link with the original file");
-                    }
+                                var originalSubjectId = plan.OriginalSubjectId;
+                                var replacementSubjectId = plan.ReplacementSubjectId;
 
-                    return (plan, originalReleaseFile, replacementReleaseFile);
-                })
-                .OnSuccess(async planAndReleaseFiles =>
+                                await plan.DataBlocks
+                                    .ToAsyncEnumerable()
+                                    .ForEachAwaitAsync(async dataBlockPlan =>
+                                    {
+                                        await InvalidateDataBlockCachedResults(dataBlockPlan, releaseVersionId);
+                                        await ReplaceLinksForDataBlock(dataBlockPlan, replacementSubjectId);
+                                    }, cancellationToken: cancellationToken);
+
+                                await plan.Footnotes
+                                    .ToAsyncEnumerable()
+                                    .ForEachAwaitAsync(footnotePlan =>
+                                            ReplaceLinksForFootnote(footnotePlan, originalSubjectId,
+                                                replacementSubjectId),
+                                        cancellationToken: cancellationToken);
+
+                                replacementReleaseFile.FilterSequence =
+                                    await ReplaceFilterSequence(originalReleaseFile, replacementReleaseFile);
+                                replacementReleaseFile.IndicatorSequence =
+                                    await ReplaceIndicatorSequence(originalReleaseFile, replacementReleaseFile);
+
+                                // Replace data guidance
+                                replacementReleaseFile.Summary = originalReleaseFile.Summary;
+
+                                await contentDbContext.SaveChangesAsync(cancellationToken);
+                                await statisticsDbContext.SaveChangesAsync(cancellationToken);
+
+                                return await RemoveOriginalSubjectAndFileFromRelease(
+                                    releaseVersionId: releaseVersionId,
+                                    originalReleaseFile: originalReleaseFile,
+                                    replacementReleaseFile: replacementReleaseFile);
+                            });
+                    }
+                });
+        }
+
+        private async Task<Either<ActionResult, DataReplacementPlanViewModel>> GenerateReplacementPlan(
+            Guid releaseVersionId,
+            ReleaseFile originalReleaseFile,
+            ReleaseFile replacementReleaseFile,
+            CancellationToken cancellationToken)
+        {
+            return await GetLinkedDataSetVersion(featureFlags.Value.EnableReplacementOfPublicApiDataSets
+                    ? replacementReleaseFile
+                    : originalReleaseFile, cancellationToken)
+                .OnSuccess(async replacementApiDataSetVersion =>
                 {
-                    var (plan, originalReleaseFile, replacementReleaseFile) = planAndReleaseFiles;
+                    var originalFile = originalReleaseFile.File;
+                    var replacementFile = replacementReleaseFile.File;
 
-                    var originalSubjectId = plan.OriginalSubjectId;
-                    var replacementSubjectId = plan.ReplacementSubjectId;
+                    var originalSubjectId = originalFile.SubjectId!.Value;
+                    var replacementSubjectId = replacementFile.SubjectId!.Value;
 
-                    await plan.DataBlocks
-                        .ToAsyncEnumerable()
-                        .ForEachAwaitAsync(async dataBlockPlan =>
-                        {
-                            await InvalidateDataBlockCachedResults(dataBlockPlan, releaseVersionId);
-                            await ReplaceLinksForDataBlock(dataBlockPlan, replacementSubjectId);
-                        });
+                    var replacementSubjectMeta = await GetReplacementSubjectMeta(replacementSubjectId);
 
-                    await plan.Footnotes
-                        .ToAsyncEnumerable()
-                        .ForEachAwaitAsync(footnotePlan =>
-                            ReplaceLinksForFootnote(footnotePlan, originalSubjectId, replacementSubjectId));
+                    var dataBlocks = ValidateDataBlocks(releaseVersionId: releaseVersionId,
+                        subjectId: originalSubjectId,
+                        replacementSubjectMeta);
+                    var footnotes = await ValidateFootnotes(releaseVersionId: releaseVersionId,
+                        subjectId: originalSubjectId,
+                        replacementSubjectMeta);
 
-                    replacementReleaseFile.FilterSequence =
-                        await ReplaceFilterSequence(originalReleaseFile, replacementReleaseFile);
-                    replacementReleaseFile.IndicatorSequence =
-                        await ReplaceIndicatorSequence(originalReleaseFile, replacementReleaseFile);
+                    var apiDataSetVersionPlan = replacementApiDataSetVersion is null ? null
+                        : await GetApiVersionPlanViewModel(replacementApiDataSetVersion, cancellationToken);
 
-                    // Replace data guidance
-                    replacementReleaseFile.Summary = originalReleaseFile.Summary;
-
-                    await contentDbContext.SaveChangesAsync();
-                    await statisticsDbContext.SaveChangesAsync();
-
-                    return await RemoveOriginalSubjectAndFileFromRelease(releaseVersionId, originalFileId,
-                        replacementFileId);
+                    return new DataReplacementPlanViewModel
+                    {
+                        DataBlocks = dataBlocks,
+                        Footnotes = footnotes,
+                        ApiDataSetVersionPlan = apiDataSetVersionPlan,
+                        OriginalSubjectId = originalSubjectId,
+                        ReplacementSubjectId = replacementSubjectId,
+                    };
                 });
         }
 
@@ -224,18 +231,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private async Task<Either<ActionResult, (ReleaseFile originalReleaseFile, ReleaseFile replacementReleaseFile)>>
             CheckReleaseFilesExist(
                 Guid releaseVersionId,
-                Guid originalFileId,
                 Guid replacementFileId)
         {
             return await contentDbContext.ReleaseFiles
                 .Include(rf => rf.File)
                 .FirstOrNotFoundAsync(rf => rf.ReleaseVersionId == releaseVersionId
-                                            && rf.FileId == originalFileId
+                                            && rf.FileId == replacementFileId
                                             && rf.File.Type == FileType.Data)
-                .OnSuccessCombineWith(async _ => await contentDbContext.ReleaseFiles
+                .OnSuccessCombineWith(async replacementReleaseFile => await contentDbContext.ReleaseFiles
                     .Include(rf => rf.File)
                     .FirstOrNotFoundAsync(rf => rf.ReleaseVersionId == releaseVersionId
-                                                && rf.FileId == replacementFileId
+                                                && rf.FileId == replacementReleaseFile.File.ReplacingId
                                                 && rf.File.Type == FileType.Data))
                 .OnSuccess(releaseFiles => releaseFiles.ToValueTuple());
         }
@@ -1228,30 +1234,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 originalReleaseFile);
         }
 
-        private async Task<Either<ActionResult, Unit>> RemoveOriginalSubjectAndFileFromRelease(
+        private async Task<Either<ActionResult, Unit>> RemoveOriginalSubjectAndFileFromRelease( // @MarkFix rename
             Guid releaseVersionId,
-            Guid originalFileId,
-            Guid replacementFileId)
+            ReleaseFile originalReleaseFile,
+            ReleaseFile replacementReleaseFile)
         {
             // First, unlink the original file from the replacement before removing it.
             // Ordinarily, removing a file from a Release deletes any associated replacement
             // so that there's no possibility of abandoned replacements being orphaned from their original files.
-            return await CheckReleaseFilesExist(releaseVersionId: releaseVersionId,
-                    originalFileId: originalFileId,
-                    replacementFileId: replacementFileId)
-                .OnSuccess(async releaseFiles =>
-                {
-                    var originalFile = releaseFiles.originalReleaseFile.File;
-                    var replacementFile = releaseFiles.replacementReleaseFile.File;
+            var originalFile = originalReleaseFile.File;
+            var replacementFile = replacementReleaseFile.File;
 
-                    originalFile.ReplacedById = null;
-                    replacementFile.ReplacingId = null;
+            originalFile.ReplacedById = null;
+            replacementFile.ReplacingId = null;
 
-                    await contentDbContext.SaveChangesAsync();
+            await contentDbContext.SaveChangesAsync();
 
-                    return await releaseVersionService.RemoveDataFiles(releaseVersionId: releaseVersionId,
-                        fileId: originalFileId);
-                });
+            return await releaseVersionService.RemoveDataFiles(
+                releaseVersionId: releaseVersionId,
+                fileId: originalFile.Id);
+
         }
 
         private Task<Either<ActionResult, Unit>> InvalidateDataBlockCachedResults(

@@ -120,21 +120,19 @@ export interface DataReplacementPlan {
 const dataReplacementService = {
   getReplacementPlan(
     releaseVersionId: string,
-    fileId: string,
     replacementFileId: string,
   ): Promise<DataReplacementPlan> {
     return client.get(
-      `releases/${releaseVersionId}/data/${fileId}/replacement-plan/${replacementFileId}`,
+      `releases/${releaseVersionId}/data/replacement-plan/${replacementFileId}`,
     );
   },
   replaceData(
     releaseVersionId: string,
-    fileId: string,
-    replacementFileId: string,
+    replacementFileIds: string[],
   ): Promise<void> {
-    return client.post(
-      `releases/${releaseVersionId}/data/${fileId}/replacement/${replacementFileId}`,
-    );
+    return client.post(`releases/${releaseVersionId}/data/replacements`, {
+      replacementFileIds,
+    });
   },
 };
 
