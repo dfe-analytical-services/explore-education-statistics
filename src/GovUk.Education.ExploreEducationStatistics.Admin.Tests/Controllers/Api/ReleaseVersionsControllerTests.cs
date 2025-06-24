@@ -301,7 +301,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             var fileId = Guid.NewGuid();
 
             releaseVersionService
-                .Setup(service => service.RemoveDataFiles(_releaseVersionId, fileId, It.IsAny<bool>()))
+                .Setup(service => service.RemoveDataFiles(_releaseVersionId, fileId, false))
                 .ReturnsAsync(Unit.Instance);
 
             var controller = BuildController(releaseVersionService: releaseVersionService.Object);
@@ -316,6 +316,30 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             Assert.IsAssignableFrom<NoContentResult>(result);
         }
 
+        [Fact]
+        public async Task DeleteDataFiles_WithApi_Success()
+        {
+            // Arrange
+            var releaseVersionService = new Mock<IReleaseVersionService>(Strict);
+
+            var fileId = Guid.NewGuid();
+
+            releaseVersionService
+                .Setup(service => service.RemoveDataFiles(_releaseVersionId, fileId, true))
+                .ReturnsAsync(Unit.Instance);
+
+            var controller = BuildController(releaseVersionService: releaseVersionService.Object);
+
+            // Act
+            var result = await controller.DeleteDataFilesWithApi(releaseVersionId: _releaseVersionId,
+                fileId: fileId);
+
+            // Assert
+            VerifyAllMocks(releaseVersionService);
+
+            Assert.IsAssignableFrom<NoContentResult>(result);
+        }
+        
         [Fact]
         public async Task DeleteDataFiles_Fail_UnableToFindMetaFileToDelete()
         {
