@@ -32,7 +32,6 @@ export default function DeleteDataFileModal({
       await releaseDataFileService.deleteDataFiles(
         releaseVersionId,
         dataFile.id,
-        false, // Deleting API version is not supported or applicable here (i.e., when user deletes a data file that is attached to API)
       );
 
       onConfirm();
