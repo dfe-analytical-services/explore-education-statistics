@@ -93,7 +93,6 @@ public class DataSetVersionMappingService(
         
        var majorChangesStatus = await GetMajorChangesStatus(dataSetVersionId, locationOptionMappingTypes, filterAndOptionMappingTypes, cancellationToken);
        
-
         return await publicDataDbContext
             .DataSetVersionMappings
             .Where(mapping => mapping.TargetDataSetVersionId == dataSetVersionId)
