@@ -73,7 +73,7 @@ export interface ApiDataSetDraftVersion extends ApiDataSetVersion {
     locationsHaveMajorChange: boolean;
     filtersComplete: boolean;
     filtersHaveMajorChange: boolean;
-    hasMajorVersionUpdate: boolean | null;
+    isMajorVersionUpdate: boolean | null;
   };
 }
 

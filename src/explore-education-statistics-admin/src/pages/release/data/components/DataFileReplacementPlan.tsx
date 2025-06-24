@@ -88,6 +88,8 @@ const DataFileReplacementPlan = ({
     hasIncompleteFilterMapping,
     isNotReadyToPublish,
     hasMajorVersionUpdate,
+    hasMajorLocationMapping,
+    hasMajorFilterMapping,
   } = useMemo(() => {
     if (!isNewReplaceDsvFeatureEnabled) {
       return {
@@ -96,6 +98,8 @@ const DataFileReplacementPlan = ({
         hasIncompleteFilterMapping: false,
         isNotReadyToPublish: false,
         hasMajorVersionUpdate: false,
+        hasMajorLocationMapping: false,
+        hasMajorFilterMapping: false,
       };
     }
 
@@ -105,6 +109,10 @@ const DataFileReplacementPlan = ({
         !plan?.apiDataSetVersionPlan?.mappingStatus?.locationsComplete,
       hasIncompleteFilterMapping:
         !plan?.apiDataSetVersionPlan?.mappingStatus?.filtersComplete,
+      hasMajorLocationMapping:
+        plan?.apiDataSetVersionPlan?.mappingStatus?.locationsHaveMajorChange,
+      hasMajorFilterMapping:
+        plan?.apiDataSetVersionPlan?.mappingStatus?.filtersHaveMajorChange,
       isNotReadyToPublish: !plan?.apiDataSetVersionPlan?.readyToPublish,
       hasMajorVersionUpdate:
         plan?.apiDataSetVersionPlan?.mappingStatus?.hasMajorVersionUpdate,
@@ -173,17 +181,62 @@ const DataFileReplacementPlan = ({
       </p>
     </>
   );
+  const versionParts = plan?.apiDataSetVersionPlan?.version?.split('.') || [];
+  const isPatch = isNewReplaceDsvFeatureEnabled
+    ? versionParts?.length === 3 && parseInt(versionParts[2], 10) > 0
+    : false;
+
   const locationsAndFiltersErrorTags = (
     <>
       <h3 className="govuk-heading-m govuk-!-padding-top-4">
-        <Tag colour={hasIncompleteFilterMapping ? 'red' : 'green'}>
-          {`API data set Filters: ${
-            hasIncompleteFilterMapping ? 'ERROR' : 'OK'
+        <Tag
+          colour={
+            hasIncompleteLocationMapping || (hasMajorLocationMapping && isPatch)
+              ? 'red'
+              : 'green'
+          }
+        >
+          {`API data set Locations: ${
+            hasIncompleteLocationMapping || (hasMajorLocationMapping && isPatch)
+              ? 'ERROR'
+              : 'OK'
           }`}
         </Tag>
       </h3>
 
-      {hasIncompleteFilterMapping ? (
+      {hasIncompleteLocationMapping || (hasMajorLocationMapping && isPatch) ? (
+        <p>
+          Please{' '}
+          {apiDataSetsTabRoute && (
+            <Link to={apiDataSetsTabRoute} unvisited>
+              go to the API data sets tab (This page is currently only
+              accessible to certain users, please contact the EES team for
+              support with API data sets)
+            </Link>
+          )}{' '}
+          and complete manual mapping process for locations.
+        </p>
+      ) : (
+        <p>No manual mapping required for API data set locations.</p>
+      )}
+
+      <h3 className="govuk-heading-m govuk-!-padding-top-4">
+        <Tag
+          colour={
+            hasIncompleteFilterMapping || (hasMajorFilterMapping && isPatch)
+              ? 'red'
+              : 'green'
+          }
+        >
+          {`API data set Filters: ${
+            hasIncompleteFilterMapping || (hasMajorFilterMapping && isPatch)
+              ? 'ERROR'
+              : 'OK'
+          }`}
+        </Tag>
+      </h3>
+
+      {hasIncompleteFilterMapping || (hasMajorFilterMapping && isPatch) ? (
         <p>
           Please{' '}
           {apiDataSetsTabRoute && (
@@ -199,29 +252,6 @@ const DataFileReplacementPlan = ({
         <p>No manual mapping required for API data set filters.</p>
       )}
 
-      <h3 className="govuk-heading-m govuk-!-padding-top-4">
-        <Tag colour={hasIncompleteLocationMapping ? 'red' : 'green'}>
-          {`API data set Locations: ${
-            hasIncompleteLocationMapping ? 'ERROR' : 'OK'
-          }`}
-        </Tag>
-      </h3>
-
-      {hasIncompleteLocationMapping ? (
-        <p>
-          Please{' '}
-          {apiDataSetsTabRoute && (
-            <Link to={apiDataSetsTabRoute} unvisited>
-              go to the API data sets tab (This page is currently only
-              accessible to certain users, please contact the EES team for
-              support with API data sets)
-            </Link>
-          )}{' '}
-          and complete manual mapping process for locations.
-        </p>
-      ) : (
-        <p>No manual mapping required for API data set locations.</p>
-      )}
       <h3 className="govuk-heading-m govuk-!-padding-top-4">
         <Tag colour={isNotReadyToPublish ? 'red' : 'green'}>
           {`API data set has to be finalized: ${

@@ -324,14 +324,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
 
         // We intend to change this route, to make these endpoints more consistent, as per EES-5895
         [HttpDelete("release/{releaseVersionId:guid}/data/{fileId:guid}")]
-        public async Task<ActionResult> DeleteDataFiles(Guid releaseVersionId, Guid fileId, bool removeApiVersion = false)
+        public async Task<ActionResult> DeleteDataFiles(Guid releaseVersionId, Guid fileId)
         {
-            return await _releaseVersionService
-                .RemoveDataFiles(releaseVersionId: releaseVersionId,
-                    fileId: fileId,
-                    removeApiVersion: removeApiVersion)
-                .HandleFailuresOrNoContent();
+            return await RemoveDataFiles(
+                releaseVersionId: releaseVersionId, 
+                fileId: fileId,
+                removeApiVersion: false);
         }
+
+        [HttpDelete("release/{releaseVersionId:guid}/data/{fileId:guid}/with-api")]
+        public async Task<ActionResult> DeleteDataFilesWithApi(Guid releaseVersionId, Guid fileId)
+        {
+            return await RemoveDataFiles(
+                releaseVersionId: releaseVersionId, 
+                fileId: fileId,
+                removeApiVersion: true);        }
 
         // We intend to change this route, to make these endpoints more consistent, as per EES-5895
         [HttpPost("release/{releaseVersionId:guid}/data/{fileId:guid}/import/cancel")]
@@ -368,6 +375,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         {
             return await _releaseVersionService
                 .UpdateReleasePublished(releaseVersionId, request)
+                .HandleFailuresOrNoContent();
+        }
+        
+        private async Task<ActionResult> RemoveDataFiles(Guid releaseVersionId, Guid fileId, bool removeApiVersion)
+        {
+            return await _releaseVersionService
+                .RemoveDataFiles(releaseVersionId: releaseVersionId,
+                    fileId: fileId,
+                    removeApiVersion: removeApiVersion)
                 .HandleFailuresOrNoContent();
         }
     }

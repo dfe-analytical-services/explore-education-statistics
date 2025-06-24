@@ -35,6 +35,11 @@ public static class ValidationMessages
         Message: "The source mapping does not exist."
     );
 
+    public static readonly LocalizableMessage DataSetVersionMappingResultedInMajorChange = new(
+        Code: nameof(DataSetVersionMappingResultedInMajorChange),
+        Message: "The data file uploaded has incomplete sections or has resulted in a major version update which is not allowed in release amendments."
+    );
+
     public static readonly LocalizableMessage DataSetVersionMappingCandidatePathDoesNotExist = new(
         Code: nameof(DataSetVersionMappingCandidatePathDoesNotExist),
         Message: "The candidate does not exist."
