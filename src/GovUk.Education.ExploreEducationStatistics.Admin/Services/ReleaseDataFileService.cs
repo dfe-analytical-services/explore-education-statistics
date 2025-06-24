@@ -563,14 +563,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(dataSetUploads => dataSetUploads
                     .Select(ValidateDataSetCanBeImported)
                     .OnSuccessAll())
-                .OnSuccessVoid(async dataSetUploads =>
+                .OnSuccessDo(async dataSetUploads =>
                 {
                     await dataSetFileStorage.MoveDataSetsToPermanentStorage(releaseVersionId, dataSetUploads, cancellationToken);
 
                     // Upload records are no longer needed once the files have been queued for import
                     contentDbContext.DataSetUploads.RemoveRange(dataSetUploads);
                     await contentDbContext.SaveChangesAsync(cancellationToken);
-                });
+                })
+                .OnSuccessVoid();
         }
 
         private async Task<Either<ActionResult, DataSetUpload>> ValidateDataSetUploadExistence(
@@ -594,7 +595,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         }
 
         // TODO: This doesn't need to be an async task. Find out expected pattern for use with results pattern
-        private static async Task<Either<ActionResult, DataSetUpload>> ValidateDataSetCanBeImported(DataSetUpload dataSetUpload)
+        private static Either<ActionResult, DataSetUpload> ValidateDataSetCanBeImported(DataSetUpload dataSetUpload)
         {
             return dataSetUpload.Status is not DataSetUploadStatus.PENDING_REVIEW and not DataSetUploadStatus.PENDING_IMPORT
                 ? Common.Validators.ValidationUtils.ValidationResult(ValidationMessages.GenerateErrorDataSetIsNotInAnImportableState())
