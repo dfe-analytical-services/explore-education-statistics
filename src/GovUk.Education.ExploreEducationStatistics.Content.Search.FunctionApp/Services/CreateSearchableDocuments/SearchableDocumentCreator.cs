@@ -1,3 +1,4 @@
+using System.Net.Mime;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Clients.AzureBlobStorage;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Clients.ContentApi;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Extensions;
@@ -29,10 +30,11 @@ internal class SearchableDocumentCreator(
 
         var blobName = releaseSearchableDocument.ReleaseId.ToString();
         await azureBlobStorageClient.UploadBlob(
-            appOptions.Value.SearchableDocumentsContainerName,
-            blobName,
-            new Blob(releaseSearchableDocument.HtmlContent, releaseSearchableDocument.BuildMetadata()),
-            cancellationToken);
+            containerName: appOptions.Value.SearchableDocumentsContainerName,
+            blobName: blobName,
+            blob: new Blob(releaseSearchableDocument.HtmlContent, releaseSearchableDocument.BuildMetadata()),
+            contentType: MediaTypeNames.Text.Html,
+            cancellationToken: cancellationToken);
         
         return new CreatePublicationLatestReleaseSearchableDocumentResponse
         {

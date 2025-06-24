@@ -1,5 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
 using Azure.Storage.Blobs;
+using Azure.Storage.Blobs.Models;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Exceptions;
 using Microsoft.Extensions.Logging;
 
@@ -33,10 +34,18 @@ public class AzureBlobStorageClient(
         string containerName,
         string blobName,
         Blob blob,
+        string contentType,
+        string? contentEncoding = null,
         CancellationToken cancellationToken = default)
     {
         var blobContainerClient = BlobServiceClient.GetBlobContainerClient(containerName);
         var blobClient = blobContainerClient.GetBlobClient(blobName);
+
+        var httpHeaders = new BlobHttpHeaders
+        {
+            ContentEncoding = contentEncoding,
+            ContentType = contentType
+        };
 
         await using var stream = blob.Contents.ToStream();
         try
@@ -44,6 +53,7 @@ public class AzureBlobStorageClient(
             await blobClient.UploadAsync(
                 stream,
                 metadata: blob.Metadata,
+                httpHeaders: httpHeaders,
                 cancellationToken: cancellationToken);
         }
         catch (Exception e)

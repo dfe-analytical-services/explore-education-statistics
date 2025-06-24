@@ -1,3 +1,4 @@
+using System.Net.Mime;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Options;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Services.CreateSearchableDocuments;
@@ -72,7 +73,7 @@ public class SearchableDocumentCreatorTests
             // ASSERT
             _azureBlobStorageClientMockBuilder.Assert.BlobWasUploaded(blobName: releaseId.ToString());
         }
-        
+
         [Fact]
         public async Task Should_upload_searchable_document_blob()
         {
@@ -80,15 +81,18 @@ public class SearchableDocumentCreatorTests
             var releaseSearchableDocument = new ReleaseSearchableDocumentBuilder().Build();
             _contentApiClientMockBuilder.WhereReleaseSearchViewModelIs(releaseSearchableDocument);
             var sut = GetSut();
-            
+
             // ACT
-            await sut.CreatePublicationLatestReleaseSearchableDocument(new CreatePublicationLatestReleaseSearchableDocumentRequest { PublicationSlug = "publication-slug" });
-            
+            await sut.CreatePublicationLatestReleaseSearchableDocument(
+                new CreatePublicationLatestReleaseSearchableDocumentRequest { PublicationSlug = "publication-slug" });
+
             // ASSERT
             var expected = new Blob(releaseSearchableDocument.HtmlContent, releaseSearchableDocument.BuildMetadata());
-            _azureBlobStorageClientMockBuilder.Assert.BlobWasUploaded(whereBlob: blob => blob == expected);
+            _azureBlobStorageClientMockBuilder.Assert.BlobWasUploaded(
+                contentType: MediaTypeNames.Text.Html,
+                whereBlob: blob => blob == expected);
         }
-        
+
         [Fact]
         public async Task Should_return_information_in_response()
         {
