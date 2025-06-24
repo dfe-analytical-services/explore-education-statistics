@@ -77,7 +77,7 @@ describe('ReleasePublishingFeedbackPage', () => {
       expect(
         releasePublishingFeedbackService.sendFeedback,
       ).toHaveBeenCalledWith({
-        token: 'test-token',
+        emailToken: 'test-token',
         response: 'ExtremelySatisfied',
       });
     });
@@ -110,7 +110,7 @@ describe('ReleasePublishingFeedbackPage', () => {
       expect(
         releasePublishingFeedbackService.sendFeedback,
       ).toHaveBeenCalledWith({
-        token: 'test-token',
+        emailToken: 'test-token',
         response: 'ExtremelySatisfied',
         additionalFeedback: 'Some additional feedback.',
       });
