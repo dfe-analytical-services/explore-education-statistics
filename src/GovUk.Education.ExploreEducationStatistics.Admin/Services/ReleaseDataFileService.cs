@@ -241,7 +241,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                             => await dataSetFileStorage.UploadDataSetsToTemporaryStorage(releaseVersionId, [dataSet], cancellationToken))
                         .OnSuccess(dataSetUploads
                             => dataSetUploads.SelectAsync(dataSetUpload
-                                => dataSetFileStorage.CreateOrReplaceExistingDbRecord(releaseVersionId, dataSetUpload, cancellationToken)))
+                                => dataSetFileStorage.CreateOrReplaceExistingDataSetUpload(releaseVersionId, dataSetUpload, cancellationToken)))
                         .OnSuccess(async dataSetUploads
                             => await ScreenDataSetUploads([.. dataSetUploads], cancellationToken));
                 });
@@ -290,7 +290,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                             => await dataSetFileStorage.UploadDataSetsToTemporaryStorage(releaseVersionId, [dataSet], cancellationToken))
                         .OnSuccess(dataSetUploads
                             => dataSetUploads.SelectAsync(dataSetUpload
-                                => dataSetFileStorage.CreateOrReplaceExistingDbRecord(releaseVersionId, dataSetUpload, cancellationToken)))
+                                => dataSetFileStorage.CreateOrReplaceExistingDataSetUpload(releaseVersionId, dataSetUpload, cancellationToken)))
                         .OnSuccess(async dataSetUploads
                             => await ScreenDataSetUploads([.. dataSetUploads], cancellationToken));
                 });
@@ -332,7 +332,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     => await dataSetFileStorage.UploadDataSetsToTemporaryStorage(releaseVersionId, dataSets, cancellationToken))
                 .OnSuccess(dataSetUploads
                     => dataSetUploads.SelectAsync(dataSetUpload
-                        => dataSetFileStorage.CreateOrReplaceExistingDbRecord(releaseVersionId, dataSetUpload, cancellationToken)))
+                        => dataSetFileStorage.CreateOrReplaceExistingDataSetUpload(releaseVersionId, dataSetUpload, cancellationToken)))
                 .OnSuccess(async dataSetUploads
                     => await ScreenDataSetUploads([.. dataSetUploads], cancellationToken));
         }
