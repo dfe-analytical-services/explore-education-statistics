@@ -68,7 +68,7 @@ public interface IDataSetFileStorage
     /// </summary>
     /// <remarks>Allows an upload which previously failed screening to be easily overwritten, without the need for manual deletion.</remarks>
     /// <returns>The new entity.</returns>
-    Task<DataSetUpload> CreateOrReplaceExistingDbRecord(
+    Task<DataSetUpload> CreateOrReplaceExistingDataSetUpload(
         Guid releaseVersionId,
         DataSetUpload dataSetUpload,
         CancellationToken cancellationToken);
