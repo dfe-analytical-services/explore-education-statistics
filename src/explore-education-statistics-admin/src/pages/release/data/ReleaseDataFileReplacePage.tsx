@@ -167,7 +167,6 @@ const ReleaseDataFileReplacePage = ({
           await releaseDataFileService.deleteDataFilesWithApi(
             releaseVersionId,
             replacementDataFile.id,
-            true, // Deleting draft API version attached to the cancelled draft replacement file.
           );
         }
 
