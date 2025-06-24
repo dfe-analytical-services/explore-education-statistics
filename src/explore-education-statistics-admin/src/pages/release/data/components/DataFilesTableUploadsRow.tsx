@@ -3,7 +3,7 @@ import releaseDataFileService, {
 } from '@admin/services/releaseDataFileService';
 import ButtonGroup from '@common/components/ButtonGroup';
 import ButtonText from '@common/components/ButtonText';
-import React, { useCallback } from 'react';
+import React, { useCallback, useState } from 'react';
 import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
 import WarningMessage from '@common/components/WarningMessage';
@@ -44,6 +44,26 @@ export default function DataFilesTableUploadRow({
   const hasWarnings = dataSetUpload.screenerResult.testResults.some(
     testResult => testResult.result === 'WARNING',
   );
+
+  const warnings = dataSetUpload.screenerResult.testResults.filter(
+    testResult => testResult.result === 'WARNING',
+  );
+
+  const [warningAcknowledgements, setWarningAcknowledgements] = useState(
+    Object.fromEntries(
+      warnings.map(warning => {
+        return [warning.testFunctionName, false];
+      }),
+    ),
+  );
+
+  const acknowledgeWarning = useCallback(
+    (key: string, value: boolean) => {
+      setWarningAcknowledgements({ ...warningAcknowledgements, [key]: value });
+    },
+    [setWarningAcknowledgements, warningAcknowledgements],
+  );
+
   let tabTitle = '';
 
   if (hasFailures && hasWarnings) tabTitle = 'Failures & warnings';
@@ -105,6 +125,10 @@ export default function DataFilesTableUploadRow({
             title="Data set details"
             open={openImportConfirm}
             hideConfirm={hasFailures}
+            disableConfirm={
+              Object.keys(warningAcknowledgements).length > 0 &&
+              Object.values(warningAcknowledgements).every(item => !item)
+            }
             onConfirm={() => onConfirmImport([dataSetUpload.id])}
             confirmText={confirmText}
             triggerButton={
@@ -129,6 +153,8 @@ export default function DataFilesTableUploadRow({
                   <ScreenerResultsTable
                     screenerResult={dataSetUpload.screenerResult}
                     showAll={false}
+                    onAcknowledgeWarning={acknowledgeWarning}
+                    warningAcknowledgements={warningAcknowledgements}
                   />
                 </TabsSection>
               )}
