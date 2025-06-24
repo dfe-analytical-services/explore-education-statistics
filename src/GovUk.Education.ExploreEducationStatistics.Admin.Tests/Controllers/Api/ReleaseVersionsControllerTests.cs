@@ -55,7 +55,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
 
             var releaseDataFileService = new Mock<IReleaseDataFileService>(Strict);
             releaseDataFileService
-                .Setup(service => service.Upload(_releaseVersionId,
+                .Setup(service => service.Upload(
+                    _releaseVersionId,
                     dataFile,
                     metaFile,
                     "Data set title",
@@ -94,7 +95,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
 
             var releaseDataFileService = new Mock<IReleaseDataFileService>(Strict);
             releaseDataFileService
-                .Setup(service => service.Upload(_releaseVersionId,
+                .Setup(service => service.Upload(
+                    _releaseVersionId,
                     dataFile,
                     metaFile,
                     "Data set title",
@@ -120,6 +122,109 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             VerifyAllMocks(releaseDataFileService);
 
             result.AssertValidationProblem(CannotOverwriteFile);
+        }
+
+        [Fact]
+        public async Task UploadDataSetAsZip_Success()
+        {
+            // Arrange
+            var dataSetZipFile = MockFile("dataSetZip.zip");
+
+            var expectedVm = DataSetUploadMockBuilder.BuildViewModel();
+
+            var releaseDataFileService = new Mock<IReleaseDataFileService>(Strict);
+            releaseDataFileService
+                .Setup(service => service.UploadFromZip(
+                    _releaseVersionId,
+                    dataSetZipFile,
+                    "Data set title",
+                    null,
+                    default))
+                .ReturnsAsync(new List<DataSetUploadViewModel> { expectedVm });
+
+            // Act
+            var controller = BuildController(releaseDataFileService: releaseDataFileService.Object);
+
+            var response = await controller.UploadDataSetAsZip(
+                new()
+                {
+                    ReleaseVersionId = _releaseVersionId,
+                    Title = "Data set title",
+                    ZipFile = dataSetZipFile,
+                    ReplacingFileId = null
+                },
+                cancellationToken: default);
+
+            // Assert
+            VerifyAllMocks(releaseDataFileService);
+
+            var responseVms = response.AssertOkResult();
+            var responseVm = Assert.Single(responseVms);
+            Assert.Equivalent(expectedVm, responseVm);
+        }
+
+        [Fact]
+        public async Task UploadDataSetAsBulkZip_Success()
+        {
+            // Arrange
+            var dataSetBulkZipFile = MockFile("dataSetZip.zip");
+
+            var expectedVm = DataSetUploadMockBuilder.BuildViewModel();
+
+            var releaseDataFileService = new Mock<IReleaseDataFileService>(Strict);
+            releaseDataFileService
+                .Setup(service => service.UploadFromBulkZip(
+                    _releaseVersionId,
+                    dataSetBulkZipFile,
+                    default))
+                .ReturnsAsync(new List<DataSetUploadViewModel> { expectedVm });
+
+            // Act
+            var controller = BuildController(releaseDataFileService: releaseDataFileService.Object);
+
+            var response = await controller.UploadDataSetAsBulkZip(
+                new()
+                {
+                    ReleaseVersionId = _releaseVersionId,
+                    ZipFile = dataSetBulkZipFile,
+                },
+                cancellationToken: default);
+
+            // Assert
+            VerifyAllMocks(releaseDataFileService);
+
+            var responseVms = response.AssertOkResult();
+            var responseVm = Assert.Single(responseVms);
+            Assert.Equivalent(expectedVm, responseVm);
+        }
+
+        [Fact]
+        public async Task ImportDataSetsFromTempStorage_Success()
+        {
+            // Arrange
+            var expectedVm1 = DataSetUploadMockBuilder.BuildViewModel();
+            var expectedVm2 = DataSetUploadMockBuilder.BuildViewModel();
+            var expectedVm3 = DataSetUploadMockBuilder.BuildViewModel();
+
+            var releaseDataFileService = new Mock<IReleaseDataFileService>(Strict);
+            releaseDataFileService
+                .Setup(service => service.SaveDataSetsFromTemporaryBlobStorage(
+                    _releaseVersionId,
+                    new List<Guid> { expectedVm1.Id, expectedVm2.Id, expectedVm3.Id },
+                    default))
+                .ReturnsAsync(Unit.Instance);
+
+            // Act
+            var controller = BuildController(releaseDataFileService: releaseDataFileService.Object);
+
+            var response = await controller.ImportDataSetsFromTempStorage(
+                _releaseVersionId,
+                [expectedVm1.Id, expectedVm2.Id, expectedVm3.Id],
+                cancellationToken: default);
+
+            // Assert
+            VerifyAllMocks(releaseDataFileService);
+            response.AssertOkResult();
         }
 
         [Fact]
@@ -511,75 +616,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
 
             result.AssertOkResult(amendmentCreatedResponse);
         }
-
-        //[Fact]
-        //public async Task UploadDataSetAsBulkZip()
-        //{
-        //    // Arrange
-        //    var uploadResultVms = new List<DataSetUploadResultViewModel>();
-
-        //    var releaseDataFileService = new Mock<IReleaseDataFileService>(Strict);
-
-        //    releaseDataFileService
-        //        .Setup(s => s.UploadFromBulkZip(
-        //            It.IsAny<Guid>(),
-        //            It.IsAny<IFormFile>(),
-        //            default))
-        //        .ReturnsAsync(uploadResultVms);
-
-        //    var controller = BuildController(releaseDataFileService: releaseDataFileService.Object);
-
-        //    // Act
-        //    var result = await controller.UploadDataSetAsBulkZip(
-        //        new()
-        //        {
-        //            ReleaseVersionId = Guid.NewGuid(),
-        //            ZipFile = MockFile("bulk.zip")
-        //        },
-        //        default);
-
-        //    // Assert
-        //    VerifyAllMocks(releaseDataFileService);
-
-        //    result.AssertOkResult(uploadResultVms);
-        //}
-
-        //[Fact]
-        //public async Task ImportBulkZipDataSetsFromTempStorage()
-        //{
-        //    // Arrange
-        //    var dataFileInfo = new List<DataFileInfo>
-        //    {
-        //        new() { FileName = "one.csv", Name = "Data set title", Size = "1024" },
-        //    };
-
-        //    var importRequests = new List<DataSetUploadResultViewModel>
-        //    {
-        //        new(){ DataFileId = Guid.NewGuid(), MetaFileId = Guid.NewGuid(), Title = "Data set title", DataFileName = "one.csv", MetaFileName = "one.meta.csv", DataFileSize = 1024, MetaFileSize = 128 }
-        //    };
-
-        //    var releaseDataFileService = new Mock<IReleaseDataFileService>(Strict);
-
-        //    releaseDataFileService
-        //        .Setup(s => s.SaveDataSetsFromTemporaryBlobStorage(
-        //            It.IsAny<Guid>(),
-        //            It.IsAny<List<DataSetUploadResultViewModel>>(),
-        //            default))
-        //        .ReturnsAsync(dataFileInfo);
-
-        //    var controller = BuildController(releaseDataFileService: releaseDataFileService.Object);
-
-        //    // Act
-        //    var result = await controller.ImportBulkZipDataSetsFromTempStorage(
-        //        releaseVersionId: Guid.NewGuid(),
-        //        dataSetFiles: importRequests,
-        //        cancellationToken: default);
-
-        //    // Assert
-        //    VerifyAllMocks(releaseDataFileService);
-
-        //    result.AssertOkResult(dataFileInfo);
-        //}
 
         private static IFormFile MockFile(string fileName)
         {
