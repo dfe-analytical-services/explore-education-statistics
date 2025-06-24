@@ -83,7 +83,7 @@ export default function ReleaseApiDataSetDetailsPage() {
     return isPatchDataSetVersion
       ? !!(
           apiDataSet?.draftVersion?.mappingStatus &&
-          apiDataSet.draftVersion.mappingStatus.hasMajorVersionUpdate
+          apiDataSet.draftVersion.mappingStatus.isMajorVersionUpdate
         )
       : false;
   };
@@ -376,7 +376,8 @@ export default function ReleaseApiDataSetDetailsPage() {
                                 ?.locationsComplete && isPatch
                                 ? dataSet.draftVersion.mappingStatus
                                     ?.locationsHaveMajorChange
-                                : false
+                                : !dataSet.draftVersion.mappingStatus
+                                    ?.locationsComplete
                             )
                               ? 'red'
                               : 'blue'
@@ -419,7 +420,8 @@ export default function ReleaseApiDataSetDetailsPage() {
                                 ?.filtersComplete && isPatch
                                 ? dataSet.draftVersion.mappingStatus
                                     ?.filtersHaveMajorChange
-                                : false
+                                : !dataSet.draftVersion.mappingStatus
+                                    ?.filtersComplete
                             )
                               ? 'red'
                               : 'blue'
