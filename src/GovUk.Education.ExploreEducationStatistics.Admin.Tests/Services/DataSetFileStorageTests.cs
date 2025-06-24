@@ -257,28 +257,36 @@ public class DataSetFileStorageTests
     }
 
     [Fact]
-    public async Task CreateOrReplaceExistingDbRecord_CreateNew_ReturnsUploadDetails()
+    public async Task CreateOrReplaceExistingDataSetUpload_CreateNew_ReturnsUploadDetails()
     {
         // Arrange
         var dataSetUpload = new DataSetUploadMockBuilder().BuildEntity();
 
         var privateBlobStorageService = new Mock<IPrivateBlobStorageService>(Strict);
+        var dataSetUploadRepository = new Mock<IDataSetUploadRepository>(Strict);
 
         var contentDbContextId = Guid.NewGuid().ToString();
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
             var service = SetupReleaseDataFileService(
                 contentDbContext,
-                privateBlobStorageService: privateBlobStorageService.Object);
+                privateBlobStorageService: privateBlobStorageService.Object,
+                dataSetUploadRepository: dataSetUploadRepository.Object);
 
             // Act
-            await service.CreateOrReplaceExistingDbRecord(dataSetUpload.ReleaseVersionId, dataSetUpload, cancellationToken: default);
+            await service.CreateOrReplaceExistingDataSetUpload(dataSetUpload.ReleaseVersionId, dataSetUpload, cancellationToken: default);
         }
 
         // Assert
         privateBlobStorageService.Verify(mock => mock.DeleteBlob(
             PrivateReleaseTempFiles,
             It.IsAny<string>()),
+            Times.Never());
+
+        dataSetUploadRepository.Verify(mock => mock.Delete(
+            It.IsAny<Guid>(),
+            It.IsAny<Guid>(),
+            It.IsAny<CancellationToken>()),
             Times.Never());
 
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -291,7 +299,7 @@ public class DataSetFileStorageTests
     }
 
     [Fact]
-    public async Task CreateOrReplaceExistingDbRecord_ReplaceExisting_ReturnsUploadDetails()
+    public async Task CreateOrReplaceExistingDataSetUpload_ReplaceExisting_ReturnsUploadDetails()
     {
         // Arrange
         var releaseVersionId = Guid.NewGuid();
@@ -306,6 +314,7 @@ public class DataSetFileStorageTests
             .BuildEntity();
 
         var privateBlobStorageService = new Mock<IPrivateBlobStorageService>(Strict);
+        var dataSetUploadRepository = new Mock<IDataSetUploadRepository>(Strict);
 
         var contentDbContextId = Guid.NewGuid().ToString();
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -313,22 +322,25 @@ public class DataSetFileStorageTests
             contentDbContext.DataSetUploads.Add(existingDataSetUpload);
             await contentDbContext.SaveChangesAsync();
 
-            privateBlobStorageService
-                .Setup(mock => mock.DeleteBlob(
-                    PrivateReleaseTempFiles,
-                    It.IsAny<string>()))
-                .Returns(Task.CompletedTask);
+            dataSetUploadRepository
+                .Setup(mock => mock.Delete(
+                    releaseVersionId,
+                    existingDataSetUpload.Id,
+                    It.IsAny<CancellationToken>()))
+                .Callback(() => contentDbContext.DataSetUploads.Remove(existingDataSetUpload))
+                .ReturnsAsync(Unit.Instance);
 
             var service = SetupReleaseDataFileService(
                 contentDbContext,
-                privateBlobStorageService: privateBlobStorageService.Object);
+                privateBlobStorageService: privateBlobStorageService.Object,
+                dataSetUploadRepository: dataSetUploadRepository.Object);
 
             // Act
-            await service.CreateOrReplaceExistingDbRecord(releaseVersionId, newDataSetUpload, cancellationToken: default);
+            await service.CreateOrReplaceExistingDataSetUpload(releaseVersionId, newDataSetUpload, cancellationToken: default);
         }
 
         // Assert
-        privateBlobStorageService.Verify();
+        MockUtils.VerifyAllMocks(privateBlobStorageService, dataSetUploadRepository);
 
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
@@ -570,6 +582,7 @@ public class DataSetFileStorageTests
         IPrivateBlobStorageService? privateBlobStorageService = null,
         IReleaseVersionRepository? releaseVersionRepository = null,
         IReleaseDataFileRepository? releaseDataFileRepository = null,
+        IDataSetUploadRepository? dataSetUploadRepository = null,
         IDataImportService? dataImportService = null,
         IUserService? userService = null,
         IDataSetVersionService? dataSetVersionService = null,
@@ -587,6 +600,7 @@ public class DataSetFileStorageTests
             privateBlobStorageService ?? Mock.Of<IPrivateBlobStorageService>(Strict),
             releaseVersionRepository ?? Mock.Of<IReleaseVersionRepository>(Strict),
             releaseDataFileRepository ?? Mock.Of<IReleaseDataFileRepository>(Strict),
+            dataSetUploadRepository ?? Mock.Of<IDataSetUploadRepository>(Strict),
             dataImportService ?? Mock.Of<IDataImportService>(Strict),
             userService ?? MockUtils.AlwaysTrueUserService(_user.Id).Object,
             dataSetVersionService ?? Mock.Of<IDataSetVersionService>(Strict),

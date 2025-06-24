@@ -30,6 +30,7 @@ public class DataSetFileStorage(
     IPrivateBlobStorageService privateBlobStorageService,
     IReleaseVersionRepository releaseVersionRepository,
     IReleaseDataFileRepository releaseDataFileRepository,
+    IDataSetUploadRepository dataSetUploadRepository,
     IDataImportService dataImportService,
     IUserService userService,
     IDataSetVersionService dataSetVersionService,
@@ -244,7 +245,7 @@ public class DataSetFileStorage(
         };
     }
 
-    public async Task<DataSetUpload> CreateOrReplaceExistingDbRecord(
+    public async Task<DataSetUpload> CreateOrReplaceExistingDataSetUpload(
         Guid releaseVersionId,
         DataSetUpload dataSetUpload,
         CancellationToken cancellationToken)
@@ -256,9 +257,7 @@ public class DataSetFileStorage(
 
         if (existingUpload is not null)
         {
-            contentDbContext.DataSetUploads.Remove(existingUpload);
-            await privateBlobStorageService.DeleteBlob(PrivateReleaseTempFiles, existingUpload.DataFilePath);
-            await privateBlobStorageService.DeleteBlob(PrivateReleaseTempFiles, existingUpload.MetaFilePath);
+            await dataSetUploadRepository.Delete(releaseVersionId, existingUpload.Id, cancellationToken);
         }
 
         await contentDbContext.DataSetUploads.AddAsync(dataSetUpload, cancellationToken);
