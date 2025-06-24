@@ -59,6 +59,7 @@ export interface ScreenerResult {
 }
 
 export interface ScreenerTestSummary {
+  id: string;
   testFunctionName: string;
   result: ScreenerTestResult;
   notes: string | undefined;
@@ -305,9 +306,8 @@ const releaseDataFileService = {
     id: string,
     fileName: string,
   ): Promise<void> {
-    const response = await client.get<Blob>(
-      `/release/${releaseId}/file/${id}/download`,
-      {
+    await client
+      .get<Blob>(`/release/${releaseId}/file/${id}/download`, {
         responseType: 'blob',
       })
       .then(response => downloadFile({ file: response, fileName }));
