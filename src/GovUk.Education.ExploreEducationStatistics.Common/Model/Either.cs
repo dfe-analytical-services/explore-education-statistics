@@ -109,15 +109,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model
         }
 
         /// <summary>
-        /// If all Eithers in the provided list are successful, return Unit.Instance. Otherwise, return the first
+        /// If all Eithers in the provided list are successful, return a list of successes. Otherwise, return the first
         /// failure.
         /// </summary>
-        public static Either<TFailure, Unit> OnSuccessAllReturnVoid<TFailure, TSuccess>(
+        public static Either<TFailure, List<TSuccess>> OnSuccessAll<TFailure, TSuccess>(
             this IEnumerable<Either<TFailure, TSuccess>> items)
         {
             var result = items
-                .AggregateSuccessesAndFailures()
-                .OnSuccessVoid();
+                .AggregateSuccessesAndFailures();
 
             if (result.IsLeft)
             {
@@ -125,6 +124,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model
             }
 
             return result.Right;
+        }
+        
+        /// <summary>
+        /// If all Eithers in the provided list are successful, return Unit.Instance. Otherwise, return the first
+        /// failure.
+        /// </summary>
+        public static Either<TFailure, Unit> OnSuccessAllReturnVoid<TFailure, TSuccess>(
+            this IEnumerable<Either<TFailure, TSuccess>> items)
+        {
+            return items.OnSuccessAll().OnSuccessVoid();
         }
 
         public static Either<TFailure, Unit> OnSuccessVoid<TFailure, TSuccess>(
@@ -253,26 +262,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model
             }
 
             await func();
-
-            return Unit.Instance;
-        }
-
-        /**
-         * Convenience method so that the chained function can be
-         * void and doesn't have to explicitly return a Unit.
-         */
-        public static async Task<Either<TFailure, Unit>> OnSuccessVoid<TFailure, TSuccess>(
-            this Task<Either<TFailure, TSuccess>> task,
-            Action<TSuccess> action)
-        {
-            var firstResult = await task;
-
-            if (firstResult.IsLeft)
-            {
-                return firstResult.Left;
-            }
-
-            action(firstResult.Right);
 
             return Unit.Instance;
         }
