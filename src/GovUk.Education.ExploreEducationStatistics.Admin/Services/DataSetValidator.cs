@@ -75,7 +75,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 {
                     await GetReplacingFileIfExists(dataSet.ReleaseVersionId, dataSet.Title)
                         .OnFailureDo(errors.Add)
-                        .OnSuccessVoid(file => fileToBeReplaced = file);
+                        .OnSuccessDo(file => fileToBeReplaced = file)
+                        .OnSuccessVoid();
                 }
             }
 
@@ -134,7 +135,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
                 await GetReplacingFileIfExists(releaseVersionId, dataSetName)
                     .OnFailureDo(errors.Add)
-                    .OnSuccessVoid(fileToBeReplaced =>
+                    .OnSuccessDo(fileToBeReplaced =>
                     {
                         dataSetIndex.DataSetIndexItems.Add(new()
                         {
@@ -145,7 +146,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         });
 
                         indexFileEntries.Add((BaseFilename: dataFileName, Title: dataSetName));
-                    });
+                    })
+                    .OnSuccessVoid();
             }
 
             if (errors.Count != 0)
