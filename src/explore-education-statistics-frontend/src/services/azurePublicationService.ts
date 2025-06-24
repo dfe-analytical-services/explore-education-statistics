@@ -75,7 +75,7 @@ const azurePublicationService = {
       },
       searchMode: 'any',
       scoringProfile: 'scoring-profile-1',
-      highlightFields: 'title,summary,content',
+      highlightFields: 'title,summary,content-3',
       facets: ['themeId,count:150,sort:count', 'releaseType'],
       filter,
       orderBy: orderBy ? [orderBy] : undefined,
