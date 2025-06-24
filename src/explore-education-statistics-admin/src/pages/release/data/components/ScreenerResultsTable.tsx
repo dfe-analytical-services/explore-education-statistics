@@ -33,10 +33,10 @@ export default function ScreenerResultsTable({
   );
 
   return (
-    <table>
+    <table data-testId="screener-result-table">
       <tbody>
         {testResults.map(testResult => (
-          <tr key={testResult.id}>
+          <tr data-testid="screener-result-table-row" key={testResult.id}>
             <td>
               <div style={{ display: 'flex', alignItems: 'center' }}>
                 {warningAcknowledgements &&
