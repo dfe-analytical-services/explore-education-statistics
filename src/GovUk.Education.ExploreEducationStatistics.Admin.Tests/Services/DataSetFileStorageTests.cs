@@ -262,16 +262,11 @@ public class DataSetFileStorageTests
         // Arrange
         var dataSetUpload = new DataSetUploadMockBuilder().BuildEntity();
 
+        var privateBlobStorageService = new Mock<IPrivateBlobStorageService>(Strict);
+
         var contentDbContextId = Guid.NewGuid().ToString();
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
-            var privateBlobStorageService = new Mock<IPrivateBlobStorageService>(Strict);
-
-            privateBlobStorageService.Verify(mock => mock.DeleteBlob(
-                PrivateReleaseTempFiles,
-                It.IsAny<string>()),
-                Times.Never());
-
             var service = SetupReleaseDataFileService(
                 contentDbContext,
                 privateBlobStorageService: privateBlobStorageService.Object);
@@ -281,6 +276,11 @@ public class DataSetFileStorageTests
         }
 
         // Assert
+        privateBlobStorageService.Verify(mock => mock.DeleteBlob(
+            PrivateReleaseTempFiles,
+            It.IsAny<string>()),
+            Times.Never());
+
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
             var result = await contentDbContext.DataSetUploads.FindAsync(dataSetUpload.Id);
@@ -305,13 +305,13 @@ public class DataSetFileStorageTests
             .WithReleaseVersionId(releaseVersionId)
             .BuildEntity();
 
+        var privateBlobStorageService = new Mock<IPrivateBlobStorageService>(Strict);
+
         var contentDbContextId = Guid.NewGuid().ToString();
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
             contentDbContext.DataSetUploads.Add(existingDataSetUpload);
             await contentDbContext.SaveChangesAsync();
-
-            var privateBlobStorageService = new Mock<IPrivateBlobStorageService>(Strict);
 
             privateBlobStorageService
                 .Setup(mock => mock.DeleteBlob(
@@ -328,6 +328,8 @@ public class DataSetFileStorageTests
         }
 
         // Assert
+        privateBlobStorageService.Verify();
+
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
             var allUploads = await contentDbContext.DataSetUploads.ToListAsync();
@@ -339,7 +341,7 @@ public class DataSetFileStorageTests
     }
 
     [Fact]
-    public async Task AddScreenerResultToUpload_UploadNotFound_ThrowsExpectedException()
+    public async Task AddScreenerResultToUpload_UploadNotFound_ThrowsInvalidOperationException()
     {
         // Arrange
         await using var contentDbContext = InMemoryApplicationDbContext();
@@ -407,6 +409,8 @@ public class DataSetFileStorageTests
                 default:
                     break;
             }
+
+            Assert.Equivalent(dataSetUpload.ScreenerResult, updatedDataSetUpload.ScreenerResult);
         }
     }
 

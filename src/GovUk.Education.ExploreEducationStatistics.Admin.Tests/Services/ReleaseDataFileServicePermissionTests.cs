@@ -276,20 +276,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             contentDbContext ??= new Mock<ContentDbContext>().Object;
 
             return new ReleaseDataFileService(
-                contentDbContext,
+                contentDbContext ??= Mock.Of<ContentDbContext>(),
                 contentPersistenceHelper ?? DefaultPersistenceHelperMock().Object,
-                privateBlobStorageService ?? new Mock<IPrivateBlobStorageService>(MockBehavior.Strict).Object,
-                dataSetValidator ?? new Mock<IDataSetValidator>(MockBehavior.Strict).Object,
+                privateBlobStorageService ??= Mock.Of<IPrivateBlobStorageService>(MockBehavior.Strict),
+                dataSetValidator ?? Mock.Of<IDataSetValidator>(MockBehavior.Strict),
                 fileRepository ?? new FileRepository(contentDbContext),
                 releaseFileRepository ?? new ReleaseFileRepository(contentDbContext),
-                releaseFileService ?? new Mock<IReleaseFileService>(MockBehavior.Strict).Object,
-                dataImportService ?? new Mock<IDataImportService>(MockBehavior.Strict).Object,
-                userService ?? new Mock<IUserService>(MockBehavior.Strict).Object,
-                dataSetFileStorage ?? new Mock<IDataSetFileStorage>(MockBehavior.Strict).Object,
-                dataBlockService ?? new Mock<IDataBlockService>(MockBehavior.Strict).Object,
-                footnoteRepository ?? new Mock<IFootnoteRepository>(MockBehavior.Strict).Object,
-                dataSetScreenerClient ?? new Mock<IDataSetScreenerClient>(MockBehavior.Strict).Object,
-                mapper ?? new Mock<IMapper>(MockBehavior.Strict).Object
+                releaseFileService ?? Mock.Of<IReleaseFileService>(MockBehavior.Strict),
+                dataImportService ?? Mock.Of<IDataImportService>(MockBehavior.Strict),
+                userService ?? Mock.Of<IUserService>(MockBehavior.Strict),
+                dataSetFileStorage ?? Mock.Of<IDataSetFileStorage>(MockBehavior.Strict),
+                dataBlockService ?? Mock.Of<IDataBlockService>(MockBehavior.Strict),
+                footnoteRepository ?? Mock.Of<IFootnoteRepository>(MockBehavior.Strict),
+                dataSetScreenerClient ?? Mock.Of<IDataSetScreenerClient>(MockBehavior.Strict),
+                mapper ?? Mock.Of<IMapper>(MockBehavior.Strict)
             );
         }
 
