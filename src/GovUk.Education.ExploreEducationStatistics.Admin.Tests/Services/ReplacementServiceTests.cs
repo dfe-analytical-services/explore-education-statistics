@@ -2849,7 +2849,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var releaseVersionService = new Mock<IReleaseVersionService>(Strict);
             if (enableReplacementOfPublicApiDataSets)
             {
-                releaseVersionService.Setup(service => service.RemoveDataFiles(It.IsAny<Guid>(), It.IsAny<Guid>(), It.IsAny<bool>()))
+                releaseVersionService.Setup(service => service.RemoveDataFiles(It.IsAny<Guid>(), It.IsAny<Guid>(), false))
                     .ReturnsAsync(Unit.Instance);
             }
 
