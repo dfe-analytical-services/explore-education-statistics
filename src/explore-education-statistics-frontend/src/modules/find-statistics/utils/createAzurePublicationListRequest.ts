@@ -35,9 +35,21 @@ export default function createAzurePublicationListRequest(
     filter = odata`themeId eq ${themeId}`;
   }
 
-  const minSearchCharacters = 3;
+  // eslint-disable-next-line no-useless-escape
+  const unsafeCharactersToRemove = /["`<>#%{}+;/?:@=+&~\*\|\\\/\^\[\]]/g;
+
   const search =
-    searchParam && searchParam.length >= minSearchCharacters ? searchParam : '';
+    searchParam && searchParam.length >= 1
+      ? searchParam
+          .split(' ')
+          // Filter out single characters
+          .filter(word => word.length > 1)
+          // We need to remove unsafe/special characters,
+          // and then append *~ to match partial words and enable fuzzy matching
+          // https://learn.microsoft.com/en-gb/azure/search/query-lucene-syntax
+          .map(word => `${word.replaceAll(unsafeCharactersToRemove, '')}*~`)
+          .join(' ')
+      : '';
 
   return omitBy(
     {

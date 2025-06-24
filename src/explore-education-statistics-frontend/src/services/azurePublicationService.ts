@@ -69,10 +69,7 @@ const azurePublicationService = {
       includeTotalCount: true,
       top: 10,
       skip: page > 1 ? (page - 1) * 10 : 0,
-      queryType: !orderBy ? 'semantic' : undefined,
-      semanticSearchOptions: {
-        configurationName: 'semantic-configuration-1',
-      },
+      queryType: !orderBy ? 'full' : undefined,
       searchMode: 'any',
       scoringProfile: 'scoring-profile-1',
       highlightFields: 'content',
