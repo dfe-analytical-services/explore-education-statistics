@@ -238,24 +238,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             IDataSetScreenerClient? dataSetScreenerClient = null,
             IMapper? mapper = null)
         {
-            contentDbContext ??= new Mock<ContentDbContext>().Object;
-            privateBlobStorageService ??= new Mock<IPrivateBlobStorageService>(MockBehavior.Strict).Object;
-            dataImportService ??= new Mock<IDataImportService>(MockBehavior.Strict).Object;
-            userService ??= new Mock<IUserService>(MockBehavior.Strict).Object;
+            contentDbContext ??= Mock.Of<ContentDbContext>();
+            privateBlobStorageService ??= Mock.Of<IPrivateBlobStorageService>(MockBehavior.Strict);
+            dataImportService ??= Mock.Of<IDataImportService>(MockBehavior.Strict);
+            userService ??= Mock.Of<IUserService>(MockBehavior.Strict);
 
             return new ReleaseDataFileService(
                 contentDbContext,
                 contentPersistenceHelper ?? DefaultPersistenceHelperMock().Object,
                 privateBlobStorageService,
-                dataSetValidator ?? new Mock<IDataSetValidator>(MockBehavior.Strict).Object,
+                dataSetValidator ?? Mock.Of<IDataSetValidator>(MockBehavior.Strict),
                 fileRepository ?? new FileRepository(contentDbContext),
                 releaseFileRepository ?? new ReleaseFileRepository(contentDbContext),
-                releaseFileService ?? new Mock<IReleaseFileService>(MockBehavior.Strict).Object,
+                releaseFileService ?? Mock.Of<IReleaseFileService>(MockBehavior.Strict),
                 dataImportService,
                 userService,
-                dataSetFileStorage ?? new Mock<IDataSetFileStorage>(MockBehavior.Strict).Object,
-                dataSetScreenerClient ?? new Mock<IDataSetScreenerClient>(MockBehavior.Strict).Object,
-                mapper ?? new Mock<IMapper>(MockBehavior.Strict).Object
+                dataSetFileStorage ?? Mock.Of<IDataSetFileStorage>(MockBehavior.Strict),
+                dataSetScreenerClient ?? Mock.Of<IDataSetScreenerClient>(MockBehavior.Strict),
+                mapper ?? Mock.Of<IMapper>(MockBehavior.Strict)
             );
         }
 
