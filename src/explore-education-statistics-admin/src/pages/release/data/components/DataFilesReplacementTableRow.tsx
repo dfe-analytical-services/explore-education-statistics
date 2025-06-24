@@ -143,7 +143,6 @@ export default function DataFilesReplacementTableRow({
                 onClick={async () => {
                   await dataReplacementService.replaceData(
                     releaseVersionId,
-                    dataFile.id,
                     replacementDataFile.id,
                   );
 

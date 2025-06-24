@@ -64,10 +64,9 @@ const DataFileReplacementPlan = ({
     () =>
       dataReplacementService.getReplacementPlan(
         releaseVersionId,
-        fileId,
         replacementFileId,
       ),
-    [releaseVersionId, fileId, replacementFileId],
+    [releaseVersionId, replacementFileId],
   );
 
   const hasInvalidDataBlocks = useMemo<boolean>(
@@ -562,7 +561,6 @@ const DataFileReplacementPlan = ({
 
                   await dataReplacementService.replaceData(
                     releaseVersionId,
-                    fileId,
                     replacementFileId,
                   );
 

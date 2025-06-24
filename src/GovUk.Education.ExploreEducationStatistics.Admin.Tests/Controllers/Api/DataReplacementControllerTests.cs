@@ -26,7 +26,6 @@ public abstract class DataReplacementControllerTests
             var replacementService = new Mock<IReplacementService>(MockBehavior.Strict);
 
             var releaseVersionId = Guid.NewGuid();
-            var originalFileId = Guid.NewGuid();
             var replacementFileId = Guid.NewGuid();
 
             var dataReplacementPlan = new DataReplacementPlanViewModel
@@ -76,8 +75,7 @@ public abstract class DataReplacementControllerTests
             replacementService
                 .Setup(s => s.GetReplacementPlan(
                     releaseVersionId, 
-                    originalFileId, 
-                    replacementFileId, 
+                    replacementFileId,
                     It.IsAny<CancellationToken>()))
                 .ReturnsAsync(dataReplacementPlan);
 
@@ -85,7 +83,6 @@ public abstract class DataReplacementControllerTests
 
             var result = await controller.GetReplacementPlan(
                 releaseVersionId: releaseVersionId,
-                fileId: originalFileId,
                 replacementFileId: replacementFileId);
 
             MockUtils.VerifyAllMocks(replacementService);
@@ -108,13 +105,11 @@ public abstract class DataReplacementControllerTests
             var replacementService = new Mock<IReplacementService>(MockBehavior.Strict);
 
             var releaseVersionId = Guid.NewGuid();
-            var originalFileId = Guid.NewGuid();
             var replacementFileId = Guid.NewGuid();
 
             replacementService
                 .Setup(service => service.Replace(
                     releaseVersionId,
-                    originalFileId,
                     replacementFileId))
                 .ReturnsAsync(Unit.Instance);
 
@@ -122,7 +117,6 @@ public abstract class DataReplacementControllerTests
 
             var result = await controller.Replace(
                 releaseVersionId: releaseVersionId,
-                fileId: originalFileId,
                 replacementFileId: replacementFileId);
 
             MockUtils.VerifyAllMocks(replacementService);
@@ -142,7 +136,6 @@ public abstract class DataReplacementControllerTests
             replacementService
                 .Setup(service => service.Replace(
                     releaseVersionId,
-                    originalFileId,
                     replacementFileId))
                 .ReturnsAsync(ValidationUtils.ValidationActionResult(ValidationErrorMessages.ReplacementMustBeValid));
 
@@ -150,7 +143,6 @@ public abstract class DataReplacementControllerTests
 
             var result = await controller.Replace(
                 releaseVersionId: releaseVersionId,
-                fileId: originalFileId,
                 replacementFileId: replacementFileId);
 
             MockUtils.VerifyAllMocks(replacementService);

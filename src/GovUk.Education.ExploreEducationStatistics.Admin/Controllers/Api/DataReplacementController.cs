@@ -8,47 +8,37 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
+namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api;
+
+[Route("api")]
+[Authorize]
+[ApiController]
+public class DataReplacementController(IReplacementService replacementService) : ControllerBase
 {
-    [Route("api")]
-    [Authorize]
-    [ApiController]
-    public class DataReplacementController : ControllerBase
+    [HttpGet("releases/{releaseVersionId:guid}/data/{replacementFileId:guid}/replacement-plan")]
+    public async Task<ActionResult<DataReplacementPlanViewModel>> GetReplacementPlan(
+        Guid releaseVersionId,
+        Guid replacementFileId, // @MarkFix also turn into a list?
+        CancellationToken cancellationToken = default)
     {
-        private readonly IReplacementService _replacementService;
+        return await replacementService.GetReplacementPlan(
+                releaseVersionId: releaseVersionId,
+                replacementFileId: replacementFileId,
+                cancellationToken: cancellationToken
+            )
+            .OnSuccess(plan => plan.ToSummary())
+            .HandleFailuresOrOk();
+    }
 
-        public DataReplacementController(IReplacementService replacementService)
-        {
-            _replacementService = replacementService;
-        }
-
-        [HttpGet("releases/{releaseVersionId:guid}/data/{fileId:guid}/replacement-plan/{replacementFileId:guid}")]
-        public async Task<ActionResult<DataReplacementPlanViewModel>> GetReplacementPlan(Guid releaseVersionId,
-            Guid fileId,
-            Guid replacementFileId,
-            CancellationToken cancellationToken = default)
-        {
-            return await _replacementService.GetReplacementPlan(
-                    releaseVersionId: releaseVersionId,
-                    originalFileId: fileId,
-                    replacementFileId: replacementFileId,
-                    cancellationToken: cancellationToken
-                )
-                .OnSuccess(plan => plan.ToSummary())
-                .HandleFailuresOrOk();
-        }
-
-        [HttpPost("releases/{releaseVersionId:guid}/data/{fileId:guid}/replacement/{replacementFileId:guid}")]
-        public async Task<ActionResult<Unit>> Replace(Guid releaseVersionId,
-            Guid fileId,
-            Guid replacementFileId)
-        {
-            return await _replacementService.Replace(
-                    releaseVersionId: releaseVersionId,
-                    originalFileId: fileId,
-                    replacementFileId: replacementFileId
-                )
-                .HandleFailuresOrOk();
-        }
+    [HttpPost("releases/{releaseVersionId:guid}/data/{replacementFileId:guid}/replacement")]
+    public async Task<ActionResult<Unit>> Replace(
+        Guid releaseVersionId,
+        Guid replacementFileId) // @MarkFix turn into a list
+    {
+        return await replacementService.Replace(
+                releaseVersionId: releaseVersionId,
+                replacementFileId: replacementFileId
+            )
+            .HandleFailuresOrOk();
     }
 }
