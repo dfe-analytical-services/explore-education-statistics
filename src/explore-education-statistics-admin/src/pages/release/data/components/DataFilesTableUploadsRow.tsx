@@ -141,6 +141,7 @@ export default function DataFilesTableUploadRow({
               {(hasFailures || hasWarnings) && (
                 <TabsSection
                   id={dataSetUploadTabIds.screenerFailuresAndWarnings}
+                  testId={dataSetUploadTabIds.screenerFailuresAndWarnings}
                   title={tabTitle}
                   headingTitle={
                     hasFailures
@@ -160,6 +161,7 @@ export default function DataFilesTableUploadRow({
               )}
               <TabsSection
                 id={dataSetUploadTabIds.screenerResults}
+                testId={dataSetUploadTabIds.screenerResults}
                 title="All tests"
                 headingTitle={`Full breakdown of ${dataSetUpload.screenerResult.testResults.length} tests checked against this file`}
               >
@@ -172,6 +174,7 @@ export default function DataFilesTableUploadRow({
               </TabsSection>
               <TabsSection
                 id={dataSetUploadTabIds.fileDetails}
+                testId={dataSetUploadTabIds.fileDetails}
                 title="File details"
                 headingTitle="File details"
               >
