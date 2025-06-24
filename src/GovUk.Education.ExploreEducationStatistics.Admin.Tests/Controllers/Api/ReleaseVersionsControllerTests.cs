@@ -45,7 +45,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         private readonly Guid _releaseVersionId = Guid.NewGuid();
 
         [Fact]
-        public async Task UploadDataSet_Success()
+        public async Task UploadDataSet_Success_ReturnsOkResult()
         {
             // Arrange
             var dataFile = MockFile("datafile.csv");
@@ -125,7 +125,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         }
 
         [Fact]
-        public async Task UploadDataSetAsZip_Success()
+        public async Task UploadDataSetAsZip_Success_ReturnsOkResult()
         {
             // Arrange
             var dataSetZipFile = MockFile("dataSetZip.zip");
@@ -164,7 +164,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         }
 
         [Fact]
-        public async Task UploadDataSetAsBulkZip_Success()
+        public async Task UploadDataSetAsBulkZip_Success_ReturnsOkResult()
         {
             // Arrange
             var dataSetBulkZipFile = MockFile("dataSetZip.zip");
@@ -199,7 +199,32 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         }
 
         [Fact]
-        public async Task ImportDataSetsFromTempStorage_Success()
+        public async Task DeleteDataSetUpload_Success_ReturnsNoContent()
+        {
+            // Arrange
+            var dataSetUploadId = Guid.NewGuid();
+
+            var dataSetUploadRepository = new Mock<IDataSetUploadRepository>(Strict);
+
+            dataSetUploadRepository
+                .Setup(mock => mock.Delete(_releaseVersionId, dataSetUploadId, default))
+                .ReturnsAsync(Unit.Instance);
+
+            var controller = BuildController(dataSetUploadRepository: dataSetUploadRepository.Object);
+
+            // Act
+            var response = await controller.DeleteDataSetUpload(
+                _releaseVersionId,
+                dataSetUploadId,
+                cancellationToken: default);
+
+            // Assert
+            VerifyAllMocks(dataSetUploadRepository);
+            response.AssertNoContent();
+        }
+
+        [Fact]
+        public async Task ImportDataSetsFromTempStorage_Success_ReturnsNoContent()
         {
             // Arrange
             var expectedVm1 = DataSetUploadMockBuilder.BuildViewModel();
@@ -224,7 +249,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
 
             // Assert
             VerifyAllMocks(releaseDataFileService);
-            response.AssertOkResult();
+            response.AssertNoContent();
         }
 
         [Fact]

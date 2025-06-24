@@ -3,6 +3,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologies;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ManageContent;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Public.Data;
+using GovUk.Education.ExploreEducationStatistics.Common;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Mappings;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
@@ -243,7 +244,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
                     m => m.MapFrom(upload => upload.Result.ToString()));
 
             CreateMap<DataSetUpload, DataSetScreenerRequest>()
-                .BeforeMap((s, d) => d.StorageContainerName = "releases-temp");
+                .BeforeMap((s, d) => d.StorageContainerName = Constants.ContainerNames.PrivateReleaseTempFiles);
         }
 
         private static string GetDataSetUploadStatus(DataSetScreenerResponse screenerResult)
