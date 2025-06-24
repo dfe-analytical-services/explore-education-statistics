@@ -4,7 +4,6 @@ import _releaseDataFileService, {
   DataFile,
   UploadDataFilesRequest,
   UploadZipDataFileRequest,
-  DataSetUpload,
 } from '@admin/services/releaseDataFileService';
 import _dataReplacementService, {
   DataReplacementPlan,
@@ -81,31 +80,6 @@ describe('ReleaseDataUploadsSection', () => {
     status: 'QUEUED',
     permissions: {
       canCancelImport: true,
-    },
-  };
-
-  const testUploadResult: DataSetUpload = {
-    dataFileName: 'test.csv',
-    dataSetTitle: 'Data set 1',
-    metaFileName: 'test.meta.csv',
-    status: 'SCREENING',
-    created: new Date('2000-01-01'),
-    dataFileSize: '50 Kb',
-    id: 'test-data',
-    metaFileSize: '50 B',
-    replacingFileId: undefined,
-    uploadedBy: 'user1@test.com',
-    screenerResult: {
-      message: 'message',
-      overallResult: 'Passed',
-      testResults: [
-        {
-          notes: 'notes',
-          result: 'PASS',
-          stage: 'Passed',
-          testFunctionName: 'testFunctionName',
-        },
-      ],
     },
   };
 

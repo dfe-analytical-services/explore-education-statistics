@@ -16,6 +16,7 @@ interface Props {
   open?: boolean;
   showCancel?: boolean;
   hideConfirm?: boolean;
+  disableConfirm?: boolean;
   submitButtonVariant?: 'secondary' | 'warning';
   title: string;
   triggerButton?: ReactNode;
@@ -35,6 +36,7 @@ export default function ModalConfirm({
   open: initialOpen = false,
   showCancel = true,
   hideConfirm = false,
+  disableConfirm = false,
   submitButtonVariant,
   title,
   triggerButton,
@@ -122,7 +124,7 @@ export default function ModalConfirm({
 
         {!hideConfirm && (
           <Button
-            disabled={isCancelling}
+            disabled={isCancelling || disableConfirm}
             variant={submitButtonVariant}
             onClick={handleConfirm}
           >
