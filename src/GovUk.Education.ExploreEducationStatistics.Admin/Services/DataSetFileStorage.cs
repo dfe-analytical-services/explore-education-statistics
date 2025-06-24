@@ -244,7 +244,10 @@ public class DataSetFileStorage(
         };
     }
 
-    public async Task<DataSetUpload> CreateOrReplaceExistingDbRecord(Guid releaseVersionId, DataSetUpload dataSetUpload, CancellationToken cancellationToken)
+    public async Task<DataSetUpload> CreateOrReplaceExistingDbRecord(
+        Guid releaseVersionId,
+        DataSetUpload dataSetUpload,
+        CancellationToken cancellationToken)
     {
         var existingUpload = await contentDbContext.DataSetUploads.SingleOrDefaultAsync(existingUpload =>
             (existingUpload.ReleaseVersionId == releaseVersionId && existingUpload.DataSetTitle == dataSetUpload.DataSetTitle) ||
