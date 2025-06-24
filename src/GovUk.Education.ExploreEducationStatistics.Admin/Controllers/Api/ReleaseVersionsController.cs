@@ -108,14 +108,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         }
 
         [HttpDelete("releaseVersions/{releaseVersionId:guid}/upload/{dataSetUploadId:guid}")]
-        public async Task<ActionResult<Unit>> DeleteDataSetUploads(
+        public async Task<ActionResult> DeleteDataSetUpload(
             Guid releaseVersionId,
             Guid dataSetUploadId,
             CancellationToken cancellationToken)
         {
             return await _dataSetUploadRepository
                 .Delete(releaseVersionId, dataSetUploadId, cancellationToken)
-                .HandleFailuresOrOk();
+                .HandleFailuresOrNoContent();
         }
 
         // We intend to change this route, to make these endpoints more consistent, as per EES-5895
@@ -214,14 +214,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         }
 
         [HttpPost("releaseVersions/{releaseVersionId:guid}/import-data-sets")]
-        public async Task<ActionResult<Unit>> ImportDataSetsFromTempStorage(
+        public async Task<ActionResult> ImportDataSetsFromTempStorage(
             Guid releaseVersionId,
             List<Guid> dataSetUploadIds,
             CancellationToken cancellationToken)
         {
             return await _releaseDataFileService
                 .SaveDataSetsFromTemporaryBlobStorage(releaseVersionId, dataSetUploadIds, cancellationToken)
-                .HandleFailuresOrOk();
+                .HandleFailuresOrNoContent(convertNotFoundToNoContent: false);
         }
 
         // We intend to change this route, to make these endpoints more consistent, as per EES-5895
