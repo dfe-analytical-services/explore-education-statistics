@@ -88,8 +88,9 @@ internal class DataSetVersionService(
                         cancellationToken))
                 .OnSuccessDo(async releaseFilesAndDataSetVersions =>
                     await DeleteDataSetVersions(releaseFilesAndDataSetVersions.dataSetVersions, cancellationToken))
-                .OnSuccessVoid(releaseFilesAndDataSetVersions =>
-                    DeleteDuckDbFiles(releaseFilesAndDataSetVersions.dataSetVersions)));
+                .OnSuccessDo(releaseFilesAndDataSetVersions =>
+                    DeleteDuckDbFiles(releaseFilesAndDataSetVersions.dataSetVersions))
+                .OnSuccessVoid());
     }
 
     public async Task<Either<ActionResult, Unit>> DeleteVersion(
@@ -103,7 +104,8 @@ internal class DataSetVersionService(
                     forceDeleteAll: false))
                 .OnSuccessDo(async dataSetVersion => await UpdateReleaseFiles(dataSetVersion, cancellationToken))
                 .OnSuccessDo(async dataSetVersion => await DeleteDataSetVersion(dataSetVersion, cancellationToken))
-                .OnSuccessVoid(DeleteDuckDbFiles));
+                .OnSuccessDo(DeleteDuckDbFiles)
+                .OnSuccessVoid());
     }
 
     private async Task<Either<ActionResult, IReadOnlyList<DataSetVersion>>> GetDataSetVersions(
