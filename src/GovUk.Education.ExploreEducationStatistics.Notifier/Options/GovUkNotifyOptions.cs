@@ -35,6 +35,9 @@ public class GovUkNotifyOptions
         public string ApiSubscriptionMajorDataSetVersionPublishedId { get; init; } = null!;
 
         public string ApiSubscriptionVerificationId { get; init; } = null!;
+
+        public string ReleasePublishingFeedbackId { get; init; } = null!;
+        
         /// <summary>
         /// Returns the email template to use when a new breaking or non-breaking dataset version is published
         /// </summary>
