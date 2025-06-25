@@ -28,6 +28,10 @@ export default function ScreenerResultsTable({
           testResult.result === 'FAIL' || testResult.result === 'WARNING',
       );
 
+  const hasFailures = screenerResult.testResults.some(
+    testResult => testResult.result === 'FAIL',
+  );
+
   return (
     <table>
       <tbody>
@@ -37,6 +41,7 @@ export default function ScreenerResultsTable({
               <div style={{ display: 'flex', alignItems: 'center' }}>
                 {warningAcknowledgements &&
                   Object.keys(warningAcknowledgements).length > 0 &&
+                  !hasFailures &&
                   onAcknowledgeWarning && (
                     <FormCheckbox
                       id={testResult.id}
