@@ -329,7 +329,9 @@ describe('DataReplacementPlan', () => {
       mappingStatus: {
         locationsComplete: false,
         filtersComplete: false,
-        hasMajorVersionUpdate: false,
+        isMajorVersionUpdate: false,
+        locationsHaveMajorChange: false,
+        filtersHaveMajorChange: false,
       },
       readyToPublish: false,
       valid: false,
@@ -391,7 +393,9 @@ describe('DataReplacementPlan', () => {
       mappingStatus: {
         locationsComplete: true,
         filtersComplete: true,
-        hasMajorVersionUpdate: false,
+        isMajorVersionUpdate: false,
+        locationsHaveMajorChange: false,
+        filtersHaveMajorChange: false,
       },
       readyToPublish: true,
       valid: true,

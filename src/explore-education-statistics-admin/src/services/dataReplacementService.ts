@@ -96,7 +96,7 @@ export interface MappingStatus {
   locationsHaveMajorChange: boolean;
   filtersComplete: boolean;
   filtersHaveMajorChange: boolean;
-  hasMajorVersionUpdate: boolean;
+  isMajorVersionUpdate: boolean;
 }
 
 export interface ApiDataSetVersionPlan {

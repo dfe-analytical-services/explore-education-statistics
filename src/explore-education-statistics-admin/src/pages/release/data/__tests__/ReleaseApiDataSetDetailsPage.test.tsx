@@ -315,7 +315,7 @@ describe('ReleaseApiDataSetDetailsPage', () => {
           locationsComplete: false,
           filtersHaveMajorChange: false,
           locationsHaveMajorChange: false,
-          hasMajorVersionUpdate: false,
+          isMajorVersionUpdate: false,
         },
       },
       latestLiveVersion: testLiveVersion,
@@ -671,7 +671,7 @@ describe('ReleaseApiDataSetDetailsPage', () => {
           mappingStatus: {
             filtersComplete: true,
             locationsComplete: true,
-            hasMajorVersionUpdate: null,
+            isMajorVersionUpdate: null,
             filtersHaveMajorChange: false,
             locationsHaveMajorChange: false,
           },
@@ -709,7 +709,7 @@ describe('ReleaseApiDataSetDetailsPage', () => {
           mappingStatus: {
             filtersComplete: true,
             locationsComplete: true,
-            hasMajorVersionUpdate: null,
+            isMajorVersionUpdate: null,
             filtersHaveMajorChange: false,
             locationsHaveMajorChange: false,
           },
@@ -724,7 +724,7 @@ describe('ReleaseApiDataSetDetailsPage', () => {
           mappingStatus: {
             filtersComplete: true,
             locationsComplete: true,
-            hasMajorVersionUpdate: null,
+            isMajorVersionUpdate: null,
             filtersHaveMajorChange: false,
             locationsHaveMajorChange: false,
           },
@@ -810,7 +810,7 @@ describe('ReleaseApiDataSetDetailsPage', () => {
           mappingStatus: {
             filtersComplete: true,
             locationsComplete: true,
-            hasMajorVersionUpdate: null,
+            isMajorVersionUpdate: null,
             filtersHaveMajorChange: false,
             locationsHaveMajorChange: false,
           },
@@ -827,7 +827,7 @@ describe('ReleaseApiDataSetDetailsPage', () => {
             locationsComplete: true,
             filtersHaveMajorChange: false,
             locationsHaveMajorChange: false,
-            hasMajorVersionUpdate: null,
+            isMajorVersionUpdate: null,
           },
         },
         latestLiveVersion: testLiveVersion,
@@ -894,7 +894,7 @@ describe('ReleaseApiDataSetDetailsPage', () => {
         ...testDraftVersion,
         version: '2.0.1',
         mappingStatus: {
-          hasMajorVersionUpdate: true,
+          isMajorVersionUpdate: true,
           locationsComplete: true,
           filtersComplete: true,
           filtersHaveMajorChange: false,
@@ -929,7 +929,7 @@ describe('ReleaseApiDataSetDetailsPage', () => {
         ...testDraftVersion,
         version: '2.0.1',
         mappingStatus: {
-          hasMajorVersionUpdate: true,
+          isMajorVersionUpdate: true,
           locationsComplete: false,
           filtersComplete: true,
           filtersHaveMajorChange: true,
@@ -978,7 +978,7 @@ describe('ReleaseApiDataSetDetailsPage', () => {
         ...testDraftVersion,
         version: '2.0.1',
         mappingStatus: {
-          hasMajorVersionUpdate: true,
+          isMajorVersionUpdate: true,
           locationsComplete: true,
           filtersComplete: false,
           filtersHaveMajorChange: false,
@@ -1027,7 +1027,7 @@ describe('ReleaseApiDataSetDetailsPage', () => {
         ...testDraftVersion,
         version: '2.0.1',
         mappingStatus: {
-          hasMajorVersionUpdate: true,
+          isMajorVersionUpdate: true,
           locationsComplete: false,
           filtersComplete: true,
           filtersHaveMajorChange: true,
@@ -1076,7 +1076,7 @@ describe('ReleaseApiDataSetDetailsPage', () => {
         ...testDraftVersion,
         version: '2.0.1',
         mappingStatus: {
-          hasMajorVersionUpdate: true,
+          isMajorVersionUpdate: true,
           locationsComplete: true,
           filtersComplete: false,
           filtersHaveMajorChange: false,
@@ -1125,7 +1125,7 @@ describe('ReleaseApiDataSetDetailsPage', () => {
         ...testDraftVersion,
         version: '2.0.1',
         mappingStatus: {
-          hasMajorVersionUpdate: true,
+          isMajorVersionUpdate: true,
           locationsComplete: true,
           filtersComplete: true,
           filtersHaveMajorChange: false,
@@ -1156,7 +1156,7 @@ describe('ReleaseApiDataSetDetailsPage', () => {
         ...testDraftVersion,
         version: '1.0.1',
         mappingStatus: {
-          hasMajorVersionUpdate: false,
+          isMajorVersionUpdate: false,
           locationsComplete: false,
           filtersComplete: false,
           filtersHaveMajorChange: false,
@@ -1186,7 +1186,7 @@ describe('ReleaseApiDataSetDetailsPage', () => {
         ...testDraftVersion,
         version: '2.0',
         mappingStatus: {
-          hasMajorVersionUpdate: true,
+          isMajorVersionUpdate: true,
           locationsComplete: true,
           filtersComplete: true,
           filtersHaveMajorChange: false,
