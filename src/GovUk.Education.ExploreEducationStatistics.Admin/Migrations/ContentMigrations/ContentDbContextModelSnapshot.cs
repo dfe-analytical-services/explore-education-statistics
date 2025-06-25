@@ -342,6 +342,60 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                     b.ToTable("DataSetFileVersionGeographicLevels");
                 });
 
+            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.DataSetUpload", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("Created")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("DataFileId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("DataFileName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<long>("DataFileSizeInBytes")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("DataSetTitle")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("MetaFileId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("MetaFileName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<long>("MetaFileSizeInBytes")
+                        .HasColumnType("bigint");
+
+                    b.Property<Guid>("ReleaseVersionId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("ReplacingFileId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("ScreenerResult")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<string>("UploadedBy")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("DataSetUploads");
+                });
+
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.EmbedBlock", b =>
                 {
                     b.Property<Guid>("Id")

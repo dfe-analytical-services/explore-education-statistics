@@ -4,7 +4,6 @@ import _releaseDataFileService, {
   DataFile,
   UploadDataFilesRequest,
   UploadZipDataFileRequest,
-  DataSetUploadResult,
 } from '@admin/services/releaseDataFileService';
 import _dataReplacementService, {
   DataReplacementPlan,
@@ -82,16 +81,6 @@ describe('ReleaseDataUploadsSection', () => {
     permissions: {
       canCancelImport: true,
     },
-  };
-
-  const testUploadResult: DataSetUploadResult = {
-    dataFileId: 'data-file-1',
-    dataFileName: 'test.csv',
-    dataFileSize: 1024,
-    metaFileId: 'meta-file-1',
-    metaFileName: 'test.meta.csv',
-    metaFileSize: 128,
-    title: 'Data set 1',
   };
 
   const testQueuedImportStatus: DataFileImportStatus = {
@@ -924,9 +913,6 @@ describe('ReleaseDataUploadsSection', () => {
     });
 
     test('successful import with CSV files refetches data files', async () => {
-      releaseDataFileService.uploadDataSetFilePair.mockResolvedValue([
-        testUploadResult,
-      ]);
       releaseDataFileService.getDataFileImportStatus.mockResolvedValue(
         testQueuedImportStatus,
       );
@@ -974,9 +960,6 @@ describe('ReleaseDataUploadsSection', () => {
     });
 
     test('successful import with zip file refetches data files', async () => {
-      releaseDataFileService.uploadZippedDataSetFilePair.mockResolvedValue([
-        testUploadResult,
-      ]);
       releaseDataFileService.getDataFileImportStatus.mockResolvedValue(
         testQueuedImportStatus,
       );
@@ -1019,14 +1002,6 @@ describe('ReleaseDataUploadsSection', () => {
     });
 
     test('successful import with bulk zip file refetches data files', async () => {
-      releaseDataFileService.uploadBulkZipDataSetFile.mockResolvedValue([
-        testUploadResult,
-      ]);
-
-      releaseDataFileService.importDataSets.mockResolvedValue([
-        testImportedDataFile,
-      ]);
-
       releaseDataFileService.getDataFileImportStatus.mockResolvedValue(
         testQueuedImportStatus,
       );
@@ -1051,7 +1026,6 @@ describe('ReleaseDataUploadsSection', () => {
       await user.click(
         screen.getByRole('button', { name: 'Upload data files' }),
       );
-      await user.click(screen.getByRole('button', { name: 'Confirm' }));
 
       await waitFor(() => {
         expect(releaseDataFileService.getDataFiles).toHaveBeenCalledWith(
@@ -1062,14 +1036,6 @@ describe('ReleaseDataUploadsSection', () => {
 
     test('updates the file size after importing CSV file when status changes', async () => {
       // we don't display rows :/
-      releaseDataFileService.uploadDataSetFilePair.mockResolvedValue([
-        testUploadResult,
-      ]);
-
-      releaseDataFileService.importDataSets.mockResolvedValue([
-        testImportedDataFile,
-      ]);
-
       releaseDataFileService.getDataFileImportStatus
         .mockResolvedValue(testQueuedImportStatus)
         .mockResolvedValueOnce(testImportingImportStatus);
@@ -1116,8 +1082,6 @@ describe('ReleaseDataUploadsSection', () => {
         screen.getByRole('button', { name: 'Upload data files' }),
       );
 
-      await user.click(screen.getByRole('button', { name: 'Confirm' }));
-
       await waitFor(() => {
         expect(
           releaseDataFileService.uploadDataSetFilePair,
@@ -1141,21 +1105,13 @@ describe('ReleaseDataUploadsSection', () => {
       await waitFor(() =>
         expect(
           releaseDataFileService.getDataFileImportStatus,
-        ).toHaveBeenCalledWith('release-1', testUploadedDataFile2),
+        ).toHaveBeenCalledWith('release-1', 'file-1'),
       );
 
       expect(fileTableRow3.getByTestId('Size')).toHaveTextContent('150 Kb');
     });
 
     test('updates the file size after importing ZIP file when status changes', async () => {
-      releaseDataFileService.uploadZippedDataSetFilePair.mockResolvedValue([
-        testUploadResult,
-      ]);
-
-      releaseDataFileService.importDataSets.mockResolvedValue([
-        testImportedDataFile,
-      ]);
-
       releaseDataFileService.getDataFileImportStatus
         .mockResolvedValue(testQueuedImportStatus)
         .mockResolvedValueOnce(testImportingImportStatus);
@@ -1197,8 +1153,6 @@ describe('ReleaseDataUploadsSection', () => {
         screen.getByRole('button', { name: 'Upload data files' }),
       );
 
-      await user.click(screen.getByRole('button', { name: 'Confirm' }));
-
       await waitFor(() =>
         expect(
           releaseDataFileService.uploadZippedDataSetFilePair,
@@ -1217,7 +1171,7 @@ describe('ReleaseDataUploadsSection', () => {
       await waitFor(() =>
         expect(
           releaseDataFileService.getDataFileImportStatus,
-        ).toHaveBeenCalledWith('release-1', testUploadedDataFile2),
+        ).toHaveBeenCalledWith('release-1', 'file-1'),
       );
 
       expect(fileTableRow3.getByTestId('Size')).toHaveTextContent('150 Kb');

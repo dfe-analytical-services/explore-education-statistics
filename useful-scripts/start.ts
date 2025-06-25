@@ -7,6 +7,7 @@ import fs from 'node:fs';
 import { EOL } from 'node:os';
 import path from 'node:path';
 import process from 'node:process';
+import { spawnSync } from 'node:child_process';
 import splitLines from 'split2';
 import kill from 'tree-kill';
 import delay from './utils/delay';
@@ -19,13 +20,20 @@ import { ExecaChildProcessWithoutNullStreams } from './utils/types';
 
 const __dirname = getDirname(import.meta.url);
 const __filename = getFilename(import.meta.url);
+const accountRoot = path.resolve(__dirname, '../..');
 const projectRoot = path.resolve(__dirname, '..');
+
+const screenerRepositoryName = 'ees-screener-api';
+const screenerLocalDir = `${accountRoot}/${screenerRepositoryName}`;
+const screenerRepoUrl =
+  'https://github.com/dfe-analytical-services/ees-screener-api';
 
 const allowedDockerServices = [
   'db',
   'data-storage',
   'idp',
   'public-api-db',
+  'data-screener',
 ] as const;
 
 type DockerService = (typeof allowedDockerServices)[number];
@@ -81,6 +89,7 @@ const allowedServiceNames = [
   'db',
   'dataStorage',
   'searchFunctionApp',
+  'dataScreener',
 ] as const;
 
 type ServiceName = (typeof allowedServiceNames)[number];
@@ -94,8 +103,8 @@ const serviceSchemas: Record<ServiceName, ServiceSchema> = {
       return fs.existsSync(
         path.join(projectRoot, this.root, 'appsettings.Idp.json'),
       )
-        ? ['db', 'data-storage', 'public-api-db']
-        : ['db', 'data-storage', 'public-api-db', 'idp'];
+        ? ['db', 'data-storage', 'public-api-db', 'data-screener']
+        : ['db', 'data-storage', 'public-api-db', 'idp', 'data-screener'];
     },
   },
   analytics: {
@@ -173,6 +182,11 @@ const serviceSchemas: Record<ServiceName, ServiceSchema> = {
     port: 7075,
     type: 'func',
     dockerServices: ['data-storage'],
+  },
+  dataScreener: {
+    colour: chalk.rgb(0, 255, 221),
+    service: 'data-screener',
+    type: 'docker',
   },
   idp: {
     service: 'idp',
@@ -333,6 +347,17 @@ async function startDockerServices() {
 
     if (programOpts.rebuildDocker) {
       args.push('--build', '--force-recreate');
+    }
+
+    if (
+      servicesToStart.includes('admin') ||
+      servicesToStart.includes('dataScreener')
+    ) {
+      cloneRequiredRepository(
+        screenerRepositoryName,
+        screenerLocalDir,
+        screenerRepoUrl,
+      );
     }
 
     await $$`docker compose up ${[...args, ...dockerServicesToStart]}`;
@@ -524,4 +549,32 @@ function logService(service: ServiceName, message: string): void {
   const { colour } = serviceSchemas[service];
 
   console.info(`${colour(`[${service}]`)} ${message}`);
+}
+
+function cloneRequiredRepository(
+  repositoryName: string,
+  localDirectory: string,
+  repositoryUrl: string,
+) {
+  const localDirectoryExists = fs.existsSync(localDirectory);
+
+  if (!localDirectoryExists) {
+    console.log(`Cloning required repository '${repositoryName}'`);
+    const clone = spawnSync('git', ['clone', repositoryUrl, localDirectory], {
+      stdio: 'inherit',
+    });
+    if (clone.status !== 0) {
+      console.error(`Failed to clone repository '${repositoryName}'`);
+    }
+  } else {
+    console.log(
+      `Repository '${repositoryName}' already exists locally, pulling latest changes`,
+    );
+    const pull = spawnSync('git', ['-C', localDirectory, 'pull'], {
+      stdio: 'inherit',
+    });
+    if (pull.status !== 0) {
+      console.error(`Failed to pull repository '${repositoryName}'`);
+    }
+  }
 }

@@ -1,6 +1,6 @@
-using System;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
+using System;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions.FileExtensions;
@@ -132,6 +132,37 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Extensi
                     Assert.Throws<ArgumentOutOfRangeException>(() => file.PublicPath(releaseVersionId: Guid.NewGuid()));
                 }
             });
+        }
+
+        [Theory]
+        [InlineData(1, "1 B")]
+        [InlineData(1024, "1 Kb")]
+        [InlineData(1048576, "1 Mb")]
+        [InlineData(1073741824, "1 Gb")]
+        [InlineData(1099511627776, "1 Tb")]
+        public void DisplaySize_FromFile_ReturnsStringOfCorrectSizeAndUnit(
+            long contentLength,
+            string expectedDisplaySize)
+        {
+            var file = new File
+            {
+                ContentLength = contentLength
+            };
+
+            Assert.Equal(expectedDisplaySize, file.DisplaySize());
+        }
+
+        [Theory]
+        [InlineData(1, "1 B")]
+        [InlineData(1024, "1 Kb")]
+        [InlineData(1048576, "1 Mb")]
+        [InlineData(1073741824, "1 Gb")]
+        [InlineData(1099511627776, "1 Tb")]
+        public void DisplaySize_FromNumber_ReturnsStringOfCorrectSizeAndUnit(
+            long contentLength,
+            string expectedDisplaySize)
+        {
+            Assert.Equal(expectedDisplaySize, contentLength.DisplaySize());
         }
     }
 }

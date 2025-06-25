@@ -1,8 +1,7 @@
 #nullable enable
-using System.Collections.Generic;
 using System.Text.Json.Serialization;
 
-namespace GovUk.Education.ExploreEducationStatistics.Admin.Models;
+namespace GovUk.Education.ExploreEducationStatistics.Common.Model;
 
 public class DataScreenerTestResult
 {
@@ -10,12 +9,14 @@ public class DataScreenerTestResult
     public required string TestFunctionName { get; set; }
 
     [JsonPropertyName("result")]
-    public TestResult TestResult { get; set; }
+    [JsonConverter(typeof(JsonStringEnumConverter))]
+    public TestResult Result { get; set; }
 
-    // TODO (EES-5353): The screener currently returns a single string, so this list will fail to deserialise until the response has been updated
+    // TODO (EES-5353): The screener currently returns a single string, but the intention is for it to return a List
     [JsonPropertyName("message")]
-    public List<string> Notes { get; set; } = [];
+    public string? Notes { get; set; }
 
+    [JsonPropertyName("stage")]
     public Stage Stage { get; set; }
 }
 

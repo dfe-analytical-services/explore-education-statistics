@@ -1,8 +1,8 @@
 #nullable enable
+using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
@@ -218,7 +218,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         var service = SetupReleaseDataFileService(userService: userService.Object);
                         return service.SaveDataSetsFromTemporaryBlobStorage(
                             releaseVersionId: _releaseVersion.Id,
-                            dataSetFiles: new Mock<List<DataSetUploadResultViewModel>>().Object,
+                            dataSetUploadIds: [],
                             cancellationToken: default);
                     }
                 );
@@ -234,24 +234,28 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             IReleaseFileService? releaseFileService = null,
             IDataImportService? dataImportService = null,
             IDataSetFileStorage? dataSetFileStorage = null,
-            IUserService? userService = null)
+            IUserService? userService = null,
+            IDataSetScreenerClient? dataSetScreenerClient = null,
+            IMapper? mapper = null)
         {
-            contentDbContext ??= new Mock<ContentDbContext>().Object;
-            privateBlobStorageService ??= new Mock<IPrivateBlobStorageService>(MockBehavior.Strict).Object;
-            dataImportService ??= new Mock<IDataImportService>(MockBehavior.Strict).Object;
-            userService ??= new Mock<IUserService>(MockBehavior.Strict).Object;
+            contentDbContext ??= Mock.Of<ContentDbContext>();
+            privateBlobStorageService ??= Mock.Of<IPrivateBlobStorageService>(MockBehavior.Strict);
+            dataImportService ??= Mock.Of<IDataImportService>(MockBehavior.Strict);
+            userService ??= Mock.Of<IUserService>(MockBehavior.Strict);
 
             return new ReleaseDataFileService(
                 contentDbContext,
                 contentPersistenceHelper ?? DefaultPersistenceHelperMock().Object,
                 privateBlobStorageService,
-                dataSetValidator ?? new Mock<IDataSetValidator>(MockBehavior.Strict).Object,
+                dataSetValidator ?? Mock.Of<IDataSetValidator>(MockBehavior.Strict),
                 fileRepository ?? new FileRepository(contentDbContext),
                 releaseFileRepository ?? new ReleaseFileRepository(contentDbContext),
-                releaseFileService ?? new Mock<IReleaseFileService>(MockBehavior.Strict).Object,
+                releaseFileService ?? Mock.Of<IReleaseFileService>(MockBehavior.Strict),
                 dataImportService,
                 userService,
-                dataSetFileStorage ?? new Mock<IDataSetFileStorage>(MockBehavior.Strict).Object
+                dataSetFileStorage ?? Mock.Of<IDataSetFileStorage>(MockBehavior.Strict),
+                dataSetScreenerClient ?? Mock.Of<IDataSetScreenerClient>(MockBehavior.Strict),
+                mapper ?? Mock.Of<IMapper>(MockBehavior.Strict)
             );
         }
 
