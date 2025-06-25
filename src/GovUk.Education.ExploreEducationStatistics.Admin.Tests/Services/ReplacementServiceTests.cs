@@ -3805,7 +3805,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             }
 
             var releaseVersionService = new Mock<IReleaseVersionService>(Strict);
-            releaseVersionService.Setup(service => service.RemoveDataFiles(releaseVersion.Id, originalFile.Id))
+            releaseVersionService.Setup(service => service.RemoveDataFiles(releaseVersion.Id, originalFile.Id, false))
                 .ReturnsAsync(Unit.Instance);
 
             var cacheKey = new DataBlockTableResultCacheKey(dataBlockVersion);
