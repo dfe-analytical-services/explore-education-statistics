@@ -16,13 +16,11 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
-using Microsoft.Extensions.Options;
 using Moq;
 using System;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Tests.Fixtures;
@@ -148,11 +146,6 @@ public class DataSetFileStorageTests
                });
         }
 
-        var featureFlagOptions = Microsoft.Extensions.Options.Options.Create(new FeatureFlagsOptions()
-        {
-            EnableReplacementOfPublicApiDataSets = false
-        });
-
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
             var service = SetupReleaseDataFileService(
@@ -161,7 +154,7 @@ public class DataSetFileStorageTests
                 dataImportService: dataImportService.Object,
                 releaseVersionRepository: releaseVersionRepository.Object,
                 releaseDataFileRepository: releaseDataFileRepository.Object,
-                featureFlags: featureFlagOptions,
+                enableReplacementOfPublicApiDataSets: false,
                 addDefaultUser: false
             );
 
@@ -231,7 +224,8 @@ public class DataSetFileStorageTests
 
         var service = SetupReleaseDataFileService(
             contentDbContext: contentDbContext,
-            privateBlobStorageService: privateBlobStorageService.Object);
+            privateBlobStorageService: privateBlobStorageService.Object,
+            enableReplacementOfPublicApiDataSets: false);
 
         // Act
         var uploadSummaries = await service.UploadDataSetsToTemporaryStorage(
@@ -253,8 +247,11 @@ public class DataSetFileStorageTests
         Assert.Null(uploadSummary.ReplacingFileId);
     }
 
-    [Fact]
-    public async Task MoveDataSetsToPermanentStorage_WithReplacement_ReturnsReleaseFile()
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+
+    public async Task MoveDataSetsToPermanentStorage_WithReplacement_ReturnsReleaseFile(bool apiVersionReplacementEnabled)
     {
         // Arrange
         var dataSetName = "Test Data Set";
@@ -266,6 +263,7 @@ public class DataSetFileStorageTests
         var releaseVersionRepository = new Mock<IReleaseVersionRepository>(Strict);
         var releaseDataFileRepository = new Mock<IReleaseDataFileRepository>(Strict);
         var privateBlobStorageService = new Mock<IPrivateBlobStorageService>(Strict);
+        var dataSetVersionService = new Mock<IDataSetVersionService>(Strict);
 
         var releaseVersion = _fixture
             .DefaultReleaseVersion()
@@ -283,13 +281,26 @@ public class DataSetFileStorageTests
             .WithFilename(dataFileName)
             .WithType(FileType.Data)
             .Generate();
+        
+        var dataSetVersion = _fixture
+            .DefaultDataSetVersion(filters: 1,
+                indicators: 1,
+                locations: 1,
+                timePeriods: 2)
+            .WithDataSet(_fixture.DefaultDataSet())
+            .WithRelease(_fixture.DefaultDataSetVersionRelease()
+                .WithReleaseFileId(originalDataFile.Id))
+            .WithStatus(DataSetVersionStatus.Processing)
+            .Generate();
 
         var originalReleaseFile = _fixture
             .DefaultReleaseFile()
             .WithReleaseVersionId(releaseVersion.Id)
             .WithFile(originalDataFile)
+            .WithPublicApiDataSetId(dataSetVersion.DataSetId)
+            .WithPublicApiDataSetVersion(dataSetVersion.SemVersion())
             .Generate();
-
+        
         var newDataFile = _fixture
             .DefaultFile()
             .WithFilename(dataFileName)
@@ -353,6 +364,27 @@ public class DataSetFileStorageTests
                MetaFile = metaFile,
            });
 
+        if (apiVersionReplacementEnabled)
+        {
+            dataSetVersionService
+                .Setup(srv =>
+                    srv.GetDataSetVersion(dataSetVersion.DataSetId, dataSetVersion.SemVersion(), It.IsAny<CancellationToken>())
+                ).ReturnsAsync(dataSetVersion);
+
+            dataSetVersionService
+                .Setup(srv =>
+                    srv.CreateNextVersion(It.IsAny<Guid>(),  dataSetVersion.DataSetId, dataSetVersion.Id, It.IsAny<CancellationToken>())
+                ).ReturnsAsync(new DataSetVersionSummaryViewModel
+                {
+                    Id = default,
+                    Version = "1.0.1",
+                    Status = DataSetVersionStatus.Processing,
+                    Type = DataSetVersionType.Major,
+                    ReleaseVersion = null,
+                    File = null
+                });
+        }
+        
         var contentDbContextId = Guid.NewGuid().ToString();
 
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -382,7 +414,9 @@ public class DataSetFileStorageTests
                 privateBlobStorageService: privateBlobStorageService.Object,
                 dataImportService: dataImportService.Object,
                 releaseVersionRepository: releaseVersionRepository.Object,
-                releaseDataFileRepository: releaseDataFileRepository.Object
+                releaseDataFileRepository: releaseDataFileRepository.Object,
+                enableReplacementOfPublicApiDataSets: apiVersionReplacementEnabled,
+                dataSetVersionService: dataSetVersionService.Object
             );
 
             // Act
@@ -392,7 +426,7 @@ public class DataSetFileStorageTests
                 cancellationToken: default);
 
             // Assert
-            MockUtils.VerifyAllMocks(privateBlobStorageService, dataImportService, releaseVersionRepository, releaseDataFileRepository);
+            MockUtils.VerifyAllMocks(dataSetVersionService, privateBlobStorageService, dataImportService, releaseVersionRepository, releaseDataFileRepository);
 
             var uploadSummary = Assert.Single(uploadSummaries);
             Assert.Equal(expectedReleaseFile.ReleaseVersionId, uploadSummary.ReleaseVersionId);
@@ -410,7 +444,7 @@ public class DataSetFileStorageTests
         IUserService? userService = null,
         IDataSetVersionService? dataSetVersionService = null,
         IDataSetService? dataSetService = null,
-        IOptions<FeatureFlagsOptions>? featureFlags = null,
+        bool enableReplacementOfPublicApiDataSets = false,
         bool addDefaultUser = true)
     {
         if (addDefaultUser)
@@ -418,7 +452,6 @@ public class DataSetFileStorageTests
             contentDbContext.Users.Add(_user);
             contentDbContext.SaveChanges();
         }
-
         return new DataSetFileStorage(
             contentDbContext,
             privateBlobStorageService ?? Mock.Of<IPrivateBlobStorageService>(Strict),
@@ -428,7 +461,10 @@ public class DataSetFileStorageTests
             userService ?? MockUtils.AlwaysTrueUserService(_user.Id).Object,
             dataSetVersionService ?? Mock.Of<IDataSetVersionService>(Strict),
             dataSetService ?? Mock.Of<IDataSetService>(Strict),
-            featureFlags ?? Mock.Of<IOptions<FeatureFlagsOptions>>(Strict),
+            Microsoft.Extensions.Options.Options.Create(new FeatureFlagsOptions
+            {
+                EnableReplacementOfPublicApiDataSets = enableReplacementOfPublicApiDataSets
+            }),
             Mock.Of<ILogger<DataSetFileStorage>>(Strict));
     }
 
