@@ -97,6 +97,7 @@ public class DataSetFileStorage(
 
         if (featureFlags.Value.EnableReplacementOfPublicApiDataSets
             && dataSet.ReplacingFile is not null
+            && replacedReleaseDataFile is not null
             && releaseFileHasApiDataSet)
         {
             await CreateNextDraftDataSetVersion(dataReleaseFile.Id, replacedReleaseDataFile, cancellationToken);
@@ -251,9 +252,13 @@ public class DataSetFileStorage(
         CancellationToken cancellationToken)
     {
         var existingUpload = await contentDbContext.DataSetUploads.SingleOrDefaultAsync(existingUpload =>
-            (existingUpload.ReleaseVersionId == releaseVersionId && existingUpload.DataSetTitle == dataSetUpload.DataSetTitle) ||
-            (existingUpload.ReleaseVersionId == releaseVersionId && existingUpload.DataFileName == dataSetUpload.DataFileName && existingUpload.MetaFileName == dataSetUpload.MetaFileName),
-            cancellationToken);
+            existingUpload.ReleaseVersionId == releaseVersionId &&
+            (
+                (existingUpload.DataSetTitle == dataSetUpload.DataSetTitle) ||
+                (existingUpload.DataFileName == dataSetUpload.DataFileName && existingUpload.MetaFileName == dataSetUpload.MetaFileName)
+            ),
+            cancellationToken
+        );
 
         if (existingUpload is not null)
         {

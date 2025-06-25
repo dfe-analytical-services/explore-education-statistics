@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services;
 
-public class DataSetScreenerClient(IHttpClientFactory httpClientFactory) : IDataSetScreenerClient
+public class DataSetScreenerClient(HttpClient client) : IDataSetScreenerClient
 {
     private readonly JsonSerializerOptions _jsonSerializerOptions = new()
     {
@@ -25,10 +25,9 @@ public class DataSetScreenerClient(IHttpClientFactory httpClientFactory) : IData
         var json = JsonSerializer.Serialize(dataSetRequest, _jsonSerializerOptions);
         var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-        var client = httpClientFactory.CreateClient("DataSetScreener");
         // TODO (EES-5353): Add cancellation token handling logic to terminate Azure Function processes
         // TODO (EES-5999): Replace hardcoded URL with appsetting
-        var response = await client.PostAsync("http://localhost/api/screen", content, CancellationToken.None);
+        var response = await client.PostAsync(client.BaseAddress, content, CancellationToken.None);
 
         return response.IsSuccessStatusCode
             ? await response.Content.ReadFromJsonAsync<DataSetScreenerResponse>(cancellationToken)

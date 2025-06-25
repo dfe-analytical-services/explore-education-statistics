@@ -398,6 +398,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.Configure<FeatureFlagsOptions>(
                 configuration.GetSection(FeatureFlagsOptions.Section));
             services.Configure<RouteOptions>(options => options.LowercaseUrls = true);
+            services.Configure<DataSetScreenerClientOptions>(
+                configuration.GetRequiredSection(DataSetScreenerClientOptions.Section));
 
             StartupSecurityConfiguration.ConfigureAuthorizationPolicies(services);
 
@@ -507,6 +509,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                     var options = provider.GetRequiredService<IOptions<PublicDataApiOptions>>();
                     httpClient.BaseAddress = new Uri(options.Value.PrivateUrl);
                     httpClient.DefaultRequestHeaders.Add(HeaderNames.UserAgent, SecurityConstants.AdminUserAgent);
+                });
+
+                services.AddHttpClient<IDataSetScreenerClient, DataSetScreenerClient>((provider, httpClient) =>
+                {
+                    var options = provider.GetRequiredService<IOptions<DataSetScreenerClientOptions>>();
+                    httpClient.BaseAddress = new Uri(options.Value.Url);
                 });
 
                 services.AddTransient<IDataSetService, DataSetService>();
