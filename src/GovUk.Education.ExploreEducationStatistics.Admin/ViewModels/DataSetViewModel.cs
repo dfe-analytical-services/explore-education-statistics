@@ -3,9 +3,9 @@ using System.Collections.Generic;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 
-public class DataSetViewModel
+public record DataSetViewModel
 {
-    public List<DataFileInfo> DataFiles { get; set; }
+    public List<DataFileInfo> DataFiles { get; init; }
 
-    public List<DataSetUploadViewModel> DataSetUploads { get; set; }
+    public List<DataSetUploadViewModel> DataSetUploads { get; init; }
 }

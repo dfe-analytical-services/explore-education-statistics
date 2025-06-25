@@ -90,7 +90,6 @@ using Semver;
 using System;
 using System.Collections.Generic;
 using System.Net.Http;
-using System.Text.Json.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
 using Thinktecture;
@@ -199,8 +198,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                 {
                     options.SerializerSettings.Converters.Add(new FilterHierarchiesOptionsConverter());
                     options.SerializerSettings.NullValueHandling = NullValueHandling.Ignore;
-                })
-                .AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
+                });
 
             // Adds Brotli and Gzip compressing
             services.AddResponseCompression(options => { options.EnableForHttps = true; });
