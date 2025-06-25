@@ -33,34 +33,33 @@ export default function ScreenerResultsTable({
   );
 
   return (
-    <table data-testId="screener-result-table">
+    <table data-testid="screener-result-table">
       <tbody>
         {testResults.map(testResult => (
           <tr data-testid="screener-result-table-row" key={testResult.id}>
             <td>
               <div style={{ display: 'flex', alignItems: 'center' }}>
-                {warningAcknowledgements &&
-                  Object.keys(warningAcknowledgements).length > 0 &&
-                  !hasFailures &&
-                  onAcknowledgeWarning && (
-                    <FormCheckbox
-                      id={testResult.id}
-                      label=""
-                      name=""
-                      checked={warningAcknowledgements[testResult.id]}
-                      onChange={event =>
-                        onAcknowledgeWarning(
-                          testResult.testFunctionName,
-                          event.target.checked,
-                        )
-                      }
-                    />
-                  )}
-                <span>
-                  <strong>{testResult.testFunctionName}</strong>
-                  <br />
-                  {testResult.notes}
-                </span>
+                {!hasFailures &&
+                onAcknowledgeWarning &&
+                testResult.result === 'WARNING' ? (
+                  <FormCheckbox
+                    id={testResult.id}
+                    name={testResult.id}
+                    label={testResult.testFunctionName}
+                    hint={testResult.notes}
+                    boldLabel
+                    checked={warningAcknowledgements?.[testResult.id]}
+                    onChange={event =>
+                      onAcknowledgeWarning(testResult.id, event.target.checked)
+                    }
+                  />
+                ) : (
+                  <span>
+                    <strong>{testResult.testFunctionName}</strong>
+                    <br />
+                    {testResult.notes}
+                  </span>
+                )}
               </div>
             </td>
             <td style={{ verticalAlign: 'middle' }}>

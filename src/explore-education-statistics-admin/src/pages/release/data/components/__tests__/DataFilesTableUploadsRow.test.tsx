@@ -135,10 +135,14 @@ describe('DataFilesTableUploadsRow', () => {
   describe('"passed" screener file', () => {
     test('check UI', async () => {
       const { user } = render(
-        <DataFilesTableUploadRow
-          {...rowBaseProps}
-          dataSetUpload={fileUploads.pass}
-        />,
+        <table>
+          <tbody>
+            <DataFilesTableUploadRow
+              {...rowBaseProps}
+              dataSetUpload={fileUploads.pass}
+            />
+          </tbody>
+        </table>,
       );
 
       const cells = screen.getAllByRole('cell');
@@ -186,15 +190,6 @@ describe('DataFilesTableUploadsRow', () => {
       expect(fileDetailsTab).toBeInTheDocument();
       expect(fileDetailsTabPanel).toBeInTheDocument();
 
-      // const failuresAndWarningsTab = screen.getByRole('tab', {
-      //   name: 'Failures',
-      // });
-      // const failuresAndWarningsPanel = screen.getByTestId(
-      //   'screener-results-filtered',
-      // );
-      // expect(failuresAndWarningsTab).not.toBeInTheDocument();
-      // expect(failuresAndWarningsPanel).not.toBeInTheDocument();
-
       user.click(allTestsTab);
       expect(within(allTestsTabPanel).getAllByText('Pass').length).toEqual(3);
       user.click(fileDetailsTab);
@@ -212,10 +207,14 @@ describe('DataFilesTableUploadsRow', () => {
   describe('"passed with warnings" screener file', () => {
     test('check UI', async () => {
       const { user } = render(
-        <DataFilesTableUploadRow
-          {...rowBaseProps}
-          dataSetUpload={fileUploads.passAndWarning}
-        />,
+        <table>
+          <tbody>
+            <DataFilesTableUploadRow
+              {...rowBaseProps}
+              dataSetUpload={fileUploads.passAndWarning}
+            />
+          </tbody>
+        </table>,
       );
 
       const cells = screen.getAllByRole('cell');
@@ -311,10 +310,14 @@ describe('DataFilesTableUploadsRow', () => {
   describe('"failed" screener file', () => {
     test('check UI', async () => {
       const { user } = render(
-        <DataFilesTableUploadRow
-          {...rowBaseProps}
-          dataSetUpload={fileUploads.fail}
-        />,
+        <table>
+          <tbody>
+            <DataFilesTableUploadRow
+              {...rowBaseProps}
+              dataSetUpload={fileUploads.fail}
+            />
+          </tbody>
+        </table>,
       );
 
       const cells = screen.getAllByRole('cell');
