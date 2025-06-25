@@ -4,18 +4,18 @@ using System.Text.Json.Serialization;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Model;
 
-public class DataSetScreenerResponse
+public record DataSetScreenerResponse
 {
     // TODO (EES-5353): Discuss if this can just be a boolean (e.g. "Passed", "IsSuccessful")
     [JsonPropertyName("overall_stage")]
     [JsonConverter(typeof(JsonStringEnumConverter))]
-    public ScreenerResult OverallResult { get; set; }
+    public ScreenerResult OverallResult { get; init; }
 
     [JsonPropertyName("overall_message")]
-    public required string Message { get; set; }
+    public required string Message { get; init; }
 
     [JsonPropertyName("results_table")]
-    public List<DataScreenerTestResult> TestResults { get; set; } = [];
+    public List<DataScreenerTestResult> TestResults { get; init; } = [];
 }
 
 public enum ScreenerResult
