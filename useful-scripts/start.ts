@@ -565,7 +565,6 @@ function cloneRequiredRepository(
     });
     if (clone.status !== 0) {
       console.error(`Failed to clone repository '${repositoryName}'`);
-      process.exit(clone.status || 1);
     }
   } else {
     console.log(
@@ -576,7 +575,6 @@ function cloneRequiredRepository(
     });
     if (pull.status !== 0) {
       console.error(`Failed to pull repository '${repositoryName}'`);
-      process.exit(pull.status || 1);
     }
   }
 }
