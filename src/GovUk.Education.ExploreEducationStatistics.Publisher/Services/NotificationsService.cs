@@ -42,7 +42,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 .ReleaseVersions
                 .Include(rv => rv.Release)
                 .ThenInclude(r => r.Publication)
-                .Where(rv => releaseVersionIds.Contains(rv.Id) && rv.NotifySubscribers)
+                .Where(rv => releaseVersionIds.Contains(rv.Id))
                 .ToListAsync();
 
             var feedbackEntriesAndEmails = await releasesVersions
@@ -51,8 +51,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 {
                     var publicationRoles = await context
                         .UserPublicationRoles
+                        .IgnoreQueryFilters()
                         .Include(upr => upr.User)
-                        .Where(upr => upr.PublicationId == releaseVersion.Release.PublicationId)
+                        .Where(upr =>
+                            upr.PublicationId == releaseVersion.Release.PublicationId
+                            && upr.Deleted == null
+                            && upr.Role != PublicationRole.Approver)
                         .ToListAsync();
 
                     return publicationRoles
