@@ -4,6 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Model;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Options;
@@ -50,6 +51,7 @@ public class ReleasePublishingFeedbackFunction(
                     {
                         { "publication_name", release.Publication.Title },
                         { "release_name", release.Title },
+                        { "role_description", GetRoleDescription(feedback.UserPublicationRole) },
                         { "feedback_url", $"{_appOptions.PublicAppUrl}/release-publishing-feedback?token={feedback.EmailToken}" }
                     };
 
@@ -65,5 +67,22 @@ public class ReleasePublishingFeedbackFunction(
         {
             logger.LogError(ex, "Exception occured while executing '{FunctionName}'", nameof(SendReleasePublishingFeedbackEmail));
         }
+    }
+
+    private static string GetRoleDescription(PublicationRole role)
+    {
+        return role switch
+        {
+            PublicationRole.Owner => "an owner",
+            PublicationRole.Allower => "an approver",
+            PublicationRole.Drafter => "a drafter",
+            // Note that this function should never be invoked for PublicationRole.Approver
+            // because Publisher is explicitly filtering these out until the permissions
+            // simplification work has been completed.
+            PublicationRole.Approver => throw new ArgumentException(
+                $"{nameof(ReleasePublishingFeedbackFunction)} should not " +
+                $"have been called for {nameof(PublicationRole.Approver)}"),
+            _ => throw new ArgumentOutOfRangeException(nameof(role), role, null)
+        };
     }
 }
