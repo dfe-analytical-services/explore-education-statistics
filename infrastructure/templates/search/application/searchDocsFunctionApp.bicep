@@ -68,16 +68,16 @@ resource keyVault 'Microsoft.KeyVault/vaults@2023-07-01' existing = {
   name: resourceNames.existingResources.keyVault
 }
 
-resource vNet 'Microsoft.Network/virtualNetworks@2023-11-01' existing = {
+resource vNet 'Microsoft.Network/virtualNetworks@2024-07-01' existing = {
   name: resourceNames.existingResources.vNet
 }
 
-resource outboundVnetSubnet 'Microsoft.Network/virtualNetworks/subnets@2023-11-01' existing = {
+resource outboundVnetSubnet 'Microsoft.Network/virtualNetworks/subnets@2024-07-01' existing = {
   name: resourceNames.existingResources.subnets.searchDocsFunction
   parent: vNet
 }
 
-resource searchDocsFunctionPrivateEndpointSubnet 'Microsoft.Network/virtualNetworks/subnets@2023-11-01' existing = {
+resource searchDocsFunctionPrivateEndpointSubnet 'Microsoft.Network/virtualNetworks/subnets@2024-07-01' existing = {
   name: resourceNames.existingResources.subnets.searchDocsFunctionPrivateEndpoints
   parent: vNet
 }

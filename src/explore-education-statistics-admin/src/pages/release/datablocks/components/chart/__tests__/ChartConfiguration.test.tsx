@@ -18,6 +18,7 @@ describe('ChartConfiguration', () => {
     canIncludeNonNumericData: true,
     canPositionLegendInline: true,
     canSetBarThickness: false,
+    canSetDataLabelColour: true,
     canSetDataLabelPosition: true,
     canShowDataLabels: true,
     canShowAllMajorAxisTicks: false,
@@ -36,6 +37,7 @@ describe('ChartConfiguration', () => {
     canIncludeNonNumericData: true,
     canPositionLegendInline: true,
     canSetBarThickness: true,
+    canSetDataLabelColour: false,
     canSetDataLabelPosition: true,
     canShowDataLabels: true,
     canShowAllMajorAxisTicks: false,
@@ -306,6 +308,7 @@ describe('ChartConfiguration', () => {
       expect(handleSubmit).toHaveBeenCalledWith({
         alt: 'This is the alt text',
         boundaryLevel: undefined,
+        dataLabelColour: 'black',
         dataLabelPosition: 'above',
         height: 300,
         includeNonNumericData: false,
@@ -337,6 +340,7 @@ describe('ChartConfiguration', () => {
       expect(handleChange).toHaveBeenCalledWith({
         alt: 'This is the alt text',
         boundaryLevel: undefined,
+        dataLabelColour: 'black',
         dataLabelPosition: 'above',
         height: 300,
         includeNonNumericData: false,
@@ -400,6 +404,7 @@ describe('ChartConfiguration', () => {
       expect(handleSubmit).toHaveBeenCalledWith({
         alt: 'This is the alt text',
         boundaryLevel: undefined,
+        dataLabelColour: 'black',
         dataLabelPosition: 'above',
         height: 300,
         includeNonNumericData: false,
@@ -431,6 +436,10 @@ describe('ChartConfiguration', () => {
       'below',
     ]);
 
+    await user.selectOptions(screen.getByLabelText('Data label colour'), [
+      'inherit',
+    ]);
+
     await user.click(
       screen.getByRole('button', { name: 'Save chart options' }),
     );
@@ -439,6 +448,7 @@ describe('ChartConfiguration', () => {
       expect(handleSubmit).toHaveBeenCalledWith({
         alt: 'This is the alt text',
         boundaryLevel: undefined,
+        dataLabelColour: 'inherit',
         dataLabelPosition: 'below',
         height: 300,
         includeNonNumericData: false,

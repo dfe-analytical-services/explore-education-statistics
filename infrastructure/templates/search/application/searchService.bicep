@@ -48,11 +48,11 @@ resource keyVault 'Microsoft.KeyVault/vaults@2023-07-01' existing = {
   name: resourceNames.existingResources.keyVault
 }
 
-resource vNet 'Microsoft.Network/virtualNetworks@2023-11-01' existing = {
+resource vNet 'Microsoft.Network/virtualNetworks@2024-07-01' existing = {
   name: resourceNames.existingResources.vNet
 }
 
-resource searchStoragePrivateEndpointSubnet 'Microsoft.Network/virtualNetworks/subnets@2023-11-01' existing = {
+resource searchStoragePrivateEndpointSubnet 'Microsoft.Network/virtualNetworks/subnets@2024-07-01' existing = {
   name: resourceNames.existingResources.subnets.searchStoragePrivateEndpoints
   parent: vNet
 }
@@ -90,7 +90,7 @@ module searchStorageAccountModule '../../public-api/components/storageAccount.bi
     keyVaultName: keyVault.name
     alerts: {
       availability: true
-      latency: true
+      latency: false
       alertsGroupName: resourceNames.existingResources.alertsGroup
     }
     privateEndpointSubnetIds: {

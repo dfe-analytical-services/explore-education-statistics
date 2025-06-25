@@ -18,6 +18,8 @@ const PublicationSummary = ({ publication }: Props) => {
     slug,
     summary,
     highlightContent,
+    highlightSummary,
+    highlightTitle,
     theme,
     title,
     type,
@@ -27,17 +29,35 @@ const PublicationSummary = ({ publication }: Props) => {
     <li className={`${styles.container} govuk-!-margin-top-4`}>
       <h3 className="govuk-!-margin-bottom-2">
         <Link to={`/find-statistics/${slug}/${latestReleaseSlug}`}>
-          {title}
+          {highlightTitle ? (
+            <ContentHtml
+              html={highlightTitle}
+              sanitizeOptions={{ allowedTags: ['em'] }}
+              wrapperElement="span"
+            />
+          ) : (
+            title
+          )}
         </Link>
       </h3>
-      <p>{summary}</p>
+
+      {highlightSummary ? (
+        <ContentHtml
+          html={highlightSummary}
+          sanitizeOptions={{ allowedTags: ['em'] }}
+          wrapperElement="p"
+        />
+      ) : (
+        <p>{summary}</p>
+      )}
 
       {highlightContent && (
         <ContentHtml
-          html={`<p>${highlightContent}</p>`}
+          html={highlightContent}
           sanitizeOptions={{ allowedTags: ['em'] }}
           className={styles.highlightContent}
           testId="search-highlight"
+          wrapperElement="p"
         />
       )}
 

@@ -3,13 +3,13 @@ using GovUk.Education.ExploreEducationStatistics.Common;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Requests;
 
-public record FeedbackCreateRequest
+public record PageFeedbackCreateRequest
 {
     public string Url { get; set; } = string.Empty;
 
     public string? UserAgent { get; set; }
 
-    public FeedbackResponse Response { get; set; }
+    public PageFeedbackResponse Response { get; set; }
 
     public string? Context { get; set; }
 
@@ -17,7 +17,7 @@ public record FeedbackCreateRequest
 
     public string? Intent { get; set; }
 
-    public class Validator : AbstractValidator<FeedbackCreateRequest>
+    public class Validator : AbstractValidator<PageFeedbackCreateRequest>
     {
         public Validator()
         {

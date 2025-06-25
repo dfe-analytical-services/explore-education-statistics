@@ -13,6 +13,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Chart;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
+using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
 using GovUk.Education.ExploreEducationStatistics.Common.Options;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
@@ -406,7 +407,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             var existingFilterItemIds = dataBlock
                 .Query
-                .Filters;
+                .GetFilterItemIds();
 
             var existingFilterNames = statisticsDbContext
                 .FilterItem
@@ -436,7 +437,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 )
                 .ToDictionary(f => f.Id);
 
-            return new FilterReplacementViewModel(filter.Id, filter.Label, filter.Name,
+            return new FilterReplacementViewModel(
+                filter.Id,
+                target: null,  // null because this a new filter, therefore not replacing any existing filter
+                filter.Label,
+                filter.Name,
                 filterGroupReplacementViewModels);
         }
 
@@ -446,7 +451,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             return statisticsDbContext.FilterItem
                 .AsQueryable()
-                .Where(filterItem => dataBlock.Query.Filters.Contains(filterItem.Id))
+                .Where(filterItem => dataBlock.Query.GetFilterItemIds().Contains(filterItem.Id))
                 .Include(filterItem => filterItem.FilterGroup)
                 .ThenInclude(filterGroup => filterGroup.Filter)
                 .ToList()
@@ -458,6 +463,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     {
                         return new FilterReplacementViewModel(
                             id: filter.Key.Id,
+                            target: FindReplacementFilter(replacementSubjectMeta, filter.Key.Name)?.Id,
                             name: filter.Key.Name,
                             label: filter.Key.Label,
                             groups: filter
@@ -678,14 +684,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             contentDbContext.Update(dataBlock);
 
             dataBlock.Query.SubjectId = replacementSubjectId;
-            ReplaceDataBlockQueryFilters(replacementPlan, dataBlock);
-            ReplaceDataBlockQueryIndicators(replacementPlan, dataBlock);
-            ReplaceDataBlockQueryLocations(replacementPlan, dataBlock);
 
             var filterItemTargets = replacementPlan.Filters
                 .SelectMany(filter =>
                     filter.Value.Groups.SelectMany(group => group.Value.Filters))
                 .ToDictionary(ReplacementPlanOriginalId, ReplacementPlanTargetId);
+
+            ReplaceDataBlockQueryFilters(filterItemTargets, dataBlock);
+
+            var filterTargets = replacementPlan.Filters
+                .Where(plan => plan.Value.Target != null)
+                .ToDictionary(plan => plan.Value.Id, plan => plan.Value.Target!.Value);
+
+            ReplaceDataBlockQueryFilterHierarchiesOptions(filterTargets, filterItemTargets, dataBlock);
+            ReplaceDataBlockQueryIndicators(replacementPlan, dataBlock);
+            ReplaceDataBlockQueryLocations(replacementPlan, dataBlock);
+
             var indicatorTargets = replacementPlan.IndicatorGroups
                 .SelectMany(group => group.Value.Indicators)
                 .ToDictionary(ReplacementPlanOriginalId, ReplacementPlanTargetId);
@@ -706,22 +720,49 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 dataBlock);
         }
 
-        private static void ReplaceDataBlockQueryFilters(DataBlockReplacementPlanViewModel replacementPlan,
+        private static void ReplaceDataBlockQueryFilters(
+            Dictionary<Guid, Guid> filterItemTargets,
             DataBlock dataBlock)
         {
-            var filterItems = dataBlock.Query.Filters.ToList();
+            var originalFilterItemIds = dataBlock.Query.GetNonHierarchicalFilterItemIds();
+            dataBlock.Query.Filters = originalFilterItemIds
+                .Select(originalFilterItemId => filterItemTargets[originalFilterItemId])
+                .ToList();
+        }
 
-            replacementPlan.Filters
-                .SelectMany(filter =>
-                    filter.Value.Groups.SelectMany(group => group.Value.Filters))
-                .ToList()
-                .ForEach(plan =>
+        private static void ReplaceDataBlockQueryFilterHierarchiesOptions(
+            Dictionary<Guid, Guid> filterTargets,
+            Dictionary<Guid, Guid> filterItemTargets,
+            DataBlock dataBlock)
+        {
+            var originalFilterHierarchiesOptions = dataBlock.Query.FilterHierarchiesOptions;
+            if (originalFilterHierarchiesOptions is null || originalFilterHierarchiesOptions.Count == 0)
+            {
+                dataBlock.Query.FilterHierarchiesOptions = null;
+                return;
+            }
+
+            var newFilterHierarchiesOptions = new List<FilterHierarchyOptions>();
+
+            foreach (var originalHierarchyOptions in originalFilterHierarchiesOptions) // for each filter hierarchy
+            {
+                var originalOptions = originalHierarchyOptions.Options;
+                var newOptions = originalOptions
+                        .Select(originalOption =>
+                            originalOption // a filter hierarchy option is a list of filterItemIds, one per filter/tier
+                                .Select(originalFilterItemId => filterItemTargets[originalFilterItemId])
+                                .ToList())
+                        .ToList();
+
+                var replacementFilterId = filterTargets[originalHierarchyOptions.LeafFilterId];
+                newFilterHierarchiesOptions.Add(new FilterHierarchyOptions
                 {
-                    filterItems.Remove(plan.Id);
-                    filterItems.Add(plan.TargetValue);
+                    LeafFilterId = replacementFilterId,
+                    Options = newOptions,
                 });
+            }
 
-            dataBlock.Query.Filters = filterItems;
+            dataBlock.Query.FilterHierarchiesOptions = newFilterHierarchiesOptions;
         }
 
         private static void ReplaceDataBlockQueryIndicators(DataBlockReplacementPlanViewModel replacementPlan,

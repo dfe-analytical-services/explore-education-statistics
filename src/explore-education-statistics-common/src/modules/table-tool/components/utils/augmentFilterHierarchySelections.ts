@@ -2,10 +2,6 @@ import { SubjectMeta } from '@common/services/tableBuilderService';
 import { Dictionary } from '@common/types';
 import mapValues from 'lodash/mapValues';
 import { FiltersFormValues } from '../FiltersForm';
-import {
-  getOptionChildTotalsRecursively,
-  getOptionParentsRecursively,
-} from './filterHierarchiesShim';
 import { OptionLabelsMap } from './getFilterHierarchyLabelsMap';
 
 /**
@@ -60,4 +56,41 @@ export default function augmentFilterHierarchySelections(
   );
 
   return augmentedFilterHierarchySelections;
+}
+
+export function getOptionParentsRecursively(
+  optionIds: string[],
+  optionParentRelationsMap: Dictionary<string>,
+): string[] {
+  const optionId = optionIds[0] ?? '';
+  const parentOptionId = optionParentRelationsMap[optionId];
+
+  if (!parentOptionId) {
+    return optionIds;
+  }
+  return getOptionParentsRecursively(
+    [parentOptionId, ...optionIds],
+    optionParentRelationsMap,
+  );
+}
+
+export function getOptionChildTotalsRecursively(
+  optionIds: string[],
+  optionChildrenRelationsMap: Dictionary<string[]>,
+  optionLabelsMap: OptionLabelsMap,
+) {
+  const parentOptionId = optionIds.at(-1) ?? '';
+
+  const childTotalId = optionChildrenRelationsMap[parentOptionId]?.find(
+    childOptionId =>
+      optionLabelsMap[childOptionId]?.toLocaleLowerCase() === 'total',
+  );
+  if (!childTotalId) {
+    return optionIds;
+  }
+  return getOptionChildTotalsRecursively(
+    [...optionIds, childTotalId],
+    optionChildrenRelationsMap,
+    optionLabelsMap,
+  );
 }

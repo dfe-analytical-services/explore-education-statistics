@@ -464,6 +464,7 @@ describe('ChartBuilder', () => {
               timePeriod: '2014_AY',
             },
             inlinePosition: undefined,
+            labelColour: undefined,
             label:
               'Number of authorised absence sessions (Ethnicity Major Chinese, State-funded primary, 2014/15)',
             lineStyle: undefined,
@@ -477,6 +478,7 @@ describe('ChartBuilder', () => {
               timePeriod: '2015_AY',
             },
             inlinePosition: undefined,
+            labelColour: undefined,
             label:
               'Number of authorised absence sessions (Ethnicity Major Chinese, State-funded primary, 2015/16)',
             lineStyle: undefined,

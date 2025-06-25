@@ -63,7 +63,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     .GetMatchingObservationsQuery(
                         context,
                         fullTableQuery.SubjectId,
-                        ItIs.ListSequenceEqualTo(fullTableQuery.Filters),
+                        ItIs.ListSequenceEqualTo(fullTableQuery.GetFilterItemIds()),
                         ItIs.ListSequenceEqualTo(fullTableQuery.LocationIds),
                         fullTableQuery.TimePeriod,
                         cancellationToken))
@@ -108,8 +108,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     .GetMatchingObservationsQuery(
                         context, 
                         subjectId,
-                        null,
-                        null,
+                        [],
+                        [],
                         null,
                         cancellationToken);
 
@@ -150,8 +150,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     .GetMatchingObservationsQuery(
                         context, 
                         subjectId,
-                        null,
-                        null,
+                        [],
+                        [],
                         new TimePeriodQuery
                         {
                             StartCode = TimeIdentifier.AcademicYear,
@@ -220,7 +220,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     .GetMatchingObservationsQuery(
                         context, 
                         subjectId,
-                        null,
+                        [],
                         locationIds,
                         null,
                         cancellationToken);
@@ -257,7 +257,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 SubjectId = subjectId,
                 FilterGroups = CreateFilterGroups(10)
             };
-            
+
             var filter3 = new Filter
             {
                 Id = Guid.NewGuid(),
@@ -395,7 +395,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                             context, 
                             subjectId,
                             selectFilterItemIds,
-                            null,
+                            [],
                             null,
                             cancellationToken);
                 

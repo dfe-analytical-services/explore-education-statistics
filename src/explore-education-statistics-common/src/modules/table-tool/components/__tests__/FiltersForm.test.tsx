@@ -509,6 +509,7 @@ describe('FiltersForm', () => {
         stepTitle="Choose your filters"
         initialValues={{
           filters: ['state-funded-secondary', 'ethnicity-major-asian-total'],
+          filterHierarchies: {},
           indicators: ['unauthorised-absence-rate'],
         }}
         subject={testSubject}
@@ -529,6 +530,7 @@ describe('FiltersForm', () => {
         stepTitle="Choose your filters"
         initialValues={{
           filters: ['state-funded-secondary', 'ethnicity-major-asian-total'],
+          filterHierarchies: {},
           indicators: ['unauthorised-absence-rate'],
         }}
         subject={testSubject}
@@ -1315,7 +1317,6 @@ describe('FiltersForm', () => {
           subject={testSubject}
           subjectMeta={subjectMetaWithFilterHierarchy}
           onSubmit={noop}
-          showFilterHierarchies
         />,
       );
 
@@ -1377,7 +1378,7 @@ describe('FiltersForm', () => {
       });
       expect(entryLevelOption).toBeInTheDocument();
       const entryLevelOptionContainer = within(optionsContainer).getByTestId(
-        `filter-hierarchy-options-option-ae8fc558`,
+        `filter-hierarchy-options-option-ae8fc558,option-dcbf7d26,option-9f53e999`,
       );
       expect(entryLevelOptionContainer).toBeInTheDocument();
       const entryLevelOptionsMenu = within(entryLevelOptionContainer).getByText(
@@ -1405,7 +1406,7 @@ describe('FiltersForm', () => {
       );
       expect(engineeringOption).toBeInTheDocument();
       const engineeringOptionContainer = within(optionsContainer).getByTestId(
-        `filter-hierarchy-options-option-5687872a`,
+        `filter-hierarchy-options-option-ae8fc558,option-5687872a,option-9f53e999`,
       );
       expect(engineeringOptionContainer).toBeInTheDocument();
       const engineeringOptionsMenu = within(
@@ -1428,6 +1429,7 @@ describe('FiltersForm', () => {
         }),
       ).toBeInTheDocument();
     });
+
     test('filter hierarchies form submit with correct values ', async () => {
       const onSubmit = jest.fn();
       render(
@@ -1437,7 +1439,6 @@ describe('FiltersForm', () => {
           subject={testSubject}
           subjectMeta={subjectMetaWithFilterHierarchy}
           onSubmit={onSubmit}
-          showFilterHierarchies
         />,
       );
 
@@ -1455,7 +1456,7 @@ describe('FiltersForm', () => {
       });
       expect(entryLevelOption).toBeInTheDocument();
       const entryLevelOptionContainer = within(optionsContainer).getByTestId(
-        `filter-hierarchy-options-option-ae8fc558`,
+        `filter-hierarchy-options-option-ae8fc558,option-dcbf7d26,option-9f53e999`,
       );
 
       const entryLevelOptionsMenu = within(entryLevelOptionContainer).getByText(
@@ -1470,7 +1471,7 @@ describe('FiltersForm', () => {
         },
       );
       const engineeringOptionContainer = within(optionsContainer).getByTestId(
-        `filter-hierarchy-options-option-5687872a`,
+        `filter-hierarchy-options-option-ae8fc558,option-5687872a,option-9f53e999`,
       );
       const engineeringOptionsMenu = within(
         engineeringOptionContainer,
@@ -1498,9 +1499,9 @@ describe('FiltersForm', () => {
       expect(onSubmit).toHaveBeenCalledWith({
         filterHierarchies: {
           'filter-5709a7b4': [
-            entryLevelOption.getAttribute('value'), // 'option-ae8fc558',
-            engineeringOption.getAttribute('value'), // 'option-5687872a',
-            civilEngineering.getAttribute('value'), // 'option-99087931',
+            entryLevelOption.getAttribute('value'),
+            engineeringOption.getAttribute('value'),
+            civilEngineering.getAttribute('value'),
           ],
         },
         filters: {},
@@ -1515,7 +1516,6 @@ describe('FiltersForm', () => {
           subject={testSubject}
           subjectMeta={subjectMetaWithFilterHierarchy}
           onSubmit={jest.fn}
-          showFilterHierarchies
         />,
       );
       // attempt to submit no filter hierarchy selectiosn
@@ -1545,7 +1545,6 @@ describe('FiltersForm', () => {
           subject={testSubject}
           subjectMeta={subjectMetaWithFilterHierarchy}
           onSubmit={noop}
-          showFilterHierarchies
         />,
       );
 
@@ -1598,7 +1597,7 @@ describe('FiltersForm', () => {
 
       // see options contain search term or children with search term
       const entryLevelOptionContainer = within(optionsContainer).getByTestId(
-        `filter-hierarchy-options-option-ae8fc558`,
+        `filter-hierarchy-options-option-ae8fc558,option-dcbf7d26,option-9f53e999`,
       );
       expect(entryLevelOptionContainer).toContainElement(engineeringOption);
       expect(entryLevelOptionContainer).toContainElement(civilOption);
@@ -1630,7 +1629,6 @@ describe('FiltersForm', () => {
           subject={testSubject}
           subjectMeta={subjectMetaWithFilterHierarchy}
           onSubmit={noop}
-          showFilterHierarchies
         />,
       );
 

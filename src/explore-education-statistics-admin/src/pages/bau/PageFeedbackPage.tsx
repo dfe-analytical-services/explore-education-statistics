@@ -3,21 +3,23 @@ import LoadingSpinner from '@common/components/LoadingSpinner';
 import React from 'react';
 import FormattedDate from '@common/components/FormattedDate';
 import { useQuery } from '@tanstack/react-query';
-import feedbackQueries from '@admin/queries/feedbackQueries';
-import feedbackService from '@admin/services/feedbackService';
+import pageFeedbackQueries from '@admin/queries/pageFeedbackQueries';
+import pageFeedbackService from '@admin/services/pageFeedbackService';
 import ButtonText from '@common/components/ButtonText';
 import InsetText from '@common/components/InsetText';
 import ButtonLink from '@admin/components/ButtonLink';
 import useQueryParams from '@admin/hooks/useQueryParams';
-import { FeedbackViewModel } from '@common/services/types/feedback';
+import { PageFeedbackViewModel } from '@common/services/types/pageFeedback';
 import truncateAround from '@common/utils/string/truncateAround';
-import FeedbackDetailsModal from '../admin-dashboard/components/FeedbackDetailsModal';
+import PageFeedbackDetailsModal from '../admin-dashboard/components/PageFeedbackDetailsModal';
 
 type Params = {
   showRead?: string;
 };
 
-export const getResponseText = (response: FeedbackViewModel['response']) => {
+export const getResponseText = (
+  response: PageFeedbackViewModel['response'],
+) => {
   switch (response) {
     case 'Useful':
       return 'Useful';
@@ -30,17 +32,17 @@ export const getResponseText = (response: FeedbackViewModel['response']) => {
   }
 };
 
-const FeedbackPage = () => {
+const PageFeedbackPage = () => {
   const { showRead } = useQueryParams<Params>();
 
   const {
     data: feedbackItems = [],
     isLoading: isLoadingFeedback,
     refetch: reloadFeedbackItems,
-  } = useQuery(feedbackQueries.getFeedback(showRead ?? ''));
+  } = useQuery(pageFeedbackQueries.getFeedback(showRead ?? ''));
 
   const toggleReadStatus = async (id: string) => {
-    await feedbackService.toggleReadStatus(id);
+    await pageFeedbackService.toggleReadStatus(id);
     reloadFeedbackItems();
   };
 
@@ -118,7 +120,7 @@ const FeedbackPage = () => {
                           Mark as {feedback.read ? 'unread' : 'read'}
                         </ButtonText>
                         <br />
-                        <FeedbackDetailsModal feedback={feedback} />
+                        <PageFeedbackDetailsModal feedback={feedback} />
                       </td>
                     </tr>
                   );
@@ -131,4 +133,4 @@ const FeedbackPage = () => {
   );
 };
 
-export default FeedbackPage;
+export default PageFeedbackPage;

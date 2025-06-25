@@ -48,7 +48,6 @@ const TableToolPage: NextPage<TableToolPageProps> = ({
   themeMeta,
 }) => {
   const router = useRouter();
-  const showFilterHierachies = !!router.query.fh;
   const [loadingFastTrack, setLoadingFastTrack] = useState(false);
   const [currentStep, setCurrentStep] = useState<number | undefined>(undefined);
   const [pageTitle, setPageTitle] = useState<string>(defaultPageTitle);
@@ -161,7 +160,6 @@ const TableToolPage: NextPage<TableToolPageProps> = ({
       </p>
 
       <TableToolWizard
-        showFilterHierachies={showFilterHierachies}
         key={fastTrack?.id}
         scrollOnMount
         themeMeta={themeMeta}
