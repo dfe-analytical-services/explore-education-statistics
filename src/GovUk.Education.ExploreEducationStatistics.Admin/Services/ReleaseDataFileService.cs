@@ -537,22 +537,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             Guid dataSetUploadId,
             CancellationToken cancellationToken)
         {
-            // TODO: Replace both exceptions with proper error response
             var dataSetUpload = await contentDbContext.DataSetUploads.FirstOrDefaultAsync(upload =>
                 dataSetUploadId == upload.Id &&
                 upload.ReleaseVersionId == releaseVersionId,
-                cancellationToken)
-                    ?? throw new Exception("Data set upload not found");
+                cancellationToken);
+
+            if (dataSetUpload is null)
+            {
+                return Common.Validators.ValidationUtils.ValidationResult(ValidationMessages.GenerateErrorDataSetUploadNotFound());
+            }
 
             var dataBlobExists = await privateBlobStorageService.CheckBlobExists(PrivateReleaseTempFiles, dataSetUpload.DataFilePath);
             var metaBlobExists = await privateBlobStorageService.CheckBlobExists(PrivateReleaseTempFiles, dataSetUpload.MetaFilePath);
 
             return !dataBlobExists || !metaBlobExists
-                ? throw new Exception("Unable to locate temporary files at the locations specified")
+                ? Common.Validators.ValidationUtils.ValidationResult(ValidationMessages.GenerateErrorTemporaryFilesNotFound())
                 : dataSetUpload;
         }
 
-        // TODO: This doesn't need to be an async task. Find out expected pattern for use with results pattern
         private static Either<ActionResult, DataSetUpload> ValidateDataSetCanBeImported(DataSetUpload dataSetUpload)
         {
             return dataSetUpload.Status is not DataSetUploadStatus.PENDING_REVIEW and not DataSetUploadStatus.PENDING_IMPORT
