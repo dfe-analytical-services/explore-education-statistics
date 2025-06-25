@@ -349,11 +349,16 @@ async function startDockerServices() {
       args.push('--build', '--force-recreate');
     }
 
-    cloneRequiredRepository(
-      screenerRepositoryName,
-      screenerLocalDir,
-      screenerRepoUrl,
-    );
+    if (
+      servicesToStart.includes('admin') ||
+      servicesToStart.includes('dataScreener')
+    ) {
+      cloneRequiredRepository(
+        screenerRepositoryName,
+        screenerLocalDir,
+        screenerRepoUrl,
+      );
+    }
 
     await $$`docker compose up ${[...args, ...dockerServicesToStart]}`;
 
