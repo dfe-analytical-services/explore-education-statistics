@@ -404,6 +404,34 @@ public static class ValidationMessages
         };
     }
 
+    public static readonly LocalizableMessage DataSetUploadNotFound = new(
+        Code: nameof(DataSetUploadNotFound),
+        Message: "Data set upload not found."
+    );
+
+    public static ErrorViewModel GenerateErrorDataSetUploadNotFound()
+    {
+        return new ErrorViewModel
+        {
+            Code = DataSetUploadNotFound.Code,
+            Message = DataSetUploadNotFound.Message,
+        };
+    }
+
+    public static readonly LocalizableMessage TemporaryFilesNotFound = new(
+        Code: nameof(TemporaryFilesNotFound),
+        Message: "Unable to locate temporary files at the locations specified."
+    );
+
+    public static ErrorViewModel GenerateErrorTemporaryFilesNotFound()
+    {
+        return new ErrorViewModel
+        {
+            Code = TemporaryFilesNotFound.Code,
+            Message = TemporaryFilesNotFound.Message,
+        };
+    }
+
     public static readonly LocalizableMessage PreviewTokenExpired = new(
         Code: nameof(PreviewTokenExpired),
         Message: "The preview token is expired."
