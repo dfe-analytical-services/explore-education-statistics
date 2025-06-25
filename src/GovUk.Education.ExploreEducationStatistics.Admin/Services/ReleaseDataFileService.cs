@@ -384,17 +384,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             List<DataSetUpload> dataSetUploads,
             CancellationToken cancellationToken)
         {
-            var tasks = dataSetUploads.Select(async dataSetUpload =>
-            {
-                var request = _mapper.Map<DataSetScreenerRequest>(dataSetUpload);
-                var result = await dataSetScreenerClient.ScreenDataSet(request, cancellationToken);
+            return await dataSetUploads
+                .ToAsyncEnumerable()
+                .SelectAwait(async dataSetUpload =>
+                {
+                    var request = _mapper.Map<DataSetScreenerRequest>(dataSetUpload);
+                    var result = await dataSetScreenerClient.ScreenDataSet(request, cancellationToken);
 
-                await dataSetFileStorage.AddScreenerResultToUpload(dataSetUpload.Id, result, cancellationToken);
+                    await dataSetFileStorage.AddScreenerResultToUpload(dataSetUpload.Id, result, cancellationToken);
 
-                return _mapper.Map<DataSetUploadViewModel>(dataSetUpload);
-            });
-
-            return [.. await Task.WhenAll(tasks)];
+                    return _mapper.Map<DataSetUploadViewModel>(dataSetUpload);
+                })
+                .ToListAsync(cancellationToken);
         }
 
         private async Task<Either<ActionResult, DataSet>> ValidateDataSetCsvPair(
