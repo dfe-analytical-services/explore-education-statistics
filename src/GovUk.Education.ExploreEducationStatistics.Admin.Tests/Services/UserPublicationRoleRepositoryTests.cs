@@ -87,26 +87,25 @@ public abstract class UserPublicationRoleRepositoryTests
                 Assert.Null(userPublicationRole.EmailSent);
             }
         }
-        
+
         [Fact]
-        public async Task NewPermissionsSystemPublicationRolesToRemoveAndCreateFromOldRole()
+        public async Task OldRole_NoNewPermissionsSystemPublicationRoleChanges()
         {
+            var oldPublicationRoleToCreate = PublicationRole.Owner;
+            var newPublicationRoleToRemain = PublicationRole.Approver;
+
             User user = _fixture.DefaultUser();
             User createdBy = _fixture.DefaultUser();
             Publication publication = _fixture.DefaultPublication();
             UserPublicationRole existingPublicationRole = _fixture.DefaultUserPublicationRole()
                 .WithUser(user)
                 .WithPublication(publication)
-                .WithRole(PublicationRole.Drafter);
-            
-            var publicationRoleToCreate = PublicationRole.Owner;
+                .WithRole(newPublicationRoleToRemain);
 
             var contentDbContextId = Guid.NewGuid().ToString();
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                contentDbContext.Users.AddRange(user, createdBy);
-                contentDbContext.Publications.Add(publication);
                 contentDbContext.UserPublicationRoles.Add(existingPublicationRole);
                 await contentDbContext.SaveChangesAsync();
             }
@@ -114,23 +113,105 @@ public abstract class UserPublicationRoleRepositoryTests
             var newPermissionsSystemHelperMock = new Mock<INewPermissionsSystemHelper>();
             newPermissionsSystemHelperMock
                 .Setup(rvr => rvr.DetermineNewPermissionsSystemChanges(
-                    publicationRoleToCreate,
+                    oldPublicationRoleToCreate,
                     user.Id,
                     publication.Id))
-                .ReturnsAsync((PublicationRole.Drafter, PublicationRole.Approver));
+                .ReturnsAsync((null, null));
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
                 var repository = CreateRepository(contentDbContext, newPermissionsSystemHelperMock.Object);
 
-                var result = await repository.Create(user.Id, publication.Id, publicationRoleToCreate, createdBy.Id);
+                var result = await repository.Create(user.Id, publication.Id, oldPublicationRoleToCreate, createdBy.Id);
 
+                // Should be the OLD `Owner` role which has been created that is returned
                 Assert.NotNull(result);
 
                 Assert.NotEqual(Guid.Empty, result.Id);
                 Assert.Equal(user.Id, result.UserId);
                 Assert.Equal(publication.Id, result.PublicationId);
-                Assert.Equal(publicationRoleToCreate, result.Role);
+                Assert.Equal(oldPublicationRoleToCreate, result.Role);
+                result.Created.AssertUtcNow();
+                Assert.Equal(createdBy.Id, result.CreatedById);
+                Assert.Null(result.EmailSent);
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var userPublicationRoles = await contentDbContext.UserPublicationRoles.ToListAsync();
+
+                // Should be 2 as the 'Approver` role should be untouched,
+                // and the `Owner` role has been created.
+                Assert.Equal(2, userPublicationRoles.Count);
+
+                var createdOldPublicationRole =
+                    Assert.Single(userPublicationRoles, upr => upr.Role == oldPublicationRoleToCreate);
+
+                Assert.NotEqual(Guid.Empty, createdOldPublicationRole.Id);
+                Assert.Equal(user.Id, createdOldPublicationRole.UserId);
+                Assert.Equal(publication.Id, createdOldPublicationRole.PublicationId);
+                Assert.Equal(oldPublicationRoleToCreate, createdOldPublicationRole.Role);
+                createdOldPublicationRole.Created.AssertUtcNow();
+                Assert.Equal(createdBy.Id, createdOldPublicationRole.CreatedById);
+                Assert.Null(createdOldPublicationRole.EmailSent);
+
+                var existingNewPublicationRole =
+                    Assert.Single(userPublicationRoles, upr => upr.Role == newPublicationRoleToRemain);
+
+                Assert.NotEqual(Guid.Empty, existingNewPublicationRole.Id);
+                Assert.Equal(user.Id, existingNewPublicationRole.UserId);
+                Assert.Equal(publication.Id, existingNewPublicationRole.PublicationId);
+                Assert.Equal(newPublicationRoleToRemain, existingNewPublicationRole.Role);
+                existingNewPublicationRole.Created.AssertUtcNow();
+                Assert.Equal(createdBy.Id, existingNewPublicationRole.CreatedById);
+                Assert.Null(existingNewPublicationRole.EmailSent);
+            }
+        }
+
+        [Fact]
+        public async Task TryCreate_OldRole_NewPermissionsSystemPublicationRolesToRemoveAndCreateFromOldRole()
+        {
+            var oldPublicationRoleToCreate = PublicationRole.Allower;
+            var newPublicationRoleToCreate = PublicationRole.Approver;
+            var newPublicationRoleToRemove = PublicationRole.Drafter;
+
+            User user = _fixture.DefaultUser();
+            User createdBy = _fixture.DefaultUser();
+            Publication publication = _fixture.DefaultPublication();
+            UserPublicationRole existingPublicationRole = _fixture.DefaultUserPublicationRole()
+                .WithUser(user)
+                .WithPublication(publication)
+                .WithRole(newPublicationRoleToRemove);
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                contentDbContext.UserPublicationRoles.Add(existingPublicationRole);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            var newPermissionsSystemHelperMock = new Mock<INewPermissionsSystemHelper>();
+            newPermissionsSystemHelperMock
+                .Setup(rvr => rvr.DetermineNewPermissionsSystemChanges(
+                    oldPublicationRoleToCreate,
+                    user.Id,
+                    publication.Id))
+                .ReturnsAsync((newPublicationRoleToRemove, newPublicationRoleToCreate));
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var repository = CreateRepository(contentDbContext, newPermissionsSystemHelperMock.Object);
+
+                var result = await repository.Create(user.Id, publication.Id, oldPublicationRoleToCreate, createdBy.Id);
+
+                // Should be the OLD `Owner` role which has been created that is returned
+                Assert.NotNull(result);
+
+                Assert.NotEqual(Guid.Empty, result.Id);
+                Assert.Equal(user.Id, result.UserId);
+                Assert.Equal(publication.Id, result.PublicationId);
+                Assert.Equal(oldPublicationRoleToCreate, result.Role);
                 result.Created.AssertUtcNow();
                 Assert.Equal(createdBy.Id, result.CreatedById);
                 Assert.Null(result.EmailSent);
@@ -144,21 +225,294 @@ public abstract class UserPublicationRoleRepositoryTests
                 // and the `Owner` role has been created.
                 Assert.Equal(2, userPublicationRoles.Count);
 
-                Assert.NotEqual(Guid.Empty, userPublicationRoles[0].Id);
-                Assert.Equal(user.Id, userPublicationRoles[0].UserId);
-                Assert.Equal(publication.Id, userPublicationRoles[0].PublicationId);
-                Assert.Equal(publicationRoleToCreate, userPublicationRoles[0].Role);
-                userPublicationRoles[0].Created.AssertUtcNow();
-                Assert.Equal(createdBy.Id, userPublicationRoles[0].CreatedById);
-                Assert.Null(userPublicationRoles[0].EmailSent);
+                var createdOldPublicationRole =
+                    Assert.Single(userPublicationRoles, upr => upr.Role == oldPublicationRoleToCreate);
 
-                Assert.NotEqual(Guid.Empty, userPublicationRoles[1].Id);
-                Assert.Equal(user.Id, userPublicationRoles[1].UserId);
-                Assert.Equal(publication.Id, userPublicationRoles[1].PublicationId);
-                Assert.Equal(PublicationRole.Approver, userPublicationRoles[1].Role);
-                userPublicationRoles[1].Created.AssertUtcNow();
-                Assert.Equal(createdBy.Id, userPublicationRoles[1].CreatedById);
-                Assert.Null(userPublicationRoles[1].EmailSent);
+                Assert.NotEqual(Guid.Empty, createdOldPublicationRole.Id);
+                Assert.Equal(user.Id, createdOldPublicationRole.UserId);
+                Assert.Equal(publication.Id, createdOldPublicationRole.PublicationId);
+                Assert.Equal(oldPublicationRoleToCreate, createdOldPublicationRole.Role);
+                createdOldPublicationRole.Created.AssertUtcNow();
+                Assert.Equal(createdBy.Id, createdOldPublicationRole.CreatedById);
+                Assert.Null(createdOldPublicationRole.EmailSent);
+
+                var createdNewPublicationRole =
+                    Assert.Single(userPublicationRoles, upr => upr.Role == newPublicationRoleToCreate);
+
+                Assert.NotEqual(Guid.Empty, createdNewPublicationRole.Id);
+                Assert.Equal(user.Id, createdNewPublicationRole.UserId);
+                Assert.Equal(publication.Id, createdNewPublicationRole.PublicationId);
+                Assert.Equal(newPublicationRoleToCreate, createdNewPublicationRole.Role);
+                createdNewPublicationRole.Created.AssertUtcNow();
+                Assert.Equal(createdBy.Id, createdNewPublicationRole.CreatedById);
+                Assert.Null(createdNewPublicationRole.EmailSent);
+            }
+        }
+
+        [Fact]
+        public async Task TryCreate_OldRole_NewPermissionsSystemPublicationRoleToCreate()
+        {
+            var oldPublicationRoleToCreate = PublicationRole.Owner;
+            var newPublicationRoleToCreate = PublicationRole.Drafter;
+
+            User user = _fixture.DefaultUser();
+            User createdBy = _fixture.DefaultUser();
+            Publication publication = _fixture.DefaultPublication();
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                contentDbContext.Users.AddRange(user, createdBy);
+                contentDbContext.Publications.Add(publication);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            var newPermissionsSystemHelperMock = new Mock<INewPermissionsSystemHelper>();
+            newPermissionsSystemHelperMock
+                .Setup(rvr => rvr.DetermineNewPermissionsSystemChanges(
+                    oldPublicationRoleToCreate,
+                    user.Id,
+                    publication.Id))
+                .ReturnsAsync((null, newPublicationRoleToCreate));
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var repository = CreateRepository(contentDbContext, newPermissionsSystemHelperMock.Object);
+
+                var result = await repository.Create(user.Id, publication.Id, oldPublicationRoleToCreate, createdBy.Id);
+
+                // Should be the OLD `Owner` role which has been created that is returned
+                Assert.NotNull(result);
+
+                Assert.NotEqual(Guid.Empty, result.Id);
+                Assert.Equal(user.Id, result.UserId);
+                Assert.Equal(publication.Id, result.PublicationId);
+                Assert.Equal(oldPublicationRoleToCreate, result.Role);
+                result.Created.AssertUtcNow();
+                Assert.Equal(createdBy.Id, result.CreatedById);
+                Assert.Null(result.EmailSent);
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var userPublicationRoles = await contentDbContext.UserPublicationRoles.ToListAsync();
+
+                // Should be 2 as the 'Drafter` role has been created,
+                // and the `Owner` role has been created.
+                Assert.Equal(2, userPublicationRoles.Count);
+
+                var createdOldPublicationRole =
+                    Assert.Single(userPublicationRoles, upr => upr.Role == oldPublicationRoleToCreate);
+
+                Assert.NotEqual(Guid.Empty, createdOldPublicationRole.Id);
+                Assert.Equal(user.Id, createdOldPublicationRole.UserId);
+                Assert.Equal(publication.Id, createdOldPublicationRole.PublicationId);
+                Assert.Equal(oldPublicationRoleToCreate, createdOldPublicationRole.Role);
+                createdOldPublicationRole.Created.AssertUtcNow();
+                Assert.Equal(createdBy.Id, createdOldPublicationRole.CreatedById);
+                Assert.Null(createdOldPublicationRole.EmailSent);
+
+                var createdNewPublicationRole =
+                    Assert.Single(userPublicationRoles, upr => upr.Role == newPublicationRoleToCreate);
+
+                Assert.NotEqual(Guid.Empty, createdNewPublicationRole.Id);
+                Assert.Equal(user.Id, createdNewPublicationRole.UserId);
+                Assert.Equal(publication.Id, createdNewPublicationRole.PublicationId);
+                Assert.Equal(newPublicationRoleToCreate, createdNewPublicationRole.Role);
+                createdNewPublicationRole.Created.AssertUtcNow();
+                Assert.Equal(createdBy.Id, createdNewPublicationRole.CreatedById);
+                Assert.Null(createdNewPublicationRole.EmailSent);
+            }
+        }
+
+        [Fact]
+        public async Task TryCreate_NewRole_NoNewPermissionsSystemPublicationRoleChanges()
+        {
+            var newPublicationRoleToCreate = PublicationRole.Drafter;
+            var newPublicationRoleToRemain = PublicationRole.Approver;
+
+            User user = _fixture.DefaultUser();
+            User createdBy = _fixture.DefaultUser();
+            Publication publication = _fixture.DefaultPublication();
+            UserPublicationRole existingPublicationRole = _fixture.DefaultUserPublicationRole()
+                .WithUser(user)
+                .WithPublication(publication)
+                .WithRole(newPublicationRoleToRemain);
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                contentDbContext.UserPublicationRoles.Add(existingPublicationRole);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            var newPermissionsSystemHelperMock = new Mock<INewPermissionsSystemHelper>();
+            newPermissionsSystemHelperMock
+                .Setup(rvr => rvr.DetermineNewPermissionsSystemChanges(
+                    newPublicationRoleToCreate,
+                    user.Id,
+                    publication.Id))
+                .ReturnsAsync((null, null));
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var repository = CreateRepository(contentDbContext, newPermissionsSystemHelperMock.Object);
+
+                var result = await repository.Create(user.Id, publication.Id, newPublicationRoleToCreate, createdBy.Id);
+
+                // Should not return anything, as no OLD should be created,
+                // AND no NEW role should be created.
+                Assert.Null(result);
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var userPublicationRoles = await contentDbContext.UserPublicationRoles.ToListAsync();
+
+                // Should only be the 'Approver` role which remains,
+                // and the `Drafter` role should NOT be created (i.e. NO changes).
+                var existingNewPublicationRole = Assert.Single(userPublicationRoles);
+
+                Assert.NotEqual(Guid.Empty, existingNewPublicationRole.Id);
+                Assert.Equal(user.Id, existingNewPublicationRole.UserId);
+                Assert.Equal(publication.Id, existingNewPublicationRole.PublicationId);
+                Assert.Equal(newPublicationRoleToRemain, existingNewPublicationRole.Role);
+                existingNewPublicationRole.Created.AssertUtcNow();
+                Assert.Equal(createdBy.Id, existingNewPublicationRole.CreatedById);
+                Assert.Null(existingNewPublicationRole.EmailSent);
+            }
+        }
+
+        [Fact]
+        public async Task TryCreate_NewRole_NewPermissionsSystemPublicationRolesToRemoveAndCreateFromOldRole()
+        {
+            var newPublicationRoleToCreate = PublicationRole.Approver;
+            var newPublicationRoleToRemove = PublicationRole.Drafter;
+
+            User user = _fixture.DefaultUser();
+            User createdBy = _fixture.DefaultUser();
+            Publication publication = _fixture.DefaultPublication();
+            UserPublicationRole existingPublicationRole = _fixture.DefaultUserPublicationRole()
+                .WithUser(user)
+                .WithPublication(publication)
+                .WithRole(newPublicationRoleToRemove);
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                contentDbContext.UserPublicationRoles.Add(existingPublicationRole);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            var newPermissionsSystemHelperMock = new Mock<INewPermissionsSystemHelper>();
+            newPermissionsSystemHelperMock
+                .Setup(rvr => rvr.DetermineNewPermissionsSystemChanges(
+                    newPublicationRoleToRemove,
+                    user.Id,
+                    publication.Id))
+                .ReturnsAsync((newPublicationRoleToRemove, newPublicationRoleToCreate));
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var repository = CreateRepository(contentDbContext, newPermissionsSystemHelperMock.Object);
+
+                var result = await repository.Create(user.Id, publication.Id, newPublicationRoleToRemove, createdBy.Id);
+
+                Assert.NotNull(result);
+
+                // Should be the NEW `Approver` role which has been created that is returned
+                Assert.NotEqual(Guid.Empty, result.Id);
+                Assert.Equal(user.Id, result.UserId);
+                Assert.Equal(publication.Id, result.PublicationId);
+                Assert.Equal(newPublicationRoleToCreate, result.Role);
+                result.Created.AssertUtcNow();
+                Assert.Equal(createdBy.Id, result.CreatedById);
+                Assert.Null(result.EmailSent);
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var userPublicationRoles = await contentDbContext.UserPublicationRoles.ToListAsync();
+
+                // Should only be the 'Approver` role that exists, as the `Drafter` role should be removed,
+                // and the `Approver` should be created.
+                var createdNewPublicationRole = Assert.Single(userPublicationRoles);
+
+                Assert.NotEqual(Guid.Empty, createdNewPublicationRole.Id);
+                Assert.Equal(user.Id, createdNewPublicationRole.UserId);
+                Assert.Equal(publication.Id, createdNewPublicationRole.PublicationId);
+                Assert.Equal(newPublicationRoleToCreate, createdNewPublicationRole.Role);
+                createdNewPublicationRole.Created.AssertUtcNow();
+                Assert.Equal(createdBy.Id, createdNewPublicationRole.CreatedById);
+                Assert.Null(createdNewPublicationRole.EmailSent);
+            }
+        }
+
+        [Fact]
+        public async Task TryCreate_NewRole_NewPermissionsSystemPublicationRoleToCreate()
+        {
+            var newPublicationRoleToCreate = PublicationRole.Drafter;
+
+            User user = _fixture.DefaultUser();
+            User createdBy = _fixture.DefaultUser();
+            Publication publication = _fixture.DefaultPublication();
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                contentDbContext.Users.AddRange(user, createdBy);
+                contentDbContext.Publications.Add(publication);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            var newPermissionsSystemHelperMock = new Mock<INewPermissionsSystemHelper>();
+            newPermissionsSystemHelperMock
+                .Setup(rvr => rvr.DetermineNewPermissionsSystemChanges(
+                    newPublicationRoleToCreate,
+                    user.Id,
+                    publication.Id))
+                .ReturnsAsync((null, newPublicationRoleToCreate));
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var repository = CreateRepository(contentDbContext, newPermissionsSystemHelperMock.Object);
+
+                var result = await repository.Create(user.Id, publication.Id, newPublicationRoleToCreate, createdBy.Id);
+
+                // Should be the NEW `Drafter` role which has been created that is returned
+                Assert.NotNull(result);
+
+                Assert.NotEqual(Guid.Empty, result.Id);
+                Assert.Equal(user.Id, result.UserId);
+                Assert.Equal(publication.Id, result.PublicationId);
+                Assert.Equal(newPublicationRoleToCreate, result.Role);
+                result.Created.AssertUtcNow();
+                Assert.Equal(createdBy.Id, result.CreatedById);
+                Assert.Null(result.EmailSent);
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var userPublicationRoles = await contentDbContext.UserPublicationRoles.ToListAsync();
+
+                // Should only be the 'Drafter` role which has been created.
+                // No other role should exist.
+                Assert.Single(userPublicationRoles);
+
+                var createdNewPublicationRole =
+                    Assert.Single(userPublicationRoles, upr => upr.Role == newPublicationRoleToCreate);
+
+                Assert.NotEqual(Guid.Empty, createdNewPublicationRole.Id);
+                Assert.Equal(user.Id, createdNewPublicationRole.UserId);
+                Assert.Equal(publication.Id, createdNewPublicationRole.PublicationId);
+                Assert.Equal(newPublicationRoleToCreate, createdNewPublicationRole.Role);
+                createdNewPublicationRole.Created.AssertUtcNow();
+                Assert.Equal(createdBy.Id, createdNewPublicationRole.CreatedById);
+                Assert.Null(createdNewPublicationRole.EmailSent);
             }
         }
     }
