@@ -3,7 +3,7 @@ import releaseDataFileService, {
 } from '@admin/services/releaseDataFileService';
 import ButtonGroup from '@common/components/ButtonGroup';
 import ButtonText from '@common/components/ButtonText';
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
 import WarningMessage from '@common/components/WarningMessage';
@@ -11,6 +11,7 @@ import ModalConfirm from '@common/components/ModalConfirm';
 import useToggle from '@common/hooks/useToggle';
 import logger from '@common/services/logger';
 import Tag from '@common/components/Tag';
+import { Dictionary } from '@common/types';
 import DataSetUploadSummaryList from './DataSetUploadSummaryList';
 import dataSetUploadTabIds from '../utils/dataSetUploadTabIds';
 import ScreenerResultsTable from './ScreenerResultsTable';
@@ -45,17 +46,22 @@ export default function DataFilesTableUploadRow({
     testResult => testResult.result === 'WARNING',
   );
 
-  const warnings = dataSetUpload.screenerResult.testResults.filter(
-    testResult => testResult.result === 'WARNING',
-  );
+  const [warningAcknowledgements, setWarningAcknowledgements] = useState<
+    Dictionary<boolean>
+  >({});
 
-  const [warningAcknowledgements, setWarningAcknowledgements] = useState(
-    Object.fromEntries(
-      warnings.map(warning => {
-        return [warning.testFunctionName, false];
-      }),
-    ),
-  );
+  useEffect(() => {
+    const warnings = dataSetUpload.screenerResult.testResults.filter(
+      testResult => testResult.result === 'WARNING',
+    );
+    setWarningAcknowledgements(acknowledgements =>
+      Object.fromEntries(
+        warnings.map(warning => {
+          return [warning.id, acknowledgements?.[warning.id] ?? false];
+        }),
+      ),
+    );
+  }, [dataSetUpload]);
 
   const acknowledgeWarning = useCallback(
     (key: string, value: boolean) => {
@@ -126,8 +132,9 @@ export default function DataFilesTableUploadRow({
             open={openImportConfirm}
             hideConfirm={hasFailures}
             disableConfirm={
-              Object.keys(warningAcknowledgements).length > 0 &&
-              Object.values(warningAcknowledgements).every(item => !item)
+              !Object.values(warningAcknowledgements).every(
+                acknowledgement => acknowledgement === true,
+              )
             }
             onConfirm={() => onConfirmImport([dataSetUpload.id])}
             confirmText={confirmText}
