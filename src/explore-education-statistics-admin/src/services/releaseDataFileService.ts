@@ -49,7 +49,7 @@ export interface DataSetUpload {
   screenerResult: ScreenerResult;
   created: Date;
   uploadedBy: string;
-  replacingFileId: string | undefined;
+  replacingFileId?: string;
 }
 
 export interface ScreenerResult {
