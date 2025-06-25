@@ -863,6 +863,7 @@ public class DataSetFileStorageTests
             };
           
             var service = CreateService(context, contentDbContext);
+
             // Act
             var uploadSummary = await service.UploadDataSet(
                 context.ReleaseVersion.Id,
@@ -927,6 +928,7 @@ public class DataSetFileStorageTests
             };
           
             var service = CreateService(context, contentDbContext);
+
             // Act
             var uploadSummary = await service.UploadDataSet(
                 context.ReleaseVersion.Id,
