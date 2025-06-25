@@ -87,7 +87,7 @@ const DataFileReplacementPlan = ({
     hasIncompleteLocationMapping,
     hasIncompleteFilterMapping,
     isNotReadyToPublish,
-    hasMajorVersionUpdate,
+    isMajorVersionUpdate,
     hasMajorLocationMapping,
     hasMajorFilterMapping,
   } = useMemo(() => {
@@ -97,7 +97,7 @@ const DataFileReplacementPlan = ({
         hasIncompleteLocationMapping: false,
         hasIncompleteFilterMapping: false,
         isNotReadyToPublish: false,
-        hasMajorVersionUpdate: false,
+        isMajorVersionUpdate: false,
         hasMajorLocationMapping: false,
         hasMajorFilterMapping: false,
       };
@@ -114,8 +114,8 @@ const DataFileReplacementPlan = ({
       hasMajorFilterMapping:
         plan?.apiDataSetVersionPlan?.mappingStatus?.filtersHaveMajorChange,
       isNotReadyToPublish: !plan?.apiDataSetVersionPlan?.readyToPublish,
-      hasMajorVersionUpdate:
-        plan?.apiDataSetVersionPlan?.mappingStatus?.hasMajorVersionUpdate,
+      isMajorVersionUpdate:
+        plan?.apiDataSetVersionPlan?.mappingStatus?.isMajorVersionUpdate,
     };
   }, [plan, isNewReplaceDsvFeatureEnabled]);
 
@@ -163,8 +163,8 @@ const DataFileReplacementPlan = ({
   const majorVersionErrorTag = (
     <>
       <h3 className="govuk-heading-m govuk-!-padding-top-4">
-        <Tag colour={hasMajorVersionUpdate ? 'red' : 'green'}>
-          {`API data set status: ${hasMajorVersionUpdate ? 'ERROR' : 'OK'}`}
+        <Tag colour={isMajorVersionUpdate ? 'red' : 'green'}>
+          {`API data set status: ${isMajorVersionUpdate ? 'ERROR' : 'OK'}`}
         </Tag>
       </h3>
       <p>
@@ -588,7 +588,7 @@ const DataFileReplacementPlan = ({
 
           {hasDataSetVersionPlan && (
             <>
-              {hasMajorVersionUpdate
+              {isMajorVersionUpdate
                 ? majorVersionErrorTag
                 : locationsAndFiltersErrorTags}
             </>
