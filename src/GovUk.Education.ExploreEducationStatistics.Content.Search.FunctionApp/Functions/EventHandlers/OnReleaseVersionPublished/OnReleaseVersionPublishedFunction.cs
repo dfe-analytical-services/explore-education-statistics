@@ -19,7 +19,9 @@ public class OnReleaseVersionPublishedFunction(IEventGridEventHandler eventGridE
             eventDto,
             (payload, _) =>
                 Task.FromResult(
-                    string.IsNullOrEmpty(payload.PublicationSlug) || !payload.NewlyPublishedReleaseVersionIsLatest
+                    string.IsNullOrEmpty(payload.PublicationSlug) 
+                    || !payload.NewlyPublishedReleaseVersionIsLatest 
+                    || payload.IsPublicationArchived == true
                         ? OnReleaseVersionPublishedOutput.Empty
                         : new OnReleaseVersionPublishedOutput
                         {

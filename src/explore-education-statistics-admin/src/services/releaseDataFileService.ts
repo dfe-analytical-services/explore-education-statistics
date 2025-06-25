@@ -253,7 +253,7 @@ const releaseDataFileService = {
       .get<Blob>(`/release/${releaseId}/file/${id}/download`, {
         responseType: 'blob',
       })
-      .then(response => downloadFile(response, fileName));
+      .then(response => downloadFile({ file: response, fileName }));
   },
   updateFile(
     releaseId: string,

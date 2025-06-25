@@ -14,7 +14,8 @@ const FormNumberInput = ({ value, ...props }: FormNumberInputProps) => {
   return (
     <FormBaseInput
       {...props}
-      type="number"
+      type="text"
+      inputMode="numeric"
       value={!value && value !== 0 ? '' : value}
     />
   );

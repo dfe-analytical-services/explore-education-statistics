@@ -12,5 +12,6 @@ declare namespace jest {
   interface Matchers<R> {
     toBeAriaDisabled(): R;
     toHaveScrolledIntoView(): R;
+    toHaveNumericValue(numberValue: string | number): R;
   }
 }

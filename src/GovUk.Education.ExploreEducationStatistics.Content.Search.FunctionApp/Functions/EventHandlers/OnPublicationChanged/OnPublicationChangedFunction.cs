@@ -19,7 +19,7 @@ public class OnPublicationChangedFunction(IEventGridEventHandler eventGridEventH
             eventDto,
             (payload, _) => 
                 Task.FromResult<RefreshSearchableDocumentMessageDto[]>(
-                    string.IsNullOrEmpty(payload.Slug)
+                    string.IsNullOrEmpty(payload.Slug) || payload.IsPublicationArchived == true
                     ? []
                     : [ new RefreshSearchableDocumentMessageDto { PublicationSlug = payload.Slug } ]));
 }

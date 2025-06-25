@@ -8,4 +8,5 @@ public class PublicationLatestPublishedReleaseReorderedEventDto
     public Guid? LatestPublishedReleaseVersionId { get; init; }
     public Guid? PreviousReleaseId { get; init; }
     public Guid? PreviousReleaseVersionId { get; init; }
+    public bool? IsPublicationArchived { get; init; }
 }

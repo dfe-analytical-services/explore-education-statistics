@@ -69,7 +69,9 @@ describe('ChartDataGroupingForm', () => {
     );
 
     expect(screen.getByLabelText('Equal intervals')).toBeChecked();
-    expect(screen.getAllByLabelText('Number of data groups')[0]).toHaveValue(7);
+    expect(
+      screen.getAllByLabelText('Number of data groups')[0],
+    ).toHaveNumericValue(7);
 
     expect(screen.getByLabelText('Quantiles')).not.toBeChecked();
     expect(screen.getByLabelText('New custom groups')).not.toBeChecked();
@@ -90,7 +92,9 @@ describe('ChartDataGroupingForm', () => {
     );
 
     expect(screen.getByLabelText('Quantiles')).toBeChecked();
-    expect(screen.getAllByLabelText('Number of data groups')[1]).toHaveValue(4);
+    expect(
+      screen.getAllByLabelText('Number of data groups')[1],
+    ).toHaveNumericValue(4);
 
     expect(screen.getByLabelText('Equal intervals')).not.toBeChecked();
     expect(screen.getByLabelText('New custom groups')).not.toBeChecked();

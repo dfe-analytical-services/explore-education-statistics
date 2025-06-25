@@ -1,0 +1,21 @@
+time_period,time_identifier,geographic_level,country_code,country_name,old_la_code,new_la_code,la_name,animal_type,breed,ind_one
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Total,Total,999
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Labrador Retriever,3
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Golden Retriever,1
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,German Shortharied Pointer,2
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Cocker Spaniel,3
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Irish Stter,4
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Beagle,5
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Dachshund,6
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Basset Hound,7
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Greyhound,8
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Total,111
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Cat,Persian,9
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Cat,Maine Coon,10
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Cat,Ragdoll,11
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Cat,Siberian,12
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Cat,Norwegian Forest Cat,13
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Cat,Birman,14
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Cat,Siamese,15
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Cat,British Shorthair,16
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Cat,Total,112

@@ -39,7 +39,7 @@ export default function TableExportMenu({
 
   const handleCsvDownload = async () => {
     const csv = await onCsvDownload();
-    downloadFile(csv, fileName);
+    downloadFile({ file: csv, fileName });
   };
 
   return (

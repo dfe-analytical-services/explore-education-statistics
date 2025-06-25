@@ -15,7 +15,10 @@ const releaseFileService = {
         );
 
         if (disposition.type === 'attachment') {
-          downloadFile(data, disposition.filename);
+          downloadFile({
+            file: data,
+            fileName: disposition.filename,
+          });
         }
       });
   },

@@ -25,3 +25,7 @@ export default function getFilterHierarchyLabelsMap(
 
   return map;
 }
+
+export function isOptionTotal(map: OptionLabelsMap, optionId: string): boolean {
+  return map[optionId]?.toLocaleLowerCase() === 'total';
+}

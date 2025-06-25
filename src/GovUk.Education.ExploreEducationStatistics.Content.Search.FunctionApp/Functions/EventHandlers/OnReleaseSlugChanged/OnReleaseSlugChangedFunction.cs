@@ -19,7 +19,7 @@ public class OnReleaseSlugChangedFunction(IEventGridEventHandler eventGridEventH
             eventDto,
             (payload, _) =>
                 Task.FromResult(
-                    string.IsNullOrEmpty(payload.PublicationSlug)
+                    string.IsNullOrEmpty(payload.PublicationSlug) || payload.IsPublicationArchived == true
                     ? []
                     : new []
                     {

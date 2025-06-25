@@ -183,8 +183,8 @@ describe('ReleaseStatusForm', () => {
       screen.getByRole('group', { name: 'Next release expected (optional)' }),
     );
 
-    expect(nextReleaseDate.getByLabelText('Month')).toHaveValue(10);
-    expect(nextReleaseDate.getByLabelText('Year')).toHaveValue(2021);
+    expect(nextReleaseDate.getByLabelText('Month')).toHaveNumericValue(10);
+    expect(nextReleaseDate.getByLabelText('Year')).toHaveNumericValue(2021);
   });
 
   describe('in Draft', () => {
@@ -438,9 +438,9 @@ describe('ReleaseStatusForm', () => {
         }),
       );
 
-      expect(publishDate.getByLabelText('Day')).toHaveValue(15);
-      expect(publishDate.getByLabelText('Month')).toHaveValue(12);
-      expect(publishDate.getByLabelText('Year')).toHaveValue(2020);
+      expect(publishDate.getByLabelText('Day')).toHaveNumericValue(15);
+      expect(publishDate.getByLabelText('Month')).toHaveNumericValue(12);
+      expect(publishDate.getByLabelText('Year')).toHaveNumericValue(2020);
     });
 
     test('shows pre-release warnings when pre-release users have been added', () => {

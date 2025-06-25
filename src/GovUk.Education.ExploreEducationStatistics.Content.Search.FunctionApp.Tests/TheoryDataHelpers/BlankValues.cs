@@ -6,5 +6,6 @@ public static class TheoryDatas
     {
         public static TheoryData<string?> Strings => [null, string.Empty];
         public static TheoryData<Guid?> Guids => [null, Guid.Empty];
+        public static TheoryData<bool?> Bools => [null, false];
     }
 }

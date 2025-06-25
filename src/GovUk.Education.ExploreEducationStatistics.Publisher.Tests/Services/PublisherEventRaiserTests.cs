@@ -60,8 +60,10 @@ public class PublisherEventRaiserTests
 
     public class RaiseReleaseVersionPublishedPublisherEvents : PublisherEventRaiserTests
     {
-        [Fact]
-        public async Task WhenOnePublishedReleaseVersion_ThenEventRaised()
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public async Task WhenOnePublishedReleaseVersion_ThenEventRaised(bool isPublicationArchived)
         {
             // ARRANGE
             var publicationId = Guid.NewGuid();
@@ -82,7 +84,8 @@ public class PublisherEventRaiserTests
                         ReleaseVersionId = Guid.NewGuid(),
                         PublicationId = publicationId
                     }
-                ]
+                ],
+                IsPublicationArchived = isPublicationArchived
             };
 
             // ACT
@@ -100,13 +103,16 @@ public class PublisherEventRaiserTests
                     PreviousLatestPublishedReleaseId = info.PreviousLatestPublishedReleaseId,
                     PreviousLatestPublishedReleaseVersionId = info.PreviousLatestPublishedReleaseVersionId,
                     LatestPublishedReleaseId = info.LatestPublishedReleaseId,
-                    LatestPublishedReleaseVersionId = info.LatestPublishedReleaseVersionId
+                    LatestPublishedReleaseVersionId = info.LatestPublishedReleaseVersionId,
+                    IsPublicationArchived = isPublicationArchived
                 });
             _eventRaiserMockBuilder.Assert.EventsRaised([expectedEvent]);
         }
 
-        [Fact]
-        public async Task WhenMultiplePublishedReleaseVersions_ThenEventsRaised()
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public async Task WhenMultiplePublishedReleaseVersions_ThenEventsRaised(bool isPublicationArchived)
         {
             // ARRANGE
             var sut = GetSut();
@@ -138,7 +144,8 @@ public class PublisherEventRaiserTests
                             ReleaseVersionId = Guid.NewGuid(),
                             PublicationId = publication1Id
                         }
-                    ]
+                    ],
+                    IsPublicationArchived = isPublicationArchived
                 },
                 new PublishedPublicationInfo
                 {
@@ -164,7 +171,8 @@ public class PublisherEventRaiserTests
                             ReleaseVersionId = Guid.NewGuid(),
                             PublicationId = publication2Id
                         }
-                    ]
+                    ],
+                    IsPublicationArchived = isPublicationArchived
                 }
             };
 
@@ -185,7 +193,8 @@ public class PublisherEventRaiserTests
                             PreviousLatestPublishedReleaseId = info.PreviousLatestPublishedReleaseId,
                             PreviousLatestPublishedReleaseVersionId = info.PreviousLatestPublishedReleaseVersionId,
                             LatestPublishedReleaseId = info.LatestPublishedReleaseId,
-                            LatestPublishedReleaseVersionId = info.LatestPublishedReleaseVersionId
+                            LatestPublishedReleaseVersionId = info.LatestPublishedReleaseVersionId,
+                            IsPublicationArchived = isPublicationArchived
                         }))).ToList();
 
             _eventRaiserMockBuilder.Assert.EventsRaised(expectedEvents);
@@ -256,7 +265,8 @@ public class PublisherEventRaiserTests
                         ReleaseVersionId = Guid.NewGuid(),
                         PublicationId = publicationId
                     }
-                ]
+                ],
+                IsPublicationArchived = false
             };
 
             // ACT

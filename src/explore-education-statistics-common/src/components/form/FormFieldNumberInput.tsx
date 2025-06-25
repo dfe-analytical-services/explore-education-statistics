@@ -25,5 +25,5 @@ interface FormNumberInputProps extends FormBaseInputProps {
 }
 
 function FormNumberInput(props: FormNumberInputProps) {
-  return <FormBaseInput {...props} type="number" />;
+  return <FormBaseInput {...props} type="text" inputMode="numeric" />;
 }

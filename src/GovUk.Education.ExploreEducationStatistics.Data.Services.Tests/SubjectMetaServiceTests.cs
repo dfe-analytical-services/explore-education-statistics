@@ -11,6 +11,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Requests;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
@@ -158,7 +159,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             var releaseFile = new ReleaseFile
             {
                 ReleaseVersion = new Content.Model.ReleaseVersion { Id = releaseSubject.ReleaseVersion.Id, },
-                File = new File { SubjectId = releaseSubject.SubjectId, Type = FileType.Data, },
+                File = new File
+                {
+                    SubjectId = releaseSubject.SubjectId,
+                    Type = FileType.Data,
+                    FilterHierarchies = null,
+                },
             };
 
             // Setup multiple geographic levels of data where some but not all of the levels have a hierarchy applied.
@@ -364,6 +370,139 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 Assert.Empty(viewModel.Filters);
                 Assert.Empty(viewModel.Indicators);
                 Assert.Empty(viewModel.TimePeriod.Options);
+                Assert.Null(viewModel.FilterHierarchies);
+            }
+        }
+
+        [Fact]
+        public async Task GetSubjectMeta_FilterHierarchies()
+        {
+            var subject = new Subject { Id = Guid.NewGuid(), };
+            var releaseSubject = new ReleaseSubject
+            {
+                ReleaseVersion = new ReleaseVersion { Id = Guid.NewGuid(), },
+                SubjectId = subject.Id,
+            };
+
+            var filter1Id = Guid.NewGuid();
+            var filter2Id = Guid.NewGuid();
+            var releaseFile = new ReleaseFile
+            {
+                ReleaseVersion = new Content.Model.ReleaseVersion { Id = releaseSubject.ReleaseVersion.Id, },
+                File = new File
+                {
+                    SubjectId = releaseSubject.SubjectId,
+                    Type = FileType.Data,
+                    FilterHierarchies =
+                        [
+                            new DataSetFileFilterHierarchy(
+                                [filter1Id, filter2Id],
+                                [
+                                    new Dictionary<Guid, List<Guid>>
+                                    {
+                                        { Guid.NewGuid(), [Guid.NewGuid(), Guid.NewGuid()]},
+                                        { Guid.NewGuid(), [Guid.NewGuid(), Guid.NewGuid()]}
+                                    },
+                                    new Dictionary<Guid, List<Guid>>
+                                    {
+                                        { Guid.NewGuid(), [Guid.NewGuid(), Guid.NewGuid()]},
+                                        { Guid.NewGuid(), [Guid.NewGuid(), Guid.NewGuid()]}
+                                    }
+                                ]
+                            ),
+                        ],
+                },
+            };
+
+            var options = new LocationsOptions
+            {
+                Hierarchies = []
+            }.ToOptionsWrapper();
+
+            var statisticsDbContextId = Guid.NewGuid().ToString();
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            {
+                statisticsDbContext.ReleaseSubject.Add(releaseSubject);
+                await statisticsDbContext.SaveChangesAsync();
+            }
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                contentDbContext.ReleaseFiles.Add(releaseFile);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            var filterRepository = new Mock<IFilterRepository>(MockBehavior.Strict);
+            var indicatorGroupRepository = new Mock<IIndicatorGroupRepository>(MockBehavior.Strict);
+            var locationRepository = new Mock<ILocationRepository>(MockBehavior.Strict);
+            var timePeriodService = new Mock<ITimePeriodService>(MockBehavior.Strict);
+
+            filterRepository
+                .Setup(s => s.GetFiltersIncludingItems(releaseSubject.SubjectId))
+                .ReturnsAsync(new List<Filter>());
+
+            indicatorGroupRepository
+                .Setup(s => s.GetIndicatorGroups(releaseSubject.SubjectId))
+                .ReturnsAsync(new List<IndicatorGroup>());
+
+            timePeriodService
+                .Setup(s => s.GetTimePeriods(releaseSubject.SubjectId))
+                .ReturnsAsync(new List<(int Year, TimeIdentifier TimeIdentifier)>());
+
+            locationRepository
+                .Setup(s => s.GetDistinctForSubject(releaseSubject.SubjectId))
+                .ReturnsAsync([]);
+
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            {
+                var service = BuildSubjectMetaService(
+                    statisticsDbContext,
+                    contentDbContext,
+                    filterRepository: filterRepository.Object,
+                    indicatorGroupRepository: indicatorGroupRepository.Object,
+                    locationRepository: locationRepository.Object,
+                    timePeriodService: timePeriodService.Object,
+                    options: options
+                );
+
+                var result = (await service.GetSubjectMeta(releaseVersionId: releaseSubject.ReleaseVersionId,
+                        subjectId: releaseSubject.SubjectId))
+                    .AssertRight();
+
+                VerifyAllMocks(
+                    filterRepository,
+                    indicatorGroupRepository,
+                    locationRepository,
+                    timePeriodService);
+
+                var viewModel = Assert.IsAssignableFrom<SubjectMetaViewModel>(result);
+
+                Assert.Empty(viewModel.Locations);
+                Assert.Empty(viewModel.Filters);
+                Assert.Empty(viewModel.Indicators);
+                Assert.Empty(viewModel.TimePeriod.Options);
+
+                var fileFilterHierarchy = releaseFile.File.FilterHierarchies[0];
+                viewModel.FilterHierarchies.AssertDeepEqualTo([
+                    [
+                        new DataSetFileFilterHierarchyTierViewModel
+                        (
+                           0,
+                           filter1Id,
+                           filter2Id,
+                           fileFilterHierarchy.Tiers[0]
+                        ),
+                        new DataSetFileFilterHierarchyTierViewModel
+                        (
+                            1,
+                            filter2Id,
+                            null,
+                            fileFilterHierarchy.Tiers[1]
+                        ),
+                    ],
+                ]);
             }
         }
 
@@ -662,7 +801,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 {
                     SubjectId = releaseSubject.SubjectId,
                     Type = FileType.Data,
-                    FilterHierarchies = [],
+                    FilterHierarchies = null, // BuildFilterHierarchyViewModel is tested via GetSubjectMeta, so no need to test it here
                 },
             };
 
@@ -895,6 +1034,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                         }
                     }
                 });
+
+                Assert.Null(result.FilterHierarchies);
             }
         }
 

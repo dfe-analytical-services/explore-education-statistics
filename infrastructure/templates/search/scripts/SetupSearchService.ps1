@@ -61,6 +61,48 @@ switch ($dataSourceType)
                 'interval' = $indexerScheduleInterval
                 'startTime' = '2025-01-01T00:00:00Z'
             } : $null
+            'outputFieldMappings' = @(
+                @{
+                    'sourceFieldName' = '/document/summary'
+                    'targetFieldName' = 'summary'
+                    'mappingFunction' = @{
+                        'name' = 'base64Decode'
+                        'parameters' = @{
+                            'useHttpServerUtilityUrlTokenDecode' = $false
+                        }
+                    }
+                }
+                @{
+                    'sourceFieldName' = '/document/publicationSlug'
+                    'targetFieldName' = 'publicationSlug'
+                    'mappingFunction' = @{
+                        'name' = 'base64Decode'
+                        'parameters' = @{
+                            'useHttpServerUtilityUrlTokenDecode' = $false
+                        }
+                    }
+                }
+                @{
+                    'sourceFieldName' = '/document/themeTitle'
+                    'targetFieldName' = 'themeTitle'
+                    'mappingFunction' = @{
+                        'name' = 'base64Decode'
+                        'parameters' = @{
+                            'useHttpServerUtilityUrlTokenDecode' = $false
+                        }
+                    }
+                }
+                @{
+                    'sourceFieldName' = '/document/title'
+                    'targetFieldName' = 'title'
+                    'mappingFunction' = @{
+                        'name' = 'base64Decode'
+                        'parameters' = @{
+                            'useHttpServerUtilityUrlTokenDecode' = $false
+                        }
+                    }
+                }
+            )
         }
     }
     default {

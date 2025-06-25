@@ -47,7 +47,7 @@ const DownloadTable = ({
     : footnotes;
   const handleCsvDownload = async () => {
     const csv = await onCsvDownload();
-    downloadFile(csv, fileName);
+    downloadFile({ file: csv, fileName });
   };
 
   const handleOdsDownload = () => {

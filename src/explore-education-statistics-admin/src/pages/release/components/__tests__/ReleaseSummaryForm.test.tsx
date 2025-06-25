@@ -416,7 +416,7 @@ describe('ReleaseSummaryForm', () => {
     const inputYear = screen.getByLabelText(
       testTimeIdentifiers[0].category.label,
     );
-    expect(inputYear).toHaveValue(1966);
+    expect(inputYear).toHaveNumericValue(1966);
 
     const inputReleaseLabel = screen.getByLabelText('Release label');
     expect(inputReleaseLabel).toHaveValue('initial');

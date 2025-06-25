@@ -11,13 +11,17 @@ export interface LegendConfiguration {
 export interface LegendItemConfiguration {
   label: string;
   colour: string;
+  labelColour?: LegendLabelColour;
   symbol?: ChartSymbol;
   lineStyle?: LineStyle;
   inlinePosition?: LegendInlinePosition;
+  inlinePositionOffset?: number;
 }
 
 export interface LegendItem extends LegendItemConfiguration {
   dataSet: DataSet;
 }
 
-export type LegendInlinePosition = 'above' | 'below';
+export type LegendInlinePosition = 'above' | 'below' | 'right';
+
+export type LegendLabelColour = 'black' | 'inherit';

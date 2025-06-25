@@ -28,6 +28,11 @@ var eventGridCustomTopicSubscriptions = [
         queueName: storageQueueNames.publicationChanged
       }
       {
+        name: 'publication-deleted'
+        includedEventTypes: ['publication-deleted']
+        queueName: storageQueueNames.publicationDeleted
+      }
+      {
         name: 'publication-latest-published-release-reordered'
         includedEventTypes: ['publication-latest-published-release-reordered']
         queueName: storageQueueNames.publicationLatestPublishedReleaseReordered

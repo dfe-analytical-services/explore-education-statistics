@@ -107,11 +107,13 @@ const SubscriptionPage: NextPage<Props> = ({
                   </Form>
                 </>
               ) : (
-                <Panel headingTag="h2" title="Subscribed">
-                  <p>
-                    Thank you. Check your email to confirm your subscription.
-                  </p>
-                </Panel>
+                <div aria-live="polite">
+                  <Panel headingTag="h2" title="Subscribed">
+                    <p>
+                      Thank you. Check your email to confirm your subscription.
+                    </p>
+                  </Panel>
+                </div>
               )}
             </LoadingSpinner>
           )}

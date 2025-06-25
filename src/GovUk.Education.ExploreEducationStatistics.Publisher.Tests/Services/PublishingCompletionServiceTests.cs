@@ -26,6 +26,11 @@ public class PublishingCompletionServiceTests
     private readonly DataSetPublishingServiceMockBuilder _dataSetPublishingService = new();
     private readonly PublisherEventRaiserMockBuilder _publisherEventRaiser = new();
 
+    /// <summary>
+    /// Ensure that GetSUT is called immediate before the ACT phase.
+    /// This is because the _contentDbContext builder disposes the dbContext used during ARRANGE
+    /// and creates a fresh copy to ensure that any queries performed rehydrate the entities properly.
+    /// </summary>
     private PublishingCompletionService GetSut() =>
         new(
             _contentDbContext.Build(),
@@ -118,10 +123,12 @@ public class PublishingCompletionServiceTests
             private ReleaseVersion _releaseVersion1 = null!;
             private ReleaseVersion _releaseVersion2 = null!;
 
-            private IReadOnlyList<ReleasePublishingKey> SetupHappyPath()
+            private IReadOnlyList<ReleasePublishingKey> SetupHappyPath(
+                Func<PublicationBuilder, PublicationBuilder>? publication1BuilderModification = null)
             {
                 // Create some sample publications
-                var publication1 = new PublicationBuilder(PublicationId1, "publication-slug-1")
+                publication1BuilderModification ??= (publicationBuilder) => publicationBuilder;
+                var publication1 = publication1BuilderModification(new PublicationBuilder(PublicationId1, "publication-slug-1"))
                     .Build();
 
                 var publication2 = new PublicationBuilder(PublicationId2, "publication-slug-2")
@@ -636,7 +643,8 @@ public class PublishingCompletionServiceTests
                                 ReleaseSlug = _releaseVersion1.Release.Slug,
                                 PublicationId = _releaseVersion1.Release.PublicationId
                             }
-                        ]
+                        ],
+                        IsPublicationArchived = false
                     };
 
                     _publisherEventRaiser.Assert.ReleaseVersionPublishedEventWasRaised(evt => evt == expectedInfo);
@@ -647,7 +655,6 @@ public class PublishingCompletionServiceTests
                 {
                     // ARRANGE
                     var readyKeys = SetupHappyPath();
-                    var sut = GetSut();
                     var previousReleaseVersion = new ReleaseVersionBuilder()
                         .WithPublicationId(PublicationId1)
                         .ForRelease(release => release
@@ -660,6 +667,8 @@ public class PublishingCompletionServiceTests
                     // Set release version 1 to be the latest published release version after publishing
                     _releaseService.WherePublicationLatestPublishedReleaseVersionIs(PublicationId1, _releaseVersion1);
 
+                    var sut = GetSut();
+                    
                     // ACT
                     await sut.CompletePublishingIfAllPriorStagesComplete(readyKeys);
 
@@ -680,7 +689,8 @@ public class PublishingCompletionServiceTests
                                 ReleaseSlug = _releaseVersion1.Release.Slug,
                                 PublicationId = _releaseVersion1.Release.PublicationId
                             }
-                        ]
+                        ],
+                        IsPublicationArchived = false
                     };
                     _publisherEventRaiser.Assert.ReleaseVersionPublishedEventWasRaised(evt => evt == expectedInfo);
                 }
@@ -724,7 +734,8 @@ public class PublishingCompletionServiceTests
                                 ReleaseSlug = _releaseVersion1.Release.Slug,
                                 PublicationId = _releaseVersion1.Release.PublicationId
                             }
-                        ]
+                        ],
+                        IsPublicationArchived = false
                     };
 
                     _publisherEventRaiser.Assert.ReleaseVersionPublishedEventWasRaised(evt => evt == expectedInfo);
@@ -780,6 +791,31 @@ public class PublishingCompletionServiceTests
 
                     // ASSERT
                     _publisherEventRaiser.Assert.PublicationArchivedEventWasNotRaised();
+                }
+                
+                
+                [Fact]
+                public async Task GivenASupersededPublication_WhenReleasePublished_ThenIsPublicationArchivedIsTrue()
+                {
+                    // ARRANGE
+                    // Create a publication that supersedes publication 1 - making publication 1 archived
+                    var supersedingPublication = new PublicationBuilder(Guid.NewGuid(), "publication-slug-superseded")
+                        .HasPublishedReleaseVersion()
+                        .Build();
+                    _contentDbContext.With(supersedingPublication);
+                    
+                    var readyKeys = SetupHappyPath(
+                        publication1 => publication1.SupersededBy(supersedingPublication));
+
+                    var sut = GetSut();
+
+                    // ACT
+                    await sut.CompletePublishingIfAllPriorStagesComplete(readyKeys);
+
+                    // ASSERT
+                    _publisherEventRaiser.Assert.ReleaseVersionPublishedEventWasRaised(info => 
+                        info.PublicationId == _releaseVersion1.Release.PublicationId
+                        && info.IsPublicationArchived);
                 }
             }
 

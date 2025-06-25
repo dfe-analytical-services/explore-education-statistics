@@ -22,6 +22,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
 
@@ -142,14 +143,13 @@ public partial class ReleaseService(
                     : releaseData;
             })
             .OnSuccessDo(async releaseData =>
-            {
-                return releaseData.releaseIsLive && releaseData.slugHasChanged
+                releaseData.releaseIsLive && releaseData.slugHasChanged
                     ? await CreateReleaseRedirect(
                         releaseId: releaseId,
                         oldReleaseSlug: releaseData.releaseAndSlugs.oldReleaseSlug,
                         cancellationToken: cancellationToken)
-                    : Unit.Instance;
-            })
+                    : Unit.Instance
+            )
             .OnSuccessDo(async releaseData =>
                 {
                     if (releaseData.releaseIsLive && releaseData.slugHasChanged)
@@ -158,7 +158,8 @@ public partial class ReleaseService(
                             releaseId, 
                             releaseData.releaseAndSlugs.newReleaseSlug,
                             releaseData.releaseAndSlugs.release.PublicationId,
-                            releaseData.releaseAndSlugs.release.Publication.Slug
+                            releaseData.releaseAndSlugs.release.Publication.Slug,
+                            releaseData.releaseAndSlugs.release.Publication.IsArchived()
                             );
                     }
                 })
@@ -345,6 +346,7 @@ public partial class ReleaseService(
     {
         return await context.Releases
             .Include(r => r.Publication)
+            .ThenInclude(p => p.SupersededBy)
             .SingleOrNotFoundAsync(p => p.Id == releaseId);
     }
 

@@ -26,6 +26,8 @@ type SearchStorageQueueNames = {
   publicationArchived: string
   @description('Queue name for when a publication is changed.')
   publicationChanged: string
+  @description('Queue name for when a publication is deleted.')
+  publicationDeleted: string
   @description('Queue name for when the latest published release of a publication changes due to reordering.')
   publicationLatestPublishedReleaseReordered: string
   @description('Queue name for when an archived publication is restored.')
