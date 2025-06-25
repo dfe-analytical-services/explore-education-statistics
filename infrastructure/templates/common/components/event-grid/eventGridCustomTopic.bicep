@@ -9,18 +9,14 @@ param name string
 @description('Location for all resources.')
 param location string
 
-@description('A list IP network rules to allow access to the Search Service from specific public internet IP address ranges. These rules are applied only when \'publicNetworkAccess\' is \'Enabled\'.')
+@description('A list IP network rules to allow access to the Search Service from specific public internet IP address ranges. These rules are applied only when \'publicNetworkAccessEnabled\' is \'true\'.')
 param ipRules IpRange[] = []
 
 @description('Specifies whether to enable local authentication. Microsoft Entra access authentication is always enabled.')
 param localAuthenticationEnabled bool = false
 
-@description('Specifies whether traffic is allowed over the public interface.')
-@allowed([
-  'Disabled'
-  'Enabled'
-])
-param publicNetworkAccess string = 'Disabled'
+@description('Specifies whether the resource can be accessed from public networks, including the internet or is restricted to private endpoints only.')
+param publicNetworkAccessEnabled bool = false
 
 @description('Indicates whether the resource should have a system-assigned managed identity.')
 param systemAssignedIdentity bool = false
@@ -59,7 +55,7 @@ resource topic 'Microsoft.EventGrid/topics@2025-02-15' = {
   properties: {
     minimumTlsVersionAllowed: '1.2'
     inputSchema: 'EventGridSchema'
-    publicNetworkAccess: publicNetworkAccess
+    publicNetworkAccess: publicNetworkAccessEnabled ? 'Enabled' : 'Disabled'
     inboundIpRules: [
       for ipRule in ipRules: {
         action: 'Allow'

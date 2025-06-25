@@ -15,6 +15,9 @@ param location string
 @description('A list of IP network rules to allow access to Event Grid resources from specific public internet IP address ranges.')
 param ipRules IpRange[] = []
 
+@description('Specifies whether Event Grid resources can be accessed from public networks, including the internet or are restricted to private endpoints only.')
+param publicNetworkAccessEnabled bool = false
+
 @description('Specifies common resource naming variables.')
 param resourceNames ResourceNames
 
@@ -40,6 +43,7 @@ module eventGridMessagingModule '../../common/components/event-grid/eventGridMes
     location: location
     customTopicNames: topicNames
     ipRules: ipRules
+    publicNetworkAccessEnabled: publicNetworkAccessEnabled
     resourcePrefix: resourcePrefix
     customTopicAlerts: {
       deadLetteredCount: true

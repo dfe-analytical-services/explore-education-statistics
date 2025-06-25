@@ -7,8 +7,11 @@ param resourcePrefix string
 @description('Location for all resources.')
 param location string
 
-@description('A list of IP network rules to allow access to the resource from specific public internet IP address ranges.')
-param ipRules IpRange[]
+@description('A list of IP network rules to allow access to resources from specific public internet IP address ranges.')
+param ipRules IpRange[] = []
+
+@description('Specifies whether resources can be accessed from public networks, including the internet or are restricted to private endpoints only.')
+param publicNetworkAccessEnabled bool = false
 
 @description('Specifies which custom topic alert rules to enable. If the optional alerts parameter is not provided, no alert rules will be created or updated.')
 param customTopicAlerts {
@@ -20,7 +23,7 @@ param customTopicAlerts {
   alertsGroupName: string
 }?
 
-@description('Specifies a set of tags with which to tag the resource in Azure.')
+@description('Specifies a set of tags with which to tag resources in Azure.')
 param tagValues object
 
 @description('A list of custom topic names to create.')
@@ -34,7 +37,7 @@ module eventGridCustomTopicModule 'eventGridCustomTopic.bicep' = [
       name: buildFullyQualifiedTopicName(resourcePrefix, topicName)
       location: location
       ipRules: ipRules
-      publicNetworkAccess: 'Enabled'
+      publicNetworkAccessEnabled: publicNetworkAccessEnabled
       systemAssignedIdentity: true
       alerts: customTopicAlerts
       tagValues: tagValues

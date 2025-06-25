@@ -92,7 +92,6 @@ module eventMessagingModule 'application/eventMessaging.bicep' = {
   name: 'eventMessagingModuleDeploy'
   params: {
     location: location
-    ipRules: [] // TODO EES-6036 Should be maintenanceIpRanges
     resourcePrefix: resourcePrefix
     resourceNames: resourceNames
     tagValues: tagValues
