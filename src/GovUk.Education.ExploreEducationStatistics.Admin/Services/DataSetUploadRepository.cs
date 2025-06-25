@@ -42,12 +42,10 @@ public class DataSetUploadRepository(
                 upload.ReleaseVersionId == releaseVersionId &&
                 upload.Id == dataSetUploadId,
                 cancellationToken)
-            .OnSuccess(async dataSetUpload =>
+            .OnSuccessDo(async dataSetUpload =>
             {
                 contentDbContext.Remove(dataSetUpload);
                 await contentDbContext.SaveChangesAsync(cancellationToken);
-
-                return dataSetUpload;
             })
             .OnSuccessVoid(async dataSetUpload =>
             {
