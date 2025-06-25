@@ -90,7 +90,7 @@ module searchStorageAccountModule '../../public-api/components/storageAccount.bi
     keyVaultName: keyVault.name
     alerts: {
       availability: true
-      latency: true
+      latency: false
       alertsGroupName: resourceNames.existingResources.alertsGroup
     }
     privateEndpointSubnetIds: {
