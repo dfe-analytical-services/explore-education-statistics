@@ -77,6 +77,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         }
 
         // We intend to change this route, to make these endpoints more consistent, as per EES-5895
+        [HttpGet("release/{releaseVersionId:guid}/data/{fileId:guid}/accoutrements-summary")]
+        public async Task<ActionResult<DataSetAccoutrementsViewModel>> GetDataSetAccoutrementsSummary(Guid releaseVersionId,
+            Guid fileId)
+        {
+            return await _releaseDataFileService.GetAccoutrementsSummary(
+                    releaseVersionId: releaseVersionId,
+                    fileId: fileId)
+                .HandleFailuresOrOk();
+        }
+
+        // We intend to change this route, to make these endpoints more consistent, as per EES-5895
         [HttpGet("release/{releaseVersionId:guid}/data")]
         public async Task<ActionResult<List<DataFileInfo>>> GetDataFileInfo(Guid releaseVersionId)
         {

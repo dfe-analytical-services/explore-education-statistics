@@ -43,6 +43,11 @@ export interface DataFile {
   publicApiDataSetVersion?: string;
 }
 
+export interface DataSetAccoutrements {
+  dataBlocks: { id: string; name: string }[];
+  footnotes: { id: string; content: string }[];
+}
+
 export type UploadDataFilesRequest = {
   title: string;
   dataFile: File;
@@ -118,6 +123,14 @@ const releaseDataFileService = {
     return client
       .get<DataFileInfo>(`/release/${releaseId}/data/${fileId}`)
       .then(mapFile);
+  },
+  getDataSetAccoutrementsSummary(
+    releaseVersionId: string,
+    fileId: string,
+  ): Promise<DataSetAccoutrements> {
+    return client.get<DataSetAccoutrements>(
+      `/release/${releaseVersionId}/data/${fileId}/accoutrements-summary`,
+    );
   },
   async uploadDataSetFilePairForReplacement(
     releaseId: string,

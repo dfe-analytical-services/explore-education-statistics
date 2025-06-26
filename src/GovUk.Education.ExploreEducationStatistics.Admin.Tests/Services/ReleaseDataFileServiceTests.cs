@@ -25,6 +25,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainers;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
@@ -1170,6 +1172,143 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
+        public async Task GetAccoutrementsSummary_ReturnsDataBlockAndFootnote()
+        {
+            var releaseVersion = new ReleaseVersion();
+            var releaseFile = new ReleaseFile
+            {
+                ReleaseVersion = releaseVersion,
+                File = new File
+                {
+                    SubjectId = Guid.NewGuid(),
+                    Type = FileType.Data,
+                }
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                contentDbContext.ReleaseFiles.Add(releaseFile);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            var dataBlockService = new Mock<IDataBlockService>(Strict);
+            dataBlockService.Setup(mock => mock.ListDataBlocks(releaseVersion.Id))
+                .ReturnsAsync([
+                    new DataBlock
+                    {
+                        Id = Guid.NewGuid(),
+                        Name = "DataBlock name!",
+                        Query = new FullTableQuery
+                        {
+                            SubjectId = releaseFile.File.SubjectId.Value,
+                        }
+                    },
+                    new DataBlock
+                    {
+                        Id = Guid.NewGuid(),
+                        Name = "DataBlock for different data set, so shouldn't appear in results!",
+                        Query = new FullTableQuery
+                        {
+                            SubjectId = Guid.NewGuid(),
+                        }
+                    }
+                ]);
+
+            var footnoteRepository = new Mock<IFootnoteRepository>(Strict);
+            footnoteRepository.Setup(mock => mock.GetFootnotes(releaseVersion.Id, releaseFile.File.SubjectId))
+                .ReturnsAsync([
+                    new Footnote
+                    {
+                        Id = Guid.NewGuid(),
+                        Content = "Footnote content!",
+                    },
+                ]);
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var service = SetupReleaseDataFileService(
+                    contentDbContext: contentDbContext,
+                    dataBlockService: dataBlockService.Object,
+                    footnoteRepository: footnoteRepository.Object);
+
+                var result = await service.GetAccoutrementsSummary(
+                    releaseVersionId: releaseVersion.Id,
+                    releaseFile.FileId);
+
+                var viewModel = result.AssertRight();
+
+                var dataBlock = Assert.Single(viewModel.DataBlocks);
+                Assert.Equal("DataBlock name!", dataBlock.Name);
+
+                var footnote = Assert.Single(viewModel.Footnotes);
+                Assert.Equal("Footnote content!", footnote.Content);
+            }
+        }
+
+        [Fact]
+        public async Task GetAccoutrementsSummary_EmptyResult()
+        {
+            var releaseVersion = new ReleaseVersion();
+            var releaseFile = new ReleaseFile
+            {
+                ReleaseVersion = releaseVersion,
+                File = new File
+                {
+                    SubjectId = Guid.NewGuid(),
+                    Type = FileType.Data,
+                }
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                contentDbContext.ReleaseFiles.Add(releaseFile);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            var dataBlockService = new Mock<IDataBlockService>(Strict);
+            dataBlockService.Setup(mock => mock.ListDataBlocks(releaseVersion.Id))
+                .ReturnsAsync([]);
+
+            var footnoteRepository = new Mock<IFootnoteRepository>(Strict);
+            footnoteRepository.Setup(mock => mock.GetFootnotes(releaseVersion.Id, releaseFile.File.SubjectId))
+                .ReturnsAsync([]);
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var service = SetupReleaseDataFileService(
+                    contentDbContext: contentDbContext,
+                    dataBlockService: dataBlockService.Object,
+                    footnoteRepository: footnoteRepository.Object);
+
+                var result = await service.GetAccoutrementsSummary(
+                    releaseVersionId: releaseVersion.Id,
+                    fileId: releaseFile.FileId);
+
+                var viewModel = result.AssertRight();
+
+                Assert.Empty(viewModel.DataBlocks);
+                Assert.Empty(viewModel.Footnotes);
+            }
+        }
+
+        [Fact]
+        public async Task GetAccoutrementsSummary_ReleaseFileNotFound()
+        {
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using var contentDbContext = InMemoryApplicationDbContext(contentDbContextId);
+
+            var service = SetupReleaseDataFileService(contentDbContext: contentDbContext);
+
+            var result = await service.GetAccoutrementsSummary(
+                releaseVersionId: Guid.NewGuid(),
+                fileId: Guid.NewGuid());
+
+            result.AssertNotFound();
+        }
+
+        [Fact]
         public async Task ReorderDataFiles()
         {
             var releaseVersion = new ReleaseVersion();
@@ -1853,8 +1992,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             IReleaseFileRepository? releaseFileRepository = null,
             IReleaseFileService? releaseFileService = null,
             IDataImportService? dataImportService = null,
+            IUserService? userService = null,
             IDataSetFileStorage? dataSetFileStorage = null,
-            IUserService? userService = null)
+            IDataBlockService? dataBlockService = null,
+            IFootnoteRepository? footnoteRepository = null)
         {
             contentDbContext.Users.Add(_user);
             contentDbContext.SaveChanges();
@@ -1869,7 +2010,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 releaseFileService ?? Mock.Of<IReleaseFileService>(Strict),
                 dataImportService ?? Mock.Of<IDataImportService>(Strict),
                 userService ?? MockUtils.AlwaysTrueUserService(_user.Id).Object,
-                dataSetFileStorage ?? Mock.Of<IDataSetFileStorage>(Strict)
+                dataSetFileStorage ?? Mock.Of<IDataSetFileStorage>(Strict),
+                dataBlockService ?? Mock.Of<IDataBlockService>(Strict),
+                footnoteRepository ?? Mock.Of<IFootnoteRepository>(Strict)
             );
         }
     }
