@@ -30,7 +30,10 @@ public static class ReleaseSearchableDocumentExtensions
         var metadata = new Dictionary<string, string>
         {
             { SearchableDocumentAzureBlobMetadataKeys.ReleaseId, releaseSearchableDocument.ReleaseId.ToString() },
-            { SearchableDocumentAzureBlobMetadataKeys.ReleaseSlug, releaseSearchableDocument.ReleaseSlug },
+            {
+                SearchableDocumentAzureBlobMetadataKeys.ReleaseSlug,
+                releaseSearchableDocument.ReleaseSlug.ToBase64String()
+            },
             {
                 SearchableDocumentAzureBlobMetadataKeys.ReleaseVersionId,
                 releaseSearchableDocument.ReleaseVersionId.ToString()
