@@ -32,6 +32,23 @@ export default function DataSetFileApiVersionHistory({
   });
 
   const { page = 1, totalPages = 1 } = data?.paging ?? {};
+  const currentVersionFileId = data?.results.find(
+    version => version.version === currentVersion,
+  )?.file.id;
+  const patchVersionHighestPatchDictionary = data?.results.reduce(
+    (acc, version) => {
+      const [major, minor, patch] = version.version.split('.').map(Number);
+      if (patch === undefined) {
+        return acc;
+      }
+      const key = `${major}.${minor}`;
+      if (!acc[key] || patch > acc[key]) {
+        acc[key] = patch;
+      }
+      return acc;
+    },
+    {} as Record<string, number>,
+  );
 
   return (
     <DataSetFilePageSection heading={pageApiSections[sectionId]} id={sectionId}>
@@ -50,14 +67,21 @@ export default function DataSetFileApiVersionHistory({
                 {data?.results.map(version => (
                   <tr key={version.version}>
                     <td>
-                      {version.version !== currentVersion ? (
+                      {version.version !== currentVersion &&
+                      version.file.id !== currentVersionFileId ? (
                         <Link
                           to={`/data-catalogue/data-set/${version.file.id}`}
                         >
                           {version.version}
                         </Link>
                       ) : (
-                        <strong>{version.version} (current)</strong>
+                        <strong>
+                          {version.version}{' '}
+                          {showCurrentTag(
+                            version.version,
+                            patchVersionHighestPatchDictionary,
+                          )}
+                        </strong>
                       )}
                     </td>
                     <td>{version.release.title}</td>
@@ -99,4 +123,22 @@ export default function DataSetFileApiVersionHistory({
       </LoadingSpinner>
     </DataSetFilePageSection>
   );
+  function showCurrentTag(
+    version: string,
+    latestPatchLookup: Record<string, number> | undefined,
+  ): string {
+    const versionParts = version.split('.');
+    let isCurrent = false;
+    if (versionParts.length === 3) {
+      const patch = Number(versionParts[2]);
+      const key = versionParts.slice(0, 2).join('.');
+      if (patch === latestPatchLookup?.[key]) {
+        isCurrent = true;
+      }
+    } else {
+      // `latestPatchLookup` only contains patch versions, so in this else, we treat everything not in `latestPatchLookup` as current.
+      isCurrent = latestPatchLookup?.[version] === undefined;
+    }
+    return isCurrent ? ' (current)' : '';
+  }
 }
