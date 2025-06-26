@@ -83,6 +83,16 @@ switch ($dataSourceType)
                     }
                 }
                 @{
+                    'sourceFieldName' = '/document/releaseSlug'
+                    'targetFieldName' = 'releaseSlug'
+                    'mappingFunction' = @{
+                        'name' = 'base64Decode'
+                        'parameters' = @{
+                            'useHttpServerUtilityUrlTokenDecode' = $false
+                        }
+                    }
+                }
+                @{
                     'sourceFieldName' = '/document/themeTitle'
                     'targetFieldName' = 'themeTitle'
                     'mappingFunction' = @{

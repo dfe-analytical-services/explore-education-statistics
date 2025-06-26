@@ -33,7 +33,6 @@ public class ReleaseSearchableDocumentExtensionsTests
         AssertAll(
         [
             AssertMetadata(SearchableDocumentAzureBlobMetadataKeys.ReleaseId, "76640d46-3f02-4b08-a4d9-c1fbf1bdd502"),
-            AssertMetadata(SearchableDocumentAzureBlobMetadataKeys.ReleaseSlug, "release-slug"),
             AssertMetadata(SearchableDocumentAzureBlobMetadataKeys.ReleaseVersionId, "5cd3ae70-ff32-409b-aa6b-363b380eb4c8"),
             AssertMetadata(SearchableDocumentAzureBlobMetadataKeys.PublicationId, "caf751b8-5f8c-4526-8b5f-7fd28199866b"),
             AssertMetadata(SearchableDocumentAzureBlobMetadataKeys.ThemeId, "4625ca38-68aa-4d73-a1f9-2aab732aecc2"),
@@ -41,6 +40,7 @@ public class ReleaseSearchableDocumentExtensionsTests
             AssertMetadata(SearchableDocumentAzureBlobMetadataKeys.ReleaseType, "Official Statistics"),
             AssertMetadata(SearchableDocumentAzureBlobMetadataKeys.TypeBoost, "10"),
             AssertEncodedMetadata(SearchableDocumentAzureBlobMetadataKeys.PublicationSlug, "publication-slug"),
+            AssertEncodedMetadata(SearchableDocumentAzureBlobMetadataKeys.ReleaseSlug, "release-slug"),
             AssertEncodedMetadata(SearchableDocumentAzureBlobMetadataKeys.Summary, "This is a summary."),
             AssertEncodedMetadata(SearchableDocumentAzureBlobMetadataKeys.ThemeTitle, "Theme Title"),
             AssertEncodedMetadata(SearchableDocumentAzureBlobMetadataKeys.Title, "Publication Title"),
