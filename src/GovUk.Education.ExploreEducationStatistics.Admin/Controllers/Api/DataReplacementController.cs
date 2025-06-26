@@ -33,11 +33,13 @@ public class DataReplacementController(IReplacementService replacementService) :
     [HttpPost("releases/{releaseVersionId:guid}/data/{replacementFileId:guid}/replacement")]
     public async Task<ActionResult<Unit>> Replace(
         Guid releaseVersionId,
-        Guid replacementFileId) // @MarkFix turn into a list
+        Guid replacementFileId, // @MarkFix turn into a list
+        CancellationToken cancellationToken = default)
     {
         return await replacementService.Replace(
                 releaseVersionId: releaseVersionId,
-                replacementFileId: replacementFileId
+                replacementFileId: replacementFileId,
+                cancellationToken: cancellationToken
             )
             .HandleFailuresOrOk();
     }

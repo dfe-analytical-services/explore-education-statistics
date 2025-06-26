@@ -29,6 +29,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Options;
 using Microsoft.Extensions.Options;
@@ -2581,7 +2582,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var result = await replacementService.Replace(
                     releaseVersionId: releaseVersion.Id,
-                    replacementFileId: replacementFile.Id);
+                    replacementFileId: replacementFile.Id,
+                    cancellationToken: default);
 
                 VerifyAllMocks(locationRepository,
                     timePeriodService);
@@ -2659,7 +2661,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var exception = await Assert.ThrowsAsync<InvalidOperationException>(() =>
                     replacementService.Replace(
                         releaseVersionId: releaseVersion.Id,
-                        replacementFileId: replacementReleaseFile.FileId));
+                        replacementFileId: replacementReleaseFile.FileId,
+                        cancellationToken: default));
 
                 Assert.Contains("Original file ReplacedById not set.", exception.Message);
                 Assert.Contains($"originalFileId: {originalFile.Id}", exception.Message);
@@ -2739,7 +2742,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var result = await replacementService.Replace(
                     releaseVersionId: releaseVersion.Id,
-                    replacementFileId: replacementReleaseFile.FileId);
+                    replacementFileId: replacementReleaseFile.FileId,
+                    cancellationToken: default);
 
                 result.AssertNotFound();
             }
@@ -2858,7 +2862,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var result = await replacementService.Replace(
                     releaseVersionId: releaseVersion.Id,
-                    replacementFileId: replacementFile.Id);
+                    replacementFileId: replacementFile.Id,
+                    cancellationToken: default);
+
+                result.AssertBadRequest(ReplacementMustBeValid);
               
                 if (enableReplacementOfPublicApiDataSets)
                 {
@@ -3305,7 +3312,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var result = await replacementService.Replace(
                     releaseVersionId: releaseVersion.Id,
-                    replacementFileId: replacementFile.Id);
+                    replacementFileId: replacementFile.Id,
+                    cancellationToken: default);
 
                 VerifyAllMocks(privateBlobCacheService,
                     cacheKeyService,
@@ -3815,7 +3823,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var result = await replacementService.Replace(
                     releaseVersionId: releaseVersion.Id,
-                    replacementFileId: replacementFile.Id);
+                    replacementFileId: replacementFile.Id,
+                    cancellationToken: default);
 
                 VerifyAllMocks(privateBlobCacheService,
                     cacheKeyService,
@@ -4190,7 +4199,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var result = await replacementService.Replace(
                     releaseVersionId: releaseVersion.Id,
-                    replacementFileId: replacementFile.Id);
+                    replacementFileId: replacementFile.Id,
+                    cancellationToken: default);
 
                 VerifyAllMocks(privateBlobCacheService,
                     cacheKeyService,
@@ -4480,7 +4490,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var result = await replacementService.Replace(
                     releaseVersionId: releaseVersion.Id,
-                    replacementFileId: replacementFile.Id);
+                    replacementFileId: replacementFile.Id,
+                    cancellationToken: default);
 
                 VerifyAllMocks(privateBlobCacheService,
                     cacheKeyService,
@@ -4687,7 +4698,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var result = await replacementService.Replace(
                     releaseVersionId: releaseVersion.Id,
-                    replacementFileId: replacementFile.Id);
+                    replacementFileId: replacementFile.Id,
+                    cancellationToken: default);
 
                 VerifyAllMocks(locationRepository,
                     releaseVersionService,
@@ -4880,7 +4892,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var result = await replacementService.Replace(
                     releaseVersionId: contentRelease.Id,
-                    replacementFileId: replacementFile.Id);
+                    replacementFileId: replacementFile.Id,
+                    cancellationToken: default);
 
                 VerifyAllMocks(locationRepository,
                     releaseVersionService,
