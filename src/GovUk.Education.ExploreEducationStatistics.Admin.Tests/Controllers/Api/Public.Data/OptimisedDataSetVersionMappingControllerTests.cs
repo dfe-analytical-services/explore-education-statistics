@@ -20,40 +20,38 @@ using Xunit.Abstractions;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api.Public.Data;
 
-public abstract class OptimisedDataSetVersionMappingControllerTests 
-    : IClassFixture<WebApplicationFactory<Startup>>,
-     IClassFixture<OptimisedPostgreSqlContainerUtil>
+public abstract class OptimisedDataSetVersionMappingControllerTests :
+    IClassFixture<OptimisedHttpClientWithPsqlFixture>
 {
     private const string BaseUrl = "api/public-data/data-set-versions";
 
     private readonly DataFixture _dataFixture = new();
 
-    public class GetLocationMappingsTests : OptimisedDataSetVersionMappingControllerTests
+    public class GetLocationMappingsTests : OptimisedDataSetVersionMappingControllerTests, IAsyncLifetime
     {
         private readonly OptimisedPostgreSqlContainerUtil _psql;
         private readonly ITestOutputHelper _output;
-        private WebApplicationFactory<Startup> app;
+        private readonly HttpClient _client;
+
+        public async Task InitializeAsync() {
+            await _psql.GetDbContext().ClearTestData();
+        }
+
+        public Task DisposeAsync()
+        {
+            return Task.CompletedTask;
+        }
 
         public GetLocationMappingsTests(
-            WebApplicationFactory<Startup> testApp,
-            OptimisedPostgreSqlContainerUtil psql,
+            OptimisedHttpClientWithPsqlFixture fixture,
             ITestOutputHelper output)
         {
-            _psql = psql;
+            _psql = fixture.GetContainer();
             _output = output;
             var sw = new Stopwatch();
             sw.Start();
-            
-            _psql.Start().Wait();
-            
-            output.WriteLine($"PSQL startup {sw.ElapsedMilliseconds}");
-            sw.Restart();
 
-            
-            app = testApp
-                .ConfigureAdmin()
-                .WithPostgres(_psql.GetContainer())
-                .Build();
+            _client = fixture.GetClient();
             
             output.WriteLine($"Testapp startup {sw.ElapsedMilliseconds}");
 
@@ -66,10 +64,6 @@ public abstract class OptimisedDataSetVersionMappingControllerTests
             sw.Start();
             
             var publicDataDbContext = _psql.GetDbContext();
-            await publicDataDbContext.ClearTestData();
-            
-            _output.WriteLine($"PSQL clear {sw.ElapsedMilliseconds}");
-            sw.Restart();
 
             var (initialDataSetVersion, nextDataSetVersion) = await CreateInitialAndNextDataSetVersion(publicDataDbContext);
 
@@ -122,14 +116,10 @@ public abstract class OptimisedDataSetVersionMappingControllerTests
 
             await publicDataDbContext.AddTestData(context => context.DataSetVersionMappings.Add(mapping));
 
-            
-            
             _output.WriteLine($"PSQL set up test data {sw.ElapsedMilliseconds}");
             sw.Restart();
-            
-            var client = app
-                .CreateClient()
-                .WithUser("Bau");
+
+            var client = _client.WithUser("Bau");
             
             _output.WriteLine($"Create client {sw.ElapsedMilliseconds}");
             sw.Restart();
@@ -155,8 +145,7 @@ public abstract class OptimisedDataSetVersionMappingControllerTests
             var sw = new Stopwatch();
             sw.Start();
 
-            var client = app
-                .CreateClient()
+            var client = _client
                 .WithUser("Authenticated");
 
             _output.WriteLine($"Create client {sw.ElapsedMilliseconds}");
@@ -178,7 +167,7 @@ public abstract class OptimisedDataSetVersionMappingControllerTests
             var sw = new Stopwatch();
             sw.Start();
 
-            var client = app.CreateClient()
+            var client = _client
                 .WithUser("Bau");
 
             _output.WriteLine($"Create client {sw.ElapsedMilliseconds}");
