@@ -155,7 +155,7 @@
       "name": "typeBoost",
       "type": "Edm.Int32",
       "searchable": false,
-      "filterable": false,
+      "filterable": true,
       "retrievable": true,
       "stored": true,
       "sortable": false,
