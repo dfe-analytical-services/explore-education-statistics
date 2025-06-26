@@ -302,11 +302,23 @@
       "functionAggregation": "sum",
       "text": {
         "weights": {
-          "title": 10,
-          "summary": 2
+          "title": 100,
+          "summary": 30
         }
       },
-      "functions": []
+      "functions": [
+        {
+          "type": "magnitude",  
+          "fieldName": "typeBoost",  
+          "boost": 10,  
+          "interpolation": "linear",  
+          "magnitude": {  
+            "boostingRangeStart": 1,  
+            "boostingRangeEnd": 10,  
+            "constantBoostBeyondRange": false  
+          }  
+        }
+      ]
     }
   ],
   "semantic": {
