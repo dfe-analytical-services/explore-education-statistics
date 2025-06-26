@@ -58,11 +58,11 @@ export default function ReleaseDataUploadsSection({
     [allDataFiles],
   );
 
-  // TODO - bulk confirmation of replacements
-  //  const validReplacedDataFiles = replacedDataFiles.filter(
-  //   file => file.status === 'COMPLETE',
-  // );
-  // const allowBulkConfirm = validReplacedDataFiles.length > 1;
+  // @MarkFix - bulk confirmation of replacements
+  const validReplacedDataFiles = replacedDataFiles.filter(
+    file => file.status === 'COMPLETE',
+  );
+  const allowBulkConfirm = validReplacedDataFiles.length > 1;
 
   const dataFiles = useMemo(
     () => allDataFiles.filter(dataFile => !dataFile.replacedBy),
@@ -189,8 +189,11 @@ export default function ReleaseDataUploadsSection({
     [releaseVersionId, toggleReordering],
   );
 
-  // TODO - bulk confirmation of replacements
-  // const handleConfirmAllReplacements = () => {};
+  // @MarkFix - bulk confirmation of replacements
+  const handleConfirmAllReplacements = () => {
+    // @MarkFix make backend query to replace all replacements
+    refetchDataFiles();
+  };
 
   return (
     <>
@@ -255,12 +258,12 @@ export default function ReleaseDataUploadsSection({
                 <Button onClick={toggleReordering.on} variant="secondary">
                   Reorder data files
                 </Button>
-                {/* TODO - bulk confirmation of replacements */}
-                {/* {allowBulkConfirm && (
+                {/* @MarkFix - bulk confirmation of replacements */}
+                {allowBulkConfirm && (
                   <Button onClick={handleConfirmAllReplacements}>
                     Confirm all valid replacements
                   </Button>
-                )} */}
+                )}
               </div>
             )}
 
