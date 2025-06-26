@@ -36,6 +36,7 @@ export default function DataFilesReplacementTableRow({
   onConfirmAction,
 }: Props) {
   const [fetchPlan, toggleFetchPlan] = useToggle(false);
+  const [canCancel, toggleCanCancel] = useToggle(false);
 
   const { data: replacementDataFile, isLoading } = useQuery(
     releaseDataFileQueries.getDataFile(
@@ -57,7 +58,7 @@ export default function DataFilesReplacementTableRow({
     if (replacementDataFile?.status === 'COMPLETE') {
       toggleFetchPlan.on();
     }
-  }, [replacementDataFile?.status, toggleFetchPlan]);
+  }, [replacementDataFile?.status, toggleFetchPlan, toggleCanCancel]);
 
   const handleStatusChange = (
     _file: DataFile,
@@ -65,13 +66,14 @@ export default function DataFilesReplacementTableRow({
   ) => {
     if (importStatus.status === 'COMPLETE') {
       toggleFetchPlan.on();
+      toggleCanCancel.on();
     }
   };
 
   if (!replacementDataFile) {
     return (
       <tr>
-        <td>
+        <td colSpan={4}>
           <LoadingSpinner loading={isLoading} />
         </td>
       </tr>
@@ -120,24 +122,28 @@ export default function DataFilesReplacementTableRow({
             View details
           </Link>
           <>
-            <ModalConfirm
-              title="Cancel data replacement"
-              triggerButton={
-                <ButtonText variant="secondary">Cancel replacement</ButtonText>
-              }
-              onConfirm={async () => {
-                await releaseDataFileService.deleteDataFiles(
-                  releaseVersionId,
-                  replacementDataFile.id,
-                );
-                onConfirmAction?.();
-              }}
-            >
-              <p>
-                Are you sure you want to cancel this data replacement? The
-                pending replacement data file will be deleted.
-              </p>
-            </ModalConfirm>
+            {(canCancel || replacementDataFile.status === 'COMPLETE') && (
+              <ModalConfirm
+                title="Cancel data replacement"
+                triggerButton={
+                  <ButtonText variant="secondary">
+                    Cancel replacement
+                  </ButtonText>
+                }
+                onConfirm={async () => {
+                  await releaseDataFileService.deleteDataFiles(
+                    releaseVersionId,
+                    replacementDataFile.id,
+                  );
+                  onConfirmAction?.();
+                }}
+              >
+                <p>
+                  Are you sure you want to cancel this data replacement? The
+                  pending replacement data file will be deleted.
+                </p>
+              </ModalConfirm>
+            )}
             {plan?.valid && (
               <ButtonText
                 onClick={async () => {
