@@ -153,7 +153,7 @@
     },
     {
       "name": "typeBoost",
-      "type": "Edm.String",
+      "type": "Edm.Int32",
       "searchable": false,
       "filterable": false,
       "retrievable": true,
