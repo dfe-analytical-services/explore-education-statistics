@@ -154,6 +154,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return await persistenceHelper
                 .CheckEntityExists<ReleaseFile>(q => q
                     .Include(releaseFile => releaseFile.File)
+                    .Include(releaseFile => releaseFile.ReleaseVersion)
                     .Where(releaseFile =>
                         releaseFile.ReleaseVersionId == releaseVersionId
                         && releaseFile.FileId == fileId
