@@ -25,6 +25,16 @@ module sitesPrivateDnsZoneModule '../components/privateDnsZone.bicep' = {
   }
 }
 
+// Set up a Private DNS zone for handling private endpoints for Event Grid custom topic resources.
+module eventGridTopicPrivateDnsZoneModule '../components/privateDnsZone.bicep' = {
+  name: 'eventGridTopicPrivateDnsZoneDeploy'
+  params: {
+    zoneType: 'eventGridTopic'
+    vnetName: vnetName
+    tagValues: tagValues
+  }
+}
+
 // Set up a Private DNS zone for handling private endpoints for Storage Account File Services.
 module fileServicePrivateDnsZoneModule '../components/privateDnsZone.bicep' = {
   name: 'fileServicePrivateDnsZoneDeploy'

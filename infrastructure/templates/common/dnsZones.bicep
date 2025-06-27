@@ -4,6 +4,10 @@ var dnsZones = {
     zoneName: 'privatelink.blob.${environment().suffixes.storage}'
     dnsGroup: 'blob'
   }
+  eventGridTopic: {
+    zoneName: 'privatelink.eventgrid.azure.net'
+    dnsGroup: 'topic'
+  }
   fileService: {
     zoneName: 'privatelink.file.${environment().suffixes.storage}'
     dnsGroup: 'file'

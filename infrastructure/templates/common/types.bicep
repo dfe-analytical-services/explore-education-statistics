@@ -24,6 +24,7 @@ type FirewallRule = {
 @export()
 type PrivateDnsZone =
   | 'blobStorage'
+  | 'eventGridTopic'
   | 'fileService'
   | 'postgres'
   | 'queue'
