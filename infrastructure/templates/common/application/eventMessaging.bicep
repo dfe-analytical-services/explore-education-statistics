@@ -3,11 +3,10 @@ Sets up event messaging infrastructure using Azure Event Grid and ensures that b
 Publisher Function App have the necessary permissions to send events to the Event Grid topics.
 '''
 
-import { builtInRoleDefinitionIds } from '../../common/builtInRoles.bicep'
-import { eventTopics } from '../../common/eventTopics.bicep'
-import { buildFullyQualifiedTopicName } from '../../common/functions.bicep'
-import { IpRange } from '../../common/types.bicep'
-import { ResourceNames } from '../types.bicep'
+import { builtInRoleDefinitionIds } from '../builtInRoles.bicep'
+import { eventTopics } from '../eventTopics.bicep'
+import { buildFullyQualifiedTopicName } from '../functions.bicep'
+import { IpRange } from '../types.bicep'
 
 @description('Location for all resources.')
 param location string
@@ -18,8 +17,13 @@ param ipRules IpRange[] = []
 @description('Specifies whether Event Grid resources can be accessed from public networks, including the internet or are restricted to private endpoints only.')
 param publicNetworkAccessEnabled bool = false
 
-@description('Specifies common resource naming variables.')
-param resourceNames ResourceNames
+@description('Specifies resource naming variables.')
+@sealed()
+param resourceNames {
+  adminApp: string
+  alertsGroup: string
+  publisherFunction: string
+}
 
 @description('Resource prefix for all resources.')
 param resourcePrefix string
@@ -30,14 +34,14 @@ param tagValues object
 var topicNames = map(items(eventTopics), item => item.value)
 
 resource adminAppService 'Microsoft.Web/sites@2024-04-01' existing = {
-  name: resourceNames.existingResources.adminApp
+  name: resourceNames.adminApp
 }
 
 resource publisherFunction 'Microsoft.Web/sites@2024-04-01' existing = {
-  name: resourceNames.existingResources.publisherFunction
+  name: resourceNames.publisherFunction
 }
 
-module eventGridMessagingModule '../../common/components/event-grid/eventGridMessaging.bicep' = {
+module eventGridMessagingModule '../components/event-grid/eventGridMessaging.bicep' = {
   name: 'eventGridMessagingModuleDeploy'
   params: {
     location: location
@@ -51,14 +55,14 @@ module eventGridMessagingModule '../../common/components/event-grid/eventGridMes
       droppedEventCount: true
       publishFailCount: true
       unmatchedEventCount: true
-      alertsGroupName: resourceNames.existingResources.alertsGroup
+      alertsGroupName: resourceNames.alertsGroup
     }
     tagValues: tagValues
   }
 }
 
 // Allow the Admin App Service to send events to Event Grid topics
-module adminTopicRoleAssignmentModuleDeploy '../../common/components/event-grid/eventGridTopicRoleAssignment.bicep' = [
+module adminTopicRoleAssignmentModuleDeploy '../components/event-grid/eventGridTopicRoleAssignment.bicep' = [
   for (topicName, index) in topicNames: {
     name: 'adminTopicRoleAssignmentModuleDeploy-${index}'
     params: {
@@ -73,7 +77,7 @@ module adminTopicRoleAssignmentModuleDeploy '../../common/components/event-grid/
 ]
 
 // Allow the Publisher Function App to send events to Event Grid topics
-module publisherTopicRoleAssignmentModuleDeploy '../../common/components/event-grid/eventGridTopicRoleAssignment.bicep' = [
+module publisherTopicRoleAssignmentModuleDeploy '../components/event-grid/eventGridTopicRoleAssignment.bicep' = [
   for (topicName, index) in topicNames: {
     name: 'publisherTopicRoleAssignmentModuleDeploy-${index}'
     params: {

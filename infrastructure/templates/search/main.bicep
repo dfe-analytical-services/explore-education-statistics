@@ -88,12 +88,16 @@ module monitoringModule 'application/monitoring.bicep' = {
 // other services that publish events but are not yet defined in Bicep such as the Admin App Service
 // and the Publisher Function App.
 // The Search Service relies on this infrastructure to subscribe to events.
-module eventMessagingModule 'application/eventMessaging.bicep' = {
+module eventMessagingModule '../common/application/eventMessaging.bicep' = {
   name: 'eventMessagingModuleDeploy'
   params: {
     location: location
     resourcePrefix: resourcePrefix
-    resourceNames: resourceNames
+    resourceNames: {
+      adminApp: resourceNames.existingResources.adminApp
+      alertsGroup: resourceNames.existingResources.alertsGroup
+      publisherFunction: resourceNames.existingResources.publisherFunction
+    }
     tagValues: tagValues
   }
 }
