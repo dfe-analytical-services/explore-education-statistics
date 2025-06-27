@@ -22,7 +22,21 @@ type FirewallRule = {
 }
 
 @export()
-type StorageAccountRole = 'Storage Blob Data Contributor' | 'Storage Blob Data Owner' | 'Storage Blob Data Reader' | 'Storage Queue Data Contributor'
+type PrivateDnsZone =
+  | 'blobStorage'
+  | 'fileService'
+  | 'postgres'
+  | 'queue'
+  | 'sites'
+  | 'tableStorage'
+  | 'custom'
+
+@export()
+type StorageAccountRole =
+  | 'Storage Blob Data Contributor'
+  | 'Storage Blob Data Owner'
+  | 'Storage Blob Data Reader'
+  | 'Storage Queue Data Contributor'
 
 @export()
 type StorageAccountConfig = {

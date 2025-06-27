@@ -3,7 +3,6 @@ import {
   IpRange
   AzureFileShareMount
   EntraIdAuthentication
-  StorageAccountPrivateEndpoints
 } from '../types.bicep'
 
 import { staticAverageLessThanHundred, staticMinGreaterThanZero } from 'alerts/staticAlertConfig.bicep'
@@ -461,7 +460,7 @@ module functionAppSlotSettings 'appServiceSlotConfig.bicep' = {
   ]
 }
 
-module privateEndpointModule 'privateEndpoint.bicep' = if (privateEndpoints.?functionApp != null) {
+module privateEndpointModule '../../common/components/privateEndpoint.bicep' = if (privateEndpoints.?functionApp != null) {
   name: '${functionAppName}PrivateEndpointDeploy'
   params: {
     serviceId: functionApp.id

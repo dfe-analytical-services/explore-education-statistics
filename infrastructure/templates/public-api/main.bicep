@@ -248,10 +248,10 @@ module coreStorage 'application/shared/coreStorage.bicep' = {
   }
 }
 
-module privateDnsZonesModule 'application/shared/privateDnsZones.bicep' = if (deploySharedPrivateDnsZones) {
+module privateDnsZonesModule '../common/application/privateDnsZones.bicep' = if (deploySharedPrivateDnsZones) {
   name: 'privateDnsZonesApplicationModuleDeploy'
   params: {
-    resourceNames: resourceNames
+    vnetName: resourceNames.existingResources.vNet
     tagValues: tagValues
   }
 }
