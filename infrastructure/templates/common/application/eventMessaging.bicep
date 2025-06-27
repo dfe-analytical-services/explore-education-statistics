@@ -23,6 +23,10 @@ param resourceNames {
   adminApp: string
   alertsGroup: string
   publisherFunction: string
+  vNet: string
+  subnets: {
+    eventGridCustomTopicPrivateEndpoints: string
+  }
 }
 
 @description('Resource prefix for all resources.')
@@ -41,21 +45,33 @@ resource publisherFunction 'Microsoft.Web/sites@2024-04-01' existing = {
   name: resourceNames.publisherFunction
 }
 
+resource vNet 'Microsoft.Network/virtualNetworks@2023-11-01' existing = {
+  name: resourceNames.vNet
+}
+
+resource eventGridCustomTopicPrivateEndpointsSubnet 'Microsoft.Network/virtualNetworks/subnets@2024-07-01' existing = {
+  name: resourceNames.subnets.eventGridCustomTopicPrivateEndpoints
+  parent: vNet
+}
+
 module eventGridMessagingModule '../components/event-grid/eventGridMessaging.bicep' = {
   name: 'eventGridMessagingModuleDeploy'
   params: {
     location: location
-    customTopicNames: topicNames
     ipRules: ipRules
     publicNetworkAccessEnabled: publicNetworkAccessEnabled
     resourcePrefix: resourcePrefix
-    customTopicAlerts: {
-      deadLetteredCount: true
-      deliveryAttemptFailCount: true
-      droppedEventCount: true
-      publishFailCount: true
-      unmatchedEventCount: true
-      alertsGroupName: resourceNames.alertsGroup
+    customTopics: {
+      names: topicNames
+      privateEndpointSubnetId: eventGridCustomTopicPrivateEndpointsSubnet.id
+      alerts: {
+        deadLetteredCount: true
+        deliveryAttemptFailCount: true
+        droppedEventCount: true
+        publishFailCount: true
+        unmatchedEventCount: true
+        alertsGroupName: resourceNames.alertsGroup
+      }
     }
     tagValues: tagValues
   }

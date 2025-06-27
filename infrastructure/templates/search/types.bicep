@@ -8,6 +8,7 @@ type ResourceNames = {
     vNet: string
     alertsGroup: string
     subnets: {
+      eventGridCustomTopicPrivateEndpoints: string
       searchDocsFunction: string
       searchDocsFunctionPrivateEndpoints: string
       searchStoragePrivateEndpoints: string
