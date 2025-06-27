@@ -86,7 +86,14 @@ const LineChartBlock = ({
     includeNonNumericData,
   });
 
-  const chartData = dataSetCategories.map(toChartData);
+  const chartDataUnsorted = dataSetCategories.map(toChartData);
+  // If no `sortAsc` has been set, we should default
+  // to true as it's not really natural to sort in
+  // descending order most of the time.
+  const chartData =
+    axes.major.sortAsc ?? true
+      ? chartDataUnsorted
+      : chartDataUnsorted.reverse();
 
   const minorDomainTicks = getMinorAxisDomainTicks(chartData, axes.minor);
   const majorDomainTicks = getMajorAxisDomainTicks(chartData, axes.major);

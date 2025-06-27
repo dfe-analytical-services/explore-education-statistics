@@ -79,11 +79,18 @@ const HorizontalBarBlock = ({
     dataSetCategory => dataSetCategory.filter.group,
   );
 
-  const chartData = axes.major.groupByFilterGroups
+  const chartDataUnsorted = axes.major.groupByFilterGroups
     ? Object.entries(groupedDataSetCategories).map(([groupKey, group]) =>
         Object.assign({}, ...group.map(toChartData), { name: groupKey }),
       )
     : dataSetCategories.map(toChartData);
+  // If no `sortAsc` has been set, we should default
+  // to true as it's not really natural to sort in
+  // descending order most of the time.
+  const chartData =
+    axes.major.sortAsc ?? true
+      ? chartDataUnsorted
+      : chartDataUnsorted.reverse();
 
   const minorDomainTicks = getMinorAxisDomainTicks(chartData, axes.minor);
   const majorDomainTicks = getMajorAxisDomainTicks(chartData, axes.major);
