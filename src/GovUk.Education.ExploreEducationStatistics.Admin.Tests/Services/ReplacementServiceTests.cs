@@ -29,9 +29,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Options;
+using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using Microsoft.Extensions.Options;
 using Semver;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
@@ -2582,7 +2582,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var result = await replacementService.Replace(
                     releaseVersionId: releaseVersion.Id,
-                    replacementFileId: replacementFile.Id,
+                    replacementFileIds: [replacementFile.Id],
                     cancellationToken: default);
 
                 VerifyAllMocks(locationRepository,
@@ -2661,7 +2661,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var exception = await Assert.ThrowsAsync<InvalidOperationException>(() =>
                     replacementService.Replace(
                         releaseVersionId: releaseVersion.Id,
-                        replacementFileId: replacementReleaseFile.FileId,
+                        replacementFileIds: [replacementReleaseFile.FileId],
                         cancellationToken: default));
 
                 Assert.Contains("Original file ReplacedById not set.", exception.Message);
@@ -2742,12 +2742,168 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var result = await replacementService.Replace(
                     releaseVersionId: releaseVersion.Id,
-                    replacementFileId: replacementReleaseFile.FileId,
+                    replacementFileIds: [replacementReleaseFile.FileId],
                     cancellationToken: default);
 
-                result.AssertNotFound();
+                var validationProblem = result.AssertBadRequestWithValidationProblem();
+                validationProblem.AssertHasErrors(
+                [
+                    new ErrorViewModel { Code = "ReplacementNotFound", Message = $"Replacement or original file not found. ReplacementFileId: {replacementFile.Id}" }
+                ]);
             }
         }
+
+        [Fact]
+        public async Task Replace_TwoReplacements_OneInvalidOneNotFound()
+        {
+            var releaseVersion = _fixture.DefaultReleaseVersion().Generate();
+
+            var statsReleaseVersion = _fixture.DefaultStatsReleaseVersion()
+                .WithId(releaseVersion.Id)
+                .Generate();
+
+            var (originalReleaseSubject2, replacementReleaseSubject2) = _fixture.DefaultReleaseSubject()
+                .WithReleaseVersion(statsReleaseVersion)
+                .WithSubjects(_fixture.DefaultSubject().Generate(2))
+                .GenerateTuple2();
+
+            var originalFile2 = new File
+            {
+                Type = FileType.Data,
+                SubjectId = originalReleaseSubject2.SubjectId
+            };
+
+            var replacementFile2 = new File
+            {
+                Type = FileType.Data,
+                SubjectId = replacementReleaseSubject2.SubjectId,
+                Replacing = originalFile2
+            };
+
+            originalFile2.ReplacedBy = replacementFile2;
+
+            var originalReleaseFile2 = new ReleaseFile
+            {
+                ReleaseVersion = releaseVersion,
+                File = originalFile2
+            };
+
+            var replacementReleaseFile = new ReleaseFile
+            {
+                ReleaseVersion = releaseVersion,
+                File = replacementFile2
+            };
+
+            var originalLocation2 = new Location
+            {
+                Id = Guid.NewGuid(),
+                GeographicLevel = GeographicLevel.Country,
+                Country = _england
+            };
+
+            var timePeriod2 = new TimePeriodQuery
+            {
+                StartYear = 2019,
+                StartCode = CalendarYear,
+                EndYear = 2020,
+                EndCode = CalendarYear
+            };
+            var table2 = new TableBuilderConfiguration
+            {
+                TableHeaders = new TableHeaders
+                {
+                    ColumnGroups = new List<List<TableHeader>>(),
+                    Columns = new List<TableHeader>
+                    {
+                        new("2019_CY", TableHeaderType.TimePeriod),
+                        new("2020_CY", TableHeaderType.TimePeriod)
+                    },
+                    RowGroups = new List<List<TableHeader>>
+                    {
+                        new()
+                        {
+                            TableHeader.NewLocationHeader(GeographicLevel.Country, originalLocation2.Id.ToString())
+                        }
+                    },
+                    Rows = new List<TableHeader>()
+                }
+            };
+
+            var dataBlock2 = new DataBlock
+            {
+                Name = "Test DataBlock",
+                Query = new FullTableQuery
+                {
+                    SubjectId = originalReleaseSubject2.SubjectId,
+                    Filters = new Guid[] { },
+                    Indicators = new Guid[] { },
+                    LocationIds = ListOf(originalLocation2.Id),
+                    TimePeriod = timePeriod2
+                },
+                Table = table2,
+                ReleaseVersion = releaseVersion
+            };
+
+            var locationRepository2 = new Mock<ILocationRepository>(Strict);
+            locationRepository2.Setup(service => service.GetDistinctForSubject(replacementReleaseSubject2.SubjectId))
+                .ReturnsAsync(new List<Location>());
+
+            var timePeriodService2 = new Mock<ITimePeriodService>(Strict);
+            timePeriodService2.Setup(service => service.GetTimePeriods(replacementReleaseSubject2.SubjectId))
+                .ReturnsAsync(new List<(int Year, TimeIdentifier TimeIdentifier)>());
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            var statisticsDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                contentDbContext.ReleaseVersions.AddRange(releaseVersion);
+
+                contentDbContext.ReleaseFiles.AddRange(
+                    originalReleaseFile2,
+                    replacementReleaseFile);
+                contentDbContext.DataBlocks.AddRange(dataBlock2);
+
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            {
+                statisticsDbContext.ReleaseVersion.AddRange(statsReleaseVersion);
+
+                statisticsDbContext.ReleaseSubject.AddRange(
+                    originalReleaseSubject2,
+                    replacementReleaseSubject2);
+                statisticsDbContext.Location.AddRange(originalLocation2);
+
+                await statisticsDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            {
+                var replacementService = BuildReplacementService(contentDbContext,
+                    statisticsDbContext,
+                    locationRepository: locationRepository2.Object,
+                    timePeriodService: timePeriodService2.Object);
+
+                var nonExistantReplacementFileId = Guid.NewGuid();
+                var result = await replacementService.Replace(
+                    releaseVersionId: releaseVersion.Id,
+                    replacementFileIds: [replacementFile2.Id, nonExistantReplacementFileId],
+                    cancellationToken: default);
+
+                VerifyAllMocks(locationRepository2,
+                    timePeriodService2);
+
+                var validationProblem = result.AssertBadRequestWithValidationProblem();
+                validationProblem.AssertHasErrors([
+                    new ErrorViewModel { Code = "ReplacementMustBeValid", Message = $"Replacement not valid. ReplacementFileId: {replacementFile2.Id}" },
+                    new ErrorViewModel { Code = "ReplacementNotFound", Message = $"Replacement or original file not found. ReplacementFileId: {nonExistantReplacementFileId}" },
+                ]);
+            }
+        }
+
 
         [Theory]
         [InlineData(true)]
@@ -2862,11 +3018,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var result = await replacementService.Replace(
                     releaseVersionId: releaseVersion.Id,
-                    replacementFileId: replacementFile.Id,
+                    replacementFileIds: [replacementFile.Id],
                     cancellationToken: default);
 
-                result.AssertBadRequest(ReplacementMustBeValid);
-              
                 if (enableReplacementOfPublicApiDataSets)
                 {
                     //Once EES-5779 is enabled, replacing file linked to API data set is possible.
@@ -2888,6 +3042,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 }
             }
         }
+
+        // @MarkFix writing a test for multiple replacements at once will be a pain...
 
         [Fact]
         public async Task Replace()
@@ -3312,7 +3468,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var result = await replacementService.Replace(
                     releaseVersionId: releaseVersion.Id,
-                    replacementFileId: replacementFile.Id,
+                    replacementFileIds: [replacementFile.Id],
                     cancellationToken: default);
 
                 VerifyAllMocks(privateBlobCacheService,
@@ -3823,7 +3979,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var result = await replacementService.Replace(
                     releaseVersionId: releaseVersion.Id,
-                    replacementFileId: replacementFile.Id,
+                    replacementFileIds: [replacementFile.Id],
                     cancellationToken: default);
 
                 VerifyAllMocks(privateBlobCacheService,
@@ -4199,7 +4355,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var result = await replacementService.Replace(
                     releaseVersionId: releaseVersion.Id,
-                    replacementFileId: replacementFile.Id,
+                    replacementFileIds: [replacementFile.Id],
                     cancellationToken: default);
 
                 VerifyAllMocks(privateBlobCacheService,
@@ -4490,7 +4646,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var result = await replacementService.Replace(
                     releaseVersionId: releaseVersion.Id,
-                    replacementFileId: replacementFile.Id,
+                    replacementFileIds: [replacementFile.Id],
                     cancellationToken: default);
 
                 VerifyAllMocks(privateBlobCacheService,
@@ -4698,7 +4854,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var result = await replacementService.Replace(
                     releaseVersionId: releaseVersion.Id,
-                    replacementFileId: replacementFile.Id,
+                    replacementFileIds: [replacementFile.Id],
                     cancellationToken: default);
 
                 VerifyAllMocks(locationRepository,
@@ -4892,7 +5048,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var result = await replacementService.Replace(
                     releaseVersionId: contentRelease.Id,
-                    replacementFileId: replacementFile.Id,
+                    replacementFileIds: [replacementFile.Id],
                     cancellationToken: default);
 
                 VerifyAllMocks(locationRepository,

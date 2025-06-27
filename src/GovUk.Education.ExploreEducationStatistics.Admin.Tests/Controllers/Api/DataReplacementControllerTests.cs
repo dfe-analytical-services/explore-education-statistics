@@ -110,9 +110,9 @@ public abstract class DataReplacementControllerTests
             replacementService
                 .Setup(service => service.Replace(
                     releaseVersionId,
-                    replacementFileId,
+                    new List<Guid> { replacementFileId },
                     default))
-                .ReturnsAsync(Unit.Instance);
+        .ReturnsAsync(Unit.Instance);
 
             var controller = BuildController(replacementService: replacementService.Object);
 
@@ -136,7 +136,7 @@ public abstract class DataReplacementControllerTests
             replacementService
                 .Setup(service => service.Replace(
                     releaseVersionId,
-                    replacementFileId,
+                    new List<Guid> { replacementFileId },
                     default))
                 .ReturnsAsync(ValidationUtils.ValidationActionResult(ValidationErrorMessages.ReplacementMustBeValid));
 
