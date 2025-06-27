@@ -66,6 +66,7 @@ var resourceNames = {
     vNet: '${subscription}-${abbreviations.networkVirtualNetworks}-ees'
     alertsGroup: '${subscription}-${abbreviations.insightsActionGroups}-ees-alertedusers'
     subnets: {
+      eventGridCustomTopicPrivateEndpoints: '${resourcePrefix}-${abbreviations.networkVirtualNetworksSubnets}-${abbreviations.eventGridTopics}-pep'
       searchDocsFunction: '${resourcePrefix}-${abbreviations.networkVirtualNetworksSubnets}-${abbreviations.webSitesFunctions}-searchdocs'
       searchDocsFunctionPrivateEndpoints: '${resourcePrefix}-${abbreviations.networkVirtualNetworksSubnets}-${abbreviations.webSitesFunctions}-searchdocs-pep'
       searchStoragePrivateEndpoints: '${resourcePrefix}-${abbreviations.networkVirtualNetworksSubnets}-${abbreviations.storageStorageAccounts}-search-pep'
@@ -97,6 +98,10 @@ module eventMessagingModule '../common/application/eventMessaging.bicep' = {
       adminApp: resourceNames.existingResources.adminApp
       alertsGroup: resourceNames.existingResources.alertsGroup
       publisherFunction: resourceNames.existingResources.publisherFunction
+      vNet: resourceNames.existingResources.vNet
+      subnets: {
+        eventGridCustomTopicPrivateEndpoints: resourceNames.existingResources.subnets.eventGridCustomTopicPrivateEndpoints
+      }
     }
     tagValues: tagValues
   }

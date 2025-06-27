@@ -18,6 +18,9 @@ param localAuthenticationEnabled bool = false
 @description('Specifies whether the resource can be accessed from public networks, including the internet or is restricted to private endpoints only.')
 param publicNetworkAccessEnabled bool = false
 
+@description('The resource id of the subnet in which a private endpoint will be created.')
+param privateEndpointSubnetId string?
+
 @description('Indicates whether the resource should have a system-assigned managed identity.')
 param systemAssignedIdentity bool = false
 
@@ -66,6 +69,18 @@ resource topic 'Microsoft.EventGrid/topics@2025-02-15' = {
     dataResidencyBoundary: 'WithinRegion'
   }
   tags: tagValues
+}
+
+module privateEndpointModule '../privateEndpoint.bicep' = if (privateEndpointSubnetId != null) {
+  name: '${name}PrivEpDeploy'
+  params: {
+    serviceId: topic.id
+    serviceName: topic.name
+    serviceType: 'eventGridTopic'
+    subnetId: privateEndpointSubnetId!
+    location: location
+    tagValues: tagValues
+  }
 }
 
 module deadLetteredCountAlert '../../../public-api/components/alerts/staticMetricAlert.bicep' = if (alerts != null) {

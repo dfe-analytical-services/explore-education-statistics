@@ -13,22 +13,28 @@ param ipRules IpRange[] = []
 @description('Specifies whether resources can be accessed from public networks, including the internet or are restricted to private endpoints only.')
 param publicNetworkAccessEnabled bool = false
 
-@description('Specifies which custom topic alert rules to enable. If the optional alerts parameter is not provided, no alert rules will be created or updated.')
-param customTopicAlerts {
-  deadLetteredCount: bool
-  deliveryAttemptFailCount: bool
-  droppedEventCount: bool
-  publishFailCount: bool
-  unmatchedEventCount: bool
-  alertsGroupName: string
+@description('Specifies a set of custom topics and configuration associated with them.')
+param customTopics {
+  @description('A list of custom topic names to create.')
+  @minLength(1)
+  names: string[]
+  @description('The resource id of the subnet to be used for creating private endpoints for custom topics.')
+  privateEndpointSubnetId: string?
+  @description('Specifies which custom topic alert rules to enable. If the optional alerts parameter is not provided, no alert rules will be created or updated.')
+  alerts: {
+    deadLetteredCount: bool
+    deliveryAttemptFailCount: bool
+    droppedEventCount: bool
+    publishFailCount: bool
+    unmatchedEventCount: bool
+    alertsGroupName: string
+  }?
 }?
 
 @description('Specifies a set of tags with which to tag resources in Azure.')
 param tagValues object
 
-@description('A list of custom topic names to create.')
-@minLength(1)
-param customTopicNames string[]
+var customTopicNames string[] = customTopics.?names ?? []
 
 module eventGridCustomTopicModule 'eventGridCustomTopic.bicep' = [
   for (topicName, index) in customTopicNames: {
@@ -37,9 +43,10 @@ module eventGridCustomTopicModule 'eventGridCustomTopic.bicep' = [
       name: buildFullyQualifiedTopicName(resourcePrefix, topicName)
       location: location
       ipRules: ipRules
+      privateEndpointSubnetId: customTopics.?privateEndpointSubnetId
       publicNetworkAccessEnabled: publicNetworkAccessEnabled
       systemAssignedIdentity: true
-      alerts: customTopicAlerts
+      alerts: customTopics.?alerts
       tagValues: tagValues
     }
   }
