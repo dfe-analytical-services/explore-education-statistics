@@ -566,7 +566,7 @@ public class PublishingCompletionServiceTests
             public class NotificationServiceTests : ReadyTests
             {
                 [Fact]
-                public async Task NotifySubscribersIfApplicable()
+                public async Task NotificationsSent()
                 {
                     // ARRANGE
                     var readyKeys = SetupHappyPath();
@@ -577,6 +577,7 @@ public class PublishingCompletionServiceTests
 
                     // ASSERT
                     _notificationsService.Assert.NotifySubscribersIfApplicableCalled(_releaseVersion1.Id, _releaseVersion2.Id);
+                    _notificationsService.Assert.SendReleasePublishingFeedbackEmailsCalled(_releaseVersion1.Id, _releaseVersion2.Id);
                 }
             }
 

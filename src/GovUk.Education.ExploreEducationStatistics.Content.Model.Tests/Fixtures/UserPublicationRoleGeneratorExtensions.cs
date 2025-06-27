@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
@@ -37,6 +38,9 @@ public static class UserPublicationRoleGeneratorExtensions
         return generator;    
     }
     
+    public static Generator<UserPublicationRole> WithDeleted(this Generator<UserPublicationRole> generator, DateTime deleted)
+        => generator.ForInstance(d => d.SetDeleted(deleted));
+    
     public static InstanceSetters<UserPublicationRole> SetDefaults(this InstanceSetters<UserPublicationRole> setters)
         => setters
             .SetDefault(p => p.Id)
@@ -57,4 +61,9 @@ public static class UserPublicationRoleGeneratorExtensions
         this InstanceSetters<UserPublicationRole> setters,
         PublicationRole role)
         => setters.Set(d => d.Role, role);
+    
+    public static InstanceSetters<UserPublicationRole> SetDeleted(
+        this InstanceSetters<UserPublicationRole> setters,
+        DateTime deleted)
+        => setters.Set(d => d.Deleted, deleted);
 }

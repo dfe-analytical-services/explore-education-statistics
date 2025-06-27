@@ -17,7 +17,7 @@ public record ReleasePublishingFeedback : ICreatedTimestamp<DateTime>
     
     public required PublicationRole UserPublicationRole { get; set; }
     
-    public ReleasePublishingFeedbackResponse? Response { get; set; }
+    public ReleasePublishingFeedbackResponse? Response { get; set; } = null!;
 
     public string? AdditionalFeedback { get; set; }
 

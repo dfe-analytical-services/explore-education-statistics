@@ -86,6 +86,8 @@ public class PublishingCompletionService(
 
         await notificationsService.NotifySubscribersIfApplicable(releaseVersionIdsToUpdate);
 
+        await notificationsService.SendReleasePublishingFeedbackEmails(releaseVersionIdsToUpdate);
+
         // Update the cached trees in case any methodologies/publications
         // are now accessible for the first time after publishing these releases
         await contentService.UpdateCachedTaxonomyBlobs();

@@ -896,7 +896,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
             modelBuilder.Entity<ReleasePublishingFeedback>()
                 .Property(feedback => feedback.Response)
                 .HasConversion(new EnumToStringConverter<ReleasePublishingFeedbackResponse>())
-                .IsRequired()
                 .HasMaxLength(50);
 
             modelBuilder.Entity<ReleasePublishingFeedback>()

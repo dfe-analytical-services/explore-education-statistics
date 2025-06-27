@@ -15,7 +15,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using Notify.Client;
 using Notify.Interfaces;
 
@@ -26,10 +25,11 @@ public static class NotifierHostBuilder
     public static IHostBuilder ConfigureNotifierHostBuilder(this IHostBuilder hostBuilder)
     {
         return hostBuilder
-            .ConfigureAppConfiguration(builder =>
+            .ConfigureAppConfiguration((context, builder) =>
             {
                 builder
                     .AddJsonFile("appsettings.json", optional: true, reloadOnChange: false)
+                    .AddJsonFile($"appsettings.{context.HostingEnvironment.EnvironmentName}.json", optional: true, reloadOnChange: false)
                     .AddJsonFile("appsettings.Local.json", optional: true, reloadOnChange: false)
                     .AddEnvironmentVariables();
             })
@@ -40,6 +40,14 @@ public static class NotifierHostBuilder
             })
             .ConfigureServices((hostContext, services) =>
             {
+                var appOptions = hostContext
+                    .Configuration
+                    .GetRequiredSection(AppOptions.Section);
+
+                var govUkNotifyOptions = hostContext
+                    .Configuration
+                    .GetRequiredSection(GovUkNotifyOptions.Section);
+
                 services
                     .AddApplicationInsightsTelemetryWorkerService()
                     .ConfigureFunctionsApplicationInsights()
@@ -51,20 +59,24 @@ public static class NotifierHostBuilder
                     .AddFluentValidation()
                     .AddValidatorsFromAssembly(
                         typeof(ApiNotificationMessage.Validator).Assembly) // Adds *all* validators from Notifier.Model
-                    .Configure<AppOptions>(hostContext.Configuration.GetSection(AppOptions.Section))
-                    .Configure<GovUkNotifyOptions>(hostContext.Configuration.GetSection(GovUkNotifyOptions.Section))
-                    .AddTransient<INotificationClient>(serviceProvider =>
-                    {
-                        var govUkNotifyOptions = serviceProvider.GetRequiredService<IOptions<GovUkNotifyOptions>>();
-
-                        return new NotificationClient(govUkNotifyOptions.Value.ApiKey);
-                    })
+                    .Configure<AppOptions>(appOptions)
+                    .Configure<GovUkNotifyOptions>(govUkNotifyOptions)
+                    .AddTransient<INotificationClient>(_ => new NotificationClient(
+                        govUkNotifyOptions.GetValue<string>(nameof(GovUkNotifyOptions.ApiKey))))
                     .AddTransient<INotifierTableStorageService, NotifierTableStorageService>()
-                    .AddTransient<IEmailService, EmailService>()
                     .AddTransient<IApiSubscriptionRepository, ApiSubscriptionRepository>()
                     .AddTransient<ISubscriptionRepository, SubscriptionRepository>()
                     .AddTransient<IApiSubscriptionService, ApiSubscriptionService>()
                     .AddTransient<ITokenService, TokenService>();
+                
+                if (appOptions.GetValue<bool>(nameof(AppOptions.EmailEnabled)))
+                {
+                    services.AddTransient<IEmailService, EmailService>();
+                }
+                else
+                {
+                    services.AddTransient<IEmailService, LoggingEmailService>();
+                }
             });
     }
 }
