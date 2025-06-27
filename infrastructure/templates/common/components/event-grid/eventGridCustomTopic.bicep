@@ -87,7 +87,7 @@ module deadLetteredCountAlert '../../../public-api/components/alerts/staticMetri
   }
 }
 
-module droppedEventCount '../../../public-api/components/alerts/staticMetricAlert.bicep' = if (alerts != null) {
+module droppedEventCountAlert '../../../public-api/components/alerts/staticMetricAlert.bicep' = if (alerts != null) {
   name: '${name}DropEvntDeploy'
   params: {
     enabled: alerts!.droppedEventCount
