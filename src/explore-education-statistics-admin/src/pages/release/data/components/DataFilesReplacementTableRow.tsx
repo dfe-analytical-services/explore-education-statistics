@@ -126,7 +126,7 @@ export default function DataFilesReplacementTableRow({
                 <ButtonText variant="secondary">Cancel replacement</ButtonText>
               }
               onConfirm={async () => {
-                await releaseDataFileService.deleteDataFiles(
+                await releaseDataFileService.deleteDataFilesWithApi(
                   releaseVersionId,
                   replacementDataFile.id,
                 );
