@@ -20,7 +20,7 @@ public record HealthCheckResultViewModel(string Description, string StrategyType
     private HealthCheckResultViewModel(HealthCheckResult healthCheckResult)
         : this(
             healthCheckResult.Strategy.Description,
-            healthCheckResult.Strategy.GetType()?.Name ?? string.Empty,
+            healthCheckResult.Strategy.GetType().Name,
             healthCheckResult.IsHealthy, 
             healthCheckResult.Message) { }
     

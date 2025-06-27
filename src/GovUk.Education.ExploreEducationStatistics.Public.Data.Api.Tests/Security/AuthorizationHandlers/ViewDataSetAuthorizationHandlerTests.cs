@@ -1,6 +1,5 @@
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
-using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Constants;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Security.AuthorizationHandlers;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services.Security;
@@ -8,6 +7,7 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.TheoryDat
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Tests.Fixtures;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Utils.Requests;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Primitives;
@@ -251,7 +251,9 @@ public class ViewDataSetAuthorizationHandlerTests
         requestHeaders?.ForEach(header => 
             headers.Append(header.Key, header.Value));
 
-        var previewTokenService = new PreviewTokenService(dbContext);
+        var previewTokenService = new PreviewTokenService(
+            publicDataDbContext: dbContext,
+            httpContextAccessor: httpContextAccessor);
 
         var authorizationHandlerService = new AuthorizationHandlerService(
             httpContextAccessor: httpContextAccessor,

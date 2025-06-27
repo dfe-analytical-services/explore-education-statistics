@@ -1,36 +1,38 @@
+using GovUk.Education.ExploreEducationStatistics.Analytics.Consumer.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Analytics.Consumer.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Analytics.Consumer.Services.Workflow;
 using GovUk.Education.ExploreEducationStatistics.Common.DuckDb.DuckDb;
-using GovUk.Education.ExploreEducationStatistics.Common.Services;
-using Microsoft.Extensions.Logging;
 
 namespace GovUk.Education.ExploreEducationStatistics.Analytics.Consumer.Services;
 
 public class PublicApiDataSetVersionCallsProcessor(
     IAnalyticsPathResolver pathResolver,
-    ILogger<PublicApiDataSetVersionCallsProcessor> logger,
-    IWorkflowActor<PublicApiDataSetVersionCallsProcessor>? workflowActor = null) : IRequestFileProcessor
+    IProcessRequestFilesWorkflow workflow) : IRequestFileProcessor
 {
-    private readonly IWorkflowActor<PublicApiDataSetVersionCallsProcessor> _workflowActor 
-        = workflowActor ?? new WorkflowActor();
-    
     public Task Process()
     {
-        var workflow = new ProcessRequestFilesWorkflow<PublicApiDataSetVersionCallsProcessor>(
+        return workflow.Process(new WorkflowActor(
             sourceDirectory: pathResolver.PublicApiDataSetVersionCallsDirectoryPath(),
-            reportsDirectory: pathResolver.PublicApiDataSetVersionCallsReportsDirectoryPath(),
-            actor: _workflowActor,
-            logger: logger);
-
-        return workflow.Process();
+            reportsDirectory: pathResolver.PublicApiDataSetVersionCallsReportsDirectoryPath()));
     }
 
-    private class WorkflowActor : IWorkflowActor<PublicApiDataSetVersionCallsProcessor>
+    private class WorkflowActor(string sourceDirectory, string reportsDirectory) 
+        : IWorkflowActor
     {
+        public string GetSourceDirectory()
+        {
+            return sourceDirectory;
+        }
+
+        public string GetReportsDirectory()
+        {
+            return reportsDirectory;
+        }
+        
         public async Task InitialiseDuckDb(DuckDbConnection connection)
         {
             await connection.ExecuteNonQueryAsync(@"
-                CREATE TABLE DataSetVersionCalls (
+                CREATE TABLE sourceTable (
                     dataSetId UUID,
                     dataSetTitle VARCHAR,
                     dataSetVersion VARCHAR,
@@ -44,16 +46,11 @@ public class PublicApiDataSetVersionCallsProcessor(
             ");
         }
 
-        public async Task ProcessSourceFile(string sourceFilePath, DuckDbConnection connection)
+        public async Task ProcessSourceFiles(string sourceFilesDirectory, DuckDbConnection connection)
         {
-            await connection.ExecuteNonQueryAsync($@"
-                INSERT INTO DataSetVersionCalls BY NAME (
-                    SELECT *
-                    FROM read_json('{sourceFilePath}', 
-                        format='unstructured'
-                    )
-                 )
-            ");
+            await connection.DirectCopyJsonIntoDuckDbTable(
+                jsonFilePath: sourceFilesDirectory,
+                tableName: "sourceTable");
         }
 
         public async Task CreateParquetReports(string reportsFolderPathAndFilenamePrefix, DuckDbConnection connection)
@@ -68,7 +65,7 @@ public class PublicApiDataSetVersionCallsProcessor(
                     CAST(previewToken->>'dataSetVersionId' AS UUID) AS previewTokenDataSetVersionId,
                     CAST(previewToken->>'created' AS DATETIME) AS previewTokenCreated,
                     CAST(previewToken->>'expiry' AS DATETIME) AS previewTokenExpiry 
-                    FROM DataSetVersionCalls 
+                    FROM sourceTable 
                     ORDER BY startTime ASC
                 )
                 TO '{reportFilePath}' (FORMAT 'parquet', CODEC 'zstd')

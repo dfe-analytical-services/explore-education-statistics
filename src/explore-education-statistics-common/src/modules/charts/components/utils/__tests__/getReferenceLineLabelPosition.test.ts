@@ -17,7 +17,7 @@ describe('getReferenceLineLabelPosition', () => {
 
     expect(result).toEqual({
       x: 205,
-      y: 135,
+      y: 16,
     });
   });
 
@@ -50,7 +50,7 @@ describe('getReferenceLineLabelPosition', () => {
       otherAxisPosition: -10,
       viewBox: {
         x: 424,
-        y: 0,
+        y: 20,
         width: 0,
         height: 250,
       },
@@ -58,7 +58,7 @@ describe('getReferenceLineLabelPosition', () => {
 
     expect(result).toEqual({
       x: 424,
-      y: 125,
+      y: 16,
     });
   });
 
@@ -71,7 +71,7 @@ describe('getReferenceLineLabelPosition', () => {
       otherAxisPosition: 110,
       viewBox: {
         x: 424,
-        y: 0,
+        y: 20,
         width: 0,
         height: 250,
       },
@@ -79,7 +79,7 @@ describe('getReferenceLineLabelPosition', () => {
 
     expect(result).toEqual({
       x: 424,
-      y: 125,
+      y: 16,
     });
   });
 
@@ -154,7 +154,7 @@ describe('getReferenceLineLabelPosition', () => {
       otherAxisPosition: 10,
       viewBox: {
         x: 424,
-        y: 0,
+        y: 20,
         width: 0,
         height: 250,
       },
@@ -162,7 +162,7 @@ describe('getReferenceLineLabelPosition', () => {
 
     expect(result).toEqual({
       x: 424,
-      y: 125,
+      y: 16,
     });
   });
 
@@ -174,7 +174,7 @@ describe('getReferenceLineLabelPosition', () => {
       otherAxisPosition: 10,
       viewBox: {
         x: 424,
-        y: 0,
+        y: 20,
         width: 0,
         height: 250,
       },
@@ -182,7 +182,7 @@ describe('getReferenceLineLabelPosition', () => {
 
     expect(result).toEqual({
       x: 424,
-      y: 125,
+      y: 16,
     });
   });
 

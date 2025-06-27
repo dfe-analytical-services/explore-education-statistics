@@ -197,6 +197,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Extensions
 
             return result;
         }
+        
+        public static async Task<IEnumerable<TResult>> SelectAsyncWithIndex<TSource, TResult>(
+            this IEnumerable<TSource> source, Func<TSource, int, Task<TResult>> asyncSelector)
+        {
+            var result = new List<TResult>();
+
+            var index = 0;
+            
+            foreach (var item in source)
+            {
+                result.Add(await asyncSelector(item, index++));
+            }
+
+            return result;
+        }
 
         public static async Task<TSource?> FirstOrDefaultAsync<TSource>(
             this IEnumerable<TSource> source, Func<TSource, Task<bool>> predicate)

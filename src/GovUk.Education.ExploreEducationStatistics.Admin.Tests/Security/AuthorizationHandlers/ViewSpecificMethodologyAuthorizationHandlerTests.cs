@@ -112,7 +112,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                         handler,
                         methodologyRepository,
                         userPublicationRoleRepository,
-                        _,
+                        userReleaseRoleRepository,
                         _,
                         releaseVersionRepository
                         ) = CreateHandlerAndDependencies();
@@ -121,15 +121,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                             s.GetOwningPublication(MethodologyVersion.MethodologyId))
                         .ReturnsAsync(OwningPublication);
 
-                    var expectedToPassByRole = ListOf(PublicationRole.Owner, PublicationRole.Approver)
+                    var expectedToPassByRole = ListOf(PublicationRole.Owner, PublicationRole.Allower)
                         .Contains(publicationRole);
 
                     userPublicationRoleRepository
                         .Setup(s => s.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id))
                         .ReturnsAsync(ListOf(publicationRole));
 
+                    userReleaseRoleRepository
+                        .Setup(s => s.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id))
+                        .ReturnsAsync([]);
+
                     if (!expectedToPassByRole)
                     {
+                        methodologyRepository
+                            .Setup(s => s.GetAllPublicationIds(MethodologyVersion.MethodologyId))
+                            .ReturnsAsync([OwningPublication.Id]);
+
                         releaseVersionRepository
                             .Setup(s => s.GetLatestReleaseVersion(OwningPublication.Id, default))
                             .ReturnsAsync((ReleaseVersion?)null);

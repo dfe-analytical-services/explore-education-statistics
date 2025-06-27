@@ -84,6 +84,8 @@ public record MappingStatusViewModel
     public required bool LocationsComplete { get; init; }
     
     public required bool FiltersComplete { get; init; }
+    
+    public required bool HasMajorVersionUpdate { get; init; } 
 }
 
 public record DataSetVersionInfoViewModel 

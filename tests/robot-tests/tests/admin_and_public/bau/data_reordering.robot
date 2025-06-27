@@ -239,7 +239,7 @@ Replace subject data
     user checks headed table body row cell contains    Metadata file    1    grouped-filters-and-indicators.meta.csv
     user checks headed table body row cell contains    Number of rows    1    100    wait=%{WAIT_SMALL}
     user checks headed table body row cell contains    Data file size    1    13 Kb
-    user checks headed table body row cell contains    Status    1    Replacement in progress    wait=%{WAIT_LONG}
+    user checks headed table body row cell contains    Status    1    Complete    wait=%{WAIT_LONG}
 
     user checks headed table body row cell contains    Title    2    ${SUBJECT_NAME}
     user checks headed table body row cell contains    Data file    2    grouped-filters-and-indicators-replacement.csv
@@ -396,12 +396,19 @@ Add headline text block to Content page
     user adds headlines text block
     user adds content to headlines text block    Headline text block text
 
-Approve first release
-    user clicks link    Sign off
+Approve release
     user approves release for immediate publication
 
+Get public release link
+    ${PUBLIC_RELEASE_LINK}    user gets url public release will be accessible at
+    Set Suite Variable    ${PUBLIC_RELEASE_LINK}
+
 Verify newly published release is on Find Statistics page
+    # TODO EES-6063 - Remove this
     user checks publication is on find statistics page    ${PUBLICATION_NAME}
+
+Verify newly published release is public
+    user navigates to public release page    ${PUBLIC_RELEASE_LINK}    ${PUBLICATION_NAME}    ${RELEASE_NAME}
 
 Go to public table tool page
     user navigates to data tables page on public frontend

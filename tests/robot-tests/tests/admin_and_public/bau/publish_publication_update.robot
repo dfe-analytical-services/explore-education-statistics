@@ -16,6 +16,7 @@ ${PUBLICATION_NAME}=                UI tests - publish publication update %{RUN_
 ${PUBLIC_PUBLICATION_URL_ENDING}    /find-statistics/ui-tests-publish-publication-update-%{RUN_IDENTIFIER}
 ${ACADEMIC_YEAR}                    /2046-47
 ${PUBLICATION_NAME_UPDATED}=        ${PUBLICATION_NAME} updated
+${RELEASE_NAME}=                    Academic year 2046/47
 
 
 *** Test Cases ***
@@ -33,6 +34,10 @@ Navigate to release and add headline text block
 
 Publish release
     user approves release for immediate publication
+
+Get public release link
+    ${PUBLIC_RELEASE_LINK}=    user gets url public release will be accessible at
+    Set Suite Variable    ${PUBLIC_RELEASE_LINK}
 
 Update publication details
     user navigates to details on publication page    ${PUBLICATION_NAME}
@@ -85,10 +90,12 @@ Validate publication redirect works
     user waits until h1 is visible    ${PUBLICATION_NAME_UPDATED}
     user checks url contains    %{PUBLIC_URL}${PUBLIC_PUBLICATION_URL_ENDING}-updated${ACADEMIC_YEAR}
 
-Go to public release page
+Verify newly published release is on Find Statistics page
+    # TODO EES-6063 - Remove this
     user checks publication is on find statistics page    ${PUBLICATION_NAME_UPDATED}
-    user clicks link    ${PUBLICATION_NAME_UPDATED}
-    user waits until h1 is visible    ${PUBLICATION_NAME_UPDATED}    %{WAIT_MEDIUM}
+
+Verify newly published release is public
+    user navigates to public release page    ${PUBLIC_RELEASE_LINK}    ${PUBLICATION_NAME_UPDATED}    ${RELEASE_NAME}
 
 Validate publication details are updated on public page
     user checks page contains    Team name updated

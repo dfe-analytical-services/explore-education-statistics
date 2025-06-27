@@ -1,5 +1,5 @@
 import render from '@common-test/render';
-import _downloadService from '@common/services/downloadService';
+import _downloadService from '@frontend/services/downloadService';
 import { ApiDataSetVersionChanges } from '@common/services/types/apiDataSetChanges';
 import {
   testApiDataSet,
@@ -11,7 +11,7 @@ import { screen, waitFor, within } from '@testing-library/react';
 import React from 'react';
 
 jest.mock('@frontend/services/apiDataSetService');
-jest.mock('@common/services/downloadService');
+jest.mock('@frontend/services/downloadService');
 
 const downloadService = _downloadService as jest.Mocked<
   typeof _downloadService
@@ -96,9 +96,9 @@ describe('DataSetFilePage', () => {
     );
 
     await waitFor(() => {
-      expect(downloadService.downloadFiles).toHaveBeenCalledWith<
-        Parameters<typeof downloadService.downloadFiles>
-      >('release-id', ['file-id']);
+      expect(downloadService.downloadZip).toHaveBeenCalledWith<
+        Parameters<typeof downloadService.downloadZip>
+      >('release-id', 'DataCatalogue', 'file-id');
     });
   });
 

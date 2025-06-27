@@ -1,9 +1,9 @@
 import SubmitError from '@common/components/form/util/SubmitError';
 import WarningMessage from '@common/components/WarningMessage';
-import locationLevelsMap, {
-  LocationLevelKey,
-} from '@common/utils/locationLevelsMap';
 import { ConfirmContextProvider } from '@common/contexts/ConfirmContext';
+import DataSetStep, {
+  DataSetFormSubmitHandler,
+} from '@common/modules/table-tool/components/DataSetStep';
 import FiltersForm, {
   FilterFormSubmitHandler,
   TableQueryErrorCode,
@@ -14,9 +14,6 @@ import PreviousStepModalConfirm from '@common/modules/table-tool/components/Prev
 import PublicationForm, {
   PublicationFormSubmitHandler,
 } from '@common/modules/table-tool/components/PublicationForm';
-import DataSetStep, {
-  DataSetFormSubmitHandler,
-} from '@common/modules/table-tool/components/DataSetStep';
 import TimePeriodForm, {
   TimePeriodFormSubmitHandler,
 } from '@common/modules/table-tool/components/TimePeriodForm';
@@ -41,9 +38,13 @@ import tableBuilderService, {
   Subject,
   SubjectMeta,
 } from '@common/services/tableBuilderService';
+import { Dictionary } from '@common/types';
+import locationLevelsMap, {
+  LocationLevelKey,
+} from '@common/utils/locationLevelsMap';
 import React, { ReactElement, ReactNode, useMemo, useState } from 'react';
 import { useImmer } from 'use-immer';
-import { Dictionary } from 'lodash';
+import { convertHierarchiesFormToQuery } from './utils/filterHierarchiesConversion';
 
 const defaultLocationStepTitle = 'Choose locations';
 const defaultDataSetStepTitle = 'Select a data set';
@@ -109,7 +110,6 @@ export interface TableToolWizardProps {
     publicationTitle: string,
     subjectName: string,
   ) => void;
-  showFilterHierachies?: boolean;
 }
 
 export default function TableToolWizard({
@@ -130,7 +130,6 @@ export default function TableToolWizard({
   onSubjectStepBack,
   onSubmit,
   onTableQueryError,
-  showFilterHierachies,
 }: TableToolWizardProps) {
   const [state, updateState] = useImmer<TableToolState>({
     initialStep: 1,
@@ -446,9 +445,9 @@ export default function TableToolWizard({
 
     const updatedReleaseTableDataQuery: ReleaseTableDataQuery = {
       ...state.query,
-      filters: Object.values(filters)
-        .flat()
-        .concat(Object.values(filterHierarchies).flat()),
+      filters: Object.values(filters).flat(),
+      filterHierarchiesOptions:
+        convertHierarchiesFormToQuery(filterHierarchies),
       indicators,
     };
 
@@ -458,6 +457,8 @@ export default function TableToolWizard({
         locationIds: updatedReleaseTableDataQuery.locationIds,
         timePeriod: updatedReleaseTableDataQuery.timePeriod,
         filters: updatedReleaseTableDataQuery.filters,
+        filterHierarchiesOptions:
+          updatedReleaseTableDataQuery.filterHierarchiesOptions,
         indicators: updatedReleaseTableDataQuery.indicators,
       } as FullTableQuery,
       updatedReleaseTableDataQuery.releaseVersionId,
@@ -601,6 +602,7 @@ export default function TableToolWizard({
                   initialValues={{
                     indicators: state.query.indicators,
                     filters: state.query.filters,
+                    filterHierarchies: state.query.filterHierarchiesOptions,
                   }}
                   selectedPublication={state.selectedPublication}
                   stepTitle={stepTitles.filter}
@@ -613,7 +615,6 @@ export default function TableToolWizard({
                   showTableQueryErrorDownload={showTableQueryErrorDownload}
                   onTableQueryError={onTableQueryError}
                   onSubmit={handleFiltersFormSubmit}
-                  showFilterHierarchies={showFilterHierachies}
                 />
               )}
             </WizardStep>

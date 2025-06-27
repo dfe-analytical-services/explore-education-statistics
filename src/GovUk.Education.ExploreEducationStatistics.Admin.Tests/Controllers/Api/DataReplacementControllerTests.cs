@@ -39,7 +39,8 @@ public abstract class DataReplacementControllerTests
                             { 
                                 Guid.NewGuid(), 
                                 new FilterReplacementViewModel(
-                                    id: Guid.NewGuid(),
+                                    id: Guid.NewGuid(), // original filterId
+                                    target: Guid.NewGuid(), // replacement filterId
                                     label: "filter replacement lebel",
                                     name: "filter replacement name",
                                     groups: new Dictionary<Guid, FilterGroupReplacementViewModel> {
@@ -60,7 +61,7 @@ public abstract class DataReplacementControllerTests
                         })
                 ],
                 Footnotes = [],
-                ApiDataSetVersionPlan = new ApiDataSetVersionPlanViewModel
+                ApiDataSetVersionPlan = new ReplaceApiDataSetVersionPlanViewModel
                 {
                     DataSetId = Guid.NewGuid(),
                     DataSetTitle = "my data set",
@@ -91,8 +92,10 @@ public abstract class DataReplacementControllerTests
 
             var returnedPlan = result.AssertOkResult();
 
+            var originalPlan = dataReplacementPlan.ToSummary();
+
             Assert.Equal(
-                JsonConvert.SerializeObject(dataReplacementPlan.ToSummary()), 
+                JsonConvert.SerializeObject(originalPlan),
                 JsonConvert.SerializeObject(returnedPlan));
         }
     }

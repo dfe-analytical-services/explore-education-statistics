@@ -1,5 +1,6 @@
 using GovUk.Education.ExploreEducationStatistics.Analytics.Common;
 using GovUk.Education.ExploreEducationStatistics.Analytics.Common.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Analytics.Common.Strategies;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Options;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services.Interfaces;
@@ -20,10 +21,11 @@ public static class AnalyticsServiceCollectionExtensions
 
         if (analyticsOptions is { Enabled: false })
         {
-            services.AddSingleton<IAnalyticsManager, NoOpAnalyticsManager>();
+            services.AddTransient<IAnalyticsService, NoOpAnalyticsService>();
             return services;
         }
 
+        services.AddTransient<IAnalyticsService, AnalyticsService>();
         services.AddSingleton<IAnalyticsManager, AnalyticsManager>();
         services.AddSingleton<IAnalyticsWriter, AnalyticsWriter>();
         services.AddHostedService<AnalyticsConsumer>();
@@ -37,8 +39,17 @@ public static class AnalyticsServiceCollectionExtensions
             services.AddSingleton<IAnalyticsPathResolver, AnalyticsPathResolver>();
         }
 
-        services.AddTransient<IAnalyticsWriteStrategy, AnalyticsWritePublicApiQueryStrategy>();
-
+        services
+            .AddTransient<IAnalyticsWriteStrategy, AnalyticsWriteTopLevelCallsStrategy>()
+            .AddTransient<IAnalyticsWriteStrategy, AnalyticsWritePublicationCallsStrategy>()
+            .AddTransient<IAnalyticsWriteStrategy, AnalyticsWriteDataSetCallsStrategy>()
+            .AddTransient<IAnalyticsWriteStrategy, AnalyticsWriteDataSetVersionCallsStrategy>()
+            .AddTransient<IAnalyticsWriteStrategy, AnalyticsWritePublicApiQueryStrategy>();
+        
+        services.AddTransient(
+            typeof(ICommonAnalyticsWriteStrategyWorkflow<>),
+            typeof(CommonAnalyticsWriteStrategyWorkflow<>));
+        
         return services;
     }
 }

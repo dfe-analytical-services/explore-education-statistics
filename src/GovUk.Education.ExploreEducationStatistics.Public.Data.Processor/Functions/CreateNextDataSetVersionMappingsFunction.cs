@@ -20,7 +20,7 @@ public class CreateNextDataSetVersionMappingsFunction(
     ILogger<CreateNextDataSetVersionMappingsFunction> logger,
     IDataSetVersionService dataSetVersionService,
     IValidator<NextDataSetVersionMappingsCreateRequest> requestValidator,
-    IOptions<FeatureFlags> featureFlags)
+    IOptions<FeatureFlagsOptions> featureFlags)
 {
     [Function(nameof(CreateNextDataSetVersionMappings))]
     public async Task<IActionResult> CreateNextDataSetVersionMappings(

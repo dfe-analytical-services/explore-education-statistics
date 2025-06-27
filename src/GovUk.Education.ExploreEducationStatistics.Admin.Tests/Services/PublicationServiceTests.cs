@@ -1291,9 +1291,19 @@ public class PublicationServiceTests
         }
     }
 
-    [Fact]
-    public async Task UpdatePublication_TitleChangesPublicationAndMethodologySlug()
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public async Task UpdatePublication_TitleChangesPublicationAndMethodologySlug(bool isPublicationArchived)
     {
+        var supersedingPublication = isPublicationArchived 
+            ? new Publication
+                {
+                    Id = Guid.NewGuid(), 
+                    LatestPublishedReleaseVersionId = Guid.NewGuid()
+                } 
+            : null;
+        
         var publication = new Publication
         {
             Slug = "old-title",
@@ -1307,6 +1317,8 @@ public class PublicationServiceTests
                 TeamEmail = "old.smith@test.com",
             },
             LatestPublishedReleaseVersion = new ReleaseVersion(),
+            SupersededById = supersedingPublication?.Id,
+            SupersededBy = supersedingPublication
         };
 
         var methodologyVersionId = Guid.NewGuid();
@@ -1384,6 +1396,7 @@ public class PublicationServiceTests
                     ThemeId = publication.ThemeId,
                     Title = "New title",
                     Summary = "New summary",
+                    SupersededById = supersedingPublication?.Id
                 }
             );
 
@@ -1401,6 +1414,7 @@ public class PublicationServiceTests
             var updatedPublication = await context.Publications
                 .Include(p => p.Contact)
                 .Include(p => p.Theme)
+                .Include(p => p.SupersededBy)
                 .SingleAsync(p => p.Title == "New title");
 
             Assert.True(updatedPublication.Live);
@@ -1417,6 +1431,7 @@ public class PublicationServiceTests
             var redirect = Assert.Single(publicationRedirects);
             Assert.Equal(publication.Id, redirect.PublicationId);
             Assert.Equal("old-title", redirect.Slug);
+            
             AssertOnPublicationChangedEventRaised(updatedPublication);
         }
     }
@@ -3208,30 +3223,42 @@ public class PublicationServiceTests
         AssertOnPublicationChangedEventsNotRaised();
     }
 
-    [Fact]
-    public async Task UpdateReleaseSeries_UpdatesLatestPublishedReleaseVersion()
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public async Task UpdateReleaseSeries_UpdatesLatestPublishedReleaseVersion(bool isPublicationArchived)
     {
-        Publication publication = _dataFixture
-            .DefaultPublication()
-            .WithReleases([
-                _dataFixture
-                    .DefaultRelease(publishedVersions: 1, year: 2020),
-                _dataFixture
-                    .DefaultRelease(publishedVersions: 1, draftVersion: true, year: 2021),
-                _dataFixture
-                    .DefaultRelease(publishedVersions: 2, draftVersion: true, year: 2022)
-            ])
-            .WithTheme(_dataFixture.DefaultTheme());
+        var publicationBuilder = _dataFixture
+                .DefaultPublication()
+                .WithReleases([
+                    _dataFixture
+                        .DefaultRelease(publishedVersions: 1, year: 2020),
+                    _dataFixture
+                        .DefaultRelease(publishedVersions: 1, draftVersion: true, year: 2021),
+                    _dataFixture
+                        .DefaultRelease(publishedVersions: 2, draftVersion: true, year: 2022)
+                ])
+                .WithTheme(_dataFixture.DefaultTheme());
 
+        if (isPublicationArchived)
+        {
+           publicationBuilder.WithSupersededBy(
+               _dataFixture.DefaultPublication()
+                   .WithLatestPublishedReleaseVersion(_dataFixture.DefaultReleaseVersion()));
+        }
+
+        var publication = publicationBuilder.Generate();        
         var release2020 = publication.Releases.Single(r => r.Year == 2020);
         var release2021 = publication.Releases.Single(r => r.Year == 2021);
         var release2022 = publication.Releases.Single(r => r.Year == 2022);
 
+        var originalLatestPublishedReleaseId = release2022.Id;
         var originalLatestPublishedReleaseVersionId = release2022.Versions[1].Id;
         var expectedLatestPublishedReleaseVersionId = release2021.Versions[0].Id;
 
         // Check the publication's latest published release version in the generated test data setup
         Assert.Equal(originalLatestPublishedReleaseVersionId, publication.LatestPublishedReleaseVersionId);
+        Assert.NotNull(publication.LatestPublishedReleaseVersion);
 
         // Check the expected order of the release series items in the generated test data setup
         Assert.Equal(3, publication.ReleaseSeries.Count);
@@ -3295,6 +3322,8 @@ public class PublicationServiceTests
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
             var actualPublication = await contentDbContext.Publications
+                .Include(p => p.LatestPublishedReleaseVersion)
+                .Include(p => p.SupersededBy)
                 .SingleAsync(p => p.Id == publication.Id);
 
             var actualReleaseSeries = actualPublication.ReleaseSeries;
@@ -3311,14 +3340,17 @@ public class PublicationServiceTests
             
             AssertOnPublicationLatestPublishedReleaseReorderedWasRaised(
                 actualPublication,
+                originalLatestPublishedReleaseId,
                 originalLatestPublishedReleaseVersionId);
         }
     }
 
-    [Fact]
-    public async Task UpdateReleaseSeries_UpdatesLatestPublishedReleaseVersion_SkipsUnpublishedReleases()
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public async Task UpdateReleaseSeries_UpdatesLatestPublishedReleaseVersion_SkipsUnpublishedReleases(bool isPublicationArchived)
     {
-        Publication publication = _dataFixture
+        var publicationBuilder = _dataFixture
             .DefaultPublication()
             .WithReleases([
                 _dataFixture
@@ -3330,15 +3362,25 @@ public class PublicationServiceTests
             ])
             .WithTheme(_dataFixture.DefaultTheme());
 
+        if (isPublicationArchived)
+        {
+            publicationBuilder.WithSupersededBy(
+                _dataFixture.DefaultPublication()
+                    .WithLatestPublishedReleaseVersion(_dataFixture.DefaultReleaseVersion()));
+        }
+        
+        var publication = publicationBuilder.Generate();
         var release2020 = publication.Releases.Single(r => r.Year == 2020);
         var release2021 = publication.Releases.Single(r => r.Year == 2021);
         var release2022 = publication.Releases.Single(r => r.Year == 2022);
 
+        var originalLatestPublishedReleaseId = release2022.Id;
         var originalLatestPublishedReleaseVersionId = release2022.Versions[1].Id;
         var expectedLatestPublishedReleaseVersionId = release2020.Versions[0].Id;
 
         // Check the publication's latest published release version in the generated test data setup
         Assert.Equal(originalLatestPublishedReleaseVersionId, publication.LatestPublishedReleaseVersionId);
+        Assert.NotNull(publication.LatestPublishedReleaseVersion);
 
         // Check the expected order of the release series items in the generated test data setup
         Assert.Equal(3, publication.ReleaseSeries.Count);
@@ -3402,6 +3444,8 @@ public class PublicationServiceTests
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
             var actualPublication = await contentDbContext.Publications
+                .Include(p => p.LatestPublishedReleaseVersion)
+                .Include(p => p.SupersededBy)
                 .SingleAsync(p => p.Id == publication.Id);
 
             var actualReleaseSeries = actualPublication.ReleaseSeries;
@@ -3418,6 +3462,7 @@ public class PublicationServiceTests
 
             AssertOnPublicationLatestPublishedReleaseReorderedWasRaised(
                 actualPublication,
+                originalLatestPublishedReleaseId,
                 originalLatestPublishedReleaseVersionId);
         }
     }
@@ -3650,9 +3695,11 @@ public class PublicationServiceTests
 
     private void AssertOnPublicationLatestPublishedReleaseReorderedWasRaised(
         Publication publication,
+        Guid previousReleaseId,
         Guid previousReleaseVersionId) =>
         _adminEventRaiserMockBuilder.Assert.OnPublicationLatestPublishedReleaseReorderedWasRaised(
             publication,
+            previousReleaseId,
             previousReleaseVersionId);
 
     private void AssertOnPublicationRestoredEventRaised(

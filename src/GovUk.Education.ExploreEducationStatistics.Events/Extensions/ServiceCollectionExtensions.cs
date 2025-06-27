@@ -12,7 +12,7 @@ public static class ServiceCollectionExtensions
             .AddTransient<IEventGridClientFactory, EventGridClientFactory>()
             .AddTransient<IEventRaiser, EventRaiser>()
             .AddTransient<IConfiguredEventGridClientFactory, ConfiguredEventGridClientFactory>()
-            .AddTransient(typeof(Func<ILogger<SafeEventGridClient>>), sp => sp.GetRequiredService<ILogger<SafeEventGridClient>>)
+            .AddTransient(typeof(Func<ILogger<SafeEventGridClient>>), sp => (Func<ILogger<SafeEventGridClient>>)sp.GetRequiredService<ILogger<SafeEventGridClient>>)
             .Configure<EventGridOptions>(configuration.GetSection(EventGridOptions.Section))
     ;
 }

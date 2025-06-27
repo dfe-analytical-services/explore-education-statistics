@@ -49,8 +49,8 @@ public class MarkMethodologyAsHigherLevelReviewAuthorizationHandler : Authorizat
         }
 
         var allowedPublicationRoles = methodologyVersion.Status == Approved
-            ? ListOf(PublicationRole.Approver)
-            : ListOf(PublicationRole.Owner, PublicationRole.Approver);
+            ? ListOf(PublicationRole.Allower)
+            : ListOf(PublicationRole.Owner, PublicationRole.Allower);
 
         var allowedReleaseRoles = methodologyVersion.Status == Approved
             ? ListOf(ReleaseRole.Approver)

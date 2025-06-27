@@ -5,10 +5,13 @@ import DataFileUploadForm, {
 import releaseDataFileQueries from '@admin/queries/releaseDataFileQueries';
 import permissionService from '@admin/services/permissionService';
 import releaseDataFileService, {
-  ArchiveDataSetFile,
+  DataSetUploadResult,
   DataFile,
   DataFileImportStatus,
 } from '@admin/services/releaseDataFileService';
+import DataSetUploadModalConfirm from '@admin/pages/release/data/components/DataSetUploadModalConfirm';
+import DataFilesTable from '@admin/pages/release/data/components/DataFilesTable';
+import DataFilesReplacementTable from '@admin/pages/release/data/components/DataFilesReplacementTable';
 import Button from '@common/components/Button';
 import InsetText from '@common/components/InsetText';
 import LoadingSpinner from '@common/components/LoadingSpinner';
@@ -16,8 +19,6 @@ import WarningMessage from '@common/components/WarningMessage';
 import useToggle from '@common/hooks/useToggle';
 import { useQuery } from '@tanstack/react-query';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import BulkZipUploadModalConfirm from './BulkZipUploadModalConfirm';
-import DataFilesTable from './DataFilesTable';
 
 interface Props {
   publicationId: string;
@@ -33,7 +34,7 @@ export default function ReleaseDataUploadsSection({
   onDataFilesChange,
 }: Props) {
   const [allDataFiles, setAllDataFiles] = useState<DataFile[]>([]);
-  const [bulkUploadPlan, setBulkUploadPlan] = useState<ArchiveDataSetFile[]>();
+  const [uploadResults, setUploadResults] = useState<DataSetUploadResult[]>();
   const [isReordering, toggleReordering] = useToggle(false);
 
   const {
@@ -57,22 +58,28 @@ export default function ReleaseDataUploadsSection({
     [allDataFiles],
   );
 
+  // TODO - bulk confirmation of replacements
+  //  const validReplacedDataFiles = replacedDataFiles.filter(
+  //   file => file.status === 'COMPLETE',
+  // );
+  // const allowBulkConfirm = validReplacedDataFiles.length > 1;
+
   const dataFiles = useMemo(
     () => allDataFiles.filter(dataFile => !dataFile.replacedBy),
     [allDataFiles],
   );
 
-  const confirmBulkUploadPlan = useCallback(
-    async (archiveDataSetFiles: ArchiveDataSetFile[]) => {
-      await releaseDataFileService.importBulkZipDataFile(
+  const confirmDataSetImport = useCallback(
+    async (dataSetUploadResults: DataSetUploadResult[]) => {
+      await releaseDataFileService.importDataSets(
         releaseVersionId,
-        archiveDataSetFiles,
+        dataSetUploadResults,
       );
 
-      setBulkUploadPlan(undefined);
+      setUploadResults(undefined);
       await refetchDataFiles();
     },
-    [releaseVersionId, setBulkUploadPlan, refetchDataFiles],
+    [releaseVersionId, setUploadResults, refetchDataFiles],
   );
 
   const handleStatusChange = useCallback(
@@ -99,6 +106,7 @@ export default function ReleaseDataUploadsSection({
                 rows: totalRows,
                 status,
                 permissions,
+                replacedBy: file.replacedBy,
               },
         ),
       );
@@ -120,35 +128,45 @@ export default function ReleaseDataUploadsSection({
             return;
           }
 
-          await releaseDataFileService.uploadDataFiles(releaseVersionId, {
-            title: values.title,
-            dataFile: values.dataFile as File,
-            metadataFile: values.metadataFile as File,
-          });
+          const uploadResponse =
+            await releaseDataFileService.uploadDataSetFilePair(
+              releaseVersionId,
+              {
+                title: values.title,
+                dataFile: values.dataFile as File,
+                metadataFile: values.metadataFile as File,
+              },
+            );
 
           await refetchDataFiles();
+          setUploadResults(uploadResponse);
           break;
         }
         case 'zip': {
           if (!values.title) {
             return;
           }
-          await releaseDataFileService.uploadZipDataFile(releaseVersionId, {
-            title: values.title,
-            zipFile: values.zipFile as File,
-          });
+          const uploadResponse =
+            await releaseDataFileService.uploadZippedDataSetFilePair(
+              releaseVersionId,
+              {
+                title: values.title,
+                zipFile: values.zipFile as File,
+              },
+            );
 
           await refetchDataFiles();
+          setUploadResults(uploadResponse);
           break;
         }
         case 'bulkZip': {
-          const uploadPlan =
-            await releaseDataFileService.getUploadBulkZipDataFilePlan(
+          const uploadResponse =
+            await releaseDataFileService.uploadBulkZipDataSetFile(
               releaseVersionId,
               values.bulkZipFile!,
             );
 
-          setBulkUploadPlan(uploadPlan);
+          setUploadResults(uploadResponse);
           break;
         }
         default:
@@ -170,6 +188,9 @@ export default function ReleaseDataUploadsSection({
     },
     [releaseVersionId, toggleReordering],
   );
+
+  // TODO - bulk confirmation of replacements
+  // const handleConfirmAllReplacements = () => {};
 
   return (
     <>
@@ -208,12 +229,11 @@ export default function ReleaseDataUploadsSection({
             dataFiles={allDataFiles}
             onSubmit={handleSubmit}
           />
-          {bulkUploadPlan === undefined ||
-          bulkUploadPlan.length === 0 ? null : (
-            <BulkZipUploadModalConfirm
-              bulkUploadPlan={bulkUploadPlan}
-              onConfirm={confirmBulkUploadPlan}
-              onCancel={() => setBulkUploadPlan(undefined)}
+          {uploadResults === undefined || uploadResults.length === 0 ? null : (
+            <DataSetUploadModalConfirm
+              uploadResults={uploadResults}
+              onConfirm={confirmDataSetImport}
+              onCancel={() => setUploadResults(undefined)}
             />
           )}
         </>
@@ -231,9 +251,17 @@ export default function ReleaseDataUploadsSection({
             <h2>Uploaded data files</h2>
 
             {!isReordering && allDataFiles.length > 1 && (
-              <Button onClick={toggleReordering.on} variant="secondary">
-                Reorder data files
-              </Button>
+              <div className="dfe-flex dfe-justify-content--space-between">
+                <Button onClick={toggleReordering.on} variant="secondary">
+                  Reorder data files
+                </Button>
+                {/* TODO - bulk confirmation of replacements */}
+                {/* {allowBulkConfirm && (
+                  <Button onClick={handleConfirmAllReplacements}>
+                    Confirm all valid replacements
+                  </Button>
+                )} */}
+              </div>
             )}
 
             {isReordering ? (
@@ -245,15 +273,13 @@ export default function ReleaseDataUploadsSection({
             ) : (
               <>
                 {replacedDataFiles.length > 0 && (
-                  <DataFilesTable
-                    canUpdateRelease={canUpdateRelease}
+                  <DataFilesReplacementTable
                     caption="Data file replacements"
                     dataFiles={replacedDataFiles}
                     publicationId={publicationId}
                     releaseVersionId={releaseVersionId}
                     testId="Data file replacements table"
-                    onDeleteFile={handleDeleteConfirm}
-                    onStatusChange={handleStatusChange}
+                    onConfirmAction={refetchDataFiles}
                   />
                 )}
 

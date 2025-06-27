@@ -2,4 +2,15 @@
 
 .container {
   border-bottom: 1px solid govuk-colour('mid-grey');
+
+  em {
+    background-color: govuk-colour('yellow');
+    color: govuk-colour('black');
+    font-style: normal;
+    font-weight: bold;
+  }
+}
+
+.highlightContent {
+  color: govuk-colour('dark-grey');
 }

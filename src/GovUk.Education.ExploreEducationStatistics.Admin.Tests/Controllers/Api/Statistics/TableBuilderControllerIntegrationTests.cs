@@ -41,7 +41,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                 StartCode = CalendarYear,
                 EndYear = 2022,
                 EndCode = CalendarYear
-            }
+            },
+            FilterHierarchiesOptions = null,
         };
 
         private static readonly FullTableQuery FullTableQuery =

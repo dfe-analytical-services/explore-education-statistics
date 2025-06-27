@@ -1,5 +1,4 @@
 import PhaseBanner from '@common/components/PhaseBanner';
-import NotificationBanner from '@common/components/NotificationBanner';
 import CookieBanner from '@frontend/components/CookieBanner';
 import UserTestingBanner from '@frontend/components/UserTestingBanner';
 import classNames from 'classnames';
@@ -9,8 +8,7 @@ import PageFooter from './PageFooter';
 import PageHeader from './PageHeader';
 import PageMeta, { PageMetaProps } from './PageMeta';
 import PageTitle from './PageTitle';
-import Feedback from './Feedback';
-import Link from './Link';
+import PageFeedback from './PageFeedback';
 
 type Props = {
   includeDefaultMetaTitle?: boolean;
@@ -24,7 +22,6 @@ type Props = {
   children?: ReactNode;
   wide?: boolean;
   isHomepage?: boolean;
-  showApiBanner?: boolean;
 } & BreadcrumbsProps;
 
 const Page = ({
@@ -40,7 +37,6 @@ const Page = ({
   wide = false,
   isHomepage = false,
   breadcrumbs = [],
-  showApiBanner = true,
 }: Props) => {
   return (
     <>
@@ -62,29 +58,6 @@ const Page = ({
       >
         <PhaseBanner url="https://forms.office.com/Pages/ResponsePage.aspx?id=yXfS-grGoU2187O4s0qC-XMiKzsnr8xJoWM_DeGwIu9UNDJHOEJDRklTNVA1SDdLOFJITEwyWU1OQS4u" />
 
-        {showApiBanner && (
-          <NotificationBanner
-            className="govuk-!-margin-top-6"
-            fullWidthContent
-            title="Important update"
-          >
-            <p>
-              The first data sets are now available in our new API,{' '}
-              <Link to="/data-catalogue?dataSetType=api">
-                view them in the data catalogue
-              </Link>{' '}
-              or read our{' '}
-              <Link to="https://api.education.gov.uk/statistics/docs/ ">
-                API documentation
-              </Link>
-              . If you have any questions or feedback, contact us at{' '}
-              <a href="mailto:explore.statistics@education.gov.uk">
-                explore.statistics@education.gov.uk
-              </a>
-            </p>
-          </NotificationBanner>
-        )}
-
         <Breadcrumbs
           breadcrumbs={
             isHomepage
@@ -103,7 +76,7 @@ const Page = ({
         </main>
       </div>
 
-      <Feedback />
+      <PageFeedback />
       <PageFooter wide={wide} />
     </>
   );

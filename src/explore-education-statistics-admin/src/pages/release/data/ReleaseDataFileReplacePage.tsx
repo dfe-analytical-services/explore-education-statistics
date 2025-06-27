@@ -97,16 +97,25 @@ const ReleaseDataFileReplacePage = ({
     let file: DataFile;
 
     if (values.uploadType === 'csv') {
-      file = await releaseDataFileService.uploadDataFiles(releaseVersionId, {
-        replacingFileId: currentFile.id,
-        dataFile: values.dataFile as File,
-        metadataFile: values.metadataFile as File,
-      });
+      file = await releaseDataFileService.uploadDataSetFilePairForReplacement(
+        releaseVersionId,
+        {
+          title: values.title ?? dataFile!.title,
+          replacingFileId: currentFile.id,
+          dataFile: values.dataFile as File,
+          metadataFile: values.metadataFile as File,
+        },
+      );
     } else {
-      file = await releaseDataFileService.uploadZipDataFile(releaseVersionId, {
-        replacingFileId: currentFile.id,
-        zipFile: values.zipFile as File,
-      });
+      file =
+        await releaseDataFileService.uploadZippedDataSetFilePairForReplacement(
+          releaseVersionId,
+          {
+            title: values.title ?? dataFile!.title,
+            replacingFileId: currentFile.id,
+            zipFile: values.zipFile as File,
+          },
+        );
     }
 
     setDataFile({
@@ -125,10 +134,31 @@ const ReleaseDataFileReplacePage = ({
       },
     });
   };
-
+  const cancelBodyText = dataFile?.publicApiDataSetId ? (
+    <>
+      <p>
+        Are you sure you want to cancel this data replacement and remove the
+        attached draft API version?
+      </p>
+      <p>
+        Note that this data replacement has an associated draft API data set
+        version update. The API data set update will also be cancelled and
+        removed by this action.
+      </p>
+    </>
+  ) : (
+    <>
+      Are you sure you want to cancel this data replacement? The pending +
+      replacement data file will be deleted.?
+    </>
+  );
   const replacementCancelButton = (
     <ModalConfirm
-      title="Cancel data replacement"
+      title={
+        dataFile?.publicApiDataSetId
+          ? 'Cancel data replacement and remove draft API'
+          : 'Cancel data replacement'
+      }
       triggerButton={
         <Button variant="secondary">Cancel data replacement</Button>
       }
@@ -143,10 +173,7 @@ const ReleaseDataFileReplacePage = ({
         fetchDataFile();
       }}
     >
-      <p>
-        Are you sure you want to cancel this data replacement? The pending
-        replacement data file will be deleted.
-      </p>
+      <p>{cancelBodyText}</p>
     </ModalConfirm>
   );
 

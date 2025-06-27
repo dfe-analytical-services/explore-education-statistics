@@ -3,6 +3,7 @@ using System;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Events;
 using GovUk.Education.ExploreEducationStatistics.Events.EventGrid;
 
@@ -30,15 +31,18 @@ public class AdminEventRaiser(IEventRaiser eventRaiser) : IAdminEventRaiser
     /// <param name="newReleaseSlug">The new slug for the release.</param>
     /// <param name="publicationId">The unique identifier of the associated publication.</param>
     /// <param name="publicationSlug">The slug of the associated publication.</param>
+    /// <param name="isPublicationArchived">Indicates whether the associated publication is archived.</param>
     public async Task OnReleaseSlugChanged(
         Guid releaseId,
         string newReleaseSlug,
         Guid publicationId,
-        string publicationSlug) =>
+        string publicationSlug,
+        bool isPublicationArchived) =>
         await eventRaiser.RaiseEvent(new ReleaseSlugChangedEvent(releaseId,
             newReleaseSlug,
             publicationId,
-            publicationSlug));
+            publicationSlug,
+            isPublicationArchived));
 
     /// <summary>
     /// Publishes an event when a publication is archived.
@@ -64,20 +68,48 @@ public class AdminEventRaiser(IEventRaiser eventRaiser) : IAdminEventRaiser
             publication.Id,
             publication.Slug,
             publication.Title,
-            publication.Summary
+            publication.Summary,
+            publication.IsArchived()
         ));
+
+    /// <summary>
+    /// Publishes an event when a publication is deleted.
+    /// </summary>
+    /// <param name="publicationId">The unique identifier of the publication that has been deleted.</param>
+    /// <param name="publicationSlug">The slug of the publication that has been deleted.</param>
+    /// <param name="latestPublishedRelease">
+    /// Details of the latest published release associated with the publication that has been deleted.
+    /// </param>
+    public async Task OnPublicationDeleted(
+        Guid publicationId,
+        string publicationSlug,
+        LatestPublishedReleaseInfo? latestPublishedRelease)
+    {
+        await eventRaiser.RaiseEvent(new PublicationDeletedEvent(
+            publicationId,
+            publicationSlug,
+            latestPublishedRelease
+        ));
+    }
 
     /// <summary>
     /// On Publication Latest Published Release Reordered.
     /// It is assumed that the publication LatestPublishedReleaseVersionId has a value assigned to it.
     /// If it is null, then no event will be raised.
     /// </summary>
-    /// <param name="publication">The publication whose latest published release has been reordered.</param>
+    /// <param name="publication">
+    /// The publication whose latest published release has been reordered.
+    /// Ensure publication.LatestPublishedReleaseVersion is populated
+    /// </param>
+    /// <param name="previousLatestPublishedReleaseId">
+    /// The unique identifier of the previous latest published release.
+    /// </param>
     /// <param name="previousLatestPublishedReleaseVersionId">
     /// The unique identifier of the previous latest published release version.
     /// </param>
     public async Task OnPublicationLatestPublishedReleaseReordered(
         Publication publication,
+        Guid previousLatestPublishedReleaseId,
         Guid previousLatestPublishedReleaseVersionId)
     {
         // Should the publication not have a latest published release version for some reason, do nothing.
@@ -86,13 +118,21 @@ public class AdminEventRaiser(IEventRaiser eventRaiser) : IAdminEventRaiser
             return;
         }
 
+        if (publication.LatestPublishedReleaseVersion is null)
+        {
+            throw new ArgumentException("The latest published release version object can not be null.");
+        }
+
         await eventRaiser.RaiseEvent(
             new PublicationLatestPublishedReleaseReorderedEvent(
                 publication.Id,
                 publication.Title,
                 publication.Slug,
+                publication.LatestPublishedReleaseVersion.ReleaseId,
                 publication.LatestPublishedReleaseVersionId.Value,
-                previousLatestPublishedReleaseVersionId));
+                previousLatestPublishedReleaseId,
+                previousLatestPublishedReleaseVersionId,
+                publication.IsArchived()));
     }
 
     /// <summary>

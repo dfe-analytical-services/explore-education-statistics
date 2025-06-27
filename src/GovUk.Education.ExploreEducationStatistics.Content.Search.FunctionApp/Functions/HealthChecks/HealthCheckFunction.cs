@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
+#pragma warning disable IDE0060 // Suppress removing unused parameter `ignored` - must have a valid binding name for Azure function
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.HealthChecks;
 
@@ -11,10 +12,16 @@ public class HealthCheckFunction(IEnumerable<IHealthCheckStrategy> strategies, I
 {
     [Function(nameof(HealthCheck))]
     [Produces("application/json")]
-    public async Task<IActionResult> HealthCheck(
+    public Task<IActionResult> HealthCheck(
+        [HttpTrigger(AuthorizationLevel.Anonymous, "get")]
+        HttpRequest httpRequest) =>
+        Task.FromResult<IActionResult>(new OkResult());
+
+    [Function(nameof(FullHealthCheck))]
+    [Produces("application/json")]
+    public async Task<IActionResult> FullHealthCheck(
         [HttpTrigger(AuthorizationLevel.Anonymous, "get")] 
-        #pragma warning disable IDE0060 // Suppress removing unused parameter - must have a valid binding name for Azure function
-        HttpRequest httpRequest,
+        HttpRequest ignored, //  The binding name _ is invalid
         CancellationToken cancellationToken)
     {
         // Execute strategies sequentially so as not to interleave the logs.

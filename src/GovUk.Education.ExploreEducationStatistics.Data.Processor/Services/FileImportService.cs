@@ -105,7 +105,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 
                 if (import.Status == COMPLETE)
                 {
-                    await _dataImportService.WriteDataSetFileMeta(import.FileId, import.SubjectId);
+                    await _dataImportService.WriteDataSetFileMeta(import.FileId, import.SubjectId, import.TotalRows);
                 }
 
                 return;
@@ -139,7 +139,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 if (import.Errors.Count == 0)
                 {
                     await _dataImportService.UpdateStatus(import.Id, COMPLETE, 100);
-                    await _dataImportService.WriteDataSetFileMeta(import.FileId, import.SubjectId);
+                    await _dataImportService.WriteDataSetFileMeta(import.FileId, import.SubjectId, import.TotalRows);
                 }
                 else
                 {

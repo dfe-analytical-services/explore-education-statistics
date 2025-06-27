@@ -1,0 +1,249 @@
+time_period,time_identifier,geographic_level,country_code,country_name,old_la_code,new_la_code,la_name,animal_type,breed_group,sub_group,breed,ind_one
+2020,Calendar year,Local authority,E92000001,England,203,E09000011,Greenwich,Amphibian,Frogs,Ground Dwellers,Leopard Frog,1
+2020,Calendar year,Local authority,E92000001,England,370,E08000016,Barnsley,Amphibian,Frogs,Ground Dwellers,Pacman Frog,2
+2020,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Amphibian,Frogs,Ground Dwellers,Poison Dart Frog,3
+2018,Calendar year,Local authority,E92000001,England,203,E09000011,Greenwich,Amphibian,Frogs,Ground Dwellers,Tomato Frog,4
+2020,Calendar year,Local authority,E92000001,England,370,E08000016,Barnsley,Amphibian,Frogs,Ground Dwellers,Total,5
+2020,Calendar year,Local authority,E92000001,England,203,E09000011,Greenwich,Amphibian,Frogs,Total,Total,6
+2019,Calendar year,Local authority,E92000001,England,370,E08000016,Barnsley,Amphibian,Frogs,Tree Frogs,Amazon Milk Frog,7
+2018,Calendar year,Local authority,E92000001,England,370,E08000016,Barnsley,Amphibian,Frogs,Tree Frogs,American Green Tree Frog,8
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Amphibian,Frogs,Tree Frogs,Red-Eyed Tree Frog,9
+2020,Calendar year,Local authority,E92000001,England,203,E09000011,Greenwich,Amphibian,Frogs,Tree Frogs,Total,10
+2020,Calendar year,Local authority,E92000001,England,203,E09000011,Greenwich,Amphibian,Frogs,Tree Frogs,White's Tree Frog,11
+2019,Calendar year,Local authority,E92000001,England,203,E09000011,Greenwich,Amphibian,Salamanders & Newts,Aquatic,Alpine Newt,12
+2018,Calendar year,Local authority,E92000001,England,202,E09000007,Camden,Amphibian,Salamanders & Newts,Aquatic,Axolotl,13
+2018,Calendar year,Local authority,E92000001,England,202,E09000007,Camden,Amphibian,Salamanders & Newts,Aquatic,Eastern Newt,14
+2018,Calendar year,Local authority,E92000001,England,370,E08000016,Barnsley,Amphibian,Salamanders & Newts,Aquatic,Great Crested Newt,15
+2018,Calendar year,Local authority,E92000001,England,202,E09000007,Camden,Amphibian,Salamanders & Newts,Aquatic,Total,16
+2020,Calendar year,Local authority,E92000001,England,203,E09000011,Greenwich,Amphibian,Salamanders & Newts,Terrestrial,Fire Salamander,17
+2018,Calendar year,Local authority,E92000001,England,202,E09000007,Camden,Amphibian,Salamanders & Newts,Terrestrial,Marbled Salamander,18
+2018,Calendar year,Local authority,E92000001,England,202,E09000007,Camden,Amphibian,Salamanders & Newts,Terrestrial,Spotted Salamander,19
+2020,Calendar year,Local authority,E92000001,England,203,E09000011,Greenwich,Amphibian,Salamanders & Newts,Terrestrial,Tiger Salamander,20
+2020,Calendar year,Local authority,E92000001,England,203,E09000011,Greenwich,Amphibian,Salamanders & Newts,Terrestrial,Total,21
+2018,Calendar year,Local authority,E92000001,England,202,E09000007,Camden,Amphibian,Salamanders & Newts,Total,Total,22
+2020,Calendar year,Local authority,E92000001,England,203,E09000011,Greenwich,Amphibian,Total,Total,Total,23
+2018,Calendar year,Local authority,E92000001,England,202,E09000007,Camden,Bird,Finches & Canaries,Australian Finches,Gouldian Finch,24
+2019,Calendar year,Local authority,E92000001,England,203,E09000011,Greenwich,Bird,Finches & Canaries,Australian Finches,Owl Finch,25
+2019,Calendar year,Local authority,E92000001,England,202,E09000007,Camden,Bird,Finches & Canaries,Australian Finches,Society Finch,26
+2018,Calendar year,Local authority,E92000001,England,202,E09000007,Camden,Bird,Finches & Canaries,Australian Finches,Star Finch,27
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Bird,Finches & Canaries,Australian Finches,Total,28
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Bird,Finches & Canaries,Australian Finches,Zebra Finch,29
+2020,Calendar year,Local authority,E92000001,England,203,E09000011,Greenwich,Bird,Finches & Canaries,Other Finches,Canary,30
+2018,Calendar year,Local authority,E92000001,England,370,E08000016,Barnsley,Bird,Finches & Canaries,Other Finches,European Goldfinch,31
+2018,Calendar year,Local authority,E92000001,England,203,E09000011,Greenwich,Bird,Finches & Canaries,Other Finches,Red Siskin,32
+2020,Calendar year,Local authority,E92000001,England,202,E09000007,Camden,Bird,Finches & Canaries,Other Finches,Red-billed Firefinch,33
+2019,Calendar year,Local authority,E92000001,England,370,E08000016,Barnsley,Bird,Finches & Canaries,Other Finches,Spice Finch,34
+2019,Calendar year,Local authority,E92000001,England,370,E08000016,Barnsley,Bird,Finches & Canaries,Other Finches,Total,35
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Bird,Finches & Canaries,Total,Total,36
+2018,Calendar year,Local authority,E92000001,England,203,E09000011,Greenwich,Bird,Parrots,New World Parrots,Amazon Parrot,37
+2020,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Bird,Parrots,New World Parrots,Blue and Gold Macaw,38
+2020,Calendar year,Local authority,E92000001,England,202,E09000007,Camden,Bird,Parrots,New World Parrots,Conure,39
+2019,Calendar year,Local authority,E92000001,England,202,E09000007,Camden,Bird,Parrots,New World Parrots,Quaker Parrot,40
+2018,Calendar year,Local authority,E92000001,England,370,E08000016,Barnsley,Bird,Parrots,New World Parrots,Scarlet Macaw,41
+2018,Calendar year,Local authority,E92000001,England,370,E08000016,Barnsley,Bird,Parrots,New World Parrots,Total,42
+2019,Calendar year,Local authority,E92000001,England,370,E08000016,Barnsley,Bird,Parrots,Old World Parrots,African Grey Parrot,43
+2019,Calendar year,Local authority,E92000001,England,203,E09000011,Greenwich,Bird,Parrots,Old World Parrots,Budgerigar,44
+2020,Calendar year,Local authority,E92000001,England,202,E09000007,Camden,Bird,Parrots,Old World Parrots,Cockatiel,45
+2018,Calendar year,Local authority,E92000001,England,202,E09000007,Camden,Bird,Parrots,Old World Parrots,Eclectus Parrot,46
+2020,Calendar year,Local authority,E92000001,England,370,E08000016,Barnsley,Bird,Parrots,Old World Parrots,Lovebird,47
+2019,Calendar year,Local authority,E92000001,England,370,E08000016,Barnsley,Bird,Parrots,Old World Parrots,Total,48
+2018,Calendar year,Local authority,E92000001,England,370,E08000016,Barnsley,Bird,Parrots,Total,Total,49
+2018,Calendar year,Local authority,E92000001,England,370,E08000016,Barnsley,Bird,Total,Total,Total,50
+2019,Calendar year,Local authority,E92000001,England,370,E08000016,Barnsley,Cat,Long-Haired,Large Breeds,Maine Coon,51
+2020,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Cat,Long-Haired,Large Breeds,Norwegian Forest Cat,52
+2018,Calendar year,Local authority,E92000001,England,202,E09000007,Camden,Cat,Long-Haired,Large Breeds,Ragdoll,53
+2020,Calendar year,Local authority,E92000001,England,202,E09000007,Camden,Cat,Long-Haired,Large Breeds,Siberian,54
+2019,Calendar year,Local authority,E92000001,England,370,E08000016,Barnsley,Cat,Long-Haired,Large Breeds,Total,55
+2018,Calendar year,Local authority,E92000001,England,370,E08000016,Barnsley,Cat,Long-Haired,Medium Breeds,Birman,56
+2020,Calendar year,Local authority,E92000001,England,202,E09000007,Camden,Cat,Long-Haired,Medium Breeds,British Longhair,57
+2019,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Cat,Long-Haired,Medium Breeds,Himalayan,58
+2020,Calendar year,Local authority,E92000001,England,203,E09000011,Greenwich,Cat,Long-Haired,Medium Breeds,Selkirk Rex,59
+2018,Calendar year,Local authority,E92000001,England,370,E08000016,Barnsley,Cat,Long-Haired,Medium Breeds,Total,60
+2018,Calendar year,Local authority,E92000001,England,370,E08000016,Barnsley,Cat,Long-Haired,Medium Breeds,Turkish Angora,61
+2019,Calendar year,Local authority,E92000001,England,370,E08000016,Barnsley,Cat,Long-Haired,Total,Total,62
+2018,Calendar year,Local authority,E92000001,England,202,E09000007,Camden,Cat,Short-Haired,Cobby Breeds,British Shorthair,63
+2020,Calendar year,Local authority,E92000001,England,370,E08000016,Barnsley,Cat,Short-Haired,Cobby Breeds,Burmese,64
+2018,Calendar year,Local authority,E92000001,England,202,E09000007,Camden,Cat,Short-Haired,Cobby Breeds,Exotic Shorthair,65
+2020,Calendar year,Local authority,E92000001,England,203,E09000011,Greenwich,Cat,Short-Haired,Cobby Breeds,Manx,66
+2020,Calendar year,Local authority,E92000001,England,370,E08000016,Barnsley,Cat,Short-Haired,Cobby Breeds,Russian Blue,67
+2018,Calendar year,Local authority,E92000001,England,202,E09000007,Camden,Cat,Short-Haired,Cobby Breeds,Total,68
+2020,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Cat,Short-Haired,Slender Breeds,Cornish Rex,69
+2019,Calendar year,Local authority,E92000001,England,203,E09000011,Greenwich,Cat,Short-Haired,Slender Breeds,Oriental Shorthair,70
+2020,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Cat,Short-Haired,Slender Breeds,Siamese,71
+2020,Calendar year,Local authority,E92000001,England,370,E08000016,Barnsley,Cat,Short-Haired,Slender Breeds,Sphynx,72
+2020,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Cat,Short-Haired,Slender Breeds,Total,73
+2020,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Cat,Short-Haired,Total,Total,74
+2019,Calendar year,Local authority,E92000001,England,370,E08000016,Barnsley,Cat,Total,Total,Total,75
+2019,Calendar year,Local authority,E92000001,England,202,E09000007,Camden,Cattle,Beef Breeds,American Breeds,Texas Longhorn,76
+2019,Calendar year,Local authority,E92000001,England,202,E09000007,Camden,Cattle,Beef Breeds,American Breeds,Total,77
+2019,Calendar year,Local authority,E92000001,England,202,E09000007,Camden,Cattle,Beef Breeds,British Breeds,Angus,78
+2018,Calendar year,Local authority,E92000001,England,370,E08000016,Barnsley,Cattle,Beef Breeds,British Breeds,Belted Galloway,79
+2019,Calendar year,Local authority,E92000001,England,370,E08000016,Barnsley,Cattle,Beef Breeds,British Breeds,Hereford,80
+2018,Calendar year,Local authority,E92000001,England,370,E08000016,Barnsley,Cattle,Beef Breeds,British Breeds,Shorthorn,81
+2019,Calendar year,Local authority,E92000001,England,202,E09000007,Camden,Cattle,Beef Breeds,British Breeds,Total,82
+2019,Calendar year,Local authority,E92000001,England,370,E08000016,Barnsley,Cattle,Beef Breeds,European Breeds,Brahman,83
+2020,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Cattle,Beef Breeds,European Breeds,Charolais,84
+2019,Calendar year,Local authority,E92000001,England,203,E09000011,Greenwich,Cattle,Beef Breeds,European Breeds,Gelbvieh,85
+2019,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Cattle,Beef Breeds,European Breeds,Limousin,86
+2019,Calendar year,Local authority,E92000001,England,202,E09000007,Camden,Cattle,Beef Breeds,European Breeds,Simmental,87
+2019,Calendar year,Local authority,E92000001,England,370,E08000016,Barnsley,Cattle,Beef Breeds,European Breeds,Total,88
+2019,Calendar year,Local authority,E92000001,England,202,E09000007,Camden,Cattle,Beef Breeds,Total,Total,89
+2019,Calendar year,Local authority,E92000001,England,370,E08000016,Barnsley,Cattle,Dairy Breeds,High-Fat Breeds,Ayrshire,90
+2019,Calendar year,Local authority,E92000001,England,202,E09000007,Camden,Cattle,Dairy Breeds,High-Fat Breeds,Brown Swiss,91
+2020,Calendar year,Local authority,E92000001,England,202,E09000007,Camden,Cattle,Dairy Breeds,High-Fat Breeds,Guernsey,92
+2020,Calendar year,Local authority,E92000001,England,202,E09000007,Camden,Cattle,Dairy Breeds,High-Fat Breeds,Jersey,93
+2020,Calendar year,Local authority,E92000001,England,202,E09000007,Camden,Cattle,Dairy Breeds,High-Fat Breeds,Total,94
+2020,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Cattle,Dairy Breeds,High-Yield Breeds,Holstein,95
+2019,Calendar year,Local authority,E92000001,England,370,E08000016,Barnsley,Cattle,Dairy Breeds,High-Yield Breeds,Milking Shorthorn,96
+2019,Calendar year,Local authority,E92000001,England,370,E08000016,Barnsley,Cattle,Dairy Breeds,High-Yield Breeds,Red and White Holstein,97
+2020,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Cattle,Dairy Breeds,High-Yield Breeds,Total,98
+2020,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Cattle,Dairy Breeds,Total,Total,99
+2020,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Cattle,Total,Total,Total,100
+2020,Calendar year,Local authority,E92000001,England,370,E08000016,Barnsley,Dog,Hound Group,Scent Hounds,Basset Hound,101
+2019,Calendar year,Local authority,E92000001,England,203,E09000011,Greenwich,Dog,Hound Group,Scent Hounds,Beagle,102
+2018,Calendar year,Local authority,E92000001,England,202,E09000007,Camden,Dog,Hound Group,Scent Hounds,Black and Tan Coonhound,103
+2018,Calendar year,Local authority,E92000001,England,203,E09000011,Greenwich,Dog,Hound Group,Scent Hounds,Bloodhound,104
+2019,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Hound Group,Scent Hounds,Dachshund,105
+2019,Calendar year,Local authority,E92000001,England,203,E09000011,Greenwich,Dog,Hound Group,Scent Hounds,Total,106
+2020,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Hound Group,Sight Hounds,Afghan Hound,107
+2019,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Hound Group,Sight Hounds,Basenji,108
+2019,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Hound Group,Sight Hounds,Greyhound,109
+2019,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Hound Group,Sight Hounds,Irish Wolfhound,110
+2019,Calendar year,Local authority,E92000001,England,370,E08000016,Barnsley,Dog,Hound Group,Sight Hounds,Rhodesian Ridgeback,111
+2019,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Hound Group,Sight Hounds,Total,112
+2019,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Hound Group,Sight Hounds,Whippet,113
+2019,Calendar year,Local authority,E92000001,England,203,E09000011,Greenwich,Dog,Hound Group,Total,Total,114
+2019,Calendar year,Local authority,E92000001,England,370,E08000016,Barnsley,Dog,Terrier Group,Large Terriers,Airedale Terrier,115
+2020,Calendar year,Local authority,E92000001,England,370,E08000016,Barnsley,Dog,Terrier Group,Large Terriers,American Staffordshire Terrier,116
+2020,Calendar year,Local authority,E92000001,England,202,E09000007,Camden,Dog,Terrier Group,Large Terriers,Bull Terrier,117
+2020,Calendar year,Local authority,E92000001,England,202,E09000007,Camden,Dog,Terrier Group,Large Terriers,Soft Coated Wheaten Terrier,118
+2019,Calendar year,Local authority,E92000001,England,370,E08000016,Barnsley,Dog,Terrier Group,Large Terriers,Total,119
+2018,Calendar year,Local authority,E92000001,England,370,E08000016,Barnsley,Dog,Terrier Group,Small Terriers,Bedlington Terrier,120
+2018,Calendar year,Local authority,E92000001,England,202,E09000007,Camden,Dog,Terrier Group,Small Terriers,Cairn Terrier,121
+2018,Calendar year,Local authority,E92000001,England,370,E08000016,Barnsley,Dog,Terrier Group,Small Terriers,Jack Russell Terrier,122
+2019,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Terrier Group,Small Terriers,Rat Terrier,123
+2020,Calendar year,Local authority,E92000001,England,202,E09000007,Camden,Dog,Terrier Group,Small Terriers,Scottish Terrier,124
+2020,Calendar year,Local authority,E92000001,England,202,E09000007,Camden,Dog,Terrier Group,Small Terriers,Total,125
+2020,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Terrier Group,Small Terriers,West Highland White Terrier,126
+2019,Calendar year,Local authority,E92000001,England,370,E08000016,Barnsley,Dog,Terrier Group,Total,Total,127
+2019,Calendar year,Local authority,E92000001,England,370,E08000016,Barnsley,Dog,Total,Total,Total,128
+2020,Calendar year,Local authority,E92000001,England,370,E08000016,Barnsley,Fish,Livebearers,Poecilia,Endler's Livebearer,129
+2018,Calendar year,Local authority,E92000001,England,370,E08000016,Barnsley,Fish,Livebearers,Poecilia,Guppy,130
+2018,Calendar year,Local authority,E92000001,England,202,E09000007,Camden,Fish,Livebearers,Poecilia,Molly,131
+2018,Calendar year,Local authority,E92000001,England,370,E08000016,Barnsley,Fish,Livebearers,Poecilia,Total,132
+2018,Calendar year,Local authority,E92000001,England,370,E08000016,Barnsley,Fish,Livebearers,Total,Total,133
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Fish,Livebearers,Xiphophorus,Platy,134
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Fish,Livebearers,Xiphophorus,Swordtail,135
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Fish,Livebearers,Xiphophorus,Total,136
+2018,Calendar year,Local authority,E92000001,England,370,E08000016,Barnsley,Fish,Tetras,African Tetras,Congo Tetra,137
+2018,Calendar year,Local authority,E92000001,England,370,E08000016,Barnsley,Fish,Tetras,African Tetras,Total,138
+2020,Calendar year,Local authority,E92000001,England,203,E09000011,Greenwich,Fish,Tetras,South American Tetras,Black Skirt Tetra,139
+2018,Calendar year,Local authority,E92000001,England,370,E08000016,Barnsley,Fish,Tetras,South American Tetras,Cardinal Tetra,140
+2019,Calendar year,Local authority,E92000001,England,370,E08000016,Barnsley,Fish,Tetras,South American Tetras,Ember Tetra,141
+2020,Calendar year,Local authority,E92000001,England,202,E09000007,Camden,Fish,Tetras,South American Tetras,Neon Tetra,142
+2020,Calendar year,Local authority,E92000001,England,203,E09000011,Greenwich,Fish,Tetras,South American Tetras,Rummy-nose Tetra,143
+2020,Calendar year,Local authority,E92000001,England,202,E09000007,Camden,Fish,Tetras,South American Tetras,Total,144
+2020,Calendar year,Local authority,E92000001,England,202,E09000007,Camden,Fish,Tetras,Total,Total,145
+2018,Calendar year,Local authority,E92000001,England,370,E08000016,Barnsley,Fish,Total,Total,Total,146
+2019,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Horse,Draft Breeds,American Drafts,American Cream Draft,147
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Horse,Draft Breeds,American Drafts,Belgian Draft,148
+2020,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Horse,Draft Breeds,American Drafts,Gypsy Vanner,149
+2019,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Horse,Draft Breeds,American Drafts,Suffolk Punch,150
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Horse,Draft Breeds,American Drafts,Total,151
+2020,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Horse,Draft Breeds,European Drafts,Breton,152
+2020,Calendar year,Local authority,E92000001,England,202,E09000007,Camden,Horse,Draft Breeds,European Drafts,Clydesdale,153
+2019,Calendar year,Local authority,E92000001,England,370,E08000016,Barnsley,Horse,Draft Breeds,European Drafts,Friesian,154
+2018,Calendar year,Local authority,E92000001,England,202,E09000007,Camden,Horse,Draft Breeds,European Drafts,Irish Draught,155
+2018,Calendar year,Local authority,E92000001,England,370,E08000016,Barnsley,Horse,Draft Breeds,European Drafts,Percheron,156
+2020,Calendar year,Local authority,E92000001,England,203,E09000011,Greenwich,Horse,Draft Breeds,European Drafts,Shire,157
+2020,Calendar year,Local authority,E92000001,England,202,E09000007,Camden,Horse,Draft Breeds,European Drafts,Total,158
+2020,Calendar year,Local authority,E92000001,England,202,E09000007,Camden,Horse,Draft Breeds,Total,Total,159
+2019,Calendar year,Local authority,E92000001,England,203,E09000011,Greenwich,Horse,Light Breeds,Gaited Breeds,American Saddlebred,160
+2019,Calendar year,Local authority,E92000001,England,202,E09000007,Camden,Horse,Light Breeds,Gaited Breeds,Paso Fino,161
+2018,Calendar year,Local authority,E92000001,England,202,E09000007,Camden,Horse,Light Breeds,Gaited Breeds,Tennessee Walking Horse,162
+2018,Calendar year,Local authority,E92000001,England,202,E09000007,Camden,Horse,Light Breeds,Gaited Breeds,Total,163
+2020,Calendar year,Local authority,E92000001,England,370,E08000016,Barnsley,Horse,Light Breeds,Sport & Racing,Andalusian,164
+2019,Calendar year,Local authority,E92000001,England,203,E09000011,Greenwich,Horse,Light Breeds,Sport & Racing,Appaloosa,165
+2018,Calendar year,Local authority,E92000001,England,202,E09000007,Camden,Horse,Light Breeds,Sport & Racing,Arabian,166
+2019,Calendar year,Local authority,E92000001,England,370,E08000016,Barnsley,Horse,Light Breeds,Sport & Racing,Morgan,167
+2020,Calendar year,Local authority,E92000001,England,370,E08000016,Barnsley,Horse,Light Breeds,Sport & Racing,Quarter Horse,168
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Horse,Light Breeds,Sport & Racing,Standardbred,169
+2019,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Horse,Light Breeds,Sport & Racing,Thoroughbred,170
+2019,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Horse,Light Breeds,Sport & Racing,Total,171
+2018,Calendar year,Local authority,E92000001,England,202,E09000007,Camden,Horse,Light Breeds,Total,Total,172
+2020,Calendar year,Local authority,E92000001,England,202,E09000007,Camden,Horse,Total,Total,Total,173
+2020,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Rabbit,Fur Breeds,Other Fur Types,American Chinchilla,174
+2019,Calendar year,Local authority,E92000001,England,203,E09000011,Greenwich,Rabbit,Fur Breeds,Other Fur Types,American Sable,175
+2018,Calendar year,Local authority,E92000001,England,203,E09000011,Greenwich,Rabbit,Fur Breeds,Other Fur Types,Angora,176
+2018,Calendar year,Local authority,E92000001,England,370,E08000016,Barnsley,Rabbit,Fur Breeds,Other Fur Types,Cinnamon,177
+2018,Calendar year,Local authority,E92000001,England,370,E08000016,Barnsley,Rabbit,Fur Breeds,Other Fur Types,Giant Chinchilla,178
+2020,Calendar year,Local authority,E92000001,England,370,E08000016,Barnsley,Rabbit,Fur Breeds,Other Fur Types,Silver Fox,179
+2020,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Rabbit,Fur Breeds,Other Fur Types,Total,180
+2020,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Rabbit,Fur Breeds,Rex Fur,Mini Rex,181
+2019,Calendar year,Local authority,E92000001,England,202,E09000007,Camden,Rabbit,Fur Breeds,Rex Fur,Rex,182
+2019,Calendar year,Local authority,E92000001,England,202,E09000007,Camden,Rabbit,Fur Breeds,Rex Fur,Total,183
+2020,Calendar year,Local authority,E92000001,England,202,E09000007,Camden,Rabbit,Fur Breeds,Satin Fur,Mini Satin,184
+2020,Calendar year,Local authority,E92000001,England,202,E09000007,Camden,Rabbit,Fur Breeds,Satin Fur,Satin,185
+2020,Calendar year,Local authority,E92000001,England,202,E09000007,Camden,Rabbit,Fur Breeds,Satin Fur,Total,186
+2019,Calendar year,Local authority,E92000001,England,202,E09000007,Camden,Rabbit,Fur Breeds,Total,Total,187
+2020,Calendar year,Local authority,E92000001,England,203,E09000011,Greenwich,Rabbit,Lop Breeds,Dwarf Lops,American Fuzzy Lop,188
+2019,Calendar year,Local authority,E92000001,England,202,E09000007,Camden,Rabbit,Lop Breeds,Dwarf Lops,Holland Lop,189
+2020,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Rabbit,Lop Breeds,Dwarf Lops,Mini Lop,190
+2020,Calendar year,Local authority,E92000001,England,203,E09000011,Greenwich,Rabbit,Lop Breeds,Dwarf Lops,Plush Lop,191
+2019,Calendar year,Local authority,E92000001,England,202,E09000007,Camden,Rabbit,Lop Breeds,Dwarf Lops,Total,192
+2020,Calendar year,Local authority,E92000001,England,202,E09000007,Camden,Rabbit,Lop Breeds,Dwarf Lops,Velveteen Lop,193
+2019,Calendar year,Local authority,E92000001,England,203,E09000011,Greenwich,Rabbit,Lop Breeds,Large Lops,English Lop,194
+2019,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Rabbit,Lop Breeds,Large Lops,French Lop,195
+2020,Calendar year,Local authority,E92000001,England,370,E08000016,Barnsley,Rabbit,Lop Breeds,Large Lops,Meissner Lop,196
+2019,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Rabbit,Lop Breeds,Large Lops,Total,197
+2019,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Rabbit,Lop Breeds,Total,Total,198
+2019,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Rabbit,Total,Total,Total,199
+2018,Calendar year,Local authority,E92000001,England,370,E08000016,Barnsley,Reptile,Lizards,Geckos,Crested Gecko,200
+2018,Calendar year,Local authority,E92000001,England,203,E09000011,Greenwich,Reptile,Lizards,Geckos,Day Gecko,201
+2020,Calendar year,Local authority,E92000001,England,202,E09000007,Camden,Reptile,Lizards,Geckos,Leopard Gecko,202
+2020,Calendar year,Local authority,E92000001,England,202,E09000007,Camden,Reptile,Lizards,Geckos,Total,203
+2019,Calendar year,Local authority,E92000001,England,202,E09000007,Camden,Reptile,Lizards,Iguanas & Agamas,Bearded Dragon,204
+2020,Calendar year,Local authority,E92000001,England,203,E09000011,Greenwich,Reptile,Lizards,Iguanas & Agamas,Chameleon,205
+2020,Calendar year,Local authority,E92000001,England,202,E09000007,Camden,Reptile,Lizards,Iguanas & Agamas,Green Anole,206
+2020,Calendar year,Local authority,E92000001,England,370,E08000016,Barnsley,Reptile,Lizards,Iguanas & Agamas,Iguana,207
+2019,Calendar year,Local authority,E92000001,England,202,E09000007,Camden,Reptile,Lizards,Iguanas & Agamas,Total,208
+2020,Calendar year,Local authority,E92000001,England,203,E09000011,Greenwich,Reptile,Lizards,Iguanas & Agamas,Uromastyx,209
+2020,Calendar year,Local authority,E92000001,England,202,E09000007,Camden,Reptile,Lizards,Total,Total,210
+2019,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Reptile,Snakes,Colubrids,Corn Snake,211
+2018,Calendar year,Local authority,E92000001,England,203,E09000011,Greenwich,Reptile,Snakes,Colubrids,Garter Snake,212
+2018,Calendar year,Local authority,E92000001,England,202,E09000007,Camden,Reptile,Snakes,Colubrids,Hognose Snake,213
+2019,Calendar year,Local authority,E92000001,England,370,E08000016,Barnsley,Reptile,Snakes,Colubrids,King Snake,214
+2019,Calendar year,Local authority,E92000001,England,202,E09000007,Camden,Reptile,Snakes,Colubrids,Milk Snake,215
+2019,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Reptile,Snakes,Colubrids,Total,216
+2020,Calendar year,Local authority,E92000001,England,370,E08000016,Barnsley,Reptile,Snakes,Constrictors,Ball Python,217
+2020,Calendar year,Local authority,E92000001,England,202,E09000007,Camden,Reptile,Snakes,Constrictors,Boa Constrictor,218
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Reptile,Snakes,Constrictors,Children's Python,219
+2020,Calendar year,Local authority,E92000001,England,370,E08000016,Barnsley,Reptile,Snakes,Constrictors,Rosy Boa,220
+2020,Calendar year,Local authority,E92000001,England,202,E09000007,Camden,Reptile,Snakes,Constrictors,Sand Boa,221
+2020,Calendar year,Local authority,E92000001,England,370,E08000016,Barnsley,Reptile,Snakes,Constrictors,Total,222
+2020,Calendar year,Local authority,E92000001,England,370,E08000016,Barnsley,Reptile,Snakes,Total,Total,223
+2020,Calendar year,Local authority,E92000001,England,202,E09000007,Camden,Reptile,Total,Total,Total,224
+2018,Calendar year,Local authority,E92000001,England,370,E08000016,Barnsley,Rodent,Guinea Pigs,Long-Haired,Coronet,225
+2020,Calendar year,Local authority,E92000001,England,370,E08000016,Barnsley,Rodent,Guinea Pigs,Long-Haired,Lunkarya,226
+2020,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Rodent,Guinea Pigs,Long-Haired,Peruvian,227
+2019,Calendar year,Local authority,E92000001,England,202,E09000007,Camden,Rodent,Guinea Pigs,Long-Haired,Silkie,228
+2019,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Rodent,Guinea Pigs,Long-Haired,Texel,229
+2020,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Rodent,Guinea Pigs,Long-Haired,Total,230
+2019,Calendar year,Local authority,E92000001,England,203,E09000011,Greenwich,Rodent,Guinea Pigs,Short-Haired,Abyssinian,231
+2019,Calendar year,Local authority,E92000001,England,370,E08000016,Barnsley,Rodent,Guinea Pigs,Short-Haired,American,232
+2018,Calendar year,Local authority,E92000001,England,370,E08000016,Barnsley,Rodent,Guinea Pigs,Short-Haired,Baldwin,233
+2018,Calendar year,Local authority,E92000001,England,202,E09000007,Camden,Rodent,Guinea Pigs,Short-Haired,Teddy,234
+2019,Calendar year,Local authority,E92000001,England,370,E08000016,Barnsley,Rodent,Guinea Pigs,Short-Haired,Total,235
+2020,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Rodent,Guinea Pigs,Short-Haired,White Crested,236
+2020,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Rodent,Guinea Pigs,Total,Total,237
+2019,Calendar year,Local authority,E92000001,England,203,E09000011,Greenwich,Rodent,Hamsters,Dwarf Hamsters,Dwarf Campbell Russian Hamster,238
+2020,Calendar year,Local authority,E92000001,England,203,E09000011,Greenwich,Rodent,Hamsters,Dwarf Hamsters,Roborovski Hamster,239
+2019,Calendar year,Local authority,E92000001,England,203,E09000011,Greenwich,Rodent,Hamsters,Dwarf Hamsters,Total,240
+2018,Calendar year,Local authority,E92000001,England,203,E09000011,Greenwich,Rodent,Hamsters,Dwarf Hamsters,Winter White Russian Hamster,241
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Rodent,Hamsters,Large Hamsters,Chinese Hamster,242
+2020,Calendar year,Local authority,E92000001,England,203,E09000011,Greenwich,Rodent,Hamsters,Large Hamsters,European Hamster,243
+2018,Calendar year,Local authority,E92000001,England,370,E08000016,Barnsley,Rodent,Hamsters,Large Hamsters,Syrian Hamster,244
+2018,Calendar year,Local authority,E92000001,England,370,E08000016,Barnsley,Rodent,Hamsters,Large Hamsters,Total,245
+2019,Calendar year,Local authority,E92000001,England,203,E09000011,Greenwich,Rodent,Hamsters,Total,Total,246
+2019,Calendar year,Local authority,E92000001,England,203,E09000011,Greenwich,Rodent,Total,Total,Total,247
+2019,Calendar year,Local authority,E92000001,England,370,E08000016,Barnsley,Total,Total,Total,Total,248

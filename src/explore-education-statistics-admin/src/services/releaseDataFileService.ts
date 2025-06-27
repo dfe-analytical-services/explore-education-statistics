@@ -43,34 +43,30 @@ export interface DataFile {
   publicApiDataSetVersion?: string;
 }
 
-export type UploadDataFilesRequest =
-  | {
-      title: string;
-      dataFile: File;
-      metadataFile: File;
-    }
-  | {
-      replacingFileId: string;
-      dataFile: File;
-      metadataFile: File;
-    };
+export interface DataSetAccoutrements {
+  dataBlocks: { id: string; name: string }[];
+  footnotes: { id: string; content: string }[];
+}
 
-export type UploadZipDataFileRequest =
-  | {
-      title: string;
-      zipFile: File;
-    }
-  | {
-      replacingFileId: string;
-      zipFile: File;
-    };
-
-export type ArchiveDataSetFile = {
+export type UploadDataFilesRequest = {
   title: string;
-  dataFilename: string;
+  dataFile: File;
+  metadataFile: File;
+  replacingFileId?: string;
+};
+
+export type UploadZipDataFileRequest = {
+  title: string;
+  zipFile: File;
+  replacingFileId?: string;
+};
+
+export type DataSetUploadResult = {
+  title: string;
+  dataFileName: string;
   dataFileId: string;
   dataFileSize: number;
-  metaFilename: string;
+  metaFileName: string;
   metaFileId: string;
   metaFileSize: number;
   replacingFileId?: string;
@@ -128,64 +124,105 @@ const releaseDataFileService = {
       .get<DataFileInfo>(`/release/${releaseId}/data/${fileId}`)
       .then(mapFile);
   },
-  async uploadDataFiles(
+  getDataSetAccoutrementsSummary(
+    releaseVersionId: string,
+    fileId: string,
+  ): Promise<DataSetAccoutrements> {
+    return client.get<DataSetAccoutrements>(
+      `/release/${releaseVersionId}/data/${fileId}/accoutrements-summary`,
+    );
+  },
+  async uploadDataSetFilePairForReplacement(
     releaseId: string,
     request: UploadDataFilesRequest,
   ): Promise<DataFile> {
-    const { dataFile, metadataFile, ...params } = request;
+    const { dataFile, metadataFile, title, replacingFileId } = request;
 
     const data = new FormData();
-    data.append('file', dataFile);
+    data.append('releaseVersionId', releaseId);
+    data.append('title', title);
+    data.append('dataFile', dataFile);
     data.append('metaFile', metadataFile);
+    data.append('replacingFileId', replacingFileId ?? '');
 
     const file = await client.post<DataFileInfo>(
-      `/release/${releaseId}/data`,
+      '/releaseVersions/replacement-data',
       data,
-      {
-        params,
-      },
     );
 
     return mapFile(file);
   },
-  async uploadZipDataFile(
+  async uploadZippedDataSetFilePairForReplacement(
     releaseId: string,
     request: UploadZipDataFileRequest,
   ): Promise<DataFile> {
-    const { zipFile, ...params } = request;
+    const { zipFile, title, replacingFileId } = request;
 
     const data = new FormData();
+    data.append('releaseVersionId', releaseId);
+    data.append('title', title);
     data.append('zipFile', zipFile);
+    data.append('replacingFileId', replacingFileId ?? '');
 
     const file = await client.post<DataFileInfo>(
-      `/release/${releaseId}/zip-data`,
+      '/releaseVersions/replacement-zip-data',
       data,
-      {
-        params,
-      },
     );
 
     return mapFile(file);
   },
-  async getUploadBulkZipDataFilePlan(
+  async uploadDataSetFilePair(
     releaseId: string,
-    zipFile: File,
-  ): Promise<ArchiveDataSetFile[]> {
-    const data = new FormData();
-    data.append('zipFile', zipFile);
+    request: UploadDataFilesRequest,
+  ): Promise<DataSetUploadResult[]> {
+    const { dataFile, metadataFile, title, replacingFileId } = request;
 
-    return client.post<ArchiveDataSetFile[]>(
-      `/release/${releaseId}/upload-bulk-zip-data`,
+    const data = new FormData();
+    data.append('releaseVersionId', releaseId);
+    data.append('title', title);
+    data.append('dataFile', dataFile);
+    data.append('metaFile', metadataFile);
+    data.append('replacingFileId', replacingFileId ?? '');
+
+    return client.post<DataSetUploadResult[]>('/releaseVersions/data', data);
+  },
+  async uploadZippedDataSetFilePair(
+    releaseId: string,
+    request: UploadZipDataFileRequest,
+  ): Promise<DataSetUploadResult[]> {
+    const { zipFile, title, replacingFileId } = request;
+
+    const data = new FormData();
+    data.append('releaseVersionId', releaseId);
+    data.append('title', title);
+    data.append('zipFile', zipFile);
+    data.append('replacingFileId', replacingFileId ?? '');
+
+    return client.post<DataSetUploadResult[]>(
+      '/releaseVersions/zip-data',
       data,
     );
   },
-  async importBulkZipDataFile(
+  async uploadBulkZipDataSetFile(
     releaseId: string,
-    dataSetFiles: ArchiveDataSetFile[],
+    zipFile: File,
+  ): Promise<DataSetUploadResult[]> {
+    const data = new FormData();
+    data.append('releaseVersionId', releaseId);
+    data.append('zipFile', zipFile);
+
+    return client.post<DataSetUploadResult[]>(
+      'releaseVersions/upload-bulk-zip-data',
+      data,
+    );
+  },
+  async importDataSets(
+    releaseId: string,
+    dataSetUploadResults: DataSetUploadResult[],
   ): Promise<DataFile[]> {
     const files = await client.post<DataFileInfo[]>(
-      `/release/${releaseId}/import-bulk-zip-data`,
-      dataSetFiles,
+      `/releases/${releaseId}/import-data-sets`,
+      dataSetUploadResults,
     );
 
     return files.map(file => mapFile(file));
@@ -226,7 +263,7 @@ const releaseDataFileService = {
       .get<Blob>(`/release/${releaseId}/file/${id}/download`, {
         responseType: 'blob',
       })
-      .then(response => downloadFile(response, fileName));
+      .then(response => downloadFile({ file: response, fileName }));
   },
   updateFile(
     releaseId: string,

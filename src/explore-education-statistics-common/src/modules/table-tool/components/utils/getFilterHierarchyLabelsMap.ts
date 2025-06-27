@@ -3,6 +3,11 @@ import { Dictionary } from '@common/types';
 
 export type OptionLabelsMap = Dictionary<string>;
 
+/**
+ * Maps all filters and filter options by their id with their label strings
+ * @param filters subject meta filters
+ * @returns dictionary of filter and filter option labels, keyed by their id
+ */
 export default function getFilterHierarchyLabelsMap(
   filters: SubjectMetaFilter[],
 ): OptionLabelsMap {
@@ -19,4 +24,8 @@ export default function getFilterHierarchyLabelsMap(
   });
 
   return map;
+}
+
+export function isOptionTotal(map: OptionLabelsMap, optionId: string): boolean {
+  return map[optionId]?.toLocaleLowerCase() === 'total';
 }

@@ -1,5 +1,3 @@
-using System.Text.Json;
-using System.Threading.Tasks;
 using Azure.Storage.Queues;
 using GovUk.Education.ExploreEducationStatistics.Common.Database;
 using GovUk.Education.ExploreEducationStatistics.Common.Functions;
@@ -18,6 +16,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using System.Text.Json;
+using System.Threading.Tasks;
 using static GovUk.Education.ExploreEducationStatistics.Data.Processor.Model.ProcessorQueues;
 
 var host = new HostBuilder()
@@ -53,7 +53,6 @@ var host = new HostBuilder()
             .AddTransient<IImporterMetaService, ImporterMetaService>()
             .AddTransient<IDataImportService, DataImportService>()
             .AddTransient<IValidatorService, ValidatorService>()
-            .AddSingleton<IDataArchiveService, DataArchiveService>()
             .AddSingleton<IFileTypeService, FileTypeService>()
             .AddSingleton<IGuidGenerator, SequentialGuidGenerator>()
             .AddTransient<IProcessorService, ProcessorService>()
@@ -97,7 +96,7 @@ async Task RestartImports()
     var config = host.Services.GetRequiredService<IOptions<AppOptions>>().Value;
     var connectionString = config.PrivateStorageConnectionString;
 
-    QueueClientOptions queueOptions = 
+    QueueClientOptions queueOptions =
         new() { MessageEncoding = QueueMessageEncoding.Base64 };
 
     var restartImportsQueueClient = new QueueClient(connectionString, queueName: RestartImportsQueue, queueOptions);

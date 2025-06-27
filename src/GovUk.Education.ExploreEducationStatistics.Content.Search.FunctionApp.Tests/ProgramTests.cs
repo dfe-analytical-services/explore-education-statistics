@@ -3,7 +3,6 @@ using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Clie
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.CommandHandlers.ReindexSearchableDocuments;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Options;
-using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Services;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Services.CreateSearchableDocuments;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Services.RemoveSearchableDocument;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Tests.Extensions;
@@ -39,7 +38,9 @@ public class ProgramTests
         }));
 
     private IHost GetSut(Func<IHostBuilder, IHostBuilder> modifyHostBuilder) =>
-        modifyHostBuilder(new HostBuilder()).BuildHost();
+        modifyHostBuilder(new HostBuilder().UseEnvironment("Development"))
+            .ConfigureHostServices()
+            .Build();
 
     public class BasicTests : ProgramTests
     {

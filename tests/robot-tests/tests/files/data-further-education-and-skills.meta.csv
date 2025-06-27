@@ -1,0 +1,7 @@
+col_name,col_type,label,indicator_grouping,indicator_unit,indicator_dp,filter_hint,filter_grouping_column,parent_filter
+ethnicity_major,Filter,Ethnicity major,,,,,,
+ethnicity_minor,Filter,Ethnicity minor,,,,,,ethnicity_major
+sector_subject_area_t1,Filter,Sector subject area 1,,,,,,
+qualification_type,Filter,Qualification,,,,,,sector_subject_area_t1
+learning_aim_title,Filter,Learning aim title,,,,,,qualification_type
+achiever_count,Indicator,Number of achievers,,,0,,,

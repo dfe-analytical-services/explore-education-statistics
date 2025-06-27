@@ -128,7 +128,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api
 
             // Services
             services.AddSingleton<IPublicBlobStorageService, PublicBlobStorageService>(provider =>
-                new PublicBlobStorageService(configuration.GetValue<string>("PublicStorage"),
+                new PublicBlobStorageService(configuration.GetRequiredValue("PublicStorage"),
                     provider.GetRequiredService<ILogger<IBlobStorageService>>()));
             services.AddTransient<IBlobCacheService, BlobCacheService>(provider => new BlobCacheService(
                 provider.GetRequiredService<IPublicBlobStorageService>(),
@@ -190,7 +190,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app,
             IWebHostEnvironment env,
-            ILogger<Startup> logger)
+            ILogger<Startup> _)
         {
             // Enable caching and register any caching services
             CacheAspect.Enabled = true;

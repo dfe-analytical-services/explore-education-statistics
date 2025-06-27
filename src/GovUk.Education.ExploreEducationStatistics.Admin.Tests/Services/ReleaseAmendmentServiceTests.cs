@@ -18,6 +18,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Fixtures;
 using Microsoft.EntityFrameworkCore;
 using Moq;
+using Semver;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
@@ -319,7 +320,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     ],
                     Published = new DateTime(2020, 1, 1, 0, 0, 0, DateTimeKind.Utc),
                     PublicApiDataSetId = Guid.NewGuid(),
-                    PublicApiDataSetVersion = "1.0.0",
+                    PublicApiDataSetVersion = SemVersion.Parse("1.0.0", SemVersionStyles.Any),
                 },
                 new()
                 {

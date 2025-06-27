@@ -24,6 +24,7 @@ internal class DataSetService(
     ContentDbContext contentDbContext,
     PublicDataDbContext publicDataDbContext,
     IProcessorClient processorClient,
+    IDataSetVersionMappingService dataSetVersionMappingService,
     IUserService userService)
     : IDataSetService
 {
@@ -156,8 +157,8 @@ internal class DataSetService(
             ? null
             : MapDraftVersion(
                 dataSetVersion: dataSet.LatestDraftVersion,
-                mappingStatus: await GetMappingStatus(
-                    nextDataSetVersionId: dataSet.LatestDraftVersion.Id,
+                mappingStatus: await dataSetVersionMappingService.GetMappingStatus(
+                    dataSetVersionId: dataSet.LatestDraftVersion.Id,
                     cancellationToken),
                 releaseFilesByDataSetVersionId[dataSet.LatestDraftVersion.Id]
             );
@@ -262,22 +263,7 @@ internal class DataSetService(
             MappingStatus = mappingStatus
         };
     }
-
-    public async Task<MappingStatusViewModel?> GetMappingStatus(
-        Guid nextDataSetVersionId,
-        CancellationToken cancellationToken)
-    {
-        return await publicDataDbContext
-            .DataSetVersionMappings
-            .Where(mapping => mapping.TargetDataSetVersionId == nextDataSetVersionId)
-            .Select(mapping => new MappingStatusViewModel
-            {
-                LocationsComplete = mapping.LocationMappingsComplete,
-                FiltersComplete = mapping.FilterMappingsComplete
-            })
-            .SingleOrDefaultAsync(cancellationToken);
-    }
-
+    
     private static DataSetLiveVersionViewModel MapLiveVersion(
         DataSetVersion dataSetVersion,
         ReleaseFile releaseFile)

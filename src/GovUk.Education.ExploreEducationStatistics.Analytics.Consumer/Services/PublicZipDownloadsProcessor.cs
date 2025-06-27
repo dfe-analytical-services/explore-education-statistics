@@ -1,55 +1,57 @@
 using GovUk.Education.ExploreEducationStatistics.Analytics.Consumer.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Analytics.Consumer.Services.Workflow;
 using GovUk.Education.ExploreEducationStatistics.Common.DuckDb.DuckDb;
-using GovUk.Education.ExploreEducationStatistics.Common.Services;
-using Microsoft.Extensions.Logging;
 
 namespace GovUk.Education.ExploreEducationStatistics.Analytics.Consumer.Services;
 
 public class PublicZipDownloadsProcessor(
     IAnalyticsPathResolver pathResolver,
-    ILogger<PublicZipDownloadsProcessor> logger,
-    IWorkflowActor<PublicZipDownloadsProcessor>? workflowActor = null) : IRequestFileProcessor
+    IProcessRequestFilesWorkflow workflow) : IRequestFileProcessor
 {
-    private readonly IWorkflowActor<PublicZipDownloadsProcessor> _workflowActor 
-        = workflowActor ?? new WorkflowActor();
-    
-    public Task Process() {
-    
-        var workflow = new ProcessRequestFilesWorkflow<PublicZipDownloadsProcessor>(
+    public Task Process()
+    {
+        return workflow.Process(new WorkflowActor(
             sourceDirectory: pathResolver.PublicZipDownloadsDirectoryPath(),
-            reportsDirectory: pathResolver.PublicZipDownloadsReportsDirectoryPath(),
-            actor: _workflowActor,
-            logger: logger);
-
-        return workflow.Process();
+            reportsDirectory: pathResolver.PublicZipDownloadsReportsDirectoryPath()));
     }
 
-    private class WorkflowActor : IWorkflowActor<PublicZipDownloadsProcessor>
+    private class WorkflowActor(string sourceDirectory, string reportsDirectory) 
+        : IWorkflowActor
     {
+        public string GetSourceDirectory()
+        {
+            return sourceDirectory;
+        }
+
+        public string GetReportsDirectory()
+        {
+            return reportsDirectory;
+        }
+        
         public async Task InitialiseDuckDb(DuckDbConnection connection)
         {
             await connection.ExecuteNonQueryAsync(@"
-                CREATE TABLE zipDownloads (
+                CREATE TABLE sourceTable (
                     zipDownloadHash VARCHAR,
                     publicationName VARCHAR,
                     releaseVersionId UUID,
                     releaseName VARCHAR,
                     releaseLabel VARCHAR,
                     subjectId UUID,
-                    dataSetTitle VARCHAR
+                    dataSetTitle VARCHAR,
+                    fromPage VARCHAR
                 )
             ");
         }
 
-        public async Task ProcessSourceFile(string sourceFilePath, DuckDbConnection connection)
+        public async Task ProcessSourceFiles(string sourceFilesDirectory, DuckDbConnection connection)
         {
             await connection.ExecuteNonQueryAsync($@"
-                INSERT INTO zipDownloads BY NAME (
+                INSERT INTO sourceTable BY NAME (
                     SELECT
-                        MD5(CONCAT(subjectId, releaseVersionId)) AS zipDownloadHash,
+                        MD5(CONCAT(subjectId, releaseVersionId, fromPage)) AS zipDownloadHash,
                         *
-                    FROM read_json('{sourceFilePath}', 
+                    FROM read_json('{sourceFilesDirectory}', 
                         format='unstructured',
                         columns = {{
                             publicationName: VARCHAR,
@@ -57,7 +59,8 @@ public class PublicZipDownloadsProcessor(
                             releaseName: VARCHAR,
                             releaseLabel: VARCHAR,
                             subjectId: UUID,
-                            dataSetTitle: VARCHAR
+                            dataSetTitle: VARCHAR,
+                            fromPage: VARCHAR
                         }}
                     )
                  )
@@ -76,12 +79,13 @@ public class PublicZipDownloadsProcessor(
                     FIRST(releaseLabel) AS releaseLabel,
                     FIRST(subjectId) AS subjectId,
                     FIRST(dataSetTitle) AS dataSetTitle,
+                    FIRST(fromPage) AS fromPage,
                     CAST(COUNT(zipDownloadHash) AS INT) AS downloads
-                FROM zipDownloads
+                FROM sourceTable
                 GROUP BY zipDownloadHash
                 ORDER BY zipDownloadHash
             ");
-        
+
             var reportFilePath = 
                 $"{reportsFolderPathAndFilenamePrefix}_public-zip-downloads.parquet";
 

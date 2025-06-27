@@ -18,7 +18,7 @@ public class RefreshSearchableDocumentFunction(
         await commandHandler.Handle(
             RefreshSearchableDocument,
             message,
-            context.CancellationToken) ?? [];
+            context.CancellationToken);
 
     private async Task<SearchableDocumentCreatedMessageDto[]> RefreshSearchableDocument(
         RefreshSearchableDocumentMessageDto message, 

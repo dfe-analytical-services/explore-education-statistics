@@ -549,8 +549,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [InlineData("Release guidance", "", false)]
         [InlineData("Release guidance", " ", false)]
         [InlineData("Release guidance", "Data set 1 guidance", true)]
-        public async Task ValidateForReleaseChecklist(string releaseGuidance,
-            string dataSet1Guidance,
+        public async Task ValidateForReleaseChecklist(string? releaseGuidance,
+            string? dataSet1Guidance,
             bool expectedValidResult)
         {
             var releaseVersion = new ReleaseVersion

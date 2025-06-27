@@ -9,23 +9,25 @@ public record ReleaseSlugChangedEvent : IEvent
         Guid releaseId,
         string newReleaseSlug,
         Guid publicationId,
-        string publicationSlug)
+        string publicationSlug,
+        bool isPublicationArchived)
     {
         Subject = releaseId.ToString();
         Payload = new EventPayload
         {
             NewReleaseSlug = newReleaseSlug,
             PublicationId = publicationId.ToString(),
-            PublicationSlug = publicationSlug
+            PublicationSlug = publicationSlug,
+            IsPublicationArchived = isPublicationArchived
         };
     }
 
     // Changes to this event should also increment the version accordingly.
     private const string DataVersion = "1.0";
-    private const string EventType = "release-slug-changed";
-    
+    private const string EventType = ReleaseChangedEventTypes.ReleaseSlugChanged;
+
     // Which Topic endpoint to use from the appsettings
-    public static string EventTopicOptionsKey => "ReleaseChangedEvent";
+    public static string EventTopicOptionsKey => EventTopicOptionsKeys.ReleaseChanged;
 
     /// <summary>
     /// The ThemeId is the subject
@@ -39,9 +41,10 @@ public record ReleaseSlugChangedEvent : IEvent
     
     public record EventPayload
     {
-        public string NewReleaseSlug { get; init; }
-        public string PublicationId { get; init; }
-        public string PublicationSlug { get; init; }
+        public required string NewReleaseSlug { get; init; }
+        public required string PublicationId { get; init; }
+        public required string PublicationSlug { get; init; }
+        public required bool IsPublicationArchived { get; init; }
     }
 
     public EventGridEvent ToEventGridEvent() => new(Subject, EventType, DataVersion, Payload);

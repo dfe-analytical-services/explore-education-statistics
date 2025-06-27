@@ -329,7 +329,9 @@ describe('DataReplacementPlan', () => {
       mappingStatus: {
         locationsComplete: false,
         filtersComplete: false,
+        hasMajorVersionUpdate: false,
       },
+      readyToPublish: false,
       valid: false,
     },
     originalSubjectId: 'subject-1',
@@ -389,7 +391,9 @@ describe('DataReplacementPlan', () => {
       mappingStatus: {
         locationsComplete: true,
         filtersComplete: true,
+        hasMajorVersionUpdate: false,
       },
+      readyToPublish: true,
       valid: true,
     },
     valid: true,
@@ -417,10 +421,10 @@ describe('DataReplacementPlan', () => {
       );
       await waitFor(() => {
         expect(
-          screen.getByText('Api Data Set Filters: ERROR'),
+          screen.getByText('API data set Filters: ERROR'),
         ).toBeInTheDocument();
         expect(
-          screen.getByText('Api Data Set Locations: ERROR'),
+          screen.getByText('API data set Locations: ERROR'),
         ).toBeInTheDocument();
       });
     });
@@ -441,10 +445,10 @@ describe('DataReplacementPlan', () => {
         </MemoryRouter>,
       );
       await waitFor(() => {
-        expect(() => screen.getByText('Api Data Set Filters: ERROR')).toThrow(
+        expect(() => screen.getByText('API data set Filters: ERROR')).toThrow(
           'Unable to find an element',
         );
-        expect(() => screen.getByText('Api Data Set Locations: ERROR')).toThrow(
+        expect(() => screen.getByText('API data set Locations: ERROR')).toThrow(
           'Unable to find an element',
         );
       });
@@ -458,6 +462,7 @@ describe('DataReplacementPlan', () => {
           dataSetId: 'data-set-1',
           name: 'Version 1',
           version: '1.0',
+          readyToPublish: false,
           status: 'Draft',
           valid: false,
         },
@@ -480,10 +485,10 @@ describe('DataReplacementPlan', () => {
         </FeatureFlagProvider>,
       );
       await waitFor(() => {
-        expect(() => screen.getByText('Api Data Set Filters: ERROR')).toThrow(
+        expect(() => screen.getByText('API data set Filters: ERROR')).toThrow(
           'Unable to find an element',
         );
-        expect(() => screen.getByText('Api Data Set Locations: ERROR')).toThrow(
+        expect(() => screen.getByText('API data set Locations: ERROR')).toThrow(
           'Unable to find an element',
         );
       });

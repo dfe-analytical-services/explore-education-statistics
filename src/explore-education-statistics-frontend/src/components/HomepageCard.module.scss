@@ -1,0 +1,8 @@
+@import '~govuk-frontend/dist/govuk/base';
+
+.cardTitle {
+  margin-bottom: 0 !important;
+  @include govuk-media-query($from: tablet, $until: desktop) {
+    @include govuk-font-size(27);
+  }
+}

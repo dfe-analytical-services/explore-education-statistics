@@ -1,25 +1,25 @@
-using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Services;
 
-public class TestAnalyticsPathResolver : IAnalyticsPathResolver, IDisposable
+public class TestAnalyticsPathResolver : AnalyticsPathResolverBase, IDisposable
 {
-    public void Dispose()
-    {
-        if (Directory.Exists(_basePath))
-        {
-            Directory.Delete(_basePath, recursive: true);
-        }
-    }
-
     private readonly string _basePath = Path.Combine(
         Path.GetTempPath(),
         "ExploreEducationStatistics",
         "Analytics",
         Guid.NewGuid().ToString());
 
-    public string PublicApiQueriesDirectoryPath()
+    protected override string GetBasePath()
     {
-        return Path.Combine(_basePath, "PublicApiQueries");
+        return _basePath;
+    }
+    
+    public void Dispose()
+    {
+        if (Directory.Exists(_basePath))
+        {
+            Directory.Delete(_basePath, recursive: true);
+        }
     }
 }

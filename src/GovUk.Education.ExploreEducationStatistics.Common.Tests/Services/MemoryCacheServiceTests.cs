@@ -240,7 +240,7 @@ public class MemoryCacheServiceTests
 
         var memoryCache = new Mock<IMemoryCache>(Strict);
 
-        object entity;
+        object? entity;
         memoryCache
             .Setup(mock => mock.TryGetValue(key, out entity))
             .Throws(new Exception("Something went wrong"));
@@ -256,7 +256,7 @@ public class MemoryCacheServiceTests
     [Fact]
     public void GetItem_NullIfIncorrectType()
     {
-        object entityOfIncorrectType = new SampleClass();
+        object? entityOfIncorrectType = new SampleClass();
 
         var key = new SampleCacheKey("");
 
@@ -316,7 +316,7 @@ public class MemoryCacheServiceTests
         public CacheItemPriority Priority { get; set; }
         public long? Size { get; set; }
         public TimeSpan? SlidingExpiration { get; set; }
-        public object Value { get; set; } = null!;
+        public object? Value { get; set; } = null;
 
         public void Dispose()
         {

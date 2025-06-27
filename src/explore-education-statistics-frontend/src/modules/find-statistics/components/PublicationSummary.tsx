@@ -1,3 +1,4 @@
+import ContentHtml from '@common/components/ContentHtml';
 import FormattedDate from '@common/components/FormattedDate';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
@@ -12,16 +13,53 @@ interface Props {
 }
 
 const PublicationSummary = ({ publication }: Props) => {
-  const { published, slug, summary, theme, title, type, latestReleaseSlug } =
-    publication;
+  const {
+    published,
+    slug,
+    summary,
+    highlightContent,
+    highlightSummary,
+    highlightTitle,
+    theme,
+    title,
+    type,
+    latestReleaseSlug,
+  } = publication;
   return (
     <li className={`${styles.container} govuk-!-margin-top-4`}>
       <h3 className="govuk-!-margin-bottom-2">
         <Link to={`/find-statistics/${slug}/${latestReleaseSlug}`}>
-          {title}
+          {highlightTitle ? (
+            <ContentHtml
+              html={highlightTitle}
+              sanitizeOptions={{ allowedTags: ['em'] }}
+              wrapperElement="span"
+            />
+          ) : (
+            title
+          )}
         </Link>
       </h3>
-      <p>{summary}</p>
+
+      {highlightSummary ? (
+        <ContentHtml
+          html={highlightSummary}
+          sanitizeOptions={{ allowedTags: ['em'] }}
+          wrapperElement="p"
+        />
+      ) : (
+        <p>{summary}</p>
+      )}
+
+      {highlightContent && (
+        <ContentHtml
+          html={highlightContent}
+          sanitizeOptions={{ allowedTags: ['em'] }}
+          className={styles.highlightContent}
+          testId="search-highlight"
+          wrapperElement="p"
+        />
+      )}
 
       <SummaryList
         className="govuk-!-margin-bottom-4 govuk-!-margin-top-4"

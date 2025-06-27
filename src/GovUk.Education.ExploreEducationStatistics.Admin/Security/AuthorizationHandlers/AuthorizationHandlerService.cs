@@ -23,7 +23,6 @@ public class AuthorizationHandlerService
 
     public static readonly ReleaseRole[] UnrestrictedReleaseViewerRoles =
     {
-        ReleaseRole.Viewer,
         ReleaseRole.Contributor,
         ReleaseRole.Approver
     };
@@ -145,11 +144,17 @@ public class AuthorizationHandlerService
             return true;
         }
 
+        // This will be changed when we start introducing the use of the NEW publication roles in the 
+        // authorisation handlers, in STEP 8 (EES-6194) of the Permissions Rework. For now, we want to
+        // filter out any usage of the NEW roles.
+        var validPublicationRoles = EnumUtil.GetEnums<PublicationRole>()
+            .Except([PublicationRole.Approver, PublicationRole.Drafter]);
+
         // If the user has any PublicationRoles on the owning Publication, they can see its child release versions.
         if (await HasRolesOnPublication(
                 userId: user.GetUserId(),
                 publicationId: releaseVersion.PublicationId,
-                EnumUtil.GetEnumsArray<PublicationRole>()))
+                [.. validPublicationRoles]))
         {
             return true;
         }

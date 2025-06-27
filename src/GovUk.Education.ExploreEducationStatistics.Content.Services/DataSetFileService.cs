@@ -26,7 +26,10 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Analytics.Common.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
+using GovUk.Education.ExploreEducationStatistics.Content.Services.Requests;
+using Microsoft.Extensions.Logging;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.SortDirection;
 using static GovUk.Education.ExploreEducationStatistics.Content.Requests.DataSetsListRequestSortBy;
 using ReleaseVersion = GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseVersion;
@@ -37,7 +40,9 @@ public class DataSetFileService(
     ContentDbContext contentDbContext,
     IReleaseVersionRepository releaseVersionRepository,
     IPublicBlobStorageService publicBlobStorageService,
-    IFootnoteRepository footnoteRepository)
+    IFootnoteRepository footnoteRepository,
+    IAnalyticsManager analyticsManager,
+    ILogger<DataSetFileService> logger)
     : IDataSetFileService
 {
     public async Task<Either<ActionResult, PaginatedListViewModel<DataSetFileSummaryViewModel>>> ListDataSetFiles(
@@ -265,27 +270,32 @@ public class DataSetFileService(
     }
 
     public async Task<ActionResult> DownloadDataSetFile(
-        Guid dataSetFileId)
+        Guid dataSetFileId,
+        CancellationToken cancellationToken)
     {
         var releaseFile = await contentDbContext.ReleaseFiles
             .Include(rf => rf.File)
+            .Include(rf => rf.ReleaseVersion.Release.Publication)
             .Where(rf =>
                 rf.File.DataSetFileId == dataSetFileId
                 && rf.ReleaseVersion.Published.HasValue
                 && DateTime.UtcNow >= rf.ReleaseVersion.Published.Value)
             .OrderByDescending(rf => rf.ReleaseVersion.Version)
-            .FirstOrDefaultAsync();
+            .FirstOrDefaultAsync(cancellationToken);
 
         if (releaseFile == null
             || !await releaseVersionRepository.IsLatestPublishedReleaseVersion(
-                releaseFile.ReleaseVersionId))
+                releaseFile.ReleaseVersionId, cancellationToken))
         {
             return new NotFoundResult();
         }
 
+        await RecordCsvDownloadAnalytics(releaseFile, cancellationToken);
+
         var stream = await publicBlobStorageService.StreamBlob(
             containerName: BlobContainers.PublicReleaseFiles,
-            path: releaseFile.PublicPath());
+            path: releaseFile.PublicPath(),
+            cancellationToken: cancellationToken);
 
         return new FileStreamResult(stream, "text/csv")
         {
@@ -307,6 +317,7 @@ public class DataSetFileService(
 
         return new DataSetFileMetaViewModel
         {
+            NumDataFileRows = meta.NumDataFileRows,
             GeographicLevels = dataSetFileVersionGeographicLevels
                 .Select(gl => gl.GeographicLevel.GetEnumLabel())
                 .ToList(),
@@ -419,6 +430,38 @@ public class DataSetFileService(
             Id = releaseFile.PublicApiDataSetId.Value,
             Version = releaseFile.PublicApiDataSetVersionString!,
         };
+    }
+
+    private async Task RecordCsvDownloadAnalytics(
+        ReleaseFile releaseFile, CancellationToken cancellationToken)
+    {
+        var subjectId = releaseFile.File.SubjectId;
+
+        if (!subjectId.HasValue)
+        {
+            logger.LogWarning("ReleaseFile does not have a SubjectId set. ReleaseId: {ReleaseVersionId} FileId: {FileId}",
+                releaseFile.ReleaseVersionId, releaseFile.FileId);
+            return;
+        }
+
+        try
+        {
+            await analyticsManager.Add(new CaptureCsvDownloadRequest(
+                releaseFile.ReleaseVersion.Release.Publication.Title,
+                releaseFile.ReleaseVersionId,
+                releaseFile.ReleaseVersion.Release.Title,
+                releaseFile.ReleaseVersion.Release.Label,
+                subjectId.Value,
+                releaseFile.Name ?? "No data set title"
+            ), cancellationToken);
+        }
+        catch (Exception e)
+        {
+            logger.LogError(
+                exception: e,
+                message: "Error whilst capturing csv download analytics for subject {SubjectId}",
+                subjectId);
+        }
     }
 }
 

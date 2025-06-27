@@ -71,6 +71,7 @@ export const mapBlockDefinition: ChartDefinition = {
     canIncludeNonNumericData: false,
     canPositionLegendInline: false,
     canSetBarThickness: false,
+    canSetDataLabelColour: false,
     canSetDataLabelPosition: false,
     canShowDataLabels: false,
     canShowAllMajorAxisTicks: false,
@@ -99,9 +100,6 @@ export const mapBlockDefinition: ChartDefinition = {
       title: 'GeoJSON (major axis)',
       type: 'major',
       hide: true,
-      capabilities: {
-        canRotateLabel: false,
-      },
       defaults: {
         groupBy: 'locations',
       },

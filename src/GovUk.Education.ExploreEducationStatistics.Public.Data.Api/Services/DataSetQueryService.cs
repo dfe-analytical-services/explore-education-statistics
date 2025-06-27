@@ -1,5 +1,4 @@
 using System.Diagnostics.CodeAnalysis;
-using GovUk.Education.ExploreEducationStatistics.Analytics.Common.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
@@ -40,8 +39,7 @@ internal class DataSetQueryService(
     IParquetIndicatorRepository indicatorRepository,
     IParquetLocationRepository locationRepository,
     IParquetTimePeriodRepository timePeriodRepository,
-    IAnalyticsManager analyticsManager,
-    ILogger<DataSetQueryService> logger)
+    IAnalyticsService analyticsService)
     : IDataSetQueryService
 {
     private static readonly Dictionary<string, string> ReservedSorts = new()
@@ -83,6 +81,7 @@ internal class DataSetQueryService(
             .OnSuccessDo(userService.CheckCanQueryDataSetVersion)
             .OnSuccess(dsv => RunQueryWithAnalytics(
                 dataSetVersion: dsv,
+                requestedDataSetVersion: dataSetVersion,
                 query: query,
                 cancellationToken: cancellationToken
             ))
@@ -104,6 +103,7 @@ internal class DataSetQueryService(
             .OnSuccessDo(userService.CheckCanQueryDataSetVersion)
             .OnSuccess(dsv => RunQueryWithAnalytics(
                 dataSetVersion: dsv,
+                requestedDataSetVersion: dataSetVersion,
                 query: request,
                 cancellationToken: cancellationToken,
                 baseCriteriaPath: "criteria"
@@ -139,6 +139,7 @@ internal class DataSetQueryService(
 
     private async Task<Either<ActionResult, DataSetQueryPaginatedResultsViewModel>> RunQueryWithAnalytics(
         DataSetVersion dataSetVersion,
+        string? requestedDataSetVersion,
         DataSetQueryRequest query,
         CancellationToken cancellationToken,
         string baseCriteriaPath = "")
@@ -151,31 +152,13 @@ internal class DataSetQueryService(
                 query: query,
                 cancellationToken: cancellationToken,
                 baseCriteriaPath: baseCriteriaPath)
-            .OnSuccessDo(async results =>
-            {
-                try
-                {
-                    await analyticsManager.Add(
-                        request: new CaptureDataSetVersionQueryRequest(
-                            DataSetId: dataSetVersion.DataSetId,
-                            DataSetVersionId: dataSetVersion.Id,
-                            DataSetVersion: dataSetVersion.SemVersion().ToString(),
-                            DataSetTitle: dataSetVersion.DataSet.Title,
-                            Query: query,
-                            ResultsCount: results.Results.Count,
-                            TotalRowsCount: results.Paging.TotalResults,
-                            StartTime: startTime,
-                            EndTime: DateTime.UtcNow),
-                        cancellationToken: cancellationToken);
-                }
-                catch (Exception e)
-                {
-                    logger.LogError(
-                        exception: e,
-                        message: "Error whilst adding a query to {QueryManager}",
-                        nameof(IAnalyticsManager));
-                }
-            });
+            .OnSuccessDo(results => analyticsService.CaptureDataSetVersionQuery(
+                dataSetVersion: dataSetVersion,
+                requestedDataSetVersion: requestedDataSetVersion,
+                query: query,
+                results: results,
+                startTime: startTime,
+                cancellationToken: cancellationToken));
     }
 
     private async Task<Either<ActionResult, DataSetQueryPaginatedResultsViewModel>> RunQuery(
@@ -294,6 +277,11 @@ internal class DataSetQueryService(
         Dictionary<string, string> indicatorColumnsById,
         QueryState queryState)
     {
+        if (request.Indicators == null)
+        {
+            return [.. indicatorColumnsById.Values];
+        }
+        
         var validIndicatorColumns = new HashSet<string>();
         var invalidIndicatorIds = new HashSet<string>();
 

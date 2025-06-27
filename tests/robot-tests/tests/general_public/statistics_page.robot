@@ -9,6 +9,8 @@ Test Setup          fail test fast if required
 
 Force Tags          GeneralPublic    Local    Dev    PreProd
 
+# TODO EES-6063 - Remove this test suite
+
 
 *** Test Cases ***
 Navigate to Find Statistics page

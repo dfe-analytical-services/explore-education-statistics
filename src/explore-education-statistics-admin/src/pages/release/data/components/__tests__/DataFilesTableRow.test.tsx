@@ -1,9 +1,11 @@
-﻿import React from 'react';
-import { MemoryRouter } from 'react-router-dom';
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
-import { FeatureFlags } from '@admin/config/featureFlags';
+﻿import { FeatureFlags } from '@admin/config/featureFlags';
 import { FeatureFlagProvider } from '@admin/contexts/FeatureFlagContext';
-import DataFilesTableRow from '../DataFilesTableRow';
+import DataFilesTableRow from '@admin/pages/release/data/components/DataFilesTableRow';
+import { DataFile } from '@admin/services/releaseDataFileService';
+import render from '@common-test/render';
+import React from 'react';
+import { MemoryRouter } from 'react-router-dom';
+import { screen, waitFor } from '@testing-library/react';
 
 describe('DataFilesTableRow', () => {
   const baseProps = {
@@ -14,7 +16,7 @@ describe('DataFilesTableRow', () => {
     onStatusChange: jest.fn(),
   };
 
-  const mockDataFile = {
+  const mockDataFile: DataFile = {
     fileName: '',
     metaFileName: '',
     metaFileId: '',
@@ -36,29 +38,17 @@ describe('DataFilesTableRow', () => {
       const testFeatureFlag: FeatureFlags = {
         enableReplacementOfPublicApiDataSets: true,
       };
-      render(
+      const { user } = render(
         <FeatureFlagProvider initialFlags={testFeatureFlag}>
           <MemoryRouter>
-            <table>
-              <thead>
-                <tr>
-                  <th scope="col">Title</th>
-                  <th scope="col">Size</th>
-                  <th scope="col">Status</th>
-                  <th scope="col">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                <DataFilesTableRow {...baseProps} dataFile={dataFile} />
-              </tbody>
-            </table>
+            <DataFilesTableRow {...baseProps} dataFile={dataFile} />
           </MemoryRouter>
         </FeatureFlagProvider>,
       );
       const replaceLink = screen.getByText('Replace data');
       expect(replaceLink).toBeInTheDocument();
 
-      fireEvent.click(replaceLink);
+      await user.click(replaceLink);
 
       await waitFor(() => {
         expect(
@@ -72,29 +62,17 @@ describe('DataFilesTableRow', () => {
       const testFeatureFlag: FeatureFlags = {
         enableReplacementOfPublicApiDataSets: false,
       };
-      render(
+      const { user } = render(
         <FeatureFlagProvider initialFlags={testFeatureFlag}>
           <MemoryRouter>
-            <table>
-              <thead>
-                <tr>
-                  <th scope="col">Title</th>
-                  <th scope="col">Size</th>
-                  <th scope="col">Status</th>
-                  <th scope="col">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                <DataFilesTableRow {...baseProps} dataFile={dataFile} />
-              </tbody>
-            </table>
+            <DataFilesTableRow {...baseProps} dataFile={dataFile} />
           </MemoryRouter>
         </FeatureFlagProvider>,
       );
       const replaceLink = screen.getByText('Replace data');
       expect(replaceLink).toBeInTheDocument();
 
-      fireEvent.click(replaceLink);
+      await user.click(replaceLink);
 
       await waitFor(() => {
         expect(

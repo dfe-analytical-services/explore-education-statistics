@@ -201,7 +201,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .Include(upr => upr.User)
                 .Where(upr =>
                     upr.PublicationId == releaseVersion.PublicationId
-                    && upr.Role == PublicationRole.Approver)
+                    && upr.Role == PublicationRole.Allower)
                 .ToListAsync();
 
             var notifyHigherReviewers = userReleaseRoles.Any() || userPublicationRoles.Any();

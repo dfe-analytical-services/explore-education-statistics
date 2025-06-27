@@ -181,16 +181,19 @@ Publish the scheduled release
 
     user waits for caches to expire
 
+Get public release link
+    ${PUBLIC_RELEASE_LINK}=    user gets url public release will be accessible at
+    Set Suite Variable    ${PUBLIC_RELEASE_LINK}
+
 Verify newly published release is on Find Statistics page
+    # TODO EES-6063 - Remove this
     user checks publication is on find statistics page    ${PUBLICATION_NAME}
 
-Navigate to newly published release page
-    user clicks link    ${PUBLICATION_NAME}
-    user waits until h1 is visible    ${PUBLICATION_NAME}    %{WAIT_SMALL}
+Verify newly published release is public
+    user navigates to public release page    ${PUBLIC_RELEASE_LINK}    ${PUBLICATION_NAME}    ${RELEASE_NAME}
 
-Verify release URL and page caption
+Verify release URL
     user checks url contains    %{PUBLIC_URL}/find-statistics/ui-tests-publish-amend-and-cancel-%{RUN_IDENTIFIER}
-    user waits until page contains title caption    ${RELEASE_NAME}
 
 Return to Admin and create amendment
     user navigates to admin dashboard    Bau1

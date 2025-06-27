@@ -13,7 +13,6 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Services.
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
-using Semver;
 using ValidationMessages =
     GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Requests.Validators.ValidationMessages;
 
@@ -23,7 +22,7 @@ internal class DataSetVersionMappingService(
     IDataSetMetaService dataSetMetaService,
     PublicDataDbContext publicDataDbContext,
     ContentDbContext contentDbContext,
-    IOptions<FeatureFlags> featureFlags)
+    IOptions<FeatureFlagsOptions> featureFlags)
     : IDataSetVersionMappingService
 {
     private static readonly MappingType[] IncompleteMappingTypes =
@@ -51,7 +50,7 @@ internal class DataSetVersionMappingService(
             .SingleAsync(dsv => dsv.Id == nextDataSetVersionId, cancellationToken);
 
         var sourceVersion = featureFlags.Value.EnableReplacementOfPublicApiDataSets && dataSetVersionToReplaceId is not null
-            ? nextVersion.DataSet.Versions.FirstOrDefault(v => v.Id == dataSetVersionToReplaceId )
+            ? nextVersion.DataSet.Versions.SingleOrDefault(v => v.Id == dataSetVersionToReplaceId)
             : nextVersion.DataSet.LatestLiveVersion;
         
         if (featureFlags.Value.EnableReplacementOfPublicApiDataSets 

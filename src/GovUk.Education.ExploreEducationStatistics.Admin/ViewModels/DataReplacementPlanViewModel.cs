@@ -14,7 +14,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
     {
         public IEnumerable<DataBlockReplacementPlanViewModel> DataBlocks { get; init; } = [];
         public IEnumerable<FootnoteReplacementPlanViewModel> Footnotes { get; init; } = [];
-        public ApiDataSetVersionPlanViewModel? ApiDataSetVersionPlan { get; init; }
+        public ReplaceApiDataSetVersionPlanViewModel? ApiDataSetVersionPlan { get; init; }
         public Guid OriginalSubjectId { get; init; }
         public Guid ReplacementSubjectId { get; init; }
 
@@ -172,6 +172,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
     public class FilterReplacementViewModel
     {
         public Guid Id { get; }
+        public Guid? Target { get; }
         public string Label { get; }
         public string Name { get; }
         public Dictionary<Guid, FilterGroupReplacementViewModel> Groups { get; }
@@ -185,11 +186,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
 
         public FilterReplacementViewModel(
             Guid id,
+            Guid? target,
             string label,
             string name,
             Dictionary<Guid, FilterGroupReplacementViewModel> groups)
         {
             Id = id;
+            Target = target;
             Label = label;
             Name = name;
             Groups = groups;

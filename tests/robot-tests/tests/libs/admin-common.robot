@@ -494,6 +494,11 @@ user deletes subject file
     user clicks element    ${button}
     user clicks button    Confirm
 
+user navigates to Sign off page
+    user clicks link    Sign off
+    user waits until page finishes loading
+    user waits until h2 is visible    Sign off
+
 user approves original release for immediate publication
     user approves release for immediate publication    original
 
@@ -502,9 +507,7 @@ user approves amended release for immediate publication
 
 user approves release for immediate publication
     [Arguments]    ${release_type}=original    ${NEXT_RELEASE_MONTH}=01    ${NEXT_RELEASE_YEAR}=2200
-    user clicks link    Sign off
-    user waits until page finishes loading
-    user waits until h2 is visible    Sign off
+    user navigates to Sign off page
     user waits until page contains button    Edit release status
     user clicks button    Edit release status
     user waits until h2 is visible    Edit release status
@@ -523,6 +526,12 @@ user approves release for immediate publication
     user waits for release process status to be    Complete    %{RELEASE_COMPLETE_WAIT}
     user reloads page    # EES-1448
     user checks page does not contain button    Edit release status
+
+user gets url public release will be accessible at
+    user waits until page contains element    testid:public-release-url
+    ${link}=    Get Value    testid:public-release-url
+    check that variable is not empty    link    ${link}
+    [Return]    ${link}
 
 user navigates to admin dashboard
     [Arguments]    ${USER}=
@@ -574,7 +583,11 @@ user uploads subject
     user chooses file    id:dataFileUploadForm-dataFile    ${FOLDER}${SUBJECT_FILE}
     user chooses file    id:dataFileUploadForm-metadataFile    ${FOLDER}${META_FILE}
     user clicks button    Upload data files
-    user waits until h2 is visible    Uploaded data files    %{WAIT_LONG}
+    user waits until modal is visible    Upload summary
+    user waits until modal table cell contains    1    1    ${SUBJECT_NAME}
+    user waits until modal table cell contains    1    2    ${SUBJECT_FILE}
+    user clicks button    Confirm
+    user waits until modal is not visible    Upload summary
     user waits until page contains element    testid:Data files table
 
     IF    "${IMPORT_STATUS}" != "Importing"

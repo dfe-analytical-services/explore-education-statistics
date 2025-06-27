@@ -122,7 +122,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
         {
             await using var stream = await fileStreamProvider.Invoke();
 
-            if (!await _fileTypeService.IsValidCsvFile(stream))
+            if (!await _fileTypeService.HasCsvFileType(stream))
             {
                 return ListOf(isMetaFile
                     ? new DataImportError(MetaFileMustBeCsvFile.GetEnumLabel())
@@ -214,7 +214,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             return (csvHeaders, totalRows);
         }
 
-        private static async Task<Either<List<DataImportError>, Unit>> ValidateObservationHeaders(List<string> cols)
+        private static Task<Either<List<DataImportError>, Unit>> ValidateObservationHeaders(List<string> cols)
         {
             var errors = new List<DataImportError>();
 
@@ -232,12 +232,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 }
             }
 
-            if (errors.Count > 0)
-            {
-                return errors;
-            }
-
-            return Unit.Instance;
+            return Task.FromResult<Either<List<DataImportError>, Unit>>(
+                errors.Count > 0
+                    ? errors
+                    : Unit.Instance);
         }
 
         private async Task<Either<List<DataImportError>, ProcessorStatistics>>

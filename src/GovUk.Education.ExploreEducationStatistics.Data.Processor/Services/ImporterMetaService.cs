@@ -138,7 +138,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             });
 
             var indicatorGroups = indicatorRows
-                .GroupBy(row => row.IndicatorGrouping)
+                .GroupBy(row => row.IndicatorGrouping!)
                 .ToDictionary(
                     rows => rows.Key,
                     rows => context.IndicatorGroup.Single(ig =>
@@ -147,7 +147,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             return indicatorRows
                 .Select(row =>
                 {
-                    var indicatorGroup = indicatorGroups.GetValueOrDefault(row.IndicatorGrouping)!;
+                    var indicatorGroup = indicatorGroups[row.IndicatorGrouping!];
 
                     return (
                         indicator:

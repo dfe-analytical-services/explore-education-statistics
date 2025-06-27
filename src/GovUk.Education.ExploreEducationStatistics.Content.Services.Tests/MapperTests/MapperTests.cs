@@ -24,7 +24,7 @@ public class MapperTests
         services.AddAutoMapper(typeof(MappingProfiles));
 
         var serviceProvider = services.BuildServiceProvider();
-        var mapper = serviceProvider.GetService<IMapper>();
+        var mapper = serviceProvider.GetRequiredService<IMapper>();
 
         var contactViewModel = mapper.Map<ContactViewModel>(mockContact);
 

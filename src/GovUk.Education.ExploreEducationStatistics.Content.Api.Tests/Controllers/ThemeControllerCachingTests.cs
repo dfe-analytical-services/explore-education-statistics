@@ -49,7 +49,7 @@ public class ThemeControllerCachingTests : CacheServiceTestFixture
             .Setup(s => s.GetItem(
                 new ListThemesCacheKey(),
                 typeof(IList<ThemeViewModel>)))
-            .Returns(null);
+            .Returns((object?)null);
 
         var expectedCacheConfiguration = new MemoryCacheConfiguration(
             10, CrontabSchedule.Parse(HalfHourlyExpirySchedule));

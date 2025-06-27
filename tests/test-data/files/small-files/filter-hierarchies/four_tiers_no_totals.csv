@@ -1,0 +1,176 @@
+time_period,time_identifier,geographic_level,country_code,country_name,old_la_code,new_la_code,la_name,animal_type,breed_group,sub_group,breed,ind_one
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Terrier Group,Large Terriers,Airedale Terrier,490
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Terrier Group,Large Terriers,Bull Terrier,500
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Terrier Group,Large Terriers,American Staffordshire Terrier,305
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Terrier Group,Large Terriers,Soft Coated Wheaten Terrier,177
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Terrier Group,Small Terriers,Scottish Terrier,354
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Terrier Group,Small Terriers,West Highland White Terrier,47
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Terrier Group,Small Terriers,Cairn Terrier,19
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Terrier Group,Small Terriers,Jack Russell Terrier,236
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Terrier Group,Small Terriers,Rat Terrier,410
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Terrier Group,Small Terriers,Bedlington Terrier,313
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Hound Group,Scent Hounds,Beagle,144
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Hound Group,Scent Hounds,Basset Hound,418
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Hound Group,Scent Hounds,Bloodhound,359
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Hound Group,Scent Hounds,Dachshund,291
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Hound Group,Scent Hounds,Black and Tan Coonhound,59
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Hound Group,Sight Hounds,Greyhound,104
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Hound Group,Sight Hounds,Whippet,121
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Hound Group,Sight Hounds,Irish Wolfhound,390
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Hound Group,Sight Hounds,Afghan Hound,216
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Hound Group,Sight Hounds,Basenji,57
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Dog,Hound Group,Sight Hounds,Rhodesian Ridgeback,49
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Cat,Long-Haired,Large Breeds,Maine Coon,200
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Cat,Long-Haired,Large Breeds,Norwegian Forest Cat,68
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Cat,Long-Haired,Large Breeds,Siberian,44
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Cat,Long-Haired,Large Breeds,Ragdoll,216
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Cat,Long-Haired,Medium Breeds,Birman,240
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Cat,Long-Haired,Medium Breeds,Himalayan,298
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Cat,Long-Haired,Medium Breeds,Turkish Angora,305
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Cat,Long-Haired,Medium Breeds,Selkirk Rex,99
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Cat,Long-Haired,Medium Breeds,British Longhair,27
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Cat,Short-Haired,Slender Breeds,Siamese,372
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Cat,Short-Haired,Slender Breeds,Oriental Shorthair,194
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Cat,Short-Haired,Slender Breeds,Cornish Rex,252
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Cat,Short-Haired,Slender Breeds,Sphynx,264
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Cat,Short-Haired,Cobby Breeds,British Shorthair,467
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Cat,Short-Haired,Cobby Breeds,Burmese,149
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Cat,Short-Haired,Cobby Breeds,Manx,44
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Cat,Short-Haired,Cobby Breeds,Exotic Shorthair,413
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Cat,Short-Haired,Cobby Breeds,Russian Blue,118
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Horse,Draft Breeds,European Drafts,Clydesdale,35
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Horse,Draft Breeds,European Drafts,Shire,471
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Horse,Draft Breeds,European Drafts,Percheron,240
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Horse,Draft Breeds,European Drafts,Friesian,78
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Horse,Draft Breeds,European Drafts,Irish Draught,289
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Horse,Draft Breeds,European Drafts,Breton,196
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Horse,Draft Breeds,American Drafts,Belgian Draft,447
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Horse,Draft Breeds,American Drafts,Suffolk Punch,382
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Horse,Draft Breeds,American Drafts,American Cream Draft,222
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Horse,Draft Breeds,American Drafts,Gypsy Vanner,500
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Horse,Light Breeds,Gaited Breeds,Tennessee Walking Horse,240
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Horse,Light Breeds,Gaited Breeds,American Saddlebred,201
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Horse,Light Breeds,Gaited Breeds,Paso Fino,49
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Horse,Light Breeds,Sport & Racing,Thoroughbred,24
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Horse,Light Breeds,Sport & Racing,Quarter Horse,440
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Horse,Light Breeds,Sport & Racing,Arabian,378
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Horse,Light Breeds,Sport & Racing,Morgan,135
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Horse,Light Breeds,Sport & Racing,Andalusian,262
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Horse,Light Breeds,Sport & Racing,Appaloosa,487
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Horse,Light Breeds,Sport & Racing,Standardbred,403
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Rabbit,Lop Breeds,Large Lops,French Lop,319
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Rabbit,Lop Breeds,Large Lops,English Lop,423
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Rabbit,Lop Breeds,Large Lops,Meissner Lop,269
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Rabbit,Lop Breeds,Dwarf Lops,Holland Lop,397
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Rabbit,Lop Breeds,Dwarf Lops,Mini Lop,238
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Rabbit,Lop Breeds,Dwarf Lops,American Fuzzy Lop,20
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Rabbit,Lop Breeds,Dwarf Lops,Velveteen Lop,128
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Rabbit,Lop Breeds,Dwarf Lops,Plush Lop,164
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Rabbit,Fur Breeds,Rex Fur,Rex,327
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Rabbit,Fur Breeds,Rex Fur,Mini Rex,203
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Rabbit,Fur Breeds,Satin Fur,Satin,5
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Rabbit,Fur Breeds,Satin Fur,Mini Satin,378
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Rabbit,Fur Breeds,Other Fur Types,American Chinchilla,183
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Rabbit,Fur Breeds,Other Fur Types,Giant Chinchilla,342
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Rabbit,Fur Breeds,Other Fur Types,Silver Fox,304
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Rabbit,Fur Breeds,Other Fur Types,Angora,376
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Rabbit,Fur Breeds,Other Fur Types,American Sable,373
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Rabbit,Fur Breeds,Other Fur Types,Cinnamon,38
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Bird,Parrots,New World Parrots,Scarlet Macaw,269
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Bird,Parrots,New World Parrots,Blue and Gold Macaw,5
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Bird,Parrots,New World Parrots,Amazon Parrot,70
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Bird,Parrots,New World Parrots,Conure,102
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Bird,Parrots,New World Parrots,Quaker Parrot,263
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Bird,Parrots,Old World Parrots,African Grey Parrot,204
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Bird,Parrots,Old World Parrots,Cockatiel,319
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Bird,Parrots,Old World Parrots,Budgerigar,464
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Bird,Parrots,Old World Parrots,Eclectus Parrot,287
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Bird,Parrots,Old World Parrots,Lovebird,223
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Bird,Finches & Canaries,Australian Finches,Zebra Finch,441
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Bird,Finches & Canaries,Australian Finches,Gouldian Finch,103
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Bird,Finches & Canaries,Australian Finches,Society Finch,371
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Bird,Finches & Canaries,Australian Finches,Star Finch,180
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Bird,Finches & Canaries,Australian Finches,Owl Finch,338
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Bird,Finches & Canaries,Other Finches,Spice Finch,255
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Bird,Finches & Canaries,Other Finches,Red-billed Firefinch,307
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Bird,Finches & Canaries,Other Finches,Canary,265
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Bird,Finches & Canaries,Other Finches,Red Siskin,114
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Bird,Finches & Canaries,Other Finches,European Goldfinch,460
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Reptile,Lizards,Geckos,Leopard Gecko,37
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Reptile,Lizards,Geckos,Crested Gecko,106
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Reptile,Lizards,Geckos,Day Gecko,413
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Reptile,Lizards,Iguanas & Agamas,Bearded Dragon,332
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Reptile,Lizards,Iguanas & Agamas,Green Anole,318
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Reptile,Lizards,Iguanas & Agamas,Chameleon,89
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Reptile,Lizards,Iguanas & Agamas,Iguana,376
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Reptile,Lizards,Iguanas & Agamas,Uromastyx,266
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Reptile,Snakes,Constrictors,Ball Python,129
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Reptile,Snakes,Constrictors,Boa Constrictor,444
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Reptile,Snakes,Constrictors,Sand Boa,402
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Reptile,Snakes,Constrictors,Rosy Boa,148
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Reptile,Snakes,Constrictors,Children's Python,138
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Reptile,Snakes,Colubrids,Corn Snake,130
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Reptile,Snakes,Colubrids,King Snake,258
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Reptile,Snakes,Colubrids,Milk Snake,252
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Reptile,Snakes,Colubrids,Garter Snake,340
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Reptile,Snakes,Colubrids,Hognose Snake,63
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Cattle,Dairy Breeds,High-Yield Breeds,Holstein,38
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Cattle,Dairy Breeds,High-Yield Breeds,Milking Shorthorn,389
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Cattle,Dairy Breeds,High-Yield Breeds,Red and White Holstein,72
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Cattle,Dairy Breeds,High-Fat Breeds,Jersey,447
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Cattle,Dairy Breeds,High-Fat Breeds,Guernsey,17
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Cattle,Dairy Breeds,High-Fat Breeds,Brown Swiss,465
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Cattle,Dairy Breeds,High-Fat Breeds,Ayrshire,303
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Cattle,Beef Breeds,British Breeds,Angus,64
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Cattle,Beef Breeds,British Breeds,Hereford,351
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Cattle,Beef Breeds,British Breeds,Shorthorn,53
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Cattle,Beef Breeds,British Breeds,Belted Galloway,462
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Cattle,Beef Breeds,European Breeds,Brahman,214
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Cattle,Beef Breeds,European Breeds,Charolais,121
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Cattle,Beef Breeds,European Breeds,Simmental,111
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Cattle,Beef Breeds,European Breeds,Limousin,480
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Cattle,Beef Breeds,European Breeds,Gelbvieh,424
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Cattle,Beef Breeds,American Breeds,Texas Longhorn,491
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Fish,Livebearers,Poecilia,Guppy,359
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Fish,Livebearers,Poecilia,Molly,29
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Fish,Livebearers,Poecilia,Endler's Livebearer,239
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Fish,Livebearers,Xiphophorus,Platy,171
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Fish,Livebearers,Xiphophorus,Swordtail,189
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Fish,Tetras,South American Tetras,Neon Tetra,400
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Fish,Tetras,South American Tetras,Cardinal Tetra,468
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Fish,Tetras,South American Tetras,Rummy-nose Tetra,153
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Fish,Tetras,South American Tetras,Black Skirt Tetra,232
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Fish,Tetras,South American Tetras,Ember Tetra,273
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Fish,Tetras,African Tetras,Congo Tetra,133
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Rodent,Hamsters,Dwarf Hamsters,Dwarf Campbell Russian Hamster,10
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Rodent,Hamsters,Dwarf Hamsters,Roborovski Hamster,346
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Rodent,Hamsters,Dwarf Hamsters,Winter White Russian Hamster,171
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Rodent,Hamsters,Large Hamsters,Syrian Hamster,356
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Rodent,Hamsters,Large Hamsters,Chinese Hamster,184
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Rodent,Hamsters,Large Hamsters,European Hamster,487
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Rodent,Guinea Pigs,Long-Haired,Peruvian,41
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Rodent,Guinea Pigs,Long-Haired,Silkie,416
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Rodent,Guinea Pigs,Long-Haired,Texel,424
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Rodent,Guinea Pigs,Long-Haired,Coronet,158
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Rodent,Guinea Pigs,Long-Haired,Lunkarya,264
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Rodent,Guinea Pigs,Short-Haired,American,490
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Rodent,Guinea Pigs,Short-Haired,Abyssinian,406
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Rodent,Guinea Pigs,Short-Haired,Teddy,253
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Rodent,Guinea Pigs,Short-Haired,White Crested,115
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Rodent,Guinea Pigs,Short-Haired,Baldwin,12
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Amphibian,Frogs,Tree Frogs,White's Tree Frog,81
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Amphibian,Frogs,Tree Frogs,American Green Tree Frog,470
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Amphibian,Frogs,Tree Frogs,Red-Eyed Tree Frog,184
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Amphibian,Frogs,Tree Frogs,Amazon Milk Frog,182
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Amphibian,Frogs,Ground Dwellers,Pacman Frog,172
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Amphibian,Frogs,Ground Dwellers,Tomato Frog,133
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Amphibian,Frogs,Ground Dwellers,Poison Dart Frog,320
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Amphibian,Frogs,Ground Dwellers,Leopard Frog,329
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Amphibian,Salamanders & Newts,Aquatic,Axolotl,114
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Amphibian,Salamanders & Newts,Aquatic,Eastern Newt,345
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Amphibian,Salamanders & Newts,Aquatic,Alpine Newt,317
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Amphibian,Salamanders & Newts,Aquatic,Great Crested Newt,371
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Amphibian,Salamanders & Newts,Terrestrial,Tiger Salamander,447
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Amphibian,Salamanders & Newts,Terrestrial,Spotted Salamander,39
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Amphibian,Salamanders & Newts,Terrestrial,Fire Salamander,245
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Amphibian,Salamanders & Newts,Terrestrial,Marbled Salamander,162

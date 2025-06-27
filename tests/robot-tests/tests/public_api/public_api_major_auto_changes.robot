@@ -78,7 +78,6 @@ Add headline text block to Content page
     user adds content to headlines text block    Headline text block text
 
 Approve first release
-    user clicks link    Sign off
     user approves release for immediate publication
 
 Create a second draft release
@@ -195,11 +194,18 @@ Add headline text block to Content page for the second release
     user adds content to headlines text block    Headline text block text
 
 Approve second release
-    user clicks link    Sign off
     user approves release for immediate publication
 
+Get public second release link
+    ${PUBLIC_RELEASE_2_LINK}=    user gets url public release will be accessible at
+    Set Suite Variable    ${PUBLIC_RELEASE_2_LINK}
+
 Verify newly published release is on Find Statistics page
+    # TODO EES-6063 - Remove this
     user checks publication is on find statistics page    ${PUBLICATION_NAME}
+
+Verify newly published release is public
+    user navigates to public release page    ${PUBLIC_RELEASE_2_LINK}    ${PUBLICATION_NAME}    ${RELEASE_2_NAME}
 
 User navigates to data catalogue page
     user navigates to data catalogue page on public frontend

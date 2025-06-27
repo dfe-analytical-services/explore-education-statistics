@@ -525,7 +525,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
 
             var directPublicationsWithApprovalRole = await _context
                 .UserPublicationRoles
-                .Where(role => role.UserId == userId && role.Role == PublicationRole.Approver)
+                .Where(role => role.UserId == userId && role.Role == PublicationRole.Allower)
                 .Select(role => role.PublicationId)
                 .ToListAsync();
 

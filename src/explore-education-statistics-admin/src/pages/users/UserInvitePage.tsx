@@ -20,6 +20,10 @@ import { useQuery } from '@tanstack/react-query';
 import React, { useMemo } from 'react';
 import { RouteComponentProps } from 'react-router';
 import orderBy from 'lodash/orderBy';
+import {
+  PublicationRole,
+  publicationRoles,
+} from '@admin/services/types/PublicationRole';
 
 export interface InviteUserReleaseRole {
   releaseId: string;
@@ -30,7 +34,7 @@ export interface InviteUserReleaseRole {
 export interface InviteUserPublicationRole {
   publicationId: string;
   publicationTitle?: string;
-  publicationRole: string;
+  publicationRole: PublicationRole;
 }
 
 export interface UserInviteFormValues {
@@ -39,7 +43,7 @@ export interface UserInviteFormValues {
   userReleaseRoles?: InviteUserReleaseRole[];
   userPublicationRoles?: InviteUserPublicationRole[];
   publicationId?: string;
-  publicationRole?: string;
+  publicationRole?: PublicationRole;
   releaseId?: string;
   releaseRole?: string;
 }
@@ -127,11 +131,13 @@ export default function UserInvitePage({
         Yup.object({
           publicationId: Yup.string().required(),
           publicationTitle: Yup.string(),
-          publicationRole: Yup.string().required(),
+          publicationRole: Yup.mixed<PublicationRole>()
+            .oneOf(publicationRoles)
+            .required(),
         }),
       ),
       publicationId: Yup.string(),
-      publicationRole: Yup.string(),
+      publicationRole: Yup.mixed<PublicationRole>(),
       releaseId: Yup.string(),
       releaseRole: Yup.string(),
     });

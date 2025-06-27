@@ -86,6 +86,7 @@ describe('ReleaseDataFileReplacePage', () => {
       name: '',
       version: '',
       status: '',
+      readyToPublish: false,
       valid: false,
     },
   };
@@ -255,9 +256,7 @@ describe('ReleaseDataFileReplacePage', () => {
       );
       expect(screen.getByTestId('Data file size')).toHaveTextContent('200 B');
       expect(screen.getByTestId('Number of rows')).toHaveTextContent('100');
-      expect(screen.getByTestId('Status')).toHaveTextContent(
-        'Replacement in progress',
-      );
+      expect(screen.getByTestId('Status')).toHaveTextContent('Complete');
       expect(screen.getByTestId('Uploaded by')).toHaveTextContent(
         'original@test.com',
       );
@@ -316,9 +315,7 @@ describe('ReleaseDataFileReplacePage', () => {
       );
       expect(screen.getByTestId('Data file size')).toHaveTextContent('200 B');
       expect(screen.getByTestId('Number of rows')).toHaveTextContent('100');
-      expect(screen.getByTestId('Status')).toHaveTextContent(
-        'Replacement in progress',
-      );
+      expect(screen.getByTestId('Status')).toHaveTextContent('Complete');
       expect(screen.getByTestId('Uploaded by')).toHaveTextContent(
         'original@test.com',
       );
@@ -326,8 +323,8 @@ describe('ReleaseDataFileReplacePage', () => {
         '20 September 2020 12:00',
       );
 
-      expect(screen.getByText('Pending data replacement')).toBeInTheDocument();
-      expect(screen.getByText('Replacement in progress')).toBeInTheDocument();
+      expect(screen.getByText('Complete')).toBeInTheDocument();
+      expect(screen.getByText('Complete')).toBeInTheDocument();
       expect(
         screen.getByText(
           'There was a problem loading the data replacement information.',
@@ -375,9 +372,6 @@ describe('ReleaseDataFileReplacePage', () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByText('Pending data replacement')).toBeInTheDocument();
-      expect(screen.getByText('Replacement in progress')).toBeInTheDocument();
-
       expect(screen.getByText('Data blocks: OK')).toBeInTheDocument();
       expect(screen.getByText('Footnotes: OK')).toBeInTheDocument();
 
@@ -430,8 +424,8 @@ describe('ReleaseDataFileReplacePage', () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByText('Pending data replacement')).toBeInTheDocument();
-      expect(screen.getByText('Replacement in progress')).toBeInTheDocument();
+      expect(screen.getByText('Complete')).toBeInTheDocument();
+      expect(screen.getByText('Complete')).toBeInTheDocument();
       expect(
         screen.getByText(/The replacement data file is still being processed/),
       );
@@ -480,8 +474,6 @@ describe('ReleaseDataFileReplacePage', () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByText('Pending data replacement')).toBeInTheDocument();
-      expect(screen.getByText('Replacement in progress')).toBeInTheDocument();
       expect(
         screen.getByText(
           'There was a problem loading the data replacement information.',

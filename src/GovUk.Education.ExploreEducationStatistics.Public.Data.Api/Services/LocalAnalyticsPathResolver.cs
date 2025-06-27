@@ -1,12 +1,11 @@
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Options;
-using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services.Interfaces;
 using Microsoft.Extensions.Options;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services;
 
-public class LocalAnalyticsPathResolver : IAnalyticsPathResolver
+public class LocalAnalyticsPathResolver : AnalyticsPathResolverBase
 {
     private readonly string _basePath;
 
@@ -24,10 +23,8 @@ public class LocalAnalyticsPathResolver : IAnalyticsPathResolver
         _basePath = Path.Combine(PathUtils.ProjectRootPath, PathUtils.OsPath(originalPath));
     }
 
-    private string BasePath() => _basePath;
-
-    public string PublicApiQueriesDirectoryPath()
+    protected override string GetBasePath()
     {
-        return Path.Combine(BasePath(), "public-api", "queries");
+        return _basePath;
     }
 }

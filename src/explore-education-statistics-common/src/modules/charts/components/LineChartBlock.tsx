@@ -10,7 +10,10 @@ import {
   LineChartDataLabelPosition,
 } from '@common/modules/charts/types/chart';
 import { DataSetCategory } from '@common/modules/charts/types/dataSet';
-import { LegendConfiguration } from '@common/modules/charts/types/legend';
+import {
+  LegendConfiguration,
+  LegendLabelColour,
+} from '@common/modules/charts/types/legend';
 import { axisTickStyle } from '@common/modules/charts/util/chartUtils';
 import createDataSetCategories, {
   toChartData,
@@ -52,6 +55,7 @@ const lineStyles: Dictionary<string> = {
 };
 
 export interface LineChartProps extends ChartProps {
+  dataLabelColour?: LegendLabelColour;
   dataLabelPosition?: LineChartDataLabelPosition;
   legend: LegendConfiguration;
   axes: {
@@ -70,6 +74,7 @@ const LineChartBlock = ({
   width,
   includeNonNumericData,
   showDataLabels,
+  dataLabelColour = 'inherit',
   dataLabelPosition,
 }: LineChartProps) => {
   const [legendProps, renderLegend] = useLegend();
@@ -81,7 +86,14 @@ const LineChartBlock = ({
     includeNonNumericData,
   });
 
-  const chartData = dataSetCategories.map(toChartData);
+  const chartDataUnsorted = dataSetCategories.map(toChartData);
+  // If no `sortAsc` has been set, we should default
+  // to true as it's not really natural to sort in
+  // descending order most of the time.
+  const chartData =
+    axes.major.sortAsc ?? true
+      ? chartDataUnsorted
+      : chartDataUnsorted.reverse();
 
   const minorDomainTicks = getMinorAxisDomainTicks(chartData, axes.minor);
   const majorDomainTicks = getMajorAxisDomainTicks(chartData, axes.major);
@@ -104,6 +116,12 @@ const LineChartBlock = ({
   const xAxisHeight = parseNumber(axes.major.size);
   const chartHasNegativeValues =
     (parseNumber(minorDomainTicks.domain?.[0]) ?? 0) < 0;
+
+  const rightMargin =
+    legend.position === 'inline' &&
+    legend.items.some(legendItem => legendItem.inlinePosition === 'right')
+      ? 160 // Arbitrary number that covers max width of labels
+      : 0;
 
   if (!chartData.length) {
     return <p className="govuk-!-margin-top-5">No data to display.</p>;
@@ -128,6 +146,7 @@ const LineChartBlock = ({
           margin={{
             left: 30,
             top: 20,
+            right: rightMargin,
           }}
         >
           <Tooltip
@@ -195,13 +214,17 @@ const LineChartBlock = ({
                   colour={config.colour}
                   decimalPlaces={dataSet.indicator.decimalPlaces}
                   index={props.index}
+                  inlinePositionOffset={config.inlinePositionOffset}
                   isDataLabel={showDataLabels}
+                  isLastItem={props.index === chartData.length - 1}
                   isLegendLabel={legend.position === 'inline'}
+                  labelColour={
+                    showDataLabels ? dataLabelColour : config.labelColour
+                  }
                   name={config.label}
                   position={
                     showDataLabels ? dataLabelPosition : config.inlinePosition
                   }
-                  totalDataPoints={chartData.length}
                   unit={dataSet.indicator.unit}
                   value={props.value}
                   x={props.x}
@@ -258,6 +281,7 @@ export const lineChartBlockDefinition: ChartDefinition = {
     canIncludeNonNumericData: true,
     canPositionLegendInline: true,
     canSetBarThickness: false,
+    canSetDataLabelColour: true,
     canSetDataLabelPosition: true,
     canShowDataLabels: true,
     canShowAllMajorAxisTicks: false,
@@ -281,7 +305,7 @@ export const lineChartBlockDefinition: ChartDefinition = {
   },
   legend: {
     defaults: {
-      position: 'bottom',
+      position: 'inline',
     },
   },
   axes: {
@@ -290,9 +314,6 @@ export const lineChartBlockDefinition: ChartDefinition = {
       id: 'xaxis',
       title: 'X Axis (major axis)',
       type: 'major',
-      capabilities: {
-        canRotateLabel: false,
-      },
       defaults: {
         groupBy: 'timePeriod',
         min: 0,
@@ -310,9 +331,6 @@ export const lineChartBlockDefinition: ChartDefinition = {
       id: 'yaxis',
       title: 'Y Axis (minor axis)',
       type: 'minor',
-      capabilities: {
-        canRotateLabel: true,
-      },
       defaults: {
         showGrid: true,
         tickConfig: 'default',

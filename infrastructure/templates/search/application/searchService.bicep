@@ -2,9 +2,6 @@ import { abbreviations } from '../../common/abbreviations.bicep'
 import { IpRange } from '../../common/types.bicep'
 import { ResourceNames } from '../types.bicep'
 
-@description('Whether to create/update Azure Monitor alerts during this deploy.')
-param deployAlerts bool
-
 @description('Whether to deploy the Search service configuration to create/update the data source, index and indexer.')
 param deploySearchConfig bool
 
@@ -29,6 +26,9 @@ param indexDefinitionsBasePath string = 'infrastructure/templates/search/applica
 @description('Specifies the name of the indexer to create/update.')
 param indexerName string = '${indexName}-indexer'
 
+@description('The URL of the Public site.')
+param publicSiteUrl string
+
 @description('Name of the searchable documents container in the Search storage account.')
 param searchableDocumentsContainerName string = 'searchable-documents'
 
@@ -48,11 +48,11 @@ resource keyVault 'Microsoft.KeyVault/vaults@2023-07-01' existing = {
   name: resourceNames.existingResources.keyVault
 }
 
-resource vNet 'Microsoft.Network/virtualNetworks@2023-11-01' existing = {
+resource vNet 'Microsoft.Network/virtualNetworks@2024-07-01' existing = {
   name: resourceNames.existingResources.vNet
 }
 
-resource searchStoragePrivateEndpointSubnet 'Microsoft.Network/virtualNetworks/subnets@2023-11-01' existing = {
+resource searchStoragePrivateEndpointSubnet 'Microsoft.Network/virtualNetworks/subnets@2024-07-01' existing = {
   name: resourceNames.existingResources.subnets.searchStoragePrivateEndpoints
   parent: vNet
 }
@@ -68,6 +68,12 @@ module searchServiceModule '../components/searchService.bicep' = {
     publicNetworkAccess: 'Enabled'
     sku: 'basic'
     systemAssignedIdentity: true
+    alerts: {
+      searchLatency: true
+      searchQueriesPerSecond: true
+      throttledSearchQueriesPercentage: true
+      alertsGroupName: resourceNames.existingResources.alertsGroup
+    }
     tagValues: tagValues
   }
 }
@@ -82,11 +88,11 @@ module searchStorageAccountModule '../../public-api/components/storageAccount.bi
     sku: 'Standard_LRS'
     kind: 'StorageV2'
     keyVaultName: keyVault.name
-    alerts: deployAlerts ? {
+    alerts: {
       availability: true
-      latency: true
+      latency: false
       alertsGroupName: resourceNames.existingResources.alertsGroup
-    } : null
+    }
     privateEndpointSubnetIds: {
       blob: searchStoragePrivateEndpointSubnet.id
     }
@@ -120,8 +126,13 @@ module searchServiceConfigModule '../components/searchServiceConfig.bicep' = if 
     dataSourceConnectionString: 'ResourceId=${searchStorageAccountModule.outputs.storageAccountId};'
     dataSourceContainerName: searchableDocumentsContainerName
     dataSourceType: 'azureblob'
-    indexerName: indexerName
     indexDefinitionUri: '${gitHubRawContentBaseUrl}/${githubSourceRef}/${indexDefinitionsBasePath}/${indexDefinitionFilename}'
+    indexCorsAllowedOrigins: [
+      'http://localhost:3000'
+      'https://localhost:3000'
+      publicSiteUrl
+    ]
+    indexerName: indexerName
     indexerScheduleInterval: 'PT5M'
     searchServiceName: searchServiceModule.outputs.searchServiceName
     location: location

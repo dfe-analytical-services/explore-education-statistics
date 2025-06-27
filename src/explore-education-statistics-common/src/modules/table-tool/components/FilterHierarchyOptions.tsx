@@ -1,7 +1,10 @@
 import ButtonText from '@common/components/ButtonText';
+import ContentHtml from '@common/components/ContentHtml';
 import DetailsMenu from '@common/components/DetailsMenu';
 import { FormCheckbox, FormTextSearchInput } from '@common/components/form';
+import Tag from '@common/components/Tag';
 import VisuallyHidden from '@common/components/VisuallyHidden';
+import { Dictionary } from '@common/types';
 import classNames from 'classnames';
 import React, { memo, useCallback, useMemo, useState } from 'react';
 import { useFormContext } from 'react-hook-form';
@@ -15,14 +18,21 @@ export type FilterHierarchyOption = {
   options?: FilterHierarchyOption[];
 };
 
+export type SelectedChildren = {
+  valuesRelatedToSelectedValues: string[];
+  valuesRelatedToSelectedValuesCountMap: Dictionary<number>;
+};
+
 interface FilterHierarchyOptionsProps {
-  optionTree: FilterHierarchyOption;
-  level: number;
   disabled?: boolean;
-  name: string;
-  selectedValues: string[];
   expandedOptionsList: string[];
+  hierarchySearchTerm: string;
+  level: number;
+  name: string;
+  optionTree: FilterHierarchyOption;
+  selectedValues: string[];
   toggleOptions: (optionId: string) => void;
+  selectedChildren: SelectedChildren;
 }
 
 function FilterHierarchyOptions({
@@ -32,17 +42,56 @@ function FilterHierarchyOptions({
   level,
   selectedValues = [],
   expandedOptionsList,
+  hierarchySearchTerm,
   toggleOptions,
+  selectedChildren,
 }: FilterHierarchyOptionsProps) {
   const [searchTerm, setSearchTerm] = useState<string>('');
 
+  const renderSelectedCount = useCallback(() => {
+    const selectedChildrenCount =
+      selectedChildren.valuesRelatedToSelectedValuesCountMap[optionTree.value];
+
+    if (!selectedChildrenCount) {
+      return null;
+    }
+    return (
+      <Tag className="govuk-!-margin-left-2 govuk-!-font-size-16">
+        {selectedChildrenCount} selected
+      </Tag>
+    );
+  }, [
+    optionTree.value,
+    selectedChildren.valuesRelatedToSelectedValuesCountMap,
+  ]);
+  const renderLabel = useCallback(
+    (label: string) => {
+      const termIndex = label.toLowerCase().indexOf(hierarchySearchTerm);
+      if (!hierarchySearchTerm || termIndex === -1) {
+        return optionTree.label;
+      }
+
+      // text matching search term emboldened
+      const regex = new RegExp(hierarchySearchTerm, 'gi');
+      const labelHtml = optionTree.label.replace(regex, `<em>$&</em>`);
+      return (
+        <ContentHtml
+          testId="search-highlight"
+          html={labelHtml}
+          sanitizeOptions={{ allowedTags: ['em'] }}
+        />
+      );
+    },
+    [hierarchySearchTerm, optionTree],
+  );
+
   const filteredOptions = useMemo(() => {
     if (!optionTree.options) return [];
-    if (!searchTerm) return optionTree.options;
+    if (!hierarchySearchTerm && !searchTerm) return optionTree.options;
     return optionTree.options.filter(option =>
       option.label.toLowerCase().includes(searchTerm.trim().toLowerCase()),
     );
-  }, [optionTree, searchTerm]);
+  }, [optionTree, searchTerm, hierarchySearchTerm]);
 
   const { childOptionIds, hasAllSelected } = useMemo(() => {
     const childIds = filteredOptions?.map(({ value }) => value) ?? [];
@@ -75,6 +124,7 @@ function FilterHierarchyOptions({
 
   return (
     <div
+      data-testid={`filter-hierarchy-options-${optionTree.value}`}
       className={classNames(
         'govuk-checkboxes',
         'govuk-checkboxes--small',
@@ -91,6 +141,7 @@ function FilterHierarchyOptions({
           key={optionTree.label}
           id={`${name}-${optionTree.value}`}
           label={optionTree.label}
+          renderLabel={renderLabel}
           value={optionTree.value}
           hint={optionTree.filterLabel}
           disabled={disabled}
@@ -102,29 +153,32 @@ function FilterHierarchyOptions({
           summary={`${
             isExpanded ? 'Close' : 'Show'
           } ${optionTree.childFilterLabel?.toLocaleLowerCase()}`}
+          summaryAfter={renderSelectedCount()}
           hiddenText={`options for ${optionTree.label.toLocaleLowerCase()}`}
           open={isExpanded}
           onToggle={() => toggleOptions(optionTree.value)}
           className={styles.detailsMenu}
         >
-          {optionTree.options.length > 6 && (
-            <div className={styles.search}>
-              <FormTextSearchInput
-                id={`${name}-search`}
-                name={`${name}-search`}
-                label={`Search ${
-                  optionTree.label
-                } (${optionTree.childFilterLabel?.toLocaleLowerCase()})`}
-                width={20}
-                onChange={event => setSearchTerm(event.target.value)}
-                onKeyPress={event => {
-                  if (event.key === 'Enter') {
-                    event.preventDefault();
-                  }
-                }}
-              />
-            </div>
-          )}
+          {level !== 0 &&
+            optionTree.options.length > 6 &&
+            !hierarchySearchTerm && (
+              <div className={styles.search}>
+                <FormTextSearchInput
+                  id={`${name}-search`}
+                  name={`${name}-search`}
+                  label={`Search ${
+                    optionTree.label
+                  } (${optionTree.childFilterLabel?.toLocaleLowerCase()})`}
+                  width={20}
+                  onChange={event => setSearchTerm(event.target.value)}
+                  onKeyPress={event => {
+                    if (event.key === 'Enter') {
+                      event.preventDefault();
+                    }
+                  }}
+                />
+              </div>
+            )}
           <div>
             {filteredOptions.length > 1 && (
               <ButtonText
@@ -150,6 +204,8 @@ function FilterHierarchyOptions({
                 disabled={disabled}
                 selectedValues={selectedValues}
                 level={level + 1}
+                hierarchySearchTerm={hierarchySearchTerm}
+                selectedChildren={selectedChildren}
               />
             ))}
           </div>

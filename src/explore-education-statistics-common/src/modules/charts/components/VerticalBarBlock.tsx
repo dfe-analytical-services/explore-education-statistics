@@ -94,11 +94,18 @@ const VerticalBarBlock = ({
     dataSetCategory => dataSetCategory.filter.group,
   );
 
-  const chartData = axes.major.groupByFilterGroups
+  const chartDataUnsorted = axes.major.groupByFilterGroups
     ? Object.entries(groupedDataSetCategories).map(([groupKey, group]) =>
         Object.assign({}, ...group.map(toChartData), { name: groupKey }),
       )
     : dataSetCategories.map(toChartData);
+  // If no `sortAsc` has been set, we should default
+  // to true as it's not really natural to sort in
+  // descending order most of the time.
+  const chartData =
+    axes.major.sortAsc ?? true
+      ? chartDataUnsorted
+      : chartDataUnsorted.reverse();
 
   const majorAxisCategories = chartData.map(({ name }) => name);
   const minorDomainTicks = getMinorAxisDomainTicks(chartData, axes.minor);
@@ -330,6 +337,7 @@ export const verticalBarBlockDefinition: ChartDefinition = {
     canIncludeNonNumericData: true,
     canPositionLegendInline: false,
     canSetBarThickness: true,
+    canSetDataLabelColour: false,
     canSetDataLabelPosition: false,
     canShowDataLabels: true,
     canShowAllMajorAxisTicks: true,
@@ -363,9 +371,6 @@ export const verticalBarBlockDefinition: ChartDefinition = {
       id: 'major',
       title: 'X Axis (major axis)',
       type: 'major',
-      capabilities: {
-        canRotateLabel: false,
-      },
       defaults: {
         groupBy: 'timePeriod',
         groupByFilter: '',
@@ -385,9 +390,6 @@ export const verticalBarBlockDefinition: ChartDefinition = {
       id: 'minor',
       title: 'Y Axis (minor axis)',
       type: 'minor',
-      capabilities: {
-        canRotateLabel: true,
-      },
       defaults: {
         tickConfig: 'default',
         tickSpacing: 1,

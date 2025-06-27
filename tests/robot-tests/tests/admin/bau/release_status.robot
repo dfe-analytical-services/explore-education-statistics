@@ -269,7 +269,6 @@ Publish new release from adopted publication and make an amendment
     user navigates to content page    ${ADOPTED_PUBLICATION_NAME}
     user adds headlines text block
     user adds content to headlines text block    Headline text block text
-    user clicks link    Sign off
     user approves release for immediate publication
 
     user navigates to admin dashboard    Bau1
@@ -295,7 +294,6 @@ Navigate to contents page and add a release note
     user clicks button    Save note
 
 Publish the release immediately
-    user clicks link    Sign off
     user approves release for immediate publication
 
 Create third release
@@ -342,13 +340,7 @@ Validate checklist errors
 Navigate to data upload and confirm data replacement
     user clicks link    Data and files
     user waits until page contains element    testid:Data file replacements table
-    user clicks link    Replace data
-    user waits until h2 is visible    Data file details
-    user waits until page contains    Footnotes: OK
-    user waits until page contains    Data blocks: OK
-    user waits until button is enabled    Confirm data replacement
-    user clicks button    Confirm data replacement
-    user waits until h2 is visible    Data replacement complete    %{WAIT_MEDIUM}
+    user clicks button    Confirm replacement
 
 Upload the larger data file via data upload
     user uploads subject and waits until importing
@@ -398,5 +390,4 @@ Add headline text block to Content page
     user waits until data upload is completed    ${SUBJECT_NAME}-updated
 
 Publish the release immediately
-    user clicks link    Sign off
     user approves release for immediate publication

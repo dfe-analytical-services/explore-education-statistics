@@ -11,23 +11,25 @@ public record ReleaseVersionPublishedEvent : IEvent
         Payload = new EventPayload
         {
             ReleaseId = eventInfo.ReleaseId,
+            ReleaseVersionId = eventInfo.ReleaseVersionId,
             ReleaseSlug = eventInfo.ReleaseSlug,
             PublicationId = eventInfo.PublicationId,
             PublicationSlug = eventInfo.PublicationSlug,
             LatestPublishedReleaseId = eventInfo.LatestPublishedReleaseId,
             LatestPublishedReleaseVersionId = eventInfo.LatestPublishedReleaseVersionId,
             PreviousLatestPublishedReleaseId = eventInfo.PreviousLatestPublishedReleaseId,
-            PreviousLatestPublishedReleaseVersionId = eventInfo.PreviousLatestPublishedReleaseVersionId
+            PreviousLatestPublishedReleaseVersionId = eventInfo.PreviousLatestPublishedReleaseVersionId,
+            IsPublicationArchived = eventInfo.IsPublicationArchived
         };
     }
 
     // Changes to this event should also increment the version accordingly.
     public const string DataVersion = "1.0";
-    public const string EventType = "release-version-published";
-    
+    public const string EventType = ReleaseVersionChangedEventTypes.ReleaseVersionPublished;
+
     // Which Topic endpoint to use from the appsettings
-    public static string EventTopicOptionsKey => "ReleaseVersionChangedEvent";
-    
+    public static string EventTopicOptionsKey => EventTopicOptionsKeys.ReleaseVersionChanged;
+
     /// <summary>
     /// The ReleaseVersionId is the subject
     /// </summary>
@@ -39,6 +41,7 @@ public record ReleaseVersionPublishedEvent : IEvent
     public record EventPayload
     {
         public required Guid ReleaseId { get; init; }
+        public required Guid ReleaseVersionId { get; set; }
         public required string ReleaseSlug { get; init; }
         public required Guid PublicationId { get; init; }
         public required string PublicationSlug { get; init; }
@@ -46,9 +49,11 @@ public record ReleaseVersionPublishedEvent : IEvent
         public required Guid LatestPublishedReleaseVersionId { get; init; }
         public required Guid? PreviousLatestPublishedReleaseId { get; init; }
         public required Guid? PreviousLatestPublishedReleaseVersionId { get; init; }
+        public required bool IsPublicationArchived { get; init; }
     }
+
     public EventPayload Payload { get; }
-    
+
     public EventGridEvent ToEventGridEvent() => new(Subject, EventType, DataVersion, Payload);
 
     public record ReleaseVersionPublishedEventInfo
@@ -99,5 +104,10 @@ public record ReleaseVersionPublishedEvent : IEvent
         /// The latest published release version id of the publication's latest published release before the release version was published.
         /// </summary>
         public required Guid? PreviousLatestPublishedReleaseVersionId { get; init; }
+        
+        /// <summary>
+        /// Indicates whether the associated publication is archived
+        /// </summary>
+        public required bool IsPublicationArchived { get; init; }
     }
 }

@@ -28,7 +28,11 @@ export default function ChartExportMenu({ chartRef, chartTitle }: Props) {
   const handlePngDownload = useCallback(async () => {
     const png = await getClipboardPng();
     if (png) {
-      downloadFile(png, chartTitle || 'Chart');
+      downloadFile({
+        file: png,
+        extension: 'png',
+        fileName: `${chartTitle || 'Chart'}`,
+      });
     }
   }, [chartTitle, getClipboardPng]);
 

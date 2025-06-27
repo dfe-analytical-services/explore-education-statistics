@@ -5,6 +5,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Hubs;
 using GovUk.Education.ExploreEducationStatistics.Admin.Hubs.Filters;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Options;
+using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers;
@@ -18,6 +19,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Publi
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageContent;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologies;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Public.Data;
+using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Cache;
 using GovUk.Education.ExploreEducationStatistics.Common.Cancellation;
@@ -26,6 +28,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Database;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
+using GovUk.Education.ExploreEducationStatistics.Common.Options;
 using GovUk.Education.ExploreEducationStatistics.Common.Requests;
 using GovUk.Education.ExploreEducationStatistics.Common.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
@@ -49,6 +52,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Processor.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Services;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Options;
+using GovUk.Education.ExploreEducationStatistics.Events.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.ViewModels;
@@ -83,6 +87,11 @@ using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Admin.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Converters;
+using GovUk.Education.ExploreEducationStatistics.Admin.Repositories;
+using GovUk.Education.ExploreEducationStatistics.Admin.Repositories.Public.Data;
+using GovUk.Education.ExploreEducationStatistics.Admin.Repositories.Public.Data.Interfaces;
 using Thinktecture;
 using static GovUk.Education.ExploreEducationStatistics.Common.Utils.StartupUtils;
 using ContentGlossaryService = GovUk.Education.ExploreEducationStatistics.Content.Services.GlossaryService;
@@ -111,9 +120,10 @@ using IPublicationRepository =
     GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IPublicationRepository;
 using IPublicationService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IPublicationService;
 using IReleaseFileService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IReleaseFileService;
-using IReleaseVersionService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IReleaseVersionService;
+using IReleaseService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IReleaseService;
 using IReleaseVersionRepository =
     GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IReleaseVersionRepository;
+using IReleaseVersionService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IReleaseVersionService;
 using IThemeService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IThemeService;
 using MethodologyImageService =
     GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologies.MethodologyImageService;
@@ -121,15 +131,11 @@ using MethodologyService = GovUk.Education.ExploreEducationStatistics.Admin.Serv
 using PublicationRepository = GovUk.Education.ExploreEducationStatistics.Admin.Services.PublicationRepository;
 using PublicationService = GovUk.Education.ExploreEducationStatistics.Admin.Services.PublicationService;
 using ReleaseFileService = GovUk.Education.ExploreEducationStatistics.Admin.Services.ReleaseFileService;
-using ReleaseVersionService = GovUk.Education.ExploreEducationStatistics.Admin.Services.ReleaseVersionService;
+using ReleaseService = GovUk.Education.ExploreEducationStatistics.Admin.Services.ReleaseService;
 using ReleaseVersionRepository = GovUk.Education.ExploreEducationStatistics.Admin.Services.ReleaseVersionRepository;
+using ReleaseVersionService = GovUk.Education.ExploreEducationStatistics.Admin.Services.ReleaseVersionService;
 using SameSiteMode = Microsoft.AspNetCore.Http.SameSiteMode;
 using ThemeService = GovUk.Education.ExploreEducationStatistics.Admin.Services.ThemeService;
-using IReleaseService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IReleaseService;
-using ReleaseService = GovUk.Education.ExploreEducationStatistics.Admin.Services.ReleaseService;
-using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
-using GovUk.Education.ExploreEducationStatistics.Events.Extensions;
-using GovUk.Education.ExploreEducationStatistics.Common.Options;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin
 {
@@ -174,8 +180,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddHttpContextAccessor();
 
             services.AddFluentValidation();
-            services.AddValidatorsFromAssembly(typeof(FullTableQueryRequest.Validator)
-                .Assembly); // Adds *all* validators from Common
+
+            services.AddValidatorsFromAssemblies([
+                typeof(UploadDataSetRequest.Validator).Assembly, // Adds *all* validators from Admin
+                typeof(FullTableQueryRequest.Validator).Assembly // Adds *all* validators from Common
+            ]);
 
             services.AddMvc(options =>
                 {
@@ -187,6 +196,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                 })
                 .AddNewtonsoftJson(options =>
                 {
+                    options.SerializerSettings.Converters.Add(new FilterHierarchiesOptionsConverter());
                     options.SerializerSettings.NullValueHandling = NullValueHandling.Ignore;
                 });
 
@@ -194,7 +204,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddResponseCompression(options => { options.EnableForHttps = true; });
 
             // In production, the React files will be served from this directory
-            services.AddSpaStaticFiles(configuration => { configuration.RootPath = "wwwroot"; });
+            services.AddSpaStaticFiles(config => { config.RootPath = "wwwroot"; });
             services.Configure<RouteOptions>(options => options.LowercaseUrls = true);
 
             /*
@@ -383,8 +393,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                 configuration.GetRequiredSection(TableBuilderOptions.Section));
             services.Configure<OpenIdConnectSpaClientOptions>(
                 configuration.GetSection(OpenIdConnectSpaClientOptions.Section));
-            services.Configure<FeatureFlags>(
-                configuration.GetSection(FeatureFlags.Section));
+            services.Configure<FeatureFlagsOptions>(
+                configuration.GetSection(FeatureFlagsOptions.Section));
             services.Configure<RouteOptions>(options => options.LowercaseUrls = true);
 
             StartupSecurityConfiguration.ConfigureAuthorizationPolicies(services);
@@ -392,10 +402,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             /*
              * Services
              */
-
-            var coreStorageConnectionString = configuration.GetValue<string>("CoreStorage");
-            var publisherStorageConnectionString = configuration.GetValue<string>("PublisherStorage");
-
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
             // This service is responsible for handling calls immediately following successful login into the Admin SPA.
@@ -421,6 +427,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<IReleaseDataFileRepository, ReleaseDataFileRepository>();
 
             services.AddTransient<IReleaseDataFileService, ReleaseDataFileService>();
+            services.AddTransient<IDataSetFileStorage, DataSetFileStorage>();
             services.AddTransient<IDataGuidanceFileWriter, DataGuidanceFileWriter>();
             services.AddTransient<IReleaseFileService, ReleaseFileService>();
             services.AddTransient<IReleaseImageService, ReleaseImageService>();
@@ -503,6 +510,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                 services.AddTransient<IDataSetVersionMappingService, DataSetVersionMappingService>();
                 services.AddTransient<IPreviewTokenService, PreviewTokenService>();
                 services.AddTransient<IDataSetVersionRepository, DataSetVersionRepository>();
+                services.AddScoped<IMappingTypesRepository, MappingTypesRepository>();
             }
             else
             {
@@ -512,14 +520,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                 // This is allowing for the PublicDataDbContext to be null.
                 services.AddTransient<IDataSetService, DataSetService>(provider =>
                     new DataSetService(provider.GetRequiredService<ContentDbContext>(),
-                        provider.GetService<PublicDataDbContext>(),
+                        provider.GetService<PublicDataDbContext>()!,
                         provider.GetRequiredService<IProcessorClient>(),
+                        provider.GetRequiredService<IDataSetVersionMappingService>(),
                         provider.GetRequiredService<IUserService>()));
 
                 services.AddTransient<IDataSetVersionService, NoOpDataSetVersionService>();
                 services.AddTransient<IDataSetVersionMappingService, NoOpDataSetVersionMappingService>();
                 services.AddTransient<IPreviewTokenService, NoOpPreviewTokenService>();
                 services.AddTransient<IDataSetVersionRepository, NoOpDataSetVersionRepository>();
+                services.AddScoped<IMappingTypesRepository, NoOpMappingTypesRepository>();
             }
 
             services.AddTransient<INotificationClient>(s =>
@@ -570,7 +580,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<ISubjectRepository, SubjectRepository>();
             services.AddTransient<ITimePeriodService, TimePeriodService>();
             services.AddTransient<IReleaseSubjectService, ReleaseSubjectService>();
-            services.AddTransient<ISubjectMetaService, SubjectMetaService>(provider => 
+            services.AddTransient<ISubjectMetaService, SubjectMetaService>(provider =>
                 new SubjectMetaService(
                     statisticsDbContext: provider.GetRequiredService<StatisticsDbContext>(),
                     contentDbContext: provider.GetRequiredService<ContentDbContext>(),
@@ -585,7 +595,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                     timePeriodService: provider.GetRequiredService<ITimePeriodService>(),
                     userService: provider.GetRequiredService<IUserService>(),
                     locationOptions: provider.GetRequiredService<IOptions<LocationsOptions>>()
-                    ));
+                ));
             services.AddTransient<ISubjectResultMetaService, SubjectResultMetaService>();
             services.AddTransient<ISubjectCsvMetaService, SubjectCsvMetaService>();
             services.AddSingleton<DataServiceMemoryCache<BoundaryLevel>, DataServiceMemoryCache<BoundaryLevel>>();
@@ -594,16 +604,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<IReleaseInviteService, ReleaseInviteService>();
             services.AddTransient<IUserRepository, UserRepository>();
             services.AddTransient<IUserInviteRepository, UserInviteRepository>();
-            services.AddTransient<IFileUploadsValidatorService, FileUploadsValidatorService>();
+            services.AddTransient<IDataSetValidator, DataSetValidator>();
+            services.AddTransient<IFileValidatorService, FileValidatorService>();
             services.AddTransient<IReleaseFileBlobService, PrivateReleaseFileBlobService>();
             services.AddTransient<IPrivateBlobStorageService, PrivateBlobStorageService>(provider =>
-                new PrivateBlobStorageService(configuration.GetValue<string>("CoreStorage"),
+                new PrivateBlobStorageService(configuration.GetRequiredValue("CoreStorage"),
                     provider.GetRequiredService<ILogger<IBlobStorageService>>()));
-            services.AddTransient<IPublicBlobStorageService, PublicBlobStorageService>(provider =>
-                new PublicBlobStorageService(configuration.GetValue<string>("PublicStorage"),
+            services.AddTransient<IPublicBlobStorageService, PublicBlobStorageService>(provider => 
+                new PublicBlobStorageService(configuration.GetRequiredValue("PublicStorage"),
                     provider.GetRequiredService<ILogger<IBlobStorageService>>()));
             services.AddTransient<IPublisherTableStorageService, PublisherTableStorageService>(_ =>
-                new PublisherTableStorageService(publisherStorageConnectionString));
+                new PublisherTableStorageService(configuration.GetRequiredValue("PublisherStorage")));
             services.AddSingleton<IGuidGenerator, SequentialGuidGenerator>();
             AddPersistenceHelper<ContentDbContext>(services);
             AddPersistenceHelper<StatisticsDbContext>(services);
@@ -621,19 +632,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             StartupSecurityConfiguration.ConfigureResourceBasedAuthorization(services);
 
             services.AddSingleton<IFileTypeService, FileTypeService>();
-            services.AddTransient<IDataArchiveValidationService, DataArchiveValidationService>();
             services.AddTransient<IPrivateBlobCacheService, PrivateBlobCacheService>();
             services.AddTransient<ICacheKeyService, CacheKeyService>();
             services.AddSingleton<IDataProcessorClient, DataProcessorClient>(_ =>
-                new DataProcessorClient(coreStorageConnectionString));
+                new DataProcessorClient(configuration.GetRequiredValue("CoreStorage")));
             services.AddSingleton<IPublisherClient, PublisherClient>(_ =>
-                new PublisherClient(publisherStorageConnectionString));
+                new PublisherClient(configuration.GetRequiredValue("PublisherStorage")));
 
             /*
              * Swagger
              */
-
             if (configuration.GetValue<bool>("App:EnableSwagger"))
+            {
                 services.AddSwaggerGen(c =>
                 {
                     c.SwaggerDoc("v1",
@@ -663,10 +673,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                                     Id = "Bearer"
                                 }
                             },
-                            new[] { string.Empty }
+                            [string.Empty]
                         }
                     });
                 });
+            }
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -733,8 +744,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                 .FontSources(s => s.Self())
                 .FormActions(s =>
                 {
-                    var loginAuthorityUrl = configuration.GetRequiredSection("OpenIdConnectIdentityFramework")
-                        .GetValue<string>("Authority");
+                    var loginAuthorityUrl = configuration
+                        .GetRequiredSection("OpenIdConnectIdentityFramework")
+                        .GetRequiredValue("Authority");
                     var loginAuthorityUri = new Uri(loginAuthorityUrl);
                     s
                         .CustomSources(loginAuthorityUri.GetLeftPart(UriPartial.Authority))
@@ -966,6 +978,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                 BatchFilterOptionMappingUpdatesRequest request,
                 CancellationToken cancellationToken = default) =>
             throw new NotImplementedException();
+
+        public Task<MappingStatusViewModel> GetMappingStatus(Guid dataSetVersionId, CancellationToken cancellationToken = default) => throw new NotImplementedException();
     }
 
     internal class NoOpPreviewTokenService : IPreviewTokenService
@@ -998,5 +1012,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
         {
             return Task.FromResult(new List<DataSetVersion>());
         }
+    }
+
+    internal class NoOpMappingTypesRepository : IMappingTypesRepository
+    {
+        public Task<List<LocationMappingTypes>> GetLocationOptionMappingTypes(Guid targetDataSetVersionId, CancellationToken cancellationToken = default) => throw new NotImplementedException();
+
+        public Task<List<FilterMappingTypes>> GetFilterOptionMappingTypes(Guid targetDataSetVersionId, CancellationToken cancellationToken = default) => throw new NotImplementedException();
     }
 }

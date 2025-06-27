@@ -2,13 +2,14 @@
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
+using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
-using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
+using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
@@ -22,14 +23,10 @@ using System.IO.Compression;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Public.Data;
-using GovUk.Education.ExploreEducationStatistics.Common.Options;
-using Microsoft.Extensions.Options;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainers;
-using IReleaseVersionRepository =
-    GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IReleaseVersionRepository;
 using Unit = GovUk.Education.ExploreEducationStatistics.Common.Model.Unit;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
@@ -38,27 +35,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         ContentDbContext contentDbContext,
         IPersistenceHelper<ContentDbContext> persistenceHelper,
         IPrivateBlobStorageService privateBlobStorageService,
-        IDataArchiveValidationService dataArchiveValidationService,
-        IFileUploadsValidatorService fileUploadsValidatorService,
+        IDataSetValidator dataSetValidator,
         IFileRepository fileRepository,
-        IReleaseVersionRepository releaseVersionRepository,
         IReleaseFileRepository releaseFileRepository,
         IReleaseFileService releaseFileService,
-        IReleaseDataFileRepository releaseDataFileRepository,
         IDataImportService dataImportService,
         IUserService userService,
-        IDataSetVersionService dataSetVersionService,
-        IOptions<FeatureFlags> featureFlags)
-        : IReleaseDataFileService
+        IDataSetFileStorage dataSetFileStorage,
+        IDataBlockService dataBlockService,
+        IFootnoteRepository footnoteRepository) : IReleaseDataFileService
     {
-        public async Task<Either<ActionResult, Unit>> Delete(Guid releaseVersionId,
+        public async Task<Either<ActionResult, Unit>> Delete(
+            Guid releaseVersionId,
             Guid fileId,
             bool forceDelete = false)
         {
-            return await Delete(releaseVersionId, [fileId], forceDelete: forceDelete);
+            return await Delete(releaseVersionId, [fileId], forceDelete);
         }
 
-        public async Task<Either<ActionResult, Unit>> Delete(Guid releaseVersionId,
+        public async Task<Either<ActionResult, Unit>> Delete(
+            Guid releaseVersionId,
             IEnumerable<Guid> fileIds,
             bool forceDelete = false)
         {
@@ -68,10 +64,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     await userService.CheckCanUpdateReleaseVersion(releaseVersion, ignoreCheck: forceDelete))
                 .OnSuccess(async _ =>
                     await fileIds.Select(fileId => releaseFileService.CheckFileExists(
-                            releaseVersionId: releaseVersionId,
-                            fileId: fileId,
-                            FileType.Data))
-                        .OnSuccessAll())
+                        releaseVersionId,
+                        fileId,
+                        FileType.Data))
+                    .OnSuccessAll())
                 .OnSuccessVoid(async files =>
                 {
                     foreach (var file in files)
@@ -127,7 +123,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
-        public async Task<Either<ActionResult, Unit>> DeleteAll(Guid releaseVersionId,
+        public async Task<Either<ActionResult, Unit>> DeleteAll(
+            Guid releaseVersionId,
             bool forceDelete = false)
         {
             var releaseFiles = await releaseFileRepository.GetByFileType(releaseVersionId, types: FileType.Data);
@@ -142,12 +139,52 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             return await persistenceHelper
                 .CheckEntityExists<ReleaseFile>(q => q.Where(
-                        rf => rf.ReleaseVersionId == releaseVersionId
-                              && rf.File.Type == FileType.Data
-                              && rf.FileId == fileId)
-                    .Include(rf => rf.ReleaseVersion))
+                    rf => rf.ReleaseVersionId == releaseVersionId &&
+                    rf.File.Type == FileType.Data &&
+                    rf.FileId == fileId)
+                .Include(rf => rf.ReleaseVersion))
                 .OnSuccessDo(rf => userService.CheckCanViewReleaseVersion(rf.ReleaseVersion))
                 .OnSuccess(BuildDataFileViewModel);
+        }
+
+        public async Task<Either<ActionResult, DataSetAccoutrementsViewModel>> GetAccoutrementsSummary(
+            Guid releaseVersionId,
+            Guid fileId)
+        {
+            return await persistenceHelper
+                .CheckEntityExists<ReleaseFile>(q => q
+                    .Include(releaseFile => releaseFile.File)
+                    .Include(releaseFile => releaseFile.ReleaseVersion)
+                    .Where(releaseFile =>
+                        releaseFile.ReleaseVersionId == releaseVersionId
+                        && releaseFile.FileId == fileId
+                        && releaseFile.File.Type == FileType.Data))
+                .OnSuccessDo(releaseFile => userService.CheckCanViewReleaseVersion(releaseFile.ReleaseVersion))
+                .OnSuccess(async releaseFile =>
+                {
+                    var dataBlocks = (await dataBlockService.ListDataBlocks(
+                        releaseFile.ReleaseVersionId))
+                        .Where(dataBlock => dataBlock.Query.SubjectId == releaseFile.File.SubjectId)
+                        .ToList();
+
+                    var footnotes = await footnoteRepository.GetFootnotes(
+                        releaseVersionId: releaseFile.ReleaseVersionId,
+                        subjectId: releaseFile.File.SubjectId);
+
+                    return new DataSetAccoutrementsViewModel
+                    {
+                        DataBlocks = dataBlocks.Select(db => new DataBlockAccoutrementViewModel
+                        {
+                            Id = db.Id,
+                            Name = db.Name,
+                        }).ToList(),
+                        Footnotes = footnotes.Select(fn => new FootnoteAccoutrementViewModel
+                        {
+                            Id = fn.Id,
+                            Content = fn.Content,
+                        }).ToList(),
+                    };
+                });
         }
 
         public async Task<Either<ActionResult, List<DataFileInfo>>> ListAll(Guid releaseVersionId)
@@ -187,9 +224,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     var releaseFiles = await contentDbContext.ReleaseFiles
                         .Include(releaseFile => releaseFile.File)
                         .Where(releaseFile =>
-                            releaseFile.File.Type == FileType.Data
-                            && releaseFile.ReleaseVersionId == releaseVersionId
-                            && !releaseFile.File.ReplacingId.HasValue)
+                            releaseFile.File.Type == FileType.Data &&
+                            releaseFile.ReleaseVersionId == releaseVersionId &&
+                            !releaseFile.File.ReplacingId.HasValue)
                         .ToDictionaryAsync(releaseFile => releaseFile.File.Id);
 
                     if (releaseFiles.Count != fileIds.Count)
@@ -201,8 +238,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     {
                         if (!releaseFiles.TryGetValue(fileId, out var matchingReleaseFile))
                         {
-                            throw new ArgumentException(
-                                $"fileId {fileId} not found in db as non-replacement related data file attached to the release version {releaseVersionId}");
+                            throw new ArgumentException($"fileId {fileId} not found in db as non-replacement related data file attached to the release version {releaseVersionId}");
                         }
 
                         matchingReleaseFile.Order = order;
@@ -223,11 +259,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
-        public async Task<Either<ActionResult, DataFileInfo>> Upload(Guid releaseVersionId,
+        public async Task<Either<ActionResult, List<DataSetUploadResultViewModel>>> Upload(
+            Guid releaseVersionId,
             IFormFile dataFormFile,
             IFormFile metaFormFile,
-            string? dataSetTitle,
-            Guid? replacingFileId)
+            string dataSetTitle,
+            Guid? replacingFileId,
+            CancellationToken cancellationToken)
         {
             return await persistenceHelper
                 .CheckEntityExists<ReleaseVersion>(releaseVersionId)
@@ -236,349 +274,273 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 {
                     return await persistenceHelper
                         .CheckOptionalEntityExists<File>(replacingFileId)
-                        .OnSuccessCombineWith(async replacingFile =>
-                        {
-                            var newDataSetTitle = await GetReleaseVersionDataSetTitle(
-                                releaseVersionId, dataSetTitle, replacingFile);
-
-                            var errors = await fileUploadsValidatorService
-                                .ValidateDataSetFilesForUpload(
-                                    releaseVersionId,
-                                    newDataSetTitle,
-                                    dataFormFile,
-                                    metaFormFile,
-                                    replacingFile);
-
-                            if (errors.Count > 0)
-                            {
-                                return new Either<ActionResult, string>(
-                                    Common.Validators.ValidationUtils.ValidationResult(errors));
-                            }
-
-                            return newDataSetTitle;
-                        })
-                        .OnSuccess(async tuple =>
-                        {
-                            var (replacingFile, newDataSetTitle) = tuple;
-                            var subjectId = await releaseVersionRepository
-                                    .CreateStatisticsDbReleaseAndSubjectHierarchy(releaseVersionId);
-                            ReleaseFile? replacedReleaseDataFile = null;
-
-                            if (replacingFile is not null)
-                            {
-                                replacedReleaseDataFile = await GetReplacedReleaseFile(releaseVersionId, replacingFile);
-                            }
-
-                            var releaseDataFileOrder = await GetNextDataFileOrder(releaseVersionId, replacedReleaseDataFile);
-
-                            var dataFile = await releaseDataFileRepository.Create(
-                                releaseVersionId: releaseVersionId,
-                                subjectId: subjectId,
-                                filename: dataFormFile.FileName.ToLower(),
-                                contentLength: dataFormFile.Length,
-                                type: FileType.Data,
-                                createdById: userService.GetUserId(),
-                                name: newDataSetTitle,
-                                replacingDataFile: replacingFile,
-                                order: releaseDataFileOrder);
-
-                            var dataReleaseFile = await contentDbContext.ReleaseFiles
-                                .Include(rf => rf.File)
-                                .SingleAsync(rf =>
-                                    rf.ReleaseVersionId == releaseVersionId
-                                    && rf.FileId == dataFile.Id);
-
-                            var metaFile = await releaseDataFileRepository.Create(
-                                releaseVersionId: releaseVersionId,
-                                subjectId: subjectId,
-                                filename: metaFormFile.FileName.ToLower(),
-                                contentLength: metaFormFile.Length,
-                                type: FileType.Metadata,
-                                createdById: userService.GetUserId());
-
-                            await UploadFileToStorage(dataFile, dataFormFile);
-                            await UploadFileToStorage(metaFile, metaFormFile);
-                            if (featureFlags.Value.EnableReplacementOfPublicApiDataSets)
-                            {
-                                if (replacingFile is not null && contentDbContext.ReleaseFiles
-                                        .Any(rf =>
-                                            rf.ReleaseVersionId == releaseVersionId
-                                            && rf.Name == newDataSetTitle
-                                            && rf.PublicApiDataSetId != null))
-                                {
-                                    // Creates a new data set version to enable replacement. 
-                                    //Please note this will is WIP, EES-5996 and will address failure,
-                                    //and any refactor that may be required
-                                    await dataSetVersionService.GetDataSetVersion(
-                                            replacedReleaseDataFile!.PublicApiDataSetId!.Value,
-                                            replacedReleaseDataFile.PublicApiDataSetVersion!)
-                                        .OnSuccessDo(async dataSetVersion =>
-                                        {
-                                            await dataSetVersionService.CreateNextVersion(
-                                                dataReleaseFile.Id,
-                                                replacedReleaseDataFile.PublicApiDataSetId.Value,
-                                                dataSetVersion.Id
-                                            ); 
-                                        });
-                                }
-                            }
-                            var dataImport = await dataImportService.Import(
-                                subjectId: subjectId,
-                                dataFile: dataFile,
-                                metaFile: metaFile);
-
-                            var permissions = await userService.GetDataFilePermissions(dataFile);
-
-                            return BuildDataFileViewModel(
-                                dataReleaseFile: dataReleaseFile,
-                                metaFile: metaFile,
-                                newDataSetTitle,
-                                dataImport!.TotalRows,
-                                dataImport!.Status,
-                                permissions);
-                        });
+                        .OnSuccess(async replacingFile
+                            => await ValidateDataSetCsvPair(releaseVersionId, dataFormFile, metaFormFile, dataSetTitle, replacingFile))
+                        .OnSuccess(async dataSet
+                            => await dataSetFileStorage.UploadDataSetsToTemporaryStorage(releaseVersionId, [dataSet], cancellationToken));
                 });
         }
 
-        public async Task<Either<ActionResult, DataFileInfo>> UploadAsZip(Guid releaseVersionId,
-            IFormFile zipFormFile,
-            string? dataSetTitle,
-            Guid? replacingFileId)
+        // TODO (EES-6176): Remove once manual replacement process has been consolidated to use Upload
+        public async Task<Either<ActionResult, DataFileInfo>> UploadForReplacement(
+            Guid releaseVersionId,
+            IFormFile dataFormFile,
+            IFormFile metaFormFile,
+            string dataSetTitle,
+            Guid? replacingFileId,
+            CancellationToken cancellationToken)
         {
             return await persistenceHelper
                 .CheckEntityExists<ReleaseVersion>(releaseVersionId)
                 .OnSuccess(userService.CheckCanUpdateReleaseVersion)
                 .OnSuccess(async _ =>
                 {
-                    return await persistenceHelper.CheckOptionalEntityExists<File>(replacingFileId)
-                        .OnSuccessCombineWith(async replacingFile =>
-                        {
-                            var newDataSetTitle = await GetReleaseVersionDataSetTitle(
-                                releaseVersionId, dataSetTitle, replacingFile);
-
-                            return await dataArchiveValidationService
-                                .ValidateDataArchiveFile(
-                                    releaseVersionId,
-                                    newDataSetTitle,
-                                    zipFormFile,
-                                    replacingFile);
-                        })
-                        .OnSuccess(async tuple =>
-                        {
-                            var (replacingFile, archiveDataSet) = tuple;
-
-                            var zipFile = new File
-                            {
-                                CreatedById = userService.GetUserId(),
-                                RootPath = releaseVersionId,
-                                ContentLength = zipFormFile.Length,
-                                ContentType = zipFormFile.ContentType,
-                                Filename = zipFormFile.FileName.ToLower(),
-                                Type = FileType.DataZip,
-                            };
-                            contentDbContext.Files.Add(zipFile);
-                            await contentDbContext.SaveChangesAsync();
-
-                            var subjectId = await releaseVersionRepository
-                                .CreateStatisticsDbReleaseAndSubjectHierarchy(releaseVersionId);
-                            ReleaseFile? replacedReleaseDataFile = null;
-
-                            if (replacingFile is not null)
-                            {
-                                replacedReleaseDataFile = await GetReplacedReleaseFile(releaseVersionId, replacingFile);
-                            }
-                            var releaseDataFileOrder = await 
-                                GetNextDataFileOrder(releaseVersionId, replacedReleaseDataFile);
-
-                            var dataFile = await releaseDataFileRepository.Create(
-                                releaseVersionId: releaseVersionId,
-                                subjectId: subjectId,
-                                filename: archiveDataSet.DataFilename,
-                                contentLength: archiveDataSet.DataFileSize,
-                                type: FileType.Data,
-                                createdById: userService.GetUserId(),
-                                name: archiveDataSet.Title,
-                                replacingDataFile: replacingFile,
-                                source: zipFile,
-                                order: releaseDataFileOrder);
-
-                            var dataReleaseFile = await contentDbContext.ReleaseFiles
-                                .Include(rf => rf.File)
-                                .SingleAsync(rf =>
-                                    rf.ReleaseVersionId == releaseVersionId
-                                    && rf.FileId == dataFile.Id);
-
-                            var metaFile = await releaseDataFileRepository.Create(
-                                releaseVersionId: releaseVersionId,
-                                subjectId: subjectId,
-                                filename: archiveDataSet.MetaFilename,
-                                contentLength: archiveDataSet.MetaFileSize,
-                                type: FileType.Metadata,
-                                createdById: userService.GetUserId(),
-                                source: zipFile);
-
-                            // data/meta files are extracted to blob storage by _dataImportService.Import
-                            await UploadFileToStorage(zipFile, zipFormFile);
-
-                            var dataImport = await dataImportService.Import(
-                                subjectId: subjectId,
-                                dataFile: dataFile,
-                                metaFile: metaFile,
-                                sourceZipFile: zipFile);
-
-                            var permissions =
-                                await userService.GetDataFilePermissions(dataFile);
-
-                            return BuildDataFileViewModel(
-                                dataReleaseFile: dataReleaseFile,
-                                metaFile: metaFile,
-                                archiveDataSet.Title,
-                                dataImport.TotalRows,
-                                dataImport.Status,
-                                permissions);
-                        });
+                    return await persistenceHelper
+                        .CheckOptionalEntityExists<File>(replacingFileId)
+                        .OnSuccess(async replacingFile
+                            => await ValidateDataSetCsvPair(releaseVersionId, dataFormFile, metaFormFile, dataSetTitle, replacingFile, performAutoReplacement: true))
+                        .OnSuccess(async dataSet
+                            => await dataSetFileStorage.UploadDataSet(releaseVersionId, dataSet, cancellationToken));
                 });
         }
 
-        public async Task<Either<ActionResult, List<ArchiveDataSetFileViewModel>>> ValidateAndUploadBulkZip(
+        public async Task<Either<ActionResult, List<DataSetUploadResultViewModel>>> UploadFromZip(
             Guid releaseVersionId,
-            IFormFile zipFile,
+            IFormFile zipFormFile,
+            string dataSetTitle,
+            Guid? replacingFileId,
             CancellationToken cancellationToken)
         {
             return await persistenceHelper
                 .CheckEntityExists<ReleaseVersion>(releaseVersionId)
                 .OnSuccess(userService.CheckCanUpdateReleaseVersion)
-                .OnSuccessVoid(async _ =>
+                .OnSuccess(async _ =>
                 {
-                    var errors = await dataArchiveValidationService.IsValidZipFile(zipFile);
-                    if (errors.Count > 0)
-                    {
-                        return new Either<ActionResult, Unit>(Common.Validators.ValidationUtils.ValidationResult(errors));
-                    }
-
-                    return Unit.Instance;
-                })
-                .OnSuccess(async _ => await dataArchiveValidationService.ValidateBulkDataArchiveFiles(releaseVersionId, zipFile))
-                .OnSuccess(async dataSetFiles =>
-                {
-                    await using var stream = zipFile.OpenReadStream();
-                    var archive = new ZipArchive(stream);
-
-                    var viewModels = new List<ArchiveDataSetFileViewModel>();
-
-                    foreach (var file in dataSetFiles)
-                    {
-                        var dataFileId = await UploadFileToTempStorage(releaseVersionId, archive.GetEntry(file.DataFilename)!, FileType.Data, cancellationToken);
-                        var metaFileId = await UploadFileToTempStorage(releaseVersionId, archive.GetEntry(file.MetaFilename)!, FileType.Metadata, cancellationToken);
-
-                        viewModels.Add(new ArchiveDataSetFileViewModel
-                        {
-                            Title = file.Title,
-                            DataFilename = file.DataFilename,
-                            MetaFilename = file.MetaFilename,
-                            DataFileId = dataFileId,
-                            MetaFileId = metaFileId,
-                            DataFileSize = file.DataFileSize,
-                            MetaFileSize = file.MetaFileSize,
-                            ReplacingFileId = file.ReplacingFile?.Id,
-                        });
-                    }
-
-                    return viewModels;
+                    return await persistenceHelper
+                        .CheckOptionalEntityExists<File>(replacingFileId)
+                        .OnSuccess(async replacingFile
+                            => await ValidateDataSetZip(releaseVersionId, zipFormFile, dataSetTitle, replacingFile))
+                        .OnSuccess(async dataSet
+                            => await dataSetFileStorage.UploadDataSetsToTemporaryStorage(releaseVersionId, [dataSet], cancellationToken));
                 });
+        }
+
+        // TODO (EES-6176): Remove once manual replacement process has been consolidated to use UploadFromZip
+        public async Task<Either<ActionResult, DataFileInfo>> UploadFromZipForReplacement(
+            Guid releaseVersionId,
+            IFormFile zipFormFile,
+            string dataSetTitle,
+            Guid? replacingFileId,
+            CancellationToken cancellationToken)
+        {
+            return await persistenceHelper
+                .CheckEntityExists<ReleaseVersion>(releaseVersionId)
+                .OnSuccess(userService.CheckCanUpdateReleaseVersion)
+                .OnSuccess(async _ =>
+                {
+                    return await persistenceHelper
+                        .CheckOptionalEntityExists<File>(replacingFileId)
+                        .OnSuccess(async replacingFile
+                            => await ValidateDataSetZip(releaseVersionId, zipFormFile, dataSetTitle, replacingFile, performAutoReplacement: true))
+                        .OnSuccess(async dataSet
+                            => await dataSetFileStorage.UploadDataSet(releaseVersionId, dataSet, cancellationToken));
+                });
+        }
+
+        public async Task<Either<ActionResult, List<DataSetUploadResultViewModel>>> UploadFromBulkZip(
+            Guid releaseVersionId,
+            IFormFile zipFormFile,
+            CancellationToken cancellationToken)
+        {
+            return await persistenceHelper
+                .CheckEntityExists<ReleaseVersion>(releaseVersionId)
+                .OnSuccess(userService.CheckCanUpdateReleaseVersion)
+                .OnSuccess(async _
+                    => await ValidateBulkDataSetZip(releaseVersionId, zipFormFile))
+                .OnSuccess(async dataSets
+                    => await dataSetFileStorage.UploadDataSetsToTemporaryStorage(releaseVersionId, dataSets, cancellationToken));
+        }
+
+        private async Task<Either<ActionResult, DataSet>> ValidateDataSetCsvPair(
+            Guid releaseVersionId,
+            IFormFile dataFormFile,
+            IFormFile metaFormFile,
+            string dataSetTitle,
+            File? replacingFile,
+            bool performAutoReplacement = false)
+        {
+            var dataFile = await BuildDataSetFile(dataFormFile);
+            var metaFile = await BuildDataSetFile(metaFormFile);
+            return await ValidateAndBuildDataSet(releaseVersionId, dataFile, metaFile, dataSetTitle, replacingFile, performAutoReplacement);
+        }
+
+        private async Task<Either<ActionResult, DataSet>> ValidateDataSetZip(
+            Guid releaseVersionId,
+            IFormFile zipFormFile,
+            string dataSetTitle,
+            File? replacingFile,
+            bool performAutoReplacement = false)
+        {
+            var dataSetFiles = await ExtractDataSetZipFile(zipFormFile);
+
+            var dataFile = dataSetFiles.FirstOrDefault(file => !file.FileName.EndsWith(".meta.csv"));
+            var metaFile = dataSetFiles.FirstOrDefault(file => file.FileName.EndsWith(".meta.csv"));
+
+            return await ValidateAndBuildDataSet(releaseVersionId, dataFile, metaFile, dataSetTitle, replacingFile, performAutoReplacement);
+        }
+
+        private async Task<Either<ActionResult, DataSet>> ValidateAndBuildDataSet(
+            Guid releaseVersionId,
+            FileDto? dataFile,
+            FileDto? metaFile,
+            string dataSetTitle,
+            File? replacingFile,
+            bool performAutoReplacement = false)
+        {
+            var newDataSetTitle = await GetReleaseVersionDataSetTitle(releaseVersionId, dataSetTitle, replacingFile);
+
+            var dataSet = new DataSetDto
+            {
+                ReleaseVersionId = releaseVersionId,
+                Title = newDataSetTitle,
+                DataFile = dataFile,
+                MetaFile = metaFile,
+                ReplacingFile = replacingFile,
+            };
+
+            var validationResult = await dataSetValidator.ValidateDataSet(dataSet, performAutoReplacement);
+
+            return validationResult.IsLeft
+                ? Common.Validators.ValidationUtils.ValidationResult(validationResult.Left)
+                : validationResult.Right;
+        }
+
+        private async Task<Either<ActionResult, List<DataSet>>> ValidateBulkDataSetZip(
+            Guid releaseVersionId,
+            IFormFile zipFormFile)
+        {
+            var dataSetFiles = await ExtractDataSetZipFile(zipFormFile);
+
+            var indexFile = dataSetFiles.FirstOrDefault(dsf => dsf.FileName == "dataset_names.csv");
+            if (indexFile is null)
+            {
+                return Common.Validators.ValidationUtils.ValidationResult(ValidationMessages.GenerateErrorBulkDataZipMustContainDataSetNamesCsv());
+            }
+
+            dataSetFiles.Remove(indexFile);
+
+            var dataSetDtos = new List<DataSetDto>();
+            var errors = new List<ErrorViewModel>();
+
+            await dataSetValidator.ValidateBulkDataZipIndexFile(releaseVersionId, indexFile, dataSetFiles)
+                .OnSuccessDo(dataSetIndex => dataSetDtos.AddRange(BuildDataSetsFromBulkZip(dataSetIndex, dataSetFiles)))
+                .OnFailureDo(errors.AddRange);
+
+            if (errors.Count > 0)
+            {
+                return Common.Validators.ValidationUtils.ValidationResult(errors);
+            }
+
+            var dataSets = new List<DataSet>();
+            foreach (var dataSetDto in dataSetDtos)
+            {
+                await dataSetValidator.ValidateDataSet(dataSetDto, performAutoReplacement: true)
+                    .OnSuccessDo(dataSets.Add)
+                    .OnFailureDo(errors.AddRange);
+            }
+
+            return errors.Count > 0
+                ? Common.Validators.ValidationUtils.ValidationResult(errors)
+                : dataSets;
+        }
+
+        private static List<DataSetDto> BuildDataSetsFromBulkZip(
+            DataSetIndex dataSetIndex,
+            List<FileDto> dataSetFiles)
+        {
+            var dataSets = new List<DataSetDto>();
+            foreach (var dataSet in dataSetIndex.DataSetIndexItems)
+            {
+                dataSets.Add(new()
+                {
+                    ReleaseVersionId = dataSetIndex.ReleaseVersionId,
+                    Title = dataSet.DataSetTitle,
+                    DataFile = dataSetFiles.FirstOrDefault(file => file.FileName == dataSet.DataFileName),
+                    MetaFile = dataSetFiles.FirstOrDefault(file => file.FileName == dataSet.MetaFileName),
+                    ReplacingFile = dataSet.ReplacingFile,
+                });
+            }
+
+            return dataSets;
+        }
+
+        private static async Task<List<FileDto>> ExtractDataSetZipFile(IFormFile zipFile)
+        {
+            await using var stream = zipFile.OpenReadStream();
+            using var archive = new ZipArchive(stream);
+
+            var files = new List<FileDto>();
+
+            foreach (var entry in archive.Entries)
+            {
+                using var fileStream = entry.Open();
+                files.Add(await BuildDataSetFile(fileStream, entry.Name));
+            }
+
+            return files;
+        }
+
+        private static async Task<FileDto> BuildDataSetFile(IFormFile formFile)
+        {
+            using var fileStream = formFile.OpenReadStream();
+            return await BuildDataSetFile(fileStream, formFile.FileName);
+        }
+
+        private static async Task<FileDto> BuildDataSetFile(
+            System.IO.Stream fileStream,
+            string fileName)
+        {
+            var memoryStream = new System.IO.MemoryStream();
+            await fileStream.CopyToAsync(memoryStream);
+
+            memoryStream.SeekToBeginning();
+
+            return new FileDto
+            {
+                FileName = fileName,
+                FileSize = memoryStream.Length,
+                FileStream = memoryStream,
+            };
         }
 
         public async Task<Either<ActionResult, List<DataFileInfo>>> SaveDataSetsFromTemporaryBlobStorage(
             Guid releaseVersionId,
-            List<ArchiveDataSetFileViewModel> archiveDataSetFiles,
+            List<DataSetUploadResultViewModel> dataSetFiles,
             CancellationToken cancellationToken)
         {
             return await persistenceHelper
                 .CheckEntityExists<ReleaseVersion>(releaseVersionId)
                 .OnSuccess(userService.CheckCanUpdateReleaseVersion)
-                .OnSuccess(() => archiveDataSetFiles
-                    .Select(importRequest => ValidateTempDataSetFileExistence(releaseVersionId, importRequest))
+                .OnSuccess(() => dataSetFiles
+                    .Select(dataSet => ValidateTempDataSetFileExistence(releaseVersionId, dataSet))
                     .OnSuccessAll())
                 .OnSuccess(async _ =>
                 {
-                    var releaseFiles = new List<ReleaseFile>();
-
-                    foreach (var archiveDataSetFile in archiveDataSetFiles)
-                    {
-                        var subjectId = await releaseVersionRepository.CreateStatisticsDbReleaseAndSubjectHierarchy(releaseVersionId);
-
-                        var replacingFile = archiveDataSetFile.ReplacingFileId is null
-                            ? null
-                            : await contentDbContext.Files.FirstAsync(f => f.Id == archiveDataSetFile.ReplacingFileId, cancellationToken: cancellationToken);
-                        ReleaseFile? replacedReleaseDataFile = null;
-
-                        if (replacingFile is not null)
-                        {
-                            replacedReleaseDataFile = await GetReplacedReleaseFile(releaseVersionId, replacingFile);
-                        }
-
-                        var releaseDataFileOrder = await GetNextDataFileOrder(releaseVersionId, replacedReleaseDataFile);
-
-                        var dataFile = await releaseDataFileRepository.Create(
-                            releaseVersionId: releaseVersionId,
-                            subjectId: subjectId,
-                            filename: archiveDataSetFile.DataFilename,
-                            contentLength: archiveDataSetFile.DataFileSize,
-                            type: FileType.Data,
-                            createdById: userService.GetUserId(),
-                            name: archiveDataSetFile.Title,
-                            replacingDataFile: replacingFile,
-                            order: releaseDataFileOrder);
-
-                        var sourceDataFilePath = FileExtensions.Path(releaseVersionId, FileType.Data, archiveDataSetFile.DataFileId);
-                        var destinationDataFilePath = FileExtensions.Path(releaseVersionId, FileType.Data, dataFile.Id); // Same path, but a new ID has been generated by the creation step above
-
-                        var dataReleaseFile = await contentDbContext.ReleaseFiles
-                            .Include(rf => rf.File)
-                            .SingleAsync(rf =>
-                                rf.ReleaseVersionId == releaseVersionId
-                                && rf.FileId == dataFile.Id, 
-                                cancellationToken);
-
-                        releaseFiles.Add(dataReleaseFile);
-
-                        var metaFile = await releaseDataFileRepository.Create(
-                            releaseVersionId: releaseVersionId,
-                            subjectId: subjectId,
-                            filename: archiveDataSetFile.MetaFilename,
-                            contentLength: archiveDataSetFile.MetaFileSize,
-                            type: FileType.Metadata,
-                            createdById: userService.GetUserId());
-
-                        var sourceMetaFilePath = FileExtensions.Path(releaseVersionId, FileType.Metadata, archiveDataSetFile.MetaFileId);
-                        var destinationMetaFilePath = FileExtensions.Path(releaseVersionId, FileType.Metadata, metaFile.Id); // Same path, but a new ID has been generated by the creation step above
-
-                        await dataImportService.Import(
-                            subjectId: subjectId,
-                            dataFile: dataFile,
-                            metaFile: metaFile);
-
-                        await privateBlobStorageService.MoveBlob(PrivateReleaseTempFiles, sourceDataFilePath, destinationDataFilePath, PrivateReleaseFiles);
-                        await privateBlobStorageService.MoveBlob(PrivateReleaseTempFiles, sourceMetaFilePath, destinationMetaFilePath, PrivateReleaseFiles);
-                    }
-
+                    var releaseFiles = await dataSetFileStorage.MoveDataSetsToPermanentStorage(releaseVersionId, dataSetFiles, cancellationToken);
                     return await BuildDataFileViewModels(releaseFiles);
                 });
         }
 
         private async Task<Either<ActionResult, Unit>> ValidateTempDataSetFileExistence(
             Guid releaseVersionId,
-            ArchiveDataSetFileViewModel fileImportRequest)
+            DataSetUploadResultViewModel dataSet)
         {
-            var dataBlobExists = await privateBlobStorageService.CheckBlobExists(PrivateReleaseTempFiles, $"{FileExtensions.Path(releaseVersionId, FileType.Data, fileImportRequest.DataFileId)}");
-            var metaBlobExists = await privateBlobStorageService.CheckBlobExists(PrivateReleaseTempFiles, $"{FileExtensions.Path(releaseVersionId, FileType.Metadata, fileImportRequest.MetaFileId)}");
+            var dataBlobExists = await privateBlobStorageService.CheckBlobExists(PrivateReleaseTempFiles, $"{FileExtensions.Path(releaseVersionId, FileType.Data, dataSet.DataFileId)}");
+            var metaBlobExists = await privateBlobStorageService.CheckBlobExists(PrivateReleaseTempFiles, $"{FileExtensions.Path(releaseVersionId, FileType.Metadata, dataSet.MetaFileId)}");
 
-            if (!dataBlobExists || !metaBlobExists)
-            {
-                throw new Exception("Unable to locate temporary files at the locations specified");
-            }
-
-            return Unit.Instance;
+            return !dataBlobExists || !metaBlobExists
+                ? throw new Exception("Unable to locate temporary files at the locations specified")
+                : Unit.Instance;
         }
 
         private async Task<DataFileInfo> BuildDataFileViewModel(ReleaseFile releaseFile)
@@ -592,13 +554,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
             var permissions = await userService.GetDataFilePermissions(dataImport.File);
 
-            return BuildDataFileViewModel(
-                dataReleaseFile: releaseFile,
-                metaFile: dataImport.MetaFile,
-                releaseFile.Name,
-                dataImport.TotalRows,
-                dataImport.Status,
-                permissions);
+            return new DataFileInfo
+            {
+                Id = releaseFile.FileId,
+                FileName = releaseFile.File.Filename,
+                Name = releaseFile.Name ?? "Unknown",
+                Size = releaseFile.File.DisplaySize(),
+                MetaFileId = dataImport.MetaFile.Id,
+                MetaFileName = dataImport.MetaFile.Filename,
+                ReplacedBy = releaseFile.File.ReplacedById,
+                Rows = dataImport.TotalRows,
+                UserName = releaseFile.File.CreatedBy?.Email ?? "",
+                Status = dataImport.Status,
+                Created = releaseFile.File.Created,
+                Permissions = permissions,
+                PublicApiDataSetId = releaseFile.PublicApiDataSetId,
+                PublicApiDataSetVersion = releaseFile.PublicApiDataSetVersionString,
+            };
         }
 
         private async Task<List<DataFileInfo>> BuildDataFileViewModels(List<ReleaseFile> releaseFiles)
@@ -620,147 +592,66 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             // Combine it with the import status (already known) to evaluate whether a particular import can be cancelled
             var permissions = await releaseFiles
                 .ToAsyncEnumerable()
-                .ToDictionaryAwaitAsync(rf => ValueTask.FromResult(rf.FileId),
+                .ToDictionaryAwaitAsync(
+                    rf => ValueTask.FromResult(rf.FileId),
                     async rf => await userService.GetDataFilePermissions(rf.File));
 
             return releaseFiles.Select(releaseFile =>
             {
                 var dataImport = dataImports[releaseFile.FileId];
-                return BuildDataFileViewModel(
-                    dataReleaseFile: releaseFile,
-                    metaFile: dataImport.MetaFile,
-                    subjectNames[releaseFile.FileId],
-                    dataImport.TotalRows,
-                    dataImport.Status,
-                    permissions[releaseFile.FileId]);
+
+                return new DataFileInfo
+                {
+                    Id = releaseFile.FileId,
+                    FileName = releaseFile.File.Filename,
+                    Name = subjectNames[releaseFile.FileId] ?? "",
+                    Size = releaseFile.File.DisplaySize(),
+                    MetaFileId = dataImport.MetaFile.Id,
+                    MetaFileName = dataImport.MetaFile.Filename,
+                    ReplacedBy = releaseFile.File.ReplacedById,
+                    Rows = dataImport.TotalRows,
+                    UserName = releaseFile.File.CreatedBy?.Email ?? "",
+                    Status = dataImport.Status,
+                    Created = releaseFile.File.Created,
+                    Permissions = permissions[releaseFile.FileId],
+                    PublicApiDataSetId = releaseFile.PublicApiDataSetId,
+                    PublicApiDataSetVersion = releaseFile.PublicApiDataSetVersionString,
+                };
             }).ToList();
         }
 
-        private static DataFileInfo BuildDataFileViewModel(
-            ReleaseFile dataReleaseFile,
-            File metaFile,
-            string? subjectName,
-            int? totalRows,
-            DataImportStatus importStatus,
-            DataFilePermissions permissions)
+        /// <summary>
+        /// Determine the title which should be used for a data set.
+        /// </summary>
+        /// <remarks>
+        /// Data replacements use the title of the original data set upload, regardless of whether a new one has been provided during a subsequent upload.
+        /// </remarks>
+        private async Task<string> GetReleaseVersionDataSetTitle(
+            Guid releaseVersionId,
+            string dataSetTitle,
+            File? replacingFile)
         {
-            return new DataFileInfo
+            if (replacingFile is not null)
             {
-                Id = dataReleaseFile.FileId,
-                FileName = dataReleaseFile.File.Filename,
-                Name = subjectName ?? "Unknown",
-                Size = dataReleaseFile.File.DisplaySize(),
-                MetaFileId = metaFile.Id,
-                MetaFileName = metaFile.Filename,
-                ReplacedBy = dataReleaseFile.File.ReplacedById,
-                Rows = totalRows,
-                UserName = dataReleaseFile.File.CreatedBy?.Email ?? "",
-                Status = importStatus,
-                Created = dataReleaseFile.File.Created,
-                Permissions = permissions,
-                PublicApiDataSetId = dataReleaseFile.PublicApiDataSetId,
-                PublicApiDataSetVersion = dataReleaseFile.PublicApiDataSetVersionString,
-            };
-        }
-
-        // This method fetches the data set file title based on whether it's an original import or a replacement.
-        // Replacement's use the title from the data set being replaced.
-        private async Task<string> GetReleaseVersionDataSetTitle(Guid releaseVersionId, string? dataSetTitle = null,
-            File? replacingFile = null)
-        {
-            if (replacingFile != null)
-            {
-                if (dataSetTitle != null)
-                {
-                    throw new ArgumentException("subjectName and replacingFile shouldn't both be provided");
-                }
-
-                if (replacingFile.Type != FileType.Data)
-                {
-                    throw new ArgumentException("replacingFile.Type should equal FileType.Data");
-                }
-
-                // No need to validate the data set title if a replacement is occurring and we're using the replacement title
-                return (await releaseFileRepository.Find(releaseVersionId: releaseVersionId,
-                    fileId: replacingFile.Id))?.Name ?? "Unknown";
-            }
-
-            if (dataSetTitle == null)
-            {
-                throw new ArgumentException("New data set files cannot have a null data set title");
+                var originalDataSetTitle = await releaseFileRepository.Find(releaseVersionId, replacingFile.Id);
+                dataSetTitle = originalDataSetTitle?.Name ?? dataSetTitle;
             }
 
             return dataSetTitle;
         }
 
-        private async Task UploadFileToStorage(
-            File file,
-            IFormFile formFile)
-        {
-            await privateBlobStorageService.UploadFile(
-                containerName: PrivateReleaseFiles,
-                path: file.Path(),
-                file: formFile
-            );
-        }
-
-        private async Task<Guid> UploadFileToTempStorage(
+        private async Task<File> GetAssociatedMetaFile(
             Guid releaseVersionId,
-            ZipArchiveEntry archiveEntry,
-            FileType fileType,
-            CancellationToken cancellationToken)
-        {
-            var fileId = Guid.NewGuid();
-            var path = $"{FileStoragePathUtils.FilesPath(releaseVersionId, fileType)}{fileId}";
-
-            await privateBlobStorageService.UploadStream(
-                containerName: PrivateReleaseTempFiles,
-                path: path,
-                stream: archiveEntry.Open(),
-                contentType: ContentTypes.Csv,
-                cancellationToken: cancellationToken);
-
-            return fileId;
-        }
-
-        private async Task<File> GetAssociatedMetaFile(Guid releaseVersionId,
             File dataFile)
         {
             return await contentDbContext.ReleaseFiles
                 .Include(rf => rf.File)
-                .Where(rf => rf.ReleaseVersionId == releaseVersionId
-                    && rf.File.Type == FileType.Metadata
-                    && rf.File.SubjectId == dataFile.SubjectId)
+                .Where(
+                    rf => rf.ReleaseVersionId == releaseVersionId &&
+                    rf.File.Type == FileType.Metadata &&
+                    rf.File.SubjectId == dataFile.SubjectId)
                 .Select(rf => rf.File)
                 .SingleAsync();
-        }
-
-        private async Task<int> GetNextDataFileOrder(
-            Guid releaseVersionId,
-            ReleaseFile? replacedReleaseDataFile = null)
-        {
-            if (replacedReleaseDataFile != null)
-            {
-                return replacedReleaseDataFile.Order;
-            }
-
-            var currentMaxOrder = await contentDbContext.ReleaseFiles
-                .Include(releaseFile => releaseFile.File)
-                .Where(releaseFile => releaseFile.ReleaseVersionId == releaseVersionId
-                                      && releaseFile.File.Type == FileType.Data
-                                      && releaseFile.File.ReplacingId == null)
-                .MaxAsync(releaseFile => (int?)releaseFile.Order);
-
-            return currentMaxOrder.HasValue ? currentMaxOrder.Value + 1 : 0;
-        }
-        private async Task<ReleaseFile?> GetReplacedReleaseFile(Guid releaseVersionId, File replacingFile)
-        {
-            return await contentDbContext.ReleaseFiles
-                .Include(rf => rf.File)
-                .SingleAsync(rf =>
-                    rf.ReleaseVersionId == releaseVersionId
-                    && rf.File.Type == FileType.Data
-                    && rf.File.Id == replacingFile.Id);
         }
     }
 }

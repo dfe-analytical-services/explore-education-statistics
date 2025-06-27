@@ -76,7 +76,7 @@ public class PublicationCacheServiceTests : CacheServiceTestFixture
 
         PublicBlobCacheService
             .Setup(s => s.GetItemAsync(cacheKey, typeof(PublicationCacheViewModel)))
-            .ReturnsAsync(null);
+            .ReturnsAsync((object?)null);
 
         PublicBlobCacheService
             .Setup(s => s.SetItemAsync<object>(cacheKey, _publicationViewModel))
@@ -122,7 +122,7 @@ public class PublicationCacheServiceTests : CacheServiceTestFixture
 
         PublicBlobCacheService
             .Setup(s => s.GetItemAsync(cacheKey, typeof(PublicationCacheViewModel)))
-            .ReturnsAsync(null);
+            .ReturnsAsync((object?)null);
 
         var publicationService = new Mock<IPublicationService>(Strict);
 
@@ -155,7 +155,7 @@ public class PublicationCacheServiceTests : CacheServiceTestFixture
         PublicBlobCacheService
             .Setup(s => s.GetItemAsync(
                 new PublicationTreeCacheKey(), typeof(IList<PublicationTreeThemeViewModel>)))
-            .ReturnsAsync(null);
+            .ReturnsAsync((object?)null);
 
         var publicationService = new Mock<IPublicationService>(Strict);
 
