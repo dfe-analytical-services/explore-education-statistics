@@ -13,6 +13,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services;
 
 public class UserPublicationRoleRepository(ContentDbContext contentDbContext, INewPermissionsSystemHelper newPermissionsSystemHelper) : IUserPublicationRoleRepository
 {
+    // This method will remain but be amended slightly in EES-6196, when we no longer have to cater for
+    // the old roles.
     public async Task<UserPublicationRole> Create(
         Guid userId,
         Guid publicationId,
@@ -147,11 +149,24 @@ public class UserPublicationRoleRepository(ContentDbContext contentDbContext, IN
         };
     }
 
+    // This method will mostly likely remain but be amended slightly in EES-6196, when we no longer have to cater for the old roles.
     public async Task Remove(UserPublicationRole userPublicationRole, CancellationToken cancellationToken = default)
     {
-        contentDbContext.UserPublicationRoles.Remove(userPublicationRole);
+        await RemoveRole(userPublicationRole, cancellationToken);
+        
+        if (userPublicationRole.Role.IsNewPermissionsSystemPublicationRole())
+        {
+            return;
+        }
+        
+        var newSystemPublicationRoleToRemove = await newPermissionsSystemHelper.DetermineNewPermissionsSystemRoleToDelete(userPublicationRole);
 
-        await contentDbContext.SaveChangesAsync(cancellationToken);
+        if (newSystemPublicationRoleToRemove is null)
+        {
+            return;
+        }
+
+        await RemoveRole(newSystemPublicationRoleToRemove, cancellationToken);
     }
 
     public async Task RemoveMany(
@@ -252,5 +267,12 @@ public class UserPublicationRoleRepository(ContentDbContext contentDbContext, IN
         await contentDbContext.SaveChangesAsync(cancellationToken);
 
         return newUserPublicationRole;
+    }
+
+    private async Task RemoveRole(UserPublicationRole userPublicationRole, CancellationToken cancellationToken)
+    {
+        contentDbContext.UserPublicationRoles.Remove(userPublicationRole);
+
+        await contentDbContext.SaveChangesAsync(cancellationToken);
     }
 }
