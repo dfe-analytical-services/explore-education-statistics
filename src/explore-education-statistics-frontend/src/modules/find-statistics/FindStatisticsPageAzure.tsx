@@ -245,7 +245,7 @@ const FindStatisticsPage: NextPage = () => {
           </p>
           <SearchForm
             label="Search publications"
-            value={search}
+            // value={search}
             onSubmit={nextValue =>
               handleChangeFilter({ filterType: 'search', nextValue })
             }
