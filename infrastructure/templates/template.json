@@ -1145,6 +1145,7 @@
     "searchDocsFunctionPrivateEndpointsSubnetName": "[concat(parameters('subscription'), '-', parameters('environment'), '-snet-fa-searchdocs-pep')]",
     "searchStoragePrivateEndpointsSubnetName": "[concat(parameters('subscription'), '-', parameters('environment'), '-snet-sa-search-pep')]",
     "containerAppEnvironmentSubnetName": "[concat(parameters('subscription'), '-', parameters('environment'), '-snet-cae-01')]",
+    "eventGridCustomTopicPrivateEndpointsSubnetName": "[concat(parameters('subscription'), '-', parameters('environment'), '-snet-evgt-pep')]",
     "applicationGatewaySubnetName": "[concat(parameters('subscription'), '-', parameters('environment'), '-snet-agw-01')]",
     "psqlFlexibleServerSubnetName": "[concat(parameters('subscription'), '-', parameters('environment'), '-snet-psql-flexibleserver')]",
     "screenerFunctionAppSubnetName": "[concat(parameters('subscription'), '-', parameters('environment'), '-sapi-snet-fa-screener')]",
@@ -3876,6 +3877,12 @@
                   }
                 }
               ]
+            }
+          },
+          {
+            "name": "[variables('eventGridCustomTopicPrivateEndpointsSubnetName')]",
+            "properties": {
+              "addressPrefix": "10.0.20.0/24"
             }
           }
         ]

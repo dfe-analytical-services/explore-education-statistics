@@ -1,4 +1,5 @@
-import { PrivateDnsZone, dnsZones } from '../types.bicep'
+import { PrivateDnsZone } from '../types.bicep'
+import { dnsZones } from '../dnsZones.bicep'
 
 @description('Specifies the name of the service being connected via private endpoint')
 @minLength(0)

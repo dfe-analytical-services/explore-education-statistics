@@ -326,44 +326,6 @@ type ContainerAppWorkloadProfile = {
 }
 
 @export()
-type PrivateDnsZone = 
-  | 'fileService'
-  | 'blobStorage'
-  | 'queue'
-  | 'tableStorage'
-  | 'postgres'
-  | 'sites'
-  | 'custom'
-
-@export()
-var dnsZones = {
-  sites: {
-    zoneName: 'privatelink.azurewebsites.net'
-    dnsGroup: 'sites'
-  }
-  postgres: {
-    zoneName: 'privatelink.postgres.database.azure.com'
-    dnsGroup: 'postgresqlServer'
-  }
-  fileService: {
-    zoneName: 'privatelink.file.${environment().suffixes.storage}'
-    dnsGroup: 'file'
-  }
-  blobStorage: {
-    zoneName: 'privatelink.blob.${environment().suffixes.storage}'
-    dnsGroup: 'blob'
-  }
-  queue: {
-    zoneName: 'privatelink.queue.${environment().suffixes.storage}'
-    dnsGroup: 'queue'
-  }
-  tableStorage: {
-    zoneName: 'privatelink.table.${environment().suffixes.storage}'
-    dnsGroup: 'table'
-  }
-}
-
-@export()
 type StorageAccountPrivateEndpoints = {
   file: string?
   blob: string?

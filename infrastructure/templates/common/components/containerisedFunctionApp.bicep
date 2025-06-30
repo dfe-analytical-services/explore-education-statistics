@@ -342,7 +342,7 @@ resource azureStorageAccountsConfig 'Microsoft.Web/sites/config@2023-12-01' = {
   )
 }
 
-module privateEndpointModule '../../public-api/components/privateEndpoint.bicep' = if (privateEndpoints.?functionApp != null) {
+module privateEndpointModule 'privateEndpoint.bicep' = if (privateEndpoints.?functionApp != null) {
   name: '${functionAppName}PrivateEndpointDeploy'
   params: {
     serviceId: functionApp.id

@@ -66,6 +66,7 @@ var resourceNames = {
     vNet: '${subscription}-${abbreviations.networkVirtualNetworks}-ees'
     alertsGroup: '${subscription}-${abbreviations.insightsActionGroups}-ees-alertedusers'
     subnets: {
+      eventGridCustomTopicPrivateEndpoints: '${resourcePrefix}-${abbreviations.networkVirtualNetworksSubnets}-${abbreviations.eventGridTopics}-pep'
       searchDocsFunction: '${resourcePrefix}-${abbreviations.networkVirtualNetworksSubnets}-${abbreviations.webSitesFunctions}-searchdocs'
       searchDocsFunctionPrivateEndpoints: '${resourcePrefix}-${abbreviations.networkVirtualNetworksSubnets}-${abbreviations.webSitesFunctions}-searchdocs-pep'
       searchStoragePrivateEndpoints: '${resourcePrefix}-${abbreviations.networkVirtualNetworksSubnets}-${abbreviations.storageStorageAccounts}-search-pep'
@@ -88,13 +89,20 @@ module monitoringModule 'application/monitoring.bicep' = {
 // other services that publish events but are not yet defined in Bicep such as the Admin App Service
 // and the Publisher Function App.
 // The Search Service relies on this infrastructure to subscribe to events.
-module eventMessagingModule 'application/eventMessaging.bicep' = {
+module eventMessagingModule '../common/application/eventMessaging.bicep' = {
   name: 'eventMessagingModuleDeploy'
   params: {
     location: location
-    ipRules: [] // TODO EES-6036 Should be maintenanceIpRanges
     resourcePrefix: resourcePrefix
-    resourceNames: resourceNames
+    resourceNames: {
+      adminApp: resourceNames.existingResources.adminApp
+      alertsGroup: resourceNames.existingResources.alertsGroup
+      publisherFunction: resourceNames.existingResources.publisherFunction
+      vNet: resourceNames.existingResources.vNet
+      subnets: {
+        eventGridCustomTopicPrivateEndpoints: resourceNames.existingResources.subnets.eventGridCustomTopicPrivateEndpoints
+      }
+    }
     tagValues: tagValues
   }
 }
