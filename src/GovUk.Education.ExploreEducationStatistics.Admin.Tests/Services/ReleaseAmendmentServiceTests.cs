@@ -445,7 +445,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Null(amendment.LatestInternalReleaseNote);
 
                 Assert.NotEqual(originalReleaseVersion.Created, amendment.Created);
-                amendment.Created.AssertUtcNow(withinMillis: 1500);
+                amendment.Created.AssertUtcNow();
 
                 // Check Related Information links have been copied over.
                 Assert.Equal(2, amendment.RelatedInformation.Count);
@@ -689,7 +689,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     ]);
 
                 Assert.NotEqual(releaseSubject.Created, releaseSubjectAmendment.Created);
-                releaseSubjectAmendment.Created.AssertUtcNow(withinMillis: 1500);
+                releaseSubjectAmendment.Created.AssertUtcNow();
 
                 Assert.Null(releaseSubjectAmendment.Updated);
 
@@ -1126,7 +1126,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             Assert.Equal(amendment.Id, amendedUpdate.ReleaseVersionId);
 
             Assert.NotEqual(originalUpdate.Created, amendedUpdate.Created);
-            amendedUpdate.Created.AssertUtcNow(withinMillis: 1500);
+            amendedUpdate.Created.AssertUtcNow();
 
             Assert.Equal(_userId, amendedUpdate.CreatedById);
         }
@@ -1177,7 +1177,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             Assert.Equal(amendment.Id, amendedReleaseRole.ReleaseVersionId);
             Assert.Equal(originalReleaseRole.UserId, amendedReleaseRole.UserId);
             Assert.Equal(originalReleaseRole.Role, amendedReleaseRole.Role);
-            amendedReleaseRole.Created.AssertUtcNow(withinMillis: 1500);
+            amendedReleaseRole.Created.AssertUtcNow();
             Assert.Equal(originalReleaseRole.CreatedById, amendedReleaseRole.CreatedById);
             Assert.Equal(originalReleaseRole.Deleted, amendedReleaseRole.Deleted);
             Assert.Equal(originalReleaseRole.DeletedById, amendedReleaseRole.DeletedById);
