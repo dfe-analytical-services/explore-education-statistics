@@ -15,7 +15,8 @@ public static class UserPublicationInviteGeneratorExtensions
         Publication publication)
         => generator.ForInstance(s => s.SetPublication(publication));
 
-    public static Generator<UserPublicationInvite> WithRole(this Generator<UserPublicationInvite> generator, PublicationRole role)
+    public static Generator<UserPublicationInvite> WithRole(this Generator<UserPublicationInvite> generator, 
+        PublicationRole role)
         => generator.ForInstance(s => s.SetRole(role));
 
     public static Generator<UserPublicationInvite> WithRoles(this Generator<UserPublicationInvite> generator,
