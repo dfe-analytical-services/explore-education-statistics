@@ -89,6 +89,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
         public virtual DbSet<PageFeedback> PageFeedback { get; set; }
         public virtual DbSet<ReleasePublishingFeedback> ReleasePublishingFeedback { get; set; }
 
+        // This will be removed when we remove all of the OLD publication roles from the 
+        // DB, in STEP 11 (EES-6212) of the Permissions Rework. For now, in certain situations,
+        // we need to be able to grab ALL of the publication roles (NEW permissions system roles & OLD permissions
+        // system roles) from the DB.
+        // For example, when we are removing an OLD permissions system role, we need to be able to fetch all of the
+        // OLD and NEW permissions system roles for a user, so that we can determine if the user has any NEW roles 
+        // which also need deleting. This will beecome apparent in STEP 6 (EES-6148) of the Permissions Rework.
+        public IQueryable<UserPublicationRole> AllUserPublicationRoles =>
+            UserPublicationRoles
+            .IgnoreQueryFilters()
+            .Where(PublicationRoleIsNotSoftDeleted);
+
+        private static Expression<Func<UserPublicationRole, bool>> PublicationRoleIsNotSoftDeleted =>
+            userPublicationRole => userPublicationRole.Deleted == null;
+
         [DbFunction]
         public virtual IQueryable<FreeTextRank> PublicationsFreeTextTable(string searchTerm) =>
             FromExpression(() => PublicationsFreeTextTable(searchTerm));
