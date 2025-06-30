@@ -14,7 +14,7 @@ interface Props {
   publicationId: string;
   releaseVersionId: string;
   testId?: string;
-  onConfirmAction?: () => void;
+  onConfirmReplacement?: () => void;
   onDeleteUpload: (deletedUploadId: string) => void;
   onDataSetImport: (dataSetImportIds: string[]) => void;
 }
@@ -26,7 +26,7 @@ export default function DataFilesReplacementTable({
   publicationId,
   releaseVersionId,
   testId,
-  onConfirmAction,
+  onConfirmReplacement,
   onDeleteUpload,
   onDataSetImport,
 }: Props) {
@@ -50,7 +50,7 @@ export default function DataFilesReplacementTable({
             key={dataFile.title}
             publicationId={publicationId}
             releaseVersionId={releaseVersionId}
-            onConfirmAction={onConfirmAction}
+            onConfirmAction={onConfirmReplacement}
           />
         ))}
         {dataSetUploads.map(upload => (
