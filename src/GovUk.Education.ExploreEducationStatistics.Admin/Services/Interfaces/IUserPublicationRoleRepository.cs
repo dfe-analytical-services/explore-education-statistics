@@ -24,6 +24,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 
         Task<UserPublicationRole?> GetUserPublicationRole(Guid userId, Guid publicationId, PublicationRole role);
 
+        Task<IReadOnlyList<UserPublicationRole>> ListUserPublicationRolesByUserAndPublication(Guid userId, Guid publicationId);
+
         Task Remove(UserPublicationRole userPublicationRole, Guid deletedById);
 
         Task RemoveMany(List<UserPublicationRole> userPublicationRoles, Guid deletedById);

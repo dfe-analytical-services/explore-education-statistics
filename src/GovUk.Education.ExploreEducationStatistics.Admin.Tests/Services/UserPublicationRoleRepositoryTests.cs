@@ -10,6 +10,7 @@ using Microsoft.EntityFrameworkCore;
 using Moq;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 
@@ -379,6 +380,133 @@ public class UserPublicationRoleRepositoryTests
         Assert.Equal(newPublicationRoleToCreate, createdNewPublicationRole.Role);
         createdNewPublicationRole.Created.AssertUtcNow();
         Assert.Equal(createdBy.Id, createdNewPublicationRole.CreatedById);
+    }
+
+    [Fact]
+    public async Task Remove_OldRole_NoNewPermissionsSystemPublicationRoleToRemove()
+    {
+        var oldPublicationRoleToDelete = PublicationRole.Owner;
+
+        var user = new User();
+        var deletedById = Guid.NewGuid();
+        var publication = _fixture.DefaultPublication()
+            .Generate();
+        var oldUserPublicationRole = _fixture.DefaultUserPublicationRole()
+            .WithRole(oldPublicationRoleToDelete)
+            .WithUser(user)
+            .WithPublication(publication)
+            .Generate();
+
+        await using var contentDbContext = InMemoryApplicationDbContext();
+
+        contentDbContext.UserPublicationRoles.Add(oldUserPublicationRole);
+        await contentDbContext.SaveChangesAsync();
+
+        var newPermissionsSystemHelperMock = new Mock<INewPermissionsSystemHelper>();
+        newPermissionsSystemHelperMock
+            .Setup(rvr => rvr.DetermineNewPermissionsSystemRoleToDelete(
+                oldUserPublicationRole))
+            .ReturnsAsync((UserPublicationRole?)null);
+
+        var service = SetupUserPublicationRoleRepository(
+            contentDbContext: contentDbContext,
+            newPermissionsSystemHelper: newPermissionsSystemHelperMock.Object);
+
+        await service.Remove(oldUserPublicationRole, deletedById);
+
+        var updatedPublicationRolesIgnoringQueryFilters = await contentDbContext.UserPublicationRoles
+            .IgnoreQueryFilters()
+            .ToListAsync();
+
+        // The existing role should have been hard-deleted
+        Assert.Empty(updatedPublicationRolesIgnoringQueryFilters);
+    }
+
+    [Fact]
+    public async Task Remove_OldRole_NewPermissionsSystemPublicationRoleToRemove()
+    {
+        var oldPublicationRoleToDelete = PublicationRole.Owner;
+        var newPublicationRoleToDelete = PublicationRole.Drafter;
+
+        var user = new User();
+        var deletedById = Guid.NewGuid();
+        var publication = _fixture.DefaultPublication()
+            .Generate();
+        var oldUserPublicationRole = _fixture.DefaultUserPublicationRole()
+            .WithRole(oldPublicationRoleToDelete)
+            .WithUser(user)
+            .WithPublication(publication)
+            .Generate();
+        var newUserPublicationRole = _fixture.DefaultUserPublicationRole()
+            .WithRole(newPublicationRoleToDelete)
+            .WithUser(user)
+            .WithPublication(publication)
+            .Generate();
+
+        await using var contentDbContext = InMemoryApplicationDbContext();
+
+        contentDbContext.UserPublicationRoles.AddRange(oldUserPublicationRole, newUserPublicationRole);
+        await contentDbContext.SaveChangesAsync();
+
+        var newPermissionsSystemHelperMock = new Mock<INewPermissionsSystemHelper>();
+        newPermissionsSystemHelperMock
+            .Setup(rvr => rvr.DetermineNewPermissionsSystemRoleToDelete(
+                oldUserPublicationRole))
+            .ReturnsAsync(newUserPublicationRole);
+
+        var service = SetupUserPublicationRoleRepository(
+            contentDbContext: contentDbContext,
+            newPermissionsSystemHelper: newPermissionsSystemHelperMock.Object);
+
+        await service.Remove(oldUserPublicationRole, deletedById);
+
+        var updatedPublicationRolesIgnoringQueryFilters = await contentDbContext.UserPublicationRoles
+            .IgnoreQueryFilters()
+            .ToListAsync();
+
+        // Both roles should have been hard-deleted
+        Assert.Empty(updatedPublicationRolesIgnoringQueryFilters);
+    }
+
+    [Fact]
+    public async Task Remove_NewRole()
+    {
+        var newPublicationRoleToDelete = PublicationRole.Drafter;
+
+        var user = new User();
+        var deletedById = Guid.NewGuid();
+        var publication = _fixture.DefaultPublication()
+            .Generate();
+        var newUserPublicationRole = _fixture.DefaultUserPublicationRole()
+            .WithRole(newPublicationRoleToDelete)
+            .WithUser(user)
+            .WithPublication(publication)
+            .Generate();
+
+        await using var contentDbContext = InMemoryApplicationDbContext();
+
+        contentDbContext.UserPublicationRoles.Add(newUserPublicationRole);
+        await contentDbContext.SaveChangesAsync();
+
+        var newPermissionsSystemHelperMock = new Mock<INewPermissionsSystemHelper>();
+
+        var service = SetupUserPublicationRoleRepository(
+            contentDbContext: contentDbContext,
+            newPermissionsSystemHelper: newPermissionsSystemHelperMock.Object);
+
+        await service.Remove(newUserPublicationRole, deletedById);
+
+        var updatedPublicationRolesIgnoringQueryFilters = await contentDbContext.UserPublicationRoles
+            .IgnoreQueryFilters()
+            .ToListAsync();
+
+        // The existing new role should have been hard-deleted
+        Assert.Empty(updatedPublicationRolesIgnoringQueryFilters);
+
+        // Should have exited early and not called the NewPermissionsSystemHelper
+        newPermissionsSystemHelperMock
+            .Verify(mock => mock.DetermineNewPermissionsSystemRoleToDelete(
+                It.IsAny<UserPublicationRole>()), Times.Never);
     }
 
     [Fact]

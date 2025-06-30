@@ -16,7 +16,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         IUserPublicationRoleRepository userPublicationRoleRepository) :
         AbstractUserResourceRoleRepository<UserReleaseRole, ReleaseVersion, ReleaseRole>(contentDbContext), IUserReleaseRoleRepository
     {
-        public async Task<UserReleaseRole> Create(Guid userId, Guid releaseVersionId, ReleaseRole releaseRole, Guid createdById)
+        // This class will mostly likely remain but be amended slightly in EES-6196, when we no longer have to cater for the old roles.
+        public new async Task<UserReleaseRole> Create(Guid userId, Guid releaseVersionId, ReleaseRole releaseRole, Guid createdById)
         {
             var publicationId = await ContentDbContext
                 .ReleaseVersions
@@ -25,7 +26,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .SingleAsync();
 
             var (newSystemPublicationRoleToRemove, newSystemPublicationRoleToCreate) = 
-                await newPermissionsSystemHelper.DetermineNewPermissionsSystemChanges(releaseRole, userId, publicationId);
+                await newPermissionsSystemHelper.DetermineNewPermissionsSystemChanges(
+                    releaseRoleToCreate: releaseRole,
+                    userId: userId,
+                    publicationId: publicationId);
 
             if (newSystemPublicationRoleToRemove.HasValue)
             {
@@ -51,6 +55,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 resourceId: releaseVersionId,
                 role: releaseRole,
                 createdById: createdById);
+        }
+
+        // This class will mostly likely remain but be amended slightly in EES-6196, when we no longer have to cater for the old roles.
+        public async Task Remove(UserReleaseRole userReleaseRole, Guid deletedById)
+        {
+            await SoftDeleteUserReleaseRole(
+                userReleaseRole: userReleaseRole,
+                deletedById: deletedById);
+
+            var newSystemPublicationRoleToRemove = await newPermissionsSystemHelper.DetermineNewPermissionsSystemRoleToDelete(userReleaseRole);
+
+            if (newSystemPublicationRoleToRemove is null)
+            {
+                return;
+            }
+
+            await userPublicationRoleRepository.Remove(
+                userPublicationRole: newSystemPublicationRoleToRemove,
+                deletedById: deletedById);
         }
 
         protected override IQueryable<UserReleaseRole> GetResourceRolesQueryByResourceId(Guid releaseVersionId)
@@ -127,6 +150,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         public Task<List<UserReleaseRole>> ListUserReleaseRoles(Guid releaseVersionId, ReleaseRole[]? rolesToInclude)
         {
             return ListResourceRoles(releaseVersionId, rolesToInclude);
+        }
+
+        public async Task<IReadOnlyList<UserReleaseRole>> ListUserReleaseRolesByUserAndPublication(Guid userId, Guid publicationId)
+        {
+            return await ContentDbContext
+                .UserReleaseRoles
+                .Where(urr => urr.UserId == userId)
+                .Where(urr => urr.ReleaseVersion.Release.PublicationId == publicationId)
+                .ToListAsync();
+        }
+
+        private async Task SoftDeleteUserReleaseRole(UserReleaseRole userReleaseRole, Guid deletedById)
+        {
+            userReleaseRole.Deleted = DateTime.UtcNow;
+            userReleaseRole.DeletedById = deletedById;
+            ContentDbContext.Update(userReleaseRole);
+            await ContentDbContext.SaveChangesAsync();
         }
     }
 }

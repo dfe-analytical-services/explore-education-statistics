@@ -36,6 +36,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
             Guid userId, Publication publication,
             ReleaseRole role, Guid deletedById);
 
+        Task<UserReleaseRole?> GetUserReleaseRole(Guid userId, Guid releaseVersionId, ReleaseRole role);
+
         Task<List<ReleaseRole>> GetDistinctRolesByUser(Guid userId);
 
         Task<List<ReleaseRole>> GetAllRolesByUserAndRelease(Guid userId,
@@ -46,6 +48,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 
         Task<List<UserReleaseRole>> ListUserReleaseRoles(Guid releaseVersionId,
             ReleaseRole[]? rolesToInclude);
+
+        Task<IReadOnlyList<UserReleaseRole>> ListUserReleaseRolesByUserAndPublication(Guid userId, Guid publicationId);
 
         Task<bool> HasUserReleaseRole(Guid userId,
             Guid releaseVersionId,

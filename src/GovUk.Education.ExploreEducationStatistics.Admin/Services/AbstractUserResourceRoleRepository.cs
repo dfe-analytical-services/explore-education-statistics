@@ -88,14 +88,6 @@ public abstract class AbstractUserResourceRoleRepository<TResourceRole, TResourc
         await ContentDbContext.SaveChangesAsync();
     }
 
-    public async Task Remove(TResourceRole resourceRole, Guid deletedById)
-    {
-        resourceRole.Deleted = DateTime.UtcNow;
-        resourceRole.DeletedById = deletedById;
-        ContentDbContext.Update(resourceRole);
-        await ContentDbContext.SaveChangesAsync();
-    }
-
     public async Task RemoveMany(List<TResourceRole> resourceRoles, Guid deletedById)
     {
         resourceRoles.ForEach(resourceRole =>
