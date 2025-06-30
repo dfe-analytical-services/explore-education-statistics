@@ -30,6 +30,6 @@ public class DataSetScreenerClient(HttpClient client) : IDataSetScreenerClient
 
         return response.IsSuccessStatusCode
             ? await response.Content.ReadFromJsonAsync<DataSetScreenerResponse>(cancellationToken)
-            : throw new Exception("Screening process failed");
+            : throw new Exception($"Screening process failed with status {response.StatusCode}");
     }
 }
