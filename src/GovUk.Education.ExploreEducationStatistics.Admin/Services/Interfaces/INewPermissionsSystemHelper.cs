@@ -1,3 +1,4 @@
+#nullable enable
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using System;
 using System.Threading.Tasks;
@@ -11,4 +12,8 @@ public interface INewPermissionsSystemHelper
 
     Task<(PublicationRole? newSystemPublicationRoleToRemove, PublicationRole? newSystemPublicationRoleToCreate)>
         DetermineNewPermissionsSystemChanges(ReleaseRole releaseRoleToCreate, Guid userId, Guid publicationId);
+
+    Task<UserPublicationRole?> DetermineNewPermissionsSystemRoleToDelete(UserPublicationRole oldUserPublicationRoleToDelete);
+
+    Task<UserPublicationRole?> DetermineNewPermissionsSystemRoleToDelete(UserReleaseRole userReleaseRoleToDelete);
 }

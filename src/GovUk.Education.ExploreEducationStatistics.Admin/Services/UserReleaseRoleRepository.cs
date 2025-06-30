@@ -15,6 +15,8 @@ public class UserReleaseRoleRepository(
     INewPermissionsSystemHelper newPermissionsSystemHelper,
     IUserPublicationRoleRepository userPublicationRoleRepository) : IUserReleaseRoleRepository
 {
+    // This method will remain but be amended slightly in EES-6196, when we no longer have to cater for
+    // the old roles.
     public async Task<UserReleaseRole> Create(
         Guid userId,
         Guid releaseVersionId,
@@ -129,11 +131,22 @@ public class UserReleaseRoleRepository(
             _ => throw new ArgumentOutOfRangeException(nameof(resourceRoleFilter), resourceRoleFilter, null),
         };
 
+    // This method will remain but be amended slightly in EES-6196, when we no longer have to cater
+    // for the old roles.
     public async Task Remove(UserReleaseRole userReleaseRole, CancellationToken cancellationToken = default)
     {
         contentDbContext.UserReleaseRoles.Remove(userReleaseRole);
 
         await contentDbContext.SaveChangesAsync(cancellationToken);
+
+        var newSystemPublicationRoleToRemove = await newPermissionsSystemHelper.DetermineNewPermissionsSystemRoleToDelete(userReleaseRole);
+
+        if (newSystemPublicationRoleToRemove is null)
+        {
+            return;
+        }
+
+        await userPublicationRoleRepository.Remove(newSystemPublicationRoleToRemove, cancellationToken);
     }
 
     public async Task RemoveMany(
