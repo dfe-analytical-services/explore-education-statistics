@@ -10,6 +10,11 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Moq;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 
@@ -141,16 +146,16 @@ public abstract class UserReleaseRoleRepositoryTests
                     publication.Id,
                     newPublicationRoleToRemove))
                 .ReturnsAsync(existingPublicationRole);
-            //userPublicationRoleRepositoryMock
-            //    .Setup(rvr => rvr.Remove(
-            //        existingPublicationRole,
-            //        createdBy.Id));
-            //userPublicationRoleRepositoryMock
-            //    .Setup(rvr => rvr.TryCreate(
-            //        user.Id,
-            //        publication.Id,
-            //        newPublicationRoleToCreate,
-            //        createdBy.Id));
+            userPublicationRoleRepositoryMock
+                .Setup(rvr => rvr.Remove(
+                    existingPublicationRole,
+                    It.IsAny<CancellationToken>()));
+            userPublicationRoleRepositoryMock
+                .Setup(rvr => rvr.TryCreate(
+                    user.Id,
+                    publication.Id,
+                    newPublicationRoleToCreate,
+                    createdBy.Id));
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
@@ -201,6 +206,20 @@ public abstract class UserReleaseRoleRepositoryTests
                 createdNewPublicationRole.Created.AssertUtcNow();
                 Assert.Equal(createdBy.Id, createdNewPublicationRole.CreatedById);
             }
+
+            // Should have tried to remove the existing publication role
+            userPublicationRoleRepositoryMock.Verify(
+                mock => mock.Remove(existingPublicationRole, It.IsAny<CancellationToken>()),
+                Times.Once);
+
+            // Should have tried to create the new 'Approver' publication role
+            userPublicationRoleRepositoryMock.Verify(
+                mock => mock.TryCreate(
+                    user.Id,
+                    publication.Id,
+                    newPublicationRoleToCreate,
+                    createdBy.Id),
+                Times.Once);
         }
 
         [Fact]
@@ -236,12 +255,12 @@ public abstract class UserReleaseRoleRepositoryTests
                 .ReturnsAsync((null, newPublicationRoleToCreate));
 
             var userPublicationRoleRepositoryMock = new Mock<IUserPublicationRoleRepository>();
-            //userPublicationRoleRepositoryMock
-            //    .Setup(rvr => rvr.TryCreate(
-            //        user.Id,
-            //        publication.Id,
-            //        newPublicationRoleToCreate,
-            //        createdBy.Id));
+            userPublicationRoleRepositoryMock
+                .Setup(rvr => rvr.TryCreate(
+                    user.Id,
+                    publication.Id,
+                    newPublicationRoleToCreate,
+                    createdBy.Id));
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
@@ -291,6 +310,20 @@ public abstract class UserReleaseRoleRepositoryTests
                 createdNewPublicationRole.Created.AssertUtcNow();
                 Assert.Equal(createdBy.Id, createdNewPublicationRole.CreatedById);
             }
+
+            // Should not have tried to remove any existing publication role
+            userPublicationRoleRepositoryMock.Verify(
+                mock => mock.Remove(It.IsAny<UserPublicationRole>(), It.IsAny<CancellationToken>()),
+                Times.Never);
+
+            // Should have tried to create the new 'Approver' publication role
+            userPublicationRoleRepositoryMock.Verify(
+                mock => mock.TryCreate(
+                    user.Id,
+                    publication.Id,
+                    newPublicationRoleToCreate,
+                    createdBy.Id),
+                Times.Once);
         }
     }
 
@@ -886,37 +919,46 @@ public abstract class UserReleaseRoleRepositoryTests
     public class RemoveTests : UserReleaseRoleRepositoryTests
     {
         [Fact]
-        public async Task Success()
+        public async Task Remove_NoNewPermissionsSystemPublicationRoleToRemove()
         {
-            var email = "test@test.com";
+            var releaseRoleToDelete = ReleaseRole.Approver;
 
+            var user = new User();
+            var deletedById = Guid.NewGuid();
+            var releaseVersion = _fixture.DefaultReleaseVersion()
+                .WithRelease(_fixture.DefaultRelease()
+                    .WithPublication(_fixture.DefaultPublication()))
+                .Generate();
             var userReleaseRole = _fixture.DefaultUserReleaseRole()
-                .WithUser(new User
-                {
-                    Email = email
-                })
-                .WithReleaseVersion(_fixture.DefaultReleaseVersion()
-                    .WithRelease(_fixture.DefaultRelease()
-                        .WithPublication(_fixture.DefaultPublication())))
-                .WithRole(ReleaseRole.Approver)
+                .WithRole(releaseRoleToDelete)
+                .WithUser(user)
+                .WithReleaseVersion(releaseVersion)
                 .Generate();
 
             var contentDbContextId = Guid.NewGuid().ToString();
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                contentDbContext.Add(userReleaseRole);
+                contentDbContext.UserReleaseRoles.Add(userReleaseRole);
                 await contentDbContext.SaveChangesAsync();
             }
 
+            var newPermissionsSystemHelperMock = new Mock<INewPermissionsSystemHelper>();
+            newPermissionsSystemHelperMock
+                .Setup(rvr => rvr.DetermineNewPermissionsSystemRoleToDelete(
+                    userReleaseRole))
+                .ReturnsAsync((UserPublicationRole?)null);
+
+            var userPublicationRoleRepositoryMock = new Mock<IUserPublicationRoleRepository>();
+
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var service = CreateRepository(contentDbContext);
+                var repository = CreateRepository(
+                    contentDbContext: contentDbContext,
+                    newPermissionsSystemHelper: newPermissionsSystemHelperMock.Object,
+                    userPublicationRoleRepository: userPublicationRoleRepositoryMock.Object);
 
-                var userReleaseRoleToRemove = await contentDbContext.UserReleaseRoles
-                    .SingleAsync(urr => urr.Id == userReleaseRole.Id);
-
-                await service.Remove(userReleaseRoleToRemove);
+                await repository.Remove(userReleaseRole);
             }
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -925,7 +967,102 @@ public abstract class UserReleaseRoleRepositoryTests
                     .SingleOrDefaultAsync(urr => urr.Id == userReleaseRole.Id);
 
                 Assert.Null(updatedReleaseRole);
+
+                var updatedReleaseRoleIgnoringQueryFilters = await contentDbContext.UserReleaseRoles
+                    .IgnoreQueryFilters()
+                    .SingleOrDefaultAsync(urr => urr.Id == userReleaseRole.Id);
+
+                Assert.NotNull(updatedReleaseRoleIgnoringQueryFilters);
+                Assert.Equal(userReleaseRole.ReleaseVersionId,
+                    updatedReleaseRoleIgnoringQueryFilters!.ReleaseVersionId);
+                Assert.Equal(userReleaseRole.Role, updatedReleaseRoleIgnoringQueryFilters.Role);
+                updatedReleaseRoleIgnoringQueryFilters.Deleted.AssertUtcNow();
+                Assert.Equal(deletedById, updatedReleaseRoleIgnoringQueryFilters.DeletedById);
             }
+
+            // Should not have tried to remove any publication roles
+            userPublicationRoleRepositoryMock.Verify(
+                mock => mock.Remove(It.IsAny<UserPublicationRole>(), It.IsAny<CancellationToken>()),
+                Times.Never);
+        }
+
+        [Fact]
+        public async Task Remove_NewPermissionsSystemPublicationRoleToRemove()
+        {
+            var releaseRoleToDelete = ReleaseRole.Approver;
+            var newPublicationRoleToDelete = PublicationRole.Approver;
+
+            var user = new User();
+            var publication = _fixture.DefaultPublication()
+                .Generate();
+            var releaseVersion = _fixture.DefaultReleaseVersion()
+                .WithRelease(_fixture.DefaultRelease()
+                    .WithPublication(publication))
+                .Generate();
+            var userReleaseRole = _fixture.DefaultUserReleaseRole()
+                .WithRole(releaseRoleToDelete)
+                .WithUser(user)
+                .WithReleaseVersion(releaseVersion)
+                .Generate();
+            var userPublicationRole = _fixture.DefaultUserPublicationRole()
+                .WithRole(newPublicationRoleToDelete)
+                .WithUser(user)
+                .WithPublication(publication)
+                .Generate();
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                contentDbContext.UserReleaseRoles.Add(userReleaseRole);
+                contentDbContext.UserPublicationRoles.Add(userPublicationRole);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            var newPermissionsSystemHelperMock = new Mock<INewPermissionsSystemHelper>();
+            newPermissionsSystemHelperMock
+                .Setup(rvr => rvr.DetermineNewPermissionsSystemRoleToDelete(
+                    userReleaseRole))
+                .ReturnsAsync(userPublicationRole);
+
+            var userPublicationRoleRepositoryMock = new Mock<IUserPublicationRoleRepository>();
+            userPublicationRoleRepositoryMock
+                .Setup(rvr => rvr.Remove(
+                    userPublicationRole,
+                    It.IsAny<CancellationToken>()));
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var repository = CreateRepository(
+                    contentDbContext: contentDbContext,
+                    newPermissionsSystemHelper: newPermissionsSystemHelperMock.Object,
+                    userPublicationRoleRepository: userPublicationRoleRepositoryMock.Object);
+
+                await repository.Remove(userReleaseRole);
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var updatedReleaseRole = await contentDbContext.UserReleaseRoles
+                    .SingleOrDefaultAsync(urr => urr.Id == userReleaseRole.Id);
+
+                Assert.Null(updatedReleaseRole);
+
+                var updatedReleaseRoleIgnoringQueryFilters = await contentDbContext.UserReleaseRoles
+                    .IgnoreQueryFilters()
+                    .SingleOrDefaultAsync(urr => urr.Id == userReleaseRole.Id);
+
+                Assert.NotNull(updatedReleaseRoleIgnoringQueryFilters);
+                Assert.Equal(userReleaseRole.ReleaseVersionId,
+                    updatedReleaseRoleIgnoringQueryFilters!.ReleaseVersionId);
+                Assert.Equal(userReleaseRole.Role, updatedReleaseRoleIgnoringQueryFilters.Role);
+                updatedReleaseRoleIgnoringQueryFilters.Deleted.AssertUtcNow();
+            }
+
+            // Should have tried to remove the existing publication role
+            userPublicationRoleRepositoryMock.Verify(
+                mock => mock.Remove(userPublicationRole, It.IsAny<CancellationToken>()),
+                Times.Once);
         }
     }
 

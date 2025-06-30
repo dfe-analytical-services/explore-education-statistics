@@ -20,6 +20,8 @@ public interface IUserPublicationRoleRepository
         Guid userId,
         Guid publicationId,
         PublicationRole role);
+    
+    Task<IReadOnlyList<UserPublicationRole>> ListUserPublicationRolesByUserAndPublication(Guid userId, Guid publicationId);
 
     Task<bool> UserHasRoleOnPublication(
         Guid userId,
@@ -29,7 +31,7 @@ public interface IUserPublicationRoleRepository
     Task Remove(
         UserPublicationRole userPublicationRole,
         CancellationToken cancellationToken = default);
-
+        
     Task RemoveMany(
         IReadOnlyList<UserPublicationRole> userPublicationRoles,
         CancellationToken cancellationToken = default);
