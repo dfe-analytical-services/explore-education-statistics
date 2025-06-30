@@ -31,6 +31,8 @@ public static class DbContextTestExtensions
                 await context.Database.ExecuteSqlRawAsync($"""ALTER SEQUENCE "{sequence.Name}" RESTART WITH 1;""");
             }
 #pragma warning restore EF1002
+            
+            context.ChangeTracker.Clear();
         }
         else
         {

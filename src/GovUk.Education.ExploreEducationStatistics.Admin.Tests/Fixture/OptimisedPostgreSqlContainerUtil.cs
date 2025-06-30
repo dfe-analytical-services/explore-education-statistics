@@ -11,7 +11,7 @@ public class OptimisedPostgreSqlContainerUtil
 {
     private readonly PostgreSqlContainer _postgreSqlContainer = new PostgreSqlBuilder()
         .WithImage("postgres:16.1-alpine")
-        .WithReuse(true)
+        // .WithReuse(true)
         .Build();
 
     public async Task Start()
@@ -29,11 +29,11 @@ public class OptimisedPostgreSqlContainerUtil
         await _postgreSqlContainer.StopAsync();
     }
 
-    // public PublicDataDbContext GetPublicDataDbContext()
-    // {
-    //     var services = new ServiceCollection();
-    //     services.AddDbContext<PublicDataDbContext>(
-    //         options => options.UseNpgsql(_postgreSqlContainer.GetConnectionString()));
-    //     return services.BuildServiceProvider().GetRequiredService<PublicDataDbContext>();
-    // }
+    public PublicDataDbContext GetPublicDataDbContext()
+    {
+        var services = new ServiceCollection();
+        services.AddDbContext<PublicDataDbContext>(
+            options => options.UseNpgsql(_postgreSqlContainer.GetConnectionString()));
+        return services.BuildServiceProvider().GetRequiredService<PublicDataDbContext>();
+    }
 }

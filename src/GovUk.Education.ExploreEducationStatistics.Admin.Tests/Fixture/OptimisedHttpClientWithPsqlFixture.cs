@@ -5,6 +5,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Fixture;
@@ -30,9 +31,16 @@ public class OptimisedHttpClientWithPsqlFixture : IAsyncLifetime
             .Build();
 
         _publicDataDbContext = _factory.Services.GetRequiredService<PublicDataDbContext>();
+        _publicDataDbContext.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
+
         _contentDbContext = _factory.Services.GetRequiredService<ContentDbContext>();
+        _contentDbContext.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
+        
         _statisticsDbContext = _factory.Services.GetRequiredService<StatisticsDbContext>();
+        _statisticsDbContext.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
+        
         _usersAndRolesDbContext = _factory.Services.GetRequiredService<UsersAndRolesDbContext>();
+        _usersAndRolesDbContext.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
     }
     
     public void DisposeDbContexts()
