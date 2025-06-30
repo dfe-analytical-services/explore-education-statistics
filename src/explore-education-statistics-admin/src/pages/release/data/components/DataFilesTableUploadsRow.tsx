@@ -130,7 +130,7 @@ export default function DataFilesTableUploadRow({
           <ModalConfirm
             title="Data set details"
             open={openImportConfirm}
-            hideConfirm={hasFailures}
+            hideConfirm={!canUpdateRelease || hasFailures}
             disableConfirm={
               !Object.values(warningAcknowledgements).every(
                 acknowledgement => acknowledgement === true,
@@ -206,7 +206,7 @@ export default function DataFilesTableUploadRow({
                 Are you sure you want to delete{' '}
                 <strong>{dataSetUpload.dataSetTitle}</strong>?
               </p>
-              <p>This data set has not yet been imported.</p>
+              <p>This version of the data set has not yet been imported.</p>
             </ModalConfirm>
           )}
         </ButtonGroup>
