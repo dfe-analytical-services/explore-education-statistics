@@ -1,38 +1,64 @@
-// import FormProvider from '@common/components/form/FormProvider';
-// import { Form, FormFieldTextInput } from '@common/components/form';
 import SearchIcon from '@common/components/SearchIcon';
 import VisuallyHidden from '@common/components/VisuallyHidden';
-import React from 'react';
-import Autocomplete from 'accessible-autocomplete/react';
-// import publicationQueries from '@frontend/queries/azurePublicationQueries';
 import styles from '@common/components/form/FormSearchBar.module.scss';
-// import { useQuery } from '@tanstack/react-query';
-import { useRouter } from 'next/router';
-import { truncate } from 'lodash';
+import logger from '@common/services/logger';
+import { createAzurePublicationSuggestRequest } from '@frontend/modules/find-statistics/utils/createAzurePublicationListRequest';
 import azurePublicationService, {
   AzurePublicationSuggestResult,
 } from '@frontend/services/azurePublicationService';
-import { createAzurePublicationSuggestRequest } from '@frontend/modules/find-statistics/utils/createAzurePublicationListRequest';
-import logger from '@common/services/logger';
+import React, { useEffect, useRef } from 'react';
+import Autocomplete from 'accessible-autocomplete/react';
+import { truncate } from 'lodash';
+import { useRouter } from 'next/router';
 
 interface Props {
   label?: string;
-  // value?: string;
   onSubmit: (value: string) => void;
 }
 
-export default function SearchForm({
-  label = 'Search',
-  // value: initialValue = '',
-  onSubmit,
-}: Props) {
+export default function SearchForm({ label = 'Search', onSubmit }: Props) {
   const router = useRouter();
 
-  // const { data: suggestions } = useQuery({
-  //   ...publicationQueries.suggestPublications(router.query, term),
-  //   keepPreviousData: true,
-  //   staleTime: 60000,
-  // });
+  const wrapper = useRef<HTMLFormElement>(null);
+
+  // The accessible-autocomplete component generates a text input element.
+  // We need to access the created elements to:
+  // 1) change input type to 'search'
+  // 2) add form submission when user presses 'Enter'
+  useEffect(() => {
+    const autocompleteInput = wrapper.current?.querySelector(
+      '#search',
+    ) as HTMLInputElement;
+    if (!autocompleteInput) {
+      return undefined;
+    }
+
+    // 1
+    autocompleteInput.setAttribute('type', 'search');
+
+    function handleEnter(evt: KeyboardEvent) {
+      const dropdownVisible =
+        autocompleteInput.getAttribute('aria-expanded') === 'true';
+      if (dropdownVisible && evt.key && evt.key === 'Enter') {
+        const searchTerm = new FormData(wrapper.current!).get(
+          'search',
+        ) as string;
+        onSubmit(searchTerm || '');
+      }
+    }
+
+    // 2) The accessible-autocomplete component has an edge case where when the menu is visible, it
+    // prevents default on the Enter key event, even if the user hasn't put keyboard focus on a
+    // suggestion. This results in a scenario where the user types something, does _not_ interact
+    // with the autocomplete menu at all, and then hits Enter to try to submit the form - but it
+    // isn't submitted.
+    // So let's call our onSubmit when user presses Enter.
+    autocompleteInput.addEventListener('keyup', handleEnter);
+
+    return () => {
+      autocompleteInput.removeEventListener('keyup', handleEnter);
+    };
+  }, [onSubmit]);
 
   const fetchResults = (
     enteredText: string,
@@ -70,6 +96,7 @@ export default function SearchForm({
         ) as string;
         onSubmit(searchTerm || '');
       }}
+      ref={wrapper}
     >
       <label htmlFor="search" className="govuk-label govuk-label--m">
         {label}
@@ -86,7 +113,6 @@ export default function SearchForm({
           }}
           confirmOnBlur={false}
           showNoOptionsFound={false}
-          // defaultValue={initialValue}
           onConfirm={result => {
             if (result) {
               return router.push(
