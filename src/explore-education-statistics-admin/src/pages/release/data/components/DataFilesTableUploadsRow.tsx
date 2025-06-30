@@ -39,10 +39,10 @@ export default function DataFilesTableUploadRow({
   const [openImportConfirm, toggleOpenImportConfirm] = useToggle(false);
   const [openDeleteConfirm, toggleOpenDeleteConfirm] = useToggle(false);
 
-  const hasFailures = dataSetUpload.screenerResult.testResults.some(
+  const hasFailures = dataSetUpload.screenerResult?.testResults.some(
     testResult => testResult.result === 'FAIL',
   );
-  const hasWarnings = dataSetUpload.screenerResult.testResults.some(
+  const hasWarnings = dataSetUpload.screenerResult?.testResults.some(
     testResult => testResult.result === 'WARNING',
   );
 
@@ -51,16 +51,19 @@ export default function DataFilesTableUploadRow({
   >({});
 
   useEffect(() => {
-    const warnings = dataSetUpload.screenerResult.testResults.filter(
+    const warnings = dataSetUpload.screenerResult?.testResults.filter(
       testResult => testResult.result === 'WARNING',
     );
-    setWarningAcknowledgements(acknowledgements =>
-      Object.fromEntries(
-        warnings.map(warning => {
-          return [warning.id, acknowledgements?.[warning.id] ?? false];
-        }),
-      ),
-    );
+
+    if (warnings) {
+      setWarningAcknowledgements(acknowledgements =>
+        Object.fromEntries(
+          warnings.map(warning => {
+            return [warning.id, acknowledgements?.[warning.id] ?? false];
+          }),
+        ),
+      );
+    }
   }, [dataSetUpload]);
 
   const acknowledgeWarning = useCallback(
@@ -130,7 +133,9 @@ export default function DataFilesTableUploadRow({
           <ModalConfirm
             title="Data set details"
             open={openImportConfirm}
-            hideConfirm={!canUpdateRelease || hasFailures}
+            hideConfirm={
+              !canUpdateRelease || hasFailures || !dataSetUpload.screenerResult
+            }
             disableConfirm={
               !Object.values(warningAcknowledgements).every(
                 acknowledgement => acknowledgement === true,
@@ -170,7 +175,11 @@ export default function DataFilesTableUploadRow({
                 id={dataSetUploadTabIds.screenerResults}
                 testId={dataSetUploadTabIds.screenerResults}
                 title="All tests"
-                headingTitle={`Full breakdown of ${dataSetUpload.screenerResult.testResults.length} tests checked against this file`}
+                headingTitle={
+                  dataSetUpload.screenerResult
+                    ? `Full breakdown of ${dataSetUpload.screenerResult?.testResults.length} tests checked against this file`
+                    : 'No tests checked against this file'
+                }
               >
                 {hasFailures && failuresNoticeMessage}
                 {hasWarnings && !hasFailures && warningsNoticeMessage}

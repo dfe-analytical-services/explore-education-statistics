@@ -46,7 +46,7 @@ export interface DataSetUpload {
   metaFileName: string;
   metaFileSize: string;
   status: DataSetUploadStatus;
-  screenerResult: ScreenerResult;
+  screenerResult?: ScreenerResult; // Nullable if screening fails
   created: Date;
   uploadedBy: string;
   replacingFileId?: string;
