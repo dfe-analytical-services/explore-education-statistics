@@ -8,6 +8,7 @@ import React from 'react';
 import DataFilesTableUploadRow from './DataFilesTableUploadsRow';
 
 interface Props {
+  canUpdateRelease?: boolean;
   caption: string;
   dataFiles: DataFile[];
   dataSetUploads: DataSetUpload[];
@@ -20,6 +21,7 @@ interface Props {
 }
 
 export default function DataFilesReplacementTable({
+  canUpdateRelease,
   caption,
   dataFiles,
   dataSetUploads,
@@ -55,6 +57,7 @@ export default function DataFilesReplacementTable({
         ))}
         {dataSetUploads.map(upload => (
           <DataFilesTableUploadRow
+            canUpdateRelease={canUpdateRelease}
             dataSetUpload={upload}
             key={upload.id}
             releaseVersionId={releaseVersionId}

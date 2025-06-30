@@ -281,6 +281,7 @@ export default function ReleaseDataUploadsSection({
                 {(replacedDataFiles.length > 0 ||
                   uploadsWithReplacements.length > 0) && (
                   <DataFilesReplacementTable
+                    canUpdateRelease={canUpdateRelease}
                     caption="Data file replacements"
                     dataFiles={replacedDataFiles}
                     dataSetUploads={uploadsWithReplacements}
