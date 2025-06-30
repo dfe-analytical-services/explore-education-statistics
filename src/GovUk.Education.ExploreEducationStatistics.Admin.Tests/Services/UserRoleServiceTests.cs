@@ -2854,112 +2854,102 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 .WithRelease(_dataFixture.DefaultRelease()
                     .WithPublication(_dataFixture.DefaultPublication()));
 
-            var user = new User
+            var user1 = new User
+            {
+                Id = Guid.NewGuid()
+            };
+            var user2 = new User
             {
                 Id = Guid.NewGuid()
             };
 
-            var identityUser = new ApplicationUser
+            var identityUser1 = new ApplicationUser
             {
-                Id = user.Id.ToString()
+                Id = user1.Id.ToString()
+            };
+            var identityUser2 = new ApplicationUser
+            {
+                Id = user2.Id.ToString()
             };
 
-            var userReleaseRole = new UserReleaseRole
-            {
-                User = user,
-                ReleaseVersion = releaseVersion,
-                Role = ReleaseRole.Approver
-            };
+            var user1ReleaseRoles = EnumUtil.GetEnums<ReleaseRole>()
+                .Select(role =>
+                    _dataFixture.DefaultUserReleaseRole()
+                        .WithUser(user1)
+                        .WithReleaseVersion(releaseVersion)
+                        .WithRole(role)
+                        .Generate());
+            var user2ReleaseRole = _dataFixture.DefaultUserReleaseRole()
+                .WithUser(user2)
+                .WithReleaseVersion(releaseVersion)
+                .WithRole(ReleaseRole.Approver)
+                .Generate();
 
-            var userPublicationRole = new UserPublicationRole
-            {
-                User = user,
-                Publication = releaseVersion.Release.Publication,
-                Role = PublicationRole.Allower
-            };
+            var user1PublicationRoles = EnumUtil.GetEnums<PublicationRole>()
+                .Select(role =>
+                    _dataFixture.DefaultUserPublicationRole()
+                        .WithUser(user1)
+                        .WithPublication(releaseVersion.Release.Publication)
+                        .WithRole(role)
+                        .Generate());
+            var user2PublicationRole = _dataFixture.DefaultUserPublicationRole()
+                .WithUser(user2)
+                .WithPublication(releaseVersion.Release.Publication)
+                .WithRole(PublicationRole.Allower)
+                .Generate();
 
-            var userTwo = new User
-            {
-                Id = Guid.NewGuid()
-            };
+            await using var contentDbContext = InMemoryApplicationDbContext();
+            await using var userAndRolesDbContext = InMemoryUserAndRolesDbContext();
 
-            var identityUserTwo = new ApplicationUser
-            {
-                Id = userTwo.Id.ToString()
-            };
+            await contentDbContext.UserReleaseRoles.AddRangeAsync([ .. user1ReleaseRoles, user2ReleaseRole ]);
+            await contentDbContext.UserPublicationRoles.AddRangeAsync([ .. user1PublicationRoles, user2PublicationRole ]);
+            await contentDbContext.SaveChangesAsync();
 
-            var userTwoReleaseRole = new UserReleaseRole
-            {
-                User = userTwo,
-                ReleaseVersion = releaseVersion,
-                Role = ReleaseRole.Approver
-            };
-
-            var userTwoPublicationRole = new UserPublicationRole
-            {
-                User = userTwo,
-                Publication = releaseVersion.Release.Publication,
-                Role = PublicationRole.Allower
-            };
-
-            var contentDbContextId = Guid.NewGuid().ToString();
-            var userAndRolesDbContextId = Guid.NewGuid().ToString();
-
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                await contentDbContext.UserReleaseRoles.AddRangeAsync(userReleaseRole, userTwoReleaseRole);
-                await contentDbContext.UserPublicationRoles.AddRangeAsync(userPublicationRole, userTwoPublicationRole);
-                await contentDbContext.SaveChangesAsync();
-            }
-
-            await using (var userAndRolesDbContext = InMemoryUserAndRolesDbContext(userAndRolesDbContextId))
-            {
-                await userAndRolesDbContext.Users.AddRangeAsync(identityUser, identityUserTwo);
-                await userAndRolesDbContext.SaveChangesAsync();
-            }
+            await userAndRolesDbContext.Users.AddRangeAsync(identityUser1, identityUser2);
+            await userAndRolesDbContext.SaveChangesAsync();
 
             var userManager = MockUserManager();
 
             userManager
-                .Setup(s => s.GetRolesAsync(ItIsUser(identityUser)))
+                .Setup(s => s.GetRolesAsync(ItIsUser(identityUser1)))
                 .ReturnsAsync(ListOf(RoleNames.Analyst));
 
             userManager
                 .Setup(s => s.RemoveFromRolesAsync(
-                    ItIsUser(identityUser), ItIs.ListSequenceEqualTo(ListOf(RoleNames.Analyst))))
+                    ItIsUser(identityUser1), ItIs.ListSequenceEqualTo(ListOf(RoleNames.Analyst))))
                 .ReturnsAsync(new IdentityResult());
 
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-            await using (var userAndRolesDbContext = InMemoryUserAndRolesDbContext(userAndRolesDbContextId))
-            {
-                var service = SetupUserRoleService(
-                    contentDbContext: contentDbContext,
-                    usersAndRolesDbContext: userAndRolesDbContext,
-                    userManager: userManager.Object);
+            var service = SetupUserRoleService(
+                contentDbContext: contentDbContext,
+                usersAndRolesDbContext: userAndRolesDbContext,
+                userManager: userManager.Object);
 
-                var result = await service.RemoveAllUserResourceRoles(user.Id);
+            var result = await service.RemoveAllUserResourceRoles(user1.Id);
 
-                VerifyAllMocks(userManager);
+            VerifyAllMocks(userManager);
 
-                result.AssertRight();
-            }
+            result.AssertRight();
 
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                var userReleaseRoles = await contentDbContext
-                    .UserReleaseRoles
-                    .ToListAsync();
+            var allUserReleaseRoles = await contentDbContext
+                .UserReleaseRoles
+                .ToListAsync();
 
-                var userPublicationRoles = await contentDbContext
-                    .UserPublicationRoles.ToListAsync();
+            // This will be changed when we remove all of the OLD publication roles from the 
+            // DB, in STEP 11 (EES-6212) of the Permissions Rework. For now, we want to
+            // make sure ALL publication roles for the intended user are deleted here, regardless of
+            // if they're NEW permissions system roles or OLD permissions system roles.
+            // After that, this will just reference `_contentDbContext.UserPublicationRoles` directly.
+            var allUserPublicationRoles = await contentDbContext
+                .AllUserPublicationRoles
+                .ToListAsync();
 
-                // At this point none of userTwo's roles should be affected.
-                var remainingUserReleaseRole = Assert.Single(userReleaseRoles);
-                var remainingUserPublicationRole = Assert.Single(userPublicationRoles);
+            // At this point none of user2's roles should be affected. 
+            // But ALL of user1's roles should have been removed.
+            var remainingUserReleaseRole = Assert.Single(allUserReleaseRoles);
+            var remainingUserPublicationRole = Assert.Single(allUserPublicationRoles);
 
-                Assert.Equal(userTwo.Id, remainingUserReleaseRole.UserId);
-                Assert.Equal(userTwo.Id, remainingUserPublicationRole.UserId);
-            }
+            Assert.Equal(user2.Id, remainingUserReleaseRole.UserId);
+            Assert.Equal(user2.Id, remainingUserPublicationRole.UserId);
         }
 
         private UserRoleService SetupUserRoleService(

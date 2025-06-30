@@ -1,8 +1,4 @@
 #nullable enable
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Database;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
@@ -18,8 +14,13 @@ using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
+using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using Microsoft.AspNetCore.Identity;
 using Moq;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Utils.AdminMockUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
@@ -1018,97 +1019,89 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Email = email,
             };
 
-            var usersAndRolesDbContextId = Guid.NewGuid().ToString();
-            await using (var usersAndRolesDbContext = InMemoryUserAndRolesDbContext(usersAndRolesDbContextId))
-            {
-                // Not adding identity user, as it is deleted via userManager.DeleteAsync
-                usersAndRolesDbContext.UserInvites.Add(invite);
-                await usersAndRolesDbContext.SaveChangesAsync();
-            }
-
-            var internalUser = new User
+            var user = new User
             {
                 Id = userId,
                 Email = email,
             };
 
-            var releaseInvite = new UserReleaseInvite
-            {
-                Email = email,
-            };
+            var releaseInvite = _dataFixture.DefaultUserReleaseInvite()
+                .WithEmail(email)
+                .Generate();
 
-            var publicationInvite = new UserPublicationInvite
-            {
-                Email = email,
-            };
+            var publicationInvite = _dataFixture.DefaultUserPublicationInvite()
+                .WithEmail(email)
+                .Generate();
 
-            var releaseRole = new UserReleaseRole
-            {
-                UserId = userId,
-            };
+            var releaseRoles = EnumUtil.GetEnums<ReleaseRole>()
+                .Select(role =>
+                    _dataFixture.DefaultUserReleaseRole()
+                        .WithUser(user)
+                        .WithRole(role)
+                        .Generate());
 
-            var publicationRole = new UserPublicationRole
-            {
-                UserId = userId,
-            };
+            var publicationRoles = EnumUtil.GetEnums<PublicationRole>()
+                .Select(role =>
+                    _dataFixture.DefaultUserPublicationRole()
+                        .WithUser(user)
+                        .WithRole(role)
+                        .Generate());
 
-            var contentDbContextId = Guid.NewGuid().ToString();
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                contentDbContext.Users.Add(internalUser);
-                contentDbContext.UserReleaseInvites.Add(releaseInvite);
-                contentDbContext.UserPublicationInvites.Add(publicationInvite);
-                contentDbContext.UserReleaseRoles.Add(releaseRole);
-                contentDbContext.UserPublicationRoles.Add(publicationRole);
-                await contentDbContext.SaveChangesAsync();
-            }
+            await using var contentDbContext = InMemoryApplicationDbContext();
+            await using var usersAndRolesDbContext = InMemoryUserAndRolesDbContext();
 
-            await using (var usersAndRolesDbContext = InMemoryUserAndRolesDbContext(usersAndRolesDbContextId))
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                var userManager = MockUserManager();
-                userManager.Setup(mock => mock.DeleteAsync(
-                        It.Is<ApplicationUser>(user => user.Email == email)))
-                    .ReturnsAsync(new IdentityResult());
+            // Not adding identity user, as it is deleted via userManager.DeleteAsync
+            usersAndRolesDbContext.UserInvites.Add(invite);
+            await usersAndRolesDbContext.SaveChangesAsync();
 
-                var service = SetupUserManagementService(
-                    contentDbContext: contentDbContext,
-                    usersAndRolesDbContext: usersAndRolesDbContext,
-                    userManager: userManager.Object);
+            contentDbContext.Users.Add(user);
+            contentDbContext.UserReleaseInvites.Add(releaseInvite);
+            contentDbContext.UserPublicationInvites.Add(publicationInvite);
+            contentDbContext.UserReleaseRoles.AddRange(releaseRoles);
+            contentDbContext.UserPublicationRoles.AddRange(publicationRoles);
+            await contentDbContext.SaveChangesAsync();
 
-                var result = await service.DeleteUser(email);
-                result.AssertRight();
-            }
+            var userManager = MockUserManager();
+            userManager.Setup(mock => mock.DeleteAsync(
+                    It.Is<ApplicationUser>(user => user.Email == email)))
+                .ReturnsAsync(new IdentityResult());
 
-            await using (var usersAndRolesDbContext = InMemoryUserAndRolesDbContext(usersAndRolesDbContextId))
-            {
-                // Mock checks that ApplicationUser has been removed, so no check required here
+            var service = SetupUserManagementService(
+                contentDbContext: contentDbContext,
+                usersAndRolesDbContext: usersAndRolesDbContext,
+                userManager: userManager.Object);
 
-                var invites = usersAndRolesDbContext.UserInvites.ToList();
-                Assert.Empty(invites);
-            }
+            var result = await service.DeleteUser(email);
+            result.AssertRight();
 
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                var releaseInvites = contentDbContext.UserReleaseInvites.ToList();
-                Assert.Empty(releaseInvites);
+            // Mock checks that ApplicationUser has been removed, so no check required here
 
-                var publicationInvites = contentDbContext.UserPublicationInvites.ToList();
-                Assert.Empty(publicationInvites);
+            var invites = usersAndRolesDbContext.UserInvites.ToList();
+            Assert.Empty(invites);
 
-                var releaseRoles = contentDbContext.UserReleaseRoles.ToList();
-                Assert.Empty(releaseRoles);
+            var releaseInvites = contentDbContext.UserReleaseInvites.ToList();
+            Assert.Empty(releaseInvites);
 
-                var publicationRoles = contentDbContext.UserPublicationRoles.ToList();
-                Assert.Empty(publicationRoles);
+            var publicationInvites = contentDbContext.UserPublicationInvites.ToList();
+            Assert.Empty(publicationInvites);
 
-                var dbInternalUserList = contentDbContext.Users.ToList();
-                var dbInternalUser = Assert.Single(dbInternalUserList);
-                Assert.Equal(email, dbInternalUser.Email);
-                Assert.NotNull(dbInternalUser.SoftDeleted);
-                dbInternalUser.SoftDeleted.AssertUtcNow();
-                Assert.Equal(CreatedById, dbInternalUser.DeletedById);
-            }
+            var remainingReleaseRoles = contentDbContext.UserReleaseRoles.ToList();
+            Assert.Empty(remainingReleaseRoles);
+
+            // This will be changed when we remove all of the OLD publication roles from the 
+            // DB, in STEP 11 (EES-6212) of the Permissions Rework. For now, we want to
+            // make sure we delete ALL publication roles here, regardless of if they're NEW permissions
+            // system roles or OLD permissions system roles.
+            // After that, this will just reference `_contentDbContext.UserPublicationRoles` directly.
+            var remainingPublicationRoles = contentDbContext.AllUserPublicationRoles.ToList();
+            Assert.Empty(remainingPublicationRoles);
+
+            var dbInternalUserList = contentDbContext.Users.ToList();
+            var dbInternalUser = Assert.Single(dbInternalUserList);
+            Assert.Equal(email, dbInternalUser.Email);
+            Assert.NotNull(dbInternalUser.SoftDeleted);
+            dbInternalUser.SoftDeleted.AssertUtcNow();
+            Assert.Equal(CreatedById, dbInternalUser.DeletedById);
         }
 
         [Fact]

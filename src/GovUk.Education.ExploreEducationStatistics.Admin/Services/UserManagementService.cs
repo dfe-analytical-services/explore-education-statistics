@@ -445,8 +445,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         .Where(urr => internalUser != null && urr.UserId == internalUser.Id)
                         .ToListAsync();
 
+                    // This will be changed when we remove all of the OLD publication roles from the 
+                    // DB, in STEP 11 (EES-6212) of the Permissions Rework. For now, we want to
+                    // make sure we delete ALL publication roles here, regardless of if they're NEW permissions
+                    // system roles or OLD permissions system roles.
+                    // After that, this will just reference `_contentDbContext.UserPublicationRoles` directly.
                     var userPublicationRoles = await _contentDbContext
-                        .UserPublicationRoles
+                        .AllUserPublicationRoles
                         .Where(upr => internalUser != null && upr.UserId == internalUser.Id)
                         .ToListAsync();
 
