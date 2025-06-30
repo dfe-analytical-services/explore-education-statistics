@@ -17,181 +17,194 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Tests.Fixture
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
 using Xunit.Abstractions;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api.Public.Data.OptimisedDataSetVersionMappingControllerTestsHelpers;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api.Public.Data;
 
-public abstract class OptimisedDataSetVersionMappingControllerTests :
-    IClassFixture<OptimisedHttpClientWithPsqlFixture>
+public class GetLocationMappingsTests : IClassFixture<OptimisedHttpClientWithPsqlFixture>, IAsyncLifetime
 {
     private const string BaseUrl = "api/public-data/data-set-versions";
 
     private readonly DataFixture _dataFixture = new();
-
-    public class GetLocationMappingsTests : OptimisedDataSetVersionMappingControllerTests, IAsyncLifetime
-    {
-        private readonly OptimisedPostgreSqlContainerUtil _psql;
-        private readonly ITestOutputHelper _output;
-        private readonly HttpClient _client;
-
-        public async Task InitializeAsync() {
-            await _psql.GetDbContext().ClearTestData();
-        }
-
-        public Task DisposeAsync()
-        {
-            return Task.CompletedTask;
-        }
-
-        public GetLocationMappingsTests(
-            OptimisedHttpClientWithPsqlFixture fixture,
-            ITestOutputHelper output)
-        {
-            _psql = fixture.GetContainer();
-            _output = output;
-            var sw = new Stopwatch();
-            sw.Start();
-
-            _client = fixture.GetClient();
-            
-            output.WriteLine($"Testapp startup {sw.ElapsedMilliseconds}");
-
-        }
-
-        [Fact]
-        public async Task Success()
-        {
-            var sw = new Stopwatch();
-            sw.Start();
-            
-            var publicDataDbContext = _psql.GetDbContext();
-
-            var (initialDataSetVersion, nextDataSetVersion) = await CreateInitialAndNextDataSetVersion(publicDataDbContext);
-
-            DataSetVersionMapping mapping = _dataFixture
-                .DefaultDataSetVersionMapping()
-                .WithSourceDataSetVersionId(initialDataSetVersion.Id)
-                .WithTargetDataSetVersionId(nextDataSetVersion.Id)
-                .WithLocationMappingPlan(_dataFixture
-                    .DefaultLocationMappingPlan()
-                    .AddLevel(
-                        level: GeographicLevel.LocalAuthority,
-                        mappings: _dataFixture
-                            .DefaultLocationLevelMappings()
-                            .AddMapping(
-                                sourceKey: "source-location-1-key",
-                                mapping: _dataFixture
-                                    .DefaultLocationOptionMapping()
-                                    .WithSource(_dataFixture.DefaultMappableLocationOption())
-                                    .WithAutoMapped("target-location-1-key"))
-                            .AddMapping(
-                                sourceKey: "source-location-2-key",
-                                mapping: _dataFixture
-                                    .DefaultLocationOptionMapping()
-                                    .WithSource(_dataFixture.DefaultMappableLocationOption())
-                                    .WithNoMapping()
-                            )
-                            .AddCandidate(
-                                targetKey: "target-location-1-key",
-                                candidate: _dataFixture.DefaultMappableLocationOption()))
-                    .AddLevel(
-                        level: GeographicLevel.Country,
-                        mappings: _dataFixture
-                            .DefaultLocationLevelMappings()
-                            .AddMapping(
-                                sourceKey: "source-location-1-key",
-                                mapping: _dataFixture
-                                    .DefaultLocationOptionMapping()
-                                    .WithSource(_dataFixture.DefaultMappableLocationOption())
-                                    .WithManualNone())
-                            .AddMapping(
-                                sourceKey: "source-location-2-key",
-                                mapping: _dataFixture
-                                    .DefaultLocationOptionMapping()
-                                    .WithSource(_dataFixture.DefaultMappableLocationOption())
-                                    .WithManualMapped("target-location-1-key")
-                            )
-                            .AddCandidate(
-                                targetKey: "target-location-1-key",
-                                candidate: _dataFixture.DefaultMappableLocationOption())));
-
-            await publicDataDbContext.AddTestData(context => context.DataSetVersionMappings.Add(mapping));
-
-            _output.WriteLine($"PSQL set up test data {sw.ElapsedMilliseconds}");
-            sw.Restart();
-
-            var client = _client.WithUser("Bau");
-            
-            _output.WriteLine($"Create client {sw.ElapsedMilliseconds}");
-            sw.Restart();
-
-            var response = await GetLocationMappings(
-                nextDataSetVersionId: nextDataSetVersion.Id,
-                client);
-
-            var retrievedMappings = response.AssertOk<LocationMappingPlan>();
-
-            // Test that the mappings from the Controller are identical to the mappings saved in the database
-            retrievedMappings.AssertDeepEqualTo(
-                mapping.LocationMappingPlan,
-                ignoreCollectionOrders: true);
-            
-            _output.WriteLine($"Do test {sw.ElapsedMilliseconds}");
-            sw.Restart();
-        }
-
-        [Fact]
-        public async Task NotBauUser_Returns403()
-        {
-            var sw = new Stopwatch();
-            sw.Start();
-
-            var client = _client
-                .WithUser("Authenticated");
-
-            _output.WriteLine($"Create client {sw.ElapsedMilliseconds}");
-            sw.Restart();
-
-            var response = await GetLocationMappings(
-                Guid.NewGuid(),
-                client);
-
-            response.AssertForbidden();
-
-            _output.WriteLine($"Do test {sw.ElapsedMilliseconds}");
-            sw.Restart();
-        }
-
-        [Fact]
-        public async Task DataSetVersionMappingDoesNotExist_Returns404()
-        {
-            var sw = new Stopwatch();
-            sw.Start();
-
-            var client = _client
-                .WithUser("Bau");
-
-            _output.WriteLine($"Create client {sw.ElapsedMilliseconds}");
-            sw.Restart();
-            
-            var response = await GetLocationMappings(
-                Guid.NewGuid(),
-                client);
-
-            response.AssertNotFound();
-
-            _output.WriteLine($"Do test {sw.ElapsedMilliseconds}");
-            sw.Restart();
-        }
-
-        private async Task<HttpResponseMessage> GetLocationMappings(
-            Guid nextDataSetVersionId,
-            HttpClient client)
-        {
-            var uri = new Uri($"{BaseUrl}/{nextDataSetVersionId}/mapping/locations", UriKind.Relative);
-
-            return await client.GetAsync(uri);
-        }
+    
+    private readonly OptimisedPostgreSqlContainerUtil _psql;
+    private readonly ITestOutputHelper _output;
+    private readonly HttpClient _client;
+    private readonly OptimisedHttpClientWithPsqlFixture _fixture;
+    
+    public async Task InitializeAsync() {
+        var sw = new Stopwatch();
+        sw.Start();
+        
+        await _fixture.GetPublicDataDbContext().ClearTestData();
+        
+        _output.WriteLine($"Clear up test data {sw.ElapsedMilliseconds}");
+        sw.Restart();
     }
+
+    public Task DisposeAsync()
+    {
+        return Task.CompletedTask;
+    }
+
+    public GetLocationMappingsTests(
+        OptimisedHttpClientWithPsqlFixture fixture,
+        ITestOutputHelper output)
+    {
+        _fixture = fixture;
+        _psql = fixture.GetContainer();
+        _output = output;
+
+        var sw = new Stopwatch();
+        sw.Start();
+        
+        _client = fixture.CreateClient();
+        
+        output.WriteLine($"Create client {sw.ElapsedMilliseconds}");
+    }
+
+    [Fact]
+    public async Task Success()
+    {
+        var totalSw = new Stopwatch();
+        totalSw.Start();
+        
+        var sw = new Stopwatch();
+        sw.Start();
+        
+        var (initialDataSetVersion, nextDataSetVersion) = await CreateInitialAndNextDataSetVersion(
+            _fixture.GetPublicDataDbContext(), _fixture.GetContentDbContext(), _output);
+
+        _output.WriteLine($"Set up initial data set version test data {sw.ElapsedMilliseconds}");
+        sw.Restart();
+        
+        DataSetVersionMapping mapping = _dataFixture
+            .DefaultDataSetVersionMapping()
+            .WithSourceDataSetVersionId(initialDataSetVersion.Id)
+            .WithTargetDataSetVersionId(nextDataSetVersion.Id)
+            .WithLocationMappingPlan(_dataFixture
+                .DefaultLocationMappingPlan()
+                .AddLevel(
+                    level: GeographicLevel.LocalAuthority,
+                    mappings: _dataFixture
+                        .DefaultLocationLevelMappings()
+                        .AddMapping(
+                            sourceKey: "source-location-1-key",
+                            mapping: _dataFixture
+                                .DefaultLocationOptionMapping()
+                                .WithSource(_dataFixture.DefaultMappableLocationOption())
+                                .WithAutoMapped("target-location-1-key"))
+                        .AddMapping(
+                            sourceKey: "source-location-2-key",
+                            mapping: _dataFixture
+                                .DefaultLocationOptionMapping()
+                                .WithSource(_dataFixture.DefaultMappableLocationOption())
+                                .WithNoMapping()
+                        )
+                        .AddCandidate(
+                            targetKey: "target-location-1-key",
+                            candidate: _dataFixture.DefaultMappableLocationOption()))
+                .AddLevel(
+                    level: GeographicLevel.Country,
+                    mappings: _dataFixture
+                        .DefaultLocationLevelMappings()
+                        .AddMapping(
+                            sourceKey: "source-location-1-key",
+                            mapping: _dataFixture
+                                .DefaultLocationOptionMapping()
+                                .WithSource(_dataFixture.DefaultMappableLocationOption())
+                                .WithManualNone())
+                        .AddMapping(
+                            sourceKey: "source-location-2-key",
+                            mapping: _dataFixture
+                                .DefaultLocationOptionMapping()
+                                .WithSource(_dataFixture.DefaultMappableLocationOption())
+                                .WithManualMapped("target-location-1-key")
+                        )
+                        .AddCandidate(
+                            targetKey: "target-location-1-key",
+                            candidate: _dataFixture.DefaultMappableLocationOption())));
+
+        _output.WriteLine($"Set up in-memory test data {sw.ElapsedMilliseconds}");
+        sw.Restart();        
+
+        await _fixture.GetPublicDataDbContext().AddTestData(context => context.DataSetVersionMappings.Add(mapping));
+
+        _output.WriteLine($"PSQL set up test data {sw.ElapsedMilliseconds}");
+        sw.Restart();
+
+        var client = _client.WithUser("Bau");
+        
+        var response = await GetLocationMappings(
+            nextDataSetVersionId: nextDataSetVersion.Id,
+            client);
+
+        var retrievedMappings = response.AssertOk<LocationMappingPlan>();
+
+        // Test that the mappings from the Controller are identical to the mappings saved in the database
+        retrievedMappings.AssertDeepEqualTo(
+            mapping.LocationMappingPlan,
+            ignoreCollectionOrders: true);
+        
+        _output.WriteLine($"Do test {sw.ElapsedMilliseconds}");
+        sw.Restart();
+        
+        _output.WriteLine($"Total test run time {totalSw.ElapsedMilliseconds}");
+    }
+
+    [Fact]
+    public async Task NotBauUser_Returns403()
+    {
+        var sw = new Stopwatch();
+        sw.Start();
+
+        var client = _client
+            .WithUser("Authenticated");
+
+        _output.WriteLine($"Create client {sw.ElapsedMilliseconds}");
+        sw.Restart();
+
+        var response = await GetLocationMappings(
+            Guid.NewGuid(),
+            client);
+
+        response.AssertForbidden();
+
+        _output.WriteLine($"Do test {sw.ElapsedMilliseconds}");
+        sw.Restart();
+    }
+
+    [Fact]
+    public async Task DataSetVersionMappingDoesNotExist_Returns404()
+    {
+        var sw = new Stopwatch();
+        sw.Start();
+
+        var client = _client
+            .WithUser("Bau");
+
+        _output.WriteLine($"Create client {sw.ElapsedMilliseconds}");
+        sw.Restart();
+        
+        var response = await GetLocationMappings(
+            Guid.NewGuid(),
+            client);
+
+        response.AssertNotFound();
+
+        _output.WriteLine($"Do test {sw.ElapsedMilliseconds}");
+        sw.Restart();
+    }
+
+    private async Task<HttpResponseMessage> GetLocationMappings(
+        Guid nextDataSetVersionId,
+        HttpClient client)
+    {
+        var uri = new Uri($"{BaseUrl}/{nextDataSetVersionId}/mapping/locations", UriKind.Relative);
+
+        return await client.GetAsync(uri);
+    }
+}
 
     // public class ApplyBatchLocationMappingUpdatesTests(
     //     TestApplicationFactory2 testApp)
@@ -481,7 +494,11 @@ public abstract class OptimisedDataSetVersionMappingControllerTests :
     //     }
     // }
 
-    private async Task AssertCorrectDataSetVersionNumbers(
+static class OptimisedDataSetVersionMappingControllerTestsHelpers 
+{
+    private static readonly DataFixture DataFixture = new();
+    
+    public static async Task AssertCorrectDataSetVersionNumbers(
         DataSetVersionMapping mapping,
         string expectedVersion,
         WebApplicationFactory<TestStartup> testApp)
@@ -495,49 +512,65 @@ public abstract class OptimisedDataSetVersionMappingControllerTests :
         Assert.Equal(expectedVersion, updatedReleaseFile.PublicApiDataSetVersion?.ToString());
     }
 
-    private async Task<(DataSetVersion initialVersion, DataSetVersion nextVersion)> 
-        CreateInitialAndNextDataSetVersion(PublicDataDbContext publicDataDbContext)
+    public static async Task<(DataSetVersion initialVersion, DataSetVersion nextVersion)> 
+        CreateInitialAndNextDataSetVersion(
+            PublicDataDbContext publicDataDbContext,
+            ContentDbContext contentDbContext,
+            ITestOutputHelper output)
     {
-        DataSet dataSet = _dataFixture
+        var sw = new Stopwatch();
+        sw.Start();
+
+        DataSet dataSet = DataFixture
             .DefaultDataSet()
             .WithStatusPublished();
-
+        
+        output.WriteLine($"  Creating in-memory Data Set {sw.ElapsedMilliseconds}");
+        sw.Restart();
+        
         await publicDataDbContext.AddTestData(context => context.DataSets.Add(dataSet));
 
-        DataSetVersion initialDataSetVersion = _dataFixture
+        output.WriteLine($"  Saving initial Data Set {sw.ElapsedMilliseconds}");
+        sw.Restart();
+
+        DataSetVersion initialDataSetVersion = DataFixture
             .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 2)
             .WithVersionNumber(major: 1, minor: 0)
             .WithStatusPublished()
             .WithDataSet(dataSet)
             .FinishWith(dsv => dsv.DataSet.LatestLiveVersion = dsv);
 
-        DataSetVersion nextDataSetVersion = _dataFixture
+        DataSetVersion nextDataSetVersion = DataFixture
             .DefaultDataSetVersion()
             .WithVersionNumber(major: 1, minor: 1)
             .WithStatusDraft()
             .WithDataSet(dataSet)
             .FinishWith(dsv => dsv.DataSet.LatestDraftVersion = dsv);
-
+        
+        output.WriteLine($"  Creating in-memory Data Set Versions {sw.ElapsedMilliseconds}");
+        sw.Restart();
+        
         await publicDataDbContext.AddTestData(context =>
         {
             context.DataSetVersions.AddRange(initialDataSetVersion, nextDataSetVersion);
             context.DataSets.Update(dataSet);
         });
+        
+        output.WriteLine($"  Saving Data Set Versions {sw.ElapsedMilliseconds}");
+        sw.Restart();
 
-        ReleaseFile releaseFile = _dataFixture.DefaultReleaseFile()
+        ReleaseFile releaseFile = DataFixture.DefaultReleaseFile()
             .WithId(nextDataSetVersion.Release.ReleaseFileId)
-            .WithReleaseVersion(_dataFixture.DefaultReleaseVersion())
-            .WithFile(_dataFixture.DefaultFile(FileType.Data))
+            .WithReleaseVersion(DataFixture.DefaultReleaseVersion())
+            .WithFile(DataFixture.DefaultFile(FileType.Data))
             .WithPublicApiDataSetId(nextDataSetVersion.DataSetId)
             .WithPublicApiDataSetVersion(nextDataSetVersion.SemVersion());
 
-        // await psql.AddTestData<ContentDbContext, Startup>(context => context.ReleaseFiles.Add(releaseFile));
+        await contentDbContext.AddTestData(context => context.ReleaseFiles.Add(releaseFile));
+
+        output.WriteLine($"  Saving Release File {sw.ElapsedMilliseconds}");
+        sw.Restart();
 
         return (initialDataSetVersion, nextDataSetVersion);
     }
-
-    // private WebApplicationFactory<TestStartup> BuildApp(ClaimsPrincipal? user = null)
-    // {
-    //     return testApp.SetUser(user ?? DataFixture.BauUser());
-    // }
 }
