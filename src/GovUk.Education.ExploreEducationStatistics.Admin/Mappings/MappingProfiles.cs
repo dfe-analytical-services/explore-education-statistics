@@ -251,7 +251,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
         {
             // TODO (EES-5353): This first condition shouldn't be required to determine pass or fail and should eventually be removed.
             // This is an issue with the WIP screener package where a "stage" passes, even though it contains failing tests.
-            var hasIndividualTestFailures = screenerResult.TestResults.Any(test => test.Result == TestResult.FAIL);
+            var hasIndividualTestFailures = screenerResult is null || screenerResult.TestResults.Any(test => test.Result == TestResult.FAIL);
             if (hasIndividualTestFailures)
             {
                 return DataSetUploadStatus.FAILED_SCREENING.ToString();

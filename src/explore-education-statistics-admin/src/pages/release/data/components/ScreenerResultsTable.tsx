@@ -9,7 +9,7 @@ import {
 } from './ImporterStatus';
 
 interface Props {
-  screenerResult: ScreenerResult;
+  screenerResult?: ScreenerResult;
   showAll: boolean | undefined;
   onAcknowledgeWarning?: (key: string, value: boolean) => void;
   warningAcknowledgements?: Dictionary<boolean>;
@@ -22,17 +22,17 @@ export default function ScreenerResultsTable({
   warningAcknowledgements,
 }: Props) {
   const testResults = showAll
-    ? screenerResult.testResults
-    : screenerResult.testResults.filter(
+    ? screenerResult?.testResults
+    : screenerResult?.testResults.filter(
         testResult =>
           testResult.result === 'FAIL' || testResult.result === 'WARNING',
       );
 
-  const hasFailures = screenerResult.testResults.some(
+  const hasFailures = screenerResult?.testResults.some(
     testResult => testResult.result === 'FAIL',
   );
 
-  return (
+  return testResults ? (
     <table data-testid="screener-result-table">
       <tbody>
         {testResults.map(testResult => (
@@ -73,5 +73,7 @@ export default function ScreenerResultsTable({
         ))}
       </tbody>
     </table>
+  ) : (
+    <p>No test results to display, please delete the file and try again.</p>
   );
 }
