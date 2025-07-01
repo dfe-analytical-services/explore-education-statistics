@@ -10,6 +10,3 @@ wwwroot/
 # Ignore backend projects
 src/GovUk.Education.ExploreEducationStatistics.*/
 src/explore-education-statistics-ckeditor/sample
-
-# Ignore playwright test reports
-tests/playwright-tests/playwright-report/*
