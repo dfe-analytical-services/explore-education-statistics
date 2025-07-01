@@ -37,11 +37,15 @@ public class DataReplacementController : ControllerBase
     }
 
     [HttpPost("releases/{releaseVersionId:guid}/data/{originalFileId:guid}/replacement")]
-    public async Task<ActionResult<Unit>> Replace(Guid releaseVersionId, Guid originalFileId)
+    public async Task<ActionResult<Unit>> Replace(
+        Guid releaseVersionId,
+        Guid originalFileId,
+        CancellationToken cancellationToken = default)
     {
         return await _replacementService.Replace(
                 releaseVersionId: releaseVersionId,
-                originalFileId: originalFileId // @MarkFix turn into a list
+                originalFileId: originalFileId, // @MarkFix turn into a list
+                cancellationToken: cancellationToken
             )
             .HandleFailuresOrOk();
     }
