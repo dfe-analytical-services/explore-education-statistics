@@ -46,7 +46,8 @@ public class UserReleaseRoleRepository(
                 userId: userId,
                 publicationId: publicationId,
                 role: newSystemPublicationRoleToRemove.Value,
-                cancellationToken: cancellationToken);
+                cancellationToken: cancellationToken,
+                includeNewPermissionsSystemRoles: true);
 
             await userPublicationRoleRepository.Remove(userPublicationRole!, cancellationToken);
         }

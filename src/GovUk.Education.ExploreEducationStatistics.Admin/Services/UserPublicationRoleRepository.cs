@@ -38,6 +38,7 @@ public class UserPublicationRoleRepository(ContentDbContext contentDbContext, IN
                 userId: userId,
                 publicationId: publicationId,
                 role: newSystemPublicationRoleToRemove.Value,
+                includeNewPermissionsSystemRoles: true,
                 cancellationToken: cancellationToken);
 
             await Remove(userPublicationRole!, cancellationToken);
@@ -93,10 +94,11 @@ public class UserPublicationRoleRepository(ContentDbContext contentDbContext, IN
 
     public async Task<UserPublicationRole?> GetById(
         Guid userPublicationRoleId,
+        bool includeNewPermissionsSystemRoles = false,
         CancellationToken cancellationToken = default
     )
     {
-        return await Query(ResourceRoleFilter.All)
+        return await Query(ResourceRoleFilter.All, includeNewPermissionsSystemRoles)
             .SingleOrDefaultAsync(upr => upr.Id == userPublicationRoleId, cancellationToken);
     }
 
@@ -104,10 +106,11 @@ public class UserPublicationRoleRepository(ContentDbContext contentDbContext, IN
         Guid userId,
         Guid publicationId,
         PublicationRole role,
+        bool includeNewPermissionsSystemRoles = false,
         CancellationToken cancellationToken = default
     )
     {
-        return await Query(ResourceRoleFilter.All)
+        return await Query(ResourceRoleFilter.All, includeNewPermissionsSystemRoles)
             .WhereForUser(userId)
             .WhereForPublication(publicationId)
             .WhereRolesIn(role)
@@ -185,7 +188,7 @@ public class UserPublicationRoleRepository(ContentDbContext contentDbContext, IN
 
     public async Task RemoveForUser(Guid userId, CancellationToken cancellationToken = default)
     {
-        var userPublicationRoles = await Query(ResourceRoleFilter.All)
+        var userPublicationRoles = await Query(ResourceRoleFilter.All, includeNewPermissionsSystemRoles: true)
             .Where(upr => upr.UserId == userId)
             .ToListAsync(cancellationToken);
 
@@ -200,7 +203,7 @@ public class UserPublicationRoleRepository(ContentDbContext contentDbContext, IN
         CancellationToken cancellationToken = default
     )
     {
-        return await Query(resourceRoleFilter)
+        return await Query(resourceRoleFilter, includeNewPermissionsSystemRoles: true)
             .WhereForUser(userId)
             .WhereForPublication(publicationId)
             .WhereRolesIn(role)
