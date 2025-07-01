@@ -26,7 +26,6 @@ public class DataSetScreenerClient(HttpClient client) : IDataSetScreenerClient
         var content = new StringContent(json, Encoding.UTF8, "application/json");
 
         // TODO (EES-5353): Add cancellation token handling logic to terminate Azure Function processes
-        // TODO (EES-5999): Replace hardcoded URL with appsetting
         var response = await client.PostAsync(client.BaseAddress, content, CancellationToken.None);
 
         return response.IsSuccessStatusCode
