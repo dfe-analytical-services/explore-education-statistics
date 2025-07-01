@@ -25,8 +25,7 @@ public class MarkMethodologyAsApprovedAuthorizationHandlerTests
 
     private static readonly MethodologyVersion MethodologyVersion = new()
     {
-        Id = Guid.NewGuid(),
-        MethodologyId = Guid.NewGuid()
+        Id = Guid.NewGuid(), MethodologyId = Guid.NewGuid()
     };
 
     private static readonly Publication OwningPublication = new() { Id = Guid.NewGuid() };
@@ -72,9 +71,7 @@ public class MarkMethodologyAsApprovedAuthorizationHandlerTests
         {
             var methodologyVersion = new MethodologyVersion
             {
-                Id = Guid.NewGuid(),
-                MethodologyId = Guid.NewGuid(),
-                Status = Draft
+                Id = Guid.NewGuid(), MethodologyId = Guid.NewGuid(), Status = Draft
             };
 
             await ForEachSecurityClaimAsync(async claim =>
@@ -101,12 +98,12 @@ public class MarkMethodologyAsApprovedAuthorizationHandlerTests
                         .ReturnsAsync(OwningPublication);
 
                     userPublicationRoleRepository
-                        .Setup(s => s.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id))
-                        .ReturnsAsync(new List<PublicationRole>());
+                        .Setup(s => s.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id, false))
+                        .ReturnsAsync([]);
 
                     userReleaseRoleRepository
                         .Setup(s => s.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id))
-                        .ReturnsAsync(new List<ReleaseRole>());
+                        .ReturnsAsync([]);
                 }
 
                 var user = DataFixture
@@ -133,9 +130,7 @@ public class MarkMethodologyAsApprovedAuthorizationHandlerTests
         {
             var methodologyVersion = new MethodologyVersion
             {
-                Id = Guid.NewGuid(),
-                MethodologyId = Guid.NewGuid(),
-                Status = Approved
+                Id = Guid.NewGuid(), MethodologyId = Guid.NewGuid(), Status = Approved
             };
 
             await ForEachSecurityClaimAsync(async claim =>
@@ -162,12 +157,12 @@ public class MarkMethodologyAsApprovedAuthorizationHandlerTests
                         .ReturnsAsync(OwningPublication);
 
                     userPublicationRoleRepository
-                        .Setup(s => s.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id))
-                        .ReturnsAsync(new List<PublicationRole>());
+                        .Setup(s => s.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id, false))
+                        .ReturnsAsync([]);
 
                     userReleaseRoleRepository
                         .Setup(s => s.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id))
-                        .ReturnsAsync(new List<ReleaseRole>());
+                        .ReturnsAsync([]);
                 }
 
                 var user = DataFixture
@@ -217,7 +212,7 @@ public class MarkMethodologyAsApprovedAuthorizationHandlerTests
                     .ReturnsAsync(OwningPublication);
 
                 userPublicationRoleRepository
-                    .Setup(s => s.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id))
+                    .Setup(s => s.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id, false))
                     .ReturnsAsync(ListOf(publicationRole));
 
                 if (!expectedToPassByPublicationRole)
@@ -274,8 +269,8 @@ public class MarkMethodologyAsApprovedAuthorizationHandlerTests
                     .ReturnsAsync(OwningPublication);
 
                 userPublicationRoleRepository
-                    .Setup(s => s.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id))
-                    .ReturnsAsync(new List<PublicationRole>());
+                    .Setup(s => s.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id, false))
+                    .ReturnsAsync([]);
 
                 userReleaseRoleRepository
                     .Setup(s => s.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id))
@@ -319,12 +314,12 @@ public class MarkMethodologyAsApprovedAuthorizationHandlerTests
                 .ReturnsAsync(OwningPublication);
 
             userPublicationRoleRepository
-                .Setup(s => s.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id))
-                .ReturnsAsync(new List<PublicationRole>());
+                .Setup(s => s.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id, false))
+                .ReturnsAsync([]);
 
             userReleaseRoleRepository
                 .Setup(s => s.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id))
-                .ReturnsAsync(new List<ReleaseRole>());
+                .ReturnsAsync([]);
 
             var user = DataFixture.AuthenticatedUser(userId: UserId);
 

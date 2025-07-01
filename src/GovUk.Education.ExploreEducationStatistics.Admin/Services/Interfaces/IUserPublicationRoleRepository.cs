@@ -14,14 +14,19 @@ public interface IUserPublicationRoleRepository
 
     Task<List<PublicationRole>> GetAllRolesByUserAndPublication(
         Guid userId,
-        Guid publicationId);
+        Guid publicationId,
+        bool includeNewPermissionsSystemRoles = false);
 
     Task<UserPublicationRole?> GetUserPublicationRole(
         Guid userId,
         Guid publicationId,
-        PublicationRole role);
-    
-    Task<IReadOnlyList<UserPublicationRole>> ListUserPublicationRolesByUserAndPublication(Guid userId, Guid publicationId);
+        PublicationRole role,
+        bool includeNewPermissionsSystemRoles = false);
+
+    Task<IReadOnlyList<UserPublicationRole>> ListUserPublicationRolesByUserAndPublication(
+        Guid userId,
+        Guid publicationId,
+        bool includeNewPermissionsSystemRoles = false);
 
     Task<bool> UserHasRoleOnPublication(
         Guid userId,
@@ -31,7 +36,7 @@ public interface IUserPublicationRoleRepository
     Task Remove(
         UserPublicationRole userPublicationRole,
         CancellationToken cancellationToken = default);
-        
+
     Task RemoveMany(
         IReadOnlyList<UserPublicationRole> userPublicationRoles,
         CancellationToken cancellationToken = default);
@@ -40,4 +45,3 @@ public interface IUserPublicationRoleRepository
         Guid userId,
         CancellationToken cancellationToken = default);
 }
-

@@ -23,8 +23,7 @@ public class UpdateSpecificMethodologyAuthorizationHandlerTests
 
     private static readonly MethodologyVersion MethodologyVersion = new()
     {
-        Id = Guid.NewGuid(),
-        MethodologyId = Guid.NewGuid()
+        Id = Guid.NewGuid(), MethodologyId = Guid.NewGuid()
     };
 
     private static readonly Publication OwningPublication = new() { Id = Guid.NewGuid() };
@@ -36,11 +35,7 @@ public class UpdateSpecificMethodologyAuthorizationHandlerTests
         [Fact]
         public async Task NoClaimsAllowUpdatingApprovedMethodology()
         {
-            var methodologyVersion = new MethodologyVersion
-            {
-                Id = Guid.NewGuid(),
-                Status = Approved
-            };
+            var methodologyVersion = new MethodologyVersion { Id = Guid.NewGuid(), Status = Approved };
 
             await ForEachSecurityClaimAsync(async claim =>
             {
@@ -84,7 +79,7 @@ public class UpdateSpecificMethodologyAuthorizationHandlerTests
                     .ReturnsAsync(OwningPublication);
 
                 userPublicationRoleRepository
-                    .Setup(s => s.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id))
+                    .Setup(s => s.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id, false))
                     .ReturnsAsync(ListOf(publicationRole));
 
                 var expectedToPassByRole = ListOf(PublicationRole.Owner, PublicationRole.Allower)
@@ -137,8 +132,8 @@ public class UpdateSpecificMethodologyAuthorizationHandlerTests
                     .ReturnsAsync(OwningPublication);
 
                 userPublicationRoleRepository
-                    .Setup(s => s.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id))
-                    .ReturnsAsync(new List<PublicationRole>());
+                    .Setup(s => s.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id, false))
+                    .ReturnsAsync([]);
 
                 userReleaseRoleRepository
                     .Setup(s => s.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id))
@@ -176,12 +171,12 @@ public class UpdateSpecificMethodologyAuthorizationHandlerTests
                 .ReturnsAsync(OwningPublication);
 
             userPublicationRoleRepository
-                .Setup(s => s.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id))
-                .ReturnsAsync(new List<PublicationRole>());
+                .Setup(s => s.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id, false))
+                .ReturnsAsync([]);
 
             userReleaseRoleRepository
                 .Setup(s => s.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id))
-                .ReturnsAsync(new List<ReleaseRole>());
+                .ReturnsAsync([]);
 
             var user = DataFixture.AuthenticatedUser(userId: UserId);
 

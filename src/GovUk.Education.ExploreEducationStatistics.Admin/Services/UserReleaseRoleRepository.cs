@@ -41,7 +41,8 @@ public class UserReleaseRoleRepository(
             var userPublicationRole = await userPublicationRoleRepository.GetUserPublicationRole(
                 userId: userId,
                 publicationId: publicationId,
-                role: newSystemPublicationRoleToRemove.Value);
+                role: newSystemPublicationRoleToRemove.Value,
+                includeNewPermissionsSystemRoles: true);
 
             await userPublicationRoleRepository.Remove(userPublicationRole!);
         }
@@ -62,7 +63,15 @@ public class UserReleaseRoleRepository(
             createdById: createdById);
     }
 
-    protected override IQueryable<UserReleaseRole> GetResourceRolesQueryByResourceId(Guid releaseVersionId)
+    // The optional parameter 'includeNewPermissionsSystemRoles', which is set to a discard '_' here, is
+    // purely here to assist with the code that SYNCS the creation and removal of the NEW permissions system publication
+    // role with the OLD roles. It is not ideal to have it here, as this class is abstract and is not specific to
+    // publication roles. However, it was put here as a temporary parameter that will be removed
+    // in EES-6196, when we no longer have to cater for the old roles. Due to it being a short-lived temporary
+    // parameter, it was not worth refactoring this class and the base class.
+    protected override IQueryable<UserReleaseRole> GetResourceRolesQueryByResourceId(
+        Guid releaseVersionId,
+        bool _)
     {
         return ContentDbContext
             .UserReleaseRoles
@@ -95,9 +104,9 @@ public class UserReleaseRoleRepository(
             .Distinct()
             .ToListAsync();
     }
-    
+
     public async Task<IReadOnlyList<UserReleaseRole>> ListUserReleaseRolesByUserAndPublication(
-        Guid userId, 
+        Guid userId,
         Guid publicationId)
     {
         return await ContentDbContext
@@ -127,7 +136,7 @@ public class UserReleaseRoleRepository(
         return await ListResourceRoles(releaseVersionId, rolesToInclude);
     }
     
-    // This class will mostly likely remain but be amended slightly in EES-6196, when we no longer have to cater
+    // This method will mostly likely remain but be amended slightly in EES-6196, when we no longer have to cater
     // for the old roles.
     public new async Task Remove(
         UserReleaseRole userReleaseRole,
@@ -135,7 +144,8 @@ public class UserReleaseRoleRepository(
     {
         await base.Remove(userReleaseRole, cancellationToken);
 
-        var newSystemPublicationRoleToRemove = await newPermissionsSystemHelper.DetermineNewPermissionsSystemRoleToDelete(userReleaseRole);
+        var newSystemPublicationRoleToRemove =
+            await newPermissionsSystemHelper.DetermineNewPermissionsSystemRoleToDelete(userReleaseRole);
 
         if (newSystemPublicationRoleToRemove is null)
         {
