@@ -10,10 +10,10 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Fixture;
 
+// ReSharper disable once ClassNeverInstantiated.Global
 public class OptimisedHttpClientWithPsqlFixture : IAsyncLifetime
 {
     private readonly OptimisedPostgreSqlContainerUtil _psql = new();
-    // private HttpClient _client;
     
     private WebApplicationFactory<Startup> _factory;
     private PublicDataDbContext _publicDataDbContext;
@@ -88,6 +88,6 @@ public class OptimisedHttpClientWithPsqlFixture : IAsyncLifetime
     {
         return _publicDataDbContext;
     }
-    
+
     private class TestWebApplicationFactory : WebApplicationFactory<Startup>;
 }
