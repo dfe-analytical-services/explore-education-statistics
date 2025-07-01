@@ -7,6 +7,7 @@ using System.Text.Encodings.Web;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Database;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
@@ -127,6 +128,8 @@ public class OptimisedWebApplicationFactoryBuilder<TStartup>(
             .UseInMemoryDbContext<StatisticsDbContext>()
             .UseInMemoryDbContext<UsersAndRolesDbContext>()
             .AddScoped<PublicDataDbContext>(_ => Mock.Of<PublicDataDbContext>(MockBehavior.Loose))
+            .AddSingleton<IProcessorClient>(_ => Mock.Of<IProcessorClient>(MockBehavior.Strict))
+            .AddSingleton<IPublicDataApiClient>(_ => Mock.Of<IPublicDataApiClient>(MockBehavior.Strict))
             .MockService<IDataProcessorClient>()
             .MockService<IPublisherClient>()
             .MockService<IPublisherTableStorageService>()

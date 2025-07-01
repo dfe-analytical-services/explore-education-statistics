@@ -1,6 +1,7 @@
 using System.Net.Http;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Database;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
@@ -8,6 +9,7 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Moq;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Fixture;
 
@@ -21,6 +23,8 @@ public class OptimisedHttpClientWithPsqlFixture : IAsyncLifetime
     private ContentDbContext _contentDbContext;
     private StatisticsDbContext _statisticsDbContext;
     private UsersAndRolesDbContext _usersAndRolesDbContext;
+    private Mock<IProcessorClient> _processorClientMock;
+    private Mock<IPublicDataApiClient> _publicDataApiClientMock;
 
     public async Task InitializeAsync()
     {
@@ -42,14 +46,9 @@ public class OptimisedHttpClientWithPsqlFixture : IAsyncLifetime
         
         _usersAndRolesDbContext = _factory.Services.GetRequiredService<UsersAndRolesDbContext>();
         _usersAndRolesDbContext.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
-    }
-    
-    public void DisposeDbContexts()
-    {
-        _publicDataDbContext.Dispose();
-        _contentDbContext.Dispose();
-        _statisticsDbContext.Dispose();
-        _usersAndRolesDbContext.Dispose();
+
+        _processorClientMock = Mock.Get(_factory.Services.GetRequiredService<IProcessorClient>());
+        _publicDataApiClientMock = Mock.Get(_factory.Services.GetRequiredService<IPublicDataApiClient>());
     }
 
     public async Task DisposeAsync()
@@ -100,6 +99,24 @@ public class OptimisedHttpClientWithPsqlFixture : IAsyncLifetime
     public PublicDataDbContext GetPublicDataDbContext()
     {
         return _publicDataDbContext;
+    }
+
+    public Mock<IProcessorClient> GetProcessorClientMock()
+    {
+        return _processorClientMock;
+    }
+    
+    public Mock<IPublicDataApiClient> GetPublicDataApiClientMock()
+    {
+        return _publicDataApiClientMock;
+    }
+
+    private void DisposeDbContexts()
+    {
+        _publicDataDbContext.Dispose();
+        _contentDbContext.Dispose();
+        _statisticsDbContext.Dispose();
+        _usersAndRolesDbContext.Dispose();
     }
     
     private class TestWebApplicationFactory : WebApplicationFactory<Startup>;

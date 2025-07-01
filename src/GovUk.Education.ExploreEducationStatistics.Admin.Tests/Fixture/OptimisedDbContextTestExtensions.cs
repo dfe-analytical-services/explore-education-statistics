@@ -13,5 +13,6 @@ public static class OptimisedDbContextTestExtensions
     {
         supplier.Invoke(context);
         await context.SaveChangesAsync();
+        context.ChangeTracker.Clear();
     }
 }
