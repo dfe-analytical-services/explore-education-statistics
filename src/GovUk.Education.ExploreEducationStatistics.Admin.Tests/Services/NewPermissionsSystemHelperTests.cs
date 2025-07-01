@@ -366,6 +366,81 @@ public class NewPermissionsSystemHelperTests
     }
 
     [Theory]
+    [InlineData(PublicationRole.Owner)]
+    [InlineData(PublicationRole.Allower)]
+    public async Task DetermineNewPermissionsSystemRoleToDelete_ForOldPublicationRoleWhichDoesNotExist_Throws(
+        PublicationRole publicationRole)
+    {
+        var user = new User
+        {
+            Id = Guid.NewGuid(),
+        };
+        var publication = _fixture.DefaultPublication()
+            .Generate();
+        var userPublicationRoleToRemove = _fixture.DefaultUserPublicationRole()
+            .WithUser(user)
+            .WithPublication(publication)
+            .WithRole(publicationRole)
+            .Generate();
+
+        var userPublicationRoleRepositoryMock = new Mock<IUserPublicationRoleRepository>();
+        userPublicationRoleRepositoryMock
+            .Setup(rvr => rvr.ListUserPublicationRolesByUserAndPublication(
+                userPublicationRoleToRemove.UserId,
+                userPublicationRoleToRemove.PublicationId,
+                true))
+            .ReturnsAsync([]);
+
+        var newPermissionsSystemHelper = SetupNewPermissionsSystemHelper(
+            userPublicationRoleRepository: userPublicationRoleRepositoryMock.Object);
+
+        var exception = await Assert.ThrowsAsync<ArgumentException>(async () =>
+            await newPermissionsSystemHelper.DetermineNewPermissionsSystemRoleToDelete(userPublicationRoleToRemove)
+        );
+
+        Assert.Equal($"User does not have the publication role '{publicationRole}' assigned to the publication.", exception.Message);
+    }
+
+    [Theory]
+    [InlineData(PublicationRole.Drafter, false)]
+    [InlineData(PublicationRole.Approver, false)]
+    [InlineData(PublicationRole.Drafter, true)]
+    [InlineData(PublicationRole.Approver, true)]
+    public async Task DetermineNewPermissionsSystemRoleToDelete_ForNewPublicationRole_Throws(
+        PublicationRole publicationRole,
+        bool roleExists)
+    {
+        var user = new User
+        {
+            Id = Guid.NewGuid(),
+        };
+        var publication = _fixture.DefaultPublication()
+            .Generate();
+        var userPublicationRoleToRemove = _fixture.DefaultUserPublicationRole()
+            .WithUser(user)
+            .WithPublication(publication)
+            .WithRole(publicationRole)
+            .Generate();
+
+        var userPublicationRoleRepositoryMock = new Mock<IUserPublicationRoleRepository>();
+        userPublicationRoleRepositoryMock
+            .Setup(rvr => rvr.ListUserPublicationRolesByUserAndPublication(
+                userPublicationRoleToRemove.UserId,
+                userPublicationRoleToRemove.PublicationId,
+                true))
+            .ReturnsAsync(roleExists ? [ userPublicationRoleToRemove ] : []);
+
+        var newPermissionsSystemHelper = SetupNewPermissionsSystemHelper(
+            userPublicationRoleRepository: userPublicationRoleRepositoryMock.Object);
+
+        var exception = await Assert.ThrowsAsync<ArgumentException>(async () =>
+            await newPermissionsSystemHelper.DetermineNewPermissionsSystemRoleToDelete(userPublicationRoleToRemove)
+        );
+
+        Assert.Equal($"Unexpected OLD permissions system publication role: '{publicationRole}'.", exception.Message);
+    }
+
+    [Theory]
     [MemberData(nameof(ReleaseRoleDeletionData))]
     public async Task DetermineNewPermissionsSystemRoleToDelete_ForReleaseRole(
         UserReleaseRole userReleaseRoleToRemove,
@@ -411,6 +486,73 @@ public class NewPermissionsSystemHelperTests
             await newPermissionsSystemHelper.DetermineNewPermissionsSystemRoleToDelete(userReleaseRoleToRemove);
 
         Assert.Equal(expectedNewSystemPublicationRoleToRemove, newSystemPublicationRoleToRemove);
+    }
+
+    [Fact]
+    public async Task DetermineNewPermissionsSystemRoleToDelete_ForReleaseRoleWhichDoesNotExist_Throws()
+    {
+        var user = new User
+        {
+            Id = Guid.NewGuid(),
+        };
+        var releaseVersion = _fixture.DefaultReleaseVersion()
+            .WithRelease(_fixture.DefaultRelease()
+                .WithPublication(_fixture.DefaultPublication()))
+            .Generate();
+        var userReleaseRoleToRemove = _fixture.DefaultUserReleaseRole()
+            .WithUser(user)
+            .WithReleaseVersion(releaseVersion)
+            .WithRole(ReleaseRole.Contributor)
+            .Generate();
+
+        var userReleaseRoleRepositoryMock = new Mock<IUserReleaseRoleRepository>();
+        userReleaseRoleRepositoryMock
+            .Setup(rvr => rvr.ListUserReleaseRolesByUserAndPublication(
+                userReleaseRoleToRemove.UserId,
+                userReleaseRoleToRemove.ReleaseVersion.Release.PublicationId))
+            .ReturnsAsync([]);
+
+        var newPermissionsSystemHelper = SetupNewPermissionsSystemHelper(
+            userReleaseRoleRepository: userReleaseRoleRepositoryMock.Object);
+
+        var exception = await Assert.ThrowsAsync<ArgumentException>(async () =>
+            await newPermissionsSystemHelper.DetermineNewPermissionsSystemRoleToDelete(userReleaseRoleToRemove)
+        );
+
+        Assert.Equal($"User does not have the release role '{ReleaseRole.Contributor}' assigned to the publication.", exception.Message);
+    }
+
+    [Fact]
+    public async Task DetermineNewPermissionsSystemRoleToDelete_ForPrereleaseReleaseRole_ReturnsNull()
+    {
+        var user = new User
+        {
+            Id = Guid.NewGuid(),
+        };
+        var releaseVersion = _fixture.DefaultReleaseVersion()
+            .WithRelease(_fixture.DefaultRelease()
+                .WithPublication(_fixture.DefaultPublication()))
+            .Generate();
+        var userReleaseRoleToRemove = _fixture.DefaultUserReleaseRole()
+            .WithUser(user)
+            .WithReleaseVersion(releaseVersion)
+            .WithRole(ReleaseRole.PrereleaseViewer)
+            .Generate();
+
+        var userReleaseRoleRepositoryMock = new Mock<IUserReleaseRoleRepository>();
+        userReleaseRoleRepositoryMock
+            .Setup(rvr => rvr.ListUserReleaseRolesByUserAndPublication(
+                userReleaseRoleToRemove.UserId,
+                userReleaseRoleToRemove.ReleaseVersion.Release.PublicationId))
+            .ReturnsAsync([ userReleaseRoleToRemove ]);
+
+        var newPermissionsSystemHelper = SetupNewPermissionsSystemHelper(
+            userReleaseRoleRepository: userReleaseRoleRepositoryMock.Object);
+
+        var newSystemPublicationRoleToRemove = 
+            await newPermissionsSystemHelper.DetermineNewPermissionsSystemRoleToDelete(userReleaseRoleToRemove);
+
+        Assert.Null(newSystemPublicationRoleToRemove);
     }
 
     private static NewPermissionsSystemHelper SetupNewPermissionsSystemHelper(

@@ -128,7 +128,7 @@ public class NewPermissionsSystemHelper(
 
         if (!oldUserReleaseRoleToDeleteExists)
         {
-            throw new ArgumentException($"User does not have the publication role '{userReleaseRoleToDelete.Role}' assigned to the publication.");
+            throw new ArgumentException($"User does not have the release role '{userReleaseRoleToDelete.Role}' assigned to the publication.");
         }
 
         if (!userReleaseRoleToDelete.Role.TryConvertToNewPermissionsSystemPublicationRole(out var equivalentNewPermissionsSystemPublicationRoleToDelete))
