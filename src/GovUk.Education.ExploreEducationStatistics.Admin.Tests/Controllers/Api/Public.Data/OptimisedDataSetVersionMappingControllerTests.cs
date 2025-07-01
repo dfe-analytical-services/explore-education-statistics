@@ -26,31 +26,36 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api.Public.Data;
 
 [Collection(nameof(OptimisedDataSetVersionMappingControllerTests))]
-public abstract class OptimisedDataSetVersionMappingControllerTests
+public abstract class OptimisedDataSetVersionMappingControllerTests(
+    OptimisedHttpClientWithPsqlFixture fixture,
+    ITestOutputHelper output) : IAsyncLifetime
 {
+    private const string BaseUrl = "api/public-data/data-set-versions";
+    private readonly DataFixture _dataFixture = new();
+
+    public async Task InitializeAsync()
+    {
+        var sw = new Stopwatch();
+        sw.Start();
+
+        await fixture.GetPublicDataDbContext().ClearTestData();
+
+        output.WriteLine($"Clear up test data {sw.ElapsedMilliseconds}");
+        sw.Restart();
+    }
+
+    public Task DisposeAsync()
+    {
+        return Task.CompletedTask;
+    }
+    
     public class OptimisedGetLocationMappingsTests(
         OptimisedHttpClientWithPsqlFixture fixture,
         ITestOutputHelper output)
-        : OptimisedDataSetVersionMappingControllerTests, IAsyncLifetime
+        : OptimisedDataSetVersionMappingControllerTests(fixture, output)
     {
-        private const string BaseUrl = "api/public-data/data-set-versions";
-        private readonly DataFixture _dataFixture = new();
-
-        public async Task InitializeAsync()
-        {
-            var sw = new Stopwatch();
-            sw.Start();
-
-            await fixture.GetPublicDataDbContext().ClearTestData();
-
-            output.WriteLine($"Clear up test data {sw.ElapsedMilliseconds}");
-            sw.Restart();
-        }
-
-        public Task DisposeAsync()
-        {
-            return Task.CompletedTask;
-        }
+        private readonly OptimisedHttpClientWithPsqlFixture _fixture = fixture;
+        private readonly ITestOutputHelper _output = output;
 
         [Fact]
         public async Task Success()
@@ -62,9 +67,9 @@ public abstract class OptimisedDataSetVersionMappingControllerTests
             sw.Start();
 
             var (initialDataSetVersion, nextDataSetVersion) = await CreateInitialAndNextDataSetVersion(
-                fixture.GetPublicDataDbContext(), fixture.GetContentDbContext(), output);
+                _fixture.GetPublicDataDbContext(), _fixture.GetContentDbContext(), _output);
 
-            output.WriteLine($"Set up initial data set version test data {sw.ElapsedMilliseconds}");
+            _output.WriteLine($"Set up initial data set version test data {sw.ElapsedMilliseconds}");
             sw.Restart();
 
             DataSetVersionMapping mapping = _dataFixture
@@ -114,17 +119,17 @@ public abstract class OptimisedDataSetVersionMappingControllerTests
                                 targetKey: "target-location-1-key",
                                 candidate: _dataFixture.DefaultMappableLocationOption())));
 
-            output.WriteLine($"Set up in-memory test data {sw.ElapsedMilliseconds}");
+            _output.WriteLine($"Set up in-memory test data {sw.ElapsedMilliseconds}");
             sw.Restart();
 
-            await fixture.GetPublicDataDbContext().AddTestData(context => context.DataSetVersionMappings.Add(mapping));
+            await _fixture.GetPublicDataDbContext().AddTestData(context => context.DataSetVersionMappings.Add(mapping));
 
-            output.WriteLine($"PSQL set up test data {sw.ElapsedMilliseconds}");
+            _output.WriteLine($"PSQL set up test data {sw.ElapsedMilliseconds}");
             sw.Restart();
 
             var response = await GetLocationMappings(
                 nextDataSetVersionId: nextDataSetVersion.Id,
-                fixture.CreateClient().WithUser("Bau"));
+                _fixture.CreateClient().WithUser(TestUser.Bau));
 
             var retrievedMappings = response.AssertOk<LocationMappingPlan>();
 
@@ -133,10 +138,10 @@ public abstract class OptimisedDataSetVersionMappingControllerTests
                 mapping.LocationMappingPlan,
                 ignoreCollectionOrders: true);
 
-            output.WriteLine($"Do test {sw.ElapsedMilliseconds}");
+            _output.WriteLine($"Do test {sw.ElapsedMilliseconds}");
             sw.Restart();
 
-            output.WriteLine($"Total test run time {totalSw.ElapsedMilliseconds}");
+            _output.WriteLine($"Total test run time {totalSw.ElapsedMilliseconds}");
         }
 
         [Fact]
@@ -147,11 +152,11 @@ public abstract class OptimisedDataSetVersionMappingControllerTests
 
             var response = await GetLocationMappings(
                 Guid.NewGuid(),
-                fixture.CreateClient().WithUser("Authenticated"));
+                _fixture.CreateClient().WithUser(TestUser.Authenticated));
 
             response.AssertForbidden();
 
-            output.WriteLine($"Do test {sw.ElapsedMilliseconds}");
+            _output.WriteLine($"Do test {sw.ElapsedMilliseconds}");
             sw.Restart();
         }
 
@@ -163,11 +168,11 @@ public abstract class OptimisedDataSetVersionMappingControllerTests
 
             var response = await GetLocationMappings(
                 Guid.NewGuid(),
-                fixture.CreateClient().WithUser("Bau"));
+                _fixture.CreateClient().WithUser(TestUser.Bau));
 
             response.AssertNotFound();
 
-            output.WriteLine($"Do test {sw.ElapsedMilliseconds}");
+            _output.WriteLine($"Do test {sw.ElapsedMilliseconds}");
             sw.Restart();
         }
 
@@ -183,32 +188,16 @@ public abstract class OptimisedDataSetVersionMappingControllerTests
 
     public class OptimisedApplyBatchLocationMappingUpdatesTests(
         OptimisedHttpClientWithPsqlFixture fixture,
-        ITestOutputHelper output) : OptimisedDataSetVersionMappingControllerTests, IAsyncLifetime
+        ITestOutputHelper output) : OptimisedDataSetVersionMappingControllerTests(fixture, output)
     {
-        private const string BaseUrl = "api/public-data/data-set-versions";
-        private readonly DataFixture _dataFixture = new();
-
-        public async Task InitializeAsync()
-        {
-            var sw = new Stopwatch();
-            sw.Start();
-
-            await fixture.GetPublicDataDbContext().ClearTestData();
-
-            output.WriteLine($"Clear up test data {sw.ElapsedMilliseconds}");
-            sw.Restart();
-        }
-
-        public Task DisposeAsync()
-        {
-            return Task.CompletedTask;
-        }
+        private readonly OptimisedHttpClientWithPsqlFixture _fixture = fixture;
+        private readonly ITestOutputHelper _output = output;
 
         [Fact]
         public async Task Success()
         {
             var (initialDataSetVersion, nextDataSetVersion) = await CreateInitialAndNextDataSetVersion(
-                fixture.GetPublicDataDbContext(), fixture.GetContentDbContext(), output);
+                _fixture.GetPublicDataDbContext(), _fixture.GetContentDbContext(), _output);
 
             DataSetVersionMapping mapping = _dataFixture
                 .DefaultDataSetVersionMapping()
@@ -256,7 +245,7 @@ public abstract class OptimisedDataSetVersionMappingControllerTests
                                 targetKey: "target-location-1-key",
                                 candidate: _dataFixture.DefaultMappableLocationOption())));
 
-            await fixture.GetPublicDataDbContext().AddTestData(context => context.DataSetVersionMappings.Add(mapping));
+            await _fixture.GetPublicDataDbContext().AddTestData(context => context.DataSetVersionMappings.Add(mapping));
 
             List<LocationMappingUpdateRequest> updates =
             [
@@ -278,7 +267,7 @@ public abstract class OptimisedDataSetVersionMappingControllerTests
             var response = await ApplyBatchLocationMappingUpdates(
                 nextDataSetVersionId: nextDataSetVersion.Id,
                 updates: updates,
-                fixture.CreateClient().WithUser("Bau"));
+                _fixture.CreateClient().WithUser(TestUser.Bau));
 
             var viewModel = response.AssertOk<BatchLocationMappingUpdatesResponseViewModel>();
 
@@ -327,7 +316,7 @@ public abstract class OptimisedDataSetVersionMappingControllerTests
 
             // _fixture.GetPublicDataDbContext().ChangeTracker.Clear();
 
-            var updatedMapping = await fixture.GetPublicDataDbContext()
+            var updatedMapping = await _fixture.GetPublicDataDbContext()
                 .DataSetVersionMappings
                 .Include(m => m.TargetDataSetVersion)
                 .SingleAsync(m => m.TargetDataSetVersionId == nextDataSetVersion.Id);
@@ -414,7 +403,7 @@ public abstract class OptimisedDataSetVersionMappingControllerTests
             string expectedVersion)
         {
             var (initialDataSetVersion, nextDataSetVersion) = await CreateInitialAndNextDataSetVersion(
-                fixture.GetPublicDataDbContext(), fixture.GetContentDbContext(), output);
+                _fixture.GetPublicDataDbContext(), _fixture.GetContentDbContext(), _output);
 
             DataSetVersionMapping mapping = _dataFixture
                 .DefaultDataSetVersionMapping()
@@ -454,7 +443,7 @@ public abstract class OptimisedDataSetVersionMappingControllerTests
                                 targetKey: "target-location-1-key",
                                 candidate: _dataFixture.DefaultMappableLocationOption())));
 
-            await fixture.GetPublicDataDbContext().AddTestData(context => context.DataSetVersionMappings.Add(mapping));
+            await _fixture.GetPublicDataDbContext().AddTestData(context => context.DataSetVersionMappings.Add(mapping));
 
             List<LocationMappingUpdateRequest> updates =
             [
@@ -472,26 +461,26 @@ public abstract class OptimisedDataSetVersionMappingControllerTests
             var response = await ApplyBatchLocationMappingUpdates(
                 nextDataSetVersionId: nextDataSetVersion.Id,
                 updates: updates,
-                fixture.CreateClient().WithUser("Bau"));
+                _fixture.CreateClient().WithUser(TestUser.Bau));
 
             response.AssertOk<BatchLocationMappingUpdatesResponseViewModel>();
 
-            var updatedMapping = await fixture.GetPublicDataDbContext()
+            var updatedMapping = await _fixture.GetPublicDataDbContext()
                 .DataSetVersionMappings
                 .Include(m => m.TargetDataSetVersion)
                 .SingleAsync(m => m.TargetDataSetVersionId == nextDataSetVersion.Id);
 
             Assert.Equal(expectedMappingsComplete, updatedMapping.LocationMappingsComplete);
 
-            await AssertCorrectDataSetVersionNumbers(updatedMapping, expectedVersion, fixture.GetContentDbContext());
+            await AssertCorrectDataSetVersionNumbers(updatedMapping, expectedVersion, _fixture.GetContentDbContext());
         }
 
         [Fact]
         public async Task Success_MappedLocation_HasDeletedLocationLevels_MajorUpdate()
         {
             var (initialDataSetVersion, nextDataSetVersion) =
-                await CreateInitialAndNextDataSetVersion(fixture.GetPublicDataDbContext(),
-                    fixture.GetContentDbContext(), output);
+                await CreateInitialAndNextDataSetVersion(_fixture.GetPublicDataDbContext(),
+                    _fixture.GetContentDbContext(), _output);
 
             DataSetVersionMapping mapping = _dataFixture
                 .DefaultDataSetVersionMapping()
@@ -523,7 +512,7 @@ public abstract class OptimisedDataSetVersionMappingControllerTests
                                     .WithSource(_dataFixture.DefaultMappableLocationOption())
                                     .WithAutoNone())));
 
-            await fixture.GetPublicDataDbContext().AddTestData(context => context.DataSetVersionMappings.Add(mapping));
+            await _fixture.GetPublicDataDbContext().AddTestData(context => context.DataSetVersionMappings.Add(mapping));
 
             List<LocationMappingUpdateRequest> updates =
             [
@@ -539,11 +528,11 @@ public abstract class OptimisedDataSetVersionMappingControllerTests
             var response = await ApplyBatchLocationMappingUpdates(
                 nextDataSetVersionId: nextDataSetVersion.Id,
                 updates: updates,
-                client: fixture.CreateClient().WithUser("Bau"));
+                client: _fixture.CreateClient().WithUser(TestUser.Bau));
 
             response.AssertOk<BatchLocationMappingUpdatesResponseViewModel>();
 
-            var updatedMapping = await fixture.GetPublicDataDbContext()
+            var updatedMapping = await _fixture.GetPublicDataDbContext()
                 .DataSetVersionMappings
                 .Include(m => m.TargetDataSetVersion)
                 .SingleAsync(m => m.TargetDataSetVersionId == nextDataSetVersion.Id);
@@ -552,15 +541,15 @@ public abstract class OptimisedDataSetVersionMappingControllerTests
             // location level deletion, it's a major version update.
             Assert.True(updatedMapping.LocationMappingsComplete);
 
-            await AssertCorrectDataSetVersionNumbers(updatedMapping, "2.0.0", fixture.GetContentDbContext());
+            await AssertCorrectDataSetVersionNumbers(updatedMapping, "2.0.0", _fixture.GetContentDbContext());
         }
 
         [Fact]
         public async Task Success_MappedLocation_HasDeletedIndicators_MajorUpdate()
         {
             var (initialDataSetVersion, nextDataSetVersion) =
-                await CreateInitialAndNextDataSetVersion(fixture.GetPublicDataDbContext(),
-                    fixture.GetContentDbContext(), output);
+                await CreateInitialAndNextDataSetVersion(_fixture.GetPublicDataDbContext(),
+                    _fixture.GetContentDbContext(), _output);
 
             DataSetVersionMapping mapping = _dataFixture
                 .DefaultDataSetVersionMapping()
@@ -584,7 +573,7 @@ public abstract class OptimisedDataSetVersionMappingControllerTests
                 // There are deleted indicators that cannot be mapped.
                 .WithHasDeletedIndicators(true);
 
-            await fixture.GetPublicDataDbContext().AddTestData(context => context.DataSetVersionMappings.Add(mapping));
+            await _fixture.GetPublicDataDbContext().AddTestData(context => context.DataSetVersionMappings.Add(mapping));
 
             List<LocationMappingUpdateRequest> updates =
             [
@@ -600,11 +589,11 @@ public abstract class OptimisedDataSetVersionMappingControllerTests
             var response = await ApplyBatchLocationMappingUpdates(
                 nextDataSetVersionId: nextDataSetVersion.Id,
                 updates: updates,
-                client: fixture.CreateClient().WithUser("Bau"));
+                client: _fixture.CreateClient().WithUser(TestUser.Bau));
 
             response.AssertOk<BatchLocationMappingUpdatesResponseViewModel>();
 
-            var updatedMapping = await fixture.GetPublicDataDbContext()
+            var updatedMapping = await _fixture.GetPublicDataDbContext()
                 .DataSetVersionMappings
                 .Include(m => m.TargetDataSetVersion)
                 .SingleAsync(m => m.TargetDataSetVersionId == nextDataSetVersion.Id);
@@ -613,15 +602,15 @@ public abstract class OptimisedDataSetVersionMappingControllerTests
 
             // This update completes the mapping and would normally be a minor version
             // update, but the deleted indicators mean this is still a major version update.
-            await AssertCorrectDataSetVersionNumbers(updatedMapping, "2.0.0", fixture.GetContentDbContext());
+            await AssertCorrectDataSetVersionNumbers(updatedMapping, "2.0.0", _fixture.GetContentDbContext());
         }
 
         [Fact]
         public async Task Success_MappedLocation_HasDeletedGeographicLevels_MajorUpdate()
         {
             var (initialDataSetVersion, nextDataSetVersion) =
-                await CreateInitialAndNextDataSetVersion(fixture.GetPublicDataDbContext(),
-                    fixture.GetContentDbContext(), output);
+                await CreateInitialAndNextDataSetVersion(_fixture.GetPublicDataDbContext(),
+                    _fixture.GetContentDbContext(), _output);
 
             DataSetVersionMapping mapping = _dataFixture
                 .DefaultDataSetVersionMapping()
@@ -645,7 +634,7 @@ public abstract class OptimisedDataSetVersionMappingControllerTests
                 // There are deleted geographic levels that cannot be mapped.
                 .WithHasDeletedGeographicLevels(true);
 
-            await fixture.GetPublicDataDbContext().AddTestData(context => context.DataSetVersionMappings.Add(mapping));
+            await _fixture.GetPublicDataDbContext().AddTestData(context => context.DataSetVersionMappings.Add(mapping));
 
             List<LocationMappingUpdateRequest> updates =
             [
@@ -661,11 +650,11 @@ public abstract class OptimisedDataSetVersionMappingControllerTests
             var response = await ApplyBatchLocationMappingUpdates(
                 nextDataSetVersionId: nextDataSetVersion.Id,
                 updates: updates,
-                client: fixture.CreateClient().WithUser("Bau"));
+                client: _fixture.CreateClient().WithUser(TestUser.Bau));
 
             response.AssertOk<BatchLocationMappingUpdatesResponseViewModel>();
 
-            var updatedMapping = await fixture.GetPublicDataDbContext()
+            var updatedMapping = await _fixture.GetPublicDataDbContext()
                 .DataSetVersionMappings
                 .Include(m => m.TargetDataSetVersion)
                 .SingleAsync(m => m.TargetDataSetVersionId == nextDataSetVersion.Id);
@@ -674,15 +663,15 @@ public abstract class OptimisedDataSetVersionMappingControllerTests
 
             // This update completes the mapping and would normally be a minor version
             // update, but the deleted geographic levels mean this is still a major version update.
-            await AssertCorrectDataSetVersionNumbers(updatedMapping, "2.0.0", fixture.GetContentDbContext());
+            await AssertCorrectDataSetVersionNumbers(updatedMapping, "2.0.0", _fixture.GetContentDbContext());
         }
 
         [Fact]
         public async Task Success_MappedLocation_HasDeletedTimePeriods_MajorUpdate()
         {
             var (initialDataSetVersion, nextDataSetVersion) =
-                await CreateInitialAndNextDataSetVersion(fixture.GetPublicDataDbContext(),
-                    fixture.GetContentDbContext(), output);
+                await CreateInitialAndNextDataSetVersion(_fixture.GetPublicDataDbContext(),
+                    _fixture.GetContentDbContext(), _output);
 
             DataSetVersionMapping mapping = _dataFixture
                 .DefaultDataSetVersionMapping()
@@ -706,7 +695,7 @@ public abstract class OptimisedDataSetVersionMappingControllerTests
                 // There are deleted time periods that cannot be mapped.
                 .WithHasDeletedTimePeriods(true);
 
-            await fixture.GetPublicDataDbContext().AddTestData(context => context.DataSetVersionMappings.Add(mapping));
+            await _fixture.GetPublicDataDbContext().AddTestData(context => context.DataSetVersionMappings.Add(mapping));
 
             List<LocationMappingUpdateRequest> updates =
             [
@@ -722,11 +711,11 @@ public abstract class OptimisedDataSetVersionMappingControllerTests
             var response = await ApplyBatchLocationMappingUpdates(
                 nextDataSetVersionId: nextDataSetVersion.Id,
                 updates: updates,
-                client: fixture.CreateClient().WithUser("Bau"));
+                client: _fixture.CreateClient().WithUser(TestUser.Bau));
 
             response.AssertOk<BatchLocationMappingUpdatesResponseViewModel>();
 
-            var updatedMapping = await fixture.GetPublicDataDbContext()
+            var updatedMapping = await _fixture.GetPublicDataDbContext()
                 .DataSetVersionMappings
                 .Include(m => m.TargetDataSetVersion)
                 .SingleAsync(m => m.TargetDataSetVersionId == nextDataSetVersion.Id);
@@ -735,7 +724,7 @@ public abstract class OptimisedDataSetVersionMappingControllerTests
 
             // This update completes the mapping and would normally be a minor version
             // update, but the deleted time periods mean this is still a major version update.
-            await AssertCorrectDataSetVersionNumbers(updatedMapping, "2.0.0", fixture.GetContentDbContext());
+            await AssertCorrectDataSetVersionNumbers(updatedMapping, "2.0.0", _fixture.GetContentDbContext());
         }
 
 
@@ -743,8 +732,8 @@ public abstract class OptimisedDataSetVersionMappingControllerTests
         public async Task SourceKeyDoesNotExist_Returns400_AndRollsBackTransaction()
         {
             var (initialDataSetVersion, nextDataSetVersion) =
-                await CreateInitialAndNextDataSetVersion(fixture.GetPublicDataDbContext(),
-                    fixture.GetContentDbContext(), output);
+                await CreateInitialAndNextDataSetVersion(_fixture.GetPublicDataDbContext(),
+                    _fixture.GetContentDbContext(), _output);
 
             DataSetVersionMapping mapping = _dataFixture
                 .DefaultDataSetVersionMapping()
@@ -783,7 +772,7 @@ public abstract class OptimisedDataSetVersionMappingControllerTests
                                 targetKey: "target-country-location-1-key",
                                 candidate: _dataFixture.DefaultMappableLocationOption())));
 
-            await fixture.GetPublicDataDbContext().AddTestData(context => context.DataSetVersionMappings.Add(mapping));
+            await _fixture.GetPublicDataDbContext().AddTestData(context => context.DataSetVersionMappings.Add(mapping));
 
             List<LocationMappingUpdateRequest> updates =
             [
@@ -816,7 +805,7 @@ public abstract class OptimisedDataSetVersionMappingControllerTests
             var response = await ApplyBatchLocationMappingUpdates(
                 nextDataSetVersionId: nextDataSetVersion.Id,
                 updates: updates,
-                client: fixture.CreateClient().WithUser("Bau"));
+                client: _fixture.CreateClient().WithUser(TestUser.Bau));
 
             var validationProblem = response.AssertValidationProblem();
 
@@ -832,7 +821,7 @@ public abstract class OptimisedDataSetVersionMappingControllerTests
                 expectedPath: "updates[2].sourceKey",
                 expectedCode: nameof(ValidationMessages.DataSetVersionMappingSourcePathDoesNotExist));
 
-            var retrievedMappings = await fixture.GetPublicDataDbContext()
+            var retrievedMappings = await _fixture.GetPublicDataDbContext()
                 .DataSetVersionMappings
                 .SingleAsync(m => m.TargetDataSetVersionId == nextDataSetVersion.Id);
 
@@ -846,8 +835,8 @@ public abstract class OptimisedDataSetVersionMappingControllerTests
         public async Task CandidateKeyDoesNotExist_Returns400()
         {
             var (initialDataSetVersion, nextDataSetVersion) =
-                await CreateInitialAndNextDataSetVersion(fixture.GetPublicDataDbContext(),
-                    fixture.GetContentDbContext(), output);
+                await CreateInitialAndNextDataSetVersion(_fixture.GetPublicDataDbContext(),
+                    _fixture.GetContentDbContext(), _output);
 
             DataSetVersionMapping mapping = _dataFixture
                 .DefaultDataSetVersionMapping()
@@ -890,7 +879,7 @@ public abstract class OptimisedDataSetVersionMappingControllerTests
                                 targetKey: "target-country-location-1-key",
                                 candidate: _dataFixture.DefaultMappableLocationOption())));
 
-            await fixture.GetPublicDataDbContext().AddTestData(context => context.DataSetVersionMappings.Add(mapping));
+            await _fixture.GetPublicDataDbContext().AddTestData(context => context.DataSetVersionMappings.Add(mapping));
 
             List<LocationMappingUpdateRequest> updates =
             [
@@ -931,7 +920,7 @@ public abstract class OptimisedDataSetVersionMappingControllerTests
             var response = await ApplyBatchLocationMappingUpdates(
                 nextDataSetVersionId: nextDataSetVersion.Id,
                 updates: updates,
-                client: fixture.CreateClient().WithUser("Bau"));
+                client: _fixture.CreateClient().WithUser(TestUser.Bau));
 
             var validationProblem = response.AssertValidationProblem();
 
@@ -947,7 +936,7 @@ public abstract class OptimisedDataSetVersionMappingControllerTests
 
             Assert.Equal(2, validationProblem.Errors.Count);
 
-            var retrievedMappings = await fixture.GetPublicDataDbContext()
+            var retrievedMappings = await _fixture.GetPublicDataDbContext()
                 .DataSetVersionMappings
                 .SingleAsync(m => m.TargetDataSetVersionId == nextDataSetVersion.Id);
 
@@ -963,7 +952,7 @@ public abstract class OptimisedDataSetVersionMappingControllerTests
             var response = await ApplyBatchLocationMappingUpdates(
                 nextDataSetVersionId: Guid.NewGuid(),
                 updates: [],
-                client: fixture.CreateClient().WithUser("Authenticated"));
+                client: _fixture.CreateClient().WithUser(TestUser.Authenticated));
 
             response.AssertForbidden();
         }
@@ -974,7 +963,7 @@ public abstract class OptimisedDataSetVersionMappingControllerTests
             var response = await ApplyBatchLocationMappingUpdates(
                 nextDataSetVersionId: Guid.NewGuid(),
                 updates: [],
-                client: fixture.CreateClient().WithUser("Bau"));
+                client: _fixture.CreateClient().WithUser(TestUser.Bau));
 
             response.AssertNotFound();
         }
@@ -988,7 +977,7 @@ public abstract class OptimisedDataSetVersionMappingControllerTests
                 [
                     new LocationMappingUpdateRequest()
                 ],
-                client: fixture.CreateClient().WithUser("Bau"));
+                client: _fixture.CreateClient().WithUser(TestUser.Bau));
 
             var validationProblem = response.AssertValidationProblem();
             Assert.Equal(3, validationProblem.Errors.Count);
@@ -1014,7 +1003,7 @@ public abstract class OptimisedDataSetVersionMappingControllerTests
                         CandidateKey = candidateKeyValue
                     }
                 ],
-                client: fixture.CreateClient().WithUser("Bau"));
+                client: _fixture.CreateClient().WithUser(TestUser.Bau));
 
             var validationProblem = response.AssertValidationProblem();
             Assert.Single(validationProblem.Errors);
@@ -1040,7 +1029,7 @@ public abstract class OptimisedDataSetVersionMappingControllerTests
                         CandidateKey = "target-location-1"
                     }
                 ],
-                client: fixture.CreateClient().WithUser("Bau"));
+                client: _fixture.CreateClient().WithUser(TestUser.Bau));
 
             var validationProblem = response.AssertValidationProblem();
             Assert.Single(validationProblem.Errors);
@@ -1068,7 +1057,7 @@ public abstract class OptimisedDataSetVersionMappingControllerTests
                         CandidateKey = null
                     }
                 ],
-                client: fixture.CreateClient().WithUser("Bau"));
+                client: _fixture.CreateClient().WithUser(TestUser.Bau));
 
             var validationProblem = response.AssertValidationProblem();
             Assert.Single(validationProblem.Errors);
@@ -1092,32 +1081,16 @@ public abstract class OptimisedDataSetVersionMappingControllerTests
 
     public class OptimisedGetFilterMappingsTests(
         OptimisedHttpClientWithPsqlFixture fixture,
-        ITestOutputHelper output) : OptimisedDataSetVersionMappingControllerTests, IAsyncLifetime
+        ITestOutputHelper output) : OptimisedDataSetVersionMappingControllerTests(fixture, output)
     {
-        private const string BaseUrl = "api/public-data/data-set-versions";
-        private readonly DataFixture _dataFixture = new();
-
-        public async Task InitializeAsync()
-        {
-            var sw = new Stopwatch();
-            sw.Start();
-
-            await fixture.GetPublicDataDbContext().ClearTestData();
-
-            output.WriteLine($"Clear up test data {sw.ElapsedMilliseconds}");
-            sw.Restart();
-        }
-
-        public Task DisposeAsync()
-        {
-            return Task.CompletedTask;
-        }
+        private readonly OptimisedHttpClientWithPsqlFixture _fixture = fixture;
+        private readonly ITestOutputHelper _output = output;
 
         [Fact]
         public async Task Success()
         {
             var (initialDataSetVersion, nextDataSetVersion) = await CreateInitialAndNextDataSetVersion(
-                fixture.GetPublicDataDbContext(), fixture.GetContentDbContext(), output);
+                _fixture.GetPublicDataDbContext(), _fixture.GetContentDbContext(), _output);
 
             DataSetVersionMapping mapping = _dataFixture
                 .DefaultDataSetVersionMapping()
@@ -1147,13 +1120,13 @@ public abstract class OptimisedDataSetVersionMappingControllerTests
                         .AddOptionCandidate("filter-1-option-3-key", _dataFixture
                             .DefaultMappableFilterOption())));
 
-            await fixture.GetPublicDataDbContext().AddTestData(context =>
+            await _fixture.GetPublicDataDbContext().AddTestData(context =>
             {
                 context.DataSetVersionMappings.Add(mapping);
             });
 
             var response = await GetFilterMappings(
-                nextDataSetVersionId: nextDataSetVersion.Id, fixture.CreateClient().WithUser("Bau"));
+                nextDataSetVersionId: nextDataSetVersion.Id, _fixture.CreateClient().WithUser(TestUser.Bau));
 
             var retrievedMappings = response.AssertOk<FilterMappingPlan>();
 
@@ -1168,7 +1141,7 @@ public abstract class OptimisedDataSetVersionMappingControllerTests
         {
             var response = await GetFilterMappings(
                 nextDataSetVersionId: Guid.NewGuid(),
-                client: fixture.CreateClient().WithUser("Authenticated"));
+                client: _fixture.CreateClient().WithUser(TestUser.Authenticated));
 
             response.AssertForbidden();
         }
@@ -1176,7 +1149,7 @@ public abstract class OptimisedDataSetVersionMappingControllerTests
         [Fact]
         public async Task DataSetVersionMappingDoesNotExist_Returns404()
         {
-            var response = await GetFilterMappings(Guid.NewGuid(), fixture.CreateClient().WithUser("Bau"));
+            var response = await GetFilterMappings(Guid.NewGuid(), _fixture.CreateClient().WithUser(TestUser.Bau));
 
             response.AssertNotFound();
         }
@@ -1193,32 +1166,16 @@ public abstract class OptimisedDataSetVersionMappingControllerTests
 
     public class OptimisedApplyBatchFilterOptionMappingUpdatesTests(
         OptimisedHttpClientWithPsqlFixture fixture,
-        ITestOutputHelper output) : OptimisedDataSetVersionMappingControllerTests, IAsyncLifetime
+        ITestOutputHelper output) : OptimisedDataSetVersionMappingControllerTests(fixture, output)
     {
-        private const string BaseUrl = "api/public-data/data-set-versions";
-        private readonly DataFixture _dataFixture = new();
-
-        public async Task InitializeAsync()
-        {
-            var sw = new Stopwatch();
-            sw.Start();
-
-            await fixture.GetPublicDataDbContext().ClearTestData();
-
-            output.WriteLine($"Clear up test data {sw.ElapsedMilliseconds}");
-            sw.Restart();
-        }
-
-        public Task DisposeAsync()
-        {
-            return Task.CompletedTask;
-        }
+        private readonly OptimisedHttpClientWithPsqlFixture _fixture = fixture;
+        private readonly ITestOutputHelper _output = output;
 
         [Fact]
         public async Task Success()
         {
             var (initialDataSetVersion, nextDataSetVersion) = await CreateInitialAndNextDataSetVersion(
-                fixture.GetPublicDataDbContext(), fixture.GetContentDbContext(), output);
+                _fixture.GetPublicDataDbContext(), _fixture.GetContentDbContext(), _output);
 
             DataSetVersionMapping mapping = _dataFixture
                 .DefaultDataSetVersionMapping()
@@ -1250,7 +1207,7 @@ public abstract class OptimisedDataSetVersionMappingControllerTests
                         .AddOptionCandidate("filter-2-option-1-key", _dataFixture
                             .DefaultMappableFilterOption())));
 
-            await fixture.GetPublicDataDbContext().AddTestData(context => context.DataSetVersionMappings.Add(mapping));
+            await _fixture.GetPublicDataDbContext().AddTestData(context => context.DataSetVersionMappings.Add(mapping));
 
             List<FilterOptionMappingUpdateRequest> updates =
             [
@@ -1272,7 +1229,7 @@ public abstract class OptimisedDataSetVersionMappingControllerTests
             var response = await ApplyBatchFilterOptionMappingUpdates(
                 nextDataSetVersionId: nextDataSetVersion.Id,
                 updates: updates,
-                fixture.CreateClient().WithUser("Bau"));
+                _fixture.CreateClient().WithUser(TestUser.Bau));
 
             var viewModel = response.AssertOk<BatchFilterOptionMappingUpdatesResponseViewModel>();
 
@@ -1311,7 +1268,7 @@ public abstract class OptimisedDataSetVersionMappingControllerTests
             // that were updated.
             viewModel.AssertDeepEqualTo(expectedUpdateResponse, ignoreCollectionOrders: true);
 
-            var updatedMapping = await fixture.GetPublicDataDbContext()
+            var updatedMapping = await _fixture.GetPublicDataDbContext()
                 .DataSetVersionMappings
                 .Include(m => m.TargetDataSetVersion)
                 .SingleAsync(m => m.TargetDataSetVersionId == nextDataSetVersion.Id);
@@ -1372,7 +1329,7 @@ public abstract class OptimisedDataSetVersionMappingControllerTests
             // belonging to mapped filters have a mapping type of "ManualNone", indicating that
             // some of the source filter options are no longer available in the target data set
             // version, thus creating a breaking change.
-            await AssertCorrectDataSetVersionNumbers(updatedMapping, "2.0.0", fixture.GetContentDbContext());
+            await AssertCorrectDataSetVersionNumbers(updatedMapping, "2.0.0", _fixture.GetContentDbContext());
         }
 
         [Theory]
@@ -1390,7 +1347,7 @@ public abstract class OptimisedDataSetVersionMappingControllerTests
             bool expectedMappingsComplete)
         {
             var (initialDataSetVersion, nextDataSetVersion) = await CreateInitialAndNextDataSetVersion(
-                fixture.GetPublicDataDbContext(), fixture.GetContentDbContext(), output);
+                _fixture.GetPublicDataDbContext(), _fixture.GetContentDbContext(), _output);
 
             DataSetVersionMapping mapping = _dataFixture
                 .DefaultDataSetVersionMapping()
@@ -1433,7 +1390,7 @@ public abstract class OptimisedDataSetVersionMappingControllerTests
                         .AddOptionCandidate("filter-2-option-1-key", _dataFixture
                             .DefaultMappableFilterOption())));
 
-            await fixture.GetPublicDataDbContext().AddTestData(context => context.DataSetVersionMappings.Add(mapping));
+            await _fixture.GetPublicDataDbContext().AddTestData(context => context.DataSetVersionMappings.Add(mapping));
 
             var mappingCandidateKey = updatedMappingType == MappingType.ManualMapped
                 ? "filter-1-option-1-key"
@@ -1453,11 +1410,11 @@ public abstract class OptimisedDataSetVersionMappingControllerTests
             var response = await ApplyBatchFilterOptionMappingUpdates(
                 nextDataSetVersionId: nextDataSetVersion.Id,
                 updates: updates,
-                fixture.CreateClient().WithUser("Bau"));
+                _fixture.CreateClient().WithUser(TestUser.Bau));
 
             response.AssertOk<BatchFilterOptionMappingUpdatesResponseViewModel>();
 
-            var updatedMapping = await fixture.GetPublicDataDbContext()
+            var updatedMapping = await _fixture.GetPublicDataDbContext()
                 .DataSetVersionMappings
                 .SingleAsync(m => m.TargetDataSetVersionId == nextDataSetVersion.Id);
 
@@ -1481,7 +1438,7 @@ public abstract class OptimisedDataSetVersionMappingControllerTests
             string expectedVersion)
         {
             var (initialDataSetVersion, nextDataSetVersion) = await CreateInitialAndNextDataSetVersion(
-                fixture.GetPublicDataDbContext(), fixture.GetContentDbContext(), output);
+                _fixture.GetPublicDataDbContext(), _fixture.GetContentDbContext(), _output);
 
             DataSetVersionMapping mapping = _dataFixture
                 .DefaultDataSetVersionMapping()
@@ -1515,7 +1472,7 @@ public abstract class OptimisedDataSetVersionMappingControllerTests
                         .AddOptionCandidate("filter-2-option-1-key", _dataFixture
                             .DefaultMappableFilterOption())));
 
-            await fixture.GetPublicDataDbContext().AddTestData(context => context.DataSetVersionMappings.Add(mapping));
+            await _fixture.GetPublicDataDbContext().AddTestData(context => context.DataSetVersionMappings.Add(mapping));
 
             var mappingCandidateKey = updatedMappingType == MappingType.ManualMapped
                 ? "filter-1-option-1-key"
@@ -1535,23 +1492,23 @@ public abstract class OptimisedDataSetVersionMappingControllerTests
             var response = await ApplyBatchFilterOptionMappingUpdates(
                 nextDataSetVersionId: nextDataSetVersion.Id,
                 updates: updates,
-                fixture.CreateClient().WithUser("Bau"));
+                _fixture.CreateClient().WithUser(TestUser.Bau));
 
             response.AssertOk<BatchFilterOptionMappingUpdatesResponseViewModel>();
 
-            var updatedMapping = await fixture.GetPublicDataDbContext()
+            var updatedMapping = await _fixture.GetPublicDataDbContext()
                 .DataSetVersionMappings
                 .Include(m => m.TargetDataSetVersion)
                 .SingleAsync(m => m.TargetDataSetVersionId == nextDataSetVersion.Id);
 
-            await AssertCorrectDataSetVersionNumbers(updatedMapping, expectedVersion, fixture.GetContentDbContext());
+            await AssertCorrectDataSetVersionNumbers(updatedMapping, expectedVersion, _fixture.GetContentDbContext());
         }
 
         [Fact]
         public async Task Success_VersionUpdate_HasDeletedIndicators_MajorUpdate()
         {
             var (initialDataSetVersion, nextDataSetVersion) = await CreateInitialAndNextDataSetVersion(
-                fixture.GetPublicDataDbContext(), fixture.GetContentDbContext(), output);
+                _fixture.GetPublicDataDbContext(), _fixture.GetContentDbContext(), _output);
 
             DataSetVersionMapping mapping = _dataFixture
                 .DefaultDataSetVersionMapping()
@@ -1572,7 +1529,7 @@ public abstract class OptimisedDataSetVersionMappingControllerTests
                 // Has deleted indicators that cannot be mapped
                 .WithHasDeletedIndicators(true);
 
-            await fixture.GetPublicDataDbContext().AddTestData(context => context.DataSetVersionMappings.Add(mapping));
+            await _fixture.GetPublicDataDbContext().AddTestData(context => context.DataSetVersionMappings.Add(mapping));
 
             List<FilterOptionMappingUpdateRequest> updates =
             [
@@ -1588,24 +1545,24 @@ public abstract class OptimisedDataSetVersionMappingControllerTests
             var response = await ApplyBatchFilterOptionMappingUpdates(
                 nextDataSetVersionId: nextDataSetVersion.Id,
                 updates: updates,
-                fixture.CreateClient().WithUser("Bau"));
+                _fixture.CreateClient().WithUser(TestUser.Bau));
 
             response.AssertOk<BatchFilterOptionMappingUpdatesResponseViewModel>();
 
-            var updatedMapping = await fixture.GetPublicDataDbContext()
+            var updatedMapping = await _fixture.GetPublicDataDbContext()
                 .DataSetVersionMappings
                 .Include(m => m.TargetDataSetVersion)
                 .SingleAsync(m => m.TargetDataSetVersionId == nextDataSetVersion.Id);
 
             // Should be a minor version update, but has deleted indicators so must be a major update.
-            await AssertCorrectDataSetVersionNumbers(updatedMapping, "2.0.0", fixture.GetContentDbContext());
+            await AssertCorrectDataSetVersionNumbers(updatedMapping, "2.0.0", _fixture.GetContentDbContext());
         }
 
         [Fact]
         public async Task Success_VersionUpdate_HasDeletedGeographicLevels_MajorUpdate()
         {
             var (initialDataSetVersion, nextDataSetVersion) = await CreateInitialAndNextDataSetVersion(
-                fixture.GetPublicDataDbContext(), fixture.GetContentDbContext(), output);
+                _fixture.GetPublicDataDbContext(), _fixture.GetContentDbContext(), _output);
 
             DataSetVersionMapping mapping = _dataFixture
                 .DefaultDataSetVersionMapping()
@@ -1626,7 +1583,7 @@ public abstract class OptimisedDataSetVersionMappingControllerTests
                 // Has deleted geographic levels that cannot be mapped
                 .WithHasDeletedGeographicLevels(true);
 
-            await fixture.GetPublicDataDbContext().AddTestData(context => context.DataSetVersionMappings.Add(mapping));
+            await _fixture.GetPublicDataDbContext().AddTestData(context => context.DataSetVersionMappings.Add(mapping));
 
             List<FilterOptionMappingUpdateRequest> updates =
             [
@@ -1642,24 +1599,24 @@ public abstract class OptimisedDataSetVersionMappingControllerTests
             var response = await ApplyBatchFilterOptionMappingUpdates(
                 nextDataSetVersionId: nextDataSetVersion.Id,
                 updates: updates,
-                fixture.CreateClient().WithUser("Bau"));
+                _fixture.CreateClient().WithUser(TestUser.Bau));
 
             response.AssertOk<BatchFilterOptionMappingUpdatesResponseViewModel>();
 
-            var updatedMapping = await fixture.GetPublicDataDbContext()
+            var updatedMapping = await _fixture.GetPublicDataDbContext()
                 .DataSetVersionMappings
                 .Include(m => m.TargetDataSetVersion)
                 .SingleAsync(m => m.TargetDataSetVersionId == nextDataSetVersion.Id);
 
             // Should be a minor version update, but has deleted geographic levels so must be a major update.
-            await AssertCorrectDataSetVersionNumbers(updatedMapping, "2.0.0", fixture.GetContentDbContext());
+            await AssertCorrectDataSetVersionNumbers(updatedMapping, "2.0.0", _fixture.GetContentDbContext());
         }
 
         [Fact]
         public async Task Success_VersionUpdate_HasDeletedTimePeriods_MajorUpdate()
         {
             var (initialDataSetVersion, nextDataSetVersion) = await CreateInitialAndNextDataSetVersion(
-                fixture.GetPublicDataDbContext(), fixture.GetContentDbContext(), output);
+                _fixture.GetPublicDataDbContext(), _fixture.GetContentDbContext(), _output);
 
             DataSetVersionMapping mapping = _dataFixture
                 .DefaultDataSetVersionMapping()
@@ -1681,7 +1638,7 @@ public abstract class OptimisedDataSetVersionMappingControllerTests
                 // Has deleted time periods that cannot be mapped
                 .WithHasDeletedTimePeriods(true);
 
-            await fixture.GetPublicDataDbContext().AddTestData(context => context.DataSetVersionMappings.Add(mapping));
+            await _fixture.GetPublicDataDbContext().AddTestData(context => context.DataSetVersionMappings.Add(mapping));
 
             List<FilterOptionMappingUpdateRequest> updates =
             [
@@ -1697,17 +1654,17 @@ public abstract class OptimisedDataSetVersionMappingControllerTests
             var response = await ApplyBatchFilterOptionMappingUpdates(
                 nextDataSetVersionId: nextDataSetVersion.Id,
                 updates: updates,
-                fixture.CreateClient().WithUser("Bau"));
+                _fixture.CreateClient().WithUser(TestUser.Bau));
 
             response.AssertOk<BatchFilterOptionMappingUpdatesResponseViewModel>();
 
-            var updatedMapping = await fixture.GetPublicDataDbContext()
+            var updatedMapping = await _fixture.GetPublicDataDbContext()
                 .DataSetVersionMappings
                 .Include(m => m.TargetDataSetVersion)
                 .SingleAsync(m => m.TargetDataSetVersionId == nextDataSetVersion.Id);
 
             // Should be a minor version update, but has deleted time periods so must be a major update.
-            await AssertCorrectDataSetVersionNumbers(updatedMapping, "2.0.0", fixture.GetContentDbContext());
+            await AssertCorrectDataSetVersionNumbers(updatedMapping, "2.0.0", _fixture.GetContentDbContext());
         }
 
         [Theory]
@@ -1716,7 +1673,7 @@ public abstract class OptimisedDataSetVersionMappingControllerTests
         public async Task Success_VersionUpdates_UnmappableFilter(MappingType updatedMappingType)
         {
             var (initialDataSetVersion, nextDataSetVersion) = await CreateInitialAndNextDataSetVersion(
-                fixture.GetPublicDataDbContext(), fixture.GetContentDbContext(), output);
+                _fixture.GetPublicDataDbContext(), _fixture.GetContentDbContext(), _output);
 
             DataSetVersionMapping mapping = _dataFixture
                 .DefaultDataSetVersionMapping()
@@ -1749,7 +1706,7 @@ public abstract class OptimisedDataSetVersionMappingControllerTests
                         .AddOptionCandidate("filter-2-option-1-key", _dataFixture
                             .DefaultMappableFilterOption())));
 
-            await fixture.GetPublicDataDbContext().AddTestData(context => context.DataSetVersionMappings.Add(mapping));
+            await _fixture.GetPublicDataDbContext().AddTestData(context => context.DataSetVersionMappings.Add(mapping));
 
             var mappingCandidateKey = updatedMappingType == MappingType.ManualMapped
                 ? "filter-1-option-1-key"
@@ -1769,11 +1726,11 @@ public abstract class OptimisedDataSetVersionMappingControllerTests
             var response = await ApplyBatchFilterOptionMappingUpdates(
                 nextDataSetVersionId: nextDataSetVersion.Id,
                 updates: updates,
-                fixture.CreateClient().WithUser("Bau"));
+                _fixture.CreateClient().WithUser(TestUser.Bau));
 
             response.AssertOk<BatchFilterOptionMappingUpdatesResponseViewModel>();
 
-            var updatedMapping = await fixture.GetPublicDataDbContext()
+            var updatedMapping = await _fixture.GetPublicDataDbContext()
                 .DataSetVersionMappings
                 .Include(m => m.TargetDataSetVersion)
                 .SingleAsync(m => m.TargetDataSetVersionId == nextDataSetVersion.Id);
@@ -1781,14 +1738,14 @@ public abstract class OptimisedDataSetVersionMappingControllerTests
             // Assert that the batch save calculates the next version number as a major change,
             // as filter options that were in the source data set version no longer appear in the
             // next version.
-            await AssertCorrectDataSetVersionNumbers(updatedMapping, "2.0.0", fixture.GetContentDbContext());
+            await AssertCorrectDataSetVersionNumbers(updatedMapping, "2.0.0", _fixture.GetContentDbContext());
         }
 
         [Fact]
         public async Task SourceKeyDoesNotExist_Returns400_AndRollsBackTransaction()
         {
             var (initialDataSetVersion, nextDataSetVersion) = await CreateInitialAndNextDataSetVersion(
-                fixture.GetPublicDataDbContext(), fixture.GetContentDbContext(), output);
+                _fixture.GetPublicDataDbContext(), _fixture.GetContentDbContext(), _output);
 
             DataSetVersionMapping mapping = _dataFixture
                 .DefaultDataSetVersionMapping()
@@ -1814,7 +1771,7 @@ public abstract class OptimisedDataSetVersionMappingControllerTests
                         .AddOptionCandidate("filter-1-option-3-key", _dataFixture
                             .DefaultMappableFilterOption())));
 
-            await fixture.GetPublicDataDbContext().AddTestData(context => context.DataSetVersionMappings.Add(mapping));
+            await _fixture.GetPublicDataDbContext().AddTestData(context => context.DataSetVersionMappings.Add(mapping));
 
             List<FilterOptionMappingUpdateRequest> updates =
             [
@@ -1839,7 +1796,7 @@ public abstract class OptimisedDataSetVersionMappingControllerTests
             var response = await ApplyBatchFilterOptionMappingUpdates(
                 nextDataSetVersionId: nextDataSetVersion.Id,
                 updates: updates,
-                fixture.CreateClient().WithUser("Bau"));
+                _fixture.CreateClient().WithUser(TestUser.Bau));
 
             var validationProblem = response.AssertValidationProblem();
 
@@ -1851,7 +1808,7 @@ public abstract class OptimisedDataSetVersionMappingControllerTests
 
             Assert.Single(validationProblem.Errors);
 
-            var retrievedMappings = await fixture.GetPublicDataDbContext()
+            var retrievedMappings = await _fixture.GetPublicDataDbContext()
                 .DataSetVersionMappings
                 .SingleAsync(m => m.TargetDataSetVersionId == nextDataSetVersion.Id);
 
@@ -1865,7 +1822,7 @@ public abstract class OptimisedDataSetVersionMappingControllerTests
         public async Task CandidateKeyDoesNotExist_Returns400()
         {
             var (initialDataSetVersion, nextDataSetVersion) = await CreateInitialAndNextDataSetVersion(
-                fixture.GetPublicDataDbContext(), fixture.GetContentDbContext(), output);
+                _fixture.GetPublicDataDbContext(), _fixture.GetContentDbContext(), _output);
 
             DataSetVersionMapping mapping = _dataFixture
                 .DefaultDataSetVersionMapping()
@@ -1899,7 +1856,7 @@ public abstract class OptimisedDataSetVersionMappingControllerTests
                         .AddOptionCandidate("filter-2-option-1-key", _dataFixture
                             .DefaultMappableFilterOption())));
 
-            await fixture.GetPublicDataDbContext().AddTestData(context => context.DataSetVersionMappings.Add(mapping));
+            await _fixture.GetPublicDataDbContext().AddTestData(context => context.DataSetVersionMappings.Add(mapping));
 
             List<FilterOptionMappingUpdateRequest> updates =
             [
@@ -1940,7 +1897,7 @@ public abstract class OptimisedDataSetVersionMappingControllerTests
             var response = await ApplyBatchFilterOptionMappingUpdates(
                 nextDataSetVersionId: nextDataSetVersion.Id,
                 updates: updates,
-                fixture.CreateClient().WithUser("Bau"));
+                _fixture.CreateClient().WithUser(TestUser.Bau));
 
             var validationProblem = response.AssertValidationProblem();
 
@@ -1956,7 +1913,7 @@ public abstract class OptimisedDataSetVersionMappingControllerTests
 
             Assert.Equal(2, validationProblem.Errors.Count);
 
-            var retrievedMappings = await fixture.GetPublicDataDbContext()
+            var retrievedMappings = await _fixture.GetPublicDataDbContext()
                 .DataSetVersionMappings
                 .SingleAsync(m => m.TargetDataSetVersionId == nextDataSetVersion.Id);
 
@@ -1970,7 +1927,7 @@ public abstract class OptimisedDataSetVersionMappingControllerTests
         public async Task OwningFilterNotMapped_Returns400()
         {
             var (initialDataSetVersion, nextDataSetVersion) = await CreateInitialAndNextDataSetVersion(
-                fixture.GetPublicDataDbContext(), fixture.GetContentDbContext(), output);
+                _fixture.GetPublicDataDbContext(), _fixture.GetContentDbContext(), _output);
 
             DataSetVersionMapping mapping = _dataFixture
                 .DefaultDataSetVersionMapping()
@@ -1992,7 +1949,7 @@ public abstract class OptimisedDataSetVersionMappingControllerTests
                         .AddOptionCandidate("filter-1-option-1-key", _dataFixture
                             .DefaultMappableFilterOption())));
 
-            await fixture.GetPublicDataDbContext().AddTestData(context => context.DataSetVersionMappings.Add(mapping));
+            await _fixture.GetPublicDataDbContext().AddTestData(context => context.DataSetVersionMappings.Add(mapping));
 
             List<FilterOptionMappingUpdateRequest> updates =
             [
@@ -2010,7 +1967,7 @@ public abstract class OptimisedDataSetVersionMappingControllerTests
             var response = await ApplyBatchFilterOptionMappingUpdates(
                 nextDataSetVersionId: nextDataSetVersion.Id,
                 updates: updates,
-                fixture.CreateClient().WithUser("Bau"));
+                _fixture.CreateClient().WithUser(TestUser.Bau));
 
             var validationProblem = response.AssertValidationProblem();
 
@@ -2022,7 +1979,7 @@ public abstract class OptimisedDataSetVersionMappingControllerTests
 
             Assert.Single(validationProblem.Errors);
 
-            var retrievedMappings = await fixture.GetPublicDataDbContext()
+            var retrievedMappings = await _fixture.GetPublicDataDbContext()
                 .DataSetVersionMappings
                 .SingleAsync(m => m.TargetDataSetVersionId == nextDataSetVersion.Id);
 
@@ -2038,7 +1995,7 @@ public abstract class OptimisedDataSetVersionMappingControllerTests
             var response = await ApplyBatchFilterOptionMappingUpdates(
                 nextDataSetVersionId: Guid.NewGuid(),
                 updates: [],
-                client: fixture.CreateClient().WithUser("Authenticated"));
+                client: _fixture.CreateClient().WithUser(TestUser.Authenticated));
 
             response.AssertForbidden();
         }
@@ -2049,7 +2006,7 @@ public abstract class OptimisedDataSetVersionMappingControllerTests
             var response = await ApplyBatchFilterOptionMappingUpdates(
                 nextDataSetVersionId: Guid.NewGuid(),
                 updates: [],
-                fixture.CreateClient().WithUser("Bau"));
+                _fixture.CreateClient().WithUser(TestUser.Bau));
 
             response.AssertNotFound();
         }
@@ -2063,7 +2020,7 @@ public abstract class OptimisedDataSetVersionMappingControllerTests
                 [
                     new FilterOptionMappingUpdateRequest()
                 ],
-                fixture.CreateClient().WithUser("Bau"));
+                _fixture.CreateClient().WithUser(TestUser.Bau));
 
             var validationProblem = response.AssertValidationProblem();
             Assert.Equal(3, validationProblem.Errors.Count);
@@ -2089,7 +2046,7 @@ public abstract class OptimisedDataSetVersionMappingControllerTests
                         CandidateKey = candidateKeyValue
                     }
                 ],
-                fixture.CreateClient().WithUser("Bau"));
+                _fixture.CreateClient().WithUser(TestUser.Bau));
 
             var validationProblem = response.AssertValidationProblem();
 
@@ -2117,7 +2074,7 @@ public abstract class OptimisedDataSetVersionMappingControllerTests
                         CandidateKey = "target-location-1"
                     }
                 ],
-                fixture.CreateClient().WithUser("Bau"));
+                _fixture.CreateClient().WithUser(TestUser.Bau));
 
             var validationProblem = response.AssertValidationProblem();
 
@@ -2147,7 +2104,7 @@ public abstract class OptimisedDataSetVersionMappingControllerTests
                         CandidateKey = null
                     }
                 ],
-                fixture.CreateClient().WithUser("Bau"));
+                _fixture.CreateClient().WithUser(TestUser.Bau));
 
             var validationProblem = response.AssertValidationProblem();
 

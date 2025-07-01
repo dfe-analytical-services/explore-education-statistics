@@ -245,10 +245,10 @@ public class OptimisedWebApplicationFactoryBuilder<TStartup>(
             return Task.FromResult(result);
         }
     }
+}
 
-    public enum TestUser
-    {
-        Bau,
-        Authenticated
-    }
+public enum TestUser
+{
+    Bau,
+    Authenticated
 }

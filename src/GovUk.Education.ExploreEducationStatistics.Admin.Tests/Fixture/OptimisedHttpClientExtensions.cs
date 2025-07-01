@@ -8,9 +8,9 @@ public static class OptimisedHttpClientExtensions
 {
     public static HttpClient WithUser(
         this HttpClient client,
-        string userId)
+        TestUser testUser)
     {
-        return client.WithOptionalHeader("TestUser", userId);
+        return client.WithOptionalHeader("TestUser", testUser.ToString());
     }
     
     private static HttpClient WithOptionalHeader(
