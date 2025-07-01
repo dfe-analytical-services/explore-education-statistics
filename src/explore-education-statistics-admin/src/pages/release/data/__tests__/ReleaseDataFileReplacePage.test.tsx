@@ -549,9 +549,10 @@ describe('ReleaseDataFileReplacePage', () => {
     await waitFor(() => {
       expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
 
-      expect(
-        releaseDataFileService.deleteDataFilesWithApi,
-      ).toHaveBeenCalledWith('release-1', 'data-2');
+      expect(releaseDataFileService.deleteDataFiles).toHaveBeenCalledWith(
+        'release-1',
+        'data-2',
+      );
     });
   });
 
