@@ -258,12 +258,6 @@ const releaseDataFileService = {
   deleteDataFiles(releaseId: string, fileId: string): Promise<void> {
     return client.delete<void>(`/release/${releaseId}/data/${fileId}`);
   },
-  deleteDataFilesWithApi(releaseId: string, fileId: string): Promise<void> {
-    return client.delete<void>(`/release/${releaseId}/data/${fileId}/with-api`);
-  },
-  deleteDataFilesWithApi(releaseId: string, fileId: string): Promise<void> {
-    return client.delete<void>(`/release/${releaseId}/data/${fileId}/with-api`);
-  },
   downloadFile(releaseId: string, id: string, fileName: string): Promise<void> {
     return client
       .get<Blob>(`/release/${releaseId}/file/${id}/download`, {
