@@ -128,9 +128,13 @@ const dataReplacementService = {
       `releases/${releaseVersionId}/data/${originalFileId}/replacement-plan`,
     );
   },
-  replaceData(releaseVersionId: string, originalFileId: string): Promise<void> {
+  replaceData(
+    releaseVersionId: string,
+    originalFileIds: string[],
+  ): Promise<void> {
     return client.post(
-      `releases/${releaseVersionId}/data/${originalFileId}/replacement`,
+      `releases/${releaseVersionId}/data/replacements`,
+      originalFileIds,
     );
   },
 };

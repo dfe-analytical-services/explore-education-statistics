@@ -13,6 +13,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api;
 
@@ -118,7 +119,7 @@ public abstract class DataReplacementControllerTests
 
             var result = await controller.Replace(
                 releaseVersionId: releaseVersionId,
-                originalFileId: originalFileId);
+                new ReplacementRequest { OriginalFileIds = [originalFileId] });
 
             MockUtils.VerifyAllMocks(replacementService);
 
@@ -144,7 +145,7 @@ public abstract class DataReplacementControllerTests
 
             var result = await controller.Replace(
                 releaseVersionId: releaseVersionId,
-                originalFileId: originalFileId);
+                new ReplacementRequest { OriginalFileIds = [originalFileId] });
 
             MockUtils.VerifyAllMocks(replacementService);
 
