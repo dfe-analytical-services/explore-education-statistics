@@ -168,8 +168,9 @@ const DataFileReplacementPlan = ({
         </Tag>
       </h3>
       <p>
-        Please cancel this data replacement and upload a new data file that
-        doesn't create a breaking change. To see the breaking changes, please{' '}
+        Please fix the major breaking changes for API versions by mapping to
+        non-breaking changes or uploading a file with no breaking changes. To
+        configure mapping, please{' '}
         {apiDataSetsTabRoute && (
           <Link to={apiDataSetsTabRoute} unvisited>
             go to the API data sets tab (This page is currently only accessible

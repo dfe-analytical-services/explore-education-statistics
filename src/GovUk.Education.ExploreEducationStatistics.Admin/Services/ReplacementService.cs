@@ -14,7 +14,6 @@ using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Chart;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
-using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
 using GovUk.Education.ExploreEducationStatistics.Common.Options;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
@@ -1260,8 +1259,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     // removeApiVersion is set to false here as we shouldn't delete the previous API version for the original data file being replaced, we only create new patch versions. 
                     return await releaseVersionService.RemoveDataFiles(
                         releaseVersionId: releaseVersionId,
-                        fileId: originalFileId, 
-                        removeApiVersion: false);
+                        fileId: originalFileId);
                 });
         }
 
