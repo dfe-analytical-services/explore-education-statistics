@@ -124,6 +124,10 @@ public abstract class UserReleaseRoleRepositoryTests
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
+                // Should not have tried to remove any existing publication role
+                // Should not have tried to create any new publication role
+                // Hence, letting the mock for 'userPublicationRoleRepository' default to
+                // expecting no method calls, with Strict Mock behaviour
                 var repository = CreateRepository(contentDbContext, newPermissionsSystemHelperMock.Object);
 
                 var result = await repository.Create(
@@ -202,6 +206,7 @@ public abstract class UserReleaseRoleRepositoryTests
                     user.Id,
                     publication.Id,
                     newPublicationRoleToRemove,
+                    true,
                     It.IsAny<CancellationToken>()))
                 .ReturnsAsync(existingPublicationRole);
             // Should have tried to remove the existing publication role

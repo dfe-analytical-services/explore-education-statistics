@@ -18,7 +18,10 @@ public class NewPermissionsSystemHelper(
         DetermineNewPermissionsSystemChanges(PublicationRole publicationRoleToCreate, Guid userId, Guid publicationId)
     {
         var existingUserPublicationRoles = (await userPublicationRoleRepository
-            .GetAllRolesByUserAndPublication(userId, publicationId))
+            .GetAllRolesByUserAndPublication(
+                userId: userId,
+                publicationId: publicationId,
+                includeNewPermissionsSystemRoles: true))
             .ToHashSet();
 
         var newPermissionsSystemPublicationRole = PublicationRoleUtils.ConvertToNewPermissionsSystemPublicationRole(publicationRoleToCreate);
@@ -32,7 +35,10 @@ public class NewPermissionsSystemHelper(
         DetermineNewPermissionsSystemChanges(ReleaseRole releaseRoleToCreate, Guid userId, Guid publicationId)
     {
         var existingUserPublicationRoles = (await userPublicationRoleRepository
-            .GetAllRolesByUserAndPublication(userId, publicationId))
+            .GetAllRolesByUserAndPublication(
+                userId: userId, 
+                publicationId: publicationId,
+                includeNewPermissionsSystemRoles: true))
             .ToHashSet();
 
         if (!releaseRoleToCreate.TryConvertToNewPermissionsSystemPublicationRole(out var newPermissionsSystemPublicationRole))
@@ -60,14 +66,26 @@ public class NewPermissionsSystemHelper(
         var allUserPublicationRolesForPublication = await userPublicationRoleRepository
             .ListUserPublicationRolesByUserAndPublication(
                 userId: userId,
-                publicationId: publicationId);
+                publicationId: publicationId,
+                includeNewPermissionsSystemRoles: true);
 
-        if (!allUserPublicationRolesForPublication.Any(upr => upr.Id == oldUserPublicationRoleToDelete.Id))
+        var oldUserPublicationRoleToDeleteExists = allUserPublicationRolesForPublication
+            .Any(upr => upr.Id == oldUserPublicationRoleToDelete.Id);
+
+        if (!oldUserPublicationRoleToDeleteExists)
         {
             throw new ArgumentException($"User does not have the publication role '{oldUserPublicationRoleToDelete.Role}' assigned to the publication.");
         }
 
         var equivalentNewPermissionsSystemPublicationRoleToDelete = PublicationRoleUtils.ConvertToNewPermissionsSystemPublicationRole(oldUserPublicationRoleToDelete.Role);
+
+        var equivalentNewPermissionsSystemPublicationRoleToDeleteExists = allUserPublicationRolesForPublication
+            .Any(upr => upr.Role == equivalentNewPermissionsSystemPublicationRoleToDelete);
+
+        if (!equivalentNewPermissionsSystemPublicationRoleToDeleteExists)
+        {
+            return null;
+        }
 
         var remainingPublicationRolesForPublication = allUserPublicationRolesForPublication
             .Where(upr => upr.Id != oldUserPublicationRoleToDelete.Id)
@@ -89,7 +107,8 @@ public class NewPermissionsSystemHelper(
             ? await userPublicationRoleRepository.GetUserPublicationRole(
                 userId: userId,
                 publicationId: publicationId, 
-                role: equivalentNewPermissionsSystemPublicationRoleToDelete)
+                role: equivalentNewPermissionsSystemPublicationRoleToDelete,
+                includeNewPermissionsSystemRoles: true)
             : null;
     }
 
@@ -104,7 +123,10 @@ public class NewPermissionsSystemHelper(
                 userId: userId,
                 publicationId: publicationId);
 
-        if (!allUserReleaseRolesForPublication.Any(urr => urr.Id == userReleaseRoleToDelete.Id))
+        var oldUserReleaseRoleToDeleteExists = allUserReleaseRolesForPublication
+            .Any(urr => urr.Id == userReleaseRoleToDelete.Id);
+
+        if (!oldUserReleaseRoleToDeleteExists)
         {
             throw new ArgumentException($"User does not have the publication role '{userReleaseRoleToDelete.Role}' assigned to the publication.");
         }
@@ -114,15 +136,24 @@ public class NewPermissionsSystemHelper(
             return null;
         }
 
-        var remainingReleaseRolesForPublication = allUserReleaseRolesForPublication
-            .Where(urr => urr.Id != userReleaseRoleToDelete.Id)
-            .Select(urr => urr.Role)
-            .ToHashSet();
-
         var allPublicationRolesForPublication = (await userPublicationRoleRepository
             .GetAllRolesByUserAndPublication(
                 userId: userId,
-                publicationId: publicationId))
+                publicationId: publicationId,
+                includeNewPermissionsSystemRoles: true))
+            .ToHashSet();
+
+        var equivalentNewPermissionsSystemPublicationRoleToDeleteExists = allPublicationRolesForPublication
+            .Any(pr => pr == equivalentNewPermissionsSystemPublicationRoleToDelete);
+
+        if (!equivalentNewPermissionsSystemPublicationRoleToDeleteExists)
+        {
+            return null;
+        }
+
+        var remainingReleaseRolesForPublication = allUserReleaseRolesForPublication
+            .Where(urr => urr.Id != userReleaseRoleToDelete.Id)
+            .Select(urr => urr.Role)
             .ToHashSet();
 
         var shouldDeleteNewPermissionsSystemPublicationRole = ShouldDeleteNewPermissionsSystemPublicationRole(
@@ -134,7 +165,8 @@ public class NewPermissionsSystemHelper(
             ? await userPublicationRoleRepository.GetUserPublicationRole(
                 userId: userId, 
                 publicationId: publicationId, 
-                role: equivalentNewPermissionsSystemPublicationRoleToDelete.Value)
+                role: equivalentNewPermissionsSystemPublicationRoleToDelete.Value,
+                includeNewPermissionsSystemRoles: true)
             : null;
     }
 
@@ -166,7 +198,11 @@ public class NewPermissionsSystemHelper(
         HashSet<PublicationRole> remainingPublicationRoles, 
         HashSet<ReleaseRole> remainingReleaseRoles)
     {
-        var allEquivalentNewPermissionsSystemPublicationRoles = remainingPublicationRoles
+        var remainingOldPublicationRoles = remainingPublicationRoles
+            .Where(role => !role.IsNewPermissionsSystemPublicationRole())
+            .ToHashSet();
+
+        var allEquivalentNewPermissionsSystemPublicationRoles = remainingOldPublicationRoles
             .Select(PublicationRoleUtils.ConvertToNewPermissionsSystemPublicationRole)
             .Union(
                 remainingReleaseRoles
