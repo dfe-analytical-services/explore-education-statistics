@@ -110,7 +110,7 @@ public abstract class DataReplacementControllerTests
             replacementService
                 .Setup(service => service.Replace(
                     releaseVersionId,
-                    originalFileId,
+                    new List<Guid>{ originalFileId },
                     It.IsAny<CancellationToken>()))
                 .ReturnsAsync(Unit.Instance);
 
@@ -136,7 +136,7 @@ public abstract class DataReplacementControllerTests
             replacementService
                 .Setup(service => service.Replace(
                     releaseVersionId,
-                    originalFileId,
+                    new List<Guid>{ originalFileId } ,
                     It.IsAny<CancellationToken>()))
                 .ReturnsAsync(ValidationUtils.ValidationActionResult(ValidationErrorMessages.ReplacementMustBeValid));
 
