@@ -1,6 +1,7 @@
 using System.Net.Http;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Database;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
@@ -56,8 +57,20 @@ public class OptimisedHttpClientWithPsqlFixture : IAsyncLifetime
         await _psql.Stop();
         DisposeDbContexts();
     }
-    
-    public OptimisedPostgreSqlContainerUtil GetContainer() => _psql;
+
+    public async Task ClearTestData()
+    {
+        _contentDbContext.ChangeTracker.Clear();
+        await _contentDbContext.Database.EnsureDeletedAsync();
+        
+        _statisticsDbContext.ChangeTracker.Clear();
+        await _statisticsDbContext.Database.EnsureDeletedAsync();
+        
+        _statisticsDbContext.ChangeTracker.Clear();
+        await _statisticsDbContext.Database.EnsureDeletedAsync();
+        
+        await _publicDataDbContext.ClearTestData();
+    }
     
     public HttpClient CreateClient()
     {
@@ -88,6 +101,6 @@ public class OptimisedHttpClientWithPsqlFixture : IAsyncLifetime
     {
         return _publicDataDbContext;
     }
-
+    
     private class TestWebApplicationFactory : WebApplicationFactory<Startup>;
 }

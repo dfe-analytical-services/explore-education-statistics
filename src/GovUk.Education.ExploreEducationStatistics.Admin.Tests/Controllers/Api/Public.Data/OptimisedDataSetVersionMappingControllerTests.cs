@@ -25,7 +25,7 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api.Public.Data;
 
-[Collection(nameof(OptimisedDataSetVersionMappingControllerTests))]
+[Collection(nameof(OptimisedPsqlContainerFixture))]
 public abstract class OptimisedDataSetVersionMappingControllerTests(
     OptimisedHttpClientWithPsqlFixture fixture,
     ITestOutputHelper output) : IAsyncLifetime
@@ -38,7 +38,7 @@ public abstract class OptimisedDataSetVersionMappingControllerTests(
         var sw = new Stopwatch();
         sw.Start();
 
-        await fixture.GetPublicDataDbContext().ClearTestData();
+        await fixture.ClearTestData();
 
         output.WriteLine($"Clear up test data {sw.ElapsedMilliseconds}");
         sw.Restart();
@@ -2126,17 +2126,6 @@ public abstract class OptimisedDataSetVersionMappingControllerTests(
             return await client.PatchAsync(uri,
                 new JsonNetContent(new BatchFilterOptionMappingUpdatesRequest { Updates = updates }));
         }
-    }
-
-    
-    
-    [CollectionDefinition(nameof(OptimisedDataSetVersionMappingControllerTests))]
-    public class
-        OptimisedDataSetVersionMappingControllerCollection : ICollectionFixture<OptimisedHttpClientWithPsqlFixture>
-    {
-        // This class has no code, and is never created. Its purpose is simply
-        // to be the place to apply [CollectionDefinition] and all the
-        // ICollectionFixture<> interfaces.
     }
 }
 
