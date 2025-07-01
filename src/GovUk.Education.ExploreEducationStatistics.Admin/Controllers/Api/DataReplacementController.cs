@@ -44,7 +44,7 @@ public class DataReplacementController : ControllerBase
     {
         return await _replacementService.Replace(
                 releaseVersionId: releaseVersionId,
-                originalFileId: originalFileId, // @MarkFix turn into a list
+                originalFileIds: [originalFileId], // @MarkFix turn into a list
                 cancellationToken: cancellationToken
             )
             .HandleFailuresOrOk();

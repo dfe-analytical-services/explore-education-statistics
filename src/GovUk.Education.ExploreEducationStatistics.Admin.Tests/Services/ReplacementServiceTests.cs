@@ -31,6 +31,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Options;
+using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using Microsoft.Extensions.Options;
 using Semver;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
@@ -2575,7 +2576,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var result = await replacementService.Replace(
                     releaseVersionId: releaseVersion.Id,
-                    originalFileId: originalFile.Id,
+                    originalFileIds: [originalFile.Id],
                     default);
 
                 VerifyAllMocks(locationRepository,
@@ -2584,6 +2585,430 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 result.AssertBadRequest(ReplacementMustBeValid);
             }
         }
+
+        [Fact]
+        public async Task Replace_ReplacementImportNotComplete()
+        {
+            var releaseVersion = _fixture.DefaultReleaseVersion().Generate();
+
+            var statsReleaseVersion = _fixture.DefaultStatsReleaseVersion()
+                .WithId(releaseVersion.Id)
+                .Generate();
+
+            var (originalReleaseSubject, replacementReleaseSubject) = _fixture.DefaultReleaseSubject()
+                .WithReleaseVersion(statsReleaseVersion)
+                .WithSubjects(_fixture.DefaultSubject().Generate(2))
+                .GenerateTuple2();
+
+            var originalFile = new File
+            {
+                Type = FileType.Data,
+                SubjectId = originalReleaseSubject.SubjectId
+            };
+
+            var replacementFile = new File
+            {
+                Type = FileType.Data,
+                SubjectId = replacementReleaseSubject.SubjectId,
+                Replacing = originalFile,
+            };
+
+            originalFile.ReplacedBy = replacementFile;
+
+            var originalReleaseFile = new ReleaseFile
+            {
+                ReleaseVersion = releaseVersion,
+                File = originalFile,
+                Summary = "Original data set guidance"
+            };
+
+            var replacementReleaseFile = new ReleaseFile
+            {
+                ReleaseVersion = releaseVersion,
+                File = replacementFile,
+                Summary = null
+            };
+
+            var originalFilterItem1 = new FilterItem
+            {
+                Id = Guid.NewGuid(),
+                Label = "Test filter item - not changing"
+            };
+
+            var originalFilterItem2 = new FilterItem
+            {
+                Id = Guid.NewGuid(),
+                Label = "Test filter item - not changing"
+            };
+
+            var replacementFilterItem1 = new FilterItem
+            {
+                Id = Guid.NewGuid(),
+                Label = "Test filter item - not changing"
+            };
+
+            var replacementFilterItem2 = new FilterItem
+            {
+                Id = Guid.NewGuid(),
+                Label = "Test filter item - not changing"
+            };
+
+            var originalFilterGroup1 = new FilterGroup
+            {
+                Label = "Default group - not changing",
+                FilterItems = new List<FilterItem>
+                {
+                    originalFilterItem1
+                }
+            };
+
+            var originalFilterGroup2 = new FilterGroup
+            {
+                Label = "Default group - not changing",
+                FilterItems = new List<FilterItem>
+                {
+                    originalFilterItem2
+                }
+            };
+
+            var replacementFilterGroup1 = new FilterGroup
+            {
+                Label = "Default group - not changing",
+                FilterItems = new List<FilterItem>
+                {
+                    replacementFilterItem1
+                }
+            };
+
+            var replacementFilterGroup2 = new FilterGroup
+            {
+                Label = "Default group - not changing",
+                FilterItems = new List<FilterItem>
+                {
+                    replacementFilterItem2
+                }
+            };
+
+            var originalFilter1 = new Filter
+            {
+                Label = "Test filter 1 - not changing",
+                Name = "test_filter_1_not_changing",
+                Subject = originalReleaseSubject.Subject,
+                FilterGroups = new List<FilterGroup>
+                {
+                    originalFilterGroup1
+                }
+            };
+
+            var originalFilter2 = new Filter
+            {
+                Label = "Test filter 2 - not changing",
+                Name = "test_filter_2_not_changing",
+                Subject = originalReleaseSubject.Subject,
+                FilterGroups = new List<FilterGroup>
+                {
+                    originalFilterGroup2
+                }
+            };
+
+            var replacementFilter1 = new Filter
+            {
+                Label = "Test filter 1 - not changing",
+                Name = "test_filter_1_not_changing",
+                Subject = replacementReleaseSubject.Subject,
+                FilterGroups = new List<FilterGroup>
+                {
+                    replacementFilterGroup1
+                }
+            };
+
+            var replacementFilter2 = new Filter
+            {
+                Label = "Test filter 2 - not changing",
+                Name = "test_filter_2_not_changing",
+                Subject = replacementReleaseSubject.Subject,
+                FilterGroups = new List<FilterGroup>
+                {
+                    replacementFilterGroup2
+                }
+            };
+
+            var originalIndicator = new Indicator
+            {
+                Id = Guid.NewGuid(),
+                Label = "Indicator - not changing",
+                Name = "indicator_not_changing"
+            };
+
+            var replacementIndicator = new Indicator
+            {
+                Label = "Indicator - not changing",
+                Name = "indicator_not_changing"
+            };
+
+            var originalIndicatorGroup = new IndicatorGroup
+            {
+                Label = "Default group - not changing",
+                Subject = originalReleaseSubject.Subject,
+                Indicators = new List<Indicator>
+                {
+                    originalIndicator
+                }
+            };
+
+            var replacementIndicatorGroup = new IndicatorGroup
+            {
+                Label = "Default group - not changing",
+                Subject = replacementReleaseSubject.Subject,
+                Indicators = new List<Indicator>
+                {
+                    replacementIndicator
+                }
+            };
+
+            var originalLocation = new Location
+            {
+                Id = Guid.NewGuid(),
+                GeographicLevel = GeographicLevel.LocalAuthority,
+                LocalAuthority = _derby
+            };
+
+            var replacementLocation = new Location
+            {
+                Id = Guid.NewGuid(),
+                GeographicLevel = GeographicLevel.LocalAuthority,
+                Country = _england,
+                LocalAuthority = _derby
+            };
+
+            var timePeriod = new TimePeriodQuery
+            {
+                StartYear = 2019,
+                StartCode = CalendarYear,
+                EndYear = 2020,
+                EndCode = CalendarYear
+            };
+
+            var dataBlock = new DataBlock
+            {
+                Name = "Test DataBlock",
+                Query = new FullTableQuery
+                {
+                    SubjectId = originalReleaseSubject.SubjectId,
+                    Filters = new[] {originalFilterItem1.Id, originalFilterItem2.Id},
+                    Indicators = new[] {originalIndicator.Id},
+                    LocationIds = ListOf(originalLocation.Id),
+                    TimePeriod = timePeriod,
+                    FilterHierarchiesOptions = null, // it is null by default, but included to be visible to you, dear test reader
+                },
+                Table = new TableBuilderConfiguration
+                {
+                    TableHeaders = new TableHeaders
+                    {
+                        ColumnGroups = new List<List<TableHeader>>
+                        {
+                            new()
+                            {
+                                TableHeader.NewLocationHeader(GeographicLevel.LocalAuthority,
+                                    originalLocation.Id.ToString())
+                            }
+                        },
+                        Columns = new List<TableHeader>
+                        {
+                            new("2019_CY", TableHeaderType.TimePeriod),
+                            new("2020_CY", TableHeaderType.TimePeriod)
+                        },
+                        RowGroups = new List<List<TableHeader>>
+                        {
+                            new()
+                            {
+                                new TableHeader(originalFilterItem1.Id.ToString(), TableHeaderType.Filter),
+                                new TableHeader(originalFilterItem2.Id.ToString(), TableHeaderType.Filter)
+                            }
+                        },
+                        Rows = new List<TableHeader>
+                        {
+                            new(originalIndicator.Id.ToString(), TableHeaderType.Indicator)
+                        }
+                    }
+                },
+                Charts = new List<IChart>
+                {
+                    new LineChart
+                    {
+                        Axes = new Dictionary<string, ChartAxisConfiguration>
+                        {
+                            {
+                                "major",
+                                new ChartAxisConfiguration
+                                {
+                                    DataSets = new List<ChartDataSet>
+                                    {
+                                        new()
+                                        {
+                                            Filters = new List<Guid>
+                                            {
+                                                originalFilterItem1.Id
+                                            },
+                                            Indicator = originalIndicator.Id,
+                                            Location = new ChartDataSetLocation
+                                            {
+                                                Level = GeographicLevel.LocalAuthority.ToString().CamelCase(),
+                                                Value = originalLocation.Id
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        Legend = new ChartLegend
+                        {
+                            Items = new List<ChartLegendItem>
+                            {
+                                new()
+                                {
+                                    DataSet = new ChartBaseDataSet
+                                    {
+                                        Filters = new List<Guid>
+                                        {
+                                            originalFilterItem1.Id
+                                        },
+                                        Indicator = originalIndicator.Id,
+                                        Location = new ChartDataSetLocation
+                                        {
+                                            Level = GeographicLevel.LocalAuthority.ToString().CamelCase(),
+                                            Value = originalLocation.Id
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                ReleaseVersion = releaseVersion
+            };
+
+            var dataBlockVersion = new DataBlockVersion
+            {
+                Id = dataBlock.Id,
+                ContentBlock = dataBlock
+            };
+
+            var footnoteForFilter = CreateFootnote(statsReleaseVersion,
+                "Test footnote for Filter",
+                filterFootnotes: new List<FilterFootnote>
+                {
+                    new()
+                    {
+                        Filter = originalFilter1
+                    }
+                });
+
+            var footnoteForFilterGroup = CreateFootnote(statsReleaseVersion,
+                "Test footnote for Filter group",
+                filterGroupFootnotes: new List<FilterGroupFootnote>
+                {
+                    new()
+                    {
+                        FilterGroup = originalFilterGroup1
+                    }
+                });
+
+            var footnoteForFilterItem = CreateFootnote(statsReleaseVersion,
+                "Test footnote for Filter item",
+                filterItemFootnotes: new List<FilterItemFootnote>
+                {
+                    new()
+                    {
+                        FilterItem = originalFilterItem1
+                    }
+                });
+
+            var footnoteForIndicator = CreateFootnote(statsReleaseVersion,
+                "Test footnote for Filter item",
+                indicatorFootnotes: new List<IndicatorFootnote>
+                {
+                    new()
+                    {
+                        Indicator = originalIndicator
+                    }
+                });
+
+            var footnoteForSubject = CreateFootnote(statsReleaseVersion,
+                "Test footnote for Subject",
+                subject: originalReleaseSubject.Subject);
+
+            var locationRepository = new Mock<ILocationRepository>(Strict);
+            locationRepository.Setup(service => service.GetDistinctForSubject(replacementReleaseSubject.SubjectId))
+                .ReturnsAsync(new List<Location>
+                {
+                    replacementLocation
+                });
+
+            var timePeriodService = new Mock<ITimePeriodService>(Strict);
+            timePeriodService.Setup(service => service.GetTimePeriods(replacementReleaseSubject.SubjectId))
+                .ReturnsAsync(new List<(int Year, TimeIdentifier TimeIdentifier)>
+                {
+                    (2019, CalendarYear),
+                    (2020, CalendarYear)
+                });
+
+            var dataImport = new DataImport
+            {
+                FileId = replacementFile.Id,
+                Status = DataImportStatus.STAGE_2,
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            var statisticsDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                contentDbContext.ReleaseVersions.Add(releaseVersion);
+                contentDbContext.Files.AddRange(originalFile, replacementFile);
+                contentDbContext.ReleaseFiles.AddRange(originalReleaseFile,
+                    replacementReleaseFile);
+                contentDbContext.DataBlockVersions.Add(dataBlockVersion);
+                contentDbContext.DataImports.Add(dataImport);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            {
+                statisticsDbContext.ReleaseVersion.AddRange(statsReleaseVersion);
+                statisticsDbContext.ReleaseSubject.AddRange(originalReleaseSubject,
+                    replacementReleaseSubject);
+                statisticsDbContext.Filter.AddRange(originalFilter1, originalFilter2,
+                    replacementFilter1, replacementFilter2);
+                statisticsDbContext.IndicatorGroup.AddRange(originalIndicatorGroup,
+                    replacementIndicatorGroup);
+                statisticsDbContext.Location.AddRange(originalLocation);
+                statisticsDbContext.Footnote.AddRange(footnoteForFilter, footnoteForFilterGroup,
+                    footnoteForFilterItem, footnoteForIndicator, footnoteForSubject);
+                await statisticsDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            {
+                var replacementService = BuildReplacementService(contentDbContext,
+                    statisticsDbContext,
+                    locationRepository: locationRepository.Object,
+                    timePeriodService: timePeriodService.Object);
+
+                var result = await replacementService.Replace(
+                    releaseVersionId: releaseVersion.Id,
+                    originalFileIds: [originalFile.Id],
+                    default);
+
+                result.AssertBadRequest(ReplacementImportMustBeComplete);
+
+                VerifyAllMocks(
+                    locationRepository,
+                    timePeriodService);
+            }
+        }
+
 
         [Fact]
         public async Task Replace_OriginalFileIsNotAssociatedWithReplacementFile()
@@ -2654,10 +3079,406 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var result = await replacementService.Replace(
                         releaseVersionId: releaseVersion.Id,
-                        originalFileId: originalReleaseFile.FileId,
+                        originalFileIds: [originalReleaseFile.FileId],
                         default);
 
-                result.AssertNotFound();
+                var validationProblem = result.AssertBadRequestWithValidationProblem();
+                validationProblem.AssertHasErrors(
+                [
+                    new ErrorViewModel
+                    {
+                        Code = "ReplacementNotFound",
+                        Message = $"Linked original and replacement file(s) not found. OriginalFileId: {originalFile.Id}"
+                    }
+                ]);
+            }
+        }
+
+        [Fact]
+        public async Task Replace_ThreeReplacements_OneValidOneInvalidOneNotFound()
+        {
+            var releaseVersion = _fixture.DefaultReleaseVersion().Generate();
+
+            var statsReleaseVersion = _fixture.DefaultStatsReleaseVersion()
+                .WithId(releaseVersion.Id)
+                .Generate();
+
+            // Valid replacement file
+            var (originalReleaseSubjectValid, replacementReleaseSubjectValid) = _fixture.DefaultReleaseSubject()
+                .WithReleaseVersion(statsReleaseVersion)
+                .WithSubjects(_fixture.DefaultSubject().Generate(2))
+                .GenerateTuple2();
+
+            var originalFileValid = new File
+            {
+                Id = Guid.NewGuid(),
+                Type = FileType.Data,
+                SubjectId = originalReleaseSubjectValid.SubjectId
+            };
+
+            var replacementFileValid = new File
+            {
+                Type = FileType.Data,
+                SubjectId = replacementReleaseSubjectValid.SubjectId,
+                Replacing = originalFileValid,
+            };
+
+            originalFileValid.ReplacedBy = replacementFileValid;
+
+            var originalReleaseFileValid = new ReleaseFile
+            {
+                ReleaseVersion = releaseVersion,
+                File = originalFileValid
+            };
+
+            var replacementReleaseFileValid = new ReleaseFile
+            {
+                ReleaseVersion = releaseVersion,
+                File = replacementFileValid
+            };
+
+            var originalDefaultFilterItemValid = new FilterItem
+            {
+                Id = Guid.NewGuid(),
+                Label = "Test filter item - not changing"
+            };
+
+            var replacementDefaultFilterItemValid = new FilterItem
+            {
+                Label = "Test filter item - not changing"
+            };
+
+            var originalDefaultFilterGroupValid = new FilterGroup
+            {
+                Label = "Default group - not changing",
+                FilterItems = new List<FilterItem>
+                {
+                    originalDefaultFilterItemValid
+                }
+            };
+
+            var replacementDefaultFilterGroupValid = new FilterGroup
+            {
+                Label = "Default group - not changing",
+                FilterItems = new List<FilterItem>
+                {
+                    replacementDefaultFilterItemValid
+                }
+            };
+
+            var originalDefaultFilterValid = new Filter
+            {
+                Label = "Test filter 1 - not changing",
+                Name = "test_filter_1_not_changing",
+                Subject = originalReleaseSubjectValid.Subject,
+                FilterGroups = new List<FilterGroup>
+                {
+                    originalDefaultFilterGroupValid
+                }
+            };
+
+            var replacementDefaultFilterValid = new Filter
+            {
+                Label = "Test filter 1 - not changing",
+                Name = "test_filter_1_not_changing",
+                Subject = replacementReleaseSubjectValid.Subject,
+                FilterGroups = new List<FilterGroup>
+                {
+                    replacementDefaultFilterGroupValid
+                }
+            };
+
+            var originalIndicatorValid = new Indicator
+            {
+                Id = Guid.NewGuid(),
+                Label = "Indicator - not changing",
+                Name = "indicator_not_changing"
+            };
+
+            var replacementIndicatorValid = new Indicator
+            {
+                Label = "Indicator - not changing",
+                Name = "indicator_not_changing"
+            };
+
+            var originalIndicatorGroupValid = new IndicatorGroup
+            {
+                Label = "Default group - not changing",
+                Subject = originalReleaseSubjectValid.Subject,
+                Indicators = new List<Indicator>
+                {
+                    originalIndicatorValid
+                }
+            };
+
+            var replacementIndicatorGroupValid = new IndicatorGroup
+            {
+                Label = "Default group - not changing",
+                Subject = replacementReleaseSubjectValid.Subject,
+                Indicators = new List<Indicator>
+                {
+                    replacementIndicatorValid
+                }
+            };
+
+            var locationValid = new Location
+            {
+                Id = Guid.NewGuid(),
+                GeographicLevel = GeographicLevel.Country,
+                Country = _england
+            };
+
+            var timePeriodValid = new TimePeriodQuery
+            {
+                StartYear = 2019,
+                StartCode = CalendarYear,
+                EndYear = 2020,
+                EndCode = CalendarYear
+            };
+
+            var dataBlockValid = new DataBlock
+            {
+                Id = Guid.NewGuid(),
+                Name = "Test DataBlock",
+                Query = new FullTableQuery
+                {
+                    SubjectId = originalReleaseSubjectValid.SubjectId,
+                    Filters = new[]
+                    {
+                        originalDefaultFilterItemValid.Id,
+                    },
+                    Indicators = new[] {originalIndicatorValid.Id},
+                    LocationIds = ListOf(locationValid.Id),
+                    TimePeriod = timePeriodValid
+                },
+                ReleaseVersion = releaseVersion,
+                Table = new TableBuilderConfiguration
+                    {
+                    TableHeaders = new TableHeaders
+                    {
+                        ColumnGroups = new List<List<TableHeader>>(),
+                        Columns = new List<TableHeader>
+                        {
+                            new("2019_CY", TableHeaderType.TimePeriod),
+                            new("2020_CY", TableHeaderType.TimePeriod)
+                        },
+                        RowGroups = new List<List<TableHeader>>
+                        {
+                            new()
+                            {
+                                TableHeader.NewLocationHeader(GeographicLevel.Country, locationValid.Id.ToString())
+                            }
+                        },
+                        Rows = new List<TableHeader>()
+                    }
+                }
+            };
+
+            var replacementDataImportValid = new DataImport
+            {
+                File = replacementFileValid,
+                Status = DataImportStatus.COMPLETE,
+            };
+
+            var locationRepository = new Mock<ILocationRepository>(Strict);
+            locationRepository.Setup(service => service.GetDistinctForSubject(replacementReleaseSubjectValid.SubjectId))
+                .ReturnsAsync(new List<Location>
+                {
+                    locationValid
+                });
+
+            var timePeriodService = new Mock<ITimePeriodService>(Strict);
+            timePeriodService.Setup(service => service.GetTimePeriods(replacementReleaseSubjectValid.SubjectId))
+                .ReturnsAsync(new List<(int Year, TimeIdentifier TimeIdentifier)>
+                {
+                    (2019, CalendarYear),
+                    (2020, CalendarYear)
+                });
+
+            var dataBlockVersionId = Guid.NewGuid();
+            var dataBlockTableResultCacheKey = new DataBlockTableResultCacheKey(
+                new DataBlockVersion { Id = dataBlockVersionId });
+            var cacheKeyService = new Mock<ICacheKeyService>(Strict);
+            cacheKeyService.Setup(mock => mock.CreateCacheKeyForDataBlock(
+                releaseVersion.Id, dataBlockValid.Id
+            )).ReturnsAsync(dataBlockTableResultCacheKey);
+
+            var privateBlobCacheService = new Mock<IPrivateBlobCacheService>(Strict);
+            privateBlobCacheService.Setup(mock => mock.DeleteItemAsync(dataBlockTableResultCacheKey))
+                .Returns(Task.CompletedTask);
+
+            var releaseVersionService = new Mock<IReleaseVersionService>(Strict);
+            releaseVersionService.Setup(service => service.RemoveDataFiles(releaseVersion.Id, originalFileValid.Id))
+                .ReturnsAsync(Unit.Instance);
+
+            // Invalid replacement file
+            var (originalReleaseSubjectInvalid, replacementReleaseSubjectInvalid) = _fixture.DefaultReleaseSubject()
+                .WithReleaseVersion(statsReleaseVersion)
+                .WithSubjects(_fixture.DefaultSubject().Generate(2))
+                .GenerateTuple2();
+
+            var originalFileInvalid = new File
+            {
+                Type = FileType.Data,
+                SubjectId = originalReleaseSubjectInvalid.SubjectId,
+            };
+
+            var replacementFileInvalid = new File
+            {
+                Type = FileType.Data,
+                SubjectId = replacementReleaseSubjectInvalid.SubjectId,
+                Replacing = originalFileInvalid,
+            };
+
+            originalFileInvalid.ReplacedBy = replacementFileInvalid;
+
+            var originalReleaseFileInvalid = new ReleaseFile
+            {
+                ReleaseVersion = releaseVersion,
+                File = originalFileInvalid,
+            };
+
+            var replacementReleaseFileInvalid = new ReleaseFile
+            {
+                ReleaseVersion = releaseVersion,
+                File = replacementFileInvalid,
+            };
+
+            var originalLocationInvalid = new Location
+            {
+                Id = Guid.NewGuid(),
+                GeographicLevel = GeographicLevel.Country,
+                Country = _england
+            };
+
+            var timePeriodInvalid = new TimePeriodQuery
+            {
+                StartYear = 2019,
+                StartCode = CalendarYear,
+                EndYear = 2020,
+                EndCode = CalendarYear
+            };
+            var tableInvalid = new TableBuilderConfiguration
+            {
+                TableHeaders = new TableHeaders
+                {
+                    ColumnGroups = new List<List<TableHeader>>(),
+                    Columns = new List<TableHeader>
+                    {
+                        new("2019_CY", TableHeaderType.TimePeriod),
+                        new("2020_CY", TableHeaderType.TimePeriod)
+                    },
+                    RowGroups = new List<List<TableHeader>>
+                    {
+                        new()
+                        {
+                            TableHeader.NewLocationHeader(GeographicLevel.Country, originalLocationInvalid.Id.ToString())
+                        }
+                    },
+                    Rows = new List<TableHeader>()
+                }
+            };
+
+            var dataBlockInvalid = new DataBlock
+            {
+                Id = Guid.NewGuid(),
+                Name = "Test DataBlock",
+                Query = new FullTableQuery
+                {
+                    SubjectId = originalReleaseSubjectInvalid.SubjectId,
+                    Filters = new Guid[] { },
+                    Indicators = new Guid[] { },
+                    LocationIds = ListOf(originalLocationInvalid.Id),
+                    TimePeriod = timePeriodInvalid
+                },
+                Table = tableInvalid,
+                ReleaseVersion = releaseVersion
+            };
+
+            var replacementDataImportInvalid = new DataImport
+            {
+                File = replacementFileInvalid,
+                Status = DataImportStatus.COMPLETE,
+            };
+
+            locationRepository.Setup(service => service.GetDistinctForSubject(replacementReleaseSubjectInvalid.SubjectId))
+                .ReturnsAsync(new List<Location>());
+
+            timePeriodService.Setup(service => service.GetTimePeriods(replacementReleaseSubjectInvalid.SubjectId))
+                .ReturnsAsync(new List<(int Year, TimeIdentifier TimeIdentifier)>());
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            var statisticsDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                contentDbContext.ReleaseVersions.AddRange(releaseVersion);
+
+                contentDbContext.ReleaseFiles.AddRange(
+                    originalReleaseFileValid,
+                    replacementReleaseFileValid,
+                    originalReleaseFileInvalid,
+                    replacementReleaseFileInvalid);
+                contentDbContext.DataBlocks.AddRange(
+                    dataBlockValid,
+                    dataBlockInvalid);
+                contentDbContext.DataImports.AddRange(
+                    replacementDataImportValid,
+                    replacementDataImportInvalid);
+
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            {
+                statisticsDbContext.ReleaseVersion.AddRange(statsReleaseVersion);
+
+                statisticsDbContext.ReleaseSubject.AddRange(
+                    originalReleaseSubjectValid,
+                    replacementReleaseSubjectValid,
+                    originalReleaseSubjectInvalid,
+                    replacementReleaseSubjectInvalid);
+                statisticsDbContext.Filter.AddRange(
+                    originalDefaultFilterValid,
+                    replacementDefaultFilterValid);
+                statisticsDbContext.IndicatorGroup.AddRange(
+                    originalIndicatorGroupValid,
+                    replacementIndicatorGroupValid);
+                statisticsDbContext.Location.AddRange(
+                    locationValid,
+                    originalLocationInvalid);
+
+                await statisticsDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            {
+                var replacementService = BuildReplacementService(contentDbContext,
+                    statisticsDbContext,
+                    locationRepository: locationRepository.Object,
+                    timePeriodService: timePeriodService.Object,
+                    cacheKeyService: cacheKeyService.Object,
+                    privateBlobCacheService: privateBlobCacheService.Object,
+                    releaseVersionService: releaseVersionService.Object);
+
+                var nonExistentOriginalFileId = Guid.NewGuid();
+                var result = await replacementService.Replace(
+                    releaseVersionId: releaseVersion.Id,
+                    originalFileIds: [originalFileValid.Id, originalFileInvalid.Id, nonExistentOriginalFileId],
+                    cancellationToken: default);
+
+                VerifyAllMocks(
+                    locationRepository,
+                    timePeriodService);
+
+                // The valid replacement completes, but we still return errors for the invalid and not found
+                // replacements as in normal usage the user should never see one of these errors.
+                var validationProblem = result.AssertBadRequestWithValidationProblem();
+                validationProblem.AssertHasErrors([
+                    new ErrorViewModel { Code = "ReplacementMustBeValid", Message = $"Replacement not valid. OriginalFileId: {originalFileInvalid.Id}" },
+                    new ErrorViewModel { Code = "ReplacementNotFound", Message = $"Linked original and replacement file(s) not found. OriginalFileId: {nonExistentOriginalFileId}" },
+                ]);
             }
         }
 
@@ -2732,10 +3553,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var result = await replacementService.Replace(
                     releaseVersionId: releaseVersion.Id,
-                    originalFileId: originalReleaseFile.FileId,
+                    originalFileIds: [originalReleaseFile.FileId],
                     default);
 
-                result.AssertNotFound();
+                var validationProblem = result.AssertBadRequestWithValidationProblem();
+                validationProblem.AssertHasErrors(
+                [
+                    new ErrorViewModel
+                    {
+                        Code = "ReplacementNotFound",
+                        Message = $"Linked original and replacement file(s) not found. OriginalFileId: {originalFile.Id}"
+                    }
+                ]);
             }
         }
 
@@ -2791,6 +3620,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 })
                 .GenerateTuple2();
 
+            var replacementDataImport = _fixture.DefaultDataImport()
+                .WithFile(replacementFile)
+                .WithStatus(DataImportStatus.COMPLETE);
+
             var dataSetVersionService = new Mock<IDataSetVersionService>(Strict);
             dataSetVersionService.Setup(mock => mock.GetDataSetVersion(
                 originalReleaseFile.PublicApiDataSetId!.Value,
@@ -2836,6 +3669,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 contentDbContext.ReleaseVersions.Add(releaseVersion);
                 contentDbContext.ReleaseFiles.AddRange(originalReleaseFile, replacementReleaseFile);
+                contentDbContext.DataImports.Add(replacementDataImport);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -2854,7 +3688,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var result = await replacementService.Replace(
                     releaseVersionId: releaseVersion.Id,
-                    originalFileId: originalFile.Id,
+                    originalFileIds: [originalFile.Id],
                     default);
 
                 if (enableReplacementOfPublicApiDataSets)
@@ -3244,16 +4078,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     (2020, CalendarYear)
                 });
 
+            var replacementDataImport = new DataImport
+            {
+                File = replacementFile,
+                Status = DataImportStatus.COMPLETE,
+            };
+
             var contentDbContextId = Guid.NewGuid().ToString();
             var statisticsDbContextId = Guid.NewGuid().ToString();
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                contentDbContext.ReleaseVersions.AddRange(releaseVersion);
+                contentDbContext.ReleaseVersions.Add(releaseVersion);
                 contentDbContext.Files.AddRange(originalFile, replacementFile);
                 contentDbContext.ReleaseFiles.AddRange(originalReleaseFile,
                     replacementReleaseFile);
-                contentDbContext.DataBlockVersions.AddRange(dataBlockVersion);
+                contentDbContext.DataBlockVersions.Add(dataBlockVersion);
+                contentDbContext.DataImports.Add(replacementDataImport);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -3277,7 +4118,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 .ReturnsAsync(Unit.Instance);
 
             var cacheKey = new DataBlockTableResultCacheKey(dataBlockVersion);
-
             var cacheKeyService = new Mock<ICacheKeyService>(Strict);
             cacheKeyService.Setup(service =>
                     service.CreateCacheKeyForDataBlock(dataBlock.ReleaseVersionId, dataBlock.Id))
@@ -3300,16 +4140,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var result = await replacementService.Replace(
                     releaseVersionId: releaseVersion.Id,
-                    originalFileId: originalFile.Id,
+                    originalFileIds: [originalFile.Id],
                     default);
+
+                result.AssertRight();
 
                 VerifyAllMocks(privateBlobCacheService,
                     cacheKeyService,
                     locationRepository,
                     releaseVersionService,
                     timePeriodService);
-
-                result.AssertRight();
             }
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -3742,6 +4582,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 ContentBlock = dataBlock
             };
 
+            var replacementDataImport = new DataImport
+            {
+                File = replacementFile,
+                Status = DataImportStatus.COMPLETE,
+            };
+
             var locationRepository = new Mock<ILocationRepository>(Strict);
             locationRepository.Setup(service => service.GetDistinctForSubject(replacementReleaseSubject.SubjectId))
                 .ReturnsAsync(new List<Location>
@@ -3767,6 +4613,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 contentDbContext.ReleaseFiles.AddRange(originalReleaseFile,
                     replacementReleaseFile);
                 contentDbContext.DataBlockVersions.AddRange(dataBlockVersion);
+                contentDbContext.DataImports.Add(replacementDataImport);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -3811,7 +4658,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var result = await replacementService.Replace(
                     releaseVersionId: releaseVersion.Id,
-                    originalFileId: originalFile.Id,
+                    originalFileIds: [originalFile.Id],
                     default);
 
                 VerifyAllMocks(privateBlobCacheService,
@@ -4117,6 +4964,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 ContentBlock = dataBlock
             };
 
+            var replacementDataImport = new DataImport
+            {
+                File = replacementFile,
+                Status = DataImportStatus.COMPLETE,
+            };
+
             var locationRepository = new Mock<ILocationRepository>(Strict);
             locationRepository.Setup(service => service.GetDistinctForSubject(replacementReleaseSubject.SubjectId))
                 .ReturnsAsync(new List<Location>
@@ -4141,6 +4994,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 contentDbContext.Files.AddRange(originalFile, replacementFile);
                 contentDbContext.ReleaseFiles.AddRange(originalReleaseFile, replacementReleaseFile);
                 contentDbContext.DataBlocks.AddRange(dataBlock);
+                contentDbContext.DataImports.Add(replacementDataImport);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -4187,16 +5041,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var result = await replacementService.Replace(
                     releaseVersionId: releaseVersion.Id,
-                    originalFileId: originalFile.Id,
+                    originalFileIds: [originalFile.Id],
                     default);
+
+                result.AssertRight();
 
                 VerifyAllMocks(privateBlobCacheService,
                     cacheKeyService,
                     locationRepository,
                     releaseVersionService,
                     timePeriodService);
-
-                result.AssertRight();
             }
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -4409,6 +5263,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 ContentBlock = dataBlock
             };
 
+            var replacementDataImport = new DataImport
+            {
+                File = replacementFile,
+                Status = DataImportStatus.COMPLETE,
+            };
+
             var locationRepository = new Mock<ILocationRepository>(Strict);
             locationRepository.Setup(service => service.GetDistinctForSubject(replacementReleaseSubject.SubjectId))
                 .ReturnsAsync(new List<Location>
@@ -4433,6 +5293,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 contentDbContext.Files.AddRange(originalFile, replacementFile);
                 contentDbContext.ReleaseFiles.AddRange(originalReleaseFile, replacementReleaseFile);
                 contentDbContext.DataBlocks.AddRange(dataBlock);
+                contentDbContext.DataImports.Add(replacementDataImport);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -4478,7 +5339,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var result = await replacementService.Replace(
                     releaseVersionId: releaseVersion.Id,
-                    originalFileId: originalFile.Id,
+                    originalFileIds: [originalFile.Id],
                     default);
 
                 VerifyAllMocks(privateBlobCacheService,
@@ -4642,6 +5503,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 }
             };
 
+            var replacementDataImport = new DataImport
+            {
+                File = replacementFile,
+                Status = DataImportStatus.COMPLETE,
+            };
+
             var contentDbContextId = Guid.NewGuid().ToString();
             var statisticsDbContextId = Guid.NewGuid().ToString();
 
@@ -4650,6 +5517,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 contentDbContext.ReleaseVersions.AddRange(releaseVersion);
                 contentDbContext.Files.AddRange(originalFile, replacementFile);
                 contentDbContext.ReleaseFiles.AddRange(originalReleaseFile, replacementReleaseFile);
+                contentDbContext.DataImports.Add(replacementDataImport);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -4686,14 +5554,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var result = await replacementService.Replace(
                     releaseVersionId: releaseVersion.Id,
-                    originalFileId: originalFile.Id,
+                    originalFileIds: [originalFile.Id],
                     default);
+
+                result.AssertRight();
 
                 VerifyAllMocks(locationRepository,
                     releaseVersionService,
                     timePeriodService);
-
-                result.AssertRight();
             }
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
@@ -4834,14 +5702,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 }
             };
 
+            var replacementDataImport = new DataImport
+            {
+                File = replacementFile,
+                Status = DataImportStatus.COMPLETE,
+            };
+
             var contentDbContextId = Guid.NewGuid().ToString();
             var statisticsDbContextId = Guid.NewGuid().ToString();
-
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
                 contentDbContext.ReleaseVersions.AddRange(contentRelease);
                 contentDbContext.Files.AddRange(originalFile, replacementFile);
                 contentDbContext.ReleaseFiles.AddRange(originalReleaseFile, replacementReleaseFile);
+                contentDbContext.DataImports.Add(replacementDataImport);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -4880,14 +5754,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var result = await replacementService.Replace(
                     releaseVersionId: contentRelease.Id,
-                    originalFileId: originalFile.Id,
+                    originalFileIds: [originalFile.Id],
                     default);
+
+                result.AssertRight();
 
                 VerifyAllMocks(locationRepository,
                     releaseVersionService,
                     timePeriodService);
-
-                result.AssertRight();
             }
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))

@@ -17,6 +17,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Options;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
+using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
@@ -33,6 +34,7 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.Validat
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
 using IReleaseVersionService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IReleaseVersionService;
 using Unit = GovUk.Education.ExploreEducationStatistics.Common.Model.Unit;
+using ValidationUtils = GovUk.Education.ExploreEducationStatistics.Common.Validators.ValidationUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 {
@@ -127,16 +129,49 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         public async Task<Either<ActionResult, Unit>> Replace(
             Guid releaseVersionId,
-            Guid originalFileId,
+            List<Guid> originalFileIds,
             CancellationToken cancellationToken)
         {
             return await contentDbContext.ReleaseVersions
                 .FirstOrNotFoundAsync(rv => rv.Id == releaseVersionId,
                     cancellationToken: cancellationToken)
                 .OnSuccess(userService.CheckCanUpdateReleaseVersion)
-                .OnSuccess(() => CheckLinkedOriginalAndReplacementReleaseFilesExist(
+                .OnSuccess(async _ =>
+                {
+                    var errors = new List<ErrorViewModel>();
+
+                    foreach (var originalFileId in originalFileIds)
+                    {
+                        var replacementResult = await Replace(
+                            releaseVersionId: releaseVersionId,
+                            originalFileId: originalFileId,
+                            cancellationToken);
+
+                        if (replacementResult.IsLeft)
+                        {
+                            var error = GetReplaceError(replacementResult.Left, originalFileId);
+                            errors.Add(error);
+                        }
+                    }
+
+                    if (errors.Count > 0)
+                    {
+                        return new Either<ActionResult, Unit>(ValidationUtils.ValidationResult(errors));
+                    }
+
+                    return Unit.Instance;
+
+                });
+        }
+
+        private async Task<Either<ActionResult, Unit>> Replace(
+                Guid releaseVersionId,
+                Guid originalFileId,
+                CancellationToken cancellationToken)
+        {
+            return await CheckLinkedOriginalAndReplacementReleaseFilesExist(
                     releaseVersionId: releaseVersionId,
-                    originalFileId: originalFileId))
+                    originalFileId: originalFileId)
                 .OnSuccessCombineWith(async releaseFiles =>
                 {
                     var originalReleaseFile = releaseFiles.originalReleaseFile;
@@ -149,12 +184,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 })
                 .OnSuccessDo(releaseFilesAndPlan =>
                 {
-                    var ((_, _), plan) = releaseFilesAndPlan;
+                    var ((_, replacementReleaseFile), plan) = releaseFilesAndPlan;
                     if (!plan.Valid)
                     {
                         return new Either<ActionResult, Tuple<
                             (ReleaseFile, ReleaseFile), DataReplacementPlanViewModel>>(
                             ValidationActionResult(ReplacementMustBeValid));
+                    }
+
+                    var replacementImportHasCompleted = contentDbContext.DataImports
+                        .Any(import =>
+                            import.FileId == replacementReleaseFile.FileId
+                            && import.Status == DataImportStatus.COMPLETE);
+                    if (!replacementImportHasCompleted)
+                    {
+                        return new Either<ActionResult, Tuple<
+                            (ReleaseFile, ReleaseFile), DataReplacementPlanViewModel>>(
+                            ValidationActionResult(ReplacementImportMustBeComplete));
                     }
 
                     return releaseFilesAndPlan;
@@ -172,12 +218,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         {
                             await InvalidateDataBlockCachedResults(dataBlockPlan, releaseVersionId);
                             await ReplaceLinksForDataBlock(dataBlockPlan, replacementSubjectId);
-                        });
+                        }, cancellationToken);
 
                     await plan.Footnotes
                         .ToAsyncEnumerable()
                         .ForEachAwaitAsync(footnotePlan =>
-                            ReplaceLinksForFootnote(footnotePlan, originalSubjectId, replacementSubjectId));
+                            ReplaceLinksForFootnote(footnotePlan, originalSubjectId, replacementSubjectId),
+                            cancellationToken);
 
                     replacementReleaseFile.FilterSequence =
                         await ReplaceFilterSequence(originalReleaseFile, replacementReleaseFile);
@@ -198,6 +245,42 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         releaseVersionId: releaseVersionId,
                         fileId: originalReleaseFile.FileId);
                 });
+        }
+
+        private ErrorViewModel GetReplaceError(ActionResult actionResult, Guid originalFileId)
+        {
+            if (IsNotFound(actionResult))
+            {
+                return new ErrorViewModel
+                {
+                    Code = "ReplacementNotFound",
+                    Message = $"Linked original and replacement file(s) not found. OriginalFileId: {originalFileId}",
+                };
+            }
+
+            if (HasValidationError(actionResult, ReplacementMustBeValid))
+            {
+                return new ErrorViewModel
+                {
+                    Code = "ReplacementMustBeValid",
+                    Message = $"Replacement not valid. OriginalFileId: {originalFileId}",
+                };
+            }
+
+            if (HasValidationError(actionResult, ReplacementImportMustBeComplete))
+            {
+                return new ErrorViewModel
+                {
+                    Code = "ReplacementImportMustBeComplete",
+                    Message = $"Replacement import not complete. OriginalFileId: {originalFileId}",
+                };
+            }
+
+            return new ErrorViewModel
+            {
+                Code = "ReplacementError",
+                Message = $"Replacement error. OriginalFileId: {originalFileId}",
+            };
         }
 
         private async Task<Either<ActionResult, DataReplacementPlanViewModel>> GenerateReplacementPlan(
