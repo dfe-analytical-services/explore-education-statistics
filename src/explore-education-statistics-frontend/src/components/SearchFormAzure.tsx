@@ -16,6 +16,10 @@ interface Props {
   onSubmit: (value: string) => void;
 }
 
+// Nb we are not using tanstack-query or react-hook-form here, as
+// accessible-autocomplete lib is managing its own state, and we can't
+// access the generated text input to be able to hook into its value easily
+
 export default function SearchForm({ label = 'Search', onSubmit }: Props) {
   const router = useRouter();
 
@@ -98,13 +102,20 @@ export default function SearchForm({ label = 'Search', onSubmit }: Props) {
       }}
       ref={wrapper}
     >
-      <label htmlFor="search" className="govuk-label govuk-label--m">
+      <label
+        htmlFor="search"
+        className="govuk-label govuk-label--m"
+        id="search-label"
+      >
         {label}
       </label>
       <div className="autocomplete__item-wrap">
         <Autocomplete
           id="search"
           name="search"
+          menuAttributes={{
+            'aria-labelledby': 'search-label',
+          }}
           minLength={3}
           source={fetchResults}
           templates={{

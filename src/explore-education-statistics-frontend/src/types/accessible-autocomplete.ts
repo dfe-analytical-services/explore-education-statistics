@@ -56,8 +56,9 @@ declare module 'accessible-autocomplete/react' {
    */
   interface AccessibleAutocompleteProps {
     /**
-     * The `id` attribute for the generated input field.
-     * If not provided, a unique ID will be generated.
+     * The id to assign to the autocomplete input field,
+     * to use with a <label for=id>.
+     * Not required if using enhanceSelectElement
      */
     id?: string;
     /**
@@ -88,10 +89,27 @@ declare module 'accessible-autocomplete/react' {
      * Controls how the dropdown menu is displayed.
      * - `'inline'`: The dropdown appears directly below the input.
      * - `'overlay'`: The dropdown appears as an overlay over other content.
-     * - `'hidden'`: The dropdown is visually hidden but still accessible (e.g., for screen readers).
-     * Defaults to `'overlay'`.
+     * Defaults to `'inline'`.
      */
-    displayMenu?: 'inline' | 'overlay' | 'hidden';
+    displayMenu?: 'inline' | 'overlay';
+    /**
+     * Sets html attributes and their values on the generated ul menu element.
+     * Useful for adding aria-labelledby and setting to the value of the id attribute on your existing label,to provide context to an assistive technology user.
+     */
+    menuAttributes?: Record<string, string | boolean>;
+    /**
+     * Adds custom html classes to the generated ul menu element.
+     */
+    menuClasses?: string;
+    /**
+     * Adds custom html classes to the generated input element.
+     */
+    inputClasses?: string;
+    /**
+     * Adds custom html classes to the additional input element that appears
+     * when what the user typed matches the start of a suggestion.
+     */
+    hintClasses?: string;
     /**
      * A callback function that is triggered when a suggestion is confirmed (selected by user or on blur).
      * @param query The confirmed suggestion (string or object from the source), or `undefined` if nothing was selected.
@@ -143,11 +161,6 @@ declare module 'accessible-autocomplete/react' {
      * The `placeholder` attribute for the generated text input field.
      */
     placeholder?: string;
-    /**
-     * If `true`, the form containing the autocomplete will be submitted when a suggestion is confirmed.
-     * Defaults to `false`.
-     */
-    autoSubmit?: boolean;
     /**
      * Optional `className` to apply to the top-level autocomplete wrapper div.
      */
