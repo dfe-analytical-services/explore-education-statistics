@@ -23,7 +23,7 @@ public class UserPublicationRoleRepositoryTests
     [Fact]
     public async Task TryCreate_OldRole_NoNewPermissionsSystemPublicationRoleChanges()
     {
-        var oldPublicationRoleToCreate = PublicationRole.Owner;
+        var oldPublicationRoleToCreate = PublicationRole.Allower;
         var newPublicationRoleToRemain = PublicationRole.Approver;
 
         var user = new User();
@@ -53,7 +53,7 @@ public class UserPublicationRoleRepositoryTests
 
         var result = await service.TryCreate(user.Id, publication.Id, oldPublicationRoleToCreate, createdBy.Id);
 
-        // Should be the OLD `Owner` role which has been created that is returned
+        // Should be the OLD `Allower` role which has been created that is returned
         Assert.NotNull(result);
 
         Assert.NotEqual(Guid.Empty, result.Id);
@@ -63,7 +63,10 @@ public class UserPublicationRoleRepositoryTests
         result.Created.AssertUtcNow();
         Assert.Equal(createdBy.Id, result.CreatedById);
 
-        var userPublicationRoles = await contentDbContext.UserPublicationRoles.ToListAsync();
+        // Checking 'AllUserPublicationRoles', which includes the NEW and OLD permissions system
+        // publication roles. This will likely be changed back to just 'UserPublicationRoles' in EES-6196 
+        // when we stop using the OLD roles.
+        var userPublicationRoles = await contentDbContext.AllUserPublicationRoles.ToListAsync();
 
         // Should be 2 as the 'Approver` role should be untouched,
         // and the `Owner` role has been created.
@@ -84,8 +87,6 @@ public class UserPublicationRoleRepositoryTests
         Assert.Equal(user.Id, existingNewPublicationRole.UserId);
         Assert.Equal(publication.Id, existingNewPublicationRole.PublicationId);
         Assert.Equal(newPublicationRoleToRemain, existingNewPublicationRole.Role);
-        existingNewPublicationRole.Created.AssertUtcNow();
-        Assert.Equal(createdBy.Id, existingNewPublicationRole.CreatedById);
     }
 
     [Fact]
@@ -132,7 +133,10 @@ public class UserPublicationRoleRepositoryTests
         result.Created.AssertUtcNow();
         Assert.Equal(createdBy.Id, result.CreatedById);
 
-        var userPublicationRoles = await contentDbContext.UserPublicationRoles.ToListAsync();
+        // Checking 'AllUserPublicationRoles', which includes the NEW and OLD permissions system
+        // publication roles. This will likely be changed back to just 'UserPublicationRoles' in EES-6196 
+        // when we stop using the OLD roles.
+        var userPublicationRoles = await contentDbContext.AllUserPublicationRoles.ToListAsync();
 
         // Should be 2 as the 'Drafter` role has been removed and replaced with the `Approver` role,
         // and the `Owner` role has been created.
@@ -196,7 +200,10 @@ public class UserPublicationRoleRepositoryTests
         result.Created.AssertUtcNow();
         Assert.Equal(createdBy.Id, result.CreatedById);
 
-        var userPublicationRoles = await contentDbContext.UserPublicationRoles.ToListAsync();
+        // Checking 'AllUserPublicationRoles', which includes the NEW and OLD permissions system
+        // publication roles. This will likely be changed back to just 'UserPublicationRoles' in EES-6196 
+        // when we stop using the OLD roles.
+        var userPublicationRoles = await contentDbContext.AllUserPublicationRoles.ToListAsync();
 
         // Should be 2 as the 'Drafter` role has been created,
         // and the `Owner` role has been created.
@@ -257,7 +264,10 @@ public class UserPublicationRoleRepositoryTests
         // AND no NEW role should be created.
         Assert.Null(result);
 
-        var userPublicationRoles = await contentDbContext.UserPublicationRoles.ToListAsync();
+        // Checking 'AllUserPublicationRoles', which includes the NEW and OLD permissions system
+        // publication roles. This will likely be changed back to just 'UserPublicationRoles' in EES-6196 
+        // when we stop using the OLD roles.
+        var userPublicationRoles = await contentDbContext.AllUserPublicationRoles.ToListAsync();
 
         // Should only be the 'Approver` role which remains,
         // and the `Drafter` role should NOT be created (i.e. NO changes).
@@ -267,8 +277,6 @@ public class UserPublicationRoleRepositoryTests
         Assert.Equal(user.Id, existingNewPublicationRole.UserId);
         Assert.Equal(publication.Id, existingNewPublicationRole.PublicationId);
         Assert.Equal(newPublicationRoleToRemain, existingNewPublicationRole.Role);
-        existingNewPublicationRole.Created.AssertUtcNow();
-        Assert.Equal(createdBy.Id, existingNewPublicationRole.CreatedById);
     }
 
     [Fact]
@@ -314,7 +322,10 @@ public class UserPublicationRoleRepositoryTests
         result.Created.AssertUtcNow();
         Assert.Equal(createdBy.Id, result.CreatedById);
 
-        var userPublicationRoles = await contentDbContext.UserPublicationRoles.ToListAsync();
+        // Checking 'AllUserPublicationRoles', which includes the NEW and OLD permissions system
+        // publication roles. This will likely be changed back to just 'UserPublicationRoles' in EES-6196 
+        // when we stop using the OLD roles.
+        var userPublicationRoles = await contentDbContext.AllUserPublicationRoles.ToListAsync();
 
         // Should only be the 'Approver` role that exists, as the `Drafter` role should be removed,
         // and the `Approver` should be created.
@@ -366,7 +377,10 @@ public class UserPublicationRoleRepositoryTests
         result.Created.AssertUtcNow();
         Assert.Equal(createdBy.Id, result.CreatedById);
 
-        var userPublicationRoles = await contentDbContext.UserPublicationRoles.ToListAsync();
+        // Checking 'AllUserPublicationRoles', which includes the NEW and OLD permissions system
+        // publication roles. This will likely be changed back to just 'UserPublicationRoles' in EES-6196 
+        // when we stop using the OLD roles.
+        var userPublicationRoles = await contentDbContext.AllUserPublicationRoles.ToListAsync();
 
         // Should only be the 'Drafter` role which has been created.
         // No other role should exist.
@@ -414,12 +428,14 @@ public class UserPublicationRoleRepositoryTests
 
         await service.Remove(oldUserPublicationRole, deletedById);
 
-        var updatedPublicationRolesIgnoringQueryFilters = await contentDbContext.UserPublicationRoles
-            .IgnoreQueryFilters()
+        // Checking 'AllUserPublicationRoles', which includes the NEW and OLD permissions system
+        // publication roles. This will likely be changed back to just 'UserPublicationRoles' in EES-6196 
+        // when we stop using the OLD roles.
+        var updatedPublicationRoles = await contentDbContext.AllUserPublicationRoles
             .ToListAsync();
 
         // The existing role should have been hard-deleted
-        Assert.Empty(updatedPublicationRolesIgnoringQueryFilters);
+        Assert.Empty(updatedPublicationRoles);
     }
 
     [Fact]
@@ -460,12 +476,14 @@ public class UserPublicationRoleRepositoryTests
 
         await service.Remove(oldUserPublicationRole, deletedById);
 
-        var updatedPublicationRolesIgnoringQueryFilters = await contentDbContext.UserPublicationRoles
-            .IgnoreQueryFilters()
+        // Checking 'AllUserPublicationRoles', which includes the NEW and OLD permissions system
+        // publication roles. This will likely be changed back to just 'UserPublicationRoles' in EES-6196 
+        // when we stop using the OLD roles.
+        var updatedPublicationRoles = await contentDbContext.AllUserPublicationRoles
             .ToListAsync();
 
         // Both roles should have been hard-deleted
-        Assert.Empty(updatedPublicationRolesIgnoringQueryFilters);
+        Assert.Empty(updatedPublicationRoles);
     }
 
     [Fact]
@@ -496,12 +514,14 @@ public class UserPublicationRoleRepositoryTests
 
         await service.Remove(newUserPublicationRole, deletedById);
 
-        var updatedPublicationRolesIgnoringQueryFilters = await contentDbContext.UserPublicationRoles
-            .IgnoreQueryFilters()
+        // Checking 'AllUserPublicationRoles', which includes the NEW and OLD permissions system
+        // publication roles. This will likely be changed back to just 'UserPublicationRoles' in EES-6196 
+        // when we stop using the OLD roles.
+        var updatedPublicationRoles = await contentDbContext.AllUserPublicationRoles
             .ToListAsync();
 
         // The existing new role should have been hard-deleted
-        Assert.Empty(updatedPublicationRolesIgnoringQueryFilters);
+        Assert.Empty(updatedPublicationRoles);
 
         // Should have exited early and not called the NewPermissionsSystemHelper
         newPermissionsSystemHelperMock

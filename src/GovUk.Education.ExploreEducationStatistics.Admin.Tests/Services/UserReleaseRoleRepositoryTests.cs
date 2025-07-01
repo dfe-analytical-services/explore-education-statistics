@@ -55,7 +55,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     releaseVersion.Release.PublicationId))
                 .ReturnsAsync((null, null));
 
-            var service = SetupUserReleaseRoleRepository(contentDbContext, newPermissionsSystemHelperMock.Object);
+            var userPublicationRoleRepositoryMock = new Mock<IUserPublicationRoleRepository>();
+
+            var service = SetupUserReleaseRoleRepository(
+                contentDbContext: contentDbContext,
+                newPermissionsSystemHelper: newPermissionsSystemHelperMock.Object,
+                userPublicationRoleRepository: userPublicationRoleRepositoryMock.Object);
 
             var result = await service.Create(
                 userId: user.Id,
@@ -81,10 +86,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             Assert.Equal(releaseRoleToCreate, createdReleaseRole.Role);
             Assert.Equal(createdBy.Id, createdReleaseRole.CreatedById);
 
-            var userPublicationRoles = await contentDbContext.UserPublicationRoles.ToListAsync();
+            // Should not have tried to remove any existing publication role
+            userPublicationRoleRepositoryMock.Verify(
+                mock => mock.Remove(It.IsAny<UserPublicationRole>(), It.IsAny<Guid>()),
+                Times.Never);
 
-            // Should not have created any new publication roles
-            Assert.Empty(userPublicationRoles);
+            // Should not have tried to create any new publication role
+            userPublicationRoleRepositoryMock.Verify(
+                mock => mock.TryCreate(
+                    It.IsAny<Guid>(),
+                    It.IsAny<Guid>(),
+                    It.IsAny<PublicationRole>(),
+                    It.IsAny<Guid>()),
+                Times.Never);
         }
 
         [Fact]
@@ -127,7 +141,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 .Setup(rvr => rvr.GetUserPublicationRole(
                     user.Id,
                     publication.Id,
-                    newPublicationRoleToRemove))
+                    newPublicationRoleToRemove,
+                    true))
                 .ReturnsAsync(existingPublicationRole);
             userPublicationRoleRepositoryMock
                 .Setup(rvr => rvr.Remove(
@@ -170,19 +185,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             Assert.Equal(releaseVersion.Id, createdReleaseRole.ReleaseVersionId);
             Assert.Equal(releaseRoleToCreate, createdReleaseRole.Role);
             Assert.Equal(createdBy.Id, createdReleaseRole.CreatedById);
-
-            var userPublicationRoles = await contentDbContext.UserPublicationRoles.ToListAsync();
-
-            // Should just be 1 as the the 'Approver` role should have been created,
-            // and the 'Drafter` role should have been removed.
-            var createdNewPublicationRole = Assert.Single(userPublicationRoles);
-
-            Assert.NotEqual(Guid.Empty, createdNewPublicationRole.Id);
-            Assert.Equal(user.Id, createdNewPublicationRole.UserId);
-            Assert.Equal(publication.Id, createdNewPublicationRole.PublicationId);
-            Assert.Equal(newPublicationRoleToCreate, createdNewPublicationRole.Role);
-            createdNewPublicationRole.Created.AssertUtcNow();
-            Assert.Equal(createdBy.Id, createdNewPublicationRole.CreatedById);
 
             // Should have tried to remove the existing publication role
             userPublicationRoleRepositoryMock.Verify(
@@ -266,18 +268,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             Assert.Equal(releaseVersion.Id, createdReleaseRole.ReleaseVersionId);
             Assert.Equal(releaseRoleToCreate, createdReleaseRole.Role);
             Assert.Equal(createdBy.Id, createdReleaseRole.CreatedById);
-
-            var userPublicationRoles = await contentDbContext.UserPublicationRoles.ToListAsync();
-
-            // Should just be 1 as the the 'Drafter` role should have been created
-            var createdNewPublicationRole = Assert.Single(userPublicationRoles);
-
-            Assert.NotEqual(Guid.Empty, createdNewPublicationRole.Id);
-            Assert.Equal(user.Id, createdNewPublicationRole.UserId);
-            Assert.Equal(publication.Id, createdNewPublicationRole.PublicationId);
-            Assert.Equal(newPublicationRoleToCreate, createdNewPublicationRole.Role);
-            createdNewPublicationRole.Created.AssertUtcNow();
-            Assert.Equal(createdBy.Id, createdNewPublicationRole.CreatedById);
 
             // Should not have tried to remove any existing publication role
             userPublicationRoleRepositoryMock.Verify(

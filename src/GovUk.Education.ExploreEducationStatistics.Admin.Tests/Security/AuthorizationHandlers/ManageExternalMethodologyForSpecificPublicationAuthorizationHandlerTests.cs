@@ -51,7 +51,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                     if (!expectedToPassByClaimAlone)
                     {
                         userPublicationRoleRepository
-                            .Setup(s => s.GetAllRolesByUserAndPublication(UserId, Publication.Id))
+                            .Setup(s => s.GetAllRolesByUserAndPublication(UserId, Publication.Id, false))
                             .ReturnsAsync(new List<PublicationRole>());
                     }
 
@@ -79,7 +79,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                 var authContext = CreateAuthContext(user, Publication);
 
                 userPublicationRoleRepository
-                    .Setup(s => s.GetAllRolesByUserAndPublication(UserId, Publication.Id))
+                    .Setup(s => s.GetAllRolesByUserAndPublication(UserId, Publication.Id, false))
                     .ReturnsAsync(CollectionUtils.ListOf(Owner));
 
                 await handler.HandleAsync(authContext);
@@ -99,7 +99,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                 var authContext = CreateAuthContext(user, Publication);
 
                 userPublicationRoleRepository
-                    .Setup(s => s.GetAllRolesByUserAndPublication(UserId, Publication.Id))
+                    .Setup(s => s.GetAllRolesByUserAndPublication(UserId, Publication.Id, false))
                     .ReturnsAsync(new List<PublicationRole>());
 
                 await handler.HandleAsync(authContext);

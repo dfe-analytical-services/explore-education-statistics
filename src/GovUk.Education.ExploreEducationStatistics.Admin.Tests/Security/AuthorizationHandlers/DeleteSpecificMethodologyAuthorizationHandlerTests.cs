@@ -91,7 +91,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                             .ReturnsAsync(OwningPublication);
 
                         userPublicationRoleRepository
-                            .Setup(s => s.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id))
+                            .Setup(s => s.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id, false))
                             .ReturnsAsync(new List<PublicationRole>());
                     }
 
@@ -157,7 +157,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                             .ReturnsAsync(OwningPublication);
 
                         userPublicationRoleRepository
-                            .Setup(s => s.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id))
+                            .Setup(s => s.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id, false))
                             .ReturnsAsync(new List<PublicationRole>());
                     }
 
@@ -222,7 +222,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                             .ReturnsAsync(OwningPublication);
 
                         userPublicationRoleRepository
-                            .Setup(s => s.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id))
+                            .Setup(s => s.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id, false))
                             .ReturnsAsync(ListOf(role));
 
                         var user = DataFixture.AuthenticatedUser(userId: UserId);
@@ -251,7 +251,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                     .ReturnsAsync(OwningPublication);
 
                 userPublicationRoleRepository
-                    .Setup(s => s.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id))
+                    .Setup(s => s.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id, false))
                     .ReturnsAsync(new List<PublicationRole>());
 
                 var user = DataFixture.AuthenticatedUser(userId: UserId);
@@ -302,7 +302,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                             .ReturnsAsync(OwningPublication);
 
                         userPublicationRoleRepository
-                            .Setup(s => s.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id))
+                            .Setup(s => s.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id, false))
                             .ReturnsAsync(ListOf(role));
 
                         var user = DataFixture.AuthenticatedUser(userId: UserId);

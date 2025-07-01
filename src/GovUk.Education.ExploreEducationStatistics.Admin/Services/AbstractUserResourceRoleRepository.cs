@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using CsvHelper.Configuration.Attributes;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
@@ -112,20 +113,39 @@ public abstract class AbstractUserResourceRoleRepository<TResourceRole, TResourc
             .ToListAsync();
     }
 
-    protected async Task<List<TRoleEnum>> GetAllResourceRolesByUserAndResource(Guid userId, Guid resourceId)
+    // The optional parameter 'includeNewPermissionsSystemRoles' is purely here to assist with the
+    // code that SYNCS the creation and removal of the NEW permissions system publication role with the
+    // OLD roles. It is not ideal to have it here, as this class is abstract and is not specific to
+    // publication roles. However, it was put here as a temporary parameter that will be removed
+    // in EES-6196, when we no longer have to cater for the old roles. Due to it being a short-lived temporary
+    // parameter, it was not worth refactoring this class and the repositories inheriting from it.
+    protected async Task<List<TRoleEnum>> GetAllResourceRolesByUserAndResource(
+        Guid userId, 
+        Guid resourceId, 
+        bool includeNewPermissionsSystemRoles = false)
     {
         return await 
-            GetResourceRolesQueryByResourceId(resourceId)
+            GetResourceRolesQueryByResourceId(resourceId, includeNewPermissionsSystemRoles)
             .Where(r => r.UserId == userId)
             .Select(r => r.Role)
             .Distinct()
             .ToListAsync();
     }
 
-    protected async Task<TResourceRole?> GetResourceRole(Guid userId, Guid resourceId, TRoleEnum role)
+    // The optional parameter 'includeNewPermissionsSystemRoles' is purely here to assist with the
+    // code that SYNCS the creation and removal of the NEW permissions system publication role with the
+    // OLD roles. It is not ideal to have it here, as this class is abstract and is not specific to
+    // publication roles. However, it was put here as a temporary parameter that will be removed
+    // in EES-6196, when we no longer have to cater for the old roles. Due to it being a short-lived temporary
+    // parameter, it was not worth refactoring this class and the repositories inheriting from it.
+    protected async Task<TResourceRole?> GetResourceRole(
+        Guid userId, 
+        Guid resourceId, 
+        TRoleEnum role,
+        bool includeNewPermissionsSystemRoles = false)
     {
         return await 
-            GetResourceRolesQueryByResourceId(resourceId)
+            GetResourceRolesQueryByResourceId(resourceId, includeNewPermissionsSystemRoles)
             .SingleOrDefaultAsync(r =>
                 r.UserId == userId &&
                 r.Role.Equals(role));
@@ -173,7 +193,13 @@ public abstract class AbstractUserResourceRoleRepository<TResourceRole, TResourc
         return resourceRole;
     }
 
-    protected abstract IQueryable<TResourceRole> GetResourceRolesQueryByResourceId(Guid resourceId);
-    
+    // The optional parameter 'includeNewPermissionsSystemRoles' is purely here to assist with the
+    // code that SYNCS the creation and removal of the NEW permissions system publication role with the
+    // OLD roles. It is not ideal to have it here, as this class is abstract and is not specific to
+    // publication roles. However, it was put here as a temporary parameter that will be removed
+    // in EES-6196, when we no longer have to cater for the old roles. Due to it being a short-lived temporary
+    // parameter, it was not worth refactoring this class and the repositories inheriting from it.
+    protected abstract IQueryable<TResourceRole> GetResourceRolesQueryByResourceId(Guid resourceId, bool includeNewPermissionsSystemRoles = false);
+
     protected abstract IQueryable<TResourceRole> GetResourceRolesQueryByResourceIds(List<Guid> resourceIds);
 }

@@ -108,7 +108,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                             .ReturnsAsync(OwningPublication);
 
                         userPublicationRoleRepository
-                            .Setup(s => s.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id))
+                            .Setup(s => s.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id, false))
                             .ReturnsAsync(new List<PublicationRole>());
 
                         userReleaseRoleRepository
@@ -164,7 +164,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
 
                     userPublicationRoleRepository
                         .Setup(mock =>
-                            mock.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id))
+                            mock.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id, false))
                         .ReturnsAsync(ListOf(publicationRole));
 
                     if (!expectedToPassByPublicationRole)
@@ -220,7 +220,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
 
                     userPublicationRoleRepository
                         .Setup(mock =>
-                            mock.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id))
+                            mock.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id, false))
                         .ReturnsAsync(ListOf(publicationRole));
 
                     if (!expectedToPassByPublicationRole)
@@ -278,7 +278,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                         .ReturnsAsync(OwningPublication);
 
                     userPublicationRoleRepository
-                        .Setup(s => s.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id))
+                        .Setup(s => s.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id, false))
                         .ReturnsAsync(new List<PublicationRole>());
 
                     userReleaseRoleRepository
@@ -329,7 +329,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
 
                     userPublicationRoleRepository
                         .Setup(mock =>
-                            mock.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id))
+                            mock.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id, false))
                         .ReturnsAsync(new List<PublicationRole>());
 
                     userReleaseRoleRepository
@@ -376,7 +376,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                     .ReturnsAsync(OwningPublication);
 
                 userPublicationRoleRepository
-                    .Setup(s => s.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id))
+                    .Setup(s => s.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id, false))
                     .ReturnsAsync(new List<PublicationRole>());
 
                 userReleaseRoleRepository

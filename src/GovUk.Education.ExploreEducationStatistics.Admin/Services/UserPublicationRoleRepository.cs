@@ -17,7 +17,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         AbstractUserResourceRoleRepository<UserPublicationRole, Publication, PublicationRole>(contentDbContext), 
         IUserPublicationRoleRepository
     {
-        // This class will mostly likely remain but be amended slightly in EES-6196, when we no longer have to cater for the old roles.
+        // This method will mostly likely remain but be amended slightly in EES-6196, when we no longer have to cater for the old roles.
         public async Task<UserPublicationRole?> TryCreate(Guid userId, Guid publicationId, PublicationRole publicationRole, Guid createdById)
         {
             var (newSystemPublicationRoleToRemove, newSystemPublicationRoleToCreate) =
@@ -31,7 +31,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 var userPublicationRole = await GetUserPublicationRole(
                     userId: userId,
                     publicationId: publicationId,
-                    role: newSystemPublicationRoleToRemove.Value);
+                    role: newSystemPublicationRoleToRemove.Value,
+                    includeNewPermissionsSystemRoles: true);
 
                 await Remove(userPublicationRole!, createdById);
             }
@@ -44,7 +45,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     userId: userId,
                     resourceId: publicationId, 
                     role: newSystemPublicationRoleToCreate.Value,
-                    createdById:createdById);
+                    createdById: createdById);
             }
 
             return publicationRole.IsNewPermissionsSystemPublicationRole()
@@ -56,7 +57,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     createdById: createdById);
         }
 
-        // This class will mostly likely remain but be amended slightly in EES-6196, when we no longer have to cater for the old roles.
+        // This method will mostly likely remain but be amended slightly in EES-6196, when we no longer have to cater for the old roles.
         public async Task Remove(UserPublicationRole userPublicationRole, Guid deletedById)
         {
             contentDbContext.UserPublicationRoles.Remove(userPublicationRole);
@@ -78,10 +79,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             await contentDbContext.SaveChangesAsync();
         }
 
-        protected override IQueryable<UserPublicationRole> GetResourceRolesQueryByResourceId(Guid publicationId)
+        protected override IQueryable<UserPublicationRole> GetResourceRolesQueryByResourceId(
+            Guid publicationId, 
+            bool includeNewPermissionsSystemRoles = false)
         {
-            return ContentDbContext
-                .UserPublicationRoles
+            var query = includeNewPermissionsSystemRoles
+                ? ContentDbContext.AllUserPublicationRoles
+                : ContentDbContext.UserPublicationRoles;
+
+            return query
                 .Where(role => role.PublicationId == publicationId);
         }
 
@@ -97,20 +103,58 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return GetDistinctResourceRolesByUser(userId);
         }
 
-        public Task<List<PublicationRole>> GetAllRolesByUserAndPublication(Guid userId, Guid publicationId)
+        // The optional parameter 'includeNewPermissionsSystemRoles' is purely here to assist with the
+        // code that SYNCS the creation and removal of the NEW permissions system publication role with the
+        // OLD roles. It is not ideal to have it here, as this class is abstract and is not specific to
+        // publication roles. However, it was put here as a temporary parameter that will be removed
+        // in EES-6196, when we no longer have to cater for the old roles. Due to it being a short-lived temporary
+        // parameter, it was not worth refactoring this class and the base class.
+        public Task<List<PublicationRole>> GetAllRolesByUserAndPublication(
+            Guid userId, 
+            Guid publicationId, 
+            bool includeNewPermissionsSystemRoles = false)
         {
-            return GetAllResourceRolesByUserAndResource(userId, publicationId);
+            return GetAllResourceRolesByUserAndResource(
+                userId: userId, 
+                resourceId: publicationId,
+                includeNewPermissionsSystemRoles: includeNewPermissionsSystemRoles);
         }
 
-        public async Task<UserPublicationRole?> GetUserPublicationRole(Guid userId, Guid publicationId, PublicationRole role)
+        // The optional parameter 'includeNewPermissionsSystemRoles' is purely here to assist with the
+        // code that SYNCS the creation and removal of the NEW permissions system publication role with the
+        // OLD roles. It is not ideal to have it here, as this class is abstract and is not specific to
+        // publication roles. However, it was put here as a temporary parameter that will be removed
+        // in EES-6196, when we no longer have to cater for the old roles. Due to it being a short-lived temporary
+        // parameter, it was not worth refactoring this class and the base class.
+        public async Task<UserPublicationRole?> GetUserPublicationRole(
+            Guid userId, 
+            Guid publicationId, 
+            PublicationRole role,
+            bool includeNewPermissionsSystemRoles = true)
         {
-            return await GetResourceRole(userId, publicationId, role);
+            return await GetResourceRole(
+                userId: userId, 
+                resourceId: publicationId, 
+                role: role,
+                includeNewPermissionsSystemRoles: includeNewPermissionsSystemRoles);
         }
 
-        public async Task<IReadOnlyList<UserPublicationRole>> ListUserPublicationRolesByUserAndPublication(Guid userId, Guid publicationId)
+        // The optional parameter 'includeNewPermissionsSystemRoles' is purely here to assist with the
+        // code that SYNCS the creation and removal of the NEW permissions system publication role with the
+        // OLD roles. It is not ideal to have it here, as this class is abstract and is not specific to
+        // publication roles. However, it was put here as a temporary parameter that will be removed
+        // in EES-6196, when we no longer have to cater for the old roles. Due to it being a short-lived temporary
+        // parameter, it was not worth refactoring this class and the base class.
+        public async Task<IReadOnlyList<UserPublicationRole>> ListUserPublicationRolesByUserAndPublication(
+            Guid userId, 
+            Guid publicationId,
+            bool includeNewPermissionsSystemRoles = false)
         {
-            return await ContentDbContext
-                .UserPublicationRoles
+            var query = includeNewPermissionsSystemRoles
+                ? ContentDbContext.AllUserPublicationRoles
+                : ContentDbContext.UserPublicationRoles;
+
+            return await query
                 .Where(urr => urr.UserId == userId)
                 .Where(urr => urr.PublicationId == publicationId)
                 .ToListAsync();

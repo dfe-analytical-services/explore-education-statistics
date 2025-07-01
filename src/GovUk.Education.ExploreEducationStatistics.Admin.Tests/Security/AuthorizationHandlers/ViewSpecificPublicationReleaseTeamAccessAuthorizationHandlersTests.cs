@@ -41,7 +41,7 @@ public class ViewSpecificPublicationReleaseTeamAccessAuthorizationHandlersTests
             if (!expectedToPassByClaimAlone)
             {
                 userPublicationRoleRepository
-                    .Setup(s => s.GetAllRolesByUserAndPublication(UserId, Publication.Id))
+                    .Setup(s => s.GetAllRolesByUserAndPublication(UserId, Publication.Id, false))
                     .ReturnsAsync(new List<PublicationRole>());
             }
 
@@ -71,7 +71,7 @@ public class ViewSpecificPublicationReleaseTeamAccessAuthorizationHandlersTests
             var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>(Strict);
 
             userPublicationRoleRepository
-                .Setup(s => s.GetAllRolesByUserAndPublication(UserId, Publication.Id))
+                .Setup(s => s.GetAllRolesByUserAndPublication(UserId, Publication.Id, false))
                 .ReturnsAsync(ListOf(role));
 
             var handler = CreateHandler(userPublicationRoleRepository.Object);

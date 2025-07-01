@@ -15,16 +15,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 
         Task<List<PublicationRole>> GetDistinctRolesByUser(Guid userId);
 
-        Task<List<PublicationRole>> GetAllRolesByUserAndPublication(Guid userId,
-            Guid publicationId);
+        Task<List<PublicationRole>> GetAllRolesByUserAndPublication(
+            Guid userId,
+            Guid publicationId,
+            bool includeNewPermissionsSystemRoles = false);
 
         Task<bool> UserHasRoleOnPublication(Guid userId,
             Guid publicationId,
             PublicationRole role);
 
-        Task<UserPublicationRole?> GetUserPublicationRole(Guid userId, Guid publicationId, PublicationRole role);
+        Task<UserPublicationRole?> GetUserPublicationRole(
+            Guid userId, 
+            Guid publicationId, 
+            PublicationRole role,
+            bool includeNewPermissionsSystemRoles = false);
 
-        Task<IReadOnlyList<UserPublicationRole>> ListUserPublicationRolesByUserAndPublication(Guid userId, Guid publicationId);
+        Task<IReadOnlyList<UserPublicationRole>> ListUserPublicationRolesByUserAndPublication(
+            Guid userId, 
+            Guid publicationId,
+            bool includeNewPermissionsSystemRoles = false);
 
         Task Remove(UserPublicationRole userPublicationRole, Guid deletedById);
 

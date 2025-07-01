@@ -85,7 +85,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                     if (!expectedToPassByClaimAlone)
                     {
                         userPublicationRoleRepository
-                            .Setup(s => s.GetAllRolesByUserAndPublication(UserId, NonOwningLink.PublicationId))
+                            .Setup(s => s.GetAllRolesByUserAndPublication(UserId, NonOwningLink.PublicationId, false))
                             .ReturnsAsync(new List<PublicationRole>());
                     }
 
@@ -145,7 +145,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                     var handler = SetupHandler(userPublicationRoleRepository.Object);
 
                     userPublicationRoleRepository
-                        .Setup(s => s.GetAllRolesByUserAndPublication(UserId, NonOwningLink.PublicationId))
+                        .Setup(s => s.GetAllRolesByUserAndPublication(UserId, NonOwningLink.PublicationId, false))
                         .ReturnsAsync(ListOf(publicationRole));
 
                     var user = DataFixture.AuthenticatedUser(userId: UserId);
@@ -170,7 +170,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                 var handler = SetupHandler(userPublicationRoleRepository.Object);
 
                 userPublicationRoleRepository
-                    .Setup(s => s.GetAllRolesByUserAndPublication(UserId, NonOwningLink.PublicationId))
+                    .Setup(s => s.GetAllRolesByUserAndPublication(UserId, NonOwningLink.PublicationId, false))
                     .ReturnsAsync(new List<PublicationRole>());
 
                 var user = DataFixture.AuthenticatedUser(userId: UserId);

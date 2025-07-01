@@ -46,7 +46,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                     if (!expectedToPassByClaimAlone)
                     {
                         userPublicationRoleRepository
-                            .Setup(s => s.GetAllRolesByUserAndPublication(UserId, Publication.Id))
+                            .Setup(s => s.GetAllRolesByUserAndPublication(UserId, Publication.Id, false))
                             .ReturnsAsync(new List<PublicationRole>());
                     }
 
@@ -80,7 +80,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                     var handler = SetupHandler(userPublicationRoleRepository.Object);
 
                     userPublicationRoleRepository
-                        .Setup(s => s.GetAllRolesByUserAndPublication(UserId, Publication.Id))
+                        .Setup(s => s.GetAllRolesByUserAndPublication(UserId, Publication.Id, false))
                         .ReturnsAsync(CollectionUtils.ListOf(publicationRole));
 
                     var user = DataFixture.AuthenticatedUser(userId: UserId);

@@ -36,7 +36,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 var userPublicationRole = await userPublicationRoleRepository.GetUserPublicationRole(
                     userId: userId,
                     publicationId: publicationId,
-                    role: newSystemPublicationRoleToRemove.Value);
+                    role: newSystemPublicationRoleToRemove.Value,
+                    includeNewPermissionsSystemRoles: true);
 
                 await userPublicationRoleRepository.Remove(userPublicationRole!, createdById);
             }
@@ -76,7 +77,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 deletedById: deletedById);
         }
 
-        protected override IQueryable<UserReleaseRole> GetResourceRolesQueryByResourceId(Guid releaseVersionId)
+        // The optional parameter 'includeNewPermissionsSystemRoles', which is set to a discard '_' here, is
+        // purely here to assist with the code that SYNCS the creation and removal of the NEW permissions system publication
+        // role with the OLD roles. It is not ideal to have it here, as this class is abstract and is not specific to
+        // publication roles. However, it was put here as a temporary parameter that will be removed
+        // in EES-6196, when we no longer have to cater for the old roles. Due to it being a short-lived temporary
+        // parameter, it was not worth refactoring this class and the base class.
+        protected override IQueryable<UserReleaseRole> GetResourceRolesQueryByResourceId(
+            Guid releaseVersionId,
+            bool _)
         {
             return ContentDbContext
                 .UserReleaseRoles
