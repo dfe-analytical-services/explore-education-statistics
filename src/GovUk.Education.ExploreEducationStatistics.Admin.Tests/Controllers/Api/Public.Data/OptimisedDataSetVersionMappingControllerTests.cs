@@ -1133,6 +1133,1130 @@ public abstract class OptimisedDataSetVersionMappingControllerTests
         }
     }
     
+    public class OptimisedGetFilterMappingsTests : OptimisedDataSetVersionMappingControllerTests, IAsyncLifetime
+    {
+        private const string BaseUrl = "api/public-data/data-set-versions";
+
+        private readonly DataFixture _dataFixture = new();
+
+        private readonly OptimisedPostgreSqlContainerUtil _psql;
+        private readonly ITestOutputHelper _output;
+        private readonly HttpClient _client;
+        private readonly OptimisedHttpClientWithPsqlFixture _fixture;
+
+        public async Task InitializeAsync()
+        {
+            var sw = new Stopwatch();
+            sw.Start();
+
+            await _fixture.GetPublicDataDbContext().ClearTestData();
+
+            _output.WriteLine($"Clear up test data {sw.ElapsedMilliseconds}");
+            sw.Restart();
+        }
+
+        public Task DisposeAsync()
+        {
+            return Task.CompletedTask;
+        }
+        
+        public OptimisedGetFilterMappingsTests(
+            OptimisedHttpClientWithPsqlFixture fixture,
+            ITestOutputHelper output)
+        {
+            _fixture = fixture;
+            _psql = fixture.GetContainer();
+            _output = output;
+
+            var sw = new Stopwatch();
+            sw.Start();
+
+            _client = fixture.CreateClient();
+
+            output.WriteLine($"Create client {sw.ElapsedMilliseconds}");
+        }
+    
+        [Fact]
+        public async Task Success()
+        {
+            var (initialDataSetVersion, nextDataSetVersion) = await CreateInitialAndNextDataSetVersion(
+                _fixture.GetPublicDataDbContext(), _fixture.GetContentDbContext(), _output);
+
+            DataSetVersionMapping mapping = _dataFixture
+                .DefaultDataSetVersionMapping()
+                .WithSourceDataSetVersionId(initialDataSetVersion.Id)
+                .WithTargetDataSetVersionId(nextDataSetVersion.Id)
+                .WithFilterMappingPlan(_dataFixture
+                    .DefaultFilterMappingPlan()
+                    .AddFilterMapping("filter-1-key", _dataFixture
+                        .DefaultFilterMapping()
+                        .WithAutoMapped("filter-1-key")
+                        .AddOptionMapping("filter-1-option-1-key", _dataFixture
+                            .DefaultFilterOptionMapping()
+                            .WithAutoMapped("filter-1-option-1-key"))
+                        .AddOptionMapping("filter-1-option-2-key", _dataFixture
+                            .DefaultFilterOptionMapping()
+                            .WithManualNone()))
+                    .AddFilterMapping("filter-2-key", _dataFixture
+                        .DefaultFilterMapping()
+                        .WithAutoMapped("filter-2-key")
+                        .AddOptionMapping("filter-2-option-1-key", _dataFixture
+                            .DefaultFilterOptionMapping()
+                            .WithAutoNone()))
+                    .AddFilterCandidate("filter-1-key", _dataFixture
+                        .DefaultFilterMappingCandidate()
+                        .AddOptionCandidate("filter-1-option-1-key", _dataFixture
+                            .DefaultMappableFilterOption())
+                        .AddOptionCandidate("filter-1-option-3-key", _dataFixture
+                            .DefaultMappableFilterOption())));
+
+            await _fixture.GetPublicDataDbContext().AddTestData(context =>
+            {
+                context.DataSetVersionMappings.Add(mapping);
+            });
+
+            var response = await GetFilterMappings(
+                nextDataSetVersionId: nextDataSetVersion.Id, _fixture.CreateClient().WithUser("Bau"));
+
+            var retrievedMappings = response.AssertOk<FilterMappingPlan>();
+
+            // Test that the mappings from the Controller are identical to the mappings saved in the database
+            retrievedMappings.AssertDeepEqualTo(
+                mapping.FilterMappingPlan,
+                ignoreCollectionOrders: true);
+        }
+
+        [Fact]
+        public async Task NotBauUser_Returns403()
+        {
+            var response = await GetFilterMappings(
+                nextDataSetVersionId: Guid.NewGuid(),
+                client: _fixture.CreateClient().WithUser("Authenticated"));
+
+            response.AssertForbidden();
+        }
+
+        [Fact]
+        public async Task DataSetVersionMappingDoesNotExist_Returns404()
+        {
+            var response = await GetFilterMappings(Guid.NewGuid(), _fixture.CreateClient().WithUser("Bau"));
+
+            response.AssertNotFound();
+        }
+
+        private async Task<HttpResponseMessage> GetFilterMappings(
+            Guid nextDataSetVersionId,
+            HttpClient client)
+        {
+            var uri = new Uri($"{BaseUrl}/{nextDataSetVersionId}/mapping/filters", UriKind.Relative);
+
+            return await client.GetAsync(uri);
+        }
+    }
+
+    
+    public class OptimisedApplyBatchFilterOptionMappingUpdatesTests : OptimisedDataSetVersionMappingControllerTests, IAsyncLifetime
+    {
+        private const string BaseUrl = "api/public-data/data-set-versions";
+
+        private readonly DataFixture _dataFixture = new();
+
+        private readonly OptimisedPostgreSqlContainerUtil _psql;
+        private readonly ITestOutputHelper _output;
+        private readonly HttpClient _client;
+        private readonly OptimisedHttpClientWithPsqlFixture _fixture;
+
+        public async Task InitializeAsync()
+        {
+            var sw = new Stopwatch();
+            sw.Start();
+
+            await _fixture.GetPublicDataDbContext().ClearTestData();
+
+            _output.WriteLine($"Clear up test data {sw.ElapsedMilliseconds}");
+            sw.Restart();
+        }
+
+        public Task DisposeAsync()
+        {
+            return Task.CompletedTask;
+        }
+        
+        public OptimisedApplyBatchFilterOptionMappingUpdatesTests(
+            OptimisedHttpClientWithPsqlFixture fixture,
+            ITestOutputHelper output)
+        {
+            _fixture = fixture;
+            _psql = fixture.GetContainer();
+            _output = output;
+
+            var sw = new Stopwatch();
+            sw.Start();
+
+            _client = fixture.CreateClient();
+
+            output.WriteLine($"Create client {sw.ElapsedMilliseconds}");
+        }
+        
+        [Fact]
+        public async Task Success()
+        {
+            var (initialDataSetVersion, nextDataSetVersion) = await CreateInitialAndNextDataSetVersion(
+                _fixture.GetPublicDataDbContext(), _fixture.GetContentDbContext(), _output);
+
+            DataSetVersionMapping mapping = _dataFixture
+                .DefaultDataSetVersionMapping()
+                .WithSourceDataSetVersionId(initialDataSetVersion.Id)
+                .WithTargetDataSetVersionId(nextDataSetVersion.Id)
+                .WithFilterMappingPlan(_dataFixture
+                    .DefaultFilterMappingPlan()
+                    .AddFilterMapping("filter-1-key", _dataFixture
+                        .DefaultFilterMapping()
+                        .WithAutoMapped("filter-1-key")
+                        .AddOptionMapping("filter-1-option-1-key", _dataFixture
+                            .DefaultFilterOptionMapping()
+                            .WithAutoMapped("filter-1-option-1-key"))
+                        .AddOptionMapping("filter-1-option-2-key", _dataFixture
+                            .DefaultFilterOptionMapping()
+                            .WithManualNone()))
+                    .AddFilterMapping("filter-2-key", _dataFixture
+                        .DefaultFilterMapping()
+                        .WithAutoMapped("filter-2-key")
+                        .AddOptionMapping("filter-2-option-1-key", _dataFixture
+                            .DefaultFilterOptionMapping()
+                            .WithAutoMapped("filter-2-option-1-key")))
+                    .AddFilterCandidate("filter-1-key", _dataFixture
+                        .DefaultFilterMappingCandidate()
+                        .AddOptionCandidate("filter-1-option-1-key", _dataFixture
+                            .DefaultMappableFilterOption()))
+                    .AddFilterCandidate("filter-2-key", _dataFixture
+                        .DefaultFilterMappingCandidate()
+                        .AddOptionCandidate("filter-2-option-1-key", _dataFixture
+                            .DefaultMappableFilterOption())));
+
+            await _fixture.GetPublicDataDbContext().AddTestData(context => context.DataSetVersionMappings.Add(mapping));
+
+            List<FilterOptionMappingUpdateRequest> updates =
+            [
+                new()
+                {
+                    FilterKey = "filter-1-key",
+                    SourceKey = "filter-1-option-1-key",
+                    Type = MappingType.ManualMapped,
+                    CandidateKey = "filter-1-option-1-key"
+                },
+                new()
+                {
+                    FilterKey = "filter-2-key",
+                    SourceKey = "filter-2-option-1-key",
+                    Type = MappingType.ManualNone
+                }
+            ];
+
+            var response = await ApplyBatchFilterOptionMappingUpdates(
+                nextDataSetVersionId: nextDataSetVersion.Id,
+                updates: updates,
+                _fixture.CreateClient().WithUser("Bau"));
+
+            var viewModel = response.AssertOk<BatchFilterOptionMappingUpdatesResponseViewModel>();
+
+            var expectedUpdateResponse = new BatchFilterOptionMappingUpdatesResponseViewModel
+            {
+                Updates =
+                [
+                    new FilterOptionMappingUpdateResponseViewModel
+                    {
+                        FilterKey = "filter-1-key",
+                        SourceKey = "filter-1-option-1-key",
+                        Mapping = mapping.GetFilterOptionMapping(
+                                filterKey: "filter-1-key",
+                                filterOptionKey: "filter-1-option-1-key") with
+                            {
+                                Type = MappingType.ManualMapped,
+                                CandidateKey = "filter-1-option-1-key"
+                            }
+                    },
+                    new FilterOptionMappingUpdateResponseViewModel
+                    {
+                        FilterKey = "filter-2-key",
+                        SourceKey = "filter-2-option-1-key",
+                        Mapping = mapping.GetFilterOptionMapping(
+                                filterKey: "filter-2-key",
+                                filterOptionKey: "filter-2-option-1-key") with
+                            {
+                                Type = MappingType.ManualNone,
+                                CandidateKey = null
+                            }
+                    },
+                ]
+            };
+
+            // Test that the response from the Controller contains details of all the mappings
+            // that were updated.
+            viewModel.AssertDeepEqualTo(expectedUpdateResponse, ignoreCollectionOrders: true);
+
+            var updatedMapping = await _fixture.GetPublicDataDbContext()
+                .DataSetVersionMappings
+                .Include(m => m.TargetDataSetVersion)
+                .SingleAsync(m => m.TargetDataSetVersionId == nextDataSetVersion.Id);
+
+            var expectedFullMappings = new Dictionary<string, FilterMapping>
+            {
+                {
+                    "filter-1-key",
+                    mapping.GetFilterMapping("filter-1-key") with
+                    {
+                        OptionMappings = new Dictionary<string, FilterOptionMapping>
+                        {
+                            {
+                                "filter-1-option-1-key",
+                                mapping.GetFilterOptionMapping("filter-1-key", "filter-1-option-1-key") with
+                                {
+                                    Type = MappingType.ManualMapped,
+                                    CandidateKey = "filter-1-option-1-key"
+                                }
+                            },
+                            {
+                                "filter-1-option-2-key",
+                                mapping.GetFilterOptionMapping("filter-1-key", "filter-1-option-2-key")
+                            }
+                        }
+                    }
+                },
+                {
+                    "filter-2-key",
+                    mapping.GetFilterMapping("filter-2-key") with
+                    {
+                        OptionMappings = new Dictionary<string, FilterOptionMapping>
+                        {
+                            {
+                                "filter-2-option-1-key",
+                                mapping.GetFilterOptionMapping("filter-2-key", "filter-2-option-1-key") with
+                                {
+                                    Type = MappingType.ManualNone,
+                                    CandidateKey = null
+                                }
+                            }
+                        }
+                    }
+                }
+            };
+
+            // Test that the updated mappings retrieved from the database reflect the updates
+            // that were requested.
+            updatedMapping.FilterMappingPlan.Mappings.AssertDeepEqualTo(
+                expectedFullMappings,
+                ignoreCollectionOrders: true);
+
+            // Assert that the batch saves show the filter mappings as complete, as there
+            // are no remaining mappings with type "None" or "AutoNone" in the plan.
+            Assert.True(updatedMapping.FilterMappingsComplete);
+
+            // Assert that this update constitutes a major version update, as some filter options
+            // belonging to mapped filters have a mapping type of "ManualNone", indicating that
+            // some of the source filter options are no longer available in the target data set
+            // version, thus creating a breaking change.
+            await AssertCorrectDataSetVersionNumbers(updatedMapping, "2.0.0", _fixture.GetContentDbContext());
+        }
+
+        [Theory]
+        [InlineData(MappingType.ManualMapped, MappingType.AutoNone, false)]
+        [InlineData(MappingType.ManualMapped, MappingType.AutoMapped, true)]
+        [InlineData(MappingType.ManualMapped, MappingType.ManualMapped, true)]
+        [InlineData(MappingType.ManualMapped, MappingType.ManualNone, true)]
+        [InlineData(MappingType.ManualNone, MappingType.AutoNone, false)]
+        [InlineData(MappingType.ManualNone, MappingType.AutoMapped, true)]
+        [InlineData(MappingType.ManualNone, MappingType.ManualMapped, true)]
+        [InlineData(MappingType.ManualNone, MappingType.ManualNone, true)]
+        public async Task Success_MappingsComplete(
+            MappingType updatedMappingType,
+            MappingType unchangedMappingType,
+            bool expectedMappingsComplete)
+        {
+            var (initialDataSetVersion, nextDataSetVersion) = await CreateInitialAndNextDataSetVersion(
+                _fixture.GetPublicDataDbContext(), _fixture.GetContentDbContext(), _output);
+
+            DataSetVersionMapping mapping = _dataFixture
+                .DefaultDataSetVersionMapping()
+                .WithSourceDataSetVersionId(initialDataSetVersion.Id)
+                .WithTargetDataSetVersionId(nextDataSetVersion.Id)
+                .WithFilterMappingPlan(_dataFixture
+                    .DefaultFilterMappingPlan()
+                    .AddFilterMapping("filter-1-key", _dataFixture
+                        .DefaultFilterMapping()
+                        .WithAutoMapped("filter-1-key")
+                        .AddOptionMapping("filter-1-option-1-key", _dataFixture
+                            .DefaultFilterOptionMapping()
+                            .WithNoMapping()))
+                    .AddFilterMapping("filter-2-key", _dataFixture
+                        .DefaultFilterMapping()
+                        .WithAutoMapped("filter-2-key")
+                        .AddOptionMapping("filter-2-option-1-key", _dataFixture
+                            .DefaultFilterOptionMapping()
+                            .WithType(unchangedMappingType)
+                            .WithCandidateKey(unchangedMappingType switch
+                            {
+                                MappingType.ManualMapped or MappingType.AutoMapped => "filter-2-option-1-key",
+                                _ => null
+                            })))
+                    // Add an unmappable filter and filter options. Because we don't currently allow the
+                    // users to update mappings for filters, this should not count against the calculation
+                    // of the FilterMappingsComplete flag.
+                    .AddFilterMapping("filter-3-key", _dataFixture
+                        .DefaultFilterMapping()
+                        .WithAutoNone()
+                        .AddOptionMapping("filter-3-option-1-key", _dataFixture
+                            .DefaultFilterOptionMapping()
+                            .WithAutoNone()))
+                    .AddFilterCandidate("filter-1-key", _dataFixture
+                        .DefaultFilterMappingCandidate()
+                        .AddOptionCandidate("filter-1-option-1-key", _dataFixture
+                            .DefaultMappableFilterOption()))
+                    .AddFilterCandidate("filter-2-key", _dataFixture
+                        .DefaultFilterMappingCandidate()
+                        .AddOptionCandidate("filter-2-option-1-key", _dataFixture
+                            .DefaultMappableFilterOption())));
+
+            await _fixture.GetPublicDataDbContext().AddTestData(context => context.DataSetVersionMappings.Add(mapping));
+
+            var mappingCandidateKey = updatedMappingType == MappingType.ManualMapped
+                ? "filter-1-option-1-key"
+                : null;
+
+            List<FilterOptionMappingUpdateRequest> updates =
+            [
+                new()
+                {
+                    FilterKey = "filter-1-key",
+                    SourceKey = "filter-1-option-1-key",
+                    Type = updatedMappingType,
+                    CandidateKey = mappingCandidateKey
+                }
+            ];
+
+            var response = await ApplyBatchFilterOptionMappingUpdates(
+                nextDataSetVersionId: nextDataSetVersion.Id,
+                updates: updates,
+                _fixture.CreateClient().WithUser("Bau"));
+
+            response.AssertOk<BatchFilterOptionMappingUpdatesResponseViewModel>();
+
+            var updatedMapping = await _fixture.GetPublicDataDbContext()
+                .DataSetVersionMappings
+                .SingleAsync(m => m.TargetDataSetVersionId == nextDataSetVersion.Id);
+
+            // Assert that the batch save calculates the LocationMappingsComplete flag as expected given the
+            // combination of the requested mapping update and the existing mapping that is untouched. 
+            Assert.Equal(expectedMappingsComplete, updatedMapping.FilterMappingsComplete);
+        }
+
+        [Theory]
+        [InlineData(MappingType.ManualMapped, MappingType.AutoMapped, "1.1.0")]
+        [InlineData(MappingType.ManualMapped, MappingType.AutoNone, "2.0.0")]
+        [InlineData(MappingType.ManualMapped, MappingType.ManualMapped, "1.1.0")]
+        [InlineData(MappingType.ManualMapped, MappingType.ManualNone, "2.0.0")]
+        [InlineData(MappingType.ManualNone, MappingType.AutoMapped, "2.0.0")]
+        [InlineData(MappingType.ManualNone, MappingType.AutoNone, "2.0.0")]
+        [InlineData(MappingType.ManualNone, MappingType.ManualMapped, "2.0.0")]
+        [InlineData(MappingType.ManualNone, MappingType.ManualNone, "2.0.0")]
+        public async Task Success_VersionUpdate(
+            MappingType updatedMappingType,
+            MappingType unchangedMappingType,
+            string expectedVersion)
+        {
+            var (initialDataSetVersion, nextDataSetVersion) = await CreateInitialAndNextDataSetVersion(
+                _fixture.GetPublicDataDbContext(), _fixture.GetContentDbContext(), _output);
+
+            DataSetVersionMapping mapping = _dataFixture
+                .DefaultDataSetVersionMapping()
+                .WithSourceDataSetVersionId(initialDataSetVersion.Id)
+                .WithTargetDataSetVersionId(nextDataSetVersion.Id)
+                .WithFilterMappingPlan(_dataFixture
+                    .DefaultFilterMappingPlan()
+                    .AddFilterMapping("filter-1-key", _dataFixture
+                        .DefaultFilterMapping()
+                        .WithAutoMapped("filter-1-key")
+                        .AddOptionMapping("filter-1-option-1-key", _dataFixture
+                            .DefaultFilterOptionMapping()
+                            .WithNoMapping()))
+                    .AddFilterMapping("filter-2-key", _dataFixture
+                        .DefaultFilterMapping()
+                        .WithAutoMapped("filter-2-key")
+                        .AddOptionMapping("filter-2-option-1-key", _dataFixture
+                            .DefaultFilterOptionMapping()
+                            .WithType(unchangedMappingType)
+                            .WithCandidateKey(unchangedMappingType switch
+                            {
+                                MappingType.ManualMapped or MappingType.AutoMapped => "filter-2-option-1-key",
+                                _ => null
+                            })))
+                    .AddFilterCandidate("filter-1-key", _dataFixture
+                        .DefaultFilterMappingCandidate()
+                        .AddOptionCandidate("filter-1-option-1-key", _dataFixture
+                            .DefaultMappableFilterOption()))
+                    .AddFilterCandidate("filter-2-key", _dataFixture
+                        .DefaultFilterMappingCandidate()
+                        .AddOptionCandidate("filter-2-option-1-key", _dataFixture
+                            .DefaultMappableFilterOption())));
+
+            await _fixture.GetPublicDataDbContext().AddTestData(context => context.DataSetVersionMappings.Add(mapping));
+
+            var mappingCandidateKey = updatedMappingType == MappingType.ManualMapped
+                ? "filter-1-option-1-key"
+                : null;
+
+            List<FilterOptionMappingUpdateRequest> updates =
+            [
+                new()
+                {
+                    FilterKey = "filter-1-key",
+                    SourceKey = "filter-1-option-1-key",
+                    Type = updatedMappingType,
+                    CandidateKey = mappingCandidateKey
+                }
+            ];
+
+            var response = await ApplyBatchFilterOptionMappingUpdates(
+                nextDataSetVersionId: nextDataSetVersion.Id,
+                updates: updates,
+                _fixture.CreateClient().WithUser("Bau"));
+
+            response.AssertOk<BatchFilterOptionMappingUpdatesResponseViewModel>();
+
+            var updatedMapping = await _fixture.GetPublicDataDbContext()
+                .DataSetVersionMappings
+                .Include(m => m.TargetDataSetVersion)
+                .SingleAsync(m => m.TargetDataSetVersionId == nextDataSetVersion.Id);
+
+            await AssertCorrectDataSetVersionNumbers(updatedMapping, expectedVersion, _fixture.GetContentDbContext());
+        }
+
+        [Fact]
+        public async Task Success_VersionUpdate_HasDeletedIndicators_MajorUpdate()
+        {
+            var (initialDataSetVersion, nextDataSetVersion) = await CreateInitialAndNextDataSetVersion(
+                _fixture.GetPublicDataDbContext(), _fixture.GetContentDbContext(), _output);
+
+            DataSetVersionMapping mapping = _dataFixture
+                .DefaultDataSetVersionMapping()
+                .WithSourceDataSetVersionId(initialDataSetVersion.Id)
+                .WithTargetDataSetVersionId(nextDataSetVersion.Id)
+                .WithFilterMappingPlan(_dataFixture
+                    .DefaultFilterMappingPlan()
+                    .AddFilterMapping("filter-1-key", _dataFixture
+                        .DefaultFilterMapping()
+                        .WithAutoMapped("filter-1-key")
+                        .AddOptionMapping("filter-1-option-1-key", _dataFixture
+                            .DefaultFilterOptionMapping()
+                            .WithNoMapping()))
+                    .AddFilterCandidate("filter-1-key", _dataFixture
+                        .DefaultFilterMappingCandidate()
+                        .AddOptionCandidate("filter-1-option-1-key", _dataFixture
+                            .DefaultMappableFilterOption())))
+                // Has deleted indicators that cannot be mapped
+                .WithHasDeletedIndicators(true);
+
+            await _fixture.GetPublicDataDbContext().AddTestData(context => context.DataSetVersionMappings.Add(mapping));
+
+            List<FilterOptionMappingUpdateRequest> updates =
+            [
+                new()
+                {
+                    FilterKey = "filter-1-key",
+                    SourceKey = "filter-1-option-1-key",
+                    Type = MappingType.ManualMapped,
+                    CandidateKey = "filter-1-option-1-key"
+                }
+            ];
+
+            var response = await ApplyBatchFilterOptionMappingUpdates(
+                nextDataSetVersionId: nextDataSetVersion.Id,
+                updates: updates,
+                _fixture.CreateClient().WithUser("Bau"));
+
+            response.AssertOk<BatchFilterOptionMappingUpdatesResponseViewModel>();
+
+            var updatedMapping = await _fixture.GetPublicDataDbContext()
+                .DataSetVersionMappings
+                .Include(m => m.TargetDataSetVersion)
+                .SingleAsync(m => m.TargetDataSetVersionId == nextDataSetVersion.Id);
+
+            // Should be a minor version update, but has deleted indicators so must be a major update.
+            await AssertCorrectDataSetVersionNumbers(updatedMapping, "2.0.0", _fixture.GetContentDbContext());
+        }
+
+        [Fact]
+        public async Task Success_VersionUpdate_HasDeletedGeographicLevels_MajorUpdate()
+        {
+            var (initialDataSetVersion, nextDataSetVersion) = await CreateInitialAndNextDataSetVersion(
+                _fixture.GetPublicDataDbContext(), _fixture.GetContentDbContext(), _output);
+
+            DataSetVersionMapping mapping = _dataFixture
+                .DefaultDataSetVersionMapping()
+                .WithSourceDataSetVersionId(initialDataSetVersion.Id)
+                .WithTargetDataSetVersionId(nextDataSetVersion.Id)
+                .WithFilterMappingPlan(_dataFixture
+                    .DefaultFilterMappingPlan()
+                    .AddFilterMapping("filter-1-key", _dataFixture
+                        .DefaultFilterMapping()
+                        .WithAutoMapped("filter-1-key")
+                        .AddOptionMapping("filter-1-option-1-key", _dataFixture
+                            .DefaultFilterOptionMapping()
+                            .WithNoMapping()))
+                    .AddFilterCandidate("filter-1-key", _dataFixture
+                        .DefaultFilterMappingCandidate()
+                        .AddOptionCandidate("filter-1-option-1-key", _dataFixture
+                            .DefaultMappableFilterOption())))
+                // Has deleted geographic levels that cannot be mapped
+                .WithHasDeletedGeographicLevels(true);
+
+            await _fixture.GetPublicDataDbContext().AddTestData(context => context.DataSetVersionMappings.Add(mapping));
+
+            List<FilterOptionMappingUpdateRequest> updates =
+            [
+                new()
+                {
+                    FilterKey = "filter-1-key",
+                    SourceKey = "filter-1-option-1-key",
+                    Type = MappingType.ManualMapped,
+                    CandidateKey = "filter-1-option-1-key"
+                }
+            ];
+
+            var response = await ApplyBatchFilterOptionMappingUpdates(
+                nextDataSetVersionId: nextDataSetVersion.Id,
+                updates: updates,
+                _fixture.CreateClient().WithUser("Bau"));
+
+            response.AssertOk<BatchFilterOptionMappingUpdatesResponseViewModel>();
+
+            var updatedMapping = await _fixture.GetPublicDataDbContext()
+                .DataSetVersionMappings
+                .Include(m => m.TargetDataSetVersion)
+                .SingleAsync(m => m.TargetDataSetVersionId == nextDataSetVersion.Id);
+
+            // Should be a minor version update, but has deleted geographic levels so must be a major update.
+            await AssertCorrectDataSetVersionNumbers(updatedMapping, "2.0.0", _fixture.GetContentDbContext());
+        }
+
+        [Fact]
+        public async Task Success_VersionUpdate_HasDeletedTimePeriods_MajorUpdate()
+        {
+            var (initialDataSetVersion, nextDataSetVersion) = await CreateInitialAndNextDataSetVersion(
+                _fixture.GetPublicDataDbContext(), _fixture.GetContentDbContext(), _output);
+
+            DataSetVersionMapping mapping = _dataFixture
+                .DefaultDataSetVersionMapping()
+                .WithSourceDataSetVersionId(initialDataSetVersion.Id)
+                .WithTargetDataSetVersionId(nextDataSetVersion.Id)
+                .WithFilterMappingPlan(_dataFixture
+                    .DefaultFilterMappingPlan()
+                    .AddFilterMapping("filter-1-key", _dataFixture
+                        .DefaultFilterMapping()
+                        .WithAutoMapped("filter-1-key")
+                        .AddOptionMapping("filter-1-option-1-key", _dataFixture
+                            .DefaultFilterOptionMapping()
+                            .WithNoMapping()))
+                    .AddFilterCandidate("filter-1-key", _dataFixture
+                        .DefaultFilterMappingCandidate()
+                        .AddOptionCandidate(
+                            "filter-1-option-1-key",
+                            _dataFixture.DefaultMappableFilterOption())))
+                // Has deleted time periods that cannot be mapped
+                .WithHasDeletedTimePeriods(true);
+
+            await _fixture.GetPublicDataDbContext().AddTestData(context => context.DataSetVersionMappings.Add(mapping));
+
+            List<FilterOptionMappingUpdateRequest> updates =
+            [
+                new()
+                {
+                    FilterKey = "filter-1-key",
+                    SourceKey = "filter-1-option-1-key",
+                    Type = MappingType.ManualMapped,
+                    CandidateKey = "filter-1-option-1-key"
+                }
+            ];
+
+            var response = await ApplyBatchFilterOptionMappingUpdates(
+                nextDataSetVersionId: nextDataSetVersion.Id,
+                updates: updates,
+                _fixture.CreateClient().WithUser("Bau"));
+
+            response.AssertOk<BatchFilterOptionMappingUpdatesResponseViewModel>();
+
+            var updatedMapping = await _fixture.GetPublicDataDbContext()
+                .DataSetVersionMappings
+                .Include(m => m.TargetDataSetVersion)
+                .SingleAsync(m => m.TargetDataSetVersionId == nextDataSetVersion.Id);
+
+            // Should be a minor version update, but has deleted time periods so must be a major update.
+            await AssertCorrectDataSetVersionNumbers(updatedMapping, "2.0.0", _fixture.GetContentDbContext());
+        }
+
+        [Theory]
+        [InlineData(MappingType.ManualMapped)]
+        [InlineData(MappingType.ManualNone)]
+        public async Task Success_VersionUpdates_UnmappableFilter(MappingType updatedMappingType)
+        {
+            var (initialDataSetVersion, nextDataSetVersion) = await CreateInitialAndNextDataSetVersion(
+                _fixture.GetPublicDataDbContext(), _fixture.GetContentDbContext(), _output);
+
+            DataSetVersionMapping mapping = _dataFixture
+                .DefaultDataSetVersionMapping()
+                .WithSourceDataSetVersionId(initialDataSetVersion.Id)
+                .WithTargetDataSetVersionId(nextDataSetVersion.Id)
+                .WithFilterMappingPlan(_dataFixture
+                    .DefaultFilterMappingPlan()
+                    .AddFilterMapping("filter-1-key", _dataFixture
+                        .DefaultFilterMapping()
+                        .WithAutoMapped("filter-1-key")
+                        .AddOptionMapping("filter-1-option-1-key", _dataFixture
+                            .DefaultFilterOptionMapping()
+                            .WithNoMapping()))
+                    // Add an unmappable filter and filter options. Unlike the calculation of the
+                    // "FilterMappingsComplete" flag, this counts towards the version number having
+                    // to be a major update, as a filter from the source data set version no longer
+                    // appears in the next version.
+                    .AddFilterMapping("filter-3-key", _dataFixture
+                        .DefaultFilterMapping()
+                        .WithAutoNone()
+                        .AddOptionMapping("filter-3-option-1-key", _dataFixture
+                            .DefaultFilterOptionMapping()
+                            .WithAutoNone()))
+                    .AddFilterCandidate("filter-1-key", _dataFixture
+                        .DefaultFilterMappingCandidate()
+                        .AddOptionCandidate("filter-1-option-1-key", _dataFixture
+                            .DefaultMappableFilterOption()))
+                    .AddFilterCandidate("filter-2-key", _dataFixture
+                        .DefaultFilterMappingCandidate()
+                        .AddOptionCandidate("filter-2-option-1-key", _dataFixture
+                            .DefaultMappableFilterOption())));
+
+            await _fixture.GetPublicDataDbContext().AddTestData(context => context.DataSetVersionMappings.Add(mapping));
+
+            var mappingCandidateKey = updatedMappingType == MappingType.ManualMapped
+                ? "filter-1-option-1-key"
+                : null;
+
+            List<FilterOptionMappingUpdateRequest> updates =
+            [
+                new()
+                {
+                    FilterKey = "filter-1-key",
+                    SourceKey = "filter-1-option-1-key",
+                    Type = updatedMappingType,
+                    CandidateKey = mappingCandidateKey
+                }
+            ];
+
+            var response = await ApplyBatchFilterOptionMappingUpdates(
+                nextDataSetVersionId: nextDataSetVersion.Id,
+                updates: updates,
+                _fixture.CreateClient().WithUser("Bau"));
+
+            response.AssertOk<BatchFilterOptionMappingUpdatesResponseViewModel>();
+
+            var updatedMapping = await _fixture.GetPublicDataDbContext()
+                .DataSetVersionMappings
+                .Include(m => m.TargetDataSetVersion)
+                .SingleAsync(m => m.TargetDataSetVersionId == nextDataSetVersion.Id);
+
+            // Assert that the batch save calculates the next version number as a major change,
+            // as filter options that were in the source data set version no longer appear in the
+            // next version.
+            await AssertCorrectDataSetVersionNumbers(updatedMapping, "2.0.0", _fixture.GetContentDbContext());
+        }
+
+        [Fact]
+        public async Task SourceKeyDoesNotExist_Returns400_AndRollsBackTransaction()
+        {
+            var (initialDataSetVersion, nextDataSetVersion) = await CreateInitialAndNextDataSetVersion(
+                _fixture.GetPublicDataDbContext(), _fixture.GetContentDbContext(), _output);
+
+            DataSetVersionMapping mapping = _dataFixture
+                .DefaultDataSetVersionMapping()
+                .WithSourceDataSetVersionId(initialDataSetVersion.Id)
+                .WithTargetDataSetVersionId(nextDataSetVersion.Id)
+                .WithFilterMappingPlan(_dataFixture
+                    .DefaultFilterMappingPlan()
+                    .AddFilterMapping("filter-1-key", _dataFixture
+                        .DefaultFilterMapping()
+                        .WithAutoMapped("filter-1-key")
+                        .AddOptionMapping("filter-1-option-1-key", _dataFixture
+                            .DefaultFilterOptionMapping()
+                            .WithAutoMapped("filter-1-option-1-key"))
+                        .AddOptionMapping("filter-1-option-2-key", _dataFixture
+                            .DefaultFilterOptionMapping()
+                            .WithManualNone()))
+                    .AddFilterCandidate("filter-1-key", _dataFixture
+                        .DefaultFilterMappingCandidate()
+                        .AddOptionCandidate("filter-1-option-1-key", _dataFixture
+                            .DefaultMappableFilterOption())
+                        .AddOptionCandidate("filter-1-option-2-key", _dataFixture
+                            .DefaultMappableFilterOption())
+                        .AddOptionCandidate("filter-1-option-3-key", _dataFixture
+                            .DefaultMappableFilterOption())));
+
+            await _fixture.GetPublicDataDbContext().AddTestData(context => context.DataSetVersionMappings.Add(mapping));
+
+            List<FilterOptionMappingUpdateRequest> updates =
+            [
+                // This mapping exists.
+                new()
+                {
+                    FilterKey = "filter-1-key",
+                    SourceKey = "filter-1-option-1-key",
+                    Type = MappingType.ManualMapped,
+                    CandidateKey = "filter-1-option-1-key"
+                },
+                // This mapping does not exist.
+                new()
+                {
+                    FilterKey = "filter-1-key",
+                    SourceKey = "filter-1-option-3-key",
+                    Type = MappingType.ManualMapped,
+                    CandidateKey = "filter-1-option-2-key"
+                }
+            ];
+
+            var response = await ApplyBatchFilterOptionMappingUpdates(
+                nextDataSetVersionId: nextDataSetVersion.Id,
+                updates: updates,
+                _fixture.CreateClient().WithUser("Bau"));
+
+            var validationProblem = response.AssertValidationProblem();
+
+            // The non-existent mapping in the batch update request should have failure messages
+            // indicating that the mappings they were attempting to update do not exist.
+            validationProblem.AssertHasError(
+                expectedPath: "updates[1].sourceKey",
+                expectedCode: nameof(ValidationMessages.DataSetVersionMappingSourcePathDoesNotExist));
+
+            Assert.Single(validationProblem.Errors);
+
+            var retrievedMappings = await _fixture.GetPublicDataDbContext()
+                .DataSetVersionMappings
+                .SingleAsync(m => m.TargetDataSetVersionId == nextDataSetVersion.Id);
+
+            // Test that the mappings are not updated due to the failures of some of the update requests.
+            retrievedMappings.FilterMappingPlan.Mappings.AssertDeepEqualTo(
+                mapping.FilterMappingPlan.Mappings,
+                ignoreCollectionOrders: true);
+        }
+
+        [Fact]
+        public async Task CandidateKeyDoesNotExist_Returns400()
+        {
+            var (initialDataSetVersion, nextDataSetVersion) = await CreateInitialAndNextDataSetVersion(
+                _fixture.GetPublicDataDbContext(), _fixture.GetContentDbContext(), _output);
+
+            DataSetVersionMapping mapping = _dataFixture
+                .DefaultDataSetVersionMapping()
+                .WithSourceDataSetVersionId(initialDataSetVersion.Id)
+                .WithTargetDataSetVersionId(nextDataSetVersion.Id)
+                .WithFilterMappingPlan(_dataFixture
+                    .DefaultFilterMappingPlan()
+                    .AddFilterMapping("filter-1-key", _dataFixture
+                        .DefaultFilterMapping()
+                        .WithAutoMapped("filter-1-key")
+                        .AddOptionMapping("filter-1-option-1-key", _dataFixture
+                            .DefaultFilterOptionMapping()
+                            .WithAutoMapped("filter-1-option-1-key"))
+                        .AddOptionMapping("filter-1-option-2-key", _dataFixture
+                            .DefaultFilterOptionMapping()
+                            .WithManualNone()))
+                    .AddFilterMapping("filter-2-key", _dataFixture
+                        .DefaultFilterMapping()
+                        .WithAutoMapped("filter-2-key")
+                        .AddOptionMapping("filter-2-option-1-key", _dataFixture
+                            .DefaultFilterOptionMapping()
+                            .WithAutoMapped("filter-2-option-1-key")))
+                    .AddFilterCandidate("filter-1-key", _dataFixture
+                        .DefaultFilterMappingCandidate()
+                        .AddOptionCandidate("filter-1-option-1-key", _dataFixture
+                            .DefaultMappableFilterOption())
+                        .AddOptionCandidate("filter-1-option-2-key", _dataFixture
+                            .DefaultMappableFilterOption()))
+                    .AddFilterCandidate("filter-2-key", _dataFixture
+                        .DefaultFilterMappingCandidate()
+                        .AddOptionCandidate("filter-2-option-1-key", _dataFixture
+                            .DefaultMappableFilterOption())));
+
+            await _fixture.GetPublicDataDbContext().AddTestData(context => context.DataSetVersionMappings.Add(mapping));
+
+            List<FilterOptionMappingUpdateRequest> updates =
+            [
+                // This candidate exists.
+                new()
+                {
+                    FilterKey = "filter-1-key",
+                    SourceKey = "filter-1-option-1-key",
+                    Type = MappingType.ManualMapped,
+                    CandidateKey = "filter-1-option-1-key"
+                },
+                // This candidate does not exist as there is no candidate with the key
+                // "Non existent candidate key".  This tests the simple case where a candidate
+                // doesn't exist at all with the given key.
+                new()
+                {
+                    FilterKey = "filter-1-key",
+                    SourceKey = "filter-1-option-2-key",
+                    Type = MappingType.ManualMapped,
+                    CandidateKey = "Non existent candidate key"
+                },
+                // This candidate does not exist as there is no candidate with the key
+                // "Non existent candidate key" under the filter that "filter-2-key" is
+                // mapped to, despite there being a filter option candidate that exists
+                // under a different filter with the key "filter-1-option-1-key".
+                // This tests the more complex case whereby only filter option candidates
+                // that exist under the filter that the owning filter is mapped to are
+                // considered valid candidates.
+                new()
+                {
+                    FilterKey = "filter-2-key",
+                    SourceKey = "filter-2-option-1-key",
+                    Type = MappingType.ManualMapped,
+                    CandidateKey = "filter-1-option-1-key"
+                }
+            ];
+
+            var response = await ApplyBatchFilterOptionMappingUpdates(
+                nextDataSetVersionId: nextDataSetVersion.Id,
+                updates: updates,
+                _fixture.CreateClient().WithUser("Bau"));
+
+            var validationProblem = response.AssertValidationProblem();
+
+            // The 2 non-existent mappings in the batch update request should have failure messages
+            // indicating that the mappings they were attempting to update do not exist.
+            validationProblem.AssertHasError(
+                expectedPath: "updates[1].candidateKey",
+                expectedCode: nameof(ValidationMessages.DataSetVersionMappingCandidatePathDoesNotExist));
+
+            validationProblem.AssertHasError(
+                expectedPath: "updates[2].candidateKey",
+                expectedCode: nameof(ValidationMessages.DataSetVersionMappingCandidatePathDoesNotExist));
+
+            Assert.Equal(2, validationProblem.Errors.Count);
+
+            var retrievedMappings = await _fixture.GetPublicDataDbContext()
+                .DataSetVersionMappings
+                .SingleAsync(m => m.TargetDataSetVersionId == nextDataSetVersion.Id);
+
+            // Test that the mappings are not updated due to the failures of some of the update requests.
+            retrievedMappings.FilterMappingPlan.Mappings.AssertDeepEqualTo(
+                mapping.FilterMappingPlan.Mappings,
+                ignoreCollectionOrders: true);
+        }
+
+        [Fact]
+        public async Task OwningFilterNotMapped_Returns400()
+        {
+            var (initialDataSetVersion, nextDataSetVersion) = await CreateInitialAndNextDataSetVersion(
+                _fixture.GetPublicDataDbContext(), _fixture.GetContentDbContext(), _output);
+
+            DataSetVersionMapping mapping = _dataFixture
+                .DefaultDataSetVersionMapping()
+                .WithSourceDataSetVersionId(initialDataSetVersion.Id)
+                .WithTargetDataSetVersionId(nextDataSetVersion.Id)
+                .WithFilterMappingPlan(_dataFixture
+                    .DefaultFilterMappingPlan()
+                    .AddFilterMapping("filter-1-key", _dataFixture
+                        .DefaultFilterMapping()
+                        .WithManualNone()
+                        .AddOptionMapping("filter-1-option-1-key", _dataFixture
+                            .DefaultFilterOptionMapping()
+                            .WithManualNone())
+                        .AddOptionMapping("filter-1-option-2-key", _dataFixture
+                            .DefaultFilterOptionMapping()
+                            .WithManualNone()))
+                    .AddFilterCandidate("filter-1-key", _dataFixture
+                        .DefaultFilterMappingCandidate()
+                        .AddOptionCandidate("filter-1-option-1-key", _dataFixture
+                            .DefaultMappableFilterOption())));
+
+            await _fixture.GetPublicDataDbContext().AddTestData(context => context.DataSetVersionMappings.Add(mapping));
+
+            List<FilterOptionMappingUpdateRequest> updates =
+            [
+                // This candidate exists, but the filter that owns "filter-1-option-1-key" has not itself
+                // been mapped, so it cannot supply any valid candidate filter options.
+                new()
+                {
+                    FilterKey = "filter-1-key",
+                    SourceKey = "filter-1-option-1-key",
+                    Type = MappingType.ManualMapped,
+                    CandidateKey = "filter-1-option-1-key"
+                }
+            ];
+
+            var response = await ApplyBatchFilterOptionMappingUpdates(
+                nextDataSetVersionId: nextDataSetVersion.Id,
+                updates: updates,
+                _fixture.CreateClient().WithUser("Bau"));
+
+            var validationProblem = response.AssertValidationProblem();
+
+            // The mappings in the batch update request should have failure messages
+            // indicating that the owning filter has not been mapped.
+            validationProblem.AssertHasError(
+                expectedPath: "updates[0].filterKey",
+                expectedCode: nameof(ValidationMessages.OwningFilterNotMapped));
+
+            Assert.Single(validationProblem.Errors);
+
+            var retrievedMappings = await _fixture.GetPublicDataDbContext()
+                .DataSetVersionMappings
+                .SingleAsync(m => m.TargetDataSetVersionId == nextDataSetVersion.Id);
+
+            // Test that the mappings are not updated due to the failures of some of the update requests.
+            retrievedMappings.FilterMappingPlan.Mappings.AssertDeepEqualTo(
+                mapping.FilterMappingPlan.Mappings,
+                ignoreCollectionOrders: true);
+        }
+
+        [Fact]
+        public async Task NotBauUser_Returns403()
+        {
+            var response = await ApplyBatchFilterOptionMappingUpdates(
+                nextDataSetVersionId: Guid.NewGuid(),
+                updates: [],
+                client: _fixture.CreateClient().WithUser("Authenticated"));
+
+            response.AssertForbidden();
+        }
+
+        [Fact]
+        public async Task DataSetVersionMappingDoesNotExist_Returns404()
+        {
+            var response = await ApplyBatchFilterOptionMappingUpdates(
+                nextDataSetVersionId: Guid.NewGuid(),
+                updates: [],
+                _fixture.CreateClient().WithUser("Bau"));
+
+            response.AssertNotFound();
+        }
+
+        [Fact]
+        public async Task EmptyRequiredFields_Return400()
+        {
+            var response = await ApplyBatchFilterOptionMappingUpdates(
+                nextDataSetVersionId: Guid.NewGuid(),
+                updates:
+                [
+                    new FilterOptionMappingUpdateRequest()
+                ],
+                _fixture.CreateClient().WithUser("Bau"));
+
+            var validationProblem = response.AssertValidationProblem();
+            Assert.Equal(3, validationProblem.Errors.Count);
+            validationProblem.AssertHasNotEmptyError("updates[0].filterKey");
+            validationProblem.AssertHasNotNullError("updates[0].type");
+            validationProblem.AssertHasNotEmptyError("updates[0].sourceKey");
+        }
+
+        [Theory]
+        [InlineData(MappingType.ManualMapped, null)]
+        [InlineData(MappingType.ManualMapped, "")]
+        public async Task MappingTypeExpectsCandidateKey_Returns400(MappingType type, string? candidateKeyValue)
+        {
+            var response = await ApplyBatchFilterOptionMappingUpdates(
+                nextDataSetVersionId: Guid.NewGuid(),
+                updates:
+                [
+                    new FilterOptionMappingUpdateRequest
+                    {
+                        FilterKey = "filter-1",
+                        SourceKey = "location-1",
+                        Type = type,
+                        CandidateKey = candidateKeyValue
+                    }
+                ],
+                _fixture.CreateClient().WithUser("Bau"));
+
+            var validationProblem = response.AssertValidationProblem();
+
+            validationProblem.AssertHasError(
+                expectedPath: "updates[0].candidateKey",
+                expectedCode: ValidationMessages.CandidateKeyMustBeSpecifiedWithMappedMappingType.Code,
+                expectedMessage: ValidationMessages.CandidateKeyMustBeSpecifiedWithMappedMappingType.Message);
+
+            Assert.Single(validationProblem.Errors);
+        }
+
+        [Theory]
+        [InlineData(MappingType.ManualNone)]
+        public async Task MappingTypeDoeNotExpectCandidateKey_Returns400(MappingType type)
+        {
+            var response = await ApplyBatchFilterOptionMappingUpdates(
+                nextDataSetVersionId: Guid.NewGuid(),
+                updates:
+                [
+                    new FilterOptionMappingUpdateRequest
+                    {
+                        FilterKey = "filter-1",
+                        SourceKey = "location-1",
+                        Type = type,
+                        CandidateKey = "target-location-1"
+                    }
+                ],
+                _fixture.CreateClient().WithUser("Bau"));
+
+            var validationProblem = response.AssertValidationProblem();
+
+            validationProblem.AssertHasError(
+                expectedPath: "updates[0].candidateKey",
+                expectedCode: ValidationMessages.CandidateKeyMustBeEmptyWithNoneMappingType.Code,
+                expectedMessage: ValidationMessages.CandidateKeyMustBeEmptyWithNoneMappingType.Message);
+
+            Assert.Single(validationProblem.Errors);
+        }
+
+        [Theory]
+        [InlineData(MappingType.None)]
+        [InlineData(MappingType.AutoMapped)]
+        [InlineData(MappingType.AutoNone)]
+        public async Task InvalidMappingTypeForManualInteraction_Returns400(MappingType type)
+        {
+            var response = await ApplyBatchFilterOptionMappingUpdates(
+                nextDataSetVersionId: Guid.NewGuid(),
+                updates:
+                [
+                    new FilterOptionMappingUpdateRequest
+                    {
+                        FilterKey = "filter-1",
+                        SourceKey = "location-1",
+                        Type = type,
+                        CandidateKey = null
+                    }
+                ],
+                _fixture.CreateClient().WithUser("Bau"));
+
+            var validationProblem = response.AssertValidationProblem();
+
+            validationProblem.AssertHasError(
+                expectedPath: "updates[0].type",
+                expectedCode: ValidationMessages.ManualMappingTypeInvalid.Code,
+                expectedMessage: "Type must be one of the following values: ManualMapped, ManualNone");
+
+            Assert.Single(validationProblem.Errors);
+        }
+
+        private async Task<HttpResponseMessage> ApplyBatchFilterOptionMappingUpdates(
+            Guid nextDataSetVersionId,
+            List<FilterOptionMappingUpdateRequest> updates,
+            HttpClient client)
+        {
+            var uri = new Uri($"{BaseUrl}/{nextDataSetVersionId}/mapping/filters/options", UriKind.Relative);
+
+            return await client.PatchAsync(uri,
+                new JsonNetContent(new BatchFilterOptionMappingUpdatesRequest { Updates = updates }));
+        }
+    }
+
+    
+    
     [CollectionDefinition(nameof(OptimisedDataSetVersionMappingControllerTests))]
     public class
         OptimisedDataSetVersionMappingControllerCollection : ICollectionFixture<OptimisedHttpClientWithPsqlFixture>
