@@ -55,7 +55,7 @@ services:
     build:
       context: ../ees-screener-api
     ports:
-      - "80:80"
+      - "7078:80"
     depends_on:
       - data-storage
 
