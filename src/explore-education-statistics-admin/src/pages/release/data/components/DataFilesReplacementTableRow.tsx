@@ -150,7 +150,6 @@ export default function DataFilesReplacementTableRow({
                   await dataReplacementService.replaceData(
                     releaseVersionId,
                     dataFile.id,
-                    replacementDataFile.id,
                   );
 
                   onConfirmAction?.();
