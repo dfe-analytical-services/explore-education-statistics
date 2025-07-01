@@ -33,12 +33,15 @@ export default function ScreenerResultsTable({
   );
 
   return testResults ? (
-    <table data-testid="screener-result-table">
+    <table
+      className="dfe-table--vertical-align-middle"
+      data-testid="screener-result-table"
+    >
       <tbody>
         {testResults.map(testResult => (
           <tr data-testid="screener-result-table-row" key={testResult.id}>
             <td>
-              <div style={{ display: 'flex', alignItems: 'center' }}>
+              <div>
                 {!hasFailures &&
                 onAcknowledgeWarning &&
                 testResult.result === 'WARNING' ? (
@@ -62,7 +65,7 @@ export default function ScreenerResultsTable({
                 )}
               </div>
             </td>
-            <td style={{ verticalAlign: 'middle' }}>
+            <td>
               <Tag
                 colour={getScreenerTestResultStatusColour(testResult.result)}
               >
