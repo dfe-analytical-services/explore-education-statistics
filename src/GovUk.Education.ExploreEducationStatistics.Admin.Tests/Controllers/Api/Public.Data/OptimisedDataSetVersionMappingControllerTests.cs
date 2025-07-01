@@ -25,7 +25,7 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api.Public.Data;
 
-[Collection(nameof(OptimisedPsqlContainerFixture))]
+[Collection(nameof(OptimisedHttpClientWithPsqlFixture))]
 public abstract class OptimisedDataSetVersionMappingControllerTests(
     OptimisedHttpClientWithPsqlFixture fixture,
     ITestOutputHelper output) : IAsyncLifetime

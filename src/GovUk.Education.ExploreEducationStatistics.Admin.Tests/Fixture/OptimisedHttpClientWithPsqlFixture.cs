@@ -121,3 +121,5 @@ public class OptimisedHttpClientWithPsqlFixture : IAsyncLifetime
     
     private class TestWebApplicationFactory : WebApplicationFactory<Startup>;
 }
+
+public class OptimisedHttpClientWithPsqlFixture2 : OptimisedHttpClientWithPsqlFixture;
