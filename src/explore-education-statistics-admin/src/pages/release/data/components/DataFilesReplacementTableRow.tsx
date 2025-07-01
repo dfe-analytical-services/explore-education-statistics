@@ -48,7 +48,6 @@ export default function DataFilesReplacementTableRow({
     ...dataFileReplacementQueries.getReplacementPlan(
       releaseVersionId,
       dataFile.id,
-      dataFile.replacedBy ?? '',
     ),
     enabled: fetchPlan,
   });
@@ -141,10 +140,9 @@ export default function DataFilesReplacementTableRow({
             {plan?.valid && (
               <ButtonText
                 onClick={async () => {
-                  await dataReplacementService.replaceData(
-                    releaseVersionId,
+                  await dataReplacementService.replaceData(releaseVersionId, [
                     dataFile.id,
-                  );
+                  ]);
 
                   onConfirmAction?.();
                 }}

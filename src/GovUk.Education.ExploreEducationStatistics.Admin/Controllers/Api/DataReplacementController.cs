@@ -1,6 +1,7 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
@@ -36,15 +37,15 @@ public class DataReplacementController : ControllerBase
             .HandleFailuresOrOk();
     }
 
-    [HttpPost("releases/{releaseVersionId:guid}/data/{originalFileId:guid}/replacement")]
+    [HttpPost("releases/{releaseVersionId:guid}/data/replacements")]
     public async Task<ActionResult<Unit>> Replace(
-        Guid releaseVersionId,
-        Guid originalFileId,
+        [FromRoute] Guid releaseVersionId,
+        [FromBody] ReplacementRequest request,
         CancellationToken cancellationToken = default)
     {
         return await _replacementService.Replace(
                 releaseVersionId: releaseVersionId,
-                originalFileIds: [originalFileId], // @MarkFix turn into a list
+                originalFileIds: request.OriginalFileIds,
                 cancellationToken: cancellationToken
             )
             .HandleFailuresOrOk();

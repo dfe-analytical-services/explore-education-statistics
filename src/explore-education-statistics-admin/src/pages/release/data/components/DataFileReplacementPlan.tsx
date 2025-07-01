@@ -555,10 +555,9 @@ const DataFileReplacementPlan = ({
                 onClick={async () => {
                   toggleSubmitting.on();
 
-                  await dataReplacementService.replaceData(
-                    releaseVersionId,
+                  await dataReplacementService.replaceData(releaseVersionId, [
                     fileId,
-                  );
+                  ]);
 
                   if (onReplacement) {
                     onReplacement();

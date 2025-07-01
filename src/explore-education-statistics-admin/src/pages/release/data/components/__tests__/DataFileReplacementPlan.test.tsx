@@ -1249,7 +1249,7 @@ describe('DataReplacementPlan', () => {
 
     expect(dataReplacementService.replaceData).toHaveBeenCalledWith(
       'release-id',
-      'original-file-id',
+      ['original-file-id'],
     );
   });
 });
