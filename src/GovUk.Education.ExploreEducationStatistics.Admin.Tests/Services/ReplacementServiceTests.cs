@@ -65,7 +65,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 File = new File
                 {
                     Type = FileType.Data,
-                    SubjectId = Guid.NewGuid()
+                    SubjectId = Guid.NewGuid(),
+                    ReplacedById = Guid.NewGuid(), // nonexistent fileId
                 }
             };
 
@@ -87,8 +88,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var result = await replacementService.GetReplacementPlan(
                     releaseVersionId: releaseVersion.Id,
-                    originalFileId: originalReleaseFile.FileId,
-                    replacementFileId: Guid.NewGuid());
+                    originalFileId: originalReleaseFile.FileId);
 
                 result.AssertNotFound();
             }
@@ -99,23 +99,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         {
             var releaseVersion = _fixture.DefaultReleaseVersion().Generate();
 
-            var replacementReleaseFile = new ReleaseFile
-            {
-                ReleaseVersion = releaseVersion,
-                File = new File
-                {
-                    Type = FileType.Data,
-                    SubjectId = Guid.NewGuid()
-                }
-            };
-
             var contentDbContextId = Guid.NewGuid().ToString();
             var statisticsDbContextId = Guid.NewGuid().ToString();
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
                 contentDbContext.ReleaseVersions.AddRange(releaseVersion);
-                contentDbContext.ReleaseFiles.AddRange(replacementReleaseFile);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -127,8 +116,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var result = await replacementService.GetReplacementPlan(
                     releaseVersionId: releaseVersion.Id,
-                    originalFileId: Guid.NewGuid(),
-                    replacementFileId: replacementReleaseFile.FileId);
+                    originalFileId: Guid.NewGuid());
 
                 result.AssertNotFound();
             }
@@ -140,14 +128,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var originalFile = new File
             {
                 Type = FileType.Data,
-                SubjectId = Guid.NewGuid()
+                SubjectId = Guid.NewGuid(),
             };
 
             var replacementFile = new File
             {
                 Type = FileType.Data,
                 SubjectId = Guid.NewGuid(),
+                Replacing = originalFile,
             };
+
+            originalFile.ReplacedBy = replacementFile;
 
             var contentDbContextId = Guid.NewGuid().ToString();
             var statisticsDbContextId = Guid.NewGuid().ToString();
@@ -166,8 +157,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var result = await replacementService.GetReplacementPlan(
                     releaseVersionId: Guid.NewGuid(),
-                    originalFileId: originalFile.Id,
-                    replacementFileId: replacementFile.Id);
+                    originalFileId: originalFile.Id);
 
                 result.AssertNotFound();
             }
@@ -221,8 +211,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var result = await replacementService.GetReplacementPlan(
                     releaseVersionId: release1.Id,
-                    originalFileId: originalFile.Id,
-                    replacementFileId: replacementFile.Id);
+                    originalFileId: originalFile.Id);
 
                 result.AssertNotFound();
             }
@@ -251,8 +240,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var replacementFile = new File
             {
                 Type = FileType.Data,
-                SubjectId = replacementReleaseSubject.SubjectId
+                SubjectId = replacementReleaseSubject.SubjectId,
+                Replacing = originalFile,
             };
+
+            originalFile.ReplacedBy = replacementFile;
 
             var originalReleaseFile = new ReleaseFile
             {
@@ -303,8 +295,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var result = await replacementService.GetReplacementPlan(
                     releaseVersionId: releaseVersion.Id,
-                    originalFileId: originalFile.Id,
-                    replacementFileId: replacementFile.Id);
+                    originalFileId: originalFile.Id);
 
                 VerifyAllMocks(locationRepository,
                     timePeriodService);
@@ -343,8 +334,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var replacementFile = new File
             {
                 Type = FileType.Data,
-                SubjectId = replacementReleaseSubject.SubjectId
+                SubjectId = replacementReleaseSubject.SubjectId,
+                Replacing = originalFile,
             };
+
+            originalFile.ReplacedBy = replacementFile;
 
             var originalReleaseFile = new ReleaseFile
             {
@@ -559,8 +553,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var result = await replacementService.GetReplacementPlan(
                     releaseVersionId: releaseVersion.Id,
-                    originalFileId: originalFile.Id,
-                    replacementFileId: replacementFile.Id);
+                    originalFileId: originalFile.Id);
 
                 VerifyAllMocks(locationRepository,
                     timePeriodService);
@@ -776,14 +769,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var originalFile = new File
             {
                 Type = FileType.Data,
-                SubjectId = originalReleaseSubject.SubjectId
+                SubjectId = originalReleaseSubject.SubjectId,
             };
 
             var replacementFile = new File
             {
                 Type = FileType.Data,
-                SubjectId = replacementReleaseSubject.SubjectId
+                SubjectId = replacementReleaseSubject.SubjectId,
+                Replacing = originalFile,
             };
+
+            originalFile.ReplacedBy = replacementFile;
 
             var originalReleaseFile = new ReleaseFile
             {
@@ -970,8 +966,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var result = await replacementService.GetReplacementPlan(
                     releaseVersionId: releaseVersion.Id,
-                    originalFileId: originalFile.Id,
-                    replacementFileId: replacementFile.Id);
+                    originalFileId: originalFile.Id);
 
                 VerifyAllMocks(locationRepository,
                     timePeriodService);
@@ -1003,14 +998,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var originalFile = new File
             {
                 Type = FileType.Data,
-                SubjectId = originalReleaseSubject.SubjectId
+                SubjectId = originalReleaseSubject.SubjectId,
             };
 
             var replacementFile = new File
             {
                 Type = FileType.Data,
-                SubjectId = replacementReleaseSubject.SubjectId
+                SubjectId = replacementReleaseSubject.SubjectId,
+                Replacing = originalFile,
             };
+
+            originalFile.ReplacedBy = replacementFile;
 
             var originalReleaseFile = new ReleaseFile
             {
@@ -1189,8 +1187,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var result = await replacementService.GetReplacementPlan(
                     releaseVersionId: releaseVersion.Id,
-                    originalFileId: originalFile.Id,
-                    replacementFileId: replacementFile.Id);
+                    originalFileId: originalFile.Id);
 
                 VerifyAllMocks(locationRepository,
                     timePeriodService);
@@ -1228,8 +1225,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var replacementFile = new File
             {
                 Type = FileType.Data,
-                SubjectId = replacementReleaseSubject.SubjectId
+                SubjectId = replacementReleaseSubject.SubjectId,
+                Replacing = originalFile,
             };
+
+            originalFile.ReplacedBy = replacementFile;
 
             var originalReleaseFile = new ReleaseFile
             {
@@ -1434,8 +1434,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var result = await replacementService.GetReplacementPlan(
                     releaseVersionId: releaseVersion.Id,
-                    originalFileId: originalFile.Id,
-                    replacementFileId: replacementFile.Id);
+                    originalFileId: originalFile.Id);
 
                 VerifyAllMocks(locationRepository,
                     timePeriodService);
@@ -1467,14 +1466,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var originalFile = new File
             {
                 Type = FileType.Data,
-                SubjectId = originalReleaseSubject.SubjectId
+                SubjectId = originalReleaseSubject.SubjectId,
             };
 
             var replacementFile = new File
             {
                 Type = FileType.Data,
-                SubjectId = replacementReleaseSubject.SubjectId
+                SubjectId = replacementReleaseSubject.SubjectId,
+                Replacing = originalFile,
             };
+
+            originalFile.ReplacedBy = replacementFile;
 
             var originalReleaseFile = new ReleaseFile
             {
@@ -1658,8 +1660,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var result = await replacementService.GetReplacementPlan(
                     releaseVersionId: releaseVersion.Id,
-                    originalFileId: originalFile.Id,
-                    replacementFileId: replacementFile.Id);
+                    originalFileId: originalFile.Id);
 
                 VerifyAllMocks(locationRepository,
                     timePeriodService);
@@ -1764,7 +1765,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             File replacementFile = _fixture
                 .DefaultFile()
                 .WithSubjectId(replacementReleaseSubject.SubjectId)
-                .WithType(FileType.Data);
+                .WithType(FileType.Data)
+                .WithReplacing(originalFile);
+
+            originalFile.ReplacedBy = replacementFile;
 
             var (originalReleaseFile, replacementReleaseFile) = _fixture.DefaultReleaseFile()
                 .WithReleaseVersion(releaseVersion)
@@ -1834,8 +1838,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var result = await replacementService.GetReplacementPlan(
                     releaseVersionId: releaseVersion.Id,
-                    originalFileId: originalFile.Id,
-                    replacementFileId: replacementFile.Id);
+                    originalFileId: originalFile.Id);
 
                 VerifyAllMocks(dataSetVersionService);
 
@@ -1879,14 +1882,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var originalFile = new File
             {
                 Type = FileType.Data,
-                SubjectId = originalReleaseSubject.SubjectId
+                SubjectId = originalReleaseSubject.SubjectId,
             };
 
             var replacementFile = new File
             {
                 Type = FileType.Data,
-                SubjectId = replacementReleaseSubject.SubjectId
+                SubjectId = replacementReleaseSubject.SubjectId,
+                Replacing = originalFile,
             };
+
+            originalFile.ReplacedBy = replacementFile;
 
             var originalReleaseFile = new ReleaseFile
             {
@@ -2196,8 +2202,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var result = await replacementService.GetReplacementPlan(
                     releaseVersionId: releaseVersion.Id,
-                    originalFileId: originalFile.Id,
-                    replacementFileId: replacementFile.Id);
+                    originalFileId: originalFile.Id);
 
                 VerifyAllMocks(locationRepository,
                     timePeriodService);
@@ -2568,8 +2573,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var result = await replacementService.Replace(
                     releaseVersionId: releaseVersion.Id,
-                    originalFileId: originalFile.Id,
-                    replacementFileId: replacementFile.Id);
+                    originalFileId: originalFile.Id);
 
                 VerifyAllMocks(locationRepository,
                     timePeriodService);
@@ -2620,14 +2624,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 File = replacementFile
             };
 
-            var locationRepository = new Mock<ILocationRepository>(Strict);
-            locationRepository.Setup(service => service.GetDistinctForSubject(replacementReleaseSubject.SubjectId))
-                .ReturnsAsync(new List<Location>());
-
-            var timePeriodService = new Mock<ITimePeriodService>(Strict);
-            timePeriodService.Setup(service => service.GetTimePeriods(replacementReleaseSubject.SubjectId))
-                .ReturnsAsync(new List<(int Year, TimeIdentifier TimeIdentifier)>());
-
             var contentDbContextId = Guid.NewGuid().ToString();
             var statisticsDbContextId = Guid.NewGuid().ToString();
 
@@ -2649,21 +2645,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
-                var replacementService = BuildReplacementService(contentDbContext,
-                    statisticsDbContext,
-                    locationRepository: locationRepository.Object,
-                    timePeriodService: timePeriodService.Object);
+                var replacementService = BuildReplacementService(
+                    contentDbContext: contentDbContext,
+                    statisticsDbContext: statisticsDbContext);
 
-                var exception = await Assert.ThrowsAsync<InvalidOperationException>(() =>
-                    replacementService.Replace(
+                var result = await replacementService.Replace(
                         releaseVersionId: releaseVersion.Id,
-                        originalFileId: originalReleaseFile.FileId,
-                        replacementFileId: replacementReleaseFile.FileId));
+                        originalFileId: originalReleaseFile.FileId);
 
-                VerifyAllMocks(locationRepository,
-                    timePeriodService);
-
-                Assert.Equal("Original file has no link with the replacement file", exception.Message);
+                result.AssertNotFound();
             }
         }
 
@@ -2711,14 +2701,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 File = replacementFile
             };
 
-            var locationRepository = new Mock<ILocationRepository>(Strict);
-            locationRepository.Setup(service => service.GetDistinctForSubject(replacementReleaseSubject.SubjectId))
-                .ReturnsAsync(new List<Location>());
-
-            var timePeriodService = new Mock<ITimePeriodService>(Strict);
-            timePeriodService.Setup(service => service.GetTimePeriods(replacementReleaseSubject.SubjectId))
-                .ReturnsAsync(new List<(int Year, TimeIdentifier TimeIdentifier)>());
-
             var contentDbContextId = Guid.NewGuid().ToString();
             var statisticsDbContextId = Guid.NewGuid().ToString();
 
@@ -2740,21 +2722,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
-                var replacementService = BuildReplacementService(contentDbContext,
-                    statisticsDbContext,
-                    locationRepository: locationRepository.Object,
-                    timePeriodService: timePeriodService.Object);
+                var replacementService = BuildReplacementService(
+                    contentDbContext: contentDbContext,
+                    statisticsDbContext: statisticsDbContext);
 
-                var exception = await Assert.ThrowsAsync<InvalidOperationException>(() =>
-                    replacementService.Replace(
-                        releaseVersionId: releaseVersion.Id,
-                        originalFileId: originalReleaseFile.FileId,
-                        replacementFileId: replacementReleaseFile.FileId));
+                var result = await replacementService.Replace(
+                    releaseVersionId: releaseVersion.Id,
+                    originalFileId: originalReleaseFile.FileId);
 
-                VerifyAllMocks(locationRepository,
-                    timePeriodService);
-
-                Assert.Equal("Replacement file has no link with the original file", exception.Message);
+                result.AssertNotFound();
             }
         }
 
@@ -2790,11 +2766,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             File originalFile = _fixture
                 .DefaultFile()
-                .WithReplacedBy(replacementFile).WithReplacedById(replacementFile.Id)
+                .WithReplacedBy(replacementFile)
                 .WithSubjectId(originalReleaseSubject.SubjectId)
                 .WithType(FileType.Data);
 
-            replacementFile.ReplacingId = originalFile.Id;
+            replacementFile.Replacing = originalFile;
 
             var (originalReleaseFile, replacementReleaseFile) = _fixture.DefaultReleaseFile()
                 .WithReleaseVersion(releaseVersion)
@@ -2840,8 +2816,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 EnableReplacementOfPublicApiDataSets = enableReplacementOfPublicApiDataSets
             });
             
-            var contentDbContextId = Guid.NewGuid().ToString();
-            var statisticsDbContextId = Guid.NewGuid().ToString();
             var releaseVersionService = new Mock<IReleaseVersionService>(Strict);
             if (enableReplacementOfPublicApiDataSets)
             {
@@ -2849,6 +2823,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .ReturnsAsync(Unit.Instance);
             }
 
+            var contentDbContextId = Guid.NewGuid().ToString();
+            var statisticsDbContextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
                 contentDbContext.ReleaseVersions.Add(releaseVersion);
@@ -2871,9 +2847,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var result = await replacementService.Replace(
                     releaseVersionId: releaseVersion.Id,
-                    originalFileId: originalFile.Id,
-                    replacementFileId: replacementFile.Id);
-              
+                    originalFileId: originalFile.Id);
+
                 if (enableReplacementOfPublicApiDataSets)
                 {
                     //Once EES-5779 is enabled, replacing file linked to API data set is possible.
@@ -2920,7 +2895,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 Type = FileType.Data,
                 SubjectId = replacementReleaseSubject.SubjectId,
-                Replacing = originalFile
+                Replacing = originalFile,
             };
 
             originalFile.ReplacedBy = replacementFile;
@@ -3319,8 +3294,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var result = await replacementService.Replace(
                     releaseVersionId: releaseVersion.Id,
-                    originalFileId: originalFile.Id,
-                    replacementFileId: replacementFile.Id);
+                    originalFileId: originalFile.Id);
 
                 VerifyAllMocks(privateBlobCacheService,
                     cacheKeyService,
@@ -3830,8 +3804,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var result = await replacementService.Replace(
                     releaseVersionId: releaseVersion.Id,
-                    originalFileId: originalFile.Id,
-                    replacementFileId: replacementFile.Id);
+                    originalFileId: originalFile.Id);
 
                 VerifyAllMocks(privateBlobCacheService,
                     cacheKeyService,
@@ -4206,8 +4179,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var result = await replacementService.Replace(
                     releaseVersionId: releaseVersion.Id,
-                    originalFileId: originalFile.Id,
-                    replacementFileId: replacementFile.Id);
+                    originalFileId: originalFile.Id);
 
                 VerifyAllMocks(privateBlobCacheService,
                     cacheKeyService,
@@ -4497,8 +4469,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var result = await replacementService.Replace(
                     releaseVersionId: releaseVersion.Id,
-                    originalFileId: originalFile.Id,
-                    replacementFileId: replacementFile.Id);
+                    originalFileId: originalFile.Id);
 
                 VerifyAllMocks(privateBlobCacheService,
                     cacheKeyService,
@@ -4705,8 +4676,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var result = await replacementService.Replace(
                     releaseVersionId: releaseVersion.Id,
-                    originalFileId: originalFile.Id,
-                    replacementFileId: replacementFile.Id);
+                    originalFileId: originalFile.Id);
 
                 VerifyAllMocks(locationRepository,
                     releaseVersionService,
@@ -4899,8 +4869,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var result = await replacementService.Replace(
                     releaseVersionId: contentRelease.Id,
-                    originalFileId: originalFile.Id,
-                    replacementFileId: replacementFile.Id);
+                    originalFileId: originalFile.Id);
 
                 VerifyAllMocks(locationRepository,
                     releaseVersionService,

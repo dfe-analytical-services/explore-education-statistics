@@ -27,7 +27,6 @@ public abstract class DataReplacementControllerTests
 
             var releaseVersionId = Guid.NewGuid();
             var originalFileId = Guid.NewGuid();
-            var replacementFileId = Guid.NewGuid();
 
             var dataReplacementPlan = new DataReplacementPlanViewModel
             {
@@ -77,7 +76,6 @@ public abstract class DataReplacementControllerTests
                 .Setup(s => s.GetReplacementPlan(
                     releaseVersionId, 
                     originalFileId, 
-                    replacementFileId, 
                     It.IsAny<CancellationToken>()))
                 .ReturnsAsync(dataReplacementPlan);
 
@@ -85,8 +83,7 @@ public abstract class DataReplacementControllerTests
 
             var result = await controller.GetReplacementPlan(
                 releaseVersionId: releaseVersionId,
-                fileId: originalFileId,
-                replacementFileId: replacementFileId);
+                originalFileId: originalFileId);
 
             MockUtils.VerifyAllMocks(replacementService);
 
@@ -109,21 +106,18 @@ public abstract class DataReplacementControllerTests
 
             var releaseVersionId = Guid.NewGuid();
             var originalFileId = Guid.NewGuid();
-            var replacementFileId = Guid.NewGuid();
 
             replacementService
                 .Setup(service => service.Replace(
                     releaseVersionId,
-                    originalFileId,
-                    replacementFileId))
+                    originalFileId))
                 .ReturnsAsync(Unit.Instance);
 
             var controller = BuildController(replacementService: replacementService.Object);
 
             var result = await controller.Replace(
                 releaseVersionId: releaseVersionId,
-                fileId: originalFileId,
-                replacementFileId: replacementFileId);
+                originalFileId: originalFileId);
 
             MockUtils.VerifyAllMocks(replacementService);
 
@@ -137,21 +131,18 @@ public abstract class DataReplacementControllerTests
 
             var releaseVersionId = Guid.NewGuid();
             var originalFileId = Guid.NewGuid();
-            var replacementFileId = Guid.NewGuid();
 
             replacementService
                 .Setup(service => service.Replace(
                     releaseVersionId,
-                    originalFileId,
-                    replacementFileId))
+                    originalFileId))
                 .ReturnsAsync(ValidationUtils.ValidationActionResult(ValidationErrorMessages.ReplacementMustBeValid));
 
             var controller = BuildController(replacementService: replacementService.Object);
 
             var result = await controller.Replace(
                 releaseVersionId: releaseVersionId,
-                fileId: originalFileId,
-                replacementFileId: replacementFileId);
+                originalFileId: originalFileId);
 
             MockUtils.VerifyAllMocks(replacementService);
 
