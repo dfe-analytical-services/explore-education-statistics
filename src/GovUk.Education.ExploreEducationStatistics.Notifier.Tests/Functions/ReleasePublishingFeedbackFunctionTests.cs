@@ -23,7 +23,6 @@ public class ReleasePublishingFeedbackFunctionTests
 
     private static readonly AppOptions AppOptions = new()
     {
-        Url = "https://notifier.func/api",
         PublicAppUrl = "https://public.app"
     };
 

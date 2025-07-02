@@ -79,7 +79,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             var feedbackEntries = feedbackEntriesAndEmails
                 .Select(feedbackEntry => feedbackEntry.feedback);
             
-            await context.ReleasePublishingFeedback.AddRangeAsync(feedbackEntries);
+            context.ReleasePublishingFeedback.AddRange(feedbackEntries);
             await context.SaveChangesAsync();
             
             var messages = feedbackEntriesAndEmails

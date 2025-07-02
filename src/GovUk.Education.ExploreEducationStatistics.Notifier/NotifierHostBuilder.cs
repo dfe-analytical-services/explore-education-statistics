@@ -1,3 +1,4 @@
+using System.IO;
 using FluentValidation;
 using GovUk.Education.ExploreEducationStatistics.Common.Database;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
@@ -28,7 +29,8 @@ public static class NotifierHostBuilder
             .ConfigureAppConfiguration((context, builder) =>
             {
                 builder
-                    .AddJsonFile("appsettings.json", optional: true, reloadOnChange: false)
+                    .SetBasePath(Directory.GetCurrentDirectory())
+                    .AddJsonFile("appsettings.json", optional: false, reloadOnChange: false)
                     .AddJsonFile($"appsettings.{context.HostingEnvironment.EnvironmentName}.json", optional: true, reloadOnChange: false)
                     .AddJsonFile("appsettings.Local.json", optional: true, reloadOnChange: false)
                     .AddEnvironmentVariables();
