@@ -166,40 +166,6 @@ public class RemoveDataSetTestFixture
         return instance;
     }
 
-    public static async Task<RemoveDataSetTestFixture> CreateApiLinkedToPublished(
-        DataFixture dataFixture,
-        DataSetVersionStatus dataSetVersionStatus,
-        StatisticsDbContext statisticsDbContext,
-        ContentDbContext contentDbContext)
-    {
-        var instance = new RemoveDataSetTestFixture();
-        
-        instance.SetupApiLinkedDataFixtures(dataFixture, dataSetVersionStatus);
-        
-        var releaseVersionPublished = dataFixture
-            .DefaultReleaseVersion()
-            .WithPublished(DateTime.Now)
-            .Generate();
-
-        dataFixture
-            .DefaultReleaseFile()
-            .WithReleaseVersion(releaseVersionPublished)
-            .WithFile(instance.File)
-            .WithPublicApiDataSetId(instance.TestDataSet.Id)
-            .WithPublicApiDataSetVersion(instance.TestDataSetVersion.SemVersion())
-            .Generate();
-        
-        contentDbContext.ReleaseVersions.Add(instance.ReleaseVersion);
-        contentDbContext.ReleaseVersions.Add(releaseVersionPublished);
-        contentDbContext.ReleaseFiles.Add(instance.ReleaseFile);
-        await contentDbContext.SaveChangesAsync();
-                
-        statisticsDbContext.Subject.Add(instance.Subject);
-        await statisticsDbContext.SaveChangesAsync();
-        
-        return instance;
-    }
-
     private void SetupApiLinkedReplaceByIds(Guid? replacedById, Guid? replacingId)
     {
         File.ReplacedById = replacedById;

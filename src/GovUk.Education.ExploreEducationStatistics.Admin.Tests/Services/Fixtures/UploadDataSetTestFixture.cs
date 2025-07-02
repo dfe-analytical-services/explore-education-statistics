@@ -60,7 +60,8 @@ public class UploadDataSetTestFixture
         DataSetVersionService = dataSetVersionService ?? new Mock<IDataSetVersionService>(Strict);
         DataSetService = dataSetService ?? new Mock<IDataSetService>(Strict);
     }
-    public static async Task<UploadDataSetTestFixture> InitializeTextFixture(
+
+    public static async Task<UploadDataSetTestFixture> InitializeUploadDataSetTestFixture(
         DataFixture fixture,
         User user,
         string dataSetName,
@@ -71,7 +72,7 @@ public class UploadDataSetTestFixture
         SemVersion version,
         bool isPublished = false)
     {
-        var context = new UploadDataSetTestFixture
+        var testFixture = new UploadDataSetTestFixture
         {
             DataImportService = new Mock<IDataImportService>(Strict),
             ReleaseVersionRepository = new Mock<IReleaseVersionRepository>(Strict),
@@ -83,11 +84,11 @@ public class UploadDataSetTestFixture
             ContentDbContextId = contentDbContextId.ToString()
         };
 
-        context.SetupCommonData(fixture, user, dataFileName, metaFileName, isPublished, version);
-        await context.SetupContentDbContext(contentDbContext);
-        context.SetupCommonMocks(user, metaFileName, dataSetName);
+        testFixture.SetupCommonData(fixture, user, dataFileName, metaFileName, isPublished, version);
+        await testFixture.SetupContentDbContext(contentDbContext);
+        testFixture.SetupCommonMocks(user, metaFileName, dataSetName);
 
-        return context;
+        return testFixture;
     }
 
     private void SetupCommonData(
@@ -145,7 +146,7 @@ public class UploadDataSetTestFixture
             .Generate();
     }
 
-    public async Task SetupContentDbContext(ContentDbContext contentDbContext)
+    private async Task SetupContentDbContext(ContentDbContext contentDbContext)
     {
         contentDbContext.ReleaseVersions.Add(ReleaseVersion);
         contentDbContext.ReleaseFiles.AddRange(ReleaseFile, ReleaseFileReplace);
