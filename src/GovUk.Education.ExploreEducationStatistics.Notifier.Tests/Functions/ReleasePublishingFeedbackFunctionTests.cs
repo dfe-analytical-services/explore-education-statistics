@@ -122,14 +122,23 @@ public class ReleasePublishingFeedbackFunctionTests
             ReleasePublishingFeedbackId: feedback.Id,
             EmailAddress: "test@test.com");
 
+        var emailService = new Mock<IEmailService>(MockBehavior.Strict);
+
         await using (var context = ContentDbUtils.InMemoryContentDbContext(contentDbContextId))
         {
-            var function = BuildFunction(contentDbContext: context);
+            var function = BuildFunction(contentDbContext: context, emailService: emailService.Object);
 
             await function.SendReleasePublishingFeedbackEmail(
                 releasePublishingFeedbackMessage,
                 cancellationToken: default);
         }
+
+        emailService
+            .Verify(s => s.SendEmail(
+                It.IsAny<string>(),
+                It.IsAny<string>(),
+                It.IsAny<Dictionary<string, dynamic>>()
+                ), Times.Never);
     }
 
     private static bool AssertEmailTemplateValues(
