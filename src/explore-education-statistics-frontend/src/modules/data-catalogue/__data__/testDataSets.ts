@@ -287,6 +287,74 @@ export const testApiDataSetVersions: PaginatedList<ApiDataSetVersion> = {
   ],
 };
 
+export const testPatchApiDataSetVersions: PaginatedList<ApiDataSetVersion> = {
+  paging: {
+    page: 1,
+    pageSize: 10,
+    totalResults: 10,
+    totalPages: 1,
+  },
+  results: [
+    {
+      ...testApiDataSetVersion,
+      version: '2.0.2',
+      file: {
+        id: 'file-1-id',
+      },
+      release: {
+        title: 'Release 1 title',
+        slug: 'release-1-slug',
+      },
+    },
+    {
+      ...testApiDataSetVersion,
+      version: '2.0.1',
+      file: {
+        id: 'file-1-id',
+      },
+      release: {
+        title: 'Release 1 title',
+        slug: 'release-1-slug',
+      },
+    },
+    {
+      ...testApiDataSetVersion,
+      version: '2.0',
+      file: {
+        id: 'file-1-id',
+      },
+      release: {
+        title: 'Release 1 title',
+        slug: 'release-1-slug',
+      },
+    },
+    {
+      ...testApiDataSetVersion,
+      version: '1.1',
+      status: 'Deprecated',
+      file: {
+        id: 'file-2-id',
+      },
+      release: {
+        title: 'Release 2 title',
+        slug: 'release-2-slug',
+      },
+    },
+    {
+      ...testApiDataSetVersion,
+      version: '1.0',
+      status: 'Withdrawn',
+      file: {
+        id: 'file-3-id',
+      },
+      release: {
+        title: 'Release 3 title',
+        slug: 'release-3-slug',
+      },
+    },
+  ],
+};
+
 export const testApiDataSet: ApiDataSet = {
   id: 'api-data-set-id',
   title: 'Test title',
