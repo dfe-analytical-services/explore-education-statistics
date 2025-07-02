@@ -94,6 +94,9 @@
     },
     "immediatePublicationOfScheduledReleaseVersionsEnabled": {
       "value": true
+    },
+    "notifierSuppressExceptionsForTeamOnlyApiKeyErrors": {
+      "value": true
     }
   }
 }

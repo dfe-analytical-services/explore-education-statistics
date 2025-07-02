@@ -767,6 +767,13 @@
       "metadata": {
         "description": "Where analytics request files are saved before being processed"
       }
+    },
+    "notifierSuppressExceptionsForTeamOnlyApiKeyErrors": {
+      "type": "bool",
+      "defaultValue": false,
+      "metadata": {
+        "description": "Replaces Notify exceptions with logged messages only when team-only API keys are used and a recipient email address is not valid for that key."
+      }
     }
   },
   "variables": {
@@ -3091,6 +3098,7 @@
         "FUNCTIONS_WORKER_RUNTIME": "dotnet-isolated",
         "APPINSIGHTS_INSTRUMENTATIONKEY": "[reference(resourceId('microsoft.insights/components/', variables('notificationsAppInsights')), '2020-02-02').InstrumentationKey]",
         "App__EmailEnabled": "true",
+        "App__SuppressExceptionsForTeamOnlyApiKeyErrors": "[parameters('notifierSuppressExceptionsForTeamOnlyApiKeyErrors')]",
         "App__Url": "[concat(concat('https://', variables('notificationsAppName')), '.azurewebsites.net/api')]",
         "App__PublicAppUrl": "[variables('publicAppUrl')]",
         "App__NotifierStorageConnectionString": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-storage-notifications')).secretUriWithVersion, ')')]",
