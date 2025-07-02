@@ -7,4 +7,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfac
 public interface INotificationsService
 {
     Task NotifySubscribersIfApplicable(IReadOnlyList<Guid> releaseVersionIds);
+
+    Task SendReleasePublishingFeedbackEmails(IReadOnlyList<Guid> releaseVersionIds);
 }

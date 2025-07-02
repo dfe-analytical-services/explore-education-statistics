@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
-using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
@@ -12,113 +12,446 @@ using GovUk.Education.ExploreEducationStatistics.Notifier.Model;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services;
 using Moq;
 using Xunit;
+using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Utils.ContentDbUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services;
 
-public class NotificationsServiceTests
+public abstract class NotificationsServiceTests
 {
     private readonly DataFixture _dataFixture = new();
 
-    [Fact]
-    public async Task NotifySubscribersIfApplicable()
+    public class NotifySubscribersTests : NotificationsServiceTests
     {
-        var (publication1, publication2, publication3) = _dataFixture
-            .DefaultPublication()
-            .ForRange(..2, s => s.SetReleases([_dataFixture.DefaultRelease(publishedVersions: 1)]))
-            .ForRange(2..3, s => s.SetReleases([_dataFixture.DefaultRelease(publishedVersions: 2)]))
-            .GenerateTuple3();
+        [Fact]
+        public async Task NotifySubscribersTrueForSomeReleaseVersions_SubscribersNotifiedWhenTrue()
+        {
+            var (publication1, publication2, publication3) = _dataFixture
+                .DefaultPublication()
+                .ForRange(..2, s => s.SetReleases([_dataFixture.DefaultRelease(publishedVersions: 1)]))
+                .ForRange(2..3, s => s.SetReleases([_dataFixture.DefaultRelease(publishedVersions: 2)]))
+                .GenerateTuple3();
 
-        var publication1Release = publication1.Releases.Single();
-        var publication1ReleaseVersion0 = publication1Release.Versions[0];
-        publication1ReleaseVersion0.NotifySubscribers = true;
+            var publication1Release = publication1.Releases.Single();
+            var publication1ReleaseVersion0 = publication1Release.Versions[0];
+            publication1ReleaseVersion0.NotifySubscribers = true;
 
-        var publication2Release = publication2.Releases.Single();
-        var publication2ReleaseVersion0 = publication2Release.Versions[0];
-        publication2ReleaseVersion0.NotifySubscribers = false;
+            var publication2Release = publication2.Releases.Single();
+            var publication2ReleaseVersion0 = publication2Release.Versions[0];
+            publication2ReleaseVersion0.NotifySubscribers = false;
 
-        var publication3Release = publication3.Releases.Single();
-        var publication3ReleaseVersion1 = publication3Release.Versions[1];
-        publication3ReleaseVersion1.NotifySubscribers = true;
-        publication3ReleaseVersion1.Updates =
-        [
-            new Update
+            var publication3Release = publication3.Releases.Single();
+            var publication3ReleaseVersion1 = publication3Release.Versions[1];
+            publication3ReleaseVersion1.NotifySubscribers = true;
+            publication3ReleaseVersion1.Updates =
+            [
+                new Update
+                {
+                    Created = DateTime.UtcNow,
+                    Reason = "latest update note"
+                },
+                new Update
+                {
+                    Created = DateTime.UtcNow.Subtract(TimeSpan.FromDays(2)),
+                    Reason = "old update note"
+                }
+            ];
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
-                Created = DateTime.UtcNow,
-                Reason = "latest update note"
-            },
-            new Update
-            {
-                Created = DateTime.UtcNow.Subtract(TimeSpan.FromDays(2)),
-                Reason = "old update note"
+                contentDbContext.Publications.AddRange(publication1, publication2, publication3);
+                await contentDbContext.SaveChangesAsync();
             }
-        ];
 
-        var contentDbContextId = Guid.NewGuid().ToString();
-        await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
-        {
-            contentDbContext.Publications.AddRange(publication1, publication2, publication3);
-            await contentDbContext.SaveChangesAsync();
-        }
+            var notifierClient = new Mock<INotifierClient>(MockBehavior.Strict);
+            notifierClient.Setup(mock => mock.NotifyPublicationSubscribers(
+                    It.IsAny<IReadOnlyList<ReleaseNotificationMessage>>(),
+                    CancellationToken.None))
+                .Returns(Task.CompletedTask);
 
-        var notifierClient = new Mock<INotifierClient>(MockBehavior.Strict);
-        notifierClient.Setup(mock => mock.NotifyPublicationSubscribers(
-                It.IsAny<IReadOnlyList<ReleaseNotificationMessage>>(),
-                CancellationToken.None))
-            .Returns(Task.CompletedTask);
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                var notificationsService = BuildNotificationsService(
+                    contentDbContext,
+                    notifierClient: notifierClient.Object);
 
-        await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
-        {
-            var notificationsService = BuildNotificationsService(
-                contentDbContext,
-                notifierClient: notifierClient.Object);
+                await notificationsService.NotifySubscribersIfApplicable([
+                    publication1ReleaseVersion0.Id,
+                    publication2ReleaseVersion0.Id,
+                    publication3ReleaseVersion1.Id
+                ]);
 
-            await notificationsService.NotifySubscribersIfApplicable([
-                publication1ReleaseVersion0.Id,
-                publication2ReleaseVersion0.Id,
-                publication3ReleaseVersion1.Id
-            ]);
-
-            notifierClient.Verify(mock => mock.NotifyPublicationSubscribers(
-                    new List<ReleaseNotificationMessage>
-                    {
-                        new()
+                notifierClient.Verify(mock => mock.NotifyPublicationSubscribers(
+                        new List<ReleaseNotificationMessage>
                         {
-                            PublicationId = publication1.Id,
-                            PublicationName = publication1.Title,
-                            PublicationSlug = publication1.Slug,
-                            ReleaseName = publication1Release.Title,
-                            ReleaseSlug = publication1Release.Slug,
-                            Amendment = false,
-                            UpdateNote = "No update note provided.",
+                            new()
+                            {
+                                PublicationId = publication1.Id,
+                                PublicationName = publication1.Title,
+                                PublicationSlug = publication1.Slug,
+                                ReleaseName = publication1Release.Title,
+                                ReleaseSlug = publication1Release.Slug,
+                                Amendment = false,
+                                UpdateNote = "No update note provided.",
+                            },
+                            new()
+                            {
+                                PublicationId = publication3.Id,
+                                PublicationName = publication3.Title,
+                                PublicationSlug = publication3.Slug,
+                                ReleaseName = publication3Release.Title,
+                                ReleaseSlug = publication3Release.Slug,
+                                Amendment = true,
+                                UpdateNote = "latest update note",
+                            }
                         },
-                        new()
-                        {
-                            PublicationId = publication3.Id,
-                            PublicationName = publication3.Title,
-                            PublicationSlug = publication3.Slug,
-                            ReleaseName = publication3Release.Title,
-                            ReleaseSlug = publication3Release.Slug,
-                            Amendment = true,
-                            UpdateNote = "latest update note",
-                        }
-                    },
-                    CancellationToken.None),
-                Times.Once);
+                        CancellationToken.None),
+                    Times.Once);
+            }
+
+            VerifyAllMocks(notifierClient);
         }
 
-        MockUtils.VerifyAllMocks(notifierClient);
+        [Fact]
+        public async Task NoReleaseVersions()
+        {
+            await using var contentDbContext = InMemoryContentDbContext();
+            var notificationsService = BuildNotificationsService(contentDbContext);
+
+            await notificationsService.NotifySubscribersIfApplicable([]);
+
+            // No interaction with the notifier client is expected since no releases are being published.
+        }
     }
 
-    [Fact]
-    public async Task NotifySubscribersIfApplicable_NoReleaseVersions()
+    public class SendReleasePublishingFeedbackTests : NotificationsServiceTests
     {
-        await using var contentDbContext = InMemoryContentDbContext();
-        var notificationsService = BuildNotificationsService(contentDbContext);
+        [Fact]
+        public async Task AllExpectedUsersAreSentFeedbackEmails()
+        {
+            var (affectedPublication, otherPublication) = _dataFixture
+                .DefaultPublication()
+                .WithReleases(_ => _dataFixture
+                    .DefaultRelease(publishedVersions: 0, draftVersion: true)
+                    .Generate(1))
+                .GenerateTuple2();
 
-        await notificationsService.NotifySubscribersIfApplicable([]);
+            var releaseVersionBeingPublished = affectedPublication.Releases[0].Versions[0];
 
-        // No interaction with the notifier client is expected since no releases are being published.
+            var affectedPublicationTeam = _dataFixture
+                .DefaultUserPublicationRole()
+                .WithPublication(affectedPublication)
+                .ForIndex(0, s => s
+                    .SetRole(PublicationRole.Owner)
+                    .SetUser(new User { Email = "affected-publication-owner@example.com" }))
+                .ForIndex(1, s => s
+                    .SetRole(PublicationRole.Drafter)
+                    .SetUser(new User { Email = "affected-publication-drafter1@example.com" }))
+                .ForIndex(2, s => s
+                    .SetRole(PublicationRole.Drafter)
+                    .SetUser(new User { Email = "affected-publication-drafter2@example.com" }))
+                .ForIndex(3, s => s
+                    .SetRole(PublicationRole.Allower)
+                    .SetUser(new User { Email = "affected-publication-approver@example.com" }))
+                .GenerateList();
+
+            var otherPublicationTeam = _dataFixture
+                .DefaultUserPublicationRole()
+                .WithPublication(otherPublication)
+                .WithRole(PublicationRole.Owner)
+                .WithUser(new User { Email = "other-publication-owner@example.com" })
+                .GenerateList(1);
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                contentDbContext.Publications.AddRange(affectedPublication, otherPublication);
+                contentDbContext.UserPublicationRoles.AddRange(affectedPublicationTeam);
+                contentDbContext.UserPublicationRoles.AddRange(otherPublicationTeam);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            var notifierClient = new Mock<INotifierClient>(MockBehavior.Strict);
+
+            notifierClient
+                .Setup(mock => mock
+                    .NotifyReleasePublishingFeedbackUsers(
+                        It.IsAny<IReadOnlyList<ReleasePublishingFeedbackMessage>>(),
+                        CancellationToken.None))
+                .Returns(Task.CompletedTask);
+
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                var notificationsService = BuildNotificationsService(
+                    contentDbContext,
+                    notifierClient: notifierClient.Object);
+
+                await notificationsService.SendReleasePublishingFeedbackEmails([
+                    releaseVersionBeingPublished.Id
+                ]);
+            }
+
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                var feedbackEntries = contentDbContext
+                    .ReleasePublishingFeedback
+                    .ToList();
+
+                Assert.Equal(4, feedbackEntries.Count);
+
+                var ownerFeedbackEntry = feedbackEntries
+                    .Single(f => f.UserPublicationRole == PublicationRole.Owner);
+
+                AssertNewFeedbackRecordCreatedOk(
+                    feedbackEntry: ownerFeedbackEntry,
+                    expectedReleaseVersionId: releaseVersionBeingPublished.Id,
+                    expectedRole: PublicationRole.Owner);
+                
+                var drafter1FeedbackEntry = feedbackEntries
+                    .First(f => f.UserPublicationRole == PublicationRole.Drafter);
+
+                AssertNewFeedbackRecordCreatedOk(
+                    feedbackEntry: drafter1FeedbackEntry,
+                    expectedReleaseVersionId: releaseVersionBeingPublished.Id,
+                    expectedRole: PublicationRole.Drafter);
+                
+                var drafter2FeedbackEntry = feedbackEntries
+                    .Last(f => f.UserPublicationRole == PublicationRole.Drafter);
+                
+                AssertNewFeedbackRecordCreatedOk(
+                    feedbackEntry: drafter2FeedbackEntry,
+                    expectedReleaseVersionId: releaseVersionBeingPublished.Id,
+                    expectedRole: PublicationRole.Drafter);
+
+                var approverFeedbackEntry = feedbackEntries
+                    .Single(f => f.UserPublicationRole == PublicationRole.Allower);
+                
+                AssertNewFeedbackRecordCreatedOk(
+                    feedbackEntry: approverFeedbackEntry,
+                    expectedReleaseVersionId: releaseVersionBeingPublished.Id,
+                    expectedRole: PublicationRole.Allower);
+
+                notifierClient.Verify(mock => mock.NotifyReleasePublishingFeedbackUsers(
+                        new List<ReleasePublishingFeedbackMessage>
+                        {
+                            new(ownerFeedbackEntry.Id,
+                                "affected-publication-owner@example.com"),
+                            new(drafter1FeedbackEntry.Id,
+                                "affected-publication-drafter1@example.com"),
+                            new(drafter2FeedbackEntry.Id,
+                                "affected-publication-drafter2@example.com"),
+                            new(approverFeedbackEntry.Id,
+                                "affected-publication-approver@example.com")
+                        },
+                        CancellationToken.None),
+                    Times.Once);
+            }
+
+            VerifyAllMocks(notifierClient);
+        }
+
+        [Fact]
+        public async Task MultipleReleaseVersionPublished_MultipleEmailsSentToTeam()
+        {
+            var publication = _dataFixture
+                .DefaultPublication()
+                .WithReleases(_ => _dataFixture
+                    .DefaultRelease(publishedVersions: 0, draftVersion: true)
+                    .Generate(2))
+                .Generate();
+
+            var release1Version = publication.Releases[0].Versions[0];
+            var release2Version = publication.Releases[1].Versions[0];
+
+            var publicationOwner = _dataFixture
+                .DefaultUserPublicationRole()
+                .WithPublication(publication)
+                .WithRole(PublicationRole.Owner)
+                .WithUser(new User { Email = "publication-owner@example.com" })
+                .Generate();
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                contentDbContext.Publications.AddRange(publication);
+                contentDbContext.UserPublicationRoles.AddRange(publicationOwner);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            var notifierClient = new Mock<INotifierClient>(MockBehavior.Strict);
+
+            notifierClient
+                .Setup(mock => mock
+                    .NotifyReleasePublishingFeedbackUsers(
+                        It.IsAny<IReadOnlyList<ReleasePublishingFeedbackMessage>>(),
+                        CancellationToken.None))
+                .Returns(Task.CompletedTask);
+
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                var notificationsService = BuildNotificationsService(
+                    contentDbContext,
+                    notifierClient: notifierClient.Object);
+
+                await notificationsService.SendReleasePublishingFeedbackEmails([
+                    release1Version.Id,
+                    release2Version.Id
+                ]);
+            }
+
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                var feedbackEntries = contentDbContext
+                    .ReleasePublishingFeedback
+                    .ToList();
+
+                Assert.Equal(2, feedbackEntries.Count);
+
+                var release1OwnerFeedbackEntry = feedbackEntries
+                    .Single(f => f.ReleaseVersionId == release1Version.Id);
+                
+                AssertNewFeedbackRecordCreatedOk(
+                    feedbackEntry: release1OwnerFeedbackEntry,
+                    expectedReleaseVersionId: release1Version.Id,
+                    expectedRole: PublicationRole.Owner);
+
+                var release2OwnerFeedbackEntry = feedbackEntries
+                    .Single(f => f.ReleaseVersionId == release2Version.Id);
+                
+                AssertNewFeedbackRecordCreatedOk(
+                    feedbackEntry: release2OwnerFeedbackEntry,
+                    expectedReleaseVersionId: release2Version.Id,
+                    expectedRole: PublicationRole.Owner);
+
+                notifierClient.Verify(mock => mock.NotifyReleasePublishingFeedbackUsers(
+                        new List<ReleasePublishingFeedbackMessage>
+                        {
+                            new(release1OwnerFeedbackEntry.Id,
+                                "publication-owner@example.com"),
+                            new(release2OwnerFeedbackEntry.Id,
+                                "publication-owner@example.com")
+                        },
+                        CancellationToken.None),
+                    Times.Once);
+            }
+
+            VerifyAllMocks(notifierClient);
+        }
+        
+        [Fact]
+        public async Task UserPublicationRoleDeleted_NoEmailSent()
+        {
+            var publication = _dataFixture
+                .DefaultPublication()
+                .WithReleases(_ => _dataFixture
+                    .DefaultRelease(publishedVersions: 0, draftVersion: true)
+                    .Generate(1))
+                .Generate();
+
+            var publicationOwner = _dataFixture
+                .DefaultUserPublicationRole()
+                .WithPublication(publication)
+                .WithRole(PublicationRole.Owner)
+                .WithUser(new User { Email = "publication-owner@example.com" })
+                .WithDeleted(DateTime.UtcNow)
+                .Generate();
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                contentDbContext.Publications.AddRange(publication);
+                contentDbContext.UserPublicationRoles.AddRange(publicationOwner);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            var notifierClient = new Mock<INotifierClient>(MockBehavior.Strict);
+
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                var notificationsService = BuildNotificationsService(
+                    contentDbContext,
+                    notifierClient: notifierClient.Object);
+
+                await notificationsService.SendReleasePublishingFeedbackEmails([
+                    publication.Releases[0].Versions[0].Id
+                ]);
+            }
+
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                var feedbackEntries = contentDbContext
+                    .ReleasePublishingFeedback
+                    .ToList();
+
+                Assert.Empty(feedbackEntries);
+            }
+        }
+        
+        [Fact]
+        public async Task OldApproverRoleUsed_NoEmailSent()
+        {
+            var publication = _dataFixture
+                .DefaultPublication()
+                .WithReleases(_ => _dataFixture
+                    .DefaultRelease(publishedVersions: 0, draftVersion: true)
+                    .Generate(1))
+                .Generate();
+
+            var publicationOwner = _dataFixture
+                .DefaultUserPublicationRole()
+                .WithPublication(publication)
+                .WithRole(PublicationRole.Approver)
+                .WithUser(new User { Email = "publication-old-approver@example.com" })
+                .Generate();
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                contentDbContext.Publications.AddRange(publication);
+                contentDbContext.UserPublicationRoles.AddRange(publicationOwner);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            var notifierClient = new Mock<INotifierClient>(MockBehavior.Strict);
+
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                var notificationsService = BuildNotificationsService(
+                    contentDbContext,
+                    notifierClient: notifierClient.Object);
+
+                await notificationsService.SendReleasePublishingFeedbackEmails([
+                    publication.Releases[0].Versions[0].Id
+                ]);
+            }
+
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                var feedbackEntries = contentDbContext
+                    .ReleasePublishingFeedback
+                    .ToList();
+
+                Assert.Empty(feedbackEntries);
+            }
+        }
+
+        private static void AssertNewFeedbackRecordCreatedOk(
+            ReleasePublishingFeedback feedbackEntry,
+            Guid expectedReleaseVersionId,
+            PublicationRole expectedRole)
+        {
+            feedbackEntry.Created.AssertUtcNow();
+            Assert.NotEmpty(feedbackEntry.EmailToken);
+            Assert.Null(feedbackEntry.Response);
+            Assert.Null(feedbackEntry.AdditionalFeedback);
+            Assert.Equal(expectedReleaseVersionId, feedbackEntry.ReleaseVersionId);
+            Assert.Equal(expectedRole, feedbackEntry.UserPublicationRole);
+        }
     }
 
     private static NotificationsService BuildNotificationsService(

@@ -3,7 +3,7 @@ import { ReleasePublishingFeedbackRequest } from '@common/services/types/release
 
 const releasePublishingFeedbackService = {
   sendFeedback(feedback: ReleasePublishingFeedbackRequest): Promise<void> {
-    return contentApi.post('/feedback/release-publishing', feedback);
+    return contentApi.put('/feedback/release-publishing', feedback);
   },
 };
 

@@ -26,4 +26,13 @@ public class NotifierClient(string connectionString) : INotifierClient
             messages,
             cancellationToken);
     }
+
+    public async Task NotifyReleasePublishingFeedbackUsers(
+        IReadOnlyList<ReleasePublishingFeedbackMessage> messages,
+        CancellationToken cancellationToken = default)
+    {
+        await _queueServiceClient.SendMessagesAsJson(NotifierQueueStorage.ReleasePublishingFeedbackQueue,
+            messages,
+            cancellationToken);
+    }
 }

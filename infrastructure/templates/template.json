@@ -3091,21 +3091,12 @@
         "FUNCTIONS_EXTENSION_VERSION": "~4",
         "FUNCTIONS_WORKER_RUNTIME": "dotnet-isolated",
         "APPINSIGHTS_INSTRUMENTATIONKEY": "[reference(resourceId('microsoft.insights/components/', variables('notificationsAppInsights')), '2020-02-02').InstrumentationKey]",
+        "App__EmailEnabled": "true",
         "App__Url": "[concat(concat('https://', variables('notificationsAppName')), '.azurewebsites.net/api')]",
         "App__PublicAppUrl": "[variables('publicAppUrl')]",
         "App__NotifierStorageConnectionString": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-storage-notifications')).secretUriWithVersion, ')')]",
         "App__TokenSecretKey": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-notifier-token-secret-key'), '2018-02-14').secretUriWithVersion, ')')]",
-        "GovUkNotify__ApiKey": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-notifier-govuknotify-api-key'), '2018-02-14').secretUriWithVersion, ')')]",
-        "GovUkNotify__EmailTemplates__ReleaseAmendmentPublishedId": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-notifier-templateid-release-amendment-published'), '2018-02-14').secretUriWithVersion, ')')]",
-        "GovUkNotify__EmailTemplates__ReleaseAmendmentPublishedSupersededSubscribersId": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-notifier-templateid-release-amendment-published-superseded-subscribers'), '2018-02-14').secretUriWithVersion, ')')]",
-        "GovUkNotify__EmailTemplates__ReleasePublishedId": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-notifier-templateid-release-published'), '2018-02-14').secretUriWithVersion, ')')]",
-        "GovUkNotify__EmailTemplates__ReleasePublishedSupersededSubscribersId": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-notifier-templateid-release-published-superseded-subscribers'), '2018-02-14').secretUriWithVersion, ')')]",
-        "GovUkNotify__EmailTemplates__SubscriptionConfirmationId": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-notifier-templateid-subscription-confirmation'), '2018-02-14').secretUriWithVersion, ')')]",
-        "GovUkNotify__EmailTemplates__SubscriptionVerificationId": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-notifier-templateid-subscription-verification'), '2018-02-14').secretUriWithVersion, ')')]",
-        "GovUkNotify__EmailTemplates__ApiSubscriptionConfirmationId": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-notifier-templateid-api-subscription-confirmation'), '2018-02-14').secretUriWithVersion, ')')]",
-        "GovUkNotify__EmailTemplates__ApiSubscriptionMajorDataSetVersionPublishedId": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-notifier-templateid-api-subscription-major-data-set-version-published'), '2018-02-14').secretUriWithVersion, ')')]",
-        "GovUkNotify__EmailTemplates__ApiSubscriptionDataSetVersionPublishedId": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-notifier-templateid-api-subscription-data-set-version-published'), '2018-02-14').secretUriWithVersion, ')')]",
-        "GovUkNotify__EmailTemplates__ApiSubscriptionVerificationId": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-notifier-templateid-api-subscription-verification'), '2018-02-14').secretUriWithVersion, ')')]"
+        "GovUkNotify__ApiKey": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-notifier-govuknotify-api-key'), '2018-02-14').secretUriWithVersion, ')')]"
       }
     },
     {
