@@ -111,6 +111,8 @@ export type UploadZipDataFileRequest = {
   replacingFileId?: string;
 };
 
+export type FileType = 'data' | 'metadata';
+
 export interface DataFileUpdateRequest {
   title: string;
 }
@@ -323,6 +325,21 @@ const releaseDataFileService = {
       .get<Blob>(`/release/${releaseId}/file/${id}/download`, {
         responseType: 'blob',
       })
+      .then(response => downloadFile({ file: response, fileName }));
+  },
+  async downloadTemporaryFile(
+    releaseId: string,
+    fileType: FileType,
+    dataSetUploadId: string,
+    fileName: string,
+  ): Promise<void> {
+    await client
+      .get<Blob>(
+        `/releaseVersions/${releaseId}/${fileType}/${dataSetUploadId}/download`,
+        {
+          responseType: 'blob',
+        },
+      )
       .then(response => downloadFile({ file: response, fileName }));
   },
   updateFile(

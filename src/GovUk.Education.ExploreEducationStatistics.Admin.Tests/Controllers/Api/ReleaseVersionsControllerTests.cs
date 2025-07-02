@@ -2,6 +2,7 @@
 using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Fixture;
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.MockBuilders;
@@ -660,7 +661,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             IReleasePublishingStatusService? releaseStatusService = null,
             IReleaseChecklistService? releaseChecklistService = null,
             IDataImportService? importService = null,
-            IDataSetUploadRepository? dataSetUploadRepository = null)
+            IDataSetUploadRepository? dataSetUploadRepository = null,
+            IDataSetFileStorage? dataSetFileStorage = null)
         {
             return new ReleaseVersionsController(
                 releaseVersionService ?? Mock.Of<IReleaseVersionService>(Strict),
@@ -670,7 +672,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                 releaseStatusService ?? Mock.Of<IReleasePublishingStatusService>(Strict),
                 releaseChecklistService ?? Mock.Of<IReleaseChecklistService>(Strict),
                 importService ?? Mock.Of<IDataImportService>(Strict),
-                dataSetUploadRepository ?? Mock.Of<IDataSetUploadRepository>(Strict));
+                dataSetUploadRepository ?? Mock.Of<IDataSetUploadRepository>(Strict),
+                dataSetFileStorage ?? Mock.Of<IDataSetFileStorage>(Strict));
         }
     }
 

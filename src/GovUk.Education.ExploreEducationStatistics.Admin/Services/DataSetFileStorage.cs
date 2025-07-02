@@ -12,11 +12,14 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -197,6 +200,32 @@ public class DataSetFileStorage(
         var uploads = await Task.WhenAll(uploadTasks);
 
         return [.. uploads];
+    }
+
+    public async Task<Either<ActionResult, FileStreamResult>> RetrieveDataSetFileFromTemporaryStorage(
+    Guid releaseVersionId,
+    Guid dataSetUploadId,
+    FileType fileType,
+    CancellationToken cancellationToken)
+    {
+        var upload = await contentDbContext.DataSetUploads.FindAsync(dataSetUploadId, cancellationToken);
+
+        if (upload is null)
+        {
+            return new NotFoundResult();
+        }
+
+        var filePath = fileType switch
+        {
+            FileType.Data => $"{FileStoragePathUtils.FilesPath(releaseVersionId, FileType.Data)}{upload.DataFileId}",
+            FileType.Metadata => $"{FileStoragePathUtils.FilesPath(releaseVersionId, FileType.Metadata)}{upload.MetaFileId}",
+            _ => throw new InvalidEnumArgumentException(nameof(fileType), (int)fileType, typeof(FileType))
+        };
+
+        return await privateBlobStorageService
+            .DownloadToStream(PrivateReleaseTempFiles, filePath, new MemoryStream(), cancellationToken: cancellationToken)
+            .OnSuccess(stream
+                => new FileStreamResult(stream, ContentTypes.Csv));
     }
 
     /// <summary>

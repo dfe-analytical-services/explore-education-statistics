@@ -1,19 +1,26 @@
-import { DataSetUpload } from '@admin/services/releaseDataFileService';
+import releaseDataFileService, {
+  DataSetUpload,
+} from '@admin/services/releaseDataFileService';
 import FormattedDate from '@common/components/FormattedDate';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
 import Tag from '@common/components/Tag';
 import React from 'react';
+import ButtonText from '@common/components/ButtonText';
 import {
   getDataSetUploadStatusColour,
   getDataSetUploadStatusLabel,
 } from './ImporterStatus';
 
 interface Props {
+  releaseVersionId: string;
   dataSetUpload: DataSetUpload;
 }
 
-export default function DataSetUploadSummaryList({ dataSetUpload }: Props) {
+export default function DataSetUploadSummaryList({
+  releaseVersionId,
+  dataSetUpload,
+}: Props) {
   const uploadedByUrl = `mailto:${dataSetUpload.uploadedBy}`;
 
   return (
@@ -22,10 +29,32 @@ export default function DataSetUploadSummaryList({ dataSetUpload }: Props) {
         {dataSetUpload.dataSetTitle}
       </SummaryListItem>
       <SummaryListItem term="Data file">
-        {dataSetUpload.dataFileName}
+        <ButtonText
+          onClick={() =>
+            releaseDataFileService.downloadTemporaryFile(
+              releaseVersionId,
+              'data',
+              dataSetUpload.id,
+              dataSetUpload.dataFileName,
+            )
+          }
+        >
+          {dataSetUpload.dataFileName}
+        </ButtonText>
       </SummaryListItem>
       <SummaryListItem term="Meta file">
-        {dataSetUpload.metaFileName}
+        <ButtonText
+          onClick={() =>
+            releaseDataFileService.downloadTemporaryFile(
+              releaseVersionId,
+              'metadata',
+              dataSetUpload.id,
+              dataSetUpload.metaFileName,
+            )
+          }
+        >
+          {dataSetUpload.metaFileName}
+        </ButtonText>
       </SummaryListItem>
       <SummaryListItem term="Size">
         {dataSetUpload.dataFileSize}
