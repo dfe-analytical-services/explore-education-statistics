@@ -690,12 +690,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
              {
                  return Unit.Instance;
              }
-
-             if (!deletePlan.Valid)
-             {
-                 throw new InvalidOperationException(
-                     "Deletion plan has indicated this deletion does not meet requirements to make it valid to proceed with deletion.");
-             }
              
              return await dataSetVersionService.DeleteVersion(deletePlan.ApiDataSetVersionPlan!.Id);
         }
