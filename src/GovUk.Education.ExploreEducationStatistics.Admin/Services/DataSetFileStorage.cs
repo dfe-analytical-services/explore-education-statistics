@@ -158,8 +158,7 @@ public class DataSetFileStorage(
                     {
                         await CreateNextDataSetVersion(dataReleaseFileId, replacedReleaseDataFile, cancellationToken, dataSetVersion, dataSetId);
                     }
-                }
-                );
+                });
     }
 
     private async Task CreateNextDataSetVersion(

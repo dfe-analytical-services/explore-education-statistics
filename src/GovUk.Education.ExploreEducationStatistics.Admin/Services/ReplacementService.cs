@@ -127,12 +127,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
  
             var mappingStatus =  await dataSetVersionMappingService.GetMappingStatus(replacementApiDataSetVersion.Id, cancellationToken);
             var isPatch = DataSetVersionNumber.TryParse(apiDataSetVersionPlan.Version, out var number) && number.Patch > 0;
+
+            // If no mapping is found and the api version status is DRAFT, this data set version was deleted and recreated (& no mapping was necessary)
+            // `completeStatusResult` is used for when we are replacing a draft release file (not an amendment) and therefore the mapping is complete/not applicable.
+            var completeStatusResult = new MappingStatusViewModel
+            {
+                FiltersComplete = true,
+                FiltersHaveMajorChange = false,
+                LocationsComplete = true,
+                LocationsHaveMajorChange = false,
+                HasDeletionChanges = false
+            }; 
             
             return apiDataSetVersionPlan with
             {
                 MappingStatus = mappingStatus 
                                 ?? (apiDataSetVersionPlan.ReadyToPublish 
-                                    ? new MappingStatusViewModel { FiltersComplete = true, FiltersHaveMajorChange = false, LocationsComplete = true, LocationsHaveMajorChange = false, HasDeletionChanges = false} 
+                                    ? completeStatusResult 
                                     : null),// If no mapping is found, this data set version was deleted and recreated (& no mapping was necessary)  
                 Valid = (isPatch 
                             ? mappingStatus is { IsMajorVersionUpdate: false } && apiDataSetVersionPlan.ReadyToPublish 

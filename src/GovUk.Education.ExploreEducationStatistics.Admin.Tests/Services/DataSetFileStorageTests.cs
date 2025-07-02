@@ -888,7 +888,7 @@ public class DataSetFileStorageTests
         SemVersion version,
         bool isPublished = false) =>
         await UploadDataSetTestFixture
-            .InitializeTextFixture(
+            .InitializeUploadDataSetTestFixture(
                 _fixture,
                 _user,
                 dataSetName,
