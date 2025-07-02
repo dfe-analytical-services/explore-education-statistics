@@ -1256,7 +1256,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     replacementFile.ReplacingId = null;
 
                     await contentDbContext.SaveChangesAsync();
-                    // removeApiVersion is set to false here as we shouldn't delete the previous API version for the original data file being replaced, we only create new patch versions. 
+
                     return await releaseVersionService.RemoveDataFiles(
                         releaseVersionId: releaseVersionId,
                         fileId: originalFileId);

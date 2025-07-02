@@ -617,20 +617,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         }
 
 
-        private void ValidateDataFilesAndApi(bool publishedFile,
-            DataSetVersionStatus? versionStatus,
-            bool fileReplacedByIdIsNull,
-            bool fileReplacingIsNull)
+        private async Task<Either<ActionResult, Unit>>  ValidateDataFilesStatus(ReleaseFile releaseFile)
         {
-            var datasetVersionStatusIsPublished = versionStatus == DataSetVersionStatus.Published;
-            var draftReleaseFile = !publishedFile;
+            var dataSetVersionStatus = await GetDataSetVersionStatus(releaseFile);
+            var fileExistsInPublishedReleaseVersion = await context.ReleaseFiles
+                .Include(rf => rf.ReleaseVersion)
+                .AnyAsync(rf => rf.FileId == releaseFile.File.Id &&
+                                rf.ReleaseVersion.Published != null);
+            var datasetVersionStatusIsPublished = DataSetVersionAuthExtensions.PublicStatuses.Any(status => status == dataSetVersionStatus);
+            var draftReleaseFile = !fileExistsInPublishedReleaseVersion;
 
-            if (!fileReplacedByIdIsNull)
+            if (releaseFile.File.ReplacedById is not null && releaseFile.PublicApiDataSetId is not null)
             {
-                throw new InvalidOperationException(
-                    "This must be an original file linked to a replacement. You MUST cancel the replacement first.");
+                return ValidationUtils.ValidationResult(new ErrorViewModel
+                {
+                    Code = ValidationMessages.ReleaseFileMustBeOriginal.Code,
+                    Message = ValidationMessages.ReleaseFileMustBeOriginal.Message,
+                });
             }
-            if (!fileReplacingIsNull && !draftReleaseFile)
+            if (releaseFile.File.ReplacingId is not null && !draftReleaseFile)
             {
                 throw new InvalidOperationException(
                     "A replacement file for a DRAFT release version cannot also be a PUBLISHED file.");
@@ -638,8 +643,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             if (datasetVersionStatusIsPublished && draftReleaseFile)
             {
                 throw new InvalidOperationException(
-                    "A DRAFT file cannot be linked to a PUBLISHED API.");
+                    "A DRAFT release version's file cannot be linked to a PUBLISHED API.");
             }
+            
+            return Unit.Instance;
         }
         public async Task<Either<ActionResult, Unit>> RemoveDataFiles(Guid releaseVersionId, Guid fileId)
         {
@@ -648,6 +655,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(userService.CheckCanUpdateReleaseVersion)
                 .OnSuccess(() => CheckReleaseDataFileExists(releaseVersionId: releaseVersionId, fileId: fileId))
                 .OnSuccessDo(releaseFile => CheckCanDeleteDataFiles(releaseVersionId, releaseFile))
+                .OnSuccessDo(ValidateDataFilesStatus)
                 .OnSuccessDo(async releaseFile =>
                 {
                     // Delete any replacement that might exist
@@ -811,22 +819,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             {
                 return ValidationActionResult(CannotRemoveDataFilesOnceReleaseApproved);
             }
-            
-            var publishedFile = 
-                releaseFile.Published is not null || await context.ReleaseFiles
-                    .AnyAsync(rf => 
-                        rf.ReleaseVersionId != releaseVersionId &&
-                        rf.FileId == releaseFile.File.Id &&
-                        rf.Published != null);
-            
-            var status = await GetDataSetVersionStatus(releaseFile);
-            
-            ValidateDataFilesAndApi(
-                publishedFile: publishedFile,
-                versionStatus: status,
-                fileReplacedByIdIsNull: releaseFile.File.ReplacedById == null,
-                fileReplacingIsNull: releaseFile.File.ReplacingId == null);
 
+            if (!featureFlags.Value.EnableReplacementOfPublicApiDataSets && releaseFile.PublicApiDataSetId is not null)
+            {
+                return ValidationUtils.ValidationResult(new ErrorViewModel
+                {
+                    Code = ValidationMessages.CannotDeleteApiDataSetReleaseFile.Code,
+                    Message = ValidationMessages.CannotDeleteApiDataSetReleaseFile.Message,
+                    Detail = new ApiDataSetErrorDetail(releaseFile.PublicApiDataSetId.Value)
+                });
+            }
             return Unit.Instance;
         }
         

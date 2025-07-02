@@ -39,6 +39,11 @@ public static class ValidationMessages
         Code: nameof(DataSetVersionMappingResultedInMajorChange),
         Message: "The data file uploaded has incomplete sections or has resulted in a major version update which is not allowed in release amendments."
     );
+    
+    public static readonly LocalizableMessage ReleaseFileMustBeOriginal = new(
+        Code: nameof(ReleaseFileMustBeOriginal),
+        Message: "This must be an original file linked to a replacement. You MUST cancel the replacement first."
+    );
 
     public static readonly LocalizableMessage DataSetVersionMappingCandidatePathDoesNotExist = new(
         Code: nameof(DataSetVersionMappingCandidatePathDoesNotExist),
