@@ -51,12 +51,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 {
                     var publicationRoles = await context
                         .UserPublicationRoles
-                        .IgnoreQueryFilters()
                         .Include(upr => upr.User)
                         .Where(upr =>
                             upr.PublicationId == releaseVersion.Release.PublicationId
-                            && upr.Deleted == null
-                            && upr.Role != PublicationRole.Approver)
+                            && upr.Deleted == null)
                         .ToListAsync();
 
                     return publicationRoles

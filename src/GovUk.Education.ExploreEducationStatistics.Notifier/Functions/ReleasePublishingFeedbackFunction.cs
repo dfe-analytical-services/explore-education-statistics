@@ -75,13 +75,17 @@ public class ReleasePublishingFeedbackFunction(
         {
             PublicationRole.Owner => "an owner",
             PublicationRole.Allower => "an approver",
-            PublicationRole.Drafter => "a drafter",
+            
             // Note that this function should never be invoked for PublicationRole.Approver
-            // because Publisher is explicitly filtering these out until the permissions
-            // simplification work has been completed.
+            // or PublicationRole.Drafter currently, because Publisher is filtering
+            // these out until the permissions simplification work has been completed.
+            PublicationRole.Drafter => throw new ArgumentException(
+                $"{nameof(ReleasePublishingFeedbackFunction)} should not " +
+                $"have been called for {nameof(PublicationRole.Drafter)}"),
             PublicationRole.Approver => throw new ArgumentException(
                 $"{nameof(ReleasePublishingFeedbackFunction)} should not " +
                 $"have been called for {nameof(PublicationRole.Approver)}"),
+            
             _ => throw new ArgumentOutOfRangeException(nameof(role), role, null)
         };
     }

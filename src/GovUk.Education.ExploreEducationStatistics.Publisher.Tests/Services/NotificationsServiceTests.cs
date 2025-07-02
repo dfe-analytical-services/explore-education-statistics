@@ -146,14 +146,11 @@ public abstract class NotificationsServiceTests
                     .SetRole(PublicationRole.Owner)
                     .SetUser(new User { Email = "affected-publication-owner@example.com" }))
                 .ForIndex(1, s => s
-                    .SetRole(PublicationRole.Drafter)
-                    .SetUser(new User { Email = "affected-publication-drafter1@example.com" }))
-                .ForIndex(2, s => s
-                    .SetRole(PublicationRole.Drafter)
-                    .SetUser(new User { Email = "affected-publication-drafter2@example.com" }))
-                .ForIndex(3, s => s
                     .SetRole(PublicationRole.Allower)
-                    .SetUser(new User { Email = "affected-publication-approver@example.com" }))
+                    .SetUser(new User { Email = "affected-publication-approver1@example.com" }))
+                .ForIndex(2, s => s
+                    .SetRole(PublicationRole.Allower)
+                    .SetUser(new User { Email = "affected-publication-approver2@example.com" }))
                 .GenerateList();
 
             var otherPublicationTeam = _dataFixture
@@ -199,7 +196,7 @@ public abstract class NotificationsServiceTests
                     .ReleasePublishingFeedback
                     .ToList();
 
-                Assert.Equal(4, feedbackEntries.Count);
+                Assert.Equal(3, feedbackEntries.Count);
 
                 var ownerFeedbackEntry = feedbackEntries
                     .Single(f => f.UserPublicationRole == PublicationRole.Owner);
@@ -209,27 +206,19 @@ public abstract class NotificationsServiceTests
                     expectedReleaseVersionId: releaseVersionBeingPublished.Id,
                     expectedRole: PublicationRole.Owner);
                 
-                var drafter1FeedbackEntry = feedbackEntries
-                    .First(f => f.UserPublicationRole == PublicationRole.Drafter);
-
+                var approverFeedbackEntry1 = feedbackEntries
+                    .First(f => f.UserPublicationRole == PublicationRole.Allower);
+                
                 AssertNewFeedbackRecordCreatedOk(
-                    feedbackEntry: drafter1FeedbackEntry,
+                    feedbackEntry: approverFeedbackEntry1,
                     expectedReleaseVersionId: releaseVersionBeingPublished.Id,
-                    expectedRole: PublicationRole.Drafter);
+                    expectedRole: PublicationRole.Allower);
                 
-                var drafter2FeedbackEntry = feedbackEntries
-                    .Last(f => f.UserPublicationRole == PublicationRole.Drafter);
-                
-                AssertNewFeedbackRecordCreatedOk(
-                    feedbackEntry: drafter2FeedbackEntry,
-                    expectedReleaseVersionId: releaseVersionBeingPublished.Id,
-                    expectedRole: PublicationRole.Drafter);
-
-                var approverFeedbackEntry = feedbackEntries
-                    .Single(f => f.UserPublicationRole == PublicationRole.Allower);
+                var approverFeedbackEntry2 = feedbackEntries
+                    .Last(f => f.UserPublicationRole == PublicationRole.Allower);
                 
                 AssertNewFeedbackRecordCreatedOk(
-                    feedbackEntry: approverFeedbackEntry,
+                    feedbackEntry: approverFeedbackEntry2,
                     expectedReleaseVersionId: releaseVersionBeingPublished.Id,
                     expectedRole: PublicationRole.Allower);
 
@@ -238,12 +227,10 @@ public abstract class NotificationsServiceTests
                         {
                             new(ownerFeedbackEntry.Id,
                                 "affected-publication-owner@example.com"),
-                            new(drafter1FeedbackEntry.Id,
-                                "affected-publication-drafter1@example.com"),
-                            new(drafter2FeedbackEntry.Id,
-                                "affected-publication-drafter2@example.com"),
-                            new(approverFeedbackEntry.Id,
-                                "affected-publication-approver@example.com")
+                            new(approverFeedbackEntry1.Id,
+                                "affected-publication-approver1@example.com"),
+                            new(approverFeedbackEntry2.Id,
+                                "affected-publication-approver2@example.com")
                         },
                         CancellationToken.None),
                     Times.Once);
@@ -392,7 +379,7 @@ public abstract class NotificationsServiceTests
         }
         
         [Fact]
-        public async Task OldApproverRoleUsed_NoEmailSent()
+        public async Task OldApproverRoleAndDrafterRole_NoEmailsSent()
         {
             var publication = _dataFixture
                 .DefaultPublication()
@@ -401,11 +388,15 @@ public abstract class NotificationsServiceTests
                     .Generate(1))
                 .Generate();
 
-            var publicationOwner = _dataFixture
+            var filteredOutPublicationRoles = _dataFixture
                 .DefaultUserPublicationRole()
                 .WithPublication(publication)
-                .WithRole(PublicationRole.Approver)
-                .WithUser(new User { Email = "publication-old-approver@example.com" })
+                .ForIndex(0, s => s
+                    .SetRole(PublicationRole.Approver)
+                    .SetUser(new User { Email = "affected-publication-old-approver@example.com" }))
+                .ForIndex(1, s => s
+                    .SetRole(PublicationRole.Drafter)
+                    .SetUser(new User { Email = "affected-publication-drafter@example.com" }))
                 .Generate();
 
             var contentDbContextId = Guid.NewGuid().ToString();
@@ -413,7 +404,7 @@ public abstract class NotificationsServiceTests
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
                 contentDbContext.Publications.AddRange(publication);
-                contentDbContext.UserPublicationRoles.AddRange(publicationOwner);
+                contentDbContext.UserPublicationRoles.AddRange(filteredOutPublicationRoles);
                 await contentDbContext.SaveChangesAsync();
             }
 
