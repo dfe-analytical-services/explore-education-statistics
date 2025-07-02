@@ -2,6 +2,7 @@
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
+using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Threading;
@@ -39,6 +40,12 @@ public interface IDataSetFileStorage
     Task<List<DataSetUpload>> UploadDataSetsToTemporaryStorage(
         Guid releaseVersionId,
         List<DataSet> dataSets,
+        CancellationToken cancellationToken);
+
+    Task<Either<ActionResult, FileStreamResult>> RetrieveDataSetFileFromTemporaryStorage(
+        Guid releaseVersionId,
+        Guid dataSetUploadId,
+        FileType fileType,
         CancellationToken cancellationToken);
 
     /// <summary>

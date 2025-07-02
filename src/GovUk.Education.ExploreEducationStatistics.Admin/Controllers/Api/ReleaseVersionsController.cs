@@ -1,5 +1,6 @@
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
@@ -29,6 +30,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         private readonly IReleaseChecklistService _releaseChecklistService;
         private readonly IDataImportService _dataImportService;
         private readonly IDataSetUploadRepository _dataSetUploadRepository;
+        private readonly IDataSetFileStorage _dataSetFileStorage;
 
         public ReleaseVersionsController(
             IReleaseVersionService releaseVersionService,
@@ -38,7 +40,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             IReleasePublishingStatusService releasePublishingStatusService,
             IReleaseChecklistService releaseChecklistService,
             IDataImportService dataImportService,
-            IDataSetUploadRepository dataSetUploadRepository)
+            IDataSetUploadRepository dataSetUploadRepository,
+            IDataSetFileStorage dataSetFileStorage)
         {
             _releaseVersionService = releaseVersionService;
             _releaseAmendmentService = releaseAmendmentService;
@@ -48,6 +51,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             _releaseChecklistService = releaseChecklistService;
             _dataImportService = dataImportService;
             _dataSetUploadRepository = dataSetUploadRepository;
+            _dataSetFileStorage = dataSetFileStorage;
         }
 
         // We intend to change this route, to make these endpoints more consistent, as per EES-5895
@@ -76,6 +80,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             return await _releaseDataFileService
                 .GetInfo(releaseVersionId, fileId)
                 .HandleFailuresOrOk();
+        }
+
+        [HttpGet("releaseVersions/{releaseVersionId:guid}/{fileType}/{dataSetUploadId:guid}/download")]
+        public async Task<ActionResult> GetDataSetUploadFile(
+            Guid releaseVersionId,
+            FileType fileType,
+            Guid dataSetUploadId,
+            CancellationToken cancellationToken)
+        {
+            return await _dataSetFileStorage
+                .RetrieveDataSetFileFromTemporaryStorage(releaseVersionId, dataSetUploadId, fileType, cancellationToken)
+                .HandleFailures();
         }
 
         // We intend to change this route, to make these endpoints more consistent, as per EES-5895

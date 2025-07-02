@@ -196,7 +196,10 @@ export default function DataFilesTableUploadRow({
               >
                 {hasFailures && failuresNoticeMessage}
                 {hasWarnings && !hasFailures && warningsNoticeMessage}
-                <DataSetUploadSummaryList dataSetUpload={dataSetUpload} />
+                <DataSetUploadSummaryList
+                  releaseVersionId={releaseVersionId}
+                  dataSetUpload={dataSetUpload}
+                />
               </TabsSection>
             </Tabs>
           </ModalConfirm>
