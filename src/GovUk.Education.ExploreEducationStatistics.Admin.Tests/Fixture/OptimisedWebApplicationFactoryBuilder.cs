@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Database;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Public.Data;
+using GovUk.Education.ExploreEducationStatistics.Common.Database;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
@@ -42,7 +43,7 @@ public class OptimisedWebApplicationFactoryBuilder<TStartup>(
 {
     private readonly List<Action<IServiceCollection>> _serviceRegistrations = [];
     private readonly List<Action<IConfigurationBuilder>> _configRegistrations = [];
-    
+
     public WebApplicationFactory<TStartup> Build()
     {
         return factory.WithWebHostBuilder(builder =>
@@ -156,13 +157,29 @@ public class OptimisedWebApplicationFactoryBuilder<TStartup>(
             services.Remove(descriptor);
         }
 
-        services.AddDbContext<PublicDataDbContext>(
-            options => options.UseNpgsql(connectionString));
+        var schemaInitializer = new OptimisedTestSchemaInitialiser(connectionString);
+        schemaInitializer.InitializeAsync().Wait();
+        
+        // var options = new DbContextOptionsBuilder<PublicDataDbContext>()
+        //     .UseNpgsql(connectionString)
+        //     .Options;
 
+        // var publicDataDbContext = new PublicDataDbContext(options, true, _schemaInitializer.SchemaName);
+        
+        services.AddDbContext<PublicDataDbContext>(
+            options => options
+                .UseNpgsql(connectionString, options => options.
+            MigrationsHistoryTable("__EFMigrationsHistory", schemaInitializer.SchemaName)));
+
+        // services.ReplaceService(publicDataDbContext);
+        
+        services.AddScoped<ISchemaNameProvider>(_ => new SchemaNameProvider(schemaInitializer.SchemaName));
+
+        
         using var serviceScope = services.BuildServiceProvider()
             .GetRequiredService<IServiceScopeFactory>()
             .CreateScope();
-
+        
         using var context = serviceScope.ServiceProvider.GetRequiredService<PublicDataDbContext>();
         context.Database.Migrate();
     }

@@ -1,4 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
+using GovUk.Education.ExploreEducationStatistics.Common.Database;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using Microsoft.EntityFrameworkCore;
 
@@ -13,8 +14,9 @@ public class PublicDataDbContext : DbContext
     public const string IndicatorMetasIdSequence = "IndicatorMetas_Id_seq";
     public const string LocationOptionMetasIdSequence = "LocationOptionMetas_Id_seq";
 
-    public PublicDataDbContext()
+    public PublicDataDbContext(ISchemaNameProvider schemaNameNameProvider)
     {
+        SchemaName = schemaNameNameProvider.SchemaName;
         // We intentionally don't run `Configure` here as Moq would call this constructor, and we'd immediately get
         // a MockException from interacting with its fields e.g. from adding events listeners to `ChangeTracker`.
         // We can just rely on the variant which takes options instead as this is what gets used in real application
@@ -22,10 +24,15 @@ public class PublicDataDbContext : DbContext
     }
 
     public PublicDataDbContext(
-        DbContextOptions<PublicDataDbContext> options, bool updateTimestamps = true) : base(options)
+        DbContextOptions<PublicDataDbContext> options,
+        ISchemaNameProvider schemaNameNameProvider,
+        bool updateTimestamps = true) : base(options)
     {
+        SchemaName = schemaNameNameProvider.SchemaName;
         Configure(updateTimestamps: updateTimestamps);
     }
+    
+    public string SchemaName { get; init; }
 
     private void Configure(bool updateTimestamps = true)
     {
@@ -40,20 +47,25 @@ public class PublicDataDbContext : DbContext
     {
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(PublicDataDbContext).Assembly);
 
-        modelBuilder.HasSequence<int>(FilterOptionMetaLinkSequence);
+        modelBuilder.HasSequence<int>(FilterOptionMetaLinkSequence, SchemaName);
+        
+        foreach (var entity in modelBuilder.Model.GetEntityTypes())
+        {
+            entity.SetSchema(SchemaName);
+        }
     }
 
     [SuppressMessage("Security", "EF1002:Risk of vulnerability to SQL injection.")]
     public Task<int> NextSequenceValue(string sequenceName, CancellationToken cancellationToken = default) =>
         Database.SqlQueryRaw<int>($"""
-                                   SELECT nextval('public."{sequenceName}"') AS "Value"
+                                   SELECT nextval('${SchemaName}."{sequenceName}"') AS "Value"
                                    """)
             .FirstAsync(cancellationToken);
 
     [SuppressMessage("Security", "EF1002:Risk of vulnerability to SQL injection.")]
     public Task<int> SetSequenceValue(string sequenceName, long value, CancellationToken cancellationToken = default) =>
         Database.SqlQueryRaw<int>($"""
-                                   SELECT setval('public."{sequenceName}"', {value}) AS "Value"
+                                   SELECT setval('${SchemaName}."{sequenceName}"', {value}) AS "Value"
                                    """)
             .FirstAsync(cancellationToken);
 

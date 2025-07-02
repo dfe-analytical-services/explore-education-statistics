@@ -28,12 +28,4 @@ public class OptimisedPostgreSqlContainerUtil
     {
         await _postgreSqlContainer.StopAsync();
     }
-
-    public PublicDataDbContext GetPublicDataDbContext()
-    {
-        var services = new ServiceCollection();
-        services.AddDbContext<PublicDataDbContext>(
-            options => options.UseNpgsql(_postgreSqlContainer.GetConnectionString()));
-        return services.BuildServiceProvider().GetRequiredService<PublicDataDbContext>();
-    }
 }

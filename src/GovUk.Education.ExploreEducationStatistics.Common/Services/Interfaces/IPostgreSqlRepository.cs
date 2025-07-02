@@ -16,6 +16,7 @@ public interface IPostgreSqlRepository
     /// </summary>
     Task<bool> KeyExistsAtJsonbPath<TDbContext, TRowId>(
         TDbContext context,
+        string schemaName,
         JsonbPathRequest<TRowId> request,
         string keyValue,
         CancellationToken cancellationToken = default)
@@ -27,6 +28,7 @@ public interface IPostgreSqlRepository
     /// </summary>
     Task<TResponse?> GetJsonbFromPath<TDbContext, TRowId, TResponse>(
         TDbContext context,
+        string schemaName,
         JsonbPathRequest<TRowId> request,
         CancellationToken cancellationToken = default)
         where TDbContext : DbContext
@@ -38,6 +40,7 @@ public interface IPostgreSqlRepository
     /// </summary>
     Task<TValue?> SetJsonbAtPath<TDbContext, TValue, TRowId>(
         TDbContext context,
+        string schemaName,
         JsonbPathRequest<TRowId> request,
         TValue? value,
         CancellationToken cancellationToken = default)
@@ -54,6 +57,7 @@ public interface IPostgreSqlRepository
     /// </summary>
     Task<Either<TFailure, TValue?>> UpdateJsonbAtPath<TDbContext, TValue, TRowId, TFailure>(
         TDbContext context,
+        string schemaName,
         JsonbPathRequest<TRowId> request,
         Func<TValue?, Task<Either<TFailure, TValue?>>> updateValueFn,
         CancellationToken cancellationToken = default)

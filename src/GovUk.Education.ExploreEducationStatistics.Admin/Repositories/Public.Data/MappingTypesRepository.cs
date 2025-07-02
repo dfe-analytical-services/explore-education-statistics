@@ -33,7 +33,7 @@ public class MappingTypesRepository(PublicDataDbContext context) : IMappingTypes
                        END "{{{nameof(LocationMappingTypes.LocationLevelRaw)}}}",
                        OptionMappingType "{{{nameof(LocationMappingTypes.LocationOptionRaw)}}}"
                    FROM
-                       "{{{nameof(PublicDataDbContext.DataSetVersionMappings)}}}" Mapping,
+                       "{{{context.SchemaName}}}"."{{{nameof(PublicDataDbContext.DataSetVersionMappings)}}}" Mapping,
                        jsonb_each(Mapping."{{{nameof(DataSetVersionMapping.LocationMappingPlan)}}}"
                                     -> '{{{nameof(LocationMappingPlan.Levels)}}}') Level,
                        jsonb_each(Level.value -> '{{{nameof(LocationLevelMappings.Mappings)}}}') OptionMapping,
@@ -57,7 +57,7 @@ public class MappingTypesRepository(PublicDataDbContext context) : IMappingTypes
                      FilterMappingType "{nameof(FilterMappingTypes.FilterRaw)}", 
                      OptionMappingType "{nameof(FilterMappingTypes.FilterOptionRaw)}" 
                  FROM 
-                     "{nameof(PublicDataDbContext.DataSetVersionMappings)}" Mapping,
+                     "{context.SchemaName}"."{nameof(PublicDataDbContext.DataSetVersionMappings)}" Mapping,
                      jsonb_each(Mapping."{nameof(DataSetVersionMapping.FilterMappingPlan)}" 
                                     -> '{nameof(FilterMappingPlan.Mappings)}') FilterMapping,
                      jsonb_each(FilterMapping.value -> '{nameof(FilterMapping.OptionMappings)}') OptionMapping,

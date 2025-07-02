@@ -11,9 +11,9 @@ using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Secu
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
-using Moq.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Moq;
+using Moq.EntityFrameworkCore;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services;

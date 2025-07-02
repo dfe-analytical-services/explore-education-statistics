@@ -10,6 +10,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Publi
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Public.Data;
+using GovUk.Education.ExploreEducationStatistics.Common.Database;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Options;
@@ -480,6 +481,7 @@ public class DataSetVersionMappingService(
                     return await postgreSqlRepository
                         .GetJsonbFromPath<PublicDataDbContext, Guid, string>(
                             context: publicDataDbContext,
+                            schemaName: publicDataDbContext.SchemaName,
                             request: candidateKeyPath,
                             cancellationToken: cancellationToken);
                 },
@@ -547,6 +549,7 @@ public class DataSetVersionMappingService(
         var candidateExists = await postgreSqlRepository
             .KeyExistsAtJsonbPath(
                 publicDataDbContext,
+                publicDataDbContext.SchemaName,
                 jsonRequest,
                 candidateKey,
                 cancellationToken: cancellationToken);
@@ -592,6 +595,7 @@ public class DataSetVersionMappingService(
         return await postgreSqlRepository
             .UpdateJsonbAtPath(
                 publicDataDbContext,
+                schemaName: publicDataDbContext.SchemaName,
                 updateJsonRequest,
                 (TMapping? mapping) => Task.FromResult(mapping is not null
                     ? mapping with
