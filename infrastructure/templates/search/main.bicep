@@ -23,23 +23,17 @@ param resourceTags {
 @description('Tagging : Date Provisioned. Used for tagging resources created by this infrastructure pipeline.')
 param dateProvisioned string = utcNow('u')
 
-@description('Whether to deploy the Search service configuration to create/update the data source, index and indexer.')
-param deploySearchConfig bool = false
-
 @description('The URL of the Content API.')
 param contentApiUrl string
-
-@description('The URL of the Public site.')
-param publicSiteUrl string
 
 @description('Specifies whether or not the Search Docs Function App already exists.')
 param searchDocsFunctionAppExists bool = true
 
+@description('Specifies the name of the Azure AI Search indexer.')
+param searchServiceIndexerName string
+
 @description('Provides access to resources for specific IP address ranges used for service maintenance.')
 param maintenanceIpRanges IpRange[] = []
-
-@description('The branch, tag or commit of the source code from which the deployment is triggered.')
-param githubSourceRef string = 'refs/heads/dev'
 
 var tagValues = union(resourceTags ?? {}, {
   Environment: environmentName
@@ -127,7 +121,7 @@ module searchDocsFunctionAppModule 'application/searchDocsFunctionApp.bicep' = {
       maintenanceFirewallRules
     )
     logAnalyticsWorkspaceId: monitoringModule.outputs.logAnalyticsWorkspaceId
-    searchServiceIndexerName: searchServiceModule.outputs.searchServiceIndexerName
+    searchServiceIndexerName: searchServiceIndexerName
     searchServiceName: searchServiceModule.outputs.searchServiceName
     searchStorageAccountName: searchServiceModule.outputs.searchStorageAccountName
     searchStorageAccountConnectionStringSecretName: searchServiceModule.outputs.searchStorageAccountConnectionStringSecretName
@@ -154,14 +148,10 @@ module searchServiceModule 'application/searchService.bicep' = {
   name: 'searchServiceApplicationModuleDeploy'
   params: {
     location: location
-    githubSourceRef: githubSourceRef
-    indexName: 'index-1'
-    publicSiteUrl: publicSiteUrl
     resourceNames: resourceNames
     resourcePrefix: resourcePrefix
     searchServiceIpRules: [] // No restrictions applied as the resource is intended to be publicly accessible.
     storageIpRules: maintenanceIpRanges
-    deploySearchConfig: deploySearchConfig
     tagValues: tagValues
   }
 }

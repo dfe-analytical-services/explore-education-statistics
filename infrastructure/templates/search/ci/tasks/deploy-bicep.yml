@@ -11,13 +11,11 @@ parameters:
     type: string
   - name: parameterFile
     type: string
-  - name: deploySearchConfig
-    type: string
-  - name: githubSourceRef
-    type: string
   - name: searchDocsFunctionAppExists
     type: string
     default: true
+  - name: searchServiceIndexerName
+    type: string
 
 steps:
   - task: AzureCLI@2
@@ -42,7 +40,6 @@ steps:
           --parameters \
               subscription='$(subscription)' \
               resourceTags='$(resourceTags)' \
+              searchServiceIndexerName=${{ parameters.searchServiceIndexerName }} \
               maintenanceIpRanges='$(maintenanceFirewallRules)' \
-              deploySearchConfig=${{ parameters.deploySearchConfig }} \
-              githubSourceRef=${{ parameters.githubSourceRef }} \
               searchDocsFunctionAppExists=${{ parameters.searchDocsFunctionAppExists }}
