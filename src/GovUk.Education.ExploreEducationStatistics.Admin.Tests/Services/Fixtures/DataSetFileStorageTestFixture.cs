@@ -27,7 +27,7 @@ using ReleaseVersion = GovUk.Education.ExploreEducationStatistics.Content.Model.
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Fixtures;
 
-public class UploadDataSetTestFixture
+public class DataSetFileStorageTestFixture
 {
     public Mock<IDataImportService> DataImportService { get; set; }
     public Mock<IReleaseVersionRepository> ReleaseVersionRepository { get; set; }
@@ -45,7 +45,7 @@ public class UploadDataSetTestFixture
     private Guid SubjectId { get; init; }
     public string ContentDbContextId { get; set; } = null!;
 
-    private UploadDataSetTestFixture(
+    private DataSetFileStorageTestFixture(
         Mock<IDataImportService>? dataImportService = null,
         Mock<IReleaseVersionRepository>? releaseVersionRepository = null,
         Mock<IReleaseDataFileRepository>? releaseDataFileRepository = null,
@@ -61,7 +61,7 @@ public class UploadDataSetTestFixture
         DataSetService = dataSetService ?? new Mock<IDataSetService>(Strict);
     }
 
-    public static async Task<UploadDataSetTestFixture> InitializeUploadDataSetTestFixture(
+    public static async Task<DataSetFileStorageTestFixture> InitializeUploadDataSetTestFixture(
         DataFixture fixture,
         User user,
         string dataSetName,
@@ -72,7 +72,7 @@ public class UploadDataSetTestFixture
         SemVersion version,
         bool isPublished = false)
     {
-        var testFixture = new UploadDataSetTestFixture
+        var testFixture = new DataSetFileStorageTestFixture
         {
             DataImportService = new Mock<IDataImportService>(Strict),
             ReleaseVersionRepository = new Mock<IReleaseVersionRepository>(Strict),

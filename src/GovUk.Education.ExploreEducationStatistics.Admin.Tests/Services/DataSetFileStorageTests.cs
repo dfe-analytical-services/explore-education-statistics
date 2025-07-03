@@ -879,7 +879,7 @@ public class DataSetFileStorageTests
         Assert.Equal(QUEUED, uploadSummary.Status);
     }
 
-    private async Task<UploadDataSetTestFixture> SetupTestFixture(
+    private async Task<DataSetFileStorageTestFixture> SetupTestFixture(
         string dataSetName,
         string dataFileName,
         string metaFileName,
@@ -887,7 +887,7 @@ public class DataSetFileStorageTests
         Guid contentDbContextId,
         SemVersion version,
         bool isPublished = false) =>
-        await UploadDataSetTestFixture
+        await DataSetFileStorageTestFixture
             .InitializeUploadDataSetTestFixture(
                 _fixture,
                 _user,
@@ -900,7 +900,7 @@ public class DataSetFileStorageTests
                 isPublished);
 
     private DataSetFileStorage CreateServiceForApiPatchReplacement(
-        UploadDataSetTestFixture setTestFixture, 
+        DataSetFileStorageTestFixture fileStorageTestFixture, 
         ContentDbContext contentDbContext)
     {
         var featureFlagOptions = Microsoft.Extensions.Options.Options.Create(new FeatureFlagsOptions
@@ -910,13 +910,13 @@ public class DataSetFileStorageTests
 
         return SetupReleaseDataFileService(
             contentDbContext: contentDbContext,
-            privateBlobStorageService: setTestFixture.PrivateBlobStorageService.Object,
-            dataImportService: setTestFixture.DataImportService.Object,
-            releaseVersionRepository: setTestFixture.ReleaseVersionRepository.Object,
-            releaseDataFileRepository: setTestFixture.ReleaseDataFileRepository.Object,
+            privateBlobStorageService: fileStorageTestFixture.PrivateBlobStorageService.Object,
+            dataImportService: fileStorageTestFixture.DataImportService.Object,
+            releaseVersionRepository: fileStorageTestFixture.ReleaseVersionRepository.Object,
+            releaseDataFileRepository: fileStorageTestFixture.ReleaseDataFileRepository.Object,
             featureFlags: featureFlagOptions,
-            dataSetVersionService: setTestFixture.DataSetVersionService.Object,
-            dataSetService: setTestFixture.DataSetService.Object,
+            dataSetVersionService: fileStorageTestFixture.DataSetVersionService.Object,
+            dataSetService: fileStorageTestFixture.DataSetService.Object,
             addDefaultUser: false
         );
     }
