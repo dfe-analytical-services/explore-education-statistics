@@ -24,6 +24,7 @@ describe('SearchFormAzure', () => {
     expect(screen.getByRole('combobox')).toBeInTheDocument();
     expect(screen.getByRole('combobox')).toHaveAttribute('type', 'search');
     expect(screen.getByRole('button', { name: 'Search' })).toBeInTheDocument();
+    // N.b checking by 'not.toBeVisible' doesn't work as Jest isn't loading the global CSS
     expect(screen.getByRole('listbox')).toHaveClass(
       'autocomplete__menu--hidden',
     );
