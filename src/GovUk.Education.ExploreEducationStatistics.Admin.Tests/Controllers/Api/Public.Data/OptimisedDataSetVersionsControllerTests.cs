@@ -34,37 +34,40 @@ using ValidationMessages = GovUk.Education.ExploreEducationStatistics.Admin.Vali
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api.Public.Data;
 
-[Collection(nameof(OptimisedHttpClientWithPsqlFixture2))]
-public abstract class OptimisedDataSetVersionsControllerTests(
-    OptimisedHttpClientWithPsqlFixture2 fixture,
-    ITestOutputHelper output) : IAsyncLifetime
+public abstract class OptimisedDataSetVersionsControllerTests(ITestOutputHelper output) : IAsyncLifetime
 {
     private const string BaseUrl = "api/public-data/data-set-versions";
     private readonly DataFixture _dataFixture = new();
+    private OptimisedHttpClientWithPsqlFixture _fixture = null!;
     
     public async Task InitializeAsync()
     {
         var sw = new Stopwatch();
         sw.Start();
 
-        await fixture.ClearTestData();
+        if (string.IsNullOrEmpty(OptimisedSharedPostgresContainer.Instance.ConnectionString))
+        {
+            await OptimisedSharedPostgresContainer.Instance.StartAsync();
+        }
+
+        _fixture = new OptimisedHttpClientWithPsqlFixture(OptimisedSharedPostgresContainer.Instance.ConnectionString);
+        
+        await _fixture.InitializeAsync();
+        await _fixture.ClearTestData();
 
         output.WriteLine($"Clear up test data {sw.ElapsedMilliseconds}");
         sw.Restart();
     }
 
-    public Task DisposeAsync()
+    public async Task DisposeAsync()
     {
-        return Task.CompletedTask;
+        await _fixture.DisposeAsync();
     }
 
     public class OptimisedGetVersionsTests(
-        OptimisedHttpClientWithPsqlFixture2 fixture,
         ITestOutputHelper output)
-        : OptimisedDataSetVersionsControllerTests(fixture, output)
+        : OptimisedDataSetVersionsControllerTests(output)
     {
-        private readonly OptimisedHttpClientWithPsqlFixture2 _fixture = fixture;
-        
         [Theory]
         [MemberData(nameof(DataSetVersionStatusTheoryData.AvailableStatuses),
             MemberType = typeof(DataSetVersionStatusTheoryData))]
@@ -389,12 +392,9 @@ public abstract class OptimisedDataSetVersionsControllerTests(
     }
 
     public class GetDataSetVersionTests(
-        OptimisedHttpClientWithPsqlFixture2 fixture,
         ITestOutputHelper output)
-        : OptimisedDataSetVersionsControllerTests(fixture, output)
+        : OptimisedDataSetVersionsControllerTests(output)
     {
-        private readonly OptimisedHttpClientWithPsqlFixture2 _fixture = fixture;
-
         public static TheoryData<DataSetVersionStatus> AllDataSetVersionStatuses => new(EnumUtil.GetEnums<DataSetVersionStatus>());
     
         [Theory]
@@ -464,12 +464,9 @@ public abstract class OptimisedDataSetVersionsControllerTests(
     }
     
     public class CreateNextVersionTests(
-        OptimisedHttpClientWithPsqlFixture2 fixture,
         ITestOutputHelper output)
-        : OptimisedDataSetVersionsControllerTests(fixture, output)
+        : OptimisedDataSetVersionsControllerTests(output)
     {
-        private readonly OptimisedHttpClientWithPsqlFixture2 _fixture = fixture;
-
         [Fact]
         public async Task Success()
         {
@@ -598,12 +595,9 @@ public abstract class OptimisedDataSetVersionsControllerTests(
     }
     
     public class CompleteNextVersionTests(
-        OptimisedHttpClientWithPsqlFixture2 fixture,
         ITestOutputHelper output)
-        : OptimisedDataSetVersionsControllerTests(fixture, output)
+        : OptimisedDataSetVersionsControllerTests(output)
     {
-        private readonly OptimisedHttpClientWithPsqlFixture2 _fixture = fixture;
-
         [Fact]
         public async Task Success()
         {
@@ -710,12 +704,9 @@ public abstract class OptimisedDataSetVersionsControllerTests(
     }
     
     public class DeleteVersionTests(
-        OptimisedHttpClientWithPsqlFixture2 fixture,
         ITestOutputHelper output)
-        : OptimisedDataSetVersionsControllerTests(fixture, output)
+        : OptimisedDataSetVersionsControllerTests(output)
     {
-        private readonly OptimisedHttpClientWithPsqlFixture2 _fixture = fixture;
-
         [Fact]
         public async Task Success()
         {
@@ -887,12 +878,9 @@ public abstract class OptimisedDataSetVersionsControllerTests(
     }
     
     public class GetVersionChangesTests(
-        OptimisedHttpClientWithPsqlFixture2 fixture,
         ITestOutputHelper output)
-        : OptimisedDataSetVersionsControllerTests(fixture, output)
+        : OptimisedDataSetVersionsControllerTests(output)
     {
-        private readonly OptimisedHttpClientWithPsqlFixture2 _fixture = fixture;
-
         [Fact]
         public async Task Success_Returns200()
         {
@@ -1046,12 +1034,9 @@ public abstract class OptimisedDataSetVersionsControllerTests(
     }
     
     public class UpdateVersionTests(
-        OptimisedHttpClientWithPsqlFixture2 fixture,
         ITestOutputHelper output)
-        : OptimisedDataSetVersionsControllerTests(fixture, output)
+        : OptimisedDataSetVersionsControllerTests(output)
     {
-        private readonly OptimisedHttpClientWithPsqlFixture2 _fixture = fixture;
-
         [Theory]
         [MemberData(nameof(DataSetVersionStatusTheoryData.UpdateableStatuses),
             MemberType = typeof(DataSetVersionStatusTheoryData))]

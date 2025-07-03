@@ -116,9 +116,9 @@ public class OptimisedWebApplicationFactoryBuilder<TStartup>(
     }
     
     public OptimisedWebApplicationFactoryBuilder<TStartup> WithPostgres(
-        PostgreSqlContainer testContainer)
+        string connectionString)
     {
-        _serviceRegistrations.Add(services => RegisterPostgres(services, testContainer.GetConnectionString()));
+        _serviceRegistrations.Add(services => RegisterPostgres(services, connectionString));
         return this;
     }
     

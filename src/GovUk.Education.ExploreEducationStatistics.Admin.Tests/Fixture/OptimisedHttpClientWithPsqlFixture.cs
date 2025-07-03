@@ -14,10 +14,8 @@ using Moq;
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Fixture;
 
 // ReSharper disable once ClassNeverInstantiated.Global
-public class OptimisedHttpClientWithPsqlFixture : IAsyncLifetime
+public class OptimisedHttpClientWithPsqlFixture(string connectionString) : IAsyncLifetime
 {
-    private readonly OptimisedPostgreSqlContainerUtil _psql = new();
-    
     private WebApplicationFactory<Startup> _factory;
     private PublicDataDbContext _publicDataDbContext;
     private ContentDbContext _contentDbContext;
@@ -28,11 +26,9 @@ public class OptimisedHttpClientWithPsqlFixture : IAsyncLifetime
 
     public async Task InitializeAsync()
     {
-        await _psql.Start();
-            
         _factory = new TestWebApplicationFactory()
             .ConfigureAdmin()
-            .WithPostgres(_psql.GetContainer())
+            .WithPostgres(connectionString)
             .Build();
 
         _publicDataDbContext = _factory.Services.GetRequiredService<PublicDataDbContext>();
@@ -53,7 +49,6 @@ public class OptimisedHttpClientWithPsqlFixture : IAsyncLifetime
 
     public async Task DisposeAsync()
     {
-        await _psql.Stop();
         DisposeDbContexts();
     }
 
@@ -121,5 +116,3 @@ public class OptimisedHttpClientWithPsqlFixture : IAsyncLifetime
     
     private class TestWebApplicationFactory : WebApplicationFactory<Startup>;
 }
-
-public class OptimisedHttpClientWithPsqlFixture2 : OptimisedHttpClientWithPsqlFixture;
