@@ -729,7 +729,7 @@ public class DataSetFileStorageTests
     }
 
     [Fact]
-    public async Task UploadDataSet_ReplaceInitialDraft_ReturnsUploadSummary()
+    public async Task UploadDataSet_ReplaceInitialDraft_ApiDataSet_ReturnsUploadSummary()
     {
         // Arrange
         var dataSetName = "Test Data Set";
@@ -757,7 +757,7 @@ public class DataSetFileStorageTests
             Title = dataSetName, DataFile = dataSetFile, MetaFile = metaSetFile, ReplacingFile =testFixture.DataFileReplace
         };
           
-        var service = CreateService(testFixture, contentDbContext);
+        var service = CreateServiceForApiPatchReplacement(testFixture, contentDbContext);
 
         // Act
         var uploadSummary = await service.UploadDataSet(
@@ -773,7 +773,7 @@ public class DataSetFileStorageTests
     }
     
     [Fact]
-    public async Task UploadDataSet_ReplaceDraft_ReturnsUploadSummary()
+    public async Task UploadDataSet_ReplaceDraft_ApiDataSet_ReturnsUploadSummary()
     {
         // Arrange
         var dataSetName = "Test Data Set";
@@ -801,7 +801,7 @@ public class DataSetFileStorageTests
             Title = dataSetName, DataFile = dataSetFile, MetaFile = metaSetFile, ReplacingFile =testFixture.DataFileReplace
         };
           
-        var service = CreateService(testFixture, contentDbContext);
+        var service = CreateServiceForApiPatchReplacement(testFixture, contentDbContext);
 
         // Act
         var uploadSummary = await service.UploadDataSet(
@@ -817,7 +817,7 @@ public class DataSetFileStorageTests
     }
 
     [Fact]
-    public async Task UploadDataSet_ReplacePublishByPatch_ReturnsUploadSummary()
+    public async Task UploadDataSet_ReplacePublishedViaPatchApiDataSet_ReturnsUploadSummary()
     {
         // Arrange
         var dataSetName = "Test Data Set";
@@ -845,7 +845,7 @@ public class DataSetFileStorageTests
             Title = dataSetName, DataFile = dataSetFile, MetaFile = metaSetFile, ReplacingFile = testFixture.DataFileReplace
         };
           
-        var service = CreateService(testFixture, contentDbContext);
+        var service = CreateServiceForApiPatchReplacement(testFixture, contentDbContext);
 
         // Act
         var uploadSummary = await service.UploadDataSet(
@@ -899,7 +899,7 @@ public class DataSetFileStorageTests
                 version,
                 isPublished);
 
-    private DataSetFileStorage CreateService(
+    private DataSetFileStorage CreateServiceForApiPatchReplacement(
         UploadDataSetTestFixture setTestFixture, 
         ContentDbContext contentDbContext)
     {
