@@ -2,6 +2,7 @@
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using System;
 using System.ComponentModel.DataAnnotations;
+using FluentValidation;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 
@@ -24,4 +25,14 @@ public record PublicationCreateRequest
     }
 
     public Guid? SupersededById { get; set; }
+
+     public class Validator : AbstractValidator<PublicationCreateRequest>
+    {
+        public Validator()
+        {
+            RuleFor(request => request.Title)
+                .NotEmpty()
+                .MaximumLength(65);
+        }
+    }
 }

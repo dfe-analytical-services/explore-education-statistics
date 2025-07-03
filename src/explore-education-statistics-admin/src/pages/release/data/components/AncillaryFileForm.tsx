@@ -81,13 +81,13 @@ export default function AncillaryFileForm({
         })
         .max(
           titleMaxLength,
-          `Title must be ${titleMaxLength} characters or less`,
+          `Title must be ${titleMaxLength} characters or fewer`,
         ),
       summary: Yup.string()
         .required('Enter a summary')
         .max(
           summaryMaxLength,
-          `Summary must be ${summaryMaxLength} characters or less`,
+          `Summary must be ${summaryMaxLength} characters or fewer`,
         ),
       file: Yup.file()
         .minSize(0, 'Choose a file that is not empty')

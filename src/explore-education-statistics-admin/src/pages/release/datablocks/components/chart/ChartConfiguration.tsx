@@ -48,6 +48,9 @@ import React, {
 import { Path } from 'react-hook-form';
 import { ObjectSchema } from 'yup';
 
+const titleMaxLength = 220;
+const altTextMaxLength = 220;
+
 type FormValues = Partial<ChartOptions>;
 
 export const errorMappings = [
@@ -107,9 +110,6 @@ const ChartConfiguration = ({
     value: position,
   }));
 
-  const titleMaxLength = 220;
-  const altTextMaxLength = 220;
-
   const validationSchema = useMemo<ObjectSchema<FormValues>>(() => {
     let schema: ObjectSchema<FormValues> = Yup.object<FormValues>({
       titleType: Yup.mixed()
@@ -122,7 +122,7 @@ const ChartConfiguration = ({
             .required('Enter chart title')
             .max(
               titleMaxLength,
-              `Chart title must be ${titleMaxLength} characters or less`,
+              `Chart title must be ${titleMaxLength} characters or fewer`,
             ),
         otherwise: s => s.notRequired(),
       }),
@@ -130,7 +130,7 @@ const ChartConfiguration = ({
         .required('Enter chart alt text')
         .max(
           altTextMaxLength,
-          `Alt text must be ${altTextMaxLength} characters or less`,
+          `Alt text must be ${altTextMaxLength} characters or fewer`,
         )
         .test({
           name: 'noRepeatTitle',
@@ -148,7 +148,7 @@ const ChartConfiguration = ({
       width: Yup.number().positive('Chart width must be positive'),
       subtitle: Yup.string().max(
         160,
-        'Subtitle must be 160 characters or less',
+        'Subtitle must be 160 characters or fewer',
       ),
     });
 
