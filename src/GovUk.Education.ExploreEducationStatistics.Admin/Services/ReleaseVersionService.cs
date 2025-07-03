@@ -616,8 +616,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
-
-        private async Task<Either<ActionResult, Unit>>  ValidateDataFilesStatus(ReleaseFile releaseFile)
+        private async Task<Either<ActionResult, Unit>> ValidateDataFilesStatusForDeletion(ReleaseFile releaseFile)
         {
             var dataSetVersionStatus = await GetDataSetVersionStatus(releaseFile);
             var fileExistsInPublishedReleaseVersion = await context.ReleaseFiles
@@ -648,6 +647,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             
             return Unit.Instance;
         }
+
         public async Task<Either<ActionResult, Unit>> RemoveDataFiles(Guid releaseVersionId, Guid fileId)
         {
             return await context.ReleaseVersions
@@ -655,7 +655,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(userService.CheckCanUpdateReleaseVersion)
                 .OnSuccess(() => CheckReleaseDataFileExists(releaseVersionId: releaseVersionId, fileId: fileId))
                 .OnSuccessDo(releaseFile => CheckCanDeleteDataFiles(releaseVersionId, releaseFile))
-                .OnSuccessDo(ValidateDataFilesStatus)
+                .OnSuccessDo(ValidateDataFilesStatusForDeletion)
                 .OnSuccessDo(async releaseFile =>
                 {
                     // Delete any replacement that might exist
