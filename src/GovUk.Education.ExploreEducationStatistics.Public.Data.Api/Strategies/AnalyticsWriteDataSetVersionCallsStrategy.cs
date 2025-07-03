@@ -15,9 +15,13 @@ public class AnalyticsWriteDataSetVersionCallsStrategy(
         
     public Type RequestType => typeof(CaptureDataSetVersionCallRequest);
 
-    public async Task Report(IAnalyticsCaptureRequestBase request, CancellationToken cancellationToken)
+    public async Task Report(IAnalyticsCaptureRequest request, CancellationToken cancellationToken)
     {
-        await workflow.Report(_workflowActor, request, cancellationToken);
+        if (request is not CaptureDataSetVersionCallRequest captureRequest)
+        {
+            throw new ArgumentException($"Request must be of type {nameof(CaptureDataSetVersionCallRequest)}. It is {request.GetType().FullName}", nameof(request));
+        }
+        await workflow.Report(_workflowActor, captureRequest, cancellationToken);
     }
 
     private class WorkflowActor(string analyticsPath) 

@@ -157,7 +157,7 @@ public class AnalyticsService(
     private async Task DoCaptureCall<TAnalyticsCaptureRequest>(
         Func<Task<TAnalyticsCaptureRequest?>> requestSupplier,
         CancellationToken cancellationToken = default)
-        where TAnalyticsCaptureRequest : IAnalyticsCaptureRequestBase
+        where TAnalyticsCaptureRequest : IAnalyticsCaptureRequest
     {
         try
         {

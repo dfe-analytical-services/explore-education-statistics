@@ -10,7 +10,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Requests;
 /// <summary>
 /// To capture data relating to a zip download request for analytics.
 /// </summary>
-public record CaptureZipDownloadRequest : IAnalyticsCaptureRequestBase
+public record CaptureZipDownloadRequest : IAnalyticsCaptureRequest
 {
     public string PublicationName = string.Empty;
 
@@ -34,4 +34,4 @@ public record CaptureCsvDownloadRequest(
     string ReleaseName,
     string? ReleaseLabel,
     Guid SubjectId,
-    string DataSetTitle) : IAnalyticsCaptureRequestBase;
+    string DataSetTitle) : IAnalyticsCaptureRequest;

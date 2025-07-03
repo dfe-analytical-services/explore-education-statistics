@@ -1,3 +1,3 @@
 namespace GovUk.Education.ExploreEducationStatistics.Analytics.Common.Interfaces;
 
-public interface IAnalyticsCaptureRequestBase;
+public interface IAnalyticsCaptureRequest;
