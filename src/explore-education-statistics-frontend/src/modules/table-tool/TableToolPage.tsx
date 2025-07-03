@@ -163,7 +163,7 @@ const TableToolPage: NextPage<TableToolPageProps> = ({
       title={basePageTitle}
       description={
         selectedPublication?.title
-          ? `Create and download your own custom data tables by choosing your areas of interest using filters to build your table from ${selectedPublication.title}`
+          ? `Create and download your own custom data tables by choosing your areas of interest using filters to build your table from ${selectedPublication.title.toLocaleLowerCase()}`
           : undefined
       }
       caption="Table Tool"

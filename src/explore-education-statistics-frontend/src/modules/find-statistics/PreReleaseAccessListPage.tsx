@@ -18,8 +18,10 @@ const PreReleaseAccessListPage = ({ release }: Props) => {
     <Page
       title={release.publication.title}
       caption={release.title}
-      metaTitle={`${release.publication.title} pre-release access list ${release.title}`}
-      description={`Pre-release access list for statistics on ${release.publication.title} ${release.title}.`}
+      metaTitle={`${
+        release.publication.title
+      } pre-release access list ${release.title.toLocaleLowerCase()}`}
+      description={`Pre-release access list for statistics on ${release.publication.title.toLocaleLowerCase()} ${release.title.toLocaleLowerCase()}.`}
       breadcrumbs={[
         { name: 'Find statistics and data', link: '/find-statistics' },
         {

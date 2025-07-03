@@ -1,5 +1,6 @@
 *** Settings ***
 Library             DateTime
+Library             String
 Library             ../../libs/admin_api.py
 Resource            ../../libs/admin-common.robot
 Resource            ../../libs/admin/manage-content-common.robot
@@ -284,6 +285,11 @@ Verify newly published release is on Find Statistics page
 Verify newly published release is public
     user navigates to public release page    ${PUBLIC_RELEASE_LINK}    ${PUBLICATION_NAME}    ${RELEASE_NAME}
 
+Verify release page meta
+    user checks meta title should be    ${PUBLICATION_NAME}, ${RELEASE_NAME}
+    user checks meta description should be
+    ...    Find, download and explore official Department for Education (DfE) statistics and data in England.
+
 Verify release URL
     user checks url contains    %{PUBLIC_URL}/find-statistics/ui-tests-publish-release-and-amend-%{RUN_IDENTIFIER}
 
@@ -317,15 +323,23 @@ Verify release associated files
     download file    link:Test ancillary file 1 (txt, 12 B)    test_ancillary_file_1.txt
     downloaded file should have first line    test_ancillary_file_1.txt    Test file 1
 
-Verify public metadata guidance document
+Navigate to public metadata guidance document
     user clicks link    Data guidance
+    user waits until h2 is visible    Data guidance    %{WAIT_SMALL}
 
+Verify guidance document page meta
+    ${RELEASE_NAME_LOWERCASE}=    Convert To Lower Case    ${RELEASE_NAME}
+    ${PUBLICATION_NAME_LOWERCASE}=    Convert To Lower Case    ${PUBLICATION_NAME}
+    user checks meta title should be    ${PUBLICATION_NAME} data guidance ${RELEASE_NAME_LOWERCASE}
+    user checks meta description should be
+    ...    Data guidance describing the contents of files containing statistics from ${PUBLICATION_NAME_LOWERCASE} ${RELEASE_NAME_LOWERCASE}.
+
+Verify public metadata guidance document
     user checks breadcrumb count should be    4
     user checks nth breadcrumb contains    1    Home
     user checks nth breadcrumb contains    2    Find statistics and data
     user checks nth breadcrumb contains    3    ${PUBLICATION_NAME}
     user checks nth breadcrumb contains    4    Data guidance
-    user waits until h2 is visible    Data guidance    %{WAIT_SMALL}
 
     user waits until page contains title caption    ${RELEASE_NAME}
     user waits until h1 is visible    ${PUBLICATION_NAME}
@@ -361,21 +375,28 @@ Verify public metadata guidance document
 
     user goes to release page via breadcrumb    ${PUBLICATION_NAME}    ${RELEASE_NAME}
 
-Verify public pre-release access list
+Navigate to the public pre-release access list
     user clicks link    Pre-release access list
+    user waits until page contains title caption    ${RELEASE_NAME}
+    user waits until h1 is visible    ${PUBLICATION_NAME}
 
+Verify public pre-release access list
     user checks breadcrumb count should be    4
     user checks nth breadcrumb contains    1    Home
     user checks nth breadcrumb contains    2    Find statistics and data
     user checks nth breadcrumb contains    3    ${PUBLICATION_NAME}
     user checks nth breadcrumb contains    4    Pre-release access list
 
-    user waits until page contains title caption    ${RELEASE_NAME}
-    user waits until h1 is visible    ${PUBLICATION_NAME}
-
     user waits until h2 is visible    Pre-release access list
     user waits until page contains    Published ${EXPECTED_PUBLISHED_DATE}
     user waits until page contains    Test public access list
+
+Verify the pre-release access page meta
+    ${RELEASE_NAME_LOWERCASE}=    Convert To Lower Case    ${RELEASE_NAME}
+    ${PUBLICATION_NAME_LOWERCASE}=    Convert To Lower Case    ${PUBLICATION_NAME}
+    user checks meta title should be    ${PUBLICATION_NAME} pre-release access list ${RELEASE_NAME_LOWERCASE}
+    user checks meta description should be
+    ...    Pre-release access list for statistics on ${PUBLICATION_NAME_LOWERCASE} ${RELEASE_NAME_LOWERCASE}.
 
 Verify free text key stat is correct
     user goes to release page via breadcrumb    ${PUBLICATION_NAME}    ${RELEASE_NAME}

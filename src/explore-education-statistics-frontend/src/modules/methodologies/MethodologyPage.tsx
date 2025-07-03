@@ -39,7 +39,7 @@ const MethodologyPage: NextPage<Props> = ({ data }) => {
     <Page
       title={data.title}
       metaTitle={`${data.title}: methodology`}
-      description={`Methodology detailing the preparation of ${data.title}.`}
+      description={`Methodology detailing the preparation of ${data.title.toLocaleLowerCase()}.`}
       breadcrumbs={[{ name: 'Methodologies', link: '/methodology' }]}
       caption="Methodology"
     >
