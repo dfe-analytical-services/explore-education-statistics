@@ -42,7 +42,7 @@ public static class ValidationMessages
     
     public static readonly LocalizableMessage ReleaseFileMustBeOriginal = new(
         Code: nameof(ReleaseFileMustBeOriginal),
-        Message: "This must be an original file linked to a replacement. You must cancel the replacement first before removing release file."
+        Message: "This must be an original file linked to a replacement. You must cancel the replacement first before removing file."
     );
 
     public static readonly LocalizableMessage DataSetVersionMappingCandidatePathDoesNotExist = new(
