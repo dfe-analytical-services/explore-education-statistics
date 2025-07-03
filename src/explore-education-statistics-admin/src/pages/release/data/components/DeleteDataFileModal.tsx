@@ -48,7 +48,9 @@ export default function DeleteDataFileModal({
       open={open}
       title="Confirm deletion of selected data files"
       triggerButton={
-        <ButtonText onClick={toggleOpen.on}>Delete files</ButtonText>
+        <ButtonText variant="warning" onClick={toggleOpen.on}>
+          Delete files
+        </ButtonText>
       }
       onConfirm={handleDeleteConfirm}
     >
