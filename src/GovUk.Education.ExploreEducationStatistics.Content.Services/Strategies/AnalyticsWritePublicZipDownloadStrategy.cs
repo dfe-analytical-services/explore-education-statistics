@@ -19,7 +19,7 @@ public class AnalyticsWritePublicZipDownloadStrategy(
 
     public Type RequestType => typeof(CaptureZipDownloadRequest);
 
-    public async Task Report(IAnalyticsCaptureRequestBase request, CancellationToken cancellationToken)
+    public async Task Report(IAnalyticsCaptureRequest request, CancellationToken cancellationToken)
     {
         if (request is not CaptureZipDownloadRequest captureRequest)
         {

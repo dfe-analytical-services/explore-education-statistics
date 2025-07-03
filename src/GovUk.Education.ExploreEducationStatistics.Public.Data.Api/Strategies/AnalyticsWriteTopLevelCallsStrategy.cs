@@ -16,7 +16,7 @@ public class AnalyticsWriteTopLevelCallsStrategy(
 
     public Type RequestType => typeof(CaptureTopLevelCallRequest);
 
-    public async Task Report(IAnalyticsCaptureRequestBase request, CancellationToken cancellationToken)
+    public async Task Report(IAnalyticsCaptureRequest request, CancellationToken cancellationToken)
     {
         if (request is not CaptureTopLevelCallRequest captureRequest)
         {

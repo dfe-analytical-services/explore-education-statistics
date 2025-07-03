@@ -7,7 +7,7 @@ using Formatting = Newtonsoft.Json.Formatting;
 namespace GovUk.Education.ExploreEducationStatistics.Analytics.Common.Strategies;
 
 public interface ICommonAnalyticsWriteStrategyWorkflow<TAnalyticsRequest>
-    where TAnalyticsRequest : IAnalyticsCaptureRequestBase
+    where TAnalyticsRequest : IAnalyticsCaptureRequest
 {
     Task Report(
         IWorkflowActor<TAnalyticsRequest> workflowActor,
@@ -19,7 +19,7 @@ public class CommonAnalyticsWriteStrategyWorkflow<TAnalyticsRequest>(
     DateTimeProvider dateTimeProvider,
     ILogger<CommonAnalyticsWriteStrategyWorkflow<TAnalyticsRequest>> logger)
     : ICommonAnalyticsWriteStrategyWorkflow<TAnalyticsRequest>
-    where TAnalyticsRequest : IAnalyticsCaptureRequestBase
+    where TAnalyticsRequest : IAnalyticsCaptureRequest
 {
     public async Task Report(
         IWorkflowActor<TAnalyticsRequest> workflowActor,
@@ -60,7 +60,7 @@ public class CommonAnalyticsWriteStrategyWorkflow<TAnalyticsRequest>(
 }
 
 public interface IWorkflowActor<TAnalyticsRequest> 
-    where TAnalyticsRequest : IAnalyticsCaptureRequestBase
+    where TAnalyticsRequest : IAnalyticsCaptureRequest
 {
     string GetAnalyticsPath();
     
@@ -71,7 +71,7 @@ public interface IWorkflowActor<TAnalyticsRequest>
 
 public abstract class WorkflowActorBase<TAnalyticsRequest>(string analyticsPath) 
     : IWorkflowActor<TAnalyticsRequest> 
-    where TAnalyticsRequest : IAnalyticsCaptureRequestBase
+    where TAnalyticsRequest : IAnalyticsCaptureRequest
 {
     public string GetAnalyticsPath()
     {

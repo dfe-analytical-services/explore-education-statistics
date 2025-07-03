@@ -15,7 +15,7 @@ public class AnalyticsWritePublicationCallsStrategy(
         
     public Type RequestType => typeof(CapturePublicationCallRequest);
 
-    public async Task Report(IAnalyticsCaptureRequestBase request, CancellationToken cancellationToken)
+    public async Task Report(IAnalyticsCaptureRequest request, CancellationToken cancellationToken)
     {
         if (request is not CapturePublicationCallRequest captureRequest)
         {

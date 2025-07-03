@@ -15,7 +15,7 @@ public class AnalyticsWriteDataSetVersionCallsStrategy(
         
     public Type RequestType => typeof(CaptureDataSetVersionCallRequest);
 
-    public async Task Report(IAnalyticsCaptureRequestBase request, CancellationToken cancellationToken)
+    public async Task Report(IAnalyticsCaptureRequest request, CancellationToken cancellationToken)
     {
         if (request is not CaptureDataSetVersionCallRequest captureRequest)
         {

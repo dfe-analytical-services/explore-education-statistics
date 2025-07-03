@@ -15,7 +15,7 @@ public class AnalyticsWriteDataSetCallsStrategy(
         
     public Type RequestType => typeof(CaptureDataSetCallRequest);
 
-    public async Task Report(IAnalyticsCaptureRequestBase request, CancellationToken cancellationToken)
+    public async Task Report(IAnalyticsCaptureRequest request, CancellationToken cancellationToken)
     {
         if (request is not CaptureDataSetCallRequest captureRequest)
         {

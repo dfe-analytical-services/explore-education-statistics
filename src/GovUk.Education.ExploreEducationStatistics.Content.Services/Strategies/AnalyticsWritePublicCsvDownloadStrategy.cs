@@ -19,7 +19,7 @@ public class AnalyticsWritePublicCsvDownloadStrategy(
         
     public Type RequestType => typeof(CaptureCsvDownloadRequest);
 
-    public async Task Report(IAnalyticsCaptureRequestBase request, CancellationToken cancellationToken)
+    public async Task Report(IAnalyticsCaptureRequest request, CancellationToken cancellationToken)
     {
         if (request is not CaptureCsvDownloadRequest captureRequest)
         {
