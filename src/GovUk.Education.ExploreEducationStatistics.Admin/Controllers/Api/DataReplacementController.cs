@@ -14,21 +14,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api;
 [Route("api")]
 [Authorize]
 [ApiController]
-public class DataReplacementController : ControllerBase
+public class DataReplacementController(
+    IReplacementService replacementService,
+    IReplacementBatchService replacementBatchService)
+    : ControllerBase
 {
-    private readonly IReplacementService _replacementService;
-
-    public DataReplacementController(IReplacementService replacementService)
-    {
-        _replacementService = replacementService;
-    }
-
     [HttpGet("releases/{releaseVersionId:guid}/data/{originalFileId:guid}/replacement-plan")]
     public async Task<ActionResult<DataReplacementPlanViewModel>> GetReplacementPlan(Guid releaseVersionId,
         Guid originalFileId,
         CancellationToken cancellationToken = default)
     {
-        return await _replacementService.GetReplacementPlan(
+        return await replacementService.GetReplacementPlan(
                 releaseVersionId: releaseVersionId,
                 originalFileId: originalFileId,
                 cancellationToken: cancellationToken
@@ -43,7 +39,7 @@ public class DataReplacementController : ControllerBase
         [FromBody] ReplacementRequest request,
         CancellationToken cancellationToken = default)
     {
-        return await _replacementService.Replace(
+        return await replacementBatchService.Replace(
                 releaseVersionId: releaseVersionId,
                 originalFileIds: request.OriginalFileIds,
                 cancellationToken: cancellationToken

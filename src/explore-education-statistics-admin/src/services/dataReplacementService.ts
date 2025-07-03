@@ -130,10 +130,9 @@ const dataReplacementService = {
     releaseVersionId: string,
     originalFileIds: string[],
   ): Promise<void> {
-    return client.post(
-      `releases/${releaseVersionId}/data/replacements`,
+    return client.post(`releases/${releaseVersionId}/data/replacements`, {
       originalFileIds,
-    );
+    });
   },
 };
 
