@@ -1,0 +1,56 @@
+parameters:
+  - name: serviceConnection
+    type: string
+  - name: dataSourceContainerName
+    type: string
+  - name: dataSourceContainerQuery
+    default: ''
+    type: string
+  - name: dataSourceConnectionString
+    default: 'PROVIDED'
+    type: string
+  - name: dataSourceType
+    values:
+      - azuresql
+      - cosmosdb
+      - azureblob
+      - adlsgen2
+      - azuretable
+      - azurefile
+      - mysql
+      - sharepoint
+    default: azureblob
+    type: string
+  - name: indexCorsAllowedOrigins
+    default:
+      - 'http://localhost:3000'
+      - 'https://localhost:3000'
+    type: object
+  - name: indexerDisabled
+    default: false
+    type: boolean
+  - name: indexerScheduleInterval
+    default: 'PT5M'
+    type: string
+  - name: indexerName
+    type: string
+  - name: searchServiceName
+    type: string
+
+steps:
+  - task: AzureCLI@2
+    displayName: Deploy Search service configuration
+    inputs:
+      azureSubscription: ${{parameters.serviceConnection}}
+      scriptType: bash
+      scriptLocation: inlineScript
+      inlineScript: |
+        set -e
+        echo "dataSourceConnectionString: \"${{parameters.dataSourceConnectionString}}\""
+        echo "dataSourceContainerName: \"${{parameters.dataSourceContainerName}}\""
+        echo "dataSourceContainerQuery: \"${{parameters.dataSourceContainerQuery}}\""
+        echo "dataSourceType: \"${{parameters.dataSourceType}}\""
+        echo "indexerScheduleInterval: \"${{parameters.indexerScheduleInterval}}\""
+        echo "indexerDisabled: \"${{parameters.indexerDisabled}}\""
+        echo "indexerName: \"${{parameters.indexerName}}\""
+        echo "searchServiceName: \"${{parameters.searchServiceName}}\""

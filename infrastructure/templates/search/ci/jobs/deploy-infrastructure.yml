@@ -23,24 +23,24 @@ jobs:
             - checkout: self
             - download: none
 
-            - script: az upgrade --yes
-              displayName: Upgrade Azure CLI and extensions
+            # - script: az upgrade --yes
+            #   displayName: Upgrade Azure CLI and extensions
 
-            - template: ../tasks/deploy-bicep.yml
-              parameters:
-                displayName: Validate Bicep template
-                action: validate
-                serviceConnection: ${{ parameters.serviceConnection }}
-                parameterFile: $(paramFile)
-                searchServiceIndexerName: $(searchServiceIndexerName)
-                searchDocsFunctionAppExists: false
+            # - template: ../tasks/deploy-bicep.yml
+            #   parameters:
+            #     displayName: Validate Bicep template
+            #     action: validate
+            #     serviceConnection: ${{ parameters.serviceConnection }}
+            #     parameterFile: $(paramFile)
+            #     searchServiceIndexerName: $(searchServiceIndexerName)
+            #     searchDocsFunctionAppExists: false
 
-            - template: ../../../public-api/ci/tasks/check-function-app-exists.yml
-              parameters:
-                serviceConnection: ${{ parameters.serviceConnection }}
-                resourceGroupName: $(resourceGroupName)
-                functionAppName: $(searchDocsFunctionAppName)
-                variableName: searchDocsFunctionAppExists
+            # - template: ../../../public-api/ci/tasks/check-function-app-exists.yml
+            #   parameters:
+            #     serviceConnection: ${{ parameters.serviceConnection }}
+            #     resourceGroupName: $(resourceGroupName)
+            #     functionAppName: $(searchDocsFunctionAppName)
+            #     variableName: searchDocsFunctionAppExists
 
             - template: ../tasks/deploy-bicep.yml
               parameters:
@@ -50,3 +50,16 @@ jobs:
                 parameterFile: $(paramFile)
                 searchServiceIndexerName: $(searchServiceIndexerName)
                 searchDocsFunctionAppExists: $(searchDocsFunctionAppExists)
+
+            - template: ../../../../common/ci/tasks/bicep-output-variables.yml
+              parameters:
+                serviceConnection: ${{ parameters.serviceConnection }}
+
+            - template: ../tasks/deploy-search-service-config.yml
+              # TODO EES-6224 Fix this
+              # condition: $(deploySearchConfig)
+              parameters:
+                serviceConnection: ${{ parameters.serviceConnection }}
+                dataSourceContainerName: $(searchableDocumentsContainerName)
+                indexerName: $(searchServiceIndexerName)
+                searchServiceName: $(searchServiceName)
