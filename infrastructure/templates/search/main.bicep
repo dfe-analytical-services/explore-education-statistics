@@ -165,5 +165,7 @@ module searchServiceModule 'application/searchService.bicep' = {
   }
 }
 
+output searchableDocumentsContainerName string = searchServiceModule.outputs.searchableDocumentsContainerName
 output searchDocsFunctionAppUrl string = searchDocsFunctionAppModule.outputs.functionAppUrl
 output searchServiceEndpoint string = searchServiceModule.outputs.searchServiceEndpoint
+output searchStorageAccountManagedIdentityConnectionString string = searchServiceModule.outputs.searchStorageAccountManagedIdentityConnectionString

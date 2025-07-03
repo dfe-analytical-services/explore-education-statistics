@@ -109,4 +109,5 @@ output searchableDocumentsContainerName string = searchableDocumentsContainerNam
 output searchServiceEndpoint string = searchServiceModule.outputs.searchServiceEndpoint
 output searchServiceName string = searchServiceModule.outputs.searchServiceName
 output searchStorageAccountConnectionStringSecretName string = searchStorageAccountModule.outputs.connectionStringSecretName
+output searchStorageAccountManagedIdentityConnectionString string = 'ResourceId=${searchStorageAccountModule.outputs.storageAccountId};'
 output searchStorageAccountName string = searchStorageAccountModule.outputs.storageAccountName
