@@ -11,6 +11,7 @@ jobs:
     displayName: Deploy Search Infrastructure
     environment: ${{ parameters.environment }}
     variables:
+      searchServiceIndexerName: 'index-1-indexer'
       templateDirectory: $(Build.SourcesDirectory)/infrastructure/templates/search
       templateFile: $(templateDirectory)/main.bicep
       paramDirectory: $(templateDirectory)/parameters
@@ -31,8 +32,7 @@ jobs:
                 action: validate
                 serviceConnection: ${{ parameters.serviceConnection }}
                 parameterFile: $(paramFile)
-                deploySearchConfig: false
-                githubSourceRef: $(Build.SourceBranch)
+                searchServiceIndexerName: $(searchServiceIndexerName)
                 searchDocsFunctionAppExists: false
 
             - template: ../../../public-api/ci/tasks/check-function-app-exists.yml
@@ -48,6 +48,5 @@ jobs:
                 action: create
                 serviceConnection: ${{ parameters.serviceConnection }}
                 parameterFile: $(paramFile)
-                deploySearchConfig: $(deploySearchConfig)
-                githubSourceRef: $(Build.SourceBranch)
+                searchServiceIndexerName: $(searchServiceIndexerName)
                 searchDocsFunctionAppExists: $(searchDocsFunctionAppExists)
