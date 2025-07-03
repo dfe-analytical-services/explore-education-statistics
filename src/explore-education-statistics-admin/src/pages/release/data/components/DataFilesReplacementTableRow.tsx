@@ -49,6 +49,7 @@ export default function DataFilesReplacementTableRow({
     ...dataFileReplacementQueries.getReplacementPlan(
       releaseVersionId,
       dataFile.id,
+      dataFile.replacedBy ?? '',
     ),
     enabled: fetchPlan,
   });

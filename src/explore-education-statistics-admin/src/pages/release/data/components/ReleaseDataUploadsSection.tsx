@@ -76,7 +76,7 @@ export default function ReleaseDataUploadsSection({
 
   // TODO - EES-6244 bulk confirmation of replacements
   //  const validReplacedDataFiles = replacedDataFiles.filter(
-  //   file => file.status === 'COMPLETE',
+  //   file => file.status === 'COMPLETE', // this checks the original file status, not the replacement!
   // );
   // const allowBulkConfirm = validReplacedDataFiles.length > 1;
 
