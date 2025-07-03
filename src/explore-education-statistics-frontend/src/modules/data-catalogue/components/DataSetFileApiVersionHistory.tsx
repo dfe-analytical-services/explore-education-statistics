@@ -10,6 +10,7 @@ import { logEvent } from '@frontend/services/googleAnalyticsService';
 import { useQuery } from '@tanstack/react-query';
 import { useRouter } from 'next/router';
 import React from 'react';
+import showCurrentNextToVersion from '../utils/showCurrentNextToVersion';
 
 const sectionId = 'apiVersionHistory';
 
@@ -35,20 +36,19 @@ export default function DataSetFileApiVersionHistory({
   const currentVersionFileId = data?.results.find(
     version => version.version === currentVersion,
   )?.file.id;
-  const patchVersionHighestPatchDictionary = data?.results.reduce(
-    (acc, version) => {
-      const [major, minor, patch] = version.version.split('.').map(Number);
-      if (patch === undefined) {
-        return acc;
-      }
-      const key = `${major}.${minor}`;
-      if (!acc[key] || patch > acc[key]) {
-        acc[key] = patch;
-      }
+  const patchVersionHighestPatchDictionary = data?.results.reduce<
+    Record<string, number>
+  >((acc, version) => {
+    const [major, minor, patch] = version.version.split('.').map(Number);
+    if (patch === undefined) {
       return acc;
-    },
-    {} as Record<string, number>,
-  );
+    }
+    const key = `${major}.${minor}`;
+    if (!acc[key] || patch > acc[key]) {
+      acc[key] = patch;
+    }
+    return acc;
+  }, {});
 
   return (
     <DataSetFilePageSection heading={pageApiSections[sectionId]} id={sectionId}>
@@ -77,10 +77,12 @@ export default function DataSetFileApiVersionHistory({
                       ) : (
                         <strong>
                           {version.version}{' '}
-                          {showCurrentTag(
+                          {showCurrentNextToVersion(
                             version.version,
                             patchVersionHighestPatchDictionary,
-                          )}
+                          )
+                            ? '(Current)'
+                            : ''}
                         </strong>
                       )}
                     </td>
@@ -123,22 +125,4 @@ export default function DataSetFileApiVersionHistory({
       </LoadingSpinner>
     </DataSetFilePageSection>
   );
-  function showCurrentTag(
-    version: string,
-    latestPatchLookup: Record<string, number> | undefined,
-  ): string {
-    const versionParts = version.split('.');
-    let isCurrent = false;
-    if (versionParts.length === 3) {
-      const patch = Number(versionParts[2]);
-      const key = versionParts.slice(0, 2).join('.');
-      if (patch === latestPatchLookup?.[key]) {
-        isCurrent = true;
-      }
-    } else {
-      // `latestPatchLookup` only contains patch versions, so in this else, we treat everything not in `latestPatchLookup` as current.
-      isCurrent = latestPatchLookup?.[version] === undefined;
-    }
-    return isCurrent ? ' (current)' : '';
-  }
 }

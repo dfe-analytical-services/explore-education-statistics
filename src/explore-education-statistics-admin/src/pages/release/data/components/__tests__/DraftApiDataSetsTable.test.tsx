@@ -129,7 +129,7 @@ describe('DraftApiDataSetsTable', () => {
         id: 'version-8',
         version: '2.0.1',
         status: 'Mapping',
-        type: 'Major',
+        type: 'Patch',
       },
       previousReleaseIds: [],
     },
