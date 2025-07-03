@@ -1,6 +1,7 @@
 {
   "App": {
     "EmailEnabled": true
+    "SuppressExceptionsForTeamOnlyApiKeyErrors": true
   },
   "GovUkNotify" : {
     "ApiKey": "add-a-restricted-api-key-here-NOT-A-LIVE-ONE",

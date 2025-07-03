@@ -6,6 +6,8 @@ public class AppOptions
     
     public bool EmailEnabled { get; init; }
 
+    public bool SuppressExceptionsForTeamOnlyApiKeyErrors { get; init; }
+
     public string Url { get; init; } = null!;
 
     public string PublicAppUrl { get; init; } = null!;
