@@ -20,7 +20,7 @@ public class AnalyticsWritePublicApiQueryStrategy(
     {
         if (request is not CaptureDataSetVersionQueryRequest captureRequest)
         {
-            throw new ArgumentException($"Request must be of type CaptureDataSetVersionQueryRequest. It is {request.GetType().FullName}", nameof(request));
+            throw new ArgumentException($"Request must be of type {nameof(CaptureDataSetVersionQueryRequest)}. It is {request.GetType().FullName}", nameof(request));
         }
         await workflow.Report(_workflowActor, captureRequest, cancellationToken);
     }

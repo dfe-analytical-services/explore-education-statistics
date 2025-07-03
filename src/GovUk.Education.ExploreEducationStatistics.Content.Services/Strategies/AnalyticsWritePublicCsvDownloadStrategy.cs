@@ -23,7 +23,7 @@ public class AnalyticsWritePublicCsvDownloadStrategy(
     {
         if (request is not CaptureCsvDownloadRequest captureRequest)
         {
-            throw new ArgumentException($"Request must be of type CaptureCsvDownloadRequest. It is {request.GetType().FullName}", nameof(request));
+            throw new ArgumentException($"Request must be of type {nameof(CaptureCsvDownloadRequest)}. It is {request.GetType().FullName}", nameof(request));
         }
         await workflow.Report(_workflowActor, captureRequest, cancellationToken);
     }

@@ -19,7 +19,7 @@ public class AnalyticsWriteDataSetVersionCallsStrategy(
     {
         if (request is not CaptureDataSetVersionCallRequest captureRequest)
         {
-            throw new ArgumentException($"Request must be of type CaptureDataSetVersionCallRequest. It is {request.GetType().FullName}", nameof(request));
+            throw new ArgumentException($"Request must be of type {nameof(CaptureDataSetVersionCallRequest)}. It is {request.GetType().FullName}", nameof(request));
         }
         await workflow.Report(_workflowActor, captureRequest, cancellationToken);
     }

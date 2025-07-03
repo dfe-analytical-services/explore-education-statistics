@@ -23,7 +23,7 @@ public class AnalyticsWritePublicZipDownloadStrategy(
     {
         if (request is not CaptureZipDownloadRequest captureRequest)
         {
-            throw new ArgumentException($"Request must be of type CaptureZipDownloadRequest. It is {request.GetType().FullName}", nameof(request));
+            throw new ArgumentException($"Request must be of type {nameof(CaptureZipDownloadRequest)}. It is {request.GetType().FullName}", nameof(request));
         }
         await workflow.Report(_workflowActor, captureRequest, cancellationToken);
     }
