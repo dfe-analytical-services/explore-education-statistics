@@ -17,7 +17,11 @@ public class AnalyticsWriteDataSetCallsStrategy(
 
     public async Task Report(IAnalyticsCaptureRequestBase request, CancellationToken cancellationToken)
     {
-        await workflow.Report(_workflowActor, request, cancellationToken);
+        if (request is not CaptureDataSetCallRequest captureRequest)
+        {
+            throw new ArgumentException($"Request must be of type CaptureDataSetCallRequest. It is {request.GetType().FullName}", nameof(request));
+        }
+        await workflow.Report(_workflowActor, captureRequest, cancellationToken);
     }
 
     private class WorkflowActor(string analyticsPath)

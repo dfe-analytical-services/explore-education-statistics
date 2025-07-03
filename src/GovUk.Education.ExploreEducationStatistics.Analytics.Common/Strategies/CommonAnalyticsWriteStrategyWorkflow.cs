@@ -11,7 +11,7 @@ public interface ICommonAnalyticsWriteStrategyWorkflow<TAnalyticsRequest>
 {
     Task Report(
         IWorkflowActor<TAnalyticsRequest> workflowActor,
-        IAnalyticsCaptureRequestBase request,
+        TAnalyticsRequest request,
         CancellationToken cancellationToken);
 }
 
@@ -23,16 +23,9 @@ public class CommonAnalyticsWriteStrategyWorkflow<TAnalyticsRequest>(
 {
     public async Task Report(
         IWorkflowActor<TAnalyticsRequest> workflowActor,
-        IAnalyticsCaptureRequestBase request,
+        TAnalyticsRequest analyticsRequest,
         CancellationToken cancellationToken)
     {
-        if (typeof(TAnalyticsRequest) != request.GetType())
-        {
-            throw new ArgumentException($"Request isn't of type {typeof(TAnalyticsRequest)}");
-        }
-
-        var analyticsRequest = (TAnalyticsRequest)request;
-
         logger.LogDebug("Capturing request of type {RequestType} for analytics", typeof(TAnalyticsRequest));
 
         var filename =

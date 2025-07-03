@@ -21,7 +21,11 @@ public class AnalyticsWritePublicZipDownloadStrategy(
 
     public async Task Report(IAnalyticsCaptureRequestBase request, CancellationToken cancellationToken)
     {
-        await workflow.Report(_workflowActor, request, cancellationToken);
+        if (request is not CaptureZipDownloadRequest captureRequest)
+        {
+            throw new ArgumentException($"Request must be of type CaptureZipDownloadRequest. It is {request.GetType().FullName}", nameof(request));
+        }
+        await workflow.Report(_workflowActor, captureRequest, cancellationToken);
     }
 
     private class WorkflowActor(string analyticsPath)
