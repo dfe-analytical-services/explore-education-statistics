@@ -1,6 +1,6 @@
 #nullable enable
-using System.Text;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+using System.Text;
 using Xunit;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions
@@ -351,11 +351,36 @@ Test
 
             [Theory]
             [InlineData("foo", "Foo")]
-            [InlineData("bar", "Bar")]
             [InlineData("fooBar", "FooBar")]
             public void FirstCharacterIsLowerCased(string input, string expected)
             {
                 Assert.Equal(expected, input.ToUpperFirst());
+            }
+        }
+
+        public class ToTitleCaseTests
+        {
+            [Fact]
+            public void NullString()
+            {
+                string? input = null;
+                Assert.Null(input!.ToUpperFirst());
+            }
+
+            [Fact]
+            public void EmptyString()
+            {
+                Assert.Equal(string.Empty, string.Empty.ToUpperFirst());
+            }
+
+            [Theory]
+            [InlineData("foo", "Foo")]
+            [InlineData("FOO ", "Foo")]
+            [InlineData("FOOBAR", "Foobar")]
+            [InlineData("FOO BAR", "Foo Bar")]
+            public void InputStringIsTitleCased(string input, string expected)
+            {
+                Assert.Equal(expected, input.ToTitleCase());
             }
         }
 

@@ -4,7 +4,6 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.MockBuilders;
-using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Options;
@@ -17,13 +16,15 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
+using LinqToDB;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
 using System;
+using System.ComponentModel;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainers;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.DataImportStatus;
@@ -196,7 +197,7 @@ public class DataSetFileStorageTests
     }
 
     [Fact]
-    public async Task UploadDataSetsToTemporaryStorage_ReturnsUploadSummary()
+    public async Task UploadDataSetsToTemporaryStorage_ReturnsUploadDetails()
     {
         // Arrange
         var dataSetName = "Test Data Set";
@@ -213,6 +214,7 @@ public class DataSetFileStorageTests
 
         await using var contentDbContext = InMemoryApplicationDbContext();
         var privateBlobStorageService = new Mock<IPrivateBlobStorageService>(Strict);
+        var userService = new Mock<IUserService>(Strict);
 
         privateBlobStorageService
             .Setup(mock => mock.UploadStream(
@@ -224,12 +226,17 @@ public class DataSetFileStorageTests
                 It.IsAny<CancellationToken>()))
             .Returns(Task.CompletedTask);
 
+        userService
+            .Setup(mock => mock.GetProfileFromClaims())
+            .Returns(new UserProfileFromClaims(_user.Email, "Test", "Test"));
+
         var service = SetupReleaseDataFileService(
             contentDbContext: contentDbContext,
-            privateBlobStorageService: privateBlobStorageService.Object);
+            privateBlobStorageService: privateBlobStorageService.Object,
+            userService: userService.Object);
 
         // Act
-        var uploadSummaries = await service.UploadDataSetsToTemporaryStorage(
+        var result = await service.UploadDataSetsToTemporaryStorage(
             Guid.NewGuid(),
             [dataSet],
             cancellationToken: default);
@@ -237,15 +244,187 @@ public class DataSetFileStorageTests
         // Assert
         privateBlobStorageService.Verify();
 
-        var uploadSummary = Assert.Single(uploadSummaries);
-        Assert.Equal(dataSetName, uploadSummary.Title);
-        Assert.NotEqual(Guid.Empty, uploadSummary.DataFileId);
-        Assert.Equal("test-data.csv", uploadSummary.DataFileName);
-        Assert.Equal(434, uploadSummary.DataFileSize);
-        Assert.NotEqual(Guid.Empty, uploadSummary.MetaFileId);
-        Assert.Equal("test-data.meta.csv", uploadSummary.MetaFileName);
-        Assert.Equal(157, uploadSummary.MetaFileSize);
-        Assert.Null(uploadSummary.ReplacingFileId);
+        var uploadDetails = Assert.Single(result);
+        Assert.Equal(dataSetName, uploadDetails.DataSetTitle);
+        Assert.NotEqual(Guid.Empty, uploadDetails.DataFileId);
+        Assert.Equal("test-data.csv", uploadDetails.DataFileName);
+        Assert.Equal(434, uploadDetails.DataFileSizeInBytes);
+        Assert.NotEqual(Guid.Empty, uploadDetails.MetaFileId);
+        Assert.Equal("test-data.meta.csv", uploadDetails.MetaFileName);
+        Assert.Equal(157, uploadDetails.MetaFileSizeInBytes);
+        Assert.Equal(DataSetUploadStatus.SCREENING, uploadDetails.Status);
+        Assert.Equal(_user.Email, uploadDetails.UploadedBy);
+        Assert.Null(uploadDetails.ReplacingFileId);
+    }
+
+    [Fact]
+    public async Task CreateOrReplaceExistingDataSetUpload_CreateNew_ReturnsUploadDetails()
+    {
+        // Arrange
+        var dataSetUpload = new DataSetUploadMockBuilder().BuildEntity();
+
+        var privateBlobStorageService = new Mock<IPrivateBlobStorageService>(Strict);
+        var dataSetUploadRepository = new Mock<IDataSetUploadRepository>(Strict);
+
+        var contentDbContextId = Guid.NewGuid().ToString();
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        {
+            var service = SetupReleaseDataFileService(
+                contentDbContext,
+                privateBlobStorageService: privateBlobStorageService.Object,
+                dataSetUploadRepository: dataSetUploadRepository.Object);
+
+            // Act
+            await service.CreateOrReplaceExistingDataSetUpload(dataSetUpload.ReleaseVersionId, dataSetUpload, cancellationToken: default);
+        }
+
+        // Assert
+        privateBlobStorageService.Verify(mock => mock.DeleteBlob(
+            PrivateReleaseTempFiles,
+            It.IsAny<string>()),
+            Times.Never());
+
+        dataSetUploadRepository.Verify(mock => mock.Delete(
+            It.IsAny<Guid>(),
+            It.IsAny<Guid>(),
+            It.IsAny<CancellationToken>()),
+            Times.Never());
+
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        {
+            var result = await contentDbContext.DataSetUploads.FindAsync(dataSetUpload.Id);
+
+            Assert.NotNull(result);
+            Assert.Equivalent(dataSetUpload, result);
+        }
+    }
+
+    [Fact]
+    public async Task CreateOrReplaceExistingDataSetUpload_ReplaceExisting_ReturnsUploadDetails()
+    {
+        // Arrange
+        var releaseVersionId = Guid.NewGuid();
+
+        var existingDataSetUpload = new DataSetUploadMockBuilder()
+            .WithReleaseVersionId(releaseVersionId)
+            .WithFailingTests()
+            .BuildEntity();
+
+        var newDataSetUpload = new DataSetUploadMockBuilder()
+            .WithReleaseVersionId(releaseVersionId)
+            .BuildEntity();
+
+        var privateBlobStorageService = new Mock<IPrivateBlobStorageService>(Strict);
+        var dataSetUploadRepository = new Mock<IDataSetUploadRepository>(Strict);
+
+        var contentDbContextId = Guid.NewGuid().ToString();
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        {
+            contentDbContext.DataSetUploads.Add(existingDataSetUpload);
+            await contentDbContext.SaveChangesAsync();
+
+            dataSetUploadRepository
+                .Setup(mock => mock.Delete(
+                    releaseVersionId,
+                    existingDataSetUpload.Id,
+                    It.IsAny<CancellationToken>()))
+                .Callback(() => contentDbContext.DataSetUploads.Remove(existingDataSetUpload))
+                .ReturnsAsync(Unit.Instance);
+
+            var service = SetupReleaseDataFileService(
+                contentDbContext,
+                privateBlobStorageService: privateBlobStorageService.Object,
+                dataSetUploadRepository: dataSetUploadRepository.Object);
+
+            // Act
+            await service.CreateOrReplaceExistingDataSetUpload(releaseVersionId, newDataSetUpload, cancellationToken: default);
+        }
+
+        // Assert
+        MockUtils.VerifyAllMocks(privateBlobStorageService, dataSetUploadRepository);
+
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        {
+            var allUploads = await contentDbContext.DataSetUploads.ToListAsync();
+            var upload = Assert.Single(allUploads);
+
+            Assert.NotNull(upload);
+            Assert.Equivalent(newDataSetUpload, upload);
+        }
+    }
+
+    [Fact]
+    public async Task AddScreenerResultToUpload_UploadNotFound_ThrowsInvalidOperationException()
+    {
+        // Arrange
+        await using var contentDbContext = InMemoryApplicationDbContext();
+        var service = SetupReleaseDataFileService(contentDbContext);
+
+        // Act & Assert
+        var exception = await Assert.ThrowsAsync<InvalidOperationException>(async ()
+            => await service.AddScreenerResultToUpload(Guid.NewGuid(), screenerResult: null!, cancellationToken: default));
+
+        Assert.Equal("Sequence contains no elements", exception.Message);
+    }
+
+    [Theory]
+    [InlineData(TestResult.PASS)]
+    [InlineData(TestResult.WARNING)]
+    [InlineData(TestResult.FAIL)]
+    public async Task AddScreenerResultToUpload_WithTestResult_UpdatesStatusCorrectly(TestResult testResult)
+    {
+        // Arrange
+        var builder = new DataSetUploadMockBuilder();
+
+        var dataSetUpload = testResult switch
+        {
+            TestResult.PASS => builder.BuildEntity(),
+            TestResult.WARNING => builder
+                .WithWarningTests()
+                .BuildEntity(),
+            TestResult.FAIL => builder
+                .WithFailingTests()
+                .BuildEntity(),
+            _ => throw new ArgumentOutOfRangeException(nameof(testResult))
+        };
+
+        var contentDbContextId = Guid.NewGuid().ToString();
+
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        {
+            contentDbContext.DataSetUploads.Add(dataSetUpload);
+            await contentDbContext.SaveChangesAsync();
+
+            var service = SetupReleaseDataFileService(contentDbContext);
+
+            // Act
+            await service.AddScreenerResultToUpload(dataSetUpload.Id, dataSetUpload.ScreenerResult!, cancellationToken: default);
+        }
+
+        // Assert
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        {
+            var updatedDataSetUpload = await contentDbContext.DataSetUploads.FindAsync(dataSetUpload.Id);
+
+            Assert.NotNull(updatedDataSetUpload);
+
+            switch (testResult)
+            {
+                case TestResult.PASS:
+                    Assert.Equal(DataSetUploadStatus.PENDING_IMPORT, updatedDataSetUpload.Status);
+                    break;
+                case TestResult.WARNING:
+                    Assert.Equal(DataSetUploadStatus.PENDING_REVIEW, updatedDataSetUpload.Status);
+                    break;
+                case TestResult.FAIL:
+                    Assert.Equal(DataSetUploadStatus.FAILED_SCREENING, updatedDataSetUpload.Status);
+                    break;
+                default:
+                    break;
+            }
+
+            Assert.Equivalent(dataSetUpload.ScreenerResult, updatedDataSetUpload.ScreenerResult);
+        }
     }
 
     [Fact]
@@ -358,15 +537,18 @@ public class DataSetFileStorageTests
             await contentDbContext.SaveChangesAsync();
         }
 
-        var dataSet = new DataSetUploadResultViewModel
+        var dataSet = new DataSetUpload
         {
-            Title = dataSetName,
+            ReleaseVersionId = releaseVersion.Id,
+            DataSetTitle = dataSetName,
             DataFileId = Guid.NewGuid(),
             DataFileName = dataFileName,
-            DataFileSize = 434,
+            DataFileSizeInBytes = 434,
             MetaFileId = Guid.NewGuid(),
             MetaFileName = metaFileName,
-            MetaFileSize = 157,
+            MetaFileSizeInBytes = 157,
+            Status = DataSetUploadStatus.SCREENING,
+            UploadedBy = _user.Email,
             ReplacingFileId = originalDataFile.Id,
         };
 
@@ -396,11 +578,125 @@ public class DataSetFileStorageTests
         }
     }
 
+    [Fact]
+    public async Task RetrieveDataSetFileFromTemporaryStorage_Success_ReturnsFileStreamResult()
+    {
+        // Arrange
+        var dataSetUploadId = Guid.NewGuid();
+        var releaseVersionId = Guid.NewGuid();
+
+        await using var contentDbContext = InMemoryApplicationDbContext();
+        contentDbContext.DataSetUploads.Add(new()
+        {
+            Id = dataSetUploadId,
+            ReleaseVersionId = releaseVersionId,
+            DataSetTitle = "Test Data Set",
+            DataFileId = Guid.NewGuid(),
+            DataFileName = "data.csv",
+            DataFileSizeInBytes = 123,
+            MetaFileName = "meta.csv",
+            MetaFileSizeInBytes = 456,
+            MetaFileId = Guid.NewGuid(),
+            UploadedBy = _user.Email,
+            Status = DataSetUploadStatus.SCREENING,
+        });
+
+        await contentDbContext.SaveChangesAsync();
+
+        var privateBlobStorageService = new Mock<IPrivateBlobStorageService>(Strict);
+
+        privateBlobStorageService
+            .Setup(mock => mock.DownloadToStream(
+                PrivateReleaseTempFiles,
+                It.IsAny<string>(),
+                It.IsAny<MemoryStream>(),
+                It.IsAny<bool>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync(Stream.Null);
+
+        var service = SetupReleaseDataFileService(
+            contentDbContext: contentDbContext,
+            privateBlobStorageService: privateBlobStorageService.Object);
+
+        // Act
+        var result = await service.RetrieveDataSetFileFromTemporaryStorage(
+            releaseVersionId,
+            dataSetUploadId,
+            FileType.Data,
+            cancellationToken: default);
+
+        // Assert
+        privateBlobStorageService.Verify();
+        var fileStreamResult = result.AssertRight();
+        Assert.Equal(ContentTypes.Csv, fileStreamResult.ContentType);
+        Assert.Equal(Stream.Null, fileStreamResult.FileStream);
+    }
+
+    [Fact]
+    public async Task RetrieveDataSetFileFromTemporaryStorage_UploadNotFound_ReturnsNotFound()
+    {
+        // Arrange
+        await using var contentDbContext = InMemoryApplicationDbContext();
+
+        var service = SetupReleaseDataFileService(contentDbContext: contentDbContext);
+
+        // Act
+        var result = await service.RetrieveDataSetFileFromTemporaryStorage(
+            releaseVersionId: Guid.NewGuid(),
+            dataSetUploadId: Guid.NewGuid(),
+            FileType.Data,
+            cancellationToken: default);
+
+        // Assert
+        result
+            .AssertLeft()
+            .AssertNotFoundResult();
+    }
+
+    [Fact]
+    public async Task RetrieveDataSetFileFromTemporaryStorage_InvalidFileType_ThrowsInvalidEnumArgumentException()
+    {
+        // Arrange
+        var dataSetUploadId = Guid.NewGuid();
+        var releaseVersionId = Guid.NewGuid();
+
+        await using var contentDbContext = InMemoryApplicationDbContext();
+        contentDbContext.DataSetUploads.Add(new()
+        {
+            Id = dataSetUploadId,
+            ReleaseVersionId = releaseVersionId,
+            DataSetTitle = "Test Data Set",
+            DataFileId = Guid.NewGuid(),
+            DataFileName = "data.csv",
+            DataFileSizeInBytes = 123,
+            MetaFileName = "meta.csv",
+            MetaFileSizeInBytes = 456,
+            MetaFileId = Guid.NewGuid(),
+            UploadedBy = _user.Email,
+            Status = DataSetUploadStatus.SCREENING,
+        });
+
+        await contentDbContext.SaveChangesAsync();
+
+        var service = SetupReleaseDataFileService(contentDbContext: contentDbContext);
+
+        // Act & Assert
+        var exception = await Assert.ThrowsAsync<InvalidEnumArgumentException>(async ()
+            => await service.RetrieveDataSetFileFromTemporaryStorage(
+                releaseVersionId,
+                dataSetUploadId,
+                FileType.Image,
+                cancellationToken: default));
+
+        Assert.Equal($"The value of argument 'fileType' ({(int)FileType.Image}) is invalid for Enum type '{nameof(FileType)}'. (Parameter 'fileType')", exception.Message);
+    }
+
     private DataSetFileStorage SetupReleaseDataFileService(
         ContentDbContext contentDbContext,
         IPrivateBlobStorageService? privateBlobStorageService = null,
         IReleaseVersionRepository? releaseVersionRepository = null,
         IReleaseDataFileRepository? releaseDataFileRepository = null,
+        IDataSetUploadRepository? dataSetUploadRepository = null,
         IDataImportService? dataImportService = null,
         IUserService? userService = null,
         IDataSetVersionService? dataSetVersionService = null,
@@ -418,6 +714,7 @@ public class DataSetFileStorageTests
             privateBlobStorageService ?? Mock.Of<IPrivateBlobStorageService>(Strict),
             releaseVersionRepository ?? Mock.Of<IReleaseVersionRepository>(Strict),
             releaseDataFileRepository ?? Mock.Of<IReleaseDataFileRepository>(Strict),
+            dataSetUploadRepository ?? Mock.Of<IDataSetUploadRepository>(Strict),
             dataImportService ?? Mock.Of<IDataImportService>(Strict),
             userService ?? MockUtils.AlwaysTrueUserService(_user.Id).Object,
             dataSetVersionService ?? Mock.Of<IDataSetVersionService>(Strict),

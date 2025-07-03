@@ -1,5 +1,7 @@
 #nullable enable
+using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
+using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
@@ -43,7 +45,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         IUserService userService,
         IDataSetFileStorage dataSetFileStorage,
         IDataBlockService dataBlockService,
-        IFootnoteRepository footnoteRepository) : IReleaseDataFileService
+        IFootnoteRepository footnoteRepository,
+        IDataSetScreenerClient dataSetScreenerClient,
+        IMapper _mapper) : IReleaseDataFileService
     {
         public async Task<Either<ActionResult, Unit>> Delete(
             Guid releaseVersionId,
@@ -259,7 +263,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
-        public async Task<Either<ActionResult, List<DataSetUploadResultViewModel>>> Upload(
+        public async Task<Either<ActionResult, List<DataSetUploadViewModel>>> Upload(
             Guid releaseVersionId,
             IFormFile dataFormFile,
             IFormFile metaFormFile,
@@ -277,7 +281,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         .OnSuccess(async replacingFile
                             => await ValidateDataSetCsvPair(releaseVersionId, dataFormFile, metaFormFile, dataSetTitle, replacingFile))
                         .OnSuccess(async dataSet
-                            => await dataSetFileStorage.UploadDataSetsToTemporaryStorage(releaseVersionId, [dataSet], cancellationToken));
+                            => await dataSetFileStorage.UploadDataSetsToTemporaryStorage(releaseVersionId, [dataSet], cancellationToken))
+                        .OnSuccess(dataSetUploads
+                            => dataSetUploads.SelectAsync(dataSetUpload
+                                => dataSetFileStorage.CreateOrReplaceExistingDataSetUpload(releaseVersionId, dataSetUpload, cancellationToken)))
+                        .OnSuccess(async dataSetUploads
+                            => await ScreenDataSetUploads([.. dataSetUploads], cancellationToken));
                 });
         }
 
@@ -304,7 +313,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
-        public async Task<Either<ActionResult, List<DataSetUploadResultViewModel>>> UploadFromZip(
+        public async Task<Either<ActionResult, List<DataSetUploadViewModel>>> UploadFromZip(
             Guid releaseVersionId,
             IFormFile zipFormFile,
             string dataSetTitle,
@@ -321,7 +330,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         .OnSuccess(async replacingFile
                             => await ValidateDataSetZip(releaseVersionId, zipFormFile, dataSetTitle, replacingFile))
                         .OnSuccess(async dataSet
-                            => await dataSetFileStorage.UploadDataSetsToTemporaryStorage(releaseVersionId, [dataSet], cancellationToken));
+                            => await dataSetFileStorage.UploadDataSetsToTemporaryStorage(releaseVersionId, [dataSet], cancellationToken))
+                        .OnSuccess(dataSetUploads
+                            => dataSetUploads.SelectAsync(dataSetUpload
+                                => dataSetFileStorage.CreateOrReplaceExistingDataSetUpload(releaseVersionId, dataSetUpload, cancellationToken)))
+                        .OnSuccess(async dataSetUploads
+                            => await ScreenDataSetUploads([.. dataSetUploads], cancellationToken));
                 });
         }
 
@@ -347,7 +361,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
-        public async Task<Either<ActionResult, List<DataSetUploadResultViewModel>>> UploadFromBulkZip(
+        public async Task<Either<ActionResult, List<DataSetUploadViewModel>>> UploadFromBulkZip(
             Guid releaseVersionId,
             IFormFile zipFormFile,
             CancellationToken cancellationToken)
@@ -358,7 +372,30 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(async _
                     => await ValidateBulkDataSetZip(releaseVersionId, zipFormFile))
                 .OnSuccess(async dataSets
-                    => await dataSetFileStorage.UploadDataSetsToTemporaryStorage(releaseVersionId, dataSets, cancellationToken));
+                    => await dataSetFileStorage.UploadDataSetsToTemporaryStorage(releaseVersionId, dataSets, cancellationToken))
+                .OnSuccess(dataSetUploads
+                    => dataSetUploads.SelectAsync(dataSetUpload
+                        => dataSetFileStorage.CreateOrReplaceExistingDataSetUpload(releaseVersionId, dataSetUpload, cancellationToken)))
+                .OnSuccess(async dataSetUploads
+                    => await ScreenDataSetUploads([.. dataSetUploads], cancellationToken));
+        }
+
+        private async Task<List<DataSetUploadViewModel>> ScreenDataSetUploads(
+            List<DataSetUpload> dataSetUploads,
+            CancellationToken cancellationToken)
+        {
+            return await dataSetUploads
+                .ToAsyncEnumerable()
+                .SelectAwait(async dataSetUpload =>
+                {
+                    var request = _mapper.Map<DataSetScreenerRequest>(dataSetUpload);
+                    var result = await dataSetScreenerClient.ScreenDataSet(request, cancellationToken);
+
+                    await dataSetFileStorage.AddScreenerResultToUpload(dataSetUpload.Id, result, cancellationToken);
+
+                    return _mapper.Map<DataSetUploadViewModel>(dataSetUpload);
+                })
+                .ToListAsync(cancellationToken);
         }
 
         private async Task<Either<ActionResult, DataSet>> ValidateDataSetCsvPair(
@@ -513,34 +550,59 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             };
         }
 
-        public async Task<Either<ActionResult, List<DataFileInfo>>> SaveDataSetsFromTemporaryBlobStorage(
+        public async Task<Either<ActionResult, Unit>> SaveDataSetsFromTemporaryBlobStorage(
             Guid releaseVersionId,
-            List<DataSetUploadResultViewModel> dataSetFiles,
+            List<Guid> dataSetUploadIds,
             CancellationToken cancellationToken)
         {
             return await persistenceHelper
                 .CheckEntityExists<ReleaseVersion>(releaseVersionId)
                 .OnSuccess(userService.CheckCanUpdateReleaseVersion)
-                .OnSuccess(() => dataSetFiles
-                    .Select(dataSet => ValidateTempDataSetFileExistence(releaseVersionId, dataSet))
+                .OnSuccess(_ => dataSetUploadIds
+                    .Select(dataSetUploadId => ValidateDataSetUploadExistence(releaseVersionId, dataSetUploadId, cancellationToken))
                     .OnSuccessAll())
-                .OnSuccess(async _ =>
+                .OnSuccess(dataSetUploads => dataSetUploads
+                    .Select(ValidateDataSetCanBeImported)
+                    .OnSuccessAll())
+                .OnSuccessDo(async dataSetUploads =>
                 {
-                    var releaseFiles = await dataSetFileStorage.MoveDataSetsToPermanentStorage(releaseVersionId, dataSetFiles, cancellationToken);
-                    return await BuildDataFileViewModels(releaseFiles);
-                });
+                    await dataSetFileStorage.MoveDataSetsToPermanentStorage(releaseVersionId, dataSetUploads, cancellationToken);
+
+                    // Upload records are no longer needed once the files have been queued for import
+                    contentDbContext.DataSetUploads.RemoveRange(dataSetUploads);
+                    await contentDbContext.SaveChangesAsync(cancellationToken);
+                })
+                .OnSuccessVoid();
         }
 
-        private async Task<Either<ActionResult, Unit>> ValidateTempDataSetFileExistence(
+        private async Task<Either<ActionResult, DataSetUpload>> ValidateDataSetUploadExistence(
             Guid releaseVersionId,
-            DataSetUploadResultViewModel dataSet)
+            Guid dataSetUploadId,
+            CancellationToken cancellationToken)
         {
-            var dataBlobExists = await privateBlobStorageService.CheckBlobExists(PrivateReleaseTempFiles, $"{FileExtensions.Path(releaseVersionId, FileType.Data, dataSet.DataFileId)}");
-            var metaBlobExists = await privateBlobStorageService.CheckBlobExists(PrivateReleaseTempFiles, $"{FileExtensions.Path(releaseVersionId, FileType.Metadata, dataSet.MetaFileId)}");
+            var dataSetUpload = await contentDbContext.DataSetUploads.FirstOrDefaultAsync(upload =>
+                dataSetUploadId == upload.Id &&
+                upload.ReleaseVersionId == releaseVersionId,
+                cancellationToken);
+
+            if (dataSetUpload is null)
+            {
+                return Common.Validators.ValidationUtils.ValidationResult(ValidationMessages.GenerateErrorDataSetUploadNotFound());
+            }
+
+            var dataBlobExists = await privateBlobStorageService.CheckBlobExists(PrivateReleaseTempFiles, dataSetUpload.DataFilePath);
+            var metaBlobExists = await privateBlobStorageService.CheckBlobExists(PrivateReleaseTempFiles, dataSetUpload.MetaFilePath);
 
             return !dataBlobExists || !metaBlobExists
-                ? throw new Exception("Unable to locate temporary files at the locations specified")
-                : Unit.Instance;
+                ? Common.Validators.ValidationUtils.ValidationResult(ValidationMessages.GenerateErrorTemporaryFilesNotFound())
+                : dataSetUpload;
+        }
+
+        private static Either<ActionResult, DataSetUpload> ValidateDataSetCanBeImported(DataSetUpload dataSetUpload)
+        {
+            return dataSetUpload.Status is not DataSetUploadStatus.PENDING_REVIEW and not DataSetUploadStatus.PENDING_IMPORT
+                ? Common.Validators.ValidationUtils.ValidationResult(ValidationMessages.GenerateErrorDataSetIsNotInAnImportableState())
+                : dataSetUpload;
         }
 
         private async Task<DataFileInfo> BuildDataFileViewModel(ReleaseFile releaseFile)

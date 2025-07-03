@@ -43,8 +43,14 @@ export default function ReleaseDataFilePage({
     queryClient.removeQueries({
       queryKey: releaseDataFileQueries.list(releaseVersionId).queryKey,
     });
+    queryClient.removeQueries({
+      queryKey: releaseDataFileQueries.listUploads(releaseVersionId).queryKey,
+    });
     await queryClient.invalidateQueries({
       queryKey: releaseDataFileQueries.list._def,
+    });
+    await queryClient.invalidateQueries({
+      queryKey: releaseDataFileQueries.listUploads._def,
     });
 
     history.push(

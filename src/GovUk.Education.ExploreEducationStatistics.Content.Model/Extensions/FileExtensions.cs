@@ -1,8 +1,8 @@
 #nullable enable
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStoragePathUtils;
 
@@ -31,7 +31,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions
 
         public static string DisplaySize(this File file)
         {
-            var contentLength = file.ContentLength;
+            return DisplaySize(file.ContentLength);
+        }
+
+        public static string DisplaySize(this long contentLength)
+        {
             var unit = FileSizeUnit.B;
             while (contentLength >= 1024 && unit < FileSizeUnit.Tb)
             {

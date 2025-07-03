@@ -3,10 +3,13 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologies;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ManageContent;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Public.Data;
+using GovUk.Education.ExploreEducationStatistics.Common;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Mappings;
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
@@ -222,6 +225,46 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
                 .ForMember(dest => dest.Type,
                     m => m.MapFrom(dataSetVersion =>
                         dataSetVersion.VersionType));
+
+            CreateMap<DataSetUpload, DataSetUploadViewModel>()
+                .ForMember(dest => dest.Status,
+                    m => m.MapFrom(upload =>
+                        GetDataSetUploadStatus(upload.ScreenerResult)))
+                .ForMember(dest => dest.DataFileSize,
+                    m => m.MapFrom(upload =>
+                        FileExtensions.DisplaySize(upload.DataFileSizeInBytes)))
+                .ForMember(dest => dest.MetaFileSize,
+                    m => m.MapFrom(upload =>
+                        FileExtensions.DisplaySize(upload.MetaFileSizeInBytes)));
+
+            CreateMap<DataSetScreenerResponse, ScreenerResultViewModel>();
+
+            CreateMap<DataScreenerTestResult, ScreenerTestResultViewModel>()
+                .ForMember(dest => dest.Result,
+                    m => m.MapFrom(upload => upload.Result.ToString()));
+
+            CreateMap<DataSetUpload, DataSetScreenerRequest>()
+                .BeforeMap((s, d) => d.StorageContainerName = Constants.ContainerNames.PrivateReleaseTempFiles);
+        }
+
+        private static string GetDataSetUploadStatus(DataSetScreenerResponse screenerResult)
+        {
+            // TODO (EES-5353): This first condition shouldn't be required to determine pass or fail and should eventually be removed.
+            // This is an issue with the WIP screener package where a "stage" passes, even though it contains failing tests.
+            var hasIndividualTestFailures = screenerResult is null || screenerResult.TestResults.Any(test => test.Result == TestResult.FAIL);
+            if (hasIndividualTestFailures)
+            {
+                return DataSetUploadStatus.FAILED_SCREENING.ToString();
+            }
+
+            return screenerResult.OverallResult switch
+            {
+                ScreenerResult.Passed => screenerResult.TestResults.Any(test => test.Result == TestResult.WARNING)
+                    ? DataSetUploadStatus.PENDING_REVIEW.ToString()
+                    : DataSetUploadStatus.PENDING_IMPORT.ToString(),
+                ScreenerResult.Failed => DataSetUploadStatus.FAILED_SCREENING.ToString(),
+                _ => throw new ArgumentOutOfRangeException(nameof(screenerResult), screenerResult, null),
+            };
         }
 
         private void CreateContentBlockMap()
