@@ -13,6 +13,7 @@ interface DataFileInfo extends FileInfo {
   created: string;
   status: ImportStatusCode;
   replacedBy?: string;
+  replacedByDataFile?: DataFileInfo;
   permissions: DataFilePermissions;
 }
 
@@ -35,6 +36,7 @@ export interface DataFile {
   userName: string;
   status: ImportStatusCode;
   replacedBy?: string;
+  replacedByDataFile?: DataFile;
   created?: string;
   isDeleting?: boolean;
   isCancelling?: boolean;
@@ -107,6 +109,10 @@ function mapFile({ name, ...file }: DataFileInfo): DataFile {
       size: parseInt(size, 10),
       unit,
     },
+    replacedByDataFile:
+      file.replacedByDataFile === undefined
+        ? undefined
+        : mapFile(file.replacedByDataFile),
   };
 }
 
