@@ -30,6 +30,7 @@ export interface AzurePublicationSearchResult {
 }
 
 export interface AzurePublicationSuggestResult {
+  highlightedMatch: string;
   releaseSlug: string;
   publicationSlug: string;
   summary: string;
@@ -163,9 +164,12 @@ const azurePublicationService = {
 
     let resultsToReturn = [] as AzurePublicationSuggestResult[];
     if (suggestResults?.results) {
-      resultsToReturn = suggestResults?.results.map(
-        result => result.document as AzurePublicationSuggestResult,
-      );
+      resultsToReturn = suggestResults?.results.map(result => {
+        return {
+          ...result.document,
+          highlightedMatch: result.text,
+        } as AzurePublicationSuggestResult;
+      });
     }
     return resultsToReturn;
   },

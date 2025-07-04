@@ -1,11 +1,10 @@
 import SearchFormAzure from '@frontend/components/SearchFormAzure';
 import _publicationService from '@frontend/services/azurePublicationService';
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import React from 'react';
 import noop from 'lodash/noop';
 import userEvent from '@testing-library/user-event';
 import { testPublicationSuggestions } from '@frontend/modules/find-statistics/__tests__/__data__/testPublicationSuggestions';
-import mockRouter from 'next-router-mock';
 
 jest.mock('@azure/search-documents', () => ({
   SearchClient: jest.fn(),
