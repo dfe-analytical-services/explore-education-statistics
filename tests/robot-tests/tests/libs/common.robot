@@ -992,6 +992,14 @@ user checks items matching locator contain exact items in order
         user checks element should contain    ${actual}[${index}]    ${content}
     END
 
+user checks meta title should be
+    [Arguments]    ${text}
+    user checks element attribute value should be    xpath://meta[@name="title"]    content    ${text}
+
+user checks meta description should be
+    [Arguments]    ${text}
+    user checks element attribute value should be    xpath://meta[@name="description"]    content    ${text}
+
 user checks breadcrumb count should be
     [Arguments]    ${count}
     user waits until page contains element    css:[data-testid="breadcrumbs--list"] li    limit=${count}

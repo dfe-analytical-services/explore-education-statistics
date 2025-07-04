@@ -60,12 +60,7 @@ const PublicationReleasePage: NextPage<Props> = ({ releaseVersion }) => {
     <Page
       title={releaseVersion.publication.title}
       caption={releaseVersion.title}
-      description={
-        releaseVersion.summarySection.content &&
-        releaseVersion.summarySection.content.length > 0
-          ? releaseVersion.summarySection.content[0].body
-          : ''
-      }
+      description={releaseVersion.publication.summary}
       breadcrumbs={[
         { name: 'Find statistics and data', link: '/find-statistics' },
       ]}

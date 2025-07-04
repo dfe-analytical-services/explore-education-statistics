@@ -20,6 +20,7 @@ export interface Publication {
   id: string;
   slug: string;
   title: string;
+  summary?: string;
   releaseSeries: ReleaseSeriesItem[];
   theme: {
     id: string;
