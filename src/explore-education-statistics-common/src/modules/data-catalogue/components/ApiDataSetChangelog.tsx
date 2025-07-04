@@ -2,7 +2,6 @@ import WarningMessage from '@common/components/WarningMessage';
 import ChangeSection from '@common/modules/data-catalogue/components/ChangeSection';
 import { ChangeSet } from '@common/services/types/apiDataSetChanges';
 import React from 'react';
-import isPatchVersion from '@common/utils/isPatchVersion';
 
 interface Props {
   majorChanges: ChangeSet;
@@ -15,8 +14,6 @@ export default function ApiDataSetChangelog({
   minorChanges,
   version,
 }: Props) {
-  const isPatch = isPatchVersion(version);
-
   return (
     <>
       {Object.keys(majorChanges).length > 0 && (
@@ -47,15 +44,12 @@ export default function ApiDataSetChangelog({
 
       {Object.keys(minorChanges).length > 0 && (
         <div data-testid="minor-changes">
-          <h3>
-            {isPatch ? 'Patch' : 'Minor'} changes for version {version}
-          </h3>
+          <h3>Minor changes for version {version}</h3>
 
           <p>
-            This version introduces {isPatch ? 'patch' : 'minor non-breaking'}{' '}
-            changes that are unlikely to affect consumers of the previous
-            version. You may wish to check the list of changes below before
-            upgrading.
+            This version introduces minor non-breaking changes that are unlikely
+            to affect consumers of the previous version. You may wish to check
+            the list of changes below before upgrading.
           </p>
 
           <ChangeSection changes={minorChanges} />

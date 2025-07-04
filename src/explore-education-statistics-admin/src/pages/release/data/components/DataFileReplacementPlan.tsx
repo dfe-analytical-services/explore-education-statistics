@@ -32,7 +32,6 @@ import sanitizeHtml from '@common/utils/sanitizeHtml';
 import { useAuthContext } from '@admin/contexts/AuthContext';
 import Link from '@admin/components/Link';
 import { useConfig } from '@admin/contexts/ConfigContext';
-import isPatchVersion from '@common/utils/isPatchVersion';
 
 interface Props {
   cancelButton: ReactNode;
@@ -183,9 +182,9 @@ const DataFileReplacementPlan = ({
       </p>
     </>
   );
-
+  const versionParts = plan?.apiDataSetVersionPlan?.version?.split('.') || [];
   const isPatch = isNewReplaceDsvFeatureEnabled
-    ? isPatchVersion(plan?.apiDataSetVersionPlan?.version)
+    ? versionParts?.length === 3 && parseInt(versionParts[2], 10) > 0
     : false;
 
   const locationsAndFiltersErrorTags = (

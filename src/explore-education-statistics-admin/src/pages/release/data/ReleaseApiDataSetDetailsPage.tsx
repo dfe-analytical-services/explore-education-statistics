@@ -33,7 +33,6 @@ import TaskListItem from '@common/components/TaskListItem';
 import { useQuery } from '@tanstack/react-query';
 import React, { useEffect, useState } from 'react';
 import { generatePath, useHistory, useParams } from 'react-router-dom';
-import isPatchVersion from '@common/utils/isPatchVersion';
 
 export type DataSetFinalisingStatus = 'finalising' | 'finalised' | undefined;
 
@@ -72,8 +71,9 @@ export default function ReleaseApiDataSetDetailsPage() {
     }
   }, [finalisingStatus, dataSet?.draftVersion?.status, setFinalisingStatus]);
 
+  const versionParts = dataSet?.draftVersion?.version?.split('.') || [];
   const isPatch = isNewReplaceDsvFeatureEnabled
-    ? isPatchVersion(dataSet?.draftVersion?.version)
+    ? versionParts?.length === 3 && parseInt(versionParts[2], 10) > 0
     : false;
 
   const shouldShowRejectedError = (
@@ -165,7 +165,7 @@ export default function ReleaseApiDataSetDetailsPage() {
                 </li>
               </>
             )}
-            {canUpdateRelease && !isPatch && (
+            {canUpdateRelease && (
               <li>
                 <DeleteDraftVersionButton
                   dataSet={dataSet}

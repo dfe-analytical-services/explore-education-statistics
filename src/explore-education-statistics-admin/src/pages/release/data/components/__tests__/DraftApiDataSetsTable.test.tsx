@@ -1,4 +1,3 @@
-import { TestConfigContextProvider } from '@admin/contexts/ConfigContext';
 import DraftApiDataSetsTable, {
   DraftApiDataSetSummary,
 } from '@admin/pages/release/data/components/DraftApiDataSetsTable';
@@ -114,22 +113,6 @@ describe('DraftApiDataSetsTable', () => {
         version: '1.0',
         status: 'Failed',
         type: 'Major',
-      },
-      previousReleaseIds: [],
-    },
-  ];
-
-  const patchDataSet: DraftApiDataSetSummary[] = [
-    {
-      id: 'data-set-7',
-      title: 'Data set 7 title',
-      summary: 'Data set 7 summary',
-      status: 'Published',
-      draftVersion: {
-        id: 'version-8',
-        version: '2.0.1',
-        status: 'Mapping',
-        type: 'Patch',
       },
       previousReleaseIds: [],
     },
@@ -393,92 +376,7 @@ describe('DraftApiDataSetsTable', () => {
     expect(screen.queryByRole('table')).not.toBeInTheDocument();
   });
 
-  test('it renders Remove Draft button if working with a PATCH draft version but the feature flag is off', () => {
-    render(
-      <DraftApiDataSetsTable
-        canUpdateRelease
-        dataSets={patchDataSet}
-        publicationId="publication-1"
-        releaseVersionId="release-1"
-      />,
-    );
-
-    const rows = within(screen.getByRole('table')).getAllByRole('row');
-
-    expect(rows).toHaveLength(2);
-
-    const row1Cells = within(rows[1]).getAllByRole('cell');
-
-    expect(row1Cells[0]).toHaveTextContent('v2.0.1');
-    expect(row1Cells[1]).toHaveTextContent('Data set 7 title');
-    expect(row1Cells[2]).toHaveTextContent('Action required');
-    expect(row1Cells[3]).toHaveTextContent('Remove draft for Data set 7 title');
-  });
-
-  test('it doesnt render Remove Draft button if working with a PATCH draft version but the feature flag is on', () => {
-    render(
-      <DraftApiDataSetsTable
-        canUpdateRelease
-        dataSets={patchDataSet}
-        publicationId="publication-1"
-        releaseVersionId="release-1"
-      />,
-      true,
-    );
-
-    const rows = within(screen.getByRole('table')).getAllByRole('row');
-
-    expect(rows).toHaveLength(2);
-
-    const row1Cells = within(rows[1]).getAllByRole('cell');
-
-    expect(row1Cells[0]).toHaveTextContent('v2.0.1');
-    expect(row1Cells[1]).toHaveTextContent('Data set 7 title');
-    expect(row1Cells[2]).toHaveTextContent('Action required');
-    expect(row1Cells[3]).not.toHaveTextContent(
-      'Remove draft for Data set 7 title',
-    );
-  });
-
-  function render(
-    element: ReactNode,
-    enableReplacementOfPublicApiDataSets?: boolean,
-  ) {
-    const defaultTestConfig = {
-      appInsightsKey: '',
-      publicAppUrl: 'http://localhost',
-      publicApiUrl: 'http://public-api',
-      publicApiDocsUrl: 'http://public-api-docs',
-      permittedEmbedUrlDomains: [
-        'https://department-for-education.shinyapps.io',
-      ],
-      oidc: {
-        clientId: '',
-        authority: '',
-        knownAuthorities: [''],
-        adminApiScope: '',
-        authorityMetadata: {
-          authorizationEndpoint: '',
-          tokenEndpoint: '',
-          issuer: '',
-          userInfoEndpoint: '',
-          endSessionEndpoint: '',
-        },
-      },
-    };
-
-    return baseRender(
-      <MemoryRouter>
-        <TestConfigContextProvider
-          config={{
-            ...defaultTestConfig,
-            enableReplacementOfPublicApiDataSets:
-              enableReplacementOfPublicApiDataSets ?? false,
-          }}
-        >
-          {element}
-        </TestConfigContextProvider>
-      </MemoryRouter>,
-    );
+  function render(element: ReactNode) {
+    return baseRender(<MemoryRouter>{element}</MemoryRouter>);
   }
 });

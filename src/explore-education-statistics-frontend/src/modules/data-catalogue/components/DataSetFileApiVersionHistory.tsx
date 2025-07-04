@@ -10,7 +10,6 @@ import { logEvent } from '@frontend/services/googleAnalyticsService';
 import { useQuery } from '@tanstack/react-query';
 import { useRouter } from 'next/router';
 import React from 'react';
-import showCurrentNextToVersion from '../utils/showCurrentNextToVersion';
 
 const sectionId = 'apiVersionHistory';
 
@@ -33,22 +32,6 @@ export default function DataSetFileApiVersionHistory({
   });
 
   const { page = 1, totalPages = 1 } = data?.paging ?? {};
-  const currentVersionFileId = data?.results.find(
-    version => version.version === currentVersion,
-  )?.file.id;
-  const patchVersionHighestPatchDictionary = data?.results.reduce<
-    Record<string, number>
-  >((acc, version) => {
-    const [major, minor, patch] = version.version.split('.').map(Number);
-    if (patch === undefined) {
-      return acc;
-    }
-    const key = `${major}.${minor}`;
-    if (!acc[key] || patch > acc[key]) {
-      acc[key] = patch;
-    }
-    return acc;
-  }, {});
 
   return (
     <DataSetFilePageSection heading={pageApiSections[sectionId]} id={sectionId}>
@@ -67,23 +50,14 @@ export default function DataSetFileApiVersionHistory({
                 {data?.results.map(version => (
                   <tr key={version.version}>
                     <td>
-                      {version.version !== currentVersion &&
-                      version.file.id !== currentVersionFileId ? (
+                      {version.version !== currentVersion ? (
                         <Link
                           to={`/data-catalogue/data-set/${version.file.id}`}
                         >
                           {version.version}
                         </Link>
                       ) : (
-                        <strong>
-                          {version.version}{' '}
-                          {showCurrentNextToVersion(
-                            version.version,
-                            patchVersionHighestPatchDictionary,
-                          )
-                            ? '(Current)'
-                            : ''}
-                        </strong>
+                        <strong>{version.version} (current)</strong>
                       )}
                     </td>
                     <td>{version.release.title}</td>
