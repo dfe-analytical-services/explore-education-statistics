@@ -7,6 +7,7 @@ Library     String
 *** Variables ***
 ${BAU1_BROWSER}         bau1
 ${ANALYST1_BROWSER}     analyst1
+${MODAL_SELECTOR}       css:[role="dialog"]
 
 
 *** Keywords ***
@@ -570,6 +571,19 @@ user uploads subject and waits until pending import
     ...    Pending import
     ...    ${FOLDER}
 
+user uploads subject and waits until failed screening
+    [Arguments]
+    ...    ${SUBJECT_NAME}
+    ...    ${SUBJECT_FILE}
+    ...    ${META_FILE}
+    ...    ${FOLDER}=${FILES_DIR}
+    user uploads subject
+    ...    ${SUBJECT_NAME}
+    ...    ${SUBJECT_FILE}
+    ...    ${META_FILE}
+    ...    Failed screening
+    ...    ${FOLDER}
+
 user uploads subject
     [Arguments]
     ...    ${SUBJECT_NAME}
@@ -851,19 +865,35 @@ user waits until modal is visible
     ...    ${modal_text}=${EMPTY}
     ...    ${wait}=${timeout}
 
-    user waits until parent contains element    css:[role="dialog"]    xpath://h2[.="${modal_title}"]
+    user waits until parent contains element    ${MODAL_SELECTOR}    xpath://h2[.="${modal_title}"]
     ...    timeout=${wait}
     IF    "${modal_text}" != "${EMPTY}"
-        user waits until parent contains element    css:[role="dialog"]    xpath://*[.="${modal_text}"]
+        user waits until parent contains element    ${MODAL_SELECTOR}    xpath://*[.="${modal_text}"]
         ...    timeout=${wait}
     END
-    ${modal_element}=    get webelement    css:[role="dialog"]
+    ${modal_element}=    get webelement    ${MODAL_SELECTOR}
     [Return]    ${modal_element}
 
 user waits until modal is not visible
     [Arguments]    ${modal_title}    ${wait}=${timeout}
-    user waits until page does not contain element    css:[role="dialog"]    ${wait}
+    user waits until page does not contain element    ${MODAL_SELECTOR}    ${wait}
     user waits until h2 is not visible    ${modal_title}
+
+user checks modal warning text contains
+    [Arguments]
+    ...    ${text}
+    user waits until parent contains element    ${MODAL_SELECTOR}
+    ...    //*[contains(@class, "govuk-warning-text")][contains(., "${text}")]
+
+user checks modal contains text
+    [Arguments]
+    ...    ${text}
+    user waits until parent contains element    ${MODAL_SELECTOR}    //*[contains(., "${text}")]
+
+user clicks modal button
+    [Arguments]
+    ...    ${text}
+    user clicks button    ${text}    ${MODAL_SELECTOR}
 
 user gets resolved comments
     [Arguments]    ${parent}=css:body

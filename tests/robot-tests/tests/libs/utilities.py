@@ -192,7 +192,13 @@ def user_scrolls_element_to_center_of_view(locator_or_element: object):
         element = _get_webelement_from_locator(locator_or_element)
         sl().driver.execute_script('arguments[0].scrollIntoView({behavior: "instant", block: "center"})', element)
 
-    do_with_stale_element_retries(scroll_to_element, "user_scrolls_element_to_center_of_view")
+    do_with_retries(
+        scroll_to_element,
+        "user_scrolls_element_to_center_of_view",
+        StaleElementReferenceException,
+        retries=3,
+        retry_delay=2,
+    )
 
 
 def set_cookie_from_json(cookie_json):
@@ -330,10 +336,6 @@ def get_child_element_with_retry(parent_locator: object, child_locator: str, max
     return do_with_retries(
         get_element, "get_child_element_with_retry", NoSuchElementException, max_retries, retry_delay
     )
-
-
-def do_with_stale_element_retries(action, action_description, retries=3, retry_delay=2):
-    return do_with_retries(action, action_description, StaleElementReferenceException, retries, retry_delay)
 
 
 def do_with_retries(action, action_description: str, allowed_exception_types, retries: int, retry_delay: int):
