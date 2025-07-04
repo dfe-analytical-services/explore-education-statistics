@@ -29,7 +29,9 @@ export default function DataFilesReplacementTable({
           <th scope="col">Title</th>
           <th scope="col">Size</th>
           <th scope="col">Replacement status</th>
-          <th scope="col">Actions</th>
+          <th className={styles.actionsColumn} scope="col">
+            Actions
+          </th>
         </tr>
       </thead>
 
