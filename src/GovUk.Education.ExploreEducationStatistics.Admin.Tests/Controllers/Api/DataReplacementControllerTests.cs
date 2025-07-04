@@ -13,6 +13,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api;
 
@@ -27,7 +28,6 @@ public abstract class DataReplacementControllerTests
 
             var releaseVersionId = Guid.NewGuid();
             var originalFileId = Guid.NewGuid();
-            var replacementFileId = Guid.NewGuid();
 
             var dataReplacementPlan = new DataReplacementPlanViewModel
             {
@@ -77,7 +77,6 @@ public abstract class DataReplacementControllerTests
                 .Setup(s => s.GetReplacementPlan(
                     releaseVersionId, 
                     originalFileId, 
-                    replacementFileId, 
                     It.IsAny<CancellationToken>()))
                 .ReturnsAsync(dataReplacementPlan);
 
@@ -85,8 +84,7 @@ public abstract class DataReplacementControllerTests
 
             var result = await controller.GetReplacementPlan(
                 releaseVersionId: releaseVersionId,
-                fileId: originalFileId,
-                replacementFileId: replacementFileId);
+                originalFileId: originalFileId);
 
             MockUtils.VerifyAllMocks(replacementService);
 
@@ -105,27 +103,25 @@ public abstract class DataReplacementControllerTests
         [Fact]
         public async Task Success()
         {
-            var replacementService = new Mock<IReplacementService>(MockBehavior.Strict);
+            var replacementBatchService = new Mock<IReplacementBatchService>(MockBehavior.Strict);
 
             var releaseVersionId = Guid.NewGuid();
             var originalFileId = Guid.NewGuid();
-            var replacementFileId = Guid.NewGuid();
 
-            replacementService
+            replacementBatchService
                 .Setup(service => service.Replace(
                     releaseVersionId,
-                    originalFileId,
-                    replacementFileId))
+                    new List<Guid> { originalFileId },
+                    It.IsAny<CancellationToken>()))
                 .ReturnsAsync(Unit.Instance);
 
-            var controller = BuildController(replacementService: replacementService.Object);
+            var controller = BuildController(replacementBatchService: replacementBatchService.Object);
 
             var result = await controller.Replace(
                 releaseVersionId: releaseVersionId,
-                fileId: originalFileId,
-                replacementFileId: replacementFileId);
+                new ReplacementRequest { OriginalFileIds = [originalFileId] });
 
-            MockUtils.VerifyAllMocks(replacementService);
+            MockUtils.VerifyAllMocks(replacementBatchService);
 
             result.AssertOkResult();
         }
@@ -133,35 +129,36 @@ public abstract class DataReplacementControllerTests
         [Fact]
         public async Task ValidationProblem()
         {
-            var replacementService = new Mock<IReplacementService>(MockBehavior.Strict);
+            var replacementBatchService = new Mock<IReplacementBatchService>(MockBehavior.Strict);
 
             var releaseVersionId = Guid.NewGuid();
             var originalFileId = Guid.NewGuid();
-            var replacementFileId = Guid.NewGuid();
 
-            replacementService
+            replacementBatchService
                 .Setup(service => service.Replace(
                     releaseVersionId,
-                    originalFileId,
-                    replacementFileId))
+                    new List<Guid> { originalFileId },
+                    It.IsAny<CancellationToken>()))
                 .ReturnsAsync(ValidationUtils.ValidationActionResult(ValidationErrorMessages.ReplacementMustBeValid));
 
-            var controller = BuildController(replacementService: replacementService.Object);
+            var controller = BuildController(replacementBatchService: replacementBatchService.Object);
 
             var result = await controller.Replace(
                 releaseVersionId: releaseVersionId,
-                fileId: originalFileId,
-                replacementFileId: replacementFileId);
+                new ReplacementRequest { OriginalFileIds = [originalFileId] });
 
-            MockUtils.VerifyAllMocks(replacementService);
+            MockUtils.VerifyAllMocks(replacementBatchService);
 
             result.AssertValidationProblem(ValidationErrorMessages.ReplacementMustBeValid);
         }
     }
 
-    private static DataReplacementController BuildController(IReplacementService? replacementService = null)
+    private static DataReplacementController BuildController(
+        IReplacementService? replacementService = null,
+        IReplacementBatchService? replacementBatchService = null)
     {
         return new DataReplacementController(
-            replacementService ?? Mock.Of<IReplacementService>(MockBehavior.Strict));
+            replacementService ?? Mock.Of<IReplacementService>(MockBehavior.Strict),
+            replacementBatchService ?? Mock.Of<IReplacementBatchService>(MockBehavior.Strict));
     }
 }

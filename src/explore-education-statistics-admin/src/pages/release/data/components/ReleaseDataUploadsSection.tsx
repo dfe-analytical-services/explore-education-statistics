@@ -58,9 +58,9 @@ export default function ReleaseDataUploadsSection({
     [allDataFiles],
   );
 
-  // TODO - bulk confirmation of replacements
+  // TODO - EES-6244 bulk confirmation of replacements
   //  const validReplacedDataFiles = replacedDataFiles.filter(
-  //   file => file.status === 'COMPLETE',
+  //   file => file.status === 'COMPLETE', // this checks the original file status, not the replacement!
   // );
   // const allowBulkConfirm = validReplacedDataFiles.length > 1;
 
@@ -189,7 +189,7 @@ export default function ReleaseDataUploadsSection({
     [releaseVersionId, toggleReordering],
   );
 
-  // TODO - bulk confirmation of replacements
+  // TODO - EES-6244 bulk confirmation of replacements
   // const handleConfirmAllReplacements = () => {};
 
   return (
@@ -255,7 +255,7 @@ export default function ReleaseDataUploadsSection({
                 <Button onClick={toggleReordering.on} variant="secondary">
                   Reorder data files
                 </Button>
-                {/* TODO - bulk confirmation of replacements */}
+                {/* TODO - EES-6244 bulk confirmation of replacements */}
                 {/* {allowBulkConfirm && (
                   <Button onClick={handleConfirmAllReplacements}>
                     Confirm all valid replacements
