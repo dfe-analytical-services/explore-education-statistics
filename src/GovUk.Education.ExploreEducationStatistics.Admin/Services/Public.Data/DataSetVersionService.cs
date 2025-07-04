@@ -34,7 +34,8 @@ public class DataSetVersionService(
     IProcessorClient processorClient,
     IPublicDataApiClient publicDataApiClient,
     IUserService userService,
-    IMapper mapper)
+    IMapper mapper,
+    IDataSetVersionMappingService dataSetVersionMappingService)
     : IDataSetVersionService
 {
     public async Task<Either<ActionResult, PaginatedListViewModel<DataSetLiveVersionSummaryViewModel>>>
@@ -148,6 +149,10 @@ public class DataSetVersionService(
         CancellationToken cancellationToken = default)
     {
         return await userService.CheckIsBauUser()
+            .OnSuccess(async () => await GetVersion(
+                dataSetVersionId: dataSetVersionId,
+                cancellationToken: cancellationToken))
+            .OnSuccessDo(CheckCanUpdatePatchVersion)
             .OnSuccess(async _ => await processorClient.CompleteNextDataSetVersionImport(
                 dataSetVersionId: dataSetVersionId,
                 cancellationToken: cancellationToken))
@@ -319,6 +324,26 @@ public class DataSetVersionService(
         }
 
         return Unit.Instance;
+    }
+
+    private async Task<Either<ActionResult, Unit>> CheckCanUpdatePatchVersion(
+        DataSetVersion dataSetVersion)
+    {
+        if (dataSetVersion.VersionPatch == 0)
+        {
+            return Unit.Instance;
+        }
+        // If the version is a patch version, we need to check that the mapping status is not major.
+        var mappingStatus = await dataSetVersionMappingService.GetMappingStatus(dataSetVersion.Id);
+
+        return mappingStatus.IsMajorVersionUpdate
+            ? ValidationUtils.ValidationResult(new ErrorViewModel
+            {
+                Code = ValidationMessages.DataSetVersionMappingResultedInMajorChange.Code,
+                Message = ValidationMessages.DataSetVersionMappingResultedInMajorChange.Message,
+                Path = "dataSetVersionId"
+            })
+            : Unit.Instance;
     }
 
     private async Task<Either<ActionResult, DataSetVersion>> UpdateVersion(

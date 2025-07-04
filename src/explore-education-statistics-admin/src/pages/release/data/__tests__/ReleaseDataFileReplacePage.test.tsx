@@ -1,3 +1,4 @@
+import { TestConfigContextProvider } from '@admin/contexts/ConfigContext';
 import ReleaseDataFileReplacePage from '@admin/pages/release/data/ReleaseDataFileReplacePage';
 import {
   releaseDataFileReplaceRoute,
@@ -14,6 +15,7 @@ import { render, screen, waitFor, within } from '@testing-library/react';
 import React from 'react';
 import { generatePath, MemoryRouter, Route } from 'react-router';
 import userEvent from '@testing-library/user-event';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 jest.mock('@admin/services/dataReplacementService');
 jest.mock('@admin/services/releaseDataFileService');
@@ -100,7 +102,7 @@ describe('ReleaseDataFileReplacePage', () => {
       totalRows: 100,
     });
 
-    render(
+    renderWithTestConfig(
       <MemoryRouter
         initialEntries={[
           generatePath<ReleaseDataFileReplaceRouteParams>(
@@ -150,7 +152,7 @@ describe('ReleaseDataFileReplacePage', () => {
       testValidReplacementPlan,
     );
 
-    render(
+    renderWithTestConfig(
       <MemoryRouter
         initialEntries={[
           generatePath<ReleaseDataFileReplaceRouteParams>(
@@ -201,7 +203,7 @@ describe('ReleaseDataFileReplacePage', () => {
       testValidReplacementPlan,
     );
 
-    render(
+    renderWithTestConfig(
       <MemoryRouter
         initialEntries={[
           generatePath<ReleaseDataFileReplaceRouteParams>(
@@ -281,7 +283,7 @@ describe('ReleaseDataFileReplacePage', () => {
       totalRows: 100,
     });
 
-    render(
+    renderWithTestConfig(
       <MemoryRouter
         initialEntries={[
           generatePath<ReleaseDataFileReplaceRouteParams>(
@@ -351,7 +353,7 @@ describe('ReleaseDataFileReplacePage', () => {
       testValidReplacementPlan,
     );
 
-    render(
+    renderWithTestConfig(
       <MemoryRouter
         initialEntries={[
           generatePath<ReleaseDataFileReplaceRouteParams>(
@@ -403,7 +405,7 @@ describe('ReleaseDataFileReplacePage', () => {
       totalRows: 110,
     });
 
-    render(
+    renderWithTestConfig(
       <MemoryRouter
         initialEntries={[
           generatePath<ReleaseDataFileReplaceRouteParams>(
@@ -453,7 +455,7 @@ describe('ReleaseDataFileReplacePage', () => {
       new Error('Something went wrong'),
     );
 
-    render(
+    renderWithTestConfig(
       <MemoryRouter
         initialEntries={[
           generatePath<ReleaseDataFileReplaceRouteParams>(
@@ -497,7 +499,7 @@ describe('ReleaseDataFileReplacePage', () => {
       testValidReplacementPlan,
     );
 
-    render(
+    renderWithTestConfig(
       <MemoryRouter
         initialEntries={[
           generatePath<ReleaseDataFileReplaceRouteParams>(
@@ -570,7 +572,7 @@ describe('ReleaseDataFileReplacePage', () => {
       totalRows: 0,
     });
 
-    render(
+    renderWithTestConfig(
       <MemoryRouter
         initialEntries={[
           generatePath<ReleaseDataFileReplaceRouteParams>(
@@ -631,7 +633,7 @@ describe('ReleaseDataFileReplacePage', () => {
       new Error('Something went wrong'),
     );
 
-    render(
+    renderWithTestConfig(
       <MemoryRouter
         initialEntries={[
           generatePath<ReleaseDataFileReplaceRouteParams>(
@@ -681,4 +683,54 @@ describe('ReleaseDataFileReplacePage', () => {
       ).toBeInTheDocument();
     });
   });
+
+  const createTestQueryClient = () => {
+    return new QueryClient({
+      defaultOptions: {
+        queries: {
+          // Avoid retries to speed up testing feedback
+          retry: false,
+        },
+      },
+    });
+  };
+
+  const renderWithTestConfig = (
+    ui: React.ReactElement,
+    enableReplaceApiFeatureFlag: boolean = false,
+  ) => {
+    const defaultTestConfig = {
+      appInsightsKey: '',
+      publicAppUrl: 'http://localhost',
+      publicApiUrl: 'http://public-api',
+      publicApiDocsUrl: 'http://public-api-docs',
+      permittedEmbedUrlDomains: [
+        'https://department-for-education.shinyapps.io',
+      ],
+      oidc: {
+        clientId: '',
+        authority: '',
+        knownAuthorities: [''],
+        adminApiScope: '',
+        authorityMetadata: {
+          authorizationEndpoint: '',
+          tokenEndpoint: '',
+          issuer: '',
+          userInfoEndpoint: '',
+          endSessionEndpoint: '',
+        },
+      },
+    };
+    const testQueryClient = createTestQueryClient();
+    return render(
+      <TestConfigContextProvider
+        config={{
+          ...defaultTestConfig,
+          enableReplacementOfPublicApiDataSets: enableReplaceApiFeatureFlag,
+        }}
+      >
+        <QueryClientProvider client={testQueryClient}>{ui}</QueryClientProvider>
+      </TestConfigContextProvider>,
+    );
+  };
 });
