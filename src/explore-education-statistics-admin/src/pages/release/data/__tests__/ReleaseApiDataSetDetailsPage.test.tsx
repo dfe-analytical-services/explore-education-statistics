@@ -108,6 +108,12 @@ describe('ReleaseApiDataSetDetailsPage', () => {
     },
   };
 
+  const testPatchDraftVersion: ApiDataSetDraftVersion = {
+    ...testDraftVersion,
+    version: '2.0.1',
+    type: 'Patch',
+  };
+
   const defaultTestConfig = {
     appInsightsKey: '',
     publicAppUrl: 'http://localhost',
@@ -438,6 +444,54 @@ describe('ReleaseApiDataSetDetailsPage', () => {
       'href',
       '/publication/publication-1/release/release-1-id/api-data-sets/data-set-id/versions',
     );
+  });
+
+  test('it renders Remove Draft button if working with a PATCH draft version but the feature flag is off', async () => {
+    apiDataSetService.getDataSet.mockResolvedValue({
+      ...testDataSet,
+      draftVersion: {
+        ...testPatchDraftVersion,
+        mappingStatus: {
+          filtersComplete: false,
+          locationsComplete: false,
+          filtersHaveMajorChange: false,
+          locationsHaveMajorChange: false,
+          isMajorVersionUpdate: false,
+        },
+      },
+      latestLiveVersion: testLiveVersion,
+    });
+
+    renderPage({ enableReplacementOfPublicApiDataSets: false });
+
+    await waitFor(() => {
+      expect(screen.queryByText('Remove draft version')).toBeInTheDocument();
+    });
+  });
+
+  test('it doesnt render Remove Draft button if working with a PATCH draft version but the feature flag is on', async () => {
+    apiDataSetService.getDataSet.mockResolvedValue({
+      ...testDataSet,
+      draftVersion: {
+        ...testPatchDraftVersion,
+        mappingStatus: {
+          filtersComplete: false,
+          locationsComplete: false,
+          filtersHaveMajorChange: false,
+          locationsHaveMajorChange: false,
+          isMajorVersionUpdate: false,
+        },
+      },
+      latestLiveVersion: testLiveVersion,
+    });
+
+    renderPage({ enableReplacementOfPublicApiDataSets: true });
+
+    await waitFor(() => {
+      expect(
+        screen.queryByText('Remove draft version'),
+      ).not.toBeInTheDocument();
+    });
   });
 
   test('renders the correct draft version (v1) actions', async () => {

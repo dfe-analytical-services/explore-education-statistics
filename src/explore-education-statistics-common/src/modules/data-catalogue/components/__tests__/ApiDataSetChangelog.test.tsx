@@ -167,4 +167,50 @@ describe('ApiDataSetChangelog', () => {
       'Filter 2 (id: filter-2, column: filter_2)',
     );
   });
+
+  test('renders patch changes', () => {
+    render(
+      <ApiDataSetChangelog
+        version="2.0.1"
+        majorChanges={{}}
+        minorChanges={{
+          filters: [
+            {
+              currentState: {
+                id: 'filter-2',
+                column: 'filter_2',
+                label: 'Filter 2',
+                hint: '',
+              },
+            },
+          ],
+        }}
+      />,
+    );
+
+    // No major changes
+    expect(screen.queryByTestId('major-changes')).not.toBeInTheDocument();
+
+    const minorChanges = within(screen.getByTestId('minor-changes'));
+
+    expect(
+      minorChanges.getByRole('heading', {
+        name: 'Patch changes for version 2.0.1',
+      }),
+    ).toBeInTheDocument();
+
+    expect(
+      minorChanges.getByRole('heading', { name: 'New filters' }),
+    ).toBeInTheDocument();
+
+    const addedFilters = within(
+      minorChanges.getByTestId('added-filters'),
+    ).getAllByRole('listitem');
+
+    expect(addedFilters).toHaveLength(1);
+
+    expect(addedFilters[0]).toHaveTextContent(
+      'Filter 2 (id: filter-2, column: filter_2)',
+    );
+  });
 });
