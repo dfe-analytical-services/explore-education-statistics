@@ -29,6 +29,13 @@ export interface AzurePublicationSearchResult {
   metadata_storage_name: string;
 }
 
+export interface AzurePublicationSuggestResult {
+  releaseSlug: string;
+  publicationSlug: string;
+  summary: string;
+  title: string;
+}
+
 export interface PaginatedListWithAzureFacets<T> extends PaginatedList<T> {
   facets: {
     [propertyName: string]: FacetResult[];
@@ -136,6 +143,31 @@ const azurePublicationService = {
     }
 
     return publicationsResult;
+  },
+  async suggestPublications(
+    params: AzurePublicationListRequest,
+  ): Promise<AzurePublicationSuggestResult[]> {
+    const { filter, search = '' } = params;
+
+    const suggestResults =
+      search?.length > 2
+        ? await azureSearchClient.suggest(search, 'suggester-1', {
+            select: ['releaseSlug', 'title', 'summary', 'publicationSlug'],
+            filter,
+            useFuzzyMatching: true,
+            top: 3,
+            highlightPostTag: '</mark>',
+            highlightPreTag: '<mark>',
+          })
+        : null;
+
+    let resultsToReturn = [] as AzurePublicationSuggestResult[];
+    if (suggestResults?.results) {
+      resultsToReturn = suggestResults?.results.map(
+        result => result.document as AzurePublicationSuggestResult,
+      );
+    }
+    return resultsToReturn;
   },
 };
 

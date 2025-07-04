@@ -10,6 +10,7 @@ import {
   testFacetResultsSearchedOneResult,
 } from '@frontend/modules/find-statistics/__tests__/__data__/testFacetData';
 import { testPublications } from '@frontend/modules/find-statistics/__tests__/__data__/testPublications';
+import { testPublicationSuggestions } from '@frontend/modules/find-statistics/__tests__/__data__/testPublicationSuggestions';
 import { testThemeSummaries } from '@frontend/modules/find-statistics/__tests__/__data__/testThemeData';
 import { screen, waitFor, within } from '@testing-library/react';
 import React from 'react';
@@ -76,7 +77,9 @@ describe('FindStatisticsPageAzure', () => {
       ),
     ).toBeInTheDocument();
 
-    expect(screen.getByLabelText('Search publications')).toBeInTheDocument();
+    expect(
+      screen.getByRole('combobox', { name: 'Search publications' }),
+    ).toBeInTheDocument();
 
     const sortSelect = screen.getByLabelText('Sort by');
     const sortOptions = within(sortSelect).getAllByRole(
@@ -790,6 +793,10 @@ describe('FindStatisticsPageAzure', () => {
   });
 
   test('searching', async () => {
+    publicationService.suggestPublications.mockResolvedValue(
+      testPublicationSuggestions,
+    );
+
     publicationService.listPublications
       .mockResolvedValueOnce({
         results: testPublications,
@@ -813,8 +820,10 @@ describe('FindStatisticsPageAzure', () => {
     expect(
       within(screen.getByTestId('publicationsList')).getAllByRole('listitem'),
     ).toHaveLength(3);
-
-    await user.type(screen.getByLabelText('Search publications'), 'Find me');
+    await user.type(
+      screen.getByRole('combobox', { name: 'Search publications' }),
+      'Find me',
+    );
     await user.click(screen.getByRole('button', { name: 'Search' }));
 
     expect(mockRouter).toMatchObject({
@@ -939,6 +948,10 @@ describe('FindStatisticsPageAzure', () => {
   });
 
   test('adds the relevance sort option when applying a search filter', async () => {
+    publicationService.suggestPublications.mockResolvedValue(
+      testPublicationSuggestions,
+    );
+
     publicationService.listPublications
       .mockResolvedValueOnce({
         results: testPublications,
@@ -967,7 +980,10 @@ describe('FindStatisticsPageAzure', () => {
     expect(sortOptions[2]).toHaveTextContent('A to Z');
     expect(sortOptions[2].selected).toBe(false);
 
-    await user.type(screen.getByLabelText('Search publications'), 'Find me');
+    await user.type(
+      screen.getByRole('combobox', { name: 'Search publications' }),
+      'Find me',
+    );
     await user.click(screen.getByRole('button', { name: 'Search' }));
 
     expect(await screen.findByText('2 results')).toBeInTheDocument();

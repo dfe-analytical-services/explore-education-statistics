@@ -52,6 +52,32 @@ export default function createAzurePublicationListRequest(
   );
 }
 
+export function createAzurePublicationSuggestRequest(
+  query: FindStatisticsPageQuery,
+  searchTerm: string,
+): AzurePublicationListRequest {
+  const { releaseType, themeId } = getParamsFromQuery(query);
+
+  let filter: string | undefined;
+  if (releaseType && themeId) {
+    filter = odata`releaseType eq ${releaseType} and themeId eq ${themeId}`;
+  } else if (releaseType) {
+    filter = odata`releaseType eq ${releaseType}`;
+  } else if (themeId) {
+    filter = odata`themeId eq ${themeId}`;
+  }
+
+  return omitBy(
+    {
+      filter,
+      releaseType,
+      search: searchTerm,
+      themeId,
+    },
+    value => typeof value === 'undefined',
+  );
+}
+
 function getSortParam(
   sortBy: PublicationSortOption,
 ): AzurePublicationOrderByParam {
