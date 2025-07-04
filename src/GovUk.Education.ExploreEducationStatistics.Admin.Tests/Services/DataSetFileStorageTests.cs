@@ -381,7 +381,11 @@ public class DataSetFileStorageTests
                 privateBlobStorageService: privateBlobStorageService.Object,
                 dataImportService: dataImportService.Object,
                 releaseVersionRepository: releaseVersionRepository.Object,
-                releaseDataFileRepository: releaseDataFileRepository.Object
+                releaseDataFileRepository: releaseDataFileRepository.Object,
+                featureFlags: Microsoft.Extensions.Options.Options.Create(new FeatureFlagsOptions()
+                {
+                    EnableReplacementOfPublicApiDataSets = false
+                })
             );
 
             // Act
@@ -623,7 +627,6 @@ public class DataSetFileStorageTests
         string[] dataSetNames = ["test data 1", "test data 2"];
         var contentDbContextId = Guid.NewGuid();
         await using var contentDbContext = InMemoryApplicationDbContext(contentDbContextId.ToString());
-        var replacingId = Guid.NewGuid();
         var testFixture = await DataSetFileStorageTestFixture
             .CreateBulkZipUploadDataSetTestFixture(
                 fixture: _fixture,
@@ -633,23 +636,24 @@ public class DataSetFileStorageTests
                 metaFileName: metaFileNames,
                 contentDbContext: contentDbContext,
                 isPublished: true,
-                version: new SemVersion(2, 0, 0),
-                replacingId: replacingId
+                version: new SemVersion(2, 0, 0)
             );
+        
+        var releaseFilesAndDataSets = testFixture.ReleaseFilesReplacing.Zip(dataSetNames, (releaseFile, dataSetName) => (releaseFile, dataSetName)).ToArray(); 
 
         var dataSets = new DataSetUploadResultViewModel[dataSetNames.Length];
-        for (var i = 0; i < dataSetNames.Length; i++)
+        for (var i = 0; i < releaseFilesAndDataSets.Length; i++)
         {
             dataSets[i] = new DataSetUploadResultViewModel
             {
-                Title = dataSetNames[i],
+                Title = releaseFilesAndDataSets[i].dataSetName,
                 DataFileId = Guid.NewGuid(),
                 DataFileName = dataFileNames[i],
                 DataFileSize = 432,
                 MetaFileId = Guid.NewGuid(),
                 MetaFileName = metaFileNames[i],
                 MetaFileSize = 157,
-                ReplacingFileId = replacingId
+                ReplacingFileId = releaseFilesAndDataSets[i].releaseFile.FileId
             };
         }
 

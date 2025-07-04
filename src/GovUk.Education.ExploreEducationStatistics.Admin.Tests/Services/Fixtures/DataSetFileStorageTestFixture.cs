@@ -19,6 +19,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interf
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Tests.Fixtures;
+using Microsoft.AspNetCore.Mvc;
 using Moq;
 using Semver;
 using File = GovUk.Education.ExploreEducationStatistics.Content.Model.File;
@@ -44,6 +45,7 @@ public class DataSetFileStorageTestFixture
     private ReleaseFile ReleaseFileReplace { get; set; } = null!;
     private DataSetVersion TestDatasetVersion { get; set; } = null!;
     private Guid SubjectId { get; init; }
+    public ReleaseFile[]? ReleaseFilesReplacing { get; set; }
 
     private DataSetFileStorageTestFixture(
         Mock<IDataImportService>? dataImportService = null,
@@ -160,9 +162,13 @@ public class DataSetFileStorageTestFixture
         string[] metaFileName,
         ContentDbContext contentDbContext,
         SemVersion version,
-        Guid replacingId,
         bool isPublished = false)
     {
+        if (dataSetName.Length != dataFileName.Length || dataSetName.Length != metaFileName.Length)
+        {
+            throw new ArgumentException("All arrays must be of the same length");
+        }
+
         var testFixture = new DataSetFileStorageTestFixture
         {
             DataImportService = new Mock<IDataImportService>(Strict),
@@ -174,13 +180,13 @@ public class DataSetFileStorageTestFixture
             SubjectId = Guid.NewGuid()
         };
 
-        File[] dataFiles = new File[dataFileName.Length];
-        File[] metaFiles = new File[metaFileName.Length];
-        DataSet[] dataSets = new DataSet[dataSetName.Length];
-        DataSetVersion[] dataSetVersions = new DataSetVersion[dataSetName.Length];
-        ReleaseFile[] releaseFiles = new ReleaseFile[dataFileName.Length + 1];
+        var dataFiles = new File[dataFileName.Length];
+        var metaFiles = new File[metaFileName.Length];
+        var dataSets = new DataSet[dataSetName.Length];
+        var dataSetVersions = new DataSetVersion[dataSetName.Length];
+        var releaseFiles = new ReleaseFile[dataFileName.Length];
         var status = isPublished ? DataSetVersionStatus.Published : DataSetVersionStatus.Draft;
-        
+
         for (var i = 0; i < dataSetName.Length; i++)
         {
             dataSets[i] = fixture
@@ -194,6 +200,7 @@ public class DataSetFileStorageTestFixture
                 .WithStatus(status)
                 .Generate();
         }
+
         var releaseVersion = fixture
             .DefaultReleaseVersion()
             .WithRelease(fixture
@@ -217,21 +224,16 @@ public class DataSetFileStorageTestFixture
                 .WithPublicApiDataSetVersion(dataSetVersions[i].SemVersion())
                 .Generate();
         }
-        var dataFileReplacing = fixture
-            .DefaultFile()
-            .WithType(FileType.Data)
-            .WithFilename(dataFileName[0])
-            .WithCreatedByUser(user)
-            .Generate();
-        dataFileReplacing.Id = replacingId;
-        var releaseFileReplacing = fixture
-            .DefaultReleaseFile()
-            .WithReleaseVersion(releaseVersion)
-            .WithFile(dataFileReplacing)
-            .WithPublicApiDataSetId(dataSetVersions[0].DataSetId)
-            .WithPublicApiDataSetVersion(dataSetVersions[0].SemVersion())
-            .Generate();
+
+        var releaseFileReplacing = CreateReplacingReleaseFiles(
+            fixture,
+            user, 
+            dataFileName, 
+            releaseVersion,
+            dataSetVersions);
         
+        testFixture.ReleaseFilesReplacing = releaseFileReplacing; // Used to create the input DataSet view model that the method under test takes
+
         for (var i = 0; i < metaFileName.Length; i++)
         {
             metaFiles[i] = fixture
@@ -244,27 +246,57 @@ public class DataSetFileStorageTestFixture
         var fileAndDataSetName = dataFiles.Zip(dataSetName, 
                 (file, name) => (file, name)).ToArray();
         
-        releaseFiles[^1] = releaseFileReplacing;
-        testFixture.ReleaseVersion = releaseVersion;
+        testFixture.ReleaseVersion = releaseVersion; //Used by some of the shared mock services set up
+
         testFixture.SetupMockBulkPatchDataSetVersionCreation(dataSetVersions);
         testFixture.SetupMocksForBulkUpload(fileAndDataSetName);
-        for (var i = 0; i < metaFiles.Length; i++)
+        
+        foreach(var metafile in metaFiles)
         {
             testFixture.ReleaseDataFileRepository
                 .Setup(mock => mock.Create(
                     releaseVersion.Id,
                     testFixture.SubjectId,
-                    metaFiles[i].Filename,
+                    metafile.Filename,
                     157,
                     FileType.Metadata,
                     user.Id,
                     null, null, null, 0))
-                .Returns(Task.FromResult(metaFiles[i]));
+                .Returns(Task.FromResult(metafile));
         }
+
+        var releaseFilesToSave = releaseFileReplacing.Concat(releaseFiles).Distinct().ToArray();
         testFixture.SetUpImportAndBlobMocks(user, releaseVersion);
-        await testFixture.SetupContentDbContext(contentDbContext, releaseVersion, releaseFiles, metaFiles[0]);
+        await testFixture.SetupContentDbContext(contentDbContext, releaseVersion, releaseFilesToSave, metaFiles[0]);
 
         return testFixture;
+    }
+
+
+    private static ReleaseFile[] CreateReplacingReleaseFiles(
+        DataFixture fixture,
+        User user,
+        string[] dataFileName,
+        ReleaseVersion releaseVersion,
+        DataSetVersion[] dataSetVersions)
+    {
+        var versionsAndFileNames = dataSetVersions.Zip(dataFileName, (version, fileName) => (version, fileName));
+        return [.. versionsAndFileNames.Select(versionAndFileName =>
+        {
+            var dataFileReplacing = fixture
+                .DefaultFile()
+                .WithType(FileType.Data)
+                .WithFilename(versionAndFileName.fileName)
+                .WithCreatedByUser(user)
+                .Generate();
+            return fixture
+                .DefaultReleaseFile()
+                .WithReleaseVersion(releaseVersion)
+                .WithFile(dataFileReplacing)
+                .WithPublicApiDataSetId(versionAndFileName.version.DataSetId)
+                .WithPublicApiDataSetVersion(versionAndFileName.version.SemVersion())
+                .Generate();
+        })];
     }
 
     private void SetupMocksForZipUpload(User user, string dataSetName, string metaFileName)
@@ -563,13 +595,13 @@ public class DataSetFileStorageTestFixture
 
     private void SetupMockBulkPatchDataSetVersionCreation(DataSetVersion[] dataSetVersions)
     {
-        for (var i = 0; i < dataSetVersions.Length; i++)
+        foreach (var dataSetVersion in dataSetVersions)
         {
-            DataSetVersionService.Setup(mock => mock.GetDataSetVersion(
-                    It.IsAny<Guid>(),
+            DataSetVersionService.Setup<Task<Either<ActionResult, DataSetVersion>>>(mock => mock.GetDataSetVersion(
+                    dataSetVersion.DataSetId,
                     It.IsAny<SemVersion>(),
                     It.IsAny<CancellationToken>()))
-                .ReturnsAsync(dataSetVersions[i]);
+                .ReturnsAsync(dataSetVersion);
         }
         
         DataSetVersionService.Setup(mock => mock.CreateNextVersion(
