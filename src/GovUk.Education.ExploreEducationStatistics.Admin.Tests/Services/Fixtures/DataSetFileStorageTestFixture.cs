@@ -3,6 +3,7 @@ using static Moq.MockBehavior;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.DataImportStatus;
 using System;
 using System.IO;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
@@ -29,21 +30,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Fixtur
 
 public class DataSetFileStorageTestFixture
 {
-    public Mock<IDataImportService> DataImportService { get; set; }
-    public Mock<IReleaseVersionRepository> ReleaseVersionRepository { get; set; }
-    public Mock<IReleaseDataFileRepository> ReleaseDataFileRepository { get; set; }
-    public Mock<IPrivateBlobStorageService> PrivateBlobStorageService { get; set; }
-    public Mock<IDataSetVersionService> DataSetVersionService { get; set; }
-    public Mock<IDataSetService> DataSetService { get; set; }
-    public ReleaseVersion ReleaseVersion { get; set; } = null!;
-    private File DataFile { get; set; } = null!;
+    public Mock<IDataImportService> DataImportService { get; private init; }
+    public Mock<IReleaseVersionRepository> ReleaseVersionRepository { get; private init; }
+    public Mock<IReleaseDataFileRepository> ReleaseDataFileRepository { get; private init; }
+    public Mock<IPrivateBlobStorageService> PrivateBlobStorageService { get; private init; }
+    public Mock<IDataSetVersionService> DataSetVersionService { get; private init; }
+    public Mock<IDataSetService> DataSetService { get; private init; }
+    public ReleaseVersion ReleaseVersion { get; private set; } = null!;
+    public File DataFile { get; private set; } = null!;
     public File DataFileReplace { get; private set; } = null!;
     private File MetaFile { get; set; } = null!;
     public ReleaseFile ReleaseFile { get; private set; } = null!;
     private ReleaseFile ReleaseFileReplace { get; set; } = null!;
-    public DataSetVersion TestDatasetVersion { get; private set; } = null!;
+    private DataSetVersion TestDatasetVersion { get; set; } = null!;
     private Guid SubjectId { get; init; }
-    public string ContentDbContextId { get; set; } = null!;
 
     private DataSetFileStorageTestFixture(
         Mock<IDataImportService>? dataImportService = null,
@@ -60,15 +60,26 @@ public class DataSetFileStorageTestFixture
         DataSetVersionService = dataSetVersionService ?? new Mock<IDataSetVersionService>(Strict);
         DataSetService = dataSetService ?? new Mock<IDataSetService>(Strict);
     }
-
-    public static async Task<DataSetFileStorageTestFixture> InitializeUploadDataSetTestFixture(
+    
+    /// <summary>
+    /// Creates test data and mocks for DataSetFileStorage.UploadDataSet
+    /// </summary>
+    /// <param name="fixture">Used to generate mock data</param>
+    /// <param name="user">Used to mock the user</param>
+    /// <param name="dataSetName">Used as mock data</param>
+    /// <param name="dataFileName">Used as mock data</param>
+    /// <param name="metaFileName">Used as mock data</param>
+    /// <param name="contentDbContext">Used to save mocked data</param>
+    /// <param name="version">Used to mock the version of the api data set</param>
+    /// <param name="isPublished">Used to signal whether to mock the api data set version as published or not</param>
+    /// <returns>Abstracted test fixture which is used by test cases to execute tests</returns>
+    public static async Task<DataSetFileStorageTestFixture> CreateUploadDataSetTestFixture(
         DataFixture fixture,
         User user,
         string dataSetName,
         string dataFileName,
         string metaFileName,
         ContentDbContext contentDbContext,
-        Guid contentDbContextId,
         SemVersion version,
         bool isPublished = false)
     {
@@ -80,24 +91,256 @@ public class DataSetFileStorageTestFixture
             PrivateBlobStorageService = new Mock<IPrivateBlobStorageService>(Strict),
             DataSetVersionService = new Mock<IDataSetVersionService>(Strict),
             DataSetService = new Mock<IDataSetService>(Strict),
-            SubjectId = Guid.NewGuid(),
-            ContentDbContextId = contentDbContextId.ToString()
+            SubjectId = Guid.NewGuid()
         };
 
-        testFixture.SetupCommonData(fixture, user, dataFileName, metaFileName, isPublished, version);
-        await testFixture.SetupContentDbContext(contentDbContext);
+        await testFixture.SetupCommonData(fixture, user, dataFileName, metaFileName, isPublished, version, contentDbContext);
         testFixture.SetupCommonMocks(user, metaFileName, dataSetName);
 
         return testFixture;
     }
+    
+    /// <summary>
+    /// Used to Create test data for the ZIP uploading mechanisms provided by DataSetFileStorage method MoveDataSetsToPermanentStorage
+    /// </summary>
+    /// <param name="fixture">Used to generate mock data</param>
+    /// <param name="user">Used to mock the user</param>
+    /// <param name="dataSetName">Used as mock data</param>
+    /// <param name="dataFileName">Used as mock data</param>
+    /// <param name="metaFileName">Used as mock data</param>
+    /// <param name="contentDbContext">Used to save mocked data</param>
+    /// <param name="version">Used to mock the version of the api data set</param>
+    /// <param name="isPublished">Used to signal whether to mock the api data set version as published or not</param>
+    /// <returns>Abstracted test fixture which is used by test cases to execute tests</returns>
+    public static async Task<DataSetFileStorageTestFixture> CreateZipUploadDataSetTestFixture(
+        DataFixture fixture,
+        User user,
+        string dataSetName,
+        string dataFileName,
+        string metaFileName,
+        ContentDbContext contentDbContext,
+        SemVersion version,
+        bool isPublished = false)
+    {
+        var testFixture = new DataSetFileStorageTestFixture
+        {
+            DataImportService = new Mock<IDataImportService>(Strict),
+            ReleaseVersionRepository = new Mock<IReleaseVersionRepository>(Strict),
+            ReleaseDataFileRepository = new Mock<IReleaseDataFileRepository>(Strict),
+            PrivateBlobStorageService = new Mock<IPrivateBlobStorageService>(Strict),
+            DataSetVersionService = new Mock<IDataSetVersionService>(Strict),
+            DataSetService = new Mock<IDataSetService>(Strict),
+            SubjectId = Guid.NewGuid()
+        };
 
-    private void SetupCommonData(
+        await testFixture.SetupCommonData(fixture, user, dataFileName, metaFileName, isPublished, version, contentDbContext);
+        testFixture.SetupMocksForZipUpload(user, dataSetName, metaFileName);
+
+        return testFixture;
+    }
+    
+    /// <summary>
+    /// Used to Create test data for the BULK ZIP uploading mechanisms provided by DataSetFileStorage method MoveDataSetsToPermanentStorage
+    /// </summary>
+    /// <param name="fixture">Used to generate mock data</param>
+    /// <param name="user">Used to mock the user</param>
+    /// <param name="dataSetName">Used as mock data</param>
+    /// <param name="dataFileName">Used as mock data</param>
+    /// <param name="metaFileName">Used as mock data</param>
+    /// <param name="contentDbContext">Used to save mocked data</param>
+    /// <param name="version">Used to mock the version of the api data set</param>
+    /// <param name="replacingId">Mocked ID which replaces data file</param>
+    /// <param name="isPublished">Used to signal whether to mock the api data set version as published or not</param>
+    /// <returns>Abstracted test fixture which is used by test cases to execute tests</returns>
+    public static async Task<DataSetFileStorageTestFixture> CreateBulkZipUploadDataSetTestFixture(
+        DataFixture fixture,
+        User user,
+        string[] dataSetName,
+        string[] dataFileName,
+        string[] metaFileName,
+        ContentDbContext contentDbContext,
+        SemVersion version,
+        Guid replacingId,
+        bool isPublished = false)
+    {
+        var testFixture = new DataSetFileStorageTestFixture
+        {
+            DataImportService = new Mock<IDataImportService>(Strict),
+            ReleaseVersionRepository = new Mock<IReleaseVersionRepository>(Strict),
+            ReleaseDataFileRepository = new Mock<IReleaseDataFileRepository>(Strict),
+            PrivateBlobStorageService = new Mock<IPrivateBlobStorageService>(Strict),
+            DataSetVersionService = new Mock<IDataSetVersionService>(Strict),
+            DataSetService = new Mock<IDataSetService>(Strict),
+            SubjectId = Guid.NewGuid()
+        };
+
+        File[] dataFiles = new File[dataFileName.Length];
+        File[] metaFiles = new File[metaFileName.Length];
+        DataSet[] dataSets = new DataSet[dataSetName.Length];
+        DataSetVersion[] dataSetVersions = new DataSetVersion[dataSetName.Length];
+        ReleaseFile[] releaseFiles = new ReleaseFile[dataFileName.Length + 1];
+        var status = isPublished ? DataSetVersionStatus.Published : DataSetVersionStatus.Draft;
+        
+        for (var i = 0; i < dataSetName.Length; i++)
+        {
+            dataSets[i] = fixture
+                .DefaultDataSet()
+                .WithTitle(dataSetName[i])
+                .Generate();
+            dataSetVersions[i] = fixture
+                .DefaultDataSetVersion()
+                .WithDataSet(dataSets[i])
+                .WithVersionNumber(version.Major, version.Minor, version.Patch)
+                .WithStatus(status)
+                .Generate();
+        }
+        var releaseVersion = fixture
+            .DefaultReleaseVersion()
+            .WithRelease(fixture
+                .DefaultRelease()
+                .WithPublication(fixture.DefaultPublication()))
+            .Generate();
+
+        for (var i = 0; i < dataFileName.Length; i++)
+        {
+            dataFiles[i] = fixture
+                .DefaultFile()
+                .WithType(FileType.Data)
+                .WithFilename(dataFileName[i])
+                .WithCreatedByUser(user)
+                .Generate();
+            releaseFiles[i] = testFixture.ReleaseFile = fixture// set ReleaseFile to one of the itmes so we can verify the releaseVersionId later.
+                .DefaultReleaseFile()
+                .WithReleaseVersion(releaseVersion)
+                .WithFile(dataFiles[i])
+                .WithPublicApiDataSetId(dataSetVersions[i].DataSetId)
+                .WithPublicApiDataSetVersion(dataSetVersions[i].SemVersion())
+                .Generate();
+        }
+        var dataFileReplacing = fixture
+            .DefaultFile()
+            .WithType(FileType.Data)
+            .WithFilename(dataFileName[0])
+            .WithCreatedByUser(user)
+            .Generate();
+        dataFileReplacing.Id = replacingId;
+        var releaseFileReplacing = fixture
+            .DefaultReleaseFile()
+            .WithReleaseVersion(releaseVersion)
+            .WithFile(dataFileReplacing)
+            .WithPublicApiDataSetId(dataSetVersions[0].DataSetId)
+            .WithPublicApiDataSetVersion(dataSetVersions[0].SemVersion())
+            .Generate();
+        
+        for (var i = 0; i < metaFileName.Length; i++)
+        {
+            metaFiles[i] = fixture
+                .DefaultFile()
+                .WithType(FileType.Metadata)
+                .WithFilename(metaFileName[i])
+                .WithCreatedByUser(user)
+                .Generate();
+        }
+        var fileAndDataSetName = dataFiles.Zip(dataSetName, 
+                (file, name) => (file, name)).ToArray();
+        
+        releaseFiles[^1] = releaseFileReplacing;
+        testFixture.ReleaseVersion = releaseVersion;
+        testFixture.SetupMockBulkPatchDataSetVersionCreation(dataSetVersions);
+        testFixture.SetupMocksForBulkUpload(fileAndDataSetName);
+        for (var i = 0; i < metaFiles.Length; i++)
+        {
+            testFixture.ReleaseDataFileRepository
+                .Setup(mock => mock.Create(
+                    releaseVersion.Id,
+                    testFixture.SubjectId,
+                    metaFiles[i].Filename,
+                    157,
+                    FileType.Metadata,
+                    user.Id,
+                    null, null, null, 0))
+                .Returns(Task.FromResult(metaFiles[i]));
+        }
+        testFixture.SetUpImportAndBlobMocks(user, releaseVersion);
+        await testFixture.SetupContentDbContext(contentDbContext, releaseVersion, releaseFiles, metaFiles[0]);
+
+        return testFixture;
+    }
+
+    private void SetupMocksForZipUpload(User user, string dataSetName, string metaFileName)
+    {
+        ReleaseDataFileRepository
+            .Setup(mock => mock.Create(
+                ReleaseVersion.Id,
+                SubjectId,
+                DataFile.Filename,
+                DataFile.ContentLength,
+                FileType.Data,
+                user.Id,
+                dataSetName, 
+                ReleaseFile.File,
+                null, 
+                0 ))
+            .Returns(Task.FromResult(DataFile));
+        
+        PrivateBlobStorageService
+            .Setup(mock => mock.MoveBlob(
+                BlobContainers.PrivateReleaseTempFiles,
+                It.IsAny<string>(),
+                It.IsAny<string>(),
+                BlobContainers.PrivateReleaseFiles))
+            .Returns(Task.FromResult(true));
+        
+        SetupPatchDataSetVersionCreation();
+        SetUpImportAndBlobMocks(user, ReleaseVersion, metaFileName);
+    }
+    
+    private void SetupMocksForBulkUpload((File, string)[] fileAndDataSetName)
+    {
+        for (var i = 0; i < fileAndDataSetName.Length; i++)
+        {
+            ReleaseDataFileRepository
+                .Setup(mock => mock.Create(
+                    It.IsAny<Guid>(),
+                    It.IsAny<Guid>(),
+                    It.IsAny<string>(),
+                    It.IsAny<long>(),
+                    FileType.Data,
+                    It.IsAny<Guid>(),
+                    fileAndDataSetName[i].Item2,
+                    It.IsAny<File>(),
+                    null,
+                    It.IsAny<int>()))
+                .Returns(Task.FromResult(fileAndDataSetName[i].Item1));
+        }
+
+        PrivateBlobStorageService
+            .Setup(mock => mock.MoveBlob(
+                BlobContainers.PrivateReleaseTempFiles,
+                It.IsAny<string>(),
+                It.IsAny<string>(),
+                BlobContainers.PrivateReleaseFiles))
+            .Returns(Task.FromResult(true));
+    }
+
+    /// <summary>
+    /// This sets up objects that are commonly used by tests and assigns these objects to properties of this class
+    /// </summary>
+    /// <param name="fixture">Used to generate objects</param>
+    /// <param name="user">Mocks the user</param>
+    /// <param name="dataFileName">Mocks of data file names</param>
+    /// <param name="metaFileName">Mocks of metadata file names</param>
+    /// <param name="isPublished">Mocks whether the api version is set to published or not</param>
+    /// <param name="dataSetVersionNumber">Mocks the api version number</param>
+    /// <param name="contentDbContext">This is used to save mocked data in memory for the context of the test</param>
+    private async Task SetupCommonData(
         DataFixture fixture,
         User user,
         string dataFileName,
         string metaFileName,
         bool isPublished,
-        SemVersion dataSetVersionNumber)
+        SemVersion dataSetVersionNumber,
+        ContentDbContext contentDbContext)
     {
         DataFile = fixture
             .DefaultFile()
@@ -144,13 +387,22 @@ public class DataSetFileStorageTestFixture
             .WithPublicApiDataSetId(TestDatasetVersion.DataSetId)
             .WithPublicApiDataSetVersion(TestDatasetVersion.SemVersion())
             .Generate();
-    }
 
-    private async Task SetupContentDbContext(ContentDbContext contentDbContext)
-    {
         contentDbContext.ReleaseVersions.Add(ReleaseVersion);
         contentDbContext.ReleaseFiles.AddRange(ReleaseFile, ReleaseFileReplace);
         contentDbContext.Files.Add(MetaFile);
+        await contentDbContext.SaveChangesAsync();
+    }
+
+    private async Task SetupContentDbContext(
+        ContentDbContext contentDbContext, 
+        ReleaseVersion releaseVersion, 
+        ReleaseFile[] releaseFiles,
+        File metaFile)
+    {
+        contentDbContext.ReleaseVersions.Add(releaseVersion);
+        contentDbContext.ReleaseFiles.AddRange(releaseFiles);
+        contentDbContext.Files.Add(metaFile);
         await contentDbContext.SaveChangesAsync();
     }
 
@@ -173,25 +425,33 @@ public class DataSetFileStorageTestFixture
                 1))
             .Returns(Task.FromResult(DataFile));
 
+        SetUpImportAndBlobMocks(user, ReleaseVersion, metaFileName);
+    }
+
+    private void SetUpImportAndBlobMocks(User user, ReleaseVersion releaseVersion, string? metaFileName = null)
+    {
         ReleaseVersionRepository
-            .Setup(mock => mock.CreateStatisticsDbReleaseAndSubjectHierarchy(ReleaseVersion.Id))
+            .Setup(mock => mock.CreateStatisticsDbReleaseAndSubjectHierarchy(releaseVersion.Id))
             .Returns(Task.FromResult(SubjectId));
 
         ReleaseVersionRepository
-            .Setup(mock => mock.CreateStatisticsDbReleaseAndSubjectHierarchy(ReleaseVersion.Id))
+            .Setup(mock => mock.CreateStatisticsDbReleaseAndSubjectHierarchy(releaseVersion.Id))
             .Returns(Task.FromResult(SubjectId));
 
-        ReleaseDataFileRepository
-            .Setup(mock => mock.Create(
-                ReleaseVersion.Id,
-                SubjectId,
-                metaFileName,
-                157,
-                FileType.Metadata,
-                user.Id,
-                null, null, null, 0))
-            .Returns(Task.FromResult(MetaFile));
-
+        if (metaFileName is not null)
+        {
+            ReleaseDataFileRepository
+                .Setup(mock => mock.Create(
+                    ReleaseVersion.Id,
+                    SubjectId,
+                    metaFileName,
+                    157,
+                    FileType.Metadata,
+                    user.Id,
+                    null, null, null, 0))
+                .Returns(Task.FromResult(MetaFile));
+        }
+        
         PrivateBlobStorageService
             .Setup(mock => mock.UploadStream(
                 It.IsAny<IBlobContainer>(),
@@ -289,6 +549,33 @@ public class DataSetFileStorageTestFixture
                 ReleaseFile.Id,
                 TestDatasetVersion.DataSetId,
                 TestDatasetVersion.Id,
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new DataSetVersionSummaryViewModel
+            {
+                Id = Guid.NewGuid(),
+                Version = "2.0.1",
+                Status = DataSetVersionStatus.Processing,
+                Type = DataSetVersionType.Minor,
+                ReleaseVersion = null,
+                File = null
+            });
+    }
+
+    private void SetupMockBulkPatchDataSetVersionCreation(DataSetVersion[] dataSetVersions)
+    {
+        for (var i = 0; i < dataSetVersions.Length; i++)
+        {
+            DataSetVersionService.Setup(mock => mock.GetDataSetVersion(
+                    It.IsAny<Guid>(),
+                    It.IsAny<SemVersion>(),
+                    It.IsAny<CancellationToken>()))
+                .ReturnsAsync(dataSetVersions[i]);
+        }
+        
+        DataSetVersionService.Setup(mock => mock.CreateNextVersion(
+                It.IsAny<Guid>(),
+                It.IsAny<Guid>(),
+                It.IsAny<Guid>(),
                 It.IsAny<CancellationToken>()))
             .ReturnsAsync(new DataSetVersionSummaryViewModel
             {
