@@ -1,0 +1,33 @@
+﻿#nullable enable
+using System;
+using FluentValidation;
+using GovUk.Education.ExploreEducationStatistics.Data.Services.Analytics;
+
+namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Requests;
+
+public record RecordPermalinkTableDownloadRequestBindingModel
+{
+    public string? PermalinkTitle { get; init; }
+    public Guid? PermalinkId { get; init; }
+    public TableDownloadFormat? DownloadFormat { get; init; }
+
+    public class Validator : AbstractValidator<RecordPermalinkTableDownloadRequestBindingModel>
+    {
+        public Validator()
+        {
+            RuleFor(dto => dto.PermalinkTitle).NotNull().NotEmpty();
+            RuleFor(dto => dto.PermalinkId).NotNull().NotEmpty();
+            RuleFor(dto => dto.DownloadFormat).NotNull();
+        }
+    }
+
+    public CapturePermaLinkTableDownloadCall ToModel()
+    {
+        return new CapturePermaLinkTableDownloadCall
+        {
+            PermalinkTitle = PermalinkTitle,
+            PermalinkId = PermalinkId!.Value,
+            DownloadFormat = DownloadFormat!.Value
+        };
+    }
+}
