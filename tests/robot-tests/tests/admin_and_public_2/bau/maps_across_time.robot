@@ -29,7 +29,7 @@ Go to "Release summary" page
 
 Upload subject
     user uploads subject and waits until pending import    Dates test subject    dates.csv    dates.meta.csv
-    user confirms upload to begin import    Dates test subject
+    user confirms upload to complete import    Dates test subject
 
 Add data guidance
     user clicks link    Data guidance
