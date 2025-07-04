@@ -20,6 +20,7 @@ using Microsoft.Extensions.Options;
 using Moq;
 using System;
 using System.IO;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
@@ -380,7 +381,11 @@ public class DataSetFileStorageTests
                 privateBlobStorageService: privateBlobStorageService.Object,
                 dataImportService: dataImportService.Object,
                 releaseVersionRepository: releaseVersionRepository.Object,
-                releaseDataFileRepository: releaseDataFileRepository.Object
+                releaseDataFileRepository: releaseDataFileRepository.Object,
+                featureFlags: Microsoft.Extensions.Options.Options.Create(new FeatureFlagsOptions()
+                {
+                    EnableReplacementOfPublicApiDataSets = false
+                })
             );
 
             // Act
@@ -444,7 +449,6 @@ public class DataSetFileStorageTests
             dataFileName: dataFileName,
             metaFileName: metaFileName,
             contentDbContext: contentDbContext,
-            contentDbContextId: contentDbContextId,
             isPublished: false,
             version: new SemVersion(1, 0, 0)
         );
@@ -488,7 +492,6 @@ public class DataSetFileStorageTests
             dataFileName: dataFileName,
             metaFileName: metaFileName,
             contentDbContext: contentDbContext,
-            contentDbContextId: contentDbContextId,
             isPublished: false,
             version: new SemVersion(2, 0, 0)
         );
@@ -532,7 +535,6 @@ public class DataSetFileStorageTests
             dataFileName: dataFileName,
             metaFileName: metaFileName,
             contentDbContext: contentDbContext,
-            contentDbContextId: contentDbContextId,
             isPublished: true,
             version: new SemVersion(2, 0, 0)
         );
@@ -562,6 +564,116 @@ public class DataSetFileStorageTests
         AssertUploadSummary(uploadSummary, dataSetName, dataFileName, metaFileName);
     }
 
+    [Fact]
+    public async Task MoveDataSetsToPermanentStorage_ReplacePublishedViaPatchApiDataSet_ReturnsReleaseFile()
+    {
+        // Arrange
+        var dataSetName = "Test Data Set";
+        var dataFileName = "test-data.csv";
+        var metaFileName = "test-data.meta.csv";
+        var contentDbContextId = Guid.NewGuid();
+        await using var contentDbContext = InMemoryApplicationDbContext(contentDbContextId.ToString());
+        var dataSetFile = await new DataSetFileBuilder().Build(FileType.Data);
+        var metaSetFile = await new DataSetFileBuilder().Build(FileType.Metadata);
+        
+        var testFixture = await DataSetFileStorageTestFixture
+            .CreateZipUploadDataSetTestFixture(
+                fixture: _fixture,
+                user: _user,
+                dataSetName: dataSetName,
+                dataFileName: dataFileName,
+                metaFileName: metaFileName,
+                contentDbContext: contentDbContext,
+                isPublished: true,
+                version: new SemVersion(2, 0, 0)
+            );
+
+        var dataSet = new DataSetUploadResultViewModel
+        {
+            Title = dataSetName,
+            DataFileId = Guid.NewGuid(),
+            DataFileName = dataFileName,
+            DataFileSize = testFixture.DataFile.ContentLength,
+            MetaFileId = Guid.NewGuid(),
+            MetaFileName = metaFileName,
+            MetaFileSize = 157,
+            ReplacingFileId = testFixture.DataFile.Id
+        };
+        
+        var service = CreateServiceForApiPatchReplacement(testFixture, contentDbContext);
+
+        // Act
+        var uploadSummaries = await service.MoveDataSetsToPermanentStorage(
+            testFixture.ReleaseVersion.Id,
+            [dataSet],
+            cancellationToken: default);
+
+        // Assert
+        MockUtils.VerifyAllMocks(testFixture.DataSetService, testFixture.DataSetVersionService, testFixture.DataImportService,
+            testFixture.ReleaseVersionRepository, testFixture.ReleaseDataFileRepository);
+
+        var uploadSummary = Assert.Single(uploadSummaries);
+        Assert.Equal(testFixture.ReleaseFile.ReleaseVersionId, uploadSummary.ReleaseVersionId);
+        Assert.Equivalent(testFixture.ReleaseFile.File, uploadSummary.File);
+        Assert.Equal(testFixture.ReleaseFile.Order, uploadSummary.Order);
+    }
+  
+    [Fact]
+    public async Task MoveDataSetsToPermanentStorage_ReplaceMultiplePublishedViaPatchApiDataSet_ReturnsReleaseFile()
+    {
+        // Arrange
+        string[] dataFileNames = ["test-data-1.csv", "test-data-2.csv"];
+        string[] metaFileNames = ["test-data-1.meta.csv", "test-data-2.meta.csv"];
+        string[] dataSetNames = ["test data 1", "test data 2"];
+        var contentDbContextId = Guid.NewGuid();
+        await using var contentDbContext = InMemoryApplicationDbContext(contentDbContextId.ToString());
+        var testFixture = await DataSetFileStorageTestFixture
+            .CreateBulkZipUploadDataSetTestFixture(
+                fixture: _fixture,
+                user: _user,
+                dataSetName: dataSetNames,
+                dataFileName: dataFileNames,
+                metaFileName: metaFileNames,
+                contentDbContext: contentDbContext,
+                isPublished: true,
+                version: new SemVersion(2, 0, 0)
+            );
+        
+        var releaseFilesAndDataSets = testFixture.ReleaseFilesReplacing.Zip(dataSetNames, (releaseFile, dataSetName) => (releaseFile, dataSetName)).ToArray(); 
+
+        var dataSets = new DataSetUploadResultViewModel[dataSetNames.Length];
+        for (var i = 0; i < releaseFilesAndDataSets.Length; i++)
+        {
+            dataSets[i] = new DataSetUploadResultViewModel
+            {
+                Title = releaseFilesAndDataSets[i].dataSetName,
+                DataFileId = Guid.NewGuid(),
+                DataFileName = dataFileNames[i],
+                DataFileSize = 432,
+                MetaFileId = Guid.NewGuid(),
+                MetaFileName = metaFileNames[i],
+                MetaFileSize = 157,
+                ReplacingFileId = releaseFilesAndDataSets[i].releaseFile.FileId
+            };
+        }
+
+        var service = CreateServiceForApiPatchReplacement(testFixture, contentDbContext);
+
+        // Act
+        var uploadSummaries = await service.MoveDataSetsToPermanentStorage(
+            testFixture.ReleaseVersion.Id,
+            [.. dataSets],
+            cancellationToken: default);
+
+        // Assert
+        MockUtils.VerifyAllMocks(testFixture.DataSetService, testFixture.DataSetVersionService, testFixture.DataImportService,
+            testFixture.ReleaseVersionRepository, testFixture.ReleaseDataFileRepository);
+
+        Assert.Equal(2, uploadSummaries.Count);
+        Assert.Equal(testFixture.ReleaseFile.ReleaseVersionId, uploadSummaries[0].ReleaseVersionId);
+        Assert.Equal(dataFileNames, uploadSummaries.Select(x => x.File.Filename));
+    }
+  
     private static void AssertUploadSummary(
         DataFileInfo uploadSummary,
         string dataSetName,
@@ -586,21 +698,19 @@ public class DataSetFileStorageTests
         string dataFileName,
         string metaFileName,
         ContentDbContext contentDbContext,
-        Guid contentDbContextId,
         SemVersion version,
         bool isPublished = false) =>
         await DataSetFileStorageTestFixture
-            .InitializeUploadDataSetTestFixture(
+            .CreateUploadDataSetTestFixture(
                 _fixture,
                 _user,
                 dataSetName,
                 dataFileName,
                 metaFileName,
                 contentDbContext,
-                contentDbContextId,
                 version,
                 isPublished);
-
+    
     private DataSetFileStorage CreateServiceForApiPatchReplacement(
         DataSetFileStorageTestFixture fileStorageTestFixture, 
         ContentDbContext contentDbContext)

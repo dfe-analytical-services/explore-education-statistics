@@ -388,6 +388,13 @@ public class DataSetFileStorage(
 
             await privateBlobStorageService.MoveBlob(PrivateReleaseTempFiles, sourceDataFilePath, destinationDataFilePath, PrivateReleaseFiles);
             await privateBlobStorageService.MoveBlob(PrivateReleaseTempFiles, sourceMetaFilePath, destinationMetaFilePath, PrivateReleaseFiles);
+            
+            if (featureFlags.Value.EnableReplacementOfPublicApiDataSets 
+                && replacingFile is not null
+                && replacedReleaseDataFile!.PublicApiDataSetId != null)
+            { 
+                await CreateDraftDataSetVersion(dataReleaseFile.Id, replacedReleaseDataFile, cancellationToken);
+            }
 
             await dataImportService.Import(subjectId, dataFile, metaFile);
         }
