@@ -59,7 +59,7 @@ Add text block with link to absence glossary entry to accordion section
     user clicks element    id:glossarySearch-option-0
     user clicks button    Insert    ${modal}
     user waits until modal is not visible    Insert glossary link
-    user clicks button    Save & close    ${block}
+    user saves autosaving text block    ${block}
     user waits until parent contains button    ${block}    Absence
 
 Check glossary info icon appears on release preview

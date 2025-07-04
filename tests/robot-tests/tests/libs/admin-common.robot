@@ -544,8 +544,6 @@ user navigates to admin dashboard
     ...    css:[data-testid='theme-publications'],[data-testid='no-permission-to-access-releases']
     ...    %{WAIT_SMALL}
 
-# no longer accurate
-
 user uploads subject and waits until complete
     [Arguments]
     ...    ${SUBJECT_NAME}
@@ -585,25 +583,15 @@ user uploads subject
     user chooses file    id:dataFileUploadForm-dataFile    ${FOLDER}${SUBJECT_FILE}
     user chooses file    id:dataFileUploadForm-metadataFile    ${FOLDER}${META_FILE}
     user clicks button    Upload data files
-    # user waits until modal is visible    Upload summary
-    # user waits until modal table cell contains    1    1    ${SUBJECT_NAME}
-    # user waits until modal table cell contains    1    2    ${SUBJECT_FILE}
-    # user clicks button    Confirm
-    # user waits until modal is not visible    Upload summary
     user waits until page contains element    testid:Data files table
 
-    IF    "${IMPORT_STATUS}" != "Pending import"
-        user waits until page finishes loading
+    IF    "${IMPORT_STATUS}" == "Complete"
+        User confirms upload to complete import    ${SUBJECT_NAME}
+    ELSE
+        user waits until data file import is in status    ${SUBJECT_NAME}    ${IMPORT_STATUS}
     END
 
-    user waits until page contains data uploads table
-    user waits until table contains row with    ${SUBJECT_NAME}    testid:Data files table    %{WAIT_SMALL}
-    ${row}=    user gets table row    ${SUBJECT_NAME}    testid:Data files table
-    ${status_cell}=    user gets testid element    Status    %{WAIT_SMALL}    ${row}
-    user scrolls to element    ${status_cell}
-    user waits until element contains    ${status_cell}    ${IMPORT_STATUS}    %{WAIT_DATA_FILE_IMPORT}
-
-user confirms upload to begin import
+user confirms upload to complete import
     [Arguments]
     ...    ${SUBJECT_NAME}
     ${row}=    user gets table row    ${SUBJECT_NAME}    testid:Data files table
@@ -623,15 +611,21 @@ user waits until data files table contains subject
     [Arguments]
     ...    ${SUBJECT_NAME}
     user waits until table contains row with    ${SUBJECT_NAME}    testid:Data files table    %{WAIT_DATA_FILE_IMPORT}
-    ${row}=    user gets table row    ${SUBJECT_NAME}    testid:Data files table
 
 user waits until data file import is complete
     [Arguments]
     ...    ${SUBJECT_NAME}
+    user waits until data file import is in status    ${SUBJECT_NAME}    Complete
+
+user waits until data file import is in status
+    [Arguments]
+    ...    ${subject_name}
+    ...    ${status}
     user waits until page contains data uploads table
-    user waits until table contains row with    ${SUBJECT_NAME}    testid:Data files table    %{WAIT_DATA_FILE_IMPORT}
-    ${row}=    user gets table row    ${SUBJECT_NAME}    testid:Data files table
-    user waits until element contains    ${row}    Complete
+    user waits until parent contains element
+    ...    testid:Data files table
+    ...    xpath:.//tbody/tr/td[contains(., "${subject_name}")]/../td[contains(., "${status}")]
+    ...    %{WAIT_DATA_FILE_IMPORT}
 
 user waits until page contains data uploads table
     user waits until page contains testid    Data files table    %{WAIT_DATA_FILE_IMPORT}
