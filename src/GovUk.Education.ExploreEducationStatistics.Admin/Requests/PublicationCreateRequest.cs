@@ -8,9 +8,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 
 public record PublicationCreateRequest
 {
-    [Required] public string Title { get; set; } = string.Empty;
+    public string Title { get; set; } = string.Empty;
 
-    [Required, MaxLength(160)] public string Summary { get; set; } = string.Empty;
+    public string Summary { get; set; } = string.Empty;
 
     [Required] public Guid ThemeId { get; set; }
 
@@ -26,13 +26,17 @@ public record PublicationCreateRequest
 
     public Guid? SupersededById { get; set; }
 
-     public class Validator : AbstractValidator<PublicationCreateRequest>
+    public class Validator : AbstractValidator<PublicationCreateRequest>
     {
         public Validator()
         {
             RuleFor(request => request.Title)
                 .NotEmpty()
                 .MaximumLength(65);
+
+            RuleFor(request => request.Summary)
+                .NotEmpty()
+                .MaximumLength(160);
         }
     }
 }
