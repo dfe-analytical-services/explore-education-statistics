@@ -102,7 +102,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository
             params FileType[] types)
         {
             return await _contentDbContext.ReleaseFiles
-                .Include(f => f.File)
+                .Include(f => f.File.CreatedBy)
                 .Where(releaseFile =>
                     releaseFile.ReleaseVersionId == releaseVersionId
                     && types.Contains(releaseFile.File.Type))
