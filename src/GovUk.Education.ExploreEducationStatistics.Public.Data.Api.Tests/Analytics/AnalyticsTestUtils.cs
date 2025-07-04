@@ -53,7 +53,7 @@ public static class AnalyticsTestAssertions
         
         Assert.NotNull(capturedCall);
         Assert.Equal(expectedType, capturedCall.Type);
-        capturedCall.StartTime.AssertUtcNow(withinMillis: 5000);
+        capturedCall.StartTime.AssertUtcNow();
         
         if (expectedParameters == null)
         {
@@ -89,7 +89,7 @@ public static class AnalyticsTestAssertions
         Assert.Equal(expectedType, capturedCall.Type);
         Assert.Equal(publicationId, capturedCall.PublicationId);
         Assert.Equal(publicationTitle, capturedCall.PublicationTitle);
-        capturedCall.StartTime.AssertUtcNow(withinMillis: 5000);
+        capturedCall.StartTime.AssertUtcNow();
 
         if (expectedParameters == null)
         {
@@ -126,7 +126,7 @@ public static class AnalyticsTestAssertions
         Assert.Equal(expectedType, capturedCall.Type);
         Assert.Equal(dataSet.Id, capturedCall.DataSetId);
         Assert.Equal(dataSet.Title, capturedCall.DataSetTitle);
-        capturedCall.StartTime.AssertUtcNow(withinMillis: 5000);
+        capturedCall.StartTime.AssertUtcNow();
         
         if (expectedParameters == null)
         {
@@ -181,7 +181,7 @@ public static class AnalyticsTestAssertions
         Assert.Equal(dataSetVersion.Id, capturedCall.DataSetVersionId);
         Assert.Equal(dataSetVersion.SemVersion().ToString(), capturedCall.DataSetVersion);
         Assert.Equal(expectedRequestedDataSetVersion, capturedCall.RequestedDataSetVersion);
-        capturedCall.StartTime.AssertUtcNow(withinMillis: 5000);
+        capturedCall.StartTime.AssertUtcNow();
 
         if (expectedParameters == null)
         {
@@ -237,8 +237,8 @@ public static class AnalyticsTestAssertions
         Assert.Equal(expectedResultsCount, capturedQuery.ResultsCount);
         Assert.Equal(expectedTotalRows, capturedQuery.TotalRowsCount);
 
-        capturedQuery.StartTime.AssertUtcNow(withinMillis: 5000);
-        capturedQuery.EndTime.AssertUtcNow(withinMillis: 5000);
+        capturedQuery.StartTime.AssertUtcNow();
+        capturedQuery.EndTime.AssertUtcNow();
         Assert.True(capturedQuery.EndTime > capturedQuery.StartTime);
     }
 
