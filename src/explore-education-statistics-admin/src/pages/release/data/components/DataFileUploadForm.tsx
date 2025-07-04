@@ -201,7 +201,7 @@ export default function DataFileUploadForm({
               })
               .max(
                 titleMaxLength,
-                `Title must be ${titleMaxLength} characters or less`,
+                `Title must be ${titleMaxLength} characters or fewer`,
               ),
         }),
       });

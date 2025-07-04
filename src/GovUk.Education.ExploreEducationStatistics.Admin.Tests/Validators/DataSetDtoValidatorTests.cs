@@ -79,7 +79,7 @@ public class DataSetDtoValidatorTests
 
         // Assert
         result.ShouldHaveValidationErrorFor(dto => dto.Title)
-            .WithErrorMessage($"Title '{title}' must be 120 characters or less")
+            .WithErrorMessage($"Title '{title}' must be 120 characters or fewer")
             .WithErrorCode("DataSetTitleTooLong");
     }
 

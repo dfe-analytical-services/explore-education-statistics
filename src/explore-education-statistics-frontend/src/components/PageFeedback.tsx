@@ -64,15 +64,15 @@ export default function PageFeedback() {
     return Yup.object({
       context: Yup.string().max(
         feedbackLimit,
-        `What were you doing must be ${feedbackLimit} characters or less`,
+        `What were you doing must be ${feedbackLimit} characters or fewer`,
       ),
       issue: Yup.string().max(
         feedbackLimit,
-        `What went wrong must  be ${feedbackLimit} characters or less`,
+        `What went wrong must  be ${feedbackLimit} characters or fewer`,
       ),
       intent: Yup.string().max(
         feedbackLimit,
-        `What were you hoping to achieve must be ${feedbackLimit} characters or less`,
+        `What were you hoping to achieve must be ${feedbackLimit} characters or fewer`,
       ),
     });
   }, []);

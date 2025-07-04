@@ -1,4 +1,5 @@
 #nullable enable
+using System;
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Fixture;
@@ -12,6 +13,7 @@ using Microsoft.EntityFrameworkCore;
 using System.Net.Http;
 using System.Net.Http.Json;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api;
 
@@ -124,6 +126,60 @@ public class PublicationControllerTests(TestApplicationFactory testApp) : Integr
         }
 
         [Fact]
+        public async Task RequiredFieldsAreEmpty_ReturnsValidationError()
+        {
+            var request = new PublicationCreateRequest
+            {
+                Title = "", // Empty title
+                Summary = "", // Empty summary
+                Contact = new ContactSaveRequest
+                {
+                    TeamName = "Team",
+                    TeamEmail = "team@test.com",
+                    ContactName = "Contact",
+                    ContactTelNo = "01234567890"
+                },
+                ThemeId = Guid.NewGuid()
+            };
+
+            var response = await CreatePublication(request);
+
+            var validationProblem = response.AssertValidationProblem();
+
+            Assert.Equal(2, validationProblem.Errors.Count);
+            validationProblem.AssertHasNotEmptyError(nameof(PublicationCreateRequest.Title).ToLowerFirst());
+            validationProblem.AssertHasNotEmptyError(nameof(PublicationCreateRequest.Summary).ToLowerFirst());
+        }
+
+        [Fact]
+        public async Task FieldsExceedMaxLength_ReturnsValidationError()
+        {
+            var request = new PublicationCreateRequest
+            {
+                Title = new string('A', count: 66), // Title exceeds max length of 65
+                Summary = new string('A', count: 161), // Summary exceeds max length of 160
+                Contact = new ContactSaveRequest
+                {
+                    TeamName = "Team",
+                    TeamEmail = "team@test.com",
+                    ContactName = "Contact",
+                    ContactTelNo = "01234567890"
+                },
+                ThemeId = Guid.NewGuid()
+            };
+
+            var response = await CreatePublication(request);
+
+            var validationProblem = response.AssertValidationProblem();
+
+            Assert.Equal(2, validationProblem.Errors.Count);
+            validationProblem.AssertHasMaximumLengthError(nameof(PublicationCreateRequest.Title).ToLowerFirst(),
+                maxLength: 65);
+            validationProblem.AssertHasMaximumLengthError(nameof(PublicationCreateRequest.Summary).ToLowerFirst(),
+                maxLength: 160);
+        }
+
+        [Fact]
         public async Task UserHasNoAccessToCreatePublication_ReturnsForbidden()
         {
             var theme = DataFixture.DefaultTheme().Generate();
@@ -163,10 +219,69 @@ public class PublicationControllerTests(TestApplicationFactory testApp) : Integr
             client ??= TestApp
                 .SetUser(DataFixture
                     .AuthenticatedUser()
-                    .WithClaim(SecurityClaimTypes.CreateAnyPublication.ToString()))
+                    .WithClaim(nameof(SecurityClaimTypes.CreateAnyPublication)))
                 .CreateClient();
 
             return await client.PostAsJsonAsync("api/publications", request);
+        }
+    }
+
+    public class UpdatePublicationTests(TestApplicationFactory testApp) : PublicationControllerTests(testApp)
+    {
+        [Fact]
+        public async Task RequiredFieldsAreEmpty_ReturnsValidationError()
+        {
+            var publicationId = Guid.NewGuid();
+            var request = new PublicationSaveRequest
+            {
+                Title = "", // Empty title
+                Summary = "", // Empty summary
+                ThemeId = Guid.NewGuid()
+            };
+
+            var response = await UpdatePublication(publicationId, request);
+
+            var validationProblem = response.AssertValidationProblem();
+
+            Assert.Equal(2, validationProblem.Errors.Count);
+            validationProblem.AssertHasNotEmptyError(nameof(PublicationSaveRequest.Title).ToLowerFirst());
+            validationProblem.AssertHasNotEmptyError(nameof(PublicationSaveRequest.Summary).ToLowerFirst());
+        }
+
+        [Fact]
+        public async Task FieldsExceedMaxLength_ReturnsValidationError()
+        {
+            var publicationId = Guid.NewGuid();
+            var request = new PublicationSaveRequest
+            {
+                Title = new string('A', count: 66), // Title exceeds max length of 65
+                Summary = new string('A', count: 161), // Summary exceeds max length of 160
+                ThemeId = Guid.NewGuid()
+            };
+
+            var response = await UpdatePublication(publicationId, request);
+
+            var validationProblem = response.AssertValidationProblem();
+
+            Assert.Equal(2, validationProblem.Errors.Count);
+            validationProblem.AssertHasMaximumLengthError(nameof(PublicationSaveRequest.Title).ToLowerFirst(),
+                maxLength: 65);
+            validationProblem.AssertHasMaximumLengthError(nameof(PublicationSaveRequest.Summary).ToLowerFirst(),
+                maxLength: 160);
+        }
+
+        private async Task<HttpResponseMessage> UpdatePublication(
+            Guid publicationId,
+            PublicationSaveRequest request,
+            HttpClient? client = null)
+        {
+            client ??= TestApp
+                .SetUser(DataFixture
+                    .AuthenticatedUser()
+                    .WithClaim(nameof(SecurityClaimTypes.UpdateAllPublications)))
+                .CreateClient();
+
+            return await client.PutAsJsonAsync($"api/publications/{publicationId}", request);
         }
     }
 }
