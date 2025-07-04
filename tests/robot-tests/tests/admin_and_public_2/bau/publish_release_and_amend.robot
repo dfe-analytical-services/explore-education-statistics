@@ -288,7 +288,7 @@ Verify newly published release is public
 Verify release page meta
     user checks meta title should be    ${PUBLICATION_NAME}, ${RELEASE_NAME}
     user checks meta description should be
-    ...    Find, download and explore official Department for Education (DfE) statistics and data in England.
+    ...    ${PUBLICATION_NAME} summary
 
 Verify release URL
     user checks url contains    %{PUBLIC_URL}/find-statistics/ui-tests-publish-release-and-amend-%{RUN_IDENTIFIER}
