@@ -45,7 +45,7 @@ public static class AnalyticsServiceCollectionExtensions
             .AddTransient<IAnalyticsWriteStrategy, AnalyticsWriteDataSetCallsStrategy>()
             .AddTransient<IAnalyticsWriteStrategy, AnalyticsWriteDataSetVersionCallsStrategy>()
             .AddTransient<IAnalyticsWriteStrategy, AnalyticsWritePublicApiQueryStrategy>();
-        
+
         services.AddTransient(
             typeof(ICommonAnalyticsWriteStrategyWorkflow<>),
             typeof(CommonAnalyticsWriteStrategyWorkflow<>));

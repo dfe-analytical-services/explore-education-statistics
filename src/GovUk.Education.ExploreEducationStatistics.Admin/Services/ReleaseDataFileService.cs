@@ -151,7 +151,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         rf.File.Type == FileType.Data &&
                         rf.FileId == fileId))
                 .OnSuccessDo(rf => userService.CheckCanViewReleaseVersion(rf.ReleaseVersion))
-                .OnSuccess(BuildDataFileViewModel);
+                .OnSuccess(async releaseFile =>
+                {
+                    var dataImport = await contentDbContext.DataImports
+                        .AsSplitQuery()
+                        .Include(di => di.File)
+                        .Include(di => di.MetaFile)
+                        .SingleAsync(di => di.FileId == releaseFile.FileId);
+
+                    var permissions = await userService.GetDataFilePermissions(dataImport.File);
+
+                    return BuildDataFileViewModel(releaseFile, dataImport, permissions);
+                });
         }
 
         public async Task<Either<ActionResult, DataSetAccoutrementsViewModel>> GetAccoutrementsSummary(
@@ -201,16 +212,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(userService.CheckCanViewReleaseVersion)
                 .OnSuccess(async () =>
                 {
-                    var files = await releaseFileRepository.GetByFileType(releaseVersionId, types: FileType.Data);
+                    var files = await releaseFileRepository.GetByFileType(
+                        releaseVersionId: releaseVersionId,
+                        types: FileType.Data);
 
-                    // Exclude files that are replacements in progress
+                    // An in-progress data set replacement has two release files associated with it: the original and
+                    // the replacement. The frontend doesn't want to display two files for the in-progress replacement,
+                    // so we exclude the replacement file and keep the original file.
                     var filesExcludingReplacements = files
                         .Where(releaseFile => !releaseFile.File.ReplacingId.HasValue)
                         .OrderBy(releaseFile => releaseFile.Order)
                         .ThenBy(releaseFile => releaseFile.Name) // For subjects existing before ordering was added
                         .ToList();
 
-                    return await BuildDataFileViewModels(filesExcludingReplacements);
+                    // We want the in-progress replacement files for use in the generated view models
+                    var inProgressReplacements = files
+                        .Where(releaseFile => releaseFile.File.ReplacingId.HasValue)
+                        .ToList();
+
+                    return await BuildDataFileViewModels(filesExcludingReplacements, inProgressReplacements);
                 });
         }
 
@@ -608,27 +628,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 : dataSetUpload;
         }
 
-        private async Task<DataFileInfo> BuildDataFileViewModel(ReleaseFile releaseFile)
-        {
-            var dataImport = await contentDbContext.DataImports
-                .AsSplitQuery()
-                .Include(di => di.File)
-                .ThenInclude(f => f.CreatedBy)
-                .Include(di => di.MetaFile)
-                .SingleAsync(di => di.FileId == releaseFile.FileId);
-
-            var permissions = await userService.GetDataFilePermissions(dataImport.File);
-
-            return BuildDataFileViewModel(releaseFile, dataImport, permissions);
-        }
-
-        private DataFileInfo BuildDataFileViewModel(
+        private DataFileInfo BuildDataFileViewModel( // @MarkFix add test with replacement
             ReleaseFile releaseFile,
             DataImport dataImport,
-            DataFilePermissions permissions)
+            DataFilePermissions permissions,
+            ReleaseFile? replacementReleaseFile = null,
+            DataImport? replacementDataImport = null,
+            DataFilePermissions? replacementPermissions = null)
         {
-            Debug.Assert(releaseFile.File.CreatedBy != null);
-            Debug.Assert(dataImport.MetaFile != null);
+            if (replacementReleaseFile != null && (replacementDataImport == null || replacementPermissions == null))
+            {
+                throw new ArgumentException(
+                    "If replacementReleaseFile is provided, must also provide replacementDataImport and replacementPermissions");
+            }
 
             return new DataFileInfo
             {
@@ -639,6 +651,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 MetaFileId = dataImport.MetaFile.Id,
                 MetaFileName = dataImport.MetaFile.Filename,
                 ReplacedBy = releaseFile.File.ReplacedById,
+                ReplacedByDataFile = replacementReleaseFile == null
+                    ? null
+                    : BuildDataFileViewModel(replacementReleaseFile, replacementDataImport!, replacementPermissions!),
                 Rows = dataImport.TotalRows,
                 UserName = releaseFile.File.CreatedBy?.Email ?? "",
                 Status = dataImport.Status,
@@ -649,32 +664,53 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             };
         }
 
-        private async Task<List<DataFileInfo>> BuildDataFileViewModels(List<ReleaseFile> releaseFiles)
+        private async Task<List<DataFileInfo>> BuildDataFileViewModels( // @MarkFix add test with replacement
+            List<ReleaseFile> releaseFiles,
+            List<ReleaseFile>? inProgressReplacements = null)
         {
-            var fileIds = releaseFiles.Select(rf => rf.FileId).ToList();
+            var files = releaseFiles
+                .Concat(inProgressReplacements ?? [])
+                .Select(rf => rf.File).ToList();
 
             var dataImportsDict = await contentDbContext.DataImports
                 .AsSplitQuery()
-                .Include(di => di.File)
-                .ThenInclude(f => f.CreatedBy)
+                .Include(di => di.File.CreatedBy)
                 .Include(di => di.MetaFile)
-                .Where(di => fileIds.Contains(di.FileId))
+                .Where(di => files
+                    .Select(f => f.Id)
+                    .Contains(di.FileId))
                 .ToDictionaryAsync(di => di.FileId);
 
             // TODO Optimise GetDataFilePermissions here instead of potentially making several db queries
             // Work out if the user has permission to cancel any import which Bau users can.
             // Combine it with the import status (already known) to evaluate whether a particular import can be cancelled
-            var permissionsDict = await releaseFiles
+            var permissionsDict = await files
                 .ToAsyncEnumerable()
                 .ToDictionaryAwaitAsync(
-                    rf => ValueTask.FromResult(rf.FileId),
-                    async rf => await userService.GetDataFilePermissions(rf.File));
+                    file => ValueTask.FromResult(file.Id),
+                    async file => await userService.GetDataFilePermissions(file));
 
             return releaseFiles.Select(releaseFile =>
             {
-                var dataImport = dataImportsDict[releaseFile.FileId];
-                var permissions = permissionsDict[releaseFile.FileId];
-                return BuildDataFileViewModel(releaseFile, dataImport, permissions);
+                if (inProgressReplacements == null || releaseFile.File.ReplacedById == null)
+                {
+                    return BuildDataFileViewModel(
+                        releaseFile,
+                        dataImportsDict[releaseFile.FileId],
+                        permissionsDict[releaseFile.FileId]);
+                }
+
+                var replacement = inProgressReplacements.Single(rf =>
+                    rf.FileId == releaseFile.File.ReplacedById);
+
+                return BuildDataFileViewModel(
+                    releaseFile,
+                    dataImportsDict[releaseFile.FileId],
+                    permissionsDict[releaseFile.FileId],
+                    replacement,
+                    dataImportsDict[replacement.FileId],
+                    permissionsDict[replacement.FileId]);
+
             }).ToList();
         }
 

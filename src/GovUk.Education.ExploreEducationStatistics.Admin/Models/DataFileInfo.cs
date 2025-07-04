@@ -19,6 +19,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Models
 
         public Guid? ReplacedBy { get; set; }
 
+        public DataFileInfo? ReplacedByDataFile { get; set; }
+
         [JsonConverter(typeof(EnumToEnumValueJsonConverter<DataImportStatus>))]
         public DataImportStatus Status { get; set; }
 
