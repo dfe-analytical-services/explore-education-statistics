@@ -1,4 +1,7 @@
-import { DataFile } from '@admin/services/releaseDataFileService';
+import {
+  DataFile,
+  DataFileImportStatus,
+} from '@admin/services/releaseDataFileService';
 import styles from '@admin/pages/release/data/components/DataFilesTable.module.scss';
 import DataFileReplacementTableRow from '@admin/pages/release/data/components/DataFilesReplacementTableRow';
 import React from 'react';
@@ -10,6 +13,7 @@ interface Props {
   releaseVersionId: string;
   testId?: string;
   onConfirmAction?: () => void;
+  onImportComplete?: (dataFile: DataFile) => void;
 }
 
 export default function DataFilesReplacementTable({
@@ -19,6 +23,7 @@ export default function DataFilesReplacementTable({
   releaseVersionId,
   testId,
   onConfirmAction,
+  onImportComplete,
 }: Props) {
   return (
     <table className={styles.table} data-testid={testId}>
@@ -41,6 +46,7 @@ export default function DataFilesReplacementTable({
             publicationId={publicationId}
             releaseVersionId={releaseVersionId}
             onConfirmAction={onConfirmAction}
+            onImportComplete={onImportComplete}
           />
         ))}
       </tbody>

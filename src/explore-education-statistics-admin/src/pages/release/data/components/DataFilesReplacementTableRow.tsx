@@ -27,6 +27,7 @@ interface Props {
   publicationId: string;
   releaseVersionId: string;
   onConfirmAction?: () => void;
+  onImportComplete?: (dataFile: DataFile) => void;
 }
 
 export default function DataFilesReplacementTableRow({
@@ -34,15 +35,17 @@ export default function DataFilesReplacementTableRow({
   publicationId,
   releaseVersionId,
   onConfirmAction,
+  onImportComplete,
 }: Props) {
   const [fetchPlan, toggleFetchPlan] = useToggle(false);
 
-  const { data: replacementDataFile, isLoading } = useQuery(
-    releaseDataFileQueries.getDataFile(
+  const { data: replacementDataFile, isLoading } = useQuery({
+    ...releaseDataFileQueries.getDataFile(
       releaseVersionId,
       dataFile.replacedBy ?? '',
     ),
-  );
+    initialData: dataFile.replacedByDataFile,
+  });
 
   const { data: plan } = useQuery({
     ...dataFileReplacementQueries.getReplacementPlan(
@@ -59,12 +62,19 @@ export default function DataFilesReplacementTableRow({
     }
   }, [replacementDataFile?.status, toggleFetchPlan]);
 
-  const handleStatusChange = (
-    _file: DataFile,
+  const handleStatusChange = async (
+    replacementDataFile: DataFile,
     importStatus: DataFileImportStatus,
   ) => {
     if (importStatus.status === 'COMPLETE') {
       toggleFetchPlan.on();
+
+      onImportComplete?.({
+        ...dataFile,
+        replacedBy: replacementDataFile.id,
+        // replacedByDataFile: replacementDataFile,
+        replacedByDataFile: { ...replacementDataFile, status: 'COMPLETE' }, // @MarkFix avoid another request
+      });
     }
   };
 

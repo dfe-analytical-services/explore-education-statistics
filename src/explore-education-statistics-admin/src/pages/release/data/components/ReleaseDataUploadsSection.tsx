@@ -19,6 +19,7 @@ import WarningMessage from '@common/components/WarningMessage';
 import useToggle from '@common/hooks/useToggle';
 import { useQuery } from '@tanstack/react-query';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import dataReplacementService from '@admin/services/dataReplacementService';
 
 interface Props {
   publicationId: string;
@@ -53,21 +54,24 @@ export default function ReleaseDataUploadsSection({
     onDataFilesChange?.(allDataFiles);
   }, [allDataFiles, onDataFilesChange]);
 
-  const replacedDataFiles = useMemo(
-    () => allDataFiles.filter(dataFile => dataFile.replacedBy),
-    [allDataFiles],
-  );
-
-  // TODO - EES-6244 bulk confirmation of replacements
-  //  const validReplacedDataFiles = replacedDataFiles.filter(
-  //   file => file.status === 'COMPLETE', // this checks the original file status, not the replacement!
-  // );
-  // const allowBulkConfirm = validReplacedDataFiles.length > 1;
-
   const dataFiles = useMemo(
-    () => allDataFiles.filter(dataFile => !dataFile.replacedBy),
+    () => allDataFiles.filter(dataFile => !dataFile.replacedByDataFile),
     [allDataFiles],
   );
+
+  const inProgressReplacementDataFiles = useMemo(
+    () => allDataFiles.filter(dataFile => dataFile.replacedByDataFile),
+    [allDataFiles],
+  );
+
+  const validReplacedDataFiles = inProgressReplacementDataFiles.filter(
+    originalFile => originalFile.replacedByDataFile?.status === 'COMPLETE', // @MarkFix more checks required? replacement plan?
+  );
+
+  console.log('allDataFiles:', allDataFiles); // @MarkFix
+  console.log('validReplacedDataFiles:', validReplacedDataFiles); // @MarkFix
+
+  const displayBulkReplacementConfirmButton = validReplacedDataFiles.length > 1;
 
   const confirmDataSetImport = useCallback(
     async (dataSetUploadResults: DataSetUploadResult[]) => {
@@ -83,12 +87,15 @@ export default function ReleaseDataUploadsSection({
   );
 
   const handleStatusChange = useCallback(
-    async (dataFile: DataFile, { totalRows, status }: DataFileImportStatus) => {
+    async (
+      dataFile: DataFile,
+      importStatus: DataFileImportStatus | undefined,
+    ) => {
       // EES-5732 UI tests related to data replacement sometimes fail
       // because of a permission call for the replaced file being called,
       // probably caused by the speed of the tests.
       // This prevents this happening.
-      if (status === 'NOT_FOUND') {
+      if (importStatus?.status === 'NOT_FOUND') {
         return;
       }
 
@@ -97,16 +104,17 @@ export default function ReleaseDataUploadsSection({
         dataFile.id,
       );
 
-      setAllDataFiles(currentDataFiles =>
+      setAllDataFiles(currentDataFiles => // @MarkFix Start here - this doesn't seem to update the page, but after replacement imports complete, a single click on the page causes bulk confirm button to appear
         currentDataFiles.map(file =>
           file.fileName !== dataFile.fileName
             ? file
             : {
                 ...dataFile,
-                rows: totalRows,
-                status,
+                rows: importStatus?.totalRows ?? dataFile.rows, // @MarkFix dataFile or file here?
+                status: importStatus?.status ?? dataFile.status, // @MarkFix dataFile or file here?
                 permissions,
                 replacedBy: file.replacedBy,
+                replacedByDataFile: file.replacedByDataFile, // @MarkFix this should be dataFile maybe?
               },
         ),
       );
@@ -189,8 +197,15 @@ export default function ReleaseDataUploadsSection({
     [releaseVersionId, toggleReordering],
   );
 
-  // TODO - EES-6244 bulk confirmation of replacements
-  // const handleConfirmAllReplacements = () => {};
+  const handleConfirmAllReplacements = async () => {
+    // @MarkFix async going to sting me?
+    await dataReplacementService.replaceData(
+      releaseVersionId,
+      validReplacedDataFiles.map(file => file.id),
+    );
+
+    await refetchDataFiles();
+  };
 
   return (
     <>
@@ -255,12 +270,11 @@ export default function ReleaseDataUploadsSection({
                 <Button onClick={toggleReordering.on} variant="secondary">
                   Reorder data files
                 </Button>
-                {/* TODO - EES-6244 bulk confirmation of replacements */}
-                {/* {allowBulkConfirm && (
+                {displayBulkReplacementConfirmButton && (
                   <Button onClick={handleConfirmAllReplacements}>
                     Confirm all valid replacements
                   </Button>
-                )} */}
+                )}
               </div>
             )}
 
@@ -272,14 +286,17 @@ export default function ReleaseDataUploadsSection({
               />
             ) : (
               <>
-                {replacedDataFiles.length > 0 && (
+                {inProgressReplacementDataFiles.length > 0 && (
                   <DataFilesReplacementTable
                     caption="Data file replacements"
-                    dataFiles={replacedDataFiles}
+                    dataFiles={inProgressReplacementDataFiles}
                     publicationId={publicationId}
                     releaseVersionId={releaseVersionId}
                     testId="Data file replacements table"
                     onConfirmAction={refetchDataFiles}
+                    onImportComplete={async (dataFile: DataFile) => {
+                      await handleStatusChange(dataFile, undefined);
+                    }}
                   />
                 )}
 
