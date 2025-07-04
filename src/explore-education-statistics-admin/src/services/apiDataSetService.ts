@@ -106,7 +106,7 @@ export type DataSetVersionStatus =
   | DataSetDraftVersionStatus
   | DataSetLiveVersionStatus;
 
-export type DataSetVersionType = 'Major' | 'Minor';
+export type DataSetVersionType = 'Major' | 'Minor' | 'Patch';
 
 const apiDataSetService = {
   async listDataSets(publicationId: string): Promise<ApiDataSetSummary[]> {
