@@ -188,7 +188,7 @@ describe('ReleaseDataFileReplacePage', () => {
   test('renders replacement and original data file details', async () => {
     releaseDataFileService.getDataFile.mockResolvedValueOnce({
       ...testOriginalFile,
-      replacedBy: testReplacementFile.id,
+      replacedBy: testReplacementFile.id, // @MarkFix add replacedByDataFile here? (And on other tests?)
     });
     releaseDataFileService.getDataFile.mockResolvedValueOnce(
       testReplacementFile,

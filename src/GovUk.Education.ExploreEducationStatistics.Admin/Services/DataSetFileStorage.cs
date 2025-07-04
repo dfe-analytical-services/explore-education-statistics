@@ -116,6 +116,7 @@ public class DataSetFileStorage(
             MetaFileId = dataImport.MetaFile.Id,
             MetaFileName = dataImport.MetaFile.Filename,
             ReplacedBy = dataReleaseFile.File.ReplacedById,
+            ReplacedByDataFile = null, // @MarkFix do we want to build DataFileInfo here?
             Rows = dataImport.TotalRows,
             UserName = dataReleaseFile.File.CreatedBy?.Email ?? "",
             Status = dataImport.Status,

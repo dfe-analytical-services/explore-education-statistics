@@ -27,6 +27,10 @@ interface Props {
   publicationId: string;
   releaseVersionId: string;
   onConfirmAction?: () => void;
+  onImportComplete?: (
+    originalDataFile: DataFile,
+    replacementImportStatus: DataFileImportStatus,
+  ) => void;
 }
 
 export default function DataFilesReplacementTableRow({
@@ -34,16 +38,18 @@ export default function DataFilesReplacementTableRow({
   publicationId,
   releaseVersionId,
   onConfirmAction,
+  onImportComplete,
 }: Props) {
   const [fetchPlan, toggleFetchPlan] = useToggle(false);
   const [canCancel, toggleCanCancel] = useToggle(false);
 
-  const { data: replacementDataFile, isLoading } = useQuery(
-    releaseDataFileQueries.getDataFile(
+  const { data: replacementDataFile, isLoading } = useQuery({
+    ...releaseDataFileQueries.getDataFile(
       releaseVersionId,
       dataFile.replacedBy ?? '',
     ),
-  );
+    initialData: dataFile.replacedByDataFile,
+  });
 
   const { data: plan } = useQuery({
     ...dataFileReplacementQueries.getReplacementPlan(
@@ -60,13 +66,15 @@ export default function DataFilesReplacementTableRow({
     }
   }, [replacementDataFile?.status, toggleFetchPlan, toggleCanCancel]);
 
-  const handleStatusChange = (
-    _file: DataFile,
-    importStatus: DataFileImportStatus,
+  const handleStatusChange = async (
+    _: DataFile,
+    replacementImportStatus: DataFileImportStatus,
   ) => {
-    if (importStatus.status === 'COMPLETE') {
+    if (replacementImportStatus.status === 'COMPLETE') {
       toggleFetchPlan.on();
       toggleCanCancel.on();
+
+      onImportComplete?.(dataFile, replacementImportStatus);
     }
   };
 
