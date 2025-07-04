@@ -248,7 +248,7 @@ public class DataSetFileStorageTestFixture
         
         testFixture.ReleaseVersion = releaseVersion; //Used by some of the shared mock services set up
 
-        testFixture.SetupMockBulkPatchDataSetVersionCreation(dataSetVersions);
+        testFixture.SetupMockBulkPatchDataSetVersionCreation(dataSetVersions, releaseFiles);
         testFixture.SetupMocksForBulkUpload(fileAndDataSetName);
         
         foreach(var metafile in metaFiles)
@@ -593,30 +593,33 @@ public class DataSetFileStorageTestFixture
             });
     }
 
-    private void SetupMockBulkPatchDataSetVersionCreation(DataSetVersion[] dataSetVersions)
+    private void SetupMockBulkPatchDataSetVersionCreation(DataSetVersion[] dataSetVersions, ReleaseFile[] releaseFiles)
     {
         foreach (var dataSetVersion in dataSetVersions)
         {
             DataSetVersionService.Setup<Task<Either<ActionResult, DataSetVersion>>>(mock => mock.GetDataSetVersion(
                     dataSetVersion.DataSetId,
-                    It.IsAny<SemVersion>(),
+                    new SemVersion(2,0, 0),
                     It.IsAny<CancellationToken>()))
                 .ReturnsAsync(dataSetVersion);
         }
-        
-        DataSetVersionService.Setup(mock => mock.CreateNextVersion(
-                It.IsAny<Guid>(),
-                It.IsAny<Guid>(),
-                It.IsAny<Guid>(),
-                It.IsAny<CancellationToken>()))
-            .ReturnsAsync(new DataSetVersionSummaryViewModel
-            {
-                Id = Guid.NewGuid(),
-                Version = "2.0.1",
-                Status = DataSetVersionStatus.Processing,
-                Type = DataSetVersionType.Minor,
-                ReleaseVersion = null,
-                File = null
-            });
+
+        foreach (var releaseFile in releaseFiles)
+        {
+            DataSetVersionService.Setup(mock => mock.CreateNextVersion(
+                    releaseFile.Id,
+                    releaseFile.PublicApiDataSetId!.Value,
+                    It.IsAny<Guid>(),
+                    It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new DataSetVersionSummaryViewModel
+                {
+                    Id = Guid.NewGuid(),
+                    Version = "2.0.1",
+                    Status = DataSetVersionStatus.Processing,
+                    Type = DataSetVersionType.Minor,
+                    ReleaseVersion = null,
+                    File = null
+                });
+        }
     }
 }
