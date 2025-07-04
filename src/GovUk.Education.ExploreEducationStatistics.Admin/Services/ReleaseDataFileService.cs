@@ -19,6 +19,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO.Compression;
 using System.Linq;
 using System.Threading;
@@ -138,11 +139,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             Guid fileId)
         {
             return await persistenceHelper
-                .CheckEntityExists<ReleaseFile>(q => q.Where(
-                    rf => rf.ReleaseVersionId == releaseVersionId &&
-                    rf.File.Type == FileType.Data &&
-                    rf.FileId == fileId)
-                .Include(rf => rf.ReleaseVersion))
+                .CheckEntityExists<ReleaseFile>(q => q
+                    .Include(rf => rf.ReleaseVersion)
+                    .Include(rf => rf.File.CreatedBy)
+                    .Where(rf =>
+                        rf.ReleaseVersionId == releaseVersionId &&
+                        rf.File.Type == FileType.Data &&
+                        rf.FileId == fileId))
                 .OnSuccessDo(rf => userService.CheckCanViewReleaseVersion(rf.ReleaseVersion))
                 .OnSuccess(BuildDataFileViewModel);
         }
@@ -554,6 +557,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
             var permissions = await userService.GetDataFilePermissions(dataImport.File);
 
+            return BuildDataFileViewModel(releaseFile, dataImport, permissions);
+        }
+
+        private DataFileInfo BuildDataFileViewModel(
+            ReleaseFile releaseFile,
+            DataImport dataImport,
+            DataFilePermissions permissions)
+        {
+            Debug.Assert(releaseFile.File.CreatedBy != null);
+            Debug.Assert(dataImport.MetaFile != null);
+
             return new DataFileInfo
             {
                 Id = releaseFile.FileId,
@@ -577,7 +591,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             var fileIds = releaseFiles.Select(rf => rf.FileId).ToList();
 
-            var dataImports = await contentDbContext.DataImports
+            var dataImportsDict = await contentDbContext.DataImports
                 .AsSplitQuery()
                 .Include(di => di.File)
                 .ThenInclude(f => f.CreatedBy)
@@ -585,12 +599,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .Where(di => fileIds.Contains(di.FileId))
                 .ToDictionaryAsync(di => di.FileId);
 
-            var subjectNames = releaseFiles.ToDictionary(rf => rf.FileId, rf => rf.Name);
-
             // TODO Optimise GetDataFilePermissions here instead of potentially making several db queries
             // Work out if the user has permission to cancel any import which Bau users can.
             // Combine it with the import status (already known) to evaluate whether a particular import can be cancelled
-            var permissions = await releaseFiles
+            var permissionsDict = await releaseFiles
                 .ToAsyncEnumerable()
                 .ToDictionaryAwaitAsync(
                     rf => ValueTask.FromResult(rf.FileId),
@@ -598,25 +610,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
             return releaseFiles.Select(releaseFile =>
             {
-                var dataImport = dataImports[releaseFile.FileId];
-
-                return new DataFileInfo
-                {
-                    Id = releaseFile.FileId,
-                    FileName = releaseFile.File.Filename,
-                    Name = subjectNames[releaseFile.FileId] ?? "",
-                    Size = releaseFile.File.DisplaySize(),
-                    MetaFileId = dataImport.MetaFile.Id,
-                    MetaFileName = dataImport.MetaFile.Filename,
-                    ReplacedBy = releaseFile.File.ReplacedById,
-                    Rows = dataImport.TotalRows,
-                    UserName = releaseFile.File.CreatedBy?.Email ?? "",
-                    Status = dataImport.Status,
-                    Created = releaseFile.File.Created,
-                    Permissions = permissions[releaseFile.FileId],
-                    PublicApiDataSetId = releaseFile.PublicApiDataSetId,
-                    PublicApiDataSetVersion = releaseFile.PublicApiDataSetVersionString,
-                };
+                var dataImport = dataImportsDict[releaseFile.FileId];
+                var permissions = permissionsDict[releaseFile.FileId];
+                return BuildDataFileViewModel(releaseFile, dataImport, permissions);
             }).ToList();
         }
 
