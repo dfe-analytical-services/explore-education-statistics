@@ -604,12 +604,13 @@ public class DataSetFileStorageTestFixture
                 .ReturnsAsync(dataSetVersion);
         }
 
-        foreach (var releaseFile in releaseFiles)
+        var releaseFilesAndVersions = releaseFiles.Zip(dataSetVersions, (releaseFile, dataSetVersion) => (releaseFile, dataSetVersion));
+        foreach (var releaseFileAndVersion in releaseFilesAndVersions)
         {
             DataSetVersionService.Setup(mock => mock.CreateNextVersion(
-                    releaseFile.Id,
-                    releaseFile.PublicApiDataSetId!.Value,
-                    It.IsAny<Guid>(),
+                    releaseFileAndVersion.releaseFile.Id,
+                    releaseFileAndVersion.releaseFile.PublicApiDataSetId!.Value,
+                    releaseFileAndVersion.dataSetVersion.Id,
                     It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new DataSetVersionSummaryViewModel
                 {
