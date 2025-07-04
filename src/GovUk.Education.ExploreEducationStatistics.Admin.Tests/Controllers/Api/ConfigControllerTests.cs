@@ -2,6 +2,7 @@
 using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Options;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
+using GovUk.Education.ExploreEducationStatistics.Common.Options;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using Microsoft.Extensions.Configuration;
 
@@ -46,11 +47,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             var publicDataApiOptions = new PublicDataApiOptions();
             configuration.Bind(PublicDataApiOptions.Section, publicDataApiOptions);
 
+            var featureFlagsOptions = new FeatureFlagsOptions();
+            configuration.Bind(FeatureFlagsOptions.Section, featureFlagsOptions);
+
             var controller = new ConfigController(
                 openIdConnectSpaClientOptions.ToOptionsWrapper(),
                 appInsightsOptions.ToOptionsWrapper(),
                 publicAppOptions.ToOptionsWrapper(),
-                publicDataApiOptions.ToOptionsWrapper()
+                publicDataApiOptions.ToOptionsWrapper(),
+                featureFlagsOptions.ToOptionsWrapper()
             );
 
             var result = controller.GetConfig();
