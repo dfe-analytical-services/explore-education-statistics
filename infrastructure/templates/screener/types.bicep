@@ -10,6 +10,7 @@ type ResourceNames = {
       screenerFunctionPrivateEndpoints: string
       adminApp: string
     }
+    coreStorageAccount: string
   }
   screener: {
     screenerFunction: string
