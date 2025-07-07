@@ -91,14 +91,14 @@ export default function SearchForm({ label = 'Search', onSubmit }: Props) {
     // We also need to find out which term was highlighted in order to manually
     // add highlights to the other field.
     const highlightedTerm = result.highlightedMatch.match(
-      /(?<=<mark>)(.*?)(?=<\/mark>)/,
+      /(?<=<strong>)(.*?)(?=<\/strong>)/,
     );
 
-    const addMarkToString = (snippet: string) =>
+    const addstrongToString = (snippet: string) =>
       highlightedTerm
         ? snippet.replaceAll(
             highlightedTerm[0],
-            match => `<mark>${match}</mark>`,
+            match => `<strong>${match}</strong>`,
           )
         : snippet;
 
@@ -110,14 +110,14 @@ export default function SearchForm({ label = 'Search', onSubmit }: Props) {
         ${
           result.title.includes(highlightMatchWithoutTags)
             ? result.highlightedMatch
-            : addMarkToString(result.title)
+            : addstrongToString(result.title)
         }
       </span>
       <span class="autocomplete__option-summary">
       ${
         result.summary.includes(highlightMatchWithoutTags)
           ? result.highlightedMatch
-          : addMarkToString(truncate(result.summary, { length: 140 }))
+          : addstrongToString(truncate(result.summary, { length: 140 }))
       }
       </span>
     </p>`;

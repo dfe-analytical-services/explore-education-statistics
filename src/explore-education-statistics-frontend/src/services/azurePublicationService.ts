@@ -158,8 +158,8 @@ const azurePublicationService = {
             searchFields: ['title', 'summary'],
             useFuzzyMatching: true,
             top: 3,
-            highlightPostTag: '</mark>',
-            highlightPreTag: '<mark>',
+            highlightPostTag: '</strong>',
+            highlightPreTag: '<strong>',
           })
         : null;
 
