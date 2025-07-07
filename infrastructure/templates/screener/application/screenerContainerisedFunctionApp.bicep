@@ -40,6 +40,10 @@ param screenerAppRegistrationClientId string
 @secure()
 param devopsServicePrincipalId string
 
+@description('The connection string to the Core storage account.')
+@secure()
+param coreStorageConnectionStringSecretName string
+
 @description('Specifies the login server from the registry.')
 @secure()
 param acrLoginServer string
@@ -102,6 +106,12 @@ module containerisedFunctionAppModule '../../common/components/containerisedFunc
     applicationInsightsConnectionString: applicationInsightsConnectionString
     healthCheckPath: '/api/screen'
     appServicePlanName: resourceNames.screener.screenerFunction
+    appSettings: [
+      {
+        name: 'App__CoreStorageConnectionString'
+        value: '@Microsoft.KeyVault(VaultName=${keyVault.name};SecretName=${coreStorageConnectionStringSecretName})'
+      }
+    ]
     functionAppExists: functionAppExists
     keyVaultName: keyVault.name
     // entraIdAuthentication: {

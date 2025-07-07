@@ -66,11 +66,19 @@ module applicationInsightsModule 'application/screenerApplicationInsights.bicep'
   }
 }
 
+module coreStorage '../public-api/application/shared/coreStorage.bicep' {
+  name: 'coreStorageApplicationModuleDeploy'
+  params: {
+    resourceNames: resourceNames
+  }
+}
+
 module screenerFunctionAppModule 'application/screenerContainerisedFunctionApp.bicep' = {
   name: 'screenerFunctionApp'
   params: {
     location: location
     functionAppImageName: 'ees-screener-api'
+    coreStorageConnectionStringSecretName: coreStorage.outputs.coreStorageConnectionStringSecretKey
     acrLoginServer: keyVault.getSecret('DOCKER-REGISTRY-SERVER-DOMAIN')
     screenerAppRegistrationClientId: screenerAppRegistrationClientId
     devopsServicePrincipalId: devopsServicePrincipalId

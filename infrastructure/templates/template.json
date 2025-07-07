@@ -1909,8 +1909,8 @@
         "PublicDataApi__DocsUrl": "[concat('https://', parameters('publicApiDocsUrl'))]",
         "PublicDataApi__AppRegistrationClientId": "[parameters('apiAppRegistrationClientId')]",
         "PublicDataProcessor__Url": "[concat('https://', variables('publicDataProcessorName'), '.azurewebsites.net')]",
-        "PublicDataProcessor__AppRegistrationClientId": "[parameters('publicDataProcessorAppRegistrationClientId')]"
-        // "ScreenerApi__Url": "[concat('https://', variables('screenerApiName'), '.azurewebsites.net')]",
+        "PublicDataProcessor__AppRegistrationClientId": "[parameters('publicDataProcessorAppRegistrationClientId')]",
+        "ScreenerApi__Url": "[concat('https://', variables('screenerApiName'), '.azurewebsites.net')]"
         // "ScreenerApi__AppRegistrationClientId": "[parameters('screenerApiAppRegistrationClientId')]"
       }
     },
