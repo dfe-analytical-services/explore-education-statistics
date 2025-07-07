@@ -66,7 +66,7 @@ module applicationInsightsModule 'application/screenerApplicationInsights.bicep'
   }
 }
 
-module coreStorage '../public-api/application/shared/coreStorage.bicep' {
+module coreStorage 'application/shared/coreStorage.bicep' = {
   name: 'coreStorageApplicationModuleDeploy'
   params: {
     resourceNames: resourceNames
@@ -78,7 +78,8 @@ module screenerFunctionAppModule 'application/screenerContainerisedFunctionApp.b
   params: {
     location: location
     functionAppImageName: 'ees-screener-api'
-    coreStorageConnectionStringSecretName: coreStorage.outputs.coreStorageConnectionStringSecretKey
+    coreStorageAccessKeyName: coreStorage.outputs.coreStorageAccessKey
+    coreStorageBlobEndpoint: coreStorage.outputs.coreStorageBlobEndpoint
     acrLoginServer: keyVault.getSecret('DOCKER-REGISTRY-SERVER-DOMAIN')
     screenerAppRegistrationClientId: screenerAppRegistrationClientId
     devopsServicePrincipalId: devopsServicePrincipalId
@@ -125,6 +126,9 @@ var resourceNames = {
       screenerFunction: '${resourcePrefix}-snet-${abbreviations.webSitesFunctions}-screener'
       screenerFunctionPrivateEndpoints: '${resourcePrefix}-snet-${abbreviations.storageStorageAccounts}-screener-pep'
     }
+    coreStorageAccount: subscription == 's101t01' || subscription == 's101p02'
+      ? '${legacyResourcePrefix}storageeescore'
+      : '${legacyResourcePrefix}saeescore'
   }
   screener: {
     screenerFunction: '${resourcePrefix}-${abbreviations.webSitesFunctions}-screener'

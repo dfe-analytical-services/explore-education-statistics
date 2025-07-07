@@ -40,9 +40,12 @@ param screenerAppRegistrationClientId string
 @secure()
 param devopsServicePrincipalId string
 
-@description('The connection string to the Core storage account.')
+@description('The access key name for the Core storage account.')
 @secure()
-param coreStorageConnectionStringSecretName string
+param coreStorageAccessKeyName string
+
+@description('The endpoint URL for the core storage blob service.')
+param coreStorageBlobEndpoint string
 
 @description('Specifies the login server from the registry.')
 @secure()
@@ -108,8 +111,16 @@ module containerisedFunctionAppModule '../../common/components/containerisedFunc
     appServicePlanName: resourceNames.screener.screenerFunction
     appSettings: [
       {
-        name: 'App__CoreStorageConnectionString'
-        value: '@Microsoft.KeyVault(VaultName=${keyVault.name};SecretName=${coreStorageConnectionStringSecretName})'
+        name: 'STORAGE_URL'
+        value: coreStorageBlobEndpoint
+      }
+      {
+        name: 'STORAGE_KEY'
+        value: '@Microsoft.KeyVault(VaultName=${keyVault.name};SecretName=${coreStorageAccessKeyName})'
+      }
+      {
+        name: 'STORAGE_CONTAINER_NAME'
+        value: 'releases-temp'
       }
     ]
     functionAppExists: functionAppExists
