@@ -155,6 +155,7 @@ const azurePublicationService = {
         ? await azureSearchClient.suggest(search, 'suggester-1', {
             select: ['releaseSlug', 'title', 'summary', 'publicationSlug'],
             filter,
+            searchFields: ['title', 'summary'],
             useFuzzyMatching: true,
             top: 3,
             highlightPostTag: '</mark>',

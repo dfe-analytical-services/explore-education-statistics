@@ -80,27 +80,44 @@ export default function SearchForm({ label = 'Search', onSubmit }: Props) {
   };
 
   const suggestionTemplate = (result: AzurePublicationSuggestResult) => {
-    // The result has a highlightedMatch with HTML tags which could either be
-    // from the title or the summary. So we will strip out the HTML tags
-    // to be able to check which field it is from, and use accordingly.
+    // The result has a `highlightedMatch` property with HTML tags which could
+    // either be from the `title` or the `summary`. So we will strip out the HTML
+    // tags to be able to check which field it is from, and use accordingly.
     const highlightMatchWithoutTags = result.highlightedMatch.replaceAll(
       /<[^>]*>/g,
       '',
     );
 
+    // We also need to find out which term was highlighted in order to manually
+    // add highlights to the other field.
+    const highlightedTerm = result.highlightedMatch.match(
+      /(?<=<mark>)(.*?)(?=<\/mark>)/,
+    );
+
+    const addMarkToString = (snippet: string) =>
+      highlightedTerm
+        ? snippet.replaceAll(
+            highlightedTerm[0],
+            match => `<mark>${match}</mark>`,
+          )
+        : snippet;
+
+    // For both title and summary, render the `highlightedMatch` from azure
+    // if it is from this field.
+    // Otherwise, render the field with highlights manually added.
     return `<p class="autocomplete__option-item">
       <span class="autocomplete__option-title">
         ${
           result.title.includes(highlightMatchWithoutTags)
             ? result.highlightedMatch
-            : result.title
+            : addMarkToString(result.title)
         }
       </span>
       <span class="autocomplete__option-summary">
       ${
         result.summary.includes(highlightMatchWithoutTags)
           ? result.highlightedMatch
-          : truncate(result.summary, { length: 140 })
+          : addMarkToString(truncate(result.summary, { length: 140 }))
       }
       </span>
     </p>`;
