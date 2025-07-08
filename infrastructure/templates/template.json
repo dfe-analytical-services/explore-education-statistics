@@ -742,7 +742,7 @@
         "description": "The Client ID of a manually-created App Registration that represents the Public API Data Processor Function App in Entra ID"
       }
     },
-    // "screenerApiAppRegistrationClientId": {
+    // "dataScreenerAppRegistrationClientId": {
     //   "type": "string",
     //   "metadata": {
     //     "description": "The Client ID of a manually-created App Registration that represents the Screener API Function App in Entra ID"
@@ -815,7 +815,7 @@
     "publisherStorageAccountId": "[concat(resourceGroup().id,'/providers/','Microsoft.Storage/storageAccounts/', variables('publisherStorageAccountName'))]",
     "loggingStorageAccountName": "[concat(parameters('subscription'), 'saeeslogging')]",
     "publicDataProcessorName": "[concat(parameters('subscription'), '-', parameters('environment'), '-papi-fa-processor')]",
-    "screenerApiName": "[concat(parameters('subscription'), '-', parameters('environment'), '-sapi')]",
+    "dataScreenerName": "[concat(parameters('subscription'), '-', parameters('environment'), '-sapi')]",
     "logicAppSlackAlerts": "[concat(parameters('subscription'), '-la-', parameters('environment'), '-slackwebhook')]",
     "actionGroupAlerts": "[concat(parameters('subscription'), '-ag-', parameters('environment'), '-alertedusers')]",
     "metricAlerts": [
@@ -1910,8 +1910,8 @@
         "PublicDataApi__AppRegistrationClientId": "[parameters('apiAppRegistrationClientId')]",
         "PublicDataProcessor__Url": "[concat('https://', variables('publicDataProcessorName'), '.azurewebsites.net')]",
         "PublicDataProcessor__AppRegistrationClientId": "[parameters('publicDataProcessorAppRegistrationClientId')]",
-        "ScreenerApi__Url": "[concat('https://', variables('screenerApiName'), '.azurewebsites.net')]"
-        // "ScreenerApi__AppRegistrationClientId": "[parameters('screenerApiAppRegistrationClientId')]"
+        "DataScreener__Url": "[concat('https://', variables('dataScreenerName'), '.azurewebsites.net')]"
+        // "DataScreener__AppRegistrationClientId": "[parameters('dataScreenerAppRegistrationClientId')]"
       }
     },
     {
