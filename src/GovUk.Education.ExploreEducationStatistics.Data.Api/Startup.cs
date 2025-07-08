@@ -48,6 +48,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Net.Http.Headers;
 using System.Text;
 using GovUk.Education.ExploreEducationStatistics.Common.Converters;
+using GovUk.Education.ExploreEducationStatistics.Data.Services.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Options;
 using Thinktecture;
 using static GovUk.Education.ExploreEducationStatistics.Common.Utils.StartupUtils;
@@ -178,7 +179,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
             services.AddTransient<IUserService, UserService>();
             services.AddTransient<ICacheKeyService, CacheKeyService>();
             services.AddTransient<ILocationService, LocationService>();
-
+            services.AddAnalytics(Configuration);
+            
             services
                 .AddAuthentication(options =>
                 {
