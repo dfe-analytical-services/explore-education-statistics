@@ -6,6 +6,7 @@ import { createAzurePublicationSuggestRequest } from '@frontend/modules/find-sta
 import azurePublicationService, {
   AzurePublicationSuggestResult,
 } from '@frontend/services/azurePublicationService';
+import { logEvent } from '@frontend/services/googleAnalyticsService';
 import React, { useEffect, useRef } from 'react';
 import Autocomplete from 'accessible-autocomplete/react';
 import { truncate } from 'lodash';
@@ -124,8 +125,13 @@ export default function SearchForm({ label = 'Search', onSubmit }: Props) {
           }}
           confirmOnBlur={false}
           showNoOptionsFound={false}
-          onConfirm={result => {
+          onConfirm={(result: AzurePublicationSuggestResult) => {
             if (result) {
+              logEvent({
+                category: 'Find statistics and data',
+                action: `Autocomplete suggestion accepted`,
+                label: result.title,
+              });
               return router.push(
                 `/find-statistics/${result.publicationSlug}/${result.releaseSlug}`,
               );
