@@ -2049,6 +2049,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             IDataBlockService? dataBlockService = null,
             IFootnoteRepository? footnoteRepository = null,
             IDataSetScreenerClient? dataSetScreenerClient = null,
+            IReplacementPlanService? replacementPlanService = null,
             IMapper? mapper = null)
         {
             contentDbContext.Users.Add(_user);
@@ -2068,6 +2069,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 dataBlockService ?? Mock.Of<IDataBlockService>(Strict),
                 footnoteRepository ?? Mock.Of<IFootnoteRepository>(Strict),
                 dataSetScreenerClient ?? Mock.Of<IDataSetScreenerClient>(Strict),
+                replacementPlanService ?? Mock.Of<IReplacementPlanService>(Strict),
                 mapper ?? Mock.Of<IMapper>(Strict)
             );
         }
