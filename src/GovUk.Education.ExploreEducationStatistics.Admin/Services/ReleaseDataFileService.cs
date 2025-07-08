@@ -703,6 +703,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 var replacement = inProgressReplacements.Single(rf =>
                     rf.FileId == releaseFile.File.ReplacedById);
 
+                // @MarkFix add HasValidReplacementPlan value
+
                 return BuildDataFileViewModel(
                     releaseFile,
                     dataImportsDict[releaseFile.FileId],

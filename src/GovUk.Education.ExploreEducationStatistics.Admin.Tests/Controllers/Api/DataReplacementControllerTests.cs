@@ -24,7 +24,7 @@ public abstract class DataReplacementControllerTests
         [Fact]
         public async Task Success()
         {
-            var replacementService = new Mock<IReplacementService>(MockBehavior.Strict);
+            var replacementPlanService = new Mock<IReplacementPlanService>(MockBehavior.Strict);
 
             var releaseVersionId = Guid.NewGuid();
             var originalFileId = Guid.NewGuid();
@@ -73,20 +73,20 @@ public abstract class DataReplacementControllerTests
                 ReplacementSubjectId = Guid.NewGuid()
             };
 
-            replacementService
+            replacementPlanService
                 .Setup(s => s.GetReplacementPlan(
                     releaseVersionId, 
                     originalFileId, 
                     It.IsAny<CancellationToken>()))
                 .ReturnsAsync(dataReplacementPlan);
 
-            var controller = BuildController(replacementService: replacementService.Object);
+            var controller = BuildController(replacementPlanService: replacementPlanService.Object);
 
             var result = await controller.GetReplacementPlan(
                 releaseVersionId: releaseVersionId,
                 originalFileId: originalFileId);
 
-            MockUtils.VerifyAllMocks(replacementService);
+            MockUtils.VerifyAllMocks(replacementPlanService);
 
             var returnedPlan = result.AssertOkResult();
 
@@ -154,11 +154,11 @@ public abstract class DataReplacementControllerTests
     }
 
     private static DataReplacementController BuildController(
-        IReplacementService? replacementService = null,
+        IReplacementPlanService? replacementPlanService = null,
         IReplacementBatchService? replacementBatchService = null)
     {
         return new DataReplacementController(
-            replacementService ?? Mock.Of<IReplacementService>(MockBehavior.Strict),
+            replacementPlanService ?? Mock.Of<IReplacementPlanService>(MockBehavior.Strict),
             replacementBatchService ?? Mock.Of<IReplacementBatchService>(MockBehavior.Strict));
     }
 }
