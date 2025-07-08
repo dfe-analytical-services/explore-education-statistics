@@ -1,8 +1,8 @@
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Options;
 
-public class DataSetScreenerClientOptions
+public class DataScreenerClientOptions
 {
-    public const string Section = "DataSetScreener";
+    public const string Section = "DataScreener";
 
     public string Url { get; set; }
 }
