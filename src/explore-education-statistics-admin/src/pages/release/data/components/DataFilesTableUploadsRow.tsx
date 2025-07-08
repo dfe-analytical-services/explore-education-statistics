@@ -149,7 +149,7 @@ export default function DataFilesTableUploadRow({
               </ButtonText>
             }
           >
-            <Tabs id="data-set-upload-tabs">
+            <Tabs id="data-set-upload-tabs" modifyHash={false}>
               {(hasFailures || hasWarnings) && (
                 <TabsSection
                   id={dataSetUploadTabIds.screenerFailuresAndWarnings}

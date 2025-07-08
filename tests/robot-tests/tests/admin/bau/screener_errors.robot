@@ -54,11 +54,6 @@ Check the file details in the modal
     user checks invalid data set file details in modal
 
 Close the screener modal and delete the invalid data set
-    ## TODO - EES-6299 bug remembers which tab was selected last in the first modal's interactions.
-    ## Therefore we manually return to the starting tab so that the 2nd modal interaction
-    ## starts on this tab as well, until the above bug is fixed.
-    user clicks element    id:screener-results-filtered-tab
-
     user clicks modal button    Cancel
     user clicks button    Delete files
     user waits until modal is visible    Confirm deletion of selected data files

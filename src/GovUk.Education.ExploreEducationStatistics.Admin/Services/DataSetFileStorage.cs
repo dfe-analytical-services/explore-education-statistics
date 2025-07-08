@@ -270,7 +270,7 @@ public class DataSetFileStorage(
             MetaFileName = dataSet.MetaFile.FileName,
             MetaFileSizeInBytes = dataSet.MetaFile.FileSize,
             Status = DataSetUploadStatus.SCREENING,
-            UploadedBy = userService.GetProfileFromClaims().Email,
+            UploadedBy = userService.GetProfileFromClaims().Email.ToLower(),
             ReplacingFileId = dataSet.ReplacingFile?.Id
         };
     }
