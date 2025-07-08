@@ -224,6 +224,10 @@ describe('ReleaseDataFileReplacePage', () => {
     );
 
     await waitFor(() => {
+      expect(
+        screen.getByRole('button', { name: 'Confirm all valid replacements' }),
+      ).toBeInTheDocument();
+
       // Replacement
       expect(screen.getByTestId('Replacement Title')).toHaveTextContent(
         'Test data',

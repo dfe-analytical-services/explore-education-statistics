@@ -9,6 +9,7 @@ import releaseDataFileQueries from '@admin/queries/releaseDataFileQueries';
 import releaseDataFileService, {
   DataFile,
   DataFileImportStatus,
+  ReplacementDataFile,
 } from '@admin/services/releaseDataFileService';
 import dataReplacementService from '@admin/services/dataReplacementService';
 import useToggle from '@common/hooks/useToggle';
@@ -27,10 +28,7 @@ interface Props {
   publicationId: string;
   releaseVersionId: string;
   onConfirmAction?: () => void;
-  onImportComplete?: (
-    originalDataFile: DataFile,
-    replacementImportStatus: DataFileImportStatus,
-  ) => void;
+  onReplacementStatusUpdate?: (updatedDataFile: DataFile) => void;
 }
 
 export default function DataFilesReplacementTableRow({
@@ -38,7 +36,7 @@ export default function DataFilesReplacementTableRow({
   publicationId,
   releaseVersionId,
   onConfirmAction,
-  onImportComplete,
+  onReplacementStatusUpdate,
 }: Props) {
   const [fetchPlan, toggleFetchPlan] = useToggle(false);
   const [canCancel, toggleCanCancel] = useToggle(false);
@@ -66,6 +64,16 @@ export default function DataFilesReplacementTableRow({
     }
   }, [replacementDataFile?.status, toggleFetchPlan, toggleCanCancel]);
 
+  useEffect(() => {
+    onReplacementStatusUpdate?.({
+      ...dataFile,
+      replacedByDataFile: {
+        ...dataFile.replacedByDataFile,
+        hasValidReplacementPlan: plan?.valid ?? false,
+      } as ReplacementDataFile,
+    });
+  }, [plan, dataFile, onReplacementStatusUpdate]);
+
   const handleStatusChange = async (
     _: DataFile,
     replacementImportStatus: DataFileImportStatus,
@@ -74,7 +82,13 @@ export default function DataFilesReplacementTableRow({
       toggleFetchPlan.on();
       toggleCanCancel.on();
 
-      onImportComplete?.(dataFile, replacementImportStatus);
+      onReplacementStatusUpdate?.({
+        ...dataFile,
+        replacedByDataFile: {
+          ...dataFile.replacedByDataFile,
+          status: replacementImportStatus.status,
+        } as ReplacementDataFile,
+      });
     }
   };
 

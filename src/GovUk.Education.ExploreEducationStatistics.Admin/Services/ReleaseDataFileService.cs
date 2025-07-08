@@ -225,7 +225,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         .ThenBy(releaseFile => releaseFile.Name) // For subjects existing before ordering was added
                         .ToList();
 
-                    // We want the in-progress replacement files for use in the generated view models
+                    // But we still want the in-progress replacement files for generating view models
                     var inProgressReplacements = files
                         .Where(releaseFile => releaseFile.File.ReplacingId.HasValue)
                         .ToList();
@@ -665,7 +665,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             var files = releaseFiles
                 .Concat(inProgressReplacements ?? [])
-                .Select(rf => rf.File).ToList();
+                .Select(rf => rf.File)
+                .ToList();
 
             var dataImportsDict = await contentDbContext.DataImports
                 .AsSplitQuery()
@@ -701,12 +702,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 var hasValidReplacementPlan = false;
                 if (dataImportsDict[replacement.FileId].Status == DataImportStatus.COMPLETE)
                 {
-                    var plan = await replacementPlanService
-                        .GenerateReplacementPlan(releaseFile, replacement);
-                    if (plan.IsRight)
-                    {
-                        hasValidReplacementPlan = plan.Right.Valid; // @MarkFix test this
-                    }
+                    hasValidReplacementPlan = await replacementPlanService.HasValidReplacementPlan(
+                        releaseFile, replacement);
                 }
 
                 return BuildDataFileViewModel(
