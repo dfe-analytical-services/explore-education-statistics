@@ -11,7 +11,7 @@ public class CaptureTableToolDownloadCallAnalyticsWriteStrategy(
     ICommonAnalyticsWriteStrategyWorkflow<CaptureTableToolDownloadCall> workflow) : IAnalyticsWriteStrategy
 {
     private readonly IWorkflowActor<CaptureTableToolDownloadCall> _workflowActor =
-        new WorkflowActor(analyticsPath: analyticsPathResolver.GetPermaLinkTableDownloadCallsDirectoryPath());
+        new WorkflowActor(analyticsPath: analyticsPathResolver.GetTableToolDownloadCallsDirectoryPath());
     public Type RequestType => typeof(CaptureTableToolDownloadCall);
 
     public async Task Report(IAnalyticsCaptureRequest request, CancellationToken cancellationToken)
