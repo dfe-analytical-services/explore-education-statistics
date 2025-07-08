@@ -165,7 +165,6 @@ export interface DataFileImportStatus {
 }
 
 function mapFile({ name, ...file }: DataFileInfo): DataFile {
-  // @MarkFix this will work with ReplacementDataFile yeah?
   const [size, unit] = file.size.split(' ');
 
   return {

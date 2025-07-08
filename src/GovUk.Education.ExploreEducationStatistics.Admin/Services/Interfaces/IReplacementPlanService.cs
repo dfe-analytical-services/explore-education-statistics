@@ -20,5 +20,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
             ReleaseFile originalReleaseFile,
             ReleaseFile replacementReleaseFile,
             CancellationToken cancellationToken = default);
+
+        Task<bool> HasValidReplacementPlan(
+            ReleaseFile originalReleaseFile,
+            ReleaseFile replacementReleaseFile,
+            CancellationToken cancellationToken = default);
     }
 }

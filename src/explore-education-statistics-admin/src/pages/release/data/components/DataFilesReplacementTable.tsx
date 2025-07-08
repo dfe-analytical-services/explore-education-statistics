@@ -1,7 +1,6 @@
 import {
   DataFile,
   DataSetUpload,
-  DataFileImportStatus,
 } from '@admin/services/releaseDataFileService';
 import styles from '@admin/pages/release/data/components/DataFilesTable.module.scss';
 import DataFileReplacementTableRow from '@admin/pages/release/data/components/DataFilesReplacementTableRow';
@@ -19,10 +18,7 @@ interface Props {
   onConfirmReplacement?: () => void;
   onDeleteUpload: (deletedUploadId: string) => void;
   onDataSetImport: (dataSetImportIds: string[]) => void;
-  onImportComplete?: (
-    originalDataFile: DataFile,
-    replacementImportStatus: DataFileImportStatus,
-  ) => void;
+  onReplacementStatusChange?: (updatedDataFile: DataFile) => void;
 }
 
 export default function DataFilesReplacementTable({
@@ -36,7 +32,7 @@ export default function DataFilesReplacementTable({
   onConfirmReplacement,
   onDeleteUpload,
   onDataSetImport,
-  onImportComplete,
+  onReplacementStatusChange,
 }: Props) {
   return (
     <table className={styles.table} data-testid={testId}>
@@ -61,7 +57,7 @@ export default function DataFilesReplacementTable({
             publicationId={publicationId}
             releaseVersionId={releaseVersionId}
             onConfirmAction={onConfirmReplacement}
-            onImportComplete={onImportComplete}
+            onReplacementStatusUpdate={onReplacementStatusChange}
           />
         ))}
         {dataSetUploads.map(upload => (

@@ -158,6 +158,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
+        public async Task<bool> HasValidReplacementPlan(
+            ReleaseFile originalReleaseFile,
+            ReleaseFile replacementReleaseFile,
+            CancellationToken cancellationToken = default)
+        {
+            var result = await GenerateReplacementPlan(
+                originalReleaseFile, replacementReleaseFile, cancellationToken);
+
+            return result.IsRight && result.Right.Valid;
+        }
+
         private async Task<Either<ActionResult, DataSetVersion?>> GetLinkedDataSetVersion(
             ReleaseFile releaseFile,
             CancellationToken cancellationToken = default)
