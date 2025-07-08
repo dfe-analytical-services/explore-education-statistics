@@ -23,11 +23,9 @@ public class AnalyticsPathResolver : IAnalyticsPathResolver
         _basePath = options.Value.BasePath;
     }
 
-    public string GetPermaLinkTableDownloadCallsDirectoryPath()
-    {
-        throw new NotImplementedException();
-        return Path.Combine(_basePath, "public", "csv-downloads");
-    }
+    public string GetPermaLinkTableDownloadCallsDirectoryPath() =>
+        Path.Combine(_basePath, "public", "table-tool-downloads", "permalinks");
 
-    public string GetTableToolDownloadCallsDirectoryPath() => throw new NotImplementedException();
+    public string GetTableToolDownloadCallsDirectoryPath() => 
+        Path.Combine(_basePath, "public", "table-tool-downloads", "table-tool-page");
 }
