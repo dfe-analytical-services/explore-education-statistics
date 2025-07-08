@@ -30,6 +30,7 @@ export interface AzurePublicationSearchResult {
 }
 
 export interface AzurePublicationSuggestResult {
+  highlightedMatch: string;
   releaseSlug: string;
   publicationSlug: string;
   summary: string;
@@ -154,18 +155,22 @@ const azurePublicationService = {
         ? await azureSearchClient.suggest(search, 'suggester-1', {
             select: ['releaseSlug', 'title', 'summary', 'publicationSlug'],
             filter,
+            searchFields: ['title', 'summary'],
             useFuzzyMatching: true,
             top: 3,
-            highlightPostTag: '</mark>',
-            highlightPreTag: '<mark>',
+            highlightPostTag: '</strong>',
+            highlightPreTag: '<strong>',
           })
         : null;
 
     let resultsToReturn = [] as AzurePublicationSuggestResult[];
     if (suggestResults?.results) {
-      resultsToReturn = suggestResults?.results.map(
-        result => result.document as AzurePublicationSuggestResult,
-      );
+      resultsToReturn = suggestResults?.results.map(result => {
+        return {
+          ...result.document,
+          highlightedMatch: result.text,
+        } as AzurePublicationSuggestResult;
+      });
     }
     return resultsToReturn;
   },
