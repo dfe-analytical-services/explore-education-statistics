@@ -81,7 +81,9 @@ export default function ReleaseDataUploadsSection({
   );
 
   const validReplacedDataFiles = inProgressReplacementDataFiles.filter(
-    originalFile => originalFile.replacedByDataFile?.status === 'COMPLETE', // @MarkFix more checks required? replacement plan?
+    originalFile =>
+      originalFile.replacedByDataFile?.status === 'COMPLETE' &&
+      originalFile.replacedByDataFile?.hasValidReplacementPlan,
   );
 
   const displayBulkReplacementConfirmButton = validReplacedDataFiles.length > 1;

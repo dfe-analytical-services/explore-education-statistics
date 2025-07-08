@@ -13,8 +13,12 @@ interface DataFileInfo extends FileInfo {
   created: string;
   status: ImportStatusCode;
   replacedBy?: string;
-  replacedByDataFile?: DataFileInfo;
+  replacedByDataFile?: ReplacementDataFileInfo;
   permissions: DataFilePermissions;
+}
+
+interface ReplacementDataFileInfo extends DataFileInfo {
+  hasValidReplacementPlan?: boolean;
 }
 
 export interface DataSetInfo {
@@ -86,13 +90,17 @@ export interface DataFile {
   userName: string;
   status: ImportStatusCode;
   replacedBy?: string;
-  replacedByDataFile?: DataFile;
+  replacedByDataFile?: ReplacementDataFile;
   created?: string;
   isDeleting?: boolean;
   isCancelling?: boolean;
   permissions: DataFilePermissions;
   publicApiDataSetId?: string;
   publicApiDataSetVersion?: string;
+}
+
+export interface ReplacementDataFile extends DataFile {
+  hasValidReplacementPlan?: boolean;
 }
 
 export interface DataSetAccoutrements {
@@ -157,6 +165,7 @@ export interface DataFileImportStatus {
 }
 
 function mapFile({ name, ...file }: DataFileInfo): DataFile {
+  // @MarkFix this will work with ReplacementDataFile yeah?
   const [size, unit] = file.size.split(' ');
 
   return {

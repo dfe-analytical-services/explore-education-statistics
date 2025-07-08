@@ -21,7 +21,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO.Compression;
 using System.Linq;
 using System.Threading;
@@ -48,7 +47,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         IDataBlockService dataBlockService,
         IFootnoteRepository footnoteRepository,
         IDataSetScreenerClient dataSetScreenerClient,
-        IMapper _mapper) : IReleaseDataFileService
+        IReplacementPlanService replacementPlanService,
+        IMapper mapper) : IReleaseDataFileService
     {
         public async Task<Either<ActionResult, Unit>> Delete(
             Guid releaseVersionId,
@@ -411,12 +411,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .ToAsyncEnumerable()
                 .SelectAwait(async dataSetUpload =>
                 {
-                    var request = _mapper.Map<DataSetScreenerRequest>(dataSetUpload);
+                    var request = mapper.Map<DataSetScreenerRequest>(dataSetUpload);
                     var result = await dataSetScreenerClient.ScreenDataSet(request, cancellationToken);
 
                     await dataSetFileStorage.AddScreenerResultToUpload(dataSetUpload.Id, result, cancellationToken);
 
-                    return _mapper.Map<DataSetUploadViewModel>(dataSetUpload);
+                    return mapper.Map<DataSetUploadViewModel>(dataSetUpload);
                 })
                 .ToListAsync(cancellationToken);
         }
@@ -634,33 +634,28 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             DataFilePermissions permissions,
             ReleaseFile? replacementReleaseFile = null,
             DataImport? replacementDataImport = null,
-            DataFilePermissions? replacementPermissions = null)
+            DataFilePermissions? replacementPermissions = null,
+            bool? hasValidReplacementPlan = null)
         {
-            if (replacementReleaseFile != null && (replacementDataImport == null || replacementPermissions == null))
+            if (replacementReleaseFile != null
+                && (replacementDataImport == null || replacementPermissions == null || hasValidReplacementPlan == null))
             {
                 throw new ArgumentException(
-                    "If replacementReleaseFile is provided, must also provide replacementDataImport and replacementPermissions");
+                    "If replacementReleaseFile is provided, must also provide replacementDataImport and replacementPermissions and hasValidReplacementPlan");
             }
 
-            return new DataFileInfo
+            if (replacementReleaseFile == null)
             {
-                Id = releaseFile.FileId,
-                FileName = releaseFile.File.Filename,
-                Name = releaseFile.Name ?? "Unknown",
-                Size = releaseFile.File.DisplaySize(),
-                MetaFileId = dataImport.MetaFile.Id,
-                MetaFileName = dataImport.MetaFile.Filename,
-                ReplacedBy = releaseFile.File.ReplacedById,
-                ReplacedByDataFile = replacementReleaseFile == null
-                    ? null
-                    : BuildDataFileViewModel(replacementReleaseFile, replacementDataImport!, replacementPermissions!),
-                Rows = dataImport.TotalRows,
-                UserName = releaseFile.File.CreatedBy?.Email ?? "",
-                Status = dataImport.Status,
-                Created = releaseFile.File.Created,
-                Permissions = permissions,
-                PublicApiDataSetId = releaseFile.PublicApiDataSetId,
-                PublicApiDataSetVersion = releaseFile.PublicApiDataSetVersionString,
+                return new DataFileInfo(releaseFile, dataImport, permissions);
+            }
+
+            return new DataFileInfo(releaseFile, dataImport, permissions)
+            {
+                ReplacedByDataFile = new ReplacementDataFileInfo(
+                    replacementReleaseFile,
+                    replacementDataImport!,
+                    replacementPermissions!,
+                    hasValidReplacementPlan!.Value)
             };
         }
 
@@ -690,7 +685,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     file => ValueTask.FromResult(file.Id),
                     async file => await userService.GetDataFilePermissions(file));
 
-            return releaseFiles.Select(releaseFile =>
+            var result = await releaseFiles.SelectAsync(async releaseFile =>
             {
                 if (inProgressReplacements == null || releaseFile.File.ReplacedById == null)
                 {
@@ -703,7 +698,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 var replacement = inProgressReplacements.Single(rf =>
                     rf.FileId == releaseFile.File.ReplacedById);
 
-                // @MarkFix add HasValidReplacementPlan value
+                var hasValidReplacementPlan = false;
+                if (dataImportsDict[replacement.FileId].Status == DataImportStatus.COMPLETE)
+                {
+                    var plan = await replacementPlanService
+                        .GenerateReplacementPlan(releaseFile, replacement);
+                    if (plan.IsRight)
+                    {
+                        hasValidReplacementPlan = plan.Right.Valid; // @MarkFix test this
+                    }
+                }
 
                 return BuildDataFileViewModel(
                     releaseFile,
@@ -711,9 +715,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     permissionsDict[releaseFile.FileId],
                     replacement,
                     dataImportsDict[replacement.FileId],
-                    permissionsDict[replacement.FileId]);
+                    permissionsDict[replacement.FileId],
+                    hasValidReplacementPlan);
 
-            }).ToList();
+            });
+
+            return result.ToList();
         }
 
         /// <summary>

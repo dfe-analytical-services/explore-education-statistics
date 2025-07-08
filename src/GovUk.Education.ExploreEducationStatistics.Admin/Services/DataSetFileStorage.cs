@@ -104,26 +104,11 @@ public class DataSetFileStorage(
         }
 
         var dataImport = await dataImportService.Import(subjectId, dataFile, metaFile);
-
         var permissions = await userService.GetDataFilePermissions(dataFile);
 
-        return new DataFileInfo
+        return new DataFileInfo(dataReleaseFile, dataImport, permissions)
         {
-            Id = dataReleaseFile.FileId,
-            FileName = dataReleaseFile.File.Filename,
-            Name = dataSet.Title,
-            Size = dataReleaseFile.File.DisplaySize(),
-            MetaFileId = dataImport.MetaFile.Id,
-            MetaFileName = dataImport.MetaFile.Filename,
-            ReplacedBy = dataReleaseFile.File.ReplacedById,
-            ReplacedByDataFile = null, // @MarkFix do we want to build DataFileInfo here?
-            Rows = dataImport.TotalRows,
-            UserName = dataReleaseFile.File.CreatedBy?.Email ?? "",
-            Status = dataImport.Status,
-            Created = dataReleaseFile.File.Created,
-            Permissions = permissions,
-            PublicApiDataSetId = dataReleaseFile.PublicApiDataSetId,
-            PublicApiDataSetVersion = dataReleaseFile.PublicApiDataSetVersionString,
+            Name = dataSet.Title
         };
     }
 
