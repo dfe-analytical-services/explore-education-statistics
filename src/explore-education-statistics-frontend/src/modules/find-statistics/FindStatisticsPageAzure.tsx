@@ -73,48 +73,35 @@ const FindStatisticsPage: NextPage = () => {
     router.query,
   );
 
-  const themesWithResultCounts = !themeId
-    ? themes
-        .map(theme => {
-          const facetedResult = themeFacetResults?.find(
-            result => theme.id === result.value,
-          );
-          const count = facetedResult?.count ?? 0;
-          return {
-            label: `${theme.title} (${count})`,
-            value: theme.id,
-            count,
-          };
-        })
-        .sort((a, b) => b.count - a.count)
-    : themes.map(theme => ({
-        label: theme.title,
+  const themesWithResultCounts = themes
+    .map(theme => {
+      const facetedResult = themeFacetResults?.find(
+        result => theme.id === result.value,
+      );
+      const count = facetedResult?.count ?? 0;
+      return {
+        label: `${theme.title} (${count})`,
         value: theme.id,
-      }));
+        count,
+      };
+    })
+    .sort((a, b) => b.count - a.count);
 
-  const releaseTypesWithResultCounts = !releaseType
-    ? Object.keys(releaseTypes)
-        .map(type => {
-          const facetedResult = releaseTypeFacetResults?.find(
-            result => type === result.value,
-          );
+  const releaseTypesWithResultCounts = Object.keys(releaseTypes)
+    .map(type => {
+      const facetedResult = releaseTypeFacetResults?.find(
+        result => type === result.value,
+      );
 
-          const title = releaseTypes[type as ReleaseType];
-          const count = facetedResult?.count ?? 0;
-          return {
-            label: `${title} (${count})`,
-            value: type,
-            count,
-          };
-        })
-        .sort((a, b) => b.count - a.count)
-    : Object.keys(releaseTypes).map(type => {
-        const title = releaseTypes[type as ReleaseType];
-        return {
-          label: title,
-          value: type,
-        };
-      });
+      const title = releaseTypes[type as ReleaseType];
+      const count = facetedResult?.count ?? 0;
+      return {
+        label: `${title} (${count})`,
+        value: type,
+        count,
+      };
+    })
+    .sort((a, b) => b.count - a.count);
 
   const isFiltered = !!search || !!releaseType || !!themeId;
 
