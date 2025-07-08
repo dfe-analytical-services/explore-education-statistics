@@ -1,6 +1,4 @@
-using GovUk.Education.ExploreEducationStatistics.Analytics.Common;
-using GovUk.Education.ExploreEducationStatistics.Analytics.Common.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Analytics.Common.Strategies;
+using GovUk.Education.ExploreEducationStatistics.Analytics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Services;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Strategies;
@@ -23,14 +21,15 @@ public static class AnalyticsServiceCollectionExtensions
 
         if (analyticsOptions is null or { Enabled: false })
         {
-            services.AddSingleton<IAnalyticsManager, NoOpAnalyticsManager>();
+            services.AddAnalyticsCommon(isAnalyticsEnabled:false);
             return services;
         }
         
-        services.AddSingleton<IAnalyticsManager, AnalyticsManager>();
-        services.AddSingleton<IAnalyticsWriter, AnalyticsWriter>();
-        services.AddHostedService<AnalyticsConsumer>();
-
+        services
+            .AddAnalyticsCommon(isAnalyticsEnabled:true)
+            .AddWriteStrategy<AnalyticsWritePublicZipDownloadStrategy>()
+            .AddWriteStrategy<AnalyticsWritePublicCsvDownloadStrategy>();
+        
         if (hostEnvironment.IsDevelopment())
         {
             services.AddSingleton<IAnalyticsPathResolver, LocalAnalyticsPathResolver>();
@@ -39,13 +38,6 @@ public static class AnalyticsServiceCollectionExtensions
         {
             services.AddSingleton<IAnalyticsPathResolver, AnalyticsPathResolver>();
         }
-
-        services.AddTransient<IAnalyticsWriteStrategy, AnalyticsWritePublicZipDownloadStrategy>();
-        services.AddTransient<IAnalyticsWriteStrategy, AnalyticsWritePublicCsvDownloadStrategy>();
-        
-        services.AddTransient(
-            typeof(ICommonAnalyticsWriteStrategyWorkflow<>),
-            typeof(CommonAnalyticsWriteStrategyWorkflow<>));
 
         return services;
     }

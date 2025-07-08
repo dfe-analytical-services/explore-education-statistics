@@ -1,6 +1,4 @@
-using GovUk.Education.ExploreEducationStatistics.Analytics.Common;
-using GovUk.Education.ExploreEducationStatistics.Analytics.Common.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Analytics.Common.Strategies;
+using GovUk.Education.ExploreEducationStatistics.Analytics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Options;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services.Interfaces;
@@ -21,14 +19,18 @@ public static class AnalyticsServiceCollectionExtensions
 
         if (analyticsOptions is { Enabled: false })
         {
-            services.AddTransient<IAnalyticsService, NoOpAnalyticsService>();
+            services.AddAnalyticsCommon(isAnalyticsEnabled:false);
             return services;
         }
 
+        services.AddAnalyticsCommon(isAnalyticsEnabled:true)
+            .AddWriteStrategy<AnalyticsWriteTopLevelCallsStrategy>()
+            .AddWriteStrategy<AnalyticsWritePublicationCallsStrategy>()
+            .AddWriteStrategy<AnalyticsWriteDataSetCallsStrategy>()
+            .AddWriteStrategy<AnalyticsWriteDataSetVersionCallsStrategy>()
+            .AddWriteStrategy<AnalyticsWritePublicApiQueryStrategy>();
+
         services.AddTransient<IAnalyticsService, AnalyticsService>();
-        services.AddSingleton<IAnalyticsManager, AnalyticsManager>();
-        services.AddSingleton<IAnalyticsWriter, AnalyticsWriter>();
-        services.AddHostedService<AnalyticsConsumer>();
 
         if (hostEnvironment.IsDevelopment())
         {
@@ -38,17 +40,6 @@ public static class AnalyticsServiceCollectionExtensions
         {
             services.AddSingleton<IAnalyticsPathResolver, AnalyticsPathResolver>();
         }
-
-        services
-            .AddTransient<IAnalyticsWriteStrategy, AnalyticsWriteTopLevelCallsStrategy>()
-            .AddTransient<IAnalyticsWriteStrategy, AnalyticsWritePublicationCallsStrategy>()
-            .AddTransient<IAnalyticsWriteStrategy, AnalyticsWriteDataSetCallsStrategy>()
-            .AddTransient<IAnalyticsWriteStrategy, AnalyticsWriteDataSetVersionCallsStrategy>()
-            .AddTransient<IAnalyticsWriteStrategy, AnalyticsWritePublicApiQueryStrategy>();
-        
-        services.AddTransient(
-            typeof(ICommonAnalyticsWriteStrategyWorkflow<>),
-            typeof(CommonAnalyticsWriteStrategyWorkflow<>));
         
         return services;
     }
