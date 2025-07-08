@@ -188,7 +188,7 @@ describe('ReleaseDataFileReplacePage', () => {
   test('renders replacement and original data file details', async () => {
     releaseDataFileService.getDataFile.mockResolvedValueOnce({
       ...testOriginalFile,
-      replacedBy: testReplacementFile.id, // @MarkFix add replacedByDataFile here? (And on other tests?)
+      replacedBy: testReplacementFile.id,
     });
     releaseDataFileService.getDataFile.mockResolvedValueOnce(
       testReplacementFile,
@@ -225,8 +225,10 @@ describe('ReleaseDataFileReplacePage', () => {
 
     await waitFor(() => {
       expect(
-        screen.getByRole('button', { name: 'Confirm all valid replacements' }),
-      ).toBeInTheDocument();
+        screen.queryByRole('button', {
+          name: 'Confirm all valid replacements',
+        }),
+      ).not.toBeInTheDocument();
 
       // Replacement
       expect(screen.getByTestId('Replacement Title')).toHaveTextContent(

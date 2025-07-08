@@ -80,13 +80,11 @@ export default function ReleaseDataUploadsSection({
     [allDataFiles],
   );
 
-  const validReplacedDataFiles = inProgressReplacementDataFiles.filter(
+  const validReplacementDataFiles = inProgressReplacementDataFiles.filter(
     originalFile =>
       originalFile.replacedByDataFile?.status === 'COMPLETE' &&
       originalFile.replacedByDataFile?.hasValidReplacementPlan,
   );
-
-  const displayBulkReplacementConfirmButton = validReplacedDataFiles.length > 1;
 
   const handleStatusChange = useCallback(
     async (dataFile: DataFile, importStatus: DataFileImportStatus) => {
@@ -241,7 +239,7 @@ export default function ReleaseDataUploadsSection({
   const handleConfirmAllReplacements = async () => {
     await dataReplacementService.replaceData(
       releaseVersionId,
-      validReplacedDataFiles.map(file => file.id),
+      validReplacementDataFiles.map(file => file.id),
     );
 
     await refetchDataFiles();
@@ -298,7 +296,7 @@ export default function ReleaseDataUploadsSection({
                 <Button onClick={toggleReordering.on} variant="secondary">
                   Reorder data files
                 </Button>
-                {displayBulkReplacementConfirmButton && (
+                {validReplacementDataFiles.length > 1 && (
                   <Button onClick={handleConfirmAllReplacements}>
                     Confirm all valid replacements
                   </Button>
