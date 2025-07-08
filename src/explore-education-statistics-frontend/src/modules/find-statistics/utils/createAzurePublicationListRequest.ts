@@ -14,6 +14,17 @@ import {
 } from '@frontend/services/azurePublicationService';
 import omitBy from 'lodash/omitBy';
 
+const escapeSpecialCharacters = (providedString: string) => {
+  // eslint-disable-next-line no-useless-escape
+  const specialCharactersToEscape = /([`"<>#%{}+-;/?:@=+&~\*\|\\\/\^\[\]])/g;
+
+  return providedString.replaceAll(specialCharactersToEscape, match => {
+    // If the matched character is a backslash, we just return a single escaped backslash (\\)
+    // Otherwise, we prepend a backslash to the matched character.
+    return match === '\\' ? '\\\\' : `\\${match}`;
+  });
+};
+
 export default function createAzurePublicationListRequest(
   query: FindStatisticsPageQuery,
 ): AzurePublicationListRequest {
@@ -35,9 +46,15 @@ export default function createAzurePublicationListRequest(
     filter = odata`themeId eq ${themeId}`;
   }
 
-  const minSearchCharacters = 3;
   const search =
-    searchParam && searchParam.length >= minSearchCharacters ? searchParam : '';
+    searchParam
+      ?.split(' ')
+      // We need to escape unsafe/special characters,
+      .map(escapeSpecialCharacters)
+      // then append ~ to enable fuzzy matching
+      // https://learn.microsoft.com/en-gb/azure/search/query-lucene-syntax
+      .map(safeWord => (safeWord.length < 3 ? safeWord : `${safeWord}~`))
+      .join(' OR ') ?? '';
 
   return omitBy(
     {
