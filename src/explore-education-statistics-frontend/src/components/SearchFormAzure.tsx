@@ -94,7 +94,7 @@ export default function SearchForm({ label = 'Search', onSubmit }: Props) {
       /(?<=<strong>)(.*?)(?=<\/strong>)/,
     );
 
-    const addstrongToString = (snippet: string) =>
+    const wrapHighlightedTermWithTag = (snippet: string) =>
       highlightedTerm
         ? snippet.replaceAll(
             highlightedTerm[0],
@@ -110,14 +110,16 @@ export default function SearchForm({ label = 'Search', onSubmit }: Props) {
         ${
           result.title.includes(highlightMatchWithoutTags)
             ? result.highlightedMatch
-            : addstrongToString(result.title)
+            : wrapHighlightedTermWithTag(result.title)
         }
       </span>
       <span class="autocomplete__option-summary">
       ${
         result.summary.includes(highlightMatchWithoutTags)
           ? result.highlightedMatch
-          : addstrongToString(truncate(result.summary, { length: 140 }))
+          : wrapHighlightedTermWithTag(
+              truncate(result.summary, { length: 140 }),
+            )
       }
       </span>
     </p>`;
