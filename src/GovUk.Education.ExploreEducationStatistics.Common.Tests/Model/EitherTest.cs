@@ -337,7 +337,37 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Model
             Assert.True(aggregate.IsLeft);
             Assert.Equal(["failure 1"], aggregate.Left);
         }
+        
+        [Fact]
+        public void OnSuccessAll()
+        {
+            var either1 = new Either<int, string>("either1");
+            var either2 = new Either<int, string>("either2");
+            var either3 = new Either<int, string>("either3");
 
+            var eitherList = ListOf(either1, either2, either3);
+
+            var results = eitherList.OnSuccessAll();
+
+            Assert.True(results.IsRight);
+            Assert.Equal(["either1", "either2", "either3"], results.Right);
+        }
+
+        [Fact]
+        public void OnSuccessAll_Left()
+        {
+            var either1 = new Either<int, string>("either1");
+            var either2 = new Either<int, string>(2);
+            var either3 = new Either<int, string>(3);
+
+            var eitherList = ListOf(either1, either2, either3);
+
+            var results = eitherList.OnSuccessAll();
+
+            Assert.True(results.IsLeft);
+            Assert.Equal(2, results.Left);
+        }
+        
         [Fact]
         public void OnSuccessAllReturnVoid()
         {

@@ -104,7 +104,8 @@ Switch to bau1 to add review comments for first text block
     user sets focus to element    ${editor}
 
     # Selects the rest of the line
-    user presses keys    END    RETURN    Block 1 another sentence    SHIFT+HOME
+    sleep    1    # Prevent intermittent failure where hitting END does not move to end
+    user presses keys    END    END    END    RETURN    Block 1 another sentence    SHIFT+HOME
     sleep    0.1    # Prevent intermittent failure where toolbar button is disabled
     user adds comment to selected text    ${block}    Test comment 2
 

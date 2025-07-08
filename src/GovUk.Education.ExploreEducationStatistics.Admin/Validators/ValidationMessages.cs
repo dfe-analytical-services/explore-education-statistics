@@ -135,6 +135,20 @@ public static class ValidationMessages
         Message: "Failed to read dataset_names.csv. Exception: {0}"
     );
 
+    public static ErrorViewModel GenerateErrorDataSetIsNotInAnImportableState()
+    {
+        return new ErrorViewModel
+        {
+            Code = DataSetIsNotInAnImportableState.Code,
+            Message = DataSetIsNotInAnImportableState.Message,
+        };
+    }
+
+    public static readonly LocalizableMessage DataSetIsNotInAnImportableState = new(
+        Code: nameof(DataSetIsNotInAnImportableState),
+        Message: "Data set cannot be imported. Ensure it has been screened, and that there are no errors"
+    );
+
     public static ErrorViewModel GenerateErrorDataSetNamesCsvReaderException(string exception)
     {
         return new ErrorViewModel
@@ -387,6 +401,34 @@ public static class ValidationMessages
         {
             Code = CannotReplaceDataSetWithApiDataSet.Code,
             Message = string.Format(CannotReplaceDataSetWithApiDataSet.Message, title),
+        };
+    }
+
+    public static readonly LocalizableMessage DataSetUploadNotFound = new(
+        Code: nameof(DataSetUploadNotFound),
+        Message: "Data set upload not found."
+    );
+
+    public static ErrorViewModel GenerateErrorDataSetUploadNotFound()
+    {
+        return new ErrorViewModel
+        {
+            Code = DataSetUploadNotFound.Code,
+            Message = DataSetUploadNotFound.Message,
+        };
+    }
+
+    public static readonly LocalizableMessage TemporaryFilesNotFound = new(
+        Code: nameof(TemporaryFilesNotFound),
+        Message: "Unable to locate temporary files at the locations specified."
+    );
+
+    public static ErrorViewModel GenerateErrorTemporaryFilesNotFound()
+    {
+        return new ErrorViewModel
+        {
+            Code = TemporaryFilesNotFound.Code,
+            Message = TemporaryFilesNotFound.Message,
         };
     }
 

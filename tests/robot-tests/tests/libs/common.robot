@@ -191,6 +191,36 @@ user waits until page finishes loading
     sleep    0.5
     user waits until page does not contain element    css:body[data-network-activity="active"]    ${network_timeout}
 
+user waits until parent contains element
+    [Arguments]
+    ...    ${parent_element_or_selector}
+    ...    ${child_selector}
+    ...    ${timeout}=${timeout}
+    ...    ${error}=${NONE}
+    ...    ${count}=${NONE}
+    ...    ${retries}=5
+    wait until parent contains element
+    ...    ${parent_element_or_selector}
+    ...    ${child_selector}
+    ...    timeout=${timeout}
+    ...    error=${error}
+    ...    count=${count}
+    ...    retries=${retries}
+
+user waits until parent does not contain element
+    [Arguments]
+    ...    ${parent_element_or_selector}
+    ...    ${child_selector}
+    ...    ${timeout}=${timeout}
+    ...    ${error}=${NONE}
+    ...    ${retries}=5
+    wait until parent does not contain element
+    ...    ${parent_element_or_selector}
+    ...    ${child_selector}
+    ...    timeout=${timeout}
+    ...    error=${error}
+    ...    retries=${retries}
+
 user sets focus to element
     [Arguments]    ${selector}    ${parent}=css:body
     ${element}=    lookup or return webelement    ${selector}    ${parent}
