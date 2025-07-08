@@ -160,32 +160,53 @@ const DataFileReplacementPlan = ({
     </Tag>
   );
 
-  const majorVersionErrorTag = (
-    <>
-      <h3 className="govuk-heading-m govuk-!-padding-top-4">
-        <Tag colour={isMajorVersionUpdate ? 'red' : 'green'}>
-          {`API data set status: ${isMajorVersionUpdate ? 'ERROR' : 'OK'}`}
-        </Tag>
-      </h3>
-      <p>
-        Please fix the major breaking changes for API versions by mapping to
-        non-breaking changes or uploading a file with no breaking changes. To
-        configure mapping, please{' '}
-        {apiDataSetsTabRoute && (
-          <Link to={apiDataSetsTabRoute} unvisited>
-            go to the API data sets tab (This page is currently only accessible
-            to certain users, please contact the EES team for support with API
-            data sets)
-          </Link>
-        )}
-        .
-      </p>
-    </>
-  );
   const versionParts = plan?.apiDataSetVersionPlan?.version?.split('.') || [];
   const isPatch = isNewReplaceDsvFeatureEnabled
     ? versionParts?.length === 3 && parseInt(versionParts[2], 10) > 0
     : false;
+
+  const linkToApiDetailsTab = apiDataSetsTabRoute && (
+    <Link to={apiDataSetsTabRoute} unvisited>
+      go to the API data sets tab
+    </Link>
+  );
+
+  const linkNotAvailableToNonBauText = (
+    <p>
+      Please contact the EES team for support. Your user account does not have
+      the role required access to the API details page which can help resolve
+      this issue.
+    </p>
+  );
+  const instructionToGoToApiDetailsTabForLocations = user?.permissions
+    .isBauUser ? (
+    <p>
+      Please {linkToApiDetailsTab} and complete manual mapping process for
+      locations.
+    </p>
+  ) : (
+    linkNotAvailableToNonBauText
+  );
+
+  const instructionToGoToApiDetailsTabForFilters = user?.permissions
+    .isBauUser ? (
+    <p>
+      Please {linkToApiDetailsTab} and complete manual mapping process for
+      filters.
+    </p>
+  ) : (
+    linkNotAvailableToNonBauText
+  );
+
+  const instructionToGoToApiDetailsTabForFinalization = user?.permissions
+    .isBauUser ? (
+    <p>
+      Please {linkToApiDetailsTab} and finalize the data set version mapping
+      process.
+    </p>
+  ) : (
+    linkNotAvailableToNonBauText
+  );
 
   const locationsAndFiltersErrorTags = (
     <>
@@ -206,17 +227,7 @@ const DataFileReplacementPlan = ({
       </h3>
 
       {hasIncompleteLocationMapping || (hasMajorLocationMapping && isPatch) ? (
-        <p>
-          Please{' '}
-          {apiDataSetsTabRoute && (
-            <Link to={apiDataSetsTabRoute} unvisited>
-              go to the API data sets tab (This page is currently only
-              accessible to certain users, please contact the EES team for
-              support with API data sets)
-            </Link>
-          )}{' '}
-          and complete manual mapping process for locations.
-        </p>
+        instructionToGoToApiDetailsTabForLocations
       ) : (
         <p>No manual mapping required for API data set locations.</p>
       )}
@@ -238,17 +249,7 @@ const DataFileReplacementPlan = ({
       </h3>
 
       {hasIncompleteFilterMapping || (hasMajorFilterMapping && isPatch) ? (
-        <p>
-          Please{' '}
-          {apiDataSetsTabRoute && (
-            <Link to={apiDataSetsTabRoute} unvisited>
-              go to the API data sets tab (This page is currently only
-              accessible to certain users, please contact the EES team for
-              support with API data sets)
-            </Link>
-          )}{' '}
-          and complete manual mapping process for filters.
-        </p>
+        instructionToGoToApiDetailsTabForFilters
       ) : (
         <p>No manual mapping required for API data set filters.</p>
       )}
@@ -262,23 +263,12 @@ const DataFileReplacementPlan = ({
       </h3>
 
       {isNotReadyToPublish ? (
-        <p>
-          Please{' '}
-          {apiDataSetsTabRoute && (
-            <Link to={apiDataSetsTabRoute} unvisited>
-              go to the API data sets tab (This page is currently only
-              accessible to certain users, please contact the EES team for
-              support with API data sets)
-            </Link>
-          )}{' '}
-          and finalize the data set version mapping process.
-        </p>
+        instructionToGoToApiDetailsTabForFinalization
       ) : (
         <p>No actions required for API data set version mapping.</p>
       )}
     </>
   );
-
   return (
     <LoadingSpinner loading={isLoading}>
       {plan && (
@@ -587,13 +577,7 @@ const DataFileReplacementPlan = ({
             );
           })}
 
-          {hasDataSetVersionPlan && (
-            <>
-              {isMajorVersionUpdate
-                ? majorVersionErrorTag
-                : locationsAndFiltersErrorTags}
-            </>
-          )}
+          {hasDataSetVersionPlan && <>{locationsAndFiltersErrorTags}</>}
 
           <ButtonGroup className="govuk-!-margin-top-8">
             {plan.valid && (
