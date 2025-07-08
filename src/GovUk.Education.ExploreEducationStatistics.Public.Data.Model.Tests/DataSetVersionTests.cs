@@ -62,7 +62,7 @@ public abstract class DataSetVersionTests
         [Fact]
         public void DefaultNextVersion_IncrementsMinorDefaultsPatchToZero()
         {
-            var version = CreateDataSetVersion(major: 2, minor: 1, patch: 0);
+            var version = CreateDataSetVersion(major: 2, minor: 1, patch: 1);
 
             var semVersion = version.DefaultNextVersion();
 
