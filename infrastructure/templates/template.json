@@ -2342,38 +2342,6 @@
           "dependsOn": [
             "[variables('coreStorageAccountName')]"
           ]
-        },
-        {
-          "name": "default",
-          "type": "managementPolicies",
-          "apiVersion": "2019-04-01",
-          "properties": {
-            "policy": {
-              "rules": [
-                {
-                  "enabled": true,
-                  "type": "Lifecycle",
-                  "name": "Delete temp data/meta files after a day",
-                  "definition": {
-                    "actions": {
-                      "baseBlob": {
-                        "delete": {
-                          "daysAfterModificationGreaterThan": 1
-                        }
-                      }
-                    },
-                    "filters": {
-                      "blobTypes": ["blockBlob"],
-                      "prefixMatch": ["releases-temp"]
-                    }
-                  }
-                }
-              ]
-            }
-          },
-          "dependsOn": [
-            "[variables('coreStorageAccountName')]"
-          ]
         }
       ],
       "tags": {
