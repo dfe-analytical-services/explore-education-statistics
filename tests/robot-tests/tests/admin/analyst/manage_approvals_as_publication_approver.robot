@@ -13,7 +13,7 @@ Force Tags          Admin    Local    Dev    AltersData    Footnotes
 
 
 *** Variables ***
-${PUBLICATION_NAME}     UI tests - manage approvals as publication approver %{RUN_IDENTIFIER}
+${PUBLICATION_NAME}     Manage approvals as publication approver %{RUN_IDENTIFIER}
 ${RELEASE_TYPE}         Academic year 2026/27
 ${RELEASE_NAME}         ${PUBLICATION_NAME} - ${RELEASE_TYPE}
 ${SUBJECT_NAME}         UI test subject

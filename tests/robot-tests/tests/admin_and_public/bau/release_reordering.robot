@@ -12,8 +12,8 @@ Test Setup          fail test fast if required
 
 
 *** Variables ***
-${PUBLICATION_NAME}=                        UI tests - legacy releases %{RUN_IDENTIFIER}
-${PUBLICATION_SLUG}=                        ui-tests-legacy-releases-%{RUN_IDENTIFIER}
+${PUBLICATION_NAME}=                        Legacy releases %{RUN_IDENTIFIER}
+${PUBLICATION_SLUG}=                        legacy-releases-%{RUN_IDENTIFIER}
 ${RELEASE_1_NAME}=                          Academic year 2020/21
 ${RELEASE_2_NAME}=                          Academic year Q1 2022/23
 ${LEGACY_RELEASE_1_DESCRIPTION}=            legacy release 1

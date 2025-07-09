@@ -11,7 +11,7 @@ Force Tags          Admin    Local    Dev    AltersData
 
 
 *** Variables ***
-${PUBLICATION_NAME}=    UI tests - methodology alternative title %{RUN_IDENTIFIER}
+${PUBLICATION_NAME}=    Methodology alternative title %{RUN_IDENTIFIER}
 
 
 *** Test Cases ***

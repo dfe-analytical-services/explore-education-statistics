@@ -11,7 +11,7 @@ Force Tags          Admin    Local    Dev    AltersData
 
 
 *** Variables ***
-${PUBLICATION_NAME}=    UI tests - manage publication as publication owner %{RUN_IDENTIFIER}
+${PUBLICATION_NAME}=    Manage publication as publication owner %{RUN_IDENTIFIER}
 
 
 *** Test Cases ***

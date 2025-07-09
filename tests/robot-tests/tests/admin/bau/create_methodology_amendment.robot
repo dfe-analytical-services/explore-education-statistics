@@ -12,7 +12,7 @@ Test Setup          fail test fast if required
 
 
 *** Variables ***
-${PUBLICATION_NAME}=    UI tests - create methodology amendment publication %{RUN_IDENTIFIER}
+${PUBLICATION_NAME}=    Create methodology amendment publication %{RUN_IDENTIFIER}
 
 
 *** Test Cases ***

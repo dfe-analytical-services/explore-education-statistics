@@ -13,7 +13,7 @@ Force Tags          Admin    Local    Dev    AltersData
 
 
 *** Variables ***
-${PUBLICATION_NAME}=    UI tests - publish amend and cancel %{RUN_IDENTIFIER}
+${PUBLICATION_NAME}=    Publish amend and cancel %{RUN_IDENTIFIER}
 ${RELEASE_NAME}=        Financial year 3000-01
 ${DATABLOCK_NAME}=      Dates data block name
 
@@ -193,7 +193,7 @@ Verify newly published release is public
     user navigates to public release page    ${PUBLIC_RELEASE_LINK}    ${PUBLICATION_NAME}    ${RELEASE_NAME}
 
 Verify release URL
-    user checks url contains    %{PUBLIC_URL}/find-statistics/ui-tests-publish-amend-and-cancel-%{RUN_IDENTIFIER}
+    user checks url contains    %{PUBLIC_URL}/find-statistics/publish-amend-and-cancel-%{RUN_IDENTIFIER}
 
 Return to Admin and create amendment
     user navigates to admin dashboard    Bau1

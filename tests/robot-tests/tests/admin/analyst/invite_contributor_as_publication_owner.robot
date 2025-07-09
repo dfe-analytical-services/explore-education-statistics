@@ -11,7 +11,7 @@ Force Tags          Admin    Local    Dev    AltersData
 
 
 *** Variables ***
-${PUBLICATION_NAME}=    UI tests - invite contributor %{RUN_IDENTIFIER}
+${PUBLICATION_NAME}=    Invite contributor %{RUN_IDENTIFIER}
 ${INVITEE_EMAIL}        ees-analyst-%{RUN_IDENTIFIER}@education.gov.uk
 
 

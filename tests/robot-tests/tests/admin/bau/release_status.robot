@@ -12,11 +12,11 @@ Force Tags          Admin    Local    Dev    AltersData
 
 
 *** Variables ***
-${PUBLICATION_NAME}                 UI tests - release status %{RUN_IDENTIFIER}
+${PUBLICATION_NAME}                 Release status %{RUN_IDENTIFIER}
 ${RELEASE_1_NAME}                   Academic year Q1 2200/01
 ${RELEASE_2_NAME}                   Calendar year 2001
 ${RELEASE_3_NAME}                   Financial year 2300-01
-${ADOPTED_PUBLICATION_NAME}         UI tests - release status publication with adoptable methodology %{RUN_IDENTIFIER}
+${ADOPTED_PUBLICATION_NAME}         Release status publication with adoptable methodology %{RUN_IDENTIFIER}
 ${PUBLICATION_NAME_DATAFILES}       ${PUBLICATION_NAME} -    datafiles-updated
 ${SUBJECT_NAME}                     Dates test subject
 

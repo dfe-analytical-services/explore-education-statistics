@@ -13,7 +13,7 @@ Test Setup          fail test fast if required
 
 *** Variables ***
 ${RELEASE_NAME}         Academic year Q1 2020/21
-${PUBLICATION_NAME}     UI tests - publish release and amend 2 %{RUN_IDENTIFIER}
+${PUBLICATION_NAME}     Publish release and amend 2 %{RUN_IDENTIFIER}
 ${SUBJECT_NAME}         Seven filters
 ${SECOND_SUBJECT}       upload file test
 ${THIRD_SUBJECT}        upload file test with filter subject

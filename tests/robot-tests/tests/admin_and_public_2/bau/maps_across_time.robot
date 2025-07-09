@@ -13,7 +13,7 @@ Force Tags          Admin    Local    Dev    AltersData
 
 
 *** Variables ***
-${PUBLICATION_NAME}     UI tests - maps across time %{RUN_IDENTIFIER}
+${PUBLICATION_NAME}     Maps across time %{RUN_IDENTIFIER}
 ${RELEASE_NAME}         Financial year 3000-01
 ${DATABLOCK_NAME}=      Dates data block name
 
