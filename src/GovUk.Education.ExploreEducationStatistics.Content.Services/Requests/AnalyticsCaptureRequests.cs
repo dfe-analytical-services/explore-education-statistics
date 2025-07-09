@@ -20,7 +20,6 @@ public record CaptureZipDownloadRequest : IAnalyticsCaptureRequest
 
     public string? ReleaseLabel;
 
-    [JsonConverter(typeof(StringEnumConverter))]
     public AnalyticsFromPage FromPage;
 
     public Guid? SubjectId = null;
