@@ -35,6 +35,14 @@ param searchableDocumentsContainerName string = 'searchable-documents'
 @description('A list of IP network rules to allow access to the Search Service from specific public internet IP address ranges.')
 param searchServiceIpRules IpRange[]
 
+@description('Controls the availability of semantic ranking for all indexes. Set to \'free\' for limited query volume on the free plan, \'standard\' for unlimited volume on the standard pricing plan, or \'disabled\' to turn it off.')
+@allowed([
+  'disabled'
+  'free'
+  'standard'
+])
+param semanticRankerAvailability string
+
 @description('A list of IP network rules to allow access to the Search storage account from specific public internet IP address ranges.')
 param storageIpRules IpRange[]
 
@@ -66,6 +74,7 @@ module searchServiceModule '../components/searchService.bicep' = {
     location: location
     ipRules: searchServiceIpRules
     publicNetworkAccess: 'Enabled'
+    semanticRankerAvailability: semanticRankerAvailability
     sku: 'basic'
     systemAssignedIdentity: true
     alerts: {

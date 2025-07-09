@@ -35,6 +35,14 @@ param publicSiteUrl string
 @description('Specifies whether or not the Search Docs Function App already exists.')
 param searchDocsFunctionAppExists bool = true
 
+@description('Controls the availability of semantic ranking for all indexes. Set to \'free\' for limited query volume on the free plan, \'standard\' for unlimited volume on the standard pricing plan, or \'disabled\' to turn it off.')
+@allowed([
+  'disabled'
+  'free'
+  'standard'
+])
+param searchServiceSemanticRankerAvailability string
+
 @description('Provides access to resources for specific IP address ranges used for service maintenance.')
 param maintenanceIpRanges IpRange[] = []
 
@@ -160,6 +168,7 @@ module searchServiceModule 'application/searchService.bicep' = {
     resourceNames: resourceNames
     resourcePrefix: resourcePrefix
     searchServiceIpRules: [] // No restrictions applied as the resource is intended to be publicly accessible.
+    semanticRankerAvailability: searchServiceSemanticRankerAvailability
     storageIpRules: maintenanceIpRanges
     deploySearchConfig: deploySearchConfig
     tagValues: tagValues

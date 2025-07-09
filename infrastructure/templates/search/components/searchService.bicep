@@ -53,6 +53,14 @@ param hostingMode string = 'default'
 ])
 param publicNetworkAccess string = 'Disabled'
 
+@description('Controls the availability of semantic ranking for all indexes. Set to \'free\' for limited query volume on the free plan, \'standard\' for unlimited volume on the standard pricing plan, or \'disabled\' to turn it off.')
+@allowed([
+  'disabled'
+  'free'
+  'standard'
+])
+param semanticRankerAvailability string = 'free'
+
 @description('Indicates whether the resource should have a system-assigned managed identity.')
 param systemAssignedIdentity bool = false
 
@@ -108,6 +116,7 @@ resource searchService 'Microsoft.Search/searchServices@2025-02-01-preview' = {
     }
     partitionCount: partitionCount
     publicNetworkAccess: publicNetworkAccess
+    semanticSearch: semanticRankerAvailability
     hostingMode: hostingMode
   }
   tags: tagValues
