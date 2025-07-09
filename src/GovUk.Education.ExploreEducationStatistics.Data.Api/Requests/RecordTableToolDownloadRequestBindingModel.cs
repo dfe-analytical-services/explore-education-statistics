@@ -2,6 +2,7 @@
 using System;
 using FluentValidation;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
+using GovUk.Education.ExploreEducationStatistics.Common.Requests;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Analytics;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Requests;
@@ -14,7 +15,7 @@ public record RecordTableToolDownloadRequestBindingModel
     public Guid? SubjectId { get; init; }
     public string? DataSetName { get; init; }
     public TableDownloadFormat? DownloadFormat { get; init; }
-    public FullTableQuery? Query { get; init; }
+    public FullTableQueryRequest? Query { get; init; }
     
     public class Validator : AbstractValidator<RecordTableToolDownloadRequestBindingModel>
     {
@@ -40,7 +41,7 @@ public record RecordTableToolDownloadRequestBindingModel
             SubjectId = SubjectId!.Value,
             DataSetName = DataSetName,
             DownloadFormat = DownloadFormat!.Value,
-            Query = Query
+            Query = Query!.AsFullTableQuery()
         };
     }
 }

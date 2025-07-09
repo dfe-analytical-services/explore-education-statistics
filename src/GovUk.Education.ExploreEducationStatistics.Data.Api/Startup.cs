@@ -134,6 +134,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "Explore education statistics - Data API", Version = "v1" });
                 c.SchemaFilter<EnumSchemaFilter>();
+                c.SchemaFilter<TimeIdentifierSchemaFilter>();
             });
 
             //
