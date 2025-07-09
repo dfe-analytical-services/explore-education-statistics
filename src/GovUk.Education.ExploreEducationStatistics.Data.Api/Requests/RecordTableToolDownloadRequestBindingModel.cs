@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 using System;
 using FluentValidation;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
@@ -8,7 +8,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Requests;
 
 public record RecordTableToolDownloadRequestBindingModel
 {
-    public string? ReleaseVersionId { get; init; }
+    public Guid? ReleaseVersionId { get; init; }
     public string? PublicationName { get; init; }
     public string? ReleasePeriodAndLabel { get; init; }
     public Guid? SubjectId { get; init; }
@@ -34,7 +34,7 @@ public record RecordTableToolDownloadRequestBindingModel
     {
         return new CaptureTableToolDownloadCall
         {
-            ReleaseVersionId = ReleaseVersionId,
+            ReleaseVersionId = ReleaseVersionId!.Value,
             PublicationName = PublicationName,
             ReleasePeriodAndLabel = ReleasePeriodAndLabel,
             SubjectId = SubjectId!.Value,
