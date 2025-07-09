@@ -248,7 +248,7 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
         services.AddScoped<IParquetLocationRepository, ParquetLocationRepository>();
         services.AddScoped<IParquetTimePeriodRepository, ParquetTimePeriodRepository>();
 
-        services.AddAnalytics(hostEnvironment, configuration);
+        services.AddAnalytics(configuration);
 
         services.AddSingleton<DateTimeProvider>();
     }

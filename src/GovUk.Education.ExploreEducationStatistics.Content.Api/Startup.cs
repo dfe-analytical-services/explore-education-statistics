@@ -176,7 +176,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api
             services.AddTransient<IRedirectsCacheService, RedirectsCacheService>();
             services.AddTransient<IRedirectsService, RedirectsService>();
 
-            services.AddAnalytics(hostEnvironment, configuration);
+            services.AddAnalytics(configuration);
 
             services.AddSingleton<DateTimeProvider>();
 
