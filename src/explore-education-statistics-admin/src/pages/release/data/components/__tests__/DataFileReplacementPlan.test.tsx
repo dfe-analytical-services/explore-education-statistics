@@ -9,6 +9,8 @@ import React from 'react';
 import { MemoryRouter } from 'react-router';
 import userEvent from '@testing-library/user-event';
 import { TestConfigContextProvider } from '@admin/contexts/ConfigContext';
+import { GlobalPermissions } from 'src/services/authService';
+import { AuthContextTestProvider, User } from '@admin/contexts/AuthContext';
 
 jest.mock('@admin/services/dataBlockService');
 jest.mock('@admin/services/dataReplacementService');
@@ -403,8 +405,8 @@ describe('DataReplacementPlan', () => {
     valid: true,
   };
 
-  describe('feature flagged enableReplacementOfPublicApiDataSets section renders with invalid plan ', () => {
-    test('renders the section when the feature flag enableReplacementOfPublicApiDataSets is turned on', async () => {
+  describe('feature flagged enableReplacementOfPublicApiDataSets section renders as expected ', () => {
+    test('renders the API errors section when the feature flag enableReplacementOfPublicApiDataSets is turned on', async () => {
       dataReplacementService.getReplacementPlan.mockResolvedValue(
         testReplacementPlan,
       );
@@ -421,12 +423,253 @@ describe('DataReplacementPlan', () => {
         true,
       );
       await waitFor(() => {
+        const filtersHeading = screen.getByText('API data set Filters: ERROR');
+        const filtersParagraph =
+          filtersHeading.closest('h3')?.nextElementSibling;
+        const locationsHeading = screen.getByText(
+          'API data set Locations: ERROR',
+        );
+        const locationsParagraph =
+          locationsHeading.closest('h3')?.nextElementSibling;
+        const finalizationHeading = screen.getByText(
+          'API data set has to be finalized: ERROR',
+        );
+        const finalizationParagraph =
+          finalizationHeading.closest('h3')?.nextElementSibling;
+
+        expect(locationsHeading).toBeInTheDocument();
+        expect(locationsParagraph).toBeInTheDocument();
+        expect(locationsParagraph).toHaveTextContent(
+          /Please contact the EES team for support\. Your user account does not have the role required access to the API details page which can help resolve this issue\./,
+        );
+
+        expect(filtersHeading).toBeInTheDocument();
+        expect(filtersParagraph).toBeInTheDocument();
+        expect(filtersParagraph).toHaveTextContent(
+          /Please contact the EES team for support\. Your user account does not have the role required access to the API details page which can help resolve this issue\./,
+        );
+        expect(finalizationHeading).toBeInTheDocument();
+        expect(finalizationParagraph).toBeInTheDocument();
+        expect(finalizationParagraph).toHaveTextContent(
+          /Please contact the EES team for support\. Your user account does not have the role required access to the API details page which can help resolve this issue\./,
+        );
+      });
+    });
+
+    test('renders the API errors section with links to API details page when a BAU user is viewing the page', async () => {
+      const bauUser: User = {
+        id: 'user-id',
+        name: 'BAU',
+        permissions: {
+          isBauUser: true,
+        } as GlobalPermissions,
+      };
+      dataReplacementService.getReplacementPlan.mockResolvedValue(
+        testReplacementPlan,
+      );
+      renderWithTestConfig(
+        <MemoryRouter>
+          <AuthContextTestProvider user={bauUser}>
+            <DataFileReplacementPlan
+              cancelButton={<button type="button">Cancel</button>}
+              publicationId="publication-1"
+              releaseVersionId="release-1"
+              fileId="file-1"
+              replacementFileId="file-2"
+            />
+          </AuthContextTestProvider>
+        </MemoryRouter>,
+        true,
+      );
+      await waitFor(() => {
+        const filtersHeading = screen.getByText('API data set Filters: ERROR');
+        const filtersParagraph =
+          filtersHeading.closest('h3')?.nextElementSibling;
+        const locationsHeading = screen.getByText(
+          'API data set Locations: ERROR',
+        );
+        const locationsParagraph =
+          locationsHeading.closest('h3')?.nextElementSibling;
+        const finalizationHeading = screen.getByText(
+          'API data set has to be finalized: ERROR',
+        );
+        const finalizationParagraph =
+          finalizationHeading.closest('h3')?.nextElementSibling;
+
+        expect(locationsHeading).toBeInTheDocument();
+        expect(locationsParagraph).toBeInTheDocument();
+        expect(locationsParagraph).toHaveTextContent(
+          /Please go to the API data sets tab and complete manual mapping process for locations\./,
+        );
         expect(
-          screen.getByText('API data set Filters: ERROR'),
-        ).toBeInTheDocument();
+          within(locationsParagraph as HTMLElement).getByRole('link', {
+            name: 'go to the API data sets tab',
+            hidden: false,
+          }),
+        ).toHaveAttribute(
+          'href',
+          '/publication/publication-1/release/release-1/api-data-sets/data-set-1',
+        );
+
+        expect(filtersHeading).toBeInTheDocument();
+        expect(filtersParagraph).toBeInTheDocument();
+        expect(filtersParagraph).toHaveTextContent(
+          /Please go to the API data sets tab and complete manual mapping process for filters\./,
+        );
         expect(
-          screen.getByText('API data set Locations: ERROR'),
-        ).toBeInTheDocument();
+          within(filtersParagraph as HTMLElement).getByRole('link', {
+            name: 'go to the API data sets tab',
+            hidden: false,
+          }),
+        ).toHaveAttribute(
+          'href',
+          '/publication/publication-1/release/release-1/api-data-sets/data-set-1',
+        );
+
+        expect(finalizationHeading).toBeInTheDocument();
+        expect(finalizationParagraph).toBeInTheDocument();
+        expect(finalizationParagraph).toHaveTextContent(
+          /Please go to the API data sets tab and finalize the data set version mapping process\./,
+        );
+        expect(
+          within(finalizationParagraph as HTMLElement).getByRole('link', {
+            name: 'go to the API data sets tab',
+            hidden: false,
+          }),
+        ).toHaveAttribute(
+          'href',
+          '/publication/publication-1/release/release-1/api-data-sets/data-set-1',
+        );
+      });
+    });
+
+    test('renders the API errors section correctly when the locations is valid and the filters is not', async () => {
+      dataReplacementService.getReplacementPlan.mockResolvedValue({
+        ...testReplacementPlan,
+        apiDataSetVersionPlan: {
+          id: 'version-1',
+          dataSetId: 'data-set-1',
+          name: 'Version 1',
+          version: '1.0',
+          status: 'Draft',
+          mappingStatus: {
+            locationsComplete: true,
+            filtersComplete: false,
+            isMajorVersionUpdate: true,
+            locationsHaveMajorChange: false,
+            filtersHaveMajorChange: true,
+          },
+          readyToPublish: false,
+          valid: false,
+        },
+      });
+      renderWithTestConfig(
+        <MemoryRouter>
+          <DataFileReplacementPlan
+            cancelButton={<button type="button">Cancel</button>}
+            publicationId="publication-1"
+            releaseVersionId="release-1"
+            fileId="file-1"
+            replacementFileId="file-2"
+          />
+        </MemoryRouter>,
+        true,
+      );
+      await waitFor(() => {
+        const filtersHeading = screen.getByText('API data set Filters: ERROR');
+        const filtersParagraph =
+          filtersHeading.closest('h3')?.nextElementSibling;
+        const locationsHeading = screen.getByText('API data set Locations: OK');
+        const locationsParagraph =
+          locationsHeading.closest('h3')?.nextElementSibling;
+        const finalizationHeading = screen.getByText(
+          'API data set has to be finalized: ERROR',
+        );
+        const finalizationParagraph =
+          finalizationHeading.closest('h3')?.nextElementSibling;
+
+        expect(locationsHeading).toBeInTheDocument();
+        expect(locationsParagraph).toBeInTheDocument();
+        expect(locationsParagraph).toHaveTextContent(
+          /No manual mapping required for API data set locations\./,
+        );
+
+        expect(filtersHeading).toBeInTheDocument();
+        expect(filtersParagraph).toBeInTheDocument();
+        expect(filtersParagraph).toHaveTextContent(
+          /Please contact the EES team for support\. Your user account does not have the role required access to the API details page which can help resolve this issue\./,
+        );
+        expect(finalizationHeading).toBeInTheDocument();
+        expect(finalizationParagraph).toBeInTheDocument();
+        expect(finalizationParagraph).toHaveTextContent(
+          /Please contact the EES team for support\. Your user account does not have the role required access to the API details page which can help resolve this issue\./,
+        );
+      });
+    });
+
+    test('renders the API errors section correctly when the filters is valid and the locations is not', async () => {
+      dataReplacementService.getReplacementPlan.mockResolvedValue({
+        ...testReplacementPlan,
+        apiDataSetVersionPlan: {
+          id: 'version-1',
+          dataSetId: 'data-set-1',
+          name: 'Version 1',
+          version: '1.0',
+          status: 'Draft',
+          mappingStatus: {
+            locationsComplete: false,
+            filtersComplete: true,
+            isMajorVersionUpdate: true,
+            locationsHaveMajorChange: true,
+            filtersHaveMajorChange: false,
+          },
+          readyToPublish: false,
+          valid: false,
+        },
+      });
+      renderWithTestConfig(
+        <MemoryRouter>
+          <DataFileReplacementPlan
+            cancelButton={<button type="button">Cancel</button>}
+            publicationId="publication-1"
+            releaseVersionId="release-1"
+            fileId="file-1"
+            replacementFileId="file-2"
+          />
+        </MemoryRouter>,
+        true,
+      );
+      await waitFor(() => {
+        const filtersHeading = screen.getByText('API data set Filters: OK');
+        const filtersParagraph =
+          filtersHeading.closest('h3')?.nextElementSibling;
+        const locationsHeading = screen.getByText(
+          'API data set Locations: ERROR',
+        );
+        const locationsParagraph =
+          locationsHeading.closest('h3')?.nextElementSibling;
+        const finalizationHeading = screen.getByText(
+          'API data set has to be finalized: ERROR',
+        );
+        const finalizationParagraph =
+          finalizationHeading.closest('h3')?.nextElementSibling;
+
+        expect(locationsHeading).toBeInTheDocument();
+        expect(locationsParagraph).toBeInTheDocument();
+        expect(locationsParagraph).toHaveTextContent(
+          /Please contact the EES team for support\. Your user account does not have the role required access to the API details page which can help resolve this issue\./,
+        );
+
+        expect(filtersHeading).toBeInTheDocument();
+        expect(filtersParagraph).toBeInTheDocument();
+        expect(filtersParagraph).toHaveTextContent(
+          /No manual mapping required for API data set filters\./,
+        );
+        expect(finalizationHeading).toBeInTheDocument();
+        expect(finalizationParagraph).toBeInTheDocument();
+        expect(finalizationParagraph).toHaveTextContent(
+          /Please contact the EES team for support\. Your user account does not have the role required access to the API details page which can help resolve this issue\./,
+        );
       });
     });
 
