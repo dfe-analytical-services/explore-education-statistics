@@ -4,7 +4,6 @@ using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Strategies;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Extensions;
 
@@ -12,33 +11,19 @@ public static class AnalyticsServiceCollectionExtensions
 {
     public static IServiceCollection AddAnalytics(
         this IServiceCollection services,
-        IHostEnvironment hostEnvironment,
         IConfiguration configuration)
     {
         var analyticsOptions = configuration
             .GetSection(AnalyticsOptions.Section)
             .Get<AnalyticsOptions>();
 
-        if (analyticsOptions is null or { Enabled: false })
-        {
-            services.AddAnalyticsCommon(isAnalyticsEnabled:false);
-            return services;
-        }
-        
-        services
-            .AddAnalyticsCommon(isAnalyticsEnabled:true)
-            .AddWriteStrategy<AnalyticsWritePublicZipDownloadStrategy>()
-            .AddWriteStrategy<AnalyticsWritePublicCsvDownloadStrategy>();
-        
-        if (hostEnvironment.IsDevelopment())
-        {
-            services.AddSingleton<IAnalyticsPathResolver, LocalAnalyticsPathResolver>();
-        }
-        else
-        {
-            services.AddSingleton<IAnalyticsPathResolver, AnalyticsPathResolver>();
-        }
-
-        return services;
+        return analyticsOptions is null or { Enabled: false }
+            ? services
+                .AddAnalyticsCommon(isAnalyticsEnabled: false).Services
+            : services
+                .AddAnalyticsCommon(isAnalyticsEnabled: true)
+                .AddWriteStrategy<AnalyticsWritePublicZipDownloadStrategy>()
+                .AddWriteStrategy<AnalyticsWritePublicCsvDownloadStrategy>().Services
+                .AddSingleton<IAnalyticsPathResolver, AnalyticsPathResolver>();
     }
 }

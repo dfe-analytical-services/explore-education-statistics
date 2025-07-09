@@ -10,37 +10,23 @@ public static class AnalyticsServiceCollectionExtensions
 {
     public static IServiceCollection AddAnalytics(
         this IServiceCollection services,
-        IHostEnvironment hostEnvironment,
         IConfiguration configuration)
     {
         var analyticsOptions = configuration
             .GetSection(AnalyticsOptions.Section)
             .Get<AnalyticsOptions>();
 
-        if (analyticsOptions is { Enabled: false })
-        {
-            services.AddAnalyticsCommon(isAnalyticsEnabled:false);
-            return services;
-        }
-
-        services.AddAnalyticsCommon(isAnalyticsEnabled:true)
-            .AddWriteStrategy<AnalyticsWriteTopLevelCallsStrategy>()
-            .AddWriteStrategy<AnalyticsWritePublicationCallsStrategy>()
-            .AddWriteStrategy<AnalyticsWriteDataSetCallsStrategy>()
-            .AddWriteStrategy<AnalyticsWriteDataSetVersionCallsStrategy>()
-            .AddWriteStrategy<AnalyticsWritePublicApiQueryStrategy>();
-
-        services.AddTransient<IAnalyticsService, AnalyticsService>();
-
-        if (hostEnvironment.IsDevelopment())
-        {
-            services.AddSingleton<IAnalyticsPathResolver, LocalAnalyticsPathResolver>();
-        }
-        else
-        {
-            services.AddSingleton<IAnalyticsPathResolver, AnalyticsPathResolver>();
-        }
-        
-        return services;
+        return analyticsOptions is { Enabled: false }
+            ? services
+                .AddAnalyticsCommon(isAnalyticsEnabled: false).Services
+            : services
+                .AddAnalyticsCommon(isAnalyticsEnabled: true)
+                .AddWriteStrategy<AnalyticsWriteTopLevelCallsStrategy>()
+                .AddWriteStrategy<AnalyticsWritePublicationCallsStrategy>()
+                .AddWriteStrategy<AnalyticsWriteDataSetCallsStrategy>()
+                .AddWriteStrategy<AnalyticsWriteDataSetVersionCallsStrategy>()
+                .AddWriteStrategy<AnalyticsWritePublicApiQueryStrategy>().Services
+                .AddTransient<IAnalyticsService, AnalyticsService>()
+                .AddSingleton<IAnalyticsPathResolver, AnalyticsPathResolver>();
     }
 }
