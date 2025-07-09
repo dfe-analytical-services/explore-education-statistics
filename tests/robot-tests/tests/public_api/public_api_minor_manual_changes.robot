@@ -14,7 +14,7 @@ Test Teardown       Run Keyword If Test Failed    record test failure
 
 
 *** Variables ***
-${PUBLICATION_NAME}=    UI tests - Public API - minor manual changes %{RUN_IDENTIFIER}
+${PUBLICATION_NAME}=    Public API - minor manual changes %{RUN_IDENTIFIER}
 ${RELEASE_1_NAME}=      Financial year 3000-01
 ${RELEASE_2_NAME}=      Academic year 3010/11
 ${SUBJECT_1_NAME}=      ${PUBLICATION_NAME} - Subject 1

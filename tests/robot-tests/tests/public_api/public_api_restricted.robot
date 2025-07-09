@@ -12,7 +12,7 @@ Test Setup          fail test fast if required
 
 
 *** Variables ***
-${PUBLICATION_NAME}     UI tests - Public API - restricted %{RUN_IDENTIFIER}
+${PUBLICATION_NAME}     Public API - restricted %{RUN_IDENTIFIER}
 ${RELEASE_NAME}         Financial year 3000-01
 ${SUBJECT_NAME_1}       ${PUBLICATION_NAME} - Subject 1
 ${SUBJECT_NAME_2}       ${PUBLICATION_NAME} - Subject 2

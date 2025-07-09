@@ -15,7 +15,7 @@ Force Tags          Admin    Local    Dev    AltersData
 
 
 *** Variables ***
-${PUBLICATION_NAME}=    UI tests - publish release and amend %{RUN_IDENTIFIER}
+${PUBLICATION_NAME}=    Publish release and amend %{RUN_IDENTIFIER}
 ${RELEASE_LABEL}=       provisional
 ${RELEASE_NAME}=        Financial year 3000-01 ${RELEASE_LABEL}
 ${DATABLOCK_NAME}=      Dates data block name
@@ -291,7 +291,7 @@ Verify release page meta
     ...    ${PUBLICATION_NAME} summary
 
 Verify release URL
-    user checks url contains    %{PUBLIC_URL}/find-statistics/ui-tests-publish-release-and-amend-%{RUN_IDENTIFIER}
+    user checks url contains    %{PUBLIC_URL}/find-statistics/publish-release-and-amend-%{RUN_IDENTIFIER}
 
 Verify publish and update dates
     user checks summary list contains    Published    ${EXPECTED_PUBLISHED_DATE}
@@ -782,7 +782,7 @@ Verify amendment is on Find Statistics page again
 Navigate to amendment release page
     user navigates to public release page    ${PUBLIC_RELEASE_LINK}    ${PUBLICATION_NAME}    ${RELEASE_NAME}
 
-    user checks url contains    %{PUBLIC_URL}/find-statistics/ui-tests-publish-release-and-amend-%{RUN_IDENTIFIER}
+    user checks url contains    %{PUBLIC_URL}/find-statistics/publish-release-and-amend-%{RUN_IDENTIFIER}
 
     user checks breadcrumb count should be    3
     user checks nth breadcrumb contains    1    Home

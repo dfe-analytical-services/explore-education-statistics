@@ -11,7 +11,7 @@ Force Tags          Admin    Local    Dev    AltersData
 
 
 *** Variables ***
-${PUBLICATION_NAME}=    UI tests - register %{RUN_IDENTIFIER}
+${PUBLICATION_NAME}=    Register %{RUN_IDENTIFIER}
 ${RELEASE_NAME}=        ${PUBLICATION_NAME} - Academic year 2000/01
 
 

@@ -12,11 +12,11 @@ Force Tags          Admin    Local    Dev    AltersData
 
 
 *** Variables ***
-${PUBLICATION_NAME_ARCHIVE}=        UI tests - archived publication %{RUN_IDENTIFIER}
+${PUBLICATION_NAME_ARCHIVE}=        Archived publication %{RUN_IDENTIFIER}
 ${RELEASE_NAME_ARCHIVE}=            Financial year 3000-01
 ${SUBJECT_NAME_ARCHIVE}=            Subject for archived publication
 
-${PUBLICATION_NAME_SUPERSEDE}=      UI tests - superseding publication %{RUN_IDENTIFIER}
+${PUBLICATION_NAME_SUPERSEDE}=      Superseding publication %{RUN_IDENTIFIER}
 ${RELEASE_NAME_SUPERSEDE}=          Financial year 2000-01
 ${SUBJECT_NAME_SUPERSEDE}=          Subject for superseding publication
 
@@ -116,7 +116,7 @@ Check that archive-publication subject appears correctly on Data tables page
 
     user waits until page contains    Select a publication    %{WAIT_SMALL}
 
-    user checks page does not contain element    Radio item for UI tests - ${PUBLICATION_NAME_SUPERSEDE}
+    user checks page does not contain element    Radio item for ${PUBLICATION_NAME_SUPERSEDE}
 
     user clicks radio    ${PUBLICATION_NAME_ARCHIVE}
     user clicks element    id:publicationForm-submit

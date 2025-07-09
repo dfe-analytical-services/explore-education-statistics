@@ -12,7 +12,7 @@ Force Tags          Admin    Local    Dev    AltersData
 
 
 *** Variables ***
-${PUBLICATION_NAME}=    UI tests - upload files %{RUN_IDENTIFIER}
+${PUBLICATION_NAME}=    Upload files %{RUN_IDENTIFIER}
 
 
 *** Test Cases ***

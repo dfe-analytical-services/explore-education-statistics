@@ -12,7 +12,7 @@ Test Setup          fail test fast if required
 
 
 *** Variables ***
-${PUBLICATION_NAME}     UI tests - subject reordering %{RUN_IDENTIFIER}
+${PUBLICATION_NAME}     Subject reordering %{RUN_IDENTIFIER}
 ${RELEASE_NAME}         Calendar year 2000
 
 

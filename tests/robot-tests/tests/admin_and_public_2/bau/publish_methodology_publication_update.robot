@@ -12,11 +12,11 @@ Force Tags          Admin    Local    Dev    AltersData
 
 
 *** Variables ***
-${PUBLICATION_NAME}=                    UI tests - publish methodology publication update %{RUN_IDENTIFIER}
+${PUBLICATION_NAME}=                    Publish methodology publication update %{RUN_IDENTIFIER}
 ${PUBLICATION_NAME_UPDATED}=            ${PUBLICATION_NAME} updated
-${PUBLIC_METHODOLOGY_URL}=              %{PUBLIC_URL}/methodology/ui-tests-publish-methodology-publication-update-%{RUN_IDENTIFIER}
+${PUBLIC_METHODOLOGY_URL}=              %{PUBLIC_URL}/methodology/publish-methodology-publication-update-%{RUN_IDENTIFIER}
 ${PUBLIC_METHODOLOGY_URL_UPDATED}=      ${PUBLIC_METHODOLOGY_URL}-methodology-update
-${PUBLIC_PUBLICATION_URL}=              %{PUBLIC_URL}/find-statistics/ui-tests-publish-methodology-publication-update-%{RUN_IDENTIFIER}
+${PUBLIC_PUBLICATION_URL}=              %{PUBLIC_URL}/find-statistics/publish-methodology-publication-update-%{RUN_IDENTIFIER}
 ${PUBLIC_PUBLICATION_URL_UPDATED}=      ${PUBLIC_PUBLICATION_URL}-updated
 ${RELEASE_1_NAME}=                      Academic year 2046/47
 ${RELEASE_2_NAME}=                      Academic year Q1 2050/51

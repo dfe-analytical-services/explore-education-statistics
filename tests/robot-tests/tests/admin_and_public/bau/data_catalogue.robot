@@ -14,7 +14,7 @@ Test Setup          fail test fast if required
 
 
 *** Variables ***
-${PUBLICATION_NAME}=    UI tests - data catalogue %{RUN_IDENTIFIER}
+${PUBLICATION_NAME}=    Data catalogue %{RUN_IDENTIFIER}
 ${RELEASE_NAME}=        Academic year Q1
 ${SUBJECT_NAME_1}=      UI test subject 1
 ${SUBJECT_NAME_2}=      UI test subject 2
@@ -147,7 +147,7 @@ Validate zip contains correct files
     [Documentation]    EES-4147
     sleep    8    # wait for file to download
     ${list}=    create list    data/dates.csv    data-guidance/data-guidance.txt
-    zip should contain directories and files    ui-tests-data-catalogue-%{RUN_IDENTIFIER}_2021-22-q1.zip    ${list}
+    zip should contain directories and files    data-catalogue-%{RUN_IDENTIFIER}_2021-22-q1.zip    ${list}
 
 Validate sort controls exist
     user checks radio is checked    Newest

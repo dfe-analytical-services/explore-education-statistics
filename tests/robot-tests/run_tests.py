@@ -7,7 +7,6 @@ Run 'python run_tests.py -h' to see argument options
 """
 
 import argparse
-import datetime
 import glob
 import os
 import random
@@ -62,10 +61,8 @@ def _install_chromedriver(chromedriver_version: str):
     get_webdriver(chromedriver_version)
 
 
-def _create_run_identifier():
-    # Add randomness to prevent multiple simultaneous run_tests.py generating the same run_identifier value
-    random_str = "".join([random.choice(string.ascii_lowercase + string.digits) for n in range(6)])
-    return datetime.datetime.utcnow().strftime("%Y%m%d-%H%M%S-" + random_str)
+def _generate_random_id(size=6):
+    return "".join(random.choices(string.ascii_lowercase + string.digits, k=size))
 
 
 def _clear_files_before_next_test_run_attempt(rerunning_failures: bool):
@@ -120,7 +117,7 @@ def run():
 
     _install_chromedriver(args.chromedriver_version)
 
-    run_identifier_initial_value = _create_run_identifier()
+    run_identifier_initial_value = _generate_random_id()
 
     max_run_attempts = args.rerun_attempts + 1
     test_run_index = 0

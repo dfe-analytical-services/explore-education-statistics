@@ -22,7 +22,7 @@ Force Tags          Local    Dev
 
 
 *** Variables ***
-${PUBLICATION_NAME}     UI tests - seed data mechanism publication %{RUN_IDENTIFIER}
+${PUBLICATION_NAME}     Seed data mechanism publication %{RUN_IDENTIFIER}
 
 
 *** Test Cases ***

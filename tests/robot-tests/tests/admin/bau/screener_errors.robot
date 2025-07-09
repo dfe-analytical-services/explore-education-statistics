@@ -11,7 +11,7 @@ Force Tags          Admin    Local    Dev    AltersData
 
 
 *** Variables ***
-${PUBLICATION_NAME}=    UI tests - screener errors %{RUN_IDENTIFIER}
+${PUBLICATION_NAME}=    Screener errors %{RUN_IDENTIFIER}
 
 
 *** Test Cases ***
