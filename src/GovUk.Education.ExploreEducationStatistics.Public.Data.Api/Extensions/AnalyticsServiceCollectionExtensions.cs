@@ -19,6 +19,7 @@ public static class AnalyticsServiceCollectionExtensions
         return analyticsOptions is { Enabled: false }
             ? services
                 .AddAnalyticsCommon(isAnalyticsEnabled: false).Services
+                .AddTransient<IAnalyticsService, NoOpAnalyticsService>()
             : services
                 .AddAnalyticsCommon(isAnalyticsEnabled: true)
                 .AddWriteStrategy<AnalyticsWriteTopLevelCallsStrategy>()
