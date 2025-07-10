@@ -25,6 +25,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Options;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using Microsoft.Extensions.Options;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.TimeIdentifier;
@@ -2476,6 +2477,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             IDataSetVersionService? dataSetVersionService = null,
             ITimePeriodService? timePeriodService = null,
             IDataSetVersionMappingService? dataSetVersionMappingService = null,
+            IReleaseFileRepository? releaseFileRepository = null,
             IOptions<FeatureFlagsOptions>? featureFlags = null
             )
         {
@@ -2490,10 +2492,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 new IndicatorRepository(statisticsDbContext),
                 locationRepository ?? Mock.Of<ILocationRepository>(Strict),
                 new FootnoteRepository(statisticsDbContext),
-                dataSetVersionService ?? Mock.Of<IDataSetVersionService>(),
+                dataSetVersionService ?? Mock.Of<IDataSetVersionService>(Strict),
                 timePeriodService ?? Mock.Of<ITimePeriodService>(Strict),
                 AlwaysTrueUserService().Object,
                 dataSetVersionMappingService ?? Mock.Of<IDataSetVersionMappingService>(Strict),
+                releaseFileRepository ?? Mock.Of<IReleaseFileRepository>(Strict),
                 featureFlags
             );
         }

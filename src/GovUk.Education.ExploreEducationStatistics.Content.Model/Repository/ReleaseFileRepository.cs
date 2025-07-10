@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
@@ -143,6 +144,29 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository
             await _contentDbContext.SaveChangesAsync();
 
             return releaseFile;
+        }
+
+        public async Task<Either<ActionResult, (ReleaseFile originalReleaseFile, ReleaseFile replacementReleaseFile)>>
+            CheckLinkedOriginalAndReplacementReleaseFilesExist(Guid releaseVersionId,
+                Guid originalFileId)
+        {
+
+            return await _contentDbContext.ReleaseFiles
+                .Include(rf => rf.File)
+                .FirstOrNotFoundAsync(originalReleaseFile =>
+                    originalReleaseFile.ReleaseVersionId == releaseVersionId
+                    && originalReleaseFile.FileId == originalFileId
+                    && originalReleaseFile.File.Type == FileType.Data
+                    && originalReleaseFile.File.ReplacedById != null)
+                .OnSuccessCombineWith(async originalReleaseFile =>
+                    await _contentDbContext.ReleaseFiles
+                        .Include(rf => rf.File)
+                        .FirstOrNotFoundAsync(replacementReleaseFile =>
+                            replacementReleaseFile.ReleaseVersionId == releaseVersionId
+                            && replacementReleaseFile.FileId == originalReleaseFile.File.ReplacedById
+                            && replacementReleaseFile.File.Type == FileType.Data
+                            && originalReleaseFile.FileId == replacementReleaseFile.File.ReplacingId))
+                .OnSuccess(releaseFiles => releaseFiles.ToValueTuple());
         }
     }
 }

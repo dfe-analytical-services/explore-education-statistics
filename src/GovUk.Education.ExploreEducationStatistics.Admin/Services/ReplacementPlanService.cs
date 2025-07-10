@@ -17,6 +17,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Secu
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
@@ -40,6 +41,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         ITimePeriodService timePeriodService,
         IUserService userService,
         IDataSetVersionMappingService dataSetVersionMappingService,
+        IReleaseFileRepository releaseFileRepository,
         IOptions<FeatureFlagsOptions> featureFlags)
         : IReplacementPlanService
     {
@@ -53,13 +55,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return await contentDbContext.ReleaseVersions
                 .FirstOrNotFoundAsync(rv => rv.Id == releaseVersionId, cancellationToken: cancellationToken)
                 .OnSuccess(userService.CheckCanUpdateReleaseVersion)
-                .OnSuccess(() => CheckLinkedOriginalAndReplacementReleaseFilesExist(
+                .OnSuccess(() => releaseFileRepository.CheckLinkedOriginalAndReplacementReleaseFilesExist(
                         releaseVersionId: releaseVersionId,
                         originalFileId: originalFileId))
-                .OnSuccess(async tuple =>
+                .OnSuccess(async releaseFiles =>
                 {
-                    var originalReleaseFile = tuple.originalReleaseFile;
-                    var replacementReleaseFile = tuple.replacementReleaseFile;
+                    var originalReleaseFile = releaseFiles.originalReleaseFile;
+                    var replacementReleaseFile = releaseFiles.replacementReleaseFile;
 
                     return await GenerateReplacementPlan(
                         originalReleaseFile: originalReleaseFile,
@@ -185,27 +187,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(dsv => (DataSetVersion?)dsv)
                 .OnFailureDo(_ => throw new InvalidOperationException(
                     $"API data set version could not be found. Data set ID: '{releaseFile.PublicApiDataSetId}', version: '{releaseFile.PublicApiDataSetVersion}'"));
-        }
-
-        private async Task<Either<ActionResult, (ReleaseFile originalReleaseFile, ReleaseFile replacementReleaseFile)>>
-            CheckLinkedOriginalAndReplacementReleaseFilesExist(Guid releaseVersionId, Guid originalFileId) // @MarkFix cloned here and in ReplacementService
-        {
-            return await contentDbContext.ReleaseFiles
-                .Include(rf => rf.File)
-                .FirstOrNotFoundAsync(originalReleaseFile =>
-                    originalReleaseFile.ReleaseVersionId == releaseVersionId
-                    && originalReleaseFile.FileId == originalFileId
-                    && originalReleaseFile.File.Type == FileType.Data
-                    && originalReleaseFile.File.ReplacedById != null)
-                .OnSuccessCombineWith(async originalReleaseFile =>
-                    await contentDbContext.ReleaseFiles
-                        .Include(rf => rf.File)
-                        .FirstOrNotFoundAsync(replacementReleaseFile =>
-                            replacementReleaseFile.ReleaseVersionId == releaseVersionId
-                            && replacementReleaseFile.FileId == originalReleaseFile.File.ReplacedById
-                            && replacementReleaseFile.File.Type == FileType.Data
-                            && originalReleaseFile.FileId == replacementReleaseFile.File.ReplacingId))
-                .OnSuccess(releaseFiles => releaseFiles.ToValueTuple());
         }
 
         private async Task<ReplacementSubjectMeta> GetReplacementSubjectMeta(Guid subjectId)
