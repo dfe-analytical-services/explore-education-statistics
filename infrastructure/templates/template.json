@@ -1163,6 +1163,7 @@
     "applicationGatewaySubnetName": "[concat(parameters('subscription'), '-', parameters('environment'), '-snet-agw-01')]",
     "psqlFlexibleServerSubnetName": "[concat(parameters('subscription'), '-', parameters('environment'), '-snet-psql-flexibleserver')]",
     "screenerFunctionAppSubnetName": "[concat(parameters('subscription'), '-', parameters('environment'), '-sapi-snet-fa-screener')]",
+    "screenerFunctionAppSubnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vNetName'), variables('screenerFunctionAppSubnetName'))]",
     "screenerStoragePrivateEndpointsSubnetName": "[concat(parameters('subscription'), '-', parameters('environment'), '-sapi-snet-sa-screener-pep')]",
     "sqlAllowedSubnets": [
       {
@@ -2333,7 +2334,7 @@
             },
             {
               "condition": "[parameters('useSubnets')]",
-              "id": "[variables('screenerFunctionAppSubnetName')]",
+              "id": "[variables('screenerFunctionAppSubnetRef')]",
               "action": "Allow"
             }
           ],
