@@ -18,6 +18,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
         Task<Either<ActionResult, Unit>> Replace(
             Guid releaseVersionId,
             Guid originalFileId,
-            CancellationToken cancellationToken);
+            CancellationToken cancellationToken = default);
     }
 }

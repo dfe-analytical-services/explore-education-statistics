@@ -57,8 +57,7 @@ public class ReplacementBatchServiceTests
 
             var result = await replacementBatchService.Replace(
                 releaseVersionId: releaseVersion.Id,
-                [originalFileValid1Id, originalFileValid2Id],
-                default);
+                originalFileIds: [originalFileValid1Id, originalFileValid2Id]);
 
             result.AssertRight();
 
@@ -79,8 +78,7 @@ public class ReplacementBatchServiceTests
 
         var result = await replacementBatchService.Replace(
             releaseVersionId: Guid.NewGuid(), // releaseVersion does not exist
-            [Guid.NewGuid()],
-            default);
+            originalFileIds: [Guid.NewGuid()]);
 
         result.AssertNotFound();
 
@@ -130,29 +128,15 @@ public class ReplacementBatchServiceTests
 
             var result = await replacementBatchService.Replace(
                 releaseVersionId: releaseVersion.Id,
-                [originalFileValidId, originalFileInvalidId, originalFileNotFoundId, originalFileImportNotCompleteId],
-                default);
+                originalFileIds: [originalFileValidId, originalFileInvalidId, originalFileNotFoundId, originalFileImportNotCompleteId]);
 
             // The valid replacement completes, but we still return errors for the invalid and not found
             // replacements as in normal usage the user should never see one of these errors.
             var validationProblem = result.AssertBadRequestWithValidationProblem();
             validationProblem.AssertHasErrors([
-                new ErrorViewModel
-                {
-                    Code = "ReplacementNotFound",
-                    Message =
-                        $"Linked original and replacement file(s) not found. OriginalFileId: {originalFileNotFoundId}"
-                },
-                new ErrorViewModel
-                {
-                    Code = "ReplacementMustBeValid",
-                    Message = $"Replacement not valid. OriginalFileId: {originalFileInvalidId}"
-                },
-                new ErrorViewModel
-                {
-                    Code = "ReplacementImportMustBeComplete",
-                    Message = $"Replacement import not complete. OriginalFileId: {originalFileImportNotCompleteId}"
-                },
+                ValidationMessages.GenerateErrorReplacementNotFound(originalFileNotFoundId),
+                ValidationMessages.GenerateErrorReplacementMustBeValid(originalFileInvalidId),
+                ValidationMessages.GenerateErrorReplacementImportMustBeComplete(originalFileImportNotCompleteId),
             ]);
 
             VerifyAllMocks(replacementService);

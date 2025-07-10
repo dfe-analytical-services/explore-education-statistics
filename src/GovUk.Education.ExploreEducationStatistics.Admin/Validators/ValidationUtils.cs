@@ -34,9 +34,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators
             var badRequest = actionResult as BadRequestObjectResult;
             var validationProblem = badRequest?.Value as ValidationProblemViewModel;
             var validationErrors = validationProblem?.Errors;
-            return validationErrors != null && validationErrors
-                .Select(error => error.Code)
-                .Contains(validationMessage.ToString());
+            return validationErrors != null
+                   && validationErrors.Any(error => error.Code == validationMessage.ToString());
         }
     }
 }

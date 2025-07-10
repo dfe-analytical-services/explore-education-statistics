@@ -67,10 +67,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(() => CheckLinkedOriginalAndReplacementReleaseFilesExist(
                         releaseVersionId: releaseVersionId,
                         originalFileId: originalFileId))
-                .OnSuccess(async tuple =>
+                .OnSuccess(async releaseFiles =>
                 {
-                    var originalReleaseFile = tuple.originalReleaseFile;
-                    var replacementReleaseFile = tuple.replacementReleaseFile;
+                    var originalReleaseFile = releaseFiles.originalReleaseFile;
+                    var replacementReleaseFile = releaseFiles.replacementReleaseFile;
 
                     return await GenerateReplacementPlan(
                         originalReleaseFile: originalReleaseFile,
@@ -128,7 +128,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         public async Task<Either<ActionResult, Unit>> Replace(
                 Guid releaseVersionId,
                 Guid originalFileId,
-                CancellationToken cancellationToken)
+                CancellationToken cancellationToken = default)
         {
             return await CheckLinkedOriginalAndReplacementReleaseFilesExist(
                     releaseVersionId: releaseVersionId,
@@ -143,13 +143,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         replacementReleaseFile: replacementReleaseFile,
                         cancellationToken: cancellationToken);
                 })
-                .OnSuccessDo(releaseFilesAndPlan =>
+                .OnSuccess(releaseFilesAndPlan =>
                 {
-                    var ((_, replacementReleaseFile), plan) = releaseFilesAndPlan;
+                    var ((originalReleaseFile, replacementReleaseFile), plan) = releaseFilesAndPlan;
                     if (!plan.Valid)
                     {
-                        return new Either<ActionResult, Tuple<
-                            (ReleaseFile, ReleaseFile), DataReplacementPlanViewModel>>(
+                        return new Either<ActionResult,
+                            (ReleaseFile originalReleaseFile,
+                            ReleaseFile replacementReleaseFile,
+                            DataReplacementPlanViewModel plan)>(
                             ValidationActionResult(ReplacementMustBeValid));
                     }
 
@@ -159,16 +161,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                             && import.Status == DataImportStatus.COMPLETE);
                     if (!replacementImportHasCompleted)
                     {
-                        return new Either<ActionResult, Tuple<
-                            (ReleaseFile, ReleaseFile), DataReplacementPlanViewModel>>(
-                            ValidationActionResult(ReplacementImportMustBeComplete));
+                        return ValidationActionResult(ReplacementImportMustBeComplete);
                     }
 
-                    return releaseFilesAndPlan;
+                    return (originalReleaseFile, replacementReleaseFile, plan);
                 })
                 .OnSuccess(async releaseFilesAndPlan =>
                 {
-                    var ((originalReleaseFile, replacementReleaseFile), plan) = releaseFilesAndPlan;
+                    var originalReleaseFile = releaseFilesAndPlan.originalReleaseFile;
+                    var replacementReleaseFile = releaseFilesAndPlan.replacementReleaseFile;
+                    var plan = releaseFilesAndPlan.plan;
 
                     var originalSubjectId = plan.OriginalSubjectId;
                     var replacementSubjectId = plan.ReplacementSubjectId;
