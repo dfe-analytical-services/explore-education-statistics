@@ -2,6 +2,7 @@
 type ResourceNames = {
   existingResources: {
     keyVault: string
+    logAnalyticsWorkspace: string
     vNet: string
     adminApp: string
     alertsGroup: string
