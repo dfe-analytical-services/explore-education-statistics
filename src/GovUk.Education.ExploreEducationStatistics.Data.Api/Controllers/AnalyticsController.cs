@@ -3,15 +3,13 @@ using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Analytics.Common.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Requests;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers;
 
 [Route("api")]
 [ApiController]
 public class AnalyticsController(
-    IAnalyticsManager analyticsManager,
-    ILogger<AnalyticsController> logger) 
+    IAnalyticsManager analyticsManager) 
     : ControllerBase
 {
     /// <summary>
@@ -29,16 +27,6 @@ public class AnalyticsController(
         [FromBody] RecordTableToolDownloadRequestBindingModel requestBindingModel,
         CancellationToken cancellationToken = default)
     {
-        var result = await new RecordTableToolDownloadRequestBindingModel.Validator()
-                            .ValidateAsync(requestBindingModel, cancellationToken);
-        if (!result.IsValid)
-        {
-            logger.LogWarning(
-                "Call to record table builder table download was made with an invalid request. {@Errors}",
-                result.Errors);
-            return BadRequest(result.Errors);
-        }
-
         var callCapture = requestBindingModel.ToModel();
         await analyticsManager.Add(callCapture, cancellationToken);
         return Ok();
@@ -62,16 +50,6 @@ public class AnalyticsController(
         [FromBody] RecordPermalinkTableDownloadRequestBindingModel requestBindingModel,
         CancellationToken cancellationToken = default)
     {
-        var result = await new RecordPermalinkTableDownloadRequestBindingModel.Validator()
-            .ValidateAsync(requestBindingModel, cancellationToken);
-        if (!result.IsValid)
-        {
-            logger.LogWarning(
-                "Call to record permalink page table download was made with an invalid request. {@Errors}",
-                result.Errors);
-            return BadRequest(result.Errors);
-        }
-
         var callCapture = requestBindingModel.ToModel();
         await analyticsManager.Add(callCapture, cancellationToken);
         return Ok();
