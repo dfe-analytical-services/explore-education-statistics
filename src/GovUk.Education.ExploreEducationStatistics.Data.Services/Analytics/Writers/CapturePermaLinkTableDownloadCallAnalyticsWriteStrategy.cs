@@ -16,7 +16,7 @@ public class CapturePermaLinkTableDownloadCallAnalyticsWriteStrategy(
         new WorkflowActor(analyticsPath: analyticsPathResolver.GetPermaLinkTableDownloadCallsDirectoryPath());
     public Type RequestType => typeof(CapturePermaLinkTableDownloadCall);
 
-    public async Task Report(IAnalyticsCaptureRequest request, CancellationToken cancellationToken)
+    public async Task Report(IAnalyticsCaptureRequest request, CancellationToken cancellationToken = default)
     {
         if (request is not CapturePermaLinkTableDownloadCall captureRequest)
         {

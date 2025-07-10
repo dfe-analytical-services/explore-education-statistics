@@ -16,7 +16,7 @@ public class CaptureTableToolDownloadCallAnalyticsWriteStrategy(
         new WorkflowActor(analyticsPath: analyticsPathResolver.GetTableToolDownloadCallsDirectoryPath());
     public Type RequestType => typeof(CaptureTableToolDownloadCall);
 
-    public async Task Report(IAnalyticsCaptureRequest request, CancellationToken cancellationToken)
+    public async Task Report(IAnalyticsCaptureRequest request, CancellationToken cancellationToken = default)
     {
         if (request is not CaptureTableToolDownloadCall captureRequest)
         {
