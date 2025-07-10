@@ -5,6 +5,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
 using GovUk.Education.ExploreEducationStatistics.Common.Requests;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Requests;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Analytics;
+using GovUk.Education.ExploreEducationStatistics.Data.Services.Analytics.Dtos;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Builders;
 

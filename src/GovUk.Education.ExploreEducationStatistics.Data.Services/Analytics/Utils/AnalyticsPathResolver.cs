@@ -2,9 +2,10 @@
 using System;
 using System.IO;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Data.Services.Analytics.Config;
 using Microsoft.Extensions.Options;
 
-namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Analytics;
+namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Analytics.Utils;
 
 public class AnalyticsPathResolver : IAnalyticsPathResolver
 {

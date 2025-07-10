@@ -1,7 +1,7 @@
 ﻿using System;
 using GovUk.Education.ExploreEducationStatistics.Analytics.Common.Interfaces;
 
-namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Analytics;
+namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Analytics.Dtos;
 
 public record CapturePermaLinkTableDownloadCall : IAnalyticsCaptureRequest
 {
