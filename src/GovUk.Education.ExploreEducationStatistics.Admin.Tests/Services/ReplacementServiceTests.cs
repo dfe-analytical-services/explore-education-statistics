@@ -1799,9 +1799,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new MappingStatusViewModel
                 {
-                    FiltersComplete = true,
-                    LocationsComplete = true,
-                    HasMajorVersionUpdate = majorVersionUpdate
+                    FiltersComplete = majorVersionUpdate,
+                    LocationsComplete = majorVersionUpdate,
+                    HasDeletionChanges = majorVersionUpdate,
+                    FiltersHaveMajorChange = majorVersionUpdate,
+                    LocationsHaveMajorChange = majorVersionUpdate
                 });
             
             var options = Microsoft.Extensions.Options.Options.Create(new FeatureFlagsOptions()
@@ -2833,7 +2835,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 {
                     FiltersComplete = true,
                     LocationsComplete = true,
-                    HasMajorVersionUpdate = false
+                    HasDeletionChanges = false,
+                    FiltersHaveMajorChange = false,
+                    LocationsHaveMajorChange = false
                 });
             var options = Microsoft.Extensions.Options.Options.Create(new FeatureFlagsOptions()
             {
@@ -2876,12 +2880,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
               
                 if (enableReplacementOfPublicApiDataSets)
                 {
-                    //Once EES-5779 is enabled, replacing file linked to API data set is possible.
                     VerifyAllMocks(
                         locationRepository,
                         timePeriodService,
                         dataSetVersionService,
-                        releaseVersionService,
                         dataSetVersionMappingService);
                     result.AssertRight();
                 }

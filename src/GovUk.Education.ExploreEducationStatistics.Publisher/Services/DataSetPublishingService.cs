@@ -149,9 +149,12 @@ public class DataSetPublishingService(
                 .Where(rf => rf.FileId == previousReleaseFile.FileId)
                 .Where(rf => rf.ReleaseVersion.PreviousVersionId == previousReleaseFile.ReleaseVersionId)
                 .Select(rf => rf.Id)
-                .SingleAsync();
+                .SingleOrDefaultAsync();
 
-            dataSetVersion.Release.ReleaseFileId = nextReleaseFileId;
+            if (nextReleaseFileId != Guid.Empty)
+            {
+                dataSetVersion.Release.ReleaseFileId = nextReleaseFileId;
+            }
         }
 
         await publicDataDbContext.SaveChangesAsync();

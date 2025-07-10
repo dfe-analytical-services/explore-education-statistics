@@ -93,8 +93,10 @@ export interface DataBlockReplacementPlan {
 
 export interface MappingStatus {
   locationsComplete: boolean;
+  locationsHaveMajorChange: boolean;
   filtersComplete: boolean;
-  hasMajorVersionUpdate: boolean;
+  filtersHaveMajorChange: boolean;
+  isMajorVersionUpdate: boolean;
 }
 
 export interface ApiDataSetVersionPlan {

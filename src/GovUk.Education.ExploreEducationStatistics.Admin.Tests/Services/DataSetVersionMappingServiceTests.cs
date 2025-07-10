@@ -5,14 +5,12 @@ using System.Threading;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Repositories.Public.Data.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Public.Data;
-using GovUk.Education.ExploreEducationStatistics.Common.Options;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using Moq.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
 using Moq;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 
@@ -43,6 +41,25 @@ public class DataSetVersionMappingServiceTests
     {
         // Arrange
         var targetDataSetVersionId = Guid.NewGuid();
+
+        var locationMappingTypes = new List<LocationMappingTypes>
+        {
+            new()
+            {
+                LocationLevelRaw = locationMappingTypesLevel,
+                LocationOptionRaw = locationMappingTypesOption
+            }
+        }; 
+        
+        var filterMappingTypes = new List<FilterMappingTypes>
+        {
+            new()
+            {
+                FilterRaw = filterMappingTypesLevel,
+                FilterOptionRaw = filterMappingTypesOption
+            }
+        };
+        
         SetupDbContext(
             targetDataSetVersionId, 
             majorCausedByDeletion, 
@@ -65,13 +82,60 @@ public class DataSetVersionMappingServiceTests
             mockMappingTypesRepository: mockMappingTypesRepository.Object);
 
         // Act
-        var result = await service.IsMajorVersionUpdate(
+        var result = await service.GetMajorChangesStatus(
             targetDataSetVersionId,
+            locationMappingTypes,
+            filterMappingTypes,
             CancellationToken.None);
 
         // Assert
-        Assert.Equal(expectedMajorVersion, result);
+        Assert.Equal(expectedMajorVersion, result.IsMajorVersionUpdate);
     }
+    
+    [Theory]
+    [InlineData("AutoNone", "AutoNone", "AutoNone", "AutoNone", true, true)]
+    [InlineData("AutoMapped", "AutoNone", "AutoNone", "AutoNone", true, true)]
+    [InlineData("AutoMapped", "AutoMapped", "AutoNone", "AutoNone", false, true)]
+    [InlineData("AutoMapped", "AutoMapped", "AutoMapped", "AutoNone", false, true)]
+    [InlineData("ManualNone", "ManualNone", "ManualNone", "ManualNone", true, true)]
+    [InlineData("AutoMapped", "ManualNone", "ManualNone", "ManualNone", true, true)]
+    [InlineData("AutoMapped", "AutoMapped", "ManualNone", "ManualNone", false, true)]
+    [InlineData("ManualNone", "ManualNone", "AutoMapped", "AutoMapped",  true, false)]
+    
+    public async Task GetMappingStatus(
+        string locationMappingTypesOption, 
+        string locationMappingTypesLevel,
+        string filterMappingTypesOption, 
+        string filterMappingTypesLevel,
+        bool majorVersionInLocations,
+        bool majorVersionInFilters)
+    {
+        // Arrange
+        var targetDataSetVersionId = Guid.NewGuid();
+
+        SetupDbContext(targetDataSetVersionId);
+
+        var contextId = Guid.NewGuid().ToString();
+        await using var contentDbContext = InMemoryApplicationDbContext(contextId);
+        
+        var mockMappingTypesRepository = SetupMockMappingTypes(locationMappingTypesLevel, locationMappingTypesOption, filterMappingTypesLevel,
+            filterMappingTypesOption, targetDataSetVersionId);
+        
+        var service = CreateService(
+            publicDataDbContext: _publicDataDbContextMock.Object, 
+            contentDbContext: contentDbContext,
+            mockMappingTypesRepository: mockMappingTypesRepository.Object);
+
+        // Act
+
+        var result = await service.GetMappingStatus(targetDataSetVersionId);
+        
+        // Assert
+        Assert.NotNull(result);
+        Assert.Equal(majorVersionInLocations, result.LocationsHaveMajorChange);
+        Assert.Equal(majorVersionInFilters, result.FiltersHaveMajorChange);
+    }
+
     
     [Theory]
     [InlineData(false, false, false, false)]
@@ -166,18 +230,14 @@ public class DataSetVersionMappingServiceTests
         ContentDbContext contentDbContext,
         IPostgreSqlRepository? mockPostgreSqlRepository = null,
         IUserService? mockUserService = null,
-        IMappingTypesRepository? mockMappingTypesRepository = null,
-        IOptions<FeatureFlagsOptions>? mockFeatureFlags = null)
+        IMappingTypesRepository? mockMappingTypesRepository = null)
     {
         return new DataSetVersionMappingService(
             mockPostgreSqlRepository ?? Mock.Of<IPostgreSqlRepository>(behavior: MockBehavior.Strict),
             mockUserService ?? Mock.Of<IUserService>(behavior: MockBehavior.Strict),
             publicDataDbContext,
             contentDbContext,
-            mockMappingTypesRepository ?? Mock.Of<IMappingTypesRepository>(behavior: MockBehavior.Strict),
-            mockFeatureFlags ?? Microsoft.Extensions.Options.Options.Create(new FeatureFlagsOptions
-            {
-                EnableReplacementOfPublicApiDataSets = false
-            }));
+            mockMappingTypesRepository ?? Mock.Of<IMappingTypesRepository>(behavior: MockBehavior.Strict)
+            );
     }
 }

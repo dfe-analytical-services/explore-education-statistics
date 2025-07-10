@@ -9,14 +9,15 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Cache
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
+using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Chart;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
-using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
 using GovUk.Education.ExploreEducationStatistics.Common.Options;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
+using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
@@ -119,17 +120,35 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 Valid = false,
             };
 
-            if (!featureFlags.Value.EnableReplacementOfPublicApiDataSets || replacementApiDataSetVersion.VersionPatch == 0)
+            if (!featureFlags.Value.EnableReplacementOfPublicApiDataSets)
             { 
                 return apiDataSetVersionPlan;
             }
  
             var mappingStatus =  await dataSetVersionMappingService.GetMappingStatus(replacementApiDataSetVersion.Id, cancellationToken);
+            var isPatch = DataSetVersionNumber.TryParse(apiDataSetVersionPlan.Version, out var number) && number.Patch > 0;
 
+            // If no mapping is found and the api version status is DRAFT, this data set version was deleted and recreated (& no mapping was necessary)
+            // `completeStatusResult` is used for when we are replacing a draft release file (not an amendment) and therefore the mapping is complete/not applicable.
+            var completeStatusResult = new MappingStatusViewModel
+            {
+                FiltersComplete = true,
+                FiltersHaveMajorChange = false,
+                LocationsComplete = true,
+                LocationsHaveMajorChange = false,
+                HasDeletionChanges = false
+            }; 
+            
             return apiDataSetVersionPlan with
             {
-                MappingStatus = mappingStatus, 
-                Valid = mappingStatus is { HasMajorVersionUpdate: false } && apiDataSetVersionPlan.ReadyToPublish
+                MappingStatus = mappingStatus 
+                                ?? (apiDataSetVersionPlan.ReadyToPublish 
+                                    ? completeStatusResult 
+                                    : null),// If no mapping is found, this data set version was deleted and recreated (& no mapping was necessary)  
+                Valid = (isPatch 
+                            ? mappingStatus is { IsMajorVersionUpdate: false } && apiDataSetVersionPlan.ReadyToPublish 
+                            : apiDataSetVersionPlan.ReadyToPublish) 
+                        || (mappingStatus is null && apiDataSetVersionPlan.ReadyToPublish) // Data set version was deleted and recreated (as opposed to as a patch increment of a previous data set version)
             };
         }
         
@@ -1249,7 +1268,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
                     await contentDbContext.SaveChangesAsync();
 
-                    return await releaseVersionService.RemoveDataFiles(releaseVersionId: releaseVersionId,
+                    return await releaseVersionService.RemoveDataFiles(
+                        releaseVersionId: releaseVersionId,
                         fileId: originalFileId);
                 });
         }
