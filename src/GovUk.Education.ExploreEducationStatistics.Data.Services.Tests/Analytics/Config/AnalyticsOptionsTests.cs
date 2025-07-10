@@ -1,11 +1,10 @@
 ﻿using System.IO;
 using System.Text;
-using GovUk.Education.ExploreEducationStatistics.Data.Services.Analytics;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Analytics.Config;
 using Microsoft.Extensions.Configuration;
 using Xunit;
 
-namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests.Analytics;
+namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests.Analytics.Config;
 
 public class AnalyticsOptionsTests
 {
