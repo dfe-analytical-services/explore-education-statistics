@@ -22,6 +22,7 @@ import ButtonText from '@common/components/ButtonText';
 import Modal from '@common/components/Modal';
 import React from 'react';
 import { generatePath } from 'react-router';
+import { useReleaseVersionContext } from '@admin/pages/release/contexts/ReleaseVersionContext';
 import styles from './DataFilesTable.module.scss';
 import DeleteDataFileModal from './DeleteDataFileModal';
 
@@ -51,7 +52,69 @@ export default function DataFilesTableRow({
   const allowReplacementOfDataFile = isNewReplaceDsvFeatureEnabled
     ? true
     : dataFile.publicApiDataSetId == null;
+  const { releaseVersion: contextRelease } = useReleaseVersionContext();
+  const blockDraftReplacement =
+    !contextRelease.amendment && dataFile.publicApiDataSetId != null;
 
+  const blockReplaceLinkedApiModal = (
+    <Modal
+      showClose
+      title="Cannot replace data"
+      triggerButton={<ButtonText>Replace data</ButtonText>}
+    >
+      <p>
+        This data file has an API data set linked to it. Please remove the API
+        data set before replacing the data.
+      </p>
+      <p>
+        <Link
+          to={generatePath<ReleaseDataSetRouteParams>(
+            releaseApiDataSetDetailsRoute.path,
+            {
+              publicationId,
+              releaseVersionId,
+              dataSetId: dataFile.publicApiDataSetId ?? '',
+            },
+          )}
+        >
+          Go to API data set
+        </Link>
+      </p>
+    </Modal>
+  );
+  const blockReplaceDraftApiModal = (
+    <Modal
+      showClose
+      title="Cannot replace data"
+      triggerButton={<ButtonText>Replace data</ButtonText>}
+    >
+      <p>
+        This data replacement can not be completed as it is targeting an
+        existing draft API data set. Please contact
+        explore.statistics@education.gov.uk for support on completing this
+        replacement.
+      </p>
+    </Modal>
+  );
+  const replaceDataButton = blockDraftReplacement ? (
+    blockReplaceDraftApiModal
+  ) : (
+    <Link
+      to={generatePath<ReleaseDataFileReplaceRouteParams>(
+        releaseDataFileReplaceRoute.path,
+        {
+          publicationId,
+          releaseVersionId,
+          fileId: dataFile.id,
+        },
+      )}
+    >
+      Replace data
+    </Link>
+  );
+  const replaceDataModalsCheck = !allowReplacementOfDataFile
+    ? blockReplaceLinkedApiModal
+    : replaceDataButton;
   return (
     <tr key={dataFile.title}>
       <td data-testid="Title" className={styles.title}>
@@ -99,46 +162,7 @@ export default function DataFilesTableRow({
                     >
                       Edit title
                     </Link>
-                    {!allowReplacementOfDataFile ? (
-                      <Modal
-                        showClose
-                        title="Cannot replace data"
-                        triggerButton={<ButtonText>Replace data</ButtonText>}
-                      >
-                        <p>
-                          This data file has an API data set linked to it.
-                          Please remove the API data set before replacing the
-                          data.
-                        </p>
-                        <p>
-                          <Link
-                            to={generatePath<ReleaseDataSetRouteParams>(
-                              releaseApiDataSetDetailsRoute.path,
-                              {
-                                publicationId,
-                                releaseVersionId,
-                                dataSetId: dataFile.publicApiDataSetId ?? '',
-                              },
-                            )}
-                          >
-                            Go to API data set
-                          </Link>
-                        </p>
-                      </Modal>
-                    ) : (
-                      <Link
-                        to={generatePath<ReleaseDataFileReplaceRouteParams>(
-                          releaseDataFileReplaceRoute.path,
-                          {
-                            publicationId,
-                            releaseVersionId,
-                            fileId: dataFile.id,
-                          },
-                        )}
-                      >
-                        Replace data
-                      </Link>
-                    )}
+                    {replaceDataModalsCheck}
                   </>
                 )}
                 {dataFile.publicApiDataSetId ? (
