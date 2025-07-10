@@ -16,8 +16,8 @@ public record RecordPermalinkTableDownloadRequestBindingModel
         public Validator()
         {
             RuleFor(dto => dto.PermalinkTitle).NotNull().NotEmpty();
-            RuleFor(dto => dto.PermalinkId).NotNull().NotEmpty();
-            RuleFor(dto => dto.DownloadFormat).NotNull();
+            RuleFor(dto => dto.PermalinkId).NotNull().NotEqual(Guid.Empty);
+            RuleFor(dto => dto.DownloadFormat).NotNull().IsInEnum();
         }
     }
 
