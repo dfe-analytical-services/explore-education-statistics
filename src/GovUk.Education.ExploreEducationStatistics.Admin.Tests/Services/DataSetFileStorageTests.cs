@@ -27,7 +27,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Fixtures;
-using Microsoft.Extensions.Logging;
 using Semver;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainers;
@@ -886,16 +885,19 @@ public class DataSetFileStorageTests
                 version: new SemVersion(2, 0, 0)
             );
 
-        var dataSet = new DataSetUploadResultViewModel
+        var dataSet = new DataSetUpload
         {
-            Title = dataSetName,
             DataFileId = Guid.NewGuid(),
             DataFileName = dataFileName,
-            DataFileSize = testFixture.DataFile.ContentLength,
+            DataFileSizeInBytes = testFixture.DataFile.ContentLength,
             MetaFileId = Guid.NewGuid(),
             MetaFileName = metaFileName,
-            MetaFileSize = 157,
-            ReplacingFileId = testFixture.DataFile.Id
+            MetaFileSizeInBytes = 157,
+            ReplacingFileId = testFixture.DataFile.Id,
+            ReleaseVersionId = testFixture.ReleaseVersion.Id,
+            DataSetTitle = dataSetName,
+            Status = DataSetUploadStatus.SCREENING,
+            UploadedBy = _user.Email
         };
         
         var service = CreateServiceForApiPatchReplacement(testFixture, contentDbContext);
@@ -937,21 +939,26 @@ public class DataSetFileStorageTests
                 version: new SemVersion(2, 0, 0)
             );
         
-        var releaseFilesAndDataSets = testFixture.ReleaseFilesReplacing.Zip(dataSetNames, (releaseFile, dataSetName) => (releaseFile, dataSetName)).ToArray(); 
+        var releaseFilesAndDataSets = testFixture.ReleaseFilesReplacing!
+            .Zip(dataSetNames, 
+                (releaseFile, dataSetName) => (releaseFile, dataSetName)).ToArray(); 
 
-        var dataSets = new DataSetUploadResultViewModel[dataSetNames.Length];
+        var dataSets = new DataSetUpload[dataSetNames.Length];
         for (var i = 0; i < releaseFilesAndDataSets.Length; i++)
         {
-            dataSets[i] = new DataSetUploadResultViewModel
+            dataSets[i] = new DataSetUpload
             {
-                Title = releaseFilesAndDataSets[i].dataSetName,
+                DataFileSizeInBytes =  releaseFilesAndDataSets[i].releaseFile.File.ContentLength,
+                MetaFileSizeInBytes = 157,
+                ReleaseVersionId = testFixture.ReleaseVersion.Id,
+                DataSetTitle = releaseFilesAndDataSets[i].dataSetName,
+                Status = DataSetUploadStatus.SCREENING,
                 DataFileId = Guid.NewGuid(),
                 DataFileName = dataFileNames[i],
-                DataFileSize = 432,
                 MetaFileId = Guid.NewGuid(),
                 MetaFileName = metaFileNames[i],
-                MetaFileSize = 157,
-                ReplacingFileId = releaseFilesAndDataSets[i].releaseFile.FileId
+                ReplacingFileId = releaseFilesAndDataSets[i].releaseFile.FileId,
+                UploadedBy = _user.Email
             };
         }
 
