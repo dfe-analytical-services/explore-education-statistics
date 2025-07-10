@@ -44,4 +44,8 @@ public interface IReleaseFileRepository
         string? name = null,
         string? fileName = null,
         string? summary = null);
+
+    Task<Either<ActionResult, (ReleaseFile originalReleaseFile, ReleaseFile replacementReleaseFile)>>
+        CheckLinkedOriginalAndReplacementReleaseFilesExist(Guid releaseVersionId,
+            Guid originalFileId);
 }

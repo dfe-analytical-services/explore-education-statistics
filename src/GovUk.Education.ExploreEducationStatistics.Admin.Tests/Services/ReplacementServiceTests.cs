@@ -32,6 +32,7 @@ using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Options;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using Microsoft.Extensions.Options;
 using Semver;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
@@ -945,6 +946,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var originalFile = new File
             {
+                Id = Guid.NewGuid(),
                 Type = FileType.Data,
                 SubjectId = originalReleaseSubject.SubjectId
             };
@@ -1281,6 +1283,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 "Test footnote for Subject",
                 subject: originalReleaseSubject.Subject);
 
+            var releaseFileRepository = new Mock<IReleaseFileRepository>(Strict);
+            releaseFileRepository.Setup(mock => mock.CheckLinkedOriginalAndReplacementReleaseFilesExist(
+                    releaseVersion.Id, originalFile.Id))
+                .ReturnsAsync((originalReleaseFile, replacementReleaseFile));
+
             var locationRepository = new Mock<ILocationRepository>(Strict);
             locationRepository.Setup(service => service.GetDistinctForSubject(replacementReleaseSubject.SubjectId))
                 .ReturnsAsync(new List<Location>
@@ -1355,12 +1362,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     privateBlobCacheService: privateBlobCacheService.Object,
                     cacheKeyService: cacheKeyService.Object,
                     releaseVersionService: releaseVersionService.Object,
+                    releaseFileRepository: releaseFileRepository.Object,
                     replacementPlanService: BuildReplacementPlanService(
                         contentDbContext,
                         statisticsDbContext,
                         filterRepository: filterRepository,
                         locationRepository: locationRepository.Object,
-                        timePeriodService: timePeriodService.Object)
+                        timePeriodService: timePeriodService.Object,
+                        releaseFileRepository: releaseFileRepository.Object)
                     );
 
                 var result = await replacementService.Replace(
@@ -3095,6 +3104,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             IDataSetVersionService? dataSetVersionService = null,
             ITimePeriodService? timePeriodService = null,
             IDataSetVersionMappingService? dataSetVersionMappingService = null,
+            IReleaseFileRepository? releaseFileRepository = null,
             IOptions<FeatureFlagsOptions>? featureFlags = null)
         {
             featureFlags ??= Microsoft.Extensions.Options.Options.Create(new FeatureFlagsOptions()
@@ -3103,17 +3113,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             });
 
             return new ReplacementPlanService(
-                    contentDbContext,
-                    statisticsDbContext,
-                    filterRepository ?? Mock.Of<IFilterRepository>(Strict),
-                    new IndicatorRepository(statisticsDbContext),
-                    locationRepository ?? Mock.Of<ILocationRepository>(Strict),
-                    new FootnoteRepository(statisticsDbContext),
-                    dataSetVersionService ?? Mock.Of<IDataSetVersionService>(Strict),
-                    timePeriodService ?? Mock.Of<ITimePeriodService>(Strict),
-                    AlwaysTrueUserService().Object,
-                    dataSetVersionMappingService ?? Mock.Of<IDataSetVersionMappingService>(Strict),
-                    featureFlags);
+                contentDbContext,
+                statisticsDbContext,
+                filterRepository ?? Mock.Of<IFilterRepository>(Strict),
+                new IndicatorRepository(statisticsDbContext),
+                locationRepository ?? Mock.Of<ILocationRepository>(Strict),
+                new FootnoteRepository(statisticsDbContext),
+                dataSetVersionService ?? Mock.Of<IDataSetVersionService>(Strict),
+                timePeriodService ?? Mock.Of<ITimePeriodService>(Strict),
+                AlwaysTrueUserService().Object,
+                dataSetVersionMappingService ?? Mock.Of<IDataSetVersionMappingService>(Strict),
+                releaseFileRepository ?? Mock.Of<IReleaseFileRepository>(Strict),
+                featureFlags);
         }
 
         private static ReplacementService BuildReplacementService(
@@ -3121,6 +3132,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             StatisticsDbContext statisticsDbContext,
             IFilterRepository? filterRepository = null,
             IReleaseVersionService? releaseVersionService = null,
+            IReleaseFileRepository? releaseFileRepository = null,
             IReplacementPlanService? replacementPlanService = null,
             ICacheKeyService? cacheKeyService = null,
             IPrivateBlobCacheService? privateBlobCacheService = null
@@ -3132,6 +3144,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 filterRepository ?? new FilterRepository(statisticsDbContext),
                 new IndicatorGroupRepository(statisticsDbContext),
                 releaseVersionService ?? Mock.Of<IReleaseVersionService>(Strict),
+                releaseFileRepository ?? Mock.Of<IReleaseFileRepository>(Strict),
                 replacementPlanService ?? Mock.Of<IReplacementPlanService>(Strict),
                 cacheKeyService ?? Mock.Of<ICacheKeyService>(Strict),
                 privateBlobCacheService ?? Mock.Of<IPrivateBlobCacheService>(Strict)

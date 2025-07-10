@@ -14,6 +14,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
@@ -32,6 +33,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         IFilterRepository filterRepository,
         IIndicatorGroupRepository indicatorGroupRepository,
         IReleaseVersionService releaseVersionService,
+        IReleaseFileRepository releaseFileRepository,
         IReplacementPlanService replacementPlanService,
         ICacheKeyService cacheKeyService,
         IPrivateBlobCacheService privateCacheService)
@@ -42,7 +44,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 Guid originalFileId,
                 CancellationToken cancellationToken = default)
         {
-            return await CheckLinkedOriginalAndReplacementReleaseFilesExist(
+            return await releaseFileRepository.CheckLinkedOriginalAndReplacementReleaseFilesExist(
                     releaseVersionId: releaseVersionId,
                     originalFileId: originalFileId)
                 .OnSuccessCombineWith(async releaseFiles =>
@@ -110,8 +112,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
                     // To remove original, we first unlink the files. If we don't do this,
                     // ReleaseVersionService.RemoveDataFiles will remove the replacement file as well!
-                    originalReleaseFile.File.ReplacedById = null;
-                    replacementReleaseFile.File.ReplacingId = null;
+                    // @MarkFix YOU ARE HERE - the Replace test fails
+                    await contentDbContext.Files
+                        .Where(f => f.Id == originalReleaseFile.FileId)
+                        .ExecuteUpdateAsync(s => s.SetProperty(
+                            rf => rf.ReplacedById, (Guid?)null),
+                            cancellationToken: cancellationToken);
+                    await contentDbContext.Files
+                        .Where(f => f.Id == replacementReleaseFile.FileId)
+                        .ExecuteUpdateAsync(s => s.SetProperty(
+                            f => f.ReplacedById, (Guid?)null),
+                            cancellationToken: cancellationToken);
 
                     await contentDbContext.SaveChangesAsync(cancellationToken);
                     await statisticsDbContext.SaveChangesAsync(cancellationToken); // For footnotes
@@ -120,27 +131,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         releaseVersionId: releaseVersionId,
                         fileId: originalReleaseFile.FileId);
                 });
-        }
-
-        private async Task<Either<ActionResult, (ReleaseFile originalReleaseFile, ReleaseFile replacementReleaseFile)>>
-            CheckLinkedOriginalAndReplacementReleaseFilesExist(Guid releaseVersionId, Guid originalFileId) // @MarkFix move to ReleaseFileRepository
-        {
-            return await contentDbContext.ReleaseFiles
-                .Include(rf => rf.File)
-                .FirstOrNotFoundAsync(originalReleaseFile =>
-                    originalReleaseFile.ReleaseVersionId == releaseVersionId
-                    && originalReleaseFile.FileId == originalFileId
-                    && originalReleaseFile.File.Type == FileType.Data
-                    && originalReleaseFile.File.ReplacedById != null)
-                .OnSuccessCombineWith(async originalReleaseFile =>
-                    await contentDbContext.ReleaseFiles
-                        .Include(rf => rf.File)
-                        .FirstOrNotFoundAsync(replacementReleaseFile =>
-                            replacementReleaseFile.ReleaseVersionId == releaseVersionId
-                            && replacementReleaseFile.FileId == originalReleaseFile.File.ReplacedById
-                            && replacementReleaseFile.File.Type == FileType.Data
-                            && originalReleaseFile.FileId == replacementReleaseFile.File.ReplacingId))
-                .OnSuccess(releaseFiles => releaseFiles.ToValueTuple());
         }
 
         private async Task ReplaceLinksForDataBlock(DataBlockReplacementPlanViewModel replacementPlan,
