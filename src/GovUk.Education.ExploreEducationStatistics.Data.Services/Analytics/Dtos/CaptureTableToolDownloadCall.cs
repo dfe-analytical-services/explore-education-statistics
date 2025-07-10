@@ -2,7 +2,7 @@
 using GovUk.Education.ExploreEducationStatistics.Analytics.Common.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
 
-namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Analytics;
+namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Analytics.Dtos;
 
 public record CaptureTableToolDownloadCall : IAnalyticsCaptureRequest
 {

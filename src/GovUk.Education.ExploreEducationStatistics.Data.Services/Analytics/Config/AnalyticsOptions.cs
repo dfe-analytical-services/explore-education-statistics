@@ -1,7 +1,7 @@
 #nullable enable
 using Microsoft.Extensions.Configuration;
 
-namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Analytics;
+namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Analytics.Config;
 
 public class AnalyticsOptions
 {

@@ -3,8 +3,10 @@ using System.Threading;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Analytics.Common.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Analytics.Common.Strategies;
+using GovUk.Education.ExploreEducationStatistics.Data.Services.Analytics.Dtos;
+using GovUk.Education.ExploreEducationStatistics.Data.Services.Analytics.Utils;
 
-namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Analytics;
+namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Analytics.Writers;
 
 public class CapturePermaLinkTableDownloadCallAnalyticsWriteStrategy(
     IAnalyticsPathResolver analyticsPathResolver,
