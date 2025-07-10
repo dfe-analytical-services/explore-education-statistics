@@ -21,12 +21,12 @@ public record RecordTableToolDownloadRequestBindingModel
     {
         public Validator()
         {
-            RuleFor(dto => dto.ReleaseVersionId).NotNull().NotEmpty();
+            RuleFor(dto => dto.ReleaseVersionId).NotNull().NotEqual(Guid.Empty);
             RuleFor(dto => dto.PublicationName).NotNull().NotEmpty();
             RuleFor(dto => dto.ReleasePeriodAndLabel).NotNull().NotEmpty();
-            RuleFor(dto => dto.SubjectId).NotNull().NotEmpty();
+            RuleFor(dto => dto.SubjectId).NotNull().NotEqual(Guid.Empty);
             RuleFor(dto => dto.DataSetName).NotNull().NotEmpty();
-            RuleFor(dto => dto.DownloadFormat).NotNull();
+            RuleFor(dto => dto.DownloadFormat).NotNull().IsInEnum();
             RuleFor(dto => dto.Query).NotNull().NotEmpty();
         }
     }
