@@ -60,7 +60,7 @@ module applicationInsightsModule 'application/screenerApplicationInsights.bicep'
   name: 'screenerApplicationInsightsModule'
   params: {
     location: location
-    resourcePrefix: resourcePrefix
+    resourcePrefix: screenerResourcePrefix
     resourceNames: resourceNames
     tagValues: tagValues
   }
@@ -112,27 +112,31 @@ var tagValues = union(resourceTags ?? {}, {
 // The resource prefix for resources created in the ARM template.
 var legacyResourcePrefix = subscription
 
+// The resource prefix for more recent resources created in Bicep templates.
+var resourcePrefix = '${subscription}-ees'
+
 // The resource prefix for anything specific to the Screener API.
-var resourcePrefix = '${subscription}-ees-sapi'
+var screenerResourcePrefix = '${subscription}-ees-sapi'
 
 var resourceNames = {
   existingResources: {
     adminApp: '${legacyResourcePrefix}-as-ees-admin'
     keyVault: '${legacyResourcePrefix}-kv-ees-01'
+    logAnalyticsWorkspace: '${resourcePrefix}-${abbreviations.operationalInsightsWorkspaces}'
     vNet: '${legacyResourcePrefix}-vnet-ees'
     alertsGroup: '${legacyResourcePrefix}-ag-ees-alertedusers'
     subnets: {
       adminApp: '${legacyResourcePrefix}-snet-ees-admin'
-      screenerFunction: '${resourcePrefix}-snet-${abbreviations.webSitesFunctions}-screener'
-      screenerFunctionPrivateEndpoints: '${resourcePrefix}-snet-${abbreviations.storageStorageAccounts}-screener-pep'
+      screenerFunction: '${screenerResourcePrefix}-snet-${abbreviations.webSitesFunctions}-screener'
+      screenerFunctionPrivateEndpoints: '${screenerResourcePrefix}-snet-${abbreviations.storageStorageAccounts}-screener-pep'
     }
     coreStorageAccount: subscription == 's101t01' || subscription == 's101p02'
       ? '${legacyResourcePrefix}storageeescore'
       : '${legacyResourcePrefix}saeescore'
   }
   screener: {
-    screenerFunction: '${resourcePrefix}-${abbreviations.webSitesFunctions}-screener'
-    screenerFunctionStorageAccount: '${replace(resourcePrefix, '-', '')}${abbreviations.storageStorageAccounts}fn'
+    screenerFunction: '${screenerResourcePrefix}-${abbreviations.webSitesFunctions}-screener'
+    screenerFunctionStorageAccount: '${replace(screenerResourcePrefix, '-', '')}${abbreviations.storageStorageAccounts}fn'
   }
 }
 

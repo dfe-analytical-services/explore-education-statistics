@@ -1917,7 +1917,7 @@
         "PublicDataApi__AppRegistrationClientId": "[parameters('apiAppRegistrationClientId')]",
         "PublicDataProcessor__Url": "[concat('https://', variables('publicDataProcessorName'), '.azurewebsites.net')]",
         "PublicDataProcessor__AppRegistrationClientId": "[parameters('publicDataProcessorAppRegistrationClientId')]",
-        "DataScreener__Url": "[concat('https://', variables('dataScreenerName'), '.azurewebsites.net')]",
+        "DataScreener__Url": "[concat('https://', variables('dataScreenerName'), '.azurewebsites.net', '/api/screen')]",
         "FeatureFlags__EnableReplacementOfPublicApiDataSets": "[parameters('enableReplacementOfPublicApiDataSets')]"
         // "DataScreener__AppRegistrationClientId": "[parameters('dataScreenerAppRegistrationClientId')]"
       }
@@ -2329,6 +2329,11 @@
             {
               "condition": "[parameters('useSubnets')]",
               "id": "[variables('publicApiDataProcessorSubnetRef')]",
+              "action": "Allow"
+            },
+            {
+              "condition": "[parameters('useSubnets')]",
+              "id": "[variables('screenerFunctionAppSubnetName')]",
               "action": "Allow"
             }
           ],
