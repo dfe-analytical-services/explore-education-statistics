@@ -29,6 +29,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions
             return value;
         }
 
+        public static void AssertOkResult(this ActionResult result) => Assert.IsType<OkResult>(result);
+        
+
         public static T AssertOkResult<T>(this ActionResult<T> result, T? expectedValue = null) where T : class
         {
             Assert.IsAssignableFrom<ActionResult<T>>(result);
