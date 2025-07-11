@@ -240,7 +240,7 @@ Replace subject data
     user checks headed table body row cell contains    Metadata file    1    grouped-filters-and-indicators.meta.csv
     user checks headed table body row cell contains    Number of rows    1    100    wait=%{WAIT_SMALL}
     user checks headed table body row cell contains    Data file size    1    13 Kb
-    user checks headed table body row cell contains    Status    1    Complete    wait=%{WAIT_LONG}
+    user checks headed table body row cell contains    Data file import status    1    Complete    wait=%{WAIT_LONG}
 
     user checks headed table body row cell contains    Title    2    ${SUBJECT_NAME}
     user checks headed table body row cell contains    Data file    2    grouped-filters-and-indicators-replacement.csv
@@ -248,7 +248,8 @@ Replace subject data
     ...    grouped-filters-and-indicators-replacement.meta.csv
     user checks headed table body row cell contains    Number of rows    2    140    wait=%{WAIT_SMALL}
     user checks headed table body row cell contains    Data file size    2    19 Kb    wait=%{WAIT_SMALL}
-    user checks headed table body row cell contains    Status    2    Complete    wait=%{WAIT_DATA_FILE_IMPORT}
+    user checks headed table body row cell contains    Data file import status    2    Complete
+    ...    wait=%{WAIT_DATA_FILE_IMPORT}
 
 Confirm data replacement
     user waits until page contains    Data blocks: OK
