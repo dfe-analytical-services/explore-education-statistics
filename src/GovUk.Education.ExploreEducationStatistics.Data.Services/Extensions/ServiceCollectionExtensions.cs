@@ -1,4 +1,5 @@
-﻿using GovUk.Education.ExploreEducationStatistics.Analytics.Common.Extensions;
+﻿#nullable enable
+using GovUk.Education.ExploreEducationStatistics.Analytics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Analytics;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Analytics.Config;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Analytics.Utils;
