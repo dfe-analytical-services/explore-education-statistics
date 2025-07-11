@@ -8,11 +8,16 @@ public class PublicZipDownloadsProcessor(
     IAnalyticsPathResolver pathResolver,
     IProcessRequestFilesWorkflow workflow) : IRequestFileProcessor
 {
+    private static readonly string[] PublicZipDownloadsSubPath = ["public", "zip-downloads"];
+    
+    public string SourceDirectory => pathResolver.BuildSourceDirectory(PublicZipDownloadsSubPath);
+    public string ReportsDirectory => pathResolver.BuildReportsDirectory(PublicZipDownloadsSubPath);
+    
     public Task Process()
     {
         return workflow.Process(new WorkflowActor(
-            sourceDirectory: pathResolver.PublicZipDownloadsDirectoryPath(),
-            reportsDirectory: pathResolver.PublicZipDownloadsReportsDirectoryPath()));
+            sourceDirectory: SourceDirectory,
+            reportsDirectory: ReportsDirectory));
     }
 
     private class WorkflowActor(string sourceDirectory, string reportsDirectory) 

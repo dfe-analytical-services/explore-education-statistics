@@ -13,7 +13,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Analytics.Consumer.Tests.Se
 
 public abstract class PublicApiDataSetVersionCallsProcessorTests : ProcessorTestsBase
 {
-    private readonly string _queryResourcesPath = Path.Combine(
+    protected override string ResourcesPath => Path.Combine(
         Assembly.GetExecutingAssembly().GetDirectoryPath(),
         "Resources",
         "PublicApi",
@@ -24,22 +24,21 @@ public abstract class PublicApiDataSetVersionCallsProcessorTests : ProcessorTest
         [Fact]
         public async Task CoreDataSetVersionDetails_CapturedInReport()
         {
-            SetupRequestFile(PathResolver, "WithCoreDataSetVersionDetails.json");
-
             var service = BuildService();
+            SetupRequestFile(service, "WithCoreDataSetVersionDetails.json");
+
             await service.Process();
 
             // The root processing folder is safe to leave behind.
-            Assert.True(Directory.Exists(ProcessingDirectoryPath(PathResolver)));
+            Assert.True(Directory.Exists(ProcessingDirectoryPath(service)));
             
             // The temporary processing folder that was set up for this run of the processor
             // should have been cleared away.
-            Assert.False(Directory.Exists(TemporaryProcessingDirectoryPath(PathResolver)));
+            Assert.False(Directory.Exists(TemporaryProcessingDirectoryPath(service)));
             
-            Assert.True(Directory.Exists(PathResolver.PublicApiDataSetVersionCallsReportsDirectoryPath()));
-
-            var reports = Directory.GetFiles(PathResolver.PublicApiDataSetVersionCallsReportsDirectoryPath());
-
+            Assert.True(Directory.Exists(service.ReportsDirectory));
+            var reports = Directory.GetFiles(service.ReportsDirectory);
+            
             var queryReportFile = Assert.Single(reports);
 
             var duckDbConnection = new DuckDbConnection();
@@ -64,17 +63,16 @@ public abstract class PublicApiDataSetVersionCallsProcessorTests : ProcessorTest
         [Fact]
         public async Task WithPreviewTokenAndRequestedDataSetVersion_CapturedInReport()
         {
-            SetupRequestFile(PathResolver, "WithPreviewTokenAndRequestedDataSetVersion.json");
-
             var service = BuildService();
+            SetupRequestFile(service, "WithPreviewTokenAndRequestedDataSetVersion.json");
+
             await service.Process();
 
-            Assert.True(Directory.Exists(ProcessingDirectoryPath(PathResolver)));
-            Assert.False(Directory.Exists(TemporaryProcessingDirectoryPath(PathResolver)));
-            Assert.True(Directory.Exists(PathResolver.PublicApiDataSetVersionCallsReportsDirectoryPath()));
-
-            var reports = Directory.GetFiles(PathResolver.PublicApiDataSetVersionCallsReportsDirectoryPath());
-
+            Assert.True(Directory.Exists(ProcessingDirectoryPath(service)));
+            Assert.False(Directory.Exists(TemporaryProcessingDirectoryPath(service)));
+            Assert.True(Directory.Exists(service.ReportsDirectory));
+            
+            var reports = Directory.GetFiles(service.ReportsDirectory);
             var queryReportFile = Assert.Single(reports);
 
             var duckDbConnection = new DuckDbConnection();
@@ -99,17 +97,16 @@ public abstract class PublicApiDataSetVersionCallsProcessorTests : ProcessorTest
         [Fact]
         public async Task WithParameters_CapturedInReport()
         {
-            SetupRequestFile(PathResolver, "WithParameters.json");
-
             var service = BuildService();
+            SetupRequestFile(service, "WithParameters.json");
+
             await service.Process();
 
-            Assert.True(Directory.Exists(ProcessingDirectoryPath(PathResolver)));
-            Assert.False(Directory.Exists(TemporaryProcessingDirectoryPath(PathResolver)));
-            Assert.True(Directory.Exists(PathResolver.PublicApiDataSetVersionCallsReportsDirectoryPath()));
-
-            var reports = Directory.GetFiles(PathResolver.PublicApiDataSetVersionCallsReportsDirectoryPath());
-
+            Assert.True(Directory.Exists(ProcessingDirectoryPath(service)));
+            Assert.False(Directory.Exists(TemporaryProcessingDirectoryPath(service)));
+            Assert.True(Directory.Exists(service.ReportsDirectory));
+            
+            var reports = Directory.GetFiles(service.ReportsDirectory);
             var queryReportFile = Assert.Single(reports);
 
             var duckDbConnection = new DuckDbConnection();
@@ -134,19 +131,18 @@ public abstract class PublicApiDataSetVersionCallsProcessorTests : ProcessorTest
         [Fact]
         public async Task MultipleCalls_CapturedInReport()
         {
-            SetupRequestFile(PathResolver, "WithCoreDataSetVersionDetails.json");
-            SetupRequestFile(PathResolver, "WithParameters.json");
-            SetupRequestFile(PathResolver, "WithPreviewTokenAndRequestedDataSetVersion.json");
-
             var service = BuildService();
+            SetupRequestFile(service, "WithCoreDataSetVersionDetails.json");
+            SetupRequestFile(service, "WithParameters.json");
+            SetupRequestFile(service, "WithPreviewTokenAndRequestedDataSetVersion.json");
+
             await service.Process();
 
-            Assert.True(Directory.Exists(ProcessingDirectoryPath(PathResolver)));
-            Assert.False(Directory.Exists(TemporaryProcessingDirectoryPath(PathResolver)));
-            Assert.True(Directory.Exists(PathResolver.PublicApiDataSetVersionCallsReportsDirectoryPath()));
-
-            var reports = Directory.GetFiles(PathResolver.PublicApiDataSetVersionCallsReportsDirectoryPath());
-
+            Assert.True(Directory.Exists(ProcessingDirectoryPath(service)));
+            Assert.False(Directory.Exists(TemporaryProcessingDirectoryPath(service)));
+            Assert.True(Directory.Exists(service.ReportsDirectory));
+            
+            var reports = Directory.GetFiles(service.ReportsDirectory);
             var queryReportFile = Assert.Single(reports);
 
             var duckDbConnection = new DuckDbConnection();
@@ -241,25 +237,6 @@ public abstract class PublicApiDataSetVersionCallsProcessorTests : ProcessorTest
             workflow: Workflow);
     }
 
-    private void SetupRequestFile(TestAnalyticsPathResolver pathResolver, string filename)
-    {
-        Directory.CreateDirectory(pathResolver.PublicApiDataSetVersionCallsDirectoryPath());
-
-        var sourceFilePath = Path.Combine(_queryResourcesPath, filename);
-        File.Copy(sourceFilePath, Path.Combine(pathResolver.PublicApiDataSetVersionCallsDirectoryPath(), filename));
-    }
-    
-    private static string ProcessingDirectoryPath(TestAnalyticsPathResolver pathResolver)
-    {
-        return Path.Combine(pathResolver.PublicApiDataSetVersionCallsDirectoryPath(), "processing");
-    }
-    
-    private static string TemporaryProcessingDirectoryPath(TestAnalyticsPathResolver pathResolver)
-    {
-        return Path.Combine(ProcessingDirectoryPath(pathResolver), "temp-processing-folder");
-    }
-    
-    // ReSharper disable once ClassNeverInstantiated.Local
     private record QueryReportLine
     {
         public Guid DataSetId { get; init; }

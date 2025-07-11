@@ -6,93 +6,10 @@ public abstract class AnalyticsPathResolverBase : IAnalyticsPathResolver
 {
     public abstract string GetBasePath();
 
-    private static readonly string[] PublicApiTopLevelSubPath = ["public-api", "top-level"];
-    private static readonly string[] PublicApiPublicationSubPath = ["public-api", "publications"];
-    private static readonly string[] PublicApiDataSetsSubPath = ["public-api", "data-sets"];
-    private static readonly string[] PublicApiDataSetVersionsSubPath = ["public-api", "data-set-versions"];
-    private static readonly string[] PublicApiQueriesSubPath = ["public-api", "queries"];
-    private static readonly string[] PublicZipDownloadsSubPath = ["public", "zip-downloads"];
-    private static readonly string[] PublicCsvDownloadsSubPath = ["public", "csv-downloads"];
-        
-    // PublicApiTopLevel
-    public string PublicApiTopLevelCallsDirectoryPath()
-    {
-        return Path.Combine([GetBasePath(), ..PublicApiTopLevelSubPath]);
-    }
-
-    public string PublicApiTopLevelCallsReportsDirectoryPath()
-    {
-        return Path.Combine([ReportsDirectoryPath(), ..PublicApiTopLevelSubPath]);
-    }
     
-    // PublicApiPublicationLevel
-    public string PublicApiPublicationCallsDirectoryPath()
-    {
-        return Path.Combine([GetBasePath(), ..PublicApiPublicationSubPath]);
-    }
+    public string BuildSourceDirectory(string[] subPaths) => Path.Combine([GetBasePath(), ..subPaths]);
 
-    public string PublicApiPublicationCallsReportsDirectoryPath()
-    {
-        return Path.Combine([ReportsDirectoryPath(), ..PublicApiPublicationSubPath]);
-    }
-    
-    // PublicApiDataSets
-    public string PublicApiDataSetCallsDirectoryPath()
-    {
-        return Path.Combine([GetBasePath(), ..PublicApiDataSetsSubPath]);
-    }
+    public string BuildReportsDirectory(string[] subPaths) => Path.Combine([ReportsDirectoryPath(), ..subPaths]);
 
-    public string PublicApiDataSetCallsReportsDirectoryPath()
-    {
-        return Path.Combine([ReportsDirectoryPath(), ..PublicApiDataSetsSubPath]);
-    }
-
-    // PublicApiDataSetVersions
-    public string PublicApiDataSetVersionCallsDirectoryPath()
-    {
-        return Path.Combine([GetBasePath(), ..PublicApiDataSetVersionsSubPath]);
-    }
-
-    public string PublicApiDataSetVersionCallsReportsDirectoryPath()
-    {
-        return Path.Combine([ReportsDirectoryPath(), ..PublicApiDataSetVersionsSubPath]);
-    }
-
-    // PublicApiQueries
-    public string PublicApiQueriesDirectoryPath()
-    {
-        return Path.Combine([GetBasePath(), ..PublicApiQueriesSubPath]);
-    }
-
-    public string PublicApiQueriesReportsDirectoryPath()
-    {
-        return Path.Combine([ReportsDirectoryPath(), ..PublicApiQueriesSubPath]);
-    }
-
-    // PublicZipDownloads
-    public string PublicZipDownloadsDirectoryPath()
-    {
-        return Path.Combine([GetBasePath(), ..PublicZipDownloadsSubPath]);
-    }
-
-    public string PublicZipDownloadsReportsDirectoryPath()
-    {
-        return Path.Combine([ReportsDirectoryPath(), ..PublicZipDownloadsSubPath]);
-    }
-
-    // PublicCsvDownloads
-    public string PublicCsvDownloadsDirectoryPath()
-    {
-        return Path.Combine([GetBasePath(), ..PublicCsvDownloadsSubPath]);
-    }
-
-    public string PublicCsvDownloadsReportsDirectoryPath()
-    {
-        return Path.Combine([ReportsDirectoryPath(), ..PublicCsvDownloadsSubPath]);
-    }
-    
-    private string ReportsDirectoryPath()
-    {
-        return Path.Combine(GetBasePath(), "reports");
-    }
+    private string ReportsDirectoryPath() => Path.Combine(GetBasePath(), "reports");
 }

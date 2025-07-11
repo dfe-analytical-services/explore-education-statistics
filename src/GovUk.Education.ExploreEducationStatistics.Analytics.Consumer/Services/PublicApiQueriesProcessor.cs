@@ -9,11 +9,16 @@ public class PublicApiQueriesProcessor(
     IAnalyticsPathResolver pathResolver,
     IProcessRequestFilesWorkflow workflow) : IRequestFileProcessor
 {
+    private static readonly string[] PublicApiQueriesSubPath = ["public-api", "queries"];
+    
+    public string SourceDirectory => pathResolver.BuildSourceDirectory(PublicApiQueriesSubPath);
+    public string ReportsDirectory => pathResolver.BuildReportsDirectory(PublicApiQueriesSubPath);
+    
     public Task Process()
     {
         return workflow.Process(new WorkflowActor(
-            sourceDirectory: pathResolver.PublicApiQueriesDirectoryPath(),
-            reportsDirectory: pathResolver.PublicApiQueriesReportsDirectoryPath()));
+            sourceDirectory: SourceDirectory,
+            reportsDirectory: ReportsDirectory));;
     }
 
     private class WorkflowActor(string sourceDirectory, string reportsDirectory) 

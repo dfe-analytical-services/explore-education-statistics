@@ -29,7 +29,6 @@ public class AnalyticsPathResolver : AnalyticsPathResolverBase
         {
             _basePath = originalPath;
         }
-
     }
 
     public override string GetBasePath()
