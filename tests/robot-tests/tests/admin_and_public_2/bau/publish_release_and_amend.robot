@@ -520,7 +520,7 @@ Navigate to data replacement page
     user checks headed table body row contains    Metadata file    dates.meta.csv
     user checks headed table body row contains    Number of rows    118    wait=%{WAIT_SMALL}
     user checks headed table body row contains    Data file size    17 Kb    wait=%{WAIT_SMALL}
-    user checks headed table body row contains    Status    Complete    wait=%{WAIT_LONG}
+    user checks headed table body row contains    Data file import status    Complete    wait=%{WAIT_LONG}
 
 Upload replacement data
     user waits until h2 is visible    Upload replacement data    %{WAIT_MEDIUM}
