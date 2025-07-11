@@ -30,7 +30,7 @@ param contentApiUrl string
 param searchDocsFunctionAppExists bool = true
 
 @description('Specifies the name of the Azure AI Search indexer.')
-param searchServiceIndexerName string
+param searchServiceIndexerName string = ''
 
 @description('Controls the availability of semantic ranking for all indexes. Set to \'free\' for limited query volume on the free plan, \'standard\' for unlimited volume on the standard pricing plan, or \'disabled\' to turn it off.')
 @allowed([
