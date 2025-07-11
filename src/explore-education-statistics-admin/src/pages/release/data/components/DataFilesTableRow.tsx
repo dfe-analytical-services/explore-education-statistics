@@ -68,14 +68,18 @@ export default function DataFilesTableRow({
       </p>
       <p>
         <Link
-          to={generatePath<ReleaseDataSetRouteParams>(
-            releaseApiDataSetDetailsRoute.path,
-            {
-              publicationId,
-              releaseVersionId,
-              dataSetId: dataFile.publicApiDataSetId ?? '',
-            },
-          )}
+          to={
+            dataFile.publicApiDataSetId
+              ? generatePath<ReleaseDataSetRouteParams>(
+                  releaseApiDataSetDetailsRoute.path,
+                  {
+                    publicationId,
+                    releaseVersionId,
+                    dataSetId: dataFile.publicApiDataSetId,
+                  },
+                )
+              : {}
+          }
         >
           Go to API data set
         </Link>
