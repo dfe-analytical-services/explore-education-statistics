@@ -139,6 +139,18 @@ describe('ReleaseContentPage', () => {
       },
       methodologies: [],
     },
+    publishingOrganisations: [
+      {
+        id: 'org-id-1',
+        title: 'Department for Education',
+        url: 'https://www.gov.uk/government/organisations/department-for-education',
+      },
+      {
+        id: 'org-id-2',
+        title: 'Other Organisation',
+        url: 'https://example.com',
+      },
+    ],
     relatedInformation: [],
     slug: '2020-21',
     summarySection: {
@@ -607,6 +619,10 @@ describe('ReleaseContentPage', () => {
 
       expect(screen.getByTestId('Release type-value')).toHaveTextContent(
         'Official statistics',
+      );
+
+      expect(screen.getByTestId('Produced by-value')).toHaveTextContent(
+        'Department for Education and Other Organisation',
       );
 
       expect(
