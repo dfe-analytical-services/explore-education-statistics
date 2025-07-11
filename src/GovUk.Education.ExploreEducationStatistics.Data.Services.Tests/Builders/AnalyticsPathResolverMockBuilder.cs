@@ -28,11 +28,11 @@ public class AnalyticsPathResolverMockBuilder
     {
         public void GetPermaLinkTableDownloadCallsDirectoryPathRequested()
         {
-            mock.Verify(m => m.GetPermaLinkTableDownloadCallsDirectoryPath(), Times.Once);;
+            mock.Verify(m => m.GetPermaLinkTableDownloadCallsDirectoryPath(), Times.Once);
         }
         public void GetTableToolDownloadCallsDirectoryPathRequested()
         {
-            mock.Verify(m => m.GetTableToolDownloadCallsDirectoryPath(), Times.Once);;
+            mock.Verify(m => m.GetTableToolDownloadCallsDirectoryPath(), Times.Once);
         }
     }
 }
