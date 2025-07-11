@@ -30,12 +30,12 @@ param storageFirewallRules IpRange[]
 @description('IP address ranges that are allowed to access the Function App endpoints. Dependent on "publicNetworkAccessEnabled" being true.')
 param functionAppFirewallRules FirewallRule[] = []
 
-// @description('Specifies the Application (Client) Id of a pre-existing App Registration used to represent the Screener Function App.')
-// param screenerAppRegistrationClientId string
+@description('Specifies the Application (Client) Id of a pre-existing App Registration used to represent the Screener Function App.')
+param screenerAppRegistrationClientId string
 
-// @description('Specifies the principal id of the Azure DevOps SPN.')
-// @secure()
-// param devopsServicePrincipalId string
+@description('Specifies the principal id of the Azure DevOps SPN.')
+@secure()
+param devopsServicePrincipalId string
 
 @description('The access key name for the Core storage account.')
 @secure()
@@ -78,16 +78,16 @@ resource privateEndpointSubnet 'Microsoft.Network/virtualNetworks/subnets@2023-1
   parent: vNet
 }
 
-// resource adminAppService 'Microsoft.Web/sites@2023-12-01' existing = {
-//   name: resourceNames.existingResources.adminApp
-// }
+resource adminAppService 'Microsoft.Web/sites@2023-12-01' existing = {
+  name: resourceNames.existingResources.adminApp
+}
 
-// resource adminAppServiceIdentity 'Microsoft.ManagedIdentity/identities@2023-01-31' existing = {
-//   scope: adminAppService
-//   name: 'default'
-// }
+resource adminAppServiceIdentity 'Microsoft.ManagedIdentity/identities@2023-01-31' existing = {
+  scope: adminAppService
+  name: 'default'
+}
 
-// var adminAppClientId = adminAppServiceIdentity.properties.clientId
+var adminAppClientId = adminAppServiceIdentity.properties.clientId
 
 module containerisedFunctionAppModule '../../common/components/containerisedFunctionApp.bicep' = {
   name: 'screenerContainerisedFunctionAppModuleDeploy'
@@ -122,20 +122,15 @@ module containerisedFunctionAppModule '../../common/components/containerisedFunc
     ]
     functionAppExists: functionAppExists
     keyVaultName: keyVault.name
-    // entraIdAuthentication: {
-    //   appRegistrationClientId: screenerAppRegistrationClientId
-    //   allowedClientIds: [
-    //     adminAppClientId
-    //     devopsServicePrincipalId
-    //   ]
-    //   allowedPrincipalIds: []
-    //   requireAuthentication: true
-    // }
-    // userAssignedManagedIdentityParams: {
-    //   id: screenerFunctionAppManagedIdentity.id
-    //   name: screenerFunctionAppManagedIdentity.name
-    //   principalId: screenerFunctionAppManagedIdentity.properties.principalId
-    // }
+    entraIdAuthentication: {
+      appRegistrationClientId: screenerAppRegistrationClientId
+      allowedClientIds: [
+        adminAppClientId
+        devopsServicePrincipalId
+      ]
+      allowedPrincipalIds: []
+      requireAuthentication: true
+    }
     dockerPullManagedIdentityClientId: keyVault.getSecret('DOCKER-REGISTRY-SERVER-USERNAME')
     dockerPullManagedIdentitySecretValue: keyVault.getSecret('DOCKER-REGISTRY-SERVER-PASSWORD')
     deploymentStorageAccountName: resourceNames.screener.screenerFunctionStorageAccount

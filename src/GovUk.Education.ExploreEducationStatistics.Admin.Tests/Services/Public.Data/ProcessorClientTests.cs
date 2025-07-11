@@ -1,4 +1,11 @@
 #nullable enable
+using System;
+using System.Net;
+using System.Net.Http;
+using System.Net.Http.Json;
+using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Admin.Options;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Authentication;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
@@ -7,14 +14,6 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using Newtonsoft.Json;
 using RichardSzalay.MockHttp;
-using System;
-using System.Net;
-using System.Net.Http;
-using System.Net.Http.Json;
-using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Admin.Options;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Options;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Public.Data;
 
@@ -22,18 +21,12 @@ public class ProcessorClientTests
 {
     private static readonly Uri BaseUri = new("http://localhost");
     private readonly MockHttpMessageHandler _mockHttp;
-    private readonly ProcessorClient _processorClient;
 
-    public ProcessorClientTests()
+    protected ProcessorClientTests()
     {
         _mockHttp = new MockHttpMessageHandler();
         var client = _mockHttp.ToHttpClient();
         client.BaseAddress = BaseUri;
-        _processorClient = new ProcessorClient(
-            Mock.Of<ILogger<ProcessorClient>>(), 
-            client, 
-            Mock.Of<IOptions<PublicDataProcessorOptions>>(), 
-            Mock.Of<IWebHostEnvironment>());
     }
 
     public class CreateDataSetTests : ProcessorClientTests
@@ -71,12 +64,12 @@ public class ProcessorClientTests
                     HttpStatusCode.BadRequest,
                     JsonContent.Create(new ValidationProblemViewModel
                     {
-                        Errors = new ErrorViewModel[]
-                        {
+                        Errors =
+                        [
                             new() {
                                Code = Errors.Error1.ToString()
                             }
-                        }
+                        ]
                     }));
 
             var response = await _processorClient.CreateDataSet(releaseFileId: Guid.NewGuid());
@@ -142,12 +135,12 @@ public class ProcessorClientTests
                     HttpStatusCode.BadRequest,
                     JsonContent.Create(new ValidationProblemViewModel
                     {
-                        Errors = new ErrorViewModel[]
-                        {
+                        Errors =
+                        [
                             new() {
                                Code = Errors.Error1.ToString()
                             }
-                        }
+                        ]
                     }));
 
             var response = await _processorClient.DeleteDataSetVersion(dataSetVersionId);
@@ -229,12 +222,12 @@ public class ProcessorClientTests
                     HttpStatusCode.BadRequest,
                     JsonContent.Create(new ValidationProblemViewModel
                     {
-                        Errors = new ErrorViewModel[]
-                        {
+                        Errors =
+                        [
                             new() {
                                Code = Errors.Error1.ToString()
                             }
-                        }
+                        ]
                     }));
 
             var response = await _processorClient.BulkDeleteDataSetVersions(releaseVersionId);
