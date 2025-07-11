@@ -3,6 +3,7 @@ using GovUk.Education.ExploreEducationStatistics.Analytics.Consumer.Services;
 using GovUk.Education.ExploreEducationStatistics.Analytics.Consumer.Services.Workflow;
 using GovUk.Education.ExploreEducationStatistics.Common.DuckDb.DuckDb;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using InterpolatedSql.Dapper;
 using Microsoft.Extensions.Logging;
 using Moq;
@@ -10,9 +11,9 @@ using Xunit;
 
 namespace GovUk.Education.ExploreEducationStatistics.Analytics.Consumer.Tests.Services;
 
-public abstract class PublicApiPublicationCallsProcessorTests
+public abstract class PublicApiPublicationCallsProcessorTests : ProcessorTestsBase
 {
-    private readonly string _queryResourcesPath = Path.Combine(
+    protected override string ResourcesPath => Path.Combine(
         Assembly.GetExecutingAssembly().GetDirectoryPath(),
         "Resources",
         "PublicApi",
@@ -21,45 +22,22 @@ public abstract class PublicApiPublicationCallsProcessorTests
     public class ProcessTests : PublicApiPublicationCallsProcessorTests
     {
         [Fact]
-        public async Task ProcessorUsesWorkflow()
-        {
-            using var pathResolver = new TestAnalyticsPathResolver();
-
-            var workflow = new Mock<IProcessRequestFilesWorkflow>(MockBehavior.Strict);
-
-            workflow
-                .Setup(s => s.Process(It.IsAny<IWorkflowActor>()))
-                .Returns(Task.CompletedTask);
-            
-            var service = BuildService(
-                pathResolver: pathResolver,
-                workflow: workflow.Object);
-            
-            await service.Process();
-
-            workflow.Verify(s => s.Process(It.IsAny<IWorkflowActor>()), Times.Once);
-        }
-
-        [Fact]
         public async Task CorePublicationDetails_CapturedInReport()
         {
-            using var pathResolver = new TestAnalyticsPathResolver();
-            SetupRequestFile(pathResolver, "WithCorePublicationDetails.json");
+            var service = BuildService();
+            SetupRequestFile(service, "WithCorePublicationDetails.json");
 
-            var service = BuildService(pathResolver: pathResolver);
             await service.Process();
 
             // The root processing folder is safe to leave behind.
-            Assert.True(Directory.Exists(ProcessingDirectoryPath(pathResolver)));
+            Assert.True(Directory.Exists(ProcessingDirectoryPath(service)));
             
             // The temporary processing folder that was set up for this run of the processor
             // should have been cleared away.
-            Assert.False(Directory.Exists(TemporaryProcessingDirectoryPath(pathResolver)));
+            Assert.False(Directory.Exists(TemporaryProcessingDirectoryPath(service)));
+            Assert.True(Directory.Exists(service.ReportsDirectory));
             
-            Assert.True(Directory.Exists(pathResolver.PublicApiPublicationCallsReportsDirectoryPath()));
-
-            var reports = Directory.GetFiles(pathResolver.PublicApiPublicationCallsReportsDirectoryPath());
-
+            var reports = Directory.GetFiles(service.ReportsDirectory);
             var queryReportFile = Assert.Single(reports);
 
             var duckDbConnection = new DuckDbConnection();
@@ -82,18 +60,16 @@ public abstract class PublicApiPublicationCallsProcessorTests
         [Fact]
         public async Task WithParameters_CapturedInReport()
         {
-            using var pathResolver = new TestAnalyticsPathResolver();
-            SetupRequestFile(pathResolver, "WithParameters.json");
+            var service = BuildService();
+            SetupRequestFile(service, "WithParameters.json");
 
-            var service = BuildService(pathResolver: pathResolver);
             await service.Process();
 
-            Assert.True(Directory.Exists(ProcessingDirectoryPath(pathResolver)));
-            Assert.False(Directory.Exists(TemporaryProcessingDirectoryPath(pathResolver)));
-            Assert.True(Directory.Exists(pathResolver.PublicApiPublicationCallsReportsDirectoryPath()));
-
-            var reports = Directory.GetFiles(pathResolver.PublicApiPublicationCallsReportsDirectoryPath());
-
+            Assert.True(Directory.Exists(ProcessingDirectoryPath(service)));
+            Assert.False(Directory.Exists(TemporaryProcessingDirectoryPath(service)));
+            Assert.True(Directory.Exists(service.ReportsDirectory));
+            
+            var reports = Directory.GetFiles(service.ReportsDirectory);
             var queryReportFile = Assert.Single(reports);
 
             var duckDbConnection = new DuckDbConnection();
@@ -116,19 +92,17 @@ public abstract class PublicApiPublicationCallsProcessorTests
         [Fact]
         public async Task MultipleCalls_CapturedInReport()
         {
-            using var pathResolver = new TestAnalyticsPathResolver();
-            SetupRequestFile(pathResolver, "WithCorePublicationDetails.json");
-            SetupRequestFile(pathResolver, "WithParameters.json");
+            var service = BuildService();
+            SetupRequestFile(service, "WithCorePublicationDetails.json");
+            SetupRequestFile(service, "WithParameters.json");
 
-            var service = BuildService(pathResolver: pathResolver);
             await service.Process();
 
-            Assert.True(Directory.Exists(ProcessingDirectoryPath(pathResolver)));
-            Assert.False(Directory.Exists(TemporaryProcessingDirectoryPath(pathResolver)));
-            Assert.True(Directory.Exists(pathResolver.PublicApiPublicationCallsReportsDirectoryPath()));
-
-            var reports = Directory.GetFiles(pathResolver.PublicApiPublicationCallsReportsDirectoryPath());
-
+            Assert.True(Directory.Exists(ProcessingDirectoryPath(service)));
+            Assert.False(Directory.Exists(TemporaryProcessingDirectoryPath(service)));
+            Assert.True(Directory.Exists(service.ReportsDirectory));
+            
+            var reports = Directory.GetFiles(service.ReportsDirectory);
             var queryReportFile = Assert.Single(reports);
 
             var duckDbConnection = new DuckDbConnection();
@@ -186,33 +160,11 @@ public abstract class PublicApiPublicationCallsProcessorTests
         }
     }
 
-    private PublicApiPublicationCallsProcessor BuildService(
-        TestAnalyticsPathResolver pathResolver,
-        IProcessRequestFilesWorkflow? workflow = null)
+    private PublicApiPublicationCallsProcessor BuildService()
     {
         return new PublicApiPublicationCallsProcessor(
-            pathResolver: pathResolver,
-            workflow: workflow ?? new ProcessRequestFilesWorkflow(
-                logger: Mock.Of<ILogger<ProcessRequestFilesWorkflow>>(),
-                temporaryProcessingFolderNameGenerator: () => "temp-processing-folder"));
-    }
-
-    private void SetupRequestFile(TestAnalyticsPathResolver pathResolver, string filename)
-    {
-        Directory.CreateDirectory(pathResolver.PublicApiPublicationCallsDirectoryPath());
-
-        var sourceFilePath = Path.Combine(_queryResourcesPath, filename);
-        File.Copy(sourceFilePath, Path.Combine(pathResolver.PublicApiPublicationCallsDirectoryPath(), filename));
-    }
-    
-    private static string ProcessingDirectoryPath(TestAnalyticsPathResolver pathResolver)
-    {
-        return Path.Combine(pathResolver.PublicApiPublicationCallsDirectoryPath(), "processing");
-    }
-    
-    private static string TemporaryProcessingDirectoryPath(TestAnalyticsPathResolver pathResolver)
-    {
-        return Path.Combine(ProcessingDirectoryPath(pathResolver), "temp-processing-folder");
+            pathResolver: PathResolver,
+            workflow: Workflow);
     }
     
     // ReSharper disable once ClassNeverInstantiated.Local

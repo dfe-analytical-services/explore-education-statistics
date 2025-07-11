@@ -3,6 +3,7 @@ using GovUk.Education.ExploreEducationStatistics.Analytics.Consumer.Services;
 using GovUk.Education.ExploreEducationStatistics.Analytics.Consumer.Services.Workflow;
 using GovUk.Education.ExploreEducationStatistics.Common.DuckDb.DuckDb;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using InterpolatedSql.Dapper;
 using Microsoft.Extensions.Logging;
 using Moq;
@@ -10,9 +11,9 @@ using Xunit;
 
 namespace GovUk.Education.ExploreEducationStatistics.Analytics.Consumer.Tests.Services;
 
-public abstract class PublicApiQueriesProcessorTests
+public abstract class PublicApiQueriesProcessorTests : ProcessorTestsBase
 {
-    private readonly string _queryResourcesPath = Path.Combine(
+    protected override string ResourcesPath => Path.Combine(
         Assembly.GetExecutingAssembly().GetDirectoryPath(),
         "Resources",
         "PublicApi",
@@ -21,46 +22,22 @@ public abstract class PublicApiQueriesProcessorTests
     public class ProcessTests : PublicApiQueriesProcessorTests
     {
         [Fact]
-        public async Task ProcessorUsesWorkflow()
-        {
-            using var pathResolver = new TestAnalyticsPathResolver();
-
-            var workflow = new Mock<IProcessRequestFilesWorkflow>(MockBehavior.Strict);
-
-            workflow
-                .Setup(s => s.Process(It.IsAny<IWorkflowActor>()))
-                .Returns(Task.CompletedTask);
-            
-            var service = BuildService(
-                pathResolver: pathResolver,
-                workflow: workflow.Object);
-            
-            await service.Process();
-
-            workflow.Verify(s => s.Process(It.IsAny<IWorkflowActor>()), Times.Once);
-        }
-
-        [Fact]
         public async Task SingleSourceQuery_ProducesOneReportRow()
         {
-            using var pathResolver = new TestAnalyticsPathResolver();
-            SetupRequestFile(pathResolver, "Query1Request.json");
+            var service = BuildService();
+            SetupRequestFile(service, "Query1Request.json");
 
-            var service = BuildService(
-                pathResolver: pathResolver);
             await service.Process();
 
             // The root processing folder is safe to leave behind.
-            Assert.True(Directory.Exists(ProcessingDirectoryPath(pathResolver)));
+            Assert.True(Directory.Exists(ProcessingDirectoryPath(service)));
             
             // The temporary processing folder that was set up for this run of the processor
             // should have been cleared away.
-            Assert.False(Directory.Exists(TemporaryProcessingDirectoryPath(pathResolver)));
+            Assert.False(Directory.Exists(TemporaryProcessingDirectoryPath(service)));
+            Assert.True(Directory.Exists(service.ReportsDirectory));
             
-            Assert.True(Directory.Exists(pathResolver.PublicApiQueriesReportsDirectoryPath()));
-
-            var reports = Directory.GetFiles(pathResolver.PublicApiQueriesReportsDirectoryPath());
-
+            var reports = Directory.GetFiles(service.ReportsDirectory);
             Assert.Equal(2, reports.Length);
 
             var queryReportFile = reports.Single(file => file.EndsWith("public-api-queries.parquet"));
@@ -116,16 +93,13 @@ public abstract class PublicApiQueriesProcessorTests
         [Fact]
         public async Task TwoDifferentSourceQueries_ProduceTwoDistinctReportRows()
         {
-            using var pathResolver = new TestAnalyticsPathResolver();
+            var service = BuildService();
+            SetupRequestFile(service, "Query1Request.json");
+            SetupRequestFile(service, "Query2Request1.json");
 
-            SetupRequestFile(pathResolver, "Query1Request.json");
-            SetupRequestFile(pathResolver, "Query2Request1.json");
-
-            var service = BuildService(
-                pathResolver: pathResolver);
             await service.Process();
 
-            var reports = Directory.GetFiles(pathResolver.PublicApiQueriesReportsDirectoryPath());
+            var reports = Directory.GetFiles(service.ReportsDirectory);
 
             Assert.Equal(2, reports.Length);
 
@@ -201,17 +175,14 @@ public abstract class PublicApiQueriesProcessorTests
         [Fact]
         public async Task MultipleSourceFilesForSameQuery_ProduceSingleQueryRowAndMultipleQueryAccessRows()
         {
-            using var pathResolver = new TestAnalyticsPathResolver();
+            var service = BuildService();
+            SetupRequestFile(service, "Query2Request1.json");
+            SetupRequestFile(service, "Query2Request2.json");
+            SetupRequestFile(service, "Query2Request3.json");
 
-            SetupRequestFile(pathResolver, "Query2Request1.json");
-            SetupRequestFile(pathResolver, "Query2Request2.json");
-            SetupRequestFile(pathResolver, "Query2Request3.json");
-
-            var service = BuildService(
-                pathResolver: pathResolver);
             await service.Process();
 
-            var reports = Directory.GetFiles(pathResolver.PublicApiQueriesReportsDirectoryPath());
+            var reports = Directory.GetFiles(service.ReportsDirectory);
 
             Assert.Equal(2, reports.Length);
 
@@ -291,16 +262,13 @@ public abstract class PublicApiQueriesProcessorTests
         [Fact]
         public async Task SameQueryStructureButDifferentDataSetVersion_ProducesTwoDistinctReportRows()
         {
-            using var pathResolver = new TestAnalyticsPathResolver();
+            var service = BuildService();
+            SetupRequestFile(service, "Query1Request.json");
+            SetupRequestFile(service, "Query1RequestMinorVersionUpdate.json");
 
-            SetupRequestFile(pathResolver, "Query1Request.json");
-            SetupRequestFile(pathResolver, "Query1RequestMinorVersionUpdate.json");
-
-            var service = BuildService(
-                pathResolver: pathResolver);
             await service.Process();
 
-            var reports = Directory.GetFiles(pathResolver.PublicApiQueriesReportsDirectoryPath());
+            var reports = Directory.GetFiles(service.ReportsDirectory);
 
             Assert.Equal(2, reports.Length);
 
@@ -377,19 +345,16 @@ public abstract class PublicApiQueriesProcessorTests
         [Fact]
         public async Task WithPreviewTokenAndRequestedDataSetVersion_CapturedInReport()
         {
-            using var pathResolver = new TestAnalyticsPathResolver();
-            SetupRequestFile(pathResolver, "WithPreviewTokenAndRequestedDataSetVersion.json");
+            var service = BuildService();
+            SetupRequestFile(service, "WithPreviewTokenAndRequestedDataSetVersion.json");
 
-            var service = BuildService(
-                pathResolver: pathResolver);
             await service.Process();
 
-            Assert.True(Directory.Exists(ProcessingDirectoryPath(pathResolver)));
-            Assert.False(Directory.Exists(TemporaryProcessingDirectoryPath(pathResolver)));
-            Assert.True(Directory.Exists(pathResolver.PublicApiQueriesReportsDirectoryPath()));
-
-            var reports = Directory.GetFiles(pathResolver.PublicApiQueriesReportsDirectoryPath());
-
+            Assert.True(Directory.Exists(ProcessingDirectoryPath(service)));
+            Assert.False(Directory.Exists(TemporaryProcessingDirectoryPath(service)));
+            Assert.True(Directory.Exists(service.ReportsDirectory));
+            
+            var reports = Directory.GetFiles(service.ReportsDirectory);
             Assert.Equal(2, reports.Length);
 
             var queryReportFile = reports.Single(file => file.EndsWith("public-api-queries.parquet"));
@@ -453,33 +418,11 @@ public abstract class PublicApiQueriesProcessorTests
         }
     }
     
-    private PublicApiQueriesProcessor BuildService(
-        TestAnalyticsPathResolver pathResolver,
-        IProcessRequestFilesWorkflow? workflow = null)
+    private PublicApiQueriesProcessor BuildService()
     {
         return new PublicApiQueriesProcessor(
-            pathResolver: pathResolver,
-            workflow: workflow ?? new ProcessRequestFilesWorkflow(
-                logger: Mock.Of<ILogger<ProcessRequestFilesWorkflow>>(),
-                temporaryProcessingFolderNameGenerator: () => "temp-processing-folder"));
-    }
-
-    private void SetupRequestFile(TestAnalyticsPathResolver pathResolver, string filename)
-    {
-        Directory.CreateDirectory(pathResolver.PublicApiQueriesDirectoryPath());
-
-        var sourceFilePath = Path.Combine(_queryResourcesPath, filename);
-        File.Copy(sourceFilePath, Path.Combine(pathResolver.PublicApiQueriesDirectoryPath(), filename));
-    }
-    
-    private static string ProcessingDirectoryPath(TestAnalyticsPathResolver pathResolver)
-    {
-        return Path.Combine(pathResolver.PublicApiQueriesDirectoryPath(), "processing");
-    }
-    
-    private static string TemporaryProcessingDirectoryPath(TestAnalyticsPathResolver pathResolver)
-    {
-        return Path.Combine(ProcessingDirectoryPath(pathResolver), "temp-processing-folder");
+            pathResolver: PathResolver,
+            workflow: Workflow);
     }
 
     // ReSharper disable once ClassNeverInstantiated.Local

@@ -3,4 +3,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Analytics.Consumer.Services
 public interface IRequestFileProcessor
 {
     Task Process();
+    
+    string SourceDirectory { get; }
+    string ReportsDirectory { get; }
 }

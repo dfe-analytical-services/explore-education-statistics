@@ -8,11 +8,16 @@ public class PublicCsvDownloadsProcessor(
     IAnalyticsPathResolver pathResolver,
     IProcessRequestFilesWorkflow workflow) : IRequestFileProcessor
 {
+    private static readonly string[] PublicCsvDownloadsSubPath = ["public", "csv-downloads"];
+    
+    public string SourceDirectory => pathResolver.BuildSourceDirectory(PublicCsvDownloadsSubPath);
+    public string ReportsDirectory => pathResolver.BuildReportsDirectory(PublicCsvDownloadsSubPath);
+    
     public Task Process()
     {
         return workflow.Process(new WorkflowActor(
-            sourceDirectory: pathResolver.PublicCsvDownloadsDirectoryPath(),
-            reportsDirectory: pathResolver.PublicCsvDownloadsReportsDirectoryPath()));
+            sourceDirectory: SourceDirectory,
+            reportsDirectory: ReportsDirectory));
     }
 
     private class WorkflowActor(string sourceDirectory, string reportsDirectory)

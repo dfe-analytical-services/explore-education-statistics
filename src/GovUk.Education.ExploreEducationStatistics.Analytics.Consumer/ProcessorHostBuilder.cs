@@ -2,6 +2,7 @@ using GovUk.Education.ExploreEducationStatistics.Analytics.Consumer.Options;
 using GovUk.Education.ExploreEducationStatistics.Analytics.Consumer.Services;
 using GovUk.Education.ExploreEducationStatistics.Analytics.Consumer.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Analytics.Consumer.Services.Workflow;
+using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -48,7 +49,10 @@ public static class ProcessorHostBuilder
                     .AddTransient<IRequestFileProcessor, PublicApiQueriesProcessor>()
                     .AddTransient<IRequestFileProcessor, PublicZipDownloadsProcessor>()
                     .AddTransient<IRequestFileProcessor, PublicCsvDownloadsProcessor>()
-                    .AddTransient<IProcessRequestFilesWorkflow, ProcessRequestFilesWorkflow>();
+                    .AddTransient<IProcessRequestFilesWorkflow, ProcessRequestFilesWorkflow>()
+                    .AddTransient<IFileAccessor, FilesystemFileAccessor>()
+                    .AddTransient<DateTimeProvider>()
+                    ;
             });
     }
 }
