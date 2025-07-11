@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { ReactNode } from 'react';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
+import PageMetaItem, { PageMetaItemType } from './PageMetaItem';
 
 export interface PageMetaProps {
   includeDefaultMetaTitle?: boolean;
@@ -8,6 +9,7 @@ export interface PageMetaProps {
   title?: string;
   description?: string;
   imgUrl?: string;
+  additionalMeta?: PageMetaItemType[];
 }
 
 const defaultPageTitle = 'Explore education statistics - GOV.UK';
@@ -18,6 +20,7 @@ const PageMeta = ({
   title = defaultPageTitle,
   description = 'Find, download and explore official Department for Education (DfE) statistics and data in England.',
   imgUrl,
+  additionalMeta = [],
 }: PageMetaProps) => {
   // Generate canonical link
   const router = useRouter();
@@ -75,6 +78,9 @@ const PageMeta = ({
           content={process.env.PUBLIC_URL + imgUrl}
         />
       )}
+
+      {/* <!-- Additional Meta Tags --> */}
+      {additionalMeta.map(PageMetaItem)}
     </Head>
   );
 };
