@@ -1,4 +1,5 @@
-﻿using System.Threading;
+﻿#nullable enable
+using System.Threading;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Analytics.Common.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Requests;

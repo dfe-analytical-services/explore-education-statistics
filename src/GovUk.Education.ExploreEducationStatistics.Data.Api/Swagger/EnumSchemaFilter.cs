@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using Microsoft.OpenApi.Any;
