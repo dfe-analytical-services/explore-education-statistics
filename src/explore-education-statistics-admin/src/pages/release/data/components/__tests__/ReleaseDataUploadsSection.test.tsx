@@ -16,6 +16,8 @@ import _permissionService, {
 } from '@admin/services/permissionService';
 import render from '@common-test/render';
 import { TestConfigContextProvider } from '@admin/contexts/ConfigContext';
+import { ReleaseVersionContextProvider } from '@admin/pages/release/contexts/ReleaseVersionContext';
+import { testRelease } from '@admin/pages/release/__data__/testRelease';
 
 jest.mock('@admin/services/releaseDataFileService');
 jest.mock('@admin/services/permissionService');
@@ -1504,14 +1506,16 @@ describe('ReleaseDataUploadsSection', () => {
       },
     };
     return render(
-      <TestConfigContextProvider
-        config={{
-          ...defaultTestConfig,
-          enableReplacementOfPublicApiDataSets: enableReplacementFeatureFlag,
-        }}
-      >
-        {children}
-      </TestConfigContextProvider>,
+      <ReleaseVersionContextProvider releaseVersion={testRelease}>
+        <TestConfigContextProvider
+          config={{
+            ...defaultTestConfig,
+            enableReplacementOfPublicApiDataSets: enableReplacementFeatureFlag,
+          }}
+        >
+          {children}
+        </TestConfigContextProvider>
+      </ReleaseVersionContextProvider>,
     );
   }
 });
