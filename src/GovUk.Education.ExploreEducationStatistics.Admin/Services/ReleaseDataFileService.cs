@@ -161,7 +161,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
                     var permissions = await userService.GetDataFilePermissions(dataImport.File);
 
-                    return BuildDataFileViewModel(releaseFile, dataImport, permissions);
+                    return new DataFileInfo(releaseFile, dataImport, permissions);
                 });
         }
 
@@ -543,7 +543,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
             foreach (var entry in archive.Entries)
             {
-                using var fileStream = entry.Open();
+                await using var fileStream = entry.Open();
                 files.Add(await BuildDataSetFile(fileStream, entry.Name));
             }
 
@@ -552,7 +552,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         private static async Task<FileDto> BuildDataSetFile(IFormFile formFile)
         {
-            using var fileStream = formFile.OpenReadStream();
+            await using var fileStream = formFile.OpenReadStream();
             return await BuildDataSetFile(fileStream, formFile.FileName);
         }
 
@@ -628,37 +628,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 : dataSetUpload;
         }
 
-        private DataFileInfo BuildDataFileViewModel( // @MarkFix add test with replacement
-            ReleaseFile releaseFile,
-            DataImport dataImport,
-            DataFilePermissions permissions,
-            ReleaseFile? replacementReleaseFile = null,
-            DataImport? replacementDataImport = null,
-            DataFilePermissions? replacementPermissions = null,
-            bool? hasValidReplacementPlan = null)
-        {
-            if (replacementReleaseFile != null
-                && (replacementDataImport == null || replacementPermissions == null || hasValidReplacementPlan == null))
-            {
-                throw new ArgumentException(
-                    "If replacementReleaseFile is provided, must also provide replacementDataImport and replacementPermissions and hasValidReplacementPlan");
-            }
-
-            if (replacementReleaseFile == null)
-            {
-                return new DataFileInfo(releaseFile, dataImport, permissions);
-            }
-
-            return new DataFileInfo(releaseFile, dataImport, permissions)
-            {
-                ReplacedByDataFile = new ReplacementDataFileInfo(
-                    replacementReleaseFile,
-                    replacementDataImport!,
-                    replacementPermissions!,
-                    hasValidReplacementPlan!.Value)
-            };
-        }
-
         private async Task<List<DataFileInfo>> BuildDataFileViewModels( // @MarkFix add test with replacement
             List<ReleaseFile> releaseFiles,
             List<ReleaseFile>? inProgressReplacements = null)
@@ -690,7 +659,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             {
                 if (inProgressReplacements == null || releaseFile.File.ReplacedById == null)
                 {
-                    return BuildDataFileViewModel(
+                    return new DataFileInfo(
                         releaseFile,
                         dataImportsDict[releaseFile.FileId],
                         permissionsDict[releaseFile.FileId]);
@@ -706,15 +675,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         releaseFile, replacement);
                 }
 
-                return BuildDataFileViewModel(
+                return new DataFileInfo(
                     releaseFile,
                     dataImportsDict[releaseFile.FileId],
-                    permissionsDict[releaseFile.FileId],
-                    replacement,
-                    dataImportsDict[replacement.FileId],
-                    permissionsDict[replacement.FileId],
-                    hasValidReplacementPlan);
-
+                    permissionsDict[releaseFile.FileId])
+                {
+                    ReplacedByDataFile = new ReplacementDataFileInfo(
+                        replacement,
+                        dataImportsDict[replacement.FileId],
+                        permissionsDict[replacement.FileId],
+                        hasValidReplacementPlan),
+                };
             });
 
             return result.ToList();

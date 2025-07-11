@@ -57,7 +57,7 @@ export default function DataFilesReplacementTable({
             publicationId={publicationId}
             releaseVersionId={releaseVersionId}
             onConfirmAction={onConfirmReplacement}
-            onReplacementStatusUpdate={onReplacementStatusChange}
+            onReplacementStatusChange={onReplacementStatusChange}
           />
         ))}
         {dataSetUploads.map(upload => (

@@ -28,7 +28,7 @@ interface Props {
   publicationId: string;
   releaseVersionId: string;
   onConfirmAction?: () => void;
-  onReplacementStatusUpdate?: (updatedDataFile: DataFile) => void;
+  onReplacementStatusChange?: (updatedDataFile: DataFile) => void;
 }
 
 export default function DataFilesReplacementTableRow({
@@ -36,7 +36,7 @@ export default function DataFilesReplacementTableRow({
   publicationId,
   releaseVersionId,
   onConfirmAction,
-  onReplacementStatusUpdate,
+  onReplacementStatusChange,
 }: Props) {
   const [fetchPlan, toggleFetchPlan] = useToggle(false);
   const [canCancel, toggleCanCancel] = useToggle(false);
@@ -65,14 +65,14 @@ export default function DataFilesReplacementTableRow({
   }, [replacementDataFile?.status, toggleFetchPlan, toggleCanCancel]);
 
   useEffect(() => {
-    onReplacementStatusUpdate?.({
+    onReplacementStatusChange?.({
       ...dataFile,
       replacedByDataFile: {
         ...dataFile.replacedByDataFile,
         hasValidReplacementPlan: plan?.valid ?? false,
       } as ReplacementDataFile,
     });
-  }, [plan, dataFile, onReplacementStatusUpdate]);
+  }, [plan, dataFile, onReplacementStatusChange]);
 
   const handleStatusChange = async (
     _: DataFile,
@@ -82,7 +82,7 @@ export default function DataFilesReplacementTableRow({
       toggleFetchPlan.on();
       toggleCanCancel.on();
 
-      onReplacementStatusUpdate?.({
+      onReplacementStatusChange?.({
         ...dataFile,
         replacedByDataFile: {
           ...dataFile.replacedByDataFile,

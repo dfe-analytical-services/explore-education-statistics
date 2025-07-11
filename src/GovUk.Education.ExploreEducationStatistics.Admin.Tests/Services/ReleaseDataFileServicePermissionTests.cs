@@ -283,14 +283,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 dataSetValidator ?? Mock.Of<IDataSetValidator>(MockBehavior.Strict),
                 fileRepository ?? new FileRepository(contentDbContext),
                 releaseFileRepository ?? new ReleaseFileRepository(contentDbContext),
-                releaseFileService ?? new Mock<IReleaseFileService>(MockBehavior.Strict).Object,
-                dataImportService ?? new Mock<IDataImportService>(MockBehavior.Strict).Object,
-                userService ?? new Mock<IUserService>(MockBehavior.Strict).Object,
-                dataSetFileStorage ?? new Mock<IDataSetFileStorage>(MockBehavior.Strict).Object,
-                dataBlockService ?? new Mock<IDataBlockService>(MockBehavior.Strict).Object,
-                footnoteRepository ?? new Mock<IFootnoteRepository>(MockBehavior.Strict).Object,
+                releaseFileService ?? Mock.Of<IReleaseFileService>(MockBehavior.Strict),
+                dataImportService ?? Mock.Of<IDataImportService>(MockBehavior.Strict),
+                userService ?? Mock.Of<IUserService>(MockBehavior.Strict),
+                dataSetFileStorage ?? Mock.Of<IDataSetFileStorage>(MockBehavior.Strict),
+                dataBlockService ?? Mock.Of<IDataBlockService>(MockBehavior.Strict),
+                footnoteRepository ?? Mock.Of<IFootnoteRepository>(MockBehavior.Strict),
                 dataSetScreenerClient ?? Mock.Of<IDataSetScreenerClient>(MockBehavior.Strict),
-                replacementPlanService ?? new Mock<IReplacementPlanService>(MockBehavior.Strict).Object,
+                replacementPlanService ?? Mock.Of<IReplacementPlanService>(MockBehavior.Strict),
                 mapper ?? Mock.Of<IMapper>(MockBehavior.Strict)
             );
         }
