@@ -3,6 +3,7 @@ using GovUk.Education.ExploreEducationStatistics.Analytics.Consumer.Services;
 using GovUk.Education.ExploreEducationStatistics.Analytics.Consumer.Services.Workflow;
 using GovUk.Education.ExploreEducationStatistics.Common.DuckDb.DuckDb;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using InterpolatedSql.Dapper;
 using Microsoft.Extensions.Logging;
 using Moq;
@@ -265,6 +266,8 @@ public abstract class PublicApiDataSetVersionCallsProcessorTests
             pathResolver: pathResolver,
             workflow: workflow ?? new ProcessRequestFilesWorkflow(
                 logger: Mock.Of<ILogger<ProcessRequestFilesWorkflow>>(),
+                fileAccessor: new FilesystemFileAccessor(),
+                dateTimeProvider: new DateTimeProvider(),
                 temporaryProcessingFolderNameGenerator: () => "temp-processing-folder"));
     }
 

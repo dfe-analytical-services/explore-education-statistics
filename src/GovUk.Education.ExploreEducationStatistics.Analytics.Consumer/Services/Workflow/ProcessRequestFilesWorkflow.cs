@@ -31,23 +31,19 @@ public interface IProcessRequestFilesWorkflow
 ///     Logger from the associated Processor.
 /// </param>
 /// <param name="fileAccessor">
-///     Optional <see cref="IFileAccessor"/> implementation. If not provided, defaults to an instance of
-///     <see cref="FilesystemFileAccessor"/>.
+///     Abstracted file system handler.
 /// </param>
 /// <param name="dateTimeProvider">
-///     Optional <see cref="DateTimeProvider"/>. If not provided, defaults to providing the current time.  
+///     Abstracted date and time provider  
 /// </param>
 public class ProcessRequestFilesWorkflow(
     ILogger<ProcessRequestFilesWorkflow> logger,
-    IFileAccessor? fileAccessor = null,
-    DateTimeProvider? dateTimeProvider = null,
+    IFileAccessor fileAccessor,
+    DateTimeProvider dateTimeProvider,
     Func<string>? temporaryProcessingFolderNameGenerator = null,
     int batchSize = 100)
     : IProcessRequestFilesWorkflow
 {
-    private readonly IFileAccessor _fileAccessor = fileAccessor ?? new FilesystemFileAccessor();
-    private readonly DateTimeProvider _dateTimeProvider = dateTimeProvider ?? new DateTimeProvider();
-
     public async Task Process(IWorkflowActor actor)
     {
         var processorName = actor.GetType().FullName;
@@ -58,13 +54,13 @@ public class ProcessRequestFilesWorkflow(
         var reportsDirectory = actor.GetReportsDirectory();
         var baseProcessingDirectory = Path.Combine(sourceDirectory, "processing");
         
-        if (!_fileAccessor.DirectoryExists(sourceDirectory))
+        if (!fileAccessor.DirectoryExists(sourceDirectory))
         {
             logger.LogInformation("No requests for {Processor} to process", processorName);
             return;
         }
 
-        var filesToProcess = _fileAccessor
+        var filesToProcess = fileAccessor
             .ListFiles(sourceDirectory)
             .Order()
             .ToList();
@@ -129,7 +125,7 @@ public class ProcessRequestFilesWorkflow(
             .Result
             .Any(result => result);
 
-        _fileAccessor.DeleteDirectory(temporaryProcessingDirectory);
+        fileAccessor.DeleteDirectory(temporaryProcessingDirectory);
 
         // If no files were successfully processed, there is no need to generate
         // reports, so exit early.
@@ -138,11 +134,11 @@ public class ProcessRequestFilesWorkflow(
             return;
         }
         
-        _fileAccessor.CreateDirectory(reportsDirectory);
+        fileAccessor.CreateDirectory(reportsDirectory);
         
         var reportFilePathAndFilenamePrefix = Path.Combine(
             reportsDirectory,
-            _dateTimeProvider.UtcNow.ToString("yyyyMMdd-HHmmss"));
+            dateTimeProvider.UtcNow.ToString("yyyyMMdd-HHmmss"));
 
         await actor.CreateParquetReports(
             reportsFolderPathAndFilenamePrefix: reportFilePathAndFilenamePrefix,
@@ -178,7 +174,7 @@ public class ProcessRequestFilesWorkflow(
                 "failures",
                 temporaryProcessingDirectoryName);
 
-            _fileAccessor.CreateDirectory(failuresDirectory);
+            fileAccessor.CreateDirectory(failuresDirectory);
             
             MoveBadBatchDirectoryToFailuresDirectory(
                 batchDirectory: batchDirectory,
@@ -205,7 +201,7 @@ public class ProcessRequestFilesWorkflow(
     {
         try
         {
-            _fileAccessor.Move(
+            fileAccessor.Move(
                 sourcePath: batchDirectory,
                 destinationPath: Path.Combine(failuresDirectory, batchNumber.ToString()));
         }
@@ -223,14 +219,14 @@ public class ProcessRequestFilesWorkflow(
     {
         if (createTargetDirectory)
         {
-            _fileAccessor.CreateDirectory(targetDirectory);
+            fileAccessor.CreateDirectory(targetDirectory);
         }
 
         Parallel.ForEach(filenames, filename =>
         {
             var fileSourcePath = Path.Combine(sourceDirectory, filename);
             var fileDestPath = Path.Combine(targetDirectory, filename);
-            _fileAccessor.Move(fileSourcePath, fileDestPath);
+            fileAccessor.Move(fileSourcePath, fileDestPath);
         });
     }
 }
