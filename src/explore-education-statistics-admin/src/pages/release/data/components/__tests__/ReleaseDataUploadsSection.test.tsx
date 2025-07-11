@@ -260,7 +260,7 @@ describe('ReleaseDataUploadsSection', () => {
       'Confirm replacement',
     );
 
-    // @MarkFix all these calls are unnecessary?
+    // If a data set import is complete and plan valid, these calls are unnecessary...
     expect(releaseDataFileService.getDataFiles).toHaveBeenCalledWith(
       'release-1',
     );

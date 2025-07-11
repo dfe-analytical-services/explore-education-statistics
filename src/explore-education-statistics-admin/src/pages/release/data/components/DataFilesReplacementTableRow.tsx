@@ -72,7 +72,7 @@ export default function DataFilesReplacementTableRow({
         hasValidReplacementPlan: plan?.valid ?? false,
       } as ReplacementDataFile,
     });
-  }, [plan, dataFile, onReplacementStatusChange]);
+  }, [plan]);
 
   const handleStatusChange = async (
     _: DataFile,
