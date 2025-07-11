@@ -1,3 +1,4 @@
+import { FileFormat } from '@common/modules/table-tool/components/DownloadTable';
 import { TableJson } from '@common/modules/table-tool/utils/mapTableToJson';
 import { dataApi } from '@common/services/api';
 import { TableDataQuery } from '@common/services/tableBuilderService';
@@ -65,6 +66,13 @@ const permalinkService = {
       },
       responseType: 'blob',
     });
+  },
+  async recordDownload(payload: {
+    permalinkTitle: string;
+    permalinkId: string;
+    downloadFormat: FileFormat;
+  }) {
+    dataApi.post('permalink/analytics', payload);
   },
 };
 
