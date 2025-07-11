@@ -29,7 +29,7 @@ public class AnalyticsController(
     {
         var callCapture = requestBindingModel.ToModel();
         await analyticsManager.Add(callCapture, cancellationToken);
-        return Ok();
+        return new AcceptedResult();
     }
     
     /// <summary>
@@ -52,6 +52,6 @@ public class AnalyticsController(
     {
         var callCapture = requestBindingModel.ToModel();
         await analyticsManager.Add(callCapture, cancellationToken);
-        return Ok();
+        return new AcceptedResult();
     }
 }
