@@ -24,11 +24,11 @@ public class AnalyticsControllerTests
     private AnalyticsController GetSut() => new(
         _analyticsManager.Build());
 
+    [Fact]
+    public void Can_instantiate_Sut() => Assert.NotNull(GetSut());
+
     public class TableBuilderTests : AnalyticsControllerTests
     {
-        [Fact]
-        public void Can_instantiate_Sut() => Assert.NotNull(GetSut());
-
         [Fact]
         public async Task
             GivenValidRecordTableToolDownloadRequestBindingModel_WhenCallToRecordDownload_ThenInformationPassedToAnalyticsManager()

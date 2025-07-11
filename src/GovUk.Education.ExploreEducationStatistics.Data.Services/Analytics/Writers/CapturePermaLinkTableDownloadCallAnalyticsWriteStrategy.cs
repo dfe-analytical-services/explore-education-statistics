@@ -14,13 +14,16 @@ public class CapturePermaLinkTableDownloadCallAnalyticsWriteStrategy(
 {
     private readonly IWorkflowActor<CapturePermaLinkTableDownloadCall> _workflowActor =
         new WorkflowActor(analyticsPath: analyticsPathResolver.GetPermaLinkTableDownloadCallsDirectoryPath());
+    
     public Type RequestType => typeof(CapturePermaLinkTableDownloadCall);
 
     public async Task Report(IAnalyticsCaptureRequest request, CancellationToken cancellationToken = default)
     {
         if (request is not CapturePermaLinkTableDownloadCall captureRequest)
         {
-            throw new ArgumentException($"Request must be of type {nameof(CapturePermaLinkTableDownloadCall)}. It is {request.GetType().FullName}", nameof(request));
+            throw new ArgumentException(
+                $"Request must be of type {nameof(CapturePermaLinkTableDownloadCall)}. It is {request.GetType().FullName}", 
+                nameof(request));
         }
         await workflow.Report(_workflowActor, captureRequest, cancellationToken);   
     }

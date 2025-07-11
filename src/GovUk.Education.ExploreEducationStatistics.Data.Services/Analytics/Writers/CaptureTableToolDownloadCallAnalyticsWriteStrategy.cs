@@ -14,13 +14,16 @@ public class CaptureTableToolDownloadCallAnalyticsWriteStrategy(
 {
     private readonly IWorkflowActor<CaptureTableToolDownloadCall> _workflowActor =
         new WorkflowActor(analyticsPath: analyticsPathResolver.GetTableToolDownloadCallsDirectoryPath());
+    
     public Type RequestType => typeof(CaptureTableToolDownloadCall);
 
     public async Task Report(IAnalyticsCaptureRequest request, CancellationToken cancellationToken = default)
     {
         if (request is not CaptureTableToolDownloadCall captureRequest)
         {
-            throw new ArgumentException($"Request must be of type {nameof(CaptureTableToolDownloadCall)}. It is {request.GetType().FullName}", nameof(request));
+            throw new ArgumentException(
+                $"Request must be of type {nameof(CaptureTableToolDownloadCall)}. It is {request.GetType().FullName}", 
+                nameof(request));
         }
         await workflow.Report(_workflowActor, captureRequest, cancellationToken);   
     }
