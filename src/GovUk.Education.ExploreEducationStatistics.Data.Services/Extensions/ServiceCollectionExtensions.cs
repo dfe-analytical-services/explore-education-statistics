@@ -13,7 +13,11 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddAnalytics(this IServiceCollection services, IConfiguration configuration) =>
         services
             .AddOptions<AnalyticsOptions>().Bind(configuration.GetSection(AnalyticsOptions.Section)).Services
-            .AddAnalyticsCommon(isAnalyticsEnabled:AnalyticsOptions.IsEnabled(configuration))
+            .AddAnalyticsCommon(
+                isAnalyticsEnabled:configuration
+                    .GetSection(AnalyticsOptions.Section)
+                    .Get<AnalyticsOptions>()?
+                    .Enabled == true)
                 .AddWriteStrategy<CaptureTableToolDownloadCallAnalyticsWriteStrategy>()
                 .AddWriteStrategy<CapturePermaLinkTableDownloadCallAnalyticsWriteStrategy>()
                 .Services
