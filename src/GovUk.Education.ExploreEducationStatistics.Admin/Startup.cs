@@ -479,6 +479,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<ICommentService, CommentService>();
             services.AddTransient<IRelatedInformationService, RelatedInformationService>();
             services.AddTransient<IReplacementService, ReplacementService>();
+            services.AddTransient<IReplacementBatchService, ReplacementBatchService>();
             services.AddTransient<IUserRoleService, UserRoleService>();
             services.AddTransient<IUserReleaseRoleService, UserReleaseRoleService>();
             services.AddTransient<IUserPublicationRoleRepository, UserPublicationRoleRepository>();

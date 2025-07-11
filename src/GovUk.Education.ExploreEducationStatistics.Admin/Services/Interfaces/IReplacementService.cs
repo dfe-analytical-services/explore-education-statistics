@@ -13,12 +13,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
         Task<Either<ActionResult, DataReplacementPlanViewModel>> GetReplacementPlan(
             Guid releaseVersionId,
             Guid originalFileId,
-            Guid replacementFileId,
             CancellationToken cancellationToken = default);
 
         Task<Either<ActionResult, Unit>> Replace(
             Guid releaseVersionId,
             Guid originalFileId,
-            Guid replacementFileId);
+            CancellationToken cancellationToken = default);
     }
 }

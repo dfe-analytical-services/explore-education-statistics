@@ -147,11 +147,9 @@ export default function DataFilesReplacementTableRow({
             {plan?.valid && (
               <ButtonText
                 onClick={async () => {
-                  await dataReplacementService.replaceData(
-                    releaseVersionId,
+                  await dataReplacementService.replaceData(releaseVersionId, [
                     dataFile.id,
-                    replacementDataFile.id,
-                  );
+                  ]);
 
                   onConfirmAction?.();
                 }}
