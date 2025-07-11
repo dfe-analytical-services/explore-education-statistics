@@ -21,7 +21,7 @@ jobs:
               displayName: Download Public API Data Processor artifact
               artifact: public-api-data-processor
 
-            - template: ../tasks/bicep-output-variables.yml
+            - template: ../../../../common/ci/tasks/bicep-output-variables.yml
               parameters:
                 serviceConnection: ${{ parameters.serviceConnection }}
                 

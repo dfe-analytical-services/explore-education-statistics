@@ -1,0 +1,53 @@
+parameters:
+  - name: serviceConnection
+    type: string
+  - name: dataSourceContainerName
+    type: string
+  - name: dataSourceContainerQuery
+    default: ''
+    type: string
+  - name: dataSourceConnectionString
+    type: string
+  - name: dataSourceType
+    values:
+      - azuresql
+      - cosmosdb
+      - azureblob
+      - adlsgen2
+      - azuretable
+      - azurefile
+      - mysql
+      - sharepoint
+    default: azureblob
+    type: string
+  - name: indexCorsAllowedOrigins
+    type: object
+  - name: indexName
+    type: string
+  - name: indexerScheduleInterval
+    default: 'PT5M'
+    type: string
+  - name: searchServiceEndpoint
+    type: string
+
+steps:
+  - task: AzurePowerShell@5
+    displayName: Deploy Search service configuration
+    condition: and(eq(variables.deploySearchConfig, true), succeeded())
+    inputs:
+      azurePowerShellVersion: 'LatestVersion'
+      azureSubscription: ${{ parameters.serviceConnection }}
+      ScriptPath: $(templateDirectory)/scripts/SetupSearchService.ps1
+      ScriptArguments:
+        -dataSourceConnectionString '${{ parameters.dataSourceConnectionString }}' `
+        -dataSourceContainerName '${{ parameters.dataSourceContainerName }}' `
+        -dataSourceContainerQuery '${{ parameters.dataSourceContainerQuery }}' `
+        -dataSourceName '${{ parameters.dataSourceType }}-${{ parameters.dataSourceContainerName }}-datasource' `
+        -dataSourceType '${{ parameters.dataSourceType }}' `
+        -indexCorsAllowedOrigins '${{ join(''',''', parameters.indexCorsAllowedOrigins) }}' `
+        -indexDefinitionFilePath '$(templateDirectory)/application/indexes/${{ parameters.indexName }}.json' `
+        -indexerName '${{ parameters.indexName }}-indexer' `
+        -indexerScheduleInterval '${{ parameters.indexerScheduleInterval }}' `
+        -searchServiceEndpoint '${{ parameters.searchServiceEndpoint }}'
+      errorActionPreference: 'stop'
+      pwsh: true
