@@ -516,6 +516,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             
             services.AddEventGridClient(configuration);
 
+            services.AddHttpClient<IDataSetScreenerClient, DataSetScreenerClient>((provider, httpClient) =>
+            {
+                var options = provider.GetRequiredService<IOptions<DataScreenerClientOptions>>();
+                httpClient.BaseAddress = new Uri(options.Value.Url);
+            });
+
             if (publicDataDbExists)
             {
                 services.AddHttpClient<IProcessorClient, ProcessorClient>((provider, httpClient) =>
@@ -528,12 +534,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                 {
                     var options = provider.GetRequiredService<IOptions<PublicDataApiOptions>>();
                     httpClient.BaseAddress = new Uri(options.Value.PrivateUrl);
-                });
-
-                services.AddHttpClient<IDataSetScreenerClient, DataSetScreenerClient>((provider, httpClient) =>
-                {
-                    var options = provider.GetRequiredService<IOptions<DataScreenerClientOptions>>();
-                    httpClient.BaseAddress = new Uri(options.Value.Url);
                 });
 
                 services.AddTransient<IDataSetService, DataSetService>();
