@@ -81,7 +81,7 @@ export default function DataSetFileApiVersionHistory({
                             version.version,
                             patchVersionHighestPatchDictionary,
                           )
-                            ? '(Current)'
+                            ? '(current)'
                             : ''}
                         </strong>
                       )}
