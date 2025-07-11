@@ -13,7 +13,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Analytics.Consumer.Tests.Se
 
 public abstract class PublicApiQueriesProcessorTests : ProcessorTestsBase
 {
-    private readonly string _queryResourcesPath = Path.Combine(
+    protected override string ResourcesPath => Path.Combine(
         Assembly.GetExecutingAssembly().GetDirectoryPath(),
         "Resources",
         "PublicApi",
@@ -24,22 +24,20 @@ public abstract class PublicApiQueriesProcessorTests : ProcessorTestsBase
         [Fact]
         public async Task SingleSourceQuery_ProducesOneReportRow()
         {
-            SetupRequestFile(PathResolver, "Query1Request.json");
-
             var service = BuildService();
+            SetupRequestFile(service, "Query1Request.json");
+
             await service.Process();
 
             // The root processing folder is safe to leave behind.
-            Assert.True(Directory.Exists(ProcessingDirectoryPath(PathResolver)));
+            Assert.True(Directory.Exists(ProcessingDirectoryPath(service)));
             
             // The temporary processing folder that was set up for this run of the processor
             // should have been cleared away.
-            Assert.False(Directory.Exists(TemporaryProcessingDirectoryPath(PathResolver)));
+            Assert.False(Directory.Exists(TemporaryProcessingDirectoryPath(service)));
+            Assert.True(Directory.Exists(service.ReportsDirectory));
             
-            Assert.True(Directory.Exists(PathResolver.PublicApiQueriesReportsDirectoryPath()));
-
-            var reports = Directory.GetFiles(PathResolver.PublicApiQueriesReportsDirectoryPath());
-
+            var reports = Directory.GetFiles(service.ReportsDirectory);
             Assert.Equal(2, reports.Length);
 
             var queryReportFile = reports.Single(file => file.EndsWith("public-api-queries.parquet"));
@@ -95,13 +93,13 @@ public abstract class PublicApiQueriesProcessorTests : ProcessorTestsBase
         [Fact]
         public async Task TwoDifferentSourceQueries_ProduceTwoDistinctReportRows()
         {
-            SetupRequestFile(PathResolver, "Query1Request.json");
-            SetupRequestFile(PathResolver, "Query2Request1.json");
-
             var service = BuildService();
+            SetupRequestFile(service, "Query1Request.json");
+            SetupRequestFile(service, "Query2Request1.json");
+
             await service.Process();
 
-            var reports = Directory.GetFiles(PathResolver.PublicApiQueriesReportsDirectoryPath());
+            var reports = Directory.GetFiles(service.ReportsDirectory);
 
             Assert.Equal(2, reports.Length);
 
@@ -177,14 +175,14 @@ public abstract class PublicApiQueriesProcessorTests : ProcessorTestsBase
         [Fact]
         public async Task MultipleSourceFilesForSameQuery_ProduceSingleQueryRowAndMultipleQueryAccessRows()
         {
-            SetupRequestFile(PathResolver, "Query2Request1.json");
-            SetupRequestFile(PathResolver, "Query2Request2.json");
-            SetupRequestFile(PathResolver, "Query2Request3.json");
-
             var service = BuildService();
+            SetupRequestFile(service, "Query2Request1.json");
+            SetupRequestFile(service, "Query2Request2.json");
+            SetupRequestFile(service, "Query2Request3.json");
+
             await service.Process();
 
-            var reports = Directory.GetFiles(PathResolver.PublicApiQueriesReportsDirectoryPath());
+            var reports = Directory.GetFiles(service.ReportsDirectory);
 
             Assert.Equal(2, reports.Length);
 
@@ -264,13 +262,13 @@ public abstract class PublicApiQueriesProcessorTests : ProcessorTestsBase
         [Fact]
         public async Task SameQueryStructureButDifferentDataSetVersion_ProducesTwoDistinctReportRows()
         {
-            SetupRequestFile(PathResolver, "Query1Request.json");
-            SetupRequestFile(PathResolver, "Query1RequestMinorVersionUpdate.json");
-
             var service = BuildService();
+            SetupRequestFile(service, "Query1Request.json");
+            SetupRequestFile(service, "Query1RequestMinorVersionUpdate.json");
+
             await service.Process();
 
-            var reports = Directory.GetFiles(PathResolver.PublicApiQueriesReportsDirectoryPath());
+            var reports = Directory.GetFiles(service.ReportsDirectory);
 
             Assert.Equal(2, reports.Length);
 
@@ -347,17 +345,16 @@ public abstract class PublicApiQueriesProcessorTests : ProcessorTestsBase
         [Fact]
         public async Task WithPreviewTokenAndRequestedDataSetVersion_CapturedInReport()
         {
-            SetupRequestFile(PathResolver, "WithPreviewTokenAndRequestedDataSetVersion.json");
-
             var service = BuildService();
+            SetupRequestFile(service, "WithPreviewTokenAndRequestedDataSetVersion.json");
+
             await service.Process();
 
-            Assert.True(Directory.Exists(ProcessingDirectoryPath(PathResolver)));
-            Assert.False(Directory.Exists(TemporaryProcessingDirectoryPath(PathResolver)));
-            Assert.True(Directory.Exists(PathResolver.PublicApiQueriesReportsDirectoryPath()));
-
-            var reports = Directory.GetFiles(PathResolver.PublicApiQueriesReportsDirectoryPath());
-
+            Assert.True(Directory.Exists(ProcessingDirectoryPath(service)));
+            Assert.False(Directory.Exists(TemporaryProcessingDirectoryPath(service)));
+            Assert.True(Directory.Exists(service.ReportsDirectory));
+            
+            var reports = Directory.GetFiles(service.ReportsDirectory);
             Assert.Equal(2, reports.Length);
 
             var queryReportFile = reports.Single(file => file.EndsWith("public-api-queries.parquet"));
@@ -426,24 +423,6 @@ public abstract class PublicApiQueriesProcessorTests : ProcessorTestsBase
         return new PublicApiQueriesProcessor(
             pathResolver: PathResolver,
             workflow: Workflow);
-    }
-
-    private void SetupRequestFile(TestAnalyticsPathResolver pathResolver, string filename)
-    {
-        Directory.CreateDirectory(pathResolver.PublicApiQueriesDirectoryPath());
-
-        var sourceFilePath = Path.Combine(_queryResourcesPath, filename);
-        File.Copy(sourceFilePath, Path.Combine(pathResolver.PublicApiQueriesDirectoryPath(), filename));
-    }
-    
-    private static string ProcessingDirectoryPath(TestAnalyticsPathResolver pathResolver)
-    {
-        return Path.Combine(pathResolver.PublicApiQueriesDirectoryPath(), "processing");
-    }
-    
-    private static string TemporaryProcessingDirectoryPath(TestAnalyticsPathResolver pathResolver)
-    {
-        return Path.Combine(ProcessingDirectoryPath(pathResolver), "temp-processing-folder");
     }
 
     // ReSharper disable once ClassNeverInstantiated.Local
