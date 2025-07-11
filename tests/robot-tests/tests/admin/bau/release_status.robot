@@ -313,7 +313,7 @@ Upload data files
     user clicks link    Replace data
 
     user waits until h2 is visible    Data file details
-    user checks headed table body row contains    Status    Complete    wait=%{WAIT_LONG}
+    user checks headed table body row cell contains    Data file import status    1    Complete    wait=%{WAIT_LONG}
 
 Navigate to data replacement page
     user waits until h2 is visible    Upload replacement data    %{WAIT_MEDIUM}
@@ -325,7 +325,8 @@ Navigate to data replacement page
     user reloads page
     user checks table column heading contains    1    1    Original file
     user checks table column heading contains    1    2    Replacement file
-    user checks headed table body row cell contains    Status    2    Complete    wait=%{WAIT_DATA_FILE_IMPORT}
+    user checks headed table body row cell contains    Data file import status    1    Complete
+    ...    wait=%{WAIT_DATA_FILE_IMPORT}
 
 Validate checklist errors
     user edits release status
