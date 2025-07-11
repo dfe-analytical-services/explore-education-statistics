@@ -219,13 +219,15 @@ const TableToolPage: NextPage<TableToolPageProps> = ({
                   {table &&
                     tableHeaders &&
                     query &&
-                    selectedPublicationDetails && (
+                    selectedPublicationDetails &&
+                    selectedSubjectId && (
                       <TableToolFinalStep
                         query={query}
                         selectedPublication={selectedPublicationDetails}
                         table={table}
                         tableHeaders={tableHeaders}
                         onReorderTableHeaders={onReorder}
+                        subjectId={selectedSubjectId}
                       />
                     )}
                 </>

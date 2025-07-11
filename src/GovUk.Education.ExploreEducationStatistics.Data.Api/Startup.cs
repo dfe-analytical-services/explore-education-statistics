@@ -47,7 +47,10 @@ using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Net.Http.Headers;
 using System.Text;
+using System.Text.Json.Serialization;
 using GovUk.Education.ExploreEducationStatistics.Common.Converters;
+using GovUk.Education.ExploreEducationStatistics.Data.Api.Swagger;
+using GovUk.Education.ExploreEducationStatistics.Data.Services.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Options;
 using Thinktecture;
 using static GovUk.Education.ExploreEducationStatistics.Common.Utils.StartupUtils;
@@ -130,6 +133,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "Explore education statistics - Data API", Version = "v1" });
+                c.SchemaFilter<EnumSchemaFilter>();
+                c.SchemaFilter<TimeIdentifierSchemaFilter>();
             });
 
             //
@@ -178,7 +183,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
             services.AddTransient<IUserService, UserService>();
             services.AddTransient<ICacheKeyService, CacheKeyService>();
             services.AddTransient<ILocationService, LocationService>();
-
+            services.AddAnalytics(Configuration);
+            
             services
                 .AddAuthentication(options =>
                 {

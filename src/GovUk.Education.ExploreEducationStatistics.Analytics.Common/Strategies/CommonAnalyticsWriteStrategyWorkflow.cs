@@ -1,4 +1,5 @@
 using GovUk.Education.ExploreEducationStatistics.Analytics.Common.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Analytics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using Microsoft.Extensions.Logging;
@@ -41,11 +42,7 @@ public class CommonAnalyticsWriteStrategyWorkflow<TAnalyticsRequest>(
 
             var requestToSerialise = workflowActor.PrepareForSerialisation(analyticsRequest);
 
-            var serialisedRequest = JsonSerializationUtils.Serialize(
-                obj: requestToSerialise,
-                formatting: Formatting.Indented,
-                orderedProperties: true,
-                camelCase: true);
+            var serialisedRequest = AnalyticsRequestSerialiser.SerialiseRequest(requestToSerialise);
 
             await File.WriteAllTextAsync(
                 path: filePath,

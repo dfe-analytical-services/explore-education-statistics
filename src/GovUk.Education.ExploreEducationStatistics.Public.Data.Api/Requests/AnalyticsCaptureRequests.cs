@@ -7,7 +7,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Requests;
 
 public record CaptureTopLevelCallRequest(
     DateTimeOffset StartTime,
-    [property: JsonConverter(typeof(StringEnumConverter))]
     TopLevelCallType Type,
     object? Parameters = null
 ) : IAnalyticsCaptureRequest;
@@ -16,7 +15,6 @@ public record CapturePublicationCallRequest(
     Guid PublicationId,
     string PublicationTitle,
     DateTimeOffset StartTime,
-    [property:JsonConverter(typeof(StringEnumConverter))]
     PublicationCallType Type,
     object? Parameters = null
 ) : IAnalyticsCaptureRequest;
@@ -26,7 +24,6 @@ public record CaptureDataSetCallRequest(
     string DataSetTitle,
     PreviewTokenRequest? PreviewToken,
     DateTimeOffset StartTime,
-    [property:JsonConverter(typeof(StringEnumConverter))]
     DataSetCallType Type,
     object? Parameters = null
 ) : IAnalyticsCaptureRequest;
@@ -52,7 +49,6 @@ public record CaptureDataSetVersionCallRequest(
     PreviewTokenRequest? PreviewToken,
     string? RequestedDataSetVersion,
     DateTimeOffset StartTime,
-    [property:JsonConverter(typeof(StringEnumConverter))]
     DataSetVersionCallType Type,
     object? Parameters = null
 ) : IAnalyticsCaptureRequest;
@@ -83,7 +79,6 @@ public enum DataSetVersionCallType
 }
 
 public record GetMetadataAnalyticsParameters(
-    [property:JsonProperty(ItemConverterType=typeof(StringEnumConverter))]
     IEnumerable<DataSetMetaType> Types);
 
 public record PreviewTokenRequest(

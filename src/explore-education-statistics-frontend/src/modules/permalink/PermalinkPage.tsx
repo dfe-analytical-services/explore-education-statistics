@@ -104,7 +104,7 @@ const PermalinkPage: NextPage<Props> = ({ data }) => {
           tableRef={tableRef}
           tableTitle={caption}
           onCsvDownload={() => permalinkService.getPermalinkCsv(data.id)}
-          onSubmit={fileFormat =>
+          onSubmit={fileFormat => {
             logEvent({
               category: 'Permalink page',
               action:
@@ -112,8 +112,14 @@ const PermalinkPage: NextPage<Props> = ({ data }) => {
                   ? 'CSV download button clicked'
                   : 'ODS download button clicked',
               label: caption,
-            })
-          }
+            });
+
+            permalinkService.recordDownload({
+              permalinkId: data.id,
+              permalinkTitle: `${dataSetTitle}' from '${publicationTitle}`,
+              downloadFormat: fileFormat,
+            });
+          }}
         />
 
         <h2 className="govuk-heading-m govuk-!-margin-top-9">

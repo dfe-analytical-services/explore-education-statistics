@@ -1,0 +1,51 @@
+﻿{
+  "dataSetName": "the data set name",
+  "downloadFormat": "ODS",
+  "publicationName": "the publication name",
+  "query": {
+    "filterHierarchiesOptions": {
+      "0fc13b3b-8d6d-4ea4-a7a7-6a59c73ab205": [
+        [
+          "d021942c-c424-4dac-b81e-0912ccc4fe38",
+          "da5134f1-ea1a-40bd-bf00-7761d35bc3ee"
+        ],
+        [
+          "70e46cb9-239c-4705-9f34-e4219872fcf9",
+          "b191b41d-c77c-4229-b3d8-74398904b52c"
+        ]
+      ],
+      "acd78867-3a0b-4f6a-9fc5-7f27bf5360e8": [
+        [
+          "2d4921be-a038-45de-bd73-4f74d12bcb92",
+          "cd5bebe3-8161-4a86-8685-6ff95d9023f3"
+        ],
+        [
+          "d9cc047d-41e2-404a-aea7-8ae653e6cc7b",
+          "fc319855-ed56-4ecc-9589-dc7385dee46a"
+        ]
+      ]
+    },
+    "filters": [
+      "757dcb8e-ffa4-4bbd-a88f-dcfba8e27bc5",
+      "c803e8f9-77f5-4d74-b3c6-814c5ec43ba4"
+    ],
+    "indicators": [
+      "4510415b-4aca-478a-8c51-8f17977ab033",
+      "0f235e3b-b8c6-4f7e-9ceb-2ed6538607c0"
+    ],
+    "locationIds": [
+      "4551768e-a997-4fae-8d9f-0d97b6b7dff0",
+      "85fce0ab-2775-4300-ba4b-f62c0a7ea0cd"
+    ],
+    "subjectId": "5385a9db-60a9-49b8-b02c-84ce8b814711",
+    "timePeriod": {
+      "endCode": "AY",
+      "endYear": 2001,
+      "startCode": "AY",
+      "startYear": 2000
+    }
+  },
+  "releasePeriodAndLabel": "the release period and label",
+  "releaseVersionId": "db5429d3-19a0-4ef9-b24e-02580ccad950",
+  "subjectId": "d5917257-9970-44e9-a889-c967a9e35ad6"
+}

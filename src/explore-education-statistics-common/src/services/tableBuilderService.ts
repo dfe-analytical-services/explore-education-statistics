@@ -5,6 +5,7 @@ import { Dictionary } from '@common/types';
 import { AxiosRequestConfig } from 'axios';
 import { Feature, Geometry } from 'geojson';
 import { ReleaseType } from '@common/services/types/releaseType';
+import { FileFormat } from '@common/modules/table-tool/components/DownloadTable';
 
 export interface FilterOption {
   label: string;
@@ -304,6 +305,17 @@ const tableBuilderService = {
       `/tablebuilder/release/${releaseVersionId}/data-block/${dataBlockParentId}/geojson`,
       { params: { boundaryLevelId } },
     );
+  },
+  recordDownload(payload: {
+    dataSetName: string;
+    publicationName: string;
+    releaseVersionId: string;
+    releasePeriodAndLabel: string;
+    subjectId: string;
+    query: ReleaseTableDataQuery;
+    downloadFormat: FileFormat;
+  }) {
+    dataApi.post('tablebuilder/analytics', payload);
   },
 };
 
