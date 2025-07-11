@@ -67,7 +67,7 @@ public class CaptureTableToolDownloadCallTests
         Assert.Contains(sut.DataSetName, actual);
         Assert.Contains(sut.DownloadFormat.ToString(), actual);
 
-        // Make sure the query is included. The serialisation of that is tested elsewhere.
+        // Make sure the serialised query is included. The correct/accurate serialisation of that model should be tested elsewhere.
         var serialisedQuery = AnalyticsRequestSerialiser.SerialiseRequest(fullTableQuery);
         AssertContainsJson(serialisedQuery, actual);
     }
