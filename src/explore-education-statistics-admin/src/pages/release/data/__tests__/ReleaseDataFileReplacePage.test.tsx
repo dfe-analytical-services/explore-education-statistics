@@ -615,7 +615,7 @@ describe('ReleaseDataFileReplacePage', () => {
       );
       expect(
         modal.getByText(
-          /Are you sure you want to cancel this data replacement/,
+          /By cancelling this replacement you will delete the replacement file/,
         ),
       ).toBeInTheDocument();
     });
@@ -678,7 +678,7 @@ describe('ReleaseDataFileReplacePage', () => {
       );
       expect(
         modal.getByText(
-          /Are you sure you want to cancel this data replacement/,
+          /By cancelling this replacement you will delete the replacement file/,
         ),
       ).toBeInTheDocument();
     });
