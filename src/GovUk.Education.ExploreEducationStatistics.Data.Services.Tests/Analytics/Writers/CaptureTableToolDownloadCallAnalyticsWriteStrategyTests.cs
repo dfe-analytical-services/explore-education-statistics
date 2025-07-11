@@ -49,7 +49,7 @@ public class CaptureTableToolDownloadCallAnalyticsWriteStrategyTests
     public async Task GivenACaptureRequest_WhenRecordIsCalled_ThenWorkflowCalled()
     {
         // ARRANGE
-        var request = new CaptureTableToolDownloadCall();
+        var request = new CaptureTableToolDownloadCallBuilder().Build();
         var sut = GetSut();
         
         // ACT

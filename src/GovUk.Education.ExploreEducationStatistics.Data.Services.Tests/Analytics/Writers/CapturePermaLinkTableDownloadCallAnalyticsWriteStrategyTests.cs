@@ -50,7 +50,7 @@ public class CapturePermaLinkTableDownloadCallAnalyticsWriteStrategyTests
     public async Task GivenACaptureRequest_WhenRecordIsCalled_ThenWorkflowCalled()
     {
         // ARRANGE
-        var request = new CapturePermaLinkTableDownloadCall();
+        var request = new CapturePermaLinkTableDownloadCallBuilder().Build();
         var sut = GetSut();
         
         // ACT

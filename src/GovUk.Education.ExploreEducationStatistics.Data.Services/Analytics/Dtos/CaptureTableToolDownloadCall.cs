@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using GovUk.Education.ExploreEducationStatistics.Analytics.Common.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
 
@@ -6,11 +7,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Analytics.Dto
 
 public record CaptureTableToolDownloadCall : IAnalyticsCaptureRequest
 {
-    public Guid ReleaseVersionId { get; init; }
-    public string PublicationName { get; init; }
-    public string ReleasePeriodAndLabel { get; init; }
-    public Guid SubjectId { get; init; }
-    public string DataSetName { get; init; }
-    public TableDownloadFormat DownloadFormat { get; init; }
-    public FullTableQuery Query { get; init; }
+    public required Guid ReleaseVersionId { get; init; }
+    public required string PublicationName { get; init; }
+    public required string ReleasePeriodAndLabel { get; init; }
+    public required Guid SubjectId { get; init; }
+    public required string DataSetName { get; init; }
+    public required TableDownloadFormat DownloadFormat { get; init; }
+    public required FullTableQuery Query { get; init; }
 }

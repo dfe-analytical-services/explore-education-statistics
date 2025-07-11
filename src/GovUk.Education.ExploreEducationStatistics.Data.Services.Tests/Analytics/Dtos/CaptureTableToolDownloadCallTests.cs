@@ -5,6 +5,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Analytics.Dtos;
+using GovUk.Education.ExploreEducationStatistics.Data.Services.Tests.Builders;
 using Newtonsoft.Json;
 using Snapshooter.Xunit;
 using Xunit;
@@ -17,44 +18,12 @@ public class CaptureTableToolDownloadCallTests
     public void GivenACaptureTableToolDownloadCall_WhenSerialised_ThenAllPropertiesShouldBeCaptured()
     {
         // ARRANGE
-        var fullTableQuery = new FullTableQuery
-        {
-            LocationIds = new List<Guid> { Guid.NewGuid(), Guid.NewGuid() },
-            TimePeriod = new TimePeriodQuery
-            {
-                StartYear = 2000,
-                StartCode = TimeIdentifier.AcademicYear,
-                EndYear = 2001,
-                EndCode = TimeIdentifier.AcademicYear,
-            },
-            Indicators = new List<Guid> { Guid.NewGuid(), Guid.NewGuid() },
-            Filters = new List<Guid> { Guid.NewGuid(), Guid.NewGuid() },
-            SubjectId = Guid.NewGuid(),
-            FilterHierarchiesOptions = new List<FilterHierarchyOptions>
-            {
-                new()
-                {
-                    LeafFilterId = Guid.NewGuid(),
-                    Options = [[Guid.NewGuid(), Guid.NewGuid()], [Guid.NewGuid(), Guid.NewGuid()]],
-                },
-                new()
-                {
-                    LeafFilterId = Guid.NewGuid(),
-                    Options = [[Guid.NewGuid(), Guid.NewGuid()], [Guid.NewGuid(), Guid.NewGuid()]],
-                }
-            }
-        };
-
-        var sut = new CaptureTableToolDownloadCall
-        {
-            ReleaseVersionId = Guid.NewGuid(),
-            PublicationName = "the publication name",
-            ReleasePeriodAndLabel = "the release period and label",
-            SubjectId = Guid.NewGuid(),
-            DataSetName = "the data set name",
-            DownloadFormat = TableDownloadFormat.ODS,
-            Query = fullTableQuery
-        };
+        var fullTableQuery = new FullTableQueryBuilder()
+            .Build();
+        
+        var sut = new CaptureTableToolDownloadCallBuilder()
+            .WhereQueryIs(fullTableQuery)
+            .Build();
 
         // ACT
         var actual = AnalyticsRequestSerialiser.SerialiseRequest(sut);
