@@ -14,7 +14,7 @@ using Xunit;
 
 namespace GovUk.Education.ExploreEducationStatistics.Analytics.Consumer.Tests.Services;
 
-public abstract class PublicZipDownloadsProcessorTests
+public abstract class PublicZipDownloadsProcessorTests : ProcessorTestsBase
 {
     private readonly string _resourcesPath = Path.Combine(
         Assembly.GetExecutingAssembly().GetDirectoryPath(),
@@ -24,45 +24,23 @@ public abstract class PublicZipDownloadsProcessorTests
     public class ProcessTests : PublicZipDownloadsProcessorTests
     {
         [Fact]
-        public async Task ProcessorUsesWorkflow()
-        {
-            using var pathResolver = new TestAnalyticsPathResolver();
-
-            var workflow = new Mock<IProcessRequestFilesWorkflow>(MockBehavior.Strict);
-
-            workflow
-                .Setup(s => s.Process(It.IsAny<IWorkflowActor>()))
-                .Returns(Task.CompletedTask);
-            
-            var service = BuildService(
-                pathResolver: pathResolver,
-                workflow: workflow.Object);
-            
-            await service.Process();
-
-            workflow.Verify(s => s.Process(It.IsAny<IWorkflowActor>()), Times.Once);
-        }
-
-        [Fact]
         public async Task SingleRequestFileNoSubjectId_ProducesOneReportRow()
         {
-            using var pathResolver = new TestAnalyticsPathResolver();
-            SetupRequestFile(pathResolver, "ZipDownloadRequestFile_NoSubjectId_ReleaseUsefulInfo.json");
+            SetupRequestFile(PathResolver, "ZipDownloadRequestFile_NoSubjectId_ReleaseUsefulInfo.json");
 
-            var service = BuildService(
-                pathResolver: pathResolver);
+            var service = BuildService();
             await service.Process();
 
             // The root processing folder is safe to leave behind.
-            Assert.True(Directory.Exists(ProcessingDirectoryPath(pathResolver)));
+            Assert.True(Directory.Exists(ProcessingDirectoryPath(PathResolver)));
             
             // The temporary processing folder that was set up for this run of the processor
             // should have been cleared away.
-            Assert.False(Directory.Exists(TemporaryProcessingDirectoryPath(pathResolver)));
+            Assert.False(Directory.Exists(TemporaryProcessingDirectoryPath(PathResolver)));
             
-            Assert.True(Directory.Exists(pathResolver.PublicZipDownloadsReportsDirectoryPath()));
+            Assert.True(Directory.Exists(PathResolver.PublicZipDownloadsReportsDirectoryPath()));
 
-            var reports = Directory.GetFiles(pathResolver.PublicZipDownloadsReportsDirectoryPath());
+            var reports = Directory.GetFiles(PathResolver.PublicZipDownloadsReportsDirectoryPath());
             var zipDownloadsReport = Assert.Single(reports);
 
             Assert.EndsWith("public-zip-downloads.parquet", zipDownloadsReport);
@@ -87,16 +65,13 @@ public abstract class PublicZipDownloadsProcessorTests
         [Fact]
         public async Task TwoDifferentSourceQueries_ProduceTwoDistinctReportRows_DifferentReleaseVersion()
         {
-            using var pathResolver = new TestAnalyticsPathResolver();
+            SetupRequestFile(PathResolver, "ZipDownloadRequestFile_NoSubjectId_ReleaseUsefulInfo.json");
+            SetupRequestFile(PathResolver, "ZipDownloadRequestFile_WithSubjectId.json");
 
-            SetupRequestFile(pathResolver, "ZipDownloadRequestFile_NoSubjectId_ReleaseUsefulInfo.json");
-            SetupRequestFile(pathResolver, "ZipDownloadRequestFile_WithSubjectId.json");
-
-            var service = BuildService(
-                pathResolver: pathResolver);
+            var service = BuildService();
             await service.Process();
 
-            var reports = Directory.GetFiles(pathResolver.PublicZipDownloadsReportsDirectoryPath());
+            var reports = Directory.GetFiles(PathResolver.PublicZipDownloadsReportsDirectoryPath());
             var zipDownloadsReport = Assert.Single(reports);
 
             Assert.EndsWith("public-zip-downloads.parquet", zipDownloadsReport);
@@ -122,16 +97,13 @@ public abstract class PublicZipDownloadsProcessorTests
         [Fact]
         public async Task TwoDifferentSourceQueries_ProduceTwoDistinctReportRows_SameReleaseDifferentFromPage()
         {
-            using var pathResolver = new TestAnalyticsPathResolver();
+            SetupRequestFile(PathResolver, "ZipDownloadRequestFile_NoSubjectId_ReleaseUsefulInfo.json");
+            SetupRequestFile(PathResolver, "ZipDownloadRequestFile_NoSubjectId_ReleaseDownloads.json");
 
-            SetupRequestFile(pathResolver, "ZipDownloadRequestFile_NoSubjectId_ReleaseUsefulInfo.json");
-            SetupRequestFile(pathResolver, "ZipDownloadRequestFile_NoSubjectId_ReleaseDownloads.json");
-
-            var service = BuildService(
-                pathResolver: pathResolver);
+            var service = BuildService();
             await service.Process();
 
-            var reports = Directory.GetFiles(pathResolver.PublicZipDownloadsReportsDirectoryPath());
+            var reports = Directory.GetFiles(PathResolver.PublicZipDownloadsReportsDirectoryPath());
             var zipDownloadsReport = Assert.Single(reports);
 
             Assert.EndsWith("public-zip-downloads.parquet", zipDownloadsReport);
@@ -157,16 +129,13 @@ public abstract class PublicZipDownloadsProcessorTests
         [Fact]
         public async Task MultipleRequestFilesForSameZipFile_ProduceSingleReportRow()
         {
-            using var pathResolver = new TestAnalyticsPathResolver();
+            SetupRequestFile(PathResolver, "ZipDownloadRequestFile_WithSubjectId.json");
+            SetupRequestFile(PathResolver, "ZipDownloadRequestFile_WithSubjectId_Copy.json");
 
-            SetupRequestFile(pathResolver, "ZipDownloadRequestFile_WithSubjectId.json");
-            SetupRequestFile(pathResolver, "ZipDownloadRequestFile_WithSubjectId_Copy.json");
-
-            var service = BuildService(
-                pathResolver: pathResolver);
+            var service = BuildService();
             await service.Process();
 
-            var reports = Directory.GetFiles(pathResolver.PublicZipDownloadsReportsDirectoryPath());
+            var reports = Directory.GetFiles(PathResolver.PublicZipDownloadsReportsDirectoryPath());
             var zipDownloadsReport = Assert.Single(reports);
 
             Assert.EndsWith("public-zip-downloads.parquet", zipDownloadsReport);
@@ -194,17 +163,11 @@ public abstract class PublicZipDownloadsProcessorTests
         }
     }
     
-    private PublicZipDownloadsProcessor BuildService(
-        TestAnalyticsPathResolver pathResolver,
-        IProcessRequestFilesWorkflow? workflow = null)
+    private PublicZipDownloadsProcessor BuildService()
     {
         return new PublicZipDownloadsProcessor(
-            pathResolver: pathResolver,
-            workflow: workflow ?? new ProcessRequestFilesWorkflow(
-                logger: Mock.Of<ILogger<ProcessRequestFilesWorkflow>>(),
-                fileAccessor: new FilesystemFileAccessor(),
-                dateTimeProvider: new DateTimeProvider(),
-                temporaryProcessingFolderNameGenerator: () => "temp-processing-folder"));
+            pathResolver: PathResolver,
+            workflow: Workflow);
     }
 
     private void SetupRequestFile(TestAnalyticsPathResolver pathResolver, string filename)
