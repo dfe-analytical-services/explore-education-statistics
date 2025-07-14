@@ -1801,7 +1801,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             IUserService? userService = null,
             IUserRepository? userRepository = null,
             IUserInviteRepository? userInviteRepository = null,
-            IUserReleaseRoleRepository? userReleaseRoleRepository = null,
+            IUserReleaseRoleAndInviteManager? userReleaseRoleRepository = null,
             IUserReleaseInviteRepository? userReleaseInviteRepository = null)
         {
             return new(
@@ -1815,7 +1815,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 userService ?? AlwaysTrueUserService().Object,
                 userRepository ?? new UserRepository(context),
                 userInviteRepository ?? new UserInviteRepository(usersAndRolesDbContext),
-                userReleaseRoleRepository ?? new UserReleaseRoleRepository(context),
+                userReleaseRoleRepository ?? new UserReleaseRoleManager(context),
                 userReleaseInviteRepository ?? new UserReleaseInviteRepository(context)
             );
         }

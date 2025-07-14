@@ -65,8 +65,8 @@ public class UpdateSpecificReleaseAuthorizationHandlerTests
             return new UpdateSpecificReleaseAuthorizationHandler(
                 new AuthorizationHandlerService(
                     new ReleaseVersionRepository(contentDbContext),
-                    new UserReleaseRoleRepository(contentDbContext),
-                    new UserPublicationRoleRepository(contentDbContext),
+                    new UserReleaseRoleManager(contentDbContext),
+                    new UserPublicationRoleManager(contentDbContext),
                     Mock.Of<IPreReleaseService>(Strict)));
         };
     }

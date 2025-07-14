@@ -49,8 +49,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                     contentDbContext,
                     new AuthorizationHandlerService(
                         new ReleaseVersionRepository(contentDbContext),
-                        new UserReleaseRoleRepository(contentDbContext),
-                        new UserPublicationRoleRepository(contentDbContext),
+                        new UserReleaseRoleManager(contentDbContext),
+                        new UserPublicationRoleManager(contentDbContext),
                         Mock.Of<IPreReleaseService>(Strict))),
                 ReleaseRole.Approver, ReleaseRole.Contributor);
         }

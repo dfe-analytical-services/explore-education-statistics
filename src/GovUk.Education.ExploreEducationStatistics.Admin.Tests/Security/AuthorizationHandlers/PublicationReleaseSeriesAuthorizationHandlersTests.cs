@@ -44,8 +44,8 @@ public class PublicationReleaseSeriesAuthorizationHandlersTests
             return new ManagePublicationReleaseSeriesAuthorizationHandler(
                 new AuthorizationHandlerService(
                     new ReleaseVersionRepository(contentDbContext),
-                    Mock.Of<IUserReleaseRoleRepository>(Strict),
-                    new UserPublicationRoleRepository(contentDbContext),
+                    Mock.Of<IUserReleaseRoleAndInviteManager>(Strict),
+                    new UserPublicationRoleManager(contentDbContext),
                     Mock.Of<IPreReleaseService>(Strict)));
         }
     }

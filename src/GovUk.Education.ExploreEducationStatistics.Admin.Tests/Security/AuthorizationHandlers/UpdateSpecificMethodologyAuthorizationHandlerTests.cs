@@ -208,14 +208,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
         private static (
             UpdateSpecificMethodologyAuthorizationHandler,
             Mock<IMethodologyRepository>,
-            Mock<IUserPublicationRoleRepository>,
-            Mock<IUserReleaseRoleRepository>
+            Mock<IUserPublicationRoleAndInviteManager>,
+            Mock<IUserReleaseRoleAndInviteManager>
             )
             CreateHandlerAndDependencies()
         {
             var methodologyRepository = new Mock<IMethodologyRepository>(Strict);
-            var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>(Strict);
-            var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>(Strict);
+            var userPublicationRoleRepository = new Mock<IUserPublicationRoleAndInviteManager>(Strict);
+            var userReleaseRoleRepository = new Mock<IUserReleaseRoleAndInviteManager>(Strict);
 
             var handler = new UpdateSpecificMethodologyAuthorizationHandler(
                 methodologyRepository.Object,

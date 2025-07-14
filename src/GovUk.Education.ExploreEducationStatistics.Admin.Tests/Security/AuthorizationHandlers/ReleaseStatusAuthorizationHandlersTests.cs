@@ -209,8 +209,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             {
                 return BuildMarkReleaseAsDraftHandler(
                     releaseStatusRepository.Object,
-                    new UserPublicationRoleRepository(context),
-                    new UserReleaseRoleRepository(context));
+                    new UserPublicationRoleManager(context),
+                    new UserReleaseRoleManager(context));
             }
         }
 
@@ -393,8 +393,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             {
                 return BuildMarkReleaseAsHigherLevelReviewHandler(
                     releaseStatusRepository.Object,
-                    new UserPublicationRoleRepository(context),
-                    new UserReleaseRoleRepository(context));
+                    new UserPublicationRoleManager(context),
+                    new UserReleaseRoleManager(context));
             }
         }
 
@@ -534,14 +534,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             {
                 return BuildMarkReleaseAsApprovedHandler(
                     releaseStatusRepository.Object,
-                    new UserPublicationRoleRepository(context),
-                    new UserReleaseRoleRepository(context)
+                    new UserPublicationRoleManager(context),
+                    new UserReleaseRoleManager(context)
                 );
             }
         }
 
         private static async Task AssertClaimSucceedsWhenReleaseUnpublished<TRequirement>(
-            Func<IReleasePublishingStatusRepository, IUserPublicationRoleRepository, IUserReleaseRoleRepository,
+            Func<IReleasePublishingStatusRepository, IUserPublicationRoleAndInviteManager, IUserReleaseRoleAndInviteManager,
                 IAuthorizationHandler> authorizationHandler,
             params SecurityClaimTypes[] claims)
             where TRequirement : IAuthorizationRequirement
@@ -577,8 +577,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                                 context.SaveChanges();
 
                                 return authorizationHandler(releaseStatusRepository.Object,
-                                    new UserPublicationRoleRepository(context),
-                                    new UserReleaseRoleRepository(context));
+                                    new UserPublicationRoleManager(context),
+                                    new UserReleaseRoleManager(context));
                             },
                             releaseVersion,
                             claims
@@ -588,7 +588,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
         }
 
         private static async Task AssertAllClaimsFailWhenReleasePublishing<TRequirement>(
-            Func<IReleasePublishingStatusRepository, IUserPublicationRoleRepository, IUserReleaseRoleRepository,
+            Func<IReleasePublishingStatusRepository, IUserPublicationRoleAndInviteManager, IUserReleaseRoleAndInviteManager,
                 IAuthorizationHandler> authorizationHandler)
             where TRequirement : IAuthorizationRequirement
         {
@@ -624,8 +624,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                                 context.SaveChanges();
 
                                 return authorizationHandler(releaseStatusRepository.Object,
-                                    new UserPublicationRoleRepository(context),
-                                    new UserReleaseRoleRepository(context));
+                                    new UserPublicationRoleManager(context),
+                                    new UserReleaseRoleManager(context));
                             },
                             releaseVersion
                         );
@@ -634,7 +634,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
         }
 
         private static async Task AssertAllClaimsFailWhenReleasePublished<TRequirement>(
-            Func<IReleasePublishingStatusRepository, IUserPublicationRoleRepository, IUserReleaseRoleRepository,
+            Func<IReleasePublishingStatusRepository, IUserPublicationRoleAndInviteManager, IUserReleaseRoleAndInviteManager,
                 IAuthorizationHandler> authorizationHandler)
             where TRequirement : IAuthorizationRequirement
         {
@@ -669,8 +669,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                                 context.SaveChanges();
 
                                 return authorizationHandler(releaseStatusRepository.Object,
-                                    new UserPublicationRoleRepository(context),
-                                    new UserReleaseRoleRepository(context));
+                                    new UserPublicationRoleManager(context),
+                                    new UserReleaseRoleManager(context));
                             },
                             releaseVersion
                         );
@@ -679,7 +679,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
         }
 
         private static async Task AssertAllRolesFailWhenReleasePublishing<TRequirement>(
-            Func<IReleasePublishingStatusRepository, IUserPublicationRoleRepository, IUserReleaseRoleRepository,
+            Func<IReleasePublishingStatusRepository, IUserPublicationRoleAndInviteManager, IUserReleaseRoleAndInviteManager,
                 IAuthorizationHandler> authorizationHandler)
             where TRequirement : IAuthorizationRequirement
         {
@@ -715,8 +715,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                                 context.SaveChanges();
 
                                 return authorizationHandler(releaseStatusRepository.Object,
-                                    new UserPublicationRoleRepository(context),
-                                    new UserReleaseRoleRepository(context));
+                                    new UserPublicationRoleManager(context),
+                                    new UserReleaseRoleManager(context));
                             },
                             releaseVersion
                         );
@@ -728,8 +728,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                                 context.SaveChanges();
 
                                 return authorizationHandler(releaseStatusRepository.Object,
-                                    new UserPublicationRoleRepository(context),
-                                    new UserReleaseRoleRepository(context));
+                                    new UserPublicationRoleManager(context),
+                                    new UserReleaseRoleManager(context));
                             },
                             releaseVersion
                         );
@@ -738,7 +738,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
         }
 
         private static async Task AssertAllRolesFailWhenReleasePublished<TRequirement>(
-            Func<IReleasePublishingStatusRepository, IUserPublicationRoleRepository, IUserReleaseRoleRepository,
+            Func<IReleasePublishingStatusRepository, IUserPublicationRoleAndInviteManager, IUserReleaseRoleAndInviteManager,
                 IAuthorizationHandler> authorizationHandler)
             where TRequirement : IAuthorizationRequirement
         {
@@ -773,8 +773,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                                 context.SaveChanges();
 
                                 return authorizationHandler(releaseStatusRepository.Object,
-                                    new UserPublicationRoleRepository(context),
-                                    new UserReleaseRoleRepository(context));
+                                    new UserPublicationRoleManager(context),
+                                    new UserReleaseRoleManager(context));
                             },
                             releaseVersion
                         );
@@ -786,8 +786,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                                 context.SaveChanges();
 
                                 return authorizationHandler(releaseStatusRepository.Object,
-                                    new UserPublicationRoleRepository(context),
-                                    new UserReleaseRoleRepository(context));
+                                    new UserPublicationRoleManager(context),
+                                    new UserReleaseRoleManager(context));
                             },
                             releaseVersion
                         );
@@ -797,8 +797,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
 
         private static MarkReleaseAsDraftAuthorizationHandler BuildMarkReleaseAsDraftHandler(
             IReleasePublishingStatusRepository releasePublishingStatusRepository,
-            IUserPublicationRoleRepository userPublicationRoleRepository,
-            IUserReleaseRoleRepository userReleaseRoleRepository)
+            IUserPublicationRoleAndInviteManager userPublicationRoleRepository,
+            IUserReleaseRoleAndInviteManager userReleaseRoleRepository)
         {
             return new MarkReleaseAsDraftAuthorizationHandler(
                 releasePublishingStatusRepository,
@@ -811,8 +811,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
 
         private static MarkReleaseAsHigherLevelReviewAuthorizationHandler BuildMarkReleaseAsHigherLevelReviewHandler(
             IReleasePublishingStatusRepository releasePublishingStatusRepository,
-            IUserPublicationRoleRepository userPublicationRoleRepository,
-            IUserReleaseRoleRepository userReleaseRoleRepository)
+            IUserPublicationRoleAndInviteManager userPublicationRoleRepository,
+            IUserReleaseRoleAndInviteManager userReleaseRoleRepository)
         {
             return new MarkReleaseAsHigherLevelReviewAuthorizationHandler(
                 releasePublishingStatusRepository,
@@ -825,8 +825,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
 
         private static MarkReleaseAsApprovedAuthorizationHandler BuildMarkReleaseAsApprovedHandler(
             IReleasePublishingStatusRepository releasePublishingStatusRepository,
-            IUserPublicationRoleRepository userPublicationRoleRepository,
-            IUserReleaseRoleRepository userReleaseRoleRepository)
+            IUserPublicationRoleAndInviteManager userPublicationRoleRepository,
+            IUserReleaseRoleAndInviteManager userReleaseRoleRepository)
         {
             return new MarkReleaseAsApprovedAuthorizationHandler(
                 releasePublishingStatusRepository,

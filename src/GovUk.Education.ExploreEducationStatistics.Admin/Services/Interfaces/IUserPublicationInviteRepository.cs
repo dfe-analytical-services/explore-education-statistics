@@ -1,20 +1,34 @@
-﻿#nullable enable
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
+#nullable enable
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
+using System;
+using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 
-namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
+namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
+
+public interface IUserPublicationInviteRepository
 {
-    public interface IUserPublicationInviteRepository
-    {
-        Task CreateManyIfNotExists(
-            List<UserPublicationRoleCreateRequest> userPublicationRoles,
-            string email,
-            Guid createdById,
-            DateTime? createdDate = null);
+    Task CreateManyIfNotExists(
+        List<UserPublicationRoleCreateRequest> userPublicationRoles,
+        string email,
+        Guid createdById,
+        DateTime? createdDate = null);
 
-        Task<List<UserPublicationInvite>> ListByEmail(string email);
-    }
+    Task<List<UserPublicationInvite>> ListByEmail(string email);
+
+    Task Remove(
+        Guid publicationId,
+        string email,
+        PublicationRole role,
+        CancellationToken cancellationToken = default);
+
+    Task RemoveMany(
+        IReadOnlyList<UserPublicationInvite> userPublicationInvites,
+        CancellationToken cancellationToken = default);
+
+    Task RemoveByUser(
+        string email,
+        CancellationToken cancellationToken = default);
 }

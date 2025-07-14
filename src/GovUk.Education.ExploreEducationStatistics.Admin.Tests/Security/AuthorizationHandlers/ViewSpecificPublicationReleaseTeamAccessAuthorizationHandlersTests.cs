@@ -36,7 +36,7 @@ public class ViewSpecificPublicationReleaseTeamAccessAuthorizationHandlersTests
         {
             var expectedToPassByClaimAlone = claim == AccessAllPublications;
 
-            var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>(Strict);
+            var userPublicationRoleRepository = new Mock<IUserPublicationRoleAndInviteManager>(Strict);
 
             if (!expectedToPassByClaimAlone)
             {
@@ -68,7 +68,7 @@ public class ViewSpecificPublicationReleaseTeamAccessAuthorizationHandlersTests
     {
         await ForEachPublicationRoleAsync(async role =>
         {
-            var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>(Strict);
+            var userPublicationRoleRepository = new Mock<IUserPublicationRoleAndInviteManager>(Strict);
 
             userPublicationRoleRepository
                 .Setup(s => s.GetAllRolesByUserAndPublication(UserId, Publication.Id))
@@ -93,13 +93,13 @@ public class ViewSpecificPublicationReleaseTeamAccessAuthorizationHandlersTests
     }
 
     private static ViewSpecificPublicationReleaseTeamAccessAuthorizationHandler CreateHandler(
-        IUserPublicationRoleRepository? userPublicationRoleRepository = null)
+        IUserPublicationRoleAndInviteManager? userPublicationRoleRepository = null)
     {
         return new ViewSpecificPublicationReleaseTeamAccessAuthorizationHandler(
             new AuthorizationHandlerService(
                 new ReleaseVersionRepository(InMemoryApplicationDbContext()),
-                Mock.Of<IUserReleaseRoleRepository>(Strict),
-                userPublicationRoleRepository ?? Mock.Of<IUserPublicationRoleRepository>(Strict),
+                Mock.Of<IUserReleaseRoleAndInviteManager>(Strict),
+                userPublicationRoleRepository ?? Mock.Of<IUserPublicationRoleAndInviteManager>(Strict),
                 Mock.Of<IPreReleaseService>(Strict)));
     }
 }

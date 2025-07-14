@@ -606,16 +606,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
         private static (
             ViewSpecificMethodologyAuthorizationHandler,
             Mock<IMethodologyRepository>,
-            Mock<IUserPublicationRoleRepository>,
-            Mock<IUserReleaseRoleRepository>,
+            Mock<IUserPublicationRoleAndInviteManager>,
+            Mock<IUserReleaseRoleAndInviteManager>,
             Mock<IPreReleaseService>,
             Mock<IReleaseVersionRepository>
             )
             CreateHandlerAndDependencies()
         {
             var methodologyRepository = new Mock<IMethodologyRepository>(Strict);
-            var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>(Strict);
-            var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>(Strict);
+            var userPublicationRoleRepository = new Mock<IUserPublicationRoleAndInviteManager>(Strict);
+            var userReleaseRoleRepository = new Mock<IUserReleaseRoleAndInviteManager>(Strict);
             var preReleaseService = new Mock<IPreReleaseService>(Strict);
             var releaseVersionRepository = new Mock<IReleaseVersionRepository>(Strict);
 

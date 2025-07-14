@@ -167,7 +167,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 contentDbContext,
                 new PersistenceHelper<ContentDbContext>(contentDbContext),
                 new ReleaseVersionRepository(contentDbContext),
-                new UserReleaseRoleRepository(contentDbContext),
+                new UserReleaseRoleManager(contentDbContext),
                 new UserReleaseInviteRepository(contentDbContext),
                 userService
             );

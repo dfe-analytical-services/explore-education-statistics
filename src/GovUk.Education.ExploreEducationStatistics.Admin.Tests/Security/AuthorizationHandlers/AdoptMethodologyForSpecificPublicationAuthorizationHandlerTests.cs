@@ -36,7 +36,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             {
                 await ForEachSecurityClaimAsync(async claim =>
                 {
-                    var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>(Strict);
+                    var userPublicationRoleRepository = new Mock<IUserPublicationRoleAndInviteManager>(Strict);
 
                     var handler = SetupHandler(userPublicationRoleRepository.Object);
 
@@ -75,7 +75,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             {
                 await ForEachPublicationRoleAsync(async publicationRole =>
                 {
-                    var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>(Strict);
+                    var userPublicationRoleRepository = new Mock<IUserPublicationRoleAndInviteManager>(Strict);
 
                     var handler = SetupHandler(userPublicationRoleRepository.Object);
 
@@ -100,14 +100,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
         }
 
         private static AdoptMethodologyForSpecificPublicationAuthorizationHandler SetupHandler(
-            IUserPublicationRoleRepository? userPublicationRoleRepository = null
+            IUserPublicationRoleAndInviteManager? userPublicationRoleRepository = null
         )
         {
             return new AdoptMethodologyForSpecificPublicationAuthorizationHandler(
                 new AuthorizationHandlerService(
                     new ReleaseVersionRepository(InMemoryApplicationDbContext()),
-                    Mock.Of<IUserReleaseRoleRepository>(Strict),
-                    userPublicationRoleRepository ?? Mock.Of<IUserPublicationRoleRepository>(Strict),
+                    Mock.Of<IUserReleaseRoleAndInviteManager>(Strict),
+                    userPublicationRoleRepository ?? Mock.Of<IUserPublicationRoleAndInviteManager>(Strict),
                     Mock.Of<IPreReleaseService>(Strict)));
         }
     }

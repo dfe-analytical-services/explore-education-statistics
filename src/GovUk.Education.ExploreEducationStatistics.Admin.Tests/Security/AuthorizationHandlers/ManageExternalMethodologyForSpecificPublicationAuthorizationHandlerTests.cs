@@ -119,15 +119,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
         }
 
         private static (ManageExternalMethodologyForSpecificPublicationAuthorizationHandler,
-            Mock<IUserPublicationRoleRepository>)
+            Mock<IUserPublicationRoleAndInviteManager>)
             CreateHandlerAndDependencies()
         {
-            var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>(Strict);
+            var userPublicationRoleRepository = new Mock<IUserPublicationRoleAndInviteManager>(Strict);
 
             var handler = new ManageExternalMethodologyForSpecificPublicationAuthorizationHandler(
                 new AuthorizationHandlerService(
                     new ReleaseVersionRepository(InMemoryApplicationDbContext()),
-                    Mock.Of<IUserReleaseRoleRepository>(Strict),
+                    Mock.Of<IUserReleaseRoleAndInviteManager>(Strict),
                     userPublicationRoleRepository.Object,
                     Mock.Of<IPreReleaseService>(Strict)));
 

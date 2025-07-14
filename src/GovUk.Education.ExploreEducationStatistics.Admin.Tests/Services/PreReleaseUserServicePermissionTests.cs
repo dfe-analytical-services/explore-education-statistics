@@ -110,7 +110,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             IUserService? userService = null,
             IUserRepository? userRepository = null,
             IUserInviteRepository? userInviteRepository = null,
-            IUserReleaseRoleRepository? userReleaseRoleRepository = null,
+            IUserReleaseRoleAndInviteManager? userReleaseRoleRepository = null,
             IUserReleaseInviteRepository? userReleaseInviteRepository = null)
         {
             return new(
@@ -124,7 +124,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 userService ?? Mock.Of<IUserService>(Strict),
                 userRepository ?? Mock.Of<IUserRepository>(Strict),
                 userInviteRepository ?? Mock.Of<IUserInviteRepository>(Strict),
-                userReleaseRoleRepository ?? Mock.Of<IUserReleaseRoleRepository>(Strict),
+                userReleaseRoleRepository ?? Mock.Of<IUserReleaseRoleAndInviteManager>(Strict),
                 userReleaseInviteRepository ?? Mock.Of<IUserReleaseInviteRepository>(Strict)
             );
         }
