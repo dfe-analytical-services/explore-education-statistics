@@ -628,7 +628,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 : dataSetUpload;
         }
 
-        private async Task<List<DataFileInfo>> BuildDataFileViewModels( // @MarkFix add test with replacement
+        private async Task<List<DataFileInfo>> BuildDataFileViewModels(
             List<ReleaseFile> releaseFiles,
             List<ReleaseFile>? inProgressReplacements = null)
         {
