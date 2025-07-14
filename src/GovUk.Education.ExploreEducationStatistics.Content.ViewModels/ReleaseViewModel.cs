@@ -25,6 +25,8 @@ public record ReleaseViewModel
     [JsonConverter(typeof(StringEnumConverter))]
     public ReleaseType Type { get; }
 
+    public IEnumerable<OrganisationViewModel> PublishingOrganisations { get; }
+
     public List<ReleaseNoteViewModel> Updates { get; }
 
     public List<ContentSectionViewModel> Content { get; }
@@ -61,6 +63,7 @@ public record ReleaseViewModel
         Published = release.Published;
         Slug = release.Slug;
         Type = release.Type;
+        PublishingOrganisations = release.PublishingOrganisations;
         Updates = release.Updates;
         Content = release.Content;
         SummarySection = release.SummarySection;

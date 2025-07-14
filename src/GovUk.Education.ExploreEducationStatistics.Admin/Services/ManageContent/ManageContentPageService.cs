@@ -165,6 +165,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                 .Include(rv => rv.Release)
                 .ThenInclude(r => r.Publication)
                 .ThenInclude(p => p.Theme)
+                .Include(rv => rv.PublishingOrganisations)
                 .Include(rv => rv.Content)
                 .ThenInclude(cs => cs.Content)
                 .ThenInclude(cb => cb.Comments)

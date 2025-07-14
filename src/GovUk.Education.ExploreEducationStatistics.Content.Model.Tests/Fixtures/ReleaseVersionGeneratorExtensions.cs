@@ -63,6 +63,11 @@ public static class ReleaseVersionGeneratorExtensions
         DateTime publishScheduled)
         => generator.ForInstance(releaseVersion => releaseVersion.SetPublishScheduled(publishScheduled));
 
+    public static Generator<ReleaseVersion> WithPublishingOrganisations(
+        this Generator<ReleaseVersion> generator,
+        IEnumerable<Organisation> publishingOrganisations)
+        => generator.ForInstance(releaseVersion => releaseVersion.SetPublishingOrganisations(publishingOrganisations));
+
     public static Generator<ReleaseVersion> WithApprovalStatuses(
         this Generator<ReleaseVersion> generator,
         IEnumerable<ReleaseApprovalStatus> statuses)
@@ -293,6 +298,11 @@ public static class ReleaseVersionGeneratorExtensions
         this InstanceSetters<ReleaseVersion> setters,
         DateTime publishScheduled)
         => setters.Set(releaseVersion => releaseVersion.PublishScheduled, publishScheduled);
+
+    public static InstanceSetters<ReleaseVersion> SetPublishingOrganisations(
+        this InstanceSetters<ReleaseVersion> setters,
+        IEnumerable<Organisation> publishingOrganisations)
+        => setters.Set(releaseVersion => releaseVersion.PublishingOrganisations, publishingOrganisations.ToList());
 
     public static InstanceSetters<ReleaseVersion> SetNextReleaseDate(
         this InstanceSetters<ReleaseVersion> setters,

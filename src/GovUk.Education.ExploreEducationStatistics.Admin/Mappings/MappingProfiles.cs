@@ -27,6 +27,7 @@ using KeyStatisticViewModel = GovUk.Education.ExploreEducationStatistics.Admin.V
 using MarkDownBlockViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.MarkDownBlockViewModel;
 using MethodologyNoteViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Methodology.MethodologyNoteViewModel;
 using MethodologyVersionViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Methodology.MethodologyVersionViewModel;
+using OrganisationViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.OrganisationViewModel;
 using PublicationViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.PublicationViewModel;
 using ReleaseNoteViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ManageContent.ReleaseNoteViewModel;
 using ReleaseVersionSummaryViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ReleaseVersionSummaryViewModel;
@@ -70,6 +71,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
                         rv.PublishScheduled.HasValue
                             ? rv.PublishScheduled.Value.ConvertUtcToUkTimeZone()
                     : (DateTime?)null))
+                .ForMember(dest => dest.PublishingOrganisations,
+                    m => m.MapFrom(rv => rv.PublishingOrganisations.OrderBy(o => o.Title)))
                 .ForMember(dest => dest.Label,
                     m => m.MapFrom(rv => rv.Release.Label));
 
@@ -139,6 +142,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
             CreateMap<ContentSection, ContentSectionViewModel>().ForMember(dest => dest.Content,
                 m => m.MapFrom(section => section.Content.OrderBy(contentBlock => contentBlock.Order)));
 
+            CreateMap<Organisation, OrganisationViewModel>();
+
             CreateMap<ReleaseVersion, ManageContentPageViewModel.ReleaseViewModel>()
                 .ForMember(dest => dest.CoverageTitle,
                     m => m.MapFrom(rv => rv.Release.TimePeriodCoverage.GetEnumLabel()))
@@ -183,7 +188,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
                     m => m.MapFrom(rv =>
                         rv.PublishScheduled.HasValue
                             ? rv.PublishScheduled.Value.ConvertUtcToUkTimeZone()
-                            : (DateTime?)null));
+                            : (DateTime?)null))
+                .ForMember(dest => dest.PublishingOrganisations,
+                    m => m.MapFrom(rv => rv.PublishingOrganisations.OrderBy(o => o.Title)));
 
             CreateMap<Update, ReleaseNoteViewModel>();
 

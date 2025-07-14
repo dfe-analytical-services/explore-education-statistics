@@ -31,25 +31,27 @@ public record ReleaseCacheViewModel(Guid Id)
 
     public DateTime? Published { get; set; }
 
-    public List<ReleaseNoteViewModel> Updates { get; set; } = new();
+    public IEnumerable<OrganisationViewModel> PublishingOrganisations { get; init; } = [];
 
-    public List<ContentSectionViewModel> Content { get; set; } = new();
+    public List<ReleaseNoteViewModel> Updates { get; set; } = [];
+
+    public List<ContentSectionViewModel> Content { get; set; } = [];
 
     public ContentSectionViewModel SummarySection { get; set; } = null!;
 
     public ContentSectionViewModel HeadlinesSection { get; set; } = null!;
 
-    public List<KeyStatisticViewModel> KeyStatistics { get; set; } = new();
+    public List<KeyStatisticViewModel> KeyStatistics { get; set; } = [];
 
     public ContentSectionViewModel KeyStatisticsSecondarySection { get; set; } = null!;
 
     public ContentSectionViewModel? RelatedDashboardsSection { get; set; }
 
-    public List<Common.Model.FileInfo> DownloadFiles { get; set; } = new();
+    public List<Common.Model.FileInfo> DownloadFiles { get; set; } = [];
 
     public string DataGuidance { get; set; } = string.Empty;
 
     public string PreReleaseAccessList { get; set; } = string.Empty;
 
-    public List<LinkViewModel> RelatedInformation { get; set; } = new();
+    public List<LinkViewModel> RelatedInformation { get; set; } = [];
 }

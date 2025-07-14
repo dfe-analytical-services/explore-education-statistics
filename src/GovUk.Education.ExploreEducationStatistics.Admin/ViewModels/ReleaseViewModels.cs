@@ -1,5 +1,6 @@
 #nullable enable
 using System;
+using System.Collections.Generic;
 using GovUk.Education.ExploreEducationStatistics.Common.Converters;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
@@ -55,6 +56,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
 
         [JsonConverter(typeof(DateTimeToDateJsonConverter))]
         public DateTime? PublishScheduled { get; set; }
+
+        public IEnumerable<OrganisationViewModel> PublishingOrganisations { get; set; } = [];
 
         public DateTime? Published { get; set; }
 
