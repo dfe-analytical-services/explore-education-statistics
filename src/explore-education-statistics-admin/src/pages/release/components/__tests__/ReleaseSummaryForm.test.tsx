@@ -1,7 +1,9 @@
 import _metaService, {
   TimePeriodCoverageGroup,
 } from '@admin/services/metaService';
+import _organisationService from '@admin/services/organisationService';
 import createAxiosErrorMock from '@common-test/createAxiosErrorMock';
+import { Organisation } from '@common/services/types/organisation';
 import { ValidationProblemDetails } from '@common/services/types/problemDetails';
 import { releaseTypes } from '@common/services/types/releaseType';
 import { render, screen, waitFor, within } from '@testing-library/react';
@@ -12,6 +14,12 @@ import ReleaseSummaryForm from '../ReleaseSummaryForm';
 const metaService = _metaService as jest.Mocked<typeof _metaService>;
 
 jest.mock('@admin/services/metaService');
+
+const organisationService = _organisationService as jest.Mocked<
+  typeof _organisationService
+>;
+
+jest.mock('@admin/services/organisationService');
 
 describe('ReleaseSummaryForm', () => {
   const testTimeIdentifiers: TimePeriodCoverageGroup[] = [
@@ -26,6 +34,23 @@ describe('ReleaseSummaryForm', () => {
       ],
     },
   ];
+  const testOrganisations: Organisation[] = [
+    {
+      id: '466a14bf-4c77-4fb4-beb0-a09065d9ced8',
+      title: 'Department for Education',
+      url: 'https://www.gov.uk/government/organisations/department-for-education',
+    },
+    {
+      id: '8d26bfaa-44b8-461e-9260-2b0eed9631e0',
+      title: 'Other Organisation name',
+      url: 'https://example.com',
+    },
+  ];
+
+  beforeEach(() => {
+    organisationService.listOrganisations.mockResolvedValue(testOrganisations);
+  });
+
   test('renders correctly with empty initial values and without the template field when `templateRelease` is not provided', async () => {
     metaService.getTimePeriodCoverageGroups.mockResolvedValue(
       testTimeIdentifiers,
@@ -39,6 +64,7 @@ describe('ReleaseSummaryForm', () => {
           timePeriodCoverageStartYear: '',
           releaseType: undefined,
           releaseLabel: '',
+          publishingOrganisations: undefined,
         }}
         releaseVersion={0}
         onSubmit={noop}
@@ -86,6 +112,19 @@ describe('ReleaseSummaryForm', () => {
     expect(
       screen.queryByRole('group', { name: 'Select template' }),
     ).not.toBeInTheDocument();
+
+    expect(
+      screen.queryByRole('group', { name: 'Publishing Organisations' }),
+    ).toBeInTheDocument();
+
+    const publishingOrganisationCheckboxes = within(
+      screen.getByRole('group', { name: 'Publishing Organisations' }),
+    ).getAllByRole('checkbox');
+
+    expect(publishingOrganisationCheckboxes[0]).toEqual(
+      screen.getByLabelText('Department for Education'),
+    );
+    expect(publishingOrganisationCheckboxes[0]).not.toBeChecked();
 
     const buttonCreate = screen.getByRole('button', {
       name: 'Create new release',
@@ -397,6 +436,7 @@ describe('ReleaseSummaryForm', () => {
           timePeriodCoverageStartYear: '1966',
           releaseType: 'AccreditedOfficialStatistics',
           releaseLabel: 'initial',
+          publishingOrganisations: ['466a14bf-4c77-4fb4-beb0-a09065d9ced8'],
         }}
         releaseVersion={0}
         onSubmit={noop}
@@ -430,6 +470,16 @@ describe('ReleaseSummaryForm', () => {
     expect(releaseTypeRadios[2]).not.toBeChecked();
     expect(releaseTypeRadios[3]).not.toBeChecked();
     expect(releaseTypeRadios[4]).not.toBeChecked();
+
+    const publishingOrganisationCheckboxes = within(
+      screen.getByRole('group', { name: 'Publishing Organisations' }),
+    ).getAllByRole('checkbox');
+
+    expect(publishingOrganisationCheckboxes[0]).toEqual(
+      screen.getByLabelText('Department for Education'),
+    );
+    expect(publishingOrganisationCheckboxes[0]).toBeChecked();
+    expect(publishingOrganisationCheckboxes[1]).not.toBeChecked();
   });
 
   test('submits form with valid values', async () => {
@@ -447,6 +497,7 @@ describe('ReleaseSummaryForm', () => {
           timePeriodCoverageStartYear: '',
           releaseType: undefined,
           releaseLabel: '',
+          publishingOrganisations: undefined,
         }}
         releaseVersion={0}
         onSubmit={onSubmit}
