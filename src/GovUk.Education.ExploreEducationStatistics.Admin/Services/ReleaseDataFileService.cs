@@ -543,7 +543,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
             foreach (var entry in archive.Entries)
             {
-                using var fileStream = entry.Open();
+                await using var fileStream = entry.Open();
                 files.Add(await BuildDataSetFile(fileStream, entry.Name));
             }
 
@@ -552,7 +552,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         private static async Task<FileDto> BuildDataSetFile(IFormFile formFile)
         {
-            using var fileStream = formFile.OpenReadStream();
+            await using var fileStream = formFile.OpenReadStream();
             return await BuildDataSetFile(fileStream, formFile.FileName);
         }
 
