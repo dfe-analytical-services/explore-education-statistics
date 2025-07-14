@@ -27,7 +27,7 @@ public class AuthorizationHandlerServiceTests
 
             var user = _fixture.AuthenticatedUser();
 
-            var userPublicationRoleRepositoryMock = new Mock<IUserPublicationRoleRepository>();
+            var userPublicationRoleRepositoryMock = new Mock<IUserPublicationRoleAndInviteManager>();
             userPublicationRoleRepositoryMock
                 .Setup(rvr => rvr.GetAllRolesByUserAndPublication(It.IsAny<Guid>(), It.IsAny<Guid>()))
                 .ReturnsAsync([publicationRole]);
@@ -49,7 +49,7 @@ public class AuthorizationHandlerServiceTests
 
             var user = _fixture.AuthenticatedUser();
 
-            var userPublicationRoleRepositoryMock = new Mock<IUserPublicationRoleRepository>();
+            var userPublicationRoleRepositoryMock = new Mock<IUserPublicationRoleAndInviteManager>();
             userPublicationRoleRepositoryMock
                 .Setup(rvr => rvr.GetAllRolesByUserAndPublication(It.IsAny<Guid>(), It.IsAny<Guid>()))
                 .ReturnsAsync([publicationRole]);
@@ -65,8 +65,8 @@ public class AuthorizationHandlerServiceTests
 
     private static AuthorizationHandlerService CreateService(
         Content.Model.Repository.Interfaces.IReleaseVersionRepository? releaseVersionRepository = null,
-        IUserReleaseRoleRepository? userReleaseRoleRepository = null,
-        IUserPublicationRoleRepository? userPublicationRoleRepository = null,
+        IUserReleaseRoleAndInviteManager? userReleaseRoleRepository = null,
+        IUserPublicationRoleAndInviteManager? userPublicationRoleRepository = null,
         IPreReleaseService? preReleaseService = null)
     {
         var releaseVersionRepositoryMock = new Mock<Content.Model.Repository.Interfaces.IReleaseVersionRepository>();
@@ -74,7 +74,7 @@ public class AuthorizationHandlerServiceTests
             .Setup(rvr => rvr.IsLatestPublishedReleaseVersion(It.IsAny<Guid>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(false);
 
-        var userReleaseRoleRepositoryMock = new Mock<IUserReleaseRoleRepository>();
+        var userReleaseRoleRepositoryMock = new Mock<IUserReleaseRoleAndInviteManager>();
         userReleaseRoleRepositoryMock
             .Setup(rvr => rvr.GetAllRolesByUserAndRelease(It.IsAny<Guid>(), It.IsAny<Guid>()))
             .ReturnsAsync([]);
@@ -82,7 +82,7 @@ public class AuthorizationHandlerServiceTests
             .Setup(rvr => rvr.GetAllRolesByUserAndPublication(It.IsAny<Guid>(), It.IsAny<Guid>()))
             .ReturnsAsync([]);
 
-        var userPublicationRoleRepositoryMock = new Mock<IUserPublicationRoleRepository>();
+        var userPublicationRoleRepositoryMock = new Mock<IUserPublicationRoleAndInviteManager>();
         userPublicationRoleRepositoryMock
             .Setup(rvr => rvr.GetAllRolesByUserAndPublication(It.IsAny<Guid>(), It.IsAny<Guid>()))
             .ReturnsAsync([]);

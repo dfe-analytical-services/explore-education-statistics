@@ -394,8 +394,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             return new MakeAmendmentOfSpecificReleaseAuthorizationHandler(
                 new AuthorizationHandlerService(
                     new ReleaseVersionRepository(contentDbContext),
-                    Mock.Of<IUserReleaseRoleRepository>(Strict),
-                    new UserPublicationRoleRepository(contentDbContext),
+                    Mock.Of<IUserReleaseRoleAndInviteManager>(Strict),
+                    new UserPublicationRoleManager(contentDbContext),
                     Mock.Of<IPreReleaseService>(Strict)),
                 new ReleaseVersionRepository(contentDbContext));
         }

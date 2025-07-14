@@ -234,19 +234,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
         private static (MakeAmendmentOfSpecificMethodologyAuthorizationHandler,
             Mock<IMethodologyRepository>,
             Mock<IMethodologyVersionRepository>,
-            Mock<IUserPublicationRoleRepository>)
+            Mock<IUserPublicationRoleAndInviteManager>)
             CreateHandlerAndDependencies()
         {
             var methodologyRepository = new Mock<IMethodologyRepository>(Strict);
             var methodologyVersionRepository = new Mock<IMethodologyVersionRepository>(Strict);
-            var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>(Strict);
+            var userPublicationRoleRepository = new Mock<IUserPublicationRoleAndInviteManager>(Strict);
 
             var handler = new MakeAmendmentOfSpecificMethodologyAuthorizationHandler(
                 methodologyVersionRepository.Object,
                 methodologyRepository.Object,
                 new AuthorizationHandlerService(
                     new ReleaseVersionRepository(InMemoryApplicationDbContext()),
-                    Mock.Of<IUserReleaseRoleRepository>(Strict),
+                    Mock.Of<IUserReleaseRoleAndInviteManager>(Strict),
                     userPublicationRoleRepository.Object,
                     Mock.Of<IPreReleaseService>(Strict)));
 

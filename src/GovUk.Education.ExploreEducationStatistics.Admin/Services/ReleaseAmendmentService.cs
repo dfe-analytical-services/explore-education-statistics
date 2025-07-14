@@ -553,8 +553,6 @@ public class ReleaseAmendmentService : IReleaseAmendmentService
                 // Copy certain fields from the original.
                 Role = originalReleaseRole.Role,
                 UserId = originalReleaseRole.UserId,
-                Deleted = originalReleaseRole.Deleted,
-                DeletedById = originalReleaseRole.DeletedById,
 
                 // Assign the new created date.
                 Created = createdDate,

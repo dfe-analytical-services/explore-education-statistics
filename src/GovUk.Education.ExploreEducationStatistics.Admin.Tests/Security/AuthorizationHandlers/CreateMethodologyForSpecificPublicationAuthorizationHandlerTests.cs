@@ -252,16 +252,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
         }
 
         private static (CreateMethodologyForSpecificPublicationAuthorizationHandler,
-            Mock<IUserPublicationRoleRepository>)
+            Mock<IUserPublicationRoleAndInviteManager>)
             CreateHandlerAndDependencies(ContentDbContext contentDbContext)
         {
-            var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>(Strict);
+            var userPublicationRoleRepository = new Mock<IUserPublicationRoleAndInviteManager>(Strict);
 
             var handler = new CreateMethodologyForSpecificPublicationAuthorizationHandler(
                 contentDbContext,
                 new AuthorizationHandlerService(
                     new ReleaseVersionRepository(contentDbContext),
-                    Mock.Of<IUserReleaseRoleRepository>(Strict),
+                    Mock.Of<IUserReleaseRoleAndInviteManager>(Strict),
                     userPublicationRoleRepository.Object,
                     Mock.Of<IPreReleaseService>(Strict)));
 

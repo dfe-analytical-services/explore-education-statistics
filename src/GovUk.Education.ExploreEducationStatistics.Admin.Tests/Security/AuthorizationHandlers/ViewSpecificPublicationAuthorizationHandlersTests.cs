@@ -48,7 +48,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             await AssertPublicationHandlerSucceedsWithPublicationRoles<ViewSpecificPublicationRequirement>(
                 contentDbContext => CreateHandler(
                     contentDbContext,
-                    userPublicationRoleRepository: new UserPublicationRoleRepository(contentDbContext)),
+                    userPublicationRoleRepository: new UserPublicationRoleManager(contentDbContext)),
                 [PublicationRole.Owner, PublicationRole.Allower]);
         }
 
@@ -115,8 +115,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                     context,
                     new AuthorizationHandlerService(
                         new ReleaseVersionRepository(context),
-                        Mock.Of<IUserReleaseRoleRepository>(Strict),
-                        new UserPublicationRoleRepository(context),
+                        Mock.Of<IUserReleaseRoleAndInviteManager>(Strict),
+                        new UserPublicationRoleManager(context),
                         Mock.Of<IPreReleaseService>(Strict)));
 
                 var authContext = new AuthorizationHandlerContext(
@@ -131,16 +131,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
 
         private ViewSpecificPublicationAuthorizationHandler CreateHandler(
             ContentDbContext context,
-            IUserReleaseRoleRepository? userReleaseRoleRepository = null,
-            IUserPublicationRoleRepository? userPublicationRoleRepository = null,
+            IUserReleaseRoleAndInviteManager? userReleaseRoleRepository = null,
+            IUserPublicationRoleAndInviteManager? userPublicationRoleRepository = null,
             IPreReleaseService? preReleaseService = null)
         {
             return new ViewSpecificPublicationAuthorizationHandler(
                 context,
                 new AuthorizationHandlerService(
                     new ReleaseVersionRepository(context),
-                    userReleaseRoleRepository ?? new UserReleaseRoleRepository(context),
-                    userPublicationRoleRepository ?? new UserPublicationRoleRepository(context),
+                    userReleaseRoleRepository ?? new UserReleaseRoleManager(context),
+                    userPublicationRoleRepository ?? new UserPublicationRoleManager(context),
                     preReleaseService ?? Mock.Of<IPreReleaseService>(Strict)));
         }
     }

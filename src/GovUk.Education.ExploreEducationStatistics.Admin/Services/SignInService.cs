@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Database;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
@@ -16,48 +17,25 @@ using Microsoft.Extensions.Logging;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services;
 
-public class SignInService : ISignInService
+public class SignInService(
+    ILogger<SignInService> logger,
+    IUserService userService,
+    UsersAndRolesDbContext usersAndRolesDbContext,
+    UserManager<ApplicationUser> userManager,
+    ContentDbContext contentDbContext,
+    IUserReleaseRoleAndInviteManager userReleaseRoleAndInviteManager,
+    IUserPublicationRoleAndInviteManager userPublicationRoleAndInviteManager,
+    IUserReleaseInviteRepository releaseInviteRepository,
+    IUserPublicationInviteRepository publicationInviteRepository) : ISignInService
 {
-    private readonly ILogger<SignInService> _logger;
-    private readonly IUserService _userService;
-    private readonly UsersAndRolesDbContext _usersAndRolesDbContext;
-    private readonly UserManager<ApplicationUser> _userManager;
-    private readonly ContentDbContext _contentDbContext;
-    private readonly IUserReleaseRoleRepository _releaseRoleRepository;
-    private readonly IUserPublicationRoleRepository _publicationRoleRepository;
-    private readonly IUserReleaseInviteRepository _releaseInviteRepository;
-    private readonly IUserPublicationInviteRepository _publicationInviteRepository;
-
-    public SignInService(
-        ILogger<SignInService> logger,
-        IUserService userService,
-        UsersAndRolesDbContext usersAndRolesDbContext,
-        UserManager<ApplicationUser> userManager,
-        ContentDbContext contentDbContext,
-        IUserReleaseRoleRepository releaseRoleRepository,
-        IUserPublicationRoleRepository publicationRoleRepository,
-        IUserReleaseInviteRepository releaseInviteRepository,
-        IUserPublicationInviteRepository publicationInviteRepository)
-    {
-        _logger = logger;
-        _userService = userService;
-        _usersAndRolesDbContext = usersAndRolesDbContext;
-        _userManager = userManager;
-        _contentDbContext = contentDbContext;
-        _releaseRoleRepository = releaseRoleRepository;
-        _publicationRoleRepository = publicationRoleRepository;
-        _releaseInviteRepository = releaseInviteRepository;
-        _publicationInviteRepository = publicationInviteRepository;
-    }
-
     public async Task<Either<ActionResult, SignInResponseViewModel>> RegisterOrSignIn()
     {
         // Get the profile of the current user who has logged into the external Identity Provider.
-        var profile = _userService.GetProfileFromClaims();
+        var profile = userService.GetProfileFromClaims();
 
         // If this email address is recognised as belonging to an existing user in the service, they have
         // been registered previously and can continue to use the service.
-        var existingUser = await _userManager.FindByEmailAsync(profile.Email);
+        var existingUser = await userManager.FindByEmailAsync(profile.Email);
 
         if (existingUser != null)
         {
@@ -69,7 +47,7 @@ public class SignInService : ISignInService
         }
 
         // If the email address does not match an existing user in the service, see if they have been invited.
-        var inviteToSystem = await _usersAndRolesDbContext
+        var inviteToSystem = await usersAndRolesDbContext
             .UserInvites
             .IgnoreQueryFilters() // Retrieve expired invites as well as active ones.
             .Include(i => i.Role)
@@ -101,7 +79,7 @@ public class SignInService : ISignInService
         inviteToSystem.Accepted = true;
 
         // This will also fetch soft-deleted users
-        var existingInternalUser = await _contentDbContext
+        var existingInternalUser = await contentDbContext
             .Users
             .AsQueryable()
             .SingleOrDefaultAsync(u => u.Email.ToLower() == profile.Email.ToLower());
@@ -116,15 +94,15 @@ public class SignInService : ISignInService
             LastName = profile.LastName
         };
 
-        await _usersAndRolesDbContext.Users.AddAsync(newAspNetUser);
-        await _usersAndRolesDbContext.SaveChangesAsync();
+        await usersAndRolesDbContext.Users.AddAsync(newAspNetUser);
+        await usersAndRolesDbContext.SaveChangesAsync();
 
         // Add them to their global role.
-        var addedIdentityUserRoles = await _userManager.AddToRoleAsync(newAspNetUser, inviteToSystem.Role.Name);
+        var addedIdentityUserRoles = await userManager.AddToRoleAsync(newAspNetUser, inviteToSystem.Role.Name);
 
         if (!addedIdentityUserRoles.Succeeded)
         {
-            _logger.LogError("Error adding role to invited User - unable to log in");
+            logger.LogError("Error adding role to invited User - unable to log in");
             return new StatusCodeResult(500);
         }
 
@@ -152,13 +130,13 @@ public class SignInService : ISignInService
                 Email = newAspNetUser.Email
             };
 
-            await _contentDbContext.Users.AddAsync(newInternalUser);
+            await contentDbContext.Users.AddAsync(newInternalUser);
             await HandleReleaseInvites(newInternalUser.Id, newInternalUser.Email);
             await HandlePublicationInvites(newInternalUser.Id, newInternalUser.Email);
         }
 
-        await _contentDbContext.SaveChangesAsync();
-        await _usersAndRolesDbContext.SaveChangesAsync();
+        await contentDbContext.SaveChangesAsync();
+        await usersAndRolesDbContext.SaveChangesAsync();
 
         return new SignInResponseViewModel(
             LoginResult: LoginResult.RegistrationSuccess,
@@ -169,10 +147,10 @@ public class SignInService : ISignInService
 
     private async Task HandleReleaseInvites(Guid newUserId, string email)
     {
-        var releaseInvites = await _releaseInviteRepository.ListByEmail(email);
+        var releaseInvites = await releaseInviteRepository.ListByEmail(email);
         await releaseInvites
             .ToAsyncEnumerable()
-            .ForEachAwaitAsync(invite => _releaseRoleRepository.Create(
+            .ForEachAwaitAsync(invite => userReleaseRoleAndInviteManager.Create(
                 userId: newUserId,
                 releaseVersionId: invite.ReleaseVersionId,
                 role: invite.Role,
@@ -181,10 +159,10 @@ public class SignInService : ISignInService
 
     private async Task HandlePublicationInvites(Guid newUserId, string email)
     {
-        var publicationInvites = await _publicationInviteRepository.ListByEmail(email);
+        var publicationInvites = await publicationInviteRepository.ListByEmail(email);
         await publicationInvites
             .ToAsyncEnumerable()
-            .ForEachAwaitAsync(invite => _publicationRoleRepository.Create(
+            .ForEachAwaitAsync(invite => userPublicationRoleAndInviteManager.Create(
                 userId: newUserId,
                 publicationId: invite.PublicationId,
                 role: invite.Role,
@@ -195,12 +173,14 @@ public class SignInService : ISignInService
         UserInvite inviteToSystem,
         string email)
     {
-        var releaseInvites = await _releaseInviteRepository.ListByEmail(email);
-        var publicationInvites = await _publicationInviteRepository.ListByEmail(email);
-        _usersAndRolesDbContext.UserInvites.Remove(inviteToSystem);
-        _contentDbContext.UserReleaseInvites.RemoveRange(releaseInvites);
-        _contentDbContext.UserPublicationInvites.RemoveRange(publicationInvites);
-        await _usersAndRolesDbContext.SaveChangesAsync();
-        await _contentDbContext.SaveChangesAsync();
+        await contentDbContext.RequireTransaction(async () =>
+        {
+            await releaseInviteRepository.RemoveByUser(email);
+            await publicationInviteRepository.RemoveByUser(email);
+
+            usersAndRolesDbContext.UserInvites.Remove(inviteToSystem);
+
+            await usersAndRolesDbContext.SaveChangesAsync();
+        });
     }
 }

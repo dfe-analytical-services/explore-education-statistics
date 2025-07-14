@@ -236,8 +236,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             IPersistenceHelper<UsersAndRolesDbContext>? usersAndRolesPersistenceHelper = null,
             IEmailTemplateService? emailTemplateService = null,
             IReleaseVersionRepository? releaseVersionRepository = null,
-            IUserPublicationRoleRepository? userPublicationRoleRepository = null,
-            IUserReleaseRoleRepository? userReleaseRoleRepository = null,
+            IUserPublicationRoleAndInviteManager? userPublicationRoleRepository = null,
+            IUserReleaseRoleAndInviteManager? userReleaseRoleRepository = null,
             IUserReleaseInviteRepository? userReleaseInviteRepository = null,
             UserManager<ApplicationUser>? userManager = null,
             IUserService? userService = null)
@@ -253,8 +253,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 emailTemplateService ?? Mock.Of<IEmailTemplateService>(),
                 userService ?? Mock.Of<IUserService>(),
                 releaseVersionRepository ?? Mock.Of<IReleaseVersionRepository>(),
-                userPublicationRoleRepository ?? Mock.Of<IUserPublicationRoleRepository>(),
-                userReleaseRoleRepository ?? Mock.Of<IUserReleaseRoleRepository>(),
+                userPublicationRoleRepository ?? Mock.Of<IUserPublicationRoleAndInviteManager>(),
+                userReleaseRoleRepository ?? Mock.Of<IUserReleaseRoleAndInviteManager>(),
                 userReleaseInviteRepository ?? Mock.Of<IUserReleaseInviteRepository>(),
                 userManager ?? MockUserManager().Object);
         }

@@ -301,7 +301,7 @@ public class UserPublicationRoleRepositoryTests
         Assert.Empty(result);
     }
 
-    private static UserPublicationRoleRepository SetupUserPublicationRoleRepository(
+    private static UserPublicationRoleAndInviteManager SetupUserPublicationRoleRepository(
         ContentDbContext contentDbContext)
     {
         return new(contentDbContext);

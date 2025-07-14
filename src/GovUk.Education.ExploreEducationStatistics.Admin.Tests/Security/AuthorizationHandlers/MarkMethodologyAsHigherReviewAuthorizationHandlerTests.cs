@@ -415,15 +415,15 @@ public class MarkMethodologyAsHigherReviewAuthorizationHandlerTests
         MarkMethodologyAsHigherLevelReviewAuthorizationHandler,
         Mock<IMethodologyRepository>,
         Mock<IMethodologyVersionRepository>,
-        Mock<IUserReleaseRoleRepository>,
-        Mock<IUserPublicationRoleRepository>
+        Mock<IUserReleaseRoleAndInviteManager>,
+        Mock<IUserPublicationRoleAndInviteManager>
         )
         CreateHandlerAndDependencies()
     {
         var methodologyRepository = new Mock<IMethodologyRepository>(Strict);
         var methodologyVersionRepository = new Mock<IMethodologyVersionRepository>(Strict);
-        var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>(Strict);
-        var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>(Strict);
+        var userReleaseRoleRepository = new Mock<IUserReleaseRoleAndInviteManager>(Strict);
+        var userPublicationRoleRepository = new Mock<IUserPublicationRoleAndInviteManager>(Strict);
 
         var handler = new MarkMethodologyAsHigherLevelReviewAuthorizationHandler(
             methodologyVersionRepository.Object,

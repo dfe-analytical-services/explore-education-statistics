@@ -145,11 +145,11 @@ public class CreateReleaseForSpecificPublicationAuthorizationHandlerTests
 
     private static
         (CreateReleaseForSpecificPublicationAuthorizationHandler,
-        Mock<IUserPublicationRoleRepository>)
+        Mock<IUserPublicationRoleAndInviteManager>)
         CreateHandlerAndDependencies()
     {
-        var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>(Strict);
-        var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>(Strict);
+        var userReleaseRoleRepository = new Mock<IUserReleaseRoleAndInviteManager>(Strict);
+        var userPublicationRoleRepository = new Mock<IUserPublicationRoleAndInviteManager>(Strict);
 
         var handler = new CreateReleaseForSpecificPublicationAuthorizationHandler(
             new AuthorizationHandlerService(

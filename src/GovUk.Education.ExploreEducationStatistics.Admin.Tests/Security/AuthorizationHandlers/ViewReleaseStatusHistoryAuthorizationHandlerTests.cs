@@ -66,8 +66,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             return new ViewReleaseStatusHistoryAuthorizationHandler(
                 new AuthorizationHandlerService(
                     new ReleaseVersionRepository(contentDbContext),
-                    new UserReleaseRoleRepository(contentDbContext),
-                    new UserPublicationRoleRepository(contentDbContext),
+                    new UserReleaseRoleManager(contentDbContext),
+                    new UserPublicationRoleManager(contentDbContext),
                     Mock.Of<IPreReleaseService>(Strict)));
         }
     }

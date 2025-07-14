@@ -105,7 +105,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             IUserRoleService? userRoleService = null,
             IUserInviteRepository? userInviteRepository = null,
             IUserReleaseInviteRepository? userReleaseInviteRepository = null,
-            IUserReleaseRoleRepository? userReleaseRoleRepository = null,
+            IUserReleaseRoleAndInviteManager? userReleaseRoleRepository = null,
             IEmailService? emailService = null,
             IOptions<AppOptions>? appOptions = null,
             IOptions<NotifyOptions>? notifyOptions = null)
@@ -122,7 +122,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 userRoleService ?? Mock.Of<IUserRoleService>(Strict),
                 userInviteRepository ?? new UserInviteRepository(usersAndRolesDbContext),
                 userReleaseInviteRepository ?? new UserReleaseInviteRepository(contentDbContext),
-                userReleaseRoleRepository ?? new UserReleaseRoleRepository(contentDbContext),
+                userReleaseRoleRepository ?? new UserReleaseRoleManager(contentDbContext),
                 emailService ?? Mock.Of<IEmailService>(Strict),
                 appOptions ?? Mock.Of<IOptions<AppOptions>>(),
                 notifyOptions ?? Mock.Of<IOptions<NotifyOptions>>()

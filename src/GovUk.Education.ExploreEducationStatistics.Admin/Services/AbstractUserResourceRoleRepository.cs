@@ -1,26 +1,22 @@
 #nullable enable
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.EntityFrameworkCore;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services;
 
-public abstract class AbstractUserResourceRoleRepository<TResourceRole, TResource, TRoleEnum> 
+public abstract class AbstractUserResourceRoleRepository<TResourceRole, TResource, TRoleEnum>(ContentDbContext contentDbContext)
     where TResourceRole : ResourceRole<TRoleEnum, TResource>
     where TResource : class
     where TRoleEnum : Enum
 {
-    protected readonly ContentDbContext ContentDbContext;
-
-    protected AbstractUserResourceRoleRepository(ContentDbContext contentDbContext)
-    {
-        ContentDbContext = contentDbContext;
-    }
+    protected readonly ContentDbContext ContentDbContext = contentDbContext;
 
     public async Task<TResourceRole> Create(Guid userId, Guid resourceId, TRoleEnum role, Guid createdById)
     {
@@ -88,24 +84,25 @@ public abstract class AbstractUserResourceRoleRepository<TResourceRole, TResourc
         await ContentDbContext.SaveChangesAsync();
     }
 
-    public async Task Remove(TResourceRole resourceRole, Guid deletedById)
+    protected async Task Remove(TResourceRole resourceRole, CancellationToken cancellationToken = default)
     {
-        resourceRole.Deleted = DateTime.UtcNow;
-        resourceRole.DeletedById = deletedById;
-        ContentDbContext.Update(resourceRole);
-        await ContentDbContext.SaveChangesAsync();
+        ContentDbContext.Remove(resourceRole);
+
+        await ContentDbContext.SaveChangesAsync(cancellationToken);
     }
 
-    public async Task RemoveMany(List<TResourceRole> resourceRoles, Guid deletedById)
+    protected async Task RemoveMany(
+        IReadOnlyList<TResourceRole> resourceRoles,
+        CancellationToken cancellationToken = default)
     {
-        resourceRoles.ForEach(resourceRole =>
+        if (!resourceRoles.Any())
         {
-            resourceRole.Deleted = DateTime.UtcNow;
-            resourceRole.DeletedById = deletedById;
-        });
-        ContentDbContext.UpdateRange(resourceRoles);
+            return;
+        }
 
-        await ContentDbContext.SaveChangesAsync();
+        ContentDbContext.RemoveRange(resourceRoles);
+
+        await ContentDbContext.SaveChangesAsync(cancellationToken);
     }
 
     protected async Task<List<TRoleEnum>> GetDistinctResourceRolesByUser(Guid userId)

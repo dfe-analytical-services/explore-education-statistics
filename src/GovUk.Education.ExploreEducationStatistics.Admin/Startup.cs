@@ -482,8 +482,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<IReplacementBatchService, ReplacementBatchService>();
             services.AddTransient<IUserRoleService, UserRoleService>();
             services.AddTransient<IUserReleaseRoleService, UserReleaseRoleService>();
-            services.AddTransient<IUserPublicationRoleRepository, UserPublicationRoleRepository>();
-            services.AddTransient<IUserReleaseRoleRepository, UserReleaseRoleRepository>();
+            services.AddTransient<IUserPublicationRoleAndInviteManager, UserPublicationRoleAndInviteManager>();
+            services.AddTransient<IUserReleaseRoleAndInviteManager, UserReleaseRoleAndInviteManager>();
             services.AddTransient<IUserReleaseInviteRepository, UserReleaseInviteRepository>();
             services.AddTransient<IUserPublicationInviteRepository, UserPublicationInviteRepository>();
             services.AddTransient<IRedirectsCacheService, RedirectsCacheService>();

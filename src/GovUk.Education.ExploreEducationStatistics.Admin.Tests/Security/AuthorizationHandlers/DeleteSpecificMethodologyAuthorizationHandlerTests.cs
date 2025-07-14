@@ -348,17 +348,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
         private static (
             DeleteSpecificMethodologyAuthorizationHandler,
             Mock<IMethodologyRepository>,
-            Mock<IUserPublicationRoleRepository>)
+            Mock<IUserPublicationRoleAndInviteManager>)
             CreateHandlerAndDependencies()
         {
-            var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>(Strict);
+            var userPublicationRoleRepository = new Mock<IUserPublicationRoleAndInviteManager>(Strict);
             var methodologyRepository = new Mock<IMethodologyRepository>(Strict);
 
             var handler = new DeleteSpecificMethodologyAuthorizationHandler(
                 methodologyRepository.Object,
                 new AuthorizationHandlerService(
                     new ReleaseVersionRepository(InMemoryApplicationDbContext()),
-                    Mock.Of<IUserReleaseRoleRepository>(Strict),
+                    Mock.Of<IUserReleaseRoleAndInviteManager>(Strict),
                     userPublicationRoleRepository.Object,
                     Mock.Of<IPreReleaseService>(Strict)));
 
