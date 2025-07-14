@@ -5,11 +5,6 @@ using Microsoft.Extensions.Logging;
 
 namespace GovUk.Education.ExploreEducationStatistics.Analytics.Consumer.Services.Workflow;
 
-public interface IProcessRequestFilesWorkflow
-{
-    Task Process(IWorkflowActor actor);
-}
-
 /// <summary>
 /// This class represents a common workflow that a number of IRequestFileProcessor
 /// implementations use in order to generate their Parquet report files.
@@ -31,23 +26,19 @@ public interface IProcessRequestFilesWorkflow
 ///     Logger from the associated Processor.
 /// </param>
 /// <param name="fileAccessor">
-///     Optional <see cref="IFileAccessor"/> implementation. If not provided, defaults to an instance of
-///     <see cref="FilesystemFileAccessor"/>.
+///     Abstracted file system handler.
 /// </param>
 /// <param name="dateTimeProvider">
-///     Optional <see cref="DateTimeProvider"/>. If not provided, defaults to providing the current time.  
+///     Abstracted date and time provider  
 /// </param>
 public class ProcessRequestFilesWorkflow(
     ILogger<ProcessRequestFilesWorkflow> logger,
-    IFileAccessor? fileAccessor = null,
-    DateTimeProvider? dateTimeProvider = null,
+    IFileAccessor fileAccessor,
+    DateTimeProvider dateTimeProvider,
     Func<string>? temporaryProcessingFolderNameGenerator = null,
     int batchSize = 100)
     : IProcessRequestFilesWorkflow
 {
-    private readonly IFileAccessor _fileAccessor = fileAccessor ?? new FilesystemFileAccessor();
-    private readonly DateTimeProvider _dateTimeProvider = dateTimeProvider ?? new DateTimeProvider();
-
     public async Task Process(IWorkflowActor actor)
     {
         var processorName = actor.GetType().FullName;
@@ -58,13 +49,13 @@ public class ProcessRequestFilesWorkflow(
         var reportsDirectory = actor.GetReportsDirectory();
         var baseProcessingDirectory = Path.Combine(sourceDirectory, "processing");
         
-        if (!_fileAccessor.DirectoryExists(sourceDirectory))
+        if (!fileAccessor.DirectoryExists(sourceDirectory))
         {
             logger.LogInformation("No requests for {Processor} to process", processorName);
             return;
         }
 
-        var filesToProcess = _fileAccessor
+        var filesToProcess = fileAccessor
             .ListFiles(sourceDirectory)
             .Order()
             .ToList();
@@ -129,7 +120,7 @@ public class ProcessRequestFilesWorkflow(
             .Result
             .Any(result => result);
 
-        _fileAccessor.DeleteDirectory(temporaryProcessingDirectory);
+        fileAccessor.DeleteDirectory(temporaryProcessingDirectory);
 
         // If no files were successfully processed, there is no need to generate
         // reports, so exit early.
@@ -138,11 +129,11 @@ public class ProcessRequestFilesWorkflow(
             return;
         }
         
-        _fileAccessor.CreateDirectory(reportsDirectory);
+        fileAccessor.CreateDirectory(reportsDirectory);
         
         var reportFilePathAndFilenamePrefix = Path.Combine(
             reportsDirectory,
-            _dateTimeProvider.UtcNow.ToString("yyyyMMdd-HHmmss"));
+            dateTimeProvider.UtcNow.ToString("yyyyMMdd-HHmmss"));
 
         await actor.CreateParquetReports(
             reportsFolderPathAndFilenamePrefix: reportFilePathAndFilenamePrefix,
@@ -178,7 +169,7 @@ public class ProcessRequestFilesWorkflow(
                 "failures",
                 temporaryProcessingDirectoryName);
 
-            _fileAccessor.CreateDirectory(failuresDirectory);
+            fileAccessor.CreateDirectory(failuresDirectory);
             
             MoveBadBatchDirectoryToFailuresDirectory(
                 batchDirectory: batchDirectory,
@@ -205,7 +196,7 @@ public class ProcessRequestFilesWorkflow(
     {
         try
         {
-            _fileAccessor.Move(
+            fileAccessor.Move(
                 sourcePath: batchDirectory,
                 destinationPath: Path.Combine(failuresDirectory, batchNumber.ToString()));
         }
@@ -223,118 +214,14 @@ public class ProcessRequestFilesWorkflow(
     {
         if (createTargetDirectory)
         {
-            _fileAccessor.CreateDirectory(targetDirectory);
+            fileAccessor.CreateDirectory(targetDirectory);
         }
 
         Parallel.ForEach(filenames, filename =>
         {
             var fileSourcePath = Path.Combine(sourceDirectory, filename);
             var fileDestPath = Path.Combine(targetDirectory, filename);
-            _fileAccessor.Move(fileSourcePath, fileDestPath);
+            fileAccessor.Move(fileSourcePath, fileDestPath);
         });
     }
 }
-
-/// <summary>
-/// This interface represents a component that interacts with a file store
-/// comprising directories and files.
-///
-/// It declares common filesystem interactions, mostly modelled from equivalent
-/// calls from <see cref="Directory"/> and <see cref="File"/>.
-/// </summary>
-public interface IFileAccessor
-{
-    bool DirectoryExists(string directory);
-    
-    void CreateDirectory(string directory);
-    
-    void DeleteDirectory(string directory);
-    
-    IList<string> ListFiles(string directory);
-    
-    void Move(string sourcePath, string destinationPath);
-}
-
-/// <summary>
-/// This default implementation of <see cref="IFileAccessor"/> interacts
-/// directly with a standard filesystem, using <see cref="Directory"/>
-/// and <see cref="File"/> to perform the work.
-/// </summary>
-internal class FilesystemFileAccessor : IFileAccessor
-{
-    public bool DirectoryExists(string directory)
-    {
-        return Directory.Exists(directory);
-    }
-
-    public void CreateDirectory(string directory)
-    {
-        Directory.CreateDirectory(directory);
-    }
-
-    public void DeleteDirectory(string directory)
-    {
-        Directory.Delete(directory, recursive: true);
-    }
-
-    public IList<string> ListFiles(string directory)
-    {
-        return Directory
-            .GetFiles(directory)
-            .Select(Path.GetFileName)
-            .OfType<string>()
-            .ToList(); 
-    }
-
-    public void Move(string sourcePath, string destinationPath)
-    {
-        Directory.Move(sourcePath, destinationPath);
-    }
-}
-
-/// <summary>
-/// This class represents an actor who is guided through the workflow
-/// as implemented in <see cref="ProcessRequestFilesWorkflow"/>.
-///
-/// This class is responsible for implementing steps that
-/// are carried out during the workflow that are specific to individual
-/// use cases e.g. collecting data about and generating Parquet report
-/// files for Public API queries.
-/// </summary>
-public interface IWorkflowActor
-{
-    string GetSourceDirectory();
-    
-    string GetReportsDirectory();
-
-    /// <summary>
-    /// Create any initial tables and state needed for collecting information
-    /// from source files.
-    /// </summary>
-    Task InitialiseDuckDb(DuckDbConnection connection);
-
-    /// <summary>
-    /// Given a source file, process it, generally by reading it into DuckDb
-    /// into tables set up at the beginning of the workflow.
-    /// </summary>
-    /// <param name="sourceFilesDirectory"></param>
-    /// <param name="connection">
-    ///     An open DuckDB connection that supports JSON reading and Parquet writing.
-    /// </param>
-    Task ProcessSourceFiles(string sourceFilesDirectory, DuckDbConnection connection);
-
-    /// <summary>
-    /// Create one or more Parquet report files based on the source files that
-    /// have been read.
-    /// </summary>
-    /// <param name="reportsFolderPathAndFilenamePrefix">
-    /// The fully-qualified folder path and filename prefix for any reports being
-    /// generated. In addition to a name suffix to identify each report being generated
-    /// here, '.parquet' will also need to be appended to any report filenames.
-    /// </param>
-    /// <param name="connection">
-    /// An open DuckDB connection that supports JSON reading and Parquet writing.
-    /// </param>
-    Task CreateParquetReports(string reportsFolderPathAndFilenamePrefix, DuckDbConnection connection);
-}
-
