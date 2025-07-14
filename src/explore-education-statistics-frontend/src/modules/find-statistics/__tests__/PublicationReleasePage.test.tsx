@@ -466,4 +466,55 @@ describe('PublicationReleasePage', () => {
       }),
     ).toHaveAttribute('href', 'http://gov.uk');
   });
+
+  test('renders default publishing organisation text', () => {
+    render(<PublicationReleasePage releaseVersion={testRelease} />);
+    const producedBy = screen.getByTestId('Produced by-value');
+
+    expect(screen.getByTestId('Produced by-value')).toHaveTextContent(
+      'Department for Education',
+    );
+
+    expect(
+      within(producedBy).getByRole('link', {
+        name: 'Department for Education',
+      }),
+    ).toHaveAttribute(
+      'href',
+      'https://www.gov.uk/government/organisations/department-for-education',
+    );
+  });
+
+  test('renders custom publishing organisation text correctly if set', () => {
+    render(
+      <PublicationReleasePage
+        releaseVersion={{
+          ...testRelease,
+          publishingOrganisations: [
+            {
+              id: 'org-id-1',
+              title: 'Department for Education',
+              url: 'https://www.gov.uk/government/organisations/department-for-education',
+            },
+            {
+              id: 'org-id-2',
+              title: 'Other Organisation',
+              url: 'https://example.com',
+            },
+          ],
+        }}
+      />,
+    );
+    const producedBy = screen.getByTestId('Produced by-value');
+
+    expect(screen.getByTestId('Produced by-value')).toHaveTextContent(
+      'Department for Education and Other Organisation',
+    );
+
+    expect(
+      within(producedBy).getByRole('link', {
+        name: 'Other Organisation',
+      }),
+    ).toHaveAttribute('href', 'https://example.com');
+  });
 });

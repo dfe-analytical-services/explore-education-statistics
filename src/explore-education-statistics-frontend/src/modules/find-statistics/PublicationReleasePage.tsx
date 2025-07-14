@@ -28,7 +28,7 @@ import styles from '@frontend/modules/find-statistics/PublicationReleasePage.mod
 import classNames from 'classnames';
 import orderBy from 'lodash/orderBy';
 import { GetServerSideProps, NextPage } from 'next';
-import React from 'react';
+import React, { Fragment } from 'react';
 import Button from '@common/components/Button';
 import downloadService from '@frontend/services/downloadService';
 
@@ -167,12 +167,25 @@ const PublicationReleasePage: NextPage<Props> = ({ releaseVersion }) => {
               </Link>
             }
             renderProducerLink={
-              <Link
-                unvisited
-                to="https://www.gov.uk/government/organisations/department-for-education"
-              >
-                Department for Education
-              </Link>
+              releaseVersion.publishingOrganisations ? (
+                <span>
+                  {releaseVersion.publishingOrganisations.map((org, index) => (
+                    <Fragment key={org.id}>
+                      {index > 0 && ' and '}
+                      <Link unvisited to={org.url}>
+                        {org.title}
+                      </Link>
+                    </Fragment>
+                  ))}
+                </span>
+              ) : (
+                <Link
+                  unvisited
+                  to="https://www.gov.uk/government/organisations/department-for-education"
+                >
+                  Department for Education
+                </Link>
+              )
             }
             onShowReleaseTypeModal={() =>
               logEvent({
