@@ -87,11 +87,12 @@ public class ReleaseAmendmentService : IReleaseAmendmentService
             // Assign this Release amendment a new Id.
             Id = amendmentReleaseVersionId,
 
-            // Copy various fields directly from the originalRelease.
+            // Copy various fields directly from the original release version.
             Release = originalReleaseVersion.Release,
             Publication = originalReleaseVersion.Publication,
             Type = originalReleaseVersion.Type,
             ApprovalStatus = ReleaseApprovalStatus.Draft,
+            PublishingOrganisations = originalReleaseVersion.PublishingOrganisations,
             DataGuidance = originalReleaseVersion.DataGuidance,
             PreReleaseAccessList = originalReleaseVersion.PreReleaseAccessList,
             NextReleaseDate = originalReleaseVersion.NextReleaseDate,
@@ -651,6 +652,7 @@ internal static class ReleaseAmendmentQueryableExtensions
             .AsSplitQuery()
             .Include(releaseVersion => releaseVersion.Publication)
             .Include(releaseVersion => releaseVersion.Release)
+            .Include(releaseVersion => releaseVersion.PublishingOrganisations)
             .Include(releaseVersion => releaseVersion.Content)
             .ThenInclude(section => section.Content)
             .ThenInclude(block => (block as EmbedBlockLink)!.EmbedBlock)
