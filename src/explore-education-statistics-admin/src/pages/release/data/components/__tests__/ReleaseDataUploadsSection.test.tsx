@@ -220,6 +220,12 @@ describe('ReleaseDataUploadsSection', () => {
 
     expect(await screen.findByText('Uploaded data files')).toBeInTheDocument();
 
+    expect(
+      await screen.findByRole('button', {
+        name: 'Confirm all valid replacements',
+      }),
+    ).toBeInTheDocument();
+
     expect(await screen.findByText('Test data 2')).toBeInTheDocument();
 
     const replacementRows = getAllFileTableRows('Data file replacements');

@@ -19,6 +19,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.CodeAnalysis.FlowAnalysis;
 using Microsoft.EntityFrameworkCore;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
@@ -86,6 +87,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     var replacementReleaseFile = releaseFilesAndPlan.replacementReleaseFile;
                     var plan = releaseFilesAndPlan.plan;
 
+                    contentDbContext.Update(originalReleaseFile);
+                    contentDbContext.Update(replacementReleaseFile);
+
                     var originalSubjectId = plan.OriginalSubjectId;
                     var replacementSubjectId = plan.ReplacementSubjectId;
 
@@ -107,22 +111,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         await ReplaceFilterSequence(originalReleaseFile, replacementReleaseFile);
                     replacementReleaseFile.IndicatorSequence =
                         await ReplaceIndicatorSequence(originalReleaseFile, replacementReleaseFile);
-
                     replacementReleaseFile.Summary = originalReleaseFile.Summary; // Set Data guidance
 
                     // To remove original, we first unlink the files. If we don't do this,
                     // ReleaseVersionService.RemoveDataFiles will remove the replacement file as well!
-                    // @MarkFix YOU ARE HERE - the Replace test fails
-                    await contentDbContext.Files
-                        .Where(f => f.Id == originalReleaseFile.FileId)
-                        .ExecuteUpdateAsync(s => s.SetProperty(
-                            rf => rf.ReplacedById, (Guid?)null),
-                            cancellationToken: cancellationToken);
-                    await contentDbContext.Files
-                        .Where(f => f.Id == replacementReleaseFile.FileId)
-                        .ExecuteUpdateAsync(s => s.SetProperty(
-                            f => f.ReplacedById, (Guid?)null),
-                            cancellationToken: cancellationToken);
+                    contentDbContext.Update(originalReleaseFile.File);
+                    contentDbContext.Update(replacementReleaseFile.File);
+                    originalReleaseFile.File.ReplacedById = null;
+                    replacementReleaseFile.File.ReplacingId = null;
 
                     await contentDbContext.SaveChangesAsync(cancellationToken);
                     await statisticsDbContext.SaveChangesAsync(cancellationToken); // For footnotes

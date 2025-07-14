@@ -26,6 +26,7 @@ using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Options;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.TimeIdentifier;
@@ -45,52 +46,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         private readonly DataFixture _fixture = new();
 
         [Fact]
-        public async Task GetReplacementPlan_ReplacementFileNotFound()
+        public async Task GetReplacementPlan_LinkedReplacementReleaseFilesNotFound() // @MarkFix write tests for CheckLinkedOriginalAndReplacementReleaseFilesExist
         {
             var releaseVersion = _fixture.DefaultReleaseVersion().Generate();
-
-            var originalReleaseFile = new ReleaseFile
-            {
-                ReleaseVersion = releaseVersion,
-                File = new File
-                {
-                    Type = FileType.Data,
-                    SubjectId = Guid.NewGuid(),
-                    ReplacedById = Guid.NewGuid(), // nonexistent fileId
-                }
-            };
+            var nonExistantFileId = Guid.NewGuid();
 
             var contentDbContextId = Guid.NewGuid().ToString();
             var statisticsDbContextId = Guid.NewGuid().ToString();
 
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                contentDbContext.ReleaseVersions.AddRange(releaseVersion);
-                contentDbContext.ReleaseFiles.AddRange(originalReleaseFile);
-                await contentDbContext.SaveChangesAsync();
-            }
-
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
-            {
-                var replacementPlanService = BuildReplacementPlanService(contentDbContext,
-                    statisticsDbContext);
-
-                var result = await replacementPlanService.GetReplacementPlan(
-                    releaseVersionId: releaseVersion.Id,
-                    originalFileId: originalReleaseFile.FileId);
-
-                result.AssertNotFound();
-            }
-        }
-
-        [Fact]
-        public async Task GetReplacementPlan_OriginalFileNotFound()
-        {
-            var releaseVersion = _fixture.DefaultReleaseVersion().Generate();
-
-            var contentDbContextId = Guid.NewGuid().ToString();
-            var statisticsDbContextId = Guid.NewGuid().ToString();
+            var releaseFileRepository = new Mock<IReleaseFileRepository>(Strict);
+            releaseFileRepository.Setup(mock => mock.CheckLinkedOriginalAndReplacementReleaseFilesExist(
+                releaseVersion.Id, nonExistantFileId))
+                .ReturnsAsync(new NotFoundResult());
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
@@ -101,12 +68,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
-                var replacementPlanService = BuildReplacementPlanService(contentDbContext,
-                    statisticsDbContext);
+                var replacementPlanService = BuildReplacementPlanService(
+                    contentDbContext,
+                    statisticsDbContext,
+                    releaseFileRepository: releaseFileRepository.Object);
 
                 var result = await replacementPlanService.GetReplacementPlan(
                     releaseVersionId: releaseVersion.Id,
-                    originalFileId: Guid.NewGuid());
+                    originalFileId: nonExistantFileId);
 
                 result.AssertNotFound();
             }
@@ -154,60 +123,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async Task GetReplacementPlan_ReplacementFileAttachedToDifferentRelease()
-        {
-            var (release1, release2) = _fixture.DefaultReleaseVersion().GenerateTuple2();
-
-            var originalFile = new File
-            {
-                Type = FileType.Data,
-                SubjectId = Guid.NewGuid()
-            };
-
-            var replacementFile = new File
-            {
-                Type = FileType.Data,
-                SubjectId = Guid.NewGuid()
-            };
-
-            var originalReleaseFile = new ReleaseFile
-            {
-                ReleaseVersion = release1,
-                File = originalFile
-            };
-
-            // Link the replacement to the unrelated Release
-            var replacementReleaseFile = new ReleaseFile
-            {
-                ReleaseVersion = release2,
-                File = replacementFile
-            };
-
-            var contentDbContextId = Guid.NewGuid().ToString();
-            var statisticsDbContextId = Guid.NewGuid().ToString();
-
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                contentDbContext.ReleaseVersions.AddRange(release1, release2);
-                contentDbContext.ReleaseFiles.AddRange(originalReleaseFile, replacementReleaseFile);
-                await contentDbContext.SaveChangesAsync();
-            }
-
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
-            {
-                var replacementPlanService = BuildReplacementPlanService(contentDbContext,
-                    statisticsDbContext);
-
-                var result = await replacementPlanService.GetReplacementPlan(
-                    releaseVersionId: release1.Id,
-                    originalFileId: originalFile.Id);
-
-                result.AssertNotFound();
-            }
-        }
-
-        [Fact]
         public async Task GetReplacementPlan_OriginalFileIsNotUsedByAnyDependentData()
         {
             var releaseVersion = _fixture.DefaultReleaseVersion().Generate();
@@ -223,6 +138,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var originalFile = new File
             {
+                Id = Guid.NewGuid(),
                 Type = FileType.Data,
                 SubjectId = originalReleaseSubject.SubjectId
             };
@@ -256,6 +172,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             timePeriodService.Setup(service => service.GetTimePeriods(replacementReleaseSubject.SubjectId))
                 .ReturnsAsync(new List<(int Year, TimeIdentifier TimeIdentifier)>());
 
+            var releaseFileRepository = new Mock<IReleaseFileRepository>(Strict);
+            releaseFileRepository.Setup(mock => mock.CheckLinkedOriginalAndReplacementReleaseFilesExist(
+                releaseVersion.Id, originalFile.Id))
+                .ReturnsAsync((originalReleaseFile, replacementReleaseFile));
+
             var contentDbContextId = Guid.NewGuid().ToString();
             var statisticsDbContextId = Guid.NewGuid().ToString();
 
@@ -281,7 +202,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var replacementPlanService = BuildReplacementPlanService(contentDbContext,
                     statisticsDbContext,
                     locationRepository: locationRepository.Object,
-                    timePeriodService: timePeriodService.Object);
+                    timePeriodService: timePeriodService.Object,
+                    releaseFileRepository: releaseFileRepository.Object);
 
                 var result = await replacementPlanService.GetReplacementPlan(
                     releaseVersionId: releaseVersion.Id,
@@ -317,6 +239,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var originalFile = new File
             {
+                Id = Guid.NewGuid(),
                 Type = FileType.Data,
                 SubjectId = originalReleaseSubject.SubjectId
             };
@@ -507,6 +430,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             timePeriodService.Setup(service => service.GetTimePeriods(replacementReleaseSubject.SubjectId))
                 .ReturnsAsync(new List<(int Year, TimeIdentifier TimeIdentifier)>());
 
+            var releaseFileRepository = new Mock<IReleaseFileRepository>(Strict);
+            releaseFileRepository.Setup(mock => mock.CheckLinkedOriginalAndReplacementReleaseFilesExist(
+                releaseVersion.Id, originalFile.Id))
+                .ReturnsAsync((originalReleaseFile, replacementReleaseFile));
+
             var contentDbContextId = Guid.NewGuid().ToString();
             var statisticsDbContextId = Guid.NewGuid().ToString();
 
@@ -539,7 +467,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var replacementPlanService = BuildReplacementPlanService(contentDbContext,
                     statisticsDbContext,
                     locationRepository: locationRepository.Object,
-                    timePeriodService: timePeriodService.Object);
+                    timePeriodService: timePeriodService.Object,
+                    releaseFileRepository: releaseFileRepository.Object);
 
                 var result = await replacementPlanService.GetReplacementPlan(
                     releaseVersionId: releaseVersion.Id,
@@ -758,6 +687,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var originalFile = new File
             {
+                Id = Guid.NewGuid(),
                 Type = FileType.Data,
                 SubjectId = originalReleaseSubject.SubjectId,
             };
@@ -922,6 +852,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     (2020, CalendarYear)
                 });
 
+            var releaseFileRepository = new Mock<IReleaseFileRepository>(Strict);
+            releaseFileRepository.Setup(mock => mock.CheckLinkedOriginalAndReplacementReleaseFilesExist(
+                releaseVersion.Id, originalFile.Id))
+                .ReturnsAsync((originalReleaseFile, replacementReleaseFile));
+
             var contentDbContextId = Guid.NewGuid().ToString();
             var statisticsDbContextId = Guid.NewGuid().ToString();
 
@@ -952,7 +887,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var replacementPlanService = BuildReplacementPlanService(contentDbContext,
                     statisticsDbContext,
                     locationRepository: locationRepository.Object,
-                    timePeriodService: timePeriodService.Object);
+                    timePeriodService: timePeriodService.Object,
+                    releaseFileRepository: releaseFileRepository.Object);
 
                 var result = await replacementPlanService.GetReplacementPlan(
                     releaseVersionId: releaseVersion.Id,
@@ -987,6 +923,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var originalFile = new File
             {
+                Id = Guid.NewGuid(),
                 Type = FileType.Data,
                 SubjectId = originalReleaseSubject.SubjectId,
             };
@@ -1143,6 +1080,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     (2020, CalendarYear)
                 });
 
+            var releaseFileRepository = new Mock<IReleaseFileRepository>(Strict);
+            releaseFileRepository.Setup(mock => mock.CheckLinkedOriginalAndReplacementReleaseFilesExist(
+                releaseVersion.Id, originalFile.Id))
+                .ReturnsAsync((originalReleaseFile, replacementReleaseFile));
+
             var contentDbContextId = Guid.NewGuid().ToString();
             var statisticsDbContextId = Guid.NewGuid().ToString();
 
@@ -1173,7 +1115,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var replacementPlanService = BuildReplacementPlanService(contentDbContext,
                     statisticsDbContext,
                     locationRepository: locationRepository.Object,
-                    timePeriodService: timePeriodService.Object);
+                    timePeriodService: timePeriodService.Object,
+                    releaseFileRepository: releaseFileRepository.Object);
 
                 var result = await replacementPlanService.GetReplacementPlan(
                     releaseVersionId: releaseVersion.Id,
@@ -1208,6 +1151,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var originalFile = new File
             {
+                Id = Guid.NewGuid(),
                 Type = FileType.Data,
                 SubjectId = originalReleaseSubject.SubjectId
             };
@@ -1389,6 +1333,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     (2020, CalendarYear)
                 });
 
+            var releaseFileRepository = new Mock<IReleaseFileRepository>(Strict);
+            releaseFileRepository.Setup(mock => mock.CheckLinkedOriginalAndReplacementReleaseFilesExist(
+                releaseVersion.Id, originalFile.Id))
+                .ReturnsAsync((originalReleaseFile, replacementReleaseFile));
+
             var contentDbContextId = Guid.NewGuid().ToString();
             var statisticsDbContextId = Guid.NewGuid().ToString();
 
@@ -1420,7 +1369,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var replacementPlanService = BuildReplacementPlanService(contentDbContext,
                     statisticsDbContext,
                     locationRepository: locationRepository.Object,
-                    timePeriodService: timePeriodService.Object);
+                    timePeriodService: timePeriodService.Object,
+                    releaseFileRepository: releaseFileRepository.Object);
 
                 var result = await replacementPlanService.GetReplacementPlan(
                     releaseVersionId: releaseVersion.Id,
@@ -1455,6 +1405,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var originalFile = new File
             {
+                Id = Guid.NewGuid(),
                 Type = FileType.Data,
                 SubjectId = originalReleaseSubject.SubjectId,
             };
@@ -1617,6 +1568,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     (2020, CalendarYear)
                 });
 
+            var releaseFileRepository = new Mock<IReleaseFileRepository>(Strict);
+            releaseFileRepository.Setup(mock => mock.CheckLinkedOriginalAndReplacementReleaseFilesExist(
+                releaseVersion.Id, originalFile.Id))
+                .ReturnsAsync((originalReleaseFile, replacementReleaseFile));
+
             var contentDbContextId = Guid.NewGuid().ToString();
             var statisticsDbContextId = Guid.NewGuid().ToString();
 
@@ -1646,7 +1602,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var replacementPlanService = BuildReplacementPlanService(contentDbContext,
                     statisticsDbContext,
                     locationRepository: locationRepository.Object,
-                    timePeriodService: timePeriodService.Object);
+                    timePeriodService: timePeriodService.Object,
+                    releaseFileRepository: releaseFileRepository.Object);
 
                 var result = await replacementPlanService.GetReplacementPlan(
                     releaseVersionId: releaseVersion.Id,
@@ -1787,6 +1744,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             timePeriodService.Setup(service => service.GetTimePeriods(replacementReleaseSubject.SubjectId))
                 .ReturnsAsync(new List<(int Year, TimeIdentifier TimeIdentifier)>());
 
+            var releaseFileRepository = new Mock<IReleaseFileRepository>(Strict);
+            releaseFileRepository.Setup(mock => mock.CheckLinkedOriginalAndReplacementReleaseFilesExist(
+                releaseVersion.Id, originalFile.Id))
+                .ReturnsAsync((originalReleaseFile, replacementReleaseFile));
+
             var dataSetVersionMappingService = new Mock<IDataSetVersionMappingService>(Strict);
             dataSetVersionMappingService.Setup(service => service.GetMappingStatus(
                     It.IsAny<Guid>(),
@@ -1824,9 +1786,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     dataSetVersionService: dataSetVersionService.Object,
                     timePeriodService: timePeriodService.Object,
                     locationRepository: locationRepository.Object,
+                    releaseFileRepository: releaseFileRepository.Object,
                     dataSetVersionMappingService: dataSetVersionMappingService.Object,
-                    featureFlags: options
-                    );
+                    featureFlags: options);
 
                 var result = await replacementPlanService.GetReplacementPlan(
                     releaseVersionId: releaseVersion.Id,
@@ -1873,6 +1835,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var originalFile = new File
             {
+                Id = Guid.NewGuid(),
                 Type = FileType.Data,
                 SubjectId = originalReleaseSubject.SubjectId,
             };
@@ -2157,6 +2120,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     (2020, CalendarYear)
                 });
 
+            var releaseFileRepository = new Mock<IReleaseFileRepository>(Strict);
+            releaseFileRepository.Setup(mock => mock.CheckLinkedOriginalAndReplacementReleaseFilesExist(
+                releaseVersion.Id, originalFile.Id))
+                .ReturnsAsync((originalReleaseFile, replacementReleaseFile));
+
             var contentDbContextId = Guid.NewGuid().ToString();
             var statisticsDbContextId = Guid.NewGuid().ToString();
 
@@ -2190,7 +2158,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var replacementPlanService = BuildReplacementPlanService(contentDbContext,
                     statisticsDbContext,
                     locationRepository: locationRepository.Object,
-                    timePeriodService: timePeriodService.Object);
+                    timePeriodService: timePeriodService.Object,
+                    releaseFileRepository: releaseFileRepository.Object);
 
                 var result = await replacementPlanService.GetReplacementPlan(
                     releaseVersionId: releaseVersion.Id,

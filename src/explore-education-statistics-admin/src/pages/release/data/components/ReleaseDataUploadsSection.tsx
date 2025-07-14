@@ -70,7 +70,7 @@ export default function ReleaseDataUploadsSection({
     onDataFilesChange?.(allDataFiles);
   }, [allDataFiles, onDataFilesChange]);
 
-  const dataFiles = useMemo(
+  const dataFilesExcludingReplacements = useMemo(
     () => allDataFiles.filter(dataFile => !dataFile.replacedByDataFile),
     [allDataFiles],
   );
@@ -329,12 +329,12 @@ export default function ReleaseDataUploadsSection({
                   />
                 )}
 
-                {(dataFiles.length > 0 ||
+                {(dataFilesExcludingReplacements.length > 0 ||
                   uploadsWithoutReplacements.length > 0) && (
                   <DataFilesTable
                     canUpdateRelease={canUpdateRelease}
                     caption="Data files"
-                    dataFiles={dataFiles}
+                    dataFiles={dataFilesExcludingReplacements}
                     dataSetUploads={uploadsWithoutReplacements}
                     publicationId={publicationId}
                     releaseVersionId={releaseVersionId}
