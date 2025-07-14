@@ -61,13 +61,8 @@ const DataFileReplacementPlan = ({
     error,
     retry: reloadPlan,
   } = useAsyncRetry(
-    () =>
-      dataReplacementService.getReplacementPlan(
-        releaseVersionId,
-        fileId,
-        replacementFileId,
-      ),
-    [releaseVersionId, fileId, replacementFileId],
+    () => dataReplacementService.getReplacementPlan(releaseVersionId, fileId),
+    [releaseVersionId, fileId, replacementFileId], // Include replacementFileId because the plan could change even if fileId has not!
   );
 
   const hasInvalidDataBlocks = useMemo<boolean>(
@@ -586,11 +581,9 @@ const DataFileReplacementPlan = ({
                 onClick={async () => {
                   toggleSubmitting.on();
 
-                  await dataReplacementService.replaceData(
-                    releaseVersionId,
+                  await dataReplacementService.replaceData(releaseVersionId, [
                     fileId,
-                    replacementFileId,
-                  );
+                  ]);
 
                   if (onReplacement) {
                     onReplacement();

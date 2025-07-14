@@ -1464,10 +1464,10 @@ describe('DataReplacementPlan', () => {
       <MemoryRouter>
         <DataFileReplacementPlan
           cancelButton={<button type="button">Cancel</button>}
-          publicationId="publication-1"
-          releaseVersionId="release-1"
-          fileId="file-1"
-          replacementFileId="file-2"
+          publicationId="publication-id"
+          releaseVersionId="release-id"
+          fileId="original-file-id"
+          replacementFileId="replacement-file-id"
         />
       </MemoryRouter>,
     );
@@ -1487,9 +1487,8 @@ describe('DataReplacementPlan', () => {
     );
 
     expect(dataReplacementService.replaceData).toHaveBeenCalledWith(
-      'release-1',
-      'file-1',
-      'file-2',
+      'release-id',
+      ['original-file-id'],
     );
   });
 
