@@ -46,7 +46,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         private readonly DataFixture _fixture = new();
 
         [Fact]
-        public async Task GetReplacementPlan_LinkedReplacementReleaseFilesNotFound() // @MarkFix write tests for CheckLinkedOriginalAndReplacementReleaseFilesExist
+        public async Task GetReplacementPlan_LinkedReplacementReleaseFilesNotFound()
         {
             var releaseVersion = _fixture.DefaultReleaseVersion().Generate();
             var nonExistantFileId = Guid.NewGuid();

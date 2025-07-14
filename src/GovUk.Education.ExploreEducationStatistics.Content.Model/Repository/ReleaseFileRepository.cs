@@ -156,7 +156,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository
                 .FirstOrNotFoundAsync(originalReleaseFile =>
                     originalReleaseFile.ReleaseVersionId == releaseVersionId
                     && originalReleaseFile.FileId == originalFileId
-                    && originalReleaseFile.File.Type == FileType.Data
+                    && originalReleaseFile.File.Type == Data
                     && originalReleaseFile.File.ReplacedById != null)
                 .OnSuccessCombineWith(async originalReleaseFile =>
                     await _contentDbContext.ReleaseFiles
@@ -164,7 +164,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository
                         .FirstOrNotFoundAsync(replacementReleaseFile =>
                             replacementReleaseFile.ReleaseVersionId == releaseVersionId
                             && replacementReleaseFile.FileId == originalReleaseFile.File.ReplacedById
-                            && replacementReleaseFile.File.Type == FileType.Data
+                            && replacementReleaseFile.File.Type == Data
                             && originalReleaseFile.FileId == replacementReleaseFile.File.ReplacingId))
                 .OnSuccess(releaseFiles => releaseFiles.ToValueTuple());
         }
