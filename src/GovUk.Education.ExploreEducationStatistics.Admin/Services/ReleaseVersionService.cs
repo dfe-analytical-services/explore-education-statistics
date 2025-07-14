@@ -73,6 +73,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .ReleaseVersions
                 .Include(rv => rv.Release)
                 .ThenInclude(r => r.Publication)
+                .Include(rv => rv.PublishingOrganisations)
                 .Include(rv => rv.ReleaseStatuses)
                 .SingleOrNotFoundAsync(rv => rv.Id == releaseVersionId)
                 .OnSuccess(userService.CheckCanViewReleaseVersion)

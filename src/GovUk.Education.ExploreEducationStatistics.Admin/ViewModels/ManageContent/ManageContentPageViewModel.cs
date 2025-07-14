@@ -44,6 +44,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ManageCont
             [JsonConverter(typeof(StringEnumConverter))]
             public ReleaseType Type { get; set; }
 
+            public IEnumerable<OrganisationViewModel> PublishingOrganisations { get; set; } = [];
+
             public List<ReleaseNoteViewModel> Updates { get; set; } = new();
 
             public List<ContentSectionViewModel> Content { get; set; } = new();
