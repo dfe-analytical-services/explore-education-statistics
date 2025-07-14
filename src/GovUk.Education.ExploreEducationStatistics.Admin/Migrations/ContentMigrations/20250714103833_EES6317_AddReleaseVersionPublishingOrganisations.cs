@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
@@ -74,6 +75,11 @@ public partial class EES6317_AddReleaseVersionPublishingOrganisations : Migratio
         migrationBuilder.Sql("GRANT SELECT ON dbo.ReleaseVersionPublishingOrganisations TO [content];");
         migrationBuilder.Sql("GRANT SELECT ON dbo.Organisations TO [publisher];");
         migrationBuilder.Sql("GRANT SELECT ON dbo.ReleaseVersionPublishingOrganisations TO [publisher];");
+
+        // Insert seed Organisations
+        migrationBuilder.SqlFromFile(
+            MigrationConstants.ContentMigrationsPath,
+            $"{MigrationId}_{nameof(EES6317_AddReleaseVersionPublishingOrganisations)}.sql");
     }
 
     /// <inheritdoc />
