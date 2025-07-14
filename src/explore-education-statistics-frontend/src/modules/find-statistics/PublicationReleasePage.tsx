@@ -162,7 +162,7 @@ const PublicationReleasePage: NextPage<Props> = ({ releaseVersion }) => {
               </Link>
             }
             renderProducerLink={
-              releaseVersion.publishingOrganisations ? (
+              releaseVersion.publishingOrganisations?.length ? (
                 <span>
                   {releaseVersion.publishingOrganisations.map((org, index) => (
                     <Fragment key={org.id}>
