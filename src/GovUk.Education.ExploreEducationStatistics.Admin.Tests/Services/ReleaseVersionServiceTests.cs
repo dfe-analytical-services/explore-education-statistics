@@ -1034,6 +1034,8 @@ public abstract class ReleaseVersionServiceTests
                                 .WithApprovalStatus(ReleaseApprovalStatus.Approved)
                                 .WithPublished(DateTime.UtcNow)
                                 .WithPublishScheduled(DateTime.UtcNow)
+                                .WithPublishingOrganisations(_dataFixture.DefaultOrganisation()
+                                    .Generate(2))
                                 .WithReleaseStatuses(_dataFixture.DefaultReleaseStatus()
                                     .Generate(2))
                         ])
@@ -1091,6 +1093,16 @@ public abstract class ReleaseVersionServiceTests
                 Assert.Equal(releaseVersion.Release.TimePeriodCoverage, viewModel.TimePeriodCoverage);
                 Assert.Equal(releaseVersion.NotifySubscribers, viewModel.NotifySubscribers);
                 Assert.Equal(releaseVersion.UpdatePublishedDate, viewModel.UpdatePublishedDate);
+
+                Assert.Equal(releaseVersion.PublishingOrganisations.Count, viewModel.PublishingOrganisations.Count);
+                Assert.All(releaseVersion.PublishingOrganisations,
+                    (expectedOrganisation, index) =>
+                    {
+                        var actualOrganisation = viewModel.PublishingOrganisations[index];
+                        Assert.Equal(expectedOrganisation.Id, actualOrganisation.Id);
+                        Assert.Equal(expectedOrganisation.Title, actualOrganisation.Title);
+                        Assert.Equal(expectedOrganisation.Url, actualOrganisation.Url);
+                    });
 
                 Assert.Null(viewModel.PreviousVersionId);
                 Assert.True(viewModel.LatestRelease);

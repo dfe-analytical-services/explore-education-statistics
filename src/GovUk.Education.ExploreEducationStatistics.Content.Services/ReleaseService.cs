@@ -77,6 +77,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
             var releaseVersion = await _contentDbContext
                 .ReleaseVersions
                 .Include(rv => rv.Release)
+                .Include(rv => rv.PublishingOrganisations)
                 .Include(rv => rv.Content)
                 .ThenInclude(cs => cs.Content)
                 .ThenInclude(cb => (cb as EmbedBlockLink)!.EmbedBlock)
