@@ -23,12 +23,12 @@ param resourceTags {
 @description('Provides access to resources for specific IP address ranges used for service maintenance.')
 param maintenanceIpRanges IpRange[] = []
 
-// @description('Specifies the Application (Client) Id of a pre-existing App Registration used to represent the Screener Function App.')
-// param screenerAppRegistrationClientId string = ''
+@description('Specifies the Application (Client) Id of a pre-existing App Registration used to represent the Screener Function App.')
+param screenerAppRegistrationClientId string = ''
 
-// @description('Specifies the principal id of the Azure DevOps SPN.')
-// @secure()
-// param devopsServicePrincipalId string = ''
+@description('Specifies the principal id of the Azure DevOps SPN.')
+@secure()
+param devopsServicePrincipalId string = ''
 
 @description('Tagging : Date Provisioned. Used for tagging resources created by this infrastructure pipeline.')
 param dateProvisioned string = utcNow('u')
@@ -81,8 +81,8 @@ module screenerFunctionAppModule 'application/screenerContainerisedFunctionApp.b
     coreStorageAccessKeyName: coreStorage.outputs.coreStorageAccessKey
     coreStorageBlobEndpoint: coreStorage.outputs.coreStorageBlobEndpoint
     acrLoginServer: keyVault.getSecret('DOCKER-REGISTRY-SERVER-DOMAIN')
-    // screenerAppRegistrationClientId: screenerAppRegistrationClientId
-    // devopsServicePrincipalId: devopsServicePrincipalId
+    screenerAppRegistrationClientId: screenerAppRegistrationClientId
+    devopsServicePrincipalId: devopsServicePrincipalId
     screenerDockerImageTag: screenerDockerImageTag
     resourceNames: resourceNames
     functionAppExists: screenerFunctionAppExists
