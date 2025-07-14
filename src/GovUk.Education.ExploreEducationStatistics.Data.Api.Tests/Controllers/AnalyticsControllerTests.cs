@@ -41,7 +41,7 @@ public class AnalyticsControllerTests
             var response = await sut.RecordDownload(bindingModel);
 
             // ASSERT
-            response.AssertOkResult();
+            response.AssertAccepted();
             var expected = bindingModel.ToModel();
             _analyticsManager.Assert.RequestAdded(expected);
         }
@@ -61,7 +61,7 @@ public class AnalyticsControllerTests
             var response = await sut.RecordDownload(bindingModel);
 
             // ASSERT
-            response.AssertOkResult();
+            response.AssertAccepted();
             var expected = bindingModel.ToModel();
             _analyticsManager.Assert.RequestAdded(expected);
         }
