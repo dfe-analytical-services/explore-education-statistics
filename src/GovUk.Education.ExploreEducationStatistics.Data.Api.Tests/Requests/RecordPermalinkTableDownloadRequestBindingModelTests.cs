@@ -38,6 +38,30 @@ public class RecordPermalinkTableDownloadRequestBindingModelTests
         Assert.NotNull(result);
         Assert.True(result.IsValid);
     }
+    
+    [Fact]
+    public void GivenAFullyPopulatedBindingModel_WhenConvertedToModel_ThenShouldSucceed()
+    {
+        // ARRANGE
+        var bindingModel = new RecordPermalinkTableDownloadRequestBindingModel
+        {
+            PermalinkTitle = "perma link title",
+            PermalinkId = Guid.Parse("4e3f5743-fb44-4183-950c-39f4032dd174"),
+            DownloadFormat = TableDownloadFormat.ODS
+        };
+        
+        // ACT
+        var actual = bindingModel.ToModel();
+        
+        // ASSERT
+        var expected = new CapturePermaLinkTableDownloadCall
+        {
+            PermalinkTitle = "perma link title",
+            PermalinkId = Guid.Parse("4e3f5743-fb44-4183-950c-39f4032dd174"),
+            DownloadFormat = TableDownloadFormat.ODS
+        };
+        Assert.Equal(expected, actual);
+    }
 
     public static TheoryData<RecordPermalinkTableDownloadRequestBindingModel> InvalidBindingModels() =>
         new(
