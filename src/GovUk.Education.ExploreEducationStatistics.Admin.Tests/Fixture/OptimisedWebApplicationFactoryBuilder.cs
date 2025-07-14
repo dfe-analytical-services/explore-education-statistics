@@ -5,6 +5,7 @@ using System.Linq;
 using System.Security.Claims;
 using System.Text.Encodings.Web;
 using System.Threading.Tasks;
+using Dapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Database;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Public.Data;
@@ -26,6 +27,9 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -33,6 +37,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Console;
 using Microsoft.Extensions.Options;
 using Moq;
+using Npgsql;
 using Testcontainers.Azurite;
 using Testcontainers.PostgreSql;
 
@@ -157,8 +162,8 @@ public class OptimisedWebApplicationFactoryBuilder<TStartup>(
             services.Remove(descriptor);
         }
 
-        var schemaInitializer = new OptimisedTestSchemaInitialiser(connectionString);
-        schemaInitializer.InitializeAsync().Wait();
+        // var schemaInitializer = new OptimisedTestSchemaInitialiser(connectionString);
+        // schemaInitializer.InitializeAsync().Wait();
         
         // var options = new DbContextOptionsBuilder<PublicDataDbContext>()
         //     .UseNpgsql(connectionString)
@@ -166,22 +171,62 @@ public class OptimisedWebApplicationFactoryBuilder<TStartup>(
 
         // var publicDataDbContext = new PublicDataDbContext(options, true, _schemaInitializer.SchemaName);
         
+        var schemaName = Guid.NewGuid().ToString();
+        
+        var services2 = new ServiceCollection();
+        services2.AddEntityFrameworkNpgsql();
+
+        var internalServiceProvider = services2.BuildServiceProvider();
+        
         services.AddDbContext<PublicDataDbContext>(
             options => options
+                .EnableSensitiveDataLogging()
+                .LogTo(Console.WriteLine, LogLevel.Debug)
                 .UseNpgsql(connectionString, options => options.
-            MigrationsHistoryTable("__EFMigrationsHistory", schemaInitializer.SchemaName)));
+            MigrationsHistoryTable("__EFMigrationsHistory", schemaName))
+                .UseInternalServiceProvider(internalServiceProvider));
 
+        
         // services.ReplaceService(publicDataDbContext);
-        
-        services.AddScoped<ISchemaNameProvider>(_ => new SchemaNameProvider(schemaInitializer.SchemaName));
 
-        
+        services.AddScoped<ISchemaNameProvider>(_ => new SchemaNameProvider(schemaName));
+
+        // using var conn = new NpgsqlConnection(connectionString);
+        // conn.Open();
+        //
+        // using var cmd = conn.CreateCommand();
+        // cmd.CommandText = $@"
+        //     DROP SCHEMA IF EXISTS ""{schemaName}"" CASCADE;
+        //     CREATE SCHEMA ""{schemaName}"";
+        // ";
+        //
+        // cmd.ExecuteNonQuery();
         using var serviceScope = services.BuildServiceProvider()
             .GetRequiredService<IServiceScopeFactory>()
             .CreateScope();
         
         using var context = serviceScope.ServiceProvider.GetRequiredService<PublicDataDbContext>();
-        context.Database.Migrate();
+        // context.Database.EnsureDeleted();
+        // context.Database.ExecuteSqlRaw($"DROP SCHEMA IF EXISTS \"{context.SchemaName}\" CASCADE;");
+        // context.Database.ExecuteSqlRaw($"CREATE SCHEMA \"{context.SchemaName}\";");
+        // context.Database.EnsureDeleted();
+        // context.Database.EnsureCreated();
+
+        
+        // var options = new DbContextOptionsBuilder<PublicDataDbContext>()
+        //     .UseNpgsql(connectionString, options => options.MigrationsHistoryTable("__EFMigrationsHistory", schemaName)
+        //     )
+        //     .EnableSensitiveDataLogging()
+        //     .LogTo(Console.WriteLine, LogLevel.Information)
+        //     .Options;
+        //
+        // using var context2 = new PublicDataDbContext(options, new SchemaNameProvider(schemaName));
+        // context2.Database.EnsureCreated();
+        // context.Database.Migrate();
+        // context.
+        var databaseCreator = context.Database.GetService<IRelationalDatabaseCreator>();
+        databaseCreator.CreateTables();
+        // context2.Database.Migrate();
     }
 
     private static void RegisterAzuriteAppConfiguration(

@@ -45,9 +45,11 @@ public class PublicDataDbContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        modelBuilder.HasDefaultSchema(SchemaName);
+        
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(PublicDataDbContext).Assembly);
 
-        modelBuilder.HasSequence<int>(FilterOptionMetaLinkSequence, SchemaName);
+        modelBuilder.HasSequence<int>(FilterOptionMetaLinkSequence, schema: SchemaName);
         
         foreach (var entity in modelBuilder.Model.GetEntityTypes())
         {

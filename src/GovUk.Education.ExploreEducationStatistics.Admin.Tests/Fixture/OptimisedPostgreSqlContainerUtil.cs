@@ -11,7 +11,7 @@ public class OptimisedPostgreSqlContainerUtil
 {
     private readonly PostgreSqlContainer _postgreSqlContainer = new PostgreSqlBuilder()
         .WithImage("postgres:16.1-alpine")
-        // .WithReuse(true)
+        .WithReuse(true)
         .Build();
 
     public async Task Start()

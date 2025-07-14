@@ -45,7 +45,6 @@ public abstract class OptimisedDataSetVersionMappingControllerTests(
         _fixture = new OptimisedHttpClientWithPsqlFixture(OptimisedSharedPostgresContainer.Instance.ConnectionString);
         
         await _fixture.InitializeAsync();
-        await _fixture.ClearTestData();
 
         output.WriteLine($"Clear up test data {sw.ElapsedMilliseconds}");
         sw.Restart();
@@ -53,6 +52,7 @@ public abstract class OptimisedDataSetVersionMappingControllerTests(
 
     public async Task DisposeAsync()
     {
+        // await _fixture.ClearTestData();
         await _fixture.DisposeAsync();
     }
 
