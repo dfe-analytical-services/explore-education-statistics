@@ -206,7 +206,7 @@ const ReleaseContent = ({
               </a>
             }
             renderProducerLink={
-              release.publishingOrganisations ? (
+              release.publishingOrganisations?.length ? (
                 <span>
                   {release.publishingOrganisations.map((org, index) => (
                     <Fragment key={org.id}>
