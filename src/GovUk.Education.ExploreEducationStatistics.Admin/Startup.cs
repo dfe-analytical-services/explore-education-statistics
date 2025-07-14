@@ -495,11 +495,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
 
             // If operating within Azure, register authentication managers that obtain access
             // tokens for authenticating the Admin App Service with the target service.
+            //
+            // Otherwise, for non-Azure environments (local and integration test) register
+            // authentication managers that simply authenticate themselves via an HTTP header.
             if (hostEnvironment.IsProduction())
             {
                 services.AddTransient(
                     typeof(IHttpClientAzureAuthenticationManager<>),
-                    typeof(HttpClientDefaultAzureCredentialAuthenticationManager<>));
+                    typeof(DefaultAzureCredentialHttpClientAuthenticationManager<>));
             }
             else
             {

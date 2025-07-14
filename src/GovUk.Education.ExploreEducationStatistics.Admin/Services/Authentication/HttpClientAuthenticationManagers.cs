@@ -18,7 +18,7 @@ public interface IHttpClientAzureAuthenticationManager<TOptions>
     Task AddAuthentication(HttpClient httpClient, CancellationToken cancellationToken);
 }
 
-public class HttpClientDefaultAzureCredentialAuthenticationManager<TOptions>(
+public class DefaultAzureCredentialHttpClientAuthenticationManager<TOptions>(
     IOptions<TOptions> options) : IHttpClientAzureAuthenticationManager<TOptions>
     where TOptions : class, IAzureAuthenticationOptions
 {
