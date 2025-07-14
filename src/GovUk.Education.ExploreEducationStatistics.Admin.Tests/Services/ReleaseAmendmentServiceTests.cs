@@ -73,6 +73,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 .WithApprovalStatus(ReleaseApprovalStatus.Approved)
                 .WithPreviousVersionId(Guid.NewGuid())
                 .WithType(ReleaseType.OfficialStatistics)
+                .WithPublishingOrganisations(_fixture.DefaultOrganisation()
+                    .Generate(2))
                 .WithReleaseStatuses(_fixture
                     .DefaultReleaseStatus()
                     .Generate(1))
@@ -704,6 +706,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 .Include(releaseVersion => releaseVersion.PreviousVersion)
                 .Include(releaseVersion => releaseVersion.Publication)
                 .Include(releaseVersion => releaseVersion.Release)
+                .Include(releaseVersion => releaseVersion.PublishingOrganisations)
                 .Include(releaseVersion => releaseVersion.Content)
                 .ThenInclude(section => section.Content)
                 .ThenInclude(section => section.Comments)

@@ -75,6 +75,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
         public virtual DbSet<EmbedBlockLink> EmbedBlockLinks { get; set; }
         public virtual DbSet<FeaturedTable> FeaturedTables { get; set; }
         public virtual DbSet<MethodologyNote> MethodologyNotes { get; set; }
+        public virtual DbSet<Organisation> Organisations { get; set; } = null!;
         public virtual DbSet<Permalink> Permalinks { get; set; } = null!;
         public virtual DbSet<Contact> Contacts { get; set; }
         public virtual DbSet<Update> Update { get; set; }
@@ -563,6 +564,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 .HasConversion(
                     v => v,
                     v => v.HasValue ? DateTime.SpecifyKind(v.Value, DateTimeKind.Utc) : null);
+
+            modelBuilder.Entity<ReleaseVersion>()
+                .HasMany(rv => rv.PublishingOrganisations)
+                .WithMany()
+                .UsingEntity("ReleaseVersionPublishingOrganisations",
+                    rv =>
+                        rv.HasOne(typeof(Organisation))
+                            .WithMany()
+                            .HasForeignKey("OrganisationId"),
+                    o => o.HasOne(typeof(ReleaseVersion))
+                        .WithMany()
+                        .HasForeignKey("ReleaseVersionId"));
 
             modelBuilder.Entity<ReleaseVersion>()
                 .HasQueryFilter(rv => !rv.SoftDeleted);
