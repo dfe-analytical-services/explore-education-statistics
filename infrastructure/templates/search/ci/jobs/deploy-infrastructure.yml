@@ -11,10 +11,15 @@ jobs:
     displayName: Deploy Search Infrastructure
     environment: ${{ parameters.environment }}
     variables:
-      templateDirectory: $(Build.SourcesDirectory)/infrastructure/templates/search
-      templateFile: $(templateDirectory)/main.bicep
-      paramDirectory: $(templateDirectory)/parameters
-      paramFile: $(paramDirectory)/main-${{ parameters.bicepParamFile }}.bicepparam
+      - group: Common - ${{ parameters.environment }}
+      - name: templateDirectory
+        value: $(Build.SourcesDirectory)/infrastructure/templates/search
+      - name: templateFile
+        value: $(templateDirectory)/main.bicep
+      - name: paramDirectory
+        value: $(templateDirectory)/parameters
+      - name: paramFile
+        value: $(paramDirectory)/main-${{ parameters.bicepParamFile }}.bicepparam
     strategy:
       runOnce:
         deploy:
@@ -31,8 +36,7 @@ jobs:
                 action: validate
                 serviceConnection: ${{ parameters.serviceConnection }}
                 parameterFile: $(paramFile)
-                deploySearchConfig: false
-                githubSourceRef: $(Build.SourceBranch)
+                searchServiceIndexerName: $(searchServiceIndexerName)
                 searchDocsFunctionAppExists: false
 
             - template: ../../../public-api/ci/tasks/check-function-app-exists.yml
@@ -48,6 +52,21 @@ jobs:
                 action: create
                 serviceConnection: ${{ parameters.serviceConnection }}
                 parameterFile: $(paramFile)
-                deploySearchConfig: $(deploySearchConfig)
-                githubSourceRef: $(Build.SourceBranch)
+                searchServiceIndexerName: $(searchServiceIndexerName)
                 searchDocsFunctionAppExists: $(searchDocsFunctionAppExists)
+
+            - template: ../../../../common/ci/tasks/bicep-output-variables.yml
+              parameters:
+                serviceConnection: ${{ parameters.serviceConnection }}
+
+            - template: ../tasks/deploy-search-service-config.yml
+              parameters:
+                serviceConnection: ${{ parameters.serviceConnection }}
+                indexCorsAllowedOrigins:
+                  - $(publicSiteUrl)
+                  - 'https://localhost:3000'
+                  - 'http://localhost:3000'
+                dataSourceConnectionString: $(searchStorageAccountManagedIdentityConnectionString)
+                dataSourceContainerName: $(searchableDocumentsContainerName)
+                indexName: 'index-1'
+                searchServiceEndpoint: $(searchServiceEndpoint)

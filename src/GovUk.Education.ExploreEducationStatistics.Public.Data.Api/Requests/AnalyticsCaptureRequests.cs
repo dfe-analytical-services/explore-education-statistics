@@ -10,7 +10,7 @@ public record CaptureTopLevelCallRequest(
     [property: JsonConverter(typeof(StringEnumConverter))]
     TopLevelCallType Type,
     object? Parameters = null
-) : IAnalyticsCaptureRequestBase;
+) : IAnalyticsCaptureRequest;
 
 public record CapturePublicationCallRequest(
     Guid PublicationId,
@@ -19,7 +19,7 @@ public record CapturePublicationCallRequest(
     [property:JsonConverter(typeof(StringEnumConverter))]
     PublicationCallType Type,
     object? Parameters = null
-) : IAnalyticsCaptureRequestBase;
+) : IAnalyticsCaptureRequest;
 
 public record CaptureDataSetCallRequest(
     Guid DataSetId,
@@ -29,7 +29,7 @@ public record CaptureDataSetCallRequest(
     [property:JsonConverter(typeof(StringEnumConverter))]
     DataSetCallType Type,
     object? Parameters = null
-) : IAnalyticsCaptureRequestBase;
+) : IAnalyticsCaptureRequest;
 
 public record CaptureDataSetVersionQueryRequest(
     Guid DataSetId,
@@ -42,7 +42,7 @@ public record CaptureDataSetVersionQueryRequest(
     int TotalRowsCount,
     DateTime StartTime,
     DateTime EndTime,
-    DataSetQueryRequest Query) : IAnalyticsCaptureRequestBase;
+    DataSetQueryRequest Query) : IAnalyticsCaptureRequest;
 
 public record CaptureDataSetVersionCallRequest(
     Guid DataSetId,
@@ -55,7 +55,7 @@ public record CaptureDataSetVersionCallRequest(
     [property:JsonConverter(typeof(StringEnumConverter))]
     DataSetVersionCallType Type,
     object? Parameters = null
-) : IAnalyticsCaptureRequestBase;
+) : IAnalyticsCaptureRequest;
 
 public enum TopLevelCallType
 {

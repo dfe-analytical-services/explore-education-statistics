@@ -130,4 +130,47 @@ describe('DataFilesReplacementTableRow', () => {
       within(cells[3]).queryByRole('button', { name: 'Confirm replacement' }),
     ).not.toBeInTheDocument();
   });
+
+  test('does not show the confirm and cancel buttons while the replacement is being processed', async () => {
+    releaseDataFileService.getDataFile.mockResolvedValue({
+      ...testReplacementDataFile,
+      status: 'STAGE_3',
+    });
+
+    releaseDataFileService.getDataFileImportStatus.mockResolvedValue({
+      errors: [],
+      percentageComplete: 67,
+      stagePercentageComplete: 59,
+      status: 'STAGE_3',
+      totalRows: 5904158,
+    });
+
+    render(
+      <MemoryRouter>
+        <DataFilesReplacementTableRow
+          dataFile={testDataFile}
+          publicationId="test-publication"
+          releaseVersionId="test-release-version"
+        />
+      </MemoryRouter>,
+    );
+
+    expect(await screen.findByText('Test File')).toBeInTheDocument();
+    expect(await screen.findByText('Importing')).toBeInTheDocument();
+    expect(screen.queryByText('Ready')).not.toBeInTheDocument();
+
+    const cells = screen.getAllByRole('cell');
+    expect(cells[0]).toHaveTextContent('Test File');
+    expect(cells[1]).toHaveTextContent('1,000 B');
+    expect(cells[2]).toHaveTextContent('Importing');
+    expect(
+      within(cells[3]).getByRole('link', { name: 'View details' }),
+    ).toBeInTheDocument();
+    expect(
+      within(cells[3]).queryByRole('button', { name: 'Confirm replacement' }),
+    ).not.toBeInTheDocument();
+    expect(
+      within(cells[3]).queryByRole('button', { name: 'Cancel replacement' }),
+    ).not.toBeInTheDocument();
+  });
 });

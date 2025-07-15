@@ -148,8 +148,8 @@ const ReleaseDataFileReplacePage = ({
     </>
   ) : (
     <>
-      Are you sure you want to cancel this data replacement? The pending +
-      replacement data file will be deleted.?
+      By cancelling this replacement you will delete the replacement file. This
+      action cannot be reversed.
     </>
   );
   const replacementCancelButton = (

@@ -7,11 +7,11 @@ using Formatting = Newtonsoft.Json.Formatting;
 namespace GovUk.Education.ExploreEducationStatistics.Analytics.Common.Strategies;
 
 public interface ICommonAnalyticsWriteStrategyWorkflow<TAnalyticsRequest>
-    where TAnalyticsRequest : IAnalyticsCaptureRequestBase
+    where TAnalyticsRequest : IAnalyticsCaptureRequest
 {
     Task Report(
         IWorkflowActor<TAnalyticsRequest> workflowActor,
-        IAnalyticsCaptureRequestBase request,
+        TAnalyticsRequest request,
         CancellationToken cancellationToken);
 }
 
@@ -19,20 +19,13 @@ public class CommonAnalyticsWriteStrategyWorkflow<TAnalyticsRequest>(
     DateTimeProvider dateTimeProvider,
     ILogger<CommonAnalyticsWriteStrategyWorkflow<TAnalyticsRequest>> logger)
     : ICommonAnalyticsWriteStrategyWorkflow<TAnalyticsRequest>
-    where TAnalyticsRequest : IAnalyticsCaptureRequestBase
+    where TAnalyticsRequest : IAnalyticsCaptureRequest
 {
     public async Task Report(
         IWorkflowActor<TAnalyticsRequest> workflowActor,
-        IAnalyticsCaptureRequestBase request,
+        TAnalyticsRequest analyticsRequest,
         CancellationToken cancellationToken)
     {
-        if (typeof(TAnalyticsRequest) != request.GetType())
-        {
-            throw new ArgumentException($"Request isn't of type {typeof(TAnalyticsRequest)}");
-        }
-
-        var analyticsRequest = (TAnalyticsRequest)request;
-
         logger.LogDebug("Capturing request of type {RequestType} for analytics", typeof(TAnalyticsRequest));
 
         var filename =
@@ -67,7 +60,7 @@ public class CommonAnalyticsWriteStrategyWorkflow<TAnalyticsRequest>(
 }
 
 public interface IWorkflowActor<TAnalyticsRequest> 
-    where TAnalyticsRequest : IAnalyticsCaptureRequestBase
+    where TAnalyticsRequest : IAnalyticsCaptureRequest
 {
     string GetAnalyticsPath();
     
@@ -78,7 +71,7 @@ public interface IWorkflowActor<TAnalyticsRequest>
 
 public abstract class WorkflowActorBase<TAnalyticsRequest>(string analyticsPath) 
     : IWorkflowActor<TAnalyticsRequest> 
-    where TAnalyticsRequest : IAnalyticsCaptureRequestBase
+    where TAnalyticsRequest : IAnalyticsCaptureRequest
 {
     public string GetAnalyticsPath()
     {

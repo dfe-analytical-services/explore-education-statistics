@@ -1,4 +1,5 @@
 *** Settings ***
+Library             String
 Resource            ../../libs/admin-common.robot
 Resource            ../../libs/public-common.robot
 Resource            ../../libs/admin/manage-content-common.robot
@@ -12,7 +13,7 @@ Test Setup          fail test fast if required
 
 
 *** Variables ***
-${PUBLICATION_NAME}     UI tests - data reordering %{RUN_IDENTIFIER}
+${PUBLICATION_NAME}     Data reordering %{RUN_IDENTIFIER}
 ${RELEASE_NAME}         Calendar year 2022
 ${SUBJECT_NAME}         UI test subject
 
@@ -239,7 +240,7 @@ Replace subject data
     user checks headed table body row cell contains    Metadata file    1    grouped-filters-and-indicators.meta.csv
     user checks headed table body row cell contains    Number of rows    1    100    wait=%{WAIT_SMALL}
     user checks headed table body row cell contains    Data file size    1    13 Kb
-    user checks headed table body row cell contains    Status    1    Complete    wait=%{WAIT_LONG}
+    user checks headed table body row cell contains    Data file import status    1    Complete    wait=%{WAIT_LONG}
 
     user checks headed table body row cell contains    Title    2    ${SUBJECT_NAME}
     user checks headed table body row cell contains    Data file    2    grouped-filters-and-indicators-replacement.csv
@@ -247,7 +248,8 @@ Replace subject data
     ...    grouped-filters-and-indicators-replacement.meta.csv
     user checks headed table body row cell contains    Number of rows    2    140    wait=%{WAIT_SMALL}
     user checks headed table body row cell contains    Data file size    2    19 Kb    wait=%{WAIT_SMALL}
-    user checks headed table body row cell contains    Status    2    Complete    wait=%{WAIT_DATA_FILE_IMPORT}
+    user checks headed table body row cell contains    Data file import status    2    Complete
+    ...    wait=%{WAIT_DATA_FILE_IMPORT}
 
 Confirm data replacement
     user waits until page contains    Data blocks: OK
@@ -413,6 +415,11 @@ Verify newly published release is public
 Go to public table tool page
     user navigates to data tables page on public frontend
 
+Check page meta
+    user checks meta title should be    Create your own tables
+    user checks meta description should be
+    ...    Find, download and explore official Department for Education (DfE) statistics and data in England.
+
 Select "Test Theme" publication
     environment variable should be set    TEST_THEME_NAME
     user clicks radio    %{TEST_THEME_NAME}
@@ -420,6 +427,14 @@ Select "Test Theme" publication
     user clicks element    id:publicationForm-submit
     user waits until table tool wizard step is available    2    Select a data set
     user checks previous table tool step contains    1    Publication    ${PUBLICATION_NAME}
+
+Check page meta again
+    user reloads page
+    user waits until table tool wizard step is available    2    Select a data set
+    ${PUBLICATION_NAME_LOWERCASE}    Convert To Lower Case    ${PUBLICATION_NAME}
+    user checks meta title should be    Create your own tables on ${PUBLICATION_NAME_LOWERCASE}
+    user checks meta description should be
+    ...    Create and download your own custom data tables by choosing your areas of interest using filters to build your table from ${PUBLICATION_NAME_LOWERCASE}
 
 Select subject
     user clicks radio    ${SUBJECT_NAME}

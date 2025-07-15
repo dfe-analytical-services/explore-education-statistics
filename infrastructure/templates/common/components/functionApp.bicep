@@ -337,7 +337,7 @@ module storageAccountQueueRoleAssignmentModule 'storageAccountRoleAssignment.bic
   }
 }
 
-module privateEndpointModule '../../public-api/components/privateEndpoint.bicep' = if (privateEndpoints.?functionApp != null) {
+module privateEndpointModule 'privateEndpoint.bicep' = if (privateEndpoints.?functionApp != null) {
   name: '${functionAppName}PrivateEndpointModuleDeploy'
   params: {
     serviceId: functionApp.id

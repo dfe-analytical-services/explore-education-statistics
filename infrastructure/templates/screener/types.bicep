@@ -2,6 +2,7 @@
 type ResourceNames = {
   existingResources: {
     keyVault: string
+    logAnalyticsWorkspace: string
     vNet: string
     adminApp: string
     alertsGroup: string
@@ -10,6 +11,7 @@ type ResourceNames = {
       screenerFunctionPrivateEndpoints: string
       adminApp: string
     }
+    coreStorageAccount: string
   }
   screener: {
     screenerFunction: string

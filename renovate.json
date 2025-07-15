@@ -93,6 +93,10 @@
       "enabled": false
     },
     {
+      "matchDatasources": ["rubygems"],
+      "groupName": "Ruby dependencies"
+    },
+    {
       "matchDatasources": ["azure-bicep-resource"],
       "groupName": "Azure Bicep resources",
       "description": "Prevent unofficial resource versions being suggested",

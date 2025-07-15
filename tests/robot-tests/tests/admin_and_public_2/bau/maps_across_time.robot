@@ -13,7 +13,7 @@ Force Tags          Admin    Local    Dev    AltersData
 
 
 *** Variables ***
-${PUBLICATION_NAME}     UI tests - maps across time %{RUN_IDENTIFIER}
+${PUBLICATION_NAME}     Maps across time %{RUN_IDENTIFIER}
 ${RELEASE_NAME}         Financial year 3000-01
 ${DATABLOCK_NAME}=      Dates data block name
 
@@ -28,7 +28,8 @@ Go to "Release summary" page
     ...    ${RELEASE_NAME}
 
 Upload subject
-    user uploads subject and waits until complete    Dates test subject    dates.csv    dates.meta.csv
+    user uploads subject and waits until pending import    Dates test subject    dates.csv    dates.meta.csv
+    user confirms upload to complete import    Dates test subject
 
 Add data guidance
     user clicks link    Data guidance

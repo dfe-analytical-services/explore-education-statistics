@@ -14,6 +14,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Text.Json;
 
 // ReSharper disable StringLiteralTypo
 namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
@@ -65,6 +66,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
         public virtual DbSet<DataBlock> DataBlocks { get; set; }
         public virtual DbSet<DataBlockParent> DataBlockParents { get; set; }
         public virtual DbSet<DataBlockVersion> DataBlockVersions { get; set; }
+        public virtual DbSet<DataSetUpload> DataSetUploads { get; set; }
         public virtual DbSet<DataImport> DataImports { get; set; }
         public virtual DbSet<DataImportError> DataImportErrors { get; set; }
         public virtual DbSet<HtmlBlock> HtmlBlocks { get; set; }
@@ -73,6 +75,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
         public virtual DbSet<EmbedBlockLink> EmbedBlockLinks { get; set; }
         public virtual DbSet<FeaturedTable> FeaturedTables { get; set; }
         public virtual DbSet<MethodologyNote> MethodologyNotes { get; set; }
+        public virtual DbSet<Organisation> Organisations { get; set; } = null!;
         public virtual DbSet<Permalink> Permalinks { get; set; } = null!;
         public virtual DbSet<Contact> Contacts { get; set; }
         public virtual DbSet<Update> Update { get; set; }
@@ -100,6 +103,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             ConfigureComment(modelBuilder);
+            ConfigureDataSetUpload(modelBuilder);
             ConfigureDataImport(modelBuilder);
             ConfigureDataImportError(modelBuilder);
             ConfigureMethodology(modelBuilder);
@@ -155,6 +159,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 .HasConversion(
                     v => v,
                     v => v.HasValue ? DateTime.SpecifyKind(v.Value, DateTimeKind.Utc) : null);
+        }
+
+        private static void ConfigureDataSetUpload(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<DataSetUpload>()
+                .Property(upload => upload.ScreenerResult)
+                .HasConversion(
+                    r => System.Text.Json.JsonSerializer.Serialize(r, (JsonSerializerOptions)null),
+                    r => System.Text.Json.JsonSerializer.Deserialize<DataSetScreenerResponse>(r, (JsonSerializerOptions)null));
         }
 
         private static void ConfigureDataImport(ModelBuilder modelBuilder)
@@ -553,6 +566,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     v => v.HasValue ? DateTime.SpecifyKind(v.Value, DateTimeKind.Utc) : null);
 
             modelBuilder.Entity<ReleaseVersion>()
+                .HasMany(rv => rv.PublishingOrganisations)
+                .WithMany()
+                .UsingEntity("ReleaseVersionPublishingOrganisations",
+                    rv =>
+                        rv.HasOne(typeof(Organisation))
+                            .WithMany()
+                            .HasForeignKey("OrganisationId"),
+                    o => o.HasOne(typeof(ReleaseVersion))
+                        .WithMany()
+                        .HasForeignKey("ReleaseVersionId"));
+
+            modelBuilder.Entity<ReleaseVersion>()
                 .HasQueryFilter(rv => !rv.SoftDeleted);
 
             modelBuilder.Entity<ReleaseVersion>()
@@ -896,7 +921,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
             modelBuilder.Entity<ReleasePublishingFeedback>()
                 .Property(feedback => feedback.Response)
                 .HasConversion(new EnumToStringConverter<ReleasePublishingFeedbackResponse>())
-                .IsRequired()
                 .HasMaxLength(50);
 
             modelBuilder.Entity<ReleasePublishingFeedback>()

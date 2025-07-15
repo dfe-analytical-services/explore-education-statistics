@@ -9,12 +9,14 @@ import GoToTopLink from '@common/components/GoToTopLink';
 import ScreenReaderMessage from '@common/components/ScreenReaderMessage';
 import ButtonText from '@common/components/ButtonText';
 import LoadingSpinner from '@common/components/LoadingSpinner';
+import NotificationBanner from '@common/components/NotificationBanner';
 import VisuallyHidden from '@common/components/VisuallyHidden';
 import WarningMessage from '@common/components/WarningMessage';
 import { useMobileMedia } from '@common/hooks/useMedia';
 import { ReleaseType, releaseTypes } from '@common/services/types/releaseType';
 import FilterResetButtonAzureSearch from '@frontend/components/FilterResetButtonAzureSearch';
 import FiltersMobile from '@frontend/components/FiltersMobile';
+import Link from '@frontend/components/Link';
 import Page from '@frontend/components/Page';
 import Pagination from '@frontend/components/Pagination';
 import SearchForm from '@frontend/components/SearchFormAzure';
@@ -71,48 +73,35 @@ const FindStatisticsPage: NextPage = () => {
     router.query,
   );
 
-  const themesWithResultCounts = !themeId
-    ? themes
-        .map(theme => {
-          const facetedResult = themeFacetResults?.find(
-            result => theme.id === result.value,
-          );
-          const count = facetedResult?.count ?? 0;
-          return {
-            label: `${theme.title} (${count})`,
-            value: theme.id,
-            count,
-          };
-        })
-        .sort((a, b) => b.count - a.count)
-    : themes.map(theme => ({
-        label: theme.title,
+  const themesWithResultCounts = themes
+    .map(theme => {
+      const facetedResult = themeFacetResults?.find(
+        result => theme.id === result.value,
+      );
+      const count = facetedResult?.count ?? 0;
+      return {
+        label: `${theme.title} (${count})`,
         value: theme.id,
-      }));
+        count,
+      };
+    })
+    .sort((a, b) => b.count - a.count);
 
-  const releaseTypesWithResultCounts = !releaseType
-    ? Object.keys(releaseTypes)
-        .map(type => {
-          const facetedResult = releaseTypeFacetResults?.find(
-            result => type === result.value,
-          );
+  const releaseTypesWithResultCounts = Object.keys(releaseTypes)
+    .map(type => {
+      const facetedResult = releaseTypeFacetResults?.find(
+        result => type === result.value,
+      );
 
-          const title = releaseTypes[type as ReleaseType];
-          const count = facetedResult?.count ?? 0;
-          return {
-            label: `${title} (${count})`,
-            value: type,
-            count,
-          };
-        })
-        .sort((a, b) => b.count - a.count)
-    : Object.keys(releaseTypes).map(type => {
-        const title = releaseTypes[type as ReleaseType];
-        return {
-          label: title,
-          value: type,
-        };
-      });
+      const title = releaseTypes[type as ReleaseType];
+      const count = facetedResult?.count ?? 0;
+      return {
+        label: `${title} (${count})`,
+        value: type,
+        count,
+      };
+    })
+    .sort((a, b) => b.count - a.count);
 
   const isFiltered = !!search || !!releaseType || !!themeId;
 
@@ -233,6 +222,20 @@ const FindStatisticsPage: NextPage = () => {
   return (
     <Page
       title={defaultPageTitle}
+      customBannerContent={
+        <NotificationBanner
+          className="govuk-!-margin-top-6"
+          fullWidthContent
+          title="New improved search"
+        >
+          <p>
+            This is our new search, help us improve it by completing{' '}
+            <Link to="https://forms.office.com/e/KjpABWF8kA" target="_blank">
+              our feedback form (opens in new window)
+            </Link>
+          </p>
+        </NotificationBanner>
+      }
       // Don't include the default meta title when filtered to prevent too much screen reader noise.
       includeDefaultMetaTitle={pageTitle === defaultPageTitle}
       metaTitle={pageTitle}
@@ -245,7 +248,6 @@ const FindStatisticsPage: NextPage = () => {
           </p>
           <SearchForm
             label="Search publications"
-            value={search}
             onSubmit={nextValue =>
               handleChangeFilter({ filterType: 'search', nextValue })
             }

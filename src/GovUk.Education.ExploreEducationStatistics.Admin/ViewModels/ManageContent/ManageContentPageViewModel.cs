@@ -44,15 +44,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ManageCont
             [JsonConverter(typeof(StringEnumConverter))]
             public ReleaseType Type { get; set; }
 
-            public List<ReleaseNoteViewModel> Updates { get; set; } = new();
+            public List<OrganisationViewModel> PublishingOrganisations { get; set; } = [];
 
-            public List<ContentSectionViewModel> Content { get; set; } = new();
+            public List<ReleaseNoteViewModel> Updates { get; set; } = [];
+
+            public List<ContentSectionViewModel> Content { get; set; } = [];
 
             public ContentSectionViewModel SummarySection { get; set; } = new();
 
             public ContentSectionViewModel HeadlinesSection { get; set; } = new();
 
-            public List<KeyStatisticViewModel> KeyStatistics { get; set; } = new();
+            public List<KeyStatisticViewModel> KeyStatistics { get; set; } = [];
 
             public ContentSectionViewModel KeyStatisticsSecondarySection { get; set; } = new();
 
@@ -69,7 +71,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ManageCont
 
             public PartialDate NextReleaseDate { get; set; }
 
-            public List<Link> RelatedInformation { get; set; } = new List<Link>();
+            public List<Link> RelatedInformation { get; set; } = [];
         }
 
         public class PublicationViewModel

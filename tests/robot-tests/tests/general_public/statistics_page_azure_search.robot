@@ -35,7 +35,7 @@ Validate publications list exists and all publications are shown
     user checks page contains    showing all publications
 
 Search publications
-    user clicks element    id:searchForm-search
+    user clicks element    id:search
     user presses keys    pupil absence
     user clicks button    Search
     user checks page contains button    pupil absence

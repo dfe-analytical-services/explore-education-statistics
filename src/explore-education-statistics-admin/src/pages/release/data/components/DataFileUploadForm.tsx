@@ -61,6 +61,7 @@ const fileErrorMappings = {
   MustBeCsvFile: 'MustBeCsvFile',
   CannotReplaceDataSetWithApiDataSet: 'CannotReplaceDataSetWithApiDataSet',
   InvalidFileTypeForReplacement: 'InvalidFileTypeForReplacement',
+  DataSetIsNotInAnImportableState: 'DataSetIsNotInAnImportableState',
 };
 
 function baseErrorMappings(
@@ -201,7 +202,7 @@ export default function DataFileUploadForm({
               })
               .max(
                 titleMaxLength,
-                `Title must be ${titleMaxLength} characters or less`,
+                `Title must be ${titleMaxLength} characters or fewer`,
               ),
         }),
       });

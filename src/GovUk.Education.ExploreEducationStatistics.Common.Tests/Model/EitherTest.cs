@@ -282,7 +282,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Model
         public void OnFailure_Success()
         {
             var either = new Either<int, string>("success");
-            var result = either.OnFailure(failure => new Either<char, string>('a'));
+            var result = either.OnFailure(_ => new Either<char, string>('a'));
             Assert.True(result.IsRight);
             Assert.Equal("success", result.Right);
         }
@@ -291,7 +291,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Model
         public void OnFailure_Failure()
         {
             var either = new Either<int, string>(1);
-            var result = either.OnFailure(failure => new Either<char, string>('a'));
+            var result = either.OnFailure(_ => new Either<char, string>('a'));
             Assert.True(result.IsLeft);
             Assert.Equal('a', result.Left);
         }
@@ -337,7 +337,37 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Model
             Assert.True(aggregate.IsLeft);
             Assert.Equal(["failure 1"], aggregate.Left);
         }
+        
+        [Fact]
+        public void OnSuccessAll()
+        {
+            var either1 = new Either<int, string>("either1");
+            var either2 = new Either<int, string>("either2");
+            var either3 = new Either<int, string>("either3");
 
+            var eitherList = ListOf(either1, either2, either3);
+
+            var results = eitherList.OnSuccessAll();
+
+            Assert.True(results.IsRight);
+            Assert.Equal(["either1", "either2", "either3"], results.Right);
+        }
+
+        [Fact]
+        public void OnSuccessAll_Left()
+        {
+            var either1 = new Either<int, string>("either1");
+            var either2 = new Either<int, string>(2);
+            var either3 = new Either<int, string>(3);
+
+            var eitherList = ListOf(either1, either2, either3);
+
+            var results = eitherList.OnSuccessAll();
+
+            Assert.True(results.IsLeft);
+            Assert.Equal(2, results.Left);
+        }
+        
         [Fact]
         public void OnSuccessAllReturnVoid()
         {
@@ -1704,6 +1734,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Model
 
             Assert.Equal("Success1", result);
         }
+        
+        [Fact]
+        public async Task OrThrow_EitherTask_FirstSucceeds()
+        {
+            var result = await
+                Task.FromResult(new Either<int, string>("Success1"))
+                    .OrThrow(failure => new ArgumentException($"Error {failure}"));
+
+            Assert.Equal("Success1", result);
+        }
+        
+        [Fact]
+        public async Task OrThrow_EitherTask_FirstFails()
+        {
+            var exception = await 
+                Assert.ThrowsAsync<ArgumentException>(() => 
+                    Task.FromResult(new Either<int, string>(1))
+                        .OrThrow(failure => new ArgumentException($"Error {failure}")));
+
+            Assert.Equal("Error 1", exception.Message);
+        }
 
         [Fact]
         public async Task OnFailureVoid()
@@ -1711,12 +1762,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Model
             var failures = new List<int>();
 
             var result = await Task.FromResult(new Either<int, string>(500))
-                .OnFailureVoid(
-                    failure =>
-                    {
-                        failures.Add(failure);
-                    }
-                );
+                .OnFailureVoid(failures.Add);
 
             result.AssertLeft();
 

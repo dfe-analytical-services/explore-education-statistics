@@ -18,6 +18,10 @@ public class NotificationsServiceMockBuilder
         _mock
             .Setup(m => m.NotifySubscribersIfApplicable(It.IsAny<IReadOnlyList<Guid>>()))
             .Returns(Task.CompletedTask);
+        
+        _mock
+            .Setup(m => m.SendReleasePublishingFeedbackEmails(It.IsAny<IReadOnlyList<Guid>>()))
+            .Returns(Task.CompletedTask);
     }
 
     public class Asserter(Mock<INotificationsService> mock)
@@ -26,6 +30,16 @@ public class NotificationsServiceMockBuilder
         {
             mock.Verify(
                 m => m.NotifySubscribersIfApplicable(
+                    It.Is<IReadOnlyList<Guid>>(
+                        actual => expectedReleaseVersionIds.All(actual.Contains) &&
+                                  actual.All(expectedReleaseVersionIds.Contains))),
+                Times.Once);
+        }
+        
+        public void SendReleasePublishingFeedbackEmailsCalled(params Guid[] expectedReleaseVersionIds)
+        {
+            mock.Verify(
+                m => m.SendReleasePublishingFeedbackEmails(
                     It.Is<IReadOnlyList<Guid>>(
                         actual => expectedReleaseVersionIds.All(actual.Contains) &&
                                   actual.All(expectedReleaseVersionIds.Contains))),

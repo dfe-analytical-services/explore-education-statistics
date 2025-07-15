@@ -31,7 +31,13 @@ import Tag from '@common/components/Tag';
 import ReleaseSummarySection from '@common/modules/release/components/ReleaseSummarySection';
 import ReleaseDataAndFiles from '@common/modules/release/components/ReleaseDataAndFiles';
 import useDebouncedCallback from '@common/hooks/useDebouncedCallback';
-import React, { useCallback, useEffect, useMemo, useRef } from 'react';
+import React, {
+  Fragment,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+} from 'react';
 import { generatePath, useLocation } from 'react-router';
 import { useConfig } from '@admin/contexts/ConfigContext';
 
@@ -200,12 +206,25 @@ const ReleaseContent = ({
               </a>
             }
             renderProducerLink={
-              <Link
-                unvisited
-                to="https://www.gov.uk/government/organisations/department-for-education"
-              >
-                Department for Education
-              </Link>
+              release.publishingOrganisations?.length ? (
+                <span>
+                  {release.publishingOrganisations.map((org, index) => (
+                    <Fragment key={org.id}>
+                      {index > 0 && ' and '}
+                      <Link unvisited to={org.url}>
+                        {org.title}
+                      </Link>
+                    </Fragment>
+                  ))}
+                </span>
+              ) : (
+                <Link
+                  unvisited
+                  to="https://www.gov.uk/government/organisations/department-for-education"
+                >
+                  Department for Education
+                </Link>
+              )
             }
             trackScroll
           />

@@ -9,11 +9,16 @@ public class PublicApiDataSetVersionCallsProcessor(
     IAnalyticsPathResolver pathResolver,
     IProcessRequestFilesWorkflow workflow) : IRequestFileProcessor
 {
+    private static readonly string[] PublicApiDataSetVersionsSubPath = ["public-api", "data-set-versions"];
+    
+    public string SourceDirectory => pathResolver.BuildSourceDirectory(PublicApiDataSetVersionsSubPath);
+    public string ReportsDirectory => pathResolver.BuildReportsDirectory(PublicApiDataSetVersionsSubPath);
+    
     public Task Process()
     {
         return workflow.Process(new WorkflowActor(
-            sourceDirectory: pathResolver.PublicApiDataSetVersionCallsDirectoryPath(),
-            reportsDirectory: pathResolver.PublicApiDataSetVersionCallsReportsDirectoryPath()));
+            sourceDirectory: SourceDirectory,
+            reportsDirectory: ReportsDirectory));
     }
 
     private class WorkflowActor(string sourceDirectory, string reportsDirectory) 

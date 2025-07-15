@@ -1,7 +1,7 @@
 import Link from '@admin/components/Link';
 import DataFileSummaryList from '@admin/pages/release/data/components/DataFileSummaryList';
 import DataUploadCancelButton from '@admin/pages/release/data/components/DataUploadCancelButton';
-import { useFeatureFlag } from '@admin/contexts/FeatureFlagContext';
+import { useConfig } from '@admin/contexts/ConfigContext';
 import ImporterStatus, {
   terminalImportStatuses,
 } from '@admin/pages/release/data/components/ImporterStatus';
@@ -45,9 +45,9 @@ export default function DataFilesTableRow({
   onConfirmDelete,
   onStatusChange,
 }: Props) {
-  const isNewReplaceDsvFeatureEnabled = useFeatureFlag(
-    'enableReplacementOfPublicApiDataSets',
-  );
+  const {
+    enableReplacementOfPublicApiDataSets: isNewReplaceDsvFeatureEnabled,
+  } = useConfig();
   const allowReplacementOfDataFile = isNewReplaceDsvFeatureEnabled
     ? true
     : dataFile.publicApiDataSetId == null;

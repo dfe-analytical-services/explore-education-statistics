@@ -134,7 +134,7 @@ const ReleaseDataGuidanceSection = ({
                         })
                         .max(
                           contentMaxLength,
-                          `File guidance content must be ${contentMaxLength} characters or less`,
+                          `File guidance content must be ${contentMaxLength} characters or fewer`,
                         ),
                     }),
                   ),

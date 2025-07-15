@@ -12,7 +12,7 @@ Force Tags          Admin    Local    Dev    AltersData
 
 
 *** Variables ***
-${PUBLICATION_NAME}=                    UI tests - publish data %{RUN_IDENTIFIER}
+${PUBLICATION_NAME}=                    Publish data %{RUN_IDENTIFIER}
 ${RELEASE_1_NAME}=                      Financial year 3000-01
 ${RELEASE_2_NAME}=                      Financial year 3001-02 provisional
 ${SUBJECT_1_NAME}=                      UI test subject 1

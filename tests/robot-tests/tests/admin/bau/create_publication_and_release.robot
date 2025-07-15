@@ -10,7 +10,7 @@ Force Tags          Admin    Local    Dev    AltersData
 
 
 *** Variables ***
-${PUBLICATION_NAME}         UI tests - create publication %{RUN_IDENTIFIER}
+${PUBLICATION_NAME}         Create publication %{RUN_IDENTIFIER}
 
 ${CREATED_THEME_ID}         ${EMPTY}
 ${CREATED_THEME_NAME}       UI test theme - create publication %{RUN_IDENTIFIER}

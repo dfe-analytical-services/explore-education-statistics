@@ -17,6 +17,8 @@ import {
 } from '@common/components/form';
 import ButtonGroup from '@common/components/ButtonGroup';
 
+const feedbackMaxLength = 2000;
+
 interface FormValues {
   response: ReleasePublishingFeedbackResponse;
   additionalFeedback?: string;
@@ -73,8 +75,8 @@ const ReleasePublishingFeedbackPage: NextPage<Props> = ({
               'NotSatisfiedAtAll',
             ]),
           additionalFeedback: Yup.string().max(
-            2000,
-            'Additional feedback must be 2000 characters or less',
+            feedbackMaxLength,
+            `Additional feedback must be ${feedbackMaxLength} characters or fewer`,
           ),
         })}
       >
@@ -119,7 +121,7 @@ const ReleasePublishingFeedbackPage: NextPage<Props> = ({
                 <FormFieldTextArea
                   name="additionalFeedback"
                   label="Additional feedback (optional)"
-                  maxLength={2000}
+                  maxLength={feedbackMaxLength}
                 />
                 <ButtonGroup>
                   <Button type="submit" disabled={formState.isSubmitting}>

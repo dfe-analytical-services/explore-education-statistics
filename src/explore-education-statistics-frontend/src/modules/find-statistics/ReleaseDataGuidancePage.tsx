@@ -15,6 +15,10 @@ const ReleaseDataGuidancePage = ({ release }: Props) => {
   return (
     <Page
       title={release.publication.title}
+      metaTitle={`${
+        release.publication.title
+      } data guidance ${release.title.toLocaleLowerCase()}`}
+      description={`Data guidance describing the contents of files containing statistics from ${release.publication.title.toLocaleLowerCase()} ${release.title.toLocaleLowerCase()}.`}
       caption={release.title}
       breadcrumbs={[
         { name: 'Find statistics and data', link: '/find-statistics' },

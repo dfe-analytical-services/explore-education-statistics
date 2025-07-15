@@ -742,7 +742,7 @@
         "description": "The Client ID of a manually-created App Registration that represents the Public API Data Processor Function App in Entra ID"
       }
     },
-    // "screenerApiAppRegistrationClientId": {
+    // "dataScreenerAppRegistrationClientId": {
     //   "type": "string",
     //   "metadata": {
     //     "description": "The Client ID of a manually-created App Registration that represents the Screener API Function App in Entra ID"
@@ -766,6 +766,20 @@
       "defaultValue": "\\mounts\\analytics",
       "metadata": {
         "description": "Where analytics request files are saved before being processed"
+      }
+    },
+    "notifierSuppressExceptionsForTeamOnlyApiKeyErrors": {
+      "type": "bool",
+      "defaultValue": false,
+      "metadata": {
+        "description": "Replaces Notify exceptions with logged messages only when team-only API keys are used and a recipient email address is not valid for that key."
+      }
+    },
+    "enableReplacementOfPublicApiDataSets": {
+      "type": "bool",
+      "defaultValue": false,
+      "metadata": {
+        "description": "Feature flag to control the replacement of public API data sets"
       }
     }
   },
@@ -808,7 +822,7 @@
     "publisherStorageAccountId": "[concat(resourceGroup().id,'/providers/','Microsoft.Storage/storageAccounts/', variables('publisherStorageAccountName'))]",
     "loggingStorageAccountName": "[concat(parameters('subscription'), 'saeeslogging')]",
     "publicDataProcessorName": "[concat(parameters('subscription'), '-', parameters('environment'), '-papi-fa-processor')]",
-    "screenerApiName": "[concat(parameters('subscription'), '-', parameters('environment'), '-sapi')]",
+    "dataScreenerName": "[concat(parameters('subscription'), '-', parameters('environment'), '-sapi-fa-screener')]",
     "logicAppSlackAlerts": "[concat(parameters('subscription'), '-la-', parameters('environment'), '-slackwebhook')]",
     "actionGroupAlerts": "[concat(parameters('subscription'), '-ag-', parameters('environment'), '-alertedusers')]",
     "metricAlerts": [
@@ -1145,9 +1159,11 @@
     "searchDocsFunctionPrivateEndpointsSubnetName": "[concat(parameters('subscription'), '-', parameters('environment'), '-snet-fa-searchdocs-pep')]",
     "searchStoragePrivateEndpointsSubnetName": "[concat(parameters('subscription'), '-', parameters('environment'), '-snet-sa-search-pep')]",
     "containerAppEnvironmentSubnetName": "[concat(parameters('subscription'), '-', parameters('environment'), '-snet-cae-01')]",
+    "eventGridCustomTopicPrivateEndpointsSubnetName": "[concat(parameters('subscription'), '-', parameters('environment'), '-snet-evgt-pep')]",
     "applicationGatewaySubnetName": "[concat(parameters('subscription'), '-', parameters('environment'), '-snet-agw-01')]",
     "psqlFlexibleServerSubnetName": "[concat(parameters('subscription'), '-', parameters('environment'), '-snet-psql-flexibleserver')]",
     "screenerFunctionAppSubnetName": "[concat(parameters('subscription'), '-', parameters('environment'), '-sapi-snet-fa-screener')]",
+    "screenerFunctionAppSubnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vNetName'), variables('screenerFunctionAppSubnetName'))]",
     "screenerStoragePrivateEndpointsSubnetName": "[concat(parameters('subscription'), '-', parameters('environment'), '-sapi-snet-sa-screener-pep')]",
     "sqlAllowedSubnets": [
       {
@@ -1901,9 +1917,10 @@
         "PublicDataApi__DocsUrl": "[concat('https://', parameters('publicApiDocsUrl'))]",
         "PublicDataApi__AppRegistrationClientId": "[parameters('apiAppRegistrationClientId')]",
         "PublicDataProcessor__Url": "[concat('https://', variables('publicDataProcessorName'), '.azurewebsites.net')]",
-        "PublicDataProcessor__AppRegistrationClientId": "[parameters('publicDataProcessorAppRegistrationClientId')]"
-        // "ScreenerApi__Url": "[concat('https://', variables('screenerApiName'), '.azurewebsites.net')]",
-        // "ScreenerApi__AppRegistrationClientId": "[parameters('screenerApiAppRegistrationClientId')]"
+        "PublicDataProcessor__AppRegistrationClientId": "[parameters('publicDataProcessorAppRegistrationClientId')]",
+        "DataScreener__Url": "[concat('https://', variables('dataScreenerName'), '.azurewebsites.net', '/api/screen')]",
+        "FeatureFlags__EnableReplacementOfPublicApiDataSets": "[parameters('enableReplacementOfPublicApiDataSets')]"
+        // "DataScreener__AppRegistrationClientId": "[parameters('dataScreenerAppRegistrationClientId')]"
       }
     },
     {
@@ -2314,6 +2331,11 @@
               "condition": "[parameters('useSubnets')]",
               "id": "[variables('publicApiDataProcessorSubnetRef')]",
               "action": "Allow"
+            },
+            {
+              "condition": "[parameters('useSubnets')]",
+              "id": "[variables('screenerFunctionAppSubnetRef')]",
+              "action": "Allow"
             }
           ],
           "ipRules": "[parameters('storageFirewallRules')]",
@@ -2329,38 +2351,6 @@
             "deleteRetentionPolicy": {
               "enabled": "[parameters('blobDeleteRetentionEnabled')]",
               "days": "[parameters('blobDeleteRetentionDays')]"
-            }
-          },
-          "dependsOn": [
-            "[variables('coreStorageAccountName')]"
-          ]
-        },
-        {
-          "name": "default",
-          "type": "managementPolicies",
-          "apiVersion": "2019-04-01",
-          "properties": {
-            "policy": {
-              "rules": [
-                {
-                  "enabled": true,
-                  "type": "Lifecycle",
-                  "name": "Delete temp data/meta files after a day",
-                  "definition": {
-                    "actions": {
-                      "baseBlob": {
-                        "delete": {
-                          "daysAfterModificationGreaterThan": 1
-                        }
-                      }
-                    },
-                    "filters": {
-                      "blobTypes": ["blockBlob"],
-                      "prefixMatch": ["releases-temp"]
-                    }
-                  }
-                }
-              ]
             }
           },
           "dependsOn": [
@@ -3090,21 +3080,13 @@
         "FUNCTIONS_EXTENSION_VERSION": "~4",
         "FUNCTIONS_WORKER_RUNTIME": "dotnet-isolated",
         "APPINSIGHTS_INSTRUMENTATIONKEY": "[reference(resourceId('microsoft.insights/components/', variables('notificationsAppInsights')), '2020-02-02').InstrumentationKey]",
+        "App__EmailEnabled": "true",
+        "App__SuppressExceptionsForTeamOnlyApiKeyErrors": "[parameters('notifierSuppressExceptionsForTeamOnlyApiKeyErrors')]",
         "App__Url": "[concat(concat('https://', variables('notificationsAppName')), '.azurewebsites.net/api')]",
         "App__PublicAppUrl": "[variables('publicAppUrl')]",
         "App__NotifierStorageConnectionString": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-storage-notifications')).secretUriWithVersion, ')')]",
         "App__TokenSecretKey": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-notifier-token-secret-key'), '2018-02-14').secretUriWithVersion, ')')]",
-        "GovUkNotify__ApiKey": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-notifier-govuknotify-api-key'), '2018-02-14').secretUriWithVersion, ')')]",
-        "GovUkNotify__EmailTemplates__ReleaseAmendmentPublishedId": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-notifier-templateid-release-amendment-published'), '2018-02-14').secretUriWithVersion, ')')]",
-        "GovUkNotify__EmailTemplates__ReleaseAmendmentPublishedSupersededSubscribersId": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-notifier-templateid-release-amendment-published-superseded-subscribers'), '2018-02-14').secretUriWithVersion, ')')]",
-        "GovUkNotify__EmailTemplates__ReleasePublishedId": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-notifier-templateid-release-published'), '2018-02-14').secretUriWithVersion, ')')]",
-        "GovUkNotify__EmailTemplates__ReleasePublishedSupersededSubscribersId": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-notifier-templateid-release-published-superseded-subscribers'), '2018-02-14').secretUriWithVersion, ')')]",
-        "GovUkNotify__EmailTemplates__SubscriptionConfirmationId": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-notifier-templateid-subscription-confirmation'), '2018-02-14').secretUriWithVersion, ')')]",
-        "GovUkNotify__EmailTemplates__SubscriptionVerificationId": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-notifier-templateid-subscription-verification'), '2018-02-14').secretUriWithVersion, ')')]",
-        "GovUkNotify__EmailTemplates__ApiSubscriptionConfirmationId": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-notifier-templateid-api-subscription-confirmation'), '2018-02-14').secretUriWithVersion, ')')]",
-        "GovUkNotify__EmailTemplates__ApiSubscriptionMajorDataSetVersionPublishedId": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-notifier-templateid-api-subscription-major-data-set-version-published'), '2018-02-14').secretUriWithVersion, ')')]",
-        "GovUkNotify__EmailTemplates__ApiSubscriptionDataSetVersionPublishedId": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-notifier-templateid-api-subscription-data-set-version-published'), '2018-02-14').secretUriWithVersion, ')')]",
-        "GovUkNotify__EmailTemplates__ApiSubscriptionVerificationId": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-notifier-templateid-api-subscription-verification'), '2018-02-14').secretUriWithVersion, ')')]"
+        "GovUkNotify__ApiKey": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-notifier-govuknotify-api-key'), '2018-02-14').secretUriWithVersion, ')')]"
       }
     },
     {
@@ -3433,7 +3415,8 @@
         "EventGrid__EventTopics__0__TopicEndpoint": "[reference(resourceId('Microsoft.EventGrid/topics', variables('eventGridTopicNamePublicationChanged')), '2025-02-15').endpoint]",
         "EventGrid__EventTopics__1__Key": "ReleaseVersionChangedEvent",
         "EventGrid__EventTopics__1__TopicEndpoint": "[reference(resourceId('Microsoft.EventGrid/topics', variables('eventGridTopicNameReleaseVersionChanged')), '2025-02-15').endpoint]",
-        "PublicDataDbExists": "[parameters('publicDataDbExists')]"
+        "PublicDataDbExists": "[parameters('publicDataDbExists')]",
+        "FeatureFlags__EnableReplacementOfPublicApiDataSets": "[parameters('enableReplacementOfPublicApiDataSets')]"
       }
     },
     {
@@ -3876,6 +3859,12 @@
                   }
                 }
               ]
+            }
+          },
+          {
+            "name": "[variables('eventGridCustomTopicPrivateEndpointsSubnetName')]",
+            "properties": {
+              "addressPrefix": "10.0.20.0/24"
             }
           }
         ]

@@ -12,7 +12,7 @@ Test Setup          fail test fast if required
 
 
 *** Variables ***
-${PUBLICATION_NAME}     UI tests - subject reordering %{RUN_IDENTIFIER}
+${PUBLICATION_NAME}     Subject reordering %{RUN_IDENTIFIER}
 ${RELEASE_NAME}         Calendar year 2000
 
 
@@ -113,7 +113,8 @@ Start replacing last subject in order
     user checks headed table body row cell contains    Data file    1    ordering-test-3.csv
     user checks headed table body row cell contains    Title    2    Three
     user checks headed table body row cell contains    Data file    2    ordering-test-3-replacement.csv
-    user checks headed table body row cell contains    Status    2    Complete    wait=%{WAIT_DATA_FILE_IMPORT}
+    user checks headed table body row cell contains    Data file import status    2    Complete
+    ...    wait=%{WAIT_DATA_FILE_IMPORT}
 
 Reorder subject that is being replaced
     user clicks link    Data and files

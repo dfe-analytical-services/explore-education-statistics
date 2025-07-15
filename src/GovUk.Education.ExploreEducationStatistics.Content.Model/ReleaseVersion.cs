@@ -62,6 +62,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
         public DateTime? NotifiedOn { get; set; }
 
+        public List<Organisation> PublishingOrganisations { get; set; } = [];
+
         public bool UpdatePublishedDate { get; set; }
 
         public ReleaseVersion? PreviousVersion { get; set; }

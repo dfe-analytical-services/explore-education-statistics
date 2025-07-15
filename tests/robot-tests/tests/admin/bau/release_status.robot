@@ -2,6 +2,7 @@
 Library             ../../libs/admin_api.py
 Resource            ../../libs/admin-common.robot
 Resource            ../../libs/admin/manage-content-common.robot
+Resource            ../../libs/public-common.robot
 
 Suite Setup         user signs in as bau1
 Suite Teardown      user closes the browser
@@ -11,8 +12,11 @@ Force Tags          Admin    Local    Dev    AltersData
 
 
 *** Variables ***
-${PUBLICATION_NAME}                 UI tests - release status %{RUN_IDENTIFIER}
-${ADOPTED_PUBLICATION_NAME}         UI tests - release status publication with adoptable methodology %{RUN_IDENTIFIER}
+${PUBLICATION_NAME}                 Release status %{RUN_IDENTIFIER}
+${RELEASE_1_NAME}                   Academic year Q1 2200/01
+${RELEASE_2_NAME}                   Calendar year 2001
+${RELEASE_3_NAME}                   Financial year 2300-01
+${ADOPTED_PUBLICATION_NAME}         Release status publication with adoptable methodology %{RUN_IDENTIFIER}
 ${PUBLICATION_NAME_DATAFILES}       ${PUBLICATION_NAME} -    datafiles-updated
 ${SUBJECT_NAME}                     Dates test subject
 
@@ -225,7 +229,7 @@ Approve the owned methodology and verify the warning disappears
 Create published methodology for adopted publication
     ${adopted_publication_id}    user creates test publication via api    ${ADOPTED_PUBLICATION_NAME}
     user creates test release via api    ${adopted_publication_id}    CY    2001
-    user navigates to draft release page from dashboard    ${ADOPTED_PUBLICATION_NAME}    Calendar year 2001
+    user navigates to draft release page from dashboard    ${ADOPTED_PUBLICATION_NAME}    ${RELEASE_2_NAME}
     user navigates to content page    ${ADOPTED_PUBLICATION_NAME}
     user adds headlines text block
     user adds content to headlines text block    Headline text block text
@@ -272,7 +276,7 @@ Publish new release from adopted publication and make an amendment
     user approves release for immediate publication
 
     user navigates to admin dashboard    Bau1
-    user creates amendment for release    ${ADOPTED_PUBLICATION_NAME}    Academic year Q1 2200/01
+    user creates amendment for release    ${ADOPTED_PUBLICATION_NAME}    ${RELEASE_1_NAME}
 
 Verify the checklist errors and warnings for amendment
     user edits release status
@@ -293,14 +297,14 @@ Navigate to contents page and add a release note
     user enters text into element    id:create-release-note-form-reason    Test release note one
     user clicks button    Save note
 
-Publish the release immediately
+Publish the release amendment immediately
     user approves release for immediate publication
 
 Create third release
     ${DATA_FILES_PUBLICATION_ID}    user creates test publication via api    ${PUBLICATION_NAME_DATAFILES}
     user creates test release via api    ${DATA_FILES_PUBLICATION_ID}    FY    2300
     user navigates to draft release page from dashboard    ${PUBLICATION_NAME_DATAFILES}
-    ...    Financial year 2300-01
+    ...    ${RELEASE_3_NAME}
 
 Upload data files
     user uploads subject and waits until complete    Dates test subject    dates.csv    dates.meta.csv
@@ -309,7 +313,7 @@ Upload data files
     user clicks link    Replace data
 
     user waits until h2 is visible    Data file details
-    user checks headed table body row contains    Status    Complete    wait=%{WAIT_LONG}
+    user checks headed table body row cell contains    Data file import status    1    Complete    wait=%{WAIT_LONG}
 
 Navigate to data replacement page
     user waits until h2 is visible    Upload replacement data    %{WAIT_MEDIUM}
@@ -321,7 +325,8 @@ Navigate to data replacement page
     user reloads page
     user checks table column heading contains    1    1    Original file
     user checks table column heading contains    1    2    Replacement file
-    user checks headed table body row cell contains    Status    2    Complete    wait=%{WAIT_DATA_FILE_IMPORT}
+    user checks headed table body row cell contains    Data file import status    1    Complete
+    ...    wait=%{WAIT_DATA_FILE_IMPORT}
 
 Validate checklist errors
     user edits release status
@@ -343,12 +348,18 @@ Navigate to data upload and confirm data replacement
     user clicks button    Confirm replacement
 
 Upload the larger data file via data upload
+    # TODO https://github.com/dfe-analytical-services/eesyscreener/issues/2
+    Skip    Skipping until the "large-data-set.csv" is compatible with screener.
+
     user uploads subject and waits until importing
     ...    ${SUBJECT_NAME}-updated
     ...    large-data-set.csv
     ...    large-data-set.meta.csv
 
 Validate checklist errors (3rd release)
+    # TODO https://github.com/dfe-analytical-services/eesyscreener/issues/2
+    Skip    Skipping until the "large-data-set.csv" is compatible with screener.
+
     user edits release status
 
     user checks checklist errors contains
@@ -367,14 +378,17 @@ Add data guidance to subject
 
     user clicks link    Data guidance
     user waits until h2 is visible    Public data guidance
-
     user waits until page contains element    id:dataGuidance-dataFiles
+
     user waits until page contains accordion section    ${SUBJECT_NAME}
-    user waits until page contains accordion section    ${SUBJECT_NAME}-updated
-    user reloads page
 
     user enters text into data guidance data file content editor    ${SUBJECT_NAME}
     ...    ${SUBJECT_NAME} Main guidance content
+
+    # TODO https://github.com/dfe-analytical-services/eesyscreener/issues/2
+    Skip    Skipping until the "large-data-set.csv" is compatible with screener.
+
+    user waits until page contains accordion section    ${SUBJECT_NAME}-updated
 
     user enters text into data guidance data file content editor    ${SUBJECT_NAME}-updated
     ...    ${SUBJECT_NAME} Main guidance content
@@ -387,7 +401,14 @@ Add headline text block to Content page
     user navigates to content page    ${PUBLICATION_NAME_DATAFILES}
     user adds headlines text block
     user adds content to headlines text block    Headline text block text
+
+    # TODO https://github.com/dfe-analytical-services/eesyscreener/issues/2
+    Skip    Skipping until the "large-data-set.csv" is compatible with screener.
     user waits until data upload is completed    ${SUBJECT_NAME}-updated
 
 Publish the release immediately
     user approves release for immediate publication
+
+Verify newly published release is available publicly
+    ${PUBLIC_RELEASE_URL}    user gets url public release will be accessible at
+    user navigates to public release page    ${PUBLIC_RELEASE_URL}    ${PUBLICATION_NAME}    ${RELEASE_3_NAME}

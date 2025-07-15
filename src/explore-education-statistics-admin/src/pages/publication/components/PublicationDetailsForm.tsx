@@ -18,6 +18,8 @@ import { ObjectSchema } from 'yup';
 import PublicationUpdateConfirmModal from '@admin/pages/publication/components/PublicationUpdateConfirmModal';
 
 const id = 'publicationDetailsForm';
+const titleMaxLength = 65;
+const summaryMaxLength = 160;
 
 interface FormValues {
   summary: string;
@@ -82,9 +84,17 @@ export default function PublicationDetailsForm({
     return Yup.object({
       summary: Yup.string()
         .required('Enter a summary')
-        .max(160, 'Summary must be 160 characters or less'),
+        .max(
+          summaryMaxLength,
+          `Summary must be ${summaryMaxLength} characters or fewer`,
+        ),
       supersededById: Yup.string(),
-      title: Yup.string().required('Enter a title'),
+      title: Yup.string()
+        .required('Enter a title')
+        .max(
+          titleMaxLength,
+          `Title must be ${titleMaxLength} characters or fewer`,
+        ),
       themeId: Yup.string().required('Choose a theme'),
     });
   }, []);
@@ -115,6 +125,7 @@ export default function PublicationDetailsForm({
                       name="title"
                       label="Publication title"
                       className="govuk-!-width-one-half"
+                      maxLength={titleMaxLength}
                     />
                   )}
 
@@ -123,7 +134,7 @@ export default function PublicationDetailsForm({
                       name="summary"
                       label="Publication summary"
                       className="govuk-!-width-one-half"
-                      maxLength={160}
+                      maxLength={summaryMaxLength}
                     />
                   )}
 

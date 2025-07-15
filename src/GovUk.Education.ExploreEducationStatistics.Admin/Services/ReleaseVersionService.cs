@@ -73,6 +73,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .ReleaseVersions
                 .Include(rv => rv.Release)
                 .ThenInclude(r => r.Publication)
+                .Include(rv => rv.PublishingOrganisations)
                 .Include(rv => rv.ReleaseStatuses)
                 .SingleOrNotFoundAsync(rv => rv.Id == releaseVersionId)
                 .OnSuccess(userService.CheckCanViewReleaseVersion)
@@ -616,6 +617,38 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
+        private async Task<Either<ActionResult, Unit>> ValidateDataFilesStatusForDeletion(ReleaseFile releaseFile)
+        {
+            var dataSetVersionStatus = await GetDataSetVersionStatus(releaseFile);
+            var fileExistsInPublishedReleaseVersion = await context.ReleaseFiles
+                .Include(rf => rf.ReleaseVersion)
+                .AnyAsync(rf => rf.FileId == releaseFile.File.Id &&
+                                rf.ReleaseVersion.Published != null);
+            var datasetVersionStatusIsPublished = DataSetVersionAuthExtensions.PublicStatuses.Any(status => status == dataSetVersionStatus);
+            var draftReleaseFile = !fileExistsInPublishedReleaseVersion;
+
+            if (releaseFile.File.ReplacedById is not null && releaseFile.PublicApiDataSetId is not null)
+            {
+                return ValidationUtils.ValidationResult(new ErrorViewModel
+                {
+                    Code = ValidationMessages.ReleaseFileMustBeOriginal.Code,
+                    Message = ValidationMessages.ReleaseFileMustBeOriginal.Message,
+                });
+            }
+            if (releaseFile.File.ReplacingId is not null && !draftReleaseFile)
+            {
+                throw new InvalidOperationException(
+                    "A replacement file for a DRAFT release version cannot also be a PUBLISHED file.");
+            }
+            if (datasetVersionStatusIsPublished && draftReleaseFile)
+            {
+                throw new InvalidOperationException(
+                    "A DRAFT release version's file cannot be linked to a PUBLISHED API.");
+            }
+            
+            return Unit.Instance;
+        }
+
         public async Task<Either<ActionResult, Unit>> RemoveDataFiles(Guid releaseVersionId, Guid fileId)
         {
             return await context.ReleaseVersions
@@ -623,6 +656,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(userService.CheckCanUpdateReleaseVersion)
                 .OnSuccess(() => CheckReleaseDataFileExists(releaseVersionId: releaseVersionId, fileId: fileId))
                 .OnSuccessDo(releaseFile => CheckCanDeleteDataFiles(releaseVersionId, releaseFile))
+                .OnSuccessDo(ValidateDataFilesStatusForDeletion)
                 .OnSuccessDo(async releaseFile =>
                 {
                     // Delete any replacement that might exist
@@ -645,18 +679,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         releaseVersionId: releaseVersionId,
                         subjectId: deletePlan.SubjectId));
                 })
-                .OnSuccessDo(DeleteApiDataSetVersionIfAttached)
+                .OnSuccessDo(DeleteDraftApiDataSetVersion)
                 .OnSuccessVoid(() => releaseDataFileService.Delete(releaseVersionId, fileId));
         }
 
-        private async Task<Either<ActionResult, Unit>> DeleteApiDataSetVersionIfAttached(DeleteDataFilePlanViewModel deletePlan)
+        private async Task<Either<ActionResult, Unit>> DeleteDraftApiDataSetVersion(DeleteDataFilePlanViewModel deletePlan)
         {
-            return !featureFlags.Value.EnableReplacementOfPublicApiDataSets 
-                   || deletePlan.ApiDataSetVersionPlan == null
-                ? Unit.Instance
-                : !deletePlan.Valid 
-                    ? throw new InvalidOperationException("Deletion plan has indicated this deletion does not meet requirements to make it valid to proceed with deletion.") 
-                    : await dataSetVersionService.DeleteVersion(dataSetVersionId: deletePlan.ApiDataSetVersionPlan.Id);
+             // Skip when Status == DataSetVersionStatus.Published;  
+             if (!featureFlags.Value.EnableReplacementOfPublicApiDataSets
+                 || deletePlan.ApiDataSetVersionPlan is null or { Valid: false })
+             {
+                 return Unit.Instance;
+             }
+             
+             return await dataSetVersionService.DeleteVersion(deletePlan.ApiDataSetVersionPlan!.Id);
         }
         
         public async Task<Either<ActionResult, DataImportStatusViewModel>> GetDataFileImportStatus(
@@ -779,32 +815,42 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 return ValidationActionResult(CannotRemoveDataFilesOnceReleaseApproved);
             }
 
-            if (releaseFile.PublicApiDataSetId is null)
+            if (!featureFlags.Value.EnableReplacementOfPublicApiDataSets && releaseFile.PublicApiDataSetId is not null)
             {
-                return Unit.Instance;
-            }
-
-            DataSetVersionStatus? versionStatus = null;
-            await dataSetVersionService
-                .GetDataSetVersion(
-                    releaseFile.PublicApiDataSetId.Value,
-                    releaseFile.PublicApiDataSetVersion!)
-                .OnFailureDo(_ =>
-                {
-                    var errorMessage = "Failed to find the data set version expected to be linked to the release file that is being deleted.";
-                    var notFoundException = new InvalidOperationException(errorMessage);
-                    logger.LogError(notFoundException, errorMessage + $" Details: Data set id: {releaseFile.PublicApiDataSetId.Value} and the data set version number: {releaseFile.PublicApiDataSetVersionString}.");
-                    throw notFoundException;
-                }).OnSuccess(dsv => versionStatus = dsv.Status);
-            
-            return ShouldAllowApiDataSetDeletion(versionStatus!.Value) 
-                ? Unit.Instance 
-                :  ValidationUtils.ValidationResult(new ErrorViewModel
+                return ValidationUtils.ValidationResult(new ErrorViewModel
                 {
                     Code = ValidationMessages.CannotDeleteApiDataSetReleaseFile.Code,
                     Message = ValidationMessages.CannotDeleteApiDataSetReleaseFile.Message,
                     Detail = new ApiDataSetErrorDetail(releaseFile.PublicApiDataSetId.Value)
                 });
+            }
+            return Unit.Instance;
+        }
+        
+        private async Task<DataSetVersionStatus?> GetDataSetVersionStatus(ReleaseFile releaseFile)
+        {
+            if (releaseFile.PublicApiDataSetId == null)
+            {
+                return null;
+            }
+
+            DataSetVersionStatus? versionStatus = null;
+            await dataSetVersionService
+                    .GetDataSetVersion(
+                        releaseFile.PublicApiDataSetId.Value,
+                        releaseFile.PublicApiDataSetVersion!)
+                    .OnFailureDo(_ =>
+                    {
+                        var errorMessage =
+                            "Failed to find the data set version expected to be linked to the release file that is being deleted.";
+                        var notFoundException = new InvalidOperationException(errorMessage);
+                        logger.LogError(notFoundException,
+                            errorMessage +
+                            $" Details: Data set id: {releaseFile.PublicApiDataSetId.Value} and the data set version number: {releaseFile.PublicApiDataSetVersionString}.");
+                        throw notFoundException;
+                    }).OnSuccess(dsv => versionStatus = dsv.Status);
+            
+            return versionStatus;
         }
 
         private bool ShouldAllowApiDataSetDeletion(DataSetVersionStatus? dataSetVersionStatus)

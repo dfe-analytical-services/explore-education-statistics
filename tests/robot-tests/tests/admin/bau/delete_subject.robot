@@ -11,7 +11,7 @@ Test Setup          fail test fast if required
 
 
 *** Variables ***
-${PUBLICATION_NAME}     UI tests - delete subject %{RUN_IDENTIFIER}
+${PUBLICATION_NAME}     Delete subject %{RUN_IDENTIFIER}
 
 
 *** Test Cases ***

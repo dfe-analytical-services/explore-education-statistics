@@ -97,6 +97,12 @@
     },
     "immediatePublicationOfScheduledReleaseVersionsEnabled": {
       "value": true
+    },
+    "notifierSuppressExceptionsForTeamOnlyApiKeyErrors": {
+      "value": true
+    },
+    "enableReplacementOfPublicApiDataSets" : {
+      "value": false
     }
   }
 }

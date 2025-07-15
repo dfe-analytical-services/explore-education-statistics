@@ -16,9 +16,13 @@ public class AnalyticsWritePublicApiQueryStrategy(
         
     public Type RequestType => typeof(CaptureDataSetVersionQueryRequest);
 
-    public async Task Report(IAnalyticsCaptureRequestBase request, CancellationToken cancellationToken)
+    public async Task Report(IAnalyticsCaptureRequest request, CancellationToken cancellationToken)
     {
-        await workflow.Report(_workflowActor, request, cancellationToken);
+        if (request is not CaptureDataSetVersionQueryRequest captureRequest)
+        {
+            throw new ArgumentException($"Request must be of type {nameof(CaptureDataSetVersionQueryRequest)}. It is {request.GetType().FullName}", nameof(request));
+        }
+        await workflow.Report(_workflowActor, captureRequest, cancellationToken);
     }
 
     private class WorkflowActor(string analyticsPath) 

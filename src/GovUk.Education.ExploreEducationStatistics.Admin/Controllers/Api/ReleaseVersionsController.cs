@@ -1,5 +1,6 @@
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
@@ -28,6 +29,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         private readonly IReleasePublishingStatusService _releasePublishingStatusService;
         private readonly IReleaseChecklistService _releaseChecklistService;
         private readonly IDataImportService _dataImportService;
+        private readonly IDataSetUploadRepository _dataSetUploadRepository;
+        private readonly IDataSetFileStorage _dataSetFileStorage;
 
         public ReleaseVersionsController(
             IReleaseVersionService releaseVersionService,
@@ -36,7 +39,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             IReleaseDataFileService releaseDataFileService,
             IReleasePublishingStatusService releasePublishingStatusService,
             IReleaseChecklistService releaseChecklistService,
-            IDataImportService dataImportService)
+            IDataImportService dataImportService,
+            IDataSetUploadRepository dataSetUploadRepository,
+            IDataSetFileStorage dataSetFileStorage)
         {
             _releaseVersionService = releaseVersionService;
             _releaseAmendmentService = releaseAmendmentService;
@@ -45,6 +50,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             _releasePublishingStatusService = releasePublishingStatusService;
             _releaseChecklistService = releaseChecklistService;
             _dataImportService = dataImportService;
+            _dataSetUploadRepository = dataSetUploadRepository;
+            _dataSetFileStorage = dataSetFileStorage;
         }
 
         // We intend to change this route, to make these endpoints more consistent, as per EES-5895
@@ -67,13 +74,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                 .HandleFailuresOrOk();
         }
 
-        // We intend to change this route, to make these endpoints more consistent, as per EES-5895
-        [HttpGet("release/{releaseVersionId:guid}/data/{fileId:guid}")]
+        [HttpGet("releaseVersions/{releaseVersionId:guid}/data/{fileId:guid}")]
         public async Task<ActionResult<DataFileInfo>> GetDataFileInfo(Guid releaseVersionId, Guid fileId)
         {
             return await _releaseDataFileService
                 .GetInfo(releaseVersionId, fileId)
                 .HandleFailuresOrOk();
+        }
+
+        [HttpGet("releaseVersions/{releaseVersionId:guid}/{fileType}/{dataSetUploadId:guid}/download")]
+        public async Task<ActionResult> GetDataSetUploadFile(
+            Guid releaseVersionId,
+            FileType fileType,
+            Guid dataSetUploadId,
+            CancellationToken cancellationToken)
+        {
+            return await _dataSetFileStorage
+                .RetrieveDataSetFileFromTemporaryStorage(releaseVersionId, dataSetUploadId, fileType, cancellationToken)
+                .HandleFailures();
         }
 
         // We intend to change this route, to make these endpoints more consistent, as per EES-5895
@@ -87,8 +105,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                 .HandleFailuresOrOk();
         }
 
-        // We intend to change this route, to make these endpoints more consistent, as per EES-5895
-        [HttpGet("release/{releaseVersionId:guid}/data")]
+        [HttpGet("releaseVersions/{releaseVersionId:guid}/data")]
         public async Task<ActionResult<List<DataFileInfo>>> GetDataFileInfo(Guid releaseVersionId)
         {
             return await _releaseDataFileService
@@ -96,9 +113,31 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                 .HandleFailuresOrOk();
         }
 
+        [HttpGet("releaseVersions/{releaseVersionId:guid}/uploads")]
+        public async Task<ActionResult<List<DataSetUploadViewModel>>> GetDataSetUploads(
+            Guid releaseVersionId,
+            CancellationToken cancellationToken)
+        {
+            return await _dataSetUploadRepository
+                .ListAll(releaseVersionId, cancellationToken)
+                .HandleFailuresOrOk();
+        }
+
+        [HttpDelete("releaseVersions/{releaseVersionId:guid}/upload/{dataSetUploadId:guid}")]
+        public async Task<ActionResult> DeleteDataSetUpload(
+            Guid releaseVersionId,
+            Guid dataSetUploadId,
+            CancellationToken cancellationToken)
+        {
+            return await _dataSetUploadRepository
+                .Delete(releaseVersionId, dataSetUploadId, cancellationToken)
+                .HandleFailuresOrNoContent();
+        }
+
         // We intend to change this route, to make these endpoints more consistent, as per EES-5895
         [HttpPut("release/{releaseVersionId:guid}/data/order")]
-        public async Task<ActionResult<List<DataFileInfo>>> ReorderDataFiles(Guid releaseVersionId,
+        public async Task<ActionResult<List<DataFileInfo>>> ReorderDataFiles(
+            Guid releaseVersionId,
             List<Guid> fileIds)
         {
             return await _releaseDataFileService
@@ -109,7 +148,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         [HttpPost("releaseVersions/data")]
         [DisableRequestSizeLimit]
         [RequestFormLimits(ValueLengthLimit = int.MaxValue, MultipartBodyLengthLimit = int.MaxValue)]
-        public async Task<ActionResult<List<DataSetUploadResultViewModel>>> UploadDataSet(
+        public async Task<ActionResult<List<DataSetUploadViewModel>>> UploadDataSet(
             [FromForm] UploadDataSetRequest request,
             CancellationToken cancellationToken)
         {
@@ -146,7 +185,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         [HttpPost("releaseVersions/zip-data")]
         [DisableRequestSizeLimit]
         [RequestFormLimits(ValueLengthLimit = int.MaxValue, MultipartBodyLengthLimit = int.MaxValue)]
-        public async Task<ActionResult<List<DataSetUploadResultViewModel>>> UploadDataSetAsZip(
+        public async Task<ActionResult<List<DataSetUploadViewModel>>> UploadDataSetAsZip(
             [FromForm] UploadDataSetAsZipRequest request,
             CancellationToken cancellationToken)
         {
@@ -181,7 +220,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         [HttpPost("releaseVersions/upload-bulk-zip-data")]
         [DisableRequestSizeLimit]
         [RequestFormLimits(ValueLengthLimit = int.MaxValue, MultipartBodyLengthLimit = int.MaxValue)]
-        public async Task<ActionResult<List<DataSetUploadResultViewModel>>> UploadDataSetAsBulkZip(
+        public async Task<ActionResult<List<DataSetUploadViewModel>>> UploadDataSetAsBulkZip(
             [FromForm] UploadDataSetAsBulkZipRequest request,
             CancellationToken cancellationToken)
         {
@@ -190,15 +229,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                 .HandleFailuresOrOk();
         }
 
-        [HttpPost("releases/{releaseVersionId:guid}/import-data-sets")]
-        public async Task<ActionResult<List<DataFileInfo>>> ImportBulkZipDataSetsFromTempStorage(
+        [HttpPost("releaseVersions/{releaseVersionId:guid}/import-data-sets")]
+        public async Task<ActionResult> ImportDataSetsFromTempStorage(
             Guid releaseVersionId,
-            List<DataSetUploadResultViewModel> dataSetFiles,
+            List<Guid> dataSetUploadIds,
             CancellationToken cancellationToken)
         {
             return await _releaseDataFileService
-                .SaveDataSetsFromTemporaryBlobStorage(releaseVersionId, dataSetFiles, cancellationToken)
-                .HandleFailuresOrOk();
+                .SaveDataSetsFromTemporaryBlobStorage(releaseVersionId, dataSetUploadIds, cancellationToken)
+                .HandleFailuresOrNoContent(convertNotFoundToNoContent: false);
         }
 
         // We intend to change this route, to make these endpoints more consistent, as per EES-5895

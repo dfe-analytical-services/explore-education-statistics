@@ -7,7 +7,7 @@ interface Props {
   value?: string;
 }
 export default function FormCharacterCount({ id, maxLength, value }: Props) {
-  const remaining = maxLength - (value?.length ?? 0);
+  const remaining = maxLength - (value?.trim().length ?? 0);
 
   return (
     <div

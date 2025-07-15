@@ -1,4 +1,5 @@
 #nullable enable
+using System;
 using GovUk.Education.ExploreEducationStatistics.Common;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
@@ -33,6 +34,16 @@ public static class ValidationMessages
     public static readonly LocalizableMessage DataSetVersionMappingSourcePathDoesNotExist = new(
         Code: nameof(DataSetVersionMappingSourcePathDoesNotExist),
         Message: "The source mapping does not exist."
+    );
+
+    public static readonly LocalizableMessage DataSetVersionMappingResultedInMajorChange = new(
+        Code: nameof(DataSetVersionMappingResultedInMajorChange),
+        Message: "The data file uploaded has incomplete sections or has resulted in a major version update which is not allowed in release amendments."
+    );
+    
+    public static readonly LocalizableMessage ReleaseFileMustBeOriginal = new(
+        Code: nameof(ReleaseFileMustBeOriginal),
+        Message: "This must be an original file linked to a replacement. You must cancel the replacement first before removing file."
     );
 
     public static readonly LocalizableMessage DataSetVersionMappingCandidatePathDoesNotExist = new(
@@ -135,6 +146,20 @@ public static class ValidationMessages
         Message: "Failed to read dataset_names.csv. Exception: {0}"
     );
 
+    public static ErrorViewModel GenerateErrorDataSetIsNotInAnImportableState()
+    {
+        return new ErrorViewModel
+        {
+            Code = DataSetIsNotInAnImportableState.Code,
+            Message = DataSetIsNotInAnImportableState.Message,
+        };
+    }
+
+    public static readonly LocalizableMessage DataSetIsNotInAnImportableState = new(
+        Code: nameof(DataSetIsNotInAnImportableState),
+        Message: "Data set cannot be imported. Ensure it has been screened, and that there are no errors"
+    );
+
     public static ErrorViewModel GenerateErrorDataSetNamesCsvReaderException(string exception)
     {
         return new ErrorViewModel
@@ -230,7 +255,7 @@ public static class ValidationMessages
 
     public static readonly LocalizableMessage DataSetTitleTooLong = new(
         Code: nameof(DataSetTitleTooLong),
-        Message: "Title '{0}' must be {1} characters or less"
+        Message: "Title '{0}' must be {1} characters or fewer"
     );
 
     public static ErrorViewModel GenerateErrorDataSetTitleTooLong(
@@ -390,8 +415,92 @@ public static class ValidationMessages
         };
     }
 
+    public static readonly LocalizableMessage DataSetUploadNotFound = new(
+        Code: nameof(DataSetUploadNotFound),
+        Message: "Data set upload not found."
+    );
+
+    public static ErrorViewModel GenerateErrorDataSetUploadNotFound()
+    {
+        return new ErrorViewModel
+        {
+            Code = DataSetUploadNotFound.Code,
+            Message = DataSetUploadNotFound.Message,
+        };
+    }
+
+    public static readonly LocalizableMessage TemporaryFilesNotFound = new(
+        Code: nameof(TemporaryFilesNotFound),
+        Message: "Unable to locate temporary files at the locations specified."
+    );
+
+    public static ErrorViewModel GenerateErrorTemporaryFilesNotFound()
+    {
+        return new ErrorViewModel
+        {
+            Code = TemporaryFilesNotFound.Code,
+            Message = TemporaryFilesNotFound.Message,
+        };
+    }
+
     public static readonly LocalizableMessage PreviewTokenExpired = new(
         Code: nameof(PreviewTokenExpired),
         Message: "The preview token is expired."
     );
+
+    public static readonly LocalizableMessage ReplacementNotFound = new(
+        Code: nameof(ReplacementNotFound),
+        Message: "Linked original and replacement file(s) not found. OriginalFileId: {0}"
+    );
+
+    public static ErrorViewModel GenerateErrorReplacementNotFound(Guid originalFileId)
+    {
+        return new ErrorViewModel
+        {
+            Code = ReplacementNotFound.Code,
+            Message = string.Format(ReplacementNotFound.Message, originalFileId),
+        };
+    }
+
+    public static readonly LocalizableMessage ReplacementMustBeValid = new(
+        Code: nameof(ReplacementMustBeValid),
+        Message: "Replacement not valid. OriginalFileId: {0}"
+    );
+
+    public static ErrorViewModel GenerateErrorReplacementMustBeValid(Guid originalFileId)
+    {
+        return new ErrorViewModel
+        {
+            Code = ReplacementMustBeValid.Code,
+            Message = string.Format(ReplacementMustBeValid.Message, originalFileId),
+        };
+    }
+
+    public static readonly LocalizableMessage ReplacementImportMustBeComplete = new(
+        Code: nameof(ReplacementImportMustBeComplete),
+        Message: "Replacement import not complete. OriginalFileId: {0}"
+    );
+
+    public static ErrorViewModel GenerateErrorReplacementImportMustBeComplete(Guid originalFileId)
+    {
+        return new ErrorViewModel
+        {
+            Code = ReplacementImportMustBeComplete.Code,
+            Message = string.Format(ReplacementImportMustBeComplete.Message, originalFileId),
+        };
+    }
+
+    public static readonly LocalizableMessage ReplacementError = new(
+        Code: nameof(ReplacementError),
+        Message: "Replacement error. OriginalFileId: {0}"
+    );
+
+    public static ErrorViewModel GenerateErrorReplacementError(Guid originalFileId)
+    {
+        return new ErrorViewModel
+        {
+            Code = ReplacementError.Code,
+            Message = string.Format(ReplacementError.Message, originalFileId),
+        };
+    }
 }

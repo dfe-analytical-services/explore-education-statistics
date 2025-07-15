@@ -14,6 +14,8 @@ import render, { CustomRenderResult } from '@common-test/render';
 import { createMemoryHistory, History } from 'history';
 import { screen, waitFor, within } from '@testing-library/react';
 import { Router } from 'react-router-dom';
+import React from 'react';
+import { TestConfigContextProvider } from '@admin/contexts/ConfigContext';
 
 jest.mock('@admin/services/apiDataSetService');
 jest.mock('@admin/services/apiDataSetCandidateService');
@@ -119,7 +121,7 @@ describe('ReleaseApiDataSetsSection', () => {
     apiDataSetCandidateService.listCandidates.mockResolvedValue([]);
     apiDataSetService.listDataSets.mockResolvedValue(testDataSets);
 
-    renderPage();
+    renderWithTestConfig();
 
     expect(await screen.findByText('Draft API data sets')).toBeInTheDocument();
 
@@ -154,7 +156,7 @@ describe('ReleaseApiDataSetsSection', () => {
     apiDataSetCandidateService.listCandidates.mockResolvedValue([]);
     apiDataSetService.listDataSets.mockResolvedValue(testDataSets);
 
-    renderPage();
+    renderWithTestConfig();
 
     expect(await screen.findByText('Draft API data sets')).toBeInTheDocument();
     expect(screen.getByText('Current live API data sets')).toBeInTheDocument();
@@ -314,6 +316,57 @@ describe('ReleaseApiDataSetsSection', () => {
           </Router>
         </ReleaseVersionContextProvider>
       </AuthContextTestProvider>,
+    );
+  }
+
+  function renderWithTestConfig(options?: {
+    releaseVersion?: ReleaseVersion;
+    user?: User;
+    history?: History;
+  }): CustomRenderResult {
+    const defaultTestConfig = {
+      appInsightsKey: '',
+      publicAppUrl: 'http://localhost',
+      publicApiUrl: 'http://public-api',
+      publicApiDocsUrl: 'http://public-api-docs',
+      permittedEmbedUrlDomains: [
+        'https://department-for-education.shinyapps.io',
+      ],
+      oidc: {
+        clientId: '',
+        authority: '',
+        knownAuthorities: [''],
+        adminApiScope: '',
+        authorityMetadata: {
+          authorizationEndpoint: '',
+          tokenEndpoint: '',
+          issuer: '',
+          userInfoEndpoint: '',
+          endSessionEndpoint: '',
+        },
+      },
+    };
+    const {
+      releaseVersion = testRelease,
+      user = testBauUser,
+      history = createMemoryHistory(),
+    } = options ?? {};
+
+    return render(
+      <TestConfigContextProvider
+        config={{
+          ...defaultTestConfig,
+          enableReplacementOfPublicApiDataSets: false,
+        }}
+      >
+        <AuthContextTestProvider user={user}>
+          <ReleaseVersionContextProvider releaseVersion={releaseVersion}>
+            <Router history={history}>
+              <ReleaseApiDataSetsSection />
+            </Router>
+          </ReleaseVersionContextProvider>
+        </AuthContextTestProvider>
+      </TestConfigContextProvider>,
     );
   }
 });

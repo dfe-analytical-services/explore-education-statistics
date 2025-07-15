@@ -12,8 +12,8 @@ Force Tags          Admin    Local    Dev    AltersData
 
 
 *** Variables ***
-${PUBLICATION_NAME}=                UI tests - publish publication update %{RUN_IDENTIFIER}
-${PUBLIC_PUBLICATION_URL_ENDING}    /find-statistics/ui-tests-publish-publication-update-%{RUN_IDENTIFIER}
+${PUBLICATION_NAME}=                Publish publication update %{RUN_IDENTIFIER}
+${PUBLIC_PUBLICATION_URL_ENDING}    /find-statistics/publish-publication-update-%{RUN_IDENTIFIER}
 ${ACADEMIC_YEAR}                    /2046-47
 ${PUBLICATION_NAME_UPDATED}=        ${PUBLICATION_NAME} updated
 ${RELEASE_NAME}=                    Academic year 2046/47

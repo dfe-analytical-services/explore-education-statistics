@@ -22,6 +22,7 @@ import Page from '@frontend/components/Page';
 import Pagination from '@frontend/components/Pagination';
 import SearchForm from '@frontend/components/SearchForm';
 import SortControls, { SortOption } from '@frontend/components/SortControls';
+import TryNewSearchBanner from '@frontend/components/TryNewSearchBanner';
 import Filters from '@frontend/modules/find-statistics/components/Filters';
 import PublicationSummary from '@frontend/modules/find-statistics/components/PublicationSummary';
 import { getParamsFromQuery } from '@frontend/modules/find-statistics/utils/createPublicationListRequest';
@@ -181,6 +182,7 @@ const FindStatisticsPage: NextPage = () => {
   return (
     <Page
       title={defaultPageTitle}
+      customBannerContent={<TryNewSearchBanner />}
       // Don't include the default meta title when filtered to prevent too much screen reader noise.
       includeDefaultMetaTitle={pageTitle === defaultPageTitle}
       metaTitle={pageTitle}

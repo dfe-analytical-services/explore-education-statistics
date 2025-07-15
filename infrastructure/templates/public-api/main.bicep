@@ -158,6 +158,9 @@ param publicApiContainerAppConfig ContainerAppResourceConfig = {
 @description('Enable the Swagger UI for public API.')
 param enableSwagger bool = false
 
+@description('Enable replacement of public API data sets.')
+param enableReplacementOfPublicApiDataSets bool = false
+
 var tagValues = union(resourceTags ?? {}, {
   Environment: environmentName
   DateProvisioned: dateProvisioned
@@ -248,10 +251,10 @@ module coreStorage 'application/shared/coreStorage.bicep' = {
   }
 }
 
-module privateDnsZonesModule 'application/shared/privateDnsZones.bicep' = if (deploySharedPrivateDnsZones) {
+module privateDnsZonesModule '../common/application/privateDnsZones.bicep' = if (deploySharedPrivateDnsZones) {
   name: 'privateDnsZonesApplicationModuleDeploy'
   params: {
-    resourceNames: resourceNames
+    vnetName: resourceNames.existingResources.vNet
     tagValues: tagValues
   }
 }
@@ -563,3 +566,5 @@ output coreStorageConnectionStringSecretKey string = coreStorage.outputs.coreSto
 output keyVaultName string = resourceNames.existingResources.keyVault
 
 output enableThemeDeletion bool = enableThemeDeletion
+
+output enableReplacementOfPublicApiDataSets bool = enableReplacementOfPublicApiDataSets
