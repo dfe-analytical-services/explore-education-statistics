@@ -149,7 +149,7 @@ export default function ReleaseApiDataSetFiltersMappingPage() {
         : []),
       {
         id: sectionIds.newFilterOptions,
-        text: 'New filter options',
+        text: 'Filter options not found in old dataset',
         subNavItems: Object.keys(newFilterOptions).map(filterKey => {
           return {
             id: sectionIds.newFilterOptionsGroup(filterKey),
@@ -159,7 +159,7 @@ export default function ReleaseApiDataSetFiltersMappingPage() {
       },
       {
         id: sectionIds.autoMappedFilterOptions,
-        text: 'Auto mapped filter options',
+        text: 'Filter options found in both',
         subNavItems: Object.keys(autoMappedFilterOptions).map(filterKey => {
           return {
             id: sectionIds.autoMappedFilterOptionsGroup(filterKey),
@@ -414,7 +414,7 @@ export default function ReleaseApiDataSetFiltersMappingPage() {
               className="govuk-heading-l govuk-!-margin-top-8"
               id={sectionIds.newFilterOptions}
             >
-              New filter options ({totalNewFilterOptions}){' '}
+              Filter options not found in old dataset ({totalNewFilterOptions}){' '}
               <Tag colour="grey">No action required</Tag>
             </h3>
 
@@ -462,7 +462,7 @@ export default function ReleaseApiDataSetFiltersMappingPage() {
               className="govuk-heading-l govuk-!-margin-top-8"
               id={sectionIds.autoMappedFilterOptions}
             >
-              Auto mapped filter options ({totalAutoMappedFilterOptions}){' '}
+              Filter options found in both ({totalAutoMappedFilterOptions}){' '}
               <Tag colour="grey">No action required</Tag>
             </h3>
 
@@ -527,7 +527,7 @@ export default function ReleaseApiDataSetFiltersMappingPage() {
                 })}
               </Accordion>
             ) : (
-              <p>No auto mapped filter options.</p>
+              <p>No filter options found in both.</p>
             )}
 
             {dataSet && (
