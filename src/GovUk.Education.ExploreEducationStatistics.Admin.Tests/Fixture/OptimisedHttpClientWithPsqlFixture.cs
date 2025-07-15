@@ -49,6 +49,7 @@ public class OptimisedHttpClientWithPsqlFixture(string connectionString) : IAsyn
 
     public async Task DisposeAsync()
     {
+        await ClearTestData();
         DisposeDbContexts();
     }
 
