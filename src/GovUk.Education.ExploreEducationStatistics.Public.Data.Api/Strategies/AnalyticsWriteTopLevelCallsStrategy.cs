@@ -11,8 +11,10 @@ public class AnalyticsWriteTopLevelCallsStrategy(
     ICommonAnalyticsWriteStrategyWorkflow<CaptureTopLevelCallRequest> workflow
 ) : IAnalyticsWriteStrategy
 {
+    public static readonly string[] OutputSubPaths = ["public-api", "top-level"];
+    
     private readonly IWorkflowActor<CaptureTopLevelCallRequest> _workflowActor =
-        new WorkflowActor(analyticsPath: analyticsPathResolver.PublicApiTopLevelCallsDirectoryPath());
+        new WorkflowActor(analyticsPath: analyticsPathResolver.BuildOutputDirectory(OutputSubPaths));
 
     public Type RequestType => typeof(CaptureTopLevelCallRequest);
 

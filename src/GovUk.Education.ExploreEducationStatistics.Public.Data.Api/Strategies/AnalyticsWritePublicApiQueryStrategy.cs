@@ -11,8 +11,10 @@ public class AnalyticsWritePublicApiQueryStrategy(
     ICommonAnalyticsWriteStrategyWorkflow<CaptureDataSetVersionQueryRequest> workflow
     ) : IAnalyticsWriteStrategy
 {
+    public static readonly string[] OutputSubPaths = ["public-api", "queries"];
+    
     private readonly IWorkflowActor<CaptureDataSetVersionQueryRequest> _workflowActor =
-        new WorkflowActor(analyticsPath: analyticsPathResolver.PublicApiQueriesDirectoryPath());
+        new WorkflowActor(analyticsPath: analyticsPathResolver.BuildOutputDirectory(OutputSubPaths));
         
     public Type RequestType => typeof(CaptureDataSetVersionQueryRequest);
 

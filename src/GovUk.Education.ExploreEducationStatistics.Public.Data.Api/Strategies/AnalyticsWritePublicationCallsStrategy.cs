@@ -10,8 +10,10 @@ public class AnalyticsWritePublicationCallsStrategy(
     ICommonAnalyticsWriteStrategyWorkflow<CapturePublicationCallRequest> workflow
     ) : IAnalyticsWriteStrategy
 {
+    public static readonly string[] OutputSubPaths = ["public-api", "publications"];
+    
     private readonly IWorkflowActor<CapturePublicationCallRequest> _workflowActor =
-        new WorkflowActor(analyticsPath: analyticsPathResolver.PublicApiPublicationCallsDirectoryPath());
+        new WorkflowActor(analyticsPath: analyticsPathResolver.BuildOutputDirectory(OutputSubPaths));
         
     public Type RequestType => typeof(CapturePublicationCallRequest);
 

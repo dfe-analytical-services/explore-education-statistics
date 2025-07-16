@@ -10,8 +10,10 @@ public class AnalyticsWriteDataSetVersionCallsStrategy(
     ICommonAnalyticsWriteStrategyWorkflow<CaptureDataSetVersionCallRequest> workflow 
     ) : IAnalyticsWriteStrategy
 {
+    public static readonly string[] OutputSubPaths = ["public-api", "data-set-versions"];
+    
     private readonly IWorkflowActor<CaptureDataSetVersionCallRequest> _workflowActor =
-        new WorkflowActor(analyticsPath: analyticsPathResolver.PublicApiDataSetVersionCallsDirectoryPath());
+        new WorkflowActor(analyticsPath: analyticsPathResolver.BuildOutputDirectory(OutputSubPaths));
         
     public Type RequestType => typeof(CaptureDataSetVersionCallRequest);
 

@@ -38,12 +38,12 @@ public abstract class AnalyticsWriteDataSetVersionCallsStrategyTests
                 Type: DataSetVersionCallType.GetSummary), default);
             
             var files = Directory
-                .GetFiles(pathResolver.PublicApiDataSetVersionCallsDirectoryPath());
+                .GetFiles(pathResolver.BuildOutputDirectory(AnalyticsWriteDataSetVersionCallsStrategy.OutputSubPaths));
             
             var filePath = Assert.Single(files);
 
             var filename = filePath
-                .Split($"{pathResolver.PublicApiDataSetVersionCallsDirectoryPath()}{Path.DirectorySeparatorChar}")[1];
+                .Split($"{pathResolver.BuildOutputDirectory(AnalyticsWriteDataSetVersionCallsStrategy.OutputSubPaths)}{Path.DirectorySeparatorChar}")[1];
             Assert.StartsWith("20250316-120102_", filename);
 
             Snapshot.Match(
@@ -76,12 +76,12 @@ public abstract class AnalyticsWriteDataSetVersionCallsStrategyTests
                 Type: DataSetVersionCallType.DownloadCsv), default);
             
             var files = Directory
-                .GetFiles(pathResolver.PublicApiDataSetVersionCallsDirectoryPath());
+                .GetFiles(pathResolver.BuildOutputDirectory(AnalyticsWriteDataSetVersionCallsStrategy.OutputSubPaths));
             
             var filePath = Assert.Single(files);
 
             var filename = filePath
-                .Split($"{pathResolver.PublicApiDataSetVersionCallsDirectoryPath()}{Path.DirectorySeparatorChar}")[1];
+                .Split($"{pathResolver.BuildOutputDirectory(AnalyticsWriteDataSetVersionCallsStrategy.OutputSubPaths)}{Path.DirectorySeparatorChar}")[1];
             Assert.StartsWith("20250316-120102_", filename);
 
             Snapshot.Match(
@@ -114,7 +114,7 @@ public abstract class AnalyticsWriteDataSetVersionCallsStrategyTests
                 Type: DataSetVersionCallType.GetMetadata), default);
 
             var filePath = Assert.Single(Directory
-                .GetFiles(pathResolver.PublicApiDataSetVersionCallsDirectoryPath()));
+                .GetFiles(pathResolver.BuildOutputDirectory(AnalyticsWriteDataSetVersionCallsStrategy.OutputSubPaths)));
             
             Snapshot.Match(
                 currentResult: await File.ReadAllTextAsync(filePath),

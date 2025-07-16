@@ -33,12 +33,12 @@ public abstract class AnalyticsWriteDataSetCallsStrategyTests
                 Type: DataSetCallType.GetSummary), default);
             
             var files = Directory
-                .GetFiles(pathResolver.PublicApiDataSetCallsDirectoryPath());
+                .GetFiles(pathResolver.BuildOutputDirectory(AnalyticsWriteDataSetCallsStrategy.OutputSubPaths));
             
             var filePath = Assert.Single(files);
 
             var filename = filePath
-                .Split($"{pathResolver.PublicApiDataSetCallsDirectoryPath()}{Path.DirectorySeparatorChar}")[1];
+                .Split($"{pathResolver.BuildOutputDirectory(AnalyticsWriteDataSetCallsStrategy.OutputSubPaths)}{Path.DirectorySeparatorChar}")[1];
             Assert.StartsWith("20250316-120102_", filename);
 
             Snapshot.Match(
@@ -67,12 +67,12 @@ public abstract class AnalyticsWriteDataSetCallsStrategyTests
                 Type: DataSetCallType.GetSummary), default);
             
             var files = Directory
-                .GetFiles(pathResolver.PublicApiDataSetCallsDirectoryPath());
+                .GetFiles(pathResolver.BuildOutputDirectory(AnalyticsWriteDataSetCallsStrategy.OutputSubPaths));
             
             var filePath = Assert.Single(files);
 
             var filename = filePath
-                .Split($"{pathResolver.PublicApiDataSetCallsDirectoryPath()}{Path.DirectorySeparatorChar}")[1];
+                .Split($"{pathResolver.BuildOutputDirectory(AnalyticsWriteDataSetCallsStrategy.OutputSubPaths)}{Path.DirectorySeparatorChar}")[1];
             Assert.StartsWith("20250316-120102_", filename);
             Assert.StartsWith("20250316-120102_", filename);
 
@@ -99,12 +99,12 @@ public abstract class AnalyticsWriteDataSetCallsStrategyTests
                 PreviewToken: null), default);
             
             var files = Directory
-                .GetFiles(pathResolver.PublicApiDataSetCallsDirectoryPath());
+                .GetFiles(pathResolver.BuildOutputDirectory(AnalyticsWriteDataSetCallsStrategy.OutputSubPaths));
             
             var filePath = Assert.Single(files);
 
             var filename = filePath
-                .Split($"{pathResolver.PublicApiDataSetCallsDirectoryPath()}{Path.DirectorySeparatorChar}")[1];
+                .Split($"{pathResolver.BuildOutputDirectory(AnalyticsWriteDataSetCallsStrategy.OutputSubPaths)}{Path.DirectorySeparatorChar}")[1];
             Assert.StartsWith("20250316-120102_", filename);
             Assert.StartsWith("20250316-120102_", filename);
 
