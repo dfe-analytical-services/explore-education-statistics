@@ -3,7 +3,5 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Analytics.Uti
 
 public interface IAnalyticsPathResolver
 {
-    string GetPermaLinkTableDownloadCallsDirectoryPath();
-
-    string GetTableToolDownloadCallsDirectoryPath();
+    string BuildOutputDirectory(string[] subPaths);
 }

@@ -1,4 +1,4 @@
-#nullable enable
+﻿#nullable enable
 using System;
 using System.IO;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
@@ -23,10 +23,5 @@ public class AnalyticsPathResolver : IAnalyticsPathResolver
 
         _basePath = options.Value.BasePath;
     }
-
-    public string GetPermaLinkTableDownloadCallsDirectoryPath() =>
-        Path.Combine(_basePath, "public", "table-tool-downloads", "permalinks");
-
-    public string GetTableToolDownloadCallsDirectoryPath() => 
-        Path.Combine(_basePath, "public", "table-tool-downloads", "table-tool-page");
+    public string BuildOutputDirectory(string[] subPaths) => Path.Combine([_basePath, ..subPaths]);
 }

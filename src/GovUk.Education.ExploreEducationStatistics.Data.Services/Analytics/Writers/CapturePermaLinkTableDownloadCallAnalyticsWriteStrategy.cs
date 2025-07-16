@@ -13,8 +13,10 @@ public class CapturePermaLinkTableDownloadCallAnalyticsWriteStrategy(
     IAnalyticsPathResolver analyticsPathResolver,
     ICommonAnalyticsWriteStrategyWorkflow<CapturePermaLinkTableDownloadCall> workflow) : IAnalyticsWriteStrategy
 {
+    public static readonly string[] OutputSubPaths = ["public", "table-tool-downloads", "permalinks"];
+    
     private readonly IWorkflowActor<CapturePermaLinkTableDownloadCall> _workflowActor =
-        new WorkflowActor(analyticsPath: analyticsPathResolver.GetPermaLinkTableDownloadCallsDirectoryPath());
+        new WorkflowActor(analyticsPath: analyticsPathResolver.BuildOutputDirectory(OutputSubPaths));
     
     public Type RequestType => typeof(CapturePermaLinkTableDownloadCall);
 
