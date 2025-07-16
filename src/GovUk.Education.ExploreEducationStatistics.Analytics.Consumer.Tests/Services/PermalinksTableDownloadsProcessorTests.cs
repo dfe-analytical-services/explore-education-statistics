@@ -101,7 +101,7 @@ public abstract class PermalinksTableDownloadsProcessorTests : ProcessorTestsBas
         }
 
         [Fact]
-        public async Task MultipleRequestFilesForSameCsvFile_ProduceSingleReportRow()
+        public async Task MultipleRequestFilesForSameRequestFile_ProduceSingleReportRow()
         {
             var service = BuildService();
             SetupRequestFile(service, "Example1.json");

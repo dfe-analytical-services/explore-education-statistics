@@ -45,19 +45,18 @@ public class TableToolDownloadsProcessor(
                     releasePeriodAndLabel VARCHAR,
                     subjectId UUID,
                     datasetName VARCHAR,
-                    downloadFormat VARCHAR
+                    downloadFormat VARCHAR,
+                    query JSON
                 )
-            "); // TODO: add Query
+            ");
         }
 
         public async Task ProcessSourceFiles(string sourceFilesDirectory, DuckDbConnection connection)
         {
-            // TODO: Is this the right hash value?
-            // TODO: insert Query
             await connection.ExecuteNonQueryAsync($@"
                 INSERT INTO sourceTable BY NAME (
                     SELECT
-                        MD5(CONCAT(subjectId, releaseVersionId)) AS tableToolDownloadHash,
+                        MD5(CONCAT(query, releaseVersionId)) AS tableToolDownloadHash,
                         *
                     FROM read_json('{sourceFilesDirectory}', 
                         format='unstructured',
@@ -67,7 +66,8 @@ public class TableToolDownloadsProcessor(
                             releasePeriodAndLabel: VARCHAR,
                             subjectId: UUID,
                             dataSetName: VARCHAR,
-                            downloadFormat: VARCHAR
+                            downloadFormat: VARCHAR,
+                            query: JSON
                         }}
                     )
                  )
@@ -86,6 +86,7 @@ public class TableToolDownloadsProcessor(
                     FIRST(subjectId) AS subjectId,
                     FIRST(dataSetName) AS dataSetName,
                     FIRST(downloadFormat) AS downloadFormat,
+                    FIRST(query) AS query,
                     CAST(COUNT(tableToolDownloadHash) AS INT) AS downloads
                 FROM sourceTable
                 GROUP BY tableToolDownloadHash

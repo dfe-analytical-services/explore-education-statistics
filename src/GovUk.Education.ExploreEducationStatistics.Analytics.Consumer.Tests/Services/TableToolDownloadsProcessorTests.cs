@@ -11,6 +11,7 @@ using InterpolatedSql.Dapper;
 using Microsoft.Extensions.Logging;
 using Moq;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 using Xunit;
 
 namespace GovUk.Education.ExploreEducationStatistics.Analytics.Consumer.Tests.Services;
@@ -57,7 +58,8 @@ public abstract class TableToolDownloadsProcessorTests : ProcessorTestsBase
             await AssertReportRow(
                 captureTableToolDownloadLine,
                 "Example1.json",
-                1);
+                1,
+                expectedHash:"a9e223bcda0b5a3832bcec68025d7bd8");
         }
         
         [Fact]
@@ -92,12 +94,14 @@ public abstract class TableToolDownloadsProcessorTests : ProcessorTestsBase
             await AssertReportRow(
                 csvDownloadReportRows[0],
                 "Example1.json",
-                1);
+                1,
+                expectedHash:"a9e223bcda0b5a3832bcec68025d7bd8");
 
             await AssertReportRow(
                 csvDownloadReportRows[1],
                 "Example2.json",
-                1);
+                1,
+                expectedHash:"93d5d86bf80c7ba877c6c9a5f5f3bac5");
         }
 
         [Fact]
@@ -124,7 +128,8 @@ public abstract class TableToolDownloadsProcessorTests : ProcessorTestsBase
             await AssertReportRow(
                 csvDownloadReportRow,
                 "Example1.json",
-                2);
+                2,
+                expectedHash:"a9e223bcda0b5a3832bcec68025d7bd8");
         }
 
         private static async Task<List<CaptureTableToolDownloadLine>> ReadReport(DuckDbConnection duckDbConnection,
@@ -148,7 +153,8 @@ public abstract class TableToolDownloadsProcessorTests : ProcessorTestsBase
     private async Task AssertReportRow(
         CaptureTableToolDownloadLine row,
         string jsonFileName,
-        int numRequests)
+        int numRequests,
+        string? expectedHash = null)
     {
         var jsonText = await File.ReadAllTextAsync(Path.Combine(ResourcesPath, jsonFileName));
 
@@ -161,15 +167,12 @@ public abstract class TableToolDownloadsProcessorTests : ProcessorTestsBase
         Assert.Equal(request.SubjectId, row.SubjectId);
         Assert.Equal(request.DataSetName, row.DataSetName);
         Assert.Equal(request.DownloadFormat, row.DownloadFormat);
+        Assert.Equal(request.QueryToString, row.Query);
 
-        // Generate expected call hash
-        var strToHash = $"{request.SubjectId.ToString().ToLower()}{request.ReleaseVersionId.ToString().ToLower()}";
-        var bytesToHash = Encoding.UTF8.GetBytes(strToHash);
-        var hash = MD5.Create().ComputeHash(bytesToHash);
-        var hashSb = new StringBuilder();
-        hash.ForEach(b => hashSb.Append(b.ToString("x2")));
-
-        Assert.Equal(hashSb.ToString(), row.TableToolDownloadHash);
+        if (expectedHash is not null)
+        {
+            Assert.Equal(expectedHash, row.TableToolDownloadHash);
+        }
         Assert.Equal(numRequests, row.Downloads);
     }
 
@@ -182,6 +185,21 @@ public abstract class TableToolDownloadsProcessorTests : ProcessorTestsBase
         public required string DataSetName { get; init; }
         public required TableDownloadFormat DownloadFormat { get; init; }
         public required FullTableQuery Query { get; init; }
+        public string QueryToString => JsonConvert.SerializeObject(Query, new JsonSerializerSettings()
+        {
+            ContractResolver = new CustomContractResolver(),
+        });
+        
+        private class CustomContractResolver : CamelCasePropertyNamesContractResolver
+        {
+            protected override IList<JsonProperty> CreateProperties(Type type, MemberSerialization memberSerialization) =>
+                base
+                    // Yield the properties to be serialised in alphabetical order
+                    .CreateProperties(type, memberSerialization)
+                    .OrderBy(p => p.Order ?? int.MaxValue)
+                    .ThenBy(p => p.PropertyName)
+                    .ToList();
+        } 
     }
     
     public enum TableDownloadFormat { CSV, ODS }
@@ -196,6 +214,7 @@ public abstract class TableToolDownloadsProcessorTests : ProcessorTestsBase
         public required string DataSetName { get; init; }
         public required TableDownloadFormat DownloadFormat { get; init; }
         public required string TableToolDownloadHash { get; init; }
+        public required string Query { get; init; }
         public int Downloads { get; init; }
     }
 }
