@@ -54,7 +54,7 @@ public class AnalyticsWritePublicZipDownloadStrategyTests
                 },
                 default);
 
-            var files = Directory.GetFiles(pathResolver.PublicZipDownloadsDirectoryPath())
+            var files = Directory.GetFiles(pathResolver.BuildOutputDirectory(AnalyticsWritePublicZipDownloadStrategy.OutputSubPaths))
                 .ToList();
 
             Assert.Equal(2, files.Count);

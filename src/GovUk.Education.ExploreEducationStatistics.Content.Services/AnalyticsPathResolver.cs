@@ -1,17 +1,18 @@
 #nullable enable
 using System;
+using System.IO;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
 using Microsoft.Extensions.Options;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Services;
 
-public class AnalyticsPathResolver : AnalyticsPathResolverBase
+public class AnalyticsPathResolver : IAnalyticsPathResolver
 {
     private readonly string _basePath;
 
     public AnalyticsPathResolver(IOptions<AnalyticsOptions> options)
     {
-
         if (options.Value.BasePath.IsNullOrWhitespace())
         {
             throw new ArgumentException(
@@ -22,9 +23,5 @@ public class AnalyticsPathResolver : AnalyticsPathResolverBase
 
         _basePath = options.Value.BasePath;
     }
-
-    protected override string GetBasePath()
-    {
-        return _basePath;
-    }
+    public string BuildOutputDirectory(string[] subPaths) => Path.Combine([_basePath, ..subPaths]);
 }

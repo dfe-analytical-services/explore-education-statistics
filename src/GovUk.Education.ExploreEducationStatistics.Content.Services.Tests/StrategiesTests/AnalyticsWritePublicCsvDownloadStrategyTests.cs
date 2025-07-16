@@ -51,7 +51,7 @@ public class AnalyticsWritePublicCsvDownloadStrategyTests
                     DataSetTitle: "data set title 2"),
                 default);
 
-            var files = Directory.GetFiles(pathResolver.PublicCsvDownloadsDirectoryPath())
+            var files = Directory.GetFiles(pathResolver.BuildOutputDirectory(AnalyticsWritePublicCsvDownloadStrategy.OutputSubPaths))
                 .ToList();
 
             Assert.Equal(2, files.Count);
