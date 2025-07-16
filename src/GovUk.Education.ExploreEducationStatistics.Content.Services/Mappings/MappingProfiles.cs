@@ -54,6 +54,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Mappings
                     m => m.MapFrom(rv => rv.Release.Title))
                 .ForMember(dest => dest.YearTitle,
                     m => m.MapFrom(rv => rv.Release.YearTitle))
+                .ForMember(dest => dest.PublishingOrganisations,
+                    m => m.MapFrom(rv => rv.PublishingOrganisations.OrderBy(o => o.Title)))
                 .ForMember(dest => dest.Updates,
                     m => m.MapFrom(rv => rv.Updates.OrderByDescending(update => update.On)))
                 .ForMember(dest => dest.Content,
@@ -62,6 +64,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Mappings
                     m => m.MapFrom(rv => rv.KeyStatistics.OrderBy(ks => ks.Order)));
 
             CreateMap<Link, LinkViewModel>();
+
+            CreateMap<Organisation, OrganisationViewModel>();
 
             CreateMap<Update, ReleaseNoteViewModel>();
         }

@@ -44,6 +44,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
 
             var releaseVersion = publication.Releases.Single().Versions.Single();
 
+            releaseVersion.PublishingOrganisations = _dataFixture.DefaultOrganisation()
+                .GenerateList(2);
+
             releaseVersion.RelatedInformation.Add(
                 new Link
                 {
@@ -249,7 +252,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
                 Assert.Equal(releaseVersion.Type, contentRelease.Type);
                 Assert.Equal(releaseVersion.Release.YearTitle, contentRelease.YearTitle);
                 Assert.Empty(contentRelease.Updates);
-                
+
+                Assert.Equal(releaseVersion.PublishingOrganisations.Count,
+                    contentRelease.PublishingOrganisations.Count);
+                Assert.All(releaseVersion.PublishingOrganisations,
+                    (expectedOrganisation, index) =>
+                    {
+                        var actualOrganisation = contentRelease.PublishingOrganisations[index];
+                        Assert.Equal(expectedOrganisation.Id, actualOrganisation.Id);
+                        Assert.Equal(expectedOrganisation.Title, actualOrganisation.Title);
+                        Assert.Equal(expectedOrganisation.Url, actualOrganisation.Url);
+                    });
+
                 var contentDownloadFiles = contentRelease.DownloadFiles.ToList();
                 Assert.Equal(2, contentDownloadFiles.Count);
                 Assert.Equal(files[0].Id, contentDownloadFiles[0].Id);

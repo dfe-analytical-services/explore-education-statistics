@@ -29,70 +29,68 @@ public class ReleaseCacheServiceTests : CacheServiceTestFixture
     {
         NextReleaseDate = new PartialDate(),
         Published = DateTime.UtcNow,
-        Updates = new List<ReleaseNoteViewModel>
-        {
-            new()
+        PublishingOrganisations =
+        [
+            new OrganisationViewModel
+            {
+                Id = Guid.NewGuid(),
+                Title = "Test Organisation",
+                Url = "https://test-organisation"
+            }
+        ],
+        Updates =
+        [
+            new ReleaseNoteViewModel
             {
                 Id = Guid.NewGuid(),
                 On = DateTime.UtcNow,
             }
-        },
-        Content = new List<ContentSectionViewModel>
-        {
-            new()
+        ],
+        Content =
+        [
+            new ContentSectionViewModel
             {
                 Id = Guid.NewGuid(),
                 Order = 1,
-                Content = new List<IContentBlockViewModel>
-                {
-                    new HtmlBlockViewModel
-                    {
-                        Id = Guid.NewGuid()
-                    },
-                    new MarkDownBlockViewModel
-                    {
-                        Id = Guid.NewGuid()
-                    },
+                Content =
+                [
+                    new HtmlBlockViewModel { Id = Guid.NewGuid() },
+
+                    new MarkDownBlockViewModel { Id = Guid.NewGuid() },
+
                     new DataBlockViewModel
                     {
                         Id = Guid.NewGuid(),
-                        Charts = new List<IChart>
-                        {
-                            new LineChart()
-                        }
-                    },
-                }
+                        Charts = [new LineChart()]
+                    }
+                ]
             }
-        },
+        ],
         SummarySection = ContentSectionWithHtmlBlock(),
         HeadlinesSection = ContentSectionWithHtmlBlock(),
-        KeyStatistics = new List<KeyStatisticViewModel>
-        {
+        KeyStatistics =
+        [
             new KeyStatisticTextViewModel(),
-            new KeyStatisticDataBlockViewModel(),
-        },
+            new KeyStatisticDataBlockViewModel()
+        ],
         KeyStatisticsSecondarySection = ContentSectionWithHtmlBlock(),
         RelatedDashboardsSection = ContentSectionWithHtmlBlock(),
-        DownloadFiles = new List<FileInfo>
-        {
-            new()
+        DownloadFiles =
+        [
+            new FileInfo
             {
                 Id = Guid.NewGuid(),
                 Name = "Test file",
                 FileName = "test-file.txt",
                 Size = "10 Kb",
                 Type = FileType.Ancillary,
-
             }
-        },
+        ],
         Type = ReleaseType.AccreditedOfficialStatistics,
-        RelatedInformation = new List<LinkViewModel>
-        {
-            new()
-            {
-                Id = Guid.NewGuid()
-            }
-        }
+        RelatedInformation =
+        [
+            new LinkViewModel { Id = Guid.NewGuid() }
+        ]
     };
 
     [Fact]
