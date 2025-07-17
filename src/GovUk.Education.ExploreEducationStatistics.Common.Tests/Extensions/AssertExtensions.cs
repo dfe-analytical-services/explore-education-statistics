@@ -83,6 +83,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions
         }
 
         /// <summary>
+        /// Assert that the given DateTime is effectively "now", within a given tolerance of milliseconds.
+        /// </summary>
+        public static void AssertEqual(
+            this DateTime dateTime,
+            DateTime expectedDateTime,
+            int withinMillis = TimeWithinMillis)
+        {
+            Assert.Equal(expectedDateTime, dateTime, TimeSpan.FromMilliseconds(withinMillis));
+        }
+
+        /// <summary>
         /// Assert that the given DateTimeOffset is effectively "now", within a given tolerance of milliseconds.
         /// </summary>
         public static void AssertEqual(
