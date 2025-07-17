@@ -729,7 +729,7 @@ describe('ReleaseApiDataSetLocationsMappingPage', () => {
 
       await user.click(
         within(unmappedLocation).getByRole('button', {
-          name: 'Edit mapping for Location 2',
+          name: 'Map option for Location 2',
         }),
       );
 
@@ -827,7 +827,7 @@ describe('ReleaseApiDataSetLocationsMappingPage', () => {
 
       await user.click(
         within(unmappedLocation).getByRole('button', {
-          name: 'Edit mapping for Location 2',
+          name: 'Map option for Location 2',
         }),
       );
 
@@ -1007,7 +1007,7 @@ describe('ReleaseApiDataSetLocationsMappingPage', () => {
 
       await user.click(
         within(autoMappedLocation).getByRole('button', {
-          name: 'Edit mapping for Location 1',
+          name: 'Map option for Location 1',
         }),
       );
 
@@ -1135,7 +1135,7 @@ describe('ReleaseApiDataSetLocationsMappingPage', () => {
 
       await user.click(
         within(autoMappedLocation).getByRole('button', {
-          name: 'Edit mapping for Location 1',
+          name: 'Map option for Location 1',
         }),
       );
 
