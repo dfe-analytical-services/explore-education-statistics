@@ -12,8 +12,13 @@ interface DataFileInfo extends FileInfo {
   userName: string;
   created: string;
   status: ImportStatusCode;
-  replacedBy?: string;
+  replacedBy?: string; // the fileId of the replacement file, if it exists
+  replacedByDataFile?: ReplacementDataFileInfo; // additional info about the replacement file - although not always returned by the backend, even if it exists!
   permissions: DataFilePermissions;
+}
+
+interface ReplacementDataFileInfo extends DataFileInfo {
+  hasValidReplacementPlan?: boolean;
 }
 
 export interface DataSetInfo {
@@ -71,6 +76,7 @@ export interface DeleteDataFilePlan {
   footnoteIds: string[];
 }
 
+// Mapped from DataFileInfo - see mapFile function below
 export interface DataFile {
   id: string;
   title: string;
@@ -85,12 +91,17 @@ export interface DataFile {
   userName: string;
   status: ImportStatusCode;
   replacedBy?: string;
+  replacedByDataFile?: ReplacementDataFile;
   created?: string;
   isDeleting?: boolean;
   isCancelling?: boolean;
   permissions: DataFilePermissions;
   publicApiDataSetId?: string;
   publicApiDataSetVersion?: string;
+}
+
+export interface ReplacementDataFile extends DataFile {
+  hasValidReplacementPlan?: boolean;
 }
 
 export interface DataSetAccoutrements {
@@ -164,6 +175,10 @@ function mapFile({ name, ...file }: DataFileInfo): DataFile {
       size: parseInt(size, 10),
       unit,
     },
+    replacedByDataFile:
+      file.replacedByDataFile === undefined
+        ? undefined
+        : mapFile(file.replacedByDataFile),
   };
 }
 

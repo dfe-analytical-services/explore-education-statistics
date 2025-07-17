@@ -4,6 +4,7 @@ import _releaseDataFileService, {
   DataFile,
   UploadDataFilesRequest,
   UploadZipDataFileRequest,
+  ReplacementDataFile,
 } from '@admin/services/releaseDataFileService';
 import _dataReplacementService, {
   DataReplacementPlan,
@@ -164,24 +165,44 @@ describe('ReleaseDataUploadsSection', () => {
   });
 
   test('renders data files replacements table', async () => {
+    const replacementDataFile1 = {
+      ...testDataFiles[0],
+      id: 'data-replacement-1',
+      hasValidReplacementPlan: true,
+    } as ReplacementDataFile;
+    const originalDataFile1 = {
+      ...testDataFiles[0],
+      replacedBy: replacementDataFile1.id,
+      replacedByDataFile: replacementDataFile1,
+    };
+
+    const replacementDataFile2 = {
+      ...testDataFiles[1],
+      id: 'data-replacement-2',
+      hasValidReplacementPlan: true,
+    } as ReplacementDataFile;
+    const originalDataFile2 = {
+      ...testDataFiles[1],
+      replacedBy: replacementDataFile2.id,
+      replacedByDataFile: replacementDataFile2,
+    };
+
     releaseDataFileService.getDataFiles.mockResolvedValue([
-      { ...testDataFiles[0], replacedBy: 'data-replacement-1' },
-      { ...testDataFiles[1], replacedBy: 'data-replacement-2' },
+      originalDataFile1,
+      originalDataFile2,
     ]);
 
     releaseDataFileService.getDataFileImportStatus.mockResolvedValue(
       testCompleteImportStatus,
     );
 
-    releaseDataFileService.getDataFile.mockResolvedValueOnce({
-      ...testDataFiles[0],
-      id: 'data-replacement-1',
-    });
+    releaseDataFileService.getDataFile.mockResolvedValueOnce(
+      replacementDataFile1,
+    );
 
-    releaseDataFileService.getDataFile.mockResolvedValueOnce({
-      ...testDataFiles[1],
-      id: 'data-replacement-2',
-    });
+    releaseDataFileService.getDataFile.mockResolvedValueOnce(
+      replacementDataFile2,
+    );
 
     dataReplacementService.getReplacementPlan.mockResolvedValue(
       testValidReplacementPlan,
@@ -199,6 +220,12 @@ describe('ReleaseDataUploadsSection', () => {
 
     expect(await screen.findByText('Uploaded data files')).toBeInTheDocument();
 
+    expect(
+      await screen.findByRole('button', {
+        name: 'Confirm all valid replacements',
+      }),
+    ).toBeInTheDocument();
+
     expect(await screen.findByText('Test data 2')).toBeInTheDocument();
 
     const replacementRows = getAllFileTableRows('Data file replacements');
@@ -211,7 +238,16 @@ describe('ReleaseDataUploadsSection', () => {
       'Test data 1',
     );
     expect(replacementRow1.getByTestId('Size')).toHaveTextContent('50 Kb');
-    expect(replacementRow1.getByTestId('Status')).toHaveTextContent('Complete');
+    expect(replacementRow1.getByTestId('Status')).toHaveTextContent('Ready');
+    expect(replacementRow1.getByTestId('Actions')).toHaveTextContent(
+      'View details',
+    );
+    expect(replacementRow1.getByTestId('Actions')).toHaveTextContent(
+      'Cancel replacement',
+    );
+    expect(replacementRow1.getByTestId('Actions')).toHaveTextContent(
+      'Confirm replacement',
+    );
 
     const replacementRow2 = within(replacementRows[2]);
 
@@ -219,12 +255,53 @@ describe('ReleaseDataUploadsSection', () => {
       'Test data 2',
     );
     expect(replacementRow2.getByTestId('Size')).toHaveTextContent('100 Kb');
-    expect(replacementRow2.getByTestId('Status')).toHaveTextContent('Complete');
+    expect(replacementRow2.getByTestId('Status')).toHaveTextContent('Ready');
+    expect(replacementRow2.getByTestId('Actions')).toHaveTextContent(
+      'View details',
+    );
+    expect(replacementRow2.getByTestId('Actions')).toHaveTextContent(
+      'Cancel replacement',
+    );
+    expect(replacementRow2.getByTestId('Actions')).toHaveTextContent(
+      'Confirm replacement',
+    );
+
+    // If a data set import is complete and plan valid, these calls are unnecessary...
+    expect(releaseDataFileService.getDataFiles).toHaveBeenCalledWith(
+      'release-1',
+    );
+    expect(releaseDataFileService.getDataFile).toHaveBeenCalledWith(
+      'release-1',
+      'data-replacement-1',
+    );
+    expect(releaseDataFileService.getDataFile).toHaveBeenCalledWith(
+      'release-1',
+      'data-replacement-2',
+    );
+    expect(dataReplacementService.getReplacementPlan).toHaveBeenCalledWith(
+      'release-1',
+      'data-1',
+    );
+    expect(dataReplacementService.getReplacementPlan).toHaveBeenCalledWith(
+      'release-1',
+      'data-2',
+    );
   });
 
   test('renders data files and data file replacements tables', async () => {
+    const replacementDataFile1 = {
+      ...testDataFiles[0],
+      id: 'data-replacement-1',
+      hasValidReplacementPlan: true,
+    } as ReplacementDataFile;
+    const originalDataFile1 = {
+      ...testDataFiles[0],
+      replacedBy: replacementDataFile1.id,
+      replacedByDataFile: replacementDataFile1,
+    };
+
     releaseDataFileService.getDataFiles.mockResolvedValue([
-      { ...testDataFiles[0], replacedBy: 'data-replacement-1' },
+      originalDataFile1,
       testDataFiles[1],
     ]);
 
@@ -232,10 +309,7 @@ describe('ReleaseDataUploadsSection', () => {
       testCompleteImportStatus,
     );
 
-    releaseDataFileService.getDataFile.mockResolvedValue({
-      ...testDataFiles[0],
-      id: 'data-replacement-1',
-    });
+    releaseDataFileService.getDataFile.mockResolvedValue(replacementDataFile1);
 
     dataReplacementService.getReplacementPlan.mockResolvedValue(
       testValidReplacementPlan,
@@ -264,7 +338,7 @@ describe('ReleaseDataUploadsSection', () => {
       'Test data 1',
     );
     expect(replacementRow1.getByTestId('Size')).toHaveTextContent('50 Kb');
-    expect(replacementRow1.getByTestId('Status')).toHaveTextContent('Complete');
+    expect(replacementRow1.getByTestId('Status')).toHaveTextContent('Ready');
 
     const fileTableRows = getAllFileTableRows('Data files');
 

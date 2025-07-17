@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
@@ -102,7 +103,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository
             params FileType[] types)
         {
             return await _contentDbContext.ReleaseFiles
-                .Include(f => f.File)
+                .Include(f => f.File.CreatedBy)
                 .Where(releaseFile =>
                     releaseFile.ReleaseVersionId == releaseVersionId
                     && types.Contains(releaseFile.File.Type))
@@ -143,6 +144,36 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository
             await _contentDbContext.SaveChangesAsync();
 
             return releaseFile;
+        }
+
+        public async Task<Either<ActionResult, (ReleaseFile originalReleaseFile, ReleaseFile replacementReleaseFile)>>
+            CheckLinkedOriginalAndReplacementReleaseFilesExist(Guid releaseVersionId,
+                Guid originalFileId)
+        {
+            return await _contentDbContext.ReleaseFiles
+                .Include(rf => rf.File)
+                .Where(rf => rf.ReleaseVersionId == releaseVersionId
+                             && rf.FileId == originalFileId
+                             && rf.File.Type == Data
+                             && rf.File.ReplacedById != null)
+                .Join(
+                    _contentDbContext.ReleaseFiles.Include(rf => rf.File),
+                    original => original.File.ReplacedById,
+                    replacement => replacement.FileId,
+                    (original, replacement) => new
+                    {
+                        Original = original,
+                        Replacement = replacement
+                    })
+                .FirstOrNotFoundAsync(joined =>
+                    joined.Replacement.ReleaseVersionId == releaseVersionId
+                    && joined.Replacement.File.Type == Data
+                    && joined.Original.FileId == joined.Replacement.File.ReplacingId)
+                .OnSuccess(releaseFiles =>
+                    new Tuple<ReleaseFile, ReleaseFile>(
+                            releaseFiles.Original,
+                            releaseFiles.Replacement)
+                        .ToValueTuple());
         }
     }
 }

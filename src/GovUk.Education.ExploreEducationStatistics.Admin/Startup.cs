@@ -481,6 +481,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<IRelatedInformationService, RelatedInformationService>();
             services.AddTransient<IReplacementService, ReplacementService>();
             services.AddTransient<IReplacementBatchService, ReplacementBatchService>();
+            services.AddTransient<IReplacementPlanService, ReplacementPlanService>();
             services.AddTransient<IUserRoleService, UserRoleService>();
             services.AddTransient<IUserReleaseRoleService, UserReleaseRoleService>();
             services.AddTransient<IUserPublicationRoleRepository, UserPublicationRoleRepository>();
@@ -515,6 +516,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             
             services.AddEventGridClient(configuration);
 
+            services.AddHttpClient<IDataSetScreenerClient, DataSetScreenerClient>((provider, httpClient) =>
+            {
+                var options = provider.GetRequiredService<IOptions<DataScreenerClientOptions>>();
+                httpClient.BaseAddress = new Uri(options.Value.Url);
+            });
+
             if (publicDataDbExists)
             {
                 services.AddHttpClient<IProcessorClient, ProcessorClient>((provider, httpClient) =>
@@ -527,12 +534,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                 {
                     var options = provider.GetRequiredService<IOptions<PublicDataApiOptions>>();
                     httpClient.BaseAddress = new Uri(options.Value.PrivateUrl);
-                });
-
-                services.AddHttpClient<IDataSetScreenerClient, DataSetScreenerClient>((provider, httpClient) =>
-                {
-                    var options = provider.GetRequiredService<IOptions<DataScreenerClientOptions>>();
-                    httpClient.BaseAddress = new Uri(options.Value.Url);
                 });
 
                 services.AddTransient<IDataSetService, DataSetService>();
