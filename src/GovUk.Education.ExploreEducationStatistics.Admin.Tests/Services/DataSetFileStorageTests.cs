@@ -332,6 +332,7 @@ public class DataSetFileStorageTests
                     releaseVersionId,
                     existingDataSetUpload.Id,
                     It.IsAny<CancellationToken>()))
+                // ReSharper disable once AccessToDisposedClosure - Note: this call (and hence the reference to contentDbContext) only happens in the Act phase below, before disposal. 
                 .Callback(() => contentDbContext.DataSetUploads.Remove(existingDataSetUpload))
                 .ReturnsAsync(Unit.Instance);
 
@@ -422,8 +423,6 @@ public class DataSetFileStorageTests
                     break;
                 case TestResult.FAIL:
                     Assert.Equal(DataSetUploadStatus.FAILED_SCREENING, updatedDataSetUpload.Status);
-                    break;
-                default:
                     break;
             }
 
@@ -870,8 +869,6 @@ public class DataSetFileStorageTests
         var metaFileName = "test-data.meta.csv";
         var contentDbContextId = Guid.NewGuid();
         await using var contentDbContext = InMemoryApplicationDbContext(contentDbContextId.ToString());
-        var dataSetFile = await new DataSetFileBuilder().Build(FileType.Data);
-        var metaSetFile = await new DataSetFileBuilder().Build(FileType.Metadata);
         
         var testFixture = await DataSetFileStorageTestFixture
             .CreateZipUploadDataSetTestFixture(
@@ -979,6 +976,7 @@ public class DataSetFileStorageTests
         Assert.Equal(dataFileNames, uploadSummaries.Select(x => x.File.Filename));
     }
   
+    // ReSharper disable ParameterOnlyUsedForPreconditionCheck.Local - see https://resharper-support.jetbrains.com/hc/en-us/community/posts/206655415--Parameter-X-is-only-used-for-precondition-check-s-what-is-this
     private static void AssertUploadSummary(
         DataFileInfo uploadSummary,
         string dataSetName,
