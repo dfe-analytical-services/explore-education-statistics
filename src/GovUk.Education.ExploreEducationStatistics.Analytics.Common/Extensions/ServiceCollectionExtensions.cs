@@ -36,7 +36,7 @@ public static class ServiceCollectionExtensions
         public AnalyticsEnabledRegistrar WhenEnabled => _services.AddAnalyticsCommon(_isAnalyticsEnabled);
     }
     
-    public static AnalyticsEnabledRegistrar AddAnalyticsCommon(this IServiceCollection services, bool isAnalyticsEnabled) =>
+    private static AnalyticsEnabledRegistrar AddAnalyticsCommon(this IServiceCollection services, bool isAnalyticsEnabled) =>
         new(
             isAnalyticsEnabled
             ? services
