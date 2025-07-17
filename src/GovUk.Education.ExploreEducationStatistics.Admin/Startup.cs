@@ -92,6 +92,7 @@ using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Authentication;
 using Thinktecture;
 using static GovUk.Education.ExploreEducationStatistics.Common.Utils.StartupUtils;
 using ContentGlossaryService = GovUk.Education.ExploreEducationStatistics.Content.Services.GlossaryService;
@@ -492,6 +493,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<IPostgreSqlRepository, PostgreSqlRepository>();
             services.AddTransient<ILocationService, LocationService>();
             services.AddTransient<IAdminEventRaiser, AdminEventRaiser>();
+
+            // If operating within Azure, register authentication managers that obtain access
+            // tokens for authenticating the Admin App Service with the target service.
+            //
+            // Otherwise, for non-Azure environments (local and integration test) register
+            // authentication managers that simply authenticate themselves via an HTTP header.
+            if (hostEnvironment.IsProduction())
+            {
+                services.AddScoped(
+                    typeof(IHttpClientAzureAuthenticationManager<>),
+                    typeof(DefaultAzureCredentialHttpClientAuthenticationManager<>));
+            }
+            else
+            {
+                services.AddScoped(
+                    typeof(IHttpClientAzureAuthenticationManager<>),
+                    typeof(HttpHeaderHttpClientAuthenticationManager<>));
+            }
+
+            
             services.AddEventGridClient(configuration);
 
             if (publicDataDbExists)
@@ -500,14 +521,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                 {
                     var options = provider.GetRequiredService<IOptions<PublicDataProcessorOptions>>();
                     httpClient.BaseAddress = new Uri(options.Value.Url);
-                    httpClient.DefaultRequestHeaders.Add(HeaderNames.UserAgent, SecurityConstants.AdminUserAgent);
                 });
 
                 services.AddHttpClient<IPublicDataApiClient, PublicDataApiClient>((provider, httpClient) =>
                 {
                     var options = provider.GetRequiredService<IOptions<PublicDataApiOptions>>();
                     httpClient.BaseAddress = new Uri(options.Value.PrivateUrl);
-                    httpClient.DefaultRequestHeaders.Add(HeaderNames.UserAgent, SecurityConstants.AdminUserAgent);
                 });
 
                 services.AddHttpClient<IDataSetScreenerClient, DataSetScreenerClient>((provider, httpClient) =>
@@ -562,8 +581,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                 var logger = s.GetRequiredService<ILogger<LoggingNotificationClient>>();
                 return new LoggingNotificationClient(logger);
             });
+            
             services.AddTransient<IEmailService, EmailService>();
-
             services.AddTransient<IBoundaryLevelService, BoundaryLevelService>();
             services.AddTransient<IBoundaryLevelRepository, BoundaryLevelRepository>();
             services.AddTransient<IEmailTemplateService, EmailTemplateService>();

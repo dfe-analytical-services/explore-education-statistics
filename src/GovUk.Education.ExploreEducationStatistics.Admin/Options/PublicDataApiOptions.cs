@@ -3,7 +3,7 @@ using System;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Options;
 
-public class PublicDataApiOptions
+public class PublicDataApiOptions : IAzureAuthenticationOptions
 {
     public const string Section = "PublicDataApi";
 
