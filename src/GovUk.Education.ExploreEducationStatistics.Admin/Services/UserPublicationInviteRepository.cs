@@ -86,6 +86,17 @@ public class UserPublicationInviteRepository(ContentDbContext contentDbContext) 
         await contentDbContext.SaveChangesAsync(cancellationToken);
     }
 
+    public async Task RemoveByUser(
+        string email,
+        CancellationToken cancellationToken = default)
+    {
+        var invites = await contentDbContext.UserPublicationInvites
+            .Where(i => i.Email.ToLower().Equals(email.ToLower()))
+            .ToListAsync(cancellationToken);
+
+        await RemoveMany(invites, cancellationToken);
+    }
+
     private async Task<bool> UserHasInvite(
         Guid publicationId,
         PublicationRole role,
@@ -97,16 +108,5 @@ public class UserPublicationInviteRepository(ContentDbContext contentDbContext) 
                 i.PublicationId == publicationId
                 && i.Role == role
                 && i.Email.ToLower().Equals(email.ToLower()));
-    }
-
-    public async Task RemoveByUser(
-        string email,
-        CancellationToken cancellationToken = default)
-    {
-        var invites = await contentDbContext.UserPublicationInvites
-            .Where(i => i.Email.ToLower().Equals(email.ToLower()))
-            .ToListAsync(cancellationToken);
-
-        await RemoveMany(invites, cancellationToken);
     }
 }
