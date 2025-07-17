@@ -25,8 +25,8 @@ public class SignInService(
     ContentDbContext contentDbContext,
     IUserReleaseRoleAndInviteManager userReleaseRoleAndInviteManager,
     IUserPublicationRoleAndInviteManager userPublicationRoleAndInviteManager,
-    IUserReleaseInviteRepository releaseInviteRepository,
-    IUserPublicationInviteRepository publicationInviteRepository) : ISignInService
+    IUserReleaseInviteRepository userReleaseInviteRepository,
+    IUserPublicationInviteRepository userPublicationInviteRepository) : ISignInService
 {
     public async Task<Either<ActionResult, SignInResponseViewModel>> RegisterOrSignIn()
     {
@@ -147,7 +147,7 @@ public class SignInService(
 
     private async Task HandleReleaseInvites(Guid newUserId, string email)
     {
-        var releaseInvites = await releaseInviteRepository.ListByEmail(email);
+        var releaseInvites = await userReleaseInviteRepository.ListByEmail(email);
         await releaseInvites
             .ToAsyncEnumerable()
             .ForEachAwaitAsync(invite => userReleaseRoleAndInviteManager.Create(
@@ -159,7 +159,7 @@ public class SignInService(
 
     private async Task HandlePublicationInvites(Guid newUserId, string email)
     {
-        var publicationInvites = await publicationInviteRepository.ListByEmail(email);
+        var publicationInvites = await userPublicationInviteRepository.ListByEmail(email);
         await publicationInvites
             .ToAsyncEnumerable()
             .ForEachAwaitAsync(invite => userPublicationRoleAndInviteManager.Create(
@@ -175,11 +175,10 @@ public class SignInService(
     {
         await contentDbContext.RequireTransaction(async () =>
         {
-            await releaseInviteRepository.RemoveByUser(email);
-            await publicationInviteRepository.RemoveByUser(email);
+            await userReleaseInviteRepository.RemoveByUser(email);
+            await userPublicationInviteRepository.RemoveByUser(email);
 
             usersAndRolesDbContext.UserInvites.Remove(inviteToSystem);
-
             await usersAndRolesDbContext.SaveChangesAsync();
         });
     }
