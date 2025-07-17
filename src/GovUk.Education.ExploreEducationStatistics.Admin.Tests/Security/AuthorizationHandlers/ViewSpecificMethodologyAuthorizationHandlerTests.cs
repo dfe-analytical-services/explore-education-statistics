@@ -49,8 +49,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                     var (
                         handler,
                         methodologyRepository,
-                        userPublicationRoleRepository,
-                        userReleaseRoleRepository,
+                        userPublicationRoleAndInviteManager,
+                        userReleaseRoleAndInviteManager,
                         _,
                         releaseVersionRepository
                         ) = CreateHandlerAndDependencies();
@@ -72,11 +72,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                                 s.GetLatestReleaseVersion(OwningPublication.Id, default))
                             .ReturnsAsync((ReleaseVersion?)null);
 
-                        userPublicationRoleRepository
+                        userPublicationRoleAndInviteManager
                             .Setup(s => s.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id))
                             .ReturnsAsync(new List<PublicationRole>());
 
-                        userReleaseRoleRepository
+                        userReleaseRoleAndInviteManager
                             .Setup(s => s.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id))
                             .ReturnsAsync(new List<ReleaseRole>());
                     }
@@ -93,8 +93,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                     VerifyAllMocks(
                         methodologyRepository,
                         releaseVersionRepository,
-                        userPublicationRoleRepository,
-                        userReleaseRoleRepository);
+                        userPublicationRoleAndInviteManager,
+                        userReleaseRoleAndInviteManager);
 
                     Assert.Equal(expectedToPassByClaimAlone, authContext.HasSucceeded);
                 });
@@ -111,8 +111,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                     var (
                         handler,
                         methodologyRepository,
-                        userPublicationRoleRepository,
-                        userReleaseRoleRepository,
+                        userPublicationRoleAndInviteManager,
+                        userReleaseRoleAndInviteManager,
                         _,
                         releaseVersionRepository
                         ) = CreateHandlerAndDependencies();
@@ -124,11 +124,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                     var expectedToPassByRole = ListOf(PublicationRole.Owner, PublicationRole.Allower)
                         .Contains(publicationRole);
 
-                    userPublicationRoleRepository
+                    userPublicationRoleAndInviteManager
                         .Setup(s => s.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id))
                         .ReturnsAsync(ListOf(publicationRole));
 
-                    userReleaseRoleRepository
+                    userReleaseRoleAndInviteManager
                         .Setup(s => s.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id))
                         .ReturnsAsync([]);
 
@@ -154,7 +154,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                     VerifyAllMocks(
                         methodologyRepository,
                         releaseVersionRepository,
-                        userPublicationRoleRepository);
+                        userPublicationRoleAndInviteManager);
 
                     // As the user has Publication Owner role on the owning Publication of this Methodology, they are
                     // allowed to view it.
@@ -178,8 +178,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                     var (
                         handler,
                         methodologyRepository,
-                        userPublicationRoleRepository,
-                        userReleaseRoleRepository,
+                        userPublicationRoleAndInviteManager,
+                        userReleaseRoleAndInviteManager,
                         _,
                         releaseVersionRepository
                         ) = CreateHandlerAndDependencies();
@@ -199,11 +199,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                             .ReturnsAsync((ReleaseVersion?)null);
                     }
 
-                    userPublicationRoleRepository
+                    userPublicationRoleAndInviteManager
                         .Setup(s => s.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id))
                         .ReturnsAsync(new List<PublicationRole>());
 
-                    userReleaseRoleRepository
+                    userReleaseRoleAndInviteManager
                         .Setup(s => s.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id))
                         .ReturnsAsync(ListOf(releaseRole));
 
@@ -218,8 +218,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                     VerifyAllMocks(
                         methodologyRepository,
                         releaseVersionRepository,
-                        userPublicationRoleRepository,
-                        userReleaseRoleRepository);
+                        userPublicationRoleAndInviteManager,
+                        userReleaseRoleAndInviteManager);
 
                     // As the user has a role on any Release of the owning Publication of this Methodology,
                     // they are allowed to view it.
@@ -242,8 +242,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                 var (
                     handler,
                     methodologyRepository,
-                    userPublicationRoleRepository,
-                    userReleaseRoleRepository,
+                    userPublicationRoleAndInviteManager,
+                    userReleaseRoleAndInviteManager,
                     preReleaseService,
                     releaseVersionRepository
                     ) = CreateHandlerAndDependencies();
@@ -252,11 +252,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                         s.GetOwningPublication(MethodologyVersion.MethodologyId))
                     .ReturnsAsync(OwningPublication);
 
-                userPublicationRoleRepository
+                userPublicationRoleAndInviteManager
                     .Setup(s => s.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id))
                     .ReturnsAsync(new List<PublicationRole>());
 
-                userReleaseRoleRepository
+                userReleaseRoleAndInviteManager
                     .Setup(s => s.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id))
                     .ReturnsAsync(new List<ReleaseRole>());
 
@@ -268,7 +268,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                     .Setup(s => s.GetLatestReleaseVersion(preReleaseForConnectedPublication.PublicationId, default))
                     .ReturnsAsync(preReleaseForConnectedPublication);
 
-                userReleaseRoleRepository
+                userReleaseRoleAndInviteManager
                     .Setup(s => s.HasUserReleaseRole(UserId,
                         preReleaseForConnectedPublication.Id,
                         ReleaseRole.PrereleaseViewer))
@@ -292,8 +292,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                 VerifyAllMocks(
                     methodologyRepository,
                     releaseVersionRepository,
-                    userPublicationRoleRepository,
-                    userReleaseRoleRepository,
+                    userPublicationRoleAndInviteManager,
+                    userReleaseRoleAndInviteManager,
                     preReleaseService);
 
                 // As the user has the PrereleaseViewer role on a most recent release by time series for a publication
@@ -318,8 +318,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                 var (
                     handler,
                     methodologyRepository,
-                    userPublicationRoleRepository,
-                    userReleaseRoleRepository,
+                    userPublicationRoleAndInviteManager,
+                    userReleaseRoleAndInviteManager,
                     preReleaseService,
                     releaseVersionRepository
                     ) = CreateHandlerAndDependencies();
@@ -328,11 +328,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                         s.GetOwningPublication(MethodologyVersion.MethodologyId))
                     .ReturnsAsync(OwningPublication);
 
-                userPublicationRoleRepository
+                userPublicationRoleAndInviteManager
                     .Setup(s => s.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id))
                     .ReturnsAsync(new List<PublicationRole>());
 
-                userReleaseRoleRepository
+                userReleaseRoleAndInviteManager
                     .Setup(s => s.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id))
                     .ReturnsAsync(new List<ReleaseRole>());
 
@@ -344,7 +344,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                     .Setup(s => s.GetLatestReleaseVersion(preReleaseForConnectedPublication.PublicationId, default))
                     .ReturnsAsync(preReleaseForConnectedPublication);
 
-                userReleaseRoleRepository
+                userReleaseRoleAndInviteManager
                     .Setup(s => s.HasUserReleaseRole(UserId,
                         preReleaseForConnectedPublication.Id,
                         ReleaseRole.PrereleaseViewer))
@@ -368,8 +368,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                 VerifyAllMocks(
                     methodologyRepository,
                     releaseVersionRepository,
-                    userPublicationRoleRepository,
-                    userReleaseRoleRepository,
+                    userPublicationRoleAndInviteManager,
+                    userReleaseRoleAndInviteManager,
                     preReleaseService);
 
                 // As none of the publications using the methodology version have a most recent release by time series
@@ -393,8 +393,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                 var (
                     handler,
                     methodologyRepository,
-                    userPublicationRoleRepository,
-                    userReleaseRoleRepository,
+                    userPublicationRoleAndInviteManager,
+                    userReleaseRoleAndInviteManager,
                     _,
                     releaseVersionRepository
                     ) = CreateHandlerAndDependencies();
@@ -403,11 +403,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                         s.GetOwningPublication(MethodologyVersion.MethodologyId))
                     .ReturnsAsync(OwningPublication);
 
-                userPublicationRoleRepository
+                userPublicationRoleAndInviteManager
                     .Setup(s => s.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id))
                     .ReturnsAsync(new List<PublicationRole>());
 
-                userReleaseRoleRepository
+                userReleaseRoleAndInviteManager
                     .Setup(s => s.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id))
                     .ReturnsAsync(new List<ReleaseRole>());
 
@@ -430,8 +430,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                 VerifyAllMocks(
                     methodologyRepository,
                     releaseVersionRepository,
-                    userPublicationRoleRepository,
-                    userReleaseRoleRepository);
+                    userPublicationRoleAndInviteManager,
+                    userReleaseRoleAndInviteManager);
 
                 // As none of the publications using the methodology version have a most recent release by time series
                 // which is approved but unpublished, the user is not allowed to view it regardless of whether they have
@@ -455,8 +455,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                 var (
                     handler,
                     methodologyRepository,
-                    userPublicationRoleRepository,
-                    userReleaseRoleRepository,
+                    userPublicationRoleAndInviteManager,
+                    userReleaseRoleAndInviteManager,
                     _,
                     releaseVersionRepository
                     ) = CreateHandlerAndDependencies();
@@ -465,11 +465,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                         s.GetOwningPublication(MethodologyVersion.MethodologyId))
                     .ReturnsAsync(OwningPublication);
 
-                userPublicationRoleRepository
+                userPublicationRoleAndInviteManager
                     .Setup(s => s.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id))
                     .ReturnsAsync(new List<PublicationRole>());
 
-                userReleaseRoleRepository
+                userReleaseRoleAndInviteManager
                     .Setup(s => s.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id))
                     .ReturnsAsync(new List<ReleaseRole>());
 
@@ -492,8 +492,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                 VerifyAllMocks(
                     methodologyRepository,
                     releaseVersionRepository,
-                    userPublicationRoleRepository,
-                    userReleaseRoleRepository);
+                    userPublicationRoleAndInviteManager,
+                    userReleaseRoleAndInviteManager);
 
                 // As none of the publications using the methodology version have a most recent release by time series
                 // which is approved but unpublished, the user is not allowed to view it regardless of whether they have
@@ -507,8 +507,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                 var (
                     handler,
                     methodologyRepository,
-                    userPublicationRoleRepository,
-                    userReleaseRoleRepository,
+                    userPublicationRoleAndInviteManager,
+                    userReleaseRoleAndInviteManager,
                     _,
                     releaseVersionRepository
                     ) = CreateHandlerAndDependencies();
@@ -517,11 +517,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                         s.GetOwningPublication(MethodologyVersion.MethodologyId))
                     .ReturnsAsync(OwningPublication);
 
-                userPublicationRoleRepository
+                userPublicationRoleAndInviteManager
                     .Setup(s => s.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id))
                     .ReturnsAsync(new List<PublicationRole>());
 
-                userReleaseRoleRepository
+                userReleaseRoleAndInviteManager
                     .Setup(s => s.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id))
                     .ReturnsAsync(new List<ReleaseRole>());
 
@@ -543,8 +543,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
 
                 VerifyAllMocks(
                     methodologyRepository,
-                    userPublicationRoleRepository,
-                    userReleaseRoleRepository,
+                    userPublicationRoleAndInviteManager,
+                    userReleaseRoleAndInviteManager,
                     releaseVersionRepository);
 
                 // As there are no latest Releases for the Owning Publication, the user cannot be a Prerelease Viewer
@@ -558,8 +558,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                 var (
                     handler,
                     methodologyRepository,
-                    userPublicationRoleRepository,
-                    userReleaseRoleRepository,
+                    userPublicationRoleAndInviteManager,
+                    userReleaseRoleAndInviteManager,
                     _,
                     releaseVersionRepository
                     ) = CreateHandlerAndDependencies();
@@ -572,11 +572,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                         s.GetAllPublicationIds(MethodologyVersion.MethodologyId))
                     .ReturnsAsync(new List<Guid> { OwningPublication.Id });
 
-                userPublicationRoleRepository
+                userPublicationRoleAndInviteManager
                     .Setup(s => s.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id))
                     .ReturnsAsync(new List<PublicationRole>());
 
-                userReleaseRoleRepository
+                userReleaseRoleAndInviteManager
                     .Setup(s => s.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id))
                     .ReturnsAsync(new List<ReleaseRole>());
 
@@ -595,8 +595,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                 VerifyAllMocks(
                     methodologyRepository,
                     releaseVersionRepository,
-                    userPublicationRoleRepository,
-                    userReleaseRoleRepository);
+                    userPublicationRoleAndInviteManager,
+                    userReleaseRoleAndInviteManager);
 
                 // A user with no roles on the owning Publication of this Methodology is not allowed to view it.
                 Assert.False(authContext.HasSucceeded);
@@ -614,28 +614,28 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             CreateHandlerAndDependencies()
         {
             var methodologyRepository = new Mock<IMethodologyRepository>(Strict);
-            var userPublicationRoleRepository = new Mock<IUserPublicationRoleAndInviteManager>(Strict);
-            var userReleaseRoleRepository = new Mock<IUserReleaseRoleAndInviteManager>(Strict);
+            var userPublicationRoleAndInviteManager = new Mock<IUserPublicationRoleAndInviteManager>(Strict);
+            var userReleaseRoleAndInviteManager = new Mock<IUserReleaseRoleAndInviteManager>(Strict);
             var preReleaseService = new Mock<IPreReleaseService>(Strict);
             var releaseVersionRepository = new Mock<IReleaseVersionRepository>(Strict);
 
             var handler = new ViewSpecificMethodologyAuthorizationHandler(
                 methodologyRepository.Object,
-                userReleaseRoleRepository.Object,
+                userReleaseRoleAndInviteManager.Object,
                 preReleaseService.Object,
                 releaseVersionRepository.Object,
                 new AuthorizationHandlerService(
                     new ReleaseVersionRepository(InMemoryApplicationDbContext()),
-                    userReleaseRoleRepository.Object,
-                    userPublicationRoleRepository.Object,
+                    userReleaseRoleAndInviteManager.Object,
+                    userPublicationRoleAndInviteManager.Object,
                     Mock.Of<IPreReleaseService>(Strict))
             );
 
             return (
                 handler,
                 methodologyRepository,
-                userPublicationRoleRepository,
-                userReleaseRoleRepository,
+                userPublicationRoleAndInviteManager,
+                userReleaseRoleAndInviteManager,
                 preReleaseService,
                 releaseVersionRepository
             );

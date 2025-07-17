@@ -96,7 +96,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                     await using var context = InMemoryApplicationDbContext();
                     context.Attach(publication);
 
-                    var (handler, userPublicationRoleRepository) = CreateHandlerAndDependencies(context);
+                    var (handler, userPublicationRoleAndInviteManager) = CreateHandlerAndDependencies(context);
 
                     var user = DataFixture
                         .AuthenticatedUser(userId: UserId)
@@ -108,13 +108,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
 
                     if (!expectedToPassByClaimAlone)
                     {
-                        userPublicationRoleRepository
+                        userPublicationRoleAndInviteManager
                             .Setup(s => s.GetAllRolesByUserAndPublication(UserId, publication.Id))
                             .ReturnsAsync(new List<PublicationRole>());
                     }
 
                     await handler.HandleAsync(authContext);
-                    VerifyAllMocks(userPublicationRoleRepository);
+                    VerifyAllMocks(userPublicationRoleAndInviteManager);
 
                     // Verify that the presence of the "CreateAnyMethodology" Claim will pass the handler test, without
                     // the need for a specific Publication to be provided
@@ -131,7 +131,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                     await context.Publications.AddAsync(publication);
                     await context.SaveChangesAsync();
 
-                    var (handler, userPublicationRoleRepository) = CreateHandlerAndDependencies(context);
+                    var (handler, userPublicationRoleAndInviteManager) = CreateHandlerAndDependencies(context);
 
                     var user = DataFixture
                         .AuthenticatedUser(userId: UserId)
@@ -140,7 +140,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                     var authContext = CreateAuthContext(user, publication);
 
                     await handler.HandleAsync(authContext);
-                    VerifyAllMocks(userPublicationRoleRepository);
+                    VerifyAllMocks(userPublicationRoleAndInviteManager);
 
                     Assert.False(authContext.HasSucceeded);
                 });
@@ -175,18 +175,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                 await context.Publications.AddAsync(Publication);
                 await context.SaveChangesAsync();
 
-                var (handler, userPublicationRoleRepository) = CreateHandlerAndDependencies(context);
+                var (handler, userPublicationRoleAndInviteManager) = CreateHandlerAndDependencies(context);
 
                 var user = DataFixture.AuthenticatedUser(userId: UserId);
 
                 var authContext = CreateAuthContext(user, Publication);
 
-                userPublicationRoleRepository
+                userPublicationRoleAndInviteManager
                     .Setup(s => s.GetAllRolesByUserAndPublication(UserId, Publication.Id))
                     .ReturnsAsync(new List<PublicationRole>());
 
                 await handler.HandleAsync(authContext);
-                VerifyAllMocks(userPublicationRoleRepository);
+                VerifyAllMocks(userPublicationRoleAndInviteManager);
 
                 // Verify that the user can't create a Methodology for this Publication because they don't have
                 // Publication Owner role on it
@@ -204,18 +204,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                 await using var context = InMemoryApplicationDbContext();
                 context.Attach(publication);
 
-                var (handler, userPublicationRoleRepository) = CreateHandlerAndDependencies(context);
+                var (handler, userPublicationRoleAndInviteManager) = CreateHandlerAndDependencies(context);
 
                 var user = DataFixture.AuthenticatedUser(userId: UserId);
 
                 var authContext = CreateAuthContext(user, publication);
 
-                userPublicationRoleRepository
+                userPublicationRoleAndInviteManager
                     .Setup(s => s.GetAllRolesByUserAndPublication(UserId, publication.Id))
                     .ReturnsAsync(ListOf(Owner));
 
                 await handler.HandleAsync(authContext);
-                VerifyAllMocks(userPublicationRoleRepository);
+                VerifyAllMocks(userPublicationRoleAndInviteManager);
 
                 // Verify that the user can create a Methodology for this Publication by virtue of having a Publication
                 // Owner role on the Publication
@@ -228,7 +228,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                 await context.Publications.AddAsync(publication);
                 await context.SaveChangesAsync();
 
-                var (handler, userPublicationRoleRepository) = CreateHandlerAndDependencies(context);
+                var (handler, userPublicationRoleAndInviteManager) = CreateHandlerAndDependencies(context);
 
                 var user = DataFixture.AuthenticatedUser(userId: UserId);
 
@@ -238,7 +238,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
 
                 // There should be no interactions to check the users' publication roles to determine
                 // whether or not they can create a methodology
-                VerifyAllMocks(userPublicationRoleRepository);
+                VerifyAllMocks(userPublicationRoleAndInviteManager);
 
                 // Verify that the user cannot create a methodology for this publication
                 Assert.False(authContext.HasSucceeded);
@@ -255,17 +255,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             Mock<IUserPublicationRoleAndInviteManager>)
             CreateHandlerAndDependencies(ContentDbContext contentDbContext)
         {
-            var userPublicationRoleRepository = new Mock<IUserPublicationRoleAndInviteManager>(Strict);
+            var userPublicationRoleAndInviteManager = new Mock<IUserPublicationRoleAndInviteManager>(Strict);
 
             var handler = new CreateMethodologyForSpecificPublicationAuthorizationHandler(
                 contentDbContext,
                 new AuthorizationHandlerService(
                     new ReleaseVersionRepository(contentDbContext),
                     Mock.Of<IUserReleaseRoleAndInviteManager>(Strict),
-                    userPublicationRoleRepository.Object,
+                    userPublicationRoleAndInviteManager.Object,
                     Mock.Of<IPreReleaseService>(Strict)));
 
-            return (handler, userPublicationRoleRepository);
+            return (handler, userPublicationRoleAndInviteManager);
         }
     }
 }

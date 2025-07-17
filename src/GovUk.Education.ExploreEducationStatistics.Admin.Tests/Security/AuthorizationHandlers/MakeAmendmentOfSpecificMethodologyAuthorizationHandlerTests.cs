@@ -53,7 +53,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                         handler,
                         methodologyRepository,
                         methodologyVersionRepository,
-                        userPublicationRoleRepository
+                        userPublicationRoleAndInviteManager
                         ) = CreateHandlerAndDependencies();
 
                     methodologyVersionRepository.Setup(mock =>
@@ -70,7 +70,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                                 mock.GetOwningPublication(MethodologyVersion.MethodologyId))
                             .ReturnsAsync(OwningPublication);
 
-                        userPublicationRoleRepository
+                        userPublicationRoleAndInviteManager
                             .Setup(s => s.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id))
                             .ReturnsAsync(new List<PublicationRole>());
                     }
@@ -83,7 +83,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
 
                     await handler.HandleAsync(authContext);
                     VerifyAllMocks(methodologyRepository, methodologyVersionRepository,
-                        userPublicationRoleRepository);
+                        userPublicationRoleAndInviteManager);
 
                     Assert.Equal(expectedToPassByClaimAlone, authContext.HasSucceeded);
                 });
@@ -98,7 +98,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                         handler,
                         _,
                         methodologyVersionRepository,
-                        userPublicationRoleRepository
+                        userPublicationRoleAndInviteManager
                         ) = CreateHandlerAndDependencies();
 
                     methodologyVersionRepository.Setup(mock =>
@@ -112,7 +112,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                     var authContext = CreateAuthContext(user, MethodologyVersion);
 
                     await handler.HandleAsync(authContext);
-                    VerifyAllMocks(methodologyVersionRepository, userPublicationRoleRepository);
+                    VerifyAllMocks(methodologyVersionRepository, userPublicationRoleAndInviteManager);
 
                     // Verify that no Claims can allow a user to create an Amendment of a non-publicly-accessible
                     // Methodology.
@@ -135,7 +135,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                             handler,
                             methodologyRepository,
                             methodologyVersionRepository,
-                            userPublicationRoleRepository
+                            userPublicationRoleAndInviteManager
                             ) = CreateHandlerAndDependencies();
 
                         methodologyVersionRepository.Setup(mock =>
@@ -146,7 +146,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                                 s.GetOwningPublication(MethodologyVersion.MethodologyId))
                             .ReturnsAsync(OwningPublication);
 
-                        userPublicationRoleRepository
+                        userPublicationRoleAndInviteManager
                             .Setup(s => s.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id))
                             .ReturnsAsync(ListOf(role));
 
@@ -155,7 +155,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
 
                         await handler.HandleAsync(authContext);
                         VerifyAllMocks(methodologyRepository, methodologyVersionRepository,
-                            userPublicationRoleRepository);
+                            userPublicationRoleAndInviteManager);
 
                         // Verify that the user can create an Amendment, as they have a Publication Owner role on a Publication
                         // that uses this Methodology.
@@ -171,7 +171,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                     handler,
                     methodologyRepository,
                     methodologyVersionRepository,
-                    userPublicationRoleRepository
+                    userPublicationRoleAndInviteManager
                     ) = CreateHandlerAndDependencies();
 
                 methodologyVersionRepository.Setup(mock =>
@@ -182,7 +182,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                         s.GetOwningPublication(MethodologyVersion.MethodologyId))
                     .ReturnsAsync(OwningPublication);
 
-                userPublicationRoleRepository
+                userPublicationRoleAndInviteManager
                     .Setup(s => s.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id))
                     .ReturnsAsync(new List<PublicationRole>());
 
@@ -190,7 +190,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                 var authContext = CreateAuthContext(user, MethodologyVersion);
 
                 await handler.HandleAsync(authContext);
-                VerifyAllMocks(methodologyRepository, methodologyVersionRepository, userPublicationRoleRepository);
+                VerifyAllMocks(methodologyRepository, methodologyVersionRepository, userPublicationRoleAndInviteManager);
 
                 // Verify that the user cannot create an Amendment, as they don't have a Publication Owner role on a
                 // Publication that uses this Methodology.
@@ -205,7 +205,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                     handler,
                     _,
                     methodologyVersionRepository,
-                    userPublicationRoleRepository) = CreateHandlerAndDependencies();
+                    userPublicationRoleAndInviteManager) = CreateHandlerAndDependencies();
 
                 methodologyVersionRepository.Setup(mock =>
                         mock.IsLatestPublishedVersion(MethodologyVersion))
@@ -215,7 +215,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                 var authContext = CreateAuthContext(user, MethodologyVersion);
 
                 await handler.HandleAsync(authContext);
-                VerifyAllMocks(methodologyVersionRepository, userPublicationRoleRepository);
+                VerifyAllMocks(methodologyVersionRepository, userPublicationRoleAndInviteManager);
 
                 // Verify that the user cannot create an Amendment, as even though they have the Publication Owner role
                 // on one of the Publications that use this Methodology, this Methodology is not yet publicly
@@ -239,7 +239,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
         {
             var methodologyRepository = new Mock<IMethodologyRepository>(Strict);
             var methodologyVersionRepository = new Mock<IMethodologyVersionRepository>(Strict);
-            var userPublicationRoleRepository = new Mock<IUserPublicationRoleAndInviteManager>(Strict);
+            var userPublicationRoleAndInviteManager = new Mock<IUserPublicationRoleAndInviteManager>(Strict);
 
             var handler = new MakeAmendmentOfSpecificMethodologyAuthorizationHandler(
                 methodologyVersionRepository.Object,
@@ -247,10 +247,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                 new AuthorizationHandlerService(
                     new ReleaseVersionRepository(InMemoryApplicationDbContext()),
                     Mock.Of<IUserReleaseRoleAndInviteManager>(Strict),
-                    userPublicationRoleRepository.Object,
+                    userPublicationRoleAndInviteManager.Object,
                     Mock.Of<IPreReleaseService>(Strict)));
 
-            return (handler, methodologyRepository, methodologyVersionRepository, userPublicationRoleRepository);
+            return (handler, methodologyRepository, methodologyVersionRepository, userPublicationRoleAndInviteManager);
         }
     }
 }
