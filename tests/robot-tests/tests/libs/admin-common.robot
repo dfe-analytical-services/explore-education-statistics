@@ -656,6 +656,7 @@ user puts release into draft
     ...    ${expected_next_release_date}=Not set
 
     user clicks button    Edit release status
+    user clicks element if exists    xpath=//button[text()="Continue"]
     user waits until h2 is visible    Edit release status    %{WAIT_SMALL}
     user clicks radio    In draft
     user enters text into element    id:releaseStatusForm-internalReleaseNote    ${release_note}
