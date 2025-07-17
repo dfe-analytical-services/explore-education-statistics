@@ -456,6 +456,7 @@ describe('TableToolPage', () => {
     render(
       <TableToolPage
         selectedPublication={testSelectedPublicationWithLatestRelease}
+        selectedSubjectId="1"
         subjects={testSubjects}
         themeMeta={testThemeMeta}
         subjectMeta={testSubjectMeta}
@@ -470,6 +471,7 @@ describe('TableToolPage', () => {
     render(
       <TableToolPage
         selectedPublication={testSelectedPublicationWithLatestRelease}
+        selectedSubjectId="1"
         subjects={testSubjects}
         themeMeta={testThemeMeta}
         subjectMeta={testSubjectMeta}
@@ -490,6 +492,7 @@ describe('TableToolPage', () => {
     render(
       <TableToolPage
         selectedPublication={testSelectedPublicationWithNonLatestRelease}
+        selectedSubjectId="1"
         subjects={testSubjects}
         themeMeta={testThemeMeta}
         subjectMeta={testSubjectMeta}
