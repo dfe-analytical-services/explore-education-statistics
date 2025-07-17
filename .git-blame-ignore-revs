@@ -1,0 +1,9 @@
+# Run this in the project directory to automatically ignore commits listed below.
+# git config blame.ignoreRevsFile .git-blame-ignore-revs
+# Note: this command applies only to the current project.
+# If you then restart your IDE, then the annotate feature should respect this setting.
+
+
+# Convert namespaces to file scoped
+376bb3e7fdf06ae7c2b5efb39b8b1763be48c906
+
