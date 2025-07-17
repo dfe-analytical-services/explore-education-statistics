@@ -1,6 +1,7 @@
-using System.Collections.Generic;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
+using System;
+using System.Collections.Generic;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 
@@ -33,6 +34,11 @@ public static class UserPublicationInviteGeneratorExtensions
         string email)
         => generator.ForInstance(s => s.SetEmail(email));
 
+    public static Generator<UserPublicationInvite> WithCreatedById(
+        this Generator<UserPublicationInvite> generator,
+        Guid createdById)
+        => generator.ForInstance(s => s.SetCreatedById(createdById));
+
     public static InstanceSetters<UserPublicationInvite> SetDefaults(this InstanceSetters<UserPublicationInvite> setters)
         => setters
             .SetDefault(uri => uri.Id)
@@ -58,4 +64,9 @@ public static class UserPublicationInviteGeneratorExtensions
         this InstanceSetters<UserPublicationInvite> setters,
         string email)
         => setters.Set(uri => uri.Email, email);
+
+    public static InstanceSetters<UserPublicationInvite> SetCreatedById(
+        this InstanceSetters<UserPublicationInvite> setters,
+        Guid createdById)
+        => setters.Set(uri => uri.CreatedById, createdById);
 }
