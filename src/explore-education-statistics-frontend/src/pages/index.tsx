@@ -88,8 +88,8 @@ function HomePage() {
             </Link>
           </h3>
           <p className="govuk-caption-m">
-            Find out how to access statistics and data through our API
-            (application programming interface).
+            Find out how to automate access to statistics and data through our
+            API (application programming interface).
           </p>
 
         </div>
