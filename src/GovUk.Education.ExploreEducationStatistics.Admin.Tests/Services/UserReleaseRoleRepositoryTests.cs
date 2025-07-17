@@ -15,7 +15,7 @@ using static GovUk.Education.ExploreEducationStatistics.Common.Services.Collecti
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services;
 
-public class UserReleaseRoleRepositoryTests
+public class UserReleaseRoleAndInviteManagerTests
 {
     private readonly DataFixture _fixture = new();
 
@@ -39,7 +39,7 @@ public class UserReleaseRoleRepositoryTests
 
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
-            var service = SetupUserReleaseRoleRepository(contentDbContext);
+            var service = SetupUserReleaseRoleAndInviteManager(contentDbContext);
 
             var result = await service.Create(userId: user.Id,
                 resourceId: releaseVersion.Id,
@@ -80,7 +80,7 @@ public class UserReleaseRoleRepositoryTests
         var contentDbContextId = Guid.NewGuid().ToString();
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
-            var service = SetupUserReleaseRoleRepository(contentDbContext);
+            var service = SetupUserReleaseRoleAndInviteManager(contentDbContext);
 
             var result = await service.CreateIfNotExists(userId: userId,
                 resourceId: releaseVersionId,
@@ -132,7 +132,7 @@ public class UserReleaseRoleRepositoryTests
 
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
-            var service = SetupUserReleaseRoleRepository(contentDbContext);
+            var service = SetupUserReleaseRoleAndInviteManager(contentDbContext);
 
             var result = await service.CreateIfNotExists(userId: userReleaseRole.UserId,
                 resourceId: userReleaseRole.ReleaseVersionId,
@@ -193,7 +193,7 @@ public class UserReleaseRoleRepositoryTests
 
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
-            var service = SetupUserReleaseRoleRepository(contentDbContext);
+            var service = SetupUserReleaseRoleAndInviteManager(contentDbContext);
 
             await service.CreateManyIfNotExists(
                 userIds: ListOf(user1.Id, user2.Id, user3.Id, user4.Id),
@@ -270,7 +270,7 @@ public class UserReleaseRoleRepositoryTests
 
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
-            var service = SetupUserReleaseRoleRepository(contentDbContext);
+            var service = SetupUserReleaseRoleAndInviteManager(contentDbContext);
 
             await service.CreateManyIfNotExists(
                 userId: user.Id,
@@ -331,7 +331,7 @@ public class UserReleaseRoleRepositoryTests
 
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
-            var service = SetupUserReleaseRoleRepository(contentDbContext);
+            var service = SetupUserReleaseRoleAndInviteManager(contentDbContext);
 
             await service.CreateManyIfNotExists(new List<Guid>(),
                 releaseVersion.Id, ReleaseRole.Contributor, createdByUser.Id);
@@ -362,7 +362,7 @@ public class UserReleaseRoleRepositoryTests
         contentDbContext.Add(userReleaseRole);
         await contentDbContext.SaveChangesAsync();
 
-        var service = SetupUserReleaseRoleRepository(contentDbContext);
+        var service = SetupUserReleaseRoleAndInviteManager(contentDbContext);
         await service.RemoveRoleAndInvite(userReleaseRole);
 
         var updatedReleaseRole = contentDbContext.UserReleaseRoles
@@ -387,7 +387,7 @@ public class UserReleaseRoleRepositoryTests
         contentDbContext.Add(userReleaseRole);
         await contentDbContext.SaveChangesAsync();
 
-        var service = SetupUserReleaseRoleRepository(contentDbContext);
+        var service = SetupUserReleaseRoleAndInviteManager(contentDbContext);
         await service.RemoveRoleAndInvite(userReleaseRole);
 
         var updatedReleaseRole = contentDbContext.UserReleaseRoles
@@ -429,7 +429,7 @@ public class UserReleaseRoleRepositoryTests
         contentDbContext.AddRange(userReleaseRole1, userReleaseRole2, userReleaseRoleToRemain);
         await contentDbContext.SaveChangesAsync();
 
-        var service = SetupUserReleaseRoleRepository(contentDbContext);
+        var service = SetupUserReleaseRoleAndInviteManager(contentDbContext);
         await service.RemoveManyRolesAndInvites([userReleaseRole1, userReleaseRole2]);
 
         var userReleaseRole = await contentDbContext.UserReleaseRoles
@@ -470,7 +470,7 @@ public class UserReleaseRoleRepositoryTests
         contentDbContext.AddRange(userReleaseRole1, userReleaseRole2, userReleaseRoleToRemain);
         await contentDbContext.SaveChangesAsync();
 
-        var service = SetupUserReleaseRoleRepository(contentDbContext);
+        var service = SetupUserReleaseRoleAndInviteManager(contentDbContext);
         await service.RemoveManyRolesAndInvites([userReleaseRole1, userReleaseRole2]);
 
         var userReleaseRole = await contentDbContext.UserReleaseRoles
@@ -540,7 +540,7 @@ public class UserReleaseRoleRepositoryTests
             userReleaseRoleWithNonTargetUser);
         await contentDbContext.SaveChangesAsync();
 
-        var service = SetupUserReleaseRoleRepository(contentDbContext);
+        var service = SetupUserReleaseRoleAndInviteManager(contentDbContext);
         await service.RemoveAllRolesAndInvitesForPublication(
             publicationId: targetPublication.Id,
             userId: targetUser.Id,
@@ -609,7 +609,7 @@ public class UserReleaseRoleRepositoryTests
 
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
-            var service = SetupUserReleaseRoleRepository(contentDbContext);
+            var service = SetupUserReleaseRoleAndInviteManager(contentDbContext);
 
             var result = await service.GetAllRolesByUserAndRelease(userId: user.Id,
                 releaseVersionId: releaseVersion.Id);
@@ -695,7 +695,7 @@ public class UserReleaseRoleRepositoryTests
 
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
-            var service = SetupUserReleaseRoleRepository(contentDbContext);
+            var service = SetupUserReleaseRoleAndInviteManager(contentDbContext);
 
             var result = await service.GetAllRolesByUserAndPublication(user.Id, publication.Id);
 
@@ -771,7 +771,7 @@ public class UserReleaseRoleRepositoryTests
 
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
-            var service = SetupUserReleaseRoleRepository(contentDbContext);
+            var service = SetupUserReleaseRoleAndInviteManager(contentDbContext);
 
             var result = await service.GetDistinctRolesByUser(user.Id);
 
@@ -803,7 +803,7 @@ public class UserReleaseRoleRepositoryTests
 
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
-            var service = SetupUserReleaseRoleRepository(contentDbContext);
+            var service = SetupUserReleaseRoleAndInviteManager(contentDbContext);
 
             var result = await service.GetUserReleaseRole(
                 userId: userReleaseRole.UserId,
@@ -853,7 +853,7 @@ public class UserReleaseRoleRepositoryTests
 
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
-            var service = SetupUserReleaseRoleRepository(contentDbContext);
+            var service = SetupUserReleaseRoleAndInviteManager(contentDbContext);
 
             var result = await service.GetUserReleaseRole(
                 userId: user.Id,
@@ -864,7 +864,7 @@ public class UserReleaseRoleRepositoryTests
         }
     }
 
-    private static UserReleaseRoleAndInviteManager SetupUserReleaseRoleRepository(ContentDbContext contentDbContext)
+    private static UserReleaseRoleAndInviteManager SetupUserReleaseRoleAndInviteManager(ContentDbContext contentDbContext)
     {
         return new(
             contentDbContext: contentDbContext,

@@ -14,7 +14,7 @@ using static GovUk.Education.ExploreEducationStatistics.Content.Model.Publicatio
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services;
 
-public class UserPublicationRoleRepositoryTests
+public class UserPublicationRoleAndInviteManagerTests
 {
     private readonly DataFixture _fixture = new();
 
@@ -38,7 +38,7 @@ public class UserPublicationRoleRepositoryTests
 
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
-            var service = SetupUserPublicationRoleRepository(contentDbContext);
+            var service = SetupUserPublicationRoleAndInviteManager(contentDbContext);
 
             var result = await service.Create(user.Id, publication.Id, Owner, createdBy.Id);
 
@@ -84,7 +84,7 @@ public class UserPublicationRoleRepositoryTests
 
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
-            var service = SetupUserPublicationRoleRepository(contentDbContext);
+            var service = SetupUserPublicationRoleAndInviteManager(contentDbContext);
 
             Assert.True(await service.UserHasRoleOnPublication(
                 userPublicationRole.UserId,
@@ -117,7 +117,7 @@ public class UserPublicationRoleRepositoryTests
 
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
-            var service = SetupUserPublicationRoleRepository(contentDbContext);
+            var service = SetupUserPublicationRoleAndInviteManager(contentDbContext);
 
             Assert.False(await service.UserHasRoleOnPublication(
                 userPublicationRoleOtherPublication.UserId,
@@ -168,7 +168,7 @@ public class UserPublicationRoleRepositoryTests
         await contentDbContext.AddRangeAsync(userPublicationRoles);
         await contentDbContext.SaveChangesAsync();
 
-        var service = SetupUserPublicationRoleRepository(contentDbContext);
+        var service = SetupUserPublicationRoleAndInviteManager(contentDbContext);
 
         var result = await service.GetDistinctRolesByUser(user1.Id);
 
@@ -208,7 +208,7 @@ public class UserPublicationRoleRepositoryTests
         await contentDbContext.AddRangeAsync(userPublicationRoles);
         await contentDbContext.SaveChangesAsync();
 
-        var service = SetupUserPublicationRoleRepository(contentDbContext);
+        var service = SetupUserPublicationRoleAndInviteManager(contentDbContext);
 
         var result = await service.GetDistinctRolesByUser(user.Id);
 
@@ -252,7 +252,7 @@ public class UserPublicationRoleRepositoryTests
         await contentDbContext.AddRangeAsync(userPublicationRoles);
         await contentDbContext.SaveChangesAsync();
 
-        var service = SetupUserPublicationRoleRepository(contentDbContext);
+        var service = SetupUserPublicationRoleAndInviteManager(contentDbContext);
 
         var result = await service.GetAllRolesByUserAndPublication(
             userId: user1.Id,
@@ -292,7 +292,7 @@ public class UserPublicationRoleRepositoryTests
         await contentDbContext.AddRangeAsync(userPublicationRoles);
         await contentDbContext.SaveChangesAsync();
 
-        var service = SetupUserPublicationRoleRepository(contentDbContext);
+        var service = SetupUserPublicationRoleAndInviteManager(contentDbContext);
 
         var result = await service.GetAllRolesByUserAndPublication(
             userId: user.Id,
@@ -301,7 +301,7 @@ public class UserPublicationRoleRepositoryTests
         Assert.Empty(result);
     }
 
-    private static UserPublicationRoleAndInviteManager SetupUserPublicationRoleRepository(
+    private static UserPublicationRoleAndInviteManager SetupUserPublicationRoleAndInviteManager(
         ContentDbContext contentDbContext)
     {
         return new(

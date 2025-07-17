@@ -36,16 +36,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             {
                 await ForEachSecurityClaimAsync(async claim =>
                 {
-                    var userPublicationRoleRepository = new Mock<IUserPublicationRoleAndInviteManager>(Strict);
+                    var userPublicationRoleAndInviteManager = new Mock<IUserPublicationRoleAndInviteManager>(Strict);
 
-                    var handler = SetupHandler(userPublicationRoleRepository.Object);
+                    var handler = SetupHandler(userPublicationRoleAndInviteManager.Object);
 
                     // Only the AdoptAnyMethodology claim should allow adopting a methodology for a publication.
                     var expectedToPassByClaimAlone = claim == AdoptAnyMethodology;
 
                     if (!expectedToPassByClaimAlone)
                     {
-                        userPublicationRoleRepository
+                        userPublicationRoleAndInviteManager
                             .Setup(s => s.GetAllRolesByUserAndPublication(UserId, Publication.Id))
                             .ReturnsAsync(new List<PublicationRole>());
                     }
@@ -61,7 +61,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
 
                     await handler.HandleAsync(authContext);
 
-                    VerifyAllMocks(userPublicationRoleRepository);
+                    VerifyAllMocks(userPublicationRoleAndInviteManager);
 
                     Assert.Equal(expectedToPassByClaimAlone, authContext.HasSucceeded);
                 });
@@ -75,11 +75,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             {
                 await ForEachPublicationRoleAsync(async publicationRole =>
                 {
-                    var userPublicationRoleRepository = new Mock<IUserPublicationRoleAndInviteManager>(Strict);
+                    var userPublicationRoleAndInviteManager = new Mock<IUserPublicationRoleAndInviteManager>(Strict);
 
-                    var handler = SetupHandler(userPublicationRoleRepository.Object);
+                    var handler = SetupHandler(userPublicationRoleAndInviteManager.Object);
 
-                    userPublicationRoleRepository
+                    userPublicationRoleAndInviteManager
                         .Setup(s => s.GetAllRolesByUserAndPublication(UserId, Publication.Id))
                         .ReturnsAsync(CollectionUtils.ListOf(publicationRole));
 
@@ -91,7 +91,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
 
                     await handler.HandleAsync(authContext);
 
-                    VerifyAllMocks(userPublicationRoleRepository);
+                    VerifyAllMocks(userPublicationRoleAndInviteManager);
 
                     // As the user has Publication Owner role on the Publication they are allowed to adopt any methodology
                     Assert.Equal(publicationRole == Owner, authContext.HasSucceeded);
@@ -100,14 +100,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
         }
 
         private static AdoptMethodologyForSpecificPublicationAuthorizationHandler SetupHandler(
-            IUserPublicationRoleAndInviteManager? userPublicationRoleRepository = null
+            IUserPublicationRoleAndInviteManager? userPublicationRoleAndInviteManager = null
         )
         {
             return new AdoptMethodologyForSpecificPublicationAuthorizationHandler(
                 new AuthorizationHandlerService(
                     new ReleaseVersionRepository(InMemoryApplicationDbContext()),
                     Mock.Of<IUserReleaseRoleAndInviteManager>(Strict),
-                    userPublicationRoleRepository ?? Mock.Of<IUserPublicationRoleAndInviteManager>(Strict),
+                    userPublicationRoleAndInviteManager ?? Mock.Of<IUserPublicationRoleAndInviteManager>(Strict),
                     Mock.Of<IPreReleaseService>(Strict)));
         }
     }

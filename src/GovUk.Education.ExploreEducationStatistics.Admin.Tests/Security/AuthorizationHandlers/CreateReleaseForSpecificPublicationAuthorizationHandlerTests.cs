@@ -43,7 +43,7 @@ public class CreateReleaseForSpecificPublicationAuthorizationHandlerTests
             await AuthorizationHandlersTestUtil.ForEachSecurityClaimAsync(async claim =>
             {
                 var (handler,
-                    userPublicationRoleRepository) = CreateHandlerAndDependencies();
+                    userPublicationRoleAndInviteManager) = CreateHandlerAndDependencies();
 
                 var user = DataFixture
                     .AuthenticatedUser(userId: UserId)
@@ -55,13 +55,13 @@ public class CreateReleaseForSpecificPublicationAuthorizationHandlerTests
 
                 if (!expectedToPassByClaimAlone)
                 {
-                    userPublicationRoleRepository
+                    userPublicationRoleAndInviteManager
                         .Setup(s => s.GetAllRolesByUserAndPublication(UserId, Publication.Id))
                         .ReturnsAsync(new List<PublicationRole>());
                 }
 
                 await handler.HandleAsync(authContext);
-                MockUtils.VerifyAllMocks(userPublicationRoleRepository);
+                MockUtils.VerifyAllMocks(userPublicationRoleAndInviteManager);
 
                 // A user with the CreateAnyRelease claim is allowed to create a new release
                 Assert.Equal(expectedToPassByClaimAlone, authContext.HasSucceeded);
@@ -96,18 +96,18 @@ public class CreateReleaseForSpecificPublicationAuthorizationHandlerTests
         {
             await AuthorizationHandlersTestUtil.ForEachPublicationRoleAsync(async publicationRole =>
             {
-                var (handler, userPublicationRoleRepository) = CreateHandlerAndDependencies();
+                var (handler, userPublicationRoleAndInviteManager) = CreateHandlerAndDependencies();
 
                 var user = DataFixture.AuthenticatedUser(userId: UserId);
 
                 var authContext = CreateAuthContext(user, Publication);
 
-                userPublicationRoleRepository
+                userPublicationRoleAndInviteManager
                     .Setup(s => s.GetAllRolesByUserAndPublication(UserId, Publication.Id))
                     .ReturnsAsync(CollectionUtils.ListOf(publicationRole));
 
                 await handler.HandleAsync(authContext);
-                MockUtils.VerifyAllMocks(userPublicationRoleRepository);
+                MockUtils.VerifyAllMocks(userPublicationRoleAndInviteManager);
 
                 // A user with the publication owner role is allowed to create a new release
                 var expectedToPassByRole = publicationRole == PublicationRole.Owner;
@@ -118,7 +118,7 @@ public class CreateReleaseForSpecificPublicationAuthorizationHandlerTests
         [Fact]
         public async Task CreateReleaseForSpecificPublicationAuthorizationHandler_FailsWhenArchived()
         {
-            var (handler, userPublicationRoleRepository) = CreateHandlerAndDependencies();
+            var (handler, userPublicationRoleAndInviteManager) = CreateHandlerAndDependencies();
 
             var user = DataFixture.AuthenticatedUser(userId: UserId);
 
@@ -128,7 +128,7 @@ public class CreateReleaseForSpecificPublicationAuthorizationHandlerTests
 
             // There should be no interactions to check the users' publication roles to determine
             // whether or not they can create a release
-            MockUtils.VerifyAllMocks(userPublicationRoleRepository);
+            MockUtils.VerifyAllMocks(userPublicationRoleAndInviteManager);
 
             // Verify that the user cannot create a new release of an archived publication
             Assert.False(authContext.HasSucceeded);
@@ -148,17 +148,17 @@ public class CreateReleaseForSpecificPublicationAuthorizationHandlerTests
         Mock<IUserPublicationRoleAndInviteManager>)
         CreateHandlerAndDependencies()
     {
-        var userReleaseRoleRepository = new Mock<IUserReleaseRoleAndInviteManager>(Strict);
-        var userPublicationRoleRepository = new Mock<IUserPublicationRoleAndInviteManager>(Strict);
+        var userReleaseRoleAndInviteManager = new Mock<IUserReleaseRoleAndInviteManager>(Strict);
+        var userPublicationRoleAndInviteManager = new Mock<IUserPublicationRoleAndInviteManager>(Strict);
 
         var handler = new CreateReleaseForSpecificPublicationAuthorizationHandler(
             new AuthorizationHandlerService(
                 new ReleaseVersionRepository(InMemoryApplicationDbContext()),
-                userReleaseRoleRepository.Object,
-                userPublicationRoleRepository.Object,
+                userReleaseRoleAndInviteManager.Object,
+                userPublicationRoleAndInviteManager.Object,
                 Mock.Of<IPreReleaseService>(Strict))
         );
 
-        return (handler, userPublicationRoleRepository);
+        return (handler, userPublicationRoleAndInviteManager);
     }
 }
