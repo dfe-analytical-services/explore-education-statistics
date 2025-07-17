@@ -168,9 +168,12 @@ const DataFileReplacementPlan = ({
 
   const linkNotAvailableToNonBauText = (
     <p>
-      Please contact the EES team for support. Your user account does not have
-      the role required access to the API details page which can help resolve
-      this issue.
+      Please contact the EES team for support at{' '}
+      <a href="mailto:explore.statistics@education.gov.uk">
+        explore.statistics@education.gov.uk
+      </a>
+      . Your user account does not have the role required access to the API
+      details page which can help resolve this issue.
     </p>
   );
   const instructionToGoToApiDetailsTabForLocations = user?.permissions
