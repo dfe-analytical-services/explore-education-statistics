@@ -21,112 +21,116 @@ using static Moq.MockBehavior;
 using IReleaseVersionRepository = GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces.IReleaseVersionRepository;
 using ReleaseVersionRepository = GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.ReleaseVersionRepository;
 
-namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
+namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services;
+
+public class ReleaseInviteServicePermissionTest
 {
-    public class ReleaseInviteServicePermissionTest
+    [Fact]
+    public async Task InviteContributor()
     {
-        [Fact]
-        public async Task InviteContributor()
+        var releaseVersion = new ReleaseVersion();
+        var publication = new Publication
         {
-            var releaseVersion = new ReleaseVersion();
-            var publication = new Publication
+            Id = Guid.NewGuid(),
+            ReleaseVersions = ListOf(releaseVersion),
+        };
+
+        await PolicyCheckBuilder<SecurityPolicies>()
+            .SetupResourceCheckToFailWithMatcher<Tuple<Publication, ReleaseRole>>(
+                tuple => tuple.Item1.Id == publication.Id && tuple.Item2 == ReleaseRole.Contributor,
+                CanUpdateSpecificReleaseRole)
+            .AssertForbidden(async userService =>
             {
-                Id = Guid.NewGuid(),
-                ReleaseVersions = ListOf(releaseVersion),
-            };
-
-            await PolicyCheckBuilder<SecurityPolicies>()
-                .SetupResourceCheckToFailWithMatcher<Tuple<Publication, ReleaseRole>>(
-                    tuple => tuple.Item1.Id == publication.Id && tuple.Item2 == ReleaseRole.Contributor,
-                    CanUpdateSpecificReleaseRole)
-                .AssertForbidden(async userService =>
+                var contentDbContextId = Guid.NewGuid().ToString();
+                await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
                 {
-                    var contentDbContextId = Guid.NewGuid().ToString();
-                    await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-                    {
-                        await contentDbContext.AddAsync(publication);
-                        await contentDbContext.SaveChangesAsync();
-                    }
+                    await contentDbContext.AddAsync(publication);
+                    await contentDbContext.SaveChangesAsync();
+                }
 
-                    await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-                    {
-                        var service = SetupReleaseInviteService(
-                            contentDbContext: contentDbContext,
-                            userService: userService.Object);
-                        return await service.InviteContributor("test@test.com",
-                            publication.Id,
-                            ListOf(releaseVersion.Id));
-                    }
-                });
-        }
+                await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+                {
+                    var service = SetupReleaseInviteService(
+                        contentDbContext: contentDbContext,
+                        userService: userService.Object);
+                    return await service.InviteContributor("test@test.com",
+                        publication.Id,
+                        ListOf(releaseVersion.Id));
+                }
+            });
+    }
 
-        [Fact]
-        public async Task RemoveByPublication()
+    [Fact]
+    public async Task RemoveByPublication()
+    {
+        var releaseVersion = new ReleaseVersion();
+        var publication = new Publication
         {
-            var releaseVersion = new ReleaseVersion();
-            var publication = new Publication
+            Id = Guid.NewGuid(),
+            ReleaseVersions = ListOf(releaseVersion),
+        };
+
+        await PolicyCheckBuilder<SecurityPolicies>()
+            .SetupResourceCheckToFailWithMatcher<Tuple<Publication, ReleaseRole>>(
+                tuple => tuple.Item1.Id == publication.Id && tuple.Item2 == ReleaseRole.Contributor,
+                CanUpdateSpecificReleaseRole)
+            .AssertForbidden(async userService =>
             {
-                Id = Guid.NewGuid(),
-                ReleaseVersions = ListOf(releaseVersion),
-            };
-
-            await PolicyCheckBuilder<SecurityPolicies>()
-                .SetupResourceCheckToFailWithMatcher<Tuple<Publication, ReleaseRole>>(
-                    tuple => tuple.Item1.Id == publication.Id && tuple.Item2 == ReleaseRole.Contributor,
-                    CanUpdateSpecificReleaseRole)
-                .AssertForbidden(async userService =>
+                var contentDbContextId = Guid.NewGuid().ToString();
+                await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
                 {
-                    var contentDbContextId = Guid.NewGuid().ToString();
-                    await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-                    {
-                        await contentDbContext.AddAsync(publication);
-                        await contentDbContext.SaveChangesAsync();
-                    }
+                    await contentDbContext.AddAsync(publication);
+                    await contentDbContext.SaveChangesAsync();
+                }
 
-                    await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-                    {
-                        var service = SetupReleaseInviteService(
-                            contentDbContext: contentDbContext,
-                            userService: userService.Object);
-                        return await service.RemoveByPublication("test@test.com",
-                            publication.Id,
-                            ReleaseRole.Contributor);
-                    }
-                });
-        }
+                await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+                {
+                    var service = SetupReleaseInviteService(
+                        contentDbContext: contentDbContext,
+                        userService: userService.Object);
+                    return await service.RemoveByPublication("test@test.com",
+                        publication.Id,
+                        ReleaseRole.Contributor);
+                }
+            });
+    }
 
-        private static ReleaseInviteService SetupReleaseInviteService(
-            ContentDbContext? contentDbContext = null,
-            UsersAndRolesDbContext? usersAndRolesDbContext = null,
-            IPersistenceHelper<ContentDbContext>? contentPersistenceHelper = null,
-            IReleaseVersionRepository? releaseVersionRepository = null,
-            IUserRepository? userRepository = null,
-            IUserService? userService = null,
-            IUserRoleService? userRoleService = null,
-            IUserInviteRepository? userInviteRepository = null,
-            IUserReleaseInviteRepository? userReleaseInviteRepository = null,
-            IUserReleaseRoleAndInviteManager? userReleaseRoleRepository = null,
-            IEmailService? emailService = null,
-            IOptions<AppOptions>? appOptions = null,
-            IOptions<NotifyOptions>? notifyOptions = null)
-        {
-            contentDbContext ??= InMemoryApplicationDbContext();
-            usersAndRolesDbContext ??= InMemoryUserAndRolesDbContext();
+    private static ReleaseInviteService SetupReleaseInviteService(
+        ContentDbContext? contentDbContext = null,
+        UsersAndRolesDbContext? usersAndRolesDbContext = null,
+        IPersistenceHelper<ContentDbContext>? contentPersistenceHelper = null,
+        IReleaseVersionRepository? releaseVersionRepository = null,
+        IUserRepository? userRepository = null,
+        IUserService? userService = null,
+        IUserRoleService? userRoleService = null,
+        IUserInviteRepository? userInviteRepository = null,
+        IUserReleaseInviteRepository? userReleaseInviteRepository = null,
+        IUserReleaseRoleAndInviteManager? userReleaseRoleAndInviteManager = null,
+        IEmailService? emailService = null,
+        IOptions<AppOptions>? appOptions = null,
+        IOptions<NotifyOptions>? notifyOptions = null)
+    {
+        contentDbContext ??= InMemoryApplicationDbContext();
+        usersAndRolesDbContext ??= InMemoryUserAndRolesDbContext();
+        userRepository ??= new UserRepository(contentDbContext);
+        userReleaseInviteRepository ??= new UserReleaseInviteRepository(contentDbContext);
 
-            return new ReleaseInviteService(
-                contentDbContext,
-                contentPersistenceHelper ?? new PersistenceHelper<ContentDbContext>(contentDbContext),
-                releaseVersionRepository ?? new ReleaseVersionRepository(contentDbContext),
-                userRepository ?? new UserRepository(contentDbContext),
-                userService ?? AlwaysTrueUserService().Object,
-                userRoleService ?? Mock.Of<IUserRoleService>(Strict),
-                userInviteRepository ?? new UserInviteRepository(usersAndRolesDbContext),
-                userReleaseInviteRepository ?? new UserReleaseInviteRepository(contentDbContext),
-                userReleaseRoleRepository ?? new UserReleaseRoleManager(contentDbContext),
-                emailService ?? Mock.Of<IEmailService>(Strict),
-                appOptions ?? Mock.Of<IOptions<AppOptions>>(),
-                notifyOptions ?? Mock.Of<IOptions<NotifyOptions>>()
-            );
-        }
+        return new ReleaseInviteService(
+            contentDbContext,
+            contentPersistenceHelper ?? new PersistenceHelper<ContentDbContext>(contentDbContext),
+            releaseVersionRepository ?? new ReleaseVersionRepository(contentDbContext),
+            userRepository,
+            userService ?? AlwaysTrueUserService().Object,
+            userRoleService ?? Mock.Of<IUserRoleService>(Strict),
+            userInviteRepository ?? new UserInviteRepository(usersAndRolesDbContext),
+            userReleaseInviteRepository,
+            userReleaseRoleAndInviteManager ?? new UserReleaseRoleAndInviteManager(
+                contentDbContext: contentDbContext,
+                userReleaseInviteRepository: userReleaseInviteRepository,
+                userRepository: userRepository),
+            emailService ?? Mock.Of<IEmailService>(Strict),
+            appOptions ?? Mock.Of<IOptions<AppOptions>>(),
+            notifyOptions ?? Mock.Of<IOptions<NotifyOptions>>()
+        );
     }
 }

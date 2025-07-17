@@ -1435,6 +1435,7 @@ public abstract class ReleaseVersionServiceTests
             var releaseSubjectRepository = new Mock<IReleaseSubjectRepository>(Strict);
             var privateCacheService = new Mock<IPrivateBlobCacheService>(Strict);
             var processorClient = new Mock<IProcessorClient>(Strict);
+            var userReleaseRoleAndInviteManager = new Mock<IUserReleaseRoleAndInviteManager>(Strict);
 
             var forceDeleteRelatedData = false;
 
@@ -1459,6 +1460,12 @@ public abstract class ReleaseVersionServiceTests
                     It.IsAny<CancellationToken>()))
                 .ReturnsAsync(Unit.Instance);
 
+            userReleaseRoleAndInviteManager.Setup(mock => mock.RemoveAllRolesAndInvitesForReleaseVersion(
+                    releaseVersion.Id,
+                    null,
+                    default))
+                .Returns(Task.CompletedTask);
+
             await using var statisticsDbContext = InMemoryStatisticsDbContext(contextId);
             await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
             {
@@ -1469,7 +1476,8 @@ public abstract class ReleaseVersionServiceTests
                     releaseFileService: releaseFileService.Object,
                     releaseSubjectRepository: releaseSubjectRepository.Object,
                     privateCacheService: privateCacheService.Object,
-                    processorClient: processorClient.Object);
+                    processorClient: processorClient.Object,
+                    userReleaseRoleAndInviteManager: userReleaseRoleAndInviteManager.Object);
 
                 // Act
                 var result = await releaseVersionService.DeleteReleaseVersion(releaseVersion.Id);
@@ -1504,35 +1512,6 @@ public abstract class ReleaseVersionServiceTests
                         .FirstOrDefaultAsync(rv => rv.Id == releaseVersion.Id);
 
                     Assert.Null(hardDeletedRelease);
-
-                    var hardDeletedReleaseRole = await contentDbContext
-                        .UserReleaseRoles
-                        .IgnoreQueryFilters()
-                        .FirstOrDefaultAsync(r => r.Id == userReleaseRole.Id);
-
-                    Assert.Null(hardDeletedReleaseRole);
-
-                    var hardDeletedReleaseInvite = await contentDbContext
-                        .UserReleaseInvites
-                        .IgnoreQueryFilters()
-                        .FirstOrDefaultAsync(r => r.Id == userReleaseInvite.Id);
-
-                    Assert.Null(hardDeletedReleaseInvite);
-
-                    // assert that other entities were not accidentally hard-deleted
-                    var retrievedAnotherReleaseRole = await contentDbContext
-                        .UserReleaseRoles
-                        .IgnoreQueryFilters()
-                        .FirstAsync(r => r.Id == anotherUserReleaseRole.Id);
-
-                    Assert.False(retrievedAnotherReleaseRole.SoftDeleted);
-
-                    var retrievedAnotherReleaseInvite = await contentDbContext
-                        .UserReleaseInvites
-                        .IgnoreQueryFilters()
-                        .FirstAsync(r => r.Id == anotherUserReleaseInvite.Id);
-
-                    Assert.False(retrievedAnotherReleaseInvite.SoftDeleted);
                 }
                 else
                 {
@@ -1542,18 +1521,6 @@ public abstract class ReleaseVersionServiceTests
                         .FirstOrDefaultAsync(rv => rv.Id == releaseVersion.Id);
 
                     Assert.Null(softDeletedRelease);
-
-                    var softDeletedReleaseRole = await contentDbContext
-                        .UserReleaseRoles
-                        .FirstOrDefaultAsync(r => r.Id == userReleaseRole.Id);
-
-                    Assert.Null(softDeletedReleaseRole);
-
-                    var softDeletedReleaseInvite = await contentDbContext
-                        .UserReleaseInvites
-                        .FirstOrDefaultAsync(r => r.Id == userReleaseInvite.Id);
-
-                    Assert.Null(softDeletedReleaseInvite);
 
                     // assert that soft-deleted entities do not appear via references from other entities by default
                     var publicationWithoutDeletedRelease = await contentDbContext
@@ -1573,20 +1540,6 @@ public abstract class ReleaseVersionServiceTests
 
                     Assert.True(updatedRelease.SoftDeleted);
 
-                    var updatedReleaseRole = await contentDbContext
-                        .UserReleaseRoles
-                        .IgnoreQueryFilters()
-                        .FirstAsync(r => r.Id == userReleaseRole.Id);
-
-                    Assert.True(updatedReleaseRole.SoftDeleted);
-
-                    var updatedReleaseInvite = await contentDbContext
-                        .UserReleaseInvites
-                        .IgnoreQueryFilters()
-                        .FirstAsync(r => r.Id == userReleaseInvite.Id);
-
-                    Assert.True(updatedReleaseInvite.SoftDeleted);
-
                     // assert that soft-deleted entities appear via references from other entities when explicitly searched for
                     var publicationWithDeletedRelease = await contentDbContext
                         .Publications
@@ -1600,19 +1553,6 @@ public abstract class ReleaseVersionServiceTests
                     Assert.Equal(anotherRelease.Id, publicationWithDeletedRelease.ReleaseVersions[1].Id);
                     Assert.True(publicationWithDeletedRelease.ReleaseVersions[0].SoftDeleted);
                     Assert.False(publicationWithDeletedRelease.ReleaseVersions[1].SoftDeleted);
-
-                    // assert that other entities were not accidentally soft-deleted
-                    var retrievedAnotherReleaseRole = await contentDbContext
-                        .UserReleaseRoles
-                        .FirstAsync(r => r.Id == anotherUserReleaseRole.Id);
-
-                    Assert.False(retrievedAnotherReleaseRole.SoftDeleted);
-
-                    var retrievedAnotherReleaseInvite = await contentDbContext
-                        .UserReleaseInvites
-                        .FirstAsync(r => r.Id == anotherUserReleaseInvite.Id);
-
-                    Assert.False(retrievedAnotherReleaseInvite.SoftDeleted);
                 }
 
                 // Assert that Methodologies that were scheduled to go out with this Release are no longer scheduled
@@ -1854,6 +1794,7 @@ public abstract class ReleaseVersionServiceTests
             var releaseSubjectRepository = new Mock<IReleaseSubjectRepository>(Strict);
             var privateCacheService = new Mock<IPrivateBlobCacheService>(Strict);
             var processorClient = new Mock<IProcessorClient>(Strict);
+            var userReleaseRoleAndInviteManager = new Mock<IUserReleaseRoleAndInviteManager>(Strict);
 
             var forceDeleteRelatedData = true;
 
@@ -1882,6 +1823,12 @@ public abstract class ReleaseVersionServiceTests
                     It.IsAny<CancellationToken>()))
                 .ReturnsAsync(Unit.Instance);
 
+            userReleaseRoleAndInviteManager.Setup(mock => mock.RemoveAllRolesAndInvitesForReleaseVersion(
+                releaseVersion.Id,
+                null,
+                default))
+                .Returns(Task.CompletedTask);
+
             await using var statisticsDbContext = InMemoryStatisticsDbContext(contextId);
             await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
             {
@@ -1893,7 +1840,8 @@ public abstract class ReleaseVersionServiceTests
                     releasePublishingStatusRepository: releasePublishingStatusRepository.Object,
                     releaseSubjectRepository: releaseSubjectRepository.Object,
                     privateCacheService: privateCacheService.Object,
-                    processorClient: processorClient.Object);
+                    processorClient: processorClient.Object,
+                    userReleaseRoleAndInviteManager: userReleaseRoleAndInviteManager.Object);
 
                 // Act
                 var result = await releaseVersionService.DeleteTestReleaseVersion(releaseVersion.Id);
@@ -1928,35 +1876,6 @@ public abstract class ReleaseVersionServiceTests
                     .FirstOrDefaultAsync(rv => rv.Id == releaseVersion.Id);
 
                 Assert.Null(hardDeletedRelease);
-
-                var hardDeletedReleaseRole = await contentDbContext
-                    .UserReleaseRoles
-                    .IgnoreQueryFilters()
-                    .FirstOrDefaultAsync(r => r.Id == userReleaseRole.Id);
-
-                Assert.Null(hardDeletedReleaseRole);
-
-                var hardDeletedReleaseInvite = await contentDbContext
-                    .UserReleaseInvites
-                    .IgnoreQueryFilters()
-                    .FirstOrDefaultAsync(r => r.Id == userReleaseInvite.Id);
-
-                Assert.Null(hardDeletedReleaseInvite);
-
-                // assert that other entities were not accidentally hard-deleted
-                var retrievedAnotherReleaseRole = await contentDbContext
-                    .UserReleaseRoles
-                    .IgnoreQueryFilters()
-                    .FirstAsync(r => r.Id == anotherUserReleaseRole.Id);
-
-                Assert.False(retrievedAnotherReleaseRole.SoftDeleted);
-
-                var retrievedAnotherReleaseInvite = await contentDbContext
-                    .UserReleaseInvites
-                    .IgnoreQueryFilters()
-                    .FirstAsync(r => r.Id == anotherUserReleaseInvite.Id);
-
-                Assert.False(retrievedAnotherReleaseInvite.SoftDeleted);
 
                 // Assert that Methodologies that were scheduled to go out with this Release are no longer scheduled
                 // to do so
@@ -2579,6 +2498,7 @@ public abstract class ReleaseVersionServiceTests
         IDataSetVersionService? dataSetVersionService = null,
         IProcessorClient? processorClient = null,
         IPrivateBlobCacheService? privateCacheService = null,
+        IUserReleaseRoleAndInviteManager? userReleaseRoleAndInviteManager = null,
         IReleaseSlugValidator? releaseSlugValidator = null,
         bool enableReplacementOfPublicApiDataSets = false,
         ILogger<ReleaseVersionService>? logger = null)
@@ -2608,6 +2528,7 @@ public abstract class ReleaseVersionServiceTests
             dataSetVersionService ?? Mock.Of<IDataSetVersionService>(Strict),
             processorClient ?? Mock.Of<IProcessorClient>(Strict),
             privateCacheService ?? Mock.Of<IPrivateBlobCacheService>(Strict),
+            userReleaseRoleAndInviteManager ?? Mock.Of<IUserReleaseRoleAndInviteManager>(Strict),
             releaseSlugValidator ?? new ReleaseSlugValidatorMockBuilder().Build(),
             featureFlags: Microsoft.Extensions.Options.Options.Create(new FeatureFlagsOptions()
             {

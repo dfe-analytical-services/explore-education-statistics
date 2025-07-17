@@ -304,6 +304,9 @@ public class UserPublicationRoleRepositoryTests
     private static UserPublicationRoleAndInviteManager SetupUserPublicationRoleRepository(
         ContentDbContext contentDbContext)
     {
-        return new(contentDbContext);
+        return new(
+            contentDbContext: contentDbContext,
+            userPublicationInviteRepository: new UserPublicationInviteRepository(contentDbContext),
+            userRepository: new UserRepository(contentDbContext));
     }
 }
