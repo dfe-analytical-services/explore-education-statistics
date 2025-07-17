@@ -482,6 +482,43 @@ describe('ReleaseSummaryForm', () => {
     expect(publishingOrganisationCheckboxes[1]).not.toBeChecked();
   });
 
+  test('renders with provided initial values with multiple publishing organisations', async () => {
+    metaService.getTimePeriodCoverageGroups.mockResolvedValue(
+      testTimeIdentifiers,
+    );
+
+    render(
+      <ReleaseSummaryForm
+        submitText="Create new release"
+        initialValues={{
+          timePeriodCoverageCode: 'AYQ4',
+          timePeriodCoverageStartYear: '1966',
+          releaseType: 'AccreditedOfficialStatistics',
+          releaseLabel: 'initial',
+          publishingOrganisations: [
+            '466a14bf-4c77-4fb4-beb0-a09065d9ced8',
+            '8d26bfaa-44b8-461e-9260-2b0eed9631e0',
+          ],
+        }}
+        releaseVersion={0}
+        onSubmit={noop}
+        onCancel={noop}
+      />,
+    );
+
+    await waitFor(() => {
+      expect(
+        screen.getByText('Select time period coverage'),
+      ).toBeInTheDocument();
+    });
+
+    const publishingOrganisationCheckboxes = within(
+      screen.getByRole('group', { name: 'Publishing Organisations' }),
+    ).getAllByRole('checkbox');
+    expect(publishingOrganisationCheckboxes[0]).toBeChecked();
+    expect(publishingOrganisationCheckboxes[1]).toBeChecked();
+  });
+
   test('submits form with valid values', async () => {
     metaService.getTimePeriodCoverageGroups.mockResolvedValue(
       testTimeIdentifiers,
