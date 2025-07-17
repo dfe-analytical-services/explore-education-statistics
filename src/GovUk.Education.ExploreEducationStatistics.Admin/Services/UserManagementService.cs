@@ -270,16 +270,11 @@ public class UserManagementService(
 
                 // Clear out any pre-existing Release or Publication invites prior to adding
                 // new ones.
-                var existingReleaseInvites = contentDbContext
-                    .UserReleaseInvites
-                    .Where(invite => invite.Email.ToLower() == sanitisedEmail);
+                var existingReleaseInvites = await userReleaseInviteRepository.ListByEmail(sanitisedEmail);
+                var existingPublicationInvites = await userPublicationInviteRepository.ListByEmail(sanitisedEmail);
 
-                var existingPublicationInvites = contentDbContext
-                    .UserPublicationInvites
-                    .Where(invite => invite.Email.ToLower() == sanitisedEmail);
-
-                contentDbContext.RemoveRange(existingReleaseInvites);
-                contentDbContext.RemoveRange(existingPublicationInvites);
+                await userReleaseInviteRepository.RemoveMany(existingReleaseInvites);
+                await userPublicationInviteRepository.RemoveMany(existingPublicationInvites);
 
                 foreach (var userReleaseRole in request.UserReleaseRoles)
                 {
