@@ -42,6 +42,7 @@ describe('ReleaseContentAccordionSection', () => {
               <ReleaseContentAccordionSection
                 id="test-section-1"
                 section={testReleaseContent.release.content[0]}
+                onRemoveSection={() => {}}
               />
             </EditableAccordion>
           </ReleaseContentHubContextProvider>
@@ -99,6 +100,7 @@ describe('ReleaseContentAccordionSection', () => {
                 <ReleaseContentAccordionSection
                   id="test-section-1"
                   section={testReleaseContent.release.content[0]}
+                  onRemoveSection={() => {}}
                 />
               </EditableAccordion>
             </ReleaseContentHubContextProvider>
@@ -148,6 +150,7 @@ describe('ReleaseContentAccordionSection', () => {
               <ReleaseContentAccordionSection
                 id="test-section-1"
                 section={testReleaseContent.release.content[0]}
+                onRemoveSection={() => {}}
               />
             </EditableAccordion>
           </ReleaseContentHubContextProvider>
@@ -199,6 +202,7 @@ describe('ReleaseContentAccordionSection', () => {
               <ReleaseContentAccordionSection
                 id="test-section-1"
                 section={testReleaseContent.release.content[0]}
+                onRemoveSection={() => {}}
               />
             </EditableAccordion>
           </ReleaseContentHubContextProvider>
@@ -238,6 +242,7 @@ describe('ReleaseContentAccordionSection', () => {
               <ReleaseContentAccordionSection
                 id="test-section-1"
                 section={testReleaseContent.release.content[0]}
+                onRemoveSection={() => {}}
               />
             </EditableAccordion>
           </ReleaseContentHubContextProvider>
@@ -293,6 +298,7 @@ describe('ReleaseContentAccordionSection', () => {
               <ReleaseContentAccordionSection
                 id="test-section-1"
                 section={testSectionWithLockedBlock}
+                onRemoveSection={() => {}}
               />
             </EditableAccordion>
           </ReleaseContentHubContextProvider>

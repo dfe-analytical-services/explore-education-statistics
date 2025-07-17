@@ -1,9 +1,9 @@
 import SubmitError from '@common/components/form/util/SubmitError';
 import WarningMessage from '@common/components/WarningMessage';
-import locationLevelsMap, {
-  LocationLevelKey,
-} from '@common/utils/locationLevelsMap';
 import { ConfirmContextProvider } from '@common/contexts/ConfirmContext';
+import DataSetStep, {
+  DataSetFormSubmitHandler,
+} from '@common/modules/table-tool/components/DataSetStep';
 import FiltersForm, {
   FilterFormSubmitHandler,
   TableQueryErrorCode,
@@ -14,9 +14,6 @@ import PreviousStepModalConfirm from '@common/modules/table-tool/components/Prev
 import PublicationForm, {
   PublicationFormSubmitHandler,
 } from '@common/modules/table-tool/components/PublicationForm';
-import DataSetStep, {
-  DataSetFormSubmitHandler,
-} from '@common/modules/table-tool/components/DataSetStep';
 import TimePeriodForm, {
   TimePeriodFormSubmitHandler,
 } from '@common/modules/table-tool/components/TimePeriodForm';
@@ -41,9 +38,13 @@ import tableBuilderService, {
   Subject,
   SubjectMeta,
 } from '@common/services/tableBuilderService';
+import { Dictionary } from '@common/types';
+import locationLevelsMap, {
+  LocationLevelKey,
+} from '@common/utils/locationLevelsMap';
 import React, { ReactElement, ReactNode, useMemo, useState } from 'react';
 import { useImmer } from 'use-immer';
-import { Dictionary } from 'lodash';
+import { convertHierarchiesFormToQuery } from './utils/filterHierarchiesConversion';
 
 const defaultLocationStepTitle = 'Choose locations';
 const defaultDataSetStepTitle = 'Select a data set';
@@ -209,6 +210,7 @@ export default function TableToolWizard({
         },
         latestRelease: {
           title: latestRelease.title,
+          slug: latestRelease.slug,
         },
       };
     });
@@ -395,6 +397,8 @@ export default function TableToolWizard({
       updateState(draft => {
         draft.subjectMeta.indicators = nextSubjectMeta.indicators;
         draft.subjectMeta.filters = nextSubjectMeta.filters;
+        draft.subjectMeta.filterHierarchies = nextSubjectMeta.filterHierarchies;
+
         draft.query.indicators = filteredIndicators;
         draft.query.filters = filteredFilters;
         draft.query.timePeriod = {
@@ -424,6 +428,7 @@ export default function TableToolWizard({
     updateState(draft => {
       draft.subjectMeta.indicators = nextSubjectMeta.indicators;
       draft.subjectMeta.filters = nextSubjectMeta.filters;
+      draft.subjectMeta.filterHierarchies = nextSubjectMeta.filterHierarchies;
     });
 
     onStepSubmit?.({ nextStepNumber: 5, nextStepTitle: stepTitles.filter });
@@ -432,6 +437,7 @@ export default function TableToolWizard({
   const handleFiltersFormSubmit: FilterFormSubmitHandler = async ({
     filters,
     indicators,
+    filterHierarchies,
   }) => {
     updateState(draft => {
       draft.response = undefined;
@@ -440,6 +446,8 @@ export default function TableToolWizard({
     const updatedReleaseTableDataQuery: ReleaseTableDataQuery = {
       ...state.query,
       filters: Object.values(filters).flat(),
+      filterHierarchiesOptions:
+        convertHierarchiesFormToQuery(filterHierarchies),
       indicators,
     };
 
@@ -449,6 +457,8 @@ export default function TableToolWizard({
         locationIds: updatedReleaseTableDataQuery.locationIds,
         timePeriod: updatedReleaseTableDataQuery.timePeriod,
         filters: updatedReleaseTableDataQuery.filters,
+        filterHierarchiesOptions:
+          updatedReleaseTableDataQuery.filterHierarchiesOptions,
         indicators: updatedReleaseTableDataQuery.indicators,
       } as FullTableQuery,
       updatedReleaseTableDataQuery.releaseVersionId,
@@ -592,6 +602,7 @@ export default function TableToolWizard({
                   initialValues={{
                     indicators: state.query.indicators,
                     filters: state.query.filters,
+                    filterHierarchies: state.query.filterHierarchiesOptions,
                   }}
                   selectedPublication={state.selectedPublication}
                   stepTitle={stepTitles.filter}

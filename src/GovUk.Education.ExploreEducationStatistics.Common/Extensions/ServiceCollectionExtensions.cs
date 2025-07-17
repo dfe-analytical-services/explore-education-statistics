@@ -7,6 +7,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Npgsql;
+#pragma warning disable CS8974 // Converting method group to non-delegate type
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 

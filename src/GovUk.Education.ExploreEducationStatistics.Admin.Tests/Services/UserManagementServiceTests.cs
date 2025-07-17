@@ -475,7 +475,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                             && invites[0].PublicationId == publications[2].Id
                             && invites[0].Role == PublicationRole.Owner
                             && invites[1].PublicationId == publications[3].Id
-                            && invites[1].Role == PublicationRole.Approver)))
+                            && invites[1].Role == PublicationRole.Allower)))
                 .Returns(Unit.Instance);
 
             var contentDbContextId = Guid.NewGuid().ToString();
@@ -520,7 +520,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         new UserPublicationRoleCreateRequest
                         {
                             PublicationId = publications[3].Id,
-                            PublicationRole = PublicationRole.Approver,
+                            PublicationRole = PublicationRole.Allower,
                         }
                     ]
                 };
@@ -578,7 +578,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 Assert.Equal("test@test.com", userPublicationInvites[1].Email);
                 Assert.Equal(publications[3].Id, userPublicationInvites[1].PublicationId);
-                Assert.Equal(PublicationRole.Approver, userPublicationInvites[1].Role);
+                Assert.Equal(PublicationRole.Allower, userPublicationInvites[1].Role);
                 userPublicationInvites[1].Created.AssertUtcNow();
                 Assert.Equal(CreatedById, userPublicationInvites[1].CreatedById);
             }
@@ -766,7 +766,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     {
                         PublicationId = publication1.Id,
                         Email = "test@test.com",
-                        Role = PublicationRole.Approver
+                        Role = PublicationRole.Allower
                     });
                 await contentDbContext.SaveChangesAsync();
             }
@@ -916,7 +916,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     new UserReleaseInvite
                     {
                         Email = "should.not@be.removed",
-                        Role = ReleaseRole.Lead
+                        Role = ReleaseRole.Approver
                     });
                 await contentDbContext.UserPublicationInvites.AddRangeAsync(
                     new UserPublicationInvite
@@ -927,7 +927,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     new UserPublicationInvite
                     {
                         Email = "test@test.com",
-                        Role = PublicationRole.Approver
+                        Role = PublicationRole.Allower
                     },
                     new UserPublicationInvite
                     {

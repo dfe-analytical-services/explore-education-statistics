@@ -133,9 +133,9 @@ describe('ChartAxisConfiguration', () => {
     const generalSection = within(
       screen.getByRole('group', { name: 'General' }),
     );
-    expect(generalSection.getByLabelText('Size of axis (pixels)')).toHaveValue(
-      50,
-    );
+    expect(
+      generalSection.getByLabelText('Size of axis (pixels)'),
+    ).toHaveNumericValue(50);
     expect(generalSection.getByLabelText('Show grid lines')).toBeChecked();
     expect(generalSection.getByLabelText('Show axis')).toBeChecked();
     expect(generalSection.getByLabelText('Displayed unit')).toHaveValue('');
@@ -170,7 +170,7 @@ describe('ChartAxisConfiguration', () => {
 
     const labelsSection = within(screen.getByRole('group', { name: 'Labels' }));
     expect(labelsSection.getByLabelText('Label')).toHaveValue('');
-    expect(labelsSection.getByLabelText('Width (pixels)')).toHaveValue(null);
+    expect(labelsSection.getByLabelText('Width (pixels)')).toHaveValue('');
 
     const sortingSection = within(
       screen.getByRole('group', { name: 'Sorting' }),
@@ -239,7 +239,7 @@ describe('ChartAxisConfiguration', () => {
     expect(handleChange).toHaveBeenCalledWith<[AxisConfiguration]>({
       ...testMajorAxisConfiguration,
       groupByFilterGroups: undefined,
-      label: { rotated: false, text: '', width: undefined },
+      label: { text: '', width: undefined },
       max: 1,
       size: 20,
     });
@@ -425,7 +425,6 @@ describe('ChartAxisConfiguration', () => {
         visible: true,
         unit: '',
         label: {
-          rotated: false,
           text: '',
           width: undefined,
         },
@@ -504,6 +503,30 @@ describe('ChartAxisConfiguration', () => {
         }),
       ).toHaveAttribute('href', '#chartBuilder-minor-decimalPlaces');
     });
+
+    test('allows decimal places to be set to 0', async () => {
+      const { user } = render(
+        <ChartBuilderFormsContextProvider initialForms={testFormState}>
+          <ChartAxisConfiguration
+            id="chartBuilder-minor"
+            type="minor"
+            axesConfiguration={testAxesConfiguration}
+            definition={verticalBarBlockDefinition}
+            data={testTable.results}
+            meta={testTable.subjectMeta}
+            onChange={noop}
+            onSubmit={noop}
+          />
+        </ChartBuilderFormsContextProvider>,
+      );
+      await user.clear(screen.getByLabelText('Displayed decimal places'));
+      await user.type(screen.getByLabelText('Displayed decimal places'), '0');
+      await user.click(
+        screen.getByRole('button', { name: 'Save chart options' }),
+      );
+
+      expect(screen.queryByText('There is a problem')).not.toBeInTheDocument();
+    });
   });
 
   describe('group data by', () => {
@@ -550,7 +573,6 @@ describe('ChartAxisConfiguration', () => {
           unit: '',
           label: {
             text: '',
-            rotated: false,
             width: undefined,
           },
         };
@@ -606,7 +628,6 @@ describe('ChartAxisConfiguration', () => {
           unit: '',
           label: {
             text: '',
-            rotated: false,
             width: undefined,
           },
         };
@@ -750,7 +771,7 @@ describe('ChartAxisConfiguration', () => {
           unit: '',
           label: {
             text: '',
-            rotated: false,
+
             widht: undefined,
           },
         });
@@ -927,7 +948,6 @@ describe('ChartAxisConfiguration', () => {
           unit: '',
           label: {
             text: '',
-            rotated: false,
             width: undefined,
           },
         };
@@ -1051,7 +1071,6 @@ describe('ChartAxisConfiguration', () => {
           unit: '',
           label: {
             text: '',
-            rotated: false,
             width: undefined,
           },
         };
@@ -1141,7 +1160,7 @@ describe('ChartAxisConfiguration', () => {
         unit: '',
         label: {
           text: '',
-          rotated: false,
+
           width: undefined,
         },
       };
@@ -1213,7 +1232,6 @@ describe('ChartAxisConfiguration', () => {
           unit: '',
           label: {
             text: '',
-            rotated: false,
             width: undefined,
           },
         };

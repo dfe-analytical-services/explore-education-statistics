@@ -1,5 +1,6 @@
 #nullable enable
 using System;
+using System.Collections.Generic;
 using GovUk.Education.ExploreEducationStatistics.Common.Converters;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
@@ -56,6 +57,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
         [JsonConverter(typeof(DateTimeToDateJsonConverter))]
         public DateTime? PublishScheduled { get; set; }
 
+        public List<OrganisationViewModel> PublishingOrganisations { get; set; } = [];
+
         public DateTime? Published { get; set; }
 
         public bool Live => Published != null;
@@ -92,22 +95,28 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
     {
         public bool CanAddPrereleaseUsers { get; init; }
 
-        public bool CanViewRelease { get; set; }
-
         public bool CanUpdateRelease { get; init; }
 
-        public bool CanDeleteRelease { get; init; }
+        public bool CanViewReleaseVersion { get; set; }
 
-        public bool CanMakeAmendmentOfRelease { get; init; }
+        public bool CanUpdateReleaseVersion { get; init; }
+
+        public bool CanDeleteReleaseVersion { get; init; }
+
+        public bool CanMakeAmendmentOfReleaseVersion { get; init; }
     }
 
     public record ReleaseVersionSummaryViewModel
     {
         public Guid Id { get; init; }
 
+        public Guid ReleaseId { get; init; }
+
         public string Title { get; init; } = string.Empty;
 
         public string Slug { get; init; } = string.Empty;
+
+        public string? Label { get; init; }
 
         public int Year { get; init; }
 

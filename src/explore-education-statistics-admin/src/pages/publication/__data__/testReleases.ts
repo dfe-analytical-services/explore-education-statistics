@@ -4,7 +4,8 @@ import { PaginatedList } from '@common/services/types/pagination';
 // eslint-disable-next-line import/prefer-default-export
 export const testReleaseSummaries: ReleaseVersionSummary[] = [
   {
-    id: 'release-1',
+    id: 'release-1-version-1',
+    releaseId: 'release-1',
     slug: 'release-1-slug',
     timePeriodCoverage: {
       value: 'AY',
@@ -20,7 +21,8 @@ export const testReleaseSummaries: ReleaseVersionSummary[] = [
     latestRelease: false,
   },
   {
-    id: 'release-2',
+    id: 'release-2-version-1',
+    releaseId: 'release-2',
     slug: 'release-2-slug',
     timePeriodCoverage: {
       value: 'AY',
@@ -36,7 +38,8 @@ export const testReleaseSummaries: ReleaseVersionSummary[] = [
     latestRelease: false,
   },
   {
-    id: 'release-3',
+    id: 'release-3-version-1',
+    releaseId: 'release-3',
     slug: 'release-3-slug',
     timePeriodCoverage: {
       value: 'AY',
@@ -46,7 +49,7 @@ export const testReleaseSummaries: ReleaseVersionSummary[] = [
     type: 'AdHocStatistics',
     publishScheduled: '2021-12-01',
     approvalStatus: 'Approved',
-    year: 2022,
+    year: 2021,
     yearTitle: '2021/22',
     live: true,
     amendment: false,

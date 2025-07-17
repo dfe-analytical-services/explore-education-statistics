@@ -10,11 +10,7 @@ import BoundaryDataPage from '@admin/pages/bau/BoundaryDataPage';
 import BoundaryLevelEditPage from '@admin/pages/bau/BoundaryLevelEditPage';
 import BoundaryDataUploadPage from '@admin/pages/bau/BoundaryDataUploadPage';
 import GlossaryPage from '@admin/pages/bau/GlossaryPage';
-import FeedbackPage from '@admin/pages/bau/FeedbackPage';
-
-export type BoundaryLevelEditPageRouteParams = {
-  boundaryLevelId: number;
-};
+import PageFeedbackPage from '@admin/pages/bau/PageFeedbackPage';
 
 export const administrationIndexRoute: ProtectedRouteProps = {
   path: '/administration',
@@ -60,7 +56,7 @@ export const administrationBoundaryDataUploadRoute: ProtectedRouteProps = {
 
 export const administrationFeedbackRoute: ProtectedRouteProps = {
   path: '/administration/feedback',
-  component: FeedbackPage,
+  component: PageFeedbackPage,
   protectionAction: permissions => permissions.isBauUser,
   exact: true,
 };

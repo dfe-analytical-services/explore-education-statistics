@@ -3,8 +3,18 @@
   "Values": {
     "AzureWebJobsStorage": "UseDevelopmentStorage=true;DevelopmentStorageProxyUri=http://data-storage",
     "FUNCTIONS_WORKER_RUNTIME": "dotnet-isolated",
+    "PublicationArchivedQueueName": "publication-archived-queue",
+    "PublicationChangedQueueName": "publication-changed-queue",
+    "PublicationDeletedQueueName": "publication-deleted-queue",
+    "PublicationLatestPublishedReleaseReorderedQueueName" : "publication-latest-published-release-reordered-queue",
+    "PublicationRestoredQueueName": "publication-restored-queue",
+    "RefreshSearchableDocumentQueueName": "refresh-searchable-document-queue",
+    "ReleaseSlugChangedQueueName": "release-slug-changed-queue",
     "ReleaseVersionPublishedQueueName": "release-version-published-queue",
-    "SearchableDocumentCreatedQueueName": "search-document-created-queue"
+    "RemovePublicationSearchableDocumentsQueueName": "remove-publication-searchable-documents-queue",
+    "RemoveSearchableDocumentQueueName": "remove-searchable-document-queue",
+    "SearchableDocumentCreatedQueueName": "search-document-created-queue",
+    "ThemeUpdatedQueueName": "theme-updated-queue"
   },
   "Host": {
     "LocalHttpPort": 7075,

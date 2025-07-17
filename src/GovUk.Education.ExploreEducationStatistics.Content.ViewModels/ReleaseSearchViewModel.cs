@@ -8,9 +8,11 @@ public record ReleaseSearchViewModel
     public Guid ReleaseId { get; init; }
     public Guid ReleaseVersionId { get; init; }
     public DateTimeOffset Published { get; init; } = DateTimeOffset.MinValue;
+    public Guid PublicationId { get; init; }
     public string PublicationTitle { get; init; } = string.Empty;
     public string Summary { get; init; } = string.Empty;
-    public string Theme { get; init; } = string.Empty;
+    public Guid ThemeId { get; init; }
+    public string ThemeTitle { get; init; } = string.Empty;
     public string Type { get; init; } = string.Empty;
 
     public int TypeBoost { get; init; }
@@ -27,9 +29,11 @@ public record ReleaseSearchViewModel
         ReleaseId = releaseVersion.ReleaseId;
         ReleaseVersionId = releaseVersion.Id;
         Published = releaseVersion.Published ?? throw new ArgumentException("Release must have a published date");
+        PublicationId = publication.Id;
         PublicationTitle = publication.Title;
-        Summary = ExtractHtmlBlocks(releaseVersion.SummarySection.Content).StripHtml();
-        Theme = publication.Theme.Title;
+        Summary = publication.Summary;
+        ThemeId = publication.Theme.Id;
+        ThemeTitle = publication.Theme.Title;
         Type = releaseVersion.Type.ToString();
         TypeBoost = releaseVersion.Type.ToSearchDocumentTypeBoost();
         PublicationSlug = publication.Slug;

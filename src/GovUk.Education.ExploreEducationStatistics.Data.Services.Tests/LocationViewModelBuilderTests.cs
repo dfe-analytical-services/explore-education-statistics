@@ -203,14 +203,14 @@ public class LocationViewModelBuilderTests
         var regions = Assert.Contains(GeographicLevel.Region, result);
         var localAuthorities = Assert.Contains(GeographicLevel.LocalAuthority, result);
 
-        // Except no GeoJson at country level 
+        // Except no GeoJson at country level
         var country1 = Assert.Single(countries);
         Assert.Equal(locations[0].Id, country1.Id);
         Assert.Equal(_england.Name, country1.Label);
         Assert.Equal(_england.Code, country1.Value);
         Assert.Null(country1.GeoJson);
 
-        // Except no GeoJson at region level 
+        // Except no GeoJson at region level
         Assert.Equal(3, regions.Count);
 
         var region1 = regions[0];

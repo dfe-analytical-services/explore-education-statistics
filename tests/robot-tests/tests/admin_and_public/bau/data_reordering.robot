@@ -1,4 +1,5 @@
 *** Settings ***
+Library             String
 Resource            ../../libs/admin-common.robot
 Resource            ../../libs/public-common.robot
 Resource            ../../libs/admin/manage-content-common.robot
@@ -12,7 +13,7 @@ Test Setup          fail test fast if required
 
 
 *** Variables ***
-${PUBLICATION_NAME}     UI tests - data reordering %{RUN_IDENTIFIER}
+${PUBLICATION_NAME}     Data reordering %{RUN_IDENTIFIER}
 ${RELEASE_NAME}         Calendar year 2022
 ${SUBJECT_NAME}         UI test subject
 
@@ -239,7 +240,7 @@ Replace subject data
     user checks headed table body row cell contains    Metadata file    1    grouped-filters-and-indicators.meta.csv
     user checks headed table body row cell contains    Number of rows    1    100    wait=%{WAIT_SMALL}
     user checks headed table body row cell contains    Data file size    1    13 Kb
-    user checks headed table body row cell contains    Status    1    Replacement in progress    wait=%{WAIT_LONG}
+    user checks headed table body row cell contains    Data file import status    1    Complete    wait=%{WAIT_LONG}
 
     user checks headed table body row cell contains    Title    2    ${SUBJECT_NAME}
     user checks headed table body row cell contains    Data file    2    grouped-filters-and-indicators-replacement.csv
@@ -247,7 +248,8 @@ Replace subject data
     ...    grouped-filters-and-indicators-replacement.meta.csv
     user checks headed table body row cell contains    Number of rows    2    140    wait=%{WAIT_SMALL}
     user checks headed table body row cell contains    Data file size    2    19 Kb    wait=%{WAIT_SMALL}
-    user checks headed table body row cell contains    Status    2    Complete    wait=%{WAIT_DATA_FILE_IMPORT}
+    user checks headed table body row cell contains    Data file import status    2    Complete
+    ...    wait=%{WAIT_DATA_FILE_IMPORT}
 
 Confirm data replacement
     user waits until page contains    Data blocks: OK
@@ -396,15 +398,27 @@ Add headline text block to Content page
     user adds headlines text block
     user adds content to headlines text block    Headline text block text
 
-Approve first release
-    user clicks link    Sign off
+Approve release
     user approves release for immediate publication
 
+Get public release link
+    ${PUBLIC_RELEASE_LINK}    user gets url public release will be accessible at
+    Set Suite Variable    ${PUBLIC_RELEASE_LINK}
+
 Verify newly published release is on Find Statistics page
+    # TODO EES-6063 - Remove this
     user checks publication is on find statistics page    ${PUBLICATION_NAME}
+
+Verify newly published release is public
+    user navigates to public release page    ${PUBLIC_RELEASE_LINK}    ${PUBLICATION_NAME}    ${RELEASE_NAME}
 
 Go to public table tool page
     user navigates to data tables page on public frontend
+
+Check page meta
+    user checks meta title should be    Create your own tables
+    user checks meta description should be
+    ...    Find, download and explore official Department for Education (DfE) statistics and data in England.
 
 Select "Test Theme" publication
     environment variable should be set    TEST_THEME_NAME
@@ -413,6 +427,14 @@ Select "Test Theme" publication
     user clicks element    id:publicationForm-submit
     user waits until table tool wizard step is available    2    Select a data set
     user checks previous table tool step contains    1    Publication    ${PUBLICATION_NAME}
+
+Check page meta again
+    user reloads page
+    user waits until table tool wizard step is available    2    Select a data set
+    ${PUBLICATION_NAME_LOWERCASE}    Convert To Lower Case    ${PUBLICATION_NAME}
+    user checks meta title should be    Create your own tables on ${PUBLICATION_NAME_LOWERCASE}
+    user checks meta description should be
+    ...    Create and download your own custom data tables by choosing your areas of interest using filters to build your table from ${PUBLICATION_NAME_LOWERCASE}
 
 Select subject
     user clicks radio    ${SUBJECT_NAME}
@@ -547,31 +569,31 @@ Validate results table column headings
     user checks table row heading contains    10    1    Indicator 6
 
 Validate row headings
-    user checks table column heading contains    1    1    2021
-    user checks table column heading contains    1    2    2022
+    user checks table column heading contains    1    1    2022
+    user checks table column heading contains    1    2    2021
 
 Validate table cells
-    user checks table cell contains    1    1    91,732,417
-    user checks table cell contains    2    1    89,626,171
-    user checks table cell contains    3    1    51,029,335
-    user checks table cell contains    4    1    83,771,711
-    user checks table cell contains    5    1    91,439,757
-    user checks table cell contains    6    1    84,288,196
-    user checks table cell contains    7    1    68,482,122
-    user checks table cell contains    8    1    65,182,202
-    user checks table cell contains    9    1    61,121,060
-    user checks table cell contains    10    1    37,961,046
+    user checks table cell contains    1    1    56,920,389
+    user checks table cell contains    2    1    75,873,610
+    user checks table cell contains    3    1    49,220,007
+    user checks table cell contains    4    1    31,859,890
+    user checks table cell contains    5    1    63,230,370
+    user checks table cell contains    6    1    54,759,203
+    user checks table cell contains    7    1    10,214,603
+    user checks table cell contains    8    1    28,403,292
+    user checks table cell contains    9    1    24,284,255
+    user checks table cell contains    10    1    39,761,905
 
-    user checks table cell contains    1    2    56,920,389
-    user checks table cell contains    2    2    75,873,610
-    user checks table cell contains    3    2    49,220,007
-    user checks table cell contains    4    2    31,859,890
-    user checks table cell contains    5    2    63,230,370
-    user checks table cell contains    6    2    54,759,203
-    user checks table cell contains    7    2    10,214,603
-    user checks table cell contains    8    2    28,403,292
-    user checks table cell contains    9    2    24,284,255
-    user checks table cell contains    10    2    39,761,905
+    user checks table cell contains    1    2    91,732,417
+    user checks table cell contains    2    2    89,626,171
+    user checks table cell contains    3    2    51,029,335
+    user checks table cell contains    4    2    83,771,711
+    user checks table cell contains    5    2    91,439,757
+    user checks table cell contains    6    2    84,288,196
+    user checks table cell contains    7    2    68,482,122
+    user checks table cell contains    8    2    65,182,202
+    user checks table cell contains    9    2    61,121,060
+    user checks table cell contains    10    2    37,961,046
 
 Go back to locations step
     user clicks button    Edit locations

@@ -57,13 +57,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
                 await _methodologyRepository.GetOwningPublication(methodologyVersion.MethodologyId);
 
             // If the user is a Publication Owner or Approver of the Publication that owns this Methodology, they can
-            // view it.  Additionally, if the user is an Editor (Contributor, Lead) or an Approver of any
+            // view it.  Additionally, if the user is a Contributor or an Approver of any
             // (Live or non-Live) release version of the owning publication of this methodology, they can view it.
             if (await _authorizationHandlerService
                     .HasRolesOnPublicationOrAnyReleaseVersion(
                         context.User.GetUserId(),
                         owningPublication.Id,
-                        ListOf(PublicationRole.Owner, PublicationRole.Approver),
+                        ListOf(PublicationRole.Owner, PublicationRole.Allower),
                         ReleaseEditorAndApproverRoles))
             {
                 context.Succeed(requirement);

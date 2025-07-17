@@ -12,11 +12,11 @@ Force Tags          Admin    Local    Dev    AltersData
 
 
 *** Variables ***
-${PUBLICATION_NAME_ARCHIVE}=        UI tests - archived publication %{RUN_IDENTIFIER}
+${PUBLICATION_NAME_ARCHIVE}=        Archived publication %{RUN_IDENTIFIER}
 ${RELEASE_NAME_ARCHIVE}=            Financial year 3000-01
 ${SUBJECT_NAME_ARCHIVE}=            Subject for archived publication
 
-${PUBLICATION_NAME_SUPERSEDE}=      UI tests - superseding publication %{RUN_IDENTIFIER}
+${PUBLICATION_NAME_SUPERSEDE}=      Superseding publication %{RUN_IDENTIFIER}
 ${RELEASE_NAME_SUPERSEDE}=          Financial year 2000-01
 ${SUBJECT_NAME_SUPERSEDE}=          Subject for superseding publication
 
@@ -27,11 +27,14 @@ Create new publication to be archived and release via API
     user creates test release via api    ${PUBLICATION_ID_ARCHIVE}    FY    3000
 
 Navigate to archive-publication release
-    user navigates to draft release page from dashboard    ${PUBLICATION_NAME_ARCHIVE}
+    user navigates to draft release page from dashboard
+    ...    ${PUBLICATION_NAME_ARCHIVE}
     ...    ${RELEASE_NAME_ARCHIVE}
 
 Import archive-publication subject to release
-    user uploads subject and waits until complete    ${SUBJECT_NAME_ARCHIVE}    upload-file-test.csv
+    user uploads subject and waits until complete
+    ...    ${SUBJECT_NAME_ARCHIVE}
+    ...    upload-file-test.csv
     ...    upload-file-test.meta.csv
 
 Add data guidance to archive-publication subject
@@ -40,7 +43,8 @@ Add data guidance to archive-publication subject
 
     user waits until page contains element    id:dataGuidance-dataFiles
     user waits until page contains accordion section    ${SUBJECT_NAME_ARCHIVE}
-    user enters text into data guidance data file content editor    ${SUBJECT_NAME_ARCHIVE}
+    user enters text into data guidance data file content editor
+    ...    ${SUBJECT_NAME_ARCHIVE}
     ...    ${SUBJECT_NAME_ARCHIVE} data guidance content
 
     user clicks button    Save guidance
@@ -52,8 +56,11 @@ Add headline text block to archive-publication content
     user adds content to headlines text block    Headline text block text
 
 Go to "Sign off" page and approve archive-publication release
-    user clicks link    Sign off
     user approves original release for immediate publication
+
+Get archive-release link
+    ${PUBLICATION_URL_ARCHIVE}=    user gets url public release will be accessible at
+    Set Suite Variable    ${PUBLICATION_URL_ARCHIVE}
 
 Create new publication to supersede other publication and release via API
     ${PUBLICATION_ID_SUPERSEDE}=    user creates test publication via api    ${PUBLICATION_NAME_SUPERSEDE}
@@ -92,13 +99,15 @@ Check cannot create a methodology for archive-publication
     user checks page does not contain button    Create new methodology
 
 Validate that archive-publication appears correctly on Find stats page
+    # TODO EES-6063 - Remove this
     user checks publication is on find statistics page    ${PUBLICATION_NAME_ARCHIVE}
-    user clicks link    ${PUBLICATION_NAME_ARCHIVE}
 
-    user waits until h1 is visible    ${PUBLICATION_NAME_ARCHIVE}    %{WAIT_MEDIUM}
+Verify that archive-publication is publicly accessible
+    user navigates to public release page
+    ...    ${PUBLICATION_URL_ARCHIVE}
+    ...    ${PUBLICATION_NAME_ARCHIVE}
+    ...    ${RELEASE_NAME_ARCHIVE}
     user waits until page contains    This is the latest data
-    ${PUBLICATION_ARCHIVE_URL}=    user gets url
-    set suite variable    ${PUBLICATION_ARCHIVE_URL}
 
 Check that archive-publication subject appears correctly on Data tables page
     user navigates to data tables page on public frontend
@@ -107,7 +116,7 @@ Check that archive-publication subject appears correctly on Data tables page
 
     user waits until page contains    Select a publication    %{WAIT_SMALL}
 
-    user checks page does not contain element    Radio item for UI tests - ${PUBLICATION_NAME_SUPERSEDE}
+    user checks page does not contain element    Radio item for ${PUBLICATION_NAME_SUPERSEDE}
 
     user clicks radio    ${PUBLICATION_NAME_ARCHIVE}
     user clicks element    id:publicationForm-submit
@@ -161,13 +170,16 @@ Check that archive-publication subject appears correctly on Data catalogue page
     user wait for option to be available and select it    css:select[id="filters-form-theme"]    %{TEST_THEME_NAME}
 
     user checks select contains option    css:select[id="filters-form-publication"]    ${PUBLICATION_NAME_ARCHIVE}
-    user checks select does not contain option    css:select[id="filters-form-publication"]
+    user checks select does not contain option
+    ...    css:select[id="filters-form-publication"]
     ...    ${PUBLICATION_NAME_SUPERSEDE}
 
-    user wait for option to be available and select it    css:select[id="filters-form-publication"]
+    user wait for option to be available and select it
+    ...    css:select[id="filters-form-publication"]
     ...    ${PUBLICATION_NAME_ARCHIVE}
     sleep    1    # wait a moment to wait for release filter options to get updated
-    user wait for option to be available and select it    css:select[id="filters-form-release"]
+    user wait for option to be available and select it
+    ...    css:select[id="filters-form-release"]
     ...    ${RELEASE_NAME_ARCHIVE}
 
     user checks page contains button    ${RELEASE_NAME_ARCHIVE}
@@ -176,11 +188,14 @@ Check that archive-publication subject appears correctly on Data catalogue page
     user waits until page contains    ${SUBJECT_NAME_ARCHIVE}
 
 Navigate to superseding-publication release on Admin site
-    user navigates to draft release page from dashboard    ${PUBLICATION_NAME_SUPERSEDE}
+    user navigates to draft release page from dashboard
+    ...    ${PUBLICATION_NAME_SUPERSEDE}
     ...    ${RELEASE_NAME_SUPERSEDE}
 
 Import superseding-publication subject to release
-    user uploads subject and waits until complete    ${SUBJECT_NAME_SUPERSEDE}    upload-file-test.csv
+    user uploads subject and waits until complete
+    ...    ${SUBJECT_NAME_SUPERSEDE}
+    ...    upload-file-test.csv
     ...    upload-file-test.meta.csv
 
 Add data guidance to superseding-publication subject
@@ -189,7 +204,8 @@ Add data guidance to superseding-publication subject
 
     user waits until page contains element    id:dataGuidance-dataFiles
     user waits until page contains accordion section    ${SUBJECT_NAME_SUPERSEDE}
-    user enters text into data guidance data file content editor    ${SUBJECT_NAME_SUPERSEDE}
+    user enters text into data guidance data file content editor
+    ...    ${SUBJECT_NAME_SUPERSEDE}
     ...    ${SUBJECT_NAME_SUPERSEDE} data guidance content
 
     user clicks button    Save guidance
@@ -201,25 +217,30 @@ Add headline text block to superseding-publication content
     user adds content to headlines text block    Headline text block text
 
 Go to "Sign off" page and approve superseding-publication release
-    user clicks link    Sign off
     user approves original release for immediate publication
     user waits until page contains element    id:release-process-status-Complete    %{WAIT_MEDIUM}
 
+Get superseding-release link
+    ${PUBLICATION_URL_SUPERSEDE}=    user gets url public release will be accessible at
+    Set Suite Variable    ${PUBLICATION_URL_SUPERSEDE}
+
 Check archive-publication is now archived and superseding-publication now appears on Find stats page
+    # TODO EES-6063 - Remove this
     sleep    1    # Prevent intermittent failure where Find Stats page loads before cache is cleared
     user checks publication is on find statistics page    ${PUBLICATION_NAME_SUPERSEDE}
     user checks page does not contain    ${PUBLICATION_NAME_ARCHIVE}
 
 Check public superseding-publication release page displays correctly
-    user clicks link    ${PUBLICATION_NAME_SUPERSEDE}
-
-    user waits until h1 is visible    ${PUBLICATION_NAME_SUPERSEDE}    %{WAIT_MEDIUM}
+    user navigates to public release page
+    ...    ${PUBLICATION_URL_SUPERSEDE}
+    ...    ${PUBLICATION_NAME_SUPERSEDE}
+    ...    ${RELEASE_NAME_SUPERSEDE}
     user waits until page contains    This is the latest data
 
 Check public archive-publication release page displays correctly
     user waits for caches to expire
 
-    user navigates to    ${PUBLICATION_ARCHIVE_URL}
+    user navigates to    ${PUBLICATION_URL_ARCHIVE}
     user waits until h1 is visible    ${PUBLICATION_NAME_ARCHIVE}    %{WAIT_MEDIUM}
     user checks page does not contain    This is the latest data
 
@@ -261,10 +282,12 @@ Check data catalogue page contains archive and superseding publication subjects
     user checks select contains option    css:select[id="filters-form-publication"]    ${PUBLICATION_NAME_ARCHIVE}
     user checks select contains option    css:select[id="filters-form-publication"]    ${PUBLICATION_NAME_SUPERSEDE}
 
-    user wait for option to be available and select it    css:select[id="filters-form-publication"]
+    user wait for option to be available and select it
+    ...    css:select[id="filters-form-publication"]
     ...    ${PUBLICATION_NAME_SUPERSEDE}
     sleep    1    # wait a moment to wait for release filter options to get updated
-    user wait for option to be available and select it    css:select[id="filters-form-release"]
+    user wait for option to be available and select it
+    ...    css:select[id="filters-form-release"]
     ...    ${RELEASE_NAME_SUPERSEDE}
 
     user checks page contains button    ${RELEASE_NAME_SUPERSEDE}
@@ -274,10 +297,12 @@ Check data catalogue page contains archive and superseding publication subjects
     user checks element contains    testid:release-info    This is the latest data
     user waits until page contains    ${SUBJECT_NAME_SUPERSEDE}
 
-    user wait for option to be available and select it    css:select[id="filters-form-publication"]
+    user wait for option to be available and select it
+    ...    css:select[id="filters-form-publication"]
     ...    ${PUBLICATION_NAME_ARCHIVE}
     sleep    1    # wait a moment to wait for release filter options to get updated
-    user wait for option to be available and select it    css:select[id="filters-form-release"]
+    user wait for option to be available and select it
+    ...    css:select[id="filters-form-release"]
     ...    ${RELEASE_NAME_ARCHIVE}
 
     user checks page contains button    ${RELEASE_NAME_ARCHIVE}
@@ -343,6 +368,7 @@ Check public Find stats page and check archive-publication is no longer archived
     [Documentation]    Failing due to https://dfedigital.atlassian.net/browse/EES-4269
     [Tags]    Failing
 
+    # TODO EES-6063 - Remove this
     user checks publication is on find statistics page    ${PUBLICATION_NAME_SUPERSEDE}
     user checks publication is on find statistics page    ${PUBLICATION_NAME_ARCHIVE}
 
@@ -350,9 +376,10 @@ Check public archive-publication release page displays correctly after being una
     [Documentation]    Failing due to https://dfedigital.atlassian.net/browse/EES-4269
     [Tags]    Failing
 
-    user clicks link    ${PUBLICATION_NAME_ARCHIVE}
-
-    user waits until h1 is visible    ${PUBLICATION_NAME_ARCHIVE}    %{WAIT_MEDIUM}
+    user navigates to public release page
+    ...    ${PUBLICATION_URL_ARCHIVE}
+    ...    ${PUBLICATION_NAME_ARCHIVE}
+    ...    ${RELEASE_NAME_ARCHIVE}
     user waits until page contains    This is the latest data
 
 Check public data tables page is correct after archive-publication has been unarchived

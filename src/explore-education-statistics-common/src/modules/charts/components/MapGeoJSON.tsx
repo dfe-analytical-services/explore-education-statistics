@@ -11,7 +11,7 @@ import { Dictionary } from '@common/types';
 import formatPretty from '@common/utils/number/formatPretty';
 import { FeatureCollection } from 'geojson';
 import Leaflet, { Layer, PathOptions } from 'leaflet';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { GeoJSON, useMap } from 'react-leaflet';
 
 interface Props {
@@ -86,10 +86,11 @@ export default function MapGeoJSON({
     }
   }, [features]);
 
+  const resetZoom = useCallback(() => map.setZoom(5), [map]);
+
   useEffect(() => {
     if (!selectedFeature) {
-      // reset zoom
-      map.setZoom(5);
+      resetZoom();
       return;
     }
 
@@ -105,7 +106,7 @@ export default function MapGeoJSON({
       // Centers the feature on the map
       map.fitBounds(layer.getBounds());
     }
-  }, [map, selectedFeature]);
+  }, [map, selectedFeature, resetZoom]);
 
   // We have to assign our `onEachFeature` callback to a ref
   // as `onEachFeature` forms an internal closure which
@@ -204,6 +205,20 @@ export default function MapGeoJSON({
               const { feature } = e.sourceTarget;
               if (feature.properties && feature.id) {
                 onSelectFeature(feature);
+              }
+            },
+            keydown: e => {
+              if (e.originalEvent.code === 'Tab') {
+                // https://dfedigital.atlassian.net/browse/EES-5910
+                // Reset the map zoom when user tabs through regions
+                // to ensure tooltips that appear are in bounds and visible
+                resetZoom();
+              } else if (e.originalEvent.code === 'Enter') {
+                // Also allow a feature to be 'selected' by pressing Enter
+                const { feature } = e.sourceTarget;
+                if (feature.properties && feature.id) {
+                  onSelectFeature(feature);
+                }
               }
             },
           }}

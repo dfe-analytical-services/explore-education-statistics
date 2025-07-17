@@ -6,11 +6,12 @@ import ReleaseBlock from '@admin/pages/release/content/components/ReleaseBlock';
 import ReleaseEditableBlock from '@admin/pages/release/content/components/ReleaseEditableBlock';
 import useReleaseContentActions from '@admin/pages/release/content/contexts/useReleaseContentActions';
 import { EditableRelease } from '@admin/services/releaseContentService';
+import focusAddedSectionBlockButton from '@admin/utils/focus/focusAddedSectionBlockButton';
 import Button from '@common/components/Button';
 import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
 import DataBlockTabs from '@common/modules/find-statistics/components/DataBlockTabs';
-import React, { useCallback } from 'react';
+import React, { useCallback, useRef } from 'react';
 import AddSecondaryStats from './AddSecondaryStats';
 
 interface Props {
@@ -22,10 +23,12 @@ const ReleaseHeadlines = ({ release, transformFeaturedTableLinks }: Props) => {
   const { editingMode } = useEditingContext();
   const actions = useReleaseContentActions();
 
+  const addHeadlinesBlockButton = useRef<HTMLButtonElement>(null);
+
   const getChartFile = useGetChartFile(release.id);
 
   const addBlock = useCallback(async () => {
-    await actions.addContentSectionBlock({
+    const newBlock = await actions.addContentSectionBlock({
       releaseVersionId: release.id,
       sectionId: release.headlinesSection.id,
       sectionKey: 'headlinesSection',
@@ -35,7 +38,15 @@ const ReleaseHeadlines = ({ release, transformFeaturedTableLinks }: Props) => {
         body: '',
       },
     });
+
+    focusAddedSectionBlockButton(newBlock.id);
   }, [actions, release.id, release.headlinesSection.id]);
+
+  const onAfterDeleteHeadlinesBlock = () => {
+    setTimeout(() => {
+      addHeadlinesBlockButton.current?.focus();
+    }, 100);
+  };
 
   const headlinesTab = (
     <TabsSection title="Summary">
@@ -60,6 +71,7 @@ const ReleaseHeadlines = ({ release, transformFeaturedTableLinks }: Props) => {
               releaseVersionId={release.id}
               sectionId={release.headlinesSection.id}
               sectionKey="headlinesSection"
+              onAfterDeleteBlock={onAfterDeleteHeadlinesBlock}
             />
           )}
         />
@@ -67,7 +79,11 @@ const ReleaseHeadlines = ({ release, transformFeaturedTableLinks }: Props) => {
         {editingMode === 'edit' &&
           release.headlinesSection.content?.length === 0 && (
             <div className="govuk-!-margin-bottom-8 govuk-!-text-align-centre">
-              <Button variant="secondary" onClick={addBlock}>
+              <Button
+                variant="secondary"
+                onClick={addBlock}
+                ref={addHeadlinesBlockButton}
+              >
                 Add a headlines text block
               </Button>
             </div>

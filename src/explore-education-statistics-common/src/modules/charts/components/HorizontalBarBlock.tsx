@@ -79,11 +79,18 @@ const HorizontalBarBlock = ({
     dataSetCategory => dataSetCategory.filter.group,
   );
 
-  const chartData = axes.major.groupByFilterGroups
+  const chartDataUnsorted = axes.major.groupByFilterGroups
     ? Object.entries(groupedDataSetCategories).map(([groupKey, group]) =>
         Object.assign({}, ...group.map(toChartData), { name: groupKey }),
       )
     : dataSetCategories.map(toChartData);
+  // If no `sortAsc` has been set, we should default
+  // to true as it's not really natural to sort in
+  // descending order most of the time.
+  const chartData =
+    axes.major.sortAsc ?? true
+      ? chartDataUnsorted
+      : chartDataUnsorted.reverse();
 
   const minorDomainTicks = getMinorAxisDomainTicks(chartData, axes.minor);
   const majorDomainTicks = getMajorAxisDomainTicks(chartData, axes.major);
@@ -135,6 +142,7 @@ const HorizontalBarBlock = ({
           stackOffset={stacked ? 'sign' : undefined}
           margin={{
             left: 30,
+            top: 20,
           }}
         >
           <CartesianGrid
@@ -266,6 +274,7 @@ export const horizontalBarBlockDefinition: ChartDefinition = {
     canIncludeNonNumericData: true,
     canPositionLegendInline: false,
     canSetBarThickness: true,
+    canSetDataLabelColour: false,
     canSetDataLabelPosition: true,
     canShowDataLabels: true,
     canShowAllMajorAxisTicks: false,
@@ -300,9 +309,6 @@ export const horizontalBarBlockDefinition: ChartDefinition = {
       id: 'major',
       title: 'Y Axis (major axis)',
       type: 'major',
-      capabilities: {
-        canRotateLabel: true,
-      },
       defaults: {
         groupBy: 'timePeriod',
         min: 0,
@@ -323,9 +329,6 @@ export const horizontalBarBlockDefinition: ChartDefinition = {
       id: 'minor',
       title: 'X Axis (minor axis)',
       type: 'minor',
-      capabilities: {
-        canRotateLabel: false,
-      },
       defaults: {
         showGrid: true,
         size: 50,

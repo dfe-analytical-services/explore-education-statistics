@@ -1,0 +1,131 @@
+@import '~govuk-frontend/dist/govuk/base';
+// These styles are adapted from the original Accessible Autocomplete component stylesheet, mostly
+// to remove superfluous styles that are already provided by the GOV.UK Design System, and to adapt
+// the styling to match the new GOV.UK search box designs (e.g. to remove the zebra striping on
+// rows, adjust whitespace, and manage the tweaked markup we use in the suggestion template).
+//
+// Some of these amends have been made by the govuk_publishing_components search-with-autocomplete
+//
+// see https://github.com/alphagov/accessible-autocomplete/blob/main/src/autocomplete.css
+// and https://github.com/alphagov/govuk_publishing_components/blob/main/app/assets/stylesheets/govuk_publishing_components/components/_search-with-autocomplete.scss
+
+// Helps to make the autocomplete menu as wide as the entire search box _including_ the submit
+// button, not just the width of the input field.
+@mixin enhance-autocomplete-menu-width($button-size) {
+  margin-right: -$button-size;
+}
+
+$input-size: 40px;
+
+.autocomplete__item-wrap {
+  position: relative;
+}
+
+.autocomplete__wrapper {
+  position: relative;
+}
+
+.autocomplete__input {
+  appearance: none;
+  border: $govuk-border-width-form-element solid $govuk-input-border-colour;
+  border-radius: 0;
+  box-sizing: border-box;
+  margin-bottom: 0;
+  width: calc(100% - #{$input-size});
+  background-color: transparent;
+  padding: govuk-spacing(1);
+  position: relative;
+  height: $input-size;
+}
+
+.autocomplete__input--focused {
+  outline: $govuk-focus-width solid $govuk-focus-colour;
+  outline-offset: 0;
+  box-shadow: inset 0 0 0 $govuk-border-width-form-element;
+}
+
+.autocomplete__submit-button {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: $input-size;
+  height: $input-size;
+}
+
+.autocomplete__menu {
+  background-color: govuk-colour('white');
+  border: $govuk-border-width-form-element solid $govuk-input-border-colour;
+  border: $govuk-border-width-form-element solid govuk-colour('dark-grey');
+  border-top: 0;
+  color: $govuk-text-colour;
+  margin: 0;
+  max-height: 342px;
+  overflow-x: hidden;
+  padding: 0;
+  width: 100%;
+  @include enhance-autocomplete-menu-width($input-size);
+}
+
+.autocomplete__menu--visible {
+  display: block;
+}
+
+.autocomplete__menu--hidden {
+  display: none;
+}
+
+.autocomplete__option {
+  border-bottom: solid govuk-colour('mid-grey');
+  border-width: 1px 0;
+  cursor: pointer;
+  display: block;
+  position: relative;
+  margin-bottom: 0;
+}
+
+.autocomplete__option > * {
+  pointer-events: none;
+}
+
+.autocomplete__option:first-of-type {
+  border-top-width: 0;
+}
+
+.autocomplete__option:last-of-type {
+  border-bottom-width: 0;
+}
+
+.autocomplete__option-summary {
+  color: govuk-colour('dark-grey');
+}
+
+// .autocomplete__option--odd {
+//   background-color: govuk-colour('light-grey');
+// }
+
+.autocomplete__option--focused,
+.autocomplete__option:focus-visible,
+.autocomplete__option:hover {
+  background-color: govuk-colour('blue');
+  outline: 0;
+
+  .autocomplete__option-summary,
+  .autocomplete__option-title {
+    color: govuk-colour('white');
+    pointer-events: none;
+  }
+}
+
+.autocomplete__option-item {
+  display: grid;
+  margin-bottom: 0;
+}
+
+.autocomplete__input,
+.autocomplete__option {
+  @include govuk-font(19);
+}
+
+.autocomplete__option {
+  padding: govuk-spacing(1);
+}

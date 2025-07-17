@@ -17,9 +17,13 @@ import {
   BarChartDataLabelPosition,
   LineChartDataLabelPosition,
 } from '@common/modules/charts/types/chart';
-import { LegendPosition } from '@common/modules/charts/types/legend';
+import {
+  LegendLabelColour,
+  LegendPosition,
+} from '@common/modules/charts/types/legend';
 import {
   barChartDataLabelPositions,
+  legendLabelColours,
   lineChartDataLabelPositions,
 } from '@common/modules/charts/util/chartUtils';
 import { ValidationProblemDetails } from '@common/services/types/problemDetails';
@@ -32,6 +36,7 @@ import Yup from '@common/validation/yup';
 import capitalize from 'lodash/capitalize';
 import merge from 'lodash/merge';
 import pick from 'lodash/pick';
+import upperFirst from 'lodash/upperFirst';
 import React, {
   ChangeEvent,
   ReactNode,
@@ -42,6 +47,9 @@ import React, {
 } from 'react';
 import { Path } from 'react-hook-form';
 import { ObjectSchema } from 'yup';
+
+const titleMaxLength = 220;
+const altTextMaxLength = 220;
 
 type FormValues = Partial<ChartOptions>;
 
@@ -97,8 +105,10 @@ const ChartConfiguration = ({
     });
   }, [definition.type]);
 
-  const titleMaxLength = 220;
-  const altTextMaxLength = 220;
+  const legendLabelOptions = legendLabelColours.map(position => ({
+    label: upperFirst(position),
+    value: position,
+  }));
 
   const validationSchema = useMemo<ObjectSchema<FormValues>>(() => {
     let schema: ObjectSchema<FormValues> = Yup.object<FormValues>({
@@ -112,7 +122,7 @@ const ChartConfiguration = ({
             .required('Enter chart title')
             .max(
               titleMaxLength,
-              `Chart title must be ${titleMaxLength} characters or less`,
+              `Chart title must be ${titleMaxLength} characters or fewer`,
             ),
         otherwise: s => s.notRequired(),
       }),
@@ -120,7 +130,7 @@ const ChartConfiguration = ({
         .required('Enter chart alt text')
         .max(
           altTextMaxLength,
-          `Alt text must be ${altTextMaxLength} characters or less`,
+          `Alt text must be ${altTextMaxLength} characters or fewer`,
         )
         .test({
           name: 'noRepeatTitle',
@@ -138,7 +148,7 @@ const ChartConfiguration = ({
       width: Yup.number().positive('Chart width must be positive'),
       subtitle: Yup.string().max(
         160,
-        'Subtitle must be 160 characters or less',
+        'Subtitle must be 160 characters or fewer',
       ),
     });
 
@@ -207,10 +217,19 @@ const ChartConfiguration = ({
       });
     }
 
+    if (definition.capabilities.canSetDataLabelColour) {
+      schema = schema.shape({
+        dataLabelColour: Yup.string()
+          .oneOf<LegendLabelColour>(['inherit', 'black'])
+          .optional(),
+      });
+    }
+
     return schema;
   }, [
     definition.capabilities.canIncludeNonNumericData,
     definition.capabilities.canSetBarThickness,
+    definition.capabilities.canSetDataLabelColour,
     definition.capabilities.canSetDataLabelPosition,
     definition.capabilities.canShowDataLabels,
     definition.capabilities.stackable,
@@ -265,8 +284,9 @@ const ChartConfiguration = ({
   );
 
   const handleChange = useCallback(
-    ({ ...values }: FormValues) => {
-      onChange(normalizeValues(values));
+    ({ width, ...values }: FormValues) => {
+      // allow width to be set to undefined
+      onChange({ ...normalizeValues(values), width });
     },
     [normalizeValues, onChange],
   );
@@ -427,14 +447,24 @@ const ChartConfiguration = ({
                 label="Show data labels"
                 showError={!!formState.errors.showDataLabels}
                 conditional={
-                  validationSchema.fields.dataLabelPosition && (
-                    <FormFieldSelect<FormValues>
-                      label="Data label position"
-                      name="dataLabelPosition"
-                      order={[]}
-                      options={dataLabelPositionOptions}
-                    />
-                  )
+                  <>
+                    {validationSchema.fields.dataLabelPosition && (
+                      <FormFieldSelect<FormValues>
+                        label="Data label position"
+                        name="dataLabelPosition"
+                        order={[]}
+                        options={dataLabelPositionOptions}
+                      />
+                    )}
+                    {validationSchema.fields.dataLabelColour && (
+                      <FormFieldSelect<FormValues>
+                        label="Data label colour"
+                        name="dataLabelColour"
+                        order={[]}
+                        options={legendLabelOptions}
+                      />
+                    )}
+                  </>
                 }
               />
             )}

@@ -50,7 +50,20 @@ const TableToolPage: NextPage<TableToolPageProps> = ({
   const router = useRouter();
   const [loadingFastTrack, setLoadingFastTrack] = useState(false);
   const [currentStep, setCurrentStep] = useState<number | undefined>(undefined);
-  const [pageTitle, setPageTitle] = useState<string>(defaultPageTitle);
+  const [basePageTitle, setBasePageTitle] = useState<string>(
+    selectedPublication?.title
+      ? `${defaultPageTitle} on ${selectedPublication?.title.toLocaleLowerCase()}`
+      : defaultPageTitle,
+  );
+  const [pageTitle, setPageTitle] = useState<string>(basePageTitle);
+
+  useEffect(() => {
+    const newBasePageTitle = selectedPublication?.title
+      ? `${defaultPageTitle} on ${selectedPublication?.title.toLocaleLowerCase()}`
+      : defaultPageTitle;
+    setBasePageTitle(newBasePageTitle);
+    setPageTitle(newBasePageTitle);
+  }, [selectedPublication]);
 
   useEffect(() => {
     // Intercept the back button and activate the appropriate step
@@ -145,9 +158,14 @@ const TableToolPage: NextPage<TableToolPageProps> = ({
   return (
     <Page
       // Don't include the default meta title after intitial step to prevent too much screen reader noise.
-      includeDefaultMetaTitle={pageTitle === defaultPageTitle}
+      includeDefaultMetaTitle={pageTitle === basePageTitle}
       metaTitle={pageTitle}
-      title={defaultPageTitle}
+      title={basePageTitle}
+      description={
+        selectedPublication?.title
+          ? `Create and download your own custom data tables by choosing your areas of interest using filters to build your table from ${selectedPublication.title.toLocaleLowerCase()}`
+          : undefined
+      }
       caption="Table Tool"
       wide
     >
@@ -201,13 +219,15 @@ const TableToolPage: NextPage<TableToolPageProps> = ({
                   {table &&
                     tableHeaders &&
                     query &&
-                    selectedPublicationDetails && (
+                    selectedPublicationDetails &&
+                    selectedSubjectId && (
                       <TableToolFinalStep
                         query={query}
                         selectedPublication={selectedPublicationDetails}
                         table={table}
                         tableHeaders={tableHeaders}
                         onReorderTableHeaders={onReorder}
+                        subjectId={selectedSubjectId}
                       />
                     )}
                 </>
@@ -229,7 +249,7 @@ const TableToolPage: NextPage<TableToolPageProps> = ({
         }}
         onStepSubmit={({ nextStepNumber, nextStepTitle }) =>
           setPageTitle(
-            `Step ${nextStepNumber}: ${nextStepTitle} - ${defaultPageTitle}`,
+            `Step ${nextStepNumber}: ${nextStepTitle} - ${basePageTitle}`,
           )
         }
         onSubjectFormSubmit={async ({ publication, release, subjectId }) => {
@@ -351,6 +371,7 @@ export const getServerSideProps: GetServerSideProps<
           },
           latestRelease: {
             title: latestRelease.title,
+            slug: latestRelease.slug,
           },
         },
         selectedSubjectId: subjectId,
@@ -375,6 +396,7 @@ export const getServerSideProps: GetServerSideProps<
         },
         latestRelease: {
           title: latestRelease.title,
+          slug: latestRelease.slug,
         },
       },
       subjects,

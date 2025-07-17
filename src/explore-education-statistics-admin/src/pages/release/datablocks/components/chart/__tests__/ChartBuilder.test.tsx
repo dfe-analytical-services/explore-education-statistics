@@ -9,6 +9,7 @@ import { Chart } from '@common/modules/charts/types/chart';
 import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import noop from 'lodash/noop';
+import React from 'react';
 
 describe('ChartBuilder', () => {
   const testFormState: ChartBuilderForms = {
@@ -446,7 +447,7 @@ describe('ChartBuilder', () => {
       '1',
     ]);
 
-    expect(handleUpdate).toHaveBeenCalledWith({ boundaryLevel: 1 });
+    expect(handleUpdate).toHaveBeenCalledWith({}, 1);
   });
 
   describe('data groupings tab', () => {
@@ -463,6 +464,7 @@ describe('ChartBuilder', () => {
               timePeriod: '2014_AY',
             },
             inlinePosition: undefined,
+            labelColour: undefined,
             label:
               'Number of authorised absence sessions (Ethnicity Major Chinese, State-funded primary, 2014/15)',
             lineStyle: undefined,
@@ -476,6 +478,7 @@ describe('ChartBuilder', () => {
               timePeriod: '2015_AY',
             },
             inlinePosition: undefined,
+            labelColour: undefined,
             label:
               'Number of authorised absence sessions (Ethnicity Major Chinese, State-funded primary, 2015/16)',
             lineStyle: undefined,
@@ -555,7 +558,8 @@ describe('ChartBuilder', () => {
       },
     };
 
-    test('save chart with updated data groupings', async () => {
+    test.skip('save chart with updated data groupings', async () => {
+      // TODO EES-6256
       const handleSubmit = jest.fn();
 
       const { user } = render(

@@ -62,9 +62,16 @@ describe('ChartRenderer', () => {
   test('renders auto-generated boundary level footnote successfully', async () => {
     render(<ChartRenderer {...testMapChartRenderer} />);
     const footnotes = screen.queryByTestId('footnotes');
+
     expect(footnotes).toBeInTheDocument();
     expect(footnotes).toHaveTextContent(
       'This map uses the boundary data Countries December 2017 Ultra Generalised Clipped Boundaries in UK',
     );
+  });
+
+  test('renders export button successfully', async () => {
+    render(<ChartRenderer {...testMapChartRenderer} />);
+
+    expect(screen.queryByText('Export options')).toBeInTheDocument();
   });
 });

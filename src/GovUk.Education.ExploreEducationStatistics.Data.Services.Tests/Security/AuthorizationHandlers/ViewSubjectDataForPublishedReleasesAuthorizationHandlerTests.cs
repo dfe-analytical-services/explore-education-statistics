@@ -1,6 +1,7 @@
 #nullable enable
 using System;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
@@ -50,8 +51,8 @@ public class ViewSubjectDataForPublishedReleasesAuthorizationHandlerTests
             var handler = BuildHandler(contentDbContext);
 
             var authContext = new AuthorizationHandlerContext(
-                new IAuthorizationRequirement[] {Activator.CreateInstance<ViewSubjectDataRequirement>()},
-                null,
+                [Activator.CreateInstance<ViewSubjectDataRequirement>()],
+                _dataFixture.Generator<ClaimsPrincipal>(),
                 releaseSubject);
 
             await handler.HandleAsync(authContext);
@@ -89,8 +90,8 @@ public class ViewSubjectDataForPublishedReleasesAuthorizationHandlerTests
             var handler = BuildHandler(contentDbContext);
 
             var authContext = new AuthorizationHandlerContext(
-                new IAuthorizationRequirement[] { Activator.CreateInstance<ViewSubjectDataRequirement>() },
-                null,
+                [Activator.CreateInstance<ViewSubjectDataRequirement>()],
+                _dataFixture.Generator<ClaimsPrincipal>(),
                 releaseSubject);
 
             await handler.HandleAsync(authContext);

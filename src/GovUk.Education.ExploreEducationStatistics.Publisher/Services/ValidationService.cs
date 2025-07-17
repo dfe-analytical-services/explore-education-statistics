@@ -9,7 +9,6 @@ using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using static GovUk.Education.ExploreEducationStatistics.Publisher.Model.ReleasePublishingStatusOverallStage;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 {
@@ -55,29 +54,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
         {
             _logger.LogTrace("Validating publishing state for release version {ReleaseVersionId}", releaseVersionId);
 
-            var releasePublishingStatuses =
-                await _releasePublishingStatusService.GetAllByOverallStage(releaseVersionId, Scheduled, Started);
+            // Before creating a new release status entry for this release version,
+            // check there are no existing entries that are scheduled or started.
+            var scheduledOrStarted =
+                await _releasePublishingStatusService.GetReleasesWithOverallStages(
+                    releaseVersionId,
+                    overallStages:
+                    [
+                        ReleasePublishingStatusOverallStage.Scheduled,
+                        ReleasePublishingStatusOverallStage.Started
+                    ]);
 
-            // Should never happen as we mark scheduled releases as superseded prior to validation
-            var scheduled = releasePublishingStatuses.FirstOrDefault(status => status.State.Overall == Scheduled);
-            if (scheduled != null)
+            if (scheduledOrStarted.Any())
             {
+                // This should never be reached because:
+                // - A started entry should have failed validation in the Admin app during approval.
+                // - A scheduled entry should have been updated to a value of superseded earlier.
                 _logger.LogError(
-                    "Validating {0} failed: " +
-                    "Publishing is already scheduled. ReleaseStatus: {1}",
+                    "Validating {ValidationStage} failed. Publishing is already scheduled or started. ReleaseVersionId: {ReleaseVersionId}",
                     ValidationStage.ReleasePublishingStateNotScheduledOrStarted.ToString(),
-                    scheduled.Id);
-                return false;
-            }
+                    scheduledOrStarted[0].ReleaseVersionId);
 
-            var started = releasePublishingStatuses.FirstOrDefault(status => status.State.Overall == Started);
-            if (started != null)
-            {
-                _logger.LogError(
-                    "Validating {0} failed: " +
-                    "Publishing has already started. ReleaseStatus: {1}",
-                    ValidationStage.ReleasePublishingStateNotScheduledOrStarted.ToString(),
-                    started.Id);
                 return false;
             }
 

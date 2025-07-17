@@ -1225,7 +1225,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             var userPublicationRole = new UserPublicationRole
             {
                 PublicationId = publication.Id,
-                Role = PublicationRole.Approver,
+                Role = PublicationRole.Allower,
                 User = new User
                 {
                     Email = "publication-approver@email.com",

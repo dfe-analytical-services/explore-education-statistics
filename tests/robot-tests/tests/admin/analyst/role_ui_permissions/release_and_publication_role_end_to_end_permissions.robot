@@ -13,7 +13,7 @@ Force Tags          Admin    Local    Dev    AltersData    Footnotes
 
 
 *** Variables ***
-${PUBLICATION_NAME}     UI tests - publication_owner %{RUN_IDENTIFIER}
+${PUBLICATION_NAME}     Publication_owner %{RUN_IDENTIFIER}
 ${RELEASE_TYPE}         Academic year 2025/26
 ${RELEASE_NAME}         ${PUBLICATION_NAME} - ${RELEASE_TYPE}
 ${SUBJECT_NAME}         UI test subject
@@ -229,7 +229,6 @@ Check release approver can create a release note
     user waits until element contains    css:#release-notes li:nth-of-type(1) p    Test release note one
 
 Check release approver can publish a release
-    user clicks link    Sign off
     user approves original release for immediate publication
 
 Swap the release approver role for publication owner now that the publication is live

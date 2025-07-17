@@ -25,6 +25,9 @@ describe('DataSetFileDetails', () => {
       }),
     ).toBeInTheDocument();
     expect(
+      within(screen.getByTestId('Number of rows')).getByText('65'),
+    ).toBeInTheDocument();
+    expect(
       within(screen.getByTestId('Geographic levels')).getByText(
         'Local authority, National',
       ),

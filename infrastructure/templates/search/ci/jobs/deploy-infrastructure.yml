@@ -8,26 +8,31 @@ parameters:
 
 jobs:
   - deployment: DeploySearchInfrastructure
-    displayName: Deploy search infrastructure
+    displayName: Deploy Search Infrastructure
     environment: ${{ parameters.environment }}
     variables:
-      templateDirectory: $(Build.SourcesDirectory)/infrastructure/templates/search
-      templateFile: $(templateDirectory)/main.bicep
-      paramDirectory: $(templateDirectory)/parameters
-      paramFile: $(paramDirectory)/main-${{ parameters.bicepParamFile }}.bicepparam
+      - group: Common - ${{ parameters.environment }}
+      - name: templateDirectory
+        value: $(Build.SourcesDirectory)/infrastructure/templates/search
+      - name: templateFile
+        value: $(templateDirectory)/main.bicep
+      - name: paramDirectory
+        value: $(templateDirectory)/parameters
+      - name: paramFile
+        value: $(paramDirectory)/main-${{ parameters.bicepParamFile }}.bicepparam
+      - name: searchServiceIndexName
+        value: 'index-1'
+      - name: searchServiceIndexerName
+        value: ${{ variables.searchServiceIndexName }}-indexer
     strategy:
       runOnce:
         deploy:
           steps:
             - checkout: self
+            - download: none
 
-            - task: AzureCLI@2
-              displayName: Install Bicep
-              inputs:
-                azureSubscription: ${{ parameters.serviceConnection }}
-                scriptType: bash
-                scriptLocation: inlineScript
-                inlineScript: az bicep install
+            - script: az upgrade --yes
+              displayName: Upgrade Azure CLI and extensions
 
             - template: ../tasks/deploy-bicep.yml
               parameters:
@@ -35,7 +40,15 @@ jobs:
                 action: validate
                 serviceConnection: ${{ parameters.serviceConnection }}
                 parameterFile: $(paramFile)
-                deploySearchService: false
+                searchServiceIndexerName: ${{ variables.searchServiceIndexerName }}
+                searchDocsFunctionAppExists: false
+
+            - template: ../../../public-api/ci/tasks/check-function-app-exists.yml
+              parameters:
+                serviceConnection: ${{ parameters.serviceConnection }}
+                resourceGroupName: $(resourceGroupName)
+                functionAppName: $(searchDocsFunctionAppName)
+                variableName: searchDocsFunctionAppExists
 
             - template: ../tasks/deploy-bicep.yml
               parameters:
@@ -43,4 +56,22 @@ jobs:
                 action: create
                 serviceConnection: ${{ parameters.serviceConnection }}
                 parameterFile: $(paramFile)
-                deploySearchService: $(deploySearchService)
+                searchServiceIndexerName: ${{ variables.searchServiceIndexerName }}
+                searchDocsFunctionAppExists: $(searchDocsFunctionAppExists)
+
+            - template: ../../../../common/ci/tasks/bicep-output-variables.yml
+              parameters:
+                serviceConnection: ${{ parameters.serviceConnection }}
+
+            - template: ../tasks/deploy-search-service-config.yml
+              parameters:
+                serviceConnection: ${{ parameters.serviceConnection }}
+                indexCorsAllowedOrigins:
+                  - $(publicSiteUrl)
+                  - 'https://localhost:3000'
+                  - 'http://localhost:3000'
+                dataSourceConnectionString: $(searchStorageAccountManagedIdentityConnectionString)
+                dataSourceContainerName: $(searchableDocumentsContainerName)
+                indexName: ${{ variables.searchServiceIndexName }}
+                indexerName: ${{ variables.searchServiceIndexerName }}
+                searchServiceEndpoint: $(searchServiceEndpoint)

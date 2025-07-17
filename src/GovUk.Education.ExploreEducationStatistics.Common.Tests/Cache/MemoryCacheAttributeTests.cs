@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -41,13 +42,13 @@ public class MemoryCacheAttributeTests : IClassFixture<CacheTestFixture>, IDispo
     private static class TestMethods
     {
         [MemoryCache(typeof(TestMemoryCacheKey), expiryScheduleCron: HourlyExpirySchedule, durationInSeconds: 45)]
-        public static TestValue SingleParam(string param1)
+        public static TestValue SingleParam(string _)
         {
             return new();
         }
 
         [MemoryCache(typeof(TestMemoryCacheKey), expiryScheduleCron: HourlyExpirySchedule, durationInSeconds: 45, ServiceName = "target")]
-        public static TestValue SpecificCacheService(string param1)
+        public static TestValue SpecificCacheService(string _)
         {
             return new();
         }
@@ -65,15 +66,15 @@ public class MemoryCacheAttributeTests : IClassFixture<CacheTestFixture>, IDispo
         }
 
         [MemoryCache(typeof(TestMemoryCacheKey), durationInSeconds: 135)]
-        public static TestValue DefaultCacheConfig(string param1)
+        public static TestValue DefaultCacheConfig(string _)
         {
             return new();
         }
 
         [MemoryCache(typeof(TestMemoryCacheKey), expiryScheduleCron: HourlyExpirySchedule, durationInSeconds: 45)]
-        public static async Task<TestValue> SingleParamAsync(string param)
+        public static Task<TestValue> SingleParamAsync(string _)
         {
-            return new();
+            return Task.FromResult<TestValue>(new());
         }
     }
     // ReSharper enable UnusedParameter.Local
@@ -104,7 +105,7 @@ public class MemoryCacheAttributeTests : IClassFixture<CacheTestFixture>, IDispo
 
         _memoryCacheService
             .Setup(s => s.GetItem(cacheKey, typeof(TestValue)))
-            .Returns(null);
+            .Returns((object?)null);
 
         var args = new List<object>();
 
@@ -141,7 +142,7 @@ public class MemoryCacheAttributeTests : IClassFixture<CacheTestFixture>, IDispo
 
         _memoryCacheService
             .Setup(s => s.GetItem(cacheKey, typeof(TestValue)))
-            .Returns(null);
+            .Returns((object?)null);
 
         var args = new List<object>();
 
@@ -174,7 +175,7 @@ public class MemoryCacheAttributeTests : IClassFixture<CacheTestFixture>, IDispo
 
         targetMemoryCacheService
             .Setup(s => s.GetItem(cacheKey, typeof(TestValue)))
-            .Returns(null);
+            .Returns((object?)null);
 
         var args = new List<object>();
 
@@ -208,7 +209,7 @@ public class MemoryCacheAttributeTests : IClassFixture<CacheTestFixture>, IDispo
 
         _memoryCacheService
             .Setup(s => s.GetItem(cacheKey, typeof(TestValue)))
-            .Returns(null);
+            .Returns((object?)null);
 
         var args = new List<object>();
 
@@ -235,8 +236,8 @@ public class MemoryCacheAttributeTests : IClassFixture<CacheTestFixture>, IDispo
     public void OverrideConfigSectionSpecifiedButNoValues()
     {
         var configuration = CreateMockConfigurationSection(
-            TupleOf("DurationInSeconds", (string) null),
-            TupleOf("ExpirySchedule", (string) null));
+            TupleOf("DurationInSeconds", (string?)null),
+            TupleOf("ExpirySchedule", (string?)null));
 
         MemoryCacheAttribute.SetOverrideConfiguration(configuration.Object);
 
@@ -244,7 +245,7 @@ public class MemoryCacheAttributeTests : IClassFixture<CacheTestFixture>, IDispo
 
         _memoryCacheService
             .Setup(s => s.GetItem(cacheKey, typeof(TestValue)))
-            .Returns(null);
+            .Returns((object?)null);
 
         var args = new List<object>();
 
@@ -283,7 +284,7 @@ public class MemoryCacheAttributeTests : IClassFixture<CacheTestFixture>, IDispo
 
         _memoryCacheService
             .Setup(s => s.GetItem(cacheKey, typeof(TestValue)))
-            .Returns(null);
+            .Returns((object?)null);
 
         var args = new List<object>();
 
@@ -368,7 +369,7 @@ public class MemoryCacheAttributeTests : IClassFixture<CacheTestFixture>, IDispo
         // in MemoryCacheAttribute#GetAsync
         _memoryCacheService
             .Setup(s => s.GetItem(cacheKey, typeof(TestValue)))
-            .Returns(null);
+            .Returns((object?)null);
 
         var args = new List<object>();
 

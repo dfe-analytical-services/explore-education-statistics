@@ -26,6 +26,11 @@ const publicationService = _publicationService as jest.Mocked<
 jest.mock('@common/services/themeService');
 const themeService = _themeService as jest.Mocked<typeof _themeService>;
 
+jest.mock('@azure/search-documents', () => ({
+  SearchClient: jest.fn(),
+  AzureKeyCredential: jest.fn(),
+}));
+
 describe('FindStatisticsPage', () => {
   const testPaging: Paging = {
     page: 1,

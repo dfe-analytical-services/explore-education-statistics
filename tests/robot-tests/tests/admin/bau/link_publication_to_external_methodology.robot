@@ -10,7 +10,7 @@ Force Tags          Admin    Local    Dev    AltersData
 
 
 *** Variables ***
-${PUBLICATION_NAME}=    UI tests - link external methodology publication %{RUN_IDENTIFIER}
+${PUBLICATION_NAME}=    Link external methodology publication %{RUN_IDENTIFIER}
 
 
 *** Test Cases ***

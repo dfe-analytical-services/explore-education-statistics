@@ -1,14 +1,15 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Common.Utils;
+using GovUk.Education.ExploreEducationStatistics.Publisher.Exceptions;
+using GovUk.Education.ExploreEducationStatistics.Publisher.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Options;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using NCrontab;
-using static GovUk.Education.ExploreEducationStatistics.Common.Utils.CronExpressionUtil;
 using static GovUk.Education.ExploreEducationStatistics.Publisher.Model.PublisherQueues;
 using static GovUk.Education.ExploreEducationStatistics.Publisher.Model.ReleasePublishingStatusContentStage;
 
@@ -17,6 +18,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
     public class StageReleaseContentFunction(
         ILogger<StageReleaseContentFunction> logger,
         IOptions<AppOptions> appOptions,
+        TimeProvider timeProvider,
         IContentService contentService,
         IReleasePublishingStatusService releasePublishingStatusService)
     {
@@ -36,17 +38,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
             logger.LogInformation("{FunctionName} triggered: {Message}",
                 context.FunctionDefinition.Name,
                 message);
+
             await UpdateContentStage(message, Started);
+
+            var now = timeProvider.GetUtcNow();
+            var timeZone = timeProvider.LocalTimeZone; // UTC or the time zone in WEBSITE_TIME_ZONE if specified
+
             try
             {
-                var publishStagedReleasesCronExpression = _appOptions.PublishReleaseContentCronSchedule;
-                var nextScheduledPublishingTime = CrontabSchedule.Parse(publishStagedReleasesCronExpression,
-                    new CrontabSchedule.ParseOptions
-                    {
-                        IncludingSeconds = CronExpressionHasSecondPrecision(publishStagedReleasesCronExpression)
-                    }).GetNextOccurrence(DateTime.UtcNow);
-                await contentService.UpdateContentStaged(nextScheduledPublishingTime,
-                    message.ReleasePublishingKeys.Select(key => key.ReleaseVersionId).ToArray());
+                var nextScheduledPublishingTime = CronExpressionUtil.GetNextOccurrence(
+                    cronExpression: _appOptions.PublishScheduledReleasesFunctionCronSchedule,
+                    from: now,
+                    timeZone
+                ) ?? throw new CronNoFutureOccurrenceException(
+                    cronExpression: _appOptions.PublishScheduledReleasesFunctionCronSchedule,
+                    from: now,
+                    timeZone);
+
+                await contentService.UpdateContentStaged(
+                    expectedPublishDate: nextScheduledPublishingTime.UtcDateTime,
+                    releaseVersionIds: message.ReleasePublishingKeys.ToReleaseVersionIds());
                 await UpdateContentStage(message, Scheduled);
             }
             catch (Exception e)

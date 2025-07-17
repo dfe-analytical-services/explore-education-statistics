@@ -2,7 +2,6 @@ using System.Security.Claims;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
-using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Constants;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Security.AuthorizationHandlers;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services.Security;
@@ -11,6 +10,7 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.TheoryDat
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Tests.Fixtures;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Utils.Requests;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Hosting;
@@ -28,7 +28,7 @@ public class ViewDataSetVersionAuthorizationHandlerTests
     [Theory]
     [MemberData(nameof(DataSetVersionStatusViewTheoryData.AvailableStatuses),
         MemberType = typeof(DataSetVersionStatusViewTheoryData))]
-    public void Success(DataSetVersionStatus status)
+    public async Task Success(DataSetVersionStatus status)
     {
         DataSetVersion dataSetVersion = _dataFixture
             .DefaultDataSetVersion()
@@ -37,7 +37,7 @@ public class ViewDataSetVersionAuthorizationHandlerTests
         var handler = BuildHandler();
         var context = CreateAnonymousAuthContext<ViewDataSetVersionRequirement, DataSetVersion>(dataSetVersion);
 
-        handler.HandleAsync(context);
+        await handler.HandleAsync(context);
 
         Assert.True(context.HasSucceeded);
     }
@@ -45,7 +45,7 @@ public class ViewDataSetVersionAuthorizationHandlerTests
     [Theory]
     [MemberData(nameof(DataSetVersionStatusViewTheoryData.UnavailableStatuses),
         MemberType = typeof(DataSetVersionStatusViewTheoryData))]
-    public void Failure(DataSetVersionStatus status)
+    public async Task Failure(DataSetVersionStatus status)
     {
         DataSetVersion dataSetVersion = _dataFixture
             .DefaultDataSetVersion()
@@ -54,7 +54,7 @@ public class ViewDataSetVersionAuthorizationHandlerTests
         var handler = BuildHandler();
         var context = CreateAnonymousAuthContext<ViewDataSetVersionRequirement, DataSetVersion>(dataSetVersion);
 
-        handler.HandleAsync(context);
+        await handler.HandleAsync(context);
 
         Assert.False(context.HasSucceeded);
     }
@@ -62,7 +62,7 @@ public class ViewDataSetVersionAuthorizationHandlerTests
     [Theory]
     [MemberData(nameof(DataSetVersionStatusViewTheoryData.AvailableStatusesIncludingDraft),
         MemberType = typeof(DataSetVersionStatusViewTheoryData))]
-    public void Success_PreviewTokenIsActive(DataSetVersionStatus status)
+    public async Task Success_PreviewTokenIsActive(DataSetVersionStatus status)
     {
         DataSetVersion dataSetVersion = _dataFixture
             .DefaultDataSetVersion()
@@ -85,13 +85,13 @@ public class ViewDataSetVersionAuthorizationHandlerTests
 
         var context = CreateAnonymousAuthContext<ViewDataSetVersionRequirement, DataSetVersion>(dataSetVersion);
 
-        handler.HandleAsync(context);
+        await handler.HandleAsync(context);
 
         Assert.True(context.HasSucceeded);
     }
 
     [Fact]
-    public void Failure_PreviewTokenIsExpired()
+    public async Task Failure_PreviewTokenIsExpired()
     {
         DataSetVersion dataSetVersion = _dataFixture
             .DefaultDataSetVersion()
@@ -114,13 +114,13 @@ public class ViewDataSetVersionAuthorizationHandlerTests
 
         var context = CreateAnonymousAuthContext<ViewDataSetVersionRequirement, DataSetVersion>(dataSetVersion);
 
-        handler.HandleAsync(context);
+        await handler.HandleAsync(context);
 
         Assert.False(context.HasSucceeded);
     }
 
     [Fact]
-    public void Failure_PreviewTokenIsForWrongDataSetVersion()
+    public async Task Failure_PreviewTokenIsForWrongDataSetVersion()
     {
         var (dataSetVersion1, dataSetVersion2) = _dataFixture
             .DefaultDataSetVersion()
@@ -145,7 +145,7 @@ public class ViewDataSetVersionAuthorizationHandlerTests
 
         var context = CreateAnonymousAuthContext<ViewDataSetVersionRequirement, DataSetVersion>(dataSetVersion1);
 
-        handler.HandleAsync(context);
+        await handler.HandleAsync(context);
 
         Assert.False(context.HasSucceeded);
     }
@@ -153,7 +153,7 @@ public class ViewDataSetVersionAuthorizationHandlerTests
     [Theory]
     [MemberData(nameof(DataSetVersionStatusViewTheoryData.UnavailableStatusesExceptDraft),
         MemberType = typeof(DataSetVersionStatusViewTheoryData))]
-    public void Failure_PreviewTokenIsForUnavailableDataSetVersion(DataSetVersionStatus status)
+    public async Task Failure_PreviewTokenIsForUnavailableDataSetVersion(DataSetVersionStatus status)
     {
         DataSetVersion dataSetVersion = _dataFixture
             .DefaultDataSetVersion()
@@ -176,7 +176,7 @@ public class ViewDataSetVersionAuthorizationHandlerTests
 
         var context = CreateAnonymousAuthContext<ViewDataSetVersionRequirement, DataSetVersion>(dataSetVersion);
 
-        handler.HandleAsync(context);
+        await handler.HandleAsync(context);
 
         Assert.False(context.HasSucceeded);
     }
@@ -184,7 +184,7 @@ public class ViewDataSetVersionAuthorizationHandlerTests
     [Theory]
     [MemberData(nameof(DataSetVersionStatusViewTheoryData.AllStatuses),
         MemberType = typeof(DataSetVersionStatusViewTheoryData))]
-    public void Success_UserAgentHeaderInDevelopment(DataSetVersionStatus status)
+    public async Task Success_UserAgentHeaderInDevelopment(DataSetVersionStatus status)
     {
         DataSetVersion dataSetVersion = _dataFixture
             .DefaultDataSetVersion()
@@ -196,7 +196,7 @@ public class ViewDataSetVersionAuthorizationHandlerTests
 
         var context = CreateAnonymousAuthContext<ViewDataSetVersionRequirement, DataSetVersion>(dataSetVersion);
 
-        handler.HandleAsync(context);
+        await handler.HandleAsync(context);
 
         Assert.True(context.HasSucceeded);
     }
@@ -204,7 +204,7 @@ public class ViewDataSetVersionAuthorizationHandlerTests
     [Theory]
     [MemberData(nameof(DataSetVersionStatusViewTheoryData.UnavailableStatuses),
         MemberType = typeof(DataSetVersionStatusViewTheoryData))]
-    public void Failure_UserAgentHeaderInProduction(DataSetVersionStatus status)
+    public async Task Failure_UserAgentHeaderInProduction(DataSetVersionStatus status)
     {
         DataSetVersion dataSetVersion = _dataFixture
             .DefaultDataSetVersion()
@@ -216,7 +216,7 @@ public class ViewDataSetVersionAuthorizationHandlerTests
 
         var context = CreateAnonymousAuthContext<ViewDataSetVersionRequirement, DataSetVersion>(dataSetVersion);
 
-        handler.HandleAsync(context);
+        await handler.HandleAsync(context);
 
         Assert.False(context.HasSucceeded);
     }
@@ -224,7 +224,7 @@ public class ViewDataSetVersionAuthorizationHandlerTests
     [Theory]
     [MemberData(nameof(DataSetVersionStatusViewTheoryData.UnavailableStatuses),
         MemberType = typeof(DataSetVersionStatusViewTheoryData))]
-    public void Failure_IncorrectUserAgentHeaderInDevelopment(DataSetVersionStatus status)
+    public async Task Failure_IncorrectUserAgentHeaderInDevelopment(DataSetVersionStatus status)
     {
         DataSetVersion dataSetVersion = _dataFixture
             .DefaultDataSetVersion()
@@ -236,7 +236,7 @@ public class ViewDataSetVersionAuthorizationHandlerTests
 
         var context = CreateAnonymousAuthContext<ViewDataSetVersionRequirement, DataSetVersion>(dataSetVersion);
 
-        handler.HandleAsync(context);
+        await handler.HandleAsync(context);
 
         Assert.False(context.HasSucceeded);
     }
@@ -244,7 +244,7 @@ public class ViewDataSetVersionAuthorizationHandlerTests
     [Theory]
     [MemberData(nameof(DataSetVersionStatusViewTheoryData.AllStatuses),
         MemberType = typeof(DataSetVersionStatusViewTheoryData))]
-    public void Success_ClaimsPrincipalWithRole(DataSetVersionStatus status)
+    public async Task Success_ClaimsPrincipalWithRole(DataSetVersionStatus status)
     {
         DataSetVersion dataSetVersion = _dataFixture
             .DefaultDataSetVersion()
@@ -258,7 +258,7 @@ public class ViewDataSetVersionAuthorizationHandlerTests
 
         var context = CreateAnonymousAuthContext<ViewDataSetVersionRequirement, DataSetVersion>(dataSetVersion);
 
-        handler.HandleAsync(context);
+        await handler.HandleAsync(context);
 
         Assert.True(context.HasSucceeded);
     }
@@ -266,7 +266,7 @@ public class ViewDataSetVersionAuthorizationHandlerTests
     [Theory]
     [MemberData(nameof(DataSetVersionStatusViewTheoryData.UnavailableStatuses),
         MemberType = typeof(DataSetVersionStatusViewTheoryData))]
-    public void Failure_ClaimsPrincipalWithIncorrectRole(DataSetVersionStatus status)
+    public async Task Failure_ClaimsPrincipalWithIncorrectRole(DataSetVersionStatus status)
     {
         DataSetVersion dataSetVersion = _dataFixture
             .DefaultDataSetVersion()
@@ -280,11 +280,10 @@ public class ViewDataSetVersionAuthorizationHandlerTests
 
         var context = CreateAnonymousAuthContext<ViewDataSetVersionRequirement, DataSetVersion>(dataSetVersion);
 
-        handler.HandleAsync(context);
+        await handler.HandleAsync(context);
 
         Assert.False(context.HasSucceeded);
     }
-
 
     private static KeyValuePair<string, StringValues> PreviewTokenRequestHeader(PreviewToken previewToken)
     {
@@ -298,6 +297,8 @@ public class ViewDataSetVersionAuthorizationHandlerTests
         string? userAgentValue = null,
         ClaimsPrincipal? claimsPrincipal = null)
     {
+        var dbContext = publicDataDbContext ?? Mock.Of<PublicDataDbContext>();
+        
         var httpContextAccessor = new HttpContextAccessor
         {
             HttpContext = new DefaultHttpContext
@@ -320,15 +321,15 @@ public class ViewDataSetVersionAuthorizationHandlerTests
             .SetupGet(s => s.EnvironmentName)
             .Returns(environmentName ?? Environments.Production);
 
+        var previewTokenService = new PreviewTokenService(
+            publicDataDbContext: dbContext,
+            httpContextAccessor: httpContextAccessor);
+
         var authorizationHandlerService = new AuthorizationHandlerService(
             httpContextAccessor: httpContextAccessor,
-            environment: environment.Object);
-
-        var previewTokenService = new PreviewTokenService(publicDataDbContext);
-
-        return new ViewDataSetVersionAuthorizationHandler(
-            authorizationHandlerService,
-            httpContextAccessor,
+            environment: environment.Object,
             previewTokenService);
+
+        return new ViewDataSetVersionAuthorizationHandler(authorizationHandlerService);
     }
 }

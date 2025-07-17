@@ -1,3 +1,4 @@
+import ChartExportMenu from '@common/modules/charts/components/ChartExportMenu';
 import FigureFootnotes from '@common/components/FigureFootnotes';
 import HorizontalBarBlock, {
   HorizontalBarProps,
@@ -14,7 +15,7 @@ import MapBlock, {
 import VerticalBarBlock, {
   VerticalBarProps,
 } from '@common/modules/charts/components/VerticalBarBlock';
-import React, { memo, useMemo, useState } from 'react';
+import React, { memo, useMemo, useRef, useState } from 'react';
 import getMapInitialBoundaryLevel from './utils/getMapInitialBoundaryLevel';
 
 type HorizontalBarRendererProps = {
@@ -48,13 +49,21 @@ export interface ChartRendererProps {
   source?: string;
   id?: string;
   chart: RenderableChart;
+  showExportMenu?: boolean;
 }
 
-function ChartRenderer({ source, id, chart }: ChartRendererProps) {
+function ChartRenderer({
+  source,
+  id,
+  chart,
+  showExportMenu = true,
+}: ChartRendererProps) {
   const { data, meta, subtitle, title, type } = chart;
   const [selectedBoundaryLevelId, setSelectedBoundaryLevelId] = useState(
     type === 'map' ? getMapInitialBoundaryLevel(chart) : undefined,
   );
+
+  const chartRef = useRef<HTMLElement>(null);
 
   const chartComponent = useMemo(() => {
     switch (type) {
@@ -80,7 +89,7 @@ function ChartRenderer({ source, id, chart }: ChartRendererProps) {
       default:
         return <p>Unable to render invalid chart type</p>;
     }
-  }, [id, chart]);
+  }, [type, chart, id]);
 
   const footnotes = useMemo(() => {
     if (!data?.length || !meta) {
@@ -108,33 +117,43 @@ function ChartRenderer({ source, id, chart }: ChartRendererProps) {
     }
 
     return metaFootnotes;
-  }, [chart, data, meta, selectedBoundaryLevelId]);
+  }, [data?.length, meta, selectedBoundaryLevelId, type]);
 
   if (data?.length && meta) {
     return (
-      <figure className="govuk-!-margin-0" id={id} data-testid={id}>
-        {title && (
-          <figcaption>
-            <p
-              className="govuk-heading-s govuk-!-margin-bottom-1"
-              data-testid="chart-title"
-            >
-              {title}
-            </p>
-            {subtitle && <p data-testid="chart-subtitle">{subtitle}</p>}
-          </figcaption>
+      <>
+        {showExportMenu && (
+          <ChartExportMenu chartRef={chartRef} chartTitle={title} />
         )}
+        <figure
+          ref={chartRef}
+          className="govuk-!-margin-0"
+          id={id}
+          data-testid={id}
+        >
+          {title && (
+            <figcaption>
+              <p
+                className="govuk-heading-s govuk-!-margin-bottom-1"
+                data-testid="chart-title"
+              >
+                {title}
+              </p>
+              {subtitle && <p data-testid="chart-subtitle">{subtitle}</p>}
+            </figcaption>
+          )}
 
-        {chartComponent}
+          {chartComponent}
 
-        <FigureFootnotes
-          footnotes={footnotes}
-          headingHiddenText={`for ${title}`}
-          id={`chartFootnotes-${id}`}
-        />
+          <FigureFootnotes
+            footnotes={footnotes}
+            headingHiddenText={`for ${title}`}
+            id={`chartFootnotes-${id}`}
+          />
 
-        {source && <p className="govuk-body-s">Source: {source}</p>}
-      </figure>
+          {source && <p className="govuk-body-s">Source: {source}</p>}
+        </figure>
+      </>
     );
   }
 

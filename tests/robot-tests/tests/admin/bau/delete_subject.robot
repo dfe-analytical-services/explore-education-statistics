@@ -11,7 +11,7 @@ Test Setup          fail test fast if required
 
 
 *** Variables ***
-${PUBLICATION_NAME}     UI tests - delete subject %{RUN_IDENTIFIER}
+${PUBLICATION_NAME}     Delete subject %{RUN_IDENTIFIER}
 
 
 *** Test Cases ***
@@ -157,8 +157,8 @@ Delete UI test subject
     user waits until data upload is completed    UI test subject
     user clicks button    Delete files
 
-    user waits until h2 is visible    Confirm deletion of selected data files    %{WAIT_SMALL}
-    user checks page contains    4 footnotes will be removed or updated.
+    user waits until modal is visible    Confirm deletion of selected data files    wait=%{WAIT_LONG}
+    user waits until page contains    4 footnotes will be removed or updated.
     user checks page contains    The following data blocks will also be deleted:
     user checks page contains    UI test table name
     user checks page contains    The following infographic files will also be removed:

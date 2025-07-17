@@ -1,20 +1,24 @@
-trigger: none
+trigger:
+  branches:
+    include:
+      - master
+      - dev
+      - test
+  paths:
+    include:
+      - infrastructure/templates/common/**
+      - infrastructure/templates/search/**
+
+pr: none
 
 parameters:
-  - name: deployAlerts
-    displayName: Do the Azure Monitor alerts need creating or updating?
+  - name: deploySearchConfig
+    displayName: Create/update the Azure AI Search configuration after deployment?
     type: string
     values:
       - Yes
       - No
-    default: No
-  - name: deploySearchService
-    displayName: Does the Search Service need creating or updating?
-    type: string
-    values:
-      - Yes
-      - No
-    default: No
+    default: Yes
   - name: forceDeployToEnvironment
     displayName: Set to either dev, test or preprod to force a deploy to that environment from the chosen branch.
     type: string
@@ -27,16 +31,16 @@ parameters:
 
 resources:
   pipelines:
-    - pipeline: MainBuild
-      source: Explore Education Statistics
+    - pipeline: SearchBuild
+      source: EES - Search - Build
       trigger:
         branches:
+          - master
           - dev
           - test
-          - master
 
 variables:
-  - group: Search Infrastructure - Common
+  - group: Common
   - name: forceDeployToEnvironment
     value: ${{parameters.forceDeployToEnvironment}}
   - name: isDev
@@ -49,10 +53,8 @@ variables:
     value: $[eq(variables['Build.SourceBranch'], 'refs/heads/master')]
   - name: vmImageName
     value: ubuntu-latest
-  - name: deployAlerts
-    value: ${{ iif(eq(parameters.deployAlerts, 'Yes'), true, false) }}
-  - name: deploySearchService
-    value: ${{ iif(eq(parameters.deploySearchService, 'Yes'), true, false) }}
+  - name: deploySearchConfig
+    value: ${{ iif(eq(parameters.deploySearchConfig, 'Yes'), true, false) }}
 
 pool:
   vmImage: $(vmImageName)
@@ -81,3 +83,12 @@ stages:
       environment: Pre-Prod
       serviceConnection: $(serviceConnectionPreProd)
       bicepParamFile: preprod
+
+  - template: stages/deploy.yml
+    parameters:
+      stageName: DeployProd
+      condition: and(succeeded(), eq(variables.isMaster, true))
+      dependsOn: DeployPreProd
+      environment: Prod
+      serviceConnection: $(serviceConnectionProd)
+      bicepParamFile: prod

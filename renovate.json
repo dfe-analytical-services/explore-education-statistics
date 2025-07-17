@@ -48,6 +48,26 @@
       "schedule": ["every 3 months"]
     },
     {
+      "description": "Exclude AspectInjector to pin it to version 2.8.1 for macOS compatibility",
+      "matchDatasources": ["nuget"],
+      "matchPackageNames": ["AspectInjector"],
+      "enabled": false
+    },
+    {
+      "description": "Exclude packages which need their major versions to be in sync with the .NET version or the EF Core version",
+      "matchDatasources": ["nuget"],
+      "matchPackagePrefixes": [
+        "Microsoft.AspNetCore",
+        "Microsoft.EntityFrameworkCore",
+        "Microsoft.Extensions",
+        "Moq.EntityFrameworkCore",
+        "Npgsql.EntityFrameworkCore.PostgreSQL",
+        "Thinktecture.EntityFrameworkCore"
+      ],
+      "matchUpdateTypes": ["major"],
+      "enabled": false
+    },
+    {
       "matchDatasources": ["pypi"],
       "groupName": "Python dependencies",
       "enabled": false
@@ -71,6 +91,10 @@
       "matchDatasources": ["ruby-version"],
       "groupName": "Ruby version",
       "enabled": false
+    },
+    {
+      "matchDatasources": ["rubygems"],
+      "groupName": "Ruby dependencies"
     },
     {
       "matchDatasources": ["azure-bicep-resource"],

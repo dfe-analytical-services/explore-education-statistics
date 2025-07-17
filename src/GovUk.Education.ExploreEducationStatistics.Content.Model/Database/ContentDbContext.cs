@@ -14,6 +14,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Text.Json;
 
 // ReSharper disable StringLiteralTypo
 namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
@@ -65,6 +66,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
         public virtual DbSet<DataBlock> DataBlocks { get; set; }
         public virtual DbSet<DataBlockParent> DataBlockParents { get; set; }
         public virtual DbSet<DataBlockVersion> DataBlockVersions { get; set; }
+        public virtual DbSet<DataSetUpload> DataSetUploads { get; set; }
         public virtual DbSet<DataImport> DataImports { get; set; }
         public virtual DbSet<DataImportError> DataImportErrors { get; set; }
         public virtual DbSet<HtmlBlock> HtmlBlocks { get; set; }
@@ -73,6 +75,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
         public virtual DbSet<EmbedBlockLink> EmbedBlockLinks { get; set; }
         public virtual DbSet<FeaturedTable> FeaturedTables { get; set; }
         public virtual DbSet<MethodologyNote> MethodologyNotes { get; set; }
+        public virtual DbSet<Organisation> Organisations { get; set; } = null!;
         public virtual DbSet<Permalink> Permalinks { get; set; } = null!;
         public virtual DbSet<Contact> Contacts { get; set; }
         public virtual DbSet<Update> Update { get; set; }
@@ -86,7 +89,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
         public virtual DbSet<Comment> Comment { get; set; }
         public virtual DbSet<UserReleaseInvite> UserReleaseInvites { get; set; }
         public virtual DbSet<UserPublicationInvite> UserPublicationInvites { get; set; }
-        public virtual DbSet<Feedback> Feedback { get; set; }
+        public virtual DbSet<PageFeedback> PageFeedback { get; set; }
+        public virtual DbSet<ReleasePublishingFeedback> ReleasePublishingFeedback { get; set; }
 
         [DbFunction]
         public virtual IQueryable<FreeTextRank> PublicationsFreeTextTable(string searchTerm) =>
@@ -99,6 +103,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             ConfigureComment(modelBuilder);
+            ConfigureDataSetUpload(modelBuilder);
             ConfigureDataImport(modelBuilder);
             ConfigureDataImportError(modelBuilder);
             ConfigureMethodology(modelBuilder);
@@ -133,7 +138,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
             ConfigureKeyStatisticsText(modelBuilder);
             ConfigureDataBlockParent(modelBuilder);
             ConfigureDataBlockVersion(modelBuilder);
-            ConfigureFeedback(modelBuilder);
+            ConfigurePageFeedback(modelBuilder);
+            ConfigureReleasePublishingFeedback(modelBuilder);
 
             // Apply model configuration for types which implement IEntityTypeConfiguration
             modelBuilder.ApplyConfigurationsFromAssembly(typeof(ContentDbContext).Assembly);
@@ -153,6 +159,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 .HasConversion(
                     v => v,
                     v => v.HasValue ? DateTime.SpecifyKind(v.Value, DateTimeKind.Utc) : null);
+        }
+
+        private static void ConfigureDataSetUpload(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<DataSetUpload>()
+                .Property(upload => upload.ScreenerResult)
+                .HasConversion(
+                    r => System.Text.Json.JsonSerializer.Serialize(r, (JsonSerializerOptions)null),
+                    r => System.Text.Json.JsonSerializer.Deserialize<DataSetScreenerResponse>(r, (JsonSerializerOptions)null));
         }
 
         private static void ConfigureDataImport(ModelBuilder modelBuilder)
@@ -551,6 +566,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     v => v.HasValue ? DateTime.SpecifyKind(v.Value, DateTimeKind.Utc) : null);
 
             modelBuilder.Entity<ReleaseVersion>()
+                .HasMany(rv => rv.PublishingOrganisations)
+                .WithMany()
+                .UsingEntity("ReleaseVersionPublishingOrganisations",
+                    rv =>
+                        rv.HasOne(typeof(Organisation))
+                            .WithMany()
+                            .HasForeignKey("OrganisationId"),
+                    o => o.HasOne(typeof(ReleaseVersion))
+                        .WithMany()
+                        .HasForeignKey("ReleaseVersionId"));
+
+            modelBuilder.Entity<ReleaseVersion>()
                 .HasQueryFilter(rv => !rv.SoftDeleted);
 
             modelBuilder.Entity<ReleaseVersion>()
@@ -678,22 +705,31 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
         private static void ConfigureUserPublicationRole(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<UserPublicationRole>()
-                .Property(r => r.Created)
+                .Property(upr => upr.Created)
                 .HasConversion(
                     v => v,
                     v => v.HasValue ? DateTime.SpecifyKind(v.Value, DateTimeKind.Utc) : null);
 
             modelBuilder.Entity<UserPublicationRole>()
-                .HasOne(r => r.CreatedBy)
+                .HasOne(upr => upr.CreatedBy)
                 .WithMany()
                 .OnDelete(DeleteBehavior.NoAction);
 
             modelBuilder.Entity<UserPublicationRole>()
-                .Property(r => r.Role)
+                .Property(upr => upr.Role)
                 .HasConversion(new EnumToStringConverter<PublicationRole>());
 
+            // This will be changed when we start introducing the use of the NEW publication roles in the 
+            // UI, in STEP 9 (EES-6196) of the Permissions Rework. For now, we want to
+            // filter out any usage of the NEW roles.
+            var unusedRoles = new[]
+            {
+                PublicationRole.Approver,
+                PublicationRole.Drafter
+            };
+
             modelBuilder.Entity<UserPublicationRole>()
-                .HasQueryFilter(p => p.Deleted == null);
+                .HasQueryFilter(upr => upr.Deleted == null && !unusedRoles.Contains(upr.Role));
         }
 
         private static void ConfigureUserReleaseRole(ModelBuilder modelBuilder)
@@ -835,34 +871,82 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 .ToTable("KeyStatisticsText");
         }
 
-        private static void ConfigureFeedback(ModelBuilder modelBuilder)
+        private static void ConfigurePageFeedback(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<Feedback>()
+            modelBuilder.Entity<PageFeedback>()
                 .Property(feedback => feedback.Url)
                 .IsRequired()
                 .HasMaxLength(2000);
 
-            modelBuilder.Entity<Feedback>()
+            modelBuilder.Entity<PageFeedback>()
                 .Property(feedback => feedback.UserAgent)
                 .HasMaxLength(250);
 
-            modelBuilder.Entity<Feedback>()
+            modelBuilder.Entity<PageFeedback>()
                 .Property(feedback => feedback.Context)
                 .HasMaxLength(2000);
 
-            modelBuilder.Entity<Feedback>()
+            modelBuilder.Entity<PageFeedback>()
                 .Property(feedback => feedback.Issue)
                 .HasMaxLength(2000);
 
-            modelBuilder.Entity<Feedback>()
+            modelBuilder.Entity<PageFeedback>()
                 .Property(feedback => feedback.Intent)
                 .HasMaxLength(2000);
 
-            modelBuilder.Entity<Feedback>()
+            modelBuilder.Entity<PageFeedback>()
                 .Property(feedback => feedback.Response)
-                .HasConversion(new EnumToStringConverter<FeedbackResponse>())
+                .HasConversion(new EnumToStringConverter<PageFeedbackResponse>())
                 .IsRequired()
                 .HasMaxLength(50);
+        }
+        
+        private static void ConfigureReleasePublishingFeedback(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<ReleasePublishingFeedback>()
+                .HasOne(rf => rf.ReleaseVersion)
+                .WithMany()
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<ReleasePublishingFeedback>()
+                .Property(feedback => feedback.EmailToken)
+                .IsRequired()
+                .HasMaxLength(55);
+            
+            modelBuilder.Entity<ReleasePublishingFeedback>()
+                .Property(feedback => feedback.UserPublicationRole)
+                .HasConversion(new EnumToStringConverter<PublicationRole>())
+                .IsRequired();
+            
+            modelBuilder.Entity<ReleasePublishingFeedback>()
+                .Property(feedback => feedback.Response)
+                .HasConversion(new EnumToStringConverter<ReleasePublishingFeedbackResponse>())
+                .HasMaxLength(50);
+
+            modelBuilder.Entity<ReleasePublishingFeedback>()
+                .Property(feedback => feedback.EmailToken)
+                .IsRequired()
+                .HasMaxLength(55);
+            
+            modelBuilder.Entity<ReleasePublishingFeedback>()
+                .HasIndex(feedback => feedback.EmailToken)
+                .IsUnique();
+            
+            modelBuilder.Entity<ReleasePublishingFeedback>()
+                .Property(feedback => feedback.Created)
+                .HasConversion(
+                    v => v,
+                    v => DateTime.SpecifyKind(v, DateTimeKind.Utc));
+
+            modelBuilder.Entity<ReleasePublishingFeedback>()
+                .Property(feedback => feedback.FeedbackReceived)
+                .HasConversion(
+                    v => v,
+                    v => v.HasValue ? DateTime.SpecifyKind(v.Value, DateTimeKind.Utc) : null);
+            
+            modelBuilder.Entity<ReleasePublishingFeedback>()
+                .Property(feedback => feedback.AdditionalFeedback)
+                .HasMaxLength(2000);
         }
     }
 

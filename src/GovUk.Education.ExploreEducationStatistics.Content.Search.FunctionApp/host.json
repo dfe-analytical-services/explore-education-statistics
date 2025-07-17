@@ -4,13 +4,9 @@
     "applicationInsights": {
       "samplingSettings": {
         "isEnabled": true,
-        "excludedTypes": "Request;Exception"
+        "excludedTypes": "Request;Exception;Trace"
       },
       "enableLiveMetricsFilters": true
-    },
-    "logLevel": {
-      "default": "Error",
-      "Function": "Information"
     }
   },
   "extensions": {

@@ -1,0 +1,46 @@
+parameters:
+  - name: serviceConnection
+    type: string
+  - name: environment
+    type: string
+  - name: bicepParamFile
+    type: string
+
+jobs:
+  - deployment: DeployScreenerInfrastructure
+    displayName: Deploy screener infrastructure
+    environment: ${{ parameters.environment }}
+    variables:
+      templateDirectory: $(Build.SourcesDirectory)/infrastructure/templates/screener
+      templateFile: $(templateDirectory)/main.bicep
+      paramDirectory: $(templateDirectory)/parameters
+      paramFile: $(paramDirectory)/main-${{ parameters.bicepParamFile }}.bicepparam
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+            - checkout: self
+
+            - script: az upgrade --yes
+              displayName: Upgrade Azure CLI and extensions
+
+            - template: ../tasks/deploy-bicep.yml
+              parameters:
+                displayName: Validate Bicep template
+                action: validate
+                serviceConnection: ${{ parameters.serviceConnection }}
+                parameterFile: $(paramFile)
+
+            - template: ../../../public-api/ci/tasks/check-function-app-exists.yml
+              parameters:
+                serviceConnection: ${{ parameters.serviceConnection }}
+                resourceGroupName: $(resourceGroupName)
+                functionAppName: $(screenerFunctionAppName)
+                variableName: screenerFunctionAppExists
+
+            - template: ../tasks/deploy-bicep.yml
+              parameters:
+                displayName: Deploy Bicep template
+                action: create
+                serviceConnection: ${{ parameters.serviceConnection }}
+                parameterFile: $(paramFile)

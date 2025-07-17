@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -10,231 +11,224 @@ using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 
-namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Cache
+namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Cache;
+
+[Collection(CacheTestFixture.CollectionName)]
+public class BlobCacheAttributeTests : IClassFixture<CacheTestFixture>, IDisposable
 {
-    [Collection(CacheTestFixture.CollectionName)]
-    public class BlobCacheAttributeTests : IClassFixture<CacheTestFixture>, IDisposable
+    private readonly Mock<IBlobCacheService> _blobCacheService = new(MockBehavior.Strict);
+
+    public BlobCacheAttributeTests()
     {
-        private readonly Mock<IBlobCacheService> _blobCacheService = new(MockBehavior.Strict);
+        BlobCacheAttribute.AddService("default", _blobCacheService.Object);
+    }
 
-        public BlobCacheAttributeTests()
+    public void Dispose()
+    {
+        BlobCacheAttribute.ClearServices();
+
+        _blobCacheService.Reset();
+    }
+
+    private record TestValue
+    {
+        // ReSharper disable once UnusedMember.Local
+        public Guid Value => Guid.NewGuid();
+    }
+
+    private record TestBlobCacheKey(string Key) : IBlobCacheKey
+    {
+        public IBlobContainer Container => BlobContainers.PublicContent;
+    }
+
+    // ReSharper disable UnusedParameter.Local
+    private static class TestMethods
+    {
+        [BlobCache(typeof(TestBlobCacheKey))]
+        public static Task<TestValue> SingleParamAsync(string _)
         {
-            BlobCacheAttribute.AddService("default", _blobCacheService.Object);
+            return Task.FromResult<TestValue>(new());
         }
 
-        public void Dispose()
+        [BlobCache(typeof(TestBlobCacheKey), ServiceName = "target")]
+        public static Task<TestValue> SpecificCacheServiceAsync(string _)
         {
-            BlobCacheAttribute.ClearServices();
-
-            _blobCacheService.Reset();
+            return Task.FromResult<TestValue>(new());
         }
 
-        private record TestValue
+        [BlobCache(null!)]
+        public static Task<TestValue> NullKeyTypeAsync()
         {
-            public Guid Value => Guid.NewGuid();
+            return Task.FromResult<TestValue>(new());
         }
 
-        private record TestBlobCacheKey : IBlobCacheKey
+        [BlobCache(typeof(object))]
+        public static Task<TestValue> InvalidKeyTypeAsync()
         {
-            public IBlobContainer Container => BlobContainers.PublicContent;
-
-            public string Key { get; }
-
-            public TestBlobCacheKey(string key)
-            {
-                Key = key;
-            }
+            return Task.FromResult<TestValue>(new());
         }
 
-        // ReSharper disable UnusedParameter.Local
-        private static class TestMethods
+        [BlobCache(typeof(TestBlobCacheKey))]
+        public static TestValue SingleParam(string _)
         {
-            [BlobCache(typeof(TestBlobCacheKey))]
-            public static async Task<TestValue> SingleParamAsync(string param1)
-            {
-                return new();
-            }
-
-            [BlobCache(typeof(TestBlobCacheKey), ServiceName = "target")]
-            public static async Task<TestValue> SpecificCacheServiceAsync(string param1)
-            {
-                return new();
-            }
-
-            [BlobCache(null!)]
-            public static async Task<TestValue> NullKeyTypeAsync()
-            {
-                return new();
-            }
-
-            [BlobCache(typeof(object))]
-            public static async Task<TestValue> InvalidKeyTypeAsync()
-            {
-                return new();
-            }
-
-            [BlobCache(typeof(TestBlobCacheKey))]
-            public static TestValue SingleParam(string param1)
-            {
-                return new();
-            }
-
-        }
-        // ReSharper enable UnusedParameter.Local
-
-        [Fact]
-        public void CacheHit()
-        {
-            var cacheKey = new TestBlobCacheKey("test");
-            var expectedResult = new TestValue();
-
-            _blobCacheService
-                .Setup(s => s.GetItem(cacheKey, typeof(TestValue)))
-                .Returns(expectedResult);
-
-            var result = TestMethods.SingleParam("test");
-
-            Assert.IsType<TestValue>(result);
-            Assert.Equal(expectedResult, result);
-
-            _blobCacheService.Verify(
-                s => s.GetItem(cacheKey, typeof(TestValue)),
-                Times.Once);
+            return new();
         }
 
-        [Fact]
-        public async Task CacheHitAsync()
-        {
-            var cacheKey = new TestBlobCacheKey("test");
-            var expectedResult = new TestValue();
+    }
+    // ReSharper enable UnusedParameter.Local
 
-            _blobCacheService
-                .Setup(s => s.GetItemAsync(cacheKey, typeof(TestValue)))
-                .ReturnsAsync(expectedResult);
+    [Fact]
+    public void CacheHit()
+    {
+        var cacheKey = new TestBlobCacheKey("test");
+        var expectedResult = new TestValue();
 
-            var result = await TestMethods.SingleParamAsync("test");
+        _blobCacheService
+            .Setup(s => s.GetItem(cacheKey, typeof(TestValue)))
+            .Returns(expectedResult);
 
-            Assert.IsType<TestValue>(result);
-            Assert.Equal(expectedResult, result);
+        var result = TestMethods.SingleParam("test");
 
-            _blobCacheService.Verify(
-                s => s.GetItemAsync(cacheKey, typeof(TestValue)), 
-                Times.Once);
-        }
+        Assert.IsType<TestValue>(result);
+        Assert.Equal(expectedResult, result);
 
-        [Fact]
-        public void CacheMiss()
-        {
-            var cacheKey = new TestBlobCacheKey("test");
+        _blobCacheService.Verify(
+            s => s.GetItem(cacheKey, typeof(TestValue)),
+            Times.Once);
+    }
 
-            _blobCacheService
-                .Setup(s => s.GetItem(cacheKey, typeof(TestValue)))
-                .Returns(null);
+    [Fact]
+    public async Task CacheHitAsync()
+    {
+        var cacheKey = new TestBlobCacheKey("test");
+        var expectedResult = new TestValue();
 
-            var args = new List<object>();
+        _blobCacheService
+            .Setup(s => s.GetItemAsync(cacheKey, typeof(TestValue)))
+            .ReturnsAsync(expectedResult);
 
-            _blobCacheService
-                .Setup(s => s.SetItem(cacheKey, Capture.In(args)));
+        var result = await TestMethods.SingleParamAsync("test");
 
-            var result = TestMethods.SingleParam("test");;
+        Assert.IsType<TestValue>(result);
+        Assert.Equal(expectedResult, result);
 
-            Assert.IsType<TestValue>(result);
-            Assert.Equal(args[0], result);
+        _blobCacheService.Verify(
+            s => s.GetItemAsync(cacheKey, typeof(TestValue)), 
+            Times.Once);
+    }
 
-            _blobCacheService.Verify(
-                s => s.GetItem(cacheKey, typeof(TestValue)),
-                Times.Once);
+    [Fact]
+    public void CacheMiss()
+    {
+        var cacheKey = new TestBlobCacheKey("test");
 
-            _blobCacheService.Verify(
-                s => s.SetItem(cacheKey, Capture.In(args)),
-                Times.Once);
-        }
+        _blobCacheService
+            .Setup(s => s.GetItem(cacheKey, typeof(TestValue)))
+            .Returns((object?)null);
 
-        [Fact]
-        public async Task CacheMissAsync()
-        {
-            var cacheKey = new TestBlobCacheKey("test");
+        var args = new List<object>();
 
-            _blobCacheService
-                .Setup(s => s.GetItemAsync(cacheKey, typeof(TestValue)))
-                .ReturnsAsync(null);
+        _blobCacheService
+            .Setup(s => s.SetItem(cacheKey, Capture.In(args)));
 
-            var args = new List<object>();
+        var result = TestMethods.SingleParam("test");
 
-            _blobCacheService
-                .Setup(s => s.SetItemAsync(cacheKey, Capture.In(args)))
-                .Returns(Task.CompletedTask);
+        Assert.IsType<TestValue>(result);
+        Assert.Equal(args[0], result);
 
-            var result = await TestMethods.SingleParamAsync("test");
+        _blobCacheService.Verify(
+            s => s.GetItem(cacheKey, typeof(TestValue)),
+            Times.Once);
 
-            Assert.IsType<TestValue>(result);
-            Assert.Equal(args[0], result);
+        _blobCacheService.Verify(
+            s => s.SetItem(cacheKey, Capture.In(args)),
+            Times.Once);
+    }
 
-            _blobCacheService.Verify(
-                s => s.GetItemAsync(cacheKey, typeof(TestValue)), 
-                Times.Once);
+    [Fact]
+    public async Task CacheMissAsync()
+    {
+        var cacheKey = new TestBlobCacheKey("test");
 
-            _blobCacheService.Verify(
-                s => s.SetItemAsync(cacheKey, Capture.In(args)), 
-                Times.Once);
-        }
+        _blobCacheService
+            .Setup(s => s.GetItemAsync(cacheKey, typeof(TestValue)))
+            .ReturnsAsync((object?)null);
 
-        [Fact]
-        public async Task SpecificCacheService()
-        {
-            var targetBlobCacheService = new Mock<IBlobCacheService>(MockBehavior.Strict);
+        var args = new List<object>();
 
-            BlobCacheAttribute.AddService("target", targetBlobCacheService.Object);
+        _blobCacheService
+            .Setup(s => s.SetItemAsync(cacheKey, Capture.In(args)))
+            .Returns(Task.CompletedTask);
 
-            var cacheKey = new TestBlobCacheKey("test");
+        var result = await TestMethods.SingleParamAsync("test");
 
-            targetBlobCacheService
-                .Setup(s => s.GetItemAsync(cacheKey, typeof(TestValue)))
-                .ReturnsAsync(null);
+        Assert.IsType<TestValue>(result);
+        Assert.Equal(args[0], result);
 
-            var args = new List<object>();
+        _blobCacheService.Verify(
+            s => s.GetItemAsync(cacheKey, typeof(TestValue)), 
+            Times.Once);
 
-            targetBlobCacheService
-                .Setup(s => s.SetItemAsync(cacheKey, Capture.In(args)))
-                .Returns(Task.CompletedTask);
+        _blobCacheService.Verify(
+            s => s.SetItemAsync(cacheKey, Capture.In(args)), 
+            Times.Once);
+    }
 
-            var result = await TestMethods.SpecificCacheServiceAsync("test");
+    [Fact]
+    public async Task SpecificCacheService()
+    {
+        var targetBlobCacheService = new Mock<IBlobCacheService>(MockBehavior.Strict);
 
-            VerifyAllMocks(_blobCacheService, targetBlobCacheService);
+        BlobCacheAttribute.AddService("target", targetBlobCacheService.Object);
 
-            Assert.IsType<TestValue>(result);
-            Assert.Equal(args[0], result);
-        }
+        var cacheKey = new TestBlobCacheKey("test");
 
-        [Fact]
-        public async Task NoCacheService()
-        {
-            BlobCacheAttribute.ClearServices();
+        targetBlobCacheService
+            .Setup(s => s.GetItemAsync(cacheKey, typeof(TestValue)))
+            .ReturnsAsync((object?)null);
 
-            var result = await TestMethods.SingleParamAsync("test");
+        var args = new List<object>();
 
-            VerifyAllMocks(_blobCacheService);
+        targetBlobCacheService
+            .Setup(s => s.SetItemAsync(cacheKey, Capture.In(args)))
+            .Returns(Task.CompletedTask);
 
-            Assert.IsType<TestValue>(result);
-        }
+        var result = await TestMethods.SpecificCacheServiceAsync("test");
 
-        [Fact]
-        public async Task NullCacheKeyType()
-        {
-            var exception = await Assert.ThrowsAsync<ArgumentException>(TestMethods.NullKeyTypeAsync);
+        VerifyAllMocks(_blobCacheService, targetBlobCacheService);
 
-            Assert.Equal($"Cache key type cannot be null", exception.Message);
-        }
+        Assert.IsType<TestValue>(result);
+        Assert.Equal(args[0], result);
+    }
 
-        [Fact]
-        public async Task InvalidKeyType()
-        {
-            var exception = await Assert.ThrowsAsync<ArgumentException>(TestMethods.InvalidKeyTypeAsync);
+    [Fact]
+    public async Task NoCacheService()
+    {
+        BlobCacheAttribute.ClearServices();
 
-            Assert.Equal(
-                $"Cache key type {typeof(object).FullName} must be assignable to {typeof(IBlobCacheKey).GetPrettyFullName()}",
-                exception.Message
-            );
-        }
+        var result = await TestMethods.SingleParamAsync("test");
+
+        VerifyAllMocks(_blobCacheService);
+
+        Assert.IsType<TestValue>(result);
+    }
+
+    [Fact]
+    public async Task NullCacheKeyType()
+    {
+        var exception = await Assert.ThrowsAsync<ArgumentException>(TestMethods.NullKeyTypeAsync);
+
+        Assert.Equal($"Cache key type cannot be null", exception.Message);
+    }
+
+    [Fact]
+    public async Task InvalidKeyType()
+    {
+        var exception = await Assert.ThrowsAsync<ArgumentException>(TestMethods.InvalidKeyTypeAsync);
+
+        Assert.Equal(
+            $"Cache key type {typeof(object).FullName} must be assignable to {typeof(IBlobCacheKey).GetPrettyFullName()}",
+            exception.Message
+        );
     }
 }

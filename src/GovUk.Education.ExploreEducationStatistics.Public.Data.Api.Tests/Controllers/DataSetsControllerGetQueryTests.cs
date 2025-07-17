@@ -1,12 +1,12 @@
-using System.Text.Json;
+using GovUk.Education.ExploreEducationStatistics.Analytics.Common.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Requests;
-using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Analytics;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Fixture;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Resources.DataFiles.AbsenceSchool;
@@ -23,11 +23,12 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.Services.Tests;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Primitives;
+using Moq;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Controllers;
 
-public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory testApp) : IntegrationTestFixture(testApp)
+public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory testApp) : IntegrationTestFixtureWithCommonTestDataSetup(testApp)
 {
     private const string BaseUrl = "v1/data-sets";
 
@@ -101,6 +102,45 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
             );
 
             response.AssertNotFound();
+        }
+        
+        [Theory]
+        [MemberData(nameof(DataSetVersionStatusQueryTheoryData.NonPublishedStatus),
+            MemberType = typeof(DataSetVersionStatusQueryTheoryData))]
+        public async Task WildCardSpecified_RequestsNonPublishedVersion_Returns404(DataSetVersionStatus versionStatus)
+        {
+            var (dataSet, versions) = await SetupDataSetWithSpecifiedVersionStatuses(versionStatus);
+            
+            var response = await QueryDataSet(
+                dataSetId: dataSet.Id,
+                dataSetVersion: "2.*",
+                previewTokenId: versions.Last().PreviewTokens[0].Id,
+                indicators: [AbsenceSchoolData.IndicatorSessAuthorised]);
+
+            response.AssertNotFound();
+        }
+        
+        [Fact]
+        public async Task WildCardSpecified_RequestsPublishedVersion_Returns200()
+        {
+            var (dataSet, versions) = await SetupDataSetWithSpecifiedVersionStatuses(DataSetVersionStatus.Published);
+            
+            var response = await QueryDataSet(
+                dataSetId: dataSet.Id,
+                dataSetVersion: "2.*",
+                previewTokenId: versions.Last().PreviewTokens[0].Id,
+                indicators: [AbsenceSchoolData.IndicatorSessAuthorised]);
+
+            response.AssertOk();
+            
+            var viewModel = response.AssertOk<DataSetQueryPaginatedResultsViewModel>(useSystemJson: true);
+            Assert.Equal(1, viewModel.Paging.Page);
+            Assert.Equal(1, viewModel.Paging.TotalPages);
+            Assert.Equal(216, viewModel.Paging.TotalResults);
+
+            Assert.Empty(viewModel.Warnings);
+
+            Assert.Equal(216, viewModel.Results.Count);
         }
     }
 
@@ -274,22 +314,6 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
 
             validationProblem.AssertHasMaximumLengthError("indicators[0]", maxLength: 40);
             validationProblem.AssertHasMaximumLengthError("indicators[1]", maxLength: 40);
-        }
-
-        [Fact]
-        public async Task MissingParam_Returns400()
-        {
-            var dataSetVersion = await SetupDefaultDataSetVersion();
-
-            var client = BuildApp().CreateClient();
-
-            var response = await client.GetAsync($"{BaseUrl}/{dataSetVersion.DataSetId}/query");
-
-            var validationProblem = response.AssertValidationProblem();
-
-            Assert.Single(validationProblem.Errors);
-
-            validationProblem.AssertHasRequiredValueError("indicators");
         }
 
         [Fact]
@@ -1935,14 +1959,17 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
             Assert.Equal(0.241600007f, sessUnauthorisedPercent.Min());
         }
 
-        [Fact]
-        public async Task AllIndicators_Returns200_CorrectResultIds()
+        [Theory]
+        [InlineData(false)]
+        [InlineData(true)]
+        public async Task AllIndicators_Returns200_CorrectResultIds(bool includeIndicatorsQueryParam)
         {
             var dataSetVersion = await SetupDefaultDataSetVersion();
 
             var response = await QueryDataSet(
                 dataSetId: dataSetVersion.DataSetId,
-                indicators:
+                indicators: includeIndicatorsQueryParam
+                    ?
                 [
                     AbsenceSchoolData.IndicatorEnrolments,
                     AbsenceSchoolData.IndicatorSessAuthorised,
@@ -1950,6 +1977,7 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
                     AbsenceSchoolData.IndicatorSessUnauthorised,
                     AbsenceSchoolData.IndicatorSessUnauthorisedPercent,
                 ]
+                    : null
             );
 
             var viewModel = response.AssertOk<DataSetQueryPaginatedResultsViewModel>(useSystemJson: true);
@@ -2045,21 +2073,25 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
             Assert.Contains(AbsenceSchoolData.IndicatorSessUnauthorisedPercent, meta.Indicators);
         }
 
-        [Fact]
-        public async Task AllIndicators_Returns200_CorrectDebuggedResultLabels()
+        [Theory]
+        [InlineData(false)]
+        [InlineData(true)]
+        public async Task AllIndicators_Returns200_CorrectDebuggedResultLabels(bool includeIndicatorsQueryParam)
         {
             var dataSetVersion = await SetupDefaultDataSetVersion();
 
             var response = await QueryDataSet(
                 dataSetId: dataSetVersion.DataSetId,
-                indicators:
+                indicators: includeIndicatorsQueryParam
+                    ? 
                 [
                     AbsenceSchoolData.IndicatorEnrolments,
                     AbsenceSchoolData.IndicatorSessAuthorised,
                     AbsenceSchoolData.IndicatorSessPossible,
                     AbsenceSchoolData.IndicatorSessUnauthorised,
                     AbsenceSchoolData.IndicatorSessUnauthorisedPercent,
-                ],
+                ]
+                    : null,
                 debug: true
             );
 
@@ -2857,23 +2889,6 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
             // There are 4 results for the query above, but we are requesting page 2 and a page size of 3,
             // and so this 2nd page only displays the final single result of the 4.
             Assert.Single(viewModel.Results);
-            
-            // Add a slight delay as the writing of the query details for analytics is non-blocking
-            // and could occur slightly after the query result is returned to the user.
-            Thread.Sleep(2000);
-
-            var publicApiQueriesPath = _analyticsPathResolver.PublicApiQueriesDirectoryPath();
-            
-            // Expect the successful query to have recorded its query for analytics.
-            Assert.True(Directory.Exists(publicApiQueriesPath));
-            var queryFiles = Directory.GetFiles(publicApiQueriesPath);
-            var queryFile = Assert.Single(queryFiles);
-            var contents = await File.ReadAllTextAsync(queryFile);
-            var capturedQuery = JsonSerializer.Deserialize<CaptureDataSetVersionQueryRequest>(contents, new JsonSerializerOptions
-            {
-                PropertyNameCaseInsensitive = true
-            });
-            Assert.NotNull(capturedQuery);
 
             var expectedRequest = new DataSetQueryRequest
             {
@@ -2914,19 +2929,15 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
                 }),
                 Debug = true
             };
-
-            capturedQuery.Query.AssertDeepEqualTo(expectedRequest);
-
-            Assert.Equal(capturedQuery.DataSetId, dataSetVersion.DataSetId);
-            Assert.Equal(capturedQuery.DataSetVersionId, dataSetVersion.Id);
-            Assert.Equal(1, capturedQuery.ResultsCount);
-            Assert.Equal(4, capturedQuery.TotalRowsCount);
-
-            capturedQuery.StartTime.AssertUtcNow(withinMillis: 5000);
-            capturedQuery.EndTime.AssertUtcNow(withinMillis: 5000);
-            Assert.True(capturedQuery.EndTime > capturedQuery.StartTime);
+            
+            await AnalyticsTestAssertions.AssertDataSetVersionQueryAnalyticsCaptured(
+                dataSetVersion: dataSetVersion,
+                expectedAnalyticsPath: _analyticsPathResolver.PublicApiQueriesDirectoryPath(),
+                expectedRequest: expectedRequest,
+                expectedResultsCount: 1,
+                expectedTotalRows: 4);
         }
-        
+
         [Fact]
         public async Task UnsuccessfulQuery_NotCapturedByAnalytics()
         {
@@ -2943,12 +2954,94 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
 
             response.AssertBadRequest();
             
-            // Add a slight delay as the writing of the query details for analytics is non-blocking
-            // and could occur slightly after the query result is returned to the user.
-            Thread.Sleep(2000);
-
             // Check that the folder for capturing queries for analytics was never created.
-            Assert.False(Directory.Exists(_analyticsPathResolver.PublicApiQueriesDirectoryPath()));
+            AnalyticsTestAssertions.AssertAnalyticsCallNotCaptured(
+                _analyticsPathResolver.PublicApiQueriesDirectoryPath());
+        }
+
+        [Fact]
+        public async Task RequestFromEes_NotCapturedByAnalytics()
+        {
+            var dataSetVersion = await SetupDefaultDataSetVersion();
+
+            var response = await QueryDataSet(
+                dataSetId: dataSetVersion.DataSetId,
+                indicators: [AbsenceSchoolData.IndicatorEnrolments],
+                queryParameters: new Dictionary<string, StringValues>
+                {
+                    { "filters.eq", AbsenceSchoolData.FilterSchoolTypeTotal },
+                    { "geographicLevels.eq", "NAT" },
+                    { "timePeriods.eq", "2020/2021|AY" },
+                    { "locations.eq", $"NAT|id|{AbsenceSchoolData.LocationNatEngland}" }
+                },
+                sorts: ["timePeriod|Asc"],
+                debug: true,
+                page: 2,
+                pageSize: 3,
+                requestSource: "EES");
+
+            var viewModel = response.AssertOk<DataSetQueryPaginatedResultsViewModel>(useSystemJson: true);
+
+            // There are 4 results for the query above, but we are requesting page 2 and a page size of 3,
+            // and so this 2nd page only displays the final single result of the 4.
+            Assert.Single(viewModel.Results);
+            
+            // Expect the successful call to have been omitted from analytics because it originates
+            // from the EES service.
+            AnalyticsTestAssertions.AssertAnalyticsCallNotCaptured(
+                _analyticsPathResolver.PublicApiQueriesDirectoryPath());
+        }
+        
+        [Fact]
+        public async Task ExceptionThrownByQueryAnalyticsManager_SuccessfulResultsStillReturned()
+        {
+            // Set up the manager to throw an exception when the service attempts to add a query to it.
+            var analyticsManagerMock = new Mock<IAnalyticsManager>(MockBehavior.Strict);
+            
+            analyticsManagerMock
+                .Setup(m => m.Read(It.IsAny<CancellationToken>()))
+                .Returns(async () =>
+                {
+                    await Task.Delay(Timeout.Infinite);
+                    return null!;
+                });
+            
+            analyticsManagerMock
+                .Setup(m => m.Add(
+                    It.IsAny<CaptureDataSetVersionQueryRequest>(), 
+                    It.IsAny<CancellationToken>()))
+                .Throws(new Exception("Error"));
+
+            var app = TestApp.ConfigureServices(services => services
+                .ReplaceService<IDataSetVersionPathResolver>(_dataSetVersionPathResolver)
+                .ReplaceService(analyticsManagerMock));
+            
+            var dataSetVersion = await SetupDefaultDataSetVersion();
+
+            var response = await QueryDataSet(
+                app: app,
+                dataSetId: dataSetVersion.DataSetId,
+                indicators: [AbsenceSchoolData.IndicatorEnrolments],
+                queryParameters: new Dictionary<string, StringValues>
+                {
+                    { "filters.eq", AbsenceSchoolData.FilterSchoolTypeTotal },
+                    { "geographicLevels.eq", "NAT" },
+                    { "timePeriods.eq", "2020/2021|AY" },
+                    { "locations.eq", $"NAT|id|{AbsenceSchoolData.LocationNatEngland}" }
+                },
+                sorts: ["timePeriod|Asc"]
+            );
+
+            // Verify that the manager threw the Exception as planned.
+            analyticsManagerMock
+                .Verify(s => s.Add(
+                    It.IsAny<CaptureDataSetVersionQueryRequest>(), 
+                    It.IsAny<CancellationToken>()));
+
+            // Verify that despite the Exception being thrown, the service still returned
+            // the expected successful query.
+            var viewModel = response.AssertOk<DataSetQueryPaginatedResultsViewModel>(useSystemJson: true);
+            Assert.Equal(4, viewModel.Results.Count);
         }
     }
 
@@ -2981,33 +3074,32 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
             // and so this 2nd page only displays the final single result of the 4.
             Assert.Single(viewModel.Results);
             
-            // Add a slight delay as the writing of the query details for analytics is non-blocking
-            // and could occur slightly after the query result is returned to the user.
-            Thread.Sleep(2000);
-
-            var publicApiQueriesPath = _analyticsPathResolver.PublicApiQueriesDirectoryPath();
-            
             // Expect the successful query not to have recorded its query for analytics, as this
             // feature was disabled by appsettings.
-            Assert.False(Directory.Exists(publicApiQueriesPath));
+            AnalyticsTestAssertions.AssertAnalyticsCallNotCaptured(
+                _analyticsPathResolver.PublicApiQueriesDirectoryPath());
         }
     }
         
     private async Task<HttpResponseMessage> QueryDataSet(
         Guid dataSetId,
-        IEnumerable<string> indicators,
+        IEnumerable<string>? indicators,
         string? dataSetVersion = null,
         int? page = null,
         int? pageSize = null,
         IEnumerable<string>? sorts = null,
         bool? debug = null,
         IDictionary<string, StringValues>? queryParameters = null,
-        Guid? previewTokenId = null)
+        Guid? previewTokenId = null,
+        WebApplicationFactory<Startup>? app = null,
+        string? requestSource = null)
     {
-        var query = new Dictionary<string, StringValues>
+        var query = new Dictionary<string, StringValues>();
+
+        if (indicators is not null)
         {
-            { "indicators", indicators.ToArray() }
-        };
+            query["indicators"] = indicators.ToArray();
+        }
 
         if (dataSetVersion is not null)
         {
@@ -3039,8 +3131,10 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
             query.AddRange(queryParameters);
         }
 
-        var client = BuildApp().CreateClient();
-        client.AddPreviewTokenHeader(previewTokenId);
+        var client = (app ?? BuildApp())
+            .CreateClient()
+            .WithPreviewTokenHeader(previewTokenId)
+            .WithRequestSourceHeader(requestSource);
 
         var uri = QueryHelpers.AddQueryString($"{BaseUrl}/{dataSetId}/query", query);
 
@@ -3084,6 +3178,7 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
 
         return dataSetVersion;
     }
+
 
     private WebApplicationFactory<Startup> BuildApp()
     {
@@ -3151,3 +3246,4 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
         public required HashSet<string> Indicators { get; init; } = [];
     }
 }
+

@@ -199,7 +199,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var (userReleaseInvite1, userReleaseInvite2) = _dataFixture.DefaultUserReleaseInvite()
                 .WithReleaseVersion(releaseVersion)
-                .WithRoles([Contributor, Lead])
+                .WithRoles([Contributor, Approver])
                 .GenerateTuple2();
 
             UserReleaseInvite userReleaseInviteIgnored = _dataFixture.DefaultUserReleaseInvite()
@@ -243,7 +243,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var (userReleaseInvite1, userReleaseInvite2) = _dataFixture.DefaultUserReleaseInvite()
                 .WithReleaseVersion(releaseVersion)
-                .WithRoles([Contributor, Lead])
+                .WithRoles([Contributor, Approver])
                 .GenerateTuple2();
 
             UserReleaseInvite userReleaseInviteIgnored = _dataFixture.DefaultUserReleaseInvite()

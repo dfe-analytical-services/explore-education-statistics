@@ -91,32 +91,50 @@ export interface DataBlockReplacementPlan {
   timePeriods?: TimePeriodsReplacement;
 }
 
+export interface MappingStatus {
+  locationsComplete: boolean;
+  locationsHaveMajorChange: boolean;
+  filtersComplete: boolean;
+  filtersHaveMajorChange: boolean;
+  isMajorVersionUpdate: boolean;
+}
+
+export interface ApiDataSetVersionPlan {
+  id: string;
+  dataSetId: string;
+  name: string;
+  version: string;
+  status: string;
+  mappingStatus?: MappingStatus;
+  readyToPublish: boolean;
+  valid: boolean;
+}
+
 export interface DataReplacementPlan {
   originalSubjectId: string;
   replacementSubjectId: string;
   dataBlocks: DataBlockReplacementPlan[];
   footnotes: FootnoteReplacementPlan[];
+  apiDataSetVersionPlan: ApiDataSetVersionPlan;
   valid: boolean;
 }
 
 const dataReplacementService = {
   getReplacementPlan(
     releaseVersionId: string,
-    fileId: string,
-    replacementFileId: string,
+    originalFileId: string,
   ): Promise<DataReplacementPlan> {
     return client.get(
-      `releases/${releaseVersionId}/data/${fileId}/replacement-plan/${replacementFileId}`,
+      `releases/${releaseVersionId}/data/${originalFileId}/replacement-plan`,
     );
   },
   replaceData(
     releaseVersionId: string,
-    fileId: string,
-    replacementFileId: string,
+    originalFileIds: string[],
   ): Promise<void> {
-    return client.post(
-      `releases/${releaseVersionId}/data/${fileId}/replacement/${replacementFileId}`,
-    );
+    return client.post(`releases/${releaseVersionId}/data/replacements`, {
+      originalFileIds,
+    });
   },
 };
 

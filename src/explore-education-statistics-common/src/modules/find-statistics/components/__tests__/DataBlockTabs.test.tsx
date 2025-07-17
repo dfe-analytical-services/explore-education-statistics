@@ -199,9 +199,7 @@ describe('DataBlockTabs', () => {
         'block-1-parent',
       );
 
-      expect(
-        screen.queryByText('Could not load content'),
-      ).not.toBeInTheDocument();
+      expect(screen.queryByText('Could not load content')).toBeInTheDocument();
       expect(screen.queryByRole('table')).not.toBeInTheDocument();
     });
   });
@@ -381,6 +379,48 @@ describe('DataBlockTabs', () => {
       expect(tableBuilderService.getDataBlockGeoJson).toBeCalled();
       expect(tableBuilderService.getDataBlockGeoJson).toBeCalledTimes(1);
     });
+  });
+
+  test('renders chart and table export menus', async () => {
+    tableBuilderService.getDataBlockTableData.mockResolvedValue(
+      testChartTableData,
+    );
+
+    const { user } = render(
+      <DataBlockTabs
+        releaseVersionId="release-1"
+        id="test-datablock"
+        dataBlock={{
+          ...testDataBlock,
+          charts: [testChartConfiguration],
+        }}
+      />,
+    );
+
+    forceVisible();
+
+    await waitFor(() => {
+      expect(tableBuilderService.getDataBlockTableData).toBeCalledWith(
+        'release-1',
+        'block-1-parent',
+      );
+
+      expect(screen.getAllByRole('tab')).toHaveLength(2);
+    });
+
+    expect(
+      screen.getByRole('button', {
+        name: 'Export options for Aggregated results chart',
+      }),
+    ).toBeInTheDocument();
+
+    await user.click(screen.getByRole('tab', { name: /Table/ }));
+
+    expect(
+      screen.getByRole('button', {
+        name: 'Export options for table',
+      }),
+    ).toBeInTheDocument();
   });
 
   test('selecting data set with boundaryLevel retrieves and renders new map polygons', async () => {

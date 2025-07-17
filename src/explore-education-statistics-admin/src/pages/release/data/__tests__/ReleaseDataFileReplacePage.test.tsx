@@ -1,3 +1,4 @@
+import { TestConfigContextProvider } from '@admin/contexts/ConfigContext';
 import ReleaseDataFileReplacePage from '@admin/pages/release/data/ReleaseDataFileReplacePage';
 import {
   releaseDataFileReplaceRoute,
@@ -14,6 +15,7 @@ import { render, screen, waitFor, within } from '@testing-library/react';
 import React from 'react';
 import { generatePath, MemoryRouter, Route } from 'react-router';
 import userEvent from '@testing-library/user-event';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 jest.mock('@admin/services/dataReplacementService');
 jest.mock('@admin/services/releaseDataFileService');
@@ -80,6 +82,15 @@ describe('ReleaseDataFileReplacePage', () => {
     footnotes: [],
     originalSubjectId: 'subject-1',
     replacementSubjectId: 'subject-1',
+    apiDataSetVersionPlan: {
+      id: '',
+      dataSetId: '',
+      name: '',
+      version: '',
+      status: '',
+      readyToPublish: false,
+      valid: false,
+    },
   };
 
   test('renders original data file details', async () => {
@@ -91,7 +102,7 @@ describe('ReleaseDataFileReplacePage', () => {
       totalRows: 100,
     });
 
-    render(
+    renderWithTestConfig(
       <MemoryRouter
         initialEntries={[
           generatePath<ReleaseDataFileReplaceRouteParams>(
@@ -141,7 +152,7 @@ describe('ReleaseDataFileReplacePage', () => {
       testValidReplacementPlan,
     );
 
-    render(
+    renderWithTestConfig(
       <MemoryRouter
         initialEntries={[
           generatePath<ReleaseDataFileReplaceRouteParams>(
@@ -192,7 +203,7 @@ describe('ReleaseDataFileReplacePage', () => {
       testValidReplacementPlan,
     );
 
-    render(
+    renderWithTestConfig(
       <MemoryRouter
         initialEntries={[
           generatePath<ReleaseDataFileReplaceRouteParams>(
@@ -213,6 +224,12 @@ describe('ReleaseDataFileReplacePage', () => {
     );
 
     await waitFor(() => {
+      expect(
+        screen.queryByRole('button', {
+          name: 'Confirm all valid replacements',
+        }),
+      ).not.toBeInTheDocument();
+
       // Replacement
       expect(screen.getByTestId('Replacement Title')).toHaveTextContent(
         'Test data',
@@ -247,9 +264,7 @@ describe('ReleaseDataFileReplacePage', () => {
       );
       expect(screen.getByTestId('Data file size')).toHaveTextContent('200 B');
       expect(screen.getByTestId('Number of rows')).toHaveTextContent('100');
-      expect(screen.getByTestId('Status')).toHaveTextContent(
-        'Replacement in progress',
-      );
+      expect(screen.getByTestId('Status')).toHaveTextContent('Complete');
       expect(screen.getByTestId('Uploaded by')).toHaveTextContent(
         'original@test.com',
       );
@@ -274,7 +289,7 @@ describe('ReleaseDataFileReplacePage', () => {
       totalRows: 100,
     });
 
-    render(
+    renderWithTestConfig(
       <MemoryRouter
         initialEntries={[
           generatePath<ReleaseDataFileReplaceRouteParams>(
@@ -308,9 +323,7 @@ describe('ReleaseDataFileReplacePage', () => {
       );
       expect(screen.getByTestId('Data file size')).toHaveTextContent('200 B');
       expect(screen.getByTestId('Number of rows')).toHaveTextContent('100');
-      expect(screen.getByTestId('Status')).toHaveTextContent(
-        'Replacement in progress',
-      );
+      expect(screen.getByTestId('Status')).toHaveTextContent('Complete');
       expect(screen.getByTestId('Uploaded by')).toHaveTextContent(
         'original@test.com',
       );
@@ -318,8 +331,8 @@ describe('ReleaseDataFileReplacePage', () => {
         '20 September 2020 12:00',
       );
 
-      expect(screen.getByText('Pending data replacement')).toBeInTheDocument();
-      expect(screen.getByText('Replacement in progress')).toBeInTheDocument();
+      expect(screen.getByText('Complete')).toBeInTheDocument();
+      expect(screen.getByText('Complete')).toBeInTheDocument();
       expect(
         screen.getByText(
           'There was a problem loading the data replacement information.',
@@ -346,7 +359,7 @@ describe('ReleaseDataFileReplacePage', () => {
       testValidReplacementPlan,
     );
 
-    render(
+    renderWithTestConfig(
       <MemoryRouter
         initialEntries={[
           generatePath<ReleaseDataFileReplaceRouteParams>(
@@ -367,9 +380,6 @@ describe('ReleaseDataFileReplacePage', () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByText('Pending data replacement')).toBeInTheDocument();
-      expect(screen.getByText('Replacement in progress')).toBeInTheDocument();
-
       expect(screen.getByText('Data blocks: OK')).toBeInTheDocument();
       expect(screen.getByText('Footnotes: OK')).toBeInTheDocument();
 
@@ -401,7 +411,7 @@ describe('ReleaseDataFileReplacePage', () => {
       totalRows: 110,
     });
 
-    render(
+    renderWithTestConfig(
       <MemoryRouter
         initialEntries={[
           generatePath<ReleaseDataFileReplaceRouteParams>(
@@ -422,8 +432,8 @@ describe('ReleaseDataFileReplacePage', () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByText('Pending data replacement')).toBeInTheDocument();
-      expect(screen.getByText('Replacement in progress')).toBeInTheDocument();
+      expect(screen.getByText('Complete')).toBeInTheDocument();
+      expect(screen.getByText('Complete')).toBeInTheDocument();
       expect(
         screen.getByText(/The replacement data file is still being processed/),
       );
@@ -451,7 +461,7 @@ describe('ReleaseDataFileReplacePage', () => {
       new Error('Something went wrong'),
     );
 
-    render(
+    renderWithTestConfig(
       <MemoryRouter
         initialEntries={[
           generatePath<ReleaseDataFileReplaceRouteParams>(
@@ -472,8 +482,6 @@ describe('ReleaseDataFileReplacePage', () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByText('Pending data replacement')).toBeInTheDocument();
-      expect(screen.getByText('Replacement in progress')).toBeInTheDocument();
       expect(
         screen.getByText(
           'There was a problem loading the data replacement information.',
@@ -497,7 +505,7 @@ describe('ReleaseDataFileReplacePage', () => {
       testValidReplacementPlan,
     );
 
-    render(
+    renderWithTestConfig(
       <MemoryRouter
         initialEntries={[
           generatePath<ReleaseDataFileReplaceRouteParams>(
@@ -570,7 +578,7 @@ describe('ReleaseDataFileReplacePage', () => {
       totalRows: 0,
     });
 
-    render(
+    renderWithTestConfig(
       <MemoryRouter
         initialEntries={[
           generatePath<ReleaseDataFileReplaceRouteParams>(
@@ -613,7 +621,7 @@ describe('ReleaseDataFileReplacePage', () => {
       );
       expect(
         modal.getByText(
-          /Are you sure you want to cancel this data replacement/,
+          /By cancelling this replacement you will delete the replacement file/,
         ),
       ).toBeInTheDocument();
     });
@@ -631,7 +639,7 @@ describe('ReleaseDataFileReplacePage', () => {
       new Error('Something went wrong'),
     );
 
-    render(
+    renderWithTestConfig(
       <MemoryRouter
         initialEntries={[
           generatePath<ReleaseDataFileReplaceRouteParams>(
@@ -676,9 +684,59 @@ describe('ReleaseDataFileReplacePage', () => {
       );
       expect(
         modal.getByText(
-          /Are you sure you want to cancel this data replacement/,
+          /By cancelling this replacement you will delete the replacement file/,
         ),
       ).toBeInTheDocument();
     });
   });
+
+  const createTestQueryClient = () => {
+    return new QueryClient({
+      defaultOptions: {
+        queries: {
+          // Avoid retries to speed up testing feedback
+          retry: false,
+        },
+      },
+    });
+  };
+
+  const renderWithTestConfig = (
+    ui: React.ReactElement,
+    enableReplaceApiFeatureFlag: boolean = false,
+  ) => {
+    const defaultTestConfig = {
+      appInsightsKey: '',
+      publicAppUrl: 'http://localhost',
+      publicApiUrl: 'http://public-api',
+      publicApiDocsUrl: 'http://public-api-docs',
+      permittedEmbedUrlDomains: [
+        'https://department-for-education.shinyapps.io',
+      ],
+      oidc: {
+        clientId: '',
+        authority: '',
+        knownAuthorities: [''],
+        adminApiScope: '',
+        authorityMetadata: {
+          authorizationEndpoint: '',
+          tokenEndpoint: '',
+          issuer: '',
+          userInfoEndpoint: '',
+          endSessionEndpoint: '',
+        },
+      },
+    };
+    const testQueryClient = createTestQueryClient();
+    return render(
+      <TestConfigContextProvider
+        config={{
+          ...defaultTestConfig,
+          enableReplacementOfPublicApiDataSets: enableReplaceApiFeatureFlag,
+        }}
+      >
+        <QueryClientProvider client={testQueryClient}>{ui}</QueryClientProvider>
+      </TestConfigContextProvider>,
+    );
+  };
 });

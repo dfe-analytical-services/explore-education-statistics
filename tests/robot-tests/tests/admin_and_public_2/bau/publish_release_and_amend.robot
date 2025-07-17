@@ -1,5 +1,6 @@
 *** Settings ***
 Library             DateTime
+Library             String
 Library             ../../libs/admin_api.py
 Resource            ../../libs/admin-common.robot
 Resource            ../../libs/admin/manage-content-common.robot
@@ -14,7 +15,7 @@ Force Tags          Admin    Local    Dev    AltersData
 
 
 *** Variables ***
-${PUBLICATION_NAME}=    UI tests - publish release and amend %{RUN_IDENTIFIER}
+${PUBLICATION_NAME}=    Publish release and amend %{RUN_IDENTIFIER}
 ${RELEASE_LABEL}=       provisional
 ${RELEASE_NAME}=        Financial year 3000-01 ${RELEASE_LABEL}
 ${DATABLOCK_NAME}=      Dates data block name
@@ -268,9 +269,7 @@ Verify release is scheduled
     user checks summary list contains    Next release expected    December 3001
 
 Get public release link
-    user waits until page contains element    testid:public-release-url
-    ${PUBLIC_RELEASE_LINK}=    Get Value    xpath://*[@data-testid="public-release-url"]
-    check that variable is not empty    PUBLIC_RELEASE_LINK    ${PUBLIC_RELEASE_LINK}
+    ${PUBLIC_RELEASE_LINK}=    user gets url public release will be accessible at
     Set Suite Variable    ${PUBLIC_RELEASE_LINK}
 
 Publish the scheduled release
@@ -280,15 +279,19 @@ Publish the scheduled release
     set suite variable    ${EXPECTED_PUBLISHED_DATE}
 
 Verify newly published release is on Find Statistics page
+    # TODO EES-6063 - Remove this
     user checks publication is on find statistics page    ${PUBLICATION_NAME}
 
-Navigate to newly published release page
-    user clicks link    ${PUBLICATION_NAME}
-    user waits until h1 is visible    ${PUBLICATION_NAME}    %{WAIT_MEDIUM}
+Verify newly published release is public
+    user navigates to public release page    ${PUBLIC_RELEASE_LINK}    ${PUBLICATION_NAME}    ${RELEASE_NAME}
 
-Verify release URL and page caption
-    user checks url contains    %{PUBLIC_URL}/find-statistics/ui-tests-publish-release-and-amend-%{RUN_IDENTIFIER}
-    user waits until page contains title caption    ${RELEASE_NAME}
+Verify release page meta
+    user checks meta title should be    ${PUBLICATION_NAME}, ${RELEASE_NAME}
+    user checks meta description should be
+    ...    ${PUBLICATION_NAME} summary
+
+Verify release URL
+    user checks url contains    %{PUBLIC_URL}/find-statistics/publish-release-and-amend-%{RUN_IDENTIFIER}
 
 Verify publish and update dates
     user checks summary list contains    Published    ${EXPECTED_PUBLISHED_DATE}
@@ -320,15 +323,23 @@ Verify release associated files
     download file    link:Test ancillary file 1 (txt, 12 B)    test_ancillary_file_1.txt
     downloaded file should have first line    test_ancillary_file_1.txt    Test file 1
 
-Verify public metadata guidance document
+Navigate to public metadata guidance document
     user clicks link    Data guidance
+    user waits until h2 is visible    Data guidance    %{WAIT_SMALL}
 
+Verify guidance document page meta
+    ${RELEASE_NAME_LOWERCASE}=    Convert To Lower Case    ${RELEASE_NAME}
+    ${PUBLICATION_NAME_LOWERCASE}=    Convert To Lower Case    ${PUBLICATION_NAME}
+    user checks meta title should be    ${PUBLICATION_NAME} data guidance ${RELEASE_NAME_LOWERCASE}
+    user checks meta description should be
+    ...    Data guidance describing the contents of files containing statistics from ${PUBLICATION_NAME_LOWERCASE} ${RELEASE_NAME_LOWERCASE}.
+
+Verify public metadata guidance document
     user checks breadcrumb count should be    4
     user checks nth breadcrumb contains    1    Home
     user checks nth breadcrumb contains    2    Find statistics and data
     user checks nth breadcrumb contains    3    ${PUBLICATION_NAME}
     user checks nth breadcrumb contains    4    Data guidance
-    user waits until h2 is visible    Data guidance    %{WAIT_SMALL}
 
     user waits until page contains title caption    ${RELEASE_NAME}
     user waits until h1 is visible    ${PUBLICATION_NAME}
@@ -364,21 +375,28 @@ Verify public metadata guidance document
 
     user goes to release page via breadcrumb    ${PUBLICATION_NAME}    ${RELEASE_NAME}
 
-Verify public pre-release access list
+Navigate to the public pre-release access list
     user clicks link    Pre-release access list
+    user waits until page contains title caption    ${RELEASE_NAME}
+    user waits until h1 is visible    ${PUBLICATION_NAME}
 
+Verify public pre-release access list
     user checks breadcrumb count should be    4
     user checks nth breadcrumb contains    1    Home
     user checks nth breadcrumb contains    2    Find statistics and data
     user checks nth breadcrumb contains    3    ${PUBLICATION_NAME}
     user checks nth breadcrumb contains    4    Pre-release access list
 
-    user waits until page contains title caption    ${RELEASE_NAME}
-    user waits until h1 is visible    ${PUBLICATION_NAME}
-
     user waits until h2 is visible    Pre-release access list
     user waits until page contains    Published ${EXPECTED_PUBLISHED_DATE}
     user waits until page contains    Test public access list
+
+Verify the pre-release access page meta
+    ${RELEASE_NAME_LOWERCASE}=    Convert To Lower Case    ${RELEASE_NAME}
+    ${PUBLICATION_NAME_LOWERCASE}=    Convert To Lower Case    ${PUBLICATION_NAME}
+    user checks meta title should be    ${PUBLICATION_NAME} pre-release access list ${RELEASE_NAME_LOWERCASE}
+    user checks meta description should be
+    ...    Pre-release access list for statistics on ${PUBLICATION_NAME_LOWERCASE} ${RELEASE_NAME_LOWERCASE}.
 
 Verify free text key stat is correct
     user goes to release page via breadcrumb    ${PUBLICATION_NAME}    ${RELEASE_NAME}
@@ -502,7 +520,7 @@ Navigate to data replacement page
     user checks headed table body row contains    Metadata file    dates.meta.csv
     user checks headed table body row contains    Number of rows    118    wait=%{WAIT_SMALL}
     user checks headed table body row contains    Data file size    17 Kb    wait=%{WAIT_SMALL}
-    user checks headed table body row contains    Status    Complete    wait=%{WAIT_LONG}
+    user checks headed table body row cell contains    Data file import status    1    Complete    wait=%{WAIT_LONG}
 
 Upload replacement data
     user waits until h2 is visible    Upload replacement data    %{WAIT_MEDIUM}
@@ -519,14 +537,15 @@ Upload replacement data
     user checks headed table body row cell contains    Metadata file    1    dates.meta.csv
     user checks headed table body row cell contains    Number of rows    1    118    wait=%{WAIT_SMALL}
     user checks headed table body row cell contains    Data file size    1    17 Kb    wait=%{WAIT_SMALL}
-    user checks headed table body row cell contains    Status    1    Replacement in progress    wait=%{WAIT_LONG}
+    user checks headed table body row cell contains    Data file import status    1    Complete    wait=%{WAIT_LONG}
 
     user checks headed table body row cell contains    Title    2    Dates test subject
     user checks headed table body row cell contains    Data file    2    dates-replacement.csv
     user checks headed table body row cell contains    Metadata file    2    dates-replacement.meta.csv
     user checks headed table body row cell contains    Number of rows    2    118    wait=%{WAIT_SMALL}
     user checks headed table body row cell contains    Data file size    2    17 Kb    wait=%{WAIT_SMALL}
-    user checks headed table body row cell contains    Status    2    Complete    wait=%{WAIT_DATA_FILE_IMPORT}
+    user checks headed table body row cell contains    Data file import status    1    Complete
+    ...    wait=%{WAIT_DATA_FILE_IMPORT}
 
 Confirm data replacement
     user waits until page contains    Data blocks: OK
@@ -757,16 +776,14 @@ Approve amendment for scheduled release
     set suite variable    ${EXPECTED_PUBLISHED_DATE}
 
 Verify amendment is on Find Statistics page again
+    # TODO EES-6063 - Remove this
     user waits for caches to expire
     user checks publication is on find statistics page    ${PUBLICATION_NAME}
 
 Navigate to amendment release page
-    user clicks link    ${PUBLICATION_NAME}
-    user waits until h1 is visible    ${PUBLICATION_NAME}    %{WAIT_MEDIUM}
+    user navigates to public release page    ${PUBLIC_RELEASE_LINK}    ${PUBLICATION_NAME}    ${RELEASE_NAME}
 
-    user waits until page contains title caption    ${RELEASE_NAME}
-
-    user checks url contains    %{PUBLIC_URL}/find-statistics/ui-tests-publish-release-and-amend-%{RUN_IDENTIFIER}
+    user checks url contains    %{PUBLIC_URL}/find-statistics/publish-release-and-amend-%{RUN_IDENTIFIER}
 
     user checks breadcrumb count should be    3
     user checks nth breadcrumb contains    1    Home

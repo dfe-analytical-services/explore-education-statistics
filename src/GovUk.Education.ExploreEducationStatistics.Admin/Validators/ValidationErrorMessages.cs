@@ -68,6 +68,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators
 
         // Data replacement
         ReplacementMustBeValid,
+        ReplacementImportMustBeComplete,
 
         // Release
         ReleaseTypeInvalid,

@@ -5,6 +5,7 @@ import { Dictionary } from '@common/types';
 import { AxiosRequestConfig } from 'axios';
 import { Feature, Geometry } from 'geojson';
 import { ReleaseType } from '@common/services/types/releaseType';
+import { FileFormat } from '@common/modules/table-tool/components/DownloadTable';
 
 export interface FilterOption {
   label: string;
@@ -65,7 +66,6 @@ export interface LocationOption {
   value: string;
   level?: string;
   options?: LocationLeafOption[];
-  geoJson?: GeoJsonFeature;
 }
 
 export interface LocationGeoJsonOption extends LocationOption {
@@ -104,16 +104,28 @@ export interface FeaturedTable {
   order: number;
 }
 
+interface FilterHierarchyTier {
+  level: number;
+  filterId: string;
+  childFilterId: string;
+  hierarchy: Dictionary<string[]>;
+}
+
+export type SubjectMetaFilterHierarchy = FilterHierarchyTier[];
+
+export interface SubjectMetaFilter {
+  legend: string;
+  hint?: string;
+  id: string;
+  options: GroupedFilterOptions;
+  order: number;
+  autoSelectFilterItemId?: string;
+  name: string;
+}
+
 export interface SubjectMeta {
-  filters: Dictionary<{
-    legend: string;
-    hint?: string;
-    id: string;
-    options: GroupedFilterOptions;
-    order: number;
-    autoSelectFilterItemId?: string;
-    name: string;
-  }>;
+  filterHierarchies?: SubjectMetaFilterHierarchy[];
+  filters: Dictionary<SubjectMetaFilter>;
   indicators: Dictionary<{
     id: string;
     label: string;
@@ -138,13 +150,12 @@ export interface TimePeriodQuery {
   endCode: string;
 }
 
-export interface TableDataQuery extends FullTableQuery {
-  publicationId?: string;
-  boundaryLevel?: number;
-}
-
 export interface ReleaseTableDataQuery extends TableDataQuery {
   releaseVersionId?: string;
+}
+
+export interface TableDataQuery extends FullTableQuery {
+  publicationId?: string;
 }
 
 export interface FullTableQuery {
@@ -152,6 +163,7 @@ export interface FullTableQuery {
   locationIds: string[];
   timePeriod?: TimePeriodQuery;
   filters: string[];
+  filterHierarchiesOptions?: Dictionary<string[][]>;
   indicators: string[];
 }
 
@@ -212,6 +224,7 @@ export interface FastTrackTableAndReleaseMeta extends FastTrackTable {
   releaseType: ReleaseType;
   latestData: boolean;
   latestReleaseTitle: string;
+  latestReleaseSlug: string;
 }
 
 const tableBuilderService = {
@@ -250,16 +263,8 @@ const tableBuilderService = {
   async getTableData(
     query: FullTableQuery,
     releaseVersionId?: string,
-    boundaryLevelId?: number,
   ): Promise<TableDataResponse> {
-    if (releaseVersionId && boundaryLevelId) {
-      return dataApi.post(
-        `/tablebuilder/release/${releaseVersionId}?boundaryLevelId=${boundaryLevelId}`,
-        query,
-      );
-    }
-
-    return releaseVersionId && !boundaryLevelId
+    return releaseVersionId
       ? dataApi.post(`/tablebuilder/release/${releaseVersionId}`, query)
       : dataApi.post('/tablebuilder', query);
   },
@@ -300,6 +305,17 @@ const tableBuilderService = {
       `/tablebuilder/release/${releaseVersionId}/data-block/${dataBlockParentId}/geojson`,
       { params: { boundaryLevelId } },
     );
+  },
+  recordDownload(payload: {
+    dataSetName: string;
+    publicationName: string;
+    releaseVersionId: string;
+    releasePeriodAndLabel: string;
+    subjectId: string;
+    query: ReleaseTableDataQuery;
+    downloadFormat: FileFormat;
+  }) {
+    dataApi.post('tablebuilder/analytics', payload);
   },
 };
 

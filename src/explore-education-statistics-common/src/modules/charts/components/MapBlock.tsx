@@ -71,6 +71,7 @@ export const mapBlockDefinition: ChartDefinition = {
     canIncludeNonNumericData: false,
     canPositionLegendInline: false,
     canSetBarThickness: false,
+    canSetDataLabelColour: false,
     canSetDataLabelPosition: false,
     canShowDataLabels: false,
     canShowAllMajorAxisTicks: false,
@@ -99,9 +100,6 @@ export const mapBlockDefinition: ChartDefinition = {
       title: 'GeoJSON (major axis)',
       type: 'major',
       hide: true,
-      capabilities: {
-        canRotateLabel: false,
-      },
       defaults: {
         groupBy: 'locations',
       },
@@ -282,6 +280,13 @@ export default function MapBlock({
             },
           )}
         >
+          <a
+            id={`map-start-${id}`}
+            href={`#map-end-${id}`}
+            className="govuk-skip-link"
+          >
+            Skip to end of map
+          </a>
           <MapContainer
             style={{
               width: (width && `${width}px`) || '100%',
@@ -310,6 +315,13 @@ export default function MapBlock({
             hideText
             alert
           />
+          <a
+            id={`map-end-${id}`}
+            href={`#map-start-${id}`}
+            className="govuk-skip-link"
+          >
+            Back to start of map
+          </a>
         </div>
 
         {selectedDataSetConfig && (

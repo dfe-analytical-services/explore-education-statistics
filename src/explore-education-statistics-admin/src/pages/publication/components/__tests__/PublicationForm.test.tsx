@@ -31,6 +31,35 @@ describe('PublicationForm', () => {
     });
   });
 
+  test('shows validation error when the title is too long', async () => {
+    const { user } = render(
+      <PublicationForm themeId="theme-id" onSubmit={noop} />,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByLabelText('Publication title')).toBeInTheDocument();
+    });
+
+    await user.type(
+      screen.getByLabelText('Publication title'),
+      'a long publication title a long publication title a long publication title',
+    );
+
+    expect(
+      await screen.findByText('You have 9 characters too many'),
+    ).toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: 'Save publication' }));
+
+    await waitFor(() => {
+      expect(
+        screen.getByText('Title must be 65 characters or fewer', {
+          selector: '#publicationForm-title-error',
+        }),
+      ).toBeInTheDocument();
+    });
+  });
+
   test('shows validation error when there is no summary', async () => {
     const { user } = render(
       <PublicationForm themeId="theme-id" onSubmit={noop} />,
@@ -45,6 +74,35 @@ describe('PublicationForm', () => {
     await waitFor(() => {
       expect(
         screen.getByText('Enter a publication summary', {
+          selector: '#publicationForm-summary-error',
+        }),
+      ).toBeInTheDocument();
+    });
+  });
+
+  test('shows validation error when the summary is too long', async () => {
+    const { user } = render(
+      <PublicationForm themeId="theme-id" onSubmit={noop} />,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByLabelText('Publication title')).toBeInTheDocument();
+    });
+
+    await user.type(
+      screen.getByLabelText('Publication summary'),
+      'a long publication summary a long publication summary a long publication summary a long publication summary a long publication summary a long publication summary',
+    );
+
+    expect(
+      await screen.findByText('You have 1 character too many'),
+    ).toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: 'Save publication' }));
+
+    await waitFor(() => {
+      expect(
+        screen.getByText('Summary must be 160 characters or fewer', {
           selector: '#publicationForm-summary-error',
         }),
       ).toBeInTheDocument();

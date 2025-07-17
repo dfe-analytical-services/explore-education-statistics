@@ -11,6 +11,7 @@ import ReleaseEditableBlock from '@admin/pages/release/content/components/Releas
 import { useReleaseContentState } from '@admin/pages/release/content/contexts/ReleaseContentContext';
 import useReleaseContentActions from '@admin/pages/release/content/contexts/useReleaseContentActions';
 import { EditableBlock } from '@admin/services/types/content';
+import focusAddedSectionBlockButton from '@admin/utils/focus/focusAddedSectionBlockButton';
 import Button from '@common/components/Button';
 import ButtonGroup from '@common/components/ButtonGroup';
 import Modal from '@common/components/Modal';
@@ -19,16 +20,25 @@ import useToggle from '@common/hooks/useToggle';
 import { ContentSection } from '@common/services/publicationService';
 import { Dictionary } from '@common/types';
 import { isFuture } from 'date-fns';
-import React, { memo, useCallback, useEffect, useMemo, useState } from 'react';
+import React, {
+  memo,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 
 export interface ReleaseContentAccordionSectionProps {
   id: string;
   section: ContentSection<EditableBlock>;
+  onRemoveSection: (sectionId: string) => void;
   transformFeaturedTableLinks?: (url: string, text: string) => void;
 }
 
 const ReleaseContentAccordionSection = ({
   section,
+  onRemoveSection,
   transformFeaturedTableLinks,
   ...props
 }: ReleaseContentAccordionSectionProps) => {
@@ -48,6 +58,8 @@ const ReleaseContentAccordionSection = ({
 
   const [blocks, setBlocks] = useState<EditableBlock[]>(sectionContent);
 
+  const addTextBlockButton = useRef<HTMLButtonElement>(null);
+
   useEffect(() => {
     setBlocks(sectionContent);
   }, [sectionContent]);
@@ -66,7 +78,7 @@ const ReleaseContentAccordionSection = ({
   }, [blocks, section, unsavedBlocks, unsavedCommentDeletions]);
 
   const addBlock = useCallback(async () => {
-    await actions.addContentSectionBlock({
+    const newBlock = await actions.addContentSectionBlock({
       releaseVersionId: release.id,
       sectionId,
       sectionKey: 'content',
@@ -76,6 +88,8 @@ const ReleaseContentAccordionSection = ({
         body: '',
       },
     });
+
+    focusAddedSectionBlockButton(newBlock.id);
   }, [actions, release.id, sectionId, sectionContent.length]);
 
   const addEmbedBlock = useCallback(
@@ -134,12 +148,11 @@ const ReleaseContentAccordionSection = ({
     [actions, sectionId, release.id],
   );
 
-  const handleRemoveSection = useCallback(async () => {
-    await actions.removeContentSection({
-      sectionId,
-      releaseVersionId: release.id,
-    });
-  }, [actions, sectionId, release.id]);
+  const onAfterDeleteBlock = () => {
+    setTimeout(() => {
+      addTextBlockButton.current?.focus();
+    }, 100);
+  };
 
   const hasLockedBlocks = blocks.some(
     block => block.lockedUntil && isFuture(new Date(block.lockedUntil)),
@@ -156,7 +169,7 @@ const ReleaseContentAccordionSection = ({
       }
       caption={caption}
       onHeadingChange={handleHeadingChange}
-      onRemoveSection={handleRemoveSection}
+      onRemoveSection={() => onRemoveSection(sectionId)}
       headerButtons={
         <Tooltip
           text="This section is being edited and cannot be reordered"
@@ -207,6 +220,7 @@ const ReleaseContentAccordionSection = ({
                 publicationId={release.publication.id}
                 releaseVersionId={release.id}
                 visible={open}
+                onAfterDeleteBlock={onAfterDeleteBlock}
               />
             )}
           />
@@ -226,7 +240,11 @@ const ReleaseContentAccordionSection = ({
               )}
 
               <ButtonGroup className="govuk-!-margin-bottom-8 dfe-justify-content--center">
-                <Button variant="secondary" onClick={addBlock}>
+                <Button
+                  variant="secondary"
+                  onClick={addBlock}
+                  ref={addTextBlockButton}
+                >
                   Add text block
                 </Button>
                 {!showDataBlockForm && (
@@ -235,33 +253,31 @@ const ReleaseContentAccordionSection = ({
                   </Button>
                 )}
                 {user?.permissions.isBauUser && (
-                  <>
-                    {!showEmbedDashboardForm && (
+                  <Modal
+                    title="Embed a URL"
+                    open={showEmbedDashboardForm}
+                    onExit={toggleEmbedDashboardForm.off}
+                    triggerButton={
                       <Button
                         variant="secondary"
                         onClick={toggleEmbedDashboardForm.on}
                       >
                         Embed a URL
                       </Button>
-                    )}
-                  </>
+                    }
+                  >
+                    <EditableEmbedForm
+                      onCancel={toggleEmbedDashboardForm.off}
+                      onSubmit={async embedBlock => {
+                        await addEmbedBlock(embedBlock);
+                        toggleEmbedDashboardForm.off();
+                      }}
+                    />
+                  </Modal>
                 )}
               </ButtonGroup>
             </>
           )}
-          <Modal
-            title="Embed a URL"
-            open={showEmbedDashboardForm}
-            onExit={toggleEmbedDashboardForm.off}
-          >
-            <EditableEmbedForm
-              onCancel={toggleEmbedDashboardForm.off}
-              onSubmit={async embedBlock => {
-                await addEmbedBlock(embedBlock);
-                toggleEmbedDashboardForm.off();
-              }}
-            />
-          </Modal>
         </>
       )}
     </EditableAccordionSection>

@@ -33,7 +33,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var releaseVersion = publication.Releases.Single().Versions.Single();
 
             await PolicyCheckBuilder<SecurityPolicies>()
-                .SetupResourceCheckToFail(releaseVersion, CanMakeAmendmentOfSpecificRelease)
+                .SetupResourceCheckToFail(releaseVersion, CanMakeAmendmentOfSpecificReleaseVersion)
                 .AssertForbidden(
                     userService =>
                     {

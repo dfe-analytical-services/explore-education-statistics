@@ -330,6 +330,7 @@ describe('TableToolPage', () => {
     },
     latestRelease: {
       title: 'Latest Release Title',
+      slug: 'latest-release-slug',
     },
   };
 
@@ -347,6 +348,7 @@ describe('TableToolPage', () => {
     },
     latestRelease: {
       title: 'Latest Release Title',
+      slug: 'latest-release-slug',
     },
   };
 
@@ -454,6 +456,7 @@ describe('TableToolPage', () => {
     render(
       <TableToolPage
         selectedPublication={testSelectedPublicationWithLatestRelease}
+        selectedSubjectId="1"
         subjects={testSubjects}
         themeMeta={testThemeMeta}
         subjectMeta={testSubjectMeta}
@@ -468,6 +471,7 @@ describe('TableToolPage', () => {
     render(
       <TableToolPage
         selectedPublication={testSelectedPublicationWithLatestRelease}
+        selectedSubjectId="1"
         subjects={testSubjects}
         themeMeta={testThemeMeta}
         subjectMeta={testSubjectMeta}
@@ -488,6 +492,7 @@ describe('TableToolPage', () => {
     render(
       <TableToolPage
         selectedPublication={testSelectedPublicationWithNonLatestRelease}
+        selectedSubjectId="1"
         subjects={testSubjects}
         themeMeta={testThemeMeta}
         subjectMeta={testSubjectMeta}
@@ -508,7 +513,7 @@ describe('TableToolPage', () => {
 
     expect(latestDataLink).toBeInTheDocument();
     expect(latestDataLink.href).toEqual(
-      'http://localhost/find-statistics/test-publication/selected-release-slug',
+      'http://localhost/find-statistics/test-publication/latest-release-slug',
     );
     expect(latestDataLink.text).toContain('View latest data');
     expect(latestDataLink.text).toContain('Latest Release Title');

@@ -8,6 +8,8 @@ public record NextDataSetVersionMappingsCreateRequest
 
     public required Guid ReleaseFileId { get; init; }
 
+    public Guid? DataSetVersionToReplaceId { get; init; }
+
     public class Validator : AbstractValidator<NextDataSetVersionMappingsCreateRequest>
     {
         public Validator()

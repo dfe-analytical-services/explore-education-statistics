@@ -1,15 +1,19 @@
-﻿using Azure.Identity;
+using Azure.Identity;
 using Azure.Storage.Blobs;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Clients.AzureBlobStorage;
+using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Clients.AzureSearch;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Clients.ContentApi;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Options;
-using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Services;
-using Microsoft.Azure.Functions.Worker;
+using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Services.Core;
+using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Services.CreateSearchableDocuments;
+using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Services.RemoveSearchableDocument;
+using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Services.ResetSearchableDocuments;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using Microsoft.Net.Http.Headers;
+using Serilog;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Extensions;
 
@@ -20,22 +24,59 @@ public static class HostBuilderExtension
         .ConfigureAppConfiguration(
             (context, configurationBuilder) =>
                 configurationBuilder
-                    .AddJsonFile($"appsettings.json", true, false)
+                    // When running in Azure, the default path from which it attempts to load appsettings.Production.json is wrong.
+                    // context.HostingEnvironment.ContentRootPath = "/azure-functions-host"
+                    // However, the file resides in the current directory, "/home/site/wwwroot".
+                    // See: https://stackoverflow.com/questions/78119200/appsettings-for-azurefunction-on-net-8-isolated
+                    .SetBasePath(Directory.GetCurrentDirectory())
+                    .AddJsonFile(
+                        "appsettings.json", 
+                        optional:false, 
+                        reloadOnChange:false)
                     .AddJsonFile(
                         $"appsettings.{context.HostingEnvironment.EnvironmentName}.json",
-                        true,
-                        false)
+                        optional:false,
+                        reloadOnChange:false)
                     .AddEnvironmentVariables())
-        .ConfigureServices(
+        .ConfigureHostServices()
+        .Build();
+
+    public static IHostBuilder InitialiseSerilog(this IHostBuilder hostBuilder)
+    {
+        // Setup Serilog
+        // https://github.com/serilog/serilog-aspnetcore
+        Log.Logger = new LoggerConfiguration()
+            // Because we can't access appsettings before creating the HostBuilder we'll use a bootstrap logger
+            // without configuration specific initialization first and replace it after the HostBuilder was created.
+            // See https://github.com/serilog/serilog-aspnetcore#two-stage-initialization
+            .ConfigureBootstrapLogger()
+            .CreateBootstrapLogger();
+        
+        return hostBuilder;
+    }
+
+    internal static IHostBuilder ConfigureHostServices(this IHostBuilder hostBuilder) =>
+        hostBuilder.ConfigureServices(
             (context, services) =>
                 services
-                    .AddApplicationInsightsTelemetryWorkerService()
-                    .ConfigureFunctionsApplicationInsights()
+                    .ConfigureLogging(context.Configuration)
+                    // Config
                     .Configure<AppOptions>(context.Configuration.GetSection(AppOptions.Section))
                     .Configure<ContentApiOptions>(context.Configuration.GetSection(ContentApiOptions.Section))
-                    .AddTransient<IContentApiClient, ContentApiClient>()
-                    .AddTransient<IAzureBlobStorageClient, AzureBlobStorageClient>()
+                    .Configure<AzureSearchOptions>(context.Configuration.GetSection(AzureSearchOptions.Section))
+                    // Services
                     .AddTransient<ISearchableDocumentCreator, SearchableDocumentCreator>()
+                    .AddTransient<ISearchableDocumentRemover, SearchableDocumentRemover>()
+                    .AddTransient<IFullSearchableDocumentResetter, FullSearchableDocumentResetter>()
+                    .AddSearchDocumentChecker()
+                    // Functions
+                    .AddTransient<IEventGridEventHandler, EventGridEventHandler>()
+                    .AddTransient<ICommandHandler, CommandHandler>()
+                    .AddHealthChecks()
+                    // Clients
+                    .AddTransient<ISearchIndexerClient, SearchIndexerClient>()
+                    .AddTransient<IAzureSearchIndexerClientFactory, AzureSearchIndexerClientFactory>()
+                    .AddTransient<IAzureBlobStorageClient, AzureBlobStorageClient>()
                     .AddAzureClientsInline(
                         clientBuilder =>
                         {
@@ -56,13 +97,5 @@ public static class HostBuilderExtension
                                 HeaderNames.UserAgent,
                                 "EES Content Search Function App");
                         })
-        )
-        .Build()
-        .Execute(
-            host =>
-            {
-                // Validate the configuration on startup to fail fast.
-                host.Services.GetRequiredService<IOptions<AppOptions>>().Value.Validate();
-                host.Services.GetRequiredService<IOptions<ContentApiOptions>>().Value.Validate();
-            });
+        );
 }

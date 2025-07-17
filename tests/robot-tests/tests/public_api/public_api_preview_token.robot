@@ -13,7 +13,7 @@ Test Setup          fail test fast if required
 
 
 *** Variables ***
-${PUBLICATION_NAME}=        UI tests - Public API - preview token %{RUN_IDENTIFIER}
+${PUBLICATION_NAME}=        Public API - preview token %{RUN_IDENTIFIER}
 ${RELEASE_NAME}=            Academic year Q1 3000/01
 ${SUBJECT_NAME_1}=          ${PUBLICATION_NAME} - Subject 1
 ${PREVIEW_TOKEN_NAME}=      Test token
@@ -248,11 +248,18 @@ Add headline text block to Content page
     user adds content to headlines text block    Headline text block text
 
 Approve release
-    user clicks link    Sign off
     user approves release for immediate publication
 
+Get public release link
+    ${PUBLIC_RELEASE_LINK}=    user gets url public release will be accessible at
+    Set Suite Variable    ${PUBLIC_RELEASE_LINK}
+
 Verify newly published release is on Find Statistics page
+    # TODO EES-6063 - Remove this
     user checks publication is on find statistics page    ${PUBLICATION_NAME}
+
+Verify newly published release is public
+    user navigates to public release page    ${PUBLIC_RELEASE_LINK}    ${PUBLICATION_NAME}    ${RELEASE_NAME}
 
 User navigates to data catalogue page
     user navigates to data catalogue page on public frontend

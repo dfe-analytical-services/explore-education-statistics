@@ -15,7 +15,6 @@ import publicationService, {
   ReleaseVersion,
 } from '@common/services/publicationService';
 import { Dictionary } from '@common/types';
-import ButtonLink from '@frontend/components/ButtonLink';
 import Link from '@frontend/components/Link';
 import Page from '@frontend/components/Page';
 import PageSearchFormWithAnalytics from '@frontend/components/PageSearchFormWithAnalytics';
@@ -29,7 +28,9 @@ import styles from '@frontend/modules/find-statistics/PublicationReleasePage.mod
 import classNames from 'classnames';
 import orderBy from 'lodash/orderBy';
 import { GetServerSideProps, NextPage } from 'next';
-import React from 'react';
+import React, { Fragment } from 'react';
+import Button from '@common/components/Button';
+import downloadService from '@frontend/services/downloadService';
 
 interface Props {
   releaseVersion: ReleaseVersion;
@@ -59,12 +60,7 @@ const PublicationReleasePage: NextPage<Props> = ({ releaseVersion }) => {
     <Page
       title={releaseVersion.publication.title}
       caption={releaseVersion.title}
-      description={
-        releaseVersion.summarySection.content &&
-        releaseVersion.summarySection.content.length > 0
-          ? releaseVersion.summarySection.content[0].body
-          : ''
-      }
+      description={releaseVersion.publication.summary}
       breadcrumbs={[
         { name: 'Find statistics and data', link: '/find-statistics' },
       ]}
@@ -166,12 +162,25 @@ const PublicationReleasePage: NextPage<Props> = ({ releaseVersion }) => {
               </Link>
             }
             renderProducerLink={
-              <Link
-                unvisited
-                to="https://www.gov.uk/government/organisations/department-for-education"
-              >
-                Department for Education
-              </Link>
+              releaseVersion.publishingOrganisations?.length ? (
+                <span>
+                  {releaseVersion.publishingOrganisations.map((org, index) => (
+                    <Fragment key={org.id}>
+                      {index > 0 && ' and '}
+                      <Link unvisited to={org.url}>
+                        {org.title}
+                      </Link>
+                    </Fragment>
+                  ))}
+                </span>
+              ) : (
+                <Link
+                  unvisited
+                  to="https://www.gov.uk/government/organisations/department-for-education"
+                >
+                  Department for Education
+                </Link>
+              )
             }
             onShowReleaseTypeModal={() =>
               logEvent({
@@ -223,10 +232,14 @@ const PublicationReleasePage: NextPage<Props> = ({ releaseVersion }) => {
               <ul className="govuk-list">
                 {showAllFilesButton && (
                   <li>
-                    <ButtonLink
+                    <Button
                       className="govuk-button  govuk-!-margin-bottom-3"
-                      to={`${process.env.CONTENT_API_BASE_URL}/releases/${releaseVersion.id}/files`}
-                      onClick={() => {
+                      onClick={async () => {
+                        await downloadService.downloadZip(
+                          releaseVersion.id,
+                          'ReleaseUsefulInfo',
+                        );
+
                         logEvent({
                           category: `${releaseVersion.publication.title} release page - Useful information`,
                           action: 'Download all data button clicked',
@@ -235,7 +248,7 @@ const PublicationReleasePage: NextPage<Props> = ({ releaseVersion }) => {
                       }}
                     >
                       Download all data (zip)
-                    </ButtonLink>
+                    </Button>
                   </li>
                 )}
                 {!!releaseVersion.relatedDashboardsSection?.content.length && (
@@ -432,9 +445,13 @@ const PublicationReleasePage: NextPage<Props> = ({ releaseVersion }) => {
           downloadFiles={releaseVersion.downloadFiles}
           hasDataGuidance={releaseVersion.hasDataGuidance}
           renderAllFilesLink={
-            <Link
-              to={`${process.env.CONTENT_API_BASE_URL}/releases/${releaseVersion.id}/files`}
-              onClick={() => {
+            <Button
+              onClick={async () => {
+                await downloadService.downloadZip(
+                  releaseVersion.id,
+                  'ReleaseDownloads',
+                );
+
                 logEvent({
                   category: 'Downloads',
                   action: `Release page all files, Release: ${releaseVersion.title}, File: All files`,
@@ -442,7 +459,7 @@ const PublicationReleasePage: NextPage<Props> = ({ releaseVersion }) => {
               }}
             >
               Download all data (ZIP)
-            </Link>
+            </Button>
           }
           renderCreateTablesLink={
             <Link
@@ -577,7 +594,7 @@ const PublicationReleasePage: NextPage<Props> = ({ releaseVersion }) => {
   );
 };
 
-export const getServerSideProps: GetServerSideProps<Props> = withAxiosHandler(
+export const getServerSideProps: GetServerSideProps = withAxiosHandler(
   async ({ query }) => {
     const { publication: publicationSlug, release: releaseSlug } =
       query as Dictionary<string>;
@@ -585,6 +602,15 @@ export const getServerSideProps: GetServerSideProps<Props> = withAxiosHandler(
     const releaseVersion = await (releaseSlug
       ? publicationService.getPublicationRelease(publicationSlug, releaseSlug)
       : publicationService.getLatestPublicationRelease(publicationSlug));
+
+    if (!releaseSlug) {
+      return {
+        redirect: {
+          destination: `/find-statistics/${publicationSlug}/${releaseVersion.slug}`,
+          permanent: true,
+        },
+      };
+    }
 
     return {
       props: {

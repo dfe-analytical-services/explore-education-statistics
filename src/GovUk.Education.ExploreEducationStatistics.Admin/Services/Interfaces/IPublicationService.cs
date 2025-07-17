@@ -1,3 +1,4 @@
+using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
@@ -41,16 +42,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
         Task<Either<ActionResult, ContactViewModel>> UpdateContact(Guid publicationId,
             ContactSaveRequest updatedContact);
 
-        Task<Either<ActionResult, PaginatedListViewModel<ReleaseVersionSummaryViewModel>>> ListLatestReleaseVersionsPaginated(
+        Task<Either<ActionResult, PaginatedListViewModel<ReleaseVersionSummaryViewModel>>> ListReleaseVersionsPaginated(
             Guid publicationId,
+            ReleaseVersionsType versionsType,
             int page,
             int pageSize,
-            bool? live = null,
             bool includePermissions = false);
 
-        Task<Either<ActionResult, List<ReleaseVersionSummaryViewModel>>> ListLatestReleaseVersions(
+        Task<Either<ActionResult, List<ReleaseVersionSummaryViewModel>>> ListReleaseVersions(
             Guid publicationId,
-            bool? live = null,
+            ReleaseVersionsType versionsType,
             bool includePermissions = false);
 
         Task<Either<ActionResult, List<ReleaseSeriesTableEntryViewModel>>> GetReleaseSeries(

@@ -82,7 +82,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                                 )
                                 .ReturnsAsync(new List<ReleasePublishingStatus>());
 
-                            // Assert that a user who has the "Contributor", "Lead" or "Approver"
+                            // Assert that a user who has the "Contributor" or "Approver"
                             // role on a Release can update its status if it is not Approved
                             if (status != ReleaseApprovalStatus.Approved)
                             {
@@ -97,7 +97,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                                     },
                                     releaseVersion,
                                     ReleaseRole.Contributor,
-                                    ReleaseRole.Lead,
                                     ReleaseRole.Approver
                                 );
                             }
@@ -163,7 +162,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                                     },
                                     releaseVersion,
                                     Owner,
-                                    Approver
+                                    Allower
                                 );
                             }
                             else
@@ -181,7 +180,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                                         return CreateHandler(releaseStatusRepository, context);
                                     },
                                     releaseVersion,
-                                    Approver
+                                    Allower
                                 );
                             }
                         }
@@ -268,7 +267,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                                 )
                                 .ReturnsAsync(new List<ReleasePublishingStatus>());
 
-                            // Assert that a user who has the "Contributor", "Lead" or "Approver"
+                            // Assert that a user who has the "Contributor" or "Approver"
                             // role on a Release can update its status if it is not Approved
                             if (status != ReleaseApprovalStatus.Approved)
                             {
@@ -283,7 +282,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                                     },
                                     releaseVersion,
                                     ReleaseRole.Contributor,
-                                    ReleaseRole.Lead,
                                     ReleaseRole.Approver
                                 );
                             }
@@ -349,7 +347,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                                     },
                                     releaseVersion,
                                     Owner,
-                                    Approver
+                                    Allower
                                 );
                             }
                             else
@@ -366,7 +364,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                                         return CreateHandler(releaseStatusRepository, context);
                                     },
                                     releaseVersion,
-                                    Approver
+                                    Allower
                                 );
                             }
                         }
@@ -508,7 +506,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                                     return CreateHandler(releaseStatusRepository, context);
                                 },
                                 releaseVersion,
-                                Approver
+                                Allower
                             );
                         }
                     );

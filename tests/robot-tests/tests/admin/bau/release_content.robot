@@ -12,7 +12,7 @@ Force Tags          Admin    Local    Dev    AltersData
 
 
 *** Variables ***
-${PUBLICATION_NAME}                 UI tests - release content %{RUN_IDENTIFIER}
+${PUBLICATION_NAME}                 Release content %{RUN_IDENTIFIER}
 ${SECONDARY_STATS_TABLE_TAB_ID}     releaseHeadlines-dataBlock-tables-tab
 
 

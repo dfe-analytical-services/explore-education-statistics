@@ -14,7 +14,6 @@ using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Security.AuthorizationHandlers;
-using Microsoft.Extensions.Options;
 using Moq;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityClaimTypes;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.
@@ -70,7 +69,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                         return CreateHandler(contentDbContext);
                     },
                     ReleaseVersion,
-                    rolesExpectedToSucceed: new[] { PublicationRole.Owner, PublicationRole.Approver });
+                    rolesExpectedToSucceed: new[] { PublicationRole.Owner, PublicationRole.Allower });
             }
         }
 
@@ -87,10 +86,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                         return CreateHandler(contentDbContext);
                     },
                     ReleaseVersion,
-                    rolesExpectedToSucceed: new[]
-                    {
-                        ReleaseRole.Viewer, ReleaseRole.Lead, ReleaseRole.Contributor, ReleaseRole.Approver
-                    });
+                    rolesExpectedToSucceed:
+                    [
+                        ReleaseRole.Contributor, ReleaseRole.Approver
+                    ]);
             }
 
             [Fact]

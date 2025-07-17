@@ -12,9 +12,9 @@ Force Tags          Admin    Local    Dev    AltersData
 
 
 *** Variables ***
-${PUBLICATION_NAME}=                    UI tests - publish methodology %{RUN_IDENTIFIER}
-${PUBLICATION_URL}=                     /find-statistics/ui-tests-publish-methodology-%{RUN_IDENTIFIER}/2021-22
-${PUBLIC_METHODOLOGY_URL_ENDING}=       /methodology/ui-tests-publish-methodology-%{RUN_IDENTIFIER}
+${PUBLICATION_NAME}=                    Publish methodology %{RUN_IDENTIFIER}
+${PUBLICATION_URL}=                     /find-statistics/publish-methodology-%{RUN_IDENTIFIER}/2021-22
+${PUBLIC_METHODOLOGY_URL_ENDING}=       /methodology/publish-methodology-%{RUN_IDENTIFIER}
 ${RELEASE_NAME}=                        Academic year 2021/22
 
 
@@ -158,6 +158,8 @@ Verify that the methodology 'Published' tag and datetime is shown
 Verify that the methodology is visible on the public methodologies page with the expected URL
     user navigates to public methodologies page
     user waits until page contains accordion section    %{TEST_THEME_NAME}
+
+Verify methodology accordion content
     user opens accordion section    %{TEST_THEME_NAME}
     user checks page contains link with text and url
     ...    ${PUBLICATION_NAME}
@@ -343,6 +345,13 @@ Go to methodology amendment's public page
     user navigates to    ${METHODOLOGY_URL}
     user waits until page contains title    ${PUBLICATION_NAME} - Amended methodology
     user waits until page contains title caption    Methodology
+
+Verify public methodology page meta
+    ${AMENDED_PUBLICATION_NAME}=    Set Variable    ${PUBLICATION_NAME} - Amended methodology
+    ${AMENDED_PUBLICATION_NAME_LOWERCASE}=    Convert To Lower Case    ${PUBLICATION_NAME} - Amended methodology
+    user checks meta title should be    ${AMENDED_PUBLICATION_NAME}: methodology
+    user checks meta description should be
+    ...    Methodology detailing the preparation of ${AMENDED_PUBLICATION_NAME_LOWERCASE}.
 
 Verify that the amended methodology displays a link to the publication
     user checks element contains child element

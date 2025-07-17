@@ -10,12 +10,15 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Public.Data;
+using GovUk.Education.ExploreEducationStatistics.Admin.Tests.MockBuilders;
+using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using GovUk.Education.ExploreEducationStatistics.Admin.Validators.ErrorDetails;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Cache;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Options;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
@@ -37,6 +40,7 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Tests.Fixtures;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Moq;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.MapperUtils;
@@ -127,19 +131,39 @@ public abstract class ReleaseVersionServiceTests
                 Assert.Equal(subject.Id, deleteDataFilePlan.SubjectId);
                 Assert.Equal(deleteDataBlockPlan, deleteDataFilePlan.DeleteDataBlockPlan);
                 Assert.Equal([footnote.Id], deleteDataFilePlan.FootnoteIds);
-                Assert.Null(deleteDataFilePlan.DeleteApiDataSetVersionPlan);
+                Assert.Null(deleteDataFilePlan.ApiDataSetVersionPlan);
                 Assert.True(deleteDataFilePlan.Valid);
             }
         }
 
-        [Fact]
-        public async Task FileIsLinkedToPublicApiDataSet_InvalidPlan()
+        [Theory] 
+        [InlineData(DataSetVersionStatus.Mapping, true, true)] 
+        [InlineData(DataSetVersionStatus.Draft, true, true)] 
+        [InlineData(DataSetVersionStatus.Mapping, false, false)]
+        [InlineData(DataSetVersionStatus.Published, true, false)] 
+        [InlineData(DataSetVersionStatus.Published, false, false)]
+        [InlineData(DataSetVersionStatus.Draft, false, false)]
+        [InlineData(DataSetVersionStatus.Processing, true, true)]
+        [InlineData(DataSetVersionStatus.Failed, true, true)]
+        [InlineData(DataSetVersionStatus.Deprecated, true, false)]
+        [InlineData(DataSetVersionStatus.Withdrawn, true, false)]
+        [InlineData(DataSetVersionStatus.Cancelled, true, true)]
+        [InlineData(DataSetVersionStatus.Processing, false, false)]
+        [InlineData(DataSetVersionStatus.Failed, false, false)]
+        [InlineData(DataSetVersionStatus.Deprecated, false, false)]
+        [InlineData(DataSetVersionStatus.Withdrawn, false, false)]
+        [InlineData(DataSetVersionStatus.Cancelled, false, false)]
+        public async Task FileIsLinkedToPublicApiDataSet_DataSetVersionStatusCondition_PlanValidity(
+            DataSetVersionStatus dataSetVersionStatus, 
+            bool enableReplacementOfPublicApiDataSets,
+            bool expectedValidValue)
         {
             DataSet dataSet = _dataFixture
                 .DefaultDataSet();
 
             DataSetVersion dataSetVersion = _dataFixture
                 .DefaultDataSetVersion()
+                .WithStatus(dataSetVersionStatus)
                 .WithDataSet(dataSet);
 
             ReleaseVersion releaseVersion = _dataFixture
@@ -200,7 +224,8 @@ public abstract class ReleaseVersionServiceTests
                     statisticsDbContext: statisticsDbContext,
                     dataSetVersionService: dataSetVersionService.Object,
                     dataBlockService: dataBlockService.Object,
-                    footnoteRepository: footnoteRepository.Object);
+                    footnoteRepository: footnoteRepository.Object,
+                    enableReplacementOfPublicApiDataSets: enableReplacementOfPublicApiDataSets);
 
                 var result = await releaseVersionService.GetDeleteDataFilePlan(
                     releaseVersionId: releaseVersion.Id,
@@ -216,14 +241,14 @@ public abstract class ReleaseVersionServiceTests
                 Assert.Equal(subject.Id, deleteDataFilePlan.SubjectId);
                 Assert.Equal(deleteDataBlockPlan, deleteDataFilePlan.DeleteDataBlockPlan);
                 Assert.Equal([footnote.Id], deleteDataFilePlan.FootnoteIds);
-                Assert.NotNull(deleteDataFilePlan.DeleteApiDataSetVersionPlan);
-                Assert.Equal(dataSet.Id, deleteDataFilePlan.DeleteApiDataSetVersionPlan.DataSetId);
-                Assert.Equal(dataSet.Title, deleteDataFilePlan.DeleteApiDataSetVersionPlan.DataSetTitle);
-                Assert.Equal(dataSetVersion.Id, deleteDataFilePlan.DeleteApiDataSetVersionPlan.Id);
-                Assert.Equal(dataSetVersion.PublicVersion, deleteDataFilePlan.DeleteApiDataSetVersionPlan.Version);
-                Assert.Equal(dataSetVersion.Status, deleteDataFilePlan.DeleteApiDataSetVersionPlan.Status);
-                Assert.False(deleteDataFilePlan.DeleteApiDataSetVersionPlan.Valid);
-                Assert.False(deleteDataFilePlan.Valid);
+                Assert.NotNull(deleteDataFilePlan.ApiDataSetVersionPlan);
+                Assert.Equal(dataSet.Id, deleteDataFilePlan.ApiDataSetVersionPlan.DataSetId);
+                Assert.Equal(dataSet.Title, deleteDataFilePlan.ApiDataSetVersionPlan.DataSetTitle);
+                Assert.Equal(dataSetVersion.Id, deleteDataFilePlan.ApiDataSetVersionPlan.Id);
+                Assert.Equal(dataSetVersion.PublicVersion, deleteDataFilePlan.ApiDataSetVersionPlan.Version);
+                Assert.Equal(dataSetVersion.Status, deleteDataFilePlan.ApiDataSetVersionPlan.Status);
+                Assert.Equal(expectedValidValue, deleteDataFilePlan.ApiDataSetVersionPlan.Valid);
+                Assert.Equal(expectedValidValue, deleteDataFilePlan.Valid);
             }
         }
     }
@@ -568,56 +593,207 @@ public abstract class ReleaseVersionServiceTests
         }
 
         [Fact]
-        public async Task FileIsLinkedToPublicApiDataSet_ValidationProblem()
+        public async Task FileIsLinkedToInvalidPublicApiDataSet_ThrowsException()
         {
-            ReleaseVersion releaseVersion = _dataFixture
-                .DefaultReleaseVersion();
+            var contextId = Guid.NewGuid().ToString();
+            await using var contentDbContext = InMemoryApplicationDbContext(contextId);
+            await using var statisticsDbContext = InMemoryStatisticsDbContext(contextId);
 
-            File file = _dataFixture
-                .DefaultFile()
-                .WithType(FileType.Data);
-
-            ReleaseFile releaseFile = _dataFixture
-                .DefaultReleaseFile()
-                .WithReleaseVersion(releaseVersion)
-                .WithFile(file)
-                .WithPublicApiDataSetId(Guid.NewGuid())
-                .WithPublicApiDataSetVersion(1, 0);
-
-            var contentDbContextId = Guid.NewGuid().ToString();
-
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                contentDbContext.ReleaseVersions.Add(releaseVersion);
-                contentDbContext.ReleaseFiles.Add(releaseFile);
-                await contentDbContext.SaveChangesAsync();
-            }
-
-            var dataImportService = new Mock<IDataImportService>(Strict);
-
-            dataImportService.Setup(service => service.GetImport(file.Id))
-                .ReturnsAsync(new DataImport { Status = DataImportStatus.COMPLETE });
-
-            await using var context = InMemoryApplicationDbContext(contentDbContextId);
+            var testFixture = await RemoveDataSetTestFixture.CreateApiLinkedThrows404VersionException(
+                _dataFixture, 
+                DataSetVersionStatus.Draft,
+                statisticsDbContext, contentDbContext);
+            
             var releaseVersionService = BuildService(
-                context,
-                dataImportService: dataImportService.Object);
+                contentDbContext: contentDbContext,
+                dataSetVersionService: testFixture.DataSetVersionService.Object,
+                dataImportService: testFixture.DataImportService.Object,
+                enableReplacementOfPublicApiDataSets: true,
+                logger: testFixture.Logger.Object);
 
+            var exception = await Assert.ThrowsAsync<InvalidOperationException>(
+                async () => 
+                    await releaseVersionService.RemoveDataFiles(
+                        releaseVersionId: testFixture.ReleaseVersion.Id,
+                        fileId: testFixture.File.Id));
+
+            // Verify the exception message
+            Assert.Contains(
+                "Failed to find the data set version expected to be linked to the release file that is being deleted", 
+                exception.Message);
+        }
+        
+        [Fact]
+        public async Task FileLinkedToPublicApiDataSetAndIsReplaced_ValidationProblem()
+        {
+            var contextId = Guid.NewGuid().ToString();
+            await using var contentDbContext = InMemoryApplicationDbContext(contextId);
+            await using var statisticsDbContext = InMemoryStatisticsDbContext(contextId);
+
+            var testFixture = await RemoveDataSetTestFixture.CreateApiLinkedToRelease(
+                _dataFixture, 
+                DataSetVersionStatus.Published,
+                statisticsDbContext,
+                contentDbContext,
+                replacedById: Guid.NewGuid(),
+                replacingId: null,
+                releaseVersionPublished: false);
+            
+            var releaseVersionService = BuildService(
+                contentDbContext: contentDbContext,
+                dataSetVersionService: testFixture.DataSetVersionService.Object,
+                dataImportService: testFixture.DataImportService.Object,
+                enableReplacementOfPublicApiDataSets: true);
+            
             var result = await releaseVersionService.RemoveDataFiles(
-                releaseVersionId: releaseVersion.Id,
-                fileId: file.Id);
-
-            VerifyAllMocks(dataImportService);
-
+                        releaseVersionId: testFixture.ReleaseVersion.Id,
+                        fileId: testFixture.File.Id);
             var validationProblem = result.AssertBadRequestWithValidationProblem();
 
             var errorDetail = validationProblem.AssertHasError(
                 expectedPath: null,
-                expectedCode: ValidationMessages.CannotDeleteApiDataSetReleaseFile.Code);
+                expectedCode: ValidationMessages.ReleaseFileMustBeOriginal.Code);
+        }
+        
+        [Fact]
+        public async Task FileLinkedToPublishedReleaseAndIsReplacing_ThrowsException()
+        {
+            var contextId = Guid.NewGuid().ToString();
+            await using var contentDbContext = InMemoryApplicationDbContext(contextId);
+            await using var statisticsDbContext = InMemoryStatisticsDbContext(contextId);
 
-            var apiDataSetErrorDetail = Assert.IsType<ApiDataSetErrorDetail>(errorDetail.Detail);
+            var testFixture = await RemoveDataSetTestFixture.CreateApiLinkedToRelease(
+                _dataFixture, 
+                DataSetVersionStatus.Published,
+                statisticsDbContext,
+                contentDbContext,
+                replacedById: null,
+                replacingId: Guid.NewGuid(),
+                releaseVersionPublished: true);
+            
+            var releaseVersionService = BuildService(
+                contentDbContext: contentDbContext,
+                dataSetVersionService: testFixture.DataSetVersionService.Object,
+                dataImportService: testFixture.DataImportService.Object,
+                enableReplacementOfPublicApiDataSets: true);
+            
+            var exception = await Assert.ThrowsAsync<InvalidOperationException>(
+                async () => 
+                    await releaseVersionService.RemoveDataFiles(
+                        releaseVersionId: testFixture.ReleaseVersion.Id,
+                        fileId: testFixture.File.Id));
 
-            Assert.Equal(releaseFile.PublicApiDataSetId, apiDataSetErrorDetail.DataSetId);
+            // Verify the exception message
+            Assert.Contains(
+                "A replacement file for a DRAFT release version cannot also be a PUBLISHED file.", 
+                exception.Message);
+        }
+        
+        [Fact]
+        public async Task FileLinkedToDraftReleaseAndPublishedPublicApiDataSet_ThrowsException()
+        {
+            var contextId = Guid.NewGuid().ToString();
+            await using var contentDbContext = InMemoryApplicationDbContext(contextId);
+            await using var statisticsDbContext = InMemoryStatisticsDbContext(contextId);
+
+            var testFixture = await RemoveDataSetTestFixture.CreateApiLinkedToRelease(
+                _dataFixture, 
+                DataSetVersionStatus.Published,
+                statisticsDbContext,
+                contentDbContext,
+                replacedById: null,
+                replacingId: null,
+                releaseVersionPublished: false);
+            
+            var releaseVersionService = BuildService(
+                contentDbContext: contentDbContext,
+                dataSetVersionService: testFixture.DataSetVersionService.Object,
+                dataImportService: testFixture.DataImportService.Object,
+                enableReplacementOfPublicApiDataSets: true);
+            
+            var exception = await Assert.ThrowsAsync<InvalidOperationException>(
+                async () => 
+                    await releaseVersionService.RemoveDataFiles(
+                        releaseVersionId: testFixture.ReleaseVersion.Id,
+                        fileId: testFixture.File.Id));
+
+            // Verify the exception message
+            Assert.Contains(
+                "A DRAFT release version's file cannot be linked to a PUBLISHED API.", 
+                exception.Message);
+        }
+        
+        [Theory]
+        [InlineData(DataSetVersionStatus.Draft, true, false, true)]
+        [InlineData(DataSetVersionStatus.Draft, false, true, false)]
+        [InlineData(DataSetVersionStatus.Mapping, true, false, true)]
+        [InlineData(DataSetVersionStatus.Mapping, false, true, false)]
+        [InlineData(DataSetVersionStatus.Published, false, true, false)]
+        [InlineData(DataSetVersionStatus.Published, true, false, false)]
+        [InlineData(DataSetVersionStatus.Withdrawn, false, true, false)]
+        [InlineData(DataSetVersionStatus.Withdrawn, true, false, false)]
+        [InlineData(DataSetVersionStatus.Deprecated, false, true, false)]
+        [InlineData(DataSetVersionStatus.Deprecated, true, false, false)]
+        public async Task FileIsLinkedToPublicApiDataSet_ValidationProblem(
+            DataSetVersionStatus dataSetVersionStatus, 
+            bool enableReplacementOfPublicApiDataSets, 
+            bool expectingValidationProblem, 
+            bool expectingApiDeletion)
+        {
+            var contextId = Guid.NewGuid().ToString();
+            await using var contentDbContext = InMemoryApplicationDbContext(contextId);
+            await using var statisticsDbContext = InMemoryStatisticsDbContext(contextId);
+
+            var testFixture = await RemoveDataSetTestFixture.CreateApiLinkedValidationError(
+                _dataFixture, 
+                dataSetVersionStatus, 
+                statisticsDbContext,
+                contentDbContext);
+                
+            if (enableReplacementOfPublicApiDataSets)
+            {
+                testFixture.SetUpMocksForCheckApiLinkedServices();
+
+                if(expectingApiDeletion)
+                {
+                    testFixture.SetUpMocksForDeleteApiLinkedServices();
+                }     
+            }
+                
+            var releaseVersionService = BuildService(
+                contentDbContext: contentDbContext,
+                statisticsDbContext: statisticsDbContext,
+                dataSetVersionService: testFixture.DataSetVersionService.Object,
+                dataImportService: testFixture.DataImportService.Object,
+                dataBlockService: testFixture.DataBlockService.Object,
+                footnoteRepository: testFixture.FootnoteRepository.Object,
+                releaseSubjectRepository: testFixture.ReleaseSubjectRepository.Object,
+                privateCacheService: testFixture.PrivateCacheService.Object,
+                releaseDataFileService: testFixture.ReleaseDataFileService.Object,
+                enableReplacementOfPublicApiDataSets: enableReplacementOfPublicApiDataSets);
+
+            var result = await releaseVersionService.RemoveDataFiles(
+                releaseVersionId: testFixture.ReleaseVersion.Id,
+                fileId: testFixture.File.Id);
+
+            VerifyAllMocks(testFixture.DataImportService, testFixture.DataSetVersionService, testFixture.FootnoteRepository, testFixture.DataBlockService);
+
+            if (expectingValidationProblem)
+            {
+                var validationProblem = result.AssertBadRequestWithValidationProblem();
+
+                var errorDetail = validationProblem.AssertHasError(
+                    expectedPath: null,
+                    expectedCode: ValidationMessages.CannotDeleteApiDataSetReleaseFile.Code);
+
+                var apiDataSetErrorDetail = Assert.IsType<ApiDataSetErrorDetail>(errorDetail.Detail);
+
+                Assert.Equal(testFixture.ReleaseFile.PublicApiDataSetId, apiDataSetErrorDetail.DataSetId);
+            }
+            else
+            {
+                result.AssertRight();
+            }
         }
     }
 
@@ -737,7 +913,21 @@ public abstract class ReleaseVersionServiceTests
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                var releaseVersionService = BuildService(context);
+                var expectedUpdatedReleaseSlug = NamingUtils.CreateReleaseSlug(
+                    year: otherRelease.Year, 
+                    timePeriodCoverage: otherRelease.TimePeriodCoverage, 
+                    label: null);
+
+                var releaseSlugValidator = new ReleaseSlugValidatorMockBuilder()
+                    .SetValidationToFail(
+                        validationErrorMessage: SlugNotUnique, 
+                        releaseSlug: expectedUpdatedReleaseSlug, 
+                        publicationId: publication.Id, 
+                        releaseId: releaseVersion.ReleaseId);
+
+                var releaseVersionService = BuildService(
+                    contentDbContext: context,
+                    releaseSlugValidator: releaseSlugValidator.Build());
 
                 var result = await releaseVersionService
                     .UpdateReleaseVersion(
@@ -769,6 +959,48 @@ public abstract class ReleaseVersionServiceTests
 
             result.AssertBadRequest(ReleaseTypeInvalid);
         }
+
+        [Fact]
+        public async Task GivenReleaseVersionExists_AndIsFirstVersion_NewReleaseSlugIsValidated()
+        {
+            Release release = _dataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true)
+                .WithPublication(_dataFixture.DefaultPublication());
+
+            await using var context = InMemoryApplicationDbContext(Guid.NewGuid().ToString());
+            context.Releases.Add(release);
+            await context.SaveChangesAsync();
+
+            var dataSetVersionService = new DataSetVersionServiceMockBuilder();
+            var releaseSlugValidator = new ReleaseSlugValidatorMockBuilder();
+            var sut = BuildService(
+                context,
+                dataSetVersionService: dataSetVersionService.Build(),
+                releaseSlugValidator: releaseSlugValidator.Build());
+
+            var newLabel = "initial";
+
+            var request = new ReleaseVersionUpdateRequest
+            {
+                Year = release.Year,
+                TimePeriodCoverage = release.TimePeriodCoverage,
+                Label = newLabel,
+                Type = ReleaseType.OfficialStatistics
+            };
+
+            // ACT
+            await sut.UpdateReleaseVersion(release.Versions[0].Id, request);
+
+            // ASSERT
+            var expectedNewReleaseSlug = NamingUtils.CreateReleaseSlug(
+                year: release.Year,
+                timePeriodCoverage: release.TimePeriodCoverage,
+                label: newLabel);
+
+            releaseSlugValidator.Assert.ValidateNewSlugWasCalled(
+                expectedNewReleaseSlug: expectedNewReleaseSlug,
+                expectedPublicationId: release.PublicationId,
+                expectedReleaseId: release.Id);
+        }
     }
 
     public class GetReleaseTests : ReleaseVersionServiceTests
@@ -785,6 +1017,9 @@ public abstract class ReleaseVersionServiceTests
                             _dataFixture.DefaultReleaseVersion()
                                 .WithApprovalStatus(ReleaseApprovalStatus.Approved)
                                 .WithPublished(DateTime.UtcNow)
+                                .WithPublishScheduled(DateTime.UtcNow)
+                                .WithPublishingOrganisations(_dataFixture.DefaultOrganisation()
+                                    .Generate(2))
                                 .WithReleaseStatuses(_dataFixture.DefaultReleaseStatus()
                                     .Generate(2))
                         ])
@@ -834,7 +1069,7 @@ public abstract class ReleaseVersionServiceTests
                 Assert.Equal(releaseVersion.Release.Publication.Slug, viewModel.PublicationSlug);
                 Assert.Equal(releaseVersion.ApprovalStatus, viewModel.ApprovalStatus);
                 Assert.Equal(releaseVersion.LatestInternalReleaseNote, viewModel.LatestInternalReleaseNote);
-                Assert.Equal(releaseVersion.PublishScheduled, viewModel.PublishScheduled);
+                Assert.Equal(releaseVersion.PublishScheduled?.ConvertUtcToUkTimeZone(), viewModel.PublishScheduled);
                 Assert.Equal(releaseVersion.Published, viewModel.Published);
                 Assert.Equal(releaseVersion.PreReleaseAccessList, viewModel.PreReleaseAccessList);
                 Assert.Equal(releaseVersion.NextReleaseDate, viewModel.NextReleaseDate);
@@ -842,6 +1077,16 @@ public abstract class ReleaseVersionServiceTests
                 Assert.Equal(releaseVersion.Release.TimePeriodCoverage, viewModel.TimePeriodCoverage);
                 Assert.Equal(releaseVersion.NotifySubscribers, viewModel.NotifySubscribers);
                 Assert.Equal(releaseVersion.UpdatePublishedDate, viewModel.UpdatePublishedDate);
+
+                Assert.Equal(releaseVersion.PublishingOrganisations.Count, viewModel.PublishingOrganisations.Count);
+                Assert.All(releaseVersion.PublishingOrganisations,
+                    (expectedOrganisation, index) =>
+                    {
+                        var actualOrganisation = viewModel.PublishingOrganisations[index];
+                        Assert.Equal(expectedOrganisation.Id, actualOrganisation.Id);
+                        Assert.Equal(expectedOrganisation.Title, actualOrganisation.Title);
+                        Assert.Equal(expectedOrganisation.Url, actualOrganisation.Url);
+                    });
 
                 Assert.Null(viewModel.PreviousVersionId);
                 Assert.True(viewModel.LatestRelease);
@@ -1782,22 +2027,21 @@ public abstract class ReleaseVersionServiceTests
 
             await using var statisticsDbContext = InMemoryStatisticsDbContext(contextId);
             await using var contentDbContext = InMemoryApplicationDbContext(contextId);
-            {
-                var releaseVersionService = BuildService(
-                    contentDbContext: contentDbContext,
-                    statisticsDbContext: statisticsDbContext,
-                    processorClient: processorClient.Object);
 
-                var result = await releaseVersionService.DeleteTestReleaseVersion(releaseVersion.Id);
+            var releaseVersionService = BuildService(
+                contentDbContext: contentDbContext,
+                statisticsDbContext: statisticsDbContext,
+                processorClient: processorClient.Object);
 
-                VerifyAllMocks(processorClient);
+            var result = await releaseVersionService.DeleteTestReleaseVersion(releaseVersion.Id);
 
-                var validationProblem = result.AssertBadRequestWithValidationProblem();
+            VerifyAllMocks(processorClient);
 
-                validationProblem.AssertHasError(
-                    expectedPath: "error path",
-                    expectedCode: "error code");
-            }
+            var validationProblem = result.AssertBadRequestWithValidationProblem();
+
+            validationProblem.AssertHasError(
+                expectedPath: "error path",
+                expectedCode: "error code");
         }
 
         [Fact]
@@ -1829,17 +2073,16 @@ public abstract class ReleaseVersionServiceTests
 
             await using var statisticsDbContext = InMemoryStatisticsDbContext(contextId);
             await using var contentDbContext = InMemoryApplicationDbContext(contextId);
-            {
-                var releaseVersionService = BuildService(
-                    contentDbContext: contentDbContext,
-                    statisticsDbContext: statisticsDbContext,
-                    processorClient: processorClient.Object);
+            
+            var releaseVersionService = BuildService(
+                contentDbContext: contentDbContext,
+                statisticsDbContext: statisticsDbContext,
+                processorClient: processorClient.Object);
 
-                await Assert.ThrowsAsync<HttpRequestException>(async () =>
-                    await releaseVersionService.DeleteTestReleaseVersion(releaseVersion.Id));
+            await Assert.ThrowsAsync<HttpRequestException>(async () =>
+                await releaseVersionService.DeleteTestReleaseVersion(releaseVersion.Id));
 
-                VerifyAllMocks(processorClient);
-            }
+            VerifyAllMocks(processorClient);
         }
     }
 
@@ -2222,7 +2465,7 @@ public abstract class ReleaseVersionServiceTests
             var approverPublicationRoleForUser = _fixture
                 .DefaultUserPublicationRole()
                 .WithUser(User)
-                .WithRole(PublicationRole.Approver)
+                .WithRole(PublicationRole.Allower)
                 .WithPublication(publications[1])
                 .Generate();
 
@@ -2236,7 +2479,7 @@ public abstract class ReleaseVersionServiceTests
             var approverPublicationRolesForOtherUser = _fixture
                 .DefaultUserPublicationRole()
                 .WithUser(otherUser)
-                .WithRole(PublicationRole.Approver)
+                .WithRole(PublicationRole.Allower)
                 .WithPublications(publications)
                 .GenerateList();
 
@@ -2292,7 +2535,7 @@ public abstract class ReleaseVersionServiceTests
             var approverPublicationRoleForUser = _fixture
                 .DefaultUserPublicationRole()
                 .WithUser(User)
-                .WithRole(PublicationRole.Approver)
+                .WithRole(PublicationRole.Allower)
                 .WithPublication(publication)
                 .Generate();
 
@@ -2335,7 +2578,10 @@ public abstract class ReleaseVersionServiceTests
         IReleaseSubjectRepository? releaseSubjectRepository = null,
         IDataSetVersionService? dataSetVersionService = null,
         IProcessorClient? processorClient = null,
-        IPrivateBlobCacheService? privateCacheService = null)
+        IPrivateBlobCacheService? privateCacheService = null,
+        IReleaseSlugValidator? releaseSlugValidator = null,
+        bool enableReplacementOfPublicApiDataSets = false,
+        ILogger<ReleaseVersionService>? logger = null)
     {
         var userService = AlwaysTrueUserService();
 
@@ -2361,7 +2607,13 @@ public abstract class ReleaseVersionServiceTests
             releaseSubjectRepository ?? Mock.Of<IReleaseSubjectRepository>(Strict),
             dataSetVersionService ?? Mock.Of<IDataSetVersionService>(Strict),
             processorClient ?? Mock.Of<IProcessorClient>(Strict),
-            privateCacheService ?? Mock.Of<IPrivateBlobCacheService>(Strict)
+            privateCacheService ?? Mock.Of<IPrivateBlobCacheService>(Strict),
+            releaseSlugValidator ?? new ReleaseSlugValidatorMockBuilder().Build(),
+            featureFlags: Microsoft.Extensions.Options.Options.Create(new FeatureFlagsOptions()
+            {
+                EnableReplacementOfPublicApiDataSets = enableReplacementOfPublicApiDataSets
+            }),
+            logger ?? Mock.Of<ILogger<ReleaseVersionService>>(Strict)
         );
     }
 }

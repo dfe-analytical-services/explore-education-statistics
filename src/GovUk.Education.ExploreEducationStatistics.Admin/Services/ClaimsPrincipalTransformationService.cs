@@ -6,7 +6,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Services.Security;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Identity.Web;
-using Microsoft.IdentityModel.Tokens;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services;
 

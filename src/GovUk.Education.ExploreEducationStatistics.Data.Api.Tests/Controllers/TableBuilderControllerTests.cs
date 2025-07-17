@@ -10,6 +10,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Chart;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
+using GovUk.Education.ExploreEducationStatistics.Common.Requests;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
@@ -31,6 +32,7 @@ using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.TimeIdentifier;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
+using static GovUk.Education.ExploreEducationStatistics.Common.Utils.FilterHierarchiesOptionsUtils;
 using static Moq.MockBehavior;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
@@ -65,6 +67,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
             Indicators = new List<Guid> // use collection expression -> test failures
             {
                 Guid.NewGuid()
+            },
+            FilterHierarchiesOptions = new List<FilterHierarchyOptions>
+            {
+                new() { LeafFilterId = Guid.NewGuid(), Options = [[Guid.NewGuid(), Guid.NewGuid()], [Guid.NewGuid(), Guid.NewGuid()]] },
+                new() { LeafFilterId = Guid.NewGuid(), Options = [[Guid.NewGuid(), Guid.NewGuid()]] },
+                new() { LeafFilterId = Guid.NewGuid(), Options = [[Guid.NewGuid(), Guid.NewGuid()]] },
+                new() { LeafFilterId = Guid.NewGuid(), Options = [[Guid.NewGuid(), Guid.NewGuid()], [Guid.NewGuid(), Guid.NewGuid()]] },
             }
         };
 
@@ -107,7 +116,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
             var client = SetupApp(tableBuilderService: tableBuilderService.Object).CreateClient();
 
             var response = await client
-                .PostAsync("/api/tablebuilder", new JsonNetContent(FullTableQuery));
+                .PostAsync("/api/tablebuilder", new JsonNetContent(ToRequest(FullTableQuery)));
 
             VerifyAllMocks(tableBuilderService);
 
@@ -135,7 +144,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
 
             var response = await client
                 .PostAsync("/api/tablebuilder",
-                    content: new JsonNetContent(FullTableQuery), // binds to FullTableQueryRequest
+                    content: new JsonNetContent(ToRequest(FullTableQuery)),
                     headers: new Dictionary<string, string> { { HeaderNames.Accept, ContentTypes.Csv } }
                 );
 
@@ -162,7 +171,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
                     s => s.Query(
                         releaseVersion.Id,
                         ItIs.DeepEqualTo(FullTableQuery),
-                        It.IsAny<long?>(),
                         It.IsAny<CancellationToken>()
                     )
                 )
@@ -173,7 +181,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
 
             var response = await client
                 .PostAsync($"/api/tablebuilder/release/{releaseVersion.Id}",
-                    new JsonNetContent(FullTableQuery));
+                    new JsonNetContent(ToRequest(FullTableQuery)));
 
             VerifyAllMocks(tableBuilderService);
 
@@ -212,7 +220,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
 
             var response = await client
                 .PostAsync($"/api/tablebuilder/release/{releaseVersion.Id}",
-                    content: new JsonNetContent(FullTableQuery),
+                    content: new JsonNetContent(ToRequest(FullTableQuery)),
                     headers: new Dictionary<string, string> { { HeaderNames.Accept, ContentTypes.Csv } }
                 );
 
@@ -265,7 +273,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
             var dataBlockService = new Mock<IDataBlockService>();
 
             dataBlockService
-                .Setup(s => s.GetDataBlockTableResult(releaseVersion.Id, dataBlockId, null))
+                .Setup(s => s.GetDataBlockTableResult(releaseVersion.Id, dataBlockId))
                 .ReturnsAsync(_tableBuilderResults);
 
             var client = SetupApp(dataBlockService: dataBlockService.Object)
@@ -393,7 +401,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
             var dataBlockService = new Mock<IDataBlockService>(Strict);
 
             dataBlockService
-                .Setup(s => s.GetDataBlockTableResult(releaseVersion.Id, dataBlockId, null))
+                .Setup(s => s.GetDataBlockTableResult(releaseVersion.Id, dataBlockId))
                 .ReturnsAsync(_tableBuilderResults);
 
             var client = SetupApp(dataBlockService: dataBlockService.Object)
@@ -466,7 +474,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
             var dataBlockService = new Mock<IDataBlockService>(Strict);
 
             dataBlockService
-                .Setup(s => s.GetDataBlockTableResult(releaseVersion.Id, dataBlockId, null))
+                .Setup(s => s.GetDataBlockTableResult(releaseVersion.Id, dataBlockId))
                 .ReturnsAsync(_tableBuilderResults);
 
             var client = SetupApp(dataBlockService: dataBlockService.Object)
@@ -543,7 +551,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
             var dataBlockService = new Mock<IDataBlockService>(Strict);
 
             dataBlockService
-                .Setup(s => s.GetDataBlockTableResult(releaseVersion.Id, dataBlockId, null))
+                .Setup(s => s.GetDataBlockTableResult(releaseVersion.Id, dataBlockId))
                 .ReturnsAsync(_tableBuilderResults);
 
             var client = SetupApp(
@@ -567,13 +575,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
             viewModel.FullTable.AssertDeepEqualTo(_tableBuilderResults);
             Assert.True(viewModel.LatestData);
             Assert.Equal(release.Title, viewModel.LatestReleaseTitle);
+            Assert.Equal(release.Slug, viewModel.LatestReleaseSlug);
 
             var queryViewModel = viewModel.Query;
             Assert.NotNull(queryViewModel);
             Assert.Equal(publication.Id, queryViewModel.PublicationId);
             Assert.Equal(FullTableQuery.SubjectId, viewModel.Query.SubjectId);
             Assert.Equal(FullTableQuery.TimePeriod, viewModel.Query.TimePeriod);
-            Assert.Equal(FullTableQuery.Filters, viewModel.Query.Filters);
+            Assert.Equal(FullTableQuery.GetNonHierarchicalFilterItemIds(), viewModel.Query.GetNonHierarchicalFilterItemIds());
+            viewModel.Query.FilterHierarchiesOptions.AssertDeepEqualTo(FullTableQuery.FilterHierarchiesOptions);
             Assert.Equal(FullTableQuery.Indicators, viewModel.Query.Indicators);
             Assert.Equal(FullTableQuery.LocationIds, viewModel.Query.LocationIds);
         }
@@ -662,7 +672,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
             var dataBlockService = new Mock<IDataBlockService>(Strict);
 
             dataBlockService
-                .Setup(s => s.GetDataBlockTableResult(releaseVersion.Id, dataBlockId, null))
+                .Setup(s => s.GetDataBlockTableResult(releaseVersion.Id, dataBlockId))
                 .ReturnsAsync(_tableBuilderResults);
 
             var client = SetupApp(
@@ -684,6 +694,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
             Assert.Equal(releaseVersion.Type, viewModel.ReleaseType);
             Assert.False(viewModel.LatestData);
             Assert.Equal(release2021.Title, viewModel.LatestReleaseTitle);
+            Assert.Equal(release2021.Slug, viewModel.LatestReleaseSlug);
         }
 
         private WebApplicationFactory<Startup> SetupApp(
@@ -700,6 +711,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
                         services.AddTransient(_ => tableBuilderService ?? Mock.Of<ITableBuilderService>(Strict));
                     }
                 );
+        }
+
+        private FullTableQueryRequest ToRequest(FullTableQuery query)
+        {
+            return new FullTableQueryRequest
+            {
+                SubjectId = query.SubjectId,
+                LocationIds = query.LocationIds,
+                TimePeriod = query.TimePeriod,
+                Filters = query.GetNonHierarchicalFilterItemIds(),
+                Indicators = query.Indicators,
+                FilterHierarchiesOptions =
+                    FilterHierarchiesOptionsAsDictionary(query.FilterHierarchiesOptions),
+            };
         }
     }
 }

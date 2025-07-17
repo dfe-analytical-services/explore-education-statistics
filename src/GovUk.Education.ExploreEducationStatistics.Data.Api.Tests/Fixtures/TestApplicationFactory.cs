@@ -22,7 +22,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Fixtures;
 public sealed class TestApplicationFactory : TestApplicationFactory<Startup>
 {
     private readonly AzuriteContainer _azuriteContainer = new AzuriteBuilder()
-        .WithImage("mcr.microsoft.com/azure-storage/azurite:3.31.0")
+        .WithImage("mcr.microsoft.com/azure-storage/azurite:3.34.0")
         .WithInMemoryPersistence()
         .Build();
 

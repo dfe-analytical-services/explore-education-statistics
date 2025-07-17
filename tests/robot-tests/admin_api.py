@@ -1,4 +1,5 @@
 import os
+from datetime import datetime, timezone
 
 import requests
 from scripts.get_auth_tokens import get_local_storage_identity_json
@@ -111,8 +112,11 @@ def create_test_theme(run_id: str):
     test_theme_id = get_test_theme_id()
 
     if not test_theme_id:
-        test_theme_name = f"UI test theme {run_id}"
-        create_theme_resp = send_admin_request("POST", "/api/themes", {"title": test_theme_name, "summary": "Test theme summary"})
+        timestamp_utc_str = datetime.now(timezone.utc).strftime("%Y%m%d-%H%M%S")
+        test_theme_name = f"UI test theme {timestamp_utc_str} {run_id}"
+        create_theme_resp = send_admin_request(
+            "POST", "/api/themes", {"title": test_theme_name, "summary": "Test theme summary"}
+        )
         test_theme_id = create_theme_resp.json()["id"]
 
     os.environ["TEST_THEME_NAME"] = test_theme_name

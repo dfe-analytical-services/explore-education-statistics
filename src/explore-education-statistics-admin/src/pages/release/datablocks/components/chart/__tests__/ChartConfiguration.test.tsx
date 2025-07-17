@@ -18,6 +18,7 @@ describe('ChartConfiguration', () => {
     canIncludeNonNumericData: true,
     canPositionLegendInline: true,
     canSetBarThickness: false,
+    canSetDataLabelColour: true,
     canSetDataLabelPosition: true,
     canShowDataLabels: true,
     canShowAllMajorAxisTicks: false,
@@ -36,6 +37,7 @@ describe('ChartConfiguration', () => {
     canIncludeNonNumericData: true,
     canPositionLegendInline: true,
     canSetBarThickness: true,
+    canSetDataLabelColour: false,
     canSetDataLabelPosition: true,
     canShowDataLabels: true,
     canShowAllMajorAxisTicks: false,
@@ -70,9 +72,6 @@ describe('ChartConfiguration', () => {
         id: 'xaxis',
         title: 'X Axis (major axis)',
         type: 'major',
-        capabilities: {
-          canRotateLabel: false,
-        },
         defaults: {
           groupBy: 'timePeriod',
           min: 0,
@@ -89,9 +88,6 @@ describe('ChartConfiguration', () => {
         id: 'yaxis',
         title: 'Y Axis (minor axis)',
         type: 'minor',
-        capabilities: {
-          canRotateLabel: true,
-        },
         defaults: {
           min: 0,
           showGrid: true,
@@ -312,6 +308,7 @@ describe('ChartConfiguration', () => {
       expect(handleSubmit).toHaveBeenCalledWith({
         alt: 'This is the alt text',
         boundaryLevel: undefined,
+        dataLabelColour: 'black',
         dataLabelPosition: 'above',
         height: 300,
         includeNonNumericData: false,
@@ -343,6 +340,7 @@ describe('ChartConfiguration', () => {
       expect(handleChange).toHaveBeenCalledWith({
         alt: 'This is the alt text',
         boundaryLevel: undefined,
+        dataLabelColour: 'black',
         dataLabelPosition: 'above',
         height: 300,
         includeNonNumericData: false,
@@ -373,8 +371,8 @@ describe('ChartConfiguration', () => {
     expect(screen.getByLabelText('Alt text')).toHaveValue(
       'This is the alt text',
     );
-    expect(screen.getByLabelText('Height (pixels)')).toHaveValue(600);
-    expect(screen.getByLabelText('Width (pixels)')).toHaveValue(400);
+    expect(screen.getByLabelText('Height (pixels)')).toHaveNumericValue(600);
+    expect(screen.getByLabelText('Width (pixels)')).toHaveNumericValue(400);
     expect(
       screen.getByLabelText('Include data sets with non-numerical values'),
     ).toBeChecked();
@@ -406,6 +404,7 @@ describe('ChartConfiguration', () => {
       expect(handleSubmit).toHaveBeenCalledWith({
         alt: 'This is the alt text',
         boundaryLevel: undefined,
+        dataLabelColour: 'black',
         dataLabelPosition: 'above',
         height: 300,
         includeNonNumericData: false,
@@ -437,6 +436,10 @@ describe('ChartConfiguration', () => {
       'below',
     ]);
 
+    await user.selectOptions(screen.getByLabelText('Data label colour'), [
+      'inherit',
+    ]);
+
     await user.click(
       screen.getByRole('button', { name: 'Save chart options' }),
     );
@@ -445,6 +448,7 @@ describe('ChartConfiguration', () => {
       expect(handleSubmit).toHaveBeenCalledWith({
         alt: 'This is the alt text',
         boundaryLevel: undefined,
+        dataLabelColour: 'inherit',
         dataLabelPosition: 'below',
         height: 300,
         includeNonNumericData: false,

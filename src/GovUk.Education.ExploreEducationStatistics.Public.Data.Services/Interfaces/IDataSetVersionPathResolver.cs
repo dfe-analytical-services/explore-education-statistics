@@ -1,6 +1,5 @@
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Parquet.Tables;
-using Semver;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Services.Interfaces;
 

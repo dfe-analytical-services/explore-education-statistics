@@ -10,7 +10,6 @@ import Accordion from '@common/components/Accordion';
 import AccordionSection from '@common/components/AccordionSection';
 import InsetText from '@common/components/InsetText';
 import LoadingSpinner from '@common/components/LoadingSpinner';
-import ModalConfirm from '@common/components/ModalConfirm';
 import WarningMessage from '@common/components/WarningMessage';
 import logger from '@common/services/logger';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
@@ -68,6 +67,32 @@ export default function ReleaseFileUploadsSection({
     },
     [files, listFilesQuery.queryKey, queryClient, releaseVersionId],
   );
+
+  const handleConfirmDelete = async () => {
+    if (!deleteFile) {
+      return;
+    }
+
+    setFileDeleting(deleteFile, true);
+    setDeleteFile(undefined);
+
+    try {
+      await releaseAncillaryFileService.deleteFile(
+        releaseVersionId,
+        deleteFile.id,
+      );
+
+      queryClient.setQueryData(
+        listFilesQuery.queryKey,
+        files.filter(file => file !== deleteFile),
+      );
+
+      await queryClient.invalidateQueries(listFilesQuery.queryKey);
+    } catch (err) {
+      logger.error(err);
+      setFileDeleting(deleteFile, false);
+    }
+  };
 
   return (
     <>
@@ -141,6 +166,8 @@ export default function ReleaseFileUploadsSection({
                     publicationId={publicationId}
                     releaseVersionId={releaseVersionId}
                     onDelete={() => setDeleteFile(file)}
+                    onCancelDelete={() => setDeleteFile(undefined)}
+                    onConfirmDelete={handleConfirmDelete}
                   />
                 </div>
               </AccordionSection>
@@ -150,41 +177,6 @@ export default function ReleaseFileUploadsSection({
           <InsetText>No files have been uploaded.</InsetText>
         )}
       </LoadingSpinner>
-
-      {deleteFile && (
-        <ModalConfirm
-          open
-          title="Confirm deletion of file"
-          onExit={() => setDeleteFile(undefined)}
-          onCancel={() => setDeleteFile(undefined)}
-          onConfirm={async () => {
-            setFileDeleting(deleteFile, true);
-            setDeleteFile(undefined);
-
-            try {
-              await releaseAncillaryFileService.deleteFile(
-                releaseVersionId,
-                deleteFile.id,
-              );
-
-              queryClient.setQueryData(
-                listFilesQuery.queryKey,
-                files.filter(file => file !== deleteFile),
-              );
-
-              await queryClient.invalidateQueries(listFilesQuery.queryKey);
-            } catch (err) {
-              logger.error(err);
-              setFileDeleting(deleteFile, false);
-            }
-          }}
-        >
-          <p>
-            This file will no longer be available for use in this release (
-            {deleteFile.filename})
-          </p>
-        </ModalConfirm>
-      )}
     </>
   );
 }

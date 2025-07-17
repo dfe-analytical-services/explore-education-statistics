@@ -3,6 +3,7 @@ import {
   ApiDataSet,
   ApiDataSetLiveVersionSummary,
   ApiDataSetVersion,
+  ApiDataSetVersionInfo,
 } from '@admin/services/apiDataSetService';
 import { ApiDataSetVersionChanges } from '@common/services/types/apiDataSetChanges';
 import { PaginatedList } from '@common/services/types/pagination';
@@ -129,6 +130,9 @@ const apiDataSetVersionService = {
     return client.get(`/public-data/data-set-versions`, {
       params,
     });
+  },
+  getVersion(dataSetVersionId: string): Promise<ApiDataSetVersionInfo> {
+    return client.get(`/public-data/data-set-versions/${dataSetVersionId}`);
   },
   getFiltersMapping(dataSetVersionId: string): Promise<FiltersMapping> {
     return client.get(

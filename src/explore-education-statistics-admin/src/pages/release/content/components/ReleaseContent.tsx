@@ -20,6 +20,7 @@ import {
 } from '@admin/routes/routes';
 import releaseDataFileService from '@admin/services/releaseDataFileService';
 import releaseFileService from '@admin/services/releaseFileService';
+import focusAddedSectionBlockButton from '@admin/utils/focus/focusAddedSectionBlockButton';
 import Button from '@common/components/Button';
 import ButtonText from '@common/components/ButtonText';
 import Details from '@common/components/Details';
@@ -30,7 +31,13 @@ import Tag from '@common/components/Tag';
 import ReleaseSummarySection from '@common/modules/release/components/ReleaseSummarySection';
 import ReleaseDataAndFiles from '@common/modules/release/components/ReleaseDataAndFiles';
 import useDebouncedCallback from '@common/hooks/useDebouncedCallback';
-import React, { useCallback, useEffect, useMemo } from 'react';
+import React, {
+  Fragment,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+} from 'react';
 import { generatePath, useLocation } from 'react-router';
 import { useConfig } from '@admin/contexts/ConfigContext';
 
@@ -56,6 +63,8 @@ const ReleaseContent = ({
   const { release } = useReleaseContentState();
   const { addContentSectionBlock } = useReleaseContentActions();
 
+  const addSummaryBlockButton = useRef<HTMLButtonElement>(null);
+
   const blockRouteChange = useMemo(() => {
     if (unsavedBlocks.length > 0) {
       return true;
@@ -69,7 +78,7 @@ const ReleaseContent = ({
   }, [unsavedBlocks, unsavedCommentDeletions]);
 
   const addSummaryBlock = useCallback(async () => {
-    await addContentSectionBlock({
+    const newBlock = await addContentSectionBlock({
       releaseVersionId: release.id,
       sectionId: release.summarySection.id,
       sectionKey: 'summarySection',
@@ -79,6 +88,8 @@ const ReleaseContent = ({
         body: '',
       },
     });
+
+    focusAddedSectionBlockButton(newBlock.id);
   }, [addContentSectionBlock, release.id, release.summarySection.id]);
 
   const addRelatedDashboardsBlock = useCallback(async () => {
@@ -154,6 +165,12 @@ const ReleaseContent = ({
     };
   }, [handleScroll]);
 
+  const onAfterDeleteSummaryBlock = () => {
+    setTimeout(() => {
+      addSummaryBlockButton.current?.focus();
+    }, 100);
+  };
+
   return (
     <>
       <RouteLeavingGuard
@@ -189,12 +206,25 @@ const ReleaseContent = ({
               </a>
             }
             renderProducerLink={
-              <Link
-                unvisited
-                to="https://www.gov.uk/government/organisations/department-for-education"
-              >
-                Department for Education
-              </Link>
+              release.publishingOrganisations?.length ? (
+                <span>
+                  {release.publishingOrganisations.map((org, index) => (
+                    <Fragment key={org.id}>
+                      {index > 0 && ' and '}
+                      <Link unvisited to={org.url}>
+                        {org.title}
+                      </Link>
+                    </Fragment>
+                  ))}
+                </span>
+              ) : (
+                <Link
+                  unvisited
+                  to="https://www.gov.uk/government/organisations/department-for-education"
+                >
+                  Department for Education
+                </Link>
+              )
             }
             trackScroll
           />
@@ -219,13 +249,18 @@ const ReleaseContent = ({
                       releaseVersionId={release.id}
                       sectionId={release.summarySection.id}
                       sectionKey="summarySection"
+                      onAfterDeleteBlock={onAfterDeleteSummaryBlock}
                     />
                   )}
                 />
                 {editingMode === 'edit' &&
                   release.summarySection.content?.length === 0 && (
                     <div className="govuk-!-margin-bottom-8 govuk-!-text-align-centre">
-                      <Button variant="secondary" onClick={addSummaryBlock}>
+                      <Button
+                        variant="secondary"
+                        onClick={addSummaryBlock}
+                        ref={addSummaryBlockButton}
+                      >
                         Add a summary text block
                       </Button>
                     </div>

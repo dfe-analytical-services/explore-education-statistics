@@ -233,8 +233,6 @@ Some examples of facets include:
 - rates of change
 - proportions / percentages
 
-Both facets and indicators need to be part of a query for data to be returned.
-
 Facets and indicators are collectively referenced as a data set's **metadata**. To fetch this for
 your chosen data set, make the following `GET` request:
 
@@ -380,29 +378,38 @@ In this final step, you'll need to use the metadata from the previous step to cr
 query against the [Query a data set](/reference-v1/endpoints/QueryDataSetPost/index.html) endpoint.
 
 To use this endpoint, a `POST` request needs to be sent to the endpoint URL with an appropriate
-request body. The most basic request would look like the following:
+request body, or no body if an unrefined set of results is required. The most basic request would
+look like the following, and must include a `Content-Type` request header of `application/json`:
 
 ```
 POST <%= api_url "/v1/data-sets/{dataSetId}/query" %>
-{
-  "indicators": []
-}
 ```
 
 As seen previously, you need to substitute the `{dataSetId}` parameter with the `id` of your chosen
 data set.
 
-The request body must contain an `indicators` property with a list of indicator IDs, which can can
-found in the data set's metadata (under each indicator option's `id` property). The data values in
-the response will correspond to the indicators that you specify.
+To refine your query to a subset of indicators, you will need to provide an `indicators` property 
+and include the IDs of the indicators that you are interested in. These can be found in the data 
+set's metadata (under each indicator option's `id` property). The data values in the response will
+correspond to the indicators that you specify. For example, to fetch values for two specific 
+indicators with the IDs of `d7wir` and `a9ch2`, you would provide the following request body:
 
-To refine your query to a subset of the data, you will also need to provide some filtering criteria
+```
+POST <%= api_url "/v1/data-sets/{dataSetId}/query" %>
+{
+  "indicators": [
+    "d7wir",
+    "a9ch2"
+  ]
+}
+```
+
+To refine your query to a subset of the data, you will need to provide some filtering criteria
 by adding a `criteria` property to your query request:
 
 ```
 POST <%= api_url "/v1/data-sets/{dataSetId}/query" %>
 {
-  "indicators": [],
   "criteria": {}
 }
 ```

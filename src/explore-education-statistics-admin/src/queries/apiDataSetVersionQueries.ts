@@ -10,6 +10,12 @@ const apiDataSetVersionQueries = createQueryKeys('apiDataSetVersionQueries', {
       queryFn: () => apiDataSetVersionService.listVersions(query),
     };
   },
+  getVersion(dataSetVersionId: string) {
+    return {
+      queryKey: [dataSetVersionId],
+      queryFn: () => apiDataSetVersionService.getVersion(dataSetVersionId),
+    };
+  },
   getFiltersMapping(dataSetVersionId: string) {
     return {
       queryKey: [dataSetVersionId],

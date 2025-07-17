@@ -11,7 +11,7 @@ Force Tags          Admin    Local    Dev    AltersData
 
 
 *** Variables ***
-${PUBLICATION_NAME}=    UI tests - invite new users %{RUN_IDENTIFIER}
+${PUBLICATION_NAME}=    Invite new users %{RUN_IDENTIFIER}
 ${RELEASE1_NAME}=       ${PUBLICATION_NAME} - Academic year 2000/01
 ${RELEASE2_NAME}=       ${PUBLICATION_NAME} - Academic year 2001/02
 ${RELEASE3_NAME}=       ${PUBLICATION_NAME} - Academic year 2002/03

@@ -24,6 +24,7 @@ internal class DataSetService(
     ContentDbContext contentDbContext,
     PublicDataDbContext publicDataDbContext,
     IProcessorClient processorClient,
+    IDataSetVersionMappingService dataSetVersionMappingService,
     IUserService userService)
     : IDataSetService
 {
@@ -151,15 +152,30 @@ internal class DataSetService(
     private async Task<DataSetViewModel> MapDataSet(DataSet dataSet, CancellationToken cancellationToken)
     {
         var releaseFilesByDataSetVersionId = await GetReleaseFilesByDataSetVersionId(dataSet, cancellationToken);
+        
+        ReleaseFile? originalReleaseFile = null;
+        //Get the release file belonging to the data file that has been patched (if applicable)
+        var versionNumberBeforePatch = dataSet.LatestDraftVersion?.VersionPatch > 0 
+            ? dataSet.LatestDraftVersion?.SemVersion()
+            .WithPatch(dataSet.LatestDraftVersion.VersionPatch - 1) 
+            : null;
+        var versionBeforePatch = versionNumberBeforePatch is not null
+            ? dataSet.Versions.SingleOrDefault(dsv => dsv.SemVersion() == versionNumberBeforePatch)
+            : null;
+        if (versionBeforePatch != null)
+        {
+            originalReleaseFile = releaseFilesByDataSetVersionId[versionBeforePatch.Id];
+        }
 
         var draftVersion = dataSet.LatestDraftVersion is null
             ? null
             : MapDraftVersion(
                 dataSetVersion: dataSet.LatestDraftVersion,
-                mappingStatus: await GetMappingStatus(
-                    nextDataSetVersionId: dataSet.LatestDraftVersion.Id,
+                mappingStatus: await dataSetVersionMappingService.GetMappingStatus(
+                    dataSetVersionId: dataSet.LatestDraftVersion.Id,
                     cancellationToken),
-                releaseFilesByDataSetVersionId[dataSet.LatestDraftVersion.Id]
+                releaseFile: releaseFilesByDataSetVersionId[dataSet.LatestDraftVersion.Id],
+                originalReleaseFile: originalReleaseFile
             );
 
         var latestLiveVersion = dataSet.LatestLiveVersion is null
@@ -239,7 +255,8 @@ internal class DataSetService(
     private static DataSetDraftVersionViewModel MapDraftVersion(
         DataSetVersion dataSetVersion,
         MappingStatusViewModel? mappingStatus,
-        ReleaseFile releaseFile)
+        ReleaseFile releaseFile,
+        ReleaseFile? originalReleaseFile)
     {
         return new DataSetDraftVersionViewModel
         {
@@ -248,6 +265,7 @@ internal class DataSetService(
             Status = dataSetVersion.Status,
             Type = dataSetVersion.VersionType,
             File = MapVersionFile(releaseFile),
+            OriginalFileId = originalReleaseFile?.FileId,
             ReleaseVersion = MapReleaseVersion(releaseFile.ReleaseVersion),
             TotalResults = dataSetVersion.TotalResults,
             Notes = dataSetVersion.Notes,
@@ -262,22 +280,7 @@ internal class DataSetService(
             MappingStatus = mappingStatus
         };
     }
-
-    private async Task<MappingStatusViewModel?> GetMappingStatus(
-        Guid nextDataSetVersionId,
-        CancellationToken cancellationToken)
-    {
-        return await publicDataDbContext
-            .DataSetVersionMappings
-            .Where(mapping => mapping.TargetDataSetVersionId == nextDataSetVersionId)
-            .Select(mapping => new MappingStatusViewModel
-            {
-                LocationsComplete = mapping.LocationMappingsComplete,
-                FiltersComplete = mapping.FilterMappingsComplete
-            })
-            .SingleOrDefaultAsync(cancellationToken);
-    }
-
+    
     private static DataSetLiveVersionViewModel MapLiveVersion(
         DataSetVersion dataSetVersion,
         ReleaseFile releaseFile)

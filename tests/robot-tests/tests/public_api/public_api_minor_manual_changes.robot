@@ -14,7 +14,7 @@ Test Teardown       Run Keyword If Test Failed    record test failure
 
 
 *** Variables ***
-${PUBLICATION_NAME}=    UI tests - Public API - minor manual changes %{RUN_IDENTIFIER}
+${PUBLICATION_NAME}=    Public API - minor manual changes %{RUN_IDENTIFIER}
 ${RELEASE_1_NAME}=      Financial year 3000-01
 ${RELEASE_2_NAME}=      Academic year 3010/11
 ${SUBJECT_1_NAME}=      ${PUBLICATION_NAME} - Subject 1
@@ -78,7 +78,6 @@ Add headline text block to Content page
     user adds content to headlines text block    Headline text block text
 
 Approve first release
-    user clicks link    Sign off
     user approves release for immediate publication
 
 Create a second draft release
@@ -185,7 +184,7 @@ Validate the row headings and its contents in the 'Regions' section
     user checks table cell contains    1    3    N/A
 
 User edits location mapping
-    user clicks button in table cell    1    4    Edit
+    user clicks button in table cell    1    4    Map option
 
     ${modal}=    user waits until modal is visible    Map existing location
     user clicks radio    Yorkshire
@@ -239,7 +238,7 @@ Validate the row headings and its contents in the 'filter options' section
     user checks table cell contains    1    3    N/A
 
 User edits filter mapping
-    user clicks button in table cell    1    4    Edit
+    user clicks button in table cell    1    4    Map option
 
     ${modal}=    user waits until modal is visible    Map existing filter option
     user clicks radio    State-funded primary and secondary
@@ -296,11 +295,18 @@ Add headline text block to Content page for the second release
     user adds content to headlines text block    Headline text block text
 
 Approve second release
-    user clicks link    Sign off
     user approves release for immediate publication
 
+Get public second release link
+    ${PUBLIC_RELEASE_2_LINK}=    user gets url public release will be accessible at
+    Set Suite Variable    ${PUBLIC_RELEASE_2_LINK}
+
 Verify newly published release is on Find Statistics page
+    # TODO EES-6063 - Remove this
     user checks publication is on find statistics page    ${PUBLICATION_NAME}
+
+Verify newly published release is public
+    user navigates to public release page    ${PUBLIC_RELEASE_2_LINK}    ${PUBLICATION_NAME}    ${RELEASE_2_NAME}
 
 User navigates to data catalogue page
     user navigates to data catalogue page on public frontend

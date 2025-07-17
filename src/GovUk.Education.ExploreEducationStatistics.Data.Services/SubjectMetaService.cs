@@ -25,7 +25,6 @@ using GovUk.Education.ExploreEducationStatistics.Data.Services.Utils;
 using GovUk.Education.ExploreEducationStatistics.Data.ViewModels.Meta;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using static GovUk.Education.ExploreEducationStatistics.Common.Validators.ValidationUtils;
@@ -74,6 +73,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                 .OnSuccess(async rs =>
                 {
                     var releaseFile = await contentDbContext.ReleaseFiles
+                        .Include(rf => rf.File)
                         .Where(rf => rf.ReleaseVersionId == rs.ReleaseVersionId
                                      && rf.File.SubjectId == rs.SubjectId
                                      && rf.File.Type == FileType.Data)
@@ -84,7 +84,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                         Filters = await GetFilters(releaseSubject.SubjectId, releaseFile.FilterSequence),
                         Indicators = await GetIndicators(releaseSubject.SubjectId, releaseFile.IndicatorSequence),
                         Locations = await GetLocations(releaseSubject.SubjectId),
-                        TimePeriod = await GetTimePeriods(releaseSubject.SubjectId)
+                        TimePeriod = await GetTimePeriods(releaseSubject.SubjectId),
+                        FilterHierarchies = BuildFilterHierarchyViewModel(releaseFile.File.FilterHierarchies!),
                     };
                 });
         }
@@ -225,22 +226,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                         releaseSubject.SubjectId, releaseFile.IndicatorSequence);
                     logger.LogTrace("Got Indicators in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
 
-                    var filterHierarchies = releaseFile.File.FilterHierarchies!
-                        .Select(fh => new DataSetFileFilterHierarchyViewModel(
-                            RootFilterId: fh.RootFilterId,
-                            ChildFilterIds: fh.ChildFilterIds,
-                            RootOptionIds: fh.RootOptionIds,
-                            Tiers: fh.Tiers
-                                .Select((tier, index) =>
-                                    new DataSetFileFilterHierarchyTierViewModel(index, tier))
-                                .ToList()
-                        )).ToList();
-
                     return new SubjectMetaViewModel
                     {
                         Filters = filters,
                         Indicators = indicators,
-                        FilterHierarchies = filterHierarchies,
+                        FilterHierarchies = BuildFilterHierarchyViewModel(releaseFile.File.FilterHierarchies!),
                     };
                 }
                 default:
@@ -283,6 +273,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                         Options = pair.Value
                     }
                 );
+        }
+
+        private static List<List<DataSetFileFilterHierarchyTierViewModel>>? BuildFilterHierarchyViewModel(List<DataSetFileFilterHierarchy> filterHierarchies)
+        {
+            if (filterHierarchies.IsNullOrEmpty())
+            {
+                return null;
+            }
+
+            return filterHierarchies
+                .Select(fh => fh.Tiers
+                    .Select((tier, index) =>
+                        new DataSetFileFilterHierarchyTierViewModel(
+                            Level: index,
+                            FilterId: fh.FilterIds[index],
+                            ChildFilterId: index + 1 >= fh.FilterIds.Count ? null : fh.FilterIds[index + 1],
+                            tier))
+                    .ToList()
+                ).ToList();
         }
 
         private async Task<Dictionary<string, IndicatorGroupMetaViewModel>> GetIndicators(

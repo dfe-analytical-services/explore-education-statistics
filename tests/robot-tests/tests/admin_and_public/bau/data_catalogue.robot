@@ -14,7 +14,7 @@ Test Setup          fail test fast if required
 
 
 *** Variables ***
-${PUBLICATION_NAME}=    UI tests - data catalogue %{RUN_IDENTIFIER}
+${PUBLICATION_NAME}=    Data catalogue %{RUN_IDENTIFIER}
 ${RELEASE_NAME}=        Academic year Q1
 ${SUBJECT_NAME_1}=      UI test subject 1
 ${SUBJECT_NAME_2}=      UI test subject 2
@@ -61,7 +61,6 @@ Add headline text block to Content page
     user adds content to headlines text block    Headline text block text
 
 Approve first release
-    user clicks link    Sign off
     user approves release for immediate publication
 
 User creates second release
@@ -94,12 +93,19 @@ Add headline text block to Content page (second release)
     user adds headlines text block
     user adds content to headlines text block    Headline text block text
 
-Approve release
-    user clicks link    Sign off
+Approve second release
     user approves release for immediate publication
 
+Get public release link
+    ${PUBLIC_RELEASE_2_LINK}=    user gets url public release will be accessible at
+    Set Suite Variable    ${PUBLIC_RELEASE_2_LINK}
+
 Verify newly published release is on Find Statistics page
+    # TODO EES-6063 - Remove this
     user checks publication is on find statistics page    ${PUBLICATION_NAME}
+
+Verify newly published release is public
+    user navigates to public release page    ${PUBLIC_RELEASE_2_LINK}    ${PUBLICATION_NAME}    ${RELEASE_NAME}
 
 User navigates to data catalogue page
     user navigates to data catalogue page on public frontend
@@ -141,7 +147,7 @@ Validate zip contains correct files
     [Documentation]    EES-4147
     sleep    8    # wait for file to download
     ${list}=    create list    data/dates.csv    data-guidance/data-guidance.txt
-    zip should contain directories and files    ui-tests-data-catalogue-%{RUN_IDENTIFIER}_2021-22-q1.zip    ${list}
+    zip should contain directories and files    data-catalogue-%{RUN_IDENTIFIER}_2021-22-q1.zip    ${list}
 
 Validate sort controls exist
     user checks radio is checked    Newest

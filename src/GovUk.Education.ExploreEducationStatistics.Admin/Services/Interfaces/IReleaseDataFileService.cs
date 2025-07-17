@@ -27,33 +27,54 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
         Task<Either<ActionResult, DataFileInfo>> GetInfo(Guid releaseVersionId,
             Guid fileId);
 
+        Task<Either<ActionResult, DataSetAccoutrementsViewModel>> GetAccoutrementsSummary(
+            Guid releaseVersionId,
+            Guid fileId);
+
         Task<Either<ActionResult, List<DataFileInfo>>> ListAll(Guid releaseVersionId);
 
         Task<Either<ActionResult, List<DataFileInfo>>> ReorderDataFiles(
             Guid releaseVersionId,
             List<Guid> fileIds);
 
-        Task<Either<ActionResult, DataFileInfo>> Upload(
+        Task<Either<ActionResult, List<DataSetUploadViewModel>>> Upload(
             Guid releaseVersionId,
             IFormFile dataFormFile,
             IFormFile metaFormFile,
-            string? dataSetTitle,
-            Guid? replacingFileId);
-
-        Task<Either<ActionResult, DataFileInfo>> UploadAsZip(
-            Guid releaseVersionId,
-            IFormFile zipFormFile,
-            string? dataSetTitle,
-            Guid? replacingFileId);
-
-        Task<Either<ActionResult, List<ArchiveDataSetFileViewModel>>> ValidateAndUploadBulkZip(
-            Guid releaseVersionId,
-            IFormFile zipFile,
+            string dataSetTitle,
+            Guid? replacingFileId,
             CancellationToken cancellationToken);
 
-        Task<Either<ActionResult, List<DataFileInfo>>> SaveDataSetsFromTemporaryBlobStorage(
+        Task<Either<ActionResult, DataFileInfo>> UploadForReplacement(
             Guid releaseVersionId,
-            List<ArchiveDataSetFileViewModel> archiveDataSetFiles,
+            IFormFile dataFormFile,
+            IFormFile metaFormFile,
+            string dataSetTitle,
+            Guid? replacingFileId,
+            CancellationToken cancellationToken);
+
+        Task<Either<ActionResult, List<DataSetUploadViewModel>>> UploadFromZip(
+            Guid releaseVersionId,
+            IFormFile zipFormFile,
+            string dataSetTitle,
+            Guid? replacingFileId,
+            CancellationToken cancellationToken);
+
+        Task<Either<ActionResult, DataFileInfo>> UploadFromZipForReplacement(
+            Guid releaseVersionId,
+            IFormFile zipFormFile,
+            string dataSetTitle,
+            Guid? replacingFileId,
+            CancellationToken cancellationToken);
+
+        Task<Either<ActionResult, List<DataSetUploadViewModel>>> UploadFromBulkZip(
+            Guid releaseVersionId,
+            IFormFile zipFormFile,
+            CancellationToken cancellationToken);
+
+        Task<Either<ActionResult, Unit>> SaveDataSetsFromTemporaryBlobStorage(
+            Guid releaseVersionId,
+            List<Guid> dataSetUploadIds,
             CancellationToken cancellationToken);
     }
 }

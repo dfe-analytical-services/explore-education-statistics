@@ -10,6 +10,7 @@ import { Footnote } from '@common/services/types/footnotes';
 import downloadFile from '@common/utils/file/downloadFile';
 import Yup from '@common/validation/yup';
 import LoadingSpinner from '@common/components/LoadingSpinner';
+import copyElementToClipboard from '@common/utils/copyElementToClipboard';
 import React, { createElement, RefObject } from 'react';
 
 export type FileFormat = 'ods' | 'csv';
@@ -46,7 +47,7 @@ const DownloadTable = ({
     : footnotes;
   const handleCsvDownload = async () => {
     const csv = await onCsvDownload();
-    downloadFile(csv, fileName);
+    downloadFile({ file: csv, fileName });
   };
 
   const handleOdsDownload = () => {
@@ -73,6 +74,7 @@ const DownloadTable = ({
           <Form
             id="downloadTableForm"
             onSubmit={async ({ fileFormat }) => {
+              // TODO EES-5852 analytics for table tool/permalink csv/ods downloads
               await onSubmit?.(fileFormat);
 
               if (fileFormat === 'csv') {
@@ -113,6 +115,12 @@ const DownloadTable = ({
               <ButtonGroup>
                 <Button type="submit" disabled={formState.isSubmitting}>
                   Download table
+                </Button>
+                <Button
+                  variant="secondary"
+                  onClick={() => copyElementToClipboard(tableRef)}
+                >
+                  Copy table to clipboard
                 </Button>
                 <LoadingSpinner
                   alert

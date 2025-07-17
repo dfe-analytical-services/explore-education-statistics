@@ -80,26 +80,26 @@ Create table
     user waits until results table appears    %{WAIT_SMALL}
 
 Validate results table column headings
-    user checks table column heading contains    1    1    2012/13
-    user checks table column heading contains    1    2    2013/14
-    user checks table column heading contains    1    3    2014/15
-    user checks table column heading contains    1    4    2015/16
+    user checks table column heading contains    1    1    2015/16
+    user checks table column heading contains    1    2    2014/15
+    user checks table column heading contains    1    3    2013/14
+    user checks table column heading contains    1    4    2012/13
 
 Validate Gender male Authorised absence rate row
     ${row}=    user gets row with group and indicator    Gender male    Authorised absence rate
     user checks row contains heading    ${row}    Authorised absence rate
-    user checks row cell contains text    ${row}    1    4.2%
-    user checks row cell contains text    ${row}    2    3.4%
-    user checks row cell contains text    ${row}    3    3.6%
-    user checks row cell contains text    ${row}    4    3.5%
+    user checks row cell contains text    ${row}    1    3.5%
+    user checks row cell contains text    ${row}    2    3.6%
+    user checks row cell contains text    ${row}    3    3.4%
+    user checks row cell contains text    ${row}    4    4.2%
 
 Validate Gender male Overall absence rate row
     ${row}=    user gets row with group and indicator    Gender male    Overall absence rate
     user checks row contains heading    ${row}    Overall absence rate
-    user checks row cell contains text    ${row}    1    5.2%
-    user checks row cell contains text    ${row}    2    4.5%
-    user checks row cell contains text    ${row}    3    4.6%
-    user checks row cell contains text    ${row}    4    4.6%
+    user checks row cell contains text    ${row}    1    4.6%
+    user checks row cell contains text    ${row}    2    4.6%
+    user checks row cell contains text    ${row}    3    4.5%
+    user checks row cell contains text    ${row}    4    5.2%
 
 Validate Gender male Unauthorised absence rate row
     ${row}=    user gets row with group and indicator    Gender male    Unauthorised absence rate
@@ -112,18 +112,18 @@ Validate Gender male Unauthorised absence rate row
 Validate Gender female Authorised absence rate row
     ${row}=    user gets row with group and indicator    Gender female    Authorised absence rate
     user checks row contains heading    ${row}    Authorised absence rate
-    user checks row cell contains text    ${row}    1    4.2%
+    user checks row cell contains text    ${row}    1    3.4%
     user checks row cell contains text    ${row}    2    3.5%
     user checks row cell contains text    ${row}    3    3.5%
-    user checks row cell contains text    ${row}    4    3.4%
+    user checks row cell contains text    ${row}    4    4.2%
 
 Validate Gender female Overall absence rate row
     ${row}=    user gets row with group and indicator    Gender female    Overall absence rate
     user checks row contains heading    ${row}    Overall absence rate
-    user checks row cell contains text    ${row}    1    5.3%
-    user checks row cell contains text    ${row}    2    4.5%
-    user checks row cell contains text    ${row}    3    4.6%
-    user checks row cell contains text    ${row}    4    4.5%
+    user checks row cell contains text    ${row}    1    4.5%
+    user checks row cell contains text    ${row}    2    4.6%
+    user checks row cell contains text    ${row}    3    4.5%
+    user checks row cell contains text    ${row}    4    5.3%
 
 Validate Gender female Unauthorised absence rate row
     ${row}=    user gets row with group and indicator    Gender female    Unauthorised absence rate
@@ -177,14 +177,14 @@ Reorder Overall absence rate to be first
     user presses keys    ${SPACE}
     user clicks button    Done
 
-Reorder 2012/13 to be last
+Reorder 2012/13 to be first
     user clicks button    Reorder    testId:columnGroups-1
     # The /../.. to get to a focusable element
     user sets focus to element    xpath://*[text()="2012/13"]/../..    testId:columnGroups-1
     user presses keys    ${SPACE}
-    user presses keys    ARROW_DOWN
-    user presses keys    ARROW_DOWN
-    user presses keys    ARROW_DOWN
+    user presses keys    ARROW_UP
+    user presses keys    ARROW_UP
+    user presses keys    ARROW_UP
     user presses keys    ${SPACE}
     user clicks button    Done
 
@@ -195,14 +195,14 @@ Validate results table column headings after reordering
     user checks table column heading contains    1    1    Gender
     user checks table column heading contains    2    1    Gender male
     user checks table column heading contains    2    2    Gender female
-    user checks table column heading contains    3    1    2013/14
-    user checks table column heading contains    3    2    2014/15
-    user checks table column heading contains    3    3    2015/16
-    user checks table column heading contains    3    4    2012/13
-    user checks table column heading contains    3    5    2013/14
-    user checks table column heading contains    3    6    2014/15
-    user checks table column heading contains    3    7    2015/16
-    user checks table column heading contains    3    8    2012/13
+    user checks table column heading contains    3    1    2012/13
+    user checks table column heading contains    3    2    2015/16
+    user checks table column heading contains    3    3    2014/15
+    user checks table column heading contains    3    4    2013/14
+    user checks table column heading contains    3    5    2012/13
+    user checks table column heading contains    3    6    2015/16
+    user checks table column heading contains    3    7    2014/15
+    user checks table column heading contains    3    8    2013/14
 
 Validate results table row headings after reordering
     user checks table row heading contains    1    1    Overall absence rate
@@ -211,14 +211,14 @@ Validate results table row headings after reordering
 
 Validate rows after reordering
     # Overall absence rate
-    user checks table cell contains    1    1    4.5%
+    user checks table cell contains    1    1    5.2%
     user checks table cell contains    1    2    4.6%
     user checks table cell contains    1    3    4.6%
-    user checks table cell contains    1    4    5.2%
-    user checks table cell contains    1    5    4.5%
-    user checks table cell contains    1    6    4.6%
-    user checks table cell contains    1    7    4.5%
-    user checks table cell contains    1    8    5.3%
+    user checks table cell contains    1    4    4.5%
+    user checks table cell contains    1    5    5.3%
+    user checks table cell contains    1    6    4.5%
+    user checks table cell contains    1    7    4.6%
+    user checks table cell contains    1    8    4.5%
 
     # Unauthorised absence rate
     user checks table cell contains    2    1    1.1%
@@ -231,14 +231,14 @@ Validate rows after reordering
     user checks table cell contains    2    8    1.1%
 
     # Authorised absence rate
-    user checks table cell contains    3    1    3.4%
-    user checks table cell contains    3    2    3.6%
-    user checks table cell contains    3    3    3.5%
-    user checks table cell contains    3    4    4.2%
-    user checks table cell contains    3    5    3.5%
-    user checks table cell contains    3    6    3.5%
-    user checks table cell contains    3    7    3.4%
-    user checks table cell contains    3    8    4.2%
+    user checks table cell contains    3    1    4.2%
+    user checks table cell contains    3    2    3.5%
+    user checks table cell contains    3    3    3.6%
+    user checks table cell contains    3    4    3.4%
+    user checks table cell contains    3    5    4.2%
+    user checks table cell contains    3    6    3.4%
+    user checks table cell contains    3    7    3.5%
+    user checks table cell contains    3    8    3.5%
 
 User generates a permanent link
     user waits until page contains button    Generate shareable link
@@ -255,28 +255,28 @@ User validates permalink table
     user checks table column heading contains    1    1    Gender
     user checks table column heading contains    2    1    Gender male
     user checks table column heading contains    2    2    Gender female
-    user checks table column heading contains    3    1    2013/14
-    user checks table column heading contains    3    2    2014/15
-    user checks table column heading contains    3    3    2015/16
-    user checks table column heading contains    3    4    2012/13
-    user checks table column heading contains    3    5    2013/14
-    user checks table column heading contains    3    6    2014/15
-    user checks table column heading contains    3    7    2015/16
-    user checks table column heading contains    3    8    2012/13
+    user checks table column heading contains    3    1    2012/13
+    user checks table column heading contains    3    2    2015/16
+    user checks table column heading contains    3    3    2014/15
+    user checks table column heading contains    3    4    2013/14
+    user checks table column heading contains    3    5    2012/13
+    user checks table column heading contains    3    6    2015/16
+    user checks table column heading contains    3    7    2014/15
+    user checks table column heading contains    3    8    2013/14
 
     user checks table row heading contains    1    1    Overall absence rate
     user checks table row heading contains    2    1    Unauthorised absence rate
     user checks table row heading contains    3    1    Authorised absence rate
 
     # Overall absence rate
-    user checks table cell contains    1    1    4.5%
+    user checks table cell contains    1    1    5.2%
     user checks table cell contains    1    2    4.6%
     user checks table cell contains    1    3    4.6%
-    user checks table cell contains    1    4    5.2%
-    user checks table cell contains    1    5    4.5%
-    user checks table cell contains    1    6    4.6%
-    user checks table cell contains    1    7    4.5%
-    user checks table cell contains    1    8    5.3%
+    user checks table cell contains    1    4    4.5%
+    user checks table cell contains    1    5    5.3%
+    user checks table cell contains    1    6    4.5%
+    user checks table cell contains    1    7    4.6%
+    user checks table cell contains    1    8    4.5%
 
     # Unauthorised absence rate
     user checks table cell contains    2    1    1.1%
@@ -289,11 +289,11 @@ User validates permalink table
     user checks table cell contains    2    8    1.1%
 
     # Authorised absence rate
-    user checks table cell contains    3    1    3.4%
-    user checks table cell contains    3    2    3.6%
-    user checks table cell contains    3    3    3.5%
-    user checks table cell contains    3    4    4.2%
-    user checks table cell contains    3    5    3.5%
-    user checks table cell contains    3    6    3.5%
-    user checks table cell contains    3    7    3.4%
-    user checks table cell contains    3    8    4.2%
+    user checks table cell contains    3    1    4.2%
+    user checks table cell contains    3    2    3.5%
+    user checks table cell contains    3    3    3.6%
+    user checks table cell contains    3    4    3.4%
+    user checks table cell contains    3    5    4.2%
+    user checks table cell contains    3    6    3.4%
+    user checks table cell contains    3    7    3.5%
+    user checks table cell contains    3    8    3.5%

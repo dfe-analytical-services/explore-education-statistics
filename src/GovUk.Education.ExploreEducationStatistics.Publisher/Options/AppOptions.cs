@@ -12,7 +12,7 @@ public class AppOptions
 
     public required string PublisherStorageConnectionString { get; init; }
 
-    public required string PublishReleaseContentCronSchedule { get; init; }
+    public required string PublishScheduledReleasesFunctionCronSchedule { get; init; }
 
-    public required string PublishReleasesCronSchedule { get; init; }
+    public required string StageScheduledReleasesFunctionCronSchedule { get; init; }
 }

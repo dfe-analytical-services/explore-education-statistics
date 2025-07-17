@@ -13,6 +13,14 @@ export interface ApiDataSetSummary {
   previousReleaseIds: string[];
 }
 
+export interface ApiDataSetVersionInfo {
+  id: string;
+  version: string;
+  status: DataSetVersionStatus;
+  type: DataSetVersionType;
+  notes: string;
+}
+
 export interface ApiDataSetVersionSummary {
   id: string;
   version: string;
@@ -48,6 +56,7 @@ export interface ApiDataSetVersion {
   status: DataSetVersionStatus;
   type: DataSetVersionType;
   file: IdTitlePair;
+  originalFileId?: string | null;
   notes?: string;
   releaseVersion: IdTitlePair;
   totalResults: number;
@@ -61,7 +70,10 @@ export interface ApiDataSetDraftVersion extends ApiDataSetVersion {
   indicators?: string[];
   mappingStatus?: {
     locationsComplete: boolean;
+    locationsHaveMajorChange: boolean;
     filtersComplete: boolean;
+    filtersHaveMajorChange: boolean;
+    isMajorVersionUpdate: boolean | null;
   };
 }
 
@@ -94,7 +106,7 @@ export type DataSetVersionStatus =
   | DataSetDraftVersionStatus
   | DataSetLiveVersionStatus;
 
-export type DataSetVersionType = 'Major' | 'Minor';
+export type DataSetVersionType = 'Major' | 'Minor' | 'Patch';
 
 const apiDataSetService = {
   async listDataSets(publicationId: string): Promise<ApiDataSetSummary[]> {

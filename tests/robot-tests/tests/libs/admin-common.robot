@@ -7,6 +7,7 @@ Library     String
 *** Variables ***
 ${BAU1_BROWSER}         bau1
 ${ANALYST1_BROWSER}     analyst1
+${MODAL_SELECTOR}       css:[role="dialog"]
 
 
 *** Keywords ***
@@ -494,6 +495,11 @@ user deletes subject file
     user clicks element    ${button}
     user clicks button    Confirm
 
+user navigates to Sign off page
+    user clicks link    Sign off
+    user waits until page finishes loading
+    user waits until h2 is visible    Sign off
+
 user approves original release for immediate publication
     user approves release for immediate publication    original
 
@@ -502,9 +508,7 @@ user approves amended release for immediate publication
 
 user approves release for immediate publication
     [Arguments]    ${release_type}=original    ${NEXT_RELEASE_MONTH}=01    ${NEXT_RELEASE_YEAR}=2200
-    user clicks link    Sign off
-    user waits until page finishes loading
-    user waits until h2 is visible    Sign off
+    user navigates to Sign off page
     user waits until page contains button    Edit release status
     user clicks button    Edit release status
     user waits until h2 is visible    Edit release status
@@ -523,6 +527,12 @@ user approves release for immediate publication
     user waits for release process status to be    Complete    %{RELEASE_COMPLETE_WAIT}
     user reloads page    # EES-1448
     user checks page does not contain button    Edit release status
+
+user gets url public release will be accessible at
+    user waits until page contains element    testid:public-release-url
+    ${link}=    Get Value    testid:public-release-url
+    check that variable is not empty    link    ${link}
+    [Return]    ${link}
 
 user navigates to admin dashboard
     [Arguments]    ${USER}=
@@ -548,7 +558,7 @@ user uploads subject and waits until complete
     ...    Complete
     ...    ${FOLDER}
 
-user uploads subject and waits until importing
+user uploads subject and waits until pending import
     [Arguments]
     ...    ${SUBJECT_NAME}
     ...    ${SUBJECT_FILE}
@@ -558,7 +568,20 @@ user uploads subject and waits until importing
     ...    ${SUBJECT_NAME}
     ...    ${SUBJECT_FILE}
     ...    ${META_FILE}
-    ...    Importing
+    ...    Pending import
+    ...    ${FOLDER}
+
+user uploads subject and waits until failed screening
+    [Arguments]
+    ...    ${SUBJECT_NAME}
+    ...    ${SUBJECT_FILE}
+    ...    ${META_FILE}
+    ...    ${FOLDER}=${FILES_DIR}
+    user uploads subject
+    ...    ${SUBJECT_NAME}
+    ...    ${SUBJECT_FILE}
+    ...    ${META_FILE}
+    ...    Failed screening
     ...    ${FOLDER}
 
 user uploads subject
@@ -574,19 +597,22 @@ user uploads subject
     user chooses file    id:dataFileUploadForm-dataFile    ${FOLDER}${SUBJECT_FILE}
     user chooses file    id:dataFileUploadForm-metadataFile    ${FOLDER}${META_FILE}
     user clicks button    Upload data files
-    user waits until h2 is visible    Uploaded data files    %{WAIT_LONG}
     user waits until page contains element    testid:Data files table
 
-    IF    "${IMPORT_STATUS}" != "Importing"
-        user waits until page finishes loading
+    IF    "${IMPORT_STATUS}" == "Complete"
+        User confirms upload to complete import    ${SUBJECT_NAME}
+    ELSE
+        user waits until data file import is in status    ${SUBJECT_NAME}    ${IMPORT_STATUS}
     END
 
-    user waits until page contains data uploads table
-    user waits until table contains row with    ${SUBJECT_NAME}    testid:Data files table    %{WAIT_SMALL}
+user confirms upload to complete import
+    [Arguments]
+    ...    ${SUBJECT_NAME}
     ${row}=    user gets table row    ${SUBJECT_NAME}    testid:Data files table
-    ${status_cell}=    user gets testid element    Status    %{WAIT_SMALL}    ${row}
-    user scrolls to element    ${status_cell}
-    user waits until element contains    ${status_cell}    ${IMPORT_STATUS}    %{WAIT_DATA_FILE_IMPORT}
+    ${button}=    user gets button element    View details    ${row}
+    user clicks element    ${button}
+    user clicks button    Continue import
+    user waits until data file import is complete    ${SUBJECT_NAME}
 
 user waits until data upload is completed
     [Arguments]
@@ -599,15 +625,21 @@ user waits until data files table contains subject
     [Arguments]
     ...    ${SUBJECT_NAME}
     user waits until table contains row with    ${SUBJECT_NAME}    testid:Data files table    %{WAIT_DATA_FILE_IMPORT}
-    ${row}=    user gets table row    ${SUBJECT_NAME}    testid:Data files table
 
 user waits until data file import is complete
     [Arguments]
     ...    ${SUBJECT_NAME}
+    user waits until data file import is in status    ${SUBJECT_NAME}    Complete
+
+user waits until data file import is in status
+    [Arguments]
+    ...    ${subject_name}
+    ...    ${status}
     user waits until page contains data uploads table
-    user waits until table contains row with    ${SUBJECT_NAME}    testid:Data files table    %{WAIT_DATA_FILE_IMPORT}
-    ${row}=    user gets table row    ${SUBJECT_NAME}    testid:Data files table
-    user waits until element contains    ${row}    Complete
+    user waits until parent contains element
+    ...    testid:Data files table
+    ...    xpath:.//tbody/tr/td[contains(., "${subject_name}")]/../td[contains(., "${status}")]
+    ...    %{WAIT_DATA_FILE_IMPORT}
 
 user waits until page contains data uploads table
     user waits until page contains testid    Data files table    %{WAIT_DATA_FILE_IMPORT}
@@ -831,18 +863,37 @@ user waits until modal is visible
     [Arguments]
     ...    ${modal_title}
     ...    ${modal_text}=${EMPTY}
+    ...    ${wait}=${timeout}
 
-    user waits until parent contains element    css:[role="dialog"]    xpath://h2[.="${modal_title}"]
+    user waits until parent contains element    ${MODAL_SELECTOR}    xpath://h2[.="${modal_title}"]
+    ...    timeout=${wait}
     IF    "${modal_text}" != "${EMPTY}"
-        user waits until parent contains element    css:[role="dialog"]    xpath://*[.="${modal_text}"]
+        user waits until parent contains element    ${MODAL_SELECTOR}    xpath://*[.="${modal_text}"]
+        ...    timeout=${wait}
     END
-    ${modal_element}=    get webelement    css:[role="dialog"]
+    ${modal_element}=    get webelement    ${MODAL_SELECTOR}
     [Return]    ${modal_element}
 
 user waits until modal is not visible
     [Arguments]    ${modal_title}    ${wait}=${timeout}
-    user waits until page does not contain element    css:[role="dialog"]    ${wait}
+    user waits until page does not contain element    ${MODAL_SELECTOR}    ${wait}
     user waits until h2 is not visible    ${modal_title}
+
+user checks modal warning text contains
+    [Arguments]
+    ...    ${text}
+    user waits until parent contains element    ${MODAL_SELECTOR}
+    ...    //*[contains(@class, "govuk-warning-text")][contains(., "${text}")]
+
+user checks modal contains text
+    [Arguments]
+    ...    ${text}
+    user waits until parent contains element    ${MODAL_SELECTOR}    //*[contains(., "${text}")]
+
+user clicks modal button
+    [Arguments]
+    ...    ${text}
+    user clicks button    ${text}    ${MODAL_SELECTOR}
 
 user gets resolved comments
     [Arguments]    ${parent}=css:body

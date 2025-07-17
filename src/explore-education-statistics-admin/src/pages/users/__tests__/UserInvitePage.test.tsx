@@ -141,7 +141,10 @@ describe('UserInvitePage', () => {
       );
 
       await user.selectOptions(screen.getByLabelText('Release'), 'Release 1');
-      await user.selectOptions(screen.getByLabelText('Release role'), 'Lead');
+      await user.selectOptions(
+        screen.getByLabelText('Release role'),
+        'Contributor',
+      );
 
       await user.click(
         screen.getByRole('button', { name: 'Add release role' }),
@@ -178,7 +181,10 @@ describe('UserInvitePage', () => {
       ).toBeInTheDocument();
 
       await user.selectOptions(screen.getByLabelText('Release'), 'Release 2');
-      await user.selectOptions(screen.getByLabelText('Release role'), 'Lead');
+      await user.selectOptions(
+        screen.getByLabelText('Release role'),
+        'Contributor',
+      );
 
       await user.click(
         screen.getByRole('button', { name: 'Add release role' }),
@@ -188,7 +194,7 @@ describe('UserInvitePage', () => {
       expect(updatedRows).toHaveLength(3);
 
       expect(within(updatedRows[2]).getByText('Release 2'));
-      expect(within(updatedRows[2]).getByText('Lead'));
+      expect(within(updatedRows[2]).getByText('Contributor'));
       expect(
         within(updatedRows[2]).getByRole('button', { name: 'Remove' }),
       ).toBeInTheDocument();
@@ -453,7 +459,7 @@ describe('UserInvitePage', () => {
         { releaseId: 'release-1-id', releaseRole: 'Approver' },
       ],
       userPublicationRoles: [
-        { publicationId: 'publication-1-id', publicationRole: 'Approver' },
+        { publicationId: 'publication-1-id', publicationRole: 'Allower' },
       ],
     });
   });

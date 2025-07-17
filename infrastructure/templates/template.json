@@ -481,18 +481,18 @@
       "type": "bool",
       "defaultValue": true
     },
-    "publishReleasesCronSchedule": {
+    "stageScheduledReleasesFunctionCronSchedule": {
       "type": "string",
-      "defaultValue": "0 0 0 * * *",
+      "defaultValue": "0 5 0 * * *",
       "metadata": {
-        "description": "Cron string that is used to control the schedule of the Publish Releases Function in the Publisher App"
+        "description": "Cron string that is used to control the schedule of the StageScheduledReleases function in the Publisher Function App"
       }
     },
-    "publishReleaseContentCronSchedule": {
+    "publishScheduledReleasesFunctionCronSchedule": {
       "type": "string",
       "defaultValue": "0 30 9 * * *",
       "metadata": {
-        "description": "Cron string that is used to control the schedule of the Publish Release Content Function in the Publisher App"
+        "description": "Cron string that is used to control the schedule of the PublishScheduledReleases function in the Publisher Function App"
       }
     },
     "preReleaseMinutesBeforeStart": {
@@ -585,9 +585,12 @@
         "description": "Maximum number of table cells that a table builder query could potentially render for a request to be valid"
       }
     },
-    "timeZone": {
+    "publisherFunctionAppTimeZone": {
       "type": "string",
-      "defaultValue": "GMT Standard Time"
+      "defaultValue": "GMT Standard Time",
+      "metadata": {
+        "description": "The time zone of the Publisher Function App. This time zone is used for evaluating Cron expressions of the functions running with Cron triggers and altering it will change the time of execution of these functions. The name of this time zone depends on the operating system and plan on which the function app runs."
+      }
     },
     "branch": {
       "type": "string",
@@ -719,6 +722,13 @@
         "description": "The password to log in to the Container registry"
       }
     },
+    "searchIndexName" : {
+      "type": "string",
+      "defaultValue": "index-1",
+      "metadata": {
+        "description": "The name of the Azure AI Search index used by the public frontend application"
+      }
+    },
     "publicDataDbExists": {
       "type": "bool",
       "defaultValue": true,
@@ -732,10 +742,44 @@
         "description": "The Client ID of a manually-created App Registration that represents the Public API Data Processor Function App in Entra ID"
       }
     },
+    "screenerAppRegistrationClientId": {
+      "type": "string",
+      "metadata": {
+        "description": "The Client ID of a manually-created App Registration that represents the Screener API Function App in Entra ID"
+      }
+    },
     "apiAppRegistrationClientId": {
       "type": "string",
       "metadata": {
         "description": "The Client ID of a manually-created App Registration that represents the Public API Container App in Entra ID"
+      }
+    },
+    "analyticsEnabled": {
+      "type": "bool",
+      "defaultValue": true,
+      "metadata": {
+        "description": "Whether analytics is enabled"
+      }
+    },
+    "analyticsFileShareMountPath": {
+      "type": "string",
+      "defaultValue": "\\mounts\\analytics",
+      "metadata": {
+        "description": "Where analytics request files are saved before being processed"
+      }
+    },
+    "notifierSuppressExceptionsForTeamOnlyApiKeyErrors": {
+      "type": "bool",
+      "defaultValue": false,
+      "metadata": {
+        "description": "Replaces Notify exceptions with logged messages only when team-only API keys are used and a recipient email address is not valid for that key."
+      }
+    },
+    "enableReplacementOfPublicApiDataSets": {
+      "type": "bool",
+      "defaultValue": false,
+      "metadata": {
+        "description": "Feature flag to control the replacement of public API data sets"
       }
     }
   },
@@ -778,6 +822,7 @@
     "publisherStorageAccountId": "[concat(resourceGroup().id,'/providers/','Microsoft.Storage/storageAccounts/', variables('publisherStorageAccountName'))]",
     "loggingStorageAccountName": "[concat(parameters('subscription'), 'saeeslogging')]",
     "publicDataProcessorName": "[concat(parameters('subscription'), '-', parameters('environment'), '-papi-fa-processor')]",
+    "dataScreenerName": "[concat(parameters('subscription'), '-', parameters('environment'), '-sapi-fa-screener')]",
     "logicAppSlackAlerts": "[concat(parameters('subscription'), '-la-', parameters('environment'), '-slackwebhook')]",
     "actionGroupAlerts": "[concat(parameters('subscription'), '-ag-', parameters('environment'), '-alertedusers')]",
     "metricAlerts": [
@@ -1094,6 +1139,8 @@
     "vNetRef": "[resourceId('Microsoft.Network/virtualNetworks', variables('vNetName'))]",
     "adminSubnetName": "[concat(parameters('subscription'), '-snet-', parameters('environment'), '-admin')]",
     "adminSubnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vNetName'), variables('adminSubnetName'))]",
+    "analyticsFunctionAppSubnetName": "[concat(parameters('subscription'), '-', parameters('environment'), '-snet-fa-analytics')]",
+    "analyticsStoragePrivateEndpointsSubnetName": "[concat(parameters('subscription'), '-', parameters('environment'), '-snet-sa-anlyt-pep')]",
     "importerSubnetName": "[concat(parameters('subscription'), '-snet-', parameters('environment'), '-importer')]",
     "importerSubnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vNetName'), variables('importerSubnetName'))]",
     "publisherSubnetName": "[concat(parameters('subscription'), '-snet-', parameters('environment'), '-publisher')]",
@@ -1108,9 +1155,16 @@
     "publicApiDataProcessorSubnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vNetName'), variables('publicApiDataProcessorSubnetName'))]",
     "publicApiDataProcessorPrivateEndpointsSubnetName": "[concat(parameters('subscription'), '-', parameters('environment'), '-papi-snet-fa-processor-pep')]",
     "publicApiStoragePrivateEndpointsSubnetName": "[concat(parameters('subscription'), '-', parameters('environment'), '-papi-snet-sa-pep')]",
+    "searchDocsFunctionSubnetName": "[concat(parameters('subscription'), '-', parameters('environment'), '-snet-fa-searchdocs')]",
+    "searchDocsFunctionPrivateEndpointsSubnetName": "[concat(parameters('subscription'), '-', parameters('environment'), '-snet-fa-searchdocs-pep')]",
+    "searchStoragePrivateEndpointsSubnetName": "[concat(parameters('subscription'), '-', parameters('environment'), '-snet-sa-search-pep')]",
     "containerAppEnvironmentSubnetName": "[concat(parameters('subscription'), '-', parameters('environment'), '-snet-cae-01')]",
+    "eventGridCustomTopicPrivateEndpointsSubnetName": "[concat(parameters('subscription'), '-', parameters('environment'), '-snet-evgt-pep')]",
     "applicationGatewaySubnetName": "[concat(parameters('subscription'), '-', parameters('environment'), '-snet-agw-01')]",
     "psqlFlexibleServerSubnetName": "[concat(parameters('subscription'), '-', parameters('environment'), '-snet-psql-flexibleserver')]",
+    "screenerFunctionAppSubnetName": "[concat(parameters('subscription'), '-', parameters('environment'), '-sapi-snet-fa-screener')]",
+    "screenerFunctionAppSubnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vNetName'), variables('screenerFunctionAppSubnetName'))]",
+    "screenerStoragePrivateEndpointsSubnetName": "[concat(parameters('subscription'), '-', parameters('environment'), '-sapi-snet-sa-screener-pep')]",
     "sqlAllowedSubnets": [
       {
         "name": "admin",
@@ -1209,6 +1263,10 @@
       ]
     },
     "templateBaseUrl": "[concat('https://raw.githubusercontent.com/dfe-analytical-services/explore-education-statistics/', parameters('branch'), '/infrastructure/templates/')]",
+    "keyVaultCertificateUserRoleDefinitionId": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', 'db79e9a7-68ee-4b58-9aeb-b90e7c24fcba')]",
+    "keyVaultCertificateUserPrincipalRefs": [
+      "[concat('Microsoft.Web/sites/', variables('publicAppName'))]"
+    ],
     "keyVaultSecretsUserRoleDefinitionId": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '4633458b-17de-408a-b874-0445c86b69e6')]",
     "keyVaultSecretsUserPrincipalRefs": [
       "[concat('Microsoft.Web/sites/', variables('adminAppName'))]",
@@ -1220,7 +1278,15 @@
     ],
     "publicDataFileShareMountPathWindows": "\\mounts\\public-api-data",
     "publicDataFileShareName": "[concat(parameters('subscription'), '-ees-papi-share-data')]",
-    "publicDataStorageAccountName": "[concat(parameters('subscription'), 'eespapisa')]"
+    "publicDataStorageAccountName": "[concat(parameters('subscription'), 'eespapisa')]",
+    "analyticsFileShareName": "[concat(parameters('subscription'), '-ees-share-anlyt')]",
+    "analyticsStorageAccountName": "[concat(parameters('subscription'), 'eessaanlyt')]",
+    "eventGridTopicNamePublicationChanged": "[concat(parameters('subscription'), '-', parameters('environment'), '-evgt-publication-changed')]",
+    "eventGridTopicNameReleaseChanged": "[concat(parameters('subscription'), '-', parameters('environment'), '-evgt-release-changed')]",
+    "eventGridTopicNameReleaseVersionChanged": "[concat(parameters('subscription'), '-', parameters('environment'), '-evgt-release-version-changed')]",
+    "eventGridTopicNameThemeChanged": "[concat(parameters('subscription'), '-', parameters('environment'), '-evgt-theme-changed')]",
+    "searchServiceName": "[concat(parameters('subscription'), '-', parameters('environment'), '-srch')]",
+    "searchServiceApiVersion": "2025-02-01-preview"
   },
   "resources": [
     {
@@ -1320,16 +1386,16 @@
       ],
       "properties": {
         "APPINSIGHTS_INSTRUMENTATIONKEY": "[reference(resourceId('microsoft.insights/components/', variables('dataAppInsights')), '2020-02-02').InstrumentationKey]",
-        "WEBSITE_NODE_DEFAULT_VERSION": "20.16.0",
+        "WEBSITE_NODE_DEFAULT_VERSION": "20.19.2",
         "WEBSITE_RUN_FROM_PACKAGE": "1",
         "PublicStorage": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-storage-public'), '2018-02-14').secretUriWithVersion, ')')]",
         "enableSwagger": "[parameters('enableSwagger')]",
-        "PublicApp:Url": "[variables('publicAppUrl')]",
-        "PublicApp:BasicAuth": "[parameters('publicAppBasicAuth')]",
-        "PublicApp:BasicAuthUsername": "[parameters('publicAppBasicAuthUsername')]",
-        "PublicApp:BasicAuthPassword": "[parameters('publicAppBasicAuthPassword')]",
-        "RequestTimeouts:TableBuilderQuery": "[parameters('requestTimeoutsTableBuilderQuery')]",
-        "TableBuilder:MaxTableCellsAllowed": "[parameters('tableBuilderMaxTableCellsAllowed')]"
+        "PublicApp__Url": "[variables('publicAppUrl')]",
+        "PublicApp__BasicAuth": "[parameters('publicAppBasicAuth')]",
+        "PublicApp__BasicAuthUsername": "[parameters('publicAppBasicAuthUsername')]",
+        "PublicApp__BasicAuthPassword": "[parameters('publicAppBasicAuthPassword')]",
+        "RequestTimeouts__TableBuilderQuery": "[parameters('requestTimeoutsTableBuilderQuery')]",
+        "TableBuilder__MaxTableCellsAllowed": "[parameters('tableBuilderMaxTableCellsAllowed')]"
       }
     },
     {
@@ -1548,10 +1614,33 @@
       ],
       "properties": {
         "APPINSIGHTS_INSTRUMENTATIONKEY": "[reference(resourceId('microsoft.insights/components/', variables('contentAppInsights')), '2020-02-02').InstrumentationKey]",
-        "WEBSITE_NODE_DEFAULT_VERSION": "20.16.0",
+        "WEBSITE_NODE_DEFAULT_VERSION": "20.19.2",
+        "WEBSITE_CONTENTOVERVNET": "1",
         "WEBSITE_RUN_FROM_PACKAGE": "1",
         "PublicStorage": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-storage-public'), '2018-02-14').secretUriWithVersion, ')')]",
-        "enableSwagger": "[parameters('enableSwagger')]"
+        "enableSwagger": "[parameters('enableSwagger')]",
+        "Analytics__Enabled": "[parameters('analyticsEnabled')]",
+        "Analytics__BasePath": "[parameters('analyticsFileShareMountPath')]"
+      }
+    },
+    {
+      "condition": "[parameters('analyticsEnabled')]",
+      "name": "[concat(variables('contentAppName'), '/azurestorageaccounts')]",
+      "type": "Microsoft.Web/sites/config",
+      "location": "[resourceGroup().location]",
+      "apiVersion": "2019-08-01",
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/sites', variables('contentAppName'))]"
+      ],
+      "properties": {
+        "[variables('analyticsFileShareName')]": {
+          "type": "AzureFiles",
+          "accountName": "[variables('analyticsStorageAccountName')]",
+          "accessKey": "[listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('analyticsStorageAccountName')), '2018-02-01').keys[0].value]",
+          "shareName": "[variables('analyticsFileShareName')]",
+          "mountPath": "[parameters('analyticsFileShareMountPath')]",
+          "protocol": "Smb"
+        }
       }
     },
     {
@@ -1776,53 +1865,62 @@
       ],
       "properties": {
         "APPINSIGHTS_INSTRUMENTATIONKEY": "[reference(resourceId('microsoft.insights/components/', variables('adminAppInsights')), '2020-02-02').InstrumentationKey]",
-        "AppInsights:InstrumentationKey": "[reference(resourceId('microsoft.insights/components/', variables('adminAppInsights')), '2020-02-02').InstrumentationKey]",
-        "WEBSITE_NODE_DEFAULT_VERSION": "20.16.0",
+        "AppInsights__InstrumentationKey": "[reference(resourceId('microsoft.insights/components/', variables('adminAppInsights')), '2020-02-02').InstrumentationKey]",
+        "WEBSITE_NODE_DEFAULT_VERSION": "20.19.2",
         "WEBSITE_RUN_FROM_PACKAGE": "1",
         "WEBSITE_LOAD_CERTIFICATES": "*",
         "ASPNETCORE_DETAILEDERRORS": "[parameters('detailedErrors')]",
-        "App:Url": "[concat('https://', parameters('adminUri'))]",
-        "App:EnableSwagger": "[parameters('enableSwagger')]",
-        "App:EnableThemeDeletion": "[parameters('enableThemeDeletion')]",
-        "Azure:SignalR:ConnectionString": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-signalr-admin-connectionstring'), '2018-02-14').secretUriWithVersion, ')')]",
-        "IdentityServer:IssuerUri": "[concat('urn=', parameters('adminUri'))]",
-        "IdentityServer:Key:Name": "[concat('CN=', parameters('adminUri'))]",
-        "Notify:ApiKey": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-admin-govuknotify-api-key'), '2018-02-14').secretUriWithVersion, ')')]",
-        "Notify:InviteWithRolesTemplateId": "[parameters('notifyInviteWithRolesTemplateId')]",
-        "Notify:PublicationRoleTemplateId": "[parameters('notifyPublicationRoleTemplateId')]",
-        "Notify:ReleaseRoleTemplateId": "[parameters('notifyReleaseRoleTemplateId')]",
-        "Notify:PreReleaseTemplateId": "[parameters('notifyPreReleaseTemplateId')]",
-        "Notify:ContributorTemplateId": "[parameters('notifyContributorTemplateId')]",
-        "Notify:ReleaseHigherReviewersTemplateId": "[parameters('notifyReleaseHigherReviewersTemplateId')]",
-        "Notify:MethodologyHigherReviewersTemplateId": "[parameters('notifyMethodologyHigherReviewersTemplateId')]",
-        "OpenIdConnectIdentityFramework:ClientId": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-openidconnect-clientid'), '2018-02-14').secretUriWithVersion, ')')]",
-        "OpenIdConnectIdentityFramework:Authority": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-openidconnect-authority'), '2018-02-14').secretUriWithVersion, ')')]",
-        "OpenIdConnectIdentityFramework:TokenValidationParameters:ValidAudience": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-openidconnect-valid-audience'), '2018-02-14').secretUriWithVersion, ')')]",
-        "OpenIdConnectIdentityFramework:TokenValidationParameters:ValidIssuers": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-openidconnect-valid-issuers'), '2018-02-14').secretUriWithVersion, ')')]",
-        "OpenIdConnectSpaClient:ClientId": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-openidconnect-clientid'), '2018-02-14').secretUriWithVersion, ')')]",
-        "OpenIdConnectSpaClient:Authority": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-openidconnect-authority'), '2018-02-14').secretUriWithVersion, ')')]",
-        "OpenIdConnectSpaClient:KnownAuthorities:0": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-openidconnect-authority'), '2018-02-14').secretUriWithVersion, ')')]",
-        "OpenIdConnectSpaClient:AdminApiScope": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-openidconnect-fully-qualified-scope-name'), '2018-02-14').secretUriWithVersion, ')')]",
-        "MemoryCache:Enabled": "[parameters('memoryCacheEnabled')]",
-        "MemoryCache:MaxCacheSizeMb": "[parameters('memoryCacheMaxCacheSizeMb')]",
-        "MemoryCache:ExpirationScanFrequencySeconds": "[parameters('memoryCacheExpirationScanFrequencySeconds')]",
-        "MemoryCache:Overrides:DurationInSeconds": "[parameters('memoryCacheOverridesDurationInSeconds')]",
-        "MemoryCache:Overrides:ExpirySchedule": "[parameters('memoryCacheOverridesExpirySchedule')]",
+        "App__Url": "[concat('https://', parameters('adminUri'))]",
+        "App__EnableSwagger": "[parameters('enableSwagger')]",
+        "App__EnableThemeDeletion": "[parameters('enableThemeDeletion')]",
+        "Azure__SignalR__ConnectionString": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-signalr-admin-connectionstring'), '2018-02-14').secretUriWithVersion, ')')]",
+        "EventGrid__EventTopics__0__Key": "PublicationChangedEvent",
+        "EventGrid__EventTopics__0__TopicEndpoint": "[reference(resourceId('Microsoft.EventGrid/topics', variables('eventGridTopicNamePublicationChanged')), '2025-02-15').endpoint]",
+        "EventGrid__EventTopics__1__Key": "ReleaseChangedEvent",
+        "EventGrid__EventTopics__1__TopicEndpoint": "[reference(resourceId('Microsoft.EventGrid/topics', variables('eventGridTopicNameReleaseChanged')), '2025-02-15').endpoint]",
+        "EventGrid__EventTopics__2__Key": "ThemeChangedEvent",
+        "EventGrid__EventTopics__2__TopicEndpoint": "[reference(resourceId('Microsoft.EventGrid/topics', variables('eventGridTopicNameThemeChanged')), '2025-02-15').endpoint]",
+        "IdentityServer__IssuerUri": "[concat('urn=', parameters('adminUri'))]",
+        "IdentityServer__Key__Name": "[concat('CN=', parameters('adminUri'))]",
+        "Notify__ApiKey": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-admin-govuknotify-api-key'), '2018-02-14').secretUriWithVersion, ')')]",
+        "Notify__InviteWithRolesTemplateId": "[parameters('notifyInviteWithRolesTemplateId')]",
+        "Notify__PublicationRoleTemplateId": "[parameters('notifyPublicationRoleTemplateId')]",
+        "Notify__ReleaseRoleTemplateId": "[parameters('notifyReleaseRoleTemplateId')]",
+        "Notify__PreReleaseTemplateId": "[parameters('notifyPreReleaseTemplateId')]",
+        "Notify__ContributorTemplateId": "[parameters('notifyContributorTemplateId')]",
+        "Notify__ReleaseHigherReviewersTemplateId": "[parameters('notifyReleaseHigherReviewersTemplateId')]",
+        "Notify__MethodologyHigherReviewersTemplateId": "[parameters('notifyMethodologyHigherReviewersTemplateId')]",
+        "OpenIdConnectIdentityFramework__ClientId": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-openidconnect-clientid'), '2018-02-14').secretUriWithVersion, ')')]",
+        "OpenIdConnectIdentityFramework__Authority": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-openidconnect-authority'), '2018-02-14').secretUriWithVersion, ')')]",
+        "OpenIdConnectIdentityFramework__TokenValidationParameters__ValidAudience": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-openidconnect-valid-audience'), '2018-02-14').secretUriWithVersion, ')')]",
+        "OpenIdConnectIdentityFramework__TokenValidationParameters__ValidIssuers": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-openidconnect-valid-issuers'), '2018-02-14').secretUriWithVersion, ')')]",
+        "OpenIdConnectSpaClient__ClientId": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-openidconnect-clientid'), '2018-02-14').secretUriWithVersion, ')')]",
+        "OpenIdConnectSpaClient__Authority": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-openidconnect-authority'), '2018-02-14').secretUriWithVersion, ')')]",
+        "OpenIdConnectSpaClient__KnownAuthorities:0": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-openidconnect-authority'), '2018-02-14').secretUriWithVersion, ')')]",
+        "OpenIdConnectSpaClient__AdminApiScope": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-openidconnect-fully-qualified-scope-name'), '2018-02-14').secretUriWithVersion, ')')]",
+        "MemoryCache__Enabled": "[parameters('memoryCacheEnabled')]",
+        "MemoryCache__MaxCacheSizeMb": "[parameters('memoryCacheMaxCacheSizeMb')]",
+        "MemoryCache__ExpirationScanFrequencySeconds": "[parameters('memoryCacheExpirationScanFrequencySeconds')]",
+        "MemoryCache__Overrides__DurationInSeconds": "[parameters('memoryCacheOverridesDurationInSeconds')]",
+        "MemoryCache__Overrides__ExpirySchedule": "[parameters('memoryCacheOverridesExpirySchedule')]",
         "CoreStorage": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-storage-core'), '2018-02-14').secretUriWithVersion, ')')]",
         "PublicStorage": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-storage-public')).secretUriWithVersion, ')')]",
         "PublisherStorage": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-storage-publisher'), '2018-02-14').secretUriWithVersion, ')')]",
-        "PreReleaseAccess:AccessWindow:MinutesBeforeReleaseTimeStart": "[parameters('preReleaseMinutesBeforeStart')]",
-        "ReleaseApproval:PublishReleasesCronSchedule": "[parameters('publishReleasesCronSchedule')]",
-        "ReleaseApproval:PublishReleaseContentCronSchedule": "[parameters('publishReleaseContentCronSchedule')]",
-        "TableBuilder:MaxTableCellsAllowed": "[parameters('tableBuilderMaxTableCellsAllowed')]",
-        "PublicApp:Url": "[variables('publicAppUrl')]",
+        "PreReleaseAccess__AccessWindow__MinutesBeforeReleaseTimeStart": "[parameters('preReleaseMinutesBeforeStart')]",
+        "ReleaseApproval__StageScheduledReleasesFunctionCronSchedule": "[parameters('stageScheduledReleasesFunctionCronSchedule')]",
+        "ReleaseApproval__PublishScheduledReleasesFunctionCronSchedule": "[parameters('publishScheduledReleasesFunctionCronSchedule')]",
+        "TableBuilder__MaxTableCellsAllowed": "[parameters('tableBuilderMaxTableCellsAllowed')]",
+        "PublicApp__Url": "[variables('publicAppUrl')]",
         "PublicDataDbExists": "[parameters('publicDataDbExists')]",
-        "PublicDataApi:PublicUrl": "[concat('https://', parameters('publicApiUrl'))]",
-        "PublicDataApi:PrivateUrl": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-publicapi-public-api-containerapp-private-url'), '2018-02-14').secretUriWithVersion, ')')]",
-        "PublicDataApi:DocsUrl": "[concat('https://', parameters('publicApiDocsUrl'))]",
-        "PublicDataApi:AppRegistrationClientId": "[parameters('apiAppRegistrationClientId')]",
-        "PublicDataProcessor:Url": "[concat('https://', variables('publicDataProcessorName'), '.azurewebsites.net')]",
-        "PublicDataProcessor:AppRegistrationClientId": "[parameters('publicDataProcessorAppRegistrationClientId')]"
+        "PublicDataApi__PublicUrl": "[concat('https://', parameters('publicApiUrl'))]",
+        "PublicDataApi__PrivateUrl": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-publicapi-public-api-containerapp-private-url'), '2018-02-14').secretUriWithVersion, ')')]",
+        "PublicDataApi__DocsUrl": "[concat('https://', parameters('publicApiDocsUrl'))]",
+        "PublicDataApi__AppRegistrationClientId": "[parameters('apiAppRegistrationClientId')]",
+        "PublicDataProcessor__Url": "[concat('https://', variables('publicDataProcessorName'), '.azurewebsites.net')]",
+        "PublicDataProcessor__AppRegistrationClientId": "[parameters('publicDataProcessorAppRegistrationClientId')]",
+        "DataScreener__Url": "[concat('https://', variables('dataScreenerName'), '.azurewebsites.net', '/api/screen')]",
+        "DataScreener__AppRegistrationClientId": "[parameters('screenerAppRegistrationClientId')]",
+        "FeatureFlags__EnableReplacementOfPublicApiDataSets": "[parameters('enableReplacementOfPublicApiDataSets')]"
       }
     },
     {
@@ -2125,6 +2223,9 @@
       "properties": {
         "APP_ENV": "[parameters('environmentName')]",
         "APPINSIGHTS_INSTRUMENTATIONKEY": "[reference(resourceId('microsoft.insights/components/', variables('publicAppInsights')), '2020-02-02').InstrumentationKey]",
+        "AZURE_SEARCH_ENDPOINT": "[reference(resourceId('Microsoft.Search/searchServices', variables('searchServiceName')), variables('searchServiceApiVersion')).endpoint]",
+        "AZURE_SEARCH_INDEX": "[parameters('searchIndexName')]",
+        "AZURE_SEARCH_QUERY_KEY": "[listQueryKeys(resourceId('Microsoft.Search/searchServices', variables('searchServiceName')), variables('searchServiceApiVersion')).value[0].key]",
         "BASIC_AUTH": "[parameters('publicAppBasicAuth')]",
         "BASIC_AUTH_USERNAME": "[parameters('publicAppBasicAuthUsername')]",
         "BASIC_AUTH_PASSWORD": "[parameters('publicAppBasicAuthPassword')]",
@@ -2140,7 +2241,7 @@
         "PUBLIC_URL": "[concat(variables('publicAppUrl'), '/')]",
         "PUBLIC_API_BASE_URL": "[concat('https://', parameters('publicApiUrl'))]",
         "PUBLIC_API_DOCS_URL": "[concat('https://', parameters('publicApiDocsUrl'))]",
-        "WEBSITE_NODE_DEFAULT_VERSION": "20.16.0",
+        "WEBSITE_NODE_DEFAULT_VERSION": "20.19.2",
         "WEBSITES_PORT": 3000
       }
     },
@@ -2229,6 +2330,11 @@
             {
               "condition": "[parameters('useSubnets')]",
               "id": "[variables('publicApiDataProcessorSubnetRef')]",
+              "action": "Allow"
+            },
+            {
+              "condition": "[parameters('useSubnets')]",
+              "id": "[variables('screenerFunctionAppSubnetRef')]",
               "action": "Allow"
             }
           ],
@@ -2974,21 +3080,13 @@
         "FUNCTIONS_EXTENSION_VERSION": "~4",
         "FUNCTIONS_WORKER_RUNTIME": "dotnet-isolated",
         "APPINSIGHTS_INSTRUMENTATIONKEY": "[reference(resourceId('microsoft.insights/components/', variables('notificationsAppInsights')), '2020-02-02').InstrumentationKey]",
-        "App:Url": "[concat(concat('https://', variables('notificationsAppName')), '.azurewebsites.net/api')]",
-        "App:PublicAppUrl": "[variables('publicAppUrl')]",
-        "App:NotifierStorageConnectionString": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-storage-notifications')).secretUriWithVersion, ')')]",
-        "App:TokenSecretKey": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-notifier-token-secret-key'), '2018-02-14').secretUriWithVersion, ')')]",
-        "GovUkNotify:ApiKey": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-notifier-govuknotify-api-key'), '2018-02-14').secretUriWithVersion, ')')]",
-        "GovUkNotify:EmailTemplates:ReleaseAmendmentPublishedId": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-notifier-templateid-release-amendment-published'), '2018-02-14').secretUriWithVersion, ')')]",
-        "GovUkNotify:EmailTemplates:ReleaseAmendmentPublishedSupersededSubscribersId": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-notifier-templateid-release-amendment-published-superseded-subscribers'), '2018-02-14').secretUriWithVersion, ')')]",
-        "GovUkNotify:EmailTemplates:ReleasePublishedId": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-notifier-templateid-release-published'), '2018-02-14').secretUriWithVersion, ')')]",
-        "GovUkNotify:EmailTemplates:ReleasePublishedSupersededSubscribersId": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-notifier-templateid-release-published-superseded-subscribers'), '2018-02-14').secretUriWithVersion, ')')]",
-        "GovUkNotify:EmailTemplates:SubscriptionConfirmationId": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-notifier-templateid-subscription-confirmation'), '2018-02-14').secretUriWithVersion, ')')]",
-        "GovUkNotify:EmailTemplates:SubscriptionVerificationId": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-notifier-templateid-subscription-verification'), '2018-02-14').secretUriWithVersion, ')')]",
-        "GovUkNotify:EmailTemplates:ApiSubscriptionConfirmationId": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-notifier-templateid-api-subscription-confirmation'), '2018-02-14').secretUriWithVersion, ')')]",
-        "GovUkNotify:EmailTemplates:ApiSubscriptionMajorDataSetVersionPublishedId": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-notifier-templateid-api-subscription-major-data-set-version-published'), '2018-02-14').secretUriWithVersion, ')')]",
-        "GovUkNotify:EmailTemplates:ApiSubscriptionDataSetVersionPublishedId": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-notifier-templateid-api-subscription-data-set-version-published'), '2018-02-14').secretUriWithVersion, ')')]",
-        "GovUkNotify:EmailTemplates:ApiSubscriptionVerificationId": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-notifier-templateid-api-subscription-verification'), '2018-02-14').secretUriWithVersion, ')')]"
+        "App__EmailEnabled": "true",
+        "App__SuppressExceptionsForTeamOnlyApiKeyErrors": "[parameters('notifierSuppressExceptionsForTeamOnlyApiKeyErrors')]",
+        "App__Url": "[concat(concat('https://', variables('notificationsAppName')), '.azurewebsites.net/api')]",
+        "App__PublicAppUrl": "[variables('publicAppUrl')]",
+        "App__NotifierStorageConnectionString": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-storage-notifications')).secretUriWithVersion, ')')]",
+        "App__TokenSecretKey": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-notifier-token-secret-key'), '2018-02-14').secretUriWithVersion, ')')]",
+        "GovUkNotify__ApiKey": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-notifier-govuknotify-api-key'), '2018-02-14').secretUriWithVersion, ')')]"
       }
     },
     {
@@ -3140,8 +3238,8 @@
         "FUNCTIONS_EXTENSION_VERSION": "~4",
         "FUNCTIONS_WORKER_RUNTIME": "dotnet-isolated",
         "APPINSIGHTS_INSTRUMENTATIONKEY": "[reference(resourceId('microsoft.insights/components/', variables('importerAppInsights')), '2020-02-02').InstrumentationKey]",
-        "App:RowsPerBatch": "3000",
-        "App:PrivateStorageConnectionString": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-storage-core')).secretUriWithVersion, ')')]"
+        "App__RowsPerBatch": "3000",
+        "App__PrivateStorageConnectionString": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-storage-core')).secretUriWithVersion, ')')]"
       }
     },
     {
@@ -3301,19 +3399,24 @@
         "AzureWebJobs.StageScheduledReleaseVersionsImmediately.Disabled": "[not(parameters('immediatePublicationOfScheduledReleaseVersionsEnabled'))]",
         "AzureWebJobs.PublishStagedReleaseVersionContentImmediately.Disabled": "[not(parameters('immediatePublicationOfScheduledReleaseVersionsEnabled'))]",
         "WEBSITE_CONTENTOVERVNET": "1",
-        "WEBSITE_TIME_ZONE": "[parameters('timeZone')]",
+        "WEBSITE_TIME_ZONE": "[parameters('publisherFunctionAppTimeZone')]",
         "WEBSITE_RUN_FROM_PACKAGE": "1",
         "FUNCTIONS_EXTENSION_VERSION": "~4",
         "FUNCTIONS_WORKER_RUNTIME": "dotnet-isolated",
         "APPINSIGHTS_INSTRUMENTATIONKEY": "[reference(resourceId('microsoft.insights/components/', variables('publisherAppInsights')), '2020-02-02').InstrumentationKey]",
-        "App:PublishReleasesCronSchedule": "[parameters('publishReleasesCronSchedule')]",
-        "App:PublishReleaseContentCronSchedule": "[parameters('publishReleaseContentCronSchedule')]",
-        "App:PrivateStorageConnectionString": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-storage-core')).secretUriWithVersion, ')')]",
-        "App:NotifierStorageConnectionString": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-storage-notifications')).secretUriWithVersion, ')')]",
-        "App:PublicStorageConnectionString": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-storage-public')).secretUriWithVersion, ')')]",
-        "App:PublisherStorageConnectionString": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-storage-publisher')).secretUriWithVersion, ')')]",
-        "DataFiles:BasePath": "[variables('publicDataFileShareMountPathWindows')]",
-        "PublicDataDbExists": "[parameters('publicDataDbExists')]"
+        "App__StageScheduledReleasesFunctionCronSchedule": "[parameters('stageScheduledReleasesFunctionCronSchedule')]",
+        "App__PublishScheduledReleasesFunctionCronSchedule": "[parameters('publishScheduledReleasesFunctionCronSchedule')]",
+        "App__PrivateStorageConnectionString": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-storage-core')).secretUriWithVersion, ')')]",
+        "App__NotifierStorageConnectionString": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-storage-notifications')).secretUriWithVersion, ')')]",
+        "App__PublicStorageConnectionString": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-storage-public')).secretUriWithVersion, ')')]",
+        "App__PublisherStorageConnectionString": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-storage-publisher')).secretUriWithVersion, ')')]",
+        "DataFiles__BasePath": "[variables('publicDataFileShareMountPathWindows')]",
+        "EventGrid__EventTopics__0__Key": "PublicationChangedEvent",
+        "EventGrid__EventTopics__0__TopicEndpoint": "[reference(resourceId('Microsoft.EventGrid/topics', variables('eventGridTopicNamePublicationChanged')), '2025-02-15').endpoint]",
+        "EventGrid__EventTopics__1__Key": "ReleaseVersionChangedEvent",
+        "EventGrid__EventTopics__1__TopicEndpoint": "[reference(resourceId('Microsoft.EventGrid/topics', variables('eventGridTopicNameReleaseVersionChanged')), '2025-02-15').endpoint]",
+        "PublicDataDbExists": "[parameters('publicDataDbExists')]",
+        "FeatureFlags__EnableReplacementOfPublicApiDataSets": "[parameters('enableReplacementOfPublicApiDataSets')]"
       }
     },
     {
@@ -3676,6 +3779,93 @@
             "properties": {
               "addressPrefix": "10.0.12.0/24"
             }
+          },
+          {
+            "name": "[variables('searchStoragePrivateEndpointsSubnetName')]",
+            "properties": {
+              "addressPrefix": "10.0.13.0/24"
+            }
+          },
+          {
+            "name": "[variables('searchDocsFunctionSubnetName')]",
+            "properties": {
+              "addressPrefix": "10.0.14.0/24",
+              "serviceEndpoints": [
+                {
+                  "service": "Microsoft.Storage"
+                }
+              ],
+              "delegations": [
+                {
+                  "name": "webapp",
+                  "properties": {
+                    "serviceName": "Microsoft.Web/serverFarms"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "name": "[variables('searchDocsFunctionPrivateEndpointsSubnetName')]",
+            "properties": {
+              "addressPrefix": "10.0.15.0/24"
+            }
+          },
+          {
+            "name": "[variables('analyticsStoragePrivateEndpointsSubnetName')]",
+            "properties": {
+              "addressPrefix": "10.0.16.0/24"
+            }
+          },
+          {
+            "name": "[variables('analyticsFunctionAppSubnetName')]",
+            "properties": {
+              "addressPrefix": "10.0.17.0/24",
+              "serviceEndpoints": [
+                {
+                  "service": "Microsoft.Storage"
+                }
+              ],
+              "delegations": [
+                {
+                  "name": "webapp",
+                  "properties": {
+                    "serviceName": "Microsoft.Web/serverFarms"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "name": "[variables('screenerStoragePrivateEndpointsSubnetName')]",
+            "properties": {
+              "addressPrefix": "10.0.18.0/24"
+            }
+          },
+          {
+            "name": "[variables('screenerFunctionAppSubnetName')]",
+            "properties": {
+              "addressPrefix": "10.0.19.0/24",
+              "serviceEndpoints": [
+                {
+                  "service": "Microsoft.Storage"
+                }
+              ],
+              "delegations": [
+                {
+                  "name": "webapp",
+                  "properties": {
+                    "serviceName": "Microsoft.Web/serverFarms"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "name": "[variables('eventGridCustomTopicPrivateEndpointsSubnetName')]",
+            "properties": {
+              "addressPrefix": "10.0.20.0/24"
+            }
           }
         ]
       }
@@ -3809,6 +3999,21 @@
           }
         }
       ]
+    },
+    {
+      "copy": {
+        "name": "keyVaultCertificateUsersCopy",
+        "count": "[length(variables('keyVaultCertificateUserPrincipalRefs'))]"
+      },
+      "type": "Microsoft.KeyVault/vaults/providers/roleAssignments",
+      "apiVersion": "2022-04-01",
+      "name": "[concat(variables('keyVaultName'), '/Microsoft.Authorization/', guid(resourceId('Microsoft.KeyVault/vaults',  variables('keyVaultName')), variables('keyVaultCertificateUserRoleDefinitionId'), variables('keyVaultCertificateUserPrincipalRefs')[copyIndex()]))]",
+      "properties": {
+        "roleDefinitionId": "[variables('keyVaultCertificateUserRoleDefinitionId')]",
+        "principalId": "[reference(variables('keyVaultCertificateUserPrincipalRefs')[copyIndex()], '2022-09-01', 'Full').identity.principalId]",
+        "scope": "[resourceId('Microsoft.KeyVault/vaults', variables('keyVaultName'))]",
+        "principalType": "ServicePrincipal"
+      }
     },
     {
       "copy": {

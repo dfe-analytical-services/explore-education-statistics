@@ -81,7 +81,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
             }
 
             return await tableBuilderService
-                .Query(releaseVersionId, request.AsFullTableQuery(), boundaryLevelId: null, cancellationToken)
+                .Query(releaseVersionId, request.AsFullTableQuery(), cancellationToken)
                 .HandleFailuresOr(Ok);
         }
 
@@ -91,13 +91,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
         // DataBlockVersions rather than simply picking the latest published one.
         [HttpGet("tablebuilder/release/{releaseVersionId:guid}/data-block/{dataBlockParentId:guid}")]
         public async Task<ActionResult<TableBuilderResultViewModel>> QueryForTableBuilderResult(
-            Guid dataBlockParentId,
-            [FromQuery] long? boundaryLevelId) // TODO: Remove in EES-5433
+            Guid dataBlockParentId)
         {
             var actionResult = await GetLatestPublishedDataBlockVersion(dataBlockParentId)
                 .OnSuccessDo(dataBlockVersion => this
                     .CacheWithLastModifiedAndETag(lastModified: dataBlockVersion.Published, ApiVersion))
-                .OnSuccess(dataBlockVersion => GetDataBlockTableResult(dataBlockVersion, boundaryLevelId))
+                .OnSuccess(GetDataBlockTableResult)
                 .HandleFailuresOrOk();
 
             if (actionResult.Result is not NotFoundResult)
@@ -131,7 +130,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
         public async Task<ActionResult<FastTrackViewModel>> QueryForFastTrack(Guid dataBlockParentId)
         {
             return await GetLatestPublishedDataBlockVersion(dataBlockParentId)
-                .OnSuccessCombineWith(dataBlockVersion => GetDataBlockTableResult(dataBlockVersion))
+                .OnSuccessCombineWith(GetDataBlockTableResult)
                 .OnSuccessCombineWith(async tuple =>
                 {
                     var (dataBlockVersion, _) = tuple;
@@ -147,13 +146,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
 
         [BlobCache(typeof(DataBlockTableResultCacheKey))]
         private Task<Either<ActionResult, TableBuilderResultViewModel>> GetDataBlockTableResult(
-            DataBlockVersion dataBlockVersion,
-            long? boundaryLevelId = null)
+            DataBlockVersion dataBlockVersion)
         {
             return dataBlockService.GetDataBlockTableResult(
                 releaseVersionId: dataBlockVersion.ReleaseVersionId,
-                dataBlockVersionId: dataBlockVersion.Id,
-                boundaryLevelId);
+                dataBlockVersionId: dataBlockVersion.Id);
         }
 
         [BlobCache(typeof(LocationsForDataBlockCacheKey))]
@@ -185,7 +182,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
                 ReleaseSlug = releaseVersion.Release.Slug,
                 ReleaseType = releaseVersion.Type,
                 LatestData = latestReleaseVersion.Id == releaseVersion.Id,
-                LatestReleaseTitle = latestReleaseVersion.Release.Title
+                LatestReleaseTitle = latestReleaseVersion.Release.Title,
+                LatestReleaseSlug = latestReleaseVersion.Release.Slug
             };
         }
 

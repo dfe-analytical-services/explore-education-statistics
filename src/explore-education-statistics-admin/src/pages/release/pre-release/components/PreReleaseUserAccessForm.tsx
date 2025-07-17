@@ -16,7 +16,13 @@ import useAsyncRetry from '@common/hooks/useAsyncRetry';
 import useToggle from '@common/hooks/useToggle';
 import { mapFieldErrors } from '@common/validation/serverValidations';
 import Yup from '@common/validation/yup';
-import React, { useCallback, useMemo, useState } from 'react';
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import { ObjectSchema } from 'yup';
 
 interface FormValues {
@@ -61,6 +67,13 @@ export default function PreReleaseUserAccessForm({
   );
 
   const [invitePlan, setInvitePlan] = useState<PreReleaseInvitePlan>();
+  const submitButtonRef = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    if (!invitePlan) {
+      submitButtonRef.current?.focus();
+    }
+  }, [invitePlan]);
 
   const splitAndTrimLines = (input: string) =>
     input
@@ -163,7 +176,7 @@ export default function PreReleaseUserAccessForm({
                   label="Invite new users by email"
                   name="emails"
                   className="govuk-!-width-one-third"
-                  hint={`Invite up to ${inviteLimit} users at a time. Enter each email address on a new line.`}
+                  hint={`Invite up to ${inviteLimit} users at a time. Enter each email address on a new line. Jobshare and mailbox accounts will not be able to access EES pre-release, use individual accounts where possible.`}
                   rows={15}
                 />
 
@@ -171,6 +184,7 @@ export default function PreReleaseUserAccessForm({
                   <Button
                     type="submit"
                     disabled={formState.isSubmitting || isRemoving}
+                    ref={submitButtonRef}
                   >
                     {formState.isSubmitting
                       ? 'Inviting new users'

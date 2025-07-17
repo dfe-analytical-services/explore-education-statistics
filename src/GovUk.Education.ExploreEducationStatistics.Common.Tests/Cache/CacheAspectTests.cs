@@ -633,7 +633,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Cache
 
             CacheService
                 .Setup(s => s.GetItem(cacheKey, typeof(TestValue)))
-                .Returns(null);
+                .Returns((object?)null);
 
             TestMethods.NoParams_ActionResult_NotFound().AssertNotFoundResult();
 
@@ -655,7 +655,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Cache
 
             CacheService
                 .Setup(s => s.GetItemAsync(cacheKey, typeof(TestValue)))
-                .ReturnsAsync(null);
+                .ReturnsAsync((object?)null);
 
             var exception = await Assert.ThrowsAsync<Exception>(TestMethods.NoParams_Task_Failure);
 
@@ -688,7 +688,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Cache
 
             CacheService
                 .Setup(s => s.GetItemAsync(cacheKey, typeof(TestValue)))
-                .ReturnsAsync(null);
+                .ReturnsAsync((object?)null);
 
             var exception = await Assert.ThrowsAsync<Exception>(TestMethods.NoParams_TaskEither_Failure);
 
@@ -698,13 +698,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Cache
         }
 
         [Fact]
-        public async void NoParams_TaskEither_Left()
+        public async Task NoParams_TaskEither_Left()
         {
             var cacheKey = new TestCacheKey();
 
             CacheService
                 .Setup(s => s.GetItemAsync(cacheKey, typeof(TestValue)))
-                .ReturnsAsync(null);
+                .ReturnsAsync((object?)null);
 
             var result = await TestMethods.NoParams_TaskEither_Left();
 
@@ -729,7 +729,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Cache
 
             CacheService
                 .Setup(s => s.GetItemAsync(cacheKey, typeof(TestValue)))
-                .ReturnsAsync(null);
+                .ReturnsAsync((object?)null);
 
             var result = await TestMethods.NoParams_TaskActionResult_NotFound();
 
@@ -746,7 +746,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Cache
 
             CacheService
                 .Setup(s => s.GetItemAsync(cacheKey, returnType))
-                .ReturnsAsync(null);
+                .ReturnsAsync((object?)null);
 
             // TryUnboxResult unboxes the Either, but then throws an exception on hitting the Task
             var exception = await Assert.ThrowsAsync<ArgumentException>(TestMethods.NoParams_NestedTaskEither);
@@ -1295,7 +1295,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Cache
         {
             CacheService
                 .Setup(s => s.GetItem(cacheKey, returnType))
-                .Returns(null);
+                .Returns((object?)null);
 
             var args = new List<object>();
 
@@ -1313,7 +1313,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Cache
         {
             CacheService
                 .Setup(s => s.GetItemAsync(cacheKey, returnType))
-                .ReturnsAsync(null);
+                .ReturnsAsync((object?)null);
 
             var args = new List<object>();
 

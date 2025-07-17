@@ -23,6 +23,8 @@ type MonthOfYear =
 type ResourceNames = {
   existingResources: {
     adminApp: string
+    analyticsStorageAccount: string
+    analyticsFileShare: string
     publisherFunction: string
     keyVault: string
     vNet: string
@@ -42,8 +44,6 @@ type ResourceNames = {
     }
   }
   sharedResources: {
-    analyticsStorageAccount: string
-    analyticsFileShare: string
     appGateway: string
     appGatewayIdentity: string
     containerAppEnvironment: string
@@ -323,44 +323,6 @@ type ContainerAppWorkloadProfile = {
   workloadProfileType: 'D4' | 'D8' | 'D16' | 'D32' | 'E4' | 'E8' | 'E16' | 'E32'
   minimumCount: int
   maximumCount: int
-}
-
-@export()
-type PrivateDnsZone = 
-  | 'fileService'
-  | 'blobStorage'
-  | 'queue'
-  | 'tableStorage'
-  | 'postgres'
-  | 'sites'
-  | 'custom'
-
-@export()
-var dnsZones = {
-  sites: {
-    zoneName: 'privatelink.azurewebsites.net'
-    dnsGroup: 'sites'
-  }
-  postgres: {
-    zoneName: 'privatelink.postgres.database.azure.com'
-    dnsGroup: 'postgresqlServer'
-  }
-  fileService: {
-    zoneName: 'privatelink.file.${environment().suffixes.storage}'
-    dnsGroup: 'file'
-  }
-  blobStorage: {
-    zoneName: 'privatelink.blob.${environment().suffixes.storage}'
-    dnsGroup: 'blob'
-  }
-  queue: {
-    zoneName: 'privatelink.queue.${environment().suffixes.storage}'
-    dnsGroup: 'queue'
-  }
-  tableStorage: {
-    zoneName: 'privatelink.table.${environment().suffixes.storage}'
-    dnsGroup: 'table'
-  }
 }
 
 @export()

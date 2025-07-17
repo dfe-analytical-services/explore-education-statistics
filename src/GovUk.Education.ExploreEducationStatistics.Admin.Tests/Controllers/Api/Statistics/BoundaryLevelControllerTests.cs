@@ -14,7 +14,6 @@ using System.Net.Http;
 using System.Net.Http.Json;
 using System.Reflection;
 using System.Threading.Tasks;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Models.GlobalRoles;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api.Statistics;
 public class BoundaryLevelControllerTests(TestApplicationFactory testApp) : IntegrationTestFixture(testApp)

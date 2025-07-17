@@ -8,7 +8,8 @@
       "Children's social work workforce: attrition, caseload, and agency workforce",
       "Outcomes for children in need, including children looked after by local authorities in England",
       "Outcomes of children in need, including looked after children",
-      "Serious incident notifications"
+      "Serious incident notifications",
+      "Stability measures for children looked after in England"
     ],
     "theme_heading": "Children's social care"
   },
@@ -42,8 +43,9 @@
       "Childcare and early years survey of parents",
       "Early years education recovery",
       "Early years foundation stage profile results",
-      "Education provision: children under 5 years of age",
-      "Expansion to early childcare entitlements: eligibility codes issued and validated"
+      "Expansion to early childcare entitlements: Childcare Experiences Survey",
+      "Expansion to early childcare entitlements: eligibility codes issued and validated",
+      "Funded early education and childcare"
     ],
     "theme_heading": "Early years"
   },
@@ -97,6 +99,7 @@
       "National Tutoring Programme Statistics Methodology",
       "National pupil projections",
       "Parental responsibility measures",
+      "Primary and secondary school applications and offers",
       "Pupil absence statistics: methodology",
       "Pupil attendance in schools",
       "Pupil exclusion statistics: methodology",
@@ -105,7 +108,6 @@
       "School placements for children from outside of the UK",
       "School places sufficiency survey: methodology",
       "Schools, pupils and their characteristics",
-      "Secondary and primary school applications and offers",
       "Special educational needs in England",
       "The link between absence and attainment at KS2 and KS4"
     ],
@@ -121,7 +123,8 @@
       "Multi-academy trust performance measures (Key stages 2, 4 and 5)",
       "Multiplication tables check attainment",
       "Phonics screening check attainment",
-      "Provisional T Level results"
+      "Provisional T Level results",
+      "School counts by average Progress 8 scores for disadvantaged White British pupils"
     ],
     "theme_heading": "School and college outcomes and performance"
   },
@@ -132,7 +135,7 @@
       "Initial teacher training performance profiles",
       "Median teacher pay using teacher pension scheme data",
       "School workforce in England",
-      "Teacher and Leader development: ECF and NPQs"
+      "Teacher and leader development: ECF and NPQs"
     ],
     "theme_heading": "Teachers and school workforce"
   },

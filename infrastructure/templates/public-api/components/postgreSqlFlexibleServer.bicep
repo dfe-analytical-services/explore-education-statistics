@@ -132,7 +132,7 @@ resource firewallRuleAssignments 'Microsoft.DBforPostgreSQL/flexibleServers/fire
   }
 ]
 
-module privateEndpointModule 'privateEndpoint.bicep' = {
+module privateEndpointModule '../../common/components/privateEndpoint.bicep' = {
   name: 'postgresPrivateEndpointDeploy'
   params: {
     serviceId: postgreSQLDatabase.id

@@ -1,5 +1,6 @@
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
@@ -16,6 +17,7 @@ using Microsoft.DurableTask;
 using Microsoft.DurableTask.Client;
 using Microsoft.EntityFrameworkCore;
 using Moq;
+using Semver;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using FileType = GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
 
@@ -39,22 +41,12 @@ public abstract class CreateNextDataSetVersionMappingsFunctionTests(
 
             ProcessDataSetVersionContext? processNextDataSetVersionContext = null;
             StartOrchestrationOptions? startOrchestrationOptions = null;
-            durableTaskClientMock.Setup(client =>
-                    client.ScheduleNewOrchestrationInstanceAsync(
-                        nameof(ProcessNextDataSetVersionMappingsFunctionOrchestration
-                            .ProcessNextDataSetVersionMappings),
-                        It.IsAny<ProcessDataSetVersionContext>(),
-                        It.IsAny<StartOrchestrationOptions>(),
-                        It.IsAny<CancellationToken>()))
-                .ReturnsAsync((TaskName _, object _, StartOrchestrationOptions? options, CancellationToken _) =>
-                    options?.InstanceId ?? Guid.NewGuid().ToString())
-                .Callback<TaskName, object, StartOrchestrationOptions?, CancellationToken>(
-                    (_, input, options, _) =>
-                    {
-                        processNextDataSetVersionContext =
-                            Assert.IsAssignableFrom<ProcessDataSetVersionContext>(input);
-                        startOrchestrationOptions = options;
-                    });
+            SetUpMockDurableTaskClient(durableTaskClientMock, (_, input, options, _) =>
+            {
+                processNextDataSetVersionContext =
+                    Assert.IsAssignableFrom<ProcessDataSetVersionContext>(input);
+                startOrchestrationOptions = options;
+            });
 
             var result = await CreateNextDataSetVersion(
                 dataSetId: dataSet.Id,
@@ -62,6 +54,14 @@ public abstract class CreateNextDataSetVersionMappingsFunctionTests(
                 durableTaskClientMock.Object);
 
             VerifyAllMocks(durableTaskClientMock);
+            durableTaskClientMock.Verify(client =>
+                    client.ScheduleNewOrchestrationInstanceAsync(
+                        nameof(ProcessNextDataSetVersionMappingsFunctionOrchestration
+                            .ProcessNextDataSetVersionMappings),
+                        It.IsAny<object>(),
+                        It.IsAny<StartOrchestrationOptions>(),
+                        It.IsAny<CancellationToken>()),
+                Times.Once);
 
             var responseViewModel = result.AssertOkObjectResult<ProcessDataSetVersionResponseViewModel>();
 
@@ -369,38 +369,7 @@ public abstract class CreateNextDataSetVersionMappingsFunctionTests(
         {
             var (dataSet, liveDataSetVersion) = await AddDataSetAndLatestLiveVersion();
 
-            // TODO EES-5405 Make sure liveDataSetVersion has release info with a ReleaseFileId
-            var currentReleaseFile = GetDbContext<ContentDbContext>()
-                .ReleaseFiles
-                .Single(releaseFile => releaseFile.Id == liveDataSetVersion.Release.ReleaseFileId);
-
-            var releaseVersion = await GetDbContext<ContentDbContext>()
-                .ReleaseVersions
-                .SingleAsync(releaseVersion => releaseVersion.Id == currentReleaseFile.ReleaseVersionId);
-
-            ReleaseVersion releaseAmendment = DataFixture
-                .DefaultReleaseVersion()
-                .WithReleaseId(releaseVersion.ReleaseId);
-
-            var subjectId = Guid.NewGuid();
-
-            var (nextDataFile, nextMetaFile) = DataFixture
-                .DefaultReleaseFile()
-                .WithReleaseVersion(releaseAmendment)
-                .WithFiles([
-                    DataFixture
-                        .DefaultFile(FileType.Data)
-                        .WithSubjectId(subjectId),
-                    DataFixture
-                        .DefaultFile(FileType.Metadata)
-                        .WithSubjectId(subjectId)
-                ])
-                .GenerateTuple2();
-
-            await AddTestData<ContentDbContext>(context =>
-            {
-                context.ReleaseFiles.AddRange(nextDataFile, nextMetaFile);
-            });
+            var nextDataFile = await SetupDataFileBeingAmended(liveDataSetVersion);
 
             var result = await CreateNextDataSetVersion(
                 dataSetId: dataSet.Id,
@@ -413,83 +382,390 @@ public abstract class CreateNextDataSetVersionMappingsFunctionTests(
                 expectedCode: ValidationMessages.FileMustBeInDifferentRelease.Code
             );
         }
+    }
 
-        private async Task<(DataSet, DataSetVersion)> AddDataSetAndLatestLiveVersion()
+    public class CreateNextDataSetVersionDataSetVersionDataSetVersionToReplaceProvided(
+        ProcessorFunctionsIntegrationTestFixture fixture)
+        : CreateNextDataSetVersionMappingsFunctionTests(fixture)
+    {
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public async Task Success(bool enableDataSetVersionReplacement)
         {
+            SetDataSetVersionReplacementFeatureFlag(enableDataSetVersionReplacement);
+
             DataSet dataSet = DataFixture
                 .DefaultDataSet()
                 .WithStatusPublished();
+            await AddTestData<PublicDataDbContext>(context =>
+            {
+                context.DataSets.Add(dataSet);
+            });
 
-            await AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
+            var versions = DataFixture
+                .DefaultDataSetVersion()
+                .WithDefaults()
+                .ForIndex(0, dsv =>
+                {
+                    dsv.SetDataSet(dataSet);
+                    dsv.SetStatusPublished();
+                    dsv.SetVersionNumber(1, 0);
+                })
+                .ForIndex(1, dsv =>
+                {
+                    dsv.SetDataSet(dataSet);
+                    dsv.SetStatusPublished();
+                    dsv.SetVersionNumber(1, 1);
+                })
+                .ForIndex(2, dsv =>
+                {
+                    dsv.SetDataSet(dataSet);
+                    dsv.SetStatusPublished();
+                    dsv.SetVersionNumber(2, 0);
+                })
+                .GenerateList();
 
-            var dataSetVersion = await AddLatestLiveDataSetVersion(dataSet);
-            return (dataSet, dataSetVersion);
-        }
-
-        private async Task<DataSetVersion> AddLatestLiveDataSetVersion(DataSet dataSet)
-        {
-            var (dataFile, _) = await AddDataAndMetadataFiles(dataSet.PublicationId);
-
-            DataSetVersion liveDataSetVersion = DataFixture
-                .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 2)
-                .WithVersionNumber(1, 0)
-                .WithStatusPublished()
-                .WithDataSet(dataSet)
-                .WithRelease(DataFixture.DefaultDataSetVersionRelease()
-                    .WithReleaseFileId(dataFile.Id))
-                .WithImports(() => DataFixture
-                    .DefaultDataSetVersionImport()
-                    .Generate(1))
-                .FinishWith(dsv => dsv.DataSet.LatestLiveVersion = dsv);
+            dataSet.Versions.AddRange(versions);
+            var liveVersion = versions.Last();
 
             await AddTestData<PublicDataDbContext>(context =>
             {
-                context.DataSetVersions.Add(liveDataSetVersion);
+                context.DataSetVersions.AddRange(versions);
+                dataSet.LatestLiveVersion = liveVersion;
                 context.DataSets.Update(dataSet);
             });
+            var versionUnderTest = versions[1];
+            var expectedVersion = versionUnderTest.SemVersion().WithPatch(1);
 
-            return liveDataSetVersion;
+            var (releaseFile, _) =
+                await AddDataMetadataFilesAndDataSetVersion(dataSet.PublicationId, dataSet.Id,
+                    versionUnderTest.SemVersion());
+
+            var durableTaskClientMock = new Mock<DurableTaskClient>(MockBehavior.Strict, "TestClient");
+
+            ProcessDataSetVersionContext? processNextDataSetVersionContext = null;
+            StartOrchestrationOptions? startOrchestrationOptions = null;
+
+            SetUpMockDurableTaskClient(durableTaskClientMock, (_, input, options, _) =>
+            {
+                processNextDataSetVersionContext = Assert.IsAssignableFrom<ProcessDataSetVersionContext>(input);
+                startOrchestrationOptions = options;
+            });
+
+            var result = await CreateNextDataSetVersion(
+                dataSetId: dataSet.Id,
+                releaseFileId: releaseFile.Id,
+                durableTaskClientMock.Object,
+                dataSetVersionToReplace: versionUnderTest.Id);
+            
+            VerifyAllMocks(durableTaskClientMock);
+
+            var responseViewModel = result.AssertOkObjectResult<ProcessDataSetVersionResponseViewModel>();
+
+            await using var publicDataDbContext = GetDbContext<PublicDataDbContext>();
+
+            // Assert only the original data set exists.
+            var updatedDataSet = Assert.Single(await publicDataDbContext.DataSets
+                .Include(ds => ds.Versions)
+                .ThenInclude(dsv => dsv.Imports)
+                .ToListAsync());
+
+            //Assert that we have one new version added to the data set
+            Assert.Equal(4, updatedDataSet.Versions.Count);
+
+            var nextDataSetVersion = updatedDataSet
+                .Versions
+                .FirstOrDefault((a) => a.SemVersion() == expectedVersion);
+
+            if (enableDataSetVersionReplacement)
+            {
+                Assert.NotNull(nextDataSetVersion);
+                // Assert that the new DataSetVersion is not set as the latest live version,
+                Assert.Equal(nextDataSetVersion, updatedDataSet.LatestDraftVersion);
+                Assert.NotEqual(nextDataSetVersion, updatedDataSet.LatestLiveVersion);
+                Assert.Equal(liveVersion.Id, updatedDataSet.LatestLiveVersion!.Id);
+
+                //Assert the patch version expected has been created
+                Assert.Equal(updatedDataSet.Id, nextDataSetVersion.DataSetId);
+                Assert.Equal(1, nextDataSetVersion.VersionMajor);
+                Assert.Equal(1, nextDataSetVersion.VersionMinor);
+                Assert.Equal(1, nextDataSetVersion.VersionPatch);
+
+                Assert.Equal("1.1.1", nextDataSetVersion.PublicVersion);
+
+                // Assert a single import was created.
+                var dataSetVersionImport = Assert.Single(nextDataSetVersion.Imports);
+                Assert.Equal(nextDataSetVersion.Id, dataSetVersionImport.DataSetVersionId);
+                Assert.NotEqual(Guid.Empty, dataSetVersionImport.InstanceId);
+                Assert.Equal(DataSetVersionImportStage.Pending, dataSetVersionImport.Stage);
+
+                // Assert the response view model values match the created data set version and import.
+                Assert.Equal(updatedDataSet.Id, responseViewModel.DataSetId);
+                Assert.Equal(nextDataSetVersion.Id, responseViewModel.DataSetVersionId);
+                Assert.Equal(dataSetVersionImport.InstanceId, responseViewModel.InstanceId);
+
+                // Assert the processing orchestrator was scheduled with the correct arguments
+                Assert.NotNull(processNextDataSetVersionContext);
+                Assert.NotNull(startOrchestrationOptions);
+                Assert.Equal(new ProcessDataSetVersionContext { DataSetVersionId = nextDataSetVersion.Id },
+                    processNextDataSetVersionContext);
+                Assert.Equal(new StartOrchestrationOptions { InstanceId = dataSetVersionImport.InstanceId.ToString() },
+                    startOrchestrationOptions);
+
+                durableTaskClientMock.Verify(t => t.ScheduleNewOrchestrationInstanceAsync(
+                    nameof(ProcessNextDataSetVersionMappingsFunctionOrchestration
+                        .ProcessNextDataSetVersionMappings),
+                    It.IsAny<object>(),
+                    It.IsAny<StartOrchestrationOptions>(),
+                    It.IsAny<CancellationToken>()), Times.Once);
+            }
+            else
+            {
+                Assert.Null(nextDataSetVersion);
+            }
         }
 
-        private async Task<(ReleaseFile, ReleaseFile)> AddDataAndMetadataFiles(Guid publicationId)
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public async Task NonExistingDataSetVersionToReplaceProvided_ReturnsDataSetVersionNotFoundProblem(bool enableDataSetVersionReplacement)
         {
-            var subjectId = Guid.NewGuid();
+            // Arrange
+            var durableTaskClientMock = new Mock<DurableTaskClient>(MockBehavior.Strict, "TestClient");
+            ProcessDataSetVersionContext? processNextDataSetVersionContext = null;
+            StartOrchestrationOptions? startOrchestrationOptions = null;
+            SetUpMockDurableTaskClient(durableTaskClientMock, (_, input, options, _) =>
+            {
+                processNextDataSetVersionContext =
+                    Assert.IsAssignableFrom<ProcessDataSetVersionContext>(input);
+                startOrchestrationOptions = options;
+            });
 
-            var (dataFile, metaFile) = DataFixture
-                .DefaultReleaseFile()
-                .WithReleaseVersion(DataFixture.DefaultReleaseVersion()
-                    .WithRelease(DataFixture.DefaultRelease()
-                        .WithPublicationId(publicationId)))
-                .WithFiles([
-                    DataFixture
-                        .DefaultFile(FileType.Data)
-                        .WithSubjectId(subjectId),
-                    DataFixture
-                        .DefaultFile(FileType.Metadata)
-                        .WithSubjectId(subjectId)
-                ])
-                .GenerateTuple2();
+            SetDataSetVersionReplacementFeatureFlag(enableDataSetVersionReplacement);
+            var (dataSet, _) = await AddDataSetAndLatestLiveVersion();
+            var (releaseFile, _) = await AddDataAndMetadataFiles(publicationId: dataSet.PublicationId);
+            var nonExistingDataSetVersionToReplace = Guid.NewGuid();
 
-            await AddTestData<ContentDbContext>(context =>
-                context.ReleaseFiles.AddRange(dataFile, metaFile));
+            // Act
+            var result = await CreateNextDataSetVersion(
+                dataSetId: dataSet.Id,
+                releaseFileId: releaseFile.Id,
+                dataSetVersionToReplace: nonExistingDataSetVersionToReplace,
+                durableTaskClient: durableTaskClientMock.Object);
 
-            return (dataFile, metaFile);
+            // Assert
+            if (enableDataSetVersionReplacement)
+            {
+                result.AssertBadRequestWithValidationErrors([
+                    new ErrorViewModel
+                    {
+                        Code = ValidationMessages.NextDataSetVersionNotFound.Code,
+                        Message = ValidationMessages.NextDataSetVersionNotFound.Message,
+                        Path = nameof(NextDataSetVersionMappingsCreateRequest.DataSetId).ToLowerFirst()
+                    }
+                ]);
+            }
+            else
+            {
+                result.AssertOkObjectResult<ProcessDataSetVersionResponseViewModel>();
+            }
         }
-
-        private async Task<IActionResult> CreateNextDataSetVersion(
-            Guid dataSetId,
-            Guid releaseFileId,
-            DurableTaskClient? durableTaskClient = null)
+        
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public async Task ReleaseFileInSameReleaseSeriesAsCurrentLiveVersion_SkipsValidationProblem(bool enableDataSetVersionReplacement)
         {
-            var function = GetRequiredService<CreateNextDataSetVersionMappingsFunction>();
-            return await function.CreateNextDataSetVersionMappings(
-                new NextDataSetVersionMappingsCreateRequest
-                {
-                    DataSetId = dataSetId,
-                    ReleaseFileId = releaseFileId
-                },
-                durableTaskClient ?? new Mock<DurableTaskClient>(MockBehavior.Strict, "TestClient").Object,
-                CancellationToken.None);
+            SetDataSetVersionReplacementFeatureFlag(enableDataSetVersionReplacement);
+            
+            var (dataSet, liveDataSetVersion) = await AddDataSetAndLatestLiveVersion();
+
+            var nextDataFile = await SetupDataFileBeingAmended(liveDataSetVersion);
+
+            var result = await CreateNextDataSetVersion(
+                dataSetId: dataSet.Id,
+                releaseFileId: nextDataFile.Id,
+                dataSetVersionToReplace: liveDataSetVersion.Id
+            );
+
+            if (enableDataSetVersionReplacement)
+            {
+                var validationProblem = result.AssertBadRequestWithValidationProblem();
+
+                validationProblem.AssertDoesNotHaveError(
+                    expectedPath: nameof(NextDataSetVersionMappingsCreateRequest.ReleaseFileId).ToLowerFirst(),
+                    expectedCode: ValidationMessages.FileMustBeInDifferentRelease.Code
+                );
+            }
+            else
+            {
+                var validationProblem = result.AssertBadRequestWithValidationProblem();
+
+                validationProblem.AssertHasError(
+                    expectedPath: nameof(NextDataSetVersionMappingsCreateRequest.ReleaseFileId).ToLowerFirst(),
+                    expectedCode: ValidationMessages.FileMustBeInDifferentRelease.Code
+                );
+            }
         }
+    }
+
+    private async Task<ReleaseFile> SetupDataFileBeingAmended(DataSetVersion liveDataSetVersion)
+    {
+        // TODO EES-5405 Make sure liveDataSetVersion has release info with a ReleaseFileId
+        var currentReleaseFile = GetDbContext<ContentDbContext>()
+            .ReleaseFiles
+            .Single(releaseFile => releaseFile.Id == liveDataSetVersion.Release.ReleaseFileId);
+
+        var releaseVersion = await GetDbContext<ContentDbContext>()
+            .ReleaseVersions
+            .SingleAsync(releaseVersion => releaseVersion.Id == currentReleaseFile.ReleaseVersionId);
+
+        ReleaseVersion releaseAmendment = DataFixture
+            .DefaultReleaseVersion()
+            .WithReleaseId(releaseVersion.ReleaseId);
+
+        var subjectId = Guid.NewGuid();
+
+        var (nextDataFile, nextMetaFile) = DataFixture
+            .DefaultReleaseFile()
+            .WithReleaseVersion(releaseAmendment)
+            .WithFiles([
+                DataFixture
+                    .DefaultFile(FileType.Data)
+                    .WithSubjectId(subjectId),
+                DataFixture
+                    .DefaultFile(FileType.Metadata)
+                    .WithSubjectId(subjectId)
+            ])
+            .GenerateTuple2();
+
+        await AddTestData<ContentDbContext>(context =>
+        {
+            context.ReleaseFiles.AddRange(nextDataFile, nextMetaFile);
+        });
+        return nextDataFile;
+    }
+
+    private async Task<(DataSet, DataSetVersion)> AddDataSetAndLatestLiveVersion()
+    {
+        DataSet dataSet = DataFixture
+            .DefaultDataSet()
+            .WithStatusPublished();
+
+        await AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
+
+        var dataSetVersion = await AddLatestLiveDataSetVersion(dataSet);
+        return (dataSet, dataSetVersion);
+    }
+
+    private async Task<DataSetVersion> AddLatestLiveDataSetVersion(DataSet dataSet)
+    {
+        var (dataFile, _) = await AddDataAndMetadataFiles(dataSet.PublicationId);
+
+        DataSetVersion liveDataSetVersion = DataFixture
+            .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 2)
+            .WithVersionNumber(1, 0)
+            .WithStatusPublished()
+            .WithDataSet(dataSet)
+            .WithRelease(DataFixture.DefaultDataSetVersionRelease()
+                .WithReleaseFileId(dataFile.Id))
+            .WithImports(() => DataFixture
+                .DefaultDataSetVersionImport()
+                .Generate(1))
+            .FinishWith(dsv => dsv.DataSet.LatestLiveVersion = dsv);
+
+        await AddTestData<PublicDataDbContext>(context =>
+        {
+            context.DataSetVersions.Add(liveDataSetVersion);
+            context.DataSets.Update(dataSet);
+        });
+
+        return liveDataSetVersion;
+    }
+
+    private async Task<(ReleaseFile, ReleaseFile)> AddDataAndMetadataFiles(Guid publicationId)
+    {
+        var subjectId = Guid.NewGuid();
+
+        var (dataFile, metaFile) = DataFixture
+            .DefaultReleaseFile()
+            .WithReleaseVersion(DataFixture.DefaultReleaseVersion()
+                .WithRelease(DataFixture.DefaultRelease()
+                    .WithPublicationId(publicationId)))
+            .WithFiles([
+                DataFixture
+                    .DefaultFile(FileType.Data)
+                    .WithSubjectId(subjectId),
+                DataFixture
+                    .DefaultFile(FileType.Metadata)
+                    .WithSubjectId(subjectId)
+            ])
+            .GenerateTuple2();
+
+        await AddTestData<ContentDbContext>(context =>
+            context.ReleaseFiles.AddRange(dataFile, metaFile));
+
+        return (dataFile, metaFile);
+    }
+
+    private async Task<(ReleaseFile, ReleaseFile)> AddDataMetadataFilesAndDataSetVersion(Guid publicationId, Guid dataSetId, SemVersion version)
+    {
+        var subjectId = Guid.NewGuid();
+
+        var (dataFile, metaFile) = DataFixture
+            .DefaultReleaseFile()
+            .WithReleaseVersion(DataFixture.DefaultReleaseVersion()
+                .WithRelease(DataFixture.DefaultRelease()
+                    .WithPublicationId(publicationId)))
+            .WithFiles([
+                DataFixture
+                    .DefaultFile(FileType.Data)
+                    .WithSubjectId(subjectId),
+                DataFixture
+                    .DefaultFile(FileType.Metadata)
+                    .WithSubjectId(subjectId)
+            ])
+            .WithPublicApiDataSetId(dataSetId)
+            .WithPublicApiDataSetVersion(version)
+            .GenerateTuple2();
+
+        await AddTestData<ContentDbContext>(context =>
+            context.ReleaseFiles.AddRange(dataFile, metaFile));
+
+        return (dataFile, metaFile);
+    }
+
+    private void SetUpMockDurableTaskClient(Mock<DurableTaskClient> durableTaskClientMock, Action<TaskName, object, StartOrchestrationOptions?, CancellationToken> action)
+    {
+        durableTaskClientMock.Setup(client =>
+                client.ScheduleNewOrchestrationInstanceAsync(
+                    nameof(ProcessNextDataSetVersionMappingsFunctionOrchestration
+                        .ProcessNextDataSetVersionMappings),
+                    It.IsAny<ProcessDataSetVersionContext>(),
+                    It.IsAny<StartOrchestrationOptions>(),
+                    It.IsAny<CancellationToken>()))
+            .ReturnsAsync((TaskName _, object _, StartOrchestrationOptions? options, CancellationToken _) =>
+                options?.InstanceId ?? Guid.NewGuid().ToString())
+            .Callback(action);
+    }
+
+    private async Task<IActionResult> CreateNextDataSetVersion(
+        Guid dataSetId,
+        Guid releaseFileId,
+        DurableTaskClient? durableTaskClient = null,
+        Guid? dataSetVersionToReplace = null)
+    {
+        var function = GetRequiredService<CreateNextDataSetVersionMappingsFunction>();
+
+        return await function.CreateNextDataSetVersionMappings(
+            new NextDataSetVersionMappingsCreateRequest
+            {
+                DataSetId = dataSetId,
+                ReleaseFileId = releaseFileId,
+                DataSetVersionToReplaceId = dataSetVersionToReplace
+            },
+            durableTaskClient ?? new Mock<DurableTaskClient>(MockBehavior.Strict, "TestClient").Object,
+            CancellationToken.None);
     }
 }

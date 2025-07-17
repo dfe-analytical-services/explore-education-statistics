@@ -11,7 +11,7 @@ Test Setup          fail test fast if required
 
 
 *** Variables ***
-${PUBLICATION_NAME}=    UI tests - create methodology publication %{RUN_IDENTIFIER}
+${PUBLICATION_NAME}=    Create methodology publication %{RUN_IDENTIFIER}
 
 
 *** Test Cases ***
@@ -146,7 +146,6 @@ Unapprove the Methodology
     user clicks element    xpath://*[text()="Edit"]    ${ROW}
     user waits until h2 is visible    Methodology summary
 
-    user clicks link    Sign off
     user changes methodology status to Draft
 
     user navigates to methodologies on publication page    ${PUBLICATION_NAME}

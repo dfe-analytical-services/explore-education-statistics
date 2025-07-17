@@ -1,10 +1,12 @@
 import ButtonLink from '@admin/components/ButtonLink';
 import mergeReplacementFootnoteFilters from '@admin/pages/release/data/components/utils/mergeReplacementFootnoteFilters';
 import {
+  releaseApiDataSetDetailsRoute,
   releaseDataBlockEditRoute,
   ReleaseDataBlockRouteParams,
   ReleaseFootnoteRouteParams,
   releaseFootnotesEditRoute,
+  ReleaseDataSetRouteParams,
 } from '@admin/routes/releaseRoutes';
 import dataBlockService from '@admin/services/dataBlockService';
 import dataReplacementService from '@admin/services/dataReplacementService';
@@ -27,6 +29,10 @@ import useMountedRef from '@common/hooks/useMountedRef';
 import React, { ReactNode, useMemo } from 'react';
 import { generatePath } from 'react-router';
 import sanitizeHtml from '@common/utils/sanitizeHtml';
+import { useAuthContext } from '@admin/contexts/AuthContext';
+import Link from '@admin/components/Link';
+import { useConfig } from '@admin/contexts/ConfigContext';
+import isPatchVersion from '@common/utils/isPatchVersion';
 
 interface Props {
   cancelButton: ReactNode;
@@ -55,13 +61,8 @@ const DataFileReplacementPlan = ({
     error,
     retry: reloadPlan,
   } = useAsyncRetry(
-    () =>
-      dataReplacementService.getReplacementPlan(
-        releaseVersionId,
-        fileId,
-        replacementFileId,
-      ),
-    [releaseVersionId, fileId, replacementFileId],
+    () => dataReplacementService.getReplacementPlan(releaseVersionId, fileId),
+    [releaseVersionId, fileId, replacementFileId], // Include replacementFileId because the plan could change even if fileId has not!
   );
 
   const hasInvalidDataBlocks = useMemo<boolean>(
@@ -73,6 +74,69 @@ const DataFileReplacementPlan = ({
     () => plan?.footnotes.some(footnote => !footnote.valid) ?? false,
     [plan],
   );
+  const {
+    enableReplacementOfPublicApiDataSets: isNewReplaceDsvFeatureEnabled,
+  } = useConfig();
+
+  const {
+    hasDataSetVersionPlan,
+    hasIncompleteLocationMapping,
+    hasIncompleteFilterMapping,
+    isNotReadyToPublish,
+    isMajorVersionUpdate,
+    hasMajorLocationMapping,
+    hasMajorFilterMapping,
+  } = useMemo(() => {
+    if (!isNewReplaceDsvFeatureEnabled) {
+      return {
+        hasDataSetVersionPlan: false,
+        hasIncompleteLocationMapping: false,
+        hasIncompleteFilterMapping: false,
+        isNotReadyToPublish: false,
+        isMajorVersionUpdate: false,
+        hasMajorLocationMapping: false,
+        hasMajorFilterMapping: false,
+      };
+    }
+
+    return {
+      hasDataSetVersionPlan: !!plan?.apiDataSetVersionPlan,
+      hasIncompleteLocationMapping:
+        !plan?.apiDataSetVersionPlan?.mappingStatus?.locationsComplete,
+      hasIncompleteFilterMapping:
+        !plan?.apiDataSetVersionPlan?.mappingStatus?.filtersComplete,
+      hasMajorLocationMapping:
+        plan?.apiDataSetVersionPlan?.mappingStatus?.locationsHaveMajorChange,
+      hasMajorFilterMapping:
+        plan?.apiDataSetVersionPlan?.mappingStatus?.filtersHaveMajorChange,
+      isNotReadyToPublish: !plan?.apiDataSetVersionPlan?.readyToPublish,
+      isMajorVersionUpdate:
+        plan?.apiDataSetVersionPlan?.mappingStatus?.isMajorVersionUpdate,
+    };
+  }, [plan, isNewReplaceDsvFeatureEnabled]);
+
+  const { user } = useAuthContext();
+  const dataSetId = plan?.apiDataSetVersionPlan?.dataSetId;
+
+  const releaseRouteParams = useMemo<ReleaseDataSetRouteParams | undefined>(
+    () =>
+      dataSetId
+        ? {
+            releaseVersionId,
+            publicationId,
+            dataSetId,
+          }
+        : undefined,
+    [releaseVersionId, publicationId, dataSetId],
+  );
+
+  const apiDataSetsTabRoute =
+    user?.permissions.isBauUser && releaseRouteParams
+      ? `${generatePath<ReleaseDataSetRouteParams>(
+          releaseApiDataSetDetailsRoute.path,
+          releaseRouteParams,
+        )}`
+      : undefined;
 
   if (error) {
     return (
@@ -92,6 +156,114 @@ const DataFileReplacementPlan = ({
     </Tag>
   );
 
+  const isPatch = isNewReplaceDsvFeatureEnabled
+    ? isPatchVersion(plan?.apiDataSetVersionPlan?.version)
+    : false;
+
+  const linkToApiDetailsTab = apiDataSetsTabRoute && (
+    <Link to={apiDataSetsTabRoute} unvisited>
+      go to the API data sets tab
+    </Link>
+  );
+
+  const linkNotAvailableToNonBauText = (
+    <p>
+      Please contact the EES team for support. Your user account does not have
+      the role required access to the API details page which can help resolve
+      this issue.
+    </p>
+  );
+  const instructionToGoToApiDetailsTabForLocations = user?.permissions
+    .isBauUser ? (
+    <p>
+      Please {linkToApiDetailsTab} and complete manual mapping process for
+      locations.
+    </p>
+  ) : (
+    linkNotAvailableToNonBauText
+  );
+
+  const instructionToGoToApiDetailsTabForFilters = user?.permissions
+    .isBauUser ? (
+    <p>
+      Please {linkToApiDetailsTab} and complete manual mapping process for
+      filters.
+    </p>
+  ) : (
+    linkNotAvailableToNonBauText
+  );
+
+  const instructionToGoToApiDetailsTabForFinalization = user?.permissions
+    .isBauUser ? (
+    <p>
+      Please {linkToApiDetailsTab} and finalize the data set version mapping
+      process.
+    </p>
+  ) : (
+    linkNotAvailableToNonBauText
+  );
+
+  const locationsAndFiltersErrorTags = (
+    <>
+      <h3 className="govuk-heading-m govuk-!-padding-top-4">
+        <Tag
+          colour={
+            hasIncompleteLocationMapping || (hasMajorLocationMapping && isPatch)
+              ? 'red'
+              : 'green'
+          }
+        >
+          {`API data set Locations: ${
+            hasIncompleteLocationMapping || (hasMajorLocationMapping && isPatch)
+              ? 'ERROR'
+              : 'OK'
+          }`}
+        </Tag>
+      </h3>
+
+      {hasIncompleteLocationMapping || (hasMajorLocationMapping && isPatch) ? (
+        instructionToGoToApiDetailsTabForLocations
+      ) : (
+        <p>No manual mapping required for API data set locations.</p>
+      )}
+
+      <h3 className="govuk-heading-m govuk-!-padding-top-4">
+        <Tag
+          colour={
+            hasIncompleteFilterMapping || (hasMajorFilterMapping && isPatch)
+              ? 'red'
+              : 'green'
+          }
+        >
+          {`API data set Filters: ${
+            hasIncompleteFilterMapping || (hasMajorFilterMapping && isPatch)
+              ? 'ERROR'
+              : 'OK'
+          }`}
+        </Tag>
+      </h3>
+
+      {hasIncompleteFilterMapping || (hasMajorFilterMapping && isPatch) ? (
+        instructionToGoToApiDetailsTabForFilters
+      ) : (
+        <p>No manual mapping required for API data set filters.</p>
+      )}
+
+      <h3 className="govuk-heading-m govuk-!-padding-top-4">
+        <Tag colour={isNotReadyToPublish ? 'red' : 'green'}>
+          {`API data set has to be finalized: ${
+            isNotReadyToPublish ? 'ERROR' : 'OK'
+          }`}
+        </Tag>
+      </h3>
+
+      {isNotReadyToPublish ? (
+        instructionToGoToApiDetailsTabForFinalization
+      ) : (
+        <p>No actions required for API data set version mapping.</p>
+      )}
+    </>
+  );
   return (
     <LoadingSpinner loading={isLoading}>
       {plan && (
@@ -257,7 +429,7 @@ const DataFileReplacementPlan = ({
             </Details>
           ))}
 
-          <h3 className="govuk-heading-m">
+          <h3 className="govuk-heading-m govuk-!-padding-top-4">
             <Tag colour={hasInvalidFootnotes ? 'red' : 'green'}>
               {`Footnotes: ${hasInvalidFootnotes ? 'ERROR' : 'OK'}`}
             </Tag>
@@ -400,6 +572,8 @@ const DataFileReplacementPlan = ({
             );
           })}
 
+          {hasDataSetVersionPlan && <>{locationsAndFiltersErrorTags}</>}
+
           <ButtonGroup className="govuk-!-margin-top-8">
             {plan.valid && (
               <Button
@@ -407,11 +581,9 @@ const DataFileReplacementPlan = ({
                 onClick={async () => {
                   toggleSubmitting.on();
 
-                  await dataReplacementService.replaceData(
-                    releaseVersionId,
+                  await dataReplacementService.replaceData(releaseVersionId, [
                     fileId,
-                    replacementFileId,
-                  );
+                  ]);
 
                   if (onReplacement) {
                     onReplacement();

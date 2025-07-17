@@ -19,8 +19,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
 {
     public class PublicationControllerTests
     {
-        private readonly string sitemapItemLastModifiedTime = "2024-02-05T09:36:45.00Z";
-        private readonly string publicationLastModifiedTime = "2024-01-03T10:14:23.00Z";
+        private const string SitemapItemLastModifiedTime = "2024-02-05T09:36:45.00Z";
+        private const string PublicationLastModifiedTime = "2024-01-03T10:14:23.00Z";
 
         [Fact]
         public async Task GetPublicationTitle()
@@ -107,13 +107,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
                     new()
                     {
                         Slug = "test-publication",
-                        LastModified = DateTime.Parse(publicationLastModifiedTime),
+                        LastModified = DateTime.Parse(PublicationLastModifiedTime),
                         Releases =
                         [
                             new ReleaseSitemapItemViewModel
                             {
                                 Slug = "test-release",
-                                LastModified = DateTime.Parse(sitemapItemLastModifiedTime)
+                                LastModified = DateTime.Parse(SitemapItemLastModifiedTime)
                             }
                         ]
                     }

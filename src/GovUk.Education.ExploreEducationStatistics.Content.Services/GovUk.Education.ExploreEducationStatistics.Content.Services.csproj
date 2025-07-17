@@ -11,12 +11,12 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="AspectInjector" Version="2.8.2" PrivateAssets="all" />
-        <PackageReference Include="System.Linq.Async" Version="6.0.1" />
+        <PackageReference Include="AspectInjector" Version="2.8.1" PrivateAssets="all" /> <!-- v2.8.1 is compatible with MacOS -->
         <PackageReference Include="System.Linq.Async.Queryable" Version="6.0.1" />
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Analytics.Common\GovUk.Education.ExploreEducationStatistics.Analytics.Common.csproj" />
       <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Content.Model\GovUk.Education.ExploreEducationStatistics.Content.Model.csproj" />
       <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Content.Requests\GovUk.Education.ExploreEducationStatistics.Content.Requests.csproj" />
       <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Content.ViewModels\GovUk.Education.ExploreEducationStatistics.Content.ViewModels.csproj" />

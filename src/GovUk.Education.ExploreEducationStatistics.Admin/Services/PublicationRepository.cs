@@ -35,7 +35,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             var publicationsGrantedByPublicationRoleQueryable = _context
                 .UserPublicationRoles
                 .Where(userPublicationRole => userPublicationRole.UserId == userId &&
-                                              ListOf(PublicationRole.Owner, PublicationRole.Approver)
+                                              ListOf(PublicationRole.Owner, PublicationRole.Allower)
                                                   .Contains(userPublicationRole.Role));
 
             if (themeId.HasValue)

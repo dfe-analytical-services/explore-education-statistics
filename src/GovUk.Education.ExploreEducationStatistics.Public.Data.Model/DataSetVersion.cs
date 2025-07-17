@@ -25,10 +25,6 @@ public class DataSetVersion : ICreatedUpdatedTimestamps<DateTimeOffset, DateTime
 
     public required int VersionMinor { get; set; }
 
-    // Not using this currently, but it's being considered for
-    // data replacement version numbers in future functionality.
-    // We're including this now so that the column exists and is
-    // in the right position. Remove if not needed in the end.
     public int VersionPatch { get; set; }
 
     public required string Notes { get; set; }
@@ -79,12 +75,18 @@ public class DataSetVersion : ICreatedUpdatedTimestamps<DateTimeOffset, DateTime
 
     public SemVersion SemVersion() => new(major: VersionMajor, minor: VersionMinor, patch: VersionPatch);
 
-    public SemVersion DefaultNextVersion() => SemVersion().WithMinor(VersionMinor + 1);
+    public SemVersion DefaultNextVersion() => SemVersion().WithMinor(VersionMinor + 1).WithPatch(0);
+    
+    public SemVersion NextPatchVersion() => SemVersion().WithPatch(VersionPatch + 1);
 
     public bool IsFirstVersion => VersionMajor == 1 && VersionMinor == 0 && VersionPatch == 0;
 
     public DataSetVersionType VersionType
-        => VersionMinor == 0 ? DataSetVersionType.Major : DataSetVersionType.Minor;
+        => VersionPatch == 0 
+            ? VersionMinor == 0 
+                ? DataSetVersionType.Major 
+                : DataSetVersionType.Minor 
+            : DataSetVersionType.Patch;
 
     public bool CanBeDeleted => Status is DataSetVersionStatus.Failed
         or DataSetVersionStatus.Mapping

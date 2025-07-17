@@ -4,13 +4,14 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
+using GovUk.Education.ExploreEducationStatistics.Admin.Tests.MockBuilders;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
-using GovUk.Education.ExploreEducationStatistics.Content.Services.Cache;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.Cache;
 using Moq;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityPolicies;
@@ -90,7 +91,8 @@ public class ReleaseServicePermissionTests
         IReleaseCacheService? releaseCacheService = null,
         IPublicationCacheService? publicationCacheService = null,
         IReleasePublishingStatusRepository? releasePublishingStatusRepository = null,
-        IRedirectsCacheService? redirectsCacheService = null)
+        IRedirectsCacheService? redirectsCacheService = null,
+        IReleaseSlugValidator? releaseSlugValidator = null)
     {
         return new ReleaseService(
             context: context ?? Mock.Of<ContentDbContext>(),
@@ -100,7 +102,9 @@ public class ReleaseServicePermissionTests
             publicationCacheService: publicationCacheService ?? Mock.Of<IPublicationCacheService>(),
             releasePublishingStatusRepository: releasePublishingStatusRepository ?? Mock.Of<IReleasePublishingStatusRepository>(),
             redirectsCacheService: redirectsCacheService ?? Mock.Of<IRedirectsCacheService>(),
-            guidGenerator: new SequentialGuidGenerator()
+            adminEventRaiser: new AdminEventRaiserMockBuilder().Build(),
+            guidGenerator: new SequentialGuidGenerator(),
+            releaseSlugValidator: releaseSlugValidator ?? Mock.Of<IReleaseSlugValidator>()
         );
     }
 }

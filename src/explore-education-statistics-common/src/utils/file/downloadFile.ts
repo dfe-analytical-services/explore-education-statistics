@@ -1,3 +1,5 @@
+import sanitiseFileName, { FileExtension } from './sanitiseFileName';
+
 /**
  * Start downloading a {@param file} onto the client's disk.
  *
@@ -9,14 +11,22 @@
  * a Blob, otherwise, the filename provided by the file
  * response's `Content-Disposition` header is used instead.
  */
-export default function downloadFile(file: Blob | string, fileName?: string) {
+export default function downloadFile({
+  file,
+  extension,
+  fileName,
+}: {
+  file: Blob | string;
+  extension?: FileExtension;
+  fileName?: string;
+}) {
   const url = typeof file === 'string' ? file : URL.createObjectURL(file);
   const link = document.createElement('a');
 
   link.href = url;
 
   if (fileName) {
-    link.setAttribute('download', fileName);
+    link.setAttribute('download', sanitiseFileName(fileName, extension));
   }
 
   document.body.appendChild(link);

@@ -24,6 +24,7 @@ interface TableToolFinalStepProps {
   tableHeaders: TableHeadersConfig;
   selectedPublication: SelectedPublication;
   onReorderTableHeaders: (reorderedTableHeaders: TableHeadersConfig) => void;
+  subjectId: string;
 }
 
 const TableToolFinalStep = ({
@@ -32,6 +33,7 @@ const TableToolFinalStep = ({
   query,
   selectedPublication,
   onReorderTableHeaders,
+  subjectId,
 }: TableToolFinalStepProps) => {
   const dataTableRef = useRef<HTMLElement>(null);
   const [hasTableError, toggleHasTableError] = useToggle(false);
@@ -41,6 +43,7 @@ const TableToolFinalStep = ({
       publicationService.getLatestPublicationRelease(selectedPublication.slug),
     [selectedPublication],
   );
+
   const publication = fullPublication?.publication;
 
   const getMethodologyLinks = () => {
@@ -71,7 +74,7 @@ const TableToolFinalStep = ({
     >
       {table && tableHeaders && (
         <>
-          <div className="govuk-!-margin-bottom-3 dfe-flex dfe-align-items-start dfe-justify-content--space-between">
+          <div className="govuk-!-margin-bottom-3 dfe-flex dfe-flex-wrap dfe-align-items-start dfe-justify-content--space-between dfe-gap-3">
             {publication?.isSuperseded ? (
               <WarningMessage testId="superseded-warning">
                 This publication has been superseded by{' '}
@@ -88,16 +91,14 @@ const TableToolFinalStep = ({
                   <Tag>This is the latest data</Tag>
                 ) : (
                   <>
-                    <div className="govuk-!-margin-bottom-3">
-                      <Tag colour="orange">
-                        This data is not from the latest release
-                      </Tag>
-                    </div>
+                    <Tag colour="orange">
+                      This data is not from the latest release
+                    </Tag>
 
                     <Link
-                      className="govuk-!-display-none-print"
+                      className="govuk-!-margin-bottom-1 govuk-!-display-none-print"
                       unvisited
-                      to={`/find-statistics/${selectedPublication.slug}/${selectedPublication.selectedRelease.slug}`}
+                      to={`/find-statistics/${selectedPublication.slug}/${selectedPublication.latestRelease.slug}`}
                       testId="View latest data link"
                     >
                       View latest data:{' '}
@@ -155,7 +156,7 @@ const TableToolFinalStep = ({
             fileName={`data-${selectedPublication.slug}`}
             onCsvDownload={() => tableBuilderService.getTableCsv(query)}
             tableRef={dataTableRef}
-            onSubmit={fileFormat =>
+            onSubmit={fileFormat => {
               logEvent({
                 category: 'Table tool',
                 action:
@@ -169,8 +170,19 @@ const TableToolFinalStep = ({
                     table.subjectMeta.timePeriodRange.length - 1
                   ].label
                 }`,
-              })
-            }
+              });
+
+              tableBuilderService.recordDownload({
+                dataSetName: table.subjectMeta.subjectName,
+                publicationName: table.subjectMeta.publicationName,
+                releaseVersionId: selectedPublication.selectedRelease.id,
+                releasePeriodAndLabel:
+                  selectedPublication.selectedRelease.title,
+                subjectId,
+                query,
+                downloadFormat: fileFormat,
+              });
+            }}
           />
         </>
       )}
@@ -180,9 +192,9 @@ const TableToolFinalStep = ({
         methodologyLinks={getMethodologyLinks()}
         releaseLink={
           <Link
-            to={`/find-statistics/${selectedPublication.slug}/${selectedPublication.selectedRelease.slug}`}
+            to={`/find-statistics/${selectedPublication.slug}/${selectedPublication.latestRelease.slug}`}
           >
-            {`${selectedPublication.title}, ${selectedPublication.selectedRelease.title}`}
+            {`${selectedPublication.title}, ${selectedPublication.latestRelease.title}`}
           </Link>
         }
         releaseType={selectedPublication.selectedRelease.type}

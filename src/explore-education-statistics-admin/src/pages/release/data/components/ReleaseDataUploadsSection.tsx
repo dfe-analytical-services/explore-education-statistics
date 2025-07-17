@@ -5,22 +5,20 @@ import DataFileUploadForm, {
 import releaseDataFileQueries from '@admin/queries/releaseDataFileQueries';
 import permissionService from '@admin/services/permissionService';
 import releaseDataFileService, {
-  ArchiveDataSetFile,
   DataFile,
   DataFileImportStatus,
-  DeleteDataFilePlan,
+  DataSetUpload,
 } from '@admin/services/releaseDataFileService';
+import DataFilesTable from '@admin/pages/release/data/components/DataFilesTable';
+import DataFilesReplacementTable from '@admin/pages/release/data/components/DataFilesReplacementTable';
 import Button from '@common/components/Button';
 import InsetText from '@common/components/InsetText';
 import LoadingSpinner from '@common/components/LoadingSpinner';
-import ModalConfirm from '@common/components/ModalConfirm';
 import WarningMessage from '@common/components/WarningMessage';
 import useToggle from '@common/hooks/useToggle';
-import logger from '@common/services/logger';
 import { useQuery } from '@tanstack/react-query';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import BulkZipUploadModalConfirm from './BulkZipUploadModalConfirm';
-import DataFilesTable from './DataFilesTable';
+import dataReplacementService from '@admin/services/dataReplacementService';
 
 interface Props {
   publicationId: string;
@@ -29,81 +27,78 @@ interface Props {
   onDataFilesChange?: (dataFiles: DataFile[]) => void;
 }
 
-interface DeleteDataFile {
-  plan: DeleteDataFilePlan;
-  file: DataFile;
-}
-
 export default function ReleaseDataUploadsSection({
   publicationId,
   releaseVersionId,
   canUpdateRelease,
   onDataFilesChange,
 }: Props) {
-  const [deleteDataFile, setDeleteDataFile] = useState<DeleteDataFile>();
   const [allDataFiles, setAllDataFiles] = useState<DataFile[]>([]);
-  const [bulkUploadPlan, setBulkUploadPlan] = useState<ArchiveDataSetFile[]>();
+  const [allDataSetUploads, setAllDataSetUploads] = useState<DataSetUpload[]>(
+    [],
+  );
   const [isReordering, toggleReordering] = useToggle(false);
 
+  // NOTE: When a data set is initially imported, it is first sent to the data screener to check for screener errors and
+  // warnings. At this stage, the data set will be returned from `listUploads`. If the file has no errors from the
+  // screener tests and the user has pressed a button to continue the import, the data set then starts being imported
+  // properly, and will then be returned from `list` instead.
+  //
+  // So "dataSetUploads" are data sets currently being screened via the R docker container, while "dataFiles" are data
+  // sets that have moved beyond the screener and are now being imported by the Data.Processor
   const {
     data: initialDataFiles,
     isLoading,
     refetch: refetchDataFiles,
   } = useQuery(releaseDataFileQueries.list(releaseVersionId));
+  const {
+    data: initialDataSetUploads,
+    isLoading: isLoadingUploads,
+    refetch: refetchDataSetUploads,
+  } = useQuery(releaseDataFileQueries.listUploads(releaseVersionId));
+
+  const uploadsWithoutReplacements = allDataSetUploads.filter(
+    upload => !upload.replacingFileId,
+  );
+
+  const uploadsWithReplacements = allDataSetUploads.filter(
+    upload => upload.replacingFileId,
+  );
 
   // Store the data files on state so we can reliably update them
   // when the permissions/status change.
   useEffect(() => {
     setAllDataFiles(initialDataFiles ?? []);
-  }, [initialDataFiles]);
+    setAllDataSetUploads(initialDataSetUploads ?? []);
+  }, [initialDataFiles, initialDataSetUploads]);
 
   useEffect(() => {
     onDataFilesChange?.(allDataFiles);
   }, [allDataFiles, onDataFilesChange]);
 
-  const replacedDataFiles = useMemo(
-    () => allDataFiles.filter(dataFile => dataFile.replacedBy),
+  const dataFilesExcludingReplacements = useMemo(
+    () => allDataFiles.filter(dataFile => !dataFile.replacedByDataFile),
     [allDataFiles],
   );
 
-  const dataFiles = useMemo(
-    () => allDataFiles.filter(dataFile => !dataFile.replacedBy),
+  const inProgressReplacementDataFiles = useMemo(
+    () => allDataFiles.filter(dataFile => dataFile.replacedByDataFile),
     [allDataFiles],
   );
 
-  const setFileDeleting = useCallback(
-    (dataFile: DeleteDataFile, deleting: boolean) => {
-      setAllDataFiles(files =>
-        files.map(file =>
-          file.fileName !== dataFile.file.fileName
-            ? file
-            : { ...file, isDeleting: deleting },
-        ),
-      );
-    },
-    [],
-  );
-
-  const confirmBulkUploadPlan = useCallback(
-    async (archiveDataSetFiles: ArchiveDataSetFile[]) => {
-      await releaseDataFileService.importBulkZipDataFile(
-        releaseVersionId,
-        archiveDataSetFiles,
-      );
-
-      setBulkUploadPlan(undefined);
-      await refetchDataFiles();
-    },
-    [releaseVersionId, setBulkUploadPlan, refetchDataFiles],
+  const validReplacementDataFiles = inProgressReplacementDataFiles.filter(
+    originalFile =>
+      originalFile.replacedByDataFile?.status === 'COMPLETE' &&
+      originalFile.replacedByDataFile?.hasValidReplacementPlan,
   );
 
   const handleStatusChange = useCallback(
-    async (dataFile: DataFile, { totalRows, status }: DataFileImportStatus) => {
+    async (dataFile: DataFile, importStatus: DataFileImportStatus) => {
       // EES-5732 UI tests related to data replacement sometimes fail
       // because of a permission call for the replaced file being called,
       // probably caused by the speed of the tests.
       // This prevents this happening.
-      if (status === 'NOT_FOUND') {
+      if (importStatus?.status === 'NOT_FOUND') {
         return;
       }
 
@@ -118,53 +113,75 @@ export default function ReleaseDataUploadsSection({
             ? file
             : {
                 ...dataFile,
-                rows: totalRows,
-                status,
+                rows: importStatus.totalRows,
+                status: importStatus.status,
                 permissions,
               },
         ),
       );
     },
-    [releaseVersionId],
+    [releaseVersionId, setAllDataFiles],
   );
 
-  const handleDeleteFile = useCallback(
-    async (dataFile: DataFile) => {
-      setDeleteDataFile({
-        plan: await releaseDataFileService.getDeleteDataFilePlan(
-          releaseVersionId,
-          dataFile,
-        ),
-        file: dataFile,
-      });
-    },
-    [releaseVersionId],
-  );
+  const handleReplacementStatusChange = useCallback(
+    async (updatedDataFile: DataFile) => {
+      // EES-5732 UI tests related to data replacement sometimes fail
+      // because of a permission call for the replaced file being called,
+      // probably caused by the speed of the tests.
+      // This prevents this happening.
+      if (updatedDataFile.replacedByDataFile?.status === 'NOT_FOUND') {
+        return;
+      }
 
-  const handleDeleteConfirm = useCallback(async () => {
-    if (!deleteDataFile) {
-      return;
-    }
-
-    const { file } = deleteDataFile;
-
-    setDeleteDataFile(undefined);
-    setFileDeleting(deleteDataFile, true);
-
-    try {
-      await releaseDataFileService.deleteDataFiles(releaseVersionId, file.id);
-
-      setAllDataFiles(files =>
-        files.filter(dataFile => dataFile.id !== file.id),
+      const permissions = await permissionService.getDataFilePermissions(
+        releaseVersionId,
+        updatedDataFile.id,
       );
-    } catch (err) {
-      logger.error(err);
-      setFileDeleting(deleteDataFile, false);
-    }
-  }, [deleteDataFile, releaseVersionId, setFileDeleting]);
 
-  const handleDeleteExit = useCallback(() => {
-    setDeleteDataFile(undefined);
+      setAllDataFiles(currentDataFiles =>
+        currentDataFiles.map(file =>
+          file.fileName !== updatedDataFile.fileName
+            ? file
+            : {
+                ...updatedDataFile,
+                permissions,
+              },
+        ),
+      );
+    },
+    [releaseVersionId, setAllDataFiles],
+  );
+
+  const handleDataSetImport = useCallback(
+    async (dataSetUploadIds: string[]) => {
+      await releaseDataFileService.importDataSets(
+        releaseVersionId,
+        dataSetUploadIds,
+      );
+
+      setAllDataSetUploads(uploads =>
+        uploads.filter(upload => !dataSetUploadIds.includes(upload.id)),
+      );
+
+      await refetchDataFiles();
+      await refetchDataSetUploads();
+    },
+    [releaseVersionId, refetchDataFiles, refetchDataSetUploads],
+  );
+
+  const handleDeleteUploadConfirm = useCallback(
+    async (deletedUploadId: string) => {
+      setAllDataSetUploads(uploads =>
+        uploads.filter(upload => upload.id !== deletedUploadId),
+      );
+    },
+    [],
+  );
+
+  const handleDeleteConfirm = useCallback(async (deletedFileId: string) => {
+    setAllDataFiles(files =>
+      files.filter(dataFile => dataFile.id !== deletedFileId),
+    );
   }, []);
 
   const handleSubmit = useCallback(
@@ -175,42 +192,41 @@ export default function ReleaseDataUploadsSection({
             return;
           }
 
-          await releaseDataFileService.uploadDataFiles(releaseVersionId, {
+          await releaseDataFileService.uploadDataSetFilePair(releaseVersionId, {
             title: values.title,
             dataFile: values.dataFile as File,
             metadataFile: values.metadataFile as File,
           });
-
-          await refetchDataFiles();
           break;
         }
         case 'zip': {
           if (!values.title) {
             return;
           }
-          await releaseDataFileService.uploadZipDataFile(releaseVersionId, {
-            title: values.title,
-            zipFile: values.zipFile as File,
-          });
-
-          await refetchDataFiles();
+          await releaseDataFileService.uploadZippedDataSetFilePair(
+            releaseVersionId,
+            {
+              title: values.title,
+              zipFile: values.zipFile as File,
+            },
+          );
           break;
         }
         case 'bulkZip': {
-          const uploadPlan =
-            await releaseDataFileService.getUploadBulkZipDataFilePlan(
-              releaseVersionId,
-              values.bulkZipFile!,
-            );
-
-          setBulkUploadPlan(uploadPlan);
+          await releaseDataFileService.uploadBulkZipDataSetFile(
+            releaseVersionId,
+            values.bulkZipFile!,
+          );
           break;
         }
         default:
           break;
       }
+
+      await refetchDataFiles();
+      await refetchDataSetUploads();
     },
-    [releaseVersionId, refetchDataFiles],
+    [releaseVersionId, refetchDataFiles, refetchDataSetUploads],
   );
 
   const handleConfirmReordering = useCallback(
@@ -225,6 +241,15 @@ export default function ReleaseDataUploadsSection({
     },
     [releaseVersionId, toggleReordering],
   );
+
+  const handleConfirmAllReplacements = async () => {
+    await dataReplacementService.replaceData(
+      releaseVersionId,
+      validReplacementDataFiles.map(file => file.id),
+    );
+
+    await refetchDataFiles();
+  };
 
   return (
     <>
@@ -258,20 +283,7 @@ export default function ReleaseDataUploadsSection({
         </ul>
       </InsetText>
       {canUpdateRelease ? (
-        <>
-          <DataFileUploadForm
-            dataFiles={allDataFiles}
-            onSubmit={handleSubmit}
-          />
-          {bulkUploadPlan === undefined ||
-          bulkUploadPlan.length === 0 ? null : (
-            <BulkZipUploadModalConfirm
-              bulkUploadPlan={bulkUploadPlan}
-              onConfirm={confirmBulkUploadPlan}
-              onCancel={() => setBulkUploadPlan(undefined)}
-            />
-          )}
-        </>
+        <DataFileUploadForm dataFiles={allDataFiles} onSubmit={handleSubmit} />
       ) : (
         <WarningMessage>
           This release has been approved, and can no longer be updated.
@@ -280,15 +292,22 @@ export default function ReleaseDataUploadsSection({
 
       <hr className="govuk-!-margin-top-6 govuk-!-margin-bottom-6" />
 
-      <LoadingSpinner loading={isLoading}>
-        {allDataFiles.length > 0 ? (
+      <LoadingSpinner loading={isLoading || isLoadingUploads}>
+        {allDataFiles.length > 0 || allDataSetUploads.length > 0 ? (
           <>
             <h2>Uploaded data files</h2>
 
             {!isReordering && allDataFiles.length > 1 && (
-              <Button onClick={toggleReordering.on} variant="secondary">
-                Reorder data files
-              </Button>
+              <div className="dfe-flex dfe-justify-content--space-between">
+                <Button onClick={toggleReordering.on} variant="secondary">
+                  Reorder data files
+                </Button>
+                {validReplacementDataFiles.length > 1 && (
+                  <Button onClick={handleConfirmAllReplacements}>
+                    Confirm all valid replacements
+                  </Button>
+                )}
+              </div>
             )}
 
             {isReordering ? (
@@ -299,28 +318,36 @@ export default function ReleaseDataUploadsSection({
               />
             ) : (
               <>
-                {replacedDataFiles.length > 0 && (
-                  <DataFilesTable
+                {(inProgressReplacementDataFiles.length > 0 ||
+                  uploadsWithReplacements.length > 0) && (
+                  <DataFilesReplacementTable
                     canUpdateRelease={canUpdateRelease}
                     caption="Data file replacements"
-                    dataFiles={replacedDataFiles}
+                    dataFiles={inProgressReplacementDataFiles}
+                    dataSetUploads={uploadsWithReplacements}
                     publicationId={publicationId}
                     releaseVersionId={releaseVersionId}
                     testId="Data file replacements table"
-                    onDeleteFile={handleDeleteFile}
-                    onStatusChange={handleStatusChange}
+                    onConfirmReplacement={refetchDataFiles}
+                    onDeleteUpload={handleDeleteUploadConfirm}
+                    onDataSetImport={handleDataSetImport}
+                    onReplacementStatusChange={handleReplacementStatusChange}
                   />
                 )}
 
-                {dataFiles.length > 0 && (
+                {(dataFilesExcludingReplacements.length > 0 ||
+                  uploadsWithoutReplacements.length > 0) && (
                   <DataFilesTable
                     canUpdateRelease={canUpdateRelease}
                     caption="Data files"
-                    dataFiles={dataFiles}
+                    dataFiles={dataFilesExcludingReplacements}
+                    dataSetUploads={uploadsWithoutReplacements}
                     publicationId={publicationId}
                     releaseVersionId={releaseVersionId}
                     testId="Data files table"
-                    onDeleteFile={handleDeleteFile}
+                    onDeleteFile={handleDeleteConfirm}
+                    onDeleteUpload={handleDeleteUploadConfirm}
+                    onDataSetImport={handleDataSetImport}
                     onStatusChange={handleStatusChange}
                   />
                 )}
@@ -331,95 +358,6 @@ export default function ReleaseDataUploadsSection({
           <InsetText>No data files have been uploaded.</InsetText>
         )}
       </LoadingSpinner>
-
-      {deleteDataFile && (
-        <DeleteDataFileModal
-          file={deleteDataFile.file}
-          plan={deleteDataFile.plan}
-          onConfirm={handleDeleteConfirm}
-          onExit={handleDeleteExit}
-        />
-      )}
     </>
-  );
-}
-
-interface DeleteDataFileModalProps {
-  file: DataFile;
-  plan: DeleteDataFilePlan;
-  onConfirm: () => void;
-  onExit: () => void;
-}
-
-function DeleteDataFileModal({
-  file,
-  plan,
-  onConfirm,
-  onExit,
-}: DeleteDataFileModalProps) {
-  return (
-    <ModalConfirm
-      open
-      title="Confirm deletion of selected data files"
-      onExit={onExit}
-      onConfirm={onConfirm}
-    >
-      <p>
-        Are you sure you want to delete <strong>{file.title}</strong>?
-      </p>
-      <p>This data will no longer be available for use in this release.</p>
-
-      {plan.deleteDataBlockPlan.dependentDataBlocks.length > 0 && (
-        <>
-          <p>The following data blocks will also be deleted:</p>
-
-          <ul>
-            {plan.deleteDataBlockPlan.dependentDataBlocks.map(block => (
-              <li key={block.name}>
-                <p>{block.name}</p>
-
-                {block.contentSectionHeading && (
-                  <p>
-                    It will also be removed from the "
-                    {block.contentSectionHeading}" content section.
-                  </p>
-                )}
-                {block.infographicFilesInfo.length > 0 && (
-                  <p>
-                    The following infographic files will also be removed:
-                    <ul>
-                      {block.infographicFilesInfo.map(fileInfo => (
-                        <li key={fileInfo.filename}>
-                          <p>{fileInfo.filename}</p>
-                        </li>
-                      ))}
-                    </ul>
-                  </p>
-                )}
-                {block.isKeyStatistic && (
-                  <p>
-                    A key statistic associated with this data block will be
-                    removed.
-                  </p>
-                )}
-                {block.featuredTable && (
-                  <p>
-                    The featured table "{block.featuredTable.name}" using this
-                    data block will be removed.
-                  </p>
-                )}
-              </li>
-            ))}
-          </ul>
-        </>
-      )}
-      {plan.footnoteIds.length > 0 && (
-        <p>
-          {`${plan.footnoteIds.length} ${
-            plan.footnoteIds.length > 1 ? 'footnotes' : 'footnote'
-          } will be removed or updated.`}
-        </p>
-      )}
-    </ModalConfirm>
   );
 }

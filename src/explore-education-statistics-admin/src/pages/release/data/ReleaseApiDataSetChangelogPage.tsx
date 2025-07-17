@@ -18,30 +18,36 @@ import ApiDataSetChangelog from '@common/modules/data-catalogue/components/ApiDa
 import Tag from '@common/components/Tag';
 import { useQuery } from '@tanstack/react-query';
 import { generatePath, useParams } from 'react-router-dom';
-import React, { useEffect } from 'react';
+import React, { useCallback, useEffect } from 'react';
 import WarningMessage from '@common/components/WarningMessage';
+import { DataSetVersionStatus } from '@admin/services/apiDataSetService';
+
+const dataSetVersionIsDraft = (dataSetVersionStatus: DataSetVersionStatus) =>
+  dataSetVersionStatus === 'Draft';
 
 export default function ReleaseApiDataSetChangelogPage() {
   const { dataSetId, dataSetVersionId, releaseVersionId, publicationId } =
     useParams<ReleaseDataSetChangelogRouteParams>();
 
+  const { data: dataSet, isLoading: isLoadingDataSet } = useQuery(
+    apiDataSetQueries.get(dataSetId),
+  );
+
   const {
-    data: dataSet,
-    isLoading: isLoadingDataSet,
-    refetch: refetchDataSet,
-  } = useQuery(apiDataSetQueries.get(dataSetId));
+    data: dataSetVersion,
+    isLoading: isLoadingDataSetVersion,
+    refetch: refetchDataSetVersion,
+  } = useQuery(apiDataSetVersionQueries.getVersion(dataSetVersionId));
 
   const { data: changes, isLoading: isLoadingChanges } = useQuery(
     apiDataSetVersionQueries.getChanges(dataSetVersionId),
   );
 
-  const isDraft = dataSet?.draftVersion?.id === dataSetVersionId;
+  const isDraft = dataSetVersion
+    ? dataSetVersionIsDraft(dataSetVersion.status)
+    : false;
 
   const [showForm, toggleShowForm] = useToggle(false);
-
-  const dataSetVersion = isDraft
-    ? dataSet?.draftVersion
-    : dataSet?.latestLiveVersion;
 
   useEffect(() => {
     if (isDraft && !dataSetVersion?.notes) {
@@ -49,15 +55,16 @@ export default function ReleaseApiDataSetChangelogPage() {
     }
   }, [dataSetVersion?.notes, isDraft, toggleShowForm]);
 
-  const handleUpdateNotes = async ({
-    notes,
-  }: ApiDataSetGuidanceNotesFormValues) => {
-    await apiDataSetVersionService.updateNotes(dataSetVersionId, {
-      notes,
-    });
-    refetchDataSet();
-    toggleShowForm.off();
-  };
+  const handleUpdateNotes = useCallback(
+    async ({ notes }: ApiDataSetGuidanceNotesFormValues) => {
+      await apiDataSetVersionService.updateNotes(dataSetVersionId, {
+        notes,
+      });
+      refetchDataSetVersion();
+      toggleShowForm.off();
+    },
+    [refetchDataSetVersion, toggleShowForm, dataSetVersionId],
+  );
 
   return (
     <>
@@ -76,7 +83,11 @@ export default function ReleaseApiDataSetChangelogPage() {
         Back to API data set details
       </Link>
 
-      <LoadingSpinner loading={isLoadingDataSet || isLoadingChanges}>
+      <LoadingSpinner
+        loading={
+          isLoadingDataSet || isLoadingDataSetVersion || isLoadingChanges
+        }
+      >
         {dataSet && dataSetVersion ? (
           <>
             <div className="govuk-grid-row">
@@ -102,7 +113,7 @@ export default function ReleaseApiDataSetChangelogPage() {
             ) : (
               <>
                 <h3>Public guidance notes</h3>
-                <p>
+                <p data-testid="public-guidance-notes">
                   {dataSetVersion?.notes ||
                     'No notes have been added for this API data set.'}
                 </p>

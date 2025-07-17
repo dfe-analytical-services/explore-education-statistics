@@ -13,11 +13,13 @@ import LoadingSpinner from '@common/components/LoadingSpinner';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
 import useToggle from '@common/hooks/useToggle';
 import Yup from '@common/validation/yup';
-import React, { useMemo } from 'react';
+import React, { useEffect, useMemo, useRef } from 'react';
 import { ObjectSchema } from 'yup';
 import PublicationUpdateConfirmModal from '@admin/pages/publication/components/PublicationUpdateConfirmModal';
 
 const id = 'publicationDetailsForm';
+const titleMaxLength = 65;
+const summaryMaxLength = 160;
 
 interface FormValues {
   summary: string;
@@ -46,6 +48,13 @@ export default function PublicationDetailsForm({
   onSubmit,
 }: Props) {
   const [showConfirmModal, toggleConfirmModal] = useToggle(false);
+  const submitButtonRef = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    if (showConfirmModal === false) {
+      submitButtonRef.current?.focus();
+    }
+  }, [showConfirmModal]);
 
   const { value, isLoading } = useAsyncHandledRetry(async () => {
     const themes = await themeService.getThemes();
@@ -75,9 +84,17 @@ export default function PublicationDetailsForm({
     return Yup.object({
       summary: Yup.string()
         .required('Enter a summary')
-        .max(160, 'Summary must be 160 characters or less'),
+        .max(
+          summaryMaxLength,
+          `Summary must be ${summaryMaxLength} characters or fewer`,
+        ),
       supersededById: Yup.string(),
-      title: Yup.string().required('Enter a title'),
+      title: Yup.string()
+        .required('Enter a title')
+        .max(
+          titleMaxLength,
+          `Title must be ${titleMaxLength} characters or fewer`,
+        ),
       themeId: Yup.string().required('Choose a theme'),
     });
   }, []);
@@ -108,6 +125,7 @@ export default function PublicationDetailsForm({
                       name="title"
                       label="Publication title"
                       className="govuk-!-width-one-half"
+                      maxLength={titleMaxLength}
                     />
                   )}
 
@@ -116,7 +134,7 @@ export default function PublicationDetailsForm({
                       name="summary"
                       label="Publication summary"
                       className="govuk-!-width-one-half"
-                      maxLength={160}
+                      maxLength={summaryMaxLength}
                     />
                   )}
 
@@ -158,7 +176,9 @@ export default function PublicationDetailsForm({
                 )}
 
                 <ButtonGroup>
-                  <Button type="submit">Update publication details</Button>
+                  <Button type="submit" ref={submitButtonRef}>
+                    Update publication details
+                  </Button>
                   <ButtonText onClick={onCancel}>Cancel</ButtonText>
                 </ButtonGroup>
               </Form>

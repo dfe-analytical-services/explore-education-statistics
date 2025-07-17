@@ -15,16 +15,6 @@ param subscription string = ''
 @description('Environment : Specifies the location in which the Azure resources should be deployed.')
 param location string = resourceGroup().location
 
-@description('Analytics Storage configuration.')
-param analyticsStorageConfig StorageAccountConfig = {
-  kind: 'FileStorage'
-  sku: 'Premium_ZRS'
-  fileShare: {
-    quotaGbs: 100
-    accessTier: 'Premium'
-  }
-}
-
 @description('Public API Storage configuration.')
 param publicApiStorageConfig StorageAccountConfig = {
   kind: 'FileStorage'
@@ -168,6 +158,9 @@ param publicApiContainerAppConfig ContainerAppResourceConfig = {
 @description('Enable the Swagger UI for public API.')
 param enableSwagger bool = false
 
+@description('Enable replacement of public API data sets.')
+param enableReplacementOfPublicApiDataSets bool = false
+
 var tagValues = union(resourceTags ?? {}, {
   Environment: environmentName
   DateProvisioned: dateProvisioned
@@ -189,6 +182,8 @@ var legacyResourcePrefix = subscription
 var resourceNames = {
   existingResources: {
     adminApp: '${legacyResourcePrefix}-as-ees-admin'
+    analyticsFileShare: '${commonResourcePrefix}-${abbreviations.fileShare}-anlyt'
+    analyticsStorageAccount: '${replace(commonResourcePrefix, '-', '')}${abbreviations.storageStorageAccounts}anlyt'
     publisherFunction: '${legacyResourcePrefix}-fa-ees-publisher'
     keyVault: '${legacyResourcePrefix}-kv-ees-01'
     vNet: '${legacyResourcePrefix}-vnet-ees'
@@ -211,8 +206,6 @@ var resourceNames = {
     }
   }
   sharedResources: {
-    analyticsFileShare: '${commonResourcePrefix}-${abbreviations.fileShare}-anlyt'
-    analyticsStorageAccount: '${replace(commonResourcePrefix, '-', '')}${abbreviations.storageStorageAccounts}anlyt'
     appGateway: '${commonResourcePrefix}-${abbreviations.networkApplicationGateways}-01'
     appGatewayIdentity: '${commonResourcePrefix}-${abbreviations.managedIdentityUserAssignedIdentities}-${abbreviations.networkApplicationGateways}-01'
     containerAppEnvironment: '${commonResourcePrefix}-${abbreviations.appManagedEnvironments}-01'
@@ -258,22 +251,10 @@ module coreStorage 'application/shared/coreStorage.bicep' = {
   }
 }
 
-module privateDnsZonesModule 'application/shared/privateDnsZones.bicep' = if (deploySharedPrivateDnsZones) {
+module privateDnsZonesModule '../common/application/privateDnsZones.bicep' = if (deploySharedPrivateDnsZones) {
   name: 'privateDnsZonesApplicationModuleDeploy'
   params: {
-    resourceNames: resourceNames
-    tagValues: tagValues
-  }
-}
-
-module analyticsStorageModule 'application/shared/analyticsStorage.bicep' = {
-  name: 'analyticsStorageAccountApplicationModuleDeploy'
-  params: {
-    location: location
-    resourceNames: resourceNames
-    config: analyticsStorageConfig
-    storageFirewallRules: maintenanceIpRanges
-    deployAlerts: deployAlerts
+    vnetName: resourceNames.existingResources.vNet
     tagValues: tagValues
   }
 }
@@ -363,7 +344,6 @@ module containerAppEnvironmentModule 'application/shared/containerAppEnvironment
   }
   dependsOn: [
     publicApiStorageModule
-    analyticsStorageModule
   ]
 }
 
@@ -586,3 +566,5 @@ output coreStorageConnectionStringSecretKey string = coreStorage.outputs.coreSto
 output keyVaultName string = resourceNames.existingResources.keyVault
 
 output enableThemeDeletion bool = enableThemeDeletion
+
+output enableReplacementOfPublicApiDataSets bool = enableReplacementOfPublicApiDataSets

@@ -6,35 +6,36 @@ import SectionBreak from '@common/components/SectionBreak';
 import Tag from '@common/components/Tag';
 import useDebouncedCallback from '@common/hooks/useDebouncedCallback';
 import useToggle from '@common/hooks/useToggle';
-import downloadService from '@common/services/downloadService';
 import { ApiDataSetVersionChanges } from '@common/services/types/apiDataSetChanges';
 import { Dictionary } from '@common/types';
 import Page from '@frontend/components/Page';
+import SubscribeLink from '@frontend/components/SubscribeLink';
 import withAxiosHandler from '@frontend/middleware/ssr/withAxiosHandler';
 import DataSetFileApiChangelog from '@frontend/modules/data-catalogue/components/DataSetFileApiChangelog';
 import DataSetFileApiQuickStart from '@frontend/modules/data-catalogue/components/DataSetFileApiQuickStart';
 import DataSetFileApiVersionHistory from '@frontend/modules/data-catalogue/components/DataSetFileApiVersionHistory';
 import DataSetFileDetails from '@frontend/modules/data-catalogue/components/DataSetFileDetails';
+import DataSetFileFootnotes from '@frontend/modules/data-catalogue/components/DataSetFileFootnotes';
 import DataSetFilePreview from '@frontend/modules/data-catalogue/components/DataSetFilePreview';
 import DataSetFileUsage from '@frontend/modules/data-catalogue/components/DataSetFileUsage';
 import DataSetFileVariables from '@frontend/modules/data-catalogue/components/DataSetFileVariables';
-import DataSetFileFootnotes from '@frontend/modules/data-catalogue/components/DataSetFileFootnotes';
 import styles from '@frontend/modules/data-catalogue/DataSetPage.module.scss';
 import NotFoundPage from '@frontend/modules/NotFoundPage';
 import apiDataSetQueries from '@frontend/queries/apiDataSetQueries';
 import dataSetFileQueries from '@frontend/queries/dataSetFileQueries';
-import SubscribeLink from '@frontend/components/SubscribeLink';
 import {
   ApiDataSet,
   ApiDataSetVersion,
 } from '@frontend/services/apiDataSetService';
 import { DataSetFile } from '@frontend/services/dataSetFileService';
+import downloadService from '@frontend/services/downloadService';
 import { logEvent } from '@frontend/services/googleAnalyticsService';
 import { dehydrate, QueryClient } from '@tanstack/react-query';
 import classNames from 'classnames';
+import omit from 'lodash/omit';
 import { GetServerSideProps } from 'next';
 import React, { useEffect, useMemo, useState } from 'react';
-import omit from 'lodash/omit';
+import getDataSetFileMetaCSVW from './utils/getDataSetFileMetaCSVW';
 
 export const pageBaseSections = {
   dataSetDetails: 'Data set details',
@@ -76,7 +77,7 @@ export default function DataSetFilePage({
   const [fullScreenPreview, toggleFullScreenPreview] = useToggle(false);
 
   const handleDownload = async () => {
-    await downloadService.downloadFiles(release.id, [file.id]);
+    await downloadService.downloadZip(release.id, 'DataCatalogue', file.id);
 
     logEvent({
       category: 'Data catalogue - data set page',
@@ -84,7 +85,6 @@ export default function DataSetFilePage({
       label: `Publication: ${release.publication.title}, Release: ${release.title}, Data set: ${title}`,
     });
   };
-
   const [handleScroll] = useDebouncedCallback(() => {
     const sections = document.querySelectorAll('[data-page-section]');
 
@@ -157,6 +157,9 @@ export default function DataSetFilePage({
       caption={`Data set from ${release.publication.title}`}
       breadcrumbs={[{ name: 'Data catalogue', link: '/data-catalogue' }]}
       wide={fullScreenPreview}
+      pageMeta={{
+        additionalMeta: [getDataSetFileMetaCSVW({ dataSetFile })],
+      }}
     >
       {fullScreenPreview ? (
         <DataSetFilePreview

@@ -1,5 +1,5 @@
 {
-  "num_datasets": "952 data sets",
+  "num_datasets": "1014 data sets",
   "themes": [
     {
       "publications": [
@@ -18,7 +18,8 @@
         "Looked after children aged 16 to 17 in independent or semi-independent placements",
         "Outcomes for children in need, including children looked after by local authorities in England",
         "Outcomes of children in need, including looked after children",
-        "Serious incident notifications"
+        "Serious incident notifications",
+        "Stability measures for children looked after in England"
       ],
       "theme_heading": "Children's social care"
     },
@@ -57,8 +58,9 @@
         "Childcare and early years survey of parents",
         "Early years education recovery",
         "Early years foundation stage profile results",
-        "Education provision: children under 5 years of age",
-        "Expansion to early childcare entitlements: eligibility codes issued and validated"
+        "Expansion to early childcare entitlements: Childcare Experiences Survey",
+        "Expansion to early childcare entitlements: eligibility codes issued and validated",
+        "Funded early education and childcare"
       ],
       "theme_heading": "Early years"
     },
@@ -124,11 +126,13 @@
         "Education, children\u2019s social care and offending: local authority level dashboard",
         "Education, health and care plans",
         "Elective home education",
+        "Estimate of additional children claiming Free School Meals following expansion of eligibility",
         "Free school meals: Autumn term",
         "Local authority school places scorecards",
         "National pupil projections",
         "National Tutoring Programme",
         "Parental responsibility measures",
+        "Primary and secondary school applications and offers",
         "Pupil absence in schools in England",
         "Pupil absence in schools in England: autumn and spring terms",
         "Pupil absence in schools in England: autumn term",
@@ -137,8 +141,8 @@
         "School capacity",
         "School placements for children from outside of the UK",
         "School places sufficiency survey",
+        "Schools eligible for RISE intervention",
         "Schools, pupils and their characteristics",
-        "Secondary and primary school applications and offers",
         "Special educational needs in England",
         "Suspensions and permanent exclusions in England",
         "The link between absence and attainment at KS2 and KS4"
@@ -158,7 +162,8 @@
         "Multi-academy trust performance measures at key stage 2",
         "Multiplication tables check attainment",
         "Phonics screening check attainment",
-        "Provisional T Level results"
+        "Provisional T Level results",
+        "School counts by average Progress 8 scores for disadvantaged White British pupils"
       ],
       "theme_heading": "School and college outcomes and performance"
     },
@@ -171,7 +176,7 @@
         "Median teacher pay using teacher pension scheme data",
         "Postgraduate initial teacher training targets",
         "School workforce in England",
-        "Teacher and Leader development: ECF and NPQs"
+        "Teacher and leader development: ECF and NPQs"
       ],
       "theme_heading": "Teachers and school workforce"
     },

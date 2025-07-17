@@ -22,6 +22,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model.Chart
         Above, Below
     }
 
+    [JsonConverter(typeof(StringEnumConverter), typeof(CamelCaseNamingStrategy))]
+    public enum LineChartDataLabelColour
+    {
+        Inherit, Black
+    }
+
     [JsonConverter(typeof(ContentBlockChartConverter))]
     public interface IChart
     {
@@ -58,6 +64,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model.Chart
         public override ChartType Type => Line;
         public bool ShowDataLabels { get; set; }
         public LineChartDataLabelPosition? DataLabelPosition { get; set; }
+        public LineChartDataLabelColour? DataLabelColour { get; set; }
     }
 
     public class HorizontalBarChart : Chart

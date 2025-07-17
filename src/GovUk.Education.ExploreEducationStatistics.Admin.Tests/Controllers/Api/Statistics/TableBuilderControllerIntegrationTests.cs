@@ -41,7 +41,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                 StartCode = CalendarYear,
                 EndYear = 2022,
                 EndCode = CalendarYear
-            }
+            },
+            FilterHierarchiesOptions = null,
         };
 
         private static readonly FullTableQuery FullTableQuery =
@@ -72,7 +73,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                 .Setup(s => s.Query(
                     ReleaseVersionId,
                     ItIs.DeepEqualTo(FullTableQuery),
-                    It.IsAny<long?>(),
                     It.IsAny<CancellationToken>()))
                 .ReturnsAsync(_tableBuilderResults);
 

@@ -23,13 +23,17 @@ public interface IDataSetVersionService
         int pageSize,
         CancellationToken cancellationToken = default);
 
-    Task<List<DataSetVersionStatusSummary>> GetStatusesForReleaseVersion(
-        Guid releaseVersionId,
+    Task<Either<ActionResult, DataSetVersionInfoViewModel>> GetDataSetVersion(
+        Guid dataSetVersionId,
         CancellationToken cancellationToken = default);
 
     Task<Either<ActionResult, DataSetVersion>> GetDataSetVersion(
         Guid dataSetId,
         SemVersion version,
+        CancellationToken cancellationToken = default);
+
+    Task<List<DataSetVersionStatusSummary>> GetStatusesForReleaseVersion(
+        Guid releaseVersionId,
         CancellationToken cancellationToken = default);
 
     Task<Either<ActionResult, Unit>> DeleteVersion(
@@ -39,6 +43,7 @@ public interface IDataSetVersionService
     Task<Either<ActionResult, DataSetVersionSummaryViewModel>> CreateNextVersion(
         Guid releaseFileId,
         Guid dataSetId,
+        Guid? dataSetVersionToReplaceId = null,
         CancellationToken cancellationToken = default);
 
     Task<Either<ActionResult, DataSetVersionSummaryViewModel>> CompleteNextVersionImport(

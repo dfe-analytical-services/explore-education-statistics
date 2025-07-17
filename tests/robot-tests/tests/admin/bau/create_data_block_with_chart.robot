@@ -13,7 +13,7 @@ Force Tags          Admin    Local    AltersData    Dev
 
 
 *** Variables ***
-${PUBLICATION_NAME}=        UI tests - create data block with chart %{RUN_IDENTIFIER}
+${PUBLICATION_NAME}=        Create data block with chart %{RUN_IDENTIFIER}
 ${DATABLOCK_NAME}=          UI test data block
 ${CONTENT_SECTION_NAME}=    Test data block section
 ${FOOTNOTE_1}=              Test footnote from bau
@@ -316,6 +316,7 @@ Navigate to release content page
 
 Check updated footnote is displayed in release content page
     [Documentation]    EES-3136
+
     user clicks button    Test data block section
     ${section}=    user gets accordion section content element    Test data block section
     ...    //*[@data-testid="editableAccordionSection"]
@@ -458,9 +459,10 @@ Validate changing data sets
     user chooses select option    id:chartDataSetsConfigurationForm-location    Barnsley
     user clicks button    Add data set
 
-    user checks chart legend item contains    id:chartBuilderPreview    1    Admission Numbers (Nailsea Youngwood)
-    user checks chart legend item contains    id:chartBuilderPreview    2    Admission Numbers (Syon)
-    user checks chart legend item contains    id:chartBuilderPreview    3    Admission Numbers (Barnsley)
+    user checks chart inline legend item contains    id:chartBuilderPreview    1
+    ...    Admission Numbers(Nailsea Youngwood)
+    user checks chart inline legend item contains    id:chartBuilderPreview    2    Admission Numbers(Syon)
+    user checks chart inline legend item contains    id:chartBuilderPreview    3    Admission Numbers(Barnsley)
 
     user checks table body has x rows    3    testid:chart-data-sets
 
@@ -475,7 +477,8 @@ Configure line chart data sets
     user chooses select option    id:chartDataSetsConfigurationForm-location    Nailsea Youngwood
     user clicks button    Add data set
 
-    user checks chart legend item contains    id:chartBuilderPreview    1    Admission Numbers (Nailsea Youngwood)
+    user checks chart inline legend item contains    id:chartBuilderPreview    1
+    ...    Admission Numbers(Nailsea Youngwood)
 
     user clicks link    Legend
     user chooses select option    id:chartLegendConfigurationForm-items-0-symbol    Circle
@@ -494,7 +497,8 @@ Validate basic line chart preview
 
     user checks chart title contains    id:chartBuilderPreview    Test chart title
     user checks chart subtitle contains    id:chartBuilderPreview    Test chart subtitle
-    user checks chart legend item contains    id:chartBuilderPreview    1    Admission Numbers (Nailsea Youngwood)
+    user checks chart inline legend item contains    id:chartBuilderPreview    1
+    ...    Admission Numbers(Nailsea Youngwood)
 
     user checks chart height    id:chartBuilderPreview    400
     user checks chart width    id:chartBuilderPreview    900
@@ -569,7 +573,7 @@ Validate line chart embeds correctly
 
     user checks chart title contains    ${datablock}    Test chart title
     user checks chart subtitle contains    ${datablock}    Test chart subtitle
-    user checks chart legend item contains    ${datablock}    1    Admission Numbers (Nailsea Youngwood)
+    user checks chart inline legend item contains    ${datablock}    1    Admission Numbers(Nailsea Youngwood)
 
     user checks chart height    ${datablock}    400
     user checks chart width    ${datablock}    900
@@ -826,6 +830,9 @@ Validate basic geographic chart preview
 
     user mouses over selected map feature    id:chartBuilderPreview
     user checks map tooltip label contains    id:chartBuilderPreview    Barnsley
+
+    # EES-6055 - remove the manual selection of the "selectedDataSet" below when the EES-6055 bug is fixed.
+    user chooses select option    id:chartBuilderPreview-map-selectedDataSet    Admissions in 2014
 
     user checks map chart indicator tile contains    id:chartBuilderPreview    Admissions in 2014    9,854
 

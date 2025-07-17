@@ -12,7 +12,6 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
-using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
@@ -217,6 +216,64 @@ public abstract class ReleasesControllerIntegrationTests(TestApplicationFactory 
             var error = Assert.Single(validationProblem.Errors);
 
             Assert.Equal(SlugNotUnique.ToString(), error.Code);
+        }
+
+        [Fact]
+        public async Task ReleaseRedirectExistsForSlugForDifferentReleaseInSamePublication()
+        {
+            Publication publication = DataFixture.DefaultPublication()
+                .WithReleases([
+                    DataFixture.DefaultRelease(publishedVersions: 1)
+                        .WithYear(2020)
+                        .WithTimePeriodCoverage(TimeIdentifier.AcademicYear)
+                        .WithLabel("intermediate")
+                        .WithSlug("2020-21-intermediate")
+                        .WithRedirects([DataFixture.DefaultReleaseRedirect()
+                            .WithSlug("2020-21-final")])
+                    ]);
+
+            await TestApp.AddTestData<ContentDbContext>(
+                context => context.Publications.Add(publication));
+                
+            var response = await CreateRelease(
+                publicationId: publication.Id,
+                year: 2020,
+                timePeriodCoverage: TimeIdentifier.AcademicYear,
+                label: "final");
+
+            var validationProblem = response.AssertValidationProblem();
+
+            var error = Assert.Single(validationProblem.Errors);
+
+            Assert.Equal(ReleaseSlugUsedByRedirect.ToString(), error.Code);
+        }
+
+        [Fact]
+        public async Task ReleaseRedirectExistsForSlugForReleaseInDifferentPublication()
+        {
+            Publication otherPublication = DataFixture.DefaultPublication()
+                .WithReleases([
+                    DataFixture.DefaultRelease(publishedVersions: 1)
+                        .WithYear(2020)
+                        .WithTimePeriodCoverage(TimeIdentifier.AcademicYear)
+                        .WithLabel("intermediate")
+                        .WithSlug("2020-21-intermediate")
+                        .WithRedirects([DataFixture.DefaultReleaseRedirect()
+                            .WithSlug("2020-21-final")])
+                    ]);
+
+            Publication targetPublication = DataFixture.DefaultPublication();
+
+            await TestApp.AddTestData<ContentDbContext>(
+                context => context.Publications.AddRange(otherPublication, targetPublication));
+
+            var response = await CreateRelease(
+                publicationId: targetPublication.Id,
+                year: 2020,
+                timePeriodCoverage: TimeIdentifier.AcademicYear,
+                label: "final");
+
+            response.AssertOk();
         }
 
         [Fact]
@@ -629,7 +686,7 @@ public abstract class ReleasesControllerIntegrationTests(TestApplicationFactory 
             var newSlugReleaseCachedValue = await publicBlobCacheService.GetItemAsync(newSlugReleaseCacheKey, typeof(ReleaseCacheViewModel));
 
             var publicationCacheKey = new PublicationCacheKey(publication.Slug);
-            var publicationCacheValue = await publicBlobCacheService.GetItemAsync(newSlugReleaseCacheKey, typeof(ReleaseCacheViewModel));
+            var publicationCacheValue = await publicBlobCacheService.GetItemAsync(publicationCacheKey, typeof(ReleaseCacheViewModel));
 
             // Checking that there isn't any cache for the old release view-model
             Assert.Null(oldSlugReleaseCachedValue);
@@ -687,12 +744,11 @@ public abstract class ReleasesControllerIntegrationTests(TestApplicationFactory 
             Assert.False(releaseRedirectsExist);
 
             // Check that the redirects cache is untouched
-            var newRedirectsCachedValue = await publicBlobCacheService.GetItemAsync(redirectsCacheKey, typeof(RedirectsViewModel))
-                as RedirectsViewModel;
-
-            Assert.Empty(oldRedirectsCachedViewModel.PublicationRedirects);
-            Assert.Empty(oldRedirectsCachedViewModel.MethodologyRedirects);
-            Assert.Empty(oldRedirectsCachedViewModel.ReleaseRedirectsByPublicationSlug);
+            var newRedirectsCachedValue= Assert.IsType<RedirectsViewModel>(await publicBlobCacheService.GetItemAsync(redirectsCacheKey, typeof(RedirectsViewModel)));
+            
+            Assert.Empty(newRedirectsCachedValue.PublicationRedirects);
+            Assert.Empty(newRedirectsCachedValue.MethodologyRedirects);
+            Assert.Empty(newRedirectsCachedValue.ReleaseRedirectsByPublicationSlug);
         }
 
         [Fact]
@@ -803,12 +859,11 @@ public abstract class ReleasesControllerIntegrationTests(TestApplicationFactory 
             Assert.False(releaseRedirectExists);
 
             // Check that the redirects cache is untouched
-            var newRedirectsCachedValue = await publicBlobCacheService.GetItemAsync(redirectsCacheKey, typeof(RedirectsViewModel))
-                as RedirectsViewModel;
+            var newRedirectsCachedViewModel = Assert.IsType<RedirectsViewModel>(await publicBlobCacheService.GetItemAsync(redirectsCacheKey, typeof(RedirectsViewModel)));
 
-            Assert.Empty(oldRedirectsCachedViewModel.PublicationRedirects);
-            Assert.Empty(oldRedirectsCachedViewModel.MethodologyRedirects);
-            Assert.Empty(oldRedirectsCachedViewModel.ReleaseRedirectsByPublicationSlug);
+            Assert.Empty(newRedirectsCachedViewModel.PublicationRedirects);
+            Assert.Empty(newRedirectsCachedViewModel.MethodologyRedirects);
+            Assert.Empty(newRedirectsCachedViewModel.ReleaseRedirectsByPublicationSlug);
         }
 
         [Fact]
@@ -927,7 +982,7 @@ public abstract class ReleasesControllerIntegrationTests(TestApplicationFactory 
         }
 
         [Fact]
-        public async Task ReleaseRedirectExistsForNewSlug()
+        public async Task ReleaseRedirectExistsForNewSlugForSameRelease()
         {
             Release release = DataFixture.DefaultRelease(publishedVersions: 1)
                 .WithYear(2020)
@@ -950,6 +1005,70 @@ public abstract class ReleasesControllerIntegrationTests(TestApplicationFactory 
             var error = Assert.Single(validationProblem.Errors);
 
             Assert.Equal(ReleaseSlugUsedByRedirect.ToString(), error.Code);
+        }
+
+        [Fact]
+        public async Task ReleaseRedirectExistsForNewSlugForDifferentReleaseInSamePublication()
+        {
+            Publication publication = DataFixture.DefaultPublication();
+
+            Release targetRelease = DataFixture.DefaultRelease(publishedVersions: 1)
+                .WithYear(2020)
+                .WithTimePeriodCoverage(TimeIdentifier.AcademicYear)
+                .WithLabel("initial")
+                .WithSlug("2020-21-initial")
+                .WithPublication(publication);
+
+            Release otherRelease = DataFixture.DefaultRelease(publishedVersions: 1)
+                .WithYear(2020)
+                .WithTimePeriodCoverage(TimeIdentifier.AcademicYear)
+                .WithLabel("intermediate")
+                .WithSlug("2020-21-intermediate")
+                .WithRedirects([DataFixture.DefaultReleaseRedirect()
+                    .WithSlug("2020-21-final")])
+                .WithPublication(publication);
+
+            await TestApp.AddTestData<ContentDbContext>(
+                context => context.Releases.AddRange(targetRelease, otherRelease));
+
+            var response = await UpdateRelease(
+                releaseId: targetRelease.Id,
+                label: "final");
+
+            var validationProblem = response.AssertValidationProblem();
+
+            var error = Assert.Single(validationProblem.Errors);
+
+            Assert.Equal(ReleaseSlugUsedByRedirect.ToString(), error.Code);
+        }
+
+        [Fact]
+        public async Task ReleaseRedirectExistsForNewSlugForReleaseInDifferentPublication()
+        {
+            Release targetRelease = DataFixture.DefaultRelease(publishedVersions: 1)
+                .WithYear(2020)
+                .WithTimePeriodCoverage(TimeIdentifier.AcademicYear)
+                .WithLabel("initial")
+                .WithSlug("2020-21-initial")
+                .WithPublication(DataFixture.DefaultPublication());
+
+            Release otherRelease = DataFixture.DefaultRelease(publishedVersions: 1)
+                .WithYear(2020)
+                .WithTimePeriodCoverage(TimeIdentifier.AcademicYear)
+                .WithLabel("intermediate")
+                .WithSlug("2020-21-intermediate")
+                .WithRedirects([DataFixture.DefaultReleaseRedirect()
+                    .WithSlug("2020-21-final")])
+                .WithPublication(DataFixture.DefaultPublication());
+
+            await TestApp.AddTestData<ContentDbContext>(
+                context => context.Releases.AddRange(targetRelease, otherRelease));
+
+            var response = await UpdateRelease(
+                releaseId: targetRelease.Id,
+                label: "final");
+
+            response.AssertOk();
         }
 
         [Fact]

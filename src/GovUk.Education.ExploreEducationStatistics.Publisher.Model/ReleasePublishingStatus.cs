@@ -134,6 +134,4 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Model
             return new ReleasePublishingKey(ReleaseVersionId, Id);
         }
     }
-
-    public record ReleasePublishingKey(Guid ReleaseVersionId, Guid ReleaseStatusId);
 }

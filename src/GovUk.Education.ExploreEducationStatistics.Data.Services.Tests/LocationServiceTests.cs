@@ -147,7 +147,6 @@ public class LocationServiceTests
         // Act
         var result = await _sut.GetLocationViewModels(
             locations,
-            null,
             hierarchies);
 
         // Assert
@@ -301,8 +300,8 @@ public class LocationServiceTests
         // Act
         var result = await _sut.GetLocationViewModels(
             locations,
-            boundaryLevelId: 123,
-            hierarchies);
+            hierarchies,
+            boundaryLevelId: 123);
 
         // Assert
         VerifyAllMocks(_boundaryDataRepository);

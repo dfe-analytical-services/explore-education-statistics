@@ -3,6 +3,7 @@ using System.Security.Claims;
 using System.Text.Encodings.Web;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Database;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
@@ -18,6 +19,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Moq;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests;
 
@@ -60,6 +62,7 @@ public class TestStartup : Startup
             .MockService<IPublisherTableStorageService>()
             .MockService<IPrivateBlobStorageService>()
             .MockService<IPublicBlobStorageService>()
+            .MockService<IAdminEventRaiser>(MockBehavior.Loose) // Ignore calls to publish events
             .RegisterControllers<Startup>();
 
         services

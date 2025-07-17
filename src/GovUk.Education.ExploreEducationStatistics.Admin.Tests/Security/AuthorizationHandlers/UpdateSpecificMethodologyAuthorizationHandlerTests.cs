@@ -91,7 +91,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                         .Setup(s => s.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id))
                         .ReturnsAsync(ListOf(publicationRole));
 
-                    var expectedToPassByRole = ListOf(PublicationRole.Owner, PublicationRole.Approver)
+                    var expectedToPassByRole = ListOf(PublicationRole.Owner, PublicationRole.Allower)
                         .Contains(publicationRole);
 
                     if (!expectedToPassByRole)
@@ -125,7 +125,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             public async Task EditorsOrApproversOnAnyOwningPublicationReleaseCanUpdateMethodology()
             {
                 var expectedReleaseRolesToPass =
-                    ListOf(ReleaseRole.Approver, ReleaseRole.Contributor, ReleaseRole.Lead);
+                    ListOf(ReleaseRole.Approver, ReleaseRole.Contributor);
 
                 await ForEachReleaseRoleAsync(async releaseRole =>
                 {

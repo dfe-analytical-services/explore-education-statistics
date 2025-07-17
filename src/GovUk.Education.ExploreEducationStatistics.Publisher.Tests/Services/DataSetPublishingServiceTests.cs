@@ -302,8 +302,10 @@ public class DataSetPublishingServiceTests(PublisherFunctionsIntegrationTestFixt
             Assert.Equal(amendmentReleaseDataFile.Id, publishedDataSet.LatestLiveVersion.Release.ReleaseFileId);
         }
 
-        [Fact]
-        public async Task ReleaseAmendmentPublishedWithNewDataSetVersion_CorrectReleaseFileIds()
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public async Task ReleaseAmendmentPublishedWithNewDataSetVersion_CorrectReleaseFileIds(bool amendmentResultedInPatchReplacement)
         {
             ReleaseVersion originalReleaseVersion = DataFixture
                 .DefaultReleaseVersion();
@@ -322,6 +324,14 @@ public class DataSetPublishingServiceTests(PublisherFunctionsIntegrationTestFixt
                 .ForIndex(0, s => s.SetReleaseVersion(originalReleaseVersion))
                 .ForIndex(1, s => s.SetReleaseVersion(amendmentReleaseVersion))
                 .GenerateTuple2();
+
+            if (amendmentResultedInPatchReplacement)
+            {
+                amendmentReleaseDataFile = DataFixture
+                    .DefaultReleaseFile()
+                    .WithFile(newDataFile)
+                    .WithReleaseVersion(amendmentReleaseVersion);
+            }
 
             ReleaseFile newReleaseDataFile = DataFixture
                 .DefaultReleaseFile()
@@ -344,9 +354,12 @@ public class DataSetPublishingServiceTests(PublisherFunctionsIntegrationTestFixt
                 .WithDataSetId(dataSet.Id)
                 .WithRelease(DataFixture.DefaultDataSetVersionRelease()
                     .WithReleaseFileId(newReleaseDataFile.Id))
-                .WithVersionNumber(major: 2, minor: 0)
+                .WithVersionNumber(
+                    major: amendmentResultedInPatchReplacement ? 1 : 2, 
+                    minor: 0, 
+                    patch: amendmentResultedInPatchReplacement ? 1 : 0)
                 .WithStatusDraft();
-
+            
             await AddTestData<ContentDbContext>(context =>
                 context.ReleaseFiles.AddRange(originalReleaseDataFile, amendmentReleaseDataFile, newReleaseDataFile));
 
@@ -400,8 +413,16 @@ public class DataSetPublishingServiceTests(PublisherFunctionsIntegrationTestFixt
             Assert.Equal(DataSetVersionStatus.Published, savedDataSetVersion1.Status);
             Assert.Equal(dataSetVersion1.Published.TruncateNanoseconds(), savedDataSetVersion1.Published);
 
-            // The ReleaseFileId should be updated to reference the amendment's ReleaseFile
-            Assert.Equal(amendmentReleaseDataFile.Id, savedDataSetVersion1.Release.ReleaseFileId);
+            if (amendmentResultedInPatchReplacement)
+            {
+                // The ReleaseFileId shouldn't get overwritten with a new release file after a patch replacement. 
+                Assert.Equal(originalReleaseDataFile.Id, savedDataSetVersion1.Release.ReleaseFileId);
+            }
+            else
+            {
+                // The ReleaseFileId should be updated to reference the amendment's ReleaseFile
+                Assert.Equal(amendmentReleaseDataFile.Id, savedDataSetVersion1.Release.ReleaseFileId);
+            }
         }
     }
 }

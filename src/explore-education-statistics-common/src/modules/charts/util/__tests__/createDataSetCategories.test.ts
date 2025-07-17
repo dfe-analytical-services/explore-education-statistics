@@ -1844,24 +1844,6 @@ describe('createDataSetCategories', () => {
       expect(dataSetCategories[0].filter.value).toBe('barnet');
       expect(dataSetCategories[1].filter.value).toBe('barnsley');
     });
-
-    test('reversed when `sortAsc` = false', () => {
-      const axisConfiguration: AxisConfiguration = {
-        ...testOrderedAxisConfiguration,
-        groupBy: 'filters',
-        sortAsc: false,
-      };
-      const fullTable = mapFullTable(testTable);
-      const dataSetCategories = createDataSetCategories({
-        axisConfiguration,
-        data: fullTable.results,
-        meta: fullTable.subjectMeta,
-      });
-
-      expect(dataSetCategories).toHaveLength(2);
-      expect(dataSetCategories[0].filter.label).toBe('State-funded primary');
-      expect(dataSetCategories[1].filter.label).toBe('Ethnicity Major Chinese');
-    });
   });
 
   describe('ordering for older charts with no `order` property', () => {
@@ -2007,25 +1989,6 @@ describe('createDataSetCategories', () => {
       expect(dataSetCategories).toHaveLength(2);
       expect(dataSetCategories[0].filter.label).toBe('2014/15');
       expect(dataSetCategories[1].filter.label).toBe('2015/16');
-    });
-
-    test('reversed when `sortAsc` = false', () => {
-      const axisConfiguration: AxisConfiguration = {
-        ...testUnorderedAxisConfiguration,
-        groupBy: 'filters',
-        sortAsc: false,
-      };
-
-      const fullTable = mapFullTable(testTable);
-      const dataSetCategories = createDataSetCategories({
-        axisConfiguration,
-        data: fullTable.results,
-        meta: fullTable.subjectMeta,
-      });
-
-      expect(dataSetCategories).toHaveLength(2);
-      expect(dataSetCategories[0].filter.label).toBe('State-funded primary');
-      expect(dataSetCategories[1].filter.label).toBe('Ethnicity Major Chinese');
     });
   });
 });

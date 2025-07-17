@@ -2,5 +2,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services.In
 
 public interface IAnalyticsPathResolver
 {
+    string PublicApiTopLevelCallsDirectoryPath();
+    
+    string PublicApiPublicationCallsDirectoryPath();
+    
+    string PublicApiDataSetCallsDirectoryPath();
+    
+    string PublicApiDataSetVersionCallsDirectoryPath();
+
     string PublicApiQueriesDirectoryPath();
 }

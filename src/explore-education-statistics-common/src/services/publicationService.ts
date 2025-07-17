@@ -9,6 +9,7 @@ import {
   MethodologySummary,
   ExternalMethodology,
 } from '@common/services/types/methodology';
+import { Organisation } from '@common/services/types/organisation';
 import { PaginatedList } from '@common/services/types/pagination';
 import { SortDirection } from '@common/services/types/sort';
 import { PartialDate } from '@common/utils/date/partialDate';
@@ -20,6 +21,7 @@ export interface Publication {
   id: string;
   slug: string;
   title: string;
+  summary?: string;
   releaseSeries: ReleaseSeriesItem[];
   theme: {
     id: string;
@@ -52,11 +54,14 @@ export interface PublicationSummary {
 
 export interface PublicationListSummary {
   id: string;
-  published: Date;
+  published: Date | string;
   rank: number;
   slug: string;
   latestReleaseSlug: string;
   summary?: string;
+  highlightContent?: string | null;
+  highlightSummary?: string | null;
+  highlightTitle?: string | null;
   theme: string;
   title: string;
   type: ReleaseType;
@@ -155,6 +160,7 @@ export interface ReleaseVersion<
   headlinesSection: ContentSection<ContentBlockType>;
   relatedDashboardsSection?: ContentSection<ContentBlockType>; // optional because older releases may not have this section
   publication: Publication;
+  publishingOrganisations?: Organisation[];
   latestRelease: boolean;
   nextReleaseDate?: PartialDate;
   relatedInformation: BasicLink[];

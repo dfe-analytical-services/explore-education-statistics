@@ -1,6 +1,8 @@
 using System;
 using System.IO;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Analytics.Common;
+using GovUk.Education.ExploreEducationStatistics.Analytics.Common.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
@@ -10,6 +12,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Security;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
+using Microsoft.Extensions.Logging;
 using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
@@ -38,7 +41,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
         public async Task StreamFile()
         {
             await PolicyCheckBuilder<ContentSecurityPolicies>()
-                .SetupResourceCheckToFail(ReleaseFile.ReleaseVersion, ContentSecurityPolicies.CanViewSpecificRelease)
+                .SetupResourceCheckToFail(ReleaseFile.ReleaseVersion, ContentSecurityPolicies.CanViewSpecificReleaseVersion)
                 .AssertForbidden(
                     userService =>
                     {
@@ -64,7 +67,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
             await PolicyCheckBuilder<ContentSecurityPolicies>()
                 .SetupResourceCheckToFailWithMatcher<ReleaseVersion>(rv => rv.Id == releaseVersion.Id,
-                    ContentSecurityPolicies.CanViewSpecificRelease)
+                    ContentSecurityPolicies.CanViewSpecificReleaseVersion)
                 .AssertForbidden(
                     async userService =>
                     {
@@ -79,6 +82,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                         return await service.ZipFilesToStream(
                             releaseVersionId: releaseVersion.Id,
                             outputStream: Stream.Null,
+                            fromPage: AnalyticsFromPage.DataCatalogue,
                             fileIds: [Guid.NewGuid()]
                         );
                     }
@@ -90,14 +94,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             IPersistenceHelper<ContentDbContext>? persistenceHelper = null,
             IPublicBlobStorageService? publicBlobStorageService = null,
             IDataGuidanceFileWriter? dataGuidanceFileWriter = null,
-            IUserService? userService = null)
+            IUserService? userService = null,
+            IAnalyticsManager? analyticsManager = null,
+            ILogger<ReleaseFileService>? logger = null)
         {
             return new(
                 contentDbContext ?? Mock.Of<ContentDbContext>(),
                 persistenceHelper ?? DefaultPersistenceHelperMock().Object,
                 publicBlobStorageService ?? Mock.Of<IPublicBlobStorageService>(),
                 dataGuidanceFileWriter ?? Mock.Of<IDataGuidanceFileWriter>(),
-                userService ?? Mock.Of<IUserService>()
+                userService ?? Mock.Of<IUserService>(),
+                analyticsManager ?? Mock.Of<IAnalyticsManager>(),
+                logger ?? Mock.Of<ILogger<ReleaseFileService>>()
             );
         }
 

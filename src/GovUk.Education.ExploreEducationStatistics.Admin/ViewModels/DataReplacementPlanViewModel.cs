@@ -14,13 +14,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
     {
         public IEnumerable<DataBlockReplacementPlanViewModel> DataBlocks { get; init; } = [];
         public IEnumerable<FootnoteReplacementPlanViewModel> Footnotes { get; init; } = [];
-        public DeleteApiDataSetVersionPlanViewModel? DeleteApiDataSetVersionPlan { get; init; }
+        public ReplaceApiDataSetVersionPlanViewModel? ApiDataSetVersionPlan { get; init; }
         public Guid OriginalSubjectId { get; init; }
         public Guid ReplacementSubjectId { get; init; }
 
         public bool Valid => DataBlocks.All(info => info.Valid)
                              && Footnotes.All(info => info.Valid)
-                             && (DeleteApiDataSetVersionPlan?.Valid ?? true);
+                             && (ApiDataSetVersionPlan?.Valid ?? true);
 
         /**
          * Trimmed down version of the data replacement plan that
@@ -32,7 +32,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
             {
                 DataBlocks = DataBlocks.Select(block => block.ToSummary()),
                 Footnotes = Footnotes.Select(footnote => footnote.ToSummary()),
-                DeleteApiDataSetVersionPlan = DeleteApiDataSetVersionPlan,
+                ApiDataSetVersionPlan = ApiDataSetVersionPlan,
                 OriginalSubjectId = OriginalSubjectId,
                 ReplacementSubjectId = ReplacementSubjectId
             };
@@ -172,6 +172,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
     public class FilterReplacementViewModel
     {
         public Guid Id { get; }
+        public Guid? Target { get; }
         public string Label { get; }
         public string Name { get; }
         public Dictionary<Guid, FilterGroupReplacementViewModel> Groups { get; }
@@ -185,11 +186,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
 
         public FilterReplacementViewModel(
             Guid id,
+            Guid? target,
             string label,
             string name,
             Dictionary<Guid, FilterGroupReplacementViewModel> groups)
         {
             Id = id;
+            Target = target;
             Label = label;
             Name = name;
             Groups = groups;

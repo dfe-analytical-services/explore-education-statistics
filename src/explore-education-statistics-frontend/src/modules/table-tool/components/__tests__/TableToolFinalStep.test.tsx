@@ -32,6 +32,7 @@ describe('TableToolFinalStep', () => {
         tableHeaders={testTableHeaders}
         selectedPublication={testSelectedPublicationWithLatestRelease}
         onReorderTableHeaders={noop}
+        subjectId=""
       />,
     );
 
@@ -109,6 +110,7 @@ describe('TableToolFinalStep', () => {
         tableHeaders={testTableHeaders}
         selectedPublication={testSelectedPublicationWithLatestRelease}
         onReorderTableHeaders={noop}
+        subjectId=""
       />,
     );
 
@@ -142,16 +144,17 @@ describe('TableToolFinalStep', () => {
         tableHeaders={testTableHeaders}
         selectedPublication={testSelectedPublicationWithNonLatestRelease}
         onReorderTableHeaders={noop}
+        subjectId=""
       />,
     );
 
     expect(
       screen.getByRole('link', {
-        name: 'Test publication, Selected Release Title',
+        name: 'Test publication, Latest Release Title',
       }),
     ).toHaveAttribute(
       'href',
-      '/find-statistics/test-publication/selected-release-slug',
+      '/find-statistics/test-publication/latest-release-slug',
     );
   });
 
@@ -166,6 +169,7 @@ describe('TableToolFinalStep', () => {
         tableHeaders={testTableHeaders}
         selectedPublication={testSelectedPublicationWithLatestRelease}
         onReorderTableHeaders={noop}
+        subjectId=""
       />,
     );
 
@@ -190,6 +194,7 @@ describe('TableToolFinalStep', () => {
         tableHeaders={testTableHeaders}
         selectedPublication={testSelectedPublicationWithLatestRelease}
         onReorderTableHeaders={noop}
+        subjectId=""
       />,
     );
 
@@ -213,6 +218,7 @@ describe('TableToolFinalStep', () => {
         tableHeaders={testTableHeaders}
         selectedPublication={testSelectedPublicationWithNonLatestRelease}
         onReorderTableHeaders={noop}
+        subjectId=""
       />,
     );
 
@@ -229,16 +235,16 @@ describe('TableToolFinalStep', () => {
       }),
     ).toHaveAttribute(
       'href',
-      '/find-statistics/test-publication/selected-release-slug',
+      '/find-statistics/test-publication/latest-release-slug',
     );
 
     expect(
       screen.getByRole('link', {
-        name: 'Test publication, Selected Release Title',
+        name: 'Test publication, Latest Release Title',
       }),
     ).toHaveAttribute(
       'href',
-      '/find-statistics/test-publication/selected-release-slug',
+      '/find-statistics/test-publication/latest-release-slug',
     );
   });
 
@@ -262,6 +268,7 @@ describe('TableToolFinalStep', () => {
         tableHeaders={testTableHeaders}
         selectedPublication={testSelectedPublicationWithLatestRelease}
         onReorderTableHeaders={noop}
+        subjectId=""
       />,
     );
 
@@ -304,6 +311,7 @@ describe('TableToolFinalStep', () => {
         tableHeaders={testTableHeaders}
         selectedPublication={testSelectedPublicationWithLatestRelease}
         onReorderTableHeaders={noop}
+        subjectId=""
       />,
     );
 
@@ -327,6 +335,7 @@ describe('TableToolFinalStep', () => {
         tableHeaders={testTableHeaders}
         selectedPublication={testSelectedPublicationWithLatestRelease}
         onReorderTableHeaders={noop}
+        subjectId=""
       />,
     );
 
@@ -364,6 +373,7 @@ describe('TableToolFinalStep', () => {
         tableHeaders={testTableHeaders}
         selectedPublication={testSelectedPublicationWithLatestRelease}
         onReorderTableHeaders={noop}
+        subjectId=""
       />,
     );
 

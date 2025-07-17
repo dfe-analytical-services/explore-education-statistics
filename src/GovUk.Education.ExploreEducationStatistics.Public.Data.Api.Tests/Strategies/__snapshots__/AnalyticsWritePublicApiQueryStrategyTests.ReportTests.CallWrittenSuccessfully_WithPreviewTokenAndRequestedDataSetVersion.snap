@@ -1,0 +1,165 @@
+﻿{
+  "dataSetId": "acb97c97-89c9-4b74-88e7-39c27f6bab63",
+  "dataSetTitle": "Data Set Title",
+  "dataSetVersion": "2.3.1",
+  "dataSetVersionId": "0da7c640-80a8-44e2-8028-fc529bcedcb1",
+  "endTime": "2025-02-20T12:00:10.234Z",
+  "previewToken": {
+    "created": "2025-02-23T11:02:44.850Z",
+    "dataSetVersionId": "01d29401-7974-1276-a06b-b28a6a5385c6",
+    "expiry": "2025-02-24T11:02:44.850Z",
+    "label": "Preview token content"
+  },
+  "query": {
+    "criteria": {
+      "and": [
+        {
+          "and": [
+            {
+              "filters": {
+                "eq": "Filter3"
+              }
+            },
+            {
+              "filters": {
+                "in": [
+                  "Filter1",
+                  "Filter2"
+                ]
+              }
+            },
+            {
+              "filters": {
+                "notEq": "Filter5"
+              }
+            },
+            {
+              "filters": {
+                "notIn": [
+                  "Filter4"
+                ]
+              }
+            },
+            {
+              "not": {
+                "or": [
+                  {
+                    "locations": {
+                      "notIn": [
+                        {
+                          "id": "Location1",
+                          "level": "Level"
+                        },
+                        {
+                          "level": "Level",
+                          "ukprn": "Location4"
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "locations": {
+                      "notIn": [
+                        {
+                          "id": "Location3",
+                          "level": "Level"
+                        },
+                        {
+                          "level": "Level",
+                          "ukprn": "Location2"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "or": [
+                {
+                  "timePeriods": {
+                    "in": [
+                      {
+                        "code": "Code",
+                        "period": "Period1"
+                      },
+                      {
+                        "code": "Code",
+                        "period": "Period2"
+                      }
+                    ]
+                  }
+                },
+                {
+                  "timePeriods": {
+                    "notIn": [
+                      {
+                        "code": "Code",
+                        "period": "Period3"
+                      },
+                      {
+                        "code": "Code",
+                        "period": "Period4"
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "and": [
+            {
+              "filters": {
+                "eq": "Filter9"
+              }
+            },
+            {
+              "filters": {
+                "in": [
+                  "Filter7",
+                  "Filter8"
+                ]
+              }
+            },
+            {
+              "filters": {
+                "notEq": "Filter10"
+              }
+            },
+            {
+              "filters": {
+                "notIn": [
+                  "Filter6"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    "debug": true,
+    "indicators": [
+      "Indicator1",
+      "Indicator2",
+      "Indicator3"
+    ],
+    "page": 3,
+    "pageSize": 300,
+    "sorts": [
+      {
+        "direction": "ASC",
+        "field": "Field2"
+      },
+      {
+        "direction": "ASC",
+        "field": "Field1"
+      }
+    ]
+  },
+  "requestedDataSetVersion": "1.*",
+  "resultsCount": 55,
+  "startTime": "2025-02-20T12:00:00.000Z",
+  "totalRowsCount": 5100
+}

@@ -29,6 +29,12 @@
     "slackAlertsChannel": {
       "value": "C0681S50SP5"
     },
+    "stageScheduledReleasesFunctionCronSchedule": {
+      "value": "0 5 0 * * *"
+    },
+    "publishScheduledReleasesFunctionCronSchedule": {
+      "value": "0 30 9 * * *"
+    },
     "useSubnets": {
       "value": true
     },
@@ -87,10 +93,16 @@
       "value": 1073741824
     },
     "maxStatsDbSizeBytes": {
-      "value": 268435456000
+      "value": 375809638400
     },
     "immediatePublicationOfScheduledReleaseVersionsEnabled": {
       "value": true
+    },
+    "notifierSuppressExceptionsForTeamOnlyApiKeyErrors": {
+      "value": true
+    },
+    "enableReplacementOfPublicApiDataSets" : {
+      "value": false
     }
   }
 }

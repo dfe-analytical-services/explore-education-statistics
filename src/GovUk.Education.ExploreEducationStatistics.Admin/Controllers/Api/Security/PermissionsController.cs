@@ -120,7 +120,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Secur
         [HttpGet("permissions/release/{releaseVersionId:guid}/amend")]
         public Task<ActionResult<bool>> CanMakeAmendmentOfRelease(Guid releaseVersionId)
         {
-            return CheckPolicyAgainstEntity<ReleaseVersion>(releaseVersionId, _userService.CheckCanMakeAmendmentOfRelease);
+            return CheckPolicyAgainstEntity<ReleaseVersion>(releaseVersionId, _userService.CheckCanMakeAmendmentOfReleaseVersion);
         }
 
         [HttpGet("permissions/release/{releaseVersionId:guid}/prerelease/status")]
@@ -189,7 +189,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Secur
         private async Task<bool> IsPublicationApprover()
         {
             return (await _publicationRoleRepository.GetDistinctRolesByUser(_userService.GetUserId()))
-                .Contains(PublicationRole.Approver);
+                .Contains(PublicationRole.Allower);
         }
     }
 }

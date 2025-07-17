@@ -25,6 +25,7 @@ export interface ContentHtmlProps {
   testId?: string;
   trackGlossaryLinks?: (glossaryEntrySlug: string) => void;
   transformFeaturedTableLinks?: (url: string, text: string) => void;
+  wrapperElement?: keyof JSX.IntrinsicElements;
 }
 
 export default function ContentHtml({
@@ -36,6 +37,7 @@ export default function ContentHtml({
   testId,
   trackGlossaryLinks,
   transformFeaturedTableLinks,
+  wrapperElement: Wrapper = 'div',
 }: ContentHtmlProps) {
   const { isMounted } = useMounted();
 
@@ -104,9 +106,12 @@ export default function ContentHtml({
   });
 
   return (
-    <div className={classNames('dfe-content', className)} data-testid={testId}>
+    <Wrapper
+      className={classNames('dfe-content', className)}
+      data-testid={testId}
+    >
       {parsedContent}
-    </div>
+    </Wrapper>
   );
 }
 

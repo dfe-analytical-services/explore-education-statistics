@@ -12,7 +12,7 @@ Force Tags          Admin    Local    Dev    AltersData
 
 
 *** Variables ***
-${PUBLICATION_NAME}=                    UI tests - publish data %{RUN_IDENTIFIER}
+${PUBLICATION_NAME}=                    Publish data %{RUN_IDENTIFIER}
 ${RELEASE_1_NAME}=                      Financial year 3000-01
 ${RELEASE_2_NAME}=                      Financial year 3001-02 provisional
 ${SUBJECT_1_NAME}=                      UI test subject 1
@@ -57,7 +57,6 @@ Add public prerelease access list
     ...    Test public access list
 
 Go to "Sign off" page and approve release
-    user clicks link    Sign off
     user approves original release for immediate publication
 
 Create another release for the same publication
@@ -511,8 +510,7 @@ Add text block with link to a featured table to accordion section
     user clicks element    id:featuredTablesSearch-option-0
     user clicks button    Insert    ${modal}
     user waits until modal is not visible    Insert featured table link
-    user clicks button    Save & close    ${block}
-    sleep    0.5
+    user saves autosaving text block    ${block}
     user waits until element contains link    ${block}    Test highlight name 2
 
 Add public prerelease access list again
@@ -520,20 +518,21 @@ Add public prerelease access list again
     user creates public prerelease access list    Test public access list
 
 Approve release
-    user clicks link    Sign off
     user approves original release for immediate publication
 
-Verify newly published release is on Find Statistics page
-    user waits for caches to expire
+Get public release link
+    ${PUBLIC_RELEASE_LINK}=    user gets url public release will be accessible at
+    Set Suite Variable    ${PUBLIC_RELEASE_LINK}
 
+Verify newly published release is on Find Statistics page
+    # TODO EES-6063 - Remove this
+    user waits for caches to expire
     user checks publication is on find statistics page    ${PUBLICATION_NAME}
 
-Navigate to published release page
-    user clicks link    ${PUBLICATION_NAME}
-    user waits until h1 is visible    ${PUBLICATION_NAME}    %{WAIT_MEDIUM}
+Verify newly published release is public
+    user navigates to public release page    ${PUBLIC_RELEASE_LINK}    ${PUBLICATION_NAME}    ${RELEASE_2_NAME}
 
 Check latest release is correct
-    user waits until page contains title caption    ${RELEASE_2_NAME}    %{WAIT_MEDIUM}
     user checks page contains    This is the latest data
     user checks page contains    View releases (1)
 
@@ -598,25 +597,25 @@ Select indicators and filters in table tool
 
 Validate table
     user waits until results table appears    %{WAIT_LONG}
-    user checks table column heading contains    1    1    2014
-    user checks table column heading contains    1    2    2015
+    user checks table column heading contains    1    1    2018
+    user checks table column heading contains    1    2    2017
     user checks table column heading contains    1    3    2016
-    user checks table column heading contains    1    4    2017
-    user checks table column heading contains    1    5    2018
+    user checks table column heading contains    1    4    2015
+    user checks table column heading contains    1    5    2014
 
     ${row}=    user gets row number with heading    Barnsley
-    user checks table cell in offset row contains    ${row}    0    1    9,854
-    user checks table cell in offset row contains    ${row}    0    2    1,134
+    user checks table cell in offset row contains    ${row}    0    1    8,123
+    user checks table cell in offset row contains    ${row}    0    2    5,032
     user checks table cell in offset row contains    ${row}    0    3    7,419
-    user checks table cell in offset row contains    ${row}    0    4    5,032
-    user checks table cell in offset row contains    ${row}    0    5    8,123
+    user checks table cell in offset row contains    ${row}    0    4    1,134
+    user checks table cell in offset row contains    ${row}    0    5    9,854
 
     ${row}=    user gets row number with heading    Birmingham
-    user checks table cell in offset row contains    ${row}    0    1    3,708
-    user checks table cell in offset row contains    ${row}    0    2    9,303
+    user checks table cell in offset row contains    ${row}    0    1    3,962
+    user checks table cell in offset row contains    ${row}    0    2    8,530
     user checks table cell in offset row contains    ${row}    0    3    8,856
-    user checks table cell in offset row contains    ${row}    0    4    8,530
-    user checks table cell in offset row contains    ${row}    0    5    3,962
+    user checks table cell in offset row contains    ${row}    0    4    9,303
+    user checks table cell in offset row contains    ${row}    0    5    3,708
 
 Validate table has footnotes
     user checks list has x items    testid:footnotes    2
@@ -654,11 +653,11 @@ Select featured table from subjects step
     ...    xpath://*[@data-testid="dataTableCaption" and text()="Admission Numbers for '${SUBJECT_2_NAME}' for Not specified in Bolton 001, Bolton 004, Nailsea Youngwood and Syon between 2005 and 2017"]
 
 Validate table column headings for featured table
-    user checks table column heading contains    1    1    Admission Numbers
+    user checks table column heading contains    1    1    Not specified
 
 Validate table rows for featured table
     ${row}=    user gets row number with heading    Bolton 001
-    user checks table heading in offset row contains    ${row}    0    2    2009
+    user checks table heading in offset row contains    ${row}    0    3    2009
     user checks table heading in offset row contains    ${row}    1    1    2010
     user checks table heading in offset row contains    ${row}    2    1    2017
 
@@ -669,6 +668,7 @@ Validate table rows for featured table
     ${row}=    user gets row number with heading    Bolton 004
     user checks table heading in offset row contains    ${row}    0    2    2005
     user checks table heading in offset row contains    ${row}    1    1    2017
+
     user checks table cell in offset row contains    ${row}    0    1    8,557
     user checks table cell in offset row contains    ${row}    1    1    3,481
 

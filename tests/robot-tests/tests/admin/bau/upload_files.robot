@@ -1,6 +1,7 @@
 *** Settings ***
 Library             Collections
 Library             ../../libs/admin_api.py
+Library             ../../libs/dates_and_times.py
 Resource            ../../libs/admin-common.robot
 
 Suite Setup         user signs in as bau1
@@ -11,7 +12,7 @@ Force Tags          Admin    Local    Dev    AltersData
 
 
 *** Variables ***
-${PUBLICATION_NAME}=    UI tests - upload files %{RUN_IDENTIFIER}
+${PUBLICATION_NAME}=    Upload files %{RUN_IDENTIFIER}
 
 
 *** Test Cases ***
@@ -26,18 +27,50 @@ Navigate to 'Data and files' page
     user clicks link    Data and files
     user waits until h1 is visible    ${PUBLICATION_NAME}
 
-Upload a ZIP file file
+Upload a ZIP file
     [Documentation]    EES-1397
     user enters text into element    id:dataFileUploadForm-title    Absence in PRUs
     user clicks radio    ZIP file
     user waits until page contains element    id:dataFileUploadForm-zipFile
     user chooses file    id:dataFileUploadForm-zipFile    ${FILES_DIR}upload-zip-test.zip
     user clicks button    Upload data files
-
-    user waits until h2 is visible    Uploaded data files
     user waits until page contains data uploads table
+    user checks table cell contains    1    1    Absence in PRUs    testid:Data files table
+    user checks table cell contains    1    2    141 Kb    testid:Data files table
+    user waits until table cell contains    1    3    Pending import    testid:Data files table
+    user checks table cell contains    1    4    View details    testid:Data files table
+    user checks table cell contains    1    4    Delete files    testid:Data files table
 
-    # To ensure "Data file size" and "Number of rows" will be filled
+Check the screening results
+    user clicks button in table cell    1    4    View details    testid:Data files table
+
+    user waits until modal is visible    Data set details
+    User waits until h3 is visible    Full breakdown of 3 tests checked against this file
+
+    user checks screener results in modal    1    check_filename_spaces
+    ...    'absence_in_prus.csv' does not have spaces in the filename.    Pass
+    user checks screener results in modal    2    check_filename_spaces
+    ...    'absence_in_prus.meta.csv' does not have spaces in the filename.    Pass
+    user checks screener results in modal    3    check_empty_cols
+    ...    'absence_in_prus.csv' does not have any blank columns.    Pass
+
+Check the file details in the modal
+    user clicks element    id:file-details-tab
+    user waits until h3 is not visible    Full breakdown of 3 tests checked against this file
+    user waits until h3 is visible    File details
+    user checks summary list contains    Title    Absence in PRUs    testid:Data file details
+    user checks summary list contains    Data file    absence_in_prus.csv    testid:Data file details
+    user checks summary list contains    Meta file    absence_in_prus.meta.csv    testid:Data file details
+    user checks summary list contains    Size    141 Kb    testid:Data file details
+    user checks summary list contains    Status    Pending import    testid:Data file details
+    user checks summary list contains    Uploaded by    ees-test.bau1@education.gov.uk    testid:Data file details
+    ${date}=    get london date
+    user checks summary list contains    Date uploaded    ${date}    testid:Data file details
+
+Continue the import
+    user clicks button    Continue import
+    user waits until modal is not visible    Data file details
+
     user waits until page does not contain    Queued    %{WAIT_MEDIUM}
     user checks table cell contains    1    1    Absence in PRUs    testid:Data files table
     user checks table cell contains    1    2    141 Kb    testid:Data files table
@@ -46,17 +79,6 @@ Upload a ZIP file file
     user checks table cell contains    1    4    Edit title    testid:Data files table
     user checks table cell contains    1    4    Replace data    testid:Data files table
     user checks table cell contains    1    4    Delete files    testid:Data files table
-
-    user clicks button in table cell    1    4    View details    testid:Data files table
-    user waits until h2 is visible    Data file details
-
-    user checks summary list contains    Title    Absence in PRUs    testid:Data file details
-    user checks summary list contains    Data file    absence_in_prus.csv    testid:Data file details
-    user checks summary list contains    Meta file    absence_in_prus.meta.csv    testid:Data file details
-    user checks summary list contains    Size    141 Kb    testid:Data file details
-    user checks summary list contains    Number of rows    612    testid:Data file details
-    user checks summary list contains    Status    Complete    testid:Data file details
-    user clicks button    Close
 
 Change data file title
     user clicks link    Edit title
@@ -193,3 +215,15 @@ Delete ancillary file
     user waits until page does not contain accordion section    Test 2 updated
     user waits until page contains accordion section    Test 1
     user checks there are x accordion sections    1    id:file-uploads
+
+
+*** Keywords ***
+user checks screener results in modal
+    [Arguments]
+    ...    ${row}
+    ...    ${screener_code}
+    ...    ${screener_message}
+    ...    ${screener_result}
+    user waits until modal table cell contains    ${row}    1    ${screener_code}
+    user waits until modal table cell contains    ${row}    1    ${screener_message}
+    user waits until modal table cell contains    ${row}    2    ${screener_result}

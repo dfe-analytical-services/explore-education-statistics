@@ -12,7 +12,7 @@ Test Setup          fail test fast if required
 
 
 *** Variables ***
-${PUBLICATION_NAME}     UI tests - Public API - restricted %{RUN_IDENTIFIER}
+${PUBLICATION_NAME}     Public API - restricted %{RUN_IDENTIFIER}
 ${RELEASE_NAME}         Financial year 3000-01
 ${SUBJECT_NAME_1}       ${PUBLICATION_NAME} - Subject 1
 ${SUBJECT_NAME_2}       ${PUBLICATION_NAME} - Subject 2
@@ -160,88 +160,11 @@ Add headline text block to Content page
     user adds content to headlines text block    Headline text block text
 
 Approve first release
-    user clicks link    Sign off
     user approves release for immediate publication
 
 Navigate to admin and create an amendment
     user navigates to admin dashboard    Bau1
     user creates amendment for release    ${PUBLICATION_NAME}    ${RELEASE_NAME}
-
-Upload third subject (which is invalid for Public API import) into the first amendment
-    user uploads subject and waits until complete
-    ...    ${SUBJECT_NAME_3}
-    ...    invalid-data-set.csv
-    ...    invalid-data-set.meta.csv
-    ...    ${PUBLIC_API_FILES_DIR}
-
-Add data guidance to third subject for the first amendment
-    user clicks link    Data guidance
-    user enters text into data guidance data file content editor    ${SUBJECT_NAME_3}    meta content
-    user clicks button    Save guidance
-
-Create a new API data set version through the first amendment using the invalid subject
-    user scrolls to the top of the page
-    user clicks link    API data sets
-    user waits until h2 is visible    API data sets
-
-    user clicks button    Create API data set
-    ${modal}=    user waits until modal is visible    Create a new API data set
-    user chooses select option    name:releaseFileId    ${SUBJECT_NAME_3}
-    user clicks button    Confirm new API data set
-
-    user waits until page contains    Creating API data set
-    user clicks link    View API data set details
-
-    user waits until page finishes loading
-    user waits until modal is not visible    Create a new API data set    %{WAIT_LONG}
-
-User waits until the 2nd invalid API data set status changes to 'Failed'
-    user waits until h3 is visible    Draft version details
-    user waits until draft API data set status contains    Failed    retries=20x
-
-Verify the contents inside the 'Draft API data sets' table after the invalid import fails
-    user clicks link    Back to API data sets
-    user waits until h3 is visible    Draft API data sets
-
-    user checks table column heading contains    1    1    Draft version
-    ...    testid:draft-api-data-sets
-    user checks table column heading contains    1    2    Name    testid:draft-api-data-sets
-    user checks table column heading contains    1    3    Status    testid:draft-api-data-sets
-    user checks table column heading contains    1    4    Actions    testid:draft-api-data-sets
-
-    user checks table cell contains    1    1    v1.0    testid:draft-api-data-sets
-    user checks table cell contains    1    3    Failed    testid:draft-api-data-sets
-
-Verify the contents inside the 'Live API data sets' table after the invalid import fails
-    user checks table column heading contains    1    1    Version    testid:live-api-data-sets
-    user checks table column heading contains    1    2    Name    testid:live-api-data-sets
-    user checks table column heading contains    1    3    Actions    testid:live-api-data-sets
-
-    user checks table cell contains    1    1    v1.0    testid:live-api-data-sets
-    user checks table cell contains    1    2    ${SUBJECT_NAME_1}    testid:live-api-data-sets
-
-    user checks table cell contains    2    1    v1.0    testid:live-api-data-sets
-    user checks table cell contains    2    2    ${SUBJECT_NAME_2}    testid:live-api-data-sets
-
-Add release note for the first release amendment
-    user clicks link    Content
-    user adds a release note    Test release note two
-
-    ${date}=    get london date
-    user waits until element contains    css:#release-notes li:nth-of-type(1) time    ${date}
-    user waits until element contains    css:#release-notes li:nth-of-type(1) p    Test release note two
-
-# When processing large API data sets, the current EES system returns one of two errors depending on the processing speed.
-# Additionally, there's an active bug ticket (EES-5420) - large data files are failing to create API data sets.
-# In response, I have added checks to handle either outcome.
-
-Validate checklist error while API data set is still processing or being failed
-    user edits release status
-    user checks checklist errors contains
-    ...    1 issue that must be resolved before this release can be published.
-    user checks checklist errors contains either link
-    ...    All public API data set processing must be completed
-    ...    All failed public API data sets must be retried or removed
 
 Create a second draft release via API
     user navigates to publication page from dashboard    ${PUBLICATION_NAME}

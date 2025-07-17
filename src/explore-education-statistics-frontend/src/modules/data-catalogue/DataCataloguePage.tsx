@@ -26,7 +26,6 @@ import { useMobileMedia } from '@common/hooks/useMedia';
 import useToggle from '@common/hooks/useToggle';
 import { releaseTypes } from '@common/services/types/releaseType';
 import { SortDirection } from '@common/services/types/sort';
-import ButtonLink from '@frontend/components/ButtonLink';
 import FilterResetButton from '@frontend/components/FilterResetButton';
 import FiltersDesktop from '@frontend/components/FiltersDesktop';
 import FiltersMobile from '@frontend/components/FiltersMobile';
@@ -49,13 +48,14 @@ import { logEvent } from '@frontend/services/googleAnalyticsService';
 import compact from 'lodash/compact';
 import isEqual from 'lodash/isEqual';
 import omit from 'lodash/omit';
-import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { ParsedUrlQuery } from 'querystring';
 import {
   GeographicLevelCode,
   geographicLevelCodesMap,
 } from '@common/utils/locationLevelsMap';
+import downloadService from '@frontend/services/downloadService';
+import Button from '@common/components/Button';
 
 const defaultPageTitle = 'Data catalogue';
 
@@ -290,13 +290,6 @@ const DataCataloguePage: NextPage<Props> = ({ showTypeFilter }) => {
       includeDefaultMetaTitle={pageTitle === defaultPageTitle}
       metaTitle={pageTitle}
     >
-      <Head>
-        <link
-          rel="canonical"
-          href={`${process.env.PUBLIC_URL}data-catalogue`}
-          key="canonical"
-        />
-      </Head>
       <div className="govuk-grid-row">
         <div className="govuk-grid-column-two-thirds">
           <p className="govuk-body-l">
@@ -551,10 +544,14 @@ const DataCataloguePage: NextPage<Props> = ({ showTypeFilter }) => {
 
                               {!searchTerm && (
                                 <p>
-                                  <ButtonLink
+                                  <Button
                                     className="govuk-!-margin-bottom-2"
-                                    to={`${process.env.CONTENT_API_BASE_URL}/releases/${selectedRelease.id}/files`}
-                                    onClick={() => {
+                                    onClick={async () => {
+                                      await downloadService.downloadZip(
+                                        selectedRelease.id,
+                                        'DataCatalogue',
+                                      );
+
                                       logEvent({
                                         category: 'Data catalogue',
                                         action: 'Data set file download - all',
@@ -567,7 +564,7 @@ const DataCataloguePage: NextPage<Props> = ({ showTypeFilter }) => {
                                         ? '1 data set'
                                         : `all ${totalResults} data sets`
                                     } (ZIP)`}
-                                  </ButtonLink>
+                                  </Button>
                                   <br />
                                   <span>
                                     Download includes data guidance and

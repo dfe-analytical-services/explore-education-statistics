@@ -18,6 +18,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Fixtures;
 using Microsoft.EntityFrameworkCore;
 using Moq;
+using Semver;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
@@ -72,6 +73,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 .WithApprovalStatus(ReleaseApprovalStatus.Approved)
                 .WithPreviousVersionId(Guid.NewGuid())
                 .WithType(ReleaseType.OfficialStatistics)
+                .WithPublishingOrganisations(_fixture.DefaultOrganisation()
+                    .Generate(2))
                 .WithReleaseStatuses(_fixture
                     .DefaultReleaseStatus()
                     .Generate(1))
@@ -254,7 +257,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 Id = Guid.NewGuid(),
                 UserId = Guid.NewGuid(),
-                Role = ReleaseRole.Lead,
+                Role = ReleaseRole.Contributor,
                 ReleaseVersion = originalReleaseVersion,
                 ReleaseVersionId = originalReleaseVersion.Id,
                 Deleted = DateTime.UtcNow,
@@ -319,7 +322,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     ],
                     Published = new DateTime(2020, 1, 1, 0, 0, 0, DateTimeKind.Utc),
                     PublicApiDataSetId = Guid.NewGuid(),
-                    PublicApiDataSetVersion = "1.0.0",
+                    PublicApiDataSetVersion = SemVersion.Parse("1.0.0", SemVersionStyles.Any),
                 },
                 new()
                 {
@@ -444,7 +447,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Null(amendment.LatestInternalReleaseNote);
 
                 Assert.NotEqual(originalReleaseVersion.Created, amendment.Created);
-                amendment.Created.AssertUtcNow(withinMillis: 1500);
+                amendment.Created.AssertUtcNow();
 
                 // Check Related Information links have been copied over.
                 Assert.Equal(2, amendment.RelatedInformation.Count);
@@ -579,14 +582,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 // Expect one less UserReleaseRole on the Amendment, as the Pre-release role shouldn't be copied over
                 Assert.Equal(userReleaseRoles.Count - 1, amendmentReleaseRoles.Count);
-                var approverAmendmentRole = amendmentReleaseRoles.First(r => r.Role == ReleaseRole.Approver);
+                var approverAmendmentRole = amendmentReleaseRoles.Single(r => r.Role == ReleaseRole.Approver);
                 AssertAmendedReleaseRoleCorrect(approverReleaseRole, approverAmendmentRole, amendment);
 
-                var contributorAmendmentRole = amendmentReleaseRoles.First(r => r.Role == ReleaseRole.Contributor);
+                var contributorAmendmentRole = amendmentReleaseRoles.Single(r => r.Role == ReleaseRole.Contributor && r.Deleted == null);
                 Assert.NotEqual(contributorReleaseRole.Id, contributorAmendmentRole.Id);
                 AssertAmendedReleaseRoleCorrect(contributorReleaseRole, contributorAmendmentRole, amendment);
 
-                var deletedAmendmentRole = amendmentReleaseRoles.First(r => r.Deleted != null);
+                var deletedAmendmentRole = amendmentReleaseRoles.Single(r => r.Deleted != null);
                 Assert.NotEqual(deletedReleaseRole.Id, deletedAmendmentRole.Id);
                 AssertAmendedReleaseRoleCorrect(deletedReleaseRole, deletedAmendmentRole, amendment);
 
@@ -688,7 +691,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     ]);
 
                 Assert.NotEqual(releaseSubject.Created, releaseSubjectAmendment.Created);
-                releaseSubjectAmendment.Created.AssertUtcNow(withinMillis: 1500);
+                releaseSubjectAmendment.Created.AssertUtcNow();
 
                 Assert.Null(releaseSubjectAmendment.Updated);
 
@@ -703,6 +706,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 .Include(releaseVersion => releaseVersion.PreviousVersion)
                 .Include(releaseVersion => releaseVersion.Publication)
                 .Include(releaseVersion => releaseVersion.Release)
+                .Include(releaseVersion => releaseVersion.PublishingOrganisations)
                 .Include(releaseVersion => releaseVersion.Content)
                 .ThenInclude(section => section.Content)
                 .ThenInclude(section => section.Comments)
@@ -1125,7 +1129,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             Assert.Equal(amendment.Id, amendedUpdate.ReleaseVersionId);
 
             Assert.NotEqual(originalUpdate.Created, amendedUpdate.Created);
-            amendedUpdate.Created.AssertUtcNow(withinMillis: 1500);
+            amendedUpdate.Created.AssertUtcNow();
 
             Assert.Equal(_userId, amendedUpdate.CreatedById);
         }
@@ -1176,7 +1180,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             Assert.Equal(amendment.Id, amendedReleaseRole.ReleaseVersionId);
             Assert.Equal(originalReleaseRole.UserId, amendedReleaseRole.UserId);
             Assert.Equal(originalReleaseRole.Role, amendedReleaseRole.Role);
-            amendedReleaseRole.Created.AssertUtcNow(withinMillis: 1500);
+            amendedReleaseRole.Created.AssertUtcNow();
             Assert.Equal(originalReleaseRole.CreatedById, amendedReleaseRole.CreatedById);
             Assert.Equal(originalReleaseRole.Deleted, amendedReleaseRole.Deleted);
             Assert.Equal(originalReleaseRole.DeletedById, amendedReleaseRole.DeletedById);

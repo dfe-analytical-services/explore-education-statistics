@@ -7,6 +7,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Data.Processor.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.Configuration;
@@ -27,7 +28,7 @@ public abstract class IntegrationTestFixture(TestApplicationFactory testApp) :
     IAsyncLifetime
 {
     private readonly AzuriteContainer _azuriteContainer = new AzuriteBuilder()
-        .WithImage("mcr.microsoft.com/azure-storage/azurite:3.31.0")
+        .WithImage("mcr.microsoft.com/azure-storage/azurite:3.34.0")
         .Build();
 
     protected readonly DataFixture DataFixture = new();
@@ -68,7 +69,7 @@ public abstract class IntegrationTestFixture(TestApplicationFactory testApp) :
     }
 
     public WebApplicationFactory<TestStartup> WithAzurite(
-        WebApplicationFactory<TestStartup>? testApp = null, 
+        WebApplicationFactory<TestStartup>? testApp = null,
         bool enabled = true)
     {
         testApp ??= TestApp;
@@ -92,7 +93,7 @@ public abstract class IntegrationTestFixture(TestApplicationFactory testApp) :
                     config.AddInMemoryCollection(
                     [
                         new KeyValuePair<string, string?>("PublicStorage", _azuriteContainer.GetConnectionString()),
-                        new KeyValuePair<string, string?>("PublisherStorage", _azuriteContainer.GetConnectionString())
+                        new KeyValuePair<string, string?>("PublisherStorage", _azuriteContainer.GetConnectionString()),
                     ]);
                 })
                 .ConfigureServices(services =>
@@ -103,10 +104,20 @@ public abstract class IntegrationTestFixture(TestApplicationFactory testApp) :
                             sp.GetRequiredService<ILogger<IBlobStorageService>>()
                         )
                     );
-                    services.ReplaceService<IPublisherTableStorageService>(sp =>
+                    services.ReplaceService<IPrivateBlobStorageService>(sp =>
+                        new PrivateBlobStorageService(
+                            _azuriteContainer.GetConnectionString(),
+                            sp.GetRequiredService<ILogger<IBlobStorageService>>()
+                        )
+                    );
+                    services.ReplaceService<IPublisherTableStorageService>(_ =>
                         new PublisherTableStorageService(_azuriteContainer.GetConnectionString())
                     );
+                    services.ReplaceService<IDataProcessorClient>(_ =>
+                        new DataProcessorClient(_azuriteContainer.GetConnectionString())
+                    );
                     services.AddTransient<IPublicBlobCacheService, PublicBlobCacheService>();
+                    services.AddTransient<IPrivateBlobCacheService, PrivateBlobCacheService>();
                 });
         });
     }

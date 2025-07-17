@@ -40,10 +40,10 @@ public class PublicationsController(IPublicationService publicationService, IDat
     }
 
     /// <summary>
-    /// Get a publication’s details
+    /// Get a publication's details
     /// </summary>
     /// <remarks>
-    /// Get a specific publication's summary details.
+    /// Get a publication's summary details.
     /// </remarks>
     [HttpGet("{publicationId:guid}")]
     [Produces(MediaTypeNames.Application.Json)]
@@ -62,7 +62,7 @@ public class PublicationsController(IPublicationService publicationService, IDat
     }
 
     /// <summary>
-    /// List a publication’s data sets
+    /// List a publication's data sets
     /// </summary>
     /// <remarks>
     /// Lists summary details of all the data sets related to a publication.

@@ -3,32 +3,29 @@ import {
   releaseDataFileReplacementCompleteRoute,
   ReleaseDataFileRouteParams,
 } from '@admin/routes/releaseRoutes';
-import _dataReplacementService, {
-  DataReplacementPlan,
-} from '@admin/services/dataReplacementService';
+import _releaseDataFileService, {
+  DataSetAccoutrements,
+} from '@admin/services/releaseDataFileService';
 import { render, screen, waitFor } from '@testing-library/react';
 import { createMemoryHistory, MemoryHistory } from 'history';
 import React from 'react';
 import { generatePath, Route, Router } from 'react-router-dom';
 
-jest.mock('@admin/services/dataReplacementService');
+jest.mock('@admin/services/releaseDataFileService');
 
-const dataReplacementService = _dataReplacementService as jest.Mocked<
-  typeof _dataReplacementService
+const releaseDataFileService = _releaseDataFileService as jest.Mocked<
+  typeof _releaseDataFileService
 >;
 
 describe('ReleaseDataFilePage', () => {
-  const testValidReplacementPlan: DataReplacementPlan = {
+  const testAccoutrements: DataSetAccoutrements = {
     dataBlocks: [],
     footnotes: [],
-    originalSubjectId: 'subject-1',
-    replacementSubjectId: 'subject-2',
-    valid: true,
   };
 
   test('renders the page when successfully loads the replacement plan', async () => {
-    dataReplacementService.getReplacementPlan.mockResolvedValue(
-      testValidReplacementPlan,
+    releaseDataFileService.getDataSetAccoutrementsSummary.mockResolvedValue(
+      testAccoutrements,
     );
 
     await renderPage();
@@ -39,7 +36,7 @@ describe('ReleaseDataFilePage', () => {
   });
 
   test('renders error message if there is an error loading replacement plan', async () => {
-    dataReplacementService.getReplacementPlan.mockRejectedValue(
+    releaseDataFileService.getDataSetAccoutrementsSummary.mockRejectedValue(
       new Error('Something went wrong'),
     );
 

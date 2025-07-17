@@ -82,9 +82,6 @@ const DataBlockPageTabs = ({
     const tableData = await tableBuilderService.getTableData(
       query,
       releaseVersionId,
-      dataBlock.charts[0]?.type === 'map'
-        ? getMapInitialBoundaryLevel(dataBlock.charts[0])
-        : undefined,
     );
 
     const { initialStep, subjectMeta } = await getInitialStepSubjectMeta(
@@ -104,7 +101,21 @@ const DataBlockPageTabs = ({
       };
     }
 
-    const table = mapFullTable(tableData);
+    const table = mapFullTable({
+      ...tableData,
+      subjectMeta: {
+        ...tableData.subjectMeta,
+        locations:
+          dataBlock.charts[0]?.type !== 'map'
+            ? tableData.subjectMeta.locations
+            : // for maps, set TableDataSubjectMeta location values to LocationGeoJsonOption[], instead of LocationOption[]
+              await tableBuilderService.getDataBlockGeoJson(
+                releaseVersionId,
+                dataBlock.dataBlockParentId,
+                getMapInitialBoundaryLevel(dataBlock.charts[0]),
+              ),
+      },
+    });
 
     try {
       const tableHeaders = mapTableHeadersConfig(

@@ -1,6 +1,6 @@
 services:
   data-storage:
-    image: mcr.microsoft.com/azure-storage/azurite:3.31.0
+    image: mcr.microsoft.com/azure-storage/azurite:3.34.0
     ports:
       - "10000:10000"
       - "10001:10001"
@@ -50,6 +50,18 @@ services:
     environment:
       POSTGRES_DB: public_data
       POSTGRES_PASSWORD: password
+
+  data-screener:
+    build:
+      context: ../ees-screener-api
+    ports:
+      - "7078:80"
+    depends_on:
+      - data-storage
+    environment:
+      - STORAGE_URL=http://data-storage:10000/devstoreaccount1
+      - STORAGE_KEY=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==
+      - STORAGE_CONTAINER_NAME=releases-temp
 
 volumes:
   data-storage-data:

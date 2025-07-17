@@ -18,6 +18,7 @@ export interface FormBaseInputProps
   addOn?: ReactNode;
   addOnContainerClassName?: string;
   announceError?: boolean;
+  autoFocus?: boolean;
   className?: string;
   disabled?: boolean;
   error?: ReactNode | string;
@@ -38,7 +39,7 @@ export interface FormBaseInputProps
 
 interface HiddenProps {
   defaultValue?: string | number;
-  type?: 'text' | 'number' | 'color' | 'search';
+  type?: 'text' | 'color' | 'search';
   value?: string | number;
 }
 

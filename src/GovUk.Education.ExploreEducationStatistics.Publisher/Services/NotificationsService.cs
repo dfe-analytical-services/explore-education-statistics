@@ -36,6 +36,62 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             }
         }
 
+        public async Task SendReleasePublishingFeedbackEmails(IReadOnlyList<Guid> releaseVersionIds)
+        {
+            var releasesVersions = await context
+                .ReleaseVersions
+                .Include(rv => rv.Release)
+                .ThenInclude(r => r.Publication)
+                .Where(rv => releaseVersionIds.Contains(rv.Id))
+                .ToListAsync();
+
+            var feedbackEntriesAndEmails = await releasesVersions
+                .ToAsyncEnumerable()
+                .SelectManyAwait(async releaseVersion =>
+                {
+                    var publicationRoles = await context
+                        .UserPublicationRoles
+                        .Include(upr => upr.User)
+                        .Where(upr =>
+                            upr.PublicationId == releaseVersion.Release.PublicationId
+                            && upr.Deleted == null)
+                        .ToListAsync();
+
+                    return publicationRoles
+                        .ToAsyncEnumerable()
+                        .Select(upr =>
+                        {
+                            var feedback = new ReleasePublishingFeedback
+                            {
+                                ReleaseVersion = releaseVersion,
+                                ReleaseVersionId = releaseVersion.Id,
+                                UserPublicationRole = upr.Role,
+                                EmailToken = Guid.NewGuid().ToString()
+                            };
+
+                            return (feedback, email: upr.User.Email);
+                        });
+                })
+                .ToListAsync();
+
+            var feedbackEntries = feedbackEntriesAndEmails
+                .Select(feedbackEntry => feedbackEntry.feedback);
+            
+            context.ReleasePublishingFeedback.AddRange(feedbackEntries);
+            await context.SaveChangesAsync();
+            
+            var messages = feedbackEntriesAndEmails
+                .Select(feedbackAndEmail => new ReleasePublishingFeedbackMessage(
+                    ReleasePublishingFeedbackId: feedbackAndEmail.feedback.Id,
+                    EmailAddress: feedbackAndEmail.email))
+                .ToList();
+
+            if (messages.Count > 0)
+            {
+                await notifierClient.NotifyReleasePublishingFeedbackUsers(messages);
+            }
+        }
+
         private async Task<ReleaseNotificationMessage> BuildPublicationNotificationMessage(
             ReleaseVersion releaseVersion)
         {

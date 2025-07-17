@@ -12,7 +12,7 @@ Force Tags          Admin    Local    Dev    AltersData
 
 
 *** Variables ***
-${PUBLICATION_NAME}=    UI tests - publish content %{RUN_IDENTIFIER}
+${PUBLICATION_NAME}=    Publish content %{RUN_IDENTIFIER}
 ${RELEASE_NAME}=        Calendar year 2001
 
 
@@ -59,7 +59,7 @@ Add text block with link to absence glossary entry to accordion section
     user clicks element    id:glossarySearch-option-0
     user clicks button    Insert    ${modal}
     user waits until modal is not visible    Insert glossary link
-    user clicks button    Save & close    ${block}
+    user saves autosaving text block    ${block}
     user waits until parent contains button    ${block}    Absence
 
 Check glossary info icon appears on release preview
@@ -78,17 +78,20 @@ Click glossary info icon and validate glossary entry
     user checks page does not contain    When a pupil misses (or is absent from) at least 1 possible school session.
 
 Approve release
-    user clicks link    Sign off
     user approves original release for immediate publication
 
+Get public release link
+    ${PUBLIC_RELEASE_LINK}=    user gets url public release will be accessible at
+    Set Suite Variable    ${PUBLIC_RELEASE_LINK}
+
 Verify newly published release is on Find Statistics page
+    # TODO EES-6063 - Remove this
     user checks publication is on find statistics page    ${PUBLICATION_NAME}
 
-Navigate to published release page
-    user clicks link    ${PUBLICATION_NAME}
-    user waits until h1 is visible    ${PUBLICATION_NAME}    %{WAIT_MEDIUM}
+Verify newly published release is public
+    user navigates to public release page    ${PUBLIC_RELEASE_LINK}    ${PUBLICATION_NAME}    ${RELEASE_NAME}
 
-    user waits until page contains title caption    ${RELEASE_NAME}    %{WAIT_MEDIUM}
+Check latest release is correct
     user checks page contains    This is the latest data
 
 Check latest release contains related dashboards section

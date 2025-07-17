@@ -13,7 +13,7 @@ Force Tags          Admin    Local    Dev    AltersData
 
 
 *** Variables ***
-${PUBLICATION_NAME}=                UI tests - prerelease and amend %{RUN_IDENTIFIER}
+${PUBLICATION_NAME}=                Prerelease and amend %{RUN_IDENTIFIER}
 ${RELEASE_NAME}=                    Calendar year 2000
 ${SCHEDULED_PRERELEASE_WARNING}=
 ...                                 Pre-release users will have access to a preview of the release 24 hours before the scheduled publish date.

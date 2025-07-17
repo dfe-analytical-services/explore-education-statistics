@@ -81,6 +81,7 @@ internal class DataSetQueryService(
             .OnSuccessDo(userService.CheckCanQueryDataSetVersion)
             .OnSuccess(dsv => RunQueryWithAnalytics(
                 dataSetVersion: dsv,
+                requestedDataSetVersion: dataSetVersion,
                 query: query,
                 cancellationToken: cancellationToken
             ))
@@ -102,6 +103,7 @@ internal class DataSetQueryService(
             .OnSuccessDo(userService.CheckCanQueryDataSetVersion)
             .OnSuccess(dsv => RunQueryWithAnalytics(
                 dataSetVersion: dsv,
+                requestedDataSetVersion: dataSetVersion,
                 query: request,
                 cancellationToken: cancellationToken,
                 baseCriteriaPath: "criteria"
@@ -116,27 +118,28 @@ internal class DataSetQueryService(
         using var _ = MiniProfiler.Current
             .Step($"{nameof(DataSetQueryService)}.{nameof(FindDataSetVersion)}");
 
-        if (dataSetVersion is null)
-        {
-            return await publicDataDbContext
+        return dataSetVersion is null or "*"
+            ? await publicDataDbContext
                 .DataSets
                 .AsNoTracking()
                 .Include(ds => ds.LatestLiveVersion)
                 .ThenInclude(dsv => dsv != null ? dsv.DataSet : null)
                 .Where(ds => ds.Id == dataSetId)
                 .Select(ds => ds.LatestLiveVersion!)
-                .SingleOrNotFoundAsync(cancellationToken);
-        }
-
-        return await publicDataDbContext
-            .DataSetVersions
-            .AsNoTracking()
-            .Include(dsv => dsv.DataSet)
-            .FindByVersion(dataSetId, dataSetVersion, cancellationToken);
+                .SingleOrNotFoundAsync(cancellationToken)
+            : await publicDataDbContext
+                .DataSetVersions
+                .AsNoTracking()
+                .Include(dsv => dsv.DataSet)
+                .FindByVersion(
+                    dataSetId: dataSetId,
+                    version: dataSetVersion,
+                    cancellationToken);
     }
-    
+
     private async Task<Either<ActionResult, DataSetQueryPaginatedResultsViewModel>> RunQueryWithAnalytics(
         DataSetVersion dataSetVersion,
+        string? requestedDataSetVersion,
         DataSetQueryRequest query,
         CancellationToken cancellationToken,
         string baseCriteriaPath = "")
@@ -149,21 +152,13 @@ internal class DataSetQueryService(
                 query: query,
                 cancellationToken: cancellationToken,
                 baseCriteriaPath: baseCriteriaPath)
-            .OnSuccessDo(results =>
-            {
-                // Deliberately do not await this operation as we do not want to
-                // delay the return of the query to the end user.
-                _ = analyticsService.ReportDataSetVersionQuery(
-                    dataSetId: dataSetVersion.DataSetId,
-                    dataSetVersionId: dataSetVersion.Id,
-                    semVersion: dataSetVersion.SemVersion().ToString(),
-                    dataSetTitle: dataSetVersion.DataSet.Title,
-                    query: query,
-                    resultsCount: results.Results.Count,
-                    totalRowsCount: results.Paging.TotalResults,
-                    startTime: startTime,
-                    endTime: DateTime.UtcNow);
-            });
+            .OnSuccessDo(results => analyticsService.CaptureDataSetVersionQuery(
+                dataSetVersion: dataSetVersion,
+                requestedDataSetVersion: requestedDataSetVersion,
+                query: query,
+                results: results,
+                startTime: startTime,
+                cancellationToken: cancellationToken));
     }
 
     private async Task<Either<ActionResult, DataSetQueryPaginatedResultsViewModel>> RunQuery(
@@ -282,6 +277,11 @@ internal class DataSetQueryService(
         Dictionary<string, string> indicatorColumnsById,
         QueryState queryState)
     {
+        if (request.Indicators == null)
+        {
+            return [.. indicatorColumnsById.Values];
+        }
+        
         var validIndicatorColumns = new HashSet<string>();
         var invalidIndicatorIds = new HashSet<string>();
 

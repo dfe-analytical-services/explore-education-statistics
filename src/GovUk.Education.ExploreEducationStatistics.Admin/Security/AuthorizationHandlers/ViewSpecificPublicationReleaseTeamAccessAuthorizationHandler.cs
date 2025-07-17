@@ -37,7 +37,7 @@ public class ViewSpecificPublicationReleaseTeamAccessAuthorizationHandler :
                 .HasRolesOnPublication(
                     context.User.GetUserId(),
                     publication.Id,
-                    PublicationRole.Owner, PublicationRole.Approver))
+                    PublicationRole.Owner, PublicationRole.Allower))
         {
             context.Succeed(requirement);
         }

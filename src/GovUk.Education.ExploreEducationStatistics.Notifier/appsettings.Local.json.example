@@ -1,17 +1,9 @@
 {
+  "App": {
+    "EmailEnabled": true
+    "SuppressExceptionsForTeamOnlyApiKeyErrors": true
+  },
   "GovUkNotify" : {
-    "ApiKey": "change-me",
-    "EmailTemplates": {
-      "ReleaseAmendmentPublishedId": "change-me",
-      "ReleaseAmendmentPublishedSupersededSubscribersId": "change-me",
-      "ReleasePublishedId": "change-me",
-      "ReleasePublishedSupersededSubscribersId": "change-me",
-      "SubscriptionConfirmationId": "change-me",
-      "SubscriptionVerificationId": "change-me",
-      "ApiSubscriptionConfirmationId": "change-me",
-      "ApiSubscriptionDataSetVersionPublishedId": "change-me",
-      "ApiSubscriptionMajorDataSetVersionPublishedId": "change-me",
-      "ApiSubscriptionVerificationId": "change-me"
-    }
+    "ApiKey": "add-a-restricted-api-key-here-NOT-A-LIVE-ONE",
   }
 }

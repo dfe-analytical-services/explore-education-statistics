@@ -12,9 +12,9 @@ Test Setup          fail test fast if required
 
 
 *** Variables ***
-${PUBLICATION_NAME}=        UI tests - manage users %{RUN_IDENTIFIER}
+${PUBLICATION_NAME}=        Manage users %{RUN_IDENTIFIER}
 ${RELEASE_NAME}=            Calendar year 2000
-${PUBLICATION_2_NAME}=      UI tests - manage users second %{RUN_IDENTIFIER}
+${PUBLICATION_2_NAME}=      Manage users second %{RUN_IDENTIFIER}
 ${RELEASE_2_NAME}=          Academic year 2000/01
 
 
@@ -81,12 +81,10 @@ Check the initial manage user page
 
     user checks select contains option    name:releaseId    ${PUBLICATION_NAME} - ${RELEASE_NAME}
     user checks select contains option    name:releaseId    ${PUBLICATION_2_NAME} - ${RELEASE_2_NAME}
-    user checks select contains x options    name:releaseRole    5
+    user checks select contains x options    name:releaseRole    3
     user checks select contains option    name:releaseRole    Approver
     user checks select contains option    name:releaseRole    Contributor
-    user checks select contains option    name:releaseRole    Lead
     user checks select contains option    name:releaseRole    PrereleaseViewer
-    user checks select contains option    name:releaseRole    Viewer
 
     user checks select contains option    name:publicationId    ${PUBLICATION_NAME}
     user checks select contains option    name:publicationId    ${PUBLICATION_2_NAME}

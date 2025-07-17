@@ -11,7 +11,7 @@
   },
   "servers": [
     {
-      "url": "/",
+      "url": "http://localhost:5050",
       "description": "API server"
     }
   ],
@@ -21,8 +21,8 @@
         "tags": [
           "DataSets"
         ],
-        "summary": "Get a data set’s summary",
-        "description": "Gets a specific data set’s summary details.",
+        "summary": "Get a data set's summary",
+        "description": "Gets a data set's summary details.",
         "operationId": "GetDataSet",
         "parameters": [
           {
@@ -78,7 +78,7 @@
         "tags": [
           "DataSets"
         ],
-        "summary": "Get a data set’s metadata",
+        "summary": "Get a data set's metadata",
         "description": "Get the metadata about a data set. Use this to create data set queries.",
         "operationId": "GetDataSetMeta",
         "parameters": [
@@ -171,7 +171,7 @@
           "DataSets"
         ],
         "summary": "Query a data set (GET)",
-        "description": "Query a data set using a `GET` request, returning the filtered results.\r\n            \r\nNote that there is a `POST` variant of this endpoint which provides a more complete set\r\nof querying functionality. The `GET` variant is only recommended for initial exploratory\r\ntesting or simple queries that do not need advanced functionality.\r\n            \r\nUnlike the `POST` variant, this endpoint does not allow condition clauses (`and`, `or`, `not`)\r\nand consequently cannot express more complex queries. Use the `POST` variant instead for these\r\ntypes of queries.\r\n            \r\n## Indicators\r\n            \r\nThe `indicators` query parameter is required and **at least one** indicator must be specified.\r\n            \r\nEach indicator should be a string containing the indicator ID e.g. `4xbOu`, `8g1RI`.\r\n            \r\n## Filters\r\n            \r\nThe `filters` query parameter is used to filter by other filter options (not locations,\r\ngeographic levels or time periods).\r\n            \r\nEach filter should be a string containing the required filter option ID e.g. `z4FQE`, `DcQeg`.\r\n            \r\n## Geographic levels\r\n            \r\nThe `geographicLevels` query parameter is used to filter results by geographic level.\r\n            \r\nThe geographic levels are specified as codes, and can be one of the following:\r\n            \r\n- `EDA` - English devolved area\r\n- `INST` - Institution\r\n- `LA` - Local authority\r\n- `LAD` - Local authority district\r\n- `LEP` - Local enterprise partnership\r\n- `LSIP` - Local skills improvement plan area\r\n- `MCA` - Mayoral combined authority\r\n- `MAT` - MAT\r\n- `NAT` - National\r\n- `OA` - Opportunity area\r\n- `PA` - Planning area\r\n- `PCON` - Parliamentary constituency\r\n- `PROV` - Provider\r\n- `REG` - Regional\r\n- `RSC` - RSC region\r\n- `SCH` - School\r\n- `SPON` - Sponsor\r\n- `WARD` - Ward\r\n            \r\n## Locations\r\n            \r\nThe `locations` query parameter is used to filter results by location.\r\n            \r\nThe locations should be strings formatted like `{level}|{property}|{value}` where:\r\n            \r\n- `{level}` is the location's level code (e.g. `NAT`, `REG`, `LA`)\r\n- `{property}` is the name of the identifying property to match on (e.g. `id, `code`, `urn`)\r\n- `{value}` is the value for the property to match\r\n            \r\nAn ID or a code can be used to identify a location, with the following differences:\r\n            \r\n- IDs only match a **single location**\r\n- Codes may match **multiple locations**\r\n            \r\nWhilst codes are generally unique to a single location, they can be used for multiple locations.\r\nThis may match more results than you expect so it's recommended to use IDs where possible.\r\n            \r\n### Examples\r\n            \r\n- `LA|code|E08000019` matches any local authority with code `E08000019`\r\n- `REG|id|6bQgZ` matches any region with ID `6bQgZ`\r\n- `SCH|urn|140821` matches any school with URN `140821`\r\n            \r\n## Time periods\r\n            \r\nThe `timePeriods` query parameter is used to filter results by time period.\r\n            \r\nThe time periods should be strings formatted like `{period}|{code}` where:\r\n            \r\n- `period` is the time period or range (e.g. `2020` or `2020/2021`)\r\n- `code` is the code identifying the time period type (e.g. `AY`, `CY`, `M1`, `W20`)\r\n            \r\nThe `period` should be a single year like `2020`, or a range like `2020/2021`.\r\nCurrently, only years (or year ranges) are supported.\r\n            \r\nSome time period types span two years e.g. financial year part 2 (`P2`), or may fall in a\r\nlatter year e.g. academic year summer term (`T3`). For these types, a singular year `period`\r\nlike `2020` is considered as `2020/2021`.\r\n            \r\nFor example, a `period` value of `2020` is applicable to the following time periods:\r\n            \r\n- 2020 calendar year\r\n- 2020/2021 academic year\r\n- 2020/2021 financial year part 2 (October to March)\r\n- 2020/2021 academic year's summer term\r\n            \r\nIf you wish to be more explicit, you may use a range for the `period` e.g. `2020/2021`.\r\nHowever, a range cannot be used with time period types which only span a single year,\r\nfor example, `2020/21` cannot be used with `CY`, `M` or `W` codes.\r\n            \r\n### Examples\r\n            \r\n- `2020|AY` is the 2020/21 academic year\r\n- `2021|FY` is the 2021/22 financial year\r\n- `2020|T3` is the 2020/21 academic year's summer term\r\n- `2020|P2` is the 2020/21 financial year part 2 (October to March)\r\n- `2020|CY` is the 2020 calendar year\r\n- `2020|W32` is 2020 week 32\r\n- `2020/2021|AY` is the 2020/21 academic year\r\n- `2021/2022|FY` is the 2021/22 financial year\r\n            \r\n## Sorts\r\n            \r\nThe `sorts` query parameter is used to sort the results.\r\n            \r\nSorts are applied in the order they are provided and should be strings\r\nformatted like `{field}|{direction}` where:\r\n            \r\n- `field` is the name of the field to sort e.g. `timePeriod`\r\n- `direction` is the direction to sort in e.g. ascending (`Asc`) or descending (`Desc`)\r\n            \r\nThe `field` can be one of the following:\r\n            \r\n- `timePeriod` to sort by time period\r\n- `geographicLevel` to sort by the geographic level of the data\r\n- `location|{level}` to sort by locations in a geographic level where `{level}` is the level code (e.g. `REG`, `LA`)\r\n- `filter|{id}` to sort by the options in a filter where `{id}` is the filter ID (e.g. `3RxWP`)\r\n- `indicator|{id}` to sort by the values in a indicator where `{id}` is the indicator ID (e.g. `6VfPgZ`)\r\n            \r\n### Examples\r\n            \r\n- `timePeriod|Desc` sorts by time period in descending order\r\n- `geographicLevel|Asc` sorts by geographic level in ascending order\r\n- `location|REG|Asc` sorts by regions in ascending order\r\n- `filter|3RxWP|Desc` sorts by options in filter `3RxWP` in descending order\r\n- `indicator|7a1dk|Asc` sorts by values in indicator `7a1dk` in ascending order",
+        "description": "Query a data set using a `GET` request, returning the filtered results.\r\n            \r\nNote that there is a `POST` variant of this endpoint which provides a more complete set\r\nof querying functionality. The `GET` variant is only recommended for initial exploratory\r\ntesting or simple queries that do not need advanced functionality.\r\n            \r\nUnlike the `POST` variant, this endpoint does not allow condition clauses (`and`, `or`, `not`)\r\nand consequently cannot express more complex queries. Use the `POST` variant instead for these\r\ntypes of queries.\r\n            \r\n## Indicators\r\n            \r\nThe `indicators` query parameter is used to include only specific values in the data set\r\nresults.\r\n            \r\nEach indicator should be a string containing the indicator ID e.g. `4xbOu`, `8g1RI`.\r\n            \r\nOmitting the `indicators` parameter will return values for all indicators.\r\n\r\n## Filters\r\n            \r\nThe `filters` query parameter is used to filter by other filter options (not locations,\r\ngeographic levels or time periods).\r\n            \r\nEach filter should be a string containing the required filter option ID e.g. `z4FQE`, `DcQeg`.\r\n            \r\n## Geographic levels\r\n            \r\nThe `geographicLevels` query parameter is used to filter results by geographic level.\r\n            \r\nThe geographic levels are specified as codes, and can be one of the following:\r\n            \r\n- `EDA` - English devolved area\r\n- `INST` - Institution\r\n- `LA` - Local authority\r\n- `LAD` - Local authority district\r\n- `LEP` - Local enterprise partnership\r\n- `LSIP` - Local skills improvement plan area\r\n- `MCA` - Mayoral combined authority\r\n- `MAT` - MAT\r\n- `NAT` - National\r\n- `OA` - Opportunity area\r\n- `PA` - Planning area\r\n- `PCON` - Parliamentary constituency\r\n- `PROV` - Provider\r\n- `REG` - Regional\r\n- `RSC` - RSC region\r\n- `SCH` - School\r\n- `SPON` - Sponsor\r\n- `WARD` - Ward\r\n            \r\n## Locations\r\n            \r\nThe `locations` query parameter is used to filter results by location.\r\n            \r\nThe locations should be strings formatted like `{level}|{property}|{value}` where:\r\n            \r\n- `{level}` is the location's level code (e.g. `NAT`, `REG`, `LA`)\r\n- `{property}` is the name of the identifying property to match on (e.g. `id, `code`, `urn`)\r\n- `{value}` is the value for the property to match\r\n            \r\nAn ID or a code can be used to identify a location, with the following differences:\r\n            \r\n- IDs only match a **single location**\r\n- Codes may match **multiple locations**\r\n            \r\nWhilst codes are generally unique to a single location, they can be used for multiple locations.\r\nThis may match more results than you expect so it's recommended to use IDs where possible.\r\n            \r\n### Examples\r\n            \r\n- `LA|code|E08000019` matches any local authority with code `E08000019`\r\n- `REG|id|6bQgZ` matches any region with ID `6bQgZ`\r\n- `SCH|urn|140821` matches any school with URN `140821`\r\n            \r\n## Time periods\r\n            \r\nThe `timePeriods` query parameter is used to filter results by time period.\r\n            \r\nThe time periods should be strings formatted like `{period}|{code}` where:\r\n            \r\n- `period` is the time period or range (e.g. `2020` or `2020/2021`)\r\n- `code` is the code identifying the time period type (e.g. `AY`, `CY`, `M1`, `W20`)\r\n            \r\nThe `period` should be a single year like `2020`, or a range like `2020/2021`.\r\nCurrently, only years (or year ranges) are supported.\r\n            \r\nSome time period types span two years e.g. financial year part 2 (`P2`), or may fall in a\r\nlatter year e.g. academic year summer term (`T3`). For these types, a singular year `period`\r\nlike `2020` is considered as `2020/2021`.\r\n            \r\nFor example, a `period` value of `2020` is applicable to the following time periods:\r\n            \r\n- 2020 calendar year\r\n- 2020/2021 academic year\r\n- 2020/2021 financial year part 2 (October to March)\r\n- 2020/2021 academic year's summer term\r\n            \r\nIf you wish to be more explicit, you may use a range for the `period` e.g. `2020/2021`.\r\nHowever, a range cannot be used with time period types which only span a single year,\r\nfor example, `2020/21` cannot be used with `CY`, `M` or `W` codes.\r\n            \r\n### Examples\r\n            \r\n- `2020|AY` is the 2020/21 academic year\r\n- `2021|FY` is the 2021/22 financial year\r\n- `2020|T3` is the 2020/21 academic year's summer term\r\n- `2020|P2` is the 2020/21 financial year part 2 (October to March)\r\n- `2020|CY` is the 2020 calendar year\r\n- `2020|W32` is 2020 week 32\r\n- `2020/2021|AY` is the 2020/21 academic year\r\n- `2021/2022|FY` is the 2021/22 financial year\r\n            \r\n## Sorts\r\n            \r\nThe `sorts` query parameter is used to sort the results.\r\n            \r\nSorts are applied in the order they are provided and should be strings\r\nformatted like `{field}|{direction}` where:\r\n            \r\n- `field` is the name of the field to sort e.g. `timePeriod`\r\n- `direction` is the direction to sort in e.g. ascending (`Asc`) or descending (`Desc`)\r\n            \r\nThe `field` can be one of the following:\r\n            \r\n- `timePeriod` to sort by time period\r\n- `geographicLevel` to sort by the geographic level of the data\r\n- `location|{level}` to sort by locations in a geographic level where `{level}` is the level code (e.g. `REG`, `LA`)\r\n- `filter|{id}` to sort by the options in a filter where `{id}` is the filter ID (e.g. `3RxWP`)\r\n- `indicator|{id}` to sort by the values in a indicator where `{id}` is the indicator ID (e.g. `6VfPgZ`)\r\n            \r\n### Examples\r\n            \r\n- `timePeriod|Desc` sorts by time period in descending order\r\n- `geographicLevel|Asc` sorts by geographic level in ascending order\r\n- `location|REG|Asc` sorts by regions in ascending order\r\n- `filter|3RxWP|Desc` sorts by options in filter `3RxWP` in descending order\r\n- `indicator|7a1dk|Asc` sorts by values in indicator `7a1dk` in ascending order",
         "operationId": "QueryDataSetGet",
         "parameters": [
           {
@@ -481,14 +481,14 @@
           {
             "name": "indicators",
             "in": "query",
-            "description": "The IDs of indicators to return values for.",
-            "required": true,
+            "description": "The IDs of indicators to return values for.\r\n\r\nOmitting this parameter will return values for all indicators.",
             "schema": {
               "type": "array",
               "items": {
                 "type": "string"
               },
-              "description": "The IDs of indicators to return values for."
+              "description": "The IDs of indicators to return values for.\r\n\r\nOmitting this parameter will return values for all indicators.",
+              "nullable": true
             }
           },
           {
@@ -590,7 +590,7 @@
           "DataSets"
         ],
         "summary": "Query a data set (POST)",
-        "description": "Query a data set using a `POST` request, returning the filtered results.\r\n            \r\nNote that for simpler queries or exploratory testing, there is also GET variant of this endpoint\r\nonly handles a smaller subset of querying functionality. However, for most use-cases,\r\nthis endpoint is recommended as it provides the complete set of functionality.\r\n            \r\nUnlike the `GET` endpoint, the `POST` endpoint allows condition criteria (`and`, `or`, `not`)\r\nand consequently can express more complex queries.",
+        "description": "Query a data set using a `POST` request, returning the filtered results.\r\n            \r\nNote that for simpler queries or exploratory testing, there is also GET variant of this endpoint\r\nonly handles a smaller subset of querying functionality. However, for most use-cases,\r\nthis endpoint is recommended as it provides the complete set of functionality.\r\n            \r\nUnlike the `GET` endpoint, the `POST` endpoint allows condition criteria (`and`, `or`, `not`)\r\nand consequently can express more complex queries.\r\n            \r\nA `POST` request without a body will return a paginated set of unfiltered results and will include\r\nvalues for all indicators.\r\n            \r\nA `Content-Type` request header of `application/json` is required.",
         "operationId": "QueryDataSetPost",
         "parameters": [
           {
@@ -743,8 +743,8 @@
         "tags": [
           "DataSetVersions"
         ],
-        "summary": "List a data set’s versions",
-        "description": "List a data set’s versions. Only provides summary information of each version.",
+        "summary": "List a data set's versions",
+        "description": "List a data set's versions. Only provides summary information of each version.",
         "operationId": "ListDataSetVersions",
         "parameters": [
           {
@@ -825,8 +825,8 @@
         "tags": [
           "DataSetVersions"
         ],
-        "summary": "Get a data set version",
-        "description": "Get a data set version's summary details.",
+        "summary": "Get a data set version's summary",
+        "description": "Gets a data set version's summary details.",
         "operationId": "GetDataSetVersion",
         "parameters": [
           {
@@ -1032,8 +1032,8 @@
         "tags": [
           "Publications"
         ],
-        "summary": "Get a publication’s details",
-        "description": "Get a specific publication's summary details.",
+        "summary": "Get a publication's details",
+        "description": "Get a publication's summary details.",
         "operationId": "GetPublication",
         "parameters": [
           {
@@ -1079,7 +1079,7 @@
         "tags": [
           "Publications"
         ],
-        "summary": "List a publication’s data sets",
+        "summary": "List a publication's data sets",
         "description": "Lists summary details of all the data sets related to a publication.",
         "operationId": "ListPublicationDataSets",
         "parameters": [
@@ -1352,9 +1352,6 @@
         "description": "The location option criteria to filter results by in a data set GET query.\r\n            \r\nThe results can be matched by either the location option's ID or a code.\r\nNote the following differences:\r\n            \r\n- IDs only match a **single location**\r\n- Codes may match **multiple locations**\r\n            \r\nWhilst codes are generally unique to a single location, they can be\r\nused for multiple locations. This may match more results than you\r\nexpect so it's recommended to use IDs where possible."
       },
       "DataSetGetQueryRequest": {
-        "required": [
-          "indicators"
-        ],
         "type": "object",
         "properties": {
           "filters": {
@@ -1394,14 +1391,12 @@
             "nullable": true
           },
           "indicators": {
-            "minItems": 1,
             "type": "array",
             "items": {
-              "maxLength": 40,
-              "minLength": 1,
               "type": "string"
             },
-            "description": "The IDs of indicators to return values for."
+            "description": "The IDs of indicators to return values for.\r\n\r\nOmitting this parameter will return values for all indicators.",
+            "nullable": true
           },
           "sorts": {
             "type": "array",
@@ -2437,14 +2432,14 @@
             "nullable": true
           },
           "indicators": {
-            "minItems": 1,
             "type": "array",
             "items": {
               "maxLength": 40,
               "minLength": 1,
               "type": "string"
             },
-            "description": "The IDs of indicators in the data set to return values for.",
+            "description": "The IDs of indicators to return values for.\r\n\r\nOmitting this parameter will return values for all indicators.",
+            "nullable": true,
             "example": [
               "C2ySJ",
               "q4X3J"
@@ -2730,7 +2725,8 @@
       "DataSetVersionType": {
         "enum": [
           "Major",
-          "Minor"
+          "Minor",
+          "Patch"
         ],
         "type": "string"
       },
@@ -2883,7 +2879,6 @@
       "DataSetViewModel": {
         "required": [
           "id",
-          "latestVersion",
           "status",
           "summary",
           "title"
@@ -2928,7 +2923,8 @@
                 "$ref": "#/components/schemas/DataSetLatestVersionViewModel"
               }
             ],
-            "description": "The latest published data set version."
+            "description": "The latest published data set version.",
+            "nullable": true
           }
         },
         "additionalProperties": false,

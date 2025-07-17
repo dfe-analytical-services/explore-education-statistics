@@ -12,8 +12,10 @@ import render from '@common-test/render';
 import { Chart } from '@common/modules/charts/types/chart';
 import { FullTable } from '@common/modules/table-tool/types/fullTable';
 import _tableBuilderService, {
+  LocationGeoJsonOption,
   TableDataQuery,
 } from '@common/services/tableBuilderService';
+import { Dictionary } from '@common/types';
 import { screen } from '@testing-library/react';
 import noop from 'lodash/noop';
 
@@ -162,7 +164,15 @@ describe('ChartBuilderTabSection', () => {
   });
 
   test('calls `getTableData` and `onTableUpdate` when boundary level changed', async () => {
-    tableBuilderService.getTableData.mockResolvedValue(testTableData);
+    tableBuilderService.getTableData.mockResolvedValue({
+      ...testTableData,
+      subjectMeta: { ...testTableData.subjectMeta, locations: {} },
+    });
+    tableBuilderService.getDataBlockGeoJson.mockResolvedValue(
+      testTableData.subjectMeta.locations as Dictionary<
+        LocationGeoJsonOption[]
+      >,
+    );
 
     const handleUpdate = jest.fn();
 
@@ -190,14 +200,19 @@ describe('ChartBuilderTabSection', () => {
     ]);
 
     expect(tableBuilderService.getTableData).toHaveBeenCalledWith(
-      { ...testQuery, boundaryLevel: 1 },
+      { ...testQuery },
       'release-1',
+    );
+
+    expect(tableBuilderService.getDataBlockGeoJson).toHaveBeenCalledWith(
+      'release-1',
+      'data-block-parent-1',
       1,
     );
 
     expect(handleUpdate).toHaveBeenCalledWith({
       table: testFullTable,
-      query: { ...testQuery, boundaryLevel: 1 },
+      query: { ...testQuery },
     });
   });
 });

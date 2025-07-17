@@ -3,10 +3,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
-using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
@@ -14,7 +12,6 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
 using Microsoft.Extensions.Logging;
 using Moq;
 using Xunit;
@@ -218,6 +215,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
         [Fact]
         public async Task WriteDataSetMetaFile_Success()
         {
+            var totalRows = 9393;
+
             var subject = _fixture.DefaultSubject()
                 .Generate();
 
@@ -288,7 +287,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
                 contentDbContextId,
                 statisticsDbContextId);
 
-            await service.WriteDataSetFileMeta(file.Id, subject.Id);
+            await service.WriteDataSetFileMeta(file.Id, subject.Id, totalRows);
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
@@ -306,6 +305,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
 
                 Assert.NotNull(updatedFile.DataSetFileMeta);
                 var meta = updatedFile.DataSetFileMeta;
+
+                Assert.Equal(totalRows, meta.NumDataFileRows);
 
                 Assert.Equal("2000", meta.TimePeriodRange.Start.Period);
                 Assert.Equal(TimeIdentifier.April, meta.TimePeriodRange.Start.TimeIdentifier);
@@ -472,12 +473,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
                     }).ToList());
 
                 var hierarchy = Assert.Single(results);
-                Assert.Equal(filters[0].Id, hierarchy.RootFilterId);
-                Assert.Equal([filters[1].Id, filters[2].Id], hierarchy.ChildFilterIds);
-
-                Assert.Equal(
-                    [rootFilterItem0.Id, rootFilterItem1.Id],
-                    hierarchy.RootOptionIds);
+                Assert.Equal([filters[0].Id, filters[1].Id, filters[2].Id], hierarchy.FilterIds);
 
                 Assert.Equal(2, hierarchy.Tiers.Count);
 
@@ -613,10 +609,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
                 // hierarchy for root filter 0
                 var hierarchy0 = results[0];
 
-                Assert.Equal(filters[0].Id, hierarchy0.RootFilterId);
-                Assert.Equal([filters[1].Id], hierarchy0.ChildFilterIds);
-
-                Assert.Equal([rootFilter0Item0.Id], hierarchy0.RootOptionIds);
+                Assert.Equal([filters[0].Id, filters[1].Id], hierarchy0.FilterIds);
 
                 Assert.Single(hierarchy0.Tiers);
 
@@ -627,10 +620,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
                 // hierarchy for root filter 1
                 var hierarchy1 = results[1];
 
-                Assert.Equal(filters[2].Id, hierarchy1.RootFilterId);
-                Assert.Equal([filters[3].Id], hierarchy1.ChildFilterIds);
-
-                Assert.Equal([rootFilter1Item0.Id], hierarchy1.RootOptionIds);
+                Assert.Equal([filters[2].Id, filters[3].Id], hierarchy1.FilterIds);
 
                 Assert.Single(hierarchy1.Tiers);
 

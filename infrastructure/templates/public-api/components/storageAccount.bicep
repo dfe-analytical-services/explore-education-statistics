@@ -1,4 +1,3 @@
-import { responseTimeConfig } from 'alerts/dynamicAlertConfig.bicep'
 import { staticAverageLessThanHundred, staticAverageGreaterThanZero } from 'alerts/staticAlertConfig.bicep'
 import { IpRange, StorageAccountPrivateEndpoints } from '../types.bicep'
 
@@ -20,7 +19,7 @@ param sku 'Standard_LRS' | 'Standard_GRS' | 'Standard_RAGRS' | 'Standard_ZRS' | 
 @description('Storage Account kind')
 param kind 'StorageV2' | 'FileStorage' = 'StorageV2'
 
-@description('Storage Account Name')
+@description('Key Vault Name')
 param keyVaultName string
 
 @description('Whether the storage account is accessible from the public internet')
@@ -69,7 +68,7 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2023-05-01' = {
   tags: tagValues
 }
 
-module fileServicePrivateEndpointModule 'privateEndpoint.bicep' = if (privateEndpointSubnetIds.?file != null) {
+module fileServicePrivateEndpointModule '../../common/components/privateEndpoint.bicep' = if (privateEndpointSubnetIds.?file != null) {
   name: '${storageAccountName}FileServicePrivateEndpointDeploy'
   params: {
     serviceId: storageAccount.id
@@ -82,7 +81,7 @@ module fileServicePrivateEndpointModule 'privateEndpoint.bicep' = if (privateEnd
   }
 }
 
-module blobStoragePrivateEndpointModule 'privateEndpoint.bicep' = if (privateEndpointSubnetIds.?blob != null) {
+module blobStoragePrivateEndpointModule '../../common/components/privateEndpoint.bicep' = if (privateEndpointSubnetIds.?blob != null) {
   name: '${storageAccountName}BlobStoragePrivateEndpointDeploy'
   params: {
     serviceId: storageAccount.id
@@ -95,7 +94,7 @@ module blobStoragePrivateEndpointModule 'privateEndpoint.bicep' = if (privateEnd
   }
 }
 
-module queuePrivateEndpointModule 'privateEndpoint.bicep' = if (privateEndpointSubnetIds.?queue != null) {
+module queuePrivateEndpointModule '../../common/components/privateEndpoint.bicep' = if (privateEndpointSubnetIds.?queue != null) {
   name: '${storageAccountName}QueuePrivateEndpointDeploy'
   params: {
     serviceId: storageAccount.id
@@ -108,7 +107,7 @@ module queuePrivateEndpointModule 'privateEndpoint.bicep' = if (privateEndpointS
   }
 }
 
-module tableStoragePrivateEndpointModule 'privateEndpoint.bicep' = if (privateEndpointSubnetIds.?table != null) {
+module tableStoragePrivateEndpointModule '../../common/components/privateEndpoint.bicep' = if (privateEndpointSubnetIds.?table != null) {
   name: '${storageAccountName}TableStoragePrivateEndpointDeploy'
   params: {
     serviceId: storageAccount.id
@@ -181,6 +180,7 @@ module storeAccessKeyToKeyVault './keyVaultSecret.bicep' = {
   }
 }
 
+output storageAccountId string = storageAccount.id
 output storageAccountName string = storageAccount.name
 output connectionStringSecretName string = connectionStringSecretName
 output accessKeySecretName string = accessKeySecretName

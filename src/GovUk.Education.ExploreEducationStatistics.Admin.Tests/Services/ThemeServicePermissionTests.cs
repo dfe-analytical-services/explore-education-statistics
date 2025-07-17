@@ -3,17 +3,21 @@ using System;
 using System.Threading.Tasks;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Options;
+using GovUk.Education.ExploreEducationStatistics.Admin.Repositories;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Methodologies;
+using GovUk.Education.ExploreEducationStatistics.Admin.Tests.MockBuilders;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.Cache;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
+using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using Moq;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.MapperUtils;
@@ -176,7 +180,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             IUserService? userService = null,
             IMethodologyService? methodologyService = null,
             IPublishingService? publishingService = null,
-            IReleaseVersionService? releaseVersionService = null)
+            IReleaseVersionService? releaseVersionService = null,
+            IAdminEventRaiser? adminEventRaiser = null,
+            IPublicationCacheService? publicationCacheService = null)
         {
             var publicContext = publicDataDbContext ?? Mock.Of<PublicDataDbContext>();
             var contentContext = contentDbContext ?? Mock.Of<ContentDbContext>();
@@ -192,8 +198,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 userService ?? AlwaysTrueUserService().Object,
                 methodologyService ?? Mock.Of<IMethodologyService>(Strict),
                 publishingService ?? Mock.Of<IPublishingService>(Strict),
-                releaseVersionService ?? Mock.Of<IReleaseVersionService>(Strict)
-            );
+                releaseVersionService ?? Mock.Of<IReleaseVersionService>(Strict),
+                adminEventRaiser ?? new AdminEventRaiserMockBuilder().Build(),
+                publicationCacheService ?? new PublicationCacheServiceMockBuilder().Build(),
+                NullLogger<ThemeService>.Instance);
         }
     }
 }

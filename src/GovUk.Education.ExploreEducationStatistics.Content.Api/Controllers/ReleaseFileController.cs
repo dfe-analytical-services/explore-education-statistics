@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Net.Mime;
 using System.Threading;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Analytics.Common;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
@@ -57,8 +58,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
         [Produces(MediaTypeNames.Application.Octet)]
         public async Task<ActionResult> StreamFilesToZip(
             Guid releaseVersionId,
+            // TODO EES-6034
+            // The previous data catalogue page allowed users to selected multiple specific files to include in the
+            // zip file, hence why this endpoint takes an array of fileIds, but this is no longer the case. Via the
+            // public frontend, users only download all the releaseVersion's data (by not providing fileIds) or provide
+            // a single fileId for a specific data set.
+            [FromQuery] AnalyticsFromPage fromPage,
             [FromQuery] IList<Guid>? fileIds = null)
         {
+            if (fileIds is not null && fileIds.Count > 1)
+            {
+                ModelState.AddModelError(
+                    "fileIds",
+                    "Providing multiple fileIds is deprecated.");
+                return BadRequest(ModelState);
+            }
+
             return await persistenceHelper.CheckEntityExists<ReleaseVersion>(
                     releaseVersionId,
                     q => q.Include(rv => rv.Release)
@@ -80,6 +95,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
                         return await releaseFileService.ZipFilesToStream(
                             releaseVersionId: releaseVersionId,
                             outputStream: Response.BodyWriter.AsStream(),
+                            fromPage: fromPage,
                             fileIds: fileIds,
                             cancellationToken: HttpContext.RequestAborted
                         );

@@ -72,6 +72,7 @@ export const testDataSetFileSummaries: DataSetFileSummary[] = [
     filename: 'file-name-1',
     fileSize: '100 kb',
     meta: {
+      numDataFileRows: 11,
       timePeriodRange: {
         from: '2010',
         to: '2020',
@@ -106,6 +107,7 @@ export const testDataSetFileSummaries: DataSetFileSummary[] = [
     filename: 'file-name-2',
     fileSize: '100 kb',
     meta: {
+      numDataFileRows: 12,
       timePeriodRange: {
         from: '2010',
         to: '2020',
@@ -140,6 +142,7 @@ export const testDataSetFileSummaries: DataSetFileSummary[] = [
     filename: 'file-name-3',
     fileSize: '100 kb',
     meta: {
+      numDataFileRows: 13,
       timePeriodRange: {
         from: '2010',
         to: '2020',
@@ -176,6 +179,7 @@ export const testDataSetFile: DataSetFile = {
     name: 'file name',
     size: 'file size',
     meta: {
+      numDataFileRows: 65,
       timePeriodRange: {
         from: '2023',
         to: '2024',
@@ -259,6 +263,74 @@ export const testApiDataSetVersions: PaginatedList<ApiDataSetVersion> = {
     {
       ...testApiDataSetVersion,
       version: '1.2',
+      status: 'Deprecated',
+      file: {
+        id: 'file-2-id',
+      },
+      release: {
+        title: 'Release 2 title',
+        slug: 'release-2-slug',
+      },
+    },
+    {
+      ...testApiDataSetVersion,
+      version: '1.0',
+      status: 'Withdrawn',
+      file: {
+        id: 'file-3-id',
+      },
+      release: {
+        title: 'Release 3 title',
+        slug: 'release-3-slug',
+      },
+    },
+  ],
+};
+
+export const testPatchApiDataSetVersions: PaginatedList<ApiDataSetVersion> = {
+  paging: {
+    page: 1,
+    pageSize: 10,
+    totalResults: 10,
+    totalPages: 1,
+  },
+  results: [
+    {
+      ...testApiDataSetVersion,
+      version: '2.0.2',
+      file: {
+        id: 'file-1-id',
+      },
+      release: {
+        title: 'Release 1 title',
+        slug: 'release-1-slug',
+      },
+    },
+    {
+      ...testApiDataSetVersion,
+      version: '2.0.1',
+      file: {
+        id: 'file-1-id',
+      },
+      release: {
+        title: 'Release 1 title',
+        slug: 'release-1-slug',
+      },
+    },
+    {
+      ...testApiDataSetVersion,
+      version: '2.0',
+      file: {
+        id: 'file-1-id',
+      },
+      release: {
+        title: 'Release 1 title',
+        slug: 'release-1-slug',
+      },
+    },
+    {
+      ...testApiDataSetVersion,
+      version: '1.1',
       status: 'Deprecated',
       file: {
         id: 'file-2-id',

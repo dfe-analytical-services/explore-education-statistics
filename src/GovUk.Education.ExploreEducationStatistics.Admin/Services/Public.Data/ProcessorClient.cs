@@ -2,31 +2,25 @@
 using System;
 using System.Net;
 using System.Net.Http;
-using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Threading;
 using System.Threading.Tasks;
-using Azure.Core;
-using Azure.Identity;
-using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Admin.Options;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Authentication;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Requests;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.ViewModels;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Public.Data;
 
 internal class ProcessorClient(
     ILogger<ProcessorClient> logger,
     HttpClient httpClient,
-    IOptions<PublicDataProcessorOptions> options,
-    IWebHostEnvironment environment) : IProcessorClient
+    IHttpClientAzureAuthenticationManager<PublicDataProcessorOptions> authenticationManager) : IProcessorClient
 {
     public async Task<Either<ActionResult, ProcessDataSetVersionResponseViewModel>> CreateDataSet(
         Guid releaseFileId,
@@ -43,12 +37,14 @@ internal class ProcessorClient(
     public async Task<Either<ActionResult, ProcessDataSetVersionResponseViewModel>> CreateNextDataSetVersionMappings(
         Guid dataSetId,
         Guid releaseFileId,
+        Guid? dataSetVersionToReplaceId = null,
         CancellationToken cancellationToken = default)
     {
         var request = new NextDataSetVersionMappingsCreateRequest
         {
             ReleaseFileId = releaseFileId,
-            DataSetId = dataSetId
+            DataSetId = dataSetId,
+            DataSetVersionToReplaceId = dataSetVersionToReplaceId
         };
 
         return await SendPost<NextDataSetVersionMappingsCreateRequest, ProcessDataSetVersionResponseViewModel>(
@@ -125,7 +121,7 @@ internal class ProcessorClient(
         CancellationToken cancellationToken = default)
         where TResponse : class
     {
-        await AddBearerToken(cancellationToken);
+        await authenticationManager.AddAuthentication(httpClient, cancellationToken);
 
         var response = await requestFunction.Invoke();
 
@@ -173,34 +169,5 @@ internal class ProcessorClient(
 
         return content
                ?? throw new Exception("Could not deserialize the response from the Public Data Processor.");
-    }
-
-    /// <summary>
-    /// Request an access token to authenticate the Admin App Service with the Data Processor using its
-    /// system-assigned identity.
-    ///
-    /// We call this within this class rather than during "AddHttpClient" initialisation
-    /// within <see cref="Startup" /> because adding the call for the Bearer token in there instead would otherwise
-    /// result in a Bearer token unnecessarily being requested every time ProcessorClient was instantiated but not
-    /// used (e.g. by virtue of a Controller using DataSetService as a dependency but not calling any service methods
-    /// that require interaction with ProcessorClient).
-    ///
-    /// The other advantage of requesting the Bearer token here rather than in "AddHttpClient" is that it can be done
-    /// asynchronously here.
-    /// 
-    /// </summary>
-    private async Task AddBearerToken(CancellationToken cancellationToken)
-    {
-        // If operating within Azure, obtain an access token for authenticating the Admin App Service with
-        // the Public Data Processor using its managed identity.
-        if (environment.IsProduction())
-        {
-            var accessTokenProvider = new DefaultAzureCredential();
-            var tokenResponse = await accessTokenProvider.GetTokenAsync(
-                new TokenRequestContext([$"api://{options.Value.AppRegistrationClientId}/.default"]),
-                cancellationToken);
-            httpClient.DefaultRequestHeaders.Authorization =
-                new AuthenticationHeaderValue("Bearer", tokenResponse.Token);
-        }
     }
 }

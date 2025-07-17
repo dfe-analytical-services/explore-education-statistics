@@ -82,13 +82,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             CancellationToken cancellationToken = default)
         {
             return await FindLatestPublishedReleaseVersionId(query.SubjectId)
-                .OnSuccess(releaseVersionId => Query(releaseVersionId, query, boundaryLevelId: null, cancellationToken));
+                .OnSuccess(releaseVersionId => Query(releaseVersionId, query, cancellationToken));
         }
 
         public async Task<Either<ActionResult, TableBuilderResultViewModel>> Query(
             Guid releaseVersionId,
             FullTableQuery query,
-            long? boundaryLevelId,
             CancellationToken cancellationToken = default)
         {
             return await CheckReleaseSubjectExists(subjectId: query.SubjectId,
@@ -104,14 +103,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                     }
 
                     return await _subjectResultMetaService
-                        .GetSubjectMeta(releaseVersionId, query, boundaryLevelId, observations)
+                        .GetSubjectMeta(releaseVersionId, query, observations)
                         .OnSuccess(subjectMetaViewModel =>
                         {
                             return new TableBuilderResultViewModel
                             {
                                 SubjectMeta = subjectMetaViewModel,
                                 Results = observations.Select(observation =>
-                                    ObservationViewModelBuilder.BuildObservation(observation, query.Indicators))
+                                    ObservationViewModelBuilder.BuildObservation(observation, query.Indicators)),
                             };
                         });
                 });
@@ -140,7 +139,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                         .Distinct()
                         .ToList();
 
-                    return await _locationService.GetLocationViewModels(locations, boundaryLevelId, _locationOptions.Hierarchies);
+                    return await _locationService.GetLocationViewModels(
+                        locations,
+                        _locationOptions.Hierarchies,
+                        boundaryLevelId);
                 });
         }
 
@@ -210,7 +212,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 
         private async Task<int> GetMaximumTableCellCount(FullTableQuery query)
         {
-            var filterItemIds = query.Filters.ToList();
+            var filterItemIds = query.GetFilterItemIds();
+
             var countsOfFilterItemsByFilter = filterItemIds.Count == 0
                 ? new List<int>()
                 : (await _filterItemRepository.CountFilterItemsByFilter(filterItemIds))

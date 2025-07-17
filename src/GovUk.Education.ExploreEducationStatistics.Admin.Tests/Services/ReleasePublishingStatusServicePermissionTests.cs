@@ -25,7 +25,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public async Task GetReleaseStatusesAsync()
         {
             await PolicyCheckBuilder<ContentSecurityPolicies>()
-                .SetupResourceCheck(_releaseVersion, ContentSecurityPolicies.CanViewSpecificRelease, false)
+                .SetupResourceCheck(_releaseVersion, ContentSecurityPolicies.CanViewSpecificReleaseVersion, false)
                 .AssertForbidden(
                     async userService =>
                     {

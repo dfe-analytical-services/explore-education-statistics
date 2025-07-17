@@ -79,7 +79,7 @@ You will need the following groups of dependencies to run the project successful
 
 To run applications in this service you will require the following:
 
-   - [NodeJS v18+](https://nodejs.org/)
+   - [NodeJS v20+](https://nodejs.org/)
    - [.NET SDK v8.0](https://dotnet.microsoft.com/en-us/download/dotnet/8.0)
    - [Azure Functions Core Tools v4+](https://github.com/Azure/azure-functions-core-tools)
 
@@ -701,6 +701,24 @@ cd src/GovUk.Education.ExploreEducationStatistics.Public.Data.Api
 dotnet ef migrations add EES1234_MigrationNameHere --context PublicDataDbContext --project ../GovUk.Education.ExploreEducationStatistics.Public.Data.Model -v
 ```
 
+### Troubleshoot: `Unable to retrieve project metadata` error
+when creating a new migration for Admin or public API databases, to workaround the following error:
+```
+Unable to retrieve project metadata. Ensure it's an SDK-style project. 
+If you're using a custom BaseIntermediateOutputPath or MSBuildProjectExtensionsPath values,
+Use the --msbuildprojectextensionspath option
+```
+Then what you should do is set the value of the option parameter `msbuildprojectextensionspath`  to the `artifacts` folder of the application you are making changes to; for example:
+1) for the Admin applcation (ContentDbContext):
+```sh
+dotnet ef migrations add <TICKET_NUMBER>_<MIGRATION_DESCRIPTION> --context ContentDbContext --output-dir Migrations/ContentMigrations -v --msbuildprojectextensionspath ~\<REPOSITORY_DIRECTORY>\explore-education-statistics\src\EES\src\artifacts\obj\GovUk.Education.ExploreEducationStatistics.Admin\
+```
+2) for the public data API:
+```sh
+dotnet ef migrations add <TICKET_NUMBER>_<MIGRATION_DESCRIPTION> --context PublicDataDbContext --project ../GovUk.Education.ExploreEducationStatistics.Public.Data.Model -v --msbuildprojectextensionspath ~\<REPOSITORY_DIRECTORY>\explore-education-statistics\src\artifacts\obj\GovUk.Education.ExploreEducationStatistics.Public.Data.Model\
+```
+
+
 ### Running backend tests
 
 The backend c# projects have a number of unit and integration tests. From the project root, run:
@@ -794,6 +812,13 @@ whatever you want on your filesystem.
 Aside from unit tests for each project, we maintain suites of Robot Framework tests that can be found in `tests`.
 
 See the [Robot Framework tests README](tests/robot-tests/README.md) for more information.
+
+## Troubleshooting
+
+### The Function Apps aren't running
+
+If any of the Function Apps (Processor, Publisher or Public Processor) won't spin up successfully, and you're hitting a `Value cannot be null. (Parameter: 'provider')` error,
+try upgrading your [Azure Functions Core Tools version](https://github.com/Azure/azure-functions-core-tools).
 
 ## License
 

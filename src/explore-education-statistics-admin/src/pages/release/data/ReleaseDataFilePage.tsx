@@ -18,6 +18,8 @@ import Button from '@common/components/Button';
 import { useQueryClient } from '@tanstack/react-query';
 import releaseDataFileQueries from '@admin/queries/releaseDataFileQueries';
 
+const titleMaxLength = 120;
+
 interface FormValues {
   title: string;
 }
@@ -43,8 +45,14 @@ export default function ReleaseDataFilePage({
     queryClient.removeQueries({
       queryKey: releaseDataFileQueries.list(releaseVersionId).queryKey,
     });
+    queryClient.removeQueries({
+      queryKey: releaseDataFileQueries.listUploads(releaseVersionId).queryKey,
+    });
     await queryClient.invalidateQueries({
       queryKey: releaseDataFileQueries.list._def,
+    });
+    await queryClient.invalidateQueries({
+      queryKey: releaseDataFileQueries.listUploads._def,
     });
 
     history.push(
@@ -54,8 +62,6 @@ export default function ReleaseDataFilePage({
       }),
     );
   };
-
-  const titleMaxLength = 120;
 
   return (
     <>
@@ -82,7 +88,7 @@ export default function ReleaseDataFilePage({
                   .required('Enter a title')
                   .max(
                     titleMaxLength,
-                    `Title must be ${titleMaxLength} characters or less`,
+                    `Title must be ${titleMaxLength} characters or fewer`,
                   ),
               })}
             >

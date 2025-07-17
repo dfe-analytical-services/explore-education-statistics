@@ -25,7 +25,7 @@ export default function getReferenceLineLabelPosition({
 }): LabelPosition {
   const { height = 0, width = 0, x = 0, y = 0 } = viewBox ?? {};
   const defaultXPosition = axis === 'y' ? width / 2 + x : x;
-  const defaultYPosition = axis === 'x' ? height / 2 + y : y;
+  const defaultYPosition = axis === 'x' ? y - 4 : y;
 
   // No custom other axis position or domain so default to middle
   if (
