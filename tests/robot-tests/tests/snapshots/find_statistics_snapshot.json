@@ -30,7 +30,7 @@
   {
     "publication_summary": "Apprenticeship starts, achievements and participation. Includes breakdowns by age, sex, ethnicity, subject, provider, geography etc.",
     "publication_title": "Apprenticeships",
-    "published": "27 Mar 2025",
+    "published": "17 Jul 2025",
     "release_type": "Accredited official statistics",
     "theme": "Further education"
   },
@@ -182,13 +182,6 @@
     "theme": "UK education and training statistics"
   },
   {
-    "publication_summary": "Statistics on children aged 2 to 4 registered for funded early education and childcare entitlements in England, including on staff and providers delivering them",
-    "publication_title": "Education provision: children under 5 years of age",
-    "published": "11 Jul 2024",
-    "release_type": "Accredited official statistics",
-    "theme": "Early years"
-  },
-  {
     "publication_summary": "An examination of the education, children's social care background of children cautioned or sentenced for offences at national and local authority level. ",
     "publication_title": "Education, children\u2019s social care and offending: local authority level dashboard",
     "published": "30 Mar 2023",
@@ -259,9 +252,16 @@
     "theme": "Pupils and schools"
   },
   {
+    "publication_summary": "Annual January statistics on children under 5 registered for government funded entitlements in England and on providers and staff delivering them.",
+    "publication_title": "Funded early education and childcare",
+    "published": "17 Jul 2025",
+    "release_type": "Accredited official statistics",
+    "theme": "Early years"
+  },
+  {
     "publication_summary": "Apprenticeship and adult 19+ Further Education and skills learning, including community learning, education and training, and basic skills (English and maths).",
     "publication_title": "Further education and skills",
-    "published": "27 Mar 2025",
+    "published": "17 Jul 2025",
     "release_type": "Accredited official statistics",
     "theme": "Further education"
   },
@@ -422,7 +422,7 @@
   {
     "publication_summary": "Annual release providing national projections for the number of pupils in schools in England by type of school, age and whether full time or part time.",
     "publication_title": "National pupil projections",
-    "published": "18 Jul 2024",
+    "published": "17 Jul 2025",
     "release_type": "Official statistics",
     "theme": "Pupils and schools"
   },
@@ -478,7 +478,7 @@
   {
     "publication_summary": "LA management information on participation and not in education or training (NEET) age 16 to 17. Includes ethnicity, SEND figures and comparative NEET scorecard",
     "publication_title": "Participation in education, training and NEET age 16 to 17 by local authority",
-    "published": "30 Jan 2025",
+    "published": "17 Jul 2025",
     "release_type": "Management information",
     "theme": "Destination of pupils and students"
   },
