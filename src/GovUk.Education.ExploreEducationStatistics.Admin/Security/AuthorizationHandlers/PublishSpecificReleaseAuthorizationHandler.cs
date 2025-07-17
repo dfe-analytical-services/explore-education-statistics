@@ -5,49 +5,48 @@ using Microsoft.AspNetCore.Authorization;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityClaimTypes;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 
-namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers
+namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers;
+
+public class PublishSpecificReleaseRequirement : IAuthorizationRequirement
 {
-    public class PublishSpecificReleaseRequirement : IAuthorizationRequirement
+}
+
+public class PublishSpecificReleaseAuthorizationHandler :
+    AuthorizationHandler<PublishSpecificReleaseRequirement, ReleaseVersion>
+{
+    private readonly AuthorizationHandlerService _authorizationHandlerService;
+
+    public PublishSpecificReleaseAuthorizationHandler(
+        AuthorizationHandlerService authorizationHandlerService)
     {
+        _authorizationHandlerService = authorizationHandlerService;
     }
 
-    public class PublishSpecificReleaseAuthorizationHandler :
-        AuthorizationHandler<PublishSpecificReleaseRequirement, ReleaseVersion>
+    protected override async Task HandleRequirementAsync(
+        AuthorizationHandlerContext context,
+        PublishSpecificReleaseRequirement requirement,
+        ReleaseVersion releaseVersion)
     {
-        private readonly AuthorizationHandlerService _authorizationHandlerService;
-
-        public PublishSpecificReleaseAuthorizationHandler(
-            AuthorizationHandlerService authorizationHandlerService)
+        if (releaseVersion.ApprovalStatus != ReleaseApprovalStatus.Approved)
         {
-            _authorizationHandlerService = authorizationHandlerService;
+            return;
         }
 
-        protected override async Task HandleRequirementAsync(
-            AuthorizationHandlerContext context,
-            PublishSpecificReleaseRequirement requirement,
-            ReleaseVersion releaseVersion)
+        if (SecurityUtils.HasClaim(context.User, PublishAllReleases))
         {
-            if (releaseVersion.ApprovalStatus != ReleaseApprovalStatus.Approved)
-            {
-                return;
-            }
+            context.Succeed(requirement);
+            return;
+        }
 
-            if (SecurityUtils.HasClaim(context.User, PublishAllReleases))
-            {
-                context.Succeed(requirement);
-                return;
-            }
-
-            if (await _authorizationHandlerService
-                    .HasRolesOnPublicationOrReleaseVersion(
-                        context.User.GetUserId(),
-                        releaseVersion.PublicationId,
-                        releaseVersion.Id,
-                        ListOf(PublicationRole.Owner),
-                        ListOf(ReleaseRole.Approver)))
-            {
-                context.Succeed(requirement);
-            }
+        if (await _authorizationHandlerService
+                .HasRolesOnPublicationOrReleaseVersion(
+                    context.User.GetUserId(),
+                    releaseVersion.PublicationId,
+                    releaseVersion.Id,
+                    ListOf(PublicationRole.Owner),
+                    ListOf(ReleaseRole.Approver)))
+        {
+            context.Succeed(requirement);
         }
     }
 }

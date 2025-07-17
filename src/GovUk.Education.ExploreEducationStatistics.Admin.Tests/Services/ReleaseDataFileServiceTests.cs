@@ -36,8 +36,8 @@ using static Moq.MockBehavior;
 using File = GovUk.Education.ExploreEducationStatistics.Content.Model.File;
 using ReleaseVersion = GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseVersion;
 
-namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
-{
+namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services;
+
     public class ReleaseDataFileServiceTests
     {
         private readonly DataFixture _fixture = new();
@@ -2209,4 +2209,3 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             );
         }
     }
-}

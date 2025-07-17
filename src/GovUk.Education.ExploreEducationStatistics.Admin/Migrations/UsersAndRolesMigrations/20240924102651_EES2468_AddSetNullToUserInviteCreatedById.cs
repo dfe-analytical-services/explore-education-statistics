@@ -2,40 +2,39 @@
 
 #nullable disable
 
-namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.UsersAndRolesMigrations
+namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.UsersAndRolesMigrations;
+
+/// <inheritdoc />
+public partial class EES2468_AddSetNullToUserInviteCreatedById : Migration
 {
     /// <inheritdoc />
-    public partial class EES2468_AddSetNullToUserInviteCreatedById : Migration
+    protected override void Up(MigrationBuilder migrationBuilder)
     {
-        /// <inheritdoc />
-        protected override void Up(MigrationBuilder migrationBuilder)
-        {
-            migrationBuilder.DropForeignKey(
-                name: "FK_UserInvites_AspNetUsers_CreatedById",
-                table: "UserInvites");
+        migrationBuilder.DropForeignKey(
+            name: "FK_UserInvites_AspNetUsers_CreatedById",
+            table: "UserInvites");
 
-            migrationBuilder.AddForeignKey(
-                name: "FK_UserInvites_AspNetUsers_CreatedById",
-                table: "UserInvites",
-                column: "CreatedById",
-                principalTable: "AspNetUsers",
-                principalColumn: "Id",
-                onDelete: ReferentialAction.SetNull);
-        }
+        migrationBuilder.AddForeignKey(
+            name: "FK_UserInvites_AspNetUsers_CreatedById",
+            table: "UserInvites",
+            column: "CreatedById",
+            principalTable: "AspNetUsers",
+            principalColumn: "Id",
+            onDelete: ReferentialAction.SetNull);
+    }
 
-        /// <inheritdoc />
-        protected override void Down(MigrationBuilder migrationBuilder)
-        {
-            migrationBuilder.DropForeignKey(
-                name: "FK_UserInvites_AspNetUsers_CreatedById",
-                table: "UserInvites");
+    /// <inheritdoc />
+    protected override void Down(MigrationBuilder migrationBuilder)
+    {
+        migrationBuilder.DropForeignKey(
+            name: "FK_UserInvites_AspNetUsers_CreatedById",
+            table: "UserInvites");
 
-            migrationBuilder.AddForeignKey(
-                name: "FK_UserInvites_AspNetUsers_CreatedById",
-                table: "UserInvites",
-                column: "CreatedById",
-                principalTable: "AspNetUsers",
-                principalColumn: "Id");
-        }
+        migrationBuilder.AddForeignKey(
+            name: "FK_UserInvites_AspNetUsers_CreatedById",
+            table: "UserInvites",
+            column: "CreatedById",
+            principalTable: "AspNetUsers",
+            principalColumn: "Id");
     }
 }

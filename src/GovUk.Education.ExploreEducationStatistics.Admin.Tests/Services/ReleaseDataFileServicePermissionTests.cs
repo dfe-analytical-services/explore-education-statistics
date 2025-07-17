@@ -23,8 +23,8 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityP
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.PermissionTestUtils;
 
-namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
-{
+namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services;
+
     public class ReleaseDataFileServicePermissionTests
     {
         private readonly ReleaseVersion _releaseVersion = new()
@@ -302,4 +302,3 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             return mock;
         }
     }
-}

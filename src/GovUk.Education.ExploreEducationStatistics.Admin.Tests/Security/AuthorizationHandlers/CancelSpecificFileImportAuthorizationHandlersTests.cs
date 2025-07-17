@@ -9,50 +9,21 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interf
 using Moq;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.AuthorizationHandlersTestUtil;
 
-namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers
+namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers;
+
+public class CancelSpecificFileImportAuthorizationHandlersTests
 {
-    public class CancelSpecificFileImportAuthorizationHandlersTests
+    [Fact]
+    public async Task CannotCancelFinishedOrAbortingImport()
     {
-        [Fact]
-        public async Task CannotCancelFinishedOrAbortingImport()
-        {
-            var finishedOrAbortingStatuses = EnumUtil
-                .GetEnums<DataImportStatus>()
-                .Where(status => status.IsFinishedOrAborting())
-                .ToList();
+        var finishedOrAbortingStatuses = EnumUtil
+            .GetEnums<DataImportStatus>()
+            .Where(status => status.IsFinishedOrAborting())
+            .ToList();
 
-            await finishedOrAbortingStatuses
-                .ToAsyncEnumerable()
-                .ForEachAwaitAsync(async status =>
-                {
-                    var file = new File
-                    {
-                        Id = Guid.NewGuid()
-                    };
-
-                    var importRepository = new Mock<IDataImportRepository>();
-
-                    importRepository
-                        .Setup(s => s.GetStatusByFileId(file.Id))
-                        .ReturnsAsync(status);
-
-                    // Assert that no users can cancel a finished or aborting Import
-                    await AssertHandlerSucceedsWithCorrectClaims<File, CancelSpecificFileImportRequirement>(
-                        new CancelSpecificFileImportAuthorizationHandler(importRepository.Object), file);
-                });
-        }
-
-        [Fact]
-        public async Task CanCancelHealthyOngoingImportWithCorrectClaim()
-        {
-            var nonFinishedOrAbortingStatuses = EnumUtil
-                .GetEnums<DataImportStatus>()
-                .Where(status => !status.IsFinishedOrAborting())
-                .ToList();
-
-            await nonFinishedOrAbortingStatuses
-                .ToAsyncEnumerable()
-                .ForEachAwaitAsync(async status =>
+        await finishedOrAbortingStatuses
+            .ToAsyncEnumerable()
+            .ForEachAwaitAsync(async status =>
             {
                 var file = new File
                 {
@@ -65,12 +36,40 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                     .Setup(s => s.GetStatusByFileId(file.Id))
                     .ReturnsAsync(status);
 
-                // Assert that users with the CancelAllFileImports claim can cancel a non-finished-or-aborting Import
+                // Assert that no users can cancel a finished or aborting Import
                 await AssertHandlerSucceedsWithCorrectClaims<File, CancelSpecificFileImportRequirement>(
-                    new CancelSpecificFileImportAuthorizationHandler(importRepository.Object),
-                    file,
-                    SecurityClaimTypes.CancelAllFileImports);
+                    new CancelSpecificFileImportAuthorizationHandler(importRepository.Object), file);
             });
-        }
+    }
+
+    [Fact]
+    public async Task CanCancelHealthyOngoingImportWithCorrectClaim()
+    {
+        var nonFinishedOrAbortingStatuses = EnumUtil
+            .GetEnums<DataImportStatus>()
+            .Where(status => !status.IsFinishedOrAborting())
+            .ToList();
+
+        await nonFinishedOrAbortingStatuses
+            .ToAsyncEnumerable()
+            .ForEachAwaitAsync(async status =>
+        {
+            var file = new File
+            {
+                Id = Guid.NewGuid()
+            };
+
+            var importRepository = new Mock<IDataImportRepository>();
+
+            importRepository
+                .Setup(s => s.GetStatusByFileId(file.Id))
+                .ReturnsAsync(status);
+
+            // Assert that users with the CancelAllFileImports claim can cancel a non-finished-or-aborting Import
+            await AssertHandlerSucceedsWithCorrectClaims<File, CancelSpecificFileImportRequirement>(
+                new CancelSpecificFileImportAuthorizationHandler(importRepository.Object),
+                file,
+                SecurityClaimTypes.CancelAllFileImports);
+        });
     }
 }

@@ -24,124 +24,123 @@ using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.Permi
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Utils.ContentDbUtils;
 using static Moq.MockBehavior;
 
-namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
+namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests;
+
+public class TableBuilderServicePermissionTests
 {
-    public class TableBuilderServicePermissionTests
+    private readonly DataFixture _dataFixture = new();
+
+    [Fact]
+    public async Task Query_LatestRelease_CanViewSubjectData()
     {
-        private readonly DataFixture _dataFixture = new();
+        Publication publication = _dataFixture.DefaultPublication()
+            .WithReleases([_dataFixture.DefaultRelease(publishedVersions: 1)]);
 
-        [Fact]
-        public async Task Query_LatestRelease_CanViewSubjectData()
+        var releaseVersion = publication.Releases.Single().Versions.Single();
+
+        var releaseSubject = new ReleaseSubject
         {
-            Publication publication = _dataFixture.DefaultPublication()
-                .WithReleases([_dataFixture.DefaultRelease(publishedVersions: 1)]);
+            ReleaseVersionId = releaseVersion.Id,
+            SubjectId = Guid.NewGuid(),
+        };
 
-            var releaseVersion = publication.Releases.Single().Versions.Single();
+        var statisticsPersistenceHelper = MockUtils.MockPersistenceHelper<StatisticsDbContext>();
+        MockUtils.SetupCall(statisticsPersistenceHelper, releaseSubject);
 
-            var releaseSubject = new ReleaseSubject
-            {
-                ReleaseVersionId = releaseVersion.Id,
-                SubjectId = Guid.NewGuid(),
-            };
+        await using var contextDbContext = InMemoryContentDbContext();
+        contextDbContext.Publications.Add(publication);
+        await contextDbContext.SaveChangesAsync();
 
-            var statisticsPersistenceHelper = MockUtils.MockPersistenceHelper<StatisticsDbContext>();
-            MockUtils.SetupCall(statisticsPersistenceHelper, releaseSubject);
+        var subjectRepository = new Mock<ISubjectRepository>(Strict);
 
-            await using var contextDbContext = InMemoryContentDbContext();
-            contextDbContext.Publications.Add(publication);
-            await contextDbContext.SaveChangesAsync();
+        subjectRepository
+            .Setup(s => s.FindPublicationIdForSubject(releaseSubject.SubjectId, default))
+            .ReturnsAsync(publication.Id);
 
-            var subjectRepository = new Mock<ISubjectRepository>(Strict);
+        await PolicyCheckBuilder<DataSecurityPolicies>()
+            .SetupResourceCheckToFail(releaseSubject, DataSecurityPolicies.CanViewSubjectData)
+            .AssertForbidden(
+                async userService =>
+                {
+                    var service = BuildTableBuilderService(
+                        contextDbContext,
+                        userService: userService.Object,
+                        subjectRepository: subjectRepository.Object,
+                        statisticsPersistenceHelper: statisticsPersistenceHelper.Object
+                    );
 
-            subjectRepository
-                .Setup(s => s.FindPublicationIdForSubject(releaseSubject.SubjectId, default))
-                .ReturnsAsync(publication.Id);
-
-            await PolicyCheckBuilder<DataSecurityPolicies>()
-                .SetupResourceCheckToFail(releaseSubject, DataSecurityPolicies.CanViewSubjectData)
-                .AssertForbidden(
-                    async userService =>
-                    {
-                        var service = BuildTableBuilderService(
-                            contextDbContext,
-                            userService: userService.Object,
-                            subjectRepository: subjectRepository.Object,
-                            statisticsPersistenceHelper: statisticsPersistenceHelper.Object
-                        );
-
-                        return await service.Query(
-                            new FullTableQuery { SubjectId = releaseSubject.SubjectId }
-                        );
-                    }
-                );
-        }
-
-        [Fact]
-        public async Task Query_ReleaseVersionId_CanViewSubjectData()
-        {
-            Publication publication = _dataFixture.DefaultPublication()
-                .WithReleases([_dataFixture.DefaultRelease(publishedVersions: 1)]);
-
-            var releaseVersion = publication.Releases.Single().Versions.Single();
-
-            var releaseSubject = new ReleaseSubject
-            {
-                ReleaseVersionId = releaseVersion.Id,
-                SubjectId = Guid.NewGuid(),
-            };
-
-            var statisticsPersistenceHelper = MockUtils.MockPersistenceHelper<StatisticsDbContext>();
-            MockUtils.SetupCall(statisticsPersistenceHelper, releaseSubject);
-
-            await using var contextDbContext = InMemoryContentDbContext();
-            contextDbContext.Publications.Add(publication);
-            await contextDbContext.SaveChangesAsync();
-
-            await PolicyCheckBuilder<DataSecurityPolicies>()
-                .SetupResourceCheckToFail(releaseSubject, DataSecurityPolicies.CanViewSubjectData)
-                .AssertForbidden(
-                    async userService =>
-                    {
-                        var service = BuildTableBuilderService(
-                            contextDbContext,
-                            userService: userService.Object,
-                            statisticsPersistenceHelper: statisticsPersistenceHelper.Object
-                        );
-                        return await service.Query(
-                            releaseVersionId: releaseVersion.Id,
-                            new FullTableQuery { SubjectId = releaseSubject.SubjectId }
-                        );
-                    }
-                );
-        }
-
-        private TableBuilderService BuildTableBuilderService(
-            ContentDbContext contentDbContext,
-            IFilterItemRepository? filterItemRepository = null,
-            ILocationService? locationService = null,
-            IObservationService? observationService = null,
-            IPersistenceHelper<StatisticsDbContext>? statisticsPersistenceHelper = null,
-            ISubjectResultMetaService? subjectResultMetaService = null,
-            ISubjectCsvMetaService? subjectCsvMetaService = null,
-            ISubjectRepository? subjectRepository = null,
-            IUserService? userService = null,
-            IOptions<TableBuilderOptions>? tableBuilderOptions = null,
-            IOptions<LocationsOptions>? locationsOptions = null)
-        {
-            return new(
-                Mock.Of<StatisticsDbContext>(),
-                contentDbContext,
-                filterItemRepository ?? Mock.Of<IFilterItemRepository>(Strict),
-                locationService ?? Mock.Of<ILocationService>(Strict),
-                observationService ?? Mock.Of<IObservationService>(Strict),
-                statisticsPersistenceHelper ?? MockUtils.MockPersistenceHelper<StatisticsDbContext>().Object,
-                subjectResultMetaService ?? Mock.Of<ISubjectResultMetaService>(Strict),
-                subjectCsvMetaService ?? Mock.Of<ISubjectCsvMetaService>(Strict),
-                subjectRepository ?? Mock.Of<ISubjectRepository>(Strict),
-                userService ?? Mock.Of<IUserService>(Strict),
-                tableBuilderOptions ?? new TableBuilderOptions().ToOptionsWrapper(),
-                locationsOptions ?? new LocationsOptions().ToOptionsWrapper()
+                    return await service.Query(
+                        new FullTableQuery { SubjectId = releaseSubject.SubjectId }
+                    );
+                }
             );
-        }
+    }
+
+    [Fact]
+    public async Task Query_ReleaseVersionId_CanViewSubjectData()
+    {
+        Publication publication = _dataFixture.DefaultPublication()
+            .WithReleases([_dataFixture.DefaultRelease(publishedVersions: 1)]);
+
+        var releaseVersion = publication.Releases.Single().Versions.Single();
+
+        var releaseSubject = new ReleaseSubject
+        {
+            ReleaseVersionId = releaseVersion.Id,
+            SubjectId = Guid.NewGuid(),
+        };
+
+        var statisticsPersistenceHelper = MockUtils.MockPersistenceHelper<StatisticsDbContext>();
+        MockUtils.SetupCall(statisticsPersistenceHelper, releaseSubject);
+
+        await using var contextDbContext = InMemoryContentDbContext();
+        contextDbContext.Publications.Add(publication);
+        await contextDbContext.SaveChangesAsync();
+
+        await PolicyCheckBuilder<DataSecurityPolicies>()
+            .SetupResourceCheckToFail(releaseSubject, DataSecurityPolicies.CanViewSubjectData)
+            .AssertForbidden(
+                async userService =>
+                {
+                    var service = BuildTableBuilderService(
+                        contextDbContext,
+                        userService: userService.Object,
+                        statisticsPersistenceHelper: statisticsPersistenceHelper.Object
+                    );
+                    return await service.Query(
+                        releaseVersionId: releaseVersion.Id,
+                        new FullTableQuery { SubjectId = releaseSubject.SubjectId }
+                    );
+                }
+            );
+    }
+
+    private TableBuilderService BuildTableBuilderService(
+        ContentDbContext contentDbContext,
+        IFilterItemRepository? filterItemRepository = null,
+        ILocationService? locationService = null,
+        IObservationService? observationService = null,
+        IPersistenceHelper<StatisticsDbContext>? statisticsPersistenceHelper = null,
+        ISubjectResultMetaService? subjectResultMetaService = null,
+        ISubjectCsvMetaService? subjectCsvMetaService = null,
+        ISubjectRepository? subjectRepository = null,
+        IUserService? userService = null,
+        IOptions<TableBuilderOptions>? tableBuilderOptions = null,
+        IOptions<LocationsOptions>? locationsOptions = null)
+    {
+        return new(
+            Mock.Of<StatisticsDbContext>(),
+            contentDbContext,
+            filterItemRepository ?? Mock.Of<IFilterItemRepository>(Strict),
+            locationService ?? Mock.Of<ILocationService>(Strict),
+            observationService ?? Mock.Of<IObservationService>(Strict),
+            statisticsPersistenceHelper ?? MockUtils.MockPersistenceHelper<StatisticsDbContext>().Object,
+            subjectResultMetaService ?? Mock.Of<ISubjectResultMetaService>(Strict),
+            subjectCsvMetaService ?? Mock.Of<ISubjectCsvMetaService>(Strict),
+            subjectRepository ?? Mock.Of<ISubjectRepository>(Strict),
+            userService ?? Mock.Of<IUserService>(Strict),
+            tableBuilderOptions ?? new TableBuilderOptions().ToOptionsWrapper(),
+            locationsOptions ?? new LocationsOptions().ToOptionsWrapper()
+        );
     }
 }

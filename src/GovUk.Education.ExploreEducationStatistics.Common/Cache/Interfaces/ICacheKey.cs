@@ -1,8 +1,7 @@
 ﻿#nullable enable
-namespace GovUk.Education.ExploreEducationStatistics.Common.Cache.Interfaces
+namespace GovUk.Education.ExploreEducationStatistics.Common.Cache.Interfaces;
+
+public interface ICacheKey
 {
-    public interface ICacheKey
-    {
-        public string Key { get; }
-    }
+    public string Key { get; }
 }

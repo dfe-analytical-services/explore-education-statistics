@@ -11,37 +11,36 @@ using GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using static GovUk.Education.ExploreEducationStatistics.Common.Cache.CronSchedules;
 
-namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
+namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers;
+
+[Route("api")]
+[Produces(MediaTypeNames.Application.Json)]
+public class ThemeController : ControllerBase
 {
-    [Route("api")]
-    [Produces(MediaTypeNames.Application.Json)]
-    public class ThemeController : ControllerBase
+    private readonly IMethodologyCacheService _methodologyCacheService;
+    private readonly IThemeService _themeService;
+
+    public ThemeController(
+        IMethodologyCacheService methodologyCacheService,
+        IThemeService themeService)
     {
-        private readonly IMethodologyCacheService _methodologyCacheService;
-        private readonly IThemeService _themeService;
+        _methodologyCacheService = methodologyCacheService;
+        _themeService = themeService;
+    }
 
-        public ThemeController(
-            IMethodologyCacheService methodologyCacheService,
-            IThemeService themeService)
-        {
-            _methodologyCacheService = methodologyCacheService;
-            _themeService = themeService;
-        }
+    [HttpGet("methodology-themes")]
+    public async Task<ActionResult<List<AllMethodologiesThemeViewModel>>> GetMethodologyThemes()
+    {
+        return await _methodologyCacheService
+            .GetSummariesTree()
+            .HandleFailuresOrOk();
+    }
 
-        [HttpGet("methodology-themes")]
-        public async Task<ActionResult<List<AllMethodologiesThemeViewModel>>> GetMethodologyThemes()
-        {
-            return await _methodologyCacheService
-                .GetSummariesTree()
-                .HandleFailuresOrOk();
-        }
-
-        [MemoryCache(typeof(ListThemesCacheKey), durationInSeconds: 10, expiryScheduleCron: HalfHourlyExpirySchedule)]
-        [HttpGet("themes")]
-        public async Task<IList<ThemeViewModel>> ListThemes()
-        {
-            return await _themeService
-                .ListThemes();
-        }
+    [MemoryCache(typeof(ListThemesCacheKey), durationInSeconds: 10, expiryScheduleCron: HalfHourlyExpirySchedule)]
+    [HttpGet("themes")]
+    public async Task<IList<ThemeViewModel>> ListThemes()
+    {
+        return await _themeService
+            .ListThemes();
     }
 }

@@ -138,8 +138,8 @@ using ReleaseVersionService = GovUk.Education.ExploreEducationStatistics.Admin.S
 using SameSiteMode = Microsoft.AspNetCore.Http.SameSiteMode;
 using ThemeService = GovUk.Education.ExploreEducationStatistics.Admin.Services.ThemeService;
 
-namespace GovUk.Education.ExploreEducationStatistics.Admin
-{
+namespace GovUk.Education.ExploreEducationStatistics.Admin;
+
     public class Startup(
         IConfiguration configuration,
         IHostEnvironment hostEnvironment)
@@ -1051,4 +1051,3 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
 
         public Task<List<FilterMappingTypes>> GetFilterOptionMappingTypes(Guid targetDataSetVersionId, CancellationToken cancellationToken = default) => throw new NotImplementedException();
     }
-}

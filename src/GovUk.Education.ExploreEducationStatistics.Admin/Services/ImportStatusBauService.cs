@@ -13,71 +13,70 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.DataImportStatus;
 
-namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
+namespace GovUk.Education.ExploreEducationStatistics.Admin.Services;
+
+public class ImportStatusBauService : IImportStatusBauService
 {
-    public class ImportStatusBauService : IImportStatusBauService
+    private readonly IUserService _userService;
+    private readonly ContentDbContext _contentDbContext;
+
+    public ImportStatusBauService(
+        IUserService userService,
+        ContentDbContext contentDbContext)
     {
-        private readonly IUserService _userService;
-        private readonly ContentDbContext _contentDbContext;
+        _userService = userService;
+        _contentDbContext = contentDbContext;
+    }
 
-        public ImportStatusBauService(
-            IUserService userService,
-            ContentDbContext contentDbContext)
-        {
-            _userService = userService;
-            _contentDbContext = contentDbContext;
-        }
-
-        public async Task<Either<ActionResult, List<ImportStatusBauViewModel>>> GetAllIncompleteImports()
-        {
-            return await _userService
-                .CheckCanViewAllImports()
-                .OnSuccess(async () =>
-                {
-                    var releaseFilesQueryable = _contentDbContext.ReleaseFiles
-                        .Include(rf => rf.ReleaseVersion)
-                        .ThenInclude(rv => rv.Release)
-                        .ThenInclude(r => r.Publication);
-
-                    return await _contentDbContext.DataImports
-                        .Include(dataImport => dataImport.File)
-                        .Join(releaseFilesQueryable,
-                            dataImport => dataImport.FileId,
-                            releaseFile => releaseFile.FileId,
-                            (dataImport, releaseFile) => new
-                            {
-                                DataImport = dataImport,
-                                releaseFile.ReleaseVersion
-                            })
-                        .Where(join => join.DataImport.Status != COMPLETE)
-                        .OrderByDescending(join => join.DataImport.Created)
-                        .Select(join => BuildViewModel(join.DataImport, join.ReleaseVersion))
-                        .ToListAsync();
-                });
-        }
-
-        private static ImportStatusBauViewModel BuildViewModel(
-            DataImport dataImport,
-            ReleaseVersion releaseVersion)
-        {
-            var file = dataImport.File;
-            var release = releaseVersion.Release;
-            var publication = release.Publication;
-            return new ImportStatusBauViewModel
+    public async Task<Either<ActionResult, List<ImportStatusBauViewModel>>> GetAllIncompleteImports()
+    {
+        return await _userService
+            .CheckCanViewAllImports()
+            .OnSuccess(async () =>
             {
-                SubjectTitle = null, // EES-1655
-                SubjectId = dataImport.SubjectId,
-                PublicationId = publication.Id,
-                PublicationTitle = publication.Title,
-                ReleaseId = releaseVersion.Id,
-                ReleaseTitle = release.Title,
-                FileId = file.Id,
-                DataFileName = file.Filename,
-                TotalRows = dataImport.TotalRows,
-                Status = dataImport.Status,
-                StagePercentageComplete = dataImport.StagePercentageComplete,
-                PercentageComplete = dataImport.PercentageComplete()
-            };
-        }
+                var releaseFilesQueryable = _contentDbContext.ReleaseFiles
+                    .Include(rf => rf.ReleaseVersion)
+                    .ThenInclude(rv => rv.Release)
+                    .ThenInclude(r => r.Publication);
+
+                return await _contentDbContext.DataImports
+                    .Include(dataImport => dataImport.File)
+                    .Join(releaseFilesQueryable,
+                        dataImport => dataImport.FileId,
+                        releaseFile => releaseFile.FileId,
+                        (dataImport, releaseFile) => new
+                        {
+                            DataImport = dataImport,
+                            releaseFile.ReleaseVersion
+                        })
+                    .Where(join => join.DataImport.Status != COMPLETE)
+                    .OrderByDescending(join => join.DataImport.Created)
+                    .Select(join => BuildViewModel(join.DataImport, join.ReleaseVersion))
+                    .ToListAsync();
+            });
+    }
+
+    private static ImportStatusBauViewModel BuildViewModel(
+        DataImport dataImport,
+        ReleaseVersion releaseVersion)
+    {
+        var file = dataImport.File;
+        var release = releaseVersion.Release;
+        var publication = release.Publication;
+        return new ImportStatusBauViewModel
+        {
+            SubjectTitle = null, // EES-1655
+            SubjectId = dataImport.SubjectId,
+            PublicationId = publication.Id,
+            PublicationTitle = publication.Title,
+            ReleaseId = releaseVersion.Id,
+            ReleaseTitle = release.Title,
+            FileId = file.Id,
+            DataFileName = file.Filename,
+            TotalRows = dataImport.TotalRows,
+            Status = dataImport.Status,
+            StagePercentageComplete = dataImport.StagePercentageComplete,
+            PercentageComplete = dataImport.PercentageComplete()
+        };
     }
 }

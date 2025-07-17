@@ -7,8 +7,8 @@ using System;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
 using System.Diagnostics.CodeAnalysis;
 
-namespace GovUk.Education.ExploreEducationStatistics.Admin.Models
-{
+namespace GovUk.Education.ExploreEducationStatistics.Admin.Models;
+
     public record DataFileInfo : FileInfo
     {
         public override FileType Type { get; set; } = FileType.Data;
@@ -72,4 +72,3 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Models
             HasValidReplacementPlan = hasValidReplacementPlan;
         }
     }
-}

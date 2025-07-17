@@ -6,103 +6,102 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using static System.String;
 using static GovUk.Education.ExploreEducationStatistics.Common.Database.TimePeriodYearFormat;
 
-namespace GovUk.Education.ExploreEducationStatistics.Common.Utils
+namespace GovUk.Education.ExploreEducationStatistics.Common.Utils;
+
+public class TimePeriodLabelFormatter
 {
-    public class TimePeriodLabelFormatter
+    private static readonly Regex YearRegex = new Regex(@"^([0-9]{4})?$");
+    private TimePeriodLabelFormat LabelFormat { get; }
+    private TimePeriodYearFormat YearFormat { get; }
+
+    private TimePeriodLabelFormatter(TimePeriodLabelFormat labelFormat,
+        TimePeriodYearFormat yearFormat)
     {
-        private static readonly Regex YearRegex = new Regex(@"^([0-9]{4})?$");
-        private TimePeriodLabelFormat LabelFormat { get; }
-        private TimePeriodYearFormat YearFormat { get; }
+        LabelFormat = labelFormat;
+        YearFormat = yearFormat;
+    }
 
-        private TimePeriodLabelFormatter(TimePeriodLabelFormat labelFormat,
-            TimePeriodYearFormat yearFormat)
-        {
-            LabelFormat = labelFormat;
-            YearFormat = yearFormat;
-        }
+    public static string Format(
+        string period,
+        TimeIdentifier timeIdentifier,
+        TimePeriodLabelFormat? overridingLabelFormat = null)
+    {
+        var year = int.Parse(period); // Will change in the future - see EES-3109
+        return FormatterFor(timeIdentifier, overridingLabelFormat).FormatInternal(year, timeIdentifier);
+    }
 
-        public static string Format(
-            string period,
-            TimeIdentifier timeIdentifier,
-            TimePeriodLabelFormat? overridingLabelFormat = null)
-        {
-            var year = int.Parse(period); // Will change in the future - see EES-3109
-            return FormatterFor(timeIdentifier, overridingLabelFormat).FormatInternal(year, timeIdentifier);
-        }
+    public static string Format(
+        int year,
+        TimeIdentifier timeIdentifier,
+        TimePeriodLabelFormat? overridingLabelFormat = null)
+    {
+        return FormatterFor(timeIdentifier, overridingLabelFormat).FormatInternal(year, timeIdentifier);
+    }
 
-        public static string Format(
-            int year,
-            TimeIdentifier timeIdentifier,
-            TimePeriodLabelFormat? overridingLabelFormat = null)
-        {
-            return FormatterFor(timeIdentifier, overridingLabelFormat).FormatInternal(year, timeIdentifier);
-        }
+    public static string FormatYear(int year, TimeIdentifier timeIdentifier)
+    {
+        return FormatterFor(timeIdentifier).FormatYearInternal(year);
+    }
 
-        public static string FormatYear(int year, TimeIdentifier timeIdentifier)
-        {
-            return FormatterFor(timeIdentifier).FormatYearInternal(year);
-        }
+    public static string FormatCsvYear(int year, TimeIdentifier timeIdentifier)
+    {
+        return FormatterFor(timeIdentifier).FormatCsvYearInternal(year);
+    }
 
-        public static string FormatCsvYear(int year, TimeIdentifier timeIdentifier)
+    private string FormatInternal(int year, TimeIdentifier timeIdentifier)
+    {
+        var labelValueAttribute = timeIdentifier.GetEnumAttribute<TimeIdentifierMetaAttribute>();
+        var formattedYear = FormatYearInternal(year);
+        return LabelFormat switch
         {
-            return FormatterFor(timeIdentifier).FormatCsvYearInternal(year);
-        }
+            TimePeriodLabelFormat.FullLabel => $"{formattedYear} {labelValueAttribute.Label}",
+            TimePeriodLabelFormat.FullLabelBeforeYear => $"{labelValueAttribute.Label} {formattedYear}",
+            TimePeriodLabelFormat.NoLabel => formattedYear,
+            TimePeriodLabelFormat.ShortLabel => IsNullOrEmpty(labelValueAttribute.ShortLabel)
+                ? formattedYear
+                : $"{formattedYear} {labelValueAttribute.ShortLabel}",
+            _ => throw new ArgumentOutOfRangeException()
+        };
+    }
 
-        private string FormatInternal(int year, TimeIdentifier timeIdentifier)
+    private string FormatYearInternal(int year)
+    {
+        if (YearRegex.Match(year.ToString()).Success)
         {
-            var labelValueAttribute = timeIdentifier.GetEnumAttribute<TimeIdentifierMetaAttribute>();
-            var formattedYear = FormatYearInternal(year);
-            return LabelFormat switch
+            return YearFormat switch
             {
-                TimePeriodLabelFormat.FullLabel => $"{formattedYear} {labelValueAttribute.Label}",
-                TimePeriodLabelFormat.FullLabelBeforeYear => $"{labelValueAttribute.Label} {formattedYear}",
-                TimePeriodLabelFormat.NoLabel => formattedYear,
-                TimePeriodLabelFormat.ShortLabel => IsNullOrEmpty(labelValueAttribute.ShortLabel)
-                    ? formattedYear
-                    : $"{formattedYear} {labelValueAttribute.ShortLabel}",
+                Default => year.ToString(),
+                Academic => $"{year}/{(year + 1) % 100:D2}", // Only want the last two digits,
+                Fiscal => $"{year}-{(year + 1) % 100:D2}", // Only want the last two digits,
                 _ => throw new ArgumentOutOfRangeException()
             };
         }
 
-        private string FormatYearInternal(int year)
+        throw new ArgumentOutOfRangeException();
+    }
+
+    private string FormatCsvYearInternal(int year)
+    {
+        if (YearRegex.Match(year.ToString()).Success)
         {
-            if (YearRegex.Match(year.ToString()).Success)
+            return YearFormat switch
             {
-                return YearFormat switch
-                {
-                    Default => year.ToString(),
-                    Academic => $"{year}/{(year + 1) % 100:D2}", // Only want the last two digits,
-                    Fiscal => $"{year}-{(year + 1) % 100:D2}", // Only want the last two digits,
-                    _ => throw new ArgumentOutOfRangeException()
-                };
-            }
-
-            throw new ArgumentOutOfRangeException();
+                Academic or Fiscal => $"{year}{(year + 1) % 100:D2}",
+                _ => year.ToString()
+            };
         }
 
-        private string FormatCsvYearInternal(int year)
-        {
-            if (YearRegex.Match(year.ToString()).Success)
-            {
-                return YearFormat switch
-                {
-                    Academic or Fiscal => $"{year}{(year + 1) % 100:D2}",
-                    _ => year.ToString()
-                };
-            }
+        throw new ArgumentOutOfRangeException();
+    }
 
-            throw new ArgumentOutOfRangeException();
-        }
-
-        private static TimePeriodLabelFormatter FormatterFor(
-            TimeIdentifier timeIdentifier,
-            TimePeriodLabelFormat? overridingLabelFormat = null)
-        {
-            var labelValueAttribute = timeIdentifier.GetEnumAttribute<TimeIdentifierMetaAttribute>();
-            return overridingLabelFormat.HasValue
-                ? new TimePeriodLabelFormatter(overridingLabelFormat.Value, labelValueAttribute.YearFormat)
-                : new TimePeriodLabelFormatter(labelValueAttribute.LabelFormat,
-                    labelValueAttribute.YearFormat);
-        }
+    private static TimePeriodLabelFormatter FormatterFor(
+        TimeIdentifier timeIdentifier,
+        TimePeriodLabelFormat? overridingLabelFormat = null)
+    {
+        var labelValueAttribute = timeIdentifier.GetEnumAttribute<TimeIdentifierMetaAttribute>();
+        return overridingLabelFormat.HasValue
+            ? new TimePeriodLabelFormatter(overridingLabelFormat.Value, labelValueAttribute.YearFormat)
+            : new TimePeriodLabelFormatter(labelValueAttribute.LabelFormat,
+                labelValueAttribute.YearFormat);
     }
 }
