@@ -53,8 +53,6 @@ export default function DataFilesTableRow({
   const allowReplacementOfDataFile = isNewReplaceDsvFeatureEnabled
     ? true
     : dataFile.publicApiDataSetId == null;
-  const releaseIsNotAmendmentAndIsLinkedToApi =
-    !releaseVersion.amendment && dataFile.publicApiDataSetId != null;
   return (
     <tr key={dataFile.title}>
       <td data-testid="Title" className={styles.title}>
@@ -105,7 +103,8 @@ export default function DataFilesTableRow({
                     <ReplaceDataButtonOrModal
                       allowReplacementOfDataFile={allowReplacementOfDataFile}
                       releaseIsNotAmendmentAndIsLinkedToApi={
-                        releaseIsNotAmendmentAndIsLinkedToApi
+                        !releaseVersion.amendment &&
+                        dataFile.publicApiDataSetId != null
                       }
                       publicationId={publicationId}
                       dataFileId={dataFile.id}
@@ -161,6 +160,7 @@ export default function DataFilesTableRow({
     </tr>
   );
 }
+
 function CannotReplaceDataModal({ children }: { children: React.ReactNode }) {
   return (
     <Modal
@@ -188,55 +188,51 @@ function ReplaceDataButtonOrModal({
   publicationId: string;
   releaseVersionId: string;
 }) {
-  const blockReplaceLinkedApiModal = (
-    <CannotReplaceDataModal>
-      <p>
-        This data file has an API data set linked to it. Please remove the API
-        data set before replacing the data.
-      </p>
-      <p>
-        <Link
-          to={
-            publicApiDataSetId
-              ? generatePath<ReleaseDataSetRouteParams>(
-                  releaseApiDataSetDetailsRoute.path,
-                  {
-                    publicationId,
-                    releaseVersionId,
-                    dataSetId: publicApiDataSetId,
-                  },
-                )
-              : {}
-          }
-        >
-          Go to API data set
-        </Link>
-      </p>
-    </CannotReplaceDataModal>
-  );
-
-  const blockReplaceDraftApiModal = (
-    <CannotReplaceDataModal>
-      <p>
-        This data replacement can not be completed as it is targeting an
-        existing draft API data set.
-      </p>
-      <p>
-        Please contact the explore statistics team at{' '}
-        <a href="mailto:explore.statistics@education.gov.uk">
-          explore.statistics@education.gov.uk
-        </a>{' '}
-        for support on completing this replacement.
-      </p>
-    </CannotReplaceDataModal>
-  );
-
   if (!allowReplacementOfDataFile) {
-    return blockReplaceLinkedApiModal;
+    return (
+      <CannotReplaceDataModal>
+        <p>
+          This data file has an API data set linked to it. Please remove the API
+          data set before replacing the data.
+        </p>
+        <p>
+          <Link
+            to={
+              publicApiDataSetId
+                ? generatePath<ReleaseDataSetRouteParams>(
+                    releaseApiDataSetDetailsRoute.path,
+                    {
+                      publicationId,
+                      releaseVersionId,
+                      dataSetId: publicApiDataSetId,
+                    },
+                  )
+                : {}
+            }
+          >
+            Go to API data set
+          </Link>
+        </p>
+      </CannotReplaceDataModal>
+    );
   }
 
   if (releaseIsNotAmendmentAndIsLinkedToApi) {
-    return blockReplaceDraftApiModal;
+    return (
+      <CannotReplaceDataModal>
+        <p>
+          This data replacement can not be completed as it is targeting an
+          existing draft API data set.
+        </p>
+        <p>
+          Please contact the explore statistics team at{' '}
+          <a href="mailto:explore.statistics@education.gov.uk">
+            explore.statistics@education.gov.uk
+          </a>{' '}
+          for support on completing this replacement.
+        </p>
+      </CannotReplaceDataModal>
+    );
   }
 
   return (
