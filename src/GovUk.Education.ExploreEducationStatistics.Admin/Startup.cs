@@ -500,13 +500,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             // authentication managers that simply authenticate themselves via an HTTP header.
             if (hostEnvironment.IsProduction())
             {
-                services.AddTransient(
+                services.AddScoped(
                     typeof(IHttpClientAzureAuthenticationManager<>),
                     typeof(DefaultAzureCredentialHttpClientAuthenticationManager<>));
             }
             else
             {
-                services.AddTransient(
+                services.AddScoped(
                     typeof(IHttpClientAzureAuthenticationManager<>),
                     typeof(HttpHeaderHttpClientAuthenticationManager<>));
             }
