@@ -150,23 +150,30 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository
             CheckLinkedOriginalAndReplacementReleaseFilesExist(Guid releaseVersionId,
                 Guid originalFileId)
         {
-
             return await _contentDbContext.ReleaseFiles
                 .Include(rf => rf.File)
-                .FirstOrNotFoundAsync(originalReleaseFile =>
-                    originalReleaseFile.ReleaseVersionId == releaseVersionId
-                    && originalReleaseFile.FileId == originalFileId
-                    && originalReleaseFile.File.Type == Data
-                    && originalReleaseFile.File.ReplacedById != null)
-                .OnSuccessCombineWith(async originalReleaseFile =>
-                    await _contentDbContext.ReleaseFiles
-                        .Include(rf => rf.File)
-                        .FirstOrNotFoundAsync(replacementReleaseFile =>
-                            replacementReleaseFile.ReleaseVersionId == releaseVersionId
-                            && replacementReleaseFile.FileId == originalReleaseFile.File.ReplacedById
-                            && replacementReleaseFile.File.Type == Data
-                            && originalReleaseFile.FileId == replacementReleaseFile.File.ReplacingId))
-                .OnSuccess(releaseFiles => releaseFiles.ToValueTuple());
+                .Where(rf => rf.ReleaseVersionId == releaseVersionId
+                             && rf.FileId == originalFileId
+                             && rf.File.Type == Data
+                             && rf.File.ReplacedById != null)
+                .Join(
+                    _contentDbContext.ReleaseFiles.Include(rf => rf.File),
+                    original => original.File.ReplacedById,
+                    replacement => replacement.FileId,
+                    (original, replacement) => new
+                    {
+                        Original = original,
+                        Replacement = replacement
+                    })
+                .FirstOrNotFoundAsync(joined =>
+                    joined.Replacement.ReleaseVersionId == releaseVersionId
+                    && joined.Replacement.File.Type == Data
+                    && joined.Original.FileId == joined.Replacement.File.ReplacingId)
+                .OnSuccess(releaseFiles =>
+                    new Tuple<ReleaseFile, ReleaseFile>(
+                            releaseFiles.Original,
+                            releaseFiles.Replacement)
+                        .ToValueTuple());
         }
     }
 }

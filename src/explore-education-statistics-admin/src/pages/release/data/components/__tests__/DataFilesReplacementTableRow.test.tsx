@@ -74,6 +74,7 @@ describe('DataFilesReplacementTableRow', () => {
           dataFile={testDataFile}
           publicationId="test-publication"
           releaseVersionId="test-release-version"
+          onReplacementStatusChange={() => {}}
         />
       </MemoryRouter>,
     );
@@ -112,6 +113,7 @@ describe('DataFilesReplacementTableRow', () => {
           dataFile={testDataFile}
           publicationId="test-publication"
           releaseVersionId="test-release-version"
+          onReplacementStatusChange={() => {}}
         />
       </MemoryRouter>,
     );
@@ -151,6 +153,7 @@ describe('DataFilesReplacementTableRow', () => {
           dataFile={testDataFile}
           publicationId="test-publication"
           releaseVersionId="test-release-version"
+          onReplacementStatusChange={() => {}}
         />
       </MemoryRouter>,
     );

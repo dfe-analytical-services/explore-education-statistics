@@ -39,12 +39,18 @@ export default function ReleaseDataUploadsSection({
   );
   const [isReordering, toggleReordering] = useToggle(false);
 
+  // NOTE: When a data set is initially imported, it is first sent to the data screener to check for screener errors and
+  // warnings. At this stage, the data set will be returned from `listUploads`. If the file has no errors from the
+  // screener tests and the user has pressed a button to continue the import, the data set then starts being imported
+  // properly, and will then be returned from `list` instead.
+  //
+  // So "dataSetUploads" are data sets currently being screened via the R docker container, while "dataFiles" are data
+  // sets that have moved beyond the screener and are now being imported by the Data.Processor
   const {
     data: initialDataFiles,
     isLoading,
     refetch: refetchDataFiles,
   } = useQuery(releaseDataFileQueries.list(releaseVersionId));
-
   const {
     data: initialDataSetUploads,
     isLoading: isLoadingUploads,

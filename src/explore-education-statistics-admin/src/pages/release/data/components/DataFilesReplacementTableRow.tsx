@@ -28,7 +28,7 @@ interface Props {
   publicationId: string;
   releaseVersionId: string;
   onConfirmAction?: () => void;
-  onReplacementStatusChange?: (updatedDataFile: DataFile) => void;
+  onReplacementStatusChange: (updatedDataFile: DataFile) => void;
 }
 
 export default function DataFilesReplacementTableRow({
@@ -65,14 +65,17 @@ export default function DataFilesReplacementTableRow({
   }, [replacementDataFile?.status, toggleFetchPlan, toggleCanCancel]);
 
   useEffect(() => {
-    onReplacementStatusChange?.({
+    onReplacementStatusChange({
       ...dataFile,
-      replacedByDataFile: {
-        ...dataFile.replacedByDataFile,
-        hasValidReplacementPlan: plan?.valid ?? false,
-      } as ReplacementDataFile,
+      ...(dataFile.replacedByDataFile && {
+        replacedByDataFile: {
+          ...dataFile.replacedByDataFile,
+          hasValidReplacementPlan: plan?.valid ?? false,
+        },
+      }),
     });
-  }, [plan]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [plan, onReplacementStatusChange]);
 
   const handleStatusChange = async (
     _: DataFile,
@@ -82,12 +85,14 @@ export default function DataFilesReplacementTableRow({
       toggleFetchPlan.on();
       toggleCanCancel.on();
 
-      onReplacementStatusChange?.({
+      onReplacementStatusChange({
         ...dataFile,
-        replacedByDataFile: {
-          ...dataFile.replacedByDataFile,
-          status: replacementImportStatus.status,
-        } as ReplacementDataFile,
+        ...(dataFile.replacedByDataFile && {
+          replacedByDataFile: {
+            ...dataFile.replacedByDataFile,
+            status: replacementImportStatus.status,
+          },
+        }),
       });
     }
   };

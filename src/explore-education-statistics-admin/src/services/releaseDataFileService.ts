@@ -12,8 +12,8 @@ interface DataFileInfo extends FileInfo {
   userName: string;
   created: string;
   status: ImportStatusCode;
-  replacedBy?: string;
-  replacedByDataFile?: ReplacementDataFileInfo;
+  replacedBy?: string; // the fileId of the replacement file, if it exists
+  replacedByDataFile?: ReplacementDataFileInfo; // additional info about the replacement file - although not always returned by the backend, even if it exists!
   permissions: DataFilePermissions;
 }
 
@@ -76,6 +76,7 @@ export interface DeleteDataFilePlan {
   footnoteIds: string[];
 }
 
+// Mapped from DataFileInfo - see mapFile function below
 export interface DataFile {
   id: string;
   title: string;
