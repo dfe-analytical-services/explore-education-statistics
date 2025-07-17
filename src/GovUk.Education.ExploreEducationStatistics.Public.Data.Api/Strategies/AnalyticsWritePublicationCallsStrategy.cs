@@ -1,7 +1,6 @@
 using GovUk.Education.ExploreEducationStatistics.Analytics.Common.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Analytics.Common.Strategies;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Requests;
-using IAnalyticsPathResolver = GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services.Interfaces.IAnalyticsPathResolver;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Strategies;
 

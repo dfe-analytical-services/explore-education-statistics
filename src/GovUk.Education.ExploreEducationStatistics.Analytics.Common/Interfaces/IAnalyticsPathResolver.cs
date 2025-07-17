@@ -1,5 +1,5 @@
 #nullable enable
-namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Analytics.Utils;
+namespace GovUk.Education.ExploreEducationStatistics.Analytics.Common.Interfaces;
 
 public interface IAnalyticsPathResolver
 {

@@ -1,8 +1,7 @@
-﻿using System.Linq;
-using GovUk.Education.ExploreEducationStatistics.Data.Services.Analytics.Utils;
+﻿using GovUk.Education.ExploreEducationStatistics.Analytics.Common.Interfaces;
 using Moq;
 
-namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests.Builders;
+namespace GovUk.Education.ExploreEducationStatistics.Analytics.Common.Tests.Builders;
 
 public class AnalyticsPathResolverMockBuilder
 {

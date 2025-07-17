@@ -1,11 +1,10 @@
 #nullable enable
-using System;
-using System.IO;
+using GovUk.Education.ExploreEducationStatistics.Analytics.Common.Config;
+using GovUk.Education.ExploreEducationStatistics.Analytics.Common.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
-using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
 using Microsoft.Extensions.Options;
 
-namespace GovUk.Education.ExploreEducationStatistics.Content.Services;
+namespace GovUk.Education.ExploreEducationStatistics.Analytics.Common.Utils;
 
 public class AnalyticsPathResolver : IAnalyticsPathResolver
 {
