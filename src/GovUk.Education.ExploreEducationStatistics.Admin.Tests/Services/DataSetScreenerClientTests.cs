@@ -1,10 +1,4 @@
 #nullable enable
-using System;
-using System.Net;
-using System.Net.Http;
-using System.Text.Json;
-using System.Threading;
-using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Options;
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
@@ -12,6 +6,12 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.Authentication;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using Moq;
 using RichardSzalay.MockHttp;
+using System;
+using System.Net;
+using System.Net.Http;
+using System.Text.Json;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services;
 
@@ -23,7 +23,7 @@ public class DataSetScreenerClientTests
     {
         PropertyNamingPolicy = JsonNamingPolicy.CamelCase, // API is case sensitive
     };
-    
+
     protected DataSetScreenerClientTests()
     {
         _mockHttp = new MockHttpMessageHandler();
@@ -31,7 +31,7 @@ public class DataSetScreenerClientTests
 
     public class AuthenticationTests : DataSetScreenerClientTests
     {
-        [Fact]
+        [Fact(Skip = "EES-6341: Skip until screener has been re-enabled")]
         public async Task AuthenticationManagerCalled()
         {
             var responseBody = new DataSetScreenerResponse
@@ -68,10 +68,10 @@ public class DataSetScreenerClientTests
                 m.AddAuthentication(It.IsAny<HttpClient>(), It.IsAny<CancellationToken>()), Times.Once);
         }
     }
-    
+
     public class ScreenDataSetTests : DataSetScreenerClientTests
     {
-        [Fact]
+        [Fact(Skip = "EES-6341: Skip until screener has been re-enabled")]
         public async Task Success()
         {
             var request = new DataSetScreenerRequest
@@ -82,7 +82,7 @@ public class DataSetScreenerClientTests
                 MetaFilePath = "meta-file-path",
                 StorageContainerName = "storage-container-name"
             };
-            
+
             var responseBody = new DataSetScreenerResponse
             {
                 Message = "A message",
@@ -112,9 +112,9 @@ public class DataSetScreenerClientTests
             var dataSetScreenerClient = BuildService();
 
             var response = await dataSetScreenerClient.ScreenDataSet(request, default);
-            
+
             _mockHttp.VerifyNoOutstandingExpectation();
-            
+
             Assert.Equivalent(responseBody, response);
         }
     }
