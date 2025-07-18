@@ -1,5 +1,5 @@
 ﻿#nullable enable
-using System.Linq;
+using System.Threading;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using Moq;
@@ -14,8 +14,8 @@ public class OrganisationServiceMockBuilder
 
     public IOrganisationService Build()
     {
-        _mock.Setup(m => m.GetAllOrganisations())
-            .Returns(_organisations?.ToAsyncEnumerable() ?? AsyncEnumerable.Empty<Organisation>());
+        _mock.Setup(m => m.GetAllOrganisations(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(_organisations ?? []);
 
         return _mock.Object;
     }
@@ -32,7 +32,7 @@ public class OrganisationServiceMockBuilder
     {
         public void GetAllOrganisationsWasCalled()
         {
-            mock.Verify(m => m.GetAllOrganisations(), Times.Once);
+            mock.Verify(m => m.GetAllOrganisations(It.IsAny<CancellationToken>()), Times.Once);
         }
     }
 }

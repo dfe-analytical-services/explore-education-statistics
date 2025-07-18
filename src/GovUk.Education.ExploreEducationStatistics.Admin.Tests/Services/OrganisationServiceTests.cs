@@ -40,7 +40,7 @@ public abstract class OrganisationServiceTests
                 var sut = BuildService(context);
 
                 // Act
-                var result = await sut.GetAllOrganisations().ToArrayAsync();
+                var result = await sut.GetAllOrganisations();
 
                 // Assert
                 Assert.Equal(organisations.OrderBy(o => o.Title), result);

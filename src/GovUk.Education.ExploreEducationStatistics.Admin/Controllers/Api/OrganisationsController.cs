@@ -1,6 +1,7 @@
 ﻿#nullable enable
-using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using Microsoft.AspNetCore.Authorization;
@@ -14,7 +15,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api;
 public class OrganisationsController(IOrganisationService organisationService) : ControllerBase
 {
     [HttpGet("organisations")]
-    public IAsyncEnumerable<OrganisationViewModel> GetAllOrganisations() =>
-        organisationService.GetAllOrganisations()
-            .Select(OrganisationViewModel.FromOrganisation);
+    public async Task<OrganisationViewModel[]> GetAllOrganisations(CancellationToken cancellationToken = default) =>
+        (await organisationService.GetAllOrganisations(cancellationToken))
+        .Select(OrganisationViewModel.FromOrganisation)
+        .ToArray();
 }

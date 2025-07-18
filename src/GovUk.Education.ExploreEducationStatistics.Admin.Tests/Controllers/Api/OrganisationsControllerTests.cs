@@ -1,5 +1,4 @@
 ﻿#nullable enable
-using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.MockBuilders;
@@ -28,7 +27,7 @@ public abstract class OrganisationsControllerTests
             var sut = BuildController();
 
             // Act
-            var result = await sut.GetAllOrganisations().ToArrayAsync();
+            var result = await sut.GetAllOrganisations();
 
             // Assert
             _organisationService.Assert.GetAllOrganisationsWasCalled();
