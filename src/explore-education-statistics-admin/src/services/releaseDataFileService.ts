@@ -249,7 +249,7 @@ const releaseDataFileService = {
   async uploadDataSetFilePair(
     releaseId: string,
     request: UploadDataFilesRequest,
-  ): Promise<DataSetUpload[]> {
+  ): Promise<void> {
     const { dataFile, metadataFile, title, replacingFileId } = request;
 
     const data = new FormData();
@@ -264,7 +264,7 @@ const releaseDataFileService = {
   async uploadZippedDataSetFilePair(
     releaseId: string,
     request: UploadZipDataFileRequest,
-  ): Promise<DataSetUpload[]> {
+  ): Promise<void> {
     const { zipFile, title, replacingFileId } = request;
 
     const data = new FormData();
@@ -278,7 +278,7 @@ const releaseDataFileService = {
   async uploadBulkZipDataSetFile(
     releaseId: string,
     zipFile: File,
-  ): Promise<DataSetUpload[]> {
+  ): Promise<void> {
     const data = new FormData();
     data.append('releaseVersionId', releaseId);
     data.append('zipFile', zipFile);
