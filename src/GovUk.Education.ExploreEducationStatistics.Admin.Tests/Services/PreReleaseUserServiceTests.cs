@@ -1,9 +1,4 @@
 #nullable enable
-using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
-using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Database;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Options;
@@ -22,6 +17,11 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Moq;
+using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
+using System.Threading.Tasks;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Models.GlobalRoles;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
@@ -33,6 +33,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services;
 public class PreReleaseUserServiceTests
 {
     private readonly DataFixture _dataFixture = new();
+
+    private static readonly Guid _userId = Guid.NewGuid();
 
     private const string PreReleaseTemplateId = "prerelease-template-id";
 
@@ -332,47 +334,58 @@ public class PreReleaseUserServiceTests
             .WithRelease(_dataFixture.DefaultRelease()
                 .WithPublication(_dataFixture.DefaultPublication()));
 
-        var contextId = Guid.NewGuid().ToString();
+        var emails = ListOf(
+            "invited.prerelease@test.com",
+            "existing.prerelease.user@test.com");
 
-        await using (var context = InMemoryApplicationDbContext(contextId))
-        {
-            await context.UserReleaseInvites.AddAsync(
-                new UserReleaseInvite
-                {
-                    ReleaseVersion = releaseVersion,
-                    Role = ReleaseRole.PrereleaseViewer,
-                    Email = "invited.prerelease@test.com"
-                }
-            );
+        await using var context = InMemoryApplicationDbContext();
+        await using var userAndRolesDbContext = InMemoryUserAndRolesDbContext();
 
-            await context.UserReleaseRoles.AddAsync(
-                new UserReleaseRole
-                {
-                    ReleaseVersion = releaseVersion,
-                    Role = ReleaseRole.PrereleaseViewer,
-                    User = new User
-                    {
-                        Email = "existing.prerelease.user@test.com"
-                    }
-                }
-            );
+        context.ReleaseVersions.Add(releaseVersion);
+        await context.SaveChangesAsync();
 
-            await context.SaveChangesAsync();
-        }
-
-        await using (var context = InMemoryApplicationDbContext(contextId))
-        await using (var userAndRolesDbContext = InMemoryUserAndRolesDbContext(contextId))
-        {
-            var service = SetupPreReleaseUserService(context, usersAndRolesDbContext: userAndRolesDbContext);
-            var result = await service.GetPreReleaseUsersInvitePlan(
+        var userReleaseRoleAndInviteManager = new Mock<IUserReleaseRoleAndInviteManager>(MockBehavior.Strict);
+        userReleaseRoleAndInviteManager
+            .Setup(mock => mock.HasUserReleaseRole(
+                "invited.prerelease@test.com",
                 releaseVersion.Id,
-                ListOf(
-                    "invited.prerelease@test.com",
-                    "existing.prerelease.user@test.com")
-            );
+                ReleaseRole.PrereleaseViewer
+            ))
+            .ReturnsAsync(false)
+            .Verifiable();
+        userReleaseRoleAndInviteManager
+            .Setup(mock => mock.HasUserReleaseRole(
+                "existing.prerelease.user@test.com",
+                releaseVersion.Id,
+                ReleaseRole.PrereleaseViewer
+            ))
+            .ReturnsAsync(true)
+            .Verifiable();
 
-            result.AssertBadRequest(NoInvitableEmails);
-        }
+        var userReleaseInviteRepository = new Mock<IUserReleaseInviteRepository>(MockBehavior.Strict);
+        userReleaseInviteRepository
+            .Setup(mock => mock.UserHasInvite(
+                releaseVersion.Id,
+                "invited.prerelease@test.com",
+                ReleaseRole.PrereleaseViewer
+            ))
+            .ReturnsAsync(true)
+            .Verifiable();
+
+        var service = SetupPreReleaseUserService(
+            context: context,
+            usersAndRolesDbContext: userAndRolesDbContext,
+            userReleaseRoleAndInviteManager: userReleaseRoleAndInviteManager.Object,
+            userReleaseInviteRepository: userReleaseInviteRepository.Object);
+
+        var result = await service.GetPreReleaseUsersInvitePlan(
+            releaseVersion.Id,
+            emails
+        );
+
+        result.AssertBadRequest(NoInvitableEmails);
+
+        VerifyAllMocks(userReleaseRoleAndInviteManager, userReleaseInviteRepository);
     }
 
     [Fact]
@@ -382,106 +395,119 @@ public class PreReleaseUserServiceTests
             .WithRelease(_dataFixture.DefaultRelease()
                 .WithPublication(_dataFixture.DefaultPublication()));
 
-        var existingReleaseInvites = new List<UserReleaseInvite>
+        var usersWithExistingReleaseInviteEmails = ListOf(
+            "invited.prerelease.1@test.com",
+            "invited.prerelease.2@test.com");
+
+        var usersWithExistingRoleEmails = ListOf(
+            "existing.prerelease.user.1@test.com",
+            "existing.prerelease.user.2@test.com");
+
+        var allEmails = ListOf(
+            "new.user.1@test.com",
+            "new.user.2@test.com",
+            "existing.user.1@test.com",
+            "existing.user.2@test.com")
+            .Concat(usersWithExistingReleaseInviteEmails)
+            .Concat(usersWithExistingRoleEmails)
+            .ToList();
+
+        await using var context = InMemoryApplicationDbContext();
+        await using var userAndRolesDbContext = InMemoryUserAndRolesDbContext();
+
+        context.ReleaseVersions.Add(releaseVersion);
+        await context.SaveChangesAsync();
+
+        var userReleaseRoleAndInviteManager = new Mock<IUserReleaseRoleAndInviteManager>(MockBehavior.Strict);
+        foreach (var email in allEmails)
         {
-            new()
+            if (usersWithExistingRoleEmails.Contains(email))
             {
-                Email = "invited.prerelease.1@test.com",
-                ReleaseVersion = releaseVersion,
-                Role = ReleaseRole.PrereleaseViewer
-            },
-            new()
-            {
-                Email = "invited.prerelease.2@test.com",
-                ReleaseVersion = releaseVersion,
-                Role = ReleaseRole.PrereleaseViewer
+                userReleaseRoleAndInviteManager
+                .Setup(mock => mock.HasUserReleaseRole(
+                    email,
+                    releaseVersion.Id,
+                    ReleaseRole.PrereleaseViewer
+                ))
+                .ReturnsAsync(true)
+                .Verifiable();
+
+                continue;
             }
-        };
 
-        var existingUsers = new List<User>
-        {
-            new()
-            {
-                Email = "existing.user.1@test.com"
-            },
-            new()
-            {
-                Email = "existing.user.2@test.com"
-            },
-            new()
-            {
-                Email = "existing.prerelease.user.1@test.com"
-            },
-            new()
-            {
-                Email = "existing.prerelease.user.2@test.com"
-            }
-        };
-
-        var existingRoles = new List<UserReleaseRole>
-        {
-            new()
-            {
-                User = existingUsers.Single(u => u.Email == "existing.prerelease.user.1@test.com"),
-                ReleaseVersion = releaseVersion,
-                Role = ReleaseRole.PrereleaseViewer
-            },
-            new()
-            {
-                User = existingUsers.Single(u => u.Email == "existing.prerelease.user.2@test.com"),
-                ReleaseVersion = releaseVersion,
-                Role = ReleaseRole.PrereleaseViewer
-            }
-        };
-
-        var contextId = Guid.NewGuid().ToString();
-
-        await using (var context = InMemoryApplicationDbContext(contextId))
-        {
-            context.ReleaseVersions.Add(releaseVersion);
-            context.Users.AddRange(existingUsers);
-            context.UserReleaseInvites.AddRange(existingReleaseInvites);
-            context.UserReleaseRoles.AddRange(existingRoles);
-            await context.SaveChangesAsync();
+            userReleaseRoleAndInviteManager
+                .Setup(mock => mock.HasUserReleaseRole(
+                    email,
+                    releaseVersion.Id,
+                    ReleaseRole.PrereleaseViewer
+                ))
+                .ReturnsAsync(false)
+                .Verifiable();
         }
 
-        await using (var context = InMemoryApplicationDbContext(contextId))
-        await using (var userAndRolesDbContext = InMemoryUserAndRolesDbContext(contextId))
+        var userReleaseInviteRepository = new Mock<IUserReleaseInviteRepository>(MockBehavior.Strict);
+        foreach (var email in allEmails)
         {
-            var service = SetupPreReleaseUserService(
-                context,
-                usersAndRolesDbContext: userAndRolesDbContext
-            );
+            if (usersWithExistingRoleEmails.Contains(email))
+            {
+                continue;
+            }
 
-            var result = await service.GetPreReleaseUsersInvitePlan(
-                releaseVersion.Id,
-                ListOf(
-                    "new.user.1@test.com",
-                    "new.user.2@test.com",
-                    "existing.user.1@test.com",
-                    "existing.user.2@test.com",
-                    "invited.prerelease.1@test.com",
-                    "invited.prerelease.2@test.com",
-                    "existing.prerelease.user.1@test.com",
-                    "existing.prerelease.user.2@test.com")
-            );
+            if (usersWithExistingReleaseInviteEmails.Contains(email))
+            {
+                userReleaseInviteRepository
+                .Setup(mock => mock.UserHasInvite(
+                    releaseVersion.Id,
+                    email,
+                    ReleaseRole.PrereleaseViewer
+                ))
+                .ReturnsAsync(true)
+                .Verifiable();
 
-            var plan = result.AssertRight();
+                continue;
+            }
 
-            Assert.Equal(2, plan.AlreadyAccepted.Count);
-            Assert.Equal("existing.prerelease.user.1@test.com", plan.AlreadyAccepted[0]);
-            Assert.Equal("existing.prerelease.user.2@test.com", plan.AlreadyAccepted[1]);
-
-            Assert.Equal(2, plan.AlreadyInvited.Count);
-            Assert.Equal("invited.prerelease.1@test.com", plan.AlreadyInvited[0]);
-            Assert.Equal("invited.prerelease.2@test.com", plan.AlreadyInvited[1]);
-
-            Assert.Equal(4, plan.Invitable.Count);
-            Assert.Equal("new.user.1@test.com", plan.Invitable[0]);
-            Assert.Equal("new.user.2@test.com", plan.Invitable[1]);
-            Assert.Equal("existing.user.1@test.com", plan.Invitable[2]);
-            Assert.Equal("existing.user.2@test.com", plan.Invitable[3]);
+            userReleaseInviteRepository
+                .Setup(mock => mock.UserHasInvite(
+                    releaseVersion.Id,
+                    email,
+                    ReleaseRole.PrereleaseViewer
+                ))
+                .ReturnsAsync(false)
+                .Verifiable();
         }
+
+        var service = SetupPreReleaseUserService(
+            context,
+            usersAndRolesDbContext: userAndRolesDbContext,
+            userReleaseRoleAndInviteManager: userReleaseRoleAndInviteManager.Object,
+            userReleaseInviteRepository: userReleaseInviteRepository.Object
+        );
+
+        var result = await service.GetPreReleaseUsersInvitePlan(
+            releaseVersion.Id,
+            allEmails
+        );
+
+        var plan = result.AssertRight();
+
+        VerifyAllMocks(
+            userReleaseRoleAndInviteManager,
+            userReleaseInviteRepository);
+
+        Assert.Equal(2, plan.AlreadyAccepted.Count);
+        Assert.Equal("existing.prerelease.user.1@test.com", plan.AlreadyAccepted[0]);
+        Assert.Equal("existing.prerelease.user.2@test.com", plan.AlreadyAccepted[1]);
+
+        Assert.Equal(2, plan.AlreadyInvited.Count);
+        Assert.Equal("invited.prerelease.1@test.com", plan.AlreadyInvited[0]);
+        Assert.Equal("invited.prerelease.2@test.com", plan.AlreadyInvited[1]);
+
+        Assert.Equal(4, plan.Invitable.Count);
+        Assert.Equal("new.user.1@test.com", plan.Invitable[0]);
+        Assert.Equal("new.user.2@test.com", plan.Invitable[1]);
+        Assert.Equal("existing.user.1@test.com", plan.Invitable[2]);
+        Assert.Equal("existing.user.2@test.com", plan.Invitable[3]);
     }
 
     [Fact]
@@ -536,131 +562,58 @@ public class PreReleaseUserServiceTests
             .WithRelease(_dataFixture.DefaultRelease()
                 .WithPublication(_dataFixture.DefaultPublication()));
 
-        var contextId = Guid.NewGuid().ToString();
+        await using var context = InMemoryApplicationDbContext();
+        await using var userAndRolesDbContext = InMemoryUserAndRolesDbContext();
 
-        await using (var context = InMemoryApplicationDbContext(contextId))
-        {
-            await context.UserReleaseInvites.AddAsync(
-                new UserReleaseInvite
-                {
-                    ReleaseVersion = releaseVersion,
-                    Role = ReleaseRole.PrereleaseViewer,
-                    Email = "invited.prerelease@test.com"
-                }
-            );
+        context.ReleaseVersions.Add(releaseVersion);
+        await context.SaveChangesAsync();
 
-            await context.UserReleaseRoles.AddAsync(
-                new UserReleaseRole
-                {
-                    ReleaseVersion = releaseVersion,
-                    Role = ReleaseRole.PrereleaseViewer,
-                    User = new User
-                    {
-                        Email = "existing.prerelease.user@test.com"
-                    }
-                }
-            );
-
-            await context.SaveChangesAsync();
-        }
-
-        await using (var context = InMemoryApplicationDbContext(contextId))
-        await using (var userAndRolesDbContext = InMemoryUserAndRolesDbContext())
-        {
-            var service = SetupPreReleaseUserService(context, usersAndRolesDbContext: userAndRolesDbContext);
-            var result = await service.InvitePreReleaseUsers(
+        var userReleaseRoleAndInviteManager = new Mock<IUserReleaseRoleAndInviteManager>(MockBehavior.Strict);
+        userReleaseRoleAndInviteManager
+            .Setup(mock => mock.HasUserReleaseRole(
+                "invited.prerelease@test.com",
                 releaseVersion.Id,
-                ListOf(
-                    "invited.prerelease@test.com",
-                    "existing.prerelease.user@test.com")
-            );
-
-            result.AssertBadRequest(NoInvitableEmails);
-        }
-    }
-
-    [Fact]
-    public async Task InvitePreReleaseUsers_InvitesExistingUser_ApprovedRelease()
-    {
-        ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion()
-            .WithRelease(_dataFixture.DefaultRelease()
-                .WithPublication(_dataFixture.DefaultPublication()))
-            .WithApprovalStatus(ReleaseApprovalStatus.Approved)
-            .WithPublishScheduled(PublishedScheduledStartOfDay);
-
-        var user = new User
-        {
-            Email = "test@test.com"
-        };
-
-        var contextId = Guid.NewGuid().ToString();
-
-        await using (var context = InMemoryApplicationDbContext(contextId))
-        {
-            context.ReleaseVersions.Add(releaseVersion);
-            context.Users.Add(user);
-
-            await context.SaveChangesAsync();
-        }
-
-        var emailService = new Mock<IEmailService>(MockBehavior.Strict);
-
-        var expectedTemplateValues = GetExpectedPreReleaseTemplateValues(releaseVersion, newUser: false);
-
-        emailService.Setup(mock => mock.SendEmail(
-                "test@test.com",
-                PreReleaseTemplateId,
-                expectedTemplateValues
+                ReleaseRole.PrereleaseViewer
             ))
-            .Returns(Unit.Instance);
-
-        var preReleaseService = new Mock<IPreReleaseService>(MockBehavior.Strict);
-        SetupGetPrereleaseWindow(preReleaseService, releaseVersion);
-
-        await using (var context = InMemoryApplicationDbContext(contextId))
-        await using (var userAndRolesDbContext = InMemoryUserAndRolesDbContext(contextId))
-        {
-            var service = SetupPreReleaseUserService(
-                context,
-                usersAndRolesDbContext: userAndRolesDbContext,
-                preReleaseService: preReleaseService.Object,
-                emailService: emailService.Object
-            );
-
-            var result = await service.InvitePreReleaseUsers(
+            .ReturnsAsync(false)
+            .Verifiable();
+        userReleaseRoleAndInviteManager
+            .Setup(mock => mock.HasUserReleaseRole(
+                "existing.prerelease.user@test.com",
                 releaseVersion.Id,
-                ListOf("test@test.com")
-            );
+                ReleaseRole.PrereleaseViewer
+            ))
+            .ReturnsAsync(true)
+            .Verifiable();
 
-            emailService.Verify(
-                s => s.SendEmail(
-                    "test@test.com",
-                    PreReleaseTemplateId,
-                    expectedTemplateValues
-                ),
-                Times.Once
-            );
+        var userReleaseInviteRepository = new Mock<IUserReleaseInviteRepository>(MockBehavior.Strict);
+        userReleaseInviteRepository
+            .Setup(mock => mock.UserHasInvite(
+                releaseVersion.Id,
+                "invited.prerelease@test.com",
+                ReleaseRole.PrereleaseViewer
+            ))
+            .ReturnsAsync(true)
+            .Verifiable();
 
-            VerifyAllMocks(emailService, preReleaseService);
+        var service = SetupPreReleaseUserService(
+            context: context,
+            usersAndRolesDbContext: userAndRolesDbContext,
+            userReleaseRoleAndInviteManager: userReleaseRoleAndInviteManager.Object,
+            userReleaseInviteRepository: userReleaseInviteRepository.Object);
 
-            var preReleaseUsers = result.AssertRight();
-            var preReleaseUser = Assert.Single(preReleaseUsers);
+        var result = await service.InvitePreReleaseUsers(
+            releaseVersion.Id,
+            ListOf(
+                "invited.prerelease@test.com",
+                "existing.prerelease.user@test.com")
+        );
 
-            Assert.NotNull(preReleaseUser);
-            Assert.Equal("test@test.com", preReleaseUser.Email);
-        }
+        result.AssertBadRequest(NoInvitableEmails);
 
-        await using (var context = InMemoryApplicationDbContext(contextId))
-        {
-            var savedUserReleaseRole = Assert.Single(context.UserReleaseRoles);
-
-            Assert.NotNull(savedUserReleaseRole);
-            Assert.Equal(releaseVersion.Id, savedUserReleaseRole.ReleaseVersionId);
-            Assert.Equal(ReleaseRole.PrereleaseViewer, savedUserReleaseRole.Role);
-            Assert.Equal(user.Id, savedUserReleaseRole.UserId);
-
-            Assert.Empty(context.UserReleaseInvites);
-        }
+        VerifyAllMocks(
+            userReleaseRoleAndInviteManager,
+            userReleaseInviteRepository);
     }
 
     [Fact]
@@ -677,22 +630,19 @@ public class PreReleaseUserServiceTests
             Email = "test@test.com"
         };
 
-        var contextId = Guid.NewGuid().ToString();
+        await using var context = InMemoryApplicationDbContext();
+        await using var userAndRolesDbContext = InMemoryUserAndRolesDbContext();
 
-        await using (var context = InMemoryApplicationDbContext(contextId))
-        {
-            context.ReleaseVersions.Add(releaseVersion);
-            context.Users.Add(user);
-
-            await context.SaveChangesAsync();
-        }
+        context.ReleaseVersions.Add(releaseVersion);
+        context.Users.Add(user);
+        await context.SaveChangesAsync();
 
         var emailService = new Mock<IEmailService>(MockBehavior.Strict);
 
         var expectedTemplateValues = GetExpectedPreReleaseTemplateValues(releaseVersion, newUser: false);
 
         emailService.Setup(mock => mock.SendEmail(
-                "test@test.com",
+                user.Email,
                 PreReleaseTemplateId,
                 expectedTemplateValues
             ))
@@ -701,179 +651,45 @@ public class PreReleaseUserServiceTests
         var preReleaseService = new Mock<IPreReleaseService>(MockBehavior.Strict);
         SetupGetPrereleaseWindow(preReleaseService, releaseVersion);
 
-        await using (var context = InMemoryApplicationDbContext(contextId))
-        await using (var userAndRolesDbContext = InMemoryUserAndRolesDbContext(contextId))
-        {
-            var service = SetupPreReleaseUserService(
-                context,
-                usersAndRolesDbContext: userAndRolesDbContext,
-                preReleaseService: preReleaseService.Object,
-                emailService: emailService.Object
-            );
-
-            var result = await service.InvitePreReleaseUsers(
+        var userReleaseRoleAndInviteManager = new Mock<IUserReleaseRoleAndInviteManager>(MockBehavior.Strict);
+        userReleaseRoleAndInviteManager
+            .Setup(mock => mock.HasUserReleaseRole(
+                user.Email,
                 releaseVersion.Id,
-                ListOf("test@test.com")
-            );
+                ReleaseRole.PrereleaseViewer))
+            .ReturnsAsync(false)
+            .Verifiable();
 
-            VerifyAllMocks(emailService, preReleaseService);
-
-            result.AssertLeft();
-        }
-
-        await using (var context = InMemoryApplicationDbContext(contextId))
-        {
-            Assert.Empty(context.UserReleaseRoles);
-            Assert.Empty(context.UserReleaseInvites);
-        }
-    }
-
-    [Fact]
-    public async Task InvitePreReleaseUsers_InvitesExistingUser_DraftRelease()
-    {
-        ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion()
-            .WithRelease(_dataFixture.DefaultRelease()
-                .WithPublication(_dataFixture.DefaultPublication()))
-            .WithApprovalStatus(ReleaseApprovalStatus.Draft)
-            .WithPublishScheduled(PublishedScheduledStartOfDay);
-
-        var user = new User
-        {
-            Email = "test@test.com"
-        };
-
-        var contextId = Guid.NewGuid().ToString();
-
-        await using (var context = InMemoryApplicationDbContext(contextId))
-        {
-            context.ReleaseVersions.Add(releaseVersion);
-            context.Users.Add(user);
-
-            await context.SaveChangesAsync();
-        }
-
-        await using (var context = InMemoryApplicationDbContext(contextId))
-        await using (var userAndRolesDbContext = InMemoryUserAndRolesDbContext(contextId))
-        {
-            var service = SetupPreReleaseUserService(
-                context,
-                usersAndRolesDbContext: userAndRolesDbContext
-            );
-
-            var result = await service.InvitePreReleaseUsers(
+        var userReleaseInviteRepository = new Mock<IUserReleaseInviteRepository>(MockBehavior.Strict);
+        userReleaseInviteRepository
+            .Setup(mock => mock.UserHasInvite(
                 releaseVersion.Id,
-                ListOf("test@test.com")
-            );
+                user.Email,
+                ReleaseRole.PrereleaseViewer))
+            .ReturnsAsync(false)
+            .Verifiable();
 
-            var preReleaseUsers = result.AssertRight();
-            var preReleaseUser = Assert.Single(preReleaseUsers);
+        var service = SetupPreReleaseUserService(
+            context,
+            usersAndRolesDbContext: userAndRolesDbContext,
+            preReleaseService: preReleaseService.Object,
+            emailService: emailService.Object,
+            userReleaseRoleAndInviteManager: userReleaseRoleAndInviteManager.Object,
+            userReleaseInviteRepository: userReleaseInviteRepository.Object
+        );
 
-            Assert.NotNull(preReleaseUser);
-            Assert.Equal("test@test.com", preReleaseUser.Email);
-        }
+        var result = await service.InvitePreReleaseUsers(
+            releaseVersion.Id,
+            ListOf(user.Email)
+        );
 
-        await using (var context = InMemoryApplicationDbContext(contextId))
-        {
-            var savedUserReleaseRole = Assert.Single(context.UserReleaseRoles);
+        VerifyAllMocks(
+            emailService,
+            preReleaseService,
+            userReleaseRoleAndInviteManager,
+            userReleaseInviteRepository);
 
-            Assert.NotNull(savedUserReleaseRole);
-            Assert.Equal(releaseVersion.Id, savedUserReleaseRole.ReleaseVersionId);
-            Assert.Equal(ReleaseRole.PrereleaseViewer, savedUserReleaseRole.Role);
-            Assert.Equal(user.Id, savedUserReleaseRole.UserId);
-
-            // Release invite is created for an existing user if the release is not approved
-            var userReleaseInvite = Assert.Single(context.UserReleaseInvites);
-            Assert.Equal("test@test.com", userReleaseInvite.Email);
-            Assert.Equal(releaseVersion.Id, userReleaseInvite.ReleaseVersionId);
-            Assert.Equal(ReleaseRole.PrereleaseViewer, userReleaseInvite.Role);
-            Assert.False(userReleaseInvite.EmailSent); // Email not sent immediately for unapproved releases
-        }
-    }
-
-    [Fact]
-    public async Task InvitePreReleaseUsers_InvitesNewUser_ApprovedRelease()
-    {
-        ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion()
-            .WithRelease(_dataFixture.DefaultRelease()
-                .WithPublication(_dataFixture.DefaultPublication()))
-            .WithApprovalStatus(ReleaseApprovalStatus.Approved)
-            .WithPublishScheduled(PublishedScheduledStartOfDay);
-
-        var contextId = Guid.NewGuid().ToString();
-
-        await using (var context = InMemoryApplicationDbContext(contextId))
-        {
-            context.ReleaseVersions.Add(releaseVersion);
-            await context.SaveChangesAsync();
-        }
-
-        var emailService = new Mock<IEmailService>();
-
-        var expectedTemplateValues = GetExpectedPreReleaseTemplateValues(releaseVersion, newUser: true);
-
-        emailService.Setup(mock => mock.SendEmail(
-                "test@test.com",
-                PreReleaseTemplateId,
-                expectedTemplateValues
-            ))
-            .Returns(Unit.Instance);
-
-        var preReleaseService = new Mock<IPreReleaseService>(MockBehavior.Strict);
-        SetupGetPrereleaseWindow(preReleaseService, releaseVersion);
-
-        await using (var context = InMemoryApplicationDbContext(contextId))
-        await using (var userAndRolesDbContext = InMemoryUserAndRolesDbContext(contextId))
-        {
-            var service = SetupPreReleaseUserService(
-                context,
-                usersAndRolesDbContext: userAndRolesDbContext,
-                preReleaseService: preReleaseService.Object,
-                emailService: emailService.Object
-            );
-
-            var result = await service.InvitePreReleaseUsers(
-                releaseVersion.Id,
-                ListOf("test@test.com")
-            );
-
-            emailService.Verify(
-                s => s.SendEmail(
-                    "test@test.com",
-                    PreReleaseTemplateId,
-                    expectedTemplateValues
-                ),
-                Times.Once
-            );
-
-            VerifyAllMocks(emailService, preReleaseService);
-
-            var preReleaseUsers = result.AssertRight();
-            var preReleaseUser = Assert.Single(preReleaseUsers);
-
-            Assert.NotNull(preReleaseUser);
-            Assert.Equal("test@test.com", preReleaseUser.Email);
-        }
-
-        await using (var context = InMemoryApplicationDbContext(contextId))
-        {
-            var releaseInvite = Assert.Single(context.UserReleaseInvites);
-
-            Assert.NotNull(releaseInvite);
-            Assert.Equal(releaseVersion.Id, releaseInvite.ReleaseVersionId);
-            Assert.Equal("test@test.com", releaseInvite.Email);
-            Assert.Equal(ReleaseRole.PrereleaseViewer, releaseInvite.Role);
-            Assert.True(releaseInvite.EmailSent); // Email sent immediately for approved release
-        }
-
-        await using (var userAndRolesDbContext = InMemoryUserAndRolesDbContext(contextId))
-        {
-            var userInvite = Assert.Single(userAndRolesDbContext.UserInvites);
-
-            Assert.NotNull(userInvite);
-            Assert.Equal("test@test.com", userInvite.Email);
-            Assert.Equal(Role.PrereleaseUser.GetEnumValue(), userInvite.RoleId);
-            Assert.False(userInvite.Accepted);
-        }
+        result.AssertLeft();
     }
 
     [Fact]
@@ -885,20 +701,20 @@ public class PreReleaseUserServiceTests
             .WithApprovalStatus(ReleaseApprovalStatus.Approved)
             .WithPublishScheduled(PublishedScheduledStartOfDay);
 
-        var contextId = Guid.NewGuid().ToString();
+        var email = "test@test.com";
 
-        await using (var context = InMemoryApplicationDbContext(contextId))
-        {
-            context.ReleaseVersions.Add(releaseVersion);
-            await context.SaveChangesAsync();
-        }
+        await using var context = InMemoryApplicationDbContext();
+        await using var userAndRolesDbContext = InMemoryUserAndRolesDbContext();
+
+        context.ReleaseVersions.Add(releaseVersion);
+        await context.SaveChangesAsync();
 
         var emailService = new Mock<IEmailService>();
 
         var expectedTemplateValues = GetExpectedPreReleaseTemplateValues(releaseVersion, newUser: true);
 
         emailService.Setup(mock => mock.SendEmail(
-                "test@test.com",
+                email,
                 PreReleaseTemplateId,
                 expectedTemplateValues
             ))
@@ -907,94 +723,45 @@ public class PreReleaseUserServiceTests
         var preReleaseService = new Mock<IPreReleaseService>(MockBehavior.Strict);
         SetupGetPrereleaseWindow(preReleaseService, releaseVersion);
 
-        await using (var context = InMemoryApplicationDbContext(contextId))
-        await using (var userAndRolesDbContext = InMemoryUserAndRolesDbContext(contextId))
-        {
-            var service = SetupPreReleaseUserService(
-                context,
-                usersAndRolesDbContext: userAndRolesDbContext,
-                preReleaseService: preReleaseService.Object,
-                emailService: emailService.Object
-            );
-
-            var result = await service.InvitePreReleaseUsers(
+        var userReleaseRoleAndInviteManager = new Mock<IUserReleaseRoleAndInviteManager>(MockBehavior.Strict);
+        userReleaseRoleAndInviteManager
+            .Setup(mock => mock.HasUserReleaseRole(
+                email,
                 releaseVersion.Id,
-                ListOf("test@test.com")
-            );
+                ReleaseRole.PrereleaseViewer))
+            .ReturnsAsync(false)
+            .Verifiable();
 
-            VerifyAllMocks(emailService, preReleaseService);
-
-            result.AssertLeft();
-        }
-
-        await using (var context = InMemoryApplicationDbContext(contextId))
-        {
-            Assert.Empty(context.UserReleaseInvites);
-        }
-
-        await using (var userAndRolesDbContext = InMemoryUserAndRolesDbContext(contextId))
-        {
-            Assert.Empty(userAndRolesDbContext.UserInvites);
-        }
-    }
-
-    [Fact]
-    public async Task InvitePreReleaseUsers_InvitesNewUser_DraftRelease()
-    {
-        ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion()
-            .WithRelease(_dataFixture.DefaultRelease()
-                .WithPublication(_dataFixture.DefaultPublication()))
-            .WithApprovalStatus(ReleaseApprovalStatus.Draft)
-            .WithPublishScheduled(PublishedScheduledStartOfDay);
-
-        var contextId = Guid.NewGuid().ToString();
-
-        await using (var context = InMemoryApplicationDbContext(contextId))
-        {
-            context.ReleaseVersions.Add(releaseVersion);
-            await context.SaveChangesAsync();
-        }
-
-        await using (var context = InMemoryApplicationDbContext(contextId))
-        await using (var userAndRolesDbContext = InMemoryUserAndRolesDbContext(contextId))
-        {
-            var service = SetupPreReleaseUserService(
-                context,
-                usersAndRolesDbContext: userAndRolesDbContext
-            );
-
-            var result = await service.InvitePreReleaseUsers(
+        var userReleaseInviteRepository = new Mock<IUserReleaseInviteRepository>(MockBehavior.Strict);
+        userReleaseInviteRepository
+            .Setup(mock => mock.UserHasInvite(
                 releaseVersion.Id,
-                ListOf("test@test.com")
-            );
+                email,
+                ReleaseRole.PrereleaseViewer))
+            .ReturnsAsync(false)
+            .Verifiable();
 
-            var preReleaseUsers = result.AssertRight();
-            var preReleaseUser = Assert.Single(preReleaseUsers);
+        var service = SetupPreReleaseUserService(
+            context,
+            usersAndRolesDbContext: userAndRolesDbContext,
+            preReleaseService: preReleaseService.Object,
+            emailService: emailService.Object,
+            userReleaseRoleAndInviteManager: userReleaseRoleAndInviteManager.Object,
+            userReleaseInviteRepository: userReleaseInviteRepository.Object
+        );
 
-            Assert.NotNull(preReleaseUser);
-            Assert.Equal("test@test.com", preReleaseUser.Email);
-        }
+        var result = await service.InvitePreReleaseUsers(
+            releaseVersion.Id,
+            ListOf(email)
+        );
 
-        await using (var context = InMemoryApplicationDbContext(contextId))
-        {
-            var releaseInvite = Assert.Single(context.UserReleaseInvites);
+        VerifyAllMocks(
+            emailService,
+            preReleaseService,
+            userReleaseRoleAndInviteManager,
+            userReleaseInviteRepository);
 
-            Assert.NotNull(releaseInvite);
-            Assert.Equal(releaseVersion.Id, releaseInvite.ReleaseVersionId);
-            Assert.Equal("test@test.com", releaseInvite.Email);
-            Assert.Equal(ReleaseRole.PrereleaseViewer, releaseInvite.Role);
-            Assert.False(releaseInvite.EmailSent); // Email not sent immediately for unapproved releases
-        }
-
-        await using (var userAndRolesDbContext = InMemoryUserAndRolesDbContext(contextId))
-        {
-            var userInvite = Assert.Single(userAndRolesDbContext.UserInvites);
-
-            Assert.NotNull(userInvite);
-            Assert.Equal("test@test.com", userInvite.Email);
-            Assert.Equal(Role.PrereleaseUser.GetEnumValue(), userInvite.RoleId);
-            Assert.False(userInvite.Accepted);
-        }
+        result.AssertLeft();
     }
 
     [Fact]
@@ -1006,189 +773,179 @@ public class PreReleaseUserServiceTests
             .WithApprovalStatus(ReleaseApprovalStatus.Approved)
             .WithPublishScheduled(PublishedScheduledStartOfDay);
 
-        var existingReleaseInvites = new List<UserReleaseInvite>
-        {
-            new()
+        var emailsWithExistingReleaseInvites = ListOf(
+            "invited.prerelease.1@test.com",
+            "invited.prerelease.2@test.com");
+
+        var emailsWithExistingRoles = ListOf(
+            "existing.prerelease.user.1@test.com",
+            "existing.prerelease.user.2@test.com");
+
+        var existingEmailsWithNoRolesOrInvites = ListOf(
+            "existing.user.1@test.com",
+            "existing.user.2@test.com");
+
+        var allEmails = ListOf(
+            "new.user.1@test.com",
+            "new.user.2@test.com")
+            .Concat(existingEmailsWithNoRolesOrInvites)
+            .Concat(emailsWithExistingReleaseInvites)
+            .Concat(emailsWithExistingRoles)
+            .ToList();
+
+        var existingUsersByEmail = existingEmailsWithNoRolesOrInvites
+            .Concat(emailsWithExistingRoles)
+            .Select(email => new User
             {
-                Email = "invited.prerelease.1@test.com",
-                ReleaseVersion = releaseVersion,
-                Role = ReleaseRole.PrereleaseViewer,
-                EmailSent = true
-            },
-            new()
-            {
-                Email = "invited.prerelease.2@test.com",
-                ReleaseVersion = releaseVersion,
-                Role = ReleaseRole.PrereleaseViewer,
-                EmailSent = true
-            }
-        };
+                Email = email
+            })
+            .ToDictionary(u => u.Email);
 
-        var existingUsers = new List<User>
-        {
-            new()
-            {
-                Email = "existing.user.1@test.com"
-            },
-            new()
-            {
-                Email = "existing.user.2@test.com"
-            },
-            new()
-            {
-                Email = "existing.prerelease.user.1@test.com"
-            },
-            new()
-            {
-                Email = "existing.prerelease.user.2@test.com"
-            }
-        };
+        await using var context = InMemoryApplicationDbContext();
+        await using var userAndRolesDbContext = InMemoryUserAndRolesDbContext();
 
-        var existingRoles = new List<UserReleaseRole>
-        {
-            new()
-            {
-                User = existingUsers.Single(u => u.Email == "existing.prerelease.user.1@test.com"),
-                ReleaseVersion = releaseVersion,
-                Role = ReleaseRole.PrereleaseViewer
-            },
-            new()
-            {
-                User = existingUsers.Single(u => u.Email == "existing.prerelease.user.2@test.com"),
-                ReleaseVersion = releaseVersion,
-                Role = ReleaseRole.PrereleaseViewer
-            }
-        };
-
-        var contextId = Guid.NewGuid().ToString();
-
-        await using (var context = InMemoryApplicationDbContext(contextId))
-        {
-            context.ReleaseVersions.Add(releaseVersion);
-            context.Users.AddRange(existingUsers);
-            context.UserReleaseInvites.AddRange(existingReleaseInvites);
-            context.UserReleaseRoles.AddRange(existingRoles);
-            await context.SaveChangesAsync();
-        }
-
-        var emailService = new Mock<IEmailService>(MockBehavior.Strict);
-
-        var expectedTemplateValuesNewUser = GetExpectedPreReleaseTemplateValues(releaseVersion, newUser: true);
-
-        emailService.Setup(mock => mock.SendEmail(
-                It.IsIn("new.user.1@test.com", "new.user.2@test.com"),
-                PreReleaseTemplateId,
-                expectedTemplateValuesNewUser
-            ))
-            .Returns(Unit.Instance);
-
-        var expectedTemplateValuesExistingUser =
-            GetExpectedPreReleaseTemplateValues(releaseVersion, newUser: false);
-
-        emailService.Setup(mock => mock.SendEmail(
-                It.IsIn("existing.user.1@test.com", "existing.user.2@test.com"),
-                PreReleaseTemplateId,
-                expectedTemplateValuesExistingUser
-            ))
-            .Returns(Unit.Instance);
+        context.ReleaseVersions.Add(releaseVersion);
+        context.Users.AddRange(existingUsersByEmail.Values);
+        await context.SaveChangesAsync();
 
         var preReleaseService = new Mock<IPreReleaseService>(MockBehavior.Strict);
         SetupGetPrereleaseWindow(preReleaseService, releaseVersion);
 
-        await using (var context = InMemoryApplicationDbContext(contextId))
-        await using (var userAndRolesDbContext = InMemoryUserAndRolesDbContext(contextId))
+        var emailService = new Mock<IEmailService>(MockBehavior.Strict);
+
+        foreach (var email in allEmails)
         {
-            var service = SetupPreReleaseUserService(
-                context,
-                usersAndRolesDbContext: userAndRolesDbContext,
-                emailService: emailService.Object,
-                preReleaseService: preReleaseService.Object
-            );
+            if (emailsWithExistingRoles.Contains(email) || emailsWithExistingReleaseInvites.Contains(email))
+            {
+                continue;
+            }
 
-            var result = await service.InvitePreReleaseUsers(
-                releaseVersion.Id,
-                ListOf(
-                    "new.user.1@test.com",
-                    "new.user.2@test.com",
-                    "existing.user.1@test.com",
-                    "existing.user.2@test.com",
-                    "invited.prerelease.1@test.com",
-                    "invited.prerelease.2@test.com",
-                    "existing.prerelease.user.1@test.com",
-                    "existing.prerelease.user.2@test.com")
-            );
+            var newUser = !existingUsersByEmail.ContainsKey(email);
+            var expectedTemplateValues = GetExpectedPreReleaseTemplateValues(releaseVersion, newUser: newUser);
 
-            emailService.Verify(mock => mock.SendEmail(
-                It.IsIn("new.user.1@test.com", "new.user.2@test.com"),
+            emailService.Setup(mock => mock.SendEmail(
+                email,
                 PreReleaseTemplateId,
-                expectedTemplateValuesNewUser
-            ), Times.Exactly(2));
-
-            emailService.Verify(mock => mock.SendEmail(
-                It.IsIn("existing.user.1@test.com", "existing.user.2@test.com"),
-                PreReleaseTemplateId,
-                expectedTemplateValuesExistingUser
-            ), Times.Exactly(2));
-
-            VerifyAllMocks(emailService, preReleaseService);
-
-            var preReleaseUsers = result.AssertRight();
-
-            // The addresses that are already invited or accepted should have been ignored
-            Assert.Equal(4, preReleaseUsers.Count);
-
-            Assert.Equal("new.user.1@test.com", preReleaseUsers[0].Email);
-            Assert.Equal("new.user.2@test.com", preReleaseUsers[1].Email);
-            Assert.Equal("existing.user.1@test.com", preReleaseUsers[2].Email);
-            Assert.Equal("existing.user.2@test.com", preReleaseUsers[3].Email);
+                expectedTemplateValues
+            ))
+            .Returns(Unit.Instance)
+            .Verifiable();
         }
 
-        await using (var context = InMemoryApplicationDbContext(contextId))
+        var userReleaseRoleAndInviteManager = new Mock<IUserReleaseRoleAndInviteManager>(MockBehavior.Strict);
+        foreach (var email in allEmails)
         {
-            var releaseInvites = await context.UserReleaseInvites.AsQueryable().ToListAsync();
-            Assert.Equal(4, releaseInvites.Count);
+            if (emailsWithExistingRoles.Contains(email))
+            {
+                userReleaseRoleAndInviteManager
+                .Setup(mock => mock.HasUserReleaseRole(
+                    email,
+                    releaseVersion.Id,
+                    ReleaseRole.PrereleaseViewer
+                ))
+                .ReturnsAsync(true)
+                .Verifiable();
 
-            Assert.True(releaseInvites.All(invite => invite.ReleaseVersionId == releaseVersion.Id));
-            Assert.True(releaseInvites.All(invite => invite.Role == ReleaseRole.PrereleaseViewer));
-            Assert.True(releaseInvites.All(invite =>
-                invite.EmailSent)); // Emails sent immediately for approved releases
+                continue;
+            }
 
-            Assert.Equal("invited.prerelease.1@test.com", releaseInvites[0].Email);
-            Assert.Equal("invited.prerelease.2@test.com", releaseInvites[1].Email);
+            userReleaseRoleAndInviteManager
+                .Setup(mock => mock.HasUserReleaseRole(
+                    email,
+                    releaseVersion.Id,
+                    ReleaseRole.PrereleaseViewer
+                ))
+                .ReturnsAsync(false)
+                .Verifiable();
 
-            Assert.Equal("new.user.1@test.com", releaseInvites[2].Email);
-            Assert.Equal("new.user.2@test.com", releaseInvites[3].Email);
-
-            // Two new role assignments should have been created corresponding with the two accepted invites
-            var roles = await context.UserReleaseRoles.AsQueryable().ToListAsync();
-            Assert.Equal(4, roles.Count);
-
-            Assert.True(roles.All(role => role.ReleaseVersionId == releaseVersion.Id));
-            Assert.True(roles.All(role => role.Role == ReleaseRole.PrereleaseViewer));
-
-            // Existing release roles
-            Assert.Equal(existingUsers.Single(u => u.Email == "existing.prerelease.user.1@test.com").Id,
-                roles[0].UserId);
-            Assert.Equal(existingUsers.Single(u => u.Email == "existing.prerelease.user.2@test.com").Id,
-                roles[1].UserId);
-
-            // New release roles
-            Assert.Equal(existingUsers.Single(u => u.Email == "existing.user.1@test.com").Id, roles[2].UserId);
-            Assert.Equal(existingUsers.Single(u => u.Email == "existing.user.2@test.com").Id, roles[3].UserId);
+            if (existingUsersByEmail.ContainsKey(email))
+            {
+                userReleaseRoleAndInviteManager
+                .Setup(mock => mock.CreateIfNotExists(
+                    existingUsersByEmail[email].Id,
+                    releaseVersion.Id,
+                    ReleaseRole.PrereleaseViewer,
+                    _userId
+                ))
+                .ReturnsAsync(new UserReleaseRole())
+                .Verifiable();
+            }
         }
 
-        await using (var userAndRolesDbContext = InMemoryUserAndRolesDbContext(contextId))
+        var userReleaseInviteRepository = new Mock<IUserReleaseInviteRepository>(MockBehavior.Strict);
+        foreach (var email in allEmails)
         {
-            // Two new user invites should have been created
-            var userInvites = await userAndRolesDbContext.UserInvites.AsQueryable().ToListAsync();
-            Assert.Equal(2, userInvites.Count);
+            if (emailsWithExistingRoles.Contains(email))
+            {
+                continue;
+            }
 
-            Assert.True(userInvites.All(role => role.RoleId == Role.PrereleaseUser.GetEnumValue()));
-            Assert.True(userInvites.All(invite => !invite.Accepted));
+            if (emailsWithExistingReleaseInvites.Contains(email))
+            {
+                userReleaseInviteRepository
+                .Setup(mock => mock.UserHasInvite(
+                    releaseVersion.Id,
+                    email,
+                    ReleaseRole.PrereleaseViewer
+                ))
+                .ReturnsAsync(true)
+                .Verifiable();
 
-            Assert.Equal("new.user.1@test.com", userInvites[0].Email);
-            Assert.Equal("new.user.2@test.com", userInvites[1].Email);
+                continue;
+            }
+
+            userReleaseInviteRepository
+                .Setup(mock => mock.UserHasInvite(
+                    releaseVersion.Id,
+                    email,
+                    ReleaseRole.PrereleaseViewer
+                ))
+                .ReturnsAsync(false)
+                .Verifiable();
+
+            if (!existingUsersByEmail.ContainsKey(email))
+            {
+                userReleaseInviteRepository
+                    .Setup(mock => mock.Create(
+                        releaseVersion.Id,
+                        email,
+                        ReleaseRole.PrereleaseViewer,
+                        true,
+                        _userId,
+                        null))
+                    .Returns(Task.CompletedTask)
+                    .Verifiable();
+            }
         }
+
+        var service = SetupPreReleaseUserService(
+            context,
+            usersAndRolesDbContext: userAndRolesDbContext,
+            emailService: emailService.Object,
+            preReleaseService: preReleaseService.Object,
+            userReleaseRoleAndInviteManager: userReleaseRoleAndInviteManager.Object,
+            userReleaseInviteRepository: userReleaseInviteRepository.Object
+        );
+
+        var result = await service.InvitePreReleaseUsers(
+            releaseVersion.Id,
+            allEmails);
+
+        var preReleaseUsers = result.AssertRight();
+
+        VerifyAllMocks(
+            emailService,
+            preReleaseService,
+            userReleaseRoleAndInviteManager,
+            userReleaseInviteRepository);
+
+        // The addresses that are already invited or accepted should have been ignored
+        Assert.Equal(4, preReleaseUsers.Count);
+
+        Assert.Equal("new.user.1@test.com", preReleaseUsers[0].Email);
+        Assert.Equal("new.user.2@test.com", preReleaseUsers[1].Email);
+        Assert.Equal("existing.user.1@test.com", preReleaseUsers[2].Email);
+        Assert.Equal("existing.user.2@test.com", preReleaseUsers[3].Email);
     }
 
     [Fact]
@@ -1200,149 +957,148 @@ public class PreReleaseUserServiceTests
             .WithApprovalStatus(ReleaseApprovalStatus.Draft)
             .WithPublishScheduled(PublishedScheduledStartOfDay);
 
-        var existingReleaseInvites = new List<UserReleaseInvite>
+        var emailsWithExistingReleaseInvites = ListOf(
+            "invited.prerelease.1@test.com",
+            "invited.prerelease.2@test.com");
+
+        var emailsWithExistingRoles = ListOf(
+            "existing.prerelease.user.1@test.com",
+            "existing.prerelease.user.2@test.com");
+
+        var existingEmailsWithNoRolesOrInvites = ListOf(
+            "existing.user.1@test.com",
+            "existing.user.2@test.com");
+
+        var allEmails = ListOf(
+            "new.user.1@test.com",
+            "new.user.2@test.com")
+            .Concat(existingEmailsWithNoRolesOrInvites)
+            .Concat(emailsWithExistingReleaseInvites)
+            .Concat(emailsWithExistingRoles)
+            .ToList();
+
+        var existingUsersByEmail = existingEmailsWithNoRolesOrInvites
+            .Concat(emailsWithExistingRoles)
+            .Select(email => new User
+            {
+                Email = email
+            })
+            .ToDictionary(u => u.Email);
+
+        await using var context = InMemoryApplicationDbContext();
+        await using var userAndRolesDbContext = InMemoryUserAndRolesDbContext();
+
+        context.ReleaseVersions.Add(releaseVersion);
+        context.Users.AddRange(existingUsersByEmail.Values);
+        await context.SaveChangesAsync();
+
+        var userReleaseRoleAndInviteManager = new Mock<IUserReleaseRoleAndInviteManager>(MockBehavior.Strict);
+        foreach (var email in allEmails)
         {
-            new()
+            if (emailsWithExistingRoles.Contains(email))
             {
-                Email = "invited.prerelease.1@test.com",
-                ReleaseVersion = releaseVersion,
-                Role = ReleaseRole.PrereleaseViewer
-            },
-            new()
-            {
-                Email = "invited.prerelease.2@test.com",
-                ReleaseVersion = releaseVersion,
-                Role = ReleaseRole.PrereleaseViewer
+                userReleaseRoleAndInviteManager
+                .Setup(mock => mock.HasUserReleaseRole(
+                    email,
+                    releaseVersion.Id,
+                    ReleaseRole.PrereleaseViewer
+                ))
+                .ReturnsAsync(true)
+                .Verifiable();
+
+                continue;
             }
-        };
 
-        var existingUsers = new List<User>
-        {
-            new()
+            userReleaseRoleAndInviteManager
+                .Setup(mock => mock.HasUserReleaseRole(
+                    email,
+                    releaseVersion.Id,
+                    ReleaseRole.PrereleaseViewer
+                ))
+                .ReturnsAsync(false)
+                .Verifiable();
+
+            if (existingUsersByEmail.ContainsKey(email))
             {
-                Email = "existing.user.1@test.com"
-            },
-            new()
-            {
-                Email = "existing.user.2@test.com"
-            },
-            new()
-            {
-                Email = "existing.prerelease.user.1@test.com"
-            },
-            new()
-            {
-                Email = "existing.prerelease.user.2@test.com"
+                userReleaseRoleAndInviteManager
+                .Setup(mock => mock.CreateIfNotExists(
+                    existingUsersByEmail[email].Id,
+                    releaseVersion.Id,
+                    ReleaseRole.PrereleaseViewer,
+                    _userId
+                ))
+                .ReturnsAsync(new UserReleaseRole())
+                .Verifiable();
             }
-        };
-
-        var existingRoles = new List<UserReleaseRole>
-        {
-            new()
-            {
-                User = existingUsers.Single(u => u.Email == "existing.prerelease.user.1@test.com"),
-                ReleaseVersion = releaseVersion,
-                Role = ReleaseRole.PrereleaseViewer
-            },
-            new()
-            {
-                User = existingUsers.Single(u => u.Email == "existing.prerelease.user.2@test.com"),
-                ReleaseVersion = releaseVersion,
-                Role = ReleaseRole.PrereleaseViewer
-            }
-        };
-
-        var contextId = Guid.NewGuid().ToString();
-
-        await using (var context = InMemoryApplicationDbContext(contextId))
-        {
-            context.ReleaseVersions.Add(releaseVersion);
-            context.Users.AddRange(existingUsers);
-            context.UserReleaseInvites.AddRange(existingReleaseInvites);
-            context.UserReleaseRoles.AddRange(existingRoles);
-            await context.SaveChangesAsync();
         }
 
-        await using (var context = InMemoryApplicationDbContext(contextId))
-        await using (var userAndRolesDbContext = InMemoryUserAndRolesDbContext(contextId))
+        var userReleaseInviteRepository = new Mock<IUserReleaseInviteRepository>(MockBehavior.Strict);
+        foreach (var email in allEmails)
         {
-            var service = SetupPreReleaseUserService(
-                context,
-                usersAndRolesDbContext: userAndRolesDbContext
-            );
+            if (emailsWithExistingRoles.Contains(email))
+            {
+                continue;
+            }
 
-            var result = await service.InvitePreReleaseUsers(
+            if (emailsWithExistingReleaseInvites.Contains(email))
+            {
+                userReleaseInviteRepository
+                .Setup(mock => mock.UserHasInvite(
+                    releaseVersion.Id,
+                    email,
+                    ReleaseRole.PrereleaseViewer
+                ))
+                .ReturnsAsync(true)
+                .Verifiable();
+
+                continue;
+            }
+
+            userReleaseInviteRepository
+                .Setup(mock => mock.UserHasInvite(
+                    releaseVersion.Id,
+                    email,
+                    ReleaseRole.PrereleaseViewer
+                ))
+                .ReturnsAsync(false)
+                .Verifiable();
+
+            userReleaseInviteRepository
+            .Setup(mock => mock.Create(
                 releaseVersion.Id,
-                ListOf(
-                    "new.user.1@test.com",
-                    "new.user.2@test.com",
-                    "existing.user.1@test.com",
-                    "existing.user.2@test.com",
-                    "invited.prerelease.1@test.com",
-                    "invited.prerelease.2@test.com",
-                    "existing.prerelease.user.1@test.com",
-                    "existing.prerelease.user.2@test.com")
-            );
-
-            var preReleaseUsers = result.AssertRight();
-            // The addresses that are already invited or accepted should have been ignored
-            Assert.Equal(4, preReleaseUsers.Count);
-
-            Assert.Equal("new.user.1@test.com", preReleaseUsers[0].Email);
-            Assert.Equal("new.user.2@test.com", preReleaseUsers[1].Email);
-            Assert.Equal("existing.user.1@test.com", preReleaseUsers[2].Email);
-            Assert.Equal("existing.user.2@test.com", preReleaseUsers[3].Email);
+                email,
+                ReleaseRole.PrereleaseViewer,
+                false,
+                _userId,
+                null))
+            .Returns(Task.CompletedTask)
+            .Verifiable();
         }
 
-        await using (var context = InMemoryApplicationDbContext(contextId))
-        {
-            var releaseInvites = await context.UserReleaseInvites.AsQueryable().ToListAsync();
-            Assert.Equal(6, releaseInvites.Count);
+        var service = SetupPreReleaseUserService(
+            context,
+            usersAndRolesDbContext: userAndRolesDbContext,
+            userReleaseRoleAndInviteManager: userReleaseRoleAndInviteManager.Object,
+            userReleaseInviteRepository: userReleaseInviteRepository.Object
+        );
 
-            Assert.True(releaseInvites.All(invite => invite.ReleaseVersionId == releaseVersion.Id));
-            Assert.True(releaseInvites.All(invite => invite.Role == ReleaseRole.PrereleaseViewer));
-            Assert.True(releaseInvites.All(invite =>
-                !invite.EmailSent)); // Emails are not sent for unapproved releases
+        var result = await service.InvitePreReleaseUsers(
+            releaseVersion.Id,
+            allEmails);
 
-            Assert.Equal("invited.prerelease.1@test.com", releaseInvites[0].Email);
-            Assert.Equal("invited.prerelease.2@test.com", releaseInvites[1].Email);
+        var preReleaseUsers = result.AssertRight();
 
-            Assert.Equal("new.user.1@test.com", releaseInvites[2].Email);
-            Assert.Equal("new.user.2@test.com", releaseInvites[3].Email);
+        VerifyAllMocks(
+            userReleaseRoleAndInviteManager,
+            userReleaseInviteRepository);
 
-            Assert.Equal("existing.user.1@test.com", releaseInvites[4].Email);
-            Assert.Equal("existing.user.2@test.com", releaseInvites[5].Email);
+        // The addresses that are already invited or accepted should have been ignored
+        Assert.Equal(4, preReleaseUsers.Count);
 
-            // Two new role assignments should have been created corresponding with the two accepted invites
-            var roles = await context.UserReleaseRoles.AsQueryable().ToListAsync();
-            Assert.Equal(4, roles.Count);
-
-            Assert.True(roles.All(role => role.ReleaseVersionId == releaseVersion.Id));
-            Assert.True(roles.All(role => role.Role == ReleaseRole.PrereleaseViewer));
-
-            // Existing release roles
-            Assert.Equal(existingUsers.Single(u => u.Email == "existing.prerelease.user.1@test.com").Id,
-                roles[0].UserId);
-            Assert.Equal(existingUsers.Single(u => u.Email == "existing.prerelease.user.2@test.com").Id,
-                roles[1].UserId);
-
-            // New release roles
-            Assert.Equal(existingUsers.Single(u => u.Email == "existing.user.1@test.com").Id, roles[2].UserId);
-            Assert.Equal(existingUsers.Single(u => u.Email == "existing.user.2@test.com").Id, roles[3].UserId);
-        }
-
-        await using (var userAndRolesDbContext = InMemoryUserAndRolesDbContext(contextId))
-        {
-            // Two new user invites should have been created
-            var userInvites = await userAndRolesDbContext.UserInvites.AsQueryable().ToListAsync();
-            Assert.Equal(2, userInvites.Count);
-
-            Assert.True(userInvites.All(role => role.RoleId == Role.PrereleaseUser.GetEnumValue()));
-            Assert.True(userInvites.All(invite => !invite.Accepted));
-
-            Assert.Equal("new.user.1@test.com", userInvites[0].Email);
-            Assert.Equal("new.user.2@test.com", userInvites[1].Email);
-        }
+        Assert.Equal("new.user.1@test.com", preReleaseUsers[0].Email);
+        Assert.Equal("new.user.2@test.com", preReleaseUsers[1].Email);
+        Assert.Equal("existing.user.1@test.com", preReleaseUsers[2].Email);
+        Assert.Equal("existing.user.2@test.com", preReleaseUsers[3].Email);
     }
 
     [Fact]
@@ -1371,158 +1127,19 @@ public class PreReleaseUserServiceTests
     }
 
     [Fact]
-    public async Task RemovePreReleaseUser_ReleaseRoleRemoved()
-    {
-        ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion()
-            .WithRelease(_dataFixture.DefaultRelease()
-                .WithPublication(_dataFixture.DefaultPublication()));
-
-        var contextId = Guid.NewGuid().ToString();
-
-        await using (var context = InMemoryApplicationDbContext(contextId))
-        await using (var userAndRolesDbContext = InMemoryUserAndRolesDbContext(contextId))
-        {
-            context.ReleaseVersions.Add(releaseVersion);
-            await context.AddAsync(
-                new UserReleaseRole
-                {
-                    ReleaseVersion = releaseVersion,
-                    Role = ReleaseRole.PrereleaseViewer,
-                    User = new User
-                    {
-                        Email = "test@test.com"
-                    }
-                }
-            );
-
-            await context.SaveChangesAsync();
-
-            await userAndRolesDbContext.AddAsync(
-                new UserInvite
-                {
-                    Email = "test@test.com",
-                    RoleId = Role.PrereleaseUser.GetEnumValue(),
-                    Accepted = false
-                }
-            );
-
-            await userAndRolesDbContext.SaveChangesAsync();
-        }
-
-        await using (var context = InMemoryApplicationDbContext(contextId))
-        await using (var userAndRolesDbContext = InMemoryUserAndRolesDbContext(contextId))
-        {
-            var service = SetupPreReleaseUserService(
-                context,
-                usersAndRolesDbContext: userAndRolesDbContext
-            );
-
-            var result = await service.RemovePreReleaseUser(
-                releaseVersion.Id,
-                "test@test.com"
-            );
-
-            result.AssertRight();
-        }
-
-        await using (var context = InMemoryApplicationDbContext(contextId))
-        {
-            var savedUserReleaseRoles = await context.UserReleaseRoles
-                .AsQueryable()
-                .ToListAsync();
-
-            Assert.Empty(savedUserReleaseRoles);
-        }
-    }
-
-    [Fact]
-    public async Task RemovePreReleaseUser_OtherReleaseRolesNotRemoved()
+    public async Task RemovePreReleaseUser_NoRemainingReleaseInvites_AcceptedInvite()
     {
         var user = new User
         {
             Email = "test@test.com"
         };
 
-        var userInvite = new UserInvite
+        var unacceptedUserInvite = new UserInvite
         {
             Email = user.Email,
             RoleId = Role.PrereleaseUser.GetEnumValue(),
-            Accepted = false
-        };
-
-        ReleaseVersion targetReleaseVersion = _dataFixture.DefaultReleaseVersion()
-            .WithRelease(_dataFixture.DefaultRelease()
-                .WithPublication(_dataFixture.DefaultPublication()));
-
-        var targetUserReleaseRole1 = _dataFixture.DefaultUserReleaseRole()
-            .WithReleaseVersion(targetReleaseVersion)
-            .WithRole(ReleaseRole.PrereleaseViewer)
-            .WithUser(user)
-            .Generate();
-        var targetUserReleaseRole2 = _dataFixture.DefaultUserReleaseRole()
-            .WithReleaseVersion(targetReleaseVersion)
-            .WithRole(ReleaseRole.Contributor)
-            .WithUser(user)
-            .Generate();
-
-        ReleaseVersion otherReleaseVersion = _dataFixture.DefaultReleaseVersion()
-            .WithRelease(_dataFixture.DefaultRelease()
-                .WithPublication(_dataFixture.DefaultPublication()));
-
-        var otherUserReleaseRole = _dataFixture.DefaultUserReleaseRole()
-            .WithReleaseVersion(otherReleaseVersion)
-            .WithRole(ReleaseRole.PrereleaseViewer)
-            .WithUser(user)
-            .Generate();
-
-        await using var context = InMemoryApplicationDbContext();
-        await using var userAndRolesDbContext = InMemoryUserAndRolesDbContext();
-
-        context.ReleaseVersions.AddRange(targetReleaseVersion, otherReleaseVersion);
-        context.UserReleaseRoles.AddRange(targetUserReleaseRole1, targetUserReleaseRole2, otherUserReleaseRole);
-        await context.SaveChangesAsync();
-
-        userAndRolesDbContext.UserInvites.Add(userInvite);
-        await userAndRolesDbContext.SaveChangesAsync();
-
-        var service = SetupPreReleaseUserService(
-            context,
-            usersAndRolesDbContext: userAndRolesDbContext
-        );
-
-        var result = await service.RemovePreReleaseUser(
-            targetReleaseVersion.Id,
-            user.Email
-        );
-
-        result.AssertRight();
-
-        var savedUserReleaseRoles = await context.UserReleaseRoles
-            .AsQueryable()
-            .ToListAsync();
-
-        Assert.Equal(2, savedUserReleaseRoles.Count);
-
-        Assert.Equal(targetReleaseVersion.Id, savedUserReleaseRoles[0].ReleaseVersionId);
-        Assert.Equal(ReleaseRole.Contributor, savedUserReleaseRoles[0].Role);
-
-        Assert.Equal(otherReleaseVersion.Id, savedUserReleaseRoles[1].ReleaseVersionId);
-        Assert.Equal(ReleaseRole.PrereleaseViewer, savedUserReleaseRoles[1].Role);
-    }
-
-    [Fact]
-    public async Task RemovePreReleaseUser_AllInvitesRemoved()
-    {
-        var user = new User
-        {
-            Email = "test@test.com"
-        };
-
-        var userInvite = new UserInvite
-        {
-            Email = user.Email,
-            RoleId = Role.PrereleaseUser.GetEnumValue(),
-            Accepted = false
+            Accepted = true,
+            Created = DateTime.UtcNow
         };
 
         var releaseVersion = _dataFixture.DefaultReleaseVersion()
@@ -1530,25 +1147,31 @@ public class PreReleaseUserServiceTests
                 .WithPublication(_dataFixture.DefaultPublication()))
             .Generate();
 
-        var userReleaseInvite = _dataFixture.DefaultUserReleaseInvite()
-            .WithReleaseVersion(releaseVersion)
-            .WithEmail(user.Email)
-            .WithRole(ReleaseRole.PrereleaseViewer)
-            .Generate();
-
         await using var context = InMemoryApplicationDbContext();
         await using var userAndRolesDbContext = InMemoryUserAndRolesDbContext();
 
         context.Users.Add(user);
-        context.UserReleaseInvites.Add(userReleaseInvite);
+        context.ReleaseVersions.Add(releaseVersion);
         await context.SaveChangesAsync();
 
-        userAndRolesDbContext.UserInvites.Add(userInvite);
+        userAndRolesDbContext.UserInvites.Add(unacceptedUserInvite);
         await userAndRolesDbContext.SaveChangesAsync();
+
+        var userReleaseRoleAndInviteManager = new Mock<IUserReleaseRoleAndInviteManager>(MockBehavior.Strict);
+        userReleaseRoleAndInviteManager
+            .Setup(m => m.RemoveAllRolesAndInvitesForReleaseVersion(
+                releaseVersion.Id,
+                user.Id,
+                default,
+                ReleaseRole.PrereleaseViewer
+            ))
+            .Returns(Task.CompletedTask)
+            .Verifiable();
 
         var service = SetupPreReleaseUserService(
             context,
-            usersAndRolesDbContext: userAndRolesDbContext
+            usersAndRolesDbContext: userAndRolesDbContext,
+            userReleaseRoleAndInviteManager: userReleaseRoleAndInviteManager.Object
         );
 
         var result = await service.RemovePreReleaseUser(
@@ -1558,107 +1181,33 @@ public class PreReleaseUserServiceTests
 
         result.AssertRight();
 
-        Assert.Empty(context.UserReleaseInvites);
+        VerifyAllMocks(userReleaseRoleAndInviteManager);
 
-        // Removes system invite as there are no release invites left
-        Assert.Empty(userAndRolesDbContext.UserInvites);
+        // The UserInvite should not have been removed
+        var remainingUserInvites = await userAndRolesDbContext.UserInvites
+            .ToListAsync();
+
+        var remainingUserInvite = Assert.Single(remainingUserInvites);
+
+        Assert.Equal(user.Email, remainingUserInvite.Email);
+        Assert.True(remainingUserInvite.Accepted);
+        Assert.Equal(Role.PrereleaseUser.GetEnumValue(), remainingUserInvite.RoleId);
     }
 
     [Fact]
-    public async Task RemovePreReleaseUser_OtherReleaseInvitesNotRemoved()
+    public async Task RemovePreReleaseUser_RemainingReleaseInvites()
     {
         var user = new User
         {
             Email = "test@test.com"
         };
 
-        var userInvite = new UserInvite
+        var unacceptedUserInvite = new UserInvite
         {
             Email = user.Email,
             RoleId = Role.PrereleaseUser.GetEnumValue(),
             Accepted = false,
-            Created = DateTime.UtcNow.AddDays(-1)
-        };
-
-        var targetReleaseVersion = _dataFixture.DefaultReleaseVersion()
-            .WithRelease(_dataFixture.DefaultRelease()
-                .WithPublication(_dataFixture.DefaultPublication()))
-            .Generate();
-
-        var targetUserReleaseInvite1 = _dataFixture.DefaultUserReleaseInvite()
-            .WithReleaseVersion(targetReleaseVersion)
-            .WithEmail(user.Email)
-            .WithRole(ReleaseRole.PrereleaseViewer)
-            .Generate();
-        var targetUserReleaseInvite2 = _dataFixture.DefaultUserReleaseInvite()
-            .WithReleaseVersion(targetReleaseVersion)
-            .WithEmail(user.Email)
-            .WithRole(ReleaseRole.Contributor)
-            .Generate();
-
-        ReleaseVersion otherReleaseVersion = _dataFixture.DefaultReleaseVersion()
-            .WithRelease(_dataFixture.DefaultRelease()
-                .WithPublication(_dataFixture.DefaultPublication()));
-
-        var otherUserReleaseInvite = _dataFixture.DefaultUserReleaseInvite()
-            .WithReleaseVersion(otherReleaseVersion)
-            .WithEmail(user.Email)
-            .WithRole(ReleaseRole.PrereleaseViewer)
-            .Generate();
-
-        await using var context = InMemoryApplicationDbContext();
-        await using var userAndRolesDbContext = InMemoryUserAndRolesDbContext();
-
-        context.Users.Add(user);
-        context.UserReleaseInvites.AddRange(targetUserReleaseInvite1, targetUserReleaseInvite2, otherUserReleaseInvite);
-        await context.SaveChangesAsync();
-
-        userAndRolesDbContext.Add(userInvite);
-        await userAndRolesDbContext.SaveChangesAsync();
-
-        var service = SetupPreReleaseUserService(
-            context,
-            usersAndRolesDbContext: userAndRolesDbContext
-        );
-
-        var result = await service.RemovePreReleaseUser(
-            targetReleaseVersion.Id,
-            user.Email
-        );
-
-        result.AssertRight();
-
-        var savedUserReleaseInvites = await context.UserReleaseInvites
-            .ToListAsync();
-
-        Assert.Equal(2, savedUserReleaseInvites.Count);
-        Assert.Equal(targetReleaseVersion.Id, savedUserReleaseInvites[0].ReleaseVersionId);
-        Assert.Equal(ReleaseRole.Contributor, savedUserReleaseInvites[0].Role);
-        Assert.Equal(user.Email, savedUserReleaseInvites[0].Email);
-
-        Assert.Equal(otherReleaseVersion.Id, savedUserReleaseInvites[1].ReleaseVersionId);
-        Assert.Equal(ReleaseRole.PrereleaseViewer, savedUserReleaseInvites[1].Role);
-        Assert.Equal(user.Email, savedUserReleaseInvites[1].Email);
-
-        var savedUserInvite = await userAndRolesDbContext.UserInvites
-            .SingleAsync();
-
-        Assert.Equal(user.Email, savedUserInvite.Email);
-    }
-
-    [Fact]
-    public async Task RemovePreReleaseUser_AcceptedSystemInviteNotRemoved()
-    {
-        var user = new User
-        {
-            Email = "test@test.com"
-        };
-
-        var userInvite = new UserInvite
-        {
-            Email = user.Email,
-            RoleId = Role.PrereleaseUser.GetEnumValue(),
-            Accepted = true
+            Created = DateTime.UtcNow
         };
 
         var releaseVersion = _dataFixture.DefaultReleaseVersion()
@@ -1679,12 +1228,24 @@ public class PreReleaseUserServiceTests
         context.UserReleaseInvites.Add(userReleaseInvite);
         await context.SaveChangesAsync();
 
-        userAndRolesDbContext.UserInvites.Add(userInvite);
+        userAndRolesDbContext.UserInvites.Add(unacceptedUserInvite);
         await userAndRolesDbContext.SaveChangesAsync();
+
+        var userReleaseRoleAndInviteManager = new Mock<IUserReleaseRoleAndInviteManager>(MockBehavior.Strict);
+        userReleaseRoleAndInviteManager
+            .Setup(m => m.RemoveAllRolesAndInvitesForReleaseVersion(
+                releaseVersion.Id,
+                user.Id,
+                default,
+                ReleaseRole.PrereleaseViewer
+            ))
+            .Returns(Task.CompletedTask)
+            .Verifiable();
 
         var service = SetupPreReleaseUserService(
             context,
-            usersAndRolesDbContext: userAndRolesDbContext
+            usersAndRolesDbContext: userAndRolesDbContext,
+            userReleaseRoleAndInviteManager: userReleaseRoleAndInviteManager.Object
         );
 
         var result = await service.RemovePreReleaseUser(
@@ -1694,11 +1255,80 @@ public class PreReleaseUserServiceTests
 
         result.AssertRight();
 
-        Assert.Empty(context.UserReleaseInvites);
+        VerifyAllMocks(userReleaseRoleAndInviteManager);
 
-        var savedUserInvite = Assert.Single(userAndRolesDbContext.UserInvites);
-        Assert.NotNull(savedUserInvite);
-        Assert.Equal(user.Email, savedUserInvite.Email);
+        // The UserInvite should not have been removed
+        var remainingUserInvites = await userAndRolesDbContext.UserInvites
+            .ToListAsync();
+
+        var remainingUserInvite = Assert.Single(remainingUserInvites);
+
+        Assert.Equal(user.Email, remainingUserInvite.Email);
+        Assert.False(remainingUserInvite.Accepted);
+        Assert.Equal(Role.PrereleaseUser.GetEnumValue(), remainingUserInvite.RoleId);
+    }
+
+    [Fact]
+    public async Task RemovePreReleaseUser_NoRemainingReleaseInvites()
+    {
+        var user = new User
+        {
+            Email = "test@test.com"
+        };
+
+        var unacceptedUserInvite = new UserInvite
+        {
+            Email = user.Email,
+            RoleId = Role.PrereleaseUser.GetEnumValue(),
+            Accepted = false
+        };
+
+        var releaseVersion = _dataFixture.DefaultReleaseVersion()
+            .WithRelease(_dataFixture.DefaultRelease()
+                .WithPublication(_dataFixture.DefaultPublication()))
+            .Generate();
+
+        await using var context = InMemoryApplicationDbContext();
+        await using var userAndRolesDbContext = InMemoryUserAndRolesDbContext();
+
+        context.Users.Add(user);
+        context.ReleaseVersions.Add(releaseVersion);
+        await context.SaveChangesAsync();
+
+        userAndRolesDbContext.UserInvites.Add(unacceptedUserInvite);
+        await userAndRolesDbContext.SaveChangesAsync();
+
+        var userReleaseRoleAndInviteManager = new Mock<IUserReleaseRoleAndInviteManager>(MockBehavior.Strict);
+        userReleaseRoleAndInviteManager
+            .Setup(m => m.RemoveAllRolesAndInvitesForReleaseVersion(
+                releaseVersion.Id,
+                user.Id,
+                default,
+                ReleaseRole.PrereleaseViewer
+            ))
+            .Returns(Task.CompletedTask)
+            .Verifiable();
+
+        var service = SetupPreReleaseUserService(
+            context,
+            usersAndRolesDbContext: userAndRolesDbContext,
+            userReleaseRoleAndInviteManager: userReleaseRoleAndInviteManager.Object
+        );
+
+        var result = await service.RemovePreReleaseUser(
+            releaseVersion.Id,
+            user.Email
+        );
+
+        result.AssertRight();
+
+        VerifyAllMocks(userReleaseRoleAndInviteManager);
+
+        // The unaccepted UserInvite should have been removed
+        var remainingUserInvites = await userAndRolesDbContext.UserInvites
+            .ToListAsync();
+
+        Assert.Empty(remainingUserInvites);
     }
 
     private static Dictionary<string, dynamic> GetExpectedPreReleaseTemplateValues(ReleaseVersion releaseVersion,
@@ -1769,14 +1399,11 @@ public class PreReleaseUserServiceTests
             notifyOptions ?? DefaultNotifyOptions(),
             preReleaseService ?? Mock.Of<IPreReleaseService>(MockBehavior.Strict),
             persistenceHelper ?? new PersistenceHelper<ContentDbContext>(context),
-            userService ?? AlwaysTrueUserService().Object,
+            userService ?? AlwaysTrueUserService(_userId).Object,
             userRepository,
             userInviteRepository ?? new UserInviteRepository(usersAndRolesDbContext),
-            userReleaseRoleAndInviteManager ?? new UserReleaseRoleAndInviteManager(
-                contentDbContext: context,
-                userReleaseInviteRepository: userReleaseInviteRepository,
-                userRepository: userRepository),
-            userReleaseInviteRepository
+            userReleaseRoleAndInviteManager ?? Mock.Of<IUserReleaseRoleAndInviteManager>(MockBehavior.Strict),
+            userReleaseInviteRepository ?? Mock.Of<IUserReleaseInviteRepository>(MockBehavior.Strict)
         );
     }
 }
