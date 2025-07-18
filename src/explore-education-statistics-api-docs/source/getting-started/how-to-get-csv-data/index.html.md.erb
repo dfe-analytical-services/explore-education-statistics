@@ -26,8 +26,9 @@ examples.
 
 It should be noted that the CSV data uses human-readable labels for its contents instead of
 machine-readable identifiers. This means that unlike the rest of the API, there are no backward
-compatibility guarantees between different versions of the data set, minor changes that update labels
-may be breaking changes depending on how you are relying on the labels in your downstream process.
+compatibility guarantees between different versions of the data set if your downstream processes 
+rely on labels to always remain the same.
+
 
 Every data set is created from an underlying CSV file that contains **all** the data. You may find
 it useful (or necessary) to work with the whole underlying CSV instead of interacting with the data 
