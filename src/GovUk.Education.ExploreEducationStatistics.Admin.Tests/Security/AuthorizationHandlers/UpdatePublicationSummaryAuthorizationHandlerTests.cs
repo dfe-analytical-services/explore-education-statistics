@@ -15,35 +15,34 @@ using static GovUk.Education.ExploreEducationStatistics.Content.Model.Publicatio
 using static Moq.MockBehavior;
 using ReleaseVersionRepository = GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.ReleaseVersionRepository;
 
-namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers
+namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers;
+
+public class UpdatePublicationSummaryAuthorizationHandlerTests
 {
-    public class UpdatePublicationSummaryAuthorizationHandlerTests
+    [Fact]
+    public async Task CanUpdateAllPublicationsSummaryAuthorizationHandler_SucceedsWithClaim()
     {
-        [Fact]
-        public async Task CanUpdateAllPublicationsSummaryAuthorizationHandler_SucceedsWithClaim()
-        {
-            await AssertHandlerSucceedsWithCorrectClaims<Publication, UpdatePublicationSummaryRequirement>(
-                CreateHandler,
-                new Publication(),
-                UpdateAllPublications
-            );
-        }
+        await AssertHandlerSucceedsWithCorrectClaims<Publication, UpdatePublicationSummaryRequirement>(
+            CreateHandler,
+            new Publication(),
+            UpdateAllPublications
+        );
+    }
 
-        [Fact]
-        public async Task CanUpdateAllPublicationsSummaryAuthorizationHandler_SucceedsWithPublicationOwner()
-        {
-            await AssertPublicationHandlerSucceedsWithPublicationRoles<UpdatePublicationSummaryRequirement>(
-                CreateHandler, Owner);
-        }
+    [Fact]
+    public async Task CanUpdateAllPublicationsSummaryAuthorizationHandler_SucceedsWithPublicationOwner()
+    {
+        await AssertPublicationHandlerSucceedsWithPublicationRoles<UpdatePublicationSummaryRequirement>(
+            CreateHandler, Owner);
+    }
 
-        private static UpdatePublicationSummaryAuthorizationHandler CreateHandler(ContentDbContext contentDbContext)
-        {
-            return new UpdatePublicationSummaryAuthorizationHandler(
-                new AuthorizationHandlerService(
-                    new ReleaseVersionRepository(contentDbContext),
-                    Mock.Of<IUserReleaseRoleRepository>(Strict),
-                    new UserPublicationRoleRepository(contentDbContext),
-                    Mock.Of<IPreReleaseService>(Strict)));
-        }
+    private static UpdatePublicationSummaryAuthorizationHandler CreateHandler(ContentDbContext contentDbContext)
+    {
+        return new UpdatePublicationSummaryAuthorizationHandler(
+            new AuthorizationHandlerService(
+                new ReleaseVersionRepository(contentDbContext),
+                Mock.Of<IUserReleaseRoleRepository>(Strict),
+                new UserPublicationRoleRepository(contentDbContext),
+                Mock.Of<IPreReleaseService>(Strict)));
     }
 }

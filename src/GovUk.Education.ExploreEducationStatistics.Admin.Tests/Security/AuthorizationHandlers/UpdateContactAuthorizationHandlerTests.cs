@@ -15,35 +15,34 @@ using static GovUk.Education.ExploreEducationStatistics.Content.Model.Publicatio
 using static Moq.MockBehavior;
 using ReleaseVersionRepository = GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.ReleaseVersionRepository;
 
-namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers
+namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers;
+
+public class UpdateContactAuthorizationHandlerTests
 {
-    public class UpdateContactAuthorizationHandlerTests
+    [Fact]
+    public async Task CanUpdateAllContactAuthorizationHandler_SucceedsWithClaim()
     {
-        [Fact]
-        public async Task CanUpdateAllContactAuthorizationHandler_SucceedsWithClaim()
-        {
-            await AssertHandlerSucceedsWithCorrectClaims<Publication, UpdateContactRequirement>(
-                CreateHandler,
-                new Publication(),
-                UpdateAllPublications
-            );
-        }
+        await AssertHandlerSucceedsWithCorrectClaims<Publication, UpdateContactRequirement>(
+            CreateHandler,
+            new Publication(),
+            UpdateAllPublications
+        );
+    }
 
-        [Fact]
-        public async Task CanUpdateAllContactAuthorizationHandler_SucceedsWithPublicationOwner()
-        {
-            await AssertPublicationHandlerSucceedsWithPublicationRoles<UpdateContactRequirement>(
-                CreateHandler, Owner);
-        }
+    [Fact]
+    public async Task CanUpdateAllContactAuthorizationHandler_SucceedsWithPublicationOwner()
+    {
+        await AssertPublicationHandlerSucceedsWithPublicationRoles<UpdateContactRequirement>(
+            CreateHandler, Owner);
+    }
 
-        private static UpdateContactAuthorizationHandler CreateHandler(ContentDbContext contentDbContext)
-        {
-            return new UpdateContactAuthorizationHandler(
-                new AuthorizationHandlerService(
-                    new ReleaseVersionRepository(contentDbContext),
-                    Mock.Of<IUserReleaseRoleRepository>(Strict),
-                    new UserPublicationRoleRepository(contentDbContext),
-                    Mock.Of<IPreReleaseService>(Strict)));
-        }
+    private static UpdateContactAuthorizationHandler CreateHandler(ContentDbContext contentDbContext)
+    {
+        return new UpdateContactAuthorizationHandler(
+            new AuthorizationHandlerService(
+                new ReleaseVersionRepository(contentDbContext),
+                Mock.Of<IUserReleaseRoleRepository>(Strict),
+                new UserPublicationRoleRepository(contentDbContext),
+                Mock.Of<IPreReleaseService>(Strict)));
     }
 }

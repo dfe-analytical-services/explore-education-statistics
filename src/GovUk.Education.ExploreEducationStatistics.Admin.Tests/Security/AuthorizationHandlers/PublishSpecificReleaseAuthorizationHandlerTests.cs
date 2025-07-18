@@ -17,82 +17,81 @@ using static GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseApp
 using static Moq.MockBehavior;
 using ReleaseVersionRepository = GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.ReleaseVersionRepository;
 
-namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers
+namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers;
+
+// ReSharper disable once ClassNeverInstantiated.Global
+public class PublishSpecificReleaseAuthorizationHandlerTests
 {
-    // ReSharper disable once ClassNeverInstantiated.Global
-    public class PublishSpecificReleaseAuthorizationHandlerTests
+    public class ClaimTests
     {
-        public class ClaimTests
+        [Fact]
+        public async Task FailsWhenDraft()
         {
-            [Fact]
-            public async Task FailsWhenDraft()
-            {
-                // Assert that no claims will allow a draft release version to be published
-                await AssertHandlerSucceedsWithCorrectClaims<ReleaseVersion, PublishSpecificReleaseRequirement>(
-                    CreateHandler,
-                    new ReleaseVersion
-                    {
-                        Id = Guid.NewGuid(),
-                        ApprovalStatus = Draft
-                    }
-                );
-            }
-
-            [Fact]
-            public async Task SucceedsWhenApproved()
-            {
-                // Assert that the PublishAllReleases claim will allow an approved release version to be published
-                await AssertHandlerSucceedsWithCorrectClaims<ReleaseVersion, PublishSpecificReleaseRequirement>(
-                    CreateHandler,
-                    new ReleaseVersion
-                    {
-                        Id = Guid.NewGuid(),
-                        ApprovalStatus = Approved
-                    },
-                    PublishAllReleases
-                );
-            }
+            // Assert that no claims will allow a draft release version to be published
+            await AssertHandlerSucceedsWithCorrectClaims<ReleaseVersion, PublishSpecificReleaseRequirement>(
+                CreateHandler,
+                new ReleaseVersion
+                {
+                    Id = Guid.NewGuid(),
+                    ApprovalStatus = Draft
+                }
+            );
         }
 
-        public class ReleaseRoleTests
+        [Fact]
+        public async Task SucceedsWhenApproved()
         {
-            [Fact]
-            public async Task FailsWhenDraft()
-            {
-                // Assert that no User Release roles will allow a draft release version to be published
-                await AssertReleaseVersionHandlerSucceedsWithCorrectReleaseRoles<PublishSpecificReleaseRequirement>(
-                    CreateHandler,
-                    new ReleaseVersion
-                    {
-                        Id = Guid.NewGuid(),
-                        ApprovalStatus = Draft
-                    }
-                );
-            }
+            // Assert that the PublishAllReleases claim will allow an approved release version to be published
+            await AssertHandlerSucceedsWithCorrectClaims<ReleaseVersion, PublishSpecificReleaseRequirement>(
+                CreateHandler,
+                new ReleaseVersion
+                {
+                    Id = Guid.NewGuid(),
+                    ApprovalStatus = Approved
+                },
+                PublishAllReleases
+            );
+        }
+    }
 
-            [Fact]
-            public async Task SucceedsWhenApproved()
-            {
-                // Assert that only the Approver User Release role will allow an approved release version to be published
-                await AssertReleaseVersionHandlerSucceedsWithCorrectReleaseRoles<PublishSpecificReleaseRequirement>(
-                    CreateHandler,
-                    new ReleaseVersion
-                    {
-                        Id = Guid.NewGuid(),
-                        ApprovalStatus = Approved
-                    },
-                    Approver);
-            }
+    public class ReleaseRoleTests
+    {
+        [Fact]
+        public async Task FailsWhenDraft()
+        {
+            // Assert that no User Release roles will allow a draft release version to be published
+            await AssertReleaseVersionHandlerSucceedsWithCorrectReleaseRoles<PublishSpecificReleaseRequirement>(
+                CreateHandler,
+                new ReleaseVersion
+                {
+                    Id = Guid.NewGuid(),
+                    ApprovalStatus = Draft
+                }
+            );
         }
 
-        private static PublishSpecificReleaseAuthorizationHandler CreateHandler(ContentDbContext contentDbContext)
+        [Fact]
+        public async Task SucceedsWhenApproved()
         {
-            return new PublishSpecificReleaseAuthorizationHandler(
-                new AuthorizationHandlerService(
-                    new ReleaseVersionRepository(contentDbContext),
-                    new UserReleaseRoleRepository(contentDbContext),
-                    new UserPublicationRoleRepository(contentDbContext),
-                    Mock.Of<IPreReleaseService>(Strict)));
+            // Assert that only the Approver User Release role will allow an approved release version to be published
+            await AssertReleaseVersionHandlerSucceedsWithCorrectReleaseRoles<PublishSpecificReleaseRequirement>(
+                CreateHandler,
+                new ReleaseVersion
+                {
+                    Id = Guid.NewGuid(),
+                    ApprovalStatus = Approved
+                },
+                Approver);
         }
+    }
+
+    private static PublishSpecificReleaseAuthorizationHandler CreateHandler(ContentDbContext contentDbContext)
+    {
+        return new PublishSpecificReleaseAuthorizationHandler(
+            new AuthorizationHandlerService(
+                new ReleaseVersionRepository(contentDbContext),
+                new UserReleaseRoleRepository(contentDbContext),
+                new UserPublicationRoleRepository(contentDbContext),
+                Mock.Of<IPreReleaseService>(Strict)));
     }
 }

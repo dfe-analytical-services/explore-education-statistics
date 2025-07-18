@@ -3,22 +3,21 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
-namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
+namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
+
+public class ImportStatusBauViewModel
 {
-    public class ImportStatusBauViewModel
-    {
-        public string SubjectTitle { get; set; }
-        public Guid? SubjectId { get; set; }
-        public Guid PublicationId { get; set; }
-        public string PublicationTitle { get; set; }
-        public Guid ReleaseId { get; set; }
-        public string ReleaseTitle { get; set; }
-        public Guid FileId { get; set; }
-        public string DataFileName { get; set; }
-        public int? TotalRows { get; set; }
-        [JsonConverter(typeof(StringEnumConverter))]
-        public DataImportStatus Status { get; set; }
-        public int StagePercentageComplete { get; set; }
-        public int PercentageComplete { get; set; }
-    }
+    public string SubjectTitle { get; set; }
+    public Guid? SubjectId { get; set; }
+    public Guid PublicationId { get; set; }
+    public string PublicationTitle { get; set; }
+    public Guid ReleaseId { get; set; }
+    public string ReleaseTitle { get; set; }
+    public Guid FileId { get; set; }
+    public string DataFileName { get; set; }
+    public int? TotalRows { get; set; }
+    [JsonConverter(typeof(StringEnumConverter))]
+    public DataImportStatus Status { get; set; }
+    public int StagePercentageComplete { get; set; }
+    public int PercentageComplete { get; set; }
 }

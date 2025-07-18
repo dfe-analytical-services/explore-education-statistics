@@ -16,41 +16,40 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainers;
 
-namespace GovUk.Education.ExploreEducationStatistics.Content.Services
+namespace GovUk.Education.ExploreEducationStatistics.Content.Services;
+
+public class MethodologyImageService : IMethodologyImageService
 {
-    public class MethodologyImageService : IMethodologyImageService
+    private readonly IPersistenceHelper<ContentDbContext> _persistenceHelper;
+    private readonly IPublicBlobStorageService _publicBlobStorageService;
+    private readonly IUserService _userService;
+
+    public MethodologyImageService(IPersistenceHelper<ContentDbContext> persistenceHelper,
+        IPublicBlobStorageService publicBlobStorageService,
+        IUserService userService)
     {
-        private readonly IPersistenceHelper<ContentDbContext> _persistenceHelper;
-        private readonly IPublicBlobStorageService _publicBlobStorageService;
-        private readonly IUserService _userService;
+        _persistenceHelper = persistenceHelper;
+        _publicBlobStorageService = publicBlobStorageService;
+        _userService = userService;
+    }
 
-        public MethodologyImageService(IPersistenceHelper<ContentDbContext> persistenceHelper,
-            IPublicBlobStorageService publicBlobStorageService,
-            IUserService userService)
-        {
-            _persistenceHelper = persistenceHelper;
-            _publicBlobStorageService = publicBlobStorageService;
-            _userService = userService;
-        }
-
-        public async Task<Either<ActionResult, FileStreamResult>> Stream(Guid methodologyVersionId, Guid fileId)
-        {
-            return await _persistenceHelper
-                .CheckEntityExists<MethodologyFile>(q => q
-                    .Include(mf => mf.File)
-                    .Include(mf => mf.MethodologyVersion)
-                    .Where(mf => mf.MethodologyVersionId == methodologyVersionId && mf.FileId == fileId))
-                .OnSuccessDo(mf => _userService.CheckCanViewMethodologyVersion(mf.MethodologyVersion))
-                .OnSuccessCombineWith(mf =>
-                    _publicBlobStorageService.DownloadToStream(PublicMethodologyFiles, mf.Path(), new MemoryStream()))
-                .OnSuccess(methodologyFileAndStream =>
+    public async Task<Either<ActionResult, FileStreamResult>> Stream(Guid methodologyVersionId, Guid fileId)
+    {
+        return await _persistenceHelper
+            .CheckEntityExists<MethodologyFile>(q => q
+                .Include(mf => mf.File)
+                .Include(mf => mf.MethodologyVersion)
+                .Where(mf => mf.MethodologyVersionId == methodologyVersionId && mf.FileId == fileId))
+            .OnSuccessDo(mf => _userService.CheckCanViewMethodologyVersion(mf.MethodologyVersion))
+            .OnSuccessCombineWith(mf =>
+                _publicBlobStorageService.DownloadToStream(PublicMethodologyFiles, mf.Path(), new MemoryStream()))
+            .OnSuccess(methodologyFileAndStream =>
+            {
+                var (methodologyFile, stream) = methodologyFileAndStream;
+                return new FileStreamResult(stream, methodologyFile.File.ContentType)
                 {
-                    var (methodologyFile, stream) = methodologyFileAndStream;
-                    return new FileStreamResult(stream, methodologyFile.File.ContentType)
-                    {
-                        FileDownloadName = methodologyFile.File.Filename
-                    };
-                });
-        }
+                    FileDownloadName = methodologyFile.File.Filename
+                };
+            });
     }
 }

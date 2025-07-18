@@ -17,201 +17,200 @@ using static GovUk.Education.ExploreEducationStatistics.Common.Services.Collecti
 using IReleaseService = GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces.IReleaseService;
 using Unit = GovUk.Education.ExploreEducationStatistics.Common.Model.Unit;
 
-namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api.Statistics
+namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api.Statistics;
+
+public class FootnoteControllerTests
 {
-    public class FootnoteControllerTests
+    private readonly FootnoteController _controller;
+
+    private static readonly Guid FootnoteId = Guid.NewGuid();
+
+    private static readonly Guid ReleaseVersionId = Guid.NewGuid();
+
+    public FootnoteControllerTests()
     {
-        private readonly FootnoteController _controller;
+        var subjectIds = new[] { Guid.NewGuid(), Guid.NewGuid() };
 
-        private static readonly Guid FootnoteId = Guid.NewGuid();
-
-        private static readonly Guid ReleaseVersionId = Guid.NewGuid();
-
-        public FootnoteControllerTests()
+        var footnote = new Footnote
         {
-            var subjectIds = new[] { Guid.NewGuid(), Guid.NewGuid() };
+            Id = FootnoteId,
+            Content = "Sample footnote",
+            Filters = new List<FilterFootnote>(),
+            FilterGroups = new List<FilterGroupFootnote>(),
+            FilterItems = new List<FilterItemFootnote>(),
+            Indicators = new List<IndicatorFootnote>(),
+            Subjects = new List<SubjectFootnote>()
+        };
 
-            var footnote = new Footnote
+        var filterRepository = new Mock<IFilterRepository>(MockBehavior.Strict);
+        var indicatorGroupRepository = new Mock<IIndicatorGroupRepository>(MockBehavior.Strict);
+        var footnoteService = new Mock<IFootnoteService>(MockBehavior.Strict);
+        var releaseService = new Mock<IReleaseService>(MockBehavior.Strict);
+        var releaseDataFileRepository = new Mock<IReleaseDataFileRepository>(MockBehavior.Strict);
+
+        footnoteService.Setup(s => s.CreateFootnote(
+                ReleaseVersionId,
+                "Sample footnote",
+                It.IsAny<IReadOnlySet<Guid>>(),
+                It.IsAny<IReadOnlySet<Guid>>(),
+                It.IsAny<IReadOnlySet<Guid>>(),
+                It.IsAny<IReadOnlySet<Guid>>(),
+                It.IsAny<IReadOnlySet<Guid>>()))
+            .ReturnsAsync(footnote);
+
+        footnoteService.Setup(s => s.UpdateFootnote(
+                ReleaseVersionId,
+                FootnoteId,
+                "Updated sample footnote",
+                It.IsAny<IReadOnlySet<Guid>>(),
+                It.IsAny<IReadOnlySet<Guid>>(),
+                It.IsAny<IReadOnlySet<Guid>>(),
+                It.IsAny<IReadOnlySet<Guid>>(),
+                It.IsAny<IReadOnlySet<Guid>>()))
+            .ReturnsAsync(new Footnote
             {
                 Id = FootnoteId,
-                Content = "Sample footnote",
+                Content = "Updated sample footnote",
                 Filters = new List<FilterFootnote>(),
                 FilterGroups = new List<FilterGroupFootnote>(),
                 FilterItems = new List<FilterItemFootnote>(),
                 Indicators = new List<IndicatorFootnote>(),
                 Subjects = new List<SubjectFootnote>()
-            };
+            });
 
-            var filterRepository = new Mock<IFilterRepository>(MockBehavior.Strict);
-            var indicatorGroupRepository = new Mock<IIndicatorGroupRepository>(MockBehavior.Strict);
-            var footnoteService = new Mock<IFootnoteService>(MockBehavior.Strict);
-            var releaseService = new Mock<IReleaseService>(MockBehavior.Strict);
-            var releaseDataFileRepository = new Mock<IReleaseDataFileRepository>(MockBehavior.Strict);
+        footnoteService.Setup(s => s.GetFootnotes(ReleaseVersionId))
+            .ReturnsAsync(new List<Footnote>
+            {
+                footnote
+            });
 
-            footnoteService.Setup(s => s.CreateFootnote(
-                    ReleaseVersionId,
-                    "Sample footnote",
-                    It.IsAny<IReadOnlySet<Guid>>(),
-                    It.IsAny<IReadOnlySet<Guid>>(),
-                    It.IsAny<IReadOnlySet<Guid>>(),
-                    It.IsAny<IReadOnlySet<Guid>>(),
-                    It.IsAny<IReadOnlySet<Guid>>()))
-                .ReturnsAsync(footnote);
+        footnoteService.Setup(s => s.DeleteFootnote(ReleaseVersionId, FootnoteId)).ReturnsAsync(Unit.Instance);
 
-            footnoteService.Setup(s => s.UpdateFootnote(
-                    ReleaseVersionId,
-                    FootnoteId,
-                    "Updated sample footnote",
-                    It.IsAny<IReadOnlySet<Guid>>(),
-                    It.IsAny<IReadOnlySet<Guid>>(),
-                    It.IsAny<IReadOnlySet<Guid>>(),
-                    It.IsAny<IReadOnlySet<Guid>>(),
-                    It.IsAny<IReadOnlySet<Guid>>()))
-                .ReturnsAsync(new Footnote
-                {
-                    Id = FootnoteId,
-                    Content = "Updated sample footnote",
-                    Filters = new List<FilterFootnote>(),
-                    FilterGroups = new List<FilterGroupFootnote>(),
-                    FilterItems = new List<FilterItemFootnote>(),
-                    Indicators = new List<IndicatorFootnote>(),
-                    Subjects = new List<SubjectFootnote>()
-                });
-
-            footnoteService.Setup(s => s.GetFootnotes(ReleaseVersionId))
-                .ReturnsAsync(new List<Footnote>
-                {
-                    footnote
-                });
-
-            footnoteService.Setup(s => s.DeleteFootnote(ReleaseVersionId, FootnoteId)).ReturnsAsync(Unit.Instance);
-
-            releaseService.Setup(s => s.ListSubjects(ReleaseVersionId))
-                .ReturnsAsync(
-                    subjectIds
-                        .Select(
-                            id => new SubjectViewModel(
-                                id: id,
-                                name: $"Subject {id}",
-                                order: 0,
-                                content: "Test content",
-                                timePeriods: new TimePeriodLabels(),
-                                geographicLevels: new List<string>(),
-                                filters: new List<string>(),
-                                indicators: new List<string>(),
-                                file: new FileInfo
-                                {
-                                    Id = Guid.NewGuid(),
-                                    Name = "Test file",
-                                    FileName = "test.csv",
-                                    Size = "1 Mb",
-                                },
-                                lastUpdated: DateTime.Now
-                            )
-                        )
-                        .ToList()
-                );
-
-            filterRepository.Setup(s => s.GetFiltersIncludingItems(It.IsIn(subjectIds)))
-                .ReturnsAsync(
-                    new List<Filter>
-                    {
-                        new()
-                        {
-                            Id = Guid.NewGuid(),
-                            Hint = "Filter Hint",
-                            Label = "Filter label",
-                            Name = "Filter name",
-                            FilterGroups = new List<FilterGroup>
+        releaseService.Setup(s => s.ListSubjects(ReleaseVersionId))
+            .ReturnsAsync(
+                subjectIds
+                    .Select(
+                        id => new SubjectViewModel(
+                            id: id,
+                            name: $"Subject {id}",
+                            order: 0,
+                            content: "Test content",
+                            timePeriods: new TimePeriodLabels(),
+                            geographicLevels: new List<string>(),
+                            filters: new List<string>(),
+                            indicators: new List<string>(),
+                            file: new FileInfo
                             {
-                                new()
+                                Id = Guid.NewGuid(),
+                                Name = "Test file",
+                                FileName = "test.csv",
+                                Size = "1 Mb",
+                            },
+                            lastUpdated: DateTime.Now
+                        )
+                    )
+                    .ToList()
+            );
+
+        filterRepository.Setup(s => s.GetFiltersIncludingItems(It.IsIn(subjectIds)))
+            .ReturnsAsync(
+                new List<Filter>
+                {
+                    new()
+                    {
+                        Id = Guid.NewGuid(),
+                        Hint = "Filter Hint",
+                        Label = "Filter label",
+                        Name = "Filter name",
+                        FilterGroups = new List<FilterGroup>
+                        {
+                            new()
+                            {
+                                Id = Guid.NewGuid(),
+                                Label = "Filter group",
+                                FilterItems = new List<FilterItem>
                                 {
-                                    Id = Guid.NewGuid(),
-                                    Label = "Filter group",
-                                    FilterItems = new List<FilterItem>
+                                    new()
                                     {
-                                        new()
-                                        {
-                                            Id = Guid.NewGuid(),
-                                            Label = "Filter item",
-                                        }
+                                        Id = Guid.NewGuid(),
+                                        Label = "Filter item",
                                     }
                                 }
                             }
                         }
                     }
-                );
+                }
+            );
 
-            indicatorGroupRepository.Setup(s => s.GetIndicatorGroups(It.IsIn(subjectIds)))
-                .ReturnsAsync(
-                    new List<IndicatorGroup>
+        indicatorGroupRepository.Setup(s => s.GetIndicatorGroups(It.IsIn(subjectIds)))
+            .ReturnsAsync(
+                new List<IndicatorGroup>
+                {
+                    new()
                     {
-                        new()
+                        Id = Guid.NewGuid(),
+                        Label = "Indicator group",
+                        Indicators = new List<Indicator>
                         {
-                            Id = Guid.NewGuid(),
-                            Label = "Indicator group",
-                            Indicators = new List<Indicator>
+                            new()
                             {
-                                new()
-                                {
-                                    Id = Guid.NewGuid(),
-                                    Label = "Indicator label",
-                                    Name = "Indicator name",
-                                    Unit = IndicatorUnit.Percent,
-                                    DecimalPlaces = 2
-                                }
+                                Id = Guid.NewGuid(),
+                                Label = "Indicator label",
+                                Name = "Indicator name",
+                                Unit = IndicatorUnit.Percent,
+                                DecimalPlaces = 2
                             }
                         }
-                    });
-
-            _controller = new FootnoteController(filterRepository.Object,
-                footnoteService.Object,
-                indicatorGroupRepository.Object,
-                releaseService.Object,
-                releaseDataFileRepository.Object);
-        }
-
-        [Fact]
-        public async Task CreateFootnote()
-        {
-            var result = await _controller.CreateFootnote(ReleaseVersionId,
-                new FootnoteCreateRequest
-                {
-                    Content = "Sample footnote",
-                    Filters = SetOf<Guid>(),
-                    FilterGroups = SetOf<Guid>(),
-                    FilterItems = SetOf<Guid>(),
-                    Indicators = SetOf<Guid>(),
-                    Subjects = SetOf<Guid>()
+                    }
                 });
 
-            result.AssertOkResult();
-        }
+        _controller = new FootnoteController(filterRepository.Object,
+            footnoteService.Object,
+            indicatorGroupRepository.Object,
+            releaseService.Object,
+            releaseDataFileRepository.Object);
+    }
 
-        [Fact]
-        public async Task GetFootnotes()
-        {
-            var result = await _controller.GetFootnotes(ReleaseVersionId);
+    [Fact]
+    public async Task CreateFootnote()
+    {
+        var result = await _controller.CreateFootnote(ReleaseVersionId,
+            new FootnoteCreateRequest
+            {
+                Content = "Sample footnote",
+                Filters = SetOf<Guid>(),
+                FilterGroups = SetOf<Guid>(),
+                FilterItems = SetOf<Guid>(),
+                Indicators = SetOf<Guid>(),
+                Subjects = SetOf<Guid>()
+            });
 
-            result.AssertOkResult();
-        }
+        result.AssertOkResult();
+    }
 
-        [Fact]
-        public async Task UpdateFootnote()
-        {
-            var result = await _controller.UpdateFootnote(releaseVersionId: ReleaseVersionId,
-                footnoteId: FootnoteId,
-                new FootnoteUpdateRequest
-                {
-                    Content = "Updated sample footnote",
-                    Filters = SetOf<Guid>(),
-                    FilterGroups = SetOf<Guid>(),
-                    FilterItems = SetOf<Guid>(),
-                    Indicators = SetOf<Guid>(),
-                    Subjects = SetOf<Guid>()
-                });
+    [Fact]
+    public async Task GetFootnotes()
+    {
+        var result = await _controller.GetFootnotes(ReleaseVersionId);
 
-            result.AssertOkResult();
-        }
+        result.AssertOkResult();
+    }
+
+    [Fact]
+    public async Task UpdateFootnote()
+    {
+        var result = await _controller.UpdateFootnote(releaseVersionId: ReleaseVersionId,
+            footnoteId: FootnoteId,
+            new FootnoteUpdateRequest
+            {
+                Content = "Updated sample footnote",
+                Filters = SetOf<Guid>(),
+                FilterGroups = SetOf<Guid>(),
+                FilterItems = SetOf<Guid>(),
+                Indicators = SetOf<Guid>(),
+                Subjects = SetOf<Guid>()
+            });
+
+        result.AssertOkResult();
     }
 }

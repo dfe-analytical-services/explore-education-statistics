@@ -31,8 +31,8 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.Validat
 using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainers;
 using Unit = GovUk.Education.ExploreEducationStatistics.Common.Model.Unit;
 
-namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
-{
+namespace GovUk.Education.ExploreEducationStatistics.Admin.Services;
+
     public class ReleaseDataFileService(
         ContentDbContext contentDbContext,
         IPersistenceHelper<ContentDbContext> persistenceHelper,
@@ -148,7 +148,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     .Include(rf => rf.File.CreatedBy)
                     .Where(rf =>
                         rf.ReleaseVersionId == releaseVersionId &&
-                        rf.File.Type == FileType.Data &&
+                    rf.File.Type == FileType.Data &&
                         rf.FileId == fileId))
                 .OnSuccessDo(rf => userService.CheckCanViewReleaseVersion(rf.ReleaseVersion))
                 .OnSuccess(async releaseFile =>
@@ -732,4 +732,3 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .SingleAsync();
         }
     }
-}

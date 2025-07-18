@@ -12,64 +12,63 @@ using Moq;
 using System;
 using System.Threading.Tasks;
 
-namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.ManageContent
+namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.ManageContent;
+
+public class RelatedInformationServicePermissionTests
 {
-    public class RelatedInformationServicePermissionTests
+    private readonly ReleaseVersion _releaseVersion = new()
     {
-        private readonly ReleaseVersion _releaseVersion = new()
-        {
-            Id = Guid.NewGuid()
-        };
+        Id = Guid.NewGuid()
+    };
 
-        [Fact]
-        public void AddRelatedInformationAsync()
-        {
-            AssertSecurityPoliciesChecked(service =>
-                    service.AddRelatedInformationAsync(
-                        _releaseVersion.Id,
-                        new CreateUpdateLinkRequest()),
-                SecurityPolicies.CanUpdateSpecificReleaseVersion);
-        }
+    [Fact]
+    public void AddRelatedInformationAsync()
+    {
+        AssertSecurityPoliciesChecked(service =>
+                service.AddRelatedInformationAsync(
+                    _releaseVersion.Id,
+                    new CreateUpdateLinkRequest()),
+            SecurityPolicies.CanUpdateSpecificReleaseVersion);
+    }
 
-        [Fact]
-        public void DeleteRelatedInformationAsync()
-        {
-            AssertSecurityPoliciesChecked(service =>
-                    service.DeleteRelatedInformationAsync(
-                        releaseVersionId: _releaseVersion.Id,
-                        relatedInformationId: Guid.NewGuid()),
-                SecurityPolicies.CanUpdateSpecificReleaseVersion);
-        }
+    [Fact]
+    public void DeleteRelatedInformationAsync()
+    {
+        AssertSecurityPoliciesChecked(service =>
+                service.DeleteRelatedInformationAsync(
+                    releaseVersionId: _releaseVersion.Id,
+                    relatedInformationId: Guid.NewGuid()),
+            SecurityPolicies.CanUpdateSpecificReleaseVersion);
+    }
 
-        [Fact]
-        public void UpdateRelatedInformationAsync()
-        {
-            AssertSecurityPoliciesChecked(service =>
-                    service.UpdateRelatedInformation(
-                        _releaseVersion.Id,
-                        []),
-                SecurityPolicies.CanUpdateSpecificReleaseVersion);
-        }
+    [Fact]
+    public void UpdateRelatedInformationAsync()
+    {
+        AssertSecurityPoliciesChecked(service =>
+                service.UpdateRelatedInformation(
+                    _releaseVersion.Id,
+                    []),
+            SecurityPolicies.CanUpdateSpecificReleaseVersion);
+    }
 
-        private void AssertSecurityPoliciesChecked<T>(
-            Func<RelatedInformationService, Task<Either<ActionResult, T>>> protectedAction, params SecurityPolicies[] policies)
-        {
-            var (contentDbContext, releaseHelper, userService) = Mocks();
+    private void AssertSecurityPoliciesChecked<T>(
+        Func<RelatedInformationService, Task<Either<ActionResult, T>>> protectedAction, params SecurityPolicies[] policies)
+    {
+        var (contentDbContext, releaseHelper, userService) = Mocks();
 
-            var service = new RelatedInformationService(contentDbContext.Object, releaseHelper.Object, userService.Object);
+        var service = new RelatedInformationService(contentDbContext.Object, releaseHelper.Object, userService.Object);
 
-            PermissionTestUtil.AssertSecurityPoliciesChecked(protectedAction, _releaseVersion, userService, service, policies);
-        }
+        PermissionTestUtil.AssertSecurityPoliciesChecked(protectedAction, _releaseVersion, userService, service, policies);
+    }
 
-        private (
-            Mock<ContentDbContext>,
-            Mock<IPersistenceHelper<ContentDbContext>>,
-            Mock<IUserService>) Mocks()
-        {
-            return (
-                new Mock<ContentDbContext>(),
-                MockUtils.MockPersistenceHelper<ContentDbContext, ReleaseVersion>(_releaseVersion.Id, _releaseVersion),
-                new Mock<IUserService>());
-        }
+    private (
+        Mock<ContentDbContext>,
+        Mock<IPersistenceHelper<ContentDbContext>>,
+        Mock<IUserService>) Mocks()
+    {
+        return (
+            new Mock<ContentDbContext>(),
+            MockUtils.MockPersistenceHelper<ContentDbContext, ReleaseVersion>(_releaseVersion.Id, _releaseVersion),
+            new Mock<IUserService>());
     }
 }
