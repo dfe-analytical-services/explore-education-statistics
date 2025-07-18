@@ -1,12 +1,14 @@
 ﻿#nullable enable
 using System;
+using Generator.Equals;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Model;
 
-public class Organisation : ICreatedUpdatedTimestamps<DateTimeOffset, DateTimeOffset?>
+[Equatable]
+public partial class Organisation : ICreatedUpdatedTimestamps<DateTimeOffset, DateTimeOffset?>
 {
     public Guid Id { get; set; }
 
