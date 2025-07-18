@@ -1,16 +1,19 @@
 #nullable enable
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using Microsoft.EntityFrameworkCore;
+using Moq;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
-using static GovUk.Education.ExploreEducationStatistics.Content.Model.PublicationRole;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services;
 
@@ -42,12 +45,12 @@ public abstract class UserPublicationRoleAndInviteManagerTests
             {
                 var service = SetupUserPublicationRoleAndInviteManager(contentDbContext);
 
-                var result = await service.Create(user.Id, publication.Id, Owner, createdBy.Id);
+                var result = await service.Create(user.Id, publication.Id, PublicationRole.Owner, createdBy.Id);
 
                 Assert.NotEqual(Guid.Empty, result.Id);
                 Assert.Equal(user.Id, result.UserId);
                 Assert.Equal(publication.Id, result.PublicationId);
-                Assert.Equal(Owner, result.Role);
+                Assert.Equal(PublicationRole.Owner, result.Role);
                 result.Created.AssertUtcNow();
                 Assert.Equal(createdBy.Id, result.CreatedById);
             }
@@ -60,7 +63,7 @@ public abstract class UserPublicationRoleAndInviteManagerTests
                 Assert.NotEqual(Guid.Empty, userPublicationRoles[0].Id);
                 Assert.Equal(user.Id, userPublicationRoles[0].UserId);
                 Assert.Equal(publication.Id, userPublicationRoles[0].PublicationId);
-                Assert.Equal(Owner, userPublicationRoles[0].Role);
+                Assert.Equal(PublicationRole.Owner, userPublicationRoles[0].Role);
                 userPublicationRoles[0].Created.AssertUtcNow();
                 Assert.Equal(createdBy.Id, userPublicationRoles[0].CreatedById);
             }
@@ -76,7 +79,7 @@ public abstract class UserPublicationRoleAndInviteManagerTests
             {
                 User = new User(),
                 Publication = new Publication(),
-                Role = Owner
+                Role = PublicationRole.Owner
             };
 
             var contentDbContextId = Guid.NewGuid().ToString();
@@ -94,7 +97,7 @@ public abstract class UserPublicationRoleAndInviteManagerTests
                 Assert.True(await service.UserHasRoleOnPublication(
                     userPublicationRole.UserId,
                     userPublicationRole.PublicationId,
-                    Owner));
+                    PublicationRole.Owner));
             }
         }
 
@@ -108,7 +111,7 @@ public abstract class UserPublicationRoleAndInviteManagerTests
             {
                 User = new User(),
                 Publication = new Publication(),
-                Role = Owner
+                Role = PublicationRole.Owner
             };
 
             var contentDbContextId = Guid.NewGuid().ToString();
@@ -127,7 +130,7 @@ public abstract class UserPublicationRoleAndInviteManagerTests
                 Assert.False(await service.UserHasRoleOnPublication(
                     userPublicationRoleOtherPublication.UserId,
                     publication.Id,
-                    Owner));
+                    PublicationRole.Owner));
             }
         }
     }
@@ -149,24 +152,24 @@ public abstract class UserPublicationRoleAndInviteManagerTests
             _fixture.DefaultUserPublicationRole()
                 .WithUser(user1)
                 .WithPublication(publication1)
-                .WithRole(Owner)
+                .WithRole(PublicationRole.Owner)
                 .Generate(),
             // Roles for different pulication. One duplicate role.
             _fixture.DefaultUserPublicationRole()
                 .WithUser(user1)
                 .WithPublication(publication2)
-                .WithRole(Owner)
+                .WithRole(PublicationRole.Owner)
                 .Generate(),
             _fixture.DefaultUserPublicationRole()
                 .WithUser(user1)
                 .WithPublication(publication2)
-                .WithRole(Allower)
+                .WithRole(PublicationRole.Allower)
                 .Generate(),
             // Role for different user
             _fixture.DefaultUserPublicationRole()
                 .WithUser(user2)
                 .WithPublication(publication1)
-                .WithRole(Owner)
+                .WithRole(PublicationRole.Owner)
                 .Generate(),
         };
 
@@ -182,8 +185,8 @@ public abstract class UserPublicationRoleAndInviteManagerTests
 
             // Expect only distinct roles to be returned, therefore the 2nd "Owner" role is filtered out.
             Assert.Equal(2, result.Count);
-            Assert.Equal(Owner, result[0]);
-            Assert.Equal(Allower, result[1]);
+            Assert.Equal(PublicationRole.Owner, result[0]);
+            Assert.Equal(PublicationRole.Allower, result[1]);
         }
 
         // This test will be changed when we start introducing the use of the NEW publication roles in the 
@@ -201,12 +204,12 @@ public abstract class UserPublicationRoleAndInviteManagerTests
             _fixture.DefaultUserPublicationRole()
                 .WithUser(user)
                 .WithPublication(publication)
-                .WithRole(Approver)
+                .WithRole(PublicationRole.Approver)
                 .Generate(),
             _fixture.DefaultUserPublicationRole()
                 .WithUser(user)
                 .WithPublication(publication)
-                .WithRole(Drafter)
+                .WithRole(PublicationRole.Drafter)
                 .Generate(),
         };
 
@@ -241,19 +244,19 @@ public abstract class UserPublicationRoleAndInviteManagerTests
             _fixture.DefaultUserPublicationRole()
                 .WithUser(user1)
                 .WithPublication(publication1)
-                .WithRole(Owner)
+                .WithRole(PublicationRole.Owner)
                 .Generate(),
             // Different role for different pulication.
             _fixture.DefaultUserPublicationRole()
                 .WithUser(user1)
                 .WithPublication(publication2)
-                .WithRole(Allower)
+                .WithRole(PublicationRole.Allower)
                 .Generate(),
             // Different role for different user
             _fixture.DefaultUserPublicationRole()
                 .WithUser(user2)
                 .WithPublication(publication1)
-                .WithRole(Allower)
+                .WithRole(PublicationRole.Allower)
                 .Generate(),
         };
 
@@ -270,7 +273,7 @@ public abstract class UserPublicationRoleAndInviteManagerTests
                 publicationId: publication1.Id);
 
             var role = Assert.Single(result);
-            Assert.Equal(Owner, role);
+            Assert.Equal(PublicationRole.Owner, role);
         }
 
         // This test will be changed when we start introducing the use of the NEW publication roles in the 
@@ -288,12 +291,12 @@ public abstract class UserPublicationRoleAndInviteManagerTests
             _fixture.DefaultUserPublicationRole()
                 .WithUser(user)
                 .WithPublication(publication)
-                .WithRole(Approver)
+                .WithRole(PublicationRole.Approver)
                 .Generate(),
             _fixture.DefaultUserPublicationRole()
                 .WithUser(user)
                 .WithPublication(publication)
-                .WithRole(Drafter)
+                .WithRole(PublicationRole.Drafter)
                 .Generate(),
         };
 
@@ -313,12 +316,278 @@ public abstract class UserPublicationRoleAndInviteManagerTests
         }
     }
 
+    public class RemoveRoleAndInviteTests : UserPublicationRoleAndInviteManagerTests
+    {
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public async Task Success(bool ignoreQueryFilters)
+        {
+            var email = "test@test.com";
+
+            var userPublicationRole = _fixture.DefaultUserPublicationRole()
+                .WithUser(new User
+                {
+                    Email = email
+                })
+                .WithPublication(_fixture.DefaultPublication())
+                .WithRole(PublicationRole.Allower)
+                .Generate();
+
+            await using var contentDbContext = InMemoryApplicationDbContext();
+
+            contentDbContext.Add(userPublicationRole);
+            await contentDbContext.SaveChangesAsync();
+
+            var userPublicationInviteRepository = new Mock<IUserPublicationInviteRepository>();
+            userPublicationInviteRepository
+                .Setup(m => m.Remove(
+                    userPublicationRole.PublicationId,
+                    email,
+                    userPublicationRole.Role,
+                    default))
+                .Returns(Task.CompletedTask)
+                .Verifiable();
+
+            var service = SetupUserPublicationRoleAndInviteManager(
+                contentDbContext: contentDbContext,
+                userPublicationInviteRepository: userPublicationInviteRepository.Object);
+
+            await service.RemoveRoleAndInvite(userPublicationRole);
+
+            MockUtils.VerifyAllMocks(userPublicationInviteRepository);
+
+            var query = contentDbContext.UserPublicationRoles.AsQueryable();
+
+            if (ignoreQueryFilters)
+            {
+                query = query.IgnoreQueryFilters();
+            }
+
+            var updatedPublicationRole = query
+                .SingleOrDefault(urr => urr.Id == userPublicationRole.Id);
+
+            Assert.Null(updatedPublicationRole);
+        }
+    }
+
+    public class RemoveManyRolesAndInvitesTests : UserPublicationRoleAndInviteManagerTests
+    {
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public async Task Success(bool ignoreQueryFilters)
+        {
+            var user1 = new User { Email = "test1@test.com" };
+            var publication1 = _fixture.DefaultPublication()
+                .Generate();
+            var userPublicationRole1 = _fixture.DefaultUserPublicationRole()
+                .WithUser(user1)
+                .WithPublication(publication1)
+                .WithRole(PublicationRole.Allower)
+                .Generate();
+            var userPublicationInvite1 = _fixture.DefaultUserPublicationInvite()
+                .WithEmail(user1.Email)
+                .WithPublication(publication1)
+                .WithRole(PublicationRole.Allower)
+                .Generate();
+
+            var user2 = new User { Email = "test2@test.com" };
+            var publication2 = _fixture.DefaultPublication()
+                .Generate();
+            var userPublicationRole2 = _fixture.DefaultUserPublicationRole()
+                .WithUser(user2)
+                .WithPublication(publication2)
+                .WithRole(PublicationRole.Owner)
+                .Generate();
+            var userPublicationInvite2 = _fixture.DefaultUserPublicationInvite()
+                .WithEmail(user2.Email)
+                .WithPublication(publication2)
+                .WithRole(PublicationRole.Owner)
+                .Generate();
+
+            var user3 = new User { Email = "test3@test.com" };
+            var publication3 = _fixture.DefaultPublication()
+                .Generate();
+            var userPublicationRole3 = _fixture.DefaultUserPublicationRole()
+                .WithUser(user3)
+                .WithPublication(publication3)
+                .WithRole(PublicationRole.Allower)
+                .Generate();
+            var userPublicationInvite3 = _fixture.DefaultUserPublicationInvite()
+                .WithEmail(user3.Email)
+                .WithPublication(publication3)
+                .WithRole(PublicationRole.Allower)
+                .Generate();
+
+            await using var contentDbContext = InMemoryApplicationDbContext();
+
+            contentDbContext.UserPublicationRoles.AddRange(userPublicationRole1, userPublicationRole2, userPublicationRole3);
+            contentDbContext.UserPublicationInvites.AddRange(userPublicationInvite1, userPublicationInvite2, userPublicationInvite3);
+            await contentDbContext.SaveChangesAsync();
+
+            var userPublicationInviteRepository = new Mock<IUserPublicationInviteRepository>();
+            userPublicationInviteRepository
+                .Setup(m => m.RemoveMany(
+                    new[] { userPublicationInvite1, userPublicationInvite2 },
+                    default))
+                .Returns(Task.CompletedTask)
+                .Verifiable();
+
+            var service = SetupUserPublicationRoleAndInviteManager(
+                contentDbContext: contentDbContext,
+                userPublicationInviteRepository: userPublicationInviteRepository.Object);
+
+            await service.RemoveManyRolesAndInvites([userPublicationRole1, userPublicationRole2]);
+
+            MockUtils.VerifyAllMocks(userPublicationInviteRepository);
+
+            var query = contentDbContext.UserPublicationRoles.AsQueryable();
+
+            if (ignoreQueryFilters)
+            {
+                query = query.IgnoreQueryFilters();
+            }
+
+            var userPublicationRole = await query
+                .SingleAsync();
+
+            Assert.Equal(userPublicationRole3.Id, userPublicationRole.Id);
+        }
+    }
+
+    public class RemoveAllRolesAndInvitesForUserTests : UserPublicationRoleAndInviteManagerTests
+    {
+        [Fact]
+        public async Task TargetUserHasRoles_RemovesTargetRoles()
+        {
+            var targetUser = new User { Email = "test1@test.com" };
+            var otherUser = new User { Email = "test2@test.com" };
+            var role1 = PublicationRole.Allower;
+            var role2 = PublicationRole.Owner;
+            var publication1 = _fixture.DefaultPublication()
+                .Generate();
+            var publication2 = _fixture.DefaultPublication()
+                .Generate();
+
+            var userPublicationRoles = _fixture.DefaultUserPublicationRole()
+                // These 2 roles should be removed
+                .ForIndex(0, s => s.SetPublication(publication1))
+                .ForIndex(0, s => s.SetUser(targetUser))
+                .ForIndex(0, s => s.SetRole(role1))
+                .ForIndex(1, s => s.SetPublication(publication2))
+                .ForIndex(1, s => s.SetUser(targetUser))
+                .ForIndex(1, s => s.SetRole(role2))
+                // These roles are for a different email and should not be removed
+                .ForIndex(2, s => s.SetPublication(publication1))
+                .ForIndex(2, s => s.SetUser(otherUser))
+                .ForIndex(2, s => s.SetRole(role1))
+                .ForIndex(3, s => s.SetPublication(publication2))
+                .ForIndex(3, s => s.SetUser(otherUser))
+                .ForIndex(3, s => s.SetRole(role2))
+                .GenerateList(4);
+
+            await using var contentDbContext = InMemoryApplicationDbContext();
+
+            contentDbContext.UserPublicationRoles.AddRange(userPublicationRoles);
+            await contentDbContext.SaveChangesAsync();
+
+            var userPublicationInviteRepository = new Mock<IUserPublicationInviteRepository>();
+            userPublicationInviteRepository
+                .Setup(m => m.RemoveByUser(
+                    targetUser.Email,
+                    default))
+                .Returns(Task.CompletedTask)
+                .Verifiable();
+
+            var manager = SetupUserPublicationRoleAndInviteManager(
+                contentDbContext: contentDbContext,
+                userPublicationInviteRepository: userPublicationInviteRepository.Object);
+
+            await manager.RemoveAllRolesAndInvitesForUser(targetUser.Id);
+
+            MockUtils.VerifyAllMocks(userPublicationInviteRepository);
+
+            var remainingRoles = await contentDbContext.UserPublicationRoles
+                .ToListAsync();
+
+            Assert.Equal(2, remainingRoles.Count);
+
+            Assert.Equal(publication1.Id, remainingRoles[0].PublicationId);
+            Assert.Equal(otherUser, remainingRoles[0].User);
+            Assert.Equal(role1, remainingRoles[0].Role);
+
+            Assert.Equal(publication2.Id, remainingRoles[1].PublicationId);
+            Assert.Equal(otherUser, remainingRoles[1].User);
+            Assert.Equal(role2, remainingRoles[1].Role);
+        }
+
+        [Fact]
+        public async Task TargetUserHasNoRoles_DoesNothing()
+        {
+            var targetUser = new User { Email = "test1@test.com" };
+            var otherUser = new User { Email = "test2@test.com" };
+            var role1 = PublicationRole.Allower;
+            var role2 = PublicationRole.Owner;
+            var publication1 = _fixture.DefaultPublication()
+                .Generate();
+            var publication2 = _fixture.DefaultPublication()
+                .Generate();
+
+            var userPublicationRoles = _fixture.DefaultUserPublicationRole()
+                // These roles are for a different email and should not be removed
+                .ForIndex(0, s => s.SetPublication(publication1))
+                .ForIndex(0, s => s.SetUser(otherUser))
+                .ForIndex(0, s => s.SetRole(role1))
+                .ForIndex(1, s => s.SetPublication(publication2))
+                .ForIndex(1, s => s.SetUser(otherUser))
+                .ForIndex(1, s => s.SetRole(role2))
+                .GenerateList(2);
+
+            await using var contentDbContext = InMemoryApplicationDbContext();
+
+            contentDbContext.Users.AddRange(targetUser, otherUser);
+            contentDbContext.UserPublicationRoles.AddRange(userPublicationRoles);
+            await contentDbContext.SaveChangesAsync();
+
+            var userPublicationInviteRepository = new Mock<IUserPublicationInviteRepository>();
+            userPublicationInviteRepository
+                .Setup(m => m.RemoveByUser(
+                    targetUser.Email,
+                    default))
+                .Returns(Task.CompletedTask)
+                .Verifiable();
+
+            var manager = SetupUserPublicationRoleAndInviteManager(
+                contentDbContext: contentDbContext,
+                userPublicationInviteRepository: userPublicationInviteRepository.Object);
+
+            await manager.RemoveAllRolesAndInvitesForUser(targetUser.Id);
+
+            MockUtils.VerifyAllMocks(userPublicationInviteRepository);
+
+            var remainingRoles = await contentDbContext.UserPublicationRoles
+                .ToListAsync();
+
+            Assert.Equal(2, remainingRoles.Count);
+
+            Assert.Equal(publication1.Id, remainingRoles[0].PublicationId);
+            Assert.Equal(otherUser, remainingRoles[0].User);
+            Assert.Equal(role1, remainingRoles[0].Role);
+
+            Assert.Equal(publication2.Id, remainingRoles[1].PublicationId);
+            Assert.Equal(otherUser, remainingRoles[1].User);
+            Assert.Equal(role2, remainingRoles[1].Role);
+        }
+    }
+
     private static UserPublicationRoleAndInviteManager SetupUserPublicationRoleAndInviteManager(
-        ContentDbContext contentDbContext)
+        ContentDbContext contentDbContext,
+        IUserPublicationInviteRepository? userPublicationInviteRepository = null)
     {
         return new(
             contentDbContext: contentDbContext,
-            userPublicationInviteRepository: new UserPublicationInviteRepository(contentDbContext),
+            userPublicationInviteRepository: userPublicationInviteRepository ?? Mock.Of<IUserPublicationInviteRepository>(),
             userRepository: new UserRepository(contentDbContext));
     }
 }
