@@ -199,7 +199,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services;
                             dataFormFile: new Mock<IFormFile>().Object,
                             metaFormFile: new Mock<IFormFile>().Object,
                             dataSetTitle: "",
-                            replacingFileId: null,
                             cancellationToken: default);
                     }
                 );
@@ -217,7 +216,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services;
                         return service.UploadFromZip(releaseVersionId: _releaseVersion.Id,
                             zipFormFile: new Mock<IFormFile>().Object,
                             dataSetTitle: "",
-                            replacingFileId: null,
                             cancellationToken: default);
                     }
                 );

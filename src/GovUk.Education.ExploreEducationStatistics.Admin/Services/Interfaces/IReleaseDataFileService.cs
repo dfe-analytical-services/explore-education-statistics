@@ -37,35 +37,18 @@ public interface IReleaseDataFileService
         Guid releaseVersionId,
         List<Guid> fileIds);
 
-    Task<Either<ActionResult, List<DataSetUploadViewModel>>> Upload(
-        Guid releaseVersionId,
-        IFormFile dataFormFile,
-        IFormFile metaFormFile,
-        string dataSetTitle,
-        Guid? replacingFileId,
-        CancellationToken cancellationToken);
+        Task<Either<ActionResult, List<DataSetUploadViewModel>>> Upload(
+            Guid releaseVersionId,
+            IFormFile dataFormFile,
+            IFormFile metaFormFile,
+            string dataSetTitle,
+            CancellationToken cancellationToken);
 
-    Task<Either<ActionResult, DataFileInfo>> UploadForReplacement(
-        Guid releaseVersionId,
-        IFormFile dataFormFile,
-        IFormFile metaFormFile,
-        string dataSetTitle,
-        Guid? replacingFileId,
-        CancellationToken cancellationToken);
-
-    Task<Either<ActionResult, List<DataSetUploadViewModel>>> UploadFromZip(
-        Guid releaseVersionId,
-        IFormFile zipFormFile,
-        string dataSetTitle,
-        Guid? replacingFileId,
-        CancellationToken cancellationToken);
-
-    Task<Either<ActionResult, DataFileInfo>> UploadFromZipForReplacement(
-        Guid releaseVersionId,
-        IFormFile zipFormFile,
-        string dataSetTitle,
-        Guid? replacingFileId,
-        CancellationToken cancellationToken);
+        Task<Either<ActionResult, List<DataSetUploadViewModel>>> UploadFromZip(
+            Guid releaseVersionId,
+            IFormFile zipFormFile,
+            string dataSetTitle,
+            CancellationToken cancellationToken);
 
     Task<Either<ActionResult, List<DataSetUploadViewModel>>> UploadFromBulkZip(
         Guid releaseVersionId,

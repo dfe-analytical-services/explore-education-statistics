@@ -234,19 +234,4 @@ function ReplaceDataButtonOrModal({
       </CannotReplaceDataModal>
     );
   }
-
-  return (
-    <Link
-      to={generatePath<ReleaseDataFileReplaceRouteParams>(
-        releaseDataFileReplaceRoute.path,
-        {
-          publicationId,
-          releaseVersionId,
-          fileId: dataFileId,
-        },
-      )}
-    >
-      Replace data
-    </Link>
-  );
 }

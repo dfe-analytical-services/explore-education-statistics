@@ -844,32 +844,6 @@ describe('ReleaseDataUploadsSection', () => {
       ).toBeInTheDocument();
     });
 
-    test('shows validation message when non-unique subject title', async () => {
-      const { user } = renderWithTestConfig(
-        <MemoryRouter>
-          <ReleaseDataUploadsSection
-            publicationId="publication-1"
-            releaseVersionId="release-1"
-            canUpdateRelease
-          />
-        </MemoryRouter>,
-      );
-
-      await user.type(screen.getByLabelText('Title'), 'Test data 1');
-
-      await user.click(
-        screen.getByRole('button', { name: 'Upload data files' }),
-      );
-
-      await user.click(screen.getByLabelText('Title'));
-
-      expect(
-        await screen.findByText('Enter a unique title', {
-          selector: '#dataFileUploadForm-title-error',
-        }),
-      ).toBeInTheDocument();
-    });
-
     test('cannot submit with invalid values when trying to upload CSV files', async () => {
       const { user } = renderWithTestConfig(
         <MemoryRouter>

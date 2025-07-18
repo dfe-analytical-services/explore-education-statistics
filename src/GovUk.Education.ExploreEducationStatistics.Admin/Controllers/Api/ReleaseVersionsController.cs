@@ -145,77 +145,38 @@ public class ReleaseVersionsController : ControllerBase
             .HandleFailuresOrOk();
     }
 
-    [HttpPost("releaseVersions/data")]
-    [DisableRequestSizeLimit]
-    [RequestFormLimits(ValueLengthLimit = int.MaxValue, MultipartBodyLengthLimit = int.MaxValue)]
-    public async Task<ActionResult<List<DataSetUploadViewModel>>> UploadDataSet(
-        [FromForm] UploadDataSetRequest request,
-        CancellationToken cancellationToken)
-    {
-        return await _releaseDataFileService
-            .Upload(
-                request.ReleaseVersionId,
-                request.DataFile,
-                request.MetaFile,
-                request.Title,
-                request.ReplacingFileId,
-                cancellationToken)
-            .HandleFailuresOrOk();
-    }
+        [HttpPost("releaseVersions/data")]
+        [DisableRequestSizeLimit]
+        [RequestFormLimits(ValueLengthLimit = int.MaxValue, MultipartBodyLengthLimit = int.MaxValue)]
+        public async Task<ActionResult<List<DataSetUploadViewModel>>> UploadDataSet(
+            [FromForm] UploadDataSetRequest request,
+            CancellationToken cancellationToken)
+        {
+            return await _releaseDataFileService
+                .Upload(
+                    request.ReleaseVersionId,
+                    request.DataFile,
+                    request.MetaFile,
+                    request.Title,
+                    cancellationToken)
+                .HandleFailuresOrOk();
+        }
 
-    // TODO (EES-6176): Remove once manual replacement process has been consolidated to use UploadDataSet
-    [HttpPost("releaseVersions/replacement-data")]
-    [DisableRequestSizeLimit]
-    [RequestFormLimits(ValueLengthLimit = int.MaxValue, MultipartBodyLengthLimit = int.MaxValue)]
-    public async Task<ActionResult<DataFileInfo>> UploadDataSetForReplacement(
-        [FromForm] UploadDataSetRequest request,
-        CancellationToken cancellationToken)
-    {
-        return await _releaseDataFileService
-            .UploadForReplacement(
-                request.ReleaseVersionId,
-                request.DataFile,
-                request.MetaFile,
-                request.Title,
-                request.ReplacingFileId,
-                cancellationToken)
-            .HandleFailuresOrOk();
-    }
-
-    [HttpPost("releaseVersions/zip-data")]
-    [DisableRequestSizeLimit]
-    [RequestFormLimits(ValueLengthLimit = int.MaxValue, MultipartBodyLengthLimit = int.MaxValue)]
-    public async Task<ActionResult<List<DataSetUploadViewModel>>> UploadDataSetAsZip(
-        [FromForm] UploadDataSetAsZipRequest request,
-        CancellationToken cancellationToken)
-    {
-        return await _releaseDataFileService
-            .UploadFromZip(
-                request.ReleaseVersionId,
-                request.ZipFile,
-                request.Title,
-                request.ReplacingFileId,
-                cancellationToken)
-            .HandleFailuresOrOk();
-    }
-
-    // TODO (EES-6176): Remove once manual replacement process has been consolidated to use UploadDataSetAsZip
-    [HttpPost("releaseVersions/replacement-zip-data")]
-    [DisableRequestSizeLimit]
-    [RequestFormLimits(ValueLengthLimit = int.MaxValue, MultipartBodyLengthLimit = int.MaxValue)]
-    public async Task<ActionResult<DataFileInfo>> UploadDataSetAsZipForReplacement(
-        [FromForm] UploadDataSetAsZipRequest request,
-        CancellationToken cancellationToken)
-    {
-        return await _releaseDataFileService
-            .UploadFromZipForReplacement(
-                request.ReleaseVersionId,
-                request.ZipFile,
-                request.Title,
-                request.ReplacingFileId,
-                cancellationToken)
-            .HandleFailuresOrOk();
-    }
+        [HttpPost("releaseVersions/zip-data")]
+        [DisableRequestSizeLimit]
+        [RequestFormLimits(ValueLengthLimit = int.MaxValue, MultipartBodyLengthLimit = int.MaxValue)]
+        public async Task<ActionResult<List<DataSetUploadViewModel>>> UploadDataSetAsZip(
+            [FromForm] UploadDataSetAsZipRequest request,
+            CancellationToken cancellationToken)
+        {
+            return await _releaseDataFileService
+                .UploadFromZip(
+                    request.ReleaseVersionId,
+                    request.ZipFile,
+                    request.Title,
+                    cancellationToken)
+                .HandleFailuresOrOk();
+        }
 
     [HttpPost("releaseVersions/upload-bulk-zip-data")]
     [DisableRequestSizeLimit]

@@ -310,10 +310,6 @@ Upload data files
     user uploads subject and waits until complete    Dates test subject    dates.csv    dates.meta.csv
     user clicks link    Data and files
     user waits until page contains data uploads table
-    user clicks link    Replace data
-
-    user waits until h2 is visible    Data file details
-    user checks headed table body row cell contains    Data file import status    1    Complete    wait=%{WAIT_LONG}
 
 Navigate to data replacement page
     user waits until h2 is visible    Upload replacement data    %{WAIT_MEDIUM}

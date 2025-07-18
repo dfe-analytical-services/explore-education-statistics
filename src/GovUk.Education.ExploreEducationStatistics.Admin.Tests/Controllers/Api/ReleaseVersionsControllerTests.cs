@@ -54,30 +54,28 @@ public class ReleaseVersionsControllerUnitTests
 
         var expectedVm = DataSetUploadMockBuilder.BuildViewModel();
 
-        var releaseDataFileService = new Mock<IReleaseDataFileService>(Strict);
-        releaseDataFileService
-            .Setup(service => service.Upload(
-                _releaseVersionId,
-                dataFile,
-                metaFile,
-                "Data set title",
-                null,
-                default))
-            .ReturnsAsync(new List<DataSetUploadViewModel> { expectedVm });
+            var releaseDataFileService = new Mock<IReleaseDataFileService>(Strict);
+            releaseDataFileService
+                .Setup(service => service.Upload(
+                    _releaseVersionId,
+                    dataFile,
+                    metaFile,
+                    "Data set title",
+                    default))
+                .ReturnsAsync(new List<DataSetUploadViewModel> { expectedVm });
 
         // Act
         var controller = BuildController(releaseDataFileService: releaseDataFileService.Object);
 
-        var response = await controller.UploadDataSet(
-            new()
-            {
-                ReleaseVersionId = _releaseVersionId,
-                Title = "Data set title",
-                DataFile = dataFile,
-                MetaFile = metaFile,
-                ReplacingFileId = null
-            },
-            cancellationToken: default);
+            var response = await controller.UploadDataSet(
+                new()
+                {
+                    ReleaseVersionId = _releaseVersionId,
+                    Title = "Data set title",
+                    DataFile = dataFile,
+                    MetaFile = metaFile,
+                },
+                cancellationToken: default);
 
         // Assert
         VerifyAllMocks(releaseDataFileService);
@@ -94,30 +92,28 @@ public class ReleaseVersionsControllerUnitTests
         var dataFile = MockFile("datafile.csv");
         var metaFile = MockFile("metafile.csv");
 
-        var releaseDataFileService = new Mock<IReleaseDataFileService>(Strict);
-        releaseDataFileService
-            .Setup(service => service.Upload(
-                _releaseVersionId,
-                dataFile,
-                metaFile,
-                "Data set title",
-                null,
-                default))
-            .ReturnsAsync(ValidationActionResult(CannotOverwriteFile));
+            var releaseDataFileService = new Mock<IReleaseDataFileService>(Strict);
+            releaseDataFileService
+                .Setup(service => service.Upload(
+                    _releaseVersionId,
+                    dataFile,
+                    metaFile,
+                    "Data set title",
+                    default))
+                .ReturnsAsync(ValidationActionResult(CannotOverwriteFile));
 
         var controller = BuildController(releaseDataFileService: releaseDataFileService.Object);
 
-        // Act
-        var result = await controller.UploadDataSet(
-            new()
-            {
-                ReleaseVersionId = _releaseVersionId,
-                Title = "Data set title",
-                DataFile = dataFile,
-                MetaFile = metaFile,
-                ReplacingFileId = null
-            },
-            cancellationToken: default);
+            // Act
+            var result = await controller.UploadDataSet(
+                new()
+                {
+                    ReleaseVersionId = _releaseVersionId,
+                    Title = "Data set title",
+                    DataFile = dataFile,
+                    MetaFile = metaFile,
+                },
+                cancellationToken: default);
 
         // Assert
         VerifyAllMocks(releaseDataFileService);
@@ -133,28 +129,26 @@ public class ReleaseVersionsControllerUnitTests
 
         var expectedVm = DataSetUploadMockBuilder.BuildViewModel();
 
-        var releaseDataFileService = new Mock<IReleaseDataFileService>(Strict);
-        releaseDataFileService
-            .Setup(service => service.UploadFromZip(
-                _releaseVersionId,
-                dataSetZipFile,
-                "Data set title",
-                null,
-                default))
-            .ReturnsAsync(new List<DataSetUploadViewModel> { expectedVm });
+            var releaseDataFileService = new Mock<IReleaseDataFileService>(Strict);
+            releaseDataFileService
+                .Setup(service => service.UploadFromZip(
+                    _releaseVersionId,
+                    dataSetZipFile,
+                    "Data set title",
+                    default))
+                .ReturnsAsync(new List<DataSetUploadViewModel> { expectedVm });
 
         // Act
         var controller = BuildController(releaseDataFileService: releaseDataFileService.Object);
 
-        var response = await controller.UploadDataSetAsZip(
-            new()
-            {
-                ReleaseVersionId = _releaseVersionId,
-                Title = "Data set title",
-                ZipFile = dataSetZipFile,
-                ReplacingFileId = null
-            },
-            cancellationToken: default);
+            var response = await controller.UploadDataSetAsZip(
+                new()
+                {
+                    ReleaseVersionId = _releaseVersionId,
+                    Title = "Data set title",
+                    ZipFile = dataSetZipFile,
+                },
+                cancellationToken: default);
 
         // Assert
         VerifyAllMocks(releaseDataFileService);

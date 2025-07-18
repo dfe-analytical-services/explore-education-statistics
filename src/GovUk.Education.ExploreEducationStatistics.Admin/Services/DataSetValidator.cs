@@ -1,8 +1,4 @@
 #nullable enable
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
@@ -16,6 +12,10 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using File = GovUk.Education.ExploreEducationStatistics.Content.Model.File;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services;
@@ -24,9 +24,7 @@ public class DataSetValidator(
     ContentDbContext contentDbContext,
     IOptions<FeatureFlagsOptions> featureFlags) : IDataSetValidator
 {
-    public async Task<Either<List<ErrorViewModel>, DataSet>> ValidateDataSet(
-        DataSetDto dataSet,
-        bool performAutoReplacement = false) // TODO (EES-5708): This flag will be removed once upload methods are aligned. Currently auto-replacement is only available via bulk uploads
+    public async Task<Either<List<ErrorViewModel>, DataSet>> ValidateDataSet(DataSetDto dataSet)
     {
         var errors = new List<ErrorViewModel>();
 
@@ -52,14 +50,14 @@ public class DataSetValidator(
             }));
         }
 
-        var isReplacement = dataSet.ReplacingFile != null;
-
-        errors.AddRange(ValidateDataSetTitleDuplication(dataSet.ReleaseVersionId, dataSet.Title, isReplacement));
-        errors.AddRange(ValidateDataFileNames(dataSet.ReleaseVersionId, dataFile.FileName, dataSet.ReplacingFile));
-
         var fileToBeReplaced = (File?)null;
 
-        if (isReplacement)
+        await GetReplacingFileIfExists(dataSet.ReleaseVersionId, dataSet.Title)
+            .OnFailureDo(errors.Add)
+            .OnSuccessDo(file => fileToBeReplaced = file)
+            .OnSuccessVoid();
+
+        if (fileToBeReplaced is not null)
         {
             var releaseFileWithApiDataSet = await GetReplacingFileWithApiDataSetIfExists(dataSet.ReleaseVersionId, dataSet.Title);
 
@@ -67,16 +65,6 @@ public class DataSetValidator(
             {
                 errors.Add(ValidationMessages.GenerateErrorCannotReplaceDataSetWithApiDataSet(dataSet.Title));
                 return errors;
-            }
-
-            // TODO (EES-5708/6176): The `performAutoReplacement` condition can be removed once upload methods are aligned
-            // Auto-replacement is currently only available for bulk zip uploads, and replacements triggered via the UI
-            if (performAutoReplacement || featureFlags.Value.EnableReplacementOfPublicApiDataSets)
-            {
-                await GetReplacingFileIfExists(dataSet.ReleaseVersionId, dataSet.Title)
-                    .OnFailureDo(errors.Add)
-                    .OnSuccessDo(file => fileToBeReplaced = file)
-                    .OnSuccessVoid();
             }
         }
 
@@ -135,19 +123,18 @@ public class DataSetValidator(
 
             await GetReplacingFileIfExists(releaseVersionId, dataSetName)
                 .OnFailureDo(errors.Add)
-                .OnSuccessDo(fileToBeReplaced =>
+                .OnSuccessDo(_ =>
                 {
                     dataSetIndex.DataSetIndexItems.Add(new()
                     {
                         DataSetTitle = dataSetName,
                         DataFileName = $"{dataFileName}{Constants.DataSet.DataFileExtension}",
                         MetaFileName = $"{dataFileName}{Constants.DataSet.MetaFileExtension}",
-                        ReplacingFile = fileToBeReplaced,
                     });
 
                     indexFileEntries.Add((BaseFilename: dataFileName, Title: dataSetName));
                 })
-                .OnSuccessVoid();
+            .OnSuccessVoid();
         }
 
         if (errors.Count != 0)
@@ -258,61 +245,6 @@ public class DataSetValidator(
             return [ValidationMessages.GenerateErrorZipContainsUnusedFiles(remainingFileNames)];
         }
 
-        return [];
-    }
-
-    private List<ErrorViewModel> ValidateDataSetTitleDuplication(
-        Guid releaseVersionId,
-        string title,
-        bool isReplacement)
-    {
-        if (!isReplacement) // if it's a replacement, we get the title from the replacement which is already validated as unique
-        {
-            var dataSetNameExists = contentDbContext.ReleaseFiles
-                .Include(rf => rf.File)
-                .Any(rf =>
-                    rf.ReleaseVersionId == releaseVersionId
-                    && rf.File.Type == FileType.Data
-                    && rf.Name == title);
-
-            if (dataSetNameExists)
-            {
-                return [ValidationMessages.GenerateErrorDataSetTitleShouldBeUnique(title)];
-            }
-        }
-
-        return [];
-    }
-
-    private bool IsFileExisting(
-        Guid releaseVersionId,
-        FileType type,
-        string filename)
-    {
-        return contentDbContext
-            .ReleaseFiles
-            .Include(rf => rf.File)
-            .Where(rf => rf.ReleaseVersionId == releaseVersionId && rf.File.Type == type)
-            .AsEnumerable()
-            .Any(rf => string.Equals(rf.File.Filename, filename, StringComparison.CurrentCultureIgnoreCase));
-    }
-
-    private List<ErrorViewModel> ValidateDataFileNames(
-        Guid releaseVersionId,
-        string dataFileName,
-        File? replacingFile = null)
-    {
-        // Original uploads' data filename is not unique if a ReleaseFile exists with the same filename.
-        // With replacement uploads, we can ignore a preexisting ReleaseFile if it is the file being replaced -
-        // we only care if the preexisting duplicate ReleaseFile name isn't the file being replaced.
-        if (IsFileExisting(releaseVersionId, FileType.Data, dataFileName) &&
-            (replacingFile == null || !replacingFile.Filename.Equals(dataFileName, StringComparison.CurrentCultureIgnoreCase)))
-        {
-            return [ValidationMessages.GenerateErrorFileNameNotUnique(dataFileName, FileType.Data)];
-        }
-
-        // NOTE: We allow duplicate meta file names - meta files aren't included in publicly downloadable
-        // zips, so meta files won't be included in the same directory by filename and thereby cannot clash
         return [];
     }
 }

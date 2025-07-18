@@ -56,7 +56,6 @@ const fileErrorMappings = {
   FileNameMustEndDotCsv: 'FileNameMustEndDotCsv',
   MetaFileNameMustEndDotMetaDotCsv: 'MetaFileNameMustEndDotMetaDotCsv',
   FileNameLengthInvalid: 'FileNameLengthInvalid',
-  FileNameNotUnique: 'FileNameNotUnique',
   FileSizeMustNotBeZero: 'FileSizeMustNotBeZero',
   MustBeCsvFile: 'MustBeCsvFile',
   CannotReplaceDataSetWithApiDataSet: 'CannotReplaceDataSetWithApiDataSet',
@@ -157,7 +156,17 @@ export default function DataFileUploadForm({
             .minSize(0, 'Choose a metadata file that is not empty'),
         otherwise: s => s.nullable(),
       }),
-      title: Yup.string(),
+      title: Yup.string().when('uploadType', {
+        is: (uploadType: FileType) =>
+          uploadType === 'csv' || uploadType === 'zip',
+        then: s =>
+          s
+            .required('Enter a title')
+            .max(
+              titleMaxLength,
+              `Title must be ${titleMaxLength} characters or fewer`,
+            ),
+      }),
       uploadType: Yup.string().oneOf(['csv', 'zip', 'bulkZip']).defined(),
       zipFile: Yup.file().when('uploadType', {
         is: 'zip',
@@ -176,37 +185,6 @@ export default function DataFileUploadForm({
         otherwise: s => s.nullable(),
       }),
     });
-
-    if (!isDataReplacement) {
-      return schema.shape({
-        title: Yup.string().when('uploadType', {
-          is: (uploadType: FileType) =>
-            uploadType === 'csv' || uploadType === 'zip',
-          then: s =>
-            s
-              .required('Enter a title')
-              .test({
-                name: 'unique',
-                message: 'Enter a unique title',
-                test(value: string) {
-                  if (!value) {
-                    return true;
-                  }
-
-                  return (
-                    dataFiles?.find(
-                      f => f.title.toUpperCase() === value.toUpperCase(),
-                    ) === undefined
-                  );
-                },
-              })
-              .max(
-                titleMaxLength,
-                `Title must be ${titleMaxLength} characters or fewer`,
-              ),
-        }),
-      });
-    }
 
     return schema;
   }, [dataFiles, isDataReplacement]);
