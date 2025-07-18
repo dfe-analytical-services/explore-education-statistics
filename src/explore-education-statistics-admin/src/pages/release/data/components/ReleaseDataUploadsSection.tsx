@@ -186,42 +186,62 @@ export default function ReleaseDataUploadsSection({
 
   const handleSubmit = useCallback(
     async (values: DataFileUploadFormValues) => {
+      let uploads: DataSetUpload[] = [];
+
       switch (values.uploadType) {
         case 'csv': {
           if (!values.title) {
             return;
           }
 
-          await releaseDataFileService.uploadDataSetFilePair(releaseVersionId, {
-            title: values.title,
-            dataFile: values.dataFile as File,
-            metadataFile: values.metadataFile as File,
-          });
+          uploads = uploads.concat(
+            await releaseDataFileService.uploadDataSetFilePair(
+              releaseVersionId,
+              {
+                title: values.title,
+                dataFile: values.dataFile as File,
+                metadataFile: values.metadataFile as File,
+              },
+            ),
+          );
           break;
         }
         case 'zip': {
           if (!values.title) {
             return;
           }
-          await releaseDataFileService.uploadZippedDataSetFilePair(
-            releaseVersionId,
-            {
-              title: values.title,
-              zipFile: values.zipFile as File,
-            },
+          uploads = uploads.concat(
+            await releaseDataFileService.uploadZippedDataSetFilePair(
+              releaseVersionId,
+              {
+                title: values.title,
+                zipFile: values.zipFile as File,
+              },
+            ),
           );
           break;
         }
         case 'bulkZip': {
-          await releaseDataFileService.uploadBulkZipDataSetFile(
-            releaseVersionId,
-            values.bulkZipFile!,
+          uploads = uploads.concat(
+            await releaseDataFileService.uploadBulkZipDataSetFile(
+              releaseVersionId,
+              values.bulkZipFile!,
+            ),
           );
           break;
         }
         default:
           break;
       }
+
+      // TODO (EES-6334): Rough auto-import behaviour added as an
+      // initial step. This will later be refined to prevent
+      // auto-import when there are failures or warnings from the
+      // data screener.
+      await releaseDataFileService.importDataSets(
+        releaseVersionId,
+        uploads.map(upload => upload.id),
+      );
 
       await refetchDataFiles();
       await refetchDataSetUploads();
