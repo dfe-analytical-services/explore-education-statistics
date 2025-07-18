@@ -56,6 +56,13 @@ const ReleaseSummaryPage = () => {
             <SummaryListItem term="Release label">
               {releaseVersion.label ?? ''}
             </SummaryListItem>
+            <SummaryListItem term="Published by">
+              {releaseVersion.publishingOrganisations?.length
+                ? releaseVersion.publishingOrganisations
+                    .map(org => org.title)
+                    .join(' and ')
+                : 'Department for Education'}
+            </SummaryListItem>
           </SummaryList>
 
           <Gate

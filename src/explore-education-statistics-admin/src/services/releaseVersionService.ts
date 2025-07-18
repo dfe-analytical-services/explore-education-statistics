@@ -8,6 +8,7 @@ import {
   PublicationSummary,
   ReleaseApprovalStatus,
 } from '@common/services/publicationService';
+import { Organisation } from '@common/services/types/organisation';
 import { ReleaseType } from '@common/services/types/releaseType';
 import { PartialDate } from '@common/utils/date/partialDate';
 
@@ -38,6 +39,7 @@ export interface ReleaseVersion {
   timePeriodCoverage: ValueLabelPair;
   title: string;
   type: ReleaseType;
+  publishingOrganisations?: Organisation[];
   publishScheduled?: string;
   published?: string;
   nextReleaseDate?: PartialDate;
@@ -90,6 +92,7 @@ export interface UpdateReleaseVersionRequest {
   };
   type: ReleaseType;
   label?: string;
+  publishingOrganisations?: string[];
 }
 
 export interface CreateReleaseVersionStatusRequest {
