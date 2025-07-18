@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 using System;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
@@ -28,7 +28,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var repository = SetupUserReleaseRoleRepository(contentDbContext);
+                var repository = SetupUserRepository(contentDbContext);
                 var result = await repository.FindByEmail("test@test.com");
                 Assert.NotNull(result);
                 Assert.Equal(user.Id, result!.Id);
@@ -53,7 +53,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var repository = SetupUserReleaseRoleRepository(contentDbContext);
+                var repository = SetupUserRepository(contentDbContext);
                 var result = await repository.FindByEmail("TEST@TEST.COM");
 
                 // While this test could fail using the in-memory db if the comparison was accidentally case sensitive,
@@ -71,7 +71,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         {
             await using var contentDbContext = InMemoryApplicationDbContext();
 
-            var repository = SetupUserReleaseRoleRepository(contentDbContext);
+            var repository = SetupUserRepository(contentDbContext);
             var result = await repository.FindByEmail("test@test.com");
             Assert.Null(result);
         }
@@ -95,13 +95,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var repository = SetupUserReleaseRoleRepository(contentDbContext);
+                var repository = SetupUserRepository(contentDbContext);
                 var result = await repository.FindByEmail("test@test.com");
                 Assert.Null(result);
             }
         }
 
-        private static UserRepository SetupUserReleaseRoleRepository(
+        private static UserRepository SetupUserRepository(
             ContentDbContext contentDbContext)
         {
             return new(contentDbContext);
