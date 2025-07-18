@@ -91,7 +91,6 @@ function HomePage() {
             Find out how to automate access to statistics and data through our
             API (application programming interface).
           </p>
-
         </div>
       </div>
 
