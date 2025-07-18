@@ -600,6 +600,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin;
             services.AddTransient<IDataGuidanceService, DataGuidanceService>();
             services.AddTransient<IDataGuidanceDataSetService, DataGuidanceDataSetService>();
             services.AddTransient<IObservationService, ObservationService>();
+            services.AddTransient<IOrganisationService, OrganisationService>();
             services.AddTransient<Data.Services.Interfaces.IReleaseService, Data.Services.ReleaseService>();
             services.AddTransient<IContentSectionRepository, ContentSectionRepository>();
             services.AddTransient<IReleaseNoteService, ReleaseNoteService>();
