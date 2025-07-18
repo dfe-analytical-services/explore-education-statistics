@@ -9,6 +9,7 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Tests.Fixture
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Functions;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Utils;
+using JetBrains.Annotations;
 using Microsoft.EntityFrameworkCore;
 using FilterMeta = GovUk.Education.ExploreEducationStatistics.Public.Data.Model.FilterMeta;
 
@@ -1268,7 +1269,7 @@ public abstract class ProcessCompletionOfNextDataSetVersionFunctionsTests(
             FilterMeta expectedFilter)
         {
             Assert.Single(changes,
-                c => c.PreviousStateId == expectedFilter.Id
+                ([UsedImplicitly] c) => c.PreviousStateId == expectedFilter.Id
                      && c.CurrentStateId is null);
         }
 
@@ -1277,7 +1278,7 @@ public abstract class ProcessCompletionOfNextDataSetVersionFunctionsTests(
             FilterMeta expectedFilter)
         {
             Assert.Single(changes,
-                c => c.PreviousStateId is null
+                ([UsedImplicitly] c) => c.PreviousStateId is null
                      && c.CurrentStateId == expectedFilter.Id);
         }
 
@@ -1287,10 +1288,11 @@ public abstract class ProcessCompletionOfNextDataSetVersionFunctionsTests(
             FilterMeta expectedNewFilter)
         {
             Assert.Single(changes,
-                c => c.PreviousStateId == expectedOldFilter.Id
+                ([UsedImplicitly] c) => c.PreviousStateId == expectedOldFilter.Id
                      && c.CurrentStateId == expectedNewFilter.Id);
         }
 
+        [UsedImplicitly]
         private static void AssertFilterDeleted(FilterMeta expectedFilter, FilterMetaChange change)
         {
             Assert.Equal(expectedFilter.Id, change.PreviousStateId);
@@ -1317,7 +1319,7 @@ public abstract class ProcessCompletionOfNextDataSetVersionFunctionsTests(
             FilterOptionMetaLink expectedOptionLink)
         {
             Assert.Single(changes,
-                c => c.PreviousState!.PublicId == expectedOptionLink.PublicId
+                ([UsedImplicitly] c) => c.PreviousState!.PublicId == expectedOptionLink.PublicId
                      && c.PreviousState.MetaId == expectedOptionLink.MetaId
                      && c.PreviousState.OptionId == expectedOptionLink.OptionId
                      && c.CurrentState is null);
@@ -1328,7 +1330,7 @@ public abstract class ProcessCompletionOfNextDataSetVersionFunctionsTests(
             FilterOptionMetaLink expectedOptionLink)
         {
             Assert.Single(changes,
-                c => c.PreviousState is null
+                ([UsedImplicitly] c) => c.PreviousState is null
                      && c.CurrentState!.PublicId == expectedOptionLink.PublicId
                      && c.CurrentState.MetaId == expectedOptionLink.MetaId
                      && c.CurrentState.OptionId == expectedOptionLink.OptionId);
@@ -1340,7 +1342,7 @@ public abstract class ProcessCompletionOfNextDataSetVersionFunctionsTests(
             FilterOptionMetaLink expectedNewOptionLink)
         {
             Assert.Single(changes,
-                c => c.PreviousState!.PublicId == expectedOldOptionLink.PublicId
+                ([UsedImplicitly] c) => c.PreviousState!.PublicId == expectedOldOptionLink.PublicId
                      && c.PreviousState.MetaId == expectedOldOptionLink.MetaId
                      && c.PreviousState.OptionId == expectedOldOptionLink.OptionId
                      && c.CurrentState!.PublicId == expectedNewOptionLink.PublicId
@@ -2166,13 +2168,14 @@ public abstract class ProcessCompletionOfNextDataSetVersionFunctionsTests(
                 change: locationOptionMetaChanges[11]);
         }
 
+        
         private static void AssertSingleLocationDeleted(
             IReadOnlyList<LocationMetaChange> changes,
             LocationMeta expectedLocation)
         {
             Assert.Single(changes,
-                c => c.PreviousStateId == expectedLocation.Id
-                     && c.CurrentStateId is null);
+                ([UsedImplicitly] c) => c.PreviousStateId == expectedLocation.Id
+                                       && c.CurrentStateId is null);
         }
 
         private static void AssertSingleLocationAdded(
@@ -2180,7 +2183,7 @@ public abstract class ProcessCompletionOfNextDataSetVersionFunctionsTests(
             LocationMeta expectedLocation)
         {
             Assert.Single(changes,
-                c => c.PreviousStateId is null
+                ([UsedImplicitly] c) => c.PreviousStateId is null
                      && c.CurrentStateId == expectedLocation.Id);
         }
 
@@ -2190,10 +2193,11 @@ public abstract class ProcessCompletionOfNextDataSetVersionFunctionsTests(
             LocationMeta expectedNewLocation)
         {
             Assert.Single(changes,
-                c => c.PreviousStateId == expectedOldLocation.Id
+                ([UsedImplicitly] c) => c.PreviousStateId == expectedOldLocation.Id
                      && c.CurrentStateId == expectedNewLocation.Id);
         }
 
+        [UsedImplicitly]
         private static void AssertLocationDeleted(LocationMeta expectedLocation, LocationMetaChange change)
         {
             Assert.Equal(expectedLocation.Id, change.PreviousStateId);
@@ -2211,7 +2215,7 @@ public abstract class ProcessCompletionOfNextDataSetVersionFunctionsTests(
             LocationOptionMetaLink expectedOptionLink)
         {
             Assert.Single(changes,
-                c => c.PreviousState!.PublicId == expectedOptionLink.PublicId
+                ([UsedImplicitly] c) => c.PreviousState!.PublicId == expectedOptionLink.PublicId
                      && c.PreviousState.MetaId == expectedOptionLink.MetaId
                      && c.PreviousState.OptionId == expectedOptionLink.OptionId
                      && c.CurrentState is null);
@@ -2222,7 +2226,7 @@ public abstract class ProcessCompletionOfNextDataSetVersionFunctionsTests(
             LocationOptionMetaLink expectedOptionLink)
         {
             Assert.Single(changes,
-                c => c.PreviousState is null
+                ([UsedImplicitly] c) => c.PreviousState is null
                      && c.CurrentState!.PublicId == expectedOptionLink.PublicId
                      && c.CurrentState.MetaId == expectedOptionLink.MetaId
                      && c.CurrentState.OptionId == expectedOptionLink.OptionId);
@@ -2234,7 +2238,7 @@ public abstract class ProcessCompletionOfNextDataSetVersionFunctionsTests(
             LocationOptionMetaLink expectedNewOptionLink)
         {
             Assert.Single(changes,
-                c => c.PreviousState!.PublicId == expectedOldOptionLink.PublicId
+                ([UsedImplicitly] c) => c.PreviousState!.PublicId == expectedOldOptionLink.PublicId
                      && c.PreviousState.MetaId == expectedOldOptionLink.MetaId
                      && c.PreviousState.OptionId == expectedOldOptionLink.OptionId
                      && c.CurrentState!.PublicId == expectedNewOptionLink.PublicId
@@ -2392,7 +2396,7 @@ public abstract class ProcessCompletionOfNextDataSetVersionFunctionsTests(
         [Fact]
         public async Task GeographicLevelsUnchanged_ChangeIsNull()
         {
-            var (originalVersion, newVersion, instanceId) = await CreateDataSetInitialAndNextVersion(
+            var (_, newVersion, instanceId) = await CreateDataSetInitialAndNextVersion(
                 nextVersionStatus: DataSetVersionStatus.Mapping,
                 nextVersionImportStage: Stage.PreviousStage(),
                 initialVersionMeta: new DataSetVersionMeta
@@ -2689,7 +2693,7 @@ public abstract class ProcessCompletionOfNextDataSetVersionFunctionsTests(
             IndicatorMeta expectedIndicator)
         {
             Assert.Single(changes,
-                c => c.PreviousStateId == expectedIndicator.Id
+                ([UsedImplicitly] c) => c.PreviousStateId == expectedIndicator.Id
                      && c.CurrentStateId is null);
         }
 
@@ -2698,7 +2702,7 @@ public abstract class ProcessCompletionOfNextDataSetVersionFunctionsTests(
             IndicatorMeta expectedIndicator)
         {
             Assert.Single(changes,
-                c => c.PreviousStateId is null
+                ([UsedImplicitly] c) => c.PreviousStateId is null
                      && c.CurrentStateId == expectedIndicator.Id);
         }
 
@@ -2708,10 +2712,11 @@ public abstract class ProcessCompletionOfNextDataSetVersionFunctionsTests(
             IndicatorMeta expectedNewIndicator)
         {
             Assert.Single(changes,
-                c => c.PreviousStateId == expectedOldIndicator.Id
+                ([UsedImplicitly] c) => c.PreviousStateId == expectedOldIndicator.Id
                      && c.CurrentStateId == expectedNewIndicator.Id);
         }
 
+        [UsedImplicitly]
         private static void AssertIndicatorDeleted(IndicatorMeta expectedIndicator, IndicatorMetaChange change)
         {
             Assert.Equal(expectedIndicator.Id, change.PreviousStateId);
@@ -2850,7 +2855,7 @@ public abstract class ProcessCompletionOfNextDataSetVersionFunctionsTests(
         [Fact]
         public async Task TimePeriodsUnchanged_ChangesAreEmpty()
         {
-            var (originalVersion, newVersion, instanceId) = await CreateDataSetInitialAndNextVersion(
+            var (_, newVersion, instanceId) = await CreateDataSetInitialAndNextVersion(
                 nextVersionStatus: DataSetVersionStatus.Mapping,
                 nextVersionImportStage: Stage.PreviousStage(),
                 initialVersionMeta: new DataSetVersionMeta
@@ -2883,7 +2888,7 @@ public abstract class ProcessCompletionOfNextDataSetVersionFunctionsTests(
         [Fact]
         public async Task TimePeriodsAdded_ChangesContainOnlyAdditions()
         {
-            var (originalVersion, newVersion, instanceId) = await CreateDataSetInitialAndNextVersion(
+            var (_, newVersion, instanceId) = await CreateDataSetInitialAndNextVersion(
                 nextVersionStatus: DataSetVersionStatus.Mapping,
                 nextVersionImportStage: Stage.PreviousStage(),
                 initialVersionMeta: new DataSetVersionMeta
