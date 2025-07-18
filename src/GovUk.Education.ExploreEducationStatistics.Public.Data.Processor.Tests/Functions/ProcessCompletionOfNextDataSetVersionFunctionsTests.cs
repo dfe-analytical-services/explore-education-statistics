@@ -2187,16 +2187,6 @@ public abstract class ProcessCompletionOfNextDataSetVersionFunctionsTests(
                      && c.CurrentStateId == expectedLocation.Id);
         }
 
-        private static void AssertSingleLocationUpdated(
-            IReadOnlyList<LocationMetaChange> changes,
-            LocationMeta expectedOldLocation,
-            LocationMeta expectedNewLocation)
-        {
-            Assert.Single(changes,
-                ([UsedImplicitly] c) => c.PreviousStateId == expectedOldLocation.Id
-                     && c.CurrentStateId == expectedNewLocation.Id);
-        }
-
         [UsedImplicitly]
         private static void AssertLocationDeleted(LocationMeta expectedLocation, LocationMetaChange change)
         {
@@ -2704,16 +2694,6 @@ public abstract class ProcessCompletionOfNextDataSetVersionFunctionsTests(
             Assert.Single(changes,
                 ([UsedImplicitly] c) => c.PreviousStateId is null
                      && c.CurrentStateId == expectedIndicator.Id);
-        }
-
-        private static void AssertSingleIndicatorUpdated(
-            IReadOnlyList<IndicatorMetaChange> changes,
-            IndicatorMeta expectedOldIndicator,
-            IndicatorMeta expectedNewIndicator)
-        {
-            Assert.Single(changes,
-                ([UsedImplicitly] c) => c.PreviousStateId == expectedOldIndicator.Id
-                     && c.CurrentStateId == expectedNewIndicator.Id);
         }
 
         [UsedImplicitly]
