@@ -43,7 +43,14 @@ public class CommonAnalyticsWriteStrategyWorkflowMockBuilder<TAnalyticsCaptureRe
                 It.Is<TAnalyticsCaptureRequest>(actual => requestPredicate == null || requestPredicate(actual)), 
                 It.IsAny<CancellationToken>()), Times.Once);
         }
-        
+
+        /// <summary>
+        /// Workflow actors are created within their corresponding write strategies and passed into the workflow.
+        /// Use this method to make an assertion against the WorkflowActor.
+        /// <example>
+        /// _commonAnalyticsWriteStrategyWorkflowMockBuilder.Assert.WorkflowActor(workflowActor => Assert.Equal("c:\\temp\\output\\", workflowActor.GetAnalyticsPath()));
+        /// </example>
+        /// </summary>
         public void WorkflowActor(Action<IWorkflowActor<TAnalyticsCaptureRequest>> assertion) => assertion(Xunit.Assert.Single(parent._reportCalls).WorkflowActor);
     }
 }

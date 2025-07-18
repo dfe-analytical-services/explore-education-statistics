@@ -20,8 +20,8 @@ public static class ProcessorHostBuilder
             {
                 builder
                     .AddJsonFile("appsettings.json", optional: true, reloadOnChange: false)
-                    .AddJsonFile("appsettings.Local.json", optional: true, reloadOnChange: false)
                     .AddJsonFile($"appsettings.{context.HostingEnvironment.EnvironmentName}.json", optional: true)
+                    .AddJsonFile("appsettings.Local.json", optional: true, reloadOnChange: false)
                     .AddEnvironmentVariables();
             })
             .ConfigureLogging(logging =>
