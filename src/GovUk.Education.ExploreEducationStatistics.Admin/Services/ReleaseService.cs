@@ -61,6 +61,20 @@ public partial class ReleaseService(
                     Label = FormatReleaseLabel(request.Label),
                 };
 
+                var publishingOrganisationIds = request.PublishingOrganisations?.Distinct() ?? [];
+                var publishingOrganisations = await context.Organisations
+                    .Where(o => publishingOrganisationIds.Contains(o.Id))
+                    .ToListAsync();
+
+                var publishingOrganisationsNotFound = publishingOrganisationIds
+                    .Except(publishingOrganisations.Select(o => o.Id))
+                    .ToList();
+
+                if (publishingOrganisationsNotFound.Count > 0)
+                {
+                    throw new Exception("Publishing organisations not found");
+                }
+
                 var newReleaseVersion = new ReleaseVersion
                 {
                     Id = guidGenerator.NewGuid(),
@@ -68,6 +82,7 @@ public partial class ReleaseService(
                     Type = request.Type!.Value,
                     ApprovalStatus = ReleaseApprovalStatus.Draft,
                     PublicationId = release.PublicationId,
+                    PublishingOrganisations = publishingOrganisations
                 };
 
                 if (request.TemplateReleaseId.HasValue)

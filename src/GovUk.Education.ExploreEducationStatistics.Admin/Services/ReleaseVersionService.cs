@@ -748,6 +748,22 @@ public class ReleaseVersionService(
 
     private async Task<Either<ActionResult, Unit>> UpdateReleaseAndVersion(ReleaseVersionUpdateRequest request, ReleaseVersion releaseVersion)
     {
+        var publishingOrganisationIds = request.PublishingOrganisations?.Distinct() ?? [];
+        var publishingOrganisations = await context.Organisations
+            .Where(o => publishingOrganisationIds.Contains(o.Id))
+            .ToListAsync();
+
+        var publishingOrganisationsNotFound = publishingOrganisationIds
+            .Except(publishingOrganisations.Select(o => o.Id))
+            .ToList();
+
+        if (publishingOrganisationsNotFound.Count > 0)
+        {
+            throw new Exception("Publishing organisations not found");
+        }
+
+        releaseVersion.PublishingOrganisations = publishingOrganisations;
+
         releaseVersion.Release.Year = request.Year;
         releaseVersion.Release.TimePeriodCoverage = request.TimePeriodCoverage;
         releaseVersion.Release.Slug = request.Slug;
