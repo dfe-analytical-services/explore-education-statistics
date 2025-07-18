@@ -226,7 +226,7 @@ describe('ApiDataSetAutoMappedTable', () => {
     expect(row1Cells[2]).toHaveTextContent('Minor');
     expect(
       within(row1Cells[3]).getByRole('button', {
-        name: 'Edit mapping for Location 1',
+        name: 'Map option for Location 1',
       }),
     ).toBeInTheDocument();
 
@@ -237,7 +237,7 @@ describe('ApiDataSetAutoMappedTable', () => {
     expect(row2Cells[2]).toHaveTextContent('Minor');
     expect(
       within(row2Cells[3]).getByRole('button', {
-        name: 'Edit mapping for Location 2',
+        name: 'Map option for Location 2',
       }),
     ).toBeInTheDocument();
 
@@ -248,7 +248,7 @@ describe('ApiDataSetAutoMappedTable', () => {
     expect(row3Cells[2]).toHaveTextContent('Minor');
     expect(
       within(row3Cells[3]).getByRole('button', {
-        name: 'Edit mapping for Location 3',
+        name: 'Map option for Location 3',
       }),
     ).toBeInTheDocument();
 
@@ -259,7 +259,7 @@ describe('ApiDataSetAutoMappedTable', () => {
     expect(row4Cells[2]).toHaveTextContent('Minor');
     expect(
       within(row4Cells[3]).getByRole('button', {
-        name: 'Edit mapping for Location 4',
+        name: 'Map option for Location 4',
       }),
     ).toBeInTheDocument();
 
@@ -270,7 +270,7 @@ describe('ApiDataSetAutoMappedTable', () => {
     expect(row5Cells[2]).toHaveTextContent('Minor');
     expect(
       within(row5Cells[3]).getByRole('button', {
-        name: 'Edit mapping for Location 5',
+        name: 'Map option for Location 5',
       }),
     ).toBeInTheDocument();
 
@@ -281,7 +281,7 @@ describe('ApiDataSetAutoMappedTable', () => {
     expect(row6Cells[2]).toHaveTextContent('Minor');
     expect(
       within(row6Cells[3]).getByRole('button', {
-        name: 'Edit mapping for Location 6',
+        name: 'Map option for Location 6',
       }),
     ).toBeInTheDocument();
 
@@ -292,7 +292,7 @@ describe('ApiDataSetAutoMappedTable', () => {
     expect(row7Cells[2]).toHaveTextContent('Minor');
     expect(
       within(row7Cells[3]).getByRole('button', {
-        name: 'Edit mapping for Location 7',
+        name: 'Map option for Location 7',
       }),
     ).toBeInTheDocument();
 
@@ -303,7 +303,7 @@ describe('ApiDataSetAutoMappedTable', () => {
     expect(row8Cells[2]).toHaveTextContent('Minor');
     expect(
       within(row8Cells[3]).getByRole('button', {
-        name: 'Edit mapping for Location 8',
+        name: 'Map option for Location 8',
       }),
     ).toBeInTheDocument();
 
@@ -314,7 +314,7 @@ describe('ApiDataSetAutoMappedTable', () => {
     expect(row9Cells[2]).toHaveTextContent('Minor');
     expect(
       within(row9Cells[3]).getByRole('button', {
-        name: 'Edit mapping for Location 9',
+        name: 'Map option for Location 9',
       }),
     ).toBeInTheDocument();
 
@@ -325,7 +325,7 @@ describe('ApiDataSetAutoMappedTable', () => {
     expect(row10Cells[2]).toHaveTextContent('Minor');
     expect(
       within(row10Cells[3]).getByRole('button', {
-        name: 'Edit mapping for Location 10',
+        name: 'Map option for Location 10',
       }),
     ).toBeInTheDocument();
 
@@ -403,7 +403,7 @@ describe('ApiDataSetAutoMappedTable', () => {
     expect(row1Cells[2]).toHaveTextContent('Minor');
     expect(
       within(row1Cells[3]).getByRole('button', {
-        name: 'Edit mapping for Location 3',
+        name: 'Map option for Location 3',
       }),
     ).toBeInTheDocument();
 
@@ -449,7 +449,7 @@ describe('ApiDataSetAutoMappedTable', () => {
     expect(row1Cells[2]).toHaveTextContent('Minor');
     expect(
       within(row1Cells[3]).getByRole('button', {
-        name: 'Edit mapping for Location 11',
+        name: 'Map option for Location 11',
       }),
     ).toBeInTheDocument();
 
@@ -488,7 +488,7 @@ describe('ApiDataSetAutoMappedTable', () => {
     const row2Cells = within(rows[2]).getAllByRole('cell');
     expect(
       within(row2Cells[3]).queryByRole('button', {
-        name: 'Edit mapping for Location 2',
+        name: 'Map option for Location 2',
       }),
     ).not.toBeInTheDocument();
   });

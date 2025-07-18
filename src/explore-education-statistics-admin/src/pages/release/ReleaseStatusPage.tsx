@@ -1,9 +1,14 @@
+import Link from '@admin/components/Link';
 import StatusBlock from '@admin/components/StatusBlock';
 import { useConfig } from '@admin/contexts/ConfigContext';
 import { useLastLocation } from '@admin/contexts/LastLocationContext';
 import ReleasePublishingStatus from '@admin/pages/release/components/ReleasePublishingStatus';
 import { useReleaseVersionContext } from '@admin/pages/release/contexts/ReleaseVersionContext';
 import ReleaseStatusEditPage from '@admin/pages/release/ReleaseStatusEditPage';
+import {
+  releasePreReleaseAccessRoute,
+  ReleaseRouteParams,
+} from '@admin/routes/releaseRoutes';
 import permissionService, {
   ReleaseStatusPermissions,
 } from '@admin/services/permissionService';
@@ -14,6 +19,7 @@ import releaseVersionService, {
 import Button from '@common/components/Button';
 import FormattedDate from '@common/components/FormattedDate';
 import LoadingSpinner from '@common/components/LoadingSpinner';
+import ModalConfirm from '@common/components/ModalConfirm';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
 import UrlContainer from '@common/components/UrlContainer';
@@ -24,9 +30,9 @@ import {
   formatPartialDate,
   isValidPartialDate,
 } from '@common/utils/date/partialDate';
-import { parseISO } from 'date-fns';
+import { parseISO, isAfter, isBefore } from 'date-fns';
 import React from 'react';
-import { useLocation } from 'react-router';
+import { generatePath, useLocation } from 'react-router';
 
 const statusMap: {
   [keyof: string]: string;
@@ -38,6 +44,7 @@ const statusMap: {
 
 export default function ReleaseStatusPage() {
   const [isEditing, toggleEditing] = useToggle(false);
+  const [showWarning, toggleWarning] = useToggle(false);
 
   const location = useLocation();
   const lastLocation = useLastLocation();
@@ -76,7 +83,6 @@ export default function ReleaseStatusPage() {
   if (!releaseVersion) {
     return <LoadingSpinner />;
   }
-
   const isEditable =
     !!statusPermissions &&
     Object.values(statusPermissions).some(permission => permission);
@@ -146,7 +152,14 @@ export default function ReleaseStatusPage() {
       </SummaryList>
 
       {isEditable && (
-        <Button className="govuk-!-margin-top-2" onClick={toggleEditing.on}>
+        <Button
+          className="govuk-!-margin-top-2"
+          onClick={
+            inPublishingWindow(releaseVersion.publishScheduled)
+              ? toggleWarning.on
+              : toggleEditing.on
+          }
+        >
           Edit release status
         </Button>
       )}
@@ -200,6 +213,60 @@ export default function ReleaseStatusPage() {
           </LoadingSpinner>
         </>
       )}
+
+      <ModalConfirm
+        confirmText="Continue"
+        title="Important"
+        open={showWarning}
+        onConfirm={() => {
+          toggleWarning.off();
+          toggleEditing.on();
+        }}
+        onExit={toggleWarning.off}
+        onCancel={toggleWarning.off}
+      >
+        <p>
+          This is a release scheduled for publication today. If you change the
+          status away from approved, you will cancel the publication of this
+          release and will not be able to reschedule for today.
+        </p>
+
+        <p>
+          If you are wanting to add additional emails to pre-release access, you
+          can do this without changing the release status on the{' '}
+          <Link
+            to={generatePath<ReleaseRouteParams>(
+              releasePreReleaseAccessRoute.path,
+              {
+                publicationId: releaseVersion.publicationId,
+                releaseVersionId,
+              },
+            )}
+          >
+            pre-release tab
+          </Link>
+          .
+        </p>
+
+        <p>
+          If you have any issues or questions, please contact{' '}
+          <a href="mailto:explore.statistics@education.gov.uk">
+            explore.statistics@education.gov.uk
+          </a>{' '}
+          for support.
+        </p>
+      </ModalConfirm>
     </>
   );
+}
+
+function inPublishingWindow(publishScheduled?: string) {
+  if (!publishScheduled) {
+    return false;
+  }
+
+  const startWindow = new Date(`${publishScheduled} 00:00`);
+  const endWindow = new Date(`${publishScheduled} 09:30`);
+  const now = new Date();
+  return isAfter(now, startWindow) && isBefore(now, endWindow);
 }

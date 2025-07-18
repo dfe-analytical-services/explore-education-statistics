@@ -13,12 +13,11 @@ public class LoggingEmailService(ILogger<IEmailService> logger) : IEmailService
     {
         logger.LogInformation(
             """
-            Sending email to "{EmailAddress}" 
+            Sending email to a recipient
             with template Id "{TemplateId}" and
             the following template values: 
             {TemplateValues}
             """,
-            email,
             templateId,
             values);
     }

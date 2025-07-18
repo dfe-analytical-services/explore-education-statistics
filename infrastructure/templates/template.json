@@ -742,12 +742,12 @@
         "description": "The Client ID of a manually-created App Registration that represents the Public API Data Processor Function App in Entra ID"
       }
     },
-    // "dataScreenerAppRegistrationClientId": {
-    //   "type": "string",
-    //   "metadata": {
-    //     "description": "The Client ID of a manually-created App Registration that represents the Screener API Function App in Entra ID"
-    //   }
-    // },
+    "screenerAppRegistrationClientId": {
+      "type": "string",
+      "metadata": {
+        "description": "The Client ID of a manually-created App Registration that represents the Screener API Function App in Entra ID"
+      }
+    },
     "apiAppRegistrationClientId": {
       "type": "string",
       "metadata": {
@@ -1919,8 +1919,8 @@
         "PublicDataProcessor__Url": "[concat('https://', variables('publicDataProcessorName'), '.azurewebsites.net')]",
         "PublicDataProcessor__AppRegistrationClientId": "[parameters('publicDataProcessorAppRegistrationClientId')]",
         "DataScreener__Url": "[concat('https://', variables('dataScreenerName'), '.azurewebsites.net', '/api/screen')]",
+        "DataScreener__AppRegistrationClientId": "[parameters('screenerAppRegistrationClientId')]",
         "FeatureFlags__EnableReplacementOfPublicApiDataSets": "[parameters('enableReplacementOfPublicApiDataSets')]"
-        // "DataScreener__AppRegistrationClientId": "[parameters('dataScreenerAppRegistrationClientId')]"
       }
     },
     {

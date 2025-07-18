@@ -271,12 +271,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             IDataBlockService? dataBlockService = null,
             IFootnoteRepository? footnoteRepository = null,
             IDataSetScreenerClient? dataSetScreenerClient = null,
+            IReplacementPlanService? replacementPlanService = null,
             IMapper? mapper = null)
         {
-            contentDbContext ??= new Mock<ContentDbContext>().Object;
+            contentDbContext ??= Mock.Of<ContentDbContext>();
 
             return new ReleaseDataFileService(
-                contentDbContext ??= Mock.Of<ContentDbContext>(),
+                contentDbContext,
                 contentPersistenceHelper ?? DefaultPersistenceHelperMock().Object,
                 privateBlobStorageService ??= Mock.Of<IPrivateBlobStorageService>(MockBehavior.Strict),
                 dataSetValidator ?? Mock.Of<IDataSetValidator>(MockBehavior.Strict),
@@ -289,6 +290,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 dataBlockService ?? Mock.Of<IDataBlockService>(MockBehavior.Strict),
                 footnoteRepository ?? Mock.Of<IFootnoteRepository>(MockBehavior.Strict),
                 dataSetScreenerClient ?? Mock.Of<IDataSetScreenerClient>(MockBehavior.Strict),
+                replacementPlanService ?? Mock.Of<IReplacementPlanService>(MockBehavior.Strict),
                 mapper ?? Mock.Of<IMapper>(MockBehavior.Strict)
             );
         }

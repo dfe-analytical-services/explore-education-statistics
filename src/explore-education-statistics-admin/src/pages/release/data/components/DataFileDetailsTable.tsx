@@ -19,7 +19,7 @@ interface Props {
   replacementDataFile?: DataFile;
   releaseVersionId: string;
   onStatusChange?: ImporterStatusChangeHandler;
-  onReplacementStatusChange?: ImporterStatusChangeHandler;
+  onReplacementStatusChange: ImporterStatusChangeHandler;
 }
 
 const DataFileDetailsTable = ({

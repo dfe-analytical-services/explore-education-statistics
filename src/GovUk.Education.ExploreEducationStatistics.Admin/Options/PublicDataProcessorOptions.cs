@@ -3,7 +3,7 @@ using System;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Options;
 
-internal class PublicDataProcessorOptions
+internal class PublicDataProcessorOptions : IAzureAuthenticationOptions
 {
     public const string Section = "PublicDataProcessor";
 

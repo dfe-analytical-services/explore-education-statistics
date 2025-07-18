@@ -1,4 +1,12 @@
 #nullable enable
+using System;
+using System.Net;
+using System.Net.Http;
+using System.Net.Http.Json;
+using System.Threading;
+using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Admin.Options;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Authentication;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
@@ -7,14 +15,6 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using Newtonsoft.Json;
 using RichardSzalay.MockHttp;
-using System;
-using System.Net;
-using System.Net.Http;
-using System.Net.Http.Json;
-using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Admin.Options;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Options;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Public.Data;
 
@@ -22,18 +22,47 @@ public class ProcessorClientTests
 {
     private static readonly Uri BaseUri = new("http://localhost");
     private readonly MockHttpMessageHandler _mockHttp;
-    private readonly ProcessorClient _processorClient;
 
-    public ProcessorClientTests()
+    protected ProcessorClientTests()
     {
         _mockHttp = new MockHttpMessageHandler();
-        var client = _mockHttp.ToHttpClient();
-        client.BaseAddress = BaseUri;
-        _processorClient = new ProcessorClient(
-            Mock.Of<ILogger<ProcessorClient>>(), 
-            client, 
-            Mock.Of<IOptions<PublicDataProcessorOptions>>(), 
-            Mock.Of<IWebHostEnvironment>());
+    }
+    
+    public class AuthenticationTests : ProcessorClientTests
+    {
+        private static readonly Uri Uri = new(BaseUri, "api/CreateDataSet");
+
+        [Fact]
+        public async Task AuthenticationManagerCalled()
+        {
+            var responseBody = new ProcessDataSetVersionResponseViewModel
+            {
+                DataSetId = Guid.NewGuid(),
+                DataSetVersionId = Guid.NewGuid(),
+                InstanceId = Guid.NewGuid()
+            };
+
+            _mockHttp.Expect(HttpMethod.Post, Uri.AbsoluteUri)
+                .Respond(HttpStatusCode.Accepted, "application/json", JsonConvert.SerializeObject(responseBody));
+
+            var authenticationManager =
+                new Mock<IHttpClientAzureAuthenticationManager<PublicDataProcessorOptions>>(MockBehavior.Strict);
+
+            authenticationManager
+                .Setup(m =>
+                    m.AddAuthentication(It.IsAny<HttpClient>(), It.IsAny<CancellationToken>()))
+                .Returns(Task.CompletedTask);
+            
+            var processorClient = BuildService(
+                azureAuthenticationManager: authenticationManager.Object);
+            
+            var response = await processorClient.CreateDataSet(releaseFileId: Guid.NewGuid());
+
+            authenticationManager.Verify(m => 
+                m.AddAuthentication(It.IsAny<HttpClient>(), It.IsAny<CancellationToken>()), Times.Once);
+
+            response.AssertRight();
+        }
     }
 
     public class CreateDataSetTests : ProcessorClientTests
@@ -53,7 +82,9 @@ public class ProcessorClientTests
             _mockHttp.Expect(HttpMethod.Post, Uri.AbsoluteUri)
                 .Respond(HttpStatusCode.Accepted, "application/json", JsonConvert.SerializeObject(responseBody));
 
-            var response = await _processorClient.CreateDataSet(releaseFileId: Guid.NewGuid());
+            var processorClient = BuildService();
+            
+            var response = await processorClient.CreateDataSet(releaseFileId: Guid.NewGuid());
 
             _mockHttp.VerifyNoOutstandingExpectation();
 
@@ -71,22 +102,23 @@ public class ProcessorClientTests
                     HttpStatusCode.BadRequest,
                     JsonContent.Create(new ValidationProblemViewModel
                     {
-                        Errors = new ErrorViewModel[]
-                        {
+                        Errors =
+                        [
                             new() {
                                Code = Errors.Error1.ToString()
                             }
-                        }
+                        ]
                     }));
 
-            var response = await _processorClient.CreateDataSet(releaseFileId: Guid.NewGuid());
+            var processorClient = BuildService();
+            
+            var response = await processorClient.CreateDataSet(releaseFileId: Guid.NewGuid());
 
             _mockHttp.VerifyNoOutstandingExpectation();
 
             var left = response.AssertLeft();
             left.AssertValidationProblem(Errors.Error1);
         }
-
 
         [Theory]
         [InlineData(HttpStatusCode.RequestTimeout)]
@@ -104,9 +136,11 @@ public class ProcessorClientTests
             _mockHttp.Expect(HttpMethod.Post, Uri.AbsoluteUri)
                 .Respond(responseStatusCode);
 
+            var processorClient = BuildService();
+            
             await Assert.ThrowsAsync<HttpRequestException>(async () =>
             {
-                await _processorClient.CreateDataSet(releaseFileId: Guid.NewGuid());
+                await processorClient.CreateDataSet(releaseFileId: Guid.NewGuid());
             });
 
             _mockHttp.VerifyNoOutstandingExpectation();
@@ -125,7 +159,9 @@ public class ProcessorClientTests
             _mockHttp.Expect(HttpMethod.Delete, $"{Uri.AbsoluteUri}/{dataSetVersionId}")
                 .Respond(HttpStatusCode.NoContent);
 
-            var response = await _processorClient.DeleteDataSetVersion(dataSetVersionId);
+            var processorClient = BuildService();
+            
+            var response = await processorClient.DeleteDataSetVersion(dataSetVersionId);
 
             _mockHttp.VerifyNoOutstandingExpectation();
 
@@ -142,15 +178,17 @@ public class ProcessorClientTests
                     HttpStatusCode.BadRequest,
                     JsonContent.Create(new ValidationProblemViewModel
                     {
-                        Errors = new ErrorViewModel[]
-                        {
+                        Errors =
+                        [
                             new() {
                                Code = Errors.Error1.ToString()
                             }
-                        }
+                        ]
                     }));
 
-            var response = await _processorClient.DeleteDataSetVersion(dataSetVersionId);
+            var processorClient = BuildService();
+            
+            var response = await processorClient.DeleteDataSetVersion(dataSetVersionId);
 
             _mockHttp.VerifyNoOutstandingExpectation();
 
@@ -166,7 +204,9 @@ public class ProcessorClientTests
             _mockHttp.Expect(HttpMethod.Delete, $"{Uri.AbsoluteUri}/{dataSetVersionId}")
                 .Respond(HttpStatusCode.NotFound);
 
-            var response = await _processorClient.DeleteDataSetVersion(dataSetVersionId);
+            var processorClient = BuildService();
+            
+            var response = await processorClient.DeleteDataSetVersion(dataSetVersionId);
 
             _mockHttp.VerifyNoOutstandingExpectation();
 
@@ -191,9 +231,11 @@ public class ProcessorClientTests
             _mockHttp.Expect(HttpMethod.Delete, $"{Uri.AbsoluteUri}/{dataSetVersionId}")
                 .Respond(responseStatusCode);
 
+            var processorClient = BuildService();
+            
             await Assert.ThrowsAsync<HttpRequestException>(async () =>
             {
-                await _processorClient.DeleteDataSetVersion(dataSetVersionId);
+                await processorClient.DeleteDataSetVersion(dataSetVersionId);
             });
 
             _mockHttp.VerifyNoOutstandingExpectation();
@@ -212,7 +254,9 @@ public class ProcessorClientTests
             _mockHttp.Expect(HttpMethod.Delete, $"{Uri.AbsoluteUri}/{releaseVersionId}")
                 .Respond(HttpStatusCode.NoContent);
 
-            var response = await _processorClient.BulkDeleteDataSetVersions(releaseVersionId);
+            var processorClient = BuildService();
+            
+            var response = await processorClient.BulkDeleteDataSetVersions(releaseVersionId);
 
             _mockHttp.VerifyNoOutstandingExpectation();
 
@@ -229,15 +273,17 @@ public class ProcessorClientTests
                     HttpStatusCode.BadRequest,
                     JsonContent.Create(new ValidationProblemViewModel
                     {
-                        Errors = new ErrorViewModel[]
-                        {
+                        Errors =
+                        [
                             new() {
                                Code = Errors.Error1.ToString()
                             }
-                        }
+                        ]
                     }));
 
-            var response = await _processorClient.BulkDeleteDataSetVersions(releaseVersionId);
+            var processorClient = BuildService();
+            
+            var response = await processorClient.BulkDeleteDataSetVersions(releaseVersionId);
 
             _mockHttp.VerifyNoOutstandingExpectation();
 
@@ -263,13 +309,30 @@ public class ProcessorClientTests
             _mockHttp.Expect(HttpMethod.Delete, $"{Uri.AbsoluteUri}/{releaseVersionId}")
                 .Respond(responseStatusCode);
 
+            var processorClient = BuildService();
+            
             await Assert.ThrowsAsync<HttpRequestException>(async () =>
             {
-                await _processorClient.BulkDeleteDataSetVersions(releaseVersionId);
+                await processorClient.BulkDeleteDataSetVersions(releaseVersionId);
             });
 
             _mockHttp.VerifyNoOutstandingExpectation();
         }
+    }
+
+    private ProcessorClient BuildService(
+        IHttpClientAzureAuthenticationManager<PublicDataProcessorOptions>? azureAuthenticationManager = null)
+    {
+        var client = _mockHttp.ToHttpClient();
+        client.BaseAddress = BaseUri;
+
+        var authenticationManager = azureAuthenticationManager ??
+                                    Mock.Of<IHttpClientAzureAuthenticationManager<PublicDataProcessorOptions>>(
+                                        MockBehavior.Loose);
+        return new ProcessorClient(
+            Mock.Of<ILogger<ProcessorClient>>(),
+            client,
+            authenticationManager);
     }
 
     private enum Errors

@@ -43,6 +43,7 @@ describe('DataFileDetailsTable - replacementFileHasApi logic', () => {
           replacedBy: undefined,
         }}
         releaseVersionId="rel-1"
+        onReplacementStatusChange={() => {}}
       />,
     );
 
@@ -63,6 +64,7 @@ describe('DataFileDetailsTable - replacementFileHasApi logic', () => {
           replacedBy: undefined,
         }}
         releaseVersionId="rel-1"
+        onReplacementStatusChange={() => {}}
       />,
     );
 
@@ -89,6 +91,7 @@ describe('DataFileDetailsTable - replacementFileHasApi logic', () => {
           userName: 'other@example.com',
         }}
         releaseVersionId="rel-1"
+        onReplacementStatusChange={() => {}}
       />,
     );
 
@@ -115,6 +118,7 @@ describe('DataFileDetailsTable - replacementFileHasApi logic', () => {
           userName: 'other@example.com',
         }}
         releaseVersionId="rel-1"
+        onReplacementStatusChange={() => {}}
       />,
     );
 
@@ -141,6 +145,7 @@ describe('DataFileDetailsTable - replacementFileHasApi logic', () => {
           userName: 'other@example.com',
         }}
         releaseVersionId="rel-1"
+        onReplacementStatusChange={() => {}}
       />,
     );
 
@@ -167,6 +172,7 @@ describe('DataFileDetailsTable - replacementFileHasApi logic', () => {
           userName: 'other@example.com',
         }}
         releaseVersionId="rel-1"
+        onReplacementStatusChange={() => {}}
       />,
     );
 

@@ -24,6 +24,8 @@ parameters:
     type: object
   - name: indexName
     type: string
+  - name: indexerName
+    type: string
   - name: indexerScheduleInterval
     default: 'PT5M'
     type: string
@@ -46,7 +48,7 @@ steps:
         -dataSourceType '${{ parameters.dataSourceType }}' `
         -indexCorsAllowedOrigins '${{ join(''',''', parameters.indexCorsAllowedOrigins) }}' `
         -indexDefinitionFilePath '$(templateDirectory)/application/indexes/${{ parameters.indexName }}.json' `
-        -indexerName '${{ parameters.indexName }}-indexer' `
+        -indexerName '${{ parameters.indexerName }}' `
         -indexerScheduleInterval '${{ parameters.indexerScheduleInterval }}' `
         -searchServiceEndpoint '${{ parameters.searchServiceEndpoint }}'
       errorActionPreference: 'stop'

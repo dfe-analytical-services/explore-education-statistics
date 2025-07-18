@@ -149,7 +149,7 @@ export default function ReleaseApiDataSetFiltersMappingPage() {
         : []),
       {
         id: sectionIds.newFilterOptions,
-        text: 'New filter options',
+        text: 'Filter options not found in old dataset',
         subNavItems: Object.keys(newFilterOptions).map(filterKey => {
           return {
             id: sectionIds.newFilterOptionsGroup(filterKey),
@@ -159,7 +159,7 @@ export default function ReleaseApiDataSetFiltersMappingPage() {
       },
       {
         id: sectionIds.autoMappedFilterOptions,
-        text: 'Auto mapped filter options',
+        text: 'Filter options found in both',
         subNavItems: Object.keys(autoMappedFilterOptions).map(filterKey => {
           return {
             id: sectionIds.autoMappedFilterOptionsGroup(filterKey),
@@ -414,7 +414,7 @@ export default function ReleaseApiDataSetFiltersMappingPage() {
               className="govuk-heading-l govuk-!-margin-top-8"
               id={sectionIds.newFilterOptions}
             >
-              New filter options ({totalNewFilterOptions}){' '}
+              Filter options not found in old dataset ({totalNewFilterOptions}){' '}
               <Tag colour="grey">No action required</Tag>
             </h3>
 
@@ -462,72 +462,82 @@ export default function ReleaseApiDataSetFiltersMappingPage() {
               className="govuk-heading-l govuk-!-margin-top-8"
               id={sectionIds.autoMappedFilterOptions}
             >
-              Auto mapped filter options ({totalAutoMappedFilterOptions}){' '}
+              Filter options found in both ({totalAutoMappedFilterOptions}){' '}
               <Tag colour="grey">No action required</Tag>
             </h3>
 
             {totalAutoMappedFilterOptions > 0 ? (
-              <Accordion
-                id={`${sectionIds.autoMappedFilterOptions}-accordion`}
-                showOpenAll={false}
-                testId={`${sectionIds.autoMappedFilterOptions}-accordion`}
-              >
-                {Object.keys(autoMappedFilterOptions).map(filterKey => {
-                  if (
-                    autoMappedFilterOptions[filterKey]?.length &&
-                    filtersMapping
-                  ) {
-                    const filterLabel =
-                      filtersMapping.mappings[filterKey].source.label;
+              <>
+                <p>
+                  These filters have been mapped automatically.{' '}
+                  <strong>There is no action required.</strong>
+                </p>
+                <Accordion
+                  id={`${sectionIds.autoMappedFilterOptions}-accordion`}
+                  showOpenAll={false}
+                  testId={`${sectionIds.autoMappedFilterOptions}-accordion`}
+                >
+                  {Object.keys(autoMappedFilterOptions).map(filterKey => {
+                    if (
+                      autoMappedFilterOptions[filterKey]?.length &&
+                      filtersMapping
+                    ) {
+                      const filterLabel =
+                        filtersMapping.mappings[filterKey].source.label;
 
-                    return (
-                      <AccordionSection
-                        caption={
-                          <>
-                            <strong>Column:</strong> <code>{filterKey}</code>
-                          </>
-                        }
-                        goToTop={false}
-                        heading={`${filterLabel} (${autoMappedFilterOptions[filterKey].length})`}
-                        headingTag="h4"
-                        id={sectionIds.autoMappedFilterOptionsGroup(filterKey)}
-                        key={filterKey}
-                      >
-                        <ApiDataSetAutoMappedTable
-                          groupKey={filterKey}
-                          groupLabel={filterLabel}
-                          itemLabel="filter option"
-                          autoMappedItems={autoMappedFilterOptions[filterKey]}
-                          newItems={newFilterOptions[filterKey]}
-                          pendingUpdates={pendingUpdates}
-                          renderCandidate={candidate => candidate.label}
-                          renderSource={source => source.label}
-                          searchFilter={searchTerm =>
-                            autoMappedFilterOptions[filterKey].filter(item => {
-                              const { candidate, mapping } = item;
-
-                              const searchFields = compact([
-                                candidate.label,
-                                mapping.source.label,
-                              ]);
-
-                              return searchFields.some(field => {
-                                return field
-                                  ?.toLowerCase()
-                                  .includes(searchTerm);
-                              });
-                            })
+                      return (
+                        <AccordionSection
+                          caption={
+                            <>
+                              <strong>Column:</strong> <code>{filterKey}</code>
+                            </>
                           }
-                          onUpdate={handleUpdateMapping}
-                        />
-                      </AccordionSection>
-                    );
-                  }
-                  return null;
-                })}
-              </Accordion>
+                          goToTop={false}
+                          heading={`${filterLabel} (${autoMappedFilterOptions[filterKey].length})`}
+                          headingTag="h4"
+                          id={sectionIds.autoMappedFilterOptionsGroup(
+                            filterKey,
+                          )}
+                          key={filterKey}
+                        >
+                          <ApiDataSetAutoMappedTable
+                            groupKey={filterKey}
+                            groupLabel={filterLabel}
+                            itemLabel="filter option"
+                            autoMappedItems={autoMappedFilterOptions[filterKey]}
+                            newItems={newFilterOptions[filterKey]}
+                            pendingUpdates={pendingUpdates}
+                            renderCandidate={candidate => candidate.label}
+                            renderSource={source => source.label}
+                            searchFilter={searchTerm =>
+                              autoMappedFilterOptions[filterKey].filter(
+                                item => {
+                                  const { candidate, mapping } = item;
+
+                                  const searchFields = compact([
+                                    candidate.label,
+                                    mapping.source.label,
+                                  ]);
+
+                                  return searchFields.some(field => {
+                                    return field
+                                      ?.toLowerCase()
+                                      .includes(searchTerm);
+                                  });
+                                },
+                              )
+                            }
+                            onUpdate={handleUpdateMapping}
+                          />
+                        </AccordionSection>
+                      );
+                    }
+                    return null;
+                  })}
+                </Accordion>
+              </>
             ) : (
-              <p>No auto mapped filter options.</p>
+              <p>No filter options found in both.</p>
             )}
 
             {dataSet && (

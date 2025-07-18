@@ -47,7 +47,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         IDataBlockService dataBlockService,
         IFootnoteRepository footnoteRepository,
         IDataSetScreenerClient dataSetScreenerClient,
-        IMapper _mapper) : IReleaseDataFileService
+        IReplacementPlanService replacementPlanService,
+        IMapper mapper) : IReleaseDataFileService
     {
         public async Task<Either<ActionResult, Unit>> Delete(
             Guid releaseVersionId,
@@ -142,13 +143,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             Guid fileId)
         {
             return await persistenceHelper
-                .CheckEntityExists<ReleaseFile>(q => q.Where(
-                    rf => rf.ReleaseVersionId == releaseVersionId &&
-                    rf.File.Type == FileType.Data &&
-                    rf.FileId == fileId)
-                .Include(rf => rf.ReleaseVersion))
+                .CheckEntityExists<ReleaseFile>(q => q
+                    .Include(rf => rf.ReleaseVersion)
+                    .Include(rf => rf.File.CreatedBy)
+                    .Where(rf =>
+                        rf.ReleaseVersionId == releaseVersionId &&
+                        rf.File.Type == FileType.Data &&
+                        rf.FileId == fileId))
                 .OnSuccessDo(rf => userService.CheckCanViewReleaseVersion(rf.ReleaseVersion))
-                .OnSuccess(BuildDataFileViewModel);
+                .OnSuccess(async releaseFile =>
+                {
+                    var dataImport = await contentDbContext.DataImports
+                        .AsSplitQuery()
+                        .Include(di => di.File)
+                        .Include(di => di.MetaFile)
+                        .SingleAsync(di => di.FileId == releaseFile.FileId);
+
+                    var permissions = await userService.GetDataFilePermissions(dataImport.File);
+
+                    return new DataFileInfo(releaseFile, dataImport, permissions);
+                });
         }
 
         public async Task<Either<ActionResult, DataSetAccoutrementsViewModel>> GetAccoutrementsSummary(
@@ -198,16 +212,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(userService.CheckCanViewReleaseVersion)
                 .OnSuccess(async () =>
                 {
-                    var files = await releaseFileRepository.GetByFileType(releaseVersionId, types: FileType.Data);
+                    var files = await releaseFileRepository.GetByFileType(
+                        releaseVersionId: releaseVersionId,
+                        types: FileType.Data);
 
-                    // Exclude files that are replacements in progress
+                    // An in-progress data set replacement has two release files associated with it: the original and
+                    // the replacement. The frontend doesn't want to display two files for the in-progress replacement,
+                    // so we exclude the replacement file and keep the original file.
                     var filesExcludingReplacements = files
                         .Where(releaseFile => !releaseFile.File.ReplacingId.HasValue)
                         .OrderBy(releaseFile => releaseFile.Order)
                         .ThenBy(releaseFile => releaseFile.Name) // For subjects existing before ordering was added
                         .ToList();
 
-                    return await BuildDataFileViewModels(filesExcludingReplacements);
+                    // But we still want the in-progress replacement files for generating view models
+                    var inProgressReplacements = files
+                        .Where(releaseFile => releaseFile.File.ReplacingId.HasValue)
+                        .ToList();
+
+                    return await BuildDataFileViewModels(filesExcludingReplacements, inProgressReplacements);
                 });
         }
 
@@ -388,12 +411,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .ToAsyncEnumerable()
                 .SelectAwait(async dataSetUpload =>
                 {
-                    var request = _mapper.Map<DataSetScreenerRequest>(dataSetUpload);
+                    var request = mapper.Map<DataSetScreenerRequest>(dataSetUpload);
                     var result = await dataSetScreenerClient.ScreenDataSet(request, cancellationToken);
 
                     await dataSetFileStorage.AddScreenerResultToUpload(dataSetUpload.Id, result, cancellationToken);
 
-                    return _mapper.Map<DataSetUploadViewModel>(dataSetUpload);
+                    return mapper.Map<DataSetUploadViewModel>(dataSetUpload);
                 })
                 .ToListAsync(cancellationToken);
         }
@@ -520,7 +543,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
             foreach (var entry in archive.Entries)
             {
-                using var fileStream = entry.Open();
+                await using var fileStream = entry.Open();
                 files.Add(await BuildDataSetFile(fileStream, entry.Name));
             }
 
@@ -529,7 +552,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         private static async Task<FileDto> BuildDataSetFile(IFormFile formFile)
         {
-            using var fileStream = formFile.OpenReadStream();
+            await using var fileStream = formFile.OpenReadStream();
             return await BuildDataSetFile(fileStream, formFile.FileName);
         }
 
@@ -605,81 +628,67 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 : dataSetUpload;
         }
 
-        private async Task<DataFileInfo> BuildDataFileViewModel(ReleaseFile releaseFile)
+        private async Task<List<DataFileInfo>> BuildDataFileViewModels(
+            List<ReleaseFile> releaseFiles,
+            List<ReleaseFile>? inProgressReplacements = null)
         {
-            var dataImport = await contentDbContext.DataImports
+            var files = releaseFiles
+                .Concat(inProgressReplacements ?? [])
+                .Select(rf => rf.File)
+                .ToList();
+
+            var dataImportsDict = await contentDbContext.DataImports
                 .AsSplitQuery()
-                .Include(di => di.File)
-                .ThenInclude(f => f.CreatedBy)
+                .Include(di => di.File.CreatedBy)
                 .Include(di => di.MetaFile)
-                .SingleAsync(di => di.FileId == releaseFile.FileId);
-
-            var permissions = await userService.GetDataFilePermissions(dataImport.File);
-
-            return new DataFileInfo
-            {
-                Id = releaseFile.FileId,
-                FileName = releaseFile.File.Filename,
-                Name = releaseFile.Name ?? "Unknown",
-                Size = releaseFile.File.DisplaySize(),
-                MetaFileId = dataImport.MetaFile.Id,
-                MetaFileName = dataImport.MetaFile.Filename,
-                ReplacedBy = releaseFile.File.ReplacedById,
-                Rows = dataImport.TotalRows,
-                UserName = releaseFile.File.CreatedBy?.Email ?? "",
-                Status = dataImport.Status,
-                Created = releaseFile.File.Created,
-                Permissions = permissions,
-                PublicApiDataSetId = releaseFile.PublicApiDataSetId,
-                PublicApiDataSetVersion = releaseFile.PublicApiDataSetVersionString,
-            };
-        }
-
-        private async Task<List<DataFileInfo>> BuildDataFileViewModels(List<ReleaseFile> releaseFiles)
-        {
-            var fileIds = releaseFiles.Select(rf => rf.FileId).ToList();
-
-            var dataImports = await contentDbContext.DataImports
-                .AsSplitQuery()
-                .Include(di => di.File)
-                .ThenInclude(f => f.CreatedBy)
-                .Include(di => di.MetaFile)
-                .Where(di => fileIds.Contains(di.FileId))
+                .Where(di => files
+                    .Select(f => f.Id)
+                    .Contains(di.FileId))
                 .ToDictionaryAsync(di => di.FileId);
-
-            var subjectNames = releaseFiles.ToDictionary(rf => rf.FileId, rf => rf.Name);
 
             // TODO Optimise GetDataFilePermissions here instead of potentially making several db queries
             // Work out if the user has permission to cancel any import which Bau users can.
             // Combine it with the import status (already known) to evaluate whether a particular import can be cancelled
-            var permissions = await releaseFiles
+            var permissionsDict = await files
                 .ToAsyncEnumerable()
                 .ToDictionaryAwaitAsync(
-                    rf => ValueTask.FromResult(rf.FileId),
-                    async rf => await userService.GetDataFilePermissions(rf.File));
+                    file => ValueTask.FromResult(file.Id),
+                    async file => await userService.GetDataFilePermissions(file));
 
-            return releaseFiles.Select(releaseFile =>
+            var result = await releaseFiles.SelectAsync(async releaseFile =>
             {
-                var dataImport = dataImports[releaseFile.FileId];
-
-                return new DataFileInfo
+                if (inProgressReplacements == null || releaseFile.File.ReplacedById == null)
                 {
-                    Id = releaseFile.FileId,
-                    FileName = releaseFile.File.Filename,
-                    Name = subjectNames[releaseFile.FileId] ?? "",
-                    Size = releaseFile.File.DisplaySize(),
-                    MetaFileId = dataImport.MetaFile.Id,
-                    MetaFileName = dataImport.MetaFile.Filename,
-                    ReplacedBy = releaseFile.File.ReplacedById,
-                    Rows = dataImport.TotalRows,
-                    UserName = releaseFile.File.CreatedBy?.Email ?? "",
-                    Status = dataImport.Status,
-                    Created = releaseFile.File.Created,
-                    Permissions = permissions[releaseFile.FileId],
-                    PublicApiDataSetId = releaseFile.PublicApiDataSetId,
-                    PublicApiDataSetVersion = releaseFile.PublicApiDataSetVersionString,
+                    return new DataFileInfo(
+                        releaseFile,
+                        dataImportsDict[releaseFile.FileId],
+                        permissionsDict[releaseFile.FileId]);
+                }
+
+                var replacement = inProgressReplacements.Single(rf =>
+                    rf.FileId == releaseFile.File.ReplacedById);
+
+                var hasValidReplacementPlan = false;
+                if (dataImportsDict[replacement.FileId].Status == DataImportStatus.COMPLETE)
+                {
+                    hasValidReplacementPlan = await replacementPlanService.HasValidReplacementPlan(
+                        releaseFile, replacement);
+                }
+
+                return new DataFileInfo(
+                    releaseFile,
+                    dataImportsDict[releaseFile.FileId],
+                    permissionsDict[releaseFile.FileId])
+                {
+                    ReplacedByDataFile = new ReplacementDataFileInfo(
+                        replacement,
+                        dataImportsDict[replacement.FileId],
+                        permissionsDict[replacement.FileId],
+                        hasValidReplacementPlan),
                 };
-            }).ToList();
+            });
+
+            return result.ToList();
         }
 
         /// <summary>

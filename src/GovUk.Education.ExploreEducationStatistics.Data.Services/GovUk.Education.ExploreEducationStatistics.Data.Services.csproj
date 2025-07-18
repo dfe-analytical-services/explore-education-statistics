@@ -11,6 +11,7 @@
     </ItemGroup>
 
     <ItemGroup>
+        <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Analytics.Common\GovUk.Education.ExploreEducationStatistics.Analytics.Common.csproj" />
         <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Common\GovUk.Education.ExploreEducationStatistics.Common.csproj" />
         <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Content.Model\GovUk.Education.ExploreEducationStatistics.Content.Model.csproj" />
         <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Content.Security\GovUk.Education.ExploreEducationStatistics.Content.Security.csproj" />
