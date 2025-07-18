@@ -24,7 +24,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="JetBrains.Annotations" Version="2024.3.0" />
     <PackageReference Include="RichardSzalay.MockHttp" Version="7.0.0" />
     <PackageReference Include="Testcontainers.Azurite" Version="4.3.0" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.13.0" /> <!-- Required to execute unit tests in IDE -->
