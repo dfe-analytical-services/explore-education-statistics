@@ -27,6 +27,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Fixtures;
+using JetBrains.Annotations;
 using Semver;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainers;
@@ -975,8 +976,8 @@ public class DataSetFileStorageTests
         Assert.Equal(testFixture.ReleaseFile.ReleaseVersionId, uploadSummaries[0].ReleaseVersionId);
         Assert.Equal(dataFileNames, uploadSummaries.Select(x => x.File.Filename));
     }
-  
-    // ReSharper disable ParameterOnlyUsedForPreconditionCheck.Local - see https://resharper-support.jetbrains.com/hc/en-us/community/posts/206655415--Parameter-X-is-only-used-for-precondition-check-s-what-is-this
+
+    [UsedImplicitly]
     private static void AssertUploadSummary(
         DataFileInfo uploadSummary,
         string dataSetName,
