@@ -27,17 +27,7 @@ public class DataSetScreenerClient(
         return new DataSetScreenerResponse
         {
             OverallResult = ScreenerResult.Passed,
-            Message = "This data set has not been screened.",
-            TestResults =
-            [
-                new()
-                {
-                    Result = TestResult.WARNING,
-                    TestFunctionName = "N/A",
-                    Stage = Stage.PreScreening1,
-                    Notes = "Screening has been bypassed awaiting full implementation. Please ensure data sets pass screening using the external app prior to importing.",
-                }
-            ]
+            Message = "Screening has been bypassed awaiting full implementation.",
         };
         //await authenticationManager.AddAuthentication(httpClient, cancellationToken);
 

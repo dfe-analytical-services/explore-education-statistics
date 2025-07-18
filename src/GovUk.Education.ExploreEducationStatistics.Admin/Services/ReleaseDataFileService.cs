@@ -16,6 +16,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -25,7 +26,6 @@ using System.IO.Compression;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainers;
@@ -415,6 +415,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     var result = await dataSetScreenerClient.ScreenDataSet(request, cancellationToken);
 
                     await dataSetFileStorage.AddScreenerResultToUpload(dataSetUpload.Id, result, cancellationToken);
+
+                    // TODO (EES-6334): Basic auto-import added as an initial step. Once the screener has been re-enabled,
+                    // this will later be refined to prevent auto-import when there are failures or warnings.
+                    await SaveDataSetsFromTemporaryBlobStorage(
+                        dataSetUpload.ReleaseVersionId,
+                        [dataSetUpload.Id],
+                        cancellationToken);
 
                     return mapper.Map<DataSetUploadViewModel>(dataSetUpload);
                 })
