@@ -2,7 +2,7 @@
 using System.Diagnostics.Contracts;
 using System.Linq;
 
-namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests.Extensions;
+namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 
 public static class ArrayExtensions
 {
