@@ -306,7 +306,7 @@ public abstract class UserPublicationInviteRepositoryTests
     public class RemoveByUserTests : UserPublicationInviteRepositoryTests
     {
         [Fact]
-        public async Task TargetUserHasInvites_RemovesTargetUsersInvites()
+        public async Task TargetUserHasInvites_RemovesTargetInvites()
         {
             var targetEmail = "test1@test.com";
             var otherEmail = "test2@test.com";
