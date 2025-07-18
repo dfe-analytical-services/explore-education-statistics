@@ -20,7 +20,7 @@ public abstract class UserPublicationInviteRepositoryTests
     public class CreateManyIfNotExistsTests : UserPublicationInviteRepositoryTests
     {
         [Fact]
-        public async Task CreateManyIfNotExists()
+        public async Task Success()
         {
             var createdById = Guid.NewGuid();
             var userPublicationRole1 = new UserPublicationRoleCreateRequest
