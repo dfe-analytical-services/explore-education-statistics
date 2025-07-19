@@ -14,8 +14,10 @@ public class AnalyticsWritePublicCsvDownloadStrategy(
     ICommonAnalyticsWriteStrategyWorkflow<CaptureCsvDownloadRequest> workflow
 ) : IAnalyticsWriteStrategy
 {
+    public static readonly string[] OutputSubPaths = ["public", "csv-downloads"];
+    
     private readonly IWorkflowActor<CaptureCsvDownloadRequest> _workflowActor =
-        new WorkflowActor(analyticsPath: analyticsPathResolver.PublicCsvDownloadsDirectoryPath());
+        new WorkflowActor(analyticsPath: analyticsPathResolver.BuildOutputDirectory(OutputSubPaths));
         
     public Type RequestType => typeof(CaptureCsvDownloadRequest);
 

@@ -2,6 +2,7 @@
 using System;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Analytics.Common.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Analytics.Common.Tests.Builders;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Analytics.Dtos;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Analytics.Writers;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Tests.Builders;
@@ -49,6 +50,7 @@ public class CaptureTableToolDownloadCallAnalyticsWriteStrategyTests
     public async Task GivenACaptureRequest_WhenRecordIsCalled_ThenWorkflowCalled()
     {
         // ARRANGE
+        _analyticsPathResolverMockBuilder.WhereOutputDirectoryIs("c:\\temp\\output\\");
         var request = new CaptureTableToolDownloadCallBuilder().Build();
         var sut = GetSut();
         
@@ -56,8 +58,12 @@ public class CaptureTableToolDownloadCallAnalyticsWriteStrategyTests
         await sut.Report(request);
 
         // ASSERT
-        _analyticsPathResolverMockBuilder.Assert.GetTableToolDownloadCallsDirectoryPathRequested();
+        _analyticsPathResolverMockBuilder.Assert.BuildOutputDirectoryCalled(CaptureTableToolDownloadCallAnalyticsWriteStrategy.OutputSubPaths);
         _commonAnalyticsWriteStrategyWorkflowMockBuilder.Assert.ReportCalled(actual => actual == request);
+        
+        _commonAnalyticsWriteStrategyWorkflowMockBuilder.Assert.WorkflowActor(
+            workflowActor => Assert.Equal("c:\\temp\\output\\", workflowActor.GetAnalyticsPath()));
+        
     }
     
     private record TestAnalyticsCaptureRequest : IAnalyticsCaptureRequest;

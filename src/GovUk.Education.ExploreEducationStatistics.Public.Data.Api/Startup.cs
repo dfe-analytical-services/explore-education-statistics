@@ -5,6 +5,7 @@ using System.Text.Json.Serialization;
 using AngleSharp.Io;
 using Dapper;
 using FluentValidation;
+using GovUk.Education.ExploreEducationStatistics.Analytics.Common.Config;
 using GovUk.Education.ExploreEducationStatistics.Common.Config;
 using GovUk.Education.ExploreEducationStatistics.Common.Database;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;

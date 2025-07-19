@@ -19,7 +19,9 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Analytics.Common.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Content.Services.Strategies;
 using Microsoft.AspNetCore.Hosting;
 using Snapshooter.Xunit;
 using Xunit;
@@ -75,7 +77,7 @@ public abstract class DataSetFilesControllerAnalyticsTests : IntegrationTestFixt
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
             var analyticsRequestFiles = Directory.GetFiles(
-                    analyticsPathResolver.PublicCsvDownloadsDirectoryPath())
+                    analyticsPathResolver.BuildOutputDirectory(AnalyticsWritePublicCsvDownloadStrategy.OutputSubPaths))
                 .ToList();
 
             var requestFile = Assert.Single(analyticsRequestFiles);

@@ -1,3 +1,4 @@
+using GovUk.Education.ExploreEducationStatistics.Analytics.Common.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Analytics.Common.Strategies;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Requests;
@@ -32,12 +33,12 @@ public abstract class AnalyticsWritePublicationCallsStrategyTests
                 Type: PublicationCallType.GetSummary), default);
             
             var files = Directory
-                .GetFiles(pathResolver.PublicApiPublicationCallsDirectoryPath());
+                .GetFiles(pathResolver.BuildOutputDirectory(AnalyticsWritePublicationCallsStrategy.OutputSubPaths));
             
             var filePath = Assert.Single(files);
 
             var filename = filePath
-                .Split($"{pathResolver.PublicApiPublicationCallsDirectoryPath()}{Path.DirectorySeparatorChar}")[1];
+                .Split($"{pathResolver.BuildOutputDirectory(AnalyticsWritePublicationCallsStrategy.OutputSubPaths)}{Path.DirectorySeparatorChar}")[1];
             Assert.StartsWith("20250316-120102_", filename);
 
             Snapshot.Match(
@@ -62,12 +63,12 @@ public abstract class AnalyticsWritePublicationCallsStrategyTests
                 Type: PublicationCallType.GetDataSets), default);
             
             var files = Directory
-                .GetFiles(pathResolver.PublicApiPublicationCallsDirectoryPath());
+                .GetFiles(pathResolver.BuildOutputDirectory(AnalyticsWritePublicationCallsStrategy.OutputSubPaths));
             
             var filePath = Assert.Single(files);
 
             var filename = filePath
-                .Split($"{pathResolver.PublicApiPublicationCallsDirectoryPath()}{Path.DirectorySeparatorChar}")[1];
+                .Split($"{pathResolver.BuildOutputDirectory(AnalyticsWritePublicationCallsStrategy.OutputSubPaths)}{Path.DirectorySeparatorChar}")[1];
             Assert.StartsWith("20250316-120102_", filename);
             Assert.StartsWith("20250316-120102_", filename);
 

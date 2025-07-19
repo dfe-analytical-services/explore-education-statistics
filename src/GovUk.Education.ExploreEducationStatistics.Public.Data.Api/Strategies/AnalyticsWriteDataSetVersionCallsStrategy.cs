@@ -1,7 +1,6 @@
 using GovUk.Education.ExploreEducationStatistics.Analytics.Common.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Analytics.Common.Strategies;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Requests;
-using IAnalyticsPathResolver = GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services.Interfaces.IAnalyticsPathResolver;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Strategies;
 
@@ -10,8 +9,10 @@ public class AnalyticsWriteDataSetVersionCallsStrategy(
     ICommonAnalyticsWriteStrategyWorkflow<CaptureDataSetVersionCallRequest> workflow 
     ) : IAnalyticsWriteStrategy
 {
+    public static readonly string[] OutputSubPaths = ["public-api", "data-set-versions"];
+    
     private readonly IWorkflowActor<CaptureDataSetVersionCallRequest> _workflowActor =
-        new WorkflowActor(analyticsPath: analyticsPathResolver.PublicApiDataSetVersionCallsDirectoryPath());
+        new WorkflowActor(analyticsPath: analyticsPathResolver.BuildOutputDirectory(OutputSubPaths));
         
     public Type RequestType => typeof(CaptureDataSetVersionCallRequest);
 

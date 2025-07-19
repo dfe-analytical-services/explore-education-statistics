@@ -1,8 +1,10 @@
+using GovUk.Education.ExploreEducationStatistics.Analytics.Common.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services.Interfaces;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Services;
 
-public class TestAnalyticsPathResolver : AnalyticsPathResolverBase, IDisposable
+public class TestAnalyticsPathResolver : IAnalyticsPathResolver, IDisposable
 {
     private readonly string _basePath = Path.Combine(
         Path.GetTempPath(),
@@ -10,11 +12,6 @@ public class TestAnalyticsPathResolver : AnalyticsPathResolverBase, IDisposable
         "Analytics",
         Guid.NewGuid().ToString());
 
-    protected override string GetBasePath()
-    {
-        return _basePath;
-    }
-    
     public void Dispose()
     {
         if (Directory.Exists(_basePath))
@@ -22,4 +19,6 @@ public class TestAnalyticsPathResolver : AnalyticsPathResolverBase, IDisposable
             Directory.Delete(_basePath, recursive: true);
         }
     }
+
+    public string BuildOutputDirectory(string[] subPaths) => Path.Combine([_basePath, ..subPaths]);
 }

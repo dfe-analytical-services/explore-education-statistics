@@ -3,6 +3,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Analytics.Common;
+using GovUk.Education.ExploreEducationStatistics.Analytics.Common.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Analytics.Common.Strategies;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
@@ -54,7 +55,7 @@ public class AnalyticsWritePublicZipDownloadStrategyTests
                 },
                 default);
 
-            var files = Directory.GetFiles(pathResolver.PublicZipDownloadsDirectoryPath())
+            var files = Directory.GetFiles(pathResolver.BuildOutputDirectory(AnalyticsWritePublicZipDownloadStrategy.OutputSubPaths))
                 .ToList();
 
             Assert.Equal(2, files.Count);
