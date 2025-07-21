@@ -22,6 +22,7 @@ public class DataSetVersionChangeService(
     public Task<Either<ActionResult, DataSetVersionChangesViewModel>> GetChanges(
         Guid dataSetId,
         string dataSetVersion,
+        bool patchHistory,
         CancellationToken cancellationToken = default)
     {
         return publicDataDbContext.DataSetVersions
@@ -37,7 +38,48 @@ public class DataSetVersionChangeService(
                 requestedDataSetVersion: dataSetVersion,
                 cancellationToken: cancellationToken))
             .OnSuccess(dsv => LoadChanges(dsv, cancellationToken))
-            .OnSuccess(MapChanges);
+            .OnSuccess(MapChanges)
+            .OnSuccessCombineWith(changes => 
+                patchHistory 
+                    ? GetAllPatchChanges(dataSetId, dataSetVersion, cancellationToken) 
+                    : Task.FromResult(new Either<ActionResult, List<DataSetVersionChangesViewModel>>(new List<DataSetVersionChangesViewModel>()))
+                )
+            .OnSuccess(tuple =>
+            {
+                if (patchHistory)
+                {
+                    tuple.Item1.PatchHistory = tuple.Item2;   
+                }
+                return tuple.Item1;
+            });
+    }
+
+    public Task<Either<ActionResult, List<DataSetVersionChangesViewModel>>> GetAllPatchChanges(
+        Guid dataSetId,
+        string dataSetVersion,
+        CancellationToken cancellationToken = default)
+    {
+        return publicDataDbContext.DataSetVersions
+            .AsNoTracking()
+            .GetPreviousPatchVersions(
+                dataSetId: dataSetId,
+                version: dataSetVersion,
+                cancellationToken: cancellationToken)
+            .OnSuccessDo(versions => versions.ForEach(v => userService.CheckCanViewDataSetVersion(v)))
+            .OnSuccessDo(versions => versions.ForEach(dsv => analyticsService.CaptureDataSetVersionCall(
+                dataSetVersionId: dsv.Id,
+                type: DataSetVersionCallType.GetChanges,
+                requestedDataSetVersion: dataSetVersion,
+                cancellationToken: cancellationToken)))
+            .OnSuccess(async versions =>
+            {
+                var loadedVersions = new List<DataSetVersionChangesViewModel>();
+                foreach (var version in versions)
+                {
+                    loadedVersions.Add(MapChanges(await LoadChanges(version, cancellationToken)));
+                }
+                return loadedVersions;
+            });
     }
 
     private async Task<DataSetVersion> LoadChanges(DataSetVersion dataSetVersion, CancellationToken cancellationToken)
@@ -85,6 +127,8 @@ public class DataSetVersionChangeService(
 
         return new DataSetVersionChangesViewModel
         {
+            VersionNumber = dataSetVersion.SemVersion(),
+            Notes = dataSetVersion.Notes,
             MajorChanges = new ChangeSetViewModel
             {
                 Filters = filterChanges?.GetValueOrDefault(ChangeType.Major),
@@ -145,7 +189,7 @@ public class DataSetVersionChangeService(
             : null;
     }
 
-    private static Dictionary<ChangeType, List<FilterOptionChangesViewModel>>? GetFilterOptionChanges(
+    private static Dictionary<ChangeType, List<FilterOptionChangesViewModel>>?  GetFilterOptionChanges(
         List<FilterOptionMetaChange> changes)
     {
         return changes.Count != 0
