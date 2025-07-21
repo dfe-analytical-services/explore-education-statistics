@@ -611,7 +611,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
 
                 // Write a simple ZIP archive with one entry
                 using var archive = new ZipArchive(stream, ZipArchiveMode.Create, true);
-                var entry = archive.CreateEntry("sample.txt");
+                var entry = archive.CreateEntry("data-file.csv");
                 using var entryStream = entry.Open();
                 using var writer = new StreamWriter(entryStream);
                 writer.Write("test content");

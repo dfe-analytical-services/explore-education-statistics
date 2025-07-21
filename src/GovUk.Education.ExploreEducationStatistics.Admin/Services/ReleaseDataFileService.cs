@@ -476,14 +476,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             return zipFile
                 .GetEntries()
-                .Select(entry => BuildDataSetFile(entry.Open, entry.Name, entry.Length))
+                .Select(BuildDataSetFile)
                 .ToList();
         }
 
         private static FileDto BuildDataSetFile(IManagedStreamFile file)
         {
             return BuildDataSetFile(
-                file.OpenStream,
+                file.GetStream,
                 file.Name,
                 file.Length);
         }
