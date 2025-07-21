@@ -108,7 +108,7 @@ export default function ReleaseSummaryForm({
         'Release label must be no longer than ${max} characters',
       ),
       publishingOrganisations: Yup.array()
-        .of(Yup.string().required().uuid())
+        .of(Yup.string().required())
         .transform((value, originalValue) => {
           // If the original value is falsy (e.g., false), transform it to undefined
           // needed as react-hook-form casts no checkbox selection to false
