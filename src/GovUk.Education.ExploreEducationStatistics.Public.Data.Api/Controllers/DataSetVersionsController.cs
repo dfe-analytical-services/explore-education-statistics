@@ -87,12 +87,15 @@ public class DataSetVersionsController(
                           The data set version e.g. 1.0, 1.1, 2.0, etc.
                           Wildcard versions are supported. For example, `2.*` returns the latest minor version in the v2 series.
                           """)] string dataSetVersion,
-        CancellationToken cancellationToken)
+        [SwaggerParameter("Whether to include change logs for all associated patches will be in the results."
+            )] bool patchHistory = false,
+        CancellationToken cancellationToken = default) 
     {
         return await dataSetVersionChangeService
             .GetChanges(
                 dataSetId: dataSetId,
                 dataSetVersion: dataSetVersion,
+                patchHistory: patchHistory,
                 cancellationToken: cancellationToken)
             .HandleFailuresOrOk();
     }
