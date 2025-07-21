@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Analytics.Common.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Analytics.Common.Strategies;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Analytics.Dtos;
-using GovUk.Education.ExploreEducationStatistics.Data.Services.Analytics.Utils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Analytics.Writers;
 
@@ -13,8 +12,10 @@ public class CaptureTableToolDownloadCallAnalyticsWriteStrategy(
     IAnalyticsPathResolver analyticsPathResolver,
     ICommonAnalyticsWriteStrategyWorkflow<CaptureTableToolDownloadCall> workflow) : IAnalyticsWriteStrategy
 {
+    public static readonly string[] OutputSubPaths = ["public", "table-tool-downloads", "table-tool-page"];
+
     private readonly IWorkflowActor<CaptureTableToolDownloadCall> _workflowActor =
-        new WorkflowActor(analyticsPath: analyticsPathResolver.GetTableToolDownloadCallsDirectoryPath());
+        new WorkflowActor(analyticsPath: analyticsPathResolver.BuildOutputDirectory(OutputSubPaths));
     
     public Type RequestType => typeof(CaptureTableToolDownloadCall);
 

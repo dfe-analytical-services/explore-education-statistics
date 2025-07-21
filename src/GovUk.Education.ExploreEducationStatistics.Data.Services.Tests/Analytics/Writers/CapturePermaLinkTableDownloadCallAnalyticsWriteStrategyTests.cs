@@ -2,6 +2,7 @@
 using System;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Analytics.Common.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Analytics.Common.Tests.Builders;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Analytics.Dtos;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Analytics.Writers;
@@ -50,6 +51,7 @@ public class CapturePermaLinkTableDownloadCallAnalyticsWriteStrategyTests
     public async Task GivenACaptureRequest_WhenRecordIsCalled_ThenWorkflowCalled()
     {
         // ARRANGE
+        _analyticsPathResolverMockBuilder.WhereOutputDirectoryIs("c:\\temp\\output\\");
         var request = new CapturePermaLinkTableDownloadCallBuilder().Build();
         var sut = GetSut();
         
@@ -57,8 +59,11 @@ public class CapturePermaLinkTableDownloadCallAnalyticsWriteStrategyTests
         await sut.Report(request);
 
         // ASSERT
-        _analyticsPathResolverMockBuilder.Assert.GetPermaLinkTableDownloadCallsDirectoryPathRequested();
+        _analyticsPathResolverMockBuilder.Assert.BuildOutputDirectoryCalled(CapturePermaLinkTableDownloadCallAnalyticsWriteStrategy.OutputSubPaths);
         _commonAnalyticsWriteStrategyWorkflowMockBuilder.Assert.ReportCalled(actual => actual == request);
+        
+        _commonAnalyticsWriteStrategyWorkflowMockBuilder.Assert.WorkflowActor(
+            workflowActor => Assert.Equal("c:\\temp\\output\\", workflowActor.GetAnalyticsPath()));
     }
     
     private record TestAnalyticsCaptureRequest : IAnalyticsCaptureRequest;

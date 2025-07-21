@@ -1,3 +1,4 @@
+using GovUk.Education.ExploreEducationStatistics.Analytics.Common.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Analytics.Common.Strategies;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Requests;
@@ -30,12 +31,12 @@ public abstract class AnalyticsWriteTopLevelCallsStrategyTests
                 Type: TopLevelCallType.GetPublications), default);
             
             var files = Directory
-                .GetFiles(pathResolver.PublicApiTopLevelCallsDirectoryPath());
+                .GetFiles(pathResolver.BuildOutputDirectory(AnalyticsWriteTopLevelCallsStrategy.OutputSubPaths));
             
             var filePath = Assert.Single(files);
 
             var filename = filePath
-                .Split($"{pathResolver.PublicApiTopLevelCallsDirectoryPath()}{Path.DirectorySeparatorChar}")[1];
+                .Split($"{pathResolver.BuildOutputDirectory(AnalyticsWriteTopLevelCallsStrategy.OutputSubPaths)}{Path.DirectorySeparatorChar}")[1];
             Assert.StartsWith("20250316-120102_", filename);
 
             Snapshot.Match(
@@ -58,12 +59,12 @@ public abstract class AnalyticsWriteTopLevelCallsStrategyTests
                 Type: TopLevelCallType.GetPublications), default);
             
             var files = Directory
-                .GetFiles(pathResolver.PublicApiTopLevelCallsDirectoryPath());
+                .GetFiles(pathResolver.BuildOutputDirectory(AnalyticsWriteTopLevelCallsStrategy.OutputSubPaths));
             
             var filePath = Assert.Single(files);
 
             var filename = filePath
-                .Split($"{pathResolver.PublicApiTopLevelCallsDirectoryPath()}{Path.DirectorySeparatorChar}")[1];
+                .Split($"{pathResolver.BuildOutputDirectory(AnalyticsWriteTopLevelCallsStrategy.OutputSubPaths)}{Path.DirectorySeparatorChar}")[1];
             Assert.StartsWith("20250316-120102_", filename);
             Assert.StartsWith("20250316-120102_", filename);
 
