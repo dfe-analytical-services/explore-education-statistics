@@ -36,6 +36,9 @@ import omit from 'lodash/omit';
 import { GetServerSideProps } from 'next';
 import React, { useEffect, useMemo, useState } from 'react';
 import getDataSetFileMetaCSVW from './utils/getDataSetFileMetaCSVW';
+import omit from 'lodash/omit';
+import downloadService from '@frontend/services/downloadService';
+import isPatchVersion from '@common/utils/isPatchVersion';
 
 export const pageBaseSections = {
   dataSetDetails: 'Data set details',
@@ -133,7 +136,14 @@ export default function DataSetFilePage({
     if (
       !apiDataSetVersionChanges ||
       (!Object.keys(apiDataSetVersionChanges.majorChanges).length &&
-        !Object.keys(apiDataSetVersionChanges.minorChanges).length)
+        !Object.keys(apiDataSetVersionChanges.minorChanges).length) ||
+      (apiDataSetVersionChanges.patchHistory &&
+        apiDataSetVersionChanges.patchHistory.every(
+          change =>
+            !change ||
+            (!Object.keys(change.majorChanges).length &&
+              !Object.keys(change.minorChanges).length),
+        ))
     ) {
       sections = omit(sections, 'apiChangelog');
     }
@@ -271,11 +281,29 @@ export default function DataSetFilePage({
                   />
 
                   {apiDataSetVersionChanges && (
-                    <DataSetFileApiChangelog
-                      changes={apiDataSetVersionChanges}
-                      guidanceNotes={apiDataSetVersion.notes}
-                      version={apiDataSetVersion.version}
-                    />
+                    <>
+                      <DataSetFileApiChangelog
+                        changes={apiDataSetVersionChanges}
+                        guidanceNotes={apiDataSetVersion.notes}
+                        version={apiDataSetVersion.version}
+                      />
+                      {apiDataSetVersionChanges.patchHistory &&
+                        apiDataSetVersionChanges.patchHistory.map(
+                          (change: ApiDataSetVersionChanges) => (
+                            <DataSetFileApiChangelog
+                              key={change.versionNumber.patch}
+                              renderHeading={false}
+                              changes={change}
+                              guidanceNotes={change.notes}
+                              version={
+                                change.versionNumber.patch > 0
+                                  ? `${change.versionNumber.major}.${change.versionNumber.minor}.${change.versionNumber.patch}`
+                                  : `${change.versionNumber.major}.${change.versionNumber.minor}`
+                              }
+                            />
+                          ),
+                        )}
+                    </>
                   )}
                 </>
               )}
@@ -324,6 +352,7 @@ export const getServerSideProps: GetServerSideProps<Props> = withAxiosHandler(
                 apiDataSetQueries.getDataSetVersionChanges(
                   dataSetFile.api.id,
                   dataSetFile.api.version,
+                  isPatchVersion(dataSetFile.api.version),
                 ),
               )
             : null,
