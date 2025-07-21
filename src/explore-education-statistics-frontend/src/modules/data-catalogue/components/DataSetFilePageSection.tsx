@@ -29,7 +29,7 @@ export default function DataSetFilePageSection({
         data-page-section=""
         data-testid={testId}
       >
-        <h2>{heading}</h2>
+        {heading.length > 0 && <h2>{heading}</h2>}
 
         <div className={styles.content}>
           {children}

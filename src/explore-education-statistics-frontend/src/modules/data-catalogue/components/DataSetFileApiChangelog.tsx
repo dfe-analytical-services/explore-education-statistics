@@ -8,12 +8,14 @@ interface Props {
   changes: ApiDataSetVersionChanges;
   guidanceNotes: string;
   version: string;
+  renderHeading?: boolean;
 }
 
 export default function DataSetFileApiChangelog({
   changes,
   guidanceNotes,
   version,
+  renderHeading = true,
 }: Props) {
   const { majorChanges, minorChanges } = changes;
 
@@ -23,10 +25,10 @@ export default function DataSetFileApiChangelog({
 
   return (
     <DataSetFilePageSection
-      heading={pageSections.apiChangelog}
+      heading={renderHeading ?? true ? pageSections.apiChangelog : ''}
       id="apiChangelog"
     >
-      {guidanceNotes.length > 0 && (
+      {(guidanceNotes ?? '').length > 0 && (
         <p data-testid="public-guidance-notes">{guidanceNotes}</p>
       )}
       <ApiDataSetChangelog

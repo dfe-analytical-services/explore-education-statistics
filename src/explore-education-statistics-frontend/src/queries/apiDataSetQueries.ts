@@ -36,11 +36,16 @@ const apiDataSetQueries = {
   getDataSetVersionChanges(
     dataSetId: string,
     dataSetVersion: string,
+    patchHistory: boolean = false,
   ): UseQueryOptions<ApiDataSetVersionChanges> {
     return {
       queryKey: ['getDataSetVersionChanges', dataSetId, dataSetVersion],
       queryFn: () =>
-        apiDataSetService.getDataSetVersionChanges(dataSetId, dataSetVersion),
+        apiDataSetService.getDataSetVersionChanges(
+          dataSetId,
+          dataSetVersion,
+          patchHistory,
+        ),
     };
   },
 } as const;
