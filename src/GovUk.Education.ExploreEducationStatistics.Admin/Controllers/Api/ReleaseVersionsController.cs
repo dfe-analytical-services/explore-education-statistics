@@ -102,14 +102,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             [FromForm] UploadDataSetRequest request,
             CancellationToken cancellationToken)
         {
-            await using var dataFileHandler = new ManagedStreamFormFile(request.DataFile);
-            await using var metaFileHandler = new ManagedStreamFormFile(request.MetaFile);
+            await using var dataFile = new ManagedStreamFormFile(request.DataFile);
+            await using var metaFile = new ManagedStreamFormFile(request.MetaFile);
 
             return await _releaseDataFileService
                 .Upload(
                     request.ReleaseVersionId,
-                    dataFileHandler,
-                    metaFileHandler,
+                    dataFile,
+                    metaFile,
                     request.Title,
                     request.ReplacingFileId,
                     cancellationToken)
@@ -124,14 +124,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             [FromForm] UploadDataSetRequest request,
             CancellationToken cancellationToken)
         {
-            await using var dataFileHandler = new ManagedStreamFormFile(request.DataFile);
-            await using var metaFileHandler = new ManagedStreamFormFile(request.MetaFile);
+            await using var dataFile = new ManagedStreamFormFile(request.DataFile);
+            await using var metaFile = new ManagedStreamFormFile(request.MetaFile);
 
             return await _releaseDataFileService
                 .UploadForReplacement(
                     request.ReleaseVersionId,
-                    dataFileHandler,
-                    metaFileHandler,
+                    dataFile,
+                    metaFile,
                     request.Title,
                     request.ReplacingFileId,
                     cancellationToken)
@@ -145,12 +145,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             [FromForm] UploadDataSetAsZipRequest request,
             CancellationToken cancellationToken)
         {
-            await using var zipFileHandler = new ManagedStreamZipFormFile(request.ZipFile);
+            await using var zipFile = new ManagedStreamZipFormFile(request.ZipFile);
             
             return await _releaseDataFileService
                 .UploadFromZip(
                     request.ReleaseVersionId,
-                    zipFileHandler,
+                    zipFile,
                     request.Title,
                     request.ReplacingFileId,
                     cancellationToken)
@@ -165,12 +165,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             [FromForm] UploadDataSetAsZipRequest request,
             CancellationToken cancellationToken)
         {
-            await using var zipFileHandler = new ManagedStreamZipFormFile(request.ZipFile);
+            await using var zipFile = new ManagedStreamZipFormFile(request.ZipFile);
             
             return await _releaseDataFileService
                 .UploadFromZipForReplacement(
                     request.ReleaseVersionId,
-                    zipFileHandler,
+                    zipFile,
                     request.Title,
                     request.ReplacingFileId,
                     cancellationToken)

@@ -411,6 +411,38 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
                 });
         }
 
+        public async Task<Either<ActionResult, Stream>> GetDownloadStream(
+            IBlobContainer containerName,
+            string path,
+            bool decompress = true,
+            CancellationToken cancellationToken = default)
+        {
+            return await GetBlobClientOrNotFound(containerName, path)
+                .OnSuccess(async blob =>
+                {
+                    if (decompress)
+                    {
+                        BlobProperties blobProperties =
+                            await blob.GetPropertiesAsync(cancellationToken: cancellationToken);
+
+                        // Check the ContentEncoding property to determine if the blob
+                        // is compressed and only decompress if necessary.
+                        if (blobProperties.ContentEncoding.IsNullOrEmpty())
+                        {
+                            return await blob.OpenReadAsync(cancellationToken: cancellationToken);
+                        }
+
+                        var blobStream = await blob.OpenReadAsync(cancellationToken: cancellationToken);
+                        return CompressionUtils.GetCompressionStream(
+                            blobStream,
+                            contentEncoding: blobProperties.ContentEncoding,
+                            CompressionMode.Decompress);
+                    }
+
+                    return await blob.OpenReadAsync(cancellationToken: cancellationToken);
+                });
+        }
+        
         public async Task<Stream> StreamBlob(
             IBlobContainer containerName,
             string path,
