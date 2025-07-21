@@ -1,6 +1,6 @@
 ---
 title: How to get CSV data
-last_reviewed_on: 2024-09-16
+last_reviewed_on: 2025-07-17
 review_in: 6 months
 weight: 2
 ---
@@ -24,9 +24,15 @@ examples.
 
 ## Get an entire data set as a CSV file
 
-Every data set is created from an underlying CSV file that contains  **all** the data. You may find
-it useful (or necessary) to work with the underlying CSV instead of interacting with the data set
-via the API.
+It should be noted that the CSV data uses human-readable labels for its contents instead of
+machine-readable identifiers. This means that unlike the rest of the API, there are no backward
+compatibility guarantees between different versions of the data set if your downstream processes 
+rely on labels to always remain the same.
+
+
+Every data set is created from an underlying CSV file that contains **all** the data. You may find
+it useful (or necessary) to work with the whole underlying CSV instead of interacting with the data 
+set via the API.
 
 The underlying CSV file can be downloaded via the [Download data set CSV](/reference-v1/endpoints/DownloadDataSetCsv/index.html)
 endpoint. To use this endpoint, you need to make a `GET` request:
@@ -41,6 +47,8 @@ Upon making this request, a download containing the CSV data should start. The f
 be gzip compressed (like most of the API responses), meaning that your HTTP client will need to
 support gzip decompression to extract the contents.
 
-It should be noted that the CSV data will be use human-readable labels for its contents instead of
-machine-readable identifiers. This means that unlike the rest of the API, there are no backward
-compatibility guarantees between different versions of the data set.
+If the data set you're interested in is not available, you may still be able to access individual
+data sets through the [EES data catalogue](https://explore-education-statistics.service.gov.uk/data-catalogue). 
+Every data set in the data catalogue will have a stable URL where you can pull in the CSV from, be
+aware though that these data sets will not be version controlled or updated in the same way as those 
+available in this API.

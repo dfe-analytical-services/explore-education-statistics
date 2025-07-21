@@ -1,18 +1,17 @@
 #nullable enable
 using System;
 
-namespace GovUk.Education.ExploreEducationStatistics.Content.Model
+namespace GovUk.Education.ExploreEducationStatistics.Content.Model;
+
+public class MethodologyFile
 {
-    public class MethodologyFile
-    {
-        public Guid Id { get; set; }
+    public Guid Id { get; set; }
 
-        public MethodologyVersion MethodologyVersion { get; set; } = null!;
+    public MethodologyVersion MethodologyVersion { get; set; } = null!;
 
-        public Guid MethodologyVersionId { get; set; }
+    public Guid MethodologyVersionId { get; set; }
 
-        public File File { get; set; } = null!;
+    public File File { get; set; } = null!;
 
-        public Guid FileId { get; set; }
-    }
+    public Guid FileId { get; set; }
 }

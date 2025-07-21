@@ -48,8 +48,8 @@ using IReleaseVersionService = GovUk.Education.ExploreEducationStatistics.Admin.
 using ReleaseVersion = GovUk.Education.ExploreEducationStatistics.Data.Model.ReleaseVersion;
 using Unit = GovUk.Education.ExploreEducationStatistics.Common.Model.Unit;
 
-namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
-{
+namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services;
+
     public class ReplacementServiceTests
     {
         private readonly Country _england = new("E92000001", "England");
@@ -195,7 +195,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         contentDbContext,
                         statisticsDbContext,
                         filterRepository: filterRepository,
-                        locationRepository: locationRepository.Object,
+                    locationRepository: locationRepository.Object,
                         timePeriodService: timePeriodService.Object)
                     );
 
@@ -629,7 +629,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         contentDbContext,
                         statisticsDbContext,
                         filterRepository: filterRepository,
-                        locationRepository: locationRepository.Object,
+                    locationRepository: locationRepository.Object,
                         timePeriodService: timePeriodService.Object));
 
                 var result = await replacementService.Replace(
@@ -673,7 +673,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     releaseFileRepository: releaseFileRepository.Object);
 
                 var result = await replacementService.Replace(
-                        releaseVersionId: releaseVersion.Id,
+                    releaseVersionId: releaseVersion.Id,
                         originalFileId: originalFileId);
 
                 result.AssertNotFound();
@@ -804,10 +804,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         contentDbContext,
                         statisticsDbContext,
                         filterRepository: filterRepository,
-                        locationRepository: locationRepository.Object,
-                        timePeriodService: timePeriodService.Object,
-                        dataSetVersionService: dataSetVersionService.Object,
-                        dataSetVersionMappingService: dataSetVersionMappingService.Object,
+                    locationRepository: locationRepository.Object,
+                    timePeriodService: timePeriodService.Object,
+                    dataSetVersionService: dataSetVersionService.Object,
+                    dataSetVersionMappingService: dataSetVersionMappingService.Object,
                         featureFlags: options));
 
                 var result = await replacementService.Replace(
@@ -1272,7 +1272,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         contentDbContext,
                         statisticsDbContext,
                         filterRepository: filterRepository,
-                        locationRepository: locationRepository.Object,
+                    locationRepository: locationRepository.Object,
                         timePeriodService: timePeriodService.Object,
                         releaseFileRepository: releaseFileRepository.Object)
                     );
@@ -1804,7 +1804,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         contentDbContext,
                         statisticsDbContext,
                         filterRepository: filterRepository,
-                        locationRepository: locationRepository.Object,
+                    locationRepository: locationRepository.Object,
                         timePeriodService: timePeriodService.Object)
                 );
 
@@ -2199,7 +2199,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         contentDbContext,
                         statisticsDbContext,
                         filterRepository: filterRepository,
-                        locationRepository: locationRepository.Object,
+                    locationRepository: locationRepository.Object,
                         timePeriodService: timePeriodService.Object)
                 );
 
@@ -2509,7 +2509,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         contentDbContext,
                         statisticsDbContext,
                         filterRepository: filterRepository,
-                        locationRepository: locationRepository.Object,
+                    locationRepository: locationRepository.Object,
                         timePeriodService: timePeriodService.Object)
                 );
 
@@ -2737,7 +2737,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         contentDbContext,
                         statisticsDbContext,
                         filterRepository: filterRepository,
-                        locationRepository: locationRepository.Object,
+                    locationRepository: locationRepository.Object,
                         timePeriodService: timePeriodService.Object));
 
                 var result = await replacementService.Replace(
@@ -2949,7 +2949,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         contentDbContext,
                         statisticsDbContext,
                         filterRepository: filterRepository,
-                        locationRepository: locationRepository.Object,
+                    locationRepository: locationRepository.Object,
                         timePeriodService: timePeriodService.Object));
 
                 var result = await replacementService.Replace(
@@ -3089,4 +3089,3 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             );
         }
     }
-}

@@ -1,9 +1,8 @@
-namespace GovUk.Education.ExploreEducationStatistics.Content.Security
+namespace GovUk.Education.ExploreEducationStatistics.Content.Security;
+
+public enum ContentSecurityPolicies
 {
-    public enum ContentSecurityPolicies
-    {
-        CanViewSpecificMethodologyVersion,
-        CanViewSpecificPublication,
-        CanViewSpecificReleaseVersion
-    }
+    CanViewSpecificMethodologyVersion,
+    CanViewSpecificPublication,
+    CanViewSpecificReleaseVersion
 }

@@ -24,11 +24,11 @@ using static GovUk.Education.ExploreEducationStatistics.Content.Model.Methodolog
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.PublicationRole;
 using static Moq.MockBehavior;
 
-namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers
+namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers;
+
+// ReSharper disable once ClassNeverInstantiated.Global
+public class MakeAmendmentOfSpecificMethodologyAuthorizationHandlerTests
 {
-    // ReSharper disable once ClassNeverInstantiated.Global
-    public class MakeAmendmentOfSpecificMethodologyAuthorizationHandlerTests
-    {
         private static readonly Guid UserId = Guid.NewGuid();
 
         private static readonly MethodologyVersion MethodologyVersion = new()
@@ -252,5 +252,4 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
 
             return (handler, methodologyRepository, methodologyVersionRepository, userPublicationRoleAndInviteManager);
         }
-    }
 }

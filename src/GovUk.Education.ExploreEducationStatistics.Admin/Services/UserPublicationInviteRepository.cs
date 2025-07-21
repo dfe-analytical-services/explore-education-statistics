@@ -13,43 +13,44 @@ using Guid = System.Guid;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services;
 
+
 public class UserPublicationInviteRepository(ContentDbContext contentDbContext) : IUserPublicationInviteRepository
-{
-    public async Task CreateManyIfNotExists(
-        List<UserPublicationRoleCreateRequest> userPublicationRoles,
-        string email,
-        Guid createdById,
-        DateTime? createdDate = null)
-    {
-        var invites = await userPublicationRoles
-            .ToAsyncEnumerable()
-            .WhereAwait(async userPublicationRole =>
-                !await UserHasInvite(
-                    userPublicationRole.PublicationId,
-                    userPublicationRole.PublicationRole,
-                    email))
-            .Select(userPublicationRole =>
-                new UserPublicationInvite
-                {
-                    Email = email.ToLower(),
-                    PublicationId = userPublicationRole.PublicationId,
-                    Role = userPublicationRole.PublicationRole,
-                    Created = createdDate ?? DateTime.UtcNow,
-                    CreatedById = createdById,
-                }
-            ).ToListAsync();
+        {
+        public async Task CreateManyIfNotExists(
+            List<UserPublicationRoleCreateRequest> userPublicationRoles,
+            string email,
+            Guid createdById,
+            DateTime? createdDate = null)
+        {
+            var invites = await userPublicationRoles
+                .ToAsyncEnumerable()
+                .WhereAwait(async userPublicationRole =>
+                    !await UserHasInvite(
+                        userPublicationRole.PublicationId,
+                        userPublicationRole.PublicationRole,
+                        email))
+                .Select(userPublicationRole =>
+                    new UserPublicationInvite
+                    {
+                        Email = email.ToLower(),
+                        PublicationId = userPublicationRole.PublicationId,
+                        Role = userPublicationRole.PublicationRole,
+                        Created = createdDate ?? DateTime.UtcNow,
+                        CreatedById = createdById,
+                    }
+                ).ToListAsync();
 
         await contentDbContext.UserPublicationInvites.AddRangeAsync(invites);
         await contentDbContext.SaveChangesAsync();
-    }
+        }
 
-    public Task<List<UserPublicationInvite>> ListByEmail(string email)
-    {
+        public Task<List<UserPublicationInvite>> ListByEmail(string email)
+        {
         return contentDbContext
-            .UserPublicationInvites
-            .Where(invite => invite.Email.ToLower().Equals(email.ToLower()))
-            .ToListAsync();
-    }
+                .UserPublicationInvites
+                .Where(invite => invite.Email.ToLower().Equals(email.ToLower()))
+                .ToListAsync();
+        }
 
     public async Task Remove(
         Guid publicationId,
@@ -97,16 +98,16 @@ public class UserPublicationInviteRepository(ContentDbContext contentDbContext) 
         await RemoveMany(invites, cancellationToken);
     }
 
-    private async Task<bool> UserHasInvite(
-        Guid publicationId,
-        PublicationRole role,
-        string email)
-    {
+        private async Task<bool> UserHasInvite(
+            Guid publicationId,
+            PublicationRole role,
+            string email)
+        {
         return await contentDbContext
-            .UserPublicationInvites
-            .AnyAsync(i =>
-                i.PublicationId == publicationId
-                && i.Role == role
-                && i.Email.ToLower().Equals(email.ToLower()));
+                .UserPublicationInvites
+                .AnyAsync(i =>
+                    i.PublicationId == publicationId
+                    && i.Role == role
+                    && i.Email.ToLower().Equals(email.ToLower()));
+        }
     }
-}

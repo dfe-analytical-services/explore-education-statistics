@@ -6,84 +6,83 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using Microsoft.Extensions.Options;
 
-namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
+namespace GovUk.Education.ExploreEducationStatistics.Admin.Services;
+
+public class PreReleaseService : IPreReleaseService
 {
-    public class PreReleaseService : IPreReleaseService
+    private readonly AccessWindowOptions _preReleaseOptions;
+
+    public PreReleaseService(IOptions<PreReleaseAccessOptions> options)
     {
-        private readonly AccessWindowOptions _preReleaseOptions;
+        _preReleaseOptions = options.Value.AccessWindow;
+    }
 
-        public PreReleaseService(IOptions<PreReleaseAccessOptions> options)
+    public PreReleaseWindow GetPreReleaseWindow(ReleaseVersion releaseVersion)
+    {
+        if (!releaseVersion.PublishScheduled.HasValue)
         {
-            _preReleaseOptions = options.Value.AccessWindow;
+            throw new ArgumentException("Release version has no PublishScheduled value", nameof(releaseVersion));
         }
 
-        public PreReleaseWindow GetPreReleaseWindow(ReleaseVersion releaseVersion)
+        var publishScheduled = releaseVersion.PublishScheduled.Value;
+
+        return new PreReleaseWindow
         {
-            if (!releaseVersion.PublishScheduled.HasValue)
-            {
-                throw new ArgumentException("Release version has no PublishScheduled value", nameof(releaseVersion));
-            }
+            Start = GetStartTime(publishScheduled),
+            ScheduledPublishDate = publishScheduled
+        };
+    }
 
-            var publishScheduled = releaseVersion.PublishScheduled.Value;
-
-            return new PreReleaseWindow
-            {
-                Start = GetStartTime(publishScheduled),
-                ScheduledPublishDate = publishScheduled
-            };
-        }
-
-        public PreReleaseWindowStatus GetPreReleaseWindowStatus(ReleaseVersion releaseVersion, DateTime referenceTime)
+    public PreReleaseWindowStatus GetPreReleaseWindowStatus(ReleaseVersion releaseVersion, DateTime referenceTime)
+    {
+        if (releaseVersion.Live)
         {
-            if (releaseVersion.Live)
-            {
-                return new PreReleaseWindowStatus
-                {
-                    Access = PreReleaseAccess.After
-                };
-            }
-
-            if (!releaseVersion.PublishScheduled.HasValue)
-            {
-                return new PreReleaseWindowStatus
-                {
-                    Access = PreReleaseAccess.NoneSet
-                };
-            }
-
-            var publishScheduled = releaseVersion.PublishScheduled.Value;
-            var startTime = GetStartTime(publishScheduled);
-
             return new PreReleaseWindowStatus
             {
-                Start = GetStartTime(publishScheduled),
-                ScheduledPublishDate = publishScheduled,
-                Access = GetAccess(releaseVersion, startTime, referenceTime)
+                Access = PreReleaseAccess.After
             };
         }
 
-        private DateTime GetStartTime(DateTime publishScheduled)
+        if (!releaseVersion.PublishScheduled.HasValue)
         {
-            return publishScheduled.AddMinutes(-_preReleaseOptions.MinutesBeforeReleaseTimeStart);
+            return new PreReleaseWindowStatus
+            {
+                Access = PreReleaseAccess.NoneSet
+            };
         }
 
-        private static PreReleaseAccess GetAccess(
-            ReleaseVersion releaseVersion,
-            DateTime startTime,
-            DateTime referenceTime)
+        var publishScheduled = releaseVersion.PublishScheduled.Value;
+        var startTime = GetStartTime(publishScheduled);
+
+        return new PreReleaseWindowStatus
         {
-            if (!releaseVersion.PublishScheduled.HasValue ||
-                releaseVersion.ApprovalStatus != ReleaseApprovalStatus.Approved)
-            {
-                return PreReleaseAccess.NoneSet;
-            }
+            Start = GetStartTime(publishScheduled),
+            ScheduledPublishDate = publishScheduled,
+            Access = GetAccess(releaseVersion, startTime, referenceTime)
+        };
+    }
 
-            if (referenceTime.IsBefore(startTime))
-            {
-                return PreReleaseAccess.Before;
-            }
+    private DateTime GetStartTime(DateTime publishScheduled)
+    {
+        return publishScheduled.AddMinutes(-_preReleaseOptions.MinutesBeforeReleaseTimeStart);
+    }
 
-            return releaseVersion.Live ? PreReleaseAccess.After : PreReleaseAccess.Within;
+    private static PreReleaseAccess GetAccess(
+        ReleaseVersion releaseVersion,
+        DateTime startTime,
+        DateTime referenceTime)
+    {
+        if (!releaseVersion.PublishScheduled.HasValue ||
+            releaseVersion.ApprovalStatus != ReleaseApprovalStatus.Approved)
+        {
+            return PreReleaseAccess.NoneSet;
         }
+
+        if (referenceTime.IsBefore(startTime))
+        {
+            return PreReleaseAccess.Before;
+        }
+
+        return releaseVersion.Live ? PreReleaseAccess.After : PreReleaseAccess.Within;
     }
 }

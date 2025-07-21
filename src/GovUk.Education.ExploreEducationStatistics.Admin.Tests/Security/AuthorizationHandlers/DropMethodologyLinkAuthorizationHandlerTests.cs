@@ -18,11 +18,11 @@ using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockU
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.PublicationRole;
 using static Moq.MockBehavior;
 
-namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers
+namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers;
+
+// ReSharper disable once ClassNeverInstantiated.Global
+public class DropMethodologyLinkAuthorizationHandlerTests
 {
-    // ReSharper disable once ClassNeverInstantiated.Global
-    public class DropMethodologyLinkAuthorizationHandlerTests
-    {
         private static readonly Guid UserId = Guid.NewGuid();
 
         private static readonly PublicationMethodology OwningLink = new()
@@ -199,5 +199,4 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                     userPublicationRoleAndInviteManager ?? Mock.Of<IUserPublicationRoleAndInviteManager>(Strict),
                     Mock.Of<IPreReleaseService>(Strict)));
         }
-    }
 }

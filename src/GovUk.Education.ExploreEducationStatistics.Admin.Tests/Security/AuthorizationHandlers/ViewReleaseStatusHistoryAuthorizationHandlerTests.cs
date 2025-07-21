@@ -14,68 +14,65 @@ using ReleaseVersionRepository = GovUk.Education.ExploreEducationStatistics.Cont
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers;
 
-// ReSharper disable once ClassNeverInstantiated.Global
-public class ViewReleaseStatusHistoryAuthorizationHandlerTests
-{
-    public class ClaimTests
+    // ReSharper disable once ClassNeverInstantiated.Global
+    public class ViewReleaseStatusHistoryAuthorizationHandlerTests
     {
-        [Fact]
-        public async Task ViewReleaseStatusHistoryAuthorizationHandler_ReleaseRoles()
+        public class ClaimTests
         {
-            await AssertHandlerSucceedsWithCorrectClaims<ReleaseVersion, ViewReleaseStatusHistoryRequirement>(
-                CreateHandler,
-                new ReleaseVersion(),
-                AccessAllReleases
-            );
+            [Fact]
+            public async Task ViewReleaseStatusHistoryAuthorizationHandler_ReleaseRoles()
+            {
+                await AssertHandlerSucceedsWithCorrectClaims<ReleaseVersion, ViewReleaseStatusHistoryRequirement>(
+                    CreateHandler,
+                    new ReleaseVersion(),
+                    AccessAllReleases
+                );
+            }
+        }
+
+        public class ReleaseRoleTests
+        {
+            [Fact]
+            public async Task ViewReleaseStatusHistoryAuthorizationHandler_ReleaseRoles()
+            {
+                await AssertReleaseVersionHandlerSucceedsWithCorrectReleaseRoles<ViewReleaseStatusHistoryRequirement>(
+                    CreateHandler,
+                    new ReleaseVersion(),
+                    ReleaseRole.Contributor,
+                    ReleaseRole.Approver
+                );
+            }
+        }
+
+        public class PublicationRoleTests
+        {
+            [Fact]
+            public async Task ViewReleaseStatusHistoryAuthorizationHandler_PublicationRoles()
+            {
+                await AssertReleaseVersionHandlerSucceedsWithCorrectPublicationRoles<ViewReleaseStatusHistoryRequirement>(
+                    CreateHandler,
+                    new ReleaseVersion { Publication = new Publication() },
+                    PublicationRole.Owner,
+                    PublicationRole.Allower
+                );
+            }
+        }
+
+        private static ViewReleaseStatusHistoryAuthorizationHandler CreateHandler(ContentDbContext contentDbContext)
+        {
+            var userRepository = new UserRepository(contentDbContext);
+
+            return new ViewReleaseStatusHistoryAuthorizationHandler(
+                new AuthorizationHandlerService(
+                    releaseVersionRepository: new ReleaseVersionRepository(contentDbContext),
+                    userReleaseRoleAndInviteManager: new UserReleaseRoleAndInviteManager(
+                        contentDbContext: contentDbContext,
+                        userReleaseInviteRepository: new UserReleaseInviteRepository(contentDbContext),
+                        userRepository: userRepository),
+                    userPublicationRoleAndInviteManager: new UserPublicationRoleAndInviteManager(
+                        contentDbContext: contentDbContext,
+                        userPublicationInviteRepository: new UserPublicationInviteRepository(contentDbContext),
+                        userRepository: userRepository),
+                    preReleaseService: Mock.Of<IPreReleaseService>(Strict)));
         }
     }
-
-    public class ReleaseRoleTests
-    {
-        [Fact]
-        public async Task ViewReleaseStatusHistoryAuthorizationHandler_ReleaseRoles()
-        {
-            await AssertReleaseVersionHandlerSucceedsWithCorrectReleaseRoles<ViewReleaseStatusHistoryRequirement>(
-                CreateHandler,
-                new ReleaseVersion(),
-                ReleaseRole.Contributor,
-                ReleaseRole.Approver
-            );
-        }
-    }
-
-    public class PublicationRoleTests
-    {
-        [Fact]
-        public async Task ViewReleaseStatusHistoryAuthorizationHandler_PublicationRoles()
-        {
-            await AssertReleaseVersionHandlerSucceedsWithCorrectPublicationRoles<ViewReleaseStatusHistoryRequirement>(
-                CreateHandler,
-                new ReleaseVersion
-                {
-                    Publication = new Publication()
-                },
-                PublicationRole.Owner,
-                PublicationRole.Allower
-            );
-        }
-    }
-
-    private static ViewReleaseStatusHistoryAuthorizationHandler CreateHandler(ContentDbContext contentDbContext)
-    {
-        var userRepository = new UserRepository(contentDbContext);
-
-        return new ViewReleaseStatusHistoryAuthorizationHandler(
-            new AuthorizationHandlerService(
-                releaseVersionRepository: new ReleaseVersionRepository(contentDbContext),
-                userReleaseRoleAndInviteManager: new UserReleaseRoleAndInviteManager(
-                    contentDbContext: contentDbContext,
-                    userReleaseInviteRepository: new UserReleaseInviteRepository(contentDbContext),
-                    userRepository: userRepository),
-                userPublicationRoleAndInviteManager: new UserPublicationRoleAndInviteManager(
-                    contentDbContext: contentDbContext,
-                    userPublicationInviteRepository: new UserPublicationInviteRepository(contentDbContext),
-                    userRepository: userRepository),
-                preReleaseService: Mock.Of<IPreReleaseService>(Strict)));
-    }
-}

@@ -6,17 +6,16 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces
-{
-    public interface IBoundaryLevelRepository
-    {
-        Task<BoundaryLevel> CreateBoundaryLevel(
-            GeographicLevel level,
-            string label,
-            DateTime published,
-            FeatureCollection featureCollection,
-            CancellationToken cancellationToken = default);
+namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 
-        IEnumerable<BoundaryLevel> FindByGeographicLevels(IEnumerable<GeographicLevel> geographicLevels);
-    }
+public interface IBoundaryLevelRepository
+{
+    Task<BoundaryLevel> CreateBoundaryLevel(
+        GeographicLevel level,
+        string label,
+        DateTime published,
+        FeatureCollection featureCollection,
+        CancellationToken cancellationToken = default);
+
+    IEnumerable<BoundaryLevel> FindByGeographicLevels(IEnumerable<GeographicLevel> geographicLevels);
 }

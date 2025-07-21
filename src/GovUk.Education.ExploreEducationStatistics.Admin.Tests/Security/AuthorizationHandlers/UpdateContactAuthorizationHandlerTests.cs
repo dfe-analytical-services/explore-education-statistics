@@ -33,7 +33,8 @@ public class UpdateContactAuthorizationHandlerTests
     public async Task CanUpdateAllContactAuthorizationHandler_SucceedsWithPublicationOwner()
     {
         await AssertPublicationHandlerSucceedsWithPublicationRoles<UpdateContactRequirement>(
-            CreateHandler, Owner);
+            CreateHandler,
+            Owner);
     }
 
     private static UpdateContactAuthorizationHandler CreateHandler(ContentDbContext contentDbContext)

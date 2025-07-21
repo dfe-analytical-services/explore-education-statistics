@@ -5,44 +5,43 @@ using Microsoft.AspNetCore.Authorization;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers.AuthorizationHandlerService;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 
-namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers
+namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers;
+
+public class ViewReleaseStatusHistoryRequirement : IAuthorizationRequirement
 {
-    public class ViewReleaseStatusHistoryRequirement : IAuthorizationRequirement
+}
+
+public class ViewReleaseStatusHistoryAuthorizationHandler
+    : AuthorizationHandler<ViewReleaseStatusHistoryRequirement, ReleaseVersion>
+{
+    private readonly AuthorizationHandlerService _authorizationHandlerService;
+
+    public ViewReleaseStatusHistoryAuthorizationHandler(
+        AuthorizationHandlerService authorizationHandlerService)
     {
+        _authorizationHandlerService = authorizationHandlerService;
     }
 
-    public class ViewReleaseStatusHistoryAuthorizationHandler
-        : AuthorizationHandler<ViewReleaseStatusHistoryRequirement, ReleaseVersion>
+    protected override async Task HandleRequirementAsync(
+        AuthorizationHandlerContext context,
+        ViewReleaseStatusHistoryRequirement requirement,
+        ReleaseVersion releaseVersion)
     {
-        private readonly AuthorizationHandlerService _authorizationHandlerService;
-
-        public ViewReleaseStatusHistoryAuthorizationHandler(
-            AuthorizationHandlerService authorizationHandlerService)
+        if (SecurityUtils.HasClaim(context.User, SecurityClaimTypes.AccessAllReleases))
         {
-            _authorizationHandlerService = authorizationHandlerService;
+            context.Succeed(requirement);
+            return;
         }
-
-        protected override async Task HandleRequirementAsync(
-            AuthorizationHandlerContext context,
-            ViewReleaseStatusHistoryRequirement requirement,
-            ReleaseVersion releaseVersion)
+        
+        if (await _authorizationHandlerService
+                .HasRolesOnPublicationOrReleaseVersion(
+                    context.User.GetUserId(),
+                    releaseVersion.PublicationId,
+                    releaseVersion.Id,
+                    ListOf(PublicationRole.Owner, PublicationRole.Allower),
+                    UnrestrictedReleaseViewerRoles))
         {
-            if (SecurityUtils.HasClaim(context.User, SecurityClaimTypes.AccessAllReleases))
-            {
-                context.Succeed(requirement);
-                return;
-            }
-            
-            if (await _authorizationHandlerService
-                    .HasRolesOnPublicationOrReleaseVersion(
-                        context.User.GetUserId(),
-                        releaseVersion.PublicationId,
-                        releaseVersion.Id,
-                        ListOf(PublicationRole.Owner, PublicationRole.Allower),
-                        UnrestrictedReleaseViewerRoles))
-            {
-                context.Succeed(requirement);
-            }
+            context.Succeed(requirement);
         }
     }
 }

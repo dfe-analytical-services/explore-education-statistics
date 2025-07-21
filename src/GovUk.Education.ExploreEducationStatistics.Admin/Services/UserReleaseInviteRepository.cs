@@ -12,9 +12,11 @@ using Guid = System.Guid;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services;
 
+
 public class UserReleaseInviteRepository(ContentDbContext contentDbContext) : IUserReleaseInviteRepository
 {
-    public async Task Create(Guid releaseVersionId,
+    public async Task Create(
+        Guid releaseVersionId,
         string email,
         ReleaseRole releaseRole,
         bool emailSent,
@@ -36,7 +38,8 @@ public class UserReleaseInviteRepository(ContentDbContext contentDbContext) : IU
         await contentDbContext.SaveChangesAsync();
     }
 
-    public async Task CreateManyIfNotExists(List<Guid> releaseVersionIds,
+    public async Task CreateManyIfNotExists(
+        List<Guid> releaseVersionIds,
         string email,
         ReleaseRole releaseRole,
         bool emailSent,
@@ -62,7 +65,8 @@ public class UserReleaseInviteRepository(ContentDbContext contentDbContext) : IU
         await contentDbContext.SaveChangesAsync();
     }
 
-    public async Task<bool> UserHasInvite(Guid releaseVersionId,
+    public async Task<bool> UserHasInvite(
+        Guid releaseVersionId,
         string email,
         ReleaseRole role)
     {
@@ -75,7 +79,8 @@ public class UserReleaseInviteRepository(ContentDbContext contentDbContext) : IU
                 && i.Role == role);
     }
 
-    public async Task<bool> UserHasInvites(List<Guid> releaseVersionIds,
+    public async Task<bool> UserHasInvites(
+        List<Guid> releaseVersionIds,
         string email,
         ReleaseRole role)
     {

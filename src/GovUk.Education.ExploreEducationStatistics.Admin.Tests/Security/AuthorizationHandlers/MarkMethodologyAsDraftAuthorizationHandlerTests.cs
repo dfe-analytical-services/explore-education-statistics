@@ -21,11 +21,11 @@ using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockU
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.PublicationRole;
 using static Moq.MockBehavior;
 
-namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers
+namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers;
+
+// ReSharper disable once ClassNeverInstantiated.Global
+public class MarkMethodologyAsDraftAuthorizationHandlerTests
 {
-    // ReSharper disable once ClassNeverInstantiated.Global
-    public class MarkMethodologyAsDraftAuthorizationHandlerTests
-    {
         private static readonly DataFixture DataFixture = new();
 
         private static readonly Guid UserId = Guid.NewGuid();
@@ -433,5 +433,4 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                 userPublicationRoleAndInviteManager
             );
         }
-    }
 }

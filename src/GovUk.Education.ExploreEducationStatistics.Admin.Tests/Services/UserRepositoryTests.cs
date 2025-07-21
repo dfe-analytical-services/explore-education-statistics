@@ -6,10 +6,10 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 
-namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
+namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services;
+
+public class UserRepositoryTests
 {
-    public class UserRepositoryTests
-    {
         [Fact]
         public async Task FindByEmail()
         {
@@ -106,5 +106,4 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         {
             return new(contentDbContext);
         }
-    }
 }

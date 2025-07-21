@@ -1,34 +1,33 @@
 using GovUk.Education.ExploreEducationStatistics.Common.Database;
 
-namespace GovUk.Education.ExploreEducationStatistics.Common.Model
+namespace GovUk.Education.ExploreEducationStatistics.Common.Model;
+
+public enum TimeIdentifierCategory
 {
-    public enum TimeIdentifierCategory
-    {
-        [EnumLabelValue("Academic year")]
-        AcademicYear,
+    [EnumLabelValue("Academic year")]
+    AcademicYear,
 
-        [EnumLabelValue("Calendar year")]
-        CalendarYear,
+    [EnumLabelValue("Calendar year")]
+    CalendarYear,
 
-        [EnumLabelValue("Financial year")]
-        FinancialYear,
+    [EnumLabelValue("Financial year")]
+    FinancialYear,
 
-        [EnumLabelValue("Tax year")]
-        TaxYear,
+    [EnumLabelValue("Tax year")]
+    TaxYear,
 
-        [EnumLabelValue("Reporting year")]
-        ReportingYear,
+    [EnumLabelValue("Reporting year")]
+    ReportingYear,
 
-        [EnumLabelValue("Term")]
-        Term,
+    [EnumLabelValue("Term")]
+    Term,
 
-        [EnumLabelValue("Month")]
-        Month,
+    [EnumLabelValue("Month")]
+    Month,
 
-        [EnumLabelValue("Week")]
-        Week,
+    [EnumLabelValue("Week")]
+    Week,
 
-        [EnumLabelValue("Financial year part")]
-        FinancialYearPart,
-    }
+    [EnumLabelValue("Financial year part")]
+    FinancialYearPart,
 }

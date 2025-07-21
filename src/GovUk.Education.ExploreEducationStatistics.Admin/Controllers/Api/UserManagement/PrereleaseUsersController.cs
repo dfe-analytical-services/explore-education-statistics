@@ -5,26 +5,25 @@ using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.UserManagement
+namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.UserManagement;
+
+[Route("api")]
+[ApiController]
+[Authorize(Policy = "CanManageUsersOnSystem")]
+public class PrereleaseUsersController : ControllerBase
 {
-    [Route("api")]
-    [ApiController]
-    [Authorize(Policy = "CanManageUsersOnSystem")]
-    public class PrereleaseUsersController : ControllerBase
+    private readonly IUserManagementService _userManagementService;
+
+    public PrereleaseUsersController(IUserManagementService userManagementService)
     {
-        private readonly IUserManagementService _userManagementService;
+        _userManagementService = userManagementService;
+    }
 
-        public PrereleaseUsersController(IUserManagementService userManagementService)
-        {
-            _userManagementService = userManagementService;
-        }
-
-        [HttpGet("user-management/pre-release")]
-        [ProducesResponseType(200)]
-        [ProducesResponseType(404)]
-        public async Task<ActionResult<List<UserViewModel>>> GetPreReleaseUserList()
-        {
-            return await _userManagementService.ListPreReleaseUsersAsync();
-        }
+    [HttpGet("user-management/pre-release")]
+    [ProducesResponseType(200)]
+    [ProducesResponseType(404)]
+    public async Task<ActionResult<List<UserViewModel>>> GetPreReleaseUserList()
+    {
+        return await _userManagementService.ListPreReleaseUsersAsync();
     }
 }

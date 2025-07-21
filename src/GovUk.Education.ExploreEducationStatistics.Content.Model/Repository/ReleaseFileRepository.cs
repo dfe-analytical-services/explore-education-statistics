@@ -12,8 +12,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
 
-namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository
-{
+namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository;
+
     public class ReleaseFileRepository : IReleaseFileRepository
     {
         private readonly ContentDbContext _contentDbContext;
@@ -176,4 +176,3 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository
                         .ToValueTuple());
         }
     }
-}
