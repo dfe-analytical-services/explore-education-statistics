@@ -221,7 +221,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
             await publicBlobStorageService.UploadStream(
                 containerName: PublicReleaseFiles,
                 path: releaseVersion.AllFilesZipPath(),
-                stream: fileStream,
+                sourceStream: fileStream,
                 contentType: MediaTypeNames.Application.Zip,
                 cancellationToken: cancellationToken
             );

@@ -1,32 +1,33 @@
 #nullable enable
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
-using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
+using GovUk.Education.ExploreEducationStatistics.Common.Validators;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.IO.Compression;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainers;
+using File = GovUk.Education.ExploreEducationStatistics.Content.Model.File;
 using Unit = GovUk.Education.ExploreEducationStatistics.Common.Model.Unit;
+using ValidationMessages = GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationMessages;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 {
@@ -216,10 +217,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
-        public async Task<Either<ActionResult, List<DataSetUploadResultViewModel>>> Upload(
-            Guid releaseVersionId,
-            IFormFile dataFormFile,
-            IFormFile metaFormFile,
+        public async Task<Either<ActionResult, List<DataSetUploadResultViewModel>>> Upload(Guid releaseVersionId,
+            IManagedStreamFile dataFile,
+            IManagedStreamFile metaFile,
             string dataSetTitle,
             Guid? replacingFileId,
             CancellationToken cancellationToken)
@@ -232,17 +232,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     return await persistenceHelper
                         .CheckOptionalEntityExists<File>(replacingFileId)
                         .OnSuccess(async replacingFile
-                            => await ValidateDataSetCsvPair(releaseVersionId, dataFormFile, metaFormFile, dataSetTitle, replacingFile))
+                            => await ValidateDataSetCsvPair(
+                                releaseVersionId,
+                                dataFile,
+                                metaFile,
+                                dataSetTitle,
+                                replacingFile))
                         .OnSuccess(async dataSet
-                            => await dataSetFileStorage.UploadDataSetsToTemporaryStorage(releaseVersionId, [dataSet], cancellationToken));
+                            => await dataSetFileStorage.UploadDataSetsToTemporaryStorage(
+                                releaseVersionId,
+                                [dataSet],
+                                cancellationToken));
                 });
         }
 
         // TODO (EES-6176): Remove once manual replacement process has been consolidated to use Upload
-        public async Task<Either<ActionResult, DataFileInfo>> UploadForReplacement(
-            Guid releaseVersionId,
-            IFormFile dataFormFile,
-            IFormFile metaFormFile,
+        public async Task<Either<ActionResult, DataFileInfo>> UploadForReplacement(Guid releaseVersionId,
+            IManagedStreamFile dataFile,
+            IManagedStreamFile metaFile,
             string dataSetTitle,
             Guid? replacingFileId,
             CancellationToken cancellationToken)
@@ -255,15 +262,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     return await persistenceHelper
                         .CheckOptionalEntityExists<File>(replacingFileId)
                         .OnSuccess(async replacingFile
-                            => await ValidateDataSetCsvPair(releaseVersionId, dataFormFile, metaFormFile, dataSetTitle, replacingFile, performAutoReplacement: true))
+                            => await ValidateDataSetCsvPair(
+                                releaseVersionId,
+                                dataFile,
+                                metaFile,
+                                dataSetTitle,
+                                replacingFile,
+                                performAutoReplacement: true))
                         .OnSuccess(async dataSet
-                            => await dataSetFileStorage.UploadDataSet(releaseVersionId, dataSet, cancellationToken));
+                            => await dataSetFileStorage.UploadDataSet(
+                                releaseVersionId,
+                                dataSet,
+                                cancellationToken));
                 });
         }
 
         public async Task<Either<ActionResult, List<DataSetUploadResultViewModel>>> UploadFromZip(
             Guid releaseVersionId,
-            IFormFile zipFormFile,
+            IManagedStreamZipFile zipFile,
             string dataSetTitle,
             Guid? replacingFileId,
             CancellationToken cancellationToken)
@@ -276,16 +292,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     return await persistenceHelper
                         .CheckOptionalEntityExists<File>(replacingFileId)
                         .OnSuccess(async replacingFile
-                            => await ValidateDataSetZip(releaseVersionId, zipFormFile, dataSetTitle, replacingFile))
+                            => await ValidateDataSetZip(
+                                releaseVersionId,
+                                zipFile,
+                                dataSetTitle,
+                                replacingFile))
                         .OnSuccess(async dataSet
-                            => await dataSetFileStorage.UploadDataSetsToTemporaryStorage(releaseVersionId, [dataSet], cancellationToken));
+                            => await dataSetFileStorage.UploadDataSetsToTemporaryStorage(
+                                releaseVersionId,
+                                [dataSet],
+                                cancellationToken));
                 });
         }
 
         // TODO (EES-6176): Remove once manual replacement process has been consolidated to use UploadFromZip
         public async Task<Either<ActionResult, DataFileInfo>> UploadFromZipForReplacement(
             Guid releaseVersionId,
-            IFormFile zipFormFile,
+            IManagedStreamZipFile zipFile,
             string dataSetTitle,
             Guid? replacingFileId,
             CancellationToken cancellationToken)
@@ -298,47 +321,64 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     return await persistenceHelper
                         .CheckOptionalEntityExists<File>(replacingFileId)
                         .OnSuccess(async replacingFile
-                            => await ValidateDataSetZip(releaseVersionId, zipFormFile, dataSetTitle, replacingFile, performAutoReplacement: true))
+                            => await ValidateDataSetZip(
+                                releaseVersionId,
+                                zipFile,
+                                dataSetTitle,
+                                replacingFile,
+                                performAutoReplacement: true))
                         .OnSuccess(async dataSet
-                            => await dataSetFileStorage.UploadDataSet(releaseVersionId, dataSet, cancellationToken));
+                            => await dataSetFileStorage.UploadDataSet(
+                                releaseVersionId,
+                                dataSet,
+                                cancellationToken));
                 });
         }
 
         public async Task<Either<ActionResult, List<DataSetUploadResultViewModel>>> UploadFromBulkZip(
             Guid releaseVersionId,
-            IFormFile zipFormFile,
+            IManagedStreamZipFile zipFile,
             CancellationToken cancellationToken)
         {
             return await persistenceHelper
                 .CheckEntityExists<ReleaseVersion>(releaseVersionId)
                 .OnSuccess(userService.CheckCanUpdateReleaseVersion)
                 .OnSuccess(async _
-                    => await ValidateBulkDataSetZip(releaseVersionId, zipFormFile))
+                    => await ValidateBulkDataSetZip(
+                        releaseVersionId,
+                        zipFile))
                 .OnSuccess(async dataSets
-                    => await dataSetFileStorage.UploadDataSetsToTemporaryStorage(releaseVersionId, dataSets, cancellationToken));
+                    => await dataSetFileStorage.UploadDataSetsToTemporaryStorage(
+                        releaseVersionId,
+                        dataSets,
+                        cancellationToken));
         }
 
         private async Task<Either<ActionResult, DataSet>> ValidateDataSetCsvPair(
             Guid releaseVersionId,
-            IFormFile dataFormFile,
-            IFormFile metaFormFile,
+            IManagedStreamFile dataFile,
+            IManagedStreamFile metaFile,
             string dataSetTitle,
             File? replacingFile,
             bool performAutoReplacement = false)
         {
-            var dataFile = await BuildDataSetFile(dataFormFile);
-            var metaFile = await BuildDataSetFile(metaFormFile);
-            return await ValidateAndBuildDataSet(releaseVersionId, dataFile, metaFile, dataSetTitle, replacingFile, performAutoReplacement);
+            return await ValidateAndBuildDataSet(
+                releaseVersionId,
+                BuildDataSetFile(dataFile),
+                BuildDataSetFile(metaFile),
+                dataSetTitle,
+                replacingFile,
+                performAutoReplacement);
         }
 
         private async Task<Either<ActionResult, DataSet>> ValidateDataSetZip(
             Guid releaseVersionId,
-            IFormFile zipFormFile,
+            IManagedStreamZipFile zipFile,
             string dataSetTitle,
             File? replacingFile,
             bool performAutoReplacement = false)
         {
-            var dataSetFiles = await ExtractDataSetZipFile(zipFormFile);
+            var dataSetFiles = ExtractDataSetZipFile(zipFile);
 
             var dataFile = dataSetFiles.FirstOrDefault(file => !file.FileName.EndsWith(".meta.csv"));
             var metaFile = dataSetFiles.FirstOrDefault(file => file.FileName.EndsWith(".meta.csv"));
@@ -368,20 +408,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             var validationResult = await dataSetValidator.ValidateDataSet(dataSet, performAutoReplacement);
 
             return validationResult.IsLeft
-                ? Common.Validators.ValidationUtils.ValidationResult(validationResult.Left)
+                ? ValidationUtils.ValidationResult(validationResult.Left)
                 : validationResult.Right;
         }
 
         private async Task<Either<ActionResult, List<DataSet>>> ValidateBulkDataSetZip(
             Guid releaseVersionId,
-            IFormFile zipFormFile)
+            IManagedStreamZipFile zipFile)
         {
-            var dataSetFiles = await ExtractDataSetZipFile(zipFormFile);
+            var dataSetFiles = ExtractDataSetZipFile(zipFile);
 
             var indexFile = dataSetFiles.FirstOrDefault(dsf => dsf.FileName == "dataset_names.csv");
             if (indexFile is null)
             {
-                return Common.Validators.ValidationUtils.ValidationResult(ValidationMessages.GenerateErrorBulkDataZipMustContainDataSetNamesCsv());
+                return ValidationUtils.ValidationResult(ValidationMessages
+                    .GenerateErrorBulkDataZipMustContainDataSetNamesCsv());
             }
 
             dataSetFiles.Remove(indexFile);
@@ -395,7 +436,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
             if (errors.Count > 0)
             {
-                return Common.Validators.ValidationUtils.ValidationResult(errors);
+                return ValidationUtils.ValidationResult(errors);
             }
 
             var dataSets = new List<DataSet>();
@@ -407,7 +448,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             }
 
             return errors.Count > 0
-                ? Common.Validators.ValidationUtils.ValidationResult(errors)
+                ? ValidationUtils.ValidationResult(errors)
                 : dataSets;
         }
 
@@ -431,42 +472,32 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return dataSets;
         }
 
-        private static async Task<List<FileDto>> ExtractDataSetZipFile(IFormFile zipFile)
+        private static List<FileDto> ExtractDataSetZipFile(IManagedStreamZipFile zipFile)
         {
-            await using var stream = zipFile.OpenReadStream();
-            using var archive = new ZipArchive(stream);
-
-            var files = new List<FileDto>();
-
-            foreach (var entry in archive.Entries)
-            {
-                using var fileStream = entry.Open();
-                files.Add(await BuildDataSetFile(fileStream, entry.Name));
-            }
-
-            return files;
+            return zipFile
+                .GetEntries()
+                .Select(entry => BuildDataSetFile(entry.Open, entry.Name, entry.Length))
+                .ToList();
         }
 
-        private static async Task<FileDto> BuildDataSetFile(IFormFile formFile)
+        private static FileDto BuildDataSetFile(IManagedStreamFile file)
         {
-            using var fileStream = formFile.OpenReadStream();
-            return await BuildDataSetFile(fileStream, formFile.FileName);
+            return BuildDataSetFile(
+                file.OpenStream,
+                file.Name,
+                file.Length);
         }
 
-        private static async Task<FileDto> BuildDataSetFile(
-            System.IO.Stream fileStream,
-            string fileName)
+        private static FileDto BuildDataSetFile(
+            Func<Stream> fileStreamProvider,
+            string fileName,
+            long fileSize)
         {
-            var memoryStream = new System.IO.MemoryStream();
-            await fileStream.CopyToAsync(memoryStream);
-
-            memoryStream.SeekToBeginning();
-
             return new FileDto
             {
                 FileName = fileName,
-                FileSize = memoryStream.Length,
-                FileStream = memoryStream,
+                FileSize = fileSize,
+                FileStreamProvider = fileStreamProvider,
             };
         }
 

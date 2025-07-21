@@ -123,9 +123,9 @@ public class DataSetFileStorageTests
                 .Setup(mock => mock.UploadStream(
                     It.IsAny<IBlobContainer>(),
                     It.IsAny<string>(),
-                    It.IsAny<MemoryStream>(),
+                    It.IsAny<Stream>(),
                     It.IsAny<string>(),
-                    null,
+                    ContentEncodings.Gzip,
                     It.IsAny<CancellationToken>()))
                 .Returns(Task.CompletedTask);
 
@@ -218,9 +218,9 @@ public class DataSetFileStorageTests
             .Setup(mock => mock.UploadStream(
                 It.IsAny<IBlobContainer>(),
                 It.IsAny<string>(),
-                It.IsAny<MemoryStream>(),
+                It.IsAny<Stream>(),
                 It.IsAny<string>(),
-                null,
+                ContentEncodings.Gzip,
                 It.IsAny<CancellationToken>()))
             .Returns(Task.CompletedTask);
 

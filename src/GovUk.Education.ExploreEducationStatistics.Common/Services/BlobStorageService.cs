@@ -1,4 +1,11 @@
 #nullable enable
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.IO.Compression;
+using System.Net.Mime;
+using System.Threading;
+using System.Threading.Tasks;
 using Azure;
 using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
@@ -15,12 +22,6 @@ using Microsoft.Azure.Storage.Blob;
 using Microsoft.Azure.Storage.DataMovement;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Net.Mime;
-using System.Threading;
-using System.Threading.Tasks;
 using BlobInfo = GovUk.Education.ExploreEducationStatistics.Common.Model.BlobInfo;
 using BlobProperties = Azure.Storage.Blobs.Models.BlobProperties;
 using CopyStatus = Azure.Storage.Blobs.Models.CopyStatus;
@@ -303,7 +304,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
         public async Task UploadStream(
             IBlobContainer containerName,
             string path,
-            Stream stream,
+            Stream sourceStream,
             string contentType,
             string? contentEncoding = null,
             CancellationToken cancellationToken = default)
@@ -312,6 +313,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
 
             _logger.LogInformation("Uploading text to blob {containerName}/{path}", containerName, path);
 
+            sourceStream.SeekToBeginning();
+
             var httpHeaders = new BlobHttpHeaders
             {
                 ContentEncoding = contentEncoding,
@@ -319,25 +322,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             };
 
             var compress = contentEncoding != null;
+            
             if (compress)
             {
-                await using var targetStream = new MemoryStream();
-                await CompressionUtils.CompressToStream(
-                    stream: stream,
-                    targetStream: targetStream,
-                    contentEncoding: contentEncoding!,
+                await using var blobStream = await blob.OpenWriteAsync(
+                    overwrite: true,
+                    options: new BlobOpenWriteOptions { HttpHeaders = httpHeaders },
                     cancellationToken: cancellationToken);
-                await blob.UploadAsync(
-                    content: targetStream,
-                    httpHeaders: httpHeaders,
-                    cancellationToken: cancellationToken
-                );
+
+                await using var compressionStream = CompressionUtils.GetCompressionStream(
+                    targetStream: blobStream,
+                    contentEncoding: contentEncoding!,
+                    compressionMode: CompressionMode.Compress);
+
+                await sourceStream.CopyToAsync(compressionStream, cancellationToken);
             }
             else
             {
-                stream.SeekToBeginning();
                 await blob.UploadAsync(
-                    content: stream,
+                    content: sourceStream,
                     httpHeaders: httpHeaders,
                     cancellationToken: cancellationToken
                 );
@@ -360,7 +363,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             await UploadStream(
                 containerName: containerName,
                 path: path,
-                stream: stream,
+                sourceStream: stream,
                 contentEncoding: contentEncoding,
                 contentType: MediaTypeNames.Application.Json,
                 cancellationToken: cancellationToken);
@@ -418,7 +421,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
 
             try
             {
-                return await blob.OpenReadAsync(bufferSize: bufferSize, cancellationToken: cancellationToken);
+                var blobStream = await blob.OpenReadAsync(cancellationToken: cancellationToken);
+
+                BlobProperties blobProperties =
+                    await blob.GetPropertiesAsync(cancellationToken: cancellationToken);
+
+                // Check the ContentEncoding property to determine if the blob
+                // is compressed and only decompress if necessary.
+                if (blobProperties.ContentEncoding.IsNullOrEmpty())
+                {
+                    return blobStream;
+                }
+
+                return CompressionUtils.GetCompressionStream(
+                    targetStream: blobStream,
+                    contentEncoding: blobProperties.ContentEncoding!,
+                    compressionMode: CompressionMode.Decompress);
             }
             catch (RequestFailedException exception)
             {
@@ -529,7 +547,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             var filesTransferred = new List<BlobInfo>();
 
             var context = new DirectoryTransferContext();
-            context.FileTransferred += (sender, args) => FileTransferredCallback(sender, args, filesTransferred);
+            context.FileTransferred += (_, args) => FileTransferredCallback(args, filesTransferred);
             context.FileFailed += FileFailedCallback;
             context.FileSkipped += FileSkippedCallback;
             context.SetAttributesCallbackAsync += options?.SetAttributesCallbackAsync;
@@ -573,7 +591,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
         }
 
         private void FileTransferredCallback(
-            object sender,
             TransferEventArgs e,
             ICollection<BlobInfo> allFilesStream)
         {

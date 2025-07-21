@@ -44,7 +44,7 @@ public class DataSetFileBuilder
             {
                 FileName = _fileName,
                 FileSize = memoryStream.Length,
-                FileStream = memoryStream,
+                FileStreamProvider = () => memoryStream,
             };
     }
 

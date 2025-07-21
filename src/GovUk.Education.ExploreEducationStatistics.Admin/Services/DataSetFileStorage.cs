@@ -63,7 +63,7 @@ public class DataSetFileStorage(
             releaseVersionId,
             subjectId,
             dataSet.DataFile.FileName,
-            contentLength: dataSet.DataFile.FileStream.Length,
+            contentLength: dataSet.DataFile.FileSize,
             type: FileType.Data,
             createdById: userService.GetUserId(),
             name: dataSet.Title,
@@ -82,7 +82,7 @@ public class DataSetFileStorage(
             releaseVersionId,
             subjectId,
             dataSet.MetaFile.FileName,
-            contentLength: dataSet.MetaFile.FileStream.Length,
+            contentLength: dataSet.MetaFile.FileSize,
             type: FileType.Metadata,
             createdById: userService.GetUserId());
 
@@ -169,19 +169,18 @@ public class DataSetFileStorage(
         await privateBlobStorageService.UploadStream(
             containerName: PrivateReleaseFiles,
             dataFilePath,
-            dataSet.DataFile.FileStream,
+            dataSet.DataFile.FileStreamProvider(),
             contentType: ContentTypes.Csv,
+            contentEncoding: ContentEncodings.Gzip,
             cancellationToken: cancellationToken);
 
         await privateBlobStorageService.UploadStream(
             containerName: PrivateReleaseFiles,
             metaFilePath,
-            dataSet.MetaFile.FileStream,
+            dataSet.MetaFile.FileStreamProvider(),
             contentType: ContentTypes.Csv,
+            contentEncoding: ContentEncodings.Gzip,
             cancellationToken: cancellationToken);
-
-        await dataSet.DataFile.FileStream.DisposeAsync();
-        await dataSet.MetaFile.FileStream.DisposeAsync();
     }
 
     public async Task<List<DataSetUploadResultViewModel>> UploadDataSetsToTemporaryStorage(
@@ -228,19 +227,18 @@ public class DataSetFileStorage(
         await privateBlobStorageService.UploadStream(
             containerName: PrivateReleaseTempFiles,
             path: dataFilePath,
-            stream: dataSet.DataFile.FileStream,
+            sourceStream: dataSet.DataFile.FileStreamProvider(),
             contentType: ContentTypes.Csv,
+            contentEncoding: ContentEncodings.Gzip,
             cancellationToken: cancellationToken);
 
         await privateBlobStorageService.UploadStream(
             containerName: PrivateReleaseTempFiles,
             path: metaFilePath,
-            stream: dataSet.MetaFile.FileStream,
+            sourceStream: dataSet.MetaFile.FileStreamProvider(),
             contentType: ContentTypes.Csv,
+            contentEncoding: ContentEncodings.Gzip,
             cancellationToken: cancellationToken);
-
-        await dataSet.DataFile.FileStream.DisposeAsync();
-        await dataSet.MetaFile.FileStream.DisposeAsync();
 
         return new DataSetUploadResult
         {

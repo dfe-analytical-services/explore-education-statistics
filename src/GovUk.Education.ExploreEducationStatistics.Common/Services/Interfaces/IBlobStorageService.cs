@@ -50,7 +50,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces
         public Task UploadStream(
             IBlobContainer containerName,
             string path,
-            Stream stream,
+            Stream sourceStream,
             string contentType,
             string? contentEncoding = null,
             CancellationToken cancellationToken = default);
