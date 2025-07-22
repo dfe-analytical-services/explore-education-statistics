@@ -136,14 +136,11 @@ export default function DataSetFilePage({
     if (
       !apiDataSetVersionChanges ||
       (!Object.keys(apiDataSetVersionChanges.majorChanges).length &&
-        !Object.keys(apiDataSetVersionChanges.minorChanges).length) ||
-      (apiDataSetVersionChanges.patchHistory &&
-        apiDataSetVersionChanges.patchHistory.every(
-          change =>
-            !change ||
-            (!Object.keys(change.majorChanges).length &&
-              !Object.keys(change.minorChanges).length),
-        ))
+        !Object.keys(apiDataSetVersionChanges.minorChanges).length &&
+        (!apiDataSetVersionChanges.patchHistory ||
+          apiDataSetVersionChanges.patchHistory.every(
+            change => !change || !Object.keys(change.minorChanges).length,
+          )))
     ) {
       sections = omit(sections, 'apiChangelog');
     }

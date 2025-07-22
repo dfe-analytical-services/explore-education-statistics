@@ -6,6 +6,9 @@ describe('DataSetFileApiChangelog', () => {
     render(
       <DataSetFileApiChangelog
         changes={{
+          versionNumber: { major: 1, minor: 0, patch: 0 },
+          notes: '',
+          patchHistory: [],
           majorChanges: {
             filters: [
               {
@@ -65,6 +68,9 @@ describe('DataSetFileApiChangelog', () => {
     render(
       <DataSetFileApiChangelog
         changes={{
+          versionNumber: { major: 1, minor: 0, patch: 0 },
+          notes: '',
+          patchHistory: [],
           majorChanges: {
             filters: [
               {
@@ -97,6 +103,9 @@ describe('DataSetFileApiChangelog', () => {
     render(
       <DataSetFileApiChangelog
         changes={{
+          versionNumber: { major: 1, minor: 0, patch: 0 },
+          notes: '',
+          patchHistory: [],
           majorChanges: {},
           minorChanges: {
             filters: [
@@ -129,6 +138,9 @@ describe('DataSetFileApiChangelog', () => {
     render(
       <DataSetFileApiChangelog
         changes={{
+          versionNumber: { major: 1, minor: 0, patch: 0 },
+          notes: '',
+          patchHistory: [],
           majorChanges: {},
           minorChanges: {
             filters: [
@@ -155,6 +167,9 @@ describe('DataSetFileApiChangelog', () => {
     render(
       <DataSetFileApiChangelog
         changes={{
+          versionNumber: { major: 1, minor: 0, patch: 0 },
+          notes: '',
+          patchHistory: [],
           majorChanges: {},
           minorChanges: {},
         }}
