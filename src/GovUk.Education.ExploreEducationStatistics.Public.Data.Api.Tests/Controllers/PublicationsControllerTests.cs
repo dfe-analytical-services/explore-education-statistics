@@ -1,10 +1,12 @@
 using System.Net;
+using GovUk.Education.ExploreEducationStatistics.Analytics.Common.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Requests;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Strategies;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Analytics;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Fixture;
@@ -274,11 +276,7 @@ public abstract class PublicationsControllerTests(TestApplicationFactory testApp
 
             public void Dispose()
             {
-                var analyticsCapturePath = _analyticsPathResolver.PublicApiTopLevelCallsDirectoryPath();
-                if (Directory.Exists(analyticsCapturePath))
-                {
-                    Directory.Delete(analyticsCapturePath, recursive: true);
-                }
+                _analyticsPathResolver.Dispose();
             }
 
             [Fact]
@@ -309,7 +307,7 @@ public abstract class PublicationsControllerTests(TestApplicationFactory testApp
                 
                 await AnalyticsTestAssertions.AssertTopLevelAnalyticsCallCaptured(
                     expectedType: TopLevelCallType.GetPublications,
-                    expectedAnalyticsPath: _analyticsPathResolver.PublicApiTopLevelCallsDirectoryPath(),
+                    expectedAnalyticsPath: _analyticsPathResolver.BuildOutputDirectory(AnalyticsWriteTopLevelCallsStrategy.OutputSubPaths),
                     expectedParameters: new PaginationParameters(Page: 1, PageSize: 10));
             }
             
@@ -342,7 +340,7 @@ public abstract class PublicationsControllerTests(TestApplicationFactory testApp
                 response.AssertOk<PublicationPaginatedListViewModel>(useSystemJson: true);
 
                 AnalyticsTestAssertions.AssertAnalyticsCallNotCaptured(
-                    _analyticsPathResolver.PublicApiTopLevelCallsDirectoryPath());
+                    _analyticsPathResolver.BuildOutputDirectory(AnalyticsWriteTopLevelCallsStrategy.OutputSubPaths));
             }
         }
 
@@ -483,11 +481,7 @@ public abstract class PublicationsControllerTests(TestApplicationFactory testApp
 
             public void Dispose()
             {
-                var analyticsCapturePath = _analyticsPathResolver.PublicApiPublicationCallsDirectoryPath();
-                if (Directory.Exists(analyticsCapturePath))
-                {
-                    Directory.Delete(analyticsCapturePath, recursive: true);
-                }
+                _analyticsPathResolver.Dispose();
             }
 
             [Fact]
@@ -516,7 +510,7 @@ public abstract class PublicationsControllerTests(TestApplicationFactory testApp
                     publicationId: publication.Id,
                     publicationTitle: publication.Title,
                     expectedType: PublicationCallType.GetSummary,
-                    expectedAnalyticsPath: _analyticsPathResolver.PublicApiPublicationCallsDirectoryPath(),
+                    expectedAnalyticsPath: _analyticsPathResolver.BuildOutputDirectory(AnalyticsWritePublicationCallsStrategy.OutputSubPaths),
                     expectedParameters: null);
             }
             
@@ -545,7 +539,7 @@ public abstract class PublicationsControllerTests(TestApplicationFactory testApp
                 response.AssertOk<PublicationSummaryViewModel>(useSystemJson: true);
 
                 AnalyticsTestAssertions.AssertAnalyticsCallNotCaptured(
-                    _analyticsPathResolver.PublicApiPublicationCallsDirectoryPath());
+                    _analyticsPathResolver.BuildOutputDirectory(AnalyticsWritePublicationCallsStrategy.OutputSubPaths));
             }
         }
 
@@ -947,7 +941,7 @@ public abstract class PublicationsControllerTests(TestApplicationFactory testApp
 
             public void Dispose()
             {
-                var analyticsCapturePath = _analyticsPathResolver.PublicApiPublicationCallsDirectoryPath();
+                var analyticsCapturePath = _analyticsPathResolver.BuildOutputDirectory(AnalyticsWritePublicationCallsStrategy.OutputSubPaths);
                 if (Directory.Exists(analyticsCapturePath))
                 {
                     Directory.Delete(analyticsCapturePath, recursive: true);
@@ -1010,7 +1004,7 @@ public abstract class PublicationsControllerTests(TestApplicationFactory testApp
                     publicationId: publication.Id,
                     publicationTitle: publication.Title,
                     expectedType: PublicationCallType.GetDataSets,
-                    expectedAnalyticsPath: _analyticsPathResolver.PublicApiPublicationCallsDirectoryPath(),
+                    expectedAnalyticsPath: _analyticsPathResolver.BuildOutputDirectory(AnalyticsWritePublicationCallsStrategy.OutputSubPaths),
                     expectedParameters: new PaginationParameters(Page: 1, PageSize: 10));
             }
 
@@ -1054,7 +1048,7 @@ public abstract class PublicationsControllerTests(TestApplicationFactory testApp
                 response.AssertOk<DataSetPaginatedListViewModel>(useSystemJson: true);
 
                 AnalyticsTestAssertions.AssertAnalyticsCallNotCaptured(
-                    _analyticsPathResolver.PublicApiPublicationCallsDirectoryPath());
+                    _analyticsPathResolver.BuildOutputDirectory(AnalyticsWritePublicationCallsStrategy.OutputSubPaths));
             }
 
             [Fact]
@@ -1104,7 +1098,7 @@ public abstract class PublicationsControllerTests(TestApplicationFactory testApp
                 response.AssertOk<DataSetPaginatedListViewModel>(useSystemJson: true);
 
                 AnalyticsTestAssertions.AssertAnalyticsCallNotCaptured(
-                    _analyticsPathResolver.PublicApiPublicationCallsDirectoryPath());
+                    _analyticsPathResolver.BuildOutputDirectory(AnalyticsWritePublicationCallsStrategy.OutputSubPaths));
             }
         }
 

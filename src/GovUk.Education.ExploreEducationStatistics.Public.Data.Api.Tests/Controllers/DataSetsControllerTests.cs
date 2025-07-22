@@ -2,6 +2,7 @@ using System.Globalization;
 using System.Net.Mime;
 using System.Security.Claims;
 using CsvHelper;
+using GovUk.Education.ExploreEducationStatistics.Analytics.Common.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
@@ -10,6 +11,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Requests;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Strategies;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Analytics;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Fixture;
@@ -325,7 +327,7 @@ public abstract class DataSetsControllerTests(TestApplicationFactory testApp) : 
 
             public void Dispose()
             {
-                var analyticsCapturePath = GetAnalyticsPathResolver().PublicApiDataSetCallsDirectoryPath();
+                var analyticsCapturePath = GetAnalyticsPathResolver().BuildOutputDirectory(AnalyticsWriteDataSetCallsStrategy.OutputSubPaths);
                 if (Directory.Exists(analyticsCapturePath))
                 {
                     Directory.Delete(analyticsCapturePath, recursive: true);
@@ -377,7 +379,7 @@ public abstract class DataSetsControllerTests(TestApplicationFactory testApp) : 
                 await AnalyticsTestAssertions.AssertDataSetAnalyticsCallCaptured(
                     dataSet: dataSet,
                     expectedType: DataSetCallType.GetSummary,
-                    expectedAnalyticsPath: GetAnalyticsPathResolver().PublicApiDataSetCallsDirectoryPath(),
+                    expectedAnalyticsPath: GetAnalyticsPathResolver().BuildOutputDirectory(AnalyticsWriteDataSetCallsStrategy.OutputSubPaths),
                     expectedParameters: null,
                     expectedPreviewToken: expectedPreviewToken,
                     expectedPreviewTokenDataSetVersionId: persistedPreviewToken?.DataSetVersionId);
@@ -416,7 +418,7 @@ public abstract class DataSetsControllerTests(TestApplicationFactory testApp) : 
                 response.AssertOk();
 
                 AnalyticsTestAssertions.AssertAnalyticsCallNotCaptured(
-                    GetAnalyticsPathResolver().PublicApiDataSetCallsDirectoryPath());
+                    GetAnalyticsPathResolver().BuildOutputDirectory(AnalyticsWriteDataSetCallsStrategy.OutputSubPaths));
             }
         }
 
@@ -1487,7 +1489,7 @@ public abstract class DataSetsControllerTests(TestApplicationFactory testApp) : 
 
             public void Dispose()
             {
-                var queriesDirectory = GetAnalyticsPathResolver().PublicApiDataSetVersionCallsDirectoryPath();
+                var queriesDirectory = GetAnalyticsPathResolver().BuildOutputDirectory(AnalyticsWriteDataSetVersionCallsStrategy.OutputSubPaths);
                 if (Directory.Exists(queriesDirectory))
                 {
                     Directory.Delete(queriesDirectory, recursive: true);
@@ -1571,7 +1573,7 @@ public abstract class DataSetsControllerTests(TestApplicationFactory testApp) : 
                     dataSetVersion: dataSetVersion,
                     expectedType: DataSetVersionCallType.GetMetadata,
                     expectedParameters: expectedParameters,
-                    expectedAnalyticsPath: GetAnalyticsPathResolver().PublicApiDataSetVersionCallsDirectoryPath(),
+                    expectedAnalyticsPath: GetAnalyticsPathResolver().BuildOutputDirectory(AnalyticsWriteDataSetVersionCallsStrategy.OutputSubPaths),
                     expectedRequestedDataSetVersion: requestedDataSetVersion,
                     expectedPreviewToken: expectedPreviewToken);
             }
@@ -1610,7 +1612,7 @@ public abstract class DataSetsControllerTests(TestApplicationFactory testApp) : 
                 response.AssertOk<DataSetMetaViewModel>(useSystemJson: true);
 
                 AnalyticsTestAssertions.AssertAnalyticsCallNotCaptured(
-                    GetAnalyticsPathResolver().PublicApiDataSetVersionCallsDirectoryPath());
+                    GetAnalyticsPathResolver().BuildOutputDirectory(AnalyticsWriteDataSetVersionCallsStrategy.OutputSubPaths));
             }
         }
 
@@ -2163,7 +2165,7 @@ public abstract class DataSetsControllerTests(TestApplicationFactory testApp) : 
 
             public void Dispose()
             {
-                var analyticsCapturePath = GetAnalyticsPathResolver().PublicApiDataSetVersionCallsDirectoryPath();
+                var analyticsCapturePath = GetAnalyticsPathResolver().BuildOutputDirectory(AnalyticsWriteDataSetVersionCallsStrategy.OutputSubPaths);
                 if (Directory.Exists(analyticsCapturePath))
                 {
                     Directory.Delete(analyticsCapturePath, recursive: true);
@@ -2225,7 +2227,7 @@ public abstract class DataSetsControllerTests(TestApplicationFactory testApp) : 
                     dataSetVersion: dataSetVersion,
                     expectedType: DataSetVersionCallType.DownloadCsv,
                     expectedParameters: null,
-                    expectedAnalyticsPath: GetAnalyticsPathResolver().PublicApiDataSetVersionCallsDirectoryPath(),
+                    expectedAnalyticsPath: GetAnalyticsPathResolver().BuildOutputDirectory(AnalyticsWriteDataSetVersionCallsStrategy.OutputSubPaths),
                     expectedRequestedDataSetVersion: requestedDataSetVersion,
                     expectedPreviewToken: expectedPreviewToken);
             }
@@ -2260,7 +2262,7 @@ public abstract class DataSetsControllerTests(TestApplicationFactory testApp) : 
                 response.AssertOk();
 
                 AnalyticsTestAssertions.AssertAnalyticsCallNotCaptured(
-                    GetAnalyticsPathResolver().PublicApiDataSetVersionCallsDirectoryPath());
+                    GetAnalyticsPathResolver().BuildOutputDirectory(AnalyticsWriteDataSetVersionCallsStrategy.OutputSubPaths));
             }
         }
             
