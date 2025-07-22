@@ -42,7 +42,7 @@
     "file-loader": "^6.2.0",
     "fs-extra": "^9.1.0",
     "geojson": "^0.5.0",
-    "govuk-frontend": "^5.8.0",
+    "govuk-frontend": "^5.11.1",
     "history": "^4.10.1",
     "html-webpack-plugin": "^5.5.0",
     "i": "^0.3.7",
