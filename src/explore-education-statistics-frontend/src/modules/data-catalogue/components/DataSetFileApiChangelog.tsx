@@ -26,7 +26,7 @@ export default function DataSetFileApiChangelog({
   return (
     <DataSetFilePageSection
       heading={renderHeading ?? true ? pageSections.apiChangelog : ''}
-      id="apiChangelog"
+      id={renderHeading ?? true ? 'apiChangelog' : undefined}
     >
       {(guidanceNotes ?? '').length > 0 && (
         <p data-testid="public-guidance-notes">{guidanceNotes}</p>
