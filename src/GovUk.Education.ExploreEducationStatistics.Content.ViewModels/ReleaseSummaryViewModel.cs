@@ -35,6 +35,8 @@ public record ReleaseSummaryViewModel
 
     public PublicationSummaryViewModel? Publication { get; init; }
 
+    // ReSharper disable once UnusedMember.Global
+    // Used by JSON serialisation.
     public ReleaseSummaryViewModel()
     {
     }

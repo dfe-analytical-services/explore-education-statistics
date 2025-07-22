@@ -98,12 +98,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository;
             return await Find(releaseVersionId, fileId) ?? new Either<ActionResult, ReleaseFile>(new NotFoundResult());
         }
 
-        public async Task<List<ReleaseFile>> GetByFileType(Guid releaseVersionId,
+        public async Task<List<ReleaseFile>> GetByFileType(
+            Guid releaseVersionId,
             CancellationToken cancellationToken = default,
             params FileType[] types)
         {
-            return await _contentDbContext.ReleaseFiles
-                .Include(f => f.File.CreatedBy)
+            return await _contentDbContext
+                .ReleaseFiles
+                .Include(f => f.File)
                 .Where(releaseFile =>
                     releaseFile.ReleaseVersionId == releaseVersionId
                     && types.Contains(releaseFile.File.Type))
