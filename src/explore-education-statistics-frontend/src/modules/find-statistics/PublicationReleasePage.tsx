@@ -239,6 +239,7 @@ const PublicationReleasePage: NextPage<Props> = ({ releaseVersion }) => {
                           label: `Publication: ${releaseVersion.publication.title}, Release: ${releaseVersion.title}, File: All files`,
                         });
                       }}
+                      id="download-all-data-link"
                     >
                       Download all data (zip)
                     </Link>
