@@ -28,9 +28,9 @@ public interface IManagedStreamFile : IAsyncDisposable
 /// </summary>
 public class ManagedStreamFormFile(IFormFile formFile) : IManagedStreamFile
 {
-    public string Name { get; } = formFile.FileName;
+    public string Name => formFile.FileName;
 
-    public long Length { get; } = formFile.Length;
+    public long Length => formFile.Length;
 
     /// <summary>
     /// Return the stream of the backing <see cref="IFormFile"/>. Subsequent calls to
@@ -59,9 +59,9 @@ public class ManagedStreamZipEntry(ZipArchiveEntry entry) : IManagedStreamFile
 {
     private readonly List<Stream> _openStreams = [];
     
-    public string Name { get; } = entry.Name;
+    public string Name => entry.Name;
 
-    public long Length { get; } = entry.Length;
+    public long Length => entry.Length;
 
     /// <summary>
     /// Return a new compression Stream from the backing <see cref="ZipArchiveEntry"/>.
