@@ -7,6 +7,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using CsvHelper;
 using CsvHelper.Configuration;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Utils;
 
@@ -29,7 +30,10 @@ public static class CsvUtils
     public static async Task<List<string>> GetCsvHeaders(Func<Task<Stream>> streamProvider,
         bool leaveOpen = false)
     {
-        using var dataFileReader = new StreamReader(await streamProvider.Invoke(), leaveOpen: leaveOpen);
+        var stream = await streamProvider.Invoke();
+        stream.SeekToBeginning();
+
+        using var dataFileReader = new StreamReader(stream, leaveOpen: leaveOpen);
         using var csvReader = new CsvReader(dataFileReader, CultureInfo.InvariantCulture);
         await csvReader.ReadAsync();
         csvReader.ReadHeader();
@@ -107,7 +111,10 @@ public static class CsvUtils
     {
         var config = new CsvConfiguration(CultureInfo.InvariantCulture);
 
-        using var dataFileReader = new StreamReader(await streamProvider.Invoke());
+        var stream = await streamProvider.Invoke();
+        stream.SeekToBeginning();
+
+        using var dataFileReader = new StreamReader(stream);
         using var csvReader = new CsvReader(dataFileReader, config);
         using var csvDataReader = new CsvDataReader(csvReader);
         var lastLine = !await csvReader.ReadAsync();
@@ -128,7 +135,6 @@ public static class CsvUtils
             var cells = Enumerable
                 .Range(0, cellCount)
                 .Select(csvReader.GetField<string>)
-                .OfType<string>()
                 .ToList();
 
             lastLine = !await csvReader.ReadAsync();

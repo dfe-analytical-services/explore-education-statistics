@@ -46,9 +46,9 @@ public class DataSetValidatorTests
         var dataSet = result.AssertRight();
         Assert.Equal("Data set title", dataSet.Title);
         Assert.Equal("test-data.csv", dataSet.DataFile.FileName);
-        Assert.Equal(dataFile.FileStream.Length, dataSet.DataFile.FileSize);
+        Assert.Equal(dataFile.FileStreamProvider().Length, dataSet.DataFile.FileSize);
         Assert.Equal("test-data.meta.csv", dataSet.MetaFile.FileName);
-        Assert.Equal(metaFile.FileStream.Length, dataSet.MetaFile.FileSize);
+        Assert.Equal(metaFile.FileStreamProvider().Length, dataSet.MetaFile.FileSize);
     }
 
     // Filenames that are equal ignoring case to the original filename are valid
@@ -114,9 +114,9 @@ public class DataSetValidatorTests
             var dataSet = result.AssertRight();
             Assert.Equal("Data set title", dataSet.Title);
             Assert.Equal("test-data.csv", dataSet.DataFile.FileName);
-            Assert.Equal(dataFile.FileStream.Length, dataSet.DataFile.FileSize);
+            Assert.Equal(dataFile.FileStreamProvider().Length, dataSet.DataFile.FileSize);
             Assert.Equal("test-data.meta.csv", dataSet.MetaFile.FileName);
-            Assert.Equal(metaFile.FileStream.Length, dataSet.MetaFile.FileSize);
+            Assert.Equal(metaFile.FileStreamProvider().Length, dataSet.MetaFile.FileSize);
         }
     }
 

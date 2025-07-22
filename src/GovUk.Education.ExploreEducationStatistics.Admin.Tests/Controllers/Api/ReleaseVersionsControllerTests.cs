@@ -1,4 +1,16 @@
 #nullable enable
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.IO.Compression;
+using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Net.Http.Json;
+using System.Net.Mime;
+using System.Reflection;
+using System.Security.Claims;
+using System.Threading;
+using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
@@ -18,23 +30,13 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
 using Moq;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Net.Http;
-using System.Net.Http.Headers;
-using System.Net.Http.Json;
-using System.Net.Mime;
-using System.Reflection;
-using System.Security.Claims;
-using System.Threading;
-using System.Threading.Tasks;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using static Moq.MockBehavior;
 using ErrorViewModel = GovUk.Education.ExploreEducationStatistics.Common.ViewModels.ErrorViewModel;
+using File = System.IO.File;
 using ValidationUtils = GovUk.Education.ExploreEducationStatistics.Common.Validators.ValidationUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
@@ -67,8 +69,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             var releaseDataFileService = new Mock<IReleaseDataFileService>(Strict);
             releaseDataFileService
                 .Setup(service => service.Upload(_releaseVersionId,
-                    dataFile,
-                    metaFile,
+                    ItIsFileMatch(dataFile),
+                    ItIsFileMatch(metaFile),
                     "Data set title",
                     null,
                     default))
@@ -112,8 +114,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             var releaseDataFileService = new Mock<IReleaseDataFileService>(Strict);
             releaseDataFileService
                 .Setup(service => service.Upload(_releaseVersionId,
-                    dataFile,
-                    metaFile,
+                    ItIsFileMatch(dataFile),
+                    ItIsFileMatch(metaFile),
                     "Data set title",
                     null,
                     default))
@@ -540,7 +542,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             releaseDataFileService
                 .Setup(s => s.UploadFromBulkZip(
                     It.IsAny<Guid>(),
-                    It.IsAny<IFormFile>(),
+                    It.IsAny<IManagedStreamZipFile>(),
                     default))
                 .ReturnsAsync(uploadResultVms);
 
@@ -551,7 +553,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                 new()
                 {
                     ReleaseVersionId = Guid.NewGuid(),
-                    ZipFile = MockFile("bulk.zip")
+                    ZipFile = MockFile("bulk.zip", isZip: true)
                 },
                 default);
 
@@ -598,12 +600,30 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             result.AssertOkResult(dataFileInfo);
         }
 
-        private static IFormFile MockFile(string fileName)
+        private static IFormFile MockFile(string fileName, bool isZip = false)
         {
             var fileMock = new Mock<IFormFile>(Strict);
-            var stream = "test content".ToStream();
+            Stream stream;
+
+            if (isZip)
+            {
+                stream = new MemoryStream();
+
+                // Write a simple ZIP archive with one entry
+                using var archive = new ZipArchive(stream, ZipArchiveMode.Create, true);
+                var entry = archive.CreateEntry("data-file.csv");
+                using var entryStream = entry.Open();
+                using var writer = new StreamWriter(entryStream);
+                writer.Write("test content");
+            }
+            else
+            {
+                stream = "test content".ToStream();
+            }
+            
             fileMock.Setup(formFile => formFile.OpenReadStream()).Returns(stream);
             fileMock.Setup(formFile => formFile.FileName).Returns(fileName);
+            fileMock.Setup(formFile => formFile.Name).Returns(fileName);
             fileMock.Setup(formFile => formFile.Length).Returns(stream.Length);
             return fileMock.Object;
         }
@@ -625,6 +645,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                 releaseStatusService ?? Mock.Of<IReleasePublishingStatusService>(Strict),
                 releaseChecklistService ?? Mock.Of<IReleaseChecklistService>(Strict),
                 importService ?? Mock.Of<IDataImportService>(Strict));
+        }
+
+        private static IManagedStreamFile ItIsFileMatch(IFormFile dataFile)
+        {
+            return It.Is<IManagedStreamFile>(
+                file => file.Name == dataFile.Name
+                        && file.Length == dataFile.Length);
         }
     }
 
@@ -1381,11 +1408,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
 
                 try
                 {
-                    var dataFileContent = new ByteArrayContent(await System.IO.File.ReadAllBytesAsync(dataFilePath));
+                    var dataFileContent = new ByteArrayContent(await File.ReadAllBytesAsync(dataFilePath));
                     dataFileContent.Headers.ContentType = MediaTypeHeaderValue.Parse(MediaTypeNames.Text.Csv);
                     multipartContent.Add(dataFileContent, "DataFile", dataFileName);
 
-                    var metaFileContent = new ByteArrayContent(await System.IO.File.ReadAllBytesAsync(metaFilePath));
+                    var metaFileContent = new ByteArrayContent(await File.ReadAllBytesAsync(metaFilePath));
                     metaFileContent.Headers.ContentType = MediaTypeHeaderValue.Parse(MediaTypeNames.Text.Csv);
                     multipartContent.Add(metaFileContent, "MetaFile", metaFileName);
                 }
@@ -1418,7 +1445,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
 
                 try
                 {
-                    var fileContent = new ByteArrayContent(await System.IO.File.ReadAllBytesAsync(filePath));
+                    var fileContent = new ByteArrayContent(await File.ReadAllBytesAsync(filePath));
                     fileContent.Headers.ContentType = MediaTypeHeaderValue.Parse(MediaTypeNames.Application.Zip);
                     multipartContent.Add(fileContent, "ZipFile", fileName);
                 }
@@ -1448,7 +1475,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
 
                 try
                 {
-                    var fileContent = new ByteArrayContent(await System.IO.File.ReadAllBytesAsync(filePath));
+                    var fileContent = new ByteArrayContent(await File.ReadAllBytesAsync(filePath));
                     fileContent.Headers.ContentType = MediaTypeHeaderValue.Parse(MediaTypeNames.Application.Zip);
                     multipartContent.Add(fileContent, "ZipFile", fileName);
                 }

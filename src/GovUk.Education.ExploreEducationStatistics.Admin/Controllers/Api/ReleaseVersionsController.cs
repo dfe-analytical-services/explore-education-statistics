@@ -1,3 +1,8 @@
+using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.Threading;
+using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
@@ -8,11 +13,6 @@ using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
 {
@@ -102,11 +102,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             [FromForm] UploadDataSetRequest request,
             CancellationToken cancellationToken)
         {
+            await using var dataFile = new ManagedStreamFormFile(request.DataFile);
+            await using var metaFile = new ManagedStreamFormFile(request.MetaFile);
+
             return await _releaseDataFileService
                 .Upload(
                     request.ReleaseVersionId,
-                    request.DataFile,
-                    request.MetaFile,
+                    dataFile,
+                    metaFile,
                     request.Title,
                     request.ReplacingFileId,
                     cancellationToken)
@@ -121,11 +124,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             [FromForm] UploadDataSetRequest request,
             CancellationToken cancellationToken)
         {
+            await using var dataFile = new ManagedStreamFormFile(request.DataFile);
+            await using var metaFile = new ManagedStreamFormFile(request.MetaFile);
+
             return await _releaseDataFileService
                 .UploadForReplacement(
                     request.ReleaseVersionId,
-                    request.DataFile,
-                    request.MetaFile,
+                    dataFile,
+                    metaFile,
                     request.Title,
                     request.ReplacingFileId,
                     cancellationToken)
@@ -139,10 +145,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             [FromForm] UploadDataSetAsZipRequest request,
             CancellationToken cancellationToken)
         {
+            await using var zipFile = new ManagedStreamZipFormFile(request.ZipFile);
+            
             return await _releaseDataFileService
                 .UploadFromZip(
                     request.ReleaseVersionId,
-                    request.ZipFile,
+                    zipFile,
                     request.Title,
                     request.ReplacingFileId,
                     cancellationToken)
@@ -157,10 +165,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             [FromForm] UploadDataSetAsZipRequest request,
             CancellationToken cancellationToken)
         {
+            await using var zipFile = new ManagedStreamZipFormFile(request.ZipFile);
+            
             return await _releaseDataFileService
                 .UploadFromZipForReplacement(
                     request.ReleaseVersionId,
-                    request.ZipFile,
+                    zipFile,
                     request.Title,
                     request.ReplacingFileId,
                     cancellationToken)
@@ -174,8 +184,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             [FromForm] UploadDataSetAsBulkZipRequest request,
             CancellationToken cancellationToken)
         {
+            await using var zipFile = new ManagedStreamZipFormFile(request.ZipFile);
+
             return await _releaseDataFileService
-                .UploadFromBulkZip(request.ReleaseVersionId, request.ZipFile, cancellationToken)
+                .UploadFromBulkZip(
+                    request.ReleaseVersionId,
+                    zipFile,
+                    cancellationToken)
                 .HandleFailuresOrOk();
         }
 

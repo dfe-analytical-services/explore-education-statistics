@@ -1,4 +1,11 @@
 #nullable enable
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.IO.Compression;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
@@ -15,13 +22,6 @@ using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.IO.Compression;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainers;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
@@ -182,7 +182,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(_userService.CheckCanViewReleaseVersion)
                 .OnSuccess(_ => CheckFileExists(releaseVersionId: releaseVersionId, fileId: fileId))
                 .OnSuccessCombineWith(file =>
-                    _privateBlobStorageService.DownloadToStream(PrivateReleaseFiles, file.Path(), new MemoryStream()))
+                    _privateBlobStorageService.GetDownloadStream(PrivateReleaseFiles, file.Path()))
                 .OnSuccess(fileAndStream =>
                 {
                     var (file, stream) = fileAndStream;

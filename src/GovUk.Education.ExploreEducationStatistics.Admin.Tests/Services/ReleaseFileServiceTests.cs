@@ -1411,7 +1411,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var privateBlobStorageService = new Mock<IPrivateBlobStorageService>(Strict);
 
             privateBlobStorageService
-                .SetupDownloadToStream(PrivateReleaseFiles, releaseFile.Path(), "Test file content");
+                .SetupGetDownloadStream(PrivateReleaseFiles, releaseFile.Path(), "Test file content");
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
@@ -1461,7 +1461,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var privateBlobStorageService = new Mock<IPrivateBlobStorageService>(Strict);
 
             privateBlobStorageService
-                .SetupDownloadToStream(PrivateReleaseFiles, releaseFile.Path(), "Test file content");
+                .SetupGetDownloadStream(PrivateReleaseFiles, releaseFile.Path(), "Test file content");
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
@@ -1569,7 +1569,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var privateBlobStorageService = new Mock<IPrivateBlobStorageService>(Strict);
 
-            privateBlobStorageService.SetupDownloadToStreamNotFound(PrivateReleaseFiles, releaseFile.Path());
+            privateBlobStorageService.SetupGetDownloadStreamNotFound(PrivateReleaseFiles, releaseFile.Path());
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {

@@ -109,7 +109,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 }));
             }
 
-            var headers = await CsvUtils.GetCsvHeaders(indexFile.FileStream, leaveOpen: true);
+            var headers = await CsvUtils.GetCsvHeaders(indexFile.FileStreamProvider(), leaveOpen: true);
 
             if (headers is not ["file_name", "dataset_name"])
             {
@@ -120,9 +120,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             var fileNameIndex = headers[0] == "file_name" ? 0 : 1;
             var datasetNameIndex = headers[0] == "dataset_name" ? 0 : 1;
 
-            indexFile.FileStream.SeekToBeginning();
-
-            var rows = await CsvUtils.GetCsvRows(indexFile.FileStream);
+            var rows = await CsvUtils.GetCsvRows(indexFile.FileStreamProvider());
             var dataSetIndex = new DataSetIndex { ReleaseVersionId = releaseVersionId };
 
             var indexFileEntries = new List<(string BaseFilename, string Title)>();
