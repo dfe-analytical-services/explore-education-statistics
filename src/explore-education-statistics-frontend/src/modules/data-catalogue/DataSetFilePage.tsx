@@ -28,17 +28,15 @@ import {
   ApiDataSetVersion,
 } from '@frontend/services/apiDataSetService';
 import { DataSetFile } from '@frontend/services/dataSetFileService';
-import downloadService from '@frontend/services/downloadService';
 import { logEvent } from '@frontend/services/googleAnalyticsService';
 import { dehydrate, QueryClient } from '@tanstack/react-query';
 import classNames from 'classnames';
-import omit from 'lodash/omit';
 import { GetServerSideProps } from 'next';
+import isPatchVersion from '@common/utils/isPatchVersion';
 import React, { useEffect, useMemo, useState } from 'react';
-import getDataSetFileMetaCSVW from './utils/getDataSetFileMetaCSVW';
 import omit from 'lodash/omit';
 import downloadService from '@frontend/services/downloadService';
-import isPatchVersion from '@common/utils/isPatchVersion';
+import getDataSetFileMetaCSVW from './utils/getDataSetFileMetaCSVW';
 
 export const pageBaseSections = {
   dataSetDetails: 'Data set details',
