@@ -1,4 +1,4 @@
-using Semver;
+using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.ViewModels;
 
@@ -8,7 +8,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.ViewModels;
 public record DataSetVersionChangesViewModel
 {
     public string? Notes { get; set; }
-    public SemVersion? VersionNumber { get; set; }
+    
+    public DataSetVersionNumber? VersionNumber { get; set; }
     /// <summary>
     /// Any major changes that were made to the data set.
     /// </summary>
@@ -22,7 +23,7 @@ public record DataSetVersionChangesViewModel
     /// <summary>
     /// Change logs for any patch versions associated with this change log
     /// </summary>
-    public List<DataSetVersionChangesViewModel> PatchHistory { get; set; }
+    public List<DataSetVersionChangesViewModel>? PatchHistory { get; set; }
 }
 
 /// <summary>

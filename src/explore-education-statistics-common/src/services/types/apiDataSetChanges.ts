@@ -8,14 +8,14 @@ import {
   TimePeriodOption,
 } from '@common/services/types/apiDataSetMeta';
 
-export interface SemVer {
+export interface DataSetVersionNumber {
   major: number;
   minor: number;
   patch: number;
 }
 
 export interface ApiDataSetVersionChanges {
-  versionNumber: SemVer;
+  versionNumber: DataSetVersionNumber;
   majorChanges: ChangeSet;
   minorChanges: ChangeSet;
   notes: string;
