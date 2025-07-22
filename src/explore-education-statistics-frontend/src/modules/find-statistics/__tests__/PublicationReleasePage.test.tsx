@@ -121,6 +121,42 @@ describe('PublicationReleasePage', () => {
     expect(quickLinks[2]).toHaveAttribute('href', '#help-and-support');
   });
 
+  test('renders download all files as zip as a link when files present', async () => {
+    render(
+      <PublicationReleasePage
+        releaseVersion={{
+          ...testRelease,
+          relatedDashboardsSection: undefined,
+          downloadFiles: [
+            {
+              id: 'file-id',
+              extension: 'csv',
+              fileName: 'test-file',
+              name: 'test file',
+              size: '1 MB',
+              type: 'Data',
+            },
+          ],
+        }}
+      />,
+    );
+
+    expect(
+      screen.getByRole('navigation', { name: 'Quick links' }),
+    ).toBeInTheDocument();
+
+    const quickLinksNav = screen.getByRole('navigation', {
+      name: 'Quick links',
+    });
+
+    const quickLinks = within(quickLinksNav).getAllByRole('link');
+
+    expect(quickLinks).toHaveLength(4);
+
+    expect(quickLinks[0]).toHaveTextContent('Download all data (zip)');
+    expect(quickLinks[0]).toHaveAttribute('href');
+  });
+
   test('does not render release contents link when there is no content', async () => {
     render(
       <PublicationReleasePage

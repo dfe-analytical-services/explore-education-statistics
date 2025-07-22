@@ -29,8 +29,6 @@ import classNames from 'classnames';
 import orderBy from 'lodash/orderBy';
 import { GetServerSideProps, NextPage } from 'next';
 import React, { Fragment } from 'react';
-import Button from '@common/components/Button';
-import downloadService from '@frontend/services/downloadService';
 
 interface Props {
   releaseVersion: ReleaseVersion;
@@ -232,14 +230,9 @@ const PublicationReleasePage: NextPage<Props> = ({ releaseVersion }) => {
               <ul className="govuk-list">
                 {showAllFilesButton && (
                   <li>
-                    <Button
-                      className="govuk-button  govuk-!-margin-bottom-3"
-                      onClick={async () => {
-                        await downloadService.downloadZip(
-                          releaseVersion.id,
-                          'ReleaseUsefulInfo',
-                        );
-
+                    <Link
+                      to={`${process.env.CONTENT_API_BASE_URL}/releases/${releaseVersion.id}/files?fromPage=ReleaseUsefulInfo`}
+                      onClick={() => {
                         logEvent({
                           category: `${releaseVersion.publication.title} release page - Useful information`,
                           action: 'Download all data button clicked',
@@ -248,7 +241,7 @@ const PublicationReleasePage: NextPage<Props> = ({ releaseVersion }) => {
                       }}
                     >
                       Download all data (zip)
-                    </Button>
+                    </Link>
                   </li>
                 )}
                 {!!releaseVersion.relatedDashboardsSection?.content.length && (
@@ -445,13 +438,9 @@ const PublicationReleasePage: NextPage<Props> = ({ releaseVersion }) => {
           downloadFiles={releaseVersion.downloadFiles}
           hasDataGuidance={releaseVersion.hasDataGuidance}
           renderAllFilesLink={
-            <Button
-              onClick={async () => {
-                await downloadService.downloadZip(
-                  releaseVersion.id,
-                  'ReleaseDownloads',
-                );
-
+            <Link
+              to={`${process.env.CONTENT_API_BASE_URL}/releases/${releaseVersion.id}/files?fromPage=ReleaseDownloads`}
+              onClick={() => {
                 logEvent({
                   category: 'Downloads',
                   action: `Release page all files, Release: ${releaseVersion.title}, File: All files`,
@@ -459,7 +448,7 @@ const PublicationReleasePage: NextPage<Props> = ({ releaseVersion }) => {
               }}
             >
               Download all data (ZIP)
-            </Button>
+            </Link>
           }
           renderCreateTablesLink={
             <Link
