@@ -30,7 +30,8 @@ public interface IReleaseFileRepository
     Task<Either<ActionResult, ReleaseFile>> FindOrNotFound(Guid releaseVersionId,
         Guid fileId);
 
-    Task<List<ReleaseFile>> GetByFileType(Guid releaseVersionId,
+    Task<List<ReleaseFile>> GetByFileType(
+        Guid releaseVersionId,
         CancellationToken cancellationToken = default,
         params FileType[] types);
 
