@@ -121,7 +121,7 @@ describe('PublicationReleasePage', () => {
     expect(quickLinks[2]).toHaveAttribute('href', '#help-and-support');
   });
 
-  test('renders download all files as zip as a link when files present', async () => {
+  test(`renders 'Download all data (zip)' as a link when files present`, async () => {
     render(
       <PublicationReleasePage
         releaseVersion={{
