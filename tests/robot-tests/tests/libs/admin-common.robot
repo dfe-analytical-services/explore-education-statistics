@@ -611,7 +611,11 @@ user confirms upload to complete import
     ${row}=    user gets table row    ${SUBJECT_NAME}    testid:Data files table
     ${button}=    user gets button element    View details    ${row}
     user clicks element    ${button}
-    user clicks button    Continue import
+
+    # EES-6341 - reinstate "Continue import" button when Screener is re-enabled.
+    # user clicks button    Continue import
+    user clicks button    Close
+
     user waits until data file import is complete    ${SUBJECT_NAME}
 
 user waits until data upload is completed

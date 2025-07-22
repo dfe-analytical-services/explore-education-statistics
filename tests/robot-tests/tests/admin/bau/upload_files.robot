@@ -37,15 +37,20 @@ Upload a ZIP file
     user waits until page contains data uploads table
     user checks table cell contains    1    1    Absence in PRUs    testid:Data files table
     user checks table cell contains    1    2    141 Kb    testid:Data files table
-    user waits until table cell contains    1    3    Pending import    testid:Data files table
+
+    # EES-6341 - reinstate "Pending import" stage when Screener is re-enabled.
+    # user waits until table cell contains    1    3    Pending import    testid:Data files table
+    user waits until table cell contains    1    3    Complete    testid:Data files table
+
     user checks table cell contains    1    4    View details    testid:Data files table
     user checks table cell contains    1    4    Delete files    testid:Data files table
 
 Check the screening results
     user clicks button in table cell    1    4    View details    testid:Data files table
-    user waits until modal is visible    Data set details
 
-    Skip    msg=Skip result checking until Screener is re-enabled
+    Skip    msg=EES-6341 - skip result checking until Screener is re-enabled
+
+    user waits until modal is visible    Data set details
 
     User waits until h3 is visible    Full breakdown of 3 tests checked against this file
     user checks screener results in modal    1    check_filename_spaces
@@ -56,20 +61,31 @@ Check the screening results
     ...    'absence_in_prus.csv' does not have any blank columns.    Pass
 
 Check the file details in the modal
-    user clicks element    id:file-details-tab
-    user waits until h3 is not visible    Full breakdown of 3 tests checked against this file
-    user waits until h3 is visible    File details
+    # EES-6341 - reinstate "File details" tab when Screener is re-enabled.
+    # user clicks element    id:file-details-tab
+    # user waits until h3 is not visible    Full breakdown of 3 tests checked against this file
+    # user waits until h3 is visible    File details
+
+    user waits until modal is visible    Data file details
+
     user checks summary list contains    Title    Absence in PRUs    testid:Data file details
     user checks summary list contains    Data file    absence_in_prus.csv    testid:Data file details
     user checks summary list contains    Meta file    absence_in_prus.meta.csv    testid:Data file details
     user checks summary list contains    Size    141 Kb    testid:Data file details
-    user checks summary list contains    Status    Pending import    testid:Data file details
+
+    # EES-6341 - reinstate "Pending import" stage when Screener is re-enabled.
+    # user checks summary list contains    Status    Pending import    testid:Data file details
+    user checks summary list contains    Status    Complete    testid:Data file details
+
     user checks summary list contains    Uploaded by    ees-test.bau1@education.gov.uk    testid:Data file details
     ${date}=    get london date
     user checks summary list contains    Date uploaded    ${date}    testid:Data file details
 
 Continue the import
-    user clicks button    Continue import
+    # EES-6341 - reinstate "Continue import" button when Screener is re-enabled.
+    # user clicks button    Continue import
+    user clicks button    Close
+
     user waits until modal is not visible    Data file details
 
     user waits until page does not contain    Queued    %{WAIT_MEDIUM}
