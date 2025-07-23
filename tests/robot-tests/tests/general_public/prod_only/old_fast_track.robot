@@ -12,7 +12,7 @@ Test Setup          fail test fast if required
 Navigate to Absence publication
     user navigates to    %{PUBLIC_URL}/find-statistics/further-education-and-skills/2019-20
     user waits until h1 is visible    Further education and skills    %{WAIT_MEDIUM}
-    user checks page contains    This is not the latest data
+    user checks page contains    This is not the latest release
 
 Open Overall absence accordion
     user opens accordion section    About these statistics    id:content-1
@@ -45,11 +45,11 @@ Validate that View latest data link takes user to the latest release page
     user waits until page contains    This data is not from the latest release
     user clicks element    css:[data-testid="View latest data link"]
     user waits until h1 is visible    Further education and skills
-    user checks page contains    This is the latest data
+    user checks page contains    This is the latest release
 
  Validate that Publication link in Related information takes user to the latest release page
     user goes back
     user waits until page finishes loading
     user clicks link containing text    Further education and skills
     user waits until h1 is visible    Further education and skills
-    user checks page contains    This is the latest data
+    user checks page contains    This is the latest release

@@ -533,7 +533,7 @@ Verify newly published release is public
     user navigates to public release page    ${PUBLIC_RELEASE_LINK}    ${PUBLICATION_NAME}    ${RELEASE_2_NAME}
 
 Check latest release is correct
-    user checks page contains    This is the latest data
+    user checks page contains    This is the latest release
     user checks page contains    View releases (1)
 
     user opens details dropdown    View releases (1)
