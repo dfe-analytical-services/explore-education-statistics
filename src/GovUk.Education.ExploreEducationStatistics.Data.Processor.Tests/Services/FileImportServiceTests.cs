@@ -63,7 +63,7 @@ public class FileImportServiceTests
             .Setup(s => s.WriteDataSetFileMeta(
                 import.FileId,
                 import.SubjectId,
-                import.TotalRows))
+                import.TotalRows!.Value))
             .Returns(Task.CompletedTask);
 
         var statisticsDbContextId = Guid.NewGuid().ToString();
@@ -235,7 +235,7 @@ public class FileImportServiceTests
                     dataImportService.Setup(mock => mock.WriteDataSetFileMeta(
                             import.FileId,
                             import.SubjectId,
-                            import.TotalRows))
+                            import.TotalRows!.Value))
                         .Returns(Task.CompletedTask);
                 }
 
