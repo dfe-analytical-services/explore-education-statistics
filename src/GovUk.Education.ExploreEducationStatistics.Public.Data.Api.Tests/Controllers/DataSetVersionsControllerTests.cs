@@ -1125,10 +1125,81 @@ public abstract class DataSetVersionsControllerTests(TestApplicationFactory test
 
             await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
 
+            var (firstDataSetVersion, oldDataSetVersion, dataSetVersion) = DataFixture
+                .DefaultDataSetVersion(filters: 3, indicators: 4, locations: 0, timePeriods: 3)
+                .WithStatusPublished()
+                .WithDataSetId(dataSet.Id)
+                .ForIndex(0, s => s.SetVersionNumber(2, 1))
+                .ForIndex(0, s => s.SetGeographicLevelMeta())
+                .ForIndex(0, s => s.SetLocationMetas(DataFixture.DefaultLocationMeta(options: 3)
+                    .ForIndex(0, s => s.SetLevel(GeographicLevel.Country))
+                    .ForIndex(1, s => s.SetLevel(GeographicLevel.Region))
+                    .ForIndex(2, s => s.SetLevel(GeographicLevel.OpportunityArea))
+                    .GenerateList))
+                .ForIndex(1, s => s.SetVersionNumber(2, 1, 1))
+                .ForIndex(1, s => s.SetGeographicLevelMeta())
+                .ForIndex(1, s => s.SetLocationMetas(DataFixture.DefaultLocationMeta(options: 3)
+                    .ForIndex(0, s => s.SetLevel(GeographicLevel.Country))
+                    .ForIndex(1, s => s.SetLevel(GeographicLevel.Region))
+                    .ForIndex(2, s => s.SetLevel(GeographicLevel.OpportunityArea))
+                    .GenerateList))
+                .ForIndex(2, s => s.SetVersionNumber(2, 1, 2))
+                .ForIndex(2, s => s.SetGeographicLevelMeta())
+                .ForIndex(2, s => s.SetLocationMetas(DataFixture.DefaultLocationMeta(options: 3)
+                    .ForIndex(0, s => s.SetLevel(GeographicLevel.Country))
+                    .ForIndex(1, s => s.SetLevel(GeographicLevel.Region))
+                    .ForIndex(2, s => s.SetLevel(GeographicLevel.OpportunityArea))
+                    .GenerateList))
+                .GenerateTuple3();
+
+            await SetUpHistoryPatchData(firstDataSetVersion, oldDataSetVersion, dataSetVersion);
+
+            var response = await GetDataSetVersionChanges(
+                dataSetId: dataSet.Id,
+                dataSetVersion: dataSetVersion.PublicVersion,
+                patchHistory: patchHistory);
+
+            var viewModel = response.AssertOk<DataSetVersionChangesViewModel>(useSystemJson: true);
+            
+            Assert.NotNull(viewModel.PatchHistory);
+            
+            if (!patchHistory)
+            {
+                Assert.Empty(viewModel.PatchHistory);
+                return;
+            }
+
+            Assert.Equal(2, viewModel.PatchHistory.Count);
+
+            Assert.Equal(new DataSetVersionNumber(2, 1, 0), viewModel.PatchHistory[0].VersionNumber);
+            Assert.Equal(new DataSetVersionNumber(2, 1, 1), viewModel.PatchHistory[1].VersionNumber);
+            Assert.Single(viewModel.PatchHistory[0].MinorChanges.LocationGroups!);
+            Assert.Single(viewModel.PatchHistory[0].MinorChanges.LocationOptions!);
+            Assert.Single(viewModel.PatchHistory[1].MinorChanges.LocationOptions!);
+            Assert.Single(viewModel.PatchHistory[0].MinorChanges.Filters!);
+            Assert.Single(viewModel.PatchHistory[1].MinorChanges.Filters!);
+            Assert.Single(viewModel.PatchHistory[0].MinorChanges.FilterOptions!);
+            Assert.Single(viewModel.PatchHistory[1].MinorChanges.FilterOptions!);
+            Assert.Single(viewModel.PatchHistory[0].MinorChanges.Indicators!);
+            Assert.Single(viewModel.PatchHistory[1].MinorChanges.Indicators!);
+            Assert.Single(viewModel.PatchHistory[0].MinorChanges.TimePeriods!);
+            Assert.Single(viewModel.PatchHistory[1].MinorChanges.TimePeriods!);
+        }
+
+        [Fact]
+        public async Task GetChanges_PatchHistory_Returns403_UnViewableDataSetVersion()
+        {
+            DataSet dataSet = DataFixture
+                .DefaultDataSet()
+                .WithStatusPublished();
+
+            await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
+
             DataSetVersion firstDataSetVersion = DataFixture
                 .DefaultDataSetVersion(filters: 3, indicators: 4, locations: 0, timePeriods: 3)
                 .WithVersionNumber(2, 1)
                 .WithDataSetId(dataSet.Id)
+                .WithStatusPublished()
                 .WithLocationMetas(DataFixture.DefaultLocationMeta(options: 3)
                     .ForIndex(0, s => s.SetLevel(GeographicLevel.Country))
                     .ForIndex(1, s => s.SetLevel(GeographicLevel.Region))
@@ -1140,6 +1211,7 @@ public abstract class DataSetVersionsControllerTests(TestApplicationFactory test
                 .DefaultDataSetVersion(filters: 3, indicators: 4, locations: 0, timePeriods: 3)
                 .WithVersionNumber(2, 1, 1)
                 .WithDataSetId(dataSet.Id)
+                .WithStatusFailed() // set this version to an unviewable dataSetVersion based on `ViewDataSetVersionAuthorizationHandler` to break authorization
                 .WithLocationMetas(DataFixture.DefaultLocationMeta(options: 3)
                     .ForIndex(0, s => s.SetLevel(GeographicLevel.Country))
                     .ForIndex(1, s => s.SetLevel(GeographicLevel.Region))
@@ -1158,7 +1230,22 @@ public abstract class DataSetVersionsControllerTests(TestApplicationFactory test
                     .ForIndex(2, s => s.SetLevel(GeographicLevel.OpportunityArea))
                     .GenerateList)
                 .WithGeographicLevelMeta();
+            
+            await SetUpHistoryPatchData(firstDataSetVersion, oldDataSetVersion, dataSetVersion);
 
+            var response = await GetDataSetVersionChanges(
+                dataSetId: dataSet.Id,
+                dataSetVersion: dataSetVersion.PublicVersion,
+                patchHistory: true);
+
+            response.AssertForbidden();
+        }
+        
+        private async Task SetUpHistoryPatchData(
+            DataSetVersion firstDataSetVersion,
+            DataSetVersion oldDataSetVersion,
+            DataSetVersion dataSetVersion)
+        {
             await TestApp.AddTestData<PublicDataDbContext>(context =>
             {
                 context.DataSetVersions.AddRange(firstDataSetVersion, oldDataSetVersion, dataSetVersion);
@@ -1267,13 +1354,13 @@ public abstract class DataSetVersionsControllerTests(TestApplicationFactory test
                     .SetCurrentStateId(dataSetVersion.LocationMetas[2].Id))
                 .GenerateList();
             locationMetaChanges.Add(DataFixture
-                    .DefaultLocationMetaChange()
-                    .WithDataSetVersionId(firstDataSetVersion.Id)
-                    .ForIndex(0, s => s
-                        .SetPreviousStateId(firstDataSetVersion.LocationMetas[1].Id)
-                        .SetCurrentStateId(oldDataSetVersion.LocationMetas[1].Id))
-                    .Generate()
-                );
+                .DefaultLocationMetaChange()
+                .WithDataSetVersionId(firstDataSetVersion.Id)
+                .ForIndex(0, s => s
+                    .SetPreviousStateId(firstDataSetVersion.LocationMetas[1].Id)
+                    .SetCurrentStateId(oldDataSetVersion.LocationMetas[1].Id))
+                .Generate()
+            );
             locationMetaChanges.Add(DataFixture
                 .DefaultLocationMetaChange()
                 .WithDataSetVersionId(dataSetVersion.Id)
@@ -1343,37 +1430,6 @@ public abstract class DataSetVersionsControllerTests(TestApplicationFactory test
                 context.LocationOptionMetaChanges.AddRange(locationOptionMetaChanges);
                 context.TimePeriodMetaChanges.AddRange(timePeriodMetaChanges);
             });
-
-            var response = await GetDataSetVersionChanges(
-                dataSetId: dataSet.Id,
-                dataSetVersion: dataSetVersion.PublicVersion,
-                patchHistory: patchHistory);
-
-            var viewModel = response.AssertOk<DataSetVersionChangesViewModel>(useSystemJson: true);
-
-            if (!patchHistory)
-            {
-                Assert.Null(viewModel.PatchHistory);
-                return;
-            }
-
-            Assert.Equal(2, viewModel.PatchHistory.Count);
-
-            Assert.Equal(new DataSetVersionNumber(2, 1, 0), viewModel.PatchHistory[0].VersionNumber);
-            Assert.Equal(new DataSetVersionNumber(2, 1, 1), viewModel.PatchHistory[1].VersionNumber);
-            Assert.Single(viewModel.PatchHistory[0].MinorChanges.LocationGroups!);
-            Assert.Single(viewModel.PatchHistory[0].MinorChanges.LocationOptions!);
-            Assert.Single(viewModel.PatchHistory[1].MinorChanges.LocationOptions!);
-            Assert.Single(viewModel.PatchHistory[0].MinorChanges.Filters!);
-            Assert.Single(viewModel.PatchHistory[1].MinorChanges.Filters!);
-            Assert.Single(viewModel.PatchHistory[0].MinorChanges.FilterOptions!);
-            Assert.Single(viewModel.PatchHistory[1].MinorChanges.FilterOptions!);
-            Assert.Single(viewModel.PatchHistory[0].MinorChanges.Indicators!);
-            Assert.Single(viewModel.PatchHistory[1].MinorChanges.Indicators!);
-            Assert.Single(viewModel.PatchHistory[0].MinorChanges.GeographicLevels!);
-            Assert.Single(viewModel.PatchHistory[1].MinorChanges.GeographicLevels!);
-            Assert.Single(viewModel.PatchHistory[0].MinorChanges.TimePeriods!);
-            Assert.Single(viewModel.PatchHistory[1].MinorChanges.TimePeriods!);
         }
 
         [Fact]

@@ -42,23 +42,20 @@ public class DataSetVersionChangeService(
             .OnSuccess(MapChanges)
             .OnSuccessCombineWith(changes => 
                 patchHistory 
-                    ? GetPreviousChanges(dataSetId, dataSetVersion, cancellationToken) 
+                    ? GetPreviousChanges(dataSetId, changes.VersionNumber, cancellationToken) 
                     : Task.FromResult(new Either<ActionResult, List<DataSetVersionChangesViewModel>>(new List<DataSetVersionChangesViewModel>()))
                 )
             .OnSuccess(tuple =>
             {
                 var (change, history) = tuple;
-                if (patchHistory)
-                {
-                    change.PatchHistory = history;   
-                }
+                change.PatchHistory = history;
                 return change;
             });
     }
 
     private Task<Either<ActionResult, List<DataSetVersionChangesViewModel>>> GetPreviousChanges(
         Guid dataSetId,
-        string dataSetVersion,
+        DataSetVersionNumber dataSetVersion,
         CancellationToken cancellationToken = default)
     {
         return publicDataDbContext.DataSetVersions
@@ -67,7 +64,7 @@ public class DataSetVersionChangeService(
                 dataSetId: dataSetId,
                 version: dataSetVersion,
                 cancellationToken: cancellationToken)
-            .OnSuccessDo(versions => versions.ForEach(v => userService.CheckCanViewDataSetVersion(v)))
+            .OnSuccessDo(userService.CheckCanViewDataSetVersion)
             .OnSuccess(async versions =>
             {
                 var loadedChanges = new List<DataSetVersionChangesViewModel>();
