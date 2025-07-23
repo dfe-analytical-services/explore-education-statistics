@@ -38,7 +38,7 @@ public static class DataSetValidators
             .Must((_, dto, context) =>
             {
                 context.MessageFormatter.AppendArgument("FileName", dto.FileName);
-                return dto.FileStream.Length > 0;
+                return dto.FileSize > 0;
             })
                 .WithMessage(ValidationMessages.FileSizeMustNotBeZero, "{FileName}");
     }

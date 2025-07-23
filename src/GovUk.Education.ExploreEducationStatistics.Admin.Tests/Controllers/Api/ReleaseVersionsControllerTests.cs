@@ -23,6 +23,7 @@ using Moq;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.IO.Compression;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
@@ -37,6 +38,7 @@ using static GovUk.Education.ExploreEducationStatistics.Common.Services.Collecti
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using static Moq.MockBehavior;
 using ErrorViewModel = GovUk.Education.ExploreEducationStatistics.Common.ViewModels.ErrorViewModel;
+using File = System.IO.File;
 using ValidationUtils = GovUk.Education.ExploreEducationStatistics.Common.Validators.ValidationUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api;
@@ -58,8 +60,8 @@ public class ReleaseVersionsControllerUnitTests
         releaseDataFileService
             .Setup(service => service.Upload(
                 _releaseVersionId,
-                dataFile,
-                metaFile,
+                ItIsFileMatch(dataFile),
+                ItIsFileMatch(metaFile),
                 "Data set title",
                 null,
                 default))
@@ -98,8 +100,8 @@ public class ReleaseVersionsControllerUnitTests
         releaseDataFileService
             .Setup(service => service.Upload(
                 _releaseVersionId,
-                dataFile,
-                metaFile,
+                ItIsFileMatch(dataFile),
+                ItIsFileMatch(metaFile),
                 "Data set title",
                 null,
                 default))
@@ -129,7 +131,7 @@ public class ReleaseVersionsControllerUnitTests
     public async Task UploadDataSetAsZip_Success_ReturnsOkResult()
     {
         // Arrange
-        var dataSetZipFile = MockFile("dataSetZip.zip");
+        var dataSetZipFile = MockFile("dataSetZip.zip", isZip: true);
 
         var expectedVm = DataSetUploadMockBuilder.BuildViewModel();
 
@@ -137,7 +139,7 @@ public class ReleaseVersionsControllerUnitTests
         releaseDataFileService
             .Setup(service => service.UploadFromZip(
                 _releaseVersionId,
-                dataSetZipFile,
+                It.IsAny<IManagedStreamZipFile>(),
                 "Data set title",
                 null,
                 default))
@@ -168,7 +170,7 @@ public class ReleaseVersionsControllerUnitTests
     public async Task UploadDataSetAsBulkZip_Success_ReturnsOkResult()
     {
         // Arrange
-        var dataSetBulkZipFile = MockFile("dataSetZip.zip");
+        var dataSetBulkZipFile = MockFile("dataSetZip.zip", isZip: true);
 
         var expectedVm = DataSetUploadMockBuilder.BuildViewModel();
 
@@ -176,7 +178,7 @@ public class ReleaseVersionsControllerUnitTests
         releaseDataFileService
             .Setup(service => service.UploadFromBulkZip(
                 _releaseVersionId,
-                dataSetBulkZipFile,
+                It.IsAny<IManagedStreamZipFile>(),
                 default))
             .ReturnsAsync(new List<DataSetUploadViewModel> { expectedVm });
 
@@ -643,12 +645,30 @@ public class ReleaseVersionsControllerUnitTests
         result.AssertOkResult(amendmentCreatedResponse);
     }
 
-    private static IFormFile MockFile(string fileName)
+    private static IFormFile MockFile(string fileName, bool isZip = false)
     {
         var fileMock = new Mock<IFormFile>(Strict);
-        var stream = "test content".ToStream();
+        Stream stream;
+
+        if (isZip)
+        {
+            stream = new MemoryStream();
+
+            // Write a simple ZIP archive with one entry
+            using var archive = new ZipArchive(stream, ZipArchiveMode.Create, true);
+            var entry = archive.CreateEntry("data-file.csv");
+            using var entryStream = entry.Open();
+            using var writer = new StreamWriter(entryStream);
+            writer.Write("test content");
+        }
+        else
+        {
+            stream = "test content".ToStream();
+        }
+        
         fileMock.Setup(formFile => formFile.OpenReadStream()).Returns(stream);
         fileMock.Setup(formFile => formFile.FileName).Returns(fileName);
+        fileMock.Setup(formFile => formFile.Name).Returns(fileName);
         fileMock.Setup(formFile => formFile.Length).Returns(stream.Length);
         return fileMock.Object;
     }
@@ -674,6 +694,13 @@ public class ReleaseVersionsControllerUnitTests
             importService ?? Mock.Of<IDataImportService>(Strict),
             dataSetUploadRepository ?? Mock.Of<IDataSetUploadRepository>(Strict),
             dataSetFileStorage ?? Mock.Of<IDataSetFileStorage>(Strict));
+    }
+
+    private static IManagedStreamFile ItIsFileMatch(IFormFile dataFile)
+    {
+        return It.Is<IManagedStreamFile>(
+            file => file.Name == dataFile.Name
+                    && file.Length == dataFile.Length);
     }
 }
 
@@ -1442,11 +1469,11 @@ public abstract class ReleaseVersionsControllerIntegrationTests(TestApplicationF
 
             try
             {
-                var dataFileContent = new ByteArrayContent(await System.IO.File.ReadAllBytesAsync(dataFilePath));
+                var dataFileContent = new ByteArrayContent(await File.ReadAllBytesAsync(dataFilePath));
                 dataFileContent.Headers.ContentType = MediaTypeHeaderValue.Parse(MediaTypeNames.Text.Csv);
                 multipartContent.Add(dataFileContent, "DataFile", dataFileName);
 
-                var metaFileContent = new ByteArrayContent(await System.IO.File.ReadAllBytesAsync(metaFilePath));
+                var metaFileContent = new ByteArrayContent(await File.ReadAllBytesAsync(metaFilePath));
                 metaFileContent.Headers.ContentType = MediaTypeHeaderValue.Parse(MediaTypeNames.Text.Csv);
                 multipartContent.Add(metaFileContent, "MetaFile", metaFileName);
             }

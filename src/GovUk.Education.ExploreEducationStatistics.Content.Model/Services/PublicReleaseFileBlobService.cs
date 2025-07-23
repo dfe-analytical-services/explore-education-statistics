@@ -113,7 +113,7 @@ public class PublicReleaseFileBlobService : IReleaseFileBlobService
         return _publicBlobStorageService.UploadStream(
             containerName: PublicReleaseFiles,
             path: releaseFile.PublicPath(),
-            stream: stream,
+            sourceStream: stream,
             contentType: contentType);
     }
 

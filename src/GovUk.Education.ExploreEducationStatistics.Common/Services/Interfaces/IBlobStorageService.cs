@@ -50,7 +50,7 @@ public interface IBlobStorageService
     public Task UploadStream(
         IBlobContainer containerName,
         string path,
-        Stream stream,
+        Stream sourceStream,
         string contentType,
         string? contentEncoding = null,
         CancellationToken cancellationToken = default);
@@ -72,10 +72,25 @@ public interface IBlobStorageService
     /// <param name="decompress">if true, checks the content encoding and decompresses the blob if necessary</param>
     /// <param name="cancellationToken">used to cancel the download</param>
     /// <returns>the stream that the blob has been output to</returns>
+    [Obsolete("Use GetDownloadStream instead to create a download stream with no intermediary Streams necessary.")]
     public Task<Either<ActionResult, Stream>> DownloadToStream(
         IBlobContainer containerName,
         string path,
         Stream stream,
+        bool decompress = true,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Get a download Stream to fetch the entirety of a blob, with no intermediary Streams necessary.
+    /// </summary>
+    /// <param name="containerName">name of the blob container</param>
+    /// <param name="path">path to the blob within the container</param>
+    /// <param name="decompress">if true, checks the content encoding and decompresses the blob if necessary</param>
+    /// <param name="cancellationToken">used to cancel the download</param>
+    /// <returns>the stream via which the blob will be downloaded</returns>
+    Task<Either<ActionResult, Stream>> GetDownloadStream(
+        IBlobContainer containerName,
+        string path,
         bool decompress = true,
         CancellationToken cancellationToken = default);
 

@@ -1,6 +1,7 @@
+using System;
+using System.IO;
 using FluentValidation;
 using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
-using System.IO;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Models;
 
@@ -16,7 +17,7 @@ public record FileDto
     /// </remarks>
     public required long FileSize { get; init; }
 
-    public required MemoryStream FileStream { get; init; }
+    public required Func<Stream> FileStreamProvider { get; init; }
 
     public class Validator : AbstractValidator<FileDto>
     {

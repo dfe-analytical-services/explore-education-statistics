@@ -30,7 +30,7 @@ public class DataSetDtoBuilder
             {
                 FileName = _dataFileName,
                 FileSize = dataMemoryStream.Length,
-                FileStream = dataMemoryStream
+                FileStreamProvider = () => dataMemoryStream
             };
         }
 
@@ -42,7 +42,7 @@ public class DataSetDtoBuilder
             {
                 FileName = _metaFileName,
                 FileSize = metaMemoryStream.Length,
-                FileStream = metaMemoryStream
+                FileStreamProvider = () => metaMemoryStream
             };
         }
 

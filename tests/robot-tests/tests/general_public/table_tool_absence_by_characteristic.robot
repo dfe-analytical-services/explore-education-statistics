@@ -246,7 +246,7 @@ User generates a permanent link
     user waits until page contains link    View share link
     user checks generated permalink is valid
 
-User validates permanent link works correctly
+User validates permalink works correctly
     [Documentation]    EES-2892
     user clicks link    View share link
     user waits until h1 is visible    'Absence by characteristic' from '${PUPIL_ABSENCE_PUBLICATION_TITLE}'

@@ -1,10 +1,11 @@
+using System.IO;
 using FluentValidation.TestHelper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.MockBuilders;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
-using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using System.Text;
 using System.Threading.Tasks;
+using File = GovUk.Education.ExploreEducationStatistics.Content.Model.File;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Validators;
 
@@ -87,7 +88,12 @@ public class DataSetDtoValidatorTests
     public async Task DataSetDto_DataFileIsEmpty_ReturnsExpectedError()
     {
         // Arrange
-        var file = new FileDto { FileName = "data.csv", FileSize = 0, FileStream = new System.IO.MemoryStream() };
+        var file = new FileDto
+        {
+            FileName = "data.csv",
+            FileSize = 0,
+            FileStreamProvider = () => new MemoryStream()
+        };
 
         var dto = await new DataSetDtoBuilder()
             .WhereDataFileIs(file)
@@ -106,7 +112,12 @@ public class DataSetDtoValidatorTests
     public async Task DataSetDto_DataFileHasWrongExtension_ReturnsExpectedError()
     {
         // Arrange
-        var file = new FileDto { FileName = "data.jpg", FileSize = 4, FileStream = new System.IO.MemoryStream(Encoding.UTF8.GetBytes("test")) };
+        var file = new FileDto
+        {
+            FileName = "data.jpg",
+            FileSize = 4,
+            FileStreamProvider = () => new MemoryStream(Encoding.UTF8.GetBytes("test"))
+        };
 
         var dto = await new DataSetDtoBuilder()
             .WhereDataFileIs(file)
@@ -125,7 +136,12 @@ public class DataSetDtoValidatorTests
     public async Task DataSetDto_MetaFileIsEmpty_ReturnsExpectedError()
     {
         // Arrange
-        var file = new FileDto { FileName = "data.meta.csv", FileSize = 0, FileStream = new System.IO.MemoryStream() };
+        var file = new FileDto
+        {
+            FileName = "data.meta.csv",
+            FileSize = 0,
+            FileStreamProvider = () => new MemoryStream()
+        };
 
         var dto = await new DataSetDtoBuilder()
             .WhereDataFileIs(file)
@@ -144,7 +160,12 @@ public class DataSetDtoValidatorTests
     public async Task DataSetDto_MetaFileHasWrongExtension_ReturnsExpectedError()
     {
         // Arrange
-        var file = new FileDto { FileName = "data.meta.jpg", FileSize = 4, FileStream = new System.IO.MemoryStream(Encoding.UTF8.GetBytes("test")) };
+        var file = new FileDto
+        {
+            FileName = "data.meta.jpg",
+            FileSize = 4,
+            FileStreamProvider = () => new MemoryStream(Encoding.UTF8.GetBytes("test"))
+        };
 
         var dto = await new DataSetDtoBuilder()
             .WhereMetaFileIs(file)
