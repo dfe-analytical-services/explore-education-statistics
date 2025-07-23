@@ -79,12 +79,13 @@ public class PreviewTokenService(
         Guid previewTokenId,
         CancellationToken cancellationToken)
     {
+        var timestamp = DateTimeOffset.UtcNow; // Capture UtcNow and pass into query as a literal to avoid bizarre timing issues in tests.
         return await publicDataDbContext
             .PreviewTokens
             .Where(pt => pt.Id == previewTokenId)
             .Where(pt => pt.DataSetVersionId == dataSetVersionId)
             .Where(pt => pt.DataSetVersion.Status == DataSetVersionStatus.Draft)
-            .Where(pt => pt.Expiry > DateTimeOffset.UtcNow)
+            .Where(pt => pt.Expiry > timestamp)
             .AnyAsync(cancellationToken: cancellationToken);
     }
     
