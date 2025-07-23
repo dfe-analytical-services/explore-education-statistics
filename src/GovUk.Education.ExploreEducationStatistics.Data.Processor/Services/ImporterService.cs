@@ -129,7 +129,7 @@ public class ImporterService : IImporterService
 
                 await _dataImportService.UpdateStatus(dataImport.Id,
                     DataImportStatus.STAGE_2,
-                    (double)(index + 1) / dataImport.TotalRows!.Value * 100);
+                    (double)(index + 1) / dataImport.TotalRows * 100);
             }
 
             if (IsRowAllowed(soleGeographicLevel, rowValues, fixedInformationReader))
@@ -251,7 +251,7 @@ public class ImporterService : IImporterService
         var importObservationsBatchSize = _appOptions.RowsPerBatch;
         var soleGeographicLevel = import.HasSoleGeographicLevel();
         var csvHeaders = await CsvUtils.GetCsvHeaders(dataFileStreamProvider);
-        var totalBatches = Math.Ceiling((decimal)import.TotalRows!.Value / importObservationsBatchSize);
+        var totalBatches = Math.Ceiling((decimal)import.TotalRows / importObservationsBatchSize);
         var importedRowsSoFar = import.ImportedRows;
         var lastProcessedRowIndex = import.LastProcessedRowIndex ?? -1;
         var startingRowIndex = lastProcessedRowIndex + 1;

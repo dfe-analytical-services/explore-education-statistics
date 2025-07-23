@@ -19,7 +19,7 @@ public interface IDataImportService
 
     Task UpdateStatus(Guid id, DataImportStatus newStatus, double percentageComplete);
 
-    Task WriteDataSetFileMeta(Guid fileId, Guid subjectId, int? numDataFileRows);
+    Task WriteDataSetFileMeta(Guid fileId, Guid subjectId, int numDataFileRows);
 
     Task Update(
         Guid id,

@@ -9,7 +9,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model;
 
 public class DataSetFileMeta
 {
-    public required int? NumDataFileRows { get; set; }
+    public required int NumDataFileRows { get; set; }
 
     // NOTE: GeographicLevels aren't in DataSetFileMeta JSON because they need to queryable
     // So that meta data lives in the DataSetFileVersionGeographicLevels table
