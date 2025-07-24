@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMigrations;
 
 [ExcludeFromCodeCoverage]
+// ReSharper disable once InconsistentNaming
 public partial class EES3882_AddLatestPublishedReleaseIdToPublication : Migration
 {
     protected override void Up(MigrationBuilder migrationBuilder)

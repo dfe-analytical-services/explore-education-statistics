@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMigrations;
 
+// ReSharper disable once InconsistentNaming
 public partial class EES4002_RemovePreReleaseUsersFromAmendments : Migration
 {
     private const string MigrationId = "20230215154534";

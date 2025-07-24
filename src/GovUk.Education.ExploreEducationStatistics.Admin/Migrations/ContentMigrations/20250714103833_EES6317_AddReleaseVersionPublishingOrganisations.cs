@@ -9,6 +9,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
 
 /// <inheritdoc />
 [ExcludeFromCodeCoverage]
+// ReSharper disable once InconsistentNaming
 public partial class EES6317_AddReleaseVersionPublishingOrganisations : Migration
 {
     private const string MigrationId = "20250714103833";

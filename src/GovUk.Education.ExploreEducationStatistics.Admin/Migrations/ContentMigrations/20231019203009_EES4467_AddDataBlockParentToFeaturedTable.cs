@@ -7,6 +7,7 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Migrations.Migrati
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMigrations;
 
+// ReSharper disable once InconsistentNaming
 public partial class EES4467_AddDataBlockParentToFeaturedTable : Migration
 {
     private const string MigrationId = "20231019203009";

@@ -5,6 +5,7 @@
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMigrations;
 
 /// <inheritdoc />
+// ReSharper disable once InconsistentNaming
 public partial class EES5816_AddNumDataFileRowsToDataSetFileMeta : Migration
 {
     /// <inheritdoc />
