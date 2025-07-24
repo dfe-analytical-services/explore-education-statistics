@@ -83,7 +83,7 @@ const apiDataSetService = {
   ): Promise<ApiDataSetVersionChanges> {
     return publicApi.get(
       `/data-sets/${dataSetId}/versions/${dataSetVersion}/changes`,
-      { params: { patchHistory: showPatchHistory } },
+      { params: { includePatchHistory: showPatchHistory } },
     );
   },
 };

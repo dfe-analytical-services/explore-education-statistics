@@ -1117,7 +1117,7 @@ public abstract class DataSetVersionsControllerTests(TestApplicationFactory test
         [Theory]
         [InlineData(true)]
         [InlineData(false)]
-        public async Task GetChanges_PatchHistory_Returns200_AllChanges(bool patchHistory)
+        public async Task GetChanges_PatchHistory_Returns200_AllChanges(bool includePatchHistory)
         {
             DataSet dataSet = DataFixture
                 .DefaultDataSet()
@@ -1157,13 +1157,13 @@ public abstract class DataSetVersionsControllerTests(TestApplicationFactory test
             var response = await GetDataSetVersionChanges(
                 dataSetId: dataSet.Id,
                 dataSetVersion: dataSetVersion.PublicVersion,
-                patchHistory: patchHistory);
+                includePatchHistory: includePatchHistory);
 
             var viewModel = response.AssertOk<DataSetVersionChangesViewModel>(useSystemJson: true);
             
             Assert.NotNull(viewModel.PatchHistory);
             
-            if (!patchHistory)
+            if (!includePatchHistory)
             {
                 Assert.Empty(viewModel.PatchHistory);
                 return;
@@ -1236,7 +1236,7 @@ public abstract class DataSetVersionsControllerTests(TestApplicationFactory test
             var response = await GetDataSetVersionChanges(
                 dataSetId: dataSet.Id,
                 dataSetVersion: dataSetVersion.PublicVersion,
-                patchHistory: true);
+                includePatchHistory: true);
 
             response.AssertForbidden();
         }
@@ -2482,7 +2482,7 @@ public abstract class DataSetVersionsControllerTests(TestApplicationFactory test
             Guid? previewTokenId = null,
             ClaimsPrincipal? user = null,
             string? requestSource = null,
-            bool patchHistory = false)
+            bool includePatchHistory = false)
         {
             var client = BuildApp(contentApiClient)
                 .WithUser(user)
@@ -2490,7 +2490,7 @@ public abstract class DataSetVersionsControllerTests(TestApplicationFactory test
                 .WithPreviewTokenHeader(previewTokenId)
                 .WithRequestSourceHeader(requestSource);
 
-            var uri = new Uri($"{BaseUrl}/{dataSetId}/versions/{dataSetVersion}/changes?patchHistory={patchHistory}", UriKind.Relative);
+            var uri = new Uri($"{BaseUrl}/{dataSetId}/versions/{dataSetVersion}/changes?includePatchHistory={includePatchHistory}", UriKind.Relative);
 
             return await client.GetAsync(uri);
         }
