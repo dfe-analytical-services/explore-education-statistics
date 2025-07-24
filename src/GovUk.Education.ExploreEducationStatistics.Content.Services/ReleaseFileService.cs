@@ -111,7 +111,7 @@ public class ReleaseFileService(
             )
             .OnSuccessDo(rf => userService.CheckCanViewReleaseVersion(rf.ReleaseVersion))
             .OnSuccessCombineWith(rf =>
-                publicBlobStorageService.DownloadToStream(PublicReleaseFiles, rf.PublicPath(), new MemoryStream()))
+                publicBlobStorageService.GetDownloadStream(PublicReleaseFiles, rf.PublicPath()))
             .OnSuccess(tuple =>
             {
                 var (releaseFile, stream) = tuple;
