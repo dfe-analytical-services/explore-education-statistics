@@ -276,29 +276,12 @@ export default function DataSetFilePage({
                   />
 
                   {apiDataSetVersionChanges && (
-                    <>
-                      <DataSetFileApiChangelog
-                        changes={apiDataSetVersionChanges}
-                        guidanceNotes={apiDataSetVersion.notes}
-                        version={apiDataSetVersion.version}
-                      />
-                      {apiDataSetVersionChanges.patchHistory &&
-                        apiDataSetVersionChanges.patchHistory.map(
-                          (change: ApiDataSetVersionChanges) => (
-                            <DataSetFileApiChangelog
-                              key={change.versionNumber.patch}
-                              renderHeading={false}
-                              changes={change}
-                              guidanceNotes={change.notes}
-                              version={
-                                change.versionNumber.patch > 0
-                                  ? `${change.versionNumber.major}.${change.versionNumber.minor}.${change.versionNumber.patch}`
-                                  : `${change.versionNumber.major}.${change.versionNumber.minor}`
-                              }
-                            />
-                          ),
-                        )}
-                    </>
+                    <DataSetFileApiChangelog
+                      changes={apiDataSetVersionChanges}
+                      guidanceNotes={apiDataSetVersion.notes}
+                      version={apiDataSetVersion.version}
+                      patchHistory={apiDataSetVersionChanges.patchHistory || []}
+                    />
                   )}
                 </>
               )}

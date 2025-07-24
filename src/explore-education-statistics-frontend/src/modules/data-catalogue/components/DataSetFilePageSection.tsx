@@ -8,7 +8,7 @@ interface Props {
   children: ReactNode;
   className?: string;
   heading: string;
-  id: PageSectionId | undefined;
+  id?: PageSectionId;
   testId?: string;
 }
 
