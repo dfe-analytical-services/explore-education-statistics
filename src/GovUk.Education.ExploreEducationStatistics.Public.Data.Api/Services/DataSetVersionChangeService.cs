@@ -64,7 +64,9 @@ public class DataSetVersionChangeService(
                 dataSetId: dataSetId,
                 version: dataSetVersion,
                 cancellationToken: cancellationToken)
-            .OnSuccessDo(userService.CheckCanViewDataSetVersion)
+            .OnSuccess(version => version
+                .Select(userService.CheckCanViewDataSetVersion)
+                .OnSuccessAll())
             .OnSuccess(async versions =>
             {
                 var loadedChanges = new List<DataSetVersionChangesViewModel>();
@@ -121,10 +123,10 @@ public class DataSetVersionChangeService(
 
         return new DataSetVersionChangesViewModel
         {
-            VersionNumber = DataSetVersionNumber
-                .TryParse(dataSetVersion.PublicVersion, out var versionNumber) 
-                ? versionNumber 
-                : null,
+            VersionNumber = new DataSetVersionNumber(
+                dataSetVersion.VersionMajor, 
+                dataSetVersion.VersionMinor, 
+                dataSetVersion.VersionPatch),
             Notes = dataSetVersion.Notes,
             MajorChanges = new ChangeSetViewModel
             {

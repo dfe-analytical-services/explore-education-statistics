@@ -27,19 +27,4 @@ public static class UserServiceExtensions
     {
         return userService.CheckPolicy(dataSetVersion, PublicDataSecurityPolicies.CanViewDataSetVersion);
     }
-    
-    public static async Task<Either<ActionResult, DataSetVersion[]>> CheckCanViewDataSetVersion(
-        this IUserService userService,
-        DataSetVersion[] dataSetVersion)
-    {
-        foreach (var version in dataSetVersion)
-        {
-            var result = await userService.CheckPolicy(version, PublicDataSecurityPolicies.CanViewDataSetVersion);
-            if (result.IsLeft)
-            {
-                return new ForbidResult();
-            }
-        } 
-        return dataSetVersion;
-    }
 }
