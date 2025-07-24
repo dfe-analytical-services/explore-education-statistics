@@ -97,13 +97,19 @@ describe('DataCataloguePage', () => {
     expect(dataSets).toHaveLength(3);
 
     expect(
-      within(dataSets[0]).getByRole('heading', { name: 'Data set 1' }),
+      within(dataSets[0]).getByRole('heading', {
+        name: 'Publication 1 Data set 1',
+      }),
     ).toBeInTheDocument();
     expect(
-      within(dataSets[1]).getByRole('heading', { name: 'Data set 2' }),
+      within(dataSets[1]).getByRole('heading', {
+        name: 'Publication 1 Data set 2',
+      }),
     ).toBeInTheDocument();
     expect(
-      within(dataSets[2]).getByRole('heading', { name: 'Data set 3' }),
+      within(dataSets[2]).getByRole('heading', {
+        name: 'Publication 2 Data set 3',
+      }),
     ).toBeInTheDocument();
 
     const pagination = within(

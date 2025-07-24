@@ -89,7 +89,18 @@ export default function DataSetFileSummary({
           className: `govuk-heading-m govuk-!-margin-bottom-2`,
           id: `${id}-heading`,
         },
-        <Link to={`/data-catalogue/data-set/${dataSetFileId}`}>{title}</Link>,
+
+        <Link
+          to={`/data-catalogue/data-set/${dataSetFileId}`}
+          className={styles.heading}
+        >
+          {headingTag === 'h3' && (
+            <span className="govuk-caption-m govuk-!-font-size-16">
+              {publication.title}
+            </span>
+          )}
+          <span className={styles.title}>{title}</span>
+        </Link>,
       )}
 
       <ContentHtml
@@ -136,9 +147,6 @@ export default function DataSetFileSummary({
         </SummaryListItem>
         <SummaryListItem term="Last updated">
           <FormattedDate format="d MMM yyyy">{lastUpdated}</FormattedDate>
-        </SummaryListItem>
-        <SummaryListItem term="Publication">
-          {publication.title}
         </SummaryListItem>
         <SummaryListItem term="Release">{release.title}</SummaryListItem>
         {numDataFileRows && (

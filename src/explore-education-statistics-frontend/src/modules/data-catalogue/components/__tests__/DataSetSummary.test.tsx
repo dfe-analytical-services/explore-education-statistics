@@ -18,7 +18,7 @@ describe('DataSetFileSummary', () => {
     render(<DataSetFileSummary dataSetFile={testDataSetFileSummaries[0]} />);
 
     expect(
-      screen.getByRole('heading', { name: 'Data set 1' }),
+      screen.getByRole('heading', { name: 'Publication 1 Data set 1' }),
     ).toBeInTheDocument();
 
     expect(screen.getByText('Data set summary 1')).toBeInTheDocument();
@@ -28,9 +28,6 @@ describe('DataSetFileSummary', () => {
     ).toBeInTheDocument();
     expect(
       within(screen.getByTestId('Published')).getByText('1 Jan 2020'),
-    ).toBeInTheDocument();
-    expect(
-      within(screen.getByTestId('Publication')).getByText('Publication 1'),
     ).toBeInTheDocument();
     expect(
       within(screen.getByTestId('Release')).getByText('Release 1'),
