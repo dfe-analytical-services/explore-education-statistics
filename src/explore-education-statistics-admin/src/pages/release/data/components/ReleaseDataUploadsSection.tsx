@@ -94,62 +94,54 @@ export default function ReleaseDataUploadsSection({
 
   const handleStatusChange = useCallback(
     async (dataFile: DataFile, importStatus: DataFileImportStatus) => {
-      // EES-5732 UI tests related to data replacement sometimes fail
-      // because of a permission call for the replaced file being called,
-      // probably caused by the speed of the tests.
-      // This prevents this happening.
-      if (importStatus?.status === 'NOT_FOUND') {
-        return;
+      try {
+        const permissions = await permissionService.getDataFilePermissions(
+          releaseVersionId,
+          dataFile.id,
+        );
+
+        setAllDataFiles(currentDataFiles =>
+          currentDataFiles.map(file =>
+            file.fileName !== dataFile.fileName
+              ? file
+              : {
+                  ...dataFile,
+                  rows: importStatus.totalRows,
+                  status: importStatus.status,
+                  permissions,
+                },
+          ),
+        );
+      } catch {
+        refetchDataFiles();
       }
-
-      const permissions = await permissionService.getDataFilePermissions(
-        releaseVersionId,
-        dataFile.id,
-      );
-
-      setAllDataFiles(currentDataFiles =>
-        currentDataFiles.map(file =>
-          file.fileName !== dataFile.fileName
-            ? file
-            : {
-                ...dataFile,
-                rows: importStatus.totalRows,
-                status: importStatus.status,
-                permissions,
-              },
-        ),
-      );
     },
-    [releaseVersionId, setAllDataFiles],
+    [releaseVersionId, setAllDataFiles, refetchDataFiles],
   );
 
   const handleReplacementStatusChange = useCallback(
     async (updatedDataFile: DataFile) => {
-      // EES-5732 UI tests related to data replacement sometimes fail
-      // because of a permission call for the replaced file being called,
-      // probably caused by the speed of the tests.
-      // This prevents this happening.
-      if (updatedDataFile.replacedByDataFile?.status === 'NOT_FOUND') {
-        return;
+      try {
+        const permissions = await permissionService.getDataFilePermissions(
+          releaseVersionId,
+          updatedDataFile.id,
+        );
+
+        setAllDataFiles(currentDataFiles =>
+          currentDataFiles.map(file =>
+            file.fileName !== updatedDataFile.fileName
+              ? file
+              : {
+                  ...updatedDataFile,
+                  permissions,
+                },
+          ),
+        );
+      } catch {
+        refetchDataFiles();
       }
-
-      const permissions = await permissionService.getDataFilePermissions(
-        releaseVersionId,
-        updatedDataFile.id,
-      );
-
-      setAllDataFiles(currentDataFiles =>
-        currentDataFiles.map(file =>
-          file.fileName !== updatedDataFile.fileName
-            ? file
-            : {
-                ...updatedDataFile,
-                permissions,
-              },
-        ),
-      );
     },
-    [releaseVersionId, setAllDataFiles],
+    [releaseVersionId, setAllDataFiles, refetchDataFiles],
   );
 
   const handleDataSetImport = useCallback(

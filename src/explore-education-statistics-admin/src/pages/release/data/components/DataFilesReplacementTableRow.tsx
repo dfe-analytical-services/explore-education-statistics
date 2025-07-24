@@ -9,7 +9,6 @@ import releaseDataFileQueries from '@admin/queries/releaseDataFileQueries';
 import releaseDataFileService, {
   DataFile,
   DataFileImportStatus,
-  ReplacementDataFile,
 } from '@admin/services/releaseDataFileService';
 import dataReplacementService from '@admin/services/dataReplacementService';
 import useToggle from '@common/hooks/useToggle';
