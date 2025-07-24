@@ -107,7 +107,7 @@ Verify that archive-publication is publicly accessible
     ...    ${PUBLICATION_URL_ARCHIVE}
     ...    ${PUBLICATION_NAME_ARCHIVE}
     ...    ${RELEASE_NAME_ARCHIVE}
-    user waits until page contains    This is the latest data
+    user waits until page contains    This is the latest release
 
 Check that archive-publication subject appears correctly on Data tables page
     user navigates to data tables page on public frontend
@@ -235,14 +235,14 @@ Check public superseding-publication release page displays correctly
     ...    ${PUBLICATION_URL_SUPERSEDE}
     ...    ${PUBLICATION_NAME_SUPERSEDE}
     ...    ${RELEASE_NAME_SUPERSEDE}
-    user waits until page contains    This is the latest data
+    user waits until page contains    This is the latest release
 
 Check public archive-publication release page displays correctly
     user waits for caches to expire
 
     user navigates to    ${PUBLICATION_URL_ARCHIVE}
     user waits until h1 is visible    ${PUBLICATION_NAME_ARCHIVE}    %{WAIT_MEDIUM}
-    user checks page does not contain    This is the latest data
+    user checks page does not contain    This is the latest release
 
 Check public archive-publication release page displays superseded warning
     user checks page contains element    testid:superseded-warning
@@ -255,7 +255,7 @@ Check superseded warning link takes user to superseding-publication release page
     user clicks element    testid:superseded-by-link
 
     user waits until h1 is visible    ${PUBLICATION_NAME_SUPERSEDE}    %{WAIT_MEDIUM}
-    user checks page contains    This is the latest data
+    user checks page contains    This is the latest release
 
     user checks page does not contain element    testid:superseded-warning
     user checks page does not contain element    testid:superseded-by-link

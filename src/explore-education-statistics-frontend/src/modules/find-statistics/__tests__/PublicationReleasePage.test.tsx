@@ -9,10 +9,12 @@ describe('PublicationReleasePage', () => {
   test('renders latest data tag', () => {
     render(<PublicationReleasePage releaseVersion={testRelease} />);
 
-    expect(screen.queryByText('This is the latest data')).toBeInTheDocument();
+    expect(
+      screen.queryByText('This is the latest release'),
+    ).toBeInTheDocument();
 
     expect(
-      screen.queryByText('This is not the latest data'),
+      screen.queryByText('This is not the latest release'),
     ).not.toBeInTheDocument();
   });
 
@@ -24,7 +26,7 @@ describe('PublicationReleasePage', () => {
     render(<PublicationReleasePage releaseVersion={testReleaseSuperseded} />);
 
     expect(
-      screen.queryByText('This is the latest data'),
+      screen.queryByText('This is the latest release'),
     ).not.toBeInTheDocument();
   });
 
@@ -35,9 +37,11 @@ describe('PublicationReleasePage', () => {
     };
     render(<PublicationReleasePage releaseVersion={testReleaseNotLatest} />);
 
-    expect(screen.getByText('This is not the latest data')).toBeInTheDocument();
     expect(
-      screen.queryByText('This is the latest data'),
+      screen.getByText('This is not the latest release'),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByText('This is the latest release'),
     ).not.toBeInTheDocument();
 
     expect(

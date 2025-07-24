@@ -135,9 +135,9 @@ const PublicationReleasePage: NextPage<Props> = ({ releaseVersion }) => {
                 {!releaseVersion.publication.isSuperseded && (
                   <>
                     {releaseVersion.latestRelease ? (
-                      <Tag>This is the latest data</Tag>
+                      <Tag>This is the latest release</Tag>
                     ) : (
-                      <Tag colour="orange">This is not the latest data</Tag>
+                      <Tag colour="orange">This is not the latest release</Tag>
                     )}
                   </>
                 )}
