@@ -491,7 +491,7 @@ public class DataSetFileStorageTestFixture
                 It.IsAny<string>(),
                 It.IsAny<MemoryStream>(),
                 It.IsAny<string>(),
-                null,
+                ContentEncodings.Gzip,
                 It.IsAny<CancellationToken>()))
             .Returns(Task.CompletedTask);
 

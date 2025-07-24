@@ -129,9 +129,9 @@ public class DataSetFileStorageTests
                 .Setup(mock => mock.UploadStream(
                     It.IsAny<IBlobContainer>(),
                     It.IsAny<string>(),
-                    It.IsAny<MemoryStream>(),
+                    It.IsAny<Stream>(),
                     It.IsAny<string>(),
-                    null,
+                    ContentEncodings.Gzip,
                     It.IsAny<CancellationToken>()))
                 .Returns(Task.CompletedTask);
 
@@ -225,9 +225,9 @@ public class DataSetFileStorageTests
             .Setup(mock => mock.UploadStream(
                 It.IsAny<IBlobContainer>(),
                 It.IsAny<string>(),
-                It.IsAny<MemoryStream>(),
+                It.IsAny<Stream>(),
                 It.IsAny<string>(),
-                null,
+                ContentEncodings.Gzip,
                 It.IsAny<CancellationToken>()))
             .Returns(Task.CompletedTask);
 
@@ -800,7 +800,10 @@ public class DataSetFileStorageTests
 
         var dataSet = new DataSet
         {
-            Title = dataSetName, DataFile = dataSetFile, MetaFile = metaSetFile, ReplacingFile =testFixture.DataFileReplace
+            Title = dataSetName,
+            DataFile = dataSetFile,
+            MetaFile = metaSetFile,
+            ReplacingFile = testFixture.DataFileReplace
         };
           
         var service = CreateServiceForApiPatchReplacement(testFixture, contentDbContext);

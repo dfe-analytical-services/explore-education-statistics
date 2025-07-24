@@ -390,7 +390,7 @@ public class PermalinkService : IPermalinkService
         await _publicBlobStorageService.UploadStream(
             containerName: BlobContainers.PermalinkSnapshots,
             path: $"{permalink.Id}.csv.zst",
-            stream: csvStream,
+            sourceStream: csvStream,
             contentType: ContentTypes.Csv,
             contentEncoding: ContentEncodings.Zstd,
             cancellationToken: cancellationToken
