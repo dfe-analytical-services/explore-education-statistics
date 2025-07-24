@@ -1506,7 +1506,7 @@ public abstract class ReleaseVersionsControllerIntegrationTests(TestApplicationF
 
             try
             {
-                var fileContent = new ByteArrayContent(await System.IO.File.ReadAllBytesAsync(filePath));
+                var fileContent = new ByteArrayContent(await File.ReadAllBytesAsync(filePath));
                 fileContent.Headers.ContentType = MediaTypeHeaderValue.Parse(MediaTypeNames.Application.Zip);
                 multipartContent.Add(fileContent, "ZipFile", fileName);
             }
@@ -1536,7 +1536,7 @@ public abstract class ReleaseVersionsControllerIntegrationTests(TestApplicationF
 
             try
             {
-                var fileContent = new ByteArrayContent(await System.IO.File.ReadAllBytesAsync(filePath));
+                var fileContent = new ByteArrayContent(await File.ReadAllBytesAsync(filePath));
                 fileContent.Headers.ContentType = MediaTypeHeaderValue.Parse(MediaTypeNames.Application.Zip);
                 multipartContent.Add(fileContent, "ZipFile", fileName);
             }
