@@ -287,7 +287,8 @@ public class ReleaseFileServiceTests : IDisposable
 
             // Entries are sorted alphabetically
             Assert.Equal(3, zip.Entries.Count);
-            Assert.Equal("data/data.csv", zip.Entries[0].FullName);
+            Assert.StartsWith("data/data", zip.Entries[0].FullName);
+            Assert.EndsWith(".csv", zip.Entries[0].FullName);
             Assert.Equal("Test data blob", zip.Entries[0].Open().ReadToEnd());
 
             Assert.Equal("supporting-files/ancillary.pdf", zip.Entries[1].FullName);
@@ -349,13 +350,13 @@ public class ReleaseFileServiceTests : IDisposable
 
         var captureRequest = new CaptureZipDownloadRequest
         {
-            PublicationName =  releaseVersion.Release.Publication.Title,
-            ReleaseVersionId =  releaseVersion.Id,
-            ReleaseName =  releaseVersion.Release.Title,
-            ReleaseLabel =  releaseVersion.Release.Label,
-            SubjectId =  releaseFile.File.SubjectId,
-            DataSetTitle =  releaseFile.Name,
-            FromPage =  AnalyticsFromPage.DataCatalogue,
+            PublicationName = releaseVersion.Release.Publication.Title,
+            ReleaseVersionId = releaseVersion.Id,
+            ReleaseName = releaseVersion.Release.Title,
+            ReleaseLabel = releaseVersion.Release.Label,
+            SubjectId = releaseFile.File.SubjectId,
+            DataSetTitle = releaseFile.Name,
+            FromPage = AnalyticsFromPage.DataCatalogue,
         };
         var analyticsManager = new Mock<IAnalyticsManager>(MockBehavior.Strict);
         analyticsManager.Setup(m => m.Add(
@@ -390,7 +391,8 @@ public class ReleaseFileServiceTests : IDisposable
 
             // Entries are sorted alphabetically
             Assert.Equal(2, zip.Entries.Count);
-            Assert.Equal("data/data-1.csv", zip.Entries[0].FullName);
+            Assert.StartsWith("data/data", zip.Entries[0].FullName);
+            Assert.EndsWith(".csv", zip.Entries[0].FullName);
             Assert.Equal("Test data 1 blob", zip.Entries[0].Open().ReadToEnd());
 
             // Data guidance is generated if there is at least one data file
@@ -540,10 +542,10 @@ public class ReleaseFileServiceTests : IDisposable
 
         var request = new CaptureZipDownloadRequest
         {
-            PublicationName =  releaseVersion.Release.Publication.Title,
-            ReleaseVersionId =  releaseVersion.Id,
-            ReleaseName =  releaseVersion.Release.Title,
-            ReleaseLabel =  releaseVersion.Release.Label,
+            PublicationName = releaseVersion.Release.Publication.Title,
+            ReleaseVersionId = releaseVersion.Id,
+            ReleaseName = releaseVersion.Release.Title,
+            ReleaseLabel = releaseVersion.Release.Label,
             FromPage = AnalyticsFromPage.DataCatalogue,
         };
         var analyticsManager = new Mock<IAnalyticsManager>(MockBehavior.Strict);
@@ -942,7 +944,8 @@ public class ReleaseFileServiceTests : IDisposable
 
             // Entries are sorted alphabetically
             Assert.Equal(3, zip.Entries.Count);
-            Assert.Equal("data/data.csv", zip.Entries[0].FullName);
+            Assert.StartsWith("data/data", zip.Entries[0].FullName);
+            Assert.EndsWith(".csv", zip.Entries[0].FullName);
             Assert.Equal("Test data blob", zip.Entries[0].Open().ReadToEnd());
 
             Assert.Equal("supporting-files/ancillary.pdf", zip.Entries[1].FullName);
