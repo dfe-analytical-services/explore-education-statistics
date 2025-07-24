@@ -222,6 +222,8 @@ Cancel reordering indicators
     user clicks button    Cancel    id:reordering
     user waits until h3 is not visible    Reorder indicators for ${SUBJECT_NAME}
 
+# TODO: Rewrite (replacement behaviour is now different)
+
 Replace subject data
     user clicks link    Data uploads
     user waits until page contains data uploads table

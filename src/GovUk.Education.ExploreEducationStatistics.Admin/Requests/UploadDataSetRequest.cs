@@ -14,8 +14,6 @@ public record UploadDataSetRequest
 {
     public Guid ReleaseVersionId { get; init; }
 
-    public Guid? ReplacingFileId { get; init; }
-
     public string Title { get; init; } = string.Empty;
 
     public IFormFile DataFile { get; init; } = null!;
@@ -67,8 +65,6 @@ public record UploadDataSetRequest
 public record UploadDataSetAsZipRequest
 {
     public Guid ReleaseVersionId { get; init; }
-
-    public Guid? ReplacingFileId { get; init; }
 
     public string Title { get; init; } = string.Empty;
 
