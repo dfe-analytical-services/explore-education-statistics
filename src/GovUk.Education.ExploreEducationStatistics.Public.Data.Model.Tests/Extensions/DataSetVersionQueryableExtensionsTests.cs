@@ -1,5 +1,6 @@
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
+using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Tests.Fixtures;
@@ -9,7 +10,7 @@ using Moq.EntityFrameworkCore;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Tests.Extensions;
 
-public class DataSetVersionQueryableExtensionsTests
+public abstract class DataSetVersionQueryableExtensionsTests
 {
     public class FindByVersionTests
     {
@@ -159,6 +160,57 @@ public class DataSetVersionQueryableExtensionsTests
             Assert.Equal(0, actualResult.Right.VersionPatch);
         }
 
+        [Fact]
+        public async Task GetPreviousVersions_ReturnsAllMatchingMinorMajorVersion()
+        {
+            // Arrange
+            DataSet dataSet = _dataFixture
+                .DefaultDataSet()
+                .WithStatusPublished();
+
+            var dataSetVersions = _dataFixture
+                .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 3)
+                .WithStatusPublished()
+                .WithDataSetId(dataSet.Id)
+                .WithPreviewTokens(() => [_dataFixture.DefaultPreviewToken()])
+                .ForIndex(1, dsv => dsv.SetVersionNumber(1, 0))
+                .ForIndex(2, dsv => dsv.SetVersionNumber(2, 0))
+                .ForIndex(3, dsv => dsv.SetVersionNumber(2, 1))
+                .ForIndex(4, dsv => dsv.SetVersionNumber(2, 2))
+                .ForIndex(5, dsv => dsv.SetVersionNumber(3, 0))
+                .ForIndex(6, dsv => dsv.SetVersionNumber(3, 0))
+                .ForIndex(7, dsv => dsv.SetVersionNumber(3, 1))
+                .ForIndex(8, dsv => dsv.SetVersionNumber(3, 2))
+                .ForIndex(9, dsv => dsv.SetVersionNumber(3, 2, 1))
+                .ForIndex(10, dsv => dsv.SetVersionNumber(3, 2, 2))
+                .ForIndex(11, dsv => dsv.SetVersionNumber(3, 2, 3))
+                .GenerateList();
+
+            var publicDataDbContextMock = new Mock<PublicDataDbContext>();
+            publicDataDbContextMock.Setup(dbContext => dbContext.DataSetVersions).ReturnsDbSet(dataSetVersions);
+
+            var queryable = publicDataDbContextMock.Object.DataSetVersions.AsNoTracking();
+            
+            // Act 
+            var result = await queryable.GetPreviousPatchVersions(dataSet.Id, new DataSetVersionNumber(3, 2, 3), CancellationToken.None);
+
+            // Assert
+            var actualResult = result.AssertRight();
+            Assert.NotNull(actualResult);
+            Assert.Equal(3, actualResult.Length);
+            
+            Assert.Equal(3, actualResult[0].VersionMajor);
+            Assert.Equal(2, actualResult[0].VersionMinor);
+            Assert.Equal(0, actualResult[0].VersionPatch);
+            
+            Assert.Equal(3, actualResult[1].VersionMajor);
+            Assert.Equal(2, actualResult[1].VersionMinor);
+            Assert.Equal(1, actualResult[1].VersionPatch);
+            
+            Assert.Equal(3, actualResult[2].VersionMajor);
+            Assert.Equal(2, actualResult[2].VersionMinor);
+            Assert.Equal(2, actualResult[2].VersionPatch);
+        }
         
         private IQueryable<DataSetVersion> SetupDataSetVersions(out Guid dataSetGuid)
         {

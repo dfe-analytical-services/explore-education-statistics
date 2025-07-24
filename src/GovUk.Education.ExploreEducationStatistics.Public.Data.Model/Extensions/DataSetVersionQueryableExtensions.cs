@@ -64,8 +64,13 @@ public static class DataSetVersionQueryableExtensions
              ? throw new ArgumentException( $"Patch version must be specified in version supplied ({version}).")
                 : await queryable
                     .Where(dsv => dsv.DataSetId == dataSetId)
-                    .Where(v => v.VersionMajor == version.Major &&
-                        v.VersionMinor == version.Minor &&
-                        v.VersionPatch < version.Patch)
+                    .WherePreviousPatchVersion(version)
                     .ToArrayAsync(cancellationToken);
+
+    private static IQueryable<DataSetVersion> WherePreviousPatchVersion(
+        this IQueryable<DataSetVersion> query,
+        DataSetVersionNumber version) =>
+        query.Where(v => v.VersionMajor == version.Major &&
+                         v.VersionMinor == version.Minor &&
+                         v.VersionPatch < version.Patch);
 }
