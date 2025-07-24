@@ -5,6 +5,7 @@ describe('DataSetFileApiChangelog', () => {
   test('renders correctly with major and minor changes and public guidance notes', () => {
     render(
       <DataSetFileApiChangelog
+        patchHistory={[]}
         changes={{
           versionNumber: { major: 1, minor: 0, patch: 0 },
           notes: '',
@@ -67,6 +68,7 @@ describe('DataSetFileApiChangelog', () => {
   test('renders correctly with only major changes', () => {
     render(
       <DataSetFileApiChangelog
+        patchHistory={[]}
         changes={{
           versionNumber: { major: 1, minor: 0, patch: 0 },
           notes: '',
@@ -102,6 +104,7 @@ describe('DataSetFileApiChangelog', () => {
   test('renders correctly with only minor changes', () => {
     render(
       <DataSetFileApiChangelog
+        patchHistory={[]}
         changes={{
           versionNumber: { major: 1, minor: 0, patch: 0 },
           notes: '',
@@ -137,6 +140,7 @@ describe('DataSetFileApiChangelog', () => {
   test('renders correctly with no public data guidance', () => {
     render(
       <DataSetFileApiChangelog
+        patchHistory={[]}
         changes={{
           versionNumber: { major: 1, minor: 0, patch: 0 },
           notes: '',
@@ -166,6 +170,7 @@ describe('DataSetFileApiChangelog', () => {
   test('does not render if empty changes', () => {
     render(
       <DataSetFileApiChangelog
+        patchHistory={[]}
         changes={{
           versionNumber: { major: 1, minor: 0, patch: 0 },
           notes: '',
