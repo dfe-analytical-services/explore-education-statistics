@@ -37,19 +37,6 @@ export default function DataSetFileApiVersionHistory({
   const currentVersionFileId = data?.results.find(
     version => version.version === currentVersion,
   )?.file.id;
-  const patchVersionHighestPatchDictionary = data?.results.reduce<
-    Record<string, number>
-  >((acc, version) => {
-    const [major, minor, patch] = version.version.split('.').map(Number);
-    if (patch === undefined) {
-      return acc;
-    }
-    const key = `${major}.${minor}`;
-    if (!acc[key] || patch > acc[key]) {
-      acc[key] = patch;
-    }
-    return acc;
-  }, {});
 
   const filteredVersions = filterHighestPatchVersions(
     data?.results?.map((version: ApiDataSetVersion) => version.version) ?? [],
