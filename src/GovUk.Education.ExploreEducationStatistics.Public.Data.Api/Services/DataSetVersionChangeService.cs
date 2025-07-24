@@ -23,7 +23,7 @@ public class DataSetVersionChangeService(
     public Task<Either<ActionResult, DataSetVersionChangesViewModel>> GetChanges(
         Guid dataSetId,
         string dataSetVersion,
-        bool patchHistory,
+        bool includePatchHistory,
         CancellationToken cancellationToken = default)
     {
         return publicDataDbContext.DataSetVersions
@@ -41,7 +41,7 @@ public class DataSetVersionChangeService(
             .OnSuccess(dsv => LoadChanges(dsv, cancellationToken))
             .OnSuccess(MapChanges)
             .OnSuccessCombineWith(changes => 
-                patchHistory 
+                includePatchHistory 
                     ? GetPreviousChanges(dataSetId, changes.VersionNumber, cancellationToken) 
                     : Task.FromResult(new Either<ActionResult, List<DataSetVersionChangesViewModel>>(new List<DataSetVersionChangesViewModel>()))
                 )
