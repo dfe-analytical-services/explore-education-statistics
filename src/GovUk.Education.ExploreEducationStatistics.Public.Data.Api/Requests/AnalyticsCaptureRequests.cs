@@ -1,6 +1,4 @@
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Model;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
 using GovUk.Education.ExploreEducationStatistics.Analytics.Common.Interfaces;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Requests;

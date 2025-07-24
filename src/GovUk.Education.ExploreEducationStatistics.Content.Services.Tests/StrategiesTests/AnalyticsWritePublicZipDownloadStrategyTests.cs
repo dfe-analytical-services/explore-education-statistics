@@ -6,7 +6,6 @@ using GovUk.Education.ExploreEducationStatistics.Analytics.Common;
 using GovUk.Education.ExploreEducationStatistics.Analytics.Common.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Analytics.Common.Strategies;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
-using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Requests;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Strategies;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Tests.Services;

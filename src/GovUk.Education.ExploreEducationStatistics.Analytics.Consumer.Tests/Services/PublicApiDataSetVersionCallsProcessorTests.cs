@@ -1,12 +1,8 @@
 using System.Reflection;
 using GovUk.Education.ExploreEducationStatistics.Analytics.Consumer.Services;
-using GovUk.Education.ExploreEducationStatistics.Analytics.Consumer.Services.Workflow;
 using GovUk.Education.ExploreEducationStatistics.Common.DuckDb.DuckDb;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
-using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using InterpolatedSql.Dapper;
-using Microsoft.Extensions.Logging;
-using Moq;
 using Xunit;
 
 namespace GovUk.Education.ExploreEducationStatistics.Analytics.Consumer.Tests.Services;

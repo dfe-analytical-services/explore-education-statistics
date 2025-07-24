@@ -20,7 +20,6 @@ using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Analytics.Common.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Strategies;
 using Microsoft.AspNetCore.Hosting;
 using Snapshooter.Xunit;
