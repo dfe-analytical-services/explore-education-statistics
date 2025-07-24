@@ -609,10 +609,9 @@ public class DataSetFileStorageTests
         var privateBlobStorageService = new Mock<IPrivateBlobStorageService>(Strict);
 
         privateBlobStorageService
-            .Setup(mock => mock.DownloadToStream(
+            .Setup(mock => mock.GetDownloadStream(
                 PrivateReleaseTempFiles,
                 It.IsAny<string>(),
-                It.IsAny<MemoryStream>(),
                 It.IsAny<bool>(),
                 It.IsAny<CancellationToken>()))
             .ReturnsAsync(Stream.Null);

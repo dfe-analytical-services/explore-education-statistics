@@ -280,7 +280,7 @@ public class DataSetFileStorage(
         };
 
         return await privateBlobStorageService
-            .DownloadToStream(PrivateReleaseTempFiles, filePath, new MemoryStream(), cancellationToken: cancellationToken)
+            .GetDownloadStream(PrivateReleaseTempFiles, filePath, cancellationToken: cancellationToken)
             .OnSuccess(stream
                 => new FileStreamResult(stream, ContentTypes.Csv));
     }

@@ -48,7 +48,7 @@ public class ReleaseImageService : IReleaseImageService
                 .Include(rf => rf.File)
                 .Where(rf => rf.ReleaseVersionId == releaseVersionId && rf.FileId == fileId))
             .OnSuccessCombineWith(rf =>
-                _privateBlobStorageService.DownloadToStream(PrivateReleaseFiles, rf.Path(), new MemoryStream()))
+                _privateBlobStorageService.GetDownloadStream(PrivateReleaseFiles, rf.Path()))
             .OnSuccess(releaseFileAndStream =>
             {
                 var (releaseFile, stream) = releaseFileAndStream;

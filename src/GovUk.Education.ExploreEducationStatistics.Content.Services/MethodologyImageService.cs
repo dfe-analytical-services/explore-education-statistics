@@ -37,7 +37,7 @@ public class MethodologyImageService : IMethodologyImageService
                 .Where(mf => mf.MethodologyVersionId == methodologyVersionId && mf.FileId == fileId))
             .OnSuccessDo(mf => _userService.CheckCanViewMethodologyVersion(mf.MethodologyVersion))
             .OnSuccessCombineWith(mf =>
-                _publicBlobStorageService.DownloadToStream(PublicMethodologyFiles, mf.Path(), new MemoryStream()))
+                _publicBlobStorageService.GetDownloadStream(PublicMethodologyFiles, mf.Path()))
             .OnSuccess(methodologyFileAndStream =>
             {
                 var (methodologyFile, stream) = methodologyFileAndStream;

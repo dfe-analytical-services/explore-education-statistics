@@ -95,7 +95,7 @@ public class MethodologyImageService : IMethodologyImageService
                 .Include(mf => mf.File)
                 .Where(mf => mf.MethodologyVersionId == methodologyVersionId && mf.FileId == fileId))
             .OnSuccessCombineWith(mf =>
-                _privateBlobStorageService.DownloadToStream(PrivateMethodologyFiles, mf.Path(), new MemoryStream()))
+                _privateBlobStorageService.GetDownloadStream(PrivateMethodologyFiles, mf.Path()))
             .OnSuccess(methodologyFileAndStream =>
             {
                 var (methodologyFile, stream) = methodologyFileAndStream;
