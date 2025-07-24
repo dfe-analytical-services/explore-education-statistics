@@ -237,8 +237,8 @@ importers:
         specifier: ^0.5.0
         version: 0.5.0
       govuk-frontend:
-        specifier: ^5.8.0
-        version: 5.8.0
+        specifier: ^5.11.1
+        version: 5.11.1
       history:
         specifier: ^4.10.1
         version: 4.10.1
@@ -661,8 +661,8 @@ importers:
         specifier: ^0.5.0
         version: 0.5.0
       govuk-frontend:
-        specifier: ^5.8.0
-        version: 5.8.0
+        specifier: ^5.11.1
+        version: 5.11.1
       html-react-parser:
         specifier: ^1.3.0
         version: 1.4.14(react@18.2.0)
@@ -899,8 +899,8 @@ importers:
         specifier: ^1.2.0
         version: 1.2.1
       govuk-frontend:
-        specifier: ^5.8.0
-        version: 5.8.0
+        specifier: ^5.11.1
+        version: 5.11.1
       helmet:
         specifier: ^4.1.1
         version: 4.6.0
@@ -11885,8 +11885,8 @@ packages:
     engines: {node: '>= 0.4'}
     dev: true
 
-  /govuk-frontend@5.8.0:
-    resolution: {integrity: sha512-6l3f/YhDUCWjpmSW3CL95Hg8B+ZLzTf2WYo25ZtCs2Lb8UIzxxxFI8LxG7Ey/z04UuPhUunqFhTwSkQyJ69XbQ==}
+  /govuk-frontend@5.11.1:
+    resolution: {integrity: sha512-hJJFpaer4MZLvz/2F9RZ7xZ6FqlzpxL9aw6YWOGK3F1tn419xj2WcVXwOC8Bcj/dc/LanknbWJDGkb+IdkuhTQ==}
     engines: {node: '>= 4.2.0'}
     dev: false
 
