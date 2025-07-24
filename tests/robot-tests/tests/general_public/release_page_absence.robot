@@ -73,7 +73,7 @@ Check quick links navigation contains links
     user checks element contains link    testid:quick-links    Explore data
     user checks element contains link    testid:quick-links    Release contents
     user checks element contains link    testid:quick-links    Help and support
-    user checks element contains button    testid:quick-links    Download all data (zip)
+    user checks element contains link    testid:quick-links    Download all data (zip)
 
 Check supporting information contains methodology link
     user checks page contains link with text and url    ${PUPIL_ABSENCE_METHODOLOGY_TITLE}
