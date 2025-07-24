@@ -4,6 +4,7 @@
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMigrations;
 
+// ReSharper disable once InconsistentNaming
 public partial class EES4273_RemoveUnusedHighlightColumnsInContentBlocksTable : Migration
 {
     protected override void Up(MigrationBuilder migrationBuilder)
