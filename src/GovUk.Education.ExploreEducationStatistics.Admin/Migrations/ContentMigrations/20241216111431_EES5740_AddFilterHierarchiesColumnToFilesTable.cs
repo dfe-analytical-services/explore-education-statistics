@@ -3,6 +3,7 @@
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMigrations;
 
 /// <inheritdoc />
+// ReSharper disable once InconsistentNaming
 public partial class EES5740_AddFilterHierarchiesColumnToFilesTable : Migration
 {
     /// <inheritdoc />

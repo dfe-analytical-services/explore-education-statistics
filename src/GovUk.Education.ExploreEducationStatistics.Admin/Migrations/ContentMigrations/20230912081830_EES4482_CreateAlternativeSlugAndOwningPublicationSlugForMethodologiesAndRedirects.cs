@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMigrations;
 
+// ReSharper disable once InconsistentNaming
 public partial class EES4482_CreateAlternativeSlugAndOwningPublicationSlugForMethodologiesAndRedirects : Migration
 {
     private const string MigrationId = "20230912081830";

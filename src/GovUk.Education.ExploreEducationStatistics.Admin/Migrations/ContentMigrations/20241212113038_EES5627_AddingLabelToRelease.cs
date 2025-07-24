@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMigrations;
 
 /// <inheritdoc />
+// ReSharper disable once InconsistentNaming
 public partial class EES5627_AddingLabelToRelease : Migration
 {
     /// <inheritdoc />

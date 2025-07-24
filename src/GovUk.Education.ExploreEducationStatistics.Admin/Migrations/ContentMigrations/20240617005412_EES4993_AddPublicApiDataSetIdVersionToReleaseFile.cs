@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMigrations;
 
 /// <inheritdoc />
+// ReSharper disable once InconsistentNaming
 public partial class EES4993_AddPublicApiDataSetIdVersionToReleaseFile : Migration
 {
     /// <inheritdoc />
