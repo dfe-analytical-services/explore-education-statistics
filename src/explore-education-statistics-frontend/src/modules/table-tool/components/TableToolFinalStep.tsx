@@ -24,7 +24,6 @@ interface TableToolFinalStepProps {
   tableHeaders: TableHeadersConfig;
   selectedPublication: SelectedPublication;
   onReorderTableHeaders: (reorderedTableHeaders: TableHeadersConfig) => void;
-  subjectId: string;
 }
 
 const TableToolFinalStep = ({
@@ -33,7 +32,6 @@ const TableToolFinalStep = ({
   query,
   selectedPublication,
   onReorderTableHeaders,
-  subjectId,
 }: TableToolFinalStepProps) => {
   const dataTableRef = useRef<HTMLElement>(null);
   const [hasTableError, toggleHasTableError] = useToggle(false);
@@ -178,7 +176,7 @@ const TableToolFinalStep = ({
                 releaseVersionId: selectedPublication.selectedRelease.id,
                 releasePeriodAndLabel:
                   selectedPublication.selectedRelease.title,
-                subjectId,
+                subjectId: query.subjectId,
                 query,
                 downloadFormat: fileFormat,
               });
