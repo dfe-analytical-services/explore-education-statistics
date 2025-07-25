@@ -443,6 +443,11 @@ public static class ValidationMessages
         };
     }
 
+    public static readonly LocalizableMessage OrganisationNotFound = new(
+        Code: nameof(OrganisationNotFound),
+        Message: "The specified organisation could not be found."
+    );
+
     public static readonly LocalizableMessage PreviewTokenExpired = new(
         Code: nameof(PreviewTokenExpired),
         Message: "The preview token is expired."

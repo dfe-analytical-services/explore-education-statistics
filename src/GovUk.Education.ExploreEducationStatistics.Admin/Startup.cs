@@ -446,6 +446,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin;
             services.AddTransient<IPublicationService, PublicationService>();
             services.AddTransient<IPublicationRepository, PublicationRepository>();
             services.AddTransient<IMetaService, MetaService>();
+            services.AddTransient<IOrganisationsValidator, OrganisationsValidator>();
             services.AddTransient<IReleaseSlugValidator, ReleaseSlugValidator>();
             services.AddTransient<IReleaseVersionService, ReleaseVersionService>();
             services.AddTransient<IReleaseService, ReleaseService>();

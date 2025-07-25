@@ -1,4 +1,5 @@
 #nullable enable
+using System;
 using System.ComponentModel.DataAnnotations;
 using GovUk.Education.ExploreEducationStatistics.Common.Converters;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
@@ -26,4 +27,6 @@ public record ReleaseVersionUpdateRequest
 
     [MaxLength(50)]
     public string? Label { get; init; }
+
+    public Guid[]? PublishingOrganisations { get; init; }
 }

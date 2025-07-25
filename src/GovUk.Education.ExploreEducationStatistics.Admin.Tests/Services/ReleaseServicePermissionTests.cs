@@ -104,6 +104,7 @@ public class ReleaseServicePermissionTests
             redirectsCacheService: redirectsCacheService ?? Mock.Of<IRedirectsCacheService>(),
             adminEventRaiser: new AdminEventRaiserMockBuilder().Build(),
             guidGenerator: new SequentialGuidGenerator(),
+            organisationsValidator: new OrganisationsValidatorMockBuilder().Build(),
             releaseSlugValidator: releaseSlugValidator ?? Mock.Of<IReleaseSlugValidator>()
         );
     }
