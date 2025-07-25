@@ -46,6 +46,7 @@ export default function ReleaseSummaryEditPage({
       type: values.releaseType ?? 'AdHocStatistics',
       preReleaseAccessList: releaseVersion.preReleaseAccessList,
       label: values.releaseLabel,
+      publishingOrganisations: values.publishingOrganisations,
     });
 
     onReleaseChange();
@@ -84,6 +85,10 @@ export default function ReleaseSummaryEditPage({
               timePeriodCoverageStartYear: releaseVersion.year.toString(),
               releaseType: releaseVersion.type,
               releaseLabel: releaseVersion.label,
+              publishingOrganisations:
+                releaseVersion.publishingOrganisations?.map(
+                  organisation => organisation.id,
+                ),
             }}
             releaseVersion={releaseVersion.version}
             onSubmit={handleSubmit}

@@ -1,10 +1,15 @@
 import metaService, {
   TimePeriodCoverageGroup,
 } from '@admin/services/metaService';
+import organisationService from '@admin/services/organisationService';
 import Button from '@common/components/Button';
 import ButtonGroup from '@common/components/ButtonGroup';
 import ButtonText from '@common/components/ButtonText';
-import { FormFieldset, FormFieldTextInput } from '@common/components/form';
+import {
+  FormFieldCheckboxGroup,
+  FormFieldset,
+  FormFieldTextInput,
+} from '@common/components/form';
 import FormFieldNumberInput from '@common/components/form/FormFieldNumberInput';
 import { SelectOption } from '@common/components/form/FormSelect';
 import FormProvider from '@common/components/form/FormProvider';
@@ -14,6 +19,7 @@ import FormFieldSelect from '@common/components/form/FormFieldSelect';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import WarningMessage from '@common/components/WarningMessage';
 import useAsyncRetry from '@common/hooks/useAsyncRetry';
+import { Organisation } from '@common/services/types/organisation';
 import { ReleaseType, releaseTypes } from '@common/services/types/releaseType';
 import { Dictionary } from '@common/types';
 import { IdTitlePair } from '@admin/services/types/common';
@@ -28,6 +34,7 @@ export interface ReleaseSummaryFormValues {
   timePeriodCoverageCode: string;
   timePeriodCoverageStartYear: string;
   releaseLabel?: string;
+  publishingOrganisations?: string[];
 }
 
 const formId = 'releaseSummaryForm';
@@ -60,9 +67,17 @@ export default function ReleaseSummaryForm({
   onSubmit,
   onCancel,
 }: Props) {
-  const { value: timePeriodCoverageGroups, isLoading } = useAsyncRetry<
-    TimePeriodCoverageGroup[]
-  >(() => metaService.getTimePeriodCoverageGroups());
+  const {
+    value: timePeriodCoverageGroups,
+    isLoading: timePeriodCoverageGroupsLoading,
+  } = useAsyncRetry<TimePeriodCoverageGroup[]>(() =>
+    metaService.getTimePeriodCoverageGroups(),
+  );
+
+  const { value: organisations, isLoading: organisationsLoading } =
+    useAsyncRetry<Organisation[]>(() =>
+      organisationService.listOrganisations(),
+    );
 
   // Can't create new releases with type Experimental statistics.
   const permittedReleaseTypes = useMemo(
@@ -92,10 +107,21 @@ export default function ReleaseSummaryForm({
         /* eslint-disable no-template-curly-in-string */
         'Release label must be no longer than ${max} characters',
       ),
+      publishingOrganisations: Yup.array()
+        .of(Yup.string().required())
+        .transform((value, originalValue) => {
+          // If the original value is falsy (e.g., false), transform it to undefined
+          // needed as react-hook-form casts no checkbox selection to false
+          if (!originalValue) {
+            return undefined;
+          }
+          return value;
+        })
+        .optional(),
     });
   }, [permittedReleaseTypes]);
 
-  if (isLoading) {
+  if (timePeriodCoverageGroupsLoading || organisationsLoading) {
     return <LoadingSpinner />;
   }
 
@@ -206,6 +232,23 @@ export default function ReleaseSummaryForm({
                 ]}
               />
             )}
+
+            {organisations && (
+              <FormFieldCheckboxGroup<ReleaseSummaryFormValues>
+                hint="Optional - select which organisations are responsible for publishing this release"
+                legend="Publishing Organisations"
+                legendSize="m"
+                name="publishingOrganisations"
+                options={organisations.map(org => {
+                  return {
+                    label: org.title,
+                    value: org.id,
+                  };
+                })}
+                small
+              />
+            )}
+
             <ButtonGroup>
               <Button type="submit">{submitText}</Button>
               <ButtonText onClick={onCancel}>Cancel</ButtonText>

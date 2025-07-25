@@ -11,6 +11,7 @@ export interface CreateReleaseRequest {
   };
   type: ReleaseType;
   label?: string;
+  publishingOrganisations?: string[];
 }
 
 export interface UpdateReleaseRequest {
