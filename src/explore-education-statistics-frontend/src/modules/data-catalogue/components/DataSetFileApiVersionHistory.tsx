@@ -56,7 +56,7 @@ export default function DataSetFileApiVersionHistory({
                 </tr>
               </thead>
               <tbody>
-                {data?.results
+                {data.results
                   .filter(version => filteredVersions.includes(version.version))
                   .map(version => (
                     <tr key={version.version}>
