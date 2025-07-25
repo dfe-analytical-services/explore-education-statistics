@@ -7,9 +7,8 @@ import React from 'react';
 
 interface Props {
   changes: ApiDataSetVersionChanges;
-  guidanceNotes: string;
+  guidanceNotes?: string;
   version: string;
-  renderHeading?: boolean;
   patchHistory: ApiDataSetVersionChanges[];
 }
 
@@ -18,19 +17,25 @@ export default function DataSetFileApiChangelog({
   guidanceNotes,
   version,
   patchHistory,
-  renderHeading = true,
 }: Props) {
   const { majorChanges, minorChanges } = changes;
 
-  if (!Object.keys(majorChanges).length && !Object.keys(minorChanges).length) {
+  if (
+    !Object.keys(majorChanges).length &&
+    !Object.keys(minorChanges).length &&
+    patchHistory.every(
+      change => !change || !Object.keys(change.minorChanges).length,
+    )
+  ) {
     return null;
   }
+
   return (
     <DataSetFilePageSection
-      heading={renderHeading ?? true ? pageSections.apiChangelog : ''}
-      id={renderHeading ?? true ? 'apiChangelog' : undefined}
+      heading={pageSections.apiChangelog}
+      id="apiChangelog"
     >
-      {(guidanceNotes ?? '').length > 0 && (
+      {guidanceNotes && (
         <p data-testid="public-guidance-notes">{guidanceNotes}</p>
       )}
       <ApiDataSetChangelog
@@ -43,12 +48,16 @@ export default function DataSetFileApiChangelog({
       {patchHistory &&
         patchHistory.map(
           (patch, idx) =>
-            !(
-              !Object.keys(patch.majorChanges).length &&
-              !Object.keys(patch.minorChanges).length
-            ) && (
-              <>
-                {(patch.notes ?? '').length > 0 && (
+            (Object.keys(majorChanges).length ||
+              Object.keys(minorChanges).length) && (
+              <React.Fragment
+                key={
+                  patch.versionNumber
+                    ? `${patch.versionNumber.major}.${patch.versionNumber.minor}.${patch.versionNumber.patch}`
+                    : idx
+                }
+              >
+                {patch.notes && (
                   <p data-testid="public-guidance-notes">{patch.notes}</p>
                 )}
                 <ApiDataSetChangelog
@@ -61,7 +70,7 @@ export default function DataSetFileApiChangelog({
                   }
                 />
                 {idx !== patchHistory.length - 1 && <SectionBreak size="xl" />}
-              </>
+              </React.Fragment>
             ),
         )}
     </DataSetFilePageSection>
