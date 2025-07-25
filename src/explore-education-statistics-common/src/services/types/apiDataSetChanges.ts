@@ -18,7 +18,7 @@ export interface ApiDataSetVersionChanges {
   versionNumber: DataSetVersionNumber;
   majorChanges: ChangeSet;
   minorChanges: ChangeSet;
-  notes: string;
+  notes?: string;
   patchHistory: ApiDataSetVersionChanges[];
 }
 

@@ -8,7 +8,7 @@ interface Props {
   children: ReactNode;
   className?: string;
   heading: string;
-  id?: PageSectionId;
+  id: PageSectionId;
   testId?: string;
 }
 
@@ -25,11 +25,11 @@ export default function DataSetFilePageSection({
     <>
       <section
         className={className}
-        id={id ?? undefined}
+        id={id}
         data-page-section=""
         data-testid={testId}
       >
-        {heading.length > 0 && <h2>{heading}</h2>}
+        <h2>{heading}</h2>
 
         <div className={styles.content}>
           {children}

@@ -422,9 +422,7 @@ describe('DataSetFilePage', () => {
       assertNavigationIncludesChangelog(nav);
 
       expect(
-        await screen.findByText(
-          'This version introduces patch changes that are unlikely to affect consumers of the previous version. You may wish to check the list of changes below before upgrading.',
-        ),
+        screen.queryByRole('heading', { name: 'API data set changelog' }),
       ).toBeInTheDocument();
     });
 
@@ -539,9 +537,7 @@ describe('DataSetFilePage', () => {
       expect(await screen.findByText('On this page')).toBeInTheDocument();
 
       expect(
-        await screen.findByText(
-          'This version introduces patch changes that are unlikely to affect consumers of the previous version. You may wish to check the list of changes below before upgrading.',
-        ),
+        screen.getByRole('heading', { name: 'API data set changelog' }),
       ).toBeInTheDocument();
     });
 
