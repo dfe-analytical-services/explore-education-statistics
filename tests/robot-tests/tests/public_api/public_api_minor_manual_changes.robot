@@ -326,7 +326,7 @@ Search for the new API data set version
     user checks page contains link    ${SUBJECT_2_NAME}
 
 User clicks on the new data set version link
-    user clicks link    ${SUBJECT_2_NAME}
+    user clicks link containing text    ${SUBJECT_2_NAME}
     user waits until page finishes loading
     user waits until h1 is visible    ${SUBJECT_2_NAME}
 

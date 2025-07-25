@@ -312,7 +312,7 @@ Check data catalogue page contains archive and superseding publication subjects
     user waits until page contains    ${SUBJECT_NAME_ARCHIVE}
 
 Check data set page shows 'Not the latest data' for archived publication subject
-    user clicks link    ${SUBJECT_NAME_ARCHIVE}
+    user clicks link containing text    ${SUBJECT_NAME_ARCHIVE}
     user waits until page contains    Data set from ${PUBLICATION_NAME_ARCHIVE}
     user checks page contains    Not the latest data
 

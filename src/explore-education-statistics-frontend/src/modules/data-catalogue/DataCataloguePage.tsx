@@ -606,6 +606,7 @@ const DataCataloguePage: NextPage<Props> = ({ showTypeFilter }) => {
                           expanded={showAllDetails}
                           headingTag={selectedPublication ? 'h4' : 'h3'}
                           showLatestDataTag={!selectedRelease}
+                          showPublicationTitle={!selectedPublication}
                         />
                       ))}
                     </ul>

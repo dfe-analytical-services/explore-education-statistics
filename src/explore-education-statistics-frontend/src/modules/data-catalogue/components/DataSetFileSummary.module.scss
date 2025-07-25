@@ -1,3 +1,6 @@
+@import '~govuk-frontend/dist/govuk/base';
+@import '~govuk-frontend/dist/govuk/core/links';
+
 .content {
   /* stylelint-disable-next-line value-no-vendor-prefix */
   display: -webkit-box;
@@ -7,5 +10,19 @@
 
   &.expanded {
     -webkit-line-clamp: unset;
+  }
+}
+
+.heading {
+  text-decoration: none;
+
+  &:hover {
+    /* stylelint-disable-next-line max-nesting-depth */
+    .title {
+      text-decoration: underline;
+      text-decoration-thickness: $govuk-link-hover-underline-thickness;
+      text-decoration-skip-ink: none;
+      text-decoration-skip: none;
+    }
   }
 }

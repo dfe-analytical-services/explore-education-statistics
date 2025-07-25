@@ -275,7 +275,7 @@ Search for API data set
     user checks list item contains    testid:data-set-file-list    1    ${SUBJECT_NAME_1}
 
 User clicks on API data set link
-    user clicks link    ${SUBJECT_NAME_1}
+    user clicks link containing text    ${SUBJECT_NAME_1}
     user waits until page finishes loading
 
     user waits until h1 is visible    ${SUBJECT_NAME_1}
