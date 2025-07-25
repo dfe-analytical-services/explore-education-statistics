@@ -168,6 +168,7 @@ public class ProblemDetailsResultFilterTests(TestApplicationFactory<TestStartup>
     private class TestClass
     {
         [Required]
+        // ReSharper disable once UnusedAutoPropertyAccessor.Local - Test is for when Required property Name is unset
         public string? Name { get; init; }
     }
 
