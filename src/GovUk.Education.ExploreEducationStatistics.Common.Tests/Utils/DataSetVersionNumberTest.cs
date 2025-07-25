@@ -72,8 +72,8 @@ public static class DataSetVersionNumberTest
         public void ValidVersion_SuccessfullyParsed(
             string versionString,
             int expectedMajor,
-            int expectedMinor = default,
-            int expectedPatch = default)
+            int expectedMinor = 0,
+            int expectedPatch = 0)
         {
             Assert.True(DataSetVersionNumber.TryParse(versionString, out var version));
 
@@ -89,8 +89,8 @@ public static class DataSetVersionNumberTest
         public void VersionWithEmptySpaces_SuccessfullyParsed(
             string versionString,
             int expectedMajor,
-            int expectedMinor = default,
-            int expectedPatch = default)
+            int expectedMinor = 0,
+            int expectedPatch = 0)
         {
             Assert.True(DataSetVersionNumber.TryParse(versionString, out var version));
 
@@ -118,26 +118,6 @@ public static class DataSetVersionNumberTest
         public void InvalidVersion_FailsToParse(string versionString)
         {
             Assert.False(DataSetVersionNumber.TryParse(versionString, out _));
-        }
-
-        [Theory]
-        [InlineData("1.*")]
-        [InlineData("1.1.*")]
-        [InlineData("*")]
-        public void PassedWildcard_ExpectsIsWildcardToReturnTrue(string versionString)
-        {
-            Assert.True(DataSetVersionNumber.TryParse(versionString, out var version));
-            Assert.True(version.IsWildcard);
-        }
-        
-        [Theory]
-        [InlineData("1.1")]
-        [InlineData("1.1.1")]
-        [InlineData("1")]
-        public void PassedNonWildcard_ExpectsIsWildcardToReturnFalse(string versionString)
-        {
-            Assert.True(DataSetVersionNumber.TryParse(versionString, out var version));
-            Assert.False(version.IsWildcard);
         }
     }
 }

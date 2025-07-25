@@ -2,7 +2,6 @@ using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using LinqToDB;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Extensions;
@@ -30,7 +29,7 @@ public static class DataSetVersionQueryableExtensions
         var query = queryable
             .Where(dsv => dsv.DataSetId == dataSetId);
 
-        if (parsedVersion.IsWildcard)
+        if (DataSetVersionWildcardHelper.ContainsWildcard(version))
         {
             query = query.WherePublishedStatus();
         }

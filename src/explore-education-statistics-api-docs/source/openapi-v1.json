@@ -913,6 +913,15 @@
             "schema": {
               "type": "string"
             }
+          },
+          {
+            "name": "includePatchHistory",
+            "in": "query",
+            "description": "Whether to include change logs for all associated patches will be in the results.",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
           }
         ],
         "responses": {
@@ -2606,10 +2615,22 @@
       "DataSetVersionChangesViewModel": {
         "required": [
           "majorChanges",
-          "minorChanges"
+          "minorChanges",
+          "versionNumber"
         ],
         "type": "object",
         "properties": {
+          "notes": {
+            "type": "string",
+            "nullable": true
+          },
+          "versionNumber": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/DataSetVersionNumber"
+              }
+            ]
+          },
           "majorChanges": {
             "allOf": [
               {
@@ -2625,6 +2646,14 @@
               }
             ],
             "description": "Any minor changes that were made to the data set."
+          },
+          "patchHistory": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DataSetVersionChangesViewModel"
+            },
+            "description": "Change logs for any patch versions associated with this change log",
+            "nullable": true
           }
         },
         "additionalProperties": false,
@@ -2663,6 +2692,27 @@
             "description": "The maximum number of results per page.",
             "format": "int32",
             "default": 10
+          }
+        },
+        "additionalProperties": false
+      },
+      "DataSetVersionNumber": {
+        "type": "object",
+        "properties": {
+          "major": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "minor": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "patch": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
           }
         },
         "additionalProperties": false
