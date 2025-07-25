@@ -16,6 +16,7 @@ public class EnumToEnumLabelJsonConverterTests
 
     private record SampleClass
     {
+        // ReSharper disable once UnusedAutoPropertyAccessor.Local - It's being used by the serialiser
         [JsonConverter(typeof(EnumToEnumLabelJsonConverter<SampleEnum>))]
         public SampleEnum SampleField { get; init; }
     }
