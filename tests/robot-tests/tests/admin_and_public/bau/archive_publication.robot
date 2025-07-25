@@ -326,7 +326,7 @@ Check archive-publication permalink has out-of-date warning
     ...    '${SUBJECT_NAME_ARCHIVE}' from '${PUBLICATION_NAME_ARCHIVE}'
 
     user waits until page contains
-    ...    WARNING - The data used in this table may now be out-of-date as a new release has been published since its creation.
+    ...    A newer release of this publication is available and may include updated figures.
 
 Set archive-publication to be no longer be superseded
     [Documentation]    Failing due to https://dfedigital.atlassian.net/browse/EES-4269
@@ -438,4 +438,4 @@ Check archive-publication permalink no longer has out-of-date warning after arch
     ...    '${SUBJECT_NAME_ARCHIVE}' from '${PUBLICATION_NAME_ARCHIVE}'
 
     user checks page does not contain
-    ...    WARNING - The data used in this table may now be out-of-date as a new release has been published since its creation.
+    ...    A newer release of this publication is available and may include updated figures.

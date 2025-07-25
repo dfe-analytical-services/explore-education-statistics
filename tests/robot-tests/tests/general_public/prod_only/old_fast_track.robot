@@ -38,7 +38,7 @@ Visit featured table and generate a permalink
 Open shareable link and check outdated warning
     user clicks link    View share link
     user waits until page contains
-    ...    WARNING - The data used in this table may now be out-of-date as a new release has been published since its creation.
+    ...    A newer release of this publication is available and may include updated figures.
 
 Validate that View latest data link takes user to the latest release page
     user goes back
