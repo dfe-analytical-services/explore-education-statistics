@@ -3,7 +3,6 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
-using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Options;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
@@ -158,7 +157,7 @@ public class DataSetFileStorage(
     {
         await dataSetVersionService.CreateNextVersion(
             releaseFileId: dataReleaseFileId,
-            dataSetId: replacedReleaseDataFile!.PublicApiDataSetId!.Value,
+            dataSetId: replacedReleaseDataFile.PublicApiDataSetId!.Value,
             dataSetVersionToReplaceId: dataSetVersion.Id,
             cancellationToken
         ).OnFailureDo(_ =>
@@ -183,7 +182,7 @@ public class DataSetFileStorage(
             {
                 await dataSetVersionService.CreateNextVersion(
                     releaseFileId: dataReleaseFileId,
-                    dataSetId: replacedReleaseDataFile!.PublicApiDataSetId!.Value,
+                    dataSetId: replacedReleaseDataFile.PublicApiDataSetId!.Value,
                     dataSetVersionToReplaceId: null,
                     cancellationToken
                 ).OnFailureDo(_ =>

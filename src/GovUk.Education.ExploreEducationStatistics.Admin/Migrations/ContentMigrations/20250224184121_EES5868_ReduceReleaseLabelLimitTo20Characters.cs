@@ -5,6 +5,7 @@
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMigrations;
 
 /// <inheritdoc />
+// ReSharper disable once InconsistentNaming
 public partial class EES5868_ReduceReleaseLabelLimitTo20Characters : Migration
 {
     /// <inheritdoc />

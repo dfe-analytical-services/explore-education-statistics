@@ -11,6 +11,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Tests.Fixtures;
+using JetBrains.Annotations;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using static GovUk.Education.ExploreEducationStatistics.Common.Utils.EnumUtil;
@@ -170,7 +171,8 @@ public abstract class DataSetVersionServiceTests(TestApplicationFactory testApp)
             Assert.Equal(2, actualDataSetVersions.Count);
 
             Assert.All(actualDataSetVersions,
-                dataSetVersion =>
+                [UsedImplicitly]
+                (dataSetVersion) =>
                 {
                     Assert.Equal(updatedReleaseSlug, dataSetVersion.Release.Slug);
                     Assert.Equal(updatedReleaseTitle, dataSetVersion.Release.Title);

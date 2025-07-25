@@ -3,6 +3,7 @@ using static GovUk.Education.ExploreEducationStatistics.Content.Model.Methodolog
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMigrations;
 
+// ReSharper disable once InconsistentNaming
 public partial class EES2385_AddMethodologyPublishingStrategy : Migration
 {
     protected override void Up(MigrationBuilder migrationBuilder)

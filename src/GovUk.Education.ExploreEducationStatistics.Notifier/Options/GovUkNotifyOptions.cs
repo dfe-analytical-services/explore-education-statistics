@@ -50,7 +50,7 @@ public class GovUkNotifyOptions
             {
                 throw new System.ArgumentException(ValidationMessages.InvalidDataSetVersion.Message);
             }
-            var isNewMajorVersion = dataSetVersionNumber!.Major >= 2
+            var isNewMajorVersion = dataSetVersionNumber.Major >= 2
                 && dataSetVersionNumber.Patch == 0
                 && dataSetVersionNumber.Minor == 0;
             return isNewMajorVersion ? ApiSubscriptionMajorDataSetVersionPublishedId : ApiSubscriptionDataSetVersionPublishedId;
