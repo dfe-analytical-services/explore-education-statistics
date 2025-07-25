@@ -34,6 +34,7 @@ import { useQuery } from '@tanstack/react-query';
 import React, { useEffect, useState } from 'react';
 import { generatePath, useHistory, useParams } from 'react-router-dom';
 import isPatchVersion from '@common/utils/isPatchVersion';
+import shouldShowDraftActions from '@admin/pages/release/data/utils/shouldShowDraftActions';
 
 export type DataSetFinalisingStatus = 'finalising' | 'finalised' | undefined;
 
@@ -104,9 +105,11 @@ export default function ReleaseApiDataSetDetailsPage() {
 
   const canUpdateRelease = releaseVersion.approvalStatus !== 'Approved';
 
-  const showDraftVersionActions =
-    dataSet?.draftVersion?.status !== 'Processing';
-
+  const showDraftVersionActions = shouldShowDraftActions(
+    isPatch,
+    canUpdateRelease,
+    dataSet,
+  );
   const draftVersionSummary = dataSet?.draftVersion ? (
     <ApiDataSetVersionSummaryList
       dataSetVersion={dataSet.draftVersion}
@@ -257,7 +260,7 @@ export default function ReleaseApiDataSetDetailsPage() {
     dataSet.draftVersion.mappingStatus.locationsComplete;
 
   const showDraftVersionTasks =
-    showDraftVersionActions &&
+    dataSet?.draftVersion?.status !== 'Processing' &&
     finalisingStatus !== 'finalising' &&
     dataSet?.draftVersion?.mappingStatus &&
     (dataSet?.draftVersion?.status === 'Draft' ||
