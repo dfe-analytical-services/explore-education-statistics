@@ -38,10 +38,9 @@ public static class StartupSecurityConfiguration
                         claim.Type == SecurityClaimTypes.ApplicationAccessGranted.ToString()) &&
                     context.User.HasScope(SecurityScopes.AccessAdminApiScope)));
 
-            /**
+            /*
              * General role-based page access
              */
-
             options.AddPolicy(SecurityPolicies.IsBauUser.ToString(), policy =>
                 policy.RequireRole(RoleNames.BauUser));
 
@@ -57,7 +56,7 @@ public static class StartupSecurityConfiguration
             options.AddPolicy(SecurityPolicies.CanAccessAllImports.ToString(), policy =>
                 policy.RequireClaim(SecurityClaimTypes.AccessAllImports.ToString()));
 
-            /**
+            /*
              * Publication management
              */
             options.AddPolicy(SecurityPolicies.CanViewAllPublications.ToString(), policy =>
@@ -85,7 +84,7 @@ public static class StartupSecurityConfiguration
                 policy.Requirements.Add(new ManagePublicationReleaseSeriesRequirement()));
 
 
-            /**
+            /*
              * Release management
              */
             options.AddPolicy(SecurityPolicies.CanCreateReleaseForSpecificPublication.ToString(), policy =>
@@ -145,13 +144,13 @@ public static class StartupSecurityConfiguration
             options.AddPolicy(SecurityPolicies.CanViewReleaseStatusHistory.ToString(), policy =>
                 policy.Requirements.Add(new ViewReleaseStatusHistoryRequirement()));
 
-            /**
+            /*
              * Pre Release management
              */
             options.AddPolicy(SecurityPolicies.CanAssignPreReleaseUsersToSpecificRelease.ToString(), policy =>
                 policy.Requirements.Add(new AssignPrereleaseContactsToSpecificReleaseRequirement()));
 
-            /**
+            /*
              * Taxonomy management
              */
             options.AddPolicy(SecurityPolicies.CanManageAllTaxonomy.ToString(), policy =>
@@ -160,7 +159,7 @@ public static class StartupSecurityConfiguration
             options.AddPolicy(SecurityPolicies.CanCreatePublicationForSpecificTheme.ToString(), policy =>
                 policy.Requirements.Add(new CreatePublicationForSpecificThemeRequirement()));
 
-            /**
+            /*
              * Methodology management
              */
             options.AddPolicy(SecurityPolicies.CanAdoptMethodologyForSpecificPublication.ToString(), policy =>
@@ -207,7 +206,7 @@ public static class StartupSecurityConfiguration
         services.AddTransient<IAuthorizationService, DefaultAuthorizationService>();
         services.AddTransient<IUserService, UserService>();
 
-        /**
+        /*
          * Publication management
          */
         services.AddTransient<IAuthorizationHandler, ViewSpecificPublicationAuthorizationHandler>();
@@ -223,7 +222,7 @@ public static class StartupSecurityConfiguration
             .AddTransient<IAuthorizationHandler, ViewSpecificPublicationReleaseTeamAccessAuthorizationHandler>();
         services.AddTransient<IAuthorizationHandler, ManagePublicationReleaseSeriesAuthorizationHandler>();
 
-        /**
+        /*
          * Release management
          */
         services.AddTransient<IAuthorizationHandler, ViewSpecificReleaseAuthorizationHandler>();
@@ -245,13 +244,13 @@ public static class StartupSecurityConfiguration
         services.AddTransient<IAuthorizationHandler, ViewReleaseStatusHistoryAuthorizationHandler>();
         services.AddTransient<IAuthorizationHandler, UpdateReleaseRoleAuthorizationHandler>();
 
-        /**
+        /*
          * Pre Release management
          */
         services
             .AddTransient<IAuthorizationHandler, AssignPrereleaseContactsToSpecificReleaseAuthorizationHandler>();
 
-        /**
+        /*
          * Methodology management
          */
         services.AddTransient<IAuthorizationHandler, AdoptMethodologyForSpecificPublicationAuthorizationHandler>();
