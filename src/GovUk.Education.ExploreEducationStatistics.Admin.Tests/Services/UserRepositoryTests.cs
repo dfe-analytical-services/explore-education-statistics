@@ -31,7 +31,7 @@ public class UserRepositoryTests
             var repository = SetupUserReleaseRoleRepository(contentDbContext);
             var result = await repository.FindByEmail("test@test.com");
             Assert.NotNull(result);
-            Assert.Equal(user.Id, result!.Id);
+            Assert.Equal(user.Id, result.Id);
         }
     }
 
@@ -62,7 +62,7 @@ public class UserRepositoryTests
             // EF 5.0 will allow setting a different collation making this test worth while.
             // See https://docs.microsoft.com/en-us/ef/core/miscellaneous/collations-and-case-sensitivity
             Assert.NotNull(result);
-            Assert.Equal(user.Id, result!.Id);
+            Assert.Equal(user.Id, result.Id);
         }
     }
 

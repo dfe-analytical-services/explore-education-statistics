@@ -106,11 +106,11 @@ public class ObservationService : IObservationService
             await TempTableCreator.CreateTemporaryTable<MatchedObservation>(context, cancellationToken);
 
             var (locationIdsClause, locationIdsTempTable) = locationIds.Count > 0
-                ? await GetLocationsClause(context, locationIds!, cancellationToken)
+                ? await GetLocationsClause(context, locationIds, cancellationToken)
                 : default;
 
             var (filterItemIdsClause, filterItemIdTempTables) = filterItemIds.Count > 0
-                ? await GetSelectedFilterItemIdsClause(context, subjectId, filterItemIds!, cancellationToken)
+                ? await GetSelectedFilterItemIdsClause(context, subjectId, filterItemIds, cancellationToken)
                 : default;
 
             var sql = @$"
