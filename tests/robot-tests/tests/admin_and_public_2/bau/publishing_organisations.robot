@@ -112,6 +112,30 @@ Verify default organisation is showing on public page again
     user checks published by on public release page
     ...    ${DEFAULT_ORGANISATION_TEXT}
 
+Verify user can choose an organisation when creating a new release
+    user navigates to publication page from dashboard    ${PUBLICATION_NAME}
+    user waits until page contains title caption    Manage publication    %{WAIT_SMALL}
+    user waits until h1 is visible    ${PUBLICATION_NAME}
+    user waits until page contains link    Create new release
+    user clicks link    Create new release
+
+    user waits until page contains element    id:releaseSummaryForm-timePeriodCoverage    %{WAIT_SMALL}
+    user chooses select option    id:releaseSummaryForm-timePeriodCoverageCode    Financial year
+    user enters text into element    id:releaseSummaryForm-timePeriodCoverageStartYear    3001
+    user clicks radio    Accredited official statistics
+    user clicks radio if exists    Create new template
+    user clicks checkbox    Skills England
+    user waits until button is enabled    Create new release    %{WAIT_SMALL}
+    user clicks button    Create new release
+
+    user waits until page contains element    xpath://a[text()="Edit release summary"]    %{WAIT_SMALL}
+    user waits until h2 is visible    Release summary    %{WAIT_SMALL}
+    user verifies release summary    Financial year
+    ...    3001-02
+    ...    Accredited official statistics
+    ...
+    ...    Skills England
+
 
 *** Keywords ***
 user checks published by in admin
