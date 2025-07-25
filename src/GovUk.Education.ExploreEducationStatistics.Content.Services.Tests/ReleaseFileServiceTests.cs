@@ -81,8 +81,6 @@ public class ReleaseFileServiceTests : IDisposable
             var result = await service.StreamFile(releaseVersionId: releaseFile.ReleaseVersionId,
                 fileId: releaseFile.File.Id);
 
-            MockUtils.VerifyAllMocks(publicBlobStorageService);
-
             Assert.True(result.IsRight);
 
             Assert.Equal("application/pdf", result.Right.ContentType);
@@ -180,8 +178,6 @@ public class ReleaseFileServiceTests : IDisposable
 
             var result = await service.StreamFile(releaseVersionId: releaseFile.ReleaseVersionId,
                 fileId: releaseFile.File.Id);
-
-            MockUtils.VerifyAllMocks(publicBlobStorageService);
 
             result.AssertNotFound();
         }

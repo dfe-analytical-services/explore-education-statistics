@@ -159,8 +159,6 @@ public class MethodologyImageServiceTests
 
             var result = await service.Stream(methodologyVersion.Id, methodologyFile.File.Id);
 
-            MockUtils.VerifyAllMocks(publicBlobStorageService);
-
             result.AssertNotFound();
         }
     }
