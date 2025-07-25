@@ -47,7 +47,7 @@ public class ImporterLocationServiceTests
         var result = service.Get(location);
 
         Assert.NotNull(result);
-        Assert.Equal(location.Id, result!.Id);
+        Assert.Equal(location.Id, result.Id);
     }
     
     [Fact]
@@ -128,7 +128,7 @@ public class ImporterLocationServiceTests
             var location = Assert.Single(statisticsDbContext.Location);
 
             Assert.NotNull(location);
-            Assert.Equal(locationId, location!.Id);
+            Assert.Equal(locationId, location.Id);
             Assert.Equal(GeographicLevel.Country, location.GeographicLevel);
             Assert.NotNull(location.Country);
             Assert.Equal(_england.Code, location.Country!.Code);
@@ -186,7 +186,7 @@ public class ImporterLocationServiceTests
             var location = Assert.Single(statisticsDbContext.Location);
     
             Assert.NotNull(location);
-            Assert.Equal(locationId, location!.Id);
+            Assert.Equal(locationId, location.Id);
             Assert.Equal(GeographicLevel.LocalAuthority, location.GeographicLevel);
             Assert.NotNull(location.Country);
             Assert.Equal(_england.Code, location.Country!.Code);

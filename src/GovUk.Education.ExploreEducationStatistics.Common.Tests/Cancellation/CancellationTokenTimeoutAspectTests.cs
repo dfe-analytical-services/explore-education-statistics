@@ -99,7 +99,7 @@ public class CancellationTokenTimeoutAspectTests : IClassFixture<CancellationTok
                 // A CancellationToken should have been provided by the Aspect
                 Assert.NotNull(providedToken);
             
-                await Task.Delay(TimeoutMillis * 2, providedToken!.Value);
+                await Task.Delay(TimeoutMillis * 2, providedToken.Value);
             }));
     }
     
@@ -116,7 +116,7 @@ public class CancellationTokenTimeoutAspectTests : IClassFixture<CancellationTok
                     // A CancellationToken should have been provided by the Aspect
                     Assert.NotNull(providedToken);
                 
-                    await Task.Delay(TimeoutMillis * 2, providedToken!.Value);
+                    await Task.Delay(TimeoutMillis * 2, providedToken.Value);
                 }));
     }
 
@@ -133,7 +133,7 @@ public class CancellationTokenTimeoutAspectTests : IClassFixture<CancellationTok
             
             // Due to the above delay however, the token has had the time to expire, and so is marked as
             // "cancellation requested"
-            Assert.True(providedToken!.Value.IsCancellationRequested);
+            Assert.True(providedToken.Value.IsCancellationRequested);
         });
     }
 
@@ -156,7 +156,7 @@ public class CancellationTokenTimeoutAspectTests : IClassFixture<CancellationTok
                 // A CancellationToken should have been provided by the Aspect
                 Assert.NotNull(providedToken);
 
-                Task.WaitAll(Task.Delay(TimeoutMillis * 2, providedToken!.Value));
+                Task.WaitAll(Task.Delay(TimeoutMillis * 2, providedToken.Value));
             }));
 
         Assert.IsAssignableFrom<TaskCanceledException>(exception.InnerExceptions[0]);
@@ -171,7 +171,7 @@ public class CancellationTokenTimeoutAspectTests : IClassFixture<CancellationTok
                 // A CancellationToken should have been provided by the Aspect
                 Assert.NotNull(providedToken);
 
-                Task.WaitAll(Task.Delay(TimeoutMillis * 2, providedToken!.Value));
+                Task.WaitAll(Task.Delay(TimeoutMillis * 2, providedToken.Value));
             }));
 
         Assert.IsAssignableFrom<TaskCanceledException>(exception.InnerExceptions[0]);
@@ -222,7 +222,7 @@ public class CancellationTokenTimeoutAspectTests : IClassFixture<CancellationTok
             // A CancellationToken should have been provided by the Aspect, which is merged between the original
             // CancellationToken passed to the method, and the new Timeout one that was created by the Aspect.
             Assert.NotNull(providedToken);
-            Assert.NotEqual(originalToken, providedToken!.Value);
+            Assert.NotEqual(originalToken, providedToken.Value);
             
             // Show that both the original and the provided Token are uncancelled at
             // this point.
