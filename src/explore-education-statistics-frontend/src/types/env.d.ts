@@ -10,8 +10,5 @@ declare namespace NodeJS {
     PUBLIC_API_DOCS_URL: string;
     PUBLIC_API_BASE_URL: string;
     PUBLIC_URL: string;
-    AZURE_SEARCH_QUERY_KEY: string;
-    AZURE_SEARCH_ENDPOINT: string;
-    AZURE_SEARCH_INDEX: string;
   }
 }

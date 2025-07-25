@@ -452,6 +452,16 @@ You would then be able to use this like:
 ees content data
 ```
 
+### Running Azure Search locally
+
+We use [Azure Search](https://docs.microsoft.com/azure/search/) in our frontend project to search publications. To get this running locally, you will need to add the correct variables to a `.env.local` in the frontend project directory.
+
+```
+AZURE_SEARCH_QUERY_KEY=
+AZURE_SEARCH_ENDPOINT=
+AZURE_SEARCH_INDEX=
+```
+
 ## Frontend development
 
 ### Environment variables

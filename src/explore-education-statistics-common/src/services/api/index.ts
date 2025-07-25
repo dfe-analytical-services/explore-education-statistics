@@ -23,6 +23,12 @@ export const dataApi = new Client({
   responseInterceptors: [networkActivityResponseInterceptor],
 });
 
+export const frontendApi = new Client({
+  baseURL: `${process.env.PUBLIC_URL}api`,
+  requestInterceptors: [networkActivityRequestInterceptor],
+  responseInterceptors: [networkActivityResponseInterceptor],
+});
+
 export const publicApi = new Client({
   baseURL: `${process.env.PUBLIC_API_BASE_URL}/v1`,
   requestInterceptors: [
