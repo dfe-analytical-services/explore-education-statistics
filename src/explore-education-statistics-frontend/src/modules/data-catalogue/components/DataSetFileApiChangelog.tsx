@@ -48,8 +48,9 @@ export default function DataSetFileApiChangelog({
       {patchHistory &&
         patchHistory.map(
           (patch, idx) =>
-            (Object.keys(majorChanges).length ||
-              Object.keys(minorChanges).length) && (
+            (Object.keys(patch.majorChanges).length ||
+              Object.keys(patch.minorChanges).length ||
+              (patch.notes?.length ?? 0) > 0) && (
               <React.Fragment
                 key={
                   patch.versionNumber
