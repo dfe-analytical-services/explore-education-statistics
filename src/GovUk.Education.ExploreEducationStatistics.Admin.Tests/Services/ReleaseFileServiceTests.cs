@@ -1660,7 +1660,7 @@ public class ReleaseFileServiceTests : IDisposable
                 fileIds: fileIds
             );
 
-            MockUtils.VerifyAllMocks(privateBlobStorageService, dataGuidanceFileWriter);
+            MockUtils.VerifyAllMocks(dataGuidanceFileWriter);
 
             result.AssertRight();
 
@@ -1762,7 +1762,7 @@ public class ReleaseFileServiceTests : IDisposable
                 fileIds: fileIds
             );
 
-            MockUtils.VerifyAllMocks(privateBlobStorageService, dataGuidanceFileWriter);
+            MockUtils.VerifyAllMocks(dataGuidanceFileWriter);
 
             result.AssertRight();
 
@@ -1863,8 +1863,6 @@ public class ReleaseFileServiceTests : IDisposable
                 outputStream: stream,
                 fileIds: fileIds
             );
-
-            MockUtils.VerifyAllMocks(privateBlobStorageService);
 
             result.AssertRight();
 
@@ -2207,8 +2205,8 @@ public class ReleaseFileServiceTests : IDisposable
                 container: PrivateReleaseFiles,
                 path: releaseFile1.Path(),
                 content: "Test ancillary blob",
-                cancellationToken: tokenSource.Token)
-            .Callback(() => tokenSource.Cancel());
+                cancellationToken: tokenSource.Token,
+                callback: tokenSource.Cancel);
 
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
         {
@@ -2224,8 +2222,6 @@ public class ReleaseFileServiceTests : IDisposable
                 fileIds: fileIds,
                 cancellationToken: tokenSource.Token
             );
-
-            MockUtils.VerifyAllMocks(privateBlobStorageService);
 
             result.AssertRight();
 
