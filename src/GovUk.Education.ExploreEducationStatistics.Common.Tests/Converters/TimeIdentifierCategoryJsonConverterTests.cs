@@ -9,12 +9,12 @@ public class TimeIdentifierCategoryJsonConverterTests
 {
     private class SampleClass
     {
-        public string StringFieldBefore { get; set; }
+        public string StringFieldBefore { get; init; }
 
         [JsonConverter(typeof(TimeIdentifierCategoryJsonConverter))]
-        public TimeIdentifierCategory? SampleField { get; set; }
+        public TimeIdentifierCategory? SampleField { get; init; }
 
-        public string StringFieldAfter { get; set; }
+        public string StringFieldAfter { get; init; }
 
         protected bool Equals(SampleClass other)
         {
