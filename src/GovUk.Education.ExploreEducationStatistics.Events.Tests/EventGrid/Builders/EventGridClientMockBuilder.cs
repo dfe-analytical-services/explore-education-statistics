@@ -18,7 +18,7 @@ public class EventGridClientMockBuilder
         {
             _mock
                 .Setup(m => m.SendEventAsync(It.IsAny<EventGridEvent>(), It.IsAny<CancellationToken>()))
-                .Callback((EventGridEvent eventGridEvent, CancellationToken cancellationToken) => _eventsPublished.Add(eventGridEvent))
+                .Callback((EventGridEvent eventGridEvent, CancellationToken _) => _eventsPublished.Add(eventGridEvent))
                 .ReturnsAsync(() => new MockResponse
                 {
                     StatusCode = _httpStatusCode

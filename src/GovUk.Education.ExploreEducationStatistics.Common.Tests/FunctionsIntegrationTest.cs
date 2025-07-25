@@ -103,7 +103,7 @@ public abstract class FunctionsIntegrationTestFixture
     public virtual IHostBuilder ConfigureTestHostBuilder()
     {
         return new HostBuilder()
-            .ConfigureAppConfiguration((hostContext, config) =>
+            .ConfigureAppConfiguration((_, config) =>
             {
                 config
                     .AddJsonFile("local.settings.json", optional: true, reloadOnChange: false)
