@@ -131,15 +131,20 @@ export default function DataSetFilePage({
       sections = omit(sections, 'dataSetFootnotes');
     }
 
-    if (
+    const hasNoApiChangelog =
       !apiDataSetVersionChanges ||
       (!Object.keys(apiDataSetVersionChanges.majorChanges).length &&
-        !Object.keys(apiDataSetVersionChanges.minorChanges).length &&
-        (!apiDataSetVersionChanges.patchHistory ||
-          apiDataSetVersionChanges.patchHistory.every(
-            change => !change || !Object.keys(change.minorChanges).length,
-          )))
-    ) {
+        !Object.keys(apiDataSetVersionChanges.minorChanges).length);
+
+    const hasNoPatchApiChangelog =
+      !apiDataSetVersionChanges ||
+      !apiDataSetVersionChanges.patchHistory ||
+      !apiDataSetVersionChanges.patchHistory ||
+      apiDataSetVersionChanges.patchHistory.every(
+        change => !change || !Object.keys(change.minorChanges).length,
+      );
+
+    if (hasNoApiChangelog && hasNoPatchApiChangelog) {
       sections = omit(sections, 'apiChangelog');
     }
 

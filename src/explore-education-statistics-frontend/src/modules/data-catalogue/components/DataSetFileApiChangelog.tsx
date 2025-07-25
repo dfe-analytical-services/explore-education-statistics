@@ -43,7 +43,7 @@ export default function DataSetFileApiChangelog({
         minorChanges={changes.minorChanges}
         version={version}
       />
-      <SectionBreak size="xl" />
+      {patchHistory.length > 0 && <SectionBreak size="xl" />}
 
       {patchHistory &&
         patchHistory.map(
@@ -69,7 +69,9 @@ export default function DataSetFileApiChangelog({
                       : `${patch.versionNumber.major}.${patch.versionNumber.minor}`
                   }
                 />
-                {idx !== patchHistory.length - 1 && <SectionBreak size="xl" />}
+                {patchHistory.length > 0 && idx !== patchHistory.length - 1 && (
+                  <SectionBreak size="xl" />
+                )}
               </React.Fragment>
             ),
         )}
