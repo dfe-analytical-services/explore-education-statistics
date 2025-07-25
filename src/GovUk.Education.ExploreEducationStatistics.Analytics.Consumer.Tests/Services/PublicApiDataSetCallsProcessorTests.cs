@@ -1,8 +1,10 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using GovUk.Education.ExploreEducationStatistics.Analytics.Consumer.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.DuckDb.DuckDb;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using InterpolatedSql.Dapper;
+using JetBrains.Annotations;
 using Xunit;
 
 namespace GovUk.Education.ExploreEducationStatistics.Analytics.Consumer.Tests.Services;
@@ -181,6 +183,7 @@ public abstract class PublicApiDataSetCallsProcessorTests : ProcessorTestsBase
         }
     }
     
+    [UsedImplicitly]
     private static void AssertReportRowOk(
         QueryReportLine queryReportRow,
         string expectedType,
@@ -226,6 +229,7 @@ public abstract class PublicApiDataSetCallsProcessorTests : ProcessorTestsBase
     }
 
     // ReSharper disable once ClassNeverInstantiated.Local
+    [SuppressMessage("ReSharper", "UnusedAutoPropertyAccessor.Local")]
     private record QueryReportLine
     {
         public Guid DataSetId { get; init; }
