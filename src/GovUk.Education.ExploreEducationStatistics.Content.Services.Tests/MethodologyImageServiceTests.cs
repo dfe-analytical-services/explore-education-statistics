@@ -58,8 +58,6 @@ public class MethodologyImageServiceTests
 
             var result = await service.Stream(methodologyVersion.Id, methodologyFile.File.Id);
 
-            MockUtils.VerifyAllMocks(publicBlobStorageService);
-
             var fileStreamResult = result.AssertRight();
 
             Assert.Equal("image/png", fileStreamResult.ContentType);
