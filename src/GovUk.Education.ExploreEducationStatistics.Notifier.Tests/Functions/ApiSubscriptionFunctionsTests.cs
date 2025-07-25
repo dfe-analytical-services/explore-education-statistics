@@ -52,12 +52,14 @@ public abstract class ApiSubscriptionFunctionsTests(NotifierFunctionsIntegration
                     null))
                 .Returns(It.IsAny<EmailNotificationResponse>())
                 .Callback((
+                        // ReSharper disable UnusedParameter.Local
                         string email,
                         string templateId,
                         Dictionary<string, dynamic> personalisation,
                         string clientReference,
                         string emailReplyToId,
                         string oneClickUnsubscribeUrl)
+                        // ReSharper restore UnusedParameter.Local
                     => verificationUrl = personalisation[NotifierEmailTemplateFields.VerificationUrl]);
 
             var result = await RequestPendingSubscription(
@@ -270,12 +272,14 @@ public abstract class ApiSubscriptionFunctionsTests(NotifierFunctionsIntegration
                     null))
                 .Returns(It.IsAny<EmailNotificationResponse>())
                 .Callback((
+                        // ReSharper disable UnusedParameter.Local
                         string email,
                         string templateId,
                         Dictionary<string, dynamic> personalisation,
                         string clientReference,
                         string emailReplyToId,
                         string oneClickUnsubscribeUrl)
+                        // ReSharper restore UnusedParameter.Local
                     => unsubscribeUrl = personalisation[NotifierEmailTemplateFields.UnsubscribeUrl]);
 
             var tokenService = GetRequiredService<ITokenService>();
@@ -586,12 +590,14 @@ public abstract class ApiSubscriptionFunctionsTests(NotifierFunctionsIntegration
                     null))
                 .Returns(It.IsAny<EmailNotificationResponse>())
                 .Callback((
+                        // ReSharper disable UnusedParameter.Local
                         string email,
-                        string templateId,
+                        string templateIdArg,
                         Dictionary<string, dynamic> personalisation,
                         string clientReference,
                         string emailReplyToId,
                         string oneClickUnsubscribeUrl)
+                        // ReSharper restore UnusedParameter.Local
                     => unsubscribeUrl = personalisation[NotifierEmailTemplateFields.UnsubscribeUrl]);
 
             await NotifyApiSubscribers(
