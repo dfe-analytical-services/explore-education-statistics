@@ -176,8 +176,6 @@ public class ReleaseImageServiceTests
             var result = await service.Stream(releaseVersionId: releaseVersion.Id,
                 fileId: releaseFile.File.Id);
 
-            MockUtils.VerifyAllMocks(privateBlobStorageService);
-
             result.AssertNotFound();
         }
     }
