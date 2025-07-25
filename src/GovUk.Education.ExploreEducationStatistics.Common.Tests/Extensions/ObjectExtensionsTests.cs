@@ -1,5 +1,6 @@
 #nullable enable
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using Xunit;
 
@@ -125,6 +126,7 @@ public static class ObjectExtensionsTests
             Assert.Equal(list, dictionary["List"]);
         }
 
+        [SuppressMessage("ReSharper", "UnusedAutoPropertyAccessor.Local")]
         private class TestClassWithPrimitives
         {
             public string String { get; init; } = string.Empty;
@@ -136,6 +138,8 @@ public static class ObjectExtensionsTests
             public object? Null { get; init; }
         }
 
+        [SuppressMessage("ReSharper", "UnusedMember.Local")]
+        [SuppressMessage("ReSharper", "UnusedAutoPropertyAccessor.Local")]
         private class TestClassWithHiddenProperties
         {
             public string Field { get; init; } = string.Empty;
@@ -150,6 +154,7 @@ public static class ObjectExtensionsTests
             }
         }
 
+        [SuppressMessage("ReSharper", "UnusedAutoPropertyAccessor.Local")]
         private class TestClassWithComplexTypes
         {
             public object? Anonymous { get; init; }
