@@ -17,7 +17,7 @@ public class PublicApiQueriesProcessor(
     {
         return workflow.Process(new WorkflowActor(
             sourceDirectory: SourceDirectory,
-            reportsDirectory: ReportsDirectory));;
+            reportsDirectory: ReportsDirectory));
     }
 
     private class WorkflowActor(string sourceDirectory, string reportsDirectory) 
