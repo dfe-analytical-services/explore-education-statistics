@@ -157,7 +157,7 @@ public class DataSetFileStorage(
     {
         await dataSetVersionService.CreateNextVersion(
             releaseFileId: dataReleaseFileId,
-            dataSetId: replacedReleaseDataFile!.PublicApiDataSetId!.Value,
+            dataSetId: replacedReleaseDataFile.PublicApiDataSetId!.Value,
             dataSetVersionToReplaceId: dataSetVersion.Id,
             cancellationToken
         ).OnFailureDo(_ =>
@@ -182,7 +182,7 @@ public class DataSetFileStorage(
             {
                 await dataSetVersionService.CreateNextVersion(
                     releaseFileId: dataReleaseFileId,
-                    dataSetId: replacedReleaseDataFile!.PublicApiDataSetId!.Value,
+                    dataSetId: replacedReleaseDataFile.PublicApiDataSetId!.Value,
                     dataSetVersionToReplaceId: null,
                     cancellationToken
                 ).OnFailureDo(_ =>

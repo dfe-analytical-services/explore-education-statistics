@@ -48,7 +48,7 @@ public class OrderedQueryableExtensionsTests
 
         // Act
         var result = orderedQueryable
-            .ThenByReleaseType()!
+            .ThenByReleaseType()
             .ToList();
 
         // Assert

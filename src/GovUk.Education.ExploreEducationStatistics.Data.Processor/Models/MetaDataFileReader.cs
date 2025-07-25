@@ -49,7 +49,7 @@ public class MetaDataFileReader
             AutoSelectFilterItemLabel = ReadMetaColumnValue(MetaColumns.filter_default, rowValues),
             IndicatorGrouping = ReadMetaColumnValue(MetaColumns.indicator_grouping, rowValues),
             IndicatorUnit = EnumUtil.GetFromEnumValue<IndicatorUnit>(indicatorUnit.DefaultsTo("")),
-            DecimalPlaces = !indicatorDp.IsNullOrEmpty() ? int.Parse(indicatorDp!) : null
+            DecimalPlaces = !indicatorDp.IsNullOrEmpty() ? int.Parse(indicatorDp) : null
         };
     }
 

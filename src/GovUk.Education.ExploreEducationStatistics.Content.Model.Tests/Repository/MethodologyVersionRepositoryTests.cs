@@ -409,7 +409,7 @@ public class MethodologyVersionRepositoryTests
             VerifyAllMocks(methodologyRepository);
 
             Assert.NotNull(result);
-            Assert.Equal(latestPublishedVersion.Id, result!.Id);
+            Assert.Equal(latestPublishedVersion.Id, result.Id);
         }
     }
 
