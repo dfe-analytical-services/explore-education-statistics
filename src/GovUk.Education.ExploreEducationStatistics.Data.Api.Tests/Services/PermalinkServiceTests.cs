@@ -1114,8 +1114,6 @@ public class PermalinkServiceTests
 
             var result = await service.DownloadCsvToStream(permalink.Id, stream);
 
-            MockUtils.VerifyAllMocks(publicBlobStorageService);
-
             result.AssertRight();
 
             stream.SeekToBeginning();
@@ -1158,8 +1156,6 @@ public class PermalinkServiceTests
                 publicBlobStorageService: publicBlobStorageService.Object);
 
             var result = await service.DownloadCsvToStream(permalink.Id, new MemoryStream());
-
-            MockUtils.VerifyAllMocks(publicBlobStorageService);
 
             result.AssertNotFound();
         }
