@@ -86,7 +86,7 @@ public static partial class LocationStringValidators
                         error.ErrorMessage = context.MessageFormatter
                             .AppendArgument("Property", propertyName)
                             .AppendArgument("MaxLength", error.FormattedMessagePlaceholderValues["MaxLength"])
-                            .BuildMessage(ValidationMessages.LocationValueMaxLength.Message);;
+                            .BuildMessage(ValidationMessages.LocationValueMaxLength.Message);
                         break;
                 }
 

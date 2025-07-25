@@ -366,7 +366,7 @@ public class FootnoteService : IFootnoteService
         IReadOnlySet<Guid> filterItemIds,
         IReadOnlySet<Guid> indicatorIds)
     {
-        IReadOnlyList<ReleaseSubject> releaseSubjects = await _releaseSubjectRepository.FindAll(
+        var releaseSubjects = await _releaseSubjectRepository.FindAll(
             releaseVersionId,
             HydrateReleaseSubjects);
 

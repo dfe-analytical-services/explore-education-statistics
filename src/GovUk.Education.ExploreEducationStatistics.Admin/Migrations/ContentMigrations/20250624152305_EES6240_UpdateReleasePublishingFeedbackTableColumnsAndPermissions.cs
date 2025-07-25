@@ -5,6 +5,7 @@
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMigrations;
 
 /// <inheritdoc />
+// ReSharper disable once InconsistentNaming
 public partial class EES6240_UpdateReleasePublishingFeedbackTableColumnsAndPermissions : Migration
 {
     /// <inheritdoc />

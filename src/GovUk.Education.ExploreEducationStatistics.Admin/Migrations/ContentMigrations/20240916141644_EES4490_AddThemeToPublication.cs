@@ -6,6 +6,7 @@ using System;
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMigrations;
 
 /// <inheritdoc />
+// ReSharper disable once InconsistentNaming
 public partial class EES4490_AddThemeToPublication : Migration
 {
     /// <inheritdoc />
