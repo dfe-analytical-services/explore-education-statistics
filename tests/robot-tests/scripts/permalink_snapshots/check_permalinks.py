@@ -189,7 +189,7 @@ class PermalinkChecker:
                 print(f"Permalink {permalink_id} has a warning")
                 if (
                     permalink_warning_message
-                    == "WarningWARNING - The data used in this table may now be out-of-date as a new release has been published since its creation"
+                    == "Warning A newer release of this publication is available and may include updated figures."
                 ):
                     permalink_out_of_date = True
 
