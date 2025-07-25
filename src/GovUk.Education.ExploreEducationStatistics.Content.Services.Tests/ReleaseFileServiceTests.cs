@@ -279,7 +279,7 @@ public class ReleaseFileServiceTests : IDisposable
                 fromPage: AnalyticsFromPage.DataCatalogue
             );
 
-            MockUtils.VerifyAllMocks(publicBlobStorageService, dataGuidanceFileWriter);
+            MockUtils.VerifyAllMocks(dataGuidanceFileWriter);
 
             result.AssertRight();
 
@@ -382,7 +382,7 @@ public class ReleaseFileServiceTests : IDisposable
                 fileIds: [fileId],
                 fromPage: AnalyticsFromPage.DataCatalogue);
 
-            MockUtils.VerifyAllMocks(publicBlobStorageService, dataGuidanceFileWriter);
+            MockUtils.VerifyAllMocks(dataGuidanceFileWriter);
 
             result.AssertRight();
 
@@ -776,8 +776,8 @@ public class ReleaseFileServiceTests : IDisposable
                 container: PublicReleaseFiles,
                 path: releaseFile1.PublicPath(),
                 content: "Test ancillary blob",
-                cancellationToken: tokenSource.Token)
-            .Callback(() => tokenSource.Cancel());
+                cancellationToken: tokenSource.Token,
+                callback: tokenSource.Cancel);
 
         // This should not happen during normal usage, as the public frontend doesn't allow users to request
         // multiple files. At the time of writing, the service only officially allows users to download all data
@@ -804,8 +804,6 @@ public class ReleaseFileServiceTests : IDisposable
                 fileIds: fileIds,
                 cancellationToken: tokenSource.Token
             );
-
-            MockUtils.VerifyAllMocks(publicBlobStorageService);
 
             result.AssertRight();
 
@@ -934,7 +932,7 @@ public class ReleaseFileServiceTests : IDisposable
                 outputStream: stream
             );
 
-            MockUtils.VerifyAllMocks(publicBlobStorageService, dataGuidanceFileWriter);
+            MockUtils.VerifyAllMocks(dataGuidanceFileWriter);
 
             result.AssertRight();
 
@@ -1019,8 +1017,6 @@ public class ReleaseFileServiceTests : IDisposable
                 fromPage: AnalyticsFromPage.DataCatalogue,
                 outputStream: stream
             );
-
-            MockUtils.VerifyAllMocks(publicBlobStorageService);
 
             result.AssertRight();
 
@@ -1126,8 +1122,6 @@ public class ReleaseFileServiceTests : IDisposable
                 fromPage: AnalyticsFromPage.ReleaseUsefulInfo,
                 outputStream: stream
             );
-
-            MockUtils.VerifyAllMocks(publicBlobStorageService);
 
             result.AssertRight();
 
