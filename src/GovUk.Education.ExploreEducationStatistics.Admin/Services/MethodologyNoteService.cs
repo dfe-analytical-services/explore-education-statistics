@@ -67,7 +67,7 @@ public class MethodologyNoteService : IMethodologyNoteService
                              && n.MethodologyVersionId == methodologyVersionId))
             .OnSuccessDo(methodologyNote =>
                 _userService.CheckCanUpdateMethodologyVersion(methodologyNote.MethodologyVersion))
-            .OnSuccessVoid(async methodologyNote =>
+            .OnSuccessVoid(async _ =>
             {
                 await _methodologyNoteRepository.DeleteNote(methodologyNoteId);
             });
@@ -86,7 +86,7 @@ public class MethodologyNoteService : IMethodologyNoteService
                              && n.MethodologyVersionId == methodologyVersionId))
             .OnSuccessDo(methodologyNote =>
                 _userService.CheckCanUpdateMethodologyVersion(methodologyNote.MethodologyVersion))
-            .OnSuccess(async methodologyNote =>
+            .OnSuccess(async _ =>
             {
                 var updatedNote = await _methodologyNoteRepository.UpdateNote(
                     methodologyNoteId: methodologyNoteId,
