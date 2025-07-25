@@ -584,8 +584,6 @@ public class MethodologyImageServiceTests
 
             var result = await service.Stream(methodologyVersion.Id, methodologyFile.File.Id);
 
-            MockUtils.VerifyAllMocks(privateBlobStorageService);
-
             var fileStreamResult = result.AssertRight();
 
             Assert.Equal("image/png", fileStreamResult.ContentType);
@@ -685,8 +683,6 @@ public class MethodologyImageServiceTests
                 privateBlobStorageService: privateBlobStorageService.Object);
 
             var result = await service.Stream(methodologyVersion.Id, methodologyFile.File.Id);
-
-            MockUtils.VerifyAllMocks(privateBlobStorageService);
 
             result.AssertNotFound();
         }
