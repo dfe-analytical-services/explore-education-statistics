@@ -81,7 +81,7 @@ public static class PredicateBuilder
         public ExpressionParameterReplacer(IList<ParameterExpression> fromParameters, IList<ParameterExpression> toParameters)
         {
             ParameterReplacements = new Dictionary<ParameterExpression, ParameterExpression>();
-            for (int i = 0; i != fromParameters.Count && i != toParameters.Count; i++)
+            for (var i = 0; i != fromParameters.Count && i != toParameters.Count; i++)
                 ParameterReplacements.Add(fromParameters[i], toParameters[i]);
         }
 
