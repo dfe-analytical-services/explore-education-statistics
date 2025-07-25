@@ -1,3 +1,5 @@
 .fixPosition {
   position: fixed;
+  // Allow space for sticky edit mode bar height
+  top: 60px;
 }
